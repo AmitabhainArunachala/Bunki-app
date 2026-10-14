@@ -1540,3 +1540,67 @@ html[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art { box-shadow: 0 0
     pointer-events: none;
   }
 }
+
+/* 2026-10-13 · today's reading opens the bookshelf (it stood on Today): one paper slip under the
+   masthead — the label, the title in the reading face, the room's forward arrow */
+html[data-room='shelf'] body:not(.zen) #app .shelf-today-read {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 14px;
+  width: 100%;
+  margin: 2px 0 20px;
+  padding: 14px 16px 15px;
+  border: var(--stroke-hairline) solid var(--color-edge-strong);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--elevation-paper);
+  color: var(--color-ink);
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--motion-press) var(--ease-standard);
+}
+html[data-room='shelf'] body:not(.zen) #app .shelf-today-read:active { transform: scale(0.99); }
+html[data-room='shelf'] .shelf-today-read-l {
+  grid-column: 1;
+  font: 600 11px/1.2 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+html[data-room='shelf'] body:not(.ui-bi) .shelf-today-read-l { letter-spacing: 0.2em; text-transform: none; font-size: 12px; }
+html[data-room='shelf'] .shelf-today-read-t {
+  grid-column: 1;
+  font: 600 17px/1.45 var(--font-reading);
+  word-break: keep-all;
+  line-break: strict;
+  overflow-wrap: anywhere;
+}
+html[data-room='shelf'] .shelf-today-read-arrow {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  position: relative;
+  width: 18px;
+  height: 1px;
+  background: var(--color-accent);
+  transition: transform var(--motion-quick) var(--ease-standard);
+}
+html[data-room='shelf'] .shelf-today-read-arrow::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 7px;
+  height: 7px;
+  border-top: 1px solid var(--color-accent);
+  border-right: 1px solid var(--color-accent);
+  transform: translateY(-50%) rotate(45deg);
+}
+html[data-room='shelf'] .shelf-today-read:hover .shelf-today-read-arrow { transform: translateX(3px); }
+@media (prefers-reduced-motion: reduce) {
+  html[data-room='shelf'] :is(.shelf-today-read, .shelf-today-read-arrow) { transition: none; }
+}
+/* on a phone the slip keeps clear of the room's vertical sign, as the masthead's words do */
+@media (max-width: 520px) {
+  html[data-room='shelf'] body:not(.zen) #app .shelf-today-read { width: calc(100% - 34px); }
+}

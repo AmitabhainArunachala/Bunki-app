@@ -13,7 +13,7 @@
     const value = raw?.[key];
     return [key, Number.isSafeInteger(value) && value >= 0 && value <= LIMIT_CAPS[key] ? value : fallback];
   }));
-  const STATUS = { received: 'Received', looking_into_it: 'Looking into it', preparing_fix: 'Preparing a fix', ready_for_review: 'Ready for review' };
+  const STATUS = { received: 'Received', looking_into_it: 'Looking into it', preparing_fix: 'Preparing a fix', ready_for_review: 'Ready for review', needs_info: 'Needs your answer', closed: 'Closed' };
   const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
   // Contract lengths count Unicode codepoints. UTF-16 slicing can split an emoji.
   const clip = (value, length) => typeof value === 'string' ? Array.from(value).slice(0, length).join('') : '';
@@ -134,6 +134,78 @@
         return url.href.replace(/\/$/, '');
       } catch { return ''; }
     }
+    // GitHub delivery. A static host has no report service, so a report is filed
+    // as a prefilled GitHub issue that the learner submits under their own
+    // account. Only an exact github.com new-issue address is accepted; a working
+    // report service or Lavish review still takes precedence.
+    function githubTarget() {
+      const gh = options.github;
+      if (!gh || typeof gh.newIssueUrl !== 'string') return null;
+      try {
+        const url = new URL(gh.newIssueUrl);
+        if (url.origin !== 'https://github.com' || url.search || url.hash || url.username || url.password ||
+          !/^\/[A-Za-z0-9-]+\/[A-Za-z0-9._-]+\/issues\/new$/.test(url.pathname)) return null;
+        return { url: url.href, label: /^[a-z0-9-]{1,50}$/.test(gh.label || '') ? gh.label : '', version: clip(gh.version, 40) };
+      } catch { return null; }
+    }
+    // A pending probe is not an absent service: GitHub is offered only when no
+    // service is configured or the probe confirmed this host has none (404/405).
+    const githubMode = () => !!githubTarget() && !canQueueReview() && (!service || serviceUnavailable);
+    // GitHub rejects very long new-issue addresses; the words are shortened to fit
+    // and the full text stays in the saved report on this device.
+    const MAX_ISSUE_URL = 7000;
+    function issueParts(report, words, shortened, compact = false) {
+      const target = githubTarget();
+      const ctx = report.context;
+      let diagnostics = {};
+      try { diagnostics = JSON.parse(report.evidence.find(item => item.kind === 'action_trace')?.summary || '{}') || {}; } catch { /* Context lines below still identify the screen. */ }
+      const code = value => `\`${String(value).replace(/`/g, "'")}\``;
+      const shots = report.attachment_ids.length;
+      const first = words.split(/\r?\n/).find(line => line.trim()) || 'Problem report';
+      const title = `[KAIRO] ${clip(first.trim(), 72)}`;
+      const body = [
+        '<!-- kairo-report v1 -->',
+        '### What happened', '', words + (shortened ? '\n\n_(Shortened to fit; the full text is saved in the app.)_' : ''), '',
+        '### What I expected', '', clip(report.expected, compact ? 200 : 600), '',
+        '### Where', '',
+        `- App: KAIRO ${target?.version || '(version unknown)'}`,
+        `- Screen: ${code(ctx.surface)}`,
+        `- Path: ${code(compact ? clip(ctx.route, 120) : ctx.route)}`,
+        ...(ctx.content_ids.length ? [`- Content: ${(compact ? ctx.content_ids.slice(0, 4).map(value => clip(value, 60)) : ctx.content_ids).map(code).join(', ')}`] : []),
+        `- Interface language: ${ctx.locale}`,
+        ...(diagnostics.viewport ? [`- Viewport: ${diagnostics.viewport.width}×${diagnostics.viewport.height}`] : []),
+        `- Category: ${report.category}`,
+        `- Reported: ${report.created_at}`,
+        `- Report ID on the device: ${code(report.id)}`,
+        ...(shots ? [`- Screenshots: ${shots} saved on the device. Attach them here if they help.`] : []),
+        ...(compact ? ['', '_Some screen details were left out to fit; Copy report text in the app has them all._'] : ['', '<details><summary>Recent screens</summary>', '', '```json', JSON.stringify(diagnostics.action_trace || []), '```', '', '</details>']),
+      ].join('\n');
+      return { title, body };
+    }
+    function issueUrl(report) {
+      const target = githubTarget();
+      if (!target) return '';
+      const address = (words, shortened, compact) => {
+        const { title, body } = issueParts(report, words, shortened, compact);
+        return `${target.url}?${new URLSearchParams({ title, body, ...(target.label ? { labels: target.label } : {}) })}`;
+      };
+      const chars = Array.from(report.user_words);
+      // Full words first; then the shortest form of the screen details; then
+      // the longest prefix of the words that still fits. Never over the limit.
+      for (const compact of [false, true]) {
+        const full = address(report.user_words, false, compact);
+        if (full.length <= MAX_ISSUE_URL) return full;
+        if (address('', true, compact).length > MAX_ISSUE_URL) continue;
+        let low = 0, high = chars.length;
+        while (low < high) {
+          const middle = Math.ceil((low + high) / 2);
+          if (address(chars.slice(0, middle).join(''), true, compact).length <= MAX_ISSUE_URL) low = middle; else high = middle - 1;
+        }
+        if (!compact && low >= Math.min(chars.length, 400)) return address(chars.slice(0, low).join(''), true, false);
+        if (compact) return address(chars.slice(0, low).join(''), true, true);
+      }
+      return `${target.url}?${new URLSearchParams({ title: issueParts(report, '', false).title, body: '<!-- kairo-report v1 -->\n\nThis report was too long to fill in here. Paste it from Copy report text in the app.', ...(target.label ? { labels: target.label } : {}) })}`;
+    }
     const metaKey = name => `${name}:${service || 'unconfigured'}`;
     const emptyDraft = () => { draftCanAdoptBuild = true; return { actual: '', expected: '', category: 'bug', context: capture(), attachments: [], created_at: new Date().toISOString() }; };
     function serviceBuild() {
@@ -152,7 +224,8 @@
       if (!context.build.git_sha && !context.build.artifact_sha256 && serviceBuild()) context.build = serviceBuild();
       // Caller supplies semantic actions only; arbitrary nested payloads are discarded.
       const action_trace = (Array.isArray(source.action_trace) ? source.action_trace : []).slice(-8).filter(item => item && typeof item.action === 'string').map(item => ({ action: clip(item.action, 100), ...(typeof item.target === 'string' ? { target: clip(item.target, 160) } : {}), ...(typeof item.at === 'string' ? { at: clip(item.at, 40) } : {}) }));
-      const diagnostics = { viewport: { width: Math.round(window.innerWidth), height: Math.round(window.innerHeight) }, ...(source.content_revision ? { content_revision: clip(source.content_revision, 160) } : {}), action_trace };
+      const appVersion = clip(options.appVersion || options.github?.version, 40);
+      const diagnostics = { viewport: { width: Math.round(window.innerWidth), height: Math.round(window.innerHeight) }, ...(appVersion ? { app_version: appVersion } : {}), ...(source.content_revision ? { content_revision: clip(source.content_revision, 160) } : {}), action_trace };
       return { context, diagnostics };
     }
 
@@ -171,6 +244,27 @@
       });
     }
     const putMeta = (key, value) => transact(['meta'], tx => tx.objectStore('meta').put({ key, value }));
+    // Screenshots are stored as bytes, never as Blobs: some WebKit builds (Safari
+    // private browsing, some iPhones) fail, or never finish, a Blob write to
+    // IndexedDB. Earlier versions stored Blobs, and every reader accepts either form.
+    // A stored draft keeps its screenshots under `screenshots`, so an earlier version
+    // sees the draft without them instead of a screenshot it cannot preview.
+    const blobOf = item => item.blob || new Blob([item.bytes], { type: item.mime_type });
+    async function asBytes(item) {
+      if (!item.blob) return item;
+      const { blob, ...rest } = item;
+      return { ...rest, bytes: await blob.arrayBuffer() };
+    }
+    async function storedDraft(value) {
+      if (!Array.isArray(value?.attachments) || !value.attachments.length) return value;
+      return { ...value, attachments: [], screenshots: await Promise.all(value.attachments.map(asBytes)) };
+    }
+    function liveDraft(value) {
+      if (!value || typeof value !== 'object' || (!Array.isArray(value.attachments) && !Array.isArray(value.screenshots))) return value;
+      const { screenshots, ...rest } = value;
+      const items = [...(Array.isArray(rest.attachments) ? rest.attachments : []), ...(Array.isArray(screenshots) ? screenshots : [])];
+      return { ...rest, attachments: items.map(({ bytes, ...item }) => item.blob ? item : { ...item, blob: new Blob([bytes], { type: item.mime_type }) }) };
+    }
     function announce(value) { root.querySelector('#br-live').textContent = value; }
     function setMessage(value) { message = value; announce(value); const element = body.querySelector('.br-notice'); if (element) { element.textContent = value; element.hidden = !value; } if (closing) protectClosingDialog(); }
     const canQueueReview = () => typeof window.lavish?.queuePrompt === 'function';
@@ -249,12 +343,12 @@
       try { pointer = sessionStorage.getItem(`bunki-reports-editor:${metaKey(name)}`); } catch { /* Recovery remains available below. */ }
       const row = pointer ? await read('meta', `${metaKey(name)}:${pointer}`) : null;
       if (row?.value?.draft_id === pointer && Number.isSafeInteger(row.value.revision) && row.value.revision > 0) {
-        return { slot: { id: pointer, revision: row.value.revision }, value: row.value.draft, recovered: true };
+        return { slot: { id: pointer, revision: row.value.revision }, value: liveDraft(row.value.draft), recovered: true };
       }
       // Copy legacy slots without deleting them. Older clients and another tab
       // may still own the old key; migration must not erase their only copy.
       const legacy = await read('meta', metaKey(name));
-      return { slot: newSlot(), value: legacy?.value || fallback(), recovered: !!legacy?.value };
+      return { slot: newSlot(), value: legacy?.value ? liveDraft(legacy.value) : fallback(), recovered: !!legacy?.value };
     }
     async function savedSlots(name, current) {
       const prefix = `${metaKey(name)}:`;
@@ -274,6 +368,7 @@
       const write = async () => {
         const db = await dbPromise;
         let nextId = slot.id, nextRevision, forked = false;
+        const draftValue = await storedDraft(snapshot);
         await new Promise((resolve, reject) => {
           const tx = db.transaction('meta', 'readwrite'), store = tx.objectStore('meta');
           tx.oncomplete = resolve;
@@ -285,7 +380,9 @@
               nextId = id('draft'); forked = true;
             }
             nextRevision = forked ? 1 : slot.revision + 1;
-            store.put({ key: `${metaKey(name)}:${nextId}`, value: { draft_id: nextId, revision: nextRevision, owner: documentOwner, draft: snapshot } });
+            // A refused value fails this save; it must not escape as an uncaught error.
+            try { store.put({ key: `${metaKey(name)}:${nextId}`, value: { draft_id: nextId, revision: nextRevision, owner: documentOwner, draft: draftValue } }); }
+            catch (error) { reject(error); try { tx.abort(); } catch { /* The transaction has already ended. */ } }
           };
         });
         slot.id = nextId; slot.revision = nextRevision;
@@ -323,7 +420,7 @@
         if (!row || (key !== metaKey(name) && !key.startsWith(prefix))) throw new Error('That draft is no longer available.');
         // Recovery gets its own identity; the source stays intact even if another
         // tab is still editing it or the browser restarts during the next save.
-        const slot = newSlot(), value = structuredClone(row.value?.draft_id ? row.value.draft : row.value);
+        const slot = newSlot(), value = liveDraft(structuredClone(row.value?.draft_id ? row.value.draft : row.value));
         if (name === 'draft') { draft = value; draftSlot = slot; draftDirty = true; draftCanAdoptBuild = false; }
         else { const reportId = name.slice(9); followups[reportId] = value; followupSlots[reportId] = slot; }
         await persistSlot(name, slot, value);
@@ -338,12 +435,16 @@
       saveTimer = setTimeout(() => run(persistDraft).catch(() => setMessage('This draft could not be saved on this device. Keep the sheet open and copy your text before leaving.')), 150);
     }
     async function refreshRows() {
-      rows = (await read('records')).filter(row => row.service === service).sort((a, b) => b.created_at.localeCompare(a.created_at));
+      // A report never sent anywhere (no receipt, no frozen request, not opened on GitHub
+      // or queued in Lavish) follows the device to its current service, so reports saved
+      // before a report service was set up are delivered through it.
+      const unsentElsewhere = row => !row.view?.receipt && !row.wire_text && !row.github_opened_at && !row.review_queued_at;
+      rows = (await read('records')).filter(row => row.service === service || (service && unsentElsewhere(row))).sort((a, b) => b.created_at.localeCompare(a.created_at));
       root.querySelector('.br-count').textContent = rows.length ? String(rows.length) : '';
       root.querySelector('.br-count').hidden = !rows.length;
     }
     function statusLabel(row) {
-      if (!row.view?.receipt) return row.review_queued_at ? 'Queued in Lavish' : 'Saved on this device';
+      if (!row.view?.receipt) return row.review_queued_at ? 'Queued in Lavish' : row.github_opened_at ? 'Opened on GitHub' : 'Saved on this device';
       // A release claim needs server evidence; unknown client/model statuses cannot claim a fix.
       if (row.view.status === 'fixed' && row.view.release?.verified === true && row.view.release?.version) return `Fixed in ${row.view.release.version}`;
       return STATUS[row.view.status] || 'Received';
@@ -381,11 +482,13 @@
       const attachments = [];
       for (const attachmentId of report.attachment_ids) {
         const item = await read('attachments', attachmentId);
-        if (!item?.blob) throw new Error('A saved attachment is missing. The report was kept and has not been sent.');
-        attachments.push({ id: item.id, name: item.name, mime_type: item.mime_type, data_base64: await attachmentBase64(item.blob) });
+        if (!item?.blob && !item?.bytes) throw new Error('A saved attachment is missing. The report was kept and has not been sent.');
+        attachments.push({ id: item.id, name: item.name, mime_type: item.mime_type, data_base64: await attachmentBase64(blobOf(item)) });
       }
       const wire_text = canonical({ idempotency_key: row.idempotency_key, report, attachments });
-      const frozen = { ...row, report, wire_text, wire_sha256: await digest(wire_text) };
+      // A report adopted from before setup is bound to this service as it is frozen, so a failed
+      // first delivery keeps it listed here and retried, rather than tied to where it was saved.
+      const frozen = { ...row, service, report, wire_text, wire_sha256: await digest(wire_text) };
       await transact(['records'], tx => tx.objectStore('records').put(frozen));
       return frozen;
     }
@@ -400,7 +503,7 @@
       try {
         await refreshRows();
         if (!config && !await loadConfig()) return;
-        for (let row of rows.filter(item => !item.view?.receipt)) {
+        for (let row of rows.filter(item => !item.view?.receipt && !item.github_opened_at)) {
           try {
             const auth = await session();
             row = await freezePayload(row, auth);
@@ -418,7 +521,7 @@
         await refreshRows();
         if (dialog.open && active !== 'new' && !busy && !body.querySelector('textarea:focus')) render();
       } catch (error) { configError = errorText(error); }
-      finally { syncing = false; if (!disposed && !closing && service && !serviceUnavailable && !canQueueReview() && rows.some(row => !row.view?.receipt)) retryTimer = setTimeout(() => run(sync), 30000); }
+      finally { syncing = false; if (!disposed && !closing && service && !serviceUnavailable && !canQueueReview() && rows.some(row => !row.view?.receipt && !row.github_opened_at)) retryTimer = setTimeout(() => run(sync), 30000); }
     }
 
     function snapshotReturn() {
@@ -490,14 +593,14 @@
       const scopeChanged = canonical({ surface: context?.surface, ids: context?.content_ids }) !== canonical({ surface: currentContext.surface, ids: currentContext.content_ids });
       const scope = [context?.surface?.replace(/^corridor\//, '').replaceAll('/', ' › '), ...(context?.content_ids || [])].filter(Boolean).join(' · ');
       return `${notice()}<p>Tell us what happened. Your place in the lesson stays here.</p><p class="br-context-summary"><strong>Reporting this screen</strong><br>${esc(scope)}${scopeChanged ? '<br><button type="button" data-br="context">Use the current screen for this draft</button>' : ''}</p>${options.clockNotice ? `<p class="br-note">${esc(typeof options.clockNotice === 'function' ? options.clockNotice() : options.clockNotice)}</p>` : ''}
-        ${configError ? `<p class="br-note">${esc(configError)}</p>` : ''}${recoveryMarkup(savedDrafts, 'recover-draft', 'reports')}<form id="br-form"><label class="br-field"><span>What happened?</span><textarea id="br-actual" name="actual" ${busy ? 'readonly' : ''} required maxlength="12000" rows="4" placeholder="Which sentence or control was involved?">${esc(draft?.actual)}</textarea></label>
+        ${configError && !githubMode() ? `<p class="br-note">${esc(configError)}</p>` : ''}${recoveryMarkup(savedDrafts, 'recover-draft', 'reports')}<form id="br-form"><label class="br-field"><span>What happened?</span><textarea id="br-actual" name="actual" ${busy ? 'readonly' : ''} required maxlength="12000" rows="4" placeholder="Which sentence or control was involved?">${esc(draft?.actual)}</textarea></label>
         <label class="br-field"><span>What did you expect? <small>Optional</small></span><textarea id="br-expected" name="expected" ${busy ? 'readonly' : ''} maxlength="4000" rows="2">${esc(draft?.expected)}</textarea></label>
         <label class="br-field"><span>Category</span><select id="br-category" name="category" ${busy ? 'disabled' : ''}>${[['bug', 'Something isn’t working'], ['content', 'Language or content'], ['experience', 'Learning experience'], ['idea', 'An idea']].map(([value, label]) => `<option value="${value}" ${draft?.category === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label>
-        ${exactContext(draft?.context)}<label class="br-field"><span>Add a screenshot <small>Optional</small></span><input id="br-files" type="file" accept="image/png,image/jpeg,image/webp" multiple ${attachmentBusy || busy ? 'disabled' : ''} aria-describedby="br-file-note"></label><p id="br-file-note" class="br-note">Choose an image yourself. Preview it below and remove anything private. PNG, JPEG or WebP; up to ${limits.attachment_count} images, ${Math.floor(limits.attachment_bytes / 1048576)} MB each.</p><div class="br-attachments">${(draft?.attachments || []).map(preview).join('')}</div>
-        <div class="br-actions"><button type="submit" class="br-primary" ${busy || attachmentBusy ? 'disabled' : ''}>${busy ? 'Saving…' : canQueueReview() ? 'Save & queue in Lavish' : service && !serviceUnavailable ? 'Send report' : 'Save on this device'}</button><button type="button" data-br="close">Return to lesson</button></div><p class="br-note">${canQueueReview() ? 'Your words and screen context will join the Lavish feedback queue. Press Send to Agent in Lavish when ready. Screenshots remain saved here; use Lavish annotations to share images.' : 'Saving keeps the report in this browser. “Received” appears only when a connected service confirms delivery.'}</p></form>`;
+        ${exactContext(draft?.context)}${githubMode() && !draft?.attachments?.length ? '<p class="br-note">To include a screenshot, attach it on GitHub after the report opens there.</p>' : `<label class="br-field"><span>Add a screenshot <small>Optional</small></span><input id="br-files" type="file" accept="image/png,image/jpeg,image/webp" multiple ${attachmentBusy || busy ? 'disabled' : ''} aria-describedby="br-file-note"></label><p id="br-file-note" class="br-note">Choose an image yourself. Preview it below and remove anything private. PNG, JPEG or WebP; up to ${limits.attachment_count} images, ${Math.floor(limits.attachment_bytes / 1048576)} MB each.</p><div class="br-attachments">${(draft?.attachments || []).map(preview).join('')}</div>`}
+        <div class="br-actions"><button type="submit" class="br-primary" ${busy || attachmentBusy ? 'disabled' : ''}>${busy ? 'Saving…' : canQueueReview() ? 'Save & queue in Lavish' : githubMode() ? 'Send to GitHub' : service && !serviceUnavailable ? 'Send report' : 'Save on this device'}</button><button type="button" data-br="close">Return to lesson</button></div><p class="br-note">${canQueueReview() ? 'Your words and screen context will join the Lavish feedback queue. Press Send to Agent in Lavish when ready. Screenshots remain saved here; use Lavish annotations to share images.' : githubMode() ? 'This opens GitHub with your words and this screen filled in. Tap “Submit new issue” there to send it. Issues in this repository are public, so leave out anything private. A copy stays on this device.' : config?.public_reports === true && service && !serviceUnavailable ? 'Send report files it as a public GitHub issue, with its screenshots, so leave out anything private. A copy stays on this device.' : 'Saving keeps the report in this browser. “Received” appears only when a connected service confirms delivery.'}</p></form>`;
     }
     function listMarkup() {
-      return `${notice()}<p class="br-note">Reports and guest access are saved in this browser. Clearing browser data removes that access.</p><div class="br-actions"><button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button><button type="button" data-br="new">New report</button></div>${configError ? `<p class="br-note">${esc(configError)}</p>` : ''}${rows.length ? `<ul class="br-report-list">${rows.map(row => `<li><button type="button" data-br="detail" data-id="${esc(row.id)}"><span class="br-report-title">${esc(clip(row.report.user_words, 140))}${Array.from(row.report.user_words).length > 140 ? '…' : ''}</span><span class="br-status">${esc(statusLabel(row))}</span><time class="br-date" datetime="${esc(row.created_at)}">${esc(new Date(row.created_at).toLocaleDateString())}</time></button></li>`).join('')}</ul>` : '<h3>No reports yet</h3><p>A report can describe something broken, a language issue, or an idea for KAIRO.</p>'}`;
+      return `${notice()}<p class="br-note">${githubMode() ? 'Reports are saved in this browser. Open one to send it to GitHub, where it is filed for fixing.' : 'Reports and guest access are saved in this browser. Clearing browser data removes that access.'}</p><div class="br-actions"><button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button><button type="button" data-br="new">New report</button></div>${configError ? `<p class="br-note">${esc(configError)}</p>` : ''}${rows.length ? `<ul class="br-report-list">${rows.map(row => `<li><button type="button" data-br="detail" data-id="${esc(row.id)}"><span class="br-report-title">${esc(clip(row.report.user_words, 140))}${Array.from(row.report.user_words).length > 140 ? '…' : ''}</span><span class="br-status">${esc(statusLabel(row))}</span><time class="br-date" datetime="${esc(row.created_at)}">${esc(new Date(row.created_at).toLocaleDateString())}</time></button></li>`).join('')}</ul>` : '<h3>No reports yet</h3><p>A report can describe something broken, a language issue, or an idea for KAIRO.</p>'}`;
     }
     function proposalMarkup(proposal) {
       return `<section class="br-proposal"><h3>${esc(proposal.title)}</h3><p class="br-note">Sensei proposal · ${esc(proposal.origin?.model_ref || 'Model not supplied')} · Requires operator review</p><p class="br-verbatim">${esc(proposal.problem)}</p><h4>Suggested change</h4><p class="br-verbatim">${esc(proposal.proposed_change)}</p>${proposal.claims?.length ? `<h4>Claims and evidence</h4><ul>${proposal.claims.map(claim => `<li><strong>${esc(({ user_report: 'Reported', inspection: 'Inspected', hypothesis: 'Hypothesis' })[claim.basis] || claim.basis)}:</strong> ${esc(claim.text)}<br><span class="br-note">Evidence: ${esc((claim.evidence_ids || []).join(', '))}</span></li>`).join('')}</ul>` : ''}<h4>Acceptance checks</h4><ol>${(proposal.acceptance_cases || []).map(item => `<li><strong>Given</strong> ${esc(item.given)}<br><strong>When</strong> ${esc(item.when)}<br><strong>Then</strong> ${esc(item.then)}</li>`).join('')}</ol>${proposal.unknowns?.length ? `<h4>Still uncertain</h4><ul>${proposal.unknowns.map(item => `<li>${esc(item)}</li>`).join('')}</ul>` : ''}<h4>Rollback</h4><p>${esc(proposal.rollback)}</p><p class="br-note">Source reports: ${esc((proposal.source_report_ids || []).join(', '))}</p><details><summary>Inspect complete proposal JSON</summary><pre>${esc(JSON.stringify(proposal, null, 2))}</pre></details><button type="button" data-br="export" data-id="${esc(proposal.id)}">Export this proposal JSON</button><p class="br-note">This proposal requests review. It cannot change the app or grant execution permission.</p></section>`;
@@ -507,8 +610,11 @@
       if (!row) { active = 'list'; return listMarkup(); }
       const report = row.report, view = row.view, isReceived = !!view?.receipt, follow = followups[row.id]?.text || '', pending = followups[row.id]?.pending;
       const protectedAnswer = typeof options.protectAnswers === 'function' ? options.protectAnswers() : options.protectAnswers === true;
-      return `${notice()}<button type="button" data-br="list">Back to my reports</button><h3>${esc(statusLabel(row))}</h3><p class="br-note">${isReceived ? `Receipt ${esc(view.receipt.receipt_id)}` : row.review_queued_at ? 'Your words and screen context are queued in Lavish. Use Send to Agent there when you are ready. A copy remains saved in this browser.' : 'Saved locally. You can leave this sheet; the report stays in this browser until it can be sent.'}</p>${row.delivery_error && !serviceUnavailable && !canQueueReview() ? `<p class="br-note">${esc(row.delivery_error)}</p>` : ''}<h4>Your original words</h4><p class="br-verbatim">${esc(report.user_words)}</p><h4>What you expected</h4><p class="br-verbatim">${esc(report.expected)}</p>${exactContext({ context: report.context, evidence: report.evidence.filter(item => item.kind === 'action_trace'), attachment_ids: report.attachment_ids })}<div class="br-actions"><button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button>${!isReceived && canQueueReview() ? `<button type="button" data-br="queue-review" ${busy ? 'disabled' : ''}>${row.review_queued_at ? 'Queue in Lavish again' : 'Queue in Lavish'}</button>` : ''}${isReceived ? `<button type="button" data-br="propose" ${busy || ['running', 'pending'].includes(view.triage?.state) && view.triage?.state !== 'pending' ? 'disabled' : ''}>Ask Sensei for a proposal</button>` : ''}</div>
-        ${isReceived ? `<h3>Sensei analysis</h3>${protectedAnswer ? '<p class="br-note">Your report is available. AI analysis and proposals can be read after the protected sitting ends, to keep answer support unchanged.</p>' : `<p class="br-note">${esc(triageText(view))}</p>${view.conversation?.length ? `<ol class="br-thread">${view.conversation.map(item => `<li><strong>${esc(item.actor === 'sensei' ? 'Sensei · AI interpretation' : item.actor === 'user' ? 'You' : 'Service update')}</strong><p class="br-verbatim">${esc(item.text)}</p></li>`).join('')}</ol>` : ''}${(view.proposals || []).map(proposalMarkup).join('')}`}${recoveryMarkup(savedFollowups, 'recover-followup', 'follow-ups')}${pending ? `<section class="br-pending"><h4>Awaiting confirmation</h4><p class="br-verbatim">${esc(pending.data.text)}</p><button type="button" data-br="retry-followup" ${busy ? 'disabled' : ''}>Retry pending follow-up</button><p class="br-note">This retries the same message and request ID. The text below is kept separately.</p></section>` : ''}<form id="br-follow-form"><label class="br-field"><span>Add a detail or reply</span><textarea id="br-follow" ${recovering || !followupSlots[row.id] ? 'readonly' : ''} maxlength="4000" rows="3">${esc(follow)}</textarea></label><div class="br-actions"><button type="submit" ${busy || pending || !followupSlots[row.id] ? 'disabled' : ''}>Send follow-up</button><button type="button" data-br="reopen" ${busy || pending || !followupSlots[row.id] ? 'disabled' : ''}>Still happening</button></div><p class="br-note">“Still happening” keeps this thread and adds the current screen context.</p></form>` : ''}`;
+      const githubSend = !isReceived && githubMode();
+      const issue = isReceived && /^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+$/.test(view.issue?.url || '') ? view.issue : null;
+      const withoutAi = config?.ai?.status === 'none';
+      return `${notice()}<button type="button" data-br="list">Back to my reports</button><h3>${esc(statusLabel(row))}</h3><p class="br-note">${issue ? `Filed as issue #${esc(issue.number)}. <a href="${esc(issue.url)}" target="_blank" rel="noopener">Open it on GitHub</a>` : isReceived ? `Receipt ${esc(view.receipt.receipt_id)}` : row.review_queued_at ? 'Your words and screen context are queued in Lavish. Use Send to Agent there when you are ready. A copy remains saved in this browser.' : githubSend ? (row.github_opened_at ? 'GitHub was opened with this report. If you did not tap “Submit new issue” there, send it again.' : 'Not sent yet. Send it to GitHub to file it for fixing.') : 'Saved locally. You can leave this sheet; the report stays in this browser until it can be sent.'}</p>${githubSend ? `<div class="br-actions"><a class="br-primary br-link" href="${esc(issueUrl(report))}" target="_blank" rel="noopener" data-br="github" data-id="${esc(row.id)}">${row.github_opened_at ? 'Send to GitHub again' : 'Send to GitHub'}</a><button type="button" data-br="copy" data-id="${esc(row.id)}">Copy report text</button></div>` : ''}${row.delivery_error && !serviceUnavailable && !canQueueReview() ? `<p class="br-note">${esc(row.delivery_error)}</p>` : ''}<h4>Your original words</h4><p class="br-verbatim">${esc(report.user_words)}</p><h4>What you expected</h4><p class="br-verbatim">${esc(report.expected)}</p>${exactContext({ context: report.context, evidence: report.evidence.filter(item => item.kind === 'action_trace'), attachment_ids: report.attachment_ids })}<div class="br-actions">${githubSend ? '' : `<button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button>`}${!isReceived && canQueueReview() ? `<button type="button" data-br="queue-review" ${busy ? 'disabled' : ''}>${row.review_queued_at ? 'Queue in Lavish again' : 'Queue in Lavish'}</button>` : ''}${isReceived && !withoutAi ? `<button type="button" data-br="propose" ${busy || ['running', 'pending'].includes(view.triage?.state) && view.triage?.state !== 'pending' ? 'disabled' : ''}>Ask Sensei for a proposal</button>` : ''}</div>
+        ${isReceived ? `<h3>${withoutAi ? 'Progress' : 'Sensei analysis'}</h3>${protectedAnswer ? '<p class="br-note">Your report is available. AI analysis and proposals can be read after the protected sitting ends, to keep answer support unchanged.</p>' : `<p class="br-note">${esc(triageText(view))}</p>${view.conversation?.length ? `<ol class="br-thread">${view.conversation.map(item => `<li><strong>${esc(item.actor === 'sensei' ? 'Sensei · AI interpretation' : item.actor === 'user' ? 'You' : withoutAi ? 'On GitHub' : 'Service update')}</strong><p class="br-verbatim">${esc(item.text)}</p></li>`).join('')}</ol>` : ''}${(view.proposals || []).map(proposalMarkup).join('')}`}${recoveryMarkup(savedFollowups, 'recover-followup', 'follow-ups')}${pending ? `<section class="br-pending"><h4>Awaiting confirmation</h4><p class="br-verbatim">${esc(pending.data.text)}</p><button type="button" data-br="retry-followup" ${busy ? 'disabled' : ''}>Retry pending follow-up</button><p class="br-note">This retries the same message and request ID. The text below is kept separately.</p></section>` : ''}<form id="br-follow-form"><label class="br-field"><span>Add a detail or reply</span><textarea id="br-follow" ${recovering || !followupSlots[row.id] ? 'readonly' : ''} maxlength="4000" rows="3">${esc(follow)}</textarea></label><div class="br-actions"><button type="submit" ${busy || pending || !followupSlots[row.id] ? 'disabled' : ''}>Send follow-up</button><button type="button" data-br="reopen" ${busy || pending || !followupSlots[row.id] ? 'disabled' : ''}>Still happening</button></div><p class="br-note">“Still happening” keeps this thread and adds the current screen context.</p></form>` : ''}`;
     }
     function triageText(view) {
       const triage = view.triage;
@@ -518,31 +624,47 @@
       return config?.ai?.status && !['ready', 'available'].includes(config.ai.status) ? `AI service: ${config.ai.status}. No model response has been received.` : 'No model response has been received yet. Ask Sensei for a proposal when you are ready.';
     }
 
-    async function submitReport() {
+    function buildReport(source, reportId, createdAt = new Date().toISOString()) {
+      return { schema_version: SCHEMA, id: reportId, revision: 1, created_at: createdAt, origin: { kind: 'user', actor_ref: 'pending_guest_session', model_ref: null }, context: source.context.context, evidence: [{ id: id('evidence'), kind: 'user_quote', summary: clip(source.actual.trim(), 4000), artifact_ref: null }, { id: id('evidence'), kind: 'action_trace', summary: JSON.stringify(source.context.diagnostics), artifact_ref: null }, ...source.attachments.map(item => ({ id: id('evidence'), kind: 'screenshot', summary: `User-selected screenshot: ${item.name}`, artifact_ref: `attachment:${item.id}` }))], execution_authority: 'none', kind: 'learner_report', category: source.category, user_words: clip(source.actual.trim(), 12000), expected: clip(source.expected.trim(), 4000) || 'Not specified', actual: clip(source.actual.trim(), 4000), reproduction_steps: [], attachment_ids: source.attachments.map(item => item.id) };
+    }
+    // preset carries the identity of a report already opened on GitHub in the
+    // submit gesture, so the saved copy and the filed issue name the same report.
+    async function submitReport(preset = null) {
       if (busy || attachmentBusy || !draft?.actual.trim()) return;
       busy = true; setMessage('Saving the report and selected screenshots on this device…'); render();
+      let stored = false;
       try {
         if (draftCanAdoptBuild && service && new URL(service).origin === location.origin && !draft.context.context.build.git_sha) await loadConfig();
         await persistDraft();
         const submittedDraft = structuredClone(draft), submittedSlot = { ...draftSlot };
-        const reportId = id('report'), report = { schema_version: SCHEMA, id: reportId, revision: 1, created_at: new Date().toISOString(), origin: { kind: 'user', actor_ref: 'pending_guest_session', model_ref: null }, context: submittedDraft.context.context, evidence: [{ id: id('evidence'), kind: 'user_quote', summary: clip(submittedDraft.actual.trim(), 4000), artifact_ref: null }, { id: id('evidence'), kind: 'action_trace', summary: JSON.stringify(submittedDraft.context.diagnostics), artifact_ref: null }, ...submittedDraft.attachments.map(item => ({ id: id('evidence'), kind: 'screenshot', summary: `User-selected screenshot: ${item.name}`, artifact_ref: `attachment:${item.id}` }))], execution_authority: 'none', kind: 'learner_report', category: submittedDraft.category, user_words: clip(submittedDraft.actual.trim(), 12000), expected: clip(submittedDraft.expected.trim(), 4000) || 'Not specified', actual: clip(submittedDraft.actual.trim(), 4000), reproduction_steps: [], attachment_ids: submittedDraft.attachments.map(item => item.id) };
-        const row = { id: reportId, idempotency_key: id('delivery'), service, created_at: report.created_at, report, view: null, delivery_error: '' };
+        const reportId = preset?.id || id('report'), report = buildReport(submittedDraft, reportId, preset?.created_at);
+        const row = { id: reportId, idempotency_key: id('delivery'), service, created_at: report.created_at, report, view: null, delivery_error: '', ...(preset?.opened ? { github_opened_at: new Date().toISOString() } : {}) };
+        const attachments = await Promise.all(submittedDraft.attachments.map(asBytes));
         await transact(['records', 'attachments', 'meta'], tx => {
           tx.objectStore('records').put(row);
-          for (const item of submittedDraft.attachments) tx.objectStore('attachments').put({ ...item, report_id: reportId });
+          for (const item of attachments) tx.objectStore('attachments').put({ ...item, report_id: reportId });
           const store = tx.objectStore('meta'), key = slotKey('draft', submittedSlot), request = store.get(key);
           request.onsuccess = () => {
             const saved = request.result?.value;
             if (saved?.owner === documentOwner && saved.revision === submittedSlot.revision) store.delete(key);
           };
         });
+        stored = true;
         draft = emptyDraft(); draftSlot = newSlot(); rememberSlot('draft', draftSlot); draftDirty = false;
         selectedId = reportId; active = 'detail';
-        message = 'Saved on this device. It has not been sent.';
+        message = preset?.opened ? 'GitHub opened with this report filled in. Tap “Submit new issue” there to send it. A copy is saved here.'
+          : preset ? 'Saved here. Tap “Send to GitHub” below to file it.'
+            : 'Saved on this device. It has not been sent.';
         if (canQueueReview()) await queueReview(row);
         await refreshRows();
         announce(message);
-      } catch (error) { message = `The report could not be saved. Your draft is still here. ${errorText(error)}`; }
+      } catch (error) {
+        // GitHub may already be open with a shortened copy that says the full text is saved
+        // here; when the save failed, the full words exist only in this form, so say so
+        message = preset?.opened && !stored
+          ? `GitHub opened, but this report could not be saved on this device, so its full words are only in this form. Copy them before you close it. ${errorText(error)}`
+          : `The report could not be saved. Your draft is still here. ${errorText(error)}`;
+      }
       finally { busy = false; render(); }
       run(sync);
     }
@@ -666,9 +788,29 @@
       const link = document.createElement('a'); link.href = url; link.download = `bunki-${proposal.id.replace(/[^a-z0-9_-]/g, '')}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
+    // Clipboard writes must happen inside the tap itself (WebKit refuses them
+    // after an await), so the copy action runs before the shared async handler.
+    function copyReport(reportId) {
+      const row = rows.find(item => item.id === reportId);
+      if (!row || !navigator.clipboard?.writeText) { setMessage('Copying is not available here. Use Send to GitHub instead.'); return; }
+      const { title, body } = issueParts(row.report, row.report.user_words, false);
+      navigator.clipboard.writeText(`${title}\n\n${body}\n`).then(
+        () => setMessage('Copied. Paste it into a GitHub issue or a chat with Claude.'),
+        () => setMessage('Copying was not allowed here. Use Send to GitHub instead.'),
+      );
+    }
+    async function markGithubOpened(reportId) {
+      const row = await read('records', reportId);
+      if (!row || row.github_opened_at) return;
+      await transact(['records'], tx => tx.objectStore('records').put({ ...row, github_opened_at: new Date().toISOString() }));
+      await refreshRows();
+      if (dialog.open && active === 'detail' && selectedId === reportId) render();
+    }
     root.addEventListener('click', event => {
       event.stopPropagation();
       if (closing || disposed) return;
+      const copyButton = event.target.closest('[data-br="copy"]');
+      if (copyButton && !copyButton.disabled) { copyReport(copyButton.dataset.id); return; }
       run(async () => {
         const button = event.target.closest('[data-br]');
         if (!button || button.disabled) return;
@@ -700,6 +842,8 @@
           return recoverSlot(button.dataset.id, action === 'recover-draft' ? 'draft' : `followup:${selectedId}`);
         }
         else if (action === 'export') exportProposal(button.dataset.id);
+        // The link itself navigates to GitHub; this only records that it was opened.
+        else if (action === 'github') return markGithubOpened(button.dataset.id);
       }).catch(error => setMessage(errorText(error)));
     });
     root.addEventListener('input', event => {
@@ -719,7 +863,22 @@
       if (event.target.id === 'br-category' && !busy) { draft.category = event.target.value; scheduleDraft(); }
       if (event.target.id === 'br-files') { const files = [...event.target.files]; run(() => addFiles(files)); }
     });
-    root.addEventListener('submit', event => { event.preventDefault(); if (closing || disposed) return; if (event.target.id === 'br-form') run(submitReport); if (event.target.id === 'br-follow-form') run(() => followup(false)); });
+    root.addEventListener('submit', event => {
+      event.preventDefault();
+      if (closing || disposed) return;
+      if (event.target.id === 'br-form') {
+        let preset = null;
+        if (githubMode() && !busy && !attachmentBusy && draft?.actual.trim()) {
+          // Open GitHub inside the tap: a browser blocks a window opened after the
+          // save's await. If it is blocked anyway, the saved report keeps a link.
+          preset = { id: id('report'), created_at: new Date().toISOString(), opened: false };
+          const opened = window.open(issueUrl(buildReport(draft, preset.id, preset.created_at)), '_blank');
+          if (opened) { try { opened.opener = null; } catch { /* Cross-origin windows may refuse this. */ } preset.opened = true; }
+        }
+        run(() => submitReport(preset));
+      }
+      if (event.target.id === 'br-follow-form') run(() => followup(false));
+    });
     dialog.addEventListener('close', restoreReturn);
     dialog.addEventListener('cancel', event => { if (closing) event.preventDefault(); /* Otherwise native Escape restores the exact origin. */ });
     dialog.addEventListener('keydown', event => {
@@ -729,7 +888,7 @@
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     });
-    function onOnline() { if (engaged || rows.some(row => !row.view?.receipt)) run(() => loadConfig(true).then(sync)); }
+    function onOnline() { if (engaged || rows.some(row => !row.view?.receipt && !row.github_opened_at)) run(() => loadConfig(true).then(sync)); }
     function onVisibility() { if (document.visibilityState === 'hidden' && draftDirty) run(persistDraft).catch(() => {}); }
     window.addEventListener('online', onOnline);
     document.addEventListener('visibilitychange', onVisibility);
@@ -743,7 +902,7 @@
       catch (error) { draft = emptyDraft(); draftSlot = newSlot(); configError = `Report storage is unavailable. ${errorText(error)}`; }
       initialized = true;
       // Ordinary lessons are network-idle. Only a prior pending outbox warrants reconnecting.
-      if (rows.some(row => !row.view?.receipt)) run(() => loadConfig().then(sync));
+      if (rows.some(row => !row.view?.receipt && !row.github_opened_at)) run(() => loadConfig().then(sync));
     })();
     return {
       ready,
@@ -782,7 +941,7 @@
             setMessage('Reports could not finish saving. Your editor is still available here; keep this page open and copy your text before leaving.');
             render();
             if (draftDirty) scheduleDraft();
-            if (service && rows.some(row => !row.view?.receipt)) retryTimer = setTimeout(() => run(sync), 30000);
+            if (service && rows.some(row => !row.view?.receipt && !row.github_opened_at)) retryTimer = setTimeout(() => run(sync), 30000);
             if (resumePolling && dialog.open && active === 'detail') pollTimer = setTimeout(() => run(updateReports), 12000);
             throw error;
           }

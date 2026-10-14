@@ -131,11 +131,12 @@ try {
   const durable = await page.evaluate(async () => {
     const db = await new Promise(resolve => { const r = indexedDB.open('bunki-maintenance-reports-v1'); r.onsuccess = () => resolve(r.result); });
     const read = store => new Promise(resolve => { const r = db.transaction(store).objectStore(store).getAll(); r.onsuccess = () => resolve(r.result); });
-    return { rows: await read('records'), attachments: (await read('attachments')).map(item => ({ id: item.id, size: item.blob.size })) };
+    return { rows: await read('records'), attachments: (await read('attachments')).map(item => ({ id: item.id, blob: 'blob' in item, size: item.bytes instanceof ArrayBuffer ? item.bytes.byteLength : 0 })) };
   });
   assert.equal(durable.rows.length, 1);
   assert.equal(durable.attachments.length, 1);
   assert(durable.attachments[0].size > 0);
+  assert(!durable.attachments[0].blob, 'Screenshots are stored as bytes, never as Blobs');
   assert(!JSON.stringify(durable.rows).includes('never capture'));
   assert.equal(durable.rows[0].report.context.build.git_sha, null, 'External service build cannot become page provenance');
   await page.reload();
@@ -785,12 +786,18 @@ async function localState(target) {
     try {
       const read = store => new Promise((resolve, reject) => { const r = db.transaction(store).objectStore(store).getAll(); r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error); });
       const meta = await read('meta'), records = await read('records');
-      const describe = async item => ({ id: item.id, name: item.name, bytes: item.blob.size, sha256: Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', await item.blob.arrayBuffer())), byte => byte.toString(16).padStart(2, '0')).join('') });
+      // Content identity, whichever form stored it: bytes (current) or a Blob (earlier versions).
+      const describe = async item => {
+        const data = item.bytes instanceof ArrayBuffer ? item.bytes : await item.blob.arrayBuffer();
+        return { id: item.id, name: item.name, bytes: data.byteLength, sha256: Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', data)), byte => byte.toString(16).padStart(2, '0')).join('') };
+      };
       const drafts = [];
       for (const row of meta) {
         if (!row.key.startsWith('draft:') && !row.key.startsWith('followup:')) continue;
         const value = row.value.draft_id ? row.value.draft : row.value;
-        drafts.push({ key: row.key, revision: row.value.revision, value: { ...value, attachments: await Promise.all((value.attachments || []).map(describe)) } });
+        // A stored draft keeps its screenshots under `screenshots`; earlier versions used `attachments`.
+        const { screenshots = [], ...fields } = value;
+        drafts.push({ key: row.key, revision: row.value.revision, value: { ...fields, attachments: await Promise.all([...(value.attachments || []), ...screenshots].map(describe)) } });
       }
       return { drafts, records, attachments: await Promise.all((await read('attachments')).map(describe)) };
     } finally { db.close(); }

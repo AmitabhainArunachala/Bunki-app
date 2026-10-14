@@ -500,7 +500,14 @@ const UI_EN = {
   "裏：ふりがな付きの全文、読み、品詞、日本語の説明と使い方。英語の意味とその文の英訳はタップで開く。": "The back shows the passage with readings, the target’s reading, part of speech, Japanese definition and usage. Open folds for English meaning and the target sentence’s translation.",
   "文章はすべて書き下ろし。自然さ・事実・レベルを、書き手とは別のモデルが一枚ずつ確かめています。級は公開リストによる目安です。": "Every passage is original. A model separate from its author checks naturalness, facts and level for each card. Level labels are estimates from public lists."
 };
-const t = (ja, en = UI_EN[ja]) => ctx?.english !== false ? (en ?? ja) : ja;
+/** The focus room's plainer English (the layout under test, 2026-10-13); the current layout keeps
+ * UI_EN's words as they were. */
+const UI_EN_PLACES = {
+  "覚えるの札に入ります — このデッキの予定は変わりません": "Save puts it in your review cards. This deck’s schedule doesn’t change.",
+  "今日の分は終わり。また明日。": "Today’s cards are done. More tomorrow.",
+  "答えを見て理解が深まったなら もう一度": "If the answer taught you something, choose Again.",
+};
+const t = (ja, en = (ctx?.places && UI_EN_PLACES[ja]) || UI_EN[ja]) => ctx?.english !== false ? (en ?? ja) : ja;
 
 /* ------------------------------------------------------------- helpers */
 function el(tag, cls, ...kids) {
@@ -605,6 +612,13 @@ function displayUnits(card, units) {
     ? { ...unit, word: null, tok: { ...unit.tok, r: 'こむら', personContext: 'komura-jutaro' } } : unit);
 }
 
+/** a reading over its kanji; data-rt lets a host draw the reading as a label above the word
+ * instead of as ruby, so showing or hiding it never moves the line */
+function rubyNode(text, reading) {
+  const ruby = el('ruby', null, text, el('rt', null, reading));
+  ruby.dataset.rt = reading;
+  return ruby;
+}
 export function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'none' : 'all', split = false, clamp = false, taps = null }) {
   if (front) {
     ruby = 'none';
@@ -654,12 +668,12 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     if (isTarget === 3 && blank) return put(el('span', 'kp-blank', '　'.repeat(Math.min(6, Math.max(2, [...text].length)))), 3, len);
     const hasRuby = reading && KANJI.test(text) && ruby === 'all';
     if (isTarget) {
-      const wrap = el('span', 'kp-target', hasRuby ? el('ruby', null, text, el('rt', null, reading)) : text);
+      const wrap = el('span', 'kp-target', hasRuby ? rubyNode(text, reading) : text);
       // the card's own word: its tap says it is in this deck (no 覚える)
       if (taps) tapNode(wrap, SELF_UNIT, taps.onTap);
       return put(wrap, isTarget, len);
     }
-    if (hasRuby) return put(el('ruby', null, text, el('rt', null, reading)), 0, len, unitOver(at, len));
+    if (hasRuby) return put(rubyNode(text, reading), 0, len, unitOver(at, len));
     // plain text may hold a sentence end or a word edge: cut it there so each sentence keeps its
     // own words and each word its own tap target
     let rest = text;
@@ -724,6 +738,9 @@ function paint() {
   root.replaceChildren();
   syncDefaultLook();
   root.dataset.look = ctx.prefs.look;
+  // the first sittings of a deck name the task on each card; after them the marked word says it alone
+  root.dataset.hints = hintsOn() ? '1' : '0';
+  root.dataset.readings = ctx.prefs.readings === 'off' ? 'off' : 'on';
   const screens = { home: homeScreen, study: studyScreen, list: listScreen, settings: settingsScreen };
   if (ui.toast) {
     const undoable = UNDOABLE.includes(ui.toast) && ui.undo && ui.screen === 'study';
@@ -870,6 +887,15 @@ function frameFront() {
   const dock = ctx.root.querySelector('.kp-study > .kp-reveal');
   const target = face?.querySelector('.kp-target, .kp-blank');
   window.scrollTo({ top: 0, behavior: 'instant' });
+  // in the app the reveal is the screen's right half, not a docked button: the floor is the screen's
+  // own foot, and a marked word below it opens in view, its sentence in the middle of the page
+  if (target && dock && getComputedStyle(dock).position === 'fixed') {
+    const t = target.getBoundingClientRect();
+    const ceil = topInset() + 16;
+    const floor = innerHeight - 56;
+    if (t.bottom > floor) window.scrollTo({ top: Math.max(0, Math.round((t.top + t.bottom) / 2 - (ceil + floor) / 2)), behavior: 'instant' });
+    return;
+  }
   if (!target || !dock || getComputedStyle(dock).position !== 'sticky') return;
   const t = target.getBoundingClientRect();
   const undo = ctx.root.querySelector('.kp-study > .kp-undo');
@@ -989,6 +1015,9 @@ function studyScreen() {
     face.dataset.zoom = zoom;
     (chips.querySelector('.kp-eyebrow') || chips).append(zoomToggle(zoom));
   }
+  // in the app the back carries every reading after the reveal (learner brief 2026-10-04), and one
+  // quiet switch returns the clean original (2026-10-13); the front never shows either
+  if (ui.revealed && ctx.places) (chips.querySelector('.kp-eyebrow') || chips).append(readingsToggle());
   // the front: no readings, no English, nothing to tap in the passage, no hint (CARD_CONTRACT_V2 §2)
   face.append(ui.revealed ? sentenceNodes(card, { split: passage, clamp: passage, taps: backTaps(card, word) }) : sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage }));
   const repaired = ctx.state.repairs?.[id]?.hint;
@@ -1012,11 +1041,16 @@ function studyScreen() {
       }
       face.append(opts);
     } else {
-      if (hintsOn()) face.append(el('p', 'kp-taphint', mode === 'read' ? t("意味を思い出してからタップ") : t("タップして答えを見る")));
-      face.addEventListener('click', reveal);
+      // in the app the right half of the screen turns the card, like a page (John, 2026-10-13); the
+      // left half stays still, so a tap while reading never gives the answer away
+      const turnsCard = (e) => !ctx.places || !Number.isFinite(e.clientX) || e.clientX >= innerWidth / 2;
+      if (hintsOn()) face.append(el('p', 'kp-taphint', ctx.places ? t("思い出したら、右側をタップ", "Recall it, then tap the right side") : mode === 'read' ? t("意味を思い出してからタップ") : t("タップして答えを見る")));
+      face.addEventListener('click', (e) => {
+        if (turnsCard(e)) reveal();
+      });
       // the bare stage around the card is the same tap (the card hugs its content: T8, round 4)
       box.addEventListener('click', (e) => {
-        if (e.target === box) reveal();
+        if (e.target === box && turnsCard(e)) reveal();
       });
     }
   } else {
@@ -1131,6 +1165,17 @@ function motionOk() {
 function zoomFor() {
   if (ctx.prefs.zoom === 'full' || ctx.prefs.zoom === 'focus') return ctx.prefs.zoom;
   return ui.seen ? 'focus' : 'full';
+}
+/** 読み: every reading over the passage, or the clean original. Kept per deck; the line never moves. */
+function readingsToggle() {
+  const on = ctx.prefs.readings !== 'off';
+  return btn('kp-zoom-btn kp-readings', t('読み', 'Readings'), (e) => {
+    e.stopPropagation();
+    const next = ctx.prefs.readings === 'off' ? 'on' : 'off';
+    if (!savePrefQuiet({ readings: next })) return;
+    ctx.root.dataset.readings = next;
+    e.currentTarget.setAttribute('aria-pressed', String(next === 'on'));
+  }, { id: 'kp-readings', 'aria-pressed': String(on) });
 }
 function zoomToggle(zoom) {
   const wrap = el('span', 'kp-zoom');
@@ -1658,9 +1703,16 @@ function logTap(card, where, frame, depth) {
   if (save(next)) ctx.state = next;
 }
 
+/** the word whose meaning is open shows its reading; closing the meaning returns the clean text */
+function lightWord(node) {
+  if (!ctx?.root) return;
+  for (const lit of ctx.root.querySelectorAll('.kp-tok.kp-lit')) if (lit !== node) lit.classList.remove('kp-lit');
+  node?.classList.add('kp-lit');
+}
 function tapped(unit, node, { card, where, depth }) {
   const frame = frameOf(unit);
   logTap(card, where, frame, depth);
+  if (depth === 1) lightWord(node);
   if (ctx.host) openSheet(frame, node, depth);
   else openPop(frame, node);
 }
@@ -1690,6 +1742,7 @@ function openSheet(frame, node, depth) {
 function closeSheet() {
   const back = ui.sheet?.returnTo;
   ui.sheet = null;
+  lightWord(null);
   ctx.root.querySelector('.kp-sheet-wrap')?.remove();
   if (back?.isConnected) back.focus({ preventScroll: true });
 }
@@ -1827,6 +1880,7 @@ function openPop(frame, node) {
 }
 function closePop() {
   ui.pop = null;
+  lightWord(null);
   ctx.root.querySelector('.kp-pop')?.remove();
 }
 function drawPop() {
@@ -2371,6 +2425,10 @@ function revealInPlace() {
     const chips = face.querySelector('.kp-chips');
     (chips.querySelector('.kp-eyebrow') || chips).append(zoomToggle(zoom));
   }
+  if (ctx.places) {
+    const chips = face.querySelector('.kp-chips');
+    (chips.querySelector('.kp-eyebrow') || chips).append(readingsToggle());
+  }
   const sentence = sentenceNodes(card, { split: passage, clamp: passage, taps: backTaps(card, word) });
   face.querySelector('.kp-sentence').replaceWith(sentence);
   for (const n of face.querySelectorAll('.kp-taphint, .kp-rhint')) n.remove();
@@ -2617,7 +2675,7 @@ function doneScreen() {
   box.append(topBar(t("おつかれさま")));
   box.append(el('h2', 'kp-done-title', t("机の上は、空になった。", "The surface is clear.")));
   const missed = new Set(ui.log.filter((x) => !x.ok).map((x) => x.term));
-  const words = [...new Set(ui.log.map((x) => x.term))].slice(0, 12);
+  const words = [...new Set(ui.log.map((x) => x.term))].slice(0, ctx.places ? 24 : 12);
   if (words.length) {
     const rise = el('div', 'kp-rise');
     rise.setAttribute('aria-hidden', 'true');
@@ -2637,8 +2695,28 @@ function doneScreen() {
   box.append(el('div', 'kp-tally', cell(t("覚えた", "Kept"), String(ui.right), 'kp-tally-kept'), cell(t("もう一度"), String(ui.done - ui.right), 'kp-tally-again'), cell(t("時間", "Time"), clock, 'kp-tally-time')));
   box.append(el('p', 'kp-done-rate', el('span', null, t("思い出せた割合")), el('b', null, `${pct}%`), el('span', null, `${t("回答")} ${ui.done}`)));
   const soon = learningSoon(ctx.deck, ctx.state, new Date(), DAY, { skip: skipFor(ctx.prefs.mode) })[0];
+  // in the app's layout under test the close says it in one sentence (the tally above stays the
+  // standalone page's and the current layout's)
+  if (ctx.places) {
+    // what happened, in one sentence and only what is true: the words met, the minutes, and how many
+    // needed a second look (they were seen again in the sitting; when they return is the next line)
+    const met = new Set(ui.log.map((x) => x.term)).size;
+    const second = missed.size;
+    const mins = Math.max(1, Math.round(secs / 60));
+    const minEn = `${mins} ${mins === 1 ? 'minute' : 'minutes'}`;
+    box.append(el('p', 'kp-done-line', second
+      ? t(`${met} 語に出会った（${mins} 分）。${second} 語はもう一度見た。`, `You met ${met} ${met === 1 ? 'word' : 'words'} in ${minEn}. ${second} needed a second look.`)
+      : t(`${met} 語に出会った（${mins} 分）。`, `You met ${met} ${met === 1 ? 'word' : 'words'} in ${minEn}.`)));
+  }
   box.append(el('p', 'kp-sub', soon ? t(`次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。`, `Next review in ${fmtWait(Math.max(0, soon.t - Date.now()))}.`) : t("今日の分は終わり。また明日。")));
-  box.append(btn('kp-start', t("デッキに戻る"), () => go('home'), { id: 'kp-home' }));
+  // one door forward: the host's reading for today, the words just met waiting in it
+  const door = ctx.places ? safely(() => ctx.next?.() || null, null) : null;
+  if (door) {
+    const doorButton = btn('kp-start kp-door', [el('span', 'kp-door-l', door.label), el('span', 'kp-door-t', door.title)], () => door.open(), { id: 'kp-door' });
+    doorButton.querySelector('.kp-door-t').lang = 'ja';
+    box.append(doorButton);
+  }
+  box.append(btn(door ? 'kp-link kp-home-quiet' : 'kp-start', t("デッキに戻る"), () => go('home'), { id: 'kp-home' }));
   if (ui.undo) box.append(btn('kp-undo', t("ひとつ戻す"), undo, { id: 'kp-undo' }));
   return box;
 }
@@ -2899,7 +2977,7 @@ function ensureCss() {
   document.head.append(link);
 }
 
-export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null } = {}) {
+export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, layout = null } = {}) {
   const request = ++mountRequest;
   if (autoStart !== undefined) pendingStart = { deckId, autoStart };
   ensureCss();
@@ -2924,6 +3002,10 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     index,
     storage,
     onLeave,
+    // the host's door forward from a sitting's close: () => ({ label, title, open }) or null
+    next: typeof next === 'function' ? next : null,
+    // the app's layout under test turns on the focus room (in the app only: it needs the host)
+    places: layout === 'places' && !!host,
     openEntry: typeof openEntry === 'function' ? openEntry : lexicon ? (node) => lexicon.open(node) : null,
     host: lexicon,
     // the tap source: with a host, the tokens side file (fetched once a sitting starts); without

@@ -13,7 +13,7 @@
  */
 
 // BEGIN GENERATED RELEASE IDENTITY — npm run release:sync
-const APP_RELEASE = Object.freeze({"version":"1.0.1","channel":"stable","releasedOn":"2026-10-13","learnerDataEpoch":1});
+const APP_RELEASE = Object.freeze({"version":"1.2.0","channel":"stable","releasedOn":"2026-10-14","learnerDataEpoch":1});
 // END GENERATED RELEASE IDENTITY
 
 const DATA = {
@@ -4075,7 +4075,9 @@ function withEn(node, en) {
 /** One visible, accessible label in the chosen interface language. */
 function biLabel(tag, cls, ja, en) {
   const node = el(tag, cls);
-  node.append(el('span', 'l-ja', tx(ja, en)));
+  // the layout under test sets every English button in sentence case, as its places are named
+  const label = tx(ja, en);
+  node.append(el('span', 'l-ja', tag === 'button' && bi() && placesLayout() ? label.replace(/^[a-z]/, (c) => c.toUpperCase()) : label));
   return node;
 }
 
@@ -4147,6 +4149,16 @@ async function boot() {
   await resumeAssessmentV2();
   await installDriftRecord();
   setKairoTheme(themeId());
+  // The layout under test can be chosen by link. The choice stays on this device and the word
+  // leaves the address, so reloading the same page cannot undo a choice made since in Settings.
+  if (params.has('layout')) {
+    if (['places', 'current'].includes(params.get('layout'))) setLayout(params.get('layout'));
+    const rest = new URLSearchParams(location.search);
+    rest.delete('layout');
+    try { history.replaceState(history.state, '', `${location.pathname}${rest.toString() ? `?${rest}` : ''}${location.hash}`); } catch { /* The address keeps the word. */ }
+  }
+  // the root mark comes before any page draws: a private collection never runs render()
+  if (placesLayout()) document.documentElement.dataset.layout = 'places';
   // A private collection boots from the cached app shell alone. Its content
   // arrives through the learner's file picker, never a public repository URL.
   if (params.get('deck') === 'personal' && window.__CORRIDOR_STANDALONE__ !== true) {
@@ -4200,7 +4212,7 @@ async function boot() {
   }
   // Private collections leave through the same five destinations on a fresh
   // host page. These are UI routes only, never learner-record state.
-  if (PRIMARY_TABS.some(tab => tab.view === params.get('room'))) {
+  if (primaryTabs().some(tab => tab.view === params.get('room'))) {
     if (params.get('room') === 'me') {
       S.view = 'shelf';
       keepNavigationReturn('me', null);
@@ -4208,6 +4220,12 @@ async function boot() {
     // no S.tabRoot here: this fresh page keeps a real return (Me → Read, verify-redesign-foundation)
     S.view = params.get('room');
     if (S.view === 'search') S.searchFrom = 'shelf';
+  }
+  // an opened report setup link waits in Settings for Set up; Back leads to Me
+  if (reportRelayOffer) {
+    S.view = 'me';
+    keepNavigationReturn('settings', null);
+    S.view = 'settings';
   }
 
   render();
@@ -4756,7 +4774,7 @@ function back() {
     // holds its old frame, like every other room change.
     if (!roomTransitionUpdating) return roomTransition(() => back());
     guidedRoom?.suspend();
-    S.view = guidedFrom === 'mock' ? 'mock' : 'dojo';
+    S.view = guidedFrom === 'mock' ? 'mock' : guidedFrom === 'tests' ? 'tests' : 'dojo';
     render();
     window.scrollTo(0, 0);
     return;
@@ -4791,15 +4809,16 @@ function back() {
     window.scrollTo(0, 0);
     return;
   }
-  if (S.view === 'dojo') {
+  if (S.view === 'dojo' || S.view === 'tests') {
     S.view = 'drift';
     render();
     return;
   }
   if (S.view === 'aiquiz') {
     // POL-13: stepping out mid-quiz discards nothing — the run stays durable
-    // and the tray holds the way back in (and the quiet やめる to let it go)
-    S.view = 'tray';
+    // and the tray holds the way back in (and the quiet やめる to let it go);
+    // in the layout under test, Saved holds it
+    S.view = placesLayout() ? 'saved' : 'tray';
     render();
     return;
   }
@@ -4842,10 +4861,26 @@ function back() {
     return;
   }
   // a list page is only reachable from the tray (the リスト name-door), so
-  // 戻る returns there — the same trip the in-page ← リスト一覧へ chip makes
+  // 戻る returns there — the same trip the in-page ← リスト一覧へ chip makes.
+  // In the layout under test the lists live in Saved, and Saved in Review.
   if (S.view === 'list' || S.view === 'browse' || S.view === 'srs-stats') {
-    S.view = 'tray';
+    S.view = placesLayout() ? 'saved' : 'tray';
     render();
+    return;
+  }
+  if (S.view === 'saved') {
+    S.view = 'dojo';
+    render();
+    window.scrollTo(0, 0);
+    return;
+  }
+  // the layout under test: the JLPT room, the lessons and the level lists are the Tests room's; past
+  // their own layers (a sitting, a lesson run, a level list walked above) Back returns there
+  if (placesLayout() && ['mock', 'lessons', 'levels'].includes(S.view)) {
+    if (S.view === 'levels' && referenceLibrary?.back()) return;
+    S.view = 'tests';
+    render();
+    window.scrollTo(0, 0);
     return;
   }
   // Device Back and the chrome arrow walk list → overview → reading shelf.
@@ -5546,7 +5581,8 @@ function renderShelfBody(search = null) {
   const art = el('img', 'shelf-art'); art.src = window.__KAIRO_SHELF_ART_URL__ || 'design/ink-hoku-nami.png'; art.alt = ''; art.width = 640; art.height = 640;
   art.setAttribute('aria-hidden', 'true');
   const name = el('div', 'shelf-mast-name');
-  name.append(art, withEn(el('h1', 'view-title', '本棚'), 'bookshelf', 'en-inline'));
+  // in the layout under test the room is called what its tab is called: 本棚 / Bookshelf, John's own word
+  name.append(art, placesLayout() ? withEn(el('h1', 'view-title', '本棚'), 'Bookshelf') : withEn(el('h1', 'view-title', '本棚'), 'bookshelf', 'en-inline'));
   title.append(name);
   const dateline = el('p', 'shelf-snippet intro shelf-dateline');
   const sep = el('span', 'dateline-sep', ' · ');
@@ -5579,6 +5615,20 @@ function renderShelfBody(search = null) {
   }
   masthead.append(title);
   body.append(masthead);
+  // the layout under test opens the bookshelf on today's reading (it stood on Today): the unread
+  // article holding the most of the learner's own words, one tap from the top, before the magazine
+  const readPick = placesLayout() ? todayReadPick() : null;
+  if (readPick) {
+    const todayRead = el('button', 'shelf-today-read');
+    todayRead.type = 'button';
+    todayRead.id = 'shelf-today-read';
+    todayRead.append(el('span', 'shelf-today-read-l', readPick.count
+      ? tx(`今日の読み物 · あなたの語 ${readPick.count}`, `Today's reading · ${readPick.count} of your words`)
+      : tx('今日の読み物', "Today's reading")),
+    todayLearning('span', 'shelf-today-read-t', readPick.passage.title), el('i', 'shelf-today-read-arrow'));
+    todayRead.addEventListener('click', () => openPassage(readPick.passage.id));
+    body.append(todayRead);
+  }
   const filters = S.shelfFilters ||= { sort: 'today', topic: '', jlpt: '', grade: '', text: '' };
   const unfiltered = !filters.text && !filters.topic && !filters.jlpt && !filters.grade;
   const shelfOrder = filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : byNewest;
@@ -10519,21 +10569,25 @@ async function chooseSrsPreset(id) {
     });
   } finally {
     srsPrefsPending.delete('preset');
-    if (recordReady(epoch) && S.view === 'tray') render();
+    if (recordReady(epoch) && (S.view === 'tray' || S.view === 'settings')) render();
   }
 }
-function renderSrsPrefs(main) {
-  const toggle = el('button', 'details-toggle');
-  toggle.type = 'button';
-  toggle.id = 'srs-prefs-toggle';
-  toggle.setAttribute('aria-expanded', String(!!S.srsPrefsOpen));
-  toggle.textContent = (S.srsPrefsOpen ? '▼ ' : '▶ ') + tx('ペース — 1日に覚える数', 'pace · how many cards a day');
-  toggle.addEventListener('click', () => {
-    S.srsPrefsOpen = !S.srsPrefsOpen;
-    render();
-  });
-  main.append(toggle);
-  if (!S.srsPrefsOpen) return;
+function renderSrsPrefs(main, { open = false } = {}) {
+  // `open`: the layout under test sets the pace in Settings, where it stands open, without a fold
+  const places = open;
+  if (!open) {
+    const toggle = el('button', 'details-toggle');
+    toggle.type = 'button';
+    toggle.id = 'srs-prefs-toggle';
+    toggle.setAttribute('aria-expanded', String(!!S.srsPrefsOpen));
+    toggle.textContent = (S.srsPrefsOpen ? '▼ ' : '▶ ') + tx('ペース — 1日に覚える数', 'pace · how many cards a day');
+    toggle.addEventListener('click', () => {
+      S.srsPrefsOpen = !S.srsPrefsOpen;
+      render();
+    });
+    main.append(toggle);
+    if (!S.srsPrefsOpen) return;
+  }
   const rows = el('div', 'srs-prefs');
   rows.id = 'srs-prefs';
   const state = srsPresetState();
@@ -10558,8 +10612,8 @@ function renderSrsPrefs(main) {
   const now = el('p', 'srs-preset-now');
   now.id = 'srs-preset-now';
   now.textContent = state.custom
-    ? tx(`いま — カスタム（${base.ja}から）`, `now — Custom (from ${base.en})`)
-    : tx(`いま — ${base.ja}`, `now — ${base.en}`);
+    ? tx(`いま — カスタム（${base.ja}から）`, places ? `Now: Custom (from ${base.en})` : `now — Custom (from ${base.en})`)
+    : tx(`いま — ${base.ja}`, places ? `Now: ${base.en}` : `now — ${base.en}`);
   rows.append(now);
   const stepper = (labelJa, labelEn, key) => {
     const value = srsPrefValue(S.srsPrefs, key);
@@ -10580,14 +10634,14 @@ function renderSrsPrefs(main) {
         });
       } finally {
         srsPrefsPending.delete(key);
-        if (recordReady(epoch) && S.view === 'tray') render();
+        if (recordReady(epoch) && (S.view === 'tray' || S.view === 'settings')) render();
       }
     };
     const minus = el('button', 'rest-toggle srs-pref-step', '−');
     minus.type = 'button';
     minus.dataset.prefDown = key;
     minus.disabled = srsPrefStep(key, value, -1) === value || srsPrefsPending.has(key);
-    minus.setAttribute('aria-label', tx(`${labelJa} を減らす`, `lower ${labelEn}`));
+    minus.setAttribute('aria-label', tx(`${labelJa} を減らす`, `lower ${labelEn.toLowerCase()}`));
     minus.addEventListener('click', () => commit(-1));
     const shown = value === null ? tx('なし', 'off') : value === REVIEWS_PER_DAY_MAX ? tx('上限なし', 'no cap') : String(value);
     const val = el('span', 'srs-pref-val', shown);
@@ -10596,14 +10650,14 @@ function renderSrsPrefs(main) {
     plus.type = 'button';
     plus.dataset.prefUp = key;
     plus.disabled = srsPrefStep(key, value, 1) === value || srsPrefsPending.has(key);
-    plus.setAttribute('aria-label', tx(`${labelJa} を増やす`, `raise ${labelEn}`));
+    plus.setAttribute('aria-label', tx(`${labelJa} を増やす`, `raise ${labelEn.toLowerCase()}`));
     plus.addEventListener('click', () => commit(1));
     row.append(minus, val, plus);
     rows.append(row);
   };
-  stepper('新規 / 日', 'new a day', 'newPerDay');
-  stepper('復習 / 日', 'reviews a day', 'reviewsPerDay');
-  stepper('一息', 'a short break every … cards', 'pauseEvery');
+  stepper('新規 / 日', places ? 'New cards a day' : 'new a day', 'newPerDay');
+  stepper('復習 / 日', places ? 'Reviews a day' : 'reviews a day', 'reviewsPerDay');
+  stepper('一息', places ? 'A short break every … cards' : 'a short break every … cards', 'pauseEvery');
   // R3-D · when the learner's own fitted weights rule the scheduler, this
   // fold — the scheduler-preferences surface — names it quietly, with the
   // honest basis. The raw parameter-set slug stays in exports/debug.
@@ -11300,13 +11354,15 @@ function renderReadingPlaces(p = null) {
   updateReadingPlaces(container);
   return container;
 }
-function renderRecordNotes() {
+/** The learner's own notes. In the layout under test they stand in Saved and their sync controls in
+ * Settings with the rest of the record (`sync: false`). */
+function renderRecordNotes({ sync = true } = {}) {
   const container = el('section', 'record-notes');
   container.id = 'record-notes';
   container.setAttribute('aria-labelledby', 'record-notes-heading');
   const heading = el('h2', 'section-title', tx('保存したメモ', 'Saved notes'));
   heading.id = 'record-notes-heading';
-  container.append(heading, renderRecordSync(), renderPersonalNoteComposer(), el('p', 'record-notes-status'), el('div', 'record-notes-items'));
+  container.append(heading, ...(sync ? [renderRecordSync()] : []), renderPersonalNoteComposer(), el('p', 'record-notes-status'), el('div', 'record-notes-items'));
   updateRecordNotesContainer(container);
   return container;
 }
@@ -11314,7 +11370,7 @@ function refreshRecordNotesSurface() {
   refreshReadingPlacesSurface();
   refreshSourceReferenceSurfaces();
   refreshReceivedPracticeSurfaces();
-  if (S.view !== 'tray' || S.stack.length) return;
+  if ((S.view !== 'tray' && S.view !== 'saved') || S.stack.length) return;
   const container = document.getElementById('record-notes');
   if (container?.isConnected) updateRecordNotesContainer(container);
 }
@@ -12286,6 +12342,366 @@ function renderTray(main) {
 
   renderPortRow(main);
   renderNoteDoor(main);
+}
+
+/** Review → Saved words & lists: what the learner has kept — the cards at a glance, every list with
+ * its words, the tutor's quiz on them, saved sentence practice and the learner's own notes. Moved
+ * from Today on 2026-10-13 with every control and record path unchanged. */
+function renderSaved(main) {
+  const currentSurface = recordViewSurface();
+  main.append(el('p', 'eyebrow me-kicker', tx('復習', 'Review')));
+  main.append(el('h1', 'view-title', tx('保存した語とリスト', 'Saved words & lists')));
+  // POL-13 · a quiz that was left mid-run survives reload: the way back in
+  // stands here — no new request, the tutor's written questions intact —
+  // with a quiet やめる beside it. No key and no deck are needed to finish
+  // what is already on the device, so the row lives outside every gate.
+  if (S.aiQuiz) {
+    const qrow = el('div', 'aiq-resume-row');
+    const qb = biLabel('button', 'chip aiq-start', '先生の小テスト — 続きから', "Resume the tutor's quiz");
+    qb.type = 'button';
+    qb.id = 'aiq-resume';
+    qb.addEventListener('click', () => {
+      S.view = 'aiquiz';
+      render();
+      window.scrollTo(0, 0);
+    });
+    const drop = biLabel('button', 'chip aiq-drop', 'やめる', 'Let it go');
+    drop.type = 'button';
+    drop.id = 'aiq-drop';
+    drop.disabled = listRecordPending.has('quiz-drop') || !recordWritable();
+    drop.addEventListener('click', async () => {
+      if (listRecordPending.has('quiz-drop') || !recordWritable()) return;
+      listRecordPending.add('quiz-drop');
+      drop.disabled = true;
+      try {
+        if (await aiQuizCommit(null)) {
+          if (currentSurface()) render();
+        }
+      } finally {
+        listRecordPending.delete('quiz-drop');
+        drop.disabled = !recordWritable();
+      }
+    });
+    qrow.append(qb, drop);
+    main.append(qrow);
+  }
+  if (S.taken.length && scheduler) {
+    const today = todayQueue();
+    const f = srsForecast();
+    const laterToday = !today.order.length && !today.held && f.today > 0;
+    const cards = el('section', 'saved-cards');
+    cards.id = 'saved-cards';
+    cards.setAttribute('aria-label', tx('カード', 'Your cards'));
+    cards.append(deckCounts(today));
+    if (today.held) {
+      cards.append(
+        el(
+          'p',
+          'srs-forecast srs-held',
+          tx(`あと ${today.held} 件は明日へ — 今日の上限（1日 ${srsReviewsPerDay()} 件）`,
+            `${today.held} more due, held back by today's limit (${srsReviewsPerDay()} a day)`),
+        ),
+      );
+    }
+    if (f.today + f.tomorrow + f.week + f.fresh + f.unstarted > 0) {
+      // 未着手 appears only when no-debt rows exist: the backlog is named,
+      // never hidden and never turned into due cards by anyone but the learner
+      const unstartedJa = f.unstarted ? ` ・ 未着手 ${f.unstarted}` : '';
+      const unstartedEn = f.unstarted ? ` · not started ${f.unstarted}` : '';
+      cards.append(
+        el(
+          'p',
+          'srs-forecast',
+          tx(
+            `復習の予定 — ${laterToday ? '今日このあと' : '今日'} ${f.today} ・ 明日 ${f.tomorrow} ・ 一週間 ${f.week} ・ 新規 ${f.fresh}${unstartedJa}`,
+            `Coming up: ${laterToday ? 'later today' : 'today'} ${f.today} · tomorrow ${f.tomorrow} · this week ${f.week} · new ${f.fresh}${unstartedEn}`,
+          ),
+        ),
+      );
+    }
+    // the review trace: the last seven days as they actually happened
+    const totalReviews = Object.values(S.stats).reduce((a, s) => a + (s.n || 0), 0);
+    if (totalReviews > 0) {
+      const days = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(Date.now() - i * 86400000);
+        days.push(S.stats[dayKey(d)]?.n || 0);
+      }
+      cards.append(
+        el(
+          'p',
+          'srs-forecast srs-trace',
+          tx(`この7日 ${days.join('・')} ｜ 計 ${totalReviews}`, `Last 7 days ${days.join(' · ')} | all time ${totalReviews}`),
+        ),
+      );
+    }
+    renderDeckTable(cards, today);
+    renderDeckDoors(cards);
+    const fold = cards;
+    // one layer of the tutor's testing — absent without a key, and folded
+    // away while an unfinished quiz still holds the room (POL-13)
+    if (!S.aiQuiz && aiKey() && S.taken.filter((t) => t.t === 'word').length >= 4) {
+      const qb = biLabel('button', 'chip aiq-start', '先生の小テスト', 'A quiz from the tutor');
+      qb.type = 'button';
+      qb.id = 'aiq-start';
+      const note = el('p', 'airead-note');
+      qb.addEventListener('click', async () => {
+        qb.disabled = true;
+        note.textContent = tx('先生が問題を書いている…', 'the tutor is writing questions…');
+        const askedFrom = S.view;
+        try {
+          await aiQuizStart();
+          // a reply can arrive ten seconds later, by which time the learner
+          // may be deep in an article: the quiz waits for them where they
+          // asked for it rather than seizing the room they walked to
+          // (E3 round-A, AI lens)
+          if (S.view !== askedFrom) {
+            note.textContent = tx(
+              '小テストの用意ができた。もう一度どうぞ。',
+              'the quiz is ready — press again when you are',
+            );
+            qb.disabled = false;
+            return;
+          }
+          S.view = 'aiquiz';
+          render();
+          window.scrollTo(0, 0);
+          return;
+        } catch {
+          note.textContent = tx('いまは作れない。あとでもう一度。', 'The tutor could not write a quiz just now — try again in a moment.');
+        }
+        qb.disabled = false;
+      });
+      fold.append(qb, note);
+    }
+    main.append(cards);
+  }
+  if (!S.taken.length) {
+    main.append(el('div', 'sem-empty', tx(
+      `保存した言葉はまだない。語・漢字・熟語のページで「${sheetTakeLabel()}」を押すと、ここに並ぶ。`,
+      `Nothing saved yet. Tap ${sheetTakeLabel()} on any word, kanji or idiom, and it appears here.`)));
+  } else renderSavedLists(main);
+  renderSentencePracticeLibrary(main);
+  main.append(renderRecordNotes({ sync: false }));
+}
+/** Every list with its words, then the field that makes a new one (the lists surface of the old
+ * Today, unchanged). */
+function renderSavedLists(main) {
+  const currentSurface = recordViewSurface();
+  // month buckets fill themselves; named lists sit above them
+  const buckets = new Map();
+  for (const item of S.taken) {
+    const key = monthKey(item.ts || 0);
+    if (!buckets.has(key)) buckets.set(key, []);
+    buckets.get(key).push(item);
+  }
+  const sections = [
+    ...Object.entries(S.lists).map(([name, items]) => ({ name, items, manual: true })),
+    ...[...buckets.entries()].map(([name, items]) => ({ name, items, manual: false })),
+  ];
+  // つくる — a list is born HERE on the lists surface, with a quiet inline
+  // field. window.prompt was the only door, and only from inside an entry
+  // (P2, full-instrument review).
+  const maker = el('div', 'list-maker');
+  const nameField = el('input', 'list-maker-field');
+  nameField.type = 'text';
+  nameField.id = 'list-maker-field';
+  attachRecordDraft(nameField);
+  nameField.placeholder = tx('新しいリストの名前', 'name a new list');
+  nameField.setAttribute('aria-label', tx('新しいリストの名前', 'name for a new list'));
+  const makeBtn = biLabel('button', 'chip list-maker-make', '＋ 作る', 'Create');
+  makeBtn.type = 'button';
+  makeBtn.id = 'list-maker-make';
+  makeBtn.disabled = listRecordPending.has('tray-create') || !recordWritable();
+  nameField.readOnly = listRecordPending.has('tray-create');
+  const tryMake = async () => {
+    if (listRecordPending.has('tray-create') || !recordWritable()) return;
+    const draft = nameField.value;
+    const name = nameField.value.trim();
+    if (!name || owns(S.lists, name)) {
+      nameField.setAttribute('aria-invalid', 'true');
+      nameField.placeholder = name
+        ? tx('その名はもうある', 'that name already exists')
+        : tx('名前を入れて', 'give it a name');
+      nameField.focus();
+      return;
+    }
+    listRecordPending.add('tray-create');
+    makeBtn.disabled = true;
+    nameField.readOnly = true;
+    try {
+      const saved = await commitStorePatch((latest) => {
+        if (owns(latest.lists, name)) throw new Error('list-name-changed');
+        const next = { ...latest.lists };
+        setOwnRecordValue(next, name, []);
+        return { lists: next };
+      });
+      listRecordPending.delete('tray-create');
+      if (saved) {
+        if (readRecordDrafts()[nameField.id] === draft) {
+          nameField.value = '';
+          rememberRecordDraft(nameField);
+        }
+        if (currentSurface()) render();
+      }
+    } finally {
+      listRecordPending.delete('tray-create');
+      makeBtn.disabled = !recordWritable();
+      nameField.readOnly = false;
+    }
+  };
+  makeBtn.addEventListener('click', tryMake);
+  nameField.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter') tryMake();
+  });
+  maker.append(nameField, makeBtn);
+  // the maker used to stand ABOVE the learner's own words — admin furniture
+  // before the daily object (operator, 2026-08-20). It now waits below the
+  // lists it makes; the sections loop appends it after the last row.
+  const dueKeys = new Set(srsDueItems().map((i) => srsKey(i.t, i.id)));
+  for (const sec of sections) {
+    const label = sec.manual ? sec.name : monthLabel(sec.name);
+    const head = el('p', 'eyebrow list-head');
+    // the name is a door: every list, named or monthly, opens to its own
+    // page with its rows, its review, and its export (operator, 2026-08-27)
+    const openList = el('button', 'list-open');
+    openList.type = 'button';
+    openList.setAttribute('aria-label', tx(`「${label}」のページをひらく`, `open the ${label} list page`));
+    openList.append(document.createTextNode(`${label} — ${sec.items.length}`));
+    openList.append(el('span', 'list-open-arrow', '›'));
+    openList.addEventListener('click', () => {
+      S.listOpen = { name: sec.name, manual: sec.manual };
+      keepScroll();
+      S.view = 'list';
+      render();
+      window.scrollTo(0, 0);
+    });
+    head.append(openList);
+    if (bi()) head.append(el('span', 'en-inline', sec.manual ? 'your list' : 'words saved that month'));
+    // the filtered deck, one tap wide: review only what today serves in this list
+    const dueHere = scheduler ? todayQueue(new Date(), sec.items).order : [];
+    if (dueHere.length && scheduler) {
+      const only = el('button', 'chip list-review', tx(`この組だけ復習 ${dueHere.length}`, `Review these ${dueHere.length}`));
+      only.type = 'button';
+      only.dataset.listReview = sec.name;
+      only.addEventListener('click', () => startReview(sec.items));
+      head.append(only);
+    }
+    if (sec.manual) {
+      // 直す・消す — rename and delete live where the list lives; deleting a
+      // list never touches its items' taken status (the list is curation,
+      // the deck is the deck)
+      const ren = el('button', 'list-op', tx('名前', 'Rename'));
+      ren.type = 'button';
+      ren.setAttribute('aria-label', tx(`「${sec.name}」の名前を変える`, `rename ${sec.name}`));
+      ren.addEventListener('click', () => {
+        S.listRename = S.listRename === sec.name ? null : sec.name;
+        render();
+      });
+      const armed = S.listDeleteArm === sec.name;
+      const del = el('button', armed ? 'list-op armed' : 'list-op', armed ? tx('消す？', 'sure?') : '×');
+      del.type = 'button';
+      del.setAttribute(
+        'aria-label',
+        armed ? tx(`「${sec.name}」を本当に消す`, `really delete ${sec.name}`) : tx(`「${sec.name}」を消す`, `delete ${sec.name}`),
+      );
+      const deleteKey = `delete:${sec.name}`;
+      del.disabled = listRecordPending.has(deleteKey) || !recordWritable();
+      del.addEventListener('click', async () => {
+        if (listRecordPending.has(deleteKey) || !recordWritable()) return;
+        if (S.listDeleteArm !== sec.name) {
+          S.listDeleteArm = sec.name;
+          render();
+          setTimeout(() => {
+            if (S.listDeleteArm === sec.name && !listRecordPending.has(deleteKey)) {
+              S.listDeleteArm = null;
+              render();
+            }
+          }, 3200);
+          return;
+        }
+        listRecordPending.add(deleteKey);
+        del.disabled = true;
+        try {
+          const saved = await commitStorePatch((latest) => {
+            const next = { ...latest.lists };
+            delete next[sec.name];
+            return { lists: next };
+          });
+          if (saved) {
+            if (S.listDeleteArm === sec.name) S.listDeleteArm = null;
+            if (currentSurface()) render();
+          }
+        } finally {
+          listRecordPending.delete(deleteKey);
+          del.disabled = !recordWritable();
+        }
+      });
+      head.append(ren, del);
+    }
+    main.append(head);
+    if (sec.manual && S.listRename === sec.name) {
+      const row = el('div', 'list-maker list-rename');
+      const field = el('input', 'list-maker-field');
+      field.type = 'text';
+      field.id = `list-rename-name:${sec.name}`;
+      field.value = sec.name;
+      attachRecordDraft(field);
+      field.setAttribute('aria-label', tx('新しい名前', 'new name'));
+      const save = biLabel('button', 'chip list-maker-make', '保存', 'Save');
+      save.type = 'button';
+      const renameKey = `rename:${sec.name}`;
+      save.disabled = listRecordPending.has(renameKey) || !recordWritable();
+      field.readOnly = listRecordPending.has(renameKey);
+      const trySave = async () => {
+        if (listRecordPending.has(renameKey) || !recordWritable()) return;
+        const draft = field.value;
+        const name = field.value.trim();
+        if (!name || (name !== sec.name && owns(S.lists, name))) {
+          field.setAttribute('aria-invalid', 'true');
+          field.focus();
+          return;
+        }
+        listRecordPending.add(renameKey);
+        save.disabled = true;
+        field.readOnly = true;
+        try {
+          const saved = await commitStorePatch((latest) => {
+            if (!owns(latest.lists, sec.name) || (name !== sec.name && owns(latest.lists, name)))
+              throw new Error('list-name-changed');
+            const next = {};
+            for (const [key, items] of Object.entries(latest.lists))
+              setOwnRecordValue(next, key === sec.name ? name : key, items);
+            return { lists: next };
+          });
+          if (saved) {
+            if (readRecordDrafts()[field.id] === draft) {
+              field.value = '';
+              rememberRecordDraft(field);
+            }
+            if (S.listRename === sec.name) S.listRename = null;
+            if (currentSurface()) render();
+          }
+        } finally {
+          listRecordPending.delete(renameKey);
+          save.disabled = !recordWritable();
+          field.readOnly = false;
+        }
+      };
+      save.addEventListener('click', trySave);
+      field.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') trySave();
+        if (ev.key === 'Escape' && !listRecordPending.has(renameKey)) {
+          S.listRename = null;
+          render();
+        }
+      });
+      row.append(field, save);
+      main.append(row);
+    }
+    for (const item of sec.items) main.append(trayLine(item, dueKeys));
+  }
+  main.append(maker);
 }
 
 /* One row of the deck, shared by the tray and the list pages. The row IS
@@ -20174,7 +20590,7 @@ function leaveSentencePractice() {
     document.getElementById('sentence-listening-start')?.focus(); return;
   }
   if (state?.returnCaller && restoreLearningSourceCaller(state.returnCaller)) return;
-  S.view = state?.returnView || 'tray'; S.sentencePracticeView = null;
+  S.view = state?.returnView || (placesLayout() ? 'tests' : 'tray'); S.sentencePracticeView = null;
   render(); window.scrollTo(0, state?.returnScroll || 0);
 }
 function renderSentencePracticeLibrary(main) {
@@ -22475,7 +22891,7 @@ function renderReview(main) {
     if (!S.focus) renderReviewNext(main);
     // one row of doors: the way on, and the way back one grade
     const doors = el('div', 'close-doors');
-    const out = biLabel('button', 'take quiet', '今日へ', 'Back to Today');
+    const out = placesLayout() ? biLabel('button', 'take quiet', '復習へ', 'Back to Review') : biLabel('button', 'take quiet', '今日へ', 'Back to Today');
     out.type = 'button';
     out.addEventListener('click', () => roomTransition(() => {
       S.review = null;
@@ -23320,7 +23736,7 @@ function renderReviewBreak(main, rv, graded) {
     render();
     focusKanjiReadingReview(rv);
   });
-  const out = biLabel('button', 'chip', 'リストへ', 'back to lists');
+  const out = placesLayout() ? biLabel('button', 'chip', '復習へ', 'Back to Review') : biLabel('button', 'chip', 'リストへ', 'back to lists');
   out.type = 'button';
   out.addEventListener('click', () => {
     S.review = null;
@@ -23567,7 +23983,9 @@ function renderFocusHud(root) {
     left.querySelector('#focus-clock').textContent = fmtClock(S.focus.deadline - Date.now());
   }
   hud.append(left);
-  const end = biLabel('button', 'focus-hud-end', S.focus.ended ? '道場へ' : '終わる', S.focus.ended ? 'dojo' : 'end');
+  const end = placesLayout()
+    ? biLabel('button', 'focus-hud-end', S.focus.ended ? '復習へ' : '終わる', S.focus.ended ? 'Back to Review' : 'End')
+    : biLabel('button', 'focus-hud-end', S.focus.ended ? '道場へ' : '終わる', S.focus.ended ? 'dojo' : 'end');
   end.type = 'button';
   end.addEventListener('click', () => {
     endFocus();
@@ -23669,7 +24087,9 @@ function guidedHost() {
       open: () => {
         keepScroll(); S.stack = [];
         S.trayFrom = { view: 'guided', scroll: Math.round(window.scrollY) };
-        S.view = 'tray'; render(); window.scrollTo(0, 0);
+        // the saved words: Today's lists, or Saved in the layout under test
+        if (placesLayout()) keepNavigationReturn('saved');
+        S.view = placesLayout() ? 'saved' : 'tray'; render(); window.scrollTo(0, 0);
       },
     },
   };
@@ -23735,10 +24155,10 @@ function guidedDoorInJlptRoom(main) {
  * #study-hall wraps the five blocks, so every hall door (≥6) is inside it. */
 function learnTestCounts() {
   const mockCount = Array.isArray(D.mock) ? D.mock.length : null;
-  if (mockCount === null) ensureMockIndex().then(() => { if (S.view === 'dojo') render(); }).catch(() => {});
+  if (mockCount === null) ensureMockIndex().then(() => { if (S.view === 'dojo' || S.view === 'tests') render(); }).catch(() => {});
   if (!assessmentCatalog && !assessmentOpening) {
     assessmentOpening = true;
-    loadAssessmentCatalog().then(() => { if (S.view === 'dojo') render(); }).catch(() => {}).finally(() => { assessmentOpening = false; });
+    loadAssessmentCatalog().then(() => { if (S.view === 'dojo' || S.view === 'tests') render(); }).catch(() => {}).finally(() => { assessmentOpening = false; });
   }
   const ready = (assessmentCatalog?.entries || []).filter((entry) => entry.availability?.ready);
   return {
@@ -23754,8 +24174,17 @@ function learnTestCounts() {
 function studyHallDoors() {
   const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
   const { tests: readyTests, sections: readySections, written: readyWritten } = learnTestCounts();
+  // the reference library, named in the layout under test for what it holds
+  const levelsName = placesLayout()
+    ? ['JLPT・漢検の一覧', 'JLPT & Kanken lists', tx('級ごとの語・漢字・文法', 'Words, kanji and grammar by level')]
+    : ['参考書庫', 'reference library', tx('JLPT・漢検の一覧', 'JLPT and Kanji Kentei lists')];
   const defs = [
     ['review', '復習', 'Review cards', due ? tx(`${due} 枚 待っている`, `${due} card${due === 1 ? '' : 's'} waiting`) : tx('待っている札はない', 'none waiting'), () => {
+      // the layout under test: the saved words are reviewed from Review itself
+      if (placesLayout()) {
+        if (due) startReview();
+        return;
+      }
       keepScroll(); S.stack = []; S.trayFrom = { view: 'dojo', scroll: 0 }; S.view = 'tray'; render(); window.scrollTo(0, 0);
     }],
     ['mock', 'JLPT 模試・練習', 'JLPT tests & practice', readyTests
@@ -23766,7 +24195,7 @@ function studyHallDoors() {
       keepScroll(); S.view = 'mock'; render(); window.scrollTo(0, 0);
     }],
     ['guided', '案内つきの練習', 'Guided test practice', tx('N2 筆記 6問 · 一問ごとに解説', 'N2 written · 6 questions · every question explained'),
-      () => openGuidedRoom('dojo')],
+      () => openGuidedRoom(placesLayout() ? 'tests' : 'dojo')],
     ['lessons', 'レッスン', 'lessons', tx('語彙の稽古', 'vocabulary lessons'), () => {
       keepScroll(); S.view = 'lessons'; render(); window.scrollTo(0, 0);
     }],
@@ -23776,17 +24205,19 @@ function studyHallDoors() {
     ['probe', '読みの確認', 'Reading check', tx('まだ保存していない熟語を読む', 'read compounds you haven’t saved'), () => {
       S.focusMode = 'yomi'; render(); window.scrollTo(0, 0);
     }],
-    ['levels', '参考書庫', 'reference library', tx('JLPT・漢検の一覧', 'JLPT and Kanji Kentei lists'), () => {
+    ['levels', ...levelsName, () => {
       keepScroll(); pendingReferenceCollection = null; referenceLibrary?.reset(); S.view = 'levels'; render(); window.scrollTo(0, 0);
     }],
   ];
   const doors = {};
+  // the layout under test names every door in sentence case, as its places are named
+  const cap = (text) => (placesLayout() && bi() ? text.replace(/^[a-z]/, (c) => c.toUpperCase()) : text);
   for (const [id, ja, en, sub, go] of defs) {
     const b = el('button', 'study-door');
     b.type = 'button';
     b.dataset.studyDoor = id;
-    b.append(el('span', 'study-door-t', tx(ja, en)));
-    b.append(el('span', 'study-door-sub', sub));
+    b.append(el('span', 'study-door-t', cap(tx(ja, en))));
+    b.append(el('span', 'study-door-sub', cap(sub)));
     b.addEventListener('click', go);
     doors[id] = b;
   }
@@ -23877,9 +24308,11 @@ function renderLearnStage(main, doors) {
     stage.classList.add('is-arriving');
     stage.style.setProperty('--learn-t', `${learnStageArrived - now}ms`);
   }
+  // in the layout under test this stage is Review's: the day, the place's name, the first job
+  const places = placesLayout();
   const head = el('header', 'learn-stage-head');
-  head.append(el('p', 'learn-stage-eyebrow', tx('学ぶ・今日', 'Learn · today')));
-  const title = el('h1', 'view-title', tx('次の稽古', 'Up next'));
+  head.append(el('p', 'learn-stage-eyebrow', places ? todayDateline() : tx('学ぶ・今日', 'Learn · today')));
+  const title = el('h1', 'view-title', places ? tx('復習', 'Review') : tx('次の稽古', 'Up next'));
   title.id = 'learn-stage-title';
   head.append(title);
   stage.append(head);
@@ -23892,7 +24325,9 @@ function renderLearnStage(main, doors) {
   const loaded = sums.filter(([, , sum]) => sum);
   const best = loaded.slice().sort((a, b) => b[2].due - a[2].due || b[2].fresh - a[2].fresh)[0];
   const sitting = best && (best[2].due || best[2].fresh) ? best : null;
-  const deckStage = !!sitting;
+  // Review is every card's home in the layout under test: the learner's own saved words lead when
+  // they wait (the founding need: "I don't want to lose it"), else the deck with a sitting ready
+  const deckStage = places ? !due && !!sitting : !!sitting;
   const order = due && !deckStage ? todayQueue().order : [];
   const face = deckStage ? { item: null } : due ? learnStageFace(order) : { item: null };
   const fan = el('div', 'learn-fan');
@@ -23960,13 +24395,17 @@ function renderLearnStage(main, doors) {
       : tx(`枚 · ${short} 新規`, `new ${short} card${n === 1 ? '' : 's'}`)));
   } else {
     count.append(el('b', 'learn-due-n', String(due)));
-    count.append(el('span', 'learn-due-u', tx('枚 復習待ち', due === 1 ? 'card due today' : 'cards due today')));
+    count.append(el('span', 'learn-due-u', places
+      ? tx('枚 · 今日', due === 1 ? 'card for today' : 'cards for today')
+      : tx('枚 復習待ち', due === 1 ? 'card due today' : 'cards due today')));
   }
   row.append(count);
   if (loaded.length) {
     const anyDue = loaded.some(([, , sum]) => sum.due);
     const split = el('p', 'learn-split');
-    split.append(el('span', 'learn-split-h', anyDue ? tx('今日の復習', 'due today') : tx('今日の新しい札', 'new today')));
+    split.append(el('span', 'learn-split-h', places
+      ? anyDue ? tx('デッキ · 今日の復習', 'Decks · due today') : tx('デッキ · 今日の新しい札', 'Decks · new today')
+      : anyDue ? tx('今日の復習', 'due today') : tx('今日の新しい札', 'new today')));
     const line = el('span', 'learn-split-line');
     for (const [id, name, sum] of loaded) {
       const cell = el('span', 'learn-split-cell');
@@ -23983,22 +24422,29 @@ function renderLearnStage(main, doors) {
   // quiet door; without a deck sitting, that review door leads the stage.
   const review = doors.review;
   review.classList.add('learn-go');
-  if (due && !deckStage) {
+  if (due && !deckStage && places) {
+    // the saved words' Begin, with the minutes the learner's own pace gives (gate 3)
+    review.id = 'review-start';
+    review.querySelector('.study-door-t').textContent = tx(`はじめる · ${due} 枚`, `Begin · ${due} card${due === 1 ? '' : 's'}`);
+    const perCard = todaySecondsPerCard();
+    const minutes = perCard ? Math.max(1, Math.round((due * perCard) / 60)) : 0;
+    review.querySelector('.study-door-sub').textContent = minutes
+      ? tx(`保存した語 · 約 ${minutes} 分`, `Your saved words · about ${minutes} min`)
+      : tx('保存した語', 'Your saved words');
+    stage.append(review);
+  } else if (due && !deckStage) {
     review.querySelector('.study-door-t').textContent = tx(`${due} 枚を復習する`, `Review ${due} card${due === 1 ? '' : 's'}`);
     review.querySelector('.study-door-sub').textContent = tx('今日のリストから始める', 'starts from today’s list');
     stage.append(review);
+  } else if (places) {
+    if (sitting) stage.append(deckSittingButton(sitting));
+    // no saved word waits: the door stays, quiet and closed, saying so
+    review.classList.replace('learn-go', 'learn-go-quiet');
+    review.disabled = true;
+    stage.append(review);
   } else {
     if (sitting) {
-      const [id, short, sum] = sitting;
-      const go = el('button', 'learn-go learn-go-deck');
-      go.type = 'button';
-      go.dataset.stageDeck = id;
-      const total = sum.total;
-      go.append(el('span', 'learn-go-t', sum.due
-        ? tx(`${short}の ${total} 枚を始める`, `Begin ${total} ${short} card${total === 1 ? '' : 's'}`)
-        : tx(`${short}の新規 ${total} 枚を始める`, `Begin ${total} new ${short} card${total === 1 ? '' : 's'}`)));
-      go.addEventListener('click', () => openDeck(id, { autoStart: true }));
-      stage.append(go);
+      stage.append(deckSittingButton(sitting));
       review.classList.replace('learn-go', 'learn-go-quiet');
       if (due) {
         // Today's queue keeps its one home; here it is a line that points there
@@ -24010,6 +24456,18 @@ function renderLearnStage(main, doors) {
     stage.append(review);
   }
   main.append(stage);
+}
+/** The stage's primary for a deck with a sitting ready: begin its due cards, or its new ones. */
+function deckSittingButton([id, short, sum]) {
+  const go = el('button', 'learn-go learn-go-deck');
+  go.type = 'button';
+  go.dataset.stageDeck = id;
+  const total = sum.total;
+  go.append(el('span', 'learn-go-t', sum.due
+    ? tx(`${short}の ${total} 枚を始める`, `Begin ${total} ${short} card${total === 1 ? '' : 's'}`)
+    : tx(`${short}の新規 ${total} 枚を始める`, `Begin ${total} new ${short} card${total === 1 ? '' : 's'}`)));
+  go.addEventListener('click', () => openDeck(id, { autoStart: true }));
+  return go;
 }
 
 /** The five numbered blocks under the stage, inside #study-hall. */
@@ -24065,6 +24523,127 @@ function renderStudyHall(main, doors) {
   more.append(list);
 
   hall.append(guided, decks, focus, tests, more);
+  main.append(hall);
+}
+
+/** The layout under test: Review's blocks under the stage, inside #study-hall — every deck (the saved
+ * words and lists among them), the timed practice, and the doors to the saved words themselves and
+ * to the card browser. */
+function renderReviewHall(main) {
+  const hall = el('div', 'learn-hall');
+  hall.id = 'study-hall';
+
+  const decks = el('section', 'learn-section');
+  decks.dataset.learnSection = 'decks';
+  renderDojoDecks(decks, '01');
+
+  const focus = el('section', 'learn-section');
+  focus.dataset.learnSection = 'focus';
+  renderFocusSitting(focus, '02');
+
+  const cards = el('section', 'learn-section learn-more');
+  cards.dataset.learnSection = 'cards';
+  cards.append(learnHead('03', '保存した語', 'Your saved words', S.taken.length ? tx(`${S.taken.length} 語`, `${S.taken.length}`) : ''));
+  const list = el('div', 'learn-more-list');
+  for (const [id, ja, en, sub, view] of [
+    ['review-saved', '保存した語とリスト', 'Saved words & lists', tx('月ごと・リストごとの語、メモ', 'by month and by list, and your notes'), 'saved'],
+    ['review-browse', '札を探す', 'Browse cards', tx('語・読み・意味で探す', 'search by word, reading or meaning'), 'browse'],
+  ]) {
+    const door = el('button', 'study-door');
+    door.type = 'button';
+    door.id = id;
+    door.append(el('span', 'study-door-t', tx(ja, en)), el('span', 'study-door-sub', sub));
+    door.addEventListener('click', () => roomTransition(() => {
+      keepNavigationReturn(view, door);
+      S.view = view; render(); window.scrollTo(0, 0);
+    }));
+    list.append(door);
+  }
+  cards.append(list);
+  // a copy of the record, asked for once two weeks pass without one; its door opens the backup
+  if (!S.storeError && S.taken.length + Object.keys(S.srs).length >= 20) {
+    const last = Number(S.stats?.lastExportTs) || 0;
+    if (!last || Date.now() - last > 14 * 86400000) {
+      const nudge = el('p', 'store-nudge');
+      nudge.append(last
+        ? tx('最後の書き出しから二週間以上たった。', 'It has been over two weeks since you last saved a copy.')
+        : tx('記録はこの端末だけにある。', 'Your cards are saved only on this device.'), ' ');
+      const backup = el('button', 'store-nudge-go', tx('控えを残す', 'Back up now'));
+      backup.type = 'button';
+      backup.id = 'review-backup';
+      backup.addEventListener('click', () => roomTransition(() => {
+        keepNavigationReturn('settings', backup);
+        showRecordBackup();
+        S.view = 'settings'; render(); window.scrollTo(0, 0);
+      }));
+      nudge.append(backup);
+      cards.append(nudge);
+    }
+  }
+
+  hall.append(decks, focus, cards);
+  main.append(hall);
+}
+
+let testsRoomSeen = 0;
+/** 試験 Tests (2026-10-13): what is taken unassisted and scored — the JLPT practice tests with
+ * their lengths, the guided test practice, and the lessons and lists that prepare for them. Its
+ * own room because a test must not mix with the cards (no readings, no lookups, no help). */
+function renderTests(main) {
+  const doors = studyHallDoors();
+  const now = Date.now();
+  const arriving = now - testsRoomSeen > 1500;
+  testsRoomSeen = now;
+  const head = el('header', 'tests-head');
+  head.append(el('p', 'eyebrow', tx('JLPT · 漢検', 'JLPT · Kanken')));
+  head.append(el('h1', 'view-title', tx('試験', 'Tests')));
+  if (arriving) head.classList.add('is-arriving');
+  main.append(head);
+  const hall = el('div', 'learn-hall');
+  hall.id = 'tests-hall';
+
+  const tests = el('section', 'learn-section learn-tests');
+  tests.dataset.learnSection = 'tests';
+  const counts = learnTestCounts();
+  const total = counts.tests + counts.sections + counts.written;
+  tests.append(learnHead('01', '模擬試験', 'Practice tests', counts.loaded ? tx(`${total} 組`, `${total} set${total === 1 ? '' : 's'}`) : ''));
+  tests.append(doors.mock);
+  // the lengths a mock comes in, with how many of each are ready — the catalog's own numbers
+  const entries = assessmentCatalog?.entries || [];
+  const lengths = el('div', 'learn-lengths');
+  for (const [mode, ja, en] of [['short', '短め', 'Short'], ['medium', '中', 'Medium'], ['full', '本番', 'Full']]) {
+    const rows = entries.filter((entry) => entry.mode === mode);
+    if (!rows.length) continue;
+    const readyN = rows.filter((entry) => entry.availability?.ready).length;
+    if (!readyN) continue;
+    const minutes = rows.map((entry) => entry.durationMinutes).filter(Number.isFinite);
+    const cell = el('p', 'learn-length' + (readyN ? '' : ' is-pending'));
+    cell.dataset.mockMode = mode;
+    cell.append(el('b', 'learn-length-t', tx(ja, en)));
+    if (minutes.length) cell.append(el('span', 'learn-length-m', tx(`${Math.min(...minutes)} 分`, `${Math.min(...minutes)} min`)));
+    cell.append(el('span', 'learn-length-n', tx(`${readyN} 組`, `${readyN} ready`)));
+    lengths.append(cell);
+  }
+  if (lengths.childNodes.length) tests.append(lengths);
+
+  const guided = el('section', 'learn-section');
+  guided.dataset.learnSection = 'guided';
+  guided.append(learnHead('02', '案内つきの練習', 'Guided practice', tx('6問', '6 questions')));
+  guided.append(el('p', 'learn-gloss', tx('一問ごとに解説があり、どの語も意味をひらける。迷ったらここから。', 'Every question is explained, and every word opens its meaning. Start here if you’re unsure.')));
+  guided.append(doors.guided);
+
+  const more = el('section', 'learn-section learn-more');
+  more.dataset.learnSection = 'more';
+  more.append(learnHead('03', 'ほかの練習', 'More practice', ''));
+  const list = el('div', 'learn-more-list');
+  list.append(doors.lessons, doors.sentence, doors.levels);
+  more.append(list);
+  more.append(el('p', 'fine study-hall-note', tx(
+    '試験で間違えた語は、保存して復習に回せる。',
+    'Words you miss in a test can be saved, and they come back in Review.',
+  )));
+
+  hall.append(tests, guided, more);
   main.append(hall);
 }
 
@@ -24124,7 +24703,7 @@ function deckWordsBegun(id) {
   }
 }
 
-function renderDojoDecks(main) {
+function renderDojoDecks(main, n = '02') {
   const list = el('div', 'dojo-decks');
   let totalDue = 0;
   let totalFresh = 0;
@@ -24178,8 +24757,14 @@ function renderDojoDecks(main) {
     render();
     window.scrollTo(0, 0);
   });
-  const forecast = srsForecast();
-  row('mine', tx('保存した語', 'Your saved words'), tx(`復習 ${forecast.today + forecast.fresh} 枚`, `${forecast.today + forecast.fresh} to review`), () => startReview());
+  if (placesLayout()) {
+    // the same number the stage's Begin and the tab's badge read (todayQueue), never a second count
+    const mineToday = S.taken.length && scheduler ? todayQueue().order.length : 0;
+    row('mine', tx('保存した語', 'Your saved words'), tx(`今日 ${mineToday} 枚`, `${mineToday} to review today`), () => startReview());
+  } else {
+    const forecast = srsForecast();
+    row('mine', tx('保存した語', 'Your saved words'), tx(`復習 ${forecast.today + forecast.fresh} 枚`, `${forecast.today + forecast.fresh} to review`), () => startReview());
+  }
   for (const name of Object.keys(S.lists || {})) {
     const items = S.lists[name];
     if (!items.length) continue;
@@ -24187,7 +24772,7 @@ function renderDojoDecks(main) {
     const waiting = srsDueItems().filter((i) => keys.has(srsKey(i.t, i.id))).length;
     row(`list:${name}`, name, tx(`リスト ・ ${items.length} 語 ・ ${waiting} 枚 待っている`, `list · ${items.length} words · ${waiting} waiting`), () => startReview(items));
   }
-  main.append(learnHead('02', 'デッキ', 'Decks', counted ? tx(`復習 ${totalDue} · 新 ${totalFresh}`, `${totalDue} due · ${totalFresh} new`) : ''));
+  main.append(learnHead(n, 'デッキ', 'Decks', counted ? tx(`復習 ${totalDue} · 新 ${totalFresh}`, `${totalDue} due · ${totalFresh} new`) : ''));
   main.append(list);
 }
 
@@ -24222,6 +24807,18 @@ function renderDeckPlay(main) {
       english: bi(),
       presentation: deckPresentation,
       storage: localStorage, host: deckHost(),
+      // the layout under test opens the decks in the focus room (the clean card, the right half that
+      // turns it, every reading on the back, one door forward from the close)
+      layout: placesLayout() ? 'places' : null,
+      // the sitting's close opens one door forward: today's reading, as the bookshelf names it
+      next() {
+        const read = todayReadPick();
+        return read ? {
+          label: read.count ? tx(`今日の読み物 · あなたの語 ${read.count}`, `Today's reading · ${read.count} of your words`) : tx('今日の読み物', "Today's reading"),
+          title: read.passage.title,
+          open: () => openPassage(read.passage.id),
+        } : null;
+      },
       onLeave() {
         delete deckSummaries[S.deckPlay];
         S.view = 'dojo';
@@ -24236,19 +24833,21 @@ function renderDeckPlay(main) {
     });
 }
 
-/** 学ぶ — the Learn room: the stage, then the numbered blocks (renderStudyHall). */
+/** 学ぶ — the Learn room: the stage, then the numbered blocks (renderStudyHall). In the layout under
+ * test this room is Review: the stage, then the decks, the timed practice and the saved words. */
 function renderFocus(main) {
   const doors = studyHallDoors();
   renderLearnStage(main, doors);
-  renderStudyHall(main, doors);
+  if (placesLayout()) renderReviewHall(main);
+  else renderStudyHall(main, doors);
 }
 
 /** 03 · the focus sitting: choose a length and what to drill, then begin. */
-function renderFocusSitting(focus) {
+function renderFocusSitting(focus, n = '03') {
   const forecast = srsForecast();
   const due = forecast.today + forecast.fresh;
   S.focusMin = S.focusMin || 20;
-  focus.append(learnHead('03', '時間を決めて練習', 'Timed practice', tx(`${S.focusMin} 分`, `${S.focusMin} min`)));
+  focus.append(learnHead(n, '時間を決めて練習', 'Timed practice', tx(`${S.focusMin} 分`, `${S.focusMin} min`)));
   focus.append(
     el(
       'p',
@@ -24567,7 +25166,7 @@ function renderProbe(main) {
         main.append(row);
       }
     }
-    const out = biLabel('button', 'take', '道場へ', 'back to the dojo');
+    const out = (placesLayout() ? biLabel('button', 'take', '復習へ', 'Back to Review') : biLabel('button', 'take', '道場へ', 'back to the dojo'));
     out.type = 'button';
     out.addEventListener('click', () => {
       endFocus();
@@ -30483,7 +31082,7 @@ function openSearchPage({ sourceContext = null } = {}) {
 }
 
 function renderSearchPage(main) {
-  main.append(withEn(el('p', 'eyebrow', '検索'), 'search', 'en-inline'));
+  main.append(placesLayout() ? withEn(el('p', 'eyebrow', '辞書'), 'Dictionary') : withEn(el('p', 'eyebrow', '検索'), 'search', 'en-inline'));
   const wrap = el('div', 'search-page');
   const input = el('input', 'nav-search-input search-page-input');
   // Guard native Enter before the result-specific listener below. Keeping
@@ -30791,10 +31390,13 @@ function buildGingaChrome(root) {
   // Round 4 (T1, "a clean Today and stable entry point"): it is the door's one way down to
   // Today, so it is always here and named for where it goes, whether the app just opened or the
   // learner rose from Today's sky. The count stays its first number (the truthful-count pins).
+  // In the layout under test the one way down is the first job of the day, named as its place is.
   if (S.view === 'drift' && !S.navOpen) {
     const waiting = S.taken.length && scheduler ? todayQueue().order.length : 0;
+    const places = placesLayout();
+    const [ja, en] = places ? ['復習', 'Review'] : ['今日', 'Today'];
     const pill = biLabel('button', 'corner-bubble bubble-review' + (waiting ? '' : ' quiet'),
-      waiting ? `今日 · ${waiting}枚` : '今日', waiting ? `Today · ${waiting} card${waiting === 1 ? '' : 's'}` : 'Today');
+      waiting ? `${ja} · ${waiting}枚` : ja, waiting ? `${en} · ${waiting} card${waiting === 1 ? '' : 's'}` : en);
     pill.type = 'button';
     pill.id = 'home-review';
     pill.setAttribute('data-drift-chrome', '');
@@ -30802,8 +31404,11 @@ function buildGingaChrome(root) {
       S.navOpen = false;
       keepScroll();
       S.stack = [];
-      S.trayFrom = { view: 'drift', scroll: 0 };
-      S.view = 'tray';
+      if (places) S.view = 'dojo';
+      else {
+        S.trayFrom = { view: 'drift', scroll: 0 };
+        S.view = 'tray';
+      }
       render();
       window.scrollTo(0, 0);
     }));
@@ -30852,6 +31457,10 @@ function buildGingaChrome(root) {
   // the bar (operator, 2026-10-02, note 1): ‹ › · a real, wide look-up field · 復習 N · 集中道場 ·
   // EN/日本語. Reporting lives on the bug alone; the strip's own "Report a problem" is gone.
   bar.append(buildNavSearchField());
+  if (placesLayout()) {
+    buildPlacesMenu(root, bar);
+    return;
+  }
   // 復習 with today's due count, one tap into review; at 0 the count steps away, the door stays
   const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
   const review = biLabel('button', 'nav-review', '復習', 'review');
@@ -30902,6 +31511,56 @@ function buildGingaChrome(root) {
   root.append(shelf, sensei);
 }
 
+/** The door's menu in the layout under test: the five places, named and ordered as the tab bar,
+ * one row each with a few plain words of what is inside (Review carries today's count), and the
+ * tutor's own bubble. Each opens the room its tab opens; Back from there returns to this door. The
+ * interface language lives in Progress → Settings. */
+function buildPlacesMenu(root, bar) {
+  const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
+  const LINES = {
+    review: due ? [`今日 ${due} 枚`, `${due} card${due === 1 ? '' : 's'} for today`] : ['カードとデッキ', 'Your cards and decks'],
+    bookshelf: ['記事 · 今日の読み物から', "Articles, today's reading first"],
+    dictionary: ['語・漢字・文法を調べる', 'Look up words, kanji, grammar'],
+    tests: ['JLPT の模擬試験と練習', 'JLPT practice tests'],
+    progress: ['一年の記録 · 統計 · 設定', 'Your year, statistics, settings'],
+  };
+  const stations = el('div', 'nav-stations');
+  for (const tab of PLACES_TABS) {
+    const station = el('button', 'nav-station');
+    station.type = 'button';
+    station.id = `nav-${tab.id}`;
+    station.dataset.tab = tab.id;
+    station.append(el('span', 'nav-station-t', tx(tab.ja, tab.en)), el('span', 'nav-station-sub', tx(...LINES[tab.id])));
+    // Review's count is the tab bar's own (todayQueue); at 0 it steps away
+    if (tab.due && due) station.append(el('span', 'nav-count', String(due)));
+    station.append(el('i', 'nav-station-go'));
+    station.setAttribute('aria-label', `${tx(tab.ja, tab.en)} — ${tx(...LINES[tab.id])}`);
+    station.addEventListener('click', () => {
+      S.navOpen = false;
+      if (tab.view === 'search') { openSearchPage(); return; }
+      if (tab.view === 'me') keepNavigationReturn('me', station);
+      else keepScroll();
+      S.stack = [];
+      S.view = tab.view;
+      render();
+      window.scrollTo(0, tab.view === 'shelf' ? S.shelfScroll : 0);
+    });
+    stations.append(station);
+  }
+  bar.append(stations);
+  root.append(bar);
+  const sensei = biLabel('button', 'corner-bubble bubble-sensei', '先生', 'Tutor');
+  sensei.type = 'button';
+  sensei.setAttribute('data-drift-chrome', '');
+  sensei.addEventListener('click', () => {
+    S.navOpen = false;
+    keepScroll();
+    S.view = 'ai';
+    render();
+  });
+  root.append(sensei);
+}
+
 /** iOS Safari applies :active only where a touch listener exists. One passive listener on the
  * document lets every control show its press at touch-down, as native controls do (T2: "native
  * ios expeirnce is alreayd way smoother and tighter and crisper"). It never blocks a scroll. */
@@ -30936,7 +31595,32 @@ function syncThemeColor() {
   });
 }
 
-/** The shell has one label table; rooms retain their existing navigation paths. */
+/* The layout under test (2026-10-14; John: "save the current version and build this as a test only
+ * but build it proper"). The current layout stays the default and is untouched. "places" is the
+ * layout he is trying: five places named for what is inside them (Review, Bookshelf, Dictionary,
+ * Tests, Progress), a top bar of Back and search, Today's next step folded into Review and the
+ * focus room in the decks. It is chosen in Settings → Layout (or ?layout=places / current) and kept
+ * on this device like the colour theme: a UI preference, never learner evidence, never in the
+ * record. Both layouts read and write the same record in the same way. */
+const LAYOUT_STORE = 'kairo-layout';
+let layoutChoice = null;
+function placesLayout() {
+  if (layoutChoice === null) {
+    let stored = null;
+    try { stored = localStorage.getItem(LAYOUT_STORE); } catch { /* storage may be blocked */ }
+    layoutChoice = stored === 'places' ? 'places' : 'current';
+  }
+  return layoutChoice === 'places';
+}
+function setLayout(next) {
+  layoutChoice = next === 'places' ? 'places' : 'current';
+  try {
+    if (layoutChoice === 'places') localStorage.setItem(LAYOUT_STORE, 'places');
+    else localStorage.removeItem(LAYOUT_STORE);
+  } catch { /* the choice still holds for this visit */ }
+}
+
+/** The current layout's label table; rooms retain their existing navigation paths. */
 const PRIMARY_TABS = [
   { id: 'today', ja: '今日', en: 'Today', view: 'tray', views: ['tray', 'list', 'browse', 'review', 'aiquiz'] },
   { id: 'read', ja: '読む', en: 'Read', view: 'shelf', views: ['shelf', 'reader', 'archive', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader'] },
@@ -30946,6 +31630,25 @@ const PRIMARY_TABS = [
   // r4 skin: your own texts are a deck; the page's way back and its Learn row both lead to Learn,
   // so the Line marks Learn there too (it marked Me while ← Learn left for Learn)
 ];
+/** The layout under test: five places, one job each, each named for what is inside it. John never
+ * chose "Today · Read · Learn · Words · Me" (an agent brief coined them on 10-08) and rejected them
+ * on sight ("wtf is read learn words me??"); his own words are the SRS page, the bookshelf, the
+ * dictionary, tests. Apple's HIG, NN/g and the learning apps he could compare (Anki, WaniKani,
+ * Bunpro, LingQ, Todaii) agree: 3–5 plain nouns, due reviews in one place, tests apart because a
+ * test is taken unassisted, no catch-all "Learn" or "Me". The order follows his day. Rooms keep
+ * their internal ids: 'dojo' is the Review room, 'tests' the Tests room. `due` marks the place
+ * whose station carries today's count. */
+const PLACES_TABS = [
+  { id: 'review', ja: '復習', en: 'Review', view: 'dojo', due: true, views: ['dojo', 'review', 'deckplay', 'contextdeck', 'personaldeck', 'probe', 'saved', 'list', 'browse', 'aiquiz'] },
+  { id: 'bookshelf', ja: '本棚', en: 'Bookshelf', view: 'shelf', views: ['shelf', 'reader', 'archive', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader'] },
+  { id: 'dictionary', ja: '辞書', en: 'Dictionary', view: 'search', views: ['search', 'kanjidex', 'grammar', 'yoji', 'thesaurus'] },
+  { id: 'tests', ja: '試験', en: 'Tests', view: 'tests', views: ['tests', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice'] },
+  { id: 'progress', ja: '記録', en: 'Progress', view: 'me', views: ['me', 'kagami', 'srs-stats', 'settings'] },
+];
+/** The tab table of the layout in use. */
+function primaryTabs() {
+  return placesLayout() ? PLACES_TABS : PRIMARY_TABS;
+}
 let primaryDockObserver;
 /** Keep the report rail above live room controls, including wrapped labels. */
 function observePrimaryDocks() {
@@ -30997,28 +31700,31 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
   // the Line (concept D graft): five stations on one hairline track; the car is the one filled
   // square, and it slides (transform only) from the last station to this one. Stations and the
   // car carry no text, so each button's text stays exactly its label.
-  const at = PRIMARY_TABS.findIndex((tab) => tab.views.includes(S.view));
-  bar.dataset.station = at < 0 ? '' : PRIMARY_TABS[at].id;
+  const tabs = primaryTabs();
+  const at = tabs.findIndex((tab) => tab.views.includes(S.view));
+  bar.dataset.station = at < 0 ? '' : tabs[at].id;
   // Today's live due count: the same truth the galaxy bar's 復習 N reads (todayQueue), never a guess
   const due = !personal && S.taken.length && scheduler ? todayQueue().order.length : 0;
-  for (const tab of PRIMARY_TABS) {
+  // the station that carries it: Today in the current layout, Review in the layout under test
+  const dueTab = placesLayout() ? 'review' : 'today';
+  for (const tab of tabs) {
     const button = el('button', 'primary-tab', tx(tab.ja, tab.en));
     button.type = 'button';
     button.id = `tab-${tab.id}`;
     const node = el('i', 'station-node');
     node.setAttribute('aria-hidden', 'true');
     button.append(node);
-    if (tab.id === 'today' && due) {
+    if (tab.id === dueTab && due) {
       const count = el('i', 'station-due');
       count.dataset.due = String(due);
       count.setAttribute('aria-hidden', 'true');
       button.append(count);
-      button.setAttribute('aria-label', tx(`今日 · ${due}枚`, `Today · ${due} card${due === 1 ? '' : 's'}`));
+      button.setAttribute('aria-label', tx(`${tab.ja} · ${due}枚`, `${tab.en} · ${due} card${due === 1 ? '' : 's'}`));
     }
     if (tab.views.includes(S.view)) button.setAttribute('aria-current', 'page');
     // A finished sitting is still Today's current station. Its explicit return above the
     // dock owns the exit; the active station remains visible without repeating that action.
-    if (tab.id === 'today' && S.view === 'review' && S.review
+    if (tab.id === dueTab && S.view === 'review' && S.review
       && S.review.ix >= S.review.queue.length) button.disabled = true;
     button.addEventListener('click', () => {
       if (personal) {
@@ -31068,8 +31774,12 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
 const ROOM_SIGNS = {
   tray: ['今日', 'Today'], shelf: ['読む', 'Read'], dojo: ['学ぶ', 'Learn'], search: ['辞書', 'Words'], me: ['私', 'Me'],
 };
+/** The layout under test: each place's sign says the place's own name. */
+const PLACES_SIGNS = {
+  dojo: ['復習', 'Review'], shelf: ['本棚', 'Bookshelf'], search: ['辞書', 'Dictionary'], tests: ['試験', 'Tests'], me: ['記録', 'Progress'],
+};
 function buildRoomSign() {
-  const names = ROOM_SIGNS[S.view];
+  const names = (placesLayout() ? PLACES_SIGNS : ROOM_SIGNS)[S.view];
   if (!names || S.stack.length) return null;
   const sign = el('div', 'room-sign');
   sign.setAttribute('aria-hidden', 'true');
@@ -31399,6 +32109,11 @@ function meBreakable(tag, cls, text) {
   for (const part of String(text).split(/(?<=[・、])/u)) node.append(el('span', 'me-nb', part));
   return node;
 }
+/** Where an unbegun goal's deck lives: Learn in the current layout, Review in the layout under test. */
+function fieldsDeckHome() {
+  return placesLayout() ? tx('まだ始めていない · 専門デッキは復習に', 'not begun · the fields deck is in Review')
+    : tx('まだ始めていない · 専門デッキは学ぶの部屋に', 'not begun · the fields deck is in Learn');
+}
 /** One horizon: its name (a field also carries his own gloss), the figure held, the ruled scale. */
 function meHorizonRow(h, { quiet = false } = {}) {
   const row = el('div', 'me-hz');
@@ -31427,8 +32142,9 @@ function meHorizonRow(h, { quiet = false } = {}) {
   if (!h.begun) sub.textContent = {
     saved: tx('まだ札がない · 読みながら言葉を集める', 'no cards yet · save words as you read'),
     kanken: tx('集めた言葉の漢字が、ここに数えられる', 'counted from the kanji in your words'),
-    n1: tx('まだ始めていない · N1デッキは学ぶの部屋に', 'not begun · the N1 deck is in Learn'),
-  }[h.id] || tx('まだ始めていない · 専門デッキは学ぶの部屋に', 'not begun · the fields deck is in Learn');
+    n1: placesLayout() ? tx('まだ始めていない · N1デッキは復習に', 'not begun · the N1 deck is in Review')
+      : tx('まだ始めていない · N1デッキは学ぶの部屋に', 'not begun · the N1 deck is in Learn'),
+  }[h.id] || fieldsDeckHome();
   else if (h.counting) sub.textContent = tx('専門デッキの札を数えている…', 'counting your fields deck…');
   else {
     sub.append(el('span', '', h.measure));
@@ -31475,7 +32191,7 @@ function meHorizonsPart(decks) {
   const fields = rows.filter((h) => h.field);
   // until the fields deck is opened, the three fields say so once, not three times
   const unbegun = fields.length > 0 && fields.every((h) => !h.begun);
-  if (unbegun) sec.append(el('p', 'me-hz-sub me-hz-group-note', tx('まだ始めていない · 専門デッキは学ぶの部屋に', 'not begun · the fields deck is in Learn')));
+  if (unbegun) sec.append(el('p', 'me-hz-sub me-hz-group-note', fieldsDeckHome()));
   for (const h of fields) sec.append(meHorizonRow(h, { quiet: unbegun }));
   sec.append(el('h3', 'me-hz-group', tx('あなたの言葉', 'Your words')));
   for (const h of rows) if (h.id === 'kanken' || h.id === 'saved') sec.append(meHorizonRow(h));
@@ -31710,7 +32426,7 @@ function renderMe(main) {
   doors.append(
     foundationDoor('me-progress', '学びの足跡', 'Your progress', 'kagami'),
     foundationDoor('me-statistics', '復習の統計', 'Review statistics', 'srs-stats'),
-    foundationDoor('me-collections', '集めた言葉', 'Saved words & lists', 'tray'),
+    placesLayout() ? foundationDoor('me-collections', '保存した語とリスト', 'Saved words & lists', 'saved') : foundationDoor('me-collections', '集めた言葉', 'Saved words & lists', 'tray'),
   );
   if (window.__CORRIDOR_STANDALONE__ !== true) {
     const personal = biLabel('button', 'grammar-link foundation-door', '自分の文章', 'Your own texts');
@@ -31737,8 +32453,45 @@ function renderMe(main) {
     });
   }
 }
+/** Opening Settings at the record: the backup row in view and Export ready for a key press. */
+function showRecordBackup() {
+  requestAnimationFrame(() => {
+    document.getElementById('record-backup')?.scrollIntoView({ block: 'center' });
+    document.getElementById('export-store')?.focus({ preventScroll: true });
+  });
+}
+/** Settings → Layout: the current layout, or the one under test. Two visible states, the active one
+ * lit, and one plain line of what changes and what does not. The choice re-renders where it stands. */
+function renderLayoutChoice() {
+  const section = el('section', 'foundation-section settings-layout');
+  section.id = 'settings-layout';
+  section.append(el('h2', 'eyebrow', tx('レイアウト', 'Layout')));
+  const choices = el('div', 'lang-seg settings-layout-choice');
+  choices.setAttribute('role', 'group');
+  choices.setAttribute('aria-label', tx('レイアウト', 'Layout'));
+  for (const [id, ja, en] of [['current', 'いまの形', 'Current'], ['places', '新しい形（試験中）', 'New (test)']]) {
+    const button = el('button', '', tx(ja, en));
+    button.type = 'button';
+    button.dataset.layout = id;
+    button.setAttribute('aria-pressed', String((placesLayout() ? 'places' : 'current') === id));
+    button.addEventListener('click', () => {
+      if ((placesLayout() ? 'places' : 'current') === id) return;
+      roomTransition(() => {
+        setLayout(id);
+        render();
+        window.scrollTo(0, 0);
+      });
+    });
+    choices.append(button);
+  }
+  section.append(choices, el('p', 'settings-layout-note', tx(
+    '新しい形：復習・本棚・辞書・試験・記録の五つ。カードと記録はどちらも同じ。いつでも戻せる。',
+    'New: five places — Review, Bookshelf, Dictionary, Tests, Progress. Your cards and record are the same in both; switch back any time.')));
+  return section;
+}
 function renderSettings(main) {
-  main.append(el('p', 'eyebrow me-kicker', tx('私', 'Me')));
+  const places = placesLayout();
+  main.append(el('p', 'eyebrow me-kicker', places ? tx('記録', 'Progress') : tx('私', 'Me')));
   main.append(el('h1', 'view-title', tx('設定', 'Settings')));
   const language = el('section', 'foundation-section');
   language.append(el('h2', 'eyebrow', tx('表示言語', 'Interface language')));
@@ -31752,27 +32505,15 @@ function renderSettings(main) {
     }); choices.append(button);
   }
   language.append(choices);
-  const world = biLabel('button', 'grammar-link foundation-door', '世界を選ぶ', 'Choose a world');
+  // in the layout under test the colour theme is named as the picker names it (LABELS.md)
+  const world = places
+    ? biLabel('button', 'grammar-link foundation-door', '配色', 'Colour theme')
+    : biLabel('button', 'grammar-link foundation-door', '世界を選ぶ', 'Choose a world');
   world.type = 'button'; world.id = 'settings-world'; attachWorldPicker(world);
   const worldText = el('span', 'settings-world-text');
   worldText.append(...world.childNodes, el('span', 'settings-world-value', worldName(THEME_UI[themeIx()])));
   world.append(worldText);
   const doors = el('div', 'foundation-doors');
-  doors.append(world,
-    foundationDoor('settings-pace', '復習のペース', 'Review pace', 'tray', () => {
-      S.srsPrefsOpen = true;
-      S.todayDetailHeld = true;
-      requestAnimationFrame(() => document.getElementById('srs-prefs-toggle')?.scrollIntoView({ block: 'start' }));
-    }),
-    foundationDoor('settings-reading', '読み物の好み', 'Reading preferences', 'airead'),
-    foundationDoor('settings-tutor', '先生との接続', 'Tutor connection', 'ai'),
-    foundationDoor('settings-backup', '記録とバックアップ', 'Record & backup', 'tray', () => {
-      requestAnimationFrame(() => {
-        document.getElementById('record-backup')?.scrollIntoView({ block: 'center' });
-        document.getElementById('export-store')?.focus({ preventScroll: true });
-      });
-    }),
-  );
   const about = el('section', 'foundation-section');
   about.id = 'settings-release';
   about.append(el('h2', 'eyebrow', tx('このアプリについて', 'About this app')));
@@ -31788,9 +32529,46 @@ function renderSettings(main) {
   about.append(notes, el('p', 'card-kind', tx(
     '更新するには、オンラインで開いた後、このアプリの画面をすべて閉じて、もう一度開いてください。保存データは消さないでください。',
     'To update, open online, then close all app windows and reopen. Keep your saved website data.')));
-  main.append(language, doors, about);
+  if (places) {
+    // the layout under test keeps here what the old Today held below its cards: the pace, the
+    // record's sync and backup, and the note to the builder, each with its controls and ids unchanged
+    doors.append(world,
+      foundationDoor('settings-reading', '読み物の好み', 'Reading preferences', 'airead'),
+      foundationDoor('settings-tutor', '先生との接続', 'Tutor connection', 'ai'),
+    );
+    const pace = el('section', 'foundation-section settings-pace');
+    pace.id = 'settings-pace';
+    pace.append(el('h2', 'eyebrow', tx('復習のペース — 1日の枚数', 'Review pace — cards a day')));
+    renderSrsPrefs(pace, { open: true });
+    const record = el('section', 'foundation-section settings-record');
+    record.id = 'settings-record';
+    record.append(el('h2', 'eyebrow', tx('記録とバックアップ', 'Record & backup')));
+    record.append(renderRecordSync());
+    renderPortRow(record);
+    const builder = el('section', 'foundation-section settings-builder');
+    renderNoteDoor(builder);
+    main.append(language, renderLayoutChoice(), doors, pace, record, renderReportRelaySettings(), builder, about);
+    return;
+  }
+  doors.append(world,
+    foundationDoor('settings-pace', '復習のペース', 'Review pace', 'tray', () => {
+      S.srsPrefsOpen = true;
+      S.todayDetailHeld = true;
+      requestAnimationFrame(() => document.getElementById('srs-prefs-toggle')?.scrollIntoView({ block: 'start' }));
+    }),
+    foundationDoor('settings-reading', '読み物の好み', 'Reading preferences', 'airead'),
+    foundationDoor('settings-tutor', '先生との接続', 'Tutor connection', 'ai'),
+    foundationDoor('settings-backup', '記録とバックアップ', 'Record & backup', 'tray', showRecordBackup),
+  );
+  main.append(language, renderLayoutChoice(), doors, renderReportRelaySettings(), about);
 }
 function renderWordsDoors(main) {
+  // the layout under test: the day's word, large, with its reading and the part its kanji share —
+  // the Dictionary's one moment (it stood on Today); hidden with the web while a search shows
+  if (placesLayout()) {
+    const pick = todayWordOfDay(S.taken.length && scheduler ? todayQueue() : null);
+    if (pick) main.append(renderTodayWord(pick));
+  }
   // the Words tab opens on the word web (the last word looked up, else the
   // day's word); while a query or a finder lens is showing, words.css hides it
   const web = renderWordWeb();
@@ -31823,7 +32601,7 @@ const ROOM_IDS = {
   feed: 'feed', publisher: 'publisher', 'source-inbox': 'source-inbox',
   'source-reader': 'source-reader', 'sentence-practice': 'sentence-practice',
   kanjidex: 'kanji', yoji: 'idioms', grammar: 'grammar', guided: 'guided',
-  search: 'search', me: 'me', settings: 'settings',
+  search: 'search', me: 'me', settings: 'settings', saved: 'saved', tests: 'tests',
 };
 const REGISTER_ROOM_DOORS = [['いまの日本を読む', 'news & magazines'], ['日本語を持ち込む', 'bring your own text'], ['参考書庫', 'Reference library'], ['レッスン', 'Lessons'], ['JLPT の練習', 'JLPT practice']];
 const REGISTER_LINE_DOORS = [['読み物の好み', 'Reading preferences']];
@@ -31904,10 +32682,41 @@ function renderRoomError(main, view, error) {
   card.append(retry, home);
   main.append(card);
 }
+/** The crumb in the layout under test: the place, then the room inside it, in the words the tab bar
+ * uses; the door and the variant strip's field keep their own names. */
+function crumbPlaces(parts) {
+  const place = PLACES_TABS.find((tab) => tab.views.includes(S.view));
+  if (S.view === 'entry') parts.push(tx('野', 'Field'));
+  else if (S.view === 'drift') parts.push(tx('銀河', 'Galaxy'));
+  else parts.push(place ? tx(place.ja, place.en) : tx('本棚', 'Bookshelf'));
+  const ROOM_NAMES = {
+    reader: null, archive: ['新聞アーカイブ', 'Archive'], publisher: ['保存記事', 'Saved article'],
+    feed: ['ニュースと雑誌', 'News & magazines'], airead: ['読み物', 'Your reading'],
+    'source-inbox': ['持ち込んだ日本語', 'Your own text'], 'source-reader': ['持ち込んだ日本語', 'Your own text'],
+    review: S.focus ? ['時間を決めて練習', 'Timed practice'] : ['復習', 'Review'], probe: ['読みの確認', 'Reading check'],
+    deckplay: ['デッキ', 'Deck'], contextdeck: ['一語一段落', 'One word, one paragraph'],
+    saved: ['保存した語とリスト', 'Saved words & lists'], list: ['保存した語とリスト', 'Saved words & lists'],
+    browse: ['札を探す', 'Browse cards'], aiquiz: ['小テスト', 'Quiz'],
+    mock: ['模擬試験', 'Practice tests'], guided: ['案内つきの練習', 'Guided practice'], lessons: ['レッスン', 'Lessons'],
+    levels: ['JLPT・漢検の一覧', 'JLPT & Kanken lists'], 'sentence-practice': ['文の練習', 'Sentence practice'],
+    kanjidex: ['漢字を調べる', 'Kanji by shape'], grammar: ['文法', 'Grammar'], yoji: ['四字熟語', 'Four-character idioms'],
+    thesaurus: ['言葉のつながり', 'Word web'], kagami: ['学びの足跡', 'Your progress'],
+    'srs-stats': ['復習の統計', 'Review statistics'], settings: ['設定', 'Settings'], ai: ['先生', 'Tutor'],
+  };
+  if (ROOM_NAMES[S.view]) parts.push(tx(...ROOM_NAMES[S.view]));
+  if (S.view === 'reader' && passage()) {
+    // an archive read names the stack it came from — its back door
+    if (String(passage().file || '').startsWith('archive/')) parts.push(tx('新聞アーカイブ', 'Archive'));
+    parts.push(passage().title);
+  }
+}
 /* classes a press FLIPS — left out of the last-resort focus key, or the control could never be
  * found again by the very press that moved the keyboard */
 const FOCUS_STATE_CLASSES = new Set(['on', 'on-list', 'dead', 'active', 'lit', 'primary', 'quiet']);
 function render() {
+  // Today folds into Review in the layout under test; anything that still names it opens
+  // Review, its successor. The current layout is asked only when the view is Today.
+  if (S.view === 'tray' && placesLayout()) S.view = 'dojo';
   syncSheetActionVisit();
   if (personalHost) { personalHost.paint(); return; }
   if (retainedRetryView && S.view !== retainedRetryView) dropRetainedRetryRoute();
@@ -31981,6 +32790,9 @@ function render() {
   // the reading measure is per-view: a column for the texts, the full window
   // for the landscapes (野 and 墨流し). CSS reads this, nothing else does.
   document.body.dataset.view = S.view;
+  // the layout under test stamps the root for its styles; the current layout leaves it unmarked
+  if (placesLayout()) document.documentElement.dataset.layout = 'places';
+  else delete document.documentElement.dataset.layout;
 
   // 銀河 hero: at home on the drift the galaxy stands alone but for its symbol;
   // the ordinary top bar is replaced by the tap-to-open nav, and the drift's
@@ -32021,7 +32833,7 @@ function render() {
   // the previous tab, which the bar already shows). Leaving that tab's rooms forgets it, so a
   // root reached through a door (the front door's bubbles, the chrome's Lists/Learn/search,
   // a room link) keeps its Back to where the learner came from.
-  const tabOfRoot = S.tabRoot ? PRIMARY_TABS.find((tab) => tab.view === S.tabRoot) : null;
+  const tabOfRoot = S.tabRoot ? primaryTabs().find((tab) => tab.view === S.tabRoot) : null;
   if (!tabOfRoot || !tabOfRoot.views.includes(S.view)) S.tabRoot = null;
   const atTabRoot = S.variants.nav === 'tabs' && !!S.tabRoot && S.view === S.tabRoot;
   const atHome =
@@ -32041,62 +32853,65 @@ function render() {
 
   const crumb = el('div', 'crumb');
   const parts = [];
-  // the crumb names the TRUE origin — the room 戻る actually reopens. The
-  // dojo family (dojo, its probe, its focus blocks) is entered from the
-  // galaxy and its backs walk galaxy-ward, never through the bookshelf.
-  const dojoFamily = S.view === 'dojo' || S.view === 'probe' || S.view === 'deckplay' || (S.view === 'review' && S.focus) ||
-    (S.view === 'guided' && guidedFrom === 'dojo');
-  // the search room's door stands in the galaxy bar, and its Back walks
-  // there unless it was opened from the shelf
-  const searchFromGalaxy = S.view === 'search' && S.searchFrom !== 'shelf';
-  // the lists tray opens from every room and its 戻る walks back there, so a room reached
-  // through it (the tray, its quiz, a plain review) is rooted where the tray was opened —
-  // it said 本棚 whichever room that was (PR #77 d9f0b984)
-  const viaTray = S.view === 'tray' || S.view === 'aiquiz' || (S.view === 'review' && !S.focus);
-  const trayOrigin = !viaTray ? null : S.trayFrom === 'reader' ? 'reader' : plainRecord(S.trayFrom) ? S.trayFrom.view : null;
-  const galaxyWard = (view) => view === 'drift' || view === 'dojo' || view === 'probe' || view === 'deckplay' ||
-    (view === 'guided' && guidedFrom === 'dojo') || (view === 'search' && S.searchFrom !== 'shelf');
-  if (S.view === 'entry' || trayOrigin === 'entry') parts.push(tx('野', 'field'));
-  else if (trayOrigin) parts.push(galaxyWard(trayOrigin) ? tx('銀河', 'galaxy') : tx('本棚', 'bookshelf'));
-  else if (S.view === 'settings') parts.push(tx('私', 'Me'), tx('設定', 'Settings'));
-  else if (S.view === 'drift' || dojoFamily || searchFromGalaxy) parts.push(tx('銀河', 'galaxy'));
-  else parts.push(tx('本棚', 'bookshelf'));
-  if (S.view === 'reader' && passage()) {
-    // an archive read names the stack it came from — its back door
-    if (String(passage().file || '').startsWith('archive/')) parts.push(tx('新聞アーカイブ', 'archive'));
-    parts.push(passage().title);
+  if (placesLayout()) crumbPlaces(parts);
+  else {
+    // the crumb names the TRUE origin — the room 戻る actually reopens. The
+    // dojo family (dojo, its probe, its focus blocks) is entered from the
+    // galaxy and its backs walk galaxy-ward, never through the bookshelf.
+    const dojoFamily = S.view === 'dojo' || S.view === 'probe' || S.view === 'deckplay' || (S.view === 'review' && S.focus) ||
+      (S.view === 'guided' && guidedFrom === 'dojo');
+    // the search room's door stands in the galaxy bar, and its Back walks
+    // there unless it was opened from the shelf
+    const searchFromGalaxy = S.view === 'search' && S.searchFrom !== 'shelf';
+    // the lists tray opens from every room and its 戻る walks back there, so a room reached
+    // through it (the tray, its quiz, a plain review) is rooted where the tray was opened —
+    // it said 本棚 whichever room that was (PR #77 d9f0b984)
+    const viaTray = S.view === 'tray' || S.view === 'aiquiz' || (S.view === 'review' && !S.focus);
+    const trayOrigin = !viaTray ? null : S.trayFrom === 'reader' ? 'reader' : plainRecord(S.trayFrom) ? S.trayFrom.view : null;
+    const galaxyWard = (view) => view === 'drift' || view === 'dojo' || view === 'probe' || view === 'deckplay' ||
+      (view === 'guided' && guidedFrom === 'dojo') || (view === 'search' && S.searchFrom !== 'shelf');
+    if (S.view === 'entry' || trayOrigin === 'entry') parts.push(tx('野', 'field'));
+    else if (trayOrigin) parts.push(galaxyWard(trayOrigin) ? tx('銀河', 'galaxy') : tx('本棚', 'bookshelf'));
+    else if (S.view === 'settings') parts.push(tx('私', 'Me'), tx('設定', 'Settings'));
+    else if (S.view === 'drift' || dojoFamily || searchFromGalaxy) parts.push(tx('銀河', 'galaxy'));
+    else parts.push(tx('本棚', 'bookshelf'));
+    if (S.view === 'reader' && passage()) {
+      // an archive read names the stack it came from — its back door
+      if (String(passage().file || '').startsWith('archive/')) parts.push(tx('新聞アーカイブ', 'archive'));
+      parts.push(passage().title);
+    }
+    if (S.view === 'search') parts.push(tx('検索', 'search'));
+    // the quiz and a plain review are entered from the lists tray and their 戻る reopens it — the
+    // crumb named a bookshelf the press never touches (PR #77 ea8252a9, d9f0b984)
+    // the tray is the Today tab's room (Review #8 renamed its way back "Back to Today"); the crumb,
+    // shown on wide screens, names it the same way (r4 plain words)
+    if (viaTray) parts.push(tx('今日', 'Today'));
+    if (S.view === 'sentence-practice') parts.push(tx('文の練習', 'sentence practice'));
+    if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
+    if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
+    if (S.view === 'dojo') parts.push(tx('集中道場', 'focus'));
+    if (S.view === 'probe') parts.push(tx('集中道場', 'focus'), tx('読みの確認', 'Reading check'));
+    if (S.view === 'archive') parts.push(tx('新聞アーカイブ', 'archive'));
+    if (S.view === 'aiquiz') parts.push(tx('小テスト', 'quiz'));
+    if (S.view === 'levels') parts.push(tx('参考書庫', 'reference library'));
+    if (S.view === 'ai') parts.push(tx('先生', 'tutor'));
+    if (S.view === 'lessons') parts.push(tx('レッスン', 'lessons'));
+    if (S.view === 'mock') parts.push(tx('JLPT の練習', 'JLPT practice'));
+    if (S.view === 'kagami') parts.push(tx('鏡', 'the mirror'));
+    if (S.view === 'thesaurus') parts.push(tx('類語', 'synonyms'));
+    if (S.view === 'airead') parts.push(tx('読み物', 'reading'));
+    if (S.view === 'feed') parts.push(tx('ニュースと雑誌', 'news & magazines'));
+    if (S.view === 'publisher') parts.push(tx('ニュースと雑誌', 'news & magazines'), tx('保存記事', 'saved article'));
+    if (['source-inbox', 'source-reader'].includes(S.view)) parts.push(tx('持ち込んだ日本語', 'source inbox'));
+    if (S.view === 'kanjidex') parts.push(tx('字引', 'kanji finder'));
+    if (S.view === 'yoji') parts.push(tx('四字熟語', 'idioms'));
+    if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
+    if (S.view === 'guided') {
+      parts.push(guidedFrom === 'mock' ? tx('JLPT の練習', 'JLPT practice') : tx('集中道場', 'focus'), tx('案内つきの稽古', 'guided session'));
+    }
+    if (S.view === 'contextdeck') parts.push(tx('文脈札', 'context deck'));
+    if (S.view === 'deckplay') parts.push(tx('集中道場', 'focus'), tx('デッキ', 'deck'));
   }
-  if (S.view === 'search') parts.push(tx('検索', 'search'));
-  // the quiz and a plain review are entered from the lists tray and their 戻る reopens it — the
-  // crumb named a bookshelf the press never touches (PR #77 ea8252a9, d9f0b984)
-  // the tray is the Today tab's room (Review #8 renamed its way back "Back to Today"); the crumb,
-  // shown on wide screens, names it the same way (r4 plain words)
-  if (viaTray) parts.push(tx('今日', 'Today'));
-  if (S.view === 'sentence-practice') parts.push(tx('文の練習', 'sentence practice'));
-  if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
-  if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
-  if (S.view === 'dojo') parts.push(tx('集中道場', 'focus'));
-  if (S.view === 'probe') parts.push(tx('集中道場', 'focus'), tx('読みの確認', 'Reading check'));
-  if (S.view === 'archive') parts.push(tx('新聞アーカイブ', 'archive'));
-  if (S.view === 'aiquiz') parts.push(tx('小テスト', 'quiz'));
-  if (S.view === 'levels') parts.push(tx('参考書庫', 'reference library'));
-  if (S.view === 'ai') parts.push(tx('先生', 'tutor'));
-  if (S.view === 'lessons') parts.push(tx('レッスン', 'lessons'));
-  if (S.view === 'mock') parts.push(tx('JLPT の練習', 'JLPT practice'));
-  if (S.view === 'kagami') parts.push(tx('鏡', 'the mirror'));
-  if (S.view === 'thesaurus') parts.push(tx('類語', 'synonyms'));
-  if (S.view === 'airead') parts.push(tx('読み物', 'reading'));
-  if (S.view === 'feed') parts.push(tx('ニュースと雑誌', 'news & magazines'));
-  if (S.view === 'publisher') parts.push(tx('ニュースと雑誌', 'news & magazines'), tx('保存記事', 'saved article'));
-  if (['source-inbox', 'source-reader'].includes(S.view)) parts.push(tx('持ち込んだ日本語', 'source inbox'));
-  if (S.view === 'kanjidex') parts.push(tx('字引', 'kanji finder'));
-  if (S.view === 'yoji') parts.push(tx('四字熟語', 'idioms'));
-  if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
-  if (S.view === 'guided') {
-    parts.push(guidedFrom === 'mock' ? tx('JLPT の練習', 'JLPT practice') : tx('集中道場', 'focus'), tx('案内つきの稽古', 'guided session'));
-  }
-  if (S.view === 'contextdeck') parts.push(tx('文脈札', 'context deck'));
-  if (S.view === 'deckplay') parts.push(tx('集中道場', 'focus'), tx('デッキ', 'deck'));
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.title = parts.join(' › ');
   if (S.stack.length) crumb.dataset.uiContentValue = S.stack.map(nodeTitle).join('|');
@@ -32107,34 +32922,41 @@ function render() {
   if (S.view === 'reader' && passage()) chrome.append(levelChip(passage(), 'chrome-level'));
   chrome.append(crumb);
 
+  // In the layout under test the top bar holds only Back and search, the same in every room (John,
+  // 2026-10-13: "cleanliness of buttons and connections … navigability"): the colour theme and the
+  // interface language live in Progress → Settings, and Review is a station on the tab bar. The
+  // current layout, and any nav without the tab bar, keep the preferences and doors here.
+  const barDoors = S.variants.nav !== 'tabs' || !placesLayout();
   // the world seal, then EN | 日本語 — two visible states, the active one lit. The preferences
   // stand first in the right-hand cluster, the doors (search · Learn · Lists) after them.
-  const seal = el('button', 'theme-seal', THEME_UI[themeIx()].seal);
-  seal.type = 'button';
-  seal.id = 'theme-seal';
-  seal.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
-  attachWorldPicker(seal);
-  chrome.append(seal);
+  if (barDoors) {
+    const seal = el('button', 'theme-seal', THEME_UI[themeIx()].seal);
+    seal.type = 'button';
+    seal.id = 'theme-seal';
+    seal.setAttribute('aria-label', tx('配色を選ぶ', 'Colour theme'));
+    attachWorldPicker(seal);
+    chrome.append(seal);
 
-  const langSeg = el('div', 'lang-seg');
-  langSeg.id = 'lang';
-  langSeg.setAttribute('role', 'group');
-  langSeg.setAttribute('aria-label', tx('表示言語', 'Interface language'));
-  for (const [id, label] of [
-    ['bi', 'EN'],
-    ['ja', '日本語'],
-  ]) {
-    const b = el('button', null, label);
-    b.type = 'button';
-    b.dataset.lang = id;
-    b.setAttribute('aria-pressed', String(S.lang === id));
-    b.addEventListener('click', () => {
-      S.lang = id;
-      render();
-    });
-    langSeg.append(b);
+    const langSeg = el('div', 'lang-seg');
+    langSeg.id = 'lang';
+    langSeg.setAttribute('role', 'group');
+    langSeg.setAttribute('aria-label', tx('表示言語', 'Interface language'));
+    for (const [id, label] of [
+      ['bi', 'EN'],
+      ['ja', '日本語'],
+    ]) {
+      const b = el('button', null, label);
+      b.type = 'button';
+      b.dataset.lang = id;
+      b.setAttribute('aria-pressed', String(S.lang === id));
+      b.addEventListener('click', () => {
+        S.lang = id;
+        render();
+      });
+      langSeg.append(b);
+    }
+    chrome.append(langSeg);
   }
-  chrome.append(langSeg);
 
   // the search door — on EVERY surface, one tap from hearing a word to
   // typing it (operator, 2026-08-27); only the search room itself omits it
@@ -32156,7 +32978,7 @@ function render() {
   // used to live only behind the galaxy's tap-to-open nav; now it stands in
   // the ordinary chrome beside the search door. Inside the dojo family it is
   // the current room, so it shows as such and does nothing.
-  {
+  if (barDoors) {
     const inDojo = S.view === 'dojo' || S.view === 'probe' || (S.view === 'review' && !!S.focus);
     // the polish lane (2026-10-08): the door is the Learn tab's room, so it carries the tab's
     // name (to a screen reader) and a quiet card-stack glyph — never a second word in the bar
@@ -32273,7 +33095,8 @@ function render() {
     // offset — often past its own end (E3 round-A, dead-ends lens)
     window.scrollTo(0, 0);
   }));
-  chrome.append(trayBtn);
+  // in the layout under test Review is a station on the tab bar; the bookmark stands without it
+  if (barDoors) chrome.append(trayBtn);
   if (!heroMode && !zenReview) root.append(chrome);
   enableTouchPress();
   buildPrimaryTabs(root);
@@ -32366,6 +33189,8 @@ function render() {
     else if (S.view === 'probe') renderProbe(main);
     else if (S.view === 'archive') renderArchive(main);
     else if (S.view === 'dojo') renderFocus(main);
+    else if (S.view === 'tests') renderTests(main);
+    else if (S.view === 'saved') renderSaved(main);
     else if (S.view === 'deckplay') renderDeckPlay(main);
     else if (S.view === 'aiquiz') renderAiQuiz(main);
     else if (S.view === 'levels') renderLevels(main);
@@ -32487,12 +33312,117 @@ function reportEntries(className) {
   line.append(open, list);
   return line;
 }
+/* The report relay. A device set up with the relay's address and key sends its
+ * problem reports there, and the relay files each one as a GitHub issue. The setup
+ * link is <app>?report-relay=<https address>&report-key=<key>; ?report-relay=off
+ * forgets it. A link opened in the browser is never taken silently: it is removed
+ * from the address bar and offered in Me → Settings → Bug reports, naming the host
+ * the reports would go to, and only Set up stores it — so a link from someone else
+ * cannot quietly send this device's reports and screenshots elsewhere. A home-screen
+ * app keeps its own storage, so the same link can be pasted there. Both stay on
+ * this device only. */
+const REPORT_RELAY_STORE = 'kairo-report-relay-v1';
+function relayServiceUrl(address, key) {
+  try {
+    const url = new URL(address);
+    const loopback = url.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(url.hostname);
+    if ((url.protocol === 'https:' || loopback) && !url.search && !url.hash && !url.username && /^[A-Za-z0-9_-]{16,128}$/.test(key))
+      return `${url.origin}${url.pathname.replace(/\/+$/, '')}/k/${key}`;
+  } catch { /* An unusable link names no service. */ }
+  return '';
+}
+function saveReportRelay(address, key) {
+  try {
+    if (address === 'off') { localStorage.removeItem(REPORT_RELAY_STORE); return 'off'; }
+    const url = relayServiceUrl(address, key);
+    if (url) { localStorage.setItem(REPORT_RELAY_STORE, JSON.stringify({ url })); return 'saved'; }
+  } catch { /* An unusable link changes nothing. */ }
+  return '';
+}
+function saveReportRelayLink(text) {
+  let params;
+  try { params = new URL(String(text).trim()).searchParams; } catch { return ''; }
+  return params.has('report-relay') ? saveReportRelay(params.get('report-relay') || '', params.get('report-key') || '') : '';
+}
+// a setup link opened in the browser, waiting in Settings for the learner's Set up
+let reportRelayOffer = null;
+const REPORT_RELAY_URL = (() => {
+  let params = null;
+  try { params = new URLSearchParams(location.search); } catch { /* No address to read. */ }
+  if (params?.has('report-relay')) {
+    const address = params.get('report-relay') || '', key = params.get('report-key') || '';
+    // turning the relay off only returns reports to the prefilled GitHub page, so it needs no question
+    if (address === 'off') saveReportRelay('off', '');
+    else if (relayServiceUrl(address, key)) {
+      // shown as the setup link is written, with the address's : and / left readable
+      const query = new URLSearchParams({ 'report-relay': address, 'report-key': key }).toString().replace(/%3A/gi, ':').replace(/%2F/gi, '/');
+      reportRelayOffer = { link: `${location.origin}${location.pathname}?${query}`, host: new URL(address).host };
+    }
+    params.delete('report-relay');
+    params.delete('report-key');
+    try { history.replaceState(history.state, '', `${location.pathname}${params.toString() ? `?${params}` : ''}${location.hash}`); } catch { /* The address keeps the link. */ }
+  }
+  try {
+    const saved = JSON.parse(localStorage.getItem(REPORT_RELAY_STORE) || 'null');
+    return typeof saved?.url === 'string' ? saved.url : '';
+  } catch { return ''; }
+})();
+function renderReportRelaySettings() {
+  const section = el('section', 'foundation-section');
+  section.id = 'settings-reports';
+  section.append(el('h2', 'eyebrow', tx('不具合の報告', 'Bug reports')));
+  let host;
+  try { host = REPORT_RELAY_URL ? new URL(REPORT_RELAY_URL).host : ''; } catch { host = ''; }
+  const status = el('p', 'teacher-note', host
+    ? tx(`この端末の報告は GitHub に自動で送られる（${host}）。`, `Reports from this device go to GitHub automatically (${host}).`)
+    : tx('この端末は未設定。報告は入力済みの GitHub ページを開くので、そこで送信する。', 'Not set up on this device. A report opens a prefilled GitHub page for you to submit.'));
+  status.id = 'settings-reports-status';
+  const form = el('form', 'listening-form settings-report-form'); form.id = 'settings-report-form';
+  const field = listeningField(form, 'settings-report-link', tx('報告用リンクを貼り付ける', 'Paste your report setup link'));
+  field.type = 'url'; field.spellcheck = false; field.autocapitalize = 'off'; field.inputMode = 'url';
+  const save = el('button', 'chip', host ? tx('リンクを変更する', 'Change link') : tx('設定する', 'Set up')); save.type = 'submit'; save.id = 'settings-report-save';
+  const note = el('p', 'teacher-note'); note.id = 'settings-report-note'; note.setAttribute('role', 'status');
+  form.append(save, note);
+  if (reportRelayOffer) {
+    // the opened link waits here, with the host it names, until the learner chooses Set up
+    field.value = reportRelayOffer.link;
+    const offer = el('p', 'teacher-note', tx(
+      `開いたリンクは、この端末の報告と画面写真を ${reportRelayOffer.host} に送る。報告は公開の GitHub issue になる。自分の報告用リンクのときだけ「${save.textContent}」を押す。`,
+      `The link you opened sends this device's reports and screenshots to ${reportRelayOffer.host}, which files them as public GitHub issues. Choose ${save.textContent} only if it is your own report link.`));
+    offer.id = 'settings-report-offer';
+    form.prepend(offer);
+    requestAnimationFrame(() => {
+      if (!save.isConnected) return;
+      section.scrollIntoView({ block: 'center' });
+      save.focus({ preventScroll: true });
+    });
+  }
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (saveReportRelayLink(field.value) !== 'saved') {
+      note.textContent = tx('報告用リンクとして読めない。リンク全体を貼り付ける。', 'That is not a report setup link. Paste the whole link.');
+      return;
+    }
+    // The report client reads its service once, when the app starts.
+    reportRelayOffer = null;
+    note.textContent = tx('設定した。再読み込みする。', 'Set up. Reloading.');
+    save.disabled = true;
+    location.reload();
+  });
+  section.append(status, form);
+  return section;
+}
 function mountMaintenanceReports() {
   if (!window.BunkiReports) return;
   maintenanceReports = window.BunkiReports.mount({
     rail: true,
     locale: S.lang === 'ja' ? 'ja' : 'en',
-    serviceUrl: window.__BUNKI_MAINTENANCE_URL__ || (location.protocol === 'http:' || location.protocol === 'https:' ? location.origin : ''),
+    serviceUrl: window.__BUNKI_MAINTENANCE_URL__ || REPORT_RELAY_URL || (location.protocol === 'http:' || location.protocol === 'https:' ? location.origin : ''),
+    appVersion: APP_RELEASE.version,
+    // Without a report service (a device not yet set up for the relay), a report is
+    // filed as a prefilled GitHub issue that the learner submits; the fixer agent
+    // picks up that label either way.
+    github: { newIssueUrl: 'https://github.com/AmitabhainArunachala/Bunki-app/issues/new', label: 'kairo-report', version: APP_RELEASE.version },
     getContext: maintenanceContext,
     clockNotice: () => {
       try { const selected = currentAssessmentV2(); return selected?.attempt?.status === 'in-progress' && selected.attempt.mode === 'timed' ? 'The test clock continues while this report is open.' : ''; }

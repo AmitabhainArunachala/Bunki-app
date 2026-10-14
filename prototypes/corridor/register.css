@@ -70,8 +70,8 @@
 }
 .chrome > button:first-child .l-ja { display: block; font-family: var(--display); font-size: 17px; color: var(--ink); }
 .chrome > button:first-child .en-sub,
-.chrome > button:last-child .en-sub { display: block; font-family: var(--sans); font-size: 10px; letter-spacing: 0.16em; color: var(--faint); }
-.chrome > button:last-child .l-ja { font-family: var(--display); font-size: 17px; }
+.chrome > button#tray .en-sub { display: block; font-family: var(--sans); font-size: 10px; letter-spacing: 0.16em; color: var(--faint); }
+.chrome > button#tray .l-ja { font-family: var(--display); font-size: 17px; }
 .chrome .crumb {
   /* the mast is full; the crumb is shown only where the chrome has receded (the
      attempt), as the room's name beside 戻る. Elsewhere it is hidden visually, as
@@ -112,7 +112,7 @@
   border-radius: 999px;
   min-height: 0;
 }
-.chrome > button:last-child { /* 覚 lists — a seal only when it counts */
+.chrome > button#tray { /* 覚 lists — a seal only when it counts */
   font-family: var(--display);
   color: var(--ink-2);
 }
@@ -125,7 +125,7 @@ html[data-register="attempt"] .chrome {
 html[data-register="attempt"] .chrome .chrome-search,
 html[data-register="attempt"] .chrome .chrome-dojo,
 html[data-register="attempt"] .chrome .lang-seg,
-html[data-register="attempt"] .chrome > button:last-child { display: none; }
+html[data-register="attempt"] .chrome > button#tray { display: none; }
 html[data-register="attempt"] .chrome .crumb { position: static; width: auto; height: auto; clip-path: none; color: var(--faint); font-size: 13px; }
 
 /* the stage bar — place in the sitting, 3 px of ink under the mast */
@@ -575,7 +575,7 @@ html[data-register="tutor"] .chrome > *, html[data-register="tutor"] .chrome .cr
 html[data-register="tutor"] .chrome .lang-seg { border-color: var(--sheet-line); }
 html[data-register="tutor"] .chrome > button:first-child, html[data-register="tutor"] .chrome > button:first-child * { color: var(--sheet-ink); }
 html[data-register="tutor"] .chrome > button:first-child small, html[data-register="tutor"] .chrome > button:first-child span:last-child { color: var(--sheet-faint); }
-html[data-register="tutor"] .chrome > button:last-child, html[data-register="tutor"] .chrome > button:last-child * { color: var(--sheet-ink); }
+html[data-register="tutor"] .chrome > button#tray, html[data-register="tutor"] .chrome > button#tray * { color: var(--sheet-ink); }
 html[data-register="tutor"] .chrome .lang-seg > [aria-pressed="true"], html[data-register="tutor"] .chrome .lang-seg > .on { background: var(--sheet-ink); color: var(--sheet-ground); }
 /* the sentence under discussion sits on a washi card — the review card's material — on the lacquer stage */
 html[data-register="tutor"] .teacher-context {

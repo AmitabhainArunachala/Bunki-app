@@ -58,6 +58,7 @@
 #bunki-reports-root .br-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 20px 0 8px; }
 #bunki-reports-root .br-primary { background: var(--br-ink); color: var(--br-paper); border-color: var(--br-ink); }
 #bunki-reports-root .br-primary:hover { background: color-mix(in srgb, var(--br-ink) 85%, var(--br-paper)); }
+#bunki-reports-root a.br-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border: 1px solid var(--br-ink); border-radius: 4px; padding: 8px 12px; text-decoration: none; font: inherit; }
 #bunki-reports-root details { margin: 18px 0; border-block: 1px solid var(--br-line); }
 #bunki-reports-root summary { cursor: pointer; min-height: 44px; padding: 10px 0; font-size: 13px; }
 #bunki-reports-root pre { white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.7 'Roboto Mono', 'Noto Sans JP', ui-monospace, SFMono-Regular, monospace; max-height: 320px; overflow-y: auto; margin: 0 0 12px; }

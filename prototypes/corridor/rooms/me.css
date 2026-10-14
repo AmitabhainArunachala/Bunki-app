@@ -4,14 +4,14 @@
 
 /* ---- Skin frame (Skin lane): Me is a stab-bound book (和綴じ): its binding holes and a
    gold thread run down the left margin, in late gold light; at night a lamp. Values only. ---- */
-html:is([data-room='me'], [data-room='progress'], [data-room='settings']) body:not([data-view='drift']) {
+html:is([data-room='me'], [data-room='progress'], [data-room='settings'], [data-room='saved']) body:not([data-view='drift']) {
   --color-page: color-mix(in srgb, var(--color-ground) 62%, #f7efdc);
   --skin-ground:
     radial-gradient(circle at 9px 50%, color-mix(in srgb, var(--color-ink) 30%, transparent) 2px, transparent 2.6px) 0 0 / 18px 64px repeat-y,
     linear-gradient(90deg, transparent 8.5px, color-mix(in srgb, var(--color-gold) 55%, transparent) 8.5px, color-mix(in srgb, var(--color-gold) 55%, transparent) 9.5px, transparent 9.5px) 0 0 / 18px 100% no-repeat;
   --skin-light: radial-gradient(90% 50% at 100% 0%, rgb(232 196 120 / 18%), transparent 70%);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='me'], [data-room='progress'], [data-room='settings']) body:not([data-view='drift']) {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='me'], [data-room='progress'], [data-room='settings'], [data-room='saved']) body:not([data-view='drift']) {
   --color-page: var(--color-ground);
   --skin-ground:
     radial-gradient(circle at 9px 50%, rgb(0 0 0 / 55%) 2px, transparent 2.6px) 0 0 / 18px 64px repeat-y,
@@ -369,15 +369,15 @@ html[data-room='settings'] main .me-kicker { margin: 0 0 var(--space-2); }
 html[data-room='settings'] main > .view-title { font: 800 clamp(28px, 8vw, 36px)/1.1 var(--font-headword); }
 html[data-room='settings'] main .foundation-section { padding-top: var(--space-3); }
 
-html[data-room='settings'] main .settings-language {
+html[data-room='settings'] main :is(.settings-language, .settings-layout-choice) {
   display: inline-flex; padding: 2px; border: 0; border-radius: 8px; background: transparent;
   box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong);
 }
-html[data-room='settings'] main .settings-language button {
+html[data-room='settings'] main :is(.settings-language, .settings-layout-choice) button {
   min-width: 72px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 6px;
   background: transparent; color: var(--color-ink-2); font: 500 14px/1 var(--font-ui);
 }
-html[data-room='settings'] main .settings-language button[aria-pressed='true'] { background: var(--color-ink); color: var(--color-surface); font-weight: 700; }
+html[data-room='settings'] main :is(.settings-language, .settings-layout-choice) button[aria-pressed='true'] { background: var(--color-ink); color: var(--color-surface); font-weight: 700; }
 html[data-room='settings'] main > .foundation-doors { margin-top: var(--space-4); gap: 0; border-top: var(--stroke-hairline) solid var(--color-edge-strong); }
 html[data-room='settings'] body.v-depth-layered #app main > .foundation-doors .foundation-door {
   min-height: 54px; padding: 0 2px; margin: 0;
@@ -387,7 +387,7 @@ html[data-room='settings'] body.v-depth-layered #app main > .foundation-doors .f
 }
 html[data-room='settings'] body:not(.ui-bi) #app main > .foundation-doors .foundation-door { font: 800 16px/1.3 var(--font-headword); letter-spacing: 0.06em; }
 html[data-room='settings'] body.v-depth-layered #app main > .foundation-doors .foundation-door:hover { background: var(--color-fill); }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='settings'] main .settings-language button[aria-pressed='true'] {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='settings'] main :is(.settings-language, .settings-layout-choice) button[aria-pressed='true'] {
   background: transparent; color: var(--color-ink);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-gold) 70%, transparent), 0 0 12px -4px var(--color-gold);
 }
