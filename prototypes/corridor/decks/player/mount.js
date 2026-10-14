@@ -502,12 +502,12 @@ const UI_EN = {
 };
 /** The focus room's plainer English (the layout under test, 2026-10-13); the current layout keeps
  * UI_EN's words as they were. */
-const UI_EN_PLACES = {
+const UI_EN_FOCUS = {
   "覚えるの札に入ります — このデッキの予定は変わりません": "Save puts it in your review cards. This deck’s schedule doesn’t change.",
   "今日の分は終わり。また明日。": "Today’s cards are done. More tomorrow.",
   "答えを見て理解が深まったなら もう一度": "If the answer taught you something, choose Again.",
 };
-const t = (ja, en = (ctx?.places && UI_EN_PLACES[ja]) || UI_EN[ja]) => ctx?.english !== false ? (en ?? ja) : ja;
+const t = (ja, en = (ctx?.focusRoom && UI_EN_FOCUS[ja]) || UI_EN[ja]) => ctx?.english !== false ? (en ?? ja) : ja;
 
 /* ------------------------------------------------------------- helpers */
 function el(tag, cls, ...kids) {
@@ -1017,7 +1017,7 @@ function studyScreen() {
   }
   // in the app the back carries every reading after the reveal (learner brief 2026-10-04), and one
   // quiet switch returns the clean original (2026-10-13); the front never shows either
-  if (ui.revealed && ctx.places) (chips.querySelector('.kp-eyebrow') || chips).append(readingsToggle());
+  if (ui.revealed && ctx.focusRoom) (chips.querySelector('.kp-eyebrow') || chips).append(readingsToggle());
   // the front: no readings, no English, nothing to tap in the passage, no hint (CARD_CONTRACT_V2 §2)
   face.append(ui.revealed ? sentenceNodes(card, { split: passage, clamp: passage, taps: backTaps(card, word) }) : sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage }));
   const repaired = ctx.state.repairs?.[id]?.hint;
@@ -1043,8 +1043,8 @@ function studyScreen() {
     } else {
       // in the app the right half of the screen turns the card, like a page (John, 2026-10-13); the
       // left half stays still, so a tap while reading never gives the answer away
-      const turnsCard = (e) => !ctx.places || !Number.isFinite(e.clientX) || e.clientX >= innerWidth / 2;
-      if (hintsOn()) face.append(el('p', 'kp-taphint', ctx.places ? t("思い出したら、右側をタップ", "Recall it, then tap the right side") : mode === 'read' ? t("意味を思い出してからタップ") : t("タップして答えを見る")));
+      const turnsCard = (e) => !ctx.focusRoom || !Number.isFinite(e.clientX) || e.clientX >= innerWidth / 2;
+      if (hintsOn()) face.append(el('p', 'kp-taphint', ctx.focusRoom ? t("思い出したら、右側をタップ", "Recall it, then tap the right side") : mode === 'read' ? t("意味を思い出してからタップ") : t("タップして答えを見る")));
       face.addEventListener('click', (e) => {
         if (turnsCard(e)) reveal();
       });
@@ -2425,7 +2425,7 @@ function revealInPlace() {
     const chips = face.querySelector('.kp-chips');
     (chips.querySelector('.kp-eyebrow') || chips).append(zoomToggle(zoom));
   }
-  if (ctx.places) {
+  if (ctx.focusRoom) {
     const chips = face.querySelector('.kp-chips');
     (chips.querySelector('.kp-eyebrow') || chips).append(readingsToggle());
   }
@@ -2675,7 +2675,7 @@ function doneScreen() {
   box.append(topBar(t("おつかれさま")));
   box.append(el('h2', 'kp-done-title', t("机の上は、空になった。", "The surface is clear.")));
   const missed = new Set(ui.log.filter((x) => !x.ok).map((x) => x.term));
-  const words = [...new Set(ui.log.map((x) => x.term))].slice(0, ctx.places ? 24 : 12);
+  const words = [...new Set(ui.log.map((x) => x.term))].slice(0, ctx.focusRoom ? 24 : 12);
   if (words.length) {
     const rise = el('div', 'kp-rise');
     rise.setAttribute('aria-hidden', 'true');
@@ -2697,7 +2697,7 @@ function doneScreen() {
   const soon = learningSoon(ctx.deck, ctx.state, new Date(), DAY, { skip: skipFor(ctx.prefs.mode) })[0];
   // in the app's layout under test the close says it in one sentence (the tally above stays the
   // standalone page's and the current layout's)
-  if (ctx.places) {
+  if (ctx.focusRoom) {
     // what happened, in one sentence and only what is true: the words met, the minutes, and how many
     // needed a second look (they were seen again in the sitting; when they return is the next line)
     const met = new Set(ui.log.map((x) => x.term)).size;
@@ -2710,7 +2710,7 @@ function doneScreen() {
   }
   box.append(el('p', 'kp-sub', soon ? t(`次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。`, `Next review in ${fmtWait(Math.max(0, soon.t - Date.now()))}.`) : t("今日の分は終わり。また明日。")));
   // one door forward: the host's reading for today, the words just met waiting in it
-  const door = ctx.places ? safely(() => ctx.next?.() || null, null) : null;
+  const door = ctx.focusRoom ? safely(() => ctx.next?.() || null, null) : null;
   if (door) {
     const doorButton = btn('kp-start kp-door', [el('span', 'kp-door-l', door.label), el('span', 'kp-door-t', door.title)], () => door.open(), { id: 'kp-door' });
     doorButton.querySelector('.kp-door-t').lang = 'ja';
@@ -2977,7 +2977,7 @@ function ensureCss() {
   document.head.append(link);
 }
 
-export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, layout = null } = {}) {
+export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false } = {}) {
   const request = ++mountRequest;
   if (autoStart !== undefined) pendingStart = { deckId, autoStart };
   ensureCss();
@@ -3005,7 +3005,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     // the host's door forward from a sitting's close: () => ({ label, title, open }) or null
     next: typeof next === 'function' ? next : null,
     // the app's layout under test turns on the focus room (in the app only: it needs the host)
-    places: layout === 'places' && !!host,
+    focusRoom: focusRoom && !!host,
     openEntry: typeof openEntry === 'function' ? openEntry : lexicon ? (node) => lexicon.open(node) : null,
     host: lexicon,
     // the tap source: with a host, the tokens side file (fetched once a sitting starts); without
