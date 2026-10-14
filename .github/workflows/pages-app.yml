@@ -55,6 +55,7 @@ jobs:
         env:
           RELEASE_SITE: ${{ steps.transfer.outputs.site_dir }}
         run: node scripts/release/publish.mjs guard --site "$RELEASE_SITE"
+      # the same name the upload below gives it, kept as this job's output for the release job
       - name: Name the transfer evidence
         id: transfer_name
         if: success() && steps.transfer.outputs.verified == 'true'
@@ -63,7 +64,7 @@ jobs:
         if: success() && steps.transfer.outputs.verified == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.transfer_name.outputs.name }}
+          name: bunki-transfer-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             ${{ runner.temp }}/reuse/receipt.json
             ${{ runner.temp }}/reuse/transfer.json
