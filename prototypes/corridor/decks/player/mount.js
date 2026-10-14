@@ -688,6 +688,7 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     }
   });
   if (clamp && split) clampContext(out);
+  breakBetweenKept(out);
   if (taps || ruby === 'all') {
     reflowWatch?.observe(out);
     document.fonts?.ready.then(() => out.isConnected && seatReadings(out));
@@ -695,6 +696,26 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
   return out;
 }
 
+/** A word kept on one line (ruby, kp-nb: a host may set white-space: nowrap on it) must still
+ * leave a line break open between itself and a kept word right after it (小村|寿太郎), or the
+ * pair would move to the next line as one and leave a stretched line behind. */
+function breakBetweenKept(out) {
+  const walk = document.createTreeWalker(out, NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => (n.parentElement.closest('rt') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+  });
+  let before = null; // the kept word of the previous character
+  for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+    if (!n.textContent) continue;
+    const word = n.parentElement.closest('ruby, .kp-nb');
+    if (word && before && word !== before) {
+      // the break goes where the two words' branches meet, in the parent that wraps normally
+      let at = word;
+      while (at.parentElement && !at.parentElement.contains(before)) at = at.parentElement;
+      if (at.previousSibling?.nodeName !== 'WBR') at.before(document.createElement('wbr'));
+    }
+    before = word;
+  }
+}
 /** Whenever a passage reflows (width, zoom, an opened fold, fonts): a word that wraps onto a second
  * line would centre its 44px reach (.kp-tok::before) on the gap between the two lines and reach over
  * the words of both, so it keeps only its printed boxes (kp-split); and the readings are re-seated. */
