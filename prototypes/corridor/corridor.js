@@ -8663,7 +8663,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     pressedAt = Date.now();
     if (!seal.dataset.saveMenu) return toggleWordSave(captureNode, token.b);
     if (seal.getAttribute('aria-pressed') === 'true') return openMenu();
-    return toggleWordSave(captureNode, token.b).then((saved) => { if (saved && seal.isConnected) openMenu(); return saved; });
+    return Promise.resolve(toggleWordSave(captureNode, token.b)).then((saved) => { if (saved && seal.isConnected) openMenu(); return saved; });
   });
   if (held || identityHeld) {
     // when the meaning line already says the word is not in the quick dictionary, the reason only finishes it

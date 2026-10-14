@@ -79,7 +79,7 @@ const find = (node, className) => node.querySelector('.' + className);
 const text = value => new Element('#text', '', value);
 
 function app({ withIndex = true } = {}) {
-  const body = new Element('body'), opened = [], chosen = [];
+  const body = new Element('body'), opened = [], chosen = [], menus = [];
   const D = { dict, words, kanji: {}, dictionaryIndex: withIndex ? index : null,
     dictionaryByForm: new Map(), dictionaryCompleteForms: new Set(), dictionaryBySeq: new Map() };
   const document = { body, querySelectorAll: selector => body.querySelectorAll(selector),
@@ -99,6 +99,8 @@ function app({ withIndex = true } = {}) {
     ensureDictionaryRowsForForm: async () => [], wordCaptureState: () => 'take',
     readerCaptureReasonText: () => 'No confirmed meaning to save', readerGlossMissText: () => 'No confirmed meaning',
     toggleWordSave: node => chosen.push(copy(node)), go: node => opened.push(copy(node)),
+    // Save ▾ opens its menu once the word is saved (1.3.0): the menu is observed at its boundary
+    openVocabularyListPopover: (node, label, invoker, options) => menus.push({ node: copy(node), label, invoker: invoker?.id, menu: !!options?.menu }),
     excerptListenLabel: () => { throw new Error('This lookup suite must not enter audio controls'); } });
   vm.runInContext(program, context);
   const open = async (surface, details = {}) => {
@@ -106,7 +108,7 @@ function app({ withIndex = true } = {}) {
     await context.openJapaneseLookup(anchor, surface, details);
     return body.querySelector('#mini');
   };
-  return { context, body, document, opened, chosen, open };
+  return { context, body, document, opened, chosen, menus, open };
 }
 
 test('Auxiliary ます never borrows 升; its unresolved full-entry door cannot reopen that entry', async () => {
@@ -120,8 +122,10 @@ test('Auxiliary ます never borrows 升; its unresolved full-entry door cannot 
   assert.equal(find(mini, 'mini-take').disabled, true);
   await find(mini, 'mini-take').click();
   assert.deepEqual(f.chosen, []);
-  assert.equal(find(mini, 'mini-entry').disabled, true, 'No unresolved spelling-only route may reopen 升');
-  await find(mini, 'mini-entry').click();
+  // the word is the door into its full entry (1.3.0); an unresolved spelling's word is plain text, no door
+  assert.equal(find(mini, 'mini-word').tag, 'span', 'No unresolved spelling-only route may reopen 升');
+  assert.equal(mini.querySelectorAll('button').filter((b) => b.dataset.action === 'entry.open').length, 0);
+  await find(mini, 'mini-word').click();
   assert.deepEqual(f.opened, []);
 });
 
@@ -131,7 +135,11 @@ test('A plain kana segment しま stays on its exact dictionary spelling, never 
   assert.equal(find(mini, 'mini-gloss').textContent, 'will do');
   await find(mini, 'mini-take').click();
   assert.deepEqual(f.chosen, [{ t: 'word', id: 'しま', seq: '2861315', reading: 'しま' }]);
-  await find(mini, 'mini-entry').click();
+  // Save ▾: the save is followed by its menu, for the same word
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(f.menus, [{ node: { t: 'word', id: 'しま', seq: '2861315', reading: 'しま' }, label: 'しま', invoker: 'mini-take', menu: true }]);
+  assert.equal(find(mini, 'mini-word').dataset.action, 'entry.open');
+  await find(mini, 'mini-word').click();
   assert.deepEqual(f.opened, [{ t: 'word', id: 'しま', seq: '2861315', reading: 'しま' }]);
 });
 
@@ -145,7 +153,7 @@ test('The supplied reading selects a same-spelled entry and survives popup, save
     assert.equal(find(mini, 'mini-word').textContent, fixture.word);
     assert.equal(find(mini, 'mini-reading').textContent, fixture.reading);
     assert.equal(find(mini, 'mini-gloss').textContent, fixture.gloss);
-    await find(mini, 'mini-take').click(); await find(mini, 'mini-entry').click();
+    await find(mini, 'mini-take').click(); await find(mini, 'mini-word').click();
     const expected = { t: 'word', id: fixture.word, seq: fixture.seq, reading: fixture.reading };
     assert.deepEqual(f.chosen, [expected]); assert.deepEqual(f.opened, [expected]);
   }
@@ -159,7 +167,7 @@ test('Missing and mismatched readings cannot fall through to a different core an
     assert.equal(find(mini, 'mini-reading').textContent, fixture.reading);
     assert.equal(find(mini, 'mini-gloss').textContent, 'No dictionary entry for this spelling.');
     assert.equal(find(mini, 'mini-take').disabled, true);
-    assert.equal(find(mini, 'mini-entry').disabled, true);
+    assert.equal(find(mini, 'mini-word').tag, 'span', 'an unresolved word has no door into an entry');
   }
 });
 
@@ -172,8 +180,8 @@ test('Known kana and kanji core words keep their existing save route; unresolved
   }
   const f = app(); f.context.D.kanji['産'] = {};
   const mini = await f.open('産', { reading: 'さん' });
-  assert.equal(find(mini, 'mini-entry').disabled, false);
-  await find(mini, 'mini-entry').click(); assert.deepEqual(f.opened, [{ t: 'kanji', id: '産' }]);
+  assert.equal(find(mini, 'mini-word').tag, 'button');
+  await find(mini, 'mini-word').click(); assert.deepEqual(f.opened, [{ t: 'kanji', id: '産' }]);
 });
 
 test('The prose enhancer skips writing-room instructions while keeping existing word and character controls', async () => {
