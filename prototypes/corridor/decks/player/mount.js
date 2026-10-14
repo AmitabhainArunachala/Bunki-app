@@ -500,14 +500,7 @@ const UI_EN = {
   "裏：ふりがな付きの全文、読み、品詞、日本語の説明と使い方。英語の意味とその文の英訳はタップで開く。": "The back shows the passage with readings, the target’s reading, part of speech, Japanese definition and usage. Open folds for English meaning and the target sentence’s translation.",
   "文章はすべて書き下ろし。自然さ・事実・レベルを、書き手とは別のモデルが一枚ずつ確かめています。級は公開リストによる目安です。": "Every passage is original. A model separate from its author checks naturalness, facts and level for each card. Level labels are estimates from public lists."
 };
-/** The focus room's plainer English (the layout under test, 2026-10-13); the current layout keeps
- * UI_EN's words as they were. */
-const UI_EN_FOCUS = {
-  "覚えるの札に入ります — このデッキの予定は変わりません": "Save puts it in your review cards. This deck’s schedule doesn’t change.",
-  "今日の分は終わり。また明日。": "Today’s cards are done. More tomorrow.",
-  "答えを見て理解が深まったなら もう一度": "If the answer taught you something, choose Again.",
-};
-const t = (ja, en = (ctx?.focusRoom && UI_EN_FOCUS[ja]) || UI_EN[ja]) => ctx?.english !== false ? (en ?? ja) : ja;
+const t = (ja, en = UI_EN[ja]) => ctx?.english !== false ? (en ?? ja) : ja;
 
 /* ------------------------------------------------------------- helpers */
 function el(tag, cls, ...kids) {
@@ -691,8 +684,21 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     }
   });
   if (clamp && split) clampContext(out);
+  if (taps) splitReach?.observe(out);
   return out;
 }
+
+/** A word that wraps onto a second line would centre its 44px reach (.kp-tok::before) on the gap
+ * between the two lines and reach over the words of both. Such a word keeps only its printed boxes
+ * (kp-split); re-read whenever the passage reflows (width, zoom, an opened fold, fonts). */
+const splitReach = typeof ResizeObserver === 'function'
+  ? new ResizeObserver((entries) => {
+    for (const { target } of entries) {
+      if (!target.isConnected) { splitReach.unobserve(target); continue; }
+      for (const tok of target.querySelectorAll('.kp-tok')) tok.classList.toggle('kp-split', tok.getClientRects().length > 1);
+    }
+  })
+  : null;
 
 /** 焦点 on a long passage: the sentences before the target and those after it each become one
  * group. 全文 lays the groups out inline (nothing changes); 焦点 folds each to two dimmed lines
@@ -1044,7 +1050,10 @@ function studyScreen() {
       // in the app the right half of the screen turns the card, like a page (John, 2026-10-13); the
       // left half stays still, so a tap while reading never gives the answer away
       const turnsCard = (e) => !ctx.focusRoom || !Number.isFinite(e.clientX) || e.clientX >= innerWidth / 2;
-      if (hintsOn()) face.append(el('p', 'kp-taphint', ctx.focusRoom ? t("思い出したら、右側をタップ", "Recall it, then tap the right side") : mode === 'read' ? t("意味を思い出してからタップ") : t("タップして答えを見る")));
+      // with no button to name, the focus room's hint says where the tap goes (the right half)
+      if (hintsOn()) face.append(el('p', 'kp-taphint', ctx.focusRoom
+        ? mode === 'read' ? t("意味を思い出してから、右側をタップ", "Recall the meaning, then tap the right side") : t("右側をタップして答えを見る", "Tap the right side to reveal the answer")
+        : mode === 'read' ? t("意味を思い出してからタップ") : t("タップして答えを見る")));
       face.addEventListener('click', (e) => {
         if (turnsCard(e)) reveal();
       });
@@ -1606,6 +1615,7 @@ function tapText(text, units, onTap) {
 function defLine(card, word) {
   const p = el('p', 'kp-def');
   p.append(...tapText(word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 })));
+  splitReach?.observe(p);
   return p;
 }
 
@@ -2693,10 +2703,11 @@ function doneScreen() {
   const clock = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
   const cell = (label, value, cls) => el('div', `kp-tally-c ${cls}`, el('span', null, label), el('b', null, value));
   box.append(el('div', 'kp-tally', cell(t("覚えた", "Kept"), String(ui.right), 'kp-tally-kept'), cell(t("もう一度"), String(ui.done - ui.right), 'kp-tally-again'), cell(t("時間", "Time"), clock, 'kp-tally-time')));
-  box.append(el('p', 'kp-done-rate', el('span', null, t("思い出せた割合")), el('b', null, `${pct}%`), el('span', null, `${t("回答")} ${ui.done}`)));
+  const rate = el('p', 'kp-done-rate', el('span', null, t("思い出せた割合")), el('b', null, `${pct}%`), el('span', null, `${t("回答")} ${ui.done}`));
+  if (!ctx.focusRoom) box.append(rate);
   const soon = learningSoon(ctx.deck, ctx.state, new Date(), DAY, { skip: skipFor(ctx.prefs.mode) })[0];
-  // in the app's layout under test the close says it in one sentence (the tally above stays the
-  // standalone page's and the current layout's)
+  // in the app's focus room the close says it in one sentence, and the recall rate stays under it as
+  // one quiet line (the tally boxes above stay the standalone page's)
   if (ctx.focusRoom) {
     // what happened, in one sentence and only what is true: the words met, the minutes, and how many
     // needed a second look (they were seen again in the sitting; when they return is the next line)
@@ -2707,6 +2718,7 @@ function doneScreen() {
     box.append(el('p', 'kp-done-line', second
       ? t(`${met} 語に出会った（${mins} 分）。${second} 語はもう一度見た。`, `You met ${met} ${met === 1 ? 'word' : 'words'} in ${minEn}. ${second} needed a second look.`)
       : t(`${met} 語に出会った（${mins} 分）。`, `You met ${met} ${met === 1 ? 'word' : 'words'} in ${minEn}.`)));
+    box.append(rate);
   }
   box.append(el('p', 'kp-sub', soon ? t(`次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。`, `Next review in ${fmtWait(Math.max(0, soon.t - Date.now()))}.`) : t("今日の分は終わり。また明日。")));
   // one door forward: the host's reading for today, the words just met waiting in it
