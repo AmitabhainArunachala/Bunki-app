@@ -500,14 +500,7 @@ const UI_EN = {
   "裏：ふりがな付きの全文、読み、品詞、日本語の説明と使い方。英語の意味とその文の英訳はタップで開く。": "The back shows the passage with readings, the target’s reading, part of speech, Japanese definition and usage. Open folds for English meaning and the target sentence’s translation.",
   "文章はすべて書き下ろし。自然さ・事実・レベルを、書き手とは別のモデルが一枚ずつ確かめています。級は公開リストによる目安です。": "Every passage is original. A model separate from its author checks naturalness, facts and level for each card. Level labels are estimates from public lists."
 };
-/** The focus room's plainer English (the layout under test, 2026-10-13); the current layout keeps
- * UI_EN's words as they were. */
-const UI_EN_PLACES = {
-  "覚えるの札に入ります — このデッキの予定は変わりません": "Save puts it in your review cards. This deck’s schedule doesn’t change.",
-  "今日の分は終わり。また明日。": "Today’s cards are done. More tomorrow.",
-  "答えを見て理解が深まったなら もう一度": "If the answer taught you something, choose Again.",
-};
-const t = (ja, en = (ctx?.places && UI_EN_PLACES[ja]) || UI_EN[ja]) => ctx?.english !== false ? (en ?? ja) : ja;
+const t = (ja, en = UI_EN[ja]) => ctx?.english !== false ? (en ?? ja) : ja;
 
 /* ------------------------------------------------------------- helpers */
 function el(tag, cls, ...kids) {
@@ -638,18 +631,30 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     out.append(host);
   };
   open();
+  // A word kept on one line (ruby, kp-nb: a host may set white-space: nowrap on it) must still leave
+  // a line break open before a kept word right after it (小村|寿太郎), or the pair would move to the
+  // next line as one and leave a short line behind: a <wbr> goes between them, where the next one goes.
+  const kept = (n) => n?.nodeType === 1 && (n.tagName === 'RUBY' || /\bkp-nb\b/.test(n.className));
+  const edge = (n, end) => (n.nodeType === 1 && /\bkp-target\b/.test(n.className) ? n.childNodes[end ? n.childNodes.length - 1 : 0] : n);
+  let keptBefore = false;
   // a piece inside a tap unit goes into that unit's .kp-tok, which continues across segments
   // (one word, several ruby segments) until a sentence starts a new host
   const put = (node, isTarget, len, unit = null) => {
     if (split && isTarget === 1) host.dataset.focus = '1';
+    const gap = keptBefore && kept(edge(node, false)) ? document.createElement('wbr') : null;
+    keptBefore = kept(edge(node, true));
     if (unit) {
       let tok = host.lastChild;
       if (!(tok && tok.kpUnit === unit)) {
         tok = tapNode(el('span', 'kp-tok'), unit, taps.onTap);
         host.append(tok);
       }
+      if (gap) tok.append(gap);
       tok.append(node);
-    } else host.append(node);
+    } else {
+      if (gap) host.append(gap);
+      host.append(node);
+    }
     at += len;
     while (split && k < ends.length - 1 && at >= ends[k]) {
       k++;
@@ -667,13 +672,17 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     // the word again later in the passage: blanked too, without the hint
     if (isTarget === 3 && blank) return put(el('span', 'kp-blank', '　'.repeat(Math.min(6, Math.max(2, [...text].length)))), 3, len);
     const hasRuby = reading && KANJI.test(text) && ruby === 'all';
+    // a word that carries a reading on the back is one unit on the front too (kp-nb), so a host that
+    // keeps a reading's word on one line (the app) breaks the front's lines where the back's break
+    const keep = !hasRuby && reading && KANJI.test(text);
     if (isTarget) {
-      const wrap = el('span', 'kp-target', hasRuby ? rubyNode(text, reading) : text);
+      const wrap = el('span', 'kp-target', hasRuby ? rubyNode(text, reading) : keep ? el('span', 'kp-nb', text) : text);
       // the card's own word: its tap says it is in this deck (no 覚える)
       if (taps) tapNode(wrap, SELF_UNIT, taps.onTap);
       return put(wrap, isTarget, len);
     }
     if (hasRuby) return put(rubyNode(text, reading), 0, len, unitOver(at, len));
+    if (keep && !cover) return put(el('span', 'kp-nb', text), 0, len);
     // plain text may hold a sentence end or a word edge: cut it there so each sentence keeps its
     // own words and each word its own tap target
     let rest = text;
@@ -691,7 +700,76 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     }
   });
   if (clamp && split) clampContext(out);
+  if (taps || ruby === 'all') {
+    reflowWatch?.observe(out);
+    document.fonts?.ready.then(() => out.isConnected && seatReadings(out));
+  }
   return out;
+}
+
+/** Whenever a passage reflows (width, zoom, an opened fold, fonts): a word that wraps onto a second
+ * line would centre its 44px reach (.kp-tok::before) on the gap between the two lines and reach over
+ * the words of both, so it keeps only its printed boxes (kp-split); and the readings are re-seated. */
+const reflowWatch = typeof ResizeObserver === 'function'
+  ? new ResizeObserver((entries) => {
+    for (const { target } of entries) {
+      if (!target.isConnected) { reflowWatch.unobserve(target); continue; }
+      for (const tok of target.querySelectorAll('.kp-tok')) tok.classList.toggle('kp-split', tok.getClientRects().length > 1);
+      seatReadings(target);
+    }
+  })
+  : null;
+let rtMeasure = null;
+/** A host may draw each reading above its word (ruby[data-rt]::after; the app does, so the line
+ * never moves) instead of laying it out as ruby. A reading wider than its word would then run into
+ * its neighbour's reading or past the edge of the line. Each line's readings are seated left to
+ * right: centred on the word where there is room, nudged apart (and inside the line) where there is
+ * not, and narrowed to the word plus one reading character at most (--kp-rt-dx, --kp-rt-fit). */
+function seatReadings(sentence) {
+  const rubies = [...sentence.querySelectorAll('ruby[data-rt]')];
+  if (!rubies.length) return;
+  const style = getComputedStyle(rubies[0], '::after');
+  const size = parseFloat(style.fontSize);
+  if (!size) return;
+  rtMeasure ||= document.createElement('canvas').getContext('2d');
+  if (rtMeasure) rtMeasure.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+  const spacing = parseFloat(style.letterSpacing) || 0;
+  const gap = size * 0.2;
+  const lines = new Map();
+  for (const ruby of rubies) {
+    ruby.style.removeProperty('--kp-rt-dx');
+    ruby.style.removeProperty('--kp-rt-fit');
+    const rects = ruby.getClientRects();
+    if (rects.length !== 1 || !rects[0].width) continue;
+    const r = rects[0];
+    let block = ruby.parentElement;
+    while (block !== sentence && !/^(block|flex|flow-root|list-item)$/.test(getComputedStyle(block).display)) block = block.parentElement;
+    const text = ruby.dataset.rt;
+    const natural = (rtMeasure ? rtMeasure.measureText(text).width : [...text].length * size) + spacing * [...text].length;
+    const width = Math.min(natural, r.width + size);
+    const key = `${Math.round(r.bottom / 4)}`; // one line of the block
+    if (!lines.has(block)) lines.set(block, new Map());
+    const row = lines.get(block);
+    if (!row.has(key)) row.set(key, []);
+    row.get(key).push({ ruby, centre: (r.left + r.right) / 2, natural, width, x: (r.left + r.right) / 2 - width / 2 });
+  }
+  for (const [block, rows] of lines) {
+    const b = block.getBoundingClientRect(), cs = getComputedStyle(block);
+    const lo = b.left + parseFloat(cs.paddingLeft), hi = b.right - parseFloat(cs.paddingRight);
+    for (const items of rows.values()) {
+      items.sort((p, q) => p.centre - q.centre);
+      items.forEach((it, i) => { it.x = Math.max(it.x, i ? items[i - 1].x + items[i - 1].width + gap : lo); });
+      for (let i = items.length - 1; i >= 0; i--) {
+        const it = items[i], limit = i < items.length - 1 ? items[i + 1].x - gap : hi;
+        if (it.x + it.width > limit) it.x = limit - it.width;
+      }
+      for (const it of items) {
+        const dx = it.x + it.width / 2 - it.centre;
+        if (Math.abs(dx) >= 0.5) it.ruby.style.setProperty('--kp-rt-dx', `${dx.toFixed(1)}px`);
+        if (it.width < it.natural - 0.5) it.ruby.style.setProperty('--kp-rt-fit', (it.width / it.natural).toFixed(3));
+      }
+    }
+  }
 }
 
 /** 焦点 on a long passage: the sentences before the target and those after it each become one
@@ -712,6 +790,7 @@ function clampContext(out) {
       const open = box.dataset.open !== '1';
       box.dataset.open = open ? '1' : '';
       more.setAttribute('aria-expanded', String(open));
+      refitContext();
     }, { 'aria-expanded': 'false', 'aria-label': label, title: label });
     box.append(more);
     return box;
@@ -721,14 +800,28 @@ function clampContext(out) {
   if (before) out.prepend(before);
   if (after) out.append(after);
 }
-/** mark each context group that 焦点 clips (its text runs past two lines), so only those show ⋯ */
+/** mark each context group that 焦点 clips (its text runs past two lines), so only those show ⋯.
+ * An open group is measured folded: it keeps its ⋯ to fold it again, and the ⋯'s gutter, so a
+ * repaint (a rebuild, a return from the kanji page) lays it out exactly as the learner opened it. */
 function fitClamps(root) {
   for (const box of root.querySelectorAll('.kp-ctx')) {
     const inner = box.querySelector('.kp-ctx-in');
     const flow = box.querySelector('.kp-ctx-flow');
-    const clipped = getComputedStyle(inner).display !== 'contents' && flow.offsetHeight > inner.clientHeight + 1;
+    // folded, a group shows two of its lines; an open one is held to that measure without folding it
+    // (folding it, even for a moment, would clamp the reading window's scroll)
+    const folded = box.dataset.open === '1' ? 2 * parseFloat(getComputedStyle(flow).lineHeight) : inner.clientHeight;
+    const clipped = getComputedStyle(inner).display !== 'contents' && flow.offsetHeight > folded + 1;
     box.dataset.clip = clipped ? '1' : '';
   }
+}
+/** Opening a 焦点 group can push the word and its definition under the grade bar. A passage with no
+ * reading window then takes one, as at the reveal, so the answer stays on one screen. */
+function refitContext() {
+  if (!ctx?.root?.isConnected || !ui.revealed || ui.screen !== 'study' || externalSheet()) return;
+  const passage = ctx.root.querySelector('#kp-card .kp-sentence');
+  if (!passage || passage.classList.contains('kp-window') || backFits() !== false) return;
+  windowPassage(0, window.scrollY);
+  settleBack();
 }
 
 /* ------------------------------------------------------------- screens */
@@ -1017,7 +1110,7 @@ function studyScreen() {
   }
   // in the app the back carries every reading after the reveal (learner brief 2026-10-04), and one
   // quiet switch returns the clean original (2026-10-13); the front never shows either
-  if (ui.revealed && ctx.places) (chips.querySelector('.kp-eyebrow') || chips).append(readingsToggle());
+  if (ui.revealed && ctx.focusRoom) (chips.querySelector('.kp-eyebrow') || chips).append(readingsToggle());
   // the front: no readings, no English, nothing to tap in the passage, no hint (CARD_CONTRACT_V2 §2)
   face.append(ui.revealed ? sentenceNodes(card, { split: passage, clamp: passage, taps: backTaps(card, word) }) : sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage }));
   const repaired = ctx.state.repairs?.[id]?.hint;
@@ -1043,8 +1136,11 @@ function studyScreen() {
     } else {
       // in the app the right half of the screen turns the card, like a page (John, 2026-10-13); the
       // left half stays still, so a tap while reading never gives the answer away
-      const turnsCard = (e) => !ctx.places || !Number.isFinite(e.clientX) || e.clientX >= innerWidth / 2;
-      if (hintsOn()) face.append(el('p', 'kp-taphint', ctx.places ? t("思い出したら、右側をタップ", "Recall it, then tap the right side") : mode === 'read' ? t("意味を思い出してからタップ") : t("タップして答えを見る")));
+      const turnsCard = (e) => !ctx.focusRoom || !Number.isFinite(e.clientX) || e.clientX >= innerWidth / 2;
+      // with no button to name, the focus room's hint says where the tap goes (the right half)
+      if (hintsOn()) face.append(el('p', 'kp-taphint', ctx.focusRoom
+        ? mode === 'read' ? t("意味を思い出してから、右側をタップ", "Recall the meaning, then tap the right side") : t("右側をタップして答えを見る", "Tap the right side to reveal the answer")
+        : mode === 'read' ? t("意味を思い出してからタップ") : t("タップして答えを見る")));
       face.addEventListener('click', (e) => {
         if (turnsCard(e)) reveal();
       });
@@ -1606,6 +1702,7 @@ function tapText(text, units, onTap) {
 function defLine(card, word) {
   const p = el('p', 'kp-def');
   p.append(...tapText(word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 })));
+  reflowWatch?.observe(p);
   return p;
 }
 
@@ -2344,8 +2441,8 @@ const SETTLE_GAP = 12;
  * definition in view between the host's pinned header and the pinned grade bar, by the least
  * scroll that does it (up when the learner had scrolled past the target sentence, down when the
  * answer is under the bar); when all three cannot fit, the word and its definition win. Then no
- * fold row is left cut by the bar: it is scrolled wholly into view, or wholly under the bar,
- * whichever keeps the rest in view. Smooth unless reduced motion; nothing moves when it fits.
+ * fold row is left cut by the bar: the least further whole-pixel move that leaves every row wholly
+ * in view or wholly under the bar while keeping the rest in view. Nothing moves when it fits.
  */
 function settleBack() {
   const face = ctx.root.querySelector('#kp-card');
@@ -2377,18 +2474,31 @@ function settleBack() {
   } else dy = bottom - bottomLimit;
   const room = { up: -window.scrollY, down: document.documentElement.scrollHeight - innerHeight - window.scrollY };
   dy = Math.max(room.up, Math.min(room.down, dy));
-  for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
+  // then no fold row cut by the bar (backFits: none crosses its top edge by more than half a pixel on
+  // both sides). The scroll lands on a whole pixel while the rows and the bar sit on fractions of one,
+  // so the plan is made in whole-pixel moves: a row seated against the bar here is seated there
+  const whole = (d) => Math.round(window.scrollY + d) - window.scrollY;
+  dy = Math.abs(dy) < 1 ? 0 : whole(dy); // under a pixel off is at rest
+  const rows = [...face.querySelectorAll('.kp-folds > details > summary')].map((s) => {
     const r = s.getBoundingClientRect();
-    const [rTop, rBottom] = [r.top - lift - dy, r.bottom - lift - dy];
-    if (!(rTop < barTop && rBottom > barTop)) continue;
-    // rows touch, so the edge goes exactly at the bar: the next (or the previous) row is then whole
-    const intoView = rBottom - barTop + 1; // scroll down: the row just above the bar
-    const underBar = barTop - rTop; // scroll up: the row wholly under the bar
-    if (top - dy - intoView >= topLimit && dy + intoView <= room.down) dy += intoView;
-    else if (bottom - dy + underBar <= bottomLimit && dy - underBar >= room.up) dy -= underBar;
-    break;
+    return [r.top - lift, r.bottom - lift];
+  });
+  const clear = (d) => rows.every(([rTop, rBottom]) => !(rTop - d < barTop - 0.5 && rBottom - d > barTop + 0.5));
+  if (!clear(dy)) {
+    // the least further move (down first) that clears every row, keeping the target sentence below the
+    // top when it scrolls down and the definition above the bar when it scrolls up; none in a row's
+    // height: leave it
+    const reach = Math.ceil(Math.max(...rows.map(([rTop, rBottom]) => rBottom - rTop))) + 2;
+    const fits = (d) =>
+      d <= room.down && d >= room.up && (d > dy ? top - d >= topLimit : bottom - d <= bottomLimit) && clear(d);
+    for (let k = 1; k <= reach; k++) {
+      const d = [dy + k, dy - k].find(fits);
+      if (d === undefined) continue;
+      dy = d;
+      break;
+    }
   }
-  if (Math.abs(dy) < 1) return;
+  if (!dy) return;
   window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
 }
 /** the height of a header the host pins over the top of the page (the corridor's chrome); with
@@ -2425,7 +2535,7 @@ function revealInPlace() {
     const chips = face.querySelector('.kp-chips');
     (chips.querySelector('.kp-eyebrow') || chips).append(zoomToggle(zoom));
   }
-  if (ctx.places) {
+  if (ctx.focusRoom) {
     const chips = face.querySelector('.kp-chips');
     (chips.querySelector('.kp-eyebrow') || chips).append(readingsToggle());
   }
@@ -2675,7 +2785,7 @@ function doneScreen() {
   box.append(topBar(t("おつかれさま")));
   box.append(el('h2', 'kp-done-title', t("机の上は、空になった。", "The surface is clear.")));
   const missed = new Set(ui.log.filter((x) => !x.ok).map((x) => x.term));
-  const words = [...new Set(ui.log.map((x) => x.term))].slice(0, ctx.places ? 24 : 12);
+  const words = [...new Set(ui.log.map((x) => x.term))].slice(0, ctx.focusRoom ? 24 : 12);
   if (words.length) {
     const rise = el('div', 'kp-rise');
     rise.setAttribute('aria-hidden', 'true');
@@ -2693,11 +2803,12 @@ function doneScreen() {
   const clock = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
   const cell = (label, value, cls) => el('div', `kp-tally-c ${cls}`, el('span', null, label), el('b', null, value));
   box.append(el('div', 'kp-tally', cell(t("覚えた", "Kept"), String(ui.right), 'kp-tally-kept'), cell(t("もう一度"), String(ui.done - ui.right), 'kp-tally-again'), cell(t("時間", "Time"), clock, 'kp-tally-time')));
-  box.append(el('p', 'kp-done-rate', el('span', null, t("思い出せた割合")), el('b', null, `${pct}%`), el('span', null, `${t("回答")} ${ui.done}`)));
+  const rate = el('p', 'kp-done-rate', el('span', null, t("思い出せた割合")), el('b', null, `${pct}%`), el('span', null, `${t("回答")} ${ui.done}`));
+  if (!ctx.focusRoom) box.append(rate);
   const soon = learningSoon(ctx.deck, ctx.state, new Date(), DAY, { skip: skipFor(ctx.prefs.mode) })[0];
-  // in the app's layout under test the close says it in one sentence (the tally above stays the
-  // standalone page's and the current layout's)
-  if (ctx.places) {
+  // in the app's focus room the close says it in one sentence, and the recall rate stays under it as
+  // one quiet line (the tally boxes above stay the standalone page's)
+  if (ctx.focusRoom) {
     // what happened, in one sentence and only what is true: the words met, the minutes, and how many
     // needed a second look (they were seen again in the sitting; when they return is the next line)
     const met = new Set(ui.log.map((x) => x.term)).size;
@@ -2707,10 +2818,11 @@ function doneScreen() {
     box.append(el('p', 'kp-done-line', second
       ? t(`${met} 語に出会った（${mins} 分）。${second} 語はもう一度見た。`, `You met ${met} ${met === 1 ? 'word' : 'words'} in ${minEn}. ${second} needed a second look.`)
       : t(`${met} 語に出会った（${mins} 分）。`, `You met ${met} ${met === 1 ? 'word' : 'words'} in ${minEn}.`)));
+    box.append(rate);
   }
   box.append(el('p', 'kp-sub', soon ? t(`次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。`, `Next review in ${fmtWait(Math.max(0, soon.t - Date.now()))}.`) : t("今日の分は終わり。また明日。")));
   // one door forward: the host's reading for today, the words just met waiting in it
-  const door = ctx.places ? safely(() => ctx.next?.() || null, null) : null;
+  const door = ctx.focusRoom ? safely(() => ctx.next?.() || null, null) : null;
   if (door) {
     const doorButton = btn('kp-start kp-door', [el('span', 'kp-door-l', door.label), el('span', 'kp-door-t', door.title)], () => door.open(), { id: 'kp-door' });
     doorButton.querySelector('.kp-door-t').lang = 'ja';
@@ -2977,7 +3089,7 @@ function ensureCss() {
   document.head.append(link);
 }
 
-export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, layout = null } = {}) {
+export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false } = {}) {
   const request = ++mountRequest;
   if (autoStart !== undefined) pendingStart = { deckId, autoStart };
   ensureCss();
@@ -3005,7 +3117,10 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     // the host's door forward from a sitting's close: () => ({ label, title, open }) or null
     next: typeof next === 'function' ? next : null,
     // the app's layout under test turns on the focus room (in the app only: it needs the host)
-    places: layout === 'places' && !!host,
+    // the app's focus room does not depend on its optional lexicon host: if the host fails to load the
+    // deck still opens in the room the CSS draws (right-half reveal, readings switch). The standalone
+    // pages never ask for it.
+    focusRoom: !!focusRoom,
     openEntry: typeof openEntry === 'function' ? openEntry : lexicon ? (node) => lexicon.open(node) : null,
     host: lexicon,
     // the tap source: with a host, the tokens side file (fetched once a sitting starts); without

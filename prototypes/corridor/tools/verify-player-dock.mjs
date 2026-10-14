@@ -110,9 +110,11 @@ for(const r of results.undo){
  check(name+' no actual card ink survives over Undo',r.paint.cardInkOccluded,r.paint);
  check(name+' card-hidden control preserves geometry, ledger, and restored paint',r.paint.cardOutsideUndo&&r.paint.visibleDescendants===0&&r.paint.unchangedGeometry&&r.paint.ledgerUnchanged&&r.paint.restoredEqual,r.paint);
  check(name+' opaque full-width Undo band',opaque(g.background)&&opaque(g.band.background)&&g.band.content!=='none'&&g.undo.left+parseFloat(g.band.left)<=.1&&g.undo.right-parseFloat(g.band.right)>=r.width-.1,g.band);
- check(name+' safe area counted once',g.hasPrimaryTabs&&g.safeArea===r.bottom+'px'&&Math.abs(g.gap-16)<.1,{safeArea:g.safeArea,gap:g.gap,navClearance:g.navClearance});
- const flat=results.undo.find(b=>b.width===r.width&&b.lang===r.lang&&b.action===r.action&&b.point===r.point&&b.bottom===0)?.geometry;
- check(name+' Reveal stands off the viewport bottom by its inset-0 distance plus the inset exactly once',!!flat&&flat.revealFromBottom>0&&Math.abs(g.revealFromBottom-flat.revealFromBottom-r.bottom)<.5,{revealFromBottom:g.revealFromBottom,atInsetZero:flat?.revealFromBottom,inset:r.bottom});
+ // The app opens its decks in the focus room (John, 2026-10-13: "Simply tapping the right of the screen
+ // should show back of card. No need for 'reveal answer' button"): Reveal is the right half of the
+ // screen, not a slab above the tabs, and Undo stands alone at the foot.
+ check(name+' safe area counted once: Undo stands 10px off the viewport bottom plus the inset exactly once',g.hasPrimaryTabs&&g.safeArea===r.bottom+'px'&&Math.abs(844-g.undo.bottom-(10+r.bottom))<.1,{safeArea:g.safeArea,undoFromBottom:844-g.undo.bottom,inset:r.bottom,navClearance:g.navClearance});
+ check(name+' Reveal is the right half of the screen from below the session bar to the viewport bottom, at every inset',g.revealFromBottom===0&&Math.abs(g.reveal.left-r.width/2)<.5&&Math.abs(g.reveal.right-r.width)<.5&&g.reveal.top>=60,{reveal:g.reveal,revealFromBottom:g.revealFromBottom,inset:r.bottom});
  check(name+' actual 44-square point owns Undo',g.undo.width>=44&&g.undo.height>=44&&g.points.every(p=>p.owns),g.points);
  check(name+' trusted Undo restores last real card and exact ledger',r.changedLedger&&r.restored,{changed:r.changedLedger,restored:r.restored});
  check(name+' only bundled Undo glyphs',r.fonts.length>0&&r.fonts.every(f=>f.isCustomFont),r.fonts);

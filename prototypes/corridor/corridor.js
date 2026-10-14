@@ -13,7 +13,7 @@
  */
 
 // BEGIN GENERATED RELEASE IDENTITY — npm run release:sync
-const APP_RELEASE = Object.freeze({"version":"1.2.0","channel":"stable","releasedOn":"2026-10-14","learnerDataEpoch":1});
+const APP_RELEASE = Object.freeze({"version":"1.2.1","channel":"stable","releasedOn":"2026-10-14","learnerDataEpoch":1});
 // END GENERATED RELEASE IDENTITY
 
 const DATA = {
@@ -24807,9 +24807,10 @@ function renderDeckPlay(main) {
       english: bi(),
       presentation: deckPresentation,
       storage: localStorage, host: deckHost(),
-      // the layout under test opens the decks in the focus room (the clean card, the right half that
-      // turns it, every reading on the back, one door forward from the close)
-      layout: placesLayout() ? 'places' : null,
+      // the app opens its decks in the focus room in every layout (John, 2026-10-13: "SRS section very
+      // clear and smooth with NO CLUTTER at all"): the clean card, the right half that turns it, every
+      // reading on the back, one door forward from the close
+      focusRoom: true,
       // the sitting's close opens one door forward: today's reading, as the bookshelf names it
       next() {
         const read = todayReadPick();
