@@ -8443,8 +8443,7 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
   pop.setAttribute('role', 'dialog');
   // as Save ▾'s menu (John, 2026-10-14: "When I click save, I want a drop down menu to appear with options
   // inside the menu. List or other logical options"): the word is saved, its lists follow, then the rest
-  const title = el('p', 'vocabulary-list-title', menu ? tx(`「${label}」は復習に保存済み · リスト`, `${label} is saved to review · Lists`)
-    : tx(`「${label}」をリストに追加`, `Add ${label} to a list`));
+  const title = el('p', 'vocabulary-list-title', menu ? tx('リスト', 'Lists') : tx(`「${label}」をリストに追加`, `Add ${label} to a list`));
   title.id = 'vocabulary-list-title';
   if (menu) pop.classList.add('is-save-menu');
   pop.setAttribute('aria-labelledby', title.id);
