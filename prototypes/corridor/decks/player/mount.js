@@ -735,10 +735,10 @@ function fitClamps(root) {
   for (const box of root.querySelectorAll('.kp-ctx')) {
     const inner = box.querySelector('.kp-ctx-in');
     const flow = box.querySelector('.kp-ctx-flow');
-    const open = box.dataset.open;
-    if (open) box.dataset.open = '';
-    const clipped = getComputedStyle(inner).display !== 'contents' && flow.offsetHeight > inner.clientHeight + 1;
-    if (open) box.dataset.open = open;
+    // folded, a group shows two of its lines; an open one is held to that measure without folding it
+    // (folding it, even for a moment, would clamp the reading window's scroll)
+    const folded = box.dataset.open === '1' ? 2 * parseFloat(getComputedStyle(flow).lineHeight) : inner.clientHeight;
+    const clipped = getComputedStyle(inner).display !== 'contents' && flow.offsetHeight > folded + 1;
     box.dataset.clip = clipped ? '1' : '';
   }
 }
