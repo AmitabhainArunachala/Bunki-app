@@ -95,8 +95,10 @@ try {
       let offSeat = await page.evaluate(census);
       if (fits(offSeat)) { await page.mouse.move(width - 4, 200); await page.mouse.wheel(0, offSeat.target.bottom - offSeat.header.bottom + 20); await page.waitForTimeout(100); offSeat = await page.evaluate(census); }
       check(`${width}/${zoom} deliberate off-window comparison has open/nonzero/windowed pose and target outside`, seated(offSeat, zoom === 'focus') && !fits(offSeat), offSeat);
+      // off-window the switch may sit under the session bar, where a pointer would first scroll the page:
+      // it is pressed from the keyboard (a trusted Enter on the focused switch, the page left where it is)
       for (const state of ['false', 'true']) {
-        await page.locator('#kp-readings').click(); await resting(page);
+        await page.locator('#kp-readings').evaluate(n => n.focus({ preventScroll: true })); await page.keyboard.press('Enter'); await resting(page);
         const afterOff = await page.evaluate(census), pressed = await page.locator('#kp-readings').getAttribute('aria-pressed');
         check(`${width}/${zoom} deliberately off-window Readings ${state === 'true' ? 'on' : 'off'} retains exact reading pose`, pressed === state && same(afterOff, offSeat), { before: offSeat, after: afterOff, pressed }); offSeat = afterOff;
       }
