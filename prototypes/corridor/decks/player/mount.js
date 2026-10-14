@@ -1884,6 +1884,18 @@ function sheetNode() {
   term.id = 'kp-sheet-term';
   term.dataset.uiContent = 'learning';
   term.tabIndex = -1;
+  // the word itself is the way into the corridor's full entry, as in every word card of the app (John,
+  // 2026-10-14: the "Full entry" button is bloat); a word of this deck has no full entry here
+  if (!f.word && f.entry) {
+    const door = btn('kp-sheet-door', f.label, () => {
+      const entry = f.entry;
+      closeSheet();
+      ctx.host.open(entry);
+    }, { id: 'kp-sheet-full', 'data-action': 'entry.open', title: t('辞書の全項目を開く', 'Open the full entry') });
+    door.lang = 'ja';
+    door.dataset.uiContent = 'learning';
+    term.replaceChildren(door);
+  }
   const head = el('div', 'kp-sheet-head', term, f.reading && f.reading !== f.label ? el('span', 'kp-sheet-reading', f.reading) : null);
   const chips = el('div', 'kp-sheet-chips', f.kind ? el('span', 'kp-chip', t(f.kind)) : null, f.level ? levelChip(f.level) : null);
   top.append(head, chips, btn('kp-icon kp-sheet-x', '×', closeSheet, { id: 'kp-sheet-close', 'aria-label': t("閉じる") }));
@@ -1918,15 +1930,7 @@ function sheetNode() {
   }
   if (depth >= SHEET_DEPTH) sheet.append(el('p', 'kp-sheet-stop', t(STOP_HERE)));
   if (f.word) sheet.append(el('p', 'kp-sheet-indeck', t(IN_DECK)));
-  else if (f.entry) {
-    sheet.append(takeBlock(f));
-    // the corridor's own entry: every sense, examples, its kanji (it leaves the card for a moment)
-    sheet.append(btn('kp-link kp-sheet-full', t("辞書の全項目を開く"), () => {
-      const entry = f.entry;
-      closeSheet();
-      ctx.host.open(entry);
-    }, { id: 'kp-sheet-full' }));
-  }
+  else if (f.entry) sheet.append(takeBlock(f));
   wrap.append(sheet);
   return wrap;
 }
@@ -1937,14 +1941,14 @@ function sheetNode() {
 function takeBlock(f) {
   const box = el('div', 'kp-take-box');
   if (ui.sheet.note) box.append(el('p', 'kp-sheet-note', ui.sheet.note));
+  // Save ▾ (John, 2026-10-14: one Save, its options in a menu, no second "Add to a list"): a host with
+  // a menu opens it from Save once the word is saved (lists, copy, remove from review)
+  const menu = typeof ctx.host.addToList === 'function';
+  const openMenu = (invoker) => safely(() => ctx.host.addToList(f.entry, invoker, { menu: true, onChange: () => ui.sheet && drawSheet({ focus: false }) }), null);
+  const attrs = menu ? { 'data-save-menu': 'true', 'aria-haspopup': 'dialog', 'aria-expanded': 'false' } : {};
   if (safely(() => !!ctx.host.isTaken(f.entry), false)) {
-    box.append(el('p', 'kp-sheet-taken', t("✓ 覚えるの札にあります")));
-    if (typeof ctx.host.addToList === 'function') {
-      const add = btn('kp-link kp-take-list', t("リストに追加…"), () => {
-        safely(() => ctx.host.addToList(f.entry, add), null);
-      }, { id: 'kp-take-list', 'aria-haspopup': 'dialog' });
-      box.append(add);
-    }
+    const saved = btn('kp-take taken', t('保存済み ✓', 'Saved ✓'), () => menu && openMenu(saved), { id: 'kp-take', 'aria-pressed': 'true', ...attrs });
+    box.append(saved);
     return box;
   }
   const take = btn('kp-take', t('保存', 'Save'), async () => {
@@ -1957,7 +1961,9 @@ function takeBlock(f) {
     if (ui.sheet !== sheetNow) return; // the sheet closed or moved on while the corridor saved
     ui.sheet.note = ok ? '' : t("保存できませんでした");
     drawSheet({ focus: false });
-  }, { id: 'kp-take' });
+    const next = ctx.root.querySelector('#kp-take');
+    if (ok && menu && next) openMenu(next);
+  }, { id: 'kp-take', 'aria-pressed': 'false', ...attrs });
   box.append(take, el('p', 'kp-take-note', t(TAKE_NOTE)));
   return box;
 }

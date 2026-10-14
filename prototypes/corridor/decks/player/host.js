@@ -13,8 +13,9 @@
  *   host.take(entry)          → Promise<boolean> the corridor's one-tap save into 覚えるの札 (no chooser;
  *                                                the corridor shows its Saved toast with 元に戻す); false
  *                                                when not saved
- *   host.addToList(entry, invoker) → void       the corridor's optional リストに追加… popover, for a
- *                                                word already saved
+ *   host.addToList(entry, invoker, { menu, onChange }?) → void   the corridor's list popover for a word
+ *                                                already saved; with menu, Save ▾'s whole menu (its lists,
+ *                                                copy, remove from review), onChange after a removal
  *
  * An entry is { t: 'word' | 'kanji' | 'grammar', id, label, reading, gloss, ja, en, level?, seq?, token }:
  * t and id are the corridor's node, so open() and take() address the same row its reader does.
@@ -32,7 +33,7 @@
  *   taken()               the 覚えるの札 rows
  *   capture(node, label)  the corridor's one-tap save (toggleWordSave, bound to the dictionary
  *                         visit and the shared review pool); resolves true when the row is written
- *   addToList(node, label, invoker)  open the corridor's list popover for a saved item
+ *   addToList(node, label, invoker, options)  open the corridor's list popover (or Save ▾ menu) for a saved item
  *
  * A tap here is capture, never evidence: nothing in this adapter writes the observation log or
  * any schedule, and take() never enrols the word in the deck the card belongs to.
@@ -116,9 +117,9 @@ export function createHost(deps) {
       if (taken(entry)) return true;
       return !!(await deps.capture(nodeOf(entry, deps), entry.label || entry.id));
     },
-    addToList(entry, invoker) {
+    addToList(entry, invoker, options = {}) {
       if (!entry?.t || !entry.id || !taken(entry) || typeof deps.addToList !== 'function') return;
-      deps.addToList(nodeOf(entry, deps), entry.label || entry.id, invoker);
+      deps.addToList(nodeOf(entry, deps), entry.label || entry.id, invoker, options);
     },
   };
 }

@@ -350,8 +350,10 @@
 .kp-sheet-none { margin: 0; font-size: 14px; line-height: 1.6; color: var(--kp-ink-2); }
 .kp-sheet-stop { margin: 0; font-size: 13px; color: var(--kp-mute); letter-spacing: 0.08em; }
 .kp-sheet-indeck, .kp-sheet-taken, .kp-sheet-note { margin: 0; font-size: 15px; color: var(--kp-ink-2); padding: 10px 12px; border: 1px solid var(--kp-line); border-radius: 12px; background: var(--kp-panel-2); }
-.kp-sheet-full { justify-self: start; min-height: 44px; }
-.kp-take-list { min-height: 44px; margin-top: 6px; }
+/* the headword is the door to the host's full entry: it keeps the headword's look, a 44px reach that moves nothing */
+.kp-sheet-door { display: inline; margin: -7px 0; padding: 7px 0; border: 0; background: none; font: inherit; letter-spacing: inherit; color: inherit; text-align: start; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.kp-sheet-door:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 2px; }
+.kp-take[data-save-menu]::after { content: '▾'; margin-inline-start: 6px; font-size: 0.8em; opacity: 0.8; }
 .kp-take-note { margin: 6px 0 0; font-size: 12px; color: var(--kp-ink-2); }
 .kp-take { min-height: 48px; width: 100%; border-radius: 14px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 16px; font-weight: 700; }
 /* the popover (no host: the standalone study pages) */

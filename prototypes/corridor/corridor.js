@@ -7993,28 +7993,59 @@ function removeMini() {
   closeVocabularyListPopover();
   document.getElementById('mini')?.remove();
   miniAnchor = null;
+  miniEntry = null;
 }
 
-/* a tap anywhere outside the mini puts it away — easy to back out of. A press on the word the popup
- * belongs to puts it away too, and that press's click does not open it again (miniClosedOnAnchor). The
- * word menu and the list popover close the same way; the toast never closes anything. */
-let miniClosedOnAnchor = null;
+/* One tap grammar for every Japanese word (John, 2026-10-14: "I should be able to tap ANY word … and it
+ * should be able to cycle through the layers to full entry"; "there is NO WAY to return to the
+ * original word without the furigana"). A word cycles: the original text → one tap: its reading above
+ * it and the popup (the meaning, Save) → the same word again: the full entry → once more, or a tap off
+ * the words, or Escape: the original again, every reading a tap summoned taken back. Words inside the
+ * popup and the entry follow the same grammar, so the layers nest and always unwind.
+ *
+ * A press on the word whose popup is open keeps the popup for that press's click, which dives into the
+ * full entry (miniDiveOnAnchor). A press anywhere else outside the popup puts it away; in the reader's
+ * text it also clears the summoned readings and the marked word. The word menu and the list popover
+ * close the same way; the toast never closes anything. */
+let miniEntry = null; // the open popup's way into the full entry, or null when it has none
+let miniDiveOnAnchor = null;
 document.addEventListener(
   'pointerdown',
   (ev) => {
-    miniClosedOnAnchor = null;
+    miniDiveOnAnchor = null;
     const target = ev.target;
     if (readerWordMenu && !readerWordMenu.menu.contains(target)) closeReaderWordMenu();
     const pop = document.getElementById('vocabulary-list-popover');
-    if (pop && !pop.contains(target) && !target.closest?.('#mini-lists, #personal-add-list')) closeVocabularyListPopover();
+    if (pop && !pop.contains(target) && !target.closest?.('#mini-take, #personal-add-list, #kp-take')) closeVocabularyListPopover();
     const mini = document.getElementById('mini');
+    const inText = ev.button === 0 && !!target.closest?.('#reader');
     if (mini && !mini.contains(target) && !target.closest?.('#vocabulary-list-popover, #reader-toast')) {
-      if (ev.button === 0 && miniAnchor?.isConnected && miniAnchor.contains(target)) miniClosedOnAnchor = miniAnchor;
+      if (ev.button === 0 && miniAnchor?.isConnected && miniAnchor.contains(target)) {
+        miniDiveOnAnchor = miniAnchor;
+        return;
+      }
       removeMini();
+      clearReaderReadings({ marked: inText });
+    } else if (!mini && inText && !target.closest?.('.tok, .token-door, button, a, input, select, textarea, summary, [role="button"]')) {
+      clearReaderReadings({ marked: true });
     }
   },
   true,
 );
+/** The press or keyboard activation on the word whose popup is open: dive into its full entry (or, with
+ * no entry to open, put the popup away). True when the activation was this second tap. */
+function diveFromMini(span, event) {
+  const second = event.detail !== 0 ? miniDiveOnAnchor === span : miniAnchor === span && !!document.getElementById('mini');
+  miniDiveOnAnchor = null;
+  if (!second) return false;
+  const entry = miniEntry;
+  if (entry) entry(event.detail === 0 ? 'keyboard' : 'pointer');
+  else {
+    removeMini();
+    clearReaderReadings({ marked: true });
+  }
+  return true;
+}
 
 /** Endings and helper words are named only by an entry whose headword is exactly their text. */
 const LOOKUP_HELPER_POS = new Set(['助動詞', '助詞', '接尾辞', '接頭辞']);
@@ -8200,7 +8231,11 @@ function appendJapaneseLookup(container, text, context = {}) {
     word.tabIndex = stopPlaced ? -1 : 0; stopPlaced = true;
     word.setAttribute('aria-describedby', help);
     word.setAttribute('aria-haspopup', 'dialog');
-    word.addEventListener('click', event => { event.stopPropagation(); void openJapaneseLookup(word, segment, context); });
+    word.addEventListener('click', event => {
+      event.stopPropagation();
+      if (diveFromMini(word, event)) return;
+      void openJapaneseLookup(word, segment, context);
+    });
     word.addEventListener('keydown', event => lookupWordKey(event, word));
     word.addEventListener('focus', () => setLookupStop(word));
     if (context.kinsoku) placeKinsoku(wrapper, word, segment);
@@ -8256,15 +8291,14 @@ function paintWordSave(button, on) {
   button.textContent = on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save');
   button.classList.toggle('taken', on);
   button.setAttribute('aria-pressed', String(on));
-  button.title = on ? tx('もう一度押すと復習から外す', 'Press again to remove it from review') : '';
+  // the popup's Save ▾ opens its menu once the word is saved: lists, copy, and the way back out
+  if (button.dataset.saveMenu) button.title = on ? tx('リスト・コピー・復習から外す', 'Lists, copy, remove from review') : '';
+  else button.title = on ? tx('もう一度押すと復習から外す', 'Press again to remove it from review') : '';
 }
-/** The popup's one path: before Save, a note saying where the word goes; after it, "Add to a list". */
+/** The popup's one path: before Save, a note saying where the word goes; once saved, Save ▾ holds the rest. */
 function paintMiniPath(actions, saved) {
-  const lists = actions?.querySelector('#mini-lists');
   const note = actions?.querySelector('.mini-take-note');
-  if (!lists) return;
-  if (!saved && lists.getAttribute('aria-expanded') === 'true') closeVocabularyListPopover();
-  lists.hidden = !saved;
+  if (!actions) return;
   if (note) note.hidden = saved;
   actions.classList.toggle('is-saved', saved);
 }
@@ -8394,7 +8428,7 @@ function closeVocabularyListPopover({ restoreFocus = false } = {}) {
   return true;
 }
 
-function openVocabularyListPopover(node, label, invoker) {
+function openVocabularyListPopover(node, label, invoker, { menu = false, more = [] } = {}) {
   const allowed = personalHost?.captureAccess?.() || (() => true);
   if (!allowed()) return;
   if (document.getElementById('vocabulary-list-popover')) {
@@ -8407,8 +8441,12 @@ function openVocabularyListPopover(node, label, invoker) {
   pop.dataset.driftChrome = 'true';
   pop.tabIndex = -1;
   pop.setAttribute('role', 'dialog');
-  const title = el('p', 'vocabulary-list-title', tx(`「${label}」をリストに追加`, `Add ${label} to a list`));
+  // as Save ▾'s menu (John, 2026-10-14: "When I click save, I want a drop down menu to appear with options
+  // inside the menu. List or other logical options"): the word is saved, its lists follow, then the rest
+  const title = el('p', 'vocabulary-list-title', menu ? tx(`「${label}」は復習に保存済み · リスト`, `${label} is saved to review · Lists`)
+    : tx(`「${label}」をリストに追加`, `Add ${label} to a list`));
   title.id = 'vocabulary-list-title';
+  if (menu) pop.classList.add('is-save-menu');
   pop.setAttribute('aria-labelledby', title.id);
   const choices = el('div', 'vocabulary-list-choices');
   choices.setAttribute('role', 'group');
@@ -8528,6 +8566,21 @@ function openVocabularyListPopover(node, label, invoker) {
     closeVocabularyListPopover({ restoreFocus: true });
   });
   pop.append(title, choices, form, notice);
+  if (more.length) {
+    const rest = el('div', 'vocabulary-list-more');
+    for (const item of more) {
+      const button = el('button', 'vocabulary-list-action', item.label);
+      button.type = 'button';
+      button.id = item.id;
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        closeVocabularyListPopover({ restoreFocus: true });
+        void item.run();
+      });
+      rest.append(button);
+    }
+    pop.append(rest);
+  }
   paint();
   vocabularyListInvoker = invoker; vocabularyListNode = node;
   invoker?.setAttribute('aria-expanded', 'true');
@@ -8562,7 +8615,19 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // the word band: the word, its reading and its meaning, with the deeper door in its corner
   const head = el('div', 'mini-head');
   const said = el('div', 'mini-head-text');
-  said.append(el('span', 'mini-word', token.b));
+  // the word itself is the way into its full entry, as a second tap on it in the text is
+  const word = el(entryAvailable ? 'button' : 'span', 'mini-word', token.b);
+  if (entryAvailable) {
+    word.type = 'button';
+    word.dataset.action = 'entry.open';
+    word.dataset.targetKind = 'word';
+    word.title = tx('全項目を開く', 'Open the full entry');
+    word.addEventListener('click', (event) => {
+      event.stopPropagation();
+      onEntry(event.detail === 0 ? 'keyboard' : 'pointer');
+    });
+  }
+  said.append(word);
   if (g?.r || token.r) said.append(el('span', 'mini-reading', g?.r || token.r));
   if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText()));
   else said.append(el('span', 'mini-gloss', g?.m?.[0] || tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.')));
@@ -8571,20 +8636,32 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   const seal = el('button', 'mini-take btn-primary');
   seal.type = 'button';
   seal.id = 'mini-take';
+  if (!held && !identityHeld) {
+    seal.dataset.saveMenu = 'true';
+    seal.setAttribute('aria-haspopup', 'dialog');
+    seal.setAttribute('aria-expanded', 'false');
+  }
   paintWordSave(seal, held ? S.taken.some((t) => t.t === 'word' && t.id === token.b) : miniState === 'taken');
   if (held || identityHeld) {
     seal.disabled = true;
     seal.classList.add('reader-capture-held');
     seal.setAttribute('aria-describedby', 'mini-take-reason');
   }
-  // one press saves, a press on "Saved ✓" takes it back out; a second press within a breath of the first
-  // (a double-click, a bounced tap) is the same press, never an undo of the save it just made
+  // Save ▾: one press saves the word and opens its menu (lists, copy, remove from review); on "Saved ✓" a
+  // press opens the menu again, or puts it away. A second press within a breath of the first (a
+  // double-click, a bounced tap) is the same press
   let pressedAt = -Infinity;
+  const openMenu = () => openVocabularyListPopover(captureNode, token.b, seal, { menu: true, more: [
+    { id: 'mini-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(token.s || token.b) },
+    { id: 'mini-unsave', label: tx('復習から外す', 'Remove from review'), run: () => toggleWordSave(captureNode, token.b) },
+  ] });
   seal.addEventListener('click', (event) => {
     event.stopPropagation();
     if (seal.disabled || Date.now() - pressedAt < SAVE_PRESS_MS) return undefined;
     pressedAt = Date.now();
-    return toggleWordSave(captureNode, token.b);
+    if (!seal.dataset.saveMenu) return toggleWordSave(captureNode, token.b);
+    if (seal.getAttribute('aria-pressed') === 'true') return openMenu();
+    return toggleWordSave(captureNode, token.b).then((saved) => { if (saved && seal.isConnected) openMenu(); return saved; });
   });
   if (held || identityHeld) {
     // when the meaning line already says the word is not in the quick dictionary, the reason only finishes it
@@ -8608,43 +8685,12 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     });
     mini.append(open);
   }
-  const entry = el('button', 'mini-entry btn-tertiary');
-  entry.type = 'button';
-  // the label and its chevron are one pill in the word band's corner
-  const entryLabel = el('span', 'mini-entry-label', tx('全項目', 'Full entry'));
-  const chevron = el('span', 'mini-entry-chevron', '›');
-  chevron.setAttribute('aria-hidden', 'true');
-  entryLabel.append(chevron);
-  entry.append(entryLabel);
-  entry.disabled = !entryAvailable;
-  entry.dataset.action = 'entry.open';
-  entry.dataset.targetKind = 'word';
-  entry.addEventListener('click', (event) => {
-    event.stopPropagation();
-    if (entry.disabled) return;
-    onEntry(event.detail === 0 ? 'keyboard' : 'pointer');
-  });
-  head.append(entry);
-  // one path (John T5, "click save and then add to list from there"): Save first; once the word is saved,
-  // "Add to a list" stands beside "Saved ✓". Before that a short note says where Save puts the word.
+  // one path (John T5, "click save and then add to list from there"; 2026-10-14: no second "Add to a list"
+  // button): Save ▾ alone. Before the word is saved a short note says where Save puts it.
   const actions = el('div', 'mini-actions');
   actions.append(seal);
-  if (!held && !identityHeld) {
-    // the note and the toast share one noun: Save puts the word "to review", and the toast says "Saved to review"
-    actions.append(el('span', 'mini-take-note', tx('復習に加わります', 'to review')));
-    const lists = el('button', 'mini-lists btn-tertiary', tx('リストに追加', 'Add to a list'));
-    lists.type = 'button';
-    lists.id = 'mini-lists';
-    lists.setAttribute('aria-haspopup', 'dialog');
-    lists.setAttribute('aria-expanded', 'false');
-    lists.addEventListener('click', (event) => {
-      event.stopPropagation();
-      // another control was used between two Save presses: the next one is a choice, not a bounce
-      pressedAt = -Infinity;
-      openVocabularyListPopover(captureNode, token.b, lists);
-    });
-    actions.append(lists);
-  }
+  // the note and the toast share one noun: Save puts the word "to review", and the toast says "Saved to review"
+  if (!held && !identityHeld) actions.append(el('span', 'mini-take-note', tx('復習に加わります', 'to review')));
   paintMiniPath(actions, seal.getAttribute('aria-pressed') === 'true');
   mini.append(actions);
   // the word's kanji, their parts and its web follow the actions, so Save is always the first thing in reach
@@ -8655,12 +8701,14 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     event.preventDefault();
     event.stopPropagation();
     removeMini();
+    clearReaderReadings({ marked: true });
     span.focus({ preventScroll: true });
   });
   document.body.append(mini);
   miniAnchor = span;
+  miniEntry = entryAvailable ? onEntry : null;
   keepFloatingBeside(mini, span);
-  if (focusEntry) ([seal, entry].find((button) => !button.disabled) || mini).focus({ preventScroll: true });
+  if (focusEntry) ([seal, word].find((button) => button.tagName === 'BUTTON' && !button.disabled) || mini).focus({ preventScroll: true });
   return mini;
 }
 
@@ -9171,10 +9219,12 @@ function readerWordKey(event, span, door) {
     return;
   }
   if (event.key === 'Escape') {
-    if (!document.getElementById('mini') && !readerWordMenu) return;
+    const marked = !!(S.revealed?.size || S.readerTake);
+    if (!document.getElementById('mini') && !readerWordMenu && !marked) return;
     event.preventDefault();
     removeMini();
     closeReaderWordMenu();
+    clearReaderReadings({ marked: true });
     return;
   }
   if (event.key !== 'Enter') return;
@@ -9455,10 +9505,26 @@ function paintTok(span, token, index) {
 const readerTokenPainters = new Map();
 const readerTokenDoors = new WeakMap();
 function markReaderReading(index) {
-  if (S.dials.furigana !== 1) return;
+  if (S.dials.furigana === 2) return;
   const before = S.revealed ? [...S.revealed] : [];
   S.revealed = new Set([index]);
   for (const at of new Set([...before, index])) readerTokenPainters.get(at)?.();
+}
+/** Back to the original text: every reading a tap summoned goes (つねに keeps its own), and with
+ * `marked` the marked word too (the chrome's Save then stands for the place again). */
+let readerDivedIndex = null; // the word whose full entry was opened from its popup: one more tap clears it
+function clearReaderReadings({ marked = false } = {}) {
+  const before = S.revealed ? [...S.revealed] : [];
+  if (before.length) {
+    S.revealed = new Set();
+    for (const at of before) readerTokenPainters.get(at)?.();
+  }
+  if (!marked) return;
+  readerDivedIndex = null;
+  if (S.readerTake) {
+    S.readerTake = null;
+    syncReaderTakeSeal();
+  }
 }
 
 /** A reader content word: one tap opens the popup (the meaning), the word menu does the rest. */
@@ -9469,6 +9535,8 @@ function wireTokenGestures(span, token, index, p) {
   const openFull = (modality = 'pointer') => {
     removeMini();
     setReaderTake(token.b, index, p.id);
+    markReaderReading(index);
+    readerDivedIndex = index;
     obsLog('tap', obsKey, 3, p.id);
     interaction({ kind: 'entry.open', target }, modality, 'reader-token');
     // a core hit opens exactly as before; a spelling the core lacks is
@@ -9492,8 +9560,13 @@ function wireTokenGestures(span, token, index, p) {
     // there left real fingers dead (operator's phone, 2026-08-12). The
     // click still fires after a cancel; scrolls fire no click at all.
     if (event.detail !== 0 && Date.now() < swallowClickUntil) return;
-    // a press on the word whose popup is open put it away; its click does not open it again
-    if (event.detail !== 0 && miniClosedOnAnchor === span) { miniClosedOnAnchor = null; return; }
+    // the second tap: the popup's word dives into its full entry
+    if (diveFromMini(span, event)) return;
+    // the third: back from its entry, the same word returns to the original
+    if (readerDivedIndex === index && !document.getElementById('mini')) {
+      clearReaderReadings({ marked: true });
+      return;
+    }
     const modality = event.detail === 0 ? 'keyboard' : 'pointer';
     interaction({ kind: 'target.activate', target }, modality, 'reader-token');
     quickLook(modality);
@@ -9529,7 +9602,7 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
   };
   span.addEventListener('click', (event) => {
     if (event.detail !== 0 && Date.now() < swallowClickUntil) return;
-    if (event.detail !== 0 && miniClosedOnAnchor === span) { miniClosedOnAnchor = null; return; }
+    if (diveFromMini(span, event)) return;
     quickLook(event.detail === 0 ? 'keyboard' : 'pointer');
   });
   const door = {
@@ -18914,31 +18987,30 @@ function wireParticleGestures(span, particle, index, p) {
     // the same word band as every word's popup (round 4, T5): the particle, its role, and its entry's door
     const head = el('div', 'mini-head');
     const said = el('div', 'mini-head-text');
-    said.append(el('span', 'mini-word', particle.p), el('span', 'mini-gloss', bi() ? particle.role : particle.roleJa));
-    const entry = el('button', 'mini-entry btn-tertiary');
+    // the particle itself is the way into its page, as a second tap on it in the text is
+    const entry = el('button', 'mini-word', particle.p);
     entry.type = 'button';
-    const entryLabel = el('span', 'mini-entry-label', tx('助詞の項目', 'Full entry'));
-    const chevron = el('span', 'mini-entry-chevron', '›');
-    chevron.setAttribute('aria-hidden', 'true');
-    entryLabel.append(chevron);
-    entry.append(entryLabel);
+    entry.title = tx('助詞の項目を開く', 'Open the particle’s entry');
     entry.dataset.action = 'entry.open';
     entry.dataset.targetKind = 'particle';
     entry.addEventListener('click', (event) => {
       event.stopPropagation();
       openFull(event.detail === 0 ? 'keyboard' : 'pointer');
     });
-    head.append(said, entry);
+    said.append(entry, el('span', 'mini-gloss', bi() ? particle.role : particle.roleJa));
+    head.append(said);
     mini.append(head, readerSentenceRow(sentence(), index));
     mini.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape') return;
       event.preventDefault();
       event.stopPropagation();
       removeMini();
+      clearReaderReadings({ marked: true });
       span.focus({ preventScroll: true });
     });
     document.body.append(mini);
     miniAnchor = span;
+    miniEntry = openFull;
     keepFloatingBeside(mini, span);
     if (modality === 'keyboard') entry.focus({ preventScroll: true });
     if (!restore) retireReaderTip();
@@ -18946,7 +19018,7 @@ function wireParticleGestures(span, particle, index, p) {
   span.classList.add('particle');
   span.addEventListener('click', (event) => {
     if (event.detail !== 0 && Date.now() < swallowClickUntil) return;
-    if (event.detail !== 0 && miniClosedOnAnchor === span) { miniClosedOnAnchor = null; return; }
+    if (diveFromMini(span, event)) return;
     const modality = event.detail === 0 ? 'keyboard' : 'pointer';
     interaction({ kind: 'target.activate', target }, modality, 'reader-particle');
     interaction({ kind: 'quickLook.open', target }, modality, 'reader-particle');
@@ -25680,8 +25752,8 @@ function renderSentenceTokens(container, tokens, opts = {}) {
     span.addEventListener('click', (ev) => {
       ev.stopPropagation();
       if (ev.detail !== 0 && Date.now() < swallowClickUntil) return;
-      // a press on the word whose popup is open put it away; its click does not open it again
-      if (ev.detail !== 0 && miniClosedOnAnchor === span) { miniClosedOnAnchor = null; return; }
+      // the second tap on the popup's word dives into its full entry
+      if (diveFromMini(span, ev)) return;
       obsLog('tap', srsKey('word', token.b), 2, contextId);
       showMini(span, token, openEntry, { focusEntry: ev.detail === 0, from });
     });
@@ -33482,7 +33554,11 @@ function deckHost() {
       // save, Saved toast and 元に戻す as the reader's dictionary visit, into the shared review
       // pool; no chooser. A row already held for this identity is left as it is, never toggled off.
       capture: (node, label) => (wordCaptureState(node) === 'taken' ? true : toggleWordSave(node, label)),
-      addToList: (node, label, invoker) => openVocabularyListPopover(node, label, invoker),
+      // Save ▾'s menu from a deck card's word sheet: the same lists, copy, and the way back out of review
+      addToList: (node, label, invoker, { menu = false, onChange = null } = {}) => openVocabularyListPopover(node, label, invoker, menu ? { menu: true, more: [
+        { id: 'kp-take-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(label) },
+        { id: 'kp-take-unsave', label: tx('復習から外す', 'Remove from review'), run: async () => { await toggleWordSave(node, label); onChange?.(); } },
+      ] } : {}),
     });
   }
   return deckHostAdapter;

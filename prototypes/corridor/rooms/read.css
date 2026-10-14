@@ -835,6 +835,23 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   letter-spacing: 0.02em;
   color: var(--mini-head-ink);
 }
+/* 1.3.0 (John, 2026-10-14: "The big ugly button titled 'full entry' is unnecessary bloat"): the word
+   itself is the door to its full entry, as a second tap on it in the text is. It keeps the band's look;
+   only the hand and the keyboard find a button, with a 44px reach that moves nothing */
+:root body[data-view] #mini button.mini-word {
+  justify-self: start;
+  margin-block: -5px;
+  padding-block: 5px;
+  padding-inline: 0;
+  border: 0;
+  background: none;
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+:root body[data-view] #mini button.mini-word:focus-visible { outline: 2px solid var(--mini-gold, currentColor); outline-offset: 2px; border-radius: 2px; }
+/* Save ▾: one button; once the word is saved it opens the word's menu (lists, copy, remove) */
+:root body[data-view] #mini .mini-take[data-save-menu]::after { content: '▾'; margin-inline-start: 6px; font-size: 0.78em; opacity: 0.8; }
 :root body:not([data-view='drift']) #mini .mini-reading {
   font: 500 17px/1.3 var(--font-reading, var(--serif));
   letter-spacing: 0.06em;
