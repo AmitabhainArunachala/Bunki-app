@@ -7784,6 +7784,7 @@ function clampContext(out) {
       const open = box.dataset.open !== '1';
       box.dataset.open = open ? '1' : '';
       more.setAttribute('aria-expanded', String(open));
+      refitContext();
     }, { 'aria-expanded': 'false', 'aria-label': label, title: label });
     box.append(more);
     return box;
@@ -7793,14 +7794,28 @@ function clampContext(out) {
   if (before) out.prepend(before);
   if (after) out.append(after);
 }
-/** mark each context group that 焦点 clips (its text runs past two lines), so only those show ⋯ */
+/** mark each context group that 焦点 clips (its text runs past two lines), so only those show ⋯.
+ * An open group is measured folded: it keeps its ⋯ to fold it again, and the ⋯'s gutter, so a
+ * repaint (a rebuild, a return from the kanji page) lays it out exactly as the learner opened it. */
 function fitClamps(root) {
   for (const box of root.querySelectorAll('.kp-ctx')) {
     const inner = box.querySelector('.kp-ctx-in');
     const flow = box.querySelector('.kp-ctx-flow');
+    const open = box.dataset.open;
+    if (open) box.dataset.open = '';
     const clipped = getComputedStyle(inner).display !== 'contents' && flow.offsetHeight > inner.clientHeight + 1;
+    if (open) box.dataset.open = open;
     box.dataset.clip = clipped ? '1' : '';
   }
+}
+/** Opening a 焦点 group can push the word and its definition under the grade bar. A passage with no
+ * reading window then takes one, as at the reveal, so the answer stays on one screen. */
+function refitContext() {
+  if (!ctx?.root?.isConnected || !ui.revealed || ui.screen !== 'study' || externalSheet()) return;
+  const passage = ctx.root.querySelector('#kp-card .kp-sentence');
+  if (!passage || passage.classList.contains('kp-window') || backFits() !== false) return;
+  windowPassage(0, window.scrollY);
+  settleBack();
 }
 
 /* ------------------------------------------------------------- screens */
