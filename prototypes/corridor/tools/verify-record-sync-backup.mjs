@@ -77,6 +77,11 @@ async function nativeReplica(page) {
 }
 async function tray(page) {
   if (!await page.locator('#import-file').count()) await page.locator('#tray').click();
+  // Native room transitions can still be opening after click() returns. A
+  // second helper must not click the old door again or select a file in a
+  // transient DOM that the pending transition is about to replace.
+  await page.waitForFunction(() => document.body.dataset.view === 'tray' &&
+    !document.documentElement.dataset.roomTransition && document.querySelector('#import-file'));
 }
 async function submit(page, backup) {
   await tray(page);
@@ -122,6 +127,7 @@ try {
         await page.screenshot({ path: resolve(directory, `${name}-failure.png`) }).catch(() => {});
       } finally { await context.close(); }
       console.log(`${engine} ${name}: ${results.at(-1).pass ? 'PASS' : 'FAIL'}`);
+      if (!results.at(-1).pass) console.error(results.at(-1).error);
     };
     try {
       await test('full-ui-backup-retains-operation-bytes-record-and-archive', async ({ page, directory }) => {
