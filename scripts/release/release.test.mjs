@@ -19,7 +19,13 @@ import {
   verifyRelease,
   verifyBase,
 } from './version.mjs';
-import { assertAssetMatch, assertEvidence, assertExistingRecord, REPOSITORY } from './publish.mjs';
+import {
+  assertAssetMatch,
+  assertEvidence,
+  assertExistingRecord,
+  awaitRead,
+  REPOSITORY,
+} from './publish.mjs';
 
 const baseline = () => ({
   schemaVersion: 1,
@@ -320,4 +326,23 @@ test('release publishing has write authority only after successful main deployme
       ),
     );
   assert(job.steps.some((step) => /scripts\/release\/publish.mjs publish/u.test(step.run || '')));
+});
+
+test('a read is awaited until it shows the write, never repeating the write', async () => {
+  const pauses = [];
+  const sleep = async (ms) => pauses.push(ms);
+  let reads = 0;
+  const draft = { draft: true, tag_name: 'v1.1.0', assets: [] };
+  assert.equal(await awaitRead(() => (++reads >= 3 ? draft : null), Boolean, { sleep }), draft);
+  assert.equal(reads, 3);
+  assert.deepEqual(pauses, [5000, 5000]);
+  pauses.length = 0;
+  assert.equal(await awaitRead(() => draft, Boolean, { sleep }), draft);
+  assert.deepEqual(pauses, [], 'an existing draft returns at once');
+  let published = 0;
+  const read = () => ({ ...draft, draft: ++published < 2 });
+  assert.equal((await awaitRead(read, (value) => !value.draft, { sleep })).draft, false);
+  let misses = 0;
+  assert.equal(await awaitRead(() => (misses++, null), Boolean, { attempts: 4, sleep }), null);
+  assert.equal(misses, 4, 'it gives up after its attempts and leaves the refusal to the caller');
 });

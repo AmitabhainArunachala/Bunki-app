@@ -80,6 +80,11 @@ must check these declarations against code; metadata alone cannot prove safety.
    creates a draft GitHub Release. It uploads all assets before publication.
    A failed upload remains a draft; reruns may reuse only byte-identical assets.
    Published versions and assets are never replaced by the automation.
+   GitHub's release reads can trail its writes, so after creating the draft,
+   uploading and publishing it waits (up to a minute) for each write to read
+   back before the next step; it never repeats a write. A failure is also
+   posted as a `release publication failed` annotation on the check run, so
+   its cause is readable without the job log.
 
 Inspect the **entire Pages workflow**, including `retain and publish numbered
 release`. A successful deployment with a failed release job is an incomplete

@@ -51,6 +51,21 @@ function optionalRelease(tag) {
   }
 }
 
+/** GitHub's release reads can trail its writes by a moment: both the 1.0.0 and the 1.0.1 runs
+ * failed within a second of creating their drafts, leaving them empty. Poll a read until it shows
+ * the write (an existing draft, uploaded assets, the published tag); never repeat the write. */
+export async function awaitRead(
+  read,
+  ready = Boolean,
+  { attempts = 12, pause = 5000, sleep = delay } = {},
+) {
+  for (let attempt = 1; ; attempt++) {
+    const value = read();
+    if (ready(value) || attempt >= attempts) return value;
+    await sleep(pause);
+  }
+}
+
 export function assertEvidence({
   release,
   manifest,
@@ -352,7 +367,7 @@ async function publish(proofFile, out) {
       '--notes-file',
       join(out, 'notes.md'),
     );
-  let remote = optionalRelease(tag);
+  let remote = await awaitRead(() => optionalRelease(tag));
   assert(remote?.draft, 'Uploads may only modify an unpublished draft');
   assert.equal(remote.target_commitish, releaseCommit);
   assert.equal(
@@ -369,7 +384,12 @@ async function publish(proofFile, out) {
     if (prior) assertAssetMatch(prior, readFileSync(join(out, name)));
     else gh('release', 'upload', tag, join(out, name), '--repo', REPOSITORY);
   }
-  remote = optionalRelease(tag);
+  remote = await awaitRead(
+    () => optionalRelease(tag),
+    (read) =>
+      read?.assets.length === files.length &&
+      read.assets.every((asset) => asset.state === 'uploaded'),
+  );
   assert.equal(remote.assets.length, files.length);
   for (const name of files)
     assertAssetMatch(
@@ -378,8 +398,12 @@ async function publish(proofFile, out) {
     );
   assertTag(tag, releaseCommit);
   gh('release', 'edit', tag, '--repo', REPOSITORY, '--draft=false', '--latest');
+  await awaitRead(() => optionalApi(`git/ref/tags/${tag}`));
   assertTag(tag, releaseCommit, true);
-  const published = optionalRelease(tag);
+  const published = await awaitRead(
+    () => optionalRelease(tag),
+    (read) => read && !read.draft,
+  );
   assert(published && !published.draft);
   console.log(
     JSON.stringify({
@@ -427,6 +451,15 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       );
   })().catch((error) => {
     console.error(error);
+    // Job logs are not always reachable; an annotation keeps the cause readable from the check run.
+    if (process.env.GITHUB_ACTIONS === 'true') {
+      const text = String(error?.stack || error)
+        .slice(0, 900)
+        .replaceAll('%', '%25')
+        .replaceAll('\r', '%0D')
+        .replaceAll('\n', '%0A');
+      console.log(`::error title=release publication failed::${text}`);
+    }
     process.exitCode = 1;
   });
 }
