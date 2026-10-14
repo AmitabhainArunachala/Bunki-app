@@ -3468,8 +3468,13 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
    the same before the reveal, after it, with readings on or off, and while a word is open. After the
    reveal every kanji carries its reading (learner brief 2026-10-04); 読み off returns the clean
    original (2026-10-13), keeping only the answer's reading and the one on a word you tap. */
+/* a word that carries a reading stays on one line (its reading is drawn over the whole word), on the
+   front too (kp-nb), so the lines break the same before and after the reveal */
+#app .kp-sentence :is(ruby, .kp-nb) { white-space: nowrap; }
+/* the player seats each line's readings so none runs into the next or past the line's edge:
+   --kp-rt-dx moves a reading off its word's centre, --kp-rt-fit narrows one that cannot fit */
 #app .kp-sentence ruby[data-rt]::after {
-  content: none; position: absolute; left: 50%; bottom: calc(100% + 1px); transform: translateX(-50%);
+  content: none; position: absolute; left: 50%; bottom: calc(100% + 1px); transform: translateX(calc(-50% + var(--kp-rt-dx, 0px))) scaleX(var(--kp-rt-fit, 1));
   font: 400 max(11px, 0.5em)/1 var(--kp-jp, var(--sans, system-ui)); letter-spacing: -0.04em; white-space: nowrap;
   color: color-mix(in srgb, var(--kp-ink-2) 88%, transparent); pointer-events: none;
 }

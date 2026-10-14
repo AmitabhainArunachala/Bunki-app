@@ -7726,13 +7726,17 @@ function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'non
     // the word again later in the passage: blanked too, without the hint
     if (isTarget === 3 && blank) return put(el('span', 'kp-blank', '　'.repeat(Math.min(6, Math.max(2, [...text].length)))), 3, len);
     const hasRuby = reading && KANJI.test(text) && ruby === 'all';
+    // a word that carries a reading on the back is one unit on the front too (kp-nb), so a host that
+    // keeps a reading's word on one line (the app) breaks the front's lines where the back's break
+    const keep = !hasRuby && reading && KANJI.test(text);
     if (isTarget) {
-      const wrap = el('span', 'kp-target', hasRuby ? rubyNode(text, reading) : text);
+      const wrap = el('span', 'kp-target', hasRuby ? rubyNode(text, reading) : keep ? el('span', 'kp-nb', text) : text);
       // the card's own word: its tap says it is in this deck (no 覚える)
       if (taps) tapNode(wrap, SELF_UNIT, taps.onTap);
       return put(wrap, isTarget, len);
     }
     if (hasRuby) return put(rubyNode(text, reading), 0, len, unitOver(at, len));
+    if (keep && !cover) return put(el('span', 'kp-nb', text), 0, len);
     // plain text may hold a sentence end or a word edge: cut it there so each sentence keeps its
     // own words and each word its own tap target
     let rest = text;
@@ -7750,21 +7754,77 @@ function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'non
     }
   });
   if (clamp && split) clampContext(out);
-  if (taps) splitReach?.observe(out);
+  if (taps || ruby === 'all') {
+    reflowWatch?.observe(out);
+    document.fonts?.ready.then(() => out.isConnected && seatReadings(out));
+  }
   return out;
 }
 
-/** A word that wraps onto a second line would centre its 44px reach (.kp-tok::before) on the gap
- * between the two lines and reach over the words of both. Such a word keeps only its printed boxes
- * (kp-split); re-read whenever the passage reflows (width, zoom, an opened fold, fonts). */
-const splitReach = typeof ResizeObserver === 'function'
+/** Whenever a passage reflows (width, zoom, an opened fold, fonts): a word that wraps onto a second
+ * line would centre its 44px reach (.kp-tok::before) on the gap between the two lines and reach over
+ * the words of both, so it keeps only its printed boxes (kp-split); and the readings are re-seated. */
+const reflowWatch = typeof ResizeObserver === 'function'
   ? new ResizeObserver((entries) => {
     for (const { target } of entries) {
-      if (!target.isConnected) { splitReach.unobserve(target); continue; }
+      if (!target.isConnected) { reflowWatch.unobserve(target); continue; }
       for (const tok of target.querySelectorAll('.kp-tok')) tok.classList.toggle('kp-split', tok.getClientRects().length > 1);
+      seatReadings(target);
     }
   })
   : null;
+let rtMeasure = null;
+/** A host may draw each reading above its word (ruby[data-rt]::after; the app does, so the line
+ * never moves) instead of laying it out as ruby. A reading wider than its word would then run into
+ * its neighbour's reading or past the edge of the line. Each line's readings are seated left to
+ * right: centred on the word where there is room, nudged apart (and inside the line) where there is
+ * not, and narrowed to the word plus one reading character at most (--kp-rt-dx, --kp-rt-fit). */
+function seatReadings(sentence) {
+  const rubies = [...sentence.querySelectorAll('ruby[data-rt]')];
+  if (!rubies.length) return;
+  const style = getComputedStyle(rubies[0], '::after');
+  const size = parseFloat(style.fontSize);
+  if (!size) return;
+  rtMeasure ||= document.createElement('canvas').getContext('2d');
+  if (rtMeasure) rtMeasure.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+  const spacing = parseFloat(style.letterSpacing) || 0;
+  const gap = size * 0.2;
+  const lines = new Map();
+  for (const ruby of rubies) {
+    ruby.style.removeProperty('--kp-rt-dx');
+    ruby.style.removeProperty('--kp-rt-fit');
+    const rects = ruby.getClientRects();
+    if (rects.length !== 1 || !rects[0].width) continue;
+    const r = rects[0];
+    let block = ruby.parentElement;
+    while (block !== sentence && !/^(block|flex|flow-root|list-item)$/.test(getComputedStyle(block).display)) block = block.parentElement;
+    const text = ruby.dataset.rt;
+    const natural = (rtMeasure ? rtMeasure.measureText(text).width : [...text].length * size) + spacing * [...text].length;
+    const width = Math.min(natural, r.width + size);
+    const key = `${Math.round(r.bottom / 4)}`; // one line of the block
+    if (!lines.has(block)) lines.set(block, new Map());
+    const row = lines.get(block);
+    if (!row.has(key)) row.set(key, []);
+    row.get(key).push({ ruby, centre: (r.left + r.right) / 2, natural, width, x: (r.left + r.right) / 2 - width / 2 });
+  }
+  for (const [block, rows] of lines) {
+    const b = block.getBoundingClientRect(), cs = getComputedStyle(block);
+    const lo = b.left + parseFloat(cs.paddingLeft), hi = b.right - parseFloat(cs.paddingRight);
+    for (const items of rows.values()) {
+      items.sort((p, q) => p.centre - q.centre);
+      items.forEach((it, i) => { it.x = Math.max(it.x, i ? items[i - 1].x + items[i - 1].width + gap : lo); });
+      for (let i = items.length - 1; i >= 0; i--) {
+        const it = items[i], limit = i < items.length - 1 ? items[i + 1].x - gap : hi;
+        if (it.x + it.width > limit) it.x = limit - it.width;
+      }
+      for (const it of items) {
+        const dx = it.x + it.width / 2 - it.centre;
+        if (Math.abs(dx) >= 0.5) it.ruby.style.setProperty('--kp-rt-dx', `${dx.toFixed(1)}px`);
+        if (it.width < it.natural - 0.5) it.ruby.style.setProperty('--kp-rt-fit', (it.width / it.natural).toFixed(3));
+      }
+    }
+  }
+}
 
 /** 焦点 on a long passage: the sentences before the target and those after it each become one
  * group. 全文 lays the groups out inline (nothing changes); 焦点 folds each to two dimmed lines
@@ -8696,7 +8756,7 @@ function tapText(text, units, onTap) {
 function defLine(card, word) {
   const p = el('p', 'kp-def');
   p.append(...tapText(word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 })));
-  splitReach?.observe(p);
+  reflowWatch?.observe(p);
   return p;
 }
 
