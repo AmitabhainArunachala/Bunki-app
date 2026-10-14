@@ -17,6 +17,8 @@ jobs:
     timeout-minutes: 10
     outputs:
       matched: ${{ steps.lookup.outputs.matched }}
+      # named once, by the attempt that admitted it, so a re-run of only the release job reads it back
+      transfer_artifact: ${{ steps.transfer_name.outputs.name }}
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
@@ -53,11 +55,15 @@ jobs:
         env:
           RELEASE_SITE: ${{ steps.transfer.outputs.site_dir }}
         run: node scripts/release/publish.mjs guard --site "$RELEASE_SITE"
+      - name: Name the transfer evidence
+        id: transfer_name
+        if: success() && steps.transfer.outputs.verified == 'true'
+        run: echo "name=bunki-transfer-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
       - name: Retain the transfer evidence
         if: success() && steps.transfer.outputs.verified == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: bunki-transfer-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ steps.transfer_name.outputs.name }}
           path: |
             ${{ runner.temp }}/reuse/receipt.json
             ${{ runner.temp }}/reuse/transfer.json
@@ -143,9 +149,12 @@ jobs:
         id: producer
         env:
           REUSED: ${{ needs.lookup.outputs.matched }}
+          TRANSFER_ARTIFACT: ${{ needs.lookup.outputs.transfer_artifact }}
         run: |
           if [ "$REUSED" = true ]; then
-            release_proof_name="bunki-transfer-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+            # the attempt that admitted the proof named it; a re-run of only this job is a later attempt
+            release_proof_name="$TRANSFER_ARTIFACT"
+            test -n "$release_proof_name"
           else
             release_proof_name="bunki-proof-$(git rev-parse 'HEAD^{tree}')"
           fi

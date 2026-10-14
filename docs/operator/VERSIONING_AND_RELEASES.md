@@ -84,7 +84,10 @@ must check these declarations against code; metadata alone cannot prove safety.
    uploading and publishing it waits (up to a minute) for each write to read
    back before the next step; it never repeats a write. A failure is also
    posted as a `release publication failed` annotation on the check run, so
-   its cause is readable without the job log.
+   its cause is readable without the job log. To resume an incomplete record,
+   re-run only the failed release job: it reads the transfer evidence by the
+   name the admitting attempt gave it. (The 1.0.0 and 1.0.1 runs predate this
+   and cannot be resumed by a re-run; their drafts stay incomplete.)
 
 Inspect the **entire Pages workflow**, including `retain and publish numbered
 release`. A successful deployment with a failed release job is an incomplete
