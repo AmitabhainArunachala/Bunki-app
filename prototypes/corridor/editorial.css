@@ -3517,16 +3517,17 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 #app .kp[data-hints='0'] .kp-study .kp-eyebrow-t,
 #app .kp[data-hints='0'] .kp-study .kp-eyebrow::before { display: none; }
 #app .kp-study .kp-levelchip { margin-left: auto; padding: 0; border: 0; background: none; font: 600 11px/1 var(--sans, system-ui); letter-spacing: 0.06em; color: var(--kp-ink-2); }
-/* ─ the passage: a book page. Reading size, justified to a clean block, kinsoku and hanging
-   punctuation, and ONE line height before and after the reveal (readings sit in the leading),
-   so the text never reflows when the answer opens */
+/* ─ the passage: a book page. Reading size, kinsoku and hanging punctuation, and ONE line height
+   before and after the reveal (readings sit in the leading), so the text never reflows when the
+   answer opens */
 #app .kp-study .kp-sentence,
 #app .kp-study .kp-sentence:has(.kp-tok) {
   font-size: clamp(19px, 5.3vw, 23px); line-height: 2.3; letter-spacing: 0.05em; font-weight: 500;
-  text-align: justify; text-justify: inter-character; line-break: strict; hanging-punctuation: allow-end;
+  text-align: start; line-break: strict; hanging-punctuation: allow-end;
   overflow-wrap: break-word;
   /* a Japanese page sits on a character grid: the block is a whole number of characters wide, so a
-     full line needs no stretching and justification only absorbs kinsoku */
+     full line ends flush; a line that ends before a word kept whole for its reading stays a little
+     short rather than stretched */
   width: round(down, 100%, 1.05em); margin-inline: auto;
 }
 /* 焦点 folds the sentences around the target to exactly two of these lines (2 × 2.3), never a sliver of a third */
