@@ -1622,3 +1622,419 @@ html[data-room='shelf'] .shelf-today-read:hover .shelf-today-read-arrow { transf
 @media (max-width: 520px) {
   html[data-room='shelf'] body:not(.zen) #app .shelf-today-read { width: calc(100% - 34px); }
 }
+
+/* =====================================================================================
+   1.3.0 — the word layers, in three directions (design preview, John 2026-10-14: "Think about colors, depth,
+   sense. Feel, recursive modularity"; "show me 3 different design ideas before we lock in").
+   ?concept=a|b|c sets html[data-concept] for the tab. Each direction is two hues set 90° apart on the OKLCH
+   wheel (an action hue and a reading hue) over its own ground, with its own depth:
+     a 青磁と藍  indigo 265 · celadon 175 on porcelain — glass: layers are frosted panes over the page
+     b 朱と鶯    vermilion 33 · uguisu 123 on kinari washi — paper: layers are sheets laid on sheets
+     c 金泥と梅  gold 82 · plum 352 on sumi night — light: layers are lit from within, brighter as they rise
+   One grammar in all three: the glance is the word, its reading and its meaning, with the whole band a door
+   into the entry (the chevron says so) and Save ▾, whose menu unfolds inside the card under its own button.
+   ===================================================================================== */
+:root[data-concept='a'] {
+  --k-page: oklch(0.968 0.008 195);
+  --k-page-2: oklch(0.945 0.012 195);
+  --k-surface: oklch(0.99 0.004 195);
+  --k-surface-2: oklch(0.955 0.01 195);
+  --k-ink: oklch(0.25 0.03 262);
+  --k-ink-2: oklch(0.42 0.025 258);
+  --k-muted: oklch(0.48 0.02 258);
+  --k-h1: oklch(0.43 0.13 265);
+  --k-on-h1: oklch(0.99 0.004 195);
+  --k-h1-wash: oklch(0.43 0.13 265 / 0.09);
+  --k-h2: oklch(0.5 0.075 172);
+  --k-h2-wash: oklch(0.88 0.045 172 / 0.55);
+  --k-line: oklch(0.25 0.03 262 / 0.1);
+  --k-edge: oklch(0.25 0.03 262 / 0.3);
+  --k-bar: oklch(0.985 0.006 195 / 0.9);
+  --k-bar-filter: blur(18px) saturate(1.4);
+  --k-texture: radial-gradient(140% 70% at 100% 0%, oklch(0.92 0.035 172 / 0.6), transparent 62%),
+    radial-gradient(120% 60% at 0% 100%, oklch(0.92 0.03 265 / 0.5), transparent 62%);
+  --k-card-bg: oklch(0.99 0.004 195 / 0.95);
+  --k-card-filter: blur(28px) saturate(1.6);
+  --k-card-shadow: inset 0 0.5px 0 oklch(1 0 0 / 0.95), 0 0 0 0.5px oklch(0.25 0.03 262 / 0.16),
+    0 2px 6px -2px oklch(0.3 0.06 265 / 0.14), 0 22px 44px -18px oklch(0.3 0.08 265 / 0.4);
+  --k-card-shadow-up: inset 0 0.5px 0 oklch(1 0 0 / 0.95), 0 0 0 0.5px oklch(0.25 0.03 262 / 0.16),
+    0 -2px 6px -2px oklch(0.3 0.06 265 / 0.14), 0 -22px 44px -18px oklch(0.3 0.08 265 / 0.4);
+  --k-radius: 22px;
+  --k-pill: 999px;
+  --k-check: 50%;
+  --k-btn-shadow: inset 0 1px 0 oklch(1 0 0 / 0.22), 0 4px 12px -6px oklch(0.43 0.13 265 / 0.7);
+  --k-scrim: oklch(0.32 0.04 230 / 0.1);
+  --k-scrim-filter: blur(8px) saturate(1.25);
+  /* reading surfaces stay nearly opaque: glass is in the edge, the light and the blur, never in text showing through text */
+  --k-sheet-bg: oklch(0.985 0.005 195 / 0.97);
+  --k-sheet-filter: blur(26px) saturate(1.5);
+  --k-sheet-radius: 26px;
+  --k-sheet-shadow: inset 0 0.5px 0 oklch(1 0 0 / 0.95), 0 -0.5px 0 oklch(0.25 0.03 262 / 0.14), 0 -26px 60px -22px oklch(0.3 0.08 265 / 0.38);
+  --k-ease: cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+:root[data-concept='b'] {
+  --k-page: oklch(0.955 0.017 82);
+  --k-page-2: oklch(0.93 0.02 82);
+  --k-surface: oklch(0.985 0.008 85);
+  --k-surface-2: oklch(0.955 0.014 84);
+  --k-ink: oklch(0.24 0.012 60);
+  --k-ink-2: oklch(0.42 0.015 60);
+  --k-muted: oklch(0.48 0.015 60);
+  --k-h1: oklch(0.53 0.165 33);
+  --k-on-h1: oklch(0.985 0.008 85);
+  --k-h1-wash: oklch(0.53 0.165 33 / 0.08);
+  --k-h2: oklch(0.47 0.085 123);
+  --k-h2-wash: oklch(0.9 0.05 123 / 0.6);
+  --k-line: oklch(0.24 0.012 60 / 0.12);
+  --k-edge: oklch(0.24 0.012 60 / 0.3);
+  --k-bar: oklch(0.97 0.012 84);
+  --k-bar-filter: none;
+  --k-texture: var(--k-washi);
+  --k-washi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .36 0 0 0 0 .26 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.03 .16' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .3 0 0 0 0 .22 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  --k-card-bg: var(--k-washi), oklch(0.985 0.008 85);
+  --k-card-filter: none;
+  /* a sheet laid on a sheet: the one under it shows a few millimetres at the far edge */
+  --k-card-shadow: 0 0 0 1px oklch(0.24 0.012 60 / 0.13), 0 1px 1px oklch(0.3 0.03 60 / 0.1),
+    0 6px 0 -2px oklch(0.965 0.012 84), 0 6px 0 -1px oklch(0.24 0.012 60 / 0.12), 0 18px 26px -16px oklch(0.35 0.06 50 / 0.5);
+  --k-card-shadow-up: 0 0 0 1px oklch(0.24 0.012 60 / 0.13), 0 -1px 1px oklch(0.3 0.03 60 / 0.1),
+    0 -6px 0 -2px oklch(0.965 0.012 84), 0 -6px 0 -1px oklch(0.24 0.012 60 / 0.12), 0 -18px 26px -16px oklch(0.35 0.06 50 / 0.5);
+  --k-radius: 3px;
+  --k-pill: 3px;
+  --k-check: 2px;
+  --k-btn-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.16), 0 1px 0 oklch(0.35 0.12 33);
+  --k-scrim: oklch(0.3 0.03 60 / 0.16);
+  --k-scrim-filter: blur(4px);
+  --k-sheet-bg: var(--k-washi), oklch(0.985 0.008 85);
+  --k-sheet-filter: none;
+  --k-sheet-radius: 4px;
+  --k-sheet-shadow: 0 -1px 0 oklch(0.24 0.012 60 / 0.14), 0 -7px 0 -2px oklch(0.965 0.012 84), 0 -7px 0 -1px oklch(0.24 0.012 60 / 0.12),
+    0 -14px 0 -4px oklch(0.945 0.016 83), 0 -14px 0 -3px oklch(0.24 0.012 60 / 0.1), 0 -24px 40px -20px oklch(0.35 0.06 50 / 0.45);
+  --k-ease: cubic-bezier(0.25, 1, 0.5, 1);
+}
+:root[data-concept='c'] {
+  color-scheme: dark;
+  --k-page: oklch(0.185 0.014 268);
+  --k-page-2: oklch(0.21 0.016 268);
+  --k-surface: oklch(0.275 0.018 268);
+  --k-surface-2: oklch(0.235 0.016 268);
+  --k-ink: oklch(0.93 0.012 85);
+  --k-ink-2: oklch(0.8 0.014 85);
+  --k-muted: oklch(0.72 0.014 85);
+  --k-h1: oklch(0.8 0.105 82);
+  --k-on-h1: oklch(0.2 0.02 268);
+  --k-h1-wash: oklch(0.8 0.105 82 / 0.12);
+  --k-h2: oklch(0.76 0.095 352);
+  --k-h2-wash: oklch(0.76 0.095 352 / 0.16);
+  --k-line: oklch(0.93 0.012 85 / 0.1);
+  --k-edge: oklch(0.93 0.012 85 / 0.26);
+  --k-bar: oklch(0.16 0.012 268);
+  --k-bar-filter: none;
+  --k-texture: radial-gradient(120% 60% at 50% 125%, oklch(0.8 0.105 82 / 0.08), transparent 65%),
+    radial-gradient(90% 50% at 100% -10%, oklch(0.76 0.095 352 / 0.07), transparent 70%);
+  --k-card-bg: linear-gradient(180deg, oklch(0.305 0.02 268), oklch(0.27 0.018 268));
+  --k-card-filter: none;
+  --k-card-shadow: inset 0 1px 0 oklch(0.8 0.105 82 / 0.3), 0 0 0 1px oklch(0 0 0 / 0.5),
+    0 24px 60px -18px oklch(0 0 0 / 0.8), 0 0 46px -14px oklch(0.8 0.105 82 / 0.14);
+  --k-card-shadow-up: var(--k-card-shadow);
+  --k-radius: 16px;
+  --k-pill: 12px;
+  --k-check: 6px;
+  --k-btn-shadow: inset 0 1px 0 oklch(1 0 0 / 0.35), 0 0 22px -6px oklch(0.8 0.105 82 / 0.55);
+  --k-scrim: oklch(0.1 0.01 268 / 0.6);
+  --k-scrim-filter: blur(4px);
+  --k-sheet-bg: linear-gradient(180deg, oklch(0.255 0.018 268), oklch(0.215 0.016 268) 40%);
+  --k-sheet-filter: none;
+  --k-sheet-radius: 18px;
+  --k-sheet-shadow: inset 0 1px 0 oklch(0.8 0.105 82 / 0.32), 0 -30px 80px -20px oklch(0 0 0 / 0.85);
+  --k-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* the house tokens, from the direction's pigments (every generation of them the rooms still read) */
+:root[data-concept] {
+  --ground: var(--k-page); --ground-2: var(--k-page-2); --ground-0: var(--k-surface); --surface: var(--k-surface); --raised: var(--k-surface);
+  --ink: var(--k-ink); --ink-2: var(--k-ink-2); --label: var(--k-ink); --label-2: var(--k-ink-2); --text: var(--k-ink); --text-2: var(--k-ink-2);
+  --red: var(--k-h1); --red-wash: var(--k-h1-wash); --accent: var(--k-h1); --accent-wash: var(--k-h1-wash); --ai: var(--k-h1); --ai-wash: var(--k-h1-wash);
+  --line: var(--k-line); --line-soft: var(--k-line); --separator: var(--k-line); --raised-edge: var(--k-line); --raised-edge-strong: var(--k-edge);
+  --faint: var(--k-muted); --faint-2: var(--k-muted); --glass-solid: var(--k-bar);
+}
+:root[data-concept] body:not([data-view='drift']) {
+  --color-ground: var(--k-page); --color-ground-2: var(--k-page-2); --color-paper: var(--k-surface); --color-page: var(--k-page);
+  --color-surface: var(--k-surface); --color-surface-sunk: var(--k-surface-2);
+  --color-ink: var(--k-ink); --color-ink-2: var(--k-ink-2); --color-label-2: var(--k-ink-2); --color-quiet: var(--k-muted); --color-muted: var(--k-muted);
+  --color-accent: var(--k-h1); --color-accent-wash: var(--k-h1-wash); --color-tint-wash: var(--k-h1-wash);
+  --color-signal: var(--k-h1); --color-signal-wash: var(--k-h1-wash); --color-seal: var(--k-h1); --color-live: var(--k-h2);
+  --color-line: var(--k-line); --color-line-soft: var(--k-line); --color-separator: var(--k-line); --color-edge-strong: var(--k-edge);
+  --color-rule: var(--k-line); --color-rule-soft: var(--k-line); --color-relief-edge: var(--k-line);
+  --color-bar: var(--k-bar); --color-bar-line: var(--k-line); --color-bar-ink: var(--k-ink); --color-bar-quiet: var(--k-muted);
+  --color-glass: var(--k-bar); --color-glass-solid: var(--k-bar); --color-glass-line: var(--k-line);
+  --texture-washi: var(--k-texture); --skin-light: none; --skin-ground: none;
+  color: var(--k-ink);
+}
+:root[data-concept] body:not([data-view='drift'])::before { background: var(--k-texture), var(--k-page); }
+/* the reader's own materials from the direction: the text sits on the ground itself */
+:root[data-concept][data-room='reader'] body:not([data-view='drift']) {
+  --reader-mat: var(--k-page-2); --reader-mat-edge: var(--k-line);
+  --reader-card: var(--k-surface); --reader-card-edge: var(--k-line);
+  --reader-paper: transparent; --reader-paper-edge: var(--k-line); --reader-ink: var(--k-ink); --reader-track: var(--k-line);
+  --reader-grain: none; --reader-card-grain: none;
+}
+/* the text sits on the ground itself, not on a card laid over it */
+:root[data-concept] body[data-view='reader']:not(.zen):not([data-view='entry']) #app > main { background: transparent; box-shadow: none; }
+:root[data-concept] body:not(.zen) #app > .chrome,
+:root[data-concept] body .primary-tabs {
+  background: var(--k-bar);
+  -webkit-backdrop-filter: var(--k-bar-filter);
+  backdrop-filter: var(--k-bar-filter);
+  border-color: var(--k-line);
+  box-shadow: none;
+}
+
+/* the text: readings in the reading hue, the word in hand marked in the action hue */
+:root[data-concept][data-room='reader'] #reader rt,
+:root[data-concept][data-room='reader'] #reader:not(.fg-always) ruby::before { color: var(--k-h2); }
+:root[data-concept] #reader .tok.tok-current > .tok-word {
+  border-radius: 3px 3px 0 0;
+  background: var(--k-h1-wash);
+  box-shadow: inset 0 -2px 0 var(--k-h1);
+}
+
+/* ---- the glance ---- */
+:root[data-concept] body:not([data-view='drift']) #mini {
+  width: min(352px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  padding: 0;
+  border: 0;
+  border-radius: var(--k-radius);
+  background: var(--k-card-bg);
+  -webkit-backdrop-filter: var(--k-card-filter);
+  backdrop-filter: var(--k-card-filter);
+  box-shadow: var(--k-card-shadow);
+  color: var(--k-ink);
+  overflow: visible;
+  /* it opens out of its word: drawn from the edge nearest the word, never scaled (placeFloating measures it) */
+  animation: k-glance-down 260ms var(--k-ease) backwards;
+}
+:root[data-concept] body:not([data-view='drift']) #mini[data-side='above'] { box-shadow: var(--k-card-shadow-up); animation-name: k-glance-up; }
+@keyframes k-glance-down { from { opacity: 0; clip-path: inset(0 0 60% 0 round var(--k-radius)); transform: translateY(-4px); } }
+@keyframes k-glance-up { from { opacity: 0; clip-path: inset(60% 0 0 0 round var(--k-radius)); transform: translateY(4px); } }
+:root[data-concept] body:not([data-view='drift']) #mini .mini-head {
+  position: relative;
+  display: block;
+  padding: 16px 46px 2px 18px;
+  background: none;
+  color: inherit;
+  isolation: auto;
+}
+:root[data-concept] body:not([data-view='drift']) #mini .mini-head::before { content: none; }
+/* the band is the door: the chevron says there is more, the word's button reaches across the band */
+:root[data-concept] body:not([data-view='drift']) #mini .mini-head:has(button.mini-word)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  width: 9px;
+  height: 9px;
+  border-top: 1.75px solid var(--k-muted);
+  border-right: 1.75px solid var(--k-muted);
+  transform: translateY(-30%) rotate(45deg);
+  pointer-events: none;
+}
+:root[data-concept] body[data-view] #mini button.mini-word::before { content: ''; position: absolute; inset: 0; border-radius: var(--k-radius) var(--k-radius) 0 0; }
+:root[data-concept] body[data-view] #mini button.mini-word:active::before { background: var(--k-h1-wash); }
+:root[data-concept] body:not([data-view='drift']) #mini .mini-head-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 12px;
+}
+:root[data-concept] body:not([data-view='drift']) #mini .mini-word {
+  margin: 0;
+  padding: 0;
+  font: 700 30px/1.2 var(--font-reading, var(--serif));
+  letter-spacing: 0.03em;
+  color: var(--k-ink);
+}
+:root[data-concept] body:not([data-view='drift']) #mini .mini-reading {
+  font: 500 15px/1.3 var(--font-reading, var(--serif));
+  letter-spacing: 0.1em;
+  color: var(--k-h2);
+}
+:root[data-concept] body:not([data-view='drift']) #mini .mini-gloss {
+  flex: 1 0 100%;
+  margin: 4px 0 0;
+  font: 500 17px/1.4 var(--font-ui);
+  color: var(--k-ink);
+}
+:root[data-concept] body:not([data-view='drift']) #mini .mini-gloss.mini-miss { font-weight: 400; font-size: 15px; color: var(--k-ink-2); }
+:root[data-concept] body:not([data-view='drift']) #mini .mini-take-reason { padding: 6px 18px 0; font: 400 13.5px/1.45 var(--font-ui); color: var(--k-ink-2); }
+:root[data-concept] body:not([data-view='drift']) #mini :is(.mini-web, .mini-sentence-wrap, .mini-take-note) { display: none; }
+:root[data-concept] body:not([data-view='drift']) #mini .mini-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 14px 14px;
+  background: none;
+}
+:root[data-concept] body:not([data-view='drift']) #mini .mini-take {
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 16px 0 20px;
+  border: 0;
+  border-radius: var(--k-pill);
+  background: var(--k-h1);
+  box-shadow: var(--k-btn-shadow);
+  color: var(--k-on-h1);
+  font: 650 15.5px/1 var(--font-ui);
+  letter-spacing: 0.01em;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+:root[data-concept] body:not([data-view='drift']) #mini .mini-take.taken {
+  background: var(--k-h2-wash);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--k-h2) 40%, transparent);
+  color: var(--k-h2);
+}
+:root[data-concept] body:not([data-view='drift']) #mini .mini-take.reader-capture-held {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--k-edge);
+  color: var(--k-muted);
+}
+:root[data-concept] body[data-view] #mini .mini-take[data-save-menu]::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-inline-start: 10px;
+  border-right: 1.75px solid currentColor;
+  border-bottom: 1.75px solid currentColor;
+  opacity: 0.85;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 220ms var(--k-ease);
+}
+:root[data-concept] body[data-view] #mini .mini-take[data-save-menu][aria-expanded='true']::after { transform: translateY(1px) rotate(225deg); }
+
+/* ---- Save ▾'s menu: unfolds inside the card, under its own button ---- */
+:root[data-concept] #mini .vocabulary-list-popover.is-inline {
+  position: static;
+  z-index: auto;
+  width: auto;
+  max-height: none;
+  margin: -4px 10px 10px;
+  padding: 4px 0 0;
+  border: 0;
+  border-top: 1px solid var(--k-line);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--k-ink);
+  overflow: visible;
+  animation: k-unfold 240ms var(--k-ease) both;
+}
+@keyframes k-unfold { from { opacity: 0; clip-path: inset(0 0 100% 0); transform: translateY(-6px); } to { opacity: 1; clip-path: inset(0 0 0 0); transform: none; } }
+:root[data-concept] #mini .is-inline .vocabulary-list-choice {
+  gap: 12px;
+  min-height: 46px;
+  padding: 0 8px;
+  font: 500 16px/1.3 var(--font-ui);
+  color: var(--k-ink);
+}
+:root[data-concept] #mini .is-inline .vocabulary-list-choice { border-radius: 10px; }
+:root[data-concept='b'] #mini .is-inline .vocabulary-list-choice { border-radius: 2px; }
+:root[data-concept] #mini .is-inline .vocabulary-list-choice:hover { background: var(--k-h1-wash); }
+:root[data-concept] #mini .is-inline .vocabulary-list-choice input {
+  appearance: none;
+  -webkit-appearance: none;
+  display: grid;
+  place-content: center;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  border: 1.5px solid var(--k-edge);
+  border-radius: var(--k-check);
+  background: none;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+:root[data-concept] #mini .is-inline .vocabulary-list-choice input::before {
+  content: '';
+  width: 10px;
+  height: 5px;
+  border-left: 2px solid var(--k-on-h2, var(--k-surface));
+  border-bottom: 2px solid var(--k-on-h2, var(--k-surface));
+  transform: translateY(-1px) rotate(-45deg) scale(0.4);
+  opacity: 0;
+  transition: transform 160ms var(--k-ease), opacity 120ms ease;
+}
+:root[data-concept] #mini .is-inline .vocabulary-list-choice input:checked { border-color: var(--k-h2); background: var(--k-h2); }
+:root[data-concept] #mini .is-inline .vocabulary-list-choice input:checked::before { opacity: 1; transform: translateY(-1px) rotate(-45deg) scale(1); }
+:root[data-concept='c'] { --k-on-h2: oklch(0.2 0.02 268); }
+:root[data-concept] #mini .is-inline .vocabulary-list-review .vocabulary-list-name { font-weight: 650; }
+:root[data-concept] #mini .is-inline .vocabulary-list-count { font: 400 13px/1.2 var(--font-ui); color: var(--k-muted); }
+:root[data-concept] #mini .is-inline .vocabulary-list-title {
+  margin: 10px 8px 2px;
+  font: 600 11.5px/1.2 var(--font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--k-muted);
+}
+:root[data-concept] #mini .is-inline .vocabulary-list-choices { max-height: 30vh; margin: 0; }
+:root[data-concept] #mini .is-inline .vocabulary-list-choices:has(> .vocabulary-list-empty),
+:root[data-concept] #mini .is-inline .vocabulary-list-title:has(+ .vocabulary-list-choices > .vocabulary-list-empty) { display: none; }
+:root[data-concept] #mini .is-inline :is(.vocabulary-list-form, .vocabulary-list-new)[hidden] { display: none; }
+:root[data-concept] #mini .is-inline .vocabulary-list-new { display: block; width: 100%; color: var(--k-h1); font-weight: 600; }
+:root[data-concept] #mini .is-inline .vocabulary-list-form { gap: 8px; margin: 4px 0 0; padding: 0 0 2px; }
+:root[data-concept] #mini .is-inline .vocabulary-list-field {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--k-line);
+  border-radius: 12px;
+  background: color-mix(in oklch, var(--k-surface-2) 70%, transparent);
+  color: var(--k-ink);
+  font: 400 16px/1.2 var(--font-ui);
+}
+:root[data-concept='b'] #mini .is-inline .vocabulary-list-field { border-radius: 2px; }
+:root[data-concept] #mini .is-inline .vocabulary-list-field::placeholder { color: var(--k-muted); }
+:root[data-concept] #mini .is-inline .vocabulary-list-create {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid color-mix(in oklch, var(--k-h1) 45%, transparent);
+  border-radius: 12px;
+  background: none;
+  color: var(--k-h1);
+  font: 650 15px/1 var(--font-ui);
+  box-shadow: none;
+}
+:root[data-concept='b'] #mini .is-inline .vocabulary-list-create { border-radius: 2px; }
+:root[data-concept] #mini .is-inline .vocabulary-list-status { margin: 6px 8px 0; font: 400 13px/1.4 var(--font-ui); color: var(--k-h2); }
+:root[data-concept] #mini .is-inline .vocabulary-list-more { margin: 8px 0 0; padding-top: 4px; border-top: 1px solid var(--k-line); }
+:root[data-concept] #mini .is-inline .vocabulary-list-action {
+  min-height: 46px;
+  padding: 0 8px;
+  border-radius: 10px;
+  color: var(--k-ink);
+  font: 500 16px/1.3 var(--font-ui);
+}
+:root[data-concept] #mini .is-inline .vocabulary-list-action:hover { background: var(--k-h1-wash); }
+
+/* ---- the entry: one layer deeper ---- */
+:root[data-concept] .scrim { background: var(--k-scrim); -webkit-backdrop-filter: var(--k-scrim-filter); backdrop-filter: var(--k-scrim-filter); }
+:root[data-concept] .sheet {
+  border-top: 0;
+  border-radius: var(--k-sheet-radius) var(--k-sheet-radius) 0 0;
+  background: var(--k-sheet-bg);
+  -webkit-backdrop-filter: var(--k-sheet-filter);
+  backdrop-filter: var(--k-sheet-filter);
+  box-shadow: var(--k-sheet-shadow);
+  color: var(--k-ink);
+  /* the sheet keeps the app's own arrival (feel-rise), which a repaint continues rather than restarts */
+}
+:root[data-concept] .sheet-bar {
+  background: transparent;
+  border-bottom: 1px solid var(--k-line);
+  color: var(--k-ink);
+}
+:root[data-concept] .sheet-bar :is(.sheet-back, .sheet-take, .sheet-close, .sheet-search) { border-color: transparent; color: var(--k-h1); }
+:root[data-concept] .sheet :is(.headword rt, p.reading, p.reading .japanese-lookup-word, .row-reading) { color: var(--k-h2); }
+@media (prefers-reduced-motion: reduce) {
+  :root[data-concept] :is(#mini, #mini .vocabulary-list-popover.is-inline) { animation: none; }
+}

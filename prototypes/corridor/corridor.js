@@ -4122,6 +4122,15 @@ async function boot() {
   }
   S.variantsBar = anyVariantParam;
   if (['bi', 'ja'].includes(params.get('ui'))) S.lang = params.get('ui');
+  // 1.3.0 design preview (John, 2026-10-14: "show me 3 different design ideas before we lock in"): ?concept=a|b|c
+  // dresses the app in one of the three directions for this tab; ?concept=off clears it. Not a setting.
+  try {
+    const asked = params.get('concept');
+    if (asked === 'off') sessionStorage.removeItem('kairo-concept-preview');
+    else if (/^[abc]$/.test(asked || '')) sessionStorage.setItem('kairo-concept-preview', asked);
+    const concept = sessionStorage.getItem('kairo-concept-preview');
+    if (/^[abc]$/.test(concept || '')) document.documentElement.dataset.concept = concept;
+  } catch { /* storage refused: no preview */ }
   try { await ensureReadingModule(); }
   catch { protectStore('読み物の機能を読み込めない。保存を止めて記録を保護している。接続してから再読み込みする。',
     'The reading component could not load. Saving is paused to protect article versions. Reconnect and reload the app.'); }
@@ -8428,7 +8437,7 @@ function closeVocabularyListPopover({ restoreFocus = false } = {}) {
   return true;
 }
 
-function openVocabularyListPopover(node, label, invoker, { menu = false, more = [] } = {}) {
+function openVocabularyListPopover(node, label, invoker, { menu = false, more = [], review = null } = {}) {
   const allowed = personalHost?.captureAccess?.() || (() => true);
   if (!allowed()) return;
   if (document.getElementById('vocabulary-list-popover')) {
@@ -8545,6 +8554,8 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
       }
       notice.textContent = on ? tx(`「${listName}」に追加しました。`, `Added to ${listName}.`) : tx(`「${listName}」から外しました。`, `Taken off ${listName}.`);
       if (typed) { name.value = ''; rememberRecordDraft(name); }
+      // in Save ▾'s menu the name field folds back into its row once the list is made
+      if (typed && newList) { form.hidden = true; newList.hidden = false; }
     } catch {
       failed('保存できませんでした。もう一度試してください。', 'Could not finish saving. Please try again.');
     } finally {
@@ -8564,7 +8575,38 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
     event.stopPropagation();
     closeVocabularyListPopover({ restoreFocus: true });
   });
-  pop.append(title, choices, form, notice);
+  // Save ▾'s first row is review itself: checked once Save has put the word there, unchecked takes it back out
+  if (review) {
+    const row = el('label', 'vocabulary-list-choice vocabulary-list-review');
+    const box = el('input');
+    box.type = 'checkbox';
+    box.id = 'mini-review';
+    box.checked = review.saved();
+    box.addEventListener('change', () => {
+      box.disabled = true;
+      void Promise.resolve(review.toggle()).finally(() => {
+        box.checked = review.saved();
+        box.disabled = false;
+      });
+    });
+    row.append(box, el('span', 'vocabulary-list-name', tx('復習', 'Review')), el('span', 'vocabulary-list-count', tx('間隔反復', 'spaced repetition')));
+    pop.append(row);
+  }
+  // in Save ▾'s menu a new list is one row until it is asked for; then the row becomes its name field
+  let newList = null;
+  if (menu) {
+    newList = el('button', 'vocabulary-list-action vocabulary-list-new', tx('＋ 新しいリスト', '+ New list'));
+    newList.type = 'button';
+    newList.id = 'vocabulary-list-new';
+    form.hidden = true;
+    newList.addEventListener('click', (event) => {
+      event.stopPropagation();
+      newList.hidden = true;
+      form.hidden = false;
+      name.focus({ preventScroll: true });
+    });
+  }
+  pop.append(title, choices, ...(newList ? [newList] : []), form, notice);
   if (more.length) {
     const rest = el('div', 'vocabulary-list-more');
     for (const item of more) {
@@ -8583,6 +8625,15 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
   paint();
   vocabularyListInvoker = invoker; vocabularyListNode = node;
   invoker?.setAttribute('aria-expanded', 'true');
+  // in the word popup the menu unfolds inside the card, under its own button, so it never lies over another
+  // control: the card grows, and keepFloatingBeside seats the taller card beside its word again
+  const card = menu ? invoker?.closest?.('#mini') : null;
+  if (card) {
+    pop.classList.add('is-inline');
+    (invoker.closest('.mini-actions') || invoker).after(pop);
+    (pop.querySelector('input[type="checkbox"]:not(:disabled)') || pop).focus({ preventScroll: true });
+    return;
+  }
   document.body.append(pop);
   const anchor = invoker?.getBoundingClientRect();
   const box = pop.getBoundingClientRect();
@@ -8653,10 +8704,11 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // press opens the menu again, or puts it away. A second press within a breath of the first (a
   // double-click, a bounced tap) is the same press
   let pressedAt = -Infinity;
-  const openMenu = () => openVocabularyListPopover(captureNode, token.b, seal, { menu: true, more: [
-    { id: 'mini-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(token.s || token.b) },
-    { id: 'mini-unsave', label: tx('復習から外す', 'Remove from review'), run: () => toggleWordSave(captureNode, token.b) },
-  ] });
+  const openMenu = () => openVocabularyListPopover(captureNode, token.b, seal, {
+    menu: true,
+    review: { saved: () => seal.getAttribute('aria-pressed') === 'true', toggle: () => toggleWordSave(captureNode, token.b) },
+    more: [{ id: 'mini-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(token.s || token.b) }],
+  });
   seal.addEventListener('click', (event) => {
     event.stopPropagation();
     if (seal.disabled || Date.now() - pressedAt < SAVE_PRESS_MS) return undefined;

@@ -3209,6 +3209,7 @@ body #mini .mini-status:empty { display: none; }
 .vocabulary-list-popover .vocabulary-list-create { min-height: 44px; padding: 0 14px; border-radius: 8px; font: 600 15px/1 var(--sans); }
 .vocabulary-list-popover .vocabulary-list-status { min-height: 0; margin: 6px 0 0; font: 13px/1.5 var(--sans); color: var(--ai); }
 .vocabulary-list-popover .vocabulary-list-status:empty { display: none; }
+.vocabulary-list-popover :is(.vocabulary-list-form, .vocabulary-list-new)[hidden] { display: none; }
 
 /* The one-time hint keeps its space after the first word opens. */
 .reader-tip.is-done { opacity: 0; pointer-events: none; transition: opacity 200ms ease; }
@@ -3454,7 +3455,7 @@ body:not(.ui-bi) .primary-tabs .primary-tab[aria-current='page'] { font-weight: 
 body.has-primary-tabs #variants { bottom: var(--nav-clearance); }
 body.has-primary-tabs #bunki-reports-root .br-rail { bottom: calc(max(var(--nav-clearance), var(--foundation-dock-clearance, 0px)) + 12px); }
 /* Sheets hide tabs and reserve the original report-button strip. */
-body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) #bunki-reports-root .br-rail { bottom: 12px; }
+body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover:not(.is-inline), .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) #bunki-reports-root .br-rail { bottom: 12px; }
 body.has-primary-tabs .reader-toast { bottom: calc(var(--nav-clearance) + 24px); }
 body.has-primary-tabs .kp-grades,
 body.has-primary-tabs .pc-controls,
@@ -3467,7 +3468,7 @@ body.has-primary-tabs .pc-status { bottom: calc(var(--nav-clearance) + 125px); }
 @media (max-width: 520px) {
   .pc-preview > button { display: flex; width: fit-content; max-width: calc(100vw - 120px); margin-block: 0 var(--space-2); }
 }
-body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) .primary-tabs { display: none; }
+body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover:not(.is-inline), .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) .primary-tabs { display: none; }
 /* The focus room (John, 2026-10-13: "SRS section very clear and smooth with NO CLUTTER at all"), in
    every layout since 1.2.1: the app's decks open here.
    While a deck card is up the world recedes, as 復習's zen already does: no top bar, no tabs.
@@ -4728,7 +4729,7 @@ body.has-primary-tabs #bunki-reports-root .br-rail::before {
 body.has-primary-tabs #bunki-reports-root .br-rail .br-bug { color: color-mix(in srgb, var(--color-muted) 80%, transparent); }
 body.has-primary-tabs #bunki-reports-root .br-rail .br-bug svg { width: 17px; height: 17px; }
 /* a sheet hides the tabs and keeps the original 12px report strip (verify-redesign-docks) */
-body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover, .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) #bunki-reports-root .br-rail::before { content: none; }
+body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover:not(.is-inline), .kp-sheet-wrap, [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) #bunki-reports-root .br-rail::before { content: none; }
 /* END BUNKI POLISH ========================================================== */
 
 /* ==========================================================================
