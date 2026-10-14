@@ -1460,5 +1460,11 @@
     "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
     "startedAt": "2026-10-14T08:39:11Z",
     "reason": "Producer verification policy differs from trusted default branch"
+  },
+  "38544383407/1": {
+    "result": "rejected",
+    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
+    "startedAt": "2026-10-14T09:42:59Z",
+    "reason": "Producer verification policy differs from trusted default branch"
   }
 }
