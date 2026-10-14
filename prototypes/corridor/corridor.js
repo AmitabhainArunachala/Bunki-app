@@ -8592,6 +8592,9 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
     const top = below + box.height <= window.innerHeight - 8 ? below : Math.max(8, anchor.top - box.height - 6);
     pop.style.left = `${Math.max(8, Math.min(window.innerWidth - box.width - 8, anchor.left))}px`;
     pop.style.top = `${top}px`;
+    // a phone lays the list popover out as a sheet at the foot; Save ▾'s menu keeps this place (CSS)
+    pop.style.setProperty('--pop-left', pop.style.left);
+    pop.style.setProperty('--pop-top', pop.style.top);
   }
   (pop.querySelector('input[type="checkbox"]:not(:disabled)') || pop).focus({ preventScroll: true });
 }

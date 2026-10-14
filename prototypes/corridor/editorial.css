@@ -3239,6 +3239,18 @@ body #mini .mini-status:empty { display: none; }
     border-bottom: 0;
     border-radius: 16px 16px 0 0;
   }
+  /* Save ▾'s menu drops from its button, as a menu does, rather than rising from the foot as a sheet */
+  .vocabulary-list-popover.is-save-menu {
+    top: var(--pop-top) !important;
+    right: auto;
+    bottom: auto;
+    left: var(--pop-left) !important;
+    width: min(300px, calc(100vw - 16px));
+    max-height: calc(100dvh - 16px);
+    padding-bottom: var(--s2);
+    border-bottom: 1px solid var(--raised-edge);
+    border-radius: 12px;
+  }
   .reader-toast { bottom: calc(84px + env(safe-area-inset-bottom)); }
   /* a phone keeps the popup short, so it fits above or below its word and clear of the play bar */
   body #mini { padding: 12px var(--s2) 8px; }

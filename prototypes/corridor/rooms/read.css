@@ -1543,7 +1543,8 @@ html[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art { box-shadow: 0 0
 :root body:not([data-view='drift']) .vocabulary-list-popover .vocabulary-list-choice { min-height: 48px; border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent); border-radius: 0; }
 @media (max-width: 560px) {
   /* the sheet's grabber: it reads as a sheet that came up from the foot (decoration only) */
-  :root body:not([data-view='drift']) .vocabulary-list-popover { padding-top: 20px; }
+  :root body:not([data-view='drift']) .vocabulary-list-popover:not(.is-save-menu) { padding-top: 20px; }
+  :root body:not([data-view='drift']) .vocabulary-list-popover.is-save-menu::before { content: none; }
   :root body:not([data-view='drift']) .vocabulary-list-popover::before {
     content: '';
     position: absolute;
