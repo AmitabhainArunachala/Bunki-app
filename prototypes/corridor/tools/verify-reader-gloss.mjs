@@ -284,6 +284,8 @@ async function press(page, selector, options) {
   await delay(150);
 }
 const dismissMiniForSeal = async (page) => {
+  // Escape steps out one layer at a time: an open Save ▾ menu first, then the popup (1.3.0)
+  for (let step = 0; step < 2 && await page.locator('#vocabulary-list-popover').count(); step++) await page.keyboard.press('Escape');
   if (await page.locator('#mini').count()) {
     await page.keyboard.press('Escape');
     await page.waitForSelector('#mini', { state: 'detached' });
