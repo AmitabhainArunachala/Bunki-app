@@ -10170,7 +10170,10 @@ async function render(main, { deckId, storage = window.localStorage, onLeave, op
     // the host's door forward from a sitting's close: () => ({ label, title, open }) or null
     next: typeof next === 'function' ? next : null,
     // the app's layout under test turns on the focus room (in the app only: it needs the host)
-    focusRoom: focusRoom && !!host,
+    // the app's focus room does not depend on its optional lexicon host: if the host fails to load the
+    // deck still opens in the room the CSS draws (right-half reveal, readings switch). The standalone
+    // pages never ask for it.
+    focusRoom: !!focusRoom,
     openEntry: typeof openEntry === 'function' ? openEntry : lexicon ? (node) => lexicon.open(node) : null,
     host: lexicon,
     // the tap source: with a host, the tokens side file (fetched once a sitting starts); without

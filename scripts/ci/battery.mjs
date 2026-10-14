@@ -530,19 +530,20 @@ export async function executeShard({
       // Keep the actionable failure available even when the complete video and
       // profile evidence archive exceeds a client's artifact download limit.
       if (gate.log && existsSync(gate.log)) {
-        const tail = readFileSync(gate.log, 'utf8').slice(-16384);
+        const log = readFileSync(gate.log, 'utf8');
+        const tail = log.slice(-16384);
         console.log(`::group::${gate.name} failure log (last 16 KiB)`);
         console.log(tail);
         console.log('::endgroup::');
-        // The failing checks' own lines, as annotations: they reach a reader who can see the
-        // check run but not the job log or its artifacts.
-        const failing = tail
-          .split('\n')
-          .filter((line) => /^\s*(FAIL\b|not ok\b|✗)/u.test(line))
-          .slice(0, 6);
-        for (const line of failing)
+        // The failing checks' own lines (from the whole log: a verifier prints them as it goes), or
+        // else the log's last lines, as annotations: they reach a reader who can see the check run but
+        // not the job log or its artifacts.
+        const lines = log.split('\n');
+        const failing = lines.filter((line) => /^\s*(FAIL\b|not ok\b|✗)/u.test(line)).slice(0, 6);
+        const shown = failing.length ? failing : lines.filter((line) => line.trim()).slice(-4);
+        for (const line of shown)
           console.log(
-            `::error title=Gate ${gate.name} check::${line.trim().slice(0, 400).replace(/[\r%]/gu, ' ')}`,
+            `::error title=Gate ${gate.name} ${failing.length ? 'check' : 'log'}::${line.trim().slice(0, 400).replace(/[\r%]/gu, ' ')}`,
           );
       }
     }
