@@ -15,7 +15,7 @@
  *
  * Battery per word (charter §2, v1 slice — the operator-reported cases):
  *   tap            → unfolds + blooms, and the app's slip opens beside the word (C1, C2)   [kana words included]
- *   tap again      → the full entry (C1; the one-hand pass: the sky's gloss rung stands aside for the slip)
+ *   tap again      → glosses, the slip still beside the word (C1; the one-hand pass: the slip's band is the entry's door)
  *   slow drag →    → word MOVES and SURVIVES (C3) — never graded
  *   pinch over it  → constellation survives, camera zooms (C4, C5)
  *   water tap      → deliberate release works (C5)
@@ -475,8 +475,8 @@ for (let round = 0; round < N_WORDS; round++) {
 
   const bloomAlive = w0.bloomCentre === word.w;
 
-  // C1 — second tap: the full entry (the slip's host reads the press on the slip's own word), the word still
-  // here; closing the entry returns the bare word
+  // C1 — second tap: gloss, still here, the slip still beside the word (the sky keeps its own rungs under
+  // the slip; the slip's band, not a second tap, is the way into the full entry)
   if (s.exists) {
     s = await page.evaluate(wordProbe(word.w));
     // the bloom's assembly easing keeps moving the centre for a beat after the
@@ -495,19 +495,13 @@ for (let round = 0; round < N_WORDS; round++) {
     if (s.exists && s.onScreen && aimed2) {
       await tapAt(s.x, s.y);
       await page.waitForTimeout(500);
-      const entry = await page.evaluate(`({ sheet: !!document.getElementById('sheet'), names: !!document.getElementById('sheet')?.innerText.includes(${JSON.stringify(word.w)}), slip: !!document.getElementById('mini') })`);
-      const w2 = await page.evaluate(worldProbe);
-      if (entry.sheet) {
-        await page.locator('#sheet-back').click();
-        await page.locator('#sheet').waitFor({ state: 'detached', timeout: 5000 });
-        await page.waitForTimeout(500);
-      }
       const s2 = await page.evaluate(wordProbe(word.w));
-      if (!s2.exists && !w2.depthOpen) await file(word, 'tap-again', 'full entry', 'vanished', '');
-      else if (w2.depthOpen) await file(word, 'tap-again', 'full entry', 'misfired', 'second tap dived into the sky (the entry came late)');
-      else if (!entry.sheet || !entry.names || entry.slip) await file(word, 'tap-again', 'full entry', 'dead', `no entry (sheet=${entry.sheet} names=${entry.names} slip=${entry.slip} op=${s.opacity.toFixed(2)} pe="${s.pe}" unfolded=${s2.unfolded})`);
-      else if (s2.unfolded) await file(word, 'tap-again', 'full entry', 'misfired', 'closing the entry left the reading up');
-      else await file(word, 'tap-again', 'full entry', 'ok', '');
+      const w2 = await page.evaluate(worldProbe);
+      if (!s2.exists && !w2.depthOpen) await file(word, 'tap-again', 'gloss', 'vanished', '');
+      else if (w2.depthOpen) await file(word, 'tap-again', 'gloss', 'misfired', 'second tap dived (third act came early)');
+      else if (!s2.glossed) await file(word, 'tap-again', 'gloss', 'dead', `no English (op=${s.opacity.toFixed(2)} pe="${s.pe}" unfolded=${s2.unfolded})`);
+      else if (w2.slip !== word.w) await file(word, 'tap-again', 'gloss', 'dead', `the slip left the word (slip=${w2.slip ?? 'none'})`);
+      else await file(word, 'tap-again', 'gloss', 'ok', 'the slip still beside it');
     }
   }
 
