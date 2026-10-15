@@ -38,7 +38,8 @@
  *   D5 the detour return (D22), in ONE document, dials 0,1,0: home aozora:046605 (やまなし) takes
  *      its own mark (token 3 底, touched by one tap: そこ shown; token 1 谷川 stays the hidden reading
  *      door). わかる's word sheet opens from its token 293 by the keyboard's full-entry door
- *      (Ctrl+Enter: no popup, no touch). Its first example is ごん狐's only わかる sentence: ごん狐
+ *      (Ctrl+Enter: no popup, no touch). Its first example is its own sentence in やまなし (G1: the tapped
+ *      word's own example leads); ごん狐's only わかる sentence follows, under More examples: ごん狐
  *      precedes やまなし in the index, no other shelf article has わかる, and ごん狐's body is loaded first
  *      by opening it (the sheet lists loaded articles only). ▹, then この記事を読む, opens
  *      aozora:000628 (ごん狐), where token 1 これ, an index home has not touched, takes one tap. Then
@@ -669,10 +670,18 @@ async function d5Detour(page, rec) {
     step = `the ${D5.word.token.b} sheet`;
     await page.locator(`#sheet[data-node="word:${D5.word.token.b}"]`).waitFor({ timeout: 10_000 });
     detour.examples = await page.evaluate(() => [...document.querySelectorAll('#sheet .example')].map((line) => line.querySelector('.example-src')?.textContent ?? ''));
+    // G1 (Codex gap 17): the tapped word's own sentence from its article leads the examples; the rest wait, folded,
+    // under "More examples" — a reader opens the fold to reach them, and so does this walk
+    detour.ownFirst = await page.evaluate(() => document.querySelector('#sheet .example')?.hasAttribute('data-own') ?? false);
     const at = detour.examples.indexOf(D5.awaySource);
     if (at < 0) throw new Error(`no example from ${D5.awaySource}: ${JSON.stringify(detour.examples)}`);
+    const away = page.locator('#sheet .example').nth(at);
+    if (await away.evaluate((line) => !!line.closest('details:not([open])'))) {
+      step = 'More examples';
+      await page.locator('#sheet details.more-examples > summary').click();
+    }
     step = '▹';
-    await page.locator('#sheet .example').nth(at).locator('.sent-door').click();
+    await away.locator('.sent-door').click();
     step = 'この記事を読む';
     await page.locator('#sheet #sent-home').waitFor({ timeout: 5_000 });
     await page.locator('#sheet #sent-home').click();
@@ -685,8 +694,8 @@ async function d5Detour(page, rec) {
   } catch (error) {
     throw new Error(`D5 detour stopped at ${step}: ${error.message}`);
   }
-  rec('D5.detour', `D5 ${D5.word.token.b}'s sheet opens from token ${D5.word.index}; its first example is ${D5.away}'s only one, whose ▹ and この記事を読む open ${D5.away} at token ${D5.awaySentence.at}, in the same document`,
-    detour.word === D5.word.token.s && detour.examples?.[0] === D5.awaySource && detour.examples.filter((source) => source === D5.awaySource).length === 1
+  rec('D5.detour', `D5 ${D5.word.token.b}'s sheet opens from token ${D5.word.index}; its first example is its own sentence in ${D5.home}, and ${D5.away}'s only one, whose ▹ and この記事を読む open ${D5.away} at token ${D5.awaySentence.at}, follows in the same document`,
+    detour.word === D5.word.token.s && detour.ownFirst === true && detour.examples?.[0] !== D5.awaySource && detour.examples.filter((source) => source === D5.awaySource).length === 1
       && detour.anchor === D5.awaySentence.at && await sameDocument(), JSON.stringify(detour));
 
   const awayClean = await readerMarks(page);
