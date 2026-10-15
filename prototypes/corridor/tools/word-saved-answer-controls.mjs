@@ -60,13 +60,15 @@ export const WORD_CONTROLS = Object.freeze({
     ["  if (item.t !== 'word') return reviewBack(item);\n", '  return reviewBack(item);\n']] },
   C2: { note: 'capture guard reverted: an explicit selection on a core spelling saves nothing', witnesses: ['T2'],
     // the search stand-in rows built on a 1353320 or うわて capture on the core spelling 上手 then hold a core card,
-    // and the history fixtures then keep no うわて snapshot
+    // and the history fixtures then keep no うわて snapshot; K1 (b) captures 生 read せい, an explicit selection on the
+    // core spelling 生 whose entry 1378450 reads only なま: with the guard reverted it no longer throws (L, 2026-10-16)
     collateral: ['T7r.setup', 'T7r', 'T7s.setup', 'T7s', 'T11.setup', 'T11', 'T13.setup', 'T13', 'T15',
-      'X1', 'X2', 'X3.setup', 'X3', 'X4.setup', 'X4', 'X5.setup', 'X5', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b', 'P3r'], edits: [
+      'X1', 'X2', 'X3.setup', 'X3', 'X4.setup', 'X4', 'X5.setup', 'X5', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b', 'P3r', 'K1'], edits: [
       ["  if (node.seq != null && node.seq !== '') {\n    snapshot = explicitWordSnapshot(node, latest);",
         "  if (node.seq != null && node.seq !== '' && !D.dict[id]) {\n    snapshot = explicitWordSnapshot(node, latest);"]] },
   C3: { note: 'fail-closed removed: an explicit selection with no validated answer captures a row without identity', witnesses: ['T3'],
-    collateral: ['T4'], edits: [
+    // K1 (b): 生 read せい (entry 1378450 reads only なま) is such a selection; its capture no longer throws (L, 2026-10-16)
+    collateral: ['T4', 'K1'], edits: [
       ["    if (!snapshot) throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });\n    identity = { kind: 'seq', seq: snapshot.seq, reading: snapshot.r };",
         "    identity = snapshot ? { kind: 'seq', seq: snapshot.seq, reading: snapshot.r } : { kind: 'unknown' };"]] },
   C4: { note: 'identity by reading only: a shared reading passes for a shared entry', witnesses: ['T5'],
