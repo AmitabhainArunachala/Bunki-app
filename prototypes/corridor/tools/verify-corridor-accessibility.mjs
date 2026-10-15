@@ -757,7 +757,11 @@ async function main() {
     const holdSample = async (page, family, selector) => {
       const target = page.locator(selector).first();
       await target.waitFor({ state: 'visible', timeout: 10_000 });
-      await target.scrollIntoViewIfNeeded();
+      // a surface may redraw once more as its data lands (the sheet does): let it settle, then
+      // scroll without Playwright's stability wait, which a swapped node would fail
+      await page.waitForTimeout(400);
+      await target.evaluate((node) => node.scrollIntoView({ block: 'center', behavior: 'instant' }));
+      await page.waitForTimeout(120);
       const box = await target.boundingBox();
       const cdp = await page.context().newCDPSession(page);
       const point = { x: box.x + box.width / 2, y: box.y + box.height / 2, radiusX: 5, radiusY: 5, force: 1 };
