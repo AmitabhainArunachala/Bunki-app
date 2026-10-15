@@ -640,7 +640,10 @@ async function main() {
     await page.waitForTimeout(280);
     await page.screenshot({ path: resolve(SHOTS_DIR, '02-named-entry-dialog.png') });
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(120);
+    // the closed sheet hands focus back on the next animation frame (restoreDialogInvoker): wait for that frame, as
+    // reader-doors does, instead of a fixed beat the renderer can miss (a late frame read as body, 2026-10-15). The
+    // read after it is the same oracle: focus on the invoking token, or the row fails.
+    await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
     const returnProbe = await page.evaluate(`({
       closed: !document.querySelector('#sheet'),
       returned: document.activeElement?.matches('#reader .tok.content[data-index="${invokerIndex}"]') ?? false,
