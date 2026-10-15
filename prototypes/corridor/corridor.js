@@ -24692,21 +24692,10 @@ function learnStageFace(order) {
   return { item, label: item.label || item.id };
 }
 
-let learnStageSeen = 0;
-let learnStageArrived = 0;
 /** The stage (concept C): a lacquer proscenium holding one lit washi card. */
 function renderLearnStage(main, doors) {
   const stage = el('section', 'learn-stage');
   stage.setAttribute('aria-labelledby', 'learn-stage-title');
-  // the signature plays once per arrival: a re-render inside the beat (counts
-  // landing) continues it from where it is, through a negative delay
-  const now = Date.now();
-  if (now - learnStageSeen > 1500) learnStageArrived = now;
-  learnStageSeen = now;
-  if (now - learnStageArrived < 700) {
-    stage.classList.add('is-arriving');
-    stage.style.setProperty('--learn-t', `${learnStageArrived - now}ms`);
-  }
   // in the layout under test this stage is Review's: the day, the place's name, the first job
   const places = placesLayout();
   const head = el('header', 'learn-stage-head');
@@ -24984,19 +24973,14 @@ function renderReviewHall(main) {
   main.append(hall);
 }
 
-let testsRoomSeen = 0;
 /** 試験 Tests (2026-10-13): what is taken unassisted and scored — the JLPT practice tests with
  * their lengths, the guided test practice, and the lessons and lists that prepare for them. Its
  * own room because a test must not mix with the cards (no readings, no lookups, no help). */
 function renderTests(main) {
   const doors = studyHallDoors();
-  const now = Date.now();
-  const arriving = now - testsRoomSeen > 1500;
-  testsRoomSeen = now;
   const head = el('header', 'tests-head');
   head.append(el('p', 'eyebrow', tx('JLPT · 漢検', 'JLPT · Kanken')));
   head.append(el('h1', 'view-title', tx('試験', 'Tests')));
-  if (arriving) head.classList.add('is-arriving');
   main.append(head);
   const hall = el('div', 'learn-hall');
   hall.id = 'tests-hall';
@@ -30599,7 +30583,7 @@ function continueRoomArrival(main) {
   main.style.setProperty('--room-arrival-delay', `${-elapsed}ms`);
   main.dataset.roomArrival = '1';
   arrival.animations = (main.getAnimations?.({ subtree: false }) || [])
-    .filter((animation) => animation.animationName === 'kairo-room-arrive');
+    .filter((animation) => String(animation.animationName).startsWith('kairo-room-arrive'));
   arrival.done = Promise.all(arrival.animations.map((animation) => animation.finished.catch(() => {})));
   const animation = arrival.animations[0];
   animation?.ready.then(() => {
@@ -30608,15 +30592,23 @@ function continueRoomArrival(main) {
     }
   }, () => {});
 }
-/** An arrival is drawn once. Whichever owner finishes it (the room fade or the
- * entering beat) retires the older entrance markers, so neither can replay. */
-function retireRoomEntrance() {
-  const html = document.documentElement;
-  document.querySelector('#app > main')?.removeAttribute('data-enter');
-  clearTimeout(stampRegister.enterTimer);
-  cancelAnimationFrame(stampRegister.enterFrame);
-  delete html.dataset.roomEntering;
-  html.style.removeProperty('--enter-t');
+/** The way a room change travels along the Line: the index of the tab that holds a view, in the
+ * layout in use (-1 for a view no tab holds — a door, the sky, the guided room). */
+function roomStation(view) {
+  return primaryTabs().findIndex((tab) => tab.views.includes(view));
+}
+/** The three deck rooms pin a dock to the viewport; a translated room would carry that dock with
+ * it (a transform re-anchors fixed descendants), so they arrive by the plain hand-over. */
+const DOCKED_VIEWS = new Set(['deckplay', 'contextdeck', 'personaldeck']);
+/** 'right' when the room change goes to a tab further right along the Line, 'left' when it goes
+ * left, '' when it stays within one tab or leaves the Line; back() reverses the way in because
+ * the same reading of the Line gives the opposite sign. */
+function roomDirection(from, to) {
+  if (from === to || DOCKED_VIEWS.has(to)) return '';
+  const a = roomStation(from);
+  const b = roomStation(to);
+  if (a < 0 || b < 0 || a === b) return '';
+  return b > a ? 'right' : 'left';
 }
 function withoutRoomTransition(change) {
   roomTransitionUpdating = true;
@@ -30631,23 +30623,26 @@ function roomTransition(change) {
   // Capture only the departing room. Captured incoming DOM cannot receive a
   // pointer until the native transition finishes, so the next room stays live.
   departing?.removeAttribute('data-room-arrival');
-  departing?.removeAttribute('data-enter');
   departing?.style.removeProperty('--room-arrival-delay');
   if (departing && document.startViewTransition) departing.style.viewTransitionName = 'kairo-room';
   html.dataset.roomTransition = '1';
+  const from = S.view;
   let incoming = null;
   let arrival = null;
   const update = () => {
     roomTransitionUpdating = true;
     try { return change(); } finally {
-      retireRoomEntrance();
       incoming = document.querySelector('#app > main');
       if (departing !== incoming) departing?.style.removeProperty('view-transition-name');
+      // the direction of travel, read from the Line before the old frame and the new room are styled
+      const direction = roomDirection(from, S.view);
+      if (direction) html.dataset.roomDir = direction;
+      else delete html.dataset.roomDir;
       if (incoming) {
         // With no departing snapshot (for example the universe), native
         // finished can settle first. Keep the live fade for its actual length.
         arrival = { view: S.view, main: incoming, startedAt: performance.now(),
-          duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 80 : 220,
+          duration: motionMs('--motion-room', 220),
           animations: [], done: Promise.resolve() };
         activeRoomArrival = arrival;
         continueRoomArrival(incoming);
@@ -30666,12 +30661,12 @@ function roomTransition(change) {
     if (activeRoomTransition !== transition) return;
     activeRoomTransition = null;
     const lastMain = arrival?.main || incoming;
-    retireRoomEntrance();
     lastMain?.removeAttribute('data-room-arrival');
     lastMain?.style.removeProperty('view-transition-name');
     lastMain?.style.removeProperty('--room-arrival-delay');
     if (activeRoomArrival === arrival) activeRoomArrival = null;
     delete html.dataset.roomTransition;
+    delete html.dataset.roomDir;
   };
   if (!document.startViewTransition) {
     // Unsupported browsers still change routes and restore focus synchronously.
@@ -33016,35 +33011,6 @@ function stampRegister() {
   if (html.dataset.room !== room || html.dataset.register !== material) {
     html.dataset.room = room;
     html.dataset.register = material;
-    // one beat of entrance motion on arrival only (register.css keys the lift on this)
-    html.dataset.roomEntering = '1';
-    html.style.removeProperty('--enter-t');
-    stampRegister.enteredAt = performance.now();
-    clearTimeout(stampRegister.enterTimer);
-    cancelAnimationFrame(stampRegister.enterFrame);
-    // the 220ms beat counts from the first frame the room is drawn in (a heavy room can hold
-    // the main thread for a few frames after its render), so the rise is never cut short
-    const arrival = stampRegister.arrivals = (stampRegister.arrivals || 0) + 1;
-    stampRegister.enterFrame = requestAnimationFrame(() => {
-      if (arrival !== stampRegister.arrivals || !html.dataset.roomEntering) return;
-      stampRegister.enteredAt = performance.now();
-      stampRegister.enterTimer = setTimeout(retireRoomEntrance, 220);
-    });
-  } else if (html.dataset.roomEntering) {
-    const elapsed = performance.now() - (stampRegister.enteredAt || 0);
-    if (elapsed < 180) {
-      // the arrival's own follow-up render (its data landing a few frames later) redraws main
-      // mid-rise: the new children continue the same rise from where it is (negative delay),
-      // so the entrance is neither cut nor replayed
-      html.style.setProperty('--enter-t', `${Math.round(elapsed)}ms`);
-    } else {
-      // a re-render of the same room (a grade, a save, a tick) clears the marker before style
-      // resolution, so only the arrival render's children animate
-      clearTimeout(stampRegister.enterTimer);
-      cancelAnimationFrame(stampRegister.enterFrame);
-      delete html.dataset.roomEntering;
-      html.style.removeProperty('--enter-t');
-    }
   }
   // the older sets have no .exam-progress: their counter is the card-kind after the policy line
   const progress = document.querySelector('.exam-progress') ||
@@ -33533,8 +33499,6 @@ function render() {
   }
 
   const main = el('main');
-  // a page change cross-fades in (FEEL pass 2026-10-02); a re-render of the same room never fades
-  if (lastRenderedView && lastRenderedView !== S.view) main.dataset.enter = '1';
   root.append(main);
 
   if (!roomTransitionUpdating) continueRoomArrival(main);

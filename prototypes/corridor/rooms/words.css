@@ -130,7 +130,6 @@ html:is([data-room='search'], [data-room='word-web']) .ww-c-r { font: 500 12px/1
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph {
   display: block; font: 800 50px/1.06 var(--font-headword, var(--font-display)); color: var(--color-ink); white-space: nowrap;
   margin: 0; padding: 0 4px; border: 0; background: none; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent;
-  animation: ww-ink 300ms var(--ease-ink, ease) both;
 }
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 4px; border-radius: 4px; }
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph[data-len='1'] { font-size: 66px; }
@@ -289,7 +288,6 @@ html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-fam.ww-cho
 
 @keyframes ww-wire { from { opacity: 0.01; transform: scale(0.5); } to { opacity: 1; transform: none; } }
 @keyframes ww-node { from { opacity: 0.01; transform: translate(-50%, -50%) scale(0.6); } to { opacity: 1; transform: translate(-50%, -50%); } }
-@keyframes ww-ink { from { opacity: 0.4; transform: scale(1.04); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
   html:is([data-room='search'], [data-room='word-web']) :is(.ww-wire, .ww-node, .ww-c-glyph) { animation: none; }
   html:is([data-room='search'], [data-room='word-web']) .ww-leaving * { transition: none; }

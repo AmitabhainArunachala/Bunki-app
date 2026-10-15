@@ -498,31 +498,12 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .learn-more-list .study-door-t { font: 600 15px/1.3 var(--font-ui); }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .learn-more-list .study-door-sub { font-size: 12.5px; color: var(--color-muted); }
 
-/* ---- the signature: the card lifts, the marks snap in (once per arrival;
-   a re-render inside the beat continues it through a negative delay) ---- */
-@keyframes learn-card-lift {
-  from { opacity: 0.01; transform: translateY(16px) rotate(-1.6deg) scale(0.98); }
-  to { opacity: 1; transform: rotate(-0.5deg); }
-}
-@keyframes learn-reg-tl { from { opacity: 0.01; transform: translate(-8px, -8px); } to { opacity: 1; transform: none; } }
-@keyframes learn-reg-tr { from { opacity: 0.01; transform: translate(8px, -8px); } to { opacity: 1; transform: none; } }
-@keyframes learn-reg-bl { from { opacity: 0.01; transform: translate(-8px, 8px); } to { opacity: 1; transform: none; } }
-@keyframes learn-reg-br { from { opacity: 0.01; transform: translate(8px, 8px); } to { opacity: 1; transform: none; } }
+/* ---- the card floats on the lacquer (ambient; the room arrives by the one view transition) ---- */
 @keyframes learn-float { from { transform: rotate(-0.5deg); } to { transform: translateY(-3px) rotate(-0.25deg); } }
 @media (prefers-reduced-motion: no-preference) {
   html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-card {
     animation: learn-float 8s ease-in-out 600ms infinite alternate;
   }
-  html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage.is-arriving .learn-card {
-    animation: learn-card-lift 300ms var(--ease-enter) calc(40ms + var(--learn-t, 0ms)) backwards, learn-float 8s ease-in-out 600ms infinite alternate;
-  }
-  html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage.is-arriving .learn-reg {
-    animation: 170ms var(--ease-ink) calc(300ms + var(--learn-t, 0ms)) backwards;
-  }
-  html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage.is-arriving .learn-reg.tl { animation-name: learn-reg-tl; }
-  html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage.is-arriving .learn-reg.tr { animation-name: learn-reg-tr; }
-  html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage.is-arriving .learn-reg.bl { animation-name: learn-reg-bl; }
-  html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage.is-arriving .learn-reg.br { animation-name: learn-reg-br; }
 }
 
 /* 2026-10-13 · the Tests room: the Learn room's tests, guided practice and more practice, under

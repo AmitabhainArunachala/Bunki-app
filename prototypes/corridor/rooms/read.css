@@ -721,18 +721,7 @@ html[data-room='shelf'] #shelf-reading-results > .shelf-review-note {
 @media (max-width: 520px) {
   html[data-room='shelf'] #shelf-reading-results > .shelf-review-note { margin: -6px 0 10px; }
 }
-/* the shelf arrives as a held frame that rises: its masthead and lead woodblock are drawn on the first
-   painted frame (the old room hands over to a whole shelf, never to bare paper), and only move */
-@keyframes read-shelf-hold { from { transform: translate3d(0, var(--rise, 12px), 0); } to { transform: none; } }
-html[data-room='shelf'][data-room-entering] #app > main > * { animation-name: read-shelf-hold; }
 html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-color: color-mix(in srgb, var(--color-ink) 9%, var(--color-page, var(--color-paper))); }
-
-/* the reader's entrance: the picture and title rise; the instrument line and the text only fade in, so
-   the words are where they will stay from the first frame (a reader's place never drifts) */
-@keyframes read-text-settle { from { opacity: 0.01; } to { opacity: 1; } }
-html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .version-block, .dials, .listen-row, #reader-tip, #reader, .article-footer) {
-  animation-name: read-text-settle;
-}
 
 
 /* =====================================================================================
@@ -1320,7 +1309,7 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
 
 @media (prefers-reduced-motion: reduce) {
   #mini,
-  #mini .mini-sentence-pane { animation: read-text-settle 100ms linear both !important; }
+  #mini .mini-sentence-pane { animation: feel-fade 100ms linear both !important; }
 }
 
 /* =====================================================================================

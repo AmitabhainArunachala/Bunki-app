@@ -41,9 +41,7 @@ html[data-room='me'] .me-book {
   border-radius: 2px 6px 6px 2px;
   box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-line), var(--elevation-card);
   transform-origin: 0 50%;
-  animation: me-book-open 420ms var(--ease-enter) backwards;
 }
-@keyframes me-book-open { from { opacity: 0.01; transform: perspective(1200px) rotateY(-8deg); } }
 html[data-room='me'] .me-spine {
   position: absolute; left: 0; top: 0; bottom: 0; width: 16px;
   border-right: var(--stroke-hairline) solid var(--color-line);

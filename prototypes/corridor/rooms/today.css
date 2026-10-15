@@ -334,11 +334,8 @@ html[data-room='tray'] .today-train .car {
   height: 14px;
   background: var(--color-accent);
   opacity: 0.85;
-  animation: today-arrive 300ms var(--ease-enter) both;
-  animation-delay: calc(140ms + var(--i, 0) * 12ms);
 }
 html[data-room='tray'] .today-train .car.learn { background: var(--color-accent); }
-@keyframes today-arrive { from { opacity: 0.01; transform: translateX(46px); } to { opacity: 0.85; transform: none; } }
 html[data-room='tray'] .today-line #review-start {
   display: flex;
   align-items: center;
