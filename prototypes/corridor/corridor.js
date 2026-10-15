@@ -10004,11 +10004,13 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
     save: () => wordSaveFacts({ s: text, b: record?.head || text, r: lookupContext.reading || record?.r || '', c: !!record,
       ...(record?.seq ? { seq: record.seq } : {}) }, { from, record }),
     quickLook: (modality) => quickLook(modality),
-    openEntry: () => {
+    openEntry: (modality) => {
       if (!record && !hasKanjiEntry()) return;
       removeMini();
-      if (hasKanjiEntry()) go({ t: 'kanji', id: text }, { invoker: span });
-      else go({ t: 'word', id: record.head || text, ...(record.seq ? { seq: record.seq, reading: record.r } : {}) }, { invoker: span });
+      // the keyboard's doors (Ctrl+Enter, the word menu) open the page at once; a tap's comes by the cut
+      const instant = modality === 'keyboard';
+      if (hasKanjiEntry()) go({ t: 'kanji', id: text }, { invoker: span, instant });
+      else go({ t: 'word', id: record.head || text, ...(record.seq ? { seq: record.seq, reading: record.r } : {}) }, { invoker: span, instant });
     },
     reopen: () => quickLook('programmatic', { restore: true }),
   };
@@ -19561,7 +19563,8 @@ function wireParticleGestures(span, particle, index, p) {
   const openFull = (modality = 'pointer') => {
     removeMini();
     interaction({ kind: 'entry.open', target }, modality, 'reader-particle');
-    go({ t: 'particle', id: particle.id }, { invoker: span });
+    // the keyboard's doors (Ctrl+Enter, the word menu) open the page at once; a tap's comes by the cut
+    go({ t: 'particle', id: particle.id }, { invoker: span, instant: modality === 'keyboard' });
   };
   const sentence = () => ({ t: 'particle', id: particle.id, from: { passage: p.id, index } });
   // the same slip as every word's (contract §1): the particle, its role, its sentence row; no Save (a particle is
@@ -28248,7 +28251,10 @@ const SHORT_EXAMPLE_CHARS = 40;
 function exampleOrder(node, examples) {
   const own = ownSentenceExample(node);
   const text = (ex) => ex.tokens.map((token) => token.s).join('');
-  const rest = examples.filter((ex) => !own || !(ex.passage === own.passage && ex.start === own.start));
+  // the shelf's copy of the same sentence (its bounds may differ by a bracket) is the word's own one, not another example
+  const index = node.from?.index;
+  const rest = examples.filter((ex) => !own || !(ex.passage === own.passage && Number.isInteger(ex.start) &&
+    ex.start <= index && index < ex.start + ex.tokens.length));
   const short = rest.find((ex) => ex.en && [...text(ex)].length <= SHORT_EXAMPLE_CHARS) || null;
   let first = [own, short].filter(Boolean);
   if (!first.length && rest.length) first = [[...rest].sort((a, b) => [...text(a)].length - [...text(b)].length)[0]];
@@ -30925,6 +30931,7 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
     else render();
     const sheet = document.getElementById('sheet');
     if (sheet && !pushed.sheetScroll) sheet.scrollTop = 0;
+    if (ready) reviveBuiltAhead(pushed);
   };
   runPageCut(change, {
     names: [[source, 'word-hero'], [covered, 'kairo-paper']],
@@ -31021,7 +31028,20 @@ function prebuildPage(node, anchor) {
   if (pagePrebuilt?.key === key) return;
   const page = buildPage(node, { path: [...S.stack, node] });
   page.dataset.built = 'ahead'; // the verifier's witness that the tap only mounted it
+  page.dataset.builtWith = builtWith(node);
   pagePrebuilt = { key, node, page };
+}
+/** What a page built ahead knew of its node's data when it was built: its senses, its entry, its reader choice, the bank. */
+function builtWith(node) {
+  return [node.dictionaryReady ? 1 : 0, node.dictionaryError ? 1 : 0, String(node.seq ?? ''), node.dictionaryResolvedSeq || '',
+    node.readerChoice?.state || '', D.exampleBank?.has(node.id) ? 1 : 0].join('|');
+}
+/** Shown at last, a page built ahead takes what settled since it was built (painted once its cut ends), and a reader
+ * choice that waited while its page was not on top asks again now that it is (resolveReaderChoice settles on top only). */
+function reviveBuiltAhead(node) {
+  if (node.readerChoice?.state === 'pending' && !node.readerChoice.requested) resolveReaderChoice(node);
+  const page = document.getElementById('sheet');
+  if (page && page.dataset.builtWith !== builtWith(node)) refreshWordSheet(node);
 }
 /** The page built ahead for this node at this depth, taken (it is used once), or null. */
 function takePrebuiltPage(node, depth) {
