@@ -8357,6 +8357,7 @@ function wordSaveFacts(token, { reader = false, from = null, record } = {}) {
  * in place, so nothing under the finger moves. */
 function refreshWordSaveControls(node, label) {
   syncReaderTakeSeal();
+  syncTrayCount();
   const taken = S.taken.some(row => row.t === node.t && row.id === node.id);
   for (const word of document.querySelectorAll('[data-word]')) {
     if (node.t === 'word' && word.dataset.word === node.id) word.classList.toggle('tok-learning', taken);
@@ -8734,7 +8735,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   }
   said.append(word);
   const reading = look?.reading ?? (g?.r || token.r);
-  if (reading && reading !== label) said.append(el('span', 'mini-reading', reading));
+  if (reading) said.append(el('span', 'mini-reading', reading));
   if (look?.gloss) {
     const gloss = el('span', 'mini-gloss', look.gloss);
     if (look.glossLang) gloss.lang = look.glossLang;
@@ -8784,15 +8785,23 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
       if (seal.disabled || Date.now() - pressedAt < SAVE_PRESS_MS) return undefined;
       pressedAt = Date.now();
       if (save === 'host') {
-        seal.disabled = true;
-        return Promise.resolve(host.take()).then((ok) => {
+        // busy, never disabled, while the surface saves: a disabled button drops the keyboard to the page
+        if (seal.getAttribute('aria-busy') === 'true') return undefined;
+        seal.setAttribute('aria-busy', 'true');
+        const settle = (ok) => {
           if (!seal.isConnected) return ok;
+          seal.removeAttribute('aria-busy');
           const saved = !!host.saved?.();
           paintWordSave(seal, saved);
           paintMiniPath(actions, saved);
-          seal.disabled = saved;
+          if (saved) {
+            // Save rests once the surface says the word is saved; the keyboard stays on the slip
+            if (document.activeElement === seal) mini.focus({ preventScroll: true });
+            seal.disabled = true;
+          }
           return ok;
-        }, () => { if (seal.isConnected) seal.disabled = false; return false; });
+        };
+        return Promise.resolve(host.take()).then(settle, () => settle(false));
       }
       if (!seal.dataset.saveMenu) return toggleWordSave(captureNode, label);
       if (seal.getAttribute('aria-pressed') === 'true') return openMenu();
@@ -22100,6 +22109,19 @@ function setReaderTake(id, index, passageId) {
   syncReaderTakeSeal();
 }
 
+/** The chrome's Today bookmark carries the saved-word count: after a save or an undo it repaints in place,
+ * so the room under the slip is never redrawn for it (the guided session's word stays where the finger is). */
+function syncTrayCount() {
+  const tray = document.getElementById('tray');
+  if (!tray) return;
+  const saved = S.taken.length;
+  const count = tray.querySelector('.tray-count');
+  if (count) count.textContent = String(saved);
+  tray.dataset.count = String(saved);
+  const name = tx(`今日 · 保存した語 ${saved}`, `Today · ${saved} saved word${saved === 1 ? '' : 's'}`);
+  tray.setAttribute('aria-label', name);
+  tray.title = name;
+}
 function syncReaderTakeSeal() {
   updateReaderPlaceSave();
   const selected = readerTakeCurrent();
@@ -24432,12 +24454,14 @@ function guidedHost() {
         if (status.state !== 'take') return 'held';
         if (!recordWritable()) return 'failed';
         const saved = await toggleTaken(node, label);
+        syncTrayCount();
         return saved && guidedTaken(node) ? 'added' : 'failed';
       },
       remove: async (node) => {
         if (!guidedTaken(node)) return true;
         if (!recordWritable()) return false;
         const saved = await toggleTaken(node, nodeTitle(node));
+        syncTrayCount();
         return !!saved && !guidedTaken(node);
       },
       review: (nodes) => {
