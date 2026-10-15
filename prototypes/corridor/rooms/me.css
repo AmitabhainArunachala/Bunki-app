@@ -5,14 +5,12 @@
 /* ---- Skin frame (Skin lane): Me is a stab-bound book (和綴じ): its binding holes and a
    gold thread run down the left margin, in late gold light; at night a lamp. Values only. ---- */
 html:is([data-room='me'], [data-room='progress'], [data-room='settings'], [data-room='saved']) body:not([data-view='drift']) {
-  --color-page: color-mix(in srgb, var(--color-ground) 62%, #f7efdc);
   --skin-ground:
     radial-gradient(circle at 9px 50%, color-mix(in srgb, var(--color-ink) 30%, transparent) 2px, transparent 2.6px) 0 0 / 18px 64px repeat-y,
     linear-gradient(90deg, transparent 8.5px, color-mix(in srgb, var(--color-gold) 55%, transparent) 8.5px, color-mix(in srgb, var(--color-gold) 55%, transparent) 9.5px, transparent 9.5px) 0 0 / 18px 100% no-repeat;
   --skin-light: radial-gradient(90% 50% at 100% 0%, rgb(232 196 120 / 18%), transparent 70%);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='me'], [data-room='progress'], [data-room='settings'], [data-room='saved']) body:not([data-view='drift']) {
-  --color-page: var(--color-ground);
   --skin-ground:
     radial-gradient(circle at 9px 50%, rgb(0 0 0 / 55%) 2px, transparent 2.6px) 0 0 / 18px 64px repeat-y,
     linear-gradient(90deg, transparent 8.5px, color-mix(in srgb, var(--color-gold) 50%, transparent) 8.5px, color-mix(in srgb, var(--color-gold) 50%, transparent) 9.5px, transparent 9.5px) 0 0 / 18px 100% no-repeat;

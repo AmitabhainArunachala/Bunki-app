@@ -12,7 +12,6 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   --skin-light: radial-gradient(70% 36% at 50% 0%, rgb(255 250 236 / 40%), transparent 70%);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) {
-  --color-page: color-mix(in srgb, var(--color-ground) 82%, #000);
   --skin-ground: linear-gradient(180deg, var(--color-lacquer), transparent 220px);
   --skin-light: radial-gradient(60% 34% at 50% 4%, color-mix(in srgb, var(--color-ink) 9%, transparent), transparent 72%);
 }

@@ -10,7 +10,6 @@
  * one accent, and the paper grain lives only on the reader's page. The night worlds keep their
  * dark grounds with the same structure. The word sky (data-view='drift') is untouched. */
 body, body.v-contrast-wcag {
-  --page: color-mix(in srgb, var(--ground) 22%, #faf9f6);
   --surface: #fff;
   --surface-sunk: color-mix(in srgb, var(--ink) 3.5%, var(--surface));
   --label: var(--ink);
@@ -59,10 +58,7 @@ body, body.v-contrast-wcag {
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(.story-kicker, .story-picture-word) {
   color: color-mix(in srgb, var(--topic, var(--tint)) 45%, var(--ink));
 }
-/* the default world (ベロ藍・浪) stands on the exact near-white */
-:root:is(:not([data-theme]), [data-theme='']) body { --page: #f6f5f1; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body {
-  --page: var(--ground);
   --surface: var(--ground-0);
   --surface-sunk: color-mix(in srgb, var(--ground-0) 70%, var(--ground));
   --separator: color-mix(in srgb, var(--ink) 16%, transparent);
@@ -224,10 +220,6 @@ body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
   border-radius: var(--r-card);
   box-shadow: var(--shadow-card);
 }
-/* the page ground: clean near-white, no fibre (the paper grain is the reader's alone). It is laid
-   in the fixed layer the living paper used to hang in; the body keeps its world's ground beneath,
-   the colour that paper is still grown against and measured by (the S1 amplitude law). */
-body:not([data-view='drift'])::before { background: var(--page); }
 body:not(.zen):is([data-view='shelf'], [data-view='levels']) #app > main { max-width: 1160px; }
 /* a room's title is an iOS large title in the UI sans (FEEL); an article's headline keeps the Mincho */
 main h1.view-title, main h1.exam-heading, .assessment-room > h1 {
@@ -3660,7 +3652,9 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --color-ground: var(--world-ground);
   --color-ground-2: var(--world-ground-2);
   --color-paper: var(--world-paper);
-  --color-page: color-mix(in srgb, var(--color-ground) 22%, #faf9f6);
+  /* one paper per world (one hand, slice D): the page IS the world's ground, declared here once —
+     corridor.css's world blocks name it (楮紙 cream, 柿渋 persimmon, 紺紙 indigo, the night worlds lacquer) */
+  --color-page: var(--color-ground);
   --color-surface: #fff;
   --color-surface-sunk: color-mix(in srgb, var(--color-ink) 3.5%, var(--color-surface));
   --color-ink: var(--world-ink);
@@ -3792,12 +3786,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --elevation-focus: inset 0 -2px 0 var(--color-ink);
 }
 
-/* Preserve the current exact default paper and the existing night materials. */
-:where(:root:is(:not([data-theme]), [data-theme='']) body:not([data-view='drift'])) {
-  --color-page: #f6f5f1;
-}
 :where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift'])) {
-  --color-page: var(--color-ground);
   --color-surface: var(--color-paper);
   --color-surface-sunk: color-mix(in srgb, var(--color-paper) 70%, var(--color-ground));
   --color-separator: color-mix(in srgb, var(--color-ink) 16%, transparent);
@@ -3986,8 +3975,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
    derived from them (page, surface, ink ramp, lines, accents, light) moves.
    ========================================================================== */
 :where(body:not([data-view='drift'])) {
-  /* the page: washi tone between the world's ground and morning light */
-  --color-page: color-mix(in srgb, var(--color-ground) 58%, #fbf8f1);
   --color-surface: color-mix(in srgb, var(--color-paper) 55%, #fffdf8);
   --color-surface-sunk: color-mix(in srgb, var(--color-ground) 70%, var(--color-ink) 4%);
   --color-ink-2: color-mix(in srgb, var(--color-ink) 82%, var(--color-paper));
@@ -4036,10 +4023,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --elevation-float: 0 -1px 0 rgb(25 28 34 / 8%), 0 -16px 48px rgb(25 28 34 / 18%);
   --elevation-press: 0 2px 0 var(--color-press), 0 8px 18px -6px rgb(20 26 40 / 30%);
 
-  /* washi: two scales of kōzo fibre, painted once on the fixed page layer, never animated */
-  --texture-washi:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011 .32' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .31 0 0 0 0 .23 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   /* room light (rooms/*.css set --skin-light; the default is morning from the upper left) */
   --skin-light: radial-gradient(120% 60% at 0% 0%, rgb(255 255 255 / 34%), transparent 60%);
   --skin-ground: none;
@@ -4049,13 +4032,11 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --color-ink: #1b1f26;
   --color-accent: #1f3a5f;
   --color-accent-wash: rgb(31 58 95 / 8%);
-  --color-page: #f4eee1;
   --color-surface: #fbf8f1;
 }
 /* night: lit, never inverted. Each night world keeps its own ground and paper; the
    light that crosses it is the city's (accent, live phosphor, lantern gold). */
 :where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift'])) {
-  --color-page: var(--color-ground);
   --color-surface: var(--color-paper);
   --color-surface-sunk: color-mix(in srgb, var(--color-ground) 70%, #000);
   --color-ink-2: color-mix(in srgb, var(--color-ink) 84%, var(--color-ground));
@@ -4087,8 +4068,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --elevation-card: inset 0 1px 0 rgb(255 255 255 / 5%), 0 14px 32px -8px rgb(0 0 0 / 60%);
   --elevation-lift: inset 0 1px 0 rgb(255 255 255 / 6%), 0 22px 48px -10px rgb(0 0 0 / 70%);
   --elevation-float: 0 -1px 0 color-mix(in srgb, var(--color-accent) 16%, transparent), 0 -18px 56px rgb(0 0 0 / 60%);
-  --texture-washi:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011 .32' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .75 0 0 0 0 .82 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
   /* the city through the paper: a low glow from below, cool above */
   --skin-light:
     radial-gradient(130% 42% at 50% 112%, color-mix(in srgb, var(--color-gold) 16%, transparent), transparent 70%),
@@ -4100,7 +4079,10 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
 :where(:root[data-theme='kaku'] body:not([data-view='drift'])) { --color-live: var(--world-accent); --color-live-glow: color-mix(in srgb, var(--world-accent) 45%, transparent); }
 
 /* ---- the page itself: washi over the world's ground, lit per room ---- */
-body:not([data-view='drift'])::before { background: var(--skin-light), var(--skin-ground), var(--texture-washi), var(--page); }
+/* ---- the page itself: one paper per world (one hand, slice D). The fixed page layer paints the room's
+   own light and ground pattern over the world's ground — no generic fibre over it: 楮紙 is cream, 柿渋 is
+   persimmon, 紺紙 is indigo, the night worlds are lacquer. ---- */
+body:not([data-view='drift'])::before { background: var(--skin-light), var(--skin-ground), var(--page); }
 body:not([data-view='drift']) { color: var(--color-ink); }
 
 /* ---- the page frame: on a phone the room sits ON the washi, not in a white card ---- */
@@ -4772,7 +4754,6 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
   /* each day world keeps its own paper (柿 stays persimmon, 赤 stays warm): the page is mostly the
      world's ground, raised paper and the frame are brighter papers tinted from it. The default
      world, his everyday one, has its own cooler values below. */
-  --color-page: color-mix(in srgb, var(--color-ground) 72%, #f6f4ef);
   --color-surface: color-mix(in srgb, var(--color-paper) 40%, #fffefb);
   --color-surface-sunk: color-mix(in srgb, var(--color-page) 90%, var(--color-ink) 6%);
   --color-ink-2: color-mix(in srgb, var(--color-ink) 88%, var(--color-paper));
@@ -4802,25 +4783,17 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
      weight, tracking and leading */
   --leading-ui: 1.35;
   --leading-body: 1.55;
-  /* washi, truer: soft formation, short fibres (no long streaks), and a fine tooth */
-  --texture-washi:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .38 0 0 0 0 .3 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.03 .16' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .32 0 0 0 0 .25 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.5' numOctaves='1' seed='17' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .24 0 0 0 0 .17 0 0 0 1 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0 0 0 0 0 0 0 0 0 .28'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .27 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   --skin-light: radial-gradient(120% 50% at 0% 0%, rgb(255 255 255 / 22%), transparent 60%);
 }
 /* ベロ藍・浪, the default world: sumi ink near-black, 藍 structure, a cleaner washi */
 :where(:root:is(:not([data-theme]), [data-theme='']) body:not([data-view='drift'])) {
   --color-ink: #14171d;
-  --color-page: #efece5;
   --color-surface: #fffefb;
   --color-bar: #fcfbf8;
 }
 /* night: the frame is the deepest tone, the page the world's ground, raised paper steps up
    in light with a lit top edge. Light is emitted (edges, glows), never a solid phosphor fill. */
 :where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift'])) {
-  --color-page: var(--color-ground);
   --color-surface: color-mix(in srgb, var(--color-paper) 88%, var(--color-ink) 4%);
   --color-surface-sunk: color-mix(in srgb, var(--color-ground) 78%, #000);
   --color-ink-2: color-mix(in srgb, var(--color-ink) 88%, var(--color-ground));
@@ -4837,10 +4810,6 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
   --elevation-paper: inset 0 0.5px 0 rgb(255 255 255 / 6%), 0 6px 18px -6px rgb(0 0 0 / 50%);
   --elevation-card: inset 0 1px 0 rgb(255 255 255 / 7%), 0 1px 2px rgb(0 0 0 / 45%), 0 16px 32px -14px rgb(0 0 0 / 75%);
   --elevation-lift: inset 0 1px 0 rgb(255 255 255 / 8%), 0 2px 4px rgb(0 0 0 / 45%), 0 26px 48px -18px rgb(0 0 0 / 80%);
-  --texture-washi:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .7 0 0 0 0 .78 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.03 .16' numOctaves='2' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .75 0 0 0 0 .82 0 0 0 0 1 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .8 0 0 0 0 .85 0 0 0 0 1 0 0 0 .04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
 }
 /* 殻 · the electric night: terminal black, phosphor edges */
 :where(:root[data-theme='kaku'] body:not([data-view='drift'])) {
