@@ -8783,6 +8783,9 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // meaning (9月 read がつ never shows the quick dictionary's つき · Moon)
   const waiting = readsOtherwise && (token.seq == null || token.seq === '') && !(D.dictionaryIndex
     && (D.dictionaryMode === 'main' || D.dictionaryCompleteForms?.has(String(token.b))));
+  // L · while the right entry is still on its way (the full dictionary asked, not failed), the held Save says nothing:
+  // D23's sentence is for a dead end (answered with nothing confirmable, or the dictionary cannot answer)
+  const pending = waiting && D.dictionaryState !== 'error';
   if (look?.gloss) {
     const gloss = el('span', 'mini-gloss', look.gloss);
     if (look.glossLang) gloss.lang = look.glossLang;
@@ -8824,7 +8827,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     if (!canSave) {
       seal.disabled = true;
       seal.classList.add('reader-capture-held');
-      seal.setAttribute('aria-describedby', 'mini-take-reason');
+      if (!pending) seal.setAttribute('aria-describedby', 'mini-take-reason');
     }
     // the surface's own path keeps its own ledger: once it says the word is saved, Save rests — unless it carries
     // the menu, in which case Saved ✓ ▾ stays live for the lists
@@ -8872,7 +8875,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
       if (seal.getAttribute('aria-pressed') === 'true') return openMenu();
       return Promise.resolve(toggleWordSave(captureNode, label)).then((saved) => { if (saved && seal.isConnected) openMenu(); return saved; });
     });
-    if (!canSave) {
+    if (!canSave && !pending) {
       // when the meaning line already says the word has no entry here (the quick dictionary's miss, or, R, no entry
       // at all once the full dictionary was asked: 高市), the reason only finishes it and promises no other door
       const missShown = !g?.m?.[0];

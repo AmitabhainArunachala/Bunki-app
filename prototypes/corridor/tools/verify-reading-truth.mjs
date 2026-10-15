@@ -349,21 +349,28 @@ async function coldCase(browser, contextOptions, answer) {
     const line = await page.evaluate(() => {
       const node = document.querySelector('#mini .mini-gloss');
       return node ? { className: node.className, color: node.style.color, weight: node.style.fontWeight,
-        busy: document.getElementById('mini').getAttribute('aria-busy') } : null;
+        busy: document.getElementById('mini').getAttribute('aria-busy'),
+        describedBy: document.querySelector('#mini #mini-take')?.getAttribute('aria-describedby') ?? null } : null;
     });
-    check(`${tag}.held`, 'with the full dictionary held, the card for 月 in 9月 reads がつ, its meaning line is a quiet "…" (the world\'s muted ink), Save is held',
+    // L · while the right entry is on its way the Save area is the held Save alone: no D23 sentence, nothing it points to
+    check(`${tag}.held`, 'with the full dictionary held, the card for 月 in 9月 reads がつ, its meaning line is a quiet "…" (the world\'s muted ink), Save is held and says nothing',
       asked > 0 && held?.word === '月' && k2h(held.reading) === 'がつ' && held.gloss === '…' && line?.className === 'mini-gloss mini-wait'
-        && line.color === 'var(--mini-head-ink-2)' && line.weight === '400' && line.busy === 'true' && held.take?.disabled === true, { asked, held, line });
+        && line.color === 'var(--mini-head-ink-2)' && line.weight === '400' && line.busy === 'true' && held.take?.disabled === true
+        && held.reason === null && line.describedBy === null, { asked, held, line });
     await delay(1200);
     const still = await miniState(page);
-    check(`${tag}.still`, 'a moment later, still held, it still borrows nothing', still?.gloss === '…' && still.take?.disabled === true, still);
+    check(`${tag}.still`, 'a moment later, still held, it still borrows nothing and still says nothing',
+      still?.gloss === '…' && still.take?.disabled === true && still.reason === null, still);
     release();
     await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 30000 });
     await delay(300);
     const settled = await miniState(page);
     if (answer === 'fail') {
-      check(`${tag}.settled`, 'unanswered (the index answers 500): the "…" stays and Save stays held — never つき\'s meaning',
-        k2h(settled?.reading) === 'がつ' && settled.gloss === '…' && settled.take?.disabled === true, settled);
+      // the same run: a dead end (the dictionary cannot answer) keeps D23's sentence, and the held Save points to it
+      const describedBy = await page.locator('#mini #mini-take').getAttribute('aria-describedby');
+      check(`${tag}.settled`, 'unanswered (the index answers 500): the "…" stays, Save stays held, and now it says why (D23\'s sentence) — never つき\'s meaning',
+        k2h(settled?.reading) === 'がつ' && settled.gloss === '…' && settled.take?.disabled === true && UNCONFIRMED.includes(settled.reason)
+          && describedBy === 'mini-take-reason', { settled, describedBy });
     } else {
       check(`${tag}.settled`, `released: the card fills with がつ's meaning ("${meaning}"), Save live`,
         k2h(settled?.reading) === 'がつ' && settled.gloss === meaning && settled.take && !settled.take.disabled, settled);
