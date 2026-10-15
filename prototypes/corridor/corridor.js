@@ -9586,7 +9586,7 @@ function readyTokenReading(token) {
  * number (seq), for the entry read that way: on a spelling the quick dictionary has, the full dictionary's first
  * entry so read (lookup's choice) or, with none, its closest (the quick dictionary's own, first in the form's
  * order), whose door then says the two readings differ (D23); on a spelling it lacks, only the one entry so read
- * (readerChoiceMatch: several stay the full entry's explicit choice, D11). Until the form's rows are at hand, and
+ * and so permitted (several stay the full entry's explicit choice, D11). Until the form's rows are at hand, and
  * for every other token, it is the token as it was. */
 function readingToken(token) {
   const own = tokenReading(token);
@@ -9594,8 +9594,11 @@ function readingToken(token) {
   const rows = dictionaryRowsForForm(token.b);
   if (!rows.length) return token;
   if (D.dict[token.b]) return { ...token, seq: String(lookup(token.b, null, own)?.seq || rows[0][0]) };
-  const match = readerChoiceMatch({ b: token.b, s: token.s, r: own }, rows);
-  return match.rows.length === 1 && !match.mismatch ? { ...token, seq: match.rows[0].seq } : token;
+  // a spelling the core lacks: only the one entry that lists this reading and permits it with this spelling, by that
+  // reading's own restriction (readerReadingFits); several stay the full entry's explicit choice (D11's own matcher)
+  const wanted = kataToHira(own);
+  const read = rows.filter((row) => row[5].some((kana, k) => kataToHira(kana) === wanted && readerReadingFits(row, k, token.b)));
+  return read.length === 1 ? { ...token, seq: String(read[0][0]) } : token;
 }
 
 /** A word slip for a token whose own reading needs the full dictionary. With the dictionary open, its answer is a
