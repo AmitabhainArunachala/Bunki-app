@@ -463,6 +463,30 @@ for (let i = 0; i < 3; i++) {
   await page.waitForTimeout(i === 2 ? 1500 : 450);
 }
 const inDive = await page.evaluate(world);
+/* 3b · the one-hand pass (2026-10-15): the dive's centre is the ladder's end — a tap on it opens the app's one
+ * slip beside the centre (word · reading · meaning · Save ▾ · kanji band), the same centre again its full entry
+ * (as the slip's band does), and Back returns to the dive with the slip gone */
+{
+  const centre = await page.evaluate(`(() => { const el = document.querySelector('#drift-layer .word.center'); if (!el) return null; const r = el.getBoundingClientRect(); return { w: el.querySelector('.base')?.textContent ?? '', x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
+  let slip = null, entry = null, after = null;
+  if (centre) {
+    await tap(centre.x, centre.y);
+    await page.waitForTimeout(700);
+    slip = await page.evaluate(`(() => { const m = document.getElementById('mini'); return m ? { from: m.dataset.from, word: m.querySelector('.mini-word')?.textContent, gloss: m.querySelector('.mini-gloss')?.textContent || '', door: m.querySelector('.mini-word')?.getAttribute('aria-label'), depth: document.getElementById('depth')?.textContent ?? '' } : null; })()`);
+    await tap(centre.x, centre.y);
+    await page.waitForTimeout(700);
+    entry = await page.evaluate(`({ sheet: !!document.getElementById('sheet'), names: !!document.getElementById('sheet')?.innerText.includes(${JSON.stringify(centre.w)}), slip: !!document.getElementById('mini') })`);
+    if (entry.sheet) {
+      await page.evaluate(`document.getElementById('sheet-back')?.click()`);
+      await page.waitForTimeout(700);
+    }
+    after = await page.evaluate(`({ sheet: !!document.getElementById('sheet'), slip: !!document.getElementById('mini'), depth: document.getElementById('depth')?.textContent ?? '', centre: document.querySelector('#drift-layer .word.center')?.querySelector('.base')?.textContent ?? null })`);
+  }
+  check('hunt · the dive’s centre opens the app’s slip; the centre again its full entry; Back returns to the dive',
+    !!centre && inDive.depth !== '' && slip?.from === 'drift' && slip.word === centre.w && slip.gloss !== '' && slip.door === 'Open the full entry' && slip.depth === inDive.depth &&
+      entry?.sheet === true && entry.names && !entry.slip && after?.sheet === false && !after.slip && after.depth === inDive.depth && after.centre === centre.w,
+    `centre=${centre?.w ?? null}; slip=${JSON.stringify(slip)}; entry=${JSON.stringify(entry)}; after=${JSON.stringify(after)}`);
+}
 await drag(300, 620, 210, 620, 560); // slow drag on water
 await page.waitForTimeout(700);
 const afterDrag = await page.evaluate(world);
@@ -942,9 +966,8 @@ for (let staging = 1; staging <= 3; staging++) {
   }
   const semanticRevealOne = await semanticMember('残酷');
   const semanticAfterOne = await page.evaluate(world);
-  // one slip everywhere (the one-hand pass): the first tap unfolds the member and opens the app's slip beside it,
-  // naming it; the sky's second rung (the gloss) follows with the slip still beside the member
-  const slipOne = await page.evaluate(`(() => { const m = document.getElementById('mini'); return m ? { from: m.dataset.from, word: m.querySelector('.mini-word')?.textContent, gloss: m.querySelector('.mini-gloss')?.textContent || '' } : null; })()`);
+  // the app's slip belongs to a dive's centre (the one-hand pass), never to a lock member's reveal
+  const slipOne = await page.evaluate(`document.getElementById('mini')?.querySelector('.mini-word')?.textContent ?? null`);
   const semanticSecondAim = await aimSemantic('残酷');
   let tapTwo = { attempted: false, delivered: false, reason: 'not attempted' };
   if (semanticSecondAim?.hitSelf) {
@@ -952,27 +975,25 @@ for (let staging = 1; staging <= 3; staging++) {
     await page.waitForTimeout(500);
   }
   const semanticRevealTwo = await semanticMember('残酷');
-  const slipTwo = await page.evaluate(`document.getElementById('mini')?.querySelector('.mini-word')?.textContent ?? null`);
   const semanticAfterTwo = await page.evaluate(world);
   const ok =
     lockStarted && semanticTarget?.dom === true && semanticTarget.hitSelf === true &&
     semanticTarget.reading !== '' &&
     semanticBefore.ctr === '過酷' && semanticAfterOne.ctr === '過酷' && semanticAfterTwo.ctr === '過酷' &&
-    semanticRevealOne?.unfolded === true && semanticRevealOne.glossed === false &&
-    slipOne?.from === 'drift' && slipOne.word === '残酷' && slipOne.gloss !== '' &&
-    semanticRevealTwo?.unfolded === true && semanticRevealTwo.glossed === true && slipTwo === '残酷';
+    semanticRevealOne?.unfolded === true && semanticRevealOne.glossed === false && slipOne === null &&
+    semanticRevealTwo?.unfolded === true && semanticRevealTwo.glossed === true;
   semanticFinal = {
     ok,
     detail:
       `DOM=${semanticTarget?.dom ?? false}, hitSelf=${semanticTarget?.hitSelf ?? false}; ` +
       `stage1=${semanticRevealOne?.unfolded ?? false}/${semanticRevealOne?.glossed ?? false} slip=${JSON.stringify(slipOne)}, ` +
-      `stage2=${semanticRevealTwo?.unfolded ?? false}/${semanticRevealTwo?.glossed ?? false} slip=${JSON.stringify(slipTwo)}; ` +
+      `stage2=${semanticRevealTwo?.unfolded ?? false}/${semanticRevealTwo?.glossed ?? false}; ` +
       `centre "${semanticBefore.ctr}" → "${semanticAfterOne.ctr}" → "${semanticAfterTwo.ctr}"` +
       `; staging ${staging}/3 (tap1 ${tapOne.reason}; tap2 ${tapTwo.reason})`,
   };
   if (ok || !(missed(tapOne) || missed(tapTwo))) break;
 }
-check('hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction (its first tap unfolds it with the slip beside it; the second glosses it, the slip staying)',
+check('hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction (no slip over a lock member\'s reveal)',
   semanticFinal.ok, semanticFinal.detail);
 
 // Start the lock afresh so the old canvas failure cannot mask the kana-only
@@ -988,7 +1009,6 @@ for (let staging = 1; staging <= 3; staging++) {
     await page.waitForTimeout(500);
   }
   const kanaAnswered = await semanticMember('きつい');
-  const kanaSlip = await page.evaluate(`(() => { const m = document.getElementById('mini'); return m ? { from: m.dataset.from, word: m.querySelector('.mini-word')?.textContent, gloss: m.querySelector('.mini-gloss')?.textContent || '' } : null; })()`);
   const kanaCentreAfterAnswer = await page.evaluate(world);
   const kanaForLock = await aimSemantic('きつい');
   let kanaPress = { attempted: false, delivered: false, reason: 'not attempted' };
@@ -1006,14 +1026,14 @@ for (let staging = 1; staging <= 3; staging++) {
   // none at all. No strangers, honest emptiness.
   const ok =
     kanaTarget?.dom === true && kanaTarget.hitSelf === true && kanaTarget.reading === '' &&
-    kanaAnswered?.unfolded === true && kanaAnswered.glossed === true && kanaSlip?.from === 'drift' && kanaSlip.word === 'きつい' && kanaSlip.gloss !== '' &&
+    kanaAnswered?.unfolded === true && kanaAnswered.glossed === true &&
     kanaCentreAfterAnswer.ctr === '厳しい' && kanaFallback.ctr === 'きつい' &&
     kanaFallback.members.length === kanaFallback.sats;
   kanaFinal = {
     ok,
     detail:
       `DOM=${kanaTarget?.dom ?? false}, hitSelf=${kanaTarget?.hitSelf ?? false}, hit=${JSON.stringify(kanaTarget?.hitLabel ?? null)}, ` +
-      `reading=${JSON.stringify(kanaTarget?.reading ?? null)}, first=${kanaAnswered?.unfolded ?? false}/${kanaAnswered?.glossed ?? false} slip=${JSON.stringify(kanaSlip)}; ` +
+      `reading=${JSON.stringify(kanaTarget?.reading ?? null)}, first=${kanaAnswered?.unfolded ?? false}/${kanaAnswered?.glossed ?? false}; ` +
       `centre="${kanaCentreAfterAnswer.ctr}"→"${kanaFallback.ctr}", DOM sats=${kanaFallback.sats}, ` +
       `members=${kanaFallback.members.join('・')}` +
       `; staging ${staging}/3 (tap ${kanaTap.reason}; press ${kanaPress.reason})`,

@@ -14,8 +14,8 @@
  *     [--soak-ms N] [--shots DIR] [--out FILE]
  *
  * Battery per word (charter §2, v1 slice — the operator-reported cases):
- *   tap            → unfolds + blooms, and the app's slip opens beside the word (C1, C2)   [kana words included]
- *   tap again      → glosses, the slip still beside the word (C1; the one-hand pass: the slip's band is the entry's door)
+ *   tap            → unfolds + blooms (C1, C2)   [kana words included]
+ *   tap again      → glosses (C1)
  *   slow drag →    → word MOVES and SURVIVES (C3) — never graded
  *   pinch over it  → constellation survives, camera zooms (C4, C5)
  *   water tap      → deliberate release works (C5)
@@ -318,7 +318,7 @@ const worldProbe = `(() => ({
   tray: document.getElementById('drift-tray')?.textContent ?? '',
   depthOpen: (document.getElementById('depth')?.textContent ?? '') !== '',
   cardOpen: document.getElementById('card')?.classList.contains('open') ?? false,
-  // the app's slip beside a tapped word (the one-hand pass): the word it names, or null
+  // the app's slip (the one-hand pass): the word it names, or null — it belongs to a dive's centre, never to the bloom
   slip: document.getElementById('mini')?.querySelector('.mini-word')?.textContent ?? null,
 }))()`;
 
@@ -470,13 +470,12 @@ for (let round = 0; round < N_WORDS; round++) {
     await file(word, 'tap', 'unfold+bloom', 'dead', `no furigana (op=${at.opacity.toFixed(2)}->${s.opacity.toFixed(2)}) ${JSON.stringify(forensic)}`);
   }
   else if (w0.bloomCentre !== word.w) await file(word, 'tap', 'unfold+bloom', 'dead', `no constellation (sats=${w0.sats})`);
-  else if (w0.slip !== word.w) await file(word, 'tap', 'unfold+bloom', 'dead', `no slip beside the word (slip=${w0.slip ?? 'none'})`);
-  else await file(word, 'tap', 'unfold+bloom', 'ok', `${w0.sats} satellites, the slip`);
+  else if (w0.slip !== null) await file(word, 'tap', 'unfold+bloom', 'misfired', `the app's slip opened over the bloom (slip=${w0.slip})`);
+  else await file(word, 'tap', 'unfold+bloom', 'ok', `${w0.sats} satellites`);
 
   const bloomAlive = w0.bloomCentre === word.w;
 
-  // C1 — second tap: gloss, still here, the slip still beside the word (the sky keeps its own rungs under
-  // the slip; the slip's band, not a second tap, is the way into the full entry)
+  // C1 — second tap: gloss, still here (the app's slip belongs to the dive's centre, never to the bloom)
   if (s.exists) {
     s = await page.evaluate(wordProbe(word.w));
     // the bloom's assembly easing keeps moving the centre for a beat after the
@@ -500,8 +499,8 @@ for (let round = 0; round < N_WORDS; round++) {
       if (!s2.exists && !w2.depthOpen) await file(word, 'tap-again', 'gloss', 'vanished', '');
       else if (w2.depthOpen) await file(word, 'tap-again', 'gloss', 'misfired', 'second tap dived (third act came early)');
       else if (!s2.glossed) await file(word, 'tap-again', 'gloss', 'dead', `no English (op=${s.opacity.toFixed(2)} pe="${s.pe}" unfolded=${s2.unfolded})`);
-      else if (w2.slip !== word.w) await file(word, 'tap-again', 'gloss', 'dead', `the slip left the word (slip=${w2.slip ?? 'none'})`);
-      else await file(word, 'tap-again', 'gloss', 'ok', 'the slip still beside it');
+      else if (w2.slip !== null) await file(word, 'tap-again', 'gloss', 'misfired', `the app's slip opened over the bloom (slip=${w2.slip})`);
+      else await file(word, 'tap-again', 'gloss', 'ok', '');
     }
   }
 
