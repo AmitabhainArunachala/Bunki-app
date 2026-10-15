@@ -388,6 +388,19 @@ try {
       const sea = lines.find((line) => line.reading === 'うみ');
       check('P11.one-line', '海: the readings sharing "sea" are one line — うみ first, み, わた, わだ after "also"',
         !!sea && ['み', 'わた', 'わだ'].every((kana) => sea.also.includes(kana)) && !lines.some((line) => line !== sea && line.gloss === sea.gloss), lines);
+      // two entries never fold into one line, even with the same first gloss: 年 とし and 年 ねん stay two doors
+      await boot(page);
+      await page.locator('#chrome-search').click();
+      await page.locator('#nav-search-input').fill('年');
+      await page.locator('.nav-search-row').first().waitFor();
+      await delay(700);
+      await page.locator('.nav-search-row').first().click();
+      await pageSettled(page);
+      await page.waitForFunction(() => document.querySelectorAll('#sheet .dictionary-homograph').length >= 2, null, { timeout: 8000 }).catch(() => {});
+      const doors = await page.evaluate(() => [...document.querySelectorAll('#sheet .dictionary-homograph')].map((line) => ({
+        seq: line.dataset.dictionaryEntry, reading: line.querySelector('.row-reading')?.textContent || '', also: line.dataset.alsoEntries || '' })));
+      check('P11.entries-apart', '年: とし (1468060) and ねん (2084840) stay two doors though both read "year"',
+        doors.some((door) => door.seq === '1468060') && doors.some((door) => door.seq === '2084840') && doors.every((door) => !door.also || door.also.split(' ').every((seq) => seq === door.seq)), doors);
     });
 
     // P13 — a Mac window
