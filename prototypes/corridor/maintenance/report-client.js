@@ -58,10 +58,15 @@
     document.body.append(root);
     function syncEntryLocale() {
       const ja = (options.locale || options.getContext?.()?.locale) === 'ja';
-      const label = ja ? 'この画面の問題を報告' : 'Report a problem on this screen';
+      const label = ja ? 'この画面の不具合を知らせる' : 'Report a problem on this screen';
       const button = root.querySelector('#bunki-report-bug');
-      root.querySelector('.br-rail').setAttribute('aria-label', ja ? '問題の報告' : 'Report support');
+      root.querySelector('.br-rail').setAttribute('aria-label', ja ? '不具合を知らせる' : 'Report a problem');
       button.setAttribute('aria-label', label);
+      // the sheet's own words follow the interface language (the house voice: 不具合を知らせる · Report a problem)
+      root.querySelector('[data-br="new"]').textContent = ja ? '不具合を知らせる' : 'Report a problem';
+      root.querySelector('[data-br="list"]').textContent = ja ? '送った報告' : 'My reports';
+      root.querySelector('.br-close').textContent = ja ? '閉じる' : 'Close';
+      root.dataset.locale = ja ? 'ja' : 'en';
       button.title = label;
     }
     syncEntryLocale();
@@ -575,7 +580,8 @@
       const focus = document.activeElement, focusId = body.contains(focus) ? focus.id : '', start = focus?.selectionStart, end = focus?.selectionEnd, scroll = body.scrollTop;
       const focusAction = body.contains(focus) ? focus.dataset.br : null, focusRecord = focus?.dataset.id;
       clearPreviews();
-      root.querySelector('#br-title').textContent = active === 'new' ? 'Report a problem' : active === 'detail' ? 'Your report' : 'My reports';
+      const jaTitles = root.dataset.locale === 'ja';
+      root.querySelector('#br-title').textContent = active === 'new' ? (jaTitles ? '不具合を知らせる' : 'Report a problem') : active === 'detail' ? (jaTitles ? 'あなたの報告' : 'Your report') : (jaTitles ? '送った報告' : 'My reports');
       root.querySelector('[data-br="new"]').setAttribute('aria-current', active === 'new' ? 'page' : 'false');
       root.querySelector('[data-br="list"]').setAttribute('aria-current', active !== 'new' ? 'page' : 'false');
       body.innerHTML = active === 'new' ? newMarkup() : active === 'detail' ? detailMarkup() : listMarkup();

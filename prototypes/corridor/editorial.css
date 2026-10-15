@@ -4943,6 +4943,21 @@ body:not(.zen) #app > .chrome {
 /* the galaxy's own strip (the door's menu) wears the frame's material too */
 .nav-bar { background: var(--color-bar, rgb(250 250 248 / 96%)); border: var(--stroke-hairline, 0.5px) solid var(--color-bar-line, rgb(0 0 0 / 12%)); -webkit-backdrop-filter: none; backdrop-filter: none; }
 /* END ONE TOP BAR ========================================================== */
+
+/* ONE NOTE (contract §5): the honest notes of every room — ai · guide · record — one element, quiet and small, a
+   hairline on the left, no box (F's --type-small takes over once it lands; the label size until then) */
+.note[data-kind] {
+  margin: var(--space-3, 12px) 0;
+  padding: 2px 0 2px 12px;
+  border: 0;
+  border-left: var(--stroke-hairline, 1px) solid var(--color-edge-strong);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font: 400 var(--type-small, var(--type-label, 13px))/1.5 var(--font-ui);
+  letter-spacing: 0;
+  color: var(--color-muted);
+}
 /* ---- the frame: the Line ---- */
 .primary-tabs,
 body.has-primary-tabs .primary-tabs {

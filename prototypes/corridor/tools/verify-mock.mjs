@@ -225,12 +225,12 @@ async function main() {
   // not on each of the 25 rows; a row still wears it when the list mixes checked and unchecked
   const listing = await page.evaluate(`(() => {
     const rows = [...document.querySelectorAll('[data-mock-set]')];
-    const chips = (root) => [...root.querySelectorAll('.status-chip')].filter((c) => c.textContent.trim() === 'Unreviewed');
+    const chips = (root) => [...root.querySelectorAll('.status-chip')].filter((c) => c.textContent.trim() === 'Made by AI');
     const marked = rows.filter((r) => chips(r).length);
     const page = chips(document.querySelector('#app main')).filter((c) => !c.closest('[data-mock-set]')).length;
     return { rows: rows.length, rowMarks: marked.length, pageMarks: page };
   })()`);
-  check('earlier exercises retain all 25 papers, and Unreviewed is said once for the page, not on every row',
+  check('earlier exercises retain all 25 papers, and Made by AI is said once for the page, not on every row',
     listing.rows === 25 && listing.pageMarks === 1 && listing.rowMarks === 0, JSON.stringify(listing));
 
   // sit the shortest N5 paper end to end, answering option 1 every time

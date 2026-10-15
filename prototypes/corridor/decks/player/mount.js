@@ -351,7 +351,7 @@ const UI_EN = {
   "同じ字・同じ読みの、学習中の語": "Study words sharing a kanji or reading",
   "参照": "See also",
   "閉じる": "Close",
-  "ここでは覚えるに保存できません（回廊でできます）": "Save to your review cards in KAIRO.",
+  "ここでは保存できません": "Can't save from here.",
   "削除": "Remove",
   "このカードを削除（保留にする・あとで戻せる）": "Remove this card from study (pause it; restore it later)",
   "別の文に替える": "Use another sentence",
@@ -1508,7 +1508,7 @@ function seeAlsoLine(card, word) {
  * own words are tappable, from the page's built-in gloss map, and a tap shows a small popover with
  * no 覚える. A tap is capture, never evidence: it never grades, never changes a card's schedule and
  * never adds a card; it is written to the ledger's lookups[] for the sensei and nowhere else. */
-const NO_TAKE_HERE = 'ここでは覚えるに保存できません（回廊でできます）';
+const NO_TAKE_HERE = 'ここでは保存できません';
 const SELF_UNIT = Object.freeze({ self: true });
 const GLOSS_FORMAT = 'bunki-cloze-gloss';
 const ENTRY_KIND = { word: '語', kanji: '字', grammar: '文法' };

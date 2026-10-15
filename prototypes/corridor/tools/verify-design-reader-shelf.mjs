@@ -671,7 +671,7 @@ try {
             why: !!why?.querySelector('summary'), seal: seal ? Math.round(Math.max(seal.width, seal.height)) : 0 };
         });
         assert(Math.abs(probe.dateTop - probe.tallyTop) <= 2 && probe.datelineLines === 1, `date and count are not one line: ${JSON.stringify(probe)}`);
-        assert(/Unreviewed/u.test(probe.note) && /\d+.*\d+/u.test(probe.note), `the 未確認 note does not count the pending stories against the total: "${probe.note}"`);
+        assert(/Made by AI/u.test(probe.note) && /\d+.*\d+/u.test(probe.note), `the AI作成 note does not count the pending stories against the total: "${probe.note}"`);
         assert.equal(probe.noteLines, 1, `the 未確認 note runs to ${probe.noteLines} lines: "${probe.note}"`);
         assert(probe.why, 'the 未確認 note has no ⓘ for its longer explanation');
         await page.locator('.shelf-review-note summary').click();

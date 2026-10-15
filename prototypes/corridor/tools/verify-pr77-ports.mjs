@@ -238,17 +238,17 @@ PROBES['review-reason'] = async () => {
   const freeze = /archive froze/;
   const human = await openRow(page, 'env:press-press_05591');
   check('d9f0b984 · a row marked 未確認 for human review says so, and not with another source\'s story',
-    /Unreviewed/.test(human.eyebrow) && human.notes.some((n) => /review/i.test(n) && !freeze.test(n)) && !human.notes.some((n) => freeze.test(n)),
+    /Made by AI/.test(human.eyebrow) && human.notes.some((n) => /review/i.test(n) && !freeze.test(n)) && !human.notes.some((n) => freeze.test(n)),
     JSON.stringify(human).slice(0, 400));
   await page.click('#back');
   const rights = await openRow(page, 'yasashii:1');
   check('d9f0b984 · a row held for its rights names that reason, not the Wikinews archive freeze',
-    /Unreviewed/.test(rights.eyebrow) && rights.notes.some((n) => /terms|rights|licen/i.test(n)) && !rights.notes.some((n) => freeze.test(n)),
+    /Made by AI/.test(rights.eyebrow) && rights.notes.some((n) => /terms|rights|licen/i.test(n)) && !rights.notes.some((n) => freeze.test(n)),
     JSON.stringify(rights).slice(0, 400));
   await page.click('#back');
   const approved = await openRow(page, 'bunki-graded-n3-zoka-sanjin-morning');
   check('d9f0b984 · an approved row carries no pending note (negative control)',
-    !/Unreviewed/.test(approved.eyebrow) && !approved.notes.some((n) => /pending/i.test(n)),
+    !/Made by AI/.test(approved.eyebrow) && !approved.notes.some((n) => /pending/i.test(n)),
     JSON.stringify(approved).slice(0, 300));
   await context.close();
 };

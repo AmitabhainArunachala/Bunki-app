@@ -630,7 +630,7 @@ const receivedRow = operation => `[data-received-practice="${operation.payload.a
 async function openReceived(peer, operation, { formStatus = 'available', statuses = {}, label = 'detail' } = {}) {
   const before = await receivedNative(peer, `${label}-before-open`), row = peer.page.locator(receivedRow(operation));
   await row.waitFor(); const rowText = await row.innerText();
-  assert(rowText.startsWith('Response record · '));
+  assert(rowText.startsWith('Your answers · '));
   assert(rowText.includes(operation.payload.outcome === 'submitted' ? 'Submitted' : 'Stopped'));
   assert(rowText.includes(`${operation.payload.answers.filter(answer => answer.response.kind !== 'no-response').length}/${operation.payload.answers.length}`));
   await row.click(); await peer.page.locator('#received-practice-detail').waitFor();
@@ -641,7 +641,7 @@ async function openReceived(peer, operation, { formStatus = 'available', statuse
   const detail = peer.page.locator('#received-practice-detail');
   if (formStatus !== 'available') await peer.page.locator('#received-practice-reference summary').click();
   const text = await detail.innerText();
-  assert.equal(await detail.locator('h1').innerText(), 'Response record');
+  assert.equal(await detail.locator('h1').innerText(), 'Your answers');
   assert.equal(await peer.page.locator('#received-practice-status').innerText(), 'Saved responses, not a score or a correctness assessment.');
   const declaredDate = await peer.page.evaluate(value => new Date(value).toLocaleString(), operation.payload.startedAt);
   assert(rowText.includes(declaredDate)); assert(text.includes(declaredDate));
@@ -958,12 +958,12 @@ async function checkReceived(name) {
 try {
   await check('two-completed-attempts-and-failed-save-actions', async ({ page }) => {
     await door(page);
-    assert.match(await page.locator('main').innerText(), /Short practice sets/u);
+    assert.match(await page.locator('main').innerText(), /Short sets/u);
     const assertIntro = async () => {
       const mark = page.locator('main > .mock-review-mark');
       assert.equal(await mark.count(), 1);
       assert.equal(await mark.isVisible(), true);
-      assert.equal(await mark.locator('.status-chip').innerText(), 'Unreviewed');
+      assert.equal(await mark.locator('.status-chip').innerText(), 'Made by AI');
       assert.equal(await mark.locator('.exam-review-reason').innerText(), 'answers not yet checked by a person');
       assert.equal(await page.locator('[data-mock-set] .status-chip').count(), 0);
       assert.match(await page.locator('main').innerText(), /No listening and no time limit\./u);

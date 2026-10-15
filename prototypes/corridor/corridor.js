@@ -4071,6 +4071,23 @@ function withEn(node, en) {
   if (bi()) node.textContent = tx(node.textContent, en);
   return node;
 }
+/** ONE NOTE (contract §5): the honest notes of every room — assessment, guided, reference, the sheet — are one
+ * element with one wording per kind: ai (written by AI, not yet checked by a person), guide (a guide, not the
+ * official list), record (what you answer here is kept). Styled once in editorial.css (.note[data-kind]); the
+ * modules receive it through their host (note / noteHtml). */
+const NOTE_TEXT = Object.freeze({
+  ai: ['AIが書きました。まだ人の目は通っていません。', 'Written by AI. Not yet checked by a person.'],
+  guide: ['目安です。公式の一覧ではありません。', 'A guide, not the official list.'],
+  record: ['ここでの答えは記録に残ります。', 'What you answer here is kept.'],
+});
+function noteText(kind) {
+  return tx(...NOTE_TEXT[kind]);
+}
+function note(kind) {
+  const line = el('p', 'note', noteText(kind));
+  line.dataset.kind = kind;
+  return line;
+}
 /** One visible, accessible label in the chosen interface language. */
 function biLabel(tag, cls, ja, en) {
   const node = el(tag, cls);
@@ -5598,15 +5615,15 @@ function renderShelfBody(search = null) {
   if (unreviewed) {
     const note = el('div', 'shelf-review-note');
     reviewNote = note;
-    note.append(el('span', 'shelf-review-text', tx(`このうち ${unreviewed} 本は未確認（人の確認前）`,
-      `Unreviewed · ${unreviewed} of ${stories.length} not yet checked by a person`)));
+    note.append(el('span', 'shelf-review-text', tx(`このうち ${unreviewed} 本はAI作成（人の確認前）`,
+      `Made by AI · ${unreviewed} of ${stories.length} not yet checked by a person`)));
     const why = el('details', 'shelf-filter-help shelf-review-help');
     const whySummary = el('summary', 'icon-button');
-    whySummary.setAttribute('aria-label', tx('未確認とは', 'What Unreviewed means'));
-    whySummary.title = tx('未確認とは', 'What Unreviewed means');
+    whySummary.setAttribute('aria-label', tx('AI作成とは', 'What Made by AI means'));
+    whySummary.title = tx('AI作成とは', 'What Made by AI means');
     whySummary.append(uiIcon('info'));
-    why.append(whySummary, el('p', '', tx('人がまだ確認していない読み物です。ふりがなや英訳に誤りがあるかもしれません。記事の見出しの上にも「未確認」と出ます。',
-      'A person has not checked these articles yet, so their furigana (the small reading over the kanji) or their English may have mistakes. Each one also says Unreviewed at its top.')));
+    why.append(whySummary, el('p', '', tx('AIが書き、人がまだ確認していない読み物です。ふりがなや英訳に誤りがあるかもしれません。記事の見出しの上にも「AI作成」と出ます。',
+      'AI wrote these articles and a person has not checked them yet, so their furigana (the small reading over the kanji) or their English may have mistakes. Each one also says Made by AI at its top.')));
     note.append(why);
   }
   masthead.append(title);
@@ -5681,7 +5698,7 @@ function renderShelfBody(search = null) {
   // and its behaviour; only where it is drawn changed.
   const toolsBox = el('nav', 'shelf-study-tools');
   toolsBox.id = 'shelf-tools-panel';
-  toolsBox.setAttribute('aria-label', tx('学習ツール', 'Study tools'));
+  toolsBox.setAttribute('aria-label', tx('道具', 'Tools'));
   // tile and group names are the app's chrome, not prose to look up
   toolsBox.dataset.japaneseLookup = 'off';
   const toolGroups = [];
@@ -5699,7 +5716,7 @@ function renderShelfBody(search = null) {
   };
   const readTools = toolGroup('read', '読む', 'Read');
   const practiceTools = toolGroup('practice', '練習', 'Practice');
-  const referenceTools = toolGroup('reference', '調べる', 'Reference');
+  const referenceTools = toolGroup('reference', '調べる', 'Look up');
   const settingTools = toolGroup('settings', '設定', 'Settings');
   const news = biLabel('button', 'grammar-link', 'いまの日本を読む', 'news & magazines');
   news.type = 'button'; news.id = 'feed-link';
@@ -5868,7 +5885,7 @@ function renderShelfBody(search = null) {
   toolsToggle.id = 'shelf-tools-toggle';
   toolsToggle.setAttribute('aria-controls', toolsBox.id);
   const toolsFace = el('span', 'shelf-tools-toggle-label');
-  toolsFace.append(el('span', 'l-ja', tx('学習ツール', 'Tools')));
+  toolsFace.append(el('span', 'l-ja', tx('道具', 'Tools')));
   toolsToggle.append(uiIcon('tools'), toolsFace);
   // a filter in force is never invisible: the button says how many are set
   if (filtersSet) toolsToggle.append(el('span', 'shelf-tools-count', String(filtersSet)));
@@ -7587,12 +7604,13 @@ function reviewReason(p) {
   if (p.pendingVerification) return tx('最終版との照合の前', 'not yet checked against the final saved version');
   return tx('人による確認の前', 'not yet checked by a person');
 }
-/** 未確認 — one small chip for unreviewed text, its reason in the tooltip. */
+/** AI作成 · Made by AI — one small chip for text no person has checked yet, its reason in the tooltip (the house
+ * voice, 2026-10-15: never "unreviewed"). */
 function unreviewedChip(p) {
-  const chip = el('span', 'status-chip', tx('未確認', 'Unreviewed'));
+  const chip = el('span', 'status-chip', tx('AI作成', 'Made by AI'));
   const reason = reviewReason(p);
-  chip.title = `${tx('未確認', 'Unreviewed')} — ${reason}`;
-  chip.setAttribute('aria-label', `${tx('未確認', 'Unreviewed')} — ${reason}`);
+  chip.title = `${tx('AI作成', 'Made by AI')} — ${reason}`;
+  chip.setAttribute('aria-label', `${tx('AI作成', 'Made by AI')} — ${reason}`);
   return chip;
 }
 /** The level a learner filters by: the JLPT vocabulary estimate, with the sentence band beside it. */
@@ -8843,7 +8861,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   if (seal) {
     actions.append(seal);
     // the note and the toast share one noun: Save puts the word "to review", and the toast says "Saved to review"
-    if (canSave) actions.append(el('span', 'mini-take-note', tx('復習に加わります', 'to review')));
+    if (canSave) actions.append(el('span', 'mini-take-note', tx('復習に入ります', 'goes into review')));
     paintMiniPath(actions, seal.getAttribute('aria-pressed') === 'true');
     mini.append(actions);
   } else if (note) {
@@ -13400,7 +13418,7 @@ async function buildImportPlan(value, trustedPolicy) {
 function renderPortRow(main) {
   const port = el('div', 'port-row');
   port.id = 'record-backup';
-  const exp = biLabel('button', 'chip', '書き出す', 'export your record');
+  const exp = biLabel('button', 'chip', '書き出す', 'Export a backup');
   exp.type = 'button';
   exp.id = 'export-store';
   exp.addEventListener('click', async () => {
@@ -13450,7 +13468,7 @@ function renderPortRow(main) {
         'The file could not be exported. Check the destination and try again.');
     } finally { exp.disabled = !recordWritable(); }
   });
-  const imp = biLabel('button', 'chip', '読み込む', 'import a record');
+  const imp = biLabel('button', 'chip', '読み込む', 'Import a backup');
   imp.type = 'button';
   imp.id = 'import-store';
   const file = el('input');
@@ -14337,7 +14355,7 @@ async function performAssessmentSuppression(command, guard = null, access = null
   } catch { return false; }
 }
 function createAssessmentRoom() {
-  return assessmentViewModule.createAssessmentView({ english: bi, render: () => { if (S.view === 'mock') render(); },
+  return assessmentViewModule.createAssessmentView({ english: bi, render: () => { if (S.view === 'mock') render(); }, note,
     owned: recordWritable, recordState: recordRoomState,
     appendLookupText: (container, text, context) => appendJapaneseLookup(container, text, context),
     assistance: (selected, itemId) => assessmentV2Module.assessmentItemAssistanceV2(selected.attempt, itemId),
@@ -15089,7 +15107,7 @@ function fillPracticeHistory(history) {
       row.dataset.receivedPractice = entry.attemptId; row.dataset.receivedPayload = entry.payloadSha256;
       row.dataset.historyKey = `received:${entry.attemptId}:${entry.payloadSha256}`;
       const alternative = receivedPracticeAlternativeLabel(entry.attemptId, entry.payloadSha256);
-      row.append(el('span', 'row-main', `${tx('回答の記録', 'Response record')}${alternative ? ` · ${alternative}` : ''} · ${new Date(payload.startedAt).toLocaleString()} · ${status} · ${answered}/${payload.answers.length}`));
+      row.append(el('span', 'row-main', `${tx('あなたの答え', 'Your answers')}${alternative ? ` · ${alternative}` : ''} · ${new Date(payload.startedAt).toLocaleString()} · ${status} · ${answered}/${payload.answers.length}`));
       row.addEventListener('click', () => {
         receivedPracticeReturnY = window.scrollY; syncPracticeClock();
         receivedPracticeSelection = { attemptId: entry.attemptId, payloadSha256: entry.payloadSha256 };
@@ -15252,8 +15270,8 @@ function updateReceivedPracticeDetail(detail) {
 }
 function renderReceivedPracticeDetail(main) {
   const detail = el('section', 'mock-history'); detail.id = 'received-practice-detail';
-  detail.append(el('h1', 'view-title', tx('回答の記録', 'Response record')));
-  const back = el('button', 'chip', tx('練習の記録に戻る', 'Back to practice history')); back.type = 'button'; back.id = 'received-practice-back';
+  detail.append(el('h1', 'view-title', tx('あなたの答え', 'Your answers')));
+  const back = el('button', 'chip', tx('前の練習に戻る', 'Back to past practice')); back.type = 'button'; back.id = 'received-practice-back';
   back.addEventListener('click', leaveReceivedPractice); detail.append(back, el('div', 'received-practice-body')); main.append(detail);
   updateReceivedPracticeDetail(detail);
 }
@@ -15278,7 +15296,7 @@ function renderMock(main) {
   }
   if (receivedPracticeSelection) { renderReceivedPracticeDetail(main); return; }
   if (mockHistoryBrowse) {
-    main.append(el('h1', 'view-title', tx('練習の記録を読む', 'Review practice history')));
+    main.append(el('h1', 'view-title', tx('前の練習', 'Past practice')));
     const back = el('button', 'chip', tx('練習に戻る', 'Back to practice')); back.type = 'button'; back.id = 'mock-history-close';
     back.addEventListener('click', closePracticeHistory); main.append(back); renderPracticeHistory(main); return;
   }
@@ -15286,11 +15304,11 @@ function renderMock(main) {
   const selected = practiceSelection();
   const run = selected?.run;
   if (run) {
-    const history = el('button', 'chip', tx('練習の記録', 'Practice history')); history.type = 'button'; history.id = 'mock-history-open';
+    const history = el('button', 'chip', tx('前の練習', 'Past practice')); history.type = 'button'; history.id = 'mock-history-open';
     history.addEventListener('click', openPracticeHistory); main.append(history);
   }
   if (!run) {
-    main.append(el('h1', 'view-title', tx('短い問題集', 'Short practice sets')));
+    main.append(el('h1', 'view-title', tx('短い問題集', 'Short sets')));
     main.append(
       el(
         'p',
@@ -15321,9 +15339,9 @@ function renderMock(main) {
     if (allUnchecked) {
       const mark = el('p', 'exam-machine-label mock-review-mark');
       const reason = tx('答えはまだ人が確認していない', 'answers not yet checked by a person');
-      const chip = el('span', 'status-chip', tx('未確認', 'Unreviewed'));
+      const chip = el('span', 'status-chip', tx('AI作成', 'Made by AI'));
       chip.title = reason;
-      chip.setAttribute('aria-label', `${tx('未確認', 'Unreviewed')} — ${reason}`);
+      chip.setAttribute('aria-label', `${tx('AI作成', 'Made by AI')} — ${reason}`);
       mark.append(chip, ' ', el('span', 'exam-review-reason', reason));
       main.append(mark);
     }
@@ -17307,6 +17325,7 @@ function renderLevels(main) {
       renderLevels(main); return;
     }
     referenceLibrary = window.BunkiReferenceUI.create({
+      note,
       catalog,
       tx,
       getTaken: () => S.taken,
@@ -24425,6 +24444,8 @@ function guidedHost() {
     // a word in the session's teaching text opens the app's one slip beside it (contract §1); Save goes through
     // the session's own path (host), so its ledger and its crane keep their word
     openSlip: (node, { anchor, host, look, onClose } = {}) => openSlip(node, { anchor, from: 'guided', host, look, onClose }),
+    // the one honest note (contract §5), as markup for the room's templates
+    noteHtml: (kind) => note(kind).outerHTML,
     openTutor: () => {
       keepNavigationReturn('ai', document.activeElement);
       S.view = 'ai'; render(); window.scrollTo(0, 0);
@@ -25499,7 +25520,7 @@ function renderProbe(main) {
   if (pr.ix >= pr.queue.length) {
     main.append(withEn(el('p', 'eyebrow', '読みの確認'), 'Reading check', 'en-inline'));
     const n = pr.right + pr.missed.length;
-    main.append(el('h1', 'view-title', tx(`探査おわり — ${n} 語`, `Probe done — ${n} word${n === 1 ? '' : 's'}`)));
+    main.append(el('h1', 'view-title', tx(`探しおわり — ${n} 語`, `Done — ${n} word${n === 1 ? '' : 's'}`)));
     const sum = el('div', 'review-summary');
     sum.append(el('span', 'pool-tag', tx(`読めた ${pr.right}`, `read ${pr.right}`)));
     sum.append(el('span', 'pool-tag', tx(`読めなかった ${pr.missed.length}`, `missed ${pr.missed.length}`)));
@@ -25948,7 +25969,7 @@ async function ensureBankExamples(word) {
           entries.push({
             tokens: row[0].map(inflateExampleToken),
             en: row[1] || '',
-            source: src ? tx(src.labelJa, src.labelEn) : tx('用例', 'examples corpus'),
+            source: src ? tx(src.labelJa, src.labelEn) : tx('用例', 'examples'),
             bank: true,
           });
         }
@@ -30342,8 +30363,7 @@ function renderSheet(root) {
       notes.append(el('p', null, `${source.source}: ${/級/u.test(source.level) ? tx(source.level, kankenGradeLabel(source.level)) : source.level}`));
     }
     renderReferenceMetadata(notes, node.referenceEntry);
-    notes.append(el('p', null, tx('辞書についている級の目安です。公式の出題一覧でも、あなたが覚えたかどうかの記録でもありません。',
-      'These levels come from our dictionaries: a guide, not the official exam list, and not a record of what you know.')));
+    notes.append(note('guide'));
     notes.open = !!node.referenceNotesOpen;
     notes.addEventListener('toggle', () => { if (notes.isConnected) node.referenceNotesOpen = notes.open; });
     sheet.append(notes);
@@ -32870,7 +32890,7 @@ function renderLayoutChoice() {
   const choices = el('div', 'lang-seg settings-layout-choice');
   choices.setAttribute('role', 'group');
   choices.setAttribute('aria-label', tx('レイアウト', 'Layout'));
-  for (const [id, ja, en] of [['current', 'いまの形', 'Current'], ['places', '新しい形（試験中）', 'New (test)']]) {
+  for (const [id, ja, en] of [['current', 'いまの並び', 'Current'], ['places', '新しい並び', 'New layout']]) {
     const button = el('button', '', tx(ja, en));
     button.type = 'button';
     button.dataset.layout = id;
@@ -32886,8 +32906,8 @@ function renderLayoutChoice() {
     choices.append(button);
   }
   section.append(choices, el('p', 'settings-layout-note', tx(
-    '新しい形：復習・本棚・辞書・試験・記録の五つ。カードと記録はどちらも同じ。いつでも戻せる。',
-    'New: five places — Review, Bookshelf, Dictionary, Tests, Progress. Your cards and record are the same in both; switch back any time.')));
+    '新しい並び：復習・本棚・辞書・試験・記録の五つ。カードはどちらも同じ。いつでも戻せる。',
+    'New layout: five places — Review, Bookshelf, Dictionary, Tests, Progress. Your cards are the same in both; switch back any time.')));
   return section;
 }
 function renderSettings(main) {
@@ -32922,7 +32942,7 @@ function renderSettings(main) {
   version.id = 'settings-release-version';
   version.dataset.version = APP_RELEASE.version;
   about.append(version, el('p', 'card-kind', APP_RELEASE.channel === 'stable'
-    ? tx('通常版', 'Stable release') : tx('テスト版', 'Test release')));
+    ? tx('通常版', 'Stable release') : tx('試作版', 'Early build')));
   const notes = el('a', 'grammar-link', tx('この版の変更点', 'Changes in this release'));
   notes.id = 'settings-release-notes';
   notes.href = `https://github.com/Amitabhainarunachala/Bunki-app/releases/tag/v${APP_RELEASE.version}`;
@@ -32943,7 +32963,7 @@ function renderSettings(main) {
     renderSrsPrefs(pace, { open: true });
     const record = el('section', 'foundation-section settings-record');
     record.id = 'settings-record';
-    record.append(el('h2', 'eyebrow', tx('記録とバックアップ', 'Record & backup')));
+    record.append(el('h2', 'eyebrow', tx('バックアップ', 'Backup')));
     record.append(renderRecordSync());
     renderPortRow(record);
     const builder = el('section', 'foundation-section settings-builder');
@@ -32959,7 +32979,7 @@ function renderSettings(main) {
     }),
     foundationDoor('settings-reading', '読み物の好み', 'Reading preferences', 'airead'),
     foundationDoor('settings-tutor', '先生との接続', 'Tutor connection', 'ai'),
-    foundationDoor('settings-backup', '記録とバックアップ', 'Record & backup', 'tray', showRecordBackup),
+    foundationDoor('settings-backup', 'バックアップ', 'Backup', 'tray', showRecordBackup),
   );
   main.append(language, renderLayoutChoice(), doors, renderReportRelaySettings(), about);
 }

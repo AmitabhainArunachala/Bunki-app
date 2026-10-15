@@ -1027,7 +1027,7 @@ try {
       readerShape.facts['出典'] === learnerSource &&
       readerShape.facts['利用条件']?.includes('Bunki original') &&
       readerShape.level === expectedLevel &&
-      readerShape.unreviewed === (/-pending$/.test(row.review ?? '') ? '未確認' : null) &&
+      readerShape.unreviewed === (/-pending$/.test(row.review ?? '') ? 'AI作成' : null) &&
       readerShape.tokens === body.tokens.length &&
       readerShape.ruby > 0 &&
       readerShape.paragraphs === body.paras.length &&
@@ -1111,7 +1111,7 @@ try {
     if (!notes) return { notes, text: '', count: 0, total: null };
     const text = (await page.locator('.shelf-review-note').first().textContent()) ?? '';
     // the bilingual note is one short line since the glance pass: “Unreviewed · 54 of 120 not yet checked by a person”
-    const [, jaCount, biCount, total] = text.match(/このうち ([0-9]+) 本は未確認|Unreviewed · ([0-9]+) of (?:these )?([0-9]+)/u) ?? [];
+    const [, jaCount, biCount, total] = text.match(/このうち ([0-9]+) 本はAI作成|Made by AI · ([0-9]+) of (?:these )?([0-9]+)/u) ?? [];
     return { notes, text, count: Number(jaCount ?? biCount), total: total === undefined ? null : Number(total) };
   };
   const jaNote = await reviewNote();
@@ -1127,7 +1127,7 @@ try {
     await page.locator(`${storyCard(record.id)} .shelf-open`).click();
     await page.waitForSelector('main .reader-meta .reader-source', { state: 'attached' });
     const chip = await page.locator('main .reader-meta .status-chip').textContent().catch(() => null);
-    if (chip !== '未確認') unmarkedInReader.push(record.id);
+    if (chip !== 'AI作成') unmarkedInReader.push(record.id);
     await page.locator('#back').click();
     await page.waitForSelector(storyCard(record.id));
   }

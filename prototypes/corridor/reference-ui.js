@@ -22,7 +22,9 @@
     return element;
   };
 
-  function create({ catalog, tx, onChange, onOpen, onExit, onStudy, onMock, onSearch, getReturnLabel, getTaken }) {
+  function create({ catalog, tx, onChange, onOpen, onExit, onStudy, onMock, onSearch, getReturnLabel, getTaken, note }) {
+    // the one honest note (contract §5), from the host; without one the element is drawn without its words
+    const honest = (kind) => { if (note) return note(kind); const line = node('p', 'note'); line.dataset.kind = kind; return line; };
     const state = {
       collectionId: null,
       jlptKind: 'word',
@@ -120,8 +122,8 @@
       tx('ここでの級は、辞書についている級の目安です。試験にはここにない語や漢字も出ます。',
         'The levels here come from the level labels in our dictionaries: a guide to what each level uses. The real exam can include words and kanji that are not listed.'),
     ], [
-      [tx('公式：各レベルの目安', 'Official: what each level means'), 'https://www.jlpt.jp/e/about/levelsummary.html'],
-      [tx('公式：試験の科目と時間', 'Official: test sections and timing'), 'https://www.jlpt.jp/e/guideline/testsections.html'],
+      [tx('jlpt.jp：各レベルの目安', 'jlpt.jp · what each level means'), 'https://www.jlpt.jp/e/about/levelsummary.html'],
+      [tx('jlpt.jp：試験の科目と時間', 'jlpt.jp · test sections and timing'), 'https://www.jlpt.jp/e/guideline/testsections.html'],
     ]);
     const kankenExplainer = () => explainer('kankenInfoOpen', tx('漢検とは？', 'What is Kanji Kentei?'), [
       tx('日本漢字能力検定（漢検）は、漢字の読み・書き・意味を測る日本の検定です。10級がいちばんやさしく、1級がいちばん難しい級です。「準2級」「準1級」は、その級の一つ手前の段階です。',
@@ -129,19 +131,20 @@
       tx('10級から5級は、日本の小学1年生から6年生で習う漢字にあたります。JLPT とは別の検定で、級どうしは対応しません。',
         'Grades 10 to 5 match the kanji taught in Japanese elementary school, years 1 to 6. It is a separate test from the JLPT, and the two sets of levels do not line up.'),
     ], [
-      [tx('公式：各級の程度と漢字の数', 'Official: each grade and its kanji'), 'https://www.kanken.or.jp/kanken/grades/overview/'],
+      [tx('kanken.or.jp：各級の程度と漢字の数', 'kanken.or.jp · each grade and its kanji'), 'https://www.kanken.or.jp/kanken/grades/overview/'],
     ]);
 
     function provenance() {
       const details = node('details', 'reference-provenance');
       details.id = 'reference-provenance';
       details.open = state.provenanceOpen;
-      details.append(node('summary', null, tx('収録範囲・出典について', 'Coverage & source notes')));
+      details.append(node('summary', null, tx('この一覧はどこから', 'Where these lists come from')));
       details.addEventListener('toggle', () => {
         // A detached disclosure can emit a delayed toggle after a full render.
         if (details.isConnected) state.provenanceOpen = details.open;
       });
       const body = node('div', 'reference-source-body');
+      body.append(honest('guide'));
       body.append(
         node('p', null, tx(
           '全件とは、このアプリに収録された資料の全件です。閲覧しても My Study には追加されません。「My Study に登録」は登録数で、習得数ではありません。',
@@ -152,7 +155,7 @@
           'KAIRO groups these entries using the level labels in its dictionaries. The JLPT does not publish a complete list of the vocabulary, kanji or grammar that can appear on the exam. Vocabulary combines the dictionary and word layers, including N1. Conflicting tags retain membership in each source level and are marked on entries. Kanji tags come from a separate metadata layer.',
         )),
       );
-      const jlptLink = node('a', null, tx('JLPT 公式ガイドブック · Q7–Q8', 'Official JLPT guidebook · Q7–Q8'));
+      const jlptLink = node('a', null, tx('jlpt.jp のガイドブック · Q7–Q8', 'The JLPT guidebook (jlpt.jp) · Q7–Q8'));
       jlptLink.href = 'https://www.jlpt.jp/e/reference/pdf/guidebook_s_e.pdf';
       jlptLink.target = '_blank';
       jlptLink.rel = 'noopener noreferrer';
@@ -161,7 +164,7 @@
         '従来のアプリ内の配当表は 2,453 字ですが、参考書庫では拡張された収録資料も統合し、異体字・字形未収録の記録も残しています。各級の数はその級に配当された記録で、下の級を含む累計ではありません。準1級・1級の公式範囲すべての保証ではありません。1/準1級、準1級、配当外、級未設定などの資料上の区分は、推測で再分類せず残しています。',
         'The original app’s Kentei table contains 2,453 characters; this reference adds the extended committed Kentei corpus, including variant forms and source records without a Unicode glyph. Counts are distinct records assigned to a grade, not cumulative exam targets. They are not proof of official exam completeness (approximately 3,000 characters at pre-1 and 6,000 at grade 1). Explicit source bins, including grade 1/pre-1, pre-1, outside assigned grades, and unassigned metadata, remain separate; no grade is guessed.',
       )));
-      const kankenLink = node('a', null, tx('日本漢字能力検定 · 各級の概要', 'Official Kanji Kentei grade overview'));
+      const kankenLink = node('a', null, tx('kanken.or.jp · 各級の概要', 'kanken.or.jp · the grades'));
       kankenLink.href = 'https://www.kanken.or.jp/kanken/grades/overview/';
       kankenLink.target = '_blank';
       kankenLink.rel = 'noopener noreferrer';
@@ -455,7 +458,7 @@
         const content = node('span', 'reference-entry-content');
         content.append(
           node('span', 'reference-entry-headword', entry.missingGlyph ? tx(`字形未収録 (${entry.id})`, `Glyph not supplied (${entry.id})`) : entry.text || entry.id),
-          node('span', 'reference-entry-reading', entry.readings?.length ? entry.readings.join('・') : entry.reading || tx('読み未収録', 'Reading not supplied')),
+          node('span', 'reference-entry-reading', entry.readings?.length ? entry.readings.join('・') : entry.reading || tx('読みなし', 'No reading')),
           node('span', 'reference-entry-meaning', entry.meanings?.length
             ? entry.meanings.join('; ')
             : tx('意味未収録', 'Meaning not supplied')),
@@ -502,9 +505,7 @@
         `${number(collection.count)} 件収録 · My Study に登録 ${number(saved)}`,
         `${number(collection.count)} ${collection.kind === 'kanji' ? 'kanji' : 'words'} · ${number(saved)} in My Study`,
       )));
-      head.append(node('p', 'reference-footnote', collection.family === 'kanken'
-        ? tx('この級に分類された漢字です。下の級の漢字も試験範囲に含まれる場合があります。', 'Kanji listed at this level. An exam can also include characters from earlier levels.')
-        : tx('辞書の級表示を目安にまとめています。試験には、ここにない語や漢字も出る場合があります。', 'Grouped using our dictionaries’ level labels. The exam may include words or kanji beyond this list.')));
+      head.append(honest('guide'));
       root.append(head, collection.family === 'kanken' ? kankenExplainer() : jlptExplainer(), provenance());
       const toolbar = node('div', 'reference-toolbar');
       const searchGroup = node('div', 'reference-search-group');

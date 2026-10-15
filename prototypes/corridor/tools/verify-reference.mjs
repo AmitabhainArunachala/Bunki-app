@@ -212,7 +212,7 @@ try {
       await page.locator(`[data-entry-id="${entry.id}"]`).click();
       await page.waitForSelector('.sheet');
       const text = await page.locator('.sheet').innerText();
-      assert.ok(text.includes(entry.reading || 'Reading not supplied') || text.includes('読み未収録'));
+      assert.ok(text.includes(entry.reading || 'No reading') || text.includes('読みなし'));
       assert.equal(await page.locator('.sheet .take').count(), 0);
       await page.waitForTimeout(850);
       await page.click(await entryCloseSelector(page));

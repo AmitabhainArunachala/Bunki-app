@@ -200,7 +200,7 @@ try {
     // any chip, or the bare word anywhere in a row, let a hidden or reworded mark pass)
     const olderSets = () => page.evaluate(() => {
       const shown = (n) => n.getClientRects().length > 0 && getComputedStyle(n).visibility !== 'hidden' && Number(getComputedStyle(n).opacity) > 0;
-      const marked = (root) => [...(root?.querySelectorAll('.status-chip') || [])].some((chip) => chip.textContent.trim() === 'Unreviewed' && shown(chip));
+      const marked = (root) => [...(root?.querySelectorAll('.status-chip') || [])].some((chip) => chip.textContent.trim() === 'Made by AI' && shown(chip));
       const block = document.querySelector('[data-exam-older="N1"]');
       const sectionMarked = marked(block?.querySelector('[data-older-mark]'));
       return [...(block?.querySelectorAll('[data-legacy-set]') || [])]
@@ -216,7 +216,7 @@ try {
     const reworded = await olderSets();
     await page.evaluate((texts) => [...document.querySelectorAll('[data-exam-older="N1"] [data-older-mark] .status-chip')]
       .forEach((chip, i) => { chip.textContent = texts[i]; }), original);
-    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the Unreviewed mark is read only from a visible chip saying exactly Unreviewed (controls: hidden, reworded)`,
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the Made by AI mark is read only from a visible chip saying exactly Made by AI (controls: hidden, reworded)`,
       original.length > 0 && hidden.length > 0 && hidden.every((row) => !row.pending) && reworded.every((row) => !row.pending),
       JSON.stringify({ chips: original, hiddenMarked: hidden.filter((row) => row.pending).length, rewordedMarked: reworded.filter((row) => row.pending).length }));
     // expected identities and counts come from the artifact's own data, never from this file
@@ -226,7 +226,7 @@ try {
       JSON.stringify({ listed: listed.map((row) => row.id), expected: expected.map((set) => `${set.setId}:${set.items}`) }));
     const limits = await page.evaluate(() => document.querySelector('[data-exam-older="N1"] .exam-older-limits')?.textContent || '');
     check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the room says what these sets lack (no listening, no timer)`, /no listening|聴解/u.test(limits), limits);
-    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: every older set is marked Unreviewed (answers not yet checked)`, listed.length > 0 && listed.every((row) => row.pending));
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: every older set is marked Made by AI (answers not yet checked)`, listed.length > 0 && listed.every((row) => row.pending));
     if (listed.length) {
       await doors.first().click();
       const started = await page.waitForSelector('#mock-next', { timeout: 15_000 }).then(() => true, () => false);

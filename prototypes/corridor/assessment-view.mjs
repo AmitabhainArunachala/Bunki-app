@@ -281,13 +281,15 @@ export function createAssessmentView(host) {
   };
   // 未確認 — one quiet chip where no person has reviewed the questions yet, its reason in the
   // tooltip (and, with withReason, beside it). The review label stays in the record, not on screen.
+  // the one honest note (contract §5), from the host; a bare fixture page draws the element without its words
+  const honest = (kind) => { if (host.note) return host.note(kind); const line = node('p', 'note'); line.dataset.kind = kind; return line; };
   const reviewMark = (label, withReason = false, className = 'exam-machine-label') => {
-    const mark = node('p', className);
-    const reason = tx('AIが作成・検証した問題です。まだ人は確認していません。', 'Written and checked by AI models; not yet reviewed by a person.');
-    const chip = node('span', 'status-chip', tx('未確認', 'Unreviewed'));
-    chip.title = reason; chip.setAttribute('aria-label', `${tx('未確認', 'Unreviewed')} — ${reason}`);
+    const mark = node('div', className);
+    const reason = tx('AIが書きました。まだ人の目は通っていません。', 'Written by AI. Not yet checked by a person.');
+    const chip = node('span', 'status-chip', tx('AI作成', 'Made by AI'));
+    chip.title = reason; chip.setAttribute('aria-label', `${tx('AI作成', 'Made by AI')} — ${reason}`);
     mark.append(chip);
-    if (withReason) mark.append(node('span', 'exam-review-reason', tx('人による確認の前', 'not yet reviewed by a person')));
+    if (withReason) mark.append(honest('ai'));
     mark.dataset.reviewLabel = label;
     return mark;
   };
@@ -474,10 +476,10 @@ export function createAssessmentView(host) {
       details.append(node('p', '', tx(
         `作成：${author}（AI）。検証：${verifiers.join('・')}。どのモデルも答えを見ずに全問を解き、全員が同じ答えを選んで不備を指摘しなかった問題だけを残しています。まだ人による確認はしていません。JLPT公式問題ではありません。`,
         `Written by ${author} (AI). Checked by ${verifiers.join(', ')}: each model solved every question without seeing the answer, and only questions where all of them chose the same answer and flagged no problem were kept. Not yet reviewed by a person. Not an official JLPT paper.`)));
-    } else details.append(node('p', '', reviewed
-      ? tx('複数の独立したAIモデルが解答と日本語を確認しています。JLPT公式問題ではありません。',
-        'The answers and Japanese have been checked by independent AI models. This is not an official JLPT paper.')
-      : tx('問題の確認が終わるまで、模試として公開しません。', 'This form will be available after question and audio review.')));
+    } else details.append(reviewed
+      ? node('p', '', tx('複数の独立したAIモデルが解答と日本語を確認しています。JLPT公式問題ではありません。',
+        'The answers and Japanese have been checked by independent AI models. This is not an official JLPT paper.'))
+      : honest('ai'));
     for (const sourceId of entry?.sourceIds || []) {
       const source = (catalog?.sources || []).find(row => row.id === sourceId);
       if (!source?.url || !/^https:\/\//u.test(source.url)) continue;
@@ -507,7 +509,7 @@ export function createAssessmentView(host) {
     if (allUnchecked) {
       const mark = node('p', 'exam-machine-label exam-older-mark'); mark.dataset.olderMark = '';
       const reason = tx('答えはまだ人が確認していません', 'answers not yet checked by a person');
-      const chip = node('span', 'status-chip', tx('未確認', 'Unreviewed')); chip.title = reason; chip.setAttribute('aria-label', `${tx('未確認', 'Unreviewed')} — ${reason}`);
+      const chip = node('span', 'status-chip', tx('AI作成', 'Made by AI')); chip.title = reason; chip.setAttribute('aria-label', `${tx('AI作成', 'Made by AI')} — ${reason}`);
       mark.append(chip, node('span', 'exam-review-reason', reason));
       block.append(mark);
     }
@@ -523,7 +525,7 @@ export function createAssessmentView(host) {
       const door = button(host.english() ? (set.title.en || set.title.ja) : set.title.ja, null, () => host.startOlder(set.setId), 'entry-row exam-older-set');
       door.dataset.legacySet = set.setId;
       door.append(node('span', 'exam-older-meta', tx(`${set.items}問`, `${set.items} questions`)));
-      if (!set.approved && !allUnchecked) door.append(node('span', 'status-chip', '未確認'));
+      if (!set.approved && !allUnchecked) door.append(node('span', 'status-chip', tx('AI作成', 'Made by AI')));
       door.disabled = !!host.olderSetLoading?.(set.setId);
       block.append(door);
       if (host.olderSetFailed?.(set.setId)) {
@@ -750,8 +752,8 @@ export function createAssessmentView(host) {
         '本番形式モードでは時間制限があり、辞書・ふりがな・訳・解説は表示しません。終了したパートには戻れません。',
         'Timed exam mode has no dictionary, furigana, translations or explanations. A finished section cannot be reopened.')));
       section.append(node('p', 'exam-bookmark-note', tx(
-        '不正解は「あとで見直す」を押さなくても自動保存し、ほかの練習でその語にまた出会えるようにします。「あとで見直す」は目印です。未確認の問題の結果は、仮のものとして区別します。',
-        'Wrong answers are saved automatically, even without a bookmark, so those words come back in your other practice. A bookmark is just your reminder. Results from Unreviewed questions are kept apart as provisional.')));
+        '不正解は「あとで見直す」を押さなくても自動保存し、ほかの練習でその語にまた出会えるようにします。「あとで見直す」は目印です。AI作成の問題の結果は、仮のものとして区別します。',
+        'Wrong answers are saved automatically, even without a bookmark, so those words come back in your other practice. A bookmark is just your reminder. Results from questions made by AI are kept apart as provisional.')));
       section.append(node('p', 'exam-download-note', host.pending()
         ? audio ? tx('問題と音声を保存しています…', 'Downloading questions and audio…') : tx('問題を保存しています…', 'Downloading questions…')
         : audio ? tx('始める前に問題と音声を保存します。保存が終わってから計時を始めます。', 'Questions and audio download before the timer starts.')
@@ -1367,7 +1369,7 @@ export function createAssessmentView(host) {
       const conditions = node('details', 'exam-conditions');
       conditions.append(node('summary', '', tx('受験時の状況', 'Test conditions')));
       conditions.append(node('p', '', attempt.mode === 'timed' ? tx('時間制限あり', 'Timed attempt') : tx('時間制限なし', 'Untimed practice')));
-      if (attempt.priorExposure === 'reported') conditions.append(node('p', '', tx('以前に見た問題を含みます。初回の結果とは分けて比べてください。', 'Includes previously seen questions. Compare separately from first attempts.')));
+      if (attempt.priorExposure === 'reported') conditions.append(honest('record'));
       if (attempt.priorExposure === 'unknown') conditions.append(node('p', '', tx('以前に同じ問題を見たかどうか：未記録', 'Previous exposure: not recorded')));
       if (attempt.conditions.some(value => value !== 'assisted')) conditions.append(node('p', '', tx('途中の中断などを含む結果です。', 'Includes interruptions or changes to test conditions.')));
       if (independence?.assisted) conditions.append(node('p', '', tx(`辞書・解説を使った問題：${independence.assisted}問`,
