@@ -7017,7 +7017,7 @@ function renderTranscriptImportForm(section, saved) {
   form.append(name, preview, summary, save, status); panel.append(form); section.append(panel); refresh(true);
 }
 function renderSourceReading(main) {
-  const back = el('button', 'chip', learningSourceVisit ? learningSourceBackLabel() : tx('← 持ち込んだ日本語へ', '← Source inbox')); back.type = 'button'; back.id = 'source-reader-back';
+  const back = el('button', 'chip', learningSourceVisit ? learningSourceBackLabel() : tx(`← ${ROOM_NAMES.rooms['source-inbox'][0]}へ`, `← ${ROOM_NAMES.rooms['source-inbox'][1]}`)); back.type = 'button'; back.id = 'source-reader-back';
   back.addEventListener('click', () => { void leaveSourceReading(); }); main.append(back);
   const saved = availableSourceCapture(S.sourceCaptureId);
   if (!saved) { main.append(el('p', 'intro', tx('この出典を開けなかった。一覧に戻る。', 'This source could not open. Return to the inbox.'))); return; }
@@ -11564,8 +11564,8 @@ function renderRecordSync() {
   const container = el('div', 'record-sync');
   container.id = 'record-sync';
   container.setAttribute('role', 'group');
-  container.setAttribute('aria-label', tx('記録の同期', 'Record sync'));
-  const label = el('p', 'eyebrow', tx('記録の同期', 'Record sync'));
+  container.setAttribute('aria-label', tx('端末の同期', 'Sync between devices'));
+  const label = el('p', 'eyebrow', tx('端末の同期', 'Sync between devices'));
   const status = el('p', 'airead-note record-sync-status');
   status.setAttribute('aria-live', 'polite');
   const scope = el('p', 'airead-note', tx(
@@ -13831,7 +13831,7 @@ function renderLessons(main) {
     face.append(el('div', 'review-front', word));
     if (backc.reading) face.append(el('div', 'review-reading', backc.reading));
     for (const m of backc.senses.slice(0, 3)) face.append(el('div', 'review-sense', m));
-    const door = biLabel('button', 'chip', 'ページへ', 'full entry');
+    const door = biLabel('button', 'chip', '全項目', 'Full entry');
     door.type = 'button';
     door.addEventListener('click', () => go({ t: run.kind || 'word', id: word }));
     face.append(door);
@@ -16004,8 +16004,8 @@ function renderKagami(main) {
         'p',
         'card-kind',
         tx(
-          'まだ何も映っていない。読んで、練習し、記録が増えるとここに映る。',
-          'Nothing is reflected yet. Read and practise; your learning record will appear here.',
+          'まだ何も映っていない。読んで、練習すると、ここに映る。',
+          'Nothing here yet. Read and practise, and what you learn shows up here.',
         ),
       ),
     );
@@ -16043,7 +16043,7 @@ function renderKagami(main) {
     head.append(document.createTextNode(tx(ja, en)));
     block.append(head);
     if (!band.evidence) {
-      block.append(el('p', 'kagami-thin', tx('まだ記録がない。', 'no evidence yet')));
+      block.append(el('p', 'kagami-thin', tx('まだない。', 'nothing yet')));
       main.append(block);
       continue;
     }
@@ -23604,7 +23604,7 @@ function renderReview(main) {
     });
     moreRow.append(rest2);
     if (rv.revealed && item.t !== 'question') {
-      const door = biLabel('button', 'chip', 'ページへ', 'full entry');
+      const door = biLabel('button', 'chip', '全項目', 'Full entry');
       door.type = 'button';
       door.addEventListener('click', () => item.t === 'question' ? openAssessmentQuestionReview(item) : item.t === 'sentence' ? openSentencePractice(item.id) : go(learningItemNode(item)));
       moreRow.append(door);
@@ -25296,7 +25296,7 @@ function renderFocusSitting(focus, n = '03') {
         S.focusEmpty === 'due'
           ? tx('いま待っている札がない。覚えるリストに足すか、漢字だけで始めよう。', 'No cards are waiting. Add some to your list, or start a kanji-only run.')
           : S.focusEmpty === 'yomi'
-            ? tx('探査できる熟語が見つからない。', 'No compounds left to probe.')
+            ? tx('試せる熟語が見つからない。', 'No compounds left to try.')
             : tx('漢字が見つからない。', 'No kanji to drill yet.'),
       ),
     );
@@ -25546,7 +25546,7 @@ function renderProbe(main) {
       for (const it of pr.missed) {
         const row = el('div', 'leech-row');
         row.append(el('span', 'w', `${it.w}（${it.r}）`));
-        const door = biLabel('button', 'chip', 'ページへ', 'full entry');
+        const door = biLabel('button', 'chip', '全項目', 'Full entry');
         door.type = 'button';
         door.addEventListener('click', () => go({ t: 'word', id: it.w }));
         row.append(door);
@@ -30136,7 +30136,7 @@ function trailLastPhrase(row) {
     return tx('ふりがなを出した', 'revealed the reading');
   }
   if (kind === 'drift') return g === 3 ? tx('水で「わかる」', 'flicked as known in the water') : tx('水で「まだ」', 'flicked as not yet in the water');
-  if (kind === 'probe') return g === 3 ? tx('読めた（試し読み）', 'read it right in the probe') : tx('読めなかった（試し読み）', 'missed it in the probe');
+  if (kind === 'probe') return g === 3 ? tx('読めた（読みの確認）', 'read it right in a reading check') : tx('読めなかった（読みの確認）', 'missed it in a reading check');
   if (kind === 'lesson') return g === 3 ? tx('レッスンで正解', 'answered right in a lesson') : tx('レッスンで不正解', 'answered wrong in a lesson');
   if (kind === 'reveal') return g === 1 ? tx('復習で「思い出した」', 'declared recall in review') : tx('復習で「まだ」', 'declared not-yet in review');
   if (kind === 'dojo') {

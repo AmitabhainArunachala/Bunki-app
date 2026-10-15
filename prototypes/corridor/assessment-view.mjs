@@ -1337,7 +1337,7 @@ export function createAssessmentView(host) {
     if (machineLabel) main.append(reviewMark(machineLabel, true));
     const official = officialOf(selected);
     if (official) main.append(officialBadge(official));
-    if (stopped) main.append(node('p', '', tx('回答を保存しました。中断した結果は弱点の判定に使いません。', 'Your answers are saved. A stopped test won’t be treated as evidence of weaknesses.')));
+    if (stopped) main.append(node('p', '', tx('回答を保存しました。中断した結果は弱点の判定に使いません。', 'Your answers are saved. A stopped test won’t count toward your weak spots.')));
     else {
       // an assisted answer was committed before its explanation opened; the headline says how many
       main.append(node('p', 'exam-score', tx(`${score.correct} / ${score.totalItems} 問正解`, `${score.correct} of ${score.totalItems} correct`) +

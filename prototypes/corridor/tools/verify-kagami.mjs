@@ -684,7 +684,7 @@ async function main() {
   check(
     'an empty ledger reflects nothing rather than guessing a level',
     bareState.bands === 0 &&
-      (/まだ何も映っていない/u.test(bareState.text) || /Nothing is reflected yet/iu.test(bareState.text)) &&
+      (/まだ何も映っていない/u.test(bareState.text) || /Nothing here yet\. Read and practise/iu.test(bareState.text)) &&
       !/N[1-5]\s*(です|だ)/u.test(bareState.text),
   );
   await empty.close();

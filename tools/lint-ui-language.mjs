@@ -274,8 +274,11 @@ export async function inspectChrome(page) {
             .map((c) => '.' + c)
             .join('');
     // the house voice (the one-hand pass, contract §5): no spec words on the chrome — a control, a heading, a label,
-    // a chip or an eyebrow that says one of these is a leak, in either script
-    const BANNED = /\\b(unreviewed|corpus|evidence|probe|assisted|source inbox|test release|response record|authored draft|draft material|practice record)\\b|未確認|探査|助けありと記録/iu;
+    // a chip or an eyebrow that says one of these is a leak, in either script. The brief's list: unreviewed · corpus ·
+    // evidence · record · probe · draft · assisted · source inbox · test release · response record. (One backslash:
+    // this regex lives in the page function, not in a template string — `\\b` matched a literal backslash and let
+    // every English word through; the negative control caught it.)
+    const BANNED = /\b(unreviewed|corpus|evidence|records?|probes?|drafts?|assisted|source inbox|test release|response record)\b|未確認|探査|助けありと記録/iu;
     const issues = [],
       inspected = [];
     const chromeText =
