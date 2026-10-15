@@ -1788,12 +1788,17 @@ function lightWord(node) {
 }
 function tapped(unit, node, { card, where, depth }) {
   const frame = frameOf(unit);
-  logTap(card, where, frame, depth);
   lightWord(node);
-  if (!ctx.host) { openPop(frame, node); return; }
+  if (!ctx.host) {
+    logTap(card, where, frame, depth);
+    openPop(frame, node);
+    return;
+  }
   // the app's one slip beside the word (the one-hand pass, contract §1): the host draws it, and the next tap on
   // the same word dives into the full entry; the word's reading stays lit until the slip, or that entry, goes
   const opened = safely(() => ctx.host.openSlip?.(frame, node, { english: ctx.prefs.gloss === 'show', onClose: (reason) => { if (reason !== 'dive') lightWord(null); } }), false);
+  // the ledger keeps how deep each tap went: the slip at the tap's own depth, the full entry one deeper
+  logTap(card, where, frame, opened === 'dived' ? depth + 1 : depth);
   if (!opened) lightWord(null);
 }
 
