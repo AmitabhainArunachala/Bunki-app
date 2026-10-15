@@ -942,11 +942,20 @@ for (let staging = 1; staging <= 3; staging++) {
   }
   const semanticRevealOne = await semanticMember('残酷');
   const semanticAfterOne = await page.evaluate(world);
+  // one slip everywhere (the one-hand pass): the first tap unfolds the member and opens the app's slip beside it;
+  // the sky's own gloss rung stands aside for the slip, and the same member again opens the full entry
+  const slipOne = await page.evaluate(`(() => { const m = document.getElementById('mini'); return m ? { from: m.dataset.from, word: m.querySelector('.mini-word')?.textContent, gloss: m.querySelector('.mini-gloss')?.textContent || '' } : null; })()`);
   const semanticSecondAim = await aimSemantic('残酷');
   let tapTwo = { attempted: false, delivered: false, reason: 'not attempted' };
   if (semanticSecondAim?.hitSelf) {
     tapTwo = await touchMember('残酷');
     await page.waitForTimeout(500);
+  }
+  const entryTwo = await page.evaluate(`({ sheet: !!document.getElementById('sheet'), names: !!document.getElementById('sheet')?.innerText.includes('残酷'), mini: !!document.getElementById('mini') })`);
+  if (entryTwo.sheet) {
+    await page.locator('#sheet-back').click();
+    await page.locator('#sheet').waitFor({ state: 'detached', timeout: 5000 });
+    await page.waitForTimeout(400);
   }
   const semanticRevealTwo = await semanticMember('残酷');
   const semanticAfterTwo = await page.evaluate(world);
@@ -955,19 +964,21 @@ for (let staging = 1; staging <= 3; staging++) {
     semanticTarget.reading !== '' &&
     semanticBefore.ctr === '過酷' && semanticAfterOne.ctr === '過酷' && semanticAfterTwo.ctr === '過酷' &&
     semanticRevealOne?.unfolded === true && semanticRevealOne.glossed === false &&
-    semanticRevealTwo?.unfolded === true && semanticRevealTwo.glossed === true;
+    slipOne?.from === 'drift' && slipOne.word === '残酷' && slipOne.gloss !== '' &&
+    entryTwo.sheet && entryTwo.names && !entryTwo.mini &&
+    semanticRevealTwo?.unfolded === false && semanticRevealTwo.glossed === false;
   semanticFinal = {
     ok,
     detail:
       `DOM=${semanticTarget?.dom ?? false}, hitSelf=${semanticTarget?.hitSelf ?? false}; ` +
-      `stage1=${semanticRevealOne?.unfolded ?? false}/${semanticRevealOne?.glossed ?? false}, ` +
-      `stage2=${semanticRevealTwo?.unfolded ?? false}/${semanticRevealTwo?.glossed ?? false}; ` +
+      `stage1=${semanticRevealOne?.unfolded ?? false}/${semanticRevealOne?.glossed ?? false} slip=${JSON.stringify(slipOne)}, ` +
+      `stage2=entry ${entryTwo.sheet}/${entryTwo.names} slip=${entryTwo.mini}, after=${semanticRevealTwo?.unfolded ?? false}/${semanticRevealTwo?.glossed ?? false}; ` +
       `centre "${semanticBefore.ctr}" → "${semanticAfterOne.ctr}" → "${semanticAfterTwo.ctr}"` +
       `; staging ${staging}/3 (tap1 ${tapOne.reason}; tap2 ${tapTwo.reason})`,
   };
   if (ok || !(missed(tapOne) || missed(tapTwo))) break;
 }
-check('hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction',
+check('hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction (its first tap unfolds it with the slip; the same member again opens the full entry)',
   semanticFinal.ok, semanticFinal.detail);
 
 // Start the lock afresh so the old canvas failure cannot mask the kana-only
@@ -983,6 +994,7 @@ for (let staging = 1; staging <= 3; staging++) {
     await page.waitForTimeout(500);
   }
   const kanaAnswered = await semanticMember('きつい');
+  const kanaSlip = await page.evaluate(`(() => { const m = document.getElementById('mini'); return m ? { from: m.dataset.from, word: m.querySelector('.mini-word')?.textContent, gloss: m.querySelector('.mini-gloss')?.textContent || '' } : null; })()`);
   const kanaCentreAfterAnswer = await page.evaluate(world);
   const kanaForLock = await aimSemantic('きつい');
   let kanaPress = { attempted: false, delivered: false, reason: 'not attempted' };
@@ -1000,14 +1012,14 @@ for (let staging = 1; staging <= 3; staging++) {
   // none at all. No strangers, honest emptiness.
   const ok =
     kanaTarget?.dom === true && kanaTarget.hitSelf === true && kanaTarget.reading === '' &&
-    kanaAnswered?.unfolded === true && kanaAnswered.glossed === true &&
+    kanaAnswered?.unfolded === true && kanaSlip?.from === 'drift' && kanaSlip.word === 'きつい' && kanaSlip.gloss !== '' &&
     kanaCentreAfterAnswer.ctr === '厳しい' && kanaFallback.ctr === 'きつい' &&
     kanaFallback.members.length === kanaFallback.sats;
   kanaFinal = {
     ok,
     detail:
       `DOM=${kanaTarget?.dom ?? false}, hitSelf=${kanaTarget?.hitSelf ?? false}, hit=${JSON.stringify(kanaTarget?.hitLabel ?? null)}, ` +
-      `reading=${JSON.stringify(kanaTarget?.reading ?? null)}, first=${kanaAnswered?.unfolded ?? false}/${kanaAnswered?.glossed ?? false}; ` +
+      `reading=${JSON.stringify(kanaTarget?.reading ?? null)}, first=${kanaAnswered?.unfolded ?? false} slip=${JSON.stringify(kanaSlip)}; ` +
       `centre="${kanaCentreAfterAnswer.ctr}"→"${kanaFallback.ctr}", DOM sats=${kanaFallback.sats}, ` +
       `members=${kanaFallback.members.join('・')}` +
       `; staging ${staging}/3 (tap ${kanaTap.reason}; press ${kanaPress.reason})`,

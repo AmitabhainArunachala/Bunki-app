@@ -334,27 +334,43 @@ async function journey(browser, browserName, viewport) {
     const doors = page.locator('.guided-room .gs-word[data-word="word_62"]');
     check('J6 teaching words are doors', (await page.locator('.guided-room .gs-word').count()) > 3);
     const occurrence = (await doors.count()) - 1;
+    // one slip everywhere (the one-hand pass): a word door opens the app's slip beside it, from the session,
+    // with the word, its reading and its meaning; the same word again opens the full entry; closing that
+    // returns the explanation with the bare word, the room never having left its stage
+    await doors.nth(occurrence).evaluate((n) => n.scrollIntoView({ block: 'center' }));
     await doors.nth(occurrence).click();
+    await page.locator('#mini[data-from="guided"]').waitFor({ timeout: 5_000 });
+    const slip = await page.evaluate(() => {
+      const m = document.getElementById('mini');
+      return {
+        word: m.querySelector('.mini-word')?.textContent, reading: m.querySelector('.mini-reading')?.textContent,
+        gloss: m.querySelector('.mini-gloss')?.textContent, door: m.querySelector('.mini-word')?.getAttribute('aria-label'),
+        save: m.querySelector('#mini-take')?.textContent, stage: document.querySelector('.guided-room')?.dataset.stage,
+      };
+    });
     check(
-      'J7 a word door opens the word with its reading',
-      (await page.locator('.guided-room h1').innerText()).includes('せんもんか'),
+      'J7 a word door opens the slip with the word, its reading and its meaning, Save, and the band into the entry; the room stays on the explanation',
+      slip.word === '専門家' && slip.reading === 'せんもんか' && !!slip.gloss && slip.door === 'Open the full entry' && /^(保存|Save)$/u.test(slip.save || '') && slip.stage === 'insight',
+      JSON.stringify(slip),
     );
     await shot(page, dir, '07-word');
-    await act(page, 'entry').click();
+    await doors.nth(occurrence).click();
     await page.locator('#sheet').waitFor({ timeout: 10_000 });
     check(
-      'J7b the word opens its full dictionary entry over the room',
-      (await page.locator('#sheet').innerText()).includes('専門家'),
+      'J7b the same word again opens its full dictionary entry over the room, the slip gone',
+      (await page.locator('#sheet').innerText()).includes('専門家') && (await page.locator('#mini').count()) === 0,
     );
     await page.locator('#sheet-back').click();
     await page.locator('#sheet').waitFor({ state: 'detached', timeout: 5_000 });
     check(
-      'J7c closing the entry returns to the word, in place',
-      (await room(page).getAttribute('data-stage')) === 'word',
+      'J7c closing the entry returns the explanation with the bare word (no slip), the room on its stage',
+      (await room(page).getAttribute('data-stage')) === 'insight' && (await page.locator('#mini').count()) === 0,
     );
     const trayBefore = await page.locator('#tray').innerText();
     const answersBeforeSave = JSON.stringify((await stored(page)).answers);
-    await act(page, 'save-word').click();
+    await doors.nth(occurrence).click();
+    await page.locator('#mini[data-from="guided"] #mini-take').waitFor({ timeout: 5_000 });
+    await page.locator('#mini #mini-take').click();
     if (MOMENTS) {
       await page.locator('.bunki-moment').waitFor({ timeout: 5_000 });
       check(
@@ -375,9 +391,12 @@ async function journey(browser, browserName, viewport) {
       );
       await shot(page, dir, '08-saved');
     }
+    await page.waitForFunction(() => document.getElementById('mini-take')?.getAttribute('aria-pressed') === 'true');
     check(
-      'M11 saving keeps keyboard focus in the room',
-      (await activeAction(page)) === 'close-word',
+      'M11 saving keeps the keyboard on the slip’s Save, which now reads Saved ✓ and rests',
+      await page.evaluate(() => document.activeElement?.id === 'mini-take' || document.activeElement === document.getElementById('mini')) &&
+        /^(保存済み ✓|Saved ✓)$/u.test(await page.locator('#mini-take').innerText()) && (await page.locator('#mini-take').isDisabled()),
+      await activeAction(page),
     );
     const afterSave = await stored(page);
     check(
@@ -402,9 +421,11 @@ async function journey(browser, browserName, viewport) {
       (await dueKeys(page)).includes('word:専門家'),
     );
     if (MOMENTS) await page.locator('.bunki-moment').waitFor({ state: 'detached', timeout: 5_000 });
-    await act(page, 'close-word').click();
+    await page.locator('#mini').focus();
+    await page.keyboard.press('Escape');
+    await page.locator('#mini').waitFor({ state: 'detached', timeout: 5_000 });
     check(
-      'J8 closing the word returns focus to the exact occurrence',
+      'J8 Escape on the slip returns focus to the exact occurrence of the word',
       await page.evaluate(
         (n) =>
           document.activeElement ===
@@ -425,8 +446,12 @@ async function journey(browser, browserName, viewport) {
     // a card added outside the room, through the app's own dictionary sheet (its 覚える), is
     // read back by the room like any other real row
     await act(page, 'explain').click();
-    await page.locator('.guided-room .gs-word[data-word="word_58"]').first().click();
-    await act(page, 'entry').click();
+    const door58 = page.locator('.guided-room .gs-word[data-word="word_58"]').first();
+    await door58.evaluate((n) => n.scrollIntoView({ block: 'center' }));
+    await door58.click();
+    await page.locator('#mini[data-from="guided"]').waitFor({ timeout: 5_000 });
+    await door58.click();
+    await page.locator('#sheet').waitFor({ timeout: 10_000 });
     await page.locator('#sheet #take').click();
     await page.waitForFunction(
       () => document.querySelector('#sheet #take')?.getAttribute('aria-pressed') === 'true',
@@ -437,14 +462,16 @@ async function journey(browser, browserName, viewport) {
     );
     await page.locator('#sheet-back').click();
     await page.locator('#sheet').waitFor({ state: 'detached', timeout: 5_000 });
+    await door58.click();
+    await page.locator('#mini[data-from="guided"] #mini-take').waitFor({ timeout: 5_000 });
     check(
-      'S0b the room’s word door reads that card as already in the deck',
-      (await page.locator('.guided-room [data-action="save-word"]').isDisabled()) &&
-        (await page
-          .locator('.guided-room .gs-deck-line .gs-card[data-card="word:支障"]')
-          .count()) === 1,
+      'S0b the word’s slip reads that card as already saved: Saved ✓, at rest',
+      (await page.locator('#mini #mini-take').isDisabled()) &&
+        /^(保存済み ✓|Saved ✓)$/u.test(await page.locator('#mini #mini-take').innerText()),
     );
-    await act(page, 'close-word').click();
+    await page.locator('#mini').focus();
+    await page.keyboard.press('Escape');
+    await page.locator('#mini').waitFor({ state: 'detached', timeout: 5_000 });
     await act(page, 'next').click();
 
     // J · Q3: explanation first, a grammar branch, back to the same place
@@ -969,8 +996,11 @@ async function switches(browser, browserName) {
       (await reduced.locator('.samurai-effect').count()) === 0,
     );
     await act(reduced, 'explain').click();
-    await reduced.locator('.guided-room .gs-word').first().click();
-    await act(reduced, 'save-word').click();
+    const reducedDoor = reduced.locator('.guided-room .gs-word[data-word="word_62"]').last();
+    await reducedDoor.evaluate((n) => n.scrollIntoView({ block: 'center' }));
+    await reducedDoor.click();
+    await reduced.locator('#mini[data-from="guided"] #mini-take').waitFor({ timeout: 5_000 });
+    await reduced.locator('#mini #mini-take').click();
     await reduced.locator('.bunki-moment').waitFor();
     check(
       'M37 under reduced motion the crane stays still: only the line',

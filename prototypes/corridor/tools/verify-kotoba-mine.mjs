@@ -1065,11 +1065,12 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
         const c = n.cloneNode(true); c.querySelectorAll('rt, rp').forEach((r) => r.remove());
         if (c.textContent === ${JSON.stringify(pick.s)}) { n.dataset.verifyPick = '1'; return; } } })()`);
       await page.locator('#kp-card [data-verify-pick]').first().click();
-      await page.waitForSelector('#kp-sheet');
-      sheet = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); return { term: s.querySelector('.kp-sheet-term')?.textContent, def: s.querySelector('.kp-sheet-def')?.textContent || '', none: s.querySelector('.kp-sheet-none')?.textContent || '', take: !!s.querySelector('#kp-take'), inDeck: !!s.querySelector('.kp-sheet-indeck') }; })()`);
+      // one slip everywhere (the one-hand pass): the app's slip, from the deck, carries the deck's own Japanese sense
+      await page.waitForSelector('#mini[data-from="deck"]');
+      sheet = await page.evaluate(`(() => { const s = document.getElementById('mini'); const gloss = s.querySelector('.mini-gloss'); return { term: s.querySelector('.mini-word')?.textContent, def: gloss?.lang === 'ja' ? gloss.textContent : '', none: gloss?.lang === 'ja' ? '' : gloss?.textContent || '', take: !!s.querySelector('#mini-take'), inDeck: !!s.querySelector('.mini-note') }; })()`);
     }
     check(
-      `${label}: tapping a word that is not the deck’s own (${pick?.s ?? 'none found'}) shows its Japanese sense from gloss_ja.json in the entry sheet, not 「まだ辞書にありません」`,
+      `${label}: tapping a word that is not the deck’s own (${pick?.s ?? 'none found'}) shows its Japanese sense from gloss_ja.json in the slip, not the dictionary’s miss line`,
       !!pick && !!sense && sheet?.def === sense && !sheet.none && !sheet.inDeck,
       JSON.stringify({ pick, sense, sheet }),
     );
@@ -1184,33 +1185,34 @@ async function verifyTap(browser, base) {
     const tok = page.locator('#kp-card .kp-sentence .kp-tok:not(.kp-target):not([data-deck-word])').first();
     const tokText = await tok.evaluate((n) => { const c = n.cloneNode(true); c.querySelectorAll('rt').forEach((r) => r.remove()); return c.textContent; });
     await tok.click();
-    await page.waitForSelector('#kp-sheet');
+    // one slip everywhere (the one-hand pass): the app's slip opens beside the word, from the deck
+    await page.waitForSelector('#mini[data-from="deck"]');
     await page.waitForTimeout(250);
-    const sheet = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); const en = s.querySelector('.kp-sheet-en'); return { depth: s.dataset.depth, key: s.dataset.key, term: s.querySelector('.kp-sheet-term')?.textContent, reading: s.querySelector('.kp-sheet-reading')?.textContent || '', ja: (s.querySelector('.kp-sheet-def') || s.querySelector('.kp-sheet-none'))?.textContent, enOpen: en?.open, enText: en?.querySelector('[lang="en"]')?.textContent || '', take: !!s.querySelector('#kp-take'), inDeck: !!s.querySelector('.kp-sheet-indeck'), modal: s.getAttribute('aria-modal'), focus: document.activeElement?.id }; })()`);
+    const sheet = await page.evaluate(`(() => { const s = document.getElementById('mini'); const gloss = s.querySelector('.mini-gloss'); const word = s.querySelector('.mini-word'); return { key: s.dataset.key, term: word?.textContent, reading: s.querySelector('.mini-reading')?.textContent || '', ja: gloss?.textContent || '', jaLang: gloss?.lang || '', en2: !!s.querySelector('.mini-gloss-2'), door: word?.dataset.action === 'entry.open' && word.getAttribute('aria-label') === 'Open the full entry', take: !!s.querySelector('#mini-take'), inDeck: !!s.querySelector('.mini-note'), role: s.getAttribute('role'), modal: s.getAttribute('aria-modal'), focusLit: !!document.activeElement?.classList.contains('kp-lit'), kanji: s.querySelectorAll('.mini-kanji-row[data-kanji]').length }; })()`);
     const ledger1 = await page.evaluate(LOOKUPS_OF(KEY));
     check(
-      `tap: a word of the passage (${tokText}) opens the entry sheet through the host — its reading, the Japanese sense (or a line that says the dictionary has none), English behind 英語 (closed), 覚える`,
-      sheet.depth === '1' && /^(word|kanji|grammar):/.test(sheet.key) && !!sheet.term && !!sheet.ja && sheet.enOpen === false && !!sheet.enText && sheet.take && !sheet.inDeck && sheet.modal === 'true' && sheet.focus === 'kp-sheet-term',
+      `tap: a word of the passage (${tokText}) opens the slip through the host — its reading, the Japanese sense (or the slip's miss line), no English line under the deck's default (the band is the door into the full entry, where English lives), Save, its kanji band; a dialog that is not modal, the lit word keeping the keyboard`,
+      /^(word|kanji|grammar):/.test(sheet.key) && !!sheet.term && !!sheet.ja && sheet.jaLang === 'ja' && !sheet.en2 && sheet.door && sheet.take && !sheet.inDeck && sheet.role === 'dialog' && sheet.modal === null && sheet.focusLit && sheet.kanji >= 1,
       JSON.stringify(sheet),
     );
-    await page.click('#kp-take');
+    await page.click('#mini-take');
     const id = sheet.key.replace(/^\w+:/, '');
     await waitForAppRecord(page, (r) => r.taken.some((t) => `${t.t}:${t.id}` === sheet.key), { description: 'one-tap deck capture' });
-    await page.waitForSelector('#kp-sheet #kp-take.taken[aria-pressed="true"]');
-    // Save ▾ (1.3.0): the press that saves opens the word's menu over the deck sheet (lists · copy · remove from review)
-    await page.waitForSelector('#vocabulary-list-popover.is-save-menu', { timeout: 5000 });
-    const saved = await page.evaluate(`({ chooser: document.querySelectorAll('#kp-chooser, .kp-chooser, #kp-take-save, #kp-new-list, #kp-take-list').length, label: document.getElementById('kp-take')?.textContent || '', expanded: document.getElementById('kp-take')?.getAttribute('aria-expanded'), menu: [...document.querySelectorAll('#vocabulary-list-popover .vocabulary-list-action')].map((n) => n.id), sheet: document.getElementById('kp-sheet')?.dataset.key })`);
+    await page.waitForSelector('#mini #mini-take.taken[aria-pressed="true"]');
+    // Save ▾: the press that saves unfolds the word's menu inside the slip (review · lists · + New list · copy)
+    await page.waitForSelector('#mini #vocabulary-list-popover.is-save-menu.is-inline', { timeout: 5000 });
+    const saved = await page.evaluate(`({ chooser: document.querySelectorAll('#kp-chooser, .kp-chooser, #kp-take-save, #kp-new-list, #kp-take-list, #kp-take').length, label: document.getElementById('mini-take')?.textContent || '', expanded: document.getElementById('mini-take')?.getAttribute('aria-expanded'), menu: [...document.querySelectorAll('#vocabulary-list-popover .vocabulary-list-action')].map((n) => n.id), review: document.getElementById('mini-review')?.checked, sheet: document.getElementById('mini')?.dataset.key })`);
     const after = { sched: await page.evaluate(SCHEDULE_OF(KEY)), env: await env(page) };
     check(
-      'tap: Save is one tap through the corridor’s save path (A51) — no chooser appears; the word is in the shared review pool (覚えるの札) at once, still one row; the button reads 保存済み ✓ · Saved ✓ and its menu (lists, copy, remove from review) opens over the deck sheet',
-      saved.chooser === 0 && after.env.taken.filter((k) => k === sheet.key).length === 1 && after.env.taken.length === before.env.taken.length + 1 && /^(保存済み ✓|Saved ✓)$/.test(saved.label) && saved.expanded === 'true' && saved.menu.includes('kp-take-copy') && saved.menu.includes('kp-take-unsave') && saved.sheet === sheet.key,
+      'tap: Save is one tap through the corridor’s save path (A51) — no chooser appears; the word is in the shared review pool (覚えるの札) at once, still one row; the button reads 保存済み ✓ · Saved ✓ and its menu (review · + New list · copy) unfolds inside the slip, which stays on the same word',
+      saved.chooser === 0 && after.env.taken.filter((k) => k === sheet.key).length === 1 && after.env.taken.length === before.env.taken.length + 1 && /^(保存済み ✓|Saved ✓)$/.test(saved.label) && saved.expanded === 'true' && saved.menu.includes('vocabulary-list-new') && saved.menu.includes('mini-copy') && saved.review === true && saved.sheet === sheet.key,
       JSON.stringify({ ...saved, taken: after.env.taken }),
     );
-    // the menu is the corridor's own list popover, over the deck sheet: a list written here is the same guarded commit
-    const pop = await page.evaluate(`(() => { const p = document.getElementById('vocabulary-list-popover'); const r = p.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + Math.min(20, r.height / 2); const top = document.elementFromPoint(x, y); return { title: p.querySelector('.vocabulary-list-title')?.textContent || '', onTop: !!top && p.contains(top), inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; })()`);
+    // the menu is the corridor's own list popover, inside the slip under its button: a list written here is the same guarded commit
+    const pop = await page.evaluate(`(() => { const p = document.getElementById('vocabulary-list-popover'); const m = document.getElementById('mini'); const r = p.getBoundingClientRect(); const mr = m.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + Math.min(20, r.height / 2); const top = document.elementFromPoint(x, y); return { title: p.querySelector('.vocabulary-list-title')?.textContent || '', onTop: !!top && p.contains(top), inside: r.left >= mr.left - 0.5 && r.right <= mr.right + 0.5 && r.top >= mr.top - 0.5 && r.bottom <= mr.bottom + 0.5 && r.top >= document.getElementById('mini-take').getBoundingClientRect().bottom - 0.5, inSlip: m.contains(p) }; })()`);
     check(
-      'tap: Save ▾’s menu is the corridor’s own list popover (リスト · Lists) for the saved word, on top of the deck sheet and inside the screen',
-      ['リスト', 'Lists'].includes(pop.title) && pop.onTop && pop.inside,
+      'tap: Save ▾’s menu is the corridor’s own list popover (リスト · Lists) for the saved word, inside the slip under its Save button and covering no other control',
+      ['リスト', 'Lists'].includes(pop.title) && pop.onTop && pop.inside && pop.inSlip,
       JSON.stringify(pop),
     );
     await page.keyboard.press('Escape');
@@ -1220,12 +1222,13 @@ async function verifyTap(browser, base) {
       before.sched === after.sched && after.env.obs === before.env.obs && after.env.srs === before.env.srs && ledger1.length === 1 && ledger1[0][1] === front.card && ledger1[0][2] === 'p' && ledger1[0][4] === sheet.key && ledger1[0][5] === 1,
       JSON.stringify({ same: before.sched === after.sched, obs: [before.env.obs, after.env.obs], lookups: ledger1 }),
     );
-    // keys behind an open sheet do not grade; Escape closes it and gives focus back
+    // keys behind an open slip do not grade; Escape closes it on the same card, and the word is bare again
     await page.keyboard.press('3');
     const graded = (await page.evaluate(SCHEDULE_OF(KEY))) !== before.sched;
     await page.keyboard.press('Escape');
-    const closed = await page.evaluate(`({ sheet: !!document.getElementById('kp-sheet'), card: document.getElementById('kp-card')?.dataset.card })`);
-    check('tap: with the sheet open the grade keys do nothing; Escape closes it on the same card', !graded && !closed.sheet && closed.card === front.card, JSON.stringify({ graded, ...closed }));
+    await page.waitForFunction(() => !document.getElementById('mini'), null, { timeout: 5000 }).catch(() => {});
+    const closed = await page.evaluate(`({ sheet: !!document.getElementById('mini'), lit: !!document.querySelector('#kp-card .kp-lit'), card: document.getElementById('kp-card')?.dataset.card })`);
+    check('tap: with the slip open the grade keys do nothing; Escape closes it on the same card and the word is bare', !graded && !closed.sheet && !closed.lit && closed.card === front.card, JSON.stringify({ graded, ...closed }));
     if (o.errors.length) check('no page errors with the tap', false, o.errors.slice(0, 2).join(' | '));
   } finally {
     await o.context.close();
@@ -1238,40 +1241,41 @@ async function verifyTap(browser, base) {
     await page.waitForSelector('#kp-card .kp-sentence .kp-tok');
     const sched = await page.evaluate(SCHEDULE_OF(KEY));
     await page.click('#kp-card .kp-sentence .kp-target.kp-tok');
-    await page.waitForSelector('#kp-sheet');
-    const self = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); return { key: s.dataset.key, term: s.querySelector('.kp-sheet-term')?.textContent, indeck: s.querySelector('.kp-sheet-indeck')?.textContent, take: s.querySelectorAll('#kp-take, #kp-chooser, .kp-take').length, full: !!s.querySelector('#kp-sheet-full'), defToks: [...s.querySelectorAll('.kp-sheet-def .kp-tok')].map((n) => n.textContent), stop: !!s.querySelector('.kp-sheet-stop') }; })()`);
+    await page.waitForSelector('#mini[data-from="deck"]');
+    const self = await page.evaluate(`(() => { const s = document.getElementById('mini'); const gloss = s.querySelector('.mini-gloss'); const word = s.querySelector('.mini-word'); return { key: s.dataset.key, term: word?.textContent, indeck: s.querySelector('.mini-note')?.textContent, take: s.querySelectorAll('#mini-take, #kp-take, #kp-chooser, .kp-take').length, door: word?.dataset.action === 'entry.open' && word.getAttribute('aria-label') === 'Open the full entry', ja: gloss?.lang === 'ja' ? gloss.textContent : '', toks: s.querySelectorAll('.kp-tok, [data-depth]').length }; })()`);
     check(
-      'tap: the card’s own word (a word enrolled in this deck) shows 「このデッキにあります」 and no 覚える',
-      self.key === 'deck:km-109' && self.term === '金利' && self.indeck === 'Already in this deck' && self.take === 0 && !self.full && !self.stop && self.defToks.includes('利息'),
+      'tap: the card’s own word (a word enrolled in this deck) shows its Japanese sense, 「Already in this deck」 in Save’s place and no Save; its band is the door into the dictionary’s entry; the slip holds no deeper chain of taps',
+      self.key === 'deck:km-109' && self.term === '金利' && self.indeck === 'Already in this deck' && self.take === 0 && self.door && self.ja.includes('利息') && self.toks === 0,
       JSON.stringify(self),
     );
-    await page.click('#kp-sheet .kp-sheet-def .kp-tok[data-deck-word="km-113"]');
-    await page.waitForSelector('#kp-sheet[data-depth="2"]');
-    const deep = await page.evaluate(`(() => { const s = document.getElementById('kp-sheet'); return { key: s.dataset.key, term: s.querySelector('.kp-sheet-term')?.textContent, stop: s.querySelector('.kp-sheet-stop')?.textContent, toks: s.querySelectorAll('.kp-tok').length, def: s.querySelector('.kp-sheet-def')?.textContent, indeck: !!s.querySelector('.kp-sheet-indeck'), back: !!s.querySelector('#kp-sheet-back') }; })()`);
+    // the same word again: the dictionary's full entry over the card (the slip goes); closing it returns the bare word
+    await page.click('#kp-card .kp-sentence .kp-target.kp-tok');
+    await page.waitForSelector('#sheet');
+    const entry = await page.evaluate(`({ mini: !!document.getElementById('mini'), names: document.getElementById('sheet')?.innerText.includes('金利') })`);
+    await page.click('#sheet-back');
+    await page.waitForFunction(() => !document.getElementById('sheet'), null, { timeout: 5000 });
+    const bare = await page.evaluate(`({ mini: !!document.getElementById('mini'), lit: !!document.querySelector('#kp-card .kp-lit'), card: document.getElementById('kp-card')?.dataset.card })`);
     check(
-      'tap: a word in the sheet’s definition opens one more sheet (depth 2: 利息, also this deck’s), which says 「ここで止めよう」 and has nothing left to tap; ← goes back',
-      deep.term === '利息' && deep.stop === 'Pause here' && deep.toks === 0 && !!deep.def && deep.indeck && deep.back,
-      JSON.stringify(deep),
+      'tap: the same word again opens its full dictionary entry (the slip goes with it); closing the entry returns the bare word on the same card — no slip, not lit',
+      entry.names && !entry.mini && !bare.mini && !bare.lit && bare.card === 'km-109-m01',
+      JSON.stringify({ entry, bare }),
     );
-    await page.click('#kp-sheet-back');
-    await page.waitForSelector('#kp-sheet[data-depth="1"]');
-    await page.click('#kp-sheet-close');
-    // a word of the card's definition (お金) opens its sheet too
+    // a word of the card's definition (お金) opens its slip too
     await page.click('#kp-card .kp-def .kp-tok >> nth=0');
-    await page.waitForSelector('#kp-sheet');
-    const fromDef = await page.evaluate(`document.getElementById('kp-sheet').dataset.key`);
+    await page.waitForSelector('#mini[data-from="deck"]');
+    const fromDef = await page.evaluate(`document.getElementById('mini').dataset.key`);
     const lookups = await page.evaluate(LOOKUPS_OF(KEY));
     const same = (await page.evaluate(SCHEDULE_OF(KEY))) === sched;
     check(
-      'tap: lookups[] keeps where and how deep each tap was (passage target, sheet definition at depth 2, card definition) and the schedule is unchanged',
-      same && lookups.map((r) => `${r[2]}${r[5]}`).join(',') === 'p1,s2,d1' && lookups[0][4] === 'deck:km-109' && lookups[1][4] === 'deck:km-113' && lookups[2][4] === fromDef,
+      'tap: lookups[] keeps where and how deep each tap was (passage target: the slip at 1, the same word again: its entry at 2; card definition at 1) and the schedule is unchanged',
+      same && lookups.map((r) => `${r[2]}${r[5]}`).join(',') === 'p1,p2,d1' && lookups[0][4] === 'deck:km-109' && lookups[1][4] === 'deck:km-109' && lookups[2][4] === fromDef,
       JSON.stringify({ same, lookups }),
     );
     await page.keyboard.press('Escape');
     await page.click('#kp-grade-good');
     const graded = await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mcd'))`);
     check('tap: the card still grades as before, and its lookups stay in the ledger beside the answer', graded.log.length === 1 && graded.lookups.length === 3, JSON.stringify({ log: graded.log.length, lookups: graded.lookups.length }));
-    if (o.errors.length) check('no page errors in the sheet recursion', false, o.errors.slice(0, 2).join(' | '));
+    if (o.errors.length) check('no page errors in the slip and entry cycle', false, o.errors.slice(0, 2).join(' | '));
   } finally {
     await o.context.close();
   }
@@ -1325,7 +1329,7 @@ async function verifyTap(browser, base) {
     release.server.close();
   }
   const html = ['study.html', 'study-mcd.html'].map((f) => readFileSync(resolve(REPO_DIR, 'decks/kotoba-mine/release', f), 'utf8'));
-  check('tap: the study pages carry the gloss map of their own deck (bunki-cloze-gloss) and still no tokens', html.every((t) => t.includes('"format":"bunki-cloze-gloss"') && !t.includes('bunki-cloze-tokens","version') && t.includes('function drawPop') && t.includes('ここで止めよう')), '');
+  check('tap: the study pages carry the gloss map of their own deck (bunki-cloze-gloss), still no tokens, their popover and no entry-sheet builder', html.every((t) => t.includes('"format":"bunki-cloze-gloss"') && !t.includes('bunki-cloze-tokens","version') && t.includes('function drawPop') && !t.includes('function drawSheet') && !t.includes('kp-sheet')), '');
   // 3. Anki: no tap-to-define, nothing added
   const anki = ['anki/front.html', 'anki/back.html', 'anki-sentence/front.html', 'anki-sentence/back.html'].map((f) => resolve(REPO_DIR, 'decks/kotoba-mine/tools', f)).filter(existsSync).map((f) => readFileSync(f, 'utf8'));
   check('tap: the Anki templates add nothing for it (no tap-to-define in Anki: furigana only, STANDARD A44)', anki.length >= 2 && anki.every((t) => !/kp-tok|kp-sheet|kp-pop|tap-to-define|onclick/.test(t)), `${anki.length} templates`);

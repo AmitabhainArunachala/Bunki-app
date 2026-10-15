@@ -95,10 +95,12 @@ try {
       await page.locator('#kp-card .kp-tok').first().waitFor();
       await page.evaluate(() => window.scrollTo(0, 0));
       await page.screenshot({ path: join(out, `${id}-back-${look}.png`), fullPage: true });
+      // one slip everywhere (the one-hand pass): a word of the passage opens the app's slip beside it, from the deck
       await page.locator('#kp-card .kp-sentence .kp-tok:not([data-deck-word])').first().click();
-      await page.locator('#kp-sheet').waitFor();
-      assert((await page.locator('#kp-sheet-term').textContent()).trim());
-      await page.locator('#kp-sheet-close').click();
+      await page.locator('#mini[data-from="deck"]').waitFor();
+      assert((await page.locator('#mini .mini-word').textContent()).trim());
+      await page.keyboard.press('Escape');
+      await page.locator('#mini').waitFor({ state: 'detached' });
       await page.waitForFunction(async (deckId) => {
         const response = await caches.match(new URL(`decks/${deckId}/tokens.json`, location.href).href);
         return !!response;

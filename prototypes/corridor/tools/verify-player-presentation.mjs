@@ -68,7 +68,7 @@ try {
         const keyed = await page.evaluate(census), focus = await page.evaluate(() => ({ active: document.activeElement?.id || document.activeElement?.tagName, trusted: window.__zoomTrusted }));
         check(`${width}/${zoom} keyboard Enter on ${choice} keeps focus on that button, the marked word inside the window and the ledger unwritten`, keyed.zoom === choice && focus.active === `kp-zoom-${choice}` && focus.trusted === true && keyed.card === held.card && keyed.ledger === held.ledger && fits(keyed), { held, keyed, focus });
       }
-      await page.locator('#kp-card .kp-target').click(); await page.locator('#kp-sheet-close').click();
+      await page.locator('#kp-card .kp-target').click(); await page.locator('#mini[data-from="deck"]').waitFor(); await page.keyboard.press('Escape'); await page.locator('#mini').waitFor({ state: 'detached' });
       const initial = await page.evaluate(census);
       await page.locator('.kp-f-gloss>summary').click();
       await resting(page);
@@ -119,13 +119,13 @@ try {
         const after = await page.evaluate(census), pressed = await page.locator('#kp-readings').getAttribute('aria-pressed');
         check(`${width}/${zoom} native Readings ${state === 'true' ? 'on' : 'off'} preserves face/window/folds/context/ledger and fits`, pressed === state && same(after, before) && after.ledger === ledger && JSON.stringify(after.ruby) === JSON.stringify(before.ruby) && fits(after), { before, after, pressed }); before = after;
       }
-      // The existing word sheet's real kanji door goes through corridor go()/Back().
+      // The word slip's real kanji door (its kanji band) goes through corridor go()/Back().
       await page.locator('#kp-card .kp-target').click();
       const lookupLedger = await page.evaluate(() => localStorage.getItem('bunki-cloze:n1'));
       const seat = await page.evaluate(census);
       check(`${width}/${zoom} compared state is non-default before 交 depth: windowed, inner seat moved${zoom === 'focus' ? ', a context group opened' : ''}`, seated(seat, zoom === 'focus'), { windowed: seat.windowed, inner: seat.inner, context: seat.context });
       check(`${width}/${zoom} depth Back comparison starts with fitted reading controls`, fits(seat), seat);
-      await page.locator('.kp-sheet-kanji-door[data-kanji="交"]').click();
+      await page.locator('#mini[data-from="deck"] .mini-kanji-row[data-kanji="交"]').click();
       await page.locator('#sheet').waitFor();
       const underSheet = await page.evaluate(() => ({ page: scrollY, inert: !!document.querySelector('.kp').closest('[inert]') }));
       await resting(page);
@@ -185,12 +185,14 @@ try {
     check('late-token actual consumer surname and manually chosen window/fold/inner/page seat', JSON.stringify(pre.ruby) === JSON.stringify(['こむら', 'こむら']) && JSON.stringify(late.ruby) === JSON.stringify(pre.ruby) && late.windowed === pre.windowed && late.height === pre.height && Math.abs(late.inner - pre.inner) < 1 && Math.abs(late.anchor.top - pre.anchor.top) < 1 && JSON.stringify(late.folds) === JSON.stringify(pre.folds) && JSON.stringify(late.context) === JSON.stringify(pre.context) && fits(late), { pre, late });
     const repeat = page.locator('.kp-sentence .kp-tok').filter({ has: page.locator('rt', { hasText: 'こむら' }) }).last();
     await repeat.click();
-    const frame = await page.locator('#kp-sheet').evaluate(n => ({ text: n.textContent, reading: n.querySelector('.kp-sheet-reading')?.textContent, key: n.dataset.key, saves: n.querySelectorAll('#kp-take,#kp-take-list,#kp-sheet-full,.kp-sheet-en,.kp-sheet-def').length }));
-    check('actual repeated person lookup is missing-entry with correct reading and no generic sense/save identity', frame.reading === 'こむら' && frame.key === '' && frame.saves === 0 && /This word is not in the dictionary/.test(frame.text) && !/small village|小さい村|しょうそん/.test(frame.text), frame);
+    // the slip (one slip everywhere): the missing entry keeps the passage reading, no key, no Save, no door, no
+    // generic sense — the slip's own miss line in its place
+    const frame = await page.locator('#mini[data-from="deck"]').evaluate(n => ({ text: n.textContent, reading: n.querySelector('.mini-reading')?.textContent, key: n.dataset.key, saves: n.querySelectorAll('#mini-take,.mini-word[data-action="entry.open"],.mini-note,.mini-gloss[lang="ja"]').length, miss: n.querySelector('.mini-gloss')?.textContent }));
+    check('actual repeated person lookup is missing-entry with correct reading and no generic sense/save identity', frame.reading === 'こむら' && frame.key === '' && frame.saves === 0 && /No dictionary entry for this spelling\./.test(frame.miss) && !/small village|小さい村|しょうそん/.test(frame.text), frame);
     // the card screen has no language switch in the focus room; the card is rebuilt on the way back from
     // the corridor's kanji page instead (corridor go()/Back())
-    await page.locator('#kp-sheet-close').click();
-    await page.locator('#kp-card .kp-target').click(); await page.locator('.kp-sheet-kanji-door[data-kanji="交"]').click(); await page.locator('#sheet').waitFor();
+    await page.keyboard.press('Escape'); await page.locator('#mini').waitFor({ state: 'detached' });
+    await page.locator('#kp-card .kp-target').click(); await page.locator('#mini[data-from="deck"] .mini-kanji-row[data-kanji="交"]').click(); await page.locator('#sheet').waitFor();
     await page.locator('#sheet-back').click(); await page.locator('#sheet').waitFor({ state: 'detached' }); await resting(page);
     const rebuilt = await page.evaluate(census);
     check('actual rebuild (back from the kanji page) keeps both contextual surname ruby', JSON.stringify(rebuilt.ruby) === JSON.stringify(['こむら', 'こむら']), rebuilt.ruby);

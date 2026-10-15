@@ -14,8 +14,8 @@
  *     [--soak-ms N] [--shots DIR] [--out FILE]
  *
  * Battery per word (charter §2, v1 slice — the operator-reported cases):
- *   tap            → unfolds + blooms (C1, C2)   [kana words included]
- *   tap again      → glosses (C1)
+ *   tap            → unfolds + blooms, and the app's slip opens beside the word (C1, C2)   [kana words included]
+ *   tap again      → the full entry (C1; the one-hand pass: the sky's gloss rung stands aside for the slip)
  *   slow drag →    → word MOVES and SURVIVES (C3) — never graded
  *   pinch over it  → constellation survives, camera zooms (C4, C5)
  *   water tap      → deliberate release works (C5)
@@ -318,6 +318,8 @@ const worldProbe = `(() => ({
   tray: document.getElementById('drift-tray')?.textContent ?? '',
   depthOpen: (document.getElementById('depth')?.textContent ?? '') !== '',
   cardOpen: document.getElementById('card')?.classList.contains('open') ?? false,
+  // the app's slip beside a tapped word (the one-hand pass): the word it names, or null
+  slip: document.getElementById('mini')?.querySelector('.mini-word')?.textContent ?? null,
 }))()`;
 
 const pickOne = (exclude) => page.evaluate(`(() => {
@@ -468,11 +470,13 @@ for (let round = 0; round < N_WORDS; round++) {
     await file(word, 'tap', 'unfold+bloom', 'dead', `no furigana (op=${at.opacity.toFixed(2)}->${s.opacity.toFixed(2)}) ${JSON.stringify(forensic)}`);
   }
   else if (w0.bloomCentre !== word.w) await file(word, 'tap', 'unfold+bloom', 'dead', `no constellation (sats=${w0.sats})`);
-  else await file(word, 'tap', 'unfold+bloom', 'ok', `${w0.sats} satellites`);
+  else if (w0.slip !== word.w) await file(word, 'tap', 'unfold+bloom', 'dead', `no slip beside the word (slip=${w0.slip ?? 'none'})`);
+  else await file(word, 'tap', 'unfold+bloom', 'ok', `${w0.sats} satellites, the slip`);
 
   const bloomAlive = w0.bloomCentre === word.w;
 
-  // C1 — second tap: gloss, still here
+  // C1 — second tap: the full entry (the slip's host reads the press on the slip's own word), the word still
+  // here; closing the entry returns the bare word
   if (s.exists) {
     s = await page.evaluate(wordProbe(word.w));
     // the bloom's assembly easing keeps moving the centre for a beat after the
@@ -491,12 +495,19 @@ for (let round = 0; round < N_WORDS; round++) {
     if (s.exists && s.onScreen && aimed2) {
       await tapAt(s.x, s.y);
       await page.waitForTimeout(500);
-      const s2 = await page.evaluate(wordProbe(word.w));
+      const entry = await page.evaluate(`({ sheet: !!document.getElementById('sheet'), names: !!document.getElementById('sheet')?.innerText.includes(${JSON.stringify(word.w)}), slip: !!document.getElementById('mini') })`);
       const w2 = await page.evaluate(worldProbe);
-      if (!s2.exists && !w2.depthOpen) await file(word, 'tap-again', 'gloss', 'vanished', '');
-      else if (w2.depthOpen) await file(word, 'tap-again', 'gloss', 'misfired', 'second tap dived (third act came early)');
-      else if (!s2.glossed) await file(word, 'tap-again', 'gloss', 'dead', `no English (op=${s.opacity.toFixed(2)} pe="${s.pe}" unfolded=${s2.unfolded})`);
-      else await file(word, 'tap-again', 'gloss', 'ok', '');
+      if (entry.sheet) {
+        await page.locator('#sheet-back').click();
+        await page.locator('#sheet').waitFor({ state: 'detached', timeout: 5000 });
+        await page.waitForTimeout(500);
+      }
+      const s2 = await page.evaluate(wordProbe(word.w));
+      if (!s2.exists && !w2.depthOpen) await file(word, 'tap-again', 'full entry', 'vanished', '');
+      else if (w2.depthOpen) await file(word, 'tap-again', 'full entry', 'misfired', 'second tap dived into the sky (the entry came late)');
+      else if (!entry.sheet || !entry.names || entry.slip) await file(word, 'tap-again', 'full entry', 'dead', `no entry (sheet=${entry.sheet} names=${entry.names} slip=${entry.slip} op=${s.opacity.toFixed(2)} pe="${s.pe}" unfolded=${s2.unfolded})`);
+      else if (s2.unfolded) await file(word, 'tap-again', 'full entry', 'misfired', 'closing the entry left the reading up');
+      else await file(word, 'tap-again', 'full entry', 'ok', '');
     }
   }
 

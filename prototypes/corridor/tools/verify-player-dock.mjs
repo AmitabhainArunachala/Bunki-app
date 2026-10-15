@@ -21,7 +21,7 @@ assert(longWord); const first=n1.words[0].cards[0], second=longWord.cards[0];
 const seed=emptyState('n1');
 for(const w of n1.words) for(const c of w.cards) if(![first.id,second.id].includes(c.id)) seed.suspended[c.id]={at:'2026-10-10T00:00:00.000Z',by:'delete'};
 const host=await startStaticHost({site:SITE,port:0}), browser=await chromium.launch();
-const results={identity,scope:'Independent real browser UI. Unchanged real N1 cards selected by valid suspended ledger in a disposable context; actual native trusted grade/remove/Undo. Safe-area values use Chromium CDP env emulation, not an iOS hardware claim.',first:{id:first.id,length:first.ja.length},second:{id:second.id,length:second.ja.length,targetOffset:second.ja.indexOf(second.form)},undo:[],fold:[],paintNegativeControl:[]};
+const results={slip:[],identity,scope:'Independent real browser UI. Unchanged real N1 cards selected by valid suspended ledger in a disposable context; actual native trusted grade/remove/Undo. Safe-area values use Chromium CDP env emulation, not an iOS hardware claim.',first:{id:first.id,length:first.ja.length},second:{id:second.id,length:second.ja.length,targetOffset:second.ja.indexOf(second.form)},undo:[],fold:[],paintNegativeControl:[]};
 async function resting(page){await page.evaluate(async()=>{await document.fonts.ready;await Promise.allSettled(document.querySelector('.kp').getAnimations({subtree:true}).filter(a=>a.effect?.getComputedTiming().endTime!==Infinity).map(a=>a.finished));await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));});}
 const geometry=()=>{const u=document.querySelector('#kp-undo'),reveal=document.querySelector('#kp-reveal'),target=document.querySelector('#kp-card .kp-target,#kp-card .kp-blank'),card=document.querySelector('#kp-card');const rect=n=>{const r=n.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height,top:r.top,bottom:r.bottom,right:r.right,left:r.left}};const us=getComputedStyle(u),ps=getComputedStyle(u,'::before'),ur=rect(u),rr=rect(reveal),tr=rect(target);const p=document.createElement('div');p.style.paddingBottom='env(safe-area-inset-bottom,0px)';document.body.append(p);const safe=getComputedStyle(p).paddingBottom;p.remove();const all=[];const walk=document.createTreeWalker(card,NodeFilter.SHOW_TEXT);for(let n=walk.nextNode();n;n=walk.nextNode()){if(!n.textContent.trim())continue;const range=document.createRange();range.selectNodeContents(n);for(const r of range.getClientRects())if(r.bottom>ur.top&&r.top<ur.bottom&&r.right>ur.left&&r.left<ur.right){const x=(Math.max(r.left,ur.left)+Math.min(r.right,ur.right))/2,y=(Math.max(r.top,ur.top)+Math.min(r.bottom,ur.bottom))/2,hit=document.elementFromPoint(x,y);all.push({text:n.textContent,top:r.top,bottom:r.bottom,left:r.left,right:r.right,x,y,owns:!!hit&&u.contains(hit),hit:hit?.tagName});}}const points=[['centre',0,0],['top-left',-21,-21],['top-right',21,-21],['bottom-left',-21,21],['bottom-right',21,21]].map(([name,dx,dy])=>{const x=ur.x+ur.width/2+dx,y=ur.y+ur.height/2+dy,hit=document.elementFromPoint(x,y);return{name,x,y,owns:!!hit&&u.contains(hit),hit:hit?.tagName}});return{card:card.dataset.card,cardRect:rect(card),scrollY,undo:ur,reveal:rr,target:tr,gap:rr.top-ur.bottom,revealFromBottom:innerHeight-rr.bottom,background:us.backgroundColor,band:{content:ps.content,background:ps.backgroundColor,top:ps.top,bottom:ps.bottom,left:ps.left,right:ps.right},overlappingInk:all,points,clearTarget:tr.bottom<=ur.top-16+1,safeArea:safe,hasPrimaryTabs:document.body.classList.contains('has-primary-tabs'),navClearance:getComputedStyle(document.querySelector('.kp')).getPropertyValue('--nav-clearance'),overflow:document.documentElement.scrollWidth-innerWidth};};
 // A pointer-events:none overpaint can pass every native hit point. Compare the
@@ -95,6 +95,20 @@ for(const lang of ['bi','ja']){
   await page.locator('#kp-grade-good').click();await page.waitForTimeout(150);const r=await page.evaluate(()=>({samples:window.__foldSamples,trusted:window.__gradeTrusted,remainingHolds:document.querySelectorAll('.kp-reveal-hold,.kp-screen-hold').length,grades:JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mcd')).log.length}));results.fold.push({lang,...r});console.log('FOLD',lang,JSON.stringify(r));
  }finally{await context.close();}
 }
+for(const lang of ['bi','ja']) for(const bottom of [0,34]){
+ const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce',serviceWorkers:'block'});try{
+  await context.addInitScript(()=>localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mcd',JSON.stringify({look:'world',ruleSeen:true,sittings:3,zoom:'full'})));
+  const page=await context.newPage(); const cdp=await context.newCDPSession(page);await cdp.send('Emulation.setSafeAreaInsetsOverride',{insets:{bottom}});
+  await page.goto(host.origin+'/index.html?deck=mcd&ui='+lang);await page.locator('#kp-start').click();await page.locator('#kp-reveal').click();await page.locator('#kp-card .kp-sentence .kp-tok').first().waitFor({timeout:15000});await resting(page);
+  // the word nearest the dock that the finger can still own: the slip has the least room under it there
+  const pick=await page.evaluate(()=>{const dock=document.querySelector('.kp-grades').getBoundingClientRect();let best=null;for(const t of document.querySelectorAll('#kp-card .kp-tok:not(.kp-target)')){const r=t.getClientRects()[0];if(!r||!r.width||r.bottom>dock.top-4||r.top<80)continue;const x=(r.left+r.right)/2,y=(r.top+r.bottom)/2;const hit=document.elementFromPoint(x,y);if(!hit||!t.contains(hit))continue;if(!best||r.bottom>best.bottom)best={x,y,top:r.top,bottom:r.bottom,text:t.textContent};}return best;});
+  assert(pick,'a tappable word above the dock');
+  await page.mouse.click(pick.x,pick.y);await page.locator('#mini[data-from="deck"]').waitFor({timeout:5000});await resting(page);
+  const g=await page.evaluate(()=>{const rect=n=>{const r=n.getBoundingClientRect();return{top:r.top,bottom:r.bottom,left:r.left,right:r.right}};const m=document.getElementById('mini'),d=document.querySelector('.kp-grades'),u=document.getElementById('kp-undo');const mr=rect(m),dr=rect(d);const own=document.elementFromPoint((dr.left+dr.right)/2,(dr.top+dr.bottom)/2);return{mini:mr,dock:dr,dockFixed:getComputedStyle(d).position,undo:u?rect(u):null,dockOwnsCentre:!!own&&d.contains(own),overflow:document.documentElement.scrollWidth-innerWidth}});
+  await page.screenshot({path:OUT+`/slip-over-dock-${lang}-${bottom}.png`});
+  results.slip.push({lang,bottom,pick,geometry:g});console.log('SLIP',lang,bottom,JSON.stringify({word:pick.text,wordBottom:pick.bottom,miniBottom:g.mini.bottom,dockTop:g.dock.top}));
+ }finally{await context.close();}
+}
 }
 finally{await browser.close();await host.close();writeFileSync(OUT+'/proof.json',JSON.stringify(results,null,2)+'\n');}
 
@@ -125,6 +139,15 @@ for(const r of results.paintNegativeControl){
  check('paint oracle rejects actual overpaint while native Undo hit points still pass',r.geometry.points.every(p=>p.owns)&&r.paint.baselineRepeatEqual&&!r.paint.cardInkOccluded&&r.paint.restoredEqual&&r.paint.cardOutsideUndo&&r.paint.visibleDescendants===0&&r.paint.unchangedGeometry&&r.paint.ledgerUnchanged,r);
 }
 check('both actual reduced-motion open-fold grades executed',results.fold.length===2,results.fold.length);
+check('all four slip-over-dock cases executed',results.slip.length===4,results.slip.length);
+for(const r of results.slip){
+ const g=r.geometry,name=`${r.lang}/${r.bottom} slip on ${r.pick.text}`;
+ // the one-hand pass (slice B): the app's slip beside a word in the lower third sits above the fixed grade dock,
+ // never over it, never over its word, inside the screen; the dock still owns its centre
+ check(name+' never covers the grade dock',g.dockFixed==='fixed'&&g.mini.bottom<=g.dock.top+.5&&g.dockOwnsCentre,{mini:g.mini,dock:g.dock,fixed:g.dockFixed,owns:g.dockOwnsCentre});
+ check(name+' never covers its own word',g.mini.bottom<=r.pick.top+.5||g.mini.top>=r.pick.bottom-.5,{mini:g.mini,word:r.pick});
+ check(name+' sits inside the screen with no horizontal overflow',g.mini.top>=0&&g.mini.left>=0&&g.mini.right<=390.5&&g.overflow===0,{mini:g.mini,overflow:g.overflow});
+}
 for(const r of results.fold){
  check(r.lang+' trusted grade persists once and held frame retires',r.trusted&&r.grades===1&&r.remainingHolds===0,r);
  check(r.lang+' outgoing open fold never replays or blinks',r.samples.length>=3&&r.samples.every(s=>s.animationName==='none'&&s.opacity==='1'&&s.active.length===0&&s.inert&&s.ariaHidden==='true'),r.samples);
