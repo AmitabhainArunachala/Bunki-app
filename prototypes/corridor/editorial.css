@@ -4946,7 +4946,8 @@ body:not(.zen) #app > .chrome {
 [data-bar='guided'] .gs-bar-doors { flex: 0 0 auto; display: flex; flex-wrap: nowrap; gap: 0; }
 [data-bar='guided'] .gs-nav { min-height: 44px; padding: 0 10px; border: 0; background: transparent; color: var(--color-bar-quiet); font: 500 14px/44px var(--font-ui); letter-spacing: 0; white-space: nowrap; }
 [data-bar='guided'] .gs-nav[aria-current='page'] { color: var(--color-bar-ink); font-weight: 700; }
-[data-bar='sheet'] { gap: 4px; margin-inline: 0; }
+/* the sheet's bar bleeds to the sheet's edges (its own .sheet-bar margins), its doors on the content's gutter */
+[data-bar='sheet'] { gap: 4px; padding-inline: 12px; }
 [data-bar='sheet'] .sheet-depth { flex: 1 1 auto; min-width: 0; }
 /* the bar's Save is the A family at the bar's measure: 44, not the family's 48 (it hung below the bar) */
 body [data-bar='sheet'] .sheet-take { margin-left: auto; height: 44px; min-height: 44px; padding-block: 0; }
@@ -4979,6 +4980,9 @@ body [data-bar='sheet'] .sheet-take { margin-left: auto; height: 44px; min-heigh
 
 /* ONE NOTE (contract §5): the honest notes of every room — ai · guide · record — one element, quiet and small, a
    hairline on the left, no box (F's --type-small takes over once it lands; the label size until then) */
+/* beside a chip (the JLPT room's AI作成 · Made by AI) the note takes the rest of the line; the chip never wraps */
+.exam-machine-label > .status-chip { flex: 0 0 auto; white-space: nowrap; }
+.exam-machine-label > .note[data-kind] { flex: 1 1 12em; margin: 0; }
 body .note[data-kind] {
   margin: var(--space-3, 12px) 0;
   padding: 2px 0 2px 12px;
