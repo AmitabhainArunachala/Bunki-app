@@ -8776,13 +8776,24 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   const readsOtherwise = !!own && !!g?.r && kataToHira(String(g.r)) !== kataToHira(own);
   const reading = look?.reading ?? (readsOtherwise ? own : (g?.r || token.r));
   if (reading) said.append(el('span', 'mini-reading', reading));
+  // L · until the full dictionary names the entry read the text's way, a card read otherwise than the entry at hand
+  // borrows nothing: its meaning line is a quiet "…" in the world's muted head ink and Save stays held; the answer
+  // fills both (openReadingSlip draws the card again). Asked and unanswered, the "…" stays — never another reading's
+  // meaning (9月 read がつ never shows the quick dictionary's つき · Moon)
+  const waiting = readsOtherwise && (token.seq == null || token.seq === '') && !(D.dictionaryIndex
+    && (D.dictionaryMode === 'main' || D.dictionaryCompleteForms?.has(String(token.b))));
   if (look?.gloss) {
     const gloss = el('span', 'mini-gloss', look.gloss);
     if (look.glossLang) gloss.lang = look.glossLang;
     said.append(gloss);
     if (look.gloss2) { const second = el('span', 'mini-gloss mini-gloss-2', look.gloss2); second.lang = 'en'; said.append(second); }
   } else if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText(token.b)));
-  else said.append(el('span', 'mini-gloss', g?.m?.[0] ? (readsOtherwise ? `${g.r} · ${g.m[0]}` : g.m[0])
+  else if (waiting) {
+    const wait = el('span', 'mini-gloss mini-wait', '…');
+    wait.style.fontWeight = '400';
+    wait.style.color = 'var(--mini-head-ink-2)';
+    said.append(wait);
+  } else said.append(el('span', 'mini-gloss', g?.m?.[0] ? (readsOtherwise ? `${g.r} · ${g.m[0]}` : g.m[0])
     : tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.')));
   head.append(said);
   mini.append(head);
