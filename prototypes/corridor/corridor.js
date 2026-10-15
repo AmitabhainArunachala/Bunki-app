@@ -7940,7 +7940,7 @@ function dialRow(labelJa, labelEn, key, options) {
  *   tap              → the popup: the word, its reading, its meaning, Save, Full entry ›
  *   tap another word → the popup moves there; a tap outside or Escape puts it away
  *   right-click, or press and hold on a touch screen, or ContextMenu / Shift+F10
- *                    → the word menu: Save word · Save the sentence · Full entry ·
+ *                    → the word menu: Save · Save the sentence · Full entry ·
  *                      Ask the tutor about this sentence · Copy
  * Readings on the text belong to the ふりがな setting, not to taps; with 触れて (on touch) the word
  * you touched shows its reading. Sentences outside the reader (renderSentenceTokens) keep the older
@@ -8669,6 +8669,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     word.dataset.action = 'entry.open';
     word.dataset.targetKind = 'word';
     word.title = tx('全項目を開く', 'Open the full entry');
+    word.setAttribute('aria-label', tx('全項目を開く', 'Open the full entry'));
     word.addEventListener('click', (event) => {
       event.stopPropagation();
       onEntry(event.detail === 0 ? 'keyboard' : 'pointer');
@@ -9155,7 +9156,7 @@ async function sendSentenceToTutor(node, discuss, currentSurface, say) {
 
 /* The word menu (John #11: "I want to be able to 'right click' and choose save"). A right-click, a press and
  * hold on a touch screen, or the menu key (ContextMenu, Shift+F10) on the focused word opens it at the
- * pointer: Save word · Save the sentence · Full entry · Ask the tutor about this sentence · Copy. ↑/↓ move,
+ * pointer: Save · Save the sentence · Full entry · Ask the tutor about this sentence · Copy. ↑/↓ move,
  * Enter picks, Escape closes and gives focus back to the word. Only words lose the browser's own menu. */
 let readerWordMenu = null;
 function closeReaderWordMenu({ restoreFocus = false } = {}) {
@@ -9199,7 +9200,7 @@ async function openReaderWordMenu(anchor, door, { x = null, y = null, keyboard =
   const save = door.save?.();
   if (save) {
     const saved = save.state === 'taken';
-    add('save-word', saved ? tx('保存済み ✓', 'Saved ✓') : tx('この語を保存', 'Save word'), () => toggleWordSave(save.node, door.label),
+    add('save-word', saved ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save'), () => toggleWordSave(save.node, door.label),
       { disabled: saved || save.held || save.identityHeld, hint: save.held ? readerCaptureReasonText(door.label)
         : save.identityHeld ? wordCaptureHeldText(save.node, { route: false }) : '' });
   }
@@ -12017,9 +12018,11 @@ function renderTodayDetail(today) {
   return { section, body };
 }
 /** The entry sheet's one capture button, named once: Today's empty state quotes this same label,
- * so the two can never disagree about what the button is called (round 4 review, LABELS.md). */
-function sheetTakeLabel() {
-  return tx('覚', 'Save');
+ * so the two can never disagree about what the button is called (round 4 review, LABELS.md). One verb
+ * for one act (one-hand pass, 2026-10-15): 保存 · Save and 保存済み ✓ · Saved ✓, as the slip and the
+ * word menu say it. */
+function sheetTakeLabel(saved = false) {
+  return saved ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save');
 }
 function renderTray(main) {
   const currentSurface = recordViewSurface();
@@ -19046,7 +19049,8 @@ function wireParticleGestures(span, particle, index, p) {
     // the particle itself is the way into its page, as a second tap on it in the text is
     const entry = el('button', 'mini-word', particle.p);
     entry.type = 'button';
-    entry.title = tx('助詞の項目を開く', 'Open the particle’s entry');
+    entry.title = tx('全項目を開く', 'Open the full entry');
+    entry.setAttribute('aria-label', tx('全項目を開く', 'Open the full entry'));
     entry.dataset.action = 'entry.open';
     entry.dataset.targetKind = 'particle';
     entry.addEventListener('click', (event) => {
@@ -30017,20 +30021,13 @@ function renderSheet(root) {
     // D23: the seal shares the foot button's state, 'taken' only for this identity's card
     const capState = capNode.t === 'word' ? wordCaptureState(capNode) : null;
     const takenNow = capState ? capState === 'taken' : S.taken.some((t) => t.t === capNode.t && t.id === capNode.id);
-    const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', sheetTakeLabel());
+    const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', sheetTakeLabel(takenNow));
     capture.type = 'button';
     capture.id = 'sheet-take';
     if (personalHost && capNode.t === 'word' && !lookup(capNode.id, capNode.seq, capNode.reading)) capture.disabled = true;
     capture.setAttribute('aria-pressed', String(takenNow));
-    capture.setAttribute(
-      'aria-label',
-      capNode === node
-        ? tx(takenNow ? '覚えるをやめる' : '覚える', takenNow ? 'stop memorizing' : 'memorize')
-        : tx(
-            takenNow ? `「${capNode.id}」の覚えるをやめる` : `「${capNode.id}」を覚える`,
-            takenNow ? `stop memorizing ${capNode.id}` : `memorize ${capNode.id}`,
-          ),
-    );
+    // one verb for one act (one-hand pass): the name is Save; aria-pressed says whether the word is saved
+    capture.setAttribute('aria-label', capNode === node ? tx('保存', 'Save') : tx(`「${capNode.id}」を保存`, `Save ${capNode.id}`));
     capture.addEventListener('click', async () => {
       if (capture.disabled) return;
       if (personalHost) { await toggleWordSave(capNode, nodeTitle(capNode)); return; }

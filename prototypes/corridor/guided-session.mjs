@@ -753,14 +753,14 @@ export function createGuidedSession(host) {
     const info = cardInfo([key]).get(key);
     const taken = status.state === 'taken';
     const learn = taken
-      ? btn(bi('覚える ✓', 'in your deck'), 'save-word', 'primary', 'disabled aria-disabled="true"')
+      ? btn(bi('保存済み ✓', 'Saved ✓'), 'save-word', 'primary', 'disabled aria-disabled="true"')
       : btn(
-          bi('覚える', 'learn this word'),
+          bi('保存', 'Save'),
           'save-word',
           'primary',
           status.state === 'held' || deckBusy ? 'disabled' : '',
         );
-    return `<section class="gs-narrow gs-word-room"><div class="gs-branch-back">${textBtn(`← ${bi('元の場所へ', 'back to where you were')}`, 'close-word')}</div><h1 class="gs-title" tabindex="-1" lang="ja" data-ui-content="learning">${esc(word.surface)}<span class="gs-branch-reading">${esc(word.reading)}</span></h1><p class="gs-meaning">${esc(word.meaning)}</p><p class="gs-side-note">${esc(word.source)} · ${t('辞書の意味。文脈は元の文にある。', 'Dictionary meaning. The original sentence provides its context.')}</p>${notice ? `<p class="gs-notice" role="status">${esc(notice)}</p>` : ''}<div class="gs-actions">${learn}${textBtn(bi('文へ戻る', 'return to the sentence'), 'close-word')}${textBtn(bi('辞書で開く', 'open the full entry'), 'entry')}</div>${taken ? `<p class="gs-deck-line">${deckLine(key, 'added', info)}</p>` : status.state === 'held' ? `<p class="gs-side-note" data-held>${esc(status.reason)}</p>` : ''}<p class="gs-side-note gs-spaced">${t(`出典: ${esc(q.source.label)}。「覚える」を押すと、実際の覚えるデッキに札が一枚加わる。答えの記録は変わらない。`, `From ${esc(q.source.label)}. Learning a word adds one card to your real review deck. Your recorded answer is unchanged.`)}</p></section>`;
+    return `<section class="gs-narrow gs-word-room"><div class="gs-branch-back">${textBtn(`← ${bi('元の場所へ', 'back to where you were')}`, 'close-word')}</div><h1 class="gs-title" tabindex="-1" lang="ja" data-ui-content="learning">${esc(word.surface)}<span class="gs-branch-reading">${esc(word.reading)}</span></h1><p class="gs-meaning">${esc(word.meaning)}</p><p class="gs-side-note">${esc(word.source)} · ${t('辞書の意味。文脈は元の文にある。', 'Dictionary meaning. The original sentence provides its context.')}</p>${notice ? `<p class="gs-notice" role="status">${esc(notice)}</p>` : ''}<div class="gs-actions">${learn}${textBtn(bi('文へ戻る', 'return to the sentence'), 'close-word')}${textBtn(bi('辞書で開く', 'open the full entry'), 'entry')}</div>${taken ? `<p class="gs-deck-line">${deckLine(key, 'added', info)}</p>` : status.state === 'held' ? `<p class="gs-side-note" data-held>${esc(status.reason)}</p>` : ''}<p class="gs-side-note gs-spaced">${t(`出典: ${esc(q.source.label)}。「保存」を押すと、実際の覚えるデッキに札が一枚加わる。答えの記録は変わらない。`, `From ${esc(q.source.label)}. Saving a word adds one card to your real review deck. Your recorded answer is unchanged.`)}</p></section>`;
   }
 
   function summary() {
