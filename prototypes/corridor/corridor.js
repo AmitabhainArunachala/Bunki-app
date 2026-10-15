@@ -8712,6 +8712,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   mini.tabIndex = -1;
   mini.setAttribute('role', 'dialog');
   mini.setAttribute('aria-label', tx(`${label} の語釈`, `${label} quick look`));
+  mini.dataset.uiContentValue = label; // the word in the dialog's name is the learning content, not interface text
   mini.dataset.kind = kind;
   mini.dataset.key = key ?? (captureNode ? `${captureNode.t}:${captureNode.id}` : '');
   if (source) mini.dataset.from = source;
@@ -8721,6 +8722,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // the word itself is the way into its full entry, as a second tap on it in the text is
   const word = el(entryAvailable ? 'button' : 'span', 'mini-word', label);
   word.lang = 'ja';
+  word.dataset.uiContent = 'learning';
   if (entryAvailable) {
     word.type = 'button';
     word.dataset.action = 'entry.open';
@@ -10758,20 +10760,22 @@ window.__BUNKI_OPEN_SLIP = {
   has(kind, key) {
     return window.__BUNKI_OPEN_ENTRY.has(kind, key);
   },
-  /** The sky taps a word (or a kanji at a dive's centre): the slip opens beside the tapped element, and the
-   * next tap on it dives into the entry. 'opened' | 'dived' | false. */
-  open(kind, key, { anchor = null, onClose = null } = {}) {
+  /** The sky taps a word (or a kanji at a dive's centre): the slip opens beside the tapped element. With
+   * redo the sky keeps its own ladder under the slip (a press on the word is never the slip's dive; the band
+   * is the door); without it the next tap on the element dives into the entry. 'opened' | 'dived' | false. */
+  open(kind, key, { anchor = null, onClose = null, redo = false } = {}) {
     if (S.view !== 'drift' || !this.has(kind, key) || !anchor?.isConnected) return false;
     const before = !!document.getElementById('mini');
-    const slip = openSlip({ t: kind, id: key }, { anchor, from: 'drift', onClose });
+    const slip = openSlip({ t: kind, id: key }, { anchor, from: 'drift', onClose, redo });
     if (slip) {
       interaction({ kind: 'quickLook.open' }, 'pointer', `drift-slip-${kind}`);
       return 'opened';
     }
     return before && !document.getElementById('mini') ? 'dived' : false;
   },
-  isOpen() {
-    return !!document.getElementById('mini');
+  /** Is the slip open — beside this element, when one is named. */
+  isOpen(anchor = null) {
+    return !!document.getElementById('mini') && (!anchor || miniAnchor === anchor);
   },
   close() {
     if (document.getElementById('mini')) removeMini();
