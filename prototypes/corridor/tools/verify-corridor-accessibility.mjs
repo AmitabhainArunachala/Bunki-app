@@ -753,40 +753,56 @@ async function main() {
       dimPresses.length === 1 && dimPresses[0].opacity === '0.55' && dimPresses[0].sheet === 'editorial.css',
       JSON.stringify(dimPresses),
     );
-    // a real hold on the glass (CDP touch, as the phone gives it): read the control while it is held
+    // a real hold on the control: read it while it is held. A pointer press (mouse down) is what
+    // Chromium maps to :active deterministically; a synthetic touchStart alone never reaches it,
+    // since that needs the browser's gesture pipeline — on the phone the shell's touch listener
+    // gives iOS the same :active this rule styles.
     const holdSample = async (page, family, selector) => {
-      const target = page.locator(selector).first();
-      await target.waitFor({ state: 'visible', timeout: 10_000 });
+      await page.locator(selector).first().waitFor({ state: 'visible', timeout: 10_000 });
       // a surface may redraw once more as its data lands (the sheet does): let it settle, then
       // scroll without Playwright's stability wait, which a swapped node would fail
       await page.waitForTimeout(400);
-      await target.evaluate((node) => node.scrollIntoView({ block: 'center', behavior: 'instant' }));
-      await page.waitForTimeout(120);
-      const box = await target.boundingBox();
-      const cdp = await page.context().newCDPSession(page);
-      const point = { x: box.x + box.width / 2, y: box.y + box.height / 2, radiusX: 5, radiusY: 5, force: 1 };
-      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
-      await page.waitForTimeout(260);
-      const held = await target.evaluate((node) => {
-        const style = getComputedStyle(node);
-        return { active: node.matches(':active'), opacity: style.opacity, transform: style.transform };
-      });
-      // the finger lifts off to the side: the control is released without being clicked
-      await cdp.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
-      await cdp.detach();
-      await page.waitForTimeout(260);
-      const released = await target.evaluate((node) => ({ active: node.matches(':active'), opacity: getComputedStyle(node).opacity }));
-      return { family, selector, held, released };
+      const candidates = page.locator(selector);
+      const count = await candidates.count();
+      for (let i = 0; i < count; i += 1) {
+        const target = candidates.nth(i);
+        if (!(await target.isVisible())) continue;
+        await target.evaluate((node) => node.scrollIntoView({ block: 'center', behavior: 'instant' }));
+        await page.waitForTimeout(120);
+        // the press must land on the control itself, not on a scrim or a dock over it
+        const reach = await target.evaluate((node) => {
+          const rect = node.getBoundingClientRect();
+          const x = rect.x + rect.width / 2;
+          const y = rect.y + rect.height / 2;
+          const hit = document.elementFromPoint(x, y);
+          return { x, y, reaches: hit === node || node.contains(hit), disabled: node.matches(':disabled, [aria-disabled="true"]') };
+        });
+        if (!reach.reaches || reach.disabled) continue;
+        await page.mouse.move(reach.x, reach.y);
+        await page.mouse.down();
+        await page.waitForTimeout(260);
+        const held = await target.evaluate((node) => {
+          const style = getComputedStyle(node);
+          return { active: node.matches(':active'), opacity: style.opacity, transform: style.transform };
+        });
+        // the finger lifts off to the side: the control is released without being clicked
+        await page.mouse.move(2, 2);
+        await page.mouse.up();
+        await page.waitForTimeout(260);
+        const released = await target.evaluate((node) => ({ active: node.matches(':active'), opacity: getComputedStyle(node).opacity }));
+        return { family, selector, candidate: i, held, released };
+      }
+      return { family, selector, held: null, released: null, reason: 'no reachable control' };
     };
     const pressed = [];
     await openWordDialog(pressPage);
     pressed.push(await holdSample(pressPage, 'primary button', '#sheet .take:visible'));
-    pressed.push(await holdSample(pressPage, 'chip', ':is(#sheet, #app main) .chip:visible'));
     await pressPage.keyboard.press('Escape');
     await pressPage.waitForSelector('#sheet', { state: 'detached' });
+    pressed.push(await holdSample(pressPage, 'chip', '#app main .chip:visible'));
     await pressPage.locator('#chrome-dojo').click();
     pressed.push(await holdSample(pressPage, 'door', '.study-door:visible'));
-    const samePress = (sample) => sample.held.active && sample.held.opacity === '0.55' && sample.held.transform === 'none'
+    const samePress = (sample) => sample.held && sample.held.active && sample.held.opacity === '0.55' && sample.held.transform === 'none'
       && !sample.released.active && sample.released.opacity === '1';
     check(
       'one press: a held primary button, chip and door all dim to .55 without moving, and let go to 1',
