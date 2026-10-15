@@ -158,15 +158,13 @@ async function chooseDial(page, key, value) {
   { key, value });
 }
 
-/** The reader's click grammar (reader lane 2026-10-02): a full dictionary entry opens from the word's
- * popup — one tap, then "Full entry ›" (the hold that used to open it now opens the word menu). */
+/** The reader's tap grammar (1.3.0): one tap opens the word's popup; a second tap on the same word opens
+ * its full entry (the popup has no Full entry button; the hold that used to open it opens the word menu). */
 async function holdWord(page, selector, index = 0) {
   await touchAt(page, selector, index, 0);
-  await page.waitForSelector('#mini .mini-entry', { timeout: 8000 });
+  await page.waitForSelector('#mini .mini-word', { timeout: 8000 });
   await page.waitForTimeout(120);
-  // a press where the link is painted: the popup floats, so nothing may scroll the page to reach it
-  const box = await page.locator('#mini .mini-entry').boundingBox();
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await touchAt(page, selector, index, 0);
   await page.waitForTimeout(200);
 }
 
@@ -972,15 +970,15 @@ async function main() {
       sheet: !!document.querySelector('#sheet'),
       popup: mini ? { word: mini.querySelector('.mini-word')?.textContent, reading: mini.querySelector('.mini-reading')?.textContent ?? '',
         gloss: mini.querySelector('.mini-gloss')?.textContent ?? '', save: mini.querySelector('#mini-take')?.textContent ?? null,
-        entry: !!mini.querySelector('.mini-entry') } : null,
+        door: !!mini.querySelector('button.mini-word[data-action="entry.open"]'), entryButton: !!mini.querySelector('.mini-entry') } : null,
       covers: !!box && box.left < word.right && box.right > word.left && box.top < word.bottom && box.bottom > word.top,
       top: (tok.querySelector('ruby') ?? tok).getBoundingClientRect().bottom,
       dataWord: tok.dataset.word,
     };
   })()`);
-  check('grammar · one tap opens the popup — the word, its reading and its meaning at once, no sheet',
+  check('grammar · one tap opens the popup — the word, its reading and its meaning at once, the band its door, no Full entry button, no sheet',
     !!afterTap.popup && afterTap.popup.word === afterTap.dataWord && afterTap.popup.gloss.length > 0 &&
-      ['Save', '保存', 'Saved ✓', '保存済み ✓'].includes(afterTap.popup.save) && afterTap.popup.entry && !afterTap.sheet,
+      ['Save', '保存', 'Saved ✓', '保存済み ✓'].includes(afterTap.popup.save) && afterTap.popup.door && !afterTap.popup.entryButton && !afterTap.sheet,
     JSON.stringify(afterTap.popup));
   check('grammar · the tapped word does not move, nothing is written under it, and its popup leaves it uncovered',
     afterTap.en === 0 && !afterTap.covers && Math.abs(afterTap.top - wordTopBefore) < 2,
@@ -1053,7 +1051,7 @@ async function main() {
   check('grammar · one tap anywhere else puts the menu away',
     !!elsewhere && (await page.locator('#reader-word-menu').count()) === 0, elsewhere ? 'menu dismissed' : 'no empty margin found');
 
-  // the popup's Full entry → the full entry (from a clean slate: whatever the menu
+  // the second tap on the word → the full entry (from a clean slate: whatever the menu
   // interlude did, close it and re-aim)
   if (await page.locator('#sheet').count()) {
     await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
@@ -1080,7 +1078,7 @@ async function main() {
       hasClose: !!s.querySelector('#sheet-close'),
     };
   })()`);
-  check('grammar · the popup\'s Full entry opens the full entry',
+  check('grammar · the second tap on the word opens the full entry',
     panel.headword.length > 0 && (panel.reading.length > 0 || panel.gloss.length > 0),
     `${panel.headword}（${panel.reading}）`);
   check('the sheet carries its own back and close', panel.hasBack && panel.hasClose,
@@ -1322,13 +1320,14 @@ async function main() {
   await page.waitForTimeout(150);
   // choose the word first (its popup): a phone's sticky header grows by the chrome's 覚える door when a word is
   // chosen, and the browser's scroll anchoring moves scrollY to keep the text still. The place the reader leaves
-  // from is the place once the word is chosen; then the popup's Full entry opens the entry.
+  // from is the place once the word is chosen; then the same word again opens the entry (1.3.0).
   await tap(page, '#reader .tok.content', 23);
-  await page.waitForSelector('#mini .mini-entry', { timeout: 8000 });
+  await page.waitForSelector('#mini .mini-word', { timeout: 8000 });
   await page.waitForTimeout(150);
   const scrollBefore = await page.evaluate('window.scrollY');
-  const entryBox = await page.locator('#mini .mini-entry').boundingBox();
-  await page.mouse.click(entryBox.x + entryBox.width / 2, entryBox.y + entryBox.height / 2);
+  // a press where the word is painted: nothing may scroll the page to reach it
+  const wordBox = await page.locator('#reader .tok.content').nth(23).boundingBox();
+  await page.mouse.click(wordBox.x + wordBox.width / 2, wordBox.y + wordBox.height / 2);
   await page.waitForSelector('#sheet');
   // the deep tier's one-time re-render replaces the sheet body moments after
   // it opens — tapping a kanji row mid-swap dies with it (same settle as
@@ -2136,11 +2135,15 @@ async function main() {
   const obsBefore = await evaluateAppRecord(page,
     `(record.obslog || []).length`,
   );
-  await tap(page, '#reader .tok.content', 3); // the popup: the meaning shown
+  await tap(page, '#reader .tok.content', 3); // the popup: the meaning shown (2)
   await page.waitForTimeout(250);
-  await tap(page, '#reader .tok.content', 3); // the same word again puts it away: no look, no row
+  await tap(page, '#reader .tok.content', 3); // the same word again: its full entry (3)
+  await page.waitForSelector('#sheet');
   await page.waitForTimeout(250);
-  await holdWord(page, '#reader .tok.content', 3); // the popup again, then its Full entry
+  await page.locator(await entryCloseSelector(page)).dispatchEvent('click'); // closing it returns the original word: no row
+  await page.waitForFunction(() => !document.getElementById('sheet'));
+  await page.waitForTimeout(250);
+  await holdWord(page, '#reader .tok.content', 3); // the popup again (2), then its entry (3)
   await page.waitForSelector('#sheet');
   await page.waitForTimeout(1600); // the trailing debounce persists the rows
   const obs = await evaluateAppRecord(page, `(() => {
@@ -2149,11 +2152,11 @@ async function main() {
     return { rows, srsHasKey: rows.length ? Object.prototype.hasOwnProperty.call(env.srs || {}, rows[0][2]) : null };
   })()`);
   const ladder = obs.rows.filter((r) => r[1] === 'tap');
-  const sameWord = ladder.length === 3 && ladder.every((r) => r[2] === ladder[0][2] && r[4] === ladder[0][4]);
-  // reader lane 2026-10-02: one tap shows the meaning (an honest 2), a tap that puts the popup away logs
-  // nothing, and the Full entry is the 3
-  check('a tap, a closing tap, then the popup and its Full entry — meaning, meaning, entry — every look logged',
-    sameWord && ladder.map((r) => r[3]).join(',') === '2,2,3',
+  const sameWord = ladder.length === 4 && ladder.every((r) => r[2] === ladder[0][2] && r[4] === ladder[0][4]);
+  // 1.3.0: one tap shows the meaning (an honest 2), the same word again is its entry (the 3), closing the
+  // entry logs nothing, and the cycle logs the same again
+  check('a tap, the same word again, its close, then the popup and its entry again — meaning, entry, meaning, entry — every look logged, the close none',
+    sameWord && ladder.map((r) => r[3]).join(',') === '2,3,2,3',
     ladder.map((r) => `depth ${r[3]}`).join(' → ') + ` (${ladder[0]?.[2]}@${ladder[0]?.[4]})` || 'no rows');
   check('rows persist inside the exported envelope with ms timestamps',
     ladder.every((r) => Number.isInteger(r[0]) && r[0] > 1.7e12 && typeof r[2] === 'string' && typeof r[4] === 'string'),
@@ -2748,11 +2751,11 @@ async function main() {
     const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
-  // reader lane 2026-10-02 (John #17), round 4 (T5, "click save and then add to list from there"): Save — here the
-  // chrome's 覚える, the popup's Save or the menu's Save word — is one tap, and the popup offers a list only once the
-  // word is saved; its "Add to a list" opens a small popover that enrolls nothing more.
+  // reader lane 2026-10-02 (John #17), round 4 (T5, "click save and then add to list from there"), 1.3.0 Save ▾:
+  // Save — here the chrome's 覚える, the popup's Save ▾ or the menu's Save — is one tap; the popup has no list button,
+  // and Save ▾ unfolds its menu inside the card only once the word is saved; the menu enrolls nothing more.
   await page.waitForSelector('#mini #mini-take');
-  const listsBeforeSave = await page.evaluate(`!!document.querySelector('#mini #mini-lists')?.getClientRects().length`);
+  const listsBeforeSave = await page.evaluate(`!!document.querySelector('#mini #mini-lists, #mini .mini-entry, #vocabulary-list-popover')`);
   await page.keyboard.press('Escape');
   await page.waitForSelector('#mini', { state: 'detached' });
   await tap(page, '#reader-take');
@@ -2768,16 +2771,17 @@ async function main() {
       captured.ctx?.scope === 'sent' && captured.ctx?.i === touched.index && typeof captured.ctx?.p === 'string',
     JSON.stringify(captured.ctx));
   if (!await page.locator('#mini').count()) await tap(page, '#reader .tok.content', 9);
-  await page.waitForSelector('#mini #mini-lists:not([hidden])');
-  await tap(page, '#mini-lists');
-  await page.waitForSelector('#vocabulary-list-popover');
+  await page.waitForSelector('#mini #mini-take[aria-pressed="true"]');
+  await tap(page, '#mini-take'); // Saved ✓ ▾: the menu
+  await page.waitForSelector('#mini #vocabulary-list-popover.is-inline');
   const popoverBits = await page.evaluate(`(() => ({
     modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'),
     role: document.querySelector('#vocabulary-list-popover')?.getAttribute('role'),
-    newList: !!document.querySelector('#vocabulary-list-popover #vocabulary-list-name'),
+    inCard: !!document.querySelector('#mini #vocabulary-list-popover.is-inline'),
+    newList: !!document.querySelector('#vocabulary-list-popover #vocabulary-list-new'),
   }))()`);
-  check('R2-B · the popup offers lists only after Save; they open as a small popover, not a window, and enroll nothing more',
-    !listsBeforeSave && (await readAppRecord(page)).taken.length === captured.taken && !popoverBits.modal && popoverBits.role === 'dialog' && popoverBits.newList,
+  check('R2-B · Save ▾ opens its menu only once the word is saved; it unfolds inside the card, not a window, and enrolls nothing more',
+    !listsBeforeSave && (await readAppRecord(page)).taken.length === captured.taken && !popoverBits.modal && popoverBits.role === 'dialog' && popoverBits.inCard && popoverBits.newList,
     JSON.stringify({ listsBeforeSave, ...popoverBits }));
   await page.keyboard.press('Escape');
   await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });

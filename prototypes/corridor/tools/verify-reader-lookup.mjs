@@ -108,8 +108,8 @@ try{
      assert.equal(shown.word,'ます');assert.equal(shown.reading,'ます');
      assert.equal(shown.gloss,'No dictionary entry for this spelling.','A polite ending must not borrow 升 or 増す');
      assert.equal(await page.locator('#mini-take').isDisabled(),true);
-     assert.equal(await page.locator('#mini .mini-entry').isDisabled(),true,
-      'An unresolved full-entry door must not reopen the rejected dictionary row');
+     assert.equal(await page.locator('#mini button.mini-word, #mini [data-action="entry.open"]').count(),0,
+      'An unresolved spelling has no door into an entry: its word is plain text, never a button that reopens the rejected row');
      assert.equal(await page.locator('#sheet').count(),0);
      return{dials,shown,saveHeld:true,unresolvedEntryHeld:true};
     });

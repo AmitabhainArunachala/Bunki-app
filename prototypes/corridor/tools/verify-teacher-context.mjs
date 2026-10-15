@@ -255,9 +255,9 @@ async function holdEntry(page, index, word) {
   await token.scrollIntoViewIfNeeded();
   const box = await token.boundingBox();
   assert(box && box.width > 0 && box.height > 0, 'Word has a real pointer target');
-  // reader lane 2026-10-02: one tap opens the word's popup, whose "Full entry ›" opens the entry
+  // one tap opens the word's popup; its band (the word) opens the entry (1.3.0)
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-  await page.locator('#mini .mini-entry').click();
+  await page.locator('#mini button.mini-word').click();
   await page
     .locator(`#sheet[data-node="word:${word}"]`)
     .waitFor({ state: 'visible', timeout: 10_000 });

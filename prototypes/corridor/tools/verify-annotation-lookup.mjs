@@ -52,14 +52,20 @@ async function openLookup(page, text = '電車') {
   }, text);
   await page.locator('#mini').waitFor();
 }
-// Lists open from the popup's "Add to a list" in a compact popover (reader lane 2026-10-02); Save is the popup's own
-// one-tap button. The big list window is gone. One path (round 4, T5): the popup offers a list only once the word
-// is saved, so a word not yet saved is saved first, by the same capture the list used to make.
+// Save ▾ (1.3.0; one-hand pass 2026-10-15): the popup has one Save and no list button. On a word not yet saved the
+// press saves it and unfolds its menu (Review · lists · + New list · Copy) inside the card, under the button; on a
+// saved word the same press opens the menu. The big list window is gone.
 async function chooser(page, text = '電車') {
   await openLookup(page, text);
+  assert.equal(await page.locator('#mini #mini-lists, #mini .mini-entry').count(), 0, 'The popup has one Save ▾ and no list or entry button');
   if (await page.locator('#mini #mini-take').getAttribute('aria-pressed') !== 'true') await saveInPopup(page);
-  await page.locator('#mini #mini-lists').click();
-  await page.locator('#vocabulary-list-popover').waitFor();
+  else await page.locator('#mini #mini-take').click();
+  await menuOpen(page);
+}
+/** Save ▾'s menu: inside the card under its own button, never a window. */
+async function menuOpen(page) {
+  await page.locator('#mini #vocabulary-list-popover.is-inline').waitFor();
+  assert.equal(await page.locator('#mini #mini-take').getAttribute('aria-expanded'), 'true', 'Save ▾ says its menu is open');
   assert.equal(await page.locator('#vocabulary-list-dialog, dialog[open]').count(), 0, 'Lists must not open a modal window');
 }
 async function saveInPopup(page) {
@@ -67,6 +73,9 @@ async function saveInPopup(page) {
   await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true');
 }
 async function createList(page, name) {
+  // in Save ▾'s menu a new list is one row until it is asked for; then the row becomes its name field
+  const row = page.locator('#vocabulary-list-popover #vocabulary-list-new');
+  if (await row.isVisible()) await row.click();
   await page.locator('#vocabulary-list-popover #vocabulary-list-name').fill(name);
   await page.locator('#vocabulary-list-popover [type="submit"]').click();
 }
@@ -106,7 +115,7 @@ const cases = [
   ['failed-list-write-is-honest-and-recoverable', async page => {
     await openLookup(page); await saveInPopup(page);
     await waitForAppRecord(page, record => record.taken.some(row => row.id === '電車'));
-    await page.locator('#mini #mini-lists').click(); await page.locator('#vocabulary-list-popover').waitFor();
+    await menuOpen(page); // the save unfolded Save ▾'s menu
     const before = await state(page);
     await armRecordWriteFailure(page, 'abort', { roots: ['lists'] });
     await createList(page, 'Retry this list');
@@ -182,7 +191,7 @@ const cases = [
     });
     assert.equal(await page.locator('#mini .mini-reading').textContent(), 'うわて', 'The explicit JMdict entry must survive the quick look');
     assert.match(await page.locator('#mini .mini-gloss').textContent(), /upper part/);
-    await saveInPopup(page); await page.locator('#mini #mini-lists').click(); await createList(page, 'Exact reading');
+    await saveInPopup(page); await menuOpen(page); await createList(page, 'Exact reading');
     const saved = await waitForAppRecord(page, record => member(record, 'Exact reading', '上手'));
     const card = saved.taken.find(row => row.id === '上手');
     assert.equal(card.entrySeq, '1580400'); assert.equal(card.cueReading, 'うわて');

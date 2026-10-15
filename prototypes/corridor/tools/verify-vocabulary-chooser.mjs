@@ -1,7 +1,8 @@
 /** Real reader popup and optional list-popover journeys against one immutable artifact.
- * Round 1 retired the modal chooser: Save captures immediately; Add to a list opens
- * checkboxes, and card context remains available in Full entry. Round 4 (John T5, "click save
- * and then add to list from there"): the popup offers a list only once the word is saved.
+ * Round 1 retired the modal chooser: Save captures immediately; the lists are checkboxes, and
+ * card context remains available in the full entry. Round 4 (John T5, "click save and then add to
+ * list from there") and 1.3.0's Save ▾: one Save, whose menu (Review · lists · + New list · Copy)
+ * unfolds inside the card once the word is saved; its Review row is the way back out.
  * Uses native learner records; review history is a labelled synthetic fixture
  * restored only into this verifier's isolated loopback browser through import.
  * Faults abort real native record writes. No voice or design acceptance claim. */
@@ -37,7 +38,18 @@ const learning = record => ({ taken: record.taken || [], lists: record.lists || 
 const history = record => ({ lists: record.lists || {}, srs: record.srs || {}, revlog: record.revlog || [] });
 const dialog = page => page.locator('#vocabulary-list-popover');
 const status = page => page.locator('#vocabulary-list-popover .vocabulary-list-status');
-const listName = page => page.getByRole('textbox', { name: 'Name a new list', exact: true });
+const listName = page => page.locator('#vocabulary-list-popover #vocabulary-list-name');
+/** In Save ▾'s menu a new list is one row until it is asked for; then the row becomes the name field. */
+async function nameField(page) {
+  const row = page.locator('#vocabulary-list-new');
+  if (await row.isVisible()) await row.click();
+  assert.equal(await listName(page).getAttribute('aria-label'), 'Name a new list');
+  return listName(page);
+}
+async function addList(page) {
+  await nameField(page);
+  await addList(page);
+}
 const create = page => page.locator('#vocabulary-list-create');
 const listBox = (page, name) => dialog(page).locator('input[type="checkbox"]').filter({ visible: true }).and(page.locator(`[data-list=${JSON.stringify(name)}]`));
 const token = page => page.locator(`#reader .tok.content[data-index="${tokenIndex}"]`);
@@ -62,23 +74,25 @@ async function openPopup(page) {
 }
 async function openChooser(page) {
   await openPopup(page);
-  // one path (round 4, T5): a word not yet saved is saved first; then Add to a list stands beside Saved ✓
-  if (await page.locator('#mini-take').getAttribute('aria-pressed') !== 'true') {
-    assert.equal(await page.locator('#mini-lists').isVisible(), false, 'The popup offers no list before Save');
+  // one path (round 4, T5; 1.3.0 Save ▾): the popup has no list button — Save saves the word and unfolds its menu
+  // inside the card; on a saved word the same button opens the menu again
+  if (!await dialog(page).count()) {
+    assert.equal(await page.locator('#mini-lists, #mini .mini-entry').count(), 0, 'The popup has one Save ▾ and no list or entry button');
+    const unsaved = await page.locator('#mini-take').getAttribute('aria-pressed') !== 'true';
     await page.locator('#mini-take').click();
-    await saved(page);
+    if (unsaved) await saved(page);
   }
-  await page.locator('#mini-lists').click();
   await dialog(page).waitFor();
   assert.equal(await dialog(page).getAttribute('role'), 'dialog');
-  assert.equal(await page.locator('#mini-lists').getAttribute('aria-expanded'), 'true');
+  assert.equal(await page.locator('#mini-take').getAttribute('aria-expanded'), 'true');
+  assert.equal(await page.locator('#mini #vocabulary-list-popover.is-inline').count(), 1, 'Save ▾ unfolds its menu inside the card');
   assert.equal(await page.locator('#vocabulary-list-dialog, #capture-panel').count(), 0, 'Optional lists use the compact popover');
 }
 async function closeChooser(page) {
   await dialog(page).press('Escape');
   await dialog(page).waitFor({ state: 'detached' });
-  assert.equal(await page.locator('#mini-lists').getAttribute('aria-expanded'), 'false');
-  assert.equal(await page.locator('#mini-lists').evaluate(node => node === document.activeElement), true, 'Escape returns focus to Add to list');
+  assert.equal(await page.locator('#mini-take').getAttribute('aria-expanded'), 'false');
+  assert.equal(await page.locator('#mini-take').evaluate(node => node === document.activeElement), true, 'Escape returns focus to Save ▾');
 }
 async function recoverRecord(page) {
   if (await dialog(page).count()) await closeChooser(page);
@@ -99,7 +113,7 @@ async function saved(page) {
 }
 async function openContext(page) {
   await openPopup(page);
-  await page.locator('#mini .mini-entry').click();
+  await page.locator('#mini button.mini-word').click(); // the band is the door into the full entry
   await page.locator('#sheet [data-ctx-scope="sent"]').waitFor();
 }
 async function chooseScope(page, scope) {
@@ -167,12 +181,14 @@ try {
       await check('popup-cancel-direct-save-and-three-context-scopes', async page => {
         await reader(page);
         const before = learning(await readAppRecord(page));
-        // one path (round 4, T5): Save first, with no list offered before it
+        // one path (round 4, T5; 1.3.0 Save ▾): Save first; the save unfolds the menu inside the card
         await openPopup(page);
-        assert.equal(await page.locator('#mini-lists').isVisible(), false, 'The popup offers no list before Save');
+        assert.equal(await page.locator('#mini-lists, #mini .mini-entry').count(), 0, 'The popup has one Save ▾ and no list or entry button');
+        assert.equal(await dialog(page).count(), 0, 'No menu is open before Save');
         await page.locator('#mini-take').click();
         const initial = await saved(page);
-        assert.equal(await dialog(page).count(), 0, 'One Save captures directly without opening lists');
+        await dialog(page).waitFor();
+        assert.equal(await page.locator('#mini #vocabulary-list-popover.is-inline').count(), 1, 'One Save captures directly and unfolds its menu inside the card');
         contextIs(initial, 'sent');
         assert.deepEqual(initial.srs || {}, before.srs);
         assert.deepEqual(initial.revlog || [], before.revlog);
@@ -203,8 +219,8 @@ try {
         await reader(page);
         await openChooser(page);
         const mini = await page.locator('#mini').elementHandle();
-        await listName(page).fill('Chooser history fixture');
-        await create(page).click();
+        await (await nameField(page)).fill('Chooser history fixture');
+        await addList(page);
         await waitForAppRecord(page, value => value.lists?.['Chooser history fixture']?.some(item => item.id === word));
         await status(page).filter({ hasText: 'Added to Chooser history fixture.' }).waitFor();
         assert.equal(await mini.evaluate(node => node.isConnected), true, 'The original popup survives list capture');
@@ -235,7 +251,9 @@ try {
         await openPopup(page);
         const prior = history(await readAppRecord(page));
         assert(Object.keys(prior.srs).length && prior.revlog.length && Object.keys(prior.lists).length);
-        await page.locator('#mini-take').click();
+        // the way back out of review is the menu's own Review row (Save ▾ on a saved word opens the menu)
+        await openChooser(page);
+        await page.locator('#mini-review').uncheck();
         const removed = await waitForAppRecord(page, value => !row(value), { description: 'explicit removal from review' });
         await page.locator('#reader-toast').filter({ hasText: 'Removed from review' }).waitFor();
         assert.deepEqual(history(removed), prior, 'Removing from review preserves schedules, review history, and lists');
@@ -251,19 +269,19 @@ try {
       await check('only-a-named-add-clears-the-typed-list-name', async page => {
         await reader(page);
         await openChooser(page);
-        await listName(page).fill('Existing chooser list');
-        await create(page).click();
+        await (await nameField(page)).fill('Existing chooser list');
+        await addList(page);
         await waitForAppRecord(page, value => value.lists?.['Existing chooser list']?.some(item => item.id === word));
         await status(page).filter({ hasText: 'Added to Existing chooser list.' }).waitFor();
         assert.equal(await listName(page).inputValue(), '', 'Adding the typed name clears that draft');
-        await listName(page).fill('N1 読解');
+        await (await nameField(page)).fill('N1 読解');
         await closeChooser(page);
-        await page.locator('#mini-take').click();
+        await openChooser(page);
+        await page.locator('#mini-review').uncheck();
         await waitForAppRecord(page, value => !row(value));
         await page.locator('#reader-toast-action').click();
         await saved(page);
-        await openChooser(page);
-        assert.equal(await listName(page).inputValue(), 'N1 読解', 'Review Save/Undo keeps the unrelated typed name');
+        assert.equal(await listName(page).inputValue(), 'N1 読解', 'Review off and its Undo keep the unrelated typed name');
         await listBox(page, 'Existing chooser list').uncheck();
         await status(page).filter({ hasText: 'Taken off Existing chooser list.' }).waitFor();
         await listBox(page, 'Existing chooser list').check();
@@ -274,7 +292,7 @@ try {
         await reader(page);
         await openChooser(page);
         assert.equal(await listName(page).inputValue(), 'N1 読解', 'The draft survives close and reload');
-        await create(page).click();
+        await addList(page);
         await waitForAppRecord(page, value => value.lists?.['N1 読解']?.some(item => item.id === word));
         await status(page).filter({ hasText: 'Added to N1 読解.' }).waitFor();
         assert.equal(await listName(page).inputValue(), '');
@@ -297,7 +315,8 @@ try {
         assert(captureFault.fired > 0, 'A native capture transaction really failed');
         assert.deepEqual(learning(await readAppRecord(page)), before);
         assert.equal(await page.locator('#mini-take').getAttribute('aria-pressed'), 'false');
-        assert.equal(await page.locator('#mini-lists').isVisible(), false, 'A failed Save offers no list');
+        assert.equal(await dialog(page).count(), 0, 'A failed Save opens no menu');
+        assert.equal(await page.locator('#mini-take').getAttribute('aria-expanded'), 'false');
         // the fault protects the record until reload: a second Save, past its bounce guard, is refused and writes nothing
         await page.waitForTimeout(650);
         await page.locator('#mini-take').click();
@@ -307,16 +326,16 @@ try {
         await recoverRecord(page);
         assert.deepEqual(learning(await readAppRecord(page)), before, 'The protected reload keeps the record as it was');
         await openChooser(page);
-        await listName(page).fill('Retry vocabulary');
-        await create(page).click();
+        await (await nameField(page)).fill('Retry vocabulary');
+        await addList(page);
         await waitForAppRecord(page, value => value.lists?.['Retry vocabulary']?.some(item => item.id === word));
         await status(page).filter({ hasText: 'Added to Retry vocabulary.' }).waitFor();
         assert.equal(await listName(page).inputValue(), '');
         assert.equal(await page.locator('#mini-take').getAttribute('aria-pressed'), 'true');
         const captured = learning(await readAppRecord(page));
-        await listName(page).fill('Second retry list');
+        await (await nameField(page)).fill('Second retry list');
         await armRecordWriteFailure(page, 'abort', { roots: ['lists'] });
-        await create(page).click();
+        await addList(page);
         await status(page).filter({ hasText: /Please retry adding it to the list|reload/iu }).waitFor();
         const listFault = await clearRecordWriteFailure(page);
         assert(listFault.fired > 0);
@@ -325,7 +344,7 @@ try {
         assert.equal(await create(page).isDisabled(), true, 'A failed native write protects the host until reload');
         await recoverProtectedChooser(page);
         assert.equal(await listName(page).inputValue(), 'Second retry list', 'List-only recovery also preserves the unsaved list name');
-        await create(page).click();
+        await addList(page);
         await waitForAppRecord(page, value => value.lists?.['Second retry list']?.some(item => item.id === word));
         await status(page).filter({ hasText: 'Added to Second retry list.' }).waitFor();
         await closeChooser(page);

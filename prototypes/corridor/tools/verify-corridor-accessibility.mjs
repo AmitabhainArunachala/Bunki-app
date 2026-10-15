@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 
 import { chromium } from 'playwright-core';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { entryCloseSelector } from './sheet-navigation-support.mjs';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR_DIR = resolveCorridorSite();
@@ -396,7 +397,7 @@ async function main() {
     check(
       'focused word exposes the word menu (Shift+F10) and the full entry (Ctrl+Enter) as non-hold alternatives',
       focusProbe.tokenFocused && /Shift\+F10/.test(focusProbe.shortcuts) && /Control\+Enter/.test(focusProbe.shortcuts) &&
-        menuProbe.menu === 'menu' && menuProbe.focusInMenu && menuProbe.items.includes('Full entry') && menuProbe.items.includes('Save word') && menuBack,
+        menuProbe.menu === 'menu' && menuProbe.focusInMenu && menuProbe.items.includes('Full entry') && menuProbe.items.includes('Save') && menuBack,
       JSON.stringify({ ...focusProbe, ...menuProbe, menuBack }),
     );
     check(
@@ -435,7 +436,7 @@ async function main() {
     check(
       'screen-reader tree exposes named token, its keyboard help and the word menu items',
       describedButtons.some((text) => /Shift\+F10/.test(text) && /Enter/.test(text)) &&
-        menuItems.includes('Save word') && menuItems.includes('Full entry') &&
+        menuItems.includes('Save') && menuItems.includes('Full entry') &&
         menuItems.includes('Ask the tutor about this sentence'),
       `${menuItems.length} menu item(s): ${menuItems.join(' · ')}`,
     );
@@ -486,10 +487,22 @@ async function main() {
       popup: Boolean(document.querySelector('#mini')), sheet: Boolean(document.querySelector('#sheet')),
       current: node.classList.contains('tok-current'), gloss: Boolean(node.querySelector('.tok-en')),
     }));
+    // 1.3.0: the second action on the same word is its full entry; closing the entry returns the original word
     check(
-      'a second action on the same word puts its popup away — no sheet, no English, the word still the chosen one',
-      !secondState.popup && !secondState.sheet && !secondState.gloss && secondState.current,
+      'a second action on the same word opens its full entry — the popup gone, no English under the word, the word still the chosen one',
+      secondState.sheet && !secondState.popup && !secondState.gloss && secondState.current,
       JSON.stringify(secondState),
+    );
+    await page.locator(await entryCloseSelector(page)).click();
+    await page.waitForFunction(() => !document.getElementById('sheet'));
+    const closedState = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
+      popup: Boolean(document.querySelector('#mini')), sheet: Boolean(document.querySelector('#sheet')),
+      current: node.classList.contains('tok-current'), lit: node.classList.contains('lit'),
+    }));
+    check(
+      'closing the entry returns the original word: no popup, no sheet, nothing lit or chosen',
+      !closedState.popup && !closedState.sheet && !closedState.lit && !closedState.current,
+      JSON.stringify(closedState),
     );
     await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
     const reopened = await popupProbe();
@@ -497,7 +510,7 @@ async function main() {
     const pointerReceipts = await page.evaluate(
       `window.__KAIRO_INTERACTION__?.receipts?.filter((r) => r.action.kind === 'target.activate') ?? []`,
     );
-    // two taps opened the popup (the closing tap between them only put it away)
+    // two taps opened the popup (the dive between them opened the entry)
     check(
       'pointer route emits target.activate envelopes with pointer provenance',
       pointerReceipts.length >= 2 && pointerReceipts.slice(-2).every((r) => r.provenance.modality === 'pointer'),

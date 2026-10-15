@@ -955,7 +955,7 @@ try {
     const quick = await openQuickLook(page, quickTokenIndex.get(id));
     let fullEntry = null;
     if (quick) {
-      await touchAt(page, page.locator('#mini .mini-entry'));
+      await touchAt(page, page.locator('#mini button.mini-word'));
       await page.waitForSelector('#sheet .headword', { timeout: 6_000 });
       fullEntry = await page.evaluate(() => ({
         headword: document.querySelector('#sheet .headword')?.textContent ?? '',

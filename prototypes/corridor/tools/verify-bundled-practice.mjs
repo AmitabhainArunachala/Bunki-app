@@ -144,9 +144,9 @@ for (const engine of engines) for (const width of sizes) {
       const copy = (node.querySelector('.tok-word') || node).cloneNode(true); copy.querySelectorAll('rt,rp,.tok-en').forEach(node => node.remove());
       return copy.textContent;
     }));
-    // back from practice, the word's popup is open again with Practice focused; its Full entry opens the word
+    // back from practice, the word's popup is open again with Practice focused; its band (the word) opens the entry
     assert.equal(await page.locator('#mini .mini-word').textContent(), WORD);
-    await page.locator('#mini .mini-entry').click(); await page.locator('#sheet[data-node="word:窓"] .dictionary-entry').waitFor();
+    await page.locator('#mini button.mini-word').click(); await page.locator('#sheet[data-node="word:窓"] .dictionary-entry').waitFor();
     await settled(page); await page.waitForTimeout(800); // The real sheet's same-gesture guard.
     await page.locator('#sheet [data-kanjirow="窓"]').click(); await page.locator('#sheet[data-node="kanji:窓"]').waitFor();
     await settled(page); await page.waitForTimeout(800); await page.locator('#entry-sentence-practice').click();

@@ -208,7 +208,7 @@ try {
             }),
             'The popup Save owns its actual centre',
           );
-          const dictionary = page.locator('#mini .mini-entry');
+          const dictionary = page.locator('#mini button.mini-word');
           {
             await dictionary.click();
             await page.locator('#sheet').waitFor();

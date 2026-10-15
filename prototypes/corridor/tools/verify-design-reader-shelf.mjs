@@ -65,36 +65,38 @@
  *                         look kept だますかす as the card's reading and 全項目 called it "another reading".
  *   G1 one tap, the meaning — (reader lane 2026-10-02, John #8/#11) at 1368 and 390, ONE tap on 郊外 opens
  *                         the popup with the word, its reading こうがい, its meaning "suburb", a filled
- *                         Save and "Full entry ›", inside the screen; nothing is written under the word.
+ *                         Save ▾ and the band as the door into the full entry, inside the screen; nothing is
+ *                         written under the word.
  *                         A tap on another word moves the popup; Escape puts it away and gives focus back
  *                         to the word. Control: 3166ded3, whose first tap showed only the reading.
  *   G2 menu → one card  — (John #11 "right click and choose save") a right-click on 郊外 opens the word menu
- *                         at the pointer: Save word · Save the sentence · Full entry · Ask the tutor about
- *                         this sentence · Copy. Save word makes exactly one 郊外 card carrying its sentence
+ *                         at the pointer: Save · Save the sentence · Full entry · Ask the tutor about
+ *                         this sentence · Copy. Save makes exactly one 郊外 card carrying its sentence
  *                         (the capture path's ctx), the menu closes, a polite toast says so, and the menu
  *                         then shows "Saved ✓" unavailable. A right-click off the words keeps the browser's
  *                         own menu. Control: 3166ded3, which had no word menu.
- *   G3 Save + Undo      — (John #17) at 1368 and 390, the popup's Save makes one card in one press, no list
- *                         window opens, the button reads "Saved ✓" and a role=status toast reads "Saved to
- *                         review · Undo"; Undo takes the card back out and the button reads "Save" again.
+ *   G3 Save + Review off — (John #17; 1.3.0 Save ▾) at 1368 and 390, the popup's Save makes one card in one
+ *                         press, no list window opens, the button reads "Saved ✓" and its menu unfolds inside
+ *                         the card with Review checked; Review off takes the card back out and the button
+ *                         reads "Save" again.
  *                         Control: 3166ded3, whose Save opened dialog#vocabulary-list-dialog.
  *   G4 keyboard menu    — the focused word's Shift+F10 (and the ContextMenu key) opens the menu with the
  *                         first item focused; ↓ moves; Escape closes it and focus returns to the word.
  *                         Enter on the word opens the popup with focus on Save; Escape returns to the word.
  *                         Control: 3166ded3 (no menu).
  *   G5 lists popover    — (John #17; round 4 T5, "click save and then add to list from there") the popup
- *                         offers no list until the word is saved; after Save, at 1368 "Add to a list" opens
- *                         a compact non-modal popover beside the link (no dialog#vocabulary-list-dialog),
- *                         whose inline "New list" field makes a list holding the word and whose checkbox
- *                         takes it off again while the card stays; at 390 the popover is a short sheet
- *                         on the screen's foot. Control: 3166ded3.
+ *                         has no list button; Save ▾ saves the word and unfolds its menu inside the card
+ *                         under the button, at 1368 and 390 (no dialog#vocabulary-list-dialog, never over the
+ *                         kanji or sentence bands), whose "+ New list" row becomes a name field that makes a
+ *                         list holding the word and whose checkbox takes it off again while the card stays.
+ *                         Control: 3166ded3.
  *                         In the galaxy, where a word's entry opens over the sky and a word of its example
- *                         sentences opens the same popup, the path is the same: no list before Save, the
- *                         list beside "Saved ✓", and none again after Undo. Control: 890cd522, which
+ *                         sentences opens the same popup, the path is the same: no menu before Save, the
+ *                         menu under "Saved ✓", and none again after Review off. Control: 890cd522, which
  *                         showed "Add to a list" beside an unsaved Save there.
  *                         That popup's word band is laid out there too: the word, its reading and its meaning
- *                         each stand on a row of their own, and "Full entry" sits beside the word in the band's
- *                         corner, at least 44px each way, inside the card and the screen, and not covered.
+ *                         each stand on a row of their own, and the band itself is the door into the full entry
+ *                         (a chevron at its end), at least 44px tall, inside the card and the screen, not covered.
  *                         Control: 76c40528, whose galaxy popup ran the three together on one line.
  *   G6 sentence door    — (John #18; round 4 T5) no sentence bar shows when a word is chosen (no sentence
  *                         action shows outside the popup); the popup's last band is one named door,
@@ -821,7 +823,7 @@ try {
       // quick look first, then 全項目
       await openArticle(page, ARTICLE);
       await saveFromQuickLook(page);
-      await page.locator('#mini .mini-entry').click();
+      await page.locator('#mini button.mini-word').click(); // the band is the door
       await page.waitForSelector('#sheet #take');
       const full = await fullEntryState(page);
       assert(full.take?.pressed === 'true' && !full.take.disabled && !full.take.held && full.note === null && !full.replace,
@@ -832,8 +834,8 @@ try {
     await run('W2-one-word-one-card-reverse', DESK, async (page) => {
       await openArticle(page, ARTICLE);
       await page.locator('#reader .tok[data-index="0"]').click();
-      await page.waitForSelector('#mini .mini-entry');
-      await page.locator('#mini .mini-entry').click();
+      await page.waitForSelector('#mini button.mini-word');
+      await page.locator('#mini button.mini-word').click();
       await page.waitForSelector('#sheet #take:not([disabled])');
       await page.locator('#sheet #take').click();
       await page.waitForFunction(() => document.querySelector('#sheet #take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
@@ -856,11 +858,11 @@ try {
     const popupState = (page) => page.evaluate(() => {
       const mini = document.getElementById('mini');
       if (!mini) return null;
-      const box = mini.getBoundingClientRect(), take = mini.querySelector('#mini-take'), entry = mini.querySelector('.mini-entry');
+      const box = mini.getBoundingClientRect(), take = mini.querySelector('#mini-take'), door = mini.querySelector('button.mini-word[data-action="entry.open"]'), head = mini.querySelector('.mini-head');
       return { word: mini.querySelector('.mini-word')?.textContent, reading: mini.querySelector('.mini-reading')?.textContent,
         gloss: mini.querySelector('.mini-gloss')?.textContent, save: take && { label: take.textContent, disabled: take.disabled,
           filled: getComputedStyle(take).backgroundColor !== 'rgba(0, 0, 0, 0)' && getComputedStyle(take).backgroundColor !== 'transparent' },
-        entry: entry && { label: entry.textContent, disabled: entry.disabled },
+        door: door && { name: door.getAttribute('aria-label'), chevron: getComputedStyle(head, '::after').content !== 'none', entryButton: !!mini.querySelector('.mini-entry') },
         inside: box.left >= 0 && box.top >= 0 && box.right <= innerWidth && box.bottom <= innerHeight,
         underWord: document.querySelectorAll('#reader .tok-en').length };
     });
@@ -873,7 +875,7 @@ try {
         assert(one, 'one tap opened no popup');
         assert.deepEqual([one.word, one.reading, one.gloss], ['郊外', 'こうがい', 'suburb'], `one tap does not show the word, reading and meaning: ${JSON.stringify(one)}`);
         assert(one.save?.label === 'Save' && !one.save.disabled && one.save.filled, `no filled Save: ${JSON.stringify(one.save)}`);
-        assert(/^Full entry\s*›$/u.test(one.entry?.label ?? '') && !one.entry.disabled, `no Full entry › link: ${JSON.stringify(one.entry)}`);
+        assert(one.door?.name === 'Open the full entry' && one.door.chevron && !one.door.entryButton, `the band is not the door into the full entry: ${JSON.stringify(one.door)}`);
         assert(one.inside && one.underWord === 0, `the popup is off screen, or English was written under the word: ${JSON.stringify(one)}`);
         await tapToken(page, 2);
         const moved = await page.evaluate(() => ({ count: document.querySelectorAll('#mini').length, word: document.querySelector('#mini .mini-word')?.textContent }));
@@ -898,7 +900,7 @@ try {
         const node = document.getElementById('reader-word-menu'), box = node.getBoundingClientRect();
         return { role: node.getAttribute('role'), items: [...node.querySelectorAll('[role="menuitem"]')].map((item) => item.textContent), left: box.left, top: box.top };
       });
-      assert.deepEqual(menu.items, ['Save word', 'Save the sentence', 'Full entry', 'Ask the tutor about this sentence', 'Copy'], `the word menu: ${JSON.stringify(menu.items)}`);
+      assert.deepEqual(menu.items, ['Save', 'Save the sentence', 'Full entry', 'Ask the tutor about this sentence', 'Copy'], `the word menu: ${JSON.stringify(menu.items)}`);
       assert(menu.role === 'menu' && Math.abs(menu.left - at.x) <= 2 && Math.abs(menu.top - at.y) <= 2, `the menu is not at the pointer: ${JSON.stringify({ menu, at })}`);
       await page.locator('#reader-word-menu [data-menu-action="save-word"]').click();
       const record = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length > 0, { description: '郊外 saved from the menu' });
@@ -934,18 +936,22 @@ try {
         await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 1, { description: 'one press saves 郊外' });
         // the durable write lands a beat before the app repaints its button and raises the toast: wait for the page
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true'
-          && !!document.querySelector('#reader-toast:not([hidden])'), null, { timeout: 5_000 }).catch(() => {});
+          && !!document.querySelector('#mini #vocabulary-list-popover.is-inline'), null, { timeout: 5_000 }).catch(() => {});
         const saved = await page.evaluate(() => ({ label: document.querySelector('#mini #mini-take')?.textContent, pressed: document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed'),
           window: !!document.querySelector('#vocabulary-list-dialog, dialog[open]'),
           toast: document.querySelector('#reader-toast:not([hidden])')?.innerText.replace(/\s+/gu, ' ').trim() ?? null,
           role: document.querySelector('#reader-toast')?.getAttribute('role') }));
         assert(saved.label === 'Saved ✓' && saved.pressed === 'true' && !saved.window, `one press did not save in place: ${JSON.stringify(saved)}`);
-        assert(saved.toast === 'Saved to review Undo' && saved.role === 'status', `the toast: ${JSON.stringify(saved)}`);
-        await page.locator('#reader-toast-action').click();
-        const undone = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 0, { description: 'Undo takes the card out' });
+        // Save ▾ (1.3.0): the press that saves unfolds the word's menu inside the card, its Review row checked —
+        // that row is the way back out (the menu's opening puts the Save toast away)
+        const menu = await page.evaluate(() => { const pop = document.querySelector('#mini #vocabulary-list-popover.is-inline'), review = pop?.querySelector('#mini-review');
+          return { inline: !!pop, review: review ? review.checked : null }; });
+        assert(menu.inline && menu.review === true, `Save ▾ did not unfold its menu with Review checked: ${JSON.stringify(menu)}`);
+        await page.locator('#mini #mini-review').uncheck();
+        const undone = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length === 0, { description: 'Review off takes the card out' });
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'false', null, { timeout: 5_000 }).catch(() => {});
         const label2 = await page.locator('#mini #mini-take').textContent();
-        assert.equal(label2, 'Save', 'after Undo the button does not read Save');
+        assert.equal(label2, 'Save', 'after Review off the button does not read Save');
         return { saved: saved.label, toast: saved.toast, afterUndo: cardsFor(undone, '郊外').length };
       });
     }
@@ -979,22 +985,24 @@ try {
       await run(`G5-lists-popover-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
         await tapToken(page, SUBURB);
-        // one path (round 4, T5): the popup offers no list before Save; after it, Add to a list stands beside Saved ✓
-        assert.equal(await page.locator('#mini #mini-lists').isVisible(), false, 'the popup offers a list before the word is saved');
+        // one path (round 4, T5; 1.3.0 Save ▾): the popup has no list button; Save saves the word and unfolds its
+        // menu inside the card, under the button — never a window, never over another band
+        assert.equal(await page.locator('#mini #mini-lists, #mini .mini-entry').count(), 0, 'the popup carries a list or entry button');
+        assert.equal(await page.locator('#vocabulary-list-popover').count(), 0, 'a menu is open before Save');
         await page.locator('#mini #mini-take').click();
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
-        await page.locator('#mini #mini-lists').click();
-        await page.waitForSelector('#vocabulary-list-popover');
+        await page.waitForSelector('#mini #vocabulary-list-popover.is-inline');
         const shape = await page.evaluate(() => {
-          const pop = document.getElementById('vocabulary-list-popover'), box = pop.getBoundingClientRect(), link = document.getElementById('mini-lists').getBoundingClientRect();
-          return { modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'), width: Math.round(box.width), height: Math.round(box.height),
-            bottom: Math.round(box.bottom), left: Math.round(box.left), right: Math.round(box.right), top: Math.round(box.top), linkBottom: Math.round(link.bottom),
-            viewport: [innerWidth, innerHeight], fixed: getComputedStyle(pop).position };
+          const mini = document.getElementById('mini'), pop = document.getElementById('vocabulary-list-popover'), box = pop.getBoundingClientRect(), card = mini.getBoundingClientRect(), take = document.getElementById('mini-take').getBoundingClientRect();
+          const bands = [...mini.querySelectorAll('.mini-web, .mini-sentence-wrap')].map((n) => n.getBoundingClientRect()).filter((r) => r.height);
+          return { modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'), inCard: pop.closest('#mini') === mini, position: getComputedStyle(pop).position,
+            inside: box.left >= card.left - 0.5 && box.right <= card.right + 0.5 && box.top >= card.top - 0.5 && box.bottom <= card.bottom + 0.5,
+            underSave: box.top >= take.bottom - 1, aboveBands: bands.every((r) => r.top >= box.bottom - 0.5), expanded: document.getElementById('mini-take').getAttribute('aria-expanded'),
+            newList: !!pop.querySelector('#vocabulary-list-new'), width: Math.round(box.width), height: Math.round(box.height), viewport: [innerWidth, innerHeight] };
         });
-        assert(!shape.modal && shape.fixed === 'fixed', `the lists open as a window: ${JSON.stringify(shape)}`);
-        if (label === '1368') assert(shape.width <= 340 && Math.abs(shape.top - shape.linkBottom) <= 12, `not a compact popover beside its link: ${JSON.stringify(shape)}`);
-        else assert(shape.left === 0 && shape.right === shape.viewport[0] && Math.abs(shape.bottom - shape.viewport[1]) <= 1 && shape.height <= shape.viewport[1] * 0.62 + 1,
-          `not a short sheet at the foot: ${JSON.stringify(shape)}`);
+        assert(!shape.modal && shape.inCard && shape.position === 'static' && shape.inside && shape.underSave && shape.aboveBands && shape.expanded === 'true' && shape.newList,
+          `Save ▾'s menu is not inside the card under its button: ${JSON.stringify(shape)}`);
+        await page.locator('#vocabulary-list-new').click();
         await page.locator('#vocabulary-list-name').fill('Syria');
         await page.locator('#vocabulary-list-create').click();
         await waitForAppRecord(page, (r) => r.lists?.Syria?.some((m) => m.t === 'word' && m.id === '郊外') && cardsFor(r, '郊外').length === 1,
@@ -1040,10 +1048,10 @@ try {
       await page.waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8_000 }).catch(() => {});
       await page.waitForTimeout(400);
       const path = () => page.evaluate(() => {
-        const mini = document.getElementById('mini'), take = mini?.querySelector('#mini-take'), lists = mini?.querySelector('#mini-lists');
+        const mini = document.getElementById('mini'), take = mini?.querySelector('#mini-take'), menu = mini?.querySelector('#vocabulary-list-popover.is-inline');
         const shown = (node) => !!node && node.getClientRects().length > 0 && getComputedStyle(node).visibility !== 'hidden';
         return { view: document.body.dataset.view, word: mini?.querySelector('.mini-word')?.textContent ?? null, save: take?.textContent ?? null,
-          pressed: take?.getAttribute('aria-pressed') ?? null, held: take?.disabled ?? null, hasList: !!lists, list: shown(lists), note: shown(mini?.querySelector('.mini-take-note')) };
+          pressed: take?.getAttribute('aria-pressed') ?? null, held: take?.disabled ?? null, hasMenu: !!take?.dataset.saveMenu, list: shown(menu), note: shown(mini?.querySelector('.mini-take-note')) };
       });
       // a word of an example sentence whose Save is live and not yet pressed
       let before = null;
@@ -1053,40 +1061,43 @@ try {
         await tokens.nth(i).click();
         await page.waitForTimeout(250);
         const seen = await path();
-        if (seen.hasList && seen.held === false && seen.pressed === 'false') before = seen;
+        if (seen.hasMenu && seen.held === false && seen.pressed === 'false') before = seen;
         else await page.keyboard.press('Escape');
       }
       assert(before, 'no example word in the galaxy entry offers a live, unpressed Save');
-      assert(before.view === 'drift' && before.save === 'Save' && !before.list && before.note, `the galaxy popup offers a list before the word is saved: ${JSON.stringify(before)}`);
+      assert(before.view === 'drift' && before.save === 'Save' && !before.list && before.note, `the galaxy popup opens its menu before the word is saved: ${JSON.stringify(before)}`);
       const band = await page.evaluate(() => {
-        const mini = document.getElementById('mini'), entry = mini.querySelector('.mini-entry');
+        const mini = document.getElementById('mini'), head = mini.querySelector('.mini-head'), door = mini.querySelector('button.mini-word[data-action="entry.open"]');
         const box = (node) => { const r = node.getBoundingClientRect(); return { top: r.top, right: r.right, bottom: r.bottom, left: r.left, width: r.width, height: r.height }; };
-        const e = box(entry), hit = document.elementFromPoint(e.left + e.width / 2, e.top + e.height / 2);
-        return { card: box(mini), screen: { width: innerWidth, height: innerHeight }, entry: e, entryName: entry.innerText.trim(), entryOnTop: !!hit && entry.contains(hit),
+        const h = box(head), e = box(door), end = document.elementFromPoint(h.right - 20, h.top + h.height / 2), mid = document.elementFromPoint(e.left + e.width / 2, e.top + e.height / 2);
+        return { card: box(mini), screen: { width: innerWidth, height: innerHeight }, band: h, entry: e, entryName: door.getAttribute('aria-label'),
+          chevron: getComputedStyle(head, '::after').content !== 'none', entryOnTop: !!mid && door.contains(mid), bandIsDoor: !!end && (end === door || door.contains(end)),
+          entryButton: !!mini.querySelector('.mini-entry'),
           rows: ['.mini-word', '.mini-reading', '.mini-gloss'].map((selector) => mini.querySelector(selector)).filter(Boolean)
             .map((node) => ({ part: node.classList[0], text: node.textContent, ...box(node) })) };
       });
       assert(band.rows.length >= 2 && band.rows.every((row) => row.width > 0 && row.height > 0), `the galaxy popup's word band is missing a line: ${JSON.stringify(band.rows)}`);
       const runOn = band.rows.slice(1).map((row, i) => [band.rows[i], row]).filter(([above, below]) => below.top < above.bottom - 1).map(([above, below]) => `${above.part} and ${below.part}`);
       assert.equal(runOn.length, 0, `the galaxy popup runs its word, reading and meaning together on one line (${runOn.join('; ')}): ${JSON.stringify(band.rows)}`);
-      const word = band.rows[0];
-      assert(band.entry.width >= 44 && band.entry.height >= 44, `the galaxy popup's Full entry is under 44px: ${JSON.stringify(band.entry)}`);
-      assert(/^Full entry/u.test(band.entryName) && band.entryOnTop, `the galaxy popup's Full entry is covered or unnamed: ${JSON.stringify({ name: band.entryName, onTop: band.entryOnTop })}`);
-      assert(band.entry.left >= band.card.left - 1 && band.entry.right <= band.card.right + 1 && band.entry.top >= band.card.top - 1 && band.entry.bottom <= band.card.bottom + 1
-        && band.entry.left >= 0 && band.entry.right <= band.screen.width && band.entry.top >= 0 && band.entry.bottom <= band.screen.height,
-        `the galaxy popup's Full entry leaves its card or the screen: ${JSON.stringify(band)}`);
-      assert(band.entry.left >= word.right - 1 && band.entry.top < word.bottom && band.card.right - band.entry.right < band.entry.left - band.card.left,
-        `the galaxy popup's Full entry is not beside the word in the band's corner: ${JSON.stringify({ entry: band.entry, word, card: band.card })}`);
+      assert(band.entry.width >= 44 && band.entry.height >= 44 && band.band.height >= 44, `the galaxy popup's door into the full entry is under 44px: ${JSON.stringify({ entry: band.entry, band: band.band })}`);
+      assert(band.entryName === 'Open the full entry' && band.entryOnTop && band.bandIsDoor && band.chevron && !band.entryButton,
+        `the galaxy popup's band is not the door into the full entry: ${JSON.stringify({ name: band.entryName, onTop: band.entryOnTop, bandIsDoor: band.bandIsDoor, chevron: band.chevron, entryButton: band.entryButton })}`);
+      assert(band.band.left >= band.card.left - 1 && band.band.right <= band.card.right + 1 && band.band.top >= band.card.top - 1 && band.band.bottom <= band.card.bottom + 1
+        && band.band.left >= 0 && band.band.right <= band.screen.width && band.band.top >= 0 && band.band.bottom <= band.screen.height,
+        `the galaxy popup's band leaves its card or the screen: ${JSON.stringify(band)}`);
       await page.locator('#mini #mini-take').click();
       await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
       await waitForAppRecord(page, (r) => cardsFor(r, before.word).length === 1, { description: 'the galaxy popup saved one card' });
       const saved = await path();
-      assert(saved.save === 'Saved ✓' && saved.list && !saved.note, `after Save the galaxy popup does not offer the list: ${JSON.stringify(saved)}`);
-      await page.locator('#reader-toast-action').click();
-      await waitForAppRecord(page, (r) => cardsFor(r, before.word).length === 0, { description: 'Undo takes the card out' });
+      assert(saved.save === 'Saved ✓' && saved.list && !saved.note, `after Save the galaxy popup does not unfold its menu: ${JSON.stringify(saved)}`);
+      // the menu's Review row is the way back out; Escape folds the menu away and the card is as before
+      await page.locator('#mini #mini-review').uncheck();
+      await waitForAppRecord(page, (r) => cardsFor(r, before.word).length === 0, { description: 'Review off takes the card out' });
       await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'false', null, { timeout: 5_000 });
+      await page.keyboard.press('Escape');
+      await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'), null, { timeout: 5_000 });
       const undone = await path();
-      assert(undone.save === 'Save' && !undone.list && undone.note, `after Undo the galaxy popup still offers a list: ${JSON.stringify(undone)}`);
+      assert(undone.save === 'Save' && !undone.list && undone.note, `after Review off the galaxy popup still shows its menu: ${JSON.stringify(undone)}`);
       return { taps, entry: entry.node, word: before.word, before, saved, undone, band: { rows: band.rows.map((row) => `${row.part}@${Math.round(row.top)}`), entry: [Math.round(band.entry.width), Math.round(band.entry.height)] } };
     });
 
@@ -1361,15 +1372,16 @@ try {
         await page.locator('#mini #mini-sentence-back').click();
         await page.locator('#mini #mini-take').click();
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
-        await page.waitForSelector('#reader-toast:not([hidden])');
+        // Save ▾ (1.3.0): the save unfolds the menu inside the card (its opening puts the Save toast away)
+        await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #vocabulary-list-new');
         const saved = await page.evaluate(measureReaderMotion);
-        assert(saved.covered.toast === 1 && saved.animations > word.animations - 1, `motion check did not observe the Save toast: ${JSON.stringify(saved.covered)}`);
-        assert.deepEqual(saved.violations, [], 'The saved popup and its toast may animate only transform and opacity');
-        await page.locator('#mini #mini-lists').click();
+        assert(saved.animations > word.animations - 1, `motion check did not observe the saved popup and its menu: ${JSON.stringify(saved.covered)}`);
+        assert.deepEqual(saved.violations, [], 'The saved popup and its menu may animate only transform and opacity');
+        await page.locator('#vocabulary-list-new').click();
         await page.waitForSelector('#vocabulary-list-popover #vocabulary-list-create');
         const lists = await page.evaluate(measureReaderMotion);
-        assert.equal(lists.covered.listAdd, 1, `motion check did not observe the list sheet's Add: ${JSON.stringify(lists.covered)}`);
-        assert.deepEqual(lists.violations, [], 'The list sheet may animate only transform and opacity');
+        assert.equal(lists.covered.listAdd, 1, `motion check did not observe the menu's Add: ${JSON.stringify(lists.covered)}`);
+        assert.deepEqual(lists.violations, [], 'The menu may animate only transform and opacity');
         await page.keyboard.press('Escape');
         await page.keyboard.press('Escape');
         await page.locator('#dials-toggle').click();

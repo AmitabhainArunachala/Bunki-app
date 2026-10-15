@@ -151,11 +151,12 @@ try {
     // R3 word sheet
     const token = page.locator('#reader .tok.content').nth(3);
     if (await token.count()) {
-      // a word's full sheet opens from its popup: one tap, then "Full entry ›" (reader lane 2026-10-02)
+      // a word's full sheet opens from its popup: one tap, then the same word again (1.3.0)
       await token.scrollIntoViewIfNeeded();
       const box = await token.boundingBox();
       await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-      await page.locator('#mini .mini-entry').click({ timeout: 10_000 }).catch(() => {});
+      await page.locator('#mini .mini-word').waitFor({ timeout: 10_000 }).catch(() => {});
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
       const opened = await page.waitForSelector('#sheet', { timeout: 10_000 }).then(() => true, () => false);
       check(`R3 ${w}px sheet: the word's Full entry opens the word sheet`, opened);
       const sheetEntry = page.locator('#sheet .report-line [data-report-entry="open"]');

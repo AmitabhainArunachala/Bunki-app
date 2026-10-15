@@ -1662,23 +1662,21 @@ try {
 
       await page.keyboard.press('Enter');
       await page.locator('#mini').waitFor();
-      await page.locator('#mini .mini-entry').focus();
+      await page.locator('#mini').focus();
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('#mini').count(), 0);
       assert.equal((await atOccurrence()).focused, true, 'Esc inside the popup returns to the same occurrence');
 
       await page.keyboard.press('Space');
       await page.locator('#mini').waitFor();
-      // lists open in a small popover from the popup's "Add to a list" (reader lane 2026-10-02), never a window;
-      // one path (round 4, T5): the popup offers a list once the word is saved
+      // Save ▾ (1.3.0): the press saves the word and unfolds its menu inside the card, never a window
       await page.locator('#mini-take').click();
       await page.waitForFunction(() => document.querySelector('#mini-take')?.getAttribute('aria-pressed') === 'true');
-      await page.locator('#mini-lists').click();
-      await page.locator('#vocabulary-list-popover').waitFor();
+      await page.locator('#mini #vocabulary-list-popover.is-inline').waitFor();
       await page.keyboard.press('Escape');
       await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'));
-      assert.equal(await page.locator('#mini').count(), 1, 'Esc in the list popover closes only the popover');
-      assert.equal(await page.evaluate(() => document.activeElement?.id), 'mini-lists', 'Esc hands focus back to Add to list…');
+      assert.equal(await page.locator('#mini').count(), 1, 'Esc in the menu closes only the menu');
+      assert.equal(await page.evaluate(() => document.activeElement?.id), 'mini-take', 'Esc hands focus back to Save ▾');
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('#mini').count(), 0);
       assert.equal((await atOccurrence()).focused, true, 'Esc in the popup returns to the same occurrence');
