@@ -247,8 +247,10 @@ const PROBE = `(() => {
   const kp = document.querySelector('.kp');
   const probe = document.createElement('i');
   kp.append(probe);
-  const rgba = (v) => { probe.style.color = ''; probe.style.color = v; const c = getComputedStyle(probe).color;
-    const n = (c.match(/[\\d.]+/g) || []).map(Number); return c.startsWith('rgb') ? [n[0], n[1], n[2], n.length > 3 ? n[3] : 1] : null; };
+  // Chromium serialises a plain colour as rgb()/rgba() and a color-mix() result as color(srgb r g b / a)
+  const parse = (c) => { let m = c.match(/^rgba?\\(([^)]+)\\)$/); if (m) { const n = m[1].split(/[\\s,/]+/).filter(Boolean).map(Number); return [n[0], n[1], n[2], n[3] ?? 1]; }
+    m = c.match(/^color\\(srgb\\s+([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)(?:\\s*\\/\\s*([\\d.]+))?\\)$/); if (m) return [+m[1] * 255, +m[2] * 255, +m[3] * 255, m[4] !== undefined ? +m[4] : 1]; return null; };
+  const rgba = (v) => { probe.style.color = ''; probe.style.color = v; return parse(getComputedStyle(probe).color); };
   const out = {};
   for (const k of ${JSON.stringify(PROBE_TOKENS)}) out[k] = rgba('var(--kp-' + k + ')');
   probe.style.color = '';
@@ -256,7 +258,7 @@ const PROBE = `(() => {
   out.tex = getComputedStyle(probe).backgroundImage;
   out.look = kp.dataset.look ?? null;
   out.page = rgba('var(--color-page)');
-  out.deck = (() => { const c = getComputedStyle(kp).backgroundColor; const n = (c.match(/[\\d.]+/g) || []).map(Number); return [n[0], n[1], n[2], n.length > 3 ? n[3] : 1]; })();
+  out.deck = parse(getComputedStyle(kp).backgroundColor);
   probe.remove();
   return out;
 })()`;

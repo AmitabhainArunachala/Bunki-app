@@ -4303,7 +4303,9 @@ body:not([data-view='drift']) .sheet {
   border: 0;
   border-top: var(--stroke-hairline) solid var(--color-edge-strong);
   border-radius: var(--radius-overlay) var(--radius-overlay) 0 0;
-  background: var(--color-surface);
+  /* the leaf is the world's own raised paper (--color-paper = the world block's --ground-0): the sheet
+     opened from the review card wears the world, the operator's theme law (verify-theme-consistency) */
+  background: var(--color-paper);
   color: var(--color-ink);
   box-shadow: var(--elevation-float);
   animation: feel-rise var(--motion-sheet) var(--ease-sheet);
