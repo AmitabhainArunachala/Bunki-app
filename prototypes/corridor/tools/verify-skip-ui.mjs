@@ -81,7 +81,7 @@ try {
   await openShelfDoor(page, '#kanjidex-link');
   await page.locator('.kdx-lens').filter({ hasText: 'by its shape' }).click();
   await page.locator('.skip-hit').first().waitFor();
-  check('lens preserves heading and all dictionary lenses', await page.locator('h1').innerText() === 'Kanji finder' &&
+  check('lens preserves heading and all dictionary lenses', await page.locator('h1').innerText() === 'Kanji by shape' &&
     JSON.stringify(await page.locator('.kdx-lens .l-ja').allTextContents()) ===
       JSON.stringify(['by its parts', 'by its shape', 'draw it', 'by reading', 'by meaning', 'by strokes', 'by radical', 'by frequency', 'by level', 'Kodansha number']));
   await page.locator('.skip-hit').first().click();

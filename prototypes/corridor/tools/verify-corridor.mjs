@@ -2424,7 +2424,7 @@ async function main() {
     `document.querySelector('.view-title')?.textContent ?? ''`,
   );
   check('the archive read\'s crumb names its true origin — the archive, not the bare shelf',
-    /bookshelf › archive › /.test(archiveCrumb) && archiveCrumb.includes(archiveReaderTitle),
+    /Bookshelf › Archive › /.test(archiveCrumb) && archiveCrumb.includes(archiveReaderTitle),
     `crumb "${archiveCrumb.slice(0, 60)}"`);
   await tap(page, '#back');
   await page.waitForSelector('.archive-year');

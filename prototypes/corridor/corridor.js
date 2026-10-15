@@ -4422,7 +4422,7 @@ function ensureArchiveIndex() {
 
 function renderArchive(main) {
   main.append(withEn(el('p', 'eyebrow', '回廊 · 図書館'), 'KAIRO · the library', 'en-inline'));
-  main.append(withEn(el('h1', 'view-title', '過去のニュース · 新聞アーカイブ'), 'older news · the newspaper archive', 'en-inline'));
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.archive)));
   if (!D.archive) {
     main.append(el('p', 'gloss', tx('棚をひらいています…', 'Opening the stack…')));
     if (D.archiveError) {
@@ -5578,7 +5578,7 @@ function renderShelfBody(search = null) {
   art.setAttribute('aria-hidden', 'true');
   const name = el('div', 'shelf-mast-name');
   // in the layout under test the room is called what its tab is called: 本棚 / Bookshelf, John's own word
-  name.append(art, placesLayout() ? withEn(el('h1', 'view-title', '本棚'), 'Bookshelf') : withEn(el('h1', 'view-title', '本棚'), 'bookshelf', 'en-inline'));
+  name.append(art, el('h1', 'view-title', tx(...ROOM_NAMES.rooms.shelf)));
   title.append(name);
   const dateline = el('p', 'shelf-snippet intro shelf-dateline');
   const sep = el('span', 'dateline-sep', ' · ');
@@ -6382,7 +6382,7 @@ function refreshSourceReferenceSurfaces() {
   if (detail?.isConnected) renderSourceReferenceDetail(detail, detail.dataset.captureId);
 }
 function renderSourceInbox(main) {
-  main.append(withEn(el('h1', 'view-title', '持ち込んだ日本語'), 'your source inbox', 'en-inline'));
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms['source-inbox'])));
   if (!sourceInboxModule) {
     main.append(el('p', 'intro', tx('取り込みの機能を読み込めなかった。再読み込みして続ける。',
       'The source inbox could not load. Reload to continue.'))); return;
@@ -7461,7 +7461,7 @@ function renderFeedResults() {
 
 function renderFeed(main) {
   main.append(withEn(el('p', 'eyebrow', '回廊 · いまの日本'), 'KAIRO · Japan now', 'en-inline'));
-  main.append(withEn(el('h1', 'view-title', 'ニュースと雑誌'), 'news & magazines', 'en-inline'));
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.feed)));
   if (!feedModule) {
     main.append(el('p', 'intro', tx('出典一覧を読み込めなかった。接続して、もう一度試す。', 'The source list could not load. Reconnect and try again.')));
     const retry = el('button', 'chip', tx('もう一度試す', 'Try again')); retry.type = 'button'; retry.id = 'feed-retry'; retry.disabled = feedOpening;
@@ -12270,7 +12270,7 @@ function renderTray(main) {
   const hero = el('section', 'today-hero');
   hero.append(todayCity());
   const head = el('header', 'today-head');
-  head.append(el('p', 'eyebrow today-date', todayDateline()), el('h1', 'view-title', tx('今日', 'Today')));
+  head.append(el('p', 'eyebrow today-date', todayDateline()), el('h1', 'view-title', tx(...ROOM_NAMES.rooms.tray)));
   hero.append(head);
   // the header stands alone; the sky has its own band under it (round 4 review)
   if (pick) hero.append(todaySky(pick.word, trayToday, readPick));
@@ -12720,7 +12720,7 @@ function renderTray(main) {
 function renderSaved(main) {
   const currentSurface = recordViewSurface();
   main.append(el('p', 'eyebrow me-kicker', tx('復習', 'Review')));
-  main.append(el('h1', 'view-title', tx('保存した語とリスト', 'Saved words & lists')));
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.saved)));
   // POL-13 · a quiz that was left mid-run survives reload: the way back in
   // stands here — no new request, the tutor's written questions intact —
   // with a quiet やめる beside it. No key and no deck are needed to finish
@@ -15957,7 +15957,7 @@ const KAGAMI_BAND_NAMES = {
 function renderKagami(main) {
   const model = learnerModel();
   main.append(withEn(el('p', 'eyebrow', '鏡'), 'the mirror', 'en-inline'));
-  main.append(el('h1', 'view-title', tx('今の手ざわり', 'Where the evidence stands')));
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.kagami)));
   main.append(
     el(
       'p',
@@ -17082,7 +17082,7 @@ function renderLegacyTeacherDrafts(main) {
   main.append(section);
 }
 function renderAiSetup(main) {
-  main.append(el('h1', 'view-title', tx('先生', 'The tutor')));
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.ai)));
   const context = renderTeacherContexts(main);
   renderSentenceTeacherReturn(main, context);
   renderAiChat(main, context);
@@ -17267,7 +17267,7 @@ function loadReferenceExtra() {
 
 function renderLevels(main) {
   if (!window.BunkiReferenceCore?.createCatalog || !window.BunkiReferenceUI?.create || !D.referenceExtra) {
-    main.append(el('h1', 'view-title', tx('参考書庫', 'Reference library')));
+    main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.levels)));
     const message = el('p', 'sem-empty', referenceExtraPending
       ? tx('参考資料を読み込んでいます。他の部屋は引き続き使えます。', 'Loading the reference library. Other rooms are ready.')
       : tx('参考資料をひらけませんでした。他の部屋は引き続き使えます。再試行してください。',
@@ -17484,7 +17484,7 @@ function renderReferenceNode(sheet, node) {
  * opens the same idiom entry the kanji pages open. */
 function renderYoji(main) {
   main.append(withEn(el('p', 'eyebrow', '四字熟語'), 'four-character idioms', 'en-inline'));
-  main.append(el('h1', 'view-title', tx('四字熟語', 'Four-character idioms')));
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.yoji)));
   const all = Object.values(D.idioms)
     .filter((i) => i.yoji)
     .sort((a, b) => (a.r < b.r ? -1 : a.r > b.r ? 1 : 0));
@@ -17551,7 +17551,7 @@ function renderKanjidex(main) {
   if (typeof S.kdx.mode !== 'string') S.kdx.mode = 'parts';
   if (!Array.isArray(S.kdx.parts)) S.kdx.parts = S.kdx.part ? [S.kdx.part] : [];
   main.append(withEn(el('p', 'eyebrow', '字を引く'), 'find a kanji you cannot read', 'en-inline'));
-  main.append(el('h1', 'view-title', tx('字引', 'Kanji finder')));
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.kanjidex)));
 
   // one door, several lenses (operator 2026-08-10, KKLD tab model): the parts
   // picker, a draw canvas, reading, meaning, and stroke count — every hit
@@ -18347,7 +18347,7 @@ function thesClusters() {
 function renderThesaurus(main) {
   // the word-web room: the plate first (window.openWordWeb lands here), the
   // paper thesaurus beneath it as the room's index of hand-written clusters
-  main.append(el('h1', 'view-title ww-room-title', tx('言葉の網', 'The word web')));
+  main.append(el('h1', 'view-title ww-room-title', tx(...ROOM_NAMES.rooms.thesaurus)));
   const web = renderWordWeb();
   if (web) main.append(web);
   main.append(withEn(el('p', 'eyebrow thes-eyebrow', '類語 · 使い分け'), 'synonyms — and how they differ', 'en-inline'));
@@ -20037,7 +20037,7 @@ function renderSearchResults(main, query) {
 /* -------------------------------------------------------------- grammar */
 function renderGrammar(main) {
   main.append(withEn(el('p', 'eyebrow', '文法辞典'), 'grammar dictionary', 'en-inline'));
-  main.append(el('h1', 'view-title', tx('文法', 'Grammar')));
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.grammar)));
   const sub = el('p', 'shelf-snippet intro');
   sub.textContent = tx(
     `${GRAMMARS().length} 項目。全項目版はこれから育てる。`,
@@ -23968,7 +23968,7 @@ function renderBrowse(main) {
 function renderSrsStats(main) {
   srsRoomBack(main);
   main.append(withEn(el('p', 'eyebrow', '統計'), 'statistics', 'en-inline'));
-  main.append(el('h1', 'view-title', tx('復習の統計', 'Review statistics')));
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms['srs-stats'])));
   const DAY = 86400000;
   const now = new Date();
   const today = S.stats[dayKey(now)] || {};
@@ -24483,7 +24483,7 @@ function renderGuided(main) {
     guidedRoom.render(main);
     return;
   }
-  main.append(withEn(el('h1', 'view-title', '案内つきの稽古'), 'guided session', 'en-inline'));
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.guided)));
   const state = el('p', 'gloss', guidedFailed
     ? tx('この部屋を開けなかった。保存した記録はそのまま残っている。', 'This room didn’t open. Nothing you saved is affected.')
     : tx('稽古を開いています…', 'Opening the session…'));
@@ -24675,7 +24675,7 @@ function renderLearnStage(main, doors) {
   const places = placesLayout();
   const head = el('header', 'learn-stage-head');
   head.append(el('p', 'learn-stage-eyebrow', places ? todayDateline() : tx('学ぶ・今日', 'Learn · today')));
-  const title = el('h1', 'view-title', places ? tx('復習', 'Review') : tx('次の稽古', 'Up next'));
+  const title = el('h1', 'view-title', tx(...roomName('dojo')));
   title.id = 'learn-stage-title';
   head.append(title);
   stage.append(head);
@@ -24955,7 +24955,7 @@ function renderTests(main) {
   const doors = studyHallDoors();
   const head = el('header', 'tests-head');
   head.append(el('p', 'eyebrow', tx('JLPT · 漢検', 'JLPT · Kanken')));
-  head.append(el('h1', 'view-title', tx('試験', 'Tests')));
+  head.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.tests)));
   main.append(head);
   const hall = el('div', 'learn-hall');
   hall.id = 'tests-hall';
@@ -26993,7 +26993,7 @@ async function generatePersonalReading(settings) {
 
 function renderAiReading(main) {
   main.append(withEn(el('p', 'eyebrow', '先生の読み物'), 'original articles for you', 'en-inline'));
-  main.append(el('h1', 'view-title', tx('私の読み物', 'My readings')));
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.airead)));
   const sub = el('p', 'shelf-snippet intro');
   sub.textContent = tx(
     '興味のあることを、自分に合う長さと文体で。語彙・読み・文法などの学習記録を参考にする。証拠が少ないときは、実力を決めつけない。',
@@ -31992,13 +31992,47 @@ function setLayout(next) {
   } catch { /* the choice still holds for this visit */ }
 }
 
+/** ONE ROOM-NAME TABLE (the one-hand pass, contract §5): the tab, the title, the sign and the way back use the same
+ * word. `rooms` names every room (his nouns: 本棚 · Bookshelf, 過去のニュース · Archive, 持ち込んだ日本語 · Your own text,
+ * ニュースと雑誌 · News & magazines, 漢字を調べる · Kanji by shape, 案内つきの練習 · Guided practice, 読み物 · Your reading);
+ * `line` is the Line's five words in the current layout (coined by an agent brief on 10-08, never John's — the five
+ * places stay a test, his tap of 10-15); `places` the five places of the layout under test. Every h1.view-title,
+ * the crumb's trail, the room signs and both tab tables read from here; nothing names a room on its own. */
+const ROOM_NAMES = Object.freeze({
+  rooms: Object.freeze({
+    entry: ['野', 'Field'], drift: ['銀河', 'Galaxy'],
+    tray: ['今日', 'Today'], shelf: ['本棚', 'Bookshelf'], reader: null, archive: ['過去のニュース', 'Archive'],
+    publisher: ['保存記事', 'Saved article'], feed: ['ニュースと雑誌', 'News & magazines'], airead: ['読み物', 'Your reading'],
+    'source-inbox': ['持ち込んだ日本語', 'Your own text'], 'source-reader': ['持ち込んだ日本語', 'Your own text'],
+    review: ['復習', 'Review'], focus: ['時間を決めて練習', 'Timed practice'], probe: ['読みの確認', 'Reading check'],
+    dojo: ['次の稽古', 'Up next'], deckplay: ['デッキ', 'Deck'], contextdeck: ['一語一段落', 'One word, one paragraph'],
+    saved: ['保存した語とリスト', 'Saved words & lists'], list: ['保存した語とリスト', 'Saved words & lists'],
+    browse: ['札を探す', 'Browse cards'], aiquiz: ['小テスト', 'Quiz'],
+    mock: ['模擬試験', 'Practice tests'], tests: ['試験', 'Tests'], guided: ['案内つきの練習', 'Guided practice'], lessons: ['レッスン', 'Lessons'],
+    levels: ['JLPT・漢検の一覧', 'JLPT & Kanken lists'], 'sentence-practice': ['文の練習', 'Sentence practice'],
+    search: ['辞書', 'Dictionary'], kanjidex: ['漢字を調べる', 'Kanji by shape'], grammar: ['文法', 'Grammar'],
+    yoji: ['四字熟語', 'Four-character idioms'], thesaurus: ['言葉のつながり', 'Word web'],
+    me: ['日本語の一年', 'Your year in Japanese'], kagami: ['学びの足跡', 'Your progress'],
+    'srs-stats': ['復習の統計', 'Review statistics'], settings: ['設定', 'Settings'], ai: ['先生', 'Tutor'],
+  }),
+  line: Object.freeze({ tray: ['今日', 'Today'], shelf: ['読む', 'Read'], dojo: ['学ぶ', 'Learn'], search: ['辞書', 'Words'], me: ['私', 'Me'] }),
+  places: Object.freeze({ dojo: ['復習', 'Review'], shelf: ['本棚', 'Bookshelf'], search: ['辞書', 'Dictionary'], tests: ['試験', 'Tests'], me: ['記録', 'Progress'] }),
+});
+/** The room's name pair for the layout in use (the layout under test calls the dojo "Review"; a timed sitting is
+ * its own room), or null for a room that names itself (the reader: its article's title). */
+function roomName(view = S.view) {
+  if (view === 'dojo') return placesLayout() ? ROOM_NAMES.places.dojo : ROOM_NAMES.rooms.dojo;
+  if (view === 'review') return S.focus ? ROOM_NAMES.rooms.focus : ROOM_NAMES.rooms.review;
+  return ROOM_NAMES.rooms[view] || null;
+}
+const tabWords = ([ja, en]) => ({ ja, en });
 /** The current layout's label table; rooms retain their existing navigation paths. */
 const PRIMARY_TABS = [
-  { id: 'today', ja: '今日', en: 'Today', view: 'tray', views: ['tray', 'list', 'browse', 'review', 'aiquiz'] },
-  { id: 'read', ja: '読む', en: 'Read', view: 'shelf', views: ['shelf', 'reader', 'archive', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader'] },
-  { id: 'learn', ja: '学ぶ', en: 'Learn', view: 'dojo', views: ['dojo', 'deckplay', 'contextdeck', 'personaldeck', 'probe', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice', 'ai'] },
-  { id: 'words', ja: '辞書', en: 'Words', view: 'search', views: ['search', 'kanjidex', 'grammar', 'yoji', 'thesaurus'] },
-  { id: 'me', ja: '私', en: 'Me', view: 'me', views: ['me', 'kagami', 'srs-stats', 'settings'] },
+  { id: 'today', ...tabWords(ROOM_NAMES.line.tray), view: 'tray', views: ['tray', 'list', 'browse', 'review', 'aiquiz'] },
+  { id: 'read', ...tabWords(ROOM_NAMES.line.shelf), view: 'shelf', views: ['shelf', 'reader', 'archive', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader'] },
+  { id: 'learn', ...tabWords(ROOM_NAMES.line.dojo), view: 'dojo', views: ['dojo', 'deckplay', 'contextdeck', 'personaldeck', 'probe', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice', 'ai'] },
+  { id: 'words', ...tabWords(ROOM_NAMES.line.search), view: 'search', views: ['search', 'kanjidex', 'grammar', 'yoji', 'thesaurus'] },
+  { id: 'me', ...tabWords(ROOM_NAMES.line.me), view: 'me', views: ['me', 'kagami', 'srs-stats', 'settings'] },
   // r4 skin: your own texts are a deck; the page's way back and its Learn row both lead to Learn,
   // so the Line marks Learn there too (it marked Me while ← Learn left for Learn)
 ];
@@ -32011,11 +32045,11 @@ const PRIMARY_TABS = [
  * their internal ids: 'dojo' is the Review room, 'tests' the Tests room. `due` marks the place
  * whose station carries today's count. */
 const PLACES_TABS = [
-  { id: 'review', ja: '復習', en: 'Review', view: 'dojo', due: true, views: ['dojo', 'review', 'deckplay', 'contextdeck', 'personaldeck', 'probe', 'saved', 'list', 'browse', 'aiquiz'] },
-  { id: 'bookshelf', ja: '本棚', en: 'Bookshelf', view: 'shelf', views: ['shelf', 'reader', 'archive', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader'] },
-  { id: 'dictionary', ja: '辞書', en: 'Dictionary', view: 'search', views: ['search', 'kanjidex', 'grammar', 'yoji', 'thesaurus'] },
-  { id: 'tests', ja: '試験', en: 'Tests', view: 'tests', views: ['tests', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice'] },
-  { id: 'progress', ja: '記録', en: 'Progress', view: 'me', views: ['me', 'kagami', 'srs-stats', 'settings'] },
+  { id: 'review', ...tabWords(ROOM_NAMES.places.dojo), view: 'dojo', due: true, views: ['dojo', 'review', 'deckplay', 'contextdeck', 'personaldeck', 'probe', 'saved', 'list', 'browse', 'aiquiz'] },
+  { id: 'bookshelf', ...tabWords(ROOM_NAMES.places.shelf), view: 'shelf', views: ['shelf', 'reader', 'archive', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader'] },
+  { id: 'dictionary', ...tabWords(ROOM_NAMES.places.search), view: 'search', views: ['search', 'kanjidex', 'grammar', 'yoji', 'thesaurus'] },
+  { id: 'tests', ...tabWords(ROOM_NAMES.places.tests), view: 'tests', views: ['tests', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice'] },
+  { id: 'progress', ...tabWords(ROOM_NAMES.places.me), view: 'me', views: ['me', 'kagami', 'srs-stats', 'settings'] },
 ];
 /** The tab table of the layout in use. */
 function primaryTabs() {
@@ -32144,15 +32178,9 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
 /* The room sign (縦看板, concepts C/A): each primary room hangs its name at the right edge,
  * set vertically. In English the word is rotated a quarter turn, never stacked letter by letter;
  * in 日本語 the kanji stack. One honest datum may hang beneath it (Today's date, Learn's due). */
-const ROOM_SIGNS = {
-  tray: ['今日', 'Today'], shelf: ['読む', 'Read'], dojo: ['学ぶ', 'Learn'], search: ['辞書', 'Words'], me: ['私', 'Me'],
-};
-/** The layout under test: each place's sign says the place's own name. */
-const PLACES_SIGNS = {
-  dojo: ['復習', 'Review'], shelf: ['本棚', 'Bookshelf'], search: ['辞書', 'Dictionary'], tests: ['試験', 'Tests'], me: ['記録', 'Progress'],
-};
 function buildRoomSign() {
-  const names = (placesLayout() ? PLACES_SIGNS : ROOM_SIGNS)[S.view];
+  // the sign says the tab's word (ROOM_NAMES: the Line's words, or the place's own name)
+  const names = (placesLayout() ? ROOM_NAMES.places : ROOM_NAMES.line)[S.view];
   if (!names || S.stack.length) return null;
   const sign = el('div', 'room-sign');
   sign.setAttribute('aria-hidden', 'true');
@@ -32759,7 +32787,7 @@ function renderMe(main) {
   const now = new Date();
   const head = el('header', 'me-head');
   head.append(el('p', 'eyebrow me-kicker', tx('一年の帳', 'The book of your year')));
-  head.append(el('h1', 'view-title', tx('日本語の一年', 'Your year in Japanese')));
+  head.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.me)));
   const dateline = el('p', 'me-dateline');
   if (first) {
     const dayN = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(first.getFullYear(), first.getMonth(), first.getDate())) / 86400000) + 1;
@@ -32865,7 +32893,7 @@ function renderLayoutChoice() {
 function renderSettings(main) {
   const places = placesLayout();
   main.append(el('p', 'eyebrow me-kicker', places ? tx('記録', 'Progress') : tx('私', 'Me')));
-  main.append(el('h1', 'view-title', tx('設定', 'Settings')));
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.settings)));
   const language = el('section', 'foundation-section');
   language.append(el('h2', 'eyebrow', tx('表示言語', 'Interface language')));
   const choices = el('div', 'lang-seg settings-language');
@@ -33030,27 +33058,39 @@ function renderRoomError(main, view, error) {
  * uses; the door and the variant strip's field keep their own names. */
 function crumbPlaces(parts) {
   const place = PLACES_TABS.find((tab) => tab.views.includes(S.view));
-  if (S.view === 'entry') parts.push(tx('野', 'Field'));
-  else if (S.view === 'drift') parts.push(tx('銀河', 'Galaxy'));
-  else parts.push(place ? tx(place.ja, place.en) : tx('本棚', 'Bookshelf'));
-  const ROOM_NAMES = {
-    reader: null, archive: ['新聞アーカイブ', 'Archive'], publisher: ['保存記事', 'Saved article'],
-    feed: ['ニュースと雑誌', 'News & magazines'], airead: ['読み物', 'Your reading'],
-    'source-inbox': ['持ち込んだ日本語', 'Your own text'], 'source-reader': ['持ち込んだ日本語', 'Your own text'],
-    review: S.focus ? ['時間を決めて練習', 'Timed practice'] : ['復習', 'Review'], probe: ['読みの確認', 'Reading check'],
-    deckplay: ['デッキ', 'Deck'], contextdeck: ['一語一段落', 'One word, one paragraph'],
-    saved: ['保存した語とリスト', 'Saved words & lists'], list: ['保存した語とリスト', 'Saved words & lists'],
-    browse: ['札を探す', 'Browse cards'], aiquiz: ['小テスト', 'Quiz'],
-    mock: ['模擬試験', 'Practice tests'], guided: ['案内つきの練習', 'Guided practice'], lessons: ['レッスン', 'Lessons'],
-    levels: ['JLPT・漢検の一覧', 'JLPT & Kanken lists'], 'sentence-practice': ['文の練習', 'Sentence practice'],
-    kanjidex: ['漢字を調べる', 'Kanji by shape'], grammar: ['文法', 'Grammar'], yoji: ['四字熟語', 'Four-character idioms'],
-    thesaurus: ['言葉のつながり', 'Word web'], kagami: ['学びの足跡', 'Your progress'],
-    'srs-stats': ['復習の統計', 'Review statistics'], settings: ['設定', 'Settings'], ai: ['先生', 'Tutor'],
-  };
-  if (ROOM_NAMES[S.view]) parts.push(tx(...ROOM_NAMES[S.view]));
+  if (S.view === 'entry') parts.push(tx(...ROOM_NAMES.rooms.entry));
+  else if (S.view === 'drift') parts.push(tx(...ROOM_NAMES.rooms.drift));
+  else parts.push(place ? tx(place.ja, place.en) : tx(...ROOM_NAMES.rooms.shelf));
+  crumbRoom(parts, place?.view);
+}
+/** The crumb in the current layout: the room 戻る actually reopens (the galaxy for the dojo family, the bookshelf for
+ * the texts, Today for what the tray opened), then the room, in the words of ROOM_NAMES. */
+function crumbLine(parts) {
+  const dojoFamily = S.view === 'dojo' || S.view === 'probe' || S.view === 'deckplay' || (S.view === 'review' && S.focus) ||
+    (S.view === 'guided' && guidedFrom === 'dojo');
+  const searchFromGalaxy = S.view === 'search' && S.searchFrom !== 'shelf';
+  // the lists tray opens from every room and its 戻る walks back there (PR #77 d9f0b984)
+  const viaTray = S.view === 'tray' || S.view === 'aiquiz' || (S.view === 'review' && !S.focus);
+  const trayOrigin = !viaTray ? null : S.trayFrom === 'reader' ? 'reader' : plainRecord(S.trayFrom) ? S.trayFrom.view : null;
+  const galaxyWard = (view) => view === 'drift' || view === 'dojo' || view === 'probe' || view === 'deckplay' ||
+    (view === 'guided' && guidedFrom === 'dojo') || (view === 'search' && S.searchFrom !== 'shelf');
+  let root = null;
+  if (S.view === 'entry' || trayOrigin === 'entry') root = 'entry';
+  else if (trayOrigin) root = galaxyWard(trayOrigin) ? 'drift' : 'shelf';
+  else if (S.view === 'settings') { parts.push(tx(...ROOM_NAMES.line.me)); root = null; }
+  else if (S.view === 'drift' || dojoFamily || searchFromGalaxy) root = 'drift';
+  else root = 'shelf';
+  if (root) parts.push(tx(...ROOM_NAMES.rooms[root]));
+  if (viaTray && S.view !== 'tray') parts.push(tx(...ROOM_NAMES.rooms.tray));
+  crumbRoom(parts, root);
+}
+/** The room's own name after its root, then the article's title (an archive read names the archive it came from). */
+function crumbRoom(parts, root) {
+  const name = S.view === root || S.view === 'entry' || S.view === 'drift' ? null : roomName(S.view);
+  if (name) parts.push(tx(...name));
   if (S.view === 'reader' && passage()) {
     // an archive read names the stack it came from — its back door
-    if (String(passage().file || '').startsWith('archive/')) parts.push(tx('新聞アーカイブ', 'Archive'));
+    if (String(passage().file || '').startsWith('archive/')) parts.push(tx(...ROOM_NAMES.rooms.archive));
     parts.push(passage().title);
   }
 }
@@ -33201,64 +33241,7 @@ function render() {
   const crumb = el('div', 'crumb');
   const parts = [];
   if (placesLayout()) crumbPlaces(parts);
-  else {
-    // the crumb names the TRUE origin — the room 戻る actually reopens. The
-    // dojo family (dojo, its probe, its focus blocks) is entered from the
-    // galaxy and its backs walk galaxy-ward, never through the bookshelf.
-    const dojoFamily = S.view === 'dojo' || S.view === 'probe' || S.view === 'deckplay' || (S.view === 'review' && S.focus) ||
-      (S.view === 'guided' && guidedFrom === 'dojo');
-    // the search room's door stands in the galaxy bar, and its Back walks
-    // there unless it was opened from the shelf
-    const searchFromGalaxy = S.view === 'search' && S.searchFrom !== 'shelf';
-    // the lists tray opens from every room and its 戻る walks back there, so a room reached
-    // through it (the tray, its quiz, a plain review) is rooted where the tray was opened —
-    // it said 本棚 whichever room that was (PR #77 d9f0b984)
-    const viaTray = S.view === 'tray' || S.view === 'aiquiz' || (S.view === 'review' && !S.focus);
-    const trayOrigin = !viaTray ? null : S.trayFrom === 'reader' ? 'reader' : plainRecord(S.trayFrom) ? S.trayFrom.view : null;
-    const galaxyWard = (view) => view === 'drift' || view === 'dojo' || view === 'probe' || view === 'deckplay' ||
-      (view === 'guided' && guidedFrom === 'dojo') || (view === 'search' && S.searchFrom !== 'shelf');
-    if (S.view === 'entry' || trayOrigin === 'entry') parts.push(tx('野', 'field'));
-    else if (trayOrigin) parts.push(galaxyWard(trayOrigin) ? tx('銀河', 'galaxy') : tx('本棚', 'bookshelf'));
-    else if (S.view === 'settings') parts.push(tx('私', 'Me'), tx('設定', 'Settings'));
-    else if (S.view === 'drift' || dojoFamily || searchFromGalaxy) parts.push(tx('銀河', 'galaxy'));
-    else parts.push(tx('本棚', 'bookshelf'));
-    if (S.view === 'reader' && passage()) {
-      // an archive read names the stack it came from — its back door
-      if (String(passage().file || '').startsWith('archive/')) parts.push(tx('新聞アーカイブ', 'archive'));
-      parts.push(passage().title);
-    }
-    if (S.view === 'search') parts.push(tx('検索', 'search'));
-    // the quiz and a plain review are entered from the lists tray and their 戻る reopens it — the
-    // crumb named a bookshelf the press never touches (PR #77 ea8252a9, d9f0b984)
-    // the tray is the Today tab's room (Review #8 renamed its way back "Back to Today"); the crumb,
-    // shown on wide screens, names it the same way (r4 plain words)
-    if (viaTray) parts.push(tx('今日', 'Today'));
-    if (S.view === 'sentence-practice') parts.push(tx('文の練習', 'sentence practice'));
-    if (S.view === 'review' && S.focus) parts.push(tx('集中道場', 'focus'));
-    if (S.view === 'review') parts.push(tx(S.focus ? '集中' : '復習', S.focus ? 'focus block' : 'review'));
-    if (S.view === 'dojo') parts.push(tx('集中道場', 'focus'));
-    if (S.view === 'probe') parts.push(tx('集中道場', 'focus'), tx('読みの確認', 'Reading check'));
-    if (S.view === 'archive') parts.push(tx('新聞アーカイブ', 'archive'));
-    if (S.view === 'aiquiz') parts.push(tx('小テスト', 'quiz'));
-    if (S.view === 'levels') parts.push(tx('参考書庫', 'reference library'));
-    if (S.view === 'ai') parts.push(tx('先生', 'tutor'));
-    if (S.view === 'lessons') parts.push(tx('レッスン', 'lessons'));
-    if (S.view === 'mock') parts.push(tx('JLPT の練習', 'JLPT practice'));
-    if (S.view === 'kagami') parts.push(tx('鏡', 'the mirror'));
-    if (S.view === 'thesaurus') parts.push(tx('類語', 'synonyms'));
-    if (S.view === 'airead') parts.push(tx('読み物', 'reading'));
-    if (S.view === 'feed') parts.push(tx('ニュースと雑誌', 'news & magazines'));
-    if (S.view === 'publisher') parts.push(tx('ニュースと雑誌', 'news & magazines'), tx('保存記事', 'saved article'));
-    if (['source-inbox', 'source-reader'].includes(S.view)) parts.push(tx('持ち込んだ日本語', 'source inbox'));
-    if (S.view === 'kanjidex') parts.push(tx('字引', 'kanji finder'));
-    if (S.view === 'yoji') parts.push(tx('四字熟語', 'idioms'));
-    if (S.view === 'grammar') parts.push(tx('文法', 'grammar'));
-    if (S.view === 'guided') {
-      parts.push(guidedFrom === 'mock' ? tx('JLPT の練習', 'JLPT practice') : tx('集中道場', 'focus'), tx('案内つきの稽古', 'guided session'));
-    }
-    if (S.view === 'contextdeck') parts.push(tx('文脈札', 'context deck'));
-    if (S.view === 'deckplay') parts.push(tx('集中道場', 'focus'), tx('デッキ', 'deck'));
-  }
+  else crumbLine(parts);
   for (const node of S.stack) parts.push(nodeTitle(node));
   crumb.title = parts.join(' › ');
   if (S.stack.length) crumb.dataset.uiContentValue = S.stack.map(nodeTitle).join('|');
