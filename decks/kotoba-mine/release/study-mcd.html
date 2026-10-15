@@ -7041,7 +7041,9 @@ let pendingStart = null;
 /** Transient reading state belongs to one face, never to the learner ledger. */
 function capturePresentation({ includeInert = false } = {}) {
   if (!includeInert && ctx?.root?.closest('[inert]')) return null;
-  const face = ctx?.root?.isConnected && ctx.root.querySelector('#kp-card');
+  // L · null, never false: a deck left behind keeps its ctx with a detached root, and `false?.querySelector()` throws
+  // (?. guards only null/undefined), which aborted every later render() — the room change to Guided never came
+  const face = ctx?.root?.isConnected ? ctx.root.querySelector('#kp-card') : null;
   const passage = face?.querySelector('.kp-sentence');
   if (!passage || ui.screen !== 'study') return null;
   return {
