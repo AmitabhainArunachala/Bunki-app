@@ -12,6 +12,9 @@
  *   A6  a deck card's back: a word the deck reads otherwise than the quick dictionary shows the deck's reading
  *   A7  the guided session: every word's card reads as the session reads it
  *   A8  the full dictionary first: スタートアップ is a normal card; 高市 says it has no entry and promises no door
+ *   A9  the cold first tap (L): with the full dictionary held, 月 in 9月 (がつ) shows a quiet "…" and a held Save, never
+ *       the quick dictionary's つき "Moon"; released, がつ's meaning; answered 500, the "…" stays. Every case counts every
+ *       page error (L dropped R's ResizeObserver filter; the capture case listens too)
  *   R   recorded, never asserted: 式 in 表彰式 and 改造 in 内閣改造 (sense: the tokens carry no sense data), ちかい in
  *       the phonetic parenthetical (G3), し of する (an inflected verb reads its dictionary form), the first paint
  * Negative control: the same run against a build with R's reading edits reverted fails A1 on 年 (とし). */
@@ -56,6 +59,8 @@ const PAIRS = Object.freeze([
   { name: '一日 ついたち', at: DIARY, index: 167, s: '一日', r: 'ついたち', seq: '2225040' },
 ]);
 const STARTUP_WORD = { at: STARTUP, index: 17, s: 'スタートアップ', seq: '2303530', gloss: 'startup' };
+// L · the cold first tap: 月 in 9月 reads がつ; the quick dictionary's 月 reads つき ("Moon")
+const COLD = { at: STARTUP, index: 4, s: '月', r: 'がつ', seq: '2871532' };
 const NAME = { at: STARTUP, index: 8, s: '高市' };
 const STABLE = { at: STARTUP, index: 9, s: '総理', r: 'そうり' };
 const RECORDED = Object.freeze([
@@ -107,6 +112,9 @@ check('F0.startup', `${STARTUP.id} #17 is スタートアップ; the quick dicti
   tokenAt(STARTUP_WORD));
 check('F0.name', `${STARTUP.id} #8 is 高市, a name no dictionary lists`, tokenAt(NAME)?.s === '高市' && tokenAt(NAME).c === false && !core['高市']
   && !entries.some((row) => row[1] === '高市' || row[4].includes('高市') || row[5].includes('高市')), tokenAt(NAME));
+check('F0.cold', `${STARTUP.id} #4 is 月 read がつ, uninflected; the quick dictionary reads it つき; entry ${COLD.seq} reads がつ`,
+  tokenAt(COLD)?.s === '月' && tokenAt(COLD).b === '月' && tokenAt(COLD).r === 'がつ' && core['月']?.r === 'つき' && k2h(core['月'].r) !== 'がつ'
+    && bySeq.get(COLD.seq)?.[5]?.some((kana) => k2h(kana) === 'がつ'), { token: tokenAt(COLD), core: core['月'] });
 check('F0.stable', `${STARTUP.id} #9 is 総理 read そうり, like the quick dictionary`, tokenAt(STABLE)?.r === 'そうり' && core['総理']?.r === 'そうり', tokenAt(STABLE));
 for (const fixture of RECORDED) check(`F0.${fixture.name}`, `${fixture.at.id} #${fixture.index} is ${fixture.s}`, tokenAt(fixture)?.s === fixture.s, tokenAt(fixture));
 check('F0.no-sense', 'reader tokens carry no sense, gloss or entry number (s b p r f c, and rs)',
@@ -207,6 +215,9 @@ async function captureCase(browser, contextOptions) {
   await silenceBrowserAudio(context);
   await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
   const page = await context.newPage();
+  // L · Save unfolds its menu inside the card: the path WebKit used to raise its ResizeObserver page error on
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
   let exported = null;
   try {
     await openArticle(page, STARTUP);
@@ -228,7 +239,10 @@ async function captureCase(browser, contextOptions) {
     const chunks = [];
     for await (const chunk of stream) chunks.push(chunk);
     exported = Buffer.concat(chunks);
-  } finally { await context.close(); }
+  } finally {
+    check('capture.page-errors', 'capture (Save, its menu unfolding in the card, export): no page errors', errors.length === 0, errors);
+    await context.close();
+  }
   const fresh = await browser.newContext(contextOptions);
   await silenceBrowserAudio(fresh);
   await fresh.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
@@ -291,6 +305,80 @@ async function sentenceCase(page) {
   check('A5.sentence', 'that 年 reads ねん, the entry read that way, Save live', settled?.reading === 'ねん'
     && settled.gloss === firstGloss('2084840', 'ねん') && settled.take && !settled.take.disabled, settled);
   await closeMini(page);
+}
+
+/** A9 · the cold first tap (L, 2026-10-16): until the full dictionary names the entry a card's own reading stands for,
+ * the card borrows no other reading's meaning. The full dictionary's index is held; 月 in 9月 (read がつ; the quick
+ * dictionary's 月 reads つき, "Moon") is tapped, and every text the card's meaning line ever shows is recorded in the page.
+ * Held: the line is a quiet "…" and Save is held. Released: がつ's meaning, Save live. Answered with a 500: the "…" stays. */
+const INDEX_PATH = '/data/share_alike/dict-v2/index.json';
+async function coldCase(browser, contextOptions, answer) {
+  const tag = answer === 'fail' ? 'A9.unanswered' : 'A9.cold';
+  const context = await browser.newContext(contextOptions);
+  await silenceBrowserAudio(context);
+  await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
+  let release = () => {}, asked = 0;
+  const gate = new Promise((done) => { release = done; });
+  await context.route((url) => url.pathname === INDEX_PATH, async (route) => {
+    asked += 1;
+    await gate;
+    try {
+      if (answer === 'fail') await route.fulfill({ status: 500, contentType: 'application/json', body: '{"syntheticFailure":"verify-reading-truth A9"}' });
+      else await route.continue();
+    } catch { /* the context closed first */ }
+  });
+  const page = await context.newPage(), errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const meaning = firstGloss(COLD.seq, COLD.r);
+  try {
+    await openArticle(page, COLD.at);
+    await closeMini(page);
+    await page.evaluate(() => {
+      window.__readingTruthGlosses = [];
+      const seen = () => {
+        for (const node of document.querySelectorAll('#mini .mini-gloss')) {
+          if (window.__readingTruthGlosses.at(-1) !== node.textContent) window.__readingTruthGlosses.push(node.textContent);
+        }
+      };
+      new MutationObserver(seen).observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+    await tapAt(page, tok(page, COLD.index));
+    await page.locator('#mini').waitFor({ timeout: 20000 });
+    for (let attempt = 0; attempt < 80 && !asked; attempt++) await delay(250);
+    const held = await miniState(page);
+    const line = await page.evaluate(() => {
+      const node = document.querySelector('#mini .mini-gloss');
+      return node ? { className: node.className, color: node.style.color, weight: node.style.fontWeight,
+        busy: document.getElementById('mini').getAttribute('aria-busy') } : null;
+    });
+    check(`${tag}.held`, 'with the full dictionary held, the card for 月 in 9月 reads がつ, its meaning line is a quiet "…" (the world\'s muted ink), Save is held',
+      asked > 0 && held?.word === '月' && k2h(held.reading) === 'がつ' && held.gloss === '…' && line?.className === 'mini-gloss mini-wait'
+        && line.color === 'var(--mini-head-ink-2)' && line.weight === '400' && line.busy === 'true' && held.take?.disabled === true, { asked, held, line });
+    await delay(1200);
+    const still = await miniState(page);
+    check(`${tag}.still`, 'a moment later, still held, it still borrows nothing', still?.gloss === '…' && still.take?.disabled === true, still);
+    release();
+    await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 30000 });
+    await delay(300);
+    const settled = await miniState(page);
+    if (answer === 'fail') {
+      check(`${tag}.settled`, 'unanswered (the index answers 500): the "…" stays and Save stays held — never つき\'s meaning',
+        k2h(settled?.reading) === 'がつ' && settled.gloss === '…' && settled.take?.disabled === true, settled);
+    } else {
+      check(`${tag}.settled`, `released: the card fills with がつ's meaning ("${meaning}"), Save live`,
+        k2h(settled?.reading) === 'がつ' && settled.gloss === meaning && settled.take && !settled.take.disabled, settled);
+    }
+    const shown = await page.evaluate(() => window.__readingTruthGlosses);
+    const allowed = answer === 'fail' ? ['…'] : ['…', meaning];
+    check(`${tag}.never-borrowed`, `the meaning line never showed another reading's meaning (the quick dictionary's つき: "${core['月'].m[0]}")`,
+      shown.length > 0 && shown.every((text) => allowed.includes(text)), shown);
+  } catch (error) {
+    check(`${tag}.error`, `${tag} ran to the end`, false, String(error.stack || error).slice(0, 600));
+  } finally {
+    release();
+    check(`${tag}.page-errors`, `${tag}: no page errors`, errors.length === 0, errors);
+    await context.close();
+  }
 }
 
 async function deckCase(page) {
@@ -382,7 +470,9 @@ try {
       await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
       const page = await context.newPage(), errors = [];
       page.setDefaultTimeout(15000);
-      page.on('pageerror', (error) => { if (!/ResizeObserver loop/u.test(error.message)) errors.push(error.message); });
+      // L · every page error counts: the ResizeObserver loop error this line used to drop (R) was the slip's own
+      // observer resizing the card inside its callback, fixed at its source (keepFloatingBeside)
+      page.on('pageerror', (error) => errors.push(error.message));
       try { await body(page); }
       catch (error) {
         check(`${name}.error`, `${name} ran to the end`, false, String(error.stack || error).slice(0, 600));
@@ -399,6 +489,10 @@ try {
     await each('guided', guidedCase);
     try { await captureCase(browser, contextOptions); }
     catch (error) { check('capture.error', 'capture ran to the end', false, String(error.stack || error).slice(0, 600)); }
+    for (const answer of ['held', 'fail']) {
+      try { await coldCase(browser, contextOptions, answer); }
+      catch (error) { check(`A9.${answer}.error`, `A9 (${answer}) ran to the end`, false, String(error.stack || error).slice(0, 600)); }
+    }
     await browser.close();
   }
 } finally {

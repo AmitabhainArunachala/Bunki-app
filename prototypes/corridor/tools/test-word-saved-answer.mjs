@@ -100,6 +100,11 @@ function defineRows() {
     'wordSaveFacts', 'paintWordSave', 'paintMiniPath', 'refreshWordSaveControls', 'toggleWordSave', 'READER_TOAST_MS', 'readerToastTimer',
     'hideReaderToast', 'showReaderToast', 'miniAnchor', 'SAVE_PRESS_MS', 'placeFloating', 'keepFloatingBeside',
     'miniKanjiWeb', 'revealFloatingFocus',
+    // Save ▾ (bea9517f, 2026-10-14): a press on Saved ✓ unfolds the word's menu inside the actual mini, and its Review
+    // row is the remove route (one statement declares vocabularyListInvoker and vocabularyListNode)
+    'openVocabularyListPopover', 'closeVocabularyListPopover', 'vocabularyListInvoker',
+    // the tray count repaints in place after a save or a removal (0b413f3f, 2026-10-15)
+    'syncTrayCount',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
     'listReading', 'listGloss', 'listToMarkdown', 'resolveAssessmentSubject', 'learningEnrollmentPending', 'commitLearningEnrollment',
     'reviewAnswerAvailable', 'reviewCardBack', 'reviewBack', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord',
@@ -174,11 +179,25 @@ function defineRows() {
     return target[key];
   } });
 
-  /** The disclosed DOM boundary for the actual mini. */
+  /** The selectors the fake DOM answers: one id, one class or one tag — and the one compound query Save ▾'s menu makes
+   * for its checkboxes. Anything else is a disclosed-boundary failure. */
+  const matcher = (selector) => {
+    const box = /^input\[type="checkbox"\](:not\(:disabled\))?$/u.exec(selector);
+    if (box) return (node) => node.tag === 'input' && node.type === 'checkbox' && (!box[1] || !node.disabled);
+    assert.match(selector, /^[#.]?[a-z-]+$/u, 'the fake DOM answers one id, one class or one tag selector, or the menu’s checkbox query, only');
+    const name = selector.replace(/^[#.]/u, '');
+    return (node) => selector[0] === '#' ? node.id === name : selector[0] === '.' ? !!node.classList?.contains(name) : node.tag === name;
+  };
+  /** The disclosed DOM boundary for the actual mini (and, since Save ▾, the menu that unfolds inside it: parents,
+   * closest, after, contains and the menu's custom-property writes). */
   class FakeElement {
     constructor(tag = 'div', className = '', text = '') {
       Object.assign(this, { tag, className: className || '', textContent: text || '', children: [], attributes: {}, dataset: {},
-        style: {}, listeners: {}, disabled: false, isConnected: true, hidden: false, id: '' });
+        style: {}, listeners: {}, disabled: false, isConnected: true, hidden: false, id: '', parentNode: null });
+      Object.defineProperties(this.style, {
+        setProperty: { value: (name, value) => { this.style[name] = String(value); } },
+        removeProperty: { value: (name) => { delete this.style[name]; } },
+      });
       const names = () => this.className.split(' ').filter(Boolean);
       this.classList = {
         add: (name) => { if (!names().includes(name)) this.className = [...names(), name].join(' '); },
@@ -188,18 +207,24 @@ function defineRows() {
         contains: (name) => names().includes(name),
       };
     }
-    append(...nodes) { this.children.push(...nodes); }
-    replaceChildren(...nodes) { this.children = [...nodes]; }
+    append(...nodes) { for (const node of nodes) if (node instanceof FakeElement) node.parentNode = this; this.children.push(...nodes); }
+    replaceChildren(...nodes) { for (const node of nodes) if (node instanceof FakeElement) node.parentNode = this; this.children = [...nodes]; }
+    after(...nodes) {
+      const parent = this.parentNode;
+      assert(parent, 'after() needs a parent');
+      for (const node of nodes) if (node instanceof FakeElement) node.parentNode = parent;
+      parent.children.splice(parent.children.indexOf(this) + 1, 0, ...nodes);
+    }
+    contains(node) { for (let at = node; at; at = at.parentNode) if (at === this) return true; return false; }
+    closest(selector) { const hit = matcher(selector); for (let at = this; at; at = at.parentNode) if (hit(at)) return at; return null; }
     querySelectorAll(selector) {
-      assert.match(selector, /^[a-z]+$/u, 'the fake DOM answers tag selectors only');
-      const found = [], walk = (node) => { for (const child of node.children || []) { if (child.tag === selector) found.push(child); walk(child); } };
+      assert.match(selector, /^([a-z]+|input\[type="checkbox"\])$/u, 'the fake DOM answers tag selectors, or the menu’s checkbox query, only');
+      const hit = matcher(selector);
+      const found = [], walk = (node) => { for (const child of node.children || []) { if (hit(child)) found.push(child); walk(child); } };
       walk(this); return found;
     }
     querySelector(selector) {
-      assert.match(selector, /^[#.]?[a-z-]+$/u, 'the fake DOM answers one id, one class or one tag selector only');
-      const name = selector.replace(/^[#.]/u, '');
-      const hit = (node) => selector[0] === '#' ? node.id === name
-        : selector[0] === '.' ? !!node.classList?.contains(name) : node.tag === name;
+      const hit = matcher(selector);
       const walk = (node) => { for (const child of node.children || []) { const found = hit(child) ? child : walk(child); if (found) return found; } return null; };
       return walk(this);
     }
@@ -308,6 +333,26 @@ function defineRows() {
    * which the mini removes it (reader lane, 2026-10-02). */
   const clickSeal = async (seal) => {
     await seal.listeners.click({ stopPropagation() {}, detail: 1 });
+  };
+  /** Save ▾'s menu as it unfolded inside the actual mini, or undefined. */
+  const menuOf = (mini) => find(mini.mini, (node) => node.id === 'vocabulary-list-popover');
+  /** Save ▾ (bea9517f, 2026-10-14): a press on Saved ✓ unfolds the word's menu inside the actual mini, and its first row,
+   * Review (checked while the word is saved), is the mini's remove route: unchecked, it runs toggleWordSave on the same
+   * node the seal stands for. Returns once that row has settled (its handler ran to its end). */
+  const reviewOff = async (mini) => {
+    await clickSeal(mini.seal);
+    const menu = menuOf(mini);
+    assert(menu, 'a press on Saved ✓ unfolds Save ▾’s menu');
+    assert(menu.classList.contains('is-save-menu') && menu.classList.contains('is-inline') && menu.parentNode === mini.mini,
+      'the menu is Save ▾’s own, unfolded inside the card');
+    const review = find(menu, (node) => node.id === 'mini-review');
+    assert.equal(review?.checked, true, 'its Review row is checked while the word is saved');
+    review.checked = false;
+    review.listeners.change();
+    assert.equal(review.disabled, true, 'the Review row holds while its route runs');
+    for (let tick = 0; tick < 50 && review.disabled; tick += 1) await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(review.disabled, false, 'the Review row settles');
+    return review;
   };
 
   const NODES = {
@@ -743,11 +788,12 @@ function defineRows() {
     await clickSeal(mini.seal);
     assert.equal(bytes(ctx.latest), before);
     assert.equal(ctx.sealSyncs, 0);
-    // the same mini on a plain core card removes that card, and its handler runs to its end
+    assert.equal(menuOf(mini), undefined, 'a held seal unfolds no menu');
+    // the same mini on a plain core card removes that card through Save ▾'s Review row, and its handler runs to its end
     ctx = app({ mode: 'none', record: core });
     mini = openMini(ctx, '上手');
     assert.equal(mini.seal.disabled, false);
-    await clickSeal(mini.seal);
+    await reviewOff(mini);
     assert.deepEqual(roundTrip(ctx.latest.taken), []);
     assert.equal(ctx.sealSyncs, 1);
     // painted for the core card, the latest record holds うわて: the producer refuses, every byte kept
@@ -755,9 +801,10 @@ function defineRows() {
     mini = openMini(ctx, '上手');
     assert.equal(mini.seal.disabled, false);
     before = bytes(ctx.latest);
-    await clickSeal(mini.seal);
+    const refused = await reviewOff(mini);
     assert.equal(bytes(ctx.latest), before, 'a latest-state change after render refuses in the producer');
     assert.equal(ctx.sealSyncs, 0);
+    assert.equal(refused.checked, true, 'a refused route leaves Review checked');
     // H01's shape (no row cue; the snapshot reads うわて): the かみて door never removes the card; the うわて door does
     ctx = app({ mode: 'none', record: h01 });
     before = bytes(ctx.latest);
@@ -801,14 +848,15 @@ function defineRows() {
     assert.equal(await ctx.toggleTaken(NODES.mini, '上手'), false);
     assert.equal(bytes(ctx.latest), before);
     assert.deepEqual(roundTrip(ctx.suppressions), []);
-    // the actual mini painted for a core card while the latest record holds うわて: refused
+    // the actual mini painted for a core card while the latest record holds うわて: refused (Save ▾'s Review row)
     ctx = app({ mode: 'none', record: uwate, view: core, authority });
     let mini = openMini(ctx, '上手');
     assert.equal(mini.seal.disabled, false);
     before = bytes(ctx.latest);
-    await clickSeal(mini.seal);
+    const refused = await reviewOff(mini);
     assert.equal(bytes(ctx.latest), before);
     assert.deepEqual([roundTrip(ctx.suppressions), ctx.sealSyncs], [[], 0]);
+    assert.equal(refused.checked, true, 'a refused route leaves Review checked');
     // H01's shape: the かみて door suppresses nothing; the うわて door suppresses that card for real
     ctx = app({ mode: 'none', record: h01, authority });
     before = bytes(ctx.latest);
@@ -817,11 +865,11 @@ function defineRows() {
     assert.equal(await ctx.toggleTaken(NODES.uwateDoor, '上手'), true);
     assert.deepEqual(roundTrip(learning(ctx)), ['word:earlier', 'word:上手']);
     assert.deepEqual(roundTrip(ctx.latest.taken), []);
-    // the actual mini on a plain core card: the real suppression transition
+    // the actual mini on a plain core card: the real suppression transition, through Save ▾'s Review row
     ctx = app({ mode: 'none', record: core, authority });
     mini = openMini(ctx, '上手');
     const prior = roundTrip(ctx.latest);
-    await clickSeal(mini.seal);
+    await reviewOff(mini);
     assert.equal(ctx.sealSyncs, 1);
     assert.deepEqual(roundTrip(ctx.latest.taken), []);
     assert.deepEqual(roundTrip(learning(ctx)), ['word:earlier', 'word:上手']);
