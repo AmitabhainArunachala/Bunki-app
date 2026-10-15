@@ -7991,11 +7991,25 @@ document.addEventListener(
   true,
 );
 
+/* The slip's close callback (openSlip's onClose): the surface that opened the slip hears why it went —
+ * 'dismiss' (a tap elsewhere, Close, Escape: the word returns bare), 'dive' (the slip opened the full
+ * entry: the reading stays until the entry closes), then 'entry' (that entry closed: the word returns
+ * bare). The reader keeps its own readings through readerSlipDive; the deck, the sky and the Words room
+ * fold theirs through this. */
+let miniOnClose = null;
+let miniDiving = false; // the slip is opening the full entry (the band, the second tap)
+const slipSummons = []; // the onClose of every slip whose entry is open, called when the entry closes
 function removeMini() {
   closeVocabularyListPopover();
-  document.getElementById('mini')?.remove();
+  const slip = document.getElementById('mini');
+  slip?.remove();
   miniAnchor = null;
   miniEntry = null;
+  const closing = miniOnClose;
+  miniOnClose = null;
+  if (!slip || !closing) return;
+  if (miniDiving) slipSummons.push(closing);
+  closing(miniDiving ? 'dive' : 'dismiss');
 }
 
 /* One tap grammar for every Japanese word (John, 2026-10-14: "I should be able to tap ANY word … and it
@@ -8044,11 +8058,29 @@ function diveFromMini(span, event) {
   const entry = miniEntry;
   if (entry) {
     readerSlipDive = true; // the entry opens from the slip: its close takes the slip's reading away
-    entry(event.detail === 0 ? 'keyboard' : 'pointer');
+    slipDive(entry, event.detail === 0 ? 'keyboard' : 'pointer');
   } else {
     removeMini();
     clearReaderReadings({ marked: true });
   }
+  return true;
+}
+/** The slip opens its full entry: the slip's close is a dive, not a dismissal (removeMini tells the surface so). */
+function slipDive(entry, modality) {
+  miniDiving = true;
+  try { entry(modality); } finally { miniDiving = false; }
+}
+/** A surface that activates its own word (the deck's card, the sky, the Words room) asks whether this
+ * activation is the second tap on the word whose slip is open: then the slip dives into the full entry
+ * and the surface draws nothing. The press was already read by the pointerdown above (miniDiveOnAnchor);
+ * a keyboard activation has no press, so the open slip on the same word counts. */
+function diveFromSlip(anchor) {
+  const second = miniDiveOnAnchor === anchor || (miniAnchor === anchor && !!document.getElementById('mini'));
+  miniDiveOnAnchor = null;
+  if (!second) return false;
+  const entry = miniEntry;
+  if (entry) slipDive(entry, 'pointer');
+  else removeMini();
   return true;
 }
 
@@ -8655,75 +8687,125 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
 let miniAnchor = null;
 const SAVE_PRESS_MS = 600;
 let readerTakePressedAt = -Infinity;
-function showMini(span, token, onEntry, { focusEntry = false, from = null, reader = false, record, entryAvailable = true, sentence = null } = {}) {
+/* The slip (contract §1): one DOM for every word, kanji or particle the learner can touch, in every room.
+ * The reader calls it with a token; every other surface comes through openSlip, which adds
+ *   look     what the band shows when the surface knows better than the dictionary (the deck's own Japanese
+ *            sense, a particle's role, a kanji's meaning): { label, reading, gloss, glossLang, gloss2 }
+ *   kind     'word' | 'kanji' | 'particle' | 'grammar' — the kind of the node Save and the band's door address
+ *   save     'default' (the corridor's one save path on the node) · 'host' (the surface's own path, through
+ *            host.take/saved/held) · 'none' (a particle, a spelling the dictionary lacks)
+ *   note     a line in Save's place (the deck's "Already in this deck")
+ *   source   'reader' | 'deck' | 'drift' | 'guided' | 'lookup' — written on the slip for the eye and the verifiers
+ *   onClose  how the surface hears the slip go (removeMini) · follow: the anchor moves (the sky), the slip follows */
+function showMini(span, token, onEntry, { focusEntry = false, from = null, reader = false, record, entryAvailable = true, sentence = null,
+  look = null, kind = 'word', save = 'default', host = null, note = null, source = null, key = null, kanji = reader, onClose = null, follow = false,
+  nodeFor = null } = {}) {
   removeMini();
-  const { g, held, node: captureNode, state: miniState, identityHeld } = wordSaveFacts(token, { reader, from, record });
+  const other = nodeFor || { t: kind, id: token.b };
+  const { g, held, node: captureNode, state: miniState, identityHeld } = kind === 'word'
+    ? wordSaveFacts(token, { reader, from, record })
+    : { g: null, held: false, node: other, state: save === 'default' ? wordCaptureState(other) : null, identityHeld: false };
+  const label = look?.label || token.b;
   const mini = el('div', null);
   mini.id = 'mini';
   mini.tabIndex = -1;
   mini.setAttribute('role', 'dialog');
-  mini.setAttribute('aria-label', tx(`${token.b} の語釈`, `${token.b} quick look`));
+  mini.setAttribute('aria-label', tx(`${label} の語釈`, `${label} quick look`));
+  mini.dataset.kind = kind;
+  mini.dataset.key = key ?? (captureNode ? `${captureNode.t}:${captureNode.id}` : '');
+  if (source) mini.dataset.from = source;
   // the word band: the word, its reading and its meaning, with the deeper door in its corner
   const head = el('div', 'mini-head');
   const said = el('div', 'mini-head-text');
   // the word itself is the way into its full entry, as a second tap on it in the text is
-  const word = el(entryAvailable ? 'button' : 'span', 'mini-word', token.b);
+  const word = el(entryAvailable ? 'button' : 'span', 'mini-word', label);
+  word.lang = 'ja';
   if (entryAvailable) {
     word.type = 'button';
     word.dataset.action = 'entry.open';
-    word.dataset.targetKind = 'word';
+    word.dataset.targetKind = kind;
     word.title = tx('全項目を開く', 'Open the full entry');
     word.setAttribute('aria-label', tx('全項目を開く', 'Open the full entry'));
     word.addEventListener('click', (event) => {
       event.stopPropagation();
       readerSlipDive = true; // the band is the slip's door: the entry's close takes the slip's reading away
-      onEntry(event.detail === 0 ? 'keyboard' : 'pointer');
+      slipDive(onEntry, event.detail === 0 ? 'keyboard' : 'pointer');
     });
   }
   said.append(word);
-  if (g?.r || token.r) said.append(el('span', 'mini-reading', g?.r || token.r));
-  if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText()));
+  const reading = look?.reading ?? (g?.r || token.r);
+  if (reading && reading !== label) said.append(el('span', 'mini-reading', reading));
+  if (look?.gloss) {
+    const gloss = el('span', 'mini-gloss', look.gloss);
+    if (look.glossLang) gloss.lang = look.glossLang;
+    said.append(gloss);
+    if (look.gloss2) { const second = el('span', 'mini-gloss mini-gloss-2', look.gloss2); second.lang = 'en'; said.append(second); }
+  } else if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText()));
   else said.append(el('span', 'mini-gloss', g?.m?.[0] || tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.')));
   head.append(said);
   mini.append(head);
-  const seal = el('button', 'mini-take btn-primary');
-  seal.type = 'button';
-  seal.id = 'mini-take';
-  if (!held && !identityHeld) {
-    seal.dataset.saveMenu = 'true';
-    seal.setAttribute('aria-haspopup', 'dialog');
-    seal.setAttribute('aria-expanded', 'false');
-  }
-  paintWordSave(seal, held ? S.taken.some((t) => t.t === 'word' && t.id === token.b) : miniState === 'taken');
-  if (held || identityHeld) {
-    seal.disabled = true;
-    seal.classList.add('reader-capture-held');
-    seal.setAttribute('aria-describedby', 'mini-take-reason');
-  }
-  // Save ▾: one press saves the word and opens its menu (lists, copy, remove from review); on "Saved ✓" a
-  // press opens the menu again, or puts it away. A second press within a breath of the first (a
-  // double-click, a bounced tap) is the same press
-  let pressedAt = -Infinity;
-  const openMenu = () => openVocabularyListPopover(captureNode, token.b, seal, {
-    menu: true,
-    review: { saved: () => seal.getAttribute('aria-pressed') === 'true', toggle: () => toggleWordSave(captureNode, token.b) },
-    more: [{ id: 'mini-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(token.s || token.b) }],
-  });
-  seal.addEventListener('click', (event) => {
-    event.stopPropagation();
-    if (seal.disabled || Date.now() - pressedAt < SAVE_PRESS_MS) return undefined;
-    pressedAt = Date.now();
-    if (!seal.dataset.saveMenu) return toggleWordSave(captureNode, token.b);
-    if (seal.getAttribute('aria-pressed') === 'true') return openMenu();
-    return Promise.resolve(toggleWordSave(captureNode, token.b)).then((saved) => { if (saved && seal.isConnected) openMenu(); return saved; });
-  });
-  if (held || identityHeld) {
-    // when the meaning line already says the word is not in the quick dictionary, the reason only finishes it
-    const missShown = reader && !g?.m?.[0];
-    const reason = el('span', 'mini-take-reason', held ? (missShown ? tx('そのため、ここでは保存できません。', 'So it can’t be saved here.')
-      : readerCaptureReasonText(token.b)) : wordCaptureHeldText(captureNode));
-    reason.id = 'mini-take-reason';
-    mini.append(reason);
+  // one path (John T5, "click save and then add to list from there"; 2026-10-14: no second "Add to a list"
+  // button): Save ▾ alone. Before the word is saved a short note says where Save puts it.
+  const actions = el('div', 'mini-actions');
+  // Save: the corridor's one path on the node (default); the surface's own path (host: the guided session's
+  // ledger and crane); a note in its place (the deck's own word); or nothing (a particle, no entry)
+  const hostHeld = save === 'host' ? host?.held?.() || null : null;
+  const canSave = save !== 'none' && !note && (save === 'host' ? !hostHeld : !held && !identityHeld);
+  let seal = null;
+  if (save !== 'none' && !note) {
+    seal = el('button', 'mini-take btn-primary');
+    seal.type = 'button';
+    seal.id = 'mini-take';
+    if (canSave && save === 'default') {
+      seal.dataset.saveMenu = 'true';
+      seal.setAttribute('aria-haspopup', 'dialog');
+      seal.setAttribute('aria-expanded', 'false');
+    }
+    const savedNow = save === 'host' ? !!host?.saved?.() : held ? S.taken.some((t) => t.t === kind && t.id === token.b) : miniState === 'taken';
+    paintWordSave(seal, savedNow);
+    if (!canSave) {
+      seal.disabled = true;
+      seal.classList.add('reader-capture-held');
+      seal.setAttribute('aria-describedby', 'mini-take-reason');
+    }
+    // the surface's own path keeps its own ledger: once it says the word is saved, Save rests
+    if (save === 'host' && savedNow) seal.disabled = true;
+    // Save ▾: one press saves the word and opens its menu (lists, copy, remove from review); on "Saved ✓" a
+    // press opens the menu again, or puts it away. A second press within a breath of the first (a
+    // double-click, a bounced tap) is the same press
+    let pressedAt = -Infinity;
+    const openMenu = () => openVocabularyListPopover(captureNode, label, seal, {
+      menu: true,
+      review: { saved: () => seal.getAttribute('aria-pressed') === 'true', toggle: () => toggleWordSave(captureNode, label) },
+      more: [{ id: 'mini-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(token.s || token.b) }],
+    });
+    seal.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (seal.disabled || Date.now() - pressedAt < SAVE_PRESS_MS) return undefined;
+      pressedAt = Date.now();
+      if (save === 'host') {
+        seal.disabled = true;
+        return Promise.resolve(host.take()).then((ok) => {
+          if (!seal.isConnected) return ok;
+          const saved = !!host.saved?.();
+          paintWordSave(seal, saved);
+          paintMiniPath(actions, saved);
+          seal.disabled = saved;
+          return ok;
+        }, () => { if (seal.isConnected) seal.disabled = false; return false; });
+      }
+      if (!seal.dataset.saveMenu) return toggleWordSave(captureNode, label);
+      if (seal.getAttribute('aria-pressed') === 'true') return openMenu();
+      return Promise.resolve(toggleWordSave(captureNode, label)).then((saved) => { if (saved && seal.isConnected) openMenu(); return saved; });
+    });
+    if (!canSave) {
+      // when the meaning line already says the word is not in the quick dictionary, the reason only finishes it
+      const missShown = reader && !g?.m?.[0];
+      const reason = el('span', 'mini-take-reason', hostHeld || (held ? (missShown ? tx('そのため、ここでは保存できません。', 'So it can’t be saved here.')
+        : readerCaptureReasonText(token.b)) : wordCaptureHeldText(captureNode)));
+      reason.id = 'mini-take-reason';
+      mini.append(reason);
+    }
   }
   // D23: a spelling held by a card, or kept history, this door does not stand for offers it, by
   // its own identity, as the full note's route does. Opening only navigates: nothing is
@@ -8739,16 +8821,20 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     });
     mini.append(open);
   }
-  // one path (John T5, "click save and then add to list from there"; 2026-10-14: no second "Add to a list"
-  // button): Save ▾ alone. Before the word is saved a short note says where Save puts it.
-  const actions = el('div', 'mini-actions');
-  actions.append(seal);
-  // the note and the toast share one noun: Save puts the word "to review", and the toast says "Saved to review"
-  if (!held && !identityHeld) actions.append(el('span', 'mini-take-note', tx('復習に加わります', 'to review')));
-  paintMiniPath(actions, seal.getAttribute('aria-pressed') === 'true');
-  mini.append(actions);
+  if (seal) {
+    actions.append(seal);
+    // the note and the toast share one noun: Save puts the word "to review", and the toast says "Saved to review"
+    if (canSave) actions.append(el('span', 'mini-take-note', tx('復習に加わります', 'to review')));
+    paintMiniPath(actions, seal.getAttribute('aria-pressed') === 'true');
+    mini.append(actions);
+  } else if (note) {
+    const line = el('span', 'mini-note mini-indeck', note);
+    actions.append(line);
+    actions.classList.add('is-note');
+    mini.append(actions);
+  }
   // the word's kanji, their parts and its web follow the actions, so Save is always the first thing in reach
-  if (reader) { const web = miniKanjiWeb(token.b, span); if (web) mini.append(web); }
+  if (kanji) { const web = miniKanjiWeb(token.b, span); if (web) mini.append(web); }
   if (sentence) mini.append(sentence);
   mini.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
@@ -8763,8 +8849,9 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   document.body.append(mini);
   miniAnchor = span;
   miniEntry = entryAvailable ? onEntry : null;
-  keepFloatingBeside(mini, span);
-  if (focusEntry) ([seal, word].find((button) => button.tagName === 'BUTTON' && !button.disabled) || mini).focus({ preventScroll: true });
+  miniOnClose = onClose;
+  keepFloatingBeside(mini, span, { follow });
+  if (focusEntry) ([seal, word].find((button) => button && button.tagName === 'BUTTON' && !button.disabled) || mini).focus({ preventScroll: true });
   return mini;
 }
 
@@ -8788,6 +8875,7 @@ function miniKanjiWeb(word, anchor) {
     const k = D.kanji[c];
     const row = el('button', 'mini-kanji-row');
     row.type = 'button';
+    row.dataset.kanji = c;
     const glyph = el('span', 'mini-kanji-glyph', c);
     glyph.lang = 'ja'; glyph.dataset.uiContent = 'learning';
     row.append(glyph);
@@ -8855,11 +8943,22 @@ function miniKanjiWeb(word, anchor) {
 }
 
 /** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
-function keepFloatingBeside(card, anchor) {
+function keepFloatingBeside(card, anchor, { follow = false } = {}) {
   placeFloating(card, anchor.getBoundingClientRect());
   card.addEventListener('focusin', () => {
     requestAnimationFrame(() => { if (card.isConnected) revealFloatingFocus(card); });
   });
+  // a word that moves (the sky's words glide as a family blooms and the camera settles) keeps its slip beside it
+  if (follow) {
+    let was = anchor.getBoundingClientRect();
+    const tick = setInterval(() => {
+      if (!card.isConnected || !anchor.isConnected) { clearInterval(tick); return; }
+      const now = anchor.getBoundingClientRect();
+      if (Math.abs(now.left - was.left) < 1 && Math.abs(now.top - was.top) < 1) return;
+      was = now;
+      placeFloating(card, now);
+    }, 120);
+  }
   if (typeof ResizeObserver !== 'function') return;
   let last = card.getBoundingClientRect().height;
   const watch = new ResizeObserver(() => {
@@ -8895,7 +8994,9 @@ function placeFloating(card, r) {
   const height = window.innerHeight || Infinity;
   // A clipped card meets the chrome edge: a gutter here can expose half a title glyph.
   const ceiling = Math.max(8, fixedEdge('#app > .chrome', 'bottom') ?? 0);
-  const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height) - 8;
+  // the deck's grade dock is a floor too: the slip never covers the four grades (it sits above a word in the lower third)
+  const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
+    fixedEdge('.kp-grades', 'top') ?? height) - 8;
   const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
   const sentence = card.classList.contains('is-sentence');
   let seatHeight = m.height;
@@ -9592,6 +9693,9 @@ function clearReaderReadings({ marked = false } = {}) {
  * (Ctrl+Enter, the word menu, search) summoned nothing and changes nothing. */
 function clearReaderSummons() {
   if (readerSlipDive) clearReaderReadings();
+  // every other surface whose slip opened this entry (the deck's lit word, the sky's unfolded word) hears it close
+  const closing = slipSummons.splice(0);
+  for (const onClose of closing) onClose('entry');
 }
 
 /** A reader content word: one tap opens the popup (the meaning), the word menu does the rest. */
@@ -10575,6 +10679,93 @@ window.__BUNKI_OPEN_ENTRY = {
     if (S.view !== 'drift' || !this.has(kind, key)) return;
     interaction({ kind: 'entry.open' }, 'pointer', `drift-study-${kind}`);
     go({ t: kind, id: key });
+  },
+};
+
+/* ------------------------------------------- the slip, for every surface (the one-hand pass, contract §1)
+ * One slip for every Japanese word, kanji or particle the learner can touch: the reader, the exam paper, the
+ * deck card's back, the sky, the guided session and the Words room all open this one, and it behaves the same
+ * everywhere — tap 1: the reading and the slip (word · reading · meaning · Save ▾ · kanji band · sentence row);
+ * the same word again: the full entry; elsewhere, Close or Escape: the bare word.
+ *   node    the dictionary node ({ t: 'word' | 'kanji' | 'particle' | 'grammar', id, seq?, reading? }), or null for
+ *           a spelling the dictionary lacks (the slip then shows what the surface knows, and has no door)
+ *   anchor  the element that was tapped: the slip grows beside it, and the next tap on it is the door
+ *   from    'reader' | 'deck' | 'drift' | 'guided' | 'lookup' — the eye's and the verifiers' source
+ *   host    the surface's own save path when it keeps a ledger of its own ({ take, saved, held }: the guided
+ *           session); the deck and the sky save through the corridor's one path on the node, as the reader does
+ *   look    what the surface knows better than the dictionary: { label, reading, gloss, glossLang, gloss2, surface }
+ *   note    a line in Save's place (the deck's own word is already in its deck)
+ *   entry   false: no door; a function: the surface's own way into the entry; otherwise go(node)
+ *   redo    the caller already read the press (the reader's doors): never treat this call as the second tap
+ * Returns the slip, or null when this activation was the second tap and dived into the entry instead. */
+function openSlip(node, { anchor, from = 'lookup', host = null, look = null, note = null, sentence = null, focus = false,
+  onClose = null, entry, key = null, redo = false } = {}) {
+  if (!anchor?.isConnected) return null;
+  if (!redo && diveFromSlip(anchor)) return null;
+  const kind = node?.t === 'kanji' ? 'kanji' : node?.t === 'particle' ? 'particle' : node?.t === 'grammar' ? 'grammar' : 'word';
+  let token;
+  let record = null;
+  let save = host ? 'host' : 'default';
+  let kanji = true;
+  let entryAvailable = entry !== false;
+  if (!node) {
+    const label = look?.label || look?.surface || '';
+    token = { s: look?.surface || label, b: label, r: look?.reading || '', c: false };
+    save = 'none';
+    entryAvailable = typeof entry === 'function';
+  } else if (kind === 'word') {
+    record = lookup(node.id, node.seq ?? null, node.reading || '');
+    token = { s: look?.surface || node.id, b: node.id, r: node.reading || record?.r || look?.reading || '', c: !!record,
+      ...(node.seq != null && node.seq !== '' ? { seq: node.seq } : {}) };
+    if (entry === undefined) entryAvailable = !!record;
+  } else if (kind === 'kanji') {
+    const k = D.kanji?.[node.id];
+    token = { s: node.id, b: node.id, r: look?.reading || kanjiSlipReading(k), c: !!k };
+    look = { ...(String(k?.m || '') ? { gloss: String(k.m).toLowerCase(), glossLang: 'en' } : {}), ...(look || {}) };
+    kanji = false;
+    if (entry === undefined) entryAvailable = !!k;
+  } else if (kind === 'particle') {
+    token = { s: node.id, b: look?.label || node.id, r: '' };
+    save = 'none';
+    kanji = false;
+  } else {
+    token = { s: look?.surface || look?.label || node.id, b: look?.label || node.id, r: look?.reading || '' };
+    kanji = false;
+  }
+  const onEntry = (modality) => {
+    removeMini();
+    if (typeof entry === 'function') entry(modality);
+    else if (node) go(node, { invoker: anchor });
+  };
+  return showMini(anchor, token, onEntry, { focusEntry: focus, record, entryAvailable, sentence, look, kind, save, host, note,
+    source: from, key, kanji, onClose, follow: from === 'drift', nodeFor: node && kind !== 'word' ? { t: node.t, id: node.id } : null });
+}
+/** A kanji's first reading for the slip's band: its first on reading in kana, else its first kun stem. */
+function kanjiSlipReading(k) {
+  if (!k) return '';
+  return kataToHira(String(k.on?.[0] || '')) || String(k.kun?.[0] || '').split('.')[0];
+}
+window.__BUNKI_OPEN_SLIP = {
+  has(kind, key) {
+    return window.__BUNKI_OPEN_ENTRY.has(kind, key);
+  },
+  /** The sky taps a word (or a kanji at a dive's centre): the slip opens beside the tapped element, and the
+   * next tap on it dives into the entry. 'opened' | 'dived' | false. */
+  open(kind, key, { anchor = null, onClose = null } = {}) {
+    if (S.view !== 'drift' || !this.has(kind, key) || !anchor?.isConnected) return false;
+    const before = !!document.getElementById('mini');
+    const slip = openSlip({ t: kind, id: key }, { anchor, from: 'drift', onClose });
+    if (slip) {
+      interaction({ kind: 'quickLook.open' }, 'pointer', `drift-slip-${kind}`);
+      return 'opened';
+    }
+    return before && !document.getElementById('mini') ? 'dived' : false;
+  },
+  isOpen() {
+    return !!document.getElementById('mini');
+  },
+  close() {
+    if (document.getElementById('mini')) removeMini();
   },
 };
 
@@ -18659,8 +18850,25 @@ function wwPlate(model, section) {
   centre.style.setProperty('--x', String((WW_CX / WW_W) * 100));
   centre.style.setProperty('--y', String(WW_CY));
   if (c.reading) centre.append(wwLearn('span', 'ww-c-r', c.reading));
-  const glyph = wwLearn('span', 'ww-c-glyph', c.glyph);
+  // the plate's headword opens the app's one slip beside it (contract §1): word · reading · meaning · Save ▾,
+  // and the slip's band is the door into the full entry. A part that is also a kanji opens as that kanji; a
+  // radical that is not has no slip of its own and opens its entry directly.
+  const centreNode = wwSlipNode(c);
+  const glyph = wwLearn('button', 'ww-c-glyph', c.glyph);
+  glyph.type = 'button';
   glyph.dataset.len = String(Math.min([...c.glyph].length, 4));
+  glyph.title = tx('語釈を開く', 'Open the quick look');
+  glyph.setAttribute('aria-haspopup', 'dialog');
+  glyph.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (!centreNode) { go({ t: 'radical', id: c.key }, { invoker: glyph }); return; }
+    openSlip(centreNode, { anchor: glyph, from: 'lookup', focus: event.detail === 0 });
+  });
+  glyph.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !document.getElementById('mini')) return;
+    event.preventDefault(); event.stopPropagation();
+    removeMini();
+  });
   centre.append(glyph);
   if (c.gloss) centre.append(el('span', 'ww-c-m', c.gloss));
   inner.append(centre);
@@ -18710,11 +18918,15 @@ function wwPlate(model, section) {
     }
     b.append(box);
     if (cap) b.append(capLearn ? wwLearn('span', 'ww-cap', cap) : el('span', 'ww-cap', cap));
-    b.addEventListener('click', () => {
+    b.addEventListener('click', (event) => {
+      if (event.detail !== 0 && Date.now() < swallowClickUntil) return; // the hold's own release
       if (n.type === 'passage') wwOpenPassage(n.ex, n.target, b);
       else if (n.type === 'grammar') go({ t: 'grammar', id: n.key }, { invoker: b });
       else wwRecentre({ type: n.type, key: n.key }, section, b);
     });
+    // a tap walks the web (the node comes to the centre); a hold, or a right-click, opens the node's slip in
+    // place instead (contract §1): the word's reading and meaning, Save ▾, the band into its entry
+    if (n.type === 'word' || n.type === 'kanji' || n.type === 'part') wireWordWebHold(b, () => wwSlipNode({ type: n.type, key: n.key }));
     layer.append(b);
   });
   inner.append(layer);
@@ -18841,6 +19053,44 @@ function wwDetail(model, section) {
   return box;
 }
 
+/** The dictionary node a web node's slip stands for: a word, a kanji, or a part that is itself a kanji; null
+ * for a radical that is not (it has an entry, not a slip). */
+function wwSlipNode(n) {
+  if (n.type === 'word') return { t: 'word', id: n.key };
+  if (n.type === 'kanji' || (n.type === 'part' && D.kanji?.[n.key])) return { t: 'kanji', id: n.key };
+  return null;
+}
+/** Press-and-hold (touch and pen) or right-click on a web node opens its slip in place; a hold that moves is
+ * a scroll, and the hold's release never counts as the walking tap (swallowClickUntil, as the reader's menu). */
+function wireWordWebHold(button, nodeOf) {
+  let hold = null;
+  const clear = () => { if (hold) clearTimeout(hold.timer); hold = null; };
+  const open = () => {
+    const node = nodeOf();
+    if (!node) return;
+    openSlip(node, { anchor: button, from: 'lookup', redo: true });
+  };
+  button.addEventListener('contextmenu', (event) => { event.preventDefault(); clear(); open(); });
+  button.addEventListener('pointerdown', (event) => {
+    clear();
+    if (event.pointerType === 'mouse' || event.isPrimary === false) return;
+    hold = { start: { x: event.clientX, y: event.clientY }, timer: setTimeout(() => {
+      hold = null;
+      swallowClickUntil = Date.now() + 700;
+      open();
+    }, GESTURE.MENU_MS) };
+  });
+  button.addEventListener('pointermove', (event) => {
+    if (hold && Math.hypot(event.clientX - hold.start.x, event.clientY - hold.start.y) > GESTURE.MOVE_PX) clear();
+  });
+  button.addEventListener('pointerup', clear);
+  button.addEventListener('pointercancel', clear);
+  button.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && document.getElementById('mini')) { event.preventDefault(); event.stopPropagation(); removeMini(); return; }
+    if (event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey)) { event.preventDefault(); open(); }
+  });
+}
+
 function wwValid(n) {
   if (n.type === 'word') return !!(D.dict[n.key] || D.words[n.key]);
   if (n.type === 'kanji') return !!D.kanji[n.key];
@@ -18918,6 +19168,7 @@ function renderWordWeb({ quiet = false } = {}) {
  * — the room never re-renders, the scroll and the search field stay put. */
 function wwRecentre(node, section, invoker) {
   if (!section?.isConnected) return;
+  removeMini(); // the web moves under a slip: the slip goes with the plate it stood on
   const swap = () => {
     wwPush(node);
     const next = renderWordWeb();
@@ -19042,42 +19293,15 @@ function wireParticleGestures(span, particle, index, p) {
     go({ t: 'particle', id: particle.id }, { invoker: span });
   };
   const sentence = () => ({ t: 'particle', id: particle.id, from: { passage: p.id, index } });
+  // the same slip as every word's (contract §1): the particle, its role, its sentence row; no Save (a particle is
+  // not a card), and its band opens the particle's page
   const quickLook = (modality = 'pointer', { restore = false } = {}) => {
-    removeMini();
-    const mini = el('div', null);
-    mini.id = 'mini';
-    mini.tabIndex = -1;
-    mini.setAttribute('role', 'dialog');
-    mini.setAttribute('aria-label', tx(`${particle.p} の語釈`, `${particle.p} particle quick look`));
-    // the same word band as every word's popup (round 4, T5): the particle, its role, and its entry's door
-    const head = el('div', 'mini-head');
-    const said = el('div', 'mini-head-text');
-    // the particle itself is the way into its page, as a second tap on it in the text is
-    const entry = el('button', 'mini-word', particle.p);
-    entry.type = 'button';
-    entry.title = tx('全項目を開く', 'Open the full entry');
-    entry.setAttribute('aria-label', tx('全項目を開く', 'Open the full entry'));
-    entry.dataset.action = 'entry.open';
-    entry.dataset.targetKind = 'particle';
-    entry.addEventListener('click', (event) => {
-      event.stopPropagation();
-      openFull(event.detail === 0 ? 'keyboard' : 'pointer');
+    openSlip({ t: 'particle', id: particle.id }, {
+      anchor: span, from: 'reader', key: `particle:${particle.id}`, redo: true,
+      look: { label: particle.p, gloss: bi() ? particle.role : particle.roleJa },
+      sentence: readerSentenceRow(sentence(), index), focus: modality === 'keyboard',
+      entry: (entryModality) => openFull(entryModality),
     });
-    said.append(entry, el('span', 'mini-gloss', bi() ? particle.role : particle.roleJa));
-    head.append(said);
-    mini.append(head, readerSentenceRow(sentence(), index));
-    mini.addEventListener('keydown', (event) => {
-      if (event.key !== 'Escape') return;
-      event.preventDefault();
-      event.stopPropagation();
-      removeMini();
-      span.focus({ preventScroll: true });
-    });
-    document.body.append(mini);
-    miniAnchor = span;
-    miniEntry = openFull;
-    keepFloatingBeside(mini, span);
-    if (modality === 'keyboard') entry.focus({ preventScroll: true });
     if (!restore) retireReaderTip();
   };
   span.classList.add('particle');
@@ -24190,6 +24414,9 @@ function guidedHost() {
       : null,
     openReport: maintenanceReports ? () => maintenanceReports.openReport() : null,
     openEntry: (node) => go(node, { invoker: document.activeElement }),
+    // a word in the session's teaching text opens the app's one slip beside it (contract §1); Save goes through
+    // the session's own path (host), so its ledger and its crane keep their word
+    openSlip: (node, { anchor, host, look, onClose } = {}) => openSlip(node, { anchor, from: 'guided', host, look, onClose }),
     openTutor: () => {
       keepNavigationReturn('ai', document.activeElement);
       S.view = 'ai'; render(); window.scrollTo(0, 0);
@@ -33609,6 +33836,13 @@ function deckHost() {
       grammar: (id, pattern) =>
         GRAMMARS().find((g) => g.id === id) || (pattern ? GRAMMARS().find((g) => norm(g.p) === norm(pattern)) : null) || null,
       open: (node) => go(node),
+      // the card back's words open the app's one slip beside the tapped word (contract §1); the deck's own words
+      // say they are already in the deck where Save would stand; a word the dictionary lacks shows the deck's
+      // sense and has no door
+      openSlip: (node, options) => openSlip(node, options),
+      slipOpen: () => !!document.getElementById('mini'),
+      closeSlip: () => { if (document.getElementById('mini')) removeMini(); },
+      inDeckNote: () => tx('このデッキにあります', 'Already in this deck'),
       taken: () => S.taken,
       // 覚える from a deck card is the corridor's one save path (STANDARD A51): the same one-tap
       // save, Saved toast and 元に戻す as the reader's dictionary visit, into the shared review

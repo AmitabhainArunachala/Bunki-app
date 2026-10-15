@@ -121,5 +121,37 @@ export function createHost(deps) {
       if (!entry?.t || !entry.id || !taken(entry) || typeof deps.addToList !== 'function') return;
       deps.addToList(nodeOf(entry, deps), entry.label || entry.id, invoker, options);
     },
+    /** The card back's tap (the one-hand pass, contract §1): the corridor's one slip beside the tapped word.
+     * frame is what the player shows for the tap (frameOf): a word of this deck (frame.word), a host entry
+     * (frame.entry), or neither (a spelling the dictionary lacks: the deck's own sense, no door, no Save).
+     * The deck's own word says it is already in the deck where Save would stand, and its band opens the
+     * dictionary's entry when the dictionary has it. Save goes through the corridor's one path on the node,
+     * the path take() wraps. english: show the English sense under the Japanese one.
+     * 'opened' | 'dived' (this tap was the second on the word: the slip went into the entry) | false. */
+    openSlip(frame, anchor, { english = false, onClose = null } = {}) {
+      if (typeof deps.openSlip !== 'function' || !frame || !anchor) return false;
+      const entry = frame.entry || (frame.word
+        ? wordEntry(deps, { s: frame.word.term, ref: frame.word.term, r: frame.word.reading || '', k: '語' })
+        : null);
+      const node = entry ? nodeOf(entry, deps) : null;
+      const look = {
+        label: frame.label, reading: frame.reading || '', surface: frame.surface || frame.label,
+        ...(frame.ja ? { gloss: frame.ja, glossLang: 'ja', ...(english && frame.en ? { gloss2: frame.en } : {}) }
+          : frame.en ? { gloss: frame.en, glossLang: 'en' } : {}),
+      };
+      const before = !!deps.slipOpen?.();
+      const slip = deps.openSlip(node, {
+        anchor, from: 'deck', look, key: frame.key || '', onClose,
+        ...(frame.word ? { note: deps.inDeckNote?.() || 'このデッキにあります' } : {}),
+      });
+      if (slip) return 'opened';
+      return before && !deps.slipOpen?.() ? 'dived' : false;
+    },
+    slipOpen() {
+      return !!deps.slipOpen?.();
+    },
+    closeSlip() {
+      deps.closeSlip?.();
+    },
   };
 }

@@ -1062,8 +1062,7 @@ legend.gs-instruction {
 .gs-branch-back {
   margin-bottom: 12px;
 }
-.gs-branch .gs-title,
-.gs-word-room .gs-title {
+.gs-branch .gs-title {
   display: flex;
   align-items: baseline;
   gap: 10px;
@@ -1092,19 +1091,6 @@ legend.gs-instruction {
 }
 .gs-lacquer .gs-word:hover {
   background: var(--sheet-ai-wash, rgba(217, 178, 95, 0.14)) !important;
-}
-/* the word room sits on the ground: its reading keeps the paper's red */
-.gs-word-room .gs-branch-reading {
-  display: block;
-  margin-top: 10px;
-  font-size: 0.5em;
-  line-height: 1.6;
-  color: var(--red);
-}
-.gs-word-room .gs-meaning {
-  margin-top: 20px !important;
-  color: var(--ink-2);
-  font-size: 15px;
 }
 
 /* ---------- summary · results · learn ---------- */

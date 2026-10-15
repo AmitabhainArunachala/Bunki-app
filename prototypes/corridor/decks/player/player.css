@@ -304,7 +304,7 @@
 /* Reduced motion keeps the held frame, with a short opacity crossfade and no movement. */
 @media (prefers-reduced-motion: reduce) {
   .kp *, .kp *::before, .kp *::after { animation: none !important; transition: none !important; }
-  :is(#app, .kp) .kp-sentence.kp-enter :is(.kp-target, rt), :is(#app, .kp) .kp-answer.kp-enter, :is(#app, .kp) .kp-card.kp-arrive, :is(#app, .kp) .kp-sheet, :is(#app, .kp) .kp-pop { animation: kp-fade 100ms linear both !important; transform: none !important; }
+  :is(#app, .kp) .kp-sentence.kp-enter :is(.kp-target, rt), :is(#app, .kp) .kp-answer.kp-enter, :is(#app, .kp) .kp-card.kp-arrive, :is(#app, .kp) .kp-pop { animation: kp-fade 100ms linear both !important; transform: none !important; }
   :is(#app, .kp) .kp-study.kp-reveal-hold { animation: kp-fade-out 100ms linear both !important; transform: none !important; }
   :is(#app, .kp) .kp-screen-hold { animation: kp-fade-out 100ms linear both !important; transform: none !important; }
   :is(#app, .kp) .kp-screen-enter { animation: kp-fade 100ms linear both !important; transform: none !important; }
@@ -335,28 +335,8 @@
 .kp-tok:focus { outline: none; }
 .kp-tok:hover, .kp-tok:focus-visible { text-decoration: underline dotted; text-decoration-thickness: 1.5px; text-underline-offset: 0.3em; }
 .kp-target.kp-tok:hover, .kp-target.kp-tok:focus-visible { text-decoration: underline dotted 2px; }
-/* the entry sheet (with a host): a bottom sheet over the card and the grade bar */
-.kp-sheet-wrap { position: fixed; inset: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: center; background: rgba(0, 0, 0, 0.42); }
-.kp-sheet { width: 100%; max-width: 40rem; max-height: min(78vh, 640px); overflow-y: auto; overscroll-behavior: contain; background: var(--kp-panel); color: var(--kp-ink); border: 1px solid var(--kp-line); border-bottom: 0; border-radius: 18px 18px 0 0; padding: 14px 16px calc(18px + env(safe-area-inset-bottom)); display: grid; gap: 10px; box-shadow: var(--kp-depth); animation: kp-rise 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
-.kp-sheet-kanji { display: flex; flex-wrap: wrap; gap: 8px; }
-.kp-sheet-kanji-door { min-width: 44px; min-height: 44px; padding: 4px 8px; border: 1px solid var(--kp-line); border-radius: 4px; background: var(--kp-panel-2); color: var(--kp-ink); cursor: pointer; }
-.kp-sheet-kanji-glyph { font-family: var(--kp-head); font-size: 24px; line-height: 1.3; }
-.kp-sheet-top { display: flex; align-items: flex-start; gap: 10px; }
-.kp-sheet-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; min-width: 0; flex: 1; padding-top: 4px; }
-.kp-sheet-term { margin: 0; font-size: 26px; line-height: 1.25; font-weight: 700; color: var(--kp-ink); outline: none; }
-.kp-sheet-reading { font-size: 17px; color: var(--kp-ink-2); }
-.kp-sheet-chips { display: flex; gap: 6px; padding-top: 12px; }
-.kp-sheet-def { margin: 0; font-size: 18px; line-height: 1.7; }
-.kp-sheet-none { margin: 0; font-size: 14px; line-height: 1.6; color: var(--kp-ink-2); }
-.kp-sheet-stop { margin: 0; font-size: 13px; color: var(--kp-mute); letter-spacing: 0.08em; }
-.kp-sheet-indeck, .kp-sheet-taken, .kp-sheet-note { margin: 0; font-size: 15px; color: var(--kp-ink-2); padding: 10px 12px; border: 1px solid var(--kp-line); border-radius: 12px; background: var(--kp-panel-2); }
-/* the headword is the door to the host's full entry: it keeps the headword's look, a 44px reach that moves nothing */
-.kp-sheet-door { display: inline; margin: -7px 0; padding: 7px 0; border: 0; background: none; font: inherit; letter-spacing: inherit; color: inherit; text-align: start; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.kp-sheet-door:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 2px; }
-.kp-take[data-save-menu]::after { content: '▾'; margin-inline-start: 6px; font-size: 0.8em; opacity: 0.8; }
-.kp-take-note { margin: 6px 0 0; font-size: 12px; color: var(--kp-ink-2); }
-.kp-take { min-height: 48px; width: 100%; border-radius: 14px; border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 16px; font-weight: 700; }
-/* the popover (no host: the standalone study pages) */
+/* with a host, a tap opens the app's own slip (corridor.js openSlip, skin in rooms/read.css); the popover below is
+   the standalone study pages' only word card */
 .kp-pop { position: fixed; z-index: 40; width: min(320px, calc(100vw - 32px)); background: var(--kp-panel-2); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: 14px; padding: 10px 12px 12px; display: grid; gap: 6px; box-shadow: var(--kp-depth); animation: kp-fade 0.14s cubic-bezier(0.2, 0, 0, 1) both; }
 .kp-pop-head { display: flex; align-items: baseline; gap: 8px; }
 .kp-pop-term { font-size: 20px; }

@@ -358,17 +358,8 @@ const UI_EN = {
   "類語": "Related words",
   "同じ字・同じ読みの、学習中の語": "Study words sharing a kanji or reading",
   "参照": "See also",
-  "前の語に戻る": "Back to the previous word",
   "閉じる": "Close",
-  "辞書の全項目を開く": "Open the full dictionary entry",
-  "リストに追加…": "Add to a list…",
-  "保存できませんでした": "Could not save",
-  "このデッキにあります": "Already in this deck",
-  "ここで止めよう": "Pause here",
-  "この語の日本語の語釈は、まだ辞書にありません": "This word has no Japanese definition in the dictionary yet.",
-  "この語は辞書にありません": "This word is not in the dictionary.",
   "ここでは覚えるに保存できません（回廊でできます）": "Save to your review cards in KAIRO.",
-  "覚えるの札に入ります — このデッキの予定は変わりません": "Added to your review cards; this deck’s schedule stays the same.",
   "削除": "Remove",
   "このカードを削除（保留にする・あとで戻せる）": "Remove this card from study (pause it; restore it later)",
   "別の文に替える": "Use another sentence",
@@ -504,7 +495,7 @@ const t = (ja, en = UI_EN[ja]) => ctx?.english !== false ? (en ?? ja) : ja;
 function el(tag, cls, ...kids) {
   const node = document.createElement(tag);
   if (cls) node.className = cls;
-  if (/(?:^| )(?:kp-word|kp-def|kp-note|kp-sheet-def|kp-pop-def)(?: |$)/.test(cls || '')) node.lang = 'ja';
+  if (/(?:^| )(?:kp-word|kp-def|kp-note|kp-pop-def)(?: |$)/.test(cls || '')) node.lang = 'ja';
   for (const kid of kids.flat()) {
     if (kid == null || kid === false) continue;
     node.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
@@ -846,7 +837,6 @@ function paint() {
   fitBar();
   fitClamps(root);
   ui.pop = null; // its word was just redrawn
-  if (ui.sheet) drawSheet({ focus: false });
 }
 /** on a phone the grade bar is fixed to the bottom of the screen: keep room for it under the card */
 function fitBar() {
@@ -963,7 +953,6 @@ function topicSettings() {
 function go(screen) {
   ui.screen = screen;
   ui.toast = '';
-  ui.sheet = null;
   paintResponse({ resetScroll: true, front: true });
 }
 
@@ -1021,7 +1010,6 @@ function resetCard() {
   ui.revealed = false;
   ui.seen = false;
   ui.picked = null;
-  ui.sheet = null;
   ui.pop = null;
 }
 
@@ -1535,13 +1523,7 @@ function seeAlsoLine(card, word) {
  * own words are tappable, from the page's built-in gloss map, and a tap shows a small popover with
  * no 覚える. A tap is capture, never evidence: it never grades, never changes a card's schedule and
  * never adds a card; it is written to the ledger's lookups[] for the sensei and nowhere else. */
-const SHEET_DEPTH = 2;
-const IN_DECK = 'このデッキにあります';
-const STOP_HERE = 'ここで止めよう';
-const NO_JA = 'この語の日本語の語釈は、まだ辞書にありません';
-const NOT_FOUND = 'この語は辞書にありません';
 const NO_TAKE_HERE = 'ここでは覚えるに保存できません（回廊でできます）';
-const TAKE_NOTE = '覚えるの札に入ります — このデッキの予定は変わりません';
 const SELF_UNIT = Object.freeze({ self: true });
 const GLOSS_FORMAT = 'bunki-cloze-gloss';
 const ENTRY_KIND = { word: '語', kanji: '字', grammar: '文法' };
@@ -1658,7 +1640,7 @@ function tapNode(node, unit, onTap) {
     // word nearest its point, rather than whichever neighbouring reach paints last.
     let chosen = node;
     if (e.detail && Number.isFinite(e.clientX) && Number.isFinite(e.clientY)) {
-      const prose = node.closest('.kp-sentence, .kp-def, .kp-sheet-def');
+      const prose = node.closest('.kp-sentence, .kp-def');
       let best = Infinity;
       for (const candidate of prose?.querySelectorAll('.kp-tok') || []) {
         for (const box of candidate.getClientRects()) {
@@ -1807,9 +1789,12 @@ function lightWord(node) {
 function tapped(unit, node, { card, where, depth }) {
   const frame = frameOf(unit);
   logTap(card, where, frame, depth);
-  if (depth === 1) lightWord(node);
-  if (ctx.host) openSheet(frame, node, depth);
-  else openPop(frame, node);
+  lightWord(node);
+  if (!ctx.host) { openPop(frame, node); return; }
+  // the app's one slip beside the word (the one-hand pass, contract §1): the host draws it, and the next tap on
+  // the same word dives into the full entry; the word's reading stays lit until the slip, or that entry, goes
+  const opened = safely(() => ctx.host.openSlip?.(frame, node, { english: ctx.prefs.gloss === 'show', onClose: (reason) => { if (reason !== 'dive') lightWord(null); } }), false);
+  if (!opened) lightWord(null);
 }
 
 /** what the host answers, or fallback when it throws: a host fault never breaks the card */
@@ -1825,153 +1810,6 @@ function englishLine(cls, text) {
   const n = el('p', cls, text);
   n.lang = 'en';
   return n;
-}
-
-/* -------- the entry sheet (with a host) */
-function openSheet(frame, node, depth) {
-  const prior = ui.sheet;
-  const stack = depth > 1 && prior ? [...prior.stack.slice(0, depth - 1), frame] : [frame];
-  ui.sheet = { stack, note: '', returnTo: depth > 1 && prior ? prior.returnTo : node };
-  drawSheet();
-}
-function closeSheet() {
-  const back = ui.sheet?.returnTo;
-  ui.sheet = null;
-  lightWord(null);
-  ctx.root.querySelector('.kp-sheet-wrap')?.remove();
-  if (back?.isConnected) back.focus({ preventScroll: true });
-}
-/** (re)draw the sheet over the card; the card itself is not repainted, so its folds stay as they are */
-function drawSheet({ focus = true } = {}) {
-  const old = ctx.root.querySelector('.kp-sheet-wrap');
-  const scroll = old?.querySelector('.kp-sheet')?.scrollTop || 0;
-  old?.remove();
-  if (!ui.sheet || ui.screen !== 'study') return;
-  const wrap = sheetNode();
-  ctx.root.append(wrap);
-  const sheet = wrap.querySelector('.kp-sheet');
-  if (focus) sheet.querySelector('.kp-sheet-term')?.focus({ preventScroll: true });
-  else sheet.scrollTop = scroll;
-}
-function sheetNode() {
-  const { stack } = ui.sheet;
-  const depth = stack.length;
-  const f = stack[depth - 1];
-  const wrap = el('div', 'kp-sheet-wrap');
-  wrap.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (e.target === wrap) closeSheet();
-  });
-  const sheet = el('div', 'kp-sheet');
-  sheet.id = 'kp-sheet';
-  sheet.lang = ctx.english !== false ? 'en' : 'ja';
-  sheet.setAttribute('role', 'dialog');
-  sheet.setAttribute('aria-modal', 'true');
-  sheet.setAttribute('aria-labelledby', 'kp-sheet-term');
-  sheet.dataset.depth = String(depth);
-  sheet.dataset.key = f.key;
-  const top = el('div', 'kp-sheet-top');
-  if (depth > 1) {
-    top.append(btn('kp-icon kp-sheet-back', '←', () => {
-      ui.sheet = { ...ui.sheet, stack: stack.slice(0, -1), note: '' };
-      drawSheet();
-    }, { id: 'kp-sheet-back', 'aria-label': t("前の語に戻る") }));
-  }
-  const term = el('h2', 'kp-sheet-term', f.label);
-  term.lang = 'ja';
-  term.id = 'kp-sheet-term';
-  term.dataset.uiContent = 'learning';
-  term.tabIndex = -1;
-  // the word itself is the way into the corridor's full entry, as in every word card of the app (John,
-  // 2026-10-14: the "Full entry" button is bloat); a word of this deck has no full entry here
-  if (!f.word && f.entry) {
-    const door = btn('kp-sheet-door', f.label, () => {
-      const entry = f.entry;
-      closeSheet();
-      ctx.host.open(entry);
-    }, { id: 'kp-sheet-full', 'data-action': 'entry.open', title: t('辞書の全項目を開く', 'Open the full entry') });
-    door.lang = 'ja';
-    door.dataset.uiContent = 'learning';
-    term.replaceChildren(door);
-  }
-  const head = el('div', 'kp-sheet-head', term, f.reading && f.reading !== f.label ? el('span', 'kp-sheet-reading', f.reading) : null);
-  const chips = el('div', 'kp-sheet-chips', f.kind ? el('span', 'kp-chip', t(f.kind)) : null, f.level ? levelChip(f.level) : null);
-  top.append(head, chips, btn('kp-icon kp-sheet-x', '×', closeSheet, { id: 'kp-sheet-close', 'aria-label': t("閉じる") }));
-  sheet.append(top);
-  // the Japanese sense first; its words open one more sheet, down to SHEET_DEPTH
-  if (f.ja) {
-    const def = el('p', 'kp-sheet-def');
-    def.lang = 'ja';
-    const units = depth < SHEET_DEPTH && f.word ? defUnits(f.word) : null;
-    def.append(...tapText(f.ja, units, (u, node) => tapped(u, node, { card: currentCard(), where: 's', depth: depth + 1 })));
-    sheet.append(def);
-  } else sheet.append(el('p', 'kp-sheet-none', t(f.word || f.entry ? NO_JA : NOT_FOUND)));
-  if (f.en) sheet.append(fold('kp-f-gloss kp-sheet-en', t("英語"), ctx.prefs.gloss === 'show', englishLine('kp-gloss', f.en)));
-  // A word of this deck keeps its no-save/no-full-entry contract, but its kanji are
-  // still one tap away. These doors work at either word depth without extending
-  // the recursive word-definition chain beyond its existing two-sheet limit.
-  const kanji = [...new Set([...(f.label || '')].filter((glyph) => /\p{Script=Han}/u.test(glyph)))];
-  const entries = kanji.map((glyph) => safely(() => ctx.host?.lookup({ s: glyph, ref: glyph, k: '字' }), null)).filter((entry) => entry?.t === 'kanji');
-  if (entries.length) {
-    const band = el('nav', 'kp-sheet-kanji');
-    band.setAttribute('aria-label', t('この語の漢字', 'Kanji in this word'));
-    for (const entry of entries) {
-      const glyph = el('span', 'kp-sheet-kanji-glyph', entry.label || entry.id);
-      glyph.lang = 'ja';
-      glyph.dataset.uiContent = 'learning';
-      band.append(btn('kp-sheet-kanji-door', glyph, () => {
-        closeSheet();
-        ctx.host.open(entry);
-      }, { 'data-kanji': entry.id, 'aria-label': t(`${entry.id}の漢字の項目を開く`, `Open ${entry.id} kanji entry`) }));
-    }
-    sheet.append(band);
-  }
-  if (depth >= SHEET_DEPTH) sheet.append(el('p', 'kp-sheet-stop', t(STOP_HERE)));
-  if (f.word) sheet.append(el('p', 'kp-sheet-indeck', t(IN_DECK)));
-  else if (f.entry) sheet.append(takeBlock(f));
-  wrap.append(sheet);
-  return wrap;
-}
-
-/** 覚える is the corridor's one save path (STANDARD A51): one tap writes the word to 覚えるの札
- * through the host, the corridor shows its Saved toast with 元に戻す, and nothing is asked first.
- * Once saved, リストに追加… opens the corridor's own list popover; a list is optional. */
-function takeBlock(f) {
-  const box = el('div', 'kp-take-box');
-  if (ui.sheet.note) box.append(el('p', 'kp-sheet-note', ui.sheet.note));
-  // Save ▾ (John, 2026-10-14: one Save, its options in a menu, no second "Add to a list"): a host with
-  // a menu opens it from Save once the word is saved (lists, copy, remove from review)
-  const menu = typeof ctx.host.addToList === 'function';
-  const openMenu = (invoker) => safely(() => ctx.host.addToList(f.entry, invoker, { menu: true, onChange: () => ui.sheet && drawSheet({ focus: false }) }), null);
-  const attrs = menu ? { 'data-save-menu': 'true', 'aria-haspopup': 'dialog', 'aria-expanded': 'false' } : {};
-  if (safely(() => !!ctx.host.isTaken(f.entry), false)) {
-    const saved = btn('kp-take taken', t('保存済み ✓', 'Saved ✓'), () => menu && openMenu(saved), { id: 'kp-take', 'aria-pressed': 'true', ...attrs });
-    box.append(saved);
-    return box;
-  }
-  const take = btn('kp-take', t('保存', 'Save'), async () => {
-    if (ui.sheet?.busy) return;
-    const sheetNow = ui.sheet;
-    sheetNow.busy = true;
-    take.disabled = true;
-    const ok = await takeEntry(f.entry);
-    sheetNow.busy = false;
-    if (ui.sheet !== sheetNow) return; // the sheet closed or moved on while the corridor saved
-    ui.sheet.note = ok ? '' : t("保存できませんでした");
-    drawSheet({ focus: false });
-    const next = ctx.root.querySelector('#kp-take');
-    if (ok && menu && next) openMenu(next);
-  }, { id: 'kp-take', 'aria-pressed': 'false', ...attrs });
-  box.append(take, el('p', 'kp-take-note', t(TAKE_NOTE)));
-  return box;
-}
-/** 覚えるの札, through the host (the corridor's guarded one-tap save) */
-async function takeEntry(entry) {
-  try {
-    return !!(await ctx.host.take(entry));
-  } catch {
-    return false;
-  }
 }
 
 /* -------- the popover (no host: the standalone study pages) */
@@ -3060,11 +2898,12 @@ function restoreButton(ta, msg) {
 
 function onKey(e) {
   if (!ctx?.root?.isConnected || ui.screen !== 'study' || e.target.closest?.('input, textarea')) return;
-  // an open sheet or popover takes the keys: Escape closes it, and nothing grades behind it
-  if (ui.sheet || ui.pop) {
+  // an open slip (the host's) or popover takes the keys: Escape closes it, and nothing grades behind it
+  const slip = !!ctx.host && safely(() => !!ctx.host.slipOpen?.(), false);
+  if (slip || ui.pop) {
     if (e.key === 'Escape') {
       e.preventDefault();
-      if (ui.sheet) closeSheet();
+      if (slip) { ctx.host.closeSlip?.(); lightWord(null); }
       else closePop();
     }
     return;
@@ -3139,7 +2978,6 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
   if (!sameDeck || start === false) {
     ui.screen = 'home';
     ui.queue = [];
-    ui.sheet = null;
     ui.pop = null;
   }
   if (!keyBound) {

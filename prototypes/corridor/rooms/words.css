@@ -125,10 +125,14 @@ html:is([data-room='search'], [data-room='word-web']) .ww-centre {
   transform: translate(-50%, -50%); text-align: center; outline: none; pointer-events: none;
 }
 html:is([data-room='search'], [data-room='word-web']) .ww-c-r { font: 500 12px/1.2 var(--font-ui); letter-spacing: 0.14em; color: var(--color-muted); }
+/* the headword is a button: it opens the word's slip beside it (corridor.js wwPlate); the centre around it stays
+   inert, so the plate's wires and ring never take the tap */
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph {
   display: block; font: 800 50px/1.06 var(--font-headword, var(--font-display)); color: var(--color-ink); white-space: nowrap;
+  margin: 0; padding: 0 4px; border: 0; background: none; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent;
   animation: ww-ink 300ms var(--ease-ink, ease) both;
 }
+html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 4px; border-radius: 4px; }
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph[data-len='1'] { font-size: 66px; }
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph[data-len='3'] { font-size: 34px; }
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph[data-len='4'] { font-size: 26px; }

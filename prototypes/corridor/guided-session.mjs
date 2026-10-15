@@ -142,11 +142,6 @@ export function createGuidedSession(host) {
   let branch = null;
   let branchOpener = null;
   let branchScroll = 0;
-  let wordDetail = null;
-  let wordSourceId = null;
-  let wordReturnScroll = 0;
-  let wordOpener = null;
-  let wordOpenerIndex = 0;
   let showReadings = false;
   let notice = '';
   let confirmingReset = false;
@@ -283,7 +278,6 @@ export function createGuidedSession(host) {
   }
   function go(view, fields = {}) {
     branch = null;
-    wordDetail = null;
     notice = '';
     emit('NAVIGATE', { view, ...fields });
     redraw({ top: true });
@@ -294,7 +288,6 @@ export function createGuidedSession(host) {
     branch = null;
     branchOpener = null;
     branchScroll = 0;
-    wordDetail = null;
   }
 
   /* ------------------------------------------------------------------- deck */
@@ -439,10 +432,14 @@ export function createGuidedSession(host) {
     }
   }
 
-  async function saveWord() {
-    const word = words[wordDetail];
-    if (!word || deckBusy) return;
-    const node = wordNode(wordDetail);
+  /** Save from the word's slip (the one-hand pass): the session's own path, so the saved word is recorded with
+   * its source and the crane carries it, and the recorded answer never changes. The slip repaints its own
+   * Save; nothing here redraws the room, so the slip and its word stay where the finger is.
+   * 'added' | 'existing' | 'held' | 'failed'. */
+  async function saveWord(key, sourceId) {
+    const word = words[key];
+    if (!word || deckBusy) return 'failed';
+    const node = wordNode(key);
     deckBusy = true;
     notice = '';
     let status;
@@ -452,7 +449,7 @@ export function createGuidedSession(host) {
       deckBusy = false;
     }
     if (status === 'added' || status === 'existing') {
-      emit('SAVE_WORD', { wordId: wordDetail, id: wordSourceId, status });
+      emit('SAVE_WORD', { wordId: key, id: sourceId, status });
       const text =
         status === 'added'
           ? t(
@@ -460,22 +457,45 @@ export function createGuidedSession(host) {
               `${word.surface} · added to your review deck`,
             )
           : t(`${word.surface} · もうデッキにある`, `${word.surface} · already in your deck`);
-      redraw({
-        focus: '[data-action="close-word"]',
-        crane: status === 'added' ? text : null,
-        say: text,
-      });
-      return;
+      announce(text);
+      if (status === 'added')
+        setTimeout(() => {
+          if (root?.isConnected) moments?.carry({ text, target: '#tray' });
+        }, 0);
+      return status;
     }
-    notice =
-      status === 'held'
-        ? host.deck.status(node).reason ||
-          t('この語はここでは覚えられない。', 'This word can’t be learned here.')
-        : t(
-            'この窓では保存できなかった。もう一度試すか、再読み込みする。',
-            'This window couldn’t save it. Try again, or reload.',
-          );
-    redraw({ focus: '[data-action="save-word"]' });
+    return status === 'held' ? 'held' : 'failed';
+  }
+
+  /** A word of the teaching text, tapped: the app's one slip beside it (contract §1), with Save through
+   * saveWord above. The session keeps no word room of its own any more. */
+  function openWordSlip(key, sourceId, anchor) {
+    const word = words[key];
+    if (!word || typeof host.openSlip !== 'function') return;
+    const node = wordNode(key);
+    const status = () => host.deck.status(node);
+    host.openSlip(node, {
+      anchor,
+      look: { label: word.surface, reading: word.reading, gloss: word.meaning },
+      host: {
+        saved: () => status().state === 'taken',
+        held: () =>
+          status().state === 'held'
+            ? status().reason || t('この語はここでは覚えられない。', 'This word can’t be learned here.')
+            : null,
+        take: async () => {
+          const result = await saveWord(key, sourceId);
+          if (result === 'failed')
+            announce(
+              t(
+                'この窓では保存できなかった。もう一度試すか、再読み込みする。',
+                'This window couldn’t save it. Try again, or reload.',
+              ),
+            );
+          return result === 'added' || result === 'existing';
+        },
+      },
+    });
   }
 
   async function removeWord(wordId) {
@@ -518,7 +538,7 @@ export function createGuidedSession(host) {
   const textBtn = (label, action, attrs = '') =>
     `<button type="button" class="gs-text" data-action="${action}" ${attrs}>${label}</button>`;
   const nav = (label, view) =>
-    `<button type="button" class="gs-nav" data-action="nav" data-view="${view}" ${state.view === view && !branch && !wordDetail ? 'aria-current="page"' : ''}>${label}</button>`;
+    `<button type="button" class="gs-nav" data-action="nav" data-view="${view}" ${state.view === view && !branch ? 'aria-current="page"' : ''}>${label}</button>`;
 
   function itemState(q, infos) {
     const row = state.learn.find((entry) => entry.id === q.id && !entry.removed);
@@ -744,25 +764,6 @@ export function createGuidedSession(host) {
     return `${sessionTop()}<div class="gs-thread">${rail('insight')}<article class="gs-sheet gs-lacquer gs-branch"><div class="gs-branch-back">${textBtn(`← ${bi('文へ戻る', 'return to the sentence')}`, 'close-branch')}</div><span class="gs-eyebrow">${bi('言葉の扉', `a branch of question ${state.index + 1}`)}</span><h1 class="gs-title" tabindex="-1" lang="ja" data-ui-content="learning">${esc(b.title)}<span class="gs-branch-reading">${esc(b.reading)}</span></h1><p class="gs-meaning">${esc(b.meaning)}</p><p class="gs-teaching">${teachingText(b.body)}</p><div class="gs-example"><p lang="ja">${teachingText(b.exampleJa)}</p><small>${esc(b.exampleEn)}</small></div><p class="gs-side-note">${bi('答えも場所もそのままです。', 'your answer and place are unchanged')}</p></article>${aside(current())}</div>`;
   }
 
-  function wordView() {
-    const word = words[wordDetail];
-    const q = Q.find((entry) => entry.id === wordSourceId) || current();
-    const node = wordNode(wordDetail);
-    const status = host.deck.status(node);
-    const key = keyOf(node);
-    const info = cardInfo([key]).get(key);
-    const taken = status.state === 'taken';
-    const learn = taken
-      ? btn(bi('保存済み ✓', 'Saved ✓'), 'save-word', 'primary', 'disabled aria-disabled="true"')
-      : btn(
-          bi('保存', 'Save'),
-          'save-word',
-          'primary',
-          status.state === 'held' || deckBusy ? 'disabled' : '',
-        );
-    return `<section class="gs-narrow gs-word-room"><div class="gs-branch-back">${textBtn(`← ${bi('元の場所へ', 'back to where you were')}`, 'close-word')}</div><h1 class="gs-title" tabindex="-1" lang="ja" data-ui-content="learning">${esc(word.surface)}<span class="gs-branch-reading">${esc(word.reading)}</span></h1><p class="gs-meaning">${esc(word.meaning)}</p><p class="gs-side-note">${esc(word.source)} · ${t('辞書の意味。文脈は元の文にある。', 'Dictionary meaning. The original sentence provides its context.')}</p>${notice ? `<p class="gs-notice" role="status">${esc(notice)}</p>` : ''}<div class="gs-actions">${learn}${textBtn(bi('文へ戻る', 'return to the sentence'), 'close-word')}${textBtn(bi('辞書で開く', 'open the full entry'), 'entry')}</div>${taken ? `<p class="gs-deck-line">${deckLine(key, 'added', info)}</p>` : status.state === 'held' ? `<p class="gs-side-note" data-held>${esc(status.reason)}</p>` : ''}<p class="gs-side-note gs-spaced">${t(`出典: ${esc(q.source.label)}。「保存」を押すと、実際の覚えるデッキに札が一枚加わる。答えの記録は変わらない。`, `From ${esc(q.source.label)}. Saving a word adds one card to your real review deck. Your recorded answer is unchanged.`)}</p></section>`;
-  }
-
   function summary() {
     const n = answered();
     return `<section class="gs-narrow"><span class="gs-eyebrow">${bi('続ける前に', 'before you carry on')}</span><h1 class="gs-title" tabindex="-1">${bi('最後にもう一度。', 'take one last look')}</h1><p class="gs-lede">${t(`${Q.length}問中${n}問に答えた。`, `${n} of ${Q.length} answered.`)} ${n < Q.length ? t('未回答の問題は、そのまま残る。', 'Unanswered questions will stay unanswered.') : t('どの問題にも戻れる。それから、持っていくものを集めよう。', 'You can revisit any question, then gather what you want to carry forward.')}</p>${Q.map(
@@ -981,12 +982,12 @@ export function createGuidedSession(host) {
       sensei,
       about,
     };
-    const stage = wordDetail ? 'word' : branch ? 'branch' : state.view;
+    const stage = branch ? 'branch' : state.view;
     root = document.createElement('div');
     root.className = 'guided-room';
     root.dataset.stage = stage;
     root.dataset.set = set.id;
-    root.innerHTML = `${roomBar()}<div class="gs-main">${wordDetail ? wordView() : branch ? branchView() : (views[state.view] || home)()}</div>${footer()}`;
+    root.innerHTML = `${roomBar()}<div class="gs-main">${branch ? branchView() : (views[state.view] || home)()}</div>${footer()}`;
     root.addEventListener('click', onClick);
     root.addEventListener('change', onChange);
     root.addEventListener('input', onInput);
@@ -1146,34 +1147,9 @@ export function createGuidedSession(host) {
       case 'word': {
         const key = b.dataset.word;
         if (!words[key]) return;
-        wordDetail = key;
-        wordSourceId = b.dataset.source || (state.view === 'fresh' ? target().id : q.id);
-        wordReturnScroll = window.scrollY;
-        wordOpener = key;
-        wordOpenerIndex = [
-          ...root.querySelectorAll(`[data-action="word"][data-word="${cssEscape(key)}"]`),
-        ].indexOf(b);
-        notice = '';
-        redraw({ top: true });
+        openWordSlip(key, b.dataset.source || (state.view === 'fresh' ? target().id : q.id), b);
         return;
       }
-      case 'close-word':
-        wordDetail = null;
-        notice = '';
-        redraw({
-          scroll: wordReturnScroll,
-          focus: () =>
-            root.querySelectorAll(`[data-action="word"][data-word="${cssEscape(wordOpener)}"]`)[
-              wordOpenerIndex
-            ],
-        });
-        return;
-      case 'save-word':
-        void saveWord();
-        return;
-      case 'entry':
-        if (words[wordDetail]) host.openEntry(wordNode(wordDetail));
-        return;
       case 'remove-word':
         void removeWord(b.dataset.word);
         return;
@@ -1237,7 +1213,6 @@ export function createGuidedSession(host) {
         return;
       case 'source':
         branch = null;
-        wordDetail = null;
         emit('GO_TO', { index: Number(b.dataset.index), count: Q.length });
         redraw({ top: true });
         return;
@@ -1402,23 +1377,12 @@ export function createGuidedSession(host) {
       renderRoom(main);
       applyAfter();
     },
-    /** The app's 戻る inside the room: word → sentence, branch → sentence, an attempt or an
-     * inner page → the room's front. Returns false at the front, so the app walks on out. */
+    /** The app's 戻る inside the room: branch → sentence, an attempt or an inner page → the room's
+     * front. Returns false at the front, so the app walks on out. (A word's slip is the app's own layer:
+     * the app puts it away before asking the room.) */
     back() {
       if (!set || !state) return false;
       moments?.stop();
-      if (wordDetail) {
-        wordDetail = null;
-        notice = '';
-        redraw({
-          scroll: wordReturnScroll,
-          focus: () =>
-            root?.querySelectorAll(`[data-action="word"][data-word="${cssEscape(wordOpener)}"]`)[
-              wordOpenerIndex
-            ],
-        });
-        return true;
-      }
       if (branch) {
         branch = null;
         redraw({ scroll: branchScroll, focus: `[data-key="${cssEscape(branchOpener)}"]` });

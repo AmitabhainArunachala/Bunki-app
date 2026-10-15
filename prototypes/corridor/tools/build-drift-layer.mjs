@@ -382,8 +382,8 @@ patch(
 );
 patch(
   'addEventListener("keydown",e=>{ if(e.key==="Escape") closeRadoc(); });',
-  'addEventListener("keydown",e=>{ if(DRIFT_ON&&e.key==="Escape") closeRadoc(); });',
-  'gate keydown',
+  'addEventListener("keydown",e=>{ if(!DRIFT_ON||e.key!=="Escape")return; const slip=window.__BUNKI_OPEN_SLIP; if(slip&&typeof slip.isOpen==="function"&&slip.isOpen()){slip.close();return;} closeRadoc(); });',
+  'gate keydown; Escape puts the slip away first',
 );
 patch(
   'addEventListener("pointerdown",e=>{\n  if(e.isPrimary&&touches.size){touches.clear();pinch=null;}',
@@ -509,6 +509,28 @@ for (const name of ['refreshActive()', 'clearBloom(keep)', 'collapseUnfold()', '
 patch('function removeNode(n,delay){\n  const el=n.el;\n  setTimeout(function(){',
   'function removeNode(n,delay){\n  const el=n.el;\n  if(n.kind==="word")el.tabIndex=-1;\n  setTimeout(function(){\n    if(n.recordPending)return;', 'pending node cannot be removed by a prior timer');
 patch('function tapNode(n){', 'function tapNode(n){\n  if(recordPending.size){setHint("判断を保存しています。");return;}', 'pending judgment keeps taps from rebuilding the field');
+
+// The one-hand pass (contract §1, 2026-10-15): hosted, every word answers a tap with the app's one slip.
+// The first tap on a word (the planet, a word on open water, a lock member) shows its reading and the slip
+// beside it; the same word again opens the full entry (the slip's host reads the press); elsewhere, Close or
+// Escape returns the bare word. The sky's own gloss rung and its card stand aside for the slip. Satellites
+// keep their reveal in place and their chain walk — the walk is the sky's web, as the Words room's node tap
+// is — and the new planet opens its slip as it arrives. The standalone donor keeps its ladder and card.
+patch(
+  '  const canBloom=n.kind==="word"&&stack.length===0&&!lockOn;\n  if(V_LADDER==="stage4"',
+  '  if(n.kind==="word"&&slipFor(n)) return;\n  const canBloom=n.kind==="word"&&stack.length===0&&!lockOn;\n  if(V_LADDER==="stage4"',
+  'one-hand: the first tap on a word opens the slip',
+);
+patch(
+  '  if(isSat){\n    bloomFocus(n);   // the chain walk: the satellite becomes the planet\n    return;\n  }',
+  '  if(isSat){\n    bloomFocus(n);   // the chain walk: the satellite becomes the planet\n    slipFor(n);      // and the planet opens its slip as it arrives\n    return;\n  }',
+  'one-hand: the chain walk arrives with the slip',
+);
+patch(
+  '    if(n.kind==="word"&&hook.has("word",n.w)){hook.open("word",n.w);return;}\n    if(n.kind==="glyph"&&n.ch&&hook.has("kanji",n.ch)){hook.open("kanji",n.ch);return;}',
+  '    if(n.kind==="word"&&hook.has("word",n.w)){if(!slipFor(n))hook.open("word",n.w);return;}\n    if(n.kind==="glyph"&&n.ch&&hook.has("kanji",n.ch)){if(!slipFor(n))hook.open("kanji",n.ch);return;}',
+  'one-hand: a dive\'s centre opens its slip, the slip\'s band the entry',
+);
 patch('lvlEl.addEventListener("pointerdown",e=>{\n  e.stopPropagation();',
   'lvlEl.addEventListener("pointerdown",e=>{\n  if(recordPending.size)return;\n  e.stopPropagation();', 'pending judgment preserves the level tide');
 patch('      const nd=wr.node;\n      if(nd&&(nd===focusN||nd.hlDom)) continue;',
@@ -674,6 +696,35 @@ patch(
 js += `
 // Round 4 review (T1): the universe speaks the interface language the corridor set on <body>.
 function uiT(ja,en){return document.body&&document.body.classList.contains("ui-bi")?en:ja;}
+// The one-hand pass (contract §1): the host's one slip, asked for the way the entry door is asked for —
+//   window.__BUNKI_OPEN_SLIP = { has(kind,key), open(kind,key,{anchor,onClose}), isOpen(), close() }
+// and drawn only when has() says the far side exists. slipFor(n) is the first rung of the hosted ladder: the
+// word's reading comes up (unfolded, its family blooming as before) and the slip opens beside it; the host
+// reads the next press on the same word as the dive into the full entry. When the slip goes (a tap elsewhere,
+// Escape, or that entry closing) the word folds again; while the entry is open it stays as it was.
+function slipHost(kind,key){
+  const h=typeof window!=="undefined"&&window.__BUNKI_OPEN_SLIP;
+  if(!h||typeof h.open!=="function") return null;
+  if(typeof h.has==="function"&&!h.has(kind,key)) return null;
+  return h;
+}
+function slipFor(n){
+  const kind=n.kind==="word"?"word":n.kind==="glyph"?"kanji":null;
+  const key=kind==="word"?n.w:n.ch;
+  const h=kind&&key?slipHost(kind,key):null;
+  if(!h||!n.el||!n.el.isConnected) return false;
+  if(kind==="word"&&!n.el.classList.contains("unfolded")){
+    collapseUnfold();
+    n.el.classList.add("unfolded"); unfolded=n;   // one tap: furigana, with the slip
+    if(stack.length===0&&!lockOn&&focusN!==n) bloomFocus(n);
+  }
+  h.open(kind,key,{anchor:n.el,onClose:function(reason){
+    if(reason==="dive") return;
+    n.el.classList.remove("unfolded","glossed");
+    if(unfolded===n) unfolded=null;
+  }});
+  return true;
+}
 // Round 4 review (T1, fix 2): by day the universe keeps a sky of its own (the donor's own cool
 // ground), and by night it stands on the host world's ground only when every word ink keeps its
 // contrast there: at least 3:1, and never below the donor's own lowest ink where that is under
