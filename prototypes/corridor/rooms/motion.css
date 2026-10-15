@@ -36,3 +36,32 @@ html[data-room-transition][data-room-dir='left'] #app > main[data-room-arrival] 
 @keyframes kairo-room-arrive { from { opacity: 0; } }
 @keyframes kairo-room-arrive-from-right { from { opacity: 0; transform: translateX(24px); } }
 @keyframes kairo-room-arrive-from-left { from { opacity: 0; transform: translateX(-24px); } }
+/* G1 · the word's page arrives as a match cut — one block, names and keyframes. The source's headword (the slip's,
+   else the tapped word) and the page's headword are one word-hero in turn: its group morphs position and size on the
+   page beat (--motion-sheet, --ease-enter). The rule above stops every group's own animation so a room's frame never
+   travels; word-hero takes its user-agent morph back (revert), the duration and the curve are the house's. What the
+   page covers is kairo-paper: the root's snapshot, named for the old state only (the arriving page is never captured,
+   so it stays live — the reason the root's name is none above), recedes a step toward the source (≤ 1.03 around
+   --paper-origin, set by corridor.js) and fades, so the page is found beneath it; the slip goes with it. Back: the page
+   is kairo-page (old only) and fades while the word returns to where it was tapped. Reduced motion never starts the
+   cut (corridor.js pageCutAllowed): the page's own 120 ms fade is the one rule's (editorial.css). */
+::view-transition-group(word-hero) {
+  animation: revert;
+  animation-duration: var(--motion-sheet);
+  animation-timing-function: var(--ease-enter);
+}
+::view-transition-old(word-hero),
+::view-transition-new(word-hero) {
+  animation-duration: var(--motion-sheet);
+  animation-timing-function: var(--ease-enter);
+}
+::view-transition-old(kairo-paper) {
+  mix-blend-mode: normal;
+  transform-origin: var(--paper-origin, 50% 30%);
+  animation: kairo-paper-recede var(--motion-sheet) var(--ease-enter) both;
+}
+::view-transition-old(kairo-page) {
+  mix-blend-mode: normal;
+  animation: kairo-room-fade-out var(--motion-sheet) var(--ease-enter) both;
+}
+@keyframes kairo-paper-recede { to { opacity: 0; transform: scale(1.03); } }

@@ -110,7 +110,10 @@
       const hostDialogs = [...document.querySelectorAll('dialog[open]')].filter(item => item !== dialog && !root.contains(item));
       const focusedHost = document.activeElement?.closest('dialog[open]');
       const host = hostDialogs.includes(focusedHost) ? focusedHost : hostDialogs[hostDialogs.length - 1];
-      const destination = host || document.querySelector('#stroke-page:not([inert])') || document.querySelector('#sheet:not([inert])') || document.body;
+      // A word's page (#sheet) is no native modal: the rail stays on body, a top-layer popover above the page, and the page
+      // carries its own report entry for the keyboard and screen readers. Moving the root in and out of every page re-showed
+      // the popover each time: a 40–60 ms frame in WebKit on every page opened or closed (Bunki G1, one-hand/G1/DESIGN.md).
+      const destination = host || document.querySelector('#stroke-page:not([inert])') || document.body;
       if (root.parentElement !== destination) destination.append(root);
       if (rail.hasAttribute('popover') && !rail.matches(':popover-open')) {
         try { rail.showPopover(); } catch { rail.removeAttribute('popover'); /* Fixed-position fallback. */ }

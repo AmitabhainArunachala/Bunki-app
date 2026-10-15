@@ -343,18 +343,17 @@ body .focus-chip-u { color: inherit; opacity: 0.75; }
 body.v-depth-layered .study-door:hover { background: var(--ai-wash); }
 
 
-/* The dictionary is a distinct raised sheet, with a fixed heading and open
- * rows. Its depth comes from one shadow, not repeated inset cards. */
+/* The dictionary is a page of its own (G1): open rows on the world's paper, its measure kept by the gutter. */
 body.v-depth-layered .sheet, .sheet {
-  max-width: 900px;
-  max-height: min(90dvh, 1100px);
-  padding: 0 32px calc(32px + env(safe-area-inset-bottom));
+  /* the gutter keeps a phone's 20 px and, on a wide window, the old 820 px measure centred on the whole-screen page */
+  --page-gutter: max(20px, calc((100vw - 860px) / 2));
+  padding: 0 var(--page-gutter) calc(32px + env(safe-area-inset-bottom));
 }
 .sheet-bar {
   position: sticky;
   top: 0;
   z-index: 4;
-  margin: 0 -32px 24px;
+  margin: 0 calc(-1 * var(--page-gutter, 32px)) 24px;
 }
 .sheet-bar .sheet-depth { font-size: 14px; }
 .sheet .headword { font-family: var(--display); font-size: 42px; line-height: 1.65; letter-spacing: -0.02em; margin: 4px 0 2px; }
@@ -727,8 +726,6 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
   body:not(.zen) #app > .chrome .lang-seg button { padding-inline: 9px; font-size: 12px; }
   body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; margin: 0 auto 44px; padding: 24px 18px 72px; box-shadow: none; }
   main h1.view-title { font-size: 29px; }
-  body.v-depth-layered .sheet, .sheet { padding-inline: 20px; max-height: 91dvh; }
-  .sheet-bar { margin-inline: -20px; }
   .sheet-bar .sheet-depth { font-size: 13px; }
   .sheet-bar .sheet-back { padding-inline: 10px; }
   .sheet .headword { font-size: 36px; }
@@ -2082,11 +2079,10 @@ body .sheet > button.take .en-sub { display: inline; font-size: 13px; letter-spa
   body .sheet .headword { font-size: 38px; }
   body .sheet .reading { font-size: 19px; }
 }
-/* an open sheet is the top layer: the reader's bar, tip and dock step back under it */
-body:has(#sheet) .teacher-door.reader-actions { display: none !important; }
-@media (max-width: 520px) {
-  body:has(#sheet)[data-view='reader'] #app::after, body:has(#sheet)[data-view='reader'] .listen-row.play-bar { display: none; }
-}
+/* an open page is the top layer: the reader's bar, tip and dock stay where they are, under it (G1: the page is opaque and
+   stands above them — z-index 61 over the dock's 40, the play bar's 45 and the sentence bar's 60 — so nothing has to be
+   taken away: hiding them through body:has(#sheet) re-styled the whole document and cost WebKit a 40–60 ms frame on every
+   page opened and closed, one-hand/G1/DESIGN.md) */
 
 /* ------------------------------------------------------------------ step 3b
    The kanji page and the writing room. The kanji is printed on its own washi
@@ -4093,7 +4089,7 @@ body:not([data-view='drift']) .gs-lacquer :is(.gs-text, .gs-button:where(:not(.p
   --color-lacquer-2: #1d2638;
   --color-lacquer-ink: #e9e2d2;
   --color-press: color-mix(in srgb, var(--color-accent) 55%, #0b0f18);
-  /* the one scrim under every sheet and slip that rises from the foot */
+  /* the one scrim under a panel that rises from the foot (the lists popover on a phone); the word's page has none (G1) */
   --color-scrim: rgb(12 16 26 / 30%);
 
   /* type: Shippori B1 800 for display, Noto Serif JP for reading, Noto Sans JP for
@@ -4277,23 +4273,28 @@ body:not([data-view='drift']) .foundation-doors { gap: var(--space-2); }
   background-repeat: no-repeat;
 }
 
-/* ---- the sheet: ONE skin (one hand, slice D). A raised leaf of the world's paper on a hairline, the
-   overlay radius on its top corners, one scrim (--color-scrim), one rise on the sheet beat. The
-   four stacked skins (corridor.css, the editorial head, the FEEL pass, this block) are now this one. ---- */
-body:not([data-view='drift']) .sheet {
+/* ---- the page (slice G1, 2026-10-16). John: "this should come to the WHOLE SCREEN. not a swipable window, it should
+   come to the whole screen and not have that UGLY gap at the top". The entry is a page, not a sheet: the whole viewport,
+   in every room the galaxy included; the world's raised paper, opaque from a plain value first (--color-paper = the
+   world block's --ground-0: the page opened from the review card wears the world, verify-theme-consistency); no
+   radius, no cap (corridor.css's 82vh, the 90dvh and the phone's 91dvh are gone), no grip, no dimming layer under
+   it — a whole page has nothing to dim and nothing to tap outside. It arrives by the match cut (rooms/motion.css);
+   its own fade is only for a browser without view transitions and for reduced motion (the one rule below). ---- */
+body .sheet, body.v-depth-layered .sheet {
+  inset: 0;
+  z-index: 61;
+  max-width: none;
+  max-height: none;
+  margin: 0;
   border: 0;
-  border-top: var(--stroke-hairline) solid var(--color-edge-strong);
-  border-radius: var(--radius-overlay) var(--radius-overlay) 0 0;
-  /* the leaf is the world's own raised paper (--color-paper = the world block's --ground-0): the sheet
-     opened from the review card wears the world, the operator's theme law (verify-theme-consistency). Opaque,
-     from a plain value: a phone that cannot resolve a colour chain still gets the world's paper. */
+  border-radius: 0;
+  box-shadow: none;
+  transform: none;
   background: var(--color-paper, #f5efe0);
   color: var(--color-ink);
-  box-shadow: var(--elevation-float);
-  animation: feel-rise var(--motion-sheet) var(--ease-sheet);
+  overscroll-behavior: contain;
+  animation: none;
 }
-body:not([data-view='drift']) .sheet-grip { width: 36px; height: 4px; margin: 10px auto; border-radius: var(--radius-seal); background: var(--color-edge-strong); }
-body:not([data-view='drift']) .scrim { background: var(--color-scrim); animation: feel-fade var(--motion-standard) var(--ease-standard); }
 
 /* ---- the top chrome: clean and quiet. Every door keeps its id, place and 44px. ---- */
 body:not(.zen) #app > .chrome {
@@ -4948,6 +4949,13 @@ body:not(.zen) #app > .chrome {
 [data-bar='guided'] .gs-nav[aria-current='page'] { color: var(--color-bar-ink); font-weight: 700; }
 /* the sheet's bar bleeds to the sheet's edges (its own .sheet-bar margins), its doors on the content's gutter */
 [data-bar='sheet'] { gap: 4px; padding-inline: 12px; }
+/* G1 · the page's bar is the top of the screen: it carries the safe area as the room's chrome does, and on a wide window
+   its doors stand over the page's measure */
+#sheet > .sheet-bar[data-bar] {
+  height: calc(45px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-inline: max(12px, calc(var(--page-gutter, 20px) - 8px));
+}
 [data-bar='sheet'] .sheet-depth { flex: 1 1 auto; min-width: 0; }
 /* the bar's Save is the A family at the bar's measure: 44, not the family's 48 (it hung below the bar) */
 body [data-bar='sheet'] .sheet-take { margin-left: auto; height: 44px; min-height: 44px; padding-block: 0; }
@@ -5115,7 +5123,7 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
    ticks and quick changes to 0, every longer move to 120 ms — and nothing travels: every animation
    and transition the corridor owns runs at zero length (a keyframe that moved now only lands), and
    the surfaces that must still be seen to change cross-fade in 120 ms, opacity only: a room (the
-   old frame and the new room), the sheet, the scrim, the slip, the word menu, the lists popover,
+   old frame and the new room), the word's page (G1: no view transition then), the slip, the word menu, the lists popover,
    the world picker, the nav bar, the corner bubble, the shelf's tools, the review faces, the
    toast, the guided verdict, the report sheet. The deck (player.css, for the pages it stands
    alone on), the drift layer and the samurai moments keep their own reduced-motion contracts
@@ -5146,8 +5154,8 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
     animation-duration: 0s !important;
     animation-delay: 0s !important;
   }
-  body #app :is(.sheet, .scrim, .nav-bar, .corner-bubble, .shelf-study-tools:not([hidden]), .review-face, .review-clear, .review-rise-w, .reveal, .grade-row .grade, .guided-room .gs-feedback),
-  body > :is(.sheet, .scrim, .world-picker, .world-picker-scrim),
+  body #app :is(.sheet, .nav-bar, .corner-bubble, .shelf-study-tools:not([hidden]), .review-face, .review-clear, .review-rise-w, .reveal, .grade-row .grade, .guided-room .gs-feedback),
+  body > :is(.sheet, .world-picker, .world-picker-scrim),
   body::after,
   body #mini,
   body :is(.reader-word-menu, .vocabulary-list-popover),
