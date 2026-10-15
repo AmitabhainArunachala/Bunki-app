@@ -64,6 +64,23 @@ for (const world of WORLDS) {
   await page.goto(`${base}/?entry=shelf`);
   await page.waitForSelector('#tray', { timeout: 30000 });
   await shoot('1-shelf');
+  // one paper per world (the one-hand pass, slice D): the fixed page layer paints the world's own ground —
+  // --page resolves to the world block's --ground, the layer's final colour is that ground, and no generic
+  // fibre (a fractalNoise data-SVG) is painted over it; the room's own light and ground pattern may be
+  const paper = await page.evaluate(`(() => {
+    const layer = getComputedStyle(document.body, '::before');
+    const body = getComputedStyle(document.body);
+    const html = getComputedStyle(document.documentElement);
+    return { image: layer.backgroundImage, color: layer.backgroundColor, page: body.getPropertyValue('--page').trim(),
+      colorPage: body.getPropertyValue('--color-page').trim(), ground: html.getPropertyValue('--ground').trim() };
+  })()`);
+  const groundRgb = (hex) => `rgb(${[1, 3, 5].map((i) => parseInt(hex.length === 4 ? hex[(i + 1) / 2].repeat(2) : hex.slice(i, i + 2), 16)).join(', ')})`;
+  if (norm(paper.page) !== norm(paper.ground) || norm(paper.colorPage) !== norm(paper.ground))
+    failures.push(`${world}/paper: --page ${paper.page} (--color-page ${paper.colorPage}) is not the world's ground ${paper.ground}`);
+  if (norm(paper.color) !== norm(groundRgb(paper.ground)))
+    failures.push(`${world}/paper: the page layer's colour ${paper.color} is not the world's ground ${paper.ground}`);
+  if (/fractalNoise|data:image\/svg/i.test(paper.image))
+    failures.push(`${world}/paper: a generic fibre is painted over the world's ground (${paper.image.slice(0, 80)}…)`);
   await page.click('#tray');
   await page.waitForSelector('#review-start', { timeout: 30000 });
   await shoot('2-tray');
