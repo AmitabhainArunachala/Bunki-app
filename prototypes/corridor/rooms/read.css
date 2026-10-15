@@ -564,7 +564,7 @@ html[data-room='reader'] .reader-head > .reader-meta .status-chip {
   text-transform: lowercase;
   color: var(--color-signal);
 }
-html[data-room='reader'] body:not(.ui-bi) .reader-head > .reader-meta .status-chip { text-transform: none; }
+html[data-room='reader'] .reader-head > .reader-meta .status-chip { text-transform: none; } /* AI keeps its case */
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-head > .dials-toggle {
   position: absolute;
   top: 0;

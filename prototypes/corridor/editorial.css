@@ -2174,7 +2174,7 @@ body .sheet .stroke-door {
   box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 16%, transparent), 0 24px 60px -28px color-mix(in srgb, var(--ink) 60%, transparent),
     0 0 0 1px color-mix(in srgb, var(--ink) 10%, transparent);
 }
-#stroke-page .stroke-back, #stroke-page[data-minimal] #strokes-back, #stroke-page .stroke-btn.stroke-corner, #stroke-page .stroke-chrome-trigger {
+#stroke-page[data-minimal='on'] .stroke-back, #stroke-page[data-minimal='on'] #strokes-back, #stroke-page .stroke-btn.stroke-corner, #stroke-page .stroke-chrome-trigger {
   opacity: 0.92;
   border: 1px solid var(--raised-edge-strong);
   border-radius: var(--radius-control);
@@ -2182,7 +2182,7 @@ body .sheet .stroke-door {
   box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 10%, transparent), 0 8px 18px -12px color-mix(in srgb, var(--ink) 40%, transparent);
   color: var(--text);
 }
-#stroke-page .stroke-back, #stroke-page[data-minimal] #strokes-back { flex-direction: row; gap: 6px; padding: 0 16px; font: 600 15px/1 var(--sans); }
+#stroke-page[data-minimal='on'] .stroke-back, #stroke-page[data-minimal='on'] #strokes-back { flex-direction: row; gap: 6px; padding: 0 16px; font: 600 15px/1 var(--sans); }
 #stroke-page .stroke-back .en-sub { display: inline; font-size: 12px; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
 #stroke-page .stroke-btn.stroke-corner { padding: 6px 16px; }
 #stroke-page #stroke-numbers {
@@ -4936,19 +4936,47 @@ body:not(.zen) #app > .chrome {
 [data-bar='stroke'] .stroke-title { flex: 1 1 auto; min-width: 0; text-align: center; font: 600 17px/1.2 var(--font-headword, var(--display)); color: var(--color-bar-ink); }
 [data-bar='guided'] { justify-content: space-between; gap: 8px; margin-bottom: var(--space-3, 12px); }
 [data-bar='guided'] .gs-bar-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 15px/1.2 var(--font-ui); letter-spacing: 0; color: var(--color-bar-ink); }
+/* on a phone the room's four doors are the bar's middle; its name (the h1 below says it) goes to a screen reader */
+@media (max-width: 520px) {
+  [data-bar='guided'] .gs-bar-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  [data-bar='guided'] { justify-content: flex-end; }
+}
 [data-bar='guided'] .gs-bar-doors { flex: 0 0 auto; display: flex; flex-wrap: nowrap; gap: 0; }
 [data-bar='guided'] .gs-nav { min-height: 44px; padding: 0 10px; border: 0; background: transparent; color: var(--color-bar-quiet); font: 500 14px/44px var(--font-ui); letter-spacing: 0; white-space: nowrap; }
 [data-bar='guided'] .gs-nav[aria-current='page'] { color: var(--color-bar-ink); font-weight: 700; }
 [data-bar='sheet'] { gap: 4px; margin-inline: 0; }
 [data-bar='sheet'] .sheet-depth { flex: 1 1 auto; min-width: 0; }
 [data-bar='sheet'] .sheet-take { margin-left: auto; height: 44px; min-height: 44px; }
+/* the seal is one glyph in every bar: a small square seal in the world's signal, a hairline frame inside its 44 */
+[data-bar] > button.theme-seal {
+  position: relative;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-seal);
+  background: none;
+  box-shadow: none;
+  opacity: 1;
+  color: var(--color-seal);
+  font: 800 12px/1 var(--font-display);
+}
+[data-bar] > button.theme-seal::after {
+  content: '';
+  position: absolute;
+  inset: 11px;
+  border: 1px solid color-mix(in srgb, var(--color-seal) 70%, transparent);
+  border-radius: var(--radius-seal);
+  pointer-events: none;
+}
 /* the galaxy's own strip (the door's menu) wears the frame's material too */
 .nav-bar { background: var(--color-bar, rgb(250 250 248 / 96%)); border: var(--stroke-hairline, 0.5px) solid var(--color-bar-line, rgb(0 0 0 / 12%)); -webkit-backdrop-filter: none; backdrop-filter: none; }
 /* END ONE TOP BAR ========================================================== */
 
 /* ONE NOTE (contract §5): the honest notes of every room — ai · guide · record — one element, quiet and small, a
    hairline on the left, no box (F's --type-small takes over once it lands; the label size until then) */
-.note[data-kind] {
+body .note[data-kind] {
   margin: var(--space-3, 12px) 0;
   padding: 2px 0 2px 12px;
   border: 0;
