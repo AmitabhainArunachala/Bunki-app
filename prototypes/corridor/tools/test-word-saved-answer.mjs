@@ -93,6 +93,8 @@ function defineRows() {
     'nonBlankMeanings', 'wordSelection', 'savedAnswerFor', 'wordAnswerIdentity', 'sameWordIdentity', 'wordStudied',
     'wordCardIdentity', 'wordNodeIdentity', 'explicitWordSnapshot', 'wordCapturePlan', 'captureStorePatch', 'commitCapture',
     'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureReadingMismatch', 'wordCaptureHeldText', 'showMini',
+    // G1 (2026-10-16): a slip stands only beside a word on the top layer, and a slip leaving into its page is not standing
+    'slipAllowed', 'standingSlip',
     // glance pass 2026-10-01: the reading names an entry's kana form across scripts
     'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex', 'entryCueReading',
     // Save is one tap (reader lane, 2026-10-02): the seal itself saves, and a press on "Saved ✓" is the mini's
@@ -119,7 +121,9 @@ function defineRows() {
     'searchRowShownByCore', 'renderSearchResults', 'dictionaryQueryKey', 'activeDictionaryQuery', 'clearDictionarySearchTimer',
     'requestDictionarySearch', 'dispatchQueuedDictionarySearch', 'DICTIONARY_SEARCH_SETTLE_MS', 'dictionarySearchGeneration',
     'dictionarySearchInFlight', 'dictionarySearchQueued', 'dictionarySearchTimer',
-    'dictionaryHomographChoices', 'renderDictionaryHomographs', 'dictionaryRowsFor', 'dictionaryDetailRowsFor'];
+    'dictionaryHomographChoices', 'renderDictionaryHomographs', 'dictionaryRowsFor', 'dictionaryDetailRowsFor',
+    // G1 (2026-10-16): one line per gloss — the homograph doors are drawn from homographLines
+    'homographLines'];
   /** The authored top-level statements declaring `names`, each exactly once. */
   const liftFrom = (tree, names) => {
     const found = tree.statements.filter((statement) => {
@@ -278,6 +282,8 @@ function defineRows() {
       document: { querySelectorAll: () => [], body: { append: (node) => { context.dialogs.push(node); } }, getElementById: () => null,
         createTextNode: (text) => new FakeElement('#text', '', text) },
       window: { innerWidth: 400 }, removeMini: () => {}, activeTokenAlternatives: null,
+      // G1's frame sampler and the page built at idle are the browser's (frames, idle callbacks), not the slip's logic
+      sampleTransition: () => {}, sampleWhere: () => '', schedulePagePrebuild: () => {},
       sealSyncs: 0, syncReaderTakeSeal: () => { context.sealSyncs += 1; },
       commitStorePatch: async (producer) => {
         try {
@@ -442,11 +448,16 @@ function defineRows() {
       title: title ? [title.textContent, ...title.children.map((child) => child.textContent)] : null };
   };
   /** Click one door on the core sheet: a live door pushes its entry; returns the new stack top, or null if nothing
-   * was pushed (an inert door). */
+   * was pushed (an inert door). G1: the door opens its entry as every page opens — go, whose enterWord pushes exactly
+   * the node it is given inside the match cut — so a door's one navigation through the stand-in go is applied here as
+   * that push; a door that both navigated and pushed, or did either twice, is no door. */
   const clickDoor = (ctx, door) => {
-    const depth = ctx.S.stack.length;
+    const depth = ctx.S.stack.length, navigations = ctx.opened.length;
     door.door.listeners.click();
-    return ctx.S.stack.length === depth + 1 ? roundTrip(ctx.S.stack.at(-1)) : null;
+    const pushed = ctx.S.stack.length - depth, opened = ctx.opened.length - navigations;
+    if (opened === 1 && pushed === 0) ctx.S.stack.push(roundTrip(ctx.opened.at(-1)));
+    else if (!(pushed === 1 && opened === 0)) return null;
+    return roundTrip(ctx.S.stack.at(-1));
   };
   /** The explicit entry reached the way a learner reaches it after the dedup: search → the core row → the core sheet's
    * own door for that entry and exact reading. */

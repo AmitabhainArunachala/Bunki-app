@@ -64,6 +64,11 @@ async function query(raw) {
   await page.locator('#nav-search-input').fill(raw);
   await page.waitForTimeout(120);
 }
+/** G1: a page arrives (and leaves) by its match cut, its state changed in the cut's update a frame after the click; the
+ * checks read the page once no cut runs (none runs under reduced motion: the page then changes at once). */
+async function pageSettled() {
+  await page.waitForFunction(() => !document.documentElement.matches(':active-view-transition'), null, { timeout: 5000 });
+}
 async function count() {
   return Number((await page.locator('.skip-result-count').innerText()).split(' kanji')[0].replaceAll(',', ''));
 }
@@ -162,17 +167,22 @@ try {
   await query('1-3-8');
   const hit = page.locator('.skip-hit').first(), hitId = await hit.getAttribute('id');
   await hit.click();
+  await pageSettled();
   await page.locator('#sheet-back').click();
+  await pageSettled();
   await page.waitForTimeout(100);
   check('Back preserves query and focus', await page.locator('#nav-search-input').inputValue() === '1-3-8' &&
     await page.evaluate((id) => document.activeElement.id === id, hitId));
   await query('4-6-4');
   await page.locator('[data-skip-hit="㐆"]').click();
+  await pageSettled();
   check('fallback opens ordinary kanji sheet', await page.locator('.skip-fallback-note').count() === 1);
   check('ordinary kanji sheet has no visible SKIP code', await page.locator('.sheet .skip-code-door-wrap').count() === 0);
   await page.locator('#kanji-shape-lookup').click();
+  await pageSettled();
   check('code-free shape door opens nested lookup', await page.locator('.sheet .skip-ui').count() === 1);
   await page.locator('#sheet-back').click();
+  await pageSettled();
   check('nested Back returns to same fallback entry', await page.locator('.sheet .hero-glyph').innerText() === '㐆');
   await page.locator(await entryCloseSelector(page)).click();
   await page.locator('.theme-seal').first().click();

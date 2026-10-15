@@ -17,7 +17,10 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'enhanceJapaneseProse', 'showMini', 'wordSaveFacts', 'paintWordSave', 'paintMiniPath', 'placeFloating', 'revealFloatingFocus', 'keepFloatingBeside', 'miniAnchor', 'SAVE_PRESS_MS', 'lookupBlockWords', 'setLookupStop', 'japaneseLookupHelpId', 'lookupOccurrence',
   'lookupItemBlocks', 'findLookupOccurrence', 'japaneseLookupMini', 'lookupWordKey',
   // the one-hand pass: the slip's dive into the entry and the close callback every surface hears
-  'slipDive', 'miniDiving', 'miniOnClose', 'slipSummons'];
+  'slipDive', 'miniDiving', 'miniOnClose', 'slipSummons',
+  // G1 (2026-10-16): a slip stands only beside a word on the top layer, a slip leaving into its page is not standing, and
+  // its headword is the match cut's source
+  'slipAllowed', 'standingSlip', 'slipHeadword'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
@@ -74,6 +77,9 @@ class Element {
     this.isConnected = false;
   }
   getBoundingClientRect() { return { top: 200, bottom: 220, left: 20, width: 40, height: 20 }; }
+  // data-* attributes live in dataset here, as the browser reflects them
+  hasAttribute(name) { return name.startsWith('data-') ? name.slice(5).replace(/-([a-z])/g, (_m, c) => c.toUpperCase()) in this.dataset : name in this.attributes; }
+  contains(node) { for (let at = node; at; at = at.parentElement) if (at === this) return true; return false; }
   focus() {}
   remove() { this.isConnected = false; if (this.parentElement) this.parentElement.children = this.parentElement.children.filter(node => node !== this); }
 }
@@ -98,6 +104,8 @@ function app({ withIndex = true } = {}) {
     tx: (_ja, en) => en, el: (tag, cls, value) => new Element(tag, cls, value),
     biLabel: (tag, cls, _ja, en) => new Element(tag, cls, en),
     removeMini: () => body.querySelector('#mini')?.remove(), activeTokenAlternatives: null, articleNarration: null,
+    // G1's frame sampler and the page built at idle are the browser's (frames, idle callbacks), not the slip's logic
+    sampleTransition: () => {}, sampleWhere: () => '', schedulePagePrebuild: () => {},
     ensureDictionaryRowsForForm: async () => [], wordCaptureState: () => 'take',
     readerCaptureReasonText: () => 'No confirmed meaning to save', readerGlossMissText: () => 'No confirmed meaning',
     toggleWordSave: node => chosen.push(copy(node)), go: node => opened.push(copy(node)),

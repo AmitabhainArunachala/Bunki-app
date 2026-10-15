@@ -83,6 +83,9 @@ const boot = async (p, url = `${base}/index.html?entry=shelf`) => {
   await openShelfDoor(p, '#levels-link');
 };
 const overview = async () => {
+  // G1: Close moves the page inside its match cut (the page leaves in the cut's update, a frame after the click): a page
+  // already leaving is not open, so the layer is read once no cut runs
+  await page.waitForFunction(() => !document.documentElement.matches(':active-view-transition'), null, { timeout: 5000 });
   if (await page.locator('.sheet').count()) {
     await page.waitForTimeout(800);
     await page.click(await entryCloseSelector(page));
