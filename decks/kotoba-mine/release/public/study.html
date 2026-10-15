@@ -3728,7 +3728,7 @@
 .kp[data-host='none'] .kp-top-study { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; background: var(--kp-bg); padding-block: 8px; margin-block: -8px; } /* 8px of its own ground above and below once stuck; the same place at rest */
 .kp-progress { flex: 1; height: 6px; border-radius: 3px; background: var(--kp-panel-2); overflow: hidden; }
 /* the rail ticks per card on the compositor: scaleX, never width */
-.kp-progress i { display: block; height: 100%; width: 100%; background: var(--kp-cyan); transform-origin: left center; transform: scaleX(var(--kp-frac, 0)); transition: transform 0.12s cubic-bezier(0.2, 0, 0, 1); }
+.kp-progress i { display: block; height: 100%; width: 100%; background: var(--kp-cyan); transform-origin: left center; transform: scaleX(var(--kp-frac, 0)); transition: transform var(--motion-ma, 120ms) var(--ease-enter, ease-out); }
 .kp-count { font-family: var(--kp-num); font-size: 13px; color: var(--kp-ink-2); font-variant-numeric: tabular-nums; }
 
 .kp-card { --kp-kind: var(--kp-kind-go); background: var(--kp-panel); border: 1px solid var(--kp-line); border-left: 4px solid var(--kp-kind); border-radius: 18px; padding: 18px 18px 20px; display: grid; gap: 14px; touch-action: pan-y; user-select: none; transition: transform 0.12s; min-height: 220px; }
@@ -3827,7 +3827,7 @@
 .kp-zoom-btn::after, .kp-rule-x::after { content: ''; position: absolute; inset: -8px 0; }
 .kp-rule-x::after { inset: -7px; } /* from inside the 1px border: 30 + 14 */
 .kp-zoom-btn[aria-pressed='true'] { background: var(--kp-cyan-wash); color: var(--kp-cyan); font-weight: 700; }
-.kp-s { transition: opacity 0.16s cubic-bezier(0.2, 0, 0, 1); }
+.kp-s { transition: opacity var(--motion-quick, 160ms) var(--ease-enter, ease-out); }
 .kp-card[data-zoom='focus'] .kp-s:not([data-focus]) { opacity: 0.38; }
 /* 焦点 on a long passage (STANDARD A38): the sentences before and after the target fold to two
  * dimmed lines each — the before group shows its last two, the after group its first two — with
@@ -3861,6 +3861,18 @@
 .kp-rule > span { flex: 1; min-width: 0; }
 /* The report control occupies the lower-right corner; keep the rule dismissal on the left. */
 .kp-rule-x { position: relative; order: -1; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: 14px; flex: none; }
+/* the one press (editorial.css owns it in the corridor): the frozen study pages stand alone, so the deck
+   carries the same rule for them — every control dims to .55 at once and lets go over the press beat;
+   the deck's word tokens keep their own mark */
+.kp[data-host='none'] :where(button, [role='button'], a[href], summary) {
+  transition-property: opacity;
+  transition-duration: var(--motion-press, 150ms);
+  transition-timing-function: var(--ease-standard, ease-out);
+}
+.kp[data-host='none'] :where(button:not(:disabled), [role='button'], a[href], summary):where(:not(.kp-tok)):active {
+  opacity: 0.55;
+  transition-duration: 0s;
+}
 /* phones: the grade bar is pinned to the bottom of the screen, so a long passage never hides it */
 @media (max-width: 640px) {
   .kp-grades { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-width: 40rem; margin: 0 auto; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--kp-line); }
@@ -3871,7 +3883,6 @@
 
 .kp-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .kp-choice { min-height: 56px; border-radius: 14px; border: 1px solid var(--kp-line); background: var(--kp-panel-2); font-size: 20px; font-weight: 600; overflow-wrap: anywhere; padding: 6px; }
-.kp-choice:active { border-color: var(--kp-cyan); }
 
 /* word list */
 .kp-search { width: 100%; min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font: inherit; font-size: 16px; }
@@ -3905,21 +3916,21 @@
 /* motion (aesthetics.md §5): the reveal keeps the card and fades the answer in; a grade
  * slides the old card out in its direction while the next one settles. Opacity and
  * transform only, 120–180 ms. */
-.kp-sentence.kp-enter .kp-target { animation: kp-fade 0.16s cubic-bezier(0.2, 0, 0, 1) both; }
+.kp-sentence.kp-enter .kp-target { animation: kp-fade var(--motion-quick, 160ms) var(--ease-enter, ease-out) both; }
 /* 研ぎ出し: each reading surfaces as the polish band passes it (mount.js polish() sets --kp-rt-delay, 0–60 ms, by place) */
-.kp-sentence.kp-enter rt { animation: kp-fade 0.12s cubic-bezier(0.2, 0, 0, 1) var(--kp-rt-delay, 0.04s) both; }
-.kp-answer.kp-enter { animation: kp-rise 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
-.kp-card.kp-arrive { animation: kp-arrive 0.18s cubic-bezier(0.2, 0, 0, 1) both; }
+.kp-sentence.kp-enter rt { animation: kp-fade var(--motion-ma, 120ms) var(--ease-enter, ease-out) var(--kp-rt-delay, 40ms) both; }
+.kp-answer.kp-enter { animation: kp-rise var(--motion-fast, 180ms) var(--ease-enter, ease-out) both; }
+.kp-card.kp-arrive { animation: kp-arrive var(--motion-fast, 180ms) var(--ease-enter, ease-out) both; }
 .kp-study { position: relative; overflow-anchor: none; }
-.kp .kp-study.kp-reveal-hold { position: fixed; z-index: 5; margin: 0; pointer-events: none; background: var(--kp-stage); animation: kp-fade-out 140ms linear both; }
+.kp .kp-study.kp-reveal-hold { position: fixed; z-index: 5; margin: 0; pointer-events: none; background: var(--kp-stage); animation: kp-fade-out var(--motion-ma, 120ms) linear both; }
 .kp-reveal-hold *, .kp-reveal-hold *::before, .kp-reveal-hold *::after { pointer-events: none !important; animation: none !important; transition: none !important; }
-.kp .kp-screen-hold { position: fixed; z-index: 5; overflow: hidden; pointer-events: none; animation: kp-fade-out 140ms linear both; }
+.kp .kp-screen-hold { position: fixed; z-index: 5; overflow: hidden; pointer-events: none; animation: kp-fade-out var(--motion-ma, 120ms) linear both; }
 .kp-screen-hold *, .kp-screen-hold *::before, .kp-screen-hold *::after { pointer-events: none !important; animation: none !important; transition: none !important; }
-.kp .kp-screen-enter { animation: kp-fade 180ms cubic-bezier(0.2, 0, 0, 1) both; }
-.kp .kp-answer .kp-fold[open] > :not(summary) { animation: kp-rise 160ms cubic-bezier(0.2, 0, 0, 1) both; }
+.kp .kp-screen-enter { animation: kp-fade var(--motion-fast, 180ms) var(--ease-enter, ease-out) both; }
+.kp .kp-answer .kp-fold[open] > :not(summary) { animation: kp-rise var(--motion-quick, 160ms) var(--ease-enter, ease-out) both; }
 .kp-ghost { position: absolute; margin: 0; pointer-events: none; z-index: 1; }
-.kp-ghost.kp-out-good { animation: kp-out-good 0.14s cubic-bezier(0.4, 0, 1, 1) both; }
-.kp-ghost.kp-out-again { animation: kp-out-again 0.14s cubic-bezier(0.4, 0, 1, 1) both; }
+.kp-ghost.kp-out-good { animation: kp-out-good var(--motion-ma, 120ms) var(--ease-exit, ease-in) both; }
+.kp-ghost.kp-out-again { animation: kp-out-again var(--motion-ma, 120ms) var(--ease-exit, ease-in) both; }
 @keyframes kp-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes kp-fade-out { from { opacity: 1; } to { opacity: 0; } }
 @keyframes kp-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -3927,8 +3938,10 @@
 @keyframes kp-out-good { to { opacity: 0; transform: translateX(24px); } }
 @keyframes kp-out-again { to { opacity: 0; transform: translateX(-24px); } }
 /* Reduced motion keeps the held frame, with a short opacity crossfade and no movement. */
+/* the deck's own reduced-motion contract (it stands alone on the frozen study pages, outside the corridor's one rule) */
 @media (prefers-reduced-motion: reduce) {
   .kp *, .kp *::before, .kp *::after { animation: none !important; transition: none !important; }
+  .kp-polish, .kp-slash { display: none; }
   :is(#app, .kp) .kp-sentence.kp-enter :is(.kp-target, rt), :is(#app, .kp) .kp-answer.kp-enter, :is(#app, .kp) .kp-card.kp-arrive, :is(#app, .kp) .kp-pop { animation: kp-fade 100ms linear both !important; transform: none !important; }
   :is(#app, .kp) .kp-study.kp-reveal-hold { animation: kp-fade-out 100ms linear both !important; transform: none !important; }
   :is(#app, .kp) .kp-screen-hold { animation: kp-fade-out 100ms linear both !important; transform: none !important; }
@@ -3962,7 +3975,7 @@
 .kp-target.kp-tok:hover, .kp-target.kp-tok:focus-visible { text-decoration: underline dotted 2px; }
 /* with a host, a tap opens the app's own slip (corridor.js openSlip, skin in rooms/read.css); the popover below is
    the standalone study pages' only word card */
-.kp-pop { position: fixed; z-index: 40; width: min(320px, calc(100vw - 32px)); background: var(--kp-panel-2); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: 14px; padding: 10px 12px 12px; display: grid; gap: 6px; box-shadow: var(--kp-depth); animation: kp-fade 0.14s cubic-bezier(0.2, 0, 0, 1) both; }
+.kp-pop { position: fixed; z-index: 40; width: min(320px, calc(100vw - 32px)); background: var(--kp-panel-2); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: 14px; padding: 10px 12px 12px; display: grid; gap: 6px; box-shadow: var(--kp-depth); animation: kp-fade var(--motion-ma, 120ms) var(--ease-enter, ease-out) both; }
 .kp-pop-head { display: flex; align-items: baseline; gap: 8px; }
 .kp-pop-term { font-size: 20px; }
 .kp-pop-reading { font-size: 14px; color: var(--kp-ink-2); flex: 1; }
@@ -4166,7 +4179,7 @@
 .kp-polish::before {
   content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; width: 55%; opacity: 0;
   background: linear-gradient(100deg, transparent 0 26%, color-mix(in srgb, var(--kp-shu) 12%, transparent) 38%, color-mix(in srgb, var(--kp-ink) 14%, transparent) 47%, color-mix(in srgb, var(--kp-ink) 6%, transparent) 56%, transparent 70%);
-  animation: kp-polish 0.18s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation: kp-polish var(--motion-fast, 180ms) var(--ease-ink, ease-in-out) both;
 }
 @keyframes kp-polish { from { opacity: 1; transform: translateX(-110%) skewX(-8deg); } 70% { opacity: 1; } to { opacity: 0; transform: translateX(200%) skewX(-8deg); } }
 
@@ -4211,7 +4224,6 @@
 
 /* under the card: 答えを見る as a washi slab; the grade pads */
 .kp .kp-reveal, .kp .kp-next { min-height: 60px; border-radius: 4px; border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font-size: 18px; letter-spacing: 0.06em; box-shadow: var(--kp-depth); }
-.kp .kp-reveal:active, .kp .kp-next:active { transform: translateY(1px); }
 .kp .kp-verdict { justify-self: center; padding: 6px 16px; border-radius: 3px; background: var(--kp-panel); }
 .kp .kp-undo { color: var(--kp-dock-mute); }
 .kp .kp-grades { background: var(--kp-dock); column-gap: 10px; }
@@ -4241,7 +4253,7 @@
   position: fixed; left: 4%; right: 4%; top: 44%; height: 3px; z-index: 3; pointer-events: none; border-radius: 2px;
   background: linear-gradient(90deg, transparent, var(--kp-shu) 10%, var(--kp-shu) 85%, transparent);
   transform-origin: left center; transform: rotate(-12deg) scaleX(0); opacity: 0;
-  animation: kp-slash 0.18s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation: kp-slash var(--motion-fast, 180ms) var(--ease-ink, ease-in-out) both;
 }
 @keyframes kp-slash { from { transform: rotate(-12deg) scaleX(0); opacity: 1; } 55% { transform: rotate(-12deg) scaleX(1); opacity: 1; } to { transform: rotate(-12deg) scaleX(1); opacity: 0; } }
 
@@ -4251,7 +4263,7 @@
 .kp .kp-done .kp-title:lang(ja) { text-transform: none; letter-spacing: 0.24em; }
 .kp-done-title { margin: 0; font-family: var(--kp-head); font-weight: 800; font-size: clamp(30px, 9vw, 44px); line-height: 1.2; letter-spacing: 0.01em; color: var(--kp-ink); text-wrap: balance; word-break: keep-all; overflow-wrap: anywhere; }
 .kp-rise { position: relative; display: flex; flex-wrap: wrap; gap: 10px 22px; padding: 4px 2px 8px; }
-.kp-rise-w { font-family: var(--kp-head); font-weight: 800; font-size: 17px; color: var(--kp-ink-2); animation: kp-rise-up 180ms cubic-bezier(0.22, 1, 0.36, 1) calc(40ms + var(--i, 0) * 10ms) backwards; }
+.kp-rise-w { font-family: var(--kp-head); font-weight: 800; font-size: 17px; color: var(--kp-ink-2); animation: kp-rise-up var(--motion-fast, 180ms) var(--ease-enter, ease-out) calc(40ms + var(--i, 0) * 10ms) backwards; }
 .kp-rise-w.is-again { color: var(--kp-red); }
 @keyframes kp-rise-up { from { opacity: 0.01; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 .kp-tally { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-block: 1px solid var(--kp-line); }
@@ -4269,7 +4281,6 @@
 .kp .kp-group, .kp .kp-row { border-radius: 4px; }
 .kp .kp-start { border-radius: 4px; letter-spacing: 0.06em; box-shadow: 0 2px 0 color-mix(in srgb, var(--kp-cyan) 55%, #000); }
 .kp .kp-start:disabled { box-shadow: none; }
-.kp .kp-start:active { transform: translateY(2px); box-shadow: none; }
 .kp .kp-title { font-family: var(--kp-head); font-weight: 800; letter-spacing: 0.03em; }
 .kp .kp-h2 { font-family: var(--kp-jp); font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; }
 .kp .kp-h2:lang(ja) { text-transform: none; }
@@ -4299,10 +4310,6 @@
 /* 藍 at night: 始める is the lit slab (washi ink on the 藍 room), as the card is the lit sheet */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='ai'] .kp-start:not(:disabled) { background: var(--kp-ink); color: var(--kp-bg); box-shadow: 0 2px 0 color-mix(in srgb, var(--kp-ink) 35%, #000); }
 
-@media (prefers-reduced-motion: reduce) {
-  .kp-polish, .kp-slash { display: none; }
-  .kp .kp-reveal:active, .kp .kp-next:active, .kp .kp-start:active { transform: none; }
-}
 
 /* ---- the room family, every look (Bunki fix round 2): one quiet exit, a docked 答えを見る ---- */
 /* the deck home's ← is bare, like the study ✕: the page's one way out */
@@ -4356,20 +4363,16 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
  * expected answer, is tinted, as before. Each pad's small line is the interval the scheduler gives
  * that answer now. A press answers at once (scale, 90 ms). */
 .kp .kp-grades { grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 6px; }
-.kp .kp-grade { --kp-hue: var(--kp-ink-2); min-height: 58px; padding: 7px 2px 8px; border-radius: 10px; border: 1px solid var(--kp-line); border-top: 2px solid var(--kp-hue); background: var(--kp-panel); gap: 3px; box-shadow: var(--kp-depth); transition: transform 90ms cubic-bezier(0.2, 0, 0, 1); }
+.kp .kp-grade { --kp-hue: var(--kp-ink-2); min-height: 58px; padding: 7px 2px 8px; border-radius: 10px; border: 1px solid var(--kp-line); border-top: 2px solid var(--kp-hue); background: var(--kp-panel); gap: 3px; box-shadow: var(--kp-depth); }
 .kp .kp-grade b { color: var(--kp-hue); font-size: 15px; font-weight: 700; letter-spacing: 0.02em; line-height: 1.2; }
 .kp .kp-grade small { font-family: var(--kp-num); font-size: 12px; letter-spacing: 0.02em; color: var(--kp-ink-2); line-height: 1.2; }
 .kp .kp-again { --kp-hue: var(--kp-red); }
 .kp .kp-hard { --kp-hue: var(--kp-amber); }
 .kp .kp-good { --kp-hue: var(--kp-green); background: color-mix(in srgb, var(--kp-green) 12%, var(--kp-panel)); }
 .kp .kp-easy { --kp-hue: var(--kp-blue); }
-.kp .kp-grade:active { transform: scale(0.96); }
 /* in 日本語 the seal (再 難 良 易) is the pad's face, in its hue, and the word a caption under it */
 .kp .kp-grade-seal, .kp .kp-again .kp-grade-seal, .kp .kp-good .kp-grade-seal { font-size: 20px; color: var(--kp-hue); }
 .kp .kp-grade:has(.kp-grade-seal) b { font-size: 11px; letter-spacing: 0.04em; }
-@media (prefers-reduced-motion: reduce) {
-  .kp .kp-grade:active { transform: none; }
-}
 
 /* ---- T2: the deck home. A plain name, then "the four windows but maybe not so big" in the old home's
  * colours: due amber, new in ink, known green, difficult red, four small tiles in one row ---- */
@@ -4451,7 +4454,6 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 /* on a lacquer stage (藍, 和紙, 桜 and 白 studying) the key is lit in the stage's own washi ink */
 .kp:is([data-look='ai'], [data-look='washi'], [data-look='sakura'], [data-look='light']) .kp-study > .kp-reveal { border-color: var(--kp-stage-ink); color: var(--kp-stage-ink);
   background: linear-gradient(color-mix(in srgb, var(--kp-stage-ink) 9%, transparent), color-mix(in srgb, var(--kp-stage-ink) 9%, transparent)), var(--kp-dock); }
-.kp .kp-reveal:active, .kp .kp-next:active { transform: scale(0.985); }
 /* docked at the foot of a long passage, the key stands on a straight band of the dock that runs to both
  * screen edges (the ring alone drew a rounded frame over the card) */
 .kp .kp-study > .kp-reveal { box-shadow: var(--kp-depth), 0 0 0 10px var(--kp-dock), -48px 0 0 10px var(--kp-dock), 48px 0 0 10px var(--kp-dock); }
@@ -4490,7 +4492,7 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 .kp .kp-fold:last-child { border-bottom: 0; }
 .kp .kp-fold > summary { min-height: 44px; position: relative; padding-right: 22px; font-size: 14px; color: var(--kp-ink); letter-spacing: 0.01em; }
 .kp .kp-fold > summary::before { content: none; }
-.kp .kp-fold > summary::after { content: ''; position: absolute; right: 2px; top: 50%; width: 7px; height: 7px; margin-top: -5px; border-right: 1.5px solid var(--kp-mute); border-bottom: 1.5px solid var(--kp-mute); transform: rotate(-45deg); transition: transform 120ms cubic-bezier(0.2, 0, 0, 1); }
+.kp .kp-fold > summary::after { content: ''; position: absolute; right: 2px; top: 50%; width: 7px; height: 7px; margin-top: -5px; border-right: 1.5px solid var(--kp-mute); border-bottom: 1.5px solid var(--kp-mute); transform: rotate(-45deg); transition: transform var(--motion-ma, 120ms) var(--ease-enter, ease-out); }
 .kp .kp-fold[open] > summary::after { transform: rotate(45deg); margin-top: -7px; }
 .kp .kp-fold > :not(summary) { margin-bottom: 12px; }
 /* 英語 is the first row of the list, not a dashed slip of its own */
@@ -4498,9 +4500,6 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 .kp .kp-f-gloss > summary { font-size: 14px; font-weight: 600; color: var(--kp-ink); }
 .kp .kp-f-gloss > summary::before { content: none; }
 .kp .kp-see { padding: 10px 14px; border-bottom: 1px solid var(--kp-line); }
-@media (prefers-reduced-motion: reduce) {
-  .kp .kp-reveal:active, .kp .kp-next:active { transform: none; }
-}
 
 /* Hosted decks begin in the app's selected world. An explicit saved card look retains
  * its own palette; selecting App theme returns home, list, settings and the sitting to this family. */
@@ -4560,33 +4559,39 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 }
 
 /* The departing frame fades over the live incoming room. Capturing the new
-   room would disable its hit testing until the native transition finishes. */
+   room would disable its hit testing until the native transition finishes.
+   Slice C (one hand): rooms travel along the Line. Going to a tab to the right,
+   the old room leaves to the left (−24 px) and the new one enters from the
+   right (+24 px); going left, the reverse; back() reverses the way in.
+   corridor.js stamps html[data-room-dir] from the tab order of from → to; a
+   change with no direction along the Line (a door, a page of the same tab)
+   keeps the plain hand-over. The car and the room share one beat: --motion-room. */
 :root, #app > main { view-transition-name: none; }
 html[data-room-transition] #app > main[data-room-arrival] {
-  animation: kairo-room-arrive 220ms ease both !important;
-  animation-delay: var(--room-arrival-delay, 0ms) !important;
+  animation: kairo-room-arrive var(--motion-room) var(--ease-enter) both;
+  animation-delay: var(--room-arrival-delay, 0ms);
 }
+html[data-room-transition][data-room-dir='right'] #app > main[data-room-arrival] { animation-name: kairo-room-arrive-from-right; }
+html[data-room-transition][data-room-dir='left'] #app > main[data-room-arrival] { animation-name: kairo-room-arrive-from-left; }
 #primary-tabs .primary-tab:disabled { opacity: 1; cursor: default; }
 ::view-transition { pointer-events: none; }
 ::view-transition-group(*) { animation: none; }
 ::view-transition-image-pair(*) { isolation: isolate; }
 ::view-transition-old(kairo-room) {
   mix-blend-mode: normal;
-  animation: kairo-room-leave 220ms cubic-bezier(.22, 1, .36, 1) both;
+  animation: kairo-room-leave var(--motion-room) var(--ease-enter) both;
 }
+:root[data-room-dir='right']::view-transition-old(kairo-room) { animation-name: kairo-room-leave-to-left; }
+:root[data-room-dir='left']::view-transition-old(kairo-room) { animation-name: kairo-room-leave-to-right; }
 @keyframes kairo-room-fade-out { to { opacity: 0; } }
 @keyframes kairo-room-leave { to { opacity: 0; transform: translateY(-6px); } }
-/* Opacity keeps fixed reader/card docks anchored to the viewport. */
+@keyframes kairo-room-leave-to-left { to { opacity: 0; transform: translateX(-24px); } }
+@keyframes kairo-room-leave-to-right { to { opacity: 0; transform: translateX(24px); } }
+/* Opacity alone keeps a room's fixed docks anchored to the viewport; a directional arrival
+   translates the live room, so corridor.js gives no direction to the rooms that carry a dock. */
 @keyframes kairo-room-arrive { from { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(kairo-room) {
-    animation: kairo-room-fade-out 80ms linear both;
-  }
-  html[data-room-transition] #app > main[data-room-arrival] {
-    animation: kairo-room-arrive 80ms linear both !important;
-    animation-delay: var(--room-arrival-delay, 0ms) !important;
-  }
-}
+@keyframes kairo-room-arrive-from-right { from { opacity: 0; transform: translateX(24px); } }
+@keyframes kairo-room-arrive-from-left { from { opacity: 0; transform: translateX(-24px); } }
 </style>
 </head>
 <body>
