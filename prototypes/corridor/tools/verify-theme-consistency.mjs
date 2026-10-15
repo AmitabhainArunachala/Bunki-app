@@ -51,6 +51,37 @@ for (const world of WORLDS) {
     const allowed = expectKeys.map((k) => norm(rgb(tk[k])));
     if (got && !allowed.includes(norm(got))) failures.push(`${world}/${room}: ${sel} bg ${got} not in [${expectKeys}] (${allowed.join(' ')})`);
   };
+  const rgbOf = (hex) => {
+    if (!hex.startsWith('#')) return hex;
+    const h = hex.length === 4 ? [...hex.slice(1)].map((c) => c + c).join('') : hex.slice(1);
+    return `rgb(${parseInt(h.slice(0, 2), 16)}, ${parseInt(h.slice(2, 4), 16)}, ${parseInt(h.slice(4, 6), 16)})`;
+  };
+  const opaque = async (room, sel, { page: nearPage = false } = {}) => {
+    const got = await page.evaluate(`(() => {
+      const parse = (c) => {
+        let m = /^rgba?\\(([^)]+)\\)$/.exec(c);
+        if (m) { const p = m[1].split(/[\\s,\\/]+/).filter(Boolean).map(Number); return { r: p[0] / 255, g: p[1] / 255, b: p[2] / 255, a: p.length > 3 ? p[3] : 1 }; }
+        m = /^color\\(srgb ([^)]+)\\)$/.exec(c);
+        if (m) { const p = m[1].split(/[\\s\\/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; }
+        if (c.startsWith('#')) { const h = c.length === 4 ? [...c.slice(1)].map((x) => x + x).join('') : c.slice(1); return { r: parseInt(h.slice(0, 2), 16) / 255, g: parseInt(h.slice(2, 4), 16) / 255, b: parseInt(h.slice(4, 6), 16) / 255, a: 1 }; }
+        return null;
+      };
+      const lum = ({ r, g, b }) => { const ch = (v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * ch(r) + 0.7152 * ch(g) + 0.0722 * ch(b); };
+      const el = document.querySelector(${JSON.stringify(sel)});
+      if (!el) return { missing: true };
+      let node = el, own = parse(getComputedStyle(el).backgroundColor), paintedBy = sel;
+      // an inline menu inside the slip paints nothing of its own: the slip's paper is its paper
+      if (own && own.a === 0 && el.classList.contains('is-inline')) { node = el.closest('#mini'); own = node && parse(getComputedStyle(node).backgroundColor); paintedBy = '#mini'; }
+      const pageHex = getComputedStyle(document.body).getPropertyValue('--page').trim();
+      const pg = parse(pageHex);
+      return { bg: own, paintedBy, lum: own && lum(own), pageLum: pg && lum(pg), page: pageHex, raw: getComputedStyle(el).backgroundColor };
+    })()`);
+    if (got.missing) { failures.push(`${world}/${room}: ${sel} is not open`); return; }
+    if (!got.bg) { failures.push(`${world}/${room}: ${sel} background ${got.raw} could not be read`); return; }
+    if (got.bg.a !== 1) failures.push(`${world}/${room}: ${sel} background ${got.raw} is not opaque (alpha ${got.bg.a}, painted by ${got.paintedBy})`);
+    if (nearPage && (got.pageLum == null || Math.abs(got.lum - got.pageLum) > 0.08))
+      failures.push(`${world}/${room}: ${sel} luminance ${got.lum?.toFixed(3)} is not within 0.08 of the page's ${got.pageLum?.toFixed(3)} (${got.page})`);
+  };
   await page.goto(`${base}/?entry=shelf`);
   await page.waitForSelector('#tray', { timeout: 30000 });
   const fixture = await page.evaluate(`(() => {
@@ -104,7 +135,51 @@ for (const world of WORLDS) {
   }
   const sheetOpen = await page.$('#sheet');
   if (!sheetOpen) failures.push(`${world}/sheet-from-card: no sheet opened (no door found: ${!door})`);
-  if (sheetOpen) { await shoot('5-sheet-from-card'); await check('sheet-from-card', '.sheet', ['ground0', 'ground']); await page.keyboard.press('Escape'); await page.waitForTimeout(400); }
+  if (sheetOpen) { await shoot('5-sheet-from-card'); await check('sheet-from-card', '.sheet', ['ground0', 'ground']); await opaque('sheet-from-card', '#sheet', { page: true }); await page.keyboard.press('Escape'); await page.waitForTimeout(400); }
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+  // every overlay is opaque paper in every world (the lead, 2026-10-15, after John's 墨 screenshot: a muddy sheet
+  // body under a cream bar, a "random blue" slip): the reader's slip, its Save ▾ menu, the word menu, the entry
+  // sheet and the world picker all paint an alpha-1 background, and the sheet's body sits within 0.08 of the
+  // world's own page in relative luminance — never a scrim showing through, never a grey over cream
+  await page.goto(`${base}/?entry=shelf`);
+  await page.waitForSelector('#shelf-body [data-passage] .shelf-open', { timeout: 30000 });
+  await page.locator('#shelf-body [data-passage] .shelf-open').first().click();
+  await page.waitForFunction(() => document.querySelectorAll('#reader .tok.content').length > 3, null, { timeout: 30000 });
+  await page.waitForTimeout(500);
+  await page.locator('#reader .tok.content').first().click();
+  await page.waitForSelector('#mini', { timeout: 10000 });
+  await shoot('6-slip');
+  await opaque('slip', '#mini');
+  const band = await page.evaluate(`(() => {
+    const head = document.querySelector('#mini .mini-head'), take = document.querySelector('#mini #mini-take');
+    const v = (n) => getComputedStyle(document.body).getPropertyValue(n).trim();
+    return { head: head && getComputedStyle(head).backgroundColor, headInk: head && getComputedStyle(head).color,
+      take: take && getComputedStyle(take).backgroundColor, ink: v('--color-ink'), paper: v('--color-paper') };
+  })()`);
+  // the slip wears the world: its band and its Save are the world's ink, the band's word the world's paper
+  const same = (a, b) => a && b && norm(a) === norm(rgbOf(b));
+  if (!same(band.head, band.ink)) failures.push(`${world}/slip: the head band ${band.head} is not the world's ink ${band.ink}`);
+  if (!same(band.take, band.ink)) failures.push(`${world}/slip: Save ${band.take} is not the world's ink ${band.ink}`);
+  if (!same(band.headInk, band.paper)) failures.push(`${world}/slip: the band's word ${band.headInk} is not the world's paper ${band.paper}`);
+  await page.locator('#mini #mini-take').click();
+  await page.waitForSelector('#mini #vocabulary-list-popover.is-inline', { timeout: 10000 });
+  await shoot('7-slip-menu');
+  await opaque('slip-menu', '#vocabulary-list-popover');
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#vocabulary-list-popover', { state: 'detached', timeout: 5000 });
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#mini', { state: 'detached', timeout: 5000 });
+  await page.locator('#reader .tok.content').first().click({ button: 'right' });
+  await page.waitForSelector('.reader-word-menu', { timeout: 10000 });
+  await shoot('8-word-menu');
+  await opaque('word-menu', '.reader-word-menu');
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('.reader-word-menu', { state: 'detached', timeout: 5000 }).catch(() => {});
+  await page.locator('#theme-seal').click();
+  await page.waitForSelector('.world-picker', { timeout: 10000 });
+  await shoot('9-world-picker');
+  await opaque('world-picker', '.world-picker');
   await page.keyboard.press('Escape');
   await page.waitForTimeout(300);
   await browser.contexts()[0]?.clearCookies?.();

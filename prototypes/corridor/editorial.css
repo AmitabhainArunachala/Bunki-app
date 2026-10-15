@@ -2794,6 +2794,7 @@ body .token-actions button:hover { background: var(--ai-wash); }
   padding: 6px;
   border: 1px solid var(--raised-edge);
   border-radius: var(--radius-overlay);
+  background: var(--color-paper, #f5efe0);
   background: var(--raised);
   box-shadow: var(--float-shadow);
 }
@@ -3371,7 +3372,7 @@ body.v-depth-layered .eyebrow.shelf-section::before {
   margin-bottom: var(--space-2);
   background: var(--color-accent);
 }
-body.v-depth-layered .sheet, body .sheet { background: var(--color-paper); }
+body.v-depth-layered .sheet, body .sheet { background: var(--color-paper, #f5efe0); }
 
 /* Keep the publisher's 44px native target floor during fractional room lifts. */
 body[data-view='publisher'] :is(
@@ -4309,11 +4310,22 @@ body:not([data-view='drift']) .sheet {
   border-top: var(--stroke-hairline) solid var(--color-edge-strong);
   border-radius: var(--radius-overlay) var(--radius-overlay) 0 0;
   /* the leaf is the world's own raised paper (--color-paper = the world block's --ground-0): the sheet
-     opened from the review card wears the world, the operator's theme law (verify-theme-consistency) */
-  background: var(--color-paper);
+     opened from the review card wears the world, the operator's theme law (verify-theme-consistency). Opaque,
+     from a plain value: a phone that cannot resolve a colour chain still gets the world's paper. */
+  background: var(--color-paper, #f5efe0);
   color: var(--color-ink);
   box-shadow: var(--elevation-float);
   animation: feel-rise var(--motion-sheet) var(--ease-sheet);
+}
+/* the sheet bar's Save is the slip's key: the world's ink, the world's paper for its word (John, 2026-10-15:
+   no "random blue"); the A family's face otherwise (48, the control radius, one press) */
+:root body:not([data-view='drift']) .sheet-bar .sheet-take:not([aria-pressed='true']) {
+  background: var(--color-ink);
+  color: var(--color-paper, #f5efe0);
+  box-shadow: 0 1px 2px rgb(20 24 34 / 18%);
+}
+:root body:not([data-view='drift']) .sheet-bar .sheet-take:not([aria-pressed='true']):hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-ink) 88%, var(--color-paper));
 }
 body:not([data-view='drift']) .sheet-grip { width: 36px; height: 4px; margin: 10px auto; border-radius: var(--radius-seal); background: var(--color-edge-strong); }
 body:not([data-view='drift']) .sheet-bar { border-bottom: var(--stroke-hairline) solid var(--color-seal); }
