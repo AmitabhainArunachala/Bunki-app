@@ -4766,6 +4766,7 @@ function back() {
   if (S.stack.length) {
     S.stack.pop();
     S.sheetReturnFocus = S.stack.at(-1)?.returnFocus || null;
+    if (!S.stack.length) clearReaderSummons();
     render();
     if (!S.stack.length) {
       returnScroll();
@@ -4955,6 +4956,7 @@ function dismissSheet() {
   S.sheetReturnFocus = null;
   if (!S.stack.length) return;
   S.stack = [];
+  clearReaderSummons();
   render();
   returnScroll();
   restoreDialogInvoker();
@@ -8008,9 +8010,10 @@ function removeMini() {
 /* One tap grammar for every Japanese word (John, 2026-10-14: "I should be able to tap ANY word … and it
  * should be able to cycle through the layers to full entry"; "there is NO WAY to return to the
  * original word without the furigana"). A word cycles: the original text → one tap: its reading above
- * it and the popup (the meaning, Save) → the same word again: the full entry → once more, or a tap off
- * the words, or Escape: the original again, every reading a tap summoned taken back. Words inside the
- * popup and the entry follow the same grammar, so the layers nest and always unwind.
+ * it and the popup (the meaning, Save) → the same word again: the full entry → closing it (Close, Back,
+ * Escape, the scrim), a tap off the words, or Escape on the popup: the original again, every reading a
+ * tap summoned taken back. Words inside the popup and the entry follow the same grammar, so the layers
+ * nest and always unwind.
  *
  * A press on the word whose popup is open keeps the popup for that press's click, which dives into the
  * full entry (miniDiveOnAnchor). A press anywhere else outside the popup puts it away; in the reader's
@@ -8754,7 +8757,9 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     if (event.key !== 'Escape') return;
     event.preventDefault();
     event.stopPropagation();
+    // Escape on the slip returns the word itself: the card and the reading its tap summoned go together
     removeMini();
+    clearReaderReadings({ marked: true });
     span.focus({ preventScroll: true });
   });
   document.body.append(mini);
@@ -9271,17 +9276,18 @@ function readerWordKey(event, span, door) {
     void openReaderWordMenu(span, door, { keyboard: true });
     return;
   }
-  // Escape steps out one layer at a time: the popup or the menu first, then the marked word and its
-  // summoned reading, back to the original text
+  // Escape steps out one layer at a time: the word menu; or the popup together with the reading its tap
+  // summoned (one layer: the word returns to the original text); or a word left marked on its own
   if (event.key === 'Escape') {
-    const open = !!document.getElementById('mini') || !!readerWordMenu;
+    const slip = !!document.getElementById('mini');
     const marked = !!(S.revealed?.size || S.readerTake);
-    if (!open && !marked) return;
+    if (!slip && !readerWordMenu && !marked) return;
     event.preventDefault();
-    if (open) {
-      removeMini();
-      closeReaderWordMenu();
-    } else clearReaderReadings({ marked: true });
+    if (readerWordMenu) closeReaderWordMenu();
+    else {
+      if (slip) removeMini();
+      clearReaderReadings({ marked: true });
+    }
     return;
   }
   if (event.key !== 'Enter') return;
@@ -9569,7 +9575,7 @@ function markReaderReading(index) {
 }
 /** Back to the original text: every reading a tap summoned goes (つねに keeps its own), and with
  * `marked` the marked word too (the chrome's Save then stands for the place again). */
-let readerDivedIndex = null; // the word whose full entry was opened from its popup: one more tap clears it
+let readerDivedIndex = null; // the word whose full entry is open: closing the entry returns it to the original
 function clearReaderReadings({ marked = false } = {}) {
   const before = S.revealed ? [...S.revealed] : [];
   if (before.length) {
@@ -9582,6 +9588,13 @@ function clearReaderReadings({ marked = false } = {}) {
     S.readerTake = null;
     syncReaderTakeSeal();
   }
+}
+/** The full entry closing — Close, Back, Escape, the scrim, device Back — returns the word it was opened
+ * from to the original text: the reading its tap summoned goes with the sheet (John, 2026-10-14: "there
+ * is NO WAY to return to the original word without the furigana"). A sheet opened from anywhere else
+ * finds nothing summoned and changes nothing. */
+function clearReaderSummons() {
+  if (S.revealed?.size || readerDivedIndex !== null) clearReaderReadings({ marked: true });
 }
 
 /** A reader content word: one tap opens the popup (the meaning), the word menu does the rest. */
@@ -9617,13 +9630,8 @@ function wireTokenGestures(span, token, index, p) {
     // there left real fingers dead (operator's phone, 2026-08-12). The
     // click still fires after a cancel; scrolls fire no click at all.
     if (event.detail !== 0 && Date.now() < swallowClickUntil) return;
-    // the second tap: the popup's word dives into its full entry
+    // the second tap: the popup's word dives into its full entry (closing the entry returns the original)
     if (diveFromMini(span, event)) return;
-    // the third: back from its entry, the same word returns to the original
-    if (readerDivedIndex === index && !document.getElementById('mini')) {
-      clearReaderReadings({ marked: true });
-      return;
-    }
     const modality = event.detail === 0 ? 'keyboard' : 'pointer';
     interaction({ kind: 'target.activate', target }, modality, 'reader-token');
     quickLook(modality);

@@ -4,8 +4,9 @@
  * The lexical fixtures, exact candidate/head/reading/sense assertions, all four
  * durable capture doors, miss-state holds, dictionary failure/retry/stale-answer
  * checks and eight executable mutation controls remain independently asserted.
- * G2 also checks the tap cycle (1.3.0: a second tap opens the full entry, one more after it returns the
- * original text), keyboard reopening and unchanged prose in bi/ja.
+ * G2 also checks the tap cycle (1.3.0: a second tap opens the full entry; closing the entry returns the
+ * original text by itself, and Escape on the popup does the same), keyboard reopening and unchanged prose
+ * in bi/ja.
  *
  * Fixtures are checked against served articles, core dictionary, index and shards
  * before a control can count as killed. Mutations affect served bytes only, must
@@ -311,6 +312,9 @@ const tokenState = (page, fixture) => page.evaluate((index) => {
   const lines = node.querySelectorAll('.tok-en');
   return { surface: bare.textContent, visibleRuby: [...node.querySelectorAll('rt')].filter((rt) => !rt.classList.contains('hidden-rt'))
     .map((rt) => rt.textContent).join(''), lines: lines.length, line: lines[0]?.outerHTML ?? null,
+    // a summoned reading lights the word (lit) and the chrome's Save stands for it (tok-current): the
+    // original text has neither
+    lit: node.classList.contains('lit'), current: node.classList.contains('tok-current'),
     // R4 (2026-09-30): the name is the word, the rest is its description — read together, in order
     hasEn: node.classList.contains('has-en'), label: [node.getAttribute('aria-label') || '',
       ...(node.getAttribute('aria-describedby') || '').split(/\s+/u).filter(Boolean).map((id) => document.getElementById(id)?.textContent || '')]
@@ -905,11 +909,22 @@ try {
       check(`G2 ${lang}: tapping the same word again opens its full entry, without a gloss rung`,
         await page.locator('#mini').count() === 0 && await page.locator('#sheet').count() === 1 && (await tokenState(page, IU))?.lines === 0, '', { id: `G2.${lang}.dismiss` });
       await closeIfOpen(page);
-      await tap(page, IU);
       const back = await tokenState(page, IU);
-      check(`G2 ${lang}: back from the entry, one more tap returns the original word: no popup, no summoned reading, no gloss rung`,
-        await page.locator('#mini').count() === 0 && back?.surface === IU.token.s && back.visibleRuby === '' && back.lines === 0, JSON.stringify(back), { id: `G2.${lang}.original` });
+      // one-hand pass (2026-10-15): closing the entry is the way back to the original text by itself
+      check(`G2 ${lang}: closing the entry returns the original word by itself: no popup, no summoned reading, nothing lit or marked, no gloss rung`,
+        await page.locator('#mini').count() === 0 && back?.surface === IU.token.s && back.visibleRuby === '' && !back.lit && !back.current && back.lines === 0,
+        JSON.stringify(back), { id: `G2.${lang}.original` });
+      await tap(page, IU);
+      const again = await miniState(page), lit = await tokenState(page, IU);
+      check(`G2 ${lang}: one more tap begins the cycle again: the popup with the word lit, and no sheet`,
+        again?.word === IU.token.b && lit?.lit && lit.lines === 0 && await page.locator('#sheet').count() === 0, JSON.stringify({ again, lit }), { id: `G2.${lang}.again` });
       const word = page.locator(`#reader .tok[data-index="${IU.index}"]`);
+      await word.focus();
+      await page.keyboard.press('Escape');
+      await page.locator('#mini').waitFor({ state: 'detached' });
+      const bare = await tokenState(page, IU);
+      check(`G2 ${lang}: Escape on the word puts the popup away and returns the original word: nothing lit or marked`,
+        bare?.surface === IU.token.s && bare.visibleRuby === '' && !bare.lit && !bare.current && bare.lines === 0, JSON.stringify(bare), { id: `G2.${lang}.escape-word` });
       await word.focus();
       await page.keyboard.press('Enter');
       await page.locator('#mini').waitFor();
@@ -917,8 +932,10 @@ try {
         await page.locator('#mini .mini-word[data-action="entry.open"]').evaluate(node => node === document.activeElement), '', { id: `G2.${lang}.keyboard` });
       await page.keyboard.press('Escape');
       await page.locator('#mini').waitFor({ state: 'detached' });
-      check(`G2 ${lang}: Escape returns focus to the original word`,
-        await word.evaluate(node => node === document.activeElement), '', { id: `G2.${lang}.escape` });
+      const after = await tokenState(page, IU);
+      check(`G2 ${lang}: Escape inside the popup returns focus to the original word, bare: nothing lit or marked`,
+        await word.evaluate(node => node === document.activeElement) && after?.visibleRuby === '' && !after.lit && !after.current && after.lines === 0,
+        JSON.stringify(after), { id: `G2.${lang}.escape` });
     });
   }
 
