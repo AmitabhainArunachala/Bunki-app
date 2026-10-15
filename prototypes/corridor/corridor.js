@@ -17332,6 +17332,7 @@ function renderLevels(main) {
     }
     referenceLibrary = window.BunkiReferenceUI.create({
       note,
+      roomName: () => tx(...ROOM_NAMES.rooms.levels),
       catalog,
       tx,
       getTaken: () => S.taken,
@@ -17471,7 +17472,7 @@ function renderReferenceNode(sheet, node) {
     : entry.text || entry.id));
   sheet.append(el('p', 'reading', entry.readings?.length
     ? entry.readings.join('・')
-    : entry.reading || tx('読み未収録', 'Reading not supplied')));
+    : entry.reading || tx('読みなし', 'No reading')));
   sheet.append(el('p', 'gloss', entry.meanings?.length
     ? entry.meanings.join('; ')
     : tx('意味未収録', 'Meaning not supplied')));

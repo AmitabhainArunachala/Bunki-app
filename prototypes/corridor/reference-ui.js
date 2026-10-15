@@ -22,7 +22,7 @@
     return element;
   };
 
-  function create({ catalog, tx, onChange, onOpen, onExit, onStudy, onMock, onSearch, getReturnLabel, getTaken, note }) {
+  function create({ catalog, tx, onChange, onOpen, onExit, onStudy, onMock, onSearch, getReturnLabel, getTaken, note, roomName }) {
     // the one honest note (contract §5), from the host; without one the element is drawn without its words
     const honest = (kind) => { if (note) return note(kind); const line = node('p', 'note'); line.dataset.kind = kind; return line; };
     const state = {
@@ -236,7 +236,7 @@
     function overview(root) {
       const head = node('header', 'reference-heading');
       head.append(node('p', 'reference-eyebrow', tx('参考書庫', 'REFERENCE')));
-      const title = node('h1', 'reference-title', tx('JLPT と 漢検の参考書庫', 'Reference library'));
+      const title = node('h1', 'reference-title', roomName?.() ?? tx('JLPT と 漢検の参考書庫', 'Reference library'));
       title.id = 'reference-title';
       title.tabIndex = -1;
       head.append(title, node('p', 'reference-intro', tx(
@@ -550,7 +550,7 @@
         const matches = entriesByPrinted.get(`${type}:${key}`);
         return matches?.size === 1 ? matches.values().next().value : null;
       },
-      locationName: () => current() ? collectionName(current()) : tx('参考書庫', 'Reference library'),
+      locationName: () => current() ? collectionName(current()) : (roomName?.() ?? tx('参考書庫', 'Reference library')),
       open(id) {
         const collection = collections.find((item) => item.id === id);
         if (!collection) return false;

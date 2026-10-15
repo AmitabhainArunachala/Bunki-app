@@ -40,7 +40,8 @@ async function labels(page, cdp, lang) {
     return nodes.filter(n => !n.ignored).map(n => ({ role: n.role?.value, name: n.name?.value }));
   };
   const actual = { button: await get('#bunki-report-bug'), container: await get('.br-rail'), title: await page.locator('#bunki-report-bug').getAttribute('title') };
-  const expected = lang === 'ja' ? ['この画面の問題を報告', '問題の報告'] : ['Report a problem on this screen', 'Report support'];
+  // the house voice (one hand, slice E): 不具合を知らせる · Report a problem
+  const expected = lang === 'ja' ? ['この画面の不具合を知らせる', '不具合を知らせる'] : ['Report a problem on this screen', 'Report a problem'];
   check('actual accessibility tree report entry ' + lang, actual.button.some(n => n.role === 'button' && n.name === expected[0]) && actual.container.some(n => n.name === expected[1]) && actual.title === expected[0], actual);
 }
 try {

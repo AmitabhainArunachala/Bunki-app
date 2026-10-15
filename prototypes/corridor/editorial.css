@@ -4948,7 +4948,8 @@ body:not(.zen) #app > .chrome {
 [data-bar='guided'] .gs-nav[aria-current='page'] { color: var(--color-bar-ink); font-weight: 700; }
 [data-bar='sheet'] { gap: 4px; margin-inline: 0; }
 [data-bar='sheet'] .sheet-depth { flex: 1 1 auto; min-width: 0; }
-[data-bar='sheet'] .sheet-take { margin-left: auto; height: 44px; min-height: 44px; }
+/* the bar's Save is the A family at the bar's measure: 44, not the family's 48 (it hung below the bar) */
+body [data-bar='sheet'] .sheet-take { margin-left: auto; height: 44px; min-height: 44px; padding-block: 0; }
 /* the seal is one glyph in every bar: a small square seal in the world's signal, a hairline frame inside its 44 */
 [data-bar] > button.theme-seal {
   position: relative;
