@@ -119,7 +119,9 @@ test('Auxiliary ます never borrows 升; its unresolved full-entry door cannot 
   assert(index.entries.some(row => row[1] === '升' && row[5].includes('ます')));
   const mini = await f.open('ます', { reading: 'ます', pos: '助動詞' });
   assert.equal(find(mini, 'mini-word').textContent, 'ます');
-  assert.equal(find(mini, 'mini-reading').textContent, 'ます');
+  // L · a word written exactly as it is read does not say itself twice: ます has no reading line (a kanji word in this
+  // same run keeps its own, at the end of this test, so hiding every reading cannot pass)
+  assert.equal(find(mini, 'mini-reading'), null, 'ます, written as it is read, shows no reading line');
   assert.equal(find(mini, 'mini-gloss').textContent, 'No dictionary entry for this spelling.');
   assert.equal(find(mini, 'mini-take').disabled, true);
   await find(mini, 'mini-take').click();
@@ -129,6 +131,10 @@ test('Auxiliary ます never borrows 升; its unresolved full-entry door cannot 
   assert.equal(mini.querySelectorAll('button').filter((b) => b.dataset.action === 'entry.open').length, 0);
   await find(mini, 'mini-word').click();
   assert.deepEqual(f.opened, []);
+  // the same run, a kanji word: its reading line is still there (上手 read うわて)
+  const kanji = await f.open('上手', { reading: 'うわて', pos: '名詞' });
+  assert.equal(find(kanji, 'mini-word').textContent, '上手');
+  assert.equal(find(kanji, 'mini-reading')?.textContent, 'うわて', 'a kanji word keeps its reading line');
 });
 
 test('A plain kana segment しま stays on its exact dictionary spelling, never 島 or 縞', async () => {

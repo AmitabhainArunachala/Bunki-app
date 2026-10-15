@@ -8775,7 +8775,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   const own = kind === 'word' && (!token.b || token.b === token.s) ? String(token.r || '') : '';
   const readsOtherwise = !!own && !!g?.r && kataToHira(String(g.r)) !== kataToHira(own);
   const reading = look?.reading ?? (readsOtherwise ? own : (g?.r || token.r));
-  if (reading) said.append(el('span', 'mini-reading', reading));
+  // L · a word written exactly as it is read (ます, いう, スタートアップ) does not say itself twice: no reading line
+  if (reading && reading !== label) said.append(el('span', 'mini-reading', reading));
   // L · until the full dictionary names the entry read the text's way, a card read otherwise than the entry at hand
   // borrows nothing: its meaning line is a quiet "…" in the world's muted head ink and Save stays held; the answer
   // fills both (openReadingSlip draws the card again). Asked and unanswered, the "…" stays — never another reading's

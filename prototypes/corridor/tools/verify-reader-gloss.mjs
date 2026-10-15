@@ -885,8 +885,9 @@ try {
       await openArticle(page, IU.passage, `dials=0,1,0&ui=${lang}`);
       await tap(page, IU);
       const one = await tokenState(page, IU), mini = await miniState(page);
-      check(`G2 ${lang}: one tap shows the honest dictionary miss in the popup`,
-        mini?.word === IU.token.b && mini.reading === IU.token.r
+      // L · いう is written exactly as it is read, so its popup says it once: no reading line (G2 kanji, below, keeps one)
+      check(`G2 ${lang}: one tap shows the honest dictionary miss in the popup, the word written as it is read saying itself once`,
+        mini?.word === IU.token.b && IU.token.r === IU.token.b && mini.reading === null
           && mini.gloss === `<span class="mini-gloss mini-miss">${MISS[lang]}</span>`
           && !/no gloss yet|語釈なし|No dictionary entry for this spelling\.|この表記の辞書項目はありません。/u.test(mini.text), JSON.stringify(mini), { id: `G2.${lang}.popup` });
       check(`G2 ${lang}: prose keeps its surface and plain word name with keyboard instructions`,
@@ -924,6 +925,13 @@ try {
       check(`G2 ${lang}: Escape inside the popup returns focus to the original word, its summoned reading gone: nothing lit`,
         await word.evaluate(node => node === document.activeElement) && after?.visibleRuby === '' && !after.lit && after.lines === 0,
         JSON.stringify(after), { id: `G2.${lang}.escape` });
+      // L · the same run, a kanji word: its popup keeps the reading line (厳しい read きびしい), so hiding every reading
+      // cannot pass G2
+      await tap(page, CORE);
+      const kanji = await miniState(page);
+      check(`G2 ${lang}: in the same article a kanji word's popup keeps its reading line (${CORE.token.s} ${CORE.token.r})`,
+        kanji?.word === CORE.token.b && kanji.reading === CORE.token.r, JSON.stringify(kanji), { id: `G2.${lang}.kanji-reading` });
+      await closeIfOpen(page);
     });
   }
 

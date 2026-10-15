@@ -105,13 +105,20 @@ try{
      await open(page,dials);const ending=token(page,89);
      await click(page,ending);await page.locator('#mini').waitFor();
      const shown=await mini(page);
-     assert.equal(shown.word,'ます');assert.equal(shown.reading,'ます');
+     // L · a word written exactly as it is read does not say itself twice: ます has no reading line
+     assert.equal(shown.word,'ます');assert.equal(shown.reading,'');
+     assert.equal(await page.locator('#mini .mini-reading').count(),0,'ます, written as it is read, shows no reading line');
      assert.equal(shown.gloss,'No dictionary entry for this spelling.','A polite ending must not borrow 升 or 増す');
      assert.equal(await page.locator('#mini-take').isDisabled(),true);
      assert.equal(await page.locator('#mini button.mini-word, #mini [data-action="entry.open"]').count(),0,
       'An unresolved spelling has no door into an entry: its word is plain text, never a button that reopens the rejected row');
      assert.equal(await page.locator('#sheet').count(),0);
-     return{dials,shown,saveHeld:true,unresolvedEntryHeld:true};
+     // the same run, a kanji word: its reading line is still there (谷川 read たにがわ), so hiding every reading cannot pass
+     await tapOutside(page);const kanji=token(page,1);
+     await click(page,kanji);await page.locator('#mini .mini-reading').waitFor();
+     const kanjiShown=await mini(page);
+     assert.equal(kanjiShown.word,'谷川');assert.equal(kanjiShown.reading,'たにがわ','A kanji word keeps its reading line');
+     return{dials,shown,kanjiShown,saveHeld:true,unresolvedEntryHeld:true};
     });
    }
    await run('particle-tap-keyboard-and-menu',async()=>{
