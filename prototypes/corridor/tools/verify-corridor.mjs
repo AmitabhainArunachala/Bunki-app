@@ -1567,6 +1567,69 @@ async function main() {
   check('reader hierarchy · enlarged navigation fails the approved 17px fixture', !hasApprovedPhoneHierarchy(largeProbe));
   await largeNavigation.evaluate(n => n.remove());
 
+  // ---------------- ONE TOP BAR (the one-hand pass, slice E; contract §2). Every bar in the house is one frame:
+  // 44 high (no safe area in this headless walk), on one hairline, in the frame's material, with ONE back glyph
+  // (‹, drawn once on [data-bar-back] at 44×44) — the room's chrome in the reader and the guided room, the entry
+  // sheet's bar, the writing room's bar (the full room: the quiet room is four corners by design), the deck's
+  // study bar. The guided room's own bar is an instance too: 44, its title in the middle, no back of its own
+  // (the room's bar above carries the one back). A 52px bar fails the same check.
+  console.log('\n— one top bar · 44, one hairline, one back glyph, five instances');
+  const BAR_FN = `((sel) => {
+    const bar = document.querySelector(sel);
+    if (!bar) return { missing: sel };
+    const r = bar.getBoundingClientRect(), cs = getComputedStyle(bar);
+    const shown = (n) => n.checkVisibility() && getComputedStyle(n).visibility !== 'hidden';
+    const backs = [...bar.querySelectorAll('[data-bar-back]')].filter(shown);
+    const back = backs[0] ? backs[0].getBoundingClientRect() : null;
+    const glyph = backs[0] ? getComputedStyle(backs[0], '::after') : null;
+    return { sel, height: Math.round(r.height * 10) / 10, backs: backs.length,
+      back: back && { w: Math.round(back.width), h: Math.round(back.height), chevron: /url\\(/.test((glyph.maskImage || glyph.webkitMaskImage || '') + '') },
+      line: parseFloat(cs.borderBottomWidth) > 0, bg: cs.backgroundColor, wrap: cs.flexWrap };
+  })`;
+  const barOk = (b, backs = 1) => !!b && !b.missing && Math.abs(b.height - 44) <= 0.5 && b.backs === backs && b.line && b.wrap === 'nowrap'
+    && b.bg !== 'rgba(0, 0, 0, 0)' && (backs === 0 || (b.back && b.back.w >= 44 && b.back.h >= 44 && b.back.chevron));
+  const bars = {};
+  const barCheck = async (name, sel, backs = 1) => {
+    const b = await page.evaluate(`(${BAR_FN})(${JSON.stringify(sel)})`);
+    bars[name] = b;
+    check(`one top bar · ${name}: ${sel} is 44 high on one hairline, nowrap, ${backs} back glyph${backs === 1 ? '' : 's'} (‹, 44×44)`, barOk(b, backs), JSON.stringify(b));
+  };
+  await open('?entry=shelf');
+  await tap(page, FIRST_TEXT);
+  await settleReader(page);
+  await barCheck('reader', '#app > .chrome');
+  await tap(page, '#reader .tok.content', 1);
+  await page.waitForSelector('#mini button.mini-word');
+  await tap(page, '#mini button.mini-word');
+  await page.waitForSelector('#sheet .sheet-bar');
+  await barCheck('sheet', '#sheet .sheet-bar');
+  await open('?entry=shelf&minimal=0');
+  await openShelfTools(page);
+  await page.fill('#search', '永');
+  await page.waitForSelector('[data-result="kanji:永"]', { timeout: 15000 });
+  await tap(page, '[data-result="kanji:永"]');
+  await page.waitForSelector('#strokes-door');
+  await tap(page, '#strokes-door');
+  await page.waitForSelector('#stroke-page:not([data-minimal="on"]) .stroke-bar');
+  await barCheck('writing room', '#stroke-page .stroke-bar');
+  await open('?entry=shelf');
+  await tap(page, '#chrome-dojo');
+  await page.waitForSelector('[data-study-door="guided"]');
+  await tap(page, '[data-study-door="guided"]');
+  await page.waitForSelector('.guided-room .gs-bar');
+  await barCheck('guided room', '#app > .chrome');
+  await barCheck('guided room bar', '.guided-room .gs-bar', 0);
+  await open('?deck=n2');
+  await page.waitForSelector('#kp-start', { timeout: 30000 });
+  await tap(page, '#kp-start');
+  await page.waitForSelector('#kp-card', { timeout: 15000 });
+  await barCheck('deck', '.kp-top-study');
+  const tallBar = await page.addStyleTag({ content: '.kp-top-study { height: 52px !important; }' });
+  check('one top bar · a 52px deck bar fails the same check', !barOk(await page.evaluate(`(${BAR_FN})('.kp-top-study')`)));
+  await tallBar.evaluate(n => n.remove());
+  report.measurements.bars = bars;
+  await shoot(page, shotsDir, '07-one-top-bar-deck');
+
   // the radical picker is the densest tap grid in the app, and the shelf/panel
   // sweep above never enters the kanjidex — its chips are measured by name
   await open('?entry=shelf');

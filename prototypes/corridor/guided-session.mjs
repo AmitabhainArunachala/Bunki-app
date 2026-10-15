@@ -606,7 +606,7 @@ export function createGuidedSession(host) {
   }
 
   function roomBar() {
-    return `<nav class="gs-bar" aria-label="${esc(t('案内つきの稽古', 'Guided session'))}"><span class="gs-bar-name">${bi('案内つきの稽古', 'guided session')}</span><span class="gs-bar-doors">${nav(bi('場', 'your field'), 'field')}${nav(bi('覚', 'learn'), 'learn')}${nav(bi('先生', 'sensei'), 'sensei')}${nav(bi('出典', 'about'), 'about')}</span></nav>`;
+    return `<nav class="gs-bar" data-bar="guided" aria-label="${esc(t('案内つきの練習', 'Guided practice'))}"><span class="gs-bar-name">${bi('案内つきの練習', 'Guided practice')}</span><span class="gs-bar-doors">${nav(bi('場', 'your field'), 'field')}${nav(bi('覚', 'learn'), 'learn')}${nav(bi('先生', 'sensei'), 'sensei')}${nav(bi('出典', 'about'), 'about')}</span></nav>`;
   }
 
   function home() {

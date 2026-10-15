@@ -1048,7 +1048,13 @@ function studyScreen() {
   const mode = cardMode();
   const total = ui.queue.length;
   const top = el('header', 'kp-top kp-top-study');
-  top.append(btn('kp-icon', '×', () => go('home'), { 'aria-label': t("終わる"), id: 'kp-quit' }));
+  // the house's one top bar (one hand): this is its instance while a card is up — 44, one back glyph (drawn by the
+  // frame), its own middle (the rail and the count)
+  top.dataset.bar = 'deck';
+  const quit = btn('kp-icon', '', () => go('home'), { 'aria-label': t("終わる"), id: 'kp-quit' });
+  quit.dataset.barBack = '';
+  quit.append(el('span', 'kp-sr', t("終わる")));
+  top.append(quit);
   const prog = el('div', 'kp-progress');
   // a short sitting draws one segment per card (the rail itself still ticks by transform)
   if (total > 1 && total <= 30) prog.style.setProperty('--kp-n', String(total));

@@ -106,19 +106,12 @@ body::before {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* ---------------------------------------------------------------- chrome */
+/* ---------------------------------------------------------------- chrome
+   its frame (44, the material, the back glyph) is the ONE TOP BAR block in editorial.css; here only its place */
 .chrome {
   position: sticky;
   top: 0;
   z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px calc(6px + env(safe-area-inset-top)) 10px;
-  padding-top: calc(6px + env(safe-area-inset-top));
-  background: color-mix(in srgb, var(--ground) 92%, transparent);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--line-soft);
 }
 
 /* 稽古の間 — the study hall at the top of the dojo (operator, 2026-09-18) */
@@ -199,18 +192,6 @@ body::before {
 .chrome button.chrome-dojo .en-sub {
   display: none;
 }
-/* 320-px phones: the chrome row (back · search · seal · language · tray) already
- * fills 309 px; the dojo door (R5) pushed it to 363 and the whole page scrolled
- * sideways. Below 340 px the row wraps instead — every door, including the
- * dojo's, keeps its 44-px target and its keyboard reach; the chrome grows a
- * second line on the smallest phones. Reconciliation for the operator's eye. */
-@media (max-width: 340px) {
-  .chrome {
-    flex-wrap: wrap;
-    row-gap: 4px;
-  }
-}
-
 .crumb {
   flex: 1;
   min-width: 0;
@@ -235,7 +216,6 @@ body::before {
   .chrome {
     justify-content: space-between;
     gap: 4px;
-    padding-inline: 8px;
   }
   .chrome .crumb {
     position: absolute;
@@ -2624,14 +2604,9 @@ body.v-depth-layered .inline-link {
   padding: 0 10px;
 }
 
-/* sheet header — the way out lives on the sheet itself */
+/* sheet header — the way out lives on the sheet itself (its frame: the ONE TOP BAR block, editorial.css) */
 .sheet-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   margin: 0 0 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--line-soft);
 }
 
 .sheet-depth {
@@ -3143,13 +3118,7 @@ body.v-depth-layered .stroke-page {
   top: 0;
   z-index: 2;
   align-self: stretch;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 0;
   margin-bottom: 4px;
-  background: inherit;
-  border-bottom: 1px solid var(--line-soft);
 }
 
 .stroke-back {

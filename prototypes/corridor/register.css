@@ -34,76 +34,9 @@
 }
 
 /* ---------------------------------------------------------------- 1 · CHROME
-   Seven equal circles above every room → one quiet mast. Ink text doors on a
-   hairline; the tools recede to glyphs; 覚 is a seal only when it counts. */
-.chrome {
-  gap: 14px;
-  padding: 10px 16px calc(8px + env(safe-area-inset-top)) 16px;
-  padding-top: calc(10px + env(safe-area-inset-top));
-  background: color-mix(in srgb, var(--ground) 96%, transparent);
-  border-bottom: var(--rule);
-  backdrop-filter: none;
-}
-.chrome > button:first-child { /* 戻る back */
-  font-family: var(--display);
-  font-size: 17px;
-  line-height: 1.1;
-  text-align: start;
-}
-.chrome > button:first-child .l-ja { display: block; font-family: var(--display); font-size: 17px; color: var(--ink); }
-.chrome > button:first-child .en-sub,
-.chrome > button#tray .en-sub { display: block; font-family: var(--sans); font-size: 10px; letter-spacing: 0.16em; color: var(--faint); }
-.chrome > button#tray .l-ja { font-family: var(--display); font-size: 17px; }
-.chrome .crumb {
-  /* the mast is full; the crumb is shown only where the chrome has receded (the
-     attempt), as the room's name beside 戻る. Elsewhere it is hidden visually, as
-     corridor.css does on phones, so screen readers keep the room path */
-  flex: 1 1 auto;
-  min-width: 0;
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  clip-path: inset(50%);
-  font-family: var(--display);
-  font-size: 15px;
-  color: var(--ink-2);
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-/* the crumb was the mast's spacer: the door after it takes the push, so 戻る stands
-   alone and the tools sit right (phones keep corridor.css's space-between) */
-@media (min-width: 441px) {
-  .chrome > .crumb + * { margin-inline-start: auto; }
-}
-.chrome .chrome-search svg { width: 18px; height: 18px; }
-.chrome .chrome-dojo, .chrome .theme-seal { font-size: 14px; color: var(--ink-2); }
-.chrome .lang-seg {
-  border: var(--rule);
-  border-radius: var(--radius-control);
-  padding: 2px;
-  gap: 0;
-  background: transparent;
-}
-.chrome .lang-seg > * {
-  font-family: var(--sans);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  padding: 4px 9px;
-  border-radius: var(--radius-control);
-  min-height: 0;
-}
-.chrome > button#tray { /* 覚 lists — a seal only when it counts */
-  font-family: var(--display);
-  color: var(--ink-2);
-}
-
+   The mast is retired: the bar's frame is the ONE TOP BAR block (editorial.css). Only the attempt
+   register's collapse and its stage bar stay here. */
 /* T8 — during an attempt the chrome collapses to 戻る · progress · seal */
-html[data-register="attempt"] .chrome {
-  background: var(--ground);
-  border-bottom-color: var(--line-soft);
-}
 html[data-register="attempt"] .chrome .chrome-search,
 html[data-register="attempt"] .chrome .chrome-dojo,
 html[data-register="attempt"] .chrome .lang-seg,
@@ -119,7 +52,6 @@ html[data-register="attempt"] .chrome::after {
   background: linear-gradient(to right, var(--ink) 0 calc(var(--stage) * 100%), transparent calc(var(--stage) * 100%));
   transition: none;
 }
-.chrome { position: sticky; }
 
 /* the one seal — the 回廊 glyph stays the only round thing in the house */
 .nav-symbol {

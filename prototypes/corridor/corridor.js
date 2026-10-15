@@ -29550,9 +29550,11 @@ function renderStrokePage(root) {
   }
 
   const bar = el('div', 'stroke-bar');
-  const backBtn = biLabel('button', 'stroke-back', '← 戻る', 'back');
+  bar.dataset.bar = 'stroke';
+  const backBtn = biLabel('button', 'stroke-back', '戻る', 'Back');
   backBtn.type = 'button';
   backBtn.id = 'strokes-back';
+  backBtn.dataset.barBack = '';
   // NOT part of the sleeping-inert chrome sweep: the back door must stay
   // tappable while the room sleeps (operator, 2026-08-15: "no functioning
   // back button" — a learner may never be trapped behind a history gesture)
@@ -29567,8 +29569,12 @@ function renderStrokePage(root) {
   });
   bar.append(backBtn);
 
+  // the bar's middle is the character itself (the one top bar: each instance keeps only its own middle)
   const title = el('span', 'stroke-title');
-  title.append(el('span', 'stroke-title-word', tx('書の間', 'the writing room')));
+  const titleWord = el('span', 'stroke-title-word', st.id);
+  titleWord.lang = 'ja';
+  titleWord.dataset.uiContent = 'learning';
+  title.append(titleWord);
   bar.append(title);
 
   // the world seal, top right — the room re-dresses AND re-inks on a world
@@ -30200,11 +30206,14 @@ function renderSheet(root) {
 
   // the sheet carries its own way out — "NO BACK OPTION" (operator, on-device)
   const bar = el('div', 'sheet-bar');
+  bar.dataset.bar = 'sheet';
+  // the one back glyph (the frame draws it); its word: Close at the first depth, Back deeper in
   const backBtn = S.stack.length === 1
     ? biLabel('button', 'sheet-back', '閉じる', 'Close')
-    : biLabel('button', 'sheet-back', '← 戻る', 'back');
+    : biLabel('button', 'sheet-back', '戻る', 'Back');
   backBtn.type = 'button';
   backBtn.id = 'sheet-back';
+  backBtn.dataset.barBack = '';
   backBtn.dataset.action = 'navigation.back';
   backBtn.addEventListener('click', (event) => {
     interaction(
@@ -33161,9 +33170,12 @@ function render() {
   // the drift's spatial arbiter reads this tag: words recede under the top bar
   // instead of printing through it half-cut
   chrome.setAttribute('data-drift-chrome', '');
-  const backBtn = biLabel('button', null, '戻る', 'back');
+  // the one top bar (contract §2): the room's chrome is the frame's first instance; its Back the one back glyph
+  chrome.dataset.bar = 'room';
+  const backBtn = biLabel('button', null, '戻る', 'Back');
   backBtn.type = 'button';
   backBtn.id = 'back';
+  backBtn.dataset.barBack = '';
   // a tab root entered from the tab bar is a peer of the other tabs: no Back (its target was
   // the previous tab, which the bar already shows). Leaving that tab's rooms forgets it, so a
   // root reached through a door (the front door's bubbles, the chrome's Lists/Learn/search,

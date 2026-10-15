@@ -1946,7 +1946,7 @@ function studyHost(kind,key){
   return h;
 }
 function studyHtml(kind,key,fallback){
-  const label=uiT('全項目 →','Full entry →');
+  const label=uiT('全項目','Full entry');
   if(studyHost(kind,key))
     return '<button type="button" class="study" data-study-kind="'+esc(kind)+
       '" data-study-key="'+esc(key)+'">'+esc(label)+'</button>';

@@ -106,7 +106,9 @@
 /* study */
 .kp-top-study { gap: 10px; }
 /* no host header (the standalone study pages): the study top bar pins itself, so a long passage's settling scroll cannot take it off screen */
-.kp[data-host='none'] .kp-top-study { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; background: var(--kp-bg); padding-block: 8px; margin-block: -8px; } /* 8px of its own ground above and below once stuck; the same place at rest */
+.kp[data-host='none'] .kp-top-study { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; background: var(--kp-bg); }
+/* the bar's one back glyph says its word only to a screen reader */
+.kp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .kp-progress { flex: 1; height: 6px; border-radius: var(--radius-seal, 3px); background: var(--kp-panel-2); overflow: hidden; }
 /* the rail ticks per card on the compositor: scaleX, never width */
 .kp-progress i { display: block; height: 100%; width: 100%; background: var(--kp-cyan); transform-origin: left center; transform: scaleX(var(--kp-frac, 0)); transition: transform var(--motion-ma, 120ms) var(--ease-enter, ease-out); }
@@ -430,7 +432,7 @@
 .kp:has(> .kp-study) { background: var(--kp-study-ground); }
 .kp[data-host='none'] .kp-top-study { background: var(--kp-stage); }
 
-/* the top bar: ✕, the rail (one segment per card on a short sitting), the count, 削除 */
+/* the top bar: ‹ (the house's one back glyph), the rail (one segment per card on a short sitting), the count, 削除 */
 .kp-top-study .kp-icon { background: transparent; border-color: transparent; color: var(--kp-stage-ink); font-size: 20px; font-weight: 300; }
 .kp-top-study .kp-icon:focus-visible { border-color: var(--kp-stage-ink); }
 .kp-top-study .kp-progress { height: 3px; border-radius: 0; background: color-mix(in srgb, var(--kp-stage-ink) 24%, transparent); }

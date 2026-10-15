@@ -107,41 +107,17 @@
   margin: 0 4px;
 }
 
-/* ---------- the room bar: the room's own doors under the app's mast ---------- */
-.gs-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 2px 0 10px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid var(--line);
-}
-.gs-bar-name {
-  font-family: var(--serif);
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  color: var(--ink-2);
-}
-.gs-bar-doors {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
+/* ---------- the room bar: an instance of the house's one bar (editorial.css ONE TOP BAR); its middle is the
+   session's title, its doors at the right ---------- */
 .gs-nav {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 5px;
 }
 .gs-nav .gs-gloss {
   margin-left: 0;
 }
 /* during an attempt the room's own doors recede too (T8) */
-.guided-room[data-stage='question'] .gs-bar {
-  border-bottom-color: var(--line-soft);
-  padding-bottom: 6px;
-}
 .guided-room[data-stage='question'] .gs-nav .gs-gloss,
 .guided-room[data-stage='question'] .gs-bar-name .gs-gloss {
   display: none;

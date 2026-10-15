@@ -97,8 +97,7 @@ button:disabled { cursor: not-allowed; }
  * plain tinted text and glyphs with 44px hit boxes; the title is the UI sans at 17px. */
 body:not(.zen) #app > .chrome {
   gap: 2px;
-  min-height: 52px;
-  padding: calc(4px + env(safe-area-inset-top)) max(12px, calc((100vw - 1184px) / 2)) 4px;
+  padding-inline: max(12px, calc((100vw - 1184px) / 2));
   color: var(--label);
   background: var(--glass);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -142,18 +141,8 @@ body:not(.zen) #app > .chrome > button.chrome-search svg { width: 20px; height: 
    doors above must not bring the search, the dojo, the language or the lists back into a test */
 html[data-register='attempt'] body:not(.zen) #app > .chrome > :is(button.chrome-search, button.chrome-dojo, .lang-seg),
 html[data-register='attempt'] body:not(.zen) #app > .chrome > button#tray { display: none; }
-/* 戻る wears the iOS back chevron */
+/* 戻る: the one back glyph of every bar (the ONE TOP BAR block below draws it once) */
 body:not(.zen) #app > .chrome > button#back { padding-left: 6px; }
-body:not(.zen) #app > .chrome > button#back::before {
-  content: '';
-  align-self: center;
-  width: 10px;
-  height: 17px;
-  margin-right: 1px;
-  background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 17'%3E%3Cpath d='M8.5 1.5 1.5 8.5l7 7' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 17'%3E%3Cpath d='M8.5 1.5 1.5 8.5l7 7' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
-}
 /* the world seal: a small round mark inside its 44px door */
 body:not(.zen) #app > .chrome > button.theme-seal {
   align-items: center;
@@ -366,8 +355,6 @@ body.v-depth-layered .sheet, .sheet {
   top: 0;
   z-index: 4;
   margin: 0 -32px 24px;
-  padding: 12px 24px;
-  gap: 12px;
 }
 .sheet-bar .sheet-depth { font-size: 14px; }
 .sheet .headword { font-family: var(--display); font-size: 42px; line-height: 1.65; letter-spacing: -0.02em; margin: 4px 0 2px; }
@@ -724,7 +711,7 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
   body { --t-read: 21px; --t-display: 29px; }
   /* a phone's bar keeps every door on one row: the English words stay in each door's name for a
      screen reader, out of sight; an unavailable 戻る gives its slot back */
-  body:not(.zen) #app > .chrome { min-height: 52px; gap: 0; justify-content: flex-start; padding: calc(4px + env(safe-area-inset-top)) 6px 4px; }
+  body:not(.zen) #app > .chrome { gap: 0; justify-content: flex-start; padding-inline: 6px; }
   body:not(.zen) #app > .chrome > .crumb + * { margin-inline-start: auto; }
   body:not(.zen) #app > .chrome > button,
   body:not(.zen) #app > .chrome > button.chrome-dojo { padding-inline: 8px; font-size: 16px; }
@@ -741,7 +728,7 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
   body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; margin: 0 auto 44px; padding: 24px 18px 72px; box-shadow: none; }
   main h1.view-title { font-size: 29px; }
   body.v-depth-layered .sheet, .sheet { padding-inline: 20px; max-height: 91dvh; }
-  .sheet-bar { margin-inline: -20px; padding: 10px 14px; gap: 8px; }
+  .sheet-bar { margin-inline: -20px; }
   .sheet-bar .sheet-depth { font-size: 13px; }
   .sheet-bar .sheet-back { padding-inline: 10px; }
   .sheet .headword { font-size: 36px; }
@@ -1837,14 +1824,8 @@ body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { 
 /* pending (no recording in the locked voice): the same mark, dimmed; its reason is its description, out of sight */
 .play-pending { display: none; }
 
-/* bug report: smaller on a phone, and it steps above a floating bar */
+/* bug report: smaller on a phone (its one home is the tab slot — the ONE TOP BAR pass) */
 @media (max-width: 520px) {
-  body:not([data-view='drift']) #bunki-reports-root .br-rail {
-    right: var(--s1);
-    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-    width: 44px;
-    height: 44px;
-  }
   body:not([data-view='drift']) #bunki-reports-root .br-rail .br-bug { width: 44px; height: 44px; padding: 0; }
   body:not([data-view='drift']) #bunki-reports-root .br-bug svg { width: 20px; height: 20px; }
   /* the page's last line scrolls clear of the bug: its 12px inset + 44px + a 16px breath */
@@ -1977,7 +1958,6 @@ body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { 
   /* folded on a phone: the mark alone at the bottom right, above the tabs; its bed (the dock strip) is not drawn */
   body[data-view='reader'] .listen-row.play-bar[data-open='false'] { left: auto; right: var(--s2); width: 44px; max-width: 44px; min-height: 44px; padding: 0; }
   body[data-view='reader']:not(.zen):has(.listen-row.play-bar[data-open='false']):not(:has(.reader-actions:not([hidden]))) #app::after { display: none; }
-  body[data-view='reader'] #bunki-reports-root .br-rail { bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
   /* the sentence bar rises above the dock, clear of the bug and the voice state */
   .teacher-door.reader-actions {
     left: var(--s1);
@@ -2005,18 +1985,6 @@ body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { 
 /* the sheet's bar (FEEL pass 2026-10-02): light glass on the sheet's one hairline; its controls are
    the families (back = quiet, search and close = glyphs, Save = the screen's primary). The sheet's
    own skin is written once, in the skin block below (one hand, slice D). */
-body .sheet .sheet-bar {
-  gap: 4px;
-  padding: 6px var(--s2);
-  background: var(--glass);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
-  border: 0;
-  color: var(--label);
-}
-body .sheet .sheet-bar .sheet-back { display: inline-flex; flex-direction: row; align-items: baseline; gap: 5px; padding: 0 10px 0 6px; line-height: 44px; }
-body .sheet .sheet-bar .sheet-back :is(.l-ja, .en-sub) { display: inline; margin: 0; color: inherit; line-height: 44px; }
-body .sheet .sheet-bar .sheet-back .en-sub { font: 500 12px/1 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--label-2); }
 body .sheet .sheet-bar .sheet-depth { color: var(--label-2); }
 body .sheet .sheet-bar :focus-visible { outline-color: var(--tint); }
 
@@ -2111,7 +2079,6 @@ body .sheet > button.take {
 }
 body .sheet > button.take .en-sub { display: inline; font-size: 13px; letter-spacing: 0.02em; text-transform: none; color: inherit; opacity: 0.88; }
 @media (max-width: 520px) {
-  body .sheet .sheet-bar { padding: 8px 12px; }
   body .sheet .headword { font-size: 38px; }
   body .sheet .reading { font-size: 19px; }
 }
@@ -3150,9 +3117,7 @@ body:not(.ui-bi) .primary-tabs .primary-tab[aria-current='page'] { font-weight: 
 .primary-tabs .line-car.moving { animation: line-car-slide var(--motion-room) var(--ease-enter) both; }
 @keyframes line-car-slide { from { transform: translateX(calc(var(--from, 0) * 100%)); } }
 body.has-primary-tabs #variants { bottom: var(--nav-clearance); }
-body.has-primary-tabs #bunki-reports-root .br-rail { bottom: calc(max(var(--nav-clearance), var(--foundation-dock-clearance, 0px)) + 12px); }
 /* Sheets hide tabs and reserve the original report-button strip. */
-body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover:not(.is-inline), [role='dialog'][aria-modal='true']:not([hidden]), .world-picker) #bunki-reports-root .br-rail { bottom: 12px; }
 body.has-primary-tabs .reader-toast { bottom: calc(var(--nav-clearance) + 24px); }
 body.has-primary-tabs .kp-grades,
 body.has-primary-tabs .pc-controls,
@@ -3173,7 +3138,7 @@ body.has-primary-tabs:has(#sheet, #stroke-page, #vocabulary-list-popover:not(.is
 body:has(#app :is(.kp-study, .kp-done)) #app > .chrome,
 body:has(#app :is(.kp-study, .kp-done)) .primary-tabs { display: none; }
 body.has-primary-tabs:has(#app :is(.kp-study, .kp-done)) { --nav-clearance: env(safe-area-inset-bottom, 0px); }
-body:has(#app .kp-study) #app .kp-top-study { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; background: var(--kp-stage); padding-block: 8px; margin-block: -8px; }
+body:has(#app .kp-study) #app .kp-top-study { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; }
 /* no report button while a card is up (John, 2026-10-13) */
 body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: none; }
 /* The back reads clean, like the reader: a reading shows on the answer, and on a word you tap
@@ -3210,8 +3175,7 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
     var(--kp-study-ground);
 }
 /* ─ the bar: ×, one hairline of progress, the count in plain figures, Remove as a quiet word */
-#app .kp-top-study { gap: 14px; }
-#app .kp-top-study .kp-icon { width: 40px; color: color-mix(in srgb, var(--kp-stage-ink) 78%, transparent); font-size: 22px; }
+#app .kp-top-study .kp-icon { width: 44px; color: var(--color-bar-ink); }
 #app .kp-top-study .kp-progress { height: 2px; border-radius: var(--radius-seal); background: color-mix(in srgb, var(--kp-stage-ink) 14%, transparent); -webkit-mask-image: none; mask-image: none; }
 #app .kp-top-study .kp-progress i { background: color-mix(in srgb, var(--kp-stage-ink) 80%, transparent); border-radius: var(--radius-seal); }
 #app .kp-top-study .kp-count { min-width: 0; font: 500 13px/1 var(--sans, system-ui); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; color: var(--kp-stage-mute); }
@@ -4329,7 +4293,6 @@ body:not([data-view='drift']) .sheet {
   animation: feel-rise var(--motion-sheet) var(--ease-sheet);
 }
 body:not([data-view='drift']) .sheet-grip { width: 36px; height: 4px; margin: 10px auto; border-radius: var(--radius-seal); background: var(--color-edge-strong); }
-body:not([data-view='drift']) .sheet-bar { border-bottom: var(--stroke-hairline) solid var(--color-seal); }
 body:not([data-view='drift']) .scrim { background: var(--color-scrim); animation: feel-fade var(--motion-standard) var(--ease-standard); }
 
 /* ---- the top chrome: clean and quiet. Every door keeps its id, place and 44px. ---- */
@@ -4345,7 +4308,6 @@ body:not(.zen) #app > .chrome > button.chrome-search {
   border-radius: var(--radius-control);
 }
 body:not(.zen) #app > .chrome > button#back { color: var(--color-ink); }
-body:not(.zen) #app > .chrome > button#back::before { width: 8px; height: 14px; opacity: 0.8; }
 body:not(.zen) #app > .chrome > button.chrome-dojo { font: 600 12px/44px var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; }
 body:not(.zen):not(.ui-bi) #app > .chrome > button.chrome-dojo { font: 800 15px/44px var(--font-display); letter-spacing: 0.08em; text-transform: none; }
 body:not(.zen) #app > .chrome > button.chrome-dojo[aria-current='page'] { color: var(--color-seal); }
@@ -4902,6 +4864,85 @@ body:not(.zen) #app > .chrome {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
+
+/* ==========================================================================
+   ONE TOP BAR (the one-hand pass, slice E — contract §2). Written once: every bar in the house is an instance
+   of this frame — the room's chrome (#app > .chrome), the entry sheet's bar (.sheet-bar), the writing room's bar
+   (.stroke-bar), the deck's study bar (.kp-top-study) and the guided room's bar (.gs-bar) — 44 high on one
+   hairline in the frame's material (--color-bar / --color-bar-line / --color-bar-ink / --color-bar-quiet), one
+   back glyph (‹) drawn once on [data-bar-back], its doors 44 px glyphs (family D). Each instance keeps only its
+   own middle: the deck's progress and count, the guided session's title and doors, the stroke page's character,
+   the sheet's search and Save. verify-corridor pins every instance at 44 with its one back glyph.
+   ========================================================================== */
+[data-bar] {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0;
+  height: calc(44px + env(safe-area-inset-top, 0px));
+  min-height: 0;
+  max-height: none;
+  padding: env(safe-area-inset-top, 0px) 4px 0;
+  margin-block: 0;
+  background: var(--color-bar);
+  border: 0;
+  border-bottom: var(--stroke-hairline) solid var(--color-bar-line);
+  border-radius: 0;
+  color: var(--color-bar-ink);
+  box-shadow: var(--elevation-bar);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+/* the bars that are not the room's chrome sit inside their own layer: no safe-area of their own */
+[data-bar]:not(#app > .chrome) { height: 44px; padding-top: 0; }
+[data-bar] > button, [data-bar] .lang-seg button { height: 44px; min-height: 44px; }
+/* the one back glyph: a chevron drawn once, the door's word beside it where there is room */
+[data-bar-back] {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 10px 0 6px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-bar-ink);
+  font: 500 15px/44px var(--font-ui);
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+}
+[data-bar-back]::after {
+  content: '';
+  order: -1;
+  flex: 0 0 auto;
+  width: 8px;
+  height: 14px;
+  opacity: 0.8;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 17'%3E%3Cpath d='M8.5 1.5 1.5 8.5l7 7' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 17'%3E%3Cpath d='M8.5 1.5 1.5 8.5l7 7' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+[data-bar-back] :is(.l-ja, .en-sub) { display: inline; margin: 0; color: inherit; font: inherit; letter-spacing: 0; opacity: 1; }
+[data-bar-back] .en-sub { display: none; }
+[data-bar-back]:hover:not(:disabled) { background: color-mix(in srgb, var(--color-ink) 6%, transparent); }
+/* the instances' middles */
+[data-bar='deck'] { gap: 10px; }
+[data-bar='deck'] .kp-progress { flex: 1 1 auto; }
+[data-bar='stroke'] .stroke-title { flex: 1 1 auto; min-width: 0; text-align: center; font: 600 17px/1.2 var(--font-headword, var(--display)); color: var(--color-bar-ink); }
+[data-bar='guided'] { justify-content: space-between; gap: 8px; margin-bottom: var(--space-3, 12px); }
+[data-bar='guided'] .gs-bar-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 15px/1.2 var(--font-ui); letter-spacing: 0; color: var(--color-bar-ink); }
+[data-bar='guided'] .gs-bar-doors { flex: 0 0 auto; display: flex; flex-wrap: nowrap; gap: 0; }
+[data-bar='guided'] .gs-nav { min-height: 44px; padding: 0 10px; border: 0; background: transparent; color: var(--color-bar-quiet); font: 500 14px/44px var(--font-ui); letter-spacing: 0; white-space: nowrap; }
+[data-bar='guided'] .gs-nav[aria-current='page'] { color: var(--color-bar-ink); font-weight: 700; }
+[data-bar='sheet'] { gap: 4px; margin-inline: 0; }
+[data-bar='sheet'] .sheet-depth { flex: 1 1 auto; min-width: 0; }
+[data-bar='sheet'] .sheet-take { margin-left: auto; height: 44px; min-height: 44px; }
+/* the galaxy's own strip (the door's menu) wears the frame's material too */
+.nav-bar { background: var(--color-bar, rgb(250 250 248 / 96%)); border: var(--stroke-hairline, 0.5px) solid var(--color-bar-line, rgb(0 0 0 / 12%)); -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* END ONE TOP BAR ========================================================== */
 /* ---- the frame: the Line ---- */
 .primary-tabs,
 body.has-primary-tabs .primary-tabs {
