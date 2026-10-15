@@ -14,6 +14,7 @@ corridor's rights discipline.
 | 四国めたん (N5–N3 words) | VOICEVOX ENGINE 0.24.1 | free incl. commercial — credit: VOICEVOX:四国めたん |
 | ずんだもん (N5–N3 words) | VOICEVOX ENGINE 0.24.1 | free incl. commercial — credit: VOICEVOX:ずんだもん |
 | 玄野武宏 (N5–N3 words) | VOICEVOX ENGINE 0.24.1 | free incl. commercial — credit: VOICEVOX:玄野武宏 |
+| Kore (article narration — `narration/kore/`, first clips 2026-10-15) | Google Gemini TTS · `gemini-3.8-flash-tts` via the Generative Language API, rendered by `tools/render-narration-gemini.mjs` | Gemini API Additional Terms of Service (https://ai.google.dev/gemini-api/terms): generated output belongs to the developer, no credit line required. Each narration is an adaptation of its article's text and carries that article's licence and attribution (see `data/articles/index.json`; `jawiki:5294446` is CC BY-SA 4.0). |
 
 Format: AAC 32kbps mono 24kHz (`.m4a`). Every word clip passed a g2p
 reading gate against the dictionary reading before shipping; mismatched
@@ -24,9 +25,12 @@ readings were synthesized from kana and marked in the manifest.
 The JVNV F1 narration and F1 word clips were withdrawn on 30 September 2026:
 in the blind voice audition of 29 September the operator rated F1 1/5, so no
 F1 audio ships or plays. The locked narration voice is Google Gemini TTS
-**Kore**, with **Charon** as the second speaker. Those clips are not rendered
-yet; until they are, the reader's play bar shows a visible 音声準備中 · Kore
-(voice in preparation) state and nothing plays.
+**Kore**, with **Charon** as the second speaker. The first Kore clips shipped
+on 15 October 2026 as a one-article probe (`narration/kore/jawiki_5294446-*.m4a`,
+AAC 64 kbps mono 24 kHz, one clip per sentence, listed in
+`article-narration.json`); `index.html` now raises `__KAIRO_NARRATION__` so the
+reader fetches that manifest. An article without clips still shows the pending
+line (この記事の収録音声はありません) and nothing plays for it.
 
 Word and sentence clips follow the same lock: only a Kore or Charon recording
 may play for a word or a shelf sentence. The interim clips credited above remain
