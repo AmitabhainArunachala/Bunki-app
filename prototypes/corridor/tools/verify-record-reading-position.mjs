@@ -631,8 +631,10 @@ try {
         await page.locator('#reader .tok').first().waitFor();
         await page.waitForFunction((index) => document.activeElement?.matches(`#reader .tok[data-index="${index}"]`), tokenIndex);
         assert.equal(await page.locator('#reader-place-save').isDisabled(), true, 'Returning cannot silently select a new learner capture target');
-        assert.equal(await page.locator('#reader-take').isDisabled(), true, 'Returning cannot select a word to memorize');
-        assert.equal(await page.locator('#reader-take').getAttribute('aria-pressed'), 'false');
+        // one Save (the one-hand pass): the bar has no Save; a selected word would wear its mark and open its slip
+        assert.equal(await page.locator('#reader .tok-current').count(), 0, 'Returning cannot select a word to memorize');
+        assert.equal(await page.locator('#mini').count(), 0, 'Returning opens no slip');
+        assert.equal(await page.locator('#app > .chrome #reader-take').count(), 0, 'The bar carries no Save of its own');
         const returned = await admit(page, evidence, 'ui-return-from-confirmed-position'); rootsUnchanged(after, returned);
         assert.deepEqual(returned.snapshot.replica.operations, after.snapshot.replica.operations, 'Returning to a sole saved place cannot mint reading or learning evidence');
         await page.reload(); await page.waitForFunction(() => document.body.dataset.ready === '1');

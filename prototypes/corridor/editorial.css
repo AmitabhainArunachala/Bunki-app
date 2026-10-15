@@ -827,9 +827,6 @@ body, body.v-contrast-wcag {
 
 /* chrome never shows a greyed control: an unavailable one steps out of sight in its own slot */
 body:not(.zen):not([data-view='drift']) #app > .chrome > button:disabled { visibility: hidden; }
-/* The reader adds a capture door only after a word is selected. Its empty
- * slot must not push the visible navigation onto a second row on a phone. */
-body:not(.zen) #app > .chrome > #reader-take:disabled { display: none; }
 
 /* the buttons' faces are the eight families, written once after the design tokens (one hand, slice D);
    here only the bilingual label's layout: Japanese at full weight, English smaller and lighter, on one line */
@@ -3403,18 +3400,8 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
 
 /* Counts must not change the header's line count during a word action. */
 @media (max-width: 520px) {
-  /* The article already names its level. Reserve its capture door even before
-     a word is selected, so selecting/saving never changes header height. */
+  /* The article already names its level in its own head; the bar keeps to its doors. */
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > .chrome-level { display: none; }
-  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take {
-    display: inline-flex; width: 44px; min-width: 44px; padding: 0;
-  }
-  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take:disabled { visibility: hidden; }
-  body.has-primary-tabs[data-view='reader'] #reader-take .l-ja {
-    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
-  }
-  body.has-primary-tabs[data-view='reader'] #reader-take::after { content: '+'; font-size: 24px; }
-  body.has-primary-tabs[data-view='reader'] #reader-take[aria-pressed='true']::after { content: '✓'; }
   /* the layout under test (2026-10-13): the bar holds only Back, search and the capture door, so
      the reader's Back says its name as it does in every other room */
   html[data-layout='places'] body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#back { min-width: 0; padding: 0 10px 0 4px; }
@@ -4990,9 +4977,6 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
 @media (max-width: 520px) {
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { flex-wrap: nowrap; padding-inline: 2px; }
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg { padding-right: 3px; background-position: right 1px center; }
-  /* the capture + is always drawn, dim until a word is touched, so its slot is never an empty gap */
-  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take:disabled { visibility: visible; cursor: default; }
-  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > #reader-take:disabled::after { opacity: 0.32; }
   /* the saved count sits at the bookmark's shoulder, so the bookmark is always one 44px door */
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#tray {
     position: relative; width: 44px; min-width: 44px; padding: 0; justify-content: center; gap: 0;
@@ -5010,9 +4994,6 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg button { min-width: 44px; padding-inline: 0; }
 }
 /* END BUNKI R4 SKIN ======================================================== */
-/* R5: a popup owns Save while it is open. Its reserved chrome slot stays
-   in place; dismissing the popup restores the reader's one-tap Save. */
-body[data-view='reader']:has(#mini) #reader-take { visibility: hidden; pointer-events: none; }
 /* Settings owns its two preferences; the same choices do not repeat above it. */
 body[data-view='settings'] #app > .chrome :is(#lang, #theme-seal) { visibility: hidden; pointer-events: none; }
 /* Read's inline lookup lives in Tools. Exactly one lookup door is visible. */

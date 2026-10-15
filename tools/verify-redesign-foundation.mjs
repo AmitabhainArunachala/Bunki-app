@@ -181,18 +181,12 @@ try {
             Math.abs(headerAfter - headerBefore) <= 1,
             `Selecting a word must not shift the header/article: ${engine}/${width}/${lang} ${headerBefore} → ${headerAfter}`,
           );
+          // one Save (John, 2026-10-15 17:20): the bar carries no Save of its own, so the popup's is the one Save
           assert.equal(
-            await page.locator('#reader-take').isVisible(),
-            false,
-            'The popup owns the visible Save while it is open',
-          );
-          const capture = await page.locator('#reader-take').evaluate((node) => {
-            const r = node.getBoundingClientRect();
-            return { width: r.width, height: r.height };
-          });
-          assert(
-            capture.width >= 44 && capture.height >= 44,
-            'The retained capture slot keeps its 44px geometry',
+            await page.evaluate(() => [...document.querySelectorAll('#app > .chrome button')]
+              .filter((n) => n.id === 'reader-take' || /^(保存|Save)/u.test((n.textContent || '').trim())).length),
+            0,
+            'The bar carries no Save of its own while the popup is open',
           );
           const popupCapture = await page.locator('#mini-take').boundingBox();
           assert(
@@ -229,11 +223,17 @@ try {
               'Opening the entry must not re-lay the header',
             );
             await page.keyboard.press('Escape');
-            await page.locator('#reader-take').waitFor({ state: 'visible' });
-            const restoredCapture = await page.locator('#reader-take').boundingBox();
-            assert(
-              restoredCapture && restoredCapture.width >= 44 && restoredCapture.height >= 44,
-              'The visible reader Save regains its 44px touch target after closing the entry',
+            await page.locator('#sheet').waitFor({ state: 'detached' });
+            // closing the full entry clears the reading and its slip (contract §1); the bar gains no Save for it
+            await page.locator('#mini').waitFor({ state: 'detached' });
+            assert.equal(
+              await page.evaluate(() => ({
+                barSaves: [...document.querySelectorAll('#app > .chrome button')]
+                  .filter((n) => n.id === 'reader-take' || /^(保存|Save)/u.test((n.textContent || '').trim())).length,
+                header: document.querySelector('.chrome').getBoundingClientRect().height,
+              })).then((s) => JSON.stringify(s)),
+              JSON.stringify({ barSaves: 0, header: headerAfter }),
+              'After closing the entry the bar still carries no Save and keeps its height',
             );
           }
           await page.locator('#tab-read').click();

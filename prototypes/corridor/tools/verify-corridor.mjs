@@ -326,12 +326,14 @@ function summariesMeetAA(rows) {
 
 async function measureChromeTargets(page) {
   return page.evaluate(() => {
-    const headerSave = document.querySelector('#reader-take');
+    // one Save (John, 2026-10-15 17:20): the bar carries no Save of its own — no #reader-take, no door named Save —
+    // so while the slip is open its Save is the one Save, and it is measured beside the bar's doors
+    const barSaves = [...document.querySelectorAll('.chrome button')].filter((n) => n.id === 'reader-take'
+      || /^(保存|Save)/u.test((n.textContent || '').trim()) || /^(保存|Save)\b/u.test(n.getAttribute('aria-label') || ''));
     const popupSave = document.querySelector('#mini #mini-take');
     const popupOpen = !!document.querySelector('#mini');
-    const relocatedSave = popupOpen && !!popupSave && !!headerSave && getComputedStyle(headerSave).visibility === 'hidden';
     const targets = [...document.querySelectorAll('.chrome button')];
-    if (relocatedSave) targets.push(popupSave);
+    if (popupOpen && popupSave) targets.push(popupSave);
     const rows = targets.filter(n => {
       const r = n.getBoundingClientRect();
       return r.width > 1 && r.height > 1 && getComputedStyle(n).visibility !== 'hidden' && n.checkVisibility();
@@ -347,9 +349,9 @@ async function measureChromeTargets(page) {
       if (Math.min(a.right, b.right) - Math.max(a.x, b.x) > 1 &&
           Math.min(a.bottom, b.bottom) - Math.max(a.y, b.y) > 1) overlaps.push([a.id, b.id]);
     }
-    const saveOwnership = !popupOpen || (!!headerSave && getComputedStyle(headerSave).visibility === 'hidden' && !!popupSave && popupSave.checkVisibility({ visibilityProperty: true })
-      && rows.some(row => row.id === 'mini-take' && row.reachable && row.width >= 44 && row.height >= 44));
-    return { width: innerWidth, rows, overlaps, relocatedSave, saveOwnership, valid: saveOwnership && rows.length >= 7 && !overlaps.length &&
+    const saveOwnership = barSaves.length === 0 && (!popupOpen || (!!popupSave && popupSave.checkVisibility({ visibilityProperty: true })
+      && rows.some(row => row.id === 'mini-take' && row.reachable && row.width >= 44 && row.height >= 44)));
+    return { width: innerWidth, rows, overlaps, barSaves: barSaves.length, popupOpen, saveOwnership, valid: saveOwnership && rows.length >= 7 && !overlaps.length &&
       rows.every(r => r.width >= 44 && r.height >= 44 && r.x >= 0 && r.right <= innerWidth && r.y >= 0 && r.bottom <= innerHeight && r.reachable) };
   });
 }
@@ -1526,8 +1528,8 @@ async function main() {
   check('no console errors during the walk', consoleErrors.length === 0,
     consoleErrors.slice(0, 3).join(' | ') || 'clean');
 
-  // Phone navigation must remain usable before and after selection adds the
-  // capture door. Check actual hit testing as well as document overflow.
+  // Phone navigation must remain usable before and after a word is touched (its slip opens with the one
+  // Save; the bar gains nothing). Check actual hit testing as well as document overflow.
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
   await settleReader(page);
@@ -1535,7 +1537,7 @@ async function main() {
   for (const selected of [false, true]) {
     if (selected) {
       await tap(page, '#reader .tok.content', 1);
-      await page.waitForFunction(() => !document.querySelector('#reader-take').disabled);
+      await page.waitForSelector('#mini #mini-take');
     }
     for (const width of [320, 390]) {
       await page.setViewportSize({ width, height: VIEWPORT.height });
@@ -2746,54 +2748,49 @@ async function main() {
     armed.armedBtn && armed.still === 1 && deleted.lists === 0 && deleted.taken === 1 && deleted.revlog === 1 && deleted.srsKept,
     `armed=${JSON.stringify(armed)} → ${JSON.stringify(deleted)}`);
 
-  // The reader's capture doors save in one tap and keep their source context; lists are a popover away.
+  // One Save (John, 2026-10-15 17:20: the bar's own '+' is gone): the reader's Save lives in the slip, saves in
+  // one tap and keeps its sentence context; lists are a menu away, inside the slip.
   const captureSheetLoads = observeWordSheetLoads(page);
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
   await settleReader(page);
-  const idleSeal = await page.evaluate(`(() => {
-    const b = document.querySelector('#reader-take');
-    return b ? { disabled: b.disabled, pressed: b.getAttribute('aria-pressed') } : null;
-  })()`);
-  check('R2-B · 覚える waits top-right of the reader, quiet until a word is touched',
-    !!idleSeal && idleSeal.disabled === true && idleSeal.pressed === 'false',
-    JSON.stringify(idleSeal));
+  const barSaves = () => page.evaluate(`[...document.querySelectorAll('#app > .chrome button')].filter((n) => n.id === 'reader-take'
+    || /^(保存|Save)/u.test((n.textContent || '').trim()) || /^(保存|Save)\\b/u.test(n.getAttribute('aria-label') || '')).map((n) => n.id || n.textContent.trim())`);
+  const idleBar = await barSaves();
+  check('R2-B · the bar carries no Save of its own before a word is touched', idleBar.length === 0, JSON.stringify(idleBar));
   await tap(page, '#reader .tok.content', 9);
-  await page.waitForTimeout(200);
+  await page.waitForSelector('#mini #mini-take');
   const touched = await page.evaluate(`(() => {
     const t = document.querySelectorAll('#reader .tok.content')[9];
-    const b = document.querySelector('#reader-take');
-    return { word: t.dataset.word, index: Number(t.dataset.index), sealReady: !b.disabled, label: b.getAttribute('aria-label') };
+    const b = document.querySelector('#mini #mini-take');
+    return { word: t.dataset.word, index: Number(t.dataset.index), marked: t.classList.contains('tok-current'),
+      slipWord: document.querySelector('#mini .mini-word')?.textContent ?? '', saveReady: !!b && !b.disabled && b.getAttribute('aria-pressed') === 'false' };
   })()`);
-  check('R2-B · touching a word arms the door with that word, in place',
-    touched.sealReady && touched.label.includes(touched.word),
-    `${touched.word} — "${touched.label}"`);
+  const touchedBar = await barSaves();
+  check('R2-B · touching a word marks it and opens its slip, whose Save is the one Save — the bar still has none',
+    touched.marked && touched.slipWord === touched.word && touched.saveReady && touchedBar.length === 0,
+    `${touched.word} — slip "${touched.slipWord}", bar saves ${JSON.stringify(touchedBar)}`);
   const envBefore = await evaluateAppRecord(page, `(() => {
     const e = record;
     return { taken: (e.taken || []).length, revlog: (e.revlog || []).length };
   })()`);
   // reader lane 2026-10-02 (John #17), round 4 (T5, "click save and then add to list from there"), 1.3.0 Save ▾:
-  // Save — here the chrome's 覚える, the popup's Save ▾ or the menu's Save — is one tap; the popup has no list button,
-  // and Save ▾ unfolds its menu inside the card only once the word is saved; the menu enrolls nothing more.
-  await page.waitForSelector('#mini #mini-take');
+  // Save is one tap; the slip has no list button, and Save ▾ unfolds its menu inside the card only once the word is
+  // saved; the menu enrolls nothing more.
   const listsBeforeSave = await page.evaluate(`!!document.querySelector('#mini #mini-lists, #mini .mini-entry, #vocabulary-list-popover')`);
-  await page.keyboard.press('Escape');
-  await page.waitForSelector('#mini', { state: 'detached' });
-  await tap(page, '#reader-take');
+  await tap(page, '#mini-take');
   await waitForAppRecord(page, record => record.taken.some(row => row.t === 'word' && row.id === touched.word),
-    { description: 'explicit reader save' });
+    { description: 'the slip\'s save' });
   const captured = await evaluateAppRecord(page, `(() => {
     const e = record;
     const it = (e.taken || [])[(e.taken || []).length - 1];
     return { taken: (e.taken || []).length, t: it?.t, id: it?.id, ctx: it?.ctx ?? null };
   })()`);
-  check('R2-B · capture from the reader top-right lands in S.taken with its sentence ctx',
+  check('R2-B · the slip\'s Save lands in S.taken with its sentence ctx',
     captured.taken === envBefore.taken + 1 && captured.t === 'word' && captured.id === touched.word &&
       captured.ctx?.scope === 'sent' && captured.ctx?.i === touched.index && typeof captured.ctx?.p === 'string',
     JSON.stringify(captured.ctx));
-  if (!await page.locator('#mini').count()) await tap(page, '#reader .tok.content', 9);
-  await page.waitForSelector('#mini #mini-take[aria-pressed="true"]');
-  await tap(page, '#mini-take'); // Saved ✓ ▾: the menu
+  await page.waitForSelector('#mini #mini-take[aria-pressed="true"]'); // Saved ✓ ▾: its menu unfolds by itself
   await page.waitForSelector('#mini #vocabulary-list-popover.is-inline');
   const popoverBits = await page.evaluate(`(() => ({
     modal: !!document.querySelector('dialog[open], #vocabulary-list-dialog'),

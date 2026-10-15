@@ -582,7 +582,6 @@ const S = {
    * by design: the store persists what you took, never what you hovered. */
   readerTake: null,
   /** whether the top-right capture panel (scope stages + lists) is open */
-  captureOpen: false,
   /** which shelf cards have their raw signals expanded (詳細) */
   detailsOpen: null,
   sourcesOpen: false,
@@ -4739,11 +4738,6 @@ function back() {
     closeWorldPicker();
     return;
   }
-  if (S.captureOpen) {
-    S.captureOpen = false;
-    render();
-    return;
-  }
   if (S.navOpen) {
     S.navOpen = false;
     render();
@@ -5048,7 +5042,7 @@ function canWalkBack() {
   if (typeof personalHost !== 'undefined' && personalHost) return !!(S.strokes || S.stack.length);
   // the chrome overlays are walkable layers too — the sentinel must stay
   // armed while one is open, or Back would leave the app instead of it
-  if (worldPickerEls || S.captureOpen || S.navOpen) return true;
+  if (worldPickerEls || S.navOpen) return true;
   if (S.strokes || S.stack.length) return true;
   if (S.view === 'drift') return S.driftDepth > 0;
   if (S.view === 'entry') return false;
@@ -8687,7 +8681,6 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
  * outside, puts it away. */
 let miniAnchor = null;
 const SAVE_PRESS_MS = 600;
-let readerTakePressedAt = -Infinity;
 /* The slip (contract §1): one DOM for every word, kanji or particle the learner can touch, in every room.
  * The reader calls it with a token; every other surface comes through openSlip, which adds
  *   look     what the band shows when the surface knows better than the dictionary (the deck's own Japanese
@@ -9260,7 +9253,7 @@ async function sendSentenceToTutor(node, discuss, currentSurface, say) {
     });
     if (!saved || !recordWritable(epoch) || !currentSurface()) return false;
     if (discuss && selectionSerial === teacherContextSelectionSerial) {
-      keepScroll(); stopReadAloud(); S.stack = []; S.captureOpen = false;
+      keepScroll(); stopReadAloud(); S.stack = [];
       S.view = 'ai'; S.aiChatShown = AI_CHAT_PAGE;
       render(); window.scrollTo(0, 0);
     } else say(tx('先生のページに保存した。覚えるかどうかは、あとで選べる。',
@@ -9699,8 +9692,8 @@ function clearReaderReadings({ marked = false } = {}) {
 }
 /** The full entry closing — Close, Back, Escape, the scrim, device Back — returns the word the slip opened
  * it from to the original text: the reading its tap summoned goes with the sheet (John, 2026-10-14: "there
- * is NO WAY to return to the original word without the furigana"). The word stays the chosen one, so the
- * chrome's Save still stands for it until a tap elsewhere in the text. A sheet opened by any other door
+ * is NO WAY to return to the original word without the furigana"). The word stays the chosen one (its mark, the
+ * bookmark line) until a tap elsewhere in the text. A sheet opened by any other door
  * (Ctrl+Enter, the word menu, search) summoned nothing and changes nothing. */
 function clearReaderSummons() {
   if (readerSlipDive) clearReaderReadings();
@@ -12013,7 +12006,6 @@ function todaySky(dayWord, today, readPick) {
 function todayOpenUniverse(from) {
   keepScroll();
   closeWorldPicker();
-  S.captureOpen = false;
   S.stack = [];
   S.navOpen = false;
   S.view = 'drift';
@@ -16586,7 +16578,7 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
         });
         if (!kept || !recordWritable(epoch) || !button.isConnected) return;
         if (discuss && serial === teacherContextSelectionSerial) {
-          keepScroll(); stopReadAloud(); S.stack = []; S.captureOpen = false; S.view = 'ai'; S.aiChatShown = AI_CHAT_PAGE;
+          keepScroll(); stopReadAloud(); S.stack = []; S.view = 'ai'; S.aiChatShown = AI_CHAT_PAGE;
           render(); window.scrollTo(0, 0);
         } else status.textContent = tx('出典と一緒に保存した。復習は増えていない。', 'Saved with its source. No reviews were added.');
       } catch (error) { if (recordReady(epoch) && section.isConnected) status.textContent = teacherSourceError(error); }
@@ -20905,7 +20897,7 @@ async function openBundledSentenceChoice(getContext, button, note, stillCurrent)
     keepScroll(); stopReadAloud();
     S.sentencePracticeView = { ...choice, cloze: true, production: false, listening: false, listeningCue, returnCaller,
       returnView: S.view, returnScroll: window.scrollY };
-    S.stack = []; S.captureOpen = false; S.view = 'sentence-practice'; render(); window.scrollTo(0, 0);
+    S.stack = []; S.view = 'sentence-practice'; render(); window.scrollTo(0, 0);
   } catch (error) { if (recordReady(epoch) && note.isConnected) note.textContent = teacherSourceError(error); }
   finally { button.disabled = !recordWritable(); }
 }
@@ -20931,7 +20923,7 @@ function renderSourceKanjiDoor(sheet, node) {
       const returnCaller = learningSourceCaller(button.id);
       keepScroll(); stopReadAloud();
       S.sentencePracticeView = { ...choice, kind: 'kanji-reading', returnCaller, returnView: S.view, returnScroll: window.scrollY };
-      S.stack = []; S.captureOpen = false; S.view = 'sentence-practice'; render(); window.scrollTo(0, 0);
+      S.stack = []; S.view = 'sentence-practice'; render(); window.scrollTo(0, 0);
       focusSentencePracticeTarget('kanji-reading-confirm');
     } catch (error) { if (recordReady(epoch) && note.isConnected) note.textContent = sentencePracticeError(error); }
     finally { button.disabled = !recordWritable(); }
@@ -21218,7 +21210,7 @@ async function openSentenceResponseQuestion(state, entryId, responseId) {
     });
     if (!kept || !activated || !ownsSurface()) return;
     sentenceTeacherVisit = { epoch, contextRef: initial.context.id, entryId, responseId, state, scroll, note };
-    keepScroll(); stopReadAloud(); S.stack = []; S.captureOpen = false; S.view = 'ai'; S.aiChatShown = AI_CHAT_PAGE;
+    keepScroll(); stopReadAloud(); S.stack = []; S.view = 'ai'; S.aiChatShown = AI_CHAT_PAGE;
     render();
     requestAnimationFrame(() => {
       const input = document.getElementById('chat-input');
@@ -22087,34 +22079,8 @@ function readerTakeNode(cur) {
   return { t: 'word', id: cur.id, from: { passage: cur.p, index: cur.index }, ctxScope: 'sent' };
 }
 
-/** D11 · the reader's current word is one the core dictionary lacks: the
- * capture path would store an empty or first-row answer for it, so the chrome
- * seal never captures it. */
-function readerTakeHeld(cur) {
-  return !!cur && !D.dict?.[cur.id];
-}
-
-/** While the current word is held, the seal says so: aria-disabled rather than
- * disabled, so it stays reachable and opens the reason where the capture panel
- * opens, never a silent grey. A core hit's seal is left exactly as before. */
-function holdReaderTakeSeal(btn, cur) {
-  const held = readerTakeHeld(cur);
-  btn.classList.toggle('reader-capture-held', held);
-  if (held) {
-    btn.setAttribute('aria-disabled', 'true');
-    btn.setAttribute('aria-label', readerCaptureReasonText(cur.id));
-  } else btn.removeAttribute('aria-disabled');
-}
-
-function readerTakeLabel(cur, takenNow) {
-  if (!cur) return tx('語をタップすると、ここで保存できる', 'Tap a word, then save it here');
-  return takenNow
-    ? tx(`「${cur.id}」は保存済み — もう一度押すと外す`, `${cur.id} is saved — press again to remove it`)
-    : tx(`「${cur.id}」を保存`, `Save ${cur.id}`);
-}
-
-/** Remember the word under the learner's finger and repaint the chrome seal
- * in place — token taps deliberately never trigger a full re-render. */
+/** Remember the word under the learner's finger and repaint its mark in place — token taps deliberately
+ * never trigger a full re-render. */
 function setReaderTake(id, index, passageId) {
   S.readerTake = { id, index, p: passageId };
   syncReaderTakeSeal();
@@ -22133,40 +22099,14 @@ function syncTrayCount() {
   tray.setAttribute('aria-label', name);
   tray.title = name;
 }
+/** The touched word wears its mark (the slip's anchor); the bookmark line reads it. The bar carries no Save of
+ * its own (one Save: the slip's and the sheet's — John, 2026-10-15 17:20), so nothing up there repaints. */
 function syncReaderTakeSeal() {
   updateReaderPlaceSave();
   const selected = readerTakeCurrent();
   for (const node of document.querySelectorAll('#reader .tok-current')) node.classList.remove('tok-current');
   if (selected) readerTokenAtIndex(selected.index)?.classList.add('tok-current');
-  const btn = document.getElementById('reader-take');
-  if (!btn) return;
-  const cur = readerTakeCurrent();
-  const takenNow = !!cur && S.taken.some((t) => t.t === 'word' && t.id === cur.id);
-  btn.disabled = !cur;
-  btn.classList.toggle('taken', takenNow);
-  btn.setAttribute('aria-pressed', String(takenNow));
-  btn.setAttribute('aria-expanded', String(!!S.captureOpen));
-  btn.setAttribute('aria-label', readerTakeLabel(cur, takenNow));
-  holdReaderTakeSeal(btn, cur);
 }
-
-/* a tap anywhere outside the capture panel puts it away — the mini's law.
- * The panel node leaves on the spot (no full render, so the tap underneath
- * still lands where it was aimed) and the seal repaints in place. */
-document.addEventListener(
-  'pointerdown',
-  (ev) => {
-    if (!S.captureOpen) return;
-    const panel = document.getElementById('capture-panel');
-    const seal = document.getElementById('reader-take');
-    if (panel && !panel.contains(ev.target) && !(seal && seal.contains(ev.target))) {
-      S.captureOpen = false;
-      panel.remove();
-      syncReaderTakeSeal();
-    }
-  },
-  true,
-);
 
 /** After 覚える: the item lands in this month's bucket automatically (the
  * operator's Renzo habit, automated) and can join any named list too. */
@@ -22176,15 +22116,14 @@ document.addEventListener(
  * the review card resolves the text fresh from the article every time. */
 function recordPickerSurface(node) {
   const view = S.view;
-  const passage = S.passageId;
   const stacked = S.stack.length > 0;
   const type = node.t;
   const id = node.id;
   return () => {
     if (S.view !== view) return false;
     const top = S.stack[S.stack.length - 1];
-    return stacked ? top?.t === type && top.id === id
-      : !top && S.passageId === passage && S.captureOpen && S.readerTake?.id === id;
+    // the picker's only surface is the word's own entry sheet (the bar's capture panel is gone)
+    return stacked ? top?.t === type && top.id === id : false;
   };
 }
 
@@ -32127,7 +32066,6 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
       if (S.view === tab.view) return;
       const navigate = () => {
       closeWorldPicker();
-      S.captureOpen = false;
       S.navOpen = false;
       S.tabRoot = tab.view;
       if (tab.view === 'search') { openSearchPage(); return; }
@@ -33367,51 +33305,8 @@ function render() {
     chrome.append(dojoDoor);
   }
 
-  // 覚える — the one capture button, top-right of every capture-eligible
-  // surface (operator directive §3). The reader's takes the current thing:
-  // the word last touched, carrying the sentence it was met in; its panel
-  // holds the scope stages, the lists, and the way back out of a mis-tap.
-  // Entry sheets carry their own seal in the sheet bar; surfaces with no
-  // capturable current thing carry none.
-  if (S.captureOpen && (S.stack.length || !readerTakeCurrent())) S.captureOpen = false;
-  if (S.view === 'reader' && S.passageId) {
-    const cur = readerTakeCurrent();
-    const curTaken = !!cur && S.taken.some((t) => t.t === 'word' && t.id === cur.id);
-    // r4 (T5: "Save and add to list are confusing???"): one name for one action, the popup's Save
-    const capBtn = biLabel('button', curTaken ? 'chrome-take taken' : 'chrome-take', '保存', 'Save');
-    capBtn.type = 'button';
-    capBtn.id = 'reader-take';
-    capBtn.disabled = !cur;
-    capBtn.setAttribute('aria-pressed', String(curTaken));
-    capBtn.setAttribute('aria-expanded', String(!!S.captureOpen));
-    capBtn.setAttribute('aria-label', readerTakeLabel(cur, curTaken));
-    holdReaderTakeSeal(capBtn, cur);
-    capBtn.addEventListener('click', async () => {
-      if (capBtn.disabled) return;
-      const now = readerTakeCurrent();
-      if (!now) return;
-      // D11: a word the core dictionary lacks is never captured here; the
-      // panel opens with the reason instead of the capture controls
-      if (readerTakeHeld(now)) {
-        S.captureOpen = true;
-        render();
-        return;
-      }
-      // D23: a spelling whose record answers as another entry opens the panel with the reason
-      if (!S.taken.some((t) => t.t === 'word' && t.id === now.id) && wordCaptureState(readerTakeNode(now)) === 'conflict') {
-        S.captureOpen = true;
-        render();
-        return;
-      }
-      S.captureOpen = false;
-      // one press saves, as the popup's Save does; a press while saved takes it back out
-      if (Date.now() - readerTakePressedAt < SAVE_PRESS_MS) return;
-      readerTakePressedAt = Date.now();
-      await toggleWordSave(readerTakeNode(now), now.id);
-    });
-    chrome.append(capBtn);
-  }
-
+  // one Save (John, 2026-10-15 17:20): the bar carries none of its own; the slip's and the sheet's Save are the one
+  // Save, so touching a word never adds a control up here
   // Today: a quiet bookmark and its saved-word count. The on-screen bookmark stays quiet; its
   // name states the room it opens and that the number is saved words, not today's cards.
   const trayBtn = biLabel('button', null, `今日 ${S.taken.length}`, `Today ${S.taken.length}`);
@@ -33462,41 +33357,6 @@ function render() {
   enableTouchPress();
   buildPrimaryTabs(root);
   syncThemeColor();
-
-  // the capture panel — anchored under the chrome's top-right seal. It
-  // reuses the sheet's own instruments verbatim: the reversible 覚える
-  // button, the scope stages (語だけ・この文・段落), and the list picker
-  // with its inline maker — so the door and the deep flow never disagree.
-  if (S.captureOpen) {
-    const cur = readerTakeCurrent();
-    const capNode = readerTakeNode(cur);
-    const panel = el('div', 'capture-panel');
-    panel.id = 'capture-panel';
-    panel.setAttribute('role', 'group');
-    panel.setAttribute('aria-label', tx(`「${cur.id}」を保存`, `Save ${cur.id}`));
-    panel.setAttribute('data-drift-chrome', '');
-    const head = el('div', 'capture-head');
-    head.append(el('span', 'capture-word', cur.id));
-    head.append(el('span', 'pool-tag', tx(NODE_KIND.word[0], NODE_KIND.word[1])));
-    panel.append(head);
-    if (readerTakeHeld(cur)) {
-      // D11: a held word shows why, and offers nothing that could capture it
-      panel.setAttribute('aria-label', tx(`「${cur.id}」はここで覚えられない`, `${cur.id} cannot be memorized here`));
-      const reason = el('p', 'reader-choice-capture', readerCaptureReasonText(cur.id));
-      reason.id = 'reader-take-reason';
-      panel.append(reason);
-    } else {
-      panel.append(takeButton(capNode, cur.id));
-      renderWordCaptureNote(panel, capNode, cur.id);
-      renderContextPicker(panel, capNode);
-      renderListPicker(panel, capNode, cur.id);
-    }
-    root.append(panel);
-    requestAnimationFrame(() => {
-      const bar = document.querySelector('.chrome');
-      if (bar && panel.isConnected) panel.style.top = `${Math.ceil(bar.getBoundingClientRect().bottom + 8)}px`;
-    });
-  }
 
   const main = el('main');
   root.append(main);

@@ -2652,48 +2652,12 @@ body.v-depth-layered .inline-link {
   margin-left: 8px;
 }
 
-/* 覚える — the one capture button in the chrome's top-right (directive §3);
- * taken-state wears the same seal red as everywhere else */
-.chrome button.chrome-take.taken {
-  color: var(--red);
-  border-color: var(--red);
-}
-
 @media (max-width: 540px) {
   body[data-view='reader'] .chrome { gap: 4px; padding-inline: 8px; }
   body[data-view='reader'] .chrome .crumb { display: none; }
   body[data-view='reader'] .chrome > button { flex-shrink: 0; padding-inline: 8px; white-space: nowrap; }
 }
 
-/* the capture panel the chrome seal opens: the sheet's own instruments
- * (reversible 覚える, scope stages, list picker) anchored under the corner */
-.capture-panel {
-  position: fixed;
-  z-index: 60;
-  top: calc(56px + env(safe-area-inset-top));
-  right: 8px;
-  width: min(340px, calc(100vw - 16px));
-  max-height: min(70vh, 560px);
-  overflow-y: auto;
-  background: var(--ground-0, var(--ground));
-  border: 1px solid var(--line);
-  border-radius: var(--radius-overlay);
-  box-shadow: 0 8px 30px rgba(20, 24, 28, 0.22);
-  padding: 12px 14px;
-  animation: rise 0.16s ease;
-}
-
-.capture-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 8px;
-}
-
-.capture-word {
-  font-family: var(--serif);
-  font-size: 20px;
-}
 .sheet-close {
   margin-left: auto;
 }

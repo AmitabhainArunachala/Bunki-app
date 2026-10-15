@@ -145,11 +145,11 @@ const EDITS = Object.freeze({
   miniUnheld: Object.freeze({ file: 'corridor.js', from: "  const held = (reader && !D.dict[token.b]) || !g?.m?.some(meaning => typeof meaning === 'string' && meaning.trim());\n", to: '  const held = false;\n' }),
 });
 const RUN_ROWS = Object.freeze({
-  core: Object.freeze(['G1.popup', 'G1.seal', 'G1.mini', 'G1.entry']),
+  core: Object.freeze(['G1.popup', 'G1.bar', 'G1.mini', 'G1.entry']),
   match: Object.freeze(['M.iu.chooser', 'M.iu.choose', 'M.iu.back', 'M.itt.chooser', 'M.itt.choose', 'M.dare.chooser', 'M.dare.tare',
     'M.dare.back', 'M.dare.key', 'M.yuke.single', 'M.hi.cap', 'M.wakat.single', 'M.san.offered', 'M.iu.yuu']),
-  capture: Object.freeze(['mini', 'seal', 'sheet', 'foot'].flatMap((door) => [`G7.${door}.door`, `G7.${door}.captured`])),
-  held: Object.freeze(['G5.mini-held', 'G5.mini-click', 'G5.seal-held', 'G5.seal-panel', 'G5.iu-chooser-held', 'G5.iu-entry-held',
+  capture: Object.freeze(['G7.bar.none', ...['mini', 'sheet', 'foot'].flatMap((door) => [`G7.${door}.door`, `G7.${door}.captured`])]),
+  held: Object.freeze(['G5.mini-held', 'G5.mini-click', 'G5.bar-none', 'G5.iu-chooser-held', 'G5.iu-entry-held',
     'G5.after-iu', 'G5.dare-held', 'G5.after-dare']),
 });
 const seen = (rows, id) => rows.get(id)?.observed ?? {};
@@ -190,13 +190,13 @@ const CONTROLS = Object.freeze([
     allowed: [],
     witness: (rows) => (seen(rows, 'G1.entry').firstGloss === 'to do up (hair)' ? '' : 'the core sheet did not show 結う\'s first sense') }),
   Object.freeze({ name: 'c7', title: 'toggleTaken() inert while every door still looks enabled', edits: ['captureInert'], run: 'capture',
-    requires: ['G7.mini.door', 'G7.seal.door', 'G7.sheet.door', 'G7.foot.door'],
-    kills: ['G7.mini.captured', 'G7.seal.captured', 'G7.sheet.captured', 'G7.foot.captured'],
+    requires: ['G7.bar.none', 'G7.mini.door', 'G7.sheet.door', 'G7.foot.door'],
+    kills: ['G7.mini.captured', 'G7.sheet.captured', 'G7.foot.captured'],
     allowed: [],
-    witness: (rows) => (['mini', 'seal', 'sheet', 'foot'].every((door) => seen(rows, `G7.${door}.captured`).added?.length === 0)
+    witness: (rows) => (['mini', 'sheet', 'foot'].every((door) => seen(rows, `G7.${door}.captured`).added?.length === 0)
       ? '' : 'a door captured something') }),
   Object.freeze({ name: 'c8', title: "the mini's hold removed for a core miss", edits: ['miniUnheld'], run: 'held',
-    requires: ['G5.seal-held', 'G5.iu-chooser-held'],
+    requires: ['G5.bar-none', 'G5.iu-chooser-held'],
     kills: ['G5.mini-held', 'G5.after-iu'],
     allowed: ['G5.mini-click', 'G5.after-dare'],
     witness: (rows) => (seen(rows, 'G5.after-iu').changed?.includes('taken') ? '' : 'いう was not captured') }),
@@ -284,18 +284,6 @@ async function press(page, selector, options) {
   await page.mouse.click(x, y);
   await delay(150);
 }
-const dismissMiniForSeal = async (page) => {
-  // Escape steps out one layer at a time: an open Save ▾ menu first, then the popup (1.3.0)
-  for (let step = 0; step < 2 && await page.locator('#vocabulary-list-popover').count(); step++) await page.keyboard.press('Escape');
-  if (await page.locator('#mini').count()) {
-    await page.keyboard.press('Escape');
-    await page.waitForSelector('#mini', { state: 'detached' });
-  }
-};
-const pressSeal = async (page) => {
-  await dismissMiniForSeal(page);
-  return press(page, '#reader-take', { scroll: false });
-};
 async function closeIfOpen(page) {
   if (!(await page.locator('#sheet').count())) return;
   await press(page, await entryCloseSelector(page));
@@ -328,24 +316,21 @@ const miniState = (page) => page.evaluate(() => {
     gloss: mini.querySelector('.mini-gloss')?.outerHTML ?? null, text: mini.textContent };
 });
 
-/** The reader's capture doors: the chrome seal, its panel, and the mini's 覚 when open. */
+/** The reader's capture doors: the mini's 覚 when open — and the bar, which carries no Save of its own (one Save,
+ * John 2026-10-15 17:20): no #reader-take, no capture panel, no chrome door named Save. */
 const captureState = (page) => page.evaluate(() => {
   const visible = (node) => {
     if (!node) return false;
     const box = node.getBoundingClientRect();
     return box.width > 0 && box.height > 0 && getComputedStyle(node).visibility !== 'hidden';
   };
-  const seal = document.getElementById('reader-take');
-  const panel = document.getElementById('capture-panel');
   const mini = document.getElementById('mini');
   const miniTake = mini?.querySelector('#mini-take');
   const miniReason = mini?.querySelector('#mini-take-reason');
   return {
-    seal: seal && { disabled: seal.disabled, ariaDisabled: seal.getAttribute('aria-disabled'), held: seal.classList.contains('reader-capture-held'),
-      pressed: seal.getAttribute('aria-pressed'), label: seal.getAttribute('aria-label') },
-    panel: panel && { reason: panel.querySelector('#reader-take-reason')?.textContent ?? null,
-      reasonVisible: visible(panel.querySelector('#reader-take-reason')),
-      captureControls: panel.querySelectorAll('#take, .take, .context-picker, .list-picker').length },
+    bar: { saves: [...document.querySelectorAll('#app > .chrome button')].filter((n) => n.id === 'reader-take'
+        || /^(保存|Save)/u.test((n.textContent || '').trim()) || /^(保存|Save)\b/u.test(n.getAttribute('aria-label') || '')).map((n) => n.id || n.textContent.trim()),
+      panel: !!document.getElementById('capture-panel') },
     mini: mini && { takeDisabled: miniTake ? miniTake.disabled : null, takePressed: miniTake?.getAttribute('aria-pressed') ?? null,
       held: !!miniTake?.classList.contains('reader-capture-held'), describedBy: miniTake?.getAttribute('aria-describedby') ?? null,
       reason: miniReason?.textContent ?? null, reasonVisible: visible(miniReason) },
@@ -500,9 +485,9 @@ async function coreRun(open, rec) {
       token?.surface === CORE.token.s && token.visibleRuby === CORE_ENTRY.ruby && token.lines === 0 && !token.hasEn
         && token.label === `${CORE.token.s} · ${WORD.bi} · ${CORE_ENTRY.reading} · ${HINT.bi}`,
       JSON.stringify(token), { token });
-    const seal = (await captureState(page)).seal;
-    once('G1.seal', `G1 with ${CORE.token.s} selected, the chrome seal is enabled and not held`,
-      !!seal && seal.disabled === false && seal.ariaDisabled === null && !seal.held, JSON.stringify(seal), { seal });
+    const bar = (await captureState(page)).bar;
+    once('G1.bar', `G1 with ${CORE.token.s} selected, the bar carries no Save of its own and no panel: the slip's Save is the one Save`,
+      bar.saves.length === 0 && !bar.panel, JSON.stringify(bar), { bar });
     await openPopup(page, CORE);
     const mini = await miniState(page), take = (await captureState(page)).mini;
     once('G1.mini', `G1 its mini: word ${CORE.token.s}, reading ${CORE_ENTRY.reading}, gloss exactly "${CORE_ENTRY.gloss}"; its 覚 enabled and not held`,
@@ -650,19 +635,28 @@ async function matchRun(open, rec) {
 
 /** G7: a real capture of the core hit through each of its four separately wired doors, each in its own context. */
 async function captureRun(open, rec) {
+  // one Save (John, 2026-10-15 17:20): the bar has no door of its own; with the word touched the bar still carries none
+  await block(rec, ['G7.bar.none'], async (once) => {
+    const page = await (await open()).newPage();
+    await openArticle(page, CORE.passage);
+    await tap(page, CORE);
+    await page.waitForSelector('#mini #mini-take');
+    const bar = (await captureState(page)).bar;
+    once('G7.bar.none', `G7 with ${CORE.token.s} touched, the bar carries no Save and no panel: three doors remain (the mini's, the sheet bar's, the foot's)`,
+      bar.saves.length === 0 && !bar.panel, JSON.stringify(bar), { bar });
+  });
   const doors = [
     { door: 'mini', name: "the mini's 覚", selector: '#mini-take', prepare: (page) => openPopup(page, CORE) },
-    { door: 'seal', name: 'the chrome seal 覚える', selector: '#reader-take', seal: true, prepare: async (page) => { await tap(page, CORE); await dismissMiniForSeal(page); } },
     { door: 'sheet', name: "the entry sheet bar's 覚", selector: '#sheet-take', prepare: async (page) => { await fullEntry(page, CORE); await settleSheet(page); } },
     { door: 'foot', name: "the entry foot's 覚える", selector: '#take', prepare: async (page) => { await fullEntry(page, CORE); await settleSheet(page); } },
   ];
-  for (const { door, name, selector, seal = false, prepare } of doors) {
+  for (const { door, name, selector, prepare } of doors) {
     await block(rec, [`G7.${door}.door`, `G7.${door}.captured`], async (once) => {
       const page = await (await open()).newPage();
       await openArticle(page, CORE.passage);
       const before = await installedRecord(page);
       await prepare(page);
-      const state = await doorState(page, selector, { scroll: !seal });
+      const state = await doorState(page, selector, { scroll: true });
       const usable = state.count === 1 && state.own && state.disabled === false && state.ariaDisabled !== 'true' && !state.held;
       once(`G7.${door}.door`, `G7 ${name} on ${at(CORE)}: present once, enabled, not held, unpressed, its centre itself`,
         usable && state.pressed === 'false', JSON.stringify(state), state);
@@ -670,7 +664,7 @@ async function captureRun(open, rec) {
         once(`G7.${door}.captured`, `G7 ${name}: needs a usable door`, false, 'no usable door to press', {});
         return;
       }
-      await (seal ? pressSeal(page) : press(page, selector));
+      await press(page, selector);
       const { record: after, met } = await recordUntil(page, (current) => current.taken.length > before.taken.length, 8_000);
       const added = after.taken.filter((row) => !before.taken.some((old) => old.t === row.t && old.id === row.id));
       const changed = LEARNING_ROOTS.filter((root) => root !== 'taken' && !isDeepStrictEqual(before[root] ?? null, after[root] ?? null));
@@ -698,16 +692,10 @@ async function heldRun(open, rec) {
     const miniAfter = (await captureState(page)).mini;
     once('G5.mini-click', 'G5 a real click on that 覚 leaves it held and unpressed', miniAfter?.takeDisabled === true && miniAfter.held
       && miniAfter.takePressed === 'false', JSON.stringify(miniAfter), { mini: miniAfter });
-    const seal = (await captureState(page)).seal;
-    once('G5.seal-held', `G5 with ${IU.token.s} selected, the chrome seal is held (aria-disabled) and its name is the reason`,
-      seal?.ariaDisabled === 'true' && seal.held && seal.label === CAPTURE_REASON(IU.token.b), JSON.stringify(seal), { seal });
-    await pressSeal(page);
-    const opened = await captureState(page);
-    once('G5.seal-panel', 'G5 a real click on the held seal opens only the reason, with no capture control in the panel',
-      !!opened.panel?.reasonVisible && opened.panel.reason === CAPTURE_REASON(IU.token.b) && opened.panel.captureControls === 0,
-      JSON.stringify(opened.panel), { panel: opened.panel });
+    const bar = (await captureState(page)).bar;
+    once('G5.bar-none', `G5 with ${IU.token.s} selected, the bar carries no Save and no panel: the held 覚 and its reason live in the mini alone`,
+      bar.saves.length === 0 && !bar.panel, JSON.stringify(bar), { bar });
     await fullEntry(page, IU);
-    await page.waitForFunction(() => !document.getElementById('capture-panel'), null, { timeout: 5_000 });
     await settleSheet(page);
     await press(page, '#sheet-take');
     const chooser = await sheetState(page);
