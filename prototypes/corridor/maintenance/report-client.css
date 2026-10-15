@@ -10,8 +10,7 @@
 #bunki-reports-root *, #bunki-reports-root *::before, #bunki-reports-root *::after { box-sizing: border-box; }
 #bunki-reports-root ::selection { background: var(--br-ink); color: var(--br-paper); }
 #bunki-reports-root button, #bunki-reports-root input, #bunki-reports-root select, #bunki-reports-root textarea { font: inherit; color: inherit; }
-#bunki-reports-root button { cursor: pointer; min-height: 44px; border: 1px solid var(--br-line); border-radius: 4px; padding: 8px 12px; background: transparent; text-align: center; }
-#bunki-reports-root button:hover { background: color-mix(in srgb, var(--br-ink) 8%, transparent); }
+#bunki-reports-root button { min-height: 44px; padding: 8px 12px; text-align: center; }
 #bunki-reports-root button:disabled { cursor: wait; opacity: .58; }
 #bunki-reports-root :focus-visible { outline: 2px solid var(--br-ink); outline-offset: 3px; }
 #bunki-reports-root .br-rail { position: fixed; z-index: 2147483000; inset: auto 14px calc(14px + env(safe-area-inset-bottom, 0px)) auto; margin: 0; padding: 0; display: flex; width: 44px; height: 44px; max-width: calc(100vw - 24px); overflow: visible; border: 0; background: transparent; color: var(--br-ink); }
@@ -49,16 +48,14 @@
 #bunki-reports-root .br-field { display: block; margin: 20px 0; }
 #bunki-reports-root .br-field > span { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
 #bunki-reports-root .br-field small { font-weight: 400; color: var(--br-muted); }
-#bunki-reports-root textarea, #bunki-reports-root select { width: 100%; border: 1px solid var(--br-line); border-radius: 3px; padding: 10px 12px; background: color-mix(in srgb, var(--br-paper) 94%, var(--br-ink)); caret-color: var(--br-ink); }
+#bunki-reports-root textarea, #bunki-reports-root select { width: 100%; border: 1px solid var(--br-line); border-radius: var(--radius-seal); padding: 10px 12px; background: color-mix(in srgb, var(--br-paper) 94%, var(--br-ink)); caret-color: var(--br-ink); }
 #bunki-reports-root textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
 #bunki-reports-root textarea::placeholder { color: var(--br-muted); opacity: 1; }
 #bunki-reports-root select { min-height: 44px; }
 #bunki-reports-root input[type="file"] { display: block; max-width: 100%; font-size: 13px; margin: 10px 0; }
-#bunki-reports-root input[type="file"]::file-selector-button { min-height: 44px; border: 1px solid var(--br-line); padding: 8px 12px; margin-right: 10px; background: transparent; color: var(--br-ink); border-radius: 3px; }
+#bunki-reports-root input[type="file"]::file-selector-button { min-height: 44px; border: 1px solid var(--br-line); padding: 8px 12px; margin-right: 10px; background: transparent; color: var(--br-ink); border-radius: var(--radius-seal); }
 #bunki-reports-root .br-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 20px 0 8px; }
-#bunki-reports-root .br-primary { background: var(--br-ink); color: var(--br-paper); border-color: var(--br-ink); }
-#bunki-reports-root .br-primary:hover { background: color-mix(in srgb, var(--br-ink) 85%, var(--br-paper)); }
-#bunki-reports-root a.br-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border: 1px solid var(--br-ink); border-radius: 4px; padding: 8px 12px; text-decoration: none; font: inherit; }
+#bunki-reports-root a.br-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border: 1px solid var(--br-ink); border-radius: var(--radius-card); padding: 8px 12px; text-decoration: none; font: inherit; }
 #bunki-reports-root details { margin: 18px 0; border-block: 1px solid var(--br-line); }
 #bunki-reports-root summary { cursor: pointer; min-height: 44px; padding: 10px 0; font-size: 13px; }
 #bunki-reports-root pre { white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.7 'Roboto Mono', 'Noto Sans JP', ui-monospace, SFMono-Regular, monospace; max-height: 320px; overflow-y: auto; margin: 0 0 12px; }

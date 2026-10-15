@@ -48,6 +48,7 @@
     font-size:.4em;font-style:italic;font-family:"Noto Serif","Noto Serif JP",Georgia,serif;color:var(--faint);
     opacity:0;transition:opacity .5s;padding-top:.16em;pointer-events:none}
 #drift-layer .word.unfolded .yomi{opacity:1}
+#drift-layer .word.unfolded .base{box-shadow:inset 0 calc(0px - var(--stroke-hairline, 0.5px)) 0 var(--color-reading)}
 #drift-layer .word.glossed .yomi,
 #drift-layer .word.glossed .gloss{opacity:1}
 #drift-layer .word.fragile .base{text-shadow:0 0 1px currentColor,0 0 10px var(--halo)}
@@ -65,7 +66,7 @@
 #drift-layer .glyph .g{display:block;font-size:36px;line-height:1.1;text-shadow:0 0 1px currentColor}
 #drift-layer .glyph.center small{font-size:8px}
 #drift-layer .glyph.comp .g{font-size:24px;color:var(--pig2);border:1px solid var(--line);
-    border-radius:6px;padding:2px 7px;background:var(--plaque)}
+    border-radius:var(--radius-control);padding:2px 7px;background:var(--plaque)}
 #drift-layer .glyph small,
 #drift-layer .part small{display:block;font-size:11px;font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;
     color:var(--faint);letter-spacing:.03em;opacity:0;transition:opacity .5s}
@@ -79,7 +80,7 @@
 #drift-layer #brand{position:fixed;top:calc(12px + env(safe-area-inset-top));left:16px;z-index:8;
     font-size:13px;letter-spacing:.3em;color:var(--faint)}
 #drift-layer #seal{display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;
-    background:#B13A2F;color:#FFF8EE;border-radius:3px;font-size:11px;margin-right:8px;
+    background:#B13A2F;color:#FFF8EE;border-radius:var(--radius-seal);font-size:11px;margin-right:8px;
     vertical-align:-3px;letter-spacing:0}
 #drift-layer #depth{position:fixed;top:calc(13px + env(safe-area-inset-top));left:50%;
     transform:translateX(-50%);z-index:8;font-size:12px;letter-spacing:.14em;
@@ -87,7 +88,7 @@
     white-space:nowrap;pointer-events:none}
 #drift-layer #theme{position:fixed;top:calc(8px + env(safe-area-inset-top));right:14px;z-index:8;
     font-size:12px;letter-spacing:.12em;color:var(--ink);background:var(--plaque);
-    border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-family:inherit;cursor:pointer}
+    border:1px solid var(--line);border-radius:var(--radius-control);padding:6px 14px;font-family:inherit;cursor:pointer}
 #drift-layer #theme:focus-visible{outline:2px solid var(--pig1);outline-offset:2px}
 #drift-layer #drift-tray{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:16px;z-index:8;
     font-size:12px;color:var(--faint);letter-spacing:.1em}
@@ -95,13 +96,13 @@
 #drift-layer #hint{position:fixed;bottom:calc(40px + env(safe-area-inset-bottom));left:50%;
     transform:translateX(-50%);z-index:8;max-width:82vw;
     text-align:center;font-size:12px;letter-spacing:.14em;color:var(--ink);
-    background:var(--plaque);border:1px solid var(--line);border-radius:999px;
+    background:var(--plaque);border:1px solid var(--line);border-radius:var(--radius-control);
     padding:7px 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
     opacity:1;transition:opacity 1.2s;pointer-events:none}
 #drift-layer #hint:empty{display:none}
 #drift-layer #card{position:fixed;left:12px;right:12px;bottom:12px;z-index:9;background:var(--plaque);
-    border:1px solid var(--line);border-radius:14px;
+    border:1px solid var(--line);border-radius:var(--radius-overlay);
     padding:20px 20px calc(16px + env(safe-area-inset-bottom));
     transform:translateY(calc(100% + 70px));transition:transform .5s var(--ease-standard);
     backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
@@ -111,7 +112,7 @@
 #drift-layer #card h1{font-size:42px;font-weight:500;margin:2px 0 4px}
 #drift-layer #card .gloss{font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;color:var(--faint);font-size:15px}
 #drift-layer #card .row{display:flex;gap:10px;margin-top:14px}
-#drift-layer #card .row div{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
+#drift-layer #card .row div{flex:1;border:1px solid var(--line);border-radius:var(--radius-card);padding:10px;text-align:center}
 #drift-layer #card .row .k{font-size:24px}
 #drift-layer #card .row .kg{font-size:11px;color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic}
 #drift-layer #card .note{margin-top:13px;font-size:11px;color:var(--faint);text-align:center;
@@ -119,10 +120,10 @@
 #drift-layer #card .kx{display:flex;align-items:center;gap:14px}
 #drift-layer #card .kx h1{margin:0}
 #drift-layer #card .bt{margin-left:auto;font-size:12px;letter-spacing:.1em;color:var(--pig2);
-    background:none;border:1px solid var(--line);border-radius:999px;
+    background:none;border:1px solid var(--line);border-radius:var(--radius-control);
     padding:6px 12px;font-family:inherit;cursor:pointer}
 #drift-layer .scell{margin:12px auto 0;width:150px;height:150px;background:var(--plaque);
-    border:1px solid var(--line);border-radius:8px;color:var(--ink)}
+    border:1px solid var(--line);border-radius:var(--radius-control);color:var(--ink)}
 #drift-layer .scell svg{display:block;width:100%;height:100%}
 #drift-layer #card .rhead{margin-top:12px;font-size:11px;letter-spacing:.14em;color:var(--faint)}
 #drift-layer #card .rlist{max-height:34vh;overflow-y:auto;margin-top:6px;border-top:1px solid var(--line);
@@ -139,7 +140,7 @@
     z-index:8;opacity:.4;transition:opacity .4s;touch-action:none}
 #drift-layer #lvl.hot{opacity:1;width:56px}
 #drift-layer #lvlTrack{position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--faint);
-    border-radius:2px;transition:none}
+    border-radius:var(--radius-seal);transition:none}
 #drift-layer #lvl.hot #lvlTrack{width:3.5px;background:var(--pig1);box-shadow:0 0 10px var(--halo)}
 #drift-layer #lvlHandle{position:absolute;left:10px;width:12px;height:12px;border-radius:50%;
     background:var(--pig1);border:1.5px solid var(--plaque);margin-top:-6px;top:57%;
@@ -153,7 +154,7 @@
 #drift-layer .lvlab{position:absolute;transform:translateY(-50%);white-space:nowrap}
 #drift-layer #lvlInfo{position:absolute;left:42px;top:50%;transform:translateY(-50%);font-size:11px;
     color:var(--pig2);letter-spacing:.08em;white-space:nowrap;opacity:0;transition:opacity .3s;
-    background:var(--plaque);border:1px solid var(--line);border-radius:8px;padding:5px 10px;
+    background:var(--plaque);border:1px solid var(--line);border-radius:var(--radius-control);padding:5px 10px;
     pointer-events:none}
 #drift-layer #lvl.hot #lvlInfo{opacity:1}
 #drift-layer #card .rrow .rm{font-size:12px;color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;
@@ -162,9 +163,9 @@
     min-height:46px;padding:14px 16px;text-align:center;font-family:inherit;
     font-size:13px;letter-spacing:.14em;text-decoration:none;cursor:pointer;
     color:var(--ink);background:none;border:1px solid var(--pig2);
-    border-radius:999px}
+    border-radius:var(--radius-control)}
 #drift-layer #card .rhead .radq{margin-left:10px;font-size:10px;letter-spacing:.1em;color:var(--pig2);
-    background:none;border:1px solid var(--line);border-radius:999px;padding:3px 9px;
+    background:none;border:1px solid var(--line);border-radius:var(--radius-control);padding:3px 9px;
     font-family:inherit;cursor:pointer;vertical-align:1px}
 #drift-layer #radoc{position:fixed;inset:0;z-index:11;background:var(--plaque);
     backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
@@ -182,7 +183,7 @@
 #drift-layer #radoc .rex .rt b{color:var(--ink);font-weight:500;font-style:normal}
 #drift-layer #radoc .x{position:fixed;top:calc(16px + env(safe-area-inset-top));right:18px;
     font-size:13px;letter-spacing:.1em;color:var(--pig2);background:var(--plaque);
-    border:1px solid var(--line);border-radius:999px;padding:8px 15px;cursor:pointer;font-family:inherit}
+    border:1px solid var(--line);border-radius:var(--radius-control);padding:8px 15px;cursor:pointer;font-family:inherit}
 
 /* Overlap corrections for the fused chrome: the corridor's top bar (~58px)
  * and the bottom variant strip cover drift's own fixed chrome, so its brand,
@@ -218,7 +219,7 @@
 #drift-layer #lvl:focus-visible {
   outline: 2px solid var(--pig1);
   outline-offset: 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-card);
 }
 #drift-layer #lvl:focus-visible #lvlLabels,
 #drift-layer #lvl:focus-visible #lvlInfo { opacity: 1; }

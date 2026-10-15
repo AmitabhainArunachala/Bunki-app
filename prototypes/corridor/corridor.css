@@ -121,25 +121,6 @@ body::before {
   border-bottom: 1px solid var(--line-soft);
 }
 
-.chrome button {
-  font: inherit;
-  font-size: var(--t-chrome);
-  color: var(--ink-2);
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  min-height: var(--tap);
-  min-width: var(--tap);
-  padding: 0 12px;
-  cursor: pointer;
-  font-family: var(--serif);
-  letter-spacing: 0.08em;
-}
-
-.chrome button:disabled {
-  opacity: 0.35;
-}
-
 /* 稽古の間 — the study hall at the top of the dojo (operator, 2026-09-18) */
 .study-hall {
   display: grid;
@@ -154,14 +135,8 @@ body::before {
   min-height: var(--tap);
   padding: 14px;
   text-align: left;
-  background: var(--ground-0, #fff);
-  border: 1px solid var(--line, #cfc7b5);
-  border-radius: 12px;
-  color: var(--ink);
   font: inherit;
-  cursor: pointer;
 }
-.study-door:hover { border-color: var(--ink-2); }
 .study-door-t { font-family: var(--serif); font-size: 18px; }
 .study-door-sub { font-size: var(--t-chrome); color: var(--ink-2); }
 .study-hall-note { margin: 4px 0 18px; }
@@ -415,7 +390,7 @@ h1.view-title {
   height: 6px;
   background: var(--ground-2);
   border: 1px solid var(--line-soft);
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   overflow: hidden;
 }
 
@@ -571,7 +546,7 @@ body.ginga #drift-layer #hint.first-cue {
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
   border: 0.5px solid rgb(0 0 0 / 12%);
-  border-radius: 18px;
+  border-radius: var(--radius-overlay);
   box-shadow: 0 2px 6px rgb(0 0 0 / 6%), 0 18px 44px rgb(20 26 34 / 16%);
   font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
   transform-origin: top center;
@@ -600,7 +575,7 @@ body.ginga #drift-layer #hint.first-cue {
   color: var(--ai, #2e4d6e);
   background: transparent;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   cursor: pointer;
   transition: none;
 }
@@ -638,7 +613,7 @@ body.ginga #drift-layer #hint.first-cue {
   color: var(--ink, #23303f);
   background: rgb(120 120 128 / 12%);
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   outline: none;
   -webkit-appearance: none;
   appearance: none;
@@ -672,7 +647,7 @@ body.ginga #drift-layer #hint.first-cue {
   color: var(--ai, #2e4d6e);
   background: color-mix(in srgb, var(--ai, #2e4d6e) 12%, transparent);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   cursor: pointer;
   white-space: nowrap;
   transition: transform 0.14s ease;
@@ -705,7 +680,7 @@ body.ginga #drift-layer #hint.first-cue {
   text-align: center;
   color: #fff;
   background: var(--red, #b03a2e);
-  border-radius: 999px;
+  border-radius: var(--radius-seal);
   font-variant-numeric: tabular-nums;
 }
 @media (max-width: 600px) {
@@ -826,7 +801,7 @@ html[data-layout='places'] .nav-station-go {
   padding: 6px 0;
   background: transparent;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   cursor: pointer;
   font: inherit;
 }
@@ -835,7 +810,7 @@ html[data-layout='places'] .nav-station-go {
   position: absolute;
   inset: 6px 0;
   background: rgb(120 120 128 / 12%);
-  border-radius: 9px;
+  border-radius: var(--radius-control);
 }
 .lang-opt {
   position: relative;
@@ -856,7 +831,7 @@ html[data-layout='places'] .nav-station-go {
   left: 2px;
   width: 40px;
   background: #fff;
-  border-radius: 7px;
+  border-radius: var(--radius-control);
   box-shadow: 0 1px 3px rgb(0 0 0 / 14%), 0 0 0 0.5px rgb(0 0 0 / 5%);
   transition:
     transform var(--motion-room) var(--ease-standard);
@@ -880,7 +855,7 @@ html[data-layout='places'] .nav-station-go {
   color: var(--ink, #23303f);
   background: var(--ground, #fbf8f0);
   border: 1px solid var(--line, #cfc7b5);
-  border-radius: 10px;
+  border-radius: var(--radius-control);
 }
 .nav-search-input:focus {
   outline: 2px solid var(--ai, #2e4d6e);
@@ -893,7 +868,7 @@ html[data-layout='places'] .nav-station-go {
 .search-page .nav-search-input {
   font-size: 18px;
   padding: 13px 16px;
-  border-radius: 14px;
+  border-radius: var(--radius-control);
   background: var(--ground-0, #fff);
 }
 .search-page-hint {
@@ -905,7 +880,7 @@ html[data-layout='places'] .nav-station-go {
   margin-top: 14px;
   background: var(--ground-0, #fff);
   border: 1px solid var(--line, #cfc7b5);
-  border-radius: 14px;
+  border-radius: var(--radius-control);
   overflow: hidden;
 }
 .search-page-results:empty {
@@ -991,7 +966,7 @@ html[data-layout='places'] .nav-station-go {
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   backdrop-filter: saturate(180%) blur(20px);
   border: 0.5px solid rgb(0 0 0 / 12%);
-  border-radius: 999px;
+  border-radius: var(--radius-card);
   box-shadow: 0 2px 6px rgb(0 0 0 / 6%), 0 12px 32px rgb(20 26 34 / 14%);
   cursor: pointer;
   animation: bubble-rise var(--motion-room) var(--ease-standard);
@@ -1042,16 +1017,6 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
   align-items: center;
   gap: 1px;
   padding: 14px 6px;
-  background: var(--ground-0, #fff);
-  border: 1px solid var(--line, #cfc7b5);
-  border-radius: 12px;
-  cursor: pointer;
-  color: var(--ink);
-}
-.focus-chip.on {
-  border-color: var(--ai, #2e4d6e);
-  background: color-mix(in srgb, var(--ai, #2e4d6e) 10%, var(--ground-0, #fff));
-  box-shadow: inset 0 0 0 1px var(--ai, #2e4d6e);
 }
 .focus-chip-n {
   font-family: var(--serif);
@@ -1076,7 +1041,7 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
   text-align: left;
   background: var(--ground-0, #fff);
   border: 1px solid var(--line, #cfc7b5);
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   cursor: pointer;
   color: var(--ink);
 }
@@ -1110,7 +1075,7 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
   padding: 8px 10px 8px 16px;
   background: #2e4d6e;
   color: #fcfbf6;
-  border-radius: 999px;
+  border-radius: var(--radius-overlay);
   box-shadow: 0 6px 20px rgba(27, 42, 58, 0.32);
 }
 .focus-hud.done {
@@ -1141,7 +1106,7 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
   color: #fcfbf6;
   background: rgba(255, 255, 255, 0.16);
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-overlay);
   cursor: pointer;
 }
 .focus-hud-end .en-sub {
@@ -1182,7 +1147,7 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
   padding: 12px 6px 10px;
   background: var(--ground-0, #fff);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   cursor: pointer;
   color: var(--ink);
 }
@@ -1231,7 +1196,7 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
 /* one-band variant */
 .band {
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: var(--radius-seal);
   padding: 8px 10px;
   background: var(--ground-2);
 }
@@ -1239,7 +1204,7 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
 .band-scale {
   position: relative;
   height: 8px;
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   background: linear-gradient(90deg, var(--ground) 0%, var(--ink-2) 100%);
   margin: 7px 0 6px;
   border: 1px solid var(--line-soft);
@@ -1250,7 +1215,7 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
   top: -3px;
   bottom: -3px;
   border: 1.5px solid var(--red);
-  border-radius: 3px;
+  border-radius: var(--radius-seal);
   background: var(--red-wash);
 }
 
@@ -1274,7 +1239,7 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
 .disagree-tag {
   color: var(--red);
   border: 1px solid var(--red);
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   padding: 1px 5px;
   font-size: 11px;
   letter-spacing: 0.06em;
@@ -1321,7 +1286,7 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
 
 .tok {
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   padding: 0 0.5px;
   border: 0;
   margin: 0;
@@ -1426,7 +1391,7 @@ button.tok::before {
   max-width: min(300px, calc(100vw - 20px));
   padding: 5px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius-overlay);
   background: var(--ground-0, var(--ground));
   box-shadow: 0 6px 24px rgba(20, 24, 28, 0.2);
   transform: translateX(-50%);
@@ -1439,7 +1404,7 @@ button.tok::before {
 .token-actions button {
   min-height: var(--tap);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   padding: 4px 12px;
   color: var(--ai, var(--ink-2));
   background: transparent;
@@ -1488,7 +1453,7 @@ span.tok.named {
   margin: 12px 0 4px;
   padding: 11px 12px;
   border: 1px solid var(--line-soft);
-  border-radius: 3px;
+  border-radius: var(--radius-seal);
   background: var(--ground-2);
 }
 
@@ -1509,31 +1474,13 @@ span.tok.named {
 .seg {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border: 1px solid var(--line);
-  border-radius: 3px;
   overflow: hidden;
 }
 
 .seg button {
   font: inherit;
-  font-family: var(--serif);
-  font-size: var(--t-chrome);
   min-height: var(--tap);
-  border: 0;
-  border-left: 1px solid var(--line-soft);
-  background: transparent;
-  color: var(--ink-2);
-  cursor: pointer;
   padding: 0 2px;
-}
-
-.seg button:first-child {
-  border-left: 0;
-}
-
-.seg button[aria-pressed='true'] {
-  background: var(--ink);
-  color: var(--ground);
 }
 
 /* --------------------------------------------------------------- panel */
@@ -1663,14 +1610,8 @@ span.tok.named {
 
 .chip {
   font: inherit;
-  font-family: var(--serif);
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 3px;
   min-height: var(--tap);
   padding: 4px 11px;
-  cursor: pointer;
-  color: var(--ink);
   display: inline-flex;
   flex-direction: column;
   align-items: center;
@@ -1750,7 +1691,7 @@ span.tok.named {
   font-size: 10px;
   letter-spacing: 0.08em;
   border: 1px solid var(--line);
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   padding: 1px 5px;
   color: var(--faint);
   white-space: nowrap;
@@ -1799,29 +1740,15 @@ button.pool-tag.cat-chip {
 /* ------------------------------------------------------------- action */
 .take {
   font: inherit;
-  font-family: var(--serif);
-  font-size: 15px;
-  letter-spacing: 0.14em;
   width: 100%;
   min-height: 48px;
-  border: 1px solid var(--ink);
-  background: var(--ink);
-  color: var(--ground);
-  border-radius: 3px;
-  cursor: pointer;
   margin: 4px 0 12px;
-}
-
-.take.taken {
-  background: transparent;
-  color: var(--red);
-  border-color: var(--red);
 }
 
 /* card previews (#38, variant A) */
 .card-preview {
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: var(--radius-seal);
   padding: 14px;
   background: var(--ground-2);
   margin: 0 0 10px;
@@ -1925,7 +1852,7 @@ button.pool-tag.cat-chip {
   background: transparent;
   border: 1px solid rgba(252, 251, 246, 0.4);
   color: var(--ground);
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   min-height: var(--tap);
   padding: 0 14px;
   cursor: pointer;
@@ -1957,7 +1884,7 @@ button.pool-tag.cat-chip {
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
   border: 1px solid rgba(252, 251, 246, 0.4);
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   overflow: hidden;
 }
 
@@ -2030,7 +1957,7 @@ button.pool-tag.cat-chip {
   color: var(--ink);
   background: color-mix(in srgb, var(--ground) 88%, transparent);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   min-height: 46px;
   padding: 0 22px;
   cursor: pointer;
@@ -2155,7 +2082,6 @@ button.pool-tag.cat-chip {
 
   /* S4 hanko controls — the seal grammar shared by every stamped control */
   --seal-size: 56px;
-  --seal-radius: 5px;
   --seal-font: 22px;
 }
 
@@ -2445,7 +2371,7 @@ button.pool-tag.cat-chip {
   padding: 12px 14px 14px;
   background: var(--ground-0);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--radius-overlay);
   box-shadow: 0 1px 2px rgba(10, 10, 8, 0.12), 0 18px 44px -8px rgba(10, 10, 8, 0.36);
   animation: world-picker-in var(--motion-fast) var(--ease-standard) backwards;
 }
@@ -2570,7 +2496,7 @@ body.v-depth-layered .chrome {
 body.v-depth-layered .shelf-item {
   background: var(--ground-0);
   border: 1px solid var(--line-soft);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   padding: 14px 14px 16px;
   margin: 0 0 12px;
   box-shadow:
@@ -2586,7 +2512,7 @@ body.v-depth-layered #reader,
 body.v-depth-layered .dials {
   background: var(--ground-0);
   border: 1px solid var(--line-soft);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   box-shadow:
     0 1px 2px rgba(20, 24, 28, 0.05),
     0 5px 16px rgba(20, 24, 28, 0.06);
@@ -2609,23 +2535,23 @@ body.v-depth-layered .scrim {
 body.v-depth-layered .sem-group {
   background: var(--ground-2);
   border: 1px solid var(--line-soft);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   padding: 10px 12px 4px;
 }
 
 body.v-depth-layered .note {
   background: var(--ground-2);
-  border-radius: 0 6px 6px 0;
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
   padding: 9px 11px 9px 10px;
 }
 
 body.v-depth-layered .card-preview {
-  border-radius: 8px;
+  border-radius: var(--radius-card);
 }
 
 body.v-depth-layered .chip {
   background: var(--ground-0);
-  border-radius: 7px;
+  border-radius: var(--radius-control);
   box-shadow: 0 1px 2px rgba(20, 24, 28, 0.06);
 }
 
@@ -2687,29 +2613,15 @@ body.v-depth-layered .inline-link {
 .lang-seg {
   display: inline-flex;
   flex-shrink: 0;
-  border: 1px solid var(--line);
-  border-radius: 999px;
   overflow: hidden;
 }
 
 .lang-seg button {
   flex-shrink: 0;
   white-space: nowrap;
-  font-family: var(--sans);
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  border: 0;
-  background: transparent;
-  color: var(--ink-2);
   min-height: var(--tap);
   min-width: 44px;
   padding: 0 10px;
-  cursor: pointer;
-}
-
-.lang-seg button[aria-pressed='true'] {
-  background: var(--ink);
-  color: var(--ground);
 }
 
 /* sheet header — the way out lives on the sheet itself */
@@ -2765,7 +2677,7 @@ body.v-depth-layered .inline-link {
   overflow-y: auto;
   background: var(--ground-0, var(--ground));
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--radius-overlay);
   box-shadow: 0 8px 30px rgba(20, 24, 28, 0.22);
   padding: 12px 14px;
   animation: rise 0.16s ease;
@@ -2871,7 +2783,7 @@ body.v-depth-layered .inline-link {
   letter-spacing: 0.06em;
   color: var(--ground);
   background: var(--ai, var(--ink-2));
-  border-radius: 3px;
+  border-radius: var(--radius-seal);
   padding: 2px 8px;
 }
 
@@ -2901,7 +2813,7 @@ body.v-depth-layered .inline-link {
   flex-direction: column;
   align-items: center;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   background: var(--ground-0, transparent);
   min-height: 46px;
   padding: 4px 18px;
@@ -3051,7 +2963,7 @@ body.v-depth-layered .inline-link {
   font-family: var(--serif);
   font-size: 15px;
   background: var(--ground-2);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   padding: 8px 12px;
   margin: 0 0 12px;
 }
@@ -3068,7 +2980,7 @@ svg.strokes {
   height: 132px;
   background: var(--ground-2);
   border: 1px solid var(--line-soft);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   margin: 0 0 14px;
 }
 
@@ -3108,7 +3020,7 @@ svg.strokes text {
   color: var(--ink);
   background: var(--ground-0, var(--ground));
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   min-height: 48px;
   padding: 0 20px;
   margin: 2px 0 16px;
@@ -3153,7 +3065,7 @@ svg.strokes text {
   background: var(--ground-0, var(--ground));
   border: 1px solid var(--line);
   border-left: 3px solid var(--ai, var(--ink-2));
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   padding: 10px 14px;
   min-height: var(--tap);
   margin: 0 0 14px;
@@ -3208,7 +3120,7 @@ svg.strokes text {
   color: inherit;
   background: var(--ground-0, var(--ground));
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   padding: 12px;
   margin: 0 0 14px;
   cursor: pointer;
@@ -3289,7 +3201,7 @@ body.v-depth-layered .stroke-page {
   color: var(--ink-2);
   background: var(--ground-0, var(--ground));
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   cursor: pointer;
 }
 
@@ -3383,7 +3295,7 @@ body.v-depth-layered .stroke-page {
   position: relative;
   aspect-ratio: 1 / 1;
   overflow: hidden;
-  border-radius: 6px;
+  border-radius: var(--radius-card);
 }
 /* the CANVAS stays in normal flow (an absolutely-positioned software-GL
  * canvas can drop out of the compositor under a promoted overlay — seen in
@@ -3529,7 +3441,7 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
   aspect-ratio: 1 / 1;
   background: var(--ground-0, var(--ground));
   border: 1px solid var(--line-soft);
-  border-radius: 10px;
+  border-radius: var(--radius-card);
 }
 
 .stroke-grid line {
@@ -3612,29 +3524,8 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
   min-width: 96px;
   padding: 6px 16px;
-  font-family: var(--serif);
-  font-size: 15px;
-  color: var(--ink-2);
-  background: var(--ground-0, var(--ground));
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-.stroke-btn.primary {
-  color: var(--ai, var(--ink));
-  border-color: color-mix(in srgb, var(--ai, var(--ink)) 55%, var(--line));
-}
-
-/* a pressed toggle fills with ink, the way every other segmented control in
- * the corridor does (.seg, #lang) — 藍 stays reserved for going somewhere */
-.stroke-btn[aria-pressed='true'] {
-  color: var(--ground);
-  background: var(--ink);
-  border-color: var(--ink);
 }
 
 .stroke-btn:disabled {
@@ -3741,7 +3632,7 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
     radial-gradient(90% 120% at 75% 80%, rgba(20, 24, 28, 0.025), transparent 55%),
     var(--ground-0);
   border: 1px solid rgba(20, 24, 28, 0.07);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   box-shadow:
     inset 0 0 26px rgba(20, 24, 28, 0.035),
     0 2px 14px rgba(20, 24, 28, 0.05);
@@ -3797,29 +3688,6 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
   font-size: 11px;
   color: var(--faint);
   letter-spacing: 0.14em;
-}
-
-/* controls in one quiet register — outline chips, serif, no black slab */
-.stroke-controls button {
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--ink-2);
-  font-family: var(--serif);
-  border-radius: 999px;
-  box-shadow: none;
-}
-
-.stroke-controls button.primary {
-  background: transparent;
-  color: var(--ai);
-  border-color: color-mix(in srgb, var(--ai) 55%, var(--line));
-}
-
-.stroke-controls button[aria-pressed='true'] {
-  /* the pressed state writes with the chosen pigment, not a black slab */
-  background: var(--stroke-ink, var(--ink));
-  color: var(--ground-0, var(--ground));
-  border-color: var(--stroke-ink, var(--ink));
 }
 
 /* 顔料 — the four inks */
@@ -4059,7 +3927,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   color: var(--ink);
   background: color-mix(in srgb, var(--ground-0) 84%, transparent);
   border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   box-shadow: 0 5px 18px color-mix(in srgb, var(--ink) 10%, transparent);
   font-family: var(--serif);
 }
@@ -4105,7 +3973,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   color: var(--ink-2);
   background: transparent;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   opacity: 0.36;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -4175,7 +4043,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   min-height: 44px;
   padding: 4px 12px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: transparent;
   opacity: 0.36;
   -webkit-tap-highlight-color: transparent;
@@ -4202,7 +4070,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   min-height: 44px;
   padding: 4px 10px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: transparent;
   opacity: 0.36;
   -webkit-tap-highlight-color: transparent;
@@ -4272,7 +4140,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
     radial-gradient(circle at 67% 61%, rgba(20, 24, 28, 0.014) 0 1px, transparent 1px);
   background-size: 13px 13px, 19px 19px;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   box-shadow: 0 10px 30px rgba(10, 10, 8, 0.16);
   padding: 34px 18px 26px;
   margin: 10px 0 14px;
@@ -4323,7 +4191,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   min-height: 56px;
   border: 1px solid var(--line);
   background: transparent;
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -4364,7 +4232,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
    * carrying the meaning, label and honest interval aligned beneath */
   border: 1px solid var(--line-soft, var(--line));
   background: color-mix(in srgb, var(--ground-0, #fff) 62%, transparent);
-  border-radius: 12px;
+  border-radius: var(--radius-seal);
   gap: 4px;
   padding: 9px 0 8px;
   min-height: 78px;
@@ -4374,7 +4242,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .grade.hanko .g-seal {
   width: var(--seal-size);
   height: var(--seal-size);
-  border-radius: var(--seal-radius);
+  border-radius: var(--radius-seal);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4435,7 +4303,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .sum-seal .g-seal {
   width: 42px;
   height: 42px;
-  border-radius: var(--seal-radius, 8px);
+  border-radius: var(--radius-seal);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4528,10 +4396,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
   text-align: left;
   padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: transparent;
-  cursor: pointer;
   min-height: 48px;
 }
 
@@ -4566,7 +4430,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   min-width: 62px;
   padding: 6px 10px;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
 }
 
 .kagami-cell.thin {
@@ -4895,7 +4759,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   font-size: 11px;
   color: var(--faint);
   border: 1px solid var(--line-soft);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   padding: 1px 5px;
   white-space: nowrap;
   align-self: center;
@@ -5098,7 +4962,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .rest-toggle {
   background: transparent;
   border: 1px solid var(--line-soft);
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   color: var(--faint);
   font-size: 11px;
   line-height: 1;
@@ -5184,7 +5048,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   min-height: var(--tap);
   padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   background: color-mix(in srgb, var(--ground-0, var(--ground)) 70%, transparent);
   color: var(--ink);
   font: inherit;
@@ -5437,7 +5301,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   min-width: 0;
   min-height: 48px;
   box-sizing: border-box;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   padding: 12px 16px;
   border: 1px solid var(--line);
   background: var(--ground-0, var(--ground));
@@ -5547,7 +5411,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .teacher-question {
   resize: vertical;
   min-height: 92px;
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   padding: 12px 16px;
   line-height: 1.65;
   scroll-margin-top: calc(80px + env(safe-area-inset-top) + env(safe-area-inset-top));
@@ -5830,7 +5694,7 @@ body.zen .review-example {
   font-size: 12px;
   padding: 6px 12px;
   background: var(--ground-0, #fff);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
 }
 
 .list-head {
@@ -5868,7 +5732,7 @@ body.zen .review-example {
   padding: 5px 8px;
   background: transparent;
   border: 1px solid var(--line-soft);
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   color: var(--ink-2);
   font-size: 13px;
   cursor: pointer;
@@ -5903,7 +5767,7 @@ body.zen .review-example {
   height: 46px;
   background: transparent;
   border: 1px solid var(--line-soft);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   font-family: var(--serif);
   font-size: 24px;
   color: var(--ink);
@@ -5989,7 +5853,7 @@ body.zen .review-example {
   letter-spacing: 0.08em;
   color: var(--faint);
   border: 1px solid var(--line-soft);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   padding: 0 5px;
   margin-right: 8px;
   vertical-align: 0.12em;
@@ -6021,10 +5885,6 @@ body.zen .review-example {
   flex: 1 1 auto;
   min-height: 44px;
   padding: 7px 12px;
-  background: var(--ground-0);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  cursor: pointer;
   text-align: center;
 }
 .kdx-lens .l-ja {
@@ -6040,10 +5900,6 @@ body.zen .review-example {
   letter-spacing: 0.04em;
   color: var(--faint);
 }
-/* The chosen lens used one fixed near-white on each world's red, which fell
- * to 2.85:1 where the red is deep (E3 round-A, a11y lens). A world's own
- * ink/ground pair is its strongest by construction — the seal keeps the red
- * as its edge, so the chosen lens still reads as the red one. */
 .view-title-en {
   margin: -2px 0 10px;
   font-size: 13px;
@@ -6051,14 +5907,6 @@ body.zen .review-example {
   color: var(--ink-2);
 }
 
-.kdx-lens.on {
-  background: var(--ink);
-  border-color: var(--red);
-}
-.kdx-lens.on .l-ja,
-.kdx-lens.on .en-sub {
-  color: var(--ground);
-}
 .kdx-chosen {
   display: flex;
   flex-wrap: wrap;
@@ -6069,7 +5917,7 @@ body.zen .review-example {
 .kdx-clear {
   background: transparent;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   padding: 6px 12px;
   font-family: var(--sans);
   font-size: 12px;
@@ -6086,7 +5934,7 @@ body.zen .review-example {
   color: var(--ink);
   background: var(--ground-0);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-control);
 }
 .kdx-chip.dead {
   opacity: 0.24;
@@ -6104,7 +5952,7 @@ body.zen .review-example {
   aspect-ratio: 1 / 1;
   background: var(--ground-0);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   touch-action: none;
   cursor: crosshair;
 }
@@ -6133,7 +5981,7 @@ body.zen .review-example {
 .dictionary-retry {
   min-height: var(--tap);
   border: 1px solid var(--ai);
-  border-radius: 7px;
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--ai);
   padding: 7px 14px;
@@ -6156,7 +6004,7 @@ body.zen .review-example {
   margin: 8px 0 14px;
   padding: 9px 10px;
   border: 1px solid var(--line-soft);
-  border-radius: 7px;
+  border-radius: var(--radius-card);
   background: rgba(255, 255, 255, 0.18);
 }
 .dictionary-homograph {
@@ -6309,7 +6157,7 @@ body.zen .review-example {
   color: var(--red);
   background: var(--ground-0, var(--ground));
   border: 1px solid var(--red);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   box-shadow: 0 6px 22px rgba(20, 24, 28, 0.22);
   pointer-events: none;
 }
@@ -6342,7 +6190,7 @@ body.zen .review-example {
   color: var(--ink);
   background: var(--ground-0, var(--ground));
   border: 1px solid var(--line, currentColor);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   box-shadow: 0 6px 22px rgba(20, 24, 28, 0.18);
 }
 .record-hint[hidden] {
@@ -6446,7 +6294,7 @@ body.zen .review-face {
   justify-content: center;
   gap: 14px;
   padding: clamp(28px, 6vh, 52px) 22px;
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   box-shadow:
     0 24px 70px -30px rgba(4, 6, 12, 0.85),
     0 4px 18px -6px rgba(4, 6, 12, 0.4);
@@ -6480,7 +6328,7 @@ body.zen .review-reveal {
   width: 100%;
   max-width: 440px;
   min-height: 58px;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
 }
 /* 想起の二道 — the T-06 gate: before anything turns over, the front face
  * asks "did it come back?". Two quiet doors where the single reveal stood:
@@ -6512,7 +6360,7 @@ body.zen .declare-row {
   margin: 0;
   min-height: 58px;
   white-space: nowrap;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
 }
 .declare-row .declare-notyet {
   background: transparent;
@@ -6618,7 +6466,7 @@ body.zen .focus-hud-end {
   color: var(--ink);
   background: var(--ground-0, var(--ground));
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-control);
 }
 .list-maker-field[aria-invalid='true'] {
   border-color: var(--red);
@@ -6634,7 +6482,7 @@ body.zen .focus-hud-end {
   color: var(--ink-2);
   background: transparent;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   cursor: pointer;
 }
 .list-op.armed {
@@ -6695,7 +6543,7 @@ body.zen .review-face {
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='0.04 0.008' numOctaves='4' seed='7' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.45 0 0 0 0 0.38 0 0 0 0 0.25 0 0 0 0.06 0'/></filter><rect width='400' height='400' filter='url(%23w)'/></svg>");
   /* lacquerware radii stay small; the rim is maki-e gold, one hair wide */
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   box-shadow:
     inset 0 0 0 1px color-mix(in srgb, var(--zen-accent) 26%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.35),
@@ -6893,7 +6741,7 @@ body.zen main .declare-row {
 
 /* the two declarations, gofun and paper on the night */
 body.zen .declare-row .take {
-  border-radius: 10px;
+  border-radius: var(--radius-control);
 }
 body.zen .declare-recalled {
   background: var(--card-ground-0, var(--card-ground));
@@ -7046,7 +6894,7 @@ body.zen .grade-row .grade:nth-child(4) {
   color: var(--ink);
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   opacity: 0.28;
   cursor: pointer;
   touch-action: manipulation;
@@ -7101,7 +6949,7 @@ body.zen .grade-row .grade:nth-child(4) {
   color: var(--ink-2);
   background: transparent;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   min-height: var(--tap);
   padding: 8px 12px;
   margin: 14px 0 0;
@@ -7136,7 +6984,7 @@ body.zen .grade-row .grade:nth-child(4) {
 .study-fold .fold-body {
   border: 1px solid var(--line);
   border-top: 0;
-  border-radius: 0 0 10px 10px;
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
   padding: 10px 12px 14px;
   margin: 0;
 }
@@ -7148,7 +6996,7 @@ body.zen .grade-row .grade:nth-child(4) {
 .list-picker .fold-head ~ .chips {
   border: 1px solid var(--line);
   border-top: 0;
-  border-radius: 0 0 10px 10px;
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
   padding: 10px 12px 14px;
   margin-top: 0;
 }
@@ -7348,7 +7196,7 @@ body.zen .grade-row .grade:nth-child(4) {
   margin-bottom: 10px;
   padding: 12px;
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   background: var(--ground);
   color: var(--ink);
   font-family: var(--serif);
@@ -7396,7 +7244,7 @@ body.zen .grade-row .grade:nth-child(4) {
   margin-block: 16px;
   padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   font-size: var(--t-body);
   line-height: 1.7;
 }
@@ -7470,7 +7318,7 @@ body.zen .grade-row .grade:nth-child(4) {
 .sentence-practice-section h2, .sentence-practice-history h2 { font-size: 1.2rem; line-height: 1.5; }
 .sentence-response { display: block; box-sizing: border-box; width: 100%; max-width: 780px; margin: .6rem 0 1rem; padding: .8rem 1rem;
   font: inherit; font-size: 1.1rem; line-height: 1.7; color: var(--ink); background: var(--ground-0, #f4efe3);
-  border: 1px solid var(--line, #cfc7b5); border-radius: 8px; resize: vertical; }
+  border: 1px solid var(--line, #cfc7b5); border-radius: var(--radius-card); resize: vertical; }
 .sentence-response:focus-visible, .sentence-option input:focus-visible, .sentence-library-entry:focus-visible {
   outline: 2px solid var(--ink, #23303f); outline-offset: 3px;
 }
@@ -7532,7 +7380,7 @@ body.v-depth-layered .archive-row,
 body.v-depth-layered .nav-search-row {
   background: var(--ground-0);
   border: 1px solid var(--edge);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   box-shadow: var(--sheen), var(--lift);
 }
 body.v-depth-layered .search-page,
@@ -7593,7 +7441,7 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
   border-color: currentColor; box-shadow: inset 0 -3px currentColor;
 }
 .exam-length { flex: 1 1 150px; min-width: 0; padding: 1rem; border: 1px solid var(--line);
-  border-radius: 8px; background: transparent; color: inherit; font: inherit; text-align: start; }
+  border-radius: var(--radius-control); background: transparent; color: inherit; font: inherit; text-align: start; }
 .exam-length-time { display: block; font-size: .78em; margin-top: .4rem; line-height: 1.5; }
 .exam-form { padding: 1.25rem 0; border-bottom: 1px solid var(--line); }
 .exam-form h2 { font-size: 1.25rem; margin: 0 0 .5rem; }
@@ -7615,7 +7463,7 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
 .assessment-room .mock-opts { display: grid; gap: .6rem; margin-block: 1rem; }
 .assessment-room .mock-opt { width: 100%; min-height: 52px; text-align: start; overflow-wrap: anywhere;
   font-size: 1rem; color: inherit; background: transparent; padding: .6rem .85rem;
-  border: 1px solid var(--line, #76808066); border-radius: .4rem; }
+  border: 1px solid var(--line, #76808066); border-radius: var(--radius-control); }
 .assessment-room .mock-opt[aria-pressed="true"] { outline: 2px solid currentColor; background: var(--line-soft); }
 .exam-question-map { margin: 1.2rem 0; }
 .exam-question-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: .5rem; }
@@ -7678,7 +7526,7 @@ body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a
 .exam-image { max-width: 100%; height: auto; }
 /* The printed JLPT paper on the question sheet (editorial.css owns the sheet): 問題 in its ink box
    beside the 大問 name, underlined targets, （　） blanks, the ★ row and numbered gaps. */
-.exam-mondai-no { display: inline-block; padding: .04em .45em; border-radius: 3px; background: var(--ink, #1c2b3a);
+.exam-mondai-no { display: inline-block; padding: .04em .45em; border-radius: var(--radius-seal); background: var(--ink, #1c2b3a);
   color: var(--ground-0, #faf6ec); font-size: .78em; line-height: 1.5; letter-spacing: .06em; vertical-align: .1em; }
 .exam-mondai-instruction { overflow-wrap: anywhere; }
 .exam-underline-blank { display: inline-block; min-width: 3.2em; border-bottom: 1.5px solid currentColor;
@@ -7724,10 +7572,10 @@ body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a
 .assessment-question-review { width: 100%; min-width: 0; text-align: left; }
 .assessment-question-passage, .assessment-question-prompt, .assessment-question-rationale,
 .assessment-question-transcript p { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.85; }
-.assessment-question-passage { padding: 1rem; border: 1px solid var(--line); border-radius: .4rem; }
+.assessment-question-passage { padding: 1rem; border: 1px solid var(--line); border-radius: var(--radius-card); }
 .assessment-question-options { min-inline-size: 0; margin: 1rem 0; padding: 0; border: 0; }
 .assessment-question-option { display: flex; align-items: flex-start; gap: .65rem; min-width: 0; min-height: 44px;
-  margin: .5rem 0; padding: .7rem; border: 1px solid var(--line); border-radius: .4rem; overflow-wrap: anywhere; }
+  margin: .5rem 0; padding: .7rem; border: 1px solid var(--line); border-radius: var(--radius-control); overflow-wrap: anywhere; }
 .assessment-question-option input { flex: 0 0 auto; margin-top: .35rem; }
 .assessment-question-key { font-size: .8em; flex: 0 0 auto; }
 .assessment-question-image { display: block; max-width: 100%; height: auto; }
@@ -7736,7 +7584,7 @@ body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a
 
 /* A room that cannot draw says why (2026-09-25): a quiet sheet, the room's name,
  * one line of plain reason and the one action that helps. Never an empty page. */
-.room-state { max-width: 34rem; margin: 2.5rem auto; padding: 1.5rem 1.25rem; border: 1px solid var(--line, rgba(0, 0, 0, .12)); border-radius: 6px; }
+.room-state { max-width: 34rem; margin: 2.5rem auto; padding: 1.5rem 1.25rem; border: 1px solid var(--line, rgba(0, 0, 0, .12)); border-radius: var(--radius-card); }
 .room-state .view-title { margin-top: 0; }
 .room-state p { margin: .5rem 0; line-height: 1.6; }
 .room-state .room-state-why { opacity: .78; font-size: .92em; }
@@ -7815,7 +7663,7 @@ body.zen .say-note { color: var(--card-ink-2, var(--ink-2)); }
   text-align: center;
   padding: 10px 4px 8px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-seal);
   background: color-mix(in srgb, var(--ground-0, #faf6ea) 70%, transparent);
 }
 .deck-count .deck-count-n {
@@ -7955,7 +7803,7 @@ body.zen .review-reveal {
   padding: 7px 0 6px;
   border: 1px solid var(--line);
   border-top-width: 3px;
-  border-radius: 10px;
+  border-radius: var(--radius-seal);
   background: color-mix(in srgb, var(--ground-0, #faf6ea) 72%, transparent);
   color: var(--ink);
 }
@@ -8026,7 +7874,7 @@ body.zen .reveal.r-4 {
   color: var(--ink);
   background: var(--ground-0, #faf6ea);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-control);
 }
 .browse-sort {
   min-height: var(--tap);
@@ -8037,7 +7885,7 @@ body.zen .reveal.r-4 {
   color: var(--ink);
   background: var(--ground-0, #faf6ea);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-control);
 }
 .browse-filters {
   display: flex;
@@ -8076,7 +7924,7 @@ body.zen .reveal.r-4 {
   padding: 10px 6px 8px;
   text-align: center;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-card);
 }
 .stats-n {
   display: block;
@@ -8110,7 +7958,7 @@ body.zen .reveal.r-4 {
   display: block;
   width: 100%;
   min-height: 1px;
-  border-radius: 2px 2px 0 0;
+  border-radius: var(--radius-seal) var(--radius-seal) 0 0;
   background: var(--srs-due);
 }
 .stats-bars.ahead .stats-col i {
@@ -8140,11 +7988,6 @@ main .browse-filters .chip.browse-filter.on {
   padding: 12px 14px;
   text-align: left;
   font: inherit;
-  color: var(--ink);
-  background: var(--ground-2);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  cursor: pointer;
 }
 
 .dojo-deck:first-child {

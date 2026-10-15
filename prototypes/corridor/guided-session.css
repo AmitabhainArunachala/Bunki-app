@@ -8,7 +8,6 @@
    ========================================================================== */
 
 .guided-room {
-  --gs-radius: 6px;
   --gs-sheet-shadow: var(
     --paper-shadow,
     0 1px 0 rgba(28, 47, 66, 0.06),
@@ -134,19 +133,6 @@
   display: inline-flex;
   align-items: baseline;
   gap: 5px;
-  min-height: 36px;
-  padding: 6px 12px !important;
-  border: 1px solid transparent !important;
-  border-radius: 20px;
-  font-family: var(--serif);
-  font-size: 14px;
-}
-.gs-nav:hover {
-  border-color: var(--line) !important;
-}
-.gs-nav[aria-current='page'] {
-  border-color: var(--ink) !important;
-  background: color-mix(in srgb, var(--ground-0) 60%, transparent) !important;
 }
 .gs-nav .gs-gloss {
   margin-left: 0;
@@ -156,18 +142,13 @@
   border-bottom-color: var(--line-soft);
   padding-bottom: 6px;
 }
-.guided-room[data-stage='question'] .gs-nav {
-  font-size: 12px;
-  min-height: 32px;
-  padding: 4px 7px;
-  color: var(--ink-2);
-}
 .guided-room[data-stage='question'] .gs-nav .gs-gloss,
 .guided-room[data-stage='question'] .gs-bar-name .gs-gloss {
   display: none;
 }
 
-/* ---------- one grammar of buttons: ink fill commits; outlined is secondary; text is quiet ---------- */
+/* ---------- the buttons are the house's families (editorial.css): primary commits, a slip is secondary,
+   a quiet word is text; only their places are kept here ---------- */
 .gs-actions {
   display: flex;
   gap: 10px;
@@ -176,50 +157,12 @@
   margin-top: 22px;
 }
 .gs-button {
-  display: inline-flex !important;
+  display: inline-flex;
   align-items: baseline;
   gap: 8px;
-  min-height: 44px;
-  padding: 11px 18px !important;
-  border: 1px solid var(--ink) !important;
-  border-radius: 4px;
-  font-family: var(--serif) !important;
-  font-size: 16px;
-  line-height: 1.2;
-  color: var(--ink);
-  background: transparent;
-}
-.gs-button.primary {
-  background: var(--ink) !important;
-  color: var(--ground-0) !important;
 }
 .gs-button.primary .gs-gloss {
-  color: color-mix(in srgb, var(--ground-0) 88%, transparent);
-}
-.gs-button.primary:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--ink) 88%, black) !important;
-}
-.gs-button.quiet {
-  border-color: var(--line) !important;
-}
-.gs-button:disabled,
-.gs-button.primary:disabled {
-  background: transparent !important;
-  color: var(--ink-2) !important;
-  border-color: var(--line) !important;
-}
-.gs-button.primary:disabled .gs-gloss {
-  color: var(--faint);
-}
-.gs-text {
-  color: var(--ink);
-  min-height: 32px;
-  padding: 2px 0 !important;
-  font-size: 14.5px;
-  border-bottom: 1px solid var(--line) !important;
-}
-.gs-text:hover {
-  border-bottom-color: var(--ink) !important;
+  color: color-mix(in srgb, #f7f2e8 88%, transparent);
 }
 .gs-text:disabled {
   color: var(--faint);
@@ -321,7 +264,7 @@
   background: var(--card-ground, #f5efe0) !important;
   color: var(--card-ink, #211e17) !important;
   border: 1px solid var(--card-line, rgba(33, 30, 23, 0.16)) !important;
-  border-radius: var(--gs-radius);
+  border-radius: var(--radius-control);
   padding: 14px 16px !important;
   box-shadow: 0 10px 28px -14px rgba(28, 47, 66, 0.35);
 }
@@ -393,7 +336,7 @@
   font-size: 16px;
   color: var(--ink);
   background: none !important;
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   text-align: center !important;
 }
 .gs-node small {
@@ -624,7 +567,7 @@
     ),
     radial-gradient(ellipse at 20% 0%, color-mix(in srgb, #fff 45%, transparent), transparent 60%);
   border: 1px solid color-mix(in srgb, var(--ink) 32%, transparent);
-  border-radius: var(--gs-radius);
+  border-radius: var(--radius-card);
   box-shadow: var(--gs-sheet-shadow);
   padding: 20px 18px 18px;
 }
@@ -691,18 +634,11 @@ legend.gs-instruction {
   gap: 12px;
   min-height: 48px;
   padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--ground-0) 70%, transparent);
   font-size: 17px;
-  cursor: pointer;
   text-wrap: pretty;
   word-break: keep-all;
   line-break: strict;
   overflow-wrap: anywhere;
-}
-.gs-choice:hover {
-  border-color: var(--ink-2);
 }
 .gs-choice input {
   margin: 0;
@@ -968,7 +904,7 @@ legend.gs-instruction {
   background: var(--card-ground, var(--ground-0));
   color: var(--card-ink, var(--ink));
   padding: 16px 18px;
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   font-size: 19px;
   line-height: 1.9;
   margin: 6px 0 14px !important;
@@ -1005,7 +941,7 @@ legend.gs-instruction {
   margin-top: 16px;
   padding: 12px 14px;
   border: 1px solid var(--sheet-line);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
 }
 .gs-example p {
   font-size: 17px;
@@ -1029,7 +965,7 @@ legend.gs-instruction {
   min-height: 40px;
   padding: 8px 12px !important;
   border: 1px solid var(--gold) !important;
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   color: var(--gold);
   font-family: var(--serif) !important;
   font-size: 15px;
@@ -1069,17 +1005,9 @@ legend.gs-instruction {
 .gs-word {
   display: inline !important;
   padding: 0 1px !important;
-  border-bottom: 1px dotted currentColor !important;
-  border-radius: 0;
   font: inherit !important;
   color: inherit;
   line-height: inherit;
-}
-.gs-word:hover {
-  background: var(--ai-wash) !important;
-}
-.gs-lacquer .gs-word:hover {
-  background: var(--sheet-ai-wash, rgba(217, 178, 95, 0.14)) !important;
 }
 
 /* ---------- summary · results · learn ---------- */
@@ -1093,7 +1021,7 @@ legend.gs-instruction {
   background: var(--ground-0);
   border: 1px solid var(--line);
   border-left: 3px solid var(--line);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
 }
 .gs-row.missed {
   border-left-color: var(--red);
@@ -1152,7 +1080,7 @@ legend.gs-instruction {
   font-family: var(--serif);
   border: 1px solid var(--line);
   padding: 0 6px;
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
 }
 .gs-gap-tag .gs-gloss {
   margin-left: 0;
@@ -1277,7 +1205,7 @@ legend.gs-instruction {
 .gs-focus {
   background: var(--ground-0);
   border: 1px solid var(--line);
-  border-radius: var(--gs-radius);
+  border-radius: var(--radius-card);
   box-shadow: var(--gs-sheet-shadow);
   padding: 18px 18px 16px;
 }
@@ -1311,7 +1239,7 @@ legend.gs-instruction {
   min-height: 140px;
   padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   background: var(--ground-0);
   color: var(--ink);
   font-size: 17px;
@@ -1325,7 +1253,7 @@ legend.gs-instruction {
 .gs-sensei-context {
   background: var(--ground-0);
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   padding: 16px 18px;
   margin: 16px 0;
 }
@@ -1391,7 +1319,7 @@ legend.gs-instruction {
   color: var(--ink);
   background: var(--ground-0);
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   padding: 5px 6px;
   min-height: 34px;
 }

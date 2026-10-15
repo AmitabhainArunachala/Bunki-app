@@ -61,6 +61,26 @@ cssPatch('transition:background .25s,width .25s,box-shadow .25s', 'transition:no
 cssPatch('transition:width .25s,height .25s,left .25s,margin .25s,background .25s,box-shadow .25s', 'transition:none', 'level handle');
 cssPatch('transition:opacity .3s,left .25s,font-size .25s', 'transition:opacity .3s', 'level information');
 
+// The four radii of the house (one hand, slice D): control 6 · card 4 · overlay 18 · seal 3, read from the
+// tokens on :root; the sky's pills and plaques are controls and cards like every other, and the card that
+// rises from the word is an overlay. The round things (the symbol, the level handle) stay round.
+cssPatch('border-radius:6px;padding:2px 7px;background:var(--plaque)}', 'border-radius:var(--radius-control);padding:2px 7px;background:var(--plaque)}', 'plaque chip radius');
+cssPatch('background:#B13A2F;color:#FFF8EE;border-radius:3px;', 'background:#B13A2F;color:#FFF8EE;border-radius:var(--radius-seal);', 'level seal radius');
+cssPatch('border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-family:inherit;cursor:pointer}', 'border:1px solid var(--line);border-radius:var(--radius-control);padding:6px 14px;font-family:inherit;cursor:pointer}', 'plaque button radius');
+cssPatch('background:var(--plaque);border:1px solid var(--line);border-radius:999px;', 'background:var(--plaque);border:1px solid var(--line);border-radius:var(--radius-control);', 'plaque pill radius');
+cssPatch('border:1px solid var(--line);border-radius:14px;', 'border:1px solid var(--line);border-radius:var(--radius-overlay);', 'card radius');
+cssPatch('#card .row div{flex:1;border:1px solid var(--line);border-radius:10px;', '#card .row div{flex:1;border:1px solid var(--line);border-radius:var(--radius-card);', 'card row radius');
+cssPatch('background:none;border:1px solid var(--line);border-radius:999px;padding:3px 9px;', 'background:none;border:1px solid var(--line);border-radius:var(--radius-control);padding:3px 9px;', 'level pill radius');
+cssPatch('background:none;border:1px solid var(--line);border-radius:999px;', 'background:none;border:1px solid var(--line);border-radius:var(--radius-control);', 'card button radius');
+cssPatch('border:1px solid var(--line);border-radius:8px;color:var(--ink)}', 'border:1px solid var(--line);border-radius:var(--radius-control);color:var(--ink)}', 'card door radius');
+cssPatch('border-radius:2px;transition:none}', 'border-radius:var(--radius-seal);transition:none}', 'level track radius');
+cssPatch('background:var(--plaque);border:1px solid var(--line);border-radius:8px;padding:5px 10px;', 'background:var(--plaque);border:1px solid var(--line);border-radius:var(--radius-control);padding:5px 10px;', 'level plaque radius');
+cssPatch('border-radius:999px}', 'border-radius:var(--radius-control)}', 'level button radius');
+cssPatch('border:1px solid var(--line);border-radius:999px;padding:8px 15px;cursor:pointer;font-family:inherit}', 'border:1px solid var(--line);border-radius:var(--radius-control);padding:8px 15px;cursor:pointer;font-family:inherit}', 'radical door radius');
+// The touched word's one mark (family H, slice D): a hairline underline in the reading's colour under the
+// word whose reading is shown, no fill — the same mark the reader, the deck and the guided session wear.
+cssPatch('.word.unfolded .yomi{opacity:1}', '.word.unfolded .yomi{opacity:1}\n  .word.unfolded .base{box-shadow:inset 0 calc(0px - var(--stroke-hairline, 0.5px)) 0 var(--color-reading)}', 'touched word mark');
+
 // Bundled text faces precede native fallbacks in the fused layer. Preserve the
 // donor's reading/italic roles and all metrics without changing the donor.
 cssPatch('font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif',
@@ -157,7 +177,7 @@ ${scopedRules.join('\n')}
 #drift-layer #lvl:focus-visible {
   outline: 2px solid var(--pig1);
   outline-offset: 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-card);
 }
 #drift-layer #lvl:focus-visible #lvlLabels,
 #drift-layer #lvl:focus-visible #lvlInfo { opacity: 1; }

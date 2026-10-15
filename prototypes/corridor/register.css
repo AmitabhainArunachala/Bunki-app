@@ -44,24 +44,6 @@
   border-bottom: var(--rule);
   backdrop-filter: none;
 }
-.chrome > button,
-.chrome .theme-seal,
-.chrome .chrome-search,
-.chrome .chrome-dojo {
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  border-radius: 0;
-  width: auto;
-  height: auto;
-  min-width: 0;
-  min-height: var(--tap);
-  padding: 0 2px;
-  color: var(--ink);
-  font-family: var(--serif);
-  font-size: 15px;
-  letter-spacing: 0.02em;
-}
 .chrome > button:first-child { /* 戻る back */
   font-family: var(--display);
   font-size: 17px;
@@ -99,7 +81,7 @@
 .chrome .chrome-dojo, .chrome .theme-seal { font-size: 14px; color: var(--ink-2); }
 .chrome .lang-seg {
   border: var(--rule);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   padding: 2px;
   gap: 0;
   background: transparent;
@@ -109,7 +91,7 @@
   font-size: 11px;
   letter-spacing: 0.08em;
   padding: 4px 9px;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   min-height: 0;
 }
 .chrome > button#tray { /* 覚 lists — a seal only when it counts */
@@ -203,7 +185,7 @@ html[data-register="shelf"] .search-field::placeholder { color: var(--faint); }
 #shelf-body .shelf-snippet.intro { font-size: 15px; color: var(--ink-2); margin: 0 0 14px; }
 #shelf-body button.grammar-link {
   font-family: var(--display);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   transition: transform 120ms ease-out;
 }
 #shelf-body button.grammar-link[data-grade="room"] {
@@ -269,7 +251,7 @@ html[data-register="jlpt"] .exam-intro { font-size: 16px; color: var(--ink-2); m
   min-width: 56px;
   min-height: 48px;
   padding: 0 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   border: var(--paper-edge);
   background: var(--ground-0);
   box-shadow: none;
@@ -283,7 +265,7 @@ html[data-register="jlpt"] .exam-intro { font-size: 16px; color: var(--ink-2); m
 }
 .exam-lengths { gap: 10px; margin: 0 0 22px; }
 .exam-length {
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   border: var(--paper-edge);
   background: var(--ground-0);
   box-shadow: var(--paper-shadow);
@@ -298,7 +280,7 @@ html[data-register="jlpt"] .exam-intro { font-size: 16px; color: var(--ink-2); m
   background: var(--ground-0);
   border: var(--paper-edge);
   box-shadow: var(--paper-shadow);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   padding: 18px 18px 14px;
   margin: 0 0 14px;
 }
@@ -355,7 +337,7 @@ html[data-register="attempt"] .mock-q {
   background: var(--ground-0);
   border: var(--paper-edge);
   border-bottom: 0;
-  border-radius: 6px 6px 0 0;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
   box-shadow: var(--paper-shadow);
   padding: 20px 18px 8px;
   margin: 14px 0 0;
@@ -378,7 +360,7 @@ html[data-register="attempt"] .mock-q + .lesson-options {
   background: var(--ground-0);
   border: var(--paper-edge);
   border-top: 0;
-  border-radius: 0 0 6px 6px;
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
   box-shadow: var(--paper-shadow);
   padding: 4px 10px 12px;
   margin: 0 0 14px;
@@ -396,13 +378,13 @@ html[data-register="attempt"] .exam-instruction:not(:has(+ .mock-opts)) {
 }
 html[data-register="attempt"] :not(.exam-prompt, .exam-instruction) + .mock-opts {
   border-top: var(--paper-edge);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   margin-top: 12px;
 }
 html[data-register="attempt"] .exam-passage {
   background: var(--ground-0);
   border: var(--paper-edge);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   box-shadow: var(--paper-shadow);
   padding: 16px 18px;
 }
@@ -435,7 +417,7 @@ html[data-register="attempt"] .mock-opt.selected,
 html[data-register="attempt"] .lesson-option.picked {
   background: var(--ink);
   color: var(--ground-0);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   border-top-color: transparent;
 }
 html[data-register="attempt"] .mock-opt.wrong { background: var(--red-wash); color: var(--red); }
@@ -469,7 +451,7 @@ html[data-register="threshold"] .exam-confirm {
   background: var(--ground-0);
   border: var(--paper-edge);
   box-shadow: var(--paper-shadow);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   padding: 22px 20px;
   margin-top: 12px;
 }
@@ -501,7 +483,7 @@ html[data-register="results"] .exam-official {
   background: var(--ground-0);
   border: var(--paper-edge);
   box-shadow: var(--paper-shadow);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   padding: 16px 18px;
   margin: 0 0 14px;
 }
@@ -522,7 +504,7 @@ html[data-register="results"] #exam-sensei {
   background: var(--ink);
   color: var(--ground-0);
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   min-height: 48px;
   padding: 0 18px;
   font-family: var(--display);
@@ -534,7 +516,7 @@ html[data-register="review"] .mock-review {
   background: var(--ground-0);
   border: var(--paper-edge);
   box-shadow: var(--paper-shadow);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   padding: 4px 18px;
 }
 html[data-register="review"] .mock-review-row { padding-inline-start: 12px; }
@@ -566,7 +548,7 @@ html[data-register="tutor"] main,
 html[data-register="tutor"] main { min-height: 100vh; }
 /* the why sheet (T6) is understanding, not the attempt: the tutor's material as a sheet,
    and its verdict red only when the answer was wrong */
-.exam-why-sheet { border-radius: 6px; padding: 18px 18px 14px; margin: 10px 0 16px; }
+.exam-why-sheet { border-radius: var(--radius-card); padding: 18px 18px 14px; margin: 10px 0 16px; }
 .exam-why-verdict { font-family: var(--display); font-size: 22px; }
 .exam-why-verdict[data-verdict="incorrect"] { color: var(--red); }
 html[data-register="tutor"] .chrome { background: var(--sheet-ground); border-bottom-color: var(--sheet-line-soft); }
@@ -581,7 +563,7 @@ html[data-register="tutor"] .teacher-context {
   background: var(--card-ground);
   color: var(--card-ink);
   --ink: var(--card-ink); --ink-2: var(--card-ink-2); --faint: var(--card-faint); --faint-2: var(--card-faint-2); --line: var(--card-line); --line-soft: var(--card-line-soft); --red: var(--card-red); --red-wash: var(--card-red-wash); --ai: var(--card-ai); --ai-wash: var(--card-ai-wash); --ground-0: var(--card-ground-0); --ground-2: var(--card-ground-2);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   padding: 18px 18px 14px;
   margin: 8px 0 18px;
   box-shadow: 0 14px 34px -20px rgba(0,0,0,0.9);
@@ -594,7 +576,7 @@ html[data-register="tutor"] .chat-row.tutor, html[data-register="tutor"] .chat-r
   background: var(--card-ground);
   color: var(--card-ink);
   --ink: var(--card-ink); --ink-2: var(--card-ink-2); --faint: var(--card-faint); --line: var(--card-line); --red: var(--card-red); --ai: var(--card-ai);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   padding: 16px 18px;
   box-shadow: 0 10px 30px -18px rgba(0,0,0,0.8);
 }
@@ -605,8 +587,8 @@ html[data-register="tutor"] .search-field, html[data-register="tutor"] select, h
 }
 html[data-register="tutor"] .teacher-note { color: var(--sheet-faint); }
 html[data-register="tutor"] .chat-row { display: flex; gap: 10px; align-items: stretch; }
-html[data-register="tutor"] .chat-row .chat-field { flex: 1 1 auto; border-radius: 6px; }
-html[data-register="tutor"] main button.chat-send, html[data-register="tutor"] main .take { background: var(--sheet-ai); color: var(--sheet-ground); border: 0; border-radius: 6px; font-family: var(--display); min-width: 64px; }
+html[data-register="tutor"] .chat-row .chat-field { flex: 1 1 auto; border-radius: var(--radius-control); }
+html[data-register="tutor"] main button.chat-send, html[data-register="tutor"] main .take { background: var(--sheet-ai); color: var(--sheet-ground); border: 0; border-radius: var(--radius-control); font-family: var(--display); min-width: 64px; }
 html[data-register="tutor"] .teacher-context-label, html[data-register="tutor"] label { color: var(--sheet-faint); }
 
 /* ------------------------------------------------------ 8 · THE REPORT LINE

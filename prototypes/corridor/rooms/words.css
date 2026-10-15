@@ -129,7 +129,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph {
   display: block; font: 800 50px/1.06 var(--font-headword, var(--font-display)); color: var(--color-ink); white-space: nowrap;
   margin: 0; padding: 0 4px; border: 0; background: none; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 4px; border-radius: 4px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 4px; border-radius: var(--radius-card); }
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph[data-len='1'] { font-size: 66px; }
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph[data-len='3'] { font-size: 34px; }
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph[data-len='4'] { font-size: 26px; }
@@ -149,10 +149,9 @@ html:is([data-room='search'], [data-room='word-web']) .ww-node {
   animation: ww-node var(--motion-standard) var(--ease-enter) both; animation-delay: calc(40ms + var(--i, 0) * 5ms);
   -webkit-tap-highlight-color: transparent;
 }
-html:is([data-room='search'], [data-room='word-web']) .ww-node:focus-visible { outline: 2px solid var(--color-live); outline-offset: 2px; border-radius: 4px; }
+html:is([data-room='search'], [data-room='word-web']) .ww-node:focus-visible { outline: 2px solid var(--color-live); outline-offset: 2px; border-radius: var(--radius-card); }
 html:is([data-room='search'], [data-room='word-web']) .ww-nb { position: relative; display: grid; place-items: center; }
 /* a word in the web keeps the word family's own mark under the finger (the reader token's wash), never the press-dim */
-html:is([data-room='search'], [data-room='word-web']) .ww-node:active .ww-nb { background: var(--red-wash); border-radius: 999px; }
 html:is([data-room='search'], [data-room='word-web']) .ww-g { display: block; }
 html:is([data-room='search'], [data-room='word-web']) .ww-cap {
   max-width: 92px; padding: 0 3px; overflow: hidden; background: var(--ww-solid);
@@ -320,7 +319,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-meaning { font-size: 1
 /* follow the part: the signature door from a word into its shared part's family */
 html:is([data-room='search'], [data-room='word-web']) .ww-follow {
   display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: calc(100% - 16px); min-height: 44px; margin: var(--space-3, 12px) 8px 0; padding: 12px 14px;
-  border: 1px solid var(--color-rule); border-radius: var(--radius-card, 4px);
+  border: 1px solid var(--color-rule); border-radius: var(--radius-card);
   background: var(--ww-solid); color: var(--color-ink); text-align: left; cursor: pointer;
 }
 html:is([data-room='search'], [data-room='word-web']) .ww-follow-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; font: 500 15px/1.4 var(--font-ui); }

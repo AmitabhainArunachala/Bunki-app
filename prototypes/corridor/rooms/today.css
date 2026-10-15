@@ -663,7 +663,7 @@ html[data-room='review'] .review-next-door {
   text-align: left;
   cursor: pointer;
 }
-html[data-room='review'] .review-next-door .review-next-pic { width: 112px; aspect-ratio: 3 / 2; height: auto; border-radius: 4px; overflow: hidden; }
+html[data-room='review'] .review-next-door .review-next-pic { width: 112px; aspect-ratio: 3 / 2; height: auto; border-radius: var(--radius-card); overflow: hidden; }
 html[data-room='review'] .review-next-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 html[data-room='review'] .review-next-l {
   font: 600 11px/1 var(--font-ui);

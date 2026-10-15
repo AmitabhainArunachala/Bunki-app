@@ -146,7 +146,7 @@ html[data-room='shelf'] #shelf-today.shelf-today-strip {
 }
 html[data-room='shelf'] #shelf-body .story-teaser {
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-small) var(--radius-small) 0 0;
+  border-radius: var(--radius-seal) var(--radius-seal) 0 0;
   background: var(--color-surface);
   box-shadow: var(--elevation-paper);
 }
@@ -233,7 +233,7 @@ html[data-room='shelf'] #shelf-body .story-teaser .level-badge {
     grid-row: 1;
     width: 100%;
     margin: 0;
-    border-radius: var(--radius-small);
+    border-radius: var(--radius-seal);
     box-shadow: 0 0 0 0.5px var(--color-line);
   }
   html[data-room='shelf'] #shelf-reading-results > :is(.story-second, .story-grid) .shelf-head {
@@ -291,7 +291,7 @@ html[data-room='reader'] body main > .reader-hero .reader-picture-img {
 html[data-room='reader'] main > .reader-hero .reader-picture-caption {
   inset: 10px 12px auto auto;
   padding: 3px 7px;
-  border-radius: var(--radius-small);
+  border-radius: var(--radius-seal);
   background: rgb(10 12 16 / 55%);
   font: 500 9.5px/1.2 var(--font-data);
   letter-spacing: 0.14em;
@@ -471,7 +471,7 @@ html[data-room='shelf'] #shelf-body .shelf-tools-count {
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
-  border-radius: 9px;
+  border-radius: var(--radius-seal);
   background: var(--color-accent);
   color: #f7f2e8;
   font: 600 11px/1 var(--font-data);
@@ -753,7 +753,7 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--mini-edge);
-  border-radius: 16px;
+  border-radius: var(--radius-overlay);
   background: var(--mini-paper);
   /* a tight contact shadow, and a deep shade that falls away from the word the card describes (the card
      sits 10px from its word; a long drop shadow across it would dim the word and its reading) */
@@ -834,7 +834,7 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-#mini button.mini-word:focus-visible { outline: 2px solid var(--mini-gold, currentColor); outline-offset: 2px; border-radius: 2px; }
+#mini button.mini-word:focus-visible { outline: 2px solid var(--mini-gold, currentColor); outline-offset: 2px; border-radius: var(--radius-seal); }
 /* over the sky the house's --color-* tokens are not set (editorial.css scopes them to body:not([data-view='drift'])):
    there the slip reads the galaxy's own depth tokens, so it wears the same card and not a see-through one */
 body[data-view='drift'] #mini {
@@ -886,7 +886,7 @@ body[data-view='drift'] #mini {
   margin: 6px 14px 0;
   padding: 0 14px;
   border: 1px solid var(--mini-edge);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: var(--mini-paper);
   color: var(--color-accent);
   font: 600 15px/1 var(--font-ui);
@@ -913,7 +913,7 @@ body[data-view='drift'] #mini {
   min-height: 44px;
   padding: 0 18px;
   border: 1px solid color-mix(in srgb, var(--color-accent) 70%, #000000);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: var(--color-accent);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%), 0 1px 2px rgb(20 24 34 / 18%);
   color: #fbf8f1;
@@ -967,7 +967,7 @@ body[data-view='drift'] #mini {
   gap: 12px;
   min-height: 46px;
   padding: 0 8px;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   font: 500 16px/1.3 var(--font-ui);
   color: var(--color-ink);
 }
@@ -981,7 +981,7 @@ body[data-view='drift'] #mini {
   height: 22px;
   margin: 0;
   border: 1.5px solid var(--mini-edge);
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   background: none;
 }
 #mini .is-inline .vocabulary-list-choice input::before {
@@ -1015,7 +1015,7 @@ body[data-view='drift'] #mini {
   min-height: 44px;
   padding: 0 12px;
   border: 1px solid var(--mini-rule);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: color-mix(in srgb, var(--mini-band) 70%, transparent);
   color: var(--color-ink);
   font: 400 16px/1.2 var(--font-ui);
@@ -1025,7 +1025,7 @@ body[data-view='drift'] #mini {
   min-height: 44px;
   padding: 0 16px;
   border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: none;
   color: var(--color-accent);
   font: 650 15px/1 var(--font-ui);
@@ -1036,7 +1036,7 @@ body[data-view='drift'] #mini {
 #mini .is-inline .vocabulary-list-action {
   min-height: 46px;
   padding: 0 8px;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   color: var(--color-ink);
   font: 500 16px/1.3 var(--font-ui);
 }
@@ -1083,7 +1083,7 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
   width: 40px;
   height: 40px;
   border: 1px solid color-mix(in srgb, var(--color-ink) 30%, transparent);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   background: var(--mini-paper);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 5px -1px rgb(20 24 34 / 22%);
   color: var(--color-ink);
@@ -1119,7 +1119,7 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
   margin-right: -6px;
   padding: 0 6px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--color-accent);
   font: 600 14.5px/1.2 var(--font-ui);
@@ -1172,7 +1172,7 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
   margin: 0 0 0 -6px;
   padding: 0 8px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--color-accent);
   font: 600 15px/1 var(--font-ui);
@@ -1193,14 +1193,14 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
   margin: 0 0 10px;
   padding: 8px 12px;
   border-left: 3px solid var(--color-accent);
-  border-radius: 0 10px 10px 0;
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
   background: var(--mini-band);
   font: 400 16px/1.7 var(--font-reading);
   color: var(--color-ink);
 }
 #mini .mini-sentence-word {
   padding: 0 1px;
-  border-radius: 3px;
+  border-radius: var(--radius-seal);
   background: color-mix(in srgb, var(--color-gold, #94702a) 26%, transparent);
   box-shadow: inset 0 -2px 0 var(--color-signal);
   color: inherit;
@@ -1218,7 +1218,7 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
   margin: 0;
   padding: 8px 10px 8px 12px;
   border: 1px solid var(--mini-edge);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: var(--mini-paper);
   box-shadow: 0 1px 0 var(--mini-rule), 0 4px 10px -8px rgb(20 24 34 / 40%);
   color: var(--color-ink);
@@ -1289,7 +1289,7 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
 /* the toast is its own lacquer slip: what just happened, and the way back, never melted into the page */
 :root body:not([data-view='drift']) .reader-toast {
   border: 1px solid color-mix(in srgb, #f3ecdd 16%, transparent);
-  border-radius: 14px;
+  border-radius: var(--radius-overlay);
   background: var(--color-lacquer, #141a28);
   box-shadow: 0 2px 4px rgb(0 0 0 / 18%), 0 16px 34px -10px rgb(0 0 0 / 50%);
   color: #f3ecdd;
@@ -1345,7 +1345,7 @@ html[data-room='reader'] body:not([data-view='drift']) {
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero {
   margin: 0 0 4px;
   padding: 10px 10px 34px;
-  border-radius: var(--radius-card, 8px);
+  border-radius: var(--radius-card);
   background: var(--reader-mat);
   -webkit-mask-image: none;
   mask-image: none;
@@ -1354,7 +1354,7 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-her
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero .reader-picture-img {
   /* a phone shows the print as a band, never a sliver; the first sentence still opens on the first screen (R3) */
   height: clamp(136px, calc(100svh - 700px - var(--nav-clearance, 0px)), 280px);
-  border-radius: 3px;
+  border-radius: var(--radius-seal);
   box-shadow: 0 0 0 1px var(--reader-mat-edge), 0 8px 18px -8px rgb(0 0 0 / 70%);
 }
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-hero .reader-picture-caption {
@@ -1393,7 +1393,7 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-car
   margin: 0 0 12px;
   padding: 14px 16px 4px;
   border: 1px solid var(--reader-card-edge);
-  border-radius: 14px;
+  border-radius: var(--radius-card);
   background: var(--reader-card-grain), var(--reader-card);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 3px rgb(20 24 34 / 8%), 0 16px 32px -14px rgb(20 24 34 / 34%);
   color: var(--reader-ink);
@@ -1452,7 +1452,7 @@ html[data-room='reader'] #app > main > .reader-card .version-toggle {
   margin: 0;
   padding: 2px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   background: var(--reader-track);
   box-shadow: inset 0 1px 2px rgb(0 0 0 / 12%);
 }
@@ -1464,7 +1464,7 @@ html[data-room='reader'] #app > main > .reader-card .version-toggle .version-cho
   /* the brief's 44px floor: each side is a 44px box, so the sunk track stands 48px */
   min-height: 44px;
   padding: 0 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   background: transparent;
   box-shadow: none;
   color: var(--color-ink-2);
@@ -1538,7 +1538,7 @@ html[data-room='shelf'] body:not([data-view='drift']) {
     margin: -30px 12px 0;
     padding: 14px 16px 10px;
     border: 1px solid var(--shelf-card-edge);
-    border-radius: 14px;
+    border-radius: var(--radius-card);
     background: var(--shelf-card);
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 3px rgb(20 24 34 / 8%), 0 16px 32px -14px rgb(20 24 34 / 34%);
   }
@@ -1581,7 +1581,7 @@ html[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art { box-shadow: 0 0
 :root body:not([data-view='drift']) .vocabulary-list-popover .vocabulary-list-empty { color: var(--color-muted); }
 :root body:not([data-view='drift']) .vocabulary-list-popover .vocabulary-list-field {
   border: 1px solid color-mix(in srgb, var(--color-ink) 30%, transparent);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: color-mix(in srgb, var(--color-ground) 30%, var(--list-paper));
   box-shadow: inset 0 1px 2px rgb(20 24 34 / 10%);
   color: var(--color-ink);
@@ -1589,7 +1589,7 @@ html[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art { box-shadow: 0 0
 :root body:not([data-view='drift']) .vocabulary-list-popover #vocabulary-list-create {
   min-width: 72px;
   border: 1px solid color-mix(in srgb, var(--color-accent) 70%, #000000);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: var(--color-accent);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%), 0 1px 2px rgb(20 24 34 / 18%);
   color: #fbf8f1;
@@ -1612,7 +1612,7 @@ html[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art { box-shadow: 0 0
     width: 36px;
     height: 4px;
     margin-left: -18px;
-    border-radius: 2px;
+    border-radius: var(--radius-seal);
     background: color-mix(in srgb, var(--color-ink) 22%, transparent);
     pointer-events: none;
   }

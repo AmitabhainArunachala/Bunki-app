@@ -163,7 +163,7 @@ html[data-cd-focus='1'] .ginga-seal {
   display: block;
   height: 2px;
   background: var(--cd-rule);
-  border-radius: 1px;
+  border-radius: var(--radius-seal);
 }
 
 .cd-column {
@@ -439,17 +439,8 @@ ruby.cd-ruby rt {
 }
 
 .cd-btn {
-  border: 1px solid var(--cd-rule);
-  border-radius: 8px;
   min-height: 48px;
   padding: 0.4rem 0.9rem;
-}
-
-.cd-btn.cd-primary,
-.cd-choice.cd-primary {
-  background: var(--cd-ink);
-  color: var(--cd-paper);
-  border-color: var(--cd-ink);
 }
 
 .cd-choice {
@@ -462,7 +453,7 @@ ruby.cd-ruby rt {
 
 .cd-seal {
   border: 1px solid var(--cd-rule);
-  border-radius: 12px;
+  border-radius: var(--radius-seal);
   min-width: 3.1rem;
   min-height: 3.4rem;
   font-family: var(--seal);

@@ -25,9 +25,6 @@ body, body.v-contrast-wcag {
   --shadow-card: 0 1px 2px rgb(0 0 0 / 4%), 0 8px 24px rgb(0 0 0 / 8%);
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 5%), 0 16px 36px rgb(0 0 0 / 12%);
   --shadow-float: 0 2px 6px rgb(0 0 0 / 6%), 0 20px 48px rgb(0 0 0 / 16%);
-  --r-card: 16px;
-  --r-float: 14px;
-  --r-control: 12px;
   --sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', system-ui, sans-serif;
   /* the reader's page only: a 2–3% grain, fine fibre, never on chrome */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g' x='0' y='0' width='240' height='240' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.27 0 0 0 0 0.2 0 0 0 1.4 -0.62'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23g)' opacity='0.26'/%3E%3C/svg%3E");
@@ -127,7 +124,7 @@ body:not(.zen) #app > .chrome > button.chrome-search {
   min-height: 44px;
   padding: 0 10px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   background: transparent;
   box-shadow: none;
   color: var(--tint);
@@ -177,10 +174,10 @@ body:not(.zen) #app > .chrome .lang-seg {
   margin: 0 4px;
   padding: 0;
   border: 0;
-  border-radius: 9px;
+  border-radius: var(--radius-control);
   background: transparent;
 }
-body:not(.zen) #app > .chrome .lang-seg::before { content: ''; position: absolute; z-index: -1; inset: 6px 0; border-radius: 9px; background: var(--fill); }
+body:not(.zen) #app > .chrome .lang-seg::before { content: ''; position: absolute; z-index: -1; inset: 6px 0; border-radius: var(--radius-control); background: var(--fill); }
 body:not(.zen) #app > .chrome .lang-seg button {
   position: relative;
   min-width: 44px;
@@ -200,7 +197,7 @@ body:not(.zen) #app > .chrome .lang-seg button::before {
   position: absolute;
   z-index: -1;
   inset: 8px 2px;
-  border-radius: 7px;
+  border-radius: var(--radius-control);
   transition: none;
 }
 body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true'] { color: var(--label); background: transparent; font-weight: 600; }
@@ -217,7 +214,7 @@ body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main {
   /* --ed-paper is the white surface, unless a room's own material (the tutor's lacquer) rescopes it */
   background: var(--ed-paper);
   border: 0;
-  border-radius: var(--r-card);
+  border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
 }
 body:not(.zen):is([data-view='shelf'], [data-view='levels']) #app > main { max-width: 1160px; }
@@ -242,7 +239,7 @@ body.v-depth-layered main > .eyebrow { padding-top: 0; }
 .gesture-hint { font-size: 13px; line-height: 1.65; color: var(--ed-muted); }
 .pool-tag { font-size: 11px; line-height: 1.7; letter-spacing: 0.01em; color: var(--ed-muted); }
 body .sheet button.pool-tag.cat-chip { min-width: 44px; min-height: 44px; }
-.level-chip { font-size: 12px; letter-spacing: 0.025em; border-radius: 2px; padding: 4px 9px; }
+.level-chip { font-size: 12px; letter-spacing: 0.025em; border-radius: var(--radius-seal); padding: 4px 9px; }
 .level-note { font-size: 13px; line-height: 1.6; }
 .details-toggle { font-size: 13px; letter-spacing: 0.015em; }
 
@@ -258,18 +255,18 @@ body.v-depth-layered :is(.search-page, .search-finder, .kdx-lenses, .skip-ui) {
 }
 body.v-depth-layered :is(.list-page-ops, .record-note, .record-note-editor, .list-maker, .archive-row) {
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: var(--radius-control);
   background: var(--surface-sunk);
   box-shadow: none;
 }
-body.v-depth-layered :is(.study-door, .focus-mode, .grammar-link) { box-shadow: none; border-radius: var(--r-control); }
+body.v-depth-layered :is(.study-door, .focus-mode, .grammar-link) { box-shadow: none; border-radius: var(--radius-card); }
 /* the search room: a large iOS search field, capsule lenses, results as one grouped list */
 .search-page { max-width: 640px; }
 body .search-page .nav-search-input {
   min-height: 52px;
   padding: 0 16px;
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: var(--radius-control);
   background: var(--fill);
   color: var(--label);
   font: 400 19px/1.3 var(--sans);
@@ -286,7 +283,7 @@ body .kdx-lens {
   margin: 0;
   padding: 0 15px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: var(--fill);
   box-shadow: none;
   transition: none;
@@ -300,7 +297,7 @@ body .skip-search-opener {
   min-height: 44px;
   padding: 0 16px;
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: var(--radius-control);
   background: var(--tint-wash);
   color: var(--tint);
   font: 600 15px/1.2 var(--sans);
@@ -311,7 +308,7 @@ body .search-page-results {
   margin-top: 14px;
   overflow: hidden;
   border: 0;
-  border-radius: var(--r-float);
+  border-radius: var(--radius-overlay);
   background: var(--surface);
   box-shadow: 0 0 0 0.5px var(--separator), var(--shadow-card);
 }
@@ -341,7 +338,7 @@ body.v-depth-layered .study-door {
 /* the dojo's choices: grey capsule tiles, the chosen one filled in the accent */
 body .focus-chip, body.v-depth-layered .focus-mode {
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: var(--radius-control);
   background: var(--fill);
   box-shadow: none;
   color: var(--label);
@@ -460,7 +457,7 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
   text-decoration: none;
   background: var(--focus-wash);
   box-shadow: var(--focus-ring);
-  border-radius: 2px 2px 0 0;
+  border-radius: var(--radius-seal) var(--radius-seal) 0 0;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
@@ -502,8 +499,7 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
 .vocabulary-list-choices .chip:hover { background: var(--ai-wash); }
 .vocabulary-list-choices .chip[aria-pressed='true'] { background: var(--ed-ink); color: var(--ed-paper); }
 .vocabulary-list-form { display: grid; gap: 12px; }
-.vocabulary-list-form .search-field { width: 100%; min-width: 0; min-height: 50px; margin: 0; padding: 12px; border: 1px solid var(--ed-rule); border-radius: 3px; font: 16px/1.5 var(--sans); color: var(--ed-ink); background: var(--ed-paper); }
-.vocabulary-list-form .chip, .vocabulary-list-dialog > .chip { min-height: 46px; padding: 10px 16px; border: 1px solid var(--ed-ink); border-radius: 3px; background: var(--ed-paper); color: var(--ed-ink); font-size: 15px; box-shadow: none; }
+.vocabulary-list-form .search-field { width: 100%; min-width: 0; min-height: 50px; margin: 0; padding: 12px; border: 1px solid var(--ed-rule); border-radius: var(--radius-seal); font: 16px/1.5 var(--sans); color: var(--ed-ink); background: var(--ed-paper); }
 .vocabulary-list-dialog > .chip { display: block; margin-left: auto; background: var(--ed-ink); color: var(--ed-paper); }
 .vocabulary-list-dialog .vocabulary-list-status { min-height: 1.7em; font-size: 15px; color: var(--ai); }
 
@@ -546,9 +542,7 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
   border-block: 1px solid var(--ed-rule);
 }
 .reference-field-label { font-size: 13px; font-weight: 600; letter-spacing: 0.02em; color: var(--ed-ink); }
-.reference-library :is(input, select) { min-height: 46px; border: 1px solid var(--ed-rule); background: var(--ed-paper); color: var(--ed-ink); border-radius: 2px; font-size: 16px; padding: 10px 12px; }
-.reference-library .reference-button { padding: 9px 14px; border-color: var(--ed-rule); border-radius: 2px; font-size: 14px; background: var(--ed-paper); }
-.reference-library .reference-button:hover:not(:disabled) { border-color: var(--ed-ink); background: var(--ai-wash); }
+.reference-library :is(input, select) { min-height: 46px; border: 1px solid var(--ed-rule); background: var(--ed-paper); color: var(--ed-ink); border-radius: var(--radius-seal); font-size: 16px; padding: 10px 12px; }
 .reference-results-header { margin-top: 20px; }
 .reference-results-count { font-size: 15px; font-weight: 600; color: var(--ed-ink); }
 .reference-pagination { margin: 18px 0; }
@@ -636,7 +630,7 @@ html[data-register='attempt'] .exam-paper :not(.exam-prompt, .exam-instruction) 
   min-height: 44px;
   padding: 4px;
   border: 1px solid var(--ed-rule);
-  border-radius: 3px;
+  border-radius: var(--radius-seal);
   background: transparent;
   color: var(--ed-ink);
   font: 600 18px/1 var(--sans);
@@ -658,7 +652,7 @@ html[data-register='attempt'] .exam-paper .mock-opt {
   min-height: 62px;
   background: transparent;
 }
-html[data-register='attempt'] .exam-paper .mock-opt:is([aria-checked='true'], [aria-pressed='true'], .chosen, .selected) { color: var(--ed-paper); background: var(--ed-ink); border-radius: 2px; }
+html[data-register='attempt'] .exam-paper .mock-opt:is([aria-checked='true'], [aria-pressed='true'], .chosen, .selected) { color: var(--ed-paper); background: var(--ed-ink); border-radius: var(--radius-seal); }
 html[data-register='attempt'] .exam-paper .mock-opt.wrong { background: var(--red-wash); color: var(--red); }
 html[data-register='attempt'] .exam-paper .mock-opt.right { box-shadow: none; border-bottom: 2px solid var(--ai); }
 html[data-register='attempt'] .exam-paper .mock-opt:hover:not(:disabled):not([aria-pressed='true']) { background: var(--ai-wash); }
@@ -667,7 +661,7 @@ html[data-register='attempt'] .exam-paper .exam-option-row .exam-option-number {
   min-height: 44px;
   padding: 4px;
   border: 1px solid var(--ed-rule);
-  border-radius: 3px;
+  border-radius: var(--radius-seal);
   font: 600 18px/1 var(--sans);
 }
 html[data-register='attempt'] .exam-paper .exam-option-row[data-selected='true'] .exam-option-number { border-color: var(--ed-ink); }
@@ -679,9 +673,9 @@ html[data-register='attempt'] :is(.exam-question-map summary, .exam-leave-contro
 .assessment-room .exam-form h2 { font-size: 26px; }
 .assessment-room .exam-form :is(.exam-skills, .exam-status) { font-size: 14px; line-height: 1.7; letter-spacing: 0; }
 .assessment-room h2.exam-section-heading { font-family: var(--display); font-size: 22px; color: var(--ed-ink); letter-spacing: 0; margin-top: 30px; }
-.exam-length { border-radius: 3px; box-shadow: none; }
+.exam-length { border-radius: var(--radius-seal); box-shadow: none; }
 .exam-length-time { font-size: 13px; letter-spacing: 0; }
-.exam-levels .chip { border-radius: 3px; box-shadow: none; }
+.exam-levels .chip { border-radius: var(--radius-seal); box-shadow: none; }
 
 /* The writing surface retains its living brush. The one speed control has
  * enough room to show all three positions without a second hidden control. */
@@ -692,7 +686,7 @@ html[data-register='attempt'] :is(.exam-question-map summary, .exam-leave-contro
   width: 224px;
   padding: 13px 16px;
   border: 1px solid var(--ed-rule);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   background: var(--ed-paper);
   box-shadow: none;
   color: var(--ed-ink);
@@ -810,8 +804,6 @@ body, body.v-contrast-wcag {
   --raised-shadow: var(--shadow-card);
   --raised-shadow-hover: var(--shadow-lift);
   --float-shadow: var(--shadow-float);
-  --radius-card: var(--r-card);
-  --radius-float: var(--r-float);
   --chrome: var(--glass-solid);
   --chrome-ink: var(--label);
   --art-field: color-mix(in srgb, var(--ai) 58%, #07101d);
@@ -839,34 +831,14 @@ body:not(.zen):not([data-view='drift']) #app > .chrome > button:disabled { visib
  * slot must not push the visible navigation onto a second row on a phone. */
 body:not(.zen) #app > .chrome > #reader-take:disabled { display: none; }
 
-/* ONE button system, app-wide (FEEL, 2026-10-02): primary = the accent filled, white text;
-   secondary = an accent-tinted fill with accent text and no border (every plain .chip is one);
-   tertiary = a plain text button. 12px radius, 44px tall; a press dims (the one press rule). Bilingual labels
-   sit on one baseline: Japanese at full weight, English smaller and lighter. */
-body .chip, body.v-depth-layered .chip {
-  min-height: 44px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: var(--r-control);
-  background: var(--tint-wash);
-  box-shadow: none;
-  color: var(--tint);
-  font: 600 15px/1.25 var(--sans);
-  letter-spacing: 0;
-}
-body .chip:hover:not(:disabled):not([aria-disabled='true']) { background: color-mix(in srgb, var(--tint) 18%, transparent); }
-body .chip:disabled, body.v-depth-layered .chip:disabled, body .chip[aria-disabled='true'] { opacity: 1; background: var(--fill); color: color-mix(in srgb, var(--label) 42%, transparent); }
-/* a graph's node kinds keep their own quiet tint instead of coloured, dashed or doubled edges */
-body.v-depth-layered .chip:is(.t-kanji, .t-word, .t-radical, .t-idiom) { border: 0; }
-body.v-depth-layered .chip.t-kanji { background: color-mix(in srgb, var(--red) 10%, transparent); color: color-mix(in srgb, var(--red) 88%, var(--ink)); }
-body.v-depth-layered .chip.t-radical { background: var(--fill); color: var(--label); }
-body.v-depth-layered .chip.t-idiom { background: color-mix(in srgb, #6a4a7a 11%, transparent); color: #5a3c69; }
+/* the buttons' faces are the eight families, written once after the design tokens (one hand, slice D);
+   here only the bilingual label's layout: Japanese at full weight, English smaller and lighter, on one line */
 /* fields: one quiet iOS look — a grey fill, 12px corners, no outline until focus (the tutor's
    lacquer room keeps its own) */
 html:not([data-register='tutor']) body .search-field,
 html:not([data-register='tutor']) body .record-note-input {
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: var(--radius-control);
   background-color: var(--fill);
   color: var(--label);
   font-family: var(--sans);
@@ -882,52 +854,15 @@ body .chip:has(> .l-ja) > .en-sub { position: relative; top: 1px; }
 body .chip > .l-ja { font-weight: inherit; }
 body .chip > .en-sub { display: inline; font: 500 12px/1.2 var(--sans); letter-spacing: 0.01em; text-transform: none; color: inherit; opacity: 0.78; }
 body .chip .big { font-family: var(--serif); }
-body .btn-primary, body .chip.btn-primary {
-  color: #fff;
-  background: var(--tint);
-  border: 0;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
-  font-weight: 600;
-}
-body .btn-primary .en-sub { color: inherit; opacity: 0.82; }
-body .btn-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--tint) 86%, #000); }
-body .btn-secondary, body .chip.btn-secondary {
-  color: var(--tint);
-  background: var(--tint-wash);
-  border: 0;
-  box-shadow: none;
-  font-weight: 600;
-}
-body .btn-secondary:hover:not(:disabled) { background: color-mix(in srgb, var(--tint) 18%, transparent); }
-body .btn-tertiary, body .chip.btn-tertiary {
-  min-height: 44px;
-  padding: 0 var(--s1);
-  color: var(--tint);
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  text-decoration: none;
-  font: 600 15px/1.4 var(--sans);
-}
-body .btn-tertiary:hover:not(:disabled) { background: var(--fill); }
 .icon-button {
   display: inline-grid;
   place-items: center;
   flex: 0 0 auto;
   width: 44px;
   height: 44px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  color: var(--label-2);
-  background: transparent;
-  cursor: pointer;
   list-style: none;
-  transition: none;
 }
 .icon-button::-webkit-details-marker { display: none; }
-.icon-button:hover { color: var(--tint); background: var(--fill); }
-.icon-button[aria-expanded='true'], details[open] > .icon-button { color: var(--tint); background: var(--tint-wash); }
 .ui-icon { display: block; width: 20px; height: 20px; flex: 0 0 auto; }
 
 /* the learner's labels: level, review state, topic. A level is a crisp capsule in its own level
@@ -939,7 +874,7 @@ body .btn-tertiary:hover:not(:disabled) { background: var(--fill); }
   min-height: 22px;
   padding: 0 8px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-seal);
   color: #fff;
   background: var(--lv, var(--tint));
   font: 700 12px/1 var(--sans);
@@ -953,7 +888,7 @@ body .btn-tertiary:hover:not(:disabled) { background: var(--fill); }
   min-height: 22px;
   padding: 0 8px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-seal);
   color: var(--label-2);
   background: var(--fill);
   font: 600 12px/1 var(--sans);
@@ -1003,7 +938,7 @@ html[data-register='shelf'] .search-field {
   padding: 8px 14px 8px 40px;
   margin: 0 0 var(--s3);
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: var(--radius-control);
   color: var(--label);
   background: var(--fill) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23767680' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E") 13px 50% / 17px 17px no-repeat;
   box-shadow: none;
@@ -1066,7 +1001,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   flex: 0 0 auto;
   width: 38px;
   height: 38px;
-  border-radius: 9px;
+  border-radius: var(--radius-card);
   box-shadow: 0 0 0 0.5px rgb(0 0 0 / 12%), 0 1px 3px rgb(0 0 0 / 12%);
 }
 
@@ -1090,7 +1025,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   margin: 3px 0;
   padding: 0 10px 0 14px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   color: var(--label);
   background: var(--fill);
   box-shadow: none;
@@ -1138,7 +1073,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   margin: 3px 0;
   padding: 0 12px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   color: var(--label-2);
   background: var(--fill);
   box-shadow: none;
@@ -1173,7 +1108,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   padding: var(--s2);
   transform: translateX(-50%);
   border: 0;
-  border-radius: var(--r-float);
+  border-radius: var(--radius-overlay);
   background: var(--surface);
   box-shadow: 0 0 0 0.5px var(--separator), var(--shadow-float);
   font: 14px/1.65 var(--sans);
@@ -1200,7 +1135,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   min-height: 44px;
   padding: 0 12px 0 13px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   color: var(--tint);
   background: var(--tint-wash);
   box-shadow: none;
@@ -1224,7 +1159,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   margin: 0 0 var(--s3);
   padding: var(--s3);
   border: 0;
-  border-radius: var(--r-card);
+  border-radius: var(--radius-card);
   background: var(--surface);
   box-shadow: var(--shadow-card);
   transform-origin: top right;
@@ -1257,7 +1192,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   margin: 0;
   padding: 8px 14px;
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: var(--radius-card);
   background: var(--surface-sunk);
   box-shadow: none;
   color: var(--tint);
@@ -1299,7 +1234,7 @@ body #shelf-body .story-card {
   padding: 0;
   overflow: hidden;
   border: 0;
-  border-radius: var(--r-card);
+  border-radius: var(--radius-card);
   background: var(--surface);
   box-shadow: var(--shadow-card);
   transition: transform var(--motion-standard) var(--ease-standard);
@@ -1494,7 +1429,7 @@ body #shelf-body .story-glossary { box-shadow: 0 0 0 0.5px var(--separator), 0 1
   min-width: 0;
   padding: var(--s2);
   border: 0;
-  border-radius: var(--r-card);
+  border-radius: var(--radius-card);
   background: var(--surface);
   box-shadow: var(--shadow-card);
   color: var(--label);
@@ -1535,7 +1470,7 @@ body #shelf-body .story-glossary { box-shadow: 0 0 0 0.5px var(--separator), 0 1
   margin: var(--s3) auto var(--s8);
   padding: var(--s4) clamp(24px, 5.5vw, 72px) calc(var(--s8) + var(--s4));
   border: 0;
-  border-radius: var(--r-card);
+  border-radius: var(--radius-card);
   background: var(--grain) 0 0 / 240px 240px repeat, var(--surface);
   box-shadow: var(--shadow-card);
 }
@@ -1587,7 +1522,7 @@ body[data-view='reader'] #app > main > .view-title-en {
   aspect-ratio: 3 / 2;
   max-height: max(120px, calc(100svh - 740px));
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   background: color-mix(in srgb, var(--topic, var(--tint)) 16%, var(--surface));
   box-shadow: 0 0 0 0.5px rgb(0 0 0 / 6%);
 }
@@ -1598,7 +1533,7 @@ body[data-view='reader'] #app > main > .view-title-en {
   bottom: 0;
   margin: 0;
   padding: 18px 12px 8px;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
   background: linear-gradient(180deg, transparent, rgb(0 0 0 / 34%));
   font: 600 11px/1.3 var(--sans);
   letter-spacing: 0.04em;
@@ -1624,7 +1559,7 @@ body:not(.zen) #app > .chrome > .level-chip.chrome-level { flex: 0 0 auto; align
   margin: 0 0 var(--s3);
   padding: 3px;
   border: 1px solid var(--raised-edge-strong);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
 }
 .version-toggle .version-choice {
   display: inline-flex;
@@ -1634,7 +1569,7 @@ body:not(.zen) #app > .chrome > .level-chip.chrome-level { flex: 0 0 auto; align
   min-height: 44px;
   padding: 4px 16px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--text-2);
   font: 600 14px/1.2 var(--sans);
@@ -1644,26 +1579,13 @@ body:not(.zen) #app > .chrome > .level-chip.chrome-level { flex: 0 0 auto; align
 .version-toggle { background: color-mix(in srgb, var(--ink) 5%, var(--raised)); }
 .version-toggle .version-choice[aria-pressed='true'] { background: var(--raised); color: var(--text); box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 18%, transparent), 0 0 0 1px var(--raised-edge); }
 .dials-hint { margin: var(--s1) 0 0; font: 13px/1.6 var(--sans); color: var(--text-2); }
-body.v-depth-layered .dials { margin: 0 0 var(--s3); border: 0; border-radius: var(--r-card); background: var(--surface-sunk); box-shadow: none; padding: var(--s2); }
+body.v-depth-layered .dials { margin: 0 0 var(--s3); border: 0; border-radius: var(--radius-card); background: var(--surface-sunk); box-shadow: none; padding: var(--s2); }
 /* every segmented choice is an iOS segmented control: a grey track, the chosen segment a white knob
    inset 2px inside its own 44px door (the track adds no height to the row) */
-body .seg { gap: 0; padding: 0; border: 0; border-radius: 10px; background: var(--fill); overflow: visible; }
-body .seg button {
-  min-height: 44px;
-  padding: 0 4px;
-  border: 2px solid transparent;
-  border-radius: 10px;
-  background: transparent;
-  background-clip: padding-box;
-  color: var(--label);
-  font: 500 14px/1.25 var(--sans);
-  letter-spacing: 0;
-  transition: none;
-}
+body .seg { gap: 0; padding: 0; overflow: visible; }
+body .seg button { padding: 0 4px; }
 body .seg button :is(.l-ja, .en-sub) { color: inherit; }
 body .seg button .en-sub { font: 500 11px/1.2 var(--sans); letter-spacing: 0.01em; text-transform: none; color: var(--label-2); }
-body .seg button:hover:not([aria-pressed='true']) { background: rgb(255 255 255 / 45%); }
-body .seg button[aria-pressed='true'] { background: var(--surface); box-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 0 0 0.5px rgb(0 0 0 / 5%); color: var(--label); font-weight: 600; }
 body .dial-label { font-family: var(--sans); color: var(--label-2); letter-spacing: 0; }
 
 /* the play bar — only when the locked voice has clips for this article */
@@ -1676,7 +1598,7 @@ body.v-depth-layered .listen-row.play-bar, .listen-row.play-bar {
   margin: 0 0 var(--s3);
   padding: 6px 8px 6px 6px;
   border: 1px solid var(--raised-edge);
-  border-radius: 999px;
+  border-radius: var(--radius-overlay);
   background: color-mix(in srgb, var(--ink) 3%, var(--raised));
   box-shadow: none;
 }
@@ -1699,7 +1621,7 @@ body.v-depth-layered .listen-row.play-bar, .listen-row.play-bar {
   flex: 1 1 auto;
   height: 4px;
   overflow: hidden;
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   background: var(--hairline);
 }
 .play-track::after {
@@ -1716,7 +1638,7 @@ body.v-depth-layered .listen-row.play-bar, .listen-row.play-bar {
   height: 44px;
   flex-shrink: 0;
   border: 1px solid var(--raised-edge-strong);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--text);
   font: 600 13px/1 var(--sans);
@@ -1771,8 +1693,6 @@ body.v-depth-layered #reader, #reader.reader {
 }
 /* segmentation shows only under the finger or the pointer, hugging the glyphs */
 #reader .tok:hover, #reader .tok:focus-visible { background: transparent; }
-@media (hover: hover) { #reader .tok:hover > .tok-word { background: var(--ai-wash); border-radius: 2px; } }
-#reader .tok.tok-current > .tok-word { background: var(--accent-wash); box-shadow: inset 0 -2px 0 var(--accent); border-radius: 2px 2px 0 0; }
 body[data-view='reader'] main > blockquote {
   margin: var(--s4) 0;
   padding: var(--s3) var(--s4);
@@ -1799,7 +1719,7 @@ body[data-view='reader'] main > blockquote rt { font-size: 0.6em; color: var(--a
   padding: 10px 10px 10px var(--s3);
   transform: translateX(-50%);
   border: 1px solid var(--raised-edge);
-  border-radius: var(--radius-float);
+  border-radius: var(--radius-overlay);
   background: var(--raised);
   box-shadow: var(--float-shadow);
   animation: float-in var(--motion-room) var(--ease-standard);
@@ -1818,7 +1738,7 @@ body[data-view='reader'] main > blockquote rt { font-size: 0.6em; color: var(--a
   flex-direction: column;
   min-height: 48px;
   padding: 4px var(--s2);
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   font: 700 15px/1.2 var(--sans);
   white-space: nowrap;
 }
@@ -1833,7 +1753,7 @@ body[data-view='reader'] main > blockquote rt { font-size: 0.6em; color: var(--a
   padding: 4px 2px 4px var(--s2);
   border: 1px solid var(--raised-edge);
   border-left: 3px solid var(--ai);
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   color: var(--text);
   background: color-mix(in srgb, var(--ai) 6%, var(--raised));
 }
@@ -1849,7 +1769,7 @@ body[data-view='reader'] main > blockquote rt { font-size: 0.6em; color: var(--a
   min-height: 44px;
   padding: 0 var(--s3);
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: var(--radius-control);
   color: var(--tint);
   background: var(--tint-wash);
   box-shadow: none;
@@ -1860,7 +1780,7 @@ body[data-view='reader'] main > blockquote rt { font-size: 0.6em; color: var(--a
 .article-about {
   padding: var(--s3);
   border: 1px solid var(--hairline);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   background: color-mix(in srgb, var(--ink) 3%, var(--raised));
 }
 .article-about-head { margin: 0 0 var(--s2); font: 800 18px/1.4 var(--display); color: var(--text); }
@@ -1935,7 +1855,7 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   #shelf-body .story-second .shelf-title { font-size: 23px; }
   /* a phone reads the grid as a newspaper's list: the story on the left, its picture beside it */
   #shelf-reading-results > .story-grid .shelf-open { display: grid; grid-template-columns: minmax(0, 1fr) 128px; align-items: start; }
-  #shelf-reading-results > .story-grid .story-picture { grid-column: 2; grid-row: 1; margin: 16px 16px 16px 0; border-radius: 10px; }
+  #shelf-reading-results > .story-grid .story-picture { grid-column: 2; grid-row: 1; margin: 16px 16px 16px 0; border-radius: var(--radius-card); }
   #shelf-reading-results > .story-grid .shelf-head { grid-column: 1; grid-row: 1; padding: 14px 12px 16px 16px; }
   #shelf-reading-results > .story-grid .level-badge { top: 6px; right: 6px; min-height: 20px; padding: 0 7px; font-size: 11px; }
   #shelf-reading-results > .story-grid .story-picture-word { font-size: 10px; letter-spacing: 0.1em; }
@@ -2114,7 +2034,7 @@ body .sheet > p.eyebrow .en-inline, body .sheet > p.eyebrow .en-sub {
 body .sheet .dictionary-homographs {
   padding: 12px var(--s2);
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   background: color-mix(in srgb, var(--ink) 4%, var(--raised));
 }
 body .sheet .entry-rows { border-top: 0; }
@@ -2134,7 +2054,7 @@ body .sheet .entry-row .row-glyph {
   height: 48px;
   min-width: 48px;
   border: 1px solid var(--raised-edge);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   background: var(--washi) 0 0 / 300px 300px, color-mix(in srgb, var(--ink) 4%, var(--raised));
   box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 10%, transparent);
   font: 400 30px/1 var(--serif);
@@ -2153,7 +2073,7 @@ body .sheet > .shelf-meta > * {
   min-height: 24px;
   padding: 0 8px;
   border: 1px solid color-mix(in srgb, var(--ai) 50%, transparent);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   background: color-mix(in srgb, var(--ai) 7%, var(--raised));
   color: var(--ai);
   font: 700 13px/1 var(--sans);
@@ -2163,7 +2083,7 @@ body .sheet .teacher-door {
   margin: var(--s3) 0;
   padding: var(--s2) 20px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   background: color-mix(in srgb, var(--ink) 4%, var(--raised));
 }
 body .sheet .teacher-door .teacher-source-quote { font: 18px/1.9 var(--serif); color: var(--text); }
@@ -2205,7 +2125,7 @@ body .sheet .hero-glyph {
   width: 136px;
   height: 136px;
   border: 1px solid var(--raised-edge);
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   background: var(--washi) 0 0 / 300px 300px, color-mix(in srgb, var(--ink) 3%, var(--raised));
   box-shadow: var(--raised-shadow);
   font: 400 104px/1 var(--serif);
@@ -2220,7 +2140,7 @@ body .sheet .hero .cat-chip {
   min-height: 44px; /* a catalog door is a real 44px target */
   padding: 0 10px;
   border: 1px solid color-mix(in srgb, var(--ai) 50%, transparent);
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   background: color-mix(in srgb, var(--ai) 7%, var(--raised));
   color: var(--ai);
   font: 700 13px/1 var(--sans);
@@ -2237,7 +2157,7 @@ body .sheet .hero #kanji-shape-lookup, body .sheet .teacher-door .chip {
   min-height: 44px;
   padding: 4px 14px;
   border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent);
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   background: transparent;
   box-shadow: none;
   color: var(--ai);
@@ -2254,7 +2174,7 @@ body .sheet .rad-door {
   margin: 0 0 var(--s2);
   padding: 12px var(--s2);
   border: 1px solid var(--raised-edge);
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   background: var(--raised);
   box-shadow: var(--raised-shadow);
 }
@@ -2265,7 +2185,7 @@ body .sheet .rad-sub { font: 13px/1.5 var(--sans); color: var(--text-2); }
 body .sheet .stroke-door {
   padding: 10px;
   border: 1px solid var(--raised-edge);
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   background: var(--washi) 0 0 / 300px 300px, color-mix(in srgb, var(--ink) 3%, var(--raised));
   box-shadow: var(--raised-shadow);
 }
@@ -2273,14 +2193,14 @@ body .sheet .stroke-door {
 
 /* the writing room */
 #stroke-page .ink-sheet {
-  border-radius: 6px;
+  border-radius: var(--radius-card);
   box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 16%, transparent), 0 24px 60px -28px color-mix(in srgb, var(--ink) 60%, transparent),
     0 0 0 1px color-mix(in srgb, var(--ink) 10%, transparent);
 }
 #stroke-page .stroke-back, #stroke-page[data-minimal] #strokes-back, #stroke-page .stroke-btn.stroke-corner, #stroke-page .stroke-chrome-trigger {
   opacity: 0.92;
   border: 1px solid var(--raised-edge-strong);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: color-mix(in srgb, var(--raised) 92%, transparent);
   box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 10%, transparent), 0 8px 18px -12px color-mix(in srgb, var(--ink) 40%, transparent);
   color: var(--text);
@@ -2298,7 +2218,7 @@ body .sheet .stroke-door {
 #stroke-page :is(.stroke-back, .stroke-btn, .stroke-chrome-trigger):hover { opacity: 1; border-color: var(--ai); }
 #stroke-page .stroke-speed-wrap, #stroke-page .stroke-speed-wrap.stroke-corner {
   border: 1px solid var(--raised-edge);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: var(--raised);
   box-shadow: var(--raised-shadow);
 }
@@ -2355,7 +2275,7 @@ body, body.v-contrast-wcag {
   min-height: 44px;
   padding: 0 var(--s2) 0 12px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: var(--tint-wash);
   color: var(--tint);
   font: 600 14px/1.2 var(--sans);
@@ -2384,7 +2304,7 @@ body, body.v-contrast-wcag {
 .reference-explainer[open] {
   padding-bottom: var(--s2);
   border: 1px solid var(--raised-edge);
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   background: var(--raised);
   box-shadow: var(--raised-shadow);
 }
@@ -2401,7 +2321,7 @@ body .reference-library .reference-level {
   min-height: 148px;
   padding: 20px;
   border: 1px solid var(--raised-edge);
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   background: var(--raised);
   box-shadow: var(--raised-shadow);
   transition: transform 180ms ease-out;
@@ -2455,7 +2375,7 @@ html[data-register='jlpt'] .exam-levels .chip.exam-level-card {
   min-height: 132px;
   padding: var(--s2) var(--s2) 20px;
   border: 1px solid color-mix(in srgb, var(--lv) 28%, var(--raised-edge));
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   background: linear-gradient(180deg, color-mix(in srgb, var(--lv) 8%, var(--raised)) 0%, var(--raised) 75%);
   box-shadow: var(--raised-shadow);
   color: var(--text);
@@ -2473,7 +2393,7 @@ html[data-register='jlpt'] .exam-level-progress {
   bottom: 12px;
   height: 4px;
   overflow: hidden;
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   background: color-mix(in srgb, var(--lv) 16%, transparent);
 }
 html[data-register='jlpt'] .exam-level-progress::after {
@@ -2502,7 +2422,7 @@ html[data-register='jlpt'] .exam-lengths {
   margin: 0 0 var(--s4);
   padding: 4px;
   border: 1px solid var(--raised-edge-strong);
-  border-radius: 14px;
+  border-radius: var(--radius-card);
   background: color-mix(in srgb, var(--ink) 4%, var(--raised));
 }
 html[data-register='jlpt'] .exam-length {
@@ -2511,7 +2431,7 @@ html[data-register='jlpt'] .exam-length {
   min-height: 56px;
   padding: 8px 12px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   background: transparent;
   box-shadow: none;
   color: var(--text-2);
@@ -2526,7 +2446,7 @@ html[data-register='jlpt'] .study-hall.guided-entry { margin: 0 0 var(--s4); bor
 html[data-register='jlpt'] .study-hall.guided-entry .study-door {
   padding: 20px var(--s3);
   border: 1px solid var(--raised-edge);
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   background: var(--raised);
   box-shadow: var(--raised-shadow);
 }
@@ -2553,7 +2473,7 @@ html[data-register='jlpt'] .assessment-room .exam-form {
   margin: 0 0 var(--s2);
   padding: 20px var(--s3) var(--s2);
   border: 1px solid var(--raised-edge);
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   background: var(--raised);
   box-shadow: var(--raised-shadow);
 }
@@ -2567,7 +2487,7 @@ html[data-register='jlpt'] .exam-form button.take {
   margin-top: var(--s1);
   padding: 0 var(--s3);
   border: 1px solid var(--ai);
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   background: var(--ai);
   color: var(--raised);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), inset 0 1px 0 rgb(255 255 255 / 14%);
@@ -2610,7 +2530,7 @@ html[data-register='jlpt'] .exam-official .exam-official-import,
   margin: var(--s1) var(--s1) 0 0;
   padding: 0 var(--s3);
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: var(--radius-control);
   background: var(--tint-wash);
   color: var(--tint);
   box-shadow: none;
@@ -2622,7 +2542,7 @@ html[data-register='jlpt'] .exam-official .exam-official-import,
   html[data-register='jlpt'] .exam-official .exam-official-import:hover,
   .assessment-room .exam-confirm > button:not(.take):hover { background: color-mix(in srgb, var(--tint) 18%, transparent); }
 }
-.assessment-room .exam-confirm > button.take { min-height: 48px; border-radius: 10px; font: 700 16px/1 var(--sans); }
+.assessment-room .exam-confirm > button.take { min-height: 48px; }
 html[data-register='jlpt'] .exam-older .exam-older-mark { margin: 0 0 var(--s1); }
 /* the real-paper section is ruled by its heading like every other section, not boxed in hairlines too */
 html[data-register='jlpt'] .assessment-room .exam-official { border: 0; padding: 0; }
@@ -2634,7 +2554,7 @@ html[data-register='jlpt'] .assessment-room .exam-official > h2.exam-section-hea
   html[data-register='jlpt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
   /* five compact cards in one row: the level, its tests, and the last score once there is one */
   html[data-register='jlpt'] .exam-levels { gap: 6px; }
-  html[data-register='jlpt'] .exam-levels .chip.exam-level-card { min-height: 92px; padding: 10px 8px 18px; border-radius: 10px; }
+  html[data-register='jlpt'] .exam-levels .chip.exam-level-card { min-height: 92px; padding: 10px 8px 18px; border-radius: var(--radius-card); }
   html[data-register='jlpt'] .exam-level-name { font-size: 24px; }
   html[data-register='jlpt'] .exam-level-tests { font-size: 12px; }
   html[data-register='jlpt'] .exam-level-card[data-last='none'] .exam-level-last { display: none; }
@@ -2668,7 +2588,7 @@ html[data-register='attempt'] .exam-mode-badge {
   margin: 0 var(--s1) 0 0;
   padding: 0 12px;
   border: 1px solid color-mix(in srgb, var(--ai) 45%, transparent);
-  border-radius: 999px;
+  border-radius: var(--radius-seal);
   background: color-mix(in srgb, var(--ai) 8%, var(--raised));
   color: var(--ai);
   font: 700 13px/1 var(--sans);
@@ -2688,7 +2608,7 @@ html[data-register='attempt'] .exam-progress {
   padding: 10px var(--s2) 10px 20px;
   border: 1px solid var(--raised-edge);
   border-bottom: 0;
-  border-radius: 12px 12px 0 0;
+  border-radius: var(--radius-overlay) var(--radius-overlay) 0 0;
   background: color-mix(in srgb, var(--ink) 5%, var(--raised));
   font: 600 15px/1.4 var(--sans);
   color: var(--text);
@@ -2699,7 +2619,7 @@ html[data-register='attempt'] .exam-timer {
   align-items: center;
   min-height: 34px;
   padding: 0 14px;
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   background: var(--chrome);
   color: var(--chrome-ink);
   font: 700 18px/1 var(--sans);
@@ -2720,7 +2640,7 @@ html[data-register='attempt'] .assessment-room .exam-paper {
   padding: var(--s4) clamp(20px, 5vw, 56px) var(--s3);
   border: 1px solid var(--raised-edge);
   border-top: 0;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
   background: var(--washi) 0 0 / 300px 300px, var(--raised);
   box-shadow: var(--raised-shadow);
 }
@@ -2740,14 +2660,14 @@ html[data-register='attempt'] .exam-question-number {
   height: 34px;
   margin-right: 14px;
   border: 1.5px solid var(--text);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   font: 700 18px/1 var(--sans);
   vertical-align: 4px;
 }
 html[data-register='attempt'] .exam-target { font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.28em; text-decoration-color: var(--text); }
 html[data-register='attempt'] .exam-paper .exam-instruction { padding: 0 0 var(--s1); font: 14px/1.6 var(--sans); color: var(--text-2); background: transparent; box-shadow: none; }
-html[data-register='attempt'] .exam-paper .exam-study-help { margin: 0 0 var(--s1); padding: 10px 14px; border: 0; border-radius: 8px; background: color-mix(in srgb, var(--ai) 7%, var(--raised)); font: 14px/1.6 var(--sans); color: var(--text); }
-html[data-register='attempt'] .exam-option-row { gap: var(--s2); min-height: 64px; padding: 10px 6px; border-top: 1px solid var(--hairline); border-radius: 6px; }
+html[data-register='attempt'] .exam-paper .exam-study-help { margin: 0 0 var(--s1); padding: 10px 14px; border: 0; border-radius: var(--radius-card); background: color-mix(in srgb, var(--ai) 7%, var(--raised)); font: 14px/1.6 var(--sans); color: var(--text); }
+html[data-register='attempt'] .exam-option-row { gap: var(--s2); min-height: 64px; padding: 10px 6px; border-top: 1px solid var(--hairline); border-radius: var(--radius-control); }
 html[data-register='attempt'] .exam-paper .exam-option-row .exam-option-number, html[data-register='attempt'] .exam-paper .mock-opt.exam-option-number {
   display: grid;
   place-items: center;
@@ -2756,7 +2676,7 @@ html[data-register='attempt'] .exam-paper .exam-option-row .exam-option-number, 
   min-height: 44px;
   padding: 0;
   border: 1.5px solid color-mix(in srgb, var(--ink) 40%, transparent);
-  border-radius: 8px;
+  border-radius: var(--radius-seal);
   background: var(--raised);
   color: var(--text);
   box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 10%, transparent);
@@ -2771,7 +2691,7 @@ html[data-register='attempt'] .exam-paper .exam-option-number:is([aria-checked='
 }
 html[data-register='attempt'] .exam-paper .exam-option-row[data-selected='true'] { background: var(--ai-wash); }
 html[data-register='attempt'] .exam-option-text { font: 21px/1.9 var(--serif); color: var(--text); }
-html[data-register='attempt'] #exam-flag { min-height: 44px; padding: 0 14px; border: 1px solid var(--raised-edge-strong); border-radius: 999px; background: var(--raised); color: var(--text); font: 600 14px/1 var(--sans); box-shadow: none; }
+html[data-register='attempt'] #exam-flag { min-height: 44px; padding: 0 14px; border: 1px solid var(--raised-edge-strong); border-radius: var(--radius-control); background: var(--raised); color: var(--text); font: 600 14px/1 var(--sans); box-shadow: none; }
 html[data-register='attempt'] #exam-flag[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); background: var(--accent-wash); }
 html[data-register='attempt'] .exam-bookmark-note { font: 13px/1.6 var(--sans); color: var(--text-2); }
 html[data-register='attempt'] .mock-nav { display: flex; gap: var(--s2); margin: var(--s3) 0 var(--s2); }
@@ -2779,13 +2699,13 @@ html[data-register='attempt'] .mock-nav .take, html[data-register='attempt'] #ex
   min-height: 48px;
   padding: 0 var(--s4);
   border: 1px solid var(--ai);
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   background: var(--ai);
   color: var(--raised);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 30%, transparent), inset 0 1px 0 rgb(255 255 255 / 14%);
   font: 700 16px/1 var(--sans);
 }
-html[data-register='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var(--s3); border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent); border-radius: 10px; background: transparent; color: var(--ai); font: 700 16px/1 var(--sans); box-shadow: none; }
+html[data-register='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var(--s3); border: 1px solid color-mix(in srgb, var(--ai) 55%, transparent); border-radius: var(--radius-control); background: transparent; color: var(--ai); font: 700 16px/1 var(--sans); box-shadow: none; }
 @media (max-width: 520px) {
   html[data-register='attempt'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: 100%; padding: var(--s2) var(--s2) var(--s8); }
   html[data-register='attempt'] .assessment-room .exam-paper { padding: var(--s3) var(--s2) var(--s2); }
@@ -2800,12 +2720,12 @@ html[data-register='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var
    The reader's keyboard model: one Tab stop per paragraph, arrows between
    words. The focused word wears the focus token; the pill shows its keys. */
 #reader .tok:focus-visible { outline: none; background: transparent; }
-#reader .tok:focus-visible > .tok-word { background: var(--focus-wash); box-shadow: var(--focus-ring); border-radius: 2px 2px 0 0; }
+#reader .tok:focus-visible > .tok-word { background: var(--focus-wash); box-shadow: var(--focus-ring); border-radius: var(--radius-seal) var(--radius-seal) 0 0; }
 .token-actions .tok-kbd {
   margin-left: 6px;
   padding: 1px 5px;
   border: 1px solid var(--raised-edge-strong);
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   font: 600 11px/1.2 var(--sans);
   color: var(--text-2);
 }
@@ -2825,7 +2745,7 @@ body .token-actions {
   gap: 2px;
   padding: 4px;
   border: 1px solid var(--raised-edge);
-  border-radius: 12px;
+  border-radius: var(--radius-overlay);
   background: var(--raised);
   box-shadow: var(--float-shadow);
 }
@@ -2836,7 +2756,7 @@ body .token-actions button {
   gap: 6px;
   min-height: 44px;
   padding: 0 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   color: var(--ai);
   font: 700 14px/1 var(--sans);
   white-space: nowrap;
@@ -2856,7 +2776,7 @@ body .token-actions button:hover { background: var(--ai-wash); }
 #app .list-head .list-review {
   min-height: 44px;
   padding: 0 14px;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   font: 600 13px/1 var(--sans);
   letter-spacing: 0;
   white-space: nowrap;
@@ -2876,7 +2796,7 @@ body .token-actions button:hover { background: var(--ai-wash); }
   max-width: calc(100vw - 16px);
   padding: 6px;
   border: 1px solid var(--raised-edge);
-  border-radius: 10px;
+  border-radius: var(--radius-overlay);
   background: var(--raised);
   box-shadow: var(--float-shadow);
 }
@@ -2887,7 +2807,7 @@ body .token-actions button:hover { background: var(--ai-wash); }
   min-height: 44px;
   padding: 0 12px;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--text);
   font: 500 15px/1.25 var(--sans);
@@ -2911,7 +2831,7 @@ body .token-actions button:hover { background: var(--ai-wash); }
   max-width: calc(100vw - 2 * var(--s2));
   padding: 4px 4px 4px var(--s2);
   transform: translateX(-50%);
-  border-radius: 10px;
+  border-radius: var(--radius-overlay);
   background: var(--chrome);
   color: var(--chrome-ink);
   box-shadow: var(--float-shadow);
@@ -2923,7 +2843,7 @@ body .token-actions button:hover { background: var(--ai-wash); }
   min-height: 44px;
   padding: 0 12px;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   background: transparent;
   color: inherit;
   font: 700 15px/1 var(--sans);
@@ -2940,7 +2860,7 @@ body .token-actions button:hover { background: var(--ai-wash); }
   width: min(300px, calc(100vw - 16px));
   padding: 12px var(--s2) var(--s2);
   border: 1px solid var(--raised-edge);
-  border-radius: 12px;
+  border-radius: var(--radius-overlay);
   background: var(--raised);
   color: var(--text);
   box-shadow: var(--float-shadow);
@@ -2948,13 +2868,13 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .vocabulary-list-popover:focus { outline: none; }
 /* as Save ▾'s menu: after the lists, the word's other actions, one plain row each */
 .vocabulary-list-more { display: grid; margin: 8px -4px 0; padding-top: 6px; border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent); }
-.vocabulary-list-action { min-height: 44px; padding: 0 8px; border: 0; border-radius: 6px; background: none; color: inherit; font: 15px/1.3 var(--sans); text-align: start; cursor: pointer; }
+.vocabulary-list-action { min-height: 44px; padding: 0 8px; border: 0; border-radius: var(--radius-control); background: none; color: inherit; font: 15px/1.3 var(--sans); text-align: start; cursor: pointer; }
 .vocabulary-list-action:hover { background: var(--ai-wash); }
 .vocabulary-list-action:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .vocabulary-list-action#mini-unsave { color: var(--text-2); }
 .vocabulary-list-title { margin: 0 0 4px; font: 700 15px/1.4 var(--sans); overflow-wrap: anywhere; }
 .vocabulary-list-popover .vocabulary-list-choices { display: grid; max-height: 40vh; margin: 0 0 8px; overflow: auto; border: 0; }
-.vocabulary-list-choice { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 4px; border-radius: 6px; font: 15px/1.3 var(--sans); cursor: pointer; }
+.vocabulary-list-choice { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 4px; border-radius: var(--radius-control); font: 15px/1.3 var(--sans); cursor: pointer; }
 .vocabulary-list-choice:hover { background: var(--ai-wash); }
 .vocabulary-list-choice input { flex: 0 0 auto; width: 18px; height: 18px; margin: 0; accent-color: var(--ai); }
 .vocabulary-list-choice:has(input:focus-visible) { background: var(--focus-wash); box-shadow: var(--focus-ring); }
@@ -2968,13 +2888,13 @@ body .token-actions button:hover { background: var(--ai-wash); }
   min-height: 44px;
   padding: 0 10px;
   border: 1px solid var(--raised-edge-strong);
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   background: var(--raised);
   color: var(--text);
   font: 15px/1.2 var(--sans);
 }
 .vocabulary-list-field:focus-visible { outline: 2px solid var(--ai); outline-offset: 1px; }
-.vocabulary-list-popover .vocabulary-list-create { min-height: 44px; padding: 0 14px; border-radius: 8px; font: 600 15px/1 var(--sans); }
+.vocabulary-list-popover .vocabulary-list-create { min-height: 44px; padding: 0 14px; border-radius: var(--radius-control); font: 600 15px/1 var(--sans); }
 .vocabulary-list-popover .vocabulary-list-status { min-height: 0; margin: 6px 0 0; font: 13px/1.5 var(--sans); color: var(--ai); }
 .vocabulary-list-popover .vocabulary-list-status:empty { display: none; }
 .vocabulary-list-popover :is(.vocabulary-list-form, .vocabulary-list-new)[hidden] { display: none; }
@@ -3057,7 +2977,7 @@ html[data-cd-focus='1'] body[data-view='contextdeck'] .chrome { opacity: 1; poin
 body[data-view='contextdeck'] :is(.cd-btn, .cd-choice, .cd-seal) {
   min-height: 44px;
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: var(--radius-card);
   padding: 10px 16px;
   font-family: var(--sans);
 }
@@ -3142,7 +3062,7 @@ body.has-primary-tabs #app { padding-bottom: var(--nav-clearance); }
   margin: 0;
   padding: 0 2px 7px;
   border: 0;
-  border-radius: var(--radius-small);
+  border-radius: var(--radius-seal);
   background: transparent;
   color: var(--color-muted);
   box-shadow: none;
@@ -3281,14 +3201,14 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 /* ─ the bar: ×, one hairline of progress, the count in plain figures, Remove as a quiet word */
 #app .kp-top-study { gap: 14px; }
 #app .kp-top-study .kp-icon { width: 40px; color: color-mix(in srgb, var(--kp-stage-ink) 78%, transparent); font-size: 22px; }
-#app .kp-top-study .kp-progress { height: 2px; border-radius: 1px; background: color-mix(in srgb, var(--kp-stage-ink) 14%, transparent); -webkit-mask-image: none; mask-image: none; }
-#app .kp-top-study .kp-progress i { background: color-mix(in srgb, var(--kp-stage-ink) 80%, transparent); border-radius: 1px; }
+#app .kp-top-study .kp-progress { height: 2px; border-radius: var(--radius-seal); background: color-mix(in srgb, var(--kp-stage-ink) 14%, transparent); -webkit-mask-image: none; mask-image: none; }
+#app .kp-top-study .kp-progress i { background: color-mix(in srgb, var(--kp-stage-ink) 80%, transparent); border-radius: var(--radius-seal); }
 #app .kp-top-study .kp-count { min-width: 0; font: 500 13px/1 var(--sans, system-ui); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; color: var(--kp-stage-mute); }
 #app .kp-top-study .kp-delete { height: 44px; padding: 0 4px; border: 0; background: transparent; font: 500 13px/1 var(--sans, system-ui); letter-spacing: 0.01em; color: var(--kp-stage-mute); }
 /* ─ the sheet: one paper, one hairline edge (no kind stripe), a little fibre, lifted by two shadows:
    a close one that says it rests, a long one that says it is lit from above */
 #app .kp-study .kp-card {
-  gap: 14px; padding: 20px 22px 24px; border-radius: 3px;
+  gap: 14px; padding: 20px 22px 24px; border-radius: var(--radius-seal);
   border: 1px solid color-mix(in srgb, var(--kp-ink) 9%, transparent);
   /* plain paper: a texture never sits under the readings (the deck's own rule, 和紙・黒板・桜) */
   background: var(--kp-panel);
@@ -3321,8 +3241,6 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
    One mark, not three (the underline goes) */
 #app .kp-study .kp-target { color: var(--kp-ink); font-weight: 700; text-decoration: none; padding: 0 0.1em; margin: 0 -0.1em; }
 #app .kp-study .kp-target.kp-tok:hover, #app .kp-study .kp-target.kp-tok:focus-visible { text-decoration: none; }
-/* ─ a tapped word: its reading shows (above) and a faint ink wash ties it to its open meaning */
-#app .kp-study .kp-tok.kp-lit { background: color-mix(in srgb, var(--kp-ink) 7%, transparent); border-radius: 2px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--kp-ink) 7%, transparent); }
 /* ─ reveal: the right half of the screen turns the card (John, 2026-10-13: "Simply tapping the right
    of the screen should show back of card. No need for 'reveal answer' button"). The button stays a
    real, labelled control for keyboard and VoiceOver; it just has no look. Its keyboard focus shows as
@@ -3375,7 +3293,7 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 #app .kp-done .kp-sub { margin: -8px 0 0; font: 400 14px/1.5 var(--sans, system-ui); color: var(--kp-stage-mute); }
 #app .kp-done .kp-door {
   display: grid; justify-items: start; gap: 8px; margin-top: 12px; min-height: 0; padding: 16px 18px 18px; text-align: left;
-  border: 0; border-radius: 3px; background: var(--washi, none) 0 0 / 300px 300px, var(--kp-panel); color: var(--kp-ink);
+  border: 0; border-radius: var(--radius-seal); background: var(--washi, none) 0 0 / 300px 300px, var(--kp-panel); color: var(--kp-ink);
   box-shadow: 0 1px 0 rgb(255 255 255 / 55%) inset, 0 18px 36px -18px rgb(0 0 0 / 60%);
 }
 #app .kp-done .kp-door-l { font: 500 12px/1 var(--sans, system-ui); letter-spacing: 0.02em; color: var(--kp-mute); }
@@ -3389,7 +3307,7 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 #app .kp-study .kp-grades { column-gap: 8px; border-top: 0; background: linear-gradient(transparent, var(--kp-dock) 14px); padding-top: 16px; }
 #app .kp-study .kp-grade {
   --kp-grade-ink: var(--kp-dock-ink);
-  min-height: 60px; gap: 4px; border-radius: 3px; box-shadow: none;
+  min-height: 60px; gap: 4px; border-radius: var(--radius-seal); box-shadow: none;
   border: 1px solid color-mix(in srgb, var(--kp-dock-ink) 18%, transparent); border-top: 2px solid var(--kp-grade-ink);
   background: color-mix(in srgb, var(--kp-dock-ink) 6%, transparent); color: var(--kp-dock-ink);
 }
@@ -3698,13 +3616,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --stroke-hairline: 0.5px;
   --stroke-relief: 1px;
   --stroke-focus: 2px;
-  --radius-none: 0;
-  --radius-small: 4px;
-  --radius-seal: 5px;
-  --radius-control: 12px;
-  --radius-overlay: 14px;
-  --radius-surface: 16px;
-  --radius-pill: 999px;
 
   /* Relief remains an edge plus a shadow, independent of a concept's skin. */
   --elevation-none: none;
@@ -3841,12 +3752,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --s6: var(--space-12);
   --s8: var(--space-16);
   --tap: var(--hit);
-  --r-control: var(--radius-control);
-  --r-float: var(--radius-overlay);
-  --r-card: var(--radius-surface);
-  --radius-float: var(--radius-overlay);
-  --radius-card: var(--radius-surface);
-  --seal-radius: var(--radius-seal);
   --seal-size: var(--size-seal);
   --seal-font: var(--type-seal);
   --shadow-card: var(--elevation-card);
@@ -3885,7 +3790,286 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --ease-ink: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-linear: linear;
+  /* the four radii (one hand, slice D): control 6 · card 4 · overlay 18 · seal 3 — on :root, so the
+     drift layer and the deck's standalone pages read the same four */
+  --radius-seal: 3px;
+  --radius-card: 4px;
+  --radius-control: 6px;
+  --radius-overlay: 18px;
+  /* the reading's colour: the one red; the mark on a touched word wears it */
+  --color-reading: var(--red);
 }
+
+/* ==========================================================================
+   BEGIN BUNKI BUTTON FAMILIES · written once (one hand, slice D, 2026-10-15)
+   Eight families serve the whole house. Every legacy class is mapped to its family in the :is()
+   lists below, and the faces it used to wear per module (corridor.css, register.css,
+   guided-session.css, player.css, context-deck.css, personal.css, report-client.css, skip-ui.css,
+   reference-ui.css) are deleted; those files keep only a control's place and measure. The contract:
+   radius control 6 · card 4 · overlay 18 · seal 3 (the four tokens, on :root); 48 tall for the
+   primary, 44 for everything else; font-ui 600 16 (A) · 500 15 (B, F) · 600 15 (C). One A per
+   screen: where two primaries met, the sheet bar's Save is the A and the sheet's bottom Save is a B.
+   The press and reduced motion come from the one hand (slice C): nothing here moves or dims.
+     A Primary   the screen's one accent-filled key
+     B Secondary a hairline slip of the page (--color-edge-strong); a list variant for options
+     C Quiet     a word in the accent, no box
+     D Glyph     a 44 square, no box, a fill under the pointer; the chrome's tools keep their glyphs
+     E Door      a paper card: the card radius, the card elevation, a chevron
+     F Segment   words in a row; the chosen one is inked and underlined (tabs, segments, toggles)
+     G Grade     the 再難良易 seal bar: four seals in one row, the seal radius
+     H Word      inline, no box; one selection mark — a hairline underline in the reading's colour
+   ========================================================================== */
+
+/* ---- A · Primary ---- */
+body:not([data-view='drift']) :is(
+  .take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary, .sheet-bar .sheet-take:not([aria-pressed='true']),
+  .kp-start, .kp-reveal, .kp-next, .kp-take,
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .chat-send, .exam-confirm > button.take
+) {
+  min-height: 48px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-accent);
+  color: #f7f2e8;
+  box-shadow: var(--elevation-press);
+  font: 600 16px/1.25 var(--font-ui);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+body:not([data-view='drift']) :is(
+  .take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary, .sheet-bar .sheet-take:not([aria-pressed='true']),
+  .kp-start, .kp-reveal, .kp-next, .kp-take,
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .chat-send, .exam-confirm > button.take
+):hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 88%, #000); }
+body:not([data-view='drift']) :is(
+  .take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary, .sheet-bar .sheet-take:not([aria-pressed='true']),
+  .kp-start, .kp-reveal, .kp-next, .kp-take,
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .chat-send, .exam-confirm > button.take
+):disabled { background: var(--color-fill-strong); color: var(--color-muted); box-shadow: none; cursor: default; }
+body:not([data-view='drift']) :is(.take, .btn-primary, .chip.btn-primary) .en-sub { color: inherit; opacity: 0.82; }
+/* at night the key is lit, never a solid fill: the accent as an emitted edge and a glow */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) :is(
+  .take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary, .sheet-bar .sheet-take:not([aria-pressed='true']),
+  .kp-start, .kp-reveal, .kp-next, .kp-take,
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .chat-send, .exam-confirm > button.take
+):not(:disabled) {
+  background: color-mix(in srgb, var(--color-accent) 9%, var(--color-ground));
+  color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 72%, transparent), 0 0 0 0.5px var(--color-glow), 0 0 18px -2px var(--color-glow), 0 10px 24px -10px rgb(0 0 0 / 70%);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) :is(
+  .take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary, .sheet-bar .sheet-take:not([aria-pressed='true']),
+  .kp-start, .kp-reveal, .kp-next, .kp-take,
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .chat-send, .exam-confirm > button.take
+):hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 15%, var(--color-ground)); }
+
+/* ---- B · Secondary: a hairline slip ---- */
+body:not([data-view='drift']) :is(
+  .chip:not(.btn-primary):not(.btn-tertiary):not(.t-kanji):not(.t-word):not(.t-radical):not(.t-idiom), .btn-secondary, .chip.btn-secondary,
+  .take.taken, .take.quiet, .sheet-bar .sheet-take[aria-pressed='true'],
+  .gs-button, .cd-btn, .stroke-btn, .stroke-controls button,
+  #bunki-reports-root .br-actions button, #bunki-reports-root .br-context-summary button,
+  .skip-more, .skip-retry, .skip-search-opener, .skip-code-door, .reference-button,
+  .pc button:not(.pc nav *):not(.pc-top *):not(.pc-card-foot *):not(.pc-grades *):not(.pc-token),
+  .kp-delete, .vocabulary-list-create, .vocabulary-list-form .chip, .vocabulary-list-dialog > .chip,
+  .kdx-lens, .focus-chip
+) {
+  min-height: 44px;
+  padding: 0 14px;
+  border: var(--stroke-hairline) solid var(--color-edge-strong);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: none;
+  font: 500 15px/1.25 var(--font-ui);
+  letter-spacing: 0;
+  cursor: pointer;
+}
+body:not([data-view='drift']) :is(
+  .chip:not(.btn-primary):not(.btn-tertiary):not(.t-kanji):not(.t-word):not(.t-radical):not(.t-idiom), .btn-secondary,
+  .take.taken, .take.quiet, .sheet-bar .sheet-take[aria-pressed='true'],
+  .gs-button, .cd-btn, .stroke-btn, .stroke-controls button,
+  #bunki-reports-root .br-actions button, #bunki-reports-root .br-context-summary button,
+  .skip-more, .skip-retry, .skip-search-opener, .skip-code-door, .reference-button,
+  .pc button:not(.pc nav *):not(.pc-top *):not(.pc-card-foot *):not(.pc-grades *):not(.pc-token),
+  .kp-delete, .vocabulary-list-create, .vocabulary-list-form .chip, .vocabulary-list-dialog > .chip,
+  .kdx-lens, .focus-chip
+):hover:not(:disabled):not([aria-disabled='true']) { background: var(--color-fill); }
+body:not([data-view='drift']) :is(.chip, .gs-button, .cd-btn, .stroke-btn, .skip-more, .skip-retry, .reference-button):is(:disabled, [aria-disabled='true']) {
+  background: transparent;
+  color: color-mix(in srgb, var(--color-ink) 42%, transparent);
+  border-color: var(--color-line);
+  cursor: default;
+}
+/* one A per screen: the sheet bar's Save is the A; the sheet's bottom Save is a slip */
+body:not([data-view='drift']) #sheet > button.take {
+  min-height: 48px;
+  padding: 0 20px;
+  border: var(--stroke-hairline) solid var(--color-edge-strong);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: none;
+  font: 500 16px/1.25 var(--font-ui);
+}
+/* the list variant: an option in a list of options, read in the reading face; the attempt
+   register keeps its own ruled paper for options (register.css) */
+html:not([data-register='attempt']) body:not([data-view='drift']) :is(.lesson-option, .mock-opt, .gs-choice, .cd-choice:not(.cd-primary)) {
+  min-height: 48px;
+  padding: 12px 14px;
+  border: var(--stroke-hairline) solid var(--color-edge-strong);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: none;
+  text-align: start;
+  cursor: pointer;
+}
+html:not([data-register='attempt']) body:not([data-view='drift']) :is(.lesson-option, .mock-opt, .gs-choice, .cd-choice:not(.cd-primary)):hover:not(:disabled) { background: var(--color-fill); }
+/* a toggle keeps its slip and takes the chosen mark (F's underline) when on */
+body:not([data-view='drift']) :is(.chip.on, .kdx-lens.on, .focus-chip.on, .stroke-btn[aria-pressed='true'], .stroke-controls button[aria-pressed='true'], .chip[aria-pressed='true']:not(.btn-primary)) {
+  color: var(--color-ink);
+  background: transparent;
+  border-color: var(--color-ink);
+  box-shadow: inset 0 calc(0px - var(--stroke-focus)) 0 currentColor;
+  font-weight: 700;
+}
+body:not([data-view='drift']) :is(.kdx-lens.on, .focus-chip.on) :is(.l-ja, .en-sub) { color: inherit; }
+/* a graph's node kinds keep a quiet tint of their own, never a coloured or dashed edge */
+body:not([data-view='drift']) .chip.t-kanji { border: 0; background: color-mix(in srgb, var(--color-seal) 10%, transparent); color: color-mix(in srgb, var(--color-seal) 88%, var(--color-ink)); }
+body:not([data-view='drift']) .chip.t-radical { border: 0; background: var(--color-fill); color: var(--color-ink); }
+body:not([data-view='drift']) .chip.t-idiom { border: 0; background: color-mix(in srgb, #6a4a7a 11%, transparent); color: #5a3c69; }
+
+/* ---- C · Quiet: a word, no box ---- */
+body:not([data-view='drift']) :is(
+  .btn-tertiary, .chip.btn-tertiary, .kp-link, .kp-undo, .gs-text, .nav-arrow, .sheet-back,
+  #bunki-reports-root .br-close, .reference-text-button
+) {
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-accent);
+  box-shadow: none;
+  font: 600 15px/1.4 var(--font-ui);
+  letter-spacing: 0;
+  text-decoration: none;
+  cursor: pointer;
+}
+body:not([data-view='drift']) :is(
+  .btn-tertiary, .chip.btn-tertiary, .kp-link, .kp-undo, .gs-text, .nav-arrow, .sheet-back,
+  #bunki-reports-root .br-close, .reference-text-button
+):hover:not(:disabled) { background: var(--color-fill); }
+body:not([data-view='drift']) :is(.btn-tertiary, .gs-text, .kp-link, .kp-undo):disabled { color: var(--color-muted); cursor: default; }
+
+/* ---- D · Glyph: a 44 square, no box ---- */
+body:not([data-view='drift']) :is(
+  .icon-button, .kp-icon, .kp-pop-x, .kp-rule-x, .sheet-close, .sheet-search, #bunki-reports-root .br-bug,
+  #app > .chrome > button
+) {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-ink-2);
+  box-shadow: none;
+  cursor: pointer;
+}
+body:not([data-view='drift']) :is(.icon-button, .kp-icon, .kp-pop-x, .kp-rule-x, .sheet-close, .sheet-search, #bunki-reports-root .br-bug):hover { background: var(--color-fill); color: var(--color-ink); }
+body:not([data-view='drift']) :is(.icon-button[aria-expanded='true'], details[open] > .icon-button) { color: var(--color-accent); background: var(--color-tint-wash); }
+
+/* ---- E · Door: a paper card with a chevron ---- */
+body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, #shelf-body .grammar-link[data-grade='room']) {
+  position: relative;
+  border: var(--stroke-relief) solid var(--color-edge-strong);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: var(--elevation-card);
+  text-align: start;
+  cursor: pointer;
+}
+body:not([data-view='drift']) :is(.study-door, .dojo-deck) { padding-right: 36px; }
+body:not([data-view='drift']) :is(.study-door, .dojo-deck)::after {
+  content: '';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -5px;
+  border-top: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.55;
+}
+body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, #shelf-body .grammar-link[data-grade='room']):hover { border-color: var(--color-ink-2); }
+
+/* ---- F · Segment / tab: words in a row, the chosen one inked and underlined ---- */
+body:not([data-view='drift']) :is(
+  .seg button, .lang-seg button, .kp-seg button, .gs-nav, #bunki-reports-root .br-nav button, .pc nav button,
+  .settings-language button, .settings-layout-choice button, .version-toggle .version-choice, .me-seg button,
+  #variants .vseg button
+) {
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-muted);
+  box-shadow: none;
+  font: 500 15px/1.25 var(--font-ui);
+  letter-spacing: 0;
+  cursor: pointer;
+}
+body:not([data-view='drift']) :is(
+  .seg button, .lang-seg button, .kp-seg button, .gs-nav, #bunki-reports-root .br-nav button, .pc nav button,
+  .settings-language button, .settings-layout-choice button, .version-toggle .version-choice, .me-seg button,
+  #variants .vseg button
+):is([aria-pressed='true'], [aria-current='page'], [aria-checked='true'], .is-on, .on) {
+  color: var(--color-ink);
+  font-weight: 700;
+  background: transparent;
+  box-shadow: inset 0 calc(0px - var(--stroke-focus)) 0 currentColor;
+}
+body:not([data-view='drift']) :is(.seg, .lang-seg, .kp-seg, .me-seg, .settings-language, .settings-layout-choice, #variants .vseg) { border: 0; border-radius: var(--radius-control); background: transparent; box-shadow: none; }
+
+/* ---- G · Grade: the 再難良易 seal bar ---- */
+body:not([data-view='drift']) :is(.kp-grade, .cd-seal, .pc-grades button) {
+  min-height: 44px;
+  border: var(--stroke-hairline) solid var(--color-edge-strong);
+  border-radius: var(--radius-seal);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: none;
+  cursor: pointer;
+}
+
+/* ---- H · Word: inline, no box, one mark ---- */
+body:not([data-view='drift']) :is(.japanese-lookup-word, .gs-word, .kp-tok) { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+/* the mark: a hairline underline in the reading's colour, no fill — the reader's touched word (the
+   header Save's target), the deck's looked-up word, a guided word and a web node under the pointer */
+body:not([data-view='drift']) :is(
+  #reader .tok.tok-current > .tok-word, #reader .tok:hover > .tok-word,
+  .kp-tok.kp-lit, .kp-tok:hover, .kp-tok:focus-visible,
+  .gs-word:hover, .gs-word:focus-visible, .japanese-lookup-word:hover,
+  .ww-node:hover .ww-g, .ww-node:focus-visible .ww-g
+) {
+  background: transparent;
+  border-radius: 0;
+  box-shadow: inset 0 calc(0px - var(--stroke-hairline)) 0 var(--color-reading);
+  text-decoration: none;
+}
+/* END BUNKI BUTTON FAMILIES ================================================= */
 
 /* ==========================================================================
    BEGIN BUNKI SKIN · C 生きた本棚 Living Shelf, polished with A 磨き's craft
@@ -3941,12 +4125,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --font-headword: 'Shippori Mincho B1', var(--world-serif);
   --weight-display: 800;
 
-  --radius-small: 2px;
-  --radius-seal: 3px;
-  --radius-card: 4px;
-  --radius-control: 6px;
-  --radius-overlay: 18px;
-  --radius-surface: 8px;
 
   --elevation-paper: 0 1px 0 rgb(25 28 34 / 6%), 0 6px 18px rgb(25 28 34 / 5%);
   --elevation-card: 0 1px 0 rgb(25 28 34 / 9%), 0 10px 26px -6px rgb(40 30 16 / 16%);
@@ -4062,61 +4240,6 @@ body:not([data-view='drift']) main section > h2.eyebrow::before {
   height: 2px;
   margin: 0 0 var(--space-2);
   background: var(--color-seal);
-}
-
-/* ---- buttons: primary = solid 藍 with physical travel by day; an emitted edge at night ---- */
-body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary) {
-  border: 0;
-  border-radius: var(--radius-control);
-  background: var(--color-accent);
-  color: #f7f2e8;
-  box-shadow: var(--elevation-press);
-  font: 600 15px/1.25 var(--font-ui);
-  letter-spacing: 0.02em;
-}
-body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary):hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 88%, #000); }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary) {
-  background: color-mix(in srgb, var(--color-accent) 9%, var(--color-ground));
-  color: var(--color-accent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 72%, transparent), 0 0 0 0.5px var(--color-glow), 0 0 18px -2px var(--color-glow), 0 10px 24px -10px rgb(0 0 0 / 70%);
-}
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary):hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-accent) 15%, var(--color-ground));
-}
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary) .en-sub { color: inherit; }
-
-/* ---- chips: no grey-pill soup. A chip is a hairline-ruled slip of paper; on = 藍 ink. ---- */
-body:not([data-view='drift']) .chip:not(.btn-primary):not(.btn-tertiary):not(.t-kanji):not(.t-word):not(.t-radical):not(.t-idiom),
-body:not([data-view='drift']) .kdx-lens,
-body:not([data-view='drift']) .focus-chip {
-  border: var(--stroke-hairline) solid var(--color-edge-strong);
-  border-radius: var(--radius-small);
-  background: transparent;
-  color: var(--color-ink);
-  box-shadow: none;
-  font-weight: 500;
-}
-body:not([data-view='drift']) .chip:not(.btn-primary):not(.btn-tertiary):hover:not(:disabled),
-body:not([data-view='drift']) .kdx-lens:hover,
-body:not([data-view='drift']) .focus-chip:hover { background: var(--color-fill); }
-body:not([data-view='drift']) .kdx-lens .l-ja { color: inherit; font-weight: 500; }
-body:not([data-view='drift']) :is(.kdx-lens.on, .focus-chip.on, .chip.on) {
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-  color: #f7f2e8;
-}
-body:not([data-view='drift']) :is(.kdx-lens.on, .focus-chip.on, .chip.on) .l-ja { color: inherit; }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) :is(.kdx-lens.on, .focus-chip.on, .chip.on) {
-  background: var(--color-tint-wash);
-  color: var(--color-accent);
-  box-shadow: 0 0 12px -4px var(--color-glow);
-}
-body:not([data-view='drift']) .btn-secondary,
-body:not([data-view='drift']) .chip.btn-secondary {
-  border: var(--stroke-hairline) solid var(--color-rule);
-  border-radius: var(--radius-control);
-  background: transparent;
-  color: var(--color-accent);
 }
 
 /* ---- surfaces with relief: a hairline-and-ink edge plus a two-layer paper shadow ---- */
@@ -4309,10 +4432,6 @@ body:not([data-view='drift']) .filter-chip {
   box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong);
   border-radius: var(--radius-control);
 }
-/* chips and doors: a lighter hairline than the relief edge */
-body:not([data-view='drift']) .chip:not(.btn-primary):not(.btn-tertiary):not(.t-kanji):not(.t-word):not(.t-radical):not(.t-idiom),
-body:not([data-view='drift']) .kdx-lens,
-body:not([data-view='drift']) .focus-chip { border-color: var(--color-line-chip, color-mix(in srgb, var(--color-ink) 24%, transparent)); }
 
 /* ---- night: the Line's car and the tabs are lit from within ---- */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .primary-tabs .line-car::before {
@@ -4402,7 +4521,7 @@ body:not(.zen) #app > .chrome .lang-seg button::before,
 body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before {
   inset: auto 8px 11px;
   height: 1.5px;
-  border-radius: 1px;
+  border-radius: var(--radius-seal);
   background: transparent;
   box-shadow: none;
 }
@@ -4506,7 +4625,7 @@ body.has-primary-tabs:not(.zen) #app > .chrome > button#tray .l-ja { font: 500 1
 html[data-room='door'] body.ginga #ginga-symbol.nav-symbol {
   width: 44px;
   height: 44px;
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   color: var(--ink);
   background: color-mix(in srgb, var(--ground-0, #f6f1e6) 92%, transparent);
   border: 0.5px solid color-mix(in srgb, var(--ink) 26%, transparent);
@@ -4520,7 +4639,7 @@ html[data-room='door'] body.ginga #ginga-theme-seal.ginga-seal {
   height: 44px;
   top: calc(12px + env(safe-area-inset-top));
   right: 12px;
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   opacity: 1;
   color: var(--red, #b23a2a);
   font: 800 13px/1 var(--display);
@@ -4536,7 +4655,7 @@ html[data-room='door'] body.ginga #ginga-theme-seal.ginga-seal::after {
   position: absolute;
   inset: 10px;
   border: 1px solid color-mix(in srgb, var(--red, #b23a2a) 75%, transparent);
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   background: color-mix(in srgb, var(--ground-0, #f6f1e6) 88%, transparent);
   z-index: -1;
 }
@@ -4545,7 +4664,7 @@ html[data-room='door'] body.ginga #ginga-search.ginga-search {
   height: 44px;
   top: calc(12px + env(safe-area-inset-top));
   right: 60px;
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   opacity: 0.72;
   color: var(--ink);
 }
@@ -4554,7 +4673,7 @@ html[data-room='door'] body.ginga #home-review.corner-bubble {
   min-height: 48px;
   padding: 0 24px;
   border: 0;
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   background: var(--ai, #1f3a5f);
   color: var(--ground-0, #fbf8f1);
   font: 800 16px/48px var(--display);
@@ -4571,7 +4690,7 @@ html[data-room='door'] body.ginga #home-review.corner-bubble.quiet {
 html[data-room='door'] body.ginga #home-review.corner-bubble .l-ja { font: inherit; letter-spacing: inherit; }
 /* the drift's invitation plaque, in the family's voice (its text is set by corridor.js tx()) */
 html[data-room='door'] #drift-layer #hint {
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   padding: 8px 16px;
   font: 500 12px/1.2 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
   letter-spacing: 0.06em;
@@ -4606,7 +4725,7 @@ html[data-room='door'] body.ginga #ginga-symbol.nav-symbol::after {
   inset: 8px;
   z-index: -1;
   border: 0.5px solid color-mix(in srgb, var(--ink, #23303f) 46%, transparent);
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   background: color-mix(in srgb, var(--ground-0, #f6f1e6) 70%, transparent);
 }
 html[data-room='door'] body.ginga #ginga-symbol.nav-symbol svg { width: 18px; height: 18px; opacity: 0.86; }
@@ -4614,7 +4733,7 @@ html[data-room='door'] #bunki-reports-root .br-rail .br-bug { color: color-mix(i
 html[data-room='door'] #bunki-reports-root .br-rail .br-bug::before {
   inset: 9px;
   border: 0.5px solid color-mix(in srgb, var(--ink, #23303f) 32%, transparent);
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   background: color-mix(in srgb, var(--ground-0, #f6f1e6) 55%, transparent);
 }
 html[data-room='door'] #bunki-reports-root .br-rail .br-bug svg { width: 16px; height: 16px; }
@@ -4888,7 +5007,7 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
   }
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#tray:not([data-count='0']) .l-ja {
     position: absolute; top: 5px; right: 2px; left: auto;
-    padding: 1px 2px; border-radius: 3px; background: var(--color-bar);
+    padding: 1px 2px; border-radius: var(--radius-seal); background: var(--color-bar);
     font: 650 10px/1 var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: 0;
   }
 }

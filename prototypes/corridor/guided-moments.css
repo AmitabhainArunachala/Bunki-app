@@ -341,7 +341,7 @@
   border: 1px solid #d8be8666 !important;
   background: #0c2434b3 !important;
   color: var(--se-paper) !important;
-  border-radius: 2px !important;
+  border-radius: var(--radius-seal) !important;
   font: inherit !important;
   font-size: 0.76rem !important;
   white-space: nowrap;
@@ -349,7 +349,7 @@
 }
 .samurai-effect__skip span {
   border: 1px solid #d8be8655;
-  border-radius: 2px;
+  border-radius: var(--radius-seal);
   padding: 1px 4px;
   color: #d8be86aa;
   font-size: 0.62rem;
@@ -686,7 +686,7 @@
   font-size: 0.9rem;
   line-height: 1.5;
   text-align: center;
-  border-radius: 4px;
+  border-radius: var(--radius-card);
   animation: se-enter 0.2s ease-out both;
 }
 .bunki-moment--settle .bunki-moment__message {

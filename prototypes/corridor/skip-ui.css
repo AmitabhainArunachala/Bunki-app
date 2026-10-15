@@ -21,11 +21,11 @@
 .skip-hit-glyph { font: 29px/1.4 var(--serif); }
 .skip-hit-alt { font: var(--t-label)/1.1 var(--sans); color: var(--ink-2); }
 .skip-ui button:focus-visible, .skip-wheel:focus-visible, .skip-rules summary:focus-visible, .skip-code-door:focus-visible, .skip-search-opener:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
-.skip-more, .skip-retry, .skip-search-opener, .skip-code-door { min-height: var(--tap); border: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; font-size: var(--t-chrome); padding: 8px 12px; cursor: pointer; border-radius: 4px; }
+.skip-more, .skip-retry, .skip-search-opener, .skip-code-door { padding: 8px 12px; }
 .skip-more { width: 100%; border-inline: 0; border-bottom: 0; }
 .skip-search-opener { display: flex; align-items: center; gap: 10px; margin: 10px 0 6px; }
 .skip-search-opener[aria-expanded='true'] { background: var(--ground-2); }
-.skip-code-door { min-height: 32px; padding: 4px 8px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.skip-code-door { padding: 4px 8px; font-variant-numeric: tabular-nums; }
 .skip-code-door-wrap { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .skip-code-unavailable { color: var(--ink-2); font-size: var(--t-label); }
 .skip-wheels { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--line); margin-top: 16px; }
