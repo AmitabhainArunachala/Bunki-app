@@ -798,6 +798,9 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
    only the hand and the keyboard find a button, with a 44px reach that moves nothing */
 #mini button.mini-word {
   justify-self: start;
+  /* G1 · a one-glyph word (手, the page's short example leads now) keeps the door's own 44 across, as it keeps its 44
+     down; the glyph stays where it stands (design-reader-shelf G5-galaxy) */
+  min-inline-size: 44px;
   margin-block: -5px;
   padding-block: 5px;
   padding-inline: 0;

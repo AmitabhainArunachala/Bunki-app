@@ -21059,11 +21059,15 @@ function renderLearningSource(container, item, review = false, disclosure = item
   button.type = 'button'; button.id = review ? 'review-source-return' : 'learning-source-return';
   button.addEventListener('click', async () => {
     const epoch = recordEpoch;
+    // G1 · on a page the visit owns the action, not this element: the page is drawn again while the source is read when
+    // its senses arrive (a page opened at once by the keyboard is pressed before they do), and the element it was
+    // drawn with is gone though the learner never left (reader-doors D6, WebKit)
+    const current = retainActionSurface(button);
     if (!review) disclosure.sourceDetailsOpen = section.open;
     button.disabled = true;
     try {
       const resolved = await resolveTeacherSource(context);
-      if (!recordReady(epoch) || !button.isConnected || !preserveVisibleDrafts()) return;
+      if (!recordReady(epoch) || !current() || !preserveVisibleDrafts()) return;
       const visit = learningSourceCaller(button.id);
       S.stack = []; S.dialogInvoker = null;
       if (resolved.capture) openSourceReading(resolved.capture.id, resolved.context, visit);
