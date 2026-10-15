@@ -43,21 +43,27 @@ const KANA_ONLY = /^[぀-ヿー]+$/;
 const kataToHira = (s) => String(s || '').replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
 
 function wordEntry(deps, token) {
+  // R · reading truth: the reading this card's text gives the word for its dictionary form (an uninflected token's
+  // own; an inflected surface's says nothing about it). The host's lookup answers with the entry read that way
+  const own = !token.b || token.b === token.s ? token.r || '' : '';
   // the build's ref is a boot-core head; the lemma and the surface are the reader's own keys
   for (const id of [...new Set([token.ref, token.b, token.s].filter(Boolean))]) {
     if (token.k !== '語' && id === token.s && KANA_ONLY.test(id)) continue; // a bare particle is not a word entry
-    const rec = deps.word(id, token.r || '');
+    const rec = deps.word(id, own);
     if (rec) {
+      // an entry read otherwise (none read the text's way is at hand yet) lends the card neither its reading, its
+      // English nor its number: the card shows the text's reading, and the corridor holds Save until it is known
+      const readsAsText = !own || kataToHira(rec.r) === kataToHira(own);
       return {
         t: 'word',
         id,
         label: rec.head || id,
-        reading: rec.r || '',
-        gloss: rec.m?.[0] || '',
+        reading: readsAsText ? rec.r || '' : own,
+        gloss: readsAsText ? rec.m?.[0] || '' : '',
         ja: '',
-        en: (rec.m || []).slice(0, 3).join('; '),
+        en: readsAsText ? (rec.m || []).slice(0, 3).join('; ') : '',
         ...(rec.jlpt ? { level: `N${String(rec.jlpt).replace(/^N/i, '')}` } : {}),
-        ...(rec.seq ? { seq: rec.seq } : {}),
+        ...(readsAsText && rec.seq ? { seq: rec.seq } : {}),
         token,
       };
     }

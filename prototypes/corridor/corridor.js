@@ -3265,10 +3265,20 @@ function lookup(id, seq = null, requestedReading = '', requestedGloss = '') {
   // Reader and lesson tokens were editorially resolved into the boot core.
   // Opening the larger index must never make their immediate reading/meaning
   // jump to a different homograph merely because its ent_seq sorts first.
-  if (!seq && full) {
+  // R · that holds with no reading asked, or the core's own. A reading the
+  // text gives that the core does not carry (年 read ねん in 令和8年; the
+  // core's 年 is とし) names the full dictionary's first entry read that way
+  // once the form's rows are at hand; with none at hand the core answers, and
+  // its caller sees that the two readings differ.
+  const wanted = !seq && full && requestedReading ? kataToHira(String(requestedReading)) : '';
+  const readAs = wanted && wanted !== kataToHira(String(full.r || ''))
+    ? dictionaryRowsForForm(id).find((row) => dictionaryReadingSummaries(row).some((summary) =>
+      kataToHira(summary[0]) === wanted && dictionaryReadingSupportsForm(row, summary[0], id))) || null
+    : null;
+  if (!seq && full && !readAs) {
     return { head: id, r: full.r, m: full.m, p: full.p, jlpt: full.jlpt, k: full.k || [], alt: full.alt };
   }
-  const indexed = seq ? dictionaryRowBySeq(seq) : dictionaryRowsForForm(id)[0];
+  const indexed = seq ? dictionaryRowBySeq(seq) : readAs || dictionaryRowsForForm(id)[0];
   if (indexed) {
     const [entrySeq, defaultHead, defaultReading, defaultGloss, written, kana, glosses] = indexed;
     const glossIndex = requestedGloss
@@ -3898,6 +3908,12 @@ async function ensureDictionaryRowsForNode(node) {
       ),
     );
     if (chosen) node.dictionaryResolvedSeq = String(chosen[0]);
+  }
+  // R · a core spelling's node carrying a reading the core does not becomes the entry that reading names (or the
+  // closest), so its header, senses and Save agree once the rows are here (readingToken)
+  if (!node.seq && D.dict?.[node.id] && readingAsksIndex(node.id, node.reading)) {
+    const named = readingToken({ b: node.id, s: node.id, r: node.reading });
+    if (named.seq) node.seq = named.seq;
   }
   return rows;
 }
@@ -8361,6 +8377,10 @@ function wordSaveFacts(token, { reader = false, from = null, record } = {}) {
   const held = (reader && !D.dict[token.b]) || !g?.m?.some(meaning => typeof meaning === 'string' && meaning.trim());
   const node = { t: 'word', id: token.b, ...(token.seq ? { seq: token.seq, reading: token.r || g?.r } : {}),
     ...(from ? { from, ctxScope: 'sent' } : {}) };
+  // R · a reading of its own the core does not carry, with no entry named yet, rides the node, so its Save waits
+  // (wordCaptureState) instead of saving the core's word for a reading the core does not have
+  const own = !token.b || token.b === token.s ? String(token.r || '') : '';
+  if (!token.seq && D.dict[token.b] && own && kataToHira(own) !== kataToHira(String(D.dict[token.b].r || ''))) node.reading = own;
   const state = held ? null : wordCaptureState(node);
   return { g, held, node, state, identityHeld: state === 'conflict' || state === 'unavailable' };
 }
@@ -8750,15 +8770,20 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     });
   }
   said.append(word);
-  const reading = look?.reading ?? (g?.r || token.r);
+  // R · the reading shown is the one the text gives the word (tokenReading's rule): an entry at hand read otherwise
+  // lends only its meaning, named by its own reading (年 read ねん before ねん's entry is known: とし · year)
+  const own = kind === 'word' && (!token.b || token.b === token.s) ? String(token.r || '') : '';
+  const readsOtherwise = !!own && !!g?.r && kataToHira(String(g.r)) !== kataToHira(own);
+  const reading = look?.reading ?? (readsOtherwise ? own : (g?.r || token.r));
   if (reading) said.append(el('span', 'mini-reading', reading));
   if (look?.gloss) {
     const gloss = el('span', 'mini-gloss', look.gloss);
     if (look.glossLang) gloss.lang = look.glossLang;
     said.append(gloss);
     if (look.gloss2) { const second = el('span', 'mini-gloss mini-gloss-2', look.gloss2); second.lang = 'en'; said.append(second); }
-  } else if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText()));
-  else said.append(el('span', 'mini-gloss', g?.m?.[0] || tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.')));
+  } else if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText(token.b)));
+  else said.append(el('span', 'mini-gloss', g?.m?.[0] ? (readsOtherwise ? `${g.r} · ${g.m[0]}` : g.m[0])
+    : tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.')));
   head.append(said);
   mini.append(head);
   // one path (John T5, "click save and then add to list from there"; 2026-10-14: no second "Add to a list"
@@ -8836,8 +8861,9 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
       return Promise.resolve(toggleWordSave(captureNode, label)).then((saved) => { if (saved && seal.isConnected) openMenu(); return saved; });
     });
     if (!canSave) {
-      // when the meaning line already says the word is not in the quick dictionary, the reason only finishes it
-      const missShown = reader && !g?.m?.[0];
+      // when the meaning line already says the word has no entry here (the quick dictionary's miss, or, R, no entry
+      // at all once the full dictionary was asked: 高市), the reason only finishes it and promises no other door
+      const missShown = !g?.m?.[0];
       const reason = el('span', 'mini-take-reason', hostHeld || (held ? (missShown ? tx('そのため、ここでは保存できません。', 'So it can’t be saved here.')
         : readerCaptureReasonText(token.b)) : wordCaptureHeldText(captureNode)));
       reason.id = 'mini-take-reason';
@@ -9510,15 +9536,95 @@ function inlineGloss(rec) {
  * (hair)"). With nothing to show, the reader says so instead of staying
  * silent. lookup() is unchanged for every other caller. */
 function readerQuickRecord(token) {
-  if (D.dict[token.b]) return lookup(token.b);
+  // R · read in the token's own reading (tokenReading's rule): a door that names its entry (readingToken) answers
+  // by it, and a core spelling read otherwise answers with the entry so read once the full dictionary has it
+  const own = !token.b || token.b === token.s ? String(token.r || '') : '';
+  if (token.seq != null && token.seq !== '') return lookup(token.b, token.seq, own);
+  if (D.dict[token.b]) return lookup(token.b, null, own);
   const kept = S.deepWords?.[token.b];
   if (kept) return { r: kept.r || '', m: kept.m || [] };
   const old = D.words[token.b];
   return old ? { r: old.r, m: old.g ? [old.g] : [] } : null;
 }
 
-function readerGlossMissText() {
+function readerGlossMissText(form = '') {
+  // R · asked, the full dictionary lists nothing for this spelling: the line says so, and promises no other look
+  if (form && D.dictionaryIndex && (D.dictionaryMode === 'main' || D.dictionaryCompleteForms?.has(String(form)))
+    && !dictionaryRowsForForm(form).length) return tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.');
   return tx('この語は簡易辞書にありません。「全項目」で全辞書を引けます。', 'Not in the quick dictionary. Full entry looks it up in the whole dictionary.');
+}
+
+/* R · reading truth (2026-10-16). A word door that carries a token shows the reading the text gives that token and
+ * stands for the entry read that way: 年 is ねん in 令和8年 though the quick dictionary's 年 is とし, 月 is がつ in 9月
+ * though its 月 is つき. The reader, a sentence's words and a deck card's back are such doors. A door with no reading
+ * of its own (the sky, Words, a word in prose), or with the quick dictionary's own reading, answers from the quick
+ * dictionary exactly as before (lookup's guarantee). lookup and the slip's own functions spell tokenReading's rule
+ * inline, so each stays whole by itself. */
+
+/** The reading a token carries for its dictionary form: its own when the token is that form (uninflected). An
+ * inflected surface's reading (し of する, 聞い of 聞く) says nothing about the dictionary form's. */
+function tokenReading(token) {
+  return !token?.b || token.b === token.s ? String(token?.r || '') : '';
+}
+
+/** Whether a reading needs the full dictionary: the quick one lacks the spelling, or reads it otherwise. */
+function readingAsksIndex(form, reading) {
+  if (!form || !reading) return false;
+  const core = D.dict?.[form];
+  return !core || kataToHira(String(core.r || '')) !== kataToHira(String(reading));
+}
+
+/** Ask the full dictionary for a token's spelling when its own reading needs it and the form's rows are not at
+ * hand: a promise that settles once they are, or once the index cannot answer; null when nothing needs asking. */
+function readyTokenReading(token) {
+  if (!readingAsksIndex(token?.b, tokenReading(token))) return null;
+  if (D.dictionaryIndex && (D.dictionaryMode === 'main' || D.dictionaryCompleteForms?.has(String(token.b)))) return null;
+  return ensureDictionaryRowsForForm(token.b).then(() => undefined, () => undefined);
+}
+
+/** The token a word door stands for. One whose own reading the quick dictionary does not carry stands, by entry
+ * number (seq), for the entry read that way: on a spelling the quick dictionary has, the full dictionary's first
+ * entry so read (lookup's choice) or, with none, its closest (the quick dictionary's own, first in the form's
+ * order), whose door then says the two readings differ (D23); on a spelling it lacks, only the one entry so read
+ * (readerChoiceMatch: several stay the full entry's explicit choice, D11). Until the form's rows are at hand, and
+ * for every other token, it is the token as it was. */
+function readingToken(token) {
+  const own = tokenReading(token);
+  if (!own || (token.seq != null && token.seq !== '') || !readingAsksIndex(token.b, own) || !D.dictionaryIndex) return token;
+  const rows = dictionaryRowsForForm(token.b);
+  if (!rows.length) return token;
+  if (D.dict[token.b]) return { ...token, seq: String(lookup(token.b, null, own)?.seq || rows[0][0]) };
+  const match = readerChoiceMatch({ b: token.b, s: token.s, r: own }, rows);
+  return match.rows.length === 1 && !match.mismatch ? { ...token, seq: match.rows[0].seq } : token;
+}
+
+/** A word slip for a token whose own reading needs the full dictionary. With the dictionary open, its answer is a
+ * moment away and the slip waits for it (READING_WAIT_MS at most); with the dictionary still to open, the slip comes
+ * at once with what is at hand (the token's reading, the closest meaning named by its own reading, Save waiting).
+ * A slip still open on the word when the answer names its entry is drawn again as that entry. draw(door) draws the
+ * slip and returns it. */
+const READING_WAIT_MS = 400;
+let readingSlipSerial = 0;
+function openReadingSlip(anchor, token, draw) {
+  const serial = ++readingSlipSerial;
+  const ready = readyTokenReading(token);
+  if (!ready) return draw(readingToken(token));
+  let drawn = null;
+  const live = () => serial === readingSlipSerial && anchor.isConnected && !(document.getElementById('mini') && miniAnchor !== anchor);
+  // a slip drawn before the answer says it is still being answered (aria-busy), until the answer comes
+  const early = () => { drawn = draw(readingToken(token)); drawn?.setAttribute('aria-busy', 'true'); };
+  if (!D.dictionaryIndex) early();
+  else setTimeout(() => { if (!drawn && live()) early(); }, READING_WAIT_MS);
+  ready.then(() => {
+    const settled = () => drawn?.removeAttribute('aria-busy');
+    if (!live()) return settled();
+    const door = readingToken(token);
+    if (!drawn) drawn = draw(door);
+    else if ((door.seq || !dictionaryRowsForForm(token.b).length) && document.getElementById('mini') === drawn &&
+      !drawn.matches(':active')) drawn = draw(door);
+    else settled();
+  });
+  return drawn;
 }
 
 /** Source indices remain those of the original article. A displayed name can cover several
@@ -9589,8 +9695,11 @@ function readerTokenState(token, index, kind) {
   if (kind !== 'word') return '';
   const record = readerQuickRecord(token);
   const parts = [];
-  if ((S.dials.furigana === 2 || S.revealed?.has(index)) && record?.r && record.r !== token.s) parts.push(record.r);
-  if (S.glossed?.has(index)) parts.push(record?.m?.length ? inlineGloss(record) : readerGlossMissText());
+  // R · the reading said is the one its ruby shows: the token's own, where its entry is read otherwise
+  const own = tokenReading(token);
+  const said = own && !(record?.r && kataToHira(String(record.r)) === kataToHira(own)) ? own : record?.r;
+  if ((S.dials.furigana === 2 || S.revealed?.has(index)) && said && said !== token.s) parts.push(said);
+  if (S.glossed?.has(index)) parts.push(record?.m?.length ? inlineGloss(record) : readerGlossMissText(token.b));
   return parts.join(' · ');
 }
 function nameReaderToken(span, token, index, kind) {
@@ -9758,9 +9867,12 @@ function wireTokenGestures(span, token, index, p) {
     // the meaning is shown: the observation log's depth 2, as the mini always wrote it
     if (!restore) obsLog('tap', obsKey, 2, p.id);
     markReaderReading(index);
-    showMini(span, token, (entryModality) => openFull(entryModality, { fromSlip: true }), {
-      focusEntry: modality === 'keyboard', from, reader: true, sentence: readerSentenceRow(sentence(), index),
-    });
+    // R · the slip stands for the entry the token's own reading names (readingToken). A word the core lacks whose
+    // reading names the full dictionary's one entry is that entry's own door (D23 answers it), not D11's held look
+    openReadingSlip(span, token, (door) => showMini(span, door, (entryModality) => openFull(entryModality, { fromSlip: true }), {
+      focusEntry: modality === 'keyboard', from, reader: !(door.seq && !D.dict[door.b]), kanji: true,
+      sentence: readerSentenceRow(sentence(), index),
+    }));
     if (!restore) retireReaderTip();
   };
   span.addEventListener('click', (event) => {
@@ -9777,7 +9889,15 @@ function wireTokenGestures(span, token, index, p) {
   });
   const door = {
     target, label: token.b, copyText: token.s || token.b, entryAvailable: true, sentence,
-    save: () => wordSaveFacts(token, { reader: true, from }),
+    // R · the menu's Save stands for the entry the token's own reading names; it waits a moment for the dictionary
+    prepare: () => {
+      const ready = readyTokenReading(token);
+      return ready && Promise.race([ready, new Promise((done) => setTimeout(done, READING_WAIT_MS))]);
+    },
+    save: () => {
+      const door = readingToken(token);
+      return wordSaveFacts(door, { reader: !(door.seq && !D.dict[door.b]), from });
+    },
     quickLook: (modality) => quickLook(modality), openEntry: (modality) => openFull(modality),
     reopen: () => quickLook('programmatic', { restore: true }),
   };
@@ -10547,7 +10667,7 @@ function renderReader(main) {
       } else {
         // The supplied reading belongs to the surface; an inflected ending (まし of ます) looks
         // up its dictionary form without it. The part of speech keeps helpers to exact entries.
-        const lookupContext = { reading: !token.b || token.b === token.s ? token.r : '', pos: token.p };
+        const lookupContext = { reading: tokenReading(token), pos: token.p };
         wireLookupToken(span, token, index, p, lookupContext, namedDoor);
         nameReaderToken(span, token, index, namedDoor ? 'named' : 'lookup');
       }
@@ -10775,6 +10895,9 @@ function openSlip(node, { anchor, from = 'lookup', host = null, look = null, not
     record = lookup(node.id, node.seq ?? null, node.reading || '');
     token = { s: look?.surface || node.id, b: node.id, r: node.reading || record?.r || look?.reading || '', c: !!record,
       ...(node.seq != null && node.seq !== '' ? { seq: node.seq } : {}) };
+    // R · a reading of its own the quick dictionary does not carry asks the full dictionary now: its entry sheet
+    // resolves it, and the next look at the word stands for the entry read that way
+    void readyTokenReading(token);
     if (entry === undefined) entryAvailable = !!record;
   } else if (kind === 'kanji') {
     const k = D.kanji?.[node.id];
@@ -21907,6 +22030,10 @@ function wordCaptureState(node, record = S) {
   const row = (record.taken || []).some((entry) => entry.t === node.t && entry.id === node.id);
   if (node.t !== 'word') return row ? 'taken' : 'take';
   const explicit = node.seq != null && node.seq !== '';
+  // R · a door on a core spelling carrying a reading the core does not, and naming no entry yet, is not the core's
+  // word: its answer stays unconfirmed until the entry read that way is known (readingToken), so it saves nothing
+  if (!explicit && node.reading && D.dict?.[node.id] &&
+    kataToHira(String(node.reading)) !== kataToHira(String(D.dict[node.id].r || ''))) return 'unavailable';
   if (!row && !wordStudied(record, node.id)) return explicit && !explicitWordSnapshot(node, record) ? 'unavailable' : 'take';
   if (!sameWordIdentity(wordNodeIdentity(node, record), wordCardIdentity(record, node.id))) return 'conflict';
   if (row) return 'taken';
@@ -26061,10 +26188,14 @@ function renderSentenceTokens(container, tokens, opts = {}) {
     // the reader's grammar (reader lane 2026-10-02): one tap opens the word's popup — reading and meaning
     // at once, Save, and Full entry ›, which opens the entry with this sentence as its provenance
     const from = source ? { passage: source.passage, index: source.index + index } : null;
-    const openEntry = () => {
+    // R · the entry is the one this token's own reading names, as its slip showed it (readingToken); before the
+    // full dictionary answers, a core spelling carries the reading and its sheet resolves it
+    const openEntry = (door = readingToken(token)) => {
       removeMini();
       obsLog('tap', srsKey('word', token.b), 3, contextId);
-      go({ t: 'word', id: token.b, ...(from ? { from, ctxScope: 'sent' } : {}) });
+      const own = tokenReading(token);
+      go({ t: 'word', id: token.b, ...(door.seq ? { seq: door.seq, reading: own }
+        : D.dict[token.b] && readingAsksIndex(token.b, own) ? { reading: own } : {}), ...(from ? { from, ctxScope: 'sent' } : {}) });
     };
     span.addEventListener('contextmenu', (ev) => ev.preventDefault());
     span.addEventListener('click', (ev) => {
@@ -26073,7 +26204,7 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       // the second tap on the popup's word dives into its full entry
       if (diveFromMini(span, ev)) return;
       obsLog('tap', srsKey('word', token.b), 2, contextId);
-      showMini(span, token, openEntry, { focusEntry: ev.detail === 0, from });
+      openReadingSlip(span, token, (door) => showMini(span, door, () => openEntry(door), { focusEntry: ev.detail === 0, from }));
     });
     container.append(span);
   });
@@ -27791,6 +27922,12 @@ function readerSummaryFor(row, kanaIndex) {
 
 function readerEntryNode(token, index, p) {
   const node = { t: 'word', id: token.b, from: { passage: p.id, index }, ctxScope: 'sent' };
+  // R · the entry the token's own reading names, as its slip showed it (readingToken): 年 read ねん opens ねん's
+  // entry; before the full dictionary answers, a core spelling carries the reading and its sheet resolves it
+  const door = readingToken(token);
+  const own = tokenReading(token);
+  if (door.seq) return { ...node, seq: door.seq, reading: own };
+  if (D.dict[token.b] && readingAsksIndex(token.b, own)) return { ...node, reading: own };
   if (D.dict[token.b]) return node;
   node.readerChoice = { passage: p.id, index, s: token.s, b: token.b, r: token.r || '', state: 'pending' };
   return node;
@@ -28007,7 +28144,10 @@ function renderWordNode(sheet, node) {
     : found;
   const legacy = D.words[node.id];
   const label = rec?.head || node.id;
-  const details = dictionaryDetailsFor(node);
+  // R · until the full dictionary names the entry a reading of its own stands for, the header shows that reading and
+  // nothing is borrowed from the quick dictionary's other reading (ensureDictionaryRowsForNode resolves it)
+  const unresolved = (node.seq == null || node.seq === '') && !!D.dict[node.id] && readingAsksIndex(node.id, node.reading);
+  const details = unresolved ? [] : dictionaryDetailsFor(node);
   const head = el('h2', 'headword');
   head.append(document.createTextNode(label));
   const alternateSpellings = (rec?.written || []).filter((form) => form !== label).slice(0, 5);
@@ -28015,7 +28155,8 @@ function renderWordNode(sheet, node) {
     head.append(el('span', 'headword-alt', `／${alternateSpellings.join('・')}`));
   } else if (rec?.alt) head.append(el('span', 'headword-alt', `／${rec.alt}`));
   sheet.append(head);
-  if (rec?.r) sheet.append(el('p', 'reading', rec.r));
+  const shownReading = unresolved ? node.reading : rec?.r;
+  if (shownReading) sheet.append(el('p', 'reading', shownReading));
   // an entry matched from a reader token offers no other rows of the form:
   // its reading already chose among them (D11)
   if (node.readerChoice) renderReaderChoiceNote(sheet, node);
@@ -28048,7 +28189,7 @@ function renderWordNode(sheet, node) {
     const box = el('div', 'senses dictionary-senses');
     renderDictionaryDetails(box, details, node);
     sheet.append(box);
-  } else if (rec?.m?.length) {
+  } else if (rec?.m?.length && !unresolved) {
     const box = el('div', 'senses');
     if (rec.p) box.append(el('p', 'sense-pos', plainPos(rec.p)));
     const immediate = rec.seq ? rec.m.slice(0, 1) : rec.m;
