@@ -145,7 +145,7 @@ html[data-room='tray'] .today-wins { fill: var(--today-win); opacity: 0.6; }
 html[data-room='tray'] .today-lamps { fill: var(--today-lamp); opacity: 0.8; }
 html[data-room='tray'] .today-horizon { stroke: var(--color-rule); stroke-width: 0.5; fill: none; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-wins {
-  animation: today-windows 9s ease-in-out infinite alternate;
+  animation: today-windows var(--motion-ambient) ease-in-out infinite alternate;
 }
 @keyframes today-windows { from { opacity: 0.6; } to { opacity: 0.42; } }
 
@@ -196,7 +196,7 @@ html:is([data-room='tray'], [data-room='search']) .dw-glyph {
   font: 800 min(92px, calc(72vw / var(--n, 2)))/1.06 var(--font-headword);
   letter-spacing: 0.02em;
 }
-html:is([data-room='tray'], [data-room='search']) .dw-k { display: inline-block; animation: today-ink 520ms var(--ease-ink) both; }
+html:is([data-room='tray'], [data-room='search']) .dw-k { display: inline-block; animation: today-ink var(--motion-long) var(--ease-ink) both; }
 html:is([data-room='tray'], [data-room='search']) .dw-k:nth-child(2) { animation-delay: 60ms; }
 html:is([data-room='tray'], [data-room='search']) .dw-k:nth-child(3) { animation-delay: 120ms; }
 html:is([data-room='tray'], [data-room='search']) .dw-k:nth-child(n + 4) { animation-delay: 180ms; }
@@ -580,7 +580,7 @@ html[data-room='door'] body.ginga:not(.ui-bi) #drift-layer #hint { font-style: n
    meets a moving layer */
 html[data-arrive='sky'] #drift-layer.active {
   transform-origin: var(--arrive-x, 50%) var(--arrive-y, 30%);
-  animation: today-universe-rise 460ms var(--ease-enter, cubic-bezier(0.2, 0.8, 0.2, 1)) both;
+  animation: today-universe-rise var(--motion-long) var(--ease-enter) both;
   pointer-events: none;
 }
 @keyframes today-universe-rise { from { opacity: 0.01; transform: scale(0.86); } to { opacity: 1; transform: none; } }
@@ -601,7 +601,7 @@ html[data-room='review'] .review-clear {
   font: 800 clamp(30px, 9vw, 40px)/1.15 var(--font-headword);
   color: var(--color-ink);
   text-wrap: balance;
-  animation: today-ink 600ms var(--ease-ink) both;
+  animation: today-ink var(--motion-long) var(--ease-ink) both;
 }
 html[data-room='review'] .review-clear + .review-clear-count {
   display: block;
@@ -625,7 +625,7 @@ html[data-room='review'] .review-rise-w {
   color: var(--color-muted);
   opacity: 0.62;
   transform: translateY(calc(var(--i, 0) % 3 * 6px));
-  animation: review-rise 360ms var(--ease-ink, ease-out) min(240ms, calc(var(--i, 0) * 40ms)) backwards;
+  animation: review-rise var(--motion-sheet) var(--ease-ink) min(240ms, calc(var(--i, 0) * 40ms)) backwards;
 }
 html[data-room='review'] .review-rise-w.again { color: var(--color-ink); opacity: 1; font-family: var(--font-headword); font-weight: 800; }
 @keyframes review-rise { from { opacity: 0.01; transform: translateY(18px); } }

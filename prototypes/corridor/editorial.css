@@ -29,8 +29,6 @@ body, body.v-contrast-wcag {
   --r-card: 16px;
   --r-float: 14px;
   --r-control: 12px;
-  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --dur: 220ms;
   --sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', system-ui, sans-serif;
   /* the reader's page only: a 2–3% grain, fine fibre, never on chrome */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g' x='0' y='0' width='240' height='240' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.27 0 0 0 0 0.2 0 0 0 1.4 -0.62'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23g)' opacity='0.26'/%3E%3C/svg%3E");
@@ -89,7 +87,7 @@ body, body.v-contrast-wcag {
 @keyframes feel-pop-centred { from { opacity: 0; transform: translateX(-50%) scale(0.96); } to { transform: translateX(-50%); } }
 @keyframes feel-rise { from { opacity: 0; transform: translateY(18px); } }
 @keyframes feel-fade { from { opacity: 0; } }
-body:not([data-view='drift']) #app > main[data-enter] { animation: feel-fade 240ms var(--ease) both; }
+body:not([data-view='drift']) #app > main[data-enter] { animation: feel-fade 240ms var(--ease-standard) both; }
 @media (prefers-reduced-motion: reduce) { body:not([data-view='drift']) #app > main[data-enter] { animation: none; } }
 
 ::selection { background: var(--ink); color: var(--ground-0, #faf6ea); }
@@ -357,7 +355,7 @@ body .focus-chip, body.v-depth-layered .focus-mode {
   background: var(--fill);
   box-shadow: none;
   color: var(--label);
-  transition: transform 140ms var(--ease);
+  transition: transform 140ms var(--ease-standard);
 }
 body .focus-chip:hover, body.v-depth-layered .focus-mode:hover { background: var(--fill-strong); }
 body .focus-chip.on { background: var(--tint); box-shadow: none; color: #fff; }
@@ -1215,7 +1213,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   box-shadow: 0 0 0 0.5px var(--separator), var(--shadow-float);
   font: 14px/1.65 var(--sans);
   color: var(--label);
-  animation: feel-pop-centred var(--dur) var(--ease);
+  animation: feel-pop-centred var(--motion-standard) var(--ease-standard);
 }
 .shelf-controls .shelf-results-count {
   margin: 0 0 0 auto;
@@ -1251,7 +1249,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
 .shelf-tools-toggle .ui-icon { width: 18px; height: 18px; }
 .shelf-tools-toggle-label { display: inline-flex; align-items: baseline; gap: 5px; color: inherit; }
 .shelf-tools-toggle-label .en-sub { font: 500 12px/1 var(--sans); letter-spacing: 0.01em; text-transform: none; color: inherit; opacity: 0.8; }
-.shelf-tools-toggle .shelf-tools-caret { width: 15px; height: 15px; color: inherit; opacity: 0.8; transition: transform var(--dur) var(--ease); }
+.shelf-tools-toggle .shelf-tools-caret { width: 15px; height: 15px; color: inherit; opacity: 0.8; transition: transform var(--motion-standard) var(--ease-standard); }
 .shelf-tools-toggle[aria-expanded='true'] .shelf-tools-caret { transform: rotate(180deg); }
 
 #shelf-body .shelf-study-tools {
@@ -1265,7 +1263,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   background: var(--surface);
   box-shadow: var(--shadow-card);
   transform-origin: top right;
-  animation: feel-pop var(--dur) var(--ease);
+  animation: feel-pop var(--motion-standard) var(--ease-standard);
 }
 #shelf-body .shelf-study-tools[hidden] { display: none; }
 .shelf-tools-group { min-width: 0; margin: 0; }
@@ -1339,7 +1337,7 @@ body #shelf-body .story-card {
   border-radius: var(--r-card);
   background: var(--surface);
   box-shadow: var(--shadow-card);
-  transition: transform var(--dur) var(--ease);
+  transition: transform var(--motion-standard) var(--ease-standard);
 }
 @media (hover: hover) {
   body #shelf-body .story-card:hover { box-shadow: var(--shadow-lift); transform: translateY(-3px); }
@@ -1382,7 +1380,7 @@ body #shelf-body .story-card:focus-within { outline: 2px solid var(--tint); outl
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 600ms var(--ease);
+  transition: transform 600ms var(--ease-standard);
 }
 /* until a picture exists: a calm block in the story's colour, its topic word in small capitals */
 .story-picture.is-placeholder {
@@ -1538,7 +1536,7 @@ body #shelf-body .story-glossary { box-shadow: 0 0 0 0.5px var(--separator), 0 1
   font: 600 15px/1.55 var(--sans);
   text-align: start;
   cursor: pointer;
-  transition: transform var(--dur) var(--ease);
+  transition: transform var(--motion-standard) var(--ease-standard);
 }
 .shelf-encounter > strong { font-weight: 600; overflow-wrap: anywhere; }
 .shelf-encounter > span { font: 18px/1.7 var(--serif); color: var(--accent); overflow-wrap: anywhere; }
@@ -1844,7 +1842,7 @@ body[data-view='reader'] main > blockquote rt { font-size: 0.6em; color: var(--a
   border-radius: var(--radius-float);
   background: var(--raised);
   box-shadow: var(--float-shadow);
-  animation: float-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: float-in var(--motion-room) var(--ease-standard);
 }
 @keyframes float-in { from { opacity: 0; transform: translate(-50%, 14px); } }
 @keyframes float-in-phone { from { opacity: 0; transform: translateY(14px); } }
@@ -2122,13 +2120,13 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
 
 /* the sheet (FEEL pass 2026-10-02): white, 14px corners, rising from the foot over a soft dim; its
    bar is light glass on a hairline with plain tinted controls — no lacquer slab, no red rule */
-body.v-depth-layered .scrim, body .scrim { background: rgb(0 0 0 / 30%); animation: feel-fade var(--dur) var(--ease); }
+body.v-depth-layered .scrim, body .scrim { background: rgb(0 0 0 / 30%); animation: feel-fade var(--motion-standard) var(--ease-standard); }
 body.v-depth-layered .sheet, body .sheet {
   border: 0;
   border-radius: var(--r-float) var(--r-float) 0 0;
   background: var(--surface);
   box-shadow: 0 0 0 0.5px var(--separator), 0 -12px 48px rgb(0 0 0 / 16%);
-  animation: feel-rise 280ms var(--ease);
+  animation: feel-rise 280ms var(--ease-standard);
 }
 body .sheet .sheet-grip { width: 36px; height: 5px; border-radius: 3px; background: var(--fill-strong); }
 body .sheet .sheet-bar {
@@ -3106,8 +3104,8 @@ body .token-actions button:hover { background: var(--ai-wash); }
   .version-toggle .version-choice { flex: 1 1 0; flex-wrap: wrap; justify-content: center; column-gap: 4px; row-gap: 0; padding: 4px 8px; font-size: 13px; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .reader-toast:not([hidden]) { animation: reader-toast-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1); }
-  .reader-word-menu, .vocabulary-list-popover { animation: reader-pop-in 120ms ease-out; }
+  .reader-toast:not([hidden]) { animation: reader-toast-in var(--motion-fast) var(--ease-standard); }
+  .reader-word-menu, .vocabulary-list-popover { animation: reader-pop-in var(--motion-ma) var(--ease-enter); }
 }
 @keyframes reader-toast-in { from { opacity: 0; transform: translate(-50%, 8px); } }
 @keyframes reader-pop-in { from { opacity: 0; } }
@@ -3339,8 +3337,8 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 #app .kp[data-readings='on'] .kp-sentence ruby[data-rt]::after,
 #app .kp-sentence :is(.kp-target, .kp-tok.kp-lit) ruby[data-rt]::after { content: attr(data-rt); }
 #app .kp-sentence .kp-target ruby[data-rt]::after { color: inherit; }
-#app .kp-sentence.kp-enter ruby[data-rt]::after { animation: kp-fade 0.16s cubic-bezier(0.2, 0, 0, 1) 0.06s both; }
-#app .kp-sentence .kp-tok.kp-lit ruby[data-rt]::after { animation: kp-fade 0.12s cubic-bezier(0.2, 0, 0, 1) both; }
+#app .kp-sentence.kp-enter ruby[data-rt]::after { animation: kp-fade var(--motion-quick) var(--ease-enter) 60ms both; }
+#app .kp-sentence .kp-tok.kp-lit ruby[data-rt]::after { animation: kp-fade var(--motion-ma) var(--ease-enter) both; }
 #app .kp-study .kp-readings { margin-left: 14px; }
 /* ── The focus room, refined (John, 2026-10-13: "more detail, more sensibility, more subtle awareness,
    more precision, more depth"). One sheet of washi under a lamp on the 藍 stage; the passage is the
@@ -3819,18 +3817,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --elevation-lift: 0 2px 4px rgb(0 0 0 / 5%), 0 16px 36px rgb(0 0 0 / 12%);
   --elevation-float: 0 2px 6px rgb(0 0 0 / 6%), 0 20px 48px rgb(0 0 0 / 16%);
   --elevation-focus: inset 0 -2px 0 var(--color-ink);
-  --motion-instant: 0ms;
-  --motion-quick: 120ms;
-  --motion-press: 140ms;
-  --motion-fast: 180ms;
-  --motion-standard: 220ms;
-  --motion-room: 240ms;
-  --motion-sheet: 280ms;
-  --motion-long: 400ms;
-  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --ease-enter: ease-out;
-  --ease-exit: ease-in;
-  --ease-linear: linear;
 }
 
 /* Preserve the current exact default paper and the existing night materials. */
@@ -3982,10 +3968,33 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --ed-shadow: var(--elevation-card);
   --paper-edge: var(--stroke-relief) solid color-mix(in srgb, var(--color-ink) 30%, transparent);
   --rule: var(--stroke-relief) solid var(--color-line);
-  --dur: var(--motion-standard);
-  --ease: var(--ease-standard);
 }
 /* END BUNKI DESIGN TOKENS V2 =============================================== */
+
+/* ---- the one hand (slice C, 2026-10-15): every move in the house takes its beat and its curve
+   from this one set, defined once on :root — the view transition's pseudo-elements and the drift
+   layer inherit from the root, not from body. The only cubic-bezier literals in the house are the
+   five below. ma 120 (a tick) · press 150 · quick 160 · fast 180 · standard 200 · room 220 ·
+   sheet 320 · long 400 · ambient 9 s. prefers-reduced-motion re-values the set in one rule (the
+   shell, below). ---- */
+:root {
+  --motion-instant: 0ms;
+  --motion-ma: 120ms;
+  --motion-press: 150ms;
+  --motion-quick: 160ms;
+  --motion-fast: 180ms;
+  --motion-standard: 200ms;
+  --motion-room: 220ms;
+  --motion-sheet: 320ms;
+  --motion-long: 400ms;
+  --motion-ambient: 9000ms;
+  --ease-standard: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-ink: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-linear: linear;
+}
 
 /* ==========================================================================
    BEGIN BUNKI SKIN · C 生きた本棚 Living Shelf, polished with A 磨き's craft
@@ -4053,15 +4062,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --elevation-lift: 0 2px 0 rgb(25 28 34 / 10%), 0 18px 40px -10px rgb(40 30 16 / 26%);
   --elevation-float: 0 -1px 0 rgb(25 28 34 / 8%), 0 -16px 48px rgb(25 28 34 / 18%);
   --elevation-press: 0 2px 0 var(--color-press), 0 8px 18px -6px rgb(20 26 40 / 30%);
-
-  --motion-press: 90ms;
-  --motion-quick: 160ms;
-  --motion-room: 280ms;
-  --motion-ma: 120ms;
-  --motion-ambient: 9000ms;
-  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
-  --ease-ink: cubic-bezier(0.65, 0, 0.35, 1);
 
   /* washi: two scales of kōzo fibre, painted once on the fixed page layer, never animated */
   --texture-washi:
@@ -4858,15 +4858,6 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
      weight, tracking and leading */
   --leading-ui: 1.35;
   --leading-body: 1.55;
-  /* motion: short and springy; the sheet curve is the iOS one */
-  --motion-press: 80ms;
-  --motion-quick: 150ms;
-  --motion-standard: 200ms;
-  --motion-room: 240ms;
-  --motion-sheet: 320ms;
-  --ease-standard: cubic-bezier(0.25, 1, 0.5, 1);
-  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
   /* washi, truer: soft formation, short fibres (no long streaks), and a fine tooth */
   --texture-washi:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='3' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .38 0 0 0 0 .3 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E"),

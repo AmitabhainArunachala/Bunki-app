@@ -474,7 +474,7 @@ body.ginga #drift-layer #hint.first-cue {
   box-shadow: 0 3px 14px rgba(20, 26, 34, 0.18);
   cursor: pointer;
   transition:
-    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform var(--motion-sheet) var(--ease-standard);
 }
 .nav-symbol svg {
   width: 26px;
@@ -580,7 +580,7 @@ body.ginga #drift-layer #hint.first-cue {
   box-shadow: 0 2px 6px rgb(0 0 0 / 6%), 0 18px 44px rgb(20 26 34 / 16%);
   font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
   transform-origin: top center;
-  animation: nav-drop 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: nav-drop var(--motion-room) var(--ease-standard);
 }
 @keyframes nav-drop {
   from {
@@ -869,7 +869,7 @@ html[data-layout='places'] .nav-station-go {
   border-radius: 7px;
   box-shadow: 0 1px 3px rgb(0 0 0 / 14%), 0 0 0 0.5px rgb(0 0 0 / 5%);
   transition:
-    transform 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform var(--motion-room) var(--ease-standard);
 }
 .lang-slide[data-lang='ja'] .lang-knob {
   transform: translateX(39px);
@@ -1009,7 +1009,7 @@ html[data-layout='places'] .nav-station-go {
   border-radius: 999px;
   box-shadow: 0 2px 6px rgb(0 0 0 / 6%), 0 12px 32px rgb(20 26 34 / 14%);
   cursor: pointer;
-  animation: bubble-rise 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: bubble-rise var(--motion-room) var(--ease-standard);
 }
 .corner-bubble .l-ja {
   display: inline;
@@ -1574,7 +1574,7 @@ span.tok.named {
   box-shadow: 0 -14px 40px rgba(20, 24, 28, 0.2);
   padding: 8px 16px calc(22px + env(safe-area-inset-bottom));
   transform: translateY(0);
-  animation: rise 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
+  animation: rise var(--motion-room) var(--ease-standard);
 }
 
 @keyframes rise {
@@ -2482,7 +2482,7 @@ button.pool-tag.cat-chip {
   border: 1px solid var(--line);
   border-radius: 14px;
   box-shadow: 0 1px 2px rgba(10, 10, 8, 0.12), 0 18px 44px -8px rgba(10, 10, 8, 0.36);
-  animation: world-picker-in 180ms cubic-bezier(0.25, 1, 0.5, 1) backwards;
+  animation: world-picker-in var(--motion-fast) var(--ease-standard) backwards;
 }
 .world-row {
   display: flex;
@@ -4150,7 +4150,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 /* the readings open ELEGANTLY — a slow rise and settle, not a pop */
 .stroke-awake-field {
   transition:
-    opacity 0.34s ease, transform 0.34s cubic-bezier(0.2, 0.7, 0.3, 1);
+    opacity var(--motion-sheet) var(--ease-standard), transform var(--motion-sheet) var(--ease-standard);
 }
 .stroke-page[data-chrome='sleeping'] .stroke-awake-field {
   transform: translate(-50%, 16px);
@@ -6774,9 +6774,6 @@ body.zen {
    * block; the card itself stays on the global --card-* washi law */
   /* the shared breath: 6/min, the HRV-resonance rate */
   --breath: 10s;
-  --ease-breath: cubic-bezier(0.37, 0, 0.63, 1);
-  --ease-ceremony: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-turn: cubic-bezier(0.65, 0, 0.35, 1);
 
   /* the urushi stage: warm black, an andon light pool above the card,
    * never #000 — warm channel order R>G>B */
@@ -7085,7 +7082,7 @@ body.zen .review-example {
       0 28px 68px rgba(6, 5, 5, 0.5),
       0 0 26px var(--zen-glow);
     opacity: 0;
-    animation: kairo-breathe-glow var(--breath) var(--ease-breath) infinite;
+    animation: kairo-breathe-glow var(--breath) ease-in-out infinite;
     will-change: opacity;
   }
   @keyframes kairo-breathe-glow {
@@ -7100,7 +7097,7 @@ body.zen .review-example {
   /* the answer condenses out of the paper like ink soaking in — each zone a
    * beat of the ritual, readings first and every grade ready within 340ms */
   body.zen .reveal {
-    animation: kairo-materialize 180ms var(--ease-ceremony) both;
+    animation: kairo-materialize 180ms var(--ease-enter) both;
   }
   @keyframes kairo-materialize {
     from {
@@ -7125,7 +7122,7 @@ body.zen .review-example {
     animation-delay: 130ms;
   }
   body.zen .grade-row .grade {
-    animation: kairo-materialize 140ms var(--ease-ceremony) both;
+    animation: kairo-materialize 140ms var(--ease-enter) both;
     animation-delay: 110ms;
   }
   body.zen .grade-row .grade:nth-child(2) {
@@ -7138,7 +7135,7 @@ body.zen .review-example {
     animation-delay: 200ms;
   }
   .say.is-speaking svg {
-    animation: kairo-say-breath 6s var(--ease-breath) infinite;
+    animation: kairo-say-breath 6s ease-in-out infinite;
   }
   @keyframes kairo-say-breath {
     0%,

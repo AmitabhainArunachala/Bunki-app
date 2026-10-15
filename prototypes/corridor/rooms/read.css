@@ -758,8 +758,6 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   --mini-gold: #e5c27a;
   --mini-edge: color-mix(in srgb, var(--color-ink) 26%, transparent);
   --mini-rule: color-mix(in srgb, var(--color-ink) 12%, transparent);
-  --mini-press: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --mini-ease: cubic-bezier(0.18, 0.9, 0.24, 1);
   /* the slip floats beside its word (placeFloating seats it); it was corridor.css's base rule that said so */
   position: fixed;
   z-index: 70;
@@ -782,7 +780,7 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   color: var(--color-ink);
   cursor: auto;
   /* the card rises and settles: translate and opacity only (placeFloating measures it as it opens) */
-  animation: read-mini-rise 260ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards;
+  animation: read-mini-rise var(--motion-room) var(--ease-enter) backwards;
 }
 @keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, 10px, 0); } }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #mini {
@@ -980,7 +978,7 @@ body[data-view='drift'] #mini {
   box-shadow: none;
   color: var(--color-ink);
   overflow: visible;
-  animation: read-mini-unfold 240ms var(--mini-ease) both;
+  animation: read-mini-unfold var(--motion-room) var(--ease-enter) both;
 }
 @keyframes read-mini-unfold { from { opacity: 0; transform: translateY(-6px); } }
 #mini .is-inline .vocabulary-list-choice {
@@ -1012,7 +1010,7 @@ body[data-view='drift'] #mini {
   border-bottom: 2px solid #fbf8f1;
   transform: translateY(-1px) rotate(-45deg) scale(0.4);
   opacity: 0;
-  transition: transform 160ms var(--mini-ease), opacity 120ms ease;
+  transition: transform var(--motion-quick) var(--ease-enter), opacity var(--motion-ma) var(--ease-standard);
 }
 #mini .is-inline .vocabulary-list-choice input:checked { border-color: var(--color-accent); background: var(--color-accent); }
 #mini .is-inline .vocabulary-list-choice input:checked::before { opacity: 1; transform: translateY(-1px) rotate(-45deg) scale(1); }
@@ -1176,7 +1174,7 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
   text-overflow: ellipsis;
 }
 #mini :is(.mini-sentence-chevron, .mini-sentence-action-chevron) { font: 700 20px/1 var(--font-ui); color: var(--color-muted); }
-#mini .mini-sentence-pane { padding: 2px 14px 14px 16px; animation: read-mini-path 220ms cubic-bezier(0.18, 0.9, 0.24, 1) backwards; }
+#mini .mini-sentence-pane { padding: 2px 14px 14px 16px; animation: read-mini-path var(--motion-room) var(--ease-enter) backwards; }
 @media (max-width: 520px) {
   #mini.is-sentence[data-flow='document'] {
     position: absolute;

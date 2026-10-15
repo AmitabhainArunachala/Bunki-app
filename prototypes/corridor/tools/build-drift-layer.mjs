@@ -53,6 +53,8 @@ const cssPatch = (from, to, label) => {
   rawCss = rawCss.slice(0, first) + to + rawCss.slice(first + from.length);
 };
 cssPatch('transition:background-color 1.2s', 'transition:none', 'world colour');
+// the card's rise takes the house's curve (the one set on :root; the drift layer sits in body and inherits it)
+cssPatch('transition:transform .5s cubic-bezier(.2,.8,.2,1)', 'transition:transform .5s var(--ease-standard)', 'card rise curve');
 cssPatch('transition:filter .9s', 'transition:none', 'word sharpness');
 cssPatch('transition:opacity .4s,width .25s', 'transition:opacity .4s', 'level rail');
 cssPatch('transition:background .25s,width .25s,box-shadow .25s', 'transition:none', 'level track');

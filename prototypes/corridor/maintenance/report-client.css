@@ -90,7 +90,7 @@
   #bunki-reports-root .br-rail { right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); max-width: calc(100vw - 24px); }
 }
 @media (prefers-reduced-motion: no-preference) {
-  #bunki-reports-root .br-sheet[open] { animation: br-sheet-enter 180ms cubic-bezier(.16, 1, .3, 1); }
+  #bunki-reports-root .br-sheet[open] { animation: br-sheet-enter var(--motion-fast, 180ms) var(--ease-enter, ease-out); }
   @keyframes br-sheet-enter { from { transform: translateY(14px); } to { transform: translateY(0); } }
 }
 /* Reduced motion keeps the report sheet's response as a short crossfade. */

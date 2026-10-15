@@ -106,7 +106,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-wires { position: abso
 html:is([data-room='search'], [data-room='word-web']) .ww-wire {
   fill: none; stroke: var(--ww-wire); stroke-width: 1; vector-effect: non-scaling-stroke;
   transform-box: view-box; transform-origin: 50% 47.5%;
-  animation: ww-wire 240ms var(--ease-enter) both; animation-delay: calc(var(--i, 0) * 6ms);
+  animation: ww-wire var(--motion-room) var(--ease-enter) both; animation-delay: calc(var(--i, 0) * 6ms);
 }
 html:is([data-room='search'], [data-room='word-web']) .ww-wire-live { stroke: var(--color-live); stroke-width: 1.6; }
 html:is([data-room='search'], [data-room='word-web']) .ww-wire-rel { stroke-dasharray: 3 3; }
@@ -149,7 +149,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-node {
   min-width: 44px; min-height: 44px; margin: 0; padding: 0;
   border: 0; background: none; color: var(--color-ink); font: inherit; cursor: pointer; pointer-events: auto;
   transform: translate(-50%, -50%);
-  animation: ww-node 200ms var(--ease-enter) both; animation-delay: calc(40ms + var(--i, 0) * 5ms);
+  animation: ww-node var(--motion-standard) var(--ease-enter) both; animation-delay: calc(40ms + var(--i, 0) * 5ms);
   -webkit-tap-highlight-color: transparent;
 }
 html:is([data-room='search'], [data-room='word-web']) .ww-node:focus-visible { outline: 2px solid var(--color-live); outline-offset: 2px; border-radius: 4px; }
@@ -278,7 +278,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-plate :is(
 html:is([data-room='search'], [data-room='word-web']) .ww-leaving:not(.ww-leaving-detail) .ww-detail,
 html:is([data-room='search'], [data-room='word-web']) .ww-leaving-detail .ww-detail > :not(.ww-chosen):not(.ww-family),
 html:is([data-room='search'], [data-room='word-web']) .ww-leaving-detail .ww-fam:not(.ww-chosen) {
-  opacity: 0; transition: opacity 120ms var(--ease-exit, ease-in);
+  opacity: 0; transition: opacity var(--motion-ma) var(--ease-exit);
 }
 html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-chosen { z-index: 5; }
 html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-chosen .ww-nb { border-color: transparent; background: transparent; box-shadow: none; }

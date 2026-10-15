@@ -782,10 +782,10 @@ legend.gs-instruction {
 }
 @media (prefers-reduced-motion: no-preference) {
   .gs-slash path {
-    animation: gs-slash 0.34s cubic-bezier(0.15, 0.9, 0.2, 1) 0.06s forwards;
+    animation: gs-slash var(--motion-sheet) var(--ease-enter) 60ms forwards;
   }
   .gs-choice.is-wrong.cut .gs-choice-num {
-    animation: gs-numfall 0.5s cubic-bezier(0.35, 0.6, 0.3, 1) 0.3s forwards;
+    animation: gs-numfall 0.5s var(--ease-standard) 0.3s forwards;
   }
   .gs-choice {
     transition:

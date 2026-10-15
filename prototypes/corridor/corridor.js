@@ -18383,6 +18383,13 @@ let wwPartIndex = null;
 
 const wwReady = () => !!(D.kanji && D.dict && D.words && D.kanjiWords);
 const wwReduced = () => typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/** The house's one motion set (editorial.css, :root): a beat in ms and a curve, read as the page computes them, so a
+ * script's animation takes the same hand as the stylesheets' (and the reduced-motion rule re-values both at once). */
+const motionMs = (name, fallback) => {
+  const value = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name));
+  return Number.isFinite(value) ? value : fallback;
+};
+const motionEase = (name, fallback = 'ease-out') => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 
 function wwTrail() {
   if (!wordWeb.trail) {
@@ -19195,7 +19202,7 @@ function wwRecentre(node, section, invoker) {
     if (glyph?.animate) glyph.animate(wwReduced()
       ? [{ opacity: 0.35 }, { opacity: 1 }]
       : [{ opacity: 0.55, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }],
-      { duration: wwReduced() ? 80 : 90, easing: 'cubic-bezier(.22,1,.36,1)' });
+      { duration: motionMs('--motion-ma', 120), easing: motionEase('--ease-enter') });
     if (hadFocus) next.querySelector('.ww-centre')?.focus({ preventScroll: true });
   };
   const from = invoker?.querySelector('.ww-g') || invoker?.querySelector('span');
@@ -19212,9 +19219,9 @@ function wwRecentre(node, section, invoker) {
   const scale = Math.min(3.2, r1.height / Math.max(r0.height, 1));
   from.animate(
     [{ transform: 'none' }, { transform: `translate(${(r1.left + r1.width / 2 - (r0.left + r0.width / 2)).toFixed(1)}px, ${(r1.top + r1.height / 2 - (r0.top + r0.height / 2)).toFixed(1)}px) scale(${scale.toFixed(2)})` }],
-    { duration: 200, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' },
+    { duration: motionMs('--motion-standard', 200), easing: motionEase('--ease-enter'), fill: 'forwards' },
   );
-  setTimeout(swap, 200);
+  setTimeout(swap, motionMs('--motion-standard', 200));
 }
 
 /** Other rooms' "Open the web" buttons call this. */
