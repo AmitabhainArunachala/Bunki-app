@@ -94,12 +94,14 @@ if (card) {
   // the play bar stands folded to its one mark (John, 2026-10-15 17:20): quiet by design — no edge, no bed, no shadow;
   // the mark itself is a 44 px door. (The open bar's scan-line relief is pinned by verify-playback on a narrated fixture.)
   const mark = await page.evaluate(`(() => { const row = document.querySelector('.listen-row.play-bar'); const m = document.querySelector('#listen-open'); if (!row || !m) return null;
-    const cs = getComputedStyle(row), r = m.getBoundingClientRect(); return { open: row.dataset.open, border: parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth), bg: cs.backgroundColor, shadow: cs.boxShadow, w: r.width, h: r.height }; })()`);
+    const probe = document.createElement('i'); probe.style.background = 'var(--color-surface)'; document.body.append(probe); const surface = getComputedStyle(probe).backgroundColor; probe.remove();
+    const cs = getComputedStyle(row), r = m.getBoundingClientRect(); return { open: row.dataset.open, border: parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth), bg: cs.backgroundColor, surface, shadow: cs.boxShadow, w: r.width, h: r.height }; })()`);
   receipt.surfaces['listen mark (folded)'] = mark;
   if (!mark) failures.push('listen mark: .listen-row.play-bar #listen-open not found');
   else {
     if (mark.open !== 'false') failures.push(`listen mark: the bar is not folded (data-open ${mark.open})`);
-    if (!(mark.border === 0 && /rgba\(0, 0, 0, 0\)|transparent/.test(mark.bg) && mark.shadow === 'none')) failures.push(`listen mark: the folded bar is not quiet (border ${mark.border}, bg ${mark.bg}, shadow ${mark.shadow})`);
+    // quiet: no edge, no shadow, no bed — its ground exactly the reader's own surface (a disc that keeps the glyph off bare text)
+    if (!(mark.border === 0 && mark.bg === mark.surface && !/\/ 0\)|rgba\([^)]*, 0\)/.test(mark.bg) && mark.shadow === 'none')) failures.push(`listen mark: the folded bar is not quiet (border ${mark.border}, bg ${mark.bg} vs surface ${mark.surface}, shadow ${mark.shadow})`);
     if (!(mark.w >= 44 && mark.h >= 44)) failures.push(`listen mark: under 44px (${mark.w}×${mark.h})`);
   }
   await check('reader body', '#reader');

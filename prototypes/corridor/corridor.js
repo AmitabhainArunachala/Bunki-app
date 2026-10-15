@@ -10732,6 +10732,10 @@ window.__BUNKI_OPEN_ENTRY = {
   open(kind, key) {
     if (S.view !== 'drift' || !this.has(kind, key)) return;
     interaction({ kind: 'entry.open' }, 'pointer', `drift-study-${kind}`);
+    // the sky opens the entry on the touch's release: its compatibility click must not land on the entry that rose
+    // under the finger (a kanji tile there opened a second entry, and Back left one standing). One ghost click,
+    // once — the hold's own guard; the next press resets it
+    swallowClickUntil = Date.now() + 700;
     go({ t: kind, id: key });
   },
 };

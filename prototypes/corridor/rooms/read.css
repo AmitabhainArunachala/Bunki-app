@@ -389,7 +389,14 @@ html[data-room='reader'] .listen-row .play-track::before {
 html[data-room='reader'] .listen-row .play-voice { font-family: var(--font-data); color: var(--color-ink-2); }
 html[data-room='reader'] .listen-row .play-mark { color: var(--color-ink-2); }
 /* folded: no scan-line bed, no edge — the mark alone */
-html[data-room='reader'] body .listen-row.play-bar[data-open='false'] { border: 0; background: transparent; box-shadow: none; }
+/* folded: the mark alone, quiet — no edge, no shadow, no bed; a disc of the reader's own surface so the glyph never
+   sits on bare text where it floats over the column. #app outweighs the relief rules' :is(…, #reader, …) */
+html[data-room='reader'] body:not([data-view='drift']) #app .listen-row.play-bar[data-open='false'] {
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-surface);
+  box-shadow: none;
+}
 html[data-room='reader'] .listen-row .play-pending::after {
   content: '';
   flex: 1 1 auto;
