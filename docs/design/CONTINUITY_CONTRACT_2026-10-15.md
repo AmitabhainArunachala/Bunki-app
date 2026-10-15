@@ -112,14 +112,15 @@ world's 藍, the colour the page already uses for "you can go here" — ベロ�
 
 | world | band (ink → its foot) | band word | reading | Save (A) | sheet paper | why |
 |---|---|---|---|---|---|---|
-| 藍 ベロ藍・浪 (default) | #1b1f26 → #31343a | #faf6ea | #dcab9f | #1f3a5f | #faf6ea | the print's key line carries the word; the Berlin blue that names the world is its one key |
+| 藍 ベロ藍・浪 (default) | #14171d → #2b2d32 | #faf6ea | #dcab9f | #1f3a5f | #faf6ea | the print's key line carries the word (the default world's ink is the R4 skin's #14171d, a step deeper than its block's #1b1f26); the Berlin blue that names the world is its one key |
 | 墨 墨・楮紙 | #211e17 → #37342c | #faf6ea | #d6a498 | #2e4d6e | #faf6ea | sumi 濃淡 — ink, then the greys of the lifting brush; bengara thinned by kōzo is the one warm note; 藍 the one cool key |
 | 朱 朱・胡粉 | #2b2620 → #403b35 | #fdfaf2 | #dea49b | #2e4d6e | #fdfaf2 | shell-white on soot ink; the vermilion stays the seal's; 藍 keys |
 | 赤 凱風快晴 | #45291a → #573c2d | #f8ecdc | #d5a591 | #2a5d8a | #f8ecdc | the umber of Fuji's flank, its red lit by dawn paper; the lake's 藍 keys |
 | 柿 焦茶・柿渋 | #2e1a0c → #402a19 | #e6bd92 | #bc805e | #2c3d5c | #e6bd92 | 焦茶 on persimmon tannin; 藍 on 柿渋 is the dyer's pairing (the 藍 a step deeper, 4.5:1 on tannin) |
 | 板 板木・墨 | #26221c → #3b3731 | #faf6ea | #dcab9f | #2a5d8a | #faf6ea | the keyblock's sumi line; 藍 is the colour block |
 
-Receipts (WCAG 2, every day world): band word on the wash ≥ 7.7:1 (柿 the floor; ≥ 9.5 on full ink); reading on the ink
+Measured in WebKit (`E/worlds-slip.json`, the contact sheet `E/worlds-slip-contact.png`): every value above, in all
+eleven worlds. Receipts (WCAG 2, every day world): band word on the wash ≥ 7.7:1 (柿 the floor; ≥ 9.5 on full ink); reading on the ink
 ≥ 5.0:1 (柿); Save's word on Save ≥ 6.2:1; Save on the paper ≥ 5.9:1; band on the page ≥ 8.4:1.
 
 **The slip, at night (five worlds).** The band is the world's lacquer: its depth (ground 48% + black) under the word,
