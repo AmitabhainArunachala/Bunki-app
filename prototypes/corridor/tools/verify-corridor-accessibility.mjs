@@ -687,7 +687,7 @@ async function main() {
         };
       };
       return { sheet: describe('#sheet'), scrims: document.querySelectorAll('.scrim').length, ruby: describe('#reader rt'),
-        cuts: document.getAnimations().filter(animation => String(animation.effect?.pseudoElement || '').startsWith('::view-transition')).length,
+        cuts: document.getAnimations().filter(animation => /\((word-hero|kairo-paper|kairo-page)\)/.test(String(animation.effect?.pseudoElement || ''))).length,
         ambient: document.getAnimations().filter(animation => animation.playState === 'running' && animation.effect?.getTiming().iterations === Infinity).length };
     })()`);
     // one hand (slice C): the one reduced-motion rule gives every surviving surface a 120 ms

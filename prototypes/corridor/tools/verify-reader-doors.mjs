@@ -675,7 +675,8 @@ async function d5Detour(page, rec) {
     detour.ownFirst = await page.evaluate(() => document.querySelector('#sheet .example')?.hasAttribute('data-own') ?? false);
     const at = detour.examples.indexOf(D5.awaySource);
     if (at < 0) throw new Error(`no example from ${D5.awaySource}: ${JSON.stringify(detour.examples)}`);
-    const away = page.locator('#sheet .example').nth(at);
+    // found by its source, not its place: examples that arrive later (the bank's) take their own places in the list
+    const away = page.locator('#sheet .example', { has: page.locator('.example-src', { hasText: D5.awaySource }) }).first();
     if (await away.evaluate((line) => !!line.closest('details:not([open])'))) {
       step = 'More examples';
       await page.locator('#sheet details.more-examples > summary').click();
