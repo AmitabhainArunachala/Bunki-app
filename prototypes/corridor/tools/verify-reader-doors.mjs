@@ -715,7 +715,13 @@ async function d5Detour(page, rec) {
     D5.home, { timeout: 10_000 });
   const atReturn = await readerMarks(page), namedAtReturn = await tokenState(page, DOOR.index);
   let presses = 0;
-  while (presses < 3 && (await page.locator('#sheet').count())) { await page.locator('#sheet #sheet-back').click(); presses += 1; }
+  while (presses < 3 && (await page.locator('#sheet').count())) {
+    await page.locator('#sheet #sheet-back').click();
+    presses += 1;
+    // G1: Back moves the page inside its cut (the page changes in the cut's update, a frame after the click): the next
+    // count reads the page that stands once no cut runs
+    await page.waitForFunction(() => !document.documentElement.matches(':active-view-transition'), null, { timeout: 5_000 });
+  }
   const uncovered = await readerMarks(page), namedUncovered = await tokenState(page, DOOR.index);
   rec('D5.returned', `D5 戻る returns to ${D5.home} in the same document, and closing the sheets it left from keeps ${D5.home}`,
     atReturn.passage === D5.home && uncovered.passage === D5.home && uncovered.sheet === null && await sameDocument(),
