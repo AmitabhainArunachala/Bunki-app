@@ -244,6 +244,14 @@ const EDITS = Object.freeze({
   visitClearall: Object.freeze({ file: 'corridor.js',
     from: '    S.revealed = visit.revealed ? new Set(visit.revealed) : null;\n    S.glossed = visit.glossed ? new Set(visit.glossed) : null;\n',
     to: '    S.revealed = new Set(); S.glossed = new Set();\n' }),
+  // 1.3.0's guard: a tap off the popup clears the summoned reading (and, in the text, the mark) before any navigation,
+  // and Escape on the word does the same — so a reset or restore defect alone can no longer leak a mark. Each reset or
+  // restore control is evaluated with the guard removed too (the compound mutant): the control still proves its check
+  // catches the leak it was written for. Counted exactly once each in the candidate's corridor.js.
+  tapKeeps: Object.freeze({ file: 'corridor.js',
+    from: "      removeMini();\n      clearReaderReadings({ marked: inText });\n    } else if (!mini && inText && !target.closest?.('.tok, .token-door, button, a, input, select, textarea, summary, [role=\"button\"]')) {\n      clearReaderReadings({ marked: true });\n    }\n",
+    to: '      removeMini();\n    }\n' }),
+  escapeKeeps: Object.freeze({ file: 'corridor.js', from: '    else if (slip) { removeMini(); clearReaderReadings(); }\n', to: '    else if (slip) removeMini();\n' }),
 });
 // Every row one D4 walk or one D2 pair records, by id. A control's run must produce exactly these, once each, and the
 // candidate must pass all of them, once each, before any mutant can be said to differ from it.
@@ -271,17 +279,17 @@ const CONTROLS = Object.freeze([
     // B's 谷川 keeps its reading-only painter: nothing else may fail
     allowed: [],
     witness: (rows) => (glossed(rows, 'D4.A-no-english') ? '' : 'no English appeared under これ') }),
-  Object.freeze({ name: 'm1', title: "openPassage's per-passage reset removed", edits: ['reset'], run: 'd4',
+  Object.freeze({ name: 'm1', title: "openPassage's per-passage reset removed (with the outside-tap guard removed)", edits: ['reset', 'tapKeeps'], run: 'd4',
     requires: D4_REQUIRES, kills: ['D4.no-inherited-state'],
     // B token 1 opens touched; its first tap still shows the reading and its second still puts the popup away
     allowed: [],
     witness: (rows) => (rows.get('D4.no-inherited-state')?.observed?.visibleRuby === READING ? '' : `B token 1 did not open showing ${READING}`) }),
-  Object.freeze({ name: 'm1g', title: "openPassage's reset removed, with taps writing the gloss mark", edits: ['reset', 'glossOnTap'], run: 'd4',
+  Object.freeze({ name: 'm1g', title: "openPassage's reset removed, with taps writing the gloss mark (with the outside-tap guard removed)", edits: ['reset', 'glossOnTap', 'tapKeeps'], run: 'd4',
     requires: D4_REQUIRES, kills: ['D4.no-inherited-state'],
     // glossOnTap's own row; D4.never-english must pass: the reading-only painter strips the inherited gloss mark
     allowed: ['D4.A-no-english'],
     witness: (rows) => (rows.get('D4.no-inherited-state')?.observed?.visibleRuby === READING ? '' : `B token 1 did not open showing ${READING}`) }),
-  Object.freeze({ name: 'm2', title: 'the reading-only paint removed, on m1g for the prior state', edits: ['reset', 'glossOnTap', 'paint'], run: 'd4',
+  Object.freeze({ name: 'm2', title: 'the reading-only paint removed, on m1g for the prior state', edits: ['reset', 'glossOnTap', 'paint', 'tapKeeps'], run: 'd4',
     // m1g itself must be an admitted kill: that includes its own passing D4.never-english, the baseline this one differs from
     baseline: 'm1g',
     requires: D4_REQUIRES, kills: ['D4.never-english'],
@@ -304,20 +312,20 @@ const CONTROLS = Object.freeze([
       && rows.get(`D2.f${f}.accessible-reading`)?.observed?.[1] === doorLabel(WRONG_READING)
       && rows.get(`D2.f${f}.popup-reading`)?.observed?.[0]?.reading === WRONG_READING)
       ? '' : `the door did not show ${WRONG_READING}, as ruby, in its label and in its popup`) }),
-  Object.freeze({ name: 'm3', title: 'the D22 restore removed from returnFromNavigation (the return before 1561ff95)', edits: ['restore'], run: 'd5',
+  Object.freeze({ name: 'm3', title: 'the D22 restore removed from returnFromNavigation (the return before 1561ff95; with the outside-tap guard removed)', edits: ['restore', 'tapKeeps'], run: 'd5',
     requires: D5_REQUIRES,
     kills: ['D5.home-marks-restored', 'D5.away-index-not-lit'],
     // 谷川 comes back touched by ごん狐's mark; its tap still shows the reading; D5.named-no-english must still pass
     allowed: ['D5.named-tap'],
     witness: (rows) => (canonical(rows.get('D5.home-marks-restored')?.observed?.atReturn) === canonical({ lit: [A_TOKEN.index], glossed: [] })
       ? '' : `home did not come back showing exactly ${D5.away}'s mark at index ${A_TOKEN.index}`) }),
-  Object.freeze({ name: 'm3g', title: 'the D22 restore removed, with taps writing the gloss mark', edits: ['restore', 'glossOnTap'], run: 'd5',
+  Object.freeze({ name: 'm3g', title: 'the D22 restore removed, with taps writing the gloss mark (with the outside-tap guard removed)', edits: ['restore', 'glossOnTap', 'tapKeeps'], run: 'd5',
     requires: D5_REQUIRES,
     kills: ['D5.home-marks-restored', 'D5.away-index-not-lit'],
     allowed: ['D5.named-tap'],
     witness: (rows) => ((rows.get('D5.home-marks-restored')?.observed?.atReturn?.lit || []).join() === String(A_TOKEN.index)
       ? '' : `home did not come back showing ${D5.away}'s mark at index ${A_TOKEN.index}`) }),
-  Object.freeze({ name: 'm4', title: 'the reading-only paint removed, on m3g for the prior state', edits: ['restore', 'glossOnTap', 'paint'], run: 'd5',
+  Object.freeze({ name: 'm4', title: 'the reading-only paint removed, on m3g for the prior state', edits: ['restore', 'glossOnTap', 'paint', 'tapKeeps'], run: 'd5',
     baseline: 'm3g',
     requires: D5_REQUIRES,
     kills: ['D5.named-no-english'],
@@ -331,7 +339,7 @@ const CONTROLS = Object.freeze([
     allowed: [],
     witness: (rows) => (canonical(rows.get('D5.home-marks-restored')?.observed?.atReturn) === canonical({ lit: [], glossed: [] })
       ? '' : 'home did not come back with no marks at all') }),
-  Object.freeze({ name: 'm6', title: 'the D22b restore removed from restoreLearningSourceCaller (the source return of 1561ff95)', edits: ['visitRestore'], run: 'd6',
+  Object.freeze({ name: 'm6', title: 'the D22b restore removed from restoreLearningSourceCaller (the source return of 1561ff95; with the Escape guard removed)', edits: ['visitRestore', 'escapeKeeps'], run: 'd6',
     requires: ['D6.home-marks', 'D6.source-visit', 'D6.away-marks', 'D6.returned'],
     kills: ['D6.home-marks-restored', 'D6.away-index-not-lit'],
     // 谷川 comes back touched by ごん狐's mark; D6.named-no-english must still pass
