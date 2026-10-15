@@ -27767,6 +27767,27 @@ function dictionaryHomographChoices(form) {
   return choices.map((choice) => ({ ...choice, enabledOnCore }));
 }
 
+/** G1 · one line per gloss (Grok e-111: 海 listed うみ, み, わた and わだ, each "sea"). Choices whose first gloss is the
+ * same collapse into one line: its reading first (the open entry's when it is one of them, else the form's most common,
+ * first in row order), the others after "also". A choice with no gloss of its own stands alone. */
+function homographLines(choices, isActive) {
+  const lines = [];
+  const byGloss = new Map();
+  for (const choice of choices) {
+    const gloss = String(choice.summary[2] || '').trim().toLowerCase();
+    const line = gloss ? byGloss.get(gloss) : null;
+    if (line) { line.members.push(choice); continue; }
+    const fresh = { members: [choice] };
+    if (gloss) byGloss.set(gloss, fresh);
+    lines.push(fresh);
+  }
+  return lines.map(({ members }) => {
+    const active = members.find(isActive) || null;
+    const head = active || members[0];
+    return { head, also: members.filter((member) => member !== head), active: !!active };
+  });
+}
+
 function renderDictionaryHomographs(container, node) {
   const choices = dictionaryHomographChoices(node.id);
   const seqless = node.seq == null || node.seq === '';
@@ -27785,21 +27806,30 @@ function renderDictionaryHomographs(container, node) {
         'en-inline',
       ),
   );
-  for (const { row, summary, enabledOnCore } of choices) {
-    const [seq] = row;
-    const [reading, headForm, primaryGloss] = summary;
-    // only an explicit sheet's own entry is no door to itself; on a seq-less core sheet the
-    // resolved entry the senses below come from is still a door (D23, Codex 16:20:08Z)
-    const active = !(seqless && enabledOnCore) && String(seq) === currentSeq &&
-      (!currentReading || kataToHira(reading) === currentReading);
+  // only an explicit sheet's own entry is no door to itself; on a seq-less core sheet the
+  // resolved entry the senses below come from is still a door (D23, Codex 16:20:08Z)
+  const isActive = ({ row, summary, enabledOnCore }) => !(seqless && enabledOnCore) && String(row[0]) === currentSeq &&
+    (!currentReading || kataToHira(summary[0]) === currentReading);
+  for (const { head, also, active } of homographLines(choices, isActive)) {
+    const [seq] = head.row;
+    const [reading, headForm, primaryGloss] = head.summary;
     const choice = el('button', active ? 'dictionary-homograph active' : 'dictionary-homograph');
     choice.type = 'button';
     choice.dataset.dictionaryEntry = String(seq);
+    if (also.length) choice.dataset.alsoEntries = also.map((member) => String(member.row[0])).join(' ');
     choice.setAttribute('aria-pressed', String(active));
     const stack = el('span', 'row-stack');
     const top = el('span', 'row-word');
     top.append(document.createTextNode(headForm));
     if (reading) top.append(el('span', 'row-reading', reading));
+    if (also.length) {
+      const readings = also.map((member) => member.summary[0]).filter(Boolean);
+      const more = el('span', 'row-also', tx('ほかに ', 'also '));
+      const kana = el('span', null, readings.join(tx('、', ', ')));
+      kana.lang = 'ja';
+      more.append(kana);
+      top.append(more);
+    }
     stack.append(top);
     if (primaryGloss) stack.append(el('span', 'row-gloss', primaryGloss));
     choice.append(stack, el('span', 'row-go', active ? '·' : '›'));
@@ -27811,17 +27841,9 @@ function renderDictionaryHomographs(container, node) {
       if (active || !top || top.t !== 'word' || top.id !== node.id) return;
       // a homograph is a DOOR, not a correction: it PUSHES, so ← 戻る
       // returns to the entry the learner was reading (replacing the stack
-      // top made back close the whole sheet — P1, full-instrument review)
-      S.stack.push({
-        t: 'word',
-        id: headForm,
-        seq: String(seq),
-        reading,
-        from: node.from || null,
-      });
-      render();
-      const live = document.getElementById('sheet');
-      if (live) live.scrollTop = 0;
+      // top made back close the whole sheet — P1, full-instrument review). G1: it opens as every page does (go)
+      go({ t: 'word', id: headForm, seq: String(seq), reading, from: node.from || null },
+        { invoker: choice, from: choice.querySelector('.row-word') });
     });
     block.append(choice);
   }
@@ -28213,6 +28235,32 @@ function renderReaderChoiceNote(sheet, node) {
   sheet.append(note);
 }
 
+/** G1 · the page's examples, the tapped word's own first (Codex gap 17): the article's sentence it was tapped in, then
+ * one short example with its English (the bank's sentences are human-translated); everything else — other articles' long
+ * source sentences, tables, vote counts — folds under "More examples". With neither, the shortest example leads. */
+const SHORT_EXAMPLE_CHARS = 40;
+function exampleOrder(node, examples) {
+  const own = ownSentenceExample(node);
+  const text = (ex) => ex.tokens.map((token) => token.s).join('');
+  const rest = examples.filter((ex) => !own || !(ex.passage === own.passage && ex.start === own.start));
+  const short = rest.find((ex) => ex.en && [...text(ex)].length <= SHORT_EXAMPLE_CHARS) || null;
+  let first = [own, short].filter(Boolean);
+  if (!first.length && rest.length) first = [[...rest].sort((a, b) => [...text(a)].length - [...text(b)].length)[0]];
+  return { first, more: rest.filter((ex) => !first.includes(ex)) };
+}
+/** The sentence of its article a word was tapped in, as an example (null when it was not opened from an article). */
+function ownSentenceExample(node) {
+  const passageId = node.from?.passage;
+  const index = node.from?.index;
+  const p = passageId ? D.passages.find((entry) => entry.id === passageId) : null;
+  if (!p?.tokens || !Number.isInteger(index) || index < 0 || index >= p.tokens.length) return null;
+  const ends = (token) => '。！？'.includes(token.s);
+  let start = index;
+  while (start > 0 && !ends(p.tokens[start - 1])) start -= 1;
+  let end = index;
+  while (end < p.tokens.length - 1 && !ends(p.tokens[end])) end += 1;
+  return { tokens: p.tokens.slice(start, end + 1), source: learnerSourceLabel(p), passage: p.id, start, own: true };
+}
 function renderWordNode(sheet, node) {
   // D11: a reader token the core lacks is matched by reading before any entry opens
   if (node.readerChoice && !node.seq) {
@@ -28241,12 +28289,9 @@ function renderWordNode(sheet, node) {
   sheet.append(head);
   const shownReading = unresolved ? node.reading : rec?.r;
   if (shownReading) sheet.append(el('p', 'reading', shownReading));
-  // an entry matched from a reader token offers no other rows of the form:
-  // its reading already chose among them (D11)
-  if (node.readerChoice) renderReaderChoiceNote(sheet, node);
-  else renderDictionaryHomographs(sheet, node);
 
-  // KANJI IN THIS WORD — each row opens that kanji's full entry
+  // KANJI IN THIS WORD — each row opens that kanji's full entry. G1: right under the word and its reading
+  // (John, 09-29: "kanji in the word needs to be more at the top!"; MASTER_SPEC §7.22)
   const rowChars = (rec?.k?.length ? rec.k : [...node.id]).filter((c) => D.kanji[c]);
   if (rowChars.length) {
     sheet.append(withEn(el('p', 'eyebrow', 'この語の漢字'), 'kanji in this word', 'en-inline'));
@@ -28255,14 +28300,20 @@ function renderWordNode(sheet, node) {
       const row = el('button', 'entry-row');
       row.type = 'button';
       row.dataset.kanjirow = c;
-      row.append(el('span', 'row-glyph', c));
+      const glyph = el('span', 'row-glyph', c);
+      row.append(glyph);
       row.append(el('span', 'row-main', D.kanji[c].m));
       row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }));
+      row.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }, { invoker: row, from: glyph }));
       rows.append(row);
     }
     sheet.append(rows);
   }
+
+  // an entry matched from a reader token offers no other rows of the form:
+  // its reading already chose among them (D11)
+  if (node.readerChoice) renderReaderChoiceNote(sheet, node);
+  else renderDictionaryHomographs(sheet, node);
 
   // TRANSLATION — every sense, most common first (JMdict order). Once the
   // word's shard arrives, the full source senses take this spot: homographs,
@@ -28339,8 +28390,8 @@ function renderWordNode(sheet, node) {
       refreshWordSheet(node);
     });
   }
-  const examples = findExamples(node.id, 6);
-  if (examples.length) {
+  const { first: leadExamples, more: moreExamples } = exampleOrder(node, findExamples(node.id, 6));
+  if (leadExamples.length || moreExamples.length) {
     // the eyebrow says the whole gesture, in both tongues: the hold that
     // opens the dictionary was the ladder's unspoken rung (review P2)
     sheet.append(
@@ -28350,8 +28401,9 @@ function renderWordNode(sheet, node) {
         'en-inline',
       ),
     );
-    for (const ex of examples) {
+    const exampleLine = (ex) => {
       const line = el('div', 'example');
+      if (ex.own) line.dataset.own = '';
       const text = el('p', 'example-ja');
       renderSentenceTokens(text, ex.tokens, {
         targetId: node.id,
@@ -28362,7 +28414,16 @@ function renderWordNode(sheet, node) {
       line.append(text);
       if (ex.en) line.append(el('p', 'example-en', ex.en));
       line.append(el('span', 'example-src', ex.source));
-      sheet.append(line);
+      return line;
+    };
+    for (const ex of leadExamples) sheet.append(exampleLine(ex));
+    if (moreExamples.length) {
+      const fold = el('details', 'more-examples');
+      fold.append(el('summary', null, tx(`ほかの用例（${moreExamples.length}）`, `More examples (${moreExamples.length})`)));
+      for (const ex of moreExamples) fold.append(exampleLine(ex));
+      fold.open = !!node.moreExamplesOpen;
+      fold.addEventListener('toggle', () => { if (fold.isConnected) node.moreExamplesOpen = fold.open; });
+      sheet.append(fold);
     }
   }
   if (!personalHost) renderAiExamples(sheet, node, rec);

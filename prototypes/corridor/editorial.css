@@ -2065,6 +2065,19 @@ body .sheet .teacher-door .teacher-source-quote { font: 18px/1.9 var(--serif); c
 body .sheet .example { padding: var(--s2) 0; border: 0; border-bottom: 1px solid var(--hairline); }
 body .sheet .example-ja { font: 20px/2 var(--serif); color: var(--text); }
 body .sheet .example-en { font: 15px/1.6 var(--sans); color: var(--text-2); }
+/* G1 · the page leads with the tapped word's own example; the rest wait, folded, under "More examples" (Codex gap 17) */
+body .sheet .more-examples { margin: var(--s1) 0 var(--s2); }
+body .sheet .more-examples > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font: 600 15px/1.4 var(--sans);
+  color: var(--text-2);
+  cursor: pointer;
+}
+/* G1 · one line per gloss: the other readings that share it, quiet, after the first */
+body .sheet .dictionary-homograph .row-also { margin-inline-start: 10px; font: 14px/1.5 var(--sans); color: var(--text-2); }
+body .sheet .dictionary-homograph .row-also > span { font-family: var(--serif); }
 body .sheet > button.take {
   display: flex;
   flex-direction: row;
