@@ -15362,7 +15362,7 @@ function renderMock(main) {
         row.append(el('span', 'row-glyph', String(set.setId.split('-')[1] || '')));
         const mid = el('span', 'row-main');
         mid.append(document.createTextNode(`${set.title.ja} — ${set.items} 問`));
-        if (!set.approved && !allUnchecked) mid.append(el('span', 'status-chip', tx('未確認', 'Unreviewed')));
+        if (!set.approved && !allUnchecked) mid.append(el('span', 'status-chip', tx('AI作成', 'Made by AI')));
         const prior = latest.get(set.setId);
         const latestRun = prior ? assessmentModule.selectPractice(S.assessmentLibrary, prior.attemptId).run : null;
         const pinned = prior ? assessmentModule.selectPractice(S.assessmentLibrary, prior.attemptId).flat : null;
@@ -27198,7 +27198,7 @@ function renderAiReading(main) {
     );
     if (article?.lineage.kind === 'original-factual' && article.lineage.references.length) {
       const references = el('details', 'airead-references');
-      references.append(el('summary', '', tx('AIが挙げた参考資料・未確認', 'References supplied by the tutor · unverified')));
+      references.append(el('summary', '', tx('AIが挙げた参考資料（未検証）', 'References supplied by the tutor · unverified')));
       const list = el('ul');
       for (const reference of article.lineage.references) {
         const item = el('li');

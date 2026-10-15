@@ -4902,6 +4902,7 @@ body:not(.zen) #app > .chrome {
 /* the one back glyph: a chevron drawn once, the door's word beside it where there is room */
 [data-bar-back] {
   display: inline-flex;
+  flex-direction: row;
   align-items: center;
   gap: 4px;
   min-width: 44px;

@@ -279,7 +279,7 @@ export async function inspectChrome(page) {
     const issues = [],
       inspected = [];
     const chromeText =
-      'button, [role=button], nav, h1, h2, h3, h4, h5, h6, label, legend, summary, select, .eyebrow, .card-kind, .chip, .level-chip, .gs-eyebrow, .gs-bar-name, .gs-gap-line, .gs-row-number, .gs-gap-tag, .pc-eyebrow, .pc-kicker, .kp-chip, .kp-kicker, .vlabel, #variants .measure, .kagami-level, .kagami-obs, .kagami-read, .kagami-prov, .kagami-thin, .exam-skill, .exam-official-label, .exam-daimon-name, .exam-score-note, .exam-bookmark-note';
+      'button, [role=button], nav, h1, h2, h3, h4, h5, h6, label, legend, summary, select, .eyebrow, .card-kind, .chip, .level-chip, .status-chip, .shelf-review-text, .exam-review-reason, .mini-take-note, .gs-eyebrow, .gs-bar-name, .gs-gap-line, .gs-row-number, .gs-gap-tag, .pc-eyebrow, .pc-kicker, .kp-chip, .kp-kicker, .vlabel, #variants .measure, .kagami-level, .kagami-obs, .kagami-read, .kagami-prov, .kagami-thin, .exam-skill, .exam-official-label, .exam-daimon-name, .exam-score-note, .exam-bookmark-note';
     const nodes = [
       ...document.querySelectorAll(
         chromeText +

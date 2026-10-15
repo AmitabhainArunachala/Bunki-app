@@ -1586,8 +1586,9 @@ async function main() {
       back: back && { w: Math.round(back.width), h: Math.round(back.height), chevron: /url\\(/.test((glyph.maskImage || glyph.webkitMaskImage || '') + '') },
       line: parseFloat(cs.borderBottomWidth) > 0, bg: cs.backgroundColor, wrap: cs.flexWrap };
   })`;
-  // exactly 44 of doors plus the one hairline under them (the hairline is outside the 44, so every door sits at y = 0)
-  const barOk = (b, backs = 1) => !!b && !b.missing && b.border > 0 && b.border <= 1 && Math.abs(b.height - 44 - b.border) < 0.1 && b.backs === backs && b.line && b.wrap === 'nowrap'
+  // 44 of doors plus the one hairline under them (outside the 44, so every door sits at y = 0): the bar's box is
+  // more than 44 and at most 45 (Chromium reports a 0.5px border as "1px" in computed style, so the rect is the law)
+  const barOk = (b, backs = 1) => !!b && !b.missing && b.height > 44 && b.height <= 45 && b.backs === backs && b.line && b.wrap === 'nowrap'
     && b.bg !== 'rgba(0, 0, 0, 0)' && (backs === 0 || (b.back && b.back.w >= 44 && b.back.h >= 44 && b.back.chevron));
   const bars = {};
   const barCheck = async (name, sel, backs = 1) => {
@@ -1625,7 +1626,7 @@ async function main() {
   await tap(page, '#kp-start');
   await page.waitForSelector('#kp-card', { timeout: 15000 });
   await barCheck('deck', '.kp-top-study');
-  const tallBar = await page.addStyleTag({ content: '.kp-top-study { height: 53px !important; }' });
+  const tallBar = await page.addStyleTag({ content: '.kp-top-study { height: 52px !important; }' });
   check('one top bar · a 52px deck bar fails the same check', !barOk(await page.evaluate(`(${BAR_FN})('.kp-top-study')`)));
   await tallBar.evaluate(n => n.remove());
   report.measurements.bars = bars;
