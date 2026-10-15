@@ -109,7 +109,7 @@ export function hostAdapter() {
  * or the learner's 'full' | 'focus'; ruleSeen: the 「もう一度」 rule under the grade bar was shown
  * once; sittings: how many sittings this deck has started (the tap and swipe hints retire after
  * HINT_SITTINGS). A stored `hint` (the front hint, retired by STANDARD A37) is ignored. */
-const PREFS_DEFAULT = { newPerDay: 15, mode: 'read', look: 'dark', gloss: 'tap', zoom: 'auto', ruleSeen: false, sittings: 0 };
+const PREFS_DEFAULT = { newPerDay: 15, mode: 'read', gloss: 'tap', zoom: 'auto', ruleSeen: false, sittings: 0 };
 /** 「タップして答えを見る」 and the swipe hint show for this many sittings per deck, then retire */
 const HINT_SITTINGS = 3;
 const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, log: [], started: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null };
@@ -226,25 +226,19 @@ const beforeRestoreKey = (id) => `bunki-cloze:${id}:before-restore`;
 /** a stored ledger this player could not read, set aside before anything is saved over it */
 const quarantineKey = (id) => `bunki-cloze:${id}:quarantine`;
 const prefsKey = (deckId) => `bunki-cloze:prefs:v3:${deckId}`; // one set per deck
-const NIGHT_WORLDS = ['rokusho', 'yoru', 'nami', 'hakuu', 'kaku'];
-const keepsDarkByDay = (deck) => deck.defaults?.look === 'dark' && !NIGHT_WORLDS.includes(document.documentElement.dataset.theme);
-function defaultLook(deck, followWorld) {
-  return followWorld ? (keepsDarkByDay(deck) ? 'dark' : 'world') : (deck.defaults?.look || PREFS_DEFAULT.look);
+/** the deck wears the world (one hand, slice D): a look a deck or a stored preference once named is
+ * ignored and never written back — there is one material */
+function prefsFor(storage, deck) {
+  const defaults = { ...(deck.defaults || {}) };
+  delete defaults.look;
+  const stored = { ...(readJson(storage, prefsKey(deck.id)) || {}) };
+  delete stored.look;
+  return { ...PREFS_DEFAULT, ...defaults, ...stored };
 }
-function prefsFor(storage, deck, followWorld = false) {
-  return { ...PREFS_DEFAULT, ...(deck.defaults || {}), look: defaultLook(deck, followWorld), ...(readJson(storage, prefsKey(deck.id)) || {}) };
-}
-/** Automatic settings saves retain an implicit look as a default, rather than freezing the
- * current day/night resolution. Existing stored choices remain explicit. */
-function storePrefs(prefs, explicitLook = ctx.lookExplicit) {
+function storePrefs(prefs) {
   const stored = { ...prefs };
-  if (!explicitLook) delete stored.look;
+  delete stored.look;
   return writeJson(ctx.storage, prefsKey(ctx.deck.id), stored);
-}
-function syncDefaultLook() {
-  if (!ctx || ctx.lookExplicit) return;
-  ctx.prefs.look = defaultLook(ctx.deck, !!ctx.host);
-  ctx.root.dataset.look = ctx.prefs.look;
 }
 function readJson(storage, key) {
   try {
@@ -304,9 +298,8 @@ function save(state) {
   return writeJson(ctx.storage, stateKey(ctx.deck.id), state);
 }
 /** adopt new settings only once they are stored */
-function savePrefs(prefs, { explicitLook = ctx.lookExplicit } = {}) {
-  if (!storePrefs(prefs, explicitLook)) return saveFailed();
-  ctx.lookExplicit = explicitLook;
+function savePrefs(prefs) {
+  if (!storePrefs(prefs)) return saveFailed();
   ctx.prefs = prefs;
   ui.toast = '';
   paintResponse({ hold: false });
@@ -818,8 +811,6 @@ function paint() {
   if (!ctx?.root?.isConnected) return;
   const root = ctx.root;
   root.replaceChildren();
-  syncDefaultLook();
-  root.dataset.look = ctx.prefs.look;
   // the first sittings of a deck name the task on each card; after them the marked word says it alone
   root.dataset.hints = hintsOn() ? '1' : '0';
   root.dataset.readings = ctx.prefs.readings === 'off' ? 'off' : 'on';
@@ -1177,17 +1168,6 @@ function cardEyebrow(card, mode) {
   return n;
 }
 
-const THEMES = [
-  ['world', '全体のテーマ', '#fbf8f1', '#1f3a5f'],
-  ['dark', '墨', '#0a0e13', '#3fd0ff'],
-  ['ai', '藍', '#141a28', '#e9e2d2'],
-  ['matcha', '抹茶', '#13261a', '#a6e06a'],
-  ['kokuban', '黒板', '#1f2f28', '#ffe066'],
-  ['washi', '和紙', '#fbf6ea', '#93301a'],
-  ['sakura', '桜', '#fde7ec', '#a1264a'],
-  ['light', '白', '#ffffff', '#005f98'],
-  ['contrast', '高', '#000000', '#ffff00'],
-];
 const POS = { noun: ['noun', '名詞'], verb: ['verb', '動詞'], 'い-adjective': ['adj', '形容詞'], 'な-adjective': ['adj', '形容動詞'], adverb: ['adv', '副詞'], expression: ['expr', '表現'], 'sound word': ['sound', '擬音語'], kanji: ['noun', '漢字'] };
 const posKey = (pos) => (POS[pos] || ['noun'])[0];
 /** the part of speech as the interface names it: 名詞 in 日本語, "noun" in EN (never Japanese chrome in EN) */
@@ -2763,19 +2743,6 @@ function settingsScreen() {
   box.append(seg(t("一日の新しいカード"), 'newPerDay', [[5, '5'], [10, '10'], [15, '15'], [20, '20'], [30, '30']]));
   box.append(seg(t("答え方"), 'mode', [['read', t("読んで思い出す")], ['self', t("穴埋め")], ['choice', t("4択")]]));
   box.append(seg(t("英語の意味（答えの「英語」）"), 'gloss', [['tap', t("タップで開く")], ['show', t("いつも開いておく")]]));
-  const themes = el('div', 'kp-field', el('h2', 'kp-h2', t("色（テーマ）")));
-  const sw = el('div', 'kp-swatches');
-  sw.setAttribute('role', 'radiogroup');
-  sw.setAttribute('aria-label', t("色（テーマ）"));
-  for (const [value, label, bg, ink] of THEMES.filter(([value]) => ctx.host || value !== 'world')) {
-    const on = ctx.prefs.look === value;
-    const b = btn(`kp-swatch${on ? ' is-on' : ''}`, t(label), () => {
-      savePrefs({ ...ctx.prefs, look: value }, { explicitLook: true });
-    }, { 'data-pref': `look:${value}`, 'aria-label': t(label), role: 'radio', 'aria-checked': String(on), style: `background:${bg};color:${ink}` });
-    sw.append(b);
-  }
-  themes.append(sw);
-  box.append(themes);
   box.append(suspendedField());
 
   const ta = el('textarea', 'kp-backup');
@@ -2975,8 +2942,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     // one, the page's built-in gloss map of this deck's own words (STANDARD A44)
     tokenFile: lexicon ? tokensReady.get(deckId) || null : null,
     gloss: lexicon ? null : glossFor(deckId, deck),
-    prefs: prefsFor(storage, deck, !!lexicon),
-    lookExplicit: Object.hasOwn(readJson(storage, prefsKey(deck.id)) || {}, 'look'),
+    prefs: prefsFor(storage, deck),
   };
   root.addEventListener('pointerdown', onDown, true);
   ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));

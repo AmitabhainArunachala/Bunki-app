@@ -4868,34 +4868,6 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
   --color-bar-line: color-mix(in srgb, var(--world-accent) 34%, transparent);
   --color-surface: color-mix(in srgb, var(--color-paper) 90%, var(--world-accent) 3%);
 }
-/* deck rooms by day: the frame takes the stage it surrounds (T8 "more distinction", T9 "more
-   crispness"). A dark deck (the default look, 抹茶, 黒板, 高コントラスト) and every deck's study
-   screen sit on a dark stage, so the top line, the Line and the phone's bar become one dark frame
-   on a hairline around it, not a white band at each end. A light deck's home keeps the day frame.
-   The frame's own text and marks are remapped on the frame's elements only (the top line, the
-   Line and the report glyph at its end). */
-:root:not([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body[data-view='deckplay']:has(.kp:is([data-look='dark'], [data-look='matcha'], [data-look='kokuban'], [data-look='contrast']), .kp > .kp-study) :is(#app > .chrome, #primary-tabs, #bunki-reports-root .br-rail) {
-  color-scheme: dark;
-  --color-bar: #0b0e14;
-  --color-bar-line: rgb(233 240 247 / 13%);
-  --color-bar-ink: #eef2f6;
-  --color-bar-quiet: color-mix(in srgb, #eef2f6 70%, #0b0e14);
-  --color-ink: #eef2f6;
-  --color-ink-2: color-mix(in srgb, #eef2f6 86%, #0b0e14);
-  --color-label: #eef2f6;
-  --color-label-2: color-mix(in srgb, #eef2f6 82%, #0b0e14);
-  --color-muted: color-mix(in srgb, #eef2f6 74%, #0b0e14);
-  --color-quiet: color-mix(in srgb, #eef2f6 70%, #0b0e14);
-  --color-rule: rgb(233 240 247 / 26%);
-  --color-line: rgb(233 240 247 / 16%);
-  --color-edge-strong: rgb(233 240 247 / 30%);
-  --color-glass: #0b0e14;
-  --color-glass-solid: #0b0e14;
-  --color-surface: #161c25;
-  --color-seal: #ef8a78;
-  --color-accent: #8fb7e8;
-  --elevation-bar: 0 0.5px 0 rgb(255 255 255 / 5%), 0 10px 24px -16px rgb(0 0 0 / 80%);
-}
 /* 文脈札 gives html a background of its own, so body's flat ground stopped passing to the canvas
    and was painted over the page layer: the room read as the old beige. The page shows again. */
 html[data-cd-theme] body:not([data-view='drift']) { background: transparent; }

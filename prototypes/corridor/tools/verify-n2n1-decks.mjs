@@ -42,15 +42,15 @@ try {
     report.decks.push({ id, words: deck.words.length, cards: cards.length });
   }
 
-  for (const look of ['ai', 'washi']) {
+  for (const world of ['hokusai', 'yoru']) {
     for (const [i, id] of ids.entries()) {
       const context = await browser.newContext({ viewport: report.viewport });
       const page = await context.newPage();
       page.setDefaultTimeout(30_000);
-      console.log(`Tour ${id} / ${look}`);
-      page.on('pageerror', (error) => errors.push(`${id}/${look}: ${error.message}`));
+      console.log(`Tour ${id} / ${world}`);
+      page.on('pageerror', (error) => errors.push(`${id}/${world}: ${error.message}`));
       page.on('console', (message) => {
-        if (message.type() === 'error') errors.push(`${id}/${look}: ${message.text()}`);
+        if (message.type() === 'error') errors.push(`${id}/${world}: ${message.text()}`);
       });
       page.on('response', (response) => {
         if (response.status() >= 400) console.log(`HTTP ${response.status()} ${response.url()}`);
@@ -58,6 +58,8 @@ try {
       // Install from an inert release page, then exercise the first controlled
       // app visit so first-use resources pass through the installed worker.
       await page.goto(`${host.origin}/build-identity.json`, { waitUntil: 'load' });
+      // the world this tour walks in (one material: the deck wears it)
+      await page.evaluate((w) => localStorage.setItem('kairo-theme', w), world);
       // The production entry registers on HTTPS. Loopback is also a secure
       // context, so install the same built worker explicitly for this tour.
       await page.evaluate(() => navigator.serviceWorker.register('sw.js'));
@@ -71,15 +73,18 @@ try {
       assert.equal(await page.locator(`[data-deck="${id}"] .dojo-deck-t`).textContent(), chromeTitles[i]);
       await page.locator(`[data-deck="${id}"]`).click();
       await page.locator('#kp-start').waitFor();
-      await page.locator('#kp-to-settings').click();
-      await page.locator(`[data-pref="look:${look}"]`).click();
-      await page.locator('.kp-settings .kp-icon').click();
-      assert.equal(await page.locator('.kp').getAttribute('data-look'), look);
-      await page.screenshot({ path: join(out, `${id}-home-${look}.png`) });
+      // one material (the one-hand pass): the deck stands on the world's own page and carries no look of its own
+      assert.equal(await page.locator('.kp').getAttribute('data-look'), null, `${id}/${world}: no deck look`);
+      assert.equal(
+        await page.evaluate(() => { const kp = document.querySelector('.kp'); const p = document.createElement('i'); document.body.append(p); p.style.color = 'var(--color-page)'; const page = getComputedStyle(p).color; p.remove(); return getComputedStyle(kp).backgroundColor === page; }),
+        true,
+        `${id}/${world}: the deck's page is the world's page`,
+      );
+      await page.screenshot({ path: join(out, `${id}-home-${world}.png`) });
       await page.locator('#kp-start').click();
       await page.locator('#kp-card .kp-target').waitFor();
       assert.equal(await page.locator('#kp-card rt, #kp-card details, #kp-card .kp-answer').count(), 0);
-      await page.screenshot({ path: join(out, `${id}-front-${look}.png`), fullPage: true });
+      await page.screenshot({ path: join(out, `${id}-front-${world}.png`), fullPage: true });
       await page.locator('#kp-reveal').click();
       await page.locator('#kp-grade-good').waitFor();
       assert(await page.locator('#kp-card rt').count() > 0, `${id}: furigana`);
@@ -94,7 +99,7 @@ try {
       }
       await page.locator('#kp-card .kp-tok').first().waitFor();
       await page.evaluate(() => window.scrollTo(0, 0));
-      await page.screenshot({ path: join(out, `${id}-back-${look}.png`), fullPage: true });
+      await page.screenshot({ path: join(out, `${id}-back-${world}.png`), fullPage: true });
       // one slip everywhere (the one-hand pass): a word of the passage opens the app's slip beside it, from the deck
       await page.locator('#kp-card .kp-sentence .kp-tok:not([data-deck-word])').first().click();
       await page.locator('#mini[data-from="deck"]').waitFor();
@@ -105,7 +110,7 @@ try {
         const response = await caches.match(new URL(`decks/${deckId}/tokens.json`, location.href).href);
         return !!response;
       }, id);
-      console.log(`${id} / ${look}: online answer and cached tokens passed`);
+      console.log(`${id} / ${world}: online answer and cached tokens passed`);
       // Leave the app before cutting the network. Boot keeps prefetching the
       // shelf's articles in the background; one still in flight at the switch
       // fails with the worker's 503 and the browser logs it as a console error,
@@ -120,7 +125,7 @@ try {
       await page.locator('#kp-card .kp-tok').first().waitFor();
       assert(await page.locator('#kp-card rt').count() > 0);
       assert((await page.locator('#kp-card .kp-def').textContent()).trim());
-      report.tours.push({ id, look, furigana: true, defJa: true, englishFolds: true, tapToDefine: true, offline: true });
+      report.tours.push({ id, world, furigana: true, defJa: true, englishFolds: true, tapToDefine: true, offline: true });
       await context.close();
     }
   }

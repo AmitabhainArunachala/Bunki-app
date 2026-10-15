@@ -136,7 +136,7 @@ import { chromium } from 'playwright-core';
 import { resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 
-import { contrastTable, KIND_JI_FLOOR, kindJiTable } from './contrast-kotoba.mjs';
+import { contrastByWorld, contrastTable, KIND_JI_FLOOR, kindJiTable } from './contrast-kotoba.mjs';
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
 // The battery's law: verify the built artifact, not the source tree. Deck sources, the release
@@ -463,22 +463,18 @@ const CONTRAST = `(() => {
   const mix = (a, b, t) => a.map((v, i) => Math.round(v * t + b[i] * (1 - t)));
   const tokens = ['ink', 'ink-2', 'mute', 'cyan', 'red', 'amber', 'green', 'blue', 'violet', 'noun', 'verb', 'adj', 'adv', 'expr', 'sound', 'kind-go', 'kind-ji', 'kind-bun'];
   const out = {};
-  const before = root.dataset.look;
-  for (const look of ['light', 'sakura', 'washi']) {
-    root.dataset.look = look;
-    const t = Object.fromEntries([...tokens, 'bg', 'panel', 'panel-2'].map((k) => [k, rgb('var(--kp-' + k + ')')]));
-    const wash = rgba('var(--kp-cyan-wash)');
-    // the card panel, the second panel (tiles, kanji boxes; also the darkest texture tint), the page,
-    // the tinted 正解 (Good) pad (12% green over the panel) and the accent wash (答えを見る, chosen settings)
-    const surfaces = { panel: t.panel, 'panel-2': t['panel-2'], page: t.bg, 'good-button': mix(t.green, t.panel, 0.12), 'accent-wash': mix(wash.slice(0, 3), t.bg, wash[3] ?? 1) };
-    let min = { ratio: 99 };
-    for (const k of tokens) for (const [s, bg] of Object.entries(surfaces)) {
-      const r = ratio(t[k], bg);
-      if (r < min.ratio) min = { ratio: Math.round(r * 100) / 100, pair: k + ' on ' + s };
-    }
-    out[look] = min;
+  // one material (the one-hand pass): the deck wears the world it is opened in, so the sheet on
+  // screen is the one measured — the card panel, the second panel (tiles, kanji boxes), the page,
+  // the tinted 正解 (Good) pad (12% green over the panel) and the accent wash (答えを見る, chosen settings)
+  const t = Object.fromEntries([...tokens, 'bg', 'panel', 'panel-2'].map((k) => [k, rgb('var(--kp-' + k + ')')]));
+  const wash = rgba('var(--kp-cyan-wash)');
+  const surfaces = { panel: t.panel, 'panel-2': t['panel-2'], page: t.bg, 'good-button': mix(t.green, t.panel, 0.12), 'accent-wash': mix(wash.slice(0, 3), t.bg, wash[3] ?? 1) };
+  let min = { ratio: 99 };
+  for (const k of tokens) for (const [s, bg] of Object.entries(surfaces)) {
+    const r = ratio(t[k], bg);
+    if (r < min.ratio) min = { ratio: Math.round(r * 100) / 100, pair: k + ' on ' + s };
   }
-  root.dataset.look = before;
+  out[document.documentElement.dataset.theme || 'hokusai'] = min;
   probe.remove();
   return out;
 })()`;
@@ -672,9 +668,9 @@ async function verifyDelivery(browser, base) {
       oldHome.due === '1' && oldHome.notice === 0 && oldHome.quarantine === null && JSON.stringify(after.log.slice(0, 5)) === JSON.stringify(before.log) && after.log[5][0] === 'km-064-1' && after.log[5][1] === 2 && JSON.stringify(after.cards['km-065-1']) === JSON.stringify(before.cards['km-065-1']) && after.cards['km-064-1'].reps === 4,
       JSON.stringify({ oldHome, last: after.log.at(-1), reps: after.cards['km-064-1']?.reps }));
 
-    // every colour token clears 4.5:1 on the surfaces it sits on, in the light themes (F35, A20)
+    // every colour token clears 4.5:1 on the surfaces it sits on, in the world the deck is opened in (F35, A20)
     const contrast = await page.evaluate(CONTRAST);
-    check('light themes: every text colour, the kind colours and the four grade hues included, is at least 4.5:1 on the card, the second panel, the page, the 正解 pad and the accent wash', Object.values(contrast).every((m) => m.ratio >= 4.5), Object.entries(contrast).map(([k, m]) => `${k} ${m.ratio} (${m.pair})`).join(' · '));
+    check("the deck's material (the world's own page): every text colour, the kind colours and the four grade hues included, is at least 4.5:1 on the card, the second panel, the page, the 正解 pad and the accent wash", Object.values(contrast).every((m) => m.ratio >= 4.5), Object.entries(contrast).map(([k, m]) => `${k} ${m.ratio} (${m.pair})`).join(' · '));
   } finally {
     await context.close();
   }
@@ -1558,12 +1554,12 @@ async function verifyBack(browser, base) {
     out.push({ side: g.dataset.side, glyphs, hits, at }); } return out; })()`;
   {
     const seen = [];
-    for (const [id, look] of [
-      ['km-109-m05', 'kokuban'],
-      ['km-109-m05', 'dark'],
-      ['km-298-m02', 'dark'],
+    for (const [id, world] of [
+      ['km-109-m05', 'hokusai'],
+      ['km-109-m05', 'yoru'],
+      ['km-298-m02', 'hokusai'],
     ]) {
-      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, zoom: 'auto', look }, state: ledger('kotoba-mcd', id) });
+      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, zoom: 'auto' }, world, state: ledger('kotoba-mcd', id) });
       const card = await cardId(o.page);
       await o.page.click('#kp-reveal');
       await o.page.waitForSelector('.kp-grade');
@@ -1578,14 +1574,14 @@ async function verifyBack(browser, base) {
         await o.page.locator('#kp-card .kp-ctx .kp-more').nth(g).click();
         opened.push((await look1(g))[g]);
       }
-      seen.push({ id, look, card, rest, opened });
+      seen.push({ id, world, card, rest, opened });
       await close(o);
     }
     const all = seen.flatMap((x) => [...x.rest, ...x.opened]);
     check(
-      '1) in 焦点 the ⋯ never sits on the passage: no visible glyph of a folded group intersects its ⋯, at rest or opened (km-109-m05 in 黒板 and 墨, km-298-m02)',
+      '1) in 焦点 the ⋯ never sits on the passage: no visible glyph of a folded group intersects its ⋯, at rest or opened (km-109-m05 by day and at night in 紺紙, km-298-m02)',
       seen.every((x) => x.card === x.id && x.rest.length >= 1 && x.opened.length === x.rest.length) && all.every((g) => g && g.glyphs > 0 && g.hits === 0),
-      JSON.stringify(seen.map(({ id, look, rest, opened }) => ({ id, look, rest, opened }))),
+      JSON.stringify(seen.map(({ id, world, rest, opened }) => ({ id, world, rest, opened }))),
     );
   }
 
@@ -1673,7 +1669,7 @@ async function verifyBack(browser, base) {
         ['study.html', 'kotoba-mine', null, true],
       ]) {
         const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
-        const prefs = JSON.stringify(state ? { look: 'ai', newPerDay: 0 } : { look: 'ai' });
+        const prefs = JSON.stringify(state ? { newPerDay: 0 } : {});
         await context.addInitScript(`try { localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(prefs)});
           ${state ? `localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)});` : ''} } catch {}`);
         const p = await context.newPage();
@@ -2246,7 +2242,7 @@ const PAINT = `(() => {
   const color = (sel) => { const n = card.querySelector(sel) || document.querySelector(sel); return n ? getComputedStyle(n).color : null; };
   const chips = [...card.querySelectorAll('.kp-chips > .kp-chip')];
   const out = {
-    look: kp.dataset.look, kind: card.dataset.kind, classes: card.className, topicVar: card.style.getPropertyValue('--kp-topic'),
+    kind: card.dataset.kind, classes: card.className, topicVar: card.style.getPropertyValue('--kp-topic'),
     edge: getComputedStyle(card).borderLeftColor, kindChip: chips[0]?.textContent, kindChipColor: chips[0] ? getComputedStyle(chips[0]).color : null,
     edgeTop: getComputedStyle(card).borderTopColor, edgeWidth: getComputedStyle(card).borderLeftWidth, drawn: chips.filter((c) => c.getClientRects().length).map((c) => c.textContent),
     chips: chips.map((c) => c.textContent), level: card.querySelector('.kp-levelchip')?.textContent ?? null, levelLabel: card.querySelector('.kp-levelchip')?.getAttribute('aria-label') ?? null,
@@ -2404,23 +2400,44 @@ async function verifyVisual(browser, base) {
   verifyLevels([mcd, sent]);
   const { rows, failures: low } = contrastTable();
   check(
-    'c) contrast (tools/contrast-kotoba.mjs, read from player.css): passage ≥ 7, body, gloss, muted text, every chip, state, accent and part-of-speech colour ≥ 4.5 in all eight themes',
+    'c) contrast (tools/contrast-kotoba.mjs, read from player.css): the standalone sheet (the frozen study pages: the default world by day) — passage ≥ 7, body, gloss, muted text, every chip, state, accent and part-of-speech colour ≥ 4.5',
     low.length === 0,
     low.slice(0, 3).join(' | ') || rows.map((r) => `${r.look} ${Math.min(...Object.values(r).filter((v) => typeof v === 'number'))}`).join(' · '),
   );
 
   const ji = kindJiTable();
   check(
-    `7) the 字 hue (a 字 card's edge and chip) is at least ΔE_ok ${KIND_JI_FLOOR} from every other hue of its theme (washi and sakura no longer share the verb's blue; 墨, 白 and 抹茶 moved off the sound-word pink)`,
+    `7) the 字 hue (a 字 card's edge and chip) is at least ΔE_ok ${KIND_JI_FLOOR} from every other hue of the standalone sheet`,
     ji.failures.length === 0,
     ji.failures.slice(0, 3).join(' | ') || ji.rows.map((r) => `${r.look} ${r.value} ΔE${r.deltaE} (${r.nearest})`).join(' · '),
   );
 
+  // one material (the one-hand pass): the hosted deck in every world, measured in the browser as the
+  // page resolves the room's roles — the default and the ten public worlds, by day and at night, on the
+  // home and in a sitting (the stage and the dock)
+  const worlds = await contrastByWorld({ base, browser });
+  check(
+    'c) the deck in all eleven worlds (hosted; home and sitting): passage ≥ 7, body, gloss, muted text, every chip, state, accent, part-of-speech, stage and dock colour ≥ 4.5',
+    worlds.failures.length === 0 && worlds.rows.length === 22,
+    worlds.failures.slice(0, 3).join(' | ') || worlds.rows.map((r) => `${r.look} ${Math.min(...Object.values(r).filter((v) => typeof v === 'number'))}`).join(' · '),
+  );
+  check(
+    `7) the 字 hue is at least ΔE_ok ${KIND_JI_FLOOR} from every other hue of its material, in every world, by day and at night`,
+    worlds.ji.failures.length === 0 && worlds.ji.rows.length === 22,
+    worlds.ji.failures.slice(0, 3).join(' | ') || worlds.ji.rows.map((r) => `${r.look} ΔE${r.deltaE} (${r.nearest})`).join(' · '),
+  );
+  check(
+    "one material: in every world the deck's ground is the world's own page and it carries no look of its own",
+    worlds.sheets.length === 22 && worlds.sheets.every((s) => s.look === null) && worlds.sheets.filter((s) => s.name.endsWith('·home')).every((s) => s.page && s.deck.join() === s.page.join()),
+    JSON.stringify(worlds.sheets.filter((s) => s.look !== null || (s.name.endsWith('·home') && (!s.page || s.deck.join() !== s.page.join()))).slice(0, 3)),
+  );
+
   const due = (deck, id) => JSON.stringify({ format: 'bunki-cloze-state', version: 1, deckId: deck, groupsOff: [], log: [], cards: { [id]: { due: '2020-01-01T00:00:00.000Z', stability: 20, difficulty: 5, state: 2, reps: 3, lapses: 0, elapsed_days: 20, scheduled_days: 20 } } });
-  const open = async (q, deck, { prefs = null, state = null, reduce = false, start = true } = {}) => {
+  const open = async (q, deck, { prefs = null, state = null, reduce = false, start = true, world = null } = {}) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(SEEDED);
     await context.addInitScript(`try { if (!sessionStorage.getItem('__vis_seeded')) { sessionStorage.setItem('__vis_seeded', '1');
+      ${world ? `localStorage.setItem('kairo-theme', ${JSON.stringify(world)});` : ''}
       ${prefs ? `localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify(prefs))});` : ''}
       ${state ? `localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)});` : ''} } } catch {}`);
     const page = await context.newPage();
@@ -2461,9 +2478,10 @@ async function verifyVisual(browser, base) {
     await close(o);
   }
 
-  // b) a new MCD 語 card with a level (財政 N1), front and back, in 墨 and 白
-  for (const look of ['dark', 'light']) {
-    const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { look } });
+  // b) a new MCD 語 card with a level (財政 N1), front and back, by day (ベロ藍) and at night (紺紙)
+  for (const world of ['hokusai', 'yoru']) {
+    const look = world;
+    const o = await open('?deck=mcd', 'kotoba-mcd', { world });
     const front = await o.page.evaluate(PAINT);
     await reveal(o.page);
     await o.page.evaluate(`document.querySelectorAll('#kp-card details').forEach((d) => (d.open = true))`);
@@ -2497,7 +2515,7 @@ async function verifyVisual(browser, base) {
 
   // b) a 字 card: its own edge and chip colour; a word without a level: no level chip; the sentence deck: 語, no "3/1"
   {
-    const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, look: 'washi', mode: 'self' }, state: due('kotoba-mcd', 'km-064-m02') });
+    const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, mode: 'self' }, world: 'iwa', state: due('kotoba-mcd', 'km-064-m02') });
     const ji = await o.page.evaluate(PAINT);
     await close(o);
     const p = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, state: due('kotoba-mcd', 'km-066-m01') });
@@ -2519,22 +2537,22 @@ async function verifyVisual(browser, base) {
   // b) one hue on the asked word: the reading over a verb target takes the target's part-of-speech colour, not the accent (Anki parity: .sentence rt sets only opacity)
   {
     const seen = [];
-    for (const look of ['dark', 'washi']) {
-      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0, look }, state: due('kotoba-mcd', 'km-200-m01') });
+    for (const world of ['hokusai', 'iwa']) {
+      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, world, state: due('kotoba-mcd', 'km-200-m01') });
       await reveal(o.page);
       // in the app the reading over a kanji is drawn as its ruby's ::after (the rt keeps no box)
       const v = await o.page.evaluate(`(() => { const card = document.getElementById('kp-card'); const t = card.querySelector('.kp-target'); const drawn = t ? [...t.querySelectorAll('ruby[data-rt]')].map((r) => getComputedStyle(r, '::after')).filter((a) => a.content !== 'none' && a.content !== 'normal') : [];
         const kp = document.querySelector('.kp'); const probe = document.createElement('i'); kp.append(probe); const tok = (k) => { probe.style.color = 'var(--kp-' + k + ')'; return getComputedStyle(probe).color; };
         const out = { id: card.dataset.card, pos: card.className, target: t ? getComputedStyle(t).color : null, rt: drawn.map((a) => a.color), verb: tok('verb'), ink: tok('ink'), accent: tok('cyan') }; probe.remove(); return out; })()`);
-      seen.push({ look, ...v });
+      seen.push({ world, ...v });
       await close(o);
     }
     // one hue on the asked word: in the app's focus room the target is bold ink (no part-of-speech colour),
     // and the reading drawn over it is the target's own ink, never the accent
     check(
-      'b) 墨 and 和紙, verb card km-200-m01 (追い上げる): the reading over the target is the target\'s own colour (in the app, its ink), never the accent',
+      'b) ベロ藍 and 柿渋, verb card km-200-m01 (追い上げる): the reading over the target is the target\'s own colour (in the app, its ink), never the accent',
       seen.every((v) => v.id === 'km-200-m01' && /kp-pos-verb/.test(v.pos) && v.target === v.ink && v.rt.length > 0 && v.rt.every((c) => c === v.target) && v.target !== v.accent),
-      JSON.stringify(seen.map(({ look, target, rt, ink, accent }) => ({ look, target, rt: [...new Set(rt)], ink, accent }))),
+      JSON.stringify(seen.map(({ world, target, rt, ink, accent }) => ({ world, target, rt: [...new Set(rt)], ink, accent }))),
     );
   }
 
@@ -2560,17 +2578,18 @@ async function verifyVisual(browser, base) {
     );
   }
 
-  // d) textures: on the page, never on the card (和紙 paper, 黒板 chalk)
+  // d) one material: the world's paper is the page — the deck paints no texture of its own, and the card
+  // under the ruby is plain (ベロ藍, 柿渋 by day; 紺紙 at night)
   {
     const seen = [];
-    for (const look of ['washi', 'kokuban', 'sakura']) {
-      const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { look } });
+    for (const world of ['hokusai', 'iwa', 'yoru']) {
+      const o = await open('?deck=mcd', 'kotoba-mcd', { world });
       await reveal(o.page);
       const v = await o.page.evaluate(PAINT);
-      seen.push({ look, card: v.cardTex, page: v.pageTex !== 'none' });
+      seen.push({ world, card: v.cardTex, page: v.pageTex });
       await close(o);
     }
-    check('d) 和紙, 黒板 and 桜 paint their texture on the page; the card under the ruby is plain', seen.every((x) => x.card === 'none' && x.page), JSON.stringify(seen));
+    check("d) ベロ藍, 柿渋 and 紺紙: the card under the ruby is plain and the deck paints no texture of its own (the world's paper is the page)", seen.every((x) => x.card === 'none' && x.page === 'none'), JSON.stringify(seen));
   }
 
   // e) the reveal keeps the card; the answer fades in within 180 ms; a grade slides the card out its way
@@ -2687,7 +2706,6 @@ async function main() {
   verifyFullRunData(deck);
   const said = (d) => (d.method ?? []).join('');
   check('the method text names the same four grades the player shows (もう一度・難しい・正解・簡単), never the retired 思い出せた button or 覚えた', said(deck).includes('「もう一度・難しい・正解・簡単」') && ['「正解」', '「難しい」', '「簡単」', '「もう一度」'].every((g) => said(sentences).includes(g)) && !said(deck).includes('「思い出せた」') && !said(sentences).includes('「思い出せた」') && !said(deck).includes('覚えた') && !said(sentences).includes('覚えた'), deck.method?.at(-1) ?? '');
-  check('the two decks open in different colour themes', deck.defaults?.look && sentences.defaults?.look && deck.defaults.look !== sentences.defaults.look, `${deck.defaults?.look} · ${sentences.defaults?.look}`);
 
   console.log('\n— 集中道場 › デッキ, in a real browser');
   const { server, base } = await startServer();
@@ -2777,8 +2795,13 @@ async function main() {
     await page.click('.kp-choice');
     await page.waitForSelector('.kp-verdict');
     check('4-choice mode: four words, one tap answers and grades', choices === 4 && (await ls('bunki-cloze:kotoba-mcd')).log.length === 2);
+    // one material (the one-hand pass): both decks stand on the world's own page, with no look of their own
+    const MATERIAL = `(() => { const kp = document.querySelector('.kp'); const p = document.createElement('i'); document.body.append(p); p.style.color = 'var(--color-page)';
+      const worldPage = getComputedStyle(p).color; p.remove(); return { deck: getComputedStyle(kp).backgroundColor, worldPage, look: kp.dataset.look ?? null, blank: document.querySelectorAll('#kp-card .kp-blank').length }; })()`;
     await boot('?deck=mcd');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
+    const mcdMaterial = await page.evaluate(MATERIAL);
+    check("the two decks open in the same material: ?deck=mcd stands on the world's page and carries no look of its own", mcdMaterial.deck === mcdMaterial.worldPage && mcdMaterial.look === null, JSON.stringify(mcdMaterial));
     await page.click('#kp-to-settings');
     await page.click('[data-pref="mode:self"]');
     await page.click('.kp-icon');
@@ -2789,8 +2812,8 @@ async function main() {
     await page.waitForSelector('#kp-start', { timeout: 15000 });
     await page.click('#kp-start');
     await page.waitForSelector('#kp-card .kp-target');
-    const sent = await page.evaluate(`({ look: document.querySelector('.kp')?.dataset.look, blank: document.querySelectorAll('#kp-card .kp-blank').length })`);
-    check('?deck=kotoba opens the sentence deck: a real sentence with the word marked, in its own dark look by day', sent.blank === 0 && sent.look === 'dark', JSON.stringify(sent));
+    const sent = await page.evaluate(MATERIAL);
+    check("?deck=kotoba opens the sentence deck: a real sentence with the word marked, on the world's own page (one material: the deck's ground is the page's, no look of its own)", sent.blank === 0 && sent.deck === sent.worldPage && sent.look === null, JSON.stringify(sent));
 
     // 覚える is one tap (round-1 save path): the row is written through the
     // guarded commit at once, and the list drawer opens under the finger so
