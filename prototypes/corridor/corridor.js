@@ -8746,6 +8746,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   nodeFor = null, entryNode = null } = {}) {
   // G1 · no card from the layer below ever floats over a page: with a page open, only a word on that page gets a slip
   if (!slipAllowed(span)) return null;
+  // a fresh arrival is a move the frame sampler names; a slip drawn again on the same word (its entry arrived) is not
+  const arriving = !(standingSlip() && miniAnchor === span);
   removeMini();
   const other = nodeFor || { t: kind, id: token.b };
   const { g, held, node: captureNode, state: miniState, identityHeld } = kind === 'word'
@@ -8942,6 +8944,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   miniOnClose = onClose;
   keepFloatingBeside(mini, span, { follow });
   if (focusEntry) ([seal, word].find((button) => button && button.tagName === 'BUTTON' && !button.disabled) || mini).focus({ preventScroll: true });
+  if (arriving) sampleTransition('card', sampleWhere());
   // G1 · the page this slip's door opens is built at idle, so the next tap only mounts it
   if (entryAvailable && entryNode) schedulePagePrebuild(entryNode, span);
   return mini;
@@ -30807,6 +30810,7 @@ function enterWord(node, { from = null, invoker = null } = {}) {
   // keeps the root's name none). Capturing #app > main instead, a reader thousands of pixels tall, cost WebKit 47–98 ms
   // (one-hand/G1/frames.json, before.matchCutProbe)
   const covered = document.documentElement;
+  const where = sampleWhere();
   // the slip closes now (its surface hears 'dive'); its element leaves inside the cut, so its headword is captured
   const reason = miniDiving ? 'dive' : 'dismiss';
   const cut = pageCutAllowed();
@@ -30827,6 +30831,7 @@ function enterWord(node, { from = null, invoker = null } = {}) {
     names: [[source, 'word-hero'], [covered, 'kairo-paper']],
     after: () => (source ? [[heroOf(document.getElementById('sheet')), 'word-hero']] : []),
   });
+  sampleTransition('page', where);
 }
 
 /** Back (one level) or close-all. The page's headword returns to the element it was entered from when that still
@@ -30837,6 +30842,7 @@ function recede({ all = false, viaRender = false } = {}) {
   const leaving = all ? S.stack[0] : S.stack.at(-1);
   const sheet = document.getElementById('sheet');
   const hero = heroOf(sheet);
+  const where = sampleWhere();
   const change = () => {
     if (all) S.stack = [];
     else S.stack.pop();
@@ -30859,6 +30865,7 @@ function recede({ all = false, viaRender = false } = {}) {
       return hero && target?.isConnected ? [[target, 'word-hero']] : [];
     },
   });
+  sampleTransition('back', where);
   return vt;
 }
 
@@ -30919,6 +30926,95 @@ function takePrebuiltPage(node, depth) {
   const ready = pagePrebuilt;
   pagePrebuilt = null;
   return ready && ready.key === pageKey(node, depth) ? ready : null;
+}
+
+/* ---------------------------------------------- G1 · the phone's own truth (BRIEF Added 2)
+ * A sampler runs only inside a named move — a word's card arriving, a page arriving, Back, a room change — for at
+ * most a second from the frame the move began in, and keeps that move's worst frame (and how many passed 24 ms).
+ * One row per move in its own capped key on this device, never in the learning record, never in a backup: the bug
+ * report carries the week's worst five, and Me → Settings says the roughest one in a line. */
+const FRAMES_STORE = 'kairo-frames';
+const FRAMES_CAP = 200;
+const FRAMES_WINDOW_MS = 1000;
+const FRAME_KINDS = ['card', 'page', 'back', 'room'];
+let frameSampler = null;
+function sampleWhere() {
+  return `${S.view}${S.stack.length ? '/page' : ''}`;
+}
+function sampleTransition(kind, where) {
+  frameSampler?.close();
+  const start = document.timeline?.currentTime ?? performance.now();
+  const sampler = { last: start, worst: 0, over: 0, open: true };
+  sampler.close = () => {
+    if (!sampler.open) return;
+    sampler.open = false;
+    if (frameSampler === sampler) frameSampler = null;
+    const row = [Date.now(), kind, String((typeof where === 'function' ? where() : where) || '').slice(0, 80),
+      Math.round(sampler.worst), sampler.over];
+    whenIdle(() => recordFrameRow(row));
+  };
+  const tick = (now) => {
+    if (!sampler.open) return;
+    const delta = now - sampler.last;
+    sampler.last = now;
+    if (delta > sampler.worst) sampler.worst = delta;
+    if (delta > 24) sampler.over += 1;
+    if (now - start < FRAMES_WINDOW_MS) requestAnimationFrame(tick);
+    else sampler.close();
+  };
+  frameSampler = sampler;
+  requestAnimationFrame(tick);
+}
+const validFrameRow = (row) => Array.isArray(row) && row.length === 5 && Number.isFinite(row[0]) &&
+  FRAME_KINDS.includes(row[1]) && typeof row[2] === 'string' && Number.isFinite(row[3]) && Number.isFinite(row[4]);
+function readFrameRows() {
+  try {
+    const rows = JSON.parse(localStorage.getItem(FRAMES_STORE) || '[]');
+    return Array.isArray(rows) ? rows.filter(validFrameRow) : [];
+  } catch { return []; }
+}
+function recordFrameRow(row) {
+  try {
+    const rows = readFrameRows();
+    rows.push(row);
+    localStorage.setItem(FRAMES_STORE, JSON.stringify(rows.slice(-FRAMES_CAP)));
+  } catch { /* a device's own measure: a full or blocked storage keeps none */ }
+}
+/** The week's roughest moves, worst first. */
+function roughestThisWeek(n = 5) {
+  const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  return readFrameRows().filter((row) => row[0] >= since).sort((a, b) => b[3] - a[3]).slice(0, n)
+    .map(([t, name, where, worst]) => ({ name, where, worst_ms: worst, at: new Date(t).toISOString().slice(0, 10) }));
+}
+const FRAME_KIND_WORDS = {
+  card: ['語のカードを開いたとき', 'opening a word card'], page: ['語のページを開いたとき', "opening a word's page"],
+  back: ['戻ったとき', 'going back'], room: ['部屋を移ったとき', 'changing rooms'],
+};
+/** A place the sampler wrote, in the reader's words: a room by its own name, an article as an article. */
+function frameWhereWords(where) {
+  const place = (view) => {
+    const name = roomName(view);
+    return name ? tx(...name) : view === 'reader' ? tx('記事', 'an article') : view;
+  };
+  return String(where || '').split('→').map((part) => {
+    const [view, page] = part.split('/');
+    return page ? tx(`${place(view)}のページ`, `a page over ${place(view)}`) : place(view);
+  }).join(' → ');
+}
+/** Me → Settings, under bug reports: the roughest move this week, and where — one quiet line. */
+function framesLine() {
+  const line = el('p', 'teacher-note settings-frames');
+  line.id = 'settings-frames';
+  const [worst] = roughestThisWeek(1);
+  if (!worst) {
+    line.textContent = tx('今週はまだ動きを測っていません。', 'No moves measured on this device this week.');
+    return line;
+  }
+  const [ja, en] = FRAME_KIND_WORDS[worst.name];
+  line.dataset.worstMs = String(worst.worst_ms);
+  line.textContent = tx(`今週いちばん重かった瞬間：${worst.worst_ms} ms（${ja}、${frameWhereWords(worst.where)}）`,
+    `Roughest moment this week: ${worst.worst_ms} ms, ${en} (${frameWhereWords(worst.where)}).`);
+  return line;
 }
 
 function licencePanel() {
@@ -31095,6 +31191,9 @@ function withoutRoomTransition(change) {
 function roomTransition(change) {
   if (roomTransitionUpdating) return change();
   if (!S.ready || document.hidden) return withoutRoomTransition(change);
+  // G1 · a room change is a move the frame sampler names, from the room left to the room reached
+  const leftRoom = S.view;
+  sampleTransition('room', () => `${leftRoom}→${S.view}`);
   activeRoomTransition?.skipTransition();
   const html = document.documentElement;
   const departing = document.querySelector('#app > main');
@@ -34032,6 +34131,8 @@ function maintenanceContext() {
     viewport: { width: innerWidth, height: innerHeight },
     locale: S.lang === 'ja' ? 'ja' : 'en',
     action_trace: maintenanceNavigation.slice(),
+    // G1 · the phone's own truth: this device's five roughest moves this week (kairo-frames, never the record)
+    frames: roughestThisWeek(5),
   };
 }
 let maintenanceReports = null;
@@ -34145,7 +34246,7 @@ function renderReportRelaySettings() {
     save.disabled = true;
     location.reload();
   });
-  section.append(status, form);
+  section.append(status, form, framesLine());
   return section;
 }
 function mountMaintenanceReports() {

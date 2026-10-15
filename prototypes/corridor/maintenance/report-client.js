@@ -182,6 +182,7 @@
         ...(ctx.content_ids.length ? [`- Content: ${(compact ? ctx.content_ids.slice(0, 4).map(value => clip(value, 60)) : ctx.content_ids).map(code).join(', ')}`] : []),
         `- Interface language: ${ctx.locale}`,
         ...(diagnostics.viewport ? [`- Viewport: ${diagnostics.viewport.width}×${diagnostics.viewport.height}`] : []),
+        ...(Array.isArray(diagnostics.frames) && diagnostics.frames.length ? [`- Roughest moments this week: ${(compact ? diagnostics.frames.slice(0, 1) : diagnostics.frames).map(item => `${item.worst_ms} ms ${item.name}${item.where ? ` (${item.where})` : ''}`).join(', ')}`] : []),
         `- Category: ${report.category}`,
         `- Reported: ${report.created_at}`,
         `- Report ID on the device: ${code(report.id)}`,
@@ -233,7 +234,9 @@
       // Caller supplies semantic actions only; arbitrary nested payloads are discarded.
       const action_trace = (Array.isArray(source.action_trace) ? source.action_trace : []).slice(-8).filter(item => item && typeof item.action === 'string').map(item => ({ action: clip(item.action, 100), ...(typeof item.target === 'string' ? { target: clip(item.target, 160) } : {}), ...(typeof item.at === 'string' ? { at: clip(item.at, 40) } : {}) }));
       const appVersion = clip(options.appVersion || options.github?.version, 40);
-      const diagnostics = { viewport: { width: Math.round(window.innerWidth), height: Math.round(window.innerHeight) }, ...(appVersion ? { app_version: appVersion } : {}), ...(source.content_revision ? { content_revision: clip(source.content_revision, 160) } : {}), action_trace };
+      // The week's roughest moves on this device (the app's frame sampler): names, places and milliseconds only, five at most.
+      const frames = (Array.isArray(source.frames) ? source.frames : []).slice(0, 5).filter(item => item && typeof item.name === 'string' && Number.isFinite(item.worst_ms)).map(item => ({ name: clip(item.name, 16), where: clip(typeof item.where === 'string' ? item.where : '', 80), worst_ms: Math.round(item.worst_ms), ...(typeof item.at === 'string' ? { at: clip(item.at, 40) } : {}) }));
+      const diagnostics = { viewport: { width: Math.round(window.innerWidth), height: Math.round(window.innerHeight) }, ...(appVersion ? { app_version: appVersion } : {}), ...(source.content_revision ? { content_revision: clip(source.content_revision, 160) } : {}), action_trace, ...(frames.length ? { frames } : {}) };
       return { context, diagnostics };
     }
 
