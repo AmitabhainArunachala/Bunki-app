@@ -135,6 +135,10 @@ const cases = [
     assert.deepEqual((await state(page)).record, before.record);
     await chooser(page);
     assert.equal(await page.locator('#vocabulary-list-name').inputValue(), 'Retry this list', 'The typed list name survives the reload as a session draft');
+    // in Save ▾'s fresh menu the draft waits behind "+ New list": the row becomes the field, the draft in it
+    await page.locator('#vocabulary-list-popover #vocabulary-list-new').click();
+    assert.equal(await page.locator('#vocabulary-list-name').isVisible(), true, 'The name field shows with the draft');
+    assert.equal(await page.locator('#vocabulary-list-name').inputValue(), 'Retry this list');
     await page.locator('#vocabulary-list-popover [type="submit"]').click();
     await waitForAppRecord(page, record => member(record, 'Retry this list', '電車'));
     await page.waitForFunction(() => document.getElementById('vocabulary-list-name')?.value === '');

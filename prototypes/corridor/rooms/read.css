@@ -855,6 +855,20 @@ html[data-room='reader'][data-room-entering] #app > main > :is(.reader-head, .ve
   -webkit-tap-highlight-color: transparent;
 }
 #mini button.mini-word:focus-visible { outline: 2px solid var(--mini-gold, currentColor); outline-offset: 2px; border-radius: 2px; }
+/* over the sky the house's --color-* tokens are not set (editorial.css scopes them to body:not([data-view='drift'])):
+   there the slip reads the galaxy's own depth tokens, so it wears the same card and not a see-through one */
+body[data-view='drift'] #mini {
+  --color-surface: var(--surface, #fbf8f1);
+  --color-paper: var(--raised, #fbf8f1);
+  --color-ground: var(--ground, #ece6d8);
+  --color-ink: var(--text, #23303f);
+  --color-ink-2: var(--text-2, #4a5563);
+  --color-muted: var(--faint, #6b7280);
+  --color-accent: var(--ai, #1f3a5f);
+  --color-accent-wash: var(--ai-wash, rgb(31 58 95 / 8%));
+  --color-signal: var(--red, #b3261e);
+  --color-gold: var(--gold, #94702a);
+}
 /* the band is the door: a chevron at its end says there is more, and the word's button reaches across the band */
 #mini .mini-head:has(button.mini-word) { padding-right: 40px; }
 #mini .mini-head:has(button.mini-word)::after {

@@ -296,12 +296,13 @@ const CONTROLS = Object.freeze([
       ? '' : 'a lookup popup still opened') }),
   Object.freeze({ name: 'r1', title: `${PASSAGE_B} token ${DOOR.index} served read ${WRONG_READING}`, edits: ['reading'], run: 'd2',
     requires: ['D2.f1.door', 'D2.f0.door', 'D2.f1.no-navigation', 'D2.f0.no-navigation'],
-    kills: ['D2.f1.visible-reading', 'D2.f1.accessible-reading', 'D2.f1.popup-reading', 'D2.f0.popup-reading'],
+    // 1.3.0: a tap summons the reading at ふりがな なし too, so the wrong reading shows on the text and in the label at f=0 as well
+    kills: ['D2.f1.visible-reading', 'D2.f1.accessible-reading', 'D2.f1.popup-reading', 'D2.f0.visible-reading', 'D2.f0.accessible-reading', 'D2.f0.popup-reading'],
     // nothing else may fail: focus, neighbour, painted English and the label's wording stay the candidate's
     allowed: [],
-    witness: (rows) => (rows.get('D2.f1.visible-reading')?.observed?.[1] === WRONG_READING
-      && rows.get('D2.f1.accessible-reading')?.observed?.[1] === doorLabel(WRONG_READING)
-      && [1, 0].every((f) => rows.get(`D2.f${f}.popup-reading`)?.observed?.[0]?.reading === WRONG_READING)
+    witness: (rows) => ([1, 0].every((f) => rows.get(`D2.f${f}.visible-reading`)?.observed?.[1] === WRONG_READING
+      && rows.get(`D2.f${f}.accessible-reading`)?.observed?.[1] === doorLabel(WRONG_READING)
+      && rows.get(`D2.f${f}.popup-reading`)?.observed?.[0]?.reading === WRONG_READING)
       ? '' : `the door did not show ${WRONG_READING}, as ruby, in its label and in its popup`) }),
   Object.freeze({ name: 'm3', title: 'the D22 restore removed from returnFromNavigation (the return before 1561ff95)', edits: ['restore'], run: 'd5',
     requires: D5_REQUIRES,

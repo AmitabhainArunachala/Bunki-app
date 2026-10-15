@@ -8583,6 +8583,8 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
       void Promise.resolve(review.toggle()).finally(() => {
         box.checked = review.saved();
         box.disabled = false;
+        // the disabled beat dropped the keyboard to the page: give it back the row, so Escape still closes the menu
+        if (box.isConnected && (!document.activeElement || document.activeElement === document.body)) box.focus({ preventScroll: true });
       });
     });
     row.append(box, el('span', 'vocabulary-list-name', tx('復習', 'Review')), el('span', 'vocabulary-list-count', tx('間隔反復', 'spaced repetition')));

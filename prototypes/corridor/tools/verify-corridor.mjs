@@ -2510,24 +2510,32 @@ async function main() {
     return { rt: [...t.querySelectorAll('rt')].filter((r) => !r.classList.contains('hidden-rt')).length, gloss: !!t.querySelector('.tok-en'),
       popup: document.querySelector('#mini .mini-gloss')?.textContent ?? null };
   })()`);
-  // reader lane 2026-10-02: one tap is the meaning — the popup, with the touched word's reading on the text
-  // (ふりがな 触れて); the same word again puts it away; nothing is ever written under the word
+  // 1.3.0: one tap is the meaning — the popup, with the touched word's reading on the text (ふりがな 触れて);
+  // the same word again is its full entry; closing it returns the original word; one more tap is the
+  // popup again; nothing is ever written under the word
   await cycleTap();
   await page.waitForTimeout(150);
   const cyc1 = await cycleState();
   await cycleTap();
+  await page.waitForSelector('#sheet', { timeout: 8000 });
   await page.waitForTimeout(150);
-  const cyc2 = await cycleState();
+  const cyc2 = { ...(await cycleState()), sheet: await page.evaluate(`document.querySelector('#sheet')?.dataset.node ?? ''`) };
+  await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
+  await page.waitForFunction(() => !document.getElementById('sheet'));
+  await page.waitForTimeout(150);
+  const closed = await cycleState();
   await cycleTap();
   await page.waitForTimeout(200);
   const cyc3 = await cycleState();
-  check('one tap shows the meaning and the reading at once; the same word again puts the popup away',
-    cyc1.rt >= 1 && !!cyc1.popup && !cyc1.gloss && cyc2.popup === null && !cyc2.gloss && !!cyc3.popup && !cyc3.gloss,
-    `tap 1: rt=${cyc1.rt} popup="${cyc1.popup}" → tap 2: popup=${cyc2.popup} → tap 3: popup="${cyc3.popup}"`);
+  check('one tap shows the meaning and the reading at once; the same word again opens its entry; its close returns the original word; one more tap is the popup again',
+    cyc1.rt >= 1 && !!cyc1.popup && !cyc1.gloss && cyc2.popup === null && cyc2.sheet.startsWith('word:') && !cyc2.gloss
+      && closed.popup === null && closed.rt === 0 && !closed.gloss && !!cyc3.popup && cyc3.rt >= 1 && !cyc3.gloss,
+    `tap 1: rt=${cyc1.rt} popup="${cyc1.popup}" → tap 2: sheet=${cyc2.sheet} popup=${cyc2.popup} → close: rt=${closed.rt} popup=${closed.popup} → tap 3: rt=${cyc3.rt} popup="${cyc3.popup}"`);
   // the full entry is one choice in the word menu a press and hold opens — and 戻る works IMMEDIATELY.
   // The third tap above left the popup open, and a finger can't hold a word the popup covers, so
-  // put it away first, the way a reader would: the same word once more (checked just above).
-  await cycleTap();
+  // put it away first, the way a reader would: Escape on the word (the same word once more would dive).
+  await page.evaluate(`(() => { const t = [...document.querySelectorAll('#reader .tok.content')].find((x) => x.querySelector('rt')); t?.focus(); })()`);
+  await page.keyboard.press('Escape');
   await page.waitForSelector('#mini', { state: 'hidden', timeout: 4000 });
   await touchAt(page, '#reader .tok.content', 4, 700); // past GESTURE.MENU_MS
   await page.waitForSelector('#reader-word-menu', { timeout: 6000 });
@@ -2838,10 +2846,12 @@ async function main() {
   await shoot(page, shotsDir, '19-capture-sovereignty');
   await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
   await page.waitForSelector('#sheet', { state: 'detached' });
-  // the popup's "Saved ✓" takes the card back out
+  // the popup's Saved ✓ ▾ opens its menu; the menu's Review row takes the card back out (1.3.0)
   await tap(page, '#reader .tok.content', 9);
   await page.waitForSelector('#mini #mini-take[aria-pressed="true"]');
   await tap(page, '#mini-take');
+  await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #mini-review');
+  await tap(page, '#mini-review');
   await waitForAppRecord(page, record => !record.taken.some(row => row.t === 'word' && row.id === touched.word),
     { description: 'explicit stop memorizing' });
   const undone = await evaluateAppRecord(page, `(() => {

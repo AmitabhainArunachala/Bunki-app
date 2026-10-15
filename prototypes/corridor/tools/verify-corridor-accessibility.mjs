@@ -644,6 +644,9 @@ async function main() {
     const returnProbe = await page.evaluate(`({
       closed: !document.querySelector('#sheet'),
       returned: document.activeElement?.matches('#reader .tok.content[data-index="${invokerIndex}"]') ?? false,
+      // where focus landed instead, for the record
+      active: document.activeElement ? document.activeElement.tagName.toLowerCase() + (document.activeElement.id ? '#' + document.activeElement.id : '') + '.' + [...document.activeElement.classList].join('.') + '[' + (document.activeElement.dataset?.index ?? '') + ']' : null,
+      invoker: '${invokerIndex}',
     })`);
     check(
       'Escape dismisses the sheet and returns focus to its invoking token',

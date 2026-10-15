@@ -48,7 +48,7 @@ async function nameField(page) {
 }
 async function addList(page) {
   await nameField(page);
-  await addList(page);
+  await create(page).click();
 }
 const create = page => page.locator('#vocabulary-list-create');
 const listBox = (page, name) => dialog(page).locator('input[type="checkbox"]').filter({ visible: true }).and(page.locator(`[data-list=${JSON.stringify(name)}]`));
@@ -79,6 +79,9 @@ async function openChooser(page) {
   if (!await dialog(page).count()) {
     assert.equal(await page.locator('#mini-lists, #mini .mini-entry').count(), 0, 'The popup has one Save ▾ and no list or entry button');
     const unsaved = await page.locator('#mini-take').getAttribute('aria-pressed') !== 'true';
+    // a press within a breath (SAVE_PRESS_MS, 600 ms) of the last press on the same Save ▾ is the same press: reopening the
+    // menu on a saved word waits that breath out, as a finger would
+    if (!unsaved) await page.waitForTimeout(650);
     await page.locator('#mini-take').click();
     if (unsaved) await saved(page);
   }
@@ -279,8 +282,9 @@ try {
         await openChooser(page);
         await page.locator('#mini-review').uncheck();
         await waitForAppRecord(page, value => !row(value));
-        await page.locator('#reader-toast-action').click();
+        await page.locator('#reader-toast-action').click(); // a press outside the menu folds it away
         await saved(page);
+        await openChooser(page);
         assert.equal(await listName(page).inputValue(), 'N1 読解', 'Review off and its Undo keep the unrelated typed name');
         await listBox(page, 'Existing chooser list').uncheck();
         await status(page).filter({ hasText: 'Taken off Existing chooser list.' }).waitFor();

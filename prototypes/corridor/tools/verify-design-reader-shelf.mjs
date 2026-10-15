@@ -1074,10 +1074,10 @@ try {
         return { card: box(mini), screen: { width: innerWidth, height: innerHeight }, band: h, entry: e, entryName: door.getAttribute('aria-label'),
           chevron: getComputedStyle(head, '::after').content !== 'none', entryOnTop: !!mid && door.contains(mid), bandIsDoor: !!end && (end === door || door.contains(end)),
           entryButton: !!mini.querySelector('.mini-entry'),
-          // the word is a button whose box reaches 5px past its glyph line (its 44px hit): the rows are the glyph lines
+          // the word is a button whose padding reaches 5px past its glyph line (its 44px hit): a row is the content box
           rows: ['.mini-word', '.mini-reading', '.mini-gloss'].map((selector) => mini.querySelector(selector)).filter(Boolean)
-            .map((node) => { const range = document.createRange(); range.selectNodeContents(node); const r = range.getBoundingClientRect();
-              return { part: node.classList[0], text: node.textContent, top: r.top, right: r.right, bottom: r.bottom, left: r.left, width: r.width, height: r.height }; }) };
+            .map((node) => { const r = node.getBoundingClientRect(), s = getComputedStyle(node), pt = parseFloat(s.paddingTop) || 0, pb = parseFloat(s.paddingBottom) || 0;
+              return { part: node.classList[0], text: node.textContent, top: r.top + pt, right: r.right, bottom: r.bottom - pb, left: r.left, width: r.width, height: r.height - pt - pb }; }) };
       });
       assert(band.rows.length >= 2 && band.rows.every((row) => row.width > 0 && row.height > 0), `the galaxy popup's word band is missing a line: ${JSON.stringify(band.rows)}`);
       const runOn = band.rows.slice(1).map((row, i) => [band.rows[i], row]).filter(([above, below]) => below.top < above.bottom - 1).map(([above, below]) => `${above.part} and ${below.part}`);
@@ -1239,6 +1239,11 @@ try {
         assert.equal(await page.locator('#mini #mini-take').isVisible(), true, 'Back to the word restores its Save');
         assert.equal(await page.locator('#mini .mini-sentence-pane').isVisible(), false, 'Back to the word hides the sentence view');
         // その has no kanji band: its shorter word card exposes the sentence view's clipped-focus regression.
+        // 郊外's card still floats over the text (its band is a door into the entry): put it away first, as a finger
+        // would have to, then tap the next word where it stands
+        await page.locator('#mini').focus();
+        await page.keyboard.press('Escape');
+        await page.locator('#mini').waitFor({ state: 'detached' });
         await tapToken(page, 12); // tapToken centers the real article token before opening its word popup.
         const shortWord = await box();
         const shortScroll = await page.evaluate(() => scrollY);
