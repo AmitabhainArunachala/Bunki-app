@@ -478,6 +478,11 @@ export function createGuidedSession(host) {
       anchor,
       look: { label: word.surface, reading: word.reading, gloss: word.meaning },
       host: {
+        // the one Save ▾ menu as everywhere (the one-hand pass): the lists are written through the app's own record;
+        // Save itself stays the session's path (its ledger row, its crane), and the menu's Review row takes the card
+        // back out through the host deck
+        menu: true,
+        untake: () => host.deck.remove(node),
         saved: () => status().state === 'taken',
         held: () =>
           status().state === 'held'

@@ -178,13 +178,25 @@ try {
           }
         check(`${label} · no two stars overlap`, overlaps.length === 0, overlaps.join(' '));
 
-        // one word opens that word
+        // one word opens its slip first (one word, one slip — the one-hand pass); the slip's band opens the entry
         const star = stars.find((s) => [...s.text].length > 1) || stars[0];
         await page.touchscreen.tap(star.x, star.y);
+        await page.locator('#mini[data-from="sky"]').waitFor();
+        const slip = await page.evaluate(() => ({
+          word: document.querySelector('#mini .mini-word')?.textContent ?? '',
+          door: document.querySelector('#mini button.mini-word')?.getAttribute('aria-label') ?? '',
+          sheet: document.querySelectorAll('.sheet').length,
+        }));
+        check(
+          `${label} · a sky word opens its slip first, on that word, its band the door; no entry yet`,
+          slip.word === star.text && slip.door === 'Open the full entry' && slip.sheet === 0,
+          JSON.stringify(slip),
+        );
+        await page.locator('#mini button.mini-word').tap();
         await page.locator('.sheet').waitFor();
         const sheetText = await page.locator('.sheet').textContent();
         check(
-          `${label} · a sky word opens that word's entry`,
+          `${label} · the slip's band opens that word's entry`,
           sheetText.includes(star.text),
           star.text,
         );

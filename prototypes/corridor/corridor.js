@@ -8610,6 +8610,9 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
       void Promise.resolve(review.toggle()).finally(() => {
         box.checked = review.saved();
         box.disabled = false;
+        // a host's Save (the guided slip) is repainted from the host's own truth; the app's path repaints itself
+        const hostSeal = invoker?.id === 'mini-take' && invoker.closest('#mini') ? invoker : null;
+        if (hostSeal && !hostSeal.dataset.appSave) { paintWordSave(hostSeal, box.checked); paintMiniPath(hostSeal.closest('.mini-actions'), box.checked); }
         // the disabled beat dropped the keyboard to the page: give it back the row, so Escape still closes the menu
         if (box.isConnected && (!document.activeElement || document.activeElement === document.body)) box.focus({ preventScroll: true });
       });
@@ -8747,12 +8750,16 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // ledger and crane); a note in its place (the deck's own word); or nothing (a particle, no entry)
   const hostHeld = save === 'host' ? host?.held?.() || null : null;
   const canSave = save !== 'none' && !note && (save === 'host' ? !hostHeld : !held && !identityHeld);
+  // a surface with its own save path may still want the one menu (the guided session: its ledger keeps the save,
+  // the lists are written through the app's own record, as everywhere) — John, 2026-10-15 17:20
+  const hostMenu = save === 'host' && !!host?.menu && !identityHeld;
   let seal = null;
   if (save !== 'none' && !note) {
     seal = el('button', 'mini-take btn-primary');
     seal.type = 'button';
     seal.id = 'mini-take';
-    if (canSave && save === 'default') {
+    if (save === 'default') seal.dataset.appSave = 'true';
+    if (canSave && (save === 'default' || hostMenu)) {
       seal.dataset.saveMenu = 'true';
       seal.setAttribute('aria-haspopup', 'dialog');
       seal.setAttribute('aria-expanded', 'false');
@@ -8764,15 +8771,18 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
       seal.classList.add('reader-capture-held');
       seal.setAttribute('aria-describedby', 'mini-take-reason');
     }
-    // the surface's own path keeps its own ledger: once it says the word is saved, Save rests
-    if (save === 'host' && savedNow) seal.disabled = true;
+    // the surface's own path keeps its own ledger: once it says the word is saved, Save rests — unless it carries
+    // the menu, in which case Saved ✓ ▾ stays live for the lists
+    if (save === 'host' && savedNow && !seal.dataset.saveMenu) seal.disabled = true;
     // Save ▾: one press saves the word and opens its menu (lists, copy, remove from review); on "Saved ✓" a
     // press opens the menu again, or puts it away. A second press within a breath of the first (a
     // double-click, a bounced tap) is the same press
     let pressedAt = -Infinity;
     const openMenu = () => openVocabularyListPopover(captureNode, label, seal, {
       menu: true,
-      review: { saved: () => seal.getAttribute('aria-pressed') === 'true', toggle: () => toggleWordSave(captureNode, label) },
+      review: save === 'host'
+        ? { saved: () => !!host.saved?.(), toggle: () => (host.saved?.() ? host.untake?.() : host.take()) }
+        : { saved: () => seal.getAttribute('aria-pressed') === 'true', toggle: () => toggleWordSave(captureNode, label) },
       more: [{ id: 'mini-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(token.s || token.b) }],
     });
     seal.addEventListener('click', (event) => {
@@ -8782,6 +8792,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
       if (save === 'host') {
         // busy, never disabled, while the surface saves: a disabled button drops the keyboard to the page
         if (seal.getAttribute('aria-busy') === 'true') return undefined;
+        // Saved ✓ ▾: the menu again, or away
+        if (seal.dataset.saveMenu && seal.getAttribute('aria-pressed') === 'true') return openMenu();
         seal.setAttribute('aria-busy', 'true');
         const settle = (ok) => {
           if (!seal.isConnected) return ok;
@@ -8790,9 +8802,12 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
           paintWordSave(seal, saved);
           paintMiniPath(actions, saved);
           if (saved) {
-            // Save rests once the surface says the word is saved; the keyboard stays on the slip
-            if (document.activeElement === seal) mini.focus({ preventScroll: true });
-            seal.disabled = true;
+            if (seal.dataset.saveMenu) openMenu(); // the lists unfold under Saved ✓, as everywhere
+            else {
+              // Save rests once the surface says the word is saved; the keyboard stays on the slip
+              if (document.activeElement === seal) mini.focus({ preventScroll: true });
+              seal.disabled = true;
+            }
           }
           return ok;
         };
@@ -10757,7 +10772,7 @@ function openSlip(node, { anchor, from = 'lookup', host = null, look = null, not
     else if (node) go(node, { invoker: anchor });
   };
   return showMini(anchor, token, onEntry, { focusEntry: focus, record, entryAvailable, sentence, look, kind, save, host, note,
-    source: from, key, kanji, onClose, follow: from === 'drift', nodeFor: node && kind !== 'word' ? { t: node.t, id: node.id } : null });
+    source: from, key, kanji, onClose, follow: from === 'drift' || from === 'sky', nodeFor: node && kind !== 'word' ? { t: node.t, id: node.id } : null });
 }
 /** A kanji's first reading for the slip's band: its first on reading in kana, else its first kun stem. */
 function kanjiSlipReading(k) {
@@ -12000,7 +12015,13 @@ function todaySky(dayWord, today, readPick) {
       star.tabIndex = -1;
       star.hidden = true;
       star.style.setProperty('--d', `${(i % 4) * 1.7}s`);
-      star.addEventListener('click', () => go(item ? learningItemNode(item) : kanji ? { t: 'kanji', id: kanji } : { t: 'word', id: word }, { invoker: star }));
+      // the slip first (contract §1 — the one surface slice B did not reach): the band then opens the entry, and the
+      // same star again dives. A star drifts with its lane, so the slip follows it.
+      star.addEventListener('click', () => {
+        const node = item ? learningItemNode(item) : kanji ? { t: 'kanji', id: kanji } : { t: 'word', id: word };
+        const second = miniAnchor === star && !!document.getElementById('mini');
+        if (!openSlip(node, { anchor: star, from: 'sky' }) && !second) go(node, { invoker: star });
+      });
       lane.append(star);
       return star;
     });

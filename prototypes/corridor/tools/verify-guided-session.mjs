@@ -392,10 +392,15 @@ async function journey(browser, browserName, viewport) {
       await shot(page, dir, '08-saved');
     }
     await page.waitForFunction(() => document.getElementById('mini-take')?.getAttribute('aria-pressed') === 'true');
+    // the one Save ▾ menu, as everywhere (John, 2026-10-15 17:20): Saved ✓ stays live and its menu unfolds inside the
+    // slip, its first row Review checked by the session's own save; the keyboard lands on that row
+    await page.locator('#mini #vocabulary-list-popover.is-inline').waitFor({ timeout: 5_000 });
     check(
-      'M11 saving keeps the keyboard on the slip’s Save, which now reads Saved ✓ and rests',
-      await page.evaluate(() => document.activeElement?.id === 'mini-take' || document.activeElement === document.getElementById('mini')) &&
-        /^(保存済み ✓|Saved ✓)$/u.test(await page.locator('#mini-take').innerText()) && (await page.locator('#mini-take').isDisabled()),
+      'M11 saving reads Saved ✓ and unfolds its lists menu inside the slip, Review checked, the keyboard on the menu',
+      /^(保存済み ✓|Saved ✓)$/u.test(await page.locator('#mini-take').innerText()) && !(await page.locator('#mini-take').isDisabled()) &&
+        (await page.locator('#mini-take').getAttribute('aria-expanded')) === 'true' &&
+        (await page.locator('#mini #mini-review').isChecked()) &&
+        (await page.evaluate(() => !!document.activeElement?.closest('#vocabulary-list-popover'))),
       await activeAction(page),
     );
     const afterSave = await stored(page);
@@ -421,6 +426,10 @@ async function journey(browser, browserName, viewport) {
       (await dueKeys(page)).includes('word:専門家'),
     );
     if (MOMENTS) await page.locator('.bunki-moment').waitFor({ state: 'detached', timeout: 5_000 });
+    // Escape steps out one layer at a time: the menu first, back to Save; then the slip
+    await page.keyboard.press('Escape');
+    await page.locator('#vocabulary-list-popover').waitFor({ state: 'detached', timeout: 5_000 });
+    check('M11b Escape on the menu folds it and gives the keyboard back to Save', await page.evaluate(() => document.activeElement?.id === 'mini-take'), await activeAction(page));
     await page.locator('#mini').focus();
     await page.keyboard.press('Escape');
     await page.locator('#mini').waitFor({ state: 'detached', timeout: 5_000 });
@@ -465,9 +474,11 @@ async function journey(browser, browserName, viewport) {
     await door58.click();
     await page.locator('#mini[data-from="guided"] #mini-take').waitFor({ timeout: 5_000 });
     check(
-      'S0b the word’s slip reads that card as already saved: Saved ✓, at rest',
-      (await page.locator('#mini #mini-take').isDisabled()) &&
-        /^(保存済み ✓|Saved ✓)$/u.test(await page.locator('#mini #mini-take').innerText()),
+      'S0b the word’s slip reads that card as already saved: Saved ✓, live, its lists menu one press away',
+      !(await page.locator('#mini #mini-take').isDisabled()) &&
+        /^(保存済み ✓|Saved ✓)$/u.test(await page.locator('#mini #mini-take').innerText()) &&
+        (await page.locator('#mini #mini-take').getAttribute('data-save-menu')) === 'true' &&
+        (await page.locator('#mini #mini-take').getAttribute('aria-expanded')) === 'false',
     );
     await page.locator('#mini').focus();
     await page.keyboard.press('Escape');
