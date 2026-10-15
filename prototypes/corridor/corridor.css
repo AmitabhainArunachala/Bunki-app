@@ -2894,82 +2894,6 @@ body.v-depth-layered .inline-link {
   cursor: pointer;
 }
 
-/* the mini dictionary — long-press */
-#mini {
-  position: fixed;
-  z-index: 70;
-  max-width: 280px;
-  background: var(--ground-0, var(--ground));
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  box-shadow: 0 8px 30px rgba(20, 24, 28, 0.22);
-  padding: 10px 14px;
-  display: grid;
-  gap: 2px;
-  animation: rise 0.16s ease;
-  cursor: pointer;
-}
-
-#mini .mini-word {
-  font-family: var(--serif);
-  font-size: 20px;
-  padding-right: 48px;
-}
-
-/* 覚 — the capture door rides the mini (directive §3) */
-#mini .mini-take {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  min-width: var(--tap);
-  min-height: var(--tap);
-  font: inherit;
-  font-size: 13px;
-  font-family: var(--serif);
-  color: var(--ink-2);
-  background: transparent;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-#mini .mini-take.taken {
-  color: var(--red);
-  border-color: var(--red);
-}
-
-#mini .mini-reading {
-  color: var(--red);
-  font-family: var(--serif);
-  font-size: 13px;
-}
-
-#mini .mini-gloss {
-  font-size: 13px;
-  color: var(--ink-2);
-}
-
-#mini .mini-hint {
-  font-family: var(--sans);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  color: var(--faint);
-  margin-top: 4px;
-}
-
-#mini .mini-entry {
-  min-height: var(--tap);
-  margin-top: 5px;
-  padding: 4px 12px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--ai, var(--ink-2));
-  background: transparent;
-  font: inherit;
-  font-family: var(--sans);
-  font-size: 11px;
-  cursor: pointer;
-}
 
 /* second tap: English beneath the word — IN THE LINE FLOW, so no font's
  * metrics on any device can ever collide it with the next line. The token
@@ -8034,7 +7958,6 @@ body.zen .say-note { color: var(--card-ink-2, var(--ink-2)); }
  * along that path with the reason on the sheet. New classes only; nothing a
  * core hit renders is restyled. */
 .tok-en.tok-en-miss { color: var(--faint); }
-#mini .mini-miss { color: var(--faint); }
 .reader-choice { margin: 8px 0 14px; }
 .reader-choice-title { margin: 0 0 4px; color: var(--faint); font-family: var(--serif); font-size: 12px; letter-spacing: 0.08em; }
 .reader-choice-row { display: flex; align-items: center; gap: 9px; width: 100%; min-height: var(--tap); padding: 7px 1px;
@@ -8047,11 +7970,6 @@ body.zen .say-note { color: var(--card-ink-2, var(--ink-2)); }
 .reader-capture-held { opacity: 0.45; cursor: not-allowed; }
 /* the chrome seal stays reachable (aria-disabled): pressing it opens the reason */
 .reader-capture-held[aria-disabled='true'] { cursor: help; }
-#mini .mini-take-reason { margin-top: 3px; font-size: 10.5px; line-height: 1.45; color: var(--faint); }
-/* D23: the held mini opens the card the record holds, as the full note does */
-#mini .mini-take-open { min-height: var(--tap); margin-top: 5px; padding: 4px 12px;
-  border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ai, var(--ink-2));
-  font: inherit; font-family: var(--sans); font-size: 11px; cursor: pointer; }
 
 /* ------------------------------------------------ Anki-grade review (operator, 2026-09-28)
  * Anki's colours for its three numbers — blue new, red learning, green review — mixed toward
