@@ -456,7 +456,10 @@ const CONTRAST = `(() => {
   const root = document.querySelector('.kp');
   const probe = document.createElement('i');
   root.append(probe);
-  const rgba = (v) => { probe.style.color = ''; probe.style.color = v; return getComputedStyle(probe).color.match(/[\\d.]+/g).map(Number); };
+  // Chromium serialises a plain colour as rgb()/rgba() and a color-mix() role as color(srgb r g b / a)
+  const parse = (c) => { let m = c.match(/^rgba?\\(([^)]+)\\)$/); if (m) { const n = m[1].split(/[\\s,/]+/).filter(Boolean).map(Number); return [n[0], n[1], n[2], n[3] ?? 1]; }
+    m = c.match(/^color\\(srgb\\s+([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)(?:\\s*\\/\\s*([\\d.]+))?\\)$/); return m ? [+m[1] * 255, +m[2] * 255, +m[3] * 255, m[4] !== undefined ? +m[4] : 1] : [0, 0, 0, 0]; };
+  const rgba = (v) => { probe.style.color = ''; probe.style.color = v; return parse(getComputedStyle(probe).color); };
   const rgb = (v) => rgba(v).slice(0, 3);
   const lum = (c) => { const [r, g, b] = c.map((x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
   const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
@@ -584,7 +587,7 @@ async function verifyDelivery(browser, base) {
       reset: [...document.querySelectorAll('.kp-settings button')].filter((b) => /記録を消す|消えます|erase.*record|delete.*record|reset.*record|clear.*record/i.test(b.textContent)).length + document.querySelectorAll('.kp-danger').length, backup: [...document.getElementById('kp-backup').closest('.kp-field').querySelectorAll('button')].map((b) => b.textContent) })`);
     const axe = await new AxeBuilder({ page }).include('.kp').analyze();
     const aria = axe.violations.filter((v) => v.id === 'label' || v.id.startsWith('aria-') || v.id === 'button-name').map((v) => v.id);
-    check('設定: the backup box has a label, each choice row is a radio group with one checked (no 判定のボタン, no front ふりがな, no ヒント row: the front has no hint), the storage line shows, and axe finds no label or aria problems', settings.label === 'Backup text' && settings.groups === 4 && settings.checked === 4 && settings.gone === 0 && /^Device storage: (persistent|not persistent|unknown)$/.test(settings.persist) && aria.length === 0, JSON.stringify({ ...settings, aria }));
+    check('設定: the backup box has a label, each of the three choice rows (new per day, mode, English) is a radio group with one checked — no 色 picker (the deck wears the world), no 判定のボタン, no front ふりがな, no ヒント row — the storage line shows, and axe finds no label or aria problems', settings.label === 'Backup text' && settings.groups === 3 && settings.checked === 3 && settings.gone === 0 && /^Device storage: (persistent|not persistent|unknown)$/.test(settings.persist) && aria.length === 0, JSON.stringify({ ...settings, aria }));
     check('3) 設定 › バックアップ offers コピー and 復元 and no 記録を消す: whole-deck reset is not offered (A34)', settings.reset === 0 && settings.backup.join() === 'Copy,Restore', JSON.stringify({ reset: settings.reset, backup: settings.backup }));
 
     // the done screen keeps ひとつ戻す (F37)
@@ -1157,7 +1160,8 @@ async function verifyTap(browser, base) {
       const toks = [...document.querySelectorAll('#kp-card .kp-sentence .kp-tok:not(.kp-target)')].map(plain);
       const t = document.querySelector('#kp-card .kp-sentence .kp-tok:not(.kp-target)');
       const rest = getComputedStyle(t).textDecorationLine;
-      return { toks, def: [...document.querySelectorAll('#kp-card .kp-def .kp-tok')].map((n) => n.textContent), target: document.querySelectorAll('#kp-card .kp-sentence .kp-target.kp-tok').length, rest,
+      const restShadow = getComputedStyle(t).boxShadow;
+      return { toks, restShadow, def: [...document.querySelectorAll('#kp-card .kp-def .kp-tok')].map((n) => n.textContent), target: document.querySelectorAll('#kp-card .kp-sentence .kp-target.kp-tok').length, rest,
         roles: [...document.querySelectorAll('#kp-card .kp-tok')].every((n) => n.getAttribute('role') === 'button' && n.tabIndex === 0) };
     })()`);
     const missing = want.filter((w) => !back.toks.includes(w.s)).map((w) => w.s);
@@ -1169,11 +1173,15 @@ async function verifyTap(browser, base) {
     await page.evaluate(RESTING);
     const reach = await page.evaluate(REACH);
     await page.hover('#kp-card .kp-sentence .kp-tok:not(.kp-target)');
-    const hover = await page.evaluate(`(() => { const t = document.querySelector('#kp-card .kp-sentence .kp-tok:not(.kp-target)'); const cs = getComputedStyle(t); return cs.textDecorationLine + ' ' + cs.textDecorationStyle; })()`);
+    const hover = await page.evaluate(`(() => { const t = document.querySelector('#kp-card .kp-sentence .kp-tok:not(.kp-target)'); const cs = getComputedStyle(t);
+      const p = document.createElement('i'); document.body.append(p); p.style.color = 'var(--color-reading)'; const reading = getComputedStyle(p).color; p.remove();
+      return { deco: cs.textDecorationLine, shadow: cs.boxShadow, reading }; })()`);
+    // the one-hand pass: the house's one word mark (family H) — a hairline underline in the reading's colour,
+    // drawn as an inset shadow, no text-decoration, nothing at rest
     check(
-      'tap: each word reaches 44px tall (a press 21px above or below its centre lands on it), and has no underline until hover or focus, then a dotted one',
-      reach.sampled >= 5 && reach.miss.length === 0 && back.rest === 'none' && hover === 'underline dotted',
-      JSON.stringify({ ...reach, rest: back.rest, hover }),
+      "tap: each word reaches 44px tall (a press 21px above or below its centre lands on it), wears no mark at rest, and under the pointer wears the house's one word mark: a hairline underline in the reading's colour (an inset shadow, no text-decoration)",
+      reach.sampled >= 5 && reach.miss.length === 0 && back.rest === 'none' && back.restShadow === 'none' && hover.deco === 'none' && hover.shadow.includes('inset') && hover.shadow.includes(hover.reading) && /-0\.5px/.test(hover.shadow),
+      JSON.stringify({ ...reach, rest: back.rest, restShadow: back.restShadow, hover }),
     );
 
     const before = { sched: await page.evaluate(SCHEDULE_OF(KEY)), env: await env(page) };
@@ -2471,8 +2479,8 @@ async function verifyVisual(browser, base) {
     await o.page.waitForSelector('#kp-backup');
     const set = await o.page.evaluate(`(() => { const m = document.querySelector('.kp-settings #kp-method'); return { method: !!m, summary: m?.querySelector('summary')?.textContent, lines: m ? m.querySelectorAll('p').length : 0, groups: document.querySelectorAll('.kp-settings [role="radiogroup"]').length }; })()`);
     check(
-      'a) the deck home has no 見て覚えるコツ panel, no method panel and no topic hue on its rows; このデッキのしくみ sits in 設定 with every line of the method',
-      home.tips === 0 && home.method === 0 && home.topic === 0 && set.method && set.summary === 'How this deck works' && set.lines === mcd.method.length && set.groups === 4,
+      'a) the deck home has no 見て覚えるコツ panel, no method panel and no topic hue on its rows; このデッキのしくみ sits in 設定 with every line of the method, beside three choice rows (no 色 picker: the deck wears the world)',
+      home.tips === 0 && home.method === 0 && home.topic === 0 && set.method && set.summary === 'How this deck works' && set.lines === mcd.method.length && set.groups === 3,
       JSON.stringify({ home, set }),
     );
     await close(o);
@@ -2589,7 +2597,7 @@ async function verifyVisual(browser, base) {
       seen.push({ world, card: v.cardTex, page: v.pageTex });
       await close(o);
     }
-    check("d) ベロ藍, 柿渋 and 紺紙: the card under the ruby is plain and the deck paints no texture of its own (the world's paper is the page)", seen.every((x) => x.card === 'none' && x.page === 'none'), JSON.stringify(seen));
+    check("d) ベロ藍, 柿渋 and 紺紙: the card under the ruby is plain and the deck paints no texture of its own — no fibre (url) and no repeating pattern on the page; the stage's soft light is the stage's", seen.every((x) => x.card === 'none' && !/url\(|repeating-/.test(x.page)), JSON.stringify(seen));
   }
 
   // e) the reveal keeps the card; the answer fades in within 180 ms; a grade slides the card out its way
@@ -2810,10 +2818,11 @@ async function main() {
     check('穴埋め (the MCD blank preset): one gap and nothing under it — no hint, no readings, no English', (await page.locator('#kp-card .kp-blank').count()) >= 1 && (await page.locator('#kp-card .kp-hint').count()) === 0 && (await page.locator('#kp-card rt').count()) === 0);
     await boot('?deck=kotoba');
     await page.waitForSelector('#kp-start', { timeout: 15000 });
+    const sentHome = await page.evaluate(MATERIAL);
     await page.click('#kp-start');
     await page.waitForSelector('#kp-card .kp-target');
     const sent = await page.evaluate(MATERIAL);
-    check("?deck=kotoba opens the sentence deck: a real sentence with the word marked, on the world's own page (one material: the deck's ground is the page's, no look of its own)", sent.blank === 0 && sent.deck === sent.worldPage && sent.look === null, JSON.stringify(sent));
+    check("?deck=kotoba opens the sentence deck: a real sentence with the word marked, its home on the world's own page (one material: the deck's ground is the page's, no look of its own; a sitting stands on the room's lacquer stage)", sent.blank === 0 && sentHome.deck === sentHome.worldPage && sentHome.look === null && sent.look === null, JSON.stringify({ home: sentHome, sitting: sent }));
 
     // 覚える is one tap (round-1 save path): the row is written through the
     // guarded commit at once, and the list drawer opens under the finger so

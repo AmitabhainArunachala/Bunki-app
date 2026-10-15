@@ -3208,7 +3208,7 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 /* ─ the sheet: one paper, one hairline edge (no kind stripe), a little fibre, lifted by two shadows:
    a close one that says it rests, a long one that says it is lit from above */
 #app .kp-study .kp-card {
-  gap: 14px; padding: 20px 22px 24px; border-radius: var(--radius-seal);
+  gap: 14px; padding: 20px 22px 24px; border-radius: var(--radius-card);
   border: 1px solid color-mix(in srgb, var(--kp-ink) 9%, transparent);
   /* plain paper: a texture never sits under the readings (the deck's own rule, 和紙・黒板・桜) */
   background: var(--kp-panel);
@@ -3810,6 +3810,10 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
    primary, 44 for everything else; font-ui 600 16 (A) · 500 15 (B, F) · 600 15 (C). One A per
    screen: where two primaries met, the sheet bar's Save is the A and the sheet's bottom Save is a B.
    The press and reduced motion come from the one hand (slice C): nothing here moves or dims.
+   Specificity is held flat on purpose: every qualifier and every id in a family's :is() list sits in
+   :where(), so a family rule weighs (0,1,1) plus one class or attribute and the cascade ORDER decides
+   a tie (B after A would otherwise take a primary that also carries a B class; a chosen mark must
+   beat B). The only id kept live is the sheet's bottom Save (one A per screen).
      A Primary   the screen's one accent-filled key
      B Secondary a hairline slip of the page (--color-edge-strong); a list variant for options
      C Quiet     a word in the accent, no box
@@ -3822,9 +3826,9 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
 
 /* ---- A · Primary ---- */
 body:not([data-view='drift']) :is(
-  .take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary, .sheet-bar .sheet-take:not([aria-pressed='true']),
+  .take:where(:not(.taken, .quiet)), .btn-primary, .chip.btn-primary, .sheet-take:where(:not([aria-pressed='true'])),
   .kp-start, .kp-reveal, .kp-next, .kp-take,
-  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, :where(#bunki-reports-root) .br-primary,
   .chat-send, .exam-confirm > button.take
 ) {
   min-height: 48px;
@@ -3839,44 +3843,44 @@ body:not([data-view='drift']) :is(
   cursor: pointer;
 }
 body:not([data-view='drift']) :is(
-  .take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary, .sheet-bar .sheet-take:not([aria-pressed='true']),
+  .take:where(:not(.taken, .quiet)), .btn-primary, .chip.btn-primary, .sheet-take:where(:not([aria-pressed='true'])),
   .kp-start, .kp-reveal, .kp-next, .kp-take,
-  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, :where(#bunki-reports-root) .br-primary,
   .chat-send, .exam-confirm > button.take
-):hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 88%, #000); }
+):hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-accent) 88%, #000); }
 body:not([data-view='drift']) :is(
-  .take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary, .sheet-bar .sheet-take:not([aria-pressed='true']),
+  .take:where(:not(.taken, .quiet)), .btn-primary, .chip.btn-primary, .sheet-take:where(:not([aria-pressed='true'])),
   .kp-start, .kp-reveal, .kp-next, .kp-take,
-  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, :where(#bunki-reports-root) .br-primary,
   .chat-send, .exam-confirm > button.take
-):disabled { background: var(--color-fill-strong); color: var(--color-muted); box-shadow: none; cursor: default; }
+):where(:disabled) { background: var(--color-fill-strong); color: var(--color-muted); box-shadow: none; cursor: default; }
 body:not([data-view='drift']) :is(.take, .btn-primary, .chip.btn-primary) .en-sub { color: inherit; opacity: 0.82; }
 /* at night the key is lit, never a solid fill: the accent as an emitted edge and a glow */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) :is(
-  .take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary, .sheet-bar .sheet-take:not([aria-pressed='true']),
+  .take:where(:not(.taken, .quiet)), .btn-primary, .chip.btn-primary, .sheet-take:where(:not([aria-pressed='true'])),
   .kp-start, .kp-reveal, .kp-next, .kp-take,
-  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, :where(#bunki-reports-root) .br-primary,
   .chat-send, .exam-confirm > button.take
-):not(:disabled) {
+):where(:not(:disabled)) {
   background: color-mix(in srgb, var(--color-accent) 9%, var(--color-ground));
   color: var(--color-accent);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 72%, transparent), 0 0 0 0.5px var(--color-glow), 0 0 18px -2px var(--color-glow), 0 10px 24px -10px rgb(0 0 0 / 70%);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) :is(
-  .take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary, .sheet-bar .sheet-take:not([aria-pressed='true']),
+  .take:where(:not(.taken, .quiet)), .btn-primary, .chip.btn-primary, .sheet-take:where(:not([aria-pressed='true'])),
   .kp-start, .kp-reveal, .kp-next, .kp-take,
-  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, #bunki-reports-root .br-primary,
+  .gs-button.primary, .cd-btn.cd-primary, .cd-choice.cd-primary, .pc .pc-primary, :where(#bunki-reports-root) .br-primary,
   .chat-send, .exam-confirm > button.take
-):hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 15%, var(--color-ground)); }
+):hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-accent) 15%, var(--color-ground)); }
 
 /* ---- B · Secondary: a hairline slip ---- */
 body:not([data-view='drift']) :is(
-  .chip:not(.btn-primary):not(.btn-tertiary):not(.t-kanji):not(.t-word):not(.t-radical):not(.t-idiom), .btn-secondary, .chip.btn-secondary,
-  .take.taken, .take.quiet, .sheet-bar .sheet-take[aria-pressed='true'],
-  .gs-button, .cd-btn, .stroke-btn, .stroke-controls button,
-  #bunki-reports-root .br-actions button, #bunki-reports-root .br-context-summary button,
+  .chip:where(:not(.btn-primary, .btn-tertiary, .t-kanji, .t-word, .t-radical, .t-idiom)), .btn-secondary, .chip.btn-secondary,
+  .take.taken, .take.quiet, .sheet-take:where([aria-pressed='true']),
+  .gs-button:where(:not(.primary)), .cd-btn:where(:not(.cd-primary)), .stroke-btn, .stroke-controls button,
+  :where(#bunki-reports-root) .br-actions button, :where(#bunki-reports-root) .br-context-summary button,
   .skip-more, .skip-retry, .skip-search-opener, .skip-code-door, .reference-button,
-  .pc button:not(.pc nav *):not(.pc-top *):not(.pc-card-foot *):not(.pc-grades *):not(.pc-token),
+  .pc button:where(:not(.pc nav *, .pc-top *, .pc-card-foot *, .pc-grades *, .pc-token)),
   .kp-delete, .vocabulary-list-create, .vocabulary-list-form .chip, .vocabulary-list-dialog > .chip,
   .kdx-lens, .focus-chip
 ) {
@@ -3892,16 +3896,16 @@ body:not([data-view='drift']) :is(
   cursor: pointer;
 }
 body:not([data-view='drift']) :is(
-  .chip:not(.btn-primary):not(.btn-tertiary):not(.t-kanji):not(.t-word):not(.t-radical):not(.t-idiom), .btn-secondary,
-  .take.taken, .take.quiet, .sheet-bar .sheet-take[aria-pressed='true'],
-  .gs-button, .cd-btn, .stroke-btn, .stroke-controls button,
-  #bunki-reports-root .br-actions button, #bunki-reports-root .br-context-summary button,
+  .chip:where(:not(.btn-primary, .btn-tertiary, .t-kanji, .t-word, .t-radical, .t-idiom)), .btn-secondary,
+  .take.taken, .take.quiet, .sheet-take:where([aria-pressed='true']),
+  .gs-button:where(:not(.primary)), .cd-btn:where(:not(.cd-primary)), .stroke-btn, .stroke-controls button,
+  :where(#bunki-reports-root) .br-actions button, :where(#bunki-reports-root) .br-context-summary button,
   .skip-more, .skip-retry, .skip-search-opener, .skip-code-door, .reference-button,
-  .pc button:not(.pc nav *):not(.pc-top *):not(.pc-card-foot *):not(.pc-grades *):not(.pc-token),
+  .pc button:where(:not(.pc nav *, .pc-top *, .pc-card-foot *, .pc-grades *, .pc-token)),
   .kp-delete, .vocabulary-list-create, .vocabulary-list-form .chip, .vocabulary-list-dialog > .chip,
   .kdx-lens, .focus-chip
-):hover:not(:disabled):not([aria-disabled='true']) { background: var(--color-fill); }
-body:not([data-view='drift']) :is(.chip, .gs-button, .cd-btn, .stroke-btn, .skip-more, .skip-retry, .reference-button):is(:disabled, [aria-disabled='true']) {
+):hover:where(:not(:disabled, [aria-disabled='true'])) { background: var(--color-fill); }
+body:not([data-view='drift']) :is(.chip, .gs-button, .cd-btn, .stroke-btn, .skip-more, .skip-retry, .reference-button):where(:disabled, [aria-disabled='true']) {
   background: transparent;
   color: color-mix(in srgb, var(--color-ink) 42%, transparent);
   border-color: var(--color-line);
@@ -3920,7 +3924,7 @@ body:not([data-view='drift']) #sheet > button.take {
 }
 /* the list variant: an option in a list of options, read in the reading face; the attempt
    register keeps its own ruled paper for options (register.css) */
-html:not([data-register='attempt']) body:not([data-view='drift']) :is(.lesson-option, .mock-opt, .gs-choice, .cd-choice:not(.cd-primary)) {
+html:not([data-register='attempt']) body:not([data-view='drift']) :is(.lesson-option, .mock-opt, .gs-choice, .cd-choice:where(:not(.cd-primary))) {
   min-height: 48px;
   padding: 12px 14px;
   border: var(--stroke-hairline) solid var(--color-edge-strong);
@@ -3931,9 +3935,9 @@ html:not([data-register='attempt']) body:not([data-view='drift']) :is(.lesson-op
   text-align: start;
   cursor: pointer;
 }
-html:not([data-register='attempt']) body:not([data-view='drift']) :is(.lesson-option, .mock-opt, .gs-choice, .cd-choice:not(.cd-primary)):hover:not(:disabled) { background: var(--color-fill); }
+html:not([data-register='attempt']) body:not([data-view='drift']) :is(.lesson-option, .mock-opt, .gs-choice, .cd-choice:where(:not(.cd-primary))):hover:where(:not(:disabled)) { background: var(--color-fill); }
 /* a toggle keeps its slip and takes the chosen mark (F's underline) when on */
-body:not([data-view='drift']) :is(.chip.on, .kdx-lens.on, .focus-chip.on, .stroke-btn[aria-pressed='true'], .stroke-controls button[aria-pressed='true'], .chip[aria-pressed='true']:not(.btn-primary)) {
+body:not([data-view='drift']) :is(.chip.on, .kdx-lens.on, .focus-chip.on, .stroke-btn:where([aria-pressed='true']), .stroke-controls button:where([aria-pressed='true']), .chip:where([aria-pressed='true']):where(:not(.btn-primary))) {
   color: var(--color-ink);
   background: transparent;
   border-color: var(--color-ink);
@@ -3949,7 +3953,7 @@ body:not([data-view='drift']) .chip.t-idiom { border: 0; background: color-mix(i
 /* ---- C · Quiet: a word, no box ---- */
 body:not([data-view='drift']) :is(
   .btn-tertiary, .chip.btn-tertiary, .kp-link, .kp-undo, .gs-text, .nav-arrow, .sheet-back,
-  #bunki-reports-root .br-close, .reference-text-button
+  :where(#bunki-reports-root) .br-close, .reference-text-button
 ) {
   min-height: 44px;
   padding: 0 8px;
@@ -3965,14 +3969,16 @@ body:not([data-view='drift']) :is(
 }
 body:not([data-view='drift']) :is(
   .btn-tertiary, .chip.btn-tertiary, .kp-link, .kp-undo, .gs-text, .nav-arrow, .sheet-back,
-  #bunki-reports-root .br-close, .reference-text-button
-):hover:not(:disabled) { background: var(--color-fill); }
-body:not([data-view='drift']) :is(.btn-tertiary, .gs-text, .kp-link, .kp-undo):disabled { color: var(--color-muted); cursor: default; }
+  :where(#bunki-reports-root) .br-close, .reference-text-button
+):hover:where(:not(:disabled)) { background: var(--color-fill); }
+body:not([data-view='drift']) :is(.btn-tertiary, .gs-text, .kp-link, .kp-undo):where(:disabled) { color: var(--color-muted); cursor: default; }
 
 /* ---- D · Glyph: a 44 square, no box ---- */
+/* (the rule's × and the standalone popover's × are drawn at 32px and own a 44px reach of their own in
+   player.css, measured by verify-kotoba-mine; they are not grown here) */
 body:not([data-view='drift']) :is(
-  .icon-button, .kp-icon, .kp-pop-x, .kp-rule-x, .sheet-close, .sheet-search, #bunki-reports-root .br-bug,
-  #app > .chrome > button
+  .icon-button, .kp-icon, .sheet-close, .sheet-search, :where(#bunki-reports-root) .br-bug,
+  :where(#app) > .chrome > button
 ) {
   min-width: 44px;
   min-height: 44px;
@@ -3984,11 +3990,11 @@ body:not([data-view='drift']) :is(
   box-shadow: none;
   cursor: pointer;
 }
-body:not([data-view='drift']) :is(.icon-button, .kp-icon, .kp-pop-x, .kp-rule-x, .sheet-close, .sheet-search, #bunki-reports-root .br-bug):hover { background: var(--color-fill); color: var(--color-ink); }
-body:not([data-view='drift']) :is(.icon-button[aria-expanded='true'], details[open] > .icon-button) { color: var(--color-accent); background: var(--color-tint-wash); }
+body:not([data-view='drift']) :is(.icon-button, .kp-icon, .sheet-close, .sheet-search, :where(#bunki-reports-root) .br-bug):hover { background: var(--color-fill); color: var(--color-ink); }
+body:not([data-view='drift']) :is(.icon-button:where([aria-expanded='true']), details[open] > .icon-button) { color: var(--color-accent); background: var(--color-tint-wash); }
 
 /* ---- E · Door: a paper card with a chevron ---- */
-body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, #shelf-body .grammar-link[data-grade='room']) {
+body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, :where(#shelf-body) .grammar-link:where([data-grade='room'])) {
   position: relative;
   border: var(--stroke-relief) solid var(--color-edge-strong);
   border-radius: var(--radius-card);
@@ -4012,13 +4018,13 @@ body:not([data-view='drift']) :is(.study-door, .dojo-deck)::after {
   transform: rotate(45deg);
   opacity: 0.55;
 }
-body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, #shelf-body .grammar-link[data-grade='room']):hover { border-color: var(--color-ink-2); }
+body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, :where(#shelf-body) .grammar-link:where([data-grade='room'])):hover { border-color: var(--color-ink-2); }
 
 /* ---- F · Segment / tab: words in a row, the chosen one inked and underlined ---- */
 body:not([data-view='drift']) :is(
-  .seg button, .lang-seg button, .kp-seg button, .gs-nav, #bunki-reports-root .br-nav button, .pc nav button,
+  .seg button, .lang-seg button, .kp-seg button, .gs-nav, :where(#bunki-reports-root) .br-nav button, .pc nav button,
   .settings-language button, .settings-layout-choice button, .version-toggle .version-choice, .me-seg button,
-  #variants .vseg button
+  :where(#variants) .vseg button
 ) {
   min-height: 44px;
   padding: 0 10px;
@@ -4032,16 +4038,16 @@ body:not([data-view='drift']) :is(
   cursor: pointer;
 }
 body:not([data-view='drift']) :is(
-  .seg button, .lang-seg button, .kp-seg button, .gs-nav, #bunki-reports-root .br-nav button, .pc nav button,
+  .seg button, .lang-seg button, .kp-seg button, .gs-nav, :where(#bunki-reports-root) .br-nav button, .pc nav button,
   .settings-language button, .settings-layout-choice button, .version-toggle .version-choice, .me-seg button,
-  #variants .vseg button
-):is([aria-pressed='true'], [aria-current='page'], [aria-checked='true'], .is-on, .on) {
+  :where(#variants) .vseg button
+):where([aria-pressed='true'], [aria-current='page'], [aria-checked='true'], .is-on, .on) {
   color: var(--color-ink);
   font-weight: 700;
   background: transparent;
   box-shadow: inset 0 calc(0px - var(--stroke-focus)) 0 currentColor;
 }
-body:not([data-view='drift']) :is(.seg, .lang-seg, .kp-seg, .me-seg, .settings-language, .settings-layout-choice, #variants .vseg) { border: 0; border-radius: var(--radius-control); background: transparent; box-shadow: none; }
+body:not([data-view='drift']) :is(.seg, .lang-seg, .kp-seg, .me-seg, .settings-language, .settings-layout-choice, :where(#variants) .vseg) { border: 0; border-radius: var(--radius-control); background: transparent; box-shadow: none; }
 
 /* ---- G · Grade: the 再難良易 seal bar ---- */
 body:not([data-view='drift']) :is(.kp-grade, .cd-seal, .pc-grades button) {
@@ -4059,7 +4065,7 @@ body:not([data-view='drift']) :is(.japanese-lookup-word, .gs-word, .kp-tok) { bo
 /* the mark: a hairline underline in the reading's colour, no fill — the reader's touched word (the
    header Save's target), the deck's looked-up word, a guided word and a web node under the pointer */
 body:not([data-view='drift']) :is(
-  #reader .tok.tok-current > .tok-word, #reader .tok:hover > .tok-word,
+  :where(#reader) .tok.tok-current > .tok-word, :where(#reader) .tok:hover > .tok-word,
   .kp-tok.kp-lit, .kp-tok:hover, .kp-tok:focus-visible,
   .gs-word:hover, .gs-word:focus-visible, .japanese-lookup-word:hover,
   .ww-node:hover .ww-g, .ww-node:focus-visible .ww-g
@@ -4069,6 +4075,11 @@ body:not([data-view='drift']) :is(
   box-shadow: inset 0 calc(0px - var(--stroke-hairline)) 0 var(--color-reading);
   text-decoration: none;
 }
+/* ---- on the guided session's lacquer sheet (.gs-lacquer, the understanding) a quiet word and a slip take
+   the sheet's own ink and line, so they read on lacquer (axe: colour contrast); the sheet's gold primary is
+   its own (guided-session.css) ---- */
+body:not([data-view='drift']) .gs-lacquer :is(.gs-text, .gs-button:where(:not(.primary))) { color: var(--color-sheet-ink); border-color: var(--color-sheet-line); }
+body:not([data-view='drift']) .gs-lacquer :is(.gs-text, .gs-button:where(:not(.primary))):hover:where(:not(:disabled)) { background: var(--color-sheet-accent-wash); }
 /* END BUNKI BUTTON FAMILIES ================================================= */
 
 /* ==========================================================================

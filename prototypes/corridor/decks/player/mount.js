@@ -204,7 +204,6 @@ function refitBack(saved, always = false) {
 }
 export async function refitPresentation(always = false) {
   const saved = capturePresentation(), owner = ctx, request = mountRequest;
-  syncDefaultLook();
   if (!saved || externalSheet()) return;
   let touched = false;
   const touch = () => { touched = true; };
