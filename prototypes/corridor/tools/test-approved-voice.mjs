@@ -142,6 +142,7 @@ test('The checked-in build stays pending and silent, including every stale saved
     assert.equal(row.querySelectorAll('button').length, 1);
     assert.equal(mark.getAttribute('aria-disabled'), 'true');
     assert.equal(mark.getAttribute('aria-describedby'), 'listen-note');
+    assert.equal(mark.tabIndex, -1, 'the dimmed mark is not a stop on the keyboard\'s way');
     assert.equal(row.dataset.open, 'false');
     assert.equal(row.querySelectorAll('select').length, 0);
     assert.equal(f.fetches.includes('audio/article-narration.json'), false, 'An absent narration flag makes no doomed fetch');

@@ -195,7 +195,7 @@ const markState = (page) => page.evaluate(() => {
   const shown = (n) => !!n && n.checkVisibility() && getComputedStyle(n).visibility !== 'hidden';
   return { open: row?.dataset.open ?? null, pending: !!row?.classList.contains('is-pending'), mark: box(mark), markShown: shown(mark),
     markDim: mark ? parseFloat(getComputedStyle(mark).opacity) : null, markDisabled: mark?.getAttribute('aria-disabled') ?? null,
-    expanded: mark?.getAttribute('aria-expanded') ?? null, describedBy: mark?.getAttribute('aria-describedby') ?? null,
+    expanded: mark?.getAttribute('aria-expanded') ?? null, describedBy: mark?.getAttribute('aria-describedby') ?? null, tab: mark ? mark.tabIndex : null,
     toggleShown: shown(document.querySelector('#listen-toggle')), rateShown: shown(document.querySelector('#listen-rate')),
     noteShown: shown(document.querySelector('#listen-note')), buttons: row ? row.querySelectorAll('button').length : 0 };
 });
@@ -308,8 +308,8 @@ try {
     const { page } = f;
     assert.equal(await barShut(page), true, 'no play control and no picker: the dimmed mark, the pending note as its description');
     const mark = await markState(page);
-    assert.equal(folded(mark) && mark.pending && mark.markDisabled === 'true' && mark.markDim < 1 && mark.describedBy === 'listen-note' && mark.buttons === 1, true,
-      `the pending state is the one mark, dimmed, 44 px, the only control: ${JSON.stringify(mark)}`);
+    assert.equal(folded(mark) && mark.pending && mark.markDisabled === 'true' && mark.markDim < 1 && mark.describedBy === 'listen-note' && mark.buttons === 1 && mark.tab === -1, true,
+      `the pending state is the one mark, dimmed, 44 px, the only control, out of the tab order: ${JSON.stringify(mark)}`);
     const before = await counts(page);
     assert.match(before.note, PENDING, 'the line says that this article has no audio yet');
     assert.equal(before.description, PENDING_VOICES, 'the accessible description names the locked voices');
@@ -339,8 +339,8 @@ try {
     await switchPassage(page);
     assert.equal(await barShut(page), false, 'yasashii:6 is narrated: its bar can open');
     const live = await markState(page);
-    assert.equal(folded(live) && !live.pending && live.markDisabled === null && live.expanded === 'false' && live.markDim === 1, true,
-      `narrated, the bar stands folded to its live mark until a tap: ${JSON.stringify(live)}`);
+    assert.equal(folded(live) && !live.pending && live.markDisabled === null && live.expanded === 'false' && live.markDim === 1 && live.tab === 0, true,
+      `narrated, the bar stands folded to its live mark (a stop on the keyboard's way) until a tap: ${JSON.stringify(live)}`);
     assert.equal((await counts(page)).note, 'Kore');
     assert.equal((await counts(page)).clips.length, 0);
   });

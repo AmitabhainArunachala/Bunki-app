@@ -4881,8 +4881,9 @@ body:not(.zen) #app > .chrome {
   flex-wrap: nowrap;
   align-items: center;
   gap: 0;
-  /* 44 of doors on one hairline: the hairline is outside the 44, so every door sits at y = 0 */
-  height: calc(44px + var(--stroke-hairline, 1px) + env(safe-area-inset-top, 0px));
+  /* 44 of doors on one hairline outside them. The hairline is half a pixel, but a 1x screen draws it as a whole
+     pixel: the frame keeps a full pixel for it, so the doors sit at y = 0 at every density (45 = 44 + 1) */
+  height: calc(45px + env(safe-area-inset-top, 0px));
   min-height: 0;
   max-height: none;
   padding: env(safe-area-inset-top, 0px) 4px 0;
@@ -4897,7 +4898,7 @@ body:not(.zen) #app > .chrome {
   backdrop-filter: none;
 }
 /* the bars that are not the room's chrome sit inside their own layer: no safe-area of their own */
-[data-bar]:not(#app > .chrome) { height: calc(44px + var(--stroke-hairline, 1px)); padding-top: 0; }
+[data-bar]:not(#app > .chrome) { height: 45px; padding-top: 0; }
 [data-bar] > button, [data-bar] .lang-seg button { height: 44px; min-height: 44px; }
 /* the one back glyph: a chevron drawn once, the door's word beside it where there is room */
 [data-bar-back] {

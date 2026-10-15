@@ -10220,6 +10220,8 @@ function buildListenRow(p) {
     listenRow.classList.add('is-pending');
     listenRow.dataset.open = 'false';
     mark.setAttribute('aria-disabled', 'true');
+    // it opens nothing, so it is not a stop on the keyboard's way through the text (as a disabled control is not)
+    mark.tabIndex = -1;
     mark.setAttribute('aria-label', tx('聞く', 'Listen'));
     mark.setAttribute('aria-describedby', 'listen-note');
     listenRow.append(mark, voicePendingNote('listen-note'));
@@ -10812,7 +10814,11 @@ window.__BUNKI_OPEN_SLIP = {
       interaction({ kind: 'quickLook.open' }, 'pointer', `drift-slip-${kind}`);
       return 'opened';
     }
-    return before && !document.getElementById('mini') ? 'dived' : false;
+    const dived = before && !document.getElementById('mini');
+    // the sky opens the entry on the touch's release: its compatibility click must not land on the entry that rose
+    // under the finger (a kanji tile there opened a second entry). One ghost click, once — the hold's own guard
+    if (dived) swallowClickUntil = Date.now() + 700;
+    return dived ? 'dived' : false;
   },
   /** Is the slip open — beside this element, when one is named. */
   isOpen(anchor = null) {
