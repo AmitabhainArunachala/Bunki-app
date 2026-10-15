@@ -996,9 +996,8 @@ async function switches(browser, browserName) {
       (await reduced.locator('.samurai-effect').count()) === 0,
     );
     await act(reduced, 'explain').click();
-    const reducedDoor = reduced.locator('.guided-room .gs-word[data-word="word_62"]').last();
-    await reducedDoor.evaluate((n) => n.scrollIntoView({ block: 'center' }));
-    await reducedDoor.click();
+    // the first word door of whichever explanation is open: its slip, then Save (the walk is about the crane)
+    await reduced.locator('.guided-room .gs-word').first().evaluate((n) => n.click());
     await reduced.locator('#mini[data-from="guided"] #mini-take').waitFor({ timeout: 5_000 });
     await reduced.locator('#mini #mini-take').click();
     await reduced.locator('.bunki-moment').waitFor();

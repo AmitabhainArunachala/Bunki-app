@@ -472,9 +472,13 @@ try {
     await page.locator('.gs-branch-links [data-action=branch]').first().click();
     await record(page, 'guided-branch', language);
     await page.locator('.guided-room [data-action=close-branch]').click();
-    await page.locator('.gs-word').first().click();
+    // the one-hand pass: a word door opens the app's slip beside it (no word room); Escape puts it away
+    await page.locator('.gs-word').first().evaluate((n) => n.click());
+    await page.locator('#mini[data-from="guided"]').waitFor();
     await record(page, 'guided-word', language);
-    await page.locator('.guided-room [data-action=close-word]').first().click();
+    await page.locator('#mini').focus();
+    await page.keyboard.press('Escape');
+    await page.locator('#mini').waitFor({ state: 'detached' });
     await page.locator('.gs-progress [data-index="5"]').click();
     await page.locator('.gs-choice input').first().check();
     await page.locator('.guided-room [data-action=check]').click();

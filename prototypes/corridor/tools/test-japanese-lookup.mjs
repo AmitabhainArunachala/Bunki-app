@@ -15,7 +15,9 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'kataToHira', 'KATA_TO_HIRA_OFFSET', 'normalizeGloss', 'GLOSS_MESSY', 'GLOSS_LEAD',
   'LOOKUP_HELPER_POS', 'japaneseLookupRecord', 'openJapaneseLookup', 'appendJapaneseLookup',
   'enhanceJapaneseProse', 'showMini', 'wordSaveFacts', 'paintWordSave', 'paintMiniPath', 'placeFloating', 'revealFloatingFocus', 'keepFloatingBeside', 'miniAnchor', 'SAVE_PRESS_MS', 'lookupBlockWords', 'setLookupStop', 'japaneseLookupHelpId', 'lookupOccurrence',
-  'lookupItemBlocks', 'findLookupOccurrence', 'japaneseLookupMini', 'lookupWordKey'];
+  'lookupItemBlocks', 'findLookupOccurrence', 'japaneseLookupMini', 'lookupWordKey',
+  // the one-hand pass: the slip's dive into the entry and the close callback every surface hears
+  'slipDive', 'miniDiving', 'miniOnClose', 'slipSummons'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
