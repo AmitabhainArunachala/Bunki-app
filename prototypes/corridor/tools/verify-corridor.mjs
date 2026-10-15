@@ -3506,7 +3506,8 @@ async function main() {
     view: document.body.dataset.view,
   })`);
   check('R3-E · the dojo entered from the galaxy wears a galaxy crumb',
-    dojoProbe.view === 'dojo' && dojoProbe.crumb.trim() === 'galaxy › focus' && dojoProbe.room === 'focus',
+    // one room-name table (one hand, slice E): the crumb names the dojo by its title's word, ROOM_NAMES' 次の稽古 · Up next
+    dojoProbe.view === 'dojo' && dojoProbe.crumb.trim() === 'Galaxy › Up next' && dojoProbe.room === 'Up next',
     `crumb "${dojoProbe.crumb}" · room "${dojoProbe.room}"`);
   await page.tap('#back');
   await page.waitForTimeout(600);
