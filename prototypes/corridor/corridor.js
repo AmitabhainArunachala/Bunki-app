@@ -9024,11 +9024,25 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
   }
   if (typeof ResizeObserver !== 'function') return;
   let last = card.getBoundingClientRect().height;
-  const watch = new ResizeObserver(() => {
-    if (!card.isConnected || !anchor.isConnected) { watch.disconnect(); return; }
+  let grow = null, frame = 0;
+  const seat = () => {
+    if (!card.isConnected || !anchor.isConnected) { watch.disconnect(); grow?.disconnect(); return; }
     if (Math.abs(card.getBoundingClientRect().height - last) < 1) return;
     placeFloating(card, anchor.getBoundingClientRect());
     last = card.getBoundingClientRect().height;
+  };
+  // L · seating the card resizes the very element the ResizeObserver watches (maxHeight), and a size changed inside
+  // its own callback is left undelivered in that frame (WebKit raises it as a page error: Save ▾'s menu unfolding grew
+  // #mini 476 → 399 inside one callback). So the ResizeObserver never writes: a change of the card's own content (the
+  // menu unfolding or folding, a reason line, Save's note) is seated by a MutationObserver before the frame paints, and
+  // a size that changes with no content change (a late font) is seated in the next frame
+  if (typeof MutationObserver === 'function') {
+    grow = new MutationObserver(seat);
+    grow.observe(card, { childList: true, subtree: true, characterData: true });
+  }
+  const watch = new ResizeObserver(() => {
+    if (frame) return;
+    frame = requestAnimationFrame(() => { frame = 0; seat(); });
   });
   watch.observe(card);
 }
