@@ -2861,12 +2861,19 @@ async function main() {
   check('R2-B · explicit stop restores the deck size without changing the revlog',
     undone.taken === envBefore.taken && undone.revlog === envBefore.revlog,
     JSON.stringify(undone));
-  await tap(page, '#reader .tok.content', 9); // the same word again puts its popup away
+  // put the word's menu and popup away one layer at a time, as a finger's Escape would (the same word again would dive)
+  await page.locator('#reader .tok.content').nth(9).focus();
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'));
+  await page.locator('#reader .tok.content').nth(9).focus();
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#mini', { state: 'detached' });
 
   // the popup's Save repaints in place — the popup never blinks.
   // D11 (8d0fbccf) holds the popup's Save for a reader token the core dictionary lacks, and D23 for a
   // spelling another entry's card holds: the save runs on the first token from 12 on whose popup offers
-  // an enabled, not-yet-saved Save; each other popup is put away with a second tap on its word, as a finger would
+  // an enabled, not-yet-saved Save; each other popup is put away with Escape on its word (1.3.0: the same
+  // word again would open its entry)
   const miniCandidates = await page.evaluate(
     `[...document.querySelectorAll('#reader .tok.content')].flatMap((t, i) => (i >= 12 && t.dataset.word !== '学校' ? [i] : []))`,
   );
@@ -2882,7 +2889,9 @@ async function main() {
     })()`);
     if (!seal.disabled && !seal.taken) { miniIx = ix; break; }
     miniSkipped.push(`${seal.word}:${seal.disabled ? 'held' : 'taken'}`);
-    await tap(page, '#reader .tok.content', ix);
+    await page.locator('#reader .tok.content').nth(ix).focus();
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('#mini', { state: 'detached' });
     await page.waitForTimeout(120);
   }
   const miniWordText = await page.evaluate(`document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? ''`);
@@ -2900,9 +2909,10 @@ async function main() {
     miniIx >= 0 && miniCap.miniUp && miniCap.sealTaken === true && miniCap.id === miniWordText && miniCap.scope === 'sent' && !miniCap.window,
     JSON.stringify({ ...miniCap, word: miniWordText, skipped: miniSkipped }));
   if (miniIx >= 0) {
-    // a deliberate second press, not the second half of a double-tap (which the Save ignores, so it cannot undo itself)
-    await page.waitForTimeout(700);
-    await tap(page, '#mini-take');
+    // the save unfolded Save ▾'s menu; its Review row takes the card back out (a second press on Save ▾ within a
+    // breath is the same press, and past it only opens the menu again: Save cannot undo itself)
+    await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #mini-review');
+    await tap(page, '#mini-review');
     await waitForAppRecord(page, record => !record.taken.some(row => row.t === 'word' && row.id === miniWordText),
       { description: 'popup stop memorizing' });
   }
