@@ -686,11 +686,14 @@ async function main() {
           scrollBehavior: style.scrollBehavior,
         };
       };
-      return { sheet: describe('#sheet'), scrim: describe('.scrim'), ruby: describe('#reader rt'),
+      return { sheet: describe('#sheet'), scrims: document.querySelectorAll('.scrim').length, ruby: describe('#reader rt'),
+        cuts: document.getAnimations().filter(animation => String(animation.effect?.pseudoElement || '').startsWith('::view-transition')).length,
         ambient: document.getAnimations().filter(animation => animation.playState === 'running' && animation.effect?.getTiming().iterations === Infinity).length };
     })()`);
     // one hand (slice C): the one reduced-motion rule gives every surviving surface a 120 ms
-    // opacity cross-fade (--motion-room under reduce); the dialog is read exactly, as before
+    // opacity cross-fade (--motion-room under reduce); the dialog is read exactly, as before. G1 (2026-10-16): the entry
+    // is a whole-screen page with no dimming layer at all, so there is no scrim to cross-fade — none may exist — and the
+    // page's match cut never starts under reduced motion: the page alone cross-fades
     const crossfade = entry => entry && entry.animationName === 'feel-fade' && entry.animationDuration === '0.12s'
       && entry.animations.length === 1 && entry.animations.every(animation =>
         animation.name === 'feel-fade' && animation.timing.iterations === 1
@@ -698,12 +701,12 @@ async function main() {
         && animation.timing.delay + animation.timing.duration <= 120
         && animation.properties.length >= 2
         && animation.properties.every(properties => properties.length === 1 && properties[0] === 'opacity'));
-    const stationary = [motion.sheet, motion.scrim, motion.ruby].every(entry => entry
+    const stationary = [motion.sheet, motion.ruby].every(entry => entry
       && entry.transitionDuration === '0s' && entry.scrollBehavior === 'auto');
-    const still = stationary && crossfade(motion.sheet) && crossfade(motion.scrim)
+    const still = stationary && crossfade(motion.sheet) && motion.scrims === 0 && motion.cuts === 0
       && (motion.ruby.animationName === 'none' || motion.ruby.animationDuration === '0s')
       && motion.ambient === 0;
-    check('reduced-motion keeps exact short opacity-only dialog crossfades and removes movement', still, JSON.stringify(motion));
+    check('reduced-motion keeps the page\'s exact short opacity-only crossfade — no dimming layer, no view transition — and removes movement', still, JSON.stringify(motion));
     await reducedPage.screenshot({ path: resolve(SHOTS_DIR, '03-reduced-motion-dialog.png') });
     await reducedContext.close();
 
