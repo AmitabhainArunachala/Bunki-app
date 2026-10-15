@@ -878,7 +878,7 @@ body:not(.zen) #app > .chrome > #reader-take:disabled { display: none; }
 
 /* ONE button system, app-wide (FEEL, 2026-10-02): primary = the accent filled, white text;
    secondary = an accent-tinted fill with accent text and no border (every plain .chip is one);
-   tertiary = a plain text button. 12px radius, 44px tall, a press scales to .97. Bilingual labels
+   tertiary = a plain text button. 12px radius, 44px tall; a press dims (the one press rule). Bilingual labels
    sit on one baseline: Japanese at full weight, English smaller and lighter. */
 body .chip, body.v-depth-layered .chip {
   min-height: 44px;
@@ -890,10 +890,8 @@ body .chip, body.v-depth-layered .chip {
   color: var(--tint);
   font: 600 15px/1.25 var(--sans);
   letter-spacing: 0;
-  transition: transform 140ms var(--ease);
 }
 body .chip:hover:not(:disabled):not([aria-disabled='true']) { background: color-mix(in srgb, var(--tint) 18%, transparent); }
-body .chip:active:not(:disabled):not([aria-disabled='true']) { transform: scale(0.97); }
 body .chip:disabled, body.v-depth-layered .chip:disabled, body .chip[aria-disabled='true'] { opacity: 1; background: var(--fill); color: color-mix(in srgb, var(--label) 42%, transparent); }
 /* a graph's node kinds keep their own quiet tint instead of coloured, dashed or doubled edges */
 body.v-depth-layered .chip:is(.t-kanji, .t-word, .t-radical, .t-idiom) { border: 0; }
@@ -949,7 +947,6 @@ body .btn-tertiary, body .chip.btn-tertiary {
   font: 600 15px/1.4 var(--sans);
 }
 body .btn-tertiary:hover:not(:disabled) { background: var(--fill); }
-@media (prefers-reduced-motion: reduce) { body .chip { transition: none; } body .chip:active:not(:disabled) { transform: none; } }
 .icon-button {
   display: inline-grid;
   place-items: center;
@@ -1348,7 +1345,6 @@ body #shelf-body .story-card {
   body #shelf-body .story-card:hover { box-shadow: var(--shadow-lift); transform: translateY(-3px); }
   #shelf-body .story-card:hover .story-img { transform: scale(1.03); }
 }
-body #shelf-body .story-card:active { transform: scale(0.99); }
 body #shelf-body .story-card:focus-within { outline: 2px solid var(--tint); outline-offset: 3px; }
 #shelf-body .story-card .shelf-open {
   display: flex;
@@ -1567,7 +1563,7 @@ body #shelf-body .story-glossary { box-shadow: 0 0 0 0.5px var(--separator), 0 1
 
 @media (prefers-reduced-motion: reduce) {
   body #shelf-body .story-card, .story-picture .story-img, .shelf-encounter { transition: none; }
-  body #shelf-body .story-card:hover, body #shelf-body .story-card:active { transform: none; }
+  body #shelf-body .story-card:hover { transform: none; }
   #shelf-body .story-card:hover .story-img { transform: none; }
 }
 
@@ -3272,7 +3268,6 @@ body:not(.ui-bi) .primary-tabs .primary-tab { font: 800 13px/1 var(--font-displa
 .primary-tabs .primary-tab[aria-current='page'] { background: transparent; color: var(--color-ink); font-weight: 700; }
 body:not(.ui-bi) .primary-tabs .primary-tab[aria-current='page'] { font-weight: 800; }
 .primary-tabs .primary-tab[aria-current='page'] .station-node { opacity: 0; }
-.primary-tabs .primary-tab:active { color: var(--color-ink); }
 .primary-tabs .primary-tab:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 /* the car: one filled square that travels the line */
 .primary-tabs .line-car {
@@ -3410,7 +3405,6 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
   min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none;
   color: transparent; font-size: 0; -webkit-tap-highlight-color: transparent; cursor: pointer;
 }
-#app .kp-study > #kp-reveal:active { transform: none; }
 #app .kp-study > #kp-reveal:focus-visible { outline: none; box-shadow: inset 2px 0 0 color-mix(in srgb, var(--kp-stage-ink) 55%, transparent); }
 /* with no slab at the foot, the page runs to the bottom of the screen and can scroll clear of it */
 #app .kp-study:has(> #kp-reveal) { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
@@ -4192,13 +4186,8 @@ body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-
   box-shadow: var(--elevation-press);
   font: 600 15px/1.25 var(--font-ui);
   letter-spacing: 0.02em;
-  transition: transform var(--motion-press) var(--ease-standard);
 }
 body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary):hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 88%, #000); }
-body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary):active:not(:disabled) {
-  transform: translateY(2px);
-  box-shadow: 0 0 0 var(--color-press), 0 4px 10px -6px rgb(20 26 40 / 30%);
-}
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(.zen):not([data-view='drift']) :is(.take:not(.taken):not(.quiet), .btn-primary, .chip.btn-primary) {
   background: color-mix(in srgb, var(--color-accent) 9%, var(--color-ground));
   color: var(--color-accent);
@@ -4253,10 +4242,8 @@ body.v-depth-layered:not([data-view='drift']) :is(
 }
 body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door) {
   background: var(--color-surface);
-  transition: transform var(--motion-press) var(--ease-standard);
 }
 body.v-depth-layered:not([data-view='drift']) .study-door { padding: var(--space-4) var(--space-4) var(--space-4); margin: 0 0 var(--space-2); }
-body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door):active { transform: translateY(1px); box-shadow: var(--elevation-paper); }
 body:not([data-view='drift']) .foundation-door {
   display: flex;
   flex-direction: row;
@@ -4446,9 +4433,6 @@ body:not([data-view='drift']) .focus-chip { border-color: var(--color-line-chip,
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .primary-tabs .station-due { text-shadow: none; }
 
-@media (prefers-reduced-motion: reduce) {
-  body:not(.zen):not([data-view='drift']) :is(.take, .btn-primary, .chip.btn-primary, .study-door, .foundation-door) { transition: none; }
-}
 /* END BUNKI SKIN ============================================================ */
 
 /* ==========================================================================
@@ -5008,16 +4992,18 @@ body:not(.ui-bi):not([data-view='drift']) #sheet .eyebrow { font-size: 12px; let
 /* ---- titles: the woodblock voice, set tight ---- */
 main h1.view-title, main h1.exam-heading, .assessment-room > h1 { letter-spacing: -0.005em; line-height: 1.12; }
 
-/* ---- press: the touch lands at once (iOS gives :active only with a touch listener,
-   which the shell adds); it lets go in 150ms. Zero specificity: a room's own press wins.
-   Text and glyph controls dim; paper doors and cards press down instead; words in the
-   text (reader tokens, lookup words, web nodes) keep their own selection marks. ---- */
+/* ---- the one press (slice C): every control answers the finger the same way. The touch lands
+   at once (iOS gives :active only with a touch listener, which the shell adds): the control dims
+   to .55 with no transition, and lets go over var(--motion-press). This is the only press rule in
+   the house — no room, deck, door or card presses on its own, and nothing moves under the finger.
+   Words in the text (reader tokens, lookup words, web nodes, deck tokens) keep their own
+   selection marks and never dim. ---- */
 :where(body:not([data-view='drift'])) :where(button, [role='button'], a[href], summary) {
   transition-property: opacity;
-  transition-duration: var(--motion-quick);
+  transition-duration: var(--motion-press);
   transition-timing-function: var(--ease-standard);
 }
-:where(body:not([data-view='drift'])) :where(button:not(:disabled), [role='button'], a[href], summary):where(:not(.study-door, .foundation-door, .dojo-deck, .shelf-open, .world-stone, .tok, .japanese-lookup-word, .ww-node, .kp-tok)):active {
+:where(body:not([data-view='drift'])) :where(button:not(:disabled), [role='button'], a[href], summary):where(:not(.tok, .japanese-lookup-word, .ww-node, .kp-tok)):active {
   opacity: 0.55;
   transition-duration: 0s;
 }
@@ -5030,14 +5016,6 @@ body:not([data-view='drift'])::before { will-change: transform; }
 /* the full entry rises on the iOS sheet curve: the same 280ms and travel, only the curve
    changes, so it settles like a native sheet instead of easing in mushily */
 body.v-depth-layered .sheet, body .sheet { animation-timing-function: var(--ease-sheet); }
-body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, .shelf-open):active {
-  transform: scale(0.985);
-  transition: transform var(--motion-press) var(--ease-standard);
-}
-@media (prefers-reduced-motion: reduce) {
-  :where(body:not([data-view='drift'])) :where(button, [role='button'], a[href], summary),
-  body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, .shelf-open):active { transition: none; }
-}
 /* ---- D7 (John: "Keep them for now — figure out the smartest way to work with this"): the
    header's search · Learn · Lists stay, ids and 44px intact, as one quiet tools group of glyphs.
    One signal per fact: what is due shows once, on the Line's Today station, where the cards are

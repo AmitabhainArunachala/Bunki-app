@@ -153,8 +153,9 @@ html:is([data-room='search'], [data-room='word-web']) .ww-node {
   -webkit-tap-highlight-color: transparent;
 }
 html:is([data-room='search'], [data-room='word-web']) .ww-node:focus-visible { outline: 2px solid var(--color-live); outline-offset: 2px; border-radius: 4px; }
-html:is([data-room='search'], [data-room='word-web']) .ww-nb { position: relative; display: grid; place-items: center; transition: transform var(--motion-press, 90ms) var(--ease-standard, ease); }
-html:is([data-room='search'], [data-room='word-web']) .ww-node:active .ww-nb { transform: scale(0.94); }
+html:is([data-room='search'], [data-room='word-web']) .ww-nb { position: relative; display: grid; place-items: center; }
+/* a word in the web keeps the word family's own mark under the finger (the reader token's wash), never the press-dim */
+html:is([data-room='search'], [data-room='word-web']) .ww-node:active .ww-nb { background: var(--red-wash); border-radius: 999px; }
 html:is([data-room='search'], [data-room='word-web']) .ww-g { display: block; }
 html:is([data-room='search'], [data-room='word-web']) .ww-cap {
   max-width: 92px; padding: 0 3px; overflow: hidden; background: var(--ww-solid);
@@ -329,9 +330,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-follow {
   display: flex; flex-direction: column; align-items: flex-start; gap: 4px; width: calc(100% - 16px); min-height: 44px; margin: var(--space-3, 12px) 8px 0; padding: 12px 14px;
   border: 1px solid var(--color-rule); border-radius: var(--radius-card, 4px);
   background: var(--ww-solid); color: var(--color-ink); text-align: left; cursor: pointer;
-  transition: transform var(--motion-press, 90ms) var(--ease-standard, ease);
 }
-html:is([data-room='search'], [data-room='word-web']) .ww-follow:active { transform: translateY(1px); }
 html:is([data-room='search'], [data-room='word-web']) .ww-follow-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; font: 500 15px/1.4 var(--font-ui); }
 html:is([data-room='search'], [data-room='word-web']) .ww-follow-k { font: 800 21px/1.1 var(--font-headword, var(--font-display)); color: var(--color-accent); }
 html:is([data-room='search'], [data-room='word-web']) .ww-follow-p { display: inline-block; margin-left: 4px; font: 800 28px/1 var(--font-headword, var(--font-display)); color: var(--color-ink); }

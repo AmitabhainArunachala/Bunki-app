@@ -526,8 +526,7 @@ body.ginga #drift-layer #hint.first-cue {
     opacity 0.5s ease, transform 0.3s ease;
 }
 .ginga-seal:hover,
-.ginga-seal:focus-visible,
-.ginga-seal:active {
+.ginga-seal:focus-visible {
   opacity: 1;
   background: color-mix(in srgb, var(--ground-0, #f4efe3) 82%, transparent);
   border-color: color-mix(in srgb, var(--line, #cfc7b5) 70%, transparent);
@@ -692,10 +691,6 @@ body.ginga #drift-layer #hint.first-cue {
 .nav-dojo:hover {
   background: color-mix(in srgb, var(--ai, #2e4d6e) 18%, transparent);
 }
-.nav-review:active,
-.nav-dojo:active {
-  transform: scale(0.97);
-}
 .nav-review .l-ja,
 .nav-dojo .l-ja {
   display: inline;
@@ -768,8 +763,7 @@ html[data-layout='places'] .nav-station {
 html[data-layout='places'] .nav-station:first-child {
   border-top: 0;
 }
-html[data-layout='places'] .nav-station:hover,
-html[data-layout='places'] .nav-station:active {
+html[data-layout='places'] .nav-station:hover {
   background: color-mix(in srgb, var(--ai, #2e4d6e) 8%, transparent);
 }
 html[data-layout='places'] .nav-station-t {
@@ -811,7 +805,7 @@ html[data-layout='places'] .nav-station-go {
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-station {
   border-top-color: rgb(255 255 255 / 12%);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-station:is(:hover, :active) {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-station:hover {
   background: rgb(255 255 255 / 7%);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-layout='places'] .nav-station-t {
@@ -1016,10 +1010,6 @@ html[data-layout='places'] .nav-station-go {
   box-shadow: 0 2px 6px rgb(0 0 0 / 6%), 0 12px 32px rgb(20 26 34 / 14%);
   cursor: pointer;
   animation: bubble-rise 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
-  transition: transform 0.14s ease;
-}
-.corner-bubble:active {
-  transform: scale(0.97);
 }
 .corner-bubble .l-ja {
   display: inline;
@@ -1210,9 +1200,6 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
   border-radius: 10px;
   cursor: pointer;
   color: var(--ink);
-}
-.cat-cell:active {
-  background: var(--ground-2, #eee);
 }
 .cat-glyph {
   font-family: var(--serif);
@@ -2101,9 +2088,6 @@ button.pool-tag.cat-chip {
   padding: 13px 2px;
   cursor: pointer;
 }
-.tray-line:active {
-  background: color-mix(in srgb, var(--ink, #222) 4%, transparent);
-}
 
 .tray-line .w {
   font-family: var(--serif);
@@ -2472,9 +2456,6 @@ button.pool-tag.cat-chip {
   user-select: none;
   -webkit-user-select: none;
 }
-.theme-seal:active {
-  opacity: 0.6;
-}
 
 /* the eleven world-stones — the direct picker, in two named rows (day, night:
  * D2, both night looks are offered). Each stone previews its own world (inline
@@ -2548,7 +2529,6 @@ button.pool-tag.cat-chip {
   border-color: var(--stone-red, var(--red));
   box-shadow: 0 0 0 1px var(--stone-red, var(--red)), inset 0 0 0 1px color-mix(in srgb, var(--ink) 30%, transparent);
 }
-.world-stone:active { transform: scale(0.92); }
 
 /* ------------------------------------------------------ bilingual chrome */
 .en-sub {
@@ -4508,9 +4488,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   min-height: 78px;
   color: var(--ink);
 }
-.grade.hanko:active {
-  background: color-mix(in srgb, var(--ink, #222) 7%, transparent);
-}
 
 .grade.hanko .g-seal {
   width: var(--seal-size);
@@ -4534,9 +4511,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   color: var(--ink-2);
 }
 
-.grade.hanko:active .g-seal {
-  transform: translateY(1px);
-}
 
 .grade.hanko.g-again .g-seal {
   color: var(--red);
@@ -6106,9 +6080,6 @@ body.zen .review-example {
   color: var(--ai, #2e4d6e);
   cursor: pointer;
 }
-.more-row:active {
-  opacity: 0.6;
-}
 
 /* AI-generated leveled example sentences (Phase 3, key-gated). Each card is a
  * sentence with a small JLPT-level chip, its reading, and the English. */
@@ -7000,9 +6971,6 @@ body.zen .grade.hanko {
   border: 1px solid color-mix(in srgb, var(--zen-accent) 18%, transparent);
   background: color-mix(in srgb, var(--zen-stage-crown) 72%, transparent);
 }
-body.zen .grade.hanko:active {
-  background: color-mix(in srgb, #000 30%, transparent);
-}
 body.zen .grade.hanko .g-label {
   color: var(--zen-text);
 }
@@ -7169,10 +7137,6 @@ body.zen .review-example {
   body.zen .grade-row .grade:nth-child(4) {
     animation-delay: 200ms;
   }
-  /* the stamp: one crisp gesture in a slow room */
-  body.zen .grade.hanko:active .g-seal {
-    transform: translateY(1px) scale(0.94);
-  }
   .say.is-speaking svg {
     animation: kairo-say-breath 6s var(--ease-breath) infinite;
   }
@@ -7242,8 +7206,7 @@ body.zen .review-example {
   height: 17px;
 }
 .ginga-search:hover,
-.ginga-search:focus-visible,
-.ginga-search:active {
+.ginga-search:focus-visible {
   opacity: 1;
   background: color-mix(in srgb, var(--ground-0, #f4efe3) 82%, transparent);
   border-color: color-mix(in srgb, var(--line, #cfc7b5) 70%, transparent);
@@ -8170,9 +8133,6 @@ body.zen .review-reveal {
 .grade.anki.g-good .g-label { color: var(--srs-due); }
 .grade.anki.g-easy { border-top-color: var(--srs-new); }
 .grade.anki.g-easy .g-label { color: var(--srs-new); }
-.grade.anki:active {
-  transform: translateY(1px);
-}
 body.zen .grade.anki {
   border-color: color-mix(in srgb, var(--zen-text) 22%, transparent);
   background: color-mix(in srgb, var(--zen-stage-crown) 88%, transparent);

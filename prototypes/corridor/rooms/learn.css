@@ -238,7 +238,6 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   color: var(--learn-card-ink);
   box-shadow: 0 2px 0 color-mix(in srgb, var(--learn-card) 40%, #000), 0 0 22px color-mix(in srgb, var(--color-gold) 24%, transparent);
 }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go:active { transform: translateY(2px); box-shadow: 0 0 0 transparent, 0 6px 16px rgb(0 0 0 / 30%); }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go :is(.study-door-t, .learn-go-t) { font: 700 17px/1.25 var(--font-ui); color: inherit; letter-spacing: 0.01em; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go .study-door-sub { font: 500 12px/1.2 var(--font-ui); color: inherit; opacity: 0.74; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go-quiet {
@@ -365,7 +364,6 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .study-door-t { font: 800 18px/1.25 var(--font-headword); color: var(--color-ink); }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .study-door-sub { font: 400 13px/1.45 var(--font-ui); color: var(--color-ink-2); }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .study-door:active { transform: translateY(1px); }
 
 /* 02 the ledger: name and words left, due/new right, a slim hairline of words begun */
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-decks { display: block; margin: 0; padding: 0; border: 0; background: none; box-shadow: none; }
@@ -465,7 +463,6 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   font: 600 15px/1 var(--font-ui);
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .take.focus-start .l-ja { color: inherit; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .take.focus-start:active { transform: translateY(2px); box-shadow: none; }
 
 /* 04 the three lengths */
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-lengths { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0 12px; }

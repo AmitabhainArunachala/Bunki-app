@@ -123,8 +123,7 @@ html[data-room='tray'] .today-star.due {
   animation: today-breath 7s ease-in-out var(--d, 0s) infinite alternate;
 }
 @keyframes today-breath { from { opacity: 0.94; } to { opacity: 0.66; } }
-html[data-room='tray'] .today-star:hover,
-html[data-room='tray'] .today-star:active { opacity: 1; transform: scale(1.12); }
+html[data-room='tray'] .today-star:hover { opacity: 1; transform: scale(1.12); }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-star.due {
   color: color-mix(in srgb, var(--color-gold) 55%, var(--color-ink));
   text-shadow: 0 0 12px color-mix(in srgb, var(--color-gold) 55%, transparent);
@@ -190,9 +189,7 @@ html:is([data-room='tray'], [data-room='search']) .dw-word {
   background: none;
   color: var(--color-ink);
   cursor: pointer;
-  transition: transform var(--motion-press) var(--ease-standard);
 }
-html:is([data-room='tray'], [data-room='search']) .dw-word:active { transform: scale(0.985); }
 html:is([data-room='tray'], [data-room='search']) .dw-glyph {
   display: flex;
   gap: 0.02em;
@@ -565,7 +562,6 @@ html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero >
 }
 html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero > .today-sky + .today-universe { margin-top: -44px; }
 html[data-room='tray'] body:not(.ui-bi) #app > main > .today-hero > .today-universe { font: 800 13px/1 var(--font-headword); letter-spacing: 0.06em; }
-html[data-room='tray'] #app > main > .today-hero > .today-universe:active { transform: scale(0.97); }
 html[data-room='tray'] .today-universe .today-arrow { width: 16px; margin-left: 0; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-universe {
   color: color-mix(in srgb, var(--color-gold) 70%, var(--color-ink));

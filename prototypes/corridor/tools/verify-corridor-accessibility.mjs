@@ -705,6 +705,90 @@ async function main() {
     await reducedPage.screenshot({ path: resolve(SHOTS_DIR, '03-reduced-motion-dialog.png') });
     await reducedContext.close();
 
+    console.log('\n— the one press');
+    // One hand (slice C, 2026-10-15): every control answers the finger the same way. The one press
+    // rule in editorial.css dims a control to .55 and nothing moves under the finger. Two reads:
+    // the stylesheets themselves (no :active rule may declare a transform, translate or scale;
+    // exactly one declares an opacity, and it is .55, in editorial.css), and a live hold on the
+    // three families John presses most — a primary button, a chip and a door.
+    const pressContext = await browser.newContext({
+      viewport: VIEWPORT,
+      deviceScaleFactor: 2,
+      hasTouch: true,
+      isMobile: true,
+    });
+    await pressContext.clock.setSystemTime(SHELF_DAY);
+    const pressPage = await pressContext.newPage();
+    await openReader(pressPage, base);
+    const pressRules = await pressPage.evaluate(`(() => {
+      const presses = [];
+      const walk = (rules, sheet) => {
+        for (const rule of rules) {
+          if (rule instanceof CSSStyleRule && rule.selectorText.includes(':active')) {
+            const transform = rule.style.getPropertyValue('transform').trim();
+            const moves = [transform !== 'none' && transform, rule.style.getPropertyValue('translate').trim(), rule.style.getPropertyValue('scale').trim()].filter(Boolean);
+            presses.push({ sheet, selector: rule.selectorText.slice(0, 90), moves: moves.join(' '), opacity: rule.style.getPropertyValue('opacity').trim() });
+          }
+          if (rule.cssRules) walk(rule.cssRules, sheet);
+        }
+      };
+      for (const sheet of document.styleSheets) {
+        let rules;
+        try { rules = sheet.cssRules; } catch { continue; }
+        walk(rules, (sheet.href || 'inline').split('/').pop());
+      }
+      return presses;
+    })()`);
+    const movingPresses = pressRules.filter((rule) => rule.moves);
+    const dimPresses = pressRules.filter((rule) => rule.opacity);
+    check(
+      'one press: no :active rule in any loaded stylesheet moves its control (transform, translate or scale)',
+      pressRules.length > 0 && movingPresses.length === 0,
+      movingPresses.length ? JSON.stringify(movingPresses.slice(0, 4)) : `${pressRules.length} :active rules read, none moves`,
+    );
+    check(
+      'one press: exactly one :active rule dims, to .55, and it lives in editorial.css',
+      dimPresses.length === 1 && dimPresses[0].opacity === '0.55' && dimPresses[0].sheet === 'editorial.css',
+      JSON.stringify(dimPresses),
+    );
+    // a real hold on the glass (CDP touch, as the phone gives it): read the control while it is held
+    const holdSample = async (page, family, selector) => {
+      const target = page.locator(selector).first();
+      await target.waitFor({ state: 'visible', timeout: 10_000 });
+      await target.scrollIntoViewIfNeeded();
+      const box = await target.boundingBox();
+      const cdp = await page.context().newCDPSession(page);
+      const point = { x: box.x + box.width / 2, y: box.y + box.height / 2, radiusX: 5, radiusY: 5, force: 1 };
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
+      await page.waitForTimeout(260);
+      const held = await target.evaluate((node) => {
+        const style = getComputedStyle(node);
+        return { active: node.matches(':active'), opacity: style.opacity, transform: style.transform };
+      });
+      // the finger lifts off to the side: the control is released without being clicked
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
+      await cdp.detach();
+      await page.waitForTimeout(260);
+      const released = await target.evaluate((node) => ({ active: node.matches(':active'), opacity: getComputedStyle(node).opacity }));
+      return { family, selector, held, released };
+    };
+    const pressed = [];
+    await openWordDialog(pressPage);
+    pressed.push(await holdSample(pressPage, 'primary button', '#sheet .take:visible'));
+    pressed.push(await holdSample(pressPage, 'chip', ':is(#sheet, #app main) .chip:visible'));
+    await pressPage.keyboard.press('Escape');
+    await pressPage.waitForSelector('#sheet', { state: 'detached' });
+    await pressPage.locator('#chrome-dojo').click();
+    pressed.push(await holdSample(pressPage, 'door', '.study-door:visible'));
+    const samePress = (sample) => sample.held.active && sample.held.opacity === '0.55' && sample.held.transform === 'none'
+      && !sample.released.active && sample.released.opacity === '1';
+    check(
+      'one press: a held primary button, chip and door all dim to .55 without moving, and let go to 1',
+      pressed.length === 3 && pressed.every(samePress),
+      JSON.stringify(pressed),
+    );
+    await pressContext.close();
+
     // Quiet-label contrast across the exact ten public worlds and the retained
     // legacy-only 殻 world. The WCAG contrast
     // variant once pinned light-world ink values that sank every label into

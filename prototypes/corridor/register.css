@@ -252,7 +252,6 @@ html[data-register="shelf"] .search-field::placeholder { color: var(--faint); }
 #shelf-body button.grammar-link[data-grade="tool"] small,
 #shelf-body button.grammar-link[data-grade="tool"] span:last-child { display: none; }
 #shelf-body button.grammar-link[data-grade="room"]:nth-of-type(5) { grid-column: 1 / -1; font-size: 24px; }
-#shelf-body button.grammar-link[data-grade="room"]:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(28,47,66,0.06); }
 /* phones: after the base door rules, so they actually win at equal specificity (Codex 06:46Z) */
 @media (max-width: 520px) {
   #shelf-body button.grammar-link[data-grade="room"] { grid-column: 1 / -1; }
