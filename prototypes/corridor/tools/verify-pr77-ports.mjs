@@ -191,7 +191,7 @@ PROBES['crumb-origin'] = async () => {
   await settle(page);
   const trayBack = await page.evaluate(() => document.body.dataset.view);
   check('d9f0b984 · the tray opened from the galaxy names the galaxy, where its 戻る goes',
-    /^(銀河|galaxy)/.test(trayCrumb) && trayBack === 'drift', JSON.stringify({ trayCrumb, trayBack }));
+    /^(銀河|Galaxy) › (今日|Today)$/.test(trayCrumb) && trayBack === 'drift', JSON.stringify({ trayCrumb, trayBack }));
 
   await open(page);
   await page.click('#tray');
@@ -209,7 +209,7 @@ PROBES['crumb-origin'] = async () => {
   await settle(page);
   const reviewBack = await page.evaluate(() => document.body.dataset.view);
   check('d9f0b984 · a plain review names Today, the tray its 戻る reopens',
-    /(今日|Today).*(復習|review)/.test(reviewCrumb) && reviewBack === 'tray', JSON.stringify({ reviewCrumb, reviewBack }));
+    /(今日|Today) › (復習|Review)$/.test(reviewCrumb) && reviewBack === 'tray', JSON.stringify({ reviewCrumb, reviewBack }));
   await context.close();
 };
 
