@@ -1489,7 +1489,12 @@ try {
       for (const id of [NARRATED, ARTICLE]) {
         await openArticle(page, id);
         const listen = page.locator('#listen-toggle');
-        if (await listen.count() && await listen.isEnabled()) { await listen.click(); await page.waitForTimeout(1500); }
+        // the bar stands folded to its mark (one-hand 5a-ii): the mark opens it before its play control is pressed
+        if (await listen.count()) {
+          await page.locator('#listen-open').click();
+          await page.waitForSelector('.listen-row.play-bar[data-open="true"]', { timeout: 5000 });
+          if (await listen.isEnabled()) { await listen.click(); await page.waitForTimeout(1500); }
+        }
       }
       const listenText = await page.evaluate(() => document.querySelector('.listen-row')?.innerText ?? '');
       const f1 = requests.filter((u) => /\/audio\/(narration|w)\/f1\//u.test(u));

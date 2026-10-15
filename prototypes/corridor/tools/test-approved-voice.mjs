@@ -137,7 +137,12 @@ test('The checked-in build stays pending and silent, including every stale saved
     assert.equal(row.querySelector('#listen-note').getAttribute('aria-description'), language === 'ja'
       ? '音声は Kore、第二話者は Charon に固定されています。' : 'Approved voices: Kore (main), Charon (second).',
     'The accessible description names the locked voices');
-    assert.equal(row.querySelectorAll('button').length, 0);
+    // the one mark, dimmed (John, 2026-10-15 17:20): the only control, described by the pending note, the bar folded
+    const mark = row.querySelector('#listen-open');
+    assert.equal(row.querySelectorAll('button').length, 1);
+    assert.equal(mark.getAttribute('aria-disabled'), 'true');
+    assert.equal(mark.getAttribute('aria-describedby'), 'listen-note');
+    assert.equal(row.dataset.open, 'false');
     assert.equal(row.querySelectorAll('select').length, 0);
     assert.equal(f.fetches.includes('audio/article-narration.json'), false, 'An absent narration flag makes no doomed fetch');
     const quote = { textContent: '引用。', after() { assert.fail('Pending narration must not create a listen button'); } };
@@ -160,6 +165,17 @@ test('Only the exact approved narration voice identities are accepted; missing o
     const f = await fixture({ narration: approvedManifest(voice) });
     assert.equal(f.loadedNarration()?.voice, voice);
     assert.equal(f.bar().querySelector('#listen-note').textContent, voice === 'kore' ? 'Kore' : 'Charon');
+    // narrated: the bar is folded to its live mark; the mark's tap holds it open, a second tap folds it
+    const row = f.bar();
+    assert.equal(row.dataset.open, 'false');
+    assert.equal(row.querySelector('#listen-open').getAttribute('aria-expanded'), 'false');
+    assert.equal(row.querySelector('#listen-open').getAttribute('aria-disabled'), null);
+    const refreshesBefore = f.refreshes;
+    row.querySelector('#listen-open').handlers.click();
+    assert.equal(f.state.barOpen, true); assert.equal(f.refreshes, refreshesBefore + 1);
+    assert.equal(f.bar().dataset.open, 'true');
+    f.bar().querySelector('#listen-open').handlers.click();
+    assert.equal(f.state.barOpen, false); assert.equal(f.bar().dataset.open, 'false');
     assert.deepEqual(f.fetches.filter(url => url === 'audio/article-narration.json'), ['audio/article-narration.json']);
     assert.equal(f.created.length, 0, 'Loading an approved fixture does not autoplay');
   }

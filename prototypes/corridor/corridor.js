@@ -9844,7 +9844,7 @@ function glossaryCrossRefPlan(p) {
  * the locked voices in its accessible description. Nothing here writes learner state. */
 // failed: null, or { pid, voice } — the failure belongs to the article and voice that failed, so a
 // different article or a new voice choice never inherits its note
-const readAloud = { on: false, timer: null, failed: null, generation: 0, clip: 0, total: 0, rate: 1 };
+const readAloud = { on: false, timer: null, failed: null, generation: 0, clip: 0, total: 0, rate: 1, barOpen: false };
 /* The narration voice is locked (operator, blind audition 2026-09-29): Google Gemini TTS Kore
  * reads, Charon is the second speaker. JVNV F1 was rated 1/5 and withdrawn; it never plays.
  * Narration ships as audio/article-narration.json ({ v: 1, voice, articles: { id: { clips } } })
@@ -10131,8 +10131,8 @@ function refreshListenRow() {
   if (!row || !p || row.dataset.passage !== p.id) return;
   const focusedId = row.contains(document.activeElement) ? document.activeElement.id : null;
   const next = buildListenRow(p);
-  // in place: a play bar that replaces the instrument line's pending mark docks at the foot on a
-  // phone (fixed) and takes the mark's own line on a desk, so the text under it does not move
+  // in place: the row swaps where it stands (the foot of a phone, its own line on a desk), so the text under
+  // it does not move; the keyboard stays on the mark or the control it was on
   row.replaceWith(next);
   if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
 }
@@ -10171,20 +10171,38 @@ function voicePendingNote(id) {
 
 /** The reader's play bar, built on its own so a late narration manifest can refresh just this
  * row in place — the focused token or glossary entry elsewhere in the reader is never replaced.
- * It carries only the locked narration voice. With no clips for this article in that voice it is
- * a quiet absence label with voice provenance in its accessible description: no picker,
- * no stand-in voice, no disabled control. */
+ * It carries only the locked narration voice. One glyph when idle (John, 2026-10-15 17:20): a speaker
+ * mark, 44 px, quiet, bottom-right above the tabs; a tap opens the clean bar (play · progress · voice ·
+ * speed), a tap on the mark closes it. With no clips for this article in that voice it is the same mark,
+ * dimmed, the absence and the voice provenance in its description: no picker, no stand-in voice. */
 function buildListenRow(p) {
   const listenRow = el('div', 'listen-row play-bar');
   listenRow.dataset.passage = p.id;
   const clips = narrationClips(p);
+  const mark = el('button', 'play-mark');
+  mark.type = 'button';
+  mark.id = 'listen-open';
+  mark.append(uiIcon('speaker'));
   if (!clips.length) {
     listenRow.classList.add('is-pending');
-    listenRow.append(voicePendingNote('listen-note'));
+    listenRow.dataset.open = 'false';
+    mark.setAttribute('aria-disabled', 'true');
+    mark.setAttribute('aria-label', tx('聞く', 'Listen'));
+    mark.setAttribute('aria-describedby', 'listen-note');
+    listenRow.append(mark, voicePendingNote('listen-note'));
     return listenRow;
   }
-  if (readAloud.pid !== p.id) { readAloud.pid = p.id; readAloud.clip = 0; readAloud.failed = null; }
+  if (readAloud.pid !== p.id) { readAloud.pid = p.id; readAloud.clip = 0; readAloud.failed = null; readAloud.barOpen = false; }
   readAloud.total = clips.length;
+  // the bar stands open while it plays, or while the learner holds it open; otherwise it is the mark alone
+  const open = readAloud.on || !!readAloud.barOpen;
+  listenRow.dataset.open = String(open);
+  mark.setAttribute('aria-expanded', String(open));
+  mark.setAttribute('aria-label', open ? tx('音声の操作をとじる', 'Close the player') : tx('聞く', 'Listen'));
+  mark.addEventListener('click', () => {
+    readAloud.barOpen = !open;
+    refreshListenRow();
+  });
   const listen = el('button', 'play-toggle');
   listen.type = 'button';
   listen.id = 'listen-toggle';
@@ -10227,7 +10245,7 @@ function buildListenRow(p) {
     });
     refreshListenRow();
   });
-  listenRow.append(listen, track, listenNote, rate);
+  listenRow.append(mark, listen, track, listenNote, rate);
   return listenRow;
 }
 function renderReader(main) {
@@ -10295,12 +10313,9 @@ function renderReader(main) {
     S.dialsOpen = !S.dialsOpen;
     render();
   });
-  // the listen door: on a phone an article without a recording says so as one muted mark at the end
-  // of the instrument line (この記事の音声はまだない), not a strip at the foot; a narrated article's play bar,
-  // and a desk's relief-edged row, stand below the head as before
+  // the listen door: one mark in one place (John, 2026-10-15): the bar stands below the head, folded to its
+  // speaker mark until the learner opens it — dimmed when this article has no recording
   const listenRow = buildListenRow(p);
-  const listenInLine = listenRow.classList.contains('is-pending') && matchMedia('(max-width: 520px)').matches;
-  if (listenInLine) meta.append(listenRow);
   head.append(meta, dialsToggle);
   card.append(head);
   const versions = storyVersions(p);
@@ -10366,7 +10381,7 @@ function renderReader(main) {
   }
 
   // a narrated article's listen door — one tap to hear the article, one tap to stop
-  if (!listenInLine) main.append(listenRow);
+  main.append(listenRow);
   // the sentence's actions live in the word popup and the word menu: no bar floats over the text (#18)
   renderReaderTip(card);
 

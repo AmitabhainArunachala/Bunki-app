@@ -89,7 +89,21 @@ else failures.push('no dojo door (baseline)');
 await page.goto(`${base}/?entry=shelf`);
 await page.waitForSelector('#tray', { timeout: 30000 });
 const card = await page.$('#shelf-body [data-passage]');
-if (card) { await card.click(); await page.waitForSelector('#reader', { timeout: 30000 }); await page.waitForTimeout(400); await check('listen row', '.listen-row'); await check('reader body', '#reader'); }
+if (card) {
+  await card.click(); await page.waitForSelector('#reader', { timeout: 30000 }); await page.waitForTimeout(400);
+  // the play bar stands folded to its one mark (John, 2026-10-15 17:20): quiet by design — no edge, no bed, no shadow;
+  // the mark itself is a 44 px door. (The open bar's scan-line relief is pinned by verify-playback on a narrated fixture.)
+  const mark = await page.evaluate(`(() => { const row = document.querySelector('.listen-row.play-bar'); const m = document.querySelector('#listen-open'); if (!row || !m) return null;
+    const cs = getComputedStyle(row), r = m.getBoundingClientRect(); return { open: row.dataset.open, border: parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth), bg: cs.backgroundColor, shadow: cs.boxShadow, w: r.width, h: r.height }; })()`);
+  receipt.surfaces['listen mark (folded)'] = mark;
+  if (!mark) failures.push('listen mark: .listen-row.play-bar #listen-open not found');
+  else {
+    if (mark.open !== 'false') failures.push(`listen mark: the bar is not folded (data-open ${mark.open})`);
+    if (!(mark.border === 0 && /rgba\(0, 0, 0, 0\)|transparent/.test(mark.bg) && mark.shadow === 'none')) failures.push(`listen mark: the folded bar is not quiet (border ${mark.border}, bg ${mark.bg}, shadow ${mark.shadow})`);
+    if (!(mark.w >= 44 && mark.h >= 44)) failures.push(`listen mark: under 44px (${mark.w}×${mark.h})`);
+  }
+  await check('reader body', '#reader');
+}
 await browser.close();
 server.close();
 receipt.failures = failures;
