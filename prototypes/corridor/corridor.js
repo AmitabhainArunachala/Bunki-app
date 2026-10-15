@@ -4747,7 +4747,7 @@ function returnFromNavigation() {
 
 /** Open a node's page one level deeper. `from` is the match cut's source (the slip's headword when the slip is the door,
  * else the tapped word or row); the page itself arrives through enterWord. */
-function go(node, { invoker = null, from = null } = {}) {
+function go(node, { invoker = null, from = null, instant = false } = {}) {
   if (personalHost && !personalHost.allowed()) return;
   const sourceContext = node.sourceContext || S.stack.at(-1)?.sourceContext ||
     (S.view === 'search' ? S.navSourceContext : null);
@@ -4758,10 +4758,10 @@ function go(node, { invoker = null, from = null } = {}) {
   if (!S.stack.length && !S.dialogInvoker) {
     S.dialogInvoker = invokerKey(invoker || document.activeElement);
   }
-  enterWord(node, { from, invoker });
+  enterWord(node, { from, invoker, instant });
 }
 
-function back() {
+function back({ instant = false } = {}) {
   // The chrome's own overlays are the topmost layers of all: an open nav,
   // the world stones, the capture panel. Device Back could not see them, so
   // a learner who opened one and pressed Back left the app entirely with it
@@ -4782,7 +4782,7 @@ function back() {
     return;
   }
   if (S.stack.length) {
-    recede();
+    recede({ instant: instant === true });
     return;
   }
   if (!roomTransitionUpdating && !['drift', 'guided'].includes(S.view)) return roomTransition(() => back());
@@ -4957,9 +4957,11 @@ function back() {
   }
 }
 
-function dismissSheet() {
+function dismissSheet(options) {
   // the writing room above the page leaves with it; its element is render()'s to take away
   const strokes = !!S.strokes;
+  // (a listener hands its event here; only an explicit { instant: true } skips the cut)
+  const instant = options?.instant === true;
   if (S.strokes) {
     cancelStrokeAnimation();
     S.strokes = null;
@@ -4968,7 +4970,7 @@ function dismissSheet() {
   S.sheetFocus = null;
   S.sheetReturnFocus = null;
   if (!S.stack.length) return;
-  recede({ all: true, viaRender: strokes });
+  recede({ all: true, viaRender: strokes, instant });
 }
 
 /* ------------------------------------------------ 筆順 · the stroke page */
@@ -5127,7 +5129,8 @@ addEventListener('popstate', () => {
   }
   if (walkArmed) {
     walkArmed = false;
-    if (canWalkBack()) back(); // render() re-arms while there is more to walk
+    // the device's own Back (the edge swipe) has already moved the screen: the page changes at once, without a cut
+    if (canWalkBack()) back({ instant: true }); // render() re-arms while there is more to walk
     return;
   }
   // a stale sentinel (Forward, or one left below a reload) — adopt it so the
@@ -8227,11 +8230,11 @@ async function openJapaneseLookup(anchor, text, context = {}) {
     ...(record?.seq ? { seq: record.seq } : {}) };
   const entryNode = hasKanjiEntry ? { t: 'kanji', id: text }
     : record ? { t: 'word', id: token.b, ...(record?.seq ? { seq: record.seq, reading: record.r } : {}) } : null;
-  const mini = showMini(anchor, token, () => {
+  const mini = showMini(anchor, token, (modality) => {
     // An unresolved spelling must not reopen lookup(text)'s rejected first row.
     if (!entryNode) return;
     // the slip's headword is the cut's source; the slip itself leaves inside the cut (enterWord)
-    go(entryNode, { invoker: anchor, from: slipHeadword() });
+    go(entryNode, { invoker: anchor, from: slipHeadword(), instant: modality === 'keyboard' });
   }, { record, entryAvailable: !!record || hasKanjiEntry, from: context.from || null, sentence: context.sentence?.() || null,
     focusEntry: !!context.focusPopup, entryNode });
   // G1 · a page opened while the lookup was answering keeps a word below it from floating a card over it
@@ -8950,10 +8953,11 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   return mini;
 }
 
-/** Whether a slip may stand beside this element: always, unless a page is open and the element is not on it. */
+/** Whether a slip may stand beside this element: always, unless a layer stands over the room (the writing room, else a
+ * page) and the element is not on that top layer. */
 function slipAllowed(anchor) {
-  const page = document.getElementById('sheet');
-  return !page || !!anchor?.closest?.('#sheet');
+  const top = document.getElementById('stroke-page') || document.getElementById('sheet');
+  return !top || !!top.contains?.(anchor);
 }
 
 /** The quick look's kanji line (Read lane, redesign): each kanji of the word with its parts, the saved
@@ -9923,7 +9927,7 @@ function wireTokenGestures(span, token, index, p) {
     // a core hit opens exactly as before; a spelling the core lacks is
     // matched by this token's reading first (D11, readerEntryNode). G1: the page arrives from the slip's headword
     // (or the word itself, from the keyboard or the menu); the slip leaves inside that cut
-    go(readerEntryNode(token, index, p), { invoker: span, from: (fromSlip && slipHeadword()) || span });
+    go(readerEntryNode(token, index, p), { invoker: span, from: (fromSlip && slipHeadword()) || span, instant: modality === 'keyboard' });
   };
   const sentence = () => readerTakeNode({ id: token.b, index, p: p.id });
   const quickLook = (modality = 'pointer', { restore = false } = {}) => {
@@ -10981,7 +10985,7 @@ function openSlip(node, { anchor, from = 'lookup', host = null, look = null, not
     if (typeof entry === 'function') {
       removeMini();
       entry(modality);
-    } else if (node) go(node, { invoker: anchor, from: slipHeadword() || anchor }); // the slip leaves inside the cut (enterWord)
+    } else if (node) go(node, { invoker: anchor, from: slipHeadword() || anchor, instant: modality === 'keyboard' }); // the slip leaves inside the cut (enterWord)
   };
   return showMini(anchor, token, onEntry, { focusEntry: focus, record, entryAvailable, sentence, look, kind, save, host, note,
     source: from, key, kanji, onClose, follow: from === 'drift' || from === 'sky', nodeFor: node && kind !== 'word' ? { t: node.t, id: node.id } : null,
@@ -26261,10 +26265,10 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       return { t: 'word', id: token.b, ...(door.seq ? { seq: door.seq, reading: own }
         : D.dict[token.b] && readingAsksIndex(token.b, own) ? { reading: own } : {}), ...(from ? { from, ctxScope: 'sent' } : {}) };
     };
-    const openEntry = (door = readingToken(token)) => {
+    const openEntry = (door = readingToken(token), modality = 'pointer') => {
       obsLog('tap', srsKey('word', token.b), 3, contextId);
       // G1 · the page arrives from the slip's headword; the slip leaves inside the cut
-      go(entryNodeFor(door), { invoker: span, from: slipHeadword() || span });
+      go(entryNodeFor(door), { invoker: span, from: slipHeadword() || span, instant: modality === 'keyboard' });
     };
     span.addEventListener('contextmenu', (ev) => ev.preventDefault());
     span.addEventListener('click', (ev) => {
@@ -26273,7 +26277,7 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       // the second tap on the popup's word dives into its full entry
       if (diveFromMini(span, ev)) return;
       obsLog('tap', srsKey('word', token.b), 2, contextId);
-      openReadingSlip(span, token, (door) => showMini(span, door, () => openEntry(door), { focusEntry: ev.detail === 0, from,
+      openReadingSlip(span, token, (door) => showMini(span, door, (modality) => openEntry(door, modality), { focusEntry: ev.detail === 0, from,
         entryNode: entryNodeFor(door) }));
     });
     container.append(span);
@@ -27767,18 +27771,20 @@ function dictionaryHomographChoices(form) {
   return choices.map((choice) => ({ ...choice, enabledOnCore }));
 }
 
-/** G1 · one line per gloss (Grok e-111: 海 listed うみ, み, わた and わだ, each "sea"). Choices whose first gloss is the
- * same collapse into one line: its reading first (the open entry's when it is one of them, else the form's most common,
- * first in row order), the others after "also". A choice with no gloss of its own stands alone. */
+/** G1 · one line per gloss (Grok e-111: 海 listed うみ, み, わた and わだ, each "sea" — four readings of one entry).
+ * The readings of one entry whose first gloss is the same collapse into one line: its reading first (the open one when
+ * it is among them, else the most common, first in row order), the others after "also". Two entries never fold into one
+ * line, even with the same gloss (年 とし and 年 ねん stay two doors); a reading with no gloss of its own stands alone. */
 function homographLines(choices, isActive) {
   const lines = [];
   const byGloss = new Map();
   for (const choice of choices) {
     const gloss = String(choice.summary[2] || '').trim().toLowerCase();
-    const line = gloss ? byGloss.get(gloss) : null;
+    const key = gloss ? `${choice.row[0]}\u0000${gloss}` : null;
+    const line = key ? byGloss.get(key) : null;
     if (line) { line.members.push(choice); continue; }
     const fresh = { members: [choice] };
-    if (gloss) byGloss.set(gloss, fresh);
+    if (key) byGloss.set(key, fresh);
     lines.push(fresh);
   }
   return lines.map(({ members }) => {
@@ -30472,8 +30478,15 @@ function renderEncounterTrail(sheet, node) {
 }
 
 /** One page, detached: its bar, its body and its report line, its prose made doors. `path` is the stack the page will
- * stand on (its own node last): the bar's Close or Back and its crumb read it. Appends nothing, focuses nothing. */
+ * stand on (its own node last). While it is built the page stands on that stack, so everything a builder reads from it
+ * — the bar's Close or Back, its crumb, a picker's own surface (recordPickerSurface) — reads it as it will be when the
+ * page is shown, a page built ahead at idle included. Appends nothing, focuses nothing. */
 function buildPage(node, { path = S.stack } = {}) {
+  const live = S.stack;
+  S.stack = path;
+  try { return composePage(node, path); } finally { S.stack = live; }
+}
+function composePage(node, path) {
   const depth = path.length;
   const sheet = el('div', 'sheet');
   sheet.id = 'sheet';
@@ -30502,7 +30515,7 @@ function buildPage(node, { path = S.stack } = {}) {
       event.detail === 0 ? 'keyboard' : 'pointer',
       'sheet-back',
     );
-    back();
+    back({ instant: event.detail === 0 });
   });
   bar.append(backBtn);
   if (depth > 1) {
@@ -30581,7 +30594,7 @@ function buildPage(node, { path = S.stack } = {}) {
       event.detail === 0 ? 'keyboard' : 'pointer',
       'sheet-close',
     );
-    dismissSheet();
+    dismissSheet({ instant: event.detail === 0 });
   });
   bar.append(closeBtn);
   sheet.append(bar);
@@ -30650,7 +30663,7 @@ function buildPage(node, { path = S.stack } = {}) {
       event.preventDefault();
       event.stopPropagation();
       interaction({ kind: 'navigation.back' }, 'keyboard', 'sheet-escape');
-      back();
+      back({ instant: true });
       return;
     }
     if (event.key !== 'Tab') return;
@@ -30791,8 +30804,10 @@ function renderLayer({ prebuilt = null } = {}) {
  * carries word-hero at capture and the page's headword carries it after; the layer the page covers recedes a step
  * toward the source (kairo-paper). Back runs the reverse when the source still stands, else a cross-fade. The state
  * changes inside the transition's update, as a room's does (roomTransition). Reduced motion, a hidden document or a
- * browser without view transitions: the page changes at once (C's one rule fades it in 120 ms). Names and keyframes:
- * one block in rooms/motion.css. */
+ * browser without view transitions: the page changes at once (C's one rule fades it in 120 ms). The keyboard (Escape,
+ * Enter on a door, Ctrl+Enter) and the device's own Back change it at once too: the keyboard's next key lands on the room
+ * that is really there, and the phone's back swipe has already moved the screen. Names and keyframes: one block in
+ * rooms/motion.css. */
 let pageTransition = null; // { vt, run }: the cut still running, and its update (run once, whoever runs it first)
 const heroSource = new WeakMap(); // stack node → the element its page was entered from (the reverse cut's target)
 const keptPages = new WeakMap(); // stack node → { page, epoch }: a page a deeper one covered, mounted again by Back
@@ -30824,11 +30839,32 @@ function paperOrigin(source) {
   const s = source.getBoundingClientRect();
   html.style.setProperty('--paper-origin', `${Math.round(s.left + s.width / 2)}px ${Math.round(s.top + s.height / 2)}px`);
 }
+/** Where Back's word lands: a stand-in laid exactly over the word the page was entered from, carrying word-hero, while
+ * the word itself stays live and transparent until the cut ends — an element the cut captures takes no taps while it
+ * runs, and the word must answer the very next tap. Null when the word is not on the screen. */
+function cutLanding(target) {
+  const box = target.getBoundingClientRect();
+  if (!box.width || !box.height || box.bottom < 0 || box.top > innerHeight) return null;
+  const style = getComputedStyle(target);
+  const copy = target.cloneNode(true);
+  for (const hidden of copy.querySelectorAll('rt, .tok-en, .tok-state, .visually-hidden')) hidden.remove();
+  const landing = el('span', 'cut-landing', copy.textContent.trim());
+  landing.setAttribute('aria-hidden', 'true');
+  landing.lang = 'ja';
+  Object.assign(landing.style, {
+    position: 'fixed', left: `${box.left}px`, top: `${box.top}px`, width: `${box.width}px`, height: `${box.height}px`,
+    display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0', padding: '0', pointerEvents: 'none',
+    font: style.font, color: style.color, letterSpacing: style.letterSpacing, whiteSpace: 'nowrap',
+  });
+  document.body.append(landing);
+  target.style.opacity = '0';
+  return { landing, done: () => { landing.remove(); target.style.removeProperty('opacity'); } };
+}
 /** Run a page change inside one cut (or at once when there is none). `names` are set before the capture; `after`
- * names the new state inside the update; every name is cleared when the cut ends. */
-function runPageCut(change, { names = [], after = () => [] } = {}) {
+ * names the new state inside the update; every name is cleared when the cut ends, and `onEnd` runs then. */
+function runPageCut(change, { names = [], after = () => [], instant = false, onEnd = () => {} } = {}) {
   finishPageTransition();
-  if (!pageCutAllowed()) { change(); return null; }
+  if (instant || !pageCutAllowed()) { change(); onEnd(); return null; }
   const named = [];
   for (const [element, name] of names) if (element) { cutName(element, name); named.push(element); }
   let ran = false;
@@ -30844,6 +30880,7 @@ function runPageCut(change, { names = [], after = () => [] } = {}) {
     vt = document.startViewTransition(run);
   } catch {
     run();
+    onEnd();
     return null;
   }
   const entry = { vt, run };
@@ -30852,13 +30889,14 @@ function runPageCut(change, { names = [], after = () => [] } = {}) {
   vt.finished.catch(() => {}).finally(() => {
     for (const element of named) cutName(element, '');
     if (pageTransition === entry) pageTransition = null;
+    onEnd();
   });
   return vt;
 }
 
 /** The page arrives. Called by go() after its bookkeeping; pushes the node (the page built ahead for it, when one is
  * waiting) and mounts its page by the layer, or by render() in the rooms that keep it. */
-function enterWord(node, { from = null, invoker = null } = {}) {
+function enterWord(node, { from = null, invoker = null, instant = false } = {}) {
   finishPageTransition();
   const layered = layerPathFor();
   const depth = S.stack.length + 1;
@@ -30874,7 +30912,7 @@ function enterWord(node, { from = null, invoker = null } = {}) {
   const where = sampleWhere();
   // the slip closes now (its surface hears 'dive'); its element leaves inside the cut, so its headword is captured
   const reason = miniDiving ? 'dive' : 'dismiss';
-  const cut = pageCutAllowed();
+  const cut = !instant && pageCutAllowed();
   removeMini(reason, { forCut: cut && !!source?.closest?.('#mini') });
   if (cut) paperOrigin(source);
   const change = () => {
@@ -30891,13 +30929,14 @@ function enterWord(node, { from = null, invoker = null } = {}) {
   runPageCut(change, {
     names: [[source, 'word-hero'], [covered, 'kairo-paper']],
     after: () => (source ? [[heroOf(document.getElementById('sheet')), 'word-hero']] : []),
+    instant: !cut,
   });
   sampleTransition('page', where);
 }
 
 /** Back (one level) or close-all. The page's headword returns to the element it was entered from when that still
  * stands (the reader keeps its tokens under the layer; a kept page keeps its words), the page fades as it goes. */
-function recede({ all = false, viaRender = false } = {}) {
+function recede({ all = false, viaRender = false, instant = false } = {}) {
   if (!S.stack.length) return null;
   const layered = !viaRender && layerPathFor();
   const leaving = all ? S.stack[0] : S.stack.at(-1);
@@ -30919,12 +30958,16 @@ function recede({ all = false, viaRender = false } = {}) {
       restoreDialogInvoker();
     }
   };
+  let landing = null;
   const vt = runPageCut(change, {
     names: [[hero, 'word-hero'], [sheet, 'kairo-page']],
     after: () => {
       const target = heroSource.get(leaving);
-      return hero && target?.isConnected ? [[target, 'word-hero']] : [];
+      landing = hero && target?.isConnected ? cutLanding(target) : null;
+      return landing ? [[landing.landing, 'word-hero']] : [];
     },
+    instant,
+    onEnd: () => landing?.done(),
   });
   sampleTransition('back', where);
   return vt;
