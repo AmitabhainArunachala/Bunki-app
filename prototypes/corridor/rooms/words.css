@@ -288,10 +288,6 @@ html:is([data-room='search'], [data-room='word-web']) .ww-leaving .ww-fam.ww-cho
 
 @keyframes ww-wire { from { opacity: 0.01; transform: scale(0.5); } to { opacity: 1; transform: none; } }
 @keyframes ww-node { from { opacity: 0.01; transform: translate(-50%, -50%) scale(0.6); } to { opacity: 1; transform: translate(-50%, -50%); } }
-@media (prefers-reduced-motion: reduce) {
-  html:is([data-room='search'], [data-room='word-web']) :is(.ww-wire, .ww-node, .ww-c-glyph) { animation: none; }
-  html:is([data-room='search'], [data-room='word-web']) .ww-leaving * { transition: none; }
-}
 
 /* ---- the search field above the web: the lenses ride one ruled strip on phones ---- */
 @media (max-width: 520px) {

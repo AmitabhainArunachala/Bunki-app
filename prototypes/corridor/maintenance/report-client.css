@@ -89,13 +89,5 @@
   #bunki-reports-root .br-sheet { height: 100dvh; }
   #bunki-reports-root .br-rail { right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); max-width: calc(100vw - 24px); }
 }
-@media (prefers-reduced-motion: no-preference) {
-  #bunki-reports-root .br-sheet[open] { animation: br-sheet-enter var(--motion-fast, 180ms) var(--ease-enter, ease-out); }
-  @keyframes br-sheet-enter { from { transform: translateY(14px); } to { transform: translateY(0); } }
-}
-/* Reduced motion keeps the report sheet's response as a short crossfade. */
-@media (prefers-reduced-motion: reduce) {
-  #bunki-reports-root .br-rail .br-bug, #bunki-reports-root .br-rail .br-bug::before { transition: none; }
-  #bunki-reports-root .br-sheet[open] { animation: br-sheet-fade 80ms linear both; }
-}
-@keyframes br-sheet-fade { from { opacity: 0; } }
+#bunki-reports-root .br-sheet[open] { animation: br-sheet-enter var(--motion-fast, 180ms) var(--ease-enter, ease-out); }
+@keyframes br-sheet-enter { from { transform: translateY(14px); } to { transform: translateY(0); } }

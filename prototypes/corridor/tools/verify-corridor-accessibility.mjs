@@ -689,11 +689,13 @@ async function main() {
       return { sheet: describe('#sheet'), scrim: describe('.scrim'), ruby: describe('#reader rt'),
         ambient: document.getAnimations().filter(animation => animation.playState === 'running' && animation.effect?.getTiming().iterations === Infinity).length };
     })()`);
-    const crossfade = entry => entry && entry.animationName === 'feel-fade' && entry.animationDuration === '0.08s'
+    // one hand (slice C): the one reduced-motion rule gives every surviving surface a 120 ms
+    // opacity cross-fade (--motion-room under reduce); the dialog is read exactly, as before
+    const crossfade = entry => entry && entry.animationName === 'feel-fade' && entry.animationDuration === '0.12s'
       && entry.animations.length === 1 && entry.animations.every(animation =>
         animation.name === 'feel-fade' && animation.timing.iterations === 1
-        && animation.timing.duration === 80 && animation.timing.delay >= 0
-        && animation.timing.delay + animation.timing.duration <= 80
+        && animation.timing.duration === 120 && animation.timing.delay >= 0
+        && animation.timing.delay + animation.timing.duration <= 120
         && animation.properties.length >= 2
         && animation.properties.every(properties => properties.length === 1 && properties[0] === 'opacity'));
     const stationary = [motion.sheet, motion.scrim, motion.ruby].every(entry => entry

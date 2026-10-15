@@ -620,9 +620,6 @@ html[data-register="tutor"] #app > .report-line-page .report-door { color: var(-
 
 /* ----------------------------------------------------------------- 9 · MOTION
    Rooms arrive by the one view transition in rooms/motion.css (slice C): no lift of their own. */
-@media (prefers-reduced-motion: reduce) {
-  html[data-register="attempt"] .chrome::after { transition: none; }
-}
 
 /* ------------------------------------------------------------- 10 · WIDE
    On a desk the house keeps the phone's measure and centres it. */

@@ -582,11 +582,6 @@ html[data-arrive='sky'] #drift-layer.active {
 }
 @keyframes today-universe-rise { from { opacity: 0.01; transform: scale(0.86); } to { opacity: 1; transform: none; } }
 
-@media (prefers-reduced-motion: reduce) {
-  html[data-room='tray'] :is(.today-sky-lane, .today-sky-lane .today-star, .today-star.due, .dw-k, .today-train .car, .today-wins) { animation: none; }
-  html[data-room='tray'] :is(.today-star, .dw-word, .today-arrow, .today-detail-caret, .today-universe) { transition: none; }
-  html[data-arrive='sky'] #drift-layer.active { animation: none; }
-}
 
 /* ==========================================================================================
    The session's close (review room, done): "The surface is clear." One next door, and
@@ -739,9 +734,6 @@ html[data-room='review'] body:not(.zen) #app .close-doors :is(button.take.quiet,
   text-underline-offset: 4px;
 }
 html[data-room='review'] body:not(.zen) #app .close-doors button.chip.review-undo { color: var(--color-muted); }
-@media (prefers-reduced-motion: reduce) {
-  html[data-room='review'] :is(.review-clear, .review-rise-w) { animation: none; }
-}
 
 /* round 3 (r3-rooms): one 朱 on Today, and it is the day's part. The sign's square hangs in ink. */
 html[data-room='tray']:root body:not([data-view='drift']) #app > main > .room-sign::after {

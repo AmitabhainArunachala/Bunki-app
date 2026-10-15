@@ -500,10 +500,8 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 
 /* ---- the card floats on the lacquer (ambient; the room arrives by the one view transition) ---- */
 @keyframes learn-float { from { transform: rotate(-0.5deg); } to { transform: translateY(-3px) rotate(-0.25deg); } }
-@media (prefers-reduced-motion: no-preference) {
-  html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-card {
-    animation: learn-float 8s ease-in-out 600ms infinite alternate;
-  }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-card {
+  animation: learn-float 8s ease-in-out 600ms infinite alternate;
 }
 
 /* 2026-10-13 · the Tests room: the Learn room's tests, guided practice and more practice, under

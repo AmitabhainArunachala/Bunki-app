@@ -32,12 +32,3 @@ html[data-room-transition][data-room-dir='left'] #app > main[data-room-arrival] 
 @keyframes kairo-room-arrive { from { opacity: 0; } }
 @keyframes kairo-room-arrive-from-right { from { opacity: 0; transform: translateX(24px); } }
 @keyframes kairo-room-arrive-from-left { from { opacity: 0; transform: translateX(-24px); } }
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(kairo-room) {
-    animation: kairo-room-fade-out 80ms linear both;
-  }
-  html[data-room-transition] #app > main[data-room-arrival] {
-    animation: kairo-room-arrive 80ms linear both;
-    animation-delay: var(--room-arrival-delay, 0ms);
-  }
-}

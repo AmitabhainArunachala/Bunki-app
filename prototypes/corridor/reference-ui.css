@@ -583,11 +583,6 @@ body[data-view='levels'] main {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .reference-library * {
-    transition: none;
-  }
-}
 
 /* Recursive doors borrow the sheet's paper and ink, not a new visual layer. */
 .reference-other-rooms { flex-wrap: wrap; gap: 0 16px; }

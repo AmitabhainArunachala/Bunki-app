@@ -313,8 +313,10 @@
 @keyframes kp-out-good { to { opacity: 0; transform: translateX(24px); } }
 @keyframes kp-out-again { to { opacity: 0; transform: translateX(-24px); } }
 /* Reduced motion keeps the held frame, with a short opacity crossfade and no movement. */
+/* the deck's own reduced-motion contract (it stands alone on the frozen study pages, outside the corridor's one rule) */
 @media (prefers-reduced-motion: reduce) {
   .kp *, .kp *::before, .kp *::after { animation: none !important; transition: none !important; }
+  .kp-polish, .kp-slash { display: none; }
   :is(#app, .kp) .kp-sentence.kp-enter :is(.kp-target, rt), :is(#app, .kp) .kp-answer.kp-enter, :is(#app, .kp) .kp-card.kp-arrive, :is(#app, .kp) .kp-pop { animation: kp-fade 100ms linear both !important; transform: none !important; }
   :is(#app, .kp) .kp-study.kp-reveal-hold { animation: kp-fade-out 100ms linear both !important; transform: none !important; }
   :is(#app, .kp) .kp-screen-hold { animation: kp-fade-out 100ms linear both !important; transform: none !important; }
@@ -683,9 +685,6 @@
 /* 藍 at night: 始める is the lit slab (washi ink on the 藍 room), as the card is the lit sheet */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp[data-look='ai'] .kp-start:not(:disabled) { background: var(--kp-ink); color: var(--kp-bg); box-shadow: 0 2px 0 color-mix(in srgb, var(--kp-ink) 35%, #000); }
 
-@media (prefers-reduced-motion: reduce) {
-  .kp-polish, .kp-slash { display: none; }
-}
 
 /* ---- the room family, every look (Bunki fix round 2): one quiet exit, a docked 答えを見る ---- */
 /* the deck home's ← is bare, like the study ✕: the page's one way out */

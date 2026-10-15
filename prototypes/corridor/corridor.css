@@ -553,11 +553,6 @@ body.ginga #drift-layer #hint.first-cue {
     transform: scale(1);
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .ginga-seal.awake {
-    animation: none;
-  }
-}
 
 .nav-bar {
   position: fixed;
@@ -590,11 +585,6 @@ body.ginga #drift-layer #hint.first-cue {
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .nav-bar {
-    animation: none;
   }
 }
 .nav-arrows {
@@ -879,11 +869,6 @@ html[data-layout='places'] .nav-station-go {
 .lang-slide[data-lang='ja'] .lang-opt.ja {
   color: var(--ink, #23303f);
   font-weight: 600;
-}
-@media (prefers-reduced-motion: reduce) {
-  .lang-knob {
-    transition: none;
-  }
 }
 
 /* 検索の間 — the search room: one big box, roomy rows, its own page */
@@ -2048,11 +2033,6 @@ button.pool-tag.cat-chip {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .field-word {
-    animation: none;
-  }
-}
 
 .field-enter {
   position: absolute;
@@ -2508,9 +2488,6 @@ button.pool-tag.cat-chip {
 @keyframes world-picker-in {
   from { opacity: 0.01; transform: translateY(-4px) scale(0.98); }
 }
-@media (prefers-reduced-motion: reduce) {
-  .world-picker { animation: none; }
-}
 .world-stone {
   width: var(--tap);
   height: var(--tap);
@@ -2723,11 +2700,6 @@ body.v-depth-layered .inline-link {
   color: var(--ai);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .scrim {
-    animation: none;
-  }
-}
 
 /* ==================================================== v1.2 · 2026-08-07 ===
  * Renzo-baseline dictionary surfaces, the click grammar, lists, and the
@@ -3215,29 +3187,6 @@ svg.strokes text {
   font-family: var(--sans);
   font-size: 13.5px;
   letter-spacing: 0.02em;
-}
-
-/* Reduced motion is a behavioral mode, not a single-animation exception.
- * Corridor-owned movement and fades become immediate; the separately owned
- * Drift layer keeps its own reduction contract. */
-@media (prefers-reduced-motion: reduce) {
-  #app *,
-  #app *::before,
-  #app *::after,
-  #mini,
-  #mini * {
-    scroll-behavior: auto !important;
-    transition-duration: 0s !important;
-    animation-duration: 0s !important;
-    animation-delay: 0s !important;
-  }
-
-  .sheet,
-  .scrim,
-  .field-word,
-  #mini {
-    animation: none !important;
-  }
 }
 
 /* ==================================================== v1.9 · 筆順 =========
@@ -4341,13 +4290,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   background: color-mix(in srgb, var(--ground-0) 54%, transparent);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [data-stroke-chrome],
-  .stroke-chrome-trigger,
-  .stroke-num {
-    transition: none;
-  }
-}
 
 @media (max-height: 560px) {
   .stroke-page[data-minimal='on'] .stroke-stage,
@@ -7063,110 +7005,86 @@ body.zen .review-example {
 }
 
 /* ------------------------------------------------------ the ceremony (motion) */
-@media (prefers-reduced-motion: no-preference) {
-  /* the room breathes as one organism — in LIGHT, never geometry: a
-   * transform breath makes every element inside the card perpetually
-   * unstable to the actionability checks the battery's browser runs, so
-   * the paper holds still and its aura breathes instead (opacity-only,
-   * compositor-safe) */
-  body.zen .review-face {
-    position: relative;
-  }
-  body.zen .review-face::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    box-shadow:
-      0 28px 68px rgba(6, 5, 5, 0.5),
-      0 0 26px var(--zen-glow);
+/* the room breathes as one organism — in LIGHT, never geometry: a
+ * transform breath makes every element inside the card perpetually
+ * unstable to the actionability checks the battery's browser runs, so
+ * the paper holds still and its aura breathes instead (opacity-only,
+ * compositor-safe) */
+body.zen .review-face {
+  position: relative;
+}
+body.zen .review-face::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    0 28px 68px rgba(6, 5, 5, 0.5),
+    0 0 26px var(--zen-glow);
+  opacity: 0;
+  animation: kairo-breathe-glow var(--breath) ease-in-out infinite;
+  will-change: opacity;
+}
+@keyframes kairo-breathe-glow {
+  0%,
+  100% {
     opacity: 0;
-    animation: kairo-breathe-glow var(--breath) ease-in-out infinite;
-    will-change: opacity;
   }
-  @keyframes kairo-breathe-glow {
-    0%,
-    100% {
-      opacity: 0;
-    }
-    50% {
-      opacity: 0.5;
-    }
-  }
-  /* the answer condenses out of the paper like ink soaking in — each zone a
-   * beat of the ritual, readings first and every grade ready within 340ms */
-  body.zen .reveal {
-    animation: kairo-materialize 180ms var(--ease-enter) both;
-  }
-  @keyframes kairo-materialize {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  body.zen .reveal.r-1 {
-    animation-delay: 40ms;
-  }
-  body.zen .reveal.r-2 {
-    animation-delay: 70ms;
-  }
-  body.zen .reveal.r-3 {
-    animation-delay: 100ms;
-  }
-  body.zen .reveal.r-4 {
-    animation-delay: 130ms;
-  }
-  body.zen .grade-row .grade {
-    animation: kairo-materialize 140ms var(--ease-enter) both;
-    animation-delay: 110ms;
-  }
-  body.zen .grade-row .grade:nth-child(2) {
-    animation-delay: 140ms;
-  }
-  body.zen .grade-row .grade:nth-child(3) {
-    animation-delay: 170ms;
-  }
-  body.zen .grade-row .grade:nth-child(4) {
-    animation-delay: 200ms;
-  }
-  .say.is-speaking svg {
-    animation: kairo-say-breath 6s ease-in-out infinite;
-  }
-  @keyframes kairo-say-breath {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.6;
-    }
+  50% {
+    opacity: 0.5;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  body.zen .review-face {
-    animation: none;
+/* the answer condenses out of the paper like ink soaking in — each zone a
+ * beat of the ritual, readings first and every grade ready within 340ms */
+body.zen .reveal {
+  animation: kairo-materialize 180ms var(--ease-enter) both;
+}
+@keyframes kairo-materialize {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  body.zen .reveal,
-  body.zen .grade-row .grade {
-    animation: kairo-rm-fade 150ms ease-out both;
-    animation-delay: 0ms;
-    filter: none;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  @keyframes kairo-rm-fade {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+}
+body.zen .reveal.r-1 {
+  animation-delay: 40ms;
+}
+body.zen .reveal.r-2 {
+  animation-delay: 70ms;
+}
+body.zen .reveal.r-3 {
+  animation-delay: 100ms;
+}
+body.zen .reveal.r-4 {
+  animation-delay: 130ms;
+}
+body.zen .grade-row .grade {
+  animation: kairo-materialize 140ms var(--ease-enter) both;
+  animation-delay: 110ms;
+}
+body.zen .grade-row .grade:nth-child(2) {
+  animation-delay: 140ms;
+}
+body.zen .grade-row .grade:nth-child(3) {
+  animation-delay: 170ms;
+}
+body.zen .grade-row .grade:nth-child(4) {
+  animation-delay: 200ms;
+}
+.say.is-speaking svg {
+  animation: kairo-say-breath 6s ease-in-out infinite;
+}
+@keyframes kairo-say-breath {
+  0%,
+  100% {
+    opacity: 1;
   }
-  .say {
-    transition: none;
+  50% {
+    opacity: 0.6;
   }
 }
 

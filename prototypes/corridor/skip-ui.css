@@ -88,6 +88,3 @@
   .skip-rule-patterns { grid-template-columns: 1fr; gap: 8px; }
   .skip-title h2 { font-size: 17px; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .skip-ui * { scroll-behavior: auto; }
-}

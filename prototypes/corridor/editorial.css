@@ -807,10 +807,6 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
   .reference-other-rooms { width: 100%; justify-content: space-between; }
   .sheet-bar .sheet-depth { min-width: 18px; }
 }
-@media (prefers-reduced-motion: reduce) {
-  body:not(.zen) #app > .chrome > button { transition: none; }
-  #mini, .sheet { animation: none; }
-}
 
 /* ==========================================================================
    Design pass · 30 September 2026 — the depth system, then the reader (step 1)
@@ -1557,11 +1553,6 @@ body #shelf-body .story-glossary { box-shadow: 0 0 0 0.5px var(--separator), 0 1
 }
 #shelf-body button#archive-link.grammar-link .en-sub { font: 500 14px/1.5 var(--sans); letter-spacing: 0; text-transform: none; color: var(--label-2); }
 
-@media (prefers-reduced-motion: reduce) {
-  body #shelf-body .story-card, .story-picture .story-img, .shelf-encounter { transition: none; }
-  body #shelf-body .story-card:hover { transform: none; }
-  #shelf-body .story-card:hover .story-img { transform: none; }
-}
 
 /* ------------------------------------------------------------------ step 1
    The reader: a white page with the only paper grain in the app (2–3%, FEEL pass); one line of
@@ -2104,12 +2095,6 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   .article-facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .article-facts dd { margin-bottom: var(--s1); }
 }
-@media (prefers-reduced-motion: reduce) {
-  .teacher-door.reader-actions { animation: none; }
-  #reader:not(.fg-always) ruby::before { transition: none; }
-  body #shelf-body .story-card, .shelf-controls .filter-search input { transition: none; }
-  body #shelf-body .story-card:hover { transform: none; }
-}
 
 /* ------------------------------------------------------------------ step 3a
    The word sheet on the depth system: the top layer, a lacquer bar over raised
@@ -2157,7 +2142,6 @@ body .sheet .sheet-bar .sheet-take { background: var(--tint-wash); color: var(--
 body .sheet .sheet-bar .sheet-take[aria-pressed='true'] { background: var(--tint); border: 0; color: #fff; }
 body .sheet .sheet-bar .sheet-depth { color: var(--label-2); }
 body .sheet .sheet-bar :focus-visible { outline-color: var(--tint); }
-@media (prefers-reduced-motion: reduce) { body .sheet, body .scrim { animation: none; } }
 
 /* the word's head: headword, reading, then everything under rules */
 body .sheet .headword { margin: var(--s1) 0 0; font: 800 46px/1.3 var(--display); letter-spacing: -0.02em; color: var(--text); }
@@ -3101,10 +3085,8 @@ body .token-actions button:hover { background: var(--ai-wash); }
   .version-block .version-toggle { display: flex; width: 100%; }
   .version-toggle .version-choice { flex: 1 1 0; flex-wrap: wrap; justify-content: center; column-gap: 4px; row-gap: 0; padding: 4px 8px; font-size: 13px; }
 }
-@media (prefers-reduced-motion: no-preference) {
-  .reader-toast:not([hidden]) { animation: reader-toast-in var(--motion-fast) var(--ease-standard); }
-  .reader-word-menu, .vocabulary-list-popover { animation: reader-pop-in var(--motion-ma) var(--ease-enter); }
-}
+.reader-toast:not([hidden]) { animation: reader-toast-in var(--motion-fast) var(--ease-standard); }
+.reader-word-menu, .vocabulary-list-popover { animation: reader-pop-in var(--motion-ma) var(--ease-enter); }
 @keyframes reader-toast-in { from { opacity: 0; transform: translate(-50%, 8px); } }
 @keyframes reader-pop-in { from { opacity: 0; } }
 
@@ -3530,10 +3512,6 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 }
 @media (min-width: 521px) {
   .primary-tabs { --tabs-pad: max(12px, calc((100vw - 720px) / 2)); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .primary-tabs .primary-tab { transition: none; }
-  .primary-tabs .line-car.moving { animation: none; }
 }
 /* END BUNKI NAVIGATION SHELL =============================================== */
 
@@ -4608,10 +4586,6 @@ body.has-primary-tabs:not(.zen) #app > .chrome > button#tray .l-ja { font: 500 1
 
 /* ---- room entrances: one system, the view transition in rooms/motion.css (slice C). The chrome
    holds still; the room travels along the Line. No lift, no cross-fade of its own. ---- */
-@media (prefers-reduced-motion: reduce) {
-  .reader-word-menu,
-  .vocabulary-list-popover { animation: feel-fade 80ms linear both; }
-}
 
 /* ---- the front door (html[data-room=door]): the sky stays the drift's own; its chrome
    joins the family — square paper seals, one 藍 slip as the room's single primary. ---- */
@@ -4771,10 +4745,6 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
   text-shadow: 0 0 10px rgb(0 0 0 / 70%), 0 0 2px rgb(0 0 0 / 60%);
 }
 @keyframes door-windows { from { opacity: 0.55; } to { opacity: 0.38; } }
-@media (prefers-reduced-motion: reduce) {
-  html[data-room='door'] body.ginga #door-paper,
-  html[data-room='door'] body.ginga #door-paper .today-wins { animation: none; }
-}
 /* night: the door's primary is emitted light (a lit edge and glow on the dark sky), never a solid fill */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='door'] body.ginga #home-review.corner-bubble:not(.quiet) {
   background: color-mix(in srgb, var(--ground, #0e1626) 82%, transparent);
@@ -5044,17 +5014,57 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
 /* Revealing the shelf tools answers the press without moving the reading lead. */
 #shelf-tools-panel:not([hidden]) { animation: feel-fade 160ms ease-out; }
 
-/* A reduced-motion response is a short change of ink, rather than a hard cut.
-   These explicit surfaces override corridor.css's older blanket zero-duration
-   rule; ambient loops and unrelated children remain still. */
+/* ---- reduced motion, in one rule (slice C, 2026-10-15). The house's beats collapse — presses,
+   ticks and quick changes to 0, every longer move to 120 ms — and nothing travels: every animation
+   and transition the corridor owns runs at zero length (a keyframe that moved now only lands), and
+   the surfaces that must still be seen to change cross-fade in 120 ms, opacity only: a room (the
+   old frame and the new room), the sheet, the scrim, the slip, the word menu, the lists popover,
+   the world picker, the nav bar, the corner bubble, the shelf's tools, the review faces, the
+   toast, the guided verdict, the report sheet. The deck (player.css, for the pages it stands
+   alone on), the drift layer and the samurai moments keep their own reduced-motion contracts
+   (the drift's and the moments' are JS gates), so the blanket leaves them be. ---- */
 @media (prefers-reduced-motion: reduce) {
-  body #app :is(.sheet, .scrim, .nav-bar, .corner-bubble, .shelf-study-tools:not([hidden]), .review-face, .review-clear, .review-rise-w, .reveal, .grade-row .grade),
+  :root {
+    --motion-instant: 0ms;
+    --motion-ma: 0ms;
+    --motion-press: 0ms;
+    --motion-quick: 0ms;
+    --motion-fast: 120ms;
+    --motion-standard: 120ms;
+    --motion-room: 120ms;
+    --motion-sheet: 120ms;
+    --motion-long: 120ms;
+    --motion-ambient: 0ms;
+    --ease-standard: linear;
+    --ease-enter: linear;
+    --ease-exit: linear;
+    --ease-ink: linear;
+    --ease-sheet: linear;
+  }
+  body *:where(:not(#drift-layer, #drift-layer *, .kp, .kp *, .samurai-effect, .samurai-effect *)),
+  body *:where(:not(#drift-layer, #drift-layer *, .kp, .kp *, .samurai-effect, .samurai-effect *))::before,
+  body *:where(:not(#drift-layer, #drift-layer *, .kp, .kp *, .samurai-effect, .samurai-effect *))::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+  body #app :is(.sheet, .scrim, .nav-bar, .corner-bubble, .shelf-study-tools:not([hidden]), .review-face, .review-clear, .review-rise-w, .reveal, .grade-row .grade, .guided-room .gs-feedback),
   body > :is(.sheet, .scrim, .world-picker, .world-picker-scrim),
   body #mini,
-  body .reader-toast:not([hidden]) {
-    animation: feel-fade 80ms linear both !important;
+  body :is(.reader-word-menu, .vocabulary-list-popover),
+  body .reader-toast:not([hidden]),
+  body #bunki-reports-root .br-sheet[open] {
+    animation: feel-fade var(--motion-room) linear both !important;
     animation-delay: 0ms !important;
   }
+  ::view-transition-old(kairo-room) { animation: kairo-room-fade-out var(--motion-room) linear both; }
+  html[data-room-transition] #app > main[data-room-arrival] {
+    animation: kairo-room-arrive var(--motion-room) linear both !important;
+    animation-delay: var(--room-arrival-delay, 0ms) !important;
+  }
+  /* the sky's hand-over to the drift layer is corridor-owned motion on the layer's root */
+  html[data-arrive='sky'] #drift-layer.active { animation: none; }
 }
 
 /* the layout under test (2026-10-13): the five places' names are plain words of their own lengths:

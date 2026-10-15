@@ -158,6 +158,5 @@
   .pc-answer-head { gap:10px; }
   .pc-answer-kind { font-size:10px; }
 }
-@media (prefers-reduced-motion:reduce) { .pc *, .pc *::before, .pc *::after { scroll-behavior:auto!important; animation:none!important; transition:none!important; } }
 @media (prefers-contrast:more) { .pc-panel, .pc nav, .pc-top, .pc-card-head, .pc-answer, .pc-answer-section, .pc-controls, .pc-notes, .pc button { border-color:var(--ink-2); } .pc .pc-token { border-color:var(--ink-2); } }
 @media (forced-colors:active) { .pc mark { color:CanvasText; background:Canvas; forced-color-adjust:none; border-color:Highlight; } .pc button { border-color:ButtonText; } .pc .pc-primary { border:2px solid ButtonText; } .pc button:focus-visible, .pc .pc-token:focus-visible, .pc input:focus-visible, .pc select:focus-visible, .pc summary:focus-visible, .pc a:focus-visible { outline:3px solid Highlight; } .pc nav button[aria-current='page'] { border-bottom:2px solid Highlight; } }
