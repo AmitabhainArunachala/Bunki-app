@@ -7,6 +7,10 @@
    change with no direction along the Line (a door, a page of the same tab)
    keeps the plain hand-over. The car and the room share one beat: --motion-room. */
 :root, #app > main { view-transition-name: none; }
+/* The arriving room is translated 24 px for a beat; clipped here, it never widens the page, which
+   Chrome would read as a viewport change and drop the old frame's capture (its fixed chrome and
+   docks are not clipped: their containing block is the viewport). */
+html[data-room-transition] #app { overflow-x: clip; }
 html[data-room-transition] #app > main[data-room-arrival] {
   animation: kairo-room-arrive var(--motion-room) var(--ease-enter) both;
   animation-delay: var(--room-arrival-delay, 0ms);
