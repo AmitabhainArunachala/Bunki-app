@@ -1437,7 +1437,8 @@ const recordHint = { active: false, token: 0, generation: 0, epoch: 0, outstandi
   visibleSince: 0, suspended: false, advisoryUntil: 0, deadlineTimer: null, free: false, channel: null, query: null, failure: '' };
 
 function positionStoreAlert(node) {
-  if (!node || typeof document === 'undefined') return;
+  // G1 · no layout is read for an alert that is not shown (every render paid a forced whole-document layout here)
+  if (!node || typeof document === 'undefined' || node.hidden) return;
   let lowerEdge = 0;
   for (const blocker of document.querySelectorAll(
     '.chrome, .nav-symbol, .zen-exit, .zen-more, .focus-hud',
@@ -3391,7 +3392,7 @@ async function personalDictionaryBridge(container) {
       child.inert = true; child.setAttribute('aria-hidden', 'true');
     }
     for (const child of overlay.children) {
-      const live = S.strokes ? child.id === 'stroke-page' : child.id === 'sheet' || child.classList.contains('scrim');
+      const live = S.strokes ? child.id === 'stroke-page' : child.id === 'sheet';
       child.inert = !live;
       if (!live) child.setAttribute('aria-hidden', 'true');
     }
@@ -4744,7 +4745,9 @@ function returnFromNavigation() {
   return true;
 }
 
-function go(node, { invoker = null } = {}) {
+/** Open a node's page one level deeper. `from` is the match cut's source (the slip's headword when the slip is the door,
+ * else the tapped word or row); the page itself arrives through enterWord. */
+function go(node, { invoker = null, from = null } = {}) {
   if (personalHost && !personalHost.allowed()) return;
   const sourceContext = node.sourceContext || S.stack.at(-1)?.sourceContext ||
     (S.view === 'search' ? S.navSourceContext : null);
@@ -4755,10 +4758,7 @@ function go(node, { invoker = null } = {}) {
   if (!S.stack.length && !S.dialogInvoker) {
     S.dialogInvoker = invokerKey(invoker || document.activeElement);
   }
-  S.stack.push(node);
-  render();
-  const sheet = $('.sheet');
-  if (sheet) sheet.scrollTop = 0;
+  enterWord(node, { from, invoker });
 }
 
 function back() {
@@ -4782,14 +4782,7 @@ function back() {
     return;
   }
   if (S.stack.length) {
-    S.stack.pop();
-    S.sheetReturnFocus = S.stack.at(-1)?.returnFocus || null;
-    if (!S.stack.length) clearReaderSummons();
-    render();
-    if (!S.stack.length) {
-      returnScroll();
-      restoreDialogInvoker();
-    }
+    recede();
     return;
   }
   if (!roomTransitionUpdating && !['drift', 'guided'].includes(S.view)) return roomTransition(() => back());
@@ -4965,6 +4958,8 @@ function back() {
 }
 
 function dismissSheet() {
+  // the writing room above the page leaves with it; its element is render()'s to take away
+  const strokes = !!S.strokes;
   if (S.strokes) {
     cancelStrokeAnimation();
     S.strokes = null;
@@ -4973,11 +4968,7 @@ function dismissSheet() {
   S.sheetFocus = null;
   S.sheetReturnFocus = null;
   if (!S.stack.length) return;
-  S.stack = [];
-  clearReaderSummons();
-  render();
-  returnScroll();
-  restoreDialogInvoker();
+  recede({ all: true, viaRender: strokes });
 }
 
 /* ------------------------------------------------ 筆順 · the stroke page */
@@ -8027,24 +8018,39 @@ document.addEventListener(
 let miniOnClose = null;
 let miniDiving = false; // the slip is opening the full entry (the band, the second tap)
 const slipSummons = []; // the onClose of every slip whose entry is open, called when the entry closes
-function removeMini() {
+/* G1 · a slip diving into its page closes at once (its surface hears 'dive', its anchor and door are let go), but its
+ * element stays on the glass, inert and marked leaving, until the page's view transition has captured it: the slip's
+ * headword is the match cut's source. The transition's update takes it away (enterWord). */
+function removeMini(reason = miniDiving ? 'dive' : 'dismiss', { forCut = false } = {}) {
   closeVocabularyListPopover();
   const slip = document.getElementById('mini');
-  slip?.remove();
+  if (slip && forCut) {
+    slip.dataset.leaving = '';
+    slip.inert = true;
+  } else slip?.remove();
   miniAnchor = null;
   miniEntry = null;
   const closing = miniOnClose;
   miniOnClose = null;
   if (!slip || !closing) return;
-  if (miniDiving) slipSummons.push(closing);
-  closing(miniDiving ? 'dive' : 'dismiss');
+  if (reason === 'dive') slipSummons.push(closing);
+  closing(reason);
+}
+/** The slip that stands for a word now: never one already leaving into its page. */
+function standingSlip() {
+  const slip = document.getElementById('mini');
+  return slip && !slip.hasAttribute('data-leaving') ? slip : null;
+}
+/** The standing slip's headword: the match cut's source when the slip is the door into the page. */
+function slipHeadword() {
+  return standingSlip()?.querySelector('.mini-word') || null;
 }
 
 /* One tap grammar for every Japanese word (John, 2026-10-14: "I should be able to tap ANY word … and it
  * should be able to cycle through the layers to full entry"; "there is NO WAY to return to the
  * original word without the furigana"). A word cycles: the original text → one tap: its reading above
  * it and the popup (the meaning, Save) → the same word again: the full entry → closing it (Close, Back,
- * Escape, the scrim), a tap off the words, or Escape on the popup: the original again, every reading a
+ * Escape, device Back), a tap off the words, or Escape on the popup: the original again, every reading a
  * tap summoned taken back. Words inside the popup and the entry follow the same grammar, so the layers
  * nest and always unwind.
  *
@@ -8062,7 +8068,7 @@ document.addEventListener(
     if (readerWordMenu && !readerWordMenu.menu.contains(target)) closeReaderWordMenu();
     const pop = document.getElementById('vocabulary-list-popover');
     if (pop && !pop.contains(target) && !target.closest?.('#mini-take, #personal-add-list, #kp-take')) closeVocabularyListPopover();
-    const mini = document.getElementById('mini');
+    const mini = standingSlip();
     const inText = ev.button === 0 && !!target.closest?.('#reader');
     if (mini && !mini.contains(target) && !target.closest?.('#vocabulary-list-popover, #reader-toast')) {
       if (ev.button === 0 && miniAnchor?.isConnected && miniAnchor.contains(target)) {
@@ -8219,14 +8225,17 @@ async function openJapaneseLookup(anchor, text, context = {}) {
   const hasKanjiEntry = [...text].length === 1 && !!D.kanji[text];
   const token = { s: text, b: record?.head || text, r: context.reading || record?.r || '', c: !!record,
     ...(record?.seq ? { seq: record.seq } : {}) };
+  const entryNode = hasKanjiEntry ? { t: 'kanji', id: text }
+    : record ? { t: 'word', id: token.b, ...(record?.seq ? { seq: record.seq, reading: record.r } : {}) } : null;
   const mini = showMini(anchor, token, () => {
     // An unresolved spelling must not reopen lookup(text)'s rejected first row.
-    if (!record && !hasKanjiEntry) return;
-    removeMini();
-    if (hasKanjiEntry) go({ t: 'kanji', id: text }, { invoker: anchor });
-    else go({ t: 'word', id: token.b, ...(record?.seq ? { seq: record.seq, reading: record.r } : {}) }, { invoker: anchor });
+    if (!entryNode) return;
+    // the slip's headword is the cut's source; the slip itself leaves inside the cut (enterWord)
+    go(entryNode, { invoker: anchor, from: slipHeadword() });
   }, { record, entryAvailable: !!record || hasKanjiEntry, from: context.from || null, sentence: context.sentence?.() || null,
-    focusEntry: !!context.focusPopup });
+    focusEntry: !!context.focusPopup, entryNode });
+  // G1 · a page opened while the lookup was answering keeps a word below it from floating a card over it
+  if (!mini) return;
   japaneseLookupMini = { mini, anchor };
   mini.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
@@ -8734,7 +8743,9 @@ const SAVE_PRESS_MS = 600;
  *   onClose  how the surface hears the slip go (removeMini) · follow: the anchor moves (the sky), the slip follows */
 function showMini(span, token, onEntry, { focusEntry = false, from = null, reader = false, record, entryAvailable = true, sentence = null,
   look = null, kind = 'word', save = 'default', host = null, note = null, source = null, key = null, kanji = reader, onClose = null, follow = false,
-  nodeFor = null } = {}) {
+  nodeFor = null, entryNode = null } = {}) {
+  // G1 · no card from the layer below ever floats over a page: with a page open, only a word on that page gets a slip
+  if (!slipAllowed(span)) return null;
   removeMini();
   const other = nodeFor || { t: kind, id: token.b };
   const { g, held, node: captureNode, state: miniState, identityHeld } = kind === 'word'
@@ -8924,13 +8935,22 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     clearReaderReadings();
     span.focus({ preventScroll: true });
   });
+  if (span.closest?.('#sheet')) mini.dataset.page = '';
   document.body.append(mini);
   miniAnchor = span;
   miniEntry = entryAvailable ? onEntry : null;
   miniOnClose = onClose;
   keepFloatingBeside(mini, span, { follow });
   if (focusEntry) ([seal, word].find((button) => button && button.tagName === 'BUTTON' && !button.disabled) || mini).focus({ preventScroll: true });
+  // G1 · the page this slip's door opens is built at idle, so the next tap only mounts it
+  if (entryAvailable && entryNode) schedulePagePrebuild(entryNode, span);
   return mini;
+}
+
+/** Whether a slip may stand beside this element: always, unless a page is open and the element is not on it. */
+function slipAllowed(anchor) {
+  const page = document.getElementById('sheet');
+  return !page || !!anchor?.closest?.('#sheet');
 }
 
 /** The quick look's kanji line (Read lane, redesign): each kanji of the word with its parts, the saved
@@ -8942,7 +8962,12 @@ function miniKanjiWeb(word, anchor) {
   if (!chars.length) return null;
   const box = el('div', 'mini-web');
   box.dataset.japaneseLookup = 'off';
-  const open = (node) => (event) => { event.stopPropagation(); removeMini(); go(node, { invoker: anchor }); };
+  // a kanji row (or a card word) opens its page from its own glyph; the slip leaves inside the cut (enterWord)
+  const open = (node) => (event) => {
+    event.stopPropagation();
+    const row = event.currentTarget;
+    go(node, { invoker: anchor, from: row?.querySelector?.('.mini-kanji-glyph') || row || null });
+  };
   // the band's head names it, so its tiles read as the word's kanji, not as more words; the door into the
   // word's web stands at the head's end, the way a list's "See all" does
   const top = el('div', 'mini-band-head');
@@ -9084,8 +9109,10 @@ function placeFloating(card, r) {
     return box.height ? box[edge] : null;
   };
   const height = window.innerHeight || Infinity;
-  // A clipped card meets the chrome edge: a gutter here can expose half a title glyph.
-  const ceiling = Math.max(8, fixedEdge('#app > .chrome', 'bottom') ?? 0);
+  // A clipped card meets the chrome edge: a gutter here can expose half a title glyph. On a page the edge is the page's
+  // own bar (G1: Back is never covered)
+  const onPage = !!card.dataset.page;
+  const ceiling = Math.max(8, (onPage ? fixedEdge('#sheet > .sheet-bar', 'bottom') : null) ?? fixedEdge('#app > .chrome', 'bottom') ?? 0);
   // the deck's grade dock is a floor too: the slip never covers the four grades (it sits above a word in the lower third)
   const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
     fixedEdge('.kp-grades', 'top') ?? height) - 8;
@@ -9642,7 +9669,9 @@ function openReadingSlip(anchor, token, draw) {
   const ready = readyTokenReading(token);
   if (!ready) return draw(readingToken(token));
   let drawn = null;
-  const live = () => serial === readingSlipSerial && anchor.isConnected && !(document.getElementById('mini') && miniAnchor !== anchor);
+  // G1 · and never a card for a word a page has since covered (slipAllowed)
+  const live = () => serial === readingSlipSerial && anchor.isConnected && slipAllowed(anchor) &&
+    !(document.getElementById('mini') && miniAnchor !== anchor);
   // a slip drawn before the answer says it is still being answered (aria-busy), until the answer comes
   const early = () => { drawn = draw(readingToken(token)); drawn?.setAttribute('aria-busy', 'true'); };
   if (!D.dictionaryIndex) early();
@@ -9864,7 +9893,7 @@ function clearReaderReadings({ marked = false } = {}) {
     syncReaderTakeSeal();
   }
 }
-/** The full entry closing — Close, Back, Escape, the scrim, device Back — returns the word the slip opened
+/** The full entry closing — Close, Back, Escape, device Back — returns the word the slip opened
  * it from to the original text: the reading its tap summoned goes with the sheet (John, 2026-10-14: "there
  * is NO WAY to return to the original word without the furigana"). The word stays the chosen one (its mark, the
  * bookmark line) until a tap elsewhere in the text. A sheet opened by any other door
@@ -9882,7 +9911,6 @@ function wireTokenGestures(span, token, index, p) {
   const obsKey = srsKey('word', token.b);
   const from = { passage: p.id, index };
   const openFull = (modality = 'pointer', { fromSlip = false } = {}) => {
-    removeMini();
     setReaderTake(token.b, index, p.id);
     // only the slip's own door (tap 2, the band) carries a summoned reading into the entry; the keyboard's
     // Ctrl+Enter and the word menu open the entry from the plain word, as they always did
@@ -9890,8 +9918,9 @@ function wireTokenGestures(span, token, index, p) {
     obsLog('tap', obsKey, 3, p.id);
     interaction({ kind: 'entry.open', target }, modality, 'reader-token');
     // a core hit opens exactly as before; a spelling the core lacks is
-    // matched by this token's reading first (D11, readerEntryNode)
-    go(readerEntryNode(token, index, p), { invoker: span });
+    // matched by this token's reading first (D11, readerEntryNode). G1: the page arrives from the slip's headword
+    // (or the word itself, from the keyboard or the menu); the slip leaves inside that cut
+    go(readerEntryNode(token, index, p), { invoker: span, from: (fromSlip && slipHeadword()) || span });
   };
   const sentence = () => readerTakeNode({ id: token.b, index, p: p.id });
   const quickLook = (modality = 'pointer', { restore = false } = {}) => {
@@ -9903,7 +9932,7 @@ function wireTokenGestures(span, token, index, p) {
     // reading names the full dictionary's one entry is that entry's own door (D23 answers it), not D11's held look
     openReadingSlip(span, token, (door) => showMini(span, door, (entryModality) => openFull(entryModality, { fromSlip: true }), {
       focusEntry: modality === 'keyboard', from, reader: !(door.seq && !D.dict[door.b]), kanji: true,
-      sentence: readerSentenceRow(sentence(), index),
+      sentence: readerSentenceRow(sentence(), index), entryNode: readerEntryNode(token, index, p),
     }));
     if (!restore) retireReaderTip();
   };
@@ -10946,12 +10975,14 @@ function openSlip(node, { anchor, from = 'lookup', host = null, look = null, not
     kanji = false;
   }
   const onEntry = (modality) => {
-    removeMini();
-    if (typeof entry === 'function') entry(modality);
-    else if (node) go(node, { invoker: anchor });
+    if (typeof entry === 'function') {
+      removeMini();
+      entry(modality);
+    } else if (node) go(node, { invoker: anchor, from: slipHeadword() || anchor }); // the slip leaves inside the cut (enterWord)
   };
   return showMini(anchor, token, onEntry, { focusEntry: focus, record, entryAvailable, sentence, look, kind, save, host, note,
-    source: from, key, kanji, onClose, follow: from === 'drift' || from === 'sky', nodeFor: node && kind !== 'word' ? { t: node.t, id: node.id } : null });
+    source: from, key, kanji, onClose, follow: from === 'drift' || from === 'sky', nodeFor: node && kind !== 'word' ? { t: node.t, id: node.id } : null,
+    entryNode: typeof entry === 'function' ? null : node });
 }
 /** A kanji's first reading for the slip's band: its first on reading in kana, else its first kun stem. */
 function kanjiSlipReading(k) {
@@ -10967,13 +10998,13 @@ window.__BUNKI_OPEN_SLIP = {
    * is the door); without it the next tap on the element dives into the entry. 'opened' | 'dived' | false. */
   open(kind, key, { anchor = null, onClose = null, redo = false } = {}) {
     if (S.view !== 'drift' || !this.has(kind, key) || !anchor?.isConnected) return false;
-    const before = !!document.getElementById('mini');
+    const before = !!standingSlip();
     const slip = openSlip({ t: kind, id: key }, { anchor, from: 'drift', onClose, redo });
     if (slip) {
       interaction({ kind: 'quickLook.open' }, 'pointer', `drift-slip-${kind}`);
       return 'opened';
     }
-    const dived = before && !document.getElementById('mini');
+    const dived = before && !standingSlip();
     // the sky opens the entry on the touch's release: its compatibility click must not land on the entry that rose
     // under the finger (a kanji tile there opened a second entry). One ghost click, once — the hold's own guard
     if (dived) swallowClickUntil = Date.now() + 700;
@@ -10981,7 +11012,7 @@ window.__BUNKI_OPEN_SLIP = {
   },
   /** Is the slip open — beside this element, when one is named. */
   isOpen(anchor = null) {
-    return !!document.getElementById('mini') && (!anchor || miniAnchor === anchor);
+    return !!standingSlip() && (!anchor || miniAnchor === anchor);
   },
   close() {
     if (document.getElementById('mini')) removeMini();
@@ -26222,12 +26253,15 @@ function renderSentenceTokens(container, tokens, opts = {}) {
     const from = source ? { passage: source.passage, index: source.index + index } : null;
     // R · the entry is the one this token's own reading names, as its slip showed it (readingToken); before the
     // full dictionary answers, a core spelling carries the reading and its sheet resolves it
-    const openEntry = (door = readingToken(token)) => {
-      removeMini();
-      obsLog('tap', srsKey('word', token.b), 3, contextId);
+    const entryNodeFor = (door) => {
       const own = tokenReading(token);
-      go({ t: 'word', id: token.b, ...(door.seq ? { seq: door.seq, reading: own }
-        : D.dict[token.b] && readingAsksIndex(token.b, own) ? { reading: own } : {}), ...(from ? { from, ctxScope: 'sent' } : {}) });
+      return { t: 'word', id: token.b, ...(door.seq ? { seq: door.seq, reading: own }
+        : D.dict[token.b] && readingAsksIndex(token.b, own) ? { reading: own } : {}), ...(from ? { from, ctxScope: 'sent' } : {}) };
+    };
+    const openEntry = (door = readingToken(token)) => {
+      obsLog('tap', srsKey('word', token.b), 3, contextId);
+      // G1 · the page arrives from the slip's headword; the slip leaves inside the cut
+      go(entryNodeFor(door), { invoker: span, from: slipHeadword() || span });
     };
     span.addEventListener('contextmenu', (ev) => ev.preventDefault());
     span.addEventListener('click', (ev) => {
@@ -26236,7 +26270,8 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       // the second tap on the popup's word dives into its full entry
       if (diveFromMini(span, ev)) return;
       obsLog('tap', srsKey('word', token.b), 2, contextId);
-      openReadingSlip(span, token, (door) => showMini(span, door, () => openEntry(door), { focusEntry: ev.detail === 0, from }));
+      openReadingSlip(span, token, (door) => showMini(span, door, () => openEntry(door), { focusEntry: ev.detail === 0, from,
+        entryNode: entryNodeFor(door) }));
     });
     container.append(span);
   });
@@ -27821,15 +27856,29 @@ window.addEventListener('pointercancel', settleWordSheetGesture, { capture: true
 window.addEventListener('blur', () => settleWordSheetGesture());
 
 function refreshWordSheet(node) {
+  // G1 · a page built ahead and not yet shown is built again with what arrived, at idle
+  if (pagePrebuilt?.node === node) {
+    const anchor = miniAnchor;
+    pagePrebuilt = null;
+    schedulePagePrebuild(node, anchor);
+    return;
+  }
   if (S.stack[S.stack.length - 1] !== node) return;
   if (wordSheetGesture?.node === node) {
     wordSheetGesture.pending = true;
     return;
   }
+  // a page still arriving takes what arrived once its cut has finished
+  if (pageTransition) {
+    pageTransition.vt.finished.catch(() => {}).finally(() => refreshWordSheet(node));
+    return;
+  }
   const live = document.getElementById('sheet');
   S.sheetScrollRestore = live?.scrollTop || 0;
   S.sheetFocus = document.activeElement?.id || null;
-  render();
+  // the page alone takes the new data; the room under it is untouched
+  if (layerPathFor()) renderLayer();
+  else render();
 }
 
 function requestDictionaryDetails(node) {
@@ -30358,46 +30407,10 @@ function renderEncounterTrail(sheet, node) {
   sheet.append(box);
 }
 
-// Data enrichment rebuilds the entry, but belongs to the same arrival. Keep
-// each layer on its original timeline; actual stack navigation starts anew.
-let sheetArrivalVisit = null;
-function continueSheetArrival(sheet, scrim) {
-  const path = JSON.stringify(S.stack.map((node) => [node.t, node.id, String(node.seq || ''), node.reading || '']));
-  if (!sheetArrivalVisit || sheetArrivalVisit.view !== S.view ||
-      sheetArrivalVisit.passageId !== S.passageId || sheetArrivalVisit.stack !== S.stack ||
-      sheetArrivalVisit.path !== path) {
-    sheetArrivalVisit = { view: S.view, passageId: S.passageId, stack: S.stack, path, layers: new Map() };
-  }
-  const visit = sheetArrivalVisit;
-  for (const [key, element] of [['sheet', sheet], ['scrim', scrim]]) {
-    const animation = element.getAnimations({ subtree: false })
-      .find((item) => item.animationName === 'feel-rise' || item.animationName === 'feel-fade');
-    if (!animation) continue;
-    const previous = visit.layers.get(key);
-    const layer = { animation, startedAt: previous?.startedAt ?? document.timeline.currentTime ?? performance.now() };
-    visit.layers.set(key, layer);
-    if (previous) animation.startTime = layer.startedAt;
-    animation.ready.then(() => {
-      if (sheetArrivalVisit === visit && visit.layers.get(key) === layer && animation.startTime != null) {
-        layer.startedAt = animation.startTime;
-      }
-    }, () => {});
-  }
-}
-
-function renderSheet(root) {
-  const node = S.stack[S.stack.length - 1];
-  if (!node) { sheetArrivalVisit = null; return; }
-  // A direct UI action may already include the newly arrived data in this
-  // render. Do not follow it with a redundant deferred repaint.
-  if (wordSheetGesture?.node === node) wordSheetGesture.pending = false;
-  const scrim = el('div', 'scrim');
-  scrim.setAttribute('aria-hidden', 'true');
-  scrim.addEventListener('click', () => {
-    interaction({ kind: 'layer.dismiss' }, 'pointer', 'sheet-scrim');
-    dismissSheet();
-  });
-  root.append(scrim);
+/** One page, detached: its bar, its body and its report line, its prose made doors. `path` is the stack the page will
+ * stand on (its own node last): the bar's Close or Back and its crumb read it. Appends nothing, focuses nothing. */
+function buildPage(node, { path = S.stack } = {}) {
+  const depth = path.length;
   const sheet = el('div', 'sheet');
   sheet.id = 'sheet';
   sheet.dataset.node = `${node.t}:${node.id}`;
@@ -30407,13 +30420,12 @@ function renderSheet(root) {
   sheet.setAttribute('aria-modal', 'true');
   sheet.setAttribute('aria-label', tx(`${nodeTitle(node)} の全項目`, `${nodeTitle(node)} full entry`));
   if (node.t === 'word') sheet.addEventListener('pointerdown', (event) => beginWordSheetGesture(event, node), { capture: true, passive: true });
-  sheet.append(el('div', 'sheet-grip'));
 
   // the sheet carries its own way out — "NO BACK OPTION" (operator, on-device)
   const bar = el('div', 'sheet-bar');
   bar.dataset.bar = 'sheet';
   // the one back glyph (the frame draws it); its word: Close at the first depth, Back deeper in
-  const backBtn = S.stack.length === 1
+  const backBtn = depth === 1
     ? biLabel('button', 'sheet-back', '閉じる', 'Close')
     : biLabel('button', 'sheet-back', '戻る', 'Back');
   backBtn.type = 'button';
@@ -30429,8 +30441,8 @@ function renderSheet(root) {
     back();
   });
   bar.append(backBtn);
-  if (S.stack.length > 1) {
-    bar.append(el('span', 'sheet-depth', S.stack.map((n) => nodeTitle(n)).join(' › ')));
+  if (depth > 1) {
+    bar.append(el('span', 'sheet-depth', path.map((n) => nodeTitle(n)).join(' › ')));
   }
   // the search ghost reaches the sheets too — the layer law makes the fixed
   // chrome inert under a dialog, so the sheet bar carries its own door
@@ -30495,7 +30507,7 @@ function renderSheet(root) {
   closeBtn.id = 'sheet-close';
   // At the first depth Back and Close have the same return; the left-hand
   // Close owns it. Nested entries keep Close-all distinct from stepping Back.
-  closeBtn.hidden = S.stack.length === 1;
+  closeBtn.hidden = depth === 1;
   closeBtn.title = tx('とじる', 'close');
   closeBtn.setAttribute('aria-label', tx('全項目をとじる', 'close full entry'));
   closeBtn.dataset.action = 'layer.dismiss';
@@ -30567,16 +30579,14 @@ function renderSheet(root) {
     },
     { passive: true },
   );
-  const savedSheetScroll = node.sheetScroll || 0;
-  if (savedSheetScroll) requestAnimationFrame(() => {
-    if (sheet.isConnected) sheet.scrollTop = savedSheetScroll;
-  });
   sheet.addEventListener('keydown', (event) => {
+    // Escape steps out one level, as Back does (A's cycle; MASTER_SPEC §7.2: "Back, Escape or paper steps back
+    // one level"); the × at depth two and deeper still closes them all
     if (event.key === 'Escape') {
       event.preventDefault();
       event.stopPropagation();
-      interaction({ kind: 'layer.dismiss' }, 'keyboard', 'sheet-escape');
-      dismissSheet();
+      interaction({ kind: 'navigation.back' }, 'keyboard', 'sheet-escape');
+      back();
       return;
     }
     if (event.key !== 'Tab') return;
@@ -30611,9 +30621,32 @@ function renderSheet(root) {
     }
   });
   if (maintenanceReports) sheet.append(reportEntries('report-line-sheet'));
-  root.append(sheet);
-  continueSheetArrival(sheet, scrim);
+  enhanceJapaneseProse(sheet);
+  return sheet;
+}
 
+/** Mount the top node's page: the one way render() and the page layer both show a page (a page built ahead at idle,
+ * or a page kept for Back, is mounted as it is). */
+function renderSheet(root, { prebuilt = null } = {}) {
+  const node = S.stack[S.stack.length - 1];
+  if (!node) return;
+  // A direct UI action may already include the newly arrived data in this
+  // render. Do not follow it with a redundant deferred repaint.
+  if (wordSheetGesture?.node === node) wordSheetGesture.pending = false;
+  const sheet = prebuilt || buildPage(node);
+  root.append(sheet);
+  mountPageEffects(sheet, node);
+}
+
+/** A mounted page takes its place and the keyboard: where it was scrolled (its own node's place, or the place a
+ * re-render or the writing room carried), then the focus a re-render named, the door a deeper page was opened from, or
+ * its Close. */
+function mountPageEffects(sheet, node) {
+  // reading position survives the doors: Back hands a ~2,700px entry its place, never its top (P1, review)
+  const savedSheetScroll = node.sheetScroll || 0;
+  if (savedSheetScroll) requestAnimationFrame(() => {
+    if (sheet.isConnected) sheet.scrollTop = savedSheetScroll;
+  });
   // The sheet keeps its place across a full re-render: 筆順 carries the
   // scrollTop it left with and hands it straight back.
   const restore = S.strokes ? S.strokes.sheetScroll : S.sheetScrollRestore;
@@ -30626,9 +30659,266 @@ function renderSheet(root) {
   S.sheetFocus = null;
   S.sheetReturnFocus = null;
   queueMicrotask(() => {
-    const target = (focusId && sheet.querySelector(`#${CSS.escape(focusId)}`)) || findSheetDoor(sheet, returnFocus) || backBtn;
-    target.focus({ preventScroll: true });
+    if (!sheet.isConnected) return;
+    const target = (focusId && sheet.querySelector(`#${CSS.escape(focusId)}`)) || findSheetDoor(sheet, returnFocus) ||
+      sheet.querySelector('#sheet-back');
+    target?.focus({ preventScroll: true });
   });
+}
+
+/* ---------------------------------------------- G1 · the page as a layer
+ * Opening a page, going deeper, coming back and refreshing it re-render the page alone: the room under it keeps its
+ * DOM — its tokens, its scroll, the reading a tap raised. render() rebuilt all of #app for every page move (the
+ * reader's tokens and a forced whole-document layout: 123–159 ms frames in WebKit, one-hand/G1/frames.json). Rooms
+ * whose own render reads the stack (the galaxy's hero chrome, the levels' return door), the writing room, and rooms
+ * that run a live session keep render(); the page is the same element either way (buildPage). */
+const LAYER_ROOMS = new Set(['reader', 'shelf', 'archive', 'search', 'tray', 'saved', 'list', 'browse', 'srs-stats',
+  'kanjidex', 'grammar', 'yoji', 'thesaurus', 'feed', 'publisher', 'source-inbox', 'source-reader', 'airead', 'me',
+  'settings', 'kagami']);
+function layerPathFor(view = S.view) {
+  return !!S.ready && !personalHost && !S.strokes && LAYER_ROOMS.has(view) && !!document.querySelector('#app > main');
+}
+
+/** Exactly one layer is live at a time. 筆順 sits above the page, so when it is open even the page goes inert —
+ * nothing behind the top layer is reachable by finger, keyboard, or screen reader. What this law set on a child it
+ * also takes back, and only that: a child hidden for its own reasons keeps them. */
+const layerHidden = new WeakMap();
+function applyLayerLaw(root) {
+  const live = S.strokes ? 'stroke-page' : S.stack.length ? 'sheet' : null;
+  for (const child of root.children) {
+    const was = layerHidden.get(child);
+    if (!live || child.id === live) {
+      if (was) {
+        child.inert = was.inert;
+        if (was.hidden == null) child.removeAttribute('aria-hidden');
+        else child.setAttribute('aria-hidden', was.hidden);
+        layerHidden.delete(child);
+      } else if (live) {
+        child.inert = false;
+        child.removeAttribute('aria-hidden');
+      }
+      continue;
+    }
+    if (!was) layerHidden.set(child, { inert: child.inert, hidden: child.getAttribute('aria-hidden') });
+    child.inert = true;
+    child.setAttribute('aria-hidden', 'true');
+  }
+}
+
+/** The page layer, alone: the top node's page mounted (or none), the layer law, the crumb under it, the store alert's
+ * description, the walk sentinel. No room is rebuilt. */
+function renderLayer({ prebuilt = null } = {}) {
+  const root = document.getElementById('app');
+  syncSheetActionVisit();
+  closeReaderWordMenu();
+  stopSentenceListening();
+  removeMini();
+  for (const old of root.querySelectorAll(':scope > #sheet')) old.remove();
+  if (S.stack.length) renderSheet(root, { prebuilt });
+  applyLayerLaw(root);
+  const crumb = root.querySelector(':scope > .chrome .crumb');
+  if (crumb) paintCrumb(crumb);
+  safelySyncStoreAlert();
+  syncWalkSentinel();
+}
+
+/* ---------------------------------------------- G1 · arrival as a match cut (BRIEF D4)
+ * A same-document view transition: the source — the slip's headword when the slip is the door, else the tapped word —
+ * carries word-hero at capture and the page's headword carries it after; the layer the page covers recedes a step
+ * toward the source (kairo-paper). Back runs the reverse when the source still stands, else a cross-fade. The state
+ * changes inside the transition's update, as a room's does (roomTransition). Reduced motion, a hidden document or a
+ * browser without view transitions: the page changes at once (C's one rule fades it in 120 ms). Names and keyframes:
+ * one block in rooms/motion.css. */
+let pageTransition = null; // { vt, run }: the cut still running, and its update (run once, whoever runs it first)
+const heroSource = new WeakMap(); // stack node → the element its page was entered from (the reverse cut's target)
+const keptPages = new WeakMap(); // stack node → { page, epoch }: a page a deeper one covered, mounted again by Back
+function pageCutAllowed() {
+  return typeof document.startViewTransition === 'function' && !document.hidden &&
+    !(typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+/** The page's headword: a word's h2, a kanji's glyph, else the page's first heading. */
+function heroOf(page) {
+  return page?.querySelector('.headword, .hero-glyph, h2') || null;
+}
+function cutName(element, name) {
+  if (!element) return;
+  if (name) element.style.viewTransitionName = name;
+  else element.style.removeProperty('view-transition-name');
+}
+/** End a cut still running: its update runs now if it has not, and its animation stops. */
+function finishPageTransition() {
+  const running = pageTransition;
+  if (!running) return;
+  pageTransition = null;
+  running.run();
+  try { running.vt.skipTransition(); } catch { /* already finished */ }
+}
+/** Where the receding paper is scaled from: the source's centre on the screen (the root's snapshot is the viewport). */
+function paperOrigin(source) {
+  const html = document.documentElement;
+  if (!source) { html.style.removeProperty('--paper-origin'); return; }
+  const s = source.getBoundingClientRect();
+  html.style.setProperty('--paper-origin', `${Math.round(s.left + s.width / 2)}px ${Math.round(s.top + s.height / 2)}px`);
+}
+/** Run a page change inside one cut (or at once when there is none). `names` are set before the capture; `after`
+ * names the new state inside the update; every name is cleared when the cut ends. */
+function runPageCut(change, { names = [], after = () => [] } = {}) {
+  finishPageTransition();
+  if (!pageCutAllowed()) { change(); return null; }
+  const named = [];
+  for (const [element, name] of names) if (element) { cutName(element, name); named.push(element); }
+  let ran = false;
+  const run = () => {
+    if (ran) return;
+    ran = true;
+    for (const element of named) cutName(element, '');
+    change();
+    for (const [element, name] of after()) if (element?.isConnected) { cutName(element, name); named.push(element); }
+  };
+  let vt;
+  try {
+    vt = document.startViewTransition(run);
+  } catch {
+    run();
+    return null;
+  }
+  const entry = { vt, run };
+  pageTransition = entry;
+  vt.ready.catch(() => {});
+  vt.finished.catch(() => {}).finally(() => {
+    for (const element of named) cutName(element, '');
+    if (pageTransition === entry) pageTransition = null;
+  });
+  return vt;
+}
+
+/** The page arrives. Called by go() after its bookkeeping; pushes the node (the page built ahead for it, when one is
+ * waiting) and mounts its page by the layer, or by render() in the rooms that keep it. */
+function enterWord(node, { from = null, invoker = null } = {}) {
+  finishPageTransition();
+  const layered = layerPathFor();
+  const depth = S.stack.length + 1;
+  const ready = layered ? takePrebuiltPage(node, depth) : null;
+  const pushed = ready?.node || node;
+  if (invoker?.isConnected) heroSource.set(pushed, invoker);
+  const source = from?.isConnected ? from : invoker?.isConnected ? invoker : null;
+  // the paper that recedes is what the page covers, captured once as the viewport shows it: the document root, named only
+  // for the old state (the arriving page is never captured, so it stays live and hit-testable — the reason motion.css
+  // keeps the root's name none). Capturing #app > main instead, a reader thousands of pixels tall, cost WebKit 47–98 ms
+  // (one-hand/G1/frames.json, before.matchCutProbe)
+  const covered = document.documentElement;
+  // the slip closes now (its surface hears 'dive'); its element leaves inside the cut, so its headword is captured
+  const reason = miniDiving ? 'dive' : 'dismiss';
+  const cut = pageCutAllowed();
+  removeMini(reason, { forCut: cut && !!source?.closest?.('#mini') });
+  if (cut) paperOrigin(source);
+  const change = () => {
+    for (const leaving of document.querySelectorAll('#mini[data-leaving]')) leaving.remove();
+    // the page this one covers is kept as it stands: Back mounts the same element, its words the reverse cut's targets
+    const below = depth > 1 ? document.getElementById('sheet') : null;
+    if (below && layered) keptPages.set(S.stack.at(-1), { page: below, epoch: pageEpoch });
+    S.stack.push(pushed);
+    if (layered) renderLayer({ prebuilt: ready?.page || null });
+    else render();
+    const sheet = document.getElementById('sheet');
+    if (sheet && !pushed.sheetScroll) sheet.scrollTop = 0;
+  };
+  runPageCut(change, {
+    names: [[source, 'word-hero'], [covered, 'kairo-paper']],
+    after: () => (source ? [[heroOf(document.getElementById('sheet')), 'word-hero']] : []),
+  });
+}
+
+/** Back (one level) or close-all. The page's headword returns to the element it was entered from when that still
+ * stands (the reader keeps its tokens under the layer; a kept page keeps its words), the page fades as it goes. */
+function recede({ all = false, viaRender = false } = {}) {
+  if (!S.stack.length) return null;
+  const layered = !viaRender && layerPathFor();
+  const leaving = all ? S.stack[0] : S.stack.at(-1);
+  const sheet = document.getElementById('sheet');
+  const hero = heroOf(sheet);
+  const change = () => {
+    if (all) S.stack = [];
+    else S.stack.pop();
+    const top = S.stack.at(-1);
+    S.sheetReturnFocus = top?.returnFocus || null;
+    if (!S.stack.length) clearReaderSummons();
+    const kept = layered && top ? keptPages.get(top) : null;
+    if (top) keptPages.delete(top);
+    if (layered) renderLayer({ prebuilt: kept && kept.epoch === pageEpoch ? kept.page : null });
+    else render();
+    if (!S.stack.length) {
+      returnScroll();
+      restoreDialogInvoker();
+    }
+  };
+  const vt = runPageCut(change, {
+    names: [[hero, 'word-hero'], [sheet, 'kairo-page']],
+    after: () => {
+      const target = heroSource.get(leaving);
+      return hero && target?.isConnected ? [[target, 'word-hero']] : [];
+    },
+  });
+  return vt;
+}
+
+/* ---------------------------------------------- G1 · the page built ahead (BRIEF Added 1)
+ * Once a slip with an entry is up, the page its door opens is built at idle — detached, its senses and examples asked
+ * for — and the next tap mounts it: the page never starts with a long task. One page at most; it is only used when it
+ * was built for the same node, depth, room, article, language, world and saved words; anything else builds afresh. */
+const PREBUILD_AFTER_MS = 360; // after the slip's own arrival, so the two never share a frame
+let pagePrebuilt = null; // { key, node, page }
+let pagePrebuildCancel = null;
+let pageEpoch = 0; // bumped by every render(): a page built or kept against an older state is not used
+function pageKey(node, depth) {
+  const lists = Object.entries(S.lists || {}).map(([name, rows]) => `${name}:${rows?.length || 0}`).join(',');
+  return JSON.stringify([node.t, node.id, String(node.seq ?? ''), node.reading || '', node.from?.passage || '',
+    node.from?.index ?? '', !!node.readerChoice, depth, S.view, S.passageId || '', S.lang, themeIx(),
+    S.taken.length, lists, pageEpoch]);
+}
+/** After `after` ms, at the next idle moment: requestIdleCallback where it exists, else just after a frame (WebKit has
+ * no idle callback). Returns a cancel. */
+function whenIdle(fn, { after = 0, timeout = 800 } = {}) {
+  let live = true, idleHandle = null, idleTimer = null, frame = 0;
+  const run = () => { if (live) { live = false; fn(); } };
+  const timer = setTimeout(() => {
+    if (!live) return;
+    if (typeof window.requestIdleCallback === 'function') idleHandle = window.requestIdleCallback(run, { timeout });
+    else frame = requestAnimationFrame(() => { frame = 0; idleTimer = setTimeout(run, 0); });
+  }, after);
+  return () => {
+    live = false;
+    clearTimeout(timer);
+    if (frame) cancelAnimationFrame(frame);
+    if (idleTimer != null) clearTimeout(idleTimer);
+    if (idleHandle != null && typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idleHandle);
+  };
+}
+function schedulePagePrebuild(node, anchor) {
+  pagePrebuildCancel?.();
+  pagePrebuildCancel = null;
+  if (!node || !anchor || !layerPathFor()) return;
+  pagePrebuildCancel = whenIdle(() => {
+    pagePrebuildCancel = null;
+    prebuildPage(node, anchor);
+  }, { after: PREBUILD_AFTER_MS });
+}
+function prebuildPage(node, anchor) {
+  if (!anchor.isConnected || miniAnchor !== anchor || !standingSlip() || pageTransition || !layerPathFor()) return;
+  const depth = S.stack.length + 1;
+  const key = pageKey(node, depth);
+  if (pagePrebuilt?.key === key) return;
+  const page = buildPage(node, { path: [...S.stack, node] });
+  page.dataset.built = 'ahead'; // the verifier's witness that the tap only mounted it
+  pagePrebuilt = { key, node, page };
+}
+/** The page built ahead for this node at this depth, taken (it is used once), or null. */
+function takePrebuiltPage(node, depth) {
+  pagePrebuildCancel?.();
+  pagePrebuildCancel = null;
+  const ready = pagePrebuilt;
+  pagePrebuilt = null;
+  return ready && ready.key === pageKey(node, depth) ? ready : null;
 }
 
 function licencePanel() {
@@ -33298,6 +33588,20 @@ function crumbRoom(parts, root) {
     parts.push(passage().title);
   }
 }
+/** The room chrome's crumb: the room's trail, then every page on the stack. render() paints it on a fresh crumb; the
+ * page layer repaints the one in place (it stands under the page, and a screen reader's last look at it must be true). */
+function paintCrumb(crumb) {
+  const parts = [];
+  if (placesLayout()) crumbPlaces(parts);
+  else crumbLine(parts);
+  for (const node of S.stack) parts.push(nodeTitle(node));
+  crumb.title = parts.join(' › ');
+  if (S.stack.length) crumb.dataset.uiContentValue = S.stack.map(nodeTitle).join('|');
+  else delete crumb.dataset.uiContentValue;
+  crumb.setAttribute('aria-label', crumb.title);
+  crumb.replaceChildren(el('b', null, parts.at(-1) || ''));
+  crumb.dataset.currentRoom = S.view;
+}
 /* classes a press FLIPS — left out of the last-resort focus key, or the control could never be
  * found again by the very press that moved the keyboard */
 const FOCUS_STATE_CLASSES = new Set(['on', 'on-list', 'dead', 'active', 'lit', 'primary', 'quiet']);
@@ -33305,6 +33609,8 @@ function render() {
   // Today folds into Review in the layout under test; anything that still names it opens
   // Review, its successor. The current layout is asked only when the view is Today.
   if (S.view === 'tray' && placesLayout()) S.view = 'dojo';
+  // a page built ahead, or kept for Back, was built against the state this render is about to replace
+  pageEpoch += 1;
   syncSheetActionVisit();
   if (personalHost) { personalHost.paint(); return; }
   if (retainedRetryView && S.view !== retainedRetryView) dropRetainedRetryRoute();
@@ -33443,15 +33749,7 @@ function render() {
   chrome.append(backBtn);
 
   const crumb = el('div', 'crumb');
-  const parts = [];
-  if (placesLayout()) crumbPlaces(parts);
-  else crumbLine(parts);
-  for (const node of S.stack) parts.push(nodeTitle(node));
-  crumb.title = parts.join(' › ');
-  if (S.stack.length) crumb.dataset.uiContentValue = S.stack.map(nodeTitle).join('|');
-  crumb.setAttribute('aria-label', crumb.title);
-  crumb.append(el('b', null, parts.at(-1) || ''));
-  crumb.dataset.currentRoom = S.view;
+  paintCrumb(crumb);
   // the reader names the level it is at in its own bar, beside the title (FEEL pass 2026-10-02)
   if (S.view === 'reader' && passage()) chrome.append(levelChip(passage(), 'chrome-level'));
   chrome.append(crumb);
@@ -33684,23 +33982,7 @@ function render() {
   renderVariants(root);
   enhanceJapaneseProse(root);
 
-  // Exactly one layer is live at a time. 筆順 sits above the sheet, so when it
-  // is open even the sheet goes inert — nothing behind the top layer is
-  // reachable by finger, keyboard, or screen reader.
-  if (S.strokes || S.stack.length) {
-    for (const child of root.children) {
-      const live = S.strokes
-        ? child.id === 'stroke-page'
-        : child.id === 'sheet' || child.classList.contains('scrim');
-      if (live) {
-        child.inert = false;
-        child.removeAttribute('aria-hidden');
-        continue;
-      }
-      child.inert = true;
-      child.setAttribute('aria-hidden', 'true');
-    }
-  }
+  applyLayerLaw(root);
   // Resolve the new room's styles before store-alert positioning reads layout.
   stampRegister();
   safelySyncStoreAlert();
@@ -33934,7 +34216,7 @@ function deckHost() {
       // say they are already in the deck where Save would stand; a word the dictionary lacks shows the deck's
       // sense and has no door
       openSlip: (node, options) => openSlip(node, options),
-      slipOpen: () => !!document.getElementById('mini'),
+      slipOpen: () => !!standingSlip(),
       closeSlip: () => { if (document.getElementById('mini')) removeMini(); },
       inDeckNote: () => tx('このデッキにあります', 'Already in this deck'),
       taken: () => S.taken,
