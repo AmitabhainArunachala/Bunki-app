@@ -1196,21 +1196,21 @@ async function verifyTap(browser, base) {
     await page.click('#kp-take');
     const id = sheet.key.replace(/^\w+:/, '');
     await waitForAppRecord(page, (r) => r.taken.some((t) => `${t.t}:${t.id}` === sheet.key), { description: 'one-tap deck capture' });
-    await page.waitForSelector('#kp-sheet .kp-sheet-taken');
-    const saved = await page.evaluate(`({ chooser: document.querySelectorAll('#kp-chooser, .kp-chooser, #kp-take-save, #kp-new-list').length, toast: document.getElementById('reader-toast')?.textContent || '', undo: !!document.getElementById('reader-toast-action'), list: !!document.getElementById('kp-take-list'), sheet: document.getElementById('kp-sheet')?.dataset.key })`);
+    await page.waitForSelector('#kp-sheet #kp-take.taken[aria-pressed="true"]');
+    // Save ▾ (1.3.0): the press that saves opens the word's menu over the deck sheet (lists · copy · remove from review)
+    await page.waitForSelector('#vocabulary-list-popover.is-save-menu', { timeout: 5000 });
+    const saved = await page.evaluate(`({ chooser: document.querySelectorAll('#kp-chooser, .kp-chooser, #kp-take-save, #kp-new-list, #kp-take-list').length, label: document.getElementById('kp-take')?.textContent || '', expanded: document.getElementById('kp-take')?.getAttribute('aria-expanded'), menu: [...document.querySelectorAll('#vocabulary-list-popover .vocabulary-list-action')].map((n) => n.id), sheet: document.getElementById('kp-sheet')?.dataset.key })`);
     const after = { sched: await page.evaluate(SCHEDULE_OF(KEY)), env: await env(page) };
     check(
-      'tap: 覚える is one tap through the corridor’s save path (A51) — no chooser appears; the word is in the shared review pool (覚えるの札) at once, still one row; the corridor shows 復習に保存しました with 元に戻す; the sheet says so and offers リストに追加…',
-      saved.chooser === 0 && after.env.taken.filter((k) => k === sheet.key).length === 1 && after.env.taken.length === before.env.taken.length + 1 && /復習に保存しました|Saved to review/.test(saved.toast) && saved.undo && saved.list && saved.sheet === sheet.key,
+      'tap: Save is one tap through the corridor’s save path (A51) — no chooser appears; the word is in the shared review pool (覚えるの札) at once, still one row; the button reads 保存済み ✓ · Saved ✓ and its menu (lists, copy, remove from review) opens over the deck sheet',
+      saved.chooser === 0 && after.env.taken.filter((k) => k === sheet.key).length === 1 && after.env.taken.length === before.env.taken.length + 1 && /^(保存済み ✓|Saved ✓)$/.test(saved.label) && saved.expanded === 'true' && saved.menu.includes('kp-take-copy') && saved.menu.includes('kp-take-unsave') && saved.sheet === sheet.key,
       JSON.stringify({ ...saved, taken: after.env.taken }),
     );
-    // the optional list: the corridor's own popover, over the deck sheet, writes the same guarded commit
-    await page.click('#kp-take-list');
-    await page.waitForSelector('#vocabulary-list-popover', { timeout: 5000 });
+    // the menu is the corridor's own list popover, over the deck sheet: a list written here is the same guarded commit
     const pop = await page.evaluate(`(() => { const p = document.getElementById('vocabulary-list-popover'); const r = p.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + Math.min(20, r.height / 2); const top = document.elementFromPoint(x, y); return { title: p.querySelector('.vocabulary-list-title')?.textContent || '', onTop: !!top && p.contains(top), inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; })()`);
     check(
-      'tap: リストに追加… opens the corridor’s list popover for the saved word, on top of the deck sheet and inside the screen',
-      pop.title.includes(sheet.term || id) && pop.onTop && pop.inside,
+      'tap: Save ▾’s menu is the corridor’s own list popover (リスト · Lists) for the saved word, on top of the deck sheet and inside the screen',
+      ['リスト', 'Lists'].includes(pop.title) && pop.onTop && pop.inside,
       JSON.stringify(pop),
     );
     await page.keyboard.press('Escape');

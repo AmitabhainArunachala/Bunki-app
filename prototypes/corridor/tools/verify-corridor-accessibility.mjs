@@ -500,8 +500,8 @@ async function main() {
       current: node.classList.contains('tok-current'), lit: node.classList.contains('lit'),
     }));
     check(
-      'closing the entry returns the original word: no popup, no sheet, nothing lit or chosen',
-      !closedState.popup && !closedState.sheet && !closedState.lit && !closedState.current,
+      'closing the entry returns the original word: no popup, no sheet, nothing lit — the word still the chosen one',
+      !closedState.popup && !closedState.sheet && !closedState.lit && closedState.current,
       JSON.stringify(closedState),
     );
     await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);

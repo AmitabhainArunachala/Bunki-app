@@ -530,6 +530,12 @@ async function d2Door(page, rec, furigana) {
     if (how === 'tap') acts.push({ how, ...(await tapCentre(page, DOOR.index)) });
     else {
       const present = (await node.count()) === 1;
+      // 1.3.0: with its popup open, activating the same word again opens its full entry, so each keyboard activation
+      // begins from the original word — Escape on the word puts the popup and the reading it summoned away first
+      if (present && await page.locator('#mini').count()) {
+        await node.focus(); await page.keyboard.press('Escape');
+        await page.waitForFunction(() => !document.getElementById('mini'), null, { timeout: 3_000 }).catch(() => {});
+      }
       if (present) { await node.focus(); await page.keyboard.press(how); }
       acts.push({ how, done: present });
     }
@@ -548,14 +554,13 @@ async function d2Door(page, rec, furigana) {
   const done = acts.every((act) => act.done);
   rec(`${key}.popup-reading`, `${label}: tap, Enter and Space each open the popup for ${SURFACE} reading exactly ${READING}`,
     done && popups.every((popup) => popup?.word === SURFACE && popup.reading === READING), JSON.stringify({ popups, acts }), popups);
-  const shown = furigana === 1 ? READING : '';
+  // 1.3.0: a tap summons the reading above the word whatever the dial (ふりがな なし included): the text shows it
+  const shown = READING;
   const visible = views.map((view) => view?.visibleRuby ?? null);
-  rec(`${key}.visible-reading`, furigana === 1
-    ? `${label}: on the text, the touched word shows exactly ${READING} after each activation (visible ruby)`
-    : `${label}: on the text, no reading shows (ふりがな なし): the popup carries it`,
+  rec(`${key}.visible-reading`, `${label}: on the text, the touched word shows exactly ${READING} after each activation (visible ruby${furigana === 1 ? '' : ', summoned at ふりがな なし'})`,
   done && canonical(visible) === canonical(['', shown, shown, shown]), JSON.stringify({ visible, acts }), visible);
   const labels = views.map((view) => view?.label ?? null);
-  const shownLabel = furigana === 1 ? doorLabel(READING) : doorLabel();
+  const shownLabel = doorLabel(READING);
   // the whole label, not a segment of it: no second reading, gloss or other word may ride along
   rec(`${key}.accessible-reading`, `${label}: the accessible label is exactly "${doorLabel()}", then "${shownLabel}" once touched`,
     done && canonical(labels) === canonical([doorLabel(), shownLabel, shownLabel, shownLabel]), JSON.stringify(labels), labels);

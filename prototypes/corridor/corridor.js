@@ -8042,8 +8042,10 @@ function diveFromMini(span, event) {
   miniDiveOnAnchor = null;
   if (!second) return false;
   const entry = miniEntry;
-  if (entry) entry(event.detail === 0 ? 'keyboard' : 'pointer');
-  else {
+  if (entry) {
+    readerSlipDive = true; // the entry opens from the slip: its close takes the slip's reading away
+    entry(event.detail === 0 ? 'keyboard' : 'pointer');
+  } else {
     removeMini();
     clearReaderReadings({ marked: true });
   }
@@ -8672,6 +8674,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     word.setAttribute('aria-label', tx('全項目を開く', 'Open the full entry'));
     word.addEventListener('click', (event) => {
       event.stopPropagation();
+      readerSlipDive = true; // the band is the slip's door: the entry's close takes the slip's reading away
       onEntry(event.detail === 0 ? 'keyboard' : 'pointer');
     });
   }
@@ -8749,9 +8752,10 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     if (event.key !== 'Escape') return;
     event.preventDefault();
     event.stopPropagation();
-    // Escape on the slip returns the word itself: the card and the reading its tap summoned go together
+    // Escape on the slip returns the word itself: the card and the reading its tap summoned go together; the
+    // word stays the chosen one, so the chrome's Save still stands for it
     removeMini();
-    clearReaderReadings({ marked: true });
+    clearReaderReadings();
     span.focus({ preventScroll: true });
   });
   document.body.append(mini);
@@ -9269,17 +9273,15 @@ function readerWordKey(event, span, door) {
     return;
   }
   // Escape steps out one layer at a time: the word menu; or the popup together with the reading its tap
-  // summoned (one layer: the word returns to the original text); or a word left marked on its own
+  // summoned; then the chosen word's mark (the chrome's Save stands down), back to the original text
   if (event.key === 'Escape') {
     const slip = !!document.getElementById('mini');
     const marked = !!(S.revealed?.size || S.readerTake);
     if (!slip && !readerWordMenu && !marked) return;
     event.preventDefault();
     if (readerWordMenu) closeReaderWordMenu();
-    else {
-      if (slip) removeMini();
-      clearReaderReadings({ marked: true });
-    }
+    else if (slip) { removeMini(); clearReaderReadings(); }
+    else clearReaderReadings({ marked: true });
     return;
   }
   if (event.key !== 'Enter') return;
@@ -9567,26 +9569,27 @@ function markReaderReading(index) {
 }
 /** Back to the original text: every reading a tap summoned goes (つねに keeps its own), and with
  * `marked` the marked word too (the chrome's Save then stands for the place again). */
-let readerDivedIndex = null; // the word whose full entry is open: closing the entry returns it to the original
+let readerSlipDive = false; // the full entry was opened from the slip (tap 2, the band): closing it takes the slip's reading away
 function clearReaderReadings({ marked = false } = {}) {
   const before = S.revealed ? [...S.revealed] : [];
   if (before.length) {
     S.revealed = new Set();
     for (const at of before) readerTokenPainters.get(at)?.();
   }
+  readerSlipDive = false;
   if (!marked) return;
-  readerDivedIndex = null;
   if (S.readerTake) {
     S.readerTake = null;
     syncReaderTakeSeal();
   }
 }
-/** The full entry closing — Close, Back, Escape, the scrim, device Back — returns the word it was opened
- * from to the original text: the reading its tap summoned goes with the sheet (John, 2026-10-14: "there
- * is NO WAY to return to the original word without the furigana"). A sheet opened from anywhere else
- * finds nothing summoned and changes nothing. */
+/** The full entry closing — Close, Back, Escape, the scrim, device Back — returns the word the slip opened
+ * it from to the original text: the reading its tap summoned goes with the sheet (John, 2026-10-14: "there
+ * is NO WAY to return to the original word without the furigana"). The word stays the chosen one, so the
+ * chrome's Save still stands for it until a tap elsewhere in the text. A sheet opened by any other door
+ * (Ctrl+Enter, the word menu, search) summoned nothing and changes nothing. */
 function clearReaderSummons() {
-  if (S.revealed?.size || readerDivedIndex !== null) clearReaderReadings({ marked: true });
+  if (readerSlipDive) clearReaderReadings();
 }
 
 /** A reader content word: one tap opens the popup (the meaning), the word menu does the rest. */
@@ -9594,11 +9597,12 @@ function wireTokenGestures(span, token, index, p) {
   const target = { kind: 'word', id: token.b };
   const obsKey = srsKey('word', token.b);
   const from = { passage: p.id, index };
-  const openFull = (modality = 'pointer') => {
+  const openFull = (modality = 'pointer', { fromSlip = false } = {}) => {
     removeMini();
     setReaderTake(token.b, index, p.id);
-    markReaderReading(index);
-    readerDivedIndex = index;
+    // only the slip's own door (tap 2, the band) carries a summoned reading into the entry; the keyboard's
+    // Ctrl+Enter and the word menu open the entry from the plain word, as they always did
+    readerSlipDive = fromSlip;
     obsLog('tap', obsKey, 3, p.id);
     interaction({ kind: 'entry.open', target }, modality, 'reader-token');
     // a core hit opens exactly as before; a spelling the core lacks is
@@ -9611,7 +9615,7 @@ function wireTokenGestures(span, token, index, p) {
     // the meaning is shown: the observation log's depth 2, as the mini always wrote it
     if (!restore) obsLog('tap', obsKey, 2, p.id);
     markReaderReading(index);
-    showMini(span, token, (entryModality) => openFull(entryModality), {
+    showMini(span, token, (entryModality) => openFull(entryModality, { fromSlip: true }), {
       focusEntry: modality === 'keyboard', from, reader: true, sentence: readerSentenceRow(sentence(), index),
     });
     if (!restore) retireReaderTip();

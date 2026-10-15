@@ -1017,17 +1017,28 @@ async function main() {
   await page.waitForTimeout(120);
   const popupUp = (await page.locator('#mini').count()) === 1;
 
-  // a second tap on the same word puts the popup away: no ladder, no sheet, nothing under the word
+  // a second tap on the same word opens its full entry (1.3.0): the popup goes, nothing under the word
   await tap(page, '#reader .tok.content', tapIdx);
+  await page.waitForSelector('#sheet', { timeout: 8000 });
   await page.waitForTimeout(120);
   const afterSecond = await page.evaluate(`(() => {
     const t = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
     return { sheet: document.querySelector('#sheet')?.dataset.node ?? '', popup: !!document.querySelector('#mini'),
       gloss: !!t.querySelector('.tok-en'), current: t.classList.contains('tok-current') };
   })()`);
-  check('grammar · a second tap on the same word puts its popup away — no sheet, nothing under the word',
-    popupUp && afterSecond.sheet === '' && !afterSecond.popup && !afterSecond.gloss && afterSecond.current,
+  check('grammar · a second tap on the same word opens its full entry — the popup gone, nothing under the word, the word still the chosen one',
+    popupUp && afterSecond.sheet.startsWith('word:') && !afterSecond.popup && !afterSecond.gloss && afterSecond.current,
     JSON.stringify({ popupUp, ...afterSecond }));
+  // closing the entry returns the original word: the reading its tap summoned goes with the sheet
+  await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
+  await page.waitForFunction(() => !document.getElementById('sheet'));
+  await page.waitForTimeout(120);
+  const afterClose = await page.evaluate(`(() => {
+    const t = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
+    return { sheet: !!document.querySelector('#sheet'), popup: !!document.querySelector('#mini'), lit: t.classList.contains('lit'), current: t.classList.contains('tok-current') };
+  })()`);
+  check('grammar · closing the entry returns the original word — no sheet, no popup, no summoned reading, the word still the chosen one',
+    !afterClose.sheet && !afterClose.popup && !afterClose.lit && afterClose.current, JSON.stringify(afterClose));
 
   // press and hold → the word menu (John #11: "right click and choose save"); a tap anywhere else puts it away
   await touchAt(page, '#reader .tok.content', 6, 700);
@@ -1996,8 +2007,10 @@ async function main() {
   check('D23 · the reader’s 上手 door is taken: the mini seal is inked and live, nothing held',
     d23Taken.word === '上手' && d23Taken.taken && d23Taken.pressed === 'true' && !d23Taken.disabled && d23Taken.reason === null && !d23Taken.open,
     JSON.stringify(d23Taken));
-  // the core card leaves through its own door: a press on the popup's "Saved ✓"
+  // the core card leaves through its own door: Saved ✓ ▾ opens the word's menu, whose Review row takes it out
   await tap(page, '#mini-take');
+  await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #mini-review');
+  await tap(page, '#mini-review');
   await waitForAppRecord(page, (record) => d23Cards(record).length === 0, { description: 'the core 上手 card removed' });
 
   // (3) 1353320 through the core sheet's own live door → 覚 → an explicit card

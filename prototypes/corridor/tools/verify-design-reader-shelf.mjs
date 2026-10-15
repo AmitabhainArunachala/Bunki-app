@@ -800,7 +800,8 @@ try {
         // the durable write lands a beat before the app repaints its button: wait for the page, then read it
         await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 }).catch(() => {});
         const saved = await page.evaluate(() => ({ label: document.querySelector('#mini #mini-take')?.textContent, pressed: document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed'),
-          window: [...document.querySelectorAll('dialog[open], [role="dialog"]:not(#mini)')].some((n) => n.getClientRects().length > 0) }));
+          // Save ▾'s own menu unfolds inside the card (1.3.0): a dialog, but no window
+          window: [...document.querySelectorAll('dialog[open], [role="dialog"]:not(#mini):not(#mini *)')].some((n) => n.getClientRects().length > 0) }));
         const cards = record.taken.filter((t) => t.t === 'word' && t.id === 'ダマスカス').length;
         assert(saved.label === 'Saved ✓' && saved.pressed === 'true' && !saved.window && cards === 1, `one press did not save ダマスカス once: ${JSON.stringify({ ...saved, cards })}`);
         return { reading: probe.reading, saved: saved.label, cards };
@@ -1073,8 +1074,10 @@ try {
         return { card: box(mini), screen: { width: innerWidth, height: innerHeight }, band: h, entry: e, entryName: door.getAttribute('aria-label'),
           chevron: getComputedStyle(head, '::after').content !== 'none', entryOnTop: !!mid && door.contains(mid), bandIsDoor: !!end && (end === door || door.contains(end)),
           entryButton: !!mini.querySelector('.mini-entry'),
+          // the word is a button whose box reaches 5px past its glyph line (its 44px hit): the rows are the glyph lines
           rows: ['.mini-word', '.mini-reading', '.mini-gloss'].map((selector) => mini.querySelector(selector)).filter(Boolean)
-            .map((node) => ({ part: node.classList[0], text: node.textContent, ...box(node) })) };
+            .map((node) => { const range = document.createRange(); range.selectNodeContents(node); const r = range.getBoundingClientRect();
+              return { part: node.classList[0], text: node.textContent, top: r.top, right: r.right, bottom: r.bottom, left: r.left, width: r.width, height: r.height }; }) };
       });
       assert(band.rows.length >= 2 && band.rows.every((row) => row.width > 0 && row.height > 0), `the galaxy popup's word band is missing a line: ${JSON.stringify(band.rows)}`);
       const runOn = band.rows.slice(1).map((row, i) => [band.rows[i], row]).filter(([above, below]) => below.top < above.bottom - 1).map(([above, below]) => `${above.part} and ${below.part}`);

@@ -911,8 +911,8 @@ try {
       await closeIfOpen(page);
       const back = await tokenState(page, IU);
       // one-hand pass (2026-10-15): closing the entry is the way back to the original text by itself
-      check(`G2 ${lang}: closing the entry returns the original word by itself: no popup, no summoned reading, nothing lit or marked, no gloss rung`,
-        await page.locator('#mini').count() === 0 && back?.surface === IU.token.s && back.visibleRuby === '' && !back.lit && !back.current && back.lines === 0,
+      check(`G2 ${lang}: closing the entry returns the original word by itself: no popup, no summoned reading, nothing lit, no gloss rung`,
+        await page.locator('#mini').count() === 0 && back?.surface === IU.token.s && back.visibleRuby === '' && !back.lit && back.lines === 0,
         JSON.stringify(back), { id: `G2.${lang}.original` });
       await tap(page, IU);
       const again = await miniState(page), lit = await tokenState(page, IU);
@@ -923,8 +923,8 @@ try {
       await page.keyboard.press('Escape');
       await page.locator('#mini').waitFor({ state: 'detached' });
       const bare = await tokenState(page, IU);
-      check(`G2 ${lang}: Escape on the word puts the popup away and returns the original word: nothing lit or marked`,
-        bare?.surface === IU.token.s && bare.visibleRuby === '' && !bare.lit && !bare.current && bare.lines === 0, JSON.stringify(bare), { id: `G2.${lang}.escape-word` });
+      check(`G2 ${lang}: Escape on the word puts the popup and its summoned reading away: nothing lit`,
+        bare?.surface === IU.token.s && bare.visibleRuby === '' && !bare.lit && bare.lines === 0, JSON.stringify(bare), { id: `G2.${lang}.escape-word` });
       await word.focus();
       await page.keyboard.press('Enter');
       await page.locator('#mini').waitFor();
@@ -933,8 +933,8 @@ try {
       await page.keyboard.press('Escape');
       await page.locator('#mini').waitFor({ state: 'detached' });
       const after = await tokenState(page, IU);
-      check(`G2 ${lang}: Escape inside the popup returns focus to the original word, bare: nothing lit or marked`,
-        await word.evaluate(node => node === document.activeElement) && after?.visibleRuby === '' && !after.lit && !after.current && after.lines === 0,
+      check(`G2 ${lang}: Escape inside the popup returns focus to the original word, its summoned reading gone: nothing lit`,
+        await word.evaluate(node => node === document.activeElement) && after?.visibleRuby === '' && !after.lit && after.lines === 0,
         JSON.stringify(after), { id: `G2.${lang}.escape` });
     });
   }
