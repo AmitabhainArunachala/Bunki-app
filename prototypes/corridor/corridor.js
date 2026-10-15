@@ -4122,15 +4122,6 @@ async function boot() {
   }
   S.variantsBar = anyVariantParam;
   if (['bi', 'ja'].includes(params.get('ui'))) S.lang = params.get('ui');
-  // 1.3.0 design preview (John, 2026-10-14: "show me 3 different design ideas before we lock in"): ?concept=a|b|c
-  // dresses the app in one of the three directions for this tab; ?concept=off clears it. Not a setting.
-  try {
-    const asked = params.get('concept');
-    if (asked === 'off') sessionStorage.removeItem('kairo-concept-preview');
-    else if (/^[abc]$/.test(asked || '')) sessionStorage.setItem('kairo-concept-preview', asked);
-    const concept = sessionStorage.getItem('kairo-concept-preview');
-    if (/^[abc]$/.test(concept || '')) document.documentElement.dataset.concept = concept;
-  } catch { /* storage refused: no preview */ }
   try { await ensureReadingModule(); }
   catch { protectStore('読み物の機能を読み込めない。保存を止めて記録を保護している。接続してから再読み込みする。',
     'The reading component could not load. Saving is paused to protect article versions. Reconnect and reload the app.'); }

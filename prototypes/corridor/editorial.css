@@ -3224,7 +3224,7 @@ body #mini .mini-status:empty { display: none; }
 .version-toggle .version-choice > span { white-space: nowrap; }
 
 @media (max-width: 560px) {
-  .vocabulary-list-popover {
+  .vocabulary-list-popover:not(.is-inline) {
     top: auto !important;
     right: 0;
     bottom: 0;
@@ -3238,7 +3238,7 @@ body #mini .mini-status:empty { display: none; }
     border-radius: 16px 16px 0 0;
   }
   /* Save ▾'s menu drops from its button, as a menu does, rather than rising from the foot as a sheet */
-  .vocabulary-list-popover.is-save-menu {
+  .vocabulary-list-popover.is-save-menu:not(.is-inline) {
     top: var(--pop-top) !important;
     right: auto;
     bottom: auto;
