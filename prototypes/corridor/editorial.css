@@ -4317,16 +4317,6 @@ body:not([data-view='drift']) .sheet {
   box-shadow: var(--elevation-float);
   animation: feel-rise var(--motion-sheet) var(--ease-sheet);
 }
-/* the sheet bar's Save is the slip's key: the world's ink, the world's paper for its word (John, 2026-10-15:
-   no "random blue"); the A family's face otherwise (48, the control radius, one press) */
-:root body:not([data-view='drift']) .sheet-bar .sheet-take:not([aria-pressed='true']) {
-  background: var(--color-ink);
-  color: var(--color-paper, #f5efe0);
-  box-shadow: 0 1px 2px rgb(20 24 34 / 18%);
-}
-:root body:not([data-view='drift']) .sheet-bar .sheet-take:not([aria-pressed='true']):hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-ink) 88%, var(--color-paper));
-}
 body:not([data-view='drift']) .sheet-grip { width: 36px; height: 4px; margin: 10px auto; border-radius: var(--radius-seal); background: var(--color-edge-strong); }
 body:not([data-view='drift']) .sheet-bar { border-bottom: var(--stroke-hairline) solid var(--color-seal); }
 body:not([data-view='drift']) .scrim { background: var(--color-scrim); animation: feel-fade var(--motion-standard) var(--ease-standard); }

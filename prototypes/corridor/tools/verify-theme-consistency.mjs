@@ -69,7 +69,7 @@ for (const world of WORLDS) {
       const lum = ({ r, g, b }) => { const ch = (v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4); return 0.2126 * ch(r) + 0.7152 * ch(g) + 0.0722 * ch(b); };
       const el = document.querySelector(${JSON.stringify(sel)});
       if (!el) return { missing: true };
-      let node = el, own = parse(getComputedStyle(el).backgroundColor), paintedBy = sel;
+      let node = el, own = parse(getComputedStyle(el).backgroundColor), paintedBy = ${JSON.stringify(sel)};
       // an inline menu inside the slip paints nothing of its own: the slip's paper is its paper
       if (own && own.a === 0 && el.classList.contains('is-inline')) { node = el.closest('#mini'); own = node && parse(getComputedStyle(node).backgroundColor); paintedBy = '#mini'; }
       const pageHex = getComputedStyle(document.body).getPropertyValue('--page').trim();
@@ -151,17 +151,23 @@ for (const world of WORLDS) {
   await page.waitForSelector('#mini', { timeout: 10000 });
   await shoot('6-slip');
   await opaque('slip', '#mini');
+  // the slip wears the world (CONTINUITY_CONTRACT §6): by day its band is the world's ink, the band's word the world's
+  // paper and Save the world's accent; at night the band is the world's lacquer (ground 48% + black), the word the
+  // world's ink and Save the lit accent (accent 9% on the ground). Every expected value is resolved by the page itself.
   const band = await page.evaluate(`(() => {
     const head = document.querySelector('#mini .mini-head'), take = document.querySelector('#mini #mini-take');
-    const v = (n) => getComputedStyle(document.body).getPropertyValue(n).trim();
-    return { head: head && getComputedStyle(head).backgroundColor, headInk: head && getComputedStyle(head).color,
-      take: take && getComputedStyle(take).backgroundColor, ink: v('--color-ink'), paper: v('--color-paper') };
+    const resolve = (value) => { const i = document.createElement('i'); i.style.background = value; document.body.append(i); const c = getComputedStyle(i).backgroundColor; i.remove(); return c; };
+    const night = ${JSON.stringify(['rokusho', 'yoru', 'nami', 'hakuu', 'kaku'].includes(world))};
+    return { night, head: head && getComputedStyle(head).backgroundColor, headInk: head && getComputedStyle(head).color,
+      take: take && getComputedStyle(take).backgroundColor,
+      wantHead: resolve(night ? 'color-mix(in srgb, var(--color-ground) 48%, #000000)' : 'var(--color-ink)'),
+      wantHeadInk: resolve(night ? 'var(--color-ink)' : 'var(--color-paper)'),
+      wantTake: resolve(night ? 'color-mix(in srgb, var(--color-accent) 9%, var(--color-ground))' : 'var(--color-accent)') };
   })()`);
-  // the slip wears the world: its band and its Save are the world's ink, the band's word the world's paper
-  const same = (a, b) => a && b && norm(a) === norm(rgbOf(b));
-  if (!same(band.head, band.ink)) failures.push(`${world}/slip: the head band ${band.head} is not the world's ink ${band.ink}`);
-  if (!same(band.take, band.ink)) failures.push(`${world}/slip: Save ${band.take} is not the world's ink ${band.ink}`);
-  if (!same(band.headInk, band.paper)) failures.push(`${world}/slip: the band's word ${band.headInk} is not the world's paper ${band.paper}`);
+  const same = (a, b) => a && b && norm(a) === norm(b);
+  if (!same(band.head, band.wantHead)) failures.push(`${world}/slip: the head band ${band.head} is not the world's ${band.night ? 'lacquer' : 'ink'} ${band.wantHead}`);
+  if (!same(band.headInk, band.wantHeadInk)) failures.push(`${world}/slip: the band's word ${band.headInk} is not the world's ${band.night ? 'ink' : 'paper'} ${band.wantHeadInk}`);
+  if (!same(band.take, band.wantTake)) failures.push(`${world}/slip: Save ${band.take} is not the world's ${band.night ? 'lit accent' : 'accent'} ${band.wantTake}`);
   await page.locator('#mini #mini-take').click();
   await page.waitForSelector('#mini #vocabulary-list-popover.is-inline', { timeout: 10000 });
   await shoot('7-slip-menu');

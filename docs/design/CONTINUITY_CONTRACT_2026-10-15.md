@@ -86,6 +86,64 @@ and runs one negative control (a deliberate break that must make the verifier fa
   official list") become **one `note` component** with one wording, used by assessment, guided, reference and the sheet.
 - One verb for saving; one door label in the menu; sentence case in English, no "test-speak" in Settings.
 
+## 6. Colour: the bar and the table
+
+**His bar (10-08, verbatim), the test every colour decision passes:** "don't stop until you are proud of it and it would
+make Dogen and Musashi and Basho and Hakuin to their knees crying at the beauty. As well as all the great 80s and 90s
+anime artists and directors. I mean this very very seriously! let's make it epic" — "cyberpunk meets washi", "layers of
+depth, clarity, calm balanced with the engaging soothing crisp and deep detailed recursive animation of masters", "a
+mixture between ancient japan and cutting edge tech japan". And 10-15: "things can be their own color. That is not a
+problem. But the contrast should be deeply considered and have roots in artistic or aesthetic inspiration… Color
+gradation throughout the app is actually preferred and can bring deeper focus and texture and professionalism but it
+has to be done right… Every design decision should have to pass through that."
+
+**The law.** An overlay (the slip, the sheet, a menu, the picker) may carry its own colour; it may not float with no
+relation to the page. Each value is the world's own pigment or a mix of two of them, never a default. Ink on paper
+reads at 4.5:1 or better; a band stands as figure on its ground; a gradient is a brush stroke or a lacquer's depth,
+never a gradient for its own sake. Every overlay paints opaque paper from a plain value (`var(--color-paper, …)`)
+before any colour chain, in every world. `verify-theme-consistency` walks every world and asserts the table below.
+
+**The slip, by day (six worlds).** The head band is the world's ink as a brushed stroke (濃淡): full ink where the word
+and its reading stand, washing at its foot to ink 90% + paper where the brush lifts into the slip's paper. The word is
+the paper showing through the ink (白抜き). The reading is the world's red lit by its paper (red 40% + paper 60%): the
+one warm note, 5.0:1 or better on the ink in every world (the pure red read 1.7–2.7:1). Save is the A family: the
+world's 藍, the colour the page already uses for "you can go here" — ベロ藍 names the default world; 藍 beside 墨, on
+柿渋 and with 朱 is the dyer's pairing. The sheet's paper is the world's raised paper (`--ground-0`).
+
+| world | band (ink → its foot) | band word | reading | Save (A) | sheet paper | why |
+|---|---|---|---|---|---|---|
+| 藍 ベロ藍・浪 (default) | #1b1f26 → #31343a | #faf6ea | #dcab9f | #1f3a5f | #faf6ea | the print's key line carries the word; the Berlin blue that names the world is its one key |
+| 墨 墨・楮紙 | #211e17 → #37342c | #faf6ea | #d6a498 | #2e4d6e | #faf6ea | sumi 濃淡 — ink, then the greys of the lifting brush; bengara thinned by kōzo is the one warm note; 藍 the one cool key |
+| 朱 朱・胡粉 | #2b2620 → #403b35 | #fdfaf2 | #dea49b | #2e4d6e | #fdfaf2 | shell-white on soot ink; the vermilion stays the seal's; 藍 keys |
+| 赤 凱風快晴 | #45291a → #573c2d | #f8ecdc | #d5a591 | #2a5d8a | #f8ecdc | the umber of Fuji's flank, its red lit by dawn paper; the lake's 藍 keys |
+| 柿 焦茶・柿渋 | #2e1a0c → #402a19 | #e6bd92 | #bc805e | #2c3d5c | #e6bd92 | 焦茶 on persimmon tannin; 藍 on 柿渋 is the dyer's pairing (the 藍 a step deeper, 4.5:1 on tannin) |
+| 板 板木・墨 | #26221c → #3b3731 | #faf6ea | #dcab9f | #2a5d8a | #faf6ea | the keyblock's sumi line; 藍 is the colour block |
+
+Receipts (WCAG 2, every day world): band word on the wash ≥ 7.7:1 (柿 the floor; ≥ 9.5 on full ink); reading on the ink
+≥ 5.0:1 (柿); Save's word on Save ≥ 6.2:1; Save on the paper ≥ 5.9:1; band on the page ≥ 8.4:1.
+
+**The slip, at night (five worlds).** The band is the world's lacquer: its depth (ground 48% + black) under the word,
+its sheen (ground 72% + black) at the foot where it meets the raised lacquer paper, a lit accent hairline on its top
+edge so it stands on the dark ground (light is emitted — edges and glows — never a solid phosphor fill). The word is
+the world's shell-white or sutra-cream ink; the reading the world's own lit red; Save the lit A (the accent at 9% on
+the ground, the accent for its word, its glow).
+
+| world | band (depth → sheen) | band word | reading | Save (lit A) | sheet paper | why |
+|---|---|---|---|---|---|---|
+| 漆 胡粉・黒漆 | #0b0908 → #110e0c | #f2ecdf | #e0796b | #d9b25f on #282117 | #251e16 | shell-white on black lacquer; the gold is the maki-e key |
+| 金 紺紙金泥 | #090c17 → #0e1323 | #f4ecd9 | #ef8079 | #9db8e6 on #1f2840 | #1d2645 | sutra cream on indigo lacquer; 夜's light is 藍 |
+| 浪 神奈川沖浪裏 | #08131c → #0c1c2a | #eae6d8 | #e08a6e | #8fb3d1 on #1c3448 | #1a3450 | foam on the deep sea; the spray's blue keys |
+| 雷 山下白雨 | #100d09 → #18130d | #efe5cf | #e0796b | #d9a93f on #322816 | #30271b | storm lacquer, lightning gold |
+| 殻 攻殻・燐光 | #020609 → #04090d | #d8efe9 | #ff6b4a | #37e8b0 on #0a2120 | #0d1921 | terminal black, phosphor edge |
+
+Receipts (every night world): band word on the lacquer ≥ 13.8:1; reading ≥ 6.2:1; Save's word on its fill ≥ 5.9:1. The
+lacquer band sits 1.04–1.23:1 against the night page by design — a lacquer box, not a panel — and stands as figure by
+its lit edge, the slip's gold hairline and the raised paper under it.
+
+**What was replaced.** The band had been a fixed 藍 lacquer (#141a28 → #1d2638) with fixed cream (#f3ecdd) and fixed
+gold (#e5c27a) in every world; the slip's and the sheet's paper came only through `color-mix()` chains. The grade
+pigments, the seal red, the reader's lacquer mat and the toast are untouched.
+
 ## Order of slices (one worker each, in sequence on this branch; the lead reviews screenshots between slices)
 
 A. **The word.** §1 for the reader/exam/guided-host lookups (the #mini slip): cycle, clear-on-close, Save ▾ inline

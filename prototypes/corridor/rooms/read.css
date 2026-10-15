@@ -731,18 +731,21 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
    Colours are the skin's roles (--color-*) mixed per band; nothing here persists anything.
    ===================================================================================== */
 #mini {
-  /* the slip wears the world (John, 2026-10-15, 墨: "a random blue color with no sense of contrast or connection
-     to the background"): its paper is the world's raised paper, plain; its head band the world's ink, with the
-     world's paper for its text; its reading the world's reading red lit by the paper (45% red clears 4.5:1 on
-     the band in every world; the pure red reads 1.7–2.7:1 on ink). In 墨 that is a black band on cream, in 藍
-     indigo-ink, in 柿渋 persimmon-brown; at night the ramp inverts (a light band, dark text). No fixed navy. */
+  /* The slip wears the world (John, 2026-10-15, 墨: "a random blue color with no sense of contrast or connection to
+     the background"; his bar: contrast deeply considered, rooted in the world's pigments, gradation where it brings
+     depth — CONTINUITY_CONTRACT §6 holds the table). Its paper is the world's raised paper, plain. By day the head
+     band is the world's ink as a brushed stroke (濃淡): full ink where the word and its reading stand, washing to
+     ink 90% + paper at its foot where the brush lifts into the slip's paper; the word is the paper showing through
+     the ink (白抜き); the reading is the world's red lit by its paper (red 40%: ≥ 5.0:1 on the ink in every world —
+     the pure red reads 1.7–2.7:1 on ink); Save is the A family, the world's 藍. At night the band is the world's
+     lacquer (below) and the ramp inverts. No fixed navy: every value is the world's own. */
   --mini-paper: var(--color-paper, #f5efe0);
   --mini-band: color-mix(in srgb, var(--color-ground) 36%, var(--mini-paper));
   --mini-head: var(--color-ink);
-  --mini-head-2: color-mix(in srgb, var(--color-ink) 88%, var(--color-paper));
+  --mini-head-2: color-mix(in srgb, var(--color-ink) 90%, var(--color-paper));
   --mini-head-ink: var(--color-paper, #f5efe0);
   --mini-head-ink-2: color-mix(in srgb, var(--color-paper) 78%, var(--color-ink));
-  --mini-reading: color-mix(in srgb, var(--color-reading, var(--color-signal)) 45%, var(--color-paper));
+  --mini-reading: color-mix(in srgb, var(--color-reading, var(--color-signal)) 40%, var(--color-paper));
   --mini-gold: color-mix(in srgb, var(--color-paper) 70%, var(--color-ink));
   --mini-edge: color-mix(in srgb, var(--color-ink) 26%, transparent);
   --mini-rule: color-mix(in srgb, var(--color-ink) 12%, transparent);
@@ -774,7 +777,17 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
 }
 @keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, 10px, 0); } }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #mini {
+  /* night: the band is the world's lacquer — its depth (ground 48% + black) under the word, its sheen (ground 72% +
+     black) at the foot where it meets the raised lacquer paper; the word is the world's shell-white or sutra-cream
+     ink; the reading the world's own lit red (≥ 6.2:1 on the lacquer); Save the lit A (an emitted accent edge, never
+     a solid phosphor fill). A lit accent hairline on the band's top edge keeps it figure on the dark ground. */
   --mini-band: color-mix(in srgb, var(--color-ground) 64%, var(--mini-paper));
+  --mini-head: color-mix(in srgb, var(--color-ground) 48%, #000000);
+  --mini-head-2: color-mix(in srgb, var(--color-ground) 72%, #000000);
+  --mini-head-ink: var(--color-ink);
+  --mini-head-ink-2: color-mix(in srgb, var(--color-ink) 78%, var(--mini-head));
+  --mini-reading: var(--color-reading, var(--color-signal));
+  --mini-gold: var(--color-gold, #e2bd6c);
   --mini-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 34%, transparent);
   --mini-rule: color-mix(in srgb, var(--color-ink) 14%, transparent);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 3px 8px -3px rgb(0 0 0 / 55%),
@@ -797,9 +810,13 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
   position: relative;
   padding: 10px 8px 11px 18px;
   background-color: var(--mini-head);
-  background-image: linear-gradient(180deg, var(--mini-head-2), var(--mini-head) 72%);
+  /* the stroke: full ink over the word and its reading, lifting to the wash at the foot */
+  background-image: linear-gradient(180deg, var(--mini-head) 0 56%, var(--mini-head-2) 100%);
   color: var(--mini-head-ink);
   isolation: isolate;
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #mini .mini-head {
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-accent) 35%, transparent);
 }
 /* 青海波: Hokusai's waves, faint, behind the band's right; the word stands clear of them */
 #mini .mini-head::before {
@@ -909,6 +926,8 @@ body[data-view='drift'] #mini {
   background: var(--mini-paper);
 }
 #mini .mini-take {
+  /* the slip's one key is the A family (editorial.css): the world's 藍 by day, lit at night. Only its measure is kept
+     here: 44 high (the slip's Save is measured at 44 beside the bar's doors), one step wider than its word */
   position: static;
   display: inline-flex;
   flex: 0 0 auto;
@@ -917,23 +936,23 @@ body[data-view='drift'] #mini {
   min-width: 112px;
   min-height: 44px;
   padding: 0 18px;
-  /* the one key in the slip is the world's ink (the band's colour), its word the world's paper — the same
-     ink the page is written in, so the slip belongs to its page (墨 black, 藍 indigo-ink, 柿渋 persimmon-brown) */
-  border: 1px solid var(--color-ink);
-  border-radius: var(--radius-control);
-  background: var(--color-ink);
-  box-shadow: 0 1px 2px rgb(20 24 34 / 18%);
-  color: var(--color-paper, #f5efe0);
-  font: 650 16px/1 var(--font-ui);
   letter-spacing: 0.01em;
   cursor: pointer;
 }
-#mini .mini-take:hover:not(:disabled) { background: color-mix(in srgb, var(--color-ink) 88%, var(--color-paper)); }
+/* over the sky the families are not in force (they are scoped to the rooms): the slip paints its key from the sky's
+   own tokens, the same 藍 */
+body[data-view='drift'] #mini .mini-take:not(.taken):not(.reader-capture-held) {
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-accent);
+  color: var(--color-paper, #f5efe0);
+  font: 600 16px/1.25 var(--font-ui);
+}
 #mini .mini-take.taken {
-  border-color: color-mix(in srgb, var(--color-ink) 55%, transparent);
-  background: color-mix(in srgb, var(--color-ink) 10%, var(--mini-paper));
+  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--mini-paper));
   box-shadow: none;
-  color: var(--color-ink);
+  color: var(--color-accent);
 }
 #mini .mini-take.reader-capture-held {
   border: 1px dashed var(--mini-edge);
@@ -941,9 +960,6 @@ body[data-view='drift'] #mini {
   box-shadow: none;
   color: var(--color-ink-2);
   cursor: help;
-}
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #mini .mini-take:not(.taken):not(.reader-capture-held) {
-  box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
 }
 #mini .mini-take-note { flex: 1 1 auto; min-width: 0; font: 400 13.5px/1.3 var(--font-ui); color: var(--color-muted); }
 @keyframes read-mini-path { from { opacity: 0.01; transform: translate3d(-6px, 0, 0); } }
@@ -1000,7 +1016,7 @@ body[data-view='drift'] #mini {
   opacity: 0;
   transition: transform var(--motion-quick) var(--ease-enter), opacity var(--motion-ma) var(--ease-standard);
 }
-#mini .is-inline .vocabulary-list-choice input:checked { border-color: var(--color-ink); background: var(--color-ink); }
+#mini .is-inline .vocabulary-list-choice input:checked { border-color: var(--color-accent); background: var(--color-accent); }
 #mini .is-inline .vocabulary-list-choice input:checked::before { opacity: 1; transform: translateY(-1px) rotate(-45deg) scale(1); }
 #mini .is-inline .vocabulary-list-review .vocabulary-list-name { font-weight: 650; }
 #mini .is-inline .vocabulary-list-count { font: 400 13px/1.2 var(--font-ui); color: var(--color-muted); }
@@ -1593,10 +1609,11 @@ html[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art { box-shadow: 0 0
   color: var(--color-ink);
 }
 :root body:not([data-view='drift']) .vocabulary-list-popover #vocabulary-list-create {
+  /* the menu's Add is the same key as Save: the world's 藍, the world's paper for its word (dark at night) */
   min-width: 72px;
-  border: 1px solid var(--color-ink);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 70%, var(--color-ink));
   border-radius: var(--radius-control);
-  background: var(--color-ink);
+  background: var(--color-accent);
   box-shadow: 0 1px 2px rgb(20 24 34 / 18%);
   color: var(--color-paper, #f5efe0);
 }
