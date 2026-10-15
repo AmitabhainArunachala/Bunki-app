@@ -510,32 +510,22 @@ patch('function removeNode(n,delay){\n  const el=n.el;\n  setTimeout(function(){
   'function removeNode(n,delay){\n  const el=n.el;\n  if(n.kind==="word")el.tabIndex=-1;\n  setTimeout(function(){\n    if(n.recordPending)return;', 'pending node cannot be removed by a prior timer');
 patch('function tapNode(n){', 'function tapNode(n){\n  if(recordPending.size){setHint("判断を保存しています。");return;}', 'pending judgment keeps taps from rebuilding the field');
 
-// The one-hand pass (contract §1, 2026-10-15): hosted, every word answers a tap with the app's one slip.
-// The slip joins the ladder's first rung: the first tap on a word (the planet, a word on open water, a lock
-// member) shows its reading and the slip beside it, and the slip's band is the door into the full entry.
-// The sky keeps its own later rungs — the gloss, then the dive (the word carried in with its kanji) — under
-// the slip, which stays through the gloss and goes when the word dives; elsewhere, Close or Escape returns
-// the bare word. Satellites keep their reveal in place and their chain walk, and the new planet opens its
-// slip as it arrives; a dive's centre opens its slip first, then the entry. The standalone donor is untouched.
-patch(
-  '  const canBloom=n.kind==="word"&&stack.length===0&&!lockOn;\n  if(V_LADDER==="stage4"',
-  '  if(n.kind==="word"&&slipFor(n)) return;\n  const canBloom=n.kind==="word"&&stack.length===0&&!lockOn;\n  if(V_LADDER==="stage4"',
-  'one-hand: the first tap on a word opens the slip',
-);
+// The one-hand pass (contract §1, 2026-10-15): where the sky handed a word straight to the host's entry
+// sheet — the ladder's end, a tap on the dive's centre (openCard) — it now opens the host's one slip beside
+// the centre (word · reading · meaning · Save ▾ · kanji band); the slip's band opens the entry, and so does
+// the same centre again while its slip stands. The sky's own rungs under that — the furigana, the gloss, the
+// bloom and its chain walk, the dive — are untouched: a slip at the first rung covered the family the bloom
+// spreads around the word (drift-consistency's edge-bloom and sat-flick cases). A dive puts any slip away.
+// The standalone donor keeps its card.
 patch(
   '  card.classList.remove("open"); clearBloom(n); collapseUnfold();\n  const lvl=beginLevel(n);',
   '  slipAway();   // the word dives: the slip goes with the scene it stood in\n  card.classList.remove("open"); clearBloom(n); collapseUnfold();\n  const lvl=beginLevel(n);',
   'one-hand: a dive puts the slip away',
 );
 patch(
-  '  if(isSat){\n    bloomFocus(n);   // the chain walk: the satellite becomes the planet\n    return;\n  }',
-  '  if(isSat){\n    bloomFocus(n);   // the chain walk: the satellite becomes the planet\n    slipFor(n);      // and the planet opens its slip as it arrives\n    return;\n  }',
-  'one-hand: the chain walk arrives with the slip',
-);
-patch(
   '    if(n.kind==="word"&&hook.has("word",n.w)){hook.open("word",n.w);return;}\n    if(n.kind==="glyph"&&n.ch&&hook.has("kanji",n.ch)){hook.open("kanji",n.ch);return;}',
   '    if(n.kind==="word"&&hook.has("word",n.w)){if(!slipFor(n))hook.open("word",n.w);return;}\n    if(n.kind==="glyph"&&n.ch&&hook.has("kanji",n.ch)){if(!slipFor(n))hook.open("kanji",n.ch);return;}',
-  'one-hand: a dive\'s centre opens its slip, the slip\'s band the entry',
+  'one-hand: a dive\'s centre opens its slip, the slip\'s band (or the centre again) the entry',
 );
 patch('lvlEl.addEventListener("pointerdown",e=>{\n  e.stopPropagation();',
   'lvlEl.addEventListener("pointerdown",e=>{\n  if(recordPending.size)return;\n  e.stopPropagation();', 'pending judgment preserves the level tide');
@@ -703,11 +693,10 @@ js += `
 // Round 4 review (T1): the universe speaks the interface language the corridor set on <body>.
 function uiT(ja,en){return document.body&&document.body.classList.contains("ui-bi")?en:ja;}
 // The one-hand pass (contract §1): the host's one slip, asked for the way the entry door is asked for —
-//   window.__BUNKI_OPEN_SLIP = { has(kind,key), open(kind,key,{anchor,onClose}), isOpen(), close() }
-// and drawn only when has() says the far side exists. slipFor(n) is the first rung of the hosted ladder: the
-// word's reading comes up (unfolded, its family blooming as before) and the slip opens beside it; the host
-// reads the next press on the same word as the dive into the full entry. When the slip goes (a tap elsewhere,
-// Escape, or that entry closing) the word folds again; while the entry is open it stays as it was.
+//   window.__BUNKI_OPEN_SLIP = { has(kind,key), open(kind,key,{anchor,redo,onClose}), isOpen(anchor), close() }
+// and drawn only when has() says the far side exists. slipFor(n) opens it beside a dive's centre at the
+// ladder's end; true when this tap opened it, false when it already stands there (then the centre's tap goes
+// on to the entry, as the band does). redo: the sky owns its taps, so no press is the slip's own dive.
 function slipHost(kind,key){
   const h=typeof window!=="undefined"&&window.__BUNKI_OPEN_SLIP;
   if(!h||typeof h.open!=="function") return null;
@@ -718,26 +707,13 @@ function slipAway(){
   const h=typeof window!=="undefined"&&window.__BUNKI_OPEN_SLIP;
   if(h&&typeof h.isOpen==="function"&&h.isOpen()&&typeof h.close==="function") h.close();
 }
-// true when this tap opened the slip (the ladder rests on it); false when the slip already stands beside
-// this word, so the tap climbs the sky's own next rung (the gloss, then the dive) with the slip in place
 function slipFor(n){
   const kind=n.kind==="word"?"word":n.kind==="glyph"?"kanji":null;
   const key=kind==="word"?n.w:n.ch;
   const h=kind&&key?slipHost(kind,key):null;
   if(!h||!n.el||!n.el.isConnected) return false;
   if(typeof h.isOpen==="function"&&h.isOpen(n.el)) return false;
-  if(kind==="word"&&!n.el.classList.contains("unfolded")){
-    collapseUnfold();
-    n.el.classList.add("unfolded"); unfolded=n;   // one tap: furigana, with the slip
-    if(stack.length===0&&!lockOn&&focusN!==n) bloomFocus(n);
-  }
-  // redo: the sky owns its taps — a press on the word is never the slip's dive; the band is the door
-  const opened=h.open(kind,key,{anchor:n.el,redo:true,onClose:function(reason){
-    if(reason==="dive") return;
-    n.el.classList.remove("unfolded","glossed");
-    if(unfolded===n) unfolded=null;
-  }});
-  return opened==="opened";
+  return h.open(kind,key,{anchor:n.el,redo:true})==="opened";
 }
 // Round 4 review (T1, fix 2): by day the universe keeps a sky of its own (the donor's own cool
 // ground), and by night it stands on the host world's ground only when every word ink keeps its
