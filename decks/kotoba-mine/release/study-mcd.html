@@ -4252,7 +4252,9 @@
  * always one tap away on a long passage; its own place in the flow, under the card, is the room the
  * passage keeps: scrolled to the end, the last line sits above it, never under it. A ring of the
  * stage frames it as a dock over the passage that scrolls on beneath. */
-.kp .kp-study > .kp-reveal { position: sticky; bottom: calc(var(--nav-clearance, 0px) + 10px + env(safe-area-inset-bottom, 0px)); z-index: 2; box-shadow: var(--kp-depth), 0 0 0 10px var(--kp-dock); }
+/* the docked key's measure: 56px, the height the dock is built around (↶ stands nav + 82px up: 10 + 56 + 16); the
+   families give it its face (A), not its height here */
+.kp .kp-study > .kp-reveal { position: sticky; bottom: calc(var(--nav-clearance, 0px) + 10px + env(safe-area-inset-bottom, 0px)); z-index: 2; min-height: 56px; box-shadow: var(--kp-depth), 0 0 0 10px var(--kp-dock); }
 body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-clearance) + 10px); }
 /* a passage's eyebrow row is the 全文／焦点 toggle's height on the front too: on the back the toggle takes
  * the instruction's place on that row, so the reveal does not grow the card's head or move the passage */
