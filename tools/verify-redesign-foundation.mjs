@@ -212,10 +212,21 @@ try {
           {
             await dictionary.click();
             await page.locator('#sheet').waitFor();
+            // the one-hand pass (2026-10-15): the tabs stay mounted under a sheet so the chrome never re-lays;
+            // the bar itself is not displayed, and the header keeps the height it had
+            assert.deepEqual(
+              await page.evaluate(() => {
+                const tabs = [...document.querySelectorAll('#primary-tabs')];
+                return { mounted: tabs.length, shown: tabs.filter((el) => el.getClientRects().length).length,
+                  display: tabs.map((el) => getComputedStyle(el).display), clearance: document.body.classList.contains('has-primary-tabs') };
+              }),
+              { mounted: 1, shown: 0, display: ['none'], clearance: true },
+              'A sheet hides the bottom tabs without taking their layout away',
+            );
             assert.equal(
-              await page.locator('#primary-tabs').count(),
-              0,
-              'A sheet has no active bottom tabs',
+              await page.evaluate(() => document.querySelector('.chrome').getBoundingClientRect().height),
+              headerAfter,
+              'Opening the entry must not re-lay the header',
             );
             await page.keyboard.press('Escape');
             await page.locator('#reader-take').waitFor({ state: 'visible' });

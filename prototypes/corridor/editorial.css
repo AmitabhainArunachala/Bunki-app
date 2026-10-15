@@ -828,7 +828,6 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
   .stroke-speed-wrap.stroke-corner .stroke-speed-labels { gap: 0; }
 }
 @media (max-width: 360px) {
-  body:not(.zen) #app > .chrome { flex-wrap: wrap; }
   .reference-other-rooms { width: 100%; justify-content: space-between; }
   .sheet-bar .sheet-depth { min-width: 18px; }
 }
@@ -2115,8 +2114,6 @@ body.v-depth-layered .listen-row.play-bar.is-pending, .listen-row.play-bar.is-pe
   }
   body[data-view='reader'] .listen-row.play-bar.is-pending { bottom: env(safe-area-inset-bottom); height: 64px; align-items: center; }
   body[data-view='reader'] #bunki-reports-root .br-rail { bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
-  /* a bottom sheet owns the foot: the bug steps up to the top corner */
-  body:has(#sheet):not(:has(#stroke-page)) #bunki-reports-root .br-rail { top: calc(12px + env(safe-area-inset-top, 0px)); bottom: auto; }
   /* the sentence bar rises above the dock, clear of the bug and the voice state */
   .teacher-door.reader-actions {
     left: var(--s1);

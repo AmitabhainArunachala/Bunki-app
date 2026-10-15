@@ -2847,7 +2847,7 @@ body.v-depth-layered .inline-link {
 }
 
 @media (max-width: 540px) {
-  body[data-view='reader'] .chrome { gap: 4px; padding-inline: 8px; flex-wrap: wrap; }
+  body[data-view='reader'] .chrome { gap: 4px; padding-inline: 8px; }
   body[data-view='reader'] .chrome .crumb { display: none; }
   body[data-view='reader'] .chrome > button { flex-shrink: 0; padding-inline: 8px; white-space: nowrap; }
 }

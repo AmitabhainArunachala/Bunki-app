@@ -31818,9 +31818,11 @@ function observePrimaryDocks() {
 }
 function buildPrimaryTabs(root, { personal = false } = {}) {
   observePrimaryDocks();
+  // a sheet, the stroke page or a menu never takes the tabs' layout away: the body keeps its class and its
+  // --nav-clearance, and the CSS :has(#sheet, …) rule hides the bar itself (John, 2026-10-15: the top bar
+  // re-laid itself and the page jumped under the scrim whenever a word opened)
   const show = S.variants.nav === 'tabs' && (S.ready || personal) &&
-    !['drift', 'entry'].includes(S.view) && !document.body.classList.contains('zen') &&
-    !S.stack.length && !S.strokes;
+    !['drift', 'entry'].includes(S.view) && !document.body.classList.contains('zen');
   document.body.classList.toggle('has-primary-tabs', show);
   if (!show) return;
   const bar = el('nav', 'primary-tabs');
