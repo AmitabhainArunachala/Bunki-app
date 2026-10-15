@@ -1582,11 +1582,12 @@ async function main() {
     const backs = [...bar.querySelectorAll('[data-bar-back]')].filter(shown);
     const back = backs[0] ? backs[0].getBoundingClientRect() : null;
     const glyph = backs[0] ? getComputedStyle(backs[0], '::after') : null;
-    return { sel, height: Math.round(r.height * 10) / 10, backs: backs.length,
+    return { sel, height: Math.round(r.height * 100) / 100, border: parseFloat(cs.borderBottomWidth), backs: backs.length,
       back: back && { w: Math.round(back.width), h: Math.round(back.height), chevron: /url\\(/.test((glyph.maskImage || glyph.webkitMaskImage || '') + '') },
       line: parseFloat(cs.borderBottomWidth) > 0, bg: cs.backgroundColor, wrap: cs.flexWrap };
   })`;
-  const barOk = (b, backs = 1) => !!b && !b.missing && Math.abs(b.height - 44) <= 0.5 && b.backs === backs && b.line && b.wrap === 'nowrap'
+  // exactly 44 of doors plus the one hairline under them (the hairline is outside the 44, so every door sits at y = 0)
+  const barOk = (b, backs = 1) => !!b && !b.missing && b.border > 0 && b.border <= 1 && Math.abs(b.height - 44 - b.border) < 0.1 && b.backs === backs && b.line && b.wrap === 'nowrap'
     && b.bg !== 'rgba(0, 0, 0, 0)' && (backs === 0 || (b.back && b.back.w >= 44 && b.back.h >= 44 && b.back.chevron));
   const bars = {};
   const barCheck = async (name, sel, backs = 1) => {
@@ -1624,7 +1625,7 @@ async function main() {
   await tap(page, '#kp-start');
   await page.waitForSelector('#kp-card', { timeout: 15000 });
   await barCheck('deck', '.kp-top-study');
-  const tallBar = await page.addStyleTag({ content: '.kp-top-study { height: 52px !important; }' });
+  const tallBar = await page.addStyleTag({ content: '.kp-top-study { height: 53px !important; }' });
   check('one top bar · a 52px deck bar fails the same check', !barOk(await page.evaluate(`(${BAR_FN})('.kp-top-study')`)));
   await tallBar.evaluate(n => n.remove());
   report.measurements.bars = bars;

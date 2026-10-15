@@ -313,7 +313,8 @@ try {
     const before = await counts(page);
     assert.match(before.note, PENDING, 'the line says that this article has no audio yet');
     assert.equal(before.description, PENDING_VOICES, 'the accessible description names the locked voices');
-    await page.locator('#listen-open').click();
+    // the dimmed mark is aria-disabled: Playwright holds an ordinary click off it, so the press is forced through
+    await page.locator('#listen-open').click({ force: true });
     await page.waitForTimeout(350);
     const after = await counts(page);
     assert.equal(after.clips.length, 0, 'nothing plays');
@@ -462,7 +463,7 @@ try {
   });
   await check('a-press-on-the-pending-mark-starts-nothing-later', 'narration-delayed', async (f) => {
     const { page, release } = f;
-    await page.locator('#listen-open').click();
+    await page.locator('#listen-open').click({ force: true });
     release();
     await manifestSettled(f, '__narrationConsumed');
     await page.waitForSelector('#listen-toggle', { state: 'attached', timeout: 5000 });

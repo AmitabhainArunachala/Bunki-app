@@ -4877,10 +4877,12 @@ body:not(.zen) #app > .chrome {
 [data-bar] {
   box-sizing: border-box;
   display: flex;
+  flex: 0 0 auto; /* a bar never shrinks in a flex column (the writing room is one) */
   flex-wrap: nowrap;
   align-items: center;
   gap: 0;
-  height: calc(44px + env(safe-area-inset-top, 0px));
+  /* 44 of doors on one hairline: the hairline is outside the 44, so every door sits at y = 0 */
+  height: calc(44px + var(--stroke-hairline, 1px) + env(safe-area-inset-top, 0px));
   min-height: 0;
   max-height: none;
   padding: env(safe-area-inset-top, 0px) 4px 0;
@@ -4895,7 +4897,7 @@ body:not(.zen) #app > .chrome {
   backdrop-filter: none;
 }
 /* the bars that are not the room's chrome sit inside their own layer: no safe-area of their own */
-[data-bar]:not(#app > .chrome) { height: 44px; padding-top: 0; }
+[data-bar]:not(#app > .chrome) { height: calc(44px + var(--stroke-hairline, 1px)); padding-top: 0; }
 [data-bar] > button, [data-bar] .lang-seg button { height: 44px; min-height: 44px; }
 /* the one back glyph: a chevron drawn once, the door's word beside it where there is room */
 [data-bar-back] {
@@ -5059,9 +5061,8 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
   }
 }
 @media (max-width: 374px) {
-  /* the narrowest phones: the Learn cap yields to the Learn tab one thumb away, as in every room */
+  /* the narrowest phones: seven 44px doors on one row (the bar's own Save is gone, so the Learn door keeps its place) */
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { gap: 0; }
-  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button.chrome-dojo { display: none; }
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg button { min-width: 44px; padding-inline: 0; }
 }
 /* END BUNKI R4 SKIN ======================================================== */
