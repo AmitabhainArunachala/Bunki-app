@@ -4185,6 +4185,10 @@ body:not([data-view='drift']) :is(
 }
 /* 夜 is the 藍 room itself: its light is 藍 (the world's gold stays as lantern gold) */
 :where(:root[data-theme='yoru'] body:not([data-view='drift'])) { --color-accent: #9db8e6; --color-accent-wash: rgb(157 184 230 / 10%); }
+/* 柿渋 stands on its persimmon ground now that the page is the world's own (one hand, slice D): its 藍 is
+   set a step deeper so the accent clears 4.5:1 on that page and on the accent wash (measured by
+   contrast-kotoba in every world; #35496b read 4.13 on the wash) */
+:where(:root[data-theme='iwa'] body:not([data-view='drift'])) { --color-accent: #2c3d5c; --color-accent-wash: rgb(44 61 92 / 10%); }
 /* 殻 is already phosphor: its own accent is the live light */
 :where(:root[data-theme='kaku'] body:not([data-view='drift'])) { --color-live: var(--world-accent); --color-live-glow: color-mix(in srgb, var(--world-accent) 45%, transparent); }
 
