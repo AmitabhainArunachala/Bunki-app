@@ -4745,9 +4745,16 @@ function returnFromNavigation() {
   return true;
 }
 
+/** A door the keyboard opened: Enter or Space on a button arrives as a trusted click with no pointer behind it (detail
+ * 0). Its page changes at once, as every keyboard door's does (enterWord) — the chooser's rows, the page's own doors. */
+function keyboardActivated() {
+  const event = window.event;
+  return !!event && event.type === 'click' && event.isTrusted === true && event.detail === 0;
+}
+
 /** Open a node's page one level deeper. `from` is the match cut's source (the slip's headword when the slip is the door,
- * else the tapped word or row); the page itself arrives through enterWord. */
-function go(node, { invoker = null, from = null, instant = false } = {}) {
+ * else the tapped word or row); the page itself arrives through enterWord, at once when the keyboard opened the door. */
+function go(node, { invoker = null, from = null, instant = keyboardActivated() } = {}) {
   if (personalHost && !personalHost.allowed()) return;
   const sourceContext = node.sourceContext || S.stack.at(-1)?.sourceContext ||
     (S.view === 'search' ? S.navSourceContext : null);
@@ -28434,6 +28441,9 @@ function renderWordNode(sheet, node) {
       fold.append(el('summary', null, tx(`ほかの用例（${moreExamples.length}）`, `More examples (${moreExamples.length})`)));
       for (const ex of moreExamples) fold.append(exampleLine(ex));
       fold.open = !!node.moreExamplesOpen;
+      // the fold's state is the page's, written as the summary is pressed: the toggle event comes a task later, and a
+      // page refreshed in between (its senses or the bank's examples arriving) folded the examples shut again
+      fold.firstElementChild.addEventListener('click', () => { node.moreExamplesOpen = !fold.open; });
       fold.addEventListener('toggle', () => { if (fold.isConnected) node.moreExamplesOpen = fold.open; });
       sheet.append(fold);
     }
@@ -30813,7 +30823,7 @@ function renderLayer({ prebuilt = null } = {}) {
  * browser without view transitions: the page changes at once (C's one rule fades it in 120 ms). The keyboard (Escape,
  * Enter on a door, Ctrl+Enter) and the device's own Back change it at once too: the keyboard's next key lands on the room
  * that is really there, and the phone's back swipe has already moved the screen. Names and keyframes: one block in
- * rooms/motion.css. */
+ * editorial.css, beside the page (rooms/motion.css is copied byte for byte into the Kotoba study pages). */
 let pageTransition = null; // { vt, run }: the cut still running, and its update (run once, whoever runs it first)
 const heroSource = new WeakMap(); // stack node → the element its page was entered from (the reverse cut's target)
 const keptPages = new WeakMap(); // stack node → { page, epoch }: a page a deeper one covered, mounted again by Back

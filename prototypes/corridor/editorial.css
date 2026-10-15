@@ -2064,6 +2064,11 @@ body .sheet .teacher-door {
 body .sheet .teacher-door .teacher-source-quote { font: 18px/1.9 var(--serif); color: var(--text); }
 body .sheet .example { padding: var(--s2) 0; border: 0; border-bottom: 1px solid var(--hairline); }
 body .sheet .example-ja { font: 20px/2 var(--serif); color: var(--text); }
+/* G1 · an example line mixes the page's sentence words (button.tok) with lookup text: the line is the one isolated layer
+ * their 44px hit regions share, under all of its ink, so each glyph owns its own centre (the AI reading's rule,
+ * e78d7462). Isolated word by word, を's region lay over 手's centre in 手を触れるな: a tap on 手 opened を. */
+body .sheet .example-ja { position: relative; isolation: isolate; }
+body .sheet .example-ja .japanese-lookup-text { isolation: auto; }
 body .sheet .example-en { font: 15px/1.6 var(--sans); color: var(--text-2); }
 /* G1 · the page leads with the tapped word's own example; the rest wait, folded, under "More examples" (Codex gap 17) */
 body .sheet .more-examples { margin: var(--s1) 0 var(--s2); }
@@ -4291,7 +4296,7 @@ body:not([data-view='drift']) .foundation-doors { gap: var(--space-2); }
    in every room the galaxy included; the world's raised paper, opaque from a plain value first (--color-paper = the
    world block's --ground-0: the page opened from the review card wears the world, verify-theme-consistency); no
    radius, no cap (corridor.css's 82vh, the 90dvh and the phone's 91dvh are gone), no grip, no dimming layer under
-   it — a whole page has nothing to dim and nothing to tap outside. It arrives by the match cut (rooms/motion.css);
+   it — a whole page has nothing to dim and nothing to tap outside. It arrives by the match cut (the block below);
    its own fade is only for a browser without view transitions and for reduced motion (the one rule below). ---- */
 body .sheet, body.v-depth-layered .sheet {
   inset: 0;
@@ -4308,6 +4313,38 @@ body .sheet, body.v-depth-layered .sheet {
   overscroll-behavior: contain;
   animation: none;
 }
+/* G1 · the word's page arrives as a match cut — one block, names and keyframes. It lives here, beside the page, not in
+   rooms/motion.css: motion.css is copied byte for byte into the Kotoba study pages (decks/kotoba-mine/release, pinned by
+   verify-kotoba-mine), which this slice does not rebuild. The source's headword (the slip's, else the tapped word) and
+   the page's headword are one word-hero in turn: its group morphs position and size on the page beat (--motion-sheet,
+   --ease-enter). motion.css stops every group's own animation (::view-transition-group(*)) so a room's frame never
+   travels; word-hero, a named group and so the more specific rule, takes its user-agent morph back (revert), the
+   duration and the curve are the house's. What the page covers is kairo-paper: the root's snapshot, named for the old
+   state only (the arriving page is never captured, so it stays live — the reason motion.css keeps the root's name
+   none), recedes a step toward the source (≤ 1.03 around --paper-origin, set by corridor.js) and fades, so the page is
+   found beneath it; the slip goes with it. Back: the page is kairo-page (old only) and fades (motion.css's
+   kairo-room-fade-out) while the word returns to where it was tapped. Reduced motion never starts the cut (corridor.js
+   pageCutAllowed): the page's own 120 ms fade is the one rule's (above). */
+::view-transition-group(word-hero) {
+  animation: revert;
+  animation-duration: var(--motion-sheet);
+  animation-timing-function: var(--ease-enter);
+}
+::view-transition-old(word-hero),
+::view-transition-new(word-hero) {
+  animation-duration: var(--motion-sheet);
+  animation-timing-function: var(--ease-enter);
+}
+::view-transition-old(kairo-paper) {
+  mix-blend-mode: normal;
+  transform-origin: var(--paper-origin, 50% 30%);
+  animation: kairo-paper-recede var(--motion-sheet) var(--ease-enter) both;
+}
+::view-transition-old(kairo-page) {
+  mix-blend-mode: normal;
+  animation: kairo-room-fade-out var(--motion-sheet) var(--ease-enter) both;
+}
+@keyframes kairo-paper-recede { to { opacity: 0; transform: scale(1.03); } }
 
 /* ---- the top chrome: clean and quiet. Every door keeps its id, place and 44px. ---- */
 body:not(.zen) #app > .chrome {
