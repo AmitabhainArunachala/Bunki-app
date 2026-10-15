@@ -268,10 +268,12 @@ async function sheetViewportGeometry(page) {
   return page.evaluate((closeSelector) => {
     const sheet = document.querySelector('#sheet').getBoundingClientRect();
     const close = document.querySelector(closeSelector).getBoundingClientRect();
-    return { innerWidth, clientWidth: document.documentElement.clientWidth,
+    // G1: the entry is a whole-screen page; its measure is its content's column (the first block under its bar)
+    const content = document.querySelector('#sheet > :not(.sheet-bar)')?.getBoundingClientRect();
+    return { innerWidth, innerHeight, clientWidth: document.documentElement.clientWidth,
       scrollWidth: document.documentElement.scrollWidth,
       visualWidth: window.visualViewport?.width ?? innerWidth,
-      sheet: sheet.toJSON(), close: close.toJSON() };
+      sheet: sheet.toJSON(), close: close.toJSON(), content: content ? content.toJSON() : null };
   }, await entryCloseSelector(page));
 }
 
@@ -1075,6 +1077,9 @@ async function main() {
   await page.waitForTimeout(150);
   await holdWord(page, '#reader .tok.content');
   await page.waitForSelector('#sheet[data-node^="word:"]');
+  // G1 (2026-10-16): the page arrives by a 320 ms match cut and takes data that lands meanwhile once the cut ends, so
+  // its complete senses are read when its "Opening complete senses…" line has gone, not at a fixed 200 ms
+  await page.waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8000 }).catch(() => {});
   const panel = await page.evaluate(`(() => {
     const s = document.querySelector('#sheet');
     return {
@@ -1182,8 +1187,10 @@ async function main() {
   await page.waitForSelector('#sheet', { state: 'detached' });
   check('phone kanji close dismisses the full entry', await page.locator('#sheet').count() === 0);
 
-  // Desktop control: retain the design pass's centred 900px measure and working
-  // close path. This is another page in the same already-headless browser.
+  // Desktop control: retain the design pass's centred measure and working close path. G1 (2026-10-16, John: "this
+  // should come to the WHOLE SCREEN"): the entry is a whole-screen page, so the page covers the window and the measure
+  // is its content's — a centred column no wider than the old 900 px sheet. This is another page in the same
+  // already-headless browser.
   const desktopSheetContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   try {
     const desktopPage = await desktopSheetContext.newPage();
@@ -1194,9 +1201,12 @@ async function main() {
     await waitForFiniteMotion(desktopPage, '#sheet');
     const desktopSheet = await sheetViewportGeometry(desktopPage);
     report.measurements.kanjiDesktopViewport = desktopSheet;
-    check('desktop kanji keeps its centred measure and reachable close',
-      desktopSheet.scrollWidth <= 1280 && desktopSheet.sheet.width === 900 &&
-      desktopSheet.sheet.left === 190 && desktopSheet.close.right <= 1280,
+    const column = desktopSheet.content;
+    check('desktop kanji: the page covers the window, its content keeps a centred measure, its close is reachable',
+      desktopSheet.scrollWidth <= 1280 && desktopSheet.sheet.left === 0 && desktopSheet.sheet.top === 0 &&
+      desktopSheet.sheet.width === 1280 && desktopSheet.sheet.height === desktopSheet.innerHeight &&
+      !!column && column.width <= 900 && column.width >= 760 && Math.abs(column.left - (1280 - column.right)) <= 2 &&
+      desktopSheet.close.right <= 1280,
       JSON.stringify(desktopSheet));
     await shoot(desktopPage, shotsDir, '04b-kanji-desktop-settled');
     await desktopPage.locator('#sheet-back').focus();
@@ -2469,10 +2479,14 @@ async function main() {
   check('the 用例 eyebrow says that a tap on a word gives its meaning',
     /触れると意味/.test(exampleEyebrow) || /tap a word for its meaning/.test(exampleEyebrow),
     `eyebrow: "${exampleEyebrow}"`);
+  // R (2026-10-16): a word read otherwise than the quick dictionary (明日 あした) waits up to READING_WAIT_MS for its
+  // entry, so its popup is read once it has come — the same popup, the reading and the meaning at once (seen red on the
+  // base build too, L/site-3, before G1)
+  await page.evaluate(`document.querySelector('#sheet .example .sentence-tok')?.dispatchEvent(new MouseEvent('click', { bubbles: true }))`);
+  await page.waitForSelector('#mini .mini-word', { timeout: 3000 }).catch(() => {});
   const ladderProof = await page.evaluate(`(() => {
     const tok = document.querySelector('#sheet .example .sentence-tok');
     if (!tok) return null;
-    tok.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     const mini = document.querySelector('#mini');
     return { word: tok.textContent, popup: mini?.querySelector('.mini-word')?.textContent ?? null,
       gloss: mini?.querySelector('.mini-gloss')?.textContent ?? null, under: !!tok.querySelector('.tok-en') };
