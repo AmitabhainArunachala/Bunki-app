@@ -4854,7 +4854,9 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
 /* night: the frame is the deepest tone, the page the world's ground, raised paper steps up
    in light with a lit top edge. Light is emitted (edges, glows), never a solid phosphor fill. */
 :where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift'])) {
-  --color-surface: color-mix(in srgb, var(--color-paper) 88%, var(--color-ink) 4%);
+  /* 96 + 4: percentages that sum under 100 make color-mix scale the alpha (0.92) — every night surface was quietly
+     translucent (the word menu, the deck card); opaque paper now, the same tint */
+  --color-surface: color-mix(in srgb, var(--color-paper) 96%, var(--color-ink) 4%);
   --color-surface-sunk: color-mix(in srgb, var(--color-ground) 78%, #000);
   --color-ink-2: color-mix(in srgb, var(--color-ink) 88%, var(--color-ground));
   --color-label-2: color-mix(in srgb, var(--color-ink) 82%, var(--color-ground));
@@ -4875,7 +4877,7 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
 :where(:root[data-theme='kaku'] body:not([data-view='drift'])) {
   --color-bar: color-mix(in srgb, var(--color-ground) 70%, #000);
   --color-bar-line: color-mix(in srgb, var(--world-accent) 34%, transparent);
-  --color-surface: color-mix(in srgb, var(--color-paper) 90%, var(--world-accent) 3%);
+  --color-surface: color-mix(in srgb, var(--color-paper) 97%, var(--world-accent) 3%);
 }
 /* 文脈札 gives html a background of its own, so body's flat ground stopped passing to the canvas
    and was painted over the page layer: the room read as the old beige. The page shows again. */

@@ -74,13 +74,18 @@ for (const world of WORLDS) {
       if (own && own.a === 0 && el.classList.contains('is-inline')) { node = el.closest('#mini'); own = node && parse(getComputedStyle(node).backgroundColor); paintedBy = '#mini'; }
       const pageHex = getComputedStyle(document.body).getPropertyValue('--page').trim();
       const pg = parse(pageHex);
-      return { bg: own, paintedBy, lum: own && lum(own), pageLum: pg && lum(pg), page: pageHex, raw: getComputedStyle(el).backgroundColor };
+      const paperHex = getComputedStyle(document.documentElement).getPropertyValue('--ground-0').trim();
+      const paper = parse(paperHex);
+      const isPaper = !!(own && paper && Math.abs(own.r - paper.r) < 0.003 && Math.abs(own.g - paper.g) < 0.003 && Math.abs(own.b - paper.b) < 0.003 && own.a === 1);
+      return { bg: own, paintedBy, lum: own && lum(own), pageLum: pg && lum(pg), page: pageHex, paper: paperHex, isPaper, raw: getComputedStyle(el).backgroundColor };
     })()`);
     if (got.missing) { failures.push(`${world}/${room}: ${sel} is not open`); return; }
     if (!got.bg) { failures.push(`${world}/${room}: ${sel} background ${got.raw} could not be read`); return; }
     if (got.bg.a !== 1) failures.push(`${world}/${room}: ${sel} background ${got.raw} is not opaque (alpha ${got.bg.a}, painted by ${got.paintedBy})`);
-    if (nearPage && (got.pageLum == null || Math.abs(got.lum - got.pageLum) > 0.08))
-      failures.push(`${world}/${room}: ${sel} luminance ${got.lum?.toFixed(3)} is not within 0.08 of the page's ${got.pageLum?.toFixed(3)} (${got.page})`);
+    // the sheet's body is the world's own raised paper exactly (--ground-0: in 藍 and 板 a leaf 0.1 above a darker
+    // cream page, by design), or else within 0.08 of the page's luminance — never a grey over cream, never a scrim through
+    if (nearPage && !got.isPaper && (got.pageLum == null || Math.abs(got.lum - got.pageLum) > 0.08))
+      failures.push(`${world}/${room}: ${sel} luminance ${got.lum?.toFixed(3)} is neither the world's raised paper (${got.paper}) nor within 0.08 of the page's ${got.pageLum?.toFixed(3)} (${got.page})`);
   };
   await page.goto(`${base}/?entry=shelf`);
   await page.waitForSelector('#tray', { timeout: 30000 });
