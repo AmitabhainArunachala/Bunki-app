@@ -18,6 +18,12 @@
  *   D  the deck    — the deck's study bar is a solid band in the world's deep pigment (藍 and 墨 walked), its
  *                    back, count and Remove at 4.5:1 or more on it;
  *   T  Today       — no box inside a box: the day's line carries no bordered box within it, and no + marks.
+ *   N  the shelf's rows and cards (slice N, 2026-10-17: "made by AI!! do not write that", the twenty new articles) —
+ *                    every card carries one level, the level its text was written for where the row has one; every
+ *                    row opened in the reader shows no provenance word, one level, and its context line exactly when
+ *                    the row carries one (two Aozora excerpts), under the title; no row's authoring record (who wrote
+ *                    it, John's pending read) is drawn anywhere; the rows the queue lists as originals carry no review
+ *                    value and no 検収前; and the newest drop leads the shelf and Today's story.
  * KAIRO_SWEEP_MODE=inventory lists every instance (and screenshots each room) without failing: S/INVENTORY.md is
  * built from that run on the base build. Negative controls, each red where it is planted and nowhere else:
  * KAIRO_SWEEP_NEGATIVE=chip re-inserts one "Made by AI" chip in ONE room (the reader); =cover cancels the page's step down
@@ -27,8 +33,9 @@
 import assert from 'node:assert/strict';
 import console from 'node:console';
 import process from 'node:process';
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
 import { startCorridorDev } from '../../../scripts/serve-corridor-dev.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
@@ -93,6 +100,46 @@ window.__SWEEP__ = {
   idiom: () => { S.stack = []; S.strokes = null; go({ t: 'idiom', id: Object.keys(D.idioms || {})[0] }); window.scrollTo(0, 0); },
   closeLayers: () => { closeVocabularyListPopover(); removeMini(); S.stack = []; S.strokes = null; render(); },
   saved: (id) => S.taken.some((t) => t.id === id),
+  // N · the shelf's rows as the page holds them (archive rows aside), the cards as drawn, Today's story, one row read
+  rows: () => D.passages.filter((p) => !String(p.file || '').startsWith('archive/')).map((p) => ({
+    id: p.id, review: Object.hasOwn(p, 'review') ? p.review : null, pending: !!p.pendingVerification,
+    sourceLabel: p.sourceLabel || '', learnerLabel: learnerSourceLabel(p), attribution: p.attribution || '',
+    title: p.title || '', titleEn: p.titleEn || '', context: p.context?.ja ?? null, authorLevel: p.authorLevel || null,
+    jlpt: p.readingFacets?.jlpt || null, addedAt: p.addedAt || null,
+    hidden: [p.authoring?.humanApproval, p.authoring?.writtenBy, p.authoring?.chosenBy].filter((v) => typeof v === 'string' && v),
+  })),
+  cards: () => [...document.querySelectorAll('#shelf-reading-results .shelf-item')].map((n) => ({
+    id: n.dataset.passage, band: n.dataset.recommendation || '',
+    chips: [...n.querySelectorAll('.level-chip')].map((c) => c.textContent.trim()),
+    text: n.innerText + ' ' + [...n.querySelectorAll('[title], [aria-label]')].map((c) => (c.title || '') + ' ' + (c.getAttribute('aria-label') || '')).join(' '),
+  })),
+  todayPick: () => todayReadPick()?.passage?.id ?? null,
+  day: () => shelfCurrentDay(),
+  pageText: () => document.body.innerText,
+  openRow: async (id) => {
+    S.stack = []; S.strokes = null; closeVocabularyListPopover(); removeMini();
+    const p = D.passages.find((x) => x.id === id);
+    await ensureArticle(p);
+    openPassage(id);
+    const card = () => document.querySelector('#app main .reader-card');
+    for (let i = 0; i < 200 && !(S.view === 'reader' && card()?.querySelector('h1.view-title')?.textContent === p.title); i += 1)
+      await new Promise((done) => requestAnimationFrame(done));
+    const c = card();
+    const kids = c ? [...c.children] : [];
+    const at = (sel) => kids.findIndex((k) => k.matches(sel));
+    return {
+      title: c?.querySelector('h1.view-title')?.textContent ?? null,
+      contexts: [...document.querySelectorAll('#app main .reader-context')].map((n) => ({
+        text: n.textContent, inCard: n.parentElement === c,
+        // under the title group: after the h1 (and its English line), before the instrument line
+        placed: at('.reader-context') > at('h1.view-title') && (at('.view-title-en') < 0 || at('.reader-context') > at('.view-title-en'))
+          && at('.reader-context') < at('.reader-head'),
+        boxed: (() => { const cs = getComputedStyle(n); return ['Top', 'Right', 'Bottom', 'Left'].some((s) => parseFloat(cs['border' + s + 'Width']) > 0 && cs['border' + s + 'Style'] !== 'none') || !['transparent', 'rgba(0, 0, 0, 0)'].includes(cs.backgroundColor); })(),
+      })),
+      chips: [...document.querySelectorAll('#app main .reader-meta .level-chip')].map((n) => n.textContent.trim()),
+      text: (document.querySelector('#app main')?.innerText ?? '') + ' ' + (document.querySelector('#app > .chrome')?.innerText ?? ''),
+    };
+  },
   // a real selection of the first occurrence of text inside a surface (the source reader keeps what is selected)
   selectIn: (sel, text) => {
     const body = document.querySelector(sel);
@@ -310,6 +357,76 @@ function contrast(a, b) {
 
 const inventory = [];
 const summary = { P: 0, C: 0, K: 0, Kone: 0, M: 0, rooms: 0 };
+
+/* N · the shelf's rows and cards. The provenance words are scanPage's own (checked identical below); the originals are
+ * the review queue's rows of kind "original" (docs/content/feed-review-queue.json), the twenty that joined in slice N. */
+const PROV_N = /made by ai|ai[- ]?(made|generated|written)|written by ai|questions made by ai|unreviewed|un-reviewed|not yet checked|checked by a person|awaiting (john'?s )?review|machine[- ]checked|human[- ]review|provisional|AI作成|AIが(書|作)|未確認|検収|人の(目|確認)|人による確認|\b\d+ of \d+ not yet/iu;
+assert(scanPage.toString().includes(PROV_N.source), "N's provenance words are scanPage's own");
+const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
+const ORIGINALS = JSON.parse(readFileSync(resolve(REPO, 'docs/content/feed-review-queue.json'), 'utf8'))
+  .filter((row) => row.kind === 'original' && row.decision !== 'rejected').map((row) => row.id);
+const levelOf = (row) => (/^N[1-5]\+?$/u.test(row.authorLevel || '') ? row.authorLevel : null) ?? row.jlpt;
+async function shelfRowsAndCards(page, engine, lang) {
+  const label = `${engine} ${lang} · N`;
+  const rows = await page.evaluate(() => window.__SWEEP__.rows());
+  const cards = await page.evaluate(() => window.__SWEEP__.cards());
+  const day = await page.evaluate(() => window.__SWEEP__.day());
+  const pick = await page.evaluate(() => window.__SWEEP__.todayPick());
+  const shelfText = await page.evaluate(() => window.__SWEEP__.pageText());
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  const hidden = [...new Set(rows.flatMap((row) => row.hidden))];
+  // the drop in its own (index) order, as the shelf's daily rotation shows it: three of its first twelve lead
+  const drop = rows.filter((row) => ORIGINALS.includes(row.id)).map((row) => row.id);
+  const offset = ((Math.floor(Date.parse(`${day}T00:00:00Z`) / 86400000) * 3) % 12 + 12) % 12;
+  const window12 = drop.slice(0, 12);
+  const leading = [0, 1, 2].map((i) => window12[(offset + i) % window12.length]);
+  const expectedLead = [...leading, ...drop.filter((id) => !leading.includes(id))];
+  const grid = cards.filter((card) => !card.band).map((card) => card.id);
+  const walked = [];
+  for (const row of rows) {
+    const seen = await page.evaluate((id) => window.__SWEEP__.openRow(id), row.id);
+    walked.push({ row, seen });
+  }
+  await page.evaluate(() => window.__SWEEP__.visit('shelf'));
+  inventory.push({ engine, lang, room: 'rows-and-cards', day, offset, pick, cards: cards.map(({ id, band, chips }) => ({ id, band, chips })),
+    rows: walked.map(({ row, seen }) => ({ id: row.id, review: row.review, level: levelOf(row), chips: seen.chips, contexts: seen.contexts })) });
+  if (MODE !== 'verify') return;
+  check(`${label} the shelf's originals are the queue's (${ORIGINALS.length})`, drop.length === ORIGINALS.length && ORIGINALS.length > 0,
+    `${drop.length} of ${ORIGINALS.length}`);
+  check(`${label} the newest drop leads the shelf: its ${drop.length} cards come first, today's three (offset ${offset}) at the top`,
+    JSON.stringify(grid.slice(0, drop.length)) === JSON.stringify(expectedLead), JSON.stringify({ day, grid: grid.slice(0, drop.length), expectedLead }));
+  check(`${label} Today's story is the drop's first reading`, pick === drop[0], `${pick} (want ${drop[0]})`);
+  const cardTrouble = cards.filter((card) => {
+    const row = byId.get(card.id);
+    return !row || card.chips.length !== 1 || (levelOf(row) && card.chips[0] !== levelOf(row)) || PROV_N.test(card.text);
+  }).map((card) => `${card.id}:${card.chips.join('/')}`);
+  check(`${label} every card (${cards.length}) carries one level — the written-for level where the row has one — and no provenance word`,
+    cards.length >= rows.length - 6 && cardTrouble.length === 0, cardTrouble.slice(0, 6).join(' | '));
+  const originals = drop.map((id) => byId.get(id));
+  const labelled = originals.filter((row) => row.review !== null || row.pending || /検収前/u.test(row.sourceLabel) || row.learnerLabel !== row.sourceLabel ||
+    PROV_N.test(`${row.sourceLabel} ${row.attribution} ${row.title} ${row.titleEn} ${row.context ?? ''}`)).map((row) => row.id);
+  check(`${label} the originals carry no review value, no 検収前 and no provenance word in what the learner reads`, labelled.length === 0, labelled.join(', '));
+  const rowTrouble = [];
+  for (const { row, seen } of walked) {
+    const problems = [];
+    if (seen.title !== row.title) problems.push('not opened');
+    if (seen.chips.length !== 1 || (levelOf(row) && seen.chips[0] !== levelOf(row))) problems.push(`level ${seen.chips.join('/')}`);
+    if (row.context) {
+      const [line] = seen.contexts;
+      if (seen.contexts.length !== 1 || line.text !== row.context || !line.inCard || !line.placed || line.boxed) problems.push(`context ${JSON.stringify(seen.contexts)}`);
+    } else if (seen.contexts.length) problems.push(`stray context ${JSON.stringify(seen.contexts)}`);
+    const prov = seen.text.match(PROV_N);
+    if (prov) problems.push(`provenance "${prov[0]}"`);
+    const shown = hidden.filter((value) => seen.text.includes(value));
+    if (shown.length) problems.push(`authoring drawn: ${shown.join(' / ')}`);
+    if (problems.length) rowTrouble.push(`${row.id}: ${problems.join(', ')}`);
+  }
+  const withContext = rows.filter((row) => row.context).length;
+  check(`${label} every row read (${walked.length}): one level, no provenance, no authoring drawn; the context line on the ${withContext} rows that carry it, under the title, and on no other`,
+    walked.length === rows.length && withContext > 0 && rowTrouble.length === 0, rowTrouble.slice(0, 6).join(' | '));
+  const onShelf = hidden.filter((value) => shelfText.includes(value));
+  check(`${label} no row's authoring record is drawn on the shelf`, hidden.length > 0 && onShelf.length === 0, onShelf.join(' / '));
+}
 const SOURCE_TEXT = '町の図書館に着くと、窓の近くに席があった。そこで友達と会い、次に読む本を選んだ。';
 try {
   for (const [engine, browserType] of Object.entries(engines)) {
@@ -415,6 +532,7 @@ try {
         await boot('&entry=shelf');
         // Read: the shelf, a story, its card, the card's Save menu, the page, the page's sentence and foot
         await room('shelf', async () => { await page.evaluate(() => window.__SWEEP__.visit('shelf')); await settle(700); });
+        await shelfRowsAndCards(page, engine, lang);
         await room('reader', async () => { await page.evaluate(() => window.__SWEEP__.reader('スタートアップ')); await settle(900); }, () => page.evaluate(() => {
           const keep = document.getElementById('chrome-keep');
           return { barKeep: keep ? { text: keep.textContent.replace(/\s+/gu, ' ').trim(), one: keep.matches('button.save-one[data-save-one]'), shown: !!keep.getClientRects().length } : null };
