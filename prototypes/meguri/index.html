@@ -192,6 +192,7 @@ button{font:inherit;color:inherit}
 <script src="kvg.js"></script>
 <script src="kanji.js"></script>
 <script src="kakuji.js"></script>
+<script src="kakuji2.js"></script>
 <script src="assets.js"></script>
 <script src="assets_sound.js"></script>
 <script>
@@ -479,11 +480,13 @@ function fillPage(s){ const w=s.w,p=passes(s),sealed=!!state.sealed[w.w];
   const MK=window.MeguriKanji; let drawn=false;
   // the poster is built from KanjiVG strokes, so it needs no font to be right; it only needs the data for every character
   if(MK&&[...w.w].every(ch=>MK.has(ch))){ try{ const box=document.createElement('div'); box.className='plate'; const cw=Math.min(300,Math.floor(Math.min(window.innerWidth*.7,320))); box.style.width=cw+'px'; big.style.writingMode='horizontal-tb'; big.appendChild(box);
-      const face=state.face||'dela'; const opts={ground:T.dark?'black':'paper',pigment:pig(s.g),dots:Math.min(5,p),sealed,reading:w.r,face};
-      // a tap on the poster cycles what the word is built from: the typeface, a second typeface, or the constructed letters, so each can be judged on the phone
-      const faces=['dela','potta'].concat(window.MeguriKakuji?['kakuji']:[]); box.title='tap: another face'; box.style.cursor='pointer'; box.onclick=()=>{ state.face=faces[(faces.indexOf(face)+1)%faces.length]; save(); fillPage(s); toast({dela:'Dela Gothic',potta:'Potta',kakuji:'角字 · constructed'}[state.face]); };
-      const go=()=>{ if(cur!==s||page.hidden) return; const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
-        if(face==='kakuji'&&window.MeguriKakuji){ const KK=window.MeguriKakuji; const ko={ground:opts.ground,dots:opts.dots,reading:w.r,sealed,width:cw}; if(KK.animateIn&&!still) posterAnim=KK.animateIn(box,w.w,ko); else KK.render(box,w.w,ko); }
+      // the default face is the fidelity construction: every stroke of the real character kept, drawn as geometric pieces, read blind without error
+      const faces=(window.MeguriKakuji2?['kakuji2']:[]).concat(['dela','potta'],window.MeguriKakuji?['kakuji']:[]); const face=faces.includes(state.face)?state.face:faces[0]; const opts={ground:T.dark?'black':'paper',pigment:pig(s.g),dots:Math.min(5,p),sealed,reading:w.r,face};
+      // a tap on the poster cycles what the word is built from, so each can be judged on the phone
+      box.title='tap: another face'; box.style.cursor='pointer'; box.onclick=()=>{ state.face=faces[(faces.indexOf(face)+1)%faces.length]; save(); fillPage(s); toast({kakuji2:'構築 · constructed, legible',dela:'Dela Gothic',potta:'Potta',kakuji:'角字 · heavy'}[state.face]); };
+      const go=()=>{ if(cur!==s||page.hidden) return; const still=matchMedia('(prefers-reduced-motion:reduce)').matches; const ko={ground:opts.ground,pigment:opts.pigment,dots:opts.dots,reading:w.r,sealed,width:cw};
+        if(face==='kakuji2'&&window.MeguriKakuji2){ const KK=window.MeguriKakuji2; if(KK.animateIn&&!still) posterAnim=KK.animateIn(box,w.w,ko); else KK.render(box,w.w,ko); }
+        else if(face==='kakuji'&&window.MeguriKakuji){ const KK=window.MeguriKakuji; if(KK.animateIn&&!still) posterAnim=KK.animateIn(box,w.w,ko); else KK.render(box,w.w,ko); }
         else { if(!still) posterAnim=MK.animateIn(box,w.w,opts); else MK.render(box,w.w,opts); } };
       // the face is embedded as a subset, but a font still loads lazily: wait for the word's own characters so the first look is never the fallback
       if(document.fonts&&document.fonts.load) document.fonts.load("400 80px 'Meguri Dela'",w.w).then(go,go); else go(); drawn=true; }catch(e){ big.textContent=''; } }
