@@ -2021,13 +2021,17 @@ body .sheet .entry-row {
   border-radius: 0;
   transition: none;
 }
+/* G1b · the tile grows with its glyph (the critic's finding 3: at 200 % text the 30 px glyph became 60 px in a 48 px tile
+   and spilled out of it). The tile is its glyph and a margin round it — 30 + 2 × 8 + 2 × 1 = 48 — so whatever enlarges the
+   text (the phone's text size, a browser's text-size-adjust, which grows the glyph but not an em) grows the tile; 48 is
+   its floor */
 body .sheet .entry-row .row-glyph {
   display: grid;
   place-items: center;
   flex: 0 0 auto;
-  width: 48px;
-  height: 48px;
   min-width: 48px;
+  min-height: 48px;
+  padding: 8px;
   border: 1px solid var(--raised-edge);
   border-radius: var(--radius-card);
   background: var(--washi) 0 0 / 300px 300px, color-mix(in srgb, var(--ink) 4%, var(--raised));
