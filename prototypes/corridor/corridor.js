@@ -12614,48 +12614,24 @@ function renderTodayWord(pick) {
   block.append(follow);
   return block;
 }
-/** Today's line: three stops on a hairline track, the train of today's cards, the one primary door
- * (#review-start, built by renderTray) and the reading that follows it. */
-function renderTodayLine(today, door, read, pick) {
-  const card = el('section', 'today-line');
-  card.setAttribute('aria-label', tx('今日の路線', "Today's line"));
-  const stops = el('ol', 'today-stops');
-  const stop = (cls, n, label) => {
-    const li = el('li', `today-stop ${cls}`);
-    li.append(el('b', 'today-stop-n', String(n)), el('span', 'today-stop-l', label));
-    return li;
-  };
-  const cards = today ? today.order.length : 0;
-  if (today) stops.append(stop(cards ? 'stop-cards now' : 'stop-cards', cards, tx('枚のカード', cards === 1 ? 'card' : 'cards')));
-  if (read) stops.append(stop(!cards ? 'stop-read now' : 'stop-read', 1, tx('本の記事', 'article')));
-  // plain words (round 4): the third stop is the day's word the hero shows, one short name that
-  // sits on one line beside "8 cards" and "1 article" even at 320px
-  if (pick) stops.append(stop(!cards && !read ? 'stop-word now' : 'stop-word', 1, tx('語', 'word')));
-  stops.style.setProperty('--stops', String(stops.children.length));
-  card.append(stops);
-  if (cards) {
-    const train = el('div', 'today-train');
-    train.setAttribute('aria-hidden', 'true');
-    const learnSet = new Set([...today.learn, ...today.new].map((i) => srsKey(i.t, i.id)));
-    today.order.slice(0, 36).forEach((item, i) => {
-      const car = el('i', learnSet.has(srsKey(item.t, item.id)) ? 'car learn' : 'car');
-      car.style.setProperty('--i', String(i));
-      train.append(car);
-    });
-    card.append(train);
-  }
-  if (door) card.append(door);
+/** Today's line (S, John 2026-10-16: "i hate the plus symbols above the artile and word box. the box in general is bad
+ * taste"): two plain lines on the page and no box — the cards waiting (#review-start, the one door into today's review,
+ * built by renderTray) and today's reading — each under a hairline, in the house's type, the room's arrow at its end. */
+function renderTodayLine(today, door, read) {
+  const line = el('section', 'today-line');
+  line.setAttribute('aria-label', tx('今日', 'Today'));
+  if (door) line.append(door);
   if (read) {
-    const then = el('button', door ? 'today-then' : 'today-then solo');
+    const then = el('button', 'today-then');
     then.type = 'button';
-    then.append(el('span', 'today-then-l', door ? tx('つづいて', 'Then') : tx('今日の読み物', "Today's reading")),
+    then.append(el('span', 'today-then-l', tx('今日の読み物', "Today's reading")),
       todayPhrases(todayLearning('span', 'today-then-title'), read.passage.title));
     if (read.count) then.append(el('span', 'today-then-n', tx(`あなたの語 ${read.count}`, `${read.count} of your words`)));
     then.append(el('i', 'today-arrow'));
     then.addEventListener('click', () => openPassage(read.passage.id));
-    card.append(then);
+    line.append(then);
   }
-  return card;
+  return line;
 }
 const TODAY_DETAIL_KEY = 'bunki-today-detail';
 /** The deck room, folded under the line: the counts, the forecast, the deck rows, the doors and
@@ -12737,14 +12713,15 @@ function renderTray(main) {
     // limit are not "later today": the door says the limit is met.
     const capped = !due.length && today.held > 0;
     const laterToday = !due.length && !capped && f.today > 0;
+    // S · one plain line to the cards waiting (John, 2026-10-16: "the box in general is bad taste"): no key inside a box
     const btn = biLabel(
       'button',
-      due.length ? 'take review-start' : 'take review-start quiet',
+      due.length ? 'today-cards review-start' : 'today-cards review-start quiet',
       due.length
-        ? `はじめる · ${due.length} 枚`
+        ? `${due.length} 枚 待っている`
         : capped ? '復習する — 今日の上限まで済んだ' : laterToday ? '復習する — いまは予定なし' : '復習する — 予定なし',
       due.length
-        ? `Begin · ${due.length} card${due.length === 1 ? '' : 's'}`
+        ? `${due.length} card${due.length === 1 ? '' : 's'} waiting`
         : capped ? "today's limit reached" : laterToday ? 'nothing due right now' : 'nothing due yet',
     );
     btn.type = 'button';
@@ -12759,9 +12736,10 @@ function renderTray(main) {
       pace.title = tx(`あなたのペース：1枚 約 ${Math.round(perCard)} 秒`, `your own pace: about ${Math.round(perCard)} s a card`);
       btn.append(pace);
     }
+    if (due.length) btn.append(el('i', 'today-arrow'));
     lineDoor = btn;
     const detail = renderTodayDetail(today);
-    main.append(renderTodayLine(today, lineDoor, readPick, pick), detail.section);
+    main.append(renderTodayLine(today, lineDoor, readPick), detail.section);
     const fold = detail.body;
     fold.append(deckCounts(today));
     if (today.held) {
@@ -12847,7 +12825,7 @@ function renderTray(main) {
     }
   }
   // no cards yet (or no scheduler): the line still offers the reading and the word walk
-  if (!lineDoor && (readPick || pick)) main.append(renderTodayLine(null, null, readPick, pick));
+  if (!lineDoor && readPick) main.append(renderTodayLine(null, null, readPick));
   renderSentencePracticeLibrary(main);
   // The stable global live region owns storage errors. This surface adds only
   // the quiet backup reminder when the record itself is healthy.

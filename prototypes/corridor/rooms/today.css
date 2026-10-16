@@ -269,157 +269,83 @@ html:is([data-room='tray'], [data-room='search']) :is(.dw-go, .today-then, .toda
   text-shadow: 0 0 24px color-mix(in srgb, var(--color-gold) 30%, transparent);
 }
 
-/* ---- today's line: three stops on a hairline track, the train, the one door ---- */
+/* ---- S · today's two lines (John, 2026-10-16: "i hate the plus symbols above the artile and word box. the box in
+   general is bad taste"): no box and no box inside one. Under the day's word, two plain lines on the page, each under
+   a hairline of the page's rule: the cards waiting (#review-start), then today's reading. The line in the house's UI face,
+   the story's title in its reading face, the room's own arrow at the end; quiet ink, the accent only on the arrow. ---- */
 html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-line {
   position: relative;
   z-index: 2;
-  margin: -48px 0 0;
-  padding: 20px 18px 10px;
-  border: var(--stroke-hairline) solid var(--color-edge-strong);
-  border-radius: var(--radius-card);
-  background-color: var(--color-surface);
-  box-shadow: var(--elevation-card);
-}
-html[data-room='tray'] .today-stops {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(var(--stops, 3), minmax(0, 1fr));
-  margin: 0;
+  margin: 10px 0 0;
   padding: 0;
-  list-style: none;
-}
-html[data-room='tray'] .today-stops::before {
-  content: '';
-  position: absolute;
-  left: 6px;
-  right: 6px;
-  top: 6px;
-  height: 0.5px;
-  background: var(--color-rule);
-}
-html[data-room='tray'] .today-stop {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: 6px;
-  padding-top: 24px;
-  color: var(--color-muted);
-}
-html[data-room='tray'] .today-stop::before {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 9px;
-  height: 9px;
-  box-sizing: border-box;
-  border-radius: 50%;
-  border: 1px solid var(--color-rule);
-  background: var(--color-surface);
-}
-html[data-room='tray'] .today-stop-n { font: 800 28px/1 var(--font-headword); color: var(--color-ink-2); font-variant-numeric: tabular-nums; }
-html[data-room='tray'] .today-stop-l { font: 500 13px/1.25 var(--font-ui); }
-html[data-room='tray'] .today-stop.now { color: var(--color-ink); }
-html[data-room='tray'] .today-stop.now .today-stop-n { color: var(--color-ink); }
-/* the one live element on Today: where you stand on the line */
-html[data-room='tray'] .today-stop.now::before {
-  border-color: var(--color-ink);
-  background: var(--color-ink);
+  border: 0;
+  border-radius: 0;
+  background: none;
   box-shadow: none;
 }
-html[data-room='tray'] .today-train { display: flex; flex-wrap: wrap; gap: 4px; margin: 14px 0 16px; }
-html[data-room='tray'] .today-train .car {
-  width: 3px;
-  height: 14px;
-  background: var(--color-accent);
-  opacity: 0.85;
-}
-html[data-room='tray'] .today-train .car.learn { background: var(--color-accent); }
-html[data-room='tray'] .today-line #review-start {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-  min-height: 54px;
-  margin: 0;
-  padding: 0 18px;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  font: 700 16px/1.2 var(--font-ui);
-  text-align: left;
-}
-html[data-room='tray'] .today-line #review-start > .l-ja { display: inline; flex: 1 1 auto; min-width: 0; }
-html[data-room='tray'] .today-line #review-start.quiet { justify-content: center; margin-top: 18px; font-weight: 600; }
-html[data-room='tray'] .review-start-min {
-  font: 500 13px/1 var(--font-data);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.04em;
-  opacity: 0.86;
-  white-space: nowrap;
-}
-/* the next story (r3 fix lane, review round 2 #8): "Then" and the count share the top line; the title
-   has a line of its own, whole, broken only between phrases (auto-phrase + 禁則), never cut to "…" */
-html[data-room='tray'] .today-then {
-  /* the label, then the story named whole with its count beneath, then the arrow */
+html[data-room='tray'] .today-line > :is(#review-start, .today-then) {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas: 'l a' 't a' 'n a';
   align-items: center;
-  column-gap: 12px;
-  row-gap: 3px;
+  column-gap: 14px;
+  row-gap: 4px;
   width: 100%;
-  min-height: 44px;
-  margin: 6px 0 0;
-  padding: 8px 2px;
+  min-height: 58px;
+  margin: 0;
+  padding: 13px 2px 14px;
   border: 0;
+  border-top: var(--stroke-hairline) solid var(--color-rule);
+  border-radius: 0;
   background: none;
-  color: var(--color-muted);
-  font: 400 13px/1.3 var(--font-ui);
+  box-shadow: none;
+  color: var(--color-ink);
   text-align: left;
   cursor: pointer;
 }
+html[data-room='tray'] .today-line > :last-child { border-bottom: var(--stroke-hairline) solid var(--color-rule); }
+html[data-room='tray'] .today-line > :is(#review-start, .today-then):hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-ink) 4%, transparent); }
+html[data-room='tray'] .today-line > :is(#review-start, .today-then):focus-visible { outline: none; box-shadow: var(--focus-ring); }
+html[data-room='tray'] .today-line #review-start > .l-ja { grid-area: l; min-width: 0; font: 600 17px/1.3 var(--font-ui); letter-spacing: 0; color: var(--color-ink); }
+html[data-room='tray'] .today-line #review-start .review-start-min {
+  grid-area: t;
+  font: 500 13px/1 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+html[data-room='tray'] .today-line #review-start.quiet { cursor: default; }
+html[data-room='tray'] .today-line #review-start.quiet > .l-ja { font-weight: 500; color: var(--color-muted); }
+html[data-room='tray'] .today-line :is(#review-start, .today-then) .today-arrow { grid-area: a; color: var(--color-accent); }
 html[data-room='tray'] .today-then-l {
   grid-area: l;
   font: 600 11px/1.2 var(--font-ui);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
+  color: var(--color-muted);
 }
 html[data-room='tray'] body:not(.ui-bi) .today-then-l { letter-spacing: 0.2em; text-transform: none; }
-html[data-room='tray'] .today-then .today-arrow { grid-area: a; }
 html[data-room='tray'] .today-then-title {
   grid-area: t;
   min-width: 0;
   overflow: visible;
-  /* the day's reading is named whole, up to two lines, never cut to a fragment, and its Japanese
-     breaks only between phrases (todayPhrases gives the break points) */
+  /* the day's reading is named whole, up to two lines, never cut to a fragment, and its Japanese breaks only between
+     phrases (todayPhrases gives the break points) */
   word-break: keep-all;
   overflow-wrap: anywhere;
   display: block;
-  line-height: 1.35;
   text-wrap: balance;
-  font: 600 14px/1.3 var(--font-reading);
-  color: var(--color-ink-2);
+  font: 600 16px/1.4 var(--font-reading);
+  color: var(--color-ink);
 }
-html[data-room='tray'] .today-then .today-arrow { grid-area: a; }
 html[data-room='tray'] .today-then-n {
   grid-area: n;
   font: 400 12px/1 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-muted);
 }
-html[data-room='tray'] .today-then .today-arrow { color: var(--color-accent); }
 html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-line + .sem-empty { margin-top: 26px; }
-html[data-room='tray'] .today-then.solo {
-  margin: 18px 0 8px;
-  padding: 10px 14px;
-  min-height: 54px;
-  border: 1px solid var(--color-edge-strong);
-  border-radius: var(--radius-control);
-  background: var(--color-surface);
-  box-shadow: var(--elevation-paper);
-}
 
 /* ---- the deck room, folded under the line: mono numbers on hairlines ---- */
 html[data-room='tray'] .today-detail { margin: 30px 0 8px; }
