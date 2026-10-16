@@ -233,7 +233,10 @@ try {
     await page.click('#sheet-reference-return'); assert.ok(await page.locator('[data-entry-id="学校"] .reference-entry-saved').isVisible());
     const after = await evidence(); assert.equal(after.taken.length, (initial.taken?.length || 0) + 1); assert.deepEqual(after.revlog, initial.revlog);
     await page.click('#reference-study'); assert.ok((await page.locator('main').innerText()).includes('学校')); await page.click('#back');
+    // S · on Saved ✓ the page's one Save opens its menu (a drawer under the bar), whose Review row takes the card out — this
+    // pinned a second press on the page's seal as the removal
     await page.click('[data-entry-id="学校"]'); await page.click('#sheet-take');
+    await page.click('#vocabulary-list-popover.is-drawer #mini-review');
     const removed = await waitForAppRecord(page, record => !record.taken.some(item => item.t === 'word' && item.id === '学校'));
     assert.equal(removed.taken.length, initial.taken?.length || 0);
   });

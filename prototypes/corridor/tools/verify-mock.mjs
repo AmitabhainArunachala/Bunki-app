@@ -221,17 +221,17 @@ async function main() {
   await page.waitForSelector('.assessment-room #exam-legacy');
   await page.click('#exam-legacy');
   await page.waitForSelector('[data-mock-set="n5-01"]', { timeout: 15000 });
-  // since the 2026-10-01 polish pass Unreviewed is said once for the page (every set is unchecked),
-  // not on each of the 25 rows; a row still wears it when the list mixes checked and unchecked
+  // S · no provenance in the learner's app (John, 2026-10-16): this pinned "Made by AI said once for the page, not on every
+  // row". The new truth: the 25 papers stay, and no chip or line says how they were made — not on the page, not on a row
+  // (the sets' data keeps approved: false; the 検収前 law above reads it there)
   const listing = await page.evaluate(`(() => {
     const rows = [...document.querySelectorAll('[data-mock-set]')];
-    const chips = (root) => [...root.querySelectorAll('.status-chip')].filter((c) => c.textContent.trim() === 'Made by AI');
-    const marked = rows.filter((r) => chips(r).length);
-    const page = chips(document.querySelector('#app main')).filter((c) => !c.closest('[data-mock-set]')).length;
-    return { rows: rows.length, rowMarks: marked.length, pageMarks: page };
+    const main = document.querySelector('#app main');
+    return { rows: rows.length, chips: main.querySelectorAll('.status-chip').length,
+      words: (main.innerText.match(/.{0,16}(Made by AI|AI作成|not yet checked|未確認|人の確認|unreviewed).{0,16}/giu) || []) };
   })()`);
-  check('earlier exercises retain all 25 papers, and Made by AI is said once for the page, not on every row',
-    listing.rows === 25 && listing.pageMarks === 1 && listing.rowMarks === 0, JSON.stringify(listing));
+  check('earlier exercises retain all 25 papers, and no provenance chip or line stands on the page or a row',
+    listing.rows === 25 && listing.chips === 0 && listing.words.length === 0, JSON.stringify(listing));
 
   // sit the shortest N5 paper end to end, answering option 1 every time
   await page.click('[data-mock-set="n5-01"]');

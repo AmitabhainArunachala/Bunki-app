@@ -532,13 +532,15 @@ try {
         if (await summary.isVisible()) await summary.click();
       await record(page, `sheet-${kind}-details`, language);
     }
+    // S · the page's one Save opens its menu as a drawer under the bar (review, the lists, a new list, Copy); it pinned the
+    // foot's "saved to" drawer (.list-picker, #new-list, .list-maker-field), which is gone. The same two states are read:
+    // where the word went, and a new list asking its name
     await page.evaluate(() => window.__BUNKI_LANGUAGE_TOUR__.sheet('word'));
     await page.locator('#sheet-take').click();
-    await page.locator('#new-list').waitFor();
-    await page.locator('#sheet .list-picker').scrollIntoViewIfNeeded();
+    await page.locator('#vocabulary-list-popover.is-drawer #vocabulary-list-new').waitFor();
     await record(page, 'word-save-destinations', language);
-    await page.locator('#new-list').click();
-    await page.locator('#sheet .list-maker-field').scrollIntoViewIfNeeded();
+    await page.locator('#vocabulary-list-popover #vocabulary-list-new').click();
+    await page.locator('#vocabulary-list-popover #vocabulary-list-name').waitFor();
     await record(page, 'word-new-list', language);
     await page.evaluate(() => window.__BUNKI_LANGUAGE_TOUR__.variants());
     await record(page, 'variants', language);

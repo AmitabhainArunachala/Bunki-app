@@ -229,27 +229,29 @@ async function openRow(page, id) {
   }));
 }
 
-/* d9f0b984 — rows wearing 検収前 offered no reason: the reason block was gated
- * on pendingVerification, which few of them carry. Since the design pass of 2026-09-30 the
- * learner-facing mark is the 未確認 chip (its reason in the tooltip and the article's footer). */
+/* d9f0b984 — rows wearing 検収前 offered no reason: the reason block was gated on pendingVerification, which few of them
+ * carry, and the rights-held rows told the Wikinews archive-freeze story. Since 2026-09-30 the mark was the 未確認 chip
+ * (then Made by AI) with a reason in the footer; this probe pinned that mark and its per-row reasons.
+ * S (John, 2026-10-16: "no one wants to see a made by ai in red!!!"): the new truth is that no row says how it was made
+ * or whether it is being checked — not the human-review row, not the rights-held row, not the approved control — and none
+ * tells another source's story; the review state stays in each row's record (review, pendingVerification). */
 PROBES['review-reason'] = async () => {
   const { context, page } = await learner();
   await open(page, '?entry=shelf&ui=bi');
-  const freeze = /archive froze/;
+  const freeze = /archive froze|Wikinews closed/i;
+  const marked = (row) => /Made by AI|AI作成|unreviewed|未確認|not yet checked/iu.test(row.eyebrow)
+    || row.notes.some((n) => /review|pending|not yet verified|checked by a person|人による確認|確認され|未確認/iu.test(n) || freeze.test(n));
   const human = await openRow(page, 'env:press-press_05591');
-  check('d9f0b984 · a row marked 未確認 for human review says so, and not with another source\'s story',
-    /Made by AI/.test(human.eyebrow) && human.notes.some((n) => /review/i.test(n) && !freeze.test(n)) && !human.notes.some((n) => freeze.test(n)),
-    JSON.stringify(human).slice(0, 400));
+  check('d9f0b984 (S) · a row awaiting human review opens with no provenance mark or review note',
+    human.eyebrow.length > 0 && !marked(human), JSON.stringify(human).slice(0, 400));
   await page.click('#back');
   const rights = await openRow(page, 'yasashii:1');
-  check('d9f0b984 · a row held for its rights names that reason, not the Wikinews archive freeze',
-    /Made by AI/.test(rights.eyebrow) && rights.notes.some((n) => /terms|rights|licen/i.test(n)) && !rights.notes.some((n) => freeze.test(n)),
-    JSON.stringify(rights).slice(0, 400));
+  check('d9f0b984 (S) · a row held for its rights opens with no pending note and no other source\'s story',
+    rights.eyebrow.length > 0 && !marked(rights), JSON.stringify(rights).slice(0, 400));
   await page.click('#back');
   const approved = await openRow(page, 'bunki-graded-n3-zoka-sanjin-morning');
-  check('d9f0b984 · an approved row carries no pending note (negative control)',
-    !/Made by AI/.test(approved.eyebrow) && !approved.notes.some((n) => /pending/i.test(n)),
-    JSON.stringify(approved).slice(0, 300));
+  check('d9f0b984 (S) · an approved row reads the same (control: the probe opened a real row each time)',
+    approved.eyebrow.length > 0 && !marked(approved), JSON.stringify(approved).slice(0, 300));
   await context.close();
 };
 

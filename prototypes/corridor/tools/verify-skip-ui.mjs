@@ -258,7 +258,10 @@ try {
   const afterInvalid = await readAppRecord(page);
   check('wrong-literal imported snapshot leaves the accepted record unchanged', JSON.stringify(afterInvalid) === JSON.stringify(beforeInvalid));
   await page.locator('.tray-line').filter({ hasText: '㐆' }).click();
+  // S · on Saved ✓ the page's one Save opens its menu (a drawer under the bar), whose Review row takes the card out — this
+  // pinned a second press on the page's seal as the removal
   await page.locator('#sheet-take').click();
+  await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
   await waitForAppRecord(page, record => !record.taken.some(item => item.id === '㐆'));
   await page.locator(await entryCloseSelector(page)).click();
   await Promise.all([page.waitForEvent('load'), page.setInputFiles('#import-file', backupPath)]);

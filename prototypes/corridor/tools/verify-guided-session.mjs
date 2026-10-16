@@ -452,8 +452,8 @@ async function journey(browser, browserName, viewport) {
       'J9 a correct answer puts Next first',
       (await page.locator('.guided-room .gs-button.primary[data-action="next"]').count()) === 1,
     );
-    // a card added outside the room, through the app's own dictionary sheet (its 覚える), is
-    // read back by the room like any other real row
+    // a card added outside the room, through the app's own dictionary sheet (S: its one Save in the bar — the foot's
+    // 覚える, #take, which this pinned, is gone), is read back by the room like any other real row
     await act(page, 'explain').click();
     const door58 = page.locator('.guided-room .gs-word[data-word="word_58"]').first();
     await door58.evaluate((n) => n.scrollIntoView({ block: 'center' }));
@@ -461,9 +461,9 @@ async function journey(browser, browserName, viewport) {
     await page.locator('#mini[data-from="guided"]').waitFor({ timeout: 5_000 });
     await door58.click();
     await page.locator('#sheet').waitFor({ timeout: 10_000 });
-    await page.locator('#sheet #take').click();
+    await page.locator('#sheet #sheet-take').click();
     await page.waitForFunction(
-      () => document.querySelector('#sheet #take')?.getAttribute('aria-pressed') === 'true',
+      () => document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed') === 'true',
     );
     check(
       'S0 the app’s own entry sheet adds 支障 while the room waits underneath',

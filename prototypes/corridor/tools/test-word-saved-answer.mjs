@@ -105,6 +105,9 @@ function defineRows() {
     // Save ▾ (bea9517f, 2026-10-14): a press on Saved ✓ unfolds the word's menu inside the actual mini, and its Review
     // row is the remove route (one statement declares vocabularyListInvoker and vocabularyListNode)
     'openVocabularyListPopover', 'closeVocabularyListPopover', 'vocabularyListInvoker',
+    // S (2026-10-16): every keep is the one Save — the mini's, a lesson's and an older set's rows — built by one component
+    // whose menu stands in its card or row (or a bar's drawer)
+    'saveOne', 'reopenSaveMenu', 'openPlainSaveMenu', 'placeSaveMenu',
     // the tray count repaints in place after a save or a removal (0b413f3f, 2026-10-15)
     'syncTrayCount',
     'assessmentSuppressionRetries', 'suppressAssessmentCards', 'performAssessmentSuppression',
@@ -1570,10 +1573,11 @@ function defineRows() {
     for (const [record, line] of lines) {
       const main = lessonEnd(record);
       const held = enrollOf(main, '上手');
-      assert.deepEqual([held.disabled, held.textContent, held.classList.contains('word-capture-held')], [true, 'memorize', true]);
+      // S · each word's keep is the one Save (保存 · Save); it pinned the old 覚える · memorize label
+      assert.deepEqual([held.disabled, held.textContent, held.classList.contains('word-capture-held')], [true, 'Save', true]);
       assert.equal(byId(main, held.getAttribute('aria-describedby'))?.textContent, line);
-      assert.deepEqual([enrollOf(main, '海').disabled, enrollOf(main, '海').textContent], [false, 'memorize']);
-      assert.equal(byId(main, 'lesson-enroll-all')?.textContent, 'memorize all 1', 'the batch holds only 海');
+      assert.deepEqual([enrollOf(main, '海').disabled, enrollOf(main, '海').textContent], [false, 'Save']);
+      assert.equal(byId(main, 'lesson-enroll-all')?.textContent, 'Save all 1', 'the batch holds only 海');
     }
     // the older set, over the enrolled card and over the history with no card (Codex 17:33:57Z)
     for (const [record, line] of lines) {
@@ -1583,7 +1587,7 @@ function defineRows() {
       assert.deepEqual([held.disabled, held.classList.contains('word-capture-held')], [true, true]);
       assert.equal(byId(main, held.getAttribute('aria-describedby'))?.textContent, line);
       assert.equal(enrollOf(main, '海').disabled, false);
-      assert.equal(byId(main, 'mock-enroll-all')?.textContent, 'memorize all 1 missed');
+      assert.equal(byId(main, 'mock-enroll-all')?.textContent, 'Save all 1');
     }
   });
 
@@ -1597,11 +1601,11 @@ function defineRows() {
     assert(held, 'the 1353320 card holds the spelling: the core subject 上手 still shows its 覚える, held');
     assert.deepEqual([held.disabled, held.classList.contains('word-capture-held')], [true, true]);
     assert.equal(byId(main, held.getAttribute('aria-describedby'))?.textContent, COPY.held.unestablished('上手')[1]);
-    assert.equal(byId(main, 'mock-enroll-all')?.textContent, 'memorize all 1 missed', 'the batch still holds only 海');
+    assert.equal(byId(main, 'mock-enroll-all')?.textContent, 'Save all 1', 'the batch still holds only 海');
     main = olderSetResult(core);
     assert.equal(enrollOf(main, '上手'), undefined, 'a spelling enrolled as itself shows no 覚える, as before');
     assert.equal(all(main, (node) => node.className === 'enroll-held').length, 0, 'and no held line');
-    assert.equal(byId(main, 'mock-enroll-all')?.textContent, 'memorize all 1 missed');
+    assert.equal(byId(main, 'mock-enroll-all')?.textContent, 'Save all 1');
   });
 
   row('X5.setup', 'the route-captured 1353320 card and the card-less studied うわて history, each holding the core spelling 上手', () => {

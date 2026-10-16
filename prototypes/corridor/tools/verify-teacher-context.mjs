@@ -274,7 +274,7 @@ async function holdEntry(page, index, word) {
   );
   await settled(page, '#sheet');
   await page.locator('#sheet .teacher-save').waitFor({ state: 'visible' });
-  assert.equal(await page.locator('#sheet #take').getAttribute('aria-pressed'), 'false');
+  assert.equal(await page.locator('#sheet #sheet-take').getAttribute('aria-pressed'), 'false');
 }
 
 function coherent(context, source, index, word) {
@@ -342,7 +342,7 @@ async function saveDiscuss(fixture, source, index, word, neutral = false) {
       frozenLearning(before.record),
       'Neutral save does not enroll, schedule, or grade',
     );
-    assert.equal(await page.locator('#sheet #take').getAttribute('aria-pressed'), 'false');
+    assert.equal(await page.locator('#sheet #sheet-take').getAttribute('aria-pressed'), 'false');
     await page.waitForFunction(() => !!document.querySelector('#sheet .teacher-note')?.textContent);
     await screenshot(fixture, 'neutral-save', '#sheet');
   }
@@ -738,10 +738,11 @@ try {
     await openShelfDoor(page, '#ai-link');
     await selected(page, context);
     await page.locator('#teacher-target-open').click();
-    await page.locator('#sheet[data-node="word:窓"] #take').waitFor();
+    // S · the page's one Save is its bar's (#sheet-take); this pinned the foot's #take
+    await page.locator('#sheet[data-node="word:窓"] #sheet-take').waitFor();
     await settled(page, '#sheet');
-    assert.equal(await page.locator('#sheet #take').getAttribute('aria-pressed'), 'false');
-    await page.locator('#sheet #take').click();
+    assert.equal(await page.locator('#sheet #sheet-take').getAttribute('aria-pressed'), 'false');
+    await page.locator('#sheet #sheet-take').click();
     await waitForAppRecord(
       page,
       (record) => record.taken.some((item) => item.t === 'word' && item.id === '窓'),

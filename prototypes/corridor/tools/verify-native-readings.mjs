@@ -11,9 +11,9 @@
  * B3 (bilingual titles as schema data): every primary index row must carry a
  * non-empty titleEn with a titleEnSource provenance marker, the code-side
  * TITLES_EN map must be gone from corridor.js, the bilingual (?ui=bi) shelf
- * must render each English title from the record itself, and every
- * human-review-pending story must be counted in the masthead's 未確認 note
- * and wear 未確認 in its reader meta line.
+ * must render each English title from the record itself, and (S, 2026-10-16)
+ * no human-review-pending story is marked anywhere on the shelf or in its
+ * reader meta: the review state stays in the record.
  *
  * R3-A (furigana truth): the reading-override lexicon
  * (docs/content/reading-overrides.json) must be minted into every curated
@@ -1027,7 +1027,8 @@ try {
       readerShape.facts['出典'] === learnerSource &&
       readerShape.facts['利用条件']?.includes('Bunki original') &&
       readerShape.level === expectedLevel &&
-      readerShape.unreviewed === (/-pending$/.test(row.review ?? '') ? 'AI作成' : null) &&
+      // S · no provenance in the reader's meta for any story, pending or approved (it pinned AI作成 on the pending ones)
+      readerShape.unreviewed === null &&
       readerShape.tokens === body.tokens.length &&
       readerShape.ruby > 0 &&
       readerShape.paragraphs === body.paras.length &&
@@ -1088,8 +1089,10 @@ try {
     IDS.every((id) => savedRecord.readDone?.[id] && Number.isFinite(savedRecord.readerPos?.[id])),
   );
 
-  // B3 — the shelf's English titles come from the record itself, and 未確認 is said once in the
-  // masthead and worn in each unreviewed article's reader meta, in both chrome languages
+  // B3 — the shelf's English titles come from the record itself. S (John, 2026-10-16: "and made by AI!! do not write
+  // that!!!!"): it pinned 未確認 said once in the masthead and worn in each unreviewed article's reader meta; the new truth
+  // is no provenance note on the shelf and no mark in any reader meta, in both chrome languages — the pending stories'
+  // review state stays in their records (row.review)
   check(
     'the 日本語のみ chrome renders no English titles',
     (await page.locator('.shelf-title-en').count()) === 0,
@@ -1115,10 +1118,11 @@ try {
     return { notes, text, count: Number(jaCount ?? biCount), total: total === undefined ? null : Number(total) };
   };
   const jaNote = await reviewNote();
+  const jaMasthead = (await page.locator('.shelf-masthead').innerText().catch(() => '')) || '';
   check(
-    'the 日本語のみ masthead says 未確認 once, counting every human-review-pending story',
-    pendingStories.length === 0 ? jaNote.notes === 0 : jaNote.notes === 1 && jaNote.count === pendingStories.length,
-    jaNote.text || `no review note for ${pendingStories.length} pending stories`,
+    'the 日本語のみ shelf says nothing of how its stories were made (no note, no AI作成 / 未確認), pending stories or not',
+    pendingStories.length > 0 && jaNote.notes === 0 && !/AI作成|未確認|人の確認|Made by AI/u.test(jaMasthead),
+    jaNote.text || `${pendingStories.length} pending stories, no note`,
   );
   const pendingNoiseBefore = noise.length;
   const unmarkedInReader = [];
@@ -1126,17 +1130,18 @@ try {
     activeArticleId = record.id;
     await page.locator(`${storyCard(record.id)} .shelf-open`).click();
     await page.waitForSelector('main .reader-meta .reader-source', { state: 'attached' });
-    const chip = await page.locator('main .reader-meta .status-chip').textContent().catch(() => null);
-    if (chip !== 'AI作成') unmarkedInReader.push(record.id);
+    const marks = await page.locator('main .reader-meta .status-chip, main .article-facts .review-reason').count();
+    const meta = (await page.locator('main .reader-meta').innerText().catch(() => '')) || '';
+    if (marks || /AI作成|未確認|Made by AI|人の確認/u.test(meta)) unmarkedInReader.push(record.id);
     await page.locator('#back').click();
     await page.waitForSelector(storyCard(record.id));
   }
   activeArticleId = null;
   check(
-    'every human-review-pending story wears 未確認 in its reader meta line',
+    'no human-review-pending story wears a provenance mark in its reader meta or facts',
     unmarkedInReader.length === 0 && noise.length === pendingNoiseBefore,
     unmarkedInReader.slice(0, 4).join(', ') ||
-      `${pendingStories.length} pending stories marked` +
+      `${pendingStories.length} pending stories, none marked` +
         (noise.length === pendingNoiseBefore ? '' : ` · ${noise.length - pendingNoiseBefore} errors`),
   );
   const biNoiseBefore = noise.length;
@@ -1164,11 +1169,11 @@ try {
     wrongEn.map((record) => record.id).slice(0, 4).join(', ') || `${storyRows.length} titles`,
   );
   const biNote = await reviewNote();
+  const biMasthead = (await page.locator('.shelf-masthead').innerText().catch(() => '')) || '';
   check(
-    'the bilingual masthead says 未確認 once, counting every human-review-pending story of the shelf',
-    pendingStories.length === 0 ? biNote.notes === 0
-      : biNote.notes === 1 && biNote.count === pendingStories.length && biNote.total === STORY_COUNT,
-    biNote.text || `no review note for ${pendingStories.length} pending stories`,
+    'the bilingual shelf says nothing of how its stories were made (no note, no Made by AI), pending stories or not',
+    pendingStories.length > 0 && biNote.notes === 0 && !/Made by AI|not yet checked|AI作成|unreviewed/iu.test(biMasthead),
+    biNote.text || `${pendingStories.length} pending stories, no note`,
   );
   await page.locator(storyCard(IDS[0])).scrollIntoViewIfNeeded();
   await page.screenshot({ path: join(shotsDir, 'shelf-bilingual-titles.png') });

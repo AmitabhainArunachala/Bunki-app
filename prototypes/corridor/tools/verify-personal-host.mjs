@@ -64,10 +64,13 @@ try {
  assert.equal(await page.locator('#sheet .gloss').first().isVisible(),false);
  await page.locator('.personal-dictionary-meaning > summary').click();assert((await page.locator('#sheet .senses').innerText()).includes('library'));
  assert.equal((await sharedRecord(page)).taken.length,0,'dictionary lookup does not enroll a card');
- await page.locator('#take').click();
- await page.locator('#take[aria-pressed="true"]').waitFor();
- assert.equal(await page.locator('#take-chooser, #take-save').count(),0,'Save commits in one tap without a destination chooser');
- assert.equal(await page.locator('#vocabulary-list-popover').count(),0,'the optional list popover opens only on request');
+ // S · the page keeps through its one Save in the bar (#sheet-take): one press keeps and opens its own menu (review, lists, Copy)
+ // as a drawer under the bar; it pinned the foot's #take and a list popover that opened only on request
+ await page.locator('#sheet-take').click();
+ await page.locator('#sheet-take[aria-pressed="true"]').waitFor();
+ assert.equal(await page.locator('#take-chooser, #take-save, #take').count(),0,'Save commits in one tap without a destination chooser, and the page has one Save');
+ await page.locator('#vocabulary-list-popover.is-drawer').waitFor();
+ await page.keyboard.press('Escape');
  const savedWord=(await sharedRecord(page)).taken.find(t=>t.t==='word'&&t.id==='図書館');
  assert(savedWord,'one tap saves the canonical word to the shared learner record');
  assert(Number.isFinite(savedWord.started),'one-tap 覚える keeps the host explicit-review enrollment contract');
@@ -93,9 +96,10 @@ try {
  assert(after.sameRoot);assert.equal(after.id,before.id);assert.equal(after.progress,before.progress);assert.equal(after.inert,false);
  await page.locator('.pc-answer-tools [data-lookup]').filter({hasText:'にあたって'}).first().click();await page.locator('#sheet[data-node^=\"grammar:\"]').waitFor();
  const grammarId=(await page.locator('#sheet').getAttribute('data-node')).slice('grammar:'.length);
- await page.locator('#take').click();
- await page.locator('#take[aria-pressed="true"]').waitFor();
- await page.locator('#personal-add-list').click();await page.locator('[data-list="Synthetic host list"]').check();
+ await page.locator('#sheet-take').click();
+ await page.locator('#sheet-take[aria-pressed="true"]').waitFor();
+ // S · the lists live in the one Save's menu (it pinned #personal-add-list): the press that kept the point opened it
+ await page.locator('#vocabulary-list-popover.is-drawer').waitFor();await page.locator('[data-list="Synthetic host list"]').check();
  await page.waitForFunction(()=>document.querySelector('.vocabulary-list-status')?.textContent.includes('Synthetic host list'));
  const grammarSaved=await sharedRecord(page);
  const grammarCard=grammarSaved.taken.find(t=>t.t==='grammar'&&t.id===grammarId);

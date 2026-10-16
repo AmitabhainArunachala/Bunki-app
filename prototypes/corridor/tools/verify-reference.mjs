@@ -216,7 +216,9 @@ try {
       await page.waitForSelector('.sheet');
       const text = await page.locator('.sheet').innerText();
       assert.ok(text.includes(entry.reading || 'No reading') || text.includes('読みなし'));
-      assert.equal(await page.locator('.sheet .take').count(), 0);
+      // S · the page's keep is its one Save (.save-one) — it pinned the foot's .take, which no page carries now: a reference
+      // entry with no learning target offers no Save of any kind
+      assert.equal(await page.locator('.sheet .save-one, .sheet .take').count(), 0);
       await page.waitForTimeout(850);
       await page.click(await entryCloseSelector(page));
     }
@@ -236,7 +238,7 @@ try {
       assert.ok((await page.locator('.sheet').innerText()).includes(reading));
       const entry = catalog.collections.find(collection => collection.id === `jlpt:${level}`).entries.find(entry => entry.key === key);
       assert.equal(await page.locator('.sheet').getAttribute('data-node'), entry.canonicalTarget ? 'word:～月' : `reference:${key}`);
-      if (!entry.canonicalTarget) assert.equal(await page.locator('.sheet .take').count(), 0);
+      if (!entry.canonicalTarget) assert.equal(await page.locator('.sheet .save-one, .sheet .take').count(), 0);
       await page.click(await entryCloseSelector(page));
       await page.waitForFunction(id => document.activeElement?.id === id, rowId);
       assert.equal(await page.locator('#reference-search').inputValue(), '～月');

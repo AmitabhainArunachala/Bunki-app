@@ -1376,10 +1376,11 @@ async function existingCardCase(page, section, log) {
   return { first: first.attemptId, second: second.attemptId, mark: second.mark };
 }
 
-// Machine-checked written tests name that a person has not yet checked them.
+// S (John, 2026-10-16: no provenance in the learner's app): written tests are counted, no more — it pinned "· not yet checked
+// by a person" after the count; the review state stays in each entry's record
 const machineWritten = catalog.entries.filter((row) => row.availability.ready && row.mode === 'written').length;
 const dojoPracticeLabel = machineWritten
-  ? `${machineWritten} written tests · not yet checked by a person`
+  ? `${machineWritten} written test${machineWritten === 1 ? '' : 's'}`
   : `${sections.length} practice set${sections.length === 1 ? '' : 's'} · practice sets available`;
 try {
   for (const engine of engines) {

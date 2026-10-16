@@ -148,7 +148,7 @@ const RUN_ROWS = Object.freeze({
   core: Object.freeze(['G1.popup', 'G1.bar', 'G1.mini', 'G1.entry']),
   match: Object.freeze(['M.iu.chooser', 'M.iu.choose', 'M.iu.back', 'M.itt.chooser', 'M.itt.choose', 'M.dare.chooser', 'M.dare.tare',
     'M.dare.back', 'M.dare.key', 'M.yuke.single', 'M.hi.cap', 'M.wakat.single', 'M.san.offered', 'M.iu.yuu']),
-  capture: Object.freeze(['G7.bar.none', ...['mini', 'sheet', 'foot'].flatMap((door) => [`G7.${door}.door`, `G7.${door}.captured`])]),
+  capture: Object.freeze(['G7.bar.none', ...['mini', 'sheet', 'chrome'].flatMap((door) => [`G7.${door}.door`, `G7.${door}.captured`])]),
   held: Object.freeze(['G5.mini-held', 'G5.mini-click', 'G5.bar-none', 'G5.iu-chooser-held', 'G5.iu-entry-held',
     'G5.after-iu', 'G5.dare-held', 'G5.after-dare']),
 });
@@ -190,10 +190,10 @@ const CONTROLS = Object.freeze([
     allowed: [],
     witness: (rows) => (seen(rows, 'G1.entry').firstGloss === 'to do up (hair)' ? '' : 'the core sheet did not show 結う\'s first sense') }),
   Object.freeze({ name: 'c7', title: 'toggleTaken() inert while every door still looks enabled', edits: ['captureInert'], run: 'capture',
-    requires: ['G7.bar.none', 'G7.mini.door', 'G7.sheet.door', 'G7.foot.door'],
-    kills: ['G7.mini.captured', 'G7.sheet.captured', 'G7.foot.captured'],
+    requires: ['G7.bar.none', 'G7.mini.door', 'G7.sheet.door', 'G7.chrome.door'],
+    kills: ['G7.mini.captured', 'G7.sheet.captured', 'G7.chrome.captured'],
     allowed: [],
-    witness: (rows) => (['mini', 'sheet', 'foot'].every((door) => seen(rows, `G7.${door}.captured`).added?.length === 0)
+    witness: (rows) => (['mini', 'sheet', 'chrome'].every((door) => seen(rows, `G7.${door}.captured`).added?.length === 0)
       ? '' : 'a door captured something') }),
   Object.freeze({ name: 'c8', title: "the mini's hold removed for a core miss", edits: ['miniUnheld'], run: 'held',
     requires: ['G5.bar-none', 'G5.iu-chooser-held'],
@@ -316,8 +316,9 @@ const miniState = (page) => page.evaluate(() => {
     gloss: mini.querySelector('.mini-gloss')?.outerHTML ?? null, text: mini.textContent };
 });
 
-/** The reader's capture doors: the mini's 覚 when open — and the bar, which carries no Save of its own (one Save,
- * John 2026-10-15 17:20): no #reader-take, no capture panel, no chrome door named Save. */
+/** The reader's capture doors: the mini's 覚 when open — and the bar. S (John, 2026-10-16: "why is the plus bar gone????
+ * … how do we know where to add something"): the bar carries one keep, the one Save (#chrome-keep, button.save-one),
+ * naming the word last touched, on the slip's own path; still no #reader-take and no capture panel. */
 const captureState = (page) => page.evaluate(() => {
   const visible = (node) => {
     if (!node) return false;
@@ -330,6 +331,8 @@ const captureState = (page) => page.evaluate(() => {
   return {
     bar: { saves: [...document.querySelectorAll('#app > .chrome button')].filter((n) => n.id === 'reader-take'
         || /^(保存|Save)/u.test((n.textContent || '').trim()) || /^(保存|Save)\b/u.test(n.getAttribute('aria-label') || '')).map((n) => n.id || n.textContent.trim()),
+      keep: (() => { const k = document.getElementById('chrome-keep'); return k && { one: k.matches('button.save-one[data-save-one]'),
+        word: k.querySelector('.save-bar-word')?.textContent ?? null, held: k.classList.contains('reader-capture-held'), pressed: k.getAttribute('aria-pressed') }; })(),
       panel: !!document.getElementById('capture-panel') },
     mini: mini && { takeDisabled: miniTake ? miniTake.disabled : null, takePressed: miniTake?.getAttribute('aria-pressed') ?? null,
       held: !!miniTake?.classList.contains('reader-capture-held'), describedBy: miniTake?.getAttribute('aria-describedby') ?? null,
@@ -421,11 +424,12 @@ const observe = (state) => (state ? {
   noneText: state.noneText, focused: state.focused, depth: state.depth, takeDisabled: state.takeDisabled, footDisabled: state.footDisabled,
 } : { sheet: null });
 const brief = (state) => JSON.stringify(observe(state));
-/** An entry the reader matched, as its full sheet displays it: head, exact reading, first sense, and 覚 held. */
+/** An entry the reader matched, as its full sheet displays it: head, exact reading, first sense, and 覚 held — S: the page's
+ * one Save (its bar's) held, and no second keep at its foot (footDisabled null: the foot's 覚える, #take, is gone). */
 const shows = (state, entry, how) => !!state && state.noteSeq === entry.seq && state.noteState === how
   && state.headLabel === entry.head && state.headword === entry.headword && state.reading === entry.reading
   && state.firstGloss === entry.gloss && state.detailsIn && !state.absent && !state.warning && !state.homographs
-  && state.choiceState === null && state.takeDisabled === true && state.footDisabled === true && state.reasonVisible;
+  && state.choiceState === null && state.takeDisabled === true && state.footDisabled === null && state.reasonVisible;
 const at = (fixture) => `${fixture.passage.id} #${fixture.index} ${fixture.token.s}`;
 
 async function installedRecord(page) {
@@ -486,8 +490,10 @@ async function coreRun(open, rec) {
         && token.label === `${CORE.token.s} · ${WORD.bi} · ${CORE_ENTRY.reading} · ${HINT.bi}`,
       JSON.stringify(token), { token });
     const bar = (await captureState(page)).bar;
-    once('G1.bar', `G1 with ${CORE.token.s} selected, the bar carries no Save of its own and no panel: the slip's Save is the one Save`,
-      bar.saves.length === 0 && !bar.panel, JSON.stringify(bar), { bar });
+    // S · it pinned "the bar carries no Save of its own"; the new truth: one keep in the bar, the one Save, naming the word
+    once('G1.bar', `G1 with ${CORE.token.s} selected, the bar carries one keep — the one Save, naming ${CORE.token.b} — and no panel`,
+      bar.saves.length === 1 && bar.saves[0] === 'chrome-keep' && bar.keep?.one && bar.keep.word === CORE.token.b && !bar.keep.held && !bar.panel,
+      JSON.stringify(bar), { bar });
     await openPopup(page, CORE);
     const mini = await miniState(page), take = (await captureState(page)).mini;
     once('G1.mini', `G1 its mini: word ${CORE.token.s}, reading ${CORE_ENTRY.reading}, gloss exactly "${CORE_ENTRY.gloss}"; its 覚 enabled and not held`,
@@ -496,10 +502,10 @@ async function coreRun(open, rec) {
     await fullEntry(page, CORE);
     await settleSheet(page);
     const entry = await sheetState(page);
-    once('G1.entry', `G1 its full sheet displays exactly ${CORE_ENTRY.headword} / ${CORE_ENTRY.reading} / first sense "${CORE_ENTRY.gloss}", complete (senses in, no absence, no warning), the ordinary door (no chooser, no match note, both 覚 enabled)`,
+    once('G1.entry', `G1 its full sheet displays exactly ${CORE_ENTRY.headword} / ${CORE_ENTRY.reading} / first sense "${CORE_ENTRY.gloss}", complete (senses in, no absence, no warning), the ordinary door (no chooser, no match note, its one Save enabled, no second keep at its foot)`,
       entry?.node === `word:${CORE.token.b}` && entry.headword === CORE_ENTRY.headword && entry.headLabel === CORE_ENTRY.headword
         && entry.reading === CORE_ENTRY.reading && entry.firstGloss === CORE_ENTRY.gloss && entry.detailsIn && !entry.absent && !entry.warning
-        && entry.choiceState === null && entry.noteSeq === null && entry.reason === null && entry.takeDisabled === false && entry.footDisabled === false,
+        && entry.choiceState === null && entry.noteSeq === null && entry.reason === null && entry.takeDisabled === false && entry.footDisabled === null,
       brief(entry), observe(entry));
   });
 }
@@ -633,22 +639,24 @@ async function matchRun(open, rec) {
   });
 }
 
-/** G7: a real capture of the core hit through each of its four separately wired doors, each in its own context. */
+/** G7: a real capture of the core hit through each of its separately wired doors, each in its own context. S: the doors are
+ * the card's Save, the page bar's Save and the reader bar's keep — the page's foot (覚える, #take) it pinned is gone. */
 async function captureRun(open, rec) {
-  // one Save (John, 2026-10-15 17:20): the bar has no door of its own; with the word touched the bar still carries none
+  // S · with the word touched the bar carries one keep, the one Save naming it (it pinned "no door of its own")
   await block(rec, ['G7.bar.none'], async (once) => {
     const page = await (await open()).newPage();
     await openArticle(page, CORE.passage);
     await tap(page, CORE);
     await page.waitForSelector('#mini #mini-take');
     const bar = (await captureState(page)).bar;
-    once('G7.bar.none', `G7 with ${CORE.token.s} touched, the bar carries no Save and no panel: three doors remain (the mini's, the sheet bar's, the foot's)`,
-      bar.saves.length === 0 && !bar.panel, JSON.stringify(bar), { bar });
+    once('G7.bar.none', `G7 with ${CORE.token.s} touched, the bar carries the one Save naming it and no panel: three doors (the mini's, the page bar's, the reader bar's)`,
+      bar.saves.length === 1 && bar.saves[0] === 'chrome-keep' && bar.keep?.one && bar.keep.word === CORE.token.b && !bar.panel, JSON.stringify(bar), { bar });
   });
   const doors = [
     { door: 'mini', name: "the mini's 覚", selector: '#mini-take', prepare: (page) => openPopup(page, CORE) },
     { door: 'sheet', name: "the entry sheet bar's 覚", selector: '#sheet-take', prepare: async (page) => { await fullEntry(page, CORE); await settleSheet(page); } },
-    { door: 'foot', name: "the entry foot's 覚える", selector: '#take', prepare: async (page) => { await fullEntry(page, CORE); await settleSheet(page); } },
+    // the word touched, its card put away by Escape: the bar's keep still names it (the slip's Escape keeps the chosen word)
+    { door: 'chrome', name: "the reader bar's keep", selector: '#chrome-keep', prepare: async (page) => { await openPopup(page, CORE); await page.keyboard.press('Escape'); await delay(250); } },
   ];
   for (const { door, name, selector, prepare } of doors) {
     await block(rec, [`G7.${door}.door`, `G7.${door}.captured`], async (once) => {
@@ -693,8 +701,10 @@ async function heldRun(open, rec) {
     once('G5.mini-click', 'G5 a real click on that 覚 leaves it held and unpressed', miniAfter?.takeDisabled === true && miniAfter.held
       && miniAfter.takePressed === 'false', JSON.stringify(miniAfter), { mini: miniAfter });
     const bar = (await captureState(page)).bar;
-    once('G5.bar-none', `G5 with ${IU.token.s} selected, the bar carries no Save and no panel: the held 覚 and its reason live in the mini alone`,
-      bar.saves.length === 0 && !bar.panel, JSON.stringify(bar), { bar });
+    // S · it pinned "the bar carries no Save"; the new truth: the bar's one keep names the word and is held with it (its press
+    // says why, as the mini does); no panel
+    once('G5.bar-none', `G5 with ${IU.token.s} selected, the bar's one keep is held with the word and no panel opens: the reason lives in the mini`,
+      bar.saves.length === 1 && bar.saves[0] === 'chrome-keep' && bar.keep?.one && bar.keep.held && !bar.panel, JSON.stringify(bar), { bar });
     await fullEntry(page, IU);
     await settleSheet(page);
     await press(page, '#sheet-take');
@@ -706,11 +716,10 @@ async function heldRun(open, rec) {
       await press(page, `#reader-choice-${IU_PICK.seq}`);
       await settleSheet(page);
       await press(page, '#sheet-take');
-      await press(page, '#take');
       entry = await sheetState(page);
     }
-    once('G5.iu-entry-held', `G5 the chosen ${IU_PICK.head} holds both 覚 doors under real clicks`,
-      entry?.noteSeq === IU_PICK.seq && entry.takeDisabled === true && entry.footDisabled === true, brief(entry), observe(entry));
+    once('G5.iu-entry-held', `G5 the chosen ${IU_PICK.head} holds the page's one Save under a real click, and has no second keep`,
+      entry?.noteSeq === IU_PICK.seq && entry.takeDisabled === true && entry.footDisabled === null, brief(entry), observe(entry));
     await closeIfOpen(page);
     const afterIu = await learningSince(page, before);
     once('G5.after-iu', 'G5 after いう: the learning roots equal the first snapshot, and the only new rows are tap observations',
@@ -725,11 +734,10 @@ async function heldRun(open, rec) {
       await press(page, `#reader-choice-${DARE_TARE.seq}`);
       await settleSheet(page);
       await press(page, '#sheet-take');
-      await press(page, '#take');
       tare = await sheetState(page);
     }
-    once('G5.dare-held', `G5 ${DARE.token.s}'s chosen ${DARE_TARE.head} holds both 覚 doors under real clicks`,
-      tare?.noteSeq === DARE_TARE.seq && tare.takeDisabled === true && tare.footDisabled === true, brief(tare), observe(tare));
+    once('G5.dare-held', `G5 ${DARE.token.s}'s chosen ${DARE_TARE.head} holds the page's one Save under a real click, and has no second keep`,
+      tare?.noteSeq === DARE_TARE.seq && tare.takeDisabled === true && tare.footDisabled === null, brief(tare), observe(tare));
     await closeIfOpen(page);
     const afterDare = await learningSince(page, before);
     once('G5.after-dare', 'G5 after だれ: the learning roots still equal the first snapshot, and the only new rows are tap observations',

@@ -194,31 +194,32 @@ try {
     check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'}: after a reload the room opens at the level he chose (N1)`, remembered === 'N1', `opened at ${remembered}`);
     const doors = page.locator('[data-exam-older="N1"] [data-legacy-set]');
     await doors.first().waitFor({ timeout: 10_000 }).catch(() => {});
-    // the learner-facing mark is Unreviewed in English (未確認 in Japanese); since the polish pass of
-    // 2026-10-01 a section whose sets are all unchecked says it once, in its header. A mark counts only as
-    // verify-mock reads it: a VISIBLE status chip whose text is exactly Unreviewed (gate review on 8dea3c2e:
-    // any chip, or the bare word anywhere in a row, let a hidden or reworded mark pass)
+    // S · no provenance in the learner's app (John, 2026-10-16: "no one wants to see a made by ai in red!!!"). This pinned
+    // the Made by AI mark on every older set, read from a visible chip with its own controls (the chip hidden, reworded).
+    // The new truth: no older set and no section header carries a provenance mark of any kind; the detector is shown to
+    // see one when one is put there (the control), and the review state stays in the sets' data (approved: false).
     const olderSets = () => page.evaluate(() => {
-      const shown = (n) => n.getClientRects().length > 0 && getComputedStyle(n).visibility !== 'hidden' && Number(getComputedStyle(n).opacity) > 0;
-      const marked = (root) => [...(root?.querySelectorAll('.status-chip') || [])].some((chip) => chip.textContent.trim() === 'Made by AI' && shown(chip));
       const block = document.querySelector('[data-exam-older="N1"]');
-      const sectionMarked = marked(block?.querySelector('[data-older-mark]'));
-      return [...(block?.querySelectorAll('[data-legacy-set]') || [])]
-        .map((door) => ({ id: door.dataset.legacySet, pending: sectionMarked || marked(door), text: door.textContent }));
+      return [...(block?.querySelectorAll('[data-legacy-set]') || [])].map((door) => ({ id: door.dataset.legacySet, text: door.textContent }));
+    });
+    const provenance = () => page.evaluate(() => {
+      const block = document.querySelector('[data-exam-older="N1"]');
+      const shown = (n) => n.getClientRects().length > 0 && getComputedStyle(n).visibility !== 'hidden';
+      return { chips: [...(block?.querySelectorAll('.status-chip, [data-older-mark]') || [])].filter(shown).map((n) => n.textContent.trim()),
+        words: block?.innerText.match(/.{0,16}(Made by AI|AI作成|not yet checked|未確認|人の確認|unreviewed).{0,16}/giu) || [] };
     });
     const listed = await olderSets();
-    // its own controls, on this page: the section's chip hidden, then reworded, must leave every set unmarked
-    const hide = await page.addStyleTag({ content: '[data-exam-older="N1"] [data-older-mark] .status-chip { visibility: hidden !important; }' });
-    const hidden = await olderSets();
-    await hide.evaluate((node) => node.remove());
-    const original = await page.evaluate(() => [...document.querySelectorAll('[data-exam-older="N1"] [data-older-mark] .status-chip')]
-      .map((chip) => { const text = chip.textContent; chip.textContent = 'Reviewed'; return text; }));
-    const reworded = await olderSets();
-    await page.evaluate((texts) => [...document.querySelectorAll('[data-exam-older="N1"] [data-older-mark] .status-chip')]
-      .forEach((chip, i) => { chip.textContent = texts[i]; }), original);
-    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the Made by AI mark is read only from a visible chip saying exactly Made by AI (controls: hidden, reworded)`,
-      original.length > 0 && hidden.length > 0 && hidden.every((row) => !row.pending) && reworded.every((row) => !row.pending),
-      JSON.stringify({ chips: original, hiddenMarked: hidden.filter((row) => row.pending).length, rewordedMarked: reworded.filter((row) => row.pending).length }));
+    const clean = await provenance();
+    await page.evaluate(() => {
+      const chip = document.createElement('span');
+      chip.className = 'status-chip'; chip.textContent = 'Made by AI'; chip.dataset.provenanceControl = '';
+      document.querySelector('[data-exam-older="N1"]')?.prepend(chip);
+    });
+    const control = await provenance();
+    await page.evaluate(() => document.querySelector('[data-provenance-control]')?.remove());
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: no older set or header carries a provenance mark (control: an inserted Made by AI chip is seen)`,
+      listed.length > 0 && clean.chips.length === 0 && clean.words.length === 0 && control.chips.length === 1 && control.words.length >= 1,
+      JSON.stringify({ clean, control }));
     // expected identities and counts come from the artifact's own data, never from this file
     const expected = (await (await page.request.get(`${origin}/data/mock/index.json`)).json()).sets.filter((set) => set.level === 'N1');
     const matches = listed.length === expected.length && expected.every((set, i) => listed[i]?.id === set.setId && listed[i].text.includes(String(set.items)));
@@ -226,7 +227,8 @@ try {
       JSON.stringify({ listed: listed.map((row) => row.id), expected: expected.map((set) => `${set.setId}:${set.items}`) }));
     const limits = await page.evaluate(() => document.querySelector('[data-exam-older="N1"] .exam-older-limits')?.textContent || '');
     check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the room says what these sets lack (no listening, no timer)`, /no listening|聴解/u.test(limits), limits);
-    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: every older set is marked Made by AI (answers not yet checked)`, listed.length > 0 && listed.every((row) => row.pending));
+    check(`T10 ${viewport.width}px ${fromDoor ? 'door' : 'shelf'} N1: the older sets' review state stays in their data (approved: false), never on the page`,
+      expected.length > 0 && expected.every((set) => set.approved === false), JSON.stringify(expected.map((set) => `${set.setId}:${set.approved}`)));
     if (listed.length) {
       await doors.first().click();
       const started = await page.waitForSelector('#mock-next', { timeout: 15_000 }).then(() => true, () => false);

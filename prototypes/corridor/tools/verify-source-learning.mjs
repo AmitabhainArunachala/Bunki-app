@@ -203,9 +203,12 @@ for (const engine of engines) for (const width of sizes) {
       assert(controls.every((control) => control.height >= 44 && control.width >= 44));
       result.observations.push({ sourceControls: controls });
       await screenshot('learned-source');
-      await page.locator('#new-list').click();
-      await page.locator('.list-maker-field').fill('図書館で出会った言葉');
-      await page.locator('.list-maker-make').click();
+      // S · the page's lists live in its one Save's menu (a drawer under the bar), one tap each, a new list asking its name
+      // once — this pinned the foot's "saved to" drawer and its list maker (#new-list, .list-maker-field, .list-maker-make)
+      await page.locator('#sheet-take').click();
+      await page.locator('#vocabulary-list-popover.is-drawer #vocabulary-list-new').click();
+      await page.locator('#vocabulary-list-popover #vocabulary-list-name').fill('図書館で出会った言葉');
+      await page.locator('#vocabulary-list-popover #vocabulary-list-create').click();
       await waitForAppRecord(page, (record) => record.lists['図書館で出会った言葉']?.length === 1);
       const listed = await readAppRecordSnapshot(page);
       assert.equal(listed.record.lists['図書館で出会った言葉'][0].sourceContextRef, item.sourceContextRef);
@@ -315,7 +318,9 @@ for (const engine of engines) for (const width of sizes) {
       await page.locator('#source-capture-save').click(); await page.locator('#source-reader-body').waitFor();
       await selectWord(page); await page.locator('#source-selection-lookup').click();
       await page.locator('.nav-search-row').first().click();
+      // S · on Saved ✓ the page's one Save opens its menu; its Review row is the way out (it pinned a second press on the seal)
       await page.locator('#sheet-take').click();
+      await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
       await waitForAppRecord(page, (record) => record.taken.length === 0);
       const stopped = await readAppRecordSnapshot(page);
       assert.equal(stopped.record.lists['図書館で出会った言葉'][0].sourceContextRef, encounter.id);

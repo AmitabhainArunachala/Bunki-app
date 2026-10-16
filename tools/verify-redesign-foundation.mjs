@@ -181,12 +181,16 @@ try {
             Math.abs(headerAfter - headerBefore) <= 1,
             `Selecting a word must not shift the header/article: ${engine}/${width}/${lang} ${headerBefore} → ${headerAfter}`,
           );
-          // one Save (John, 2026-10-15 17:20): the bar carries no Save of its own, so the popup's is the one Save
-          assert.equal(
-            await page.evaluate(() => [...document.querySelectorAll('#app > .chrome button')]
-              .filter((n) => n.id === 'reader-take' || /^(保存|Save)/u.test((n.textContent || '').trim())).length),
-            0,
-            'The bar carries no Save of its own while the popup is open',
+          // S (John, 2026-10-16: "why is the plus bar gone???? … how do we know where to add something"): it pinned "the bar
+          // carries no Save of its own" (John, 2026-10-15 17:20). The new truth: the bar carries exactly one keep, and it is
+          // the one Save component — the same path as the popup's — naming the word just touched; never a second kind
+          const barKeeps = await page.evaluate(() => [...document.querySelectorAll('#app > .chrome button')]
+            .filter((n) => n.id === 'reader-take' || /^(保存|Save)/u.test((n.textContent || '').trim()))
+            .map((n) => ({ id: n.id, one: n.matches('button.save-one[data-save-one]'), word: n.querySelector('.save-bar-word')?.textContent ?? '' })));
+          const touched = await page.evaluate(() => document.querySelector('#mini .mini-word')?.textContent ?? '');
+          assert(
+            barKeeps.length === 1 && barKeeps[0].id === 'chrome-keep' && barKeeps[0].one && barKeeps[0].word === touched,
+            `The bar carries one keep, the one Save naming the touched word, while the popup is open: ${JSON.stringify({ barKeeps, touched })}`,
           );
           const popupCapture = await page.locator('#mini-take').boundingBox();
           assert(
@@ -224,16 +228,19 @@ try {
             );
             await page.keyboard.press('Escape');
             await page.locator('#sheet').waitFor({ state: 'detached' });
-            // closing the full entry clears the reading and its slip (contract §1); the bar gains no Save for it
+            // closing the full entry clears the reading and its slip (contract §1); S: the bar keeps its one keep (the one
+            // Save, it pinned "no Save") and no second one, and the header keeps its height
             await page.locator('#mini').waitFor({ state: 'detached' });
             assert.equal(
               await page.evaluate(() => ({
                 barSaves: [...document.querySelectorAll('#app > .chrome button')]
-                  .filter((n) => n.id === 'reader-take' || /^(保存|Save)/u.test((n.textContent || '').trim())).length,
+                  .filter((n) => n.id === 'reader-take' || /^(保存|Save)/u.test((n.textContent || '').trim()))
+                  .filter((n) => !(n.id === 'chrome-keep' && n.matches('button.save-one[data-save-one]'))).length,
+                one: document.querySelectorAll('#app > .chrome #chrome-keep.save-one').length,
                 header: document.querySelector('.chrome').getBoundingClientRect().height,
               })).then((s) => JSON.stringify(s)),
-              JSON.stringify({ barSaves: 0, header: headerAfter }),
-              'After closing the entry the bar still carries no Save and keeps its height',
+              JSON.stringify({ barSaves: 0, one: 1, header: headerAfter }),
+              'After closing the entry the bar carries its one keep and no other Save, and keeps its height',
             );
           }
           await page.locator('#tab-read').click();

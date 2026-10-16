@@ -578,7 +578,7 @@ try {
         // Open the real cat entry sheet. The rendered tray remains mounted
         // behind it and inert; revocation must scrub that DOM immediately too.
         await page.locator('.tray-line').filter({ has: page.locator('.w', { hasText: '猫' }) }).first().click();
-        await page.locator('#sheet #take').waitFor();
+        await page.locator('#sheet #sheet-take').waitFor(); // S · the page's one Save (it pinned the foot's #take)
         await page.waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'));
         await page.evaluate(() => {
           const notes = document.getElementById('record-notes');

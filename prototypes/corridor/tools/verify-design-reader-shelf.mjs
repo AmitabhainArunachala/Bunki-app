@@ -32,9 +32,8 @@
  *                         gloss (the accessible name says both); a door in it still opens its room.
  *                         Control: 7ef0e985, whose thirteen text doors stood in a row under the filters.
  *   M1 title block      — (glance pass) at 1368 and 390 the date and the article count stand on one
- *                         line; the 未確認 note is one short line that still counts the pending stories
- *                         against the total, and its ⓘ opens the longer explanation; the 永 seal stays
- *                         ≤ 48 px inside the title. Control: 7ef0e985, whose phone dateline broke the
+ *                         line; (S, 2026-10-16) no provenance note — no AI作成 / Made by AI, no ⓘ — on the
+ *                         shelf in either language; the 永 seal stays ≤ 48 px inside the title. Control: 7ef0e985, whose phone dateline broke the
  *                         count onto a second line and whose note ran to three lines.
  *   O1 no clipped row   — (glance pass) at 320, 390 and 1368 the shelf as served, and with its tools
  *                         panel open, never runs past the screen's side: no element of the shelf
@@ -136,7 +135,7 @@
  *                         brackets share a painted line with the following glyph, closing punctuation
  *                         shares one with the preceding glyph, and title lookup words do not split.
  *   J1 JLPT room        — the room and a question show no "awaiting John" / "machine-checked"
- *                         text; unreviewed tests wear the 未確認 chip; each level card carries its
+ *                         text and (S) no provenance chip or line at all; each level card carries its
  *                         level colour hook and a count of its tests (steps 3–4).
  *   K1 keyboard (R4)    — from the end of the title block to the article's close (読み終えた), a 3-paragraph
  *                         article costs at most paragraphs + 3 Tab presses: one stop per paragraph;
@@ -671,18 +670,15 @@ try {
             why: !!why?.querySelector('summary'), seal: seal ? Math.round(Math.max(seal.width, seal.height)) : 0 };
         });
         assert(Math.abs(probe.dateTop - probe.tallyTop) <= 2 && probe.datelineLines === 1, `date and count are not one line: ${JSON.stringify(probe)}`);
-        assert(/Made by AI/u.test(probe.note) && /\d+.*\d+/u.test(probe.note), `the AI作成 note does not count the pending stories against the total: "${probe.note}"`);
-        assert.equal(probe.noteLines, 1, `the 未確認 note runs to ${probe.noteLines} lines: "${probe.note}"`);
-        assert(probe.why, 'the 未確認 note has no ⓘ for its longer explanation');
-        await page.locator('.shelf-review-note summary').click();
-        const explained = await page.evaluate(() => {
-          const p = document.querySelector('.shelf-review-note details[open] > p');
-          const r = p?.getBoundingClientRect();
-          return p ? { text: p.innerText.trim(), inView: r.left >= 0 && r.right <= innerWidth + 0.5 && r.bottom <= innerHeight } : null;
-        });
-        assert(explained && explained.text.length > 40 && explained.inView, `the ⓘ opens no readable explanation: ${JSON.stringify(explained)}`);
+        // S · no provenance on the shelf (John, 2026-10-16: "and made by AI!! do not write that!!!!"). This pinned the AI作成
+        // note — its count against the total, its one line, its ⓘ and the explanation behind it. The new truth: the
+        // masthead carries no such note in any form, in either language; how a story was made stays in its record.
+        assert.equal(probe.note, '', `the shelf still carries a provenance note: "${probe.note}"`);
+        assert(!probe.why, 'a provenance ⓘ is still on the shelf');
+        const masthead = await page.evaluate(() => [...document.querySelectorAll('.shelf-masthead, #shelf-reading-results')].map((n) => n.innerText).join(' \n '));
+        assert(!/Made by AI|AI作成|not yet checked|人の確認|未確認|unreviewed/iu.test(masthead), `the shelf names provenance: "${masthead.match(/.{0,30}(Made by AI|AI作成|not yet checked|人の確認|未確認|unreviewed).{0,30}/iu)?.[0]}"`);
         assert(probe.seal > 0 && probe.seal <= 48, `the 永 seal is ${probe.seal}px`);
-        return { note: probe.note, explanation: explained.text.slice(0, 40), seal: probe.seal };
+        return { note: null, seal: probe.seal };
       });
     }
 
@@ -815,8 +811,9 @@ try {
       await page.locator('#mini #mini-take').click();
       await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
     };
+    // S · the page's one Save is its bar's (#sheet-take); the foot's 覚える (#take) these pinned is gone
     const fullEntryState = (page) => page.evaluate(() => {
-      const take = document.querySelector('#sheet #take');
+      const take = document.querySelector('#sheet #sheet-take');
       return { take: take && { pressed: take.getAttribute('aria-pressed'), disabled: take.disabled, held: take.classList.contains('word-capture-held') },
         note: document.querySelector('#word-capture-note')?.textContent.trim() ?? null, replace: !!document.querySelector('#word-capture-replace') };
     });
@@ -825,7 +822,7 @@ try {
       await openArticle(page, ARTICLE);
       await saveFromQuickLook(page);
       await page.locator('#mini button.mini-word').click(); // the band is the door
-      await page.waitForSelector('#sheet #take');
+      await page.waitForSelector('#sheet #sheet-take');
       const full = await fullEntryState(page);
       assert(full.take?.pressed === 'true' && !full.take.disabled && !full.take.held && full.note === null && !full.replace,
         `saved from the quick look, 全項目 does not show it saved: ${JSON.stringify(full)}`);
@@ -837,9 +834,9 @@ try {
       await page.locator('#reader .tok[data-index="0"]').click();
       await page.waitForSelector('#mini button.mini-word');
       await page.locator('#mini button.mini-word').click();
-      await page.waitForSelector('#sheet #take:not([disabled])');
-      await page.locator('#sheet #take').click();
-      await page.waitForFunction(() => document.querySelector('#sheet #take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
+      await page.waitForSelector('#sheet #sheet-take:not([disabled])');
+      await page.locator('#sheet #sheet-take').click();
+      await page.waitForFunction(() => document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
       await page.locator(await entryCloseSelector(page)).click();
       await page.waitForFunction(() => !document.querySelector('#sheet'), null, { timeout: 5_000 });
       await page.locator('#reader .tok[data-index="0"]').click();
@@ -912,7 +909,8 @@ try {
       assert.equal(cards.length, 1, `the menu made ${cards.length} 郊外 cards`);
       assert(cards[0].ctx?.scope === 'sent' && cards[0].ctx.p === ARTICLE && cards[0].ctx.i === SUBURB, `the card lost its sentence: ${JSON.stringify(cards[0])}`);
       const toast = await page.evaluate(() => { const t = document.querySelector('#reader-toast:not([hidden])'); return t && { text: t.innerText.replace(/\s+/gu, ' ').trim(), role: t.getAttribute('role'), live: t.getAttribute('aria-live') }; });
-      assert(toast && /^Saved to review\b/u.test(toast.text) && toast.role === 'status' && toast.live === 'polite', `no polite toast: ${JSON.stringify(toast)}`);
+      // S · the toast says what Save says (保存しました · Saved) with its Undo, and nothing about review (it pinned "Saved to review")
+      assert(toast && /^Saved\b/u.test(toast.text) && !/review/iu.test(toast.text) && toast.role === 'status' && toast.live === 'polite', `no polite toast: ${JSON.stringify(toast)}`);
       assert.equal(await page.locator('#reader-word-menu').count(), 0, 'the menu stayed open after Save word');
       await page.mouse.click(at.x, at.y, { button: 'right' });
       await page.waitForSelector('#reader-word-menu');
@@ -1066,7 +1064,9 @@ try {
         else await page.keyboard.press('Escape');
       }
       assert(before, 'no example word in the galaxy entry offers a live, unpressed Save');
-      assert(before.view === 'drift' && before.save === 'Save' && !before.list && before.note, `the galaxy popup opens its menu before the word is saved: ${JSON.stringify(before)}`);
+      // S · no caption beside Save (John, 2026-10-16: ":goes into review is excessive and 無駄"): this pinned the
+      // "goes into review" note under an unpressed Save; the new truth is the Save alone, no note at any moment
+      assert(before.view === 'drift' && before.save === 'Save' && !before.list && !before.note, `the galaxy popup opens its menu before the word is saved, or a caption stands beside Save: ${JSON.stringify(before)}`);
       const band = await page.evaluate(() => {
         const mini = document.getElementById('mini'), head = mini.querySelector('.mini-head'), door = mini.querySelector('button.mini-word[data-action="entry.open"]');
         const box = (node) => { const r = node.getBoundingClientRect(); return { top: r.top, right: r.right, bottom: r.bottom, left: r.left, width: r.width, height: r.height }; };
@@ -1100,7 +1100,7 @@ try {
       await page.keyboard.press('Escape');
       await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'), null, { timeout: 5_000 });
       const undone = await path();
-      assert(undone.save === 'Save' && !undone.list && undone.note, `after Review off the galaxy popup still shows its menu: ${JSON.stringify(undone)}`);
+      assert(undone.save === 'Save' && !undone.list && !undone.note, `after Review off the galaxy popup still shows its menu, or a caption beside Save: ${JSON.stringify(undone)}`);
       return { taps, entry: entry.node, word: before.word, before, saved, undone, band: { rows: band.rows.map((row) => `${row.part}@${Math.round(row.top)}`), entry: [Math.round(band.entry.width), Math.round(band.entry.height)] } };
     });
 
@@ -1121,9 +1121,10 @@ try {
       const pane = await page.evaluate(() => ({
         marked: document.querySelector('#mini .mini-sentence-pane:not([hidden]) .mini-sentence-full mark')?.textContent ?? null,
         choices: [...document.querySelectorAll('#mini .mini-sentence-pane .mini-sentence-action-name')].map((n) => n.textContent),
-        keep: document.querySelector('#mini .mini-sentence-pane #reader-context-save .mini-sentence-keep-name')?.textContent ?? null,
+        // S · the sentence's keep is the one Save (button.save-one, Save · Saved ✓); it pinned "Save the sentence" with a hint line
+        keep: (() => { const k = document.querySelector('#mini .mini-sentence-pane #reader-context-save'); return k && { one: k.matches('button.save-one[data-save-one]'), text: k.textContent }; })(),
       }));
-      assert.deepEqual([pane.marked, pane.choices, pane.keep], ['郊外', ['Ask the tutor', 'Practice it'], 'Save the sentence'], `the sentence pane: ${JSON.stringify(pane)}`);
+      assert.deepEqual([pane.marked, pane.choices, pane.keep], ['郊外', ['Ask the tutor', 'Practice it'], { one: true, text: 'Save' }], `the sentence pane: ${JSON.stringify(pane)}`);
       // the sentence's own Save keeps it on the tutor page, in the reader, without making it the active sentence
       const unkept = await readAppRecord(page);
       await page.locator('#mini #reader-context-save').click();
@@ -1437,9 +1438,11 @@ try {
       await page.locator('.exam-confirm button', { hasText: /study/i }).first().click();
       await page.waitForSelector('.exam-paper');
       const question = await page.evaluate(() => document.querySelector('#app main').innerText);
-      const leaks = [room.text, question].flatMap((t) => t.match(/.{0,20}(awaiting John|machine-checked).{0,20}/giu) || []);
-      assert.equal(leaks.length, 0, `diagnostic wording: ${leaks.join(' | ')}`);
-      assert(room.chips > 0, 'no 未確認 chip on unreviewed tests');
+      // S · no provenance in the learner's app (John, 2026-10-16): this pinned "a 未確認 chip on unreviewed tests"; the new
+      // truth is no provenance chip or line in the room or a question — the review state stays in the form's record
+      const leaks = [room.text, question].flatMap((t) => t.match(/.{0,20}(awaiting John|machine-checked|Made by AI|AI作成|Written by AI|AIが書きました|not yet checked|未確認|人の確認).{0,20}/giu) || []);
+      assert.equal(leaks.length, 0, `diagnostic or provenance wording: ${leaks.join(' | ')}`);
+      assert.equal(room.chips, 0, `${room.chips} provenance chips on the tests`);
       assert(room.levels.length === 5 && room.levels.every((l) => l.level && /\d/u.test(l.tests)), `level cards: ${JSON.stringify(room.levels)}`);
       return { chips: room.chips, levels: room.levels };
     });

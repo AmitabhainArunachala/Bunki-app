@@ -20,7 +20,9 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'slipDive', 'miniDiving', 'miniOnClose', 'slipSummons',
   // G1 (2026-10-16): a slip stands only beside a word on the top layer, a slip leaving into its page is not standing, and
   // its headword is the match cut's source
-  'slipAllowed', 'standingSlip', 'slipHeadword'];
+  'slipAllowed', 'standingSlip', 'slipHeadword',
+  // S (2026-10-16): the slip's Save is the one Save, built by one component (saveOne) for every keep in the app
+  'saveOne'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]

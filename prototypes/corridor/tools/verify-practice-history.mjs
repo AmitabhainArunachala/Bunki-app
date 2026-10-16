@@ -959,35 +959,28 @@ try {
   await check('two-completed-attempts-and-failed-save-actions', async ({ page }) => {
     await door(page);
     assert.match(await page.locator('main').innerText(), /Short sets/u);
+    // S · no provenance in the learner's app (John, 2026-10-16): this pinned the intro's one Made by AI mark and its reason
+    // ("answers not yet checked by a person"), with mutations of that mark as its controls. The new truth: the intro and
+    // every row carry no provenance chip or line; the controls now put one back — on the page, as a reason line, on a row —
+    // and each must be caught.
     const assertIntro = async () => {
-      const mark = page.locator('main > .mock-review-mark');
-      assert.equal(await mark.count(), 1);
-      assert.equal(await mark.isVisible(), true);
-      assert.equal(await mark.locator('.status-chip').innerText(), 'Made by AI');
-      assert.equal(await mark.locator('.exam-review-reason').innerText(), 'answers not yet checked by a person');
-      assert.equal(await page.locator('[data-mock-set] .status-chip').count(), 0);
-      assert.match(await page.locator('main').innerText(), /No listening and no time limit\./u);
+      assert.equal(await page.locator('main .mock-review-mark, main .status-chip, main .exam-review-reason').count(), 0);
+      const text = await page.locator('main').innerText();
+      assert.doesNotMatch(text, /Made by AI|AI作成|not yet checked|checked by a person|未確認|人の確認|unreviewed/iu);
+      assert.match(text, /No listening and no time limit\./u);
     };
     await assertIntro();
     const introRecord = await readAppRecord(page);
-    const originalMark = await page.locator('main > .mock-review-mark').evaluate(n => n.outerHTML);
-    for (const mutation of ['hidden', 'wrong-chip', 'missing-reason', 'repeated-on-row']) {
+    for (const mutation of ['chip-on-page', 'reason-line', 'chip-on-row']) {
       await page.evaluate(mutation => {
-        const mark = document.querySelector('main > .mock-review-mark');
-        if (mutation === 'hidden') mark.style.display = 'none';
-        if (mutation === 'wrong-chip') mark.querySelector('.status-chip').textContent = 'Reviewed';
-        if (mutation === 'missing-reason') mark.querySelector('.exam-review-reason').textContent = '';
-        if (mutation === 'repeated-on-row') {
-          const duplicate = mark.querySelector('.status-chip').cloneNode(true);
-          duplicate.dataset.introNegativeControl = '1';
-          document.querySelector('button[data-mock-set]').append(duplicate);
-        }
+        const control = document.createElement('span');
+        control.dataset.introNegativeControl = '1';
+        if (mutation === 'chip-on-page') { control.className = 'status-chip'; control.textContent = 'Made by AI'; document.querySelector('main').prepend(control); }
+        if (mutation === 'reason-line') { control.textContent = 'answers not yet checked by a person'; document.querySelector('main').append(control); }
+        if (mutation === 'chip-on-row') { control.className = 'status-chip'; control.textContent = 'Made by AI'; document.querySelector('button[data-mock-set]').append(control); }
       }, mutation);
       await assert.rejects(assertIntro, { name: 'AssertionError' }, `intro must reject ${mutation}`);
-      await page.evaluate(original => {
-        document.querySelector('main > .mock-review-mark').outerHTML = original;
-        document.querySelectorAll('[data-intro-negative-control]').forEach(n => n.remove());
-      }, originalMark);
+      await page.evaluate(() => document.querySelectorAll('[data-intro-negative-control]').forEach(n => n.remove()));
       await assertIntro();
     }
     assert.deepEqual(await readAppRecord(page), introRecord, 'warning probes leave the learner record unchanged');

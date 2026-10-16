@@ -328,8 +328,9 @@ function summariesMeetAA(rows) {
 
 async function measureChromeTargets(page) {
   return page.evaluate(() => {
-    // one Save (John, 2026-10-15 17:20): the bar carries no Save of its own — no #reader-take, no door named Save —
-    // so while the slip is open its Save is the one Save, and it is measured beside the bar's doors
+    // one Save: no #reader-take, and (S, John 2026-10-16: "how do we know where to add something") at most one keep in the
+    // bar — the one Save component (#chrome-keep) on the slip's own path — it pinned "no Save in the bar" (10-15 17:20);
+    // while the slip is open its Save is measured beside the bar's doors
     const barSaves = [...document.querySelectorAll('.chrome button')].filter((n) => n.id === 'reader-take'
       || /^(保存|Save)/u.test((n.textContent || '').trim()) || /^(保存|Save)\b/u.test(n.getAttribute('aria-label') || ''));
     const popupSave = document.querySelector('#mini #mini-take');
@@ -351,7 +352,8 @@ async function measureChromeTargets(page) {
       if (Math.min(a.right, b.right) - Math.max(a.x, b.x) > 1 &&
           Math.min(a.bottom, b.bottom) - Math.max(a.y, b.y) > 1) overlaps.push([a.id, b.id]);
     }
-    const saveOwnership = barSaves.length === 0 && (!popupOpen || (!!popupSave && popupSave.checkVisibility({ visibilityProperty: true })
+    const saveOwnership = barSaves.length <= 1 && barSaves.every((n) => n.id === 'chrome-keep' && n.matches('button.save-one[data-save-one]'))
+      && (!popupOpen || (!!popupSave && popupSave.checkVisibility({ visibilityProperty: true })
       && rows.some(row => row.id === 'mini-take' && row.reachable && row.width >= 44 && row.height >= 44)));
     return { width: innerWidth, rows, overlaps, barSaves: barSaves.length, popupOpen, saveOwnership, valid: saveOwnership && rows.length >= 7 && !overlaps.length &&
       rows.every(r => r.width >= 44 && r.height >= 44 && r.x >= 0 && r.right <= innerWidth && r.y >= 0 && r.bottom <= innerHeight && r.reachable) };
@@ -1303,16 +1305,24 @@ async function main() {
   report.hops = hops;
 
   // ------------------------------------------------------------ step 5 take
-  console.log('\n— step 5 · 覚える');
-  await tap(page, '#take');
+  console.log('\n— step 5 · 覚える (S: the page\'s one Save)');
+  // S · the page keeps through its one Save in the bar (#sheet-take); the foot's 覚える (#take) and its "saved to" drawer
+  // (.list-picker .fold-sub), which this pinned, are gone: the Save's own menu says where the word went
+  await tap(page, '#sheet-take');
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer', { timeout: 5000 }).catch(() => {});
   const taken = await page.locator('#tray').textContent();
   check('any node can be taken into study', /^Today\s+[1-9][0-9]*$/u.test(taken.trim()), `chrome reads "${taken.trim()}"`);
   const bucket = await page.evaluate(`(() => {
-    const p = document.querySelector('.list-picker .fold-sub');
-    return p ? p.textContent : null;
+    const pop = document.querySelector('#vocabulary-list-popover.is-drawer');
+    const review = pop?.querySelector('#mini-review');
+    const save = document.querySelector('#sheet-take');
+    return pop ? { review: review ? review.checked : null, row: review?.closest('label')?.textContent.trim() ?? null,
+      pressed: save?.getAttribute('aria-pressed'), one: !!save?.matches('button.save-one[data-save-one]'), under: Math.round(pop.getBoundingClientRect().top) } : null;
   })()`);
-  check('after saving, the sheet says plainly where the word went',
-    !!bucket && /保存先|saved to/.test(bucket), String(bucket).slice(0, 44));
+  check('after saving, the page\'s one Save opens its menu under the bar: the word is in review (Review ticked), its lists one tap away',
+    !!bucket && bucket.review === true && /^(復習|Review)$/u.test(bucket.row) && bucket.pressed === 'true' && bucket.one, JSON.stringify(bucket));
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(160);
   // the schedule preview lives one named fold deep since 2026-08-27 —
   // open 学習の記録 the way a finger does before reading it (aim at the
   // study fold's own head: the list drawer shares the .fold-head class)
@@ -2187,9 +2197,14 @@ async function main() {
     !d23ActionError && d23Opened?.node === 'word:上手' && d23Opened.reading === 'じょうず' && !d23Opened.mini &&
       d23Opened.take?.taken === true && d23Opened.take.pressed === 'true' && d23Opened.take.disabled === false,
     JSON.stringify({ opened: d23Opened, ...(d23ActionError ? { actionError: d23ActionError } : {}) }));
-  // through that route the card leaves by its own door, and the record is as it began
+  // through that route the card leaves by its own door, and the record is as it began. S · the page's one Save behaves as
+  // every Save: on Saved ✓ a press opens its menu (a drawer under the bar), whose Review row takes the card out — this
+  // pinned a second press on the page's seal as the removal
   await tap(page, '#sheet-take');
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review');
+  await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
   await waitForAppRecord(page, (record) => d23Cards(record).length === 0, { description: 'the 1353320 card removed through its own door' });
+  if (await page.locator('#vocabulary-list-popover').count()) await page.keyboard.press('Escape');
   check('D23 · through the opened route the 1353320 card is removed by its own door', true, 'no 上手 card remains');
   await shoot(page, shotsDir, '12b-d23-core-row');
 
@@ -2540,12 +2555,15 @@ async function main() {
   await tap(page, FIRST_TEXT);
   await settleReader(page);
   await holdWord(page, '#reader .tok.content', 6);
-  await page.waitForSelector('#sheet #take');
+  // S · the page keeps through its one Save in the bar (#sheet-take); the foot's #take this pinned is gone. Its menu opens
+  // as a drawer under the bar; Escape puts it away before the scopes further down are touched
+  await page.waitForSelector('#sheet #sheet-take');
   await page
     .waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'), null, { timeout: 8000 })
     .catch(() => {});
-  await tap(page, '#sheet #take');
+  await tap(page, '#sheet #sheet-take');
   await page.waitForSelector('[data-ctx-scope]', { timeout: 8000 });
+  if (await page.locator('#vocabulary-list-popover').count()) { await page.keyboard.press('Escape'); await page.waitForTimeout(200); }
   await tap(page, '[data-ctx-scope="sent"]');
   await page.waitForTimeout(300);
   const ctxStored = await evaluateAppRecord(page, `(() => {
@@ -2735,7 +2753,13 @@ async function main() {
   })()`);
   check('R2-B · the sheet seal wears taken-state where 覚える was taken',
     sealBefore.taken && sealBefore.pressed === 'true', JSON.stringify(sealBefore));
+  // S · on Saved ✓ the page's one Save opens its menu (a drawer under the bar); its Review row is the way back out — this
+  // pinned a second press on the seal as the un-memorize
   await tap(page, '#sheet-take');
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review');
+  await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
+  await waitForAppRecord(page, (record) => !(record.taken || []).length, { description: 'the 学校 card un-memorized through the Review row' });
+  if (await page.locator('#vocabulary-list-popover').count()) await page.keyboard.press('Escape');
   await page.waitForTimeout(300);
   const afterUntake = await evaluateAppRecord(page, `(() => {
     const e = record;
@@ -2834,15 +2858,19 @@ async function main() {
     `armed=${JSON.stringify(armed)} → ${JSON.stringify(deleted)}`);
 
   // One Save (John, 2026-10-15 17:20: the bar's own '+' is gone): the reader's Save lives in the slip, saves in
-  // one tap and keeps its sentence context; lists are a menu away, inside the slip.
+  // one tap and keeps its sentence context; lists are a menu away, inside the slip. S (John, 2026-10-16: "why is the plus
+  // bar gone???? what replaced it??"): the bar carries one keep again — the one Save component, naming the word last
+  // touched; this pinned "the bar carries no Save of its own" before and after a touch.
   const captureSheetLoads = observeWordSheetLoads(page);
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
   await settleReader(page);
   const barSaves = () => page.evaluate(`[...document.querySelectorAll('#app > .chrome button')].filter((n) => n.id === 'reader-take'
-    || /^(保存|Save)/u.test((n.textContent || '').trim()) || /^(保存|Save)\\b/u.test(n.getAttribute('aria-label') || '')).map((n) => n.id || n.textContent.trim())`);
+    || /^(保存|Save)/u.test((n.textContent || '').trim()) || /^(保存|Save)\\b/u.test(n.getAttribute('aria-label') || ''))
+    .map((n) => ({ id: n.id, one: n.matches('button.save-one[data-save-one]'), rest: n.dataset.saveRest != null, word: n.querySelector('.save-bar-word')?.textContent ?? '' }))`);
   const idleBar = await barSaves();
-  check('R2-B · the bar carries no Save of its own before a word is touched', idleBar.length === 0, JSON.stringify(idleBar));
+  check('R2-B · before a word is touched the bar carries one keep, the one Save, at rest (it says what it does; it names no word)',
+    idleBar.length === 1 && idleBar[0].id === 'chrome-keep' && idleBar[0].one && idleBar[0].rest, JSON.stringify(idleBar));
   await tap(page, '#reader .tok.content', 9);
   await page.waitForSelector('#mini #mini-take');
   const touched = await page.evaluate(`(() => {
@@ -2852,8 +2880,8 @@ async function main() {
       slipWord: document.querySelector('#mini .mini-word')?.textContent ?? '', saveReady: !!b && !b.disabled && b.getAttribute('aria-pressed') === 'false' };
   })()`);
   const touchedBar = await barSaves();
-  check('R2-B · touching a word marks it and opens its slip, whose Save is the one Save — the bar still has none',
-    touched.marked && touched.slipWord === touched.word && touched.saveReady && touchedBar.length === 0,
+  check('R2-B · touching a word marks it and opens its slip, whose Save is the one Save — and the bar\'s one keep names that word',
+    touched.marked && touched.slipWord === touched.word && touched.saveReady && touchedBar.length === 1 && touchedBar[0].one && !touchedBar[0].rest && touchedBar[0].word === touched.word,
     `${touched.word} — slip "${touched.slipWord}", bar saves ${JSON.stringify(touchedBar)}`);
   const envBefore = await evaluateAppRecord(page, `(() => {
     const e = record;
@@ -2898,13 +2926,19 @@ async function main() {
   await holdWord(page, '#reader .tok.content', 9);
   await page.waitForSelector('#sheet [data-ctx-scope]');
   await waitForWordSheetBody(page, captureSheetLoads);
+  // S · the way back out and the named lists live in the page's one Save (it pinned the foot's #take and its .list-picker)
   const panelBits = await page.evaluate(`(() => ({
-    take: document.querySelector('#sheet #take')?.getAttribute('aria-pressed') === 'true',
+    take: document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed') === 'true',
+    one: !!document.querySelector('#sheet #sheet-take')?.matches('button.save-one[data-save-one]'),
     scopes: document.querySelectorAll('#sheet [data-ctx-scope]').length,
-    lists: !!document.querySelector('#sheet .list-picker'),
+    foot: document.querySelectorAll('#sheet #take, #sheet .list-picker').length,
   }))()`);
-  check('R2-B · the full entry keeps the way back out, the context scopes, and named lists',
-    panelBits.take && panelBits.scopes === 3 && panelBits.lists,
+  await tap(page, '#sheet #sheet-take');
+  await page.waitForSelector('#vocabulary-list-popover.is-drawer', { timeout: 5000 }).catch(() => {});
+  panelBits.lists = await page.evaluate(`!!document.querySelector('#vocabulary-list-popover.is-drawer #vocabulary-list-new') && !!document.querySelector('#vocabulary-list-popover.is-drawer #mini-review')`);
+  if (await page.locator('#vocabulary-list-popover').count()) { await page.keyboard.press('Escape'); await page.waitForTimeout(200); }
+  check('R2-B · the full entry keeps the way back out, the context scopes, and named lists — in its one Save',
+    panelBits.take && panelBits.one && panelBits.scopes === 3 && panelBits.lists && panelBits.foot === 0,
     JSON.stringify(panelBits));
   for (const scope of ['word', 'para', 'sent']) {
     // Saving replaces the sheet; a durable record can arrive before its new

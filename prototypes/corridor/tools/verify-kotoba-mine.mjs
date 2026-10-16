@@ -830,7 +830,8 @@ async function verifyHost(browser, base) {
         other,
         takenBefore, took, again, kanjiTook,
         takenAfter: h.isTaken(word), kanjiTaken: h.isTaken(kanji),
-        toast: document.getElementById('reader-toast')?.textContent || '',
+        // the toast's own words, without its Undo action's
+        toast: (document.getElementById('reader-toast')?.textContent || '').replace(document.getElementById('reader-toast-action')?.textContent || '', '').trim(),
         undo: !!document.getElementById('reader-toast-action'),
         chooser: document.querySelectorAll('#kp-chooser, .kp-chooser, #take-chooser, .take-chooser').length,
       };
@@ -854,7 +855,8 @@ async function verifyHost(browser, base) {
     );
     check(
       'host: take() is the corridor’s one-tap save (A51) — the word and a 字 land in the shared review pool (覚えるの札) of the durable record at once, with the Saved toast and 元に戻す and no chooser; a second take writes nothing; isTaken() then says so; the deck ledger, the observation log and the schedule are untouched',
-      !o.takenBefore && o.took && o.again && o.kanjiTook && o.takenAfter && o.kanjiTaken && o.rows.length === 2 && /復習に保存しました|Saved to review/.test(o.toast) && o.undo && o.chooser === 0 && o.obs === 0 && o.srsSame && ledgerAfter === ledgerBefore,
+      // S · the toast says what Save says (保存しました · Saved), nothing about review (it pinned 復習に保存しました|Saved to review)
+      !o.takenBefore && o.took && o.again && o.kanjiTook && o.takenAfter && o.kanjiTaken && o.rows.length === 2 && /^(保存しました|Saved)$/u.test(o.toast) && o.undo && o.chooser === 0 && o.obs === 0 && o.srsSame && ledgerAfter === ledgerBefore,
       JSON.stringify({ rows: o.rows, toast: o.toast, undo: o.undo, chooser: o.chooser, obs: o.obs, srsSame: o.srsSame, ledgerSame: ledgerAfter === ledgerBefore }),
     );
     await page.evaluate(`(async () => {
@@ -864,8 +866,9 @@ async function verifyHost(browser, base) {
       h.open(h.lookup(toks.find((t) => t.k === '語' && t.ref)));
     })()`);
     await page.waitForSelector('#sheet', { timeout: 8000 });
-    const sheet = await page.evaluate(`({ node: document.querySelector('#sheet')?.dataset.node, take: document.querySelector('#sheet #take')?.getAttribute('aria-pressed'), deck: !!document.querySelector('.kp') })`);
-    check('host: open(entry) shows the corridor’s own entry sheet for the word (its 覚える already on), over the deck', /^word:/.test(sheet.node || '') && sheet.take === 'true' && sheet.deck, JSON.stringify(sheet));
+    // S · the page's one Save is its bar's (#sheet-take); it pinned the foot's #take
+    const sheet = await page.evaluate(`({ node: document.querySelector('#sheet')?.dataset.node, take: document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed'), deck: !!document.querySelector('.kp') })`);
+    check('host: open(entry) shows the corridor’s own entry sheet for the word (its one Save already on), over the deck', /^word:/.test(sheet.node || '') && sheet.take === 'true' && sheet.deck, JSON.stringify(sheet));
     if (errors.length) check('no page errors with the host adapter', false, errors.slice(0, 2).join(' | '));
   } finally {
     await context.close();
@@ -2824,37 +2827,37 @@ async function main() {
     const sent = await page.evaluate(MATERIAL);
     check("?deck=kotoba opens the sentence deck: a real sentence with the word marked, its home on the world's own page (one material: the deck's ground is the page's, no look of its own; a sitting stands on the room's lacquer stage)", sent.blank === 0 && sentHome.deck === sentHome.worldPage && sentHome.look === null && sent.look === null, JSON.stringify({ home: sentHome, sitting: sent }));
 
-    // 覚える is one tap (round-1 save path): the row is written through the
-    // guarded commit at once, and the list drawer opens under the finger so
-    // where the word went is right there.
+    // S · one tap on the page's one Save (#sheet-take, round-1 save path): the row is written through the guarded commit at
+    // once, and its menu opens as a drawer under the bar so where the word went is right there. This pinned the foot's
+    // 覚える (#take), its "saved to" drawer (.list-picker) and that drawer's own list maker; the lists now live in the Save's
+    // menu, one tap each, a new list asking its name once.
     await boot();
     await openShelfTools(page);
     await page.fill('#search', '金利');
     await page.waitForSelector('[data-result^="word:金利"]', { timeout: 15000 });
     await page.click('[data-result^="word:金利"]');
-    await page.waitForSelector('#sheet #take');
-    await page.click('#sheet #take');
+    await page.waitForSelector('#sheet #sheet-take');
+    await page.click('#sheet #sheet-take');
     await waitForAppRecord(page, (record) => record.taken.some((t) => t.id === '金利'),
       { description: 'one-tap sheet save' });
-    await page.waitForSelector('#sheet .list-picker .fold-head.open');
+    await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review:checked', { timeout: 5000 });
     const saved = await waitForAppRecord(page, (record) => record.taken.some((t) => t.id === '金利'),
       { description: 'saved word record' });
-    check('one tap on 覚える saves the word and opens its lists, nothing more written yet',
+    check('one tap on the page\'s one Save saves the word and opens its menu (review ticked, lists one tap away), nothing more written yet',
       saved.taken.length === 1 && Object.keys(saved.lists || {}).length === 0,
       `${saved.taken.length} rows · lists ${Object.keys(saved.lists || {}).length}`);
-    // a list named in the drawer receives the word through the same guarded commit
-    await page.click('#sheet #new-list');
-    await page.fill('#sheet [id^="list-picker-name:"]', '経済ニュース');
-    await page.click('#sheet .list-maker-make');
+    // a list named in the menu receives the word through the same guarded commit
+    await page.click('#vocabulary-list-popover #vocabulary-list-new');
+    await page.fill('#vocabulary-list-popover #vocabulary-list-name', '経済ニュース');
+    await page.click('#vocabulary-list-popover #vocabulary-list-create');
     const listed = await waitForAppRecord(page, (record) =>
       (record.lists?.['経済ニュース'] || []).some((x) => x.id === '金利'), { description: 'new list membership' });
     check('the new list receives the word, still one card', listed.taken.length === 1 &&
       listed.taken.filter((t) => t.id === '金利').length === 1, JSON.stringify(Object.keys(listed.lists || {})));
-    // the commit resolves before the sheet re-renders: wait (bounded) for the drawer to redraw, then read it
-    await page.waitForFunction(() => (document.querySelector('#sheet .list-picker .fold-sub')?.textContent || '').includes('経済ニュース'),
-      null, { timeout: 5000 }).catch(() => {});
-    const where = await page.evaluate(`document.querySelector('#sheet .list-picker .fold-sub')?.textContent || ''`);
-    check('the sheet then says where the word went', where.includes('経済ニュース'), where);
+    // the menu then shows the list ticked: where the word went, in the Save's own menu
+    await page.waitForFunction(() => !!document.querySelector('#vocabulary-list-popover input[data-list="経済ニュース"]:checked'), null, { timeout: 5000 }).catch(() => {});
+    const where = await page.evaluate(`[...document.querySelectorAll('#vocabulary-list-popover .vocabulary-list-choice')].filter((row) => row.querySelector('input:checked')).map((row) => row.textContent.trim()).join(' · ')`);
+    check('the Save\'s menu then says where the word went', where.includes('経済ニュース'), where);
     check('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '));
 
     console.log('\n— a grade is saved before the card moves on');

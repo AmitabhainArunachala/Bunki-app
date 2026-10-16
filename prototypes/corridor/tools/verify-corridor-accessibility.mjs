@@ -801,7 +801,8 @@ async function main() {
     };
     const pressed = [];
     await openWordDialog(pressPage);
-    pressed.push(await holdSample(pressPage, 'primary button', '#sheet .take:visible'));
+    // S · the page's primary is its one Save in the bar (button.save-one); the foot's 覚える (.take) it pinned is gone
+    pressed.push(await holdSample(pressPage, 'primary button', '#sheet .save-one:visible'));
     await pressPage.keyboard.press('Escape');
     await pressPage.waitForSelector('#sheet', { state: 'detached' });
     pressed.push(await holdSample(pressPage, 'chip', '#app main .chip:visible'));

@@ -258,7 +258,8 @@ try {
         await openChooser(page);
         await page.locator('#mini-review').uncheck();
         const removed = await waitForAppRecord(page, value => !row(value), { description: 'explicit removal from review' });
-        await page.locator('#reader-toast').filter({ hasText: 'Removed from review' }).waitFor();
+        // S · the toast says what Save says — 外しました · Removed — and nothing about review (it pinned "Removed from review")
+        await page.locator('#reader-toast .reader-toast-text').filter({ hasText: /^Removed$/ }).waitFor();
         assert.deepEqual(history(removed), prior, 'Removing from review preserves schedules, review history, and lists');
         assert.equal(await page.locator('#mini-take').getAttribute('aria-pressed'), 'false');
         await page.locator('#reader-toast-action').click();
