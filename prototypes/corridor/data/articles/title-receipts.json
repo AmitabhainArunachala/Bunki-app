@@ -96,6 +96,18 @@
       "url": "https://globalvoices.org/2026/05/21/solidarity-fields-in-syria-reviving-local-seed-production/",
       "pageHeadline": "Solidarity fields in Syria: Reviving local seed production",
       "checkedOn": "2026-10-03"
+    },
+    "aozora:000772-1": {
+      "label": "established English title, adapted",
+      "url": "https://en.wikipedia.org/wiki/Natsume_S%C5%8Dseki",
+      "pageHeadline": "Natsume Sōseki",
+      "checkedOn": "2026-10-16"
+    },
+    "aozora:049966-1": {
+      "label": "established English title, adapted",
+      "url": "https://www.gutenberg.org/ebooks/52594",
+      "pageHeadline": "Three Years in Tibet by Ekai Kawaguchi",
+      "checkedOn": "2026-10-16"
     }
   },
   "translations": {
@@ -1637,6 +1649,329 @@
         "provider": "ollama.com cloud",
         "verdict": "ok",
         "proposedEn": "Landlord"
+      }
+    ],
+    "bunki-read-n1-soai-nobel": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "A tiny imbalance that multiplies itself: Kenso Soai wins the Nobel Prize in Chemistry",
+        "verdict": "ok",
+        "proposedEn": "A tiny imbalance that multiplies itself: Kenso Soai wins the Nobel Prize in Chemistry"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "A tiny imbalance that multiplies itself: Kenso Soai wins the Nobel Prize in Chemistry",
+        "verdict": "ok",
+        "proposedEn": "A tiny imbalance that multiplies itself: Kenso Soai wins the Nobel Prize in Chemistry"
+      }
+    ],
+    "bunki-read-n2-kokugo-survey": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Does \"himotoku\" mean reading books? Only 13.1% chose the original meaning",
+        "verdict": "ok",
+        "proposedEn": "Does \"himotoku\" mean reading books? Only 13.1% chose the original meaning"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Does \"himotoku\" mean reading books? Only 13.1% chose the original meaning",
+        "verdict": "ok",
+        "proposedEn": "Does \"himotoku\" mean reading books? Only 13.1% chose the original meaning"
+      }
+    ],
+    "bunki-read-n2-bodhisena": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "The monk who opened the Great Buddha's eyes came from India",
+        "verdict": "ok",
+        "proposedEn": "The monk who opened the Great Buddha's eyes came from India"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "The monk who opened the Great Buddha's eyes came from India",
+        "verdict": "ok",
+        "proposedEn": "The monk who opened the Great Buddha's eyes came from India"
+      }
+    ],
+    "bunki-read-n3-gojuon-sanskrit": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "\"A-ka-sa-ta-na\" was a map of the mouth",
+        "verdict": "ok",
+        "proposedEn": "\"A-ka-sa-ta-na\" was a map of the mouth"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "\"A-ka-sa-ta-na\" was a map of the mouth",
+        "verdict": "ok",
+        "proposedEn": "\"A-ka-sa-ta-na\" was a map of the mouth"
+      }
+    ],
+    "bunki-read-n1-zazen-brainwaves": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "The twentieth sound, heard as if for the first time",
+        "verdict": "ok",
+        "proposedEn": "The twentieth sound, heard as if for the first time"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "The twentieth sound, heard as if for the first time",
+        "verdict": "ok",
+        "proposedEn": "The twentieth sound, heard as if for the first time"
+      }
+    ],
+    "bunki-read-n2-forgetting-curve": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "What did the forgetting curve really measure?",
+        "verdict": "ok",
+        "proposedEn": "What did the forgetting curve really measure?"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "What did the forgetting curve really measure?",
+        "verdict": "ok",
+        "proposedEn": "What did the forgetting curve really measure?"
+      }
+    ],
+    "bunki-read-n3-honda-quarter": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "\"Set aside a quarter of your pay first\": Seiroku Honda's way of saving",
+        "verdict": "ok",
+        "proposedEn": "\"Set aside a quarter of your pay first\": Seiroku Honda's way of saving"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "\"Set aside a quarter of your pay first\": Seiroku Honda's way of saving",
+        "verdict": "ok",
+        "proposedEn": "\"Set aside a quarter of your pay first\": Seiroku Honda's way of saving"
+      }
+    ],
+    "bunki-read-n2-shima-4004": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "The world's first general-purpose microprocessor was born from a Japanese calculator",
+        "verdict": "ok",
+        "proposedEn": "The world's first general-purpose microprocessor was born from a Japanese calculator"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "The world's first general-purpose microprocessor was born from a Japanese calculator",
+        "verdict": "ok",
+        "proposedEn": "The world's first general-purpose microprocessor was born from a Japanese calculator"
+      }
+    ],
+    "bunki-read-n1-strange-loop": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "A sentence that points at itself: Hofstadter's \"strange loop\"",
+        "verdict": "ok",
+        "proposedEn": "A sentence that points at itself: Hofstadter's \"strange loop\""
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "A sentence that points at itself: Hofstadter's \"strange loop\"",
+        "verdict": "ok",
+        "proposedEn": "A sentence that points at itself: Hofstadter's \"strange loop\""
+      }
+    ],
+    "bunki-read-n2-kobe-jain": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Why there is a Jain temple in Kobe",
+        "verdict": "ok",
+        "proposedEn": "Why there is a Jain temple in Kobe"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Why there is a Jain temple in Kobe",
+        "verdict": "ok",
+        "proposedEn": "Why there is a Jain temple in Kobe"
+      }
+    ],
+    "bunki-read-n1-optogenetics-nobel": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "From a light-seeking alga to a switch for the brain: the medicine Nobel goes to optogenetics",
+        "verdict": "ok",
+        "proposedEn": "From a light-seeking alga to a switch for the brain: the medicine Nobel goes to optogenetics"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "From a light-seeking alga to a switch for the brain: the medicine Nobel goes to optogenetics",
+        "verdict": "ok",
+        "proposedEn": "From a light-seeking alga to a switch for the brain: the medicine Nobel goes to optogenetics"
+      }
+    ],
+    "bunki-read-n2-shosoin-names": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Western lands hidden in the treasures' names: the 78th Shōsōin Exhibition",
+        "verdict": "ok",
+        "proposedEn": "Western lands hidden in the treasures' names: the 78th Shōsōin Exhibition"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Western lands hidden in the treasures' names: the 78th Shōsōin Exhibition",
+        "verdict": "ok",
+        "proposedEn": "Western lands hidden in the treasures' names: the 78th Shōsōin Exhibition"
+      }
+    ],
+    "bunki-read-n1-nobel-economics": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Moving today's economy with a promise about tomorrow: the economics Nobel and the Bank of Japan in 1999",
+        "verdict": "ok",
+        "proposedEn": "Moving today's economy with a promise about tomorrow: the economics Nobel and the Bank of Japan in 1999"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Moving today's economy with a promise about tomorrow: the economics Nobel and the Bank of Japan in 1999",
+        "verdict": "ok",
+        "proposedEn": "Moving today's economy with a promise about tomorrow: the economics Nobel and the Bank of Japan in 1999"
+      }
+    ],
+    "aozora:002359-1": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Scientists and Brains (excerpt) — Terada Torahiko",
+        "verdict": "issue",
+        "proposedEn": "Scientists and Intelligence (excerpt) — Terada Torahiko",
+        "note": "'Scientists and Brains' is a reasonable translation, but I could not verify it as an established title; 'Scientists and Intelligence' is the published rendering used by [Nippon.com](https://www.nippon.com/en/currents/d00282/)."
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Scientists and Brains (excerpt) — Terada Torahiko",
+        "verdict": "issue",
+        "proposedEn": "Scientists and the Head (excerpt) — Torahiko Terada",
+        "note": "あたま is the head, and the established English name order is Torahiko Terada."
+      }
+    ],
+    "bunki-read-n2-benzaiten": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "The goddess who washes money in Kamakura came from a river in India: Benzaiten's long journey",
+        "verdict": "ok",
+        "proposedEn": "The goddess who washes money in Kamakura came from a river in India: Benzaiten's long journey"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "The goddess who washes money in Kamakura came from a river in India: Benzaiten's long journey",
+        "verdict": "ok",
+        "proposedEn": "The goddess who washes money in Kamakura came from a river in India: Benzaiten's long journey"
+      }
+    ],
+    "aozora:000772-1": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "My Individualism (excerpt) — Natsume Sōseki",
+        "verdict": "ok",
+        "proposedEn": "My Individualism (excerpt) — Natsume Sōseki"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "My Individualism (excerpt) — Natsume Sōseki",
+        "verdict": "ok",
+        "proposedEn": "My Individualism (excerpt) — Natsume Sōseki"
+      }
+    ],
+    "bunki-read-n1-neocognitron": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "A neural network that took on 'shifts in position': Kunihiko Fukushima and the neocognitron",
+        "verdict": "ok",
+        "proposedEn": "A neural network that took on 'shifts in position': Kunihiko Fukushima and the neocognitron"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "A neural network that took on 'shifts in position': Kunihiko Fukushima and the neocognitron",
+        "verdict": "ok",
+        "proposedEn": "A neural network that took on 'shifts in position': Kunihiko Fukushima and the neocognitron"
+      }
+    ],
+    "bunki-read-n2-sleep-memory": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Learn before bed, or in the morning? A hundred years of sleep and memory",
+        "verdict": "ok",
+        "proposedEn": "Learn before bed, or in the morning? A hundred years of sleep and memory"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Learn before bed, or in the morning? A hundred years of sleep and memory",
+        "verdict": "ok",
+        "proposedEn": "Learn before bed, or in the morning? A hundred years of sleep and memory"
+      }
+    ],
+    "aozora:049966-1": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Three Years in Tibet: The Decision to Enter Tibet (excerpt) — Kawaguchi Ekai",
+        "verdict": "ok",
+        "proposedEn": "Three Years in Tibet: The Decision to Enter Tibet (excerpt) — Kawaguchi Ekai"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Three Years in Tibet: The Decision to Enter Tibet (excerpt) — Kawaguchi Ekai",
+        "verdict": "issue",
+        "proposedEn": "Three Years in Tibet: The Decision to Enter Tibet (excerpt) — Ekai Kawaguchi",
+        "note": "Three Years in Tibet is the established title; Gutenberg's byline is Ekai Kawaguchi."
+      }
+    ],
+    "bunki-read-n3-transistor-class": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Where 208 billion switches began: a lesson on the transistor",
+        "verdict": "ok",
+        "proposedEn": "Where 208 billion switches began: a lesson on the transistor"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Where 208 billion switches began: a lesson on the transistor",
+        "verdict": "ok",
+        "proposedEn": "Where 208 billion switches began: a lesson on the transistor"
       }
     ]
   },

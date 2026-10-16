@@ -1,6 +1,6 @@
 {
   "kind": "feed-curation-report",
-  "asOf": "2026-09-28",
+  "asOf": "2026-10-17",
   "law": "signals are ranked by the named criteria below, never composited (#42); culling is PROPOSED here and decided only by the operator in docs/content/feed-review-queue.json — never automatic",
   "criteria": {
     "droppedText": "LINK-SAFE patterns (the wikinews-1483/1403 lesson): dangling particle after 知られる — a linked name was dropped in extraction / empty quote/paren pair — bracketed content was dropped in extraction",
@@ -11,7 +11,7 @@
     "ranking": "most flags first, then fewest chars, then id — no composite score"
   },
   "counts": {
-    "shelf": 126,
+    "shelf": 136,
     "archive": 686,
     "flagged": 8,
     "cullProposals": 1
@@ -132,116 +132,6 @@
       ]
     },
     {
-      "id": "yasashii:9",
-      "where": "shelf",
-      "title": "大家",
-      "band": "中級前半",
-      "jread": 4.304,
-      "jlptCoverage": 1.0,
-      "chars": 6,
-      "date": "",
-      "flags": []
-    },
-    {
-      "id": "yasashii:1",
-      "where": "shelf",
-      "title": "育児休業",
-      "band": "中級前半",
-      "jread": 4.035,
-      "jlptCoverage": 0.7143,
-      "chars": 22,
-      "date": "",
-      "flags": []
-    },
-    {
-      "id": "yasashii:8",
-      "where": "shelf",
-      "title": "オーバーステイ",
-      "band": "初級前半",
-      "jread": 6.316,
-      "jlptCoverage": 0.6667,
-      "chars": 24,
-      "date": "",
-      "flags": []
-    },
-    {
-      "id": "yasashii:5",
-      "where": "shelf",
-      "title": "医療保険",
-      "band": "上級前半",
-      "jread": 2.154,
-      "jlptCoverage": 0.8,
-      "chars": 31,
-      "date": "",
-      "flags": []
-    },
-    {
-      "id": "yasashii:2",
-      "where": "shelf",
-      "title": "育児休業給付金",
-      "band": "初級前半",
-      "jread": 5.721,
-      "jlptCoverage": 0.6154,
-      "chars": 45,
-      "date": "",
-      "flags": []
-    },
-    {
-      "id": "yasashii:3",
-      "where": "shelf",
-      "title": "遺族基礎年金",
-      "band": "中級前半",
-      "jread": 3.577,
-      "jlptCoverage": 0.6,
-      "chars": 46,
-      "date": "",
-      "flags": []
-    },
-    {
-      "id": "yasashii:6",
-      "where": "shelf",
-      "title": "印鑑登録証明書",
-      "band": "初級後半",
-      "jread": 5.262,
-      "jlptCoverage": 0.5714,
-      "chars": 48,
-      "date": "",
-      "flags": []
-    },
-    {
-      "id": "yasashii:4",
-      "where": "shelf",
-      "title": "遺族厚生年金",
-      "band": "中級後半",
-      "jread": 3.082,
-      "jlptCoverage": 0.5294,
-      "chars": 50,
-      "date": "",
-      "flags": []
-    },
-    {
-      "id": "yasashii:10",
-      "where": "shelf",
-      "title": "介護",
-      "band": "上級前半",
-      "jread": 2.375,
-      "jlptCoverage": 0.9474,
-      "chars": 62,
-      "date": "",
-      "flags": []
-    },
-    {
-      "id": "yasashii:7",
-      "where": "shelf",
-      "title": "印鑑登録証",
-      "band": "中級前半",
-      "jread": 4.019,
-      "jlptCoverage": 0.6667,
-      "chars": 71,
-      "date": "",
-      "flags": []
-    },
-    {
       "id": "bunki-graded-n5-kitchen",
       "where": "shelf",
       "title": "台所の音",
@@ -260,6 +150,116 @@
       "jread": 5.437,
       "jlptCoverage": 0.75,
       "chars": 244,
+      "date": "",
+      "flags": []
+    },
+    {
+      "id": "real-tsurezure",
+      "where": "shelf",
+      "title": "徒然草 · 序段",
+      "band": "中級前半",
+      "jread": 3.582,
+      "jlptCoverage": 0.5946,
+      "chars": 250,
+      "date": "",
+      "flags": []
+    },
+    {
+      "id": "bunki-graded-n5-station",
+      "where": "shelf",
+      "title": "駅で待つ時間",
+      "band": "初級後半",
+      "jread": 4.737,
+      "jlptCoverage": 0.8657,
+      "chars": 255,
+      "date": "",
+      "flags": []
+    },
+    {
+      "id": "adapt-n3:jawiki:3492442",
+      "where": "shelf",
+      "title": "アジア競技大会が愛知・名古屋で",
+      "band": "初級後半",
+      "jread": 4.727,
+      "jlptCoverage": 0.8077,
+      "chars": 258,
+      "date": "2026-09-26",
+      "flags": []
+    },
+    {
+      "id": "real-hojoki",
+      "where": "shelf",
+      "title": "方丈記 · 冒頭",
+      "band": "中級前半",
+      "jread": 3.953,
+      "jlptCoverage": 0.6914,
+      "chars": 270,
+      "date": "",
+      "flags": []
+    },
+    {
+      "id": "adapt-n3:govonline:article-202609-radio-3741",
+      "where": "shelf",
+      "title": "手話も「言語」です",
+      "band": "中級後半",
+      "jread": 3.328,
+      "jlptCoverage": 0.7561,
+      "chars": 281,
+      "date": "2026-09-21",
+      "flags": []
+    },
+    {
+      "id": "bunki-graded-n4-market",
+      "where": "shelf",
+      "title": "朝の市場",
+      "band": "中級前半",
+      "jread": 4.001,
+      "jlptCoverage": 0.8873,
+      "chars": 281,
+      "date": "",
+      "flags": []
+    },
+    {
+      "id": "bunki-graded-n4-bicycle",
+      "where": "shelf",
+      "title": "自転車をなくした日",
+      "band": "中級前半",
+      "jread": 4.464,
+      "jlptCoverage": 0.8784,
+      "chars": 288,
+      "date": "",
+      "flags": []
+    },
+    {
+      "id": "real-gokajo",
+      "where": "shelf",
+      "title": "五箇条の御誓文",
+      "band": "上級前半",
+      "jread": 2.179,
+      "jlptCoverage": 0.6,
+      "chars": 288,
+      "date": "",
+      "flags": []
+    },
+    {
+      "id": "wikinews:44559",
+      "where": "archive",
+      "title": "2026年東証大発会、日経平均株価終値は5万1832円",
+      "band": "中級後半",
+      "jread": 3.333,
+      "jlptCoverage": 0.6747,
+      "chars": 300,
+      "date": "2026-01-05",
+      "flags": []
+    },
+    {
+      "id": "bunki-graded-n5-morning",
+      "where": "shelf",
+      "title": "静かな朝",
+      "band": "初級後半",
+      "jread": 4.824,
+      "jlptCoverage": 0.7722,
+      "chars": 301,
       "date": "",
       "flags": []
     }
