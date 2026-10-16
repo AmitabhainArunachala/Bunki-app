@@ -6,7 +6,7 @@
 </head>
 <body>
 <title>Meguri 廻</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+JP:wght@700;900&family=Zen+Old+Mincho:wght@400;700&family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Old+Mincho:wght@400;700&family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&display=swap">
 <style>
 /* Layout: one screen, one instrument. A row of verbs on top, the orbit field filling the middle,
    a pad of the last words heard, one line of counts. Every word is a station on a ring; a tap makes it the whole screen. */
@@ -75,6 +75,7 @@ button{font:inherit;color:inherit}
 .foot .jp{font:12px/1.3 var(--f-jp);color:var(--ink)}
 .foot button{appearance:none;border:1px solid var(--line);background:none;border-radius:999px;padding:2px 10px;font:12px/1.3 var(--f-jp);cursor:pointer;margin-left:4px}
 .foot button.yes{border-color:var(--shu);color:var(--shu)}
+.foot .credit{margin-left:auto;opacity:.7}
 /* the word, whole screen */
 .page{position:fixed;inset:0;z-index:30;background:var(--paper);color:var(--ink);overflow:auto;-webkit-overflow-scrolling:touch;
   padding:calc(env(safe-area-inset-top,0px) + 6px) 18px calc(env(safe-area-inset-bottom,0px) + 30px);
@@ -159,6 +160,7 @@ button{font:inherit;color:inherit}
   <span class="jp">五声</span>
   <span id="f-bpm">72 bpm</span>
   <span id="f-passed">0 passed · 0 sealed</span>
+  <span class="credit">strokes · KanjiVG (CC BY-SA)</span>
   <span id="f-reset" hidden><span class="jp">全部戻す？</span><button class="yes" id="f-yes">はい</button><button id="f-no">いいえ</button></span>
 </footer>
 
@@ -185,7 +187,8 @@ button{font:inherit;color:inherit}
 </section>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="poster.js"></script>
+<script src="kvg.js"></script>
+<script src="kanji.js"></script>
 <script src="assets.js"></script>
 <script>
 (function(){
@@ -461,13 +464,11 @@ function openPage(s){ cur=s; const b=live.getBoundingClientRect(); page.style.se
 function closePage(){ if(page.hidden) return; page.classList.remove('in'); menu.hidden=true; if(posterAnim){ try{posterAnim.cancel();}catch(e){} posterAnim=null; } const done=()=>{ page.hidden=true; page.removeEventListener('transitionend',done); }; page.addEventListener('transitionend',done); setTimeout(done,520); }
 function fillPage(s){ const w=s.w,p=passes(s),sealed=!!state.sealed[w.w];
   const big=$('#p-word'); big.textContent=''; if(posterAnim){ try{posterAnim.cancel();}catch(e){} posterAnim=null; }
-  const MP=window.MeguriPoster; let drawn=false;
-  if(MP&&MP.render){ try{ const c=document.createElement('canvas'); c.className='plate'; const pr=Math.max(1,window.devicePixelRatio||1); const cw=Math.min(300,Math.floor(Math.min(window.innerWidth*.7,320))); const ch=Math.round(cw*(1.0+.42*w.w.length)); c.width=cw*pr; c.height=ch*pr; c.style.width=cw+'px'; c.style.height=ch+'px'; big.style.writingMode='horizontal-tb'; big.appendChild(c);
-      const opts={ground:T.dark?'black':'paper',pigment:pig(s.g),dots:Math.min(6,p),sealed,reading:w.r,meaning:w.m};
-      const go=()=>{ if(cur!==s||page.hidden) return; if(MP.animateIn&&!matchMedia('(prefers-reduced-motion:reduce)').matches) posterAnim=MP.animateIn(c,w.w,opts); else MP.render(c,w.w,opts); };
-      // the renderer rasterises Noto Sans JP; draw once it is really loaded, so the first poster is never the fallback face
-      // Google serves the face in unicode-range slices: ask for the word's own characters or only the Latin slice arrives
-      if(document.fonts&&document.fonts.load) document.fonts.load("700 80px 'Noto Sans JP'",w.w).then(go,go); else go(); drawn=true; }catch(e){ big.textContent=''; } }
+  const MK=window.MeguriKanji; let drawn=false;
+  // the poster is built from KanjiVG strokes, so it needs no font to be right; it only needs the data for every character
+  if(MK&&[...w.w].every(ch=>MK.has(ch))){ try{ const box=document.createElement('div'); box.className='plate'; const cw=Math.min(300,Math.floor(Math.min(window.innerWidth*.7,320))); box.style.width=cw+'px'; big.style.writingMode='horizontal-tb'; big.appendChild(box);
+      const opts={ground:T.dark?'black':'paper',pigment:pig(s.g),dots:Math.min(5,p),sealed,reading:w.r,meaning:w.m};
+      if(!matchMedia('(prefers-reduced-motion:reduce)').matches) posterAnim=MK.animateIn(box,w.w,opts); else MK.render(box,w.w,opts); drawn=true; }catch(e){ big.textContent=''; } }
   if(!drawn){ big.style.writingMode=''; for(const ch of w.w){ const sp=document.createElement('span'); sp.textContent=ch; big.appendChild(sp); } }
   const dots=$('#p-dots'); dots.hidden=drawn; dots.textContent=''; for(let i=5;i>=0;i--){ const d=document.createElement('s'); if(sealed&&i===5) d.className='seal'; else if(i<Math.min(6,p)) d.className='on'; dots.appendChild(d); }
   $('#p-reading').textContent=w.r; $('#p-meaning').textContent=w.m; $('#p-def').textContent=w.d;
@@ -496,7 +497,7 @@ function start(data){ load(); if(data&&data.state) state=Object.assign(fresh(),d
   try{ window.claude?.hot?.snapshot?.(()=>({state})); }catch(e){}
   window.__meguri={stations,openPage,fire,audio,pluck,setDrone,get state(){return state},sound:()=>({AC,masterG,comp,wetG})}; }
 new ResizeObserver(()=>{ resize(); placeStations(); }).observe(field);
-if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(()=>{ drawStatic(); renderPad(); }); if(document.fonts.load) document.fonts.load("700 80px 'Noto Sans JP'",WORDS.map(w=>w.w).join('')).catch(()=>{}); }
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{ drawStatic(); renderPad(); });
 if(window.claude?.hot?.ready) window.claude.hot.ready(start); else start(window.claude?.hot?.data||null);
 })();
 </script>
