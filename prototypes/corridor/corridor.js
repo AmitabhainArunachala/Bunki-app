@@ -7847,15 +7847,20 @@ function readerDateStamp(day) {
 function learnerSourceLabel(p) {
   return String(p.sourceLabel || '').replace(/\s*·\s*検収前/gu, '').replace(/^N3書き換え\s*·\s*/u, '').trim();
 }
-/** The level a learner filters by: the JLPT vocabulary estimate, with the sentence band beside it. */
+/** A story's one level (N, 2026-10-17: one level per card): the level its text was written for where the record carries
+ * it (authorLevel, the level its reviewers accepted), else the JLPT vocabulary estimate; the sentence band beside it. */
 function levelChip(p, extra = '') {
   const jlpt = p.readingFacets?.jlpt;
+  const authored = /^N[1-5]\+?$/u.test(p.authorLevel || '') ? p.authorLevel : '';
+  const level = authored || jlpt;
   const lv = levelPhrase(p.grading);
-  const chip = el('span', `level-chip${extra ? ` ${extra}` : ''}`, jlpt || (bi() ? lv.level : lv.ja));
-  if (jlpt) chip.dataset.level = jlpt;
-  chip.title = jlpt
-    ? tx(`JLPT ${jlpt} 程度の語彙（目安）· 文の難しさ ${lv.ja}`, `JLPT ${jlpt} vocabulary (estimate) · sentences ${lv.level}`)
-    : tx(`文の難しさ ${lv.ja}`, `sentences ${lv.level}`);
+  const chip = el('span', `level-chip${extra ? ` ${extra}` : ''}`, level || (bi() ? lv.level : lv.ja));
+  if (level) chip.dataset.level = level.replace(/\+$/u, '');
+  chip.title = authored
+    ? tx(`レベル ${authored} · 文の難しさ ${lv.ja}`, `Level ${authored} · sentences ${lv.level}`)
+    : jlpt
+      ? tx(`JLPT ${jlpt} 程度の語彙（目安）· 文の難しさ ${lv.ja}`, `JLPT ${jlpt} vocabulary (estimate) · sentences ${lv.level}`)
+      : tx(`文の難しさ ${lv.ja}`, `sentences ${lv.level}`);
   return chip;
 }
 const TOPIC_KICKERS = {
