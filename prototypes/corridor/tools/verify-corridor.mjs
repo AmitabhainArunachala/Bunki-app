@@ -695,8 +695,9 @@ async function main() {
       sectionProbe.ids.length === shelfData.length + sectionProbe.today,
     `${sectionProbe.unique}/${sectionProbe.ids.length} unique stories · ${shelfData.length} grid cards + ${sectionProbe.today} of today’s six`);
 
-  // the glossary is billed as itself: one-line definitions wear the 用語集 kicker, and the shelf's
-  // one tally counts every story and says how many of them are glossary entries
+  // N (2026-10-17) rewrites the pin "glossary rows wear Glossary, and the tally names its glossary entries": the ten
+  // one-line definitions left the shelf through the cull queue (not articles) — none wears the kicker, and the one tally
+  // counts every story and names no glossary entry
   const glossaryProbe = await page.evaluate(`(() => {
     const cards = [...document.querySelectorAll('#shelf-reading-results .shelf-item')];
     const glossary = cards.filter((n) => n.querySelector('.story-kicker .l-ja')?.textContent === 'Glossary');
@@ -710,9 +711,9 @@ async function main() {
     return m ? { total: Number(m[1] ?? m[3]), glossary: Number(m[2] ?? m[4] ?? 0) } : null;
   };
   const billed = readTally(glossaryProbe.intro), resulted = readTally(glossaryProbe.results);
-  check('glossary rows wear Glossary, and the one tally counts every story and names its glossary entries',
-    glossaryProbe.glossary > 0 && billed?.total === glossaryProbe.cards && billed?.glossary === glossaryProbe.glossary &&
-      JSON.stringify(resulted) === JSON.stringify(billed),
+  check('no glossary definition stands on the shelf, and the one tally counts every story and names no glossary entry',
+    glossaryProbe.cards > 0 && glossaryProbe.glossary === 0 && billed?.total === glossaryProbe.cards && billed?.glossary === 0 &&
+      !/用語集|word definitions|glossary/iu.test(`${glossaryProbe.intro} ${glossaryProbe.results}`) && JSON.stringify(resulted) === JSON.stringify(billed),
     `${glossaryProbe.glossary} glossary of ${glossaryProbe.cards} stories · masthead "${glossaryProbe.intro}" · results "${glossaryProbe.results}"`);
   await openShelfTools(page);
   await page.locator('#shelf-reading-search').fill('no-matching-reading-fixture-zz987');
@@ -742,40 +743,19 @@ async function main() {
     ordinalCapable >= 2 ? flagged >= 0 : flagged === 0,
     `${flagged} flagged; ${ordinalCapable} articles with >=2 ordinal signals`);
 
-  // glossary cross-references resolve or fall silent: a citation whose
-  // target stands on this shelf becomes a live door; one into the missing
-  // rest of the glossary drops its number — no dead "(No.NN)" survives
-  const inkanIndex = shelfData.findIndex((s) => s.title === '印鑑登録証');
-  check('the cross-referencing glossary entry stands on the shelf', inkanIndex >= 0,
-    `shelf index ${inkanIndex}`);
-  await tap(page, '.shelf-item:not([data-recommendation])', inkanIndex);
-  await settleReader(page);
-  const refProbe = await page.evaluate(`(() => {
-    const reader = document.getElementById('reader');
-    const doors = [...reader.querySelectorAll('.glossary-ref')];
-    return {
-      text: reader.textContent,
-      doors: doors.length,
-      targets: doors.map((d) => d.dataset.glossaryRef),
-    };
-  })()`);
-  check('no dead (No.NN) citation survives into the read',
-    refProbe.text.length > 0 && !/No\s*\.\s*[0-9]/.test(refProbe.text),
-    `${refProbe.text.replace(/\s+/g, '').slice(0, 48)}…`);
-  check('the in-shelf citation is a live door to its glossary entry',
-    refProbe.doors === 1 && refProbe.targets[0] === 'yasashii:6',
-    `doors → ${refProbe.targets.join(', ') || 'none'}`);
-  await page.evaluate(`document.querySelector('#reader .glossary-ref')?.click()`);
-  await page
-    .waitForFunction(
-      `document.querySelector('h1.view-title')?.textContent === '印鑑登録証明書'`,
-      null,
-      { timeout: 8000 },
-    )
-    .catch(() => {});
-  const refLanded = await page.evaluate(`document.querySelector('h1.view-title')?.textContent ?? ''`);
-  check('the glossary door opens the entry it names', refLanded === '印鑑登録証明書',
-    `landed on "${refLanded}"`);
+  // N (2026-10-17) rewrites the pins of the glossary's cross-references ("the cross-referencing entry 印鑑登録証 stands
+  // on the shelf", "its (No.6) citation is a live door to yasashii:6", "the door opens 印鑑登録証明書", "no dead (No.NN)
+  // survives into its read"): the cited glossary left the shelf with every entry that cited it. The new truth, as
+  // strictly: neither entry stands on the shelf or in its index, and no text the shelf can open carries a (No.NN)
+  // citation at all — so no door, live or dead, is left to draw.
+  const glossaryGone = SHELF_INDEX.articles.filter((row) => row.source === 'isa-yasashii-glossary' || /^yasashii:/u.test(row.id)).map((row) => row.id);
+  const inkanIndex = shelfData.findIndex((s) => s.title === '印鑑登録証' || s.title === '印鑑登録証明書');
+  check('the cross-referencing glossary entries stand nowhere on the shelf or in its index',
+    inkanIndex === -1 && glossaryGone.length === 0, `shelf index ${inkanIndex} · index rows ${glossaryGone.join(', ') || 'none'}`);
+  const citing = SHELF_INDEX.articles.filter((row) => !String(row.file || '').startsWith('archive/')).filter((row) =>
+    /No\s*\.\s*[0-9]/.test(JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'data/articles', row.file), 'utf8')).text));
+  check('no text on the shelf carries a (No.NN) glossary citation',
+    citing.length === 0, citing.map((row) => row.id).slice(0, 4).join(', ') || `${SHELF_INDEX.articles.length} texts clean`);
   await open('?entry=shelf');
 
   // the raw instrument is one 詳細 tap away, not gone — and it must include

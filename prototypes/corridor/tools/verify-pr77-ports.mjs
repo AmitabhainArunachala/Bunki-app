@@ -245,9 +245,17 @@ PROBES['review-reason'] = async () => {
   check('d9f0b984 (S) · a row awaiting human review opens with no provenance mark or review note',
     human.eyebrow.length > 0 && !marked(human), JSON.stringify(human).slice(0, 400));
   await page.click('#back');
-  const rights = await openRow(page, 'yasashii:1');
-  check('d9f0b984 (S) · a row held for its rights opens with no pending note and no other source\'s story',
-    rights.eyebrow.length > 0 && !marked(rights), JSON.stringify(rights).slice(0, 400));
+  // N (2026-10-17) rewrites the pin "yasashii:1, a row held for its rights, opens with no pending note": the ten
+  // rights-held glossary rows left the shelf through the cull queue, so no shelf row is held for its rights any longer;
+  // the new kind of row — an original whose review state (two model families, John's own read) lives only in its
+  // authoring record — is opened in its place and must read the same
+  const shelfIndex = JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'data/articles/index.json'), 'utf8'));
+  const rightsHeld = shelfIndex.articles.filter((row) => row.review === 'rights-review-pending').map((row) => row.id);
+  check('d9f0b984 (N) · no shelf row is held for its rights any longer (the ten held glossary rows were culled)',
+    rightsHeld.length === 0, rightsHeld.join(', '));
+  const original = await openRow(page, 'aozora:049966-1');
+  check('d9f0b984 (N) · an original still awaiting John\'s own read opens with no provenance mark or review note',
+    original.eyebrow.length > 0 && !marked(original), JSON.stringify(original).slice(0, 400));
   await page.click('#back');
   const approved = await openRow(page, 'bunki-graded-n3-zoka-sanjin-morning');
   check('d9f0b984 (S) · an approved row reads the same (control: the probe opened a real row each time)',

@@ -39,14 +39,22 @@ const filter = process.argv.find((arg) => arg.startsWith('--case='))?.slice(7);
 // server and browser start inside the receipt's try below, so a launch failure still writes JSON
 let server = null, base = null, browser = null;
 const results = [];
-// synthetic Kore narration: yasashii:7 has three clips, so a stop at the second is visible as a third never asked for
+// N (2026-10-17) rewrites the fixture pin "yasashii:7 and yasashii:6 stand on the shelf, one a glossary-ref door from the
+// other": the ten glossary definitions left the shelf through the cull queue. The two passages are now a shelf story and
+// its N3 rewrite, and the reader's own version switch (原文 / やさしい版, which calls openPassage without leaving the
+// reader, as the glossary door did) is the door between them.
+const FIRST = 'govonline:article-202609-radio-3741';
+const OTHER = `adapt-n3:${FIRST}`;
+const clipName = (passage, i) => `${passage.replaceAll(':', '_')}-${String(i).padStart(3, '0')}.m4a`;
+const clipAt = (passage, i) => new RegExp(`${clipName(passage, i).replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')}$`, 'u');
+// synthetic Kore narration: FIRST has three clips, so a stop at the second is visible as a third never asked for
 const kore = (passage, n) => Array.from({ length: n }, (_, i) =>
-  ({ text: `${passage} sentence ${i + 1}`, src: `audio/narration/kore/${passage.replace(':', '_')}-${String(i).padStart(3, '0')}.m4a` }));
-const narration = { v: 1, voice: 'kore', articles: { 'yasashii:7': { clips: kore('yasashii:7', 3) }, 'yasashii:6': { clips: kore('yasashii:6', 2) } } };
-// yasashii:7 absent from a manifest that exists: the article is simply not narrated yet
-const partialNarration = { v: 1, voice: 'kore', articles: { 'yasashii:6': { clips: kore('yasashii:6', 2) } } };
+  ({ text: `${passage} sentence ${i + 1}`, src: `audio/narration/kore/${clipName(passage, i)}` }));
+const narration = { v: 1, voice: 'kore', articles: { [FIRST]: { clips: kore(FIRST, 3) }, [OTHER]: { clips: kore(OTHER, 2) } } };
+// FIRST absent from a manifest that exists: the article is simply not narrated yet
+const partialNarration = { v: 1, voice: 'kore', articles: { [OTHER]: { clips: kore(OTHER, 2) } } };
 // the withdrawn F1 voice, shaped exactly like an approved manifest: it must never open the bar
-const withdrawnNarration = { v: 1, voice: 'f1', articles: { 'yasashii:7': { clips: kore('yasashii:7', 3)
+const withdrawnNarration = { v: 1, voice: 'f1', articles: { [FIRST]: { clips: kore(FIRST, 3)
   .map((clip) => ({ ...clip, src: clip.src.replace('/kore/', '/f1/') })) } } };
 // two answer cards whose words are recorded in the approved voice (ids from the shipped manifest)
 const CARD_WORDS = [['会う', 'f4c916752a'], ['青', '1ca69c4be0']];
@@ -183,8 +191,9 @@ async function fixture(mode) {
   return f;
 }
 async function openPassage(page) {
-  await page.locator('[data-passage="yasashii:7"] .shelf-open').click();
-  await page.waitForSelector('#reader .glossary-ref');
+  await page.locator(`[data-passage="${FIRST}"]:not([data-recommendation]) .shelf-open`).click();
+  await page.waitForSelector(`#reader .tok`);
+  await page.waitForSelector(`.version-choice[data-version="${OTHER}"]`);
 }
 
 /** The bar's one mark (John, 2026-10-15 17:20): folded, it is the whole bar — 44 px, the only thing drawn; a tap opens
@@ -228,8 +237,8 @@ async function counts(page) {
   }));
 }
 async function switchPassage(page) {
-  await page.locator('#reader [data-glossary-ref="yasashii:6"]').click();
-  await page.waitForFunction(() => document.querySelector('h1.view-title')?.textContent === '印鑑登録証明書' && document.querySelector('#reader .tok'));
+  await page.locator(`.version-choice[data-version="${OTHER}"]`).click();
+  await page.waitForFunction((id) => document.querySelector('.listen-row[data-passage]')?.dataset.passage === id && document.querySelector('#reader .tok'), OTHER);
 }
 async function started(page, type, length = 1) {
   await page.waitForFunction(({ type, length }) => window.__playbackFixture[type].length === length, { type, length }, { timeout: 5000 });
@@ -333,11 +342,11 @@ try {
   await check('an-unnarrated-article-in-a-present-manifest-is-the-pending-line', 'narration-partial', async (f) => {
     const { page } = f;
     await manifestSettled(f, '__narrationConsumed');
-    assert.equal(await barShut(page), true, 'yasashii:7 has no clip: nothing to press');
+    assert.equal(await barShut(page), true, `${FIRST} has no clip: nothing to press`);
     assert.match((await counts(page)).note, PENDING);
     // positive control: the narrated article beside it opens its bar in the locked voice
     await switchPassage(page);
-    assert.equal(await barShut(page), false, 'yasashii:6 is narrated: its bar can open');
+    assert.equal(await barShut(page), false, `${OTHER} is narrated: its bar can open`);
     const live = await markState(page);
     assert.equal(folded(live) && !live.pending && live.markDisabled === null && live.expanded === 'false' && live.markDim === 1 && live.tab === 0, true,
       `narrated, the bar stands folded to its live mark (a stop on the keyboard's way) until a tap: ${JSON.stringify(live)}`);
@@ -418,7 +427,7 @@ try {
     assert.doesNotMatch(active.note, FAILED, 'a stale failure does not stop the live read');
     await page.evaluate(() => window.__playbackFixture.clips[1].onended());
     await started(page, 'clips', 3);
-    assert.match((await counts(page)).clips[2].src, /yasashii_7-001\.m4a$/u);
+    assert.match((await counts(page)).clips[2].src, clipAt(FIRST, 1));
   });
   await check('reader-settings-keep-the-active-recording-playing', 'narration', async ({ page }) => {
     await press(page);
@@ -445,7 +454,7 @@ try {
     assert.equal(active.clips.length, 2);
     await page.evaluate(() => window.__playbackFixture.clips[1].onended());
     await started(page, 'clips', 3);
-    assert.match((await counts(page)).clips[2].src, /yasashii_6-001\.m4a$/u);
+    assert.match((await counts(page)).clips[2].src, clipAt(OTHER, 1));
   });
   await check('late-manifest-opens-listen-for-the-current-passage', 'narration-delayed', async (f) => {
     const { page, release } = f;
@@ -458,7 +467,7 @@ try {
     await started(page, 'clips');
     const active = await counts(page);
     assert.equal(active.clips.length, 1);
-    assert.match(active.clips[0].src, /yasashii_6-000\.m4a$/u);
+    assert.match(active.clips[0].src, clipAt(OTHER, 0));
     assert.equal(active.pressed, 'true');
   });
   await check('a-press-on-the-pending-mark-starts-nothing-later', 'narration-delayed', async (f) => {
@@ -491,7 +500,7 @@ try {
     await page.evaluate(() => new Promise((done) => setTimeout(done, 600)));
     const after = await counts(page);
     assert.equal(after.clips.length, 2, 'the read stops at the failed sentence; the third clip is never requested');
-    assert.match(after.clips[1].src, /yasashii_7-001\.m4a$/u);
+    assert.match(after.clips[1].src, clipAt(FIRST, 1));
     assert.match(after.note, FAILED, 'a mid-passage failure is named');
   });
   await check('a-failure-note-does-not-follow-to-another-article', 'narration', async ({ page }) => {
@@ -501,7 +510,7 @@ try {
     await page.waitForFunction((re) => new RegExp(re, 'u').test(document.querySelector('#listen-note')?.textContent || ''), FAILED.source, { timeout: 5000 });
     await switchPassage(page);
     const other = await counts(page);
-    assert.doesNotMatch(other.note, FAILED, 'yasashii:6 never failed; it must not inherit yasashii:7\'s note');
+    assert.doesNotMatch(other.note, FAILED, `${OTHER} never failed; it must not inherit ${FIRST}'s note`);
     assert.equal(other.note, 'Kore', 'the other article names its voice');
     assert.equal(await barShut(page), false, 'the other narrated article stays playable');
   });
@@ -517,7 +526,7 @@ try {
     const after = await counts(page);
     assert.doesNotMatch(after.note, FAILED, 'a new press is a fresh start, not the old failure');
     assert.equal(after.pressed, 'true');
-    assert.match(after.clips[2].src, /yasashii_7-001\.m4a$/u, 'the read resumes at the sentence that failed');
+    assert.match(after.clips[2].src, clipAt(FIRST, 1), 'the read resumes at the sentence that failed');
   });
   await check('a-complete-read-returns-the-bar-to-its-start-and-writes-no-preference', 'narration', async ({ page }) => {
     await press(page);
@@ -533,7 +542,7 @@ try {
     assert.equal(await page.evaluate(() => localStorage.getItem('kairo-rec-voice-v1')), null, 'listening writes no voice preference');
     await press(page);
     await started(page, 'clips', 4);
-    assert.match((await counts(page)).clips[3].src, /yasashii_7-000\.m4a$/u, 'the next read starts at the first sentence');
+    assert.match((await counts(page)).clips[3].src, clipAt(FIRST, 0), 'the next read starts at the first sentence');
   });
   for (const [name, mode, expect] of [
     ['a-late-manifest-refreshes-the-row-and-keeps-focus-and-place', 'narration-delayed', { shut: false, note: /^Kore$/u }],
@@ -543,7 +552,8 @@ try {
       const { page, release } = f;
       assert.match((await counts(page)).note, PENDING, 'the row starts as the pending line while narration loads');
       const before = await page.evaluate(() => {
-        const refs = [...document.querySelectorAll('#reader .glossary-ref')];
+        // a control in the text itself, as the glossary door was: the second word button of the read
+        const refs = [...document.querySelectorAll('#reader .tok')];
         const target = refs[Math.min(1, refs.length - 1)];
         target.dataset.focusProbe = '1';
         target.focus();
@@ -560,7 +570,7 @@ try {
         row: document.querySelector('.listen-row')?.getBoundingClientRect().height ?? 0, passage: document.querySelector('h1.view-title')?.textContent,
         note: document.querySelector('#listen-note')?.textContent || '',
       }));
-      assert.equal(after.focusKept, true, 'the focused glossary control is the same node, still focused');
+      assert.equal(after.focusKept, true, 'the focused word in the text is the same node, still focused');
       // the only movement allowed is the listen row's own change of height (scroll anchoring may absorb even that)
       const allowed = Math.abs(after.row - before.row) + 2;
       assert.ok(Math.abs(after.top - before.top) <= allowed, `reading place kept (probe top ${before.top} → ${after.top}, allowed ${allowed})`);

@@ -149,10 +149,15 @@ async function lastPressMs(page) {
   return page.evaluate(() => window.__a11yLastPressMs ?? null);
 }
 
+// N (2026-10-17) rewrites the pin "the shelf's first card is a news story whose third word is an ordinary dictionary
+// word": the newest drop now leads the shelf, and its lead turns daily (the third word of today's lead is 月 in a date, a
+// counter held until the full dictionary answers). The walk opens one story by id — the index's own first row, as
+// verify-corridor addresses its first text — never by shelf position.
+const FIRST_ID = JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'data/articles/index.json'), 'utf8')).articles[0].id;
 async function openReader(page, base) {
   await page.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30_000 });
-  await page.locator('.shelf-item').first().click();
+  await page.locator(`.shelf-item[data-passage="${FIRST_ID}"]:not([data-recommendation]) .shelf-open`).click();
   await page.waitForSelector('#reader .tok.content');
   await page.waitForFunction('document.querySelectorAll("#reader .tok.content").length > 10');
 }

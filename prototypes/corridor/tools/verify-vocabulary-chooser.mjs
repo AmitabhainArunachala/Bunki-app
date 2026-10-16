@@ -163,22 +163,28 @@ try {
         const stories = articles.filter(item => !(item.adaptation?.basedOn && standing.has(item.adaptation.basedOn)));
         assert.equal(new Set(ids).size, ids.length, 'Each story has exactly one card across the grid and today’s six');
         assert.deepEqual([...ids].sort(), stories.map(item => item.id).sort(), 'The grid carries every bundled story once');
+        // N (2026-10-17) rewrites two pins of the old shelf: "ten glossary definitions stand on it" and "a search for
+        // 育児休業 finds two of them". The ten left through the cull queue as not articles: none stands, the one tally
+        // names none, and the search is pinned on the new shelf's own rows — exactly the stories the shelf's own
+        // filter takes (title, English title, snippet, topics), the three Nobel pieces among them.
         const glossaryIds = new Set(stories.filter(item => item.source === 'isa-yasashii-glossary').map(item => item.id));
-        assert.equal(glossaryIds.size, 10);
-        // the shelf's one tally counts every story and says how many are glossary entries
+        assert.equal(glossaryIds.size, 0, 'no glossary definition stands on the shelf');
         const tally = (total, glossary) => glossary
           ? [`読み物 ${total} 本（うち用語集 ${glossary}）`, `${total} articles, ${glossary} of them short word definitions`]
           : [`読み物 ${total} 本`, `${total} articles`];
-        assert(tally(stories.length, glossaryIds.size).includes((await page.locator('.shelf-results-count').textContent()).trim()));
+        assert(tally(stories.length, 0).includes((await page.locator('.shelf-results-count').textContent()).trim()));
         await openShelfTools(page);
-        await page.locator('#shelf-reading-search').fill('育児休業');
+        const term = 'ノーベル';
+        const expected = stories.filter(item => `${item.title} ${item.titleEn || ''} ${item.snippet || ''} ${(item.readingFacets?.topics || []).join(' ')}`
+          .toLocaleLowerCase().includes(term.toLocaleLowerCase())).map(item => item.id).sort();
+        await page.locator('#shelf-reading-search').fill(term);
         await page.locator('#shelf-reading-search').press('Enter');
         const filtered = await page.locator('#shelf-reading-results .shelf-item').evaluateAll(nodes => nodes.map(node => node.dataset.passage));
         assert(filtered.length < ids.length);
-        assert(filtered.includes('yasashii:1') && filtered.includes('yasashii:2'));
+        assert(['bunki-read-n1-soai-nobel', 'bunki-read-n1-optogenetics-nobel', 'bunki-read-n1-nobel-economics'].every(id => filtered.includes(id)));
+        assert.deepEqual([...filtered].sort(), expected, 'the search keeps exactly the stories the shelf filter names');
         assert.equal(new Set(filtered).size, filtered.length);
-        const glossary = filtered.filter(id => glossaryIds.has(id)).length;
-        assert(tally(filtered.length, glossary).includes((await page.locator('.shelf-results-count').textContent()).trim()));
+        assert(tally(filtered.length, 0).includes((await page.locator('.shelf-results-count').textContent()).trim()));
         return { stories: stories.length, glossary: glossaryIds.size, uniqueCards: ids.length, search: filtered };
       });
       await check('popup-cancel-direct-save-and-three-context-scopes', async page => {

@@ -19,8 +19,8 @@
  *                         "picture".src, loaded, decorative inside the card) where it has one, else a
  *                         calm block whose only words are its topic in small type (never a kanji, no
  *                         larger than 16 px). Every card has a kicker, the headline, a level chip and
- *                         in English its English line; the lead adds its first sentence. The short
- *                         word definitions carry no picture and stand in their own band. The 永 seal
+ *                         in English its English line; the lead adds its first sentence. No short word
+ *                         definition stands on the shelf (N, 2026-10-17: culled as not articles). The 永 seal
  *                         sits inside the 本棚 title, ≤ 48 px. Control: 2ae957bb, whose cards had no
  *                         picture slot at all.
  *   T1 tools (glance)   — (glance pass 2026-10-01) the shelf's study tools sit behind ONE visible
@@ -572,7 +572,9 @@ try {
             lede: lead?.querySelector('.story-lede')?.textContent ?? '', sealInTitle: !!seal?.closest('.shelf-mast-title'),
             seal: sealBox ? Math.round(Math.max(sealBox.width, sealBox.height)) : 0 };
         });
-        assert(probe.cards > 20 && probe.articles > 20 && probe.definitions > 0, `only ${probe.cards} cards, ${probe.definitions} word definitions`);
+        // N (2026-10-17) rewrites the pin "word definitions stand on the shelf, in their own band": the ten left through
+        // the cull queue as not articles — none stands, and every card is an article wearing its picture slot
+        assert(probe.cards > 20 && probe.articles === probe.cards && probe.definitions === 0, `${probe.cards} cards, ${probe.articles} articles, ${probe.definitions} word definitions`);
         assert.equal(probe.badCount, 0, `picture slots wrong: ${probe.bad.join(' | ')}`);
         assert(probe.named > 0 && probe.pictured === probe.named, `${probe.pictured} of the ${probe.named} pictures the index names stand on their cards`);
         assert.equal(probe.incompleteCount, 0, `cards missing kicker, headline, English line or level: ${probe.incomplete.join(', ')}`);
