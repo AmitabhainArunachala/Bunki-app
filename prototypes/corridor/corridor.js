@@ -8028,30 +8028,23 @@ document.addEventListener(
 let miniOnClose = null;
 let miniDiving = false; // the slip is opening the full entry (the band, the second tap)
 const slipSummons = []; // the onClose of every slip whose entry is open, called when the entry closes
-/* G1 · a slip diving into its page closes at once (its surface hears 'dive', its anchor and door are let go), but its
- * element stays on the glass, inert and marked leaving, until the page's view transition has captured it: the slip's
- * headword is the match cut's source. The transition's update takes it away (enterWord). */
-function removeMini(reason = miniDiving ? 'dive' : 'dismiss', { forCut = false } = {}) {
+function removeMini() {
   closeVocabularyListPopover();
   const slip = document.getElementById('mini');
-  if (slip && forCut) {
-    slip.dataset.leaving = '';
-    slip.inert = true;
-  } else slip?.remove();
+  slip?.remove();
   miniAnchor = null;
   miniEntry = null;
   const closing = miniOnClose;
   miniOnClose = null;
   if (!slip || !closing) return;
-  if (reason === 'dive') slipSummons.push(closing);
-  closing(reason);
+  if (miniDiving) slipSummons.push(closing);
+  closing(miniDiving ? 'dive' : 'dismiss');
 }
-/** The slip that stands for a word now: never one already leaving into its page. */
+/** The slip that stands for a word now. */
 function standingSlip() {
-  const slip = document.getElementById('mini');
-  return slip && !slip.hasAttribute('data-leaving') ? slip : null;
+  return document.getElementById('mini');
 }
-/** The standing slip's headword: the match cut's source when the slip is the door into the page. */
+/** The standing slip's headword: where the word leaves from when the slip is the door into the page. */
 function slipHeadword() {
   return standingSlip()?.querySelector('.mini-word') || null;
 }
@@ -27949,7 +27942,7 @@ function refreshWordSheet(node) {
   }
   // a page still arriving takes what arrived once its cut has finished
   if (pageTransition) {
-    pageTransition.vt.finished.catch(() => {}).finally(() => refreshWordSheet(node));
+    pageTransition.done.then(() => refreshWordSheet(node));
     return;
   }
   const live = document.getElementById('sheet');
@@ -30853,103 +30846,102 @@ function renderLayer({ prebuilt = null } = {}) {
   syncWalkSentinel();
 }
 
-/* ---------------------------------------------- G1 · arrival as a match cut (BRIEF D4)
- * A same-document view transition: the source — the slip's headword when the slip is the door, else the tapped word —
- * carries word-hero at capture and the page's headword carries it after; the layer the page covers recedes a step
- * toward the source (kairo-paper). Back runs the reverse when the source still stands, else a cross-fade. The state
- * changes inside the transition's update, as a room's does (roomTransition). Reduced motion, a hidden document or a
- * browser without view transitions: the page changes at once (C's one rule fades it in 120 ms). The keyboard (Escape,
- * Enter on a door, Ctrl+Enter) and the device's own Back change it at once too: the keyboard's next key lands on the room
- * that is really there, and the phone's back swipe has already moved the screen. Names and keyframes: one block in
- * editorial.css, beside the page (rooms/motion.css is copied byte for byte into the Kotoba study pages). */
-let pageTransition = null; // { vt, run }: the cut still running, and its update (run once, whoever runs it first)
-const heroSource = new WeakMap(); // stack node → the element its page was entered from (the reverse cut's target)
+/* ---------------------------------------------- G1 · arrival as a match cut (BRIEF D4) — G1b: one travelling word
+ * The page is on the glass at once, opaque and whole, and only the word travels: a copy of the page's headword (its
+ * font, its colour) is drawn where the word stood — the slip's headword when the slip is the door, else the tapped word —
+ * and played home with transform alone (--motion-sheet, --ease-enter), above everything; the headword itself waits
+ * unseen beneath it (opacity 0, still live) and shows the moment the copy lands. Back is the same in reverse: the page
+ * is gone at once and its headword travels home to the word it was entered from, which waits unseen, taps and all, until
+ * it lands. One body of text on the glass at a time (John's "jaggedness": G1's cut faded a snapshot of the whole screen
+ * — the reader and its card — over the arriving page), and nothing is captured: that snapshot's teardown was the longest
+ * frame of every cut (one-hand/G1/probe/g1b/vt-phases-site4.json: the frame holding the view transition's finish,
+ * 88–125 ms in WebKit). Reduced motion, a hidden document, a browser without Web Animations, the keyboard (Escape, Enter
+ * on a door, Ctrl+Enter) and the device's own Back change the page at once with nothing travelling: the keyboard's next
+ * key lands on the room that is really there, and the phone's back swipe has already moved the screen (C's one rule fades
+ * the page in 120 ms under reduced motion). */
+let pageTransition = null; // { flight, done, finish }: the word still travelling
+const heroSource = new WeakMap(); // stack node → the element its page was entered from (where Back's word goes home)
 const keptPages = new WeakMap(); // stack node → { page, epoch }: a page a deeper one covered, mounted again by Back
 function pageCutAllowed() {
-  return typeof document.startViewTransition === 'function' && !document.hidden &&
+  return typeof Element.prototype.animate === 'function' && !document.hidden &&
     !(typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 }
 /** The page's headword: a word's h2, a kanji's glyph, else the page's first heading. */
 function heroOf(page) {
   return page?.querySelector('.headword, .hero-glyph, h2') || null;
 }
-function cutName(element, name) {
-  if (!element) return;
-  if (name) element.style.viewTransitionName = name;
-  else element.style.removeProperty('view-transition-name');
-}
-/** End a cut still running: its update runs now if it has not, and its animation stops. */
+/** End a word still travelling: it lands at once. */
 function finishPageTransition() {
   const running = pageTransition;
   if (!running) return;
   pageTransition = null;
-  running.run();
-  try { running.vt.skipTransition(); } catch { /* already finished */ }
+  running.finish();
 }
-/** Where the receding paper is scaled from: the source's centre on the screen (the root's snapshot is the viewport). */
-function paperOrigin(source) {
-  const html = document.documentElement;
-  if (!source) { html.style.removeProperty('--paper-origin'); return; }
-  const s = source.getBoundingClientRect();
-  html.style.setProperty('--paper-origin', `${Math.round(s.left + s.width / 2)}px ${Math.round(s.top + s.height / 2)}px`);
-}
-/** Where Back's word lands: a stand-in laid exactly over the word the page was entered from, carrying word-hero, while
- * the word itself stays live and transparent until the cut ends — an element the cut captures takes no taps while it
- * runs, and the word must answer the very next tap. Null when the word is not on the screen. */
-function cutLanding(target) {
-  const box = target.getBoundingClientRect();
-  if (!box.width || !box.height || box.bottom < 0 || box.top > innerHeight) return null;
-  const style = getComputedStyle(target);
-  const copy = target.cloneNode(true);
-  for (const hidden of copy.querySelectorAll('rt, .tok-en, .tok-state, .visually-hidden')) hidden.remove();
-  const landing = el('span', 'cut-landing', copy.textContent.trim());
-  landing.setAttribute('aria-hidden', 'true');
-  landing.lang = 'ja';
-  Object.assign(landing.style, {
-    position: 'fixed', left: `${box.left}px`, top: `${box.top}px`, width: `${box.width}px`, height: `${box.height}px`,
-    display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0', padding: '0', pointerEvents: 'none',
-    font: style.font, color: style.color, letterSpacing: style.letterSpacing, whiteSpace: 'nowrap',
-  });
-  document.body.append(landing);
-  target.style.opacity = '0';
-  return { landing, done: () => { landing.remove(); target.style.removeProperty('opacity'); } };
-}
-/** Run a page change inside one cut (or at once when there is none). `names` are set before the capture; `after`
- * names the new state inside the update; every name is cleared when the cut ends, and `onEnd` runs then. */
-function runPageCut(change, { names = [], after = () => [], instant = false, onEnd = () => {} } = {}) {
-  finishPageTransition();
-  if (instant || !pageCutAllowed()) { change(); onEnd(); return null; }
-  const named = [];
-  for (const [element, name] of names) if (element) { cutName(element, name); named.push(element); }
-  let ran = false;
-  const run = () => {
-    if (ran) return;
-    ran = true;
-    for (const element of named) cutName(element, '');
-    change();
-    for (const [element, name] of after()) if (element?.isConnected) { cutName(element, name); named.push(element); }
-  };
-  let vt;
-  try {
-    vt = document.startViewTransition(run);
-  } catch {
-    run();
-    onEnd();
-    return null;
+/** Where a word's own glyphs stand on the screen — its text, not its box (a heading is a whole line, a door has padding):
+ * the union of its text's boxes, its readings, glosses and a headword's other spellings left out. Null when it has no
+ * text on the screen. */
+const GLYPH_SKIP = 'rt, rp, .tok-en, .tok-state, .visually-hidden, .headword-alt';
+function glyphBox(element) {
+  if (!element?.isConnected) return null;
+  const range = document.createRange();
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+  let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity, text = '';
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (!node.nodeValue.trim() || node.parentElement?.closest(GLYPH_SKIP)) continue;
+    range.selectNodeContents(node);
+    for (const box of range.getClientRects()) {
+      if (!box.width || !box.height) continue;
+      left = Math.min(left, box.left); top = Math.min(top, box.top);
+      right = Math.max(right, box.right); bottom = Math.max(bottom, box.bottom);
+    }
+    text += node.nodeValue;
   }
-  const entry = { vt, run };
-  pageTransition = entry;
-  vt.ready.catch(() => {});
-  vt.finished.catch(() => {}).finally(() => {
-    for (const element of named) cutName(element, '');
-    if (pageTransition === entry) pageTransition = null;
-    onEnd();
+  if (!Number.isFinite(left) || bottom <= 0 || top >= innerHeight || right <= 0 || left >= innerWidth) return null;
+  return { left, top, width: right - left, height: bottom - top, text: text.trim() };
+}
+/** The word travels: a copy of `target`'s word in its font and colour, drawn over everything where the word stood
+ * (`leaves`, a glyph box) and played home to where `target` shows it, by transform alone; `target` waits unseen (opacity
+ * 0, still live) and shows the moment the copy lands. Null when there is no road (an end off the screen). */
+function flyWord(leaves, target) {
+  const lands = leaves && glyphBox(target);
+  if (!lands?.text || !lands.height || !leaves.height) return null;
+  const style = getComputedStyle(target);
+  const word = el('span', 'cut-word', lands.text);
+  word.setAttribute('aria-hidden', 'true');
+  word.lang = target.closest('[lang]')?.lang || 'ja';
+  // its station is editorial.css's .cut-word; its face is the word's own
+  Object.assign(word.style, {
+    left: `${lands.left}px`, top: `${lands.top}px`,
+    fontFamily: style.fontFamily, fontSize: style.fontSize, fontWeight: style.fontWeight, fontStyle: style.fontStyle,
+    fontFeatureSettings: style.fontFeatureSettings, letterSpacing: style.letterSpacing, lineHeight: style.lineHeight,
+    color: style.color,
   });
-  return vt;
+  document.body.append(word);
+  // the copy's glyphs onto the word's (a line box carries its leading above the glyphs), and its scale about them
+  const own = glyphBox(word);
+  if (own) {
+    word.style.left = `${2 * lands.left - own.left}px`;
+    word.style.top = `${2 * lands.top - own.top}px`;
+  }
+  const box = word.getBoundingClientRect();
+  word.style.transformOrigin = `${lands.left - box.left}px ${lands.top - box.top}px`;
+  const flight = word.animate([
+    { transform: `translate(${leaves.left - lands.left}px, ${leaves.top - lands.top}px) scale(${leaves.height / lands.height})` },
+    { transform: 'none' },
+  ], { duration: motionMs('--motion-sheet', 320), easing: motionEase('--ease-enter'), id: 'kairo-cut' });
+  target.style.opacity = '0';
+  const land = () => {
+    if (pageTransition?.flight === flight) pageTransition = null;
+    word.remove();
+    target.style.removeProperty('opacity');
+  };
+  const done = flight.finished.then(land, land);
+  pageTransition = { flight, done, finish: () => { try { flight.finish(); } catch { flight.cancel(); } } };
+  return flight;
 }
 
 /** The page arrives. Called by go() after its bookkeeping; pushes the node (the page built ahead for it, when one is
- * waiting) and mounts its page by the layer, or by render() in the rooms that keep it. */
+ * waiting), mounts its page by the layer, or by render() in the rooms that keep it, and the word travels. */
 function enterWord(node, { from = null, invoker = null, instant = false } = {}) {
   finishPageTransition();
   const layered = layerPathFor();
@@ -30958,74 +30950,49 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
   const pushed = ready?.node || node;
   if (invoker?.isConnected) heroSource.set(pushed, invoker);
   const source = from?.isConnected ? from : invoker?.isConnected ? invoker : null;
-  // the paper that recedes is what the page covers, captured once as the viewport shows it: the document root, named only
-  // for the old state (the arriving page is never captured, so it stays live and hit-testable — the reason motion.css
-  // keeps the root's name none). Capturing #app > main instead, a reader thousands of pixels tall, cost WebKit 47–98 ms
-  // (one-hand/G1/frames.json, before.matchCutProbe)
-  const covered = document.documentElement;
   const where = sampleWhere();
-  // the slip closes now (its surface hears 'dive'); its element leaves inside the cut, so its headword is captured
-  const reason = miniDiving ? 'dive' : 'dismiss';
-  const cut = !instant && pageCutAllowed();
-  removeMini(reason, { forCut: cut && !!source?.closest?.('#mini') });
-  if (cut) paperOrigin(source);
-  const change = () => {
-    for (const leaving of document.querySelectorAll('#mini[data-leaving]')) leaving.remove();
-    // the page this one covers is kept as it stands: Back mounts the same element, its words the reverse cut's targets
-    const below = depth > 1 ? document.getElementById('sheet') : null;
-    if (below && layered) keptPages.set(S.stack.at(-1), { page: below, epoch: pageEpoch });
-    S.stack.push(pushed);
-    if (layered) renderLayer({ prebuilt: ready?.page || null });
-    else render();
-    const sheet = document.getElementById('sheet');
-    if (sheet && !pushed.sheetScroll) sheet.scrollTop = 0;
-    if (ready) reviveBuiltAhead(pushed);
-  };
-  runPageCut(change, {
-    names: [[source, 'word-hero'], [covered, 'kairo-paper']],
-    after: () => (source ? [[heroOf(document.getElementById('sheet')), 'word-hero']] : []),
-    instant: !cut,
-  });
+  // where the word leaves from, read while it still stands (the slip closes next: its surface hears 'dive')
+  const leaves = !instant && pageCutAllowed() ? glyphBox(source) : null;
+  removeMini();
+  // the page this one covers is kept as it stands: Back mounts the same element, its words where Back's word goes home
+  const below = depth > 1 ? document.getElementById('sheet') : null;
+  if (below && layered) keptPages.set(S.stack.at(-1), { page: below, epoch: pageEpoch });
+  S.stack.push(pushed);
+  if (layered) renderLayer({ prebuilt: ready?.page || null });
+  else render();
+  const sheet = document.getElementById('sheet');
+  if (sheet && !pushed.sheetScroll) sheet.scrollTop = 0;
+  if (ready) reviveBuiltAhead(pushed);
+  if (leaves) flyWord(leaves, heroOf(sheet));
   sampleTransition('page', where);
 }
 
-/** Back (one level) or close-all. The page's headword returns to the element it was entered from when that still
- * stands (the reader keeps its tokens under the layer; a kept page keeps its words), the page fades as it goes. */
+/** Back (one level) or close-all. The page goes at once; its headword travels home to the element it was entered from
+ * when that still stands on the screen (the reader keeps its tokens under the layer; a kept page keeps its words). */
 function recede({ all = false, viaRender = false, instant = false } = {}) {
   if (!S.stack.length) return null;
+  finishPageTransition();
   const layered = !viaRender && layerPathFor();
   const leaving = all ? S.stack[0] : S.stack.at(-1);
-  const sheet = document.getElementById('sheet');
-  const hero = heroOf(sheet);
   const where = sampleWhere();
-  const change = () => {
-    if (all) S.stack = [];
-    else S.stack.pop();
-    const top = S.stack.at(-1);
-    S.sheetReturnFocus = top?.returnFocus || null;
-    if (!S.stack.length) clearReaderSummons();
-    const kept = layered && top ? keptPages.get(top) : null;
-    if (top) keptPages.delete(top);
-    if (layered) renderLayer({ prebuilt: kept && kept.epoch === pageEpoch ? kept.page : null });
-    else render();
-    if (!S.stack.length) {
-      returnScroll();
-      restoreDialogInvoker();
-    }
-  };
-  let landing = null;
-  const vt = runPageCut(change, {
-    names: [[hero, 'word-hero'], [sheet, 'kairo-page']],
-    after: () => {
-      const target = heroSource.get(leaving);
-      landing = hero && target?.isConnected ? cutLanding(target) : null;
-      return landing ? [[landing.landing, 'word-hero']] : [];
-    },
-    instant,
-    onEnd: () => landing?.done(),
-  });
+  const leaves = !instant && pageCutAllowed() ? glyphBox(heroOf(document.getElementById('sheet'))) : null;
+  if (all) S.stack = [];
+  else S.stack.pop();
+  const top = S.stack.at(-1);
+  S.sheetReturnFocus = top?.returnFocus || null;
+  if (!S.stack.length) clearReaderSummons();
+  const kept = layered && top ? keptPages.get(top) : null;
+  if (top) keptPages.delete(top);
+  if (layered) renderLayer({ prebuilt: kept && kept.epoch === pageEpoch ? kept.page : null });
+  else render();
+  if (!S.stack.length) {
+    returnScroll();
+    restoreDialogInvoker();
+  }
+  const home = heroSource.get(leaving);
+  const flight = leaves && home?.isConnected ? flyWord(leaves, home) : null;
   sampleTransition('back', where);
-  return vt;
+  return flight;
 }
 
 /* ---------------------------------------------- G1 · the page built ahead (BRIEF Added 1)
