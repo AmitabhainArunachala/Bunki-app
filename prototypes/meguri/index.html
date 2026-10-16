@@ -193,6 +193,7 @@ button{font:inherit;color:inherit}
 <script src="kanji.js"></script>
 <script src="kakuji.js"></script>
 <script src="kakuji2.js"></script>
+<script src="posters.js"></script>
 <script src="assets.js"></script>
 <script src="assets_sound.js"></script>
 <script>
@@ -480,12 +481,14 @@ function fillPage(s){ const w=s.w,p=passes(s),sealed=!!state.sealed[w.w];
   const MK=window.MeguriKanji; let drawn=false;
   // the poster is built from KanjiVG strokes, so it needs no font to be right; it only needs the data for every character
   if(MK&&[...w.w].every(ch=>MK.has(ch))){ try{ const box=document.createElement('div'); box.className='plate'; const cw=Math.min(300,Math.floor(Math.min(window.innerWidth*.7,320))); box.style.width=cw+'px'; big.style.writingMode='horizontal-tb'; big.appendChild(box);
-      // the default face is the fidelity construction: every stroke of the real character kept, drawn as geometric pieces, read blind without error
-      const faces=(window.MeguriKakuji2?['kakuji2']:[]).concat(['dela','potta'],window.MeguriKakuji?['kakuji']:[]); const face=faces.includes(state.face)?state.face:faces[0]; const opts={ground:T.dark?'black':'paper',pigment:pig(s.g),dots:Math.min(5,p),sealed,reading:w.r,face};
+      // the default face is the pre-rendered poster: a build-time pen over typographic stroke data, every word read blind by two model families before it shipped
+      const PO=window.MEGURI_POSTERS||{}; const hasPen=!!PO[w.w];
+      const faces=(hasPen?['pen']:[]).concat(window.MeguriKakuji2?['kakuji2']:[],['dela','potta'],window.MeguriKakuji?['kakuji']:[]); const face=faces.includes(state.face)?state.face:faces[0]; const opts={ground:T.dark?'black':'paper',pigment:pig(s.g),dots:Math.min(5,p),sealed,reading:w.r,face};
       // a tap on the poster cycles what the word is built from, so each can be judged on the phone
-      box.title='tap: another face'; box.style.cursor='pointer'; box.onclick=()=>{ state.face=faces[(faces.indexOf(face)+1)%faces.length]; save(); fillPage(s); toast({kakuji2:'構築 · constructed, legible',dela:'Dela Gothic',potta:'Potta',kakuji:'角字 · heavy'}[state.face]); };
+      box.title='tap: another face'; box.style.cursor='pointer'; box.onclick=()=>{ state.face=faces[(faces.indexOf(face)+1)%faces.length]; save(); fillPage(s); toast({pen:'構築 · verified poster',kakuji2:'構築 · fidelity',dela:'Dela Gothic',potta:'Potta',kakuji:'角字 · heavy'}[state.face]); };
       const go=()=>{ if(cur!==s||page.hidden) return; const still=matchMedia('(prefers-reduced-motion:reduce)').matches; const ko={ground:opts.ground,pigment:opts.pigment,dots:opts.dots,reading:w.r,sealed,width:cw};
-        if(face==='kakuji2'&&window.MeguriKakuji2){ const KK=window.MeguriKakuji2; if(KK.animateIn&&!still) posterAnim=KK.animateIn(box,w.w,ko); else KK.render(box,w.w,ko); }
+        if(face==='pen'){ const svgText=(T.dark?PO[w.w]:(PO[w.w+'_paper']||PO[w.w])); box.innerHTML=svgText; const sv=box.querySelector('svg'); if(sv){ sv.removeAttribute('width'); sv.removeAttribute('height'); sv.style.width='100%'; sv.style.display='block'; sv.style.borderRadius='6px'; sv.setAttribute('role','img'); sv.setAttribute('aria-label',w.w); if(!still){ sv.style.opacity='0'; sv.style.transition='opacity .4s ease'; requestAnimationFrame(()=>{ sv.style.opacity='1'; }); } } }
+        else if(face==='kakuji2'&&window.MeguriKakuji2){ const KK=window.MeguriKakuji2; if(KK.animateIn&&!still) posterAnim=KK.animateIn(box,w.w,ko); else KK.render(box,w.w,ko); }
         else if(face==='kakuji'&&window.MeguriKakuji){ const KK=window.MeguriKakuji; if(KK.animateIn&&!still) posterAnim=KK.animateIn(box,w.w,ko); else KK.render(box,w.w,ko); }
         else { if(!still) posterAnim=MK.animateIn(box,w.w,opts); else MK.render(box,w.w,opts); } };
       // the face is embedded as a subset, but a font still loads lazily: wait for the word's own characters so the first look is never the fallback
