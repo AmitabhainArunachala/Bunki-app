@@ -1630,10 +1630,11 @@ function recordKeepLine() {
   line.dataset.kept = recordKeep.persisted === null ? 'unknown' : kept ? 'yes' : 'no';
   if (recordSize) line.dataset.share = String(Math.round(recordSize.share * 1000) / 1000);
   if (recordKeep.persisted === null) { line.hidden = true; return line; }
-  line.textContent = kept
-    ? tx('この端末に保存：保護されている', 'Saved on this device: protected')
-    : tx('この端末に保存：保護されていない — 書き出すと控えが残る', 'Saved on this device: not protected — Export keeps a copy');
-  if (share !== null) line.append(el('span', 'record-kept-share', share >= 100
+  // each clause holds together; a narrow line breaks only between them
+  if (kept) line.textContent = tx('この端末に保存：保護されている', 'Saved on this device: protected');
+  else line.append(tx('この端末に保存：保護されていない — ', 'Saved on this device: not protected — '),
+    el('span', 'record-kept-clause', tx('書き出すと控えが残る', 'Export keeps a copy')));
+  if (share !== null) line.append(el('span', 'record-kept-share record-kept-clause', share >= 100
     ? tx(' · 容量いっぱい', ' · full') : tx(` · 容量の ${share} %`, ` · ${share} % full`)));
   return line;
 }
@@ -13896,7 +13897,7 @@ function renderPortRow(main) {
       const rec = await buildExportRecord();
       if (!rec.text) {
         portNote.textContent = rec.warning === 'backup-limit'
-          ? tx('完全なバックアップがこの版の 32 MiB 制限を超える。元の記録はそのまま保護されている。', 'The complete backup exceeds this version’s 32 MiB restoration limit. All original data stays on this device; no partial backup was presented as complete.')
+          ? tx('この記録は、この版で一つのバックアップに収まる大きさ（50 万項目・32 MiB）を超えている。記録はすべてこの端末に残っている。一部だけの控えを完全なものとして出してはいない。', 'This record is larger than one backup file can hold in this version (500,000 entries or 32 MiB). Everything stays on this device; no partial backup was presented as complete.')
           : rec.warning === 'drafts-changed'
             ? tx('下書きの保存を確認してから、もう一度書き出す。',
               'Check that your drafts are saved, then export again.')

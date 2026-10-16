@@ -5301,3 +5301,4 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
 }
 .record-kept[hidden] { display: none; }
 .record-kept-share { font-weight: 400; }
+.record-kept-clause { white-space: nowrap; }
