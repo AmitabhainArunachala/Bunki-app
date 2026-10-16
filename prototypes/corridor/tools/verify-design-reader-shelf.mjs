@@ -14,11 +14,14 @@
  *   S3 one count        — every number the unfiltered shelf states about its size is the same
  *                         number, and it equals the stories on the shelf (grid + today's band).
  *   S4 picture cards    — (FEEL pass 2026-10-02, John: "there are now NO pictures at all… we want
- *                         this to be like a magazine") every article card on the shelf carries ONE
- *                         picture slot, a fixed 3:2 box: the record's own picture (index.json
- *                         "picture".src, loaded, decorative inside the card) where it has one, else a
- *                         calm block whose only words are its topic in small type (never a kanji, no
- *                         larger than 16 px). Every card has a kicker, the headline, a level chip and
+ *                         this to be like a magazine") every article card whose row has a picture or a
+ *                         key kanji carries ONE picture slot, a fixed 3:2 box: the record's own picture
+ *                         (index.json "picture".src, loaded, decorative inside the card) where it has
+ *                         one, else its key kanji (index.json "heroKanji") alone, set at a third of the
+ *                         box's height or more on the world's paper. A row with neither has no band at
+ *                         all, and no card shows a category placeholder block (N, 2026-10-17, rewrites
+ *                         the pin "else a calm block whose only words are its topic in small type, never
+ *                         a kanji, no larger than 16 px"). Every card has a kicker, the headline, a level chip and
  *                         in English its English line; the lead adds its first sentence. No short word
  *                         definition stands on the shelf (N, 2026-10-17: culled as not articles). The 永 seal
  *                         sits inside the 本棚 title, ≤ 48 px. Control: 2ae957bb, whose cards had no
@@ -532,10 +535,19 @@ try {
           const articles = cards.filter((card) => !glossary(card)), definitions = cards.filter(glossary);
           const bad = [];
           let pictured = 0;
+          let kanjiSheets = 0;
           for (const card of articles) {
             const slots = card.querySelectorAll('.story-picture');
             const slot = slots[0];
             const row = byId.get(card.dataset.passage) || {};
+            // N (2026-10-17) rewrites the pin "a row with no picture shows the calm block with its topic word": a row with
+            // no picture shows its key kanji (heroKanji) on the world's paper, and a row with neither has no band at all
+            const heroKanji = typeof row.heroKanji === 'string' && /^[\p{Script=Han}々]{1,2}$/u.test(row.heroKanji) ? row.heroKanji : '';
+            if (card.querySelector('.is-placeholder, .story-picture-word')) bad.push(`${card.dataset.passage}: a category placeholder block`);
+            if (!row.picture?.src && !heroKanji) {
+              if (slots.length) bad.push(`${card.dataset.passage}: a row with neither picture nor key kanji wears ${slots.length} band(s)`);
+              continue;
+            }
             if (slots.length !== 1) { bad.push(`${card.dataset.passage}: ${slots.length} picture slots`); continue; }
             const box = slot.getBoundingClientRect();
             const ratio = box.width / box.height;
@@ -551,10 +563,13 @@ try {
               else if (img.alt !== '') bad.push(`${card.dataset.passage}: picture inside the card is not decorative`);
               else pictured += 1;
             } else {
+              const glyph = slot.querySelector('.story-hero-kanji');
               const words = slot.textContent.trim();
-              const size = parseFloat(getComputedStyle(slot.querySelector('.story-picture-word') || slot).fontSize);
-              if (img || !slot.classList.contains('is-placeholder')) bad.push(`${card.dataset.passage}: a picture slot with no picture is not the calm block`);
-              else if (/[\p{Script=Han}]/u.test(words) || size > 16 || !words) bad.push(`${card.dataset.passage}: the calm block reads "${words}" at ${size}px`);
+              const size = glyph ? parseFloat(getComputedStyle(glyph).fontSize) : 0;
+              // the key kanji alone, large (a third of the box's height or more), and nothing else in the band
+              if (img || !slot.classList.contains('is-kanji') || !glyph) bad.push(`${card.dataset.passage}: a picture-less row does not show its key kanji`);
+              else if (words !== heroKanji || size < box.height / 3) bad.push(`${card.dataset.passage}: the key kanji band reads "${words}" at ${size}px in a ${Math.round(box.height)}px box`);
+              else kanjiSheets += 1;
             }
           }
           for (const card of definitions) {
@@ -567,7 +582,8 @@ try {
           const seal = document.querySelector('.shelf-masthead .shelf-art');
           const sealBox = seal?.getBoundingClientRect();
           const named = index.articles.filter((row) => row.picture?.src && cards.some((card) => card.dataset.passage === row.id)).length;
-          return { cards: cards.length, articles: articles.length, definitions: definitions.length, pictured, named, bad: bad.slice(0, 4), badCount: bad.length,
+          const keyed = index.articles.filter((row) => !row.picture?.src && row.heroKanji && cards.some((card) => card.dataset.passage === row.id)).length;
+          return { cards: cards.length, articles: articles.length, definitions: definitions.length, pictured, named, kanjiSheets, keyed, bad: bad.slice(0, 4), badCount: bad.length,
             incomplete: incomplete.slice(0, 4), incompleteCount: incomplete.length,
             lede: lead?.querySelector('.story-lede')?.textContent ?? '', sealInTitle: !!seal?.closest('.shelf-mast-title'),
             seal: sealBox ? Math.round(Math.max(sealBox.width, sealBox.height)) : 0 };
@@ -577,6 +593,7 @@ try {
         assert(probe.cards > 20 && probe.articles === probe.cards && probe.definitions === 0, `${probe.cards} cards, ${probe.articles} articles, ${probe.definitions} word definitions`);
         assert.equal(probe.badCount, 0, `picture slots wrong: ${probe.bad.join(' | ')}`);
         assert(probe.named > 0 && probe.pictured === probe.named, `${probe.pictured} of the ${probe.named} pictures the index names stand on their cards`);
+        assert(probe.keyed > 0 && probe.kanjiSheets === probe.keyed, `${probe.kanjiSheets} of the ${probe.keyed} key kanji the index names stand on their cards`);
         assert.equal(probe.incompleteCount, 0, `cards missing kicker, headline, English line or level: ${probe.incomplete.join(', ')}`);
         assert(/[。！？…]$/u.test(probe.lede), `the lead has no first-sentence teaser: "${probe.lede}"`);
         assert(probe.sealInTitle && probe.seal > 0 && probe.seal <= 48, `the 永 seal is not a small mark inside the title: ${JSON.stringify(probe)}`);
