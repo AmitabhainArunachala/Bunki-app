@@ -873,14 +873,14 @@ body[data-view='drift'] #mini .mini-take:not(.taken):not(.reader-capture-held) {
   color: var(--color-ink-2);
   cursor: help;
 }
-#mini .mini-take-note { flex: 1 1 auto; min-width: 0; font: 400 13.5px/1.3 var(--font-ui); color: var(--color-muted); }
 @keyframes read-mini-path { from { opacity: 0.01; transform: translate3d(-6px, 0, 0); } }
-#mini :is(.mini-take-note, .mini-sentence-open, .mini-sentence-pane)[hidden] { display: none; }
+#mini :is(.mini-sentence-open, .mini-sentence-pane)[hidden] { display: none; }
 
 /* Save ▾'s menu unfolds inside the card, under its own button (John, 2026-10-14: "a drop down menu … with
    options inside the menu"): it never lies over another control; the card grows, and keepFloatingBeside
-   seats the taller card beside its word again. One menu in every room, with no switch. */
-#mini .vocabulary-list-popover.is-inline {
+   seats the taller card beside its word again. One menu in every room, with no switch — S: the same rules dress it
+   wherever the one Save stands (the slip, a row, a bar's drawer), the slip's tokens with the page's as their fallback. */
+:is(#mini, body) .vocabulary-list-popover.is-inline {
   position: static;
   z-index: auto;
   width: auto;
@@ -888,7 +888,7 @@ body[data-view='drift'] #mini .mini-take:not(.taken):not(.reader-capture-held) {
   margin: -4px 10px 10px;
   padding: 4px 0 0;
   border: 0;
-  border-top: 1px solid var(--mini-rule);
+  border-top: 1px solid var(--mini-rule, var(--color-rule));
   border-radius: 0;
   background: none;
   box-shadow: none;
@@ -897,7 +897,7 @@ body[data-view='drift'] #mini .mini-take:not(.taken):not(.reader-capture-held) {
   animation: read-mini-unfold var(--motion-room) var(--ease-enter) both;
 }
 @keyframes read-mini-unfold { from { opacity: 0; transform: translateY(-6px); } }
-#mini .is-inline .vocabulary-list-choice {
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choice {
   gap: 12px;
   min-height: 46px;
   padding: 0 8px;
@@ -905,8 +905,8 @@ body[data-view='drift'] #mini .mini-take:not(.taken):not(.reader-capture-held) {
   font: 500 16px/1.3 var(--font-ui);
   color: var(--color-ink);
 }
-#mini .is-inline .vocabulary-list-choice:hover { background: var(--color-accent-wash); }
-#mini .is-inline .vocabulary-list-choice input {
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choice:hover { background: var(--color-accent-wash); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choice input {
   appearance: none;
   -webkit-appearance: none;
   display: grid;
@@ -914,11 +914,11 @@ body[data-view='drift'] #mini .mini-take:not(.taken):not(.reader-capture-held) {
   width: 22px;
   height: 22px;
   margin: 0;
-  border: 1.5px solid var(--mini-edge);
+  border: 1.5px solid var(--mini-edge, var(--color-edge-strong));
   border-radius: var(--radius-control);
   background: none;
 }
-#mini .is-inline .vocabulary-list-choice input::before {
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choice input::before {
   content: '';
   width: 10px;
   height: 5px;
@@ -928,34 +928,34 @@ body[data-view='drift'] #mini .mini-take:not(.taken):not(.reader-capture-held) {
   opacity: 0;
   transition: transform var(--motion-quick) var(--ease-enter), opacity var(--motion-ma) var(--ease-standard);
 }
-#mini .is-inline .vocabulary-list-choice input:checked { border-color: var(--color-accent); background: var(--color-accent); }
-#mini .is-inline .vocabulary-list-choice input:checked::before { opacity: 1; transform: translateY(-1px) rotate(-45deg) scale(1); }
-#mini .is-inline .vocabulary-list-review .vocabulary-list-name { font-weight: 650; }
-#mini .is-inline .vocabulary-list-count { font: 400 13px/1.2 var(--font-ui); color: var(--color-muted); }
-#mini .is-inline .vocabulary-list-title {
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choice input:checked { border-color: var(--color-accent); background: var(--color-accent); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choice input:checked::before { opacity: 1; transform: translateY(-1px) rotate(-45deg) scale(1); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-review .vocabulary-list-name { font-weight: 650; }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-count { font: 400 13px/1.2 var(--font-ui); color: var(--color-muted); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-title {
   margin: 10px 8px 2px;
   font: 600 11.5px/1.2 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted);
 }
-#mini .is-inline .vocabulary-list-choices { max-height: 30vh; margin: 0; }
-#mini .is-inline .vocabulary-list-choices:has(> .vocabulary-list-empty),
-#mini .is-inline .vocabulary-list-title:has(+ .vocabulary-list-choices > .vocabulary-list-empty) { display: none; }
-#mini .is-inline :is(.vocabulary-list-form, .vocabulary-list-new)[hidden] { display: none; }
-#mini .is-inline .vocabulary-list-new { display: block; width: 100%; color: var(--color-accent); font-weight: 600; }
-#mini .is-inline .vocabulary-list-form { gap: 8px; margin: 4px 0 0; padding: 0 0 2px; }
-#mini .is-inline .vocabulary-list-field {
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choices { max-height: 30vh; margin: 0; }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-choices:has(> .vocabulary-list-empty),
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-title:has(+ .vocabulary-list-choices > .vocabulary-list-empty) { display: none; }
+:is(#mini, body) .vocabulary-list-popover.is-inline :is(.vocabulary-list-form, .vocabulary-list-new)[hidden] { display: none; }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-new { display: block; width: 100%; color: var(--color-accent); font-weight: 600; }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-form { gap: 8px; margin: 4px 0 0; padding: 0 0 2px; }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-field {
   min-height: 44px;
   padding: 0 12px;
-  border: 1px solid var(--mini-rule);
+  border: 1px solid var(--mini-rule, var(--color-rule));
   border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--mini-band) 70%, transparent);
+  background: color-mix(in srgb, var(--mini-band, var(--color-surface-sunk)) 70%, transparent);
   color: var(--color-ink);
   font: 400 16px/1.2 var(--font-ui);
 }
-#mini .is-inline .vocabulary-list-field::placeholder { color: var(--color-muted); }
-#mini .is-inline .vocabulary-list-create {
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-field::placeholder { color: var(--color-muted); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-create {
   min-height: 44px;
   padding: 0 16px;
   border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
@@ -965,16 +965,16 @@ body[data-view='drift'] #mini .mini-take:not(.taken):not(.reader-capture-held) {
   font: 650 15px/1 var(--font-ui);
   box-shadow: none;
 }
-#mini .is-inline .vocabulary-list-status { margin: 6px 8px 0; font: 400 13px/1.4 var(--font-ui); color: var(--color-accent); }
-#mini .is-inline .vocabulary-list-more { margin: 8px 0 0; padding-top: 4px; border-top: 1px solid var(--mini-rule); }
-#mini .is-inline .vocabulary-list-action {
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-status { margin: 6px 8px 0; font: 400 13px/1.4 var(--font-ui); color: var(--color-accent); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-more { margin: 8px 0 0; padding-top: 4px; border-top: 1px solid var(--mini-rule, var(--color-rule)); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-action {
   min-height: 46px;
   padding: 0 8px;
   border-radius: var(--radius-control);
   color: var(--color-ink);
   font: 500 16px/1.3 var(--font-ui);
 }
-#mini .is-inline .vocabulary-list-action:hover { background: var(--color-accent-wash); }
+:is(#mini, body) .vocabulary-list-popover.is-inline .vocabulary-list-action:hover { background: var(--color-accent-wash); }
 
 /* 3. the kanji band */
 #mini .mini-web {
@@ -1201,7 +1201,6 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
   #mini :is(.mini-reading, .mini-gloss) { font-size: 15px; }
   #mini .mini-actions { padding: 6px 12px; gap: 6px 10px; }
   #mini .mini-take { min-width: 96px; padding: 0 14px; }
-  #mini .mini-take-note { font-size: 12.5px; }
   #mini .mini-web { padding: 0 10px 2px 14px; }
   #mini .mini-band-head { height: 32px; }
   #mini .mini-kanji-row { min-height: 44px; padding: 2px 0; }

@@ -2141,6 +2141,9 @@ body .sheet .hero #kanji-shape-lookup, body .sheet .teacher-door .chip {
 }
 body .sheet .teacher-door .chip { flex-direction: column; }
 body .sheet .teacher-door .chip .en-sub { font-size: 12px; letter-spacing: 0.01em; text-transform: none; color: inherit; opacity: 0.9; }
+/* S · beside the sentence's one Save, asking the tutor and practising are quiet words in the accent, no box (the C family) */
+body .sheet .teacher-door .chip.btn-tertiary { flex-direction: row; padding: 0 10px; border: 0; background: transparent; color: var(--color-accent, var(--ai)); font: 600 15px/1.3 var(--font-ui, var(--sans)); }
+body .sheet .teacher-door .chip.btn-tertiary:hover:where(:not(:disabled)) { background: var(--color-fill, var(--ai-wash)); }
 body .sheet .kv { margin: var(--s2) 0; padding: var(--s2) 0; border-block: 1px solid var(--hairline); }
 body .sheet .kv dt { font: 700 14px/1.8 var(--sans); color: var(--text); }
 body .sheet .kv dd { font: 20px/1.7 var(--serif); letter-spacing: 0.04em; color: var(--accent); }
@@ -5269,6 +5272,142 @@ body.record-not-saving #app > .chrome { margin-bottom: var(--record-band-h, 48px
 .record-kept[hidden] { display: none; }
 .record-kept-share { font-weight: 400; }
 .record-kept-clause { white-space: nowrap; }
+
+/* ==========================================================================
+   S · THE ONE SAVE (John, 2026-10-16, on Save ▾ and its lists: "this should be on every single save button
+   througought the enitre app.. be systematic about everythign!!"). One key for every act that keeps a word, kanji,
+   sentence or story (corridor.js saveOne), in every room: the A family before — the world's accent filled, its paper
+   for ink — and the taken slip after — the accent's 10 % wash on the paper, the accent for ink and a hairline of it;
+   one caret that says its menu waits inside; 44 high, so it stands in a card, a row or a bar alike. Night worlds light
+   it as an emitted edge, never a solid fill (the A family's own rule). Colours: the world's accent, paper and ground.
+   ========================================================================== */
+:is(#mini, #sheet, #app, body) button.save-one {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 96px;
+  height: auto;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  background: var(--color-accent);
+  color: var(--color-paper, #f5efe0);
+  box-shadow: var(--elevation-press);
+  font: 600 16px/1.25 var(--font-ui);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+/* the caret: its menu waits inside (drawn, so the key's words stay exactly 保存 · Save and 保存済み ✓ · Saved ✓) */
+:is(#mini, #sheet, #app, body) button.save-one::after {
+  content: '';
+  flex: 0 0 auto;
+  width: 9px;
+  height: 6px;
+  opacity: 0.85;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+:is(#mini, #sheet, #app, body) button.save-one[aria-expanded='true']::after { transform: rotate(180deg); }
+:is(#mini, #sheet, #app, body) button.save-one:hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-accent) 88%, #000); }
+:is(#mini, #sheet, #app, body) button.save-one.taken {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--color-paper, #f5efe0));
+  box-shadow: none;
+  color: var(--color-accent);
+}
+:is(#mini, #sheet, #app, body) button.save-one.taken:hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-accent) 16%, var(--color-paper, #f5efe0)); }
+:is(#mini, #sheet, #app, body) button.save-one[aria-busy='true'] { opacity: 0.72; cursor: progress; }
+/* held (D11/D23, a kanji with no meaning): a dashed slip that says why in its name; no caret, there is no menu */
+:is(#mini, #sheet, #app, body) button.save-one:is(.reader-capture-held, .word-capture-held, :disabled) {
+  border: 1px dashed var(--color-edge-strong, currentColor);
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-ink-2, currentColor);
+  cursor: help;
+}
+:is(#mini, #sheet, #app, body) button.save-one:is(.reader-capture-held, .word-capture-held, :disabled)::after { content: none; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(#mini, #sheet, #app, body) button.save-one:not(.taken, :disabled) {
+  background: color-mix(in srgb, var(--color-accent) 9%, var(--color-ground));
+  color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 72%, transparent), 0 0 0 0.5px var(--color-glow), 0 0 18px -2px var(--color-glow);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(#mini, #sheet, #app, body) button.save-one.taken {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-ground));
+}
+/* in a bar it takes the bar's measure: 44, no lift */
+:is(#sheet, #app) [data-bar] button.save-one { height: 44px; min-height: 44px; box-shadow: none; }
+/* a row that holds a Save keeps it on its own line end, the menu unfolding under the row (placeSaveMenu) */
+[data-save-row] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+/* the reader's keep stands in the room's bar in the bar's own type (corridor.js chromeKeep): its words in the bar's ink,
+   no fill, the caret; once saved, the accent. Night keeps it the same words on the bar, never a lit key there. */
+#app > .chrome button.save-one.chrome-keep {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  min-width: 44px;
+  max-width: 76px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-bar-ink);
+  font: 600 15px/1 var(--font-ui);
+  letter-spacing: 0;
+}
+/* one press keeps the word and opens its drawer: no caret beside two lines */
+#app > .chrome button.save-one.chrome-keep::after { content: none; }
+#app > .chrome .chrome-keep .save-bar-verb {
+  font: 600 10px/1.1 var(--font-ui);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-bar-quiet, var(--color-muted));
+}
+body:not(.ui-bi) #app > .chrome .chrome-keep .save-bar-verb { font-size: 10.5px; letter-spacing: 0.14em; text-transform: none; }
+#app > .chrome .chrome-keep .save-bar-word {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 15px/1.15 var(--font-reading, var(--font-ui));
+  color: var(--color-bar-ink);
+}
+#app > .chrome .chrome-keep.taken .save-bar-verb { color: var(--color-accent); }
+#app > .chrome button.save-one.chrome-keep:hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-ink) 6%, transparent); }
+#app > .chrome button.save-one.chrome-keep.taken { background: transparent; }
+#app > .chrome button.save-one.chrome-keep.reader-capture-held { border: 0; color: var(--color-bar-quiet, var(--color-muted)); cursor: help; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #app > .chrome button.save-one.chrome-keep:not(.taken) {
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-bar-ink);
+}
+/* the drawer under a bar: the menu of a bar's Save, the width of the page's measure, flush under the bar */
+:is(#mini, body) .vocabulary-list-popover.is-inline.is-drawer {
+  position: fixed;
+  top: var(--drawer-top, 0px);
+  left: 0;
+  right: 0;
+  z-index: 86;
+  width: auto;
+  max-width: 560px;
+  max-height: calc(100dvh - var(--drawer-top, 0px) - 24px);
+  margin: 0 auto;
+  padding: 6px 14px 12px;
+  overflow: auto;
+  border: 0;
+  border-bottom: var(--stroke-hairline) solid var(--color-bar-line, var(--color-rule));
+  border-radius: 0 0 var(--radius-overlay) var(--radius-overlay);
+  background: var(--color-paper, #f5efe0);
+  color: var(--color-ink);
+  box-shadow: var(--elevation-card);
+}
 
 /* ==========================================================================
    S · THE DECK'S BAND (John, 2026-10-16, on a flashcard's front: "yes but the blue banner was actually nicer. be a

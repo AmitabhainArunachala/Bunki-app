@@ -7615,12 +7615,16 @@ function renderFeedEntry(entry, reference = null) {
     'The link is saved. The article text and headline are not stored on this device.')));
   const library = feedModule.parseFeedLibrary(S.feedLibrary);
   const saved = reference || library.savedReferences.find((item) => item.entryId === entry.id && item.publisherId === entry.publisherId && item.canonicalUrl === url);
-  const save = el('button', 'chip feed-save', saved ? tx('保存済み · 外す', 'Saved · remove') : tx('リンクを保存', 'Save link'));
-  save.type = 'button'; save.dataset.feedSave = reference?.entryId || entry.id;
-  save.setAttribute('aria-pressed', String(!!saved));
-  save.setAttribute('aria-label', `${saved ? tx('保存リンクを外す', 'Remove saved link') : tx('リンクを保存', 'Save link')}: ${title}`);
+  // S · keeping a story's link is the one Save (saveOne): Save, then Saved ✓ with Remove in its menu
+  row.dataset.saveRow = '';
+  const linkKept = () => !!feedModule.parseFeedLibrary(S.feedLibrary).savedReferences.find((item) => item.entryId === (reference?.entryId || entry.id)
+    && item.publisherId === (reference?.publisherId || entry.publisherId) && item.canonicalUrl === url);
+  const save = saveOne({
+    cls: 'feed-save', label: title, saved: linkKept, attrs: { 'data-feed-save': reference?.entryId || entry.id },
+    keep: () => feedStoreChange((library) => feedModule.toggleFeedReference(library, reference || entry)),
+    more: () => [{ id: 'feed-save-remove', label: tx('外す', 'Remove'), run: () => feedStoreChange((library) => feedModule.toggleFeedReference(library, reference || entry)) }],
+  });
   save.disabled = feedMutationPending || !recordWritable();
-  save.addEventListener('click', async () => { await feedStoreChange((library) => feedModule.toggleFeedReference(library, reference || entry)); });
   row.append(save);
   if (entry && publisherModule && publisherReader?.available) {
     let selection = null;
@@ -8296,7 +8300,7 @@ document.addEventListener(
     const target = ev.target;
     if (readerWordMenu && !readerWordMenu.menu.contains(target)) closeReaderWordMenu();
     const pop = document.getElementById('vocabulary-list-popover');
-    if (pop && !pop.contains(target) && !target.closest?.('#mini-take, #personal-add-list, #kp-take')) {
+    if (pop && !pop.contains(target) && !target.closest?.('#mini-take, #personal-add-list, #kp-take, .save-one')) {
       const card = pop.classList.contains('is-inline') ? pop.closest('#mini') : null;
       if (card && (card.contains(target) || (miniAnchor?.isConnected && miniAnchor.contains(target)))) foldMenuAfterPress(pop);
       else closeVocabularyListPopover();
@@ -8595,19 +8599,154 @@ function enhanceJapaneseProse(root) {
  * A held word stays held and says why. The button then reads "Saved ✓"; pressing it again, or the
  * toast's Undo, takes the card back out, its review history kept (the door swings both ways, §3). */
 function paintWordSave(button, on) {
-  button.textContent = on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save');
+  // S · the one Save says its two words and nothing more (John, 2026-10-16: ":goes into review is excessive and 無駄");
+  // a bar's Save names its word (the reader's keep: Save 総理 · Saved 総理 ✓)
+  const word = button.dataset.saveWord || '';
+  const all = button.dataset.saveAll || '';
+  // the reader's bar holds its Save as two lines in the bar's own type: the verb small over the word it keeps (Save /
+  // 総理), so a word of any length fits the bar's last 75 px beside its five doors
+  if (button.dataset.saveBar != null) {
+    button.replaceChildren(el('span', 'save-bar-verb', on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save')),
+      document.createTextNode(' '), el('span', 'save-bar-word', word || tx('語をタップ', 'a word')));
+    button.classList.toggle('taken', on);
+    button.setAttribute('aria-pressed', String(on));
+    button.removeAttribute('title');
+    return;
+  }
+  button.textContent = all
+    ? tx(`${all} 語をぜんぶ保存`, `Save all ${all}`)
+    // the reader's keep before a word is touched: what it does, in words (never an unlabelled glyph)
+    : button.dataset.saveRest != null && !word ? tx('語を保存', 'Save a word')
+    : word
+      ? (on ? tx(`「${word}」保存済み ✓`, `Saved ${word} ✓`) : tx(`「${word}」を保存`, `Save ${word}`))
+      : (on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save'));
   button.classList.toggle('taken', on);
   button.setAttribute('aria-pressed', String(on));
-  // the popup's Save ▾ opens its menu once the word is saved: lists, copy, and the way back out
-  if (button.dataset.saveMenu) button.title = on ? tx('リスト・コピー・復習から外す', 'Lists, copy, remove from review') : '';
-  else button.title = on ? tx('もう一度押すと復習から外す', 'Press again to remove it from review') : '';
+  button.removeAttribute('title');
 }
-/** The popup's one path: before Save, a note saying where the word goes; once saved, Save ▾ holds the rest. */
+/** The popup's one path: once saved, Save ▾ holds the rest. */
 function paintMiniPath(actions, saved) {
-  const note = actions?.querySelector('.mini-take-note');
   if (!actions) return;
-  if (note) note.hidden = saved;
   actions.classList.toggle('is-saved', saved);
+}
+
+/* S · THE ONE SAVE (John, 2026-10-16, on Save ▾ and its lists: "this should be on every single save button througought
+ * the enitre app.. be systematic about everythign!! these are amateur mistakes"). Every act that keeps a word, kanji,
+ * sentence or story is this one control, in every room: the same look (the A family before, the taken slip after, one
+ * caret that says a menu waits inside — editorial.css .save-one), the same behaviour (one press keeps the item and
+ * opens its menu; on Saved ✓ a press opens or folds the menu; a second press within a breath is the same press), the
+ * same words (保存 · Save, 保存済み ✓ · Saved ✓). Its menu: a word-like item's review row and its lists (one tap each, a
+ * new list asks its name once), then the surface's own rows (Copy, Ask the tutor, Remove); an item that has no lists
+ * (a sentence, a link) shows only those rows. The menu stands inside the control's own card or row ('inline'), or as a
+ * drawer under a bar ('drawer'): never over another control. Each surface keeps its own keep path. */
+function saveOne({ id = '', cls = '', label = '', saved, keep, review = null, node = null, more = () => [], place = null,
+  held = false, word = '', all = 0, attrs = {} } = {}) {
+  const button = el('button', `save-one btn-primary${cls ? ` ${cls}` : ''}`);
+  button.type = 'button';
+  if (id) button.id = id;
+  button.dataset.saveOne = '';
+  button.dataset.saveMenu = 'true';
+  if (word) button.dataset.saveWord = word;
+  // a batch (a lesson's or a test's words, all at once) keeps them in one press; its rows hold each word's own menu
+  if (all) button.dataset.saveAll = String(all);
+  button.setAttribute('aria-haspopup', 'dialog');
+  button.setAttribute('aria-expanded', 'false');
+  for (const [name, value] of Object.entries(attrs)) button.setAttribute(name, value);
+  paintWordSave(button, !!saved());
+  if (held) {
+    button.disabled = true;
+    button.classList.add('reader-capture-held');
+  }
+  let pressedAt = -Infinity;
+  const openMenu = () => (node
+    ? openVocabularyListPopover(node, label, button, { menu: true, review: review || { saved, toggle: keep }, more: more(), place })
+    : openPlainSaveMenu(button, { more: more(), place }));
+  button.saveOneOpen = openMenu;
+  button.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (button.disabled || button.getAttribute('aria-busy') === 'true' || Date.now() - pressedAt < SAVE_PRESS_MS) return undefined;
+    pressedAt = Date.now();
+    if (saved()) return openMenu();
+    // busy, never disabled, while the item is kept: a disabled button drops the keyboard to the page
+    button.setAttribute('aria-busy', 'true');
+    const settle = (ok) => {
+      button.removeAttribute('aria-busy');
+      if (!button.isConnected) return ok;
+      const now = !!saved();
+      paintWordSave(button, now);
+      paintMiniPath(button.closest('.mini-actions'), now);
+      if (now) openMenu();
+      return ok;
+    };
+    return Promise.resolve(keep()).then(settle, () => settle(false));
+  });
+  return button;
+}
+/** The one Save's menu for an item with no lists (a sentence, a link): its own rows only, in the same places. */
+function openPlainSaveMenu(invoker, { more = [], place = null } = {}) {
+  if (document.getElementById('vocabulary-list-popover')) {
+    const same = vocabularyListInvoker === invoker;
+    if (!closeVocabularyListPopover({ restoreFocus: same }) || same) return;
+  }
+  hideReaderToast();
+  const pop = el('div', 'vocabulary-list-popover is-save-menu is-plain');
+  pop.id = 'vocabulary-list-popover';
+  pop.dataset.driftChrome = 'true';
+  pop.tabIndex = -1;
+  pop.setAttribute('role', 'dialog');
+  pop.setAttribute('aria-label', tx('保存', 'Save'));
+  pop.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    event.stopPropagation();
+    closeVocabularyListPopover({ restoreFocus: true });
+  });
+  const rest = el('div', 'vocabulary-list-more');
+  for (const item of more) {
+    const button = el('button', 'vocabulary-list-action', item.label);
+    button.type = 'button';
+    button.id = item.id;
+    if (item.disabled) button.disabled = true;
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      closeVocabularyListPopover({ restoreFocus: true });
+      void item.run();
+    });
+    rest.append(button);
+  }
+  pop.append(rest);
+  vocabularyListInvoker = invoker; vocabularyListNode = null;
+  invoker?.setAttribute('aria-expanded', 'true');
+  placeSaveMenu(pop, invoker, place);
+}
+/** Where the one Save's menu stands: inside its card or row (the card grows; nothing is covered), as a drawer under its bar,
+ * or (the lists popover of a surface with neither) beside its invoker. */
+function placeSaveMenu(pop, invoker, place = null) {
+  const where = place || (invoker?.closest?.('#mini, [data-save-row]') ? 'inline' : 'popover');
+  if (where === 'inline') {
+    pop.classList.add('is-inline');
+    (invoker.closest('.mini-actions, [data-save-row]') || invoker).after(pop);
+  } else if (where === 'drawer') {
+    pop.classList.add('is-inline', 'is-drawer');
+    const bar = invoker?.closest?.('[data-bar]');
+    const bottom = bar ? bar.getBoundingClientRect().bottom : 0;
+    pop.style.setProperty('--drawer-top', `${Math.max(0, Math.round(bottom))}px`);
+    document.body.append(pop);
+  } else {
+    document.body.append(pop);
+    const anchor = invoker?.getBoundingClientRect();
+    const box = pop.getBoundingClientRect();
+    if (anchor) {
+      const below = anchor.bottom + 6;
+      const top = below + box.height <= window.innerHeight - 8 ? below : Math.max(8, anchor.top - box.height - 6);
+      pop.style.left = `${Math.max(8, Math.min(window.innerWidth - box.width - 8, anchor.left))}px`;
+      pop.style.top = `${top}px`;
+      // a phone lays the list popover out as a sheet at the foot; Save ▾'s menu keeps this place (CSS)
+      pop.style.setProperty('--pop-left', pop.style.left);
+      pop.style.setProperty('--pop-top', pop.style.top);
+    }
+  }
+  (pop.querySelector('input[type="checkbox"]:not(:disabled)') || pop.querySelector('button:not(:disabled)') || pop).focus({ preventScroll: true });
 }
 
 /** What a word's Save stands for: the entry it would capture, and whether it is held (D11: a reader
@@ -8668,7 +8807,8 @@ async function toggleWordSave(node, label) {
     return false;
   }
   refreshWordSaveControls(node, label);
-  showReaderToast(taking ? tx('復習に保存しました', 'Saved to review') : tx('復習から外しました', 'Removed from review'),
+  // S · the toast says what the Save says, nothing about review (John, 2026-10-16: "the Save itself says enough")
+  showReaderToast(taking ? tx('保存しました', 'Saved') : tx('外しました', 'Removed'),
     [tx('元に戻す', 'Undo'), () => allowed() && toggleWordSave(node, label)]);
   return true;
 }
@@ -8740,7 +8880,7 @@ function closeVocabularyListPopover({ restoreFocus = false } = {}) {
   return true;
 }
 
-function openVocabularyListPopover(node, label, invoker, { menu = false, more = [], review = null } = {}) {
+function openVocabularyListPopover(node, label, invoker, { menu = false, more = [], review = null, place = null } = {}) {
   const allowed = personalHost?.captureAccess?.() || (() => true);
   if (!allowed()) return;
   if (document.getElementById('vocabulary-list-popover')) {
@@ -8890,20 +9030,23 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
       void Promise.resolve(review.toggle()).finally(() => {
         box.checked = review.saved();
         box.disabled = false;
-        // a host's Save (the guided slip) is repainted from the host's own truth; the app's path repaints itself
-        const hostSeal = invoker?.id === 'mini-take' && invoker.closest('#mini') ? invoker : null;
-        if (hostSeal && !hostSeal.dataset.appSave) { paintWordSave(hostSeal, box.checked); paintMiniPath(hostSeal.closest('.mini-actions'), box.checked); }
+        // a Save whose surface keeps its own truth (the guided slip, the page, a lesson row) is repainted from that truth;
+        // the app's path repaints itself (refreshWordSaveControls)
+        if (invoker?.dataset?.saveOne != null && !invoker.dataset.appSave && invoker.isConnected) {
+          paintWordSave(invoker, box.checked);
+          paintMiniPath(invoker.closest('.mini-actions'), box.checked);
+        }
         // the disabled beat dropped the keyboard to the page: give it back the row, so Escape still closes the menu
         if (box.isConnected && (!document.activeElement || document.activeElement === document.body)) box.focus({ preventScroll: true });
       });
     });
-    row.append(box, el('span', 'vocabulary-list-name', tx('復習', 'Review')), el('span', 'vocabulary-list-count', tx('間隔反復', 'spaced repetition')));
+    row.append(box, el('span', 'vocabulary-list-name', tx('復習', 'Review')));
     pop.append(row);
   }
   // in Save ▾'s menu a new list is one row until it is asked for; then the row becomes its name field
   let newList = null;
   if (menu) {
-    newList = el('button', 'vocabulary-list-action vocabulary-list-new', tx('＋ 新しいリスト', '+ New list'));
+    newList = el('button', 'vocabulary-list-action vocabulary-list-new', tx('新しいリスト…', 'New list…'));
     newList.type = 'button';
     newList.id = 'vocabulary-list-new';
     form.hidden = true;
@@ -8933,28 +9076,9 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
   paint();
   vocabularyListInvoker = invoker; vocabularyListNode = node;
   invoker?.setAttribute('aria-expanded', 'true');
-  // in the word popup the menu unfolds inside the card, under its own button, so it never lies over another
-  // control: the card grows, and keepFloatingBeside seats the taller card beside its word again
-  const card = menu ? invoker?.closest?.('#mini') : null;
-  if (card) {
-    pop.classList.add('is-inline');
-    (invoker.closest('.mini-actions') || invoker).after(pop);
-    (pop.querySelector('input[type="checkbox"]:not(:disabled)') || pop).focus({ preventScroll: true });
-    return;
-  }
-  document.body.append(pop);
-  const anchor = invoker?.getBoundingClientRect();
-  const box = pop.getBoundingClientRect();
-  if (anchor) {
-    const below = anchor.bottom + 6;
-    const top = below + box.height <= window.innerHeight - 8 ? below : Math.max(8, anchor.top - box.height - 6);
-    pop.style.left = `${Math.max(8, Math.min(window.innerWidth - box.width - 8, anchor.left))}px`;
-    pop.style.top = `${top}px`;
-    // a phone lays the list popover out as a sheet at the foot; Save ▾'s menu keeps this place (CSS)
-    pop.style.setProperty('--pop-left', pop.style.left);
-    pop.style.setProperty('--pop-top', pop.style.top);
-  }
-  (pop.querySelector('input[type="checkbox"]:not(:disabled)') || pop).focus({ preventScroll: true });
+  // Save ▾'s menu unfolds inside its card or row, or as a drawer under its bar (placeSaveMenu): it never lies over another
+  // control; in the word popup the card grows, and keepFloatingBeside seats the taller card beside its word again
+  placeSaveMenu(pop, invoker, menu ? place : 'popover');
 }
 
 /* The word popup (John, 2026-10-02, notes 8, 11, 17 and 18; round 4, T5). One tap shows a raised card
@@ -9059,68 +9183,25 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   const hostMenu = save === 'host' && !!host?.menu && !identityHeld;
   let seal = null;
   if (save !== 'none' && !note) {
-    seal = el('button', 'mini-take btn-primary');
-    seal.type = 'button';
-    seal.id = 'mini-take';
-    if (save === 'default') seal.dataset.appSave = 'true';
-    if (canSave && (save === 'default' || hostMenu)) {
-      seal.dataset.saveMenu = 'true';
-      seal.setAttribute('aria-haspopup', 'dialog');
-      seal.setAttribute('aria-expanded', 'false');
-    }
-    const savedNow = save === 'host' ? !!host?.saved?.() : held ? S.taken.some((t) => t.t === kind && t.id === token.b) : miniState === 'taken';
-    paintWordSave(seal, savedNow);
-    if (!canSave) {
-      seal.disabled = true;
-      seal.classList.add('reader-capture-held');
-      if (!pending) seal.setAttribute('aria-describedby', 'mini-take-reason');
-    }
-    // the surface's own path keeps its own ledger: once it says the word is saved, Save rests — unless it carries
-    // the menu, in which case Saved ✓ ▾ stays live for the lists
-    if (save === 'host' && savedNow && !seal.dataset.saveMenu) seal.disabled = true;
-    // Save ▾: one press saves the word and opens its menu (lists, copy, remove from review); on "Saved ✓" a
-    // press opens the menu again, or puts it away. A second press within a breath of the first (a
-    // double-click, a bounced tap) is the same press
-    let pressedAt = -Infinity;
-    const openMenu = () => openVocabularyListPopover(captureNode, label, seal, {
-      menu: true,
+    // S · the slip's Save is the one Save (saveOne): the corridor's path on the node, or the surface's own (host); its
+    // menu holds the lists either way — a host's ledger keeps the save, the lists are written through the app's record
+    const hostSaved = () => !!host?.saved?.();
+    const appSaved = () => (held ? S.taken.some((t) => t.t === kind && t.id === token.b) : wordCaptureState(captureNode) === 'taken');
+    seal = saveOne({
+      id: 'mini-take',
+      cls: 'mini-take',
+      label,
+      node: canSave && (save === 'default' || hostMenu) ? captureNode : null,
+      saved: save === 'host' ? hostSaved : appSaved,
+      keep: save === 'host' ? () => host.take() : () => toggleWordSave(captureNode, label),
       review: save === 'host'
-        ? { saved: () => !!host.saved?.(), toggle: () => (host.saved?.() ? host.untake?.() : host.take()) }
-        : { saved: () => seal.getAttribute('aria-pressed') === 'true', toggle: () => toggleWordSave(captureNode, label) },
-      more: [{ id: 'mini-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(token.s || token.b) }],
+        ? { saved: hostSaved, toggle: () => (host.saved?.() ? host.untake?.() : host.take()) }
+        : { saved: appSaved, toggle: () => toggleWordSave(captureNode, label) },
+      more: () => [{ id: 'mini-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(token.s || token.b) }],
+      held: !canSave,
     });
-    seal.addEventListener('click', (event) => {
-      event.stopPropagation();
-      if (seal.disabled || Date.now() - pressedAt < SAVE_PRESS_MS) return undefined;
-      pressedAt = Date.now();
-      if (save === 'host') {
-        // busy, never disabled, while the surface saves: a disabled button drops the keyboard to the page
-        if (seal.getAttribute('aria-busy') === 'true') return undefined;
-        // Saved ✓ ▾: the menu again, or away
-        if (seal.dataset.saveMenu && seal.getAttribute('aria-pressed') === 'true') return openMenu();
-        seal.setAttribute('aria-busy', 'true');
-        const settle = (ok) => {
-          if (!seal.isConnected) return ok;
-          seal.removeAttribute('aria-busy');
-          const saved = !!host.saved?.();
-          paintWordSave(seal, saved);
-          paintMiniPath(actions, saved);
-          if (saved) {
-            if (seal.dataset.saveMenu) openMenu(); // the lists unfold under Saved ✓, as everywhere
-            else {
-              // Save rests once the surface says the word is saved; the keyboard stays on the slip
-              if (document.activeElement === seal) mini.focus({ preventScroll: true });
-              seal.disabled = true;
-            }
-          }
-          return ok;
-        };
-        return Promise.resolve(host.take()).then(settle, () => settle(false));
-      }
-      if (!seal.dataset.saveMenu) return toggleWordSave(captureNode, label);
-      if (seal.getAttribute('aria-pressed') === 'true') return openMenu();
-      return Promise.resolve(toggleWordSave(captureNode, label)).then((saved) => { if (saved && seal.isConnected) openMenu(); return saved; });
-    });
+    if (save === 'default') seal.dataset.appSave = 'true';
+    if (!canSave && !pending) seal.setAttribute('aria-describedby', 'mini-take-reason');
     if (!canSave && !pending) {
       // when the meaning line already says the word has no entry here (the quick dictionary's miss, or, R, no entry
       // at all once the full dictionary was asked: 高市), the reason only finishes it and promises no other door
@@ -9147,8 +9228,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   }
   if (seal) {
     actions.append(seal);
-    // the note and the toast share one noun: Save puts the word "to review", and the toast says "Saved to review"
-    if (canSave) actions.append(el('span', 'mini-take-note', tx('復習に入ります', 'goes into review')));
+    // S · no caption beside Save (John, 2026-10-16: ":goes into review is excessive and 無駄"): the Save says enough
     paintMiniPath(actions, seal.getAttribute('aria-pressed') === 'true');
     mini.append(actions);
   } else if (note) {
@@ -9550,21 +9630,19 @@ function readerSentenceRow(node, index, sourceEnd = index) {
   pane.append(choices);
   // keeping the sentence for later (the glossary: the sentence's own actions live inside its pane): the word
   // menu's "Save the sentence", one guarded write, set quieter than the two choices
-  const keep = el('button', 'mini-sentence-keep');
-  keep.type = 'button';
-  keep.id = 'reader-context-save';
-  keep.append(el('span', 'mini-sentence-keep-name', tx('この文を保存', 'Save the sentence')),
-    el('span', 'mini-sentence-keep-hint', tx('先生のページに残す', 'Keep it on the tutor page')));
+  // S · keeping the sentence is the one Save (saveOne), in a row of its own under the two choices
+  const keepRow = el('div', 'mini-sentence-keep-row');
+  keepRow.dataset.saveRow = '';
+  const keep = saveOne({
+    id: 'reader-context-save', cls: 'mini-sentence-keep', label: tx('この文', 'this sentence'),
+    saved: () => sentenceKept(node),
+    keep: () => (recordWritable() ? sendSentenceToTutor(node, false, () => keep.isConnected, say) : false),
+    more: () => [{ id: 'reader-context-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(sentence?.quote || '') }],
+  });
   keep.disabled = !recordWritable();
   buttons.push(keep);
-  keep.addEventListener('click', async (event) => {
-    event.stopPropagation();
-    if (keep.disabled) return;
-    for (const control of buttons) control.disabled = true;
-    try { await sendSentenceToTutor(node, false, () => keep.isConnected, say); }
-    finally { for (const control of buttons) control.disabled = !recordWritable(); }
-  });
-  pane.append(keep);
+  keepRow.append(keep);
+  pane.append(keepRow);
   // The door and pane trade places. Keep the top edge for long quotes too; placeFloating limits
   // the pane to the available space. Back on the word, the card sits beside its word again.
   const show = (open, { focus = true } = {}) => {
@@ -9608,8 +9686,7 @@ async function sendSentenceToTutor(node, discuss, currentSurface, say) {
       keepScroll(); stopReadAloud(); S.stack = [];
       S.view = 'ai'; S.aiChatShown = AI_CHAT_PAGE;
       render(); window.scrollTo(0, 0);
-    } else say(tx('先生のページに保存した。覚えるかどうかは、あとで選べる。',
-      'Saved on the tutor page. You can choose whether to memorize it later.'));
+    } else say(tx('先生のページに保存した。', 'Saved on the tutor page.'));
     return true;
   } catch (error) {
     if (recordReady(epoch)) say(teacherSourceError(error));
@@ -14348,14 +14425,20 @@ function renderLessons(main) {
     // 覚える held, instead of a ✓ or a 覚える the batch would skip without a word
     const heldText = learningEnrollHeldText({ t: kt, id: w, from: null });
     if (heldText) held.add(w);
-    const have = !heldText && inDeck.has(srsKey(kt, w));
-    const b = biLabel('button', have ? 'chip btn-secondary lesson-enroll-one on' : 'chip btn-secondary lesson-enroll-one', have ? '覚える ✓' : '覚える', have ? 'memorizing' : 'memorize');
-    b.type = 'button';
-    b.dataset.enroll = w;
-    b.disabled = have || !!heldText || learningEnrollmentPending.has(run);
-    if (!have && !heldText) {
-      b.addEventListener('click', () => enroll([w]));
-    }
+    // S · each word's keep is the one Save (saveOne); the lesson's enrollment stays its keep path
+    row.dataset.saveRow = '';
+    const keepNode = { t: kt, id: w, from: null };
+    const kept = () => !learningEnrollHeldText(keepNode) && S.taken.some((item) => item.t === kt && item.id === w);
+    const b = saveOne({
+      cls: 'lesson-enroll-one', label: w, node: keepNode, saved: kept, held: !!heldText, attrs: { 'data-enroll': w },
+      keep: async () => {
+        const ok = await enroll([w]);
+        if (ok && kept()) document.querySelector(`#app [data-enroll="${CSS.escape(w)}"]`)?.saveOneOpen?.();
+        return ok;
+      },
+      review: { saved: kept, toggle: () => toggleWordSave(keepNode, w) },
+    });
+    if (learningEnrollmentPending.has(run)) b.disabled = true;
     row.append(b);
     list.append(row);
     if (heldText) {
@@ -14371,19 +14454,10 @@ function renderLessons(main) {
   main.append(list);
   const freshWords = run.words.filter((w) => !inDeck.has(srsKey(kt, w)) && !held.has(w));
   if (freshWords.length) {
-    const all = biLabel(
-      'button',
-      'chip lesson-enroll-all',
-      `ぜんぶ覚える — ${freshWords.length} 件`,
-      `memorize all ${freshWords.length}`,
-    );
-    all.type = 'button';
-    all.id = 'lesson-enroll-all';
+    // exactly the not-yet-chosen words, as ONE committed batch (P0-4), on the one Save
+    const all = saveOne({ id: 'lesson-enroll-all', cls: 'lesson-enroll-all', all: freshWords.length, saved: () => false,
+      keep: () => enroll(freshWords) });
     all.disabled = learningEnrollmentPending.has(run);
-    all.addEventListener('click', () => {
-      // exactly the not-yet-chosen words, as ONE committed batch (P0-4)
-      return enroll(freshWords);
-    });
     main.append(all);
   }
   const again = biLabel('button', 'take', 'レッスン一覧へ', 'back to lessons');
@@ -15984,10 +16058,20 @@ function renderMockResult(main, set, flat, run, selected) {
     const heldText = completed && !unanswered && !ok && key ? learningEnrollHeldText({ t, id, from: null }) : null;
     if (completed && !unanswered && !ok && key && (heldText || !inDeck.has(key))) {
       if (!heldText) missed.push({ t, id, key });
-      const b = biLabel('button', 'chip lesson-enroll-one', '覚える', 'memorize');
-      b.type = 'button';
-      b.dataset.enroll = id;
-      b.disabled = !!heldText || learningEnrollmentPending.has(enrollmentOwner);
+      // S · the missed word's keep is the one Save (saveOne), the menu under its row
+      row.dataset.saveRow = '';
+      const keepNode = { t, id, from: null };
+      const kept = () => !learningEnrollHeldText(keepNode) && S.taken.some((item) => item.t === t && item.id === id);
+      const b = saveOne({
+        cls: 'lesson-enroll-one', label: id, node: keepNode, saved: kept, held: !!heldText, attrs: { 'data-enroll': id },
+        keep: async () => {
+          const ok = await enroll([keepNode]);
+          if (ok && kept()) document.querySelector(`#app [data-enroll="${CSS.escape(id)}"]`)?.saveOneOpen?.();
+          return ok;
+        },
+        review: { saved: kept, toggle: () => toggleWordSave(keepNode, id) },
+      });
+      if (learningEnrollmentPending.has(enrollmentOwner)) b.disabled = true;
       if (heldText) {
         b.classList.add('word-capture-held');
         const reason = el('p', 'enroll-held', heldText);
@@ -15996,7 +16080,7 @@ function renderMockResult(main, set, flat, run, selected) {
         body.append(reason);
         const open = heldEnrollRoute({ t, id, from: null }, `mock-enroll-open-${i}`);
         if (open) body.append(open);
-      } else b.addEventListener('click', () => enroll([{ t, id, from: null }]));
+      }
       row.append(b);
     }
     list.append(row);
@@ -16006,16 +16090,9 @@ function renderMockResult(main, set, flat, run, selected) {
     (m, i) => missed.findIndex((o) => o.key === m.key) === i && !inDeck.has(m.key),
   );
   if (fresh.length) {
-    const all = biLabel(
-      'button',
-      'chip lesson-enroll-all',
-      `間違えた言葉をぜんぶ覚える — ${fresh.length} 件`,
-      `memorize all ${fresh.length} missed`,
-    );
-    all.type = 'button';
-    all.id = 'mock-enroll-all';
+    const all = saveOne({ id: 'mock-enroll-all', cls: 'lesson-enroll-all', all: fresh.length, saved: () => false,
+      keep: () => enroll(fresh.map(({ t, id }) => ({ t, id, from: null }))) });
     all.disabled = learningEnrollmentPending.has(enrollmentOwner);
-    all.addEventListener('click', () => enroll(fresh.map(({ t, id }) => ({ t, id, from: null }))));
     main.append(all);
   }
   const back = biLabel('button', 'take', '練習一覧へ', 'back to practice');
@@ -17079,25 +17156,45 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
   publisherSelectionSurface = { connected: () => section.isConnected, update };
   refresh();
 }
+/** Whether this sentence already stands on the tutor page (a kept sentence): read-only, from the record's entries. */
+function sentenceKept(node) {
+  const quote = node?.sourceContext?.quote || teacherSentence(node)?.quote || '';
+  return !!quote && (S.teacherContexts?.entries || []).some((entry) => entry.quote === quote);
+}
 function renderTeacherDoor(container, getNode) {
   const node = typeof getNode === 'function' ? getNode() : getNode;
   const wrap = el('div', 'teacher-door');
   const quote = el('p', 'teacher-source-quote');
   quote.textContent = node?.sourceContext?.quote || teacherSentence(node)?.quote || '';
   const actions = el('div', 'teacher-actions');
+  actions.dataset.saveRow = '';
   const note = el('p', 'teacher-note');
   note.setAttribute('role', 'status');
-  for (const [discuss, ja, en] of [[false, 'この文を保存', 'save this sentence'], [true, 'この文を先生と話す', 'discuss this sentence']]) {
-    const button = biLabel('button', 'chip', ja, en);
+  // S · the sentence's keep is the one Save (saveOne): it keeps the sentence on the tutor page, then its menu; asking the
+  // tutor and practising stay beside it as two quiet actions, in the words the slip's sentence pane uses
+  const selectedNow = () => (typeof getNode === 'function' ? getNode() : getNode);
+  const keepSentence = saveOne({
+    cls: 'teacher-save', label: tx('この文', 'this sentence'),
+    saved: () => sentenceKept(selectedNow()),
+    keep: async () => {
+      const selected = selectedNow();
+      if (!selected || !recordWritable()) return false;
+      return sendSentenceToTutor(selected, false, retainActionSurface(keepSentence), (text) => { note.textContent = text; });
+    },
+    more: () => [{ id: 'teacher-save-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(quote.textContent || '') }],
+  });
+  keepSentence.disabled = !node || !recordWritable();
+  actions.append(keepSentence);
+  {
+    const button = biLabel('button', 'chip btn-tertiary teacher-discuss', '先生に聞く', 'Ask the tutor');
     button.type = 'button';
-    button.classList.add(discuss ? 'teacher-discuss' : 'teacher-save');
     button.disabled = !node || !recordWritable();
     button.addEventListener('click', async () => {
-      const selected = typeof getNode === 'function' ? getNode() : getNode;
+      const selected = selectedNow();
       if (!selected || button.disabled) return;
       const currentSurface = retainActionSurface(button);
       for (const control of actions.children) control.disabled = true;
-      try { await sendSentenceToTutor(selected, discuss, currentSurface, (text) => { note.textContent = text; }); }
+      try { await sendSentenceToTutor(selected, true, currentSurface, (text) => { note.textContent = text; }); }
       finally {
         for (const control of actions.children) control.disabled = !recordWritable();
       }
@@ -17106,7 +17203,7 @@ function renderTeacherDoor(container, getNode) {
   }
   if (sentencePracticeModule && (node?.sourceContext
     ? node.sourceContext.sourceKind === 'bundled-passage' : !!node?.from)) {
-    const practice = biLabel('button', 'chip', 'この文を練習する', 'practice this sentence');
+    const practice = biLabel('button', 'chip btn-tertiary', '練習する', 'Practice it');
     practice.type = 'button'; practice.id = 'entry-sentence-practice';
     const selectedNode = () => typeof getNode === 'function' ? getNode() : getNode;
     const key = (value) => JSON.stringify([value?.t, value?.id, value?.from?.passage, value?.from?.index, value?.sourceContext?.id]);
@@ -22469,51 +22566,6 @@ function renderWordCaptureNote(container, node, label = node.id) {
   container.append(note);
 }
 
-function takeButton(node, label) {
-  // D23: a word's control is 'taken' only when the record's card is the identity it stands
-  // for. Another entry's card, or an explicit answer not yet validated, holds it.
-  const state = node.t === 'word' ? wordCaptureState(node) : null;
-  const already = state ? state === 'taken' : S.taken.some((t) => t.t === node.t && t.id === node.id);
-  const btn = biLabel(
-    'button',
-    already ? 'take taken' : 'take',
-    already ? '覚える ✓ — やめる' : '覚える',
-    already ? 'memorizing — tap to stop' : 'memorize',
-  );
-  btn.type = 'button';
-  btn.id = 'take';
-  if (personalHost) paintWordSave(btn, already);
-  if (personalHost && node.t === 'word' && !lookup(node.id, node.seq, node.reading)) btn.disabled = true;
-  btn.setAttribute('aria-pressed', String(already));
-  if (!already && node.t === 'kanji') {
-    const answer = retainedKanjiRecord(node.id) || D.kanji[node.id] || window.BunkiSkipUI?.getKanji(S.skipUi, node.id);
-    if (!answer?.m?.trim()) {
-      btn.disabled = true;
-      btn.setAttribute('aria-label', tx('語義が未収録のため覚える対象にできません。', 'A meaning is needed before this kanji can be memorized.'));
-    }
-  }
-  if (state === 'conflict' || state === 'unavailable') {
-    btn.disabled = true;
-    btn.classList.add('word-capture-held');
-    btn.setAttribute('aria-describedby', 'word-capture-note');
-  }
-  btn.addEventListener('click', async () => {
-    if (btn.disabled) return;
-    if (personalHost) { await toggleWordSave(node, label); return; }
-    const epoch = recordEpoch, currentSurface = retainActionSurface(btn);
-    btn.disabled = true;
-    const saved = await toggleTaken(node, label);
-    btn.disabled = false;
-    if (!saved || !recordWritable(epoch) || !currentSurface()) return;
-    // taking opens the list drawer right under the finger — the "where does
-    // it go" choice arrives with the act (operator, 2026-08-27); letting go
-    // closes it
-    S.listMenuFor = already ? null : `${node.t}|${node.id}`;
-    render();
-  });
-  return btn;
-}
-
 /* ------------------------------------------- 覚える top-right (directive §3)
  * One button in the top-right corner of every capture-eligible surface. The
  * entry sheets carry their own seal in the sheet bar; the reader's lives in
@@ -22527,6 +22579,61 @@ function readerTakeCurrent() {
   const cur = S.readerTake;
   if (!cur || cur.p !== S.passageId) return null;
   return cur;
+}
+
+/** S · what the reader's keep stands for: the word last touched, read as the slip reads it (readingToken, the R slice's
+ * reading truth), with the slip's own save facts — so the bar and the card can never disagree about what Save keeps. */
+function chromeKeepTarget() {
+  const cur = readerTakeCurrent();
+  const token = cur ? passage()?.tokens?.[cur.index] : null;
+  if (!token || token.b !== cur.id) return null;
+  const door = readingToken(token);
+  const facts = wordSaveFacts(door, { reader: !(door.seq && !D.dict[door.b]), from: { passage: cur.p, index: cur.index } });
+  return { label: door.b, ...facts };
+}
+/** The reader's keep: the one Save (saveOne) in the bar, its menu a drawer under the bar. A word that cannot be kept here
+ * (D11, D23) keeps its dashed look, and a press says why, as the slip does. */
+function chromeKeep() {
+  const target = chromeKeepTarget();
+  const savedNow = () => {
+    const now = chromeKeepTarget();
+    return !!now && !now.held && wordCaptureState(now.node) === 'taken';
+  };
+  const button = saveOne({
+    id: 'chrome-keep', cls: 'chrome-keep', label: target?.label || '', word: target?.label || '', attrs: { 'data-save-bar': '' },
+    node: target && !target.held && !target.identityHeld ? target.node : null, place: 'drawer', saved: savedNow,
+    keep: () => {
+      const now = chromeKeepTarget();
+      if (!now) { showReaderToast(tx('文中の語をタップしてから、保存する。', 'Tap a word in the story, then Save.')); return false; }
+      if (now.held || now.identityHeld) {
+        showReaderToast(now.held ? readerCaptureReasonText(now.label) : wordCaptureHeldText(now.node, { route: false }));
+        return false;
+      }
+      return toggleWordSave(now.node, now.label);
+    },
+    review: { saved: savedNow, toggle: () => { const now = chromeKeepTarget(); return now ? toggleWordSave(now.node, now.label) : false; } },
+    more: () => [{ id: 'chrome-keep-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(chromeKeepTarget()?.label || '') }],
+  });
+  button.dataset.saveKey = target ? `${target.node.t}:${target.node.id}:${target.node.reading || ''}` : '';
+  if (!target) button.dataset.saveRest = '';
+  if (target && (target.held || target.identityHeld)) button.classList.add('reader-capture-held');
+  paintWordSave(button, savedNow());
+  // its name is its words, with the whole word when the bar shortens it
+  button.setAttribute('aria-label', target
+    ? (savedNow() ? tx(`「${target.label}」保存済み`, `Saved ${target.label}`) : tx(`「${target.label}」を保存`, `Save ${target.label}`))
+    : tx('語を保存 — 文中の語をタップしてから', 'Save a word — tap a word in the story first'));
+  return button;
+}
+/** After a touch, a save or an undo: the bar's keep names the word now under the finger, in place (no render). */
+function syncChromeKeep() {
+  const old = document.getElementById('chrome-keep');
+  if (!old) return;
+  const fresh = chromeKeep();
+  if (fresh.dataset.saveKey === old.dataset.saveKey && old.getAttribute('aria-expanded') === 'true') {
+    paintWordSave(old, fresh.getAttribute('aria-pressed') === 'true');
+    return;
+  }
+  old.replaceWith(fresh);
 }
 
 /** The capture node the reader's door commits: the word as encountered —
@@ -22559,6 +22666,7 @@ function syncTrayCount() {
  * its own (one Save: the slip's and the sheet's — John, 2026-10-15 17:20), so nothing up there repaints. */
 function syncReaderTakeSeal() {
   updateReaderPlaceSave();
+  syncChromeKeep();
   const selected = readerTakeCurrent();
   for (const node of document.querySelectorAll('#reader .tok-current')) node.classList.remove('tok-current');
   if (selected) readerTokenAtIndex(selected.index)?.classList.add('tok-current');
@@ -22636,176 +22744,6 @@ function renderContextPicker(sheet, node, { currentSurface = recordPickerSurface
       }
     });
     chips.append(chip);
-  }
-  wrap.append(chips);
-  sheet.append(wrap);
-}
-
-function renderListPicker(sheet, node, label) {
-  if (personalHost) {
-    const add = biLabel('button', 'chip btn-secondary', 'リストに追加…', 'Add to list…');
-    add.type = 'button'; add.id = 'personal-add-list';
-    add.setAttribute('aria-haspopup', 'dialog'); add.setAttribute('aria-expanded', 'false');
-    add.disabled = !personalHost.allowed() || !recordWritable() ||
-      ['conflict', 'unavailable'].includes(wordCaptureState(node)) ||
-      (node.t === 'word' && !lookup(node.id, node.seq, node.reading));
-    add.addEventListener('click', () => openVocabularyListPopover(node, label, add));
-    sheet.append(add);
-    return;
-  }
-  const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
-  if (!item) return;
-  if (node.t === 'word' && wordCaptureState(node) !== 'taken') return;
-  const menuKey = `${node.t}|${node.id}`;
-  const currentSurface = recordPickerSurface(node);
-  const open = S.listMenuFor === menuKey;
-  const memberOf = Object.keys(S.lists).filter((n) =>
-    S.lists[n].some((x) => x.t === node.t && x.id === node.id),
-  );
-  const wrap = el('div', 'list-picker');
-  // the drawer: taking a word opens it by itself; afterwards this quiet bar
-  // reopens it — where the word lives is one glance, one tap to change
-  const head = el('button', open ? 'fold-head open' : 'fold-head');
-  head.id = `list-picker-fold:${node.t}:${node.id}`;
-  head.type = 'button';
-  head.setAttribute('aria-expanded', String(open));
-  head.append(el('span', 'fold-title', tx('保存先', 'saved to')));
-  head.append(
-    el(
-      'span',
-      'fold-sub',
-      tx(
-        `保存先：覚えるの札${memberOf.length ? `・${memberOf.join('・')}` : ''}`,
-        `saved to: daily review${memberOf.length ? ` · ${memberOf.join(' · ')}` : ''}`,
-      ),
-    ),
-  );
-  head.append(el('span', 'fold-arrow', open ? '▼' : '▶'));
-  head.addEventListener('click', () => {
-    S.listMenuFor = open ? null : menuKey;
-    render();
-  });
-  wrap.append(head);
-  if (!open) {
-    sheet.append(wrap);
-    return;
-  }
-  wrap.append(
-    withEn(el('p', 'eyebrow', 'リストに入れる・外す'), 'add to or remove from a list', 'en-inline'),
-  );
-  const chips = el('div', 'chips');
-  for (const name of Object.keys(S.lists)) {
-    const inList = S.lists[name].some((x) => x.t === node.t && x.id === node.id);
-    const chip = el('button', inList ? 'chip wide on-list' : 'chip wide');
-    chip.type = 'button';
-    chip.append(el('span', 'big', name));
-    chip.append(el('span', 'sub', `${S.lists[name].length}`));
-    const pendingKey = `member:${name}:${menuKey}`;
-    chip.disabled = listRecordPending.has(pendingKey) || !recordWritable();
-    chip.addEventListener('click', async () => {
-      if (listRecordPending.has(pendingKey) || !recordWritable()) return;
-      // membership rides the same guarded path as list creation below:
-      // prototype-safe writes on a COPY, one commit, no live mutation
-      listRecordPending.add(pendingKey);
-      chip.disabled = true;
-      let saved;
-      try {
-        saved = await commitStorePatch((latest) => {
-          if (!owns(latest.lists, name)) throw new Error('list-no-longer-available');
-          const currentItem = latest.taken.find((row) => row.t === node.t && row.id === node.id);
-          if (!currentItem) throw new Error('captured-item-no-longer-available');
-          const next = { ...latest.lists };
-          const members = latest.lists[name];
-          setOwnRecordValue(next, name, inList
-            ? members.filter((row) => !(row.t === node.t && row.id === node.id))
-            : members.some((row) => row.t === node.t && row.id === node.id) ? members : [
-              ...members,
-              { t: node.t, id: node.id, label, kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1], ts: currentItem.ts,
-                ...(currentItem.sourceContextRef ? { sourceContextRef: currentItem.sourceContextRef } : {}) },
-            ]);
-          return { lists: next };
-        });
-      } finally {
-        listRecordPending.delete(pendingKey);
-        chip.disabled = !recordWritable();
-      }
-      // A dictionary response or another sheet control may replace the DOM
-      // while IDB commits. Repaint the same content after the receipt, even
-      // when the original button has detached; another entry keeps its place.
-      if (saved && currentSurface()) render();
-    });
-    chips.append(chip);
-  }
-  const add = el('button', 'chip wide');
-  add.type = 'button';
-  add.id = 'new-list';
-  add.append(el('span', 'big', tx('＋ 新規リスト', '＋ new list')));
-  add.addEventListener('click', () => {
-    S.sheetListMaker = !S.sheetListMaker;
-    render();
-  });
-  chips.append(add);
-  if (S.sheetListMaker) {
-    const row = el('div', 'list-maker');
-    const field = el('input', 'list-maker-field');
-    field.type = 'text';
-    field.id = `list-picker-name:${node.t}:${node.id}`;
-    attachRecordDraft(field);
-    field.placeholder = tx('新しいリストの名前', 'name a new list');
-    field.setAttribute('aria-label', tx('新しいリストの名前', 'name for a new list'));
-    const make = biLabel('button', 'chip list-maker-make', '＋ 作る', 'create');
-    make.type = 'button';
-    const pendingKey = `sheet-create:${menuKey}`;
-    make.disabled = listRecordPending.has(pendingKey) || !recordWritable();
-    field.readOnly = listRecordPending.has(pendingKey);
-    const tryMake = async () => {
-      if (listRecordPending.has(pendingKey) || !recordWritable()) return;
-      const draft = field.value;
-      const name = field.value.trim();
-      if (!name) {
-        field.setAttribute('aria-invalid', 'true');
-        field.focus();
-        return;
-      }
-      listRecordPending.add(pendingKey);
-      make.disabled = true;
-      field.readOnly = true;
-      let saved;
-      try {
-        saved = await commitStorePatch((latest) => {
-          const currentItem = latest.taken.find((row) => row.t === node.t && row.id === node.id);
-          if (!currentItem) throw new Error('captured-item-no-longer-available');
-          const next = { ...latest.lists };
-          // An existing name receives the item once, without losing any
-          // membership committed while this field was open.
-          const members = owns(latest.lists, name) ? latest.lists[name] : [];
-          if (!members.some((row) => row.t === node.t && row.id === node.id))
-            setOwnRecordValue(next, name, [...members, { t: node.t, id: node.id, label, kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1], ts: currentItem.ts,
-              ...(currentItem.sourceContextRef ? { sourceContextRef: currentItem.sourceContextRef } : {}) }]);
-          return { lists: next };
-        });
-      } finally {
-        listRecordPending.delete(pendingKey);
-        make.disabled = !recordWritable();
-        field.readOnly = false;
-      }
-      if (saved) {
-        if (readRecordDrafts()[field.id] === draft) {
-          field.value = '';
-          rememberRecordDraft(field);
-        }
-        if (currentSurface()) {
-          S.sheetListMaker = false;
-          render();
-        }
-      }
-    };
-    make.addEventListener('click', tryMake);
-    field.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Enter') tryMake();
-    });
-    row.append(field, make);
-    chips.append(row);
   }
   wrap.append(chips);
   sheet.append(wrap);
@@ -27631,7 +27569,7 @@ function renderAiReading(main) {
     }
     if (S.aiReading.candidates?.wordIds?.length) {
       const row = el('div', 'airead-candidates');
-      row.append(withEn(el('p', 'eyebrow', '覚える候補'), 'suggested words — add only what you want to review', 'en-inline'));
+      row.append(withEn(el('p', 'eyebrow', '覚える候補'), 'suggested words', 'en-inline'));
       for (const word of S.aiReading.candidates.wordIds) {
         if (!lookup(word)) continue;
         const item = el('span', 'airead-candidate');
@@ -27639,18 +27577,15 @@ function renderAiReading(main) {
         open.type = 'button'; open.dataset.aireadCandidate = word;
         open.addEventListener('click', () => go({ t: 'word', id: word }));
         item.append(open);
-        if (!S.taken.some((capture) => capture.t === 'word' && capture.id === word)) {
-          const take = biLabel('button', 'chip', '覚える', 'add to review');
-          take.type = 'button'; take.dataset.aireadTake = word;
-          take.addEventListener('click', async () => {
-            if (take.disabled || !lookup(word)) return;
-            take.disabled = true;
-            const saved = await commitCapture({ t: 'word', id: word, from: null, by: 'sensei' }, word);
-            take.disabled = false;
-            if (saved && take.isConnected) render();
-          });
-          item.append(take);
-        }
+        // S · each suggestion's keep is the one Save (saveOne), its menu under the word's row
+        item.dataset.saveRow = '';
+        const keepNode = { t: 'word', id: word, from: null };
+        const kept = () => S.taken.some((capture) => capture.t === 'word' && capture.id === word);
+        item.append(saveOne({
+          label: word, node: keepNode, saved: kept, attrs: { 'data-airead-take': word },
+          keep: () => (lookup(word) ? commitCapture({ t: 'word', id: word, from: null, by: 'sensei' }, word) : false),
+          review: { saved: kept, toggle: () => toggleWordSave(keepNode, word) },
+        }));
         row.append(item);
       }
       main.append(row);
@@ -28679,13 +28614,10 @@ function renderWordNode(sheet, node) {
     sheet.append(semWrap);
   }
 
-  const take = takeButton(node, label);
-  if (node.readerChoice) holdReaderCapture(take);
-  sheet.append(take);
-  // D23: why 覚 is held on this entry: another entry's card, or an answer not yet validated
+  // S · the page's one Save stands in its bar (saveOne); D23: why it is held on this entry, another entry's card or an
+  // answer not yet validated
   if (!node.readerChoice) renderWordCaptureNote(sheet, node, label);
   renderContextPicker(sheet, node);
-  renderListPicker(sheet, node, label);
   renderStudyFold(sheet, node, { id: node.id, from: node.from });
 }
 
@@ -29003,8 +28935,7 @@ function renderKanjiNode(sheet, node) {
     );
   }
 
-  sheet.append(takeButton(node, k.c));
-  renderListPicker(sheet, node, k.c);
+
   renderStudyFold(sheet, node, null);
 }
 
@@ -30579,8 +30510,7 @@ function renderRadicalNode(sheet, node) {
     ),
   );
 
-  sheet.append(takeButton(node, r.c));
-  renderListPicker(sheet, node, r.c);
+
   renderStudyFold(sheet, node, null);
 }
 
@@ -30607,8 +30537,7 @@ function renderIdiomNode(sheet, node) {
       'kanji',
     ),
   );
-  sheet.append(takeButton(node, idiom.w));
-  renderListPicker(sheet, node, idiom.w);
+
   renderStudyFold(sheet, node, null);
 }
 
@@ -30759,27 +30688,44 @@ function composePage(node, path) {
       } : {}) }
       : null;
   if (capNode) {
-    // D23: the seal shares the foot button's state, 'taken' only for this identity's card
+    // S · the page's one Save (saveOne), top right as directive §3 asked: one press keeps the item and opens its menu as a
+    // drawer under this bar — review, the lists, Copy. The page's second keep at its foot (覚える and its "saved to" drawer)
+    // is gone: one Save per page. D23: 'taken' only for this identity's card.
     const capState = capNode.t === 'word' ? wordCaptureState(capNode) : null;
-    const takenNow = capState ? capState === 'taken' : S.taken.some((t) => t.t === capNode.t && t.id === capNode.id);
-    const capture = el('button', takenNow ? 'sheet-take taken' : 'sheet-take', sheetTakeLabel(takenNow));
-    capture.type = 'button';
-    capture.id = 'sheet-take';
-    if (personalHost && capNode.t === 'word' && !lookup(capNode.id, capNode.seq, capNode.reading)) capture.disabled = true;
-    capture.setAttribute('aria-pressed', String(takenNow));
-    // one verb for one act (one-hand pass): the name is Save; aria-pressed says whether the word is saved
-    capture.setAttribute('aria-label', capNode === node ? tx('保存', 'Save') : tx(`「${capNode.id}」を保存`, `Save ${capNode.id}`));
-    capture.addEventListener('click', async () => {
-      if (capture.disabled) return;
-      if (personalHost) { await toggleWordSave(capNode, nodeTitle(capNode)); return; }
-      const epoch = recordEpoch, currentSurface = retainActionSurface(capture);
-      capture.disabled = true;
-      const saved = await toggleTaken(capNode, nodeTitle(capNode));
-      capture.disabled = false;
-      if (!saved || !recordWritable(epoch) || !currentSurface()) return;
-      S.listMenuFor = takenNow ? null : `${capNode.t}|${capNode.id}`;
+    const capLabel = nodeTitle(capNode);
+    const savedNow = () => (capNode.t === 'word' ? wordCaptureState(capNode) === 'taken' : S.taken.some((t) => t.t === capNode.t && t.id === capNode.id));
+    // the page's keep path, unchanged: the guarded capture, then the page drawn again with the item kept
+    const pageToggle = async () => {
+      if (personalHost) return toggleWordSave(capNode, capLabel);
+      const epoch = recordEpoch, currentSurface = retainActionSurface(document.getElementById('sheet-take'));
+      const saved = await toggleTaken(capNode, capLabel);
+      if (!saved || !recordWritable(epoch) || !currentSurface()) return false;
       render();
+      return true;
+    };
+    const capture = saveOne({
+      id: 'sheet-take', cls: 'sheet-take', label: capLabel, node: capNode, place: 'drawer', saved: savedNow,
+      keep: async () => {
+        const kept = await pageToggle();
+        // the page was drawn again: its fresh Save opens the menu where the pressed one stood
+        if (kept && savedNow()) document.getElementById('sheet-take')?.saveOneOpen?.();
+        return kept;
+      },
+      review: { saved: savedNow, toggle: pageToggle },
+      more: () => [{ id: 'sheet-take-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(capLabel) }],
     });
+    if (personalHost && capNode.t === 'word' && !lookup(capNode.id, capNode.seq, capNode.reading)) capture.disabled = true;
+    // a kanji with no meaning cannot be memorized: its Save holds, and says why (the foot's 覚える did)
+    if (capNode.t === 'kanji' && !savedNow()) {
+      const answer = retainedKanjiRecord(capNode.id) || D.kanji[capNode.id] || window.BunkiSkipUI?.getKanji(S.skipUi, capNode.id);
+      if (!answer?.m?.trim()) {
+        capture.disabled = true;
+        capture.classList.add('reader-capture-held');
+        capture.setAttribute('aria-label', tx('語義が未収録のため保存できません。', 'A meaning is needed before this kanji can be saved.'));
+      }
+    }
+    // one verb for one act (one-hand pass): the name is Save; aria-pressed says whether the word is saved
+    if (capNode !== node && !capture.getAttribute('aria-label')) capture.setAttribute('aria-label', tx(`「${capNode.id}」を保存`, `Save ${capNode.id}`));
     // a word matched from a reader token cannot be carried safely by a card (D11)
     if (node.readerChoice) holdReaderCapture(capture);
     else if (capState === 'conflict' || capState === 'unavailable') {
@@ -30836,8 +30782,7 @@ function composePage(node, path) {
   else if (node.t === 'sent') renderSentenceNode(sheet, node);
   else if (node.t === 'reference') renderReferenceNode(sheet, node);
   if (personalHost && ['grammar', 'particle'].includes(node.t)) {
-    sheet.append(takeButton(node, nodeTitle(node)));
-    renderListPicker(sheet, node, nodeTitle(node));
+
   }
   if (node.t !== 'reference' && node.referenceEntry?.levelSources?.length) {
     const notes = el('details', 'reference-entry-provenance');
@@ -34243,8 +34188,10 @@ function render() {
     chrome.append(dojoDoor);
   }
 
-  // one Save (John, 2026-10-15 17:20): the bar carries none of its own; the slip's and the sheet's Save are the one
-  // Save, so touching a word never adds a control up here
+  // S · the reader's keep (John, 2026-10-16: "why is the plus bar gone???? what replaced it?? how do we know where to add
+  // something"): where the + stood, the one Save in the bar's own type, naming the word last touched (Save 総理); before a
+  // word is touched it says what it does (Save a word). Its path is the slip's Save on the same word (chromeKeep).
+  if (S.view === 'reader' && passage()) chrome.append(chromeKeep());
   // Today: a quiet bookmark and its saved-word count. The on-screen bookmark stays quiet; its
   // name states the room it opens and that the number is saved words, not today's cards.
   const trayBtn = biLabel('button', null, `今日 ${S.taken.length}`, `Today ${S.taken.length}`);
