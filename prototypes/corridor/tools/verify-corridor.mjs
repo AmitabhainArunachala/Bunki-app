@@ -2204,7 +2204,10 @@ async function main() {
   await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review');
   await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
   await waitForAppRecord(page, (record) => d23Cards(record).length === 0, { description: 'the 1353320 card removed through its own door' });
-  if (await page.locator('#vocabulary-list-popover').count()) await page.keyboard.press('Escape');
+  // the page drawn again under the open menu keeps the keyboard in the menu, on its Review row: Escape there closes it
+  await page.waitForFunction(() => document.activeElement?.id === 'mini-review' && !!document.activeElement.closest('#vocabulary-list-popover.is-drawer'));
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
   check('D23 · through the opened route the 1353320 card is removed by its own door', true, 'no 上手 card remains');
   await shoot(page, shotsDir, '12b-d23-core-row');
 
@@ -2759,7 +2762,10 @@ async function main() {
   await page.waitForSelector('#vocabulary-list-popover.is-drawer #mini-review');
   await tap(page, '#vocabulary-list-popover.is-drawer #mini-review');
   await waitForAppRecord(page, (record) => !(record.taken || []).length, { description: 'the 学校 card un-memorized through the Review row' });
-  if (await page.locator('#vocabulary-list-popover').count()) await page.keyboard.press('Escape');
+  // the page drawn again under the open menu keeps the keyboard in the menu, on its Review row: Escape there closes it
+  await page.waitForFunction(() => document.activeElement?.id === 'mini-review' && !!document.activeElement.closest('#vocabulary-list-popover.is-drawer'));
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#vocabulary-list-popover', { state: 'detached' });
   await page.waitForTimeout(300);
   const afterUntake = await evaluateAppRecord(page, `(() => {
     const e = record;

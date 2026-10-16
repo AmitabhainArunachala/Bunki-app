@@ -91,7 +91,10 @@ try {
  assert.equal(canonical.taken.filter(t=>t.t==='word'&&t.id==='図書館').length,1,'adding a list does not duplicate the saved card');
  assert.deepEqual(canonical.taken.find(t=>t.t==='word'&&t.id==='図書館'),savedWord,'list membership preserves the enrolled card');
  assert.deepEqual(canonical.srs,{});assert.deepEqual(canonical.revlog,[]);
- await page.locator('#vocabulary-list-name').press('Escape');await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
+ // S · in the Save's menu the name field folds back into its row once the list is made, and the keyboard stays in the menu
+ // on the new list's box, where Escape closes it (this pressed Escape in the old popover's always-open name field)
+ await page.waitForFunction(()=>document.activeElement?.matches?.('#vocabulary-list-popover input[data-list="Synthetic host list"]'));
+ await page.keyboard.press('Escape');await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
  await page.locator('[data-kanjirow="図"]').click();await page.locator('#sheet[data-node="kanji:図"]').waitFor();await page.locator('#sheet-back').click();await page.locator('#sheet[data-node="word:図書館"]').waitFor();
  await page.goBack();await page.locator('#sheet').waitFor({state:'detached'});
  assert.equal(new URL(page.url()).searchParams.get('deck'),'personal');
@@ -110,12 +113,17 @@ try {
  assert(grammarCard);assert(Number.isFinite(grammarCard.started));assert.equal(grammarCard.from,null);
  assert(grammarSaved.lists['Synthetic host list'].some(t=>t.t==='grammar'&&t.id===grammarId));
  assert.deepEqual(grammarSaved.srs,{});assert.deepEqual(grammarSaved.revlog,[]);
- await page.locator('#vocabulary-list-name').press('Escape');await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
+ // S · the keyboard is on the list's box it just ticked, in the menu; Escape closes it (the name field was never opened)
+ await page.waitForFunction(()=>document.activeElement?.matches?.('#vocabulary-list-popover input[data-list="Synthetic host list"]'));
+ await page.keyboard.press('Escape');await page.locator('#vocabulary-list-popover').waitFor({state:'detached'});
  await page.setViewportSize({width:1440,height:900});
- await page.locator('#personal-add-list').click();await page.locator('#vocabulary-list-popover').waitFor();
- await page.locator('#personal-add-list').click();
- assert.equal(await page.locator('#vocabulary-list-popover').count(),0,'pressing Add to list again dismisses its own popover');
- assert.equal(await page.locator('#personal-add-list').getAttribute('aria-expanded'),'false');
+ // S · the one Save toggles its own menu (it pinned #personal-add-list's popover): a press on Saved ✓ opens it, the next press
+ // folds it — after the Save's breath (SAVE_PRESS_MS: a second press within it is the same press)
+ await page.locator('#sheet-take').click();await page.locator('#vocabulary-list-popover').waitFor();
+ await page.waitForTimeout(650);
+ await page.locator('#sheet-take').click();
+ assert.equal(await page.locator('#vocabulary-list-popover').count(),0,'pressing Save again folds its own menu');
+ assert.equal(await page.locator('#sheet-take').getAttribute('aria-expanded'),'false');
  await page.setViewportSize({width:390,height:844});
  await page.locator('#sheet').press('Escape');await page.locator('#sheet').waitFor({state:'detached'});
  const finalProgress=await page.evaluate(async id=>{const {openStore}=await import('./decks/personal/store.mjs');const store=await openStore();try{return JSON.stringify((await store.get(id)).progress);}finally{store.close();}},data.id);
