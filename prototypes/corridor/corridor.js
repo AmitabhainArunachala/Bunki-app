@@ -9281,8 +9281,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     });
   }
   said.append(word);
-  // R · the reading shown is the one the text gives the word (tokenReading's rule): an entry at hand read otherwise
-  // lends only its meaning, named by its own reading (年 read ねん before ねん's entry is known: とし · year)
+  // R · the reading shown is the one the text gives the word (tokenReading's rule). N (the lead, 2026-10-17): an entry
+  // at hand read otherwise counts as missing, and lends no meaning (訳 read やく never shows わけ · reason)
   const own = kind === 'word' && (!token.b || token.b === token.s) ? String(token.r || '') : '';
   const readsOtherwise = !!own && !!g?.r && kataToHira(String(g.r)) !== kataToHira(own);
   const reading = look?.reading ?? (readsOtherwise ? own : (g?.r || token.r));
@@ -9365,8 +9365,11 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     if (!canSave && !pending) {
       // when the meaning line already says the word has no entry here (the quick dictionary's miss, or, R, no entry
       // at all once the full dictionary was asked: 高市), the reason only finishes it and promises no other door
-      const missShown = !g?.m?.[0];
-      const reason = el('span', 'mini-take-reason', hostHeld || (held ? (missShown ? tx('そのため、ここでは保存できません。', 'So it can’t be saved here.')
+      // N · so does "No dictionary entry for this reading." for a word no entry is named for (訳 read やく): the reason
+      // finishes that line, as it finishes the spelling's miss; a word whose own entry reads otherwise keeps D23's sentence
+      const readMiss = readsOtherwise && !look?.gloss && !waiting && (token.seq == null || token.seq === '');
+      const missShown = !g?.m?.[0] || readMiss;
+      const reason = el('span', 'mini-take-reason', hostHeld || (held || readMiss ? (missShown ? tx('そのため、ここでは保存できません。', 'So it can’t be saved here.')
         : readerCaptureReasonText(token.b)) : wordCaptureHeldText(captureNode)));
       reason.id = 'mini-take-reason';
       mini.append(reason);
