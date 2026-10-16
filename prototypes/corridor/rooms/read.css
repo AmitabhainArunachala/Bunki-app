@@ -811,6 +811,15 @@ body[data-view='drift'] #mini {
   color: var(--mini-head-ink);
 }
 #mini .mini-gloss.mini-miss { font-weight: 400; color: var(--mini-head-ink-2); }
+/* N · the article's own note on this word (wordNotes): one quiet line under the gloss, in the band's second ink */
+#mini .mini-word-note {
+  margin: 8px 0 0;
+  font: 400 13.5px/1.45 var(--font-ui, var(--sans));
+  color: var(--mini-head-ink-2);
+  /* a Japanese word in the note keeps together (never シ / ナ, 中 / 国 at a line's end) */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
 
 /* why a word can't be saved here, and the door to the card that holds its spelling: plain lines on paper */
 #mini .mini-take-reason { display: block; margin: 0; padding: 12px 18px 0; font: 400 13.5px/1.45 var(--font-ui); color: var(--color-ink-2); }

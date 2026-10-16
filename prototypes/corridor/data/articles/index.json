@@ -29821,6 +29821,15 @@
     ],
     "method": "bundled-vocabulary-85-percent;known-kanji-90-percent;source-and-text-topics/1"
    },
+   "wordNotes": [
+    {
+     "surface": "シナ",
+     "note": {
+      "ja": "シナ訳（しなやく）",
+      "en": "a Chinese translation (漢訳). シナ: an older word for China, offensive today; say 中国. Kept here as the 1904 text has it"
+     }
+    }
+   ],
    "authoring": {
     "kind": "real-source excerpt",
     "chosenBy": "Claude Opus 5.5 (Anthropic) as Bunki content lead, 2026-10-16",

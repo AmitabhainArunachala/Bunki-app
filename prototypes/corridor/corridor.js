@@ -8514,7 +8514,7 @@ async function openJapaneseLookup(anchor, text, context = {}) {
     // the slip's headword is the cut's source; the slip itself leaves inside the cut (enterWord)
     go(entryNode, { invoker: anchor, from: slipHeadword(), instant: modality === 'keyboard' });
   }, { record, entryAvailable: !!record || hasKanjiEntry, from: context.from || null, sentence: context.sentence?.() || null,
-    focusEntry: !!context.focusPopup, entryNode });
+    focusEntry: !!context.focusPopup, entryNode, wordNote: context.wordNote || null });
   // G1 · a page opened while the lookup was answering keeps a word below it from floating a card over it
   if (!mini) return;
   japaneseLookupMini = { mini, anchor };
@@ -9227,7 +9227,7 @@ const SAVE_PRESS_MS = 600;
  *   onClose  how the surface hears the slip go (removeMini) · follow: the anchor moves (the sky), the slip follows */
 function showMini(span, token, onEntry, { focusEntry = false, from = null, reader = false, record, entryAvailable = true, sentence = null,
   look = null, kind = 'word', save = 'default', host = null, note = null, source = null, key = null, kanji = reader, onClose = null, follow = false,
-  nodeFor = null, entryNode = null, why = '' } = {}) {
+  nodeFor = null, entryNode = null, why = '', wordNote = null } = {}) {
   // G1 · no card from the layer below ever floats over a page: with a page open, only a word on that page gets a slip
   if (!slipAllowed(span)) return null;
   // a fresh arrival is a move the frame sampler names; a slip drawn again on the same word (its entry arrived) is not
@@ -9298,6 +9298,17 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     // N · the dictionary has no entry read the text's way: the card says so, and lends no other reading's meaning
     ? tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.')
     : g?.m?.[0] || tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.')));
+  // N · the article's own note on this word (its index row's wordNotes, from the editorial word list): one quiet line
+  // under the gloss, on this word in this article only
+  if (wordNote?.en) {
+    const line = el('p', 'mini-word-note');
+    line.dataset.uiContent = 'learning';
+    if (wordNote.ja) { const ja = el('span', 'mini-word-note-ja', wordNote.ja); ja.lang = 'ja'; line.append(ja, ' '); }
+    const en = el('span', 'mini-word-note-en', wordNote.en);
+    en.lang = 'en';
+    line.append(en);
+    said.append(line);
+  }
   head.append(said);
   mini.append(head);
   // S · a star of Today's sky says, in one plain line, why it is in the sky (missed yesterday · due today · …)
@@ -10052,6 +10063,13 @@ function readerQuickRecord(token) {
   return old ? { r: old.r, m: old.g ? [old.g] : [] } : null;
 }
 
+/** N · an article's own note on one of its words: its index row's `wordNotes` ([{ surface, note: { ja, en } }], from the
+ * editorial word list), matched on the token's surface; null everywhere else. */
+function readerWordNote(p, token) {
+  const hit = (Array.isArray(p?.wordNotes) ? p.wordNotes : []).find((n) => n && n.surface === token?.s && typeof n.note?.en === 'string' && n.note.en);
+  return hit ? hit.note : null;
+}
+
 function readerGlossMissText(form = '') {
   // R · asked, the full dictionary lists nothing for this spelling: the line says so, and promises no other look
   if (form && D.dictionaryIndex && (D.dictionaryMode === 'main' || D.dictionaryCompleteForms?.has(String(form)))
@@ -10386,7 +10404,7 @@ function wireTokenGestures(span, token, index, p) {
     // reading names the full dictionary's one entry is that entry's own door (D23 answers it), not D11's held look
     openReadingSlip(span, token, (door) => showMini(span, door, (entryModality) => openFull(entryModality, { fromSlip: true }), {
       focusEntry: modality === 'keyboard', from, reader: !(door.seq && !D.dict[door.b]), kanji: true,
-      sentence: readerSentenceRow(sentence(), index), entryNode: readerEntryNode(token, index, p),
+      sentence: readerSentenceRow(sentence(), index), entryNode: readerEntryNode(token, index, p), wordNote: readerWordNote(p, token),
     }));
     if (!restore) retireReaderTip();
   };
@@ -10437,7 +10455,7 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
   const quickLook = (modality = 'pointer', { restore = false } = {}) => {
     if (named) markReaderReading(index);
     return openJapaneseLookup(span, text, { ...lookupContext, from, sentence: () => readerSentenceRow(sentence(), index, token.readerSourceEnd ?? index),
-      focusPopup: modality === 'keyboard' }).then(() => { if (!restore && document.getElementById('mini')) retireReaderTip(); });
+      focusPopup: modality === 'keyboard', wordNote: readerWordNote(p, token) }).then(() => { if (!restore && document.getElementById('mini')) retireReaderTip(); });
   };
   span.addEventListener('click', (event) => {
     if (event.detail !== 0 && Date.now() < swallowClickUntil) return;
