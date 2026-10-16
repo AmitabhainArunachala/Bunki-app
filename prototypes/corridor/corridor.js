@@ -10956,9 +10956,11 @@ function renderReader(main) {
   // N · a real text's one line of context, under its title like a dateline (no box, no label): when and where it was
   // written or spoken. Only the rows that carry it; it attributes the text and says nothing of who made the page.
   if (p.context?.ja) {
-    const context = el('p', 'reader-context', p.context.ja);
+    const context = el('p', 'reader-context');
     context.lang = 'ja';
     context.dataset.uiContent = 'learning';
+    // where a phone needs two lines, they part at a sentence's end: each sentence holds together (never 原文の / まま。)
+    for (const part of String(p.context.ja).match(/[^。]+。?/gu) || []) context.append(el('span', 'reader-context-part', part));
     card.append(context);
   }
   // The instrument line, under the title: source · date · level · saved words · the voice's state. Settings are

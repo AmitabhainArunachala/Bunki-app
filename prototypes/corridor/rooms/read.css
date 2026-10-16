@@ -1376,6 +1376,11 @@ html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .
   letter-spacing: 0.02em;
   color: color-mix(in srgb, var(--reader-ink) 76%, var(--reader-card));
 }
+/* a sentence keeps together; one longer than the line still wraps within itself */
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .reader-context > .reader-context-part {
+  display: inline-block;
+  max-width: 100%;
+}
 /* the instrument line sits under a hairline in the card; the settings icon keeps its corner */
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card > .reader-head {
   position: relative;
