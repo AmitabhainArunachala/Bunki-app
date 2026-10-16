@@ -9100,7 +9100,7 @@ const SAVE_PRESS_MS = 600;
  *   onClose  how the surface hears the slip go (removeMini) · follow: the anchor moves (the sky), the slip follows */
 function showMini(span, token, onEntry, { focusEntry = false, from = null, reader = false, record, entryAvailable = true, sentence = null,
   look = null, kind = 'word', save = 'default', host = null, note = null, source = null, key = null, kanji = reader, onClose = null, follow = false,
-  nodeFor = null, entryNode = null } = {}) {
+  nodeFor = null, entryNode = null, why = '' } = {}) {
   // G1 · no card from the layer below ever floats over a page: with a page open, only a word on that page gets a slip
   if (!slipAllowed(span)) return null;
   // a fresh arrival is a move the frame sampler names; a slip drawn again on the same word (its entry arrived) is not
@@ -9171,6 +9171,12 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     : tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.')));
   head.append(said);
   mini.append(head);
+  // S · a star of Today's sky says, in one plain line, why it is in the sky (missed yesterday · due today · …)
+  if (why) {
+    const line = el('p', 'mini-why', why);
+    line.id = 'mini-why';
+    mini.append(line);
+  }
   // one path (John T5, "click save and then add to list from there"; 2026-10-14: no second "Add to a list"
   // button): Save ▾ alone. Before the word is saved a short note says where Save puts it.
   const actions = el('div', 'mini-actions');
@@ -11235,7 +11241,7 @@ window.__BUNKI_OPEN_ENTRY = {
  *   redo    the caller already read the press (the reader's doors): never treat this call as the second tap
  * Returns the slip, or null when this activation was the second tap and dived into the entry instead. */
 function openSlip(node, { anchor, from = 'lookup', host = null, look = null, note = null, sentence = null, focus = false,
-  onClose = null, entry, key = null, redo = false } = {}) {
+  onClose = null, entry, key = null, redo = false, why = '' } = {}) {
   if (!anchor?.isConnected) return null;
   if (!redo && diveFromSlip(anchor)) return null;
   const kind = node?.t === 'kanji' ? 'kanji' : node?.t === 'particle' ? 'particle' : node?.t === 'grammar' ? 'grammar' : 'word';
@@ -11279,7 +11285,7 @@ function openSlip(node, { anchor, from = 'lookup', host = null, look = null, not
   };
   return showMini(anchor, token, onEntry, { focusEntry: focus, record, entryAvailable, sentence, look, kind, save, host, note,
     source: from, key, kanji, onClose, follow: from === 'drift' || from === 'sky', nodeFor: node && kind !== 'word' ? { t: node.t, id: node.id } : null,
-    entryNode: typeof entry === 'function' ? null : node });
+    entryNode: typeof entry === 'function' ? null : node, why });
 }
 /** A kanji's first reading for the slip's band: its first on reading in kana, else its first kun stem. */
 function kanjiSlipReading(k) {
@@ -12456,82 +12462,168 @@ function todaySkyWord(w) {
   const n = [...String(w || '')].length;
   return n >= 2 && n <= 4 && TODAY_JA_WORD.test(w) && TODAY_SKY_WORD.test(w) && !!lookup(w);
 }
-let todaySkyPool = null;
 /** At most this many stars: a sky, not a scatter (round 4 review). */
 const TODAY_SKY_CAP = 10;
-/** The sky over Today (round 4, T1): a window onto the whole universe of words, never empty, in
- * its own band between the title and the day's word (the header stays clean). Three lanes, far to
- * near: far words and two single kanji float by along the top; his due words and the day's
- * reading sway in the middle; the day's word's family waits nearest the word. A word opens that
- * word; open sky in the band opens the universe itself (todayOpenUniverse). Mouse and touch only:
- * the keyboard has the labelled door to the universe and the same saved words in the rows below. */
+/** How far back a miss still counts for the sky. */
+const TODAY_SKY_MISS_DAYS = 14;
+/** When a moment was, in words a learner says: today · yesterday · 3 days ago (by calendar day). */
+function todayWhen(at) {
+  const days = Math.round((new Date(dayKey()).getTime() - new Date(dayKey(new Date(at))).getTime()) / 86400000);
+  return days <= 0 ? 'today' : days === 1 ? 'yesterday' : days;
+}
+/** The one plain line a star says about why it is in the sky. */
+function todaySkyWhy(kind, detail = {}) {
+  const when = detail.at ? todayWhen(detail.at) : null;
+  if (kind === 'missed') {
+    if (detail.test) return tx('テストでまちがえた', 'missed in a test');
+    return when === 'today' ? tx('今日まちがえた', 'missed today') : when === 'yesterday' ? tx('きのうまちがえた', 'missed yesterday')
+      : tx(`${when}日前にまちがえた`, `missed ${when} days ago`);
+  }
+  if (kind === 'unknown') return tx('「まだ」にした', 'you marked it not yet');
+  if (kind === 'looked') return detail.times === 2 ? tx('2回調べた', 'you looked it up twice') : tx(`${detail.times}回調べた`, `you looked it up ${detail.times} times`);
+  if (kind === 'due') return tx('今日の復習', 'due today');
+  if (kind === 'read' || kind === 'glyph') return tx('今日の読み物から', "from today's story");
+  if (kind === 'kin') return tx(`今日のことばと「${detail.kanji}」が同じ`, `shares ${detail.kanji} with today's word`);
+  return '';
+}
+/* The deck ledgers' misses (localStorage, the deck's own schedule), read once a day through the deck's own read-only
+ * export; the sky draws without them and is drawn again in place when they arrive. */
+let todayDeckMisses = null;
+function todaySkyDeckMisses() {
+  const day = dayKey();
+  if (todayDeckMisses?.day === day) return todayDeckMisses.rows;
+  todayDeckMisses = { day, rows: [] };
+  if (window.__CORRIDOR_STANDALONE__ === true) return [];
+  const ids = DOJO_DECKS.map((deck) => deck.id).filter((id) => {
+    try { return localStorage.getItem(`bunki-cloze:${id}`) != null; } catch { return false; }
+  });
+  if (!ids.length) return [];
+  const since = Date.now() - TODAY_SKY_MISS_DAYS * 86400000;
+  const asked = todayDeckMisses;
+  loadDeckPlayer()
+    .then((mod) => Promise.all(ids.map((id) => (mod.missedTerms ? mod.missedTerms(id, localStorage, since).catch(() => []) : []))))
+    .then((lists) => {
+      asked.rows = lists.flat().sort((x, y) => y.at - x.at);
+      if (asked.rows.length && todayDeckMisses === asked) todayRedrawSky();
+    })
+    .catch(() => {});
+  return [];
+}
+/** The sky drawn again in place (the deck misses arrived): never under an open card, never by a full render. */
+function todayRedrawSky() {
+  const hero = document.querySelector('#app main .today-hero');
+  const old = hero?.querySelector('.today-sky');
+  if (S.view !== 'tray' || !old || document.getElementById('mini') || !old.todayArgs) return;
+  const fresh = todaySky(...old.todayArgs);
+  old.replaceWith(fresh);
+  todayPlaceSky(hero);
+}
+/** S · the sky's stars come from his learning, never by chance (John, 2026-10-16: "are those cards in the sky correlated
+ * with missed reviews? with words that are marked as not known? or are they random? if so, make it logical"). In this
+ * order, each once: words he missed lately (his reviews' Again, a practice or test answer wrong, a deck's Again), words he
+ * marked not yet, words he looked up more than once and has not kept, words due today; then today's story (his own words
+ * in it first, then in reading order) and the day word's family. Each carries the one plain line that says why. No
+ * random filler: a thin record gives a thin sky. Reads his record and the deck ledgers; writes nothing. */
+function todaySkyPicks(dayWord, today, readPick) {
+  const picks = [];
+  const seen = new Set([dayWord]);
+  const taken = new Set(S.taken.map((item) => srsKey(item.t, item.id)));
+  const add = (word, kind, why, item = null) => {
+    word = String(word || '');
+    if (!word || seen.has(word) || !TODAY_JA_WORD.test(word)) return;
+    seen.add(word);
+    picks.push({ word, kind, why, item, rank: picks.length + 1 });
+  };
+  const since = Date.now() - TODAY_SKY_MISS_DAYS * 86400000;
+  const label = (key) => {
+    const at = String(key || '').indexOf(':');
+    return at > 0 ? key.slice(at + 1) : '';
+  };
+  const itemOf = (key) => S.taken.find((item) => srsKey(item.t, item.id) === key) || null;
+  // 1 · missed lately: every miss with its day, the latest first, each word once
+  const misses = [];
+  for (const row of S.revlog || []) {
+    if (Array.isArray(row) && row[2] === 1 && row[0] >= since && /^(word|kanji|idiom):/u.test(row[1])) misses.push({ key: row[1], at: row[0] });
+  }
+  for (const row of S.obslog || []) {
+    if (!Array.isArray(row) || row[0] < since || !['probe', 'dojo', 'lesson', 'mock'].includes(row[1])) continue;
+    if (row[3] === 1 && /^(word|kanji):/u.test(row[2])) misses.push({ key: row[2], at: row[0], test: row[1] === 'mock' });
+  }
+  try {
+    const priorities = assessmentLearningModule?.assessmentPracticePriorities(S.assessmentLearning);
+    for (const target of priorities?.targets || []) {
+      if (target.suppressed || !(target.lastMissAt >= since) || !/^(word|kanji):/u.test(target.subject)) continue;
+      misses.push({ key: target.subject, at: target.lastMissAt, test: true });
+    }
+  } catch { /* a learning record this build cannot read draws no stars */ }
+  for (const miss of todaySkyDeckMisses()) misses.push({ key: `word:${miss.term}`, at: miss.at });
+  misses.sort((x, y) => y.at - x.at);
+  for (const miss of misses) add(label(miss.key), 'missed', todaySkyWhy('missed', miss), itemOf(miss.key));
+  // 2 · marked not yet (the review room's まだ)
+  const unknown = (S.obslog || []).filter((row) => Array.isArray(row) && row[1] === 'reveal' && row[3] === 0).sort((x, y) => y[0] - x[0]);
+  for (const row of unknown) add(label(row[2]), 'unknown', todaySkyWhy('unknown'), itemOf(row[2]));
+  // 3 · looked up on two or more occasions (ten minutes apart), and not kept
+  const looks = new Map();
+  for (const row of S.obslog || []) {
+    if (!Array.isArray(row) || row[1] !== 'tap' || row[3] < 2 || taken.has(row[2])) continue;
+    const times = looks.get(row[2]) || [];
+    if (!times.length || row[0] - times[times.length - 1] >= 10 * 60000) times.push(row[0]);
+    looks.set(row[2], times);
+  }
+  [...looks.entries()].filter(([, times]) => times.length >= 2)
+    .sort((x, y) => y[1].length - x[1].length || y[1][y[1].length - 1] - x[1][x[1].length - 1])
+    .forEach(([key, times]) => add(label(key), 'looked', todaySkyWhy('looked', { times: times.length })));
+  // 4 · due today, in the queue's own order
+  for (const item of today?.order || []) add(item.label || item.id, 'due', todaySkyWhy('due'), itemOf(srsKey(item.t, item.id)));
+  // 5 · today's story: his words in it first, then its words in reading order; two of its kanji float with them
+  const forms = (readPick?.passage?.readingFacets?.forms || []).filter((w) => todaySkyWord(w));
+  const mine = new Set(S.taken.filter((item) => item.t === 'word').map((item) => item.id));
+  const story = [...forms.filter((w) => mine.has(w)), ...forms.filter((w) => !mine.has(w))].slice(0, 4);
+  for (const w of story) add(w, 'read', todaySkyWhy('read'));
+  for (const c of [...new Set(story.flatMap((w) => todayKanji(w)))].filter((c) => !String(dayWord).includes(c)).slice(0, 2))
+    add(c, 'glyph', todaySkyWhy('glyph'));
+  // 6 · the day word's family: words that share one of its kanji
+  for (const c of todayKanji(dayWord)) {
+    for (const w of (D.kanjiWords?.[c] || []).slice(0, 6)) if (todaySkyWord(w)) add(w, 'kin', todaySkyWhy('kin', { kanji: c }));
+  }
+  return picks.slice(0, TODAY_SKY_CAP);
+}
+/** The sky over Today (round 4, T1): a window onto the whole universe of words, in its own band between the title and
+ * the day's word (the header stays clean). S: its stars are todaySkyPicks — his learning first — laid nearest first by
+ * rank: the near lane, then the middle lanes, then the far lanes that float by; a star says why it is there when its
+ * card opens (data-why → the slip's .mini-why). A word opens that word; open sky in the band opens the universe itself
+ * (todayOpenUniverse). Mouse and touch only: the keyboard has the labelled door to the universe and the same saved
+ * words in the rows below. */
 function todaySky(dayWord, today, readPick) {
   const sky = el('div', 'today-sky');
   sky.setAttribute('aria-hidden', 'true');
-  const dueNow = new Set((today?.order || []).map((item) => srsKey(item.t, item.id)));
-  const seen = new Set([dayWord]);
-  const due = [];
-  const rest = [];
-  for (const item of S.taken) {
-    const label = String(item.label || '');
-    if (seen.has(label) || !TODAY_JA_WORD.test(label)) continue;
-    seen.add(label);
-    (dueNow.has(srsKey(item.t, item.id)) ? due : rest).push(item);
+  sky.todayArgs = [dayWord, today, readPick];
+  const picks = todaySkyPicks(dayWord, today, readPick);
+  // five lanes, top to bottom: far (floats), middle, far (floats), middle, near. Filled nearest first, in rank order.
+  const lanes = [[], [], [], [], []];
+  // two a lane: the near lane shares its width with the band's caption (Explore all words)
+  const LIMIT = [2, 2, 2, 2, 2];
+  let at = 0;
+  for (const li of [4, 1, 3, 0, 2]) {
+    while (lanes[li].length < LIMIT[li] && at < picks.length) lanes[li].push(picks[at++]);
   }
-  const r = todayRng(todayHash(dayKey()));
-  const shuffle = (list) => {
-    for (let i = list.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(r() * (i + 1));
-      [list[i], list[j]] = [list[j], list[i]];
-    }
-    return list;
-  };
-  shuffle(rest);
-  const take = (list, n) => {
-    const out = [];
-    for (const w of list) {
-      if (out.length >= n) break;
-      if (!seen.has(w) && todaySkyWord(w)) { seen.add(w); out.push(w); }
-    }
-    return out;
-  };
-  const family = take(todayKanji(dayWord).flatMap((c) => (D.kanjiWords?.[c] || []).slice(0, 4)), 3);
-  const reading = take(shuffle([...(readPick?.passage?.readingFacets?.forms || [])]), 4);
-  todaySkyPool ||= Object.keys(D.words || {}).filter((w) => D.words[w]?.jlpt && [...w].length <= 3 && TODAY_SKY_WORD.test(w));
-  const fill = take(shuffle([...todaySkyPool]).slice(0, 120), 3);
-  // "words and kanji floating by" (his Renzo opening screen): two single kanji from today's
-  // reading drift with the far words, large and faint, each one a door to its own page
-  const glyphs = [...new Set(reading.flatMap((w) => todayKanji(w)))].filter((c) => !String(dayWord).includes(c)).slice(0, 2);
-  // five lanes, top to bottom, far and middle depths interleaved so the field reads as a sky, not
-  // rows: two far lanes (a kanji and a far word each) float by; two middle lanes hold his due words
-  // before the day's reading and one of his other words; the day's word's own family waits in the
-  // lane nearest the word. Each lane lists its stars in the order their places are given.
-  const g = glyphs.map((kanji) => ({ kanji, kind: 'glyph' }));
-  const f = fill.map((word) => ({ word, kind: 'far' }));
-  const mid = [...due.slice(0, 3).map((item) => ({ item, kind: 'due' })), ...reading.map((word) => ({ word, kind: 'read' })),
-    ...rest.slice(0, 1).map((item) => ({ item, kind: 'mine' }))];
-  const lanes = [
-    [g[0], f[1], f[2]].filter(Boolean),
-    mid.filter((_, i) => i % 2 === 0),
-    [f[0], g[1]].filter(Boolean),
-    mid.filter((_, i) => i % 2 === 1),
-    family.map((word) => ({ word, kind: 'kin' })),
-  ];
   sky.todayLanes = lanes.map((list, li) => {
     const lane = el('div', 'today-sky-lane');
     lane.dataset.lane = String(li + 1);
-    const stars = list.map(({ item, word, kanji, kind }, i) => {
-      const star = todayLearning('button', `today-star ${kind}`, item ? item.label : word || kanji);
+    const stars = list.map(({ item, word, kind, why, rank }, i) => {
+      const star = todayLearning('button', `today-star ${kind}`, word);
       star.type = 'button';
       star.tabIndex = -1;
       star.hidden = true;
+      star.dataset.why = why;
+      star.dataset.rank = String(rank);
       star.style.setProperty('--d', `${(i % 4) * 1.7}s`);
       // the slip first (contract §1 — the one surface slice B did not reach): the band then opens the entry, and the
-      // same star again dives. A star drifts with its lane, so the slip follows it.
+      // same star again dives. A star drifts with its lane, so the slip follows it; the slip says why the star is here
       star.addEventListener('click', () => {
-        const node = item ? learningItemNode(item) : kanji ? { t: 'kanji', id: kanji } : { t: 'word', id: word };
+        const node = item ? learningItemNode(item) : [...word].length === 1 && D.kanji?.[word] ? { t: 'kanji', id: word } : { t: 'word', id: word };
         const second = miniAnchor === star && !!document.getElementById('mini');
-        if (!openSlip(node, { anchor: star, from: 'sky' }) && !second) go(node, { invoker: star });
+        if (!openSlip(node, { anchor: star, from: 'sky', why }) && !second) go(node, { invoker: star });
       });
       lane.append(star);
       return star;
@@ -12591,45 +12683,66 @@ function todayPlaceSky(hero) {
   const up = hero.querySelector('.today-universe')?.getBoundingClientRect();
   const nearRight = up?.width ? Math.min(W, up.left - R.left - 6) : W;
   const caption = up?.width ? [{ x: up.left - R.left - 4, y: up.top - R.top, w: up.width + 8, h: up.height }] : [];
-  const SIZE = { glyph: 26, due: 19, kin: 18, mine: 17, read: 16, far: 15 };
+  // his learning reads largest, the story and the family quieter (S)
+  const SIZE = { glyph: 24, missed: 19, unknown: 19, looked: 18, due: 18, read: 16, kin: 16 };
   // per lane, top to bottom: does it float by, how far it sways each way, how many stars it keeps
   const FLOAT = [true, false, true, false, false];
   const SWAY = [0, 12, 0, 14, 4];
-  const LIMIT = [2, 2, 2, 2, 3];
+  const LIMIT = [2, 2, 2, 2, 2];
   const SPEED = [5, 0, 7, 0, 0];
   const placed = [...caption];
-  let shown = 0;
-  for (const li of [4, 1, 3, 0, 2].filter((i) => i < n)) {
-    const { lane, stars } = sky.todayLanes[li];
+  const order = [4, 1, 3, 0, 2].filter((i) => i < n);
+  const kept = sky.todayLanes.map(() => []);
+  const laneBox = (li) => {
     const cy = 23 + li * pitch;
-    lane.style.top = `${(cy - 22).toFixed(1)}px`;
+    const inset = FLOAT[li] ? 10 : 8 + SWAY[li];
+    return { cy, left: inset, right: (li === n - 1 ? nearRight : W) - inset };
+  };
+  sky.todayLanes.forEach(({ lane }, li) => {
+    lane.style.top = `${(laneBox(li).cy - 22).toFixed(1)}px`;
     lane.style.height = '44px';
-    const left = FLOAT[li] ? 10 : 8 + SWAY[li];
-    const right = (li === n - 1 ? nearRight : W) - (FLOAT[li] ? 10 : 8 + SWAY[li]);
-    const kept = [];
-    for (const star of stars) {
-      star.hidden = true;
-      if (kept.length >= LIMIT[li] || shown >= TODAY_SKY_CAP) continue;
-      const kind = Object.keys(SIZE).find((k) => star.classList.contains(k)) || 'far';
-      const size = SIZE[kind];
-      const w = [...star.textContent].length * size;
-      // a touch area of at least 44 x 44 around the word that meets no other at rest
-      const hitW = Math.max(44, w + 16);
-      for (let k = 0; k < 48 && right - left >= w; k += 1) {
-        const x = left + r() * (right - left - w);
+  });
+  // S · stars are seated in rank order (his learning first), each in its own lane when it has room, else in the next lane
+  // that does: a star chosen for a reason is never dropped for want of luck while the sky has a place for it
+  const ranked = sky.todayLanes.flatMap(({ stars }, li) => stars.map((star) => ({ star, li })))
+    .sort((x, y) => Number(x.star.dataset.rank || 0) - Number(y.star.dataset.rank || 0));
+  for (const { star, li: home } of ranked) {
+    star.hidden = true;
+    if (kept.flat().length >= TODAY_SKY_CAP) continue;
+    const kind = Object.keys(SIZE).find((k) => star.classList.contains(k)) || 'read';
+    const size = SIZE[kind];
+    const w = [...star.textContent].length * size;
+    // a touch area of at least 44 x 44 around the word that meets no other at rest: a place at random in the lane, else
+    // the first free place from its left edge
+    const hitW = Math.max(44, w + 16);
+    let seat = null;
+    for (const li of [home, ...order.filter((i) => i !== home)]) {
+      if (kept[li].length >= LIMIT[li]) continue;
+      const { cy, left, right } = laneBox(li);
+      const span = right - left - w;
+      if (span < 0) continue;
+      const tries = [...Array.from({ length: 48 }, () => left + r() * span), ...Array.from({ length: Math.floor(span / 6) + 1 }, (_, k) => left + k * 6)];
+      for (const x of tries) {
         const box = { x: x + w / 2 - hitW / 2, y: cy - 22, w: hitW, h: 44 };
         if (placed.some((o) => box.x < o.x + o.w && o.x < box.x + box.w && box.y < o.y + o.h && o.y < box.y + box.h)) continue;
         placed.push(box);
-        kept.push({ star, x, w, size });
-        shown += 1;
+        seat = { li, x };
         break;
       }
+      if (seat) break;
     }
-    const ringW = W + Math.max(0, ...kept.map((s) => s.w)) + 48;
-    for (const { star, x, size } of kept) {
+    if (!seat) continue;
+    const lane = sky.todayLanes[seat.li].lane;
+    if (star.parentElement !== lane) lane.append(star);
+    kept[seat.li].push({ star, x: seat.x, w, size });
+  }
+  kept.forEach((seated, li) => {
+    const ringW = W + Math.max(0, ...seated.map((s) => s.w)) + 48;
+    for (const { star, x, size } of seated) {
       star.style.fontSize = `${size}px`;
       star.style.left = `${((x / W) * 100).toFixed(2)}%`;
       star.style.top = `${(22 - size / 2).toFixed(1)}px`;
+      for (const name of ['--from', '--to', '--lag', '--ring']) star.style.removeProperty(name);
       if (FLOAT[li]) {
         // one ring for the whole lane: its stars move at one pace and wrap out of sight, so their
         // spacing never changes; at rest (and with reduced motion) each sits at x
@@ -12641,7 +12754,7 @@ function todayPlaceSky(hero) {
       }
       star.hidden = false;
     }
-  }
+  });
 }
 /** The day's word, large, with its reading, its hook and the door that follows its part. */
 function renderTodayWord(pick) {

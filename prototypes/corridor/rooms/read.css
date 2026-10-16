@@ -827,6 +827,17 @@ body[data-view='drift'] #mini {
   cursor: pointer;
 }
 
+/* S · why a star of Today's sky stands there: one plain line under the band, in the slip's quiet ink */
+#mini .mini-why {
+  margin: 0;
+  padding: 10px 14px 0;
+  background: var(--mini-paper);
+  font: 500 14px/1.35 var(--font-ui);
+  letter-spacing: 0.01em;
+  color: var(--color-ink-2);
+}
+#mini .mini-why::first-letter { text-transform: uppercase; }
+
 /* 2. one path: Save ▾ */
 #mini .mini-actions {
   display: flex;

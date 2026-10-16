@@ -9902,6 +9902,25 @@ async function render(main, { deckId, storage = window.localStorage, onLeave, op
 }
 
 /** due count for a deck chooser, without rendering anything */
+/**
+ * Read-only, for the corridor's Today (S): the words this deck's ledger answered Again since `since` (epoch ms) — a
+ * miss in reading or in the four choices (わからない) — each with its latest miss, most recent first. It loads the deck to
+ * name its cards and writes nothing.
+ */
+async function missedTerms(deckId, storage = window.localStorage, since = 0) {
+  const { deck, index } = await loadDeck(deckId);
+  const { state } = loadState(storage, deck);
+  const latest = new Map();
+  for (const row of Array.isArray(state.log) ? state.log : []) {
+    if (!Array.isArray(row) || row[1] !== RATINGS.again) continue;
+    const at = Date.parse(row[2]);
+    const word = index.cards.get(row[0])?.word;
+    if (!(at >= since) || !word?.term) continue;
+    if (!latest.has(word.term) || latest.get(word.term).at < at) latest.set(word.term, { term: word.term, reading: word.reading || '', at, deck: deckId });
+  }
+  return [...latest.values()].sort((a, b) => b.at - a.at);
+}
+
 async function summary(deckId, storage = window.localStorage) {
   const { deck } = await loadDeck(deckId);
   const { state } = loadState(storage, deck);
