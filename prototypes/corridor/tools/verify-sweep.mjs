@@ -120,6 +120,22 @@ window.__SWEEP__ = {
     text: n.innerText + ' ' + [...n.querySelectorAll('[title], [aria-label]')].map((c) => (c.title || '') + ' ' + (c.getAttribute('aria-label') || '')).join(' '),
   })),
   todayPick: () => todayReadPick()?.passage?.id ?? null,
+  // N · Today's reading under an in-memory record (saved words, readings done), restored afterwards: the story the app
+  // picks and what Today's line draws for it. Nothing is written: the record is put back before this returns
+  todayUnder: ({ taken = [], readDone = [] } = {}) => {
+    const keep = { taken: S.taken, readDone: S.readDone, view: S.view, stack: S.stack };
+    try {
+      S.taken = taken.map((id, i) => ({ t: 'word', id, label: id, ts: 1700000000000 + i }));
+      S.readDone = Object.fromEntries(readDone.map((id, i) => [id, 1700000000000 + i]));
+      removeMini(); S.stack = []; S.view = 'tray'; render();
+      const door = document.querySelector('#app main .today-line .today-then');
+      return { pick: todayReadPick()?.passage?.id ?? null, title: door?.querySelector('.today-then-title')?.textContent ?? null,
+        doors: document.querySelectorAll('#app main .today-line .today-then').length };
+    } finally {
+      S.taken = keep.taken; S.readDone = keep.readDone; S.stack = keep.stack; S.view = keep.view; render();
+    }
+  },
+  formsOf: (ids) => Object.fromEntries(ids.map((id) => [id, [...(D.passages.find((x) => x.id === id)?.readingFacets?.forms || [])]])),
   day: () => shelfCurrentDay(),
   // the shelf as the app draws it on a given day (the existing day seam), unfiltered; every card in DOM order
   shelfOn: (day) => {
@@ -458,6 +474,48 @@ async function shelfRowsAndCards(page, engine, lang) {
   check(`${label} after the drop the shelf still turns daily: its first inherited story changes across four days`,
     new Set(firstInherited).size >= 2, firstInherited.join(', '));
   check(`${label} Today's story is the shelf's lead`, !!pick && pick === shelves[0].cards[0]?.id, `${pick} (shelf lead ${shelves[0].cards[0]?.id})`);
+  // N (round 2; Codex A–E) · Today's reading offers the newest drop first, whatever the record holds: five in-memory
+  // records, each restored. The expectation is the brief's rule, computed here from the rows' forms and the drawn order
+  // (the drop as the shelf draws it, then the shelf after it) — never by calling the app's own selector
+  const dropOrder = [...new Set(shelves[0].cards.map((c) => c.id).filter((id) => ORIGINALS.includes(id)))];
+  const shelfOrder = [...new Set(shelves[0].cards.map((c) => c.id))];
+  const formsOf = await page.evaluate((ids) => window.__SWEEP__.formsOf(ids), rows.map((row) => row.id));
+  const overlap = (id, words) => (formsOf[id] || []).filter((f) => words.includes(f)).length;
+  const bestIn = (pool, words) => pool.reduce((best, id) => (overlap(id, words) > overlap(best, words) ? id : best), pool[0]);
+  const inherited = shelfOrder.filter((id) => !ORIGINALS.includes(id));
+  const todayCase = async (name, record, want, rule) => {
+    const seen = await page.evaluate((r) => window.__SWEEP__.todayUnder(r), record);
+    const row = byId.get(seen.pick);
+    check(`${label} Today ${name}: ${rule}`, !!seen.pick && seen.pick === want && seen.doors === 1 && !!row && seen.title === row.title,
+      `picked ${seen.pick} (want ${want}) · drawn "${seen.title}" · ${seen.doors} door(s)`);
+  };
+  const tb = ['結核'];
+  const tbInherited = inherited.filter((id) => overlap(id, tb));
+  check(`${label} Today fixture: 結核 stands in an inherited story (${tbInherited.slice(0, 2).join(', ')}) and in no new one`,
+    tbInherited.length > 0 && dropOrder.every((id) => !overlap(id, tb)), `${tbInherited.length} inherited`);
+  await todayCase('B saved 結核, the twenty unread', { taken: tb }, bestIn(dropOrder, tb),
+    'a new story — the drop\'s first, since none holds 結核 — never the inherited story that does');
+  // C · a word one later new story holds, and some inherited story too: Today names that new story
+  const cId = dropOrder.slice(1).find((id) => (formsOf[id] || []).some((f) => dropOrder.filter((x) => (formsOf[x] || []).includes(f)).length === 1
+    && inherited.some((x) => (formsOf[x] || []).includes(f))));
+  const cWord = cId && (formsOf[cId] || []).find((f) => dropOrder.filter((x) => (formsOf[x] || []).includes(f)).length === 1
+    && inherited.some((x) => (formsOf[x] || []).includes(f)));
+  check(`${label} Today fixture: a word only one later new story holds (${cWord} → ${cId})`, !!cId && !!cWord, String(cId));
+  if (cWord) await todayCase(`C saved ${cWord}`, { taken: [cWord] }, cId, `the one new story holding the saved word (${cId}), personalised within the drop`);
+  // D · an aged record: the lead read, fifteen inherited stories read, and sixty saved words from inherited stories
+  const aRead = [dropOrder[0], ...inherited.slice(0, 15)];
+  const aWords = [...new Set(inherited.slice(0, 12).flatMap((id) => formsOf[id] || []))].slice(0, 60);
+  const aPool = dropOrder.filter((id) => !aRead.includes(id));
+  await todayCase('D aged record (lead read, 15 inherited read, 60 saved words)', { taken: aWords, readDone: aRead }, bestIn(aPool, aWords),
+    'an unread new story — the one holding most of the saved words, first in the drop\'s order on a tie — never the read lead or an inherited story');
+  // E · the drop read through: Today falls back to an unread inherited story, a live door with its title
+  const eSeen = await page.evaluate((r) => window.__SWEEP__.todayUnder(r), { readDone: ORIGINALS });
+  const eRow = byId.get(eSeen.pick);
+  check(`${label} Today E the twenty read: an unread inherited story, drawn with its title, one door`,
+    !!eRow && !ORIGINALS.includes(eSeen.pick) && !eRow.folded && eSeen.doors === 1 && eSeen.title === eRow.title,
+    `picked ${eSeen.pick} · drawn "${eSeen.title}" · ${eSeen.doors} door(s)`);
+  const after = await page.evaluate(() => window.__SWEEP__.todayPick());
+  check(`${label} Today's record is restored after the fixtures (the pick is the shelf's lead again)`, after === pick, `${after}`);
   const stories = rows.filter((row) => !row.folded);
   let filtered = 0;
   for (const { level, cards: kept } of levels) {
