@@ -19,7 +19,7 @@
  *       訳 only わけ ("reason"). An entry read otherwise counts as missing. With the full dictionary held, the first tap
  *       shows 「やく …」 with Save held. Once it answers, the same card, with no second tap, says "No dictionary entry for
  *       this reading.", its Save held, with "So it can't be saved here.". Its meaning line never shows わけ's meaning,
- *       and its page (the second tap) shows no meaning
+ *       and its page (the second tap) lends nothing of わけ: no senses, no JLPT level, no other spelling, and it says so
  *   R   recorded, never asserted: 式 in 表彰式 and 改造 in 内閣改造 (sense: the tokens carry no sense data), ちかい in
  *       the phonetic parenthetical (G3), し of する (an inflected verb reads its dictionary form), the first paint
  * Negative control: the same run against a build with R's reading edits reverted fails A1 on 年 (とし). */
@@ -453,10 +453,12 @@ async function unreadCase(browser, contextOptions) {
     const sheet = await page.evaluate(() => {
       const node = document.getElementById('sheet');
       return node ? { head: node.querySelector('.headword')?.textContent ?? null, reading: node.querySelector('.reading')?.textContent ?? null,
-        absent: node.querySelector('.gloss.absent')?.textContent ?? null, senses: node.querySelectorAll('.senses, .sense-list').length } : null;
+        absent: node.querySelector('.gloss.absent')?.textContent ?? null, senses: node.querySelectorAll('.senses, .sense-list').length,
+        jlpt: [...node.querySelectorAll('.shelf-meta')].map((n) => n.textContent.trim()).filter((t) => /JLPT/u.test(t)),
+        alt: node.querySelector('.headword-alt')?.textContent ?? null } : null;
     });
-    check(`${tag}.page`, 'the second tap\'s page is 訳 read やく and shows no meaning (no senses; its plain no-gloss line)',
-      sheet?.head === '訳' && k2h(sheet.reading) === 'やく' && !!sheet.absent && sheet.senses === 0, sheet);
+    check(`${tag}.page`, `the second tap's page is 訳 read やく and lends nothing of わけ: no senses, no JLPT level, no other spelling; its line says "${NO_READING}"`,
+      sheet?.head === '訳' && k2h(sheet.reading) === 'やく' && sheet.absent === NO_READING && sheet.senses === 0 && sheet.jlpt.length === 0 && !sheet.alt, sheet);
   } catch (error) {
     check(`${tag}.error`, `${tag} ran to the end`, false, String(error.stack || error).slice(0, 600));
   } finally {
