@@ -12500,22 +12500,25 @@ function todaySecondsPerCard() {
   gaps.sort((a, b) => a - b);
   return gaps[Math.floor(gaps.length / 2)] / 1000;
 }
-/** The reading on today's line: the unread shelf story holding the most of the learner's saved
- * words (readingFacets.forms), else the shelf's first story that awaits no one — in the shelf's own
- * order, so the newest drop leads here as it leads the shelf (N, 2026-10-17). */
+/** The reading on today's line (N, 2026-10-17): while the newest drop has an unread story, one of them — the one holding
+ * the most of the learner's saved words (readingFacets.forms), else the first in the drop's own order — whatever else
+ * the record holds; once the drop is read, the unread story holding the most saved words, else the shelf's first story
+ * that awaits no one. */
 function todayReadPick() {
   const curated = (D.passages || []).filter((p) => !String(p.file || '').startsWith('archive/'));
   const stories = shelfStories(curated);
   const pool = stories.filter((p) => p.source !== 'isa-yasashii-glossary' && !owns(S.readDone || {}, p.id));
   if (!pool.length) return null;
-  const order = byNewestDrop(newestDropDay(stories));
+  const dropDay = newestDropDay(stories);
+  const order = byNewestDrop(dropDay);
+  const fresh = dropDay ? pool.filter((p) => p.addedAt === dropDay) : [];
   const mine = new Set(S.taken.filter((i) => i.t === 'word').map((i) => i.id));
   let best = null;
-  for (const p of pool) {
+  for (const p of fresh.length ? fresh : pool) {
     const count = mine.size ? (p.readingFacets?.forms || []).filter((f) => mine.has(f)).length : 0;
     if (!best || count > best.count || (count === best.count && order(p, best.passage) < 0)) best = { passage: p, count };
   }
-  if (best.count) return best;
+  if (best.count || fresh.length) return best;
   const ready = pool.filter((p) => !/-pending$/u.test(p.review || '') && !p.pendingVerification);
   return { passage: [...(ready.length ? ready : pool)].sort(order)[0], count: 0 };
 }
