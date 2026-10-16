@@ -10,9 +10,6 @@ const PAPER_LABEL_EN = {
   '言語知識（文法）・読解': 'Grammar · Reading', '聴解': 'Listening', '読解': 'Reading',
 };
 const LENGTHS = { short: ['ショート', 'Short'], medium: ['ミディアム', 'Medium'], full: ['フル模試', 'Full mock'] };
-// Model families named in machine-checked provenance (the review record keeps exact model ids).
-const FAMILIES = { 'anthropic-claude': 'Claude', 'zhipu-glm': 'GLM', 'moonshot-kimi': 'Kimi', deepseek: 'DeepSeek', minimax: 'MiniMax' };
-const familyName = id => FAMILIES[id] || id;
 const node = (tag, className, text) => {
   const result = document.createElement(tag);
   if (className) result.className = className;
@@ -279,20 +276,10 @@ export function createAssessmentView(host) {
     const heading = node('h2', 'exam-section-heading', tx(jaAlone, en)); heading.lang = host.english() ? 'en' : 'ja';
     return heading;
   };
-  // 未確認 — one quiet chip where no person has reviewed the questions yet, its reason in the
-  // tooltip (and, with withReason, beside it). The review label stays in the record, not on screen.
   // the one honest note (contract §5), from the host; a bare fixture page draws the element without its words
   const honest = (kind) => { if (host.note) return host.note(kind); const line = node('p', 'note'); line.dataset.kind = kind; return line; };
-  const reviewMark = (label, withReason = false, className = 'exam-machine-label') => {
-    const mark = node('div', className);
-    const reason = tx('AIが書きました。まだ人の目は通っていません。', 'Written by AI. Not yet checked by a person.');
-    const chip = node('span', 'status-chip', tx('AI作成', 'Made by AI'));
-    chip.title = reason; chip.setAttribute('aria-label', `${tx('AI作成', 'Made by AI')} — ${reason}`);
-    mark.append(chip);
-    if (withReason) mark.append(honest('ai'));
-    mark.dataset.reviewLabel = label;
-    return mark;
-  };
+  // S · how a question was made and checked (its review label, its author and verifier families) stays in the form's
+  // record and the export; the learner's page shows none of it (John, 2026-10-16: no "made by AI" anywhere)
   const titleOf = entry => host.english() ? entry.titleEn : entry.titleJa;
   const hasListening = entry => Number(entry.skillCounts?.listening) > 0;
   const isOfficial = entry => entry?.sourceClass === 'official-private';
@@ -464,22 +451,11 @@ export function createAssessmentView(host) {
   }
   function sourceDetails(container, entry, form = null) {
     const details = node('details', 'exam-sources');
-    details.append(node('summary', '', tx('出典・問題の確認方法', 'Sources and question review')));
+    details.append(node('summary', '', tx('出典', 'Sources')));
     details.append(node('p', '', entry?.sourceClass === 'original-ai'
       ? tx('JLPTの出題形式に沿って作成したオリジナル問題です。', 'Original questions written to follow the JLPT format.')
       : tx('出典と利用条件を以下に示します。', 'Sources and usage details are listed below.')));
-    const reviewed = entry?.review?.status === 'ai-reviewed';
-    if (entry?.review?.status === 'machine-checked') {
-      const check = entry.machineCheck || {};
-      const author = familyName(check.authorFamily || ''), verifiers = (check.verifierFamilies || []).map(familyName);
-      details.append(reviewMark(entry.review.label, true));
-      details.append(node('p', '', tx(
-        `作成：${author}（AI）。検証：${verifiers.join('・')}。どのモデルも答えを見ずに全問を解き、全員が同じ答えを選んで不備を指摘しなかった問題だけを残しています。まだ人による確認はしていません。JLPT公式問題ではありません。`,
-        `Written by ${author} (AI). Checked by ${verifiers.join(', ')}: each model solved every question without seeing the answer, and only questions where all of them chose the same answer and flagged no problem were kept. Not yet reviewed by a person. Not an official JLPT paper.`)));
-    } else details.append(reviewed
-      ? node('p', '', tx('複数の独立したAIモデルが解答と日本語を確認しています。JLPT公式問題ではありません。',
-        'The answers and Japanese have been checked by independent AI models. This is not an official JLPT paper.'))
-      : honest('ai'));
+    details.append(node('p', '', tx('JLPT公式問題ではありません。', 'Not an official JLPT paper.')));
     for (const sourceId of entry?.sourceIds || []) {
       const source = (catalog?.sources || []).find(row => row.id === sourceId);
       if (!source?.url || !/^https:\/\//u.test(source.url)) continue;
@@ -489,8 +465,8 @@ export function createAssessmentView(host) {
     if (form) details.append(node('p', 'exam-version', `${tx('問題番号', 'Form')} ${form.id}`));
     container.append(details);
   }
-  // A level with no checked test is not a dead end: its older sets are named here, each
-  // marked 未確認 (answers not yet checked). No date is promised; nothing is called reviewed.
+  // A level with no test is not a dead end: its older sets are named here. Whether their answers were checked stays in
+  // their data (set.approved), never on the page.
   function renderOlderSets(main, hasTests = false) {
     const older = host.olderSets?.(level) || { state: 'failed', sets: [] };
     const sets = older.sets;
@@ -500,32 +476,22 @@ export function createAssessmentView(host) {
     if (older.state === 'failed') {
       block.append(node('p', 'exam-status', hasTests
         ? tx('以前の練習セットを読み込めませんでした。', 'The older practice sets couldn’t load.')
-        : tx(`${level}の確認済みテストは、まだありません。以前の練習セットを読み込めませんでした。`, `No checked ${level} tests yet, and the older practice sets couldn’t load.`)));
+        : tx(`${level}のテストは、まだありません。以前の練習セットを読み込めませんでした。`, `No ${level} tests yet, and the older practice sets couldn’t load.`)));
       block.append(button(tx('もう\u4E00度読み込む', 'Try loading again'), 'exam-older-retry', () => host.retryOlderIndex?.()));
       main.append(block); return;
     }
-    // 未確認 is said once for the section when none of its sets is checked; a mixed list marks rows
-    const allUnchecked = sets.length > 0 && sets.every(set => !set.approved);
-    if (allUnchecked) {
-      const mark = node('p', 'exam-machine-label exam-older-mark'); mark.dataset.olderMark = '';
-      const reason = tx('答えはまだ人が確認していません', 'answers not yet checked by a person');
-      const chip = node('span', 'status-chip', tx('AI作成', 'Made by AI')); chip.title = reason; chip.setAttribute('aria-label', `${tx('AI作成', 'Made by AI')} — ${reason}`);
-      mark.append(chip, node('span', 'exam-review-reason', reason));
-      block.append(mark);
-    }
     block.append(node('p', '', hasTests
-      ? tx(`アプリの単語表と例文から自動で作った、${level}の短い練習セットです（${sets.length}つ）。`,
-        `${sets.length} short ${level} sets, made automatically from the app’s word lists and example sentences.`)
+      ? tx(`アプリの単語表と例文から、${level}の短い練習セットです（${sets.length}つ）。`,
+        `${sets.length} short ${level} sets from the app’s word lists and example sentences.`)
       : sets.length
-        ? tx(`${level}の確認済みテストは、まだありません。アプリの単語表と例文から自動で作った${level}の短い練習セットが${sets.length}つあり、今すぐ使えます。`,
-          `No reviewed ${level} tests yet. ${sets.length} short ${level} sets, made automatically from the app’s word lists and example sentences, are ready now.`)
-        : tx(`${level}の確認済みテストは、まだありません。`, `No reviewed ${level} tests yet.`)));
+        ? tx(`${level}のテストは、まだありません。アプリの単語表と例文から、${level}の短い練習セットが${sets.length}つあり、今すぐ使えます。`,
+          `No ${level} tests yet. ${sets.length} short ${level} sets from the app’s word lists and example sentences are ready now.`)
+        : tx(`${level}のテストは、まだありません。`, `No ${level} tests yet.`)));
     if (sets.length) block.append(node('p', 'exam-older-limits', tx('語彙・文法・読解のみ。聴解と時間制限はありません。', 'Vocabulary, grammar and reading only — no listening, no timer.')));
     for (const set of sets) {
       const door = button(host.english() ? (set.title.en || set.title.ja) : set.title.ja, null, () => host.startOlder(set.setId), 'entry-row exam-older-set');
       door.dataset.legacySet = set.setId;
       door.append(node('span', 'exam-older-meta', tx(`${set.items}問`, `${set.items} questions`)));
-      if (!set.approved && !allUnchecked) door.append(node('span', 'status-chip', tx('AI作成', 'Made by AI')));
       door.disabled = !!host.olderSetLoading?.(set.setId);
       block.append(door);
       if (host.olderSetFailed?.(set.setId)) {
@@ -582,10 +548,9 @@ export function createAssessmentView(host) {
     if (written.length) {
       const group = node('section', 'exam-written'); group.dataset.examWritten = level;
       group.append(sectionHeading('筆記テスト', 'Written tests: vocabulary, grammar, reading', '筆記テスト（文字・語彙・文法・読解）'));
-      group.append(reviewMark(written[0].review.label, true));
-      group.append(node('p', 'exam-status', tx('オリジナル問題です。聴解はありません。出典と確認方法は各テストの下にあります。',
-        'Original questions, no listening. Each test lists its sources and how it was checked.')));
-      for (const entry of written) renderCard(group, entry, { marked: written.every(row => row.review?.status === 'machine-checked') });
+      group.append(node('p', 'exam-status', tx('オリジナル問題です。聴解はありません。出典は各テストの下にあります。',
+        'Original questions, no listening. Each test lists its sources.')));
+      for (const entry of written) renderCard(group, entry);
       main.append(group);
     }
     const entries = catalog.entries.filter(entry => entry.level === level && entry.mode === length && !isOfficial(entry));
@@ -657,12 +622,10 @@ export function createAssessmentView(host) {
     remove.dataset.officialRemove = entry.id; card.append(remove);
     main.append(card);
   }
-  function renderCard(main, entry, { marked = false } = {}) {
+  function renderCard(main, entry) {
     const card = node('article', 'exam-form'); card.dataset.examForm = entry.id;
     card.append(node('h2', '', titleOf(entry)), node('p', 'exam-form-meta',
       tx(`${entry.questionCount}問 · 約${entry.durationMinutes}分`, `${entry.questionCount} questions · about ${entry.durationMinutes} min`)));
-    // a section that already says 未確認 in its header does not repeat it on every card
-    if (entry.review?.status === 'machine-checked' && !marked) card.append(reviewMark(entry.review.label));
     const papers = entryPapers(entry);
     if (papers.length) card.append(node('p', 'exam-form-timing', tx(
       `本試験と同じ時間割：${papers.map(row => `${row.label} ${row.minutes}分`).join('／')}`,
@@ -714,7 +677,6 @@ export function createAssessmentView(host) {
       }));
     } else if (value.kind === 'start') {
       const writtenSection = ['section', 'written'].includes(value.entry.mode), audio = hasListening(value.entry);
-      if (value.entry.review?.status === 'machine-checked') section.append(reviewMark(value.entry.review.label, true));
       if (writtenSection) section.append(node('p', 'exam-scope-note', tx(
         `${value.entry.questionCount}問・${value.entry.durationMinutes}分の短縮練習です。JLPT本試験の全問題・全科目ではありません。${audio ? '' : '聴解は含みません。'}`,
         `${value.entry.questionCount} questions · ${value.entry.durationMinutes} minutes: a shorter practice set, not a complete JLPT examination.${audio ? '' : ' Listening is not included.'}`)));
@@ -752,8 +714,8 @@ export function createAssessmentView(host) {
         '本番形式モードでは時間制限があり、辞書・ふりがな・訳・解説は表示しません。終了したパートには戻れません。',
         'Timed exam mode has no dictionary, furigana, translations or explanations. A finished section cannot be reopened.')));
       section.append(node('p', 'exam-bookmark-note', tx(
-        '不正解は「あとで見直す」を押さなくても自動保存し、ほかの練習でその語にまた出会えるようにします。「あとで見直す」は目印です。AI作成の問題の結果は、仮のものとして区別します。',
-        'Wrong answers are saved automatically, even without a bookmark, so those words come back in your other practice. A bookmark is just your reminder. Results from questions made by AI are kept apart as provisional.')));
+        '不正解は「あとで見直す」を押さなくても自動保存し、ほかの練習でその語にまた出会えるようにします。「あとで見直す」は目印です。',
+        'Wrong answers are saved automatically, even without a bookmark, so those words come back in your other practice. A bookmark is just your reminder.')));
       section.append(node('p', 'exam-download-note', host.pending()
         ? audio ? tx('問題と音声を保存しています…', 'Downloading questions and audio…') : tx('問題を保存しています…', 'Downloading questions…')
         : audio ? tx('始める前に問題と音声を保存します。保存が終わってから計時を始めます。', 'Questions and audio download before the timer starts.')
@@ -959,24 +921,6 @@ export function createAssessmentView(host) {
       if (alive(generation)) { deliveryFailures.add(selected.form.sha256); host.onMediaError?.(error); }
     } finally { if (alive(generation)) { deliveryLoading = false; refresh(); } }
   }
-  // The review wording comes from this attempt's own editorial record, never a fixed label.
-  function explanationProvenance(status) {
-    return status === 'ai-reviewed-full' ? tx('AIモデルが確認した解説です。人による確認はまだです。', 'Checked by AI models; not yet reviewed by a person.')
-      : status === 'ai-reviewed-practice' ? tx('練習用としてAIモデルが確認した解説です。人による確認はまだです。', 'Checked by AI models for practice; not yet reviewed by a person.')
-        : tx('この解説は、まだ確認されていません。', 'This explanation hasn’t been checked yet.');
-  }
-  // Machine-checked forms: the class label and this question's author and verifier families.
-  function questionProvenance(selected, itemId) {
-    const label = selected && host.machineCheckLabel?.(selected);
-    if (!label) return [];
-    const check = host.itemCheck?.(selected, itemId);
-    if (!check) { host.ensureDelivery?.(selected); return [reviewMark(label)]; }
-    const line = node('p', 'exam-item-provenance', tx(
-      `この問題：作成 ${familyName(check.author)}・検証 ${check.verifiers.join('／')}（${check.agreed}/${check.verifiers.length} \u4E00致）`,
-      `This question: written by ${familyName(check.author)}, checked by ${check.verifiers.join(', ')} (${check.agreed}/${check.verifiers.length} agreed)`));
-    line.dataset.itemProvenance = itemId;
-    return [reviewMark(label), line];
-  }
   function closeWhy() { whyOpenItemId = null; focusAfterRender = '#exam-why'; refresh(); }
   async function openWhy(itemId) {
     const current = selection();
@@ -1004,9 +948,6 @@ export function createAssessmentView(host) {
     appendText(key, explanation.key.text, selected, question.id, 'choice');
     sheet.append(title, verdict, chosen, key, rule,
       node('p', 'exam-why-absent', tx('ほかの選択肢が違う理由は、まだ書かれていません。', 'Why the other choices are wrong hasn’t been written yet.')),
-      // a machine-checked form names its own class and checks instead of the generic AI line
-      ...(host.machineCheckLabel?.(selection()) ? questionProvenance(selection(), explanation.itemId)
-        : [node('p', 'exam-why-provenance', explanationProvenance(explanation.editorial))]),
       button(tx('閉じる', 'Close'), 'exam-why-close', closeWhy));
     sheet.addEventListener('keydown', event => { if (event.key === 'Escape') { event.preventDefault(); closeWhy(); } });
     main.append(sheet);
@@ -1092,8 +1033,6 @@ export function createAssessmentView(host) {
     if (form.scope !== 'full-candidate') main.append(node('p', 'exam-scope-note', tx(
       `${form.items.length}問の短縮練習 · 本試験の全科目ではありません`,
       `${form.items.length}-question practice set · not a complete JLPT examination`)));
-    const machineLabel = host.machineCheckLabel?.(selected);
-    if (machineLabel) main.append(reviewMark(machineLabel));
     const official = officialOf(selected);
     if (official) main.append(officialBadge(official));
     if (!block) {
@@ -1333,8 +1272,6 @@ export function createAssessmentView(host) {
     const independence = host.independence?.(selected) || null;
     const assistedItem = itemId => !!host.assistance?.(selected, itemId) || !!attempt.answers.find(row => row.item.id === itemId)?.assistance;
     main.append(node('h1', 'view-title', stopped ? tx('中断した練習', 'Attempt stopped') : tx('結果', 'Your results')));
-    const machineLabel = host.machineCheckLabel?.(selected);
-    if (machineLabel) main.append(reviewMark(machineLabel, true));
     const official = officialOf(selected);
     if (official) main.append(officialBadge(official));
     if (stopped) main.append(node('p', '', tx('回答を保存しました。中断した結果は弱点の判定に使いません。', 'Your answers are saved. A stopped test won’t count toward your weak spots.')));
@@ -1382,10 +1319,6 @@ export function createAssessmentView(host) {
         main.append(node('p', 'exam-bookmark-note', tx(
           `不正解${missed}問の記録を保存しました。目印の有無に関わらず、関連する言葉や文法との次の出会いに引き継ぎます。未回答は、言葉を知らないという判定には使いません。`,
           `${missed} wrong answers saved, with or without bookmarks. Related words and grammar can reappear in later study. Unanswered questions are pacing evidence, not vocabulary weaknesses.`)));
-        if (followup.status === 'pending-review' || followup.editorialAtStart?.policyVersion === 'bunki-machine-check/1')
-          main.append(node('p', 'exam-provisional-note', tx(
-            '検収前の問題です。結果と出典は残し、復習の手がかりとして使います。確定した弱点・習得度の判定ではありません。',
-            'These questions are provisional. Their results and sources remain attached to practice suggestions; they do not establish a confirmed weakness or mastery level.')));
         const historical = followup.actions.filter(row => row.status === 'added').length;
         const { currentCount, removableCount } = host.removableAdditions?.(followup) ||
           { currentCount: historical, removableCount: historical };
@@ -1439,7 +1372,6 @@ export function createAssessmentView(host) {
         appendText(key, choice(question.response.answerOptionId), selected, question.id, 'choice'); details.append(key);
       }
       const rationale = node('p', 'exam-rationale'); appendText(rationale, question.rationale, selected, question.id, 'explanation'); details.append(rationale);
-      if (machineLabel) details.append(...questionProvenance(selected, question.id).slice(1));
       main.append(details);
       if (!official) details.append(button(tx('先生にこの問題を聞く', 'Ask Sensei about this question'), null,
         () => host.sensei(attempt.attemptId, question.id)));

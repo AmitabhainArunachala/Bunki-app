@@ -4322,11 +4322,10 @@ function withEn(node, en) {
   return node;
 }
 /** ONE NOTE (contract §5): the honest notes of every room — assessment, guided, reference, the sheet — are one
- * element with one wording per kind: ai (written by AI, not yet checked by a person), guide (a guide, not the
- * official list), record (what you answer here is kept). Styled once in editorial.css (.note[data-kind]); the
- * modules receive it through their host (note / noteHtml). */
+ * element with one wording per kind: guide (a guide, not the official list), record (what you answer here is kept).
+ * Styled once in editorial.css (.note[data-kind]); the modules receive it through their host (note / noteHtml). How a
+ * text was made is never one of them (S, John 2026-10-16: no "made by AI" in the learner's app). */
 const NOTE_TEXT = Object.freeze({
-  ai: ['AIが書きました。まだ人の目は通っていません。', 'Written by AI. Not yet checked by a person.'],
   guide: ['目安です。公式の一覧ではありません。', 'A guide, not the official list.'],
   record: ['ここでの答えは記録に残ります。', 'What you answer here is kept.'],
 });
@@ -4334,6 +4333,8 @@ function noteText(kind) {
   return tx(...NOTE_TEXT[kind]);
 }
 function note(kind) {
+  // a kind the house no longer says (the retired "ai" provenance line) draws nothing
+  if (!NOTE_TEXT[kind]) return document.createDocumentFragment();
   const line = el('p', 'note', noteText(kind));
   line.dataset.kind = kind;
   return line;
@@ -5857,25 +5858,8 @@ function renderShelfBody(search = null) {
     el('span', 'tally-short', bi() ? `${stories.length} articles` : `${stories.length}本${glossaryCount ? `（用語集${glossaryCount}含む）` : ''}`));
   dateline.append(el('span', 'dateline-date', shelfDateline(day)), sep, tally);
   title.append(dateline);
-  // 未確認 is said once, not on every card; each article still wears it in its meta line. One short
-  // line (glance pass 2026-10-01); what it means waits behind its ⓘ. It stands under the lead story,
-  // not above its picture (review round 2 #6): the shelf opens on the woodblock.
-  const unreviewed = stories.filter(reviewPending).length;
-  let reviewNote = null;
-  if (unreviewed) {
-    const note = el('div', 'shelf-review-note');
-    reviewNote = note;
-    note.append(el('span', 'shelf-review-text', tx(`このうち ${unreviewed} 本はAI作成（人の確認前）`,
-      `Made by AI · ${unreviewed} of ${stories.length} not yet checked by a person`)));
-    const why = el('details', 'shelf-filter-help shelf-review-help');
-    const whySummary = el('summary', 'icon-button');
-    whySummary.setAttribute('aria-label', tx('AI作成とは', 'What Made by AI means'));
-    whySummary.title = tx('AI作成とは', 'What Made by AI means');
-    whySummary.append(uiIcon('info'));
-    why.append(whySummary, el('p', '', tx('AIが書き、人がまだ確認していない読み物です。ふりがなや英訳に誤りがあるかもしれません。記事の見出しの上にも「AI作成」と出ます。',
-      'AI wrote these articles and a person has not checked them yet, so their furigana (the small reading over the kanji) or their English may have mistakes. Each one also says Made by AI at its top.')));
-    note.append(why);
-  }
+  // S · no provenance on the shelf (John, 2026-10-16: "and made by AI!! do not write that!!!!"): how a story was
+  // made stays in its record (p.review, the source label) and in the export, never on the learner's page
   masthead.append(title);
   body.append(masthead);
   // the layout under test opens the bookshelf on today's reading (it stood on Today): the unread
@@ -6291,11 +6275,8 @@ function renderShelfBody(search = null) {
     if (rank >= 3 && inBand.has(p.id)) continue;
     if (rank === 3) grid.append(...bands.splice(0));
     grid.append(shelfCard(p, rank === 0 ? 'lead' : rank < 3 ? 'second' : 'grid'));
-    if (rank === 0 && reviewNote) grid.append(reviewNote);
     rank += 1;
   }
-  // a shelf with no lead (every story filtered away) keeps the note in its masthead
-  if (reviewNote && !reviewNote.parentNode) title.append(reviewNote);
   grid.append(...bands);
   if (definitions.length) {
     const band = el('section', 'shelf-definitions shelf-band');
@@ -7287,8 +7268,8 @@ function renderSourceReading(main) {
   renderListeningSource(main, saved);
   if (fileCapture) renderFileSource(main, saved, fileCapture);
   const details = el('details', 'publisher-details'); details.append(el('summary', '', tx('出典と保存について', 'Source and capture details')),
-    el('p', 'feed-meta', tx('自分で貼り付けた内容。出典の著者・利用条件は未確認。選んだ文章を先生へ送るには、先生の画面でこの端末の許可を与える。音声の生成は利用できない。',
-      'Learner-supplied content. Source authorship and reuse rights are unverified. To discuss selected excerpts, approve this source on this device in the tutor. Generated audio is unavailable.')),
+    el('p', 'feed-meta', tx('自分で貼り付けた内容。選んだ文章を先生へ送るには、先生の画面でこの端末の許可を与える。音声の生成は利用できない。',
+      'Your own pasted text. To discuss selected excerpts, approve this source on this device in the tutor. Generated audio is unavailable.')),
     el('p', 'feed-meta', `${tx('取り込み', 'Captured')}: ${feedDate(saved.capturedAt)}`)); main.append(details);
   if (!article.body) {
     if (fileCapture) {
@@ -7844,24 +7825,6 @@ function readerDateStamp(day) {
 }
 function learnerSourceLabel(p) {
   return String(p.sourceLabel || '').replace(/\s*·\s*検収前/gu, '').replace(/^N3書き換え\s*·\s*/u, '').trim();
-}
-function reviewPending(p) {
-  return p.review === 'human-review-pending' || p.review === 'rights-review-pending' || !!p.pendingVerification
-    || /検収前/u.test(p.sourceLabel || '');
-}
-function reviewReason(p) {
-  if (p.review === 'rights-review-pending') return tx('出典の利用条件を確認中', 'the source’s terms are still being checked');
-  if (p.pendingVerification) return tx('最終版との照合の前', 'not yet checked against the final saved version');
-  return tx('人による確認の前', 'not yet checked by a person');
-}
-/** AI作成 · Made by AI — one small chip for text no person has checked yet, its reason in the tooltip (the house
- * voice, 2026-10-15: never "unreviewed"). */
-function unreviewedChip(p) {
-  const chip = el('span', 'status-chip', tx('AI作成', 'Made by AI'));
-  const reason = reviewReason(p);
-  chip.title = `${tx('AI作成', 'Made by AI')} — ${reason}`;
-  chip.setAttribute('aria-label', `${tx('AI作成', 'Made by AI')} — ${reason}`);
-  return chip;
 }
 /** The level a learner filters by: the JLPT vocabulary estimate, with the sentence band beside it. */
 function levelChip(p, extra = '') {
@@ -10780,8 +10743,8 @@ function renderReader(main) {
   if (picture) articleTitle.classList.add('on-hero');
   card.append(articleTitle);
   if (bi() && p.titleEn) card.append(el('p', 'view-title-en', p.titleEn));
-  // The instrument line, under the title: source · date · level · saved words · a small
-  // honest "unreviewed" · the voice's state. Settings are one icon at its end.
+  // The instrument line, under the title: source · date · level · saved words · the voice's state. Settings are
+  // one icon at its end. No provenance (S, John 2026-10-16: "no one wants to see a made by ai in red").
   const head = el('div', 'reader-head');
   const meta = el('div', 'eyebrow reader-meta');
   meta.append(el('span', 'reader-source', learnerSourceLabel(p)));
@@ -10792,7 +10755,6 @@ function renderReader(main) {
   const mine = storyYourWords(p);
   if (mine) meta.append(el('span', 'reader-fact reader-mine', tx(`保存した語 ${mine}`, `${mine} of your words`)));
   meta.append(gradeTag(p));
-  if (reviewPending(p)) meta.append(unreviewedChip(p));
   // the dials fold away — the text is the point, the settings one tap away
   const dialsToggle = el('button', 'icon-button dials-toggle');
   dialsToggle.setAttribute('aria-expanded', String(!!S.dialsOpen));
@@ -11084,7 +11046,6 @@ function renderReader(main) {
   const licence = p.licenceUrl ? el('a', 'inline-link', p.licence) : el('span', null, p.licence);
   if (p.licenceUrl) { licence.href = p.licenceUrl; licence.rel = 'noreferrer'; licence.target = '_blank'; }
   fact('利用条件', 'licence', licence);
-  if (reviewPending(p)) fact('確認', 'review', unreviewedChip(p), el('span', 'review-reason', ` ${reviewReason(p)}`));
   about.append(facts);
 
   if (p.truncated) {
@@ -11104,24 +11065,7 @@ function renderReader(main) {
     about.append(note);
   }
 
-  // A row marked unreviewed explains itself wherever the mark shows. The note was gated on
-  // pendingVerification, which few marked rows carry, so the rest wore the mark with no reason,
-  // and the rights-held glossary rows told the Wikinews archive-freeze story, false of them
-  // (PR #77 d9f0b984, with round B's per-row reasons).
-  const rightsHeld = p.review === 'rights-review-pending';
-  if (reviewPending(p)) {
-    const pv = el('div', 'note');
-    pv.textContent = rightsHeld
-      ? tx('出典の利用条件がまだ確認されていない。', 'The terms this source may be used under are not yet verified. Pending review.')
-      : p.pendingVerification
-        ? tx(
-          'ウィキニュース閉鎖の前日の記事。最終版との照合はまだ済んでいない。',
-          'Published the day before Wikinews closed; it has not yet been checked against the final saved version.',
-        )
-        : tx('人による確認がまだ済んでいない。ふりがなや英訳に誤りがあるかもしれない。',
-          'A person hasn’t reviewed this text yet, so its furigana or English may have mistakes.');
-    about.append(pv);
-  }
+  // S · a story's review state (p.review, pendingVerification) stays in its record; the learner's page says nothing of it
 
   const attribution = el('div', 'note');
   if (p.url) {
@@ -15816,17 +15760,7 @@ function renderMock(main) {
       main.append(el('p', 'gloss mock-legacy-notice', tx('以前の要約と回答も記録に残している。元の問題の版が不明なため、古い途中の練習は再開せず、新しい練習を始める。',
         'Earlier summaries and answers are preserved. Their original question versions are unknown, so an old unfinished run cannot be resumed. Start a new attempt below.')));
     }
-    // 未確認 is said once for the page when no set in it is checked, never on all 25 rows
-    const allUnchecked = D.mock.length > 0 && D.mock.every((set) => !set.approved);
-    if (allUnchecked) {
-      const mark = el('p', 'exam-machine-label mock-review-mark');
-      const reason = tx('答えはまだ人が確認していない', 'answers not yet checked by a person');
-      const chip = el('span', 'status-chip', tx('AI作成', 'Made by AI'));
-      chip.title = reason;
-      chip.setAttribute('aria-label', `${tx('AI作成', 'Made by AI')} — ${reason}`);
-      mark.append(chip, ' ', el('span', 'exam-review-reason', reason));
-      main.append(mark);
-    }
+    // S · whether a set's answers were checked stays in its data (set.approved), never on the learner's page
     renderPracticeHistory(main);
     const latest = latestPracticeBySet();
     for (const level of ['N5', 'N4', 'N3', 'N2', 'N1']) {
@@ -15844,7 +15778,6 @@ function renderMock(main) {
         row.append(el('span', 'row-glyph', String(set.setId.split('-')[1] || '')));
         const mid = el('span', 'row-main');
         mid.append(document.createTextNode(`${set.title.ja} — ${set.items} 問`));
-        if (!set.approved && !allUnchecked) mid.append(el('span', 'status-chip', tx('AI作成', 'Made by AI')));
         const prior = latest.get(set.setId);
         const latestRun = prior ? assessmentModule.selectPractice(S.assessmentLibrary, prior.attemptId).run : null;
         const pinned = prior ? assessmentModule.selectPractice(S.assessmentLibrary, prior.attemptId).flat : null;
@@ -16034,8 +15967,8 @@ function renderMockResult(main, set, flat, run, selected) {
       'p',
       'gloss',
       tx(
-        `検収前の解答との照合結果。回答と問題の版は保存済み。${set.level} の合否や習熟度の判定には使わない。必要な言葉だけ、下から覚える札にできる。`,
-        `Your answers are saved. These older answer keys still need checking, so use this as practice rather than a ${set.level} readiness score.`,
+        `解答との照合結果。回答と問題の版は保存済み。${set.level} の合否や習熟度の判定には使わない。必要な言葉だけ、下から保存できる。`,
+        `Your answers are saved. Use this as practice rather than a ${set.level} readiness score.`,
       ),
     ),
   );
@@ -16505,8 +16438,8 @@ function renderKagami(main) {
 
   if (model.unverifiedPractice.rows) {
     const practice = el('p', 'card-kind', tx(
-      `確認できない過去の練習解答 ${model.unverifiedPractice.rows} 件を記録に残している。問題の版・検収・解答条件が不明なので、能力の測定には使っていない。`,
-      `${model.unverifiedPractice.rows} unverified practice answers remain in your record. Their question versions, review and answer conditions are unknown, so they are not used to measure ability.`,
+      `過去の練習解答 ${model.unverifiedPractice.rows} 件を記録に残している。問題の版と解答の条件が分からないので、能力の測定には使っていない。`,
+      `${model.unverifiedPractice.rows} earlier practice answers remain in your record. Their question versions and answer conditions are unknown, so they are not used to measure ability.`,
     ));
     practice.id = 'kagami-unverified-practice'; main.append(practice);
   }
@@ -17252,7 +17185,9 @@ function renderTeacherContexts(main) {
       el('p', 'teacher-source-credit', context.attribution));
     section.append(credits);
   } else section.append(el('p', 'teacher-source-credit', [context.sourceKind === 'assessment-item'
-    ? tx('JLPTの練習問題', 'JLPT practice question') : context.title, context.attribution].filter(Boolean).join(' · ')));
+    ? tx('JLPTの練習問題', 'JLPT practice question') : context.title,
+    // S · a story's 検収前 rides its stored attribution (the record keeps it); the learner's page drops it
+    String(context.attribution || '').replace(/\s*·\s*検収前/gu, '')].filter(Boolean).join(' · ')));
   const actions = el('div', 'teacher-actions');
   const back = biLabel('button', 'chip', '元の文へ戻る', 'return to this sentence');
   back.type = 'button'; back.id = 'teacher-source-return';
@@ -18519,8 +18454,8 @@ function renderKdxKkld(main) {
     const q = (S.kdx.kkldQ || '').trim();
     if (!q) {
       out.append(el('p', 'fine', tx(
-        `${(D.kkld.counts?.ed2013 || 0).toLocaleString()} 字に 2013年版の番号、${(D.kkld.counts?.ed1999 || 0).toLocaleString()} 字に 1999年版の番号。2022年版の対応表は未確認。`,
-        `${(D.kkld.counts?.ed2013 || 0).toLocaleString()} kanji carry a 2013 number, ${(D.kkld.counts?.ed1999 || 0).toLocaleString()} a 1999 number. The 2022 printing's numbering is unverified.`,
+        `${(D.kkld.counts?.ed2013 || 0).toLocaleString()} 字に 2013年版の番号、${(D.kkld.counts?.ed1999 || 0).toLocaleString()} 字に 1999年版の番号。2022年版の番号は載せていない。`,
+        `${(D.kkld.counts?.ed2013 || 0).toLocaleString()} kanji carry a 2013 number, ${(D.kkld.counts?.ed1999 || 0).toLocaleString()} a 1999 number. The 2022 printing's numbers are not included.`,
       )));
       return;
     }
@@ -20121,9 +20056,6 @@ function refreshShelfBody() {
       live.querySelector('.shelf-tools-count')?.remove();
       const count = next.querySelector('.shelf-tools-count');
       if (count) live.querySelector('.shelf-tools-caret').before(count);
-      live.querySelector('.shelf-mast-title > .shelf-review-note')?.remove();
-      const reviewNote = next.querySelector('.shelf-mast-title > .shelf-review-note');
-      if (reviewNote) live.querySelector('.shelf-mast-title').append(reviewNote);
     }
     live.dataset.renderToken = next.dataset.renderToken;
     enhanceJapaneseProse(content);
@@ -21842,8 +21774,8 @@ function renderKanjiReadingPractice(main, context, state, entry) {
   const quote = el('blockquote', 'sentence-original', context.quote); quote.lang = 'ja'; main.append(quote);
   const selected = el('p', 'sentence-production-prompt', tx(`「${cue.token.s}」の読みを練習する。`, `Practice the reading of 「${cue.token.s}」.`));
   selected.lang = 'ja'; main.append(selected,
-    el('p', 'teacher-note', tx('この読みは自動で付いたもので、未校閲です。文中の語全体の読みと照合します。',
-      'This automatically supplied reading has not been reviewed. Your response is compared with the reading of the whole word in this sentence.')));
+    el('p', 'teacher-note', tx('文中の語全体の読みと照合します。',
+      'Your response is compared with the reading of the whole word in this sentence.')));
   const note = el('p', 'teacher-note'); note.id = 'sentence-practice-status'; note.setAttribute('role', 'status');
   note.textContent = state.error || (state.saved ? tx('読みの練習を保存した。', 'Your reading practice is saved.') : '');
   if (!entry) {
@@ -21923,8 +21855,8 @@ function renderSentencePractice(main) {
       ['production', '自分の文で使う', 'Use it in my own sentence',
         tx('自分の文を残す練習。自動採点や復習予定の変更は行わない。', 'Keeps your own written response. It is not automatically checked and does not change review timing.')],
       ...(state.listeningCue ? [['listening', '聞いて、分かったことを書く', 'Listen and explain what I understood',
-        tx('合成音声を聞き、自分の言葉で意味を残す。回答は未確認のまま保存する。',
-          'Hear the synthetic recording and explain its meaning in your own words. Your response stays unchecked.')]] : []),
+        tx('合成音声を聞き、自分の言葉で意味を残す。',
+          'Hear the synthetic recording and explain its meaning in your own words.')]] : []),
     ]) {
       const label = el('label', 'sentence-option'), input = el('input'); input.type = 'checkbox'; input.id = `sentence-choose-${mode}`;
       input.checked = !!state[mode]; input.disabled = !!state.pending;
@@ -21942,7 +21874,7 @@ function renderSentencePractice(main) {
   const hasCloze = entry.plan.contracts.some((contract) => contract.contractId.endsWith(':cloze'));
   const hasProduction = entry.plan.contracts.some((contract) => contract.contractId.endsWith(':production'));
   note.textContent = state.teacherPreparing ? tx('質問の下書きを準備中…', 'Preparing your question…')
-    : state.teacherError || state.error || (state.listeningSaved ? tx('聞いて書いた回答を保存した · 未確認', 'Listening response saved · unchecked')
+    : state.teacherError || state.error || (state.listeningSaved ? tx('聞いて書いた回答を保存した', 'Listening response saved')
       : state.saved ? tx('選んだ練習を保存した。', 'Your selected practice is saved.') : '');
   main.append(note);
   if (hasCloze) {
@@ -21975,14 +21907,14 @@ function renderSentencePractice(main) {
       el('p', 'sentence-production-prompt', tx(`「${selected}」を使って、自分のことを日本語で伝えてみる。`,
         `Use 「${selected}」 to say something of your own in Japanese.`)),
       el('p', 'teacher-note', tx('意味が伝わるか、表現・文法・場面が合っているかを振り返る。ここでは自動採点しない。',
-        'Consider whether your meaning is clear and the expression, grammar and register fit. This response will remain unchecked.')));
+        'Consider whether your meaning is clear and the expression, grammar and register fit. It is not scored automatically.')));
     const label = el('label', '', tx('自分の文', 'Your sentence')); label.htmlFor = 'sentence-production-text';
     const input = el('textarea', 'sentence-response'); input.id = label.htmlFor; input.rows = 4; input.maxLength = 4000; input.lang = 'ja';
     const draft = attachSentenceDraft(input, { entryId: entry.plan.id, mode: 'production' }, {
       current: () => S.view === 'sentence-practice' && S.sentencePracticeView === state && !state.listeningRun,
     });
     const status = el('p', 'teacher-note'); status.id = 'sentence-production-status'; status.setAttribute('role', 'status');
-    status.textContent = state.productionError || (state.productionSaved ? tx('回答を保存した · 未確認', 'Response saved · unchecked') : '');
+    status.textContent = state.productionError || (state.productionSaved ? tx('回答を保存した', 'Response saved') : '');
     const save = biLabel('button', 'chip', '回答を保存', 'save my response'); save.type = 'button'; save.id = 'sentence-production-save';
     const refresh = () => { save.disabled = !!state.pending || !input.value.trim() || !recordWritable() ||
       !sentenceDraftController || sentenceDraftView(input).state === 'conflict' || sentenceDraftInputErrors.has(input); };
@@ -22013,7 +21945,7 @@ function renderSentencePractice(main) {
     const section = el('section', 'sentence-practice-section');
     section.append(el('h2', '', tx('自分の文で使う', 'Use it in my own sentence')),
       el('p', 'teacher-note', tx(`「${selected}」を使った自分の文を残す。自動採点や復習予定の変更は行わない。`,
-        `Keep your own sentences using 「${selected}」. They remain unchecked and do not change review timing.`)));
+        `Keep your own sentences using 「${selected}」. They are not scored automatically and do not change review timing.`)));
     const add = biLabel('button', 'chip', '身につける — 作文の練習を追加', 'Master · add writing practice');
     add.type = 'button'; add.id = 'sentence-add-production'; add.disabled = !!state.pending || !recordWritable();
     add.addEventListener('click', () => commitSentenceChoice(state, context, start, end, ['production']));
@@ -22025,8 +21957,8 @@ function renderSentencePractice(main) {
     const hasListening = approvedSentenceCue(entry.plan.listeningCue);
     if (!hasListening && !availableSentenceListeningCue(context)) section.append(voicePendingNote('sentence-listening-pending'));
     else {
-      section.append(el('p', 'teacher-note', tx('この文の合成音声を聞き、自分の言葉で意味を残す。回答は未確認で、復習予定は変わらない。',
-        'Hear this sentence’s synthetic recording and explain its meaning in your own words. Responses stay unchecked; review timing stays the same.')));
+      section.append(el('p', 'teacher-note', tx('この文の合成音声を聞き、自分の言葉で意味を残す。復習予定は変わらない。',
+        'Hear this sentence’s synthetic recording and explain its meaning in your own words. Review timing stays the same.')));
       const button = biLabel('button', 'chip', hasListening ? 'この文を聞いて練習する' : '身につける — 聞く練習を追加',
         hasListening ? 'practice listening to this sentence' : 'Master · add listening practice');
       button.type = 'button'; button.id = hasListening ? 'sentence-listening-start' : 'sentence-add-listening';
@@ -22058,8 +21990,8 @@ function renderSentencePractice(main) {
       const grade = S.sentencePractice.grades.find((item) => item.responseId === response.id);
       const undone = grade && S.revlog.some((item) => item[2] === 0 && item[3] === grade.revlogIndex);
       const checked = response.mode === 'cloze' ? sentencePracticeModule.checkSourceCloze(entry.plan, response.text, response.revealed) : null;
-      const result = response.mode === 'listening' ? tx('聞いて書いた理解 · 未確認', 'My listening response · unchecked')
-        : response.mode === 'production' ? tx('自分の文 · 未確認', 'My own sentence · unchecked') : response.revealed
+      const result = response.mode === 'listening' ? tx('聞いて書いた理解', 'My listening response')
+        : response.mode === 'production' ? tx('自分の文', 'My own sentence') : response.revealed
         ? tx('先に答えを見た', 'Answer shown before recall') : checked.matchesWording
           ? tx('保存した表現と一致', 'Matched the saved wording') : tx('保存した表現とは異なる', 'Different from the saved wording');
       row.append(el('p', 'teacher-note', `${result} · ${feedDate(response.at)}`), el('p', 'sentence-response-text', response.text || tx('回答なし', 'No response')));
@@ -22092,8 +22024,7 @@ function renderSentenceListening(main, entry, state) {
   surface.append(el('p', 'sentence-production-prompt', tx(
     '前に出会った文を聞き直して、分かったことを自分の言葉で書く。日本語でも、使いやすい言語でもよい。',
     'Listen again to a sentence you have met. Explain what you understood in Japanese or a language you are comfortable with.')),
-  el('p', 'teacher-note', tx(`${voice}の合成音声。音声と本文の照合は検収前。回答は未確認のまま保存する。`,
-    `Synthetic voice: ${voice}. The recording and transcript still need review. Your response will stay unchecked.`)));
+  el('p', 'teacher-note', tx(`${voice}の合成音声。`, `Synthetic voice: ${voice}.`)));
   const audioStatus = el('p', 'teacher-note'); audioStatus.id = 'sentence-listening-audio-status'; audioStatus.setAttribute('role', 'status');
   audioStatus.textContent = run.completedPlays ? tx('この練習で、文を最後まで再生した。', 'The sentence finished playing during this exercise.')
     : tx('まず文を最後まで聞く。何度でも聞き直せる。', 'Play the sentence to the end first. You can listen again.');
@@ -22160,8 +22091,8 @@ function renderSentenceListening(main, entry, state) {
   const draft = attachSentenceDraft(input, draftKey, { current, exposure: () => run.revealed, opened: () => { run.revealed = true; } });
   const save = biLabel('button', 'chip', '理解したことを保存', 'save my understanding'); save.type = 'button'; save.id = 'sentence-listening-save';
   const status = el('p', 'teacher-note'); status.id = 'sentence-listening-status'; status.setAttribute('role', 'status');
-  status.textContent = run.error || (run.saved ? tx('前の回答を保存した · 未確認。次の下書きは残っている。',
-    'Previous response saved · unchecked. Your next draft is still here.') : '');
+  status.textContent = run.error || (run.saved ? tx('前の回答を保存した。次の下書きは残っている。',
+    'Previous response saved. Your next draft is still here.') : '');
   const refresh = () => { save.disabled = !!run.pending || !run.completedPlays || !input.value.trim() || !recordWritable() ||
     !sentenceDraftController || sentenceDraftView(input).state === 'conflict' || sentenceDraftInputErrors.has(input); };
   draft.binding.refresh = refresh; refresh();
@@ -22235,8 +22166,8 @@ function renderSentenceRecallFace(face, rv, item) {
   line.append(text.slice(0, start), el('span', reading || rv.revealed ? 'sentence-answer' : 'sentence-gap',
     reading || rv.revealed ? text.slice(start, end) : '［ … ］'), text.slice(end));
   face.append(line);
-  if (reading) face.append(el('p', 'teacher-note', tx('文中の語全体の読み。自動で付いた未校閲の読みと照合する。',
-    'Read the whole word in this sentence. The supplied reading is automatic and unreviewed.')));
+  if (reading) face.append(el('p', 'teacher-note', tx('文中の語全体の読みと照合する。',
+    'Read the whole word in this sentence.')));
   if (rv.revealed) {
     if (reading) {
       const answer = el('p', 'sentence-response-text', entry.plan.readingCue.token.r); answer.lang = 'ja'; face.append(answer);
@@ -24937,7 +24868,7 @@ function guidedHost() {
     // the session's own path (host), so its ledger and its crane keep their word
     openSlip: (node, { anchor, host, look, onClose } = {}) => openSlip(node, { anchor, from: 'guided', host, look, onClose }),
     // the one honest note (contract §5), as markup for the room's templates
-    noteHtml: (kind) => note(kind).outerHTML,
+    noteHtml: (kind) => (NOTE_TEXT[kind] ? note(kind).outerHTML : ''),
     openTutor: () => {
       keepNavigationReturn('ai', document.activeElement);
       S.view = 'ai'; render(); window.scrollTo(0, 0);
@@ -25076,7 +25007,7 @@ function studyHallDoors() {
     }],
     ['mock', 'JLPT 模試・練習', 'JLPT tests & practice', readyTests
       ? tx(`${readyTests}組 · 級と長さを選ぶ`, `${readyTests} tests · choose a level and length`)
-      : readyWritten ? tx(`筆記テスト ${readyWritten}組 · 人の確認前`, `${readyWritten} written tests · not yet checked by a person`)
+      : readyWritten ? tx(`筆記テスト ${readyWritten}組`, `${readyWritten} written test${readyWritten === 1 ? '' : 's'}`)
       : readySections ? tx(`${readySections}組の練習`, `${readySections} practice set${readySections === 1 ? '' : 's'} · practice sets available`)
         : tx('以前の練習', 'Earlier practice exercises'), () => {
       keepScroll(); S.view = 'mock'; render(); window.scrollTo(0, 0);
@@ -27668,9 +27599,6 @@ function renderAiReading(main) {
       const heading = el('h2', 'airead-title', article.title);
       heading.id = 'airead-title';
       main.append(heading);
-      main.append(el('p', 'airead-status', article.lineage.kind === 'original-fiction'
-        ? tx('AIによる創作・未校閲', 'AI fiction · awaiting editorial review')
-        : tx('AIによるオリジナル記事・未校閲', 'AI original · awaiting editorial review')));
     }
     const body = el('div', 'airead-body');
     if (article) body.setAttribute('aria-labelledby', 'airead-title');
@@ -27713,7 +27641,7 @@ function renderAiReading(main) {
     );
     if (article?.lineage.kind === 'original-factual' && article.lineage.references.length) {
       const references = el('details', 'airead-references');
-      references.append(el('summary', '', tx('AIが挙げた参考資料（未検証）', 'References supplied by the tutor · unverified')));
+      references.append(el('summary', '', tx('先生が挙げた参考資料', 'References from the tutor')));
       const list = el('ul');
       for (const reference of article.lineage.references) {
         const item = el('li');

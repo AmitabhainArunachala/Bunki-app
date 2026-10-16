@@ -33,7 +33,6 @@ html[data-room='shelf'] body #shelf-body .shelf-dateline {
   letter-spacing: 0.02em;
   color: var(--color-ink-2);
 }
-html[data-room='shelf'] #shelf-body .shelf-review-note { color: var(--color-muted); }
 /* Japanese datelines keep the reading face: a monospace Latin beside kanji reads as a form field */
 html[data-room='shelf'] body:not(.ui-bi) #shelf-body .shelf-dateline { font-family: var(--font-ui); letter-spacing: 0.01em; }
 /* the shelf's own search: a hairline field like the chips beside it, not a grey capsule */
@@ -463,8 +462,6 @@ html[data-room='shelf'] #shelf-body .shelf-tools-count {
   font: 600 11px/1 var(--font-data);
   font-variant-numeric: tabular-nums;
 }
-html[data-room='shelf'] #shelf-body .shelf-review-note { font-size: 12px; line-height: 1.4; }
-html[data-room='shelf'] #shelf-body .shelf-review-note summary.icon-button { color: var(--color-muted); }
 
 /* ---- fix lane rooms (2026-10-08, review #7): the reader reads as a set page, not a ruled book.
    A word's 44px touch floor is its ::before (corridor.css button.tok), never its box: a 44px box
@@ -542,20 +539,6 @@ html[data-room='reader'] body:not(.ui-bi) .reader-head > .reader-meta .reader-so
 html[data-room='reader'] .reader-head > .reader-meta :is(.reader-fact, .grade-tag, .shelf-date) { font: inherit; letter-spacing: inherit; color: inherit; text-transform: none; }
 html[data-room='reader'] .reader-head > .reader-meta .reader-mine { color: var(--color-live); font-weight: 600; }
 html[data-room='reader'] #app > main .reader-head > .reader-meta .level-chip { display: inline-block; min-height: 0; margin-right: 8px; padding: 1px 4px; font: inherit; line-height: 1.2; }
-/* 未確認 is an honest small mark in the line, not a grey pill */
-html[data-room='reader'] .reader-head > .reader-meta .status-chip {
-  min-height: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-  font: inherit;
-  letter-spacing: inherit;
-  text-transform: lowercase;
-  color: var(--color-signal);
-}
-html[data-room='reader'] .reader-head > .reader-meta .status-chip { text-transform: none; } /* AI keeps its case */
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-head > .dials-toggle {
   position: absolute;
   top: 0;
@@ -640,15 +623,6 @@ html[data-room='shelf'] body:not(.zen):not([data-view='drift']) #app > main > #s
   box-shadow: inset 0 -2px 0 var(--color-accent);
 }
 html[data-room='shelf'] body:not(.zen):not([data-view='drift']) #app > main > #search.search-field::placeholder { color: var(--color-muted); }
-/* the 未確認 note: one quiet line under the lead story, across the grid */
-html[data-room='shelf'] #shelf-reading-results > .shelf-review-note {
-  grid-column: 1 / -1;
-  margin: -4px 0 6px;
-  padding: 0;
-}
-@media (max-width: 520px) {
-  html[data-room='shelf'] #shelf-reading-results > .shelf-review-note { margin: -6px 0 10px; }
-}
 html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-color: color-mix(in srgb, var(--color-ink) 9%, var(--color-page, var(--color-paper))); }
 
 
@@ -1505,7 +1479,6 @@ html[data-room='shelf'] body:not([data-view='drift']) {
   :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] #shelf-reading-results > .story-lead .shelf-head {
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%), 0 0 0 1px rgb(0 0 0 / 28%), 0 20px 44px -14px rgb(0 0 0 / 75%);
   }
-  html[data-room='shelf'] #shelf-reading-results > .story-lead + .shelf-review-note { margin-top: 10px; }
 }
 /* the 読 seal: a crisp tile with a keyline; at night a lantern-gold one, so it never melts into the 藍 */
 html[data-room='shelf'] #shelf-body .shelf-masthead .shelf-art { box-shadow: 0 0 0 1px rgb(20 24 34 / 16%), 0 2px 6px -1px rgb(20 24 34 / 28%); }
