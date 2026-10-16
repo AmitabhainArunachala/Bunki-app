@@ -9294,8 +9294,10 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     wait.style.fontWeight = '400';
     wait.style.color = 'var(--mini-head-ink-2)';
     said.append(wait);
-  } else said.append(el('span', 'mini-gloss', g?.m?.[0] ? (readsOtherwise ? `${g.r} · ${g.m[0]}` : g.m[0])
-    : tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.')));
+  } else said.append(el('span', `mini-gloss${readsOtherwise ? ' mini-miss' : ''}`, readsOtherwise
+    // N · the dictionary has no entry read the text's way: the card says so, and lends no other reading's meaning
+    ? tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.')
+    : g?.m?.[0] || tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.')));
   head.append(said);
   mini.append(head);
   // S · a star of Today's sky says, in one plain line, why it is in the sky (missed yesterday · due today · …)
@@ -10096,7 +10098,12 @@ function readingToken(token) {
   if (!own || (token.seq != null && token.seq !== '') || !readingAsksIndex(token.b, own) || !D.dictionaryIndex) return token;
   const rows = dictionaryRowsForForm(token.b);
   if (!rows.length) return token;
-  if (D.dict[token.b]) return { ...token, seq: String(lookup(token.b, null, own)?.seq || rows[0][0]) };
+  // N · an entry read otherwise counts as missing: the door names the full dictionary's entry read the token's way, or
+  // none — never the form's first row, whose meaning belongs to another reading (訳 read やく is not わけ · reason)
+  if (D.dict[token.b]) {
+    const named = lookup(token.b, null, own)?.seq;
+    return named ? { ...token, seq: String(named) } : token;
+  }
   // a spelling the core lacks: only the one entry that lists this reading and permits it with this spelling, by that
   // reading's own restriction (readerReadingFits); several stay the full entry's explicit choice (D11's own matcher)
   const wanted = kataToHira(own);
