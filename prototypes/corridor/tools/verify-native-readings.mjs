@@ -859,7 +859,9 @@ try {
       };
     });
     const teaser = storyVariant(shelfState.className) === 'teaser';
-    const expectedLevel = row.readingFacets?.jlpt ?? null;
+    // N (2026-10-17) rewrites the pin "the chip is readingFacets.jlpt": a card shows ONE level, the level its text was written
+    // for where the row carries it (authorLevel), else the JLPT vocabulary estimate — on the card and in the reader alike
+    const expectedLevel = (/^N[1-5]\+?$/u.test(row.authorLevel ?? '') ? row.authorLevel : null) ?? row.readingFacets?.jlpt ?? null;
     const learnerSource = row.sourceLabel.replace(/\s*·\s*検収前/gu, '').trim();
     const nativeStyle = [
       'className',
