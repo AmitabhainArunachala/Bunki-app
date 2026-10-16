@@ -195,9 +195,12 @@ const CONTROLS = Object.freeze([
     allowed: [],
     witness: (rows) => (['mini', 'sheet', 'chrome'].every((door) => seen(rows, `G7.${door}.captured`).added?.length === 0)
       ? '' : 'a door captured something') }),
+  // S · the bar's keep reads the slip's own save facts (chromeKeepTarget → wordSaveFacts), so the hold this removes is the
+  // bar's too: G5.bar-none (the bar's one keep held with the word) now dies with the mini's hold — it was a prerequisite
+  // while the bar carried no Save
   Object.freeze({ name: 'c8', title: "the mini's hold removed for a core miss", edits: ['miniUnheld'], run: 'held',
-    requires: ['G5.bar-none', 'G5.iu-chooser-held'],
-    kills: ['G5.mini-held', 'G5.after-iu'],
+    requires: ['G5.iu-chooser-held'],
+    kills: ['G5.mini-held', 'G5.bar-none', 'G5.after-iu'],
     allowed: ['G5.mini-click', 'G5.after-dare'],
     witness: (rows) => (seen(rows, 'G5.after-iu').changed?.includes('taken') ? '' : 'いう was not captured') }),
 ]);

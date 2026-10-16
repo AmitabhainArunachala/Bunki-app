@@ -75,7 +75,10 @@ try {
  assert(savedWord,'one tap saves the canonical word to the shared learner record');
  assert(Number.isFinite(savedWord.started),'one-tap 覚える keeps the host explicit-review enrollment contract');
  assert.equal(savedWord.from,null);assert.equal(savedWord.ctx,undefined);assert.equal(savedWord.sourceContextRef,undefined);
- await page.locator('#personal-add-list').click();
+ // S · the lists live in the one Save's menu (it pinned the foot's "Add to list…", #personal-add-list): Saved ✓ opens it,
+ // and its New list… asks the name once
+ await page.locator('#sheet-take').click();
+ await page.locator('#vocabulary-list-popover.is-drawer #vocabulary-list-new').click();
  await page.locator('#vocabulary-list-name').fill('Synthetic host list');
  await page.locator('#sheet .dictionary-opening').waitFor();
  assert(dictionaryPending,'the full dictionary is still loading when the list draft is entered');
@@ -99,7 +102,8 @@ try {
  await page.locator('#sheet-take').click();
  await page.locator('#sheet-take[aria-pressed="true"]').waitFor();
  // S · the lists live in the one Save's menu (it pinned #personal-add-list): the press that kept the point opened it
- await page.locator('#vocabulary-list-popover.is-drawer').waitFor();await page.locator('[data-list="Synthetic host list"]').check();
+ await page.locator('#vocabulary-list-popover.is-drawer').waitFor();await page.locator('[data-list="Synthetic host list"]').click();
+ await page.locator('[data-list="Synthetic host list"]:checked').waitFor();
  await page.waitForFunction(()=>document.querySelector('.vocabulary-list-status')?.textContent.includes('Synthetic host list'));
  const grammarSaved=await sharedRecord(page);
  const grammarCard=grammarSaved.taken.find(t=>t.t==='grammar'&&t.id===grammarId);

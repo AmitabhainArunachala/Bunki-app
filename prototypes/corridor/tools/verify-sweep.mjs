@@ -92,6 +92,26 @@ window.__SWEEP__ = {
   idiom: () => { S.stack = []; S.strokes = null; go({ t: 'idiom', id: Object.keys(D.idioms || {})[0] }); window.scrollTo(0, 0); },
   closeLayers: () => { closeVocabularyListPopover(); removeMini(); S.stack = []; S.strokes = null; render(); },
   saved: (id) => S.taken.some((t) => t.id === id),
+  // a real selection of the first occurrence of text inside a surface (the source reader keeps what is selected)
+  selectIn: (sel, text) => {
+    const body = document.querySelector(sel);
+    const at = body.textContent.indexOf(text);
+    const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
+    let offset = 0;
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (at < offset + node.length) {
+        const range = document.createRange();
+        range.setStart(node, at - offset);
+        range.setEnd(node, at - offset + text.length);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        return true;
+      }
+      offset += node.length;
+    }
+    return false;
+  },
 };`;
 
 /* K · one behaviour (S brief §3: "same look, same behaviour, same words … never covering another control"). Before a
@@ -156,7 +176,9 @@ function scanPage() {
   // the names of every act that keeps a word, kanji, sentence or story (a door to a room of saved things is not one)
   const KEEP = /^(save|saved|saved ✓( ▾)?|save ▾|keep|kept|memori[sz]e|memorizing( — tap to stop)?|add to review|add to (a )?list…?|add .+ to a list|save (the|this) sentence|save link|saved · remove|remove saved link|(save|keep) \S.{0,24}|保存|保存 ▾|保存済み( ✓)?( ▾)?|覚える|覚える ✓.*|この文を保存|リンクを保存|保存済み · 外す|保存リンクを外す|リストに追加…?|「.+」をリストに追加|「.+」を保存|\S{1,12}を保存)$/iu;
   // saves of a form (a note, a key, a source's times): they keep the learner's own writing or a setting, not a learning item
-  const FORM_SAVE = /^(save (note|changes|source|listening source|excerpt and time|transcript and times|and leave|on this device)|keep it|メモを保存|変更を保存|出典と一緒に保存|聞く出典として保存|抜粋と時刻を保存|字幕と時刻を保存|中断して保存|保存する)$/iu;
+  // his own writing kept as he wrote it (a note, a source he pasted, a key, his practice answers, a list's new name): not a
+  // learning item, so not the one Save
+  const FORM_SAVE = /^(save (note|changes|source|listening source|excerpt and time|transcript and times|and leave|on this device|my response|my understanding)|keep it|メモを保存|変更を保存|出典と一緒に保存|聞く出典として保存|抜粋と時刻を保存|字幕と時刻を保存|中断して保存|保存する|回答を保存|理解したことを保存)$/iu;
   // painted: on the glass, whatever its role for a screen reader (a mark or a chip hidden from assistive tech still shows)
   const painted = (el) => {
     if (!el || !el.isConnected || !el.getClientRects().length) return false;
@@ -207,7 +229,7 @@ function scanPage() {
     if (el.matches('.japanese-lookup-word, .tok, .today-star, [data-ui-content="learning"]') || el.closest('[data-ui-content="learning"]')) continue;
     const label = name(el);
     if (!label) continue;
-    if (FORM_SAVE.test(label)) { out.formSaves.push({ where: where(el), text: label.slice(0, 80) }); continue; }
+    if (FORM_SAVE.test(label) || el.closest('.list-rename, .list-maker')) { out.formSaves.push({ where: where(el), text: label.slice(0, 80) }); continue; }
     if (!KEEP.test(label)) continue;
     const r = el.getBoundingClientRect();
     out.keeps.push({
@@ -287,6 +309,7 @@ function contrast(a, b) {
 
 const inventory = [];
 const summary = { P: 0, C: 0, K: 0, Kone: 0, M: 0, rooms: 0 };
+const SOURCE_TEXT = '町の図書館に着くと、窓の近くに席があった。そこで友達と会い、次に読む本を選んだ。';
 try {
   for (const [engine, browserType] of Object.entries(engines)) {
     const browser = await browserType.launch();
@@ -465,6 +488,19 @@ try {
         // Me, Settings, progress, the tests, lessons, the older rooms
         for (const view of ['me', 'settings', 'kagami', 'srs-stats', 'mock', 'tests', 'lessons', 'archive', 'feed', 'publisher', 'source-inbox', 'airead', 'sentence-practice', 'ai', 'probe', 'review'])
           await room(view, async () => { await page.evaluate((v) => window.__SWEEP__.visit(v), view); await settle(1000); });
+        // a source of his own, read with text selected: what keeps the selected text (with its source) is a Save too
+        const sourceSelection = async () => {
+          await page.evaluate(() => window.__SWEEP__.visit('source-inbox'));
+          await settle(700);
+          await page.locator('#source-capture-text').fill(SOURCE_TEXT);
+          await page.locator('#source-capture-save').click();
+          await page.locator('#source-reader-body').waitFor();
+          await settle(600);
+          await page.evaluate(() => window.__SWEEP__.selectIn('#source-reader-body', '図書館'));
+          await page.waitForFunction(() => document.querySelector('#source-context-save')?.disabled === false);
+          await settle(300);
+        };
+        await room('source-reader-selection', sourceSelection);
         // the report form
         await room('report-form', async () => {
           await page.evaluate(() => window.__SWEEP__.visit('shelf'));
@@ -543,6 +579,7 @@ try {
             await page.evaluate(() => document.querySelector('#sheet .teacher-save')?.scrollIntoView({ block: 'center' }));
             await settle(400);
           }, '#sheet .teacher-save');
+          await menu("the source's selection", null, sourceSelection, '#source-context-save');
           await menu('the sky card', '#mini', async () => {
             await page.evaluate(() => { window.__SWEEP__.closeLayers(); window.__SWEEP__.visit('tray'); });
             await settle(1100);

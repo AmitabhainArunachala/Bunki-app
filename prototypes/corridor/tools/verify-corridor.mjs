@@ -2931,7 +2931,8 @@ async function main() {
     take: document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed') === 'true',
     one: !!document.querySelector('#sheet #sheet-take')?.matches('button.save-one[data-save-one]'),
     scopes: document.querySelectorAll('#sheet [data-ctx-scope]').length,
-    foot: document.querySelectorAll('#sheet #take, #sheet .list-picker').length,
+    // the foot's keep and its "saved to" picker; the card's context picker (.list-picker.context-picker) stays
+    foot: document.querySelectorAll('#sheet #take, #sheet .list-picker:not(.context-picker)').length,
   }))()`);
   await tap(page, '#sheet #sheet-take');
   await page.waitForSelector('#vocabulary-list-popover.is-drawer', { timeout: 5000 }).catch(() => {});

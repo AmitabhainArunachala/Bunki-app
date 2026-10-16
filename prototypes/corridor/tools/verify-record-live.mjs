@@ -554,7 +554,8 @@ try {
         // a new list that asks its name once — this pinned the foot's picker, its chips and its list maker
         await page.locator('#sheet #sheet-take').click();
         const drawer = page.locator('#vocabulary-list-popover.is-drawer');
-        await drawer.locator('[data-list="旅の記録"]').check();
+        // one click (a box redrawn by its own commit is not clicked twice)
+        await drawer.locator('[data-list="旅の記録"]').click();
         await drawer.locator('[data-list="旅の記録"]:checked').waitFor();
         await drawer.locator('#vocabulary-list-new').click();
         await drawer.locator('#vocabulary-list-name').fill('__proto__');
