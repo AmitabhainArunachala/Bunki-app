@@ -4,11 +4,11 @@
  "generatedBy": "prototypes/corridor/tools/check_suspect_readings.py (deterministic — no clock, no rng)",
  "lexicon": "docs/content/reading-overrides.json",
  "scanned": {
-  "articles": 126,
-  "tokens": 64925
+  "articles": 136,
+  "tokens": 80235
  },
  "statusCounts": {
-  "lexicon-fixed": 368,
+  "lexicon-fixed": 463,
   "accepted": 30
  },
  "openCount": 0,
@@ -3992,6 +3992,956 @@
    "status": "accepted",
    "context": "上決定する。・都道府県・公益",
    "note": "都道府県"
+  },
+  {
+   "article": "bunki-read-n2-shosoin-names",
+   "token": 256,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "系の人々、ソグド人を指すようになっ",
+   "note": "ソグド人"
+  },
+  {
+   "article": "aozora:000772-1",
+   "token": 167,
+   "rule": "override-site",
+   "surface": "一",
+   "reading": "いっ",
+   "status": "lexicon-fixed",
+   "context": "さえあればどこか一カ所突き破って見せるの",
+   "note": "一カ所"
+  },
+  {
+   "article": "aozora:000772-1",
+   "token": 491,
+   "rule": "override-site",
+   "surface": "萍",
+   "reading": "うきぐさ",
+   "status": "lexicon-fixed",
+   "context": "で、根のない萍のように、そこ",
+   "note": "萍"
+  },
+  {
+   "article": "aozora:000772-1",
+   "token": 650,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "ましてその頃は西洋人のいう事だと",
+   "note": "西洋人"
+  },
+  {
+   "article": "aozora:000772-1",
+   "token": 728,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "です。たとえばある西洋人が甲という同じ",
+   "note": "西洋人"
+  },
+  {
+   "article": "aozora:000772-1",
+   "token": 735,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "甲という同じ西洋人の作物を評した",
+   "note": "西洋人"
+  },
+  {
+   "article": "aozora:000772-1",
+   "token": 930,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "のです。たとえば西洋人がこれは立派な",
+   "note": "西洋人"
+  },
+  {
+   "article": "aozora:000772-1",
+   "token": 955,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "、それはその西洋人の見るところで、",
+   "note": "西洋人"
+  },
+  {
+   "article": "aozora:000772-1",
+   "token": 1001,
+   "rule": "override-site",
+   "surface": "一",
+   "reading": "いっ",
+   "status": "lexicon-fixed",
+   "context": "私が独立した一個の日本人で",
+   "note": "一個"
+  },
+  {
+   "article": "aozora:000772-1",
+   "token": 1012,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "あって、けっして英国人の奴婢でない以上",
+   "note": "英国人"
+  },
+  {
+   "article": "aozora:000772-1",
+   "token": 1179,
+   "rule": "override-site",
+   "surface": "入る",
+   "reading": "いる",
+   "status": "lexicon-fixed",
+   "context": "の国民に気に入るものはきっと乙の",
+   "note": "気に入る"
+  },
+  {
+   "article": "aozora:000772-1",
+   "token": 1359,
+   "rule": "override-site",
+   "surface": "四",
+   "reading": "よ",
+   "status": "lexicon-fixed",
+   "context": "、自己本位という四字をようやく考えて",
+   "note": "四字"
+  },
+  {
+   "article": "aozora:000772-1",
+   "token": 1535,
+   "rule": "override-site",
+   "surface": "四",
+   "reading": "よ",
+   "status": "lexicon-fixed",
+   "context": "にこの自我本位の四字なのであり",
+   "note": "四字"
+  },
+  {
+   "article": "bunki-read-n2-shima-4004",
+   "token": 324,
+   "rule": "override-site",
+   "surface": "書",
+   "reading": "しょ",
+   "status": "lexicon-fixed",
+   "context": "も払った、仕様書だって渡したで",
+   "note": "仕様書"
+  },
+  {
+   "article": "bunki-read-n2-shima-4004",
+   "token": 388,
+   "rule": "override-site",
+   "surface": "ファジン",
+   "reading": "ふぁじん",
+   "status": "lexicon-fixed",
+   "context": "たばかりのフェデリコ・ファジンがチップの設計と",
+   "note": "ファジン"
+  },
+  {
+   "article": "bunki-read-n2-shima-4004",
+   "token": 690,
+   "rule": "override-site",
+   "surface": "ファジン",
+   "reading": "ふぁじん",
+   "status": "lexicon-fixed",
+   "context": "には、ホフ、ファジン、スタンレー・メイザーと",
+   "note": "ファジン"
+  },
+  {
+   "article": "bunki-read-n1-optogenetics-nobel",
+   "token": 452,
+   "rule": "override-site",
+   "surface": "卵",
+   "reading": "らん",
+   "status": "lexicon-fixed",
+   "context": "がこれをカエルの卵細胞に組み込むと、",
+   "note": "卵細胞"
+  },
+  {
+   "article": "bunki-read-n2-kobe-jain",
+   "token": 27,
+   "rule": "override-site",
+   "surface": "バグワン・マハビールスワミ・ジェイン",
+   "reading": "ばぐわん・まはびーるすわみ・じぇいん",
+   "status": "lexicon-fixed",
+   "context": "正式な名は「バグワン・マハビールスワミ・ジェイン寺院」。2020年",
+   "note": "バグワン・マハビールスワミ・ジェイン"
+  },
+  {
+   "article": "bunki-read-n2-kobe-jain",
+   "token": 114,
+   "rule": "override-site",
+   "surface": "前",
+   "reading": "ぜん",
+   "status": "lexicon-fixed",
+   "context": "ジャイナ教は、紀元前6〜5世紀ごろ",
+   "note": "紀元前"
+  },
+  {
+   "article": "bunki-read-n2-kobe-jain",
+   "token": 131,
+   "rule": "override-site",
+   "surface": "マハービーラ",
+   "reading": "まはーびーら",
+   "status": "lexicon-fixed",
+   "context": "のインドに生きたマハービーラが教えを広めた",
+   "note": "マハービーラ"
+  },
+  {
+   "article": "bunki-read-n2-kobe-jain",
+   "token": 158,
+   "rule": "override-site",
+   "surface": "バルダマーナ",
+   "reading": "ばるだまーな",
+   "status": "lexicon-fixed",
+   "context": "される。本名はバルダマーナ。30歳で出家",
+   "note": "バルダマーナ"
+  },
+  {
+   "article": "bunki-read-n2-kobe-jain",
+   "token": 175,
+   "rule": "override-site",
+   "surface": "ジナ",
+   "reading": "じな",
+   "status": "lexicon-fixed",
+   "context": "苦行の末に「ジナ（勝利者）」",
+   "note": "ジナ"
+  },
+  {
+   "article": "bunki-read-n2-kobe-jain",
+   "token": 328,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "横浜にいたインド人の多くが神戸へ",
+   "note": "インド人"
+  },
+  {
+   "article": "bunki-read-n2-kobe-jain",
+   "token": 349,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "する兵庫県のインド人は600人を超え",
+   "note": "インド人"
+  },
+  {
+   "article": "bunki-read-n2-kobe-jain",
+   "token": 371,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "日本で最大のインド人社会を抱える街だっ",
+   "note": "インド人"
+  },
+  {
+   "article": "bunki-read-n2-kobe-jain",
+   "token": 402,
+   "rule": "override-site",
+   "surface": "町",
+   "reading": "ちょう",
+   "status": "lexicon-fixed",
+   "context": "真珠業者が北野町の周辺に集まった",
+   "note": "北野町"
+  },
+  {
+   "article": "bunki-read-n2-kobe-jain",
+   "token": 452,
+   "rule": "override-site",
+   "surface": "町",
+   "reading": "ちょう",
+   "status": "lexicon-fixed",
+   "context": "集まっており、北野町には「パールストリート」",
+   "note": "北野町"
+  },
+  {
+   "article": "bunki-read-n2-kobe-jain",
+   "token": 485,
+   "rule": "override-site",
+   "surface": "町",
+   "reading": "ちょう",
+   "status": "lexicon-fixed",
+   "context": "のも、同じ北野町だ。2017年の",
+   "note": "北野町"
+  },
+  {
+   "article": "bunki-read-n2-kobe-jain",
+   "token": 549,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "に968人のインド人が暮らしていた",
+   "note": "インド人"
+  },
+  {
+   "article": "bunki-read-n3-honda-quarter",
+   "token": 385,
+   "rule": "override-site",
+   "surface": "金持ち",
+   "reading": "がねもち",
+   "status": "lexicon-fixed",
+   "context": "人は最後は大金持ちに？」森「",
+   "note": "大金持ち"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 118,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "考えで、漢訳を日本語に翻訳した",
+   "note": "日本語"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 119,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "で、漢訳を日本語に翻訳したところ",
+   "note": "日本語"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 548,
+   "rule": "override-site",
+   "surface": "訳",
+   "reading": "やく",
+   "status": "lexicon-fixed",
+   "context": "からいうてもシナ訳よりも余程確かで",
+   "note": "シナ訳"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 563,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "その説はほとんど西洋人の間には確定",
+   "note": "西洋人"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 752,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "で、有力なる西洋人が沢山の金を",
+   "note": "西洋人"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 1470,
+   "rule": "override-site",
+   "surface": "天下",
+   "reading": "てんげ",
+   "status": "lexicon-fixed",
+   "context": "あります。殊に天上天下唯我独尊の釈迦牟尼",
+   "note": "天上天下唯我独尊"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 14,
+   "rule": "override-site",
+   "surface": "日",
+   "reading": "にち",
+   "status": "lexicon-fixed",
+   "context": "の67％を1日で忘れる」という",
+   "note": "1日で"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 131,
+   "rule": "override-site",
+   "surface": "日",
+   "reading": "にち",
+   "status": "lexicon-fixed",
+   "context": "表す値です。1日後の節約率は",
+   "note": "1日後"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 327,
+   "rule": "override-site",
+   "surface": "日",
+   "reading": "にち",
+   "status": "lexicon-fixed",
+   "context": ".2％、1日後に33.7",
+   "note": "1日後"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 344,
+   "rule": "override-site",
+   "surface": "日",
+   "reading": "にち",
+   "status": "lexicon-fixed",
+   "context": ".4％、31日後でも21.",
+   "note": "31日後"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 548,
+   "rule": "override-site",
+   "surface": "カーピキ",
+   "reading": "かーぴき",
+   "status": "lexicon-fixed",
+   "context": "心理学者ローディガーとカーピキは、大学生に",
+   "note": "カーピキ"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 692,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "した知見は、日本語の学習にどう",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 693,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "た知見は、日本語の学習にどう生かせ",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 775,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "みましょう。例えば、日本語の単語を見",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 776,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "ましょう。例えば、日本語の単語を見て",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n1-neocognitron",
+   "token": 35,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "に、こう題した日本語の論文が載っ",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n1-neocognitron",
+   "token": 36,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "、こう題した日本語の論文が載った",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 13,
+   "rule": "override-site",
+   "surface": "東",
+   "reading": "とう",
+   "status": "lexicon-fixed",
+   "context": "月9日、奈良の東大寺。完成した",
+   "note": "東大寺"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 14,
+   "rule": "override-site",
+   "surface": "大寺",
+   "reading": "だいじ",
+   "status": "lexicon-fixed",
+   "context": "9日、奈良の東大寺。完成した盧舎那",
+   "note": "東大寺"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 75,
+   "rule": "override-site",
+   "surface": "続",
+   "reading": "しょく",
+   "status": "lexicon-fixed",
+   "context": "日である。『続日本紀』はこの",
+   "note": "続日本紀"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 76,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "である。『続日本紀』はこの日",
+   "note": "続日本紀"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 77,
+   "rule": "override-site",
+   "surface": "紀",
+   "reading": "ぎ",
+   "status": "lexicon-fixed",
+   "context": "ある。『続日本紀』はこの日の",
+   "note": "続日本紀"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 99,
+   "rule": "override-site",
+   "surface": "此",
+   "reading": "かく",
+   "status": "lexicon-fixed",
+   "context": "斎会の儀、嘗て此の如く盛りなるは",
+   "note": "此の如く"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 102,
+   "rule": "override-site",
+   "surface": "盛り",
+   "reading": "さかり",
+   "status": "lexicon-fixed",
+   "context": "、嘗て此の如く盛りなるは有らず」",
+   "note": "盛りなる"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 186,
+   "rule": "override-site",
+   "surface": "縷",
+   "reading": "る",
+   "status": "lexicon-fixed",
+   "context": "には縹色の長い縷が結びつけられ、参列",
+   "note": "縷"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 197,
+   "rule": "override-site",
+   "surface": "縷",
+   "reading": "る",
+   "status": "lexicon-fixed",
+   "context": "した人々はそれぞれ縷を手に取り、",
+   "note": "縷"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 254,
+   "rule": "override-site",
+   "surface": "多治比",
+   "reading": "たじひの",
+   "status": "lexicon-fixed",
+   "context": "で、遣唐使の多治比広成や学問僧の",
+   "note": "多治比広成"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 255,
+   "rule": "override-site",
+   "surface": "広成",
+   "reading": "ひろなり",
+   "status": "lexicon-fixed",
+   "context": "、遣唐使の多治比広成や学問僧の理",
+   "note": "多治比広成"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 296,
+   "rule": "override-site",
+   "surface": "仏哲",
+   "reading": "ぶってつ",
+   "status": "lexicon-fixed",
+   "context": "南部）の僧・仏哲、唐の僧・",
+   "note": "仏哲"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 340,
+   "rule": "override-site",
+   "surface": "大安",
+   "reading": "だいあん",
+   "status": "lexicon-fixed",
+   "context": "た。都では大安寺に住み、『",
+   "note": "大安寺"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 365,
+   "rule": "override-site",
+   "surface": "仏哲",
+   "reading": "ぶってつ",
+   "status": "lexicon-fixed",
+   "context": "に海を渡った仏哲は大安寺でサンスクリット",
+   "note": "仏哲"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 367,
+   "rule": "override-site",
+   "surface": "大安",
+   "reading": "だいあん",
+   "status": "lexicon-fixed",
+   "context": "を渡った仏哲は大安寺でサンスクリット語を",
+   "note": "大安寺"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 463,
+   "rule": "override-site",
+   "surface": "霊鷲",
+   "reading": "りょうじゅ",
+   "status": "lexicon-fixed",
+   "context": "の姿がインドの霊鷲山にそっくりだと",
+   "note": "霊鷲山"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 464,
+   "rule": "override-site",
+   "surface": "山",
+   "reading": "せん",
+   "status": "lexicon-fixed",
+   "context": "姿がインドの霊鷲山にそっくりだとし",
+   "note": "霊鷲山"
+  },
+  {
+   "article": "bunki-read-n2-bodhisena",
+   "token": 523,
+   "rule": "override-site",
+   "surface": "縷",
+   "reading": "る",
+   "status": "lexicon-fixed",
+   "context": "たと伝わる筆と縷が、今も残さ",
+   "note": "縷"
+  },
+  {
+   "article": "bunki-read-n1-strange-loop",
+   "token": 119,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "難問である。クレタ人のエピメニデスがクレタ人",
+   "note": "クレタ人"
+  },
+  {
+   "article": "bunki-read-n1-strange-loop",
+   "token": 124,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "人のエピメニデスがクレタ人はみな嘘つきだと",
+   "note": "クレタ人"
+  },
+  {
+   "article": "bunki-read-n1-strange-loop",
+   "token": 515,
+   "rule": "override-site",
+   "surface": "環",
+   "reading": "わ",
+   "status": "lexicon-fixed",
+   "context": "副題「あるいは不思議の環」は、彼の",
+   "note": "不思議の環"
+  },
+  {
+   "article": "bunki-read-n1-strange-loop",
+   "token": 616,
+   "rule": "override-site",
+   "surface": "環",
+   "reading": "わ",
+   "status": "lexicon-fixed",
+   "context": "『わたしは不思議の環』（原著2007年",
+   "note": "不思議の環"
+  },
+  {
+   "article": "bunki-read-n2-benzaiten",
+   "token": 142,
+   "rule": "override-site",
+   "surface": "弁財",
+   "reading": "べんざい",
+   "status": "lexicon-fixed",
+   "context": "たと伝えられる。弁財天の「財」",
+   "note": "弁財天"
+  },
+  {
+   "article": "bunki-read-n2-benzaiten",
+   "token": 166,
+   "rule": "override-site",
+   "surface": "弁才",
+   "reading": "べんざい",
+   "status": "lexicon-fixed",
+   "context": "での名は「弁才天」で、財宝",
+   "note": "弁才天"
+  },
+  {
+   "article": "bunki-read-n2-benzaiten",
+   "token": 179,
+   "rule": "override-site",
+   "surface": "弁財",
+   "reading": "べんざい",
+   "status": "lexicon-fixed",
+   "context": "神として「弁財天」と書かれる",
+   "note": "弁財天"
+  },
+  {
+   "article": "bunki-read-n2-benzaiten",
+   "token": 251,
+   "rule": "override-site",
+   "surface": "弁才",
+   "reading": "べんざい",
+   "status": "lexicon-fixed",
+   "context": "厳島にまつられた弁才天は、日本三",
+   "note": "弁才天"
+  },
+  {
+   "article": "bunki-read-n2-benzaiten",
+   "token": 308,
+   "rule": "override-site",
+   "surface": "弁才",
+   "reading": "べんざい",
+   "status": "lexicon-fixed",
+   "context": "れ、南北朝時代の弁才天像には、",
+   "note": "弁才天"
+  },
+  {
+   "article": "bunki-read-n2-benzaiten",
+   "token": 339,
+   "rule": "override-site",
+   "surface": "弁才",
+   "reading": "べんざい",
+   "status": "lexicon-fixed",
+   "context": "ている。蛇は弁才天の使いとも",
+   "note": "弁才天"
+  },
+  {
+   "article": "bunki-read-n2-benzaiten",
+   "token": 362,
+   "rule": "override-site",
+   "surface": "弁才",
+   "reading": "べんざい",
+   "status": "lexicon-fixed",
+   "context": "。「才」の弁才天は、唐の",
+   "note": "弁才天"
+  },
+  {
+   "article": "bunki-read-n2-benzaiten",
+   "token": 399,
+   "rule": "override-site",
+   "surface": "弁才",
+   "reading": "べんざい",
+   "status": "lexicon-fixed",
+   "context": "。この経には弁才天について説い",
+   "note": "弁才天"
+  },
+  {
+   "article": "bunki-read-n2-benzaiten",
+   "token": 410,
+   "rule": "override-site",
+   "surface": "八",
+   "reading": "はっ",
+   "status": "lexicon-fixed",
+   "context": "た章があり、八本の腕に弓",
+   "note": "八本"
+  },
+  {
+   "article": "bunki-read-n2-benzaiten",
+   "token": 473,
+   "rule": "override-site",
+   "surface": "弁才",
+   "reading": "べんざい",
+   "status": "lexicon-fixed",
+   "context": "た。日本最古の弁才天像とされる",
+   "note": "弁才天"
+  },
+  {
+   "article": "bunki-read-n2-benzaiten",
+   "token": 486,
+   "rule": "override-site",
+   "surface": "八",
+   "reading": "はっ",
+   "status": "lexicon-fixed",
+   "context": "堂の像も、八本の腕を持つ",
+   "note": "八本"
+  },
+  {
+   "article": "bunki-read-n2-benzaiten",
+   "token": 512,
+   "rule": "override-site",
+   "surface": "弁才",
+   "reading": "べんざい",
+   "status": "lexicon-fixed",
+   "context": "の川に行き着く。弁才天は、サンスクリット語",
+   "note": "弁才天"
+  },
+  {
+   "article": "bunki-read-n1-soai-nobel",
+   "token": 21,
+   "rule": "override-site",
+   "surface": "硤合",
+   "reading": "そあい",
+   "status": "lexicon-fixed",
+   "context": "、東京理科大学の硤合憲三名誉教授（76",
+   "note": "硤合"
+  },
+  {
+   "article": "bunki-read-n1-soai-nobel",
+   "token": 39,
+   "rule": "override-site",
+   "surface": "サクレー",
+   "reading": "さくれー",
+   "status": "lexicon-fixed",
+   "context": "大学（現パリ・サクレー大学）のアンリ・",
+   "note": "サクレー"
+  },
+  {
+   "article": "bunki-read-n1-soai-nobel",
+   "token": 212,
+   "rule": "override-site",
+   "surface": "硤合",
+   "reading": "そあい",
+   "status": "lexicon-fixed",
+   "context": "れてきた。硤合氏が1995年に",
+   "note": "硤合"
+  },
+  {
+   "article": "bunki-read-n1-soai-nobel",
+   "token": 550,
+   "rule": "override-site",
+   "surface": "ホモキラリティー",
+   "reading": "ほもきらりてぃー",
+   "status": "lexicon-fixed",
+   "context": "、2人が、ホモキラリティー（一方の鏡像体",
+   "note": "ホモキラリティー"
+  },
+  {
+   "article": "bunki-read-n1-soai-nobel",
+   "token": 592,
+   "rule": "override-site",
+   "surface": "硤合",
+   "reading": "そあい",
+   "status": "lexicon-fixed",
+   "context": "たと述べた。硤合氏は1950年生まれ",
+   "note": "硤合"
+  },
+  {
+   "article": "bunki-read-n1-soai-nobel",
+   "token": 602,
+   "rule": "override-site",
+   "surface": "町",
+   "reading": "ちょう",
+   "status": "lexicon-fixed",
+   "context": "生まれ、広島県府中町出身。東京大学大学",
+   "note": "府中町"
+  },
+  {
+   "article": "bunki-read-n1-soai-nobel",
+   "token": 620,
+   "rule": "override-site",
+   "surface": "博士",
+   "reading": "はくし",
+   "status": "lexicon-fixed",
+   "context": "、米ノースカロライナ大学の博士研究員を経て",
+   "note": "博士研究員"
+  },
+  {
+   "article": "bunki-read-n3-gojuon-sanskrit",
+   "token": 20,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "、け、こ。日本語を学ぶ人が",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n3-gojuon-sanskrit",
+   "token": 21,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "け、こ。日本語を学ぶ人が最初",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n3-gojuon-sanskrit",
+   "token": 351,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "子音も続きます。日本語に当てはめてみ",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n3-gojuon-sanskrit",
+   "token": 352,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "も続きます。日本語に当てはめてみましょう",
+   "note": "日本語"
+  },
+  {
+   "article": "aozora:002359-1",
+   "token": 351,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "事の中に、何かしら不可解な疑点を",
+   "note": "何かしら"
+  },
+  {
+   "article": "aozora:002359-1",
+   "token": 975,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "には、しかしたいてい何かしらだめでない他",
+   "note": "何かしら"
+  },
+  {
+   "article": "bunki-read-n3-transistor-class",
+   "token": 249,
+   "rule": "override-site",
+   "surface": "所",
+   "reading": "じょ",
+   "status": "lexicon-fixed",
+   "context": "、アメリカのベル研究所で、バーディーンと",
+   "note": "ベル研究所"
   }
  ]
 }

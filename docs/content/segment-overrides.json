@@ -38,6 +38,273 @@
         { "s": "で", "b": "だ", "p": "助動詞", "r": "で", "c": false }
       ],
       "note": "After ず (相変わらずなんで) UniDic tags なん as the pronoun 何, so a tap opened 何. It is the explanatory な + ん + で, split the way UniDic itself splits 暇なんで. Guarded on ず: a sentence-initial なんで (why) stays 何."
+    },
+    {
+      "word": "硤合憲三",
+      "match": [{ "s": "硤" }, { "s": "合憲" }, { "s": "三" }],
+      "tokens": [
+        { "s": "硤合", "b": "硤合", "p": "名詞", "r": "そあい", "c": false },
+        { "s": "憲三", "b": "憲三", "p": "名詞", "r": "けんそう", "c": false }
+      ],
+      "note": "UniDic does not know the surname 硤合 and splits 硤合憲三 into 硤 + 合憲 (constitutional) + 三; the laureate's name reads そあい けんそう (Asahi, Tokyo University of Science) (Bunki batch-1r, bunki-read-n1-soai-nobel)"
+    },
+    {
+      "word": "生じうるか",
+      "match": [{ "s": "うるか" }],
+      "tokens": [
+        { "s": "うる", "b": "える", "p": "動詞", "r": "うる", "c": true },
+        { "s": "か", "b": "か", "p": "助詞", "r": "か", "c": false }
+      ],
+      "note": "UniDic reads うるか in 生じうるか as the noun うるか (salted sweetfish guts); split as UniDic itself analyses 起こりうるか: うる (動詞, base える) + か (助詞) (Bunki batch-1r, bunki-read-n1-soai-nobel)"
+    },
+    {
+      "word": "ハイナー",
+      "match": [{ "s": "ハイ" }, { "s": "ナー" }],
+      "tokens": [{ "s": "ハイナー", "b": "ハイナー", "p": "名詞", "r": "はいなー", "c": false }],
+      "note": "given name Heiner; UniDic splits it into ハイ + the particle ナー (Bunki batch-1r, bunki-read-n1-soai-nobel)"
+    },
+    {
+      "word": "ノースカロライナ",
+      "match": [{ "s": "ノース" }, { "s": "カロライナ" }],
+      "tokens": [{ "s": "ノースカロライナ", "b": "ノースカロライナ", "p": "名詞", "r": "のーすかろらいな", "c": false }],
+      "note": "the state name as one token (same defect class as ハイナー) (Bunki batch-1r, bunki-read-n1-soai-nobel)"
+    },
+    {
+      "word": "7日",
+      "match": [{ "s": "7" }, { "s": "日" }],
+      "tokens": [{ "s": "7日", "b": "7日", "p": "名詞", "r": "なのか", "c": false }],
+      "note": "date: whole-span なのか; a bare 7 plus 日[か] does not teach the reading (Bunki batch-1r, bunki-read-n1-soai-nobel)"
+    },
+    {
+      "word": "10日",
+      "match": [{ "s": "10" }, { "s": "日" }],
+      "tokens": [{ "s": "10日", "b": "10日", "p": "名詞", "r": "とおか", "c": false }],
+      "note": "date: whole-span とおか (Bunki batch-1r, bunki-read-n1-soai-nobel)"
+    },
+    {
+      "word": "百分率",
+      "match": [{ "s": "百" }, { "s": "分" }, { "s": "率" }],
+      "tokens": [{ "s": "百分率", "b": "百分率", "p": "名詞", "r": "ひゃくぶんりつ", "c": true }],
+      "note": "UniDic splits 百分率 into 百 + 分[ふん] + 率; one token, read ひゃくぶんりつ (Bunki batch-1r, bunki-read-n1-soai-nobel)"
+    },
+    {
+      "word": "2日",
+      "match": [{ "s": "2" }, { "s": "日" }],
+      "tokens": [{ "s": "2日", "b": "2日", "p": "名詞", "r": "ふつか", "c": false }],
+      "note": "date: whole-span ふつか; a bare 2 plus 日[か] does not teach the reading (Bunki batch-1r, bunki-read-n2-kokugo-survey)"
+    },
+    {
+      "word": "9日",
+      "match": [{ "s": "9" }, { "s": "日" }],
+      "tokens": [{ "s": "9日", "b": "9日", "p": "名詞", "r": "ここのか", "c": false }],
+      "note": "date: whole-span ここのか; a bare 9 plus 日[か] does not teach the reading (Bunki batch-1r, bunki-read-n2-bodhisena)"
+    },
+    {
+      "word": "一直線",
+      "match": [{ "s": "一" }, { "s": "直線" }],
+      "tokens": [{ "s": "一直線", "b": "一直線", "p": "名詞", "r": "いっちょくせん", "c": true }],
+      "note": "UniDic splits 一直線 into 一[いち] + 直線, which shows いち・ちょくせん; one token, read いっちょくせん (Bunki batch-1r, bunki-read-n3-gojuon-sanskrit)"
+    },
+    {
+      "word": "20分",
+      "match": [{ "s": "20" }, { "s": "分" }],
+      "tokens": [{ "s": "20分", "b": "20分", "p": "名詞", "r": "にじゅっぷん", "c": false }],
+      "note": "elapsed time: whole-span にじゅっぷん (にじっぷん also correct); 分[ふん] after 20 is wrong (Bunki batch-1r, bunki-read-n2-forgetting-curve)"
+    },
+    {
+      "word": "6日",
+      "match": [{ "s": "6" }, { "s": "日" }],
+      "tokens": [{ "s": "6日", "b": "6日", "p": "名詞", "r": "むいか", "c": false }],
+      "note": "elapsed days: whole-span むいか (6日後 むいかご) (Bunki batch-1r, bunki-read-n2-forgetting-curve)"
+    },
+    {
+      "word": "ローディガー",
+      "match": [{ "s": "ローディ" }, { "s": "ガー" }],
+      "tokens": [{ "s": "ローディガー", "b": "ローディガー", "p": "名詞", "r": "ろーでぃがー", "c": false }],
+      "note": "surname Roediger as one token (same defect class as ハイナー) (Bunki batch-1r, bunki-read-n2-forgetting-curve)"
+    },
+    {
+      "word": "20日",
+      "match": [{ "s": "20" }, { "s": "日" }],
+      "tokens": [{ "s": "20日", "b": "20日", "p": "名詞", "r": "はつか", "c": false }],
+      "note": "day of the month: whole-span はつか (Bunki batch-1r, bunki-read-n3-honda-quarter)"
+    },
+    {
+      "word": "マウンテンビュー",
+      "match": [{ "s": "マウンテン" }, { "s": "ビュー" }],
+      "tokens": [{ "s": "マウンテンビュー", "b": "マウンテンビュー", "p": "名詞", "r": "まうんてんびゅー", "c": false }],
+      "note": "place name Mountain View as one token (Bunki batch-1r, bunki-read-n2-shima-4004)"
+    },
+    {
+      "word": "ザイログ",
+      "match": [{ "s": "ザイ" }, { "s": "ログ" }],
+      "tokens": [{ "s": "ザイログ", "b": "ザイログ", "p": "名詞", "r": "ざいろぐ", "c": false }],
+      "note": "company name Zilog; UniDic splits it into ザイ + ログ ('log') (Bunki batch-1r, bunki-read-n2-shima-4004)"
+    },
+    {
+      "word": "ブッダ",
+      "match": [{ "s": "ブッ" }, { "s": "ダ" }],
+      "tokens": [{ "s": "ブッダ", "b": "ブッダ", "p": "名詞", "r": "ぶっだ", "c": false }],
+      "note": "UniDic reads ブッダ as the adverb ブッ + the copula ダ; one proper-noun token (Bunki batch-1r, bunki-read-n2-kobe-jain)"
+    },
+    {
+      "word": "パールストリート",
+      "match": [{ "s": "パール" }, { "s": "ストリート" }],
+      "tokens": [{ "s": "パールストリート", "b": "パールストリート", "p": "名詞", "r": "ぱーるすとりーと", "c": false }],
+      "note": "street name as one token (Bunki batch-1r, bunki-read-n2-kobe-jain)"
+    },
+    {
+      "word": "5日",
+      "match": [{ "s": "5" }, { "s": "日" }],
+      "tokens": [{ "s": "5日", "b": "5日", "p": "名詞", "r": "いつか", "c": false }],
+      "note": "date: whole-span いつか; a bare 5 plus 日[か] does not teach the reading (Bunki batch-2r, bunki-read-n1-optogenetics-nobel)"
+    },
+    {
+      "word": "2人",
+      "match": [{ "s": "2" }, { "s": "人" }],
+      "tokens": [{ "s": "2人", "b": "2人", "p": "名詞", "r": "ふたり", "c": false }],
+      "note": "2人 reads ふたり (whole span); UniDic gives 人 にん (Bunki batch-2r, bunki-read-n1-optogenetics-nobel)"
+    },
+    {
+      "word": "眼点",
+      "match": [{ "s": "眼" }, { "s": "点" }],
+      "tokens": [{ "s": "眼点", "b": "眼点", "p": "名詞", "r": "がんてん", "c": true }],
+      "note": "眼点 (an eyespot) is one word read がんてん (デジタル大辞泉 via kotobank: 眼点（読み）ガンテン); UniDic splits 眼[め] + 点 (Bunki batch-2r, bunki-read-n1-optogenetics-nobel)"
+    },
+    {
+      "word": "24日",
+      "match": [{ "s": "24" }, { "s": "日" }],
+      "tokens": [{ "s": "24日", "b": "24日", "p": "名詞", "r": "にじゅうよっか", "c": false }],
+      "note": "date: whole-span にじゅうよっか; UniDic gives a bare 24 plus 日[か] (Bunki batch-2r, bunki-read-n2-shosoin-names)"
+    },
+    {
+      "word": "吠瑠璃",
+      "match": [{ "s": "吠" }, { "s": "瑠璃" }],
+      "tokens": [{ "s": "吠瑠璃", "b": "吠瑠璃", "p": "名詞", "r": "べいるり", "c": true }],
+      "note": "吠瑠璃 reads べいるり (デジタル大辞泉: 「吠瑠璃 べいるり」の略); UniDic leaves 吠 without a reading (Bunki batch-2r, bunki-read-n2-shosoin-names)"
+    },
+    {
+      "word": "正倉院展",
+      "match": [{ "s": "正倉" }, { "s": "院展" }],
+      "tokens": [{ "s": "正倉院展", "b": "正倉院展", "p": "名詞", "r": "しょうそういんてん", "c": true }],
+      "note": "正倉院展 as one token; UniDic splits 正倉 + 院展 (Bunki batch-2r, bunki-read-n2-shosoin-names)"
+    },
+    {
+      "word": "白瑠璃瓶",
+      "match": [{ "s": "白" }, { "s": "瑠璃" }, { "s": "瓶" }],
+      "tokens": [{ "s": "白瑠璃瓶", "b": "白瑠璃瓶", "p": "名詞", "r": "はくるりのへい", "c": true }],
+      "note": "the treasure's name reads はくるりのへい (Nara National Museum's list and press release); UniDic gives しろ + るり + びん (Bunki batch-2r, bunki-read-n2-shosoin-names)"
+    },
+    {
+      "word": "漆胡瓶",
+      "match": [{ "s": "漆" }, { "s": "胡瓶" }],
+      "tokens": [{ "s": "漆胡瓶", "b": "漆胡瓶", "p": "名詞", "r": "しっこへい", "c": true }],
+      "note": "the treasure's name reads しっこへい (Nara National Museum's list and press release); UniDic gives うるし + こへい (Bunki batch-2r, bunki-read-n2-shosoin-names)"
+    },
+    {
+      "word": "酔胡王",
+      "match": [{ "s": "酔" }, { "s": "胡" }, { "s": "王" }],
+      "tokens": [{ "s": "酔胡王", "b": "酔胡王", "p": "名詞", "r": "すいこおう", "c": true }],
+      "note": "the mask's name reads すいこおう (Nara National Museum's list: 伎楽面 酔胡王（ぎがくめん すいこおう）); UniDic gives よい + こ + おう (Bunki batch-2r, bunki-read-n2-shosoin-names)"
+    },
+    {
+      "word": "銭洗弁財天宇賀福神社",
+      "match": [{ "s": "銭" }, { "s": "洗" }, { "s": "弁財" }, { "s": "天" }, { "s": "宇賀" }, { "s": "福神" }, { "s": "社" }],
+      "tokens": [{ "s": "銭洗弁財天宇賀福神社", "b": "銭洗弁財天宇賀福神社", "p": "名詞", "r": "ぜにあらいべんざいてんうがふくじんじゃ", "c": false }],
+      "note": "the shrine's full name as one token: 銭洗 + 弁財天 + 宇賀福神社 (kotobank: 銭洗宇賀福神社 ぜにあらいうがふくじんじゃ; 弁財天 べんざいてん); UniDic splits it into seven pieces and reads 銭 せん, 社 しゃ (Bunki batch-2r, bunki-read-n2-benzaiten)"
+    },
+    {
+      "word": "七福神",
+      "match": [{ "s": "七" }, { "s": "福神" }],
+      "tokens": [{ "s": "七福神", "b": "七福神", "p": "名詞", "r": "しちふくじん", "c": true }],
+      "note": "七福神 reads しちふくじん (デジタル大辞泉); UniDic gives なな + ふくじん (Bunki batch-2r, bunki-read-n2-benzaiten)"
+    },
+    {
+      "word": "竹生島",
+      "match": [{ "s": "竹生" }, { "s": "島" }],
+      "tokens": [{ "s": "竹生島", "b": "竹生島", "p": "名詞", "r": "ちくぶしま", "c": false }],
+      "note": "竹生島 reads ちくぶしま (日本歴史地名大系); UniDic gives 島 とう (Bunki batch-2r, bunki-read-n2-benzaiten)"
+    },
+    {
+      "word": "金光明最勝王経",
+      "match": [{ "s": "金" }, { "s": "光明" }, { "s": "最勝" }, { "s": "王" }, { "s": "経" }],
+      "tokens": [{ "s": "金光明最勝王経", "b": "金光明最勝王経", "p": "名詞", "r": "こんこうみょうさいしょうおうきょう", "c": false }],
+      "note": "the sutra's title reads こんこうみょうさいしょうおうきょう (日本大百科全書); UniDic gives きん + みつあき + … (Bunki batch-2r, bunki-read-n2-benzaiten)"
+    },
+    {
+      "word": "金光明四天王護国之寺",
+      "match": [{ "s": "金" }, { "s": "光明" }, { "s": "四" }, { "s": "天王" }, { "s": "護国" }, { "s": "之" }, { "s": "寺" }],
+      "tokens": [{ "s": "金光明四天王護国之寺", "b": "金光明四天王護国之寺", "p": "名詞", "r": "こんこうみょうしてんのうごこくのてら", "c": false }],
+      "note": "the formal name of the 国分寺 reads こんこうみょうしてんのうごこくのてら (デジタル大辞泉); UniDic gives きん + … + よん + … (Bunki batch-2r, bunki-read-n2-benzaiten)"
+    },
+    {
+      "word": "東大寺",
+      "match": [{ "s": "東" }, { "s": "大寺" }],
+      "tokens": [{ "s": "東大寺", "b": "東大寺", "p": "名詞", "r": "とうだいじ", "c": false }],
+      "note": "東大寺 reads とうだいじ; UniDic splits ひがし + だいじ (Bunki batch-2r, bunki-read-n2-benzaiten)"
+    },
+    {
+      "word": "才",
+      "match": [{ "s": "才", "p": "記号" }],
+      "tokens": [{ "s": "才", "b": "才", "p": "名詞", "r": "さい", "c": true }],
+      "note": "the character 才 quoted on its own: UniDic tags it as an unknown symbol (記号); re-tagged as the noun 才 (さい) (Bunki batch-2r, bunki-read-n2-benzaiten)"
+    },
+    {
+      "word": "鵜呑",
+      "match": [{ "s": "鵜" }, { "s": "呑" }],
+      "tokens": [{ "s": "鵜呑", "b": "鵜呑み", "p": "名詞", "r": "うのみ", "c": true }],
+      "note": "the source's own ruby reads 鵜呑《うのみ》; UniDic splits 鵜 + 呑[どん] (Bunki batch-2r, aozora:000772-1)"
+    },
+    {
+      "word": "我物顔",
+      "match": [{ "s": "我" }, { "s": "物" }, { "s": "顔" }],
+      "tokens": [{ "s": "我物顔", "b": "我が物顔", "p": "名詞", "r": "わがものがお", "c": true }],
+      "note": "the source's own ruby reads 我物顔《わがものがお》; UniDic splits it and reads the last part かお (Bunki batch-2r, aozora:000772-1)"
+    },
+    {
+      "word": "三位一体",
+      "match": [{ "s": "三" }, { "s": "位" }, { "s": "一体" }],
+      "tokens": [{ "s": "三位一体", "b": "三位一体", "p": "名詞", "r": "さんみいったい", "c": true }],
+      "note": "三位一体 is one word read さんみいったい; UniDic splits 三[さん] + 位[い] + 一体 (Bunki batch-2r, bunki-read-n1-neocognitron)"
+    },
+    {
+      "word": "御恩蔭",
+      "match": [{ "s": "御" }, { "s": "恩" }, { "s": "蔭" }],
+      "tokens": [{ "s": "御恩蔭", "b": "御蔭", "p": "名詞", "r": "おかげ", "c": true }],
+      "note": "the source's own ruby reads 御恩蔭《おかげ》 (an ateji spelling of おかげ); UniDic reads ご + おん + かげ (Bunki batch-2r, aozora:049966-1)"
+    },
+    {
+      "word": "凍餓",
+      "match": [{ "s": "凍" }, { "s": "餓" }],
+      "tokens": [{ "s": "凍餓", "b": "凍餓", "p": "名詞", "r": "とうが", "c": true }],
+      "note": "the source's own ruby reads 凍餓《とうが》 (cold and hunger); UniDic leaves 凍 as an unknown symbol and 餓 without a reading (Bunki batch-2r, aozora:049966-1)"
+    },
+    {
+      "word": "念うて",
+      "match": [{ "s": "念" }, { "s": "う" }, { "s": "て" }],
+      "tokens": [
+        { "s": "念う", "b": "念う", "p": "動詞", "r": "おもう", "c": true },
+        { "s": "て", "b": "て", "p": "助詞", "r": "て", "c": false }
+      ],
+      "note": "the source's own ruby reads 念《おも》うて (thinking of the Buddha); UniDic reads 念[ねん] + an interjection う + a conjunction て (Bunki batch-2r, aozora:049966-1)"
+    },
+    {
+      "word": "教うる",
+      "match": [{ "s": "教" }, { "s": "うる" }],
+      "tokens": [{ "s": "教うる", "b": "教える", "p": "動詞", "r": "おしうる", "c": true }],
+      "note": "我の教うる戒法: the classical attributive 教うる reads おしうる; UniDic splits 教[おしえ] + うる (Bunki batch-2r, aozora:049966-1)"
+    },
+    {
+      "word": "井深大",
+      "match": [{ "s": "井深" }, { "s": "大" }],
+      "tokens": [{ "s": "井深大", "b": "井深大", "p": "名詞", "r": "いぶかまさる", "c": false }],
+      "note": "井深大 reads いぶかまさる (デジタル大辞泉: いぶか‐まさる【井深大】); UniDic gives 大 だい (Bunki batch-2r, bunki-read-n3-transistor-class)"
+    },
+    {
+      "word": "町工場",
+      "match": [{ "s": "町" }, { "s": "工場" }],
+      "tokens": [{ "s": "町工場", "b": "町工場", "p": "名詞", "r": "まちこうば", "c": true }],
+      "note": "町工場 is one word read まちこうば (kotobank: 町工場（読み）マチコウバ); UniDic splits まち + こうじょう (Bunki batch-2r, bunki-read-n3-transistor-class)"
     }
   ]
 }
