@@ -276,7 +276,8 @@ html:is([data-room='tray'], [data-room='search']) :is(.dw-go, .today-then, .toda
 html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-line {
   position: relative;
   z-index: 2;
-  margin: 10px 0 0;
+  /* the hero keeps 44 px under its horizon (the old box rose into it): the first hairline stands 10 px under the horizon */
+  margin: -34px 0 0;
   padding: 0;
   border: 0;
   border-radius: 0;
