@@ -5223,3 +5223,81 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
 @media (max-width: 520px) {
   html[data-layout='places'] body.ui-bi .primary-tabs .primary-tab { font-size: 11px; letter-spacing: 0; }
 }
+
+/* ==========================================================================
+   K · KEEP HIS RECORD SAFE (2026-10-16). Two quiet truths about the record, in the world's own pigments.
+   ========================================================================== */
+/* 記録の帯 — the record band (corridor.js syncRecordBand). While his learning is not being saved, one opaque line
+   stands flush under the top bar in every room, never dismissible while the condition holds. By day it is the
+   world's ink laid as a band with the paper showing through as its words (白抜き, the slip's head band — contract §6:
+   藍 #14171d / 墨 #211e17 under #faf6ea), the world's red lit by its paper as its one seal, and the Export key the B
+   family turned to the band (a hairline of the paper). It is flat: a band of ink is the frame's weight, not a
+   gradient. Outside the drift view the body carries --color-*; over the galaxy the html's --world-* answer. */
+.record-band {
+  position: fixed;
+  top: max(var(--record-band-top, 0px), env(safe-area-inset-top, 0px));
+  left: 0;
+  right: 0;
+  z-index: 131;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  margin: 0;
+  padding: 2px max(16px, env(safe-area-inset-right, 0px)) 2px max(16px, env(safe-area-inset-left, 0px));
+  background: var(--color-ink, var(--world-ink));
+  color: var(--color-paper, var(--world-paper));
+  /* depth: the frame's own elevation — the band is the bar's second line, standing on the page */
+  box-shadow: var(--elevation-bar);
+  font: 600 14px/1.3 var(--font-ui);
+  letter-spacing: 0.01em;
+  pointer-events: auto;
+}
+.record-band[hidden] { display: none; }
+.record-band-seal {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-seal, 3px);
+  background: color-mix(in srgb, var(--color-signal, var(--world-signal)) 40%, var(--color-paper, var(--world-paper)));
+}
+.record-band-line { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:root .record-band .record-band-export {
+  flex: none;
+  min-height: 44px;
+  padding: 0 14px;
+  border: var(--stroke-hairline, 1px) solid color-mix(in srgb, var(--color-paper, var(--world-paper)) 62%, transparent);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-paper, var(--world-paper));
+  font: 600 14px/1.2 var(--font-ui);
+  white-space: nowrap;
+}
+/* night: the lacquer's depth under shell-white words, a lit accent hairline at its foot (light is emitted, never a
+   phosphor fill); the seal is the world's own lit red */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .record-band {
+  background: color-mix(in srgb, var(--color-ground, var(--world-ground)) 48%, #000);
+  color: var(--color-ink, var(--world-ink));
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--color-accent, var(--world-accent)) 45%, transparent), var(--elevation-bar);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .record-band .record-band-seal {
+  background: var(--color-signal, var(--world-signal));
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .record-band .record-band-export {
+  color: var(--color-ink, var(--world-ink));
+  border-color: color-mix(in srgb, var(--color-ink, var(--world-ink)) 55%, transparent);
+}
+@media (forced-colors: active) {
+  .record-band { border-bottom: 1px solid CanvasText; }
+  .record-band-seal { background: CanvasText; }
+}
+/* Me → Settings: one plain line — whether this device keeps the record, and past half the ceiling how full it is */
+.record-kept {
+  margin: 14px 0 0;
+  font: 500 14px/1.5 var(--font-ui);
+  color: var(--color-ink-2, var(--color-ink));
+  text-wrap: pretty;
+}
+.record-kept[hidden] { display: none; }
+.record-kept-share { font-weight: 400; }

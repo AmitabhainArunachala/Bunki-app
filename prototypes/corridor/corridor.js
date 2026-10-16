@@ -479,6 +479,9 @@ const S = {
   /** storage protection: read-only quarantine when the stored envelope cannot
    * be read (never overwrite what we cannot read), plus the one quiet line */
   storeReadOnly: false,
+  /** K · writes are failing although the store is not read-only: the record has reached the size one
+   * local document can hold (invalid-request). Cleared by the next confirmed write. Never stored. */
+  storeFull: false,
   storeError: null,
   storeExtras: null,
   /** a running review session: { queue, ix, revealed, declared, done } —
@@ -1440,13 +1443,211 @@ function positionStoreAlert(node) {
   // G1 · no layout is read for an alert that is not shown (every render paid a forced whole-document layout here)
   if (!node || typeof document === 'undefined' || node.hidden) return;
   let lowerEdge = 0;
+  // K · the record band stands flush under the bar; the alert's reason hangs below it
   for (const blocker of document.querySelectorAll(
-    '.chrome, .nav-symbol, .zen-exit, .zen-more, .focus-hud',
+    '.chrome, .nav-symbol, .zen-exit, .zen-more, .focus-hud, #record-band:not([hidden])',
   )) {
     const rect = blocker.getBoundingClientRect();
     if (rect.width > 0 && rect.height > 0) lowerEdge = Math.max(lowerEdge, rect.bottom);
   }
   node.style.setProperty('--store-alert-top', `${Math.ceil(lowerEdge + 8)}px`);
+}
+
+/* K · 記録の帯 — the record band. While his learning is not being saved (the store went read-only, or the record
+ * is too large for one more save), one opaque line stands flush under the top bar in every room: what it means,
+ * and the one thing that keeps his years — Export now. It cannot be dismissed while the condition holds and it
+ * leaves the moment a save is confirmed again. The reason and the reload stay in the store alert below it (one
+ * carrier for the reason); the band carries the consequence and the copy. Outside #app like the alert, so no
+ * render replaces it and no inert pass hides it. */
+let recordBandNode = null;
+function recordNotSaving() {
+  return !!(S.storeReadOnly || S.storeFull);
+}
+function positionRecordBand(node) {
+  if (!node || node.hidden) return;
+  let lowerEdge = 0;
+  for (const blocker of document.querySelectorAll('.chrome, .nav-symbol, .zen-exit, .zen-more, .focus-hud')) {
+    const rect = blocker.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) lowerEdge = Math.max(lowerEdge, rect.bottom);
+  }
+  node.style.setProperty('--record-band-top', `${Math.ceil(lowerEdge)}px`);
+}
+function syncRecordBand() {
+  if (typeof document === 'undefined' || !document.body) return null;
+  if (!recordBandNode?.isConnected) {
+    recordBandNode = document.getElementById('record-band');
+    if (!recordBandNode) {
+      recordBandNode = document.createElement('div');
+      recordBandNode.id = 'record-band';
+      recordBandNode.className = 'record-band';
+      recordBandNode.hidden = true;
+      document.body.append(recordBandNode);
+    }
+  }
+  const on = recordNotSaving();
+  // Export works while saving is paused (it only reads the confirmed record); where this window cannot read a
+  // complete copy (another window owns the record, an import is crossing) the alert's reload is the way on
+  const exportable = on && recordExportable() && !!recordApp;
+  const key = on ? `${S.lang}|${exportable ? 'export' : 'line'}` : '';
+  if (recordBandNode.dataset.key !== key) {
+    recordBandNode.dataset.key = key;
+    recordBandNode.replaceChildren();
+    if (on) {
+      recordBandNode.setAttribute('role', 'region');
+      recordBandNode.setAttribute('aria-label', tx('記録の保存', 'Saving your record'));
+      const seal = el('i', 'record-band-seal');
+      seal.setAttribute('aria-hidden', 'true');
+      recordBandNode.append(seal, el('span', 'record-band-line', tx('学びが保存されていない', 'Your learning is not being saved')));
+      if (exportable) {
+        const go = el('button', 'chip record-band-export', tx('今すぐ書き出す', 'Export now'));
+        go.type = 'button';
+        go.id = 'record-band-export';
+        go.addEventListener('click', () => exportFromBand(go));
+        recordBandNode.append(go);
+      }
+    } else {
+      recordBandNode.removeAttribute('role');
+      recordBandNode.removeAttribute('aria-label');
+    }
+  }
+  if (recordBandNode.hidden === on) recordBandNode.hidden = !on;
+  document.body.classList.toggle('record-not-saving', on);
+  positionRecordBand(recordBandNode);
+  return recordBandNode;
+}
+/** Export now, from the band: the one export — the backup row's own button, pressed in the room that holds it
+ * (Today in the current layout, Settings among the five places). The room is drawn fresh, so its button is too. */
+function exportFromBand(button) {
+  if (!recordExportable() || !recordApp) { safelySyncStoreAlert(); return; }
+  const view = placesLayout() ? 'settings' : 'tray';
+  let frames = 0;
+  const press = () => {
+    const exp = document.getElementById('export-store');
+    if ((!exp || document.documentElement.dataset.roomTransition) && ++frames < 120) { requestAnimationFrame(press); return; }
+    if (!exp) return;
+    exp.scrollIntoView({ block: 'center' });
+    if (!exp.disabled) exp.click();
+  };
+  roomTransition(() => {
+    if (S.view !== view) keepNavigationReturn(view, button);
+    S.view = view;
+    if (view === 'tray') S.todayDetailHeld = true;
+    render();
+    window.scrollTo(0, 0);
+  });
+  requestAnimationFrame(press);
+}
+
+/* K · keep the record. A website's storage — the record's IndexedDB included — can be cleared by the browser
+ * (Safari, after days without a visit) unless the site asks to keep it. Once per boot, after his first gesture,
+ * the app asks (the deck player's askToKeepStorage, decks/player/mount.js); it never waits on the answer, and the
+ * answer lives in memory only (never in his record). Me → Settings says plainly whether the browser agreed. */
+const recordKeep = { asked: false, persisted: null, at: 0 };
+function refreshRecordKeepLine() {
+  const line = typeof document === 'undefined' ? null : document.getElementById('record-kept');
+  if (line) line.replaceWith(recordKeepLine());
+}
+function readRecordKeep() {
+  // a browser that cannot keep a site's storage leaves it unprotected: the line says so
+  const storage = typeof navigator === 'undefined' ? null : navigator.storage;
+  if (typeof storage?.persisted !== 'function') { recordKeep.persisted = false; return; }
+  try {
+    storage.persisted().then((kept) => {
+      if (recordKeep.persisted === null || kept === true) recordKeep.persisted = kept === true;
+      refreshRecordKeepLine();
+    }, () => { if (recordKeep.persisted === null) recordKeep.persisted = false; refreshRecordKeepLine(); });
+  } catch { recordKeep.persisted = false; }
+}
+function askToKeepRecord() {
+  if (recordKeep.asked) return;
+  recordKeep.asked = true;
+  for (const kind of ['pointerdown', 'touchstart', 'keydown']) window.removeEventListener(kind, askToKeepRecord, true);
+  try {
+    navigator.storage?.persist?.()?.then?.((kept) => {
+      recordKeep.persisted = kept === true;
+      recordKeep.at = Date.now();
+      refreshRecordKeepLine();
+    }, () => {});
+  } catch { /* not offered here */ }
+}
+if (typeof window !== 'undefined') {
+  for (const kind of ['pointerdown', 'touchstart', 'keydown']) window.addEventListener(kind, askToKeepRecord, { capture: true, passive: true });
+  readRecordKeep();
+}
+
+/* K · the record's size, measured after saves (at most once in 20 s, when the page is idle; the latest confirmed
+ * snapshot wins). The ceiling is the export's own: past IMPORT_MAX_NODES values (or IMPORT_MAX_BYTES) no complete
+ * backup can be made, and "Export keeps a copy" would stop being true; a save refuses later, at 1,000,000 values.
+ * Values are counted as the export counts them — every value, containers included. Measuring never writes. */
+let recordSize = null;
+let recordSizePending = null;
+let recordSizeTimer = 0;
+let recordSizeAt = 0;
+function recordValueCount(value) {
+  let count = 0;
+  const stack = [value];
+  while (stack.length) {
+    const item = stack.pop();
+    count += 1;
+    if (Array.isArray(item)) for (let i = 0; i < item.length; i += 1) stack.push(item[i]);
+    else if (item && typeof item === 'object') for (const key of Object.keys(item)) stack.push(item[key]);
+  }
+  return count;
+}
+function measureRecordSize() {
+  recordSizeTimer = 0;
+  const snapshot = recordSizePending;
+  recordSizePending = null;
+  if (!snapshot?.record) return;
+  recordSizeAt = Date.now();
+  try {
+    const values = recordValueCount(snapshot.record) + recordValueCount(snapshot.archive ?? null);
+    // string length × 2 bytes, as the brief allows: an upper bound for the ASCII-heavy rows
+    const chars = JSON.stringify(snapshot.record).length + JSON.stringify(snapshot.archive ?? null).length;
+    recordSize = { values, chars, share: Math.max(values / IMPORT_MAX_NODES, (chars * 2) / IMPORT_MAX_BYTES), at: recordSizeAt };
+    refreshRecordKeepLine();
+  } catch { /* measuring never touches the record */ }
+}
+function scheduleRecordMeasure(snapshot) {
+  recordSizePending = snapshot;
+  if (recordSizeTimer) return;
+  recordSizeTimer = setTimeout(() => {
+    if (typeof requestIdleCallback === 'function') requestIdleCallback(measureRecordSize, { timeout: 4000 });
+    else measureRecordSize();
+  }, Math.max(0, recordSizeAt + 20000 - Date.now()));
+}
+/** The share in whole percent for a line, or null below the first threshold (50 %). */
+function recordSharePercent(threshold = 0.5) {
+  return recordSize && recordSize.share >= threshold ? Math.min(999, Math.floor(recordSize.share * 100)) : null;
+}
+/** Me → Settings: one plain line — whether the browser keeps this site's storage, and past half the ceiling, how
+ * full the record is. data-* carry the same truth for the verifier. */
+function recordKeepLine() {
+  const kept = recordKeep.persisted === true;
+  const share = recordSharePercent(0.5);
+  const line = el('p', 'record-kept');
+  line.id = 'record-kept';
+  line.dataset.kept = recordKeep.persisted === null ? 'unknown' : kept ? 'yes' : 'no';
+  if (recordSize) line.dataset.share = String(Math.round(recordSize.share * 1000) / 1000);
+  if (recordKeep.persisted === null) { line.hidden = true; return line; }
+  line.textContent = kept
+    ? tx('この端末に保存：保護されている', 'Saved on this device: protected')
+    : tx('この端末に保存：保護されていない — 書き出すと控えが残る', 'Saved on this device: not protected — Export keeps a copy');
+  if (share !== null) line.append(el('span', 'record-kept-share', share >= 100
+    ? tx(' · 容量いっぱい', ' · full') : tx(` · 容量の ${share} %`, ` · ${share} % full`)));
+  return line;
+}
+/** Today (and the review hall among the five places): past 80 % of the ceiling, one quiet note asks for a copy. */
+function recordSizeNudge() {
+  const share = recordSharePercent(0.8);
+  if (share === null) return null;
+  const note = el('p', 'store-nudge record-size-nudge');
+  note.id = 'record-size-nudge';
+  note.textContent = share >= 100
+    ? tx('記録が一つの控えに入る大きさを超えた。', 'Your record has outgrown what one backup file can hold.')
+    : tx(`記録は容量の ${share} %。ひとつのファイルに収まるうちに控えを残す。`,
+      `Your record is ${share} % full. Keep a copy while one file can hold it.`);
+  return note;
 }
 
 /** One stable live region sits outside #app so a render never repeats the same
@@ -1495,6 +1696,8 @@ function syncStoreAlert() {
     if (describedBy.size) sheet.setAttribute('aria-describedby', [...describedBy].join(' '));
     else sheet.removeAttribute('aria-describedby');
   }
+  // K · the band first: the alert's reason is placed beneath it
+  syncRecordBand();
   positionStoreAlert(storeAlertNode);
   // protection and staleness arrive through this sync: they retire (or, when lifted, renew) the hint
   if (recordHint.active) { recheckRecordHintEligibility(); positionRecordHint(); }
@@ -1699,6 +1902,8 @@ function publishRecordSnapshot(snapshot) {
   refreshRecordNotesSurface();
   teacherDraftController?.refresh();
   sentenceDraftController?.refresh();
+  // K · every confirmed save is measured (idle, throttled) against the ceiling
+  scheduleRecordMeasure(snapshot);
 }
 
 /** Foreground reads publish only derived views. Command callbacks keep their
@@ -1956,6 +2161,13 @@ function recordFailure(reason, protectedState = false) {
   if (!protectedState && (reason === 'word-answer-changed' || reason === 'word-answer-unavailable'))
     S.storeError = tx('この語の答えを確かめられないため、保存していない。',
       'This word’s answer could not be confirmed, so nothing was saved.');
+  // K · the record has grown past what one local document holds (1,000,000 values): every save fails although the
+  // store is not read-only. Not a disk problem — say so, and keep the record band up until a save is confirmed again
+  if (!protectedState && reason === 'invalid-request') {
+    S.storeFull = true;
+    S.storeError = tx('記録がこの版で保存できる大きさに達した。この変更は保存していない。それまでの記録は残っている。',
+      'Your record has reached the size this version can save. This change was not saved; everything saved before it is kept.');
+  }
   safelySyncStoreAlert();
 }
 
@@ -2098,6 +2310,12 @@ function recordReady(epoch = recordEpoch) {
 }
 function recordWritable(epoch = recordEpoch) {
   return recordReady(epoch) && !storeSealed && !S.storeReadOnly;
+}
+/** K · a complete copy can still be READ while saving is paused: this window owns the recovered record and no
+ * import is crossing. Exporting writes nothing; exportBackup re-reads the confirmed record through the controller,
+ * so a closed store, a lost owner or a quarantine still yields no backup. */
+function recordExportable(epoch = recordEpoch) {
+  return recordReady(epoch) && !storeSealed;
 }
 /** Why a record room cannot write right now, in the learner's words.
  * Precedence mirrors recordWritable(): writable exactly when owned() is true;
@@ -3007,6 +3225,7 @@ async function commitStorePatch(patch, appendArchive = []) {
     if (outcome.status !== 'active') { recordFailure(outcome.reason, true); return false; }
     if (!recordWritable(epoch) || outcome.replayUiEffects !== true) return false;
     S.storeError = null;
+    S.storeFull = false;
     safelySyncStoreAlert();
     return true;
   } catch (error) {
@@ -12674,7 +12893,10 @@ function renderTray(main) {
   renderSentencePracticeLibrary(main);
   // The stable global live region owns storage errors. This surface adds only
   // the quiet backup reminder when the record itself is healthy.
-  if (!S.storeError) {
+  // K · past 80 % of the ceiling the one note asks for a copy instead
+  const sizeNote = S.storeError ? null : recordSizeNudge();
+  if (sizeNote) main.append(sizeNote);
+  else if (!S.storeError) {
     const cardCount = S.taken.length + Object.keys(S.srs).length;
     const last = Number(S.stats?.lastExportTs) || 0;
     const stale = !last || Date.now() - last > 14 * 86400000;
@@ -13556,16 +13778,21 @@ function portableRecord(record) {
 }
 async function buildExportRecord() {
   const epoch = recordEpoch;
-  if (!recordWritable(epoch) || !recordApp) return { text: null, warning: 'owner-required' };
+  // K · a copy is a read: it is offered while saving is paused (the record band's Export now), never to a window
+  // that does not own the recovered record, and never across an import crossing (recordExportable)
+  if (!recordExportable(epoch) || !recordApp) return { text: null, warning: 'owner-required' };
+  // K · while saving is paused no draft can be kept, so none is waited for: the copy is the record as last saved,
+  // and the note under Export says that work since then is not in it
+  const paused = !recordWritable(epoch);
   try {
-    if (!(await flushRecordDrafts())) return { text: null, warning: 'drafts-unsettled' };
+    if (!paused && !(await flushRecordDrafts())) return { text: null, warning: 'drafts-unsettled' };
     const result = await recordApp.exportBackup();
-    if (!recordWritable(epoch) || result.status !== 'active') return { text: null, warning: 'snapshot-unavailable' };
+    if (!recordExportable(epoch) || result.status !== 'active') return { text: null, warning: 'snapshot-unavailable' };
     const backup = result.backup;
-    if (!recordDraftsSettled(backup.record)) return { text: null, warning: 'drafts-changed' };
+    if (!paused && !recordDraftsSettled(backup.record)) return { text: null, warning: 'drafts-changed' };
     const text = JSON.stringify(backup);
     if (new Blob([text]).size > IMPORT_MAX_BYTES || !boundedImportValue(backup)) return { text: null, warning: 'backup-limit' };
-    return { text, warning: backup.completeness === 'incomplete' ? 'historical-evidence-incomplete' : undefined };
+    return { text, warning: backup.completeness === 'incomplete' ? 'historical-evidence-incomplete' : paused ? 'saving-paused' : undefined };
   } catch { return { text: null, warning: 'snapshot-unavailable' }; }
 }
 const AI_EVIDENCE_ROLES = new Set(['user', 'assistant', 'tutor', 'app']);
@@ -13695,9 +13922,11 @@ function renderPortRow(main) {
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 4000);
       }
-      if (rec.warning) portNote.textContent = tx(
-        '復旧用の記録を書き出した。完全な会話履歴を保証するバックアップではない。',
-        'Recovery material was exported. This file does not claim a complete conversation history.');
+      if (rec.warning) portNote.textContent = rec.warning === 'saving-paused'
+        ? tx('最後に保存された記録を書き出した。保存が止まってからの学びは含まれない。',
+          'The record as last saved was exported. Learning since saving stopped is not in it.')
+        : tx('復旧用の記録を書き出した。完全な会話履歴を保証するバックアップではない。',
+          'Recovery material was exported. This file does not claim a complete conversation history.');
       // A native cancellation or uncertain save never advances the backup
       // reminder. An old owner's completion cannot write the new record.
       if (recordWritable(epoch) && app === recordApp)
@@ -25194,7 +25423,20 @@ function renderReviewHall(main) {
   }
   cards.append(list);
   // a copy of the record, asked for once two weeks pass without one; its door opens the backup
-  if (!S.storeError && S.taken.length + Object.keys(S.srs).length >= 20) {
+  // K · past 80 % of the ceiling the one note asks for it whatever the date, with the same door
+  const sizeNote = S.storeError ? null : recordSizeNudge();
+  if (sizeNote) {
+    const backup = el('button', 'store-nudge-go', tx('控えを残す', 'Back up now'));
+    backup.type = 'button';
+    backup.id = 'review-backup';
+    backup.addEventListener('click', () => roomTransition(() => {
+      keepNavigationReturn('settings', backup);
+      showRecordBackup();
+      S.view = 'settings'; render(); window.scrollTo(0, 0);
+    }));
+    sizeNote.append(' ', backup);
+    cards.append(sizeNote);
+  } else if (!S.storeError && S.taken.length + Object.keys(S.srs).length >= 20) {
     const last = Number(S.stats?.lastExportTs) || 0;
     if (!last || Date.now() - last > 14 * 86400000) {
       const nudge = el('p', 'store-nudge');
@@ -26958,6 +27200,13 @@ window.__KAIRO_AI__ = Object.freeze({
   timeoutMs: AI_TIMEOUT_MS,
   requestTimeoutMs: (meta) => aiRequestTimeoutMs(meta),
   exportRecord: () => buildExportRecord(),
+});
+/* K · the record-safety instrument (the same idiom): read-only — whether saving is paused, what the browser
+ * answered about keeping the site's storage, and the last size measurement. It grants and writes nothing. */
+window.__KAIRO_RECORD_SAFETY__ = Object.freeze({
+  state: () => JSON.parse(JSON.stringify({ storeReadOnly: S.storeReadOnly, storeFull: !!S.storeFull, notSaving: recordNotSaving(),
+    writable: recordWritable(), exportable: recordExportable() && !!recordApp, keep: recordKeep, size: recordSize,
+    ceiling: { values: IMPORT_MAX_NODES, bytes: IMPORT_MAX_BYTES } })),
 });
 /** The newest archived reply for one surface and one word — the read-back
  * seam: an answer that arrived after its sheet closed is not lost, it waits
@@ -33676,6 +33925,8 @@ function renderSettings(main) {
     const record = el('section', 'foundation-section settings-record');
     record.id = 'settings-record';
     record.append(el('h2', 'eyebrow', tx('バックアップ', 'Backup')));
+    // K · one plain line: is this device keeping the record, and how full is it
+    record.append(recordKeepLine());
     record.append(renderRecordSync());
     renderPortRow(record);
     const builder = el('section', 'foundation-section settings-builder');
@@ -33693,7 +33944,8 @@ function renderSettings(main) {
     foundationDoor('settings-tutor', '先生との接続', 'Tutor connection', 'ai'),
     foundationDoor('settings-backup', 'バックアップ', 'Backup', 'tray', showRecordBackup),
   );
-  main.append(language, renderLayoutChoice(), doors, renderReportRelaySettings(), about);
+  // K · one plain line under the Backup door: is this device keeping the record, and how full is it
+  main.append(language, renderLayoutChoice(), doors, recordKeepLine(), renderReportRelaySettings(), about);
 }
 function renderWordsDoors(main) {
   // the layout under test: the day's word, large, with its reading and the part its kanji share —
