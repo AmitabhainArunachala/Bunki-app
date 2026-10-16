@@ -23,7 +23,12 @@
  *                    row opened in the reader shows no provenance word, one level, and its context line exactly when
  *                    the row carries one (two Aozora excerpts), under the title; no row's authoring record (who wrote
  *                    it, John's pending read) is drawn anywhere; the rows the queue lists as originals carry no review
- *                    value and no 検収前; and the newest drop leads the shelf and Today's story.
+ *                    value and no 検収前. On four days running (the daily turn's four offsets), every card counted in DOM
+ *                    order, today's six included: every new reading stands ahead of every inherited card, the shelf
+ *                    opens on the newest dated news piece, no two neighbours in the drop share a field or a style (the
+ *                    queue rows' fields and style) and the reviewers' pairs stand apart, the drop keeps one order while
+ *                    the shelf after it still turns; Today's story is the shelf's lead; each level filter keeps exactly
+ *                    the stories whose card shows that level.
  * KAIRO_SWEEP_MODE=inventory lists every instance (and screenshots each room) without failing: S/INVENTORY.md is
  * built from that run on the base build. Negative controls, each red where it is planted and nowhere else:
  * KAIRO_SWEEP_NEGATIVE=chip re-inserts one "Made by AI" chip in ONE room (the reader); =cover cancels the page's step down
@@ -105,7 +110,8 @@ window.__SWEEP__ = {
     id: p.id, review: Object.hasOwn(p, 'review') ? p.review : null, pending: !!p.pendingVerification,
     sourceLabel: p.sourceLabel || '', learnerLabel: learnerSourceLabel(p), attribution: p.attribution || '',
     title: p.title || '', titleEn: p.titleEn || '', context: p.context?.ja ?? null, authorLevel: p.authorLevel || null,
-    jlpt: p.readingFacets?.jlpt || null, addedAt: p.addedAt || null,
+    jlpt: p.readingFacets?.jlpt || null, addedAt: p.addedAt || null, lane: p.lane || null, date: p.date || '',
+    folded: !!(p.adaptation?.basedOn && D.passages.some((x) => x.id === p.adaptation.basedOn && !String(x.file || '').startsWith('archive/'))),
     hidden: [p.authoring?.humanApproval, p.authoring?.writtenBy, p.authoring?.chosenBy].filter((v) => typeof v === 'string' && v),
   })),
   cards: () => [...document.querySelectorAll('#shelf-reading-results .shelf-item')].map((n) => ({
@@ -115,6 +121,18 @@ window.__SWEEP__ = {
   })),
   todayPick: () => todayReadPick()?.passage?.id ?? null,
   day: () => shelfCurrentDay(),
+  // the shelf as the app draws it on a given day (the existing day seam), unfiltered; every card in DOM order
+  shelfOn: (day) => {
+    try { if (day) localStorage.setItem('kairo-shelf-day', day); else localStorage.removeItem('kairo-shelf-day'); } catch (e) { /* the seam is optional */ }
+    removeMini(); S.stack = []; S.shelfFilters = null; S.view = 'shelf'; render(); window.scrollTo(0, 0);
+  },
+  shelfLevel: (level) => {
+    removeMini(); S.stack = []; S.shelfFilters = { sort: 'today', topic: '', jlpt: level, grade: '', text: '' }; S.view = 'shelf'; render(); window.scrollTo(0, 0);
+  },
+  shelfCards: () => [...document.querySelectorAll('#shelf-reading-results .shelf-item')].map((n) => ({
+    id: n.dataset.passage, band: n.dataset.recommendation || '',
+    step: n.querySelector('.level-chip')?.dataset.level || '', chip: (n.querySelector('.level-chip')?.textContent || '').trim(),
+  })),
   pageText: () => document.body.innerText,
   openRow: async (id) => {
     S.stack = []; S.strokes = null; closeVocabularyListPopover(); removeMini();
@@ -363,9 +381,19 @@ const summary = { P: 0, C: 0, K: 0, Kone: 0, M: 0, rooms: 0 };
 const PROV_N = /made by ai|ai[- ]?(made|generated|written)|written by ai|questions made by ai|unreviewed|un-reviewed|not yet checked|checked by a person|awaiting (john'?s )?review|machine[- ]checked|human[- ]review|provisional|AI作成|AIが(書|作)|未確認|検収|人の(目|確認)|人による確認|\b\d+ of \d+ not yet/iu;
 assert(scanPage.toString().includes(PROV_N.source), "N's provenance words are scanPage's own");
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
-const ORIGINALS = JSON.parse(readFileSync(resolve(REPO, 'docs/content/feed-review-queue.json'), 'utf8'))
-  .filter((row) => row.kind === 'original' && row.decision !== 'rejected').map((row) => row.id);
+const QUEUE_ORIGINALS = JSON.parse(readFileSync(resolve(REPO, 'docs/content/feed-review-queue.json'), 'utf8'))
+  .filter((row) => row.kind === 'original' && row.decision !== 'rejected');
+const ORIGINALS = QUEUE_ORIGINALS.map((row) => row.id);
+const ORIGINAL_ROWS = new Map(QUEUE_ORIGINALS.map((row) => [row.id, row]));
 const levelOf = (row) => (/^N[1-5]\+?$/u.test(row.authorLevel || '') ? row.authorLevel : null) ?? row.jlpt;
+const stepOf = (row) => String(levelOf(row) || '').replace(/\+$/u, '');
+// the brief's neighbour rules for the newest drop (N brief §3): no two neighbours share a field (the queue row's `fields`)
+// or a style (its `style`, by genre — every news piece is one style); and the reviewers' two separations
+const genreOf = (row, q) => (row?.lane === 'news' ? 'news' : /explainer/u.test(q.style) ? 'explainer' : /column|コラム/u.test(q.style) ? 'column'
+  : /essay|随筆/u.test(q.style) ? 'essay' : /dialogue|対話/u.test(q.style) ? 'dialogue' : /history narrative/u.test(q.style) ? 'history' : q.style);
+const APART = [['bunki-read-n3-transistor-class', 'bunki-read-n3-honda-quarter'], ['bunki-read-n3-transistor-class', 'bunki-read-n2-shima-4004'],
+  ['bunki-read-n3-transistor-class', 'bunki-read-n1-neocognitron'], ['bunki-read-n2-sleep-memory', 'bunki-read-n2-forgetting-curve']];
+const plusDays = (day, n) => new Date(Date.parse(`${day}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
 async function shelfRowsAndCards(page, engine, lang) {
   const label = `${engine} ${lang} · N`;
   const rows = await page.evaluate(() => window.__SWEEP__.rows());
@@ -375,33 +403,79 @@ async function shelfRowsAndCards(page, engine, lang) {
   const shelfText = await page.evaluate(() => window.__SWEEP__.pageText());
   const byId = new Map(rows.map((row) => [row.id, row]));
   const hidden = [...new Set(rows.flatMap((row) => row.hidden))];
-  // the drop in its own (index) order, as the shelf's daily rotation shows it: three of its first twelve lead
   const drop = rows.filter((row) => ORIGINALS.includes(row.id)).map((row) => row.id);
-  const offset = ((Math.floor(Date.parse(`${day}T00:00:00Z`) / 86400000) * 3) % 12 + 12) % 12;
-  const window12 = drop.slice(0, 12);
-  const leading = [0, 1, 2].map((i) => window12[(offset + i) % window12.length]);
-  const expectedLead = [...leading, ...drop.filter((id) => !leading.includes(id))];
-  const grid = cards.filter((card) => !card.band).map((card) => card.id);
+  // the shelf as drawn on four days running — the daily turn's four offsets — every card in DOM order, today's six included
+  const shelves = [];
+  for (const d of [0, 1, 2, 3].map((n) => plusDays(day, n))) {
+    await page.evaluate((x) => window.__SWEEP__.shelfOn(x), d);
+    shelves.push({ day: d, cards: await page.evaluate(() => window.__SWEEP__.shelfCards()) });
+  }
+  // every level filter, and the cards it keeps
+  const levels = [];
+  for (const level of ['N5', 'N4', 'N3', 'N2', 'N1']) {
+    await page.evaluate((x) => window.__SWEEP__.shelfLevel(x), level);
+    levels.push({ level, cards: await page.evaluate(() => window.__SWEEP__.shelfCards()) });
+  }
+  await page.evaluate(() => window.__SWEEP__.shelfOn(null));
   const walked = [];
   for (const row of rows) {
     const seen = await page.evaluate((id) => window.__SWEEP__.openRow(id), row.id);
     walked.push({ row, seen });
   }
   await page.evaluate(() => window.__SWEEP__.visit('shelf'));
-  inventory.push({ engine, lang, room: 'rows-and-cards', day, offset, pick, cards: cards.map(({ id, band, chips }) => ({ id, band, chips })),
+  inventory.push({ engine, lang, room: 'rows-and-cards', day, pick, cards: cards.map(({ id, band, chips }) => ({ id, band, chips })),
+    shelves: shelves.map(({ day: d, cards: all }) => ({ day: d, ids: all.map((c) => `${c.id}${c.band ? ` [${c.band}]` : ''}`) })),
+    levels: levels.map(({ level, cards: kept }) => ({ level, ids: kept.map((c) => c.id) })),
     rows: walked.map(({ row, seen }) => ({ id: row.id, review: row.review, level: levelOf(row), chips: seen.chips, contexts: seen.contexts })) });
   if (MODE !== 'verify') return;
   check(`${label} the shelf's originals are the queue's (${ORIGINALS.length})`, drop.length === ORIGINALS.length && ORIGINALS.length > 0,
     `${drop.length} of ${ORIGINALS.length}`);
-  check(`${label} the newest drop leads the shelf: its ${drop.length} cards come first, today's three (offset ${offset}) at the top`,
-    JSON.stringify(grid.slice(0, drop.length)) === JSON.stringify(expectedLead), JSON.stringify({ day, grid: grid.slice(0, drop.length), expectedLead }));
-  check(`${label} Today's story is the drop's first reading`, pick === drop[0], `${pick} (want ${drop[0]})`);
+  const newestNews = drop.map((id) => byId.get(id)).filter((row) => row.lane === 'news' && /^\d{4}-\d{2}-\d{2}$/u.test(row.date)).map((row) => row.date).sort().at(-1);
+  const orders = [];
+  for (const { day: d, cards: all } of shelves) {
+    const ids = all.map((c) => c.id);
+    const head = ids.slice(0, drop.length);
+    const firstOther = ids.findIndex((id) => !ORIGINALS.includes(id));
+    const lastDrop = Math.max(...drop.map((id) => ids.indexOf(id)));
+    const lead = byId.get(ids[0]);
+    const broken = head.slice(1).map((id, i) => [head[i], id]).filter(([a, b]) => {
+      const qa = ORIGINAL_ROWS.get(a), qb = ORIGINAL_ROWS.get(b);
+      return !qa || !qb || qa.fields.some((f) => qb.fields.includes(f)) || genreOf(byId.get(a), qa) === genreOf(byId.get(b), qb)
+        || APART.some(([x, y]) => (a === x && b === y) || (a === y && b === x));
+    }).map(([a, b]) => `${a}|${b}`);
+    check(`${label} ${d}: every new reading stands ahead of every inherited card, today's six included`,
+      drop.length > 0 && head.every((id) => ORIGINALS.includes(id)) && new Set(head).size === drop.length && firstOther > lastDrop,
+      JSON.stringify(all.slice(0, drop.length + 2).map((c) => `${c.id}${c.band ? ` [${c.band}]` : ''}`)));
+    check(`${label} ${d}: the shelf opens on the newest dated news piece (${newestNews})`,
+      !!newestNews && lead?.lane === 'news' && lead.date === newestNews, `${ids[0]} · ${lead?.lane} · ${lead?.date}`);
+    check(`${label} ${d}: no two neighbours in the drop share a field or a style, and the reviewers' pairs stand apart`,
+      head.length === drop.length && broken.length === 0, broken.join(', '));
+    orders.push(head.join(','));
+  }
+  check(`${label} the drop keeps one order on all four days — the daily turn moves only the shelf after it`, new Set(orders).size === 1,
+    orders.map((o) => o.slice(0, 60)).join(' | '));
+  const firstInherited = shelves.map(({ cards: all }) => all.find((c) => !c.band && !ORIGINALS.includes(c.id))?.id);
+  check(`${label} after the drop the shelf still turns daily: its first inherited story changes across four days`,
+    new Set(firstInherited).size >= 2, firstInherited.join(', '));
+  check(`${label} Today's story is the shelf's lead`, !!pick && pick === shelves[0].cards[0]?.id, `${pick} (shelf lead ${shelves[0].cards[0]?.id})`);
+  const stories = rows.filter((row) => !row.folded);
+  let filtered = 0;
+  for (const { level, cards: kept } of levels) {
+    const want = stories.filter((row) => stepOf(row) === level).map((row) => row.id).sort();
+    const got = kept.map((c) => c.id).sort();
+    const off = kept.filter((c) => c.step !== level || c.chip.replace(/\+$/u, '') !== level).map((c) => `${c.id}:${c.chip}`);
+    filtered += got.length;
+    check(`${label} the ${level} filter keeps exactly the stories whose card shows ${level} (${want.length}), and every card it shows says ${level}`,
+      JSON.stringify(got) === JSON.stringify(want) && off.length === 0, off.slice(0, 6).join(' | ') || `${got.length} cards`);
+  }
+  check(`${label} the five level filters together show every story with a level, once`, filtered === stories.filter((row) => stepOf(row)).length,
+    `${filtered} of ${stories.filter((row) => stepOf(row)).length}`);
   const cardTrouble = cards.filter((card) => {
     const row = byId.get(card.id);
     return !row || card.chips.length !== 1 || (levelOf(row) && card.chips[0] !== levelOf(row)) || PROV_N.test(card.text);
   }).map((card) => `${card.id}:${card.chips.join('/')}`);
   check(`${label} every card (${cards.length}) carries one level — the written-for level where the row has one — and no provenance word`,
-    cards.length >= rows.length - 6 && cardTrouble.length === 0, cardTrouble.slice(0, 6).join(' | '));
+    cards.length === rows.filter((row) => !row.folded).length && cardTrouble.length === 0, cardTrouble.slice(0, 6).join(' | '));
   const originals = drop.map((id) => byId.get(id));
   const labelled = originals.filter((row) => row.review !== null || row.pending || /検収前/u.test(row.sourceLabel) || row.learnerLabel !== row.sourceLabel ||
     PROV_N.test(`${row.sourceLabel} ${row.attribution} ${row.title} ${row.titleEn} ${row.context ?? ''}`)).map((row) => row.id);

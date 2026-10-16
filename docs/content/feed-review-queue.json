@@ -1471,6 +1471,11 @@
   "licence": "Bunki original",
   "gradingSummary": "中級後半 · jread 3.25 · JLPT語彙 69% · 827字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "current news",
+   "religion and Japanese history"
+  ],
+  "style": "word-history explainer",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1483,6 +1488,10 @@
   "licence": "PD (著作権フラグ なし) · 新字新仮名",
   "gradingSummary": "上級前半 · jread 2.43 · JLPT語彙 70% · 2386字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "learning psychology"
+  ],
+  "style": "lecture (講演)",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1495,6 +1504,10 @@
   "licence": "Bunki original",
   "gradingSummary": "中級前半 · jread 3.52 · JLPT語彙 67% · 1230字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "technology and money"
+  ],
+  "style": "history narrative",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1507,6 +1520,11 @@
   "licence": "Bunki original",
   "gradingSummary": "上級前半 · jread 2.24 · JLPT語彙 74% · 1365字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "current news",
+   "learning psychology"
+  ],
+  "style": "science news explainer",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1519,6 +1537,10 @@
   "licence": "Bunki original",
   "gradingSummary": "中級後半 · jread 3.37 · JLPT語彙 76% · 957字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "religion and Japanese history"
+  ],
+  "style": "feature",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1531,6 +1553,11 @@
   "licence": "Bunki original",
   "gradingSummary": "中級前半 · jread 4.41 · JLPT語彙 74% · 885字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "technology and money",
+   "learning psychology"
+  ],
+  "style": "dialogue",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1543,6 +1570,10 @@
   "licence": "PD (著作権フラグ なし) · 新字新仮名",
   "gradingSummary": "上級前半 · jread 1.51 · JLPT語彙 70% · 2494字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "religion and Japanese history"
+  ],
+  "style": "travel memoir (旅行記)",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1555,6 +1586,10 @@
   "licence": "Bunki original",
   "gradingSummary": "中級後半 · jread 3.34 · JLPT語彙 75% · 1228字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "learning psychology"
+  ],
+  "style": "Q&A",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1567,6 +1602,10 @@
   "licence": "Bunki original",
   "gradingSummary": "上級前半 · jread 2.48 · JLPT語彙 74% · 994字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "technology and money"
+  ],
+  "style": "profile (人物伝)",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1579,6 +1618,10 @@
   "licence": "Bunki original",
   "gradingSummary": "中級後半 · jread 3.32 · JLPT語彙 66% · 823字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "religion and Japanese history"
+  ],
+  "style": "history narrative",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1591,6 +1634,11 @@
   "licence": "Bunki original",
   "gradingSummary": "中級前半 · jread 3.75 · JLPT語彙 74% · 911字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "current news",
+   "learning psychology"
+  ],
+  "style": "data news",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1603,6 +1651,10 @@
   "licence": "Bunki original",
   "gradingSummary": "中級後半 · jread 2.71 · JLPT語彙 72% · 1206字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "technology and money"
+  ],
+  "style": "essay",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1615,6 +1667,10 @@
   "licence": "Bunki original",
   "gradingSummary": "中級後半 · jread 2.84 · JLPT語彙 71% · 966字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "religion and Japanese history"
+  ],
+  "style": "cultural history explainer",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1627,6 +1683,11 @@
   "licence": "Bunki original",
   "gradingSummary": "中級後半 · jread 2.53 · JLPT語彙 70% · 1089字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "current news",
+   "technology and money"
+  ],
+  "style": "news feature",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1639,6 +1700,10 @@
   "licence": "Bunki original",
   "gradingSummary": "中級前半 · jread 4.21 · JLPT語彙 79% · 931字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "religion and Japanese history"
+  ],
+  "style": "explainer",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1651,6 +1716,10 @@
   "licence": "PD (著作権フラグ なし) · 新字新仮名",
   "gradingSummary": "中級後半 · jread 2.84 · JLPT語彙 74% · 1861字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "learning psychology"
+  ],
+  "style": "essay (随筆)",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1663,6 +1732,11 @@
   "licence": "Bunki original",
   "gradingSummary": "上級前半 · jread 2.37 · JLPT語彙 81% · 974字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "current news",
+   "technology and money"
+  ],
+  "style": "economics news explainer",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1675,6 +1749,10 @@
   "licence": "Bunki original",
   "gradingSummary": "中級後半 · jread 2.82 · JLPT語彙 79% · 1119字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "learning psychology"
+  ],
+  "style": "science column (コラム)",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1687,6 +1765,10 @@
   "licence": "Bunki original",
   "gradingSummary": "中級前半 · jread 4.44 · JLPT語彙 75% · 1353字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "technology and money"
+  ],
+  "style": "classroom lesson (授業): a constructed teaching dialogue (学習用の創作対話)",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  },
@@ -1699,6 +1781,11 @@
   "licence": "Bunki original",
   "gradingSummary": "中級後半 · jread 2.59 · JLPT語彙 77% · 935字",
   "addedAt": "2026-10-16",
+  "fields": [
+   "religion and Japanese history",
+   "learning psychology"
+  ],
+  "style": "column",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  }
