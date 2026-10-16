@@ -12673,7 +12673,7 @@ function renderTodayWord(pick) {
 /** Today's line: three stops on a hairline track, the train of today's cards, the one primary door
  * (#review-start, built by renderTray) and the reading that follows it. */
 function renderTodayLine(today, door, read, pick) {
-  const card = el('section', 'today-line skin-reg');
+  const card = el('section', 'today-line');
   card.setAttribute('aria-label', tx('今日の路線', "Today's line"));
   const stops = el('ol', 'today-stops');
   const stop = (cls, n, label) => {
@@ -19358,7 +19358,7 @@ function wwInkLabel(text, hi) {
 
 function wwPlate(model, section) {
   const liveNode = model.nodes.find((node) => node.live);
-  const plate = el('div', 'ww-plate skin-reg');
+  const plate = el('div', 'ww-plate');
   plate.dataset.wwCentre = `${model.centre.type}:${model.centre.key}`;
   const inner = el('div', 'ww-plate-in');
   const svg = wwSvg('svg', { class: 'ww-wires', viewBox: `0 0 ${WW_W} ${WW_H}`, preserveAspectRatio: 'none', 'aria-hidden': 'true', focusable: 'false' });
@@ -25213,11 +25213,6 @@ function renderLearnStage(main, doors) {
     fan.append(ghost);
   }
   const card = el('div', 'learn-card');
-  for (const corner of ['tl', 'tr', 'bl', 'br']) {
-    const reg = el('i', `learn-reg ${corner}`);
-    reg.setAttribute('aria-hidden', 'true');
-    card.append(reg);
-  }
   const meta = el('p', 'learn-card-meta');
   const text = el('p', 'learn-card-text');
   if (deckStage) {

@@ -4289,20 +4289,6 @@ body:not([data-view='drift']) .foundation-doors { gap: var(--space-2); }
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-accent) 14%, transparent), var(--elevation-card);
 }
 
-/* ---- registration marks (トンボ): "made precisely, for print". Add .skin-reg to a
-   positioned surface; the four corners are drawn in the background, no extra nodes. ---- */
-.skin-reg {
-  --reg: var(--color-edge-strong);
-  background-image:
-    linear-gradient(var(--reg), var(--reg)), linear-gradient(var(--reg), var(--reg)),
-    linear-gradient(var(--reg), var(--reg)), linear-gradient(var(--reg), var(--reg)),
-    linear-gradient(var(--reg), var(--reg)), linear-gradient(var(--reg), var(--reg)),
-    linear-gradient(var(--reg), var(--reg)), linear-gradient(var(--reg), var(--reg));
-  background-size: 12px 0.5px, 0.5px 12px, 12px 0.5px, 0.5px 12px, 12px 0.5px, 0.5px 12px, 12px 0.5px, 0.5px 12px;
-  background-position: 0 6px, 6px 0, 100% 6px, calc(100% - 6px) 0, 0 calc(100% - 6px), 6px 100%, 100% calc(100% - 6px), calc(100% - 6px) 100%;
-  background-repeat: no-repeat;
-}
-
 /* ---- the page (slice G1, 2026-10-16). John: "this should come to the WHOLE SCREEN. not a swipable window, it should
    come to the whole screen and not have that UGLY gap at the top". The entry is a page, not a sheet: the whole viewport,
    in every room the galaxy included; the world's raised paper, opaque from a plain value first (--color-paper = the

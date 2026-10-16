@@ -21,8 +21,8 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
    The stage: a 藍-lacquer proscenium holding one lit washi card (the next
    sitting), the real due count, the deck split and ONE primary. Under it, five
    numbered blocks, each its own quiet form: 01 a slip, 02 a ledger, 03 chips,
-   04 a slip and three lengths, 05 an index. Signature: the card lifts and its
-   registration marks snap in (transform/opacity only; off under reduced motion).
+   04 a slip and three lengths, 05 an index. Signature: the card lifts (transform/opacity only; off under
+   reduced motion). No registration marks (John, 2026-10-16: "i hate the plus symbols").
    ========================================================================== */
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) {
   --learn-card: color-mix(in srgb, var(--color-surface) 62%, #efe5cf);
@@ -158,26 +158,6 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   background: color-mix(in srgb, var(--color-live) 6%, transparent);
   line-height: 1.4;
 }
-/* registration marks (トンボ), just outside the card's corners */
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-reg {
-  position: absolute;
-  width: 13px;
-  height: 13px;
-  pointer-events: none;
-}
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-reg::before,
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-reg::after {
-  content: '';
-  position: absolute;
-  background: color-mix(in srgb, var(--learn-stage-ink) 62%, transparent);
-}
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-reg::before { left: 6px; top: 0; width: 1px; height: 13px; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-reg::after { top: 6px; left: 0; width: 13px; height: 1px; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-reg.tl { top: -10px; left: -10px; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-reg.tr { top: -10px; right: -10px; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-reg.bl { bottom: -10px; left: -10px; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-reg.br { bottom: -10px; right: -10px; }
-
 /* the count and the split */
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage-row {
   display: flex;

@@ -87,14 +87,6 @@ html:is([data-room='search'], [data-room='word-web']) .ww-plate {
   background-position: -0.5px -0.5px;
   contain: layout paint;
 }
-/* registration marks inside the plate's corners */
-html:is([data-room='search'], [data-room='word-web']) .ww-plate::before,
-html:is([data-room='search'], [data-room='word-web']) .ww-plate::after {
-  content: ''; position: absolute; width: 12px; height: 12px; pointer-events: none;
-  border: 0 solid var(--color-edge-strong);
-}
-html:is([data-room='search'], [data-room='word-web']) .ww-plate::before { top: 6px; left: 6px; border-width: 1px 0 0 1px; }
-html:is([data-room='search'], [data-room='word-web']) .ww-plate::after { right: 6px; top: 6px; border-width: 1px 1px 0 0; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-plate {
   border-color: color-mix(in srgb, var(--color-live) 42%, transparent);
   box-shadow: inset 0 0 60px color-mix(in srgb, var(--color-live) 7%, transparent), 0 0 0 0.5px color-mix(in srgb, var(--color-live) 18%, transparent), 0 18px 40px -24px rgb(0 0 0 / 70%);
