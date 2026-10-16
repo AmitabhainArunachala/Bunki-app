@@ -8067,17 +8067,51 @@ function slipHeadword() {
  * A press on the word whose popup is open keeps the popup for that press's click, which dives into the
  * full entry (miniDiveOnAnchor). A press anywhere else outside the popup puts it away; in the reader's
  * text it also clears the summoned readings and the marked word. The word menu and the list popover
- * close the same way; the toast never closes anything. */
+ * close the same way; the toast never closes anything. Save ▾'s menu unfolded inside the card is the one
+ * exception in time, not in kind: a press on that card (or on its word) folds it once the press has
+ * landed (foldMenuAfterPress), never as the press begins. */
 let miniEntry = null; // the open popup's way into the full entry, or null when it has none
 let miniDiveOnAnchor = null;
+/* G1b · W2 (verify-design-reader-shelf; red since L's f92014ff, green at R): folding Save ▾'s menu re-seats its card before
+ * the frame paints (keepFloatingBeside's MutationObserver), and a card that moves under a pressed finger hands the press to
+ * whatever slid beneath it — after Save, the band's first tap only folded the menu: the card sat above its word and dropped
+ * 162 px between the press and its release, so the click landed on the page behind. A press on the card or on its word
+ * therefore lets the menu stand until the press has landed: its click runs first (the band or a kanji row dives, and the
+ * card and its menu go with it), then, in a task of its own, the menu folds and the card is seated in that same task —
+ * no frame shows it unseated. A press that never clicks (a drag, a scroll) folds it on its cancel. */
+let menuFoldPending = null; // the listeners of a fold waiting for its press to land
+function foldMenuAfterPress(pop) {
+  menuFoldPending?.();
+  const stop = () => {
+    window.removeEventListener('click', landed, true);
+    window.removeEventListener('pointercancel', landed, true);
+    if (menuFoldPending === stop) menuFoldPending = null;
+  };
+  const landed = () => {
+    stop();
+    setTimeout(() => {
+      // the press took the card away (the band or a kanji row dove into a page): nothing to fold
+      if (!pop.isConnected) return;
+      closeVocabularyListPopover();
+    }, 0);
+  };
+  window.addEventListener('click', landed, true);
+  window.addEventListener('pointercancel', landed, true);
+  menuFoldPending = stop;
+}
 document.addEventListener(
   'pointerdown',
   (ev) => {
     miniDiveOnAnchor = null;
+    menuFoldPending?.();
     const target = ev.target;
     if (readerWordMenu && !readerWordMenu.menu.contains(target)) closeReaderWordMenu();
     const pop = document.getElementById('vocabulary-list-popover');
-    if (pop && !pop.contains(target) && !target.closest?.('#mini-take, #personal-add-list, #kp-take')) closeVocabularyListPopover();
+    if (pop && !pop.contains(target) && !target.closest?.('#mini-take, #personal-add-list, #kp-take')) {
+      const card = pop.classList.contains('is-inline') ? pop.closest('#mini') : null;
+      if (card && (card.contains(target) || (miniAnchor?.isConnected && miniAnchor.contains(target)))) foldMenuAfterPress(pop);
+      else closeVocabularyListPopover();
+    }
     const mini = standingSlip();
     const inText = ev.button === 0 && !!target.closest?.('#reader');
     if (mini && !mini.contains(target) && !target.closest?.('#vocabulary-list-popover, #reader-toast')) {
