@@ -9081,6 +9081,9 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
         return;
       }
       notice.textContent = on ? tx(`「${listName}」に追加しました。`, `Added to ${listName}.`) : tx(`「${listName}」から外しました。`, `Taken off ${listName}.`);
+      // S · made from a page's Save, the change is also the room's beneath (its lists, their counts): it is drawn again
+      // when the page closes (the foot's old picker drew the whole app after each change)
+      if (S.stack.length) S.roomStale = true;
       if (typed) { name.value = ''; rememberRecordDraft(name); }
       // in Save ▾'s menu the name field folds back into its row once the list is made
       if (typed && newList) { form.hidden = true; newList.hidden = false; }
@@ -9089,6 +9092,10 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
     } finally {
       busy = false;
       paint();
+      // S · the folded field took the keyboard with it, out of the menu and out of Escape's reach: the new list's box has it
+      if (typed && newList && form.hidden) {
+        [...choices.querySelectorAll('input[type="checkbox"]')].find((box) => box.dataset.list === listName)?.focus({ preventScroll: true });
+      }
     }
   };
   form.addEventListener('submit', (event) => {
@@ -31112,10 +31119,10 @@ function mountPageEffects(sheet, node) {
   S.sheetReturnFocus = null;
   queueMicrotask(() => {
     if (!sheet.isConnected) return;
-    // S · the keyboard on a bar's open drawer (a list's name half typed) stays there: the page under it was drawn again,
-    // the drawer was not
+    // S · the keyboard on a bar's open drawer (a list's name half typed, a box whose change drew the page again and holds
+    // its disabled beat) stays there: the page under it was drawn again, the drawer was not
     const drawer = document.getElementById('vocabulary-list-popover');
-    if (drawer?.classList.contains('is-drawer') && drawer.contains(document.activeElement)) return;
+    if (drawer?.classList.contains('is-drawer') && (drawer.contains(document.activeElement) || drawer.querySelector('input:disabled'))) return;
     const target = (focusId && sheet.querySelector(`#${CSS.escape(focusId)}`)) || findSheetDoor(sheet, returnFocus) ||
       sheet.querySelector('#sheet-back');
     target?.focus({ preventScroll: true });
@@ -31164,6 +31171,8 @@ function applyLayerLaw(root) {
 /** The page layer, alone: the top node's page mounted (or none), the layer law, the crumb under it, the store alert's
  * description, the walk sentinel. No room is rebuilt. */
 function renderLayer({ prebuilt = null } = {}) {
+  // back on a room whose lists a page's Save changed: the room is drawn again, the whole app as render() draws it
+  if (!S.stack.length && S.roomStale) { render(); return; }
   const root = document.getElementById('app');
   syncSheetActionVisit();
   closeReaderWordMenu();
@@ -34185,6 +34194,7 @@ function render() {
   if (S.view === 'tray' && placesLayout()) S.view = 'dojo';
   // a page built ahead, or kept for Back, was built against the state this render is about to replace
   pageEpoch += 1;
+  S.roomStale = false;
   syncSheetActionVisit();
   if (personalHost) { personalHost.paint(); return; }
   if (retainedRetryView && S.view !== retainedRetryView) dropRetainedRetryRoute();
