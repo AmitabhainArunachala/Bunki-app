@@ -37,6 +37,310 @@
   "窮屈",
   "悲惨"
  ],
- "source": "pen (KAGE piece pen) round 4, blind-read 36/36 by Seed 2.0 Mini and Gemini 3.8 Flash on 2026-10-17",
- "licence": "KAGE data from GlyphWiki (free per GlyphWiki policy); kage-engine (GPL-3.0) used only at build time, not bundled"
+ "generated": "2026-10-17 pen2 (pieces lane): bend, weights, kit(糸 氵 灬 心 忄 阝 ⺌ 丷), fuse; eye variants for 対照的 被害者 圧迫; stripes applied to no word",
+ "blind_read": {
+  "round2": "Seed 36/36@5 (300px, 120px), Gemini 36/36@5 (300px)",
+  "round3": "Seed 36/36@5 (300px, 120px), Gemini 36/36@5 (300px)",
+  "eye_variants": "Seed: 対照的 5, 被害者 5, 圧迫 5; 連日 read as 連一 → removed"
+ },
+ "switches": {
+  "関与": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "対照的": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "奉仕": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "多岐": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "被害者": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "故意": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "河川": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "樹木": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "振動": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "設置": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "戯曲": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "態勢": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "政府筋": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "連日": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "無茶": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "企画": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "移行": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "政策": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "内訳": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "痛感": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "救援": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "付録": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "一切": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "情報網": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "繊維": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "発掘": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "結束": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "辛抱": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "圧迫": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "意向": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "通常": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "気品": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "大惨事": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "切実": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "窮屈": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  },
+  "悲惨": {
+   "bend": true,
+   "weights": true,
+   "stripes": true,
+   "eye": false,
+   "fuse": true,
+   "kit": true
+  }
+ },
+ "fused": [
+  "河川",
+  "企画"
+ ],
+ "eye": [
+  "対照的",
+  "被害者",
+  "圧迫"
+ ],
+ "licence": "KAGE data from GlyphWiki (free per GlyphWiki policy); kage-engine (GPL-3.0) used only at build time for the plain-gothic guard; the SVGs are the pen's own output"
 }
