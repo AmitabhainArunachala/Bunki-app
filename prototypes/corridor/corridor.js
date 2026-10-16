@@ -10217,13 +10217,36 @@ function readerRenderedTokens(p, crossRefs) {
   return result;
 }
 
+/** N · the quick record as the text reads the word: an entry read otherwise counts as missing (the lead, 2026-10-17),
+ * so no line or spoken state lends another reading's meaning (訳 read やく never says わけ's "reason"). An inflected
+ * word answers by its dictionary form, as before. */
+function readerQuickRecordAsRead(token, record = readerQuickRecord(token)) {
+  const own = !token.b || token.b === token.s ? String(token.r || '') : '';
+  return record && own && record.r && kataToHira(String(record.r)) !== kataToHira(own) ? null : record;
+}
+
+/** N · the miss said for a word whose entries at hand are all read otherwise: once the full dictionary has answered for
+ * the spelling and names none read the text's way, "No dictionary entry for this reading."; until then, the quick
+ * dictionary's own miss. */
+function readerReadingMissText(form = '') {
+  if (form && D.dictionaryIndex && (D.dictionaryMode === 'main' || D.dictionaryCompleteForms?.has(String(form)))
+    && dictionaryRowsForForm(form).length) return tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.');
+  return readerGlossMissText(form);
+}
+
 /** The line under a content word on the ladder's English rung: its gloss
- * exactly as before, or an honest dash when the quick dictionary has none. */
+ * exactly as before, or an honest dash when the quick dictionary has none. N · a word whose entry at hand is read
+ * otherwise shows the dash until the full dictionary answers, then that answer's gloss if it has one read so. */
 function readerGlossLine(token) {
-  const record = readerQuickRecord(token);
-  return record?.m?.length
+  const record = readerQuickRecordAsRead(token);
+  const line = record?.m?.length
     ? el('span', 'tok-en', inlineGloss(record))
     : el('span', 'tok-en tok-en-miss', '—');
+  if (!record) readyTokenReading(token)?.then(() => {
+    const found = line.isConnected ? readerQuickRecordAsRead(token) : null;
+    if (found?.m?.length) { line.className = 'tok-en'; line.textContent = inlineGloss(found); }
+  });
+  return line;
 }
 
 /** The first-visit tip: one plain line (round 4, John T4: the explanation was "too verbose and..
@@ -10247,13 +10270,15 @@ function readerWordHint() {
 function readerTokenState(token, index, kind) {
   if (kind === 'named') return S.revealed?.has(index) ? token.r || '' : '';
   if (kind !== 'word') return '';
-  const record = readerQuickRecord(token);
+  // N · as the text reads it: a word whose entry at hand is read otherwise says no meaning of another reading
+  const quick = readerQuickRecord(token);
+  const record = readerQuickRecordAsRead(token, quick);
   const parts = [];
   // R · the reading said is the one its ruby shows: the token's own, where its entry is read otherwise
   const own = tokenReading(token);
   const said = own && !(record?.r && kataToHira(String(record.r)) === kataToHira(own)) ? own : record?.r;
   if ((S.dials.furigana === 2 || S.revealed?.has(index)) && said && said !== token.s) parts.push(said);
-  if (S.glossed?.has(index)) parts.push(record?.m?.length ? inlineGloss(record) : readerGlossMissText(token.b));
+  if (S.glossed?.has(index)) parts.push(record?.m?.length ? inlineGloss(record) : quick && !record ? readerReadingMissText(token.b) : readerGlossMissText(token.b));
   return parts.join(' · ');
 }
 function nameReaderToken(span, token, index, kind) {
