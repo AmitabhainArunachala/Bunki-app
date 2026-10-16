@@ -399,21 +399,29 @@ function heard(s){ const w=s.w.w; state.heard=[w].concat(state.heard.filter(x=>x
 function renderPad(){ for(const k of pad.querySelectorAll('.key')) k.remove(); for(const w of state.heard){ const s=byWord[w]; if(!s) continue; const b=document.createElement('button'); b.className='key'+(w.length>2?' two':''); b.textContent=w; b.style.setProperty('--k',pig(s.g)); b.title=s.w.r+' · '+s.w.m; b.onclick=()=>{ audio(); fire(s,true); speak(w); }; pad.appendChild(b); } }
 
 // ---- sound: a plucked string per station, a drone under the rings, a room around it
-let AC=null,masterG=null,wetG=null;
-function audio(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); masterG=AC.createGain(); masterG.gain.value=.5; masterG.connect(AC.destination);
-      const conv=AC.createConvolver(); const len=Math.floor(AC.sampleRate*1.9); const ir=AC.createBuffer(2,len,AC.sampleRate); for(let ch=0;ch<2;ch++){ const d=ir.getChannelData(ch); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6)*(i<400?i/400:1); } conv.buffer=ir; wetG=AC.createGain(); wetG.gain.value=.32; wetG.connect(conv); conv.connect(masterG); }catch(e){} }
+let AC=null,masterG=null,wetG=null,comp=null;
+function audio(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)();
+      // everything ends in a limiter, and the master swells in over a second so the first note is never a shock
+      comp=AC.createDynamicsCompressor(); comp.threshold.value=-22; comp.knee.value=10; comp.ratio.value=10; comp.attack.value=.002; comp.release.value=.22; comp.connect(AC.destination);
+      masterG=AC.createGain(); masterG.gain.setValueAtTime(0,AC.currentTime); masterG.gain.setTargetAtTime(.5,AC.currentTime+.02,.45); masterG.connect(comp);
+      const conv=AC.createConvolver(); conv.normalize=true; const len=Math.floor(AC.sampleRate*1.3); const ir=AC.createBuffer(2,len,AC.sampleRate); for(let ch=0;ch<2;ch++){ const d=ir.getChannelData(ch); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3.4)*(i<240?i/240:1); } conv.buffer=ir; wetG=AC.createGain(); wetG.gain.value=.14; wetG.connect(conv); conv.connect(masterG); }catch(e){} }
   if(AC&&AC.state==='suspended') AC.resume(); return AC; }
-function pluck(s){ if(!state.voice||!AC) return; const r=rings[s.ring]; const f=SCALE[(s.i*7)%5]*r.oct; const t=AC.currentTime; const sealed=!!state.sealed[s.w.w]; const vol=sealed?.22:.5;
-  // a Karplus-Strong string: a burst of noise through a tuned delay loop with a darkening filter
-  const n=Math.floor(AC.sampleRate*.012); const buf=AC.createBuffer(1,n,AC.sampleRate); const d=buf.getChannelData(0); for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
-  const src=AC.createBufferSource(); src.buffer=buf; const del=AC.createDelay(1); del.delayTime.value=1/f; const fb=AC.createGain(); fb.gain.value=.94-(r.oct>1?.04:0); const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=Math.min(7000,f*7); const out=AC.createGain(); out.gain.setValueAtTime(vol,t); out.gain.exponentialRampToValueAtTime(.001,t+2.4);
-  src.connect(del); del.connect(lp); lp.connect(fb); fb.connect(del); lp.connect(out); out.connect(masterG); out.connect(wetG); src.start(t); src.stop(t+.03); fb.gain.setTargetAtTime(0,t+2.3,.08);
+let recentPlucks=[];
+function pluck(s,when){ if(!state.voice||!AC) return; const r=rings[s.ring]; const f=SCALE[(s.i*7)%5]*r.oct; const t=when!=null?when:AC.currentTime; const sealed=!!state.sealed[s.w.w];
+  // words that fire together share the air: each extra voice inside a third of a second quietens the next
+  recentPlucks=recentPlucks.filter(x=>t-x<.35); const dens=recentPlucks.length; recentPlucks.push(t); const vol=(sealed?.2:.42)/(1+dens*.8);
+  // a Karplus-Strong string: a small, pre-darkened burst of noise through a tuned delay loop
+  const n=Math.floor(AC.sampleRate*.01); const buf=AC.createBuffer(1,n,AC.sampleRate); const d=buf.getChannelData(0); for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*.3*(1-i/n);
+  // the loop filter must not resonate (Q is in dB here; the default +1 dB with feedback near 1 makes the loop grow), and the feedback is set from the pitch for a ~1.5 s decay
+  const src=AC.createBufferSource(); src.buffer=buf; const pre=AC.createBiquadFilter(); pre.type='lowpass'; pre.frequency.value=Math.min(2600,f*4); pre.Q.value=-3; const del=AC.createDelay(1); del.delayTime.value=1/f; const fb=AC.createGain(); fb.gain.value=Math.min(.995,Math.exp(-4.6/f)); const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=Math.min(3600,f*4.5); lp.Q.value=-3;
+  const out=AC.createGain(); out.gain.setValueAtTime(0,t); out.gain.linearRampToValueAtTime(vol,t+.008); out.gain.exponentialRampToValueAtTime(.001,t+2.0);
+  src.connect(pre); pre.connect(del); del.connect(lp); lp.connect(fb); fb.connect(del); lp.connect(out); out.connect(masterG); out.connect(wetG); src.start(t); src.stop(t+.02); fb.gain.setTargetAtTime(0,t+1.9,.08);
   // a soft body under the string
-  const o=AC.createOscillator(),bg=AC.createGain(); o.type='sine'; o.frequency.value=f; bg.gain.setValueAtTime(vol*.35,t); bg.gain.exponentialRampToValueAtTime(.001,t+.6); o.connect(bg); bg.connect(masterG); o.start(t); o.stop(t+.7); }
+  const o=AC.createOscillator(),bg=AC.createGain(); o.type='sine'; o.frequency.value=f; bg.gain.setValueAtTime(0,t); bg.gain.linearRampToValueAtTime(vol*.3,t+.01); bg.gain.exponentialRampToValueAtTime(.001,t+.5); o.connect(bg); bg.connect(masterG); o.start(t); o.stop(t+.6); }
 let drone=null;
-function setDrone(on){ if(!AC) return; if(on&&!drone){ const g=AC.createGain(); g.gain.value=0; g.gain.setTargetAtTime(.05,AC.currentTime,1.5); const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=320; const hp=AC.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=40; const os=[73.42,73.9,110.0].map((f,i)=>{ const o=AC.createOscillator(); o.type=i<2?'sine':'triangle'; o.frequency.value=f; o.connect(lp); o.start(); return o; });
-    // soil: a bed of filtered noise under the strings
-    const nb=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate); const nd=nb.getChannelData(0); for(let i=0;i<nd.length;i++) nd[i]=Math.random()*2-1; const ns=AC.createBufferSource(); ns.buffer=nb; ns.loop=true; const ng=AC.createGain(); ng.gain.value=.12; ns.connect(ng); ng.connect(lp); ns.start(); os.push(ns);
+function setDrone(on){ if(!AC) return; if(on&&!drone){ const g=AC.createGain(); g.gain.value=0; g.gain.setTargetAtTime(.022,AC.currentTime+.5,2.5); const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=260; const hp=AC.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=40; const os=[73.42,73.9,110.0].map((f,i)=>{ const o=AC.createOscillator(); o.type=i<2?'sine':'triangle'; o.frequency.value=f; const og=AC.createGain(); og.gain.value=i<2?.5:.18; o.connect(og); og.connect(lp); o.start(); return o; });
+    // soil: a faint bed of filtered noise under the strings
+    const nb=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate); const nd=nb.getChannelData(0); for(let i=0;i<nd.length;i++) nd[i]=Math.random()*2-1; const ns=AC.createBufferSource(); ns.buffer=nb; ns.loop=true; const ng=AC.createGain(); ng.gain.value=.035; ns.connect(ng); ng.connect(lp); ns.start(); os.push(ns);
     lp.connect(hp); hp.connect(g); g.connect(masterG); g.connect(wetG); drone={g,os}; }
   else if(!on&&drone){ const d=drone; drone=null; d.g.gain.setTargetAtTime(0,AC.currentTime,.6); setTimeout(()=>{ for(const o of d.os){ try{o.stop();}catch(e){} } },2500); } }
 let voiceJa=null;
@@ -486,7 +494,7 @@ function start(data){ load(); if(data&&data.state) state=Object.assign(fresh(),d
   makePaperTile(); readTokens(); if(state.theme) document.documentElement.dataset.theme=state.theme; readTokens(); resize(); placeStations(); updateFoot(); renderPad(); requestAnimationFrame(tick);
   loadAssets(()=>{ drawStatic(); });
   try{ window.claude?.hot?.snapshot?.(()=>({state})); }catch(e){}
-  window.__meguri={stations,openPage,fire,get state(){return state}}; }
+  window.__meguri={stations,openPage,fire,audio,pluck,setDrone,get state(){return state},sound:()=>({AC,masterG,comp,wetG})}; }
 new ResizeObserver(()=>{ resize(); placeStations(); }).observe(field);
 if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(()=>{ drawStatic(); renderPad(); }); if(document.fonts.load) document.fonts.load("700 80px 'Noto Sans JP'",WORDS.map(w=>w.w).join('')).catch(()=>{}); }
 if(window.claude?.hot?.ready) window.claude.hot.ready(start); else start(window.claude?.hot?.data||null);
