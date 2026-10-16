@@ -687,13 +687,15 @@ async function main() {
         };
       };
       return { sheet: describe('#sheet'), scrims: document.querySelectorAll('.scrim').length, ruby: describe('#reader rt'),
-        cuts: document.getAnimations().filter(animation => /\((word-hero|kairo-paper|kairo-page)\)/.test(String(animation.effect?.pseudoElement || ''))).length,
+        cuts: document.getAnimations().filter(animation => animation.id === 'kairo-cut' || /\((word-hero|kairo-paper|kairo-page)\)/.test(String(animation.effect?.pseudoElement || ''))).length
+          + document.querySelectorAll('.cut-word').length,
         ambient: document.getAnimations().filter(animation => animation.playState === 'running' && animation.effect?.getTiming().iterations === Infinity).length };
     })()`);
     // one hand (slice C): the one reduced-motion rule gives every surviving surface a 120 ms
     // opacity cross-fade (--motion-room under reduce); the dialog is read exactly, as before. G1 (2026-10-16): the entry
     // is a whole-screen page with no dimming layer at all, so there is no scrim to cross-fade — none may exist — and the
-    // page's match cut never starts under reduced motion: the page alone cross-fades
+    // page's match cut never starts under reduced motion: the page alone cross-fades. G1b: the cut is one travelling word
+    // (.cut-word, animation 'kairo-cut'); under reduced motion neither it nor any of G1's view-transition names may run
     const crossfade = entry => entry && entry.animationName === 'feel-fade' && entry.animationDuration === '0.12s'
       && entry.animations.length === 1 && entry.animations.every(animation =>
         animation.name === 'feel-fade' && animation.timing.iterations === 1
