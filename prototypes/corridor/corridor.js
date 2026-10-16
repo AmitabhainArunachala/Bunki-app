@@ -10939,6 +10939,14 @@ function renderReader(main) {
   if (picture) articleTitle.classList.add('on-hero');
   card.append(articleTitle);
   if (bi() && p.titleEn) card.append(el('p', 'view-title-en', p.titleEn));
+  // N · a real text's one line of context, under its title like a dateline (no box, no label): when and where it was
+  // written or spoken. Only the rows that carry it; it attributes the text and says nothing of who made the page.
+  if (p.context?.ja) {
+    const context = el('p', 'reader-context', p.context.ja);
+    context.lang = 'ja';
+    context.dataset.uiContent = 'learning';
+    card.append(context);
+  }
   // The instrument line, under the title: source · date · level · saved words · the voice's state. Settings are
   // one icon at its end. No provenance (S, John 2026-10-16: "no one wants to see a made by ai in red").
   const head = el('div', 'reader-head');

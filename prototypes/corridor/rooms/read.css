@@ -1365,6 +1365,17 @@ html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .
   text-transform: none;
   color: var(--color-accent);
 }
+/* N · a real text's context line under its title, set like a dateline: the card's own ink thinned toward its own paper,
+   no box, no rule, no label */
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .reader-context {
+  margin: 2px 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 400 13px/1.55 var(--font-ui);
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--reader-ink) 76%, var(--reader-card));
+}
 /* the instrument line sits under a hairline in the card; the settings icon keeps its corner */
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card > .reader-head {
   position: relative;
