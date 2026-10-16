@@ -5269,3 +5269,35 @@ body.record-not-saving #app > .chrome { margin-bottom: var(--record-band-h, 48px
 .record-kept[hidden] { display: none; }
 .record-kept-share { font-weight: 400; }
 .record-kept-clause { white-space: nowrap; }
+
+/* ==========================================================================
+   S · THE DECK'S BAND (John, 2026-10-16, on a flashcard's front: "yes but the blue banner was actually nicer. be a
+   masterful designer claude"). E's one frame — ‹, the rail, the count, Remove — on a solid band in the world's deep
+   pigment, as the card's band takes its world (CONTINUITY_CONTRACT §6): the world's named ink by day (ベロ藍 #1c2f42,
+   the blue he liked; 墨 #211e17), its lacquer by night (ground 48 % + black, the card band's night value). The band's words are the paper
+   showing through the ink (白抜き); the count and Remove are that paper 82 % into the band (≥ 7:1 in 藍 and 墨); the
+   rail a paper hairline on a paper track; a lit hairline at its foot keeps it a band on the deck's lacquer stage (D1).
+   Flat: no gradient, the band is one pigment.
+   ========================================================================== */
+#app .kp-top-study[data-bar='deck'] {
+  /* the world's own named pigment (corridor.css's world block --ink, THEME_UI's ink): ベロ藍 #1c2f42 Prussian blue, 墨
+     #211e17, 朱's #2b2620 … — the house's --color-ink is a near-black in ベロ藍, so the band reads the world's pigment */
+  --deck-band: var(--world-ink, var(--color-ink));
+  --deck-band-ink: var(--color-paper, #f5efe0);
+  --deck-band-quiet: color-mix(in srgb, var(--deck-band-ink) 82%, var(--deck-band));
+  background: var(--deck-band);
+  border-bottom: 1px solid color-mix(in srgb, var(--deck-band-ink) 16%, var(--deck-band));
+  box-shadow: 0 1px 0 rgb(0 0 0 / 22%);
+  color: var(--deck-band-ink);
+}
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #app .kp-top-study[data-bar='deck'] {
+  --deck-band: color-mix(in srgb, var(--color-ground) 48%, #000000);
+  --deck-band-ink: var(--color-ink);
+}
+#app .kp-top-study[data-bar='deck'] .kp-icon { color: var(--deck-band-ink); }
+#app .kp-top-study[data-bar='deck'] :is(.kp-count, .kp-delete) { color: var(--deck-band-quiet); }
+#app .kp-top-study[data-bar='deck'] .kp-delete:hover:where(:not(:disabled)) { background: transparent; color: var(--deck-band-ink); }
+#app .kp-top-study[data-bar='deck'] [data-bar-back]:hover:not(:disabled) { background: color-mix(in srgb, var(--deck-band-ink) 12%, transparent); }
+#app .kp-top-study[data-bar='deck'] :is(.kp-icon, .kp-delete):focus-visible { outline: 2px solid var(--deck-band-ink); outline-offset: -4px; box-shadow: none; }
+#app .kp-top-study[data-bar='deck'] .kp-progress { background: color-mix(in srgb, var(--deck-band-ink) 22%, transparent); }
+#app .kp-top-study[data-bar='deck'] .kp-progress i { background: var(--deck-band-ink); }
