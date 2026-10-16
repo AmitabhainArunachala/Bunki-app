@@ -187,9 +187,11 @@ button{font:inherit;color:inherit}
 </section>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="font.js"></script>
 <script src="kvg.js"></script>
 <script src="kanji.js"></script>
 <script src="assets.js"></script>
+<script src="assets_sound.js"></script>
 <script>
 (function(){
 'use strict';
@@ -407,12 +409,17 @@ function audio(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioC
       // everything ends in a limiter, and the master swells in over a second so the first note is never a shock
       comp=AC.createDynamicsCompressor(); comp.threshold.value=-22; comp.knee.value=10; comp.ratio.value=10; comp.attack.value=.002; comp.release.value=.22; comp.connect(AC.destination);
       masterG=AC.createGain(); masterG.gain.setValueAtTime(0,AC.currentTime); masterG.gain.setTargetAtTime(.5,AC.currentTime+.02,.45); masterG.connect(comp);
-      const conv=AC.createConvolver(); conv.normalize=true; const len=Math.floor(AC.sampleRate*1.3); const ir=AC.createBuffer(2,len,AC.sampleRate); for(let ch=0;ch<2;ch++){ const d=ir.getChannelData(ch); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3.4)*(i<240?i/240:1); } conv.buffer=ir; wetG=AC.createGain(); wetG.gain.value=.14; wetG.connect(conv); conv.connect(masterG); }catch(e){} }
+      const conv=AC.createConvolver(); conv.normalize=true; const len=Math.floor(AC.sampleRate*1.3); const ir=AC.createBuffer(2,len,AC.sampleRate); for(let ch=0;ch<2;ch++){ const d=ir.getChannelData(ch); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3.4)*(i<240?i/240:1); } conv.buffer=ir; wetG=AC.createGain(); wetG.gain.value=.14; wetG.connect(conv); conv.connect(masterG); decodeSample('koto'); decodeSample('shamisen'); }catch(e){} }
   if(AC&&AC.state==='suspended') AC.resume(); return AC; }
 let recentPlucks=[];
+const SND=window.MEGURI_SOUND||null; const sampleBuf={}; let voiceClips={};
+function decodeSample(key){ if(!AC||!SND||!SND.samples||!SND.samples[key]||sampleBuf[key]!==undefined) return; sampleBuf[key]=null; try{ const b64=SND.samples[key].split(',')[1]; const bin=atob(b64); const arr=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i); AC.decodeAudioData(arr.buffer.slice(0),buf=>{ sampleBuf[key]=buf; },()=>{}); }catch(e){} }
 function pluck(s,when){ if(!state.voice||!AC) return; const r=rings[s.ring]; const f=SCALE[(s.i*7)%5]*r.oct; const t=when!=null?when:AC.currentTime; const sealed=!!state.sealed[s.w.w];
   // words that fire together share the air: each extra voice inside a third of a second quietens the next
   recentPlucks=recentPlucks.filter(x=>t-x<.35); const dens=recentPlucks.length; recentPlucks.push(t); const vol=(sealed?.2:.42)/(1+dens*.8);
+  // a real koto string when the sample is here, re-pitched to the ring's note; the synthesised string otherwise
+  const key=r.oct<1?'shamisen':'koto'; decodeSample(key); const sb=sampleBuf[key];
+  if(sb){ const src=AC.createBufferSource(); src.buffer=sb; const base=(SND.pitch&&SND.pitch[key])||235.8; src.playbackRate.value=f/base; const out=AC.createGain(); out.gain.setValueAtTime(0,t); out.gain.linearRampToValueAtTime(vol*.6,t+.004); out.gain.setValueAtTime(vol*.6,t+.6); out.gain.exponentialRampToValueAtTime(.001,t+2.2); src.connect(out); out.connect(masterG); out.connect(wetG); src.start(t); src.stop(t+2.3); return; }
   // a Karplus-Strong string: a small, pre-darkened burst of noise through a tuned delay loop
   const n=Math.floor(AC.sampleRate*.01); const buf=AC.createBuffer(1,n,AC.sampleRate); const d=buf.getChannelData(0); for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*.3*(1-i/n);
   // the loop filter must not resonate (Q is in dB here; the default +1 dB with feedback near 1 makes the loop grow), and the feedback is set from the pitch for a ~1.5 s decay
@@ -429,7 +436,9 @@ function setDrone(on){ if(!AC) return; if(on&&!drone){ const g=AC.createGain(); 
   else if(!on&&drone){ const d=drone; drone=null; d.g.gain.setTargetAtTime(0,AC.currentTime,.6); setTimeout(()=>{ for(const o of d.os){ try{o.stop();}catch(e){} } },2500); } }
 let voiceJa=null;
 function pickVoice(){ try{ const vs=speechSynthesis.getVoices(); voiceJa=vs.find(v=>/ja/i.test(v.lang)&&/Kyoko|O-ren|Otoya|Google/.test(v.name))||vs.find(v=>/ja/i.test(v.lang))||null; }catch(e){} }
-function speak(txt){ try{ if(!('speechSynthesis' in window)) return; if(speechSynthesis.pending) return; const u=new SpeechSynthesisUtterance(txt); u.lang='ja-JP'; u.rate=.9; if(voiceJa) u.voice=voiceJa; speechSynthesis.speak(u); }catch(e){} }
+let voiceEl=null;
+function speak(txt){ try{ const clip=SND&&SND.voice&&SND.voice[txt]; if(clip){ if(!voiceEl){ voiceEl=new Audio(); voiceEl.preload='auto'; } if(!voiceEl.paused&&!voiceEl.ended) return; voiceEl.src=clip; voiceEl.volume=.9; voiceEl.play().catch(()=>{}); return; }
+  if(!('speechSynthesis' in window)) return; if(speechSynthesis.pending) return; const u=new SpeechSynthesisUtterance(txt); u.lang='ja-JP'; u.rate=.9; if(voiceJa) u.voice=voiceJa; speechSynthesis.speak(u); }catch(e){} }
 if('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
 
 // ---- verbs
@@ -467,8 +476,12 @@ function fillPage(s){ const w=s.w,p=passes(s),sealed=!!state.sealed[w.w];
   const MK=window.MeguriKanji; let drawn=false;
   // the poster is built from KanjiVG strokes, so it needs no font to be right; it only needs the data for every character
   if(MK&&[...w.w].every(ch=>MK.has(ch))){ try{ const box=document.createElement('div'); box.className='plate'; const cw=Math.min(300,Math.floor(Math.min(window.innerWidth*.7,320))); box.style.width=cw+'px'; big.style.writingMode='horizontal-tb'; big.appendChild(box);
-      const opts={ground:T.dark?'black':'paper',pigment:pig(s.g),dots:Math.min(5,p),sealed,reading:w.r,meaning:w.m};
-      if(!matchMedia('(prefers-reduced-motion:reduce)').matches) posterAnim=MK.animateIn(box,w.w,opts); else MK.render(box,w.w,opts); drawn=true; }catch(e){ big.textContent=''; } }
+      const opts={ground:T.dark?'black':'paper',pigment:pig(s.g),dots:Math.min(5,p),sealed,reading:w.r,motif:true,face:state.face||'dela'};
+      // a tap on the poster cycles the typeface it is built from, so both can be judged on the phone
+      box.title='tap: another face'; box.style.cursor='pointer'; box.onclick=()=>{ const faces=['dela','potta','maru']; state.face=faces[(faces.indexOf(state.face||'dela')+1)%faces.length]; save(); fillPage(s); toast({dela:'Dela Gothic',potta:'Potta',maru:'Zen Maru'}[state.face]); };
+      // the face is embedded as a subset, but a font still loads lazily: wait for the word's own characters so the first look is never the fallback
+      const go=()=>{ if(cur!==s||page.hidden) return; if(!matchMedia('(prefers-reduced-motion:reduce)').matches) posterAnim=MK.animateIn(box,w.w,opts); else MK.render(box,w.w,opts); };
+      if(document.fonts&&document.fonts.load) document.fonts.load("400 80px 'Meguri Dela'",w.w).then(go,go); else go(); drawn=true; }catch(e){ big.textContent=''; } }
   if(!drawn){ big.style.writingMode=''; for(const ch of w.w){ const sp=document.createElement('span'); sp.textContent=ch; big.appendChild(sp); } }
   const dots=$('#p-dots'); dots.hidden=drawn; dots.textContent=''; for(let i=5;i>=0;i--){ const d=document.createElement('s'); if(sealed&&i===5) d.className='seal'; else if(i<Math.min(6,p)) d.className='on'; dots.appendChild(d); }
   $('#p-reading').textContent=w.r; $('#p-meaning').textContent=w.m; $('#p-def').textContent=w.d;
