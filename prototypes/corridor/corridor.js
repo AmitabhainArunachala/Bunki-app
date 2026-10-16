@@ -10125,10 +10125,10 @@ function readyTokenReading(token) {
 
 /** The token a word door stands for. One whose own reading the quick dictionary does not carry stands, by entry
  * number (seq), for the entry read that way: on a spelling the quick dictionary has, the full dictionary's first
- * entry so read (lookup's choice) or, with none, its closest (the quick dictionary's own, first in the form's
- * order), whose door then says the two readings differ (D23); on a spelling it lacks, only the one entry so read
- * and so permitted (several stay the full entry's explicit choice, D11). Until the form's rows are at hand, and
- * for every other token, it is the token as it was. */
+ * entry so read (lookup's choice) or, with none, no entry at all (N, 2026-10-17: an entry read otherwise counts as
+ * missing; it was the form's first row, whose meaning belonged to another reading); on a spelling it lacks, only the
+ * one entry so read and so permitted (several stay the full entry's explicit choice, D11). Until the form's rows are
+ * at hand, and for every other token, it is the token as it was. */
 function readingToken(token) {
   const own = tokenReading(token);
   if (!own || (token.seq != null && token.seq !== '') || !readingAsksIndex(token.b, own) || !D.dictionaryIndex) return token;
@@ -10171,8 +10171,11 @@ function openReadingSlip(anchor, token, draw) {
     if (!live()) return settled();
     const door = readingToken(token);
     if (!drawn) drawn = draw(door);
-    else if ((door.seq || !dictionaryRowsForForm(token.b).length) && document.getElementById('mini') === drawn &&
-      !drawn.matches(':active')) drawn = draw(door);
+    // N · a card still saying "…" is drawn again once the answer is in, whatever it is — the entry read the text's way,
+    // no entry for the spelling, or none read the text's way (訳 read やく: "No dictionary entry for this reading.").
+    // The "…" never outlives the answer (Codex 0304: the cold first tap kept it after aria-busy cleared)
+    else if ((door.seq || !dictionaryRowsForForm(token.b).length || drawn.querySelector('.mini-wait')) &&
+      document.getElementById('mini') === drawn && !drawn.matches(':active')) drawn = draw(door);
     else settled();
   });
   return drawn;
