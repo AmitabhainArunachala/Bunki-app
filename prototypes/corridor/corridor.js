@@ -7941,6 +7941,7 @@ function storyPicture(p, { eager = false, cls = 'story-picture' } = {}) {
     frame.querySelector('.story-img')?.remove();
     const glyph = el('span', 'story-hero-kanji', kanji);
     glyph.lang = 'ja';
+    glyph.dataset.uiContent = 'learning';
     glyph.setAttribute('aria-hidden', 'true');
     frame.prepend(glyph);
     return true;
