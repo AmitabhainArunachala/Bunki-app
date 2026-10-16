@@ -63,10 +63,11 @@ button{font:inherit;color:inherit}
 .pad{flex:none;display:flex;gap:6px;align-items:center;padding:6px 12px 2px;overflow-x:auto;scrollbar-width:none;min-height:46px}
 .pad::-webkit-scrollbar{display:none}
 .pad .lab{font:italic 11px/1 var(--f-lab);color:var(--ink-2);flex:none;margin-right:2px}
-.key{flex:none;appearance:none;border:0;width:38px;height:64px;padding:0;border-radius:6px;background:#0d0d0d;color:#f1efd8;
-  font:400 17px/1 var(--f-disp);writing-mode:vertical-rl;text-orientation:upright;display:grid;place-items:center;cursor:pointer;position:relative;letter-spacing:.02em;overflow:hidden}
+.key{flex:none;appearance:none;border:0;width:44px;height:74px;padding:0;border-radius:6px;background:#0d0d0d;color:#f1efd8;
+  font:400 21px/1 var(--f-disp);writing-mode:vertical-rl;text-orientation:upright;display:grid;place-items:center;cursor:pointer;position:relative;letter-spacing:.02em;overflow:hidden}
 .key::after{content:"";position:absolute;right:4px;bottom:4px;width:5px;height:5px;border-radius:50%;background:var(--k,var(--shu))}
-.key.two{font-size:12px}
+.key.two{font-size:15px}
+.pad{min-height:84px}
 .pad .lab{writing-mode:horizontal-tb}
 .key:focus-visible{outline:2px solid var(--shu);outline-offset:2px}
 /* footer */
@@ -357,8 +358,9 @@ function drawLive(now){ const g=live.getContext('2d'); g.setTransform(DPR,0,0,DP
     const n=Math.min(6,p); for(let i=0;i<6;i++){ const dy=s.y-3-i*6; g.beginPath(); g.arc(s.x+17,dy,i<n?2.3:1.5,0,TAU); if(i<n){ g.fillStyle=col; g.globalAlpha=.95; g.fill(); } else { g.strokeStyle=T['ink-2']; g.globalAlpha=.16; g.lineWidth=.7; g.stroke(); } }
     g.globalAlpha=1;
     if(sealed){ g.fillStyle=T.shu; g.fillRect(s.x-20,s.y-19,10,10); g.fillStyle=T.paper; g.font=`7px ${F.disp}`; g.textAlign='center'; g.fillText('印',s.x-15,s.y-11.5); g.textAlign='left'; }
+    // the word must read at a glance on a busy ground: a paper halo under the label, and the label never fainter than the wash
     g.globalAlpha=Math.min(1,inkA+.15); g.fillStyle=T['ink-2']; g.font=`italic 10.5px ${F.lab}`; g.fillText(String(s.i+1).padStart(2,'0')+'  ×'+s.k.toFixed(2),s.x-7,s.y+21);
-    g.globalAlpha=Math.min(1,inkA+.25); g.fillStyle=T.ink; g.font=`12px ${F.jp}`; g.fillText(s.w.w,s.x-7,s.y+34); g.globalAlpha=1;
+    g.globalAlpha=1; g.font=`700 13.5px ${F.jp}`; g.lineJoin='round'; g.strokeStyle=T.paper; g.lineWidth=3.5; g.strokeText(s.w.w,s.x-7,s.y+36); g.globalAlpha=Math.max(.78,inkA); g.fillStyle=T.ink; g.fillText(s.w.w,s.x-7,s.y+36); g.globalAlpha=1;
   }
   // the level bar: one beat, rising in vermilion
   { const bx=W*.21,by=H*.16,bh=H*.11; g.strokeStyle=T['ink-2']; g.globalAlpha=.35; g.lineWidth=1; g.beginPath(); g.moveTo(bx,by); g.lineTo(bx,by+bh); g.stroke(); const lvl=playing?(1-master/TAU):0; g.globalAlpha=.9; g.fillStyle=T.shu; g.fillRect(bx-3,by+bh*(1-lvl),6,bh*lvl); g.globalAlpha=.8; g.fillStyle=T['ink-2']; g.font=`italic 9px ${F.lab}`; g.textAlign='center'; g.fillText('bar',bx,by+bh+11); g.textAlign='left'; g.globalAlpha=1; }
