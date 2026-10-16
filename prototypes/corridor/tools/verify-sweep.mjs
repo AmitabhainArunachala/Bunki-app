@@ -90,8 +90,60 @@ window.__SWEEP__ = {
   lang: (id) => { S.lang = id; render(); },
   grammar: () => { S.stack = []; S.strokes = null; go({ t: 'grammar', id: GRAMMARS()[0]?.id }); window.scrollTo(0, 0); },
   idiom: () => { S.stack = []; S.strokes = null; go({ t: 'idiom', id: Object.keys(D.idioms || {})[0] }); window.scrollTo(0, 0); },
-  closeLayers: () => { removeMini(); document.getElementById('vocabulary-list-popover')?.remove(); S.stack = []; S.strokes = null; render(); },
+  closeLayers: () => { closeVocabularyListPopover(); removeMini(); S.stack = []; S.strokes = null; render(); },
+  saved: (id) => S.taken.some((t) => t.id === id),
 };`;
+
+/* K · one behaviour (S brief §3: "same look, same behaviour, same words … never covering another control"). Before a
+ * press: the controls in reach — every control in the scope whose centre the finger reaches — by a signature that
+ * survives a redraw (tag, id, name, words, and its place among controls that share them). After it: the menu is open,
+ * and no control that was in reach is now under the menu. A control the page moved below the glass is still one scroll
+ * away, not covered. The scope is the surface the Save stands on: a card for a card's Save (a slip floats over the
+ * story by nature; its menu grows the card), the page for a row's or a bar's Save. */
+function reachable(scope) {
+  const root = scope ? document.querySelector(scope) : document;
+  if (!root) return [];
+  const seen = new Map();
+  const rows = [];
+  for (const n of root.querySelectorAll('button, a[href], input, select, textarea, summary, [role="button"], .tok')) {
+    if (n.closest('#vocabulary-list-popover, [data-bar]')) continue;
+    const base = [n.tagName, n.id, n.getAttribute('aria-label') || '', (n.textContent || '').replace(/\s+/gu, ' ').trim().slice(0, 24)].join('|');
+    const k = (seen.get(base) || 0) + 1;
+    seen.set(base, k);
+    const r = n.getBoundingClientRect();
+    if (!r.width || !r.height) continue;
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    if (y < 0 || y >= innerHeight || x < 0 || x >= innerWidth) continue;
+    const hit = document.elementFromPoint(x, y);
+    if (hit && (hit === n || n.contains(hit))) rows.push(`${base}#${k}`);
+  }
+  return rows;
+}
+function coveredBy({ before, scope }) {
+  const pop = document.getElementById('vocabulary-list-popover');
+  if (!pop) return { open: false };
+  const want = new Set(before);
+  const root = scope ? document.querySelector(scope) : document;
+  const seen = new Map();
+  const covered = [];
+  let checked = 0, moved = 0;
+  for (const n of root ? root.querySelectorAll('button, a[href], input, select, textarea, summary, [role="button"], .tok') : []) {
+    if (n.closest('#vocabulary-list-popover, [data-bar]')) continue;
+    const base = [n.tagName, n.id, n.getAttribute('aria-label') || '', (n.textContent || '').replace(/\s+/gu, ' ').trim().slice(0, 24)].join('|');
+    const k = (seen.get(base) || 0) + 1;
+    seen.set(base, k);
+    if (!want.has(`${base}#${k}`)) continue;
+    const r = n.getBoundingClientRect();
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    if (y >= innerHeight || y < 0) { moved += 1; continue; }
+    checked += 1;
+    const hit = document.elementFromPoint(x, y);
+    if (hit && pop.contains(hit)) covered.push(base.slice(0, 60));
+  }
+  const pr = pop.getBoundingClientRect();
+  const place = pop.classList.contains('is-drawer') ? 'drawer' : pop.classList.contains('is-inline') ? 'inline' : 'popover';
+  return { open: true, place, top: Math.round(pr.top), height: Math.round(pr.height), before: before.length, checked, moved, covered };
+}
 
 /* The scan: every class of the inventory, read off the drawn page. Defined in Node and sent as a function, so the
  * negative control and the real run read the page the same way. */
@@ -421,6 +473,86 @@ try {
           await page.locator('dialog.br-sheet[open]').waitFor(); await settle(500);
         });
         await page.evaluate(() => document.querySelector('dialog.br-sheet[open]')?.close());
+        if (MODE === 'verify') {
+          // K · one behaviour on every kind of place a Save stands: a card (the reader's, the sky's), a row (the page's
+          // sentence), a bar (the page's, the reader's) — one press keeps and opens its menu, which covers nothing in reach
+          const menu = async (id, scope, prepare, save) => {
+            const label = `${engine} ${lang} · K ${id}`;
+            try {
+              await prepare();
+              const before = await page.evaluate(reachable, scope);
+              if (NEGATIVE === 'cover') {
+                // the negative control: the page no longer steps down for a bar's drawer — the drawer lies over the page
+                await page.addStyleTag({ content: "html[data-save-drawer] :is(#app > .chrome, #sheet > .sheet-bar) { margin-bottom: 0 !important; }" });
+              }
+              await tap(save);
+              await page.waitForSelector('#vocabulary-list-popover', { timeout: 6000 });
+              await settle(500);
+              const state = await page.evaluate((sel) => {
+                const b = document.querySelector(sel);
+                return b ? { pressed: b.getAttribute('aria-pressed'), expanded: b.getAttribute('aria-expanded'), text: b.textContent.replace(/\s+/gu, ' ').trim() } : null;
+              }, save);
+              const cover = await page.evaluate(coveredBy, { before, scope });
+              check(`${label} · one press keeps it and opens its menu`, state?.pressed === 'true' && state.expanded === 'true' && cover.open,
+                JSON.stringify({ state, place: cover.place }));
+              check(`${label} · its menu covers no control that was in reach`, cover.open && cover.checked > 0 && cover.covered.length === 0,
+                JSON.stringify(cover));
+            } catch (error) {
+              check(`${label} · one press keeps it and opens its menu`, false, error.message);
+            }
+            await page.keyboard.press('Escape');
+            await settle(250);
+            await page.evaluate(() => window.__SWEEP__.closeLayers());
+            await settle(300);
+          };
+          const story = async (y) => {
+            await page.evaluate(() => window.__SWEEP__.closeLayers());
+            await page.evaluate(() => window.__SWEEP__.reader('スタートアップ'));
+            await settle(900);
+            await page.evaluate((top) => window.scrollTo(0, top), y);
+            await settle(400);
+          };
+          await menu('the reader card', '#mini', async () => {
+            await story(0);
+            await tap('#reader .tok[aria-label="出席"]');
+            await page.locator('#mini-take').waitFor();
+            await settle(400);
+          }, '#mini-take');
+          await menu("the reader's bar", null, async () => {
+            await story(260);
+            await tap('#reader .tok[aria-label="官邸"]');
+            await page.locator('#mini').waitFor();
+            await page.keyboard.press('Escape');
+            await settle(400);
+          }, '#chrome-keep');
+          const wordPage = async () => {
+            await story(0);
+            await tap('#reader .tok[aria-label="大臣"]');
+            await page.locator('#mini button.mini-word').waitFor();
+            await tap('#mini button.mini-word');
+            await page.locator('#sheet .sheet-bar').waitFor();
+            await settle(1100);
+          };
+          await menu("the page's bar", null, async () => {
+            await wordPage();
+            await page.evaluate(() => { document.getElementById('sheet').scrollTop = 300; });
+            await settle(400);
+          }, '#sheet-take');
+          await menu("the page's sentence", '#sheet', async () => {
+            await wordPage();
+            await page.evaluate(() => document.querySelector('#sheet .teacher-save')?.scrollIntoView({ block: 'center' }));
+            await settle(400);
+          }, '#sheet .teacher-save');
+          await menu('the sky card', '#mini', async () => {
+            await page.evaluate(() => { window.__SWEEP__.closeLayers(); window.__SWEEP__.visit('tray'); });
+            await settle(1100);
+            const star = page.locator('.today-star:not([hidden])').first();
+            const b = await star.boundingBox();
+            await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2);
+            await page.locator('#mini[data-from="sky"] #mini-take').waitFor();
+            await settle(500);
+          }, '#mini[data-from="sky"] #mini-take');
+        }
         // the layout under test: its five places
         await page.evaluate(() => window.__SWEEP__.layout('places'));
         for (const view of ['dojo', 'shelf', 'search', 'tests', 'me']) await room(`places-${view}`, async () => { await page.evaluate((v) => window.__SWEEP__.visit(v), view); await settle(900); });
