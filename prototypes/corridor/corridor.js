@@ -1474,6 +1474,10 @@ function positionRecordBand(node) {
 }
 function syncRecordBand() {
   if (typeof document === 'undefined' || !document.body) return null;
+  const on = recordNotSaving();
+  // Export works while saving is paused (it only reads the confirmed record); where this window cannot read a
+  // complete copy (another window owns the record, an import is crossing) the alert's reload is the way on
+  const exportable = on && recordExportable() && !!recordApp;
   if (!recordBandNode?.isConnected) {
     recordBandNode = document.getElementById('record-band');
     if (!recordBandNode) {
@@ -1484,10 +1488,6 @@ function syncRecordBand() {
       document.body.append(recordBandNode);
     }
   }
-  const on = recordNotSaving();
-  // Export works while saving is paused (it only reads the confirmed record); where this window cannot read a
-  // complete copy (another window owns the record, an import is crossing) the alert's reload is the way on
-  const exportable = on && recordExportable() && !!recordApp;
   const key = on ? `${S.lang}|${exportable ? 'export' : 'line'}` : '';
   if (recordBandNode.dataset.key !== key) {
     recordBandNode.dataset.key = key;
@@ -1569,10 +1569,6 @@ function askToKeepRecord() {
       refreshRecordKeepLine();
     }, () => {});
   } catch { /* not offered here */ }
-}
-if (typeof window !== 'undefined') {
-  for (const kind of ['pointerdown', 'touchstart', 'keydown']) window.addEventListener(kind, askToKeepRecord, { capture: true, passive: true });
-  readRecordKeep();
 }
 
 /* K · the record's size, measured after saves (at most once in 20 s, when the page is idle; the latest confirmed
@@ -1697,8 +1693,9 @@ function syncStoreAlert() {
     if (describedBy.size) sheet.setAttribute('aria-describedby', [...describedBy].join(' '));
     else sheet.removeAttribute('aria-describedby');
   }
-  // K · the band first: the alert's reason is placed beneath it
-  syncRecordBand();
+  // K · the band first: the alert's reason is placed beneath it. A band that cannot draw never costs the alert
+  // (retried on the next sync, like the alert's own layout)
+  try { syncRecordBand(); } catch { /* presentation never decides storage truth */ }
   positionStoreAlert(storeAlertNode);
   // protection and staleness arrive through this sync: they retire (or, when lifted, renew) the hint
   if (recordHint.active) { recheckRecordHintEligibility(); positionRecordHint(); }
@@ -3141,6 +3138,9 @@ function releaseRecordOwnership() {
  * are not an exclusion primitive. Updated tabs acquire RECORD_LOCK before
  * boot reads. Already-open old JavaScript does not honor that lock and must
  * be closed during upgrade; an unknown import state is preserved for recovery. */
+// K · once per boot, his first gesture asks the browser to keep the record (askToKeepRecord); boot reads the answer
+for (const kind of ['pointerdown', 'touchstart', 'keydown']) window.addEventListener(kind, askToKeepRecord, { capture: true, passive: true });
+readRecordKeep();
 const CROSSING_KEY = 'kairo-crossing-v1';
 window.addEventListener('storage', (e) => {
   // Storage is outside the portable record. Recheck active leases for every
