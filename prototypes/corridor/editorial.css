@@ -5238,7 +5238,9 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
   top: max(var(--record-band-top, 0px), env(safe-area-inset-top, 0px));
   left: 0;
   right: 0;
-  z-index: 131;
+  /* above the room (its bar rides at 20), beneath every overlay — the word's page (40), the writing room, the
+     picker, the alert (130): the band belongs to the rooms and never covers what opens over them */
+  z-index: 35;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -5255,6 +5257,10 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
   pointer-events: auto;
 }
 .record-band[hidden] { display: none; }
+/* the band takes its place in the frame: the room starts below it and below the alert's reason (corridor.js
+   reserveRecordFrame), so nothing of the room hides under them (a search field, a room's tools); as the page
+   scrolls, the room passes under them as it passes under the bar */
+body.record-not-saving #app > .chrome { margin-bottom: var(--record-band-h, 48px); }
 .record-band-seal {
   flex: none;
   width: 10px;

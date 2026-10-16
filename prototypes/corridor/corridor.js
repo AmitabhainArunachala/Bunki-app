@@ -1472,6 +1472,18 @@ function positionRecordBand(node) {
   }
   node.style.setProperty('--record-band-top', `${Math.ceil(lowerEdge)}px`);
 }
+/** While the band stands, the room starts below the frame it completes — the band and, when shown, the alert's
+ * reason under it (editorial.css: the bar's margin below) — so no field or tool of the room hides beneath them. */
+function reserveRecordFrame() {
+  const band = recordBandNode;
+  if (!band?.isConnected || band.hidden) return;
+  const top = band.getBoundingClientRect();
+  let bottom = top.bottom;
+  const alert = storeAlertNode;
+  if (alert?.isConnected && !alert.hidden && getComputedStyle(alert).display !== 'none')
+    bottom = Math.max(bottom, alert.getBoundingClientRect().bottom + 8);
+  if (bottom > top.top) document.body.style.setProperty('--record-band-h', `${Math.ceil(bottom - top.top)}px`);
+}
 function syncRecordBand() {
   if (typeof document === 'undefined' || !document.body) return null;
   const on = recordNotSaving();
@@ -1697,6 +1709,7 @@ function syncStoreAlert() {
   // (retried on the next sync, like the alert's own layout)
   try { syncRecordBand(); } catch { /* presentation never decides storage truth */ }
   positionStoreAlert(storeAlertNode);
+  try { reserveRecordFrame(); } catch { /* the same: retried on the next sync */ }
   // protection and staleness arrive through this sync: they retire (or, when lifted, renew) the hint
   if (recordHint.active) { recheckRecordHintEligibility(); positionRecordHint(); }
   return storeAlertNode;
