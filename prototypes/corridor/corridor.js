@@ -5879,7 +5879,8 @@ function renderShelfBody(search = null) {
   }
   const filters = S.shelfFilters ||= { sort: 'today', topic: '', jlpt: '', grade: '', text: '' };
   const unfiltered = !filters.text && !filters.topic && !filters.jlpt && !filters.grade;
-  const shelfOrder = filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : byNewest;
+  // the default order (今日の棚) opens on the newest drop; 最新 Latest keeps the publication order
+  const shelfOrder = filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : filters.sort==='latest' ? byNewest : byNewestDrop(newestDropDay(stories));
   // One slim chip bar. Each chip wears its current value; its native <select> lies over it,
   // transparent, so the platform's own picker opens and nothing is truncated on the surface.
   const controls = el('div', 'shelf-controls shelf-chipbar');
@@ -7785,6 +7786,21 @@ function byNewest(a, b) {
     return da < db ? 1 : -1;
   }
   return (Date.parse(b.publishedAt || '') || 0) - (Date.parse(a.publishedAt || '') || 0);
+}
+/** The newest drop leads (N, 2026-10-17): the rows that share the shelf's newest addedAt day stand first, in the order
+ * they arrived (the drop's own reading order in the index); every other row keeps byNewest. */
+function newestDropDay(rows) {
+  let day = '';
+  for (const p of rows) if (ISO_DAY.test(String(p?.addedAt || '')) && p.addedAt > day) day = p.addedAt;
+  return day;
+}
+function byNewestDrop(day) {
+  return (a, b) => {
+    const da = !!day && a.addedAt === day;
+    const db = !!day && b.addedAt === day;
+    if (da !== db) return da ? -1 : 1;
+    return da ? 0 : byNewest(a, b);
+  };
 }
 
 /** Days since a calendar day, counted on the reader's own calendar. */
@@ -12456,20 +12472,23 @@ function todaySecondsPerCard() {
   return gaps[Math.floor(gaps.length / 2)] / 1000;
 }
 /** The reading on today's line: the unread shelf story holding the most of the learner's saved
- * words (readingFacets.forms), else the shelf's newest approved story. */
+ * words (readingFacets.forms), else the shelf's first story that awaits no one — in the shelf's own
+ * order, so the newest drop leads here as it leads the shelf (N, 2026-10-17). */
 function todayReadPick() {
   const curated = (D.passages || []).filter((p) => !String(p.file || '').startsWith('archive/'));
-  const pool = shelfStories(curated).filter((p) => p.source !== 'isa-yasashii-glossary' && !owns(S.readDone || {}, p.id));
+  const stories = shelfStories(curated);
+  const pool = stories.filter((p) => p.source !== 'isa-yasashii-glossary' && !owns(S.readDone || {}, p.id));
   if (!pool.length) return null;
+  const order = byNewestDrop(newestDropDay(stories));
   const mine = new Set(S.taken.filter((i) => i.t === 'word').map((i) => i.id));
   let best = null;
   for (const p of pool) {
     const count = mine.size ? (p.readingFacets?.forms || []).filter((f) => mine.has(f)).length : 0;
-    if (!best || count > best.count || (count === best.count && byNewest(p, best.passage) < 0)) best = { passage: p, count };
+    if (!best || count > best.count || (count === best.count && order(p, best.passage) < 0)) best = { passage: p, count };
   }
   if (best.count) return best;
-  const approved = pool.filter((p) => p.review === 'approved');
-  return { passage: [...(approved.length ? approved : pool)].sort(byNewest)[0], count: 0 };
+  const ready = pool.filter((p) => !/-pending$/u.test(p.review || '') && !p.pendingVerification);
+  return { passage: [...(ready.length ? ready : pool)].sort(order)[0], count: 0 };
 }
 function todayLearning(tag, cls, text) {
   const node = el(tag, cls, text);
