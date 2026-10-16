@@ -1262,6 +1262,21 @@ body #shelf-body .story-card:focus-within { outline: 2px solid var(--tint); outl
   color: color-mix(in srgb, var(--topic, var(--tint)) 82%, #000);
   opacity: 0.82;
 }
+/* N · a picture-less story's key kanji (heroKanji), one 書 sheet: the world's ink on the world's paper, set large and
+   centred in the picture's own 3:2 box, so nothing moves; no category word, no block. The glyph scales with its box. */
+.story-picture.is-kanji,
+html[data-room='shelf'] #shelf-body .story-lead .story-picture.is-kanji {
+  display: grid;
+  place-items: center;
+  container-type: inline-size;
+  background: var(--color-paper);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-ink) 12%, transparent);
+}
+.story-picture .story-hero-kanji {
+  font: 500 42cqw/1 var(--font-headword, var(--serif));
+  color: var(--color-ink);
+  user-select: none;
+}
 /* the level, top-right on the picture: a capsule in the level's colour on a fine white ring */
 .story-picture .level-chip.level-badge {
   position: absolute;

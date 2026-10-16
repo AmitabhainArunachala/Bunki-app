@@ -7925,19 +7925,28 @@ function storyPictureSource(p) {
   if (window.__CORRIDOR_STANDALONE__ === true) return null;
   return pic;
 }
+/** N · a picture-less story's key kanji (its row's heroKanji): one or two kanji, else none. */
+function storyHeroKanji(p) {
+  return typeof p?.heroKanji === 'string' && /^[\p{Script=Han}々]{1,2}$/u.test(p.heroKanji) ? p.heroKanji : '';
+}
+/** The picture band, or null: a story with no picture shows its key kanji set large in the world's ink on the world's
+ * paper — one 書 sheet, no category word — and a story with neither has no band at all, never a placeholder block
+ * (N, the lead 2026-10-17: the first screen had a plain "CULTURE" block where a print stood). */
 function storyPicture(p, { eager = false, cls = 'story-picture' } = {}) {
   const frame = el('span', cls);
-  const [ja, en] = storyTopic(p);
-  const placeholder = () => {
-    frame.classList.add('is-placeholder');
+  const kanjiSheet = () => {
+    const kanji = storyHeroKanji(p);
+    if (!kanji) return false;
+    frame.classList.add('is-kanji');
     frame.querySelector('.story-img')?.remove();
-    // the topic's word, small and set in small capitals: it says what kind of story this is
-    const word = el('span', 'story-picture-word', bi() ? en : ja);
-    word.setAttribute('aria-hidden', 'true');
-    frame.prepend(word);
+    const glyph = el('span', 'story-hero-kanji', kanji);
+    glyph.lang = 'ja';
+    glyph.setAttribute('aria-hidden', 'true');
+    frame.prepend(glyph);
+    return true;
   };
   const pic = storyPictureSource(p);
-  if (!pic) { placeholder(); return frame; }
+  if (!pic) return kanjiSheet() ? frame : null;
   const img = el('img', 'story-img');
   img.src = `data/${pic.src}`;
   if (pic.srcSmall && /^articles\/pictures\/[\w.-]+$/u.test(pic.srcSmall) && pic.wSmall && pic.w) {
@@ -7949,7 +7958,8 @@ function storyPicture(p, { eager = false, cls = 'story-picture' } = {}) {
   if (pic.w && pic.h) { img.width = pic.w; img.height = pic.h; }
   img.loading = eager ? 'eager' : 'lazy';
   img.decoding = 'async';
-  img.addEventListener('error', placeholder, { once: true });
+  // a picture that cannot load gives way to the key kanji, or takes its band with it
+  img.addEventListener('error', () => { if (!kanjiSheet()) frame.remove(); }, { once: true });
   frame.append(img);
   return frame;
 }
@@ -8080,15 +8090,19 @@ function shelfCard(p, rank = 'grid') {
   // lead and the index rows carry it in their instrument line, beside the facts it belongs with
   if (!glossary) {
     const picture = storyPicture(p, { eager: rank === 'lead' || rank === 'second' });
-    if (rank === 'teaser') picture.append(levelChip(p, 'level-badge'));
-    open.append(picture);
+    if (picture && rank === 'teaser') picture.append(levelChip(p, 'level-badge'));
+    if (picture) open.append(picture);
   }
   const head = el('div', 'shelf-head');
   if (glossary) {
     const top = el('div', 'story-topline');
     top.append(storyKicker(p), levelChip(p));
     head.append(top);
-  } else if (rank === 'teaser') head.append(storyKicker(p));
+  } else if (rank === 'teaser') {
+    // a spine's level stands on its picture; a spine with no band carries it beside its kicker (one chip either way)
+    if (!open.querySelector('.story-picture')) head.append(levelChip(p));
+    head.append(storyKicker(p));
+  }
   else head.append(storyInstrument(p, rank === 'lead'));
   const headline = el('div', 'shelf-title', p.title);
   headline.lang = 'ja'; // so a headline breaks between phrases, never inside a word (word-break: auto-phrase)
@@ -23737,14 +23751,14 @@ function renderReviewNext(main) {
     const door = el('button', 'review-next-door');
     door.type = 'button';
     const picture = storyPicture(read.passage);
-    picture.classList.add('review-next-pic');
+    picture?.classList.add('review-next-pic');
     const text = el('span', 'review-next-text');
     text.append(el('span', 'review-next-l', tx('つぎの扉 · 読む', 'Next door · Read')),
       todayLearning('span', 'review-next-title', read.passage.title));
     if (read.count) text.append(el('span', 'review-next-n', tx(`あなたの語 ${read.count}`, `${read.count} of your words`)));
     const go = el('span', 'review-next-go btn-primary', tx('今すぐ読む', 'Read it now'));
     go.append(el('i', 'today-arrow'));
-    door.append(picture, text, go);
+    door.append(...(picture ? [picture] : []), text, go);
     door.addEventListener('click', () => {
       S.review = null;
       openPassage(read.passage.id);
