@@ -5388,7 +5388,9 @@ body:not(.ui-bi) #app > .chrome .chrome-keep .save-bar-verb { font-size: 10.5px;
   box-shadow: none;
   color: var(--color-bar-ink);
 }
-/* the drawer under a bar: the menu of a bar's Save, the width of the page's measure, flush under the bar */
+/* the drawer under a bar: the menu of a bar's Save, the width of the page's measure, flush under the bar. While it is open
+   the page under that bar steps down by its height (corridor.js setSaveDrawerPush), so it hangs in a space of its own and
+   lies over no other control; nothing is under it, so it casts nothing — a hairline at its foot ends it */
 :is(#mini, body) .vocabulary-list-popover.is-inline.is-drawer {
   position: fixed;
   top: var(--drawer-top, 0px);
@@ -5403,10 +5405,14 @@ body:not(.ui-bi) #app > .chrome .chrome-keep .save-bar-verb { font-size: 10.5px;
   overflow: auto;
   border: 0;
   border-bottom: var(--stroke-hairline) solid var(--color-bar-line, var(--color-rule));
-  border-radius: 0 0 var(--radius-overlay) var(--radius-overlay);
+  border-radius: 0;
   background: var(--color-paper, #f5efe0);
   color: var(--color-ink);
-  box-shadow: var(--elevation-card);
+  box-shadow: none;
+}
+html[data-save-drawer='room'] #app > .chrome[data-bar='room'],
+html[data-save-drawer='sheet'] #sheet > .sheet-bar[data-bar='sheet'] {
+  margin-bottom: var(--save-drawer-push, 0px);
 }
 
 /* ==========================================================================

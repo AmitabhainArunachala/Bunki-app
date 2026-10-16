@@ -8303,6 +8303,9 @@ document.addEventListener(
     if (pop && !pop.contains(target) && !target.closest?.('#mini-take, #personal-add-list, #kp-take, .save-one')) {
       const card = pop.classList.contains('is-inline') ? pop.closest('#mini') : null;
       if (card && (card.contains(target) || (miniAnchor?.isConnected && miniAnchor.contains(target)))) foldMenuAfterPress(pop);
+      // S · a bar's drawer holds the page a step down while it is open: it folds once the press has landed, so the page
+      // sliding back up never hands the press to whatever slid beneath the finger (W2's lesson, above)
+      else if (pop.classList.contains('is-drawer')) foldMenuAfterPress(pop);
       else closeVocabularyListPopover();
     }
     const mini = standingSlip();
@@ -8671,12 +8674,22 @@ function saveOne({ id = '', cls = '', label = '', saved, keep, review = null, no
     // busy, never disabled, while the item is kept: a disabled button drops the keyboard to the page
     button.setAttribute('aria-busy', 'true');
     const settle = (ok) => {
-      button.removeAttribute('aria-busy');
-      if (!button.isConnected) return ok;
+      // idle again, said in the attribute itself (one write, the same in every DOM the corridor runs in)
+      button.setAttribute('aria-busy', 'false');
+      if (!button.isConnected) {
+        // the keep drew its control again (the reader's bar names its word afresh after a save): the Save standing in its
+        // place opens the menu, so one press keeps and opens wherever the press was made
+        const fresh = id && typeof document !== 'undefined' ? document.getElementById?.(id) : null;
+        if (fresh && fresh !== button && fresh.getAttribute('aria-pressed') === 'true' && fresh.getAttribute('aria-expanded') !== 'true') {
+          fresh.saveOneOpen?.();
+        }
+        return ok;
+      }
       const now = !!saved();
       paintWordSave(button, now);
       paintMiniPath(button.closest('.mini-actions'), now);
-      if (now) openMenu();
+      // the menu follows a keep that went through (as the slip's Save did: its menu on the keep's own answer)
+      if (now || ok) openMenu();
       return ok;
     };
     return Promise.resolve(keep()).then(settle, () => settle(false));
@@ -8689,6 +8702,46 @@ function reopenSaveMenu(match) {
     const fresh = [...document.querySelectorAll('#app button.save-one')].find(match);
     fresh?.saveOneOpen?.();
   } catch { /* nothing to reopen: the press already did its keep */ }
+}
+/* S · a bar's Save hangs its menu from the bar as a drawer, and while it is open the page under that bar steps down by the
+ * drawer's height (the brief: "never covering another control"): the bar's own margin grows (editorial.css,
+ * html[data-save-drawer]) and its scroller keeps its offset, so what stood under the bar stands under the drawer. Both
+ * engines anchor scrolling, which would hold the page still and slide it beneath the drawer; the offset kept undoes that.
+ * The drawer lives on <body>, so a render under it keeps it; the margin is a rule on <html>, so a render keeps that too. */
+let saveDrawerWatch = null;
+function saveDrawerScroller(kind) {
+  return kind === 'sheet' ? document.getElementById('sheet') : document.scrollingElement || document.documentElement;
+}
+function setSaveDrawerPush(kind, px) {
+  const root = document.documentElement;
+  const scroller = saveDrawerScroller(kind);
+  const top = scroller ? scroller.scrollTop : 0;
+  if (px == null) {
+    delete root.dataset.saveDrawer;
+    root.style.removeProperty('--save-drawer-push');
+  } else {
+    root.dataset.saveDrawer = kind;
+    root.style.setProperty('--save-drawer-push', `${Math.ceil(px)}px`);
+  }
+  if (scroller && scroller.scrollTop !== top) scroller.scrollTop = top;
+}
+function holdPageUnderDrawer(pop, kind) {
+  if (!kind || !document.documentElement?.dataset) return;
+  pop.dataset.drawerFor = kind;
+  setSaveDrawerPush(kind, pop.offsetHeight);
+  saveDrawerWatch?.disconnect();
+  saveDrawerWatch = null;
+  if (typeof ResizeObserver !== 'function') return;
+  // a new list's row, a status line: the page keeps stepping down by exactly the drawer's height
+  saveDrawerWatch = new ResizeObserver(() => { if (pop.isConnected) setSaveDrawerPush(kind, pop.offsetHeight); });
+  saveDrawerWatch.observe(pop);
+}
+function releasePageUnderDrawer(pop) {
+  const kind = pop?.dataset?.drawerFor;
+  if (!kind) return;
+  saveDrawerWatch?.disconnect();
+  saveDrawerWatch = null;
+  setSaveDrawerPush(kind, null);
 }
 /** The one Save's menu for an item with no lists (a sentence, a link): its own rows only, in the same places. */
 function openPlainSaveMenu(invoker, { more = [], place = null } = {}) {
@@ -8741,6 +8794,7 @@ function placeSaveMenu(pop, invoker, place = null) {
     const bottom = bar ? bar.getBoundingClientRect().bottom : 0;
     pop.style.setProperty('--drawer-top', `${Math.max(0, Math.round(bottom))}px`);
     document.body.append(pop);
+    if (bar) holdPageUnderDrawer(pop, bar.dataset.bar);
   } else {
     document.body.append(pop);
     const anchor = invoker?.getBoundingClientRect();
@@ -8882,6 +8936,7 @@ function closeVocabularyListPopover({ restoreFocus = false } = {}) {
     return false;
   }
   pop.remove();
+  releasePageUnderDrawer(pop);
   const invoker = vocabularyListInvoker;
   vocabularyListInvoker = null; vocabularyListNode = null;
   invoker?.setAttribute('aria-expanded', 'false');
@@ -30848,7 +30903,9 @@ function composePage(node, path) {
       }
     }
     // one verb for one act (one-hand pass): the name is Save; aria-pressed says whether the word is saved
-    if (capNode !== node && !capture.getAttribute('aria-label')) capture.setAttribute('aria-label', tx(`「${capNode.id}」を保存`, `Save ${capNode.id}`));
+    if (!capture.getAttribute('aria-label')) {
+      capture.setAttribute('aria-label', capNode === node ? tx('保存', 'Save') : tx(`「${capNode.id}」を保存`, `Save ${capNode.id}`));
+    }
     // a word matched from a reader token cannot be carried safely by a card (D11)
     if (node.readerChoice) holdReaderCapture(capture);
     else if (capState === 'conflict' || capState === 'unavailable') {
