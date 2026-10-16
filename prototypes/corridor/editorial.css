@@ -3344,7 +3344,7 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 
 /* Baseline repairs: raised study surfaces and world-consistent sheet paper.
    The v2 compatibility bridge above remains an exact baseline mapping. */
-:where(body:not([data-view='drift'])) {
+:where(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
   --color-relief-edge: color-mix(in srgb, var(--color-ink) 30%, transparent);
 }
 body.v-depth-layered :is(
@@ -3471,7 +3471,12 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --world-zen-glow: var(--zen-glow);
 }
 
-:where(body:not([data-view='drift'])) {
+/* G1b · the word's page over the galaxy is the house's page. The front-door sky keeps its own variables and look (every
+   colour-role block skips body[data-view='drift']), but the page that covers it is a house surface: it found no
+   --color-paper (the page fell back to a fixed cream in every world) and no frame material (its bar was see-through, on
+   no hairline). Each role block (zero specificity) names that page too, so over the sky the page, its bar and its words
+   take the world's roles exactly as in every other room. */
+:where(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
   /* Colour roles: the world supplies pigments; the page supplies material. */
   --color-ground: var(--world-ground);
   --color-ground-2: var(--world-ground-2);
@@ -3603,7 +3608,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --elevation-focus: inset 0 -2px 0 var(--color-ink);
 }
 
-:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift'])) {
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
   --color-surface: var(--color-paper);
   --color-surface-sunk: color-mix(in srgb, var(--color-paper) 70%, var(--color-ground));
   --color-separator: color-mix(in srgb, var(--color-ink) 16%, transparent);
@@ -3620,7 +3625,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
 @media (max-width: 520px) {
   /* The shipped contrast variant's body rule keeps the full reading/display
      sizes; the compact scale applies only when that variant is switched off. */
-  :where(body:not([data-view='drift']):not(.v-contrast-wcag)) {
+  :where(body:not([data-view='drift']):not(.v-contrast-wcag), body[data-view='drift']:not(.v-contrast-wcag) #sheet) {
     --type-reading: 21px;
     --type-display: 29px;
   }
@@ -3628,7 +3633,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
 
 /* Compatibility bridge. Only aliases have the specificity needed to replace
    the earlier world/body declarations. Room-local pigments remain scoped. */
-:root body:not([data-view='drift']) {
+:root :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) {
   --ground: var(--color-ground);
   --ground-2: var(--color-ground-2);
   --ground-0: var(--color-paper);
@@ -3803,9 +3808,12 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
      G Grade     the 再難良易 seal bar: four seals in one row, the seal radius
      H Word      inline, no box; one selection mark — a hairline underline in the reading's colour
    ========================================================================== */
+/* G1b · the families serve the word's page over the galaxy too: its bar's search, Save and × were the browser's own
+   buttons there. Every family's gate admits that page — :is(body:not([data-view='drift']), body[data-view='drift']
+   :where(#sheet)) weighs (0,1,1) like the gate it replaces, so the cascade above is unchanged everywhere else. */
 
 /* ---- A · Primary ---- */
-body:not([data-view='drift']) :is(
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   .take:where(:not(.taken, .quiet)), .btn-primary, .chip:where(.btn-primary), .sheet-take:where(:not([aria-pressed='true'])),
   .kp-start, .kp-reveal, .kp-next, .kp-take,
   .gs-button:where(.primary), .cd-btn:where(.cd-primary), .cd-choice:where(.cd-primary), :where(.pc) .pc-primary, :where(#bunki-reports-root) .br-primary,
@@ -3822,21 +3830,21 @@ body:not([data-view='drift']) :is(
   letter-spacing: 0.02em;
   cursor: pointer;
 }
-body:not([data-view='drift']) :is(
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   .take:where(:not(.taken, .quiet)), .btn-primary, .chip:where(.btn-primary), .sheet-take:where(:not([aria-pressed='true'])),
   .kp-start, .kp-reveal, .kp-next, .kp-take,
   .gs-button:where(.primary), .cd-btn:where(.cd-primary), .cd-choice:where(.cd-primary), :where(.pc) .pc-primary, :where(#bunki-reports-root) .br-primary,
   .chat-send, :where(.exam-confirm) > .take
 ):hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-accent) 88%, #000); }
-body:not([data-view='drift']) :is(
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   .take:where(:not(.taken, .quiet)), .btn-primary, .chip:where(.btn-primary), .sheet-take:where(:not([aria-pressed='true'])),
   .kp-start, .kp-reveal, .kp-next, .kp-take,
   .gs-button:where(.primary), .cd-btn:where(.cd-primary), .cd-choice:where(.cd-primary), :where(.pc) .pc-primary, :where(#bunki-reports-root) .br-primary,
   .chat-send, :where(.exam-confirm) > .take
 ):where(:disabled) { background: var(--color-fill-strong); color: var(--color-muted); box-shadow: none; cursor: default; }
-body:not([data-view='drift']) :is(.take, .btn-primary, .chip:where(.btn-primary)) :where(.en-sub) { color: inherit; opacity: 0.82; }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.take, .btn-primary, .chip:where(.btn-primary)) :where(.en-sub) { color: inherit; opacity: 0.82; }
 /* at night the key is lit, never a solid fill: the accent as an emitted edge and a glow */
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) :is(
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   .take:where(:not(.taken, .quiet)), .btn-primary, .chip:where(.btn-primary), .sheet-take:where(:not([aria-pressed='true'])),
   .kp-start, .kp-reveal, .kp-next, .kp-take,
   .gs-button:where(.primary), .cd-btn:where(.cd-primary), .cd-choice:where(.cd-primary), :where(.pc) .pc-primary, :where(#bunki-reports-root) .br-primary,
@@ -3846,7 +3854,7 @@ body:not([data-view='drift']) :is(.take, .btn-primary, .chip:where(.btn-primary)
   color: var(--color-accent);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 72%, transparent), 0 0 0 0.5px var(--color-glow), 0 0 18px -2px var(--color-glow), 0 10px 24px -10px rgb(0 0 0 / 70%);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift']) :is(
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   .take:where(:not(.taken, .quiet)), .btn-primary, .chip:where(.btn-primary), .sheet-take:where(:not([aria-pressed='true'])),
   .kp-start, .kp-reveal, .kp-next, .kp-take,
   .gs-button:where(.primary), .cd-btn:where(.cd-primary), .cd-choice:where(.cd-primary), :where(.pc) .pc-primary, :where(#bunki-reports-root) .br-primary,
@@ -3854,7 +3862,7 @@ body:not([data-view='drift']) :is(.take, .btn-primary, .chip:where(.btn-primary)
 ):hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-accent) 15%, var(--color-ground)); }
 
 /* ---- B · Secondary: a hairline slip ---- */
-body:not([data-view='drift']) :is(
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   .chip:where(:not(.btn-primary, .btn-tertiary, .t-kanji, .t-word, .t-radical, .t-idiom)), .btn-secondary, .chip:where(.btn-secondary),
   .take:where(.taken), .take:where(.quiet), .sheet-take:where([aria-pressed='true']),
   .gs-button:where(:not(.primary)), .cd-btn:where(:not(.cd-primary)), .stroke-btn, :where(.stroke-controls) button,
@@ -3875,7 +3883,7 @@ body:not([data-view='drift']) :is(
   letter-spacing: 0;
   cursor: pointer;
 }
-body:not([data-view='drift']) :is(
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   .chip:where(:not(.btn-primary, .btn-tertiary, .t-kanji, .t-word, .t-radical, .t-idiom)), .btn-secondary,
   .take:where(.taken), .take:where(.quiet), .sheet-take:where([aria-pressed='true']),
   .gs-button:where(:not(.primary)), .cd-btn:where(:not(.cd-primary)), .stroke-btn, :where(.stroke-controls) button,
@@ -3885,14 +3893,14 @@ body:not([data-view='drift']) :is(
   .kp-delete, .vocabulary-list-create, :where(.vocabulary-list-form) .chip, :where(.vocabulary-list-dialog) > .chip,
   .kdx-lens, .focus-chip
 ):hover:where(:not(:disabled, [aria-disabled='true'])) { background: var(--color-fill); }
-body:not([data-view='drift']) :is(.chip, .gs-button, .cd-btn, .stroke-btn, .skip-more, .skip-retry, .reference-button):where(:disabled, [aria-disabled='true']) {
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.chip, .gs-button, .cd-btn, .stroke-btn, .skip-more, .skip-retry, .reference-button):where(:disabled, [aria-disabled='true']) {
   background: transparent;
   color: color-mix(in srgb, var(--color-ink) 42%, transparent);
   border-color: var(--color-line);
   cursor: default;
 }
 /* one A per screen: the sheet bar's Save is the A; the sheet's bottom Save is a slip */
-body:not([data-view='drift']) #sheet > button.take {
+:is(body:not([data-view='drift']), body[data-view='drift']) #sheet > button.take {
   min-height: 48px;
   padding: 0 20px;
   border: var(--stroke-hairline) solid var(--color-edge-strong);
@@ -3904,7 +3912,7 @@ body:not([data-view='drift']) #sheet > button.take {
 }
 /* the list variant: an option in a list of options, read in the reading face; the attempt
    register keeps its own ruled paper for options (register.css) */
-html:not([data-register='attempt']) body:not([data-view='drift']) :is(.lesson-option, .mock-opt, .gs-choice, .cd-choice:where(:not(.cd-primary))) {
+html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.lesson-option, .mock-opt, .gs-choice, .cd-choice:where(:not(.cd-primary))) {
   min-height: 48px;
   padding: 12px 14px;
   border: var(--stroke-hairline) solid var(--color-edge-strong);
@@ -3915,23 +3923,23 @@ html:not([data-register='attempt']) body:not([data-view='drift']) :is(.lesson-op
   text-align: start;
   cursor: pointer;
 }
-html:not([data-register='attempt']) body:not([data-view='drift']) :is(.lesson-option, .mock-opt, .gs-choice, .cd-choice:where(:not(.cd-primary))):hover:where(:not(:disabled)) { background: var(--color-fill); }
+html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.lesson-option, .mock-opt, .gs-choice, .cd-choice:where(:not(.cd-primary))):hover:where(:not(:disabled)) { background: var(--color-fill); }
 /* a toggle keeps its slip and takes the chosen mark (F's underline) when on */
-body:not([data-view='drift']) :is(.chip:where(.on), .kdx-lens:where(.on), .focus-chip:where(.on), .stroke-btn:where([aria-pressed='true']), :where(.stroke-controls) button:where([aria-pressed='true']), .chip:where([aria-pressed='true']):where(:not(.btn-primary))) {
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.chip:where(.on), .kdx-lens:where(.on), .focus-chip:where(.on), .stroke-btn:where([aria-pressed='true']), :where(.stroke-controls) button:where([aria-pressed='true']), .chip:where([aria-pressed='true']):where(:not(.btn-primary))) {
   color: var(--color-ink);
   background: transparent;
   border-color: var(--color-ink);
   box-shadow: inset 0 calc(0px - var(--stroke-focus)) 0 currentColor;
   font-weight: 700;
 }
-body:not([data-view='drift']) :is(.kdx-lens:where(.on), .focus-chip:where(.on)) :where(.l-ja, .en-sub) { color: inherit; }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.kdx-lens:where(.on), .focus-chip:where(.on)) :where(.l-ja, .en-sub) { color: inherit; }
 /* a graph's node kinds keep a quiet tint of their own, never a coloured or dashed edge */
-body:not([data-view='drift']) .chip:where(.t-kanji) { border: 0; background: color-mix(in srgb, var(--color-seal) 10%, transparent); color: color-mix(in srgb, var(--color-seal) 88%, var(--color-ink)); }
-body:not([data-view='drift']) .chip:where(.t-radical) { border: 0; background: var(--color-fill); color: var(--color-ink); }
-body:not([data-view='drift']) .chip:where(.t-idiom) { border: 0; background: color-mix(in srgb, #6a4a7a 11%, transparent); color: #5a3c69; }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .chip:where(.t-kanji) { border: 0; background: color-mix(in srgb, var(--color-seal) 10%, transparent); color: color-mix(in srgb, var(--color-seal) 88%, var(--color-ink)); }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .chip:where(.t-radical) { border: 0; background: var(--color-fill); color: var(--color-ink); }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .chip:where(.t-idiom) { border: 0; background: color-mix(in srgb, #6a4a7a 11%, transparent); color: #5a3c69; }
 
 /* ---- C · Quiet: a word, no box ---- */
-body:not([data-view='drift']) :is(
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   .btn-tertiary, .chip:where(.btn-tertiary), .kp-link, .gs-text, .nav-arrow, .sheet-back,
   :where(#bunki-reports-root) .br-close, .reference-text-button
 ) {
@@ -3947,16 +3955,16 @@ body:not([data-view='drift']) :is(
   text-decoration: none;
   cursor: pointer;
 }
-body:not([data-view='drift']) :is(
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   .btn-tertiary, .chip:where(.btn-tertiary), .kp-link, .gs-text, .nav-arrow, .sheet-back,
   :where(#bunki-reports-root) .br-close, .reference-text-button
 ):hover:where(:not(:disabled)) { background: var(--color-fill); }
-body:not([data-view='drift']) :is(.btn-tertiary, .gs-text, .kp-link):where(:disabled) { color: var(--color-muted); cursor: default; }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.btn-tertiary, .gs-text, .kp-link):where(:disabled) { color: var(--color-muted); cursor: default; }
 
 /* ---- D · Glyph: a 44 square, no box ---- */
 /* (the rule's × and the standalone popover's × are drawn at 32px and own a 44px reach of their own in
    player.css, measured by verify-kotoba-mine; they are not grown here) */
-body:not([data-view='drift']) :is(
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   .icon-button, .kp-icon, .sheet-close, .sheet-search, :where(#bunki-reports-root) .br-bug,
   :where(#app > .chrome) > button
 ) {
@@ -3970,11 +3978,11 @@ body:not([data-view='drift']) :is(
   box-shadow: none;
   cursor: pointer;
 }
-body:not([data-view='drift']) :is(.icon-button, .kp-icon, .sheet-close, .sheet-search, :where(#bunki-reports-root) .br-bug):hover { background: var(--color-fill); color: var(--color-ink); }
-body:not([data-view='drift']) :is(.icon-button:where([aria-expanded='true']), :where(details[open]) > .icon-button) { color: var(--color-accent); background: var(--color-tint-wash); }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.icon-button, .kp-icon, .sheet-close, .sheet-search, :where(#bunki-reports-root) .br-bug):hover { background: var(--color-fill); color: var(--color-ink); }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.icon-button:where([aria-expanded='true']), :where(details[open]) > .icon-button) { color: var(--color-accent); background: var(--color-tint-wash); }
 
 /* ---- E · Door: a paper card with a chevron ---- */
-body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, :where(#shelf-body) .grammar-link:where([data-grade='room'])) {
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.study-door, .foundation-door, .dojo-deck, :where(#shelf-body) .grammar-link:where([data-grade='room'])) {
   position: relative;
   border: var(--stroke-relief) solid var(--color-edge-strong);
   border-radius: var(--radius-card);
@@ -3984,8 +3992,8 @@ body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, :wh
   text-align: start;
   cursor: pointer;
 }
-body:not([data-view='drift']) :is(.study-door, .dojo-deck) { padding-right: 36px; }
-body:not([data-view='drift']) :is(.study-door, .dojo-deck)::after {
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.study-door, .dojo-deck) { padding-right: 36px; }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.study-door, .dojo-deck)::after {
   content: '';
   position: absolute;
   right: 16px;
@@ -3998,10 +4006,10 @@ body:not([data-view='drift']) :is(.study-door, .dojo-deck)::after {
   transform: rotate(45deg);
   opacity: 0.55;
 }
-body:not([data-view='drift']) :is(.study-door, .foundation-door, .dojo-deck, :where(#shelf-body) .grammar-link:where([data-grade='room'])):hover { border-color: var(--color-ink-2); }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.study-door, .foundation-door, .dojo-deck, :where(#shelf-body) .grammar-link:where([data-grade='room'])):hover { border-color: var(--color-ink-2); }
 
 /* ---- F · Segment / tab: words in a row, the chosen one inked and underlined ---- */
-body:not([data-view='drift']) :is(
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   :where(.seg) button, :where(.lang-seg) button, :where(.kp-seg) button, .gs-nav, :where(#bunki-reports-root .br-nav) button, :where(.pc nav) button,
   :where(.settings-language) button, :where(.settings-layout-choice) button, :where(.version-toggle) .version-choice, :where(.me-seg) button,
   :where(#variants .vseg) button
@@ -4017,7 +4025,7 @@ body:not([data-view='drift']) :is(
   letter-spacing: 0;
   cursor: pointer;
 }
-body:not([data-view='drift']) :is(
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   :where(.seg) button, :where(.lang-seg) button, :where(.kp-seg) button, .gs-nav, :where(#bunki-reports-root .br-nav) button, :where(.pc nav) button,
   :where(.settings-language) button, :where(.settings-layout-choice) button, :where(.version-toggle) .version-choice, :where(.me-seg) button,
   :where(#variants .vseg) button
@@ -4027,10 +4035,10 @@ body:not([data-view='drift']) :is(
   background: transparent;
   box-shadow: inset 0 calc(0px - var(--stroke-focus)) 0 currentColor;
 }
-body:not([data-view='drift']) :is(.seg, .lang-seg, .kp-seg, .me-seg, .settings-language, .settings-layout-choice, :where(#variants) .vseg) { border: 0; border-radius: var(--radius-control); background: transparent; box-shadow: none; }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.seg, .lang-seg, .kp-seg, .me-seg, .settings-language, .settings-layout-choice, :where(#variants) .vseg) { border: 0; border-radius: var(--radius-control); background: transparent; box-shadow: none; }
 
 /* ---- G · Grade: the 再難良易 seal bar ---- */
-body:not([data-view='drift']) :is(.cd-seal, :where(.pc-grades) button) {
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.cd-seal, :where(.pc-grades) button) {
   min-height: 44px;
   border: var(--stroke-hairline) solid var(--color-edge-strong);
   border-radius: var(--radius-seal);
@@ -4041,10 +4049,10 @@ body:not([data-view='drift']) :is(.cd-seal, :where(.pc-grades) button) {
 }
 
 /* ---- H · Word: inline, no box, one mark ---- */
-body:not([data-view='drift']) :is(.japanese-lookup-word, .gs-word, .kp-tok) { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.japanese-lookup-word, .gs-word, .kp-tok) { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 /* the mark: a hairline underline in the reading's colour, no fill — the reader's touched word (the
    header Save's target), the deck's looked-up word, a guided word and a web node under the pointer */
-body:not([data-view='drift']) :is(
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   :where(#reader .tok.tok-current) > .tok-word, :where(#reader .tok:hover) > .tok-word,
   .kp-tok:where(.kp-lit), .kp-tok:hover, .kp-tok:focus-visible,
   .gs-word:hover, .gs-word:focus-visible, .japanese-lookup-word:hover,
@@ -4058,8 +4066,8 @@ body:not([data-view='drift']) :is(
 /* ---- on the guided session's lacquer sheet (.gs-lacquer, the understanding) a quiet word and a slip take
    the sheet's own ink and line, so they read on lacquer (axe: colour contrast); the sheet's gold primary is
    its own (guided-session.css) ---- */
-body:not([data-view='drift']) .gs-lacquer :is(.gs-text, .gs-button:where(:not(.primary))) { color: var(--color-sheet-ink); border-color: var(--color-sheet-line); }
-body:not([data-view='drift']) .gs-lacquer :is(.gs-text, .gs-button:where(:not(.primary))):hover:where(:not(:disabled)) { background: var(--color-sheet-accent-wash); }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .gs-lacquer :is(.gs-text, .gs-button:where(:not(.primary))) { color: var(--color-sheet-ink); border-color: var(--color-sheet-line); }
+:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .gs-lacquer :is(.gs-text, .gs-button:where(:not(.primary))):hover:where(:not(:disabled)) { background: var(--color-sheet-accent-wash); }
 /* END BUNKI BUTTON FAMILIES ================================================= */
 
 /* ==========================================================================
@@ -4078,7 +4086,7 @@ body:not([data-view='drift']) .gs-lacquer :is(.gs-text, .gs-button:where(:not(.p
    --color-paper, card and zen grounds stay the world's own; everything
    derived from them (page, surface, ink ramp, lines, accents, light) moves.
    ========================================================================== */
-:where(body:not([data-view='drift'])) {
+:where(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
   --color-surface: color-mix(in srgb, var(--color-paper) 55%, #fffdf8);
   --color-surface-sunk: color-mix(in srgb, var(--color-ground) 70%, var(--color-ink) 4%);
   --color-ink-2: color-mix(in srgb, var(--color-ink) 82%, var(--color-paper));
@@ -4128,7 +4136,7 @@ body:not([data-view='drift']) .gs-lacquer :is(.gs-text, .gs-button:where(:not(.p
   --skin-ground: none;
 }
 /* ベロ藍・浪, the default world, is the concept's day palette exactly: sumi ink, 藍 structure */
-:where(:root:is(:not([data-theme]), [data-theme='']) body:not([data-view='drift'])) {
+:where(:root:is(:not([data-theme]), [data-theme='']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
   --color-ink: #1b1f26;
   --color-accent: #1f3a5f;
   --color-accent-wash: rgb(31 58 95 / 8%);
@@ -4136,7 +4144,7 @@ body:not([data-view='drift']) .gs-lacquer :is(.gs-text, .gs-button:where(:not(.p
 }
 /* night: lit, never inverted. Each night world keeps its own ground and paper; the
    light that crosses it is the city's (accent, live phosphor, lantern gold). */
-:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift'])) {
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
   --color-surface: var(--color-paper);
   --color-surface-sunk: color-mix(in srgb, var(--color-ground) 70%, #000);
   --color-ink-2: color-mix(in srgb, var(--color-ink) 84%, var(--color-ground));
@@ -4817,7 +4825,7 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
    Ink is near-black sumi; the quiet ramp moves up so nothing reads washed out. Values
    only and zero specificity: every room file and html[data-room] rule still wins.
    ========================================================================== */
-:where(body:not([data-view='drift'])) {
+:where(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
   /* each day world keeps its own paper (柿 stays persimmon, 赤 stays warm): the page is mostly the
      world's ground, raised paper and the frame are brighter papers tinted from it. The default
      world, his everyday one, has its own cooler values below. */
@@ -4853,14 +4861,14 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
   --skin-light: radial-gradient(120% 50% at 0% 0%, rgb(255 255 255 / 22%), transparent 60%);
 }
 /* ベロ藍・浪, the default world: sumi ink near-black, 藍 structure, a cleaner washi */
-:where(:root:is(:not([data-theme]), [data-theme='']) body:not([data-view='drift'])) {
+:where(:root:is(:not([data-theme]), [data-theme='']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
   --color-ink: #14171d;
   --color-surface: #fffefb;
   --color-bar: #fcfbf8;
 }
 /* night: the frame is the deepest tone, the page the world's ground, raised paper steps up
    in light with a lit top edge. Light is emitted (edges, glows), never a solid phosphor fill. */
-:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not([data-view='drift'])) {
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
   /* 96 + 4: percentages that sum under 100 make color-mix scale the alpha (0.92) — every night surface was quietly
      translucent (the word menu, the deck card); opaque paper now, the same tint */
   --color-surface: color-mix(in srgb, var(--color-paper) 96%, var(--color-ink) 4%);
@@ -4881,7 +4889,7 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
   --elevation-lift: inset 0 1px 0 rgb(255 255 255 / 8%), 0 2px 4px rgb(0 0 0 / 45%), 0 26px 48px -18px rgb(0 0 0 / 80%);
 }
 /* 殻 · the electric night: terminal black, phosphor edges */
-:where(:root[data-theme='kaku'] body:not([data-view='drift'])) {
+:where(:root[data-theme='kaku'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
   --color-bar: color-mix(in srgb, var(--color-ground) 70%, #000);
   --color-bar-line: color-mix(in srgb, var(--world-accent) 34%, transparent);
   --color-surface: color-mix(in srgb, var(--color-paper) 97%, var(--world-accent) 3%);
