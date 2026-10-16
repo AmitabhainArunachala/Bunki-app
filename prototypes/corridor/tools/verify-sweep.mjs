@@ -19,8 +19,9 @@
  *                    back, count and Remove at 4.5:1 or more on it;
  *   T  Today       — no box inside a box: the day's line carries no bordered box within it, and no + marks.
  * KAIRO_SWEEP_MODE=inventory lists every instance (and screenshots each room) without failing: S/INVENTORY.md is
- * built from that run on the base build. KAIRO_SWEEP_NEGATIVE=chip re-inserts one "Made by AI" chip in ONE room
- * (the reader) and the run must go red there and only there.
+ * built from that run on the base build. Negative controls, each red where it is planted and nowhere else:
+ * KAIRO_SWEEP_NEGATIVE=chip re-inserts one "Made by AI" chip in ONE room (the reader); =cover cancels the page's step down
+ * under a bar's drawer (the two drawers' "covers no control"); =box fills Today's cards line as a key (T, with cards).
  */
 /* global window, document, getComputedStyle, NodeFilter, innerWidth, innerHeight, localStorage */
 import assert from 'node:assert/strict';
@@ -359,6 +360,10 @@ try {
               (document.querySelector('.reader-meta') || document.querySelector('main')).append(chip);
             });
           }
+          if (NEGATIVE === 'box' && id === 'today-cards') {
+            // the negative control for T: the cards line filled as a key again (the base's look) — red here and only here
+            await page.addStyleTag({ content: '#review-start { background: #1f3a5f !important; color: #fff !important; }' });
+          }
           const found = await page.evaluate(scanPage);
           const more = extra ? await extra() : null;
           summary.rooms += 1;
@@ -383,6 +388,30 @@ try {
           return { found, more };
         };
 
+        // T: Today's line read off the page — no box, none inside it; whether the cards line is there (a record with cards)
+        const todayLine = () => page.evaluate(() => {
+            const line = document.querySelector('#app main .today-line');
+            // the paint's alpha, as either engine reports it: rgb()/rgba(), or WebKit's color(srgb r g b / a)
+            const alpha = (c) => {
+              const srgb = String(c).match(/color\(srgb [\d.]+ [\d.]+ [\d.]+(?: \/ ([\d.]+))?\)/u);
+              if (srgb) return srgb[1] == null ? 1 : Number(srgb[1]);
+              const m = String(c).match(/rgba?\(([^)]+)\)/u);
+              if (!m) return 1;
+              const p = m[1].split(/[ ,/]+/u).filter(Boolean);
+              return p.length > 3 ? Number(p[3]) : 1;
+            };
+            // a box: three or more drawn sides, a lifting shadow, or a surface of its own (a filled key is a box too)
+            const boxed = (n) => {
+              const cs = getComputedStyle(n);
+              const sides = ['Top', 'Right', 'Bottom', 'Left'].filter((s) => parseFloat(cs[`border${s}Width`]) > 0 && cs[`border${s}Style`] !== 'none').length;
+              const r = n.getBoundingClientRect();
+              // a hairline or an arrow's stroke paints, but it is no surface: a box is at least 12 px each way
+              return r.width >= 12 && r.height >= 12 && (sides >= 3 || (cs.boxShadow !== 'none' && !/^inset/u.test(cs.boxShadow)) || alpha(cs.backgroundColor) > 0.08);
+            };
+            const inner = line ? [...line.querySelectorAll('*')].filter((n) => n.getClientRects().length && boxed(n)).map((n) => n.id || n.className || n.tagName) : [];
+            const stars = [...document.querySelectorAll('.today-star')].filter((n) => !n.hidden).map((n) => ({ text: n.textContent, kind: n.className, why: n.dataset.why || '' }));
+            return { line: !!line, lineBoxed: line ? boxed(line) : null, innerBoxes: inner, stars, cards: !!line?.querySelector('#review-start') };
+          });
         await boot('&entry=shelf');
         // Read: the shelf, a story, its card, the card's Save menu, the page, the page's sentence and foot
         await room('shelf', async () => { await page.evaluate(() => window.__SWEEP__.visit('shelf')); await settle(700); });
@@ -427,21 +456,7 @@ try {
         });
         // Today, its sky and line; a star's card
         await room('today', async () => { await page.evaluate(() => { window.__SWEEP__.closeLayers(); window.__SWEEP__.visit('tray'); }); await settle(1100); },
-          () => page.evaluate(() => {
-            const line = document.querySelector('#app main .today-line');
-            const alpha = (c) => { const m = String(c).match(/rgba?\(([^)]+)\)/u); if (!m) return /color\(srgb [\d.]+ [\d.]+ [\d.]+ \/ 0\)/u.test(String(c)) ? 0 : 1; const p = m[1].split(/[ ,/]+/u).filter(Boolean); return p.length > 3 ? Number(p[3]) : 1; };
-            // a box: three or more drawn sides, a lifting shadow, or a surface of its own (a filled key is a box too)
-            const boxed = (n) => {
-              const cs = getComputedStyle(n);
-              const sides = ['Top', 'Right', 'Bottom', 'Left'].filter((s) => parseFloat(cs[`border${s}Width`]) > 0 && cs[`border${s}Style`] !== 'none').length;
-              const r = n.getBoundingClientRect();
-              // a hairline or an arrow's stroke paints, but it is no surface: a box is at least 12 px each way
-              return r.width >= 12 && r.height >= 12 && (sides >= 3 || (cs.boxShadow !== 'none' && !/^inset/u.test(cs.boxShadow)) || alpha(cs.backgroundColor) > 0.08);
-            };
-            const inner = line ? [...line.querySelectorAll('*')].filter((n) => n.getClientRects().length && boxed(n)).map((n) => n.id || n.className || n.tagName) : [];
-            const stars = [...document.querySelectorAll('.today-star')].filter((n) => !n.hidden).map((n) => ({ text: n.textContent, kind: n.className, why: n.dataset.why || '' }));
-            return { line: !!line, lineBoxed: line ? boxed(line) : null, innerBoxes: inner, stars };
-          }));
+          todayLine);
         await room('today-star-card', async () => {
           const star = page.locator('.today-star:not([hidden])').first();
           const b = await star.boundingBox();
@@ -589,6 +604,11 @@ try {
             await page.locator('#mini[data-from="sky"] #mini-take').waitFor();
             await settle(500);
           }, '#mini[data-from="sky"] #mini-take');
+          // T again, with cards waiting (the words the Saves above kept): the cards line is there and still no box
+          await room('today-cards', async () => {
+            await page.evaluate(() => { window.__SWEEP__.closeLayers(); window.__SWEEP__.visit('tray'); });
+            await settle(1100);
+          }, todayLine);
         }
         // the layout under test: its five places
         await page.evaluate(() => window.__SWEEP__.layout('places'));
@@ -622,9 +642,11 @@ try {
       check(`${label} · D its back, count and Remove hold 4.5:1 on the band`, solid && bar.parts.length >= 3 && low >= 4.5, `${low.toFixed(2)}:1 ${JSON.stringify(bar?.parts)}`);
     }
     // T: Today's line is one surface, no box inside it
-    for (const row of inventory.filter((r) => r.room === 'today')) {
+    for (const row of inventory.filter((r) => r.room === 'today' || r.room === 'today-cards')) {
       const t = row.extra;
-      check(`${row.engine} ${row.lang} · T Today's line is no box and holds none`, !!t && t.line && t.lineBoxed === false && t.innerBoxes.length === 0, JSON.stringify({ line: t?.lineBoxed, inner: t?.innerBoxes }));
+      const label = row.room === 'today' ? "T Today's line is no box and holds none" : "T with cards waiting, Today's cards line is there, no box and none inside";
+      check(`${row.engine} ${row.lang} · ${label}`, !!t && t.line && t.lineBoxed === false && t.innerBoxes.length === 0 && (row.room === 'today' || t.cards),
+        JSON.stringify({ line: t?.lineBoxed, inner: t?.innerBoxes, cards: t?.cards }));
     }
     // the walk itself: every room was reached (a room that does not open cannot hide an instance)
     check('the walk reached every room in both languages and both engines', summary.rooms >= Object.keys(engines).length * 2 * 50, `${summary.rooms} rooms`);
