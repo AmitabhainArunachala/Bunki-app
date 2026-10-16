@@ -7620,7 +7620,7 @@ function renderFeedEntry(entry, reference = null) {
   const linkKept = () => !!feedModule.parseFeedLibrary(S.feedLibrary).savedReferences.find((item) => item.entryId === (reference?.entryId || entry.id)
     && item.publisherId === (reference?.publisherId || entry.publisherId) && item.canonicalUrl === url);
   const save = saveOne({
-    cls: 'feed-save', label: title, saved: linkKept, attrs: { 'data-feed-save': reference?.entryId || entry.id },
+    cls: 'feed-save', label: title, saved: linkKept, data: { feedSave: reference?.entryId || entry.id },
     keep: () => feedStoreChange((library) => feedModule.toggleFeedReference(library, reference || entry)),
     more: () => [{ id: 'feed-save-remove', label: tx('外す', 'Remove'), run: () => feedStoreChange((library) => feedModule.toggleFeedReference(library, reference || entry)) }],
   });
@@ -8610,7 +8610,7 @@ function paintWordSave(button, on) {
       document.createTextNode(' '), el('span', 'save-bar-word', word || tx('語をタップ', 'a word')));
     button.classList.toggle('taken', on);
     button.setAttribute('aria-pressed', String(on));
-    button.removeAttribute('title');
+    button.title = '';
     return;
   }
   button.textContent = all
@@ -8622,7 +8622,7 @@ function paintWordSave(button, on) {
       : (on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save'));
   button.classList.toggle('taken', on);
   button.setAttribute('aria-pressed', String(on));
-  button.removeAttribute('title');
+  button.title = '';
 }
 /** The popup's one path: once saved, Save ▾ holds the rest. */
 function paintMiniPath(actions, saved) {
@@ -8640,7 +8640,7 @@ function paintMiniPath(actions, saved) {
  * (a sentence, a link) shows only those rows. The menu stands inside the control's own card or row ('inline'), or as a
  * drawer under a bar ('drawer'): never over another control. Each surface keeps its own keep path. */
 function saveOne({ id = '', cls = '', label = '', saved, keep, review = null, node = null, more = () => [], place = null,
-  held = false, word = '', all = 0, attrs = {} } = {}) {
+  held = false, word = '', all = 0, data = {} } = {}) {
   const button = el('button', `save-one btn-primary${cls ? ` ${cls}` : ''}`);
   button.type = 'button';
   if (id) button.id = id;
@@ -8651,7 +8651,8 @@ function saveOne({ id = '', cls = '', label = '', saved, keep, review = null, no
   if (all) button.dataset.saveAll = String(all);
   button.setAttribute('aria-haspopup', 'dialog');
   button.setAttribute('aria-expanded', 'false');
-  for (const [name, value] of Object.entries(attrs)) button.setAttribute(name, value);
+  // a surface's own hooks (data-enroll, data-airead-take, data-feed-save, data-save-bar) ride the dataset
+  Object.assign(button.dataset, data);
   paintWordSave(button, !!saved());
   if (held) {
     button.disabled = true;
@@ -8681,6 +8682,13 @@ function saveOne({ id = '', cls = '', label = '', saved, keep, review = null, no
     return Promise.resolve(keep()).then(settle, () => settle(false));
   });
   return button;
+}
+/** After a keep that drew its room again, the fresh Save standing where the pressed one stood opens its menu. */
+function reopenSaveMenu(match) {
+  try {
+    const fresh = [...document.querySelectorAll('#app button.save-one')].find(match);
+    fresh?.saveOneOpen?.();
+  } catch { /* nothing to reopen: the press already did its keep */ }
 }
 /** The one Save's menu for an item with no lists (a sentence, a link): its own rows only, in the same places. */
 function openPlainSaveMenu(invoker, { more = [], place = null } = {}) {
@@ -8722,10 +8730,11 @@ function openPlainSaveMenu(invoker, { more = [], place = null } = {}) {
 /** Where the one Save's menu stands: inside its card or row (the card grows; nothing is covered), as a drawer under its bar,
  * or (the lists popover of a surface with neither) beside its invoker. */
 function placeSaveMenu(pop, invoker, place = null) {
-  const where = place || (invoker?.closest?.('#mini, [data-save-row]') ? 'inline' : 'popover');
+  // single selectors only: the corridor's own fake DOM (test-word-saved-answer) reads one selector at a time
+  const where = place || (invoker?.closest?.('#mini') || invoker?.closest?.('[data-save-row]') ? 'inline' : 'popover');
   if (where === 'inline') {
     pop.classList.add('is-inline');
-    (invoker.closest('.mini-actions, [data-save-row]') || invoker).after(pop);
+    (invoker.closest('.mini-actions') || invoker.closest('[data-save-row]') || invoker).after(pop);
   } else if (where === 'drawer') {
     pop.classList.add('is-inline', 'is-drawer');
     const bar = invoker?.closest?.('[data-bar]');
@@ -14543,10 +14552,11 @@ function renderLessons(main) {
     const keepNode = { t: kt, id: w, from: null };
     const kept = () => !learningEnrollHeldText(keepNode) && S.taken.some((item) => item.t === kt && item.id === w);
     const b = saveOne({
-      cls: 'lesson-enroll-one', label: w, node: keepNode, saved: kept, held: !!heldText, attrs: { 'data-enroll': w },
+      cls: 'lesson-enroll-one', label: w, node: keepNode, saved: kept, held: !!heldText, data: { enroll: w },
       keep: async () => {
         const ok = await enroll([w]);
-        if (ok && kept()) document.querySelector(`#app [data-enroll="${CSS.escape(w)}"]`)?.saveOneOpen?.();
+        // the room was drawn again with the word kept: its fresh Save opens the menu where the pressed one stood
+        if (ok && kept()) reopenSaveMenu((node) => node.dataset?.enroll === w);
         return ok;
       },
       review: { saved: kept, toggle: () => toggleWordSave(keepNode, w) },
@@ -16176,10 +16186,10 @@ function renderMockResult(main, set, flat, run, selected) {
       const keepNode = { t, id, from: null };
       const kept = () => !learningEnrollHeldText(keepNode) && S.taken.some((item) => item.t === t && item.id === id);
       const b = saveOne({
-        cls: 'lesson-enroll-one', label: id, node: keepNode, saved: kept, held: !!heldText, attrs: { 'data-enroll': id },
+        cls: 'lesson-enroll-one', label: id, node: keepNode, saved: kept, held: !!heldText, data: { enroll: id },
         keep: async () => {
           const ok = await enroll([keepNode]);
-          if (ok && kept()) document.querySelector(`#app [data-enroll="${CSS.escape(id)}"]`)?.saveOneOpen?.();
+          if (ok && kept()) reopenSaveMenu((node) => node.dataset?.enroll === id);
           return ok;
         },
         review: { saved: kept, toggle: () => toggleWordSave(keepNode, id) },
@@ -22713,7 +22723,7 @@ function chromeKeep() {
     return !!now && !now.held && wordCaptureState(now.node) === 'taken';
   };
   const button = saveOne({
-    id: 'chrome-keep', cls: 'chrome-keep', label: target?.label || '', word: target?.label || '', attrs: { 'data-save-bar': '' },
+    id: 'chrome-keep', cls: 'chrome-keep', label: target?.label || '', word: target?.label || '', data: { saveBar: '' },
     node: target && !target.held && !target.identityHeld ? target.node : null, place: 'drawer', saved: savedNow,
     keep: () => {
       const now = chromeKeepTarget();
@@ -27695,7 +27705,7 @@ function renderAiReading(main) {
         const keepNode = { t: 'word', id: word, from: null };
         const kept = () => S.taken.some((capture) => capture.t === 'word' && capture.id === word);
         item.append(saveOne({
-          label: word, node: keepNode, saved: kept, attrs: { 'data-airead-take': word },
+          label: word, node: keepNode, saved: kept, data: { aireadTake: word },
           keep: () => (lookup(word) ? commitCapture({ t: 'word', id: word, from: null, by: 'sensei' }, word) : false),
           review: { saved: kept, toggle: () => toggleWordSave(keepNode, word) },
         }));
