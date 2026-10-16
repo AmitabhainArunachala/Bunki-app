@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Meguri 廻</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Old+Mincho:wght@400;700&family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&display=swap">
+<style>
+/* Layout: one screen, one instrument. A row of verbs on top, the orbit field filling the middle,
+   a pad of the last words heard, one line of counts. Every word is a station on a ring; a tap makes it the whole screen. */
+:root{
+  --paper:#ebe7dc; --paper-2:#ddd7c8; --ink:#1a1816; --ink-2:#6c665a; --line:rgba(26,24,22,.14);
+  --shu:#c4432c; --ai:#3a63a3; --oudo:#c47f3c; --rokusho:#3e7d6a; --murasaki:#5f4e92; --sumi:#3a3632;
+  --f-disp:'Dela Gothic One','Zen Old Mincho','Hiragino Mincho ProN',serif;
+  --f-jp:'Zen Old Mincho','Hiragino Mincho ProN','Yu Mincho',serif;
+  --f-lab:'Cormorant Garamond','Iowan Old Style',Georgia,serif;
+  --pig:var(--shu);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#171e2b; --paper-2:#111724; --ink:#e9e1cf; --ink-2:#a7a08f; --line:rgba(233,225,207,.14);
+    --shu:#de5b43; --ai:#8ba7d8; --oudo:#dba855; --rokusho:#6fb39d; --murasaki:#a696db; --sumi:#cfc7b5; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#171e2b; --paper-2:#111724; --ink:#e9e1cf; --ink-2:#a7a08f; --line:rgba(233,225,207,.14);
+  --shu:#de5b43; --ai:#8ba7d8; --oudo:#dba855; --rokusho:#6fb39d; --murasaki:#a696db; --sumi:#cfc7b5; color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --paper:#ece4d1; --paper-2:#dfd4bb; --ink:#24211f; --ink-2:#6a6356; --line:rgba(36,33,31,.14);
+  --shu:#c2402a; --ai:#2f4d7b; --oudo:#c0862e; --rokusho:#3e7d6a; --murasaki:#5f4e92; --sumi:#3a3632; color-scheme:light;
+}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 var(--f-jp);overflow:hidden;
+  display:flex;flex-direction:column;-webkit-text-size-adjust:100%;touch-action:manipulation}
+button{font:inherit;color:inherit}
+/* verbs */
+.bar{flex:none;display:flex;align-items:flex-end;gap:0;padding:6px 10px 0;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.bar::-webkit-scrollbar{display:none}
+.verb{flex:none;appearance:none;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:4px 6px 6px;border-bottom:2px solid transparent;cursor:pointer;min-width:38px;position:relative}
+.verb b{font:400 17px/1 var(--f-jp)}
+.verb i{font:italic 10px/1 var(--f-lab);color:var(--ink-2);letter-spacing:.02em;white-space:nowrap}
+.verb[data-on="1"]{border-bottom-color:var(--shu)}
+.verb[data-on="1"] i{color:var(--shu)}
+.verb:focus-visible{outline:2px solid var(--shu);outline-offset:-2px;border-radius:6px}
+.verb .dots{position:absolute;top:0;right:3px;font:700 9px/1 var(--f-lab);color:var(--shu);letter-spacing:1px;text-decoration:none}
+.title{margin-left:auto;display:flex;align-items:baseline;gap:6px;padding:0 2px 8px 10px;flex:none}
+.title .mark{font:400 22px/1 var(--f-disp);color:var(--shu)}
+.title .name{font:italic 13px/1 var(--f-lab);color:var(--ink-2)}
+/* field */
+#field{flex:1 1 auto;position:relative;min-height:0;overflow:hidden}
+#field canvas{position:absolute;inset:0;display:block}
+#live{cursor:pointer}
+#grain{pointer-events:none}
+.hint{position:absolute;left:14px;bottom:10px;font:italic 12px/1.35 var(--f-lab);color:var(--ink-2);pointer-events:none;transition:opacity .6s;max-width:58%}
+.hint .jp{display:block;font:12px/1.4 var(--f-jp);color:var(--ink)}
+.hint.off{opacity:0}
+/* pad: the last words heard */
+.pad{flex:none;display:flex;gap:6px;align-items:center;padding:6px 12px 2px;overflow-x:auto;scrollbar-width:none;min-height:46px}
+.pad::-webkit-scrollbar{display:none}
+.pad .lab{font:italic 11px/1 var(--f-lab);color:var(--ink-2);flex:none;margin-right:2px}
+.key{flex:none;appearance:none;border:0;width:44px;height:74px;padding:0;border-radius:6px;background:#0d0d0d;color:#f1efd8;
+  font:400 21px/1 var(--f-disp);writing-mode:vertical-rl;text-orientation:upright;display:grid;place-items:center;cursor:pointer;position:relative;letter-spacing:.02em;overflow:hidden}
+.key::after{content:"";position:absolute;right:4px;bottom:4px;width:5px;height:5px;border-radius:50%;background:var(--k,var(--shu))}
+.key.two{font-size:15px}
+.pad{min-height:84px}
+.pad .lab{writing-mode:horizontal-tb}
+.key:focus-visible{outline:2px solid var(--shu);outline-offset:2px}
+/* footer */
+.foot{flex:none;display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:4px 14px 6px;border-top:1px solid var(--line);
+  font:italic 12px/1.3 var(--f-lab);color:var(--ink-2);min-height:26px}
+.foot .jp{font:12px/1.3 var(--f-jp);color:var(--ink)}
+.foot button{appearance:none;border:1px solid var(--line);background:none;border-radius:999px;padding:2px 10px;font:12px/1.3 var(--f-jp);cursor:pointer;margin-left:4px}
+.foot button.yes{border-color:var(--shu);color:var(--shu)}
+.foot .credit{margin-left:auto;opacity:.7}
+/* the word, whole screen */
+.page{position:fixed;inset:0;z-index:30;background:var(--paper);color:var(--ink);overflow:auto;-webkit-overflow-scrolling:touch;
+  padding:calc(env(safe-area-inset-top,0px) + 6px) 18px calc(env(safe-area-inset-bottom,0px) + 30px);
+  transform-origin:var(--ox,50%) var(--oy,50%);transform:scale(.14);opacity:0;
+  transition:transform .46s cubic-bezier(.22,.9,.24,1.03),opacity .28s ease}
+.page.in{transform:none;opacity:1}
+.page-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:0;background:var(--paper);padding:6px 0 8px;z-index:2}
+.page-tools{display:flex;gap:6px}
+.pbtn{appearance:none;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 12px;font:15px/1 var(--f-jp);
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;min-height:36px}
+.pbtn i{font:italic 11px/1 var(--f-lab);color:var(--ink-2)}
+.pbtn[data-on="1"]{border-color:var(--shu);color:var(--shu)}
+.pbtn:focus-visible{outline:2px solid var(--shu);outline-offset:2px}
+.poster{display:grid;grid-template-columns:auto 1fr auto;align-items:start;gap:14px;padding:14px 0 10px}
+.dots{display:flex;flex-direction:column;gap:9px;padding-top:12px}
+.dots s{width:14px;height:14px;border-radius:50%;display:block;text-decoration:none;border:1.5px solid var(--line);box-sizing:border-box}
+.dots s.on{background:var(--pig);border-color:var(--pig)}
+.dots s.seal{border-radius:3px;background:var(--shu);border-color:var(--shu)}
+.big{writing-mode:vertical-rl;text-orientation:upright;font:400 clamp(70px,23vw,132px)/1 var(--f-disp);letter-spacing:-.02em;margin:0 auto;white-space:nowrap}
+.big span{display:inline;color:transparent;background:linear-gradient(180deg,var(--pig) 0 54%,var(--ink) 54% 100%);-webkit-background-clip:text;background-clip:text}
+.big span:nth-child(even){background:linear-gradient(180deg,var(--ink) 0 46%,var(--pig) 46% 100%);-webkit-background-clip:text;background-clip:text}
+.plate{margin:0 auto;display:block;max-width:100%;border-radius:10px}
+.side{writing-mode:vertical-rl;padding-top:10px}
+.reading{font:700 clamp(18px,5vw,26px)/1.2 var(--f-jp);letter-spacing:.06em}
+.meaning{margin:0;font:italic clamp(17px,4.6vw,22px)/1.3 var(--f-lab);color:var(--ink-2);text-wrap:balance}
+.def{margin:6px 0 0;font:15px/1.7 var(--f-jp)}
+.kanji{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:6px}
+.kanji li{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.kanji .c{font:400 28px/1 var(--f-disp);color:var(--pig)}
+.kanji .r{font:14px/1.3 var(--f-jp)}
+.kanji .m{font:italic 13px/1.3 var(--f-lab);color:var(--ink-2);display:block}
+.kanji .more{font:italic 11px/1 var(--f-lab);color:var(--ink-2)}
+.kanji .parts{grid-column:1/-1;display:none;gap:6px;flex-wrap:wrap;padding-top:2px}
+.kanji li.open .parts{display:flex}
+.kanji li.open .more{color:var(--pig)}
+.parts span{font:15px/1 var(--f-jp);padding:5px 9px;border:1px solid var(--line);border-radius:6px}
+.parts .lab{font:italic 12px/1 var(--f-lab);color:var(--ink-2);border:0;padding-left:0}
+.sent{margin:16px 0 0;padding:12px 0 0;border-top:1px solid var(--line);font:16px/1.95 var(--f-jp)}
+.sent mark{background:none;color:var(--pig);border-bottom:2px solid var(--pig)}
+.page-foot{display:flex;justify-content:space-between;gap:10px;margin-top:14px;font:italic 12px/1.3 var(--f-lab);color:var(--ink-2)}
+.menu{position:absolute;right:18px;top:54px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:6px;display:grid;gap:4px;min-width:180px;box-shadow:0 10px 28px rgba(0,0,0,.14);z-index:3}
+.menu button{appearance:none;border:0;background:none;text-align:left;padding:8px 10px;border-radius:8px;font:15px/1.2 var(--f-jp);display:flex;justify-content:space-between;gap:10px;cursor:pointer}
+.menu button:hover,.menu button:focus-visible{background:var(--paper-2);outline:0}
+.menu button small{font:italic 12px/1.2 var(--f-lab);color:var(--ink-2)}
+.menu .new{display:none;gap:6px;padding:4px}
+.menu.naming .new{display:flex}
+.menu .new input{flex:1 1 auto;min-width:0;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--paper);color:var(--ink);font:15px/1.2 var(--f-jp)}
+.menu .new button{padding:6px 10px;border:1px solid var(--shu);color:var(--shu);border-radius:8px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-50%);background:var(--ink);color:var(--paper);
+  padding:8px 16px;border-radius:999px;font:14px/1.2 var(--f-jp);z-index:40;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){ .page{transition:opacity .12s linear;transform:none} }
+@media (min-width:720px){
+  .page{padding-left:max(18px,calc(50vw - 330px));padding-right:max(18px,calc(50vw - 330px))}
+  .big{font-size:clamp(90px,12vw,150px)}
+}
+</style>
+
+<header class="bar" id="bar">
+  <button class="verb" id="b-play" data-on="0" aria-label="turn the rings"><b>回</b><i>turn</i></button>
+  <button class="verb" id="b-voice" data-v="1" aria-label="sound"><b>声</b><i>voice</i><s class="dots">·</s></button>
+  <button class="verb" id="b-link" data-on="0"><b>結</b><i>link</i></button>
+  <button class="verb" id="b-fly"><b>飛</b><i>fly</i></button>
+  <button class="verb" id="b-grow" data-on="1"><b>育</b><i>grow</i></button>
+  <button class="verb" id="b-drift" data-on="0"><b>漂</b><i>drift</i></button>
+  <button class="verb" id="b-night"><b>夜</b><i>night</i></button>
+  <button class="verb" id="b-reset"><b>戻</b><i>reset</i></button>
+  <div class="title"><span class="mark">廻</span><span class="name">Meguri</span></div>
+</header>
+
+<main id="field">
+  <canvas id="paper" aria-hidden="true"></canvas>
+  <canvas id="live" role="img" aria-label="Thirty-six N1 words on five rings; a playhead on each ring reads the words in turn"></canvas>
+  <canvas id="grain" aria-hidden="true"></canvas>
+  <div class="hint" id="hint"><span class="jp">言葉を叩くと、画面いっぱいに開く。</span>Tap a word to open it. 回 turns the rings; the disc sets the beat.</div>
+</main>
+
+<div class="pad" id="pad"><span class="lab">heard</span></div>
+
+<footer class="foot">
+  <span class="jp" id="f-words">三十六語</span>
+  <span class="jp">五声</span>
+  <span id="f-bpm">72 bpm</span>
+  <span id="f-passed">0 passed · 0 sealed</span>
+  <span class="credit">strokes · KanjiVG (CC BY-SA)</span>
+  <span id="f-reset" hidden><span class="jp">全部戻す？</span><button class="yes" id="f-yes">はい</button><button id="f-no">いいえ</button></span>
+</footer>
+
+<section id="page" class="page" hidden role="dialog" aria-modal="true" aria-labelledby="p-word">
+  <div class="page-bar">
+    <button class="pbtn" id="p-back">←<i>back</i></button>
+    <div class="page-tools">
+      <button class="pbtn" id="p-say" aria-label="say it">声</button>
+      <button class="pbtn" id="p-seal" data-on="0">印<i>seal</i></button>
+      <button class="pbtn" id="p-save">▾<i>save</i></button>
+    </div>
+  </div>
+  <div class="poster">
+    <div class="dots" id="p-dots"></div>
+    <div class="big" id="p-word"></div>
+    <div class="side"><div class="reading" id="p-reading"></div></div>
+  </div>
+  <p class="meaning" id="p-meaning"></p>
+  <p class="def" id="p-def"></p>
+  <ol class="kanji" id="p-kanji"></ol>
+  <blockquote class="sent" id="p-sent"></blockquote>
+  <div class="page-foot"><span id="p-orbit"></span><span id="p-passes"></span></div>
+  <div class="menu" id="menu" hidden></div>
+</section>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="font.js"></script>
+<script src="kvg.js"></script>
+<script src="kanji.js"></script>
+<script src="kakuji.js"></script>
+<script src="kakuji2.js"></script>
+<script src="posters.js"></script>
+<script src="assets.js"></script>
+<script src="assets_sound.js"></script>
+<script>
+(function(){
+'use strict';
+const WORDS=[{"w":"関与","r":"かんよ","m":"involvement, participation","d":"物事に深くかかわること","g":"mind","k":[{"c":"関","m":"connection","r":"かん","p":["門","关","天"]},{"c":"与","m":"bestow","r":"よ","p":["一"]}],"s":"逆に、授業や仕事に主体的に関与していると感じる人ほど、記憶が定着しやすい傾向があるとされています。"},{"w":"対照的","r":"たいしょうてき","m":"contrasting","d":"二つを比べると違いがはっきりする様子","g":"ai","k":[{"c":"対","m":"vis-a-vis","r":"たい","p":["文","寸"]},{"c":"照","m":"illuminate","r":"しょう","p":["昭","灬"]},{"c":"的","m":"bull's eye","r":"てき","p":["白","勺","勹"]}],"s":"AIの規制をめぐる各国の姿勢は、驚くほど対照的だ。"},{"w":"奉仕","r":"ほうし","m":"service, selfless devotion","d":"報酬を求めず、人のために尽くすこと。","g":"india","k":[{"c":"奉","m":"observance","r":"ほう","p":["三","大","人"]},{"c":"仕","m":"attend","r":"し","p":["亻","士"]}],"s":"これは、結果への執着をきれいに手放した奉仕こそが、人を自由にするという考え方である。"},{"w":"多岐","r":"たき","m":"wide-ranging, many-branched","d":"いくつにも分かれて広がること","g":"history","k":[{"c":"多","m":"many","r":"た","p":["夕"]},{"c":"岐","m":"branch off","r":"き","p":["山","支"]}],"s":"たとえば大航海時代ひとつとっても、航海術や香辛料の貿易はもちろん、宗教や銀の流通まで、話題は多岐に及びます。"},{"w":"被害者","r":"ひがいしゃ","m":"victim","d":"災難や損害を受けた人。","g":"ai","k":[{"c":"被","m":"incur","r":"ひ","p":["衤","皮"]},{"c":"害","m":"harm","r":"がい","p":["宀","龶","口"]},{"c":"者","m":"someone","r":"しゃ","p":["耂","土","日"]}],"s":"被害者の多くは、電話口の声が本物だと信じ込み、疑う間もなく指示に従ってしまったという。"},{"w":"故意","r":"こい","m":"intention, deliberateness","d":"わざとそうすること","g":"history","k":[{"c":"故","m":"happenstance","r":"こ","p":["古","攵","乂"]},{"c":"意","m":"idea","r":"い","p":["音","心"]}],"s":"ルネサンス期のイタリアでは、故意に事実を歪めて書かれた歴史書がいくつも存在しました。"},{"w":"河川","r":"かせん","m":"rivers","d":"大小の川をまとめて言う語","g":"ai","k":[{"c":"河","m":"river","r":"か","p":["氵","可"]},{"c":"川","m":"stream","r":"せん","p":[]}],"s":"洪水の予測に、河川の水位データを学習した人工知能が使われ始めている。"},{"w":"樹木","r":"じゅもく","m":"trees and shrubs","d":"幹や枝をもつ木の総称","g":"ai","k":[{"c":"樹","m":"timber","r":"じゅ","p":["木","壴","吉"]},{"c":"木","m":"tree","r":"もく","p":[]}],"s":"国際研究チームは、衛星画像とAIを使って、アフリカ西部の乾燥地にある樹木を一本ずつ数えあげた。"},{"w":"振動","r":"しんどう","m":"vibration, oscillation","d":"物が小刻みに揺れ動くこと","g":"language","k":[{"c":"振","m":"shake","r":"しん","p":["扌","辰","厂"]},{"c":"動","m":"move","r":"どう","p":["重","力"]}],"s":"「か」と「が」の違いは、口の形ではなく、声帯が振動するかどうかにある。"},{"w":"設置","r":"せっち","m":"installation, establishment","d":"機器や機関を置いて備えること","g":"ai","k":[{"c":"設","m":"establishment","r":"せっ","p":["言","殳","几"]},{"c":"置","m":"placement","r":"ち","p":["罒","直"]}],"s":"「データセンターを設置する」と「建設する」は、ニュースでよく混ざって使われる。"},{"w":"戯曲","r":"ぎきょく","m":"play, drama script","d":"舞台で演じるために書かれた台本","g":"ai","k":[{"c":"戯","m":"frolic","r":"ぎ","p":["虚","戈"]},{"c":"曲","m":"bend","r":"きょく","p":["日","曰","廾"]}],"s":"戯曲の骨組みは人間の演出家が整えたものの、台詞の多くは機械が書いたという。"},{"w":"態勢","r":"たいせい","m":"posture, readiness; setup for action","d":"物事に取り組むための構えや準備","g":"ai","k":[{"c":"態","m":"attitude","r":"たい","p":["能","心"]},{"c":"勢","m":"forces","r":"せい","p":["埶","土","儿"]}],"s":"その結果、旧型チップの分野では自前で量産できる態勢が急速に整いつつあるのです。"},{"w":"政府筋","r":"せいふすじ","m":"government sources","d":"政府に近い関係者のこと","g":"mind","k":[{"c":"政","m":"politics","r":"せい","p":["正","攵","乂"]},{"c":"府","m":"borough","r":"ふ","p":["广","厂","付"]},{"c":"筋","m":"muscle","r":"すじ","p":["竹","肋","月"]}],"s":"「政府筋によると」という書き出しの記事は、読者に独特の読み方を求める。"},{"w":"連日","r":"れんじつ","m":"day after day; every day","d":"毎日つづくこと","g":"history","k":[{"c":"連","m":"take along","r":"れん","p":["車","辶"]},{"c":"日","m":"day","r":"じつ","p":[]}],"s":"世紀の大会議とあって、各国の代表は連日のように舞踏会や晩餐に招かれ、肝心の協議は遅々として進まなかったという。"},{"w":"無茶","r":"むちゃ","m":"absurd, unreasonable","d":"筋が通らず、むやみに乱暴なこと","g":"history","k":[{"c":"無","m":"nothingness","r":"む","p":["丿","一","灬"]},{"c":"茶","m":"tea","r":"ちゃ","p":["艹","人","木"]}],"s":"一四九二年、コロンブスが「西に進めばアジアに着く」と主張したとき、周囲は無茶だと笑ったといいます。"},{"w":"企画","r":"きかく","m":"planning; project; proposal","d":"計画を立てて案をまとめること","g":"language","k":[{"c":"企","m":"undertake","r":"き","p":["人","止"]},{"c":"画","m":"brush-stroke","r":"かく","p":["一","由","田"]}],"s":"動画で日本語を扱う企画を考えるとき、いちばん大事なのは「それ、誰が知りたいの」という問いだと思う。"},{"w":"移行","r":"いこう","m":"switching over, transition","d":"別の状態や方式に移ること","g":"language","k":[{"c":"移","m":"shift","r":"い","p":["禾","丿","木"]},{"c":"行","m":"going","r":"こう","p":["彳","亻"]}],"s":"日本語の書き言葉は、明治から昭和にかけて、文語から口語へと移行しました。"},{"w":"政策","r":"せいさく","m":"policy, political measures","d":"国や自治体が定める方針と手段","g":"history","k":[{"c":"政","m":"politics","r":"せい","p":["正","攵","乂"]},{"c":"策","m":"scheme","r":"さく","p":["竹","朿","木"]}],"s":"ねえ、江戸の鎖国って、よく政策として語られるけど、実際は外交をぜんぶ閉じたわけじゃないんですよね。"},{"w":"内訳","r":"うちわけ","m":"breakdown; itemization","d":"全体を構成する項目とその金額・数","g":"mind","k":[{"c":"内","m":"inside","r":"うち","p":["冂","丨","人"]},{"c":"訳","m":"translate","r":"わけ","p":["言","尺"]}],"s":"自分の一日の時間の内訳を、一週間だけ記録してみた人の多くが驚くという。"},{"w":"痛感","r":"つうかん","m":"feeling keenly, fully realizing","d":"身にしみて強く感じること","g":"ai","k":[{"c":"痛","m":"pain","r":"つう","p":["疒","甬","用"]},{"c":"感","m":"emotion","r":"かん","p":["咸","戍","戌"]}],"s":"最近、生成AIにメールの下書きを頼むようになって、自分の日本語の甘さを痛感してるんですよ。"},{"w":"救援","r":"きゅうえん","m":"relief, rescue","d":"困っている人を助けに行くこと","g":"ai","k":[{"c":"救","m":"salvation","r":"きゅう","p":["求","攵","乂"]},{"c":"援","m":"abet","r":"えん","p":["扌","爰","爪"]}],"s":"誰がどこに取り残されているか分からなければ、救援の手は届きようがない。"},{"w":"付録","r":"ふろく","m":"appendix; supplement","d":"本や雑誌に添えられる追加の物","g":"history","k":[{"c":"付","m":"adhere","r":"ふ","p":["亻","寸"]},{"c":"録","m":"record","r":"ろく","p":["金","彔","彑"]}],"s":"昔の雑誌の付録には、今では考えられないほど凝ったものがありました。"},{"w":"一切","r":"いっさい","m":"at all, entirely","d":"例外なく全部であること。否定を伴うと全然","g":"india","k":[{"c":"一","m":"one","r":"いっ","p":[]},{"c":"切","m":"cut","r":"さい","p":["七","刀"]}],"s":"仏教の無我を、「自分は一切存在しない」という主張だと受け取る人は意外に多い。"},{"w":"情報網","r":"じょうほうもう","m":"information network","d":"情報を集めるためのつながり","g":"ai","k":[{"c":"情","m":"feelings","r":"じょう","p":["忄","青"]},{"c":"報","m":"report","r":"ほう","p":["幸","卩","又"]},{"c":"網","m":"netting","r":"もう","p":["糸","罔","罒"]}],"s":"ああいう人は、業界のあちこちにつながる独自の情報網を持っているに違いありません。"},{"w":"繊維","r":"せんい","m":"fiber","d":"糸や布のもとになる細い筋状のもの","g":"ai","k":[{"c":"繊","m":"slender","r":"せん","p":["糸","土","戈"]},{"c":"維","m":"fiber","r":"い","p":["糸","隹","亻"]}],"s":"一本一本の繊維が細くても、縦糸と横糸が正しく組み合わされば、しっかりした布になる。"},{"w":"発掘","r":"はっくつ","m":"excavation, unearthing","d":"地中の物を掘り出すこと","g":"history","k":[{"c":"発","m":"departure","r":"はっ","p":["癶","二","儿"]},{"c":"掘","m":"dig","r":"くつ","p":["扌","屈"]}],"s":"こないだ見たんですけど、トルコのギョベクリ・テペって遺跡、発掘が始まったのは九〇年代なんですよ。"},{"w":"結束","r":"けっそく","m":"unity, solidarity","d":"人々が心を一つにまとまること","g":"mind","k":[{"c":"結","m":"tie","r":"けっ","p":["糸","吉"]},{"c":"束","m":"bundle","r":"そく","p":["木","口","丿"]}],"s":"人は共通の敵を持ったとき、驚くほど結束が強まる。"},{"w":"辛抱","r":"しんぼう","m":"patience; endurance","d":"苦しさや不満をこらえて耐えること。","g":"language","k":[{"c":"辛","m":"spicy","r":"しん","p":["立","十"]},{"c":"抱","m":"embrace","r":"ぼう","p":["扌","包"]}],"s":"日本語の小説で、冬を越すまでの辛抱だと職人が弟子に声をかける場面を想像してください。"},{"w":"圧迫","r":"あっぱく","m":"pressure, compression","d":"強く押さえつけること。","g":"india","k":[{"c":"圧","m":"pressure","r":"あっ","p":["厂","土"]},{"c":"迫","m":"urge","r":"ぱく","p":["白","辶"]}],"s":"大事な発表の前など、不安なとき、胸が圧迫されたように息が浅くなる経験は、誰にでもあるでしょう。"},{"w":"意向","r":"いこう","m":"intention, inclination","d":"こうしたいという考えや気持ち","g":"india","k":[{"c":"意","m":"idea","r":"い","p":["音","心"]},{"c":"向","m":"yonder","r":"こう","p":["丿","冂","丨"]}],"s":"敵陣に親族の姿を見て、戦う意向を失った彼は、弓を置いてしまいます。"},{"w":"通常","r":"つうじょう","m":"usual; normal","d":"ふつう。いつもの状態","g":"india","k":[{"c":"通","m":"traffic","r":"つう","p":["甬","用","辶"]},{"c":"常","m":"usual","r":"じょう","p":["尚","吊"]}],"s":"インドの総選挙は、通常の国政選挙のように一日で終えることができない。"},{"w":"気品","r":"きひん","m":"grace, elegance, refinement","d":"自然にそなわる上品さ","g":"history","k":[{"c":"気","m":"spirit","r":"き","p":["气","乂","丿"]},{"c":"品","m":"goods","r":"ひん","p":["口"]}],"s":"文章で「気品がある」と書くだけでは、読者の頭に何も浮かばず、褒め言葉がただ通り過ぎていくだけだ。"},{"w":"大惨事","r":"だいさんじ","m":"catastrophe, disaster","d":"多くの被害や犠牲を出す大きな事故","g":"india","k":[{"c":"大","m":"large","r":"だい","p":[]},{"c":"惨","m":"wretched","r":"さん","p":["忄","参"]},{"c":"事","m":"matter","r":"じ","p":["口","彑","亅"]}],"s":"迫りくる大惨事を前に、彼は戦うことの意味を問います。"},{"w":"切実","r":"せつじつ","m":"pressing; acute; earnest","d":"身にしみて強く感じられるさま","g":"mind","k":[{"c":"切","m":"cut","r":"せつ","p":["七","刀"]},{"c":"実","m":"reality","r":"じつ","p":["宀","三","人"]}],"s":"集中力が続かないって悩み、私にとってはけっこう切実な問題なんですよ。"},{"w":"窮屈","r":"きゅうくつ","m":"tight, cramped, constrained","d":"ゆとりがなく、息がつまるさま","g":"mind","k":[{"c":"窮","m":"hard up","r":"きゅう","p":["穴","躬","身"]},{"c":"屈","m":"yield","r":"くつ","p":["尸","出"]}],"s":"在宅勤務が定着して数年、かえって窮屈さを感じるという会社員が増えている。"},{"w":"悲惨","r":"ひさん","m":"miserable, tragic","d":"見ていられないほど痛ましいさま","g":"language","k":[{"c":"悲","m":"grieve","r":"ひ","p":["非","心"]},{"c":"惨","m":"wretched","r":"さん","p":["忄","参"]}],"s":"ところが現場の描写に悲惨という語を重ねすぎると、読者の感覚はかえって麻痺し、出来事の具体が見えなくなる。"}];
+
+const $=s=>document.querySelector(s);
+const TAU=Math.PI*2;
+const GROUPS=['history','ai','india','language','mind'];
+const GROUP_JA={history:'史',ai:'機',india:'印',language:'語',mind:'心'};
+const GROUP_EN={history:'history',ai:'machines',india:'india',language:'language',mind:'mind'};
+const PIG={history:'oudo',ai:'ai',india:'shu',language:'rokusho',mind:'murasaki'};
+// five rings = five voices. Normalised to the field; period in seconds at 72 bpm; oct = octave of the ring's pluck.
+const RING_DEF=[
+  {g:'history', c:[.50,.40], r:[.44,.26], tilt:-.12, period:17, oct:1},
+  {g:'ai',      c:[.48,.52], r:[.36,.33], tilt:.35,  period:13, oct:1},
+  {g:'india',   c:[.54,.46], r:[.28,.40], tilt:-.55, period:21, oct:2},
+  {g:'language',c:[.46,.58], r:[.40,.18], tilt:.10,  period:10, oct:2},
+  {g:'mind',    c:[.52,.49], r:[.47,.41], tilt:0,    period:26, oct:.5, dash:true}
+];
+const SCALE=[293.66,329.63,392.00,440.00,493.88]; // D E G A B — 陽旋法 pentatonic
+const F={disp:"'Dela Gothic One','Zen Old Mincho','Hiragino Mincho ProN',serif",jp:"'Zen Old Mincho','Hiragino Mincho ProN','Yu Mincho',serif",lab:"'Cormorant Garamond','Iowan Old Style',Georgia,serif"};
+const KEY='meguri.v1';
+const ASSETS=window.MEGURI_ASSETS||{};   // optional generated ink (black on white) and paper; the field draws without them
+const freshLists=()=>({'今日':[],'気になる':[],'試験':[]});
+const fresh=()=>({p:{},sealed:{},lists:freshLists(),bpm:72,voice:1,grow:1,link:0,drift:0,theme:null,heard:[]});
+let state=fresh();
+function load(){ try{ const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&typeof s==='object'){ state=Object.assign(fresh(),s); if(!state.lists||typeof state.lists!=='object') state.lists=freshLists(); if(!Array.isArray(state.heard)) state.heard=[]; } }catch(e){} }
+let saveT=0; function save(){ clearTimeout(saveT); saveT=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(e){} },200); }
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const KN=['〇','一','二','三','四','五','六','七','八','九'];
+function kn(n){ if(n<10) return KN[n]; if(n<20) return '十'+(n%10?KN[n%10]:''); return KN[Math.floor(n/10)]+'十'+(n%10?KN[n%10]:''); }
+function reiwaDate(d){ const y=d.getFullYear()-2018; return '令和'+(y===1?'元':kn(y))+'年'+kn(d.getMonth()+1)+'月'+kn(d.getDate())+'日'; }
+// value noise, seeded; used for paper, brush pressure, flying white, woodcut edges
+function hash2(i,j){ let n=(Math.imul(i,374761393)+Math.imul(j,668265263))|0; n=Math.imul(n^(n>>>13),1274126177); n^=n>>>16; return (n>>>0)/4294967296; }
+function noise2(x,y){ const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi; const u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf); const a=hash2(xi,yi),b=hash2(xi+1,yi),c=hash2(xi,yi+1),d=hash2(xi+1,yi+1); return (a+(b-a)*u)*(1-v)+(c+(d-c)*u)*v; }
+function fbm(x,y,o){ let a=.5,s=0,n=0; for(let i=0;i<o;i++){ s+=a*noise2(x,y); n+=a; x=x*2.03+7.1; y=y*1.97+3.3; a*=.5; } return s/n; }
+
+// ---- tokens
+let T={};
+function readTokens(){ const cs=getComputedStyle(document.documentElement); for(const k of ['paper','paper-2','ink','ink-2','shu','ai','oudo','rokusho','murasaki','sumi']) T[k]=cs.getPropertyValue('--'+k).trim(); const dt=document.documentElement.dataset.theme; T.dark=dt==='dark'||(!dt&&matchMedia('(prefers-color-scheme: dark)').matches); }
+const pig=g=>T[PIG[g]];
+const inkMode=()=>T.dark?'screen':'multiply';
+
+// ---- geometry
+const field=$('#field'), paper=$('#paper'), live=$('#live'), grain=$('#grain');
+let W=360,H=600,DPR=1,rings=[];
+function layoutRings(){ rings=RING_DEF.map((d,i)=>({...d,i,cx:d.c[0]*W,cy:d.c[1]*H,rx:d.r[0]*W,ry:d.r[1]*H,phi:rings[i]?rings[i].phi:(i*1.37)%TAU})); }
+function ringPoint(r,t,k){ k=k==null?1:k; const ct=Math.cos(r.tilt),st=Math.sin(r.tilt); const x=r.rx*k*Math.cos(t),y=r.ry*k*Math.sin(t); return {x:r.cx+x*ct-y*st,y:r.cy+x*st+y*ct}; }
+function resize(){ const b=field.getBoundingClientRect(); W=Math.max(300,b.width); H=Math.max(380,b.height); DPR=Math.min(2,window.devicePixelRatio||1); for(const c of [paper,live,grain]){ c.width=Math.round(W*DPR); c.height=Math.round(H*DPR); c.style.width=W+'px'; c.style.height=H+'px'; } layoutRings(); drawStatic(); drawGrain(); }
+
+// ---- stations
+const stations=WORDS.map((w,i)=>({i,w,g:w.g,ring:GROUPS.indexOf(w.g),t:0,k:1,kT:1,x:0,y:0,flash:0,last:0,seed:1000+i*37}));
+(function(){ const rnd=mulberry32(1016); RING_DEF.forEach((r,ri)=>{ const ss=stations.filter(s=>s.g===r.g); ss.forEach((s,j)=>{ s.t=((j+.5)/ss.length)*TAU+ri*.37+(rnd()-.5)*.22; }); }); })();
+const passes=s=>state.p[s.w.w]||0;
+const depthK=p=>1-.45*Math.min(1,p/8);
+function syncDepth(){ for(const s of stations) s.kT=depthK(passes(s)); }
+function placeStations(){ for(const s of stations){ s.k+=(s.kT-s.k)*.06; const p=ringPoint(rings[s.ring],s.t,s.k); s.x=p.x; s.y=p.y; } }
+const pairs=[]; for(let a=0;a<stations.length;a++) for(let b=a+1;b<stations.length;b++){ const A=stations[a].w.w,B=stations[b].w.w; for(const ch of A){ if(B.includes(ch)){ pairs.push([a,b,ch]); break; } } }
+let pairIdx=0;
+const byWord={}; for(const s of stations) byWord[s.w.w]=s;
+
+// ---- ink: a paper tile, a bristle brush, a woodcut sun, leaves
+let paperTile=null;
+function makePaperTile(){ const n=256,c=document.createElement('canvas'); c.width=c.height=n; const g=c.getContext('2d'); const id=g.createImageData(n,n); const d=id.data;
+  for(let y=0;y<n;y++) for(let x=0;x<n;x++){ const m=fbm(x/46,y/46,4); const fib=noise2(x/2.2,y/38)*.5+noise2(x/40,y/2.1)*.25; const fleck=hash2(x*3,y*7)>.993?.6:0; let v=(m-.5)*.9+(fib-.37)*.55+fleck; v=Math.max(-1,Math.min(1,v)); const L=Math.round(236-v*26); const i=(y*n+x)*4; d[i]=L; d[i+1]=L-2; d[i+2]=L-6; d[i+3]=255; }
+  g.putImageData(id,0,0); paperTile=c; }
+function catmull(pts,steps){ const P=[]; const n=pts.length; const get=i=>pts[Math.max(0,Math.min(n-1,i))]; for(let i=0;i<n-1;i++){ const p0=get(i-1),p1=get(i),p2=get(i+1),p3=get(i+2); for(let k=0;k<steps;k++){ const t=k/steps,t2=t*t,t3=t2*t; const x=.5*((2*p1[0])+(-p0[0]+p2[0])*t+(2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*t2+(-p0[0]+3*p1[0]-3*p2[0]+p3[0])*t3); const y=.5*((2*p1[1])+(-p0[1]+p2[1])*t+(2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*t2+(-p0[1]+3*p1[1]-3*p2[1]+p3[1])*t3); P.push({x,y}); } } P.push({x:pts[n-1][0],y:pts[n-1][1]});
+  for(let i=0;i<P.length;i++){ const a=P[Math.max(0,i-1)],b=P[Math.min(P.length-1,i+1)]; const dx=b.x-a.x,dy=b.y-a.y,l=Math.hypot(dx,dy)||1; P[i].nx=-dy/l; P[i].ny=dx/l; } return P; }
+// the brush: bristles with their own offset, weight and dryness; pressure swells then thins; flying white opens where the brush runs dry
+function brushStroke(g,pts,w0,col,seed,opt){ opt=opt||{}; const rnd=mulberry32(seed); const P=catmull(pts,opt.steps||40); const NB=opt.bristles||30; const br=[];
+  for(let i=0;i<NB;i++){ const o=rnd()*2-1; br.push({o:Math.sign(o)*Math.pow(Math.abs(o),.75),a:.18+rnd()*.5,ph:rnd()*50,drop:.2+rnd()*.5,sz:.55+rnd()*1.1}); }
+  g.save(); g.fillStyle=col; g.globalCompositeOperation=inkMode(); const L=P.length;
+  for(let k=0;k<L;k+=opt.stride||1){ const p=P[k]; const s=k/(L-1); const press=opt.profile?opt.profile(s):(.3+Math.pow(Math.sin(Math.PI*Math.min(1,s*1.08)),.7)*.95); const w=w0*press*(.8+.4*noise2(s*7+seed*.01,seed*.013));
+    for(const b of br){ const dry=noise2(s*22+b.ph,b.ph*.37); if(dry<b.drop*(1.15-press)) continue; const off=b.o*w/2; g.globalAlpha=b.a*(.45+.55*Math.abs(b.o))*Math.min(1,press*1.3)*(T.dark?.7:1); const r=b.sz*(.6+w/16); g.beginPath(); g.arc(p.x+p.nx*off,p.y+p.ny*off,r,0,TAU); g.fill(); } }
+  g.restore(); }
+function wash(g,x,y,r,col,alpha){ g.save(); g.globalCompositeOperation=inkMode(); const gr=g.createRadialGradient(x,y,r*.1,x,y,r); gr.addColorStop(0,col); gr.addColorStop(1,'rgba(0,0,0,0)'); g.globalAlpha=alpha; g.fillStyle=gr; g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); g.restore(); }
+function sunWoodcut(g,x,y,R,n,col,seed,opt){ opt=opt||{}; const rnd=mulberry32(seed); g.save(); g.translate(x,y); g.strokeStyle=col; g.fillStyle=col; g.lineCap='round';
+  for(let i=0;i<n;i++){ const a=i/n*TAU+(rnd()-.5)*.03; const r0=R*(.7+rnd()*.12), r1=R*(1.35+Math.pow(noise2(i*.61+seed,seed*.1),1.6)*1.9); g.lineWidth=(i%5===0?1.9:.75)*(.8+rnd()*.5); g.globalAlpha=.78+rnd()*.2; g.beginPath(); g.moveTo(Math.cos(a)*r0,Math.sin(a)*r0); g.lineTo(Math.cos(a)*r1,Math.sin(a)*r1); g.stroke();
+    if(rnd()<.18){ const a2=a+.012; g.lineWidth=.6; g.beginPath(); g.moveTo(Math.cos(a2)*r0,Math.sin(a2)*r0); g.lineTo(Math.cos(a2)*r1*.8,Math.sin(a2)*r1*.8); g.stroke(); } }
+  g.globalAlpha=1; g.beginPath(); for(let i=0;i<72;i++){ const a=i/72*TAU; const rr=R*.76*(1+.07*(noise2(i*.5,seed)-.5)); const px=Math.cos(a)*rr,py=Math.sin(a)*rr; i?g.lineTo(px,py):g.moveTo(px,py); } g.closePath(); g.fill();
+  g.strokeStyle=T.paper; g.lineWidth=1; g.globalAlpha=.9; g.beginPath(); g.arc(0,0,R*.42,0,TAU); g.stroke(); g.lineWidth=.6; g.beginPath(); g.arc(0,0,R*.22,0,TAU); g.stroke(); g.fillStyle=T.paper; g.beginPath(); g.arc(0,0,1.8,0,TAU); g.fill();
+  if(opt.label){ g.fillStyle=T.paper; g.font=`${Math.round(R*.5)}px ${F.disp}`; g.textAlign='center'; g.globalAlpha=1; g.fillText(opt.label,0,R*.18); }
+  g.restore(); }
+function leaf(g,x,y,len,wid,ang,col){ g.save(); g.translate(x,y); g.rotate(ang); g.fillStyle=col; g.beginPath(); g.moveTo(0,0); g.quadraticCurveTo(len*.45,-wid,len,0); g.quadraticCurveTo(len*.5,wid*.75,0,0); g.fill(); g.strokeStyle=T.paper; g.globalAlpha=.55; g.lineWidth=.6; g.beginPath(); g.moveTo(1.2,0); g.lineTo(len*.86,0); g.stroke(); g.restore(); }
+function sprout(g,x,y,n,col,seed,sealed){ const rnd=mulberry32(seed); g.save(); g.strokeStyle=col; g.fillStyle=col; g.globalAlpha*=.94; const h=13+n*7; const bend=(rnd()-.5)*12; g.lineWidth=1.15; g.lineCap='round';
+  g.beginPath(); g.moveTo(x,y-4); g.bezierCurveTo(x+bend*.25,y-h*.4,x+bend*.9,y-h*.72,x+bend*.6,y-4-h); g.stroke();
+  for(let i=0;i<n;i++){ const t=(i+1)/(n+1); const sx=x+bend*.6*t*t+bend*.25*t, sy=y-4-h*t*.9; const side=i%2?1:-1; const len=(10-i*.7)*(.85+rnd()*.35), wid=len*.4; leaf(g,sx,sy,len,wid,side*(-.95+rnd()*.35)-.25+(side<0?Math.PI:0)*0,col); }
+  const tx=x+bend*.6,ty=y-4-h; if(sealed){ for(let i=0;i<9;i++){ const a=i/9*TAU; g.beginPath(); g.arc(tx+Math.cos(a)*4.6,ty+Math.sin(a)*4.6,1.35,0,TAU); g.fill(); } g.beginPath(); g.arc(tx,ty,1.4,0,TAU); g.fill(); } else { g.beginPath(); g.arc(tx,ty,1.8,0,TAU); g.fill(); }
+  g.restore(); }
+function grass(g,x,y,col,seed){ const rnd=mulberry32(seed); g.save(); g.strokeStyle=col; g.lineWidth=.9; g.lineCap='round'; g.globalAlpha*=.8; for(let i=0;i<4;i++){ const dx=(rnd()-.5)*8, h=7+rnd()*8; g.beginPath(); g.moveTo(x+dx*.3,y-3); g.quadraticCurveTo(x+dx,y-3-h*.6,x+dx*1.8,y-3-h); g.stroke(); } g.restore(); }
+function tinted(img,col){ const c=document.createElement('canvas'); c.width=img.width; c.height=img.height; const g=c.getContext('2d'); g.drawImage(img,0,0); if(T.dark){ g.globalCompositeOperation='difference'; g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height); } g.globalCompositeOperation=T.dark?'multiply':'lighten'; g.fillStyle=col; g.fillRect(0,0,c.width,c.height); return c; }
+const imgs={}; function loadAssets(cb){ const keys=Object.keys(ASSETS); let n=keys.length; if(!n){ cb(); return; } for(const k of keys){ const im=new Image(); im.onload=im.onerror=()=>{ if(im.complete&&im.naturalWidth) imgs[k]=im; if(--n===0) cb(); }; im.src=ASSETS[k]; } }
+const tintCache={};
+function inkImage(g,key,x,y,w,h,col,alpha,rot){ const im=imgs[key]; if(!im) return false; const c=col||(T.dark?T.ink:null); let src=im; if(c){ const ck=key+'|'+c+'|'+(T.dark?1:0); src=tintCache[ck]||(tintCache[ck]=tinted(im,c)); } g.save(); g.globalCompositeOperation=inkMode(); g.globalAlpha=alpha==null?1:alpha; g.translate(x,y); if(rot) g.rotate(rot); g.drawImage(src,-w/2,-h/2,w,h); g.restore(); return true; }
+function disc(){ return {cx:W*.44,cy:H*.57,R:Math.min(W,H)*.09}; }
+
+function drawStatic(){ const g=paper.getContext('2d'); g.setTransform(DPR,0,0,DPR,0,0); const rnd=mulberry32(20261016); const m=Math.min(W,H);
+  g.globalCompositeOperation='source-over'; g.globalAlpha=1; g.fillStyle=T.paper; g.fillRect(0,0,W,H);
+  if(T.dark){ const bk=g.createLinearGradient(0,0,0,H*.26); bk.addColorStop(0,'rgba(5,8,16,.75)'); bk.addColorStop(1,'rgba(5,8,16,0)'); g.fillStyle=bk; g.fillRect(0,0,W,H*.26); g.fillStyle=T.ink; for(let i=0;i<140;i++){ g.globalAlpha=.25+rnd()*.6; g.beginPath(); g.arc(rnd()*W,rnd()*H*.5,.3+rnd()*.9,0,TAU); g.fill(); } g.globalAlpha=1; }
+  // washi: a procedural tile, or the generated paper when present
+  if(imgs.paper){ g.save(); g.globalCompositeOperation=T.dark?'soft-light':'multiply'; g.globalAlpha=T.dark?.35:.85; const pt=g.createPattern(imgs.paper,'repeat'); g.fillStyle=pt; g.fillRect(0,0,W,H); g.restore(); }
+  else if(paperTile){ g.save(); g.globalCompositeOperation=T.dark?'soft-light':'multiply'; g.globalAlpha=T.dark?.5:.9; const pt=g.createPattern(paperTile,'repeat'); g.fillStyle=pt; g.fillRect(0,0,W,H); g.restore(); }
+  // washes of pale ink sit behind the rings
+  wash(g,W*.42,H*.44,m*.34,T.sumi,T.dark?.10:.10); wash(g,W*.70,H*.60,m*.26,T.ai,T.dark?.12:.09); wash(g,W*.30,H*.70,m*.22,T.oudo,.09); wash(g,W*.85,H*.15,m*.20,T.oudo,.16);
+  // grid with faint coordinates
+  const cell=26; g.globalAlpha=.08; g.strokeStyle=T.ink; g.lineWidth=.5; g.beginPath(); for(let x=cell;x<W;x+=cell){ g.moveTo(x,0); g.lineTo(x,H); } for(let y=cell;y<H;y+=cell){ g.moveTo(0,y); g.lineTo(W,y); } g.stroke();
+  g.globalAlpha=.05; g.lineWidth=1; g.beginPath(); for(let x=cell*4;x<W;x+=cell*4){ g.moveTo(x,0); g.lineTo(x,H); } for(let y=cell*4;y<H;y+=cell*4){ g.moveTo(0,y); g.lineTo(W,y); } g.stroke();
+  g.globalAlpha=.5; g.fillStyle=T['ink-2']; g.font=`italic 8px ${F.lab}`; g.textAlign='center'; for(let i=4;i*cell<W-10;i+=4) g.fillText((i*cell/W).toFixed(2).slice(1),i*cell,9); g.textAlign='left'; for(let i=4;i*cell<H-10;i+=4) g.fillText((i*cell/H).toFixed(2).slice(1),3,i*cell+3);
+  // the dragon's body (ochre) and the wave (indigo): generated ink when present, the bristle brush otherwise
+  g.globalAlpha=1;
+  g.save(); g.translate(W*.40,H*.56); g.rotate(.5); g.strokeStyle=T['ink-2']; g.globalAlpha=.3; g.lineWidth=.9; g.beginPath(); g.ellipse(0,0,W*.5,H*.3,0,0,TAU); g.stroke(); g.restore();
+  const drag=[[W*.08,H*.66],[W*.26,H*.47],[W*.46,H*.55],[W*.64,H*.36],[W*.82,H*.44],[W*.98,H*.27]];
+  const tall=H>W*1.3; const sw=tall?W*1.34:W*1.12; if(!inkImage(g,'stroke_long_1',W*.50,H*.47,sw,sw/7.36*(tall?1.1:1.5),T.oudo,T.dark?1:.92,tall?-.34:-.24)) brushStroke(g,drag,m*.055,T.oudo,11,{bristles:34});
+  const wav=[[W*.48,H*.88],[W*.59,H*.83],[W*.69,H*.90],[W*.79,H*.82],[W*.89,H*.88],[W*.995,H*.79]];
+  const ww=tall?W*.72:W*.64; if(!inkImage(g,'stroke_wave',W*.68,H*.855,ww,ww/5.05*1.25,T.ai,T.dark?1:.88,-.05)) brushStroke(g,wav,m*.026,T.ai,23,{bristles:22});
+  g.save(); g.strokeStyle=T.ai; g.globalAlpha=.6; g.lineWidth=1; g.lineCap='round'; for(let i=0;i<6;i++){ const x=W*(.55+i*.08),y=H*(.835+(i%2)*.03); g.beginPath(); g.arc(x,y,3.5+(i%3)*2,Math.PI*1.1,Math.PI*2.15); g.stroke(); } g.restore();
+  // the sun, top right; a seed-head, lower left
+  if(!inkImage(g,'sun',W*.85,H*.15,m*.34,m*.352,null,.94)) sunWoodcut(g,W*.85,H*.15,m*.07,52,T.ink,5,{label:''});
+  sunWoodcut(g,W*.12,H*.78,m*.028,26,T['ink-2'],9);
+  // spatter near the sun, and a little at the foot
+  if(!inkImage(g,'spatter',W*.74,H*.24,m*.46,m*.46,null,.5,.35)){ g.save(); g.globalCompositeOperation=inkMode(); g.fillStyle=T.ink; for(let i=0;i<90;i++){ g.globalAlpha=.25+rnd()*.6; const a=rnd()*TAU,d=m*.07+Math.pow(rnd(),.6)*m*.13; g.beginPath(); g.arc(W*.85+Math.cos(a)*d,H*.15+Math.sin(a)*d*.85,.4+Math.pow(rnd(),2)*2.2,0,TAU); g.fill(); } g.restore(); }
+  inkImage(g,'spatter',W*.30,H*.90,m*.3,m*.3,null,.28,2.1);
+  // three still plants, bottom left; grass along the foot
+  g.globalAlpha=1; if(!inkImage(g,'sprig_1',W*.07,H*.885,m*.09,m*.225,null,1)) sprout(g,W*.06,H*.94,5,T.ink,31,false); if(!inkImage(g,'sprig_2',W*.15,H*.875,m*.075,m*.21,null,1)) sprout(g,W*.13,H*.955,3,T.ink,32,false); if(!inkImage(g,'sprig_3',W*.245,H*.89,m*.12,m*.215,null,1)) sprout(g,W*.19,H*.93,6,T.ink,33,true);
+  grass(g,W*.33,H*.965,T['ink-2'],41); grass(g,W*.37,H*.97,T['ink-2'],42);
+  // the margin holds the small truths: the drone's filters
+  g.globalAlpha=.85; g.fillStyle=T['ink-2']; g.font=`italic 9px ${F.lab}`; g.textAlign='right'; g.fillText('highpass 40',W-14,H*.33); g.fillText('lowpass 320',W-14,H*.33+12); g.textAlign='left';
+  // the date, written down the left edge
+  g.globalAlpha=.85; g.fillStyle=T['ink-2']; g.font=`11px ${F.jp}`; g.textAlign='center'; const date=reiwaDate(new Date()); for(let i=0;i<date.length;i++) g.fillText(date[i],14,H*.28+i*13);
+  // ring names at the top of each ring
+  g.globalAlpha=.9; g.font=`italic 10.5px ${F.lab}`; for(const r of rings){ const p=ringPoint(r,-Math.PI/2+r.tilt*.2); g.fillStyle=r.i===0?T.ink:pig(r.g); g.textAlign='center'; g.fillText(GROUP_EN[r.g]+'  '+GROUP_JA[r.g],p.x,p.y-6); }
+  // the seal
+  g.globalAlpha=1; g.textAlign='center'; const sx=W-52,sy=H-54,ss=36; g.fillStyle=T.shu; g.beginPath(); for(let i=0;i<40;i++){ const a=i/40*TAU; const rr=ss*.62*(1+.035*(noise2(i*.9,77)-.5)); const px=sx+ss/2+Math.cos(a)*rr,py=sy+ss/2+Math.sin(a)*rr; i?g.lineTo(px,py):g.moveTo(px,py); } g.closePath(); g.fill();
+  g.fillStyle=T.paper; g.font=`24px ${F.disp}`; g.fillText('廻',sx+ss/2,sy+ss/2+9); g.font=`italic 9px ${F.lab}`; g.fillStyle=T['ink-2']; g.fillText('kotoba no meguri',sx+ss/2,sy+ss+13); g.textAlign='left';
+}
+function drawGrain(){ const g=grain.getContext('2d'); g.setTransform(DPR,0,0,DPR,0,0); g.clearRect(0,0,W,H); if(!paperTile) return; g.save(); g.globalCompositeOperation=T.dark?'soft-light':'multiply'; g.globalAlpha=T.dark?.35:.28; g.fillStyle=g.createPattern(paperTile,'repeat'); g.translate(-37,-91); g.fillRect(0,0,W+200,H+200); g.restore();
+  const v=g.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.max(W,H)*.75); v.addColorStop(0,'rgba(0,0,0,0)'); v.addColorStop(1,T.dark?'rgba(0,0,0,.5)':'rgba(40,30,20,.16)'); g.fillStyle=v; g.fillRect(0,0,W,H); }
+
+// ---- live layer
+const ripples=[],floats=[],flecks=[];
+let playing=false,last=0,master=0;
+function stationGlyph(g,s,col,fl){ const x=s.x,y=s.y; g.lineWidth=1.3; g.strokeStyle=col; g.fillStyle=T.ink;
+  switch(s.g){
+    case 'history': { const a0=g.globalAlpha; g.beginPath(); g.arc(x,y,4+fl*2,0,TAU); g.fill(); g.beginPath(); g.arc(x,y,8+fl*6,0,TAU); g.stroke(); g.globalAlpha=a0*.5; g.beginPath(); g.arc(x,y,11.5+fl*8,0,TAU); g.stroke(); g.globalAlpha=a0; break; }
+    case 'ai': g.beginPath(); g.rect(x-5,y-5,10,10); g.fill(); g.beginPath(); g.rect(x-9-fl*5,y-9-fl*5,18+fl*10,18+fl*10); g.stroke(); g.beginPath(); g.moveTo(x-13,y); g.lineTo(x-9,y); g.moveTo(x+9,y); g.lineTo(x+13,y); g.moveTo(x,y-13); g.lineTo(x,y-9); g.moveTo(x,y+9); g.lineTo(x,y+13); g.stroke(); break;
+    case 'india': g.beginPath(); g.arc(x,y,4.2+fl*2,0,TAU); g.fill(); g.fillStyle=col; for(let i=0;i<6;i++){ const a=i/6*TAU-Math.PI/2; g.beginPath(); g.arc(x+Math.cos(a)*(9+fl*6),y+Math.sin(a)*(9+fl*6),1.6,0,TAU); g.fill(); } break;
+    case 'language': g.beginPath(); g.arc(x,y,4.2+fl*2,0,TAU); g.fill(); g.beginPath(); g.arc(x,y,8.5+fl*6,Math.PI*.15,Math.PI*1.85); g.stroke(); g.beginPath(); g.moveTo(x+6,y-7); g.lineTo(x+11,y-11); g.stroke(); break;
+    default: g.beginPath(); g.arc(x,y,4.2+fl*2,0,TAU); g.fill(); g.beginPath(); g.arc(x,y,8+fl*6,0,TAU); g.stroke(); g.setLineDash([2,3]); g.beginPath(); g.arc(x,y,12+fl*8,0,TAU); g.stroke(); g.setLineDash([]);
+  } }
+function drawLive(now){ const g=live.getContext('2d'); g.setTransform(DPR,0,0,DPR,0,0); g.clearRect(0,0,W,H);
+  // threads between words that share a kanji
+  if(state.link){ g.lineWidth=.9; for(const [a,b,ch] of pairs){ const A=stations[a],B=stations[b]; const mx=(A.x+B.x)/2+(B.y-A.y)*.14,my=(A.y+B.y)/2-(B.x-A.x)*.14; g.strokeStyle=pig(A.g); g.globalAlpha=.55; g.beginPath(); g.moveTo(A.x,A.y); g.quadraticCurveTo(mx,my,B.x,B.y); g.stroke(); g.globalAlpha=1; g.fillStyle=T.paper; g.beginPath(); g.arc(mx,my,8.5,0,TAU); g.fill(); g.strokeStyle=T.ink; g.lineWidth=.7; g.stroke(); g.fillStyle=T.ink; g.font=`12px ${F.jp}`; g.textAlign='center'; g.fillText(ch,mx,my+4); g.textAlign='left'; } g.globalAlpha=1; }
+  // rings
+  for(const r of rings){ g.save(); g.translate(r.cx,r.cy); g.rotate(r.tilt); g.strokeStyle=r.i===0?T.ink:pig(r.g); g.lineWidth=r.dash?.9:1.15; g.globalAlpha=r.dash?.6:.85; if(r.dash) g.setLineDash([3,5]); g.beginPath(); g.ellipse(0,0,r.rx,r.ry,0,0,TAU); g.stroke(); g.setLineDash([]); g.globalAlpha=.16; g.beginPath(); g.ellipse(1.6,1.2,r.rx*1.004,r.ry*.995,0,0,TAU); g.stroke(); g.restore(); }
+  g.globalAlpha=1;
+  // stations
+  // three values of ink: solid for what sounds now, wash for what has been heard, lighter still for what has not
+  for(const s of stations){ const p=passes(s),sealed=!!state.sealed[s.w.w],col=pig(s.g); const age=now-s.flash; const fl=Math.max(0,1-age/900); const inkA=age<2600?1:(p>0?.64:.42);
+    if(sealed){ g.save(); g.translate(s.x,s.y); g.strokeStyle=T.ink; g.globalAlpha=.75*inkA; for(let i=0;i<22;i++){ const a=i/22*TAU,r1=15+((i*7)%4)*2.6; g.lineWidth=i%3?.75:1.4; g.beginPath(); g.moveTo(Math.cos(a)*10,Math.sin(a)*10); g.lineTo(Math.cos(a)*r1,Math.sin(a)*r1); g.stroke(); } g.restore(); }
+    g.globalAlpha=inkA; if(state.grow){ if(p>=2) sprout(g,s.x,s.y,Math.min(7,p-1),T.ink,s.seed,sealed); else if(p===1) grass(g,s.x,s.y,T.ink,s.seed); }
+    g.globalAlpha=inkA; stationGlyph(g,s,col,fl);
+    const n=Math.min(6,p); for(let i=0;i<6;i++){ const dy=s.y-3-i*6; g.beginPath(); g.arc(s.x+17,dy,i<n?2.3:1.5,0,TAU); if(i<n){ g.fillStyle=col; g.globalAlpha=.95; g.fill(); } else { g.strokeStyle=T['ink-2']; g.globalAlpha=.16; g.lineWidth=.7; g.stroke(); } }
+    g.globalAlpha=1;
+    if(sealed){ g.fillStyle=T.shu; g.fillRect(s.x-20,s.y-19,10,10); g.fillStyle=T.paper; g.font=`7px ${F.disp}`; g.textAlign='center'; g.fillText('印',s.x-15,s.y-11.5); g.textAlign='left'; }
+    // the word must read at a glance on a busy ground: a paper halo under the label, and the label never fainter than the wash
+    g.globalAlpha=Math.min(1,inkA+.15); g.fillStyle=T['ink-2']; g.font=`italic 10.5px ${F.lab}`; g.fillText(String(s.i+1).padStart(2,'0')+'  ×'+s.k.toFixed(2),s.x-7,s.y+21);
+    g.globalAlpha=1; g.font=`700 13.5px ${F.jp}`; g.lineJoin='round'; g.strokeStyle=T.paper; g.lineWidth=3.5; g.strokeText(s.w.w,s.x-7,s.y+36); g.globalAlpha=Math.max(.78,inkA); g.fillStyle=T.ink; g.fillText(s.w.w,s.x-7,s.y+36); g.globalAlpha=1;
+  }
+  // the level bar: one beat, rising in vermilion
+  { const bx=W*.21,by=H*.16,bh=H*.11; g.strokeStyle=T['ink-2']; g.globalAlpha=.35; g.lineWidth=1; g.beginPath(); g.moveTo(bx,by); g.lineTo(bx,by+bh); g.stroke(); const lvl=playing?(1-master/TAU):0; g.globalAlpha=.9; g.fillStyle=T.shu; g.fillRect(bx-3,by+bh*(1-lvl),6,bh*lvl); g.globalAlpha=.8; g.fillStyle=T['ink-2']; g.font=`italic 9px ${F.lab}`; g.textAlign='center'; g.fillText('bar',bx,by+bh+11); g.textAlign='left'; g.globalAlpha=1; }
+  // playheads with a comet tail and a needle
+  for(const r of rings){ for(let i=10;i>=0;i--){ const q=ringPoint(r,r.phi-i*.028); g.globalAlpha=(1-i/11)*.5; g.fillStyle=T.shu; g.beginPath(); g.arc(q.x,q.y,1.1+(10-i)*.22,0,TAU); g.fill(); } const h=ringPoint(r,r.phi),h2=ringPoint(r,r.phi,.94),h3=ringPoint(r,r.phi,1.06); g.globalAlpha=1; g.strokeStyle=T.shu; g.lineWidth=1; g.beginPath(); g.moveTo(h2.x,h2.y); g.lineTo(h3.x,h3.y); g.stroke(); g.fillStyle=T.shu; g.beginPath(); g.arc(h.x,h.y,4.2,0,TAU); g.fill(); g.strokeStyle=T.paper; g.lineWidth=1; g.stroke(); }
+  // flecks, ripples and floating readings
+  g.save(); g.globalCompositeOperation=inkMode(); for(let i=flecks.length-1;i>=0;i--){ const f=flecks[i],u=(now-f.t)/f.life; if(u>=1){ flecks.splice(i,1); continue; } const e=1-Math.pow(1-u,3); g.globalAlpha=(1-u)*.9; g.fillStyle=f.c; g.beginPath(); g.arc(f.x+f.vx*e,f.y+f.vy*e,f.r*(1-u*.4),0,TAU); g.fill(); } g.restore();
+  for(let i=ripples.length-1;i>=0;i--){ const rp=ripples[i],u=(now-rp.t)/950; if(u>=1){ ripples.splice(i,1); continue; } g.globalAlpha=(1-u)*.8; g.strokeStyle=rp.c; g.lineWidth=1.2; g.beginPath(); g.arc(rp.x,rp.y,8+u*42,0,TAU); g.stroke(); }
+  for(let i=floats.length-1;i>=0;i--){ const f=floats[i],u=(now-f.t)/1500; if(u>=1){ floats.splice(i,1); continue; } g.globalAlpha=u<.15?u/.15:1-(u-.15)/.85; g.fillStyle=f.c; g.font=`700 13px ${F.jp}`; g.textAlign='center'; g.fillText(f.txt,f.x,f.y-30-u*26); g.textAlign='left'; }
+  g.globalAlpha=1;
+  // the disc: master clock and tap pad
+  const {cx,cy,R}=disc(); g.save(); g.globalCompositeOperation=inkMode(); const halo=g.createRadialGradient(cx,cy,R*.9,cx,cy,R*1.9); halo.addColorStop(0,T.dark?'rgba(233,225,207,.18)':'rgba(36,33,31,.18)'); halo.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=halo; g.beginPath(); g.arc(cx,cy,R*1.9,0,TAU); g.fill(); g.restore();
+  g.fillStyle=T.ink; g.beginPath(); for(let i=0;i<64;i++){ const a=i/64*TAU; const rr=R*(1+.025*(noise2(i*.7+master,3)-.5)); i?g.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr):g.moveTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr); } g.closePath(); g.fill();
+  g.strokeStyle=T.paper; g.lineWidth=.8; g.globalAlpha=.9; for(let i=1;i<=4;i++){ g.beginPath(); g.arc(cx,cy,R*i/5,0,TAU); g.stroke(); }
+  g.lineWidth=1.6; g.beginPath(); g.moveTo(cx,cy); g.lineTo(cx+Math.cos(master-Math.PI/2)*R*.95,cy+Math.sin(master-Math.PI/2)*R*.95); g.stroke(); g.fillStyle=T.paper; g.beginPath(); g.arc(cx,cy,2.2,0,TAU); g.fill();
+  g.globalAlpha=1; g.fillStyle=T['ink-2']; g.font=`italic 10.5px ${F.lab}`; g.textAlign='center'; g.fillText(state.bpm+' bpm · tap',cx,cy+R+14); g.textAlign='left';
+  // A · B capsule: two words that share a kanji
+  const cw=124,chh=42,px=W-cw-18,py=H*.70; g.strokeStyle=T.ink; g.lineWidth=1.1; g.globalAlpha=.9; roundRect(g,px,py,cw,chh,chh/2); g.stroke(); g.fillStyle=T.paper; g.globalAlpha=.78; roundRect(g,px,py,cw,chh,chh/2); g.fill(); g.globalAlpha=.35; g.lineWidth=.6; roundRect(g,px+3,py+3,cw-6,chh-6,chh/2-3); g.stroke(); g.globalAlpha=1;
+  if(pairs.length){ const [a,b,ch]=pairs[pairIdx%pairs.length]; const A=stations[a],B=stations[b]; g.strokeStyle=pig(A.g); g.lineWidth=1.2; g.beginPath(); g.arc(px+22,py+chh/2,11,0,TAU); g.stroke(); g.strokeStyle=pig(B.g); g.beginPath(); g.arc(px+cw-22,py+chh/2,11,0,TAU); g.stroke();
+    g.fillStyle=T.ink; g.font=`italic 11px ${F.lab}`; g.textAlign='center'; g.fillText('A',px+22,py+chh/2+4); g.fillText('B',px+cw-22,py+chh/2+4); g.font=`15px ${F.jp}`; g.fillText(ch,px+cw/2,py+chh/2+5);
+    g.strokeStyle=T.ink; g.lineWidth=.8; g.beginPath(); g.moveTo(px+38,py+chh/2); g.lineTo(px+cw/2-12,py+chh/2); g.moveTo(px+cw/2+12,py+chh/2); g.lineTo(px+cw-38,py+chh/2); g.stroke();
+    g.fillStyle=T['ink-2']; g.font=`10px ${F.jp}`; g.fillText(A.w.w+'  ·  '+B.w.w,px+cw/2,py+chh+13); g.textAlign='left'; }
+  else { g.fillStyle=T.ink; g.font=`15px ${F.jp}`; g.textAlign='center'; g.fillText('結',px+cw/2,py+chh/2+5); g.textAlign='left'; }
+}
+function roundRect(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.lineTo(x+w-r,y); g.arcTo(x+w,y,x+w,y+r,r); g.lineTo(x+w,y+h-r); g.arcTo(x+w,y+h,x+w-r,y+h,r); g.lineTo(x+r,y+h); g.arcTo(x,y+h,x,y+h-r,r); g.lineTo(x,y+r); g.arcTo(x,y,x+r,y,r); g.closePath(); }
+
+// ---- clock, crossing, firing
+function tick(now){ const dt=Math.min(.05,last?(now-last)/1000:0); last=now;
+  if(playing){ const speed=state.bpm/72; master=(master+dt*TAU/(240/state.bpm))%TAU;
+    for(const r of rings){ const prev=r.phi; const cur=prev+dt*TAU/(r.period/speed);
+      for(const s of stations){ if(s.ring!==r.i) continue; let a=s.t; while(a<=prev) a+=TAU; while(a>prev+TAU) a-=TAU; if(a<=cur) fire(s,false); }
+      r.phi=cur%TAU; } }
+  if(state.drift){ for(const s of stations){ s.t+=dt*.012*(s.ring%2?1:-1); s.t=((s.t%TAU)+TAU)%TAU; } }
+  placeStations(); drawLive(now); requestAnimationFrame(tick); }
+function fire(s,manual){ const now=performance.now(); if(now-s.last<400) return; s.last=now; const p=passes(s);
+  if(state.grow&&!manual){ state.p[s.w.w]=p+1; s.kT=depthK(p+1); }
+  s.flash=now; const col=pig(s.g); ripples.push({x:s.x,y:s.y,t:now,c:col}); floats.push({x:s.x,y:s.y,t:now,txt:s.w.r,c:T.ink});
+  const rnd=mulberry32(now|0); const nf=7+Math.floor(rnd()*7); for(let i=0;i<nf;i++){ const a=rnd()*TAU,d=10+Math.pow(rnd(),.7)*34; flecks.push({x:s.x,y:s.y,vx:Math.cos(a)*d,vy:Math.sin(a)*d,r:.5+Math.pow(rnd(),2)*2.4,t:now,life:600+rnd()*500,c:rnd()<.6?T.ink:col}); }
+  heard(s); pluck(s); if(state.voice>=2&&!state.sealed[s.w.w]) speak(s.w.w); updateFoot(); save(); }
+
+// ---- the pad: the last eight words heard
+const pad=$('#pad');
+function heard(s){ const w=s.w.w; state.heard=[w].concat(state.heard.filter(x=>x!==w)).slice(0,8); renderPad(); }
+function renderPad(){ for(const k of pad.querySelectorAll('.key')) k.remove(); for(const w of state.heard){ const s=byWord[w]; if(!s) continue; const b=document.createElement('button'); b.className='key'+(w.length>2?' two':''); b.textContent=w; b.style.setProperty('--k',pig(s.g)); b.title=s.w.r+' · '+s.w.m; b.onclick=()=>{ audio(); fire(s,true); speak(w); }; pad.appendChild(b); } }
+
+// ---- sound: a plucked string per station, a drone under the rings, a room around it
+let AC=null,masterG=null,wetG=null,comp=null;
+function audio(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)();
+      // everything ends in a limiter, and the master swells in over a second so the first note is never a shock
+      comp=AC.createDynamicsCompressor(); comp.threshold.value=-22; comp.knee.value=10; comp.ratio.value=10; comp.attack.value=.002; comp.release.value=.22; comp.connect(AC.destination);
+      masterG=AC.createGain(); masterG.gain.setValueAtTime(0,AC.currentTime); masterG.gain.setTargetAtTime(.5,AC.currentTime+.02,.45); masterG.connect(comp);
+      const conv=AC.createConvolver(); conv.normalize=true; const len=Math.floor(AC.sampleRate*1.3); const ir=AC.createBuffer(2,len,AC.sampleRate); for(let ch=0;ch<2;ch++){ const d=ir.getChannelData(ch); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3.4)*(i<240?i/240:1); } conv.buffer=ir; wetG=AC.createGain(); wetG.gain.value=.14; wetG.connect(conv); conv.connect(masterG); decodeSample('koto'); decodeSample('shamisen'); }catch(e){} }
+  if(AC&&AC.state==='suspended') AC.resume(); return AC; }
+let recentPlucks=[];
+const SND=window.MEGURI_SOUND||null; const sampleBuf={}; let voiceClips={};
+function decodeSample(key){ if(!AC||!SND||!SND.samples||!SND.samples[key]||sampleBuf[key]!==undefined) return; sampleBuf[key]=null; try{ const b64=SND.samples[key].split(',')[1]; const bin=atob(b64); const arr=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i); AC.decodeAudioData(arr.buffer.slice(0),buf=>{ sampleBuf[key]=buf; },()=>{}); }catch(e){} }
+function pluck(s,when){ if(!state.voice||!AC) return; const r=rings[s.ring]; const f=SCALE[(s.i*7)%5]*r.oct; const t=when!=null?when:AC.currentTime; const sealed=!!state.sealed[s.w.w];
+  // words that fire together share the air: each extra voice inside a third of a second quietens the next
+  recentPlucks=recentPlucks.filter(x=>t-x<.35); const dens=recentPlucks.length; recentPlucks.push(t); const vol=(sealed?.2:.42)/(1+dens*.8);
+  // a real koto string when the sample is here, re-pitched to the ring's note; the synthesised string otherwise
+  const key=r.oct<1?'shamisen':'koto'; decodeSample(key); const sb=sampleBuf[key];
+  if(sb){ const src=AC.createBufferSource(); src.buffer=sb; const base=(SND.pitch&&SND.pitch[key])||235.8; src.playbackRate.value=f/base; const out=AC.createGain(); out.gain.setValueAtTime(0,t); out.gain.linearRampToValueAtTime(vol*.6,t+.004); out.gain.setValueAtTime(vol*.6,t+.6); out.gain.exponentialRampToValueAtTime(.001,t+2.2); src.connect(out); out.connect(masterG); out.connect(wetG); src.start(t); src.stop(t+2.3); return; }
+  // a Karplus-Strong string: a small, pre-darkened burst of noise through a tuned delay loop
+  const n=Math.floor(AC.sampleRate*.01); const buf=AC.createBuffer(1,n,AC.sampleRate); const d=buf.getChannelData(0); for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*.3*(1-i/n);
+  // the loop filter must not resonate (Q is in dB here; the default +1 dB with feedback near 1 makes the loop grow), and the feedback is set from the pitch for a ~1.5 s decay
+  const src=AC.createBufferSource(); src.buffer=buf; const pre=AC.createBiquadFilter(); pre.type='lowpass'; pre.frequency.value=Math.min(2600,f*4); pre.Q.value=-3; const del=AC.createDelay(1); del.delayTime.value=1/f; const fb=AC.createGain(); fb.gain.value=Math.min(.995,Math.exp(-4.6/f)); const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=Math.min(3600,f*4.5); lp.Q.value=-3;
+  const out=AC.createGain(); out.gain.setValueAtTime(0,t); out.gain.linearRampToValueAtTime(vol,t+.008); out.gain.exponentialRampToValueAtTime(.001,t+2.0);
+  src.connect(pre); pre.connect(del); del.connect(lp); lp.connect(fb); fb.connect(del); lp.connect(out); out.connect(masterG); out.connect(wetG); src.start(t); src.stop(t+.02); fb.gain.setTargetAtTime(0,t+1.9,.08);
+  // a soft body under the string
+  const o=AC.createOscillator(),bg=AC.createGain(); o.type='sine'; o.frequency.value=f; bg.gain.setValueAtTime(0,t); bg.gain.linearRampToValueAtTime(vol*.3,t+.01); bg.gain.exponentialRampToValueAtTime(.001,t+.5); o.connect(bg); bg.connect(masterG); o.start(t); o.stop(t+.6); }
+let drone=null;
+function setDrone(on){ if(!AC) return; if(on&&!drone){ const g=AC.createGain(); g.gain.value=0; g.gain.setTargetAtTime(.022,AC.currentTime+.5,2.5); const lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=260; const hp=AC.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=40; const os=[73.42,73.9,110.0].map((f,i)=>{ const o=AC.createOscillator(); o.type=i<2?'sine':'triangle'; o.frequency.value=f; const og=AC.createGain(); og.gain.value=i<2?.5:.18; o.connect(og); og.connect(lp); o.start(); return o; });
+    // soil: a faint bed of filtered noise under the strings
+    const nb=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate); const nd=nb.getChannelData(0); for(let i=0;i<nd.length;i++) nd[i]=Math.random()*2-1; const ns=AC.createBufferSource(); ns.buffer=nb; ns.loop=true; const ng=AC.createGain(); ng.gain.value=.035; ns.connect(ng); ng.connect(lp); ns.start(); os.push(ns);
+    lp.connect(hp); hp.connect(g); g.connect(masterG); g.connect(wetG); drone={g,os}; }
+  else if(!on&&drone){ const d=drone; drone=null; d.g.gain.setTargetAtTime(0,AC.currentTime,.6); setTimeout(()=>{ for(const o of d.os){ try{o.stop();}catch(e){} } },2500); } }
+let voiceJa=null;
+function pickVoice(){ try{ const vs=speechSynthesis.getVoices(); voiceJa=vs.find(v=>/ja/i.test(v.lang)&&/Kyoko|O-ren|Otoya|Google/.test(v.name))||vs.find(v=>/ja/i.test(v.lang))||null; }catch(e){} }
+let voiceEl=null;
+function speak(txt){ try{ const clip=SND&&SND.voice&&SND.voice[txt]; if(clip){ if(!voiceEl){ voiceEl=new Audio(); voiceEl.preload='auto'; } if(!voiceEl.paused&&!voiceEl.ended) return; voiceEl.src=clip; voiceEl.volume=.9; voiceEl.play().catch(()=>{}); return; }
+  if(!('speechSynthesis' in window)) return; if(speechSynthesis.pending) return; const u=new SpeechSynthesisUtterance(txt); u.lang='ja-JP'; u.rate=.9; if(voiceJa) u.voice=voiceJa; speechSynthesis.speak(u); }catch(e){} }
+if('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+
+// ---- verbs
+const bPlay=$('#b-play');
+function setPlaying(on){ playing=on; bPlay.dataset.on=on?'1':'0'; bPlay.querySelector('b').textContent=on?'止':'回'; bPlay.querySelector('i').textContent=on?'stop':'turn'; if(on) audio(); setDrone(on&&state.voice>0); }
+bPlay.onclick=()=>setPlaying(!playing);
+const bVoice=$('#b-voice');
+function showVoice(){ bVoice.dataset.v=state.voice; bVoice.querySelector('.dots').textContent=state.voice===2?'··':state.voice===1?'·':''; bVoice.querySelector('i').textContent=state.voice===2?'voice':state.voice===1?'tone':'mute'; }
+bVoice.onclick=()=>{ state.voice=(state.voice+1)%3; if(state.voice) audio(); save(); showVoice(); setDrone(playing&&state.voice>0); if(state.voice===2) speak('廻'); };
+for(const k of ['link','grow','drift']){ const b=$('#b-'+k); b.dataset.on=state[k]?'1':'0'; b.onclick=()=>{ state[k]=state[k]?0:1; b.dataset.on=state[k]?'1':'0'; save(); }; }
+$('#b-fly').onclick=()=>{ const few=stations.slice().sort((a,b)=>passes(a)-passes(b)).slice(0,12); const s=few[Math.floor(Math.random()*few.length)]; audio(); fire(s,true); openPage(s); };
+$('#b-night').onclick=()=>{ state.theme=T.dark?'light':'dark'; save(); applyTheme(); renderPad(); };
+const fReset=$('#f-reset');
+$('#b-reset').onclick=()=>{ fReset.hidden=!fReset.hidden; };
+$('#f-no').onclick=()=>{ fReset.hidden=true; };
+$('#f-yes').onclick=()=>{ state.p={}; state.sealed={}; state.heard=[]; syncDepth(); save(); fReset.hidden=true; updateFoot(); renderPad(); toast('全部戻した'); };
+function applyTheme(){ const r=document.documentElement; if(state.theme) r.dataset.theme=state.theme; readTokens(); drawStatic(); drawGrain(); }
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{ readTokens(); drawStatic(); drawGrain(); });
+
+// ---- field taps: a word, the disc, the capsule
+const taps=[];
+function fieldTap(ev){ const b=live.getBoundingClientRect(); const x=ev.clientX-b.left,y=ev.clientY-b.top; $('#hint').classList.add('off');
+  let best=null,bd=26; for(const s of stations){ const d=Math.hypot(s.x-x,s.y-y); if(d<bd){ bd=d; best=s; } }
+  if(best){ audio(); fire(best,true); openPage(best); return; }
+  const {cx,cy,R}=disc(); if(Math.hypot(x-cx,y-cy)<R+6){ const now=performance.now(); if(taps.length&&now-taps[taps.length-1]>2200) taps.length=0; taps.push(now); if(taps.length>6) taps.shift(); if(taps.length>=2){ let sum=0; for(let i=1;i<taps.length;i++) sum+=taps[i]-taps[i-1]; const bpm=Math.round(60000/(sum/(taps.length-1))); state.bpm=Math.max(40,Math.min(160,bpm)); save(); updateFoot(); } audio(); if(!playing) setPlaying(true); return; }
+  const cw=124,chh=42,px=W-cw-18,py=H*.70; if(x>=px&&x<=px+cw&&y>=py-4&&y<=py+chh+16&&pairs.length){ pairIdx=(pairIdx+1)%pairs.length; const [a,b]=pairs[pairIdx]; audio(); fire(stations[a],true); setTimeout(()=>fire(stations[b],true),260); if(!state.link){ state.link=1; $('#b-link').dataset.on='1'; save(); } } }
+live.addEventListener('pointerdown',fieldTap);
+
+// ---- the word, whole screen
+const page=$('#page'),menu=$('#menu'); let cur=null,posterAnim=null;
+function openPage(s){ cur=s; const b=live.getBoundingClientRect(); page.style.setProperty('--pig',pig(s.g)); page.style.setProperty('--ox',(b.left+s.x)+'px'); page.style.setProperty('--oy',(b.top+s.y)+'px'); fillPage(s); page.hidden=false; page.scrollTop=0; menu.hidden=true; requestAnimationFrame(()=>requestAnimationFrame(()=>page.classList.add('in'))); }
+function closePage(){ if(page.hidden) return; page.classList.remove('in'); menu.hidden=true; if(posterAnim){ try{posterAnim.cancel();}catch(e){} posterAnim=null; } const done=()=>{ page.hidden=true; page.removeEventListener('transitionend',done); }; page.addEventListener('transitionend',done); setTimeout(done,520); }
+function fillPage(s){ const w=s.w,p=passes(s),sealed=!!state.sealed[w.w];
+  const big=$('#p-word'); big.textContent=''; if(posterAnim){ try{posterAnim.cancel();}catch(e){} posterAnim=null; }
+  const MK=window.MeguriKanji; let drawn=false;
+  // the poster is built from KanjiVG strokes, so it needs no font to be right; it only needs the data for every character
+  if(MK&&[...w.w].every(ch=>MK.has(ch))){ try{ const box=document.createElement('div'); box.className='plate'; const cw=Math.min(300,Math.floor(Math.min(window.innerWidth*.7,320))); box.style.width=cw+'px'; big.style.writingMode='horizontal-tb'; big.appendChild(box);
+      // the default face is the pre-rendered poster: a build-time pen over typographic stroke data, every word read blind by two model families before it shipped
+      const PO=window.MEGURI_POSTERS||{}; const hasPen=!!PO[w.w];
+      const faces=(hasPen?['pen']:[]).concat(window.MeguriKakuji2?['kakuji2']:[],['dela','potta'],window.MeguriKakuji?['kakuji']:[]); const face=faces.includes(state.face)?state.face:faces[0]; const opts={ground:T.dark?'black':'paper',pigment:pig(s.g),dots:Math.min(5,p),sealed,reading:w.r,face};
+      // a tap on the poster cycles what the word is built from, so each can be judged on the phone
+      box.title='tap: another face'; box.style.cursor='pointer'; box.onclick=()=>{ state.face=faces[(faces.indexOf(face)+1)%faces.length]; save(); fillPage(s); toast({pen:'構築 · verified poster',kakuji2:'構築 · fidelity',dela:'Dela Gothic',potta:'Potta',kakuji:'角字 · heavy'}[state.face]); };
+      const go=()=>{ if(cur!==s||page.hidden) return; const still=matchMedia('(prefers-reduced-motion:reduce)').matches; const ko={ground:opts.ground,pigment:opts.pigment,dots:opts.dots,reading:w.r,sealed,width:cw};
+        if(face==='pen'){ const svgText=(T.dark?PO[w.w]:(PO[w.w+'_paper']||PO[w.w])); box.innerHTML=svgText; const sv=box.querySelector('svg'); if(sv){ sv.removeAttribute('width'); sv.removeAttribute('height'); sv.style.width='100%'; sv.style.display='block'; sv.style.borderRadius='6px'; sv.setAttribute('role','img'); sv.setAttribute('aria-label',w.w); if(!still){ sv.style.opacity='0'; sv.style.transition='opacity .4s ease'; requestAnimationFrame(()=>{ sv.style.opacity='1'; }); } } }
+        else if(face==='kakuji2'&&window.MeguriKakuji2){ const KK=window.MeguriKakuji2; if(KK.animateIn&&!still) posterAnim=KK.animateIn(box,w.w,ko); else KK.render(box,w.w,ko); }
+        else if(face==='kakuji'&&window.MeguriKakuji){ const KK=window.MeguriKakuji; if(KK.animateIn&&!still) posterAnim=KK.animateIn(box,w.w,ko); else KK.render(box,w.w,ko); }
+        else { if(!still) posterAnim=MK.animateIn(box,w.w,opts); else MK.render(box,w.w,opts); } };
+      // the face is embedded as a subset, but a font still loads lazily: wait for the word's own characters so the first look is never the fallback
+      if(document.fonts&&document.fonts.load) document.fonts.load("400 80px 'Meguri Dela'",w.w).then(go,go); else go(); drawn=true; }catch(e){ big.textContent=''; } }
+  if(!drawn){ big.style.writingMode=''; for(const ch of w.w){ const sp=document.createElement('span'); sp.textContent=ch; big.appendChild(sp); } }
+  const dots=$('#p-dots'); dots.hidden=drawn; dots.textContent=''; for(let i=5;i>=0;i--){ const d=document.createElement('s'); if(sealed&&i===5) d.className='seal'; else if(i<Math.min(6,p)) d.className='on'; dots.appendChild(d); }
+  $('#p-reading').textContent=w.r; $('#p-meaning').textContent=w.m; $('#p-def').textContent=w.d;
+  const ol=$('#p-kanji'); ol.textContent='';
+  for(const k of w.k){ const li=document.createElement('li'); const c=document.createElement('span'); c.className='c'; c.textContent=k.c; const mid=document.createElement('span'); const r=document.createElement('span'); r.className='r'; r.textContent=k.r; const m=document.createElement('span'); m.className='m'; m.textContent=k.m; mid.append(r,m); const more=document.createElement('span'); more.className='more'; more.textContent=k.p.length?'inside ›':''; const parts=document.createElement('span'); parts.className='parts'; if(k.p.length){ const lab=document.createElement('span'); lab.className='lab'; lab.textContent='made of'; parts.appendChild(lab); for(const q of k.p){ const sp=document.createElement('span'); sp.textContent=q; parts.appendChild(sp); } } li.append(c,mid,more,parts); li.onclick=()=>{ if(k.p.length) li.classList.toggle('open'); speak(k.c); }; ol.appendChild(li); }
+  const bq=$('#p-sent'); bq.textContent=''; const idx=w.s.indexOf(w.w); if(idx>=0){ bq.append(w.s.slice(0,idx)); const mk=document.createElement('mark'); mk.textContent=w.w; bq.append(mk,w.s.slice(idx+w.w.length)); } else bq.textContent=w.s;
+  $('#p-orbit').textContent=GROUP_JA[w.g]+' · '+GROUP_EN[w.g]+' · ×'+depthK(p).toFixed(2)+' to the centre';
+  $('#p-passes').textContent=p+' pass'+(p===1?'':'es')+(sealed?' · sealed':'');
+  const sb=$('#p-seal'); sb.dataset.on=sealed?'1':'0'; sb.querySelector('i').textContent=sealed?'sealed':'seal'; }
+$('#p-back').onclick=closePage;
+$('#p-say').onclick=()=>{ if(cur) speak(cur.w.w); };
+$('#p-seal').onclick=()=>{ if(!cur) return; const w=cur.w.w; if(state.sealed[w]) delete state.sealed[w]; else state.sealed[w]=1; save(); fillPage(cur); updateFoot(); toast(state.sealed[w]?'印を押した':'印を外した'); };
+$('#p-save').onclick=()=>{ if(menu.hidden) showMenu(); else menu.hidden=true; };
+function showMenu(){ menu.textContent=''; menu.classList.remove('naming'); const w=cur.w.w;
+  for(const name of Object.keys(state.lists)){ const b=document.createElement('button'); const has=state.lists[name].includes(w); b.append(name); const sm=document.createElement('small'); sm.textContent=has?'✓ '+state.lists[name].length:String(state.lists[name].length); b.appendChild(sm); b.onclick=()=>{ if(!has) state.lists[name].push(w); save(); menu.hidden=true; toast('「'+name+'」に入れた'); }; menu.appendChild(b); }
+  const nb=document.createElement('button'); nb.append('新しい…'); nb.onclick=()=>{ menu.classList.add('naming'); inp.focus(); }; menu.appendChild(nb);
+  const row=document.createElement('div'); row.className='new'; const inp=document.createElement('input'); inp.id='new-list'; inp.placeholder='名前'; inp.maxLength=12; const ok=document.createElement('button'); ok.textContent='作る'; const make=()=>{ const n=inp.value.trim(); if(!n) return; if(!state.lists[n]) state.lists[n]=[]; if(!state.lists[n].includes(w)) state.lists[n].push(w); save(); menu.hidden=true; toast('「'+n+'」に入れた'); }; ok.onclick=make; inp.onkeydown=e=>{ if(e.key==='Enter') make(); }; row.append(inp,ok); menu.appendChild(row); menu.hidden=false; }
+let toastT=0; function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1500); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(!menu.hidden) menu.hidden=true; else closePage(); } else if(e.key===' '&&page.hidden&&e.target===document.body){ e.preventDefault(); setPlaying(!playing); } });
+function updateFoot(){ let passed=0,sealed=0; for(const s of stations){ if(passes(s)>0) passed++; if(state.sealed[s.w.w]) sealed++; } $('#f-passed').textContent=passed+' passed · '+sealed+' sealed'; $('#f-bpm').textContent=state.bpm+' bpm'; }
+
+// ---- boot
+function start(data){ load(); if(data&&data.state) state=Object.assign(fresh(),data.state); syncDepth(); for(const s of stations) s.k=s.kT; showVoice(); for(const k of ['link','grow','drift']) $('#b-'+k).dataset.on=state[k]?'1':'0';
+  makePaperTile(); readTokens(); if(state.theme) document.documentElement.dataset.theme=state.theme; readTokens(); resize(); placeStations(); updateFoot(); renderPad(); requestAnimationFrame(tick);
+  loadAssets(()=>{ drawStatic(); });
+  try{ window.claude?.hot?.snapshot?.(()=>({state})); }catch(e){}
+  window.__meguri={stations,openPage,fire,audio,pluck,setDrone,get state(){return state},sound:()=>({AC,masterG,comp,wetG})}; }
+new ResizeObserver(()=>{ resize(); placeStations(); }).observe(field);
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{ drawStatic(); renderPad(); });
+if(window.claude?.hot?.ready) window.claude.hot.ready(start); else start(window.claude?.hot?.data||null);
+})();
+</script>
+</body>
+</html>
