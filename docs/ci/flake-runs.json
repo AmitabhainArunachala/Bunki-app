@@ -1297,8 +1297,8 @@
     "result": "retry",
     "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
     "startedAt": "2026-10-14T01:09:56Z",
-    "failures": 6,
-    "attemptedAt": "2026-10-15T12:41:27.878Z",
+    "failures": 7,
+    "attemptedAt": "2026-10-16T13:31:31.769Z",
     "reason": "Observation artifact not yet available: bunki-plan-38488422321-1"
   },
   "38488451285/1": {
