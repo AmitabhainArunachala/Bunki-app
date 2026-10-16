@@ -10229,9 +10229,13 @@ function readerQuickRecordAsRead(token, record = readerQuickRecord(token)) {
  * the spelling and names none read the text's way, "No dictionary entry for this reading."; until then, the quick
  * dictionary's own miss. */
 function readerReadingMissText(form = '') {
-  if (form && D.dictionaryIndex && (D.dictionaryMode === 'main' || D.dictionaryCompleteForms?.has(String(form)))
-    && dictionaryRowsForForm(form).length) return tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.');
+  if (dictionaryAnsweredForm(form) && dictionaryRowsForForm(form).length) return tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.');
   return readerGlossMissText(form);
+}
+
+/** N · the full dictionary has answered for this spelling: its index is in, and the spelling's rows are complete. */
+function dictionaryAnsweredForm(form = '') {
+  return !!form && !!D.dictionaryIndex && (D.dictionaryMode === 'main' || !!D.dictionaryCompleteForms?.has(String(form)));
 }
 
 /** The line under a content word on the ladder's English rung: its gloss
@@ -28774,12 +28778,16 @@ function renderWordNode(sheet, node) {
   // nothing is borrowed from the quick dictionary's other reading (ensureDictionaryRowsForNode resolves it)
   const unresolved = (node.seq == null || node.seq === '') && !!D.dict[node.id] && readingAsksIndex(node.id, node.reading);
   const details = unresolved ? [] : dictionaryDetailsFor(node);
+  // N · an entry read otherwise counts as missing (the lead, 2026-10-17): an unresolved page lends nothing of it — no
+  // other spellings, no JLPT level, no conjugation, and the tutor is told only the word and the text's reading (訳 read
+  // やく showed わけ's JLPT N4, and its tutor was primed with わけ and "reason")
+  const own = unresolved ? { r: node.reading || '', m: [] } : rec;
   const head = el('h2', 'headword');
   head.append(document.createTextNode(label));
-  const alternateSpellings = (rec?.written || []).filter((form) => form !== label).slice(0, 5);
+  const alternateSpellings = (own?.written || []).filter((form) => form !== label).slice(0, 5);
   if (alternateSpellings.length) {
     head.append(el('span', 'headword-alt', `／${alternateSpellings.join('・')}`));
-  } else if (rec?.alt) head.append(el('span', 'headword-alt', `／${rec.alt}`));
+  } else if (own?.alt) head.append(el('span', 'headword-alt', `／${own.alt}`));
   sheet.append(head);
   const shownReading = unresolved ? node.reading : rec?.r;
   if (shownReading) sheet.append(el('p', 'reading', shownReading));
@@ -28832,7 +28840,10 @@ function renderWordNode(sheet, node) {
     sheet.append(box);
   } else {
     const gloss = el('p', 'gloss absent');
-    gloss.textContent = tx('この語の語釈はまだない。読みと接続は下にある。', 'No gloss for this word yet — its reading and connections continue below.');
+    // N · asked and answered with no entry read the text's way, the page says so, as the word's card does
+    gloss.textContent = unresolved && dictionaryAnsweredForm(node.id) && dictionaryRowsForForm(node.id).length
+      ? tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.')
+      : tx('この語の語釈はまだない。読みと接続は下にある。', 'No gloss for this word yet — its reading and connections continue below.');
     sheet.append(gloss);
   }
   if (!details.length && !node.dictionaryError && !node.dictionaryReady && D.dictionaryState !== 'error') {
@@ -28866,15 +28877,15 @@ function renderWordNode(sheet, node) {
     credit.append(licence);
     sheet.append(credit);
   }
-  const jlpt = rec?.jlpt || (legacy?.jlpt ? `N${legacy.jlpt}` : null);
+  const jlpt = own?.jlpt || (!unresolved && legacy?.jlpt ? `N${legacy.jlpt}` : null);
   if (jlpt) {
     const meta = el('div', 'shelf-meta');
     const level = String(jlpt).replace(/^N?/, 'N');
     meta.append(referenceCollectionChip(`JLPT ${level}`, `jlpt:${level}`));
     sheet.append(meta);
   }
-  renderConjugation(sheet, node.id, rec?.p);
-  if (!personalHost) renderAiTutor(sheet, node, rec);
+  renderConjugation(sheet, node.id, own?.p);
+  if (!personalHost) renderAiTutor(sheet, node, own);
 
   // EXAMPLES — real sentences, shelf first, the bank behind them; every
   // token carries the reader's ladder (ふりがな → gloss → full entry)
@@ -28923,7 +28934,7 @@ function renderWordNode(sheet, node) {
       sheet.append(fold);
     }
   }
-  if (!personalHost) renderAiExamples(sheet, node, rec);
+  if (!personalHost) renderAiExamples(sheet, node, own);
 
   // the semantic neighbourhood — the single most important surface here.
   // When nothing is written yet the section says NOTHING: the old empty
