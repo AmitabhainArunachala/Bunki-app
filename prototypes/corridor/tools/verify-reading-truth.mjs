@@ -15,6 +15,11 @@
  *   A9  the cold first tap (L): with the full dictionary held, 月 in 9月 (がつ) shows a quiet "…" and a held Save, never
  *       the quick dictionary's つき "Moon"; released, がつ's meaning; answered 500, the "…" stays. Every case counts every
  *       page error (L dropped R's ResizeObserver filter; the capture case listens too)
+ *   A10 (N, 2026-10-17) a word no entry is read for: Kawaguchi's 訳 read やく; every dictionary the build serves reads
+ *       訳 only わけ ("reason"). An entry read otherwise counts as missing. With the full dictionary held, the first tap
+ *       shows 「やく …」 with Save held. Once it answers, the same card, with no second tap, says "No dictionary entry for
+ *       this reading.", its Save held, with "So it can't be saved here.". Its meaning line never shows わけ's meaning,
+ *       and its page (the second tap) shows no meaning
  *   R   recorded, never asserted: 式 in 表彰式 and 改造 in 内閣改造 (sense: the tokens carry no sense data), ちかい in
  *       the phonetic parenthetical (G3), し of する (an inflected verb reads its dictionary form), the first paint
  * Negative control: the same run against a build with R's reading edits reverted fails A1 on 年 (とし). */
@@ -48,6 +53,7 @@ const WIKINEWS = art('wikinews:45227', 'wikinews-45227.json', '21年の歴史');
 const KOJIKI = art('bunki-essay-n2-kojiki-myth-history', 'bunki-essay-n2-kojiki-myth-history.json', '古事記');
 const DIARY = art('bunki-graded-n3-nakaima-diary', 'bunki-graded-n3-nakaima-diary.json', '中今');
 const CABINET = art('jawiki:5294446', 'jawiki-5294446.json', '高市内閣');
+const KAWAGUCHI = art('aozora:049966-1', 'aozora-049966-1.json', 'チベット旅行記');
 // a homograph read otherwise than the quick dictionary names its entry; its twin read like the quick dictionary is the core
 const PAIRS = Object.freeze([
   { name: '年 ねん (令和8年: a counter)', at: STARTUP, index: 2, s: '年', r: 'ねん', seq: '2084840' },
@@ -62,6 +68,9 @@ const STARTUP_WORD = { at: STARTUP, index: 17, s: 'スタートアップ', seq: 
 // L · the cold first tap: 月 in 9月 reads がつ; the quick dictionary's 月 reads つき ("Moon")
 const COLD = { at: STARTUP, index: 4, s: '月', r: 'がつ', seq: '2871532' };
 const NAME = { at: STARTUP, index: 8, s: '高市' };
+// N · a word no entry is read for: 訳 in シナ訳 reads やく; the served dictionaries' 訳 reads only わけ ("reason")
+const UNREAD = { at: KAWAGUCHI, index: 548, s: '訳', r: 'やく' };
+const NO_READING = 'No dictionary entry for this reading.';
 const STABLE = { at: STARTUP, index: 9, s: '総理', r: 'そうり' };
 const RECORDED = Object.freeze([
   { name: '式 in 表彰式 (sense)', at: STARTUP, index: 21, s: '式' },
@@ -115,6 +124,10 @@ check('F0.name', `${STARTUP.id} #8 is 高市, a name no dictionary lists`, token
 check('F0.cold', `${STARTUP.id} #4 is 月 read がつ, uninflected; the quick dictionary reads it つき; entry ${COLD.seq} reads がつ`,
   tokenAt(COLD)?.s === '月' && tokenAt(COLD).b === '月' && tokenAt(COLD).r === 'がつ' && core['月']?.r === 'つき' && k2h(core['月'].r) !== 'がつ'
     && bySeq.get(COLD.seq)?.[5]?.some((kana) => k2h(kana) === 'がつ'), { token: tokenAt(COLD), core: core['月'] });
+check('F0.unread', `${KAWAGUCHI.id} #548 is 訳 read やく, uninflected, a content word; the quick dictionary reads 訳 わけ; no entry the full dictionary serves writes 訳 and reads やく`,
+  tokenAt(UNREAD)?.s === '訳' && tokenAt(UNREAD).b === '訳' && tokenAt(UNREAD).r === 'やく' && tokenAt(UNREAD).c === true && k2h(core['訳']?.r) === 'わけ'
+    && entries.some((row) => row[4].includes('訳')) && !entries.some((row) => row[4].includes('訳') && row[5].some((kana) => k2h(kana) === 'やく')),
+  { token: tokenAt(UNREAD), core: core['訳'], rows: entries.filter((row) => row[4].includes('訳') && row[1] === '訳').map((row) => row.slice(0, 4)) });
 check('F0.stable', `${STARTUP.id} #9 is 総理 read そうり, like the quick dictionary`, tokenAt(STABLE)?.r === 'そうり' && core['総理']?.r === 'そうり', tokenAt(STABLE));
 for (const fixture of RECORDED) check(`F0.${fixture.name}`, `${fixture.at.id} #${fixture.index} is ${fixture.s}`, tokenAt(fixture)?.s === fixture.s, tokenAt(fixture));
 check('F0.no-sense', 'reader tokens carry no sense, gloss or entry number (s b p r f c, and rs)',
@@ -388,6 +401,71 @@ async function coldCase(browser, contextOptions, answer) {
   }
 }
 
+/** A10 · a word no entry is read for (N, 2026-10-17; Codex 0304): the cold first tap on Kawaguchi's 訳 (やく) settles,
+ * in the same card, to "No dictionary entry for this reading." once the held full dictionary answers; its meaning line
+ * never shows わけ's "reason"; the second tap's page shows no meaning. */
+async function unreadCase(browser, contextOptions) {
+  const tag = 'A10';
+  const context = await browser.newContext(contextOptions);
+  await silenceBrowserAudio(context);
+  await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
+  let release = () => {}, asked = 0;
+  const gate = new Promise((done) => { release = done; });
+  await context.route((url) => url.pathname === INDEX_PATH, async (route) => {
+    asked += 1;
+    await gate;
+    try { await route.continue(); } catch { /* the context closed first */ }
+  });
+  const page = await context.newPage(), errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  const other = core['訳']?.m?.[0];
+  try {
+    await openArticle(page, UNREAD.at);
+    await closeMini(page);
+    await page.evaluate(() => {
+      window.__readingTruthGlosses = [];
+      const seen = () => {
+        for (const node of document.querySelectorAll('#mini .mini-gloss')) {
+          if (window.__readingTruthGlosses.at(-1) !== node.textContent) window.__readingTruthGlosses.push(node.textContent);
+        }
+      };
+      new MutationObserver(seen).observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+    await tapAt(page, tok(page, UNREAD.index));
+    await page.locator('#mini').waitFor({ timeout: 20000 });
+    for (let attempt = 0; attempt < 80 && !asked; attempt++) await delay(250);
+    const held = await miniState(page);
+    check(`${tag}.held`, 'with the full dictionary held, the card for 訳 reads やく, its meaning line is a quiet "…", Save is held and says nothing',
+      asked > 0 && held?.word === '訳' && k2h(held.reading) === 'やく' && held.gloss === '…' && held.take?.disabled === true && held.reason === null,
+      { asked, held });
+    release();
+    await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 30000 });
+    await delay(600);
+    const settled = await miniState(page);
+    check(`${tag}.settled`, `answered, the same card — no second tap — says "${NO_READING}", reads やく, its Save held with "${SAVE_REASON}"`,
+      k2h(settled?.reading) === 'やく' && settled.gloss === NO_READING && settled.take?.disabled === true && settled.reason === SAVE_REASON, settled);
+    const shown = await page.evaluate(() => window.__readingTruthGlosses);
+    check(`${tag}.never-borrowed`, `the meaning line never showed わけ's meaning ("${other}")`,
+      shown.length > 0 && shown.every((text) => ['…', NO_READING].includes(text)), shown);
+    await page.locator('#mini .mini-word').click();
+    await page.locator('#sheet').waitFor({ timeout: 20000 });
+    await delay(800);
+    const sheet = await page.evaluate(() => {
+      const node = document.getElementById('sheet');
+      return node ? { head: node.querySelector('.headword')?.textContent ?? null, reading: node.querySelector('.reading')?.textContent ?? null,
+        absent: node.querySelector('.gloss.absent')?.textContent ?? null, senses: node.querySelectorAll('.senses, .sense-list').length } : null;
+    });
+    check(`${tag}.page`, 'the second tap\'s page is 訳 read やく and shows no meaning (no senses; its plain no-gloss line)',
+      sheet?.head === '訳' && k2h(sheet.reading) === 'やく' && !!sheet.absent && sheet.senses === 0, sheet);
+  } catch (error) {
+    check(`${tag}.error`, `${tag} ran to the end`, false, String(error.stack || error).slice(0, 600));
+  } finally {
+    release();
+    check(`${tag}.page-errors`, `${tag}: no page errors`, errors.length === 0, errors);
+    await context.close();
+  }
+}
+
 async function deckCase(page) {
   const file = json('decks/kotoba-mcd/tokens.json');
   await boot(page, '?deck=mcd&ui=bi');
@@ -500,6 +578,8 @@ try {
       try { await coldCase(browser, contextOptions, answer); }
       catch (error) { check(`A9.${answer}.error`, `A9 (${answer}) ran to the end`, false, String(error.stack || error).slice(0, 600)); }
     }
+    try { await unreadCase(browser, contextOptions); }
+    catch (error) { check('A10.error', 'A10 ran to the end', false, String(error.stack || error).slice(0, 600)); }
     await browser.close();
   }
 } finally {
