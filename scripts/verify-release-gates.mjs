@@ -1489,12 +1489,13 @@ const NATIVE_GATE_CASES = [
     'no request, console, or page errors across the run',
     'all completion and bookmark state persists in the native learner record',
     'the 日本語のみ chrome renders no English titles',
-    // 未確認 once per section (operator's review, 2026-10-01): each masthead counts the pending stories
-    'the 日本語のみ masthead says 未確認 once, counting every human-review-pending story',
-    'every human-review-pending story wears 未確認 in its reader meta line',
+    // S (John, 2026-10-16: "no one wants to see a made by ai in red"): no provenance on the shelf or in any reader meta —
+    // these mirror verify-native-readings' rewritten cases; they pinned 未確認 said once per masthead and worn per story
+    'the 日本語のみ shelf says nothing of how its stories were made (no note, no AI作成 / 未確認), pending stories or not',
+    'no human-review-pending story wears a provenance mark in its reader meta or facts',
     'all 30 native completions and exact bookmarks survive a real page reload',
     'the bilingual shelf renders every English title from the records themselves, today’s six included',
-    'the bilingual masthead says 未確認 once, counting every human-review-pending story of the shelf',
+    'the bilingual shelf says nothing of how its stories were made (no note, no Made by AI), pending stories or not',
     'the bilingual shelf pass added no request, console, or page errors',
   ].map((name) => ({ name, articleId: null })),
   {
