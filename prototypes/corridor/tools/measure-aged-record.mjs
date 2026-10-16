@@ -152,7 +152,7 @@ async function exportRecord(page, directory, name) {
   await button.click();
   const refusal = page.waitForFunction(() => {
     const note = document.getElementById('record-portability-status')?.textContent?.trim();
-    return note && /could not|exceeds|上限|作れない/u.test(note) ? note : false;
+    return note && /could not|exceeds|larger than|上限|作れない|収まる/u.test(note) ? note : false;
   }, null, { timeout: 180000, polling: 200 }).then((handle) => handle.jsonValue()).catch(() => null);
   const first = await Promise.race([download.then((file) => ({ file })), refusal.then((note) => ({ note }))]);
   const ms = Date.now() - t0;
