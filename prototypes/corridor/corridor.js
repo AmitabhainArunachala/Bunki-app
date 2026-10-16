@@ -8743,6 +8743,17 @@ function releasePageUnderDrawer(pop) {
   saveDrawerWatch = null;
   setSaveDrawerPush(kind, null);
 }
+/** A render under an open drawer drew its Save again (arriving examples, a list's receipt): the Save now standing under
+ * the same name owns the open menu, its caret open — one menu, one owner, and a press on it folds the menu as a press on
+ * the one it replaced would have. */
+function adoptSaveMenuOwner() {
+  const old = vocabularyListInvoker;
+  if (!old || old.isConnected || !old.id || !document.getElementById('vocabulary-list-popover')) return;
+  const fresh = document.getElementById(old.id);
+  if (!fresh || fresh === old || !fresh.matches('button.save-one')) return;
+  vocabularyListInvoker = fresh;
+  fresh.setAttribute('aria-expanded', 'true');
+}
 /** The one Save's menu for an item with no lists (a sentence, a link): its own rows only, in the same places. */
 function openPlainSaveMenu(invoker, { more = [], place = null } = {}) {
   if (document.getElementById('vocabulary-list-popover')) {
@@ -31055,6 +31066,7 @@ function renderSheet(root, { prebuilt = null } = {}) {
  * re-render or the writing room carried), then the focus a re-render named, the door a deeper page was opened from, or
  * its Close. */
 function mountPageEffects(sheet, node) {
+  adoptSaveMenuOwner();
   // reading position survives the doors: Back hands a ~2,700px entry its place, never its top (P1, review)
   const savedSheetScroll = node.sheetScroll || 0;
   if (savedSheetScroll) requestAnimationFrame(() => {
@@ -31073,6 +31085,10 @@ function mountPageEffects(sheet, node) {
   S.sheetReturnFocus = null;
   queueMicrotask(() => {
     if (!sheet.isConnected) return;
+    // S · the keyboard on a bar's open drawer (a list's name half typed) stays there: the page under it was drawn again,
+    // the drawer was not
+    const drawer = document.getElementById('vocabulary-list-popover');
+    if (drawer?.classList.contains('is-drawer') && drawer.contains(document.activeElement)) return;
     const target = (focusId && sheet.querySelector(`#${CSS.escape(focusId)}`)) || findSheetDoor(sheet, returnFocus) ||
       sheet.querySelector('#sheet-back');
     target?.focus({ preventScroll: true });
@@ -34531,6 +34547,7 @@ function render() {
       : (named.length === 1 ? named[0] : null) || all[focusKey.ix];
     if (again && typeof again.focus === 'function') again.focus({ preventScroll: true });
   }
+  adoptSaveMenuOwner();
   lastRenderedView = S.view;
   // Sample the resolved ground after both the view classes and room stamp settle.
   syncPaper();
