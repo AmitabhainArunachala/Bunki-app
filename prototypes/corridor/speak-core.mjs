@@ -261,8 +261,9 @@ export function buildSystemInstruction({ scene: sc, plants = [], notes = [], avo
   return lines.join('\n');
 }
 
-/** The request body for one turn of ears and brain. history: the recent turns as { who: 'me'|'kore', text }. */
-export function buildTurnRequest({ system, history = [], mode = 'talk', wavBase64 = null, target = null, nudge = null } = {}) {
+/** The request body for one turn of ears and brain. history: the recent turns as { who: 'me'|'kore', text }. A typed
+ * line (the microphone refused) stands where the audio would: he wrote it, so it is what was heard. */
+export function buildTurnRequest({ system, history = [], mode = 'talk', wavBase64 = null, typed = null, target = null, nudge = null } = {}) {
   if (!TURN_MODES.includes(mode)) throw new Error('unknown-mode');
   const contents = [];
   for (const turn of history.slice(-8)) {
@@ -272,6 +273,7 @@ export function buildTurnRequest({ system, history = [], mode = 'talk', wavBase6
   }
   const parts = [];
   if (wavBase64) parts.push({ inlineData: { mimeType: 'audio/wav', data: wavBase64 } });
+  else if (typed) parts.push({ text: `TYPED (what he wrote; treat it as heard): ${JSON.stringify(String(typed).slice(0, 400))}` });
   const directive = { mode, ...(target ? { target: String(target).slice(0, 200) } : {}), ...(nudge ? { note: nudge } : {}) };
   parts.push({ text: `MODE: ${JSON.stringify(directive)}` });
   contents.push({ role: 'user', parts });

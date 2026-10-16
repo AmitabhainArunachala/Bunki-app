@@ -105,6 +105,8 @@ try {
     'guided-session-engine.mjs',
     'guided-session-content.mjs',
     'guided-moments.mjs',
+    'speak.js',
+    'speak-core.mjs',
     'corridor-ink.js',
     'dictionary-worker.js',
     'skip-core.js',
