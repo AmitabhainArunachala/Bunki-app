@@ -3634,7 +3634,8 @@ async function personalDictionaryBridge(container) {
     overlay.querySelector('#sheet-search')?.remove();
     overlay.querySelectorAll('[data-reference-door]').forEach(door => door.remove());
     if (vocabularyListNode) {
-      vocabularyListInvoker = overlay.querySelector('#personal-add-list');
+      // S · the page's one Save owns its open menu (the foot's "Add to list…", #personal-add-list, is gone)
+      vocabularyListInvoker = overlay.querySelector('#sheet-take') || vocabularyListInvoker;
       vocabularyListInvoker?.setAttribute('aria-expanded', 'true');
       queueMicrotask(() => { if (popoverFocus?.isConnected) popoverFocus.focus({ preventScroll: true }); });
     }
@@ -8229,7 +8230,9 @@ let miniOnClose = null;
 let miniDiving = false; // the slip is opening the full entry (the band, the second tap)
 const slipSummons = []; // the onClose of every slip whose entry is open, called when the entry closes
 function removeMini() {
-  closeVocabularyListPopover();
+  // the card's own menu goes with the card; a bar's drawer belongs to its bar, and the render that follows decides it
+  // (adoptSaveMenuOwner): arriving data that redraws the page keeps it open, a page or room that goes takes it along
+  if (!document.getElementById('vocabulary-list-popover')?.classList.contains('is-drawer')) closeVocabularyListPopover();
   const slip = document.getElementById('mini');
   slip?.remove();
   miniAnchor = null;
@@ -8302,10 +8305,13 @@ document.addEventListener(
     const pop = document.getElementById('vocabulary-list-popover');
     if (pop && !pop.contains(target) && !target.closest?.('#mini-take, #personal-add-list, #kp-take, .save-one')) {
       const card = pop.classList.contains('is-inline') ? pop.closest('#mini') : null;
-      if (card && (card.contains(target) || (miniAnchor?.isConnected && miniAnchor.contains(target)))) foldMenuAfterPress(pop);
-      // S · a bar's drawer holds the page a step down while it is open: it folds once the press has landed, so the page
-      // sliding back up never hands the press to whatever slid beneath the finger (W2's lesson, above)
-      else if (pop.classList.contains('is-drawer')) foldMenuAfterPress(pop);
+      if (card) {
+        if (card.contains(target) || (miniAnchor?.isConnected && miniAnchor.contains(target))) foldMenuAfterPress(pop);
+        else closeVocabularyListPopover();
+      // S · a menu standing in a page's row, or hanging from a bar, holds the page a step down while it is open: it folds
+      // once the press has landed, so the page sliding back never hands the press to whatever slid beneath the finger
+      // (W2's lesson, above)
+      } else if (pop.classList.contains('is-inline')) foldMenuAfterPress(pop);
       else closeVocabularyListPopover();
     }
     const mini = standingSlip();
@@ -8748,11 +8754,15 @@ function releasePageUnderDrawer(pop) {
  * the one it replaced would have. */
 function adoptSaveMenuOwner() {
   const old = vocabularyListInvoker;
-  if (!old || old.isConnected || !old.id || !document.getElementById('vocabulary-list-popover')) return;
-  const fresh = document.getElementById(old.id);
-  if (!fresh || fresh === old || !fresh.matches('button.save-one')) return;
-  vocabularyListInvoker = fresh;
-  fresh.setAttribute('aria-expanded', 'true');
+  if (!old || old.isConnected || !document.getElementById('vocabulary-list-popover')) return;
+  const fresh = old.id ? document.getElementById(old.id) : null;
+  if (fresh && fresh !== old && fresh.matches('button.save-one')) {
+    vocabularyListInvoker = fresh;
+    fresh.setAttribute('aria-expanded', 'true');
+    return;
+  }
+  // its Save went with the render (another room, the page closed): the menu goes with it
+  closeVocabularyListPopover();
 }
 /** The one Save's menu for an item with no lists (a sentence, a link): its own rows only, in the same places. */
 function openPlainSaveMenu(invoker, { more = [], place = null } = {}) {
@@ -17268,37 +17278,54 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
       appendFileSourceRange(timedSelection, saved, { ...selection, sourceDigest: saved.candidate.article.body.contentSha256 });
     status.textContent = selection ? '' : tx('4000文字以内の文章を選ぶ。', 'Choose a selection of at most 4,000 characters.');
     refresh();
+    paintWordSave(keepSave, !!selection && keptAt === selectionKey(selection));
   };
-  for (const [discuss, ja, en] of [[false, '選んだ文章を保存', 'save selected text'], [true, '保存した文をひらく', 'open saved context']]) {
-    const button = biLabel('button', 'chip', ja, en); button.type = 'button';
-    button.id = `${controlPrefix}-context-${discuss ? 'open' : 'save'}`;
-    button.addEventListener('click', async () => {
-      const selected = selection;
-      if (!selected || pending || !recordWritable()) return;
-      const epoch = recordEpoch, serial = discuss ? ++teacherContextSelectionSerial : null;
-      pending = true; refresh();
-      try {
-        const module = await ensureTeacherContextModule();
-        const context = await makeContext(selected);
-        await resolveTeacherSource(context);
-        if (!recordWritable(epoch)) return;
-        const kept = await commitStorePatch((latest) => {
-          if (personal ? !sourceInboxModule.selectSourceCapture(latest.sourceInbox, saved.id)
-            : !publisherModule.selectPublisherReading(latest.publisherLibrary, saved.receiptSha256)) throw new Error('source-unavailable');
-          const selectedRoot = module.selectTeacherContext(latest.teacherContexts, context);
-          return { teacherContexts: discuss && button.isConnected && serial === teacherContextSelectionSerial
-            ? selectedRoot : module.activateTeacherContext(selectedRoot, latest.teacherContexts?.activeRef || null) };
-        });
-        if (!kept || !recordWritable(epoch) || !button.isConnected) return;
-        if (discuss && serial === teacherContextSelectionSerial) {
-          keepScroll(); stopReadAloud(); S.stack = []; S.view = 'ai'; S.aiChatShown = AI_CHAT_PAGE;
-          render(); window.scrollTo(0, 0);
-        } else status.textContent = tx('出典と一緒に保存した。復習は増えていない。', 'Saved with its source. No reviews were added.');
-      } catch (error) { if (recordReady(epoch) && section.isConnected) status.textContent = teacherSourceError(error); }
-      finally { pending = false; refresh(); }
-    });
-    controls.push(button); actions.append(button);
-  }
+  // S · keeping the selected text is the one Save (saveOne: Save ▾ · Saved ✓ ▾, its menu standing in this row) — it was a
+  // chip of its own words ("save selected text") with "No reviews were added." beside it; opening it on the tutor page stays
+  // its own door. Both keep through the same guarded commit.
+  let keptAt = null;
+  const selectionKey = (selected) => (selected ? `${selected.start}:${selected.end}` : null);
+  const keepSelection = async (discuss, control) => {
+    const selected = selection;
+    if (!selected || pending || !recordWritable()) return false;
+    const epoch = recordEpoch, serial = discuss ? ++teacherContextSelectionSerial : null;
+    pending = true; refresh();
+    try {
+      const module = await ensureTeacherContextModule();
+      const context = await makeContext(selected);
+      await resolveTeacherSource(context);
+      if (!recordWritable(epoch)) return false;
+      const kept = await commitStorePatch((latest) => {
+        if (personal ? !sourceInboxModule.selectSourceCapture(latest.sourceInbox, saved.id)
+          : !publisherModule.selectPublisherReading(latest.publisherLibrary, saved.receiptSha256)) throw new Error('source-unavailable');
+        const selectedRoot = module.selectTeacherContext(latest.teacherContexts, context);
+        return { teacherContexts: discuss && control.isConnected && serial === teacherContextSelectionSerial
+          ? selectedRoot : module.activateTeacherContext(selectedRoot, latest.teacherContexts?.activeRef || null) };
+      });
+      if (!kept || !recordWritable(epoch) || !control.isConnected) return false;
+      keptAt = selectionKey(selected);
+      if (discuss && serial === teacherContextSelectionSerial) {
+        keepScroll(); stopReadAloud(); S.stack = []; S.view = 'ai'; S.aiChatShown = AI_CHAT_PAGE;
+        render(); window.scrollTo(0, 0);
+      } else status.textContent = tx('出典と一緒に保存した。', 'Saved with its source.');
+      return true;
+    } catch (error) {
+      if (recordReady(epoch) && section.isConnected) status.textContent = teacherSourceError(error);
+      return false;
+    } finally { pending = false; refresh(); }
+  };
+  const keepSave = saveOne({
+    id: `${controlPrefix}-context-save`, cls: 'context-save', label: tx('選んだ文章', 'the selected text'),
+    saved: () => !!selection && keptAt === selectionKey(selection),
+    keep: () => keepSelection(false, keepSave),
+    more: () => [{ id: `${controlPrefix}-context-copy`, label: tx('コピー', 'Copy'), run: () => copyReaderText(selection?.quote || '') }],
+  });
+  controls.push(keepSave); actions.append(keepSave);
+  const openSaved = biLabel('button', 'chip', '保存した文をひらく', 'open saved context'); openSaved.type = 'button';
+  openSaved.id = `${controlPrefix}-context-open`;
+  openSaved.addEventListener('click', () => { void keepSelection(true, openSaved); });
+  controls.push(openSaved); actions.append(openSaved);
+  actions.dataset.saveRow = '';
   section.append(prompt, quote, timedSelection, actions, status); main.append(section);
   const practice = biLabel('button', 'chip', 'この文を練習する', 'practice this sentence');
   practice.type = 'button'; practice.id = `${controlPrefix}-sentence-practice`;
@@ -31144,6 +31171,7 @@ function renderLayer({ prebuilt = null } = {}) {
   removeMini();
   for (const old of root.querySelectorAll(':scope > #sheet')) old.remove();
   if (S.stack.length) renderSheet(root, { prebuilt });
+  adoptSaveMenuOwner();
   applyLayerLaw(root);
   const crumb = root.querySelector(':scope > .chrome .crumb');
   if (crumb) paintCrumb(crumb);
