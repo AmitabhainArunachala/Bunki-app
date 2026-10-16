@@ -5879,8 +5879,10 @@ function renderShelfBody(search = null) {
   }
   const filters = S.shelfFilters ||= { sort: 'today', topic: '', jlpt: '', grade: '', text: '' };
   const unfiltered = !filters.text && !filters.topic && !filters.jlpt && !filters.grade;
-  // the default order (今日の棚) opens on the newest drop; 最新 Latest keeps the publication order
-  const shelfOrder = filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : filters.sort==='latest' ? byNewest : byNewestDrop(newestDropDay(stories));
+  // the default order (今日の棚) opens on the newest drop, in its own order; 最新 Latest keeps the publication order
+  const dropFirst = !['title', 'short', 'new', 'latest'].includes(filters.sort);
+  const dropDay = dropFirst ? newestDropDay(stories) : '';
+  const shelfOrder = filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : filters.sort==='latest' ? byNewest : byNewestDrop(dropDay);
   // One slim chip bar. Each chip wears its current value; its native <select> lies over it,
   // transparent, so the platform's own picker opens and nothing is truncated on the surface.
   const controls = el('div', 'shelf-controls shelf-chipbar');
@@ -5903,7 +5905,7 @@ function renderShelfBody(search = null) {
   const topics = [['news','ニュース','News'],['politics','政治','Politics'],['international','国際','World'],['technology','テクノロジー','Technology'],['science','科学','Science'],['economy','経済','Economy'],['environment','環境','Environment'],['culture','文化','Culture'],['literature','文学','Literature'],['sports','スポーツ','Sports'],['health','健康','Health'],['society','社会','Society']];
   select('sort', tx('並び順', 'Sort'), [['today', '今日の棚', 'For today'], ['latest', '最新', 'Latest'], ['new', '新着', 'Newly added'], ['title', '見出し順', 'Title'], ['short', '短い順', 'Shortest']]);
   select('topic', tx('分野', 'Topic'), [['', '分野', 'Topic'], ...topics]);
-  select('jlpt', tx('レベル（JLPT語彙の目安）', 'Level (JLPT vocabulary, estimated)'), [['', 'レベル', 'Level'], ...['N5','N4','N3','N2','N1'].map(v => [v, v, ''])]);
+  select('jlpt', tx('レベル（JLPT の目安）', 'Level (JLPT, as a guide)'), [['', 'レベル', 'Level'], ...['N5','N4','N3','N2','N1'].map(v => [v, v, ''])]);
   select('grade', tx('漢字の学年', 'Kanji grade'), [['', '学年', 'Grade'], ...[1,2,3,4,5,6].map(v => [String(v), `小${v}`, `Grade ${v}`]), ['secondary', '中学以上', 'Secondary+']]);
   const searchLabel = el('label', 'shelf-reading-search filter-search');
   searchLabel.append(uiIcon('search'));
@@ -5916,7 +5918,7 @@ function renderShelfBody(search = null) {
   helpSummary.title = tx('レベルの見方', 'How the level filters work');
   helpSummary.append(uiIcon('info'));
   help.append(helpSummary);
-  help.append(el('p','',tx('レベルは読み物を選ぶ目安です。JLPT は本文の語彙、学年は使われている漢字から見積もっています。あなたの能力や年齢の判定ではありません。', 'These estimates help you choose an article. JLPT level comes from its vocabulary; school grade from its kanji. Neither is a rating of your ability or age.'))); controls.append(help);
+  help.append(el('p','',tx('レベルは読み物を選ぶ目安です。JLPT は、その文章が書かれたレベル（記録のない読み物は本文の語彙から見積もったもの）、学年は使われている漢字から見積もっています。あなたの能力や年齢の判定ではありません。', 'These help you choose an article. Its JLPT level is the level it was written for (where none is recorded, an estimate from its vocabulary); school grade comes from its kanji. Neither is a rating of your ability or age.'))); controls.append(help);
   // The filters and the article search fold into the Tools sheet (review 2026-10-08 #6): the shelf
   // opens on its lead woodblock, not on a wall of fields. Every control keeps its id and behaviour.
   const filterGroup = el('section', 'shelf-tools-group shelf-tools-filters');
@@ -6145,10 +6147,15 @@ function renderShelfBody(search = null) {
   body.append(main);
   let matches = stories.filter(p => {
     const f=p.readingFacets || {};
-    return (!filters.topic || (f.topics || [p.topic]).includes(filters.topic)) && (!filters.jlpt || f.jlpt===filters.jlpt) && (!filters.grade || f.schoolGrade===filters.grade) && (!filters.text || `${p.title} ${p.titleEn || ''} ${p.snippet || ''} ${(f.topics || []).join(' ')}`.toLocaleLowerCase().includes(filters.text.toLocaleLowerCase()));
+    // the level filter takes the level the card shows (N): the written-for level where the row has one, else the estimate
+    return (!filters.topic || (f.topics || [p.topic]).includes(filters.topic)) && (!filters.jlpt || storyLevel(p).step===filters.jlpt) && (!filters.grade || f.schoolGrade===filters.grade) && (!filters.text || `${p.title} ${p.titleEn || ''} ${p.snippet || ''} ${(f.topics || []).join(' ')}`.toLocaleLowerCase().includes(filters.text.toLocaleLowerCase()));
   });
   matches.sort(shelfOrder);
-  if (filters.sort === 'today' && unfiltered) matches = shelfDailyOrder(matches, day);
+  // the newest drop keeps its own reading order at the head — the newest dated news leads, and every new reading stands
+  // ahead of every inherited one (N); the daily turn freshens the shelf after it
+  let dropCount = 0;
+  while (dropDay && dropCount < matches.length && matches[dropCount].addedAt === dropDay) dropCount += 1;
+  if (filters.sort === 'today' && unfiltered) matches = [...matches.slice(0, dropCount), ...shelfDailyOrder(matches.slice(dropCount), day)];
   const count=el('p','shelf-results-count',shelfTallyText(matches));count.setAttribute('role','status');controls.append(count);
   // unfiltered, the masthead already carries this same tally: the line stays for assistive tech only
   if (!Object.values(filters).some((v,i)=>i>0 && v)) count.classList.add('is-quiet');
@@ -6275,7 +6282,8 @@ function renderShelfBody(search = null) {
   for (const p of matches) {
     if (p.source === 'isa-yasashii-glossary') continue;
     if (rank >= 3 && inBand.has(p.id)) continue;
-    if (rank === 3) grid.append(...bands.splice(0));
+    // the bands (today's six, words met again) follow the lead and its two seconds — and never stand inside the newest drop
+    if (rank === Math.max(3, dropCount)) grid.append(...bands.splice(0));
     grid.append(shelfCard(p, rank === 0 ? 'lead' : rank < 3 ? 'second' : 'grid'));
     rank += 1;
   }
@@ -7847,15 +7855,21 @@ function readerDateStamp(day) {
 function learnerSourceLabel(p) {
   return String(p.sourceLabel || '').replace(/\s*·\s*検収前/gu, '').replace(/^N3書き換え\s*·\s*/u, '').trim();
 }
-/** A story's one level (N, 2026-10-17: one level per card): the level its text was written for where the record carries
- * it (authorLevel, the level its reviewers accepted), else the JLPT vocabulary estimate; the sentence band beside it. */
+/** A story's one level (N, 2026-10-17: one level per card), shown on its chip and taken by the level filter: the level its
+ * text was written for where the record carries it (authorLevel, the level its reviewers accepted), else the JLPT
+ * vocabulary estimate. `step` is its JLPT step (N1+ steps at N1). */
+function storyLevel(p) {
+  const authored = /^N[1-5]\+?$/u.test(p?.authorLevel || '') ? p.authorLevel : '';
+  const level = authored || p?.readingFacets?.jlpt || '';
+  return { level, authored, step: level.replace(/\+$/u, '') };
+}
+/** The chip carries the story's one level, with the sentence band beside it. */
 function levelChip(p, extra = '') {
   const jlpt = p.readingFacets?.jlpt;
-  const authored = /^N[1-5]\+?$/u.test(p.authorLevel || '') ? p.authorLevel : '';
-  const level = authored || jlpt;
+  const { level, authored, step } = storyLevel(p);
   const lv = levelPhrase(p.grading);
   const chip = el('span', `level-chip${extra ? ` ${extra}` : ''}`, level || (bi() ? lv.level : lv.ja));
-  if (level) chip.dataset.level = level.replace(/\+$/u, '');
+  if (level) chip.dataset.level = step;
   chip.title = authored
     ? tx(`レベル ${authored} · 文の難しさ ${lv.ja}`, `Level ${authored} · sentences ${lv.level}`)
     : jlpt
