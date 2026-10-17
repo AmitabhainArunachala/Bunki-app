@@ -29,6 +29,7 @@
  * emulated in Chromium only; the sky is sampled, not watched.
  */
 /* global window, document, getComputedStyle, innerWidth, innerHeight, Node, NodeFilter, indexedDB */
+import assert from 'node:assert/strict';
 import console from 'node:console';
 import process from 'node:process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -87,6 +88,7 @@ const NEG_SOURCE = {
   guided: [['corridor.js', 'function openGuidedRoom(from) {', 'function openGuidedRoom(from) { const until = performance.now() + 1500; while (performance.now() < until) { /* the negative control: a slow open */ }']],
 };
 
+function NEG_SOURCE_CHECK() { return NEGATIVE ? (NEG_SOURCE[NEGATIVE] || []) : []; }
 // in-page instruments: text leaves, their glyph boxes, and where a block's lines break
 const INSTRUMENTS = `window.__I__ = (() => {
   const shown = (el) => { for (let n = el; n && n !== document.documentElement; n = n.parentElement) { const s = getComputedStyle(n); if (s.display === 'none' || s.visibility === 'hidden' || Number(s.opacity) === 0) return false; if (n !== el && s.overflow !== 'visible' && (n.clientWidth <= 2 || n.clientHeight <= 2)) return false; } const shut = el.closest('details:not([open])'); if (shut && !el.closest('summary')) return false; const r = el.getBoundingClientRect(); return r.width > 0.5 && r.height > 0.5; };
@@ -162,14 +164,16 @@ async function session(browser, width, lang, { reduced = true, query = 'entry=sh
     body: JSON.stringify(route.request().url().endsWith('/config')
       ? { schema_version: 'bunki.maintenance/v1', build: { git_sha: null, artifact_sha256: null }, content_ids: [], ai: { status: 'unavailable' } }
       : { token: 'synthetic-guest-token', actor_ref: 'guest_q' }) }));
-  for (const [file, ...rest] of new Set((NEG_SOURCE[NEGATIVE] || []).map(([f]) => f))) void rest, await context.route(new RegExp(`/${file.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}(\\?.*)?$`), async (route) => {
+  // a negative control serves the base's own lines in place of the fix (its file named in full), the bridge always
+  const negFiles = [...new Set((NEG_SOURCE[NEGATIVE] || []).map(([f]) => f))];
+  for (const file of negFiles) await context.route(new RegExp(`/${file.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}(\\?.*)?$`), async (route) => {
     const r = await route.fetch();
     let body = await r.text();
     for (const [f, from, to] of NEG_SOURCE[NEGATIVE]) if (f === file) { if (!body.includes(from)) throw new Error(`negative control ${NEGATIVE}: ${from.slice(0, 60)} not found`); body = body.replace(from, to); }
     if (file === 'corridor.js') body += BRIDGE;
     await route.fulfill({ response: r, body });
   });
-  if (!(NEG_SOURCE[NEGATIVE] || []).some(([f]) => f === 'corridor.js')) await context.route(/\/corridor\.js(\?.*)?$/, async (route) => {
+  if (!negFiles.includes('corridor.js')) await context.route(/\/corridor\.js(\?.*)?$/, async (route) => {
     const r = await route.fetch();
     await route.fulfill({ response: r, body: (await r.text()) + BRIDGE });
   });
@@ -189,6 +193,11 @@ const settle = async (page, ms = 500) => {
 };
 const run = (page, src) => page.evaluate((s) => window.__COMB__.run(s), src);
 
+// a negative control must find the lines it puts back, or it proves nothing: checked on the staged site before any page
+for (const [file, from] of NEG_SOURCE_CHECK()) {
+  const site = process.env.KAIRO_SITE_DIR;
+  assert(site && readFileSync(join(site, file), 'utf8').includes(from), `negative control ${NEGATIVE}: "${from.slice(0, 60)}" is not in ${file}`);
+}
 const want = (cls) => !NEGATIVE || NEGATIVE === cls;
 const log = { engines: {} };
 try {
