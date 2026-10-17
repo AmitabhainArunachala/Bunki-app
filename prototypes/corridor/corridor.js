@@ -4652,6 +4652,8 @@ async function ensureArticle(p) {
   )
     .then((body) => {
       Object.assign(p, body);
+      // N2 · the text's te-form auxiliaries are marked as it arrives (markTeFormAuxiliaries)
+      markTeFormAuxiliaries(p.tokens);
       return p;
     })
     .finally(() => {
@@ -8948,7 +8950,8 @@ function placeSaveMenu(pop, invoker, place = null) {
  * word menu read the same facts, so they can never disagree about what Save does. */
 function wordSaveFacts(token, { reader = false, from = null, record } = {}) {
   // a caller that already chose the entry (the shared lookup door) hands it over as is
-  const g = record !== undefined ? record : reader ? readerQuickRecord(token) : lookup(token.b, token.seq, token.r);
+  // N2 · a te-form auxiliary's card leads with its senses for the te-form, however its entry is looked up (teFormRecord)
+  const g = record !== undefined ? record : reader ? readerQuickRecord(token) : teFormRecord(lookup(token.b, token.seq, token.r), token.te);
   const held = (reader && !D.dict[token.b]) || !g?.m?.some(meaning => typeof meaning === 'string' && meaning.trim());
   const node = { t: 'word', id: token.b, ...(token.seq ? { seq: token.seq, reading: token.r || g?.r } : {}),
     ...(from ? { from, ctxScope: 'sent' } : {}) };
@@ -9385,6 +9388,10 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     // (R2: a lookup door's word whose spelling is listed but not read so, too — token.readMiss)
     ? tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.')
     : g?.m?.[0] || tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.')));
+  // N2 · a te-form auxiliary whose entry lists a second sense for the te-form shows it on a line of its own, in JMdict's
+  // words (居る: "to be ...-ing", then "to have ...-ed"); the first line is the first sense (teFormRecord)
+  const teSecond = kind === 'word' && !look?.gloss && Array.isArray(token.te) && g?.m?.[0] === token.te[0]?.[0] ? token.te[1]?.[0] : '';
+  if (teSecond) { const second = el('span', 'mini-gloss mini-gloss-2', teSecond); second.lang = 'en'; said.append(second); }
   // N · the article's own note on this word (its index row's wordNotes, from the editorial word list): one quiet line
   // under the gloss, on this word in this article only
   if (wordNote?.en) {
@@ -10145,7 +10152,8 @@ function readerQuickRecord(token) {
   // R · read in the token's own reading (tokenReading's rule): a door that names its entry (readingToken) answers
   // by it, and a core spelling read otherwise answers with the entry so read once the full dictionary has it
   const own = !token.b || token.b === token.s ? String(token.r || '') : '';
-  if (token.seq != null && token.seq !== '') return lookup(token.b, token.seq, own);
+  // N2 · a te-form auxiliary's entry leads with its senses for the te-form (teFormRecord)
+  if (token.seq != null && token.seq !== '') return teFormRecord(lookup(token.b, token.seq, own), token.te);
   // R2 · a door marked unfit (a verb whose kana form the quick dictionary has only as a noun) never takes that noun
   if (D.dict[token.b] && !token.unfit) return lookup(token.b, null, own);
   const kept = S.deepWords?.[token.b];
@@ -10271,11 +10279,20 @@ function lemmaReading(token) {
   return read.length === 1 ? read[0] : '';
 }
 
+/** N2 (the lead, 2026-10-18, on Grok 0036) · the quick dictionary's kana いる is 要る, "to be needed": a word a text
+ * writes 要る, and means in kana only in a few phrases (お金がいる). A verb the text writes いる in kana, in any form, is the
+ * verb of being, 居る, the entry JMdict heads いる: the quick dictionary's word never answers for it. Like its bare stem
+ * (R2), its door is marked unfit and its entry is chosen among the verbs read いる (readingToken, narrowLemmaEntries).
+ * 要る stays one tap away: the full entry lists every entry of the form. */
+function kanaIru(token) {
+  return token?.p === '動詞' && token.b === 'いる' && READER_KANA.test(String(token.s || ''));
+}
+
 /** R2 · a token as its dictionary form, read the way the text reads it: an inflected token with a derived reading is
  * that form read so (おい → おく; the surface it came from rides as `inflected`); one without is the word as the text
  * writes and reads it, so its door never shows a reading the text does not use. An uninflected token is itself. */
 function readingForm(token) {
-  if (!token?.b || token.b === token.s) return token;
+  if (!token?.b || token.b === token.s) return kanaIru(token) ? { ...token, unfit: true } : token;
   const reading = lemmaReading(token);
   if (!reading) return { ...token, b: token.s };
   // a verb whose kana dictionary form the quick dictionary has only as a word of another class (かえる is 蛙 "frog", なす
@@ -10291,7 +10308,89 @@ function readingForm(token) {
     /る$/u.test(reading) && kataToHira(String(token.r || '')) === kataToHira(reading).slice(0, -1);
   const unfit = token.p === '動詞' && !!core?.p && kataToHira(String(core.r || '')) === kataToHira(reading) &&
     (!parts.some((part) => /verb/u.test(part) || /^v[0-9a-z]/u.test(part)) || stemOnly);
-  return { ...token, s: token.b, r: reading, inflected: token.s, ...(unfit ? { unfit: true } : {}) };
+  return { ...token, s: token.b, r: reading, inflected: token.s, ...(unfit || kanaIru(token) ? { unfit: true } : {}) };
+}
+
+/* N2 · the te-form's auxiliaries (Grok 0036; the lead, 2026-10-18). A verb the text writes in kana right after the
+ * te-form (the particle て or で after a verb or an auxiliary verb: 残って いる, 済んで い ます, 書いて おく, 降って き た) is
+ * that verb's auxiliary use. Its door stands for the entry read as its dictionary form that JMdict lists for use after
+ * the te-form: a sense whose part of speech is aux-v, or an expression, with a note that it follows the te-form. So
+ * いる is 居る, never the quick dictionary's 要る "to be needed"; おく is 置く, never 奥 or 億; くる is 来る, never 繰る; みる
+ * is 見る, never 診る. Its card shows those senses first, in JMdict's words (居る: "to be ...-ing", then "to have ...-ed"). A
+ * dictionary form with no such sense is answered by the text's own form where JMdict lists that with one (ください:
+ * 下さい, "please (do for me)"). A verb with none, after the te-form or not, is answered as any other word. The senses come
+ * from the entry's detail shard, asked for with its rows (readyTokenReading). */
+const TE_FORM_AUXILIARY = new WeakSet();
+const TE_FORM_NOTE = /-te form|"-te" form|te-form|[～〜]て/iu;
+
+/** Mark a text's tokens that stand right after the te-form (TE_FORM_AUXILIARY). The mark rides the token object, so every
+ * door drawn for that token (the reader, a sentence's words) answers alike. */
+function markTeFormAuxiliaries(tokens) {
+  if (!Array.isArray(tokens)) return;
+  for (let at = 2; at < tokens.length; at += 1) {
+    const token = tokens[at], te = tokens[at - 1], verb = tokens[at - 2];
+    if (token?.p === '動詞' && READER_KANA.test(String(token.s || '')) && te?.p === '助詞' && (te.s === 'て' || te.s === 'で')
+      && (verb?.p === '動詞' || verb?.p === '助動詞')) TE_FORM_AUXILIARY.add(token);
+  }
+}
+
+/** The glosses of the senses JMdict lists for an entry's use after the te-form (its detail entry), sense by sense. */
+function teFormSenseGlosses(detail) {
+  return (detail?.[3] || [])
+    .filter((sense) => (sense?.[0] || []).some((pos) => pos === 'aux-v' || pos === 'exp')
+      && (sense?.[8] || []).some((note) => TE_FORM_NOTE.test(String(note))))
+    .map((sense) => (sense[10] || []).map((gloss) => String(gloss?.[0] || '')).filter(Boolean))
+    .filter((glosses) => glosses.length);
+}
+
+/** A te-form auxiliary's answer: { door } names the entry and carries its te-form senses (`te`, glosses by sense);
+ * { none: true } when JMdict lists no such sense for the word; { need: { forms, shards } } while the rows or detail
+ * shards the answer depends on are still to come; null for any other token. The entries asked, in order: those read as
+ * the dictionary form that fit the token (narrowLemmaEntries: いる → 居る, くる → 来る), then the quick dictionary's own
+ * entry for the text's form (ください → 下さい). The first with such a sense is the answer. */
+function teFormAnswer(token, door = readingForm(token)) {
+  if (!TE_FORM_AUXILIARY.has(token)) return null;
+  const forms = [{ form: door.b, reading: tokenReading(door), lemma: true }];
+  if (token.s !== door.b && D.dict?.[token.s]) forms.push({ form: token.s, reading: String(token.r || ''), lemma: false });
+  for (const { form, reading, lemma } of forms) {
+    if (!dictionaryAnsweredForm(form)) return { need: { forms: [form], shards: [] } };
+    const read = dictionaryRowsReadAs(form, reading);
+    const alt = D.dict?.[form]?.alt;
+    const rows = lemma ? narrowLemmaEntries(read, reading, form, '動詞') : read.filter((row) => row[1] === form || (!!alt && row[4].includes(alt)));
+    const missing = rows.filter((row) => !D.dictionaryDetails?.get(String(row[0])));
+    if (missing.length) return { need: { forms: [], shards: [...new Set(missing.map((row) => dictionaryShardId(row[0])))] } };
+    for (const row of rows) {
+      const te = teFormSenseGlosses(D.dictionaryDetails.get(String(row[0])));
+      if (!te.length) continue;
+      if (lemma) return { door: { ...door, seq: String(row[0]), te } };
+      // the text's own form is the word: no dictionary form rides beside it
+      const written = { ...door, s: form, b: form, r: reading, seq: String(row[0]), te };
+      delete written.inflected;
+      delete written.unfit;
+      return { door: written };
+    }
+  }
+  return { none: true };
+}
+
+/** Ask for what a te-form auxiliary's answer needs until it is answered: the dictionary form's rows, its entries'
+ * senses, then the text's own form's rows and senses. */
+async function ensureTeFormAnswer(token, door) {
+  for (let round = 0; round < 4; round += 1) {
+    const need = teFormAnswer(token, door)?.need;
+    if (!need) return;
+    await Promise.all([...need.forms.map((form) => ensureDictionaryRowsForForm(form)), ...need.shards.map((id) => ensureDictionaryShard(id))]);
+  }
+}
+
+/** A te-form auxiliary's record leads with JMdict's senses for its use after the te-form: each sense's first gloss, then
+ * the rest of those senses' glosses, then the entry's other meanings — every one a gloss of the entry, in JMdict's words.
+ * Its card shows the first, and a second such sense on a line of its own (居る: "to be ...-ing", "to have ...-ed").
+ * Any other record is returned as it is. */
+function teFormRecord(rec, te) {
+  if (!rec || !Array.isArray(te) || !te.length) return rec;
+  const senses = te.flat();
+  return { ...rec, m: [...new Set([...te.map((glosses) => glosses[0]), ...senses, ...(rec.m || []).filter((gloss) => !senses.includes(gloss))])] };
 }
 
 /** R2 · among several entries that write a dictionary form and read it the derived way, the one that fits the token:
@@ -10421,8 +10520,11 @@ function readyTokenReading(token) {
     if (!D.dict?.[token.b]) forms.add(token.b.replace(/する$/u, 'す').replace(/ずる$/u, 'じる'));
   }
   const asked = [...forms].filter((form) => form && !dictionaryAnsweredForm(form));
-  if (!asked.length) return null;
-  return Promise.all(asked.map((form) => ensureDictionaryRowsForForm(form))).then(() => undefined, () => undefined);
+  // N2 · a te-form auxiliary asks for the rows and the senses its answer needs (teFormAnswer)
+  const auxiliary = teFormAnswer(token, door)?.need ? ensureTeFormAnswer(token, door) : null;
+  if (!asked.length && !auxiliary) return null;
+  return Promise.all([...asked.map((form) => ensureDictionaryRowsForForm(form)), ...(auxiliary ? [auxiliary] : [])])
+    .then(() => undefined, () => undefined);
 }
 
 /** The token a word door stands for. One whose own reading the quick dictionary does not carry stands, by entry
@@ -10434,6 +10536,9 @@ function readyTokenReading(token) {
 function readingToken(token) {
   // R2 · the door is the token as its dictionary form, read the way the text reads it (readingForm)
   const door = readingForm(token);
+  // N2 · a te-form auxiliary is its auxiliary's entry, once JMdict's senses for it are at hand (teFormAnswer)
+  const auxiliary = teFormAnswer(token, door)?.door;
+  if (auxiliary) return auxiliary;
   const own = tokenReading(door);
   if (!own || (door.seq != null && door.seq !== '') || (!readingAsksIndex(door.b, own) && !door.unfit) || !D.dictionaryIndex) return door;
   const rows = dictionaryRowsForForm(door.b);
@@ -10454,7 +10559,8 @@ function readingToken(token) {
   let read = dictionaryRowsReadAs(door.b, own);
   // R2 · an unfit door's entry is a verb, never the noun read alike (かえる: 帰る, 変える, 返る, 替える — never 蛙)
   if (door.unfit) read = read.filter((row) => (row[6] || []).some((gloss) => /^to /u.test(String(gloss))));
-  if (door.inflected && read.length > 1) read = narrowLemmaEntries(read, own, door.b, door.p);
+  // N2 · and so does an unfit word itself (a kana いる: 居る, the entry headed いる, never 要る or 射る)
+  if ((door.inflected || door.unfit) && read.length > 1) read = narrowLemmaEntries(read, own, door.b, door.p);
   // several left: the card names them (the narrowed ones: 炊く · 焚く for a verb, never the nouns 卓 · 宅)
   if (read.length === 1) return { ...door, seq: String(read[0][0]) };
   if (read.length) return { ...door, several: [...new Set(read.map((row) => row[1]))] };
@@ -11500,6 +11606,8 @@ function renderReader(main) {
   const learning = new Set();
   for (const t of S.taken) if (t.t === 'word') learning.add(t.id);
   const dueNow = new Date();
+  // N2 · whatever brought the text here, its te-form auxiliaries are marked before any of its words is drawn
+  markTeFormAuxiliaries(p.tokens);
   const crossRefs = glossaryCrossRefPlan(p);
   let group = null;
   // set when the token just placed reaches FORWARD for what completes it — a numeral for its
@@ -27038,6 +27146,8 @@ async function ensureBankExamples(word) {
  * reader (reader lane 2026-10-02): the reading and the meaning at once,
  * Save, and Full entry ›. Taps land in the obslog. */
 function renderSentenceTokens(container, tokens, opts = {}) {
+  // N2 · a sentence's te-form auxiliaries answer as they do in the reader (markTeFormAuxiliaries)
+  markTeFormAuxiliaries(tokens);
   const target = opts.targetId || null;
   const contextId = opts.contextId || 'sentence';
   const source = sentenceSource(tokens, contextId, opts.start);
