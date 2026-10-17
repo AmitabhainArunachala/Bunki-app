@@ -14,23 +14,28 @@
  * 3 requests a minute for this model) and asks again. --resume keeps clips already rendered for the
  * same text instead of buying them twice.
  * Spend guard: one article per run; every request is logged with its character count and model.
- * Model id and audio format follow ai.google.dev/gemini-api/docs/speech-generation (read 2026-10-15):
- * gemini-3.8-flash-tts; unary audio is WAV or raw 16-bit PCM, 24 kHz, mono.
+ * Audio format follows ai.google.dev/gemini-api/docs/speech-generation (read 2026-10-15): unary
+ * audio is WAV or raw 16-bit PCM, 24 kHz, mono. The model id is NOT written here — it is the
+ * lock's (audio/voice-lock.json), so a swap is one value and this file never contradicts it.
  *
  *   node prototypes/corridor/tools/render-narration-gemini.mjs --article jawiki:5294446 \
- *        --log-dir ~/.dharma/bunki_voice/kore-probe-20261015 [--voice kore] [--model gemini-3.8-flash-tts]
+ *        --log-dir ~/.dharma/bunki_voice/kore-probe-20261015 [--voice <lock roster>] [--model <lock>]
  *        [--api generate|interactions] [--bitrate 64k] [--speak-readings] [--resume] [--pace 21] [--dry-run] */
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runtimeLock } from './voice-lock.mjs';
 
 const corridor = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const VOICES = { kore: 'Kore', charon: 'Charon' };
-const DEFAULT_MODEL = 'gemini-3.8-flash-tts';
+// V (2026-10-17): the roster and the model come from audio/voice-lock.json. Swapping the voice is
+// one edit there plus `sync-voice-lock.mjs --write` plus a re-render — no literal lives here.
+const LOCK = runtimeLock();
+const VOICES = LOCK.voices;
+const DEFAULT_MODEL = LOCK.model;
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta';
-const CLIP_PATH = /^audio\/narration\/(?:kore|charon)\/[a-zA-Z0-9_-]+\.m4a$/u;
+const CLIP_PATH = new RegExp(`^audio/narration/(?:${Object.keys(VOICES).join('|')})/[a-zA-Z0-9_-]+\\.m4a$`, 'u');
 
 const arg = (name, fallback) => {
   const at = process.argv.indexOf(`--${name}`);
@@ -39,7 +44,7 @@ const arg = (name, fallback) => {
 const flag = (name) => process.argv.includes(`--${name}`);
 
 const articleId = arg('article', null);
-const voice = arg('voice', 'kore');
+const voice = arg('voice', LOCK.main);
 const model = arg('model', DEFAULT_MODEL);
 const api = arg('api', 'generate');
 const bitrate = arg('bitrate', '64k');
