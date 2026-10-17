@@ -1124,6 +1124,70 @@
       "readings": [null, "ふん", null],
       "kind": "time",
       "note": "迎えた59分、 (the 59th minute of the match) reads ふん; UniDic read 分 ぶん (part, share). Bound to the comma so 59分の1 (a fraction, ぶん) stays UniDic's (R3, wikinews:44384)"
+    },
+    {
+      "word": "発見された方",
+      "reading": "はっけんされたかた",
+      "surfaces": ["発見", "さ", "れ", "た", "方"],
+      "readings": [null, null, null, null, "かた"],
+      "kind": "term",
+      "note": "発見された方 (those who found one, polite) reads かた; UniDic read 方 ほう (direction) (Grok 0315, R3, env:press-press_05643)"
+    },
+    {
+      "word": "家族の方",
+      "reading": "かぞくのかた",
+      "surfaces": ["家族", "の", "方", "が"],
+      "readings": [null, null, "かた", null],
+      "kind": "term",
+      "note": "その家族の方が (their family members, polite) reads かた; UniDic read 方 ほう (R3, mhlw:stf-newpage_76340)"
+    },
+    {
+      "word": "多くの方",
+      "reading": "おおくのかた",
+      "surfaces": ["多く", "の", "方", "に"],
+      "readings": [null, null, "かた", null],
+      "kind": "term",
+      "note": "多くの方に (to many people, polite) reads かた; UniDic read 方 ほう (R3, mhlw:stf-newpage_76340)"
+    },
+    {
+      "word": "希望の方",
+      "reading": "きぼうのかた",
+      "surfaces": ["希望", "の", "方", "は"],
+      "readings": [null, null, "かた", null],
+      "kind": "term",
+      "note": "取材希望の方は (those who wish to cover it, polite) reads かた; UniDic read 方 ほう (R3, env:press-press_05591)"
+    },
+    {
+      "word": "たくさんの方",
+      "reading": "たくさんのかた",
+      "surfaces": ["たくさん", "の", "方", "に"],
+      "readings": [null, null, "かた", null],
+      "kind": "term",
+      "note": "たくさんの方に (to many people, polite) reads かた; UniDic read 方 ほう (R3, wikinews:45095)"
+    },
+    {
+      "word": "先輩方",
+      "reading": "せんぱいがた",
+      "surfaces": ["先輩", "方"],
+      "readings": [null, "がた"],
+      "kind": "term",
+      "note": "先輩方 (one’s seniors, the honorific plural) reads がた; UniDic read 方 ほう (Grok 0315, R3, wikinews:45095)"
+    },
+    {
+      "word": "僕の方",
+      "reading": "ぼくのほう",
+      "surfaces": ["僕", "の", "方", "大きい"],
+      "readings": [null, null, "ほう", null],
+      "kind": "term",
+      "note": "僕の方大きいよ (mine is bigger) reads ほう, the side of a comparison; UniDic read 方 かた (Grok 0315, R3, aozora:046605)"
+    },
+    {
+      "word": "そこら中",
+      "reading": "そこらじゅう",
+      "surfaces": ["そこ", "ら", "中"],
+      "readings": [null, null, "じゅう"],
+      "kind": "term",
+      "note": "そこら中 (all over the place) reads じゅう; UniDic read 中 ちゅう (Grok 0315, R3, aozora:046605)"
     }
   ],
   "accepts": [

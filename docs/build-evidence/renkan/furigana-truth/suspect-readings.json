@@ -8,7 +8,7 @@
   "tokens": 95731
  },
  "statusCounts": {
-  "lexicon-fixed": 662,
+  "lexicon-fixed": 671,
   "accepted": 30
  },
  "openCount": 0,
@@ -222,6 +222,36 @@
    "status": "lexicon-fixed",
    "context": "いきました。四月のいい晩でした",
    "note": "四月"
+  },
+  {
+   "article": "aozora:046605",
+   "token": 406,
+   "rule": "override-site",
+   "surface": "中",
+   "reading": "じゅう",
+   "status": "lexicon-fixed",
+   "context": "がこんどはそこら中の黄金の光を",
+   "note": "そこら中"
+  },
+  {
+   "article": "aozora:046605",
+   "token": 1231,
+   "rule": "override-site",
+   "surface": "方",
+   "reading": "ほう",
+   "status": "lexicon-fixed",
+   "context": "』『やっぱり僕の方大きいよ。』『",
+   "note": "僕の方"
+  },
+  {
+   "article": "aozora:046605",
+   "token": 1323,
+   "rule": "override-site",
+   "surface": "方",
+   "reading": "ほう",
+   "status": "lexicon-fixed",
+   "context": "ないよ、僕の方大きいんだよ』",
+   "note": "僕の方"
   },
   {
    "article": "bunki-graded-n5-morning",
@@ -3564,6 +3594,26 @@
    "note": "遠藤璃菜"
   },
   {
+   "article": "wikinews:45095",
+   "token": 194,
+   "rule": "override-site",
+   "surface": "方",
+   "reading": "がた",
+   "status": "lexicon-fixed",
+   "context": "て「素敵な先輩方とともに、私",
+   "note": "先輩方"
+  },
+  {
+   "article": "wikinews:45095",
+   "token": 244,
+   "rule": "override-site",
+   "surface": "方",
+   "reading": "かた",
+   "status": "lexicon-fixed",
+   "context": "の楽曲がたくさんの方に届き、ルビィを",
+   "note": "たくさんの方"
+  },
+  {
    "article": "wikinews:45098",
    "token": 91,
    "rule": "override-site",
@@ -3974,6 +4024,16 @@
    "note": "都道府県"
   },
   {
+   "article": "env:press-press_05643",
+   "token": 933,
+   "rule": "override-site",
+   "surface": "方",
+   "reading": "かた",
+   "status": "lexicon-fixed",
+   "context": "を発見された方は、以下に留意",
+   "note": "発見された方"
+  },
+  {
    "article": "jawiki:3492442",
    "token": 31,
    "rule": "miyako",
@@ -4094,6 +4154,16 @@
    "note": "10月"
   },
   {
+   "article": "env:press-press_05591",
+   "token": 890,
+   "rule": "override-site",
+   "surface": "方",
+   "reading": "かた",
+   "status": "lexicon-fixed",
+   "context": "jp※取材希望の方は上記アドレスに各",
+   "note": "希望の方"
+  },
+  {
    "article": "mhlw:stf-newpage_76340",
    "token": 47,
    "rule": "override-site",
@@ -4105,6 +4175,16 @@
   },
   {
    "article": "mhlw:stf-newpage_76340",
+   "token": 621,
+   "rule": "override-site",
+   "surface": "方",
+   "reading": "かた",
+   "status": "lexicon-fixed",
+   "context": "さまやその家族の方が、医療用医薬",
+   "note": "家族の方"
+  },
+  {
+   "article": "mhlw:stf-newpage_76340",
    "token": 893,
    "rule": "override-site",
    "surface": "月",
@@ -4112,6 +4192,16 @@
    "status": "lexicon-fixed",
    "context": "【その他】10月は、医薬品を",
    "note": "10月"
+  },
+  {
+   "article": "mhlw:stf-newpage_76340",
+   "token": 924,
+   "rule": "override-site",
+   "surface": "方",
+   "reading": "かた",
+   "status": "lexicon-fixed",
+   "context": "一人でも多くの方に知ってもらうため",
+   "note": "多くの方"
   },
   {
    "article": "mhlw:stf-newpage_76340",
