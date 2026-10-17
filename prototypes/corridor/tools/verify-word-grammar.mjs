@@ -318,6 +318,14 @@ const G2_CONTROLS = {
   'tap-schedules': { kills: ['G2.7'], edits: [{ file: 'corridor.js', key: 'schedules', from: '  const help = article ? readHelpPatch(latest, article, key, now) : null;',
     to: "  const help = article ? readHelpPatch(latest, article, key, now) : null;\n  if (plainRecord(latest.srs) && owns(latest.srs, srsKey('word', identity.id))) patch.srs = { ...latest.srs, [srsKey('word', identity.id)]: { ...latest.srs[srsKey('word', identity.id)], due: new Date(now).toISOString() } };" }] },
 };
+/** A word's stage (its card): one tap here; two where the ladder raises the reading first (G3's tap 1), the second only
+ * once that rung is observed — a dead door is never rescued with an unconditional extra tap. */
+async function g2Stage(page, locator) {
+  await locator.tap();
+  await page.waitForFunction((node) => !!document.getElementById('mini') || node?.dataset.ladderRung === 'reading', await locator.elementHandle(), { timeout: 10000 });
+  if (!await page.locator('#mini').count()) await locator.tap();
+  await page.locator('#mini .mini-word').waitFor();
+}
 /** The first paragraph just under the top bar, for the eye. */
 async function g2ShowParagraph(page) {
   await page.evaluate(() => {
@@ -439,8 +447,7 @@ async function g2Walks(walk, browser) {
       [facts.capped, facts.homograph].every((fact) => fact && ['met', null].includes(fact.depth) && !fact.kept), { capped: facts.capped, homograph: facts.homograph });
     check('G2.5', '挨拶, owned, with his "Not yet": the dot is "again"', facts.notYet?.depth === 'again', facts.notYet);
     // the rooms: 大臣's slip, its page's basis line
-    await token(page, G2_PARA.owned).tap();
-    await page.locator('#mini .mini-word').waitFor();
+    await g2Stage(page, token(page, G2_PARA.owned));
     await delay(500);
     const slip = await page.evaluate(() => { const mini = document.getElementById('mini'); const dot = getComputedStyle(mini.querySelector('.mini-word'), '::after');
       return { depth: mini.dataset.depth || null, kept: mini.dataset.kept != null, dot: dot.content === 'none' ? null : dot.backgroundColor, shadow: dot.boxShadow }; });
@@ -507,8 +514,7 @@ async function g2Walks(walk, browser) {
   await walk('g2-reading', async (page) => {
     await prepare(page);
     await seedParagraph(page);
-    await token(page, G2_PARA.homograph).tap();
-    await page.locator('#mini .mini-word').waitFor();
+    await g2Stage(page, token(page, G2_PARA.homograph));
     // the full dictionary names 年 read ねん (#2084840): the card is drawn again with it
     await page.waitForFunction(() => /ねん/u.test(document.querySelector('#mini .mini-reading')?.textContent || '') && !!document.querySelector('#mini button.mini-word'), null, { timeout: 10000 }).catch(() => {});
     await delay(600);
@@ -533,14 +539,12 @@ async function g2Walks(walk, browser) {
     await seedParagraph(page);
     const before = await record(page);
     for (const at of [G2_PARA.met, G2_PARA.owned, G2_PARA.unmet]) {
-      await token(page, at).tap();
-      await page.locator('#mini .mini-word').waitFor();
+      await g2Stage(page, token(page, at));
       await delay(500);
       await page.keyboard.press('Escape');
       await delay(300);
     }
-    await token(page, G2_PARA.owned).tap();
-    await page.locator('#mini .mini-word').waitFor();
+    await g2Stage(page, token(page, G2_PARA.owned));
     await delay(400);
     await page.locator('#mini .mini-word').tap();
     await pageSettled(page);

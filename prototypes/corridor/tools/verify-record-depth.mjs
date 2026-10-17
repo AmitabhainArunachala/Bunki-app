@@ -141,6 +141,14 @@ async function openArticle(page, story) {
   await delay(800);
 }
 const tok = (page, index) => page.locator(`#reader .tok[data-index="${index}"]`).first();
+/** A word's stage (its card): one tap here; two where the ladder raises the reading first (G3's tap 1), the second only
+ * once that rung is observed. */
+async function stage(page, locator) {
+  await locator.tap();
+  await page.waitForFunction((node) => !!document.getElementById('mini') || node?.dataset.ladderRung === 'reading', await locator.elementHandle(), { timeout: 10000 });
+  if (!await page.locator('#mini').count()) await locator.tap();
+  await page.locator('#mini .mini-word').waitFor();
+}
 async function waitRecord(page, predicate, what, timeout = 15000) {
   const deadline = Date.now() + timeout;
   let record;
@@ -222,8 +230,7 @@ try {
         canonical(portable(booted)) === canonical(portable(old)) && !('met' in booted) && !('readHelp' in booted),
         { changed: changedRoots(portable(old), portable(booted)), roots: Object.keys(booted).length, revlog: booted.revlog.length });
       await openArticle(page, STORY);
-      await tok(page, 9).tap();
-      await page.locator('#mini .mini-word').waitFor();
+      await stage(page, tok(page, 9));
       const looked = await waitRecord(page, (record) => !!record.met, 'the look-up\'s met');
       const metKeys = Object.keys(looked.met.entries);
       const changed = changedRoots(booted, looked);
@@ -269,8 +276,7 @@ try {
       await seed(page, old);
       await boot(page);
       await openArticle(page, STORY);
-      await tok(page, 9).tap();
-      await page.locator('#mini .mini-word').waitFor();
+      await stage(page, tok(page, 9));
       const after = await waitRecord(page, (record) => record.obslog.length > old.obslog.length, 'the tap row');
       await delay(500);
       await toBackup(page);
@@ -365,8 +371,7 @@ try {
       await openArticle(page, STORY);
       await page.waitForFunction(() => !!document.querySelector('#reader .tok[data-index="2"][data-kept]'), null, { timeout: 8000 }).catch(() => {});
       const ring = await tok(page, 2).evaluate((node) => ({ kept: node.dataset.kept != null, depth: node.dataset.depth || null }));
-      await tok(page, 2).tap();
-      await page.locator('#mini .mini-word').waitFor();
+      await stage(page, tok(page, 2));
       await page.waitForFunction(() => /ねん/u.test(document.querySelector('#mini .mini-reading')?.textContent || ''), null, { timeout: 10000 }).catch(() => {});
       const reader = await page.evaluate(() => ({ reading: document.querySelector('#mini .mini-reading')?.textContent || '', text: document.getElementById('mini')?.innerText || '' }));
       check('R.reader', 'the reader\'s 年 in 令和８年 wears the kept ring and its slip reads ねん, with no とし', ring.kept && reader.reading === 'ねん' && !/とし/u.test(reader.text), { ring, reader });
