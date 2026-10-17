@@ -71,13 +71,20 @@ body.has-primary-tabs[data-view='speak'] #app { padding-bottom: calc(var(--nav-c
 .speak-waiting { min-height: calc(var(--type-reading) * 2); }
 .speak-note { margin: var(--space-1) 0 0; font: var(--weight-regular) var(--type-caption) / var(--leading-ui) var(--font-ui); color: var(--color-quiet); }
 
-/* ---- 朱入れ: the teacher's red pen — an underline in the world's red, the right form above it, two at most */
-.speak-shu { display: inline-flex; flex-direction: column; align-items: flex-start; vertical-align: bottom; }
+/* ---- 朱入れ: the teacher's red pen — an underline in the world's red, the right form above it, two at most. The right
+   form floats over his words as ruby does, never widening them (a wide correction must not tear his line apart), and a
+   line that carries one opens its leading to hold it. */
+.speak-room .has-shu { line-height: 2.5; }
+.speak-shu { position: relative; }
 .speak-shu-right {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% - 0.15em);
   font: var(--weight-medium) var(--type-label) / 1.2 var(--font-reading);
   color: var(--speak-shu);
   white-space: nowrap;
 }
+.speak-shu-right.is-end { left: auto; right: 0; }
 .speak-shu-right .japanese-lookup-word { color: inherit; }
 .speak-shu-reading { font-size: var(--type-caption); }
 .speak-shu-wrong {

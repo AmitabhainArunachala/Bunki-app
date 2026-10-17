@@ -73,7 +73,7 @@ function ensoPath(sweepDeg, cx = 36, cy = 36, r = 27) {
   const outer = [], inner = [];
   for (let k = 0; k <= steps; k += 1) {
     const u = k / steps, a = start + u * sweep;
-    const w = 5.6 * (u < 0.07 ? 0.5 + (u / 0.07) * 0.5 : 1 - Math.pow((u - 0.07) / 0.93, 2.4) * 0.8);
+    const w = 3.4 * (u < 0.06 ? 0.55 + (u / 0.06) * 0.45 : 1 - Math.pow((u - 0.06) / 0.94, 2.2) * 0.72);
     outer.push([cx + (r + w / 2) * Math.cos(a), cy + (r + w / 2) * Math.sin(a)]);
     inner.push([cx + (r - w / 2) * Math.cos(a), cy + (r - w / 2) * Math.sin(a)]);
   }
@@ -905,6 +905,7 @@ export function createSpeakRoom(host) {
       if (drawn) node.classList.add('is-new');
       script.append(node);
     }
+    fitMarks(script);
     if (!lines.length) {
       const quiet = el('li', 'speak-line speak-waiting');
       quiet.setAttribute('aria-hidden', 'true');
@@ -949,6 +950,7 @@ export function createSpeakRoom(host) {
       marks.push({ at, len: c.wrong.trim().length, c });
     }
     marks.sort((a, b) => a.at - b.at);
+    if (marks.length) container.classList.add('has-shu');
     let cursor = 0;
     for (const mark of marks) {
       if (mark.at > cursor) host.words(container, text.slice(cursor, mark.at));
@@ -965,6 +967,15 @@ export function createSpeakRoom(host) {
       cursor = mark.at + mark.len;
     }
     if (cursor < text.length) host.words(container, text.slice(cursor));
+  }
+  /** After layout: a correction that would run past its line's right edge is set flush right over its words. */
+  function fitMarks(root) {
+    requestAnimationFrame(() => {
+      for (const right of root.querySelectorAll('.speak-shu-right:not(.is-end)')) {
+        const edge = right.closest('.has-shu')?.getBoundingClientRect().right;
+        if (edge && right.getBoundingClientRect().right > edge + 1) right.classList.add('is-end');
+      }
+    });
   }
   function moreMarks(line) {
     const wrap = el('div', 'speak-shu-more');
@@ -1230,6 +1241,7 @@ export function createSpeakRoom(host) {
       item.append(his, nat, acts);
       fixed.append(item);
     }
+    fitMarks(fixed);
     // 今日の言葉: his planted words, why each came, and what happened
     const words = section(page, '今日の言葉', 'Your words that came up');
     if (!s.plants.length) words.append(el('p', 'speak-quiet-line', t('今日はまだありません。', 'None yet today.')));
@@ -1455,8 +1467,8 @@ export function createSpeakRoom(host) {
       return d ? svg('path', { d, class: cls }) : null;
     };
     const pic = svg('svg', { viewBox: `0 0 ${w} ${h}`, class: 'speak-pitch', role: 'img', 'aria-label': t('声の高さの線：Kore と あなた', 'Pitch lines: Kore and you') });
-    const hersLine = line(hers, 'pitch-hers');
-    const hisLine = line(his, 'pitch-his');
+    const hersLine = line(hers && core.smoothPitch(hers), 'pitch-hers');
+    const hisLine = line(his && core.smoothPitch(his), 'pitch-his');
     if (hersLine) pic.append(hersLine);
     if (hisLine) pic.append(hisLine);
     return pic;

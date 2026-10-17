@@ -548,6 +548,24 @@ export function pitchTrack(pcm, sampleRate = 16000, { frameMs = 40, hopMs = 10, 
   return f0;
 }
 
+/** The pitch line as it is drawn, never as it is measured: a median of five over voiced frames, a frame an octave away
+ * from its neighbours dropped (the tracker's octave slips), a voiced run shorter than three frames dropped. */
+export function smoothPitch(f0) {
+  const out = f0.map((v, i) => {
+    if (!v) return 0;
+    const near = f0.slice(Math.max(0, i - 2), i + 3).filter((x) => x > 0).sort((a, b) => a - b);
+    const median = near[Math.floor(near.length / 2)];
+    return v / median > 1.5 || median / v > 1.5 ? 0 : median;
+  });
+  let start = -1;
+  for (let i = 0; i <= out.length; i += 1) {
+    if (i < out.length && out[i] > 0) { if (start < 0) start = i; continue; }
+    if (start >= 0 && i - start < 3) for (let k = start; k < i; k += 1) out[k] = 0;
+    start = -1;
+  }
+  return out;
+}
+
 export function pitchSummary(f0) {
   const voiced = f0.filter((v) => v > 0).sort((a, b) => a - b);
   const q = (p) => (voiced.length ? voiced[Math.floor(p * (voiced.length - 1))] : null);
