@@ -5308,6 +5308,7 @@ let walkConsuming = false;
 /** Whether the app's own back() would still move — the mirror of the chrome's
  * atHome test, plus the layers back() itself handles first. */
 function canWalkBack() {
+  if (ladderVisit?.anchor.isConnected || ladderReturning?.anchor.isConnected) return true;
   if (typeof personalHost !== 'undefined' && personalHost) return !!(S.strokes || S.stack.length);
   // the chrome overlays are walkable layers too — the sentinel must stay
   // armed while one is open, or Back would leave the app instead of it
@@ -8273,6 +8274,7 @@ const slipSummons = []; // the onClose of every slip whose entry is open, called
 // visit, so a nested word returns to the stage that actually opened it.
 let ladderVisit = null;
 let ladderOpening = null;
+let ladderReturning = null;
 let ladderRefreshing = false;
 const ladderPages = new WeakMap();
 // A Save may change the room beneath a visit. Keep the actual occurrence until
@@ -8315,6 +8317,9 @@ function clearWordLadder(visit = ladderVisit) {
   readingSlipSerial++;
   syncChromeKeep();
   refreshLadderRoom();
+  // Switching occurrences may clear and open in one event. History sees its
+  // final rung, never the temporary bare state between those two operations.
+  queueMicrotask(syncWalkSentinel);
 }
 /** Folds the current rung; false when nothing visible folded, so the press reaches the layer below. A visit whose word
  * left with its surface (a deck card graded at the reading rung) is forgotten, not folded. */
@@ -8337,6 +8342,8 @@ document.addEventListener('keydown', event => {
 }, true);
 function activateWordLadder(anchor, options) {
   if (!anchor?.isConnected || !slipAllowed(anchor)) return null;
+  // A reading or stage can arrive without a room render to arm device Back.
+  queueMicrotask(syncWalkSentinel);
   if (ladderVisit?.anchor === anchor) {
     // Holds and a caller-managed refresh ask for this stage, never a dive.
     if (options.redo) {
@@ -32344,21 +32351,30 @@ function recede({ all = false, viaRender = false, instant = false } = {}) {
   if (!S.stack.length && !origin) clearReaderSummons();
   const kept = layered && top ? keptPages.get(top) : null;
   if (top) keptPages.delete(top);
-  if (layered) renderLayer({ prebuilt: kept && kept.epoch === pageEpoch ? kept.page : null,
-    preserveRoom: !!origin?.anchor.isConnected && !all });
-  else render();
-  if (!S.stack.length) {
-    returnScroll();
-    restoreDialogInvoker();
+  // The page's render runs before its original stage is remounted. Keep that
+  // return walkable throughout, so render cannot consume the shared sentinel.
+  const previousReturn = ladderReturning;
+  ladderReturning = origin?.anchor.isConnected && !all ? origin : null;
+  try {
+    if (layered) renderLayer({ prebuilt: kept && kept.epoch === pageEpoch ? kept.page : null,
+      preserveRoom: !!origin?.anchor.isConnected && !all });
+    else render();
+    if (!S.stack.length) {
+      returnScroll();
+      restoreDialogInvoker();
+    }
+    if (origin?.anchor.isConnected && !all) {
+      ladderVisit = origin;
+      origin.restoreNext = true;
+      origin.rung = origin.anchor.dataset.ladderRung = 'stage';
+      origin.openStage({ restore: true, demo: origin.demo });
+      focusProseWord(origin.anchor, { preventScroll: true });
+    } else if (origin) clearWordLadder(origin);
+  } finally {
+    ladderReturning = previousReturn;
+    syncWalkSentinel();
   }
   const home = heroSource.get(leaving);
-  if (origin?.anchor.isConnected && !all) {
-    ladderVisit = origin;
-    origin.restoreNext = true;
-    origin.rung = origin.anchor.dataset.ladderRung = 'stage';
-    origin.openStage({ restore: true, demo: origin.demo });
-    focusProseWord(origin.anchor, { preventScroll: true });
-  } else if (origin) clearWordLadder(origin);
   const flight = leaves && home?.isConnected ? flyWord(leaves, home) : null;
   sampleTransition('back', where);
   return flight;

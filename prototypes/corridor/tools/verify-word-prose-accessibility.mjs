@@ -120,9 +120,14 @@ async function keyboardChecks(engine, browser) {
 async function nativeWebKit() {
   const child = spawn(webkit.executablePath(), ['--inspector-pipe', '--headless', '--no-startup-window'], { detached: true, stdio: ['ignore', 'ignore', 'pipe', 'pipe', 'pipe'] });
   let serial = 0, buffer = Buffer.alloc(0), target, proxy;
-  const pending = new Map(), stderr = [];
+  const pending = new Map(), stderr = [], nativePageErrors = [], nativeParagraphAttempts = [];
+  receipt.nativePageErrors = nativePageErrors;
+  receipt.nativeParagraphAttempts = nativeParagraphAttempts;
   child.stderr.on('data', data => stderr.push(data.toString()));
   function dispatch(message) {
+    if (message.method === 'Console.messageAdded' && message.params?.message?.level === 'error' && message.params?.message?.source === 'javascript') {
+      nativePageErrors.push({ at: Date.now(), ...message.params.message });
+    }
     if (message.id && pending.has(message.id)) { const callback = pending.get(message.id); pending.delete(message.id); message.error ? callback.reject(message.error) : callback.resolve(message.result); }
     else if (message.method === 'Target.dispatchMessageFromTarget') dispatch(JSON.parse(message.params.message));
     else if (message.method === 'Target.targetCreated' && message.params.targetInfo.type === 'page') { target = message.params.targetInfo.targetId; proxy = message.pageProxyId; }
@@ -131,7 +136,7 @@ async function nativeWebKit() {
   function request(method, params = {}, nested = false) {
     return new Promise((resolveRequest, rejectRequest) => {
       const id = ++serial, timer = setTimeout(() => { pending.delete(id); rejectRequest(new Error(`WebKit protocol timeout: ${method}`)); }, 10000);
-      pending.set(id, { resolve: value => { clearTimeout(timer); resolveRequest(value); }, reject: error => { clearTimeout(timer); rejectRequest(new Error(JSON.stringify(error))); } });
+      pending.set(id, { resolve: value => { clearTimeout(timer); resolveRequest(value); }, reject: error => { clearTimeout(timer); rejectRequest(Object.assign(new Error(JSON.stringify(error)), { protocolError: error })); } });
       const message = { id, method, params };
       if (nested) request('Target.sendMessageToTarget', { targetId: target, message: JSON.stringify(message) }).catch(rejectRequest);
       else child.stdio[3].write(`${JSON.stringify({ ...message, ...(method.startsWith('Playwright.') ? {} : { pageProxyId: proxy }) })}\0`);
@@ -142,7 +147,7 @@ async function nativeWebKit() {
   const until = async expression => { for (let i = 0; i < 150; i++) { try { if (await evaluate(expression)) return; } catch {} await wait(100); } throw new Error(`WebKit readiness timeout: ${expression}`); };
   try {
     await request('Playwright.enable'); const ctx = await request('Playwright.createContext'); await request('Playwright.createPage', ctx); await request('Target.resume', { targetId: target }); await inner('Runtime.enable');
-    await inner('Page.enable');
+    await inner('Page.enable'); await inner('Console.enable');
     await request('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, fixedLayout: false, deviceScaleFactor: 1 });
     await inner('Page.setScreenSizeOverride', { width: 390, height: 844 });
     if (fixtureMode) { await evaluate(`document.body.innerHTML=${JSON.stringify(fixtureHtml)}`); await evaluate(fixtureJs); }
@@ -165,7 +170,59 @@ async function nativeWebKit() {
     check('webkit/native-viewport', viewport.width === 390 && viewport.height === 844, viewport);
     const properties = async nodeId => (await inner('DOM.getAccessibilityPropertiesForNode', { nodeId })).properties;
     async function tree(nodeId, seen = new Set()) { if (seen.has(nodeId) || seen.size > 800) return []; seen.add(nodeId); const p = await properties(nodeId); let rows = [p]; for (const id of p.childNodeIds || []) rows.push(...await tree(id, seen)); return rows; }
-    async function inspectProse(id, blockSelector, wordSelector, { managedSelector = wordSelector, controls = false, sentenceDoor = false } = {}) {
+    // native AX reads are a paragraph transaction. A witnessed
+    // replacement invalidates the whole attempt, never an actual failed assertion.
+    // There is no public word-page data-ready signal for dictionary/example refresh.
+    async function inspectProse(id, blockSelector, wordSelector, options = {}) {
+      for (let number = 1; number <= 3; number++) {
+        const attempt = { id, number, startedAt: Date.now(), rows: [] };
+        nativeParagraphAttempts.push(attempt);
+        const initial = await evaluate(`(() => {
+          const block=document.querySelector(${JSON.stringify(blockSelector)});
+          if(!block) return {missing:true};
+          const sheet=block.closest('#sheet');
+          const tx={block,sheet,invalidations:[]};
+          const scan=records=>{for(const r of records)for(const n of r.removedNodes)
+            if(n===block||n.contains?.(block)||sheet&&(n===sheet||n.contains?.(sheet)))
+              tx.invalidations.push({at:Date.now(),removed:n.id||n.nodeName});};
+          tx.observer=new MutationObserver(scan);tx.observer.observe(document,{subtree:true,childList:true});
+          tx.scan=scan;window.__axParagraphTransaction=tx;
+          return {missing:false,sheet:sheet?.dataset.node||null,blockTag:block.tagName};
+        })()`);
+        assert(!initial.missing, `${id}: paragraph exists at transaction start`);
+        attempt.initial=initial;
+        let error;
+        try { await inspectProseAttempt(id, blockSelector, wordSelector, options, attempt); }
+        catch (caught) { error=caught; attempt.error=String(caught.stack||caught); }
+        const generation=await evaluate(`(() => {
+          const tx=window.__axParagraphTransaction;tx.scan(tx.observer.takeRecords());tx.observer.disconnect();
+          return {same:tx.block.isConnected&&document.querySelector(${JSON.stringify(blockSelector)})===tx.block
+            &&tx.block.closest('#sheet')===tx.sheet&&(!tx.sheet||document.getElementById('sheet')===tx.sheet)
+            &&tx.invalidations.length===0,invalidations:tx.invalidations};
+        })()`);
+        attempt.generation=generation;attempt.finishedAt=Date.now();
+        if(nativePageErrors.length){error=new Error('Native WebKit page error: '+JSON.stringify(nativePageErrors));attempt.error=String(error);}
+        const assertionFailure=attempt.rows.some(row=>!row.ok);
+        // Retry only a proven root replacement with no assertion failure, and only
+        // for the known retired-node protocol signature (or no protocol error).
+        const retiredError=!error||(error.protocolError?.code === -32000 && error.protocolError?.message === 'Missing node for given nodeId');
+        if(!generation.same&&!assertionFailure&&retiredError&&!options.controls){
+          attempt.status='incomplete-root-replaced';
+          if(number<3) continue;
+          throw new Error(`${id}: native AX transaction invalidated by root replacement in all 3 attempts`);
+        }
+        attempt.status=error||assertionFailure?'failed':generation.same?'accepted':'incomplete-root-replaced';
+        for(const row of attempt.rows) check(row.id,row.ok,row.observed);
+        if(error) throw error;
+        assert(generation.same,`${id}: paragraph/root stayed identical throughout native AX transaction`);
+        return;
+      }
+    }
+    async function inspectProseAttempt(id, blockSelector, wordSelector, { managedSelector = wordSelector, controls = false, sentenceDoor = false } = {}, attempt) {
+    const check=(rowId,ok,observed)=>{
+      attempt.rows.push({id:rowId,ok:!!ok,observed});
+      if(!ok) throw new Error(`${rowId}: native AX assertion failed; retry forbidden`);
+    };
     const { root } = await inner('DOM.getDocument', { depth: -1 });
     const paragraphId = (await inner('DOM.querySelector', { nodeId: root.nodeId, selector: blockSelector })).nodeId;
     assert(paragraphId, `${id}: paragraph exists`);
@@ -228,14 +285,26 @@ async function nativeWebKit() {
       }
     } else {
       const click = async selector => { await until(`!!document.querySelector(${JSON.stringify(selector)})`); await evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`); };
+      // Select the exact idle occurrence through the paragraph's real keyboard rover.
+      // Direct focus on an idle span can fail after a legitimate reader repaint.
+      const focusReaderOccurrence = async index => {
+        const selector = `#reader .tok[data-index="${index}"]`;
+        const position = await evaluate(`(() => { const word=document.querySelector(${JSON.stringify(selector)}); const block=word?.closest('[data-reader-prose]'); return block ? [...block.querySelectorAll('.tok[data-para]')].indexOf(word) : -1; })()`);
+        assert(position >= 0, `reader occurrence ${index} belongs to a paragraph`);
+        await evaluate(`document.querySelector(${JSON.stringify(selector)}).closest('[data-reader-prose]').focus()`);
+        for (const key of ['Home', ...Array(position).fill('ArrowRight')]) {
+          for (const type of ['keyDown', 'keyUp']) await request('Input.dispatchKeyEvent', { type, modifiers: 0, key, code: key, windowsVirtualKeyCode: key === 'Home' ? 36 : 39, text: '', unmodifiedText: '', autoRepeat: false, isKeypad: false });
+        }
+        assert.equal(await evaluate('document.activeElement?.dataset.index'), String(index), `native rover selected exact reader occurrence ${index}`);
+      };
       // は's authored explanation contains several Japanese runs inside ordinary prose. It
       // exercises enhanceJapaneseProse's DocumentFragment path, not the sentence renderer.
-      await evaluate(`document.querySelector('#reader .tok[data-index="10"]').focus()`);
+      await focusReaderOccurrence(10);
       for (const type of ['keyDown', 'keyUp']) await request('Input.dispatchKeyEvent', { type, modifiers: 2, key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, text: '', unmodifiedText: '', autoRepeat: false, isKeypad: false });
       await until(`!!document.querySelector('#sheet[data-node="particle:wa"] .gloss .japanese-lookup-word')`);
       await inspectProse('page-definition', '#sheet .gloss[data-prose-roving]', '.japanese-lookup-word');
       await click('#sheet-back'); await until(`!document.getElementById('sheet')`);
-      await evaluate(`document.querySelector('#reader .tok[data-index="4"]').focus()`);
+      await focusReaderOccurrence(4);
       for (const type of ['keyDown', 'keyUp']) await request('Input.dispatchKeyEvent', { type, modifiers: 2, key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, text: '', unmodifiedText: '', autoRepeat: false, isKeypad: false });
       await until(`!!document.querySelector('#sheet .example-ja[data-prose-roving] .sentence-tok')`);
       const exampleShape = await evaluate(`(() => { const block=document.querySelector('#sheet .example-ja[data-prose-roving]'); return { nested:block.querySelectorAll('.sentence-tok .japanese-lookup-word').length, first:block.querySelector('.sentence-tok')?.dataset.proseLabel, nativeButtons:block.querySelectorAll('button.sentence-tok').length }; })()`);
@@ -258,7 +327,7 @@ async function nativeWebKit() {
       await until(`!!document.querySelector('#kp-card .kp-def[data-prose-roving] .kp-tok')`);
       await inspectProse('deck-definition', '#kp-card .kp-def[data-prose-roving]', '.kp-tok');
     }
-  } finally { try { process.kill(-child.pid, 'SIGTERM'); } catch {} child.stdio.forEach(stream => stream?.destroy()); writeFileSync(resolve(evidence, 'webkit-native-stderr.log'), stderr.join('')); }
+  } finally { check('webkit/native-page-errors', nativePageErrors.length === 0, nativePageErrors); try { process.kill(-child.pid, 'SIGTERM'); } catch {} child.stdio.forEach(stream => stream?.destroy()); writeFileSync(resolve(evidence, 'webkit-native-stderr.log'), stderr.join('')); }
 }
 try {
   if (site) { const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs'); host = await startStaticHost({ site, port: 0 }); }
