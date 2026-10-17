@@ -79,7 +79,10 @@ const NEG_SOURCE = {
   hook: [['corridor.js', 'function todayIsRadical(part, c) {', 'function todayIsRadical(part, c) { return true;']],
   count: [['corridor.js', 'function shelfTallyText(list) {', 'function shelfTallyText(list) { list = [...list, list[0]];']],
   focus: [['corridor.js', "box.addEventListener('change', () => { focusList = listName; void setMembership(listName, box.checked); });", "box.addEventListener('change', () => void setMembership(listName, box.checked));"]],
-  gradebar: [['decks/player/mount.js', 'if (said !== def && box.height - overFor(said) >= WINDOW_LINES * line) over = Math.max(over, overFor(said));', '']],
+  // the base's seating: only the definition is budgeted above the pads (the note and the rest may sit under them), and
+  // only the folds' summaries are rows the pads may not cut
+  gradebar: [['decks/player/mount.js', 'function answerSaid(def) {', 'function answerSaid(def) { return def;'],
+    ['decks/player/mount.js', "const FOLD_ROWS = '.kp-folds > details > summary, .kp-folds > :not(details)';", "const FOLD_ROWS = '.kp-folds > details > summary';"]],
   offline: [['maintenance/report-client.js', 'mime_type: file.type, bytes: bytes[i] })', 'mime_type: file.type, blob: file })']],
   guided: [['corridor.js', 'function openGuidedRoom(from) {', 'function openGuidedRoom(from) { const until = performance.now() + 1500; while (performance.now() < until) { /* the negative control: a slow open */ }']],
 };
@@ -405,8 +408,8 @@ try {
             await deck.page.locator('#kp-reveal').click();
             await deck.page.locator('.kp-grades').waitFor();
             await settle(deck.page, 900);
-            const dock = await deck.page.evaluate(() => { const d = document.querySelector('.kp-grades').getBoundingClientRect(); const below = window.__I__.leaves().filter((el) => !document.querySelector('.kp-grades').contains(el)).flatMap((el) => window.__I__.rects(el)).filter((r) => r.top < innerHeight && r.bottom > d.bottom + 0.5).length; return { bottom: d.bottom, below }; });
-            check(`G11 · ${tag} · the focus room's grade bar stands on the foot, nothing of the page below it`, dock.bottom >= 844 - 0.5 && dock.below === 0, `bar bottom ${dock.bottom.toFixed(1)} · text below it ${dock.below}`);
+            const dock = await deck.page.evaluate(() => { const d = document.querySelector('.kp-grades').getBoundingClientRect(); const below = window.__I__.leaves().filter((el) => !document.querySelector('.kp-grades').contains(el)).flatMap((el) => window.__I__.rects(el)).filter((r) => r.top >= d.bottom - 0.5 && r.top < innerHeight - 0.5).length; return { bottom: d.bottom, below }; });
+            check(`G11 · ${tag} · the focus room's grade bar stands on the foot, no line of the page showing below it`, dock.bottom >= 844 - 0.5 && dock.below === 0, `bar bottom ${dock.bottom.toFixed(1)} · text below it ${dock.below}`);
             await deck.context.close();
           } else if (lang === 'bi' && width === 390) console.log(`  ..   G11 · ${engine}: the phone's insets cannot be set in WebKit; the inset checks run in Chromium`);
         }
