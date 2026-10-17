@@ -132,7 +132,7 @@
         },
         "dictionaryIndex": {
           "path": "prototypes/corridor/data/share_alike/dict-v2/index.json",
-          "sha256": "450df37334ca3e055e886cedaa0f85ceeafe690c9f55ccc1219d1ba3fa239dc5"
+          "sha256": "ff4a262c082f3ac7d9868214c37abbc7ad9ab55d4edb49e176e47a2e9275cf3a"
         }
       },
       "kanjidicArchive": {
@@ -194,9 +194,9 @@
         "dictionaryRule": "Exact printed form and reading, respecting JMdict readingWrittenScopes. All candidates retained; no sense-level classification or automatic canonical redirect.",
         "dictionaryLinkScope": "Every attested reading on a classified vocabulary printed key; unassigned words retain runtime targets but are not matched to JMdict here.",
         "wordPairs": 7848,
-        "wordPairsUniqueCandidate": 7053,
+        "wordPairsUniqueCandidate": 7060,
         "wordPairsAmbiguous": 112,
-        "wordPairsUnmatched": 683,
+        "wordPairsUnmatched": 676,
         "kankenSpecies": 5637,
         "kankenRelationshipRule": "Shared source species_id only. Retain each entry_id, glyph and grade; never inherit metadata or grades across related forms."
       },
