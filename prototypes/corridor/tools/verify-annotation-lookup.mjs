@@ -30,8 +30,14 @@ const fixture = Buffer.concat([original, Buffer.from(shim)]);
 const reenable = ['create.disabled = busy || !recordWritable();', 'create.disabled = busy;'];
 assert.equal(original.toString().split(reenable[0]).length, 2, 'The control mutation must target one exact line');
 const reenabled = Buffer.concat([Buffer.from(original.toString().replace(...reenable)), Buffer.from(shim)]);
+// Negative control: a build that declares every kana parenthetical after a kanji an annotation by its shape alone must
+// fail the plain-prose case at its first door.
+const byShape = ['.filter(([open, , inner]) => annotationReadsAs(source, open, annotationKana(inner), tokenReadings, wordStarts))', '.filter(() => true)'];
+assert.equal(original.toString().split(byShape[0]).length, 2, 'The control mutation must target one exact line');
+const shapeOnly = Buffer.concat([Buffer.from(original.toString().replace(...byShape)), Buffer.from(shim)]);
 const controls = [['failed-list-write-is-honest-and-recoverable', 'list-form-reenabled-before-reload', reenabled, /must stay disabled until reload/],
-  ['failed-capture-inside-a-list-is-honest-and-recoverable', 'list-form-reenabled-before-reload-after-capture', reenabled, /A failed native write protects the host until reload/]];
+  ['failed-capture-inside-a-list-is-honest-and-recoverable', 'list-form-reenabled-before-reload-after-capture', reenabled, /A failed native write protects the host until reload/],
+  ['plain-prose-parentheticals-are-annotations-only-when-they-read', 'annotation-by-kana-shape', shapeOnly, /keeps its door/]];
 const sourceFiles = new Map(identity.files.map(file => [file.path, file.sha256]));
 assert.equal(sha(original), sourceFiles.get('corridor.js'));
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
@@ -326,6 +332,29 @@ const cases = [
     assert(observed.normal.source > 0, 'The entire imported/publisher reading body must support lookup');
     assert.equal(observed.normal.nestedControls, 0);
     assert.equal(observed.protectedCount, 0, 'Global enhancement cannot silently add hints to a timed/mock assessment');
+  }],
+  // G3 · plain prose has no tokens: a kana parenthetical is its word's reading only when the served dictionary or the kanji
+  // data reads that word so (子供（こども）, 拓 ひら of ひら.く); a katakana word or a grammar mark in parentheses is prose
+  ['plain-prose-parentheticals-are-annotations-only-when-they-read', async page => {
+    const observed = await page.evaluate(() => {
+      const f = window.annotationFixture;
+      const room = f.S.view; f.S.view = 'shelf';
+      const box = document.createElement('section');
+      box.innerHTML = '<p class="fixture-annotation">子供（こども）が下品(な)要因（ボトルネック）を切り拓（ひら）く。</p>';
+      document.body.append(box);
+      const before = box.textContent; f.enhanceJapaneseProse(box);
+      const words = [...box.querySelectorAll('.japanese-lookup-word')].map(node => node.dataset.lookupText);
+      const sameText = box.textContent === before;
+      f.S.view = room; box.remove();
+      return { sameText, words };
+    });
+    assert(observed.sameText, 'Lookup wrapping preserves exact source text');
+    assert(['ボトル', 'ネック'].every(part => observed.words.some(word => word.includes(part))),
+      `A katakana word in parentheses that reads no word before it keeps its door: ${JSON.stringify(observed.words)}`);
+    assert(observed.words.includes('な'), `A grammar mark in parentheses keeps its door: ${JSON.stringify(observed.words)}`);
+    assert(['子供', '下品', '要因', '拓'].every(word => observed.words.includes(word)), `Each written word stays a door: ${JSON.stringify(observed.words)}`);
+    assert(!observed.words.some(word => /^(こども|ひ|ら|ひら)$/u.test(word)), `A reading that reads its word is text, not a door: ${JSON.stringify(observed.words)}`);
+    return observed;
   }],
 ];
 const filter = new Set(process.argv.slice(2).map(arg => { assert(arg.startsWith('--case=')); return arg.slice(7); }));

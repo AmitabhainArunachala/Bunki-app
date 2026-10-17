@@ -2512,12 +2512,13 @@ async function main() {
   check('a common word carries at least 4 example sentences',
     bankSheet.n >= 4 && bankSheet.en >= 1,
     `${bankSheet.n} examples · ${bankSheet.en} with English`);
-  // the eyebrow teaches the gesture: one tap gives the meaning (reader lane 2026-10-02)
+  // G3 teaches the ladder once, through motion; examples retain their heading without a permanent gesture hint.
   const exampleEyebrow = await page.evaluate(
-    `[...document.querySelectorAll('#sheet .eyebrow')].map((n) => n.textContent).find((t) => t === 'examples — tap a word for its meaning') ?? ''`,
+    `[...document.querySelectorAll('#sheet .eyebrow')].map((n) => n.textContent).find((t) => /examples|用例/.test(t)) ?? ''`,
   );
-  check('the 用例 eyebrow says that a tap on a word gives its meaning',
-    /触れると意味/.test(exampleEyebrow) || /tap a word for its meaning/.test(exampleEyebrow),
+  const obsoleteExampleHint = await page.locator('#sheet').innerText();
+  check('the example heading remains, without the obsolete permanent one-tap hint',
+    /examples|用例/.test(exampleEyebrow) && !/触れると意味|tap (?:a|any) word for its meaning/i.test(obsoleteExampleHint),
     `eyebrow: "${exampleEyebrow}"`);
   // R (2026-10-16): a word read otherwise than the quick dictionary (明日 あした) waits up to READING_WAIT_MS for its
   // entry, so its popup is read once it has come — the same popup, the reading and the meaning at once (seen red on the
@@ -2638,6 +2639,10 @@ async function main() {
   const cyc1 = await cycleState();
   check('bare cycle · first activation is reading only', cyc1.rung === 'reading' && cyc1.rt > 0 && !cyc1.popup && !cyc1.page && !cyc1.gloss, JSON.stringify(cyc1));
   await cycleTap(); await page.waitForSelector('#mini .mini-word');
+  await page.waitForFunction(() => {
+    const gloss = document.querySelector('#mini .mini-gloss')?.textContent?.trim();
+    return !!gloss && gloss !== '…';
+  });
   const cyc2 = await cycleState();
   check('bare cycle · second activation is the meaning stage', cyc2.rung === 'stage' && cyc2.rt > 0 && !!cyc2.popup && !cyc2.page && !cyc2.gloss, JSON.stringify(cyc2));
   await cycleTap(); await page.waitForSelector('#sheet', { timeout: 8000 });
@@ -2943,6 +2948,8 @@ async function main() {
     await page.waitForSelector('#mini', { state: 'detached' });
   }
   // the deeper choices stay one door away: the word's Full entry carries the context scopes and the named lists
+  const captureOrigin = await page.locator('#reader .tok.content').nth(9).elementHandle();
+  const captureOriginIndex = await captureOrigin.getAttribute('data-index');
   await holdWord(page, '#reader .tok.content', 9);
   await page.waitForSelector('#sheet [data-ctx-scope]');
   await waitForWordSheetBody(page, captureSheetLoads);
@@ -2978,6 +2985,8 @@ async function main() {
     }, scope);
     check(`R2-B · the full entry durably saves ${scope} context without another enrollment or review`,
       record.taken.length === captured.taken && record.revlog.length === envBefore.revlog);
+    check(`G3 · saving ${scope} context preserves the exact originating occurrence`,
+      await captureOrigin.evaluate((word, index) => word.isConnected && word === document.querySelector(`#reader .tok[data-index="${index}"]`), captureOriginIndex));
   }
   captureSheetLoads.dispose();
   await shoot(page, shotsDir, '19-capture-sovereignty');
@@ -2986,6 +2995,7 @@ async function main() {
   // Back has restored this word's stage; Save opens its menu without another word activation.
   await page.waitForSelector('#mini');
   assert.equal(await page.locator('#reader .tok.content').nth(9).getAttribute('data-ladder-rung'), 'stage');
+  assert(await captureOrigin.evaluate(word => word.isConnected && word.dataset.ladderRung === 'stage'), 'Context saves return to the original occurrence stage');
   await page.waitForSelector('#mini #mini-take[aria-pressed="true"]');
   await tap(page, '#mini-take');
   await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #mini-review');

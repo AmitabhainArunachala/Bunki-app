@@ -1,3 +1,4 @@
+import { exactReaderStage } from './reader-stage-support.mjs';
 /** Bundled reading and explicit text practice through normal controls, and the sentence
  * listening lock: the voice is Kore (Charon second), so a bundled Ami cue is never offered or
  * requested and the listening mode explains the absence with Kore/Charon in its accessible description. A negative
@@ -171,7 +172,7 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(await item.count(), 1); result.passageId = await item.getAttribute('data-passage');
     await item.locator('.shelf-open').click(); await sourceToken(page).waitFor(); await settled(page);
     // reader lane 2026-10-02: no sentence bar waits on the page; the practice door is in the tapped word's popup
-    assert.equal(await page.locator('#reader-sentence-practice').count(), 0); await sourceToken(page).click();
+    assert.equal(await page.locator('#reader-sentence-practice').count(), 0); await exactReaderStage(page, sourceToken(page), { word: WORD, index: INDEX, reading: 'まど', evidenceDir: OUT });
     await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
     unchanged(initial, await snapshot('reader-choice-neutral')); await page.locator('#sentence-practice-back').click();
     await page.waitForFunction(() => document.body.dataset.view === 'reader' && document.activeElement?.id === 'reader-sentence-practice');
@@ -316,7 +317,7 @@ for (const engine of engines) {
     page.on('pageerror', error => result.errors.push(error.message));
     await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page); await shelf(page);
     await page.locator('.shelf-item').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) }).locator('.shelf-open').click();
-    await sourceToken(page).click(); await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click();
+    await exactReaderStage(page, sourceToken(page), { word: WORD, index: INDEX, reading: 'まど', evidenceDir: OUT }); await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click();
     await page.locator('#sentence-choose-listening').check();
     await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-listening-start').waitFor();
     let lockFailure = null;

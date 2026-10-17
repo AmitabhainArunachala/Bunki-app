@@ -591,15 +591,26 @@ try {
     await check(name, mode, async (f) => {
       const { page, release } = f;
       assert.match((await counts(page)).note, PENDING, 'the row starts as the pending line while narration loads');
-      const before = await page.evaluate(() => {
-        // a control in the text itself, as the glossary door was: the second word button of the read
+      // a word in the text itself, as the glossary door was: the read's second word, selected the way a keyboard
+      // reaches it (its paragraph's one stop, Home, then the arrows), never by focusing an idle prose span directly
+      const selection = await page.evaluate(() => {
         const refs = [...document.querySelectorAll('#reader .tok')];
         const target = refs[Math.min(1, refs.length - 1)];
+        const paragraph = target.closest('[data-prose-roving]');
+        return { index: target.dataset.index,
+          paragraph: [...document.querySelectorAll('#reader [data-prose-roving]')].indexOf(paragraph),
+          wordIndex: paragraph ? [...paragraph.querySelectorAll('.tok[data-para]')].indexOf(target) : -1 };
+      });
+      assert(selection.paragraph >= 0 && selection.wordIndex >= 0, 'the second word belongs to a paragraph controller');
+      await page.locator('#reader [data-prose-roving]').nth(selection.paragraph).focus();
+      await page.keyboard.press('Home');
+      for (let i = 0; i < selection.wordIndex; i++) await page.keyboard.press('ArrowRight');
+      const before = await page.evaluate((index) => {
+        const target = document.querySelector(`#reader .tok[data-index="${index}"]`);
         target.dataset.focusProbe = '1';
-        target.focus();
         return { focused: document.activeElement === target, top: target.getBoundingClientRect().top,
           row: document.querySelector('.listen-row')?.getBoundingClientRect().height ?? 0, passage: document.querySelector('h1.view-title')?.textContent };
-      });
+      }, selection.index);
       assert.equal(before.focused, true, 'the probe holds focus before the manifest settles');
       release();
       await manifestSettled(f, '__narrationConsumed');

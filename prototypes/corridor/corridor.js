@@ -8316,18 +8316,23 @@ function clearWordLadder(visit = ladderVisit) {
   syncChromeKeep();
   refreshLadderRoom();
 }
+/** Folds the current rung; false when nothing visible folded, so the press reaches the layer below. A visit whose word
+ * left with its surface (a deck card graded at the reading rung) is forgotten, not folded. */
 function foldWordLadder() {
   if (!ladderVisit) return false;
   if (standingSlip()) removeMini();
-  else clearWordLadder();
+  else if (!ladderVisit.anchor.isConnected) {
+    clearWordLadder();
+    return false;
+  } else clearWordLadder();
   return true;
 }
 document.addEventListener('keydown', event => {
   if (event.key !== 'Escape' || !ladderVisit || readerWordMenu || document.getElementById('vocabulary-list-popover')) return;
+  const anchor = ladderVisit.anchor;
+  if (!foldWordLadder()) return;
   event.preventDefault();
   event.stopPropagation();
-  const anchor = ladderVisit.anchor;
-  foldWordLadder();
   if (anchor.isConnected) focusProseWord(anchor, { preventScroll: true });
 }, true);
 function activateWordLadder(anchor, options) {
@@ -8784,14 +8789,79 @@ function placeKinsoku(container, node, surface) {
   container.append(node);
 }
 
-function phoneticAnnotationRanges(text) {
-  // A kana-only parenthetical directly following a Japanese written form is
-  // its pronunciation, not a second set of lexical targets (高市…（たかいち…）).
-  return [...String(text).matchAll(/[\p{Script=Han}々〆ヶ][（(][\p{Script=Hiragana}\p{Script=Katakana}ー・\s]+[）)]/gu)]
-    .map(match => [match.index + [...match[0]][0].length, match.index + match[0].length]);
+const ANNOTATION_DIGITS = { 0: ['ぜろ', 'れい'], 1: ['いち'], 2: ['に'], 3: ['さん'], 4: ['よん', 'し'], 5: ['ご'], 6: ['ろく'], 7: ['なな', 'しち'], 8: ['はち'], 9: ['きゅう', 'く'] };
+const annotationKana = value => kataToHira(String(value || '')).replace(/[\s・]/gu, '');
+/** The readings one written piece is known by: its token's, the quick dictionary's, a lone kanji's (on, kun and the
+ * kun's stem: 拓 ひら of ひら.く), a lone digit's, or a kana as written. */
+function annotationPieceReadings(piece, tokenReadings = []) {
+  const out = new Set(tokenReadings);
+  if (D.dict?.[piece]?.r) out.add(annotationKana(D.dict[piece].r));
+  if ([...piece].length === 1) {
+    const k = D.kanji?.[piece];
+    for (const on of k?.on || []) out.add(annotationKana(on));
+    for (const kun of k?.kun || []) {
+      const bare = String(kun).replace(/-/gu, '');
+      out.add(annotationKana(bare.replace(/\./gu, '')));
+      out.add(annotationKana(bare.split('.')[0]));
+    }
+    for (const reading of ANNOTATION_DIGITS[piece.replace(/[０-９]/u, ch => String.fromCharCode(ch.charCodeAt(0) - 0xfee0))] || []) out.add(reading);
+    if (/^[\p{Script=Hiragana}\p{Script=Katakana}ー]$/u.test(piece)) out.add(annotationKana(piece));
+  }
+  out.delete('');
+  return out;
+}
+/** Whether `wanted` reads the written run that ends at `end`: some run of the pieces just before it, starting where a
+ * word starts, reads exactly so (帯 of 地帯 is no word of its own: 森林地帯（タイ） names Thailand). */
+function annotationReadsAs(text, end, wanted, tokenReadings, wordStarts) {
+  if (!wanted) return false;
+  const chars = [...text.slice(Math.max(0, end - 32), end)];
+  let first = chars.length;
+  while (first > 0 && /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー々〆ヶ0-9０-９]/u.test(chars[first - 1])) first--;
+  const run = chars.slice(first);
+  const offsets = [end];
+  for (let i = run.length - 1; i >= 0; i--) offsets.unshift(offsets[0] - run[i].length);
+  const reach = Array.from({ length: run.length + 1 }, () => new Set());
+  reach[run.length].add(wanted.length);
+  for (let i = run.length - 1; i >= 0; i--) {
+    for (let k = i + 1; k <= run.length; k++) {
+      if (!reach[k].size) continue;
+      const own = (tokenReadings.get(offsets[i]) || []).filter(([stop]) => stop === offsets[k]).map(([, reading]) => reading);
+      for (const reading of annotationPieceReadings(run.slice(i, k).join(''), own)) {
+        for (const at of reach[k]) if (at >= reading.length && wanted.slice(at - reading.length, at) === reading) reach[i].add(at - reading.length);
+      }
+    }
+    if (reach[i].has(0) && (wordStarts ? wordStarts.has(offsets[i]) : i === 0)) return true;
+  }
+  return false;
+}
+/** A kana-only parenthetical directly after a written form is its pronunciation, not a second set of lexical targets,
+ * only when it reads that form (第2次高市改造内閣（だいにじたかいちかいぞうないかく）, 切り拓（ひら）く). One that reads
+ * no written run before it stays prose with its own doors (要因（ボトルネック）, 鯨渓谷（エジプト）). */
+function phoneticAnnotationRanges(text, tokens = null) {
+  const source = String(text);
+  const matches = [...source.matchAll(/[\p{Script=Han}々〆ヶ][（(]([\p{Script=Hiragana}\p{Script=Katakana}ー・\s]+)[）)]/gu)];
+  if (!matches.length) return [];
+  const tokenReadings = new Map();
+  let wordStarts = null;
+  if (tokens) {
+    wordStarts = new Set();
+    let at = 0;
+    for (const token of tokens) {
+      const s = String(token.s || '');
+      const reading = token.r || (/^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u.test(s) ? s : '');
+      if (reading) tokenReadings.set(at, [...(tokenReadings.get(at) || []), [at + s.length, annotationKana(reading)]]);
+      wordStarts.add(at);
+      at += s.length;
+    }
+  } else if (typeof Intl.Segmenter === 'function') {
+    wordStarts = new Set([...new Intl.Segmenter('ja', { granularity: 'word' }).segment(source)].map(part => part.index));
+  }
+  return matches.map(match => [match.index + [...match[0]][0].length, match.index + match[0].length, match[1]])
+    .filter(([open, , inner]) => annotationReadsAs(source, open, annotationKana(inner), tokenReadings, wordStarts))
+    .map(([open, close]) => [open, close]);
 }
 function phoneticAnnotationIndices(tokens) {
-  const ranges = phoneticAnnotationRanges(tokens.map(token => token.s).join(''));
+  const ranges = phoneticAnnotationRanges(tokens.map(token => token.s).join(''), tokens);
   const marked = new Set();
   let offset = 0;
   tokens.forEach((token, index) => {
@@ -8839,8 +8909,8 @@ function appendJapaneseLookup(container, text, context = {}) {
     const occurrence = () => context.itemId ? lookupOccurrence(word) : null;
     let menuOccurrence = null;
     const current = () => word.isConnected ? word : menuOccurrence && findLookupOccurrence(menuOccurrence);
-    const entry = () => [...segment].length === 1 && D.kanji[segment] ? { t: 'kanji', id: segment }
-      : menuRecord ? { t: 'word', id: menuRecord.head || segment, ...(menuRecord.seq ? { seq: menuRecord.seq, reading: menuRecord.r } : {}) } : null;
+    const entry = () => menuRecord ? { t: 'word', id: menuRecord.head || segment, ...(menuRecord.seq ? { seq: menuRecord.seq, reading: menuRecord.r } : {}) }
+      : [...segment].length === 1 && D.kanji[segment] ? { t: 'kanji', id: segment } : null;
     wireReaderWordMenu(word, {
       target: { kind: 'word', id: segment }, label: segment, copyText: segment,
       prepare: async () => {
@@ -11095,8 +11165,8 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
       removeMini();
       // the keyboard's doors (Ctrl+Enter, the word menu) open the page at once; a tap's comes by the cut
       const instant = modality === 'keyboard';
-      if (hasKanjiEntry()) go({ t: 'kanji', id: text }, { invoker: span, instant });
-      else go({ t: 'word', id: record.head || text, ...(record.seq ? { seq: record.seq, reading: record.r } : {}) }, { invoker: span, instant });
+      if (record) go({ t: 'word', id: record.head || text, ...(record.seq ? { seq: record.seq, reading: record.r } : {}) }, { invoker: span, instant });
+      else go({ t: 'kanji', id: text }, { invoker: span, instant });
     },
     reopen: () => quickLook('programmatic', { restore: true }),
   };
@@ -23668,7 +23738,17 @@ function recordPickerSurface(node) {
   };
 }
 
-function renderContextPicker(sheet, node, { currentSurface = recordPickerSurface(node), onSaved = () => render(), onFailed = () => {} } = {}) {
+/** A page Save, including its context scope, redraws the page while the originating word keeps its ladder. */
+function refreshSavedPage(node, label = nodeTitle(node)) {
+  const path = layerPathFor();
+  if (path?.some(part => ladderPages.has(part))) {
+    S.roomStale = true;
+    refreshWordSaveControls(node, label);
+    renderLayer();
+  } else render();
+}
+
+function renderContextPicker(sheet, node, { currentSurface = recordPickerSurface(node), onSaved = () => refreshSavedPage(node), onFailed = () => {} } = {}) {
   const item = S.taken.find((t) => t.t === node.t && t.id === node.id);
   if (!item || node.t !== 'word') return;
   // D23: another entry's card under this spelling is not this door's to adjust
@@ -25746,6 +25826,7 @@ function guidedHost() {
   return {
     english: bi,
     render: () => { if (S.view === 'guided') render(); },
+    isActiveRoom: () => S.view === 'guided' && !S.stack.length,
     storage: () => localStorage,
     // the single-file handoff carries the sets in its bundle, keyed by path; a served build
     // lets the room fetch them
@@ -31711,11 +31792,7 @@ function composePage(node, path) {
       const epoch = recordEpoch, currentSurface = retainActionSurface(document.getElementById('sheet-take'));
       const saved = await toggleTaken(capNode, capLabel);
       if (!saved || !recordWritable(epoch) || !currentSurface()) return false;
-      if (layerPathFor() && path.some(part => ladderPages.has(part))) {
-        S.roomStale = true;
-        refreshWordSaveControls(capNode, capLabel);
-        renderLayer();
-      } else render();
+      refreshSavedPage(capNode, capLabel);
       return true;
     };
     const capture = saveOne({

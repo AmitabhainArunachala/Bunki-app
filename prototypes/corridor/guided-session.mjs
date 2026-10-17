@@ -240,7 +240,13 @@ export function createGuidedSession(host) {
   const answered = () => Q.filter((q) => answer(q).choice !== null).length;
   const countRight = () => Q.filter((q) => answer(q).correct === true).length;
   const last = () => state.index >= Q.length - 1;
-  const roomInteractive = () => root?.isConnected && !root.closest('[inert], [aria-hidden="true"], [hidden]');
+  // The host knows whether this is its active room: a moment owning the room's inert app still lets Next
+  // retire it, while a word page over a retained room keeps every room action out.
+  const roomInteractive = () =>
+    !!root?.isConnected &&
+    (typeof host.isActiveRoom === 'function'
+      ? host.isActiveRoom()
+      : !root.closest('[inert], [aria-hidden="true"], [hidden]'));
   const kindLabel = (q) => KIND[q.kind] || [q.kind, q.kind];
   const wordNode = (key) => ({ t: 'word', id: words[key].surface });
   const saveText = () =>

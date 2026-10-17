@@ -8752,6 +8752,8 @@ function tapped(unit, node, { card, where, depth }) {
     onClose: (reason) => { if (reason !== 'dive') node.classList.remove('kp-lit'); },
   }), false);
   // Keep the existing tuple: hosted reveal, stage and page are distinct observation depths.
+  // Putting a stage away opens nothing, so it is no observation.
+  if (opened === 'dismissed') return;
   logTap(card, where, frame, opened === 'dived' ? depth + 2 : opened === 'opened' ? depth + 1 : depth);
   if (!opened) node.classList.remove('kp-lit');
 }

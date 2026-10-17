@@ -400,6 +400,11 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
  * passages and practice papers. These are words, never button-shaped chips. */
 .japanese-lookup-text { position: relative; isolation: isolate; font: inherit; line-height: inherit; letter-spacing: inherit; }
 .airead-para .japanese-lookup-text { isolation: auto; }
+/* G3 · guided prose mixes the session's teaching words (.gs-word) with lookup text: the block is the one layer their hit
+ * regions share, under all of its ink (the example line's rule below). Isolated segment by segment, に's region lay over
+ * 支 of 支障 and は's over 橋: a tap on the teaching word opened its neighbour. */
+.guided-room [data-prose-roving] { position: relative; isolation: isolate; }
+.guided-room [data-prose-roving] .japanese-lookup-text { isolation: auto; }
 .japanese-lookup-word {
   position: relative;
   display: inline;

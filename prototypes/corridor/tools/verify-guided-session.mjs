@@ -132,6 +132,37 @@ const activeAction = (page) =>
     () => document.activeElement?.dataset?.action || document.activeElement?.tagName || '',
   );
 
+/** A native press on one exact occurrence. Every printed glyph of it (its readings excluded) must hit-test to this
+ * occurrence at its own centre before the press lands on the first: a neighbour's region over any one of them is red,
+ * never routed around by choosing a glyph that survived. A wrapped word's union box is no target. */
+async function pressOccurrence(page, door) {
+  const handle = await door.elementHandle();
+  await handle.scrollIntoViewIfNeeded();
+  const glyphs = await handle.evaluate((node) => {
+    const out = [], walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+    for (let text = walker.nextNode(); text; text = walker.nextNode()) {
+      if (text.parentElement.closest('rt, .gs-reading')) continue;
+      for (let at = 0; at < text.data.length;) {
+        const ch = String.fromCodePoint(text.data.codePointAt(at));
+        if (ch.trim()) {
+          const range = document.createRange();
+          range.setStart(text, at); range.setEnd(text, at + ch.length);
+          const box = [...range.getClientRects()].find((rect) => rect.width > 0 && rect.height > 0);
+          const x = box ? box.left + box.width / 2 : NaN, y = box ? box.top + box.height / 2 : NaN;
+          const hit = box ? document.elementFromPoint(x, y) : null;
+          out.push({ ch, x, y, owned: !!hit && node.contains(hit) && !hit.closest('rt, .gs-reading'),
+            hit: hit ? `${hit.tagName.toLowerCase()}.${hit.className || ''}:${(hit.textContent || '').slice(0, 6)}` : null });
+        }
+        at += ch.length;
+      }
+    }
+    return out;
+  });
+  assert(glyphs.length > 0 && glyphs.every((glyph) => glyph.owned),
+    `Every printed glyph of ${await handle.getAttribute('data-word')} is its own occurrence's: ${JSON.stringify(glyphs)}`);
+  await page.mouse.click(glyphs[0].x, glyphs[0].y);
+}
+
 /** Activate one known teaching occurrence through its exact visible-reading branch, never a retry loop. */
 async function teachingStage(page, door) {
   const id = await door.getAttribute('data-word'), word = guidedSet.words[id];
@@ -140,7 +171,7 @@ async function teachingStage(page, door) {
     const style = getComputedStyle(n); return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0;
   }));
   const before = await stored(page);
-  await door.click();
+  await pressOccurrence(page, door);
   if (!printed && word.reading !== word.surface) {
     await page.waitForFunction(id => document.querySelector(`.guided-room .gs-word[data-word="${id}"][data-ladder-rung="reading"]`), id);
     assert.equal(await door.getAttribute('data-ladder-rung'), 'reading');
@@ -149,7 +180,7 @@ async function teachingStage(page, door) {
     assert.equal(await door.locator('rt').evaluate(n => {
       const style = getComputedStyle(n); return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0;
     }), true, 'The exact teaching reading is visible');
-    await door.click();
+    await pressOccurrence(page, door);
   }
   await page.locator('#mini[data-from="guided"]').waitFor({ timeout: 5_000 });
   assert.equal(await door.getAttribute('data-ladder-rung'), 'stage');
@@ -489,8 +520,26 @@ async function journey(browser, browserName, viewport) {
     const door58 = page.locator('.guided-room .gs-word[data-word="word_58"]').first();
     await door58.evaluate((n) => n.scrollIntoView({ block: 'center' }));
     await teachingStage(page, door58);
-    await door58.click();
+    await pressOccurrence(page, door58);
     await page.locator('#sheet').waitFor({ timeout: 10_000 });
+    // the room retained under a word page takes no action: a synthetic Next and the room's own keys change neither
+    // the session nor the page above it
+    const covered = { record: await stored(page), sheet: await page.locator('#sheet').getAttribute('data-node') };
+    const coveredNext = await page.evaluate(() => {
+      const next = document.querySelector('.guided-room [data-action="next"]');
+      next?.click();
+      return !!next;
+    });
+    await page.keyboard.press('1');
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(100);
+    check(
+      'S0c a word page over the retained room holds it: a synthetic Next, 1 and ArrowRight change neither the session nor the page',
+      coveredNext &&
+        JSON.stringify(await stored(page)) === JSON.stringify(covered.record) &&
+        (await page.locator('#sheet').getAttribute('data-node')) === covered.sheet,
+      JSON.stringify({ coveredNext, sheet: covered.sheet }),
+    );
     await page.locator('#sheet #sheet-take').click();
     await page.waitForFunction(
       () => document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed') === 'true',

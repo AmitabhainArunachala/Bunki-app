@@ -1,3 +1,4 @@
+import { exactReaderStage } from './reader-stage-support.mjs';
 /** Bundled reading, recursive exploration and explicit practice through normal
  * controls. Persistent profiles, real record output, no injected learner state
  * or provider responses. This is a scoped technical subjourney. */
@@ -136,7 +137,7 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(await item.count(), 1); result.passageId = await item.getAttribute('data-passage');
     await item.locator('.shelf-open').click(); await sourceToken(page).waitFor(); await settled(page);
     // reader lane 2026-10-02: no sentence bar waits on the page; the practice door is in the tapped word's popup
-    assert.equal(await page.locator('#reader-sentence-practice').count(), 0); await sourceToken(page).click();
+    assert.equal(await page.locator('#reader-sentence-practice').count(), 0); await exactReaderStage(page, sourceToken(page), { word: WORD, index: INDEX, reading: 'まど', evidenceDir: OUT });
     await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
     unchanged(initial, await snapshot('reader-choice-neutral')); await page.locator('#sentence-practice-back').click();
     await page.waitForFunction(() => document.body.dataset.view === 'reader' && document.activeElement?.id === 'reader-sentence-practice');
