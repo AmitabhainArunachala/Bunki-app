@@ -11,6 +11,9 @@ body.has-primary-tabs[data-view='speak'] #app { padding-bottom: calc(var(--nav-c
 
 .speak-room {
   --speak-seal: 26px;
+  /* 朱 for text: the world's red deepened with its own ink (a two-token mix, D3), so a 13 px correction and a seal read at
+     ≥ 4.5:1 in every world; the underline and the ring keep the bare red, which as a mark needs 3:1 */
+  --speak-shu: color-mix(in srgb, var(--color-signal) 72%, var(--color-ink));
   display: block;
   max-width: 40rem;
   margin: 0 auto;
@@ -55,7 +58,7 @@ body.has-primary-tabs[data-view='speak'] #app { padding-bottom: calc(var(--nav-c
   font: var(--weight-regular) var(--type-label) / 1 var(--font-seal);
   color: var(--color-ink-2);
 }
-.speak-line[data-who='kore'] .speak-seal { border-color: color-mix(in srgb, var(--color-signal) 55%, var(--color-paper)); color: var(--color-signal); }
+.speak-line[data-who='kore'] .speak-seal { border-color: color-mix(in srgb, var(--color-signal) 55%, var(--color-paper)); color: var(--speak-shu); }
 .speak-line[data-who='second'] .speak-seal { border-style: dashed; }
 .speak-text {
   margin: 0;
@@ -72,7 +75,7 @@ body.has-primary-tabs[data-view='speak'] #app { padding-bottom: calc(var(--nav-c
 .speak-shu { display: inline-flex; flex-direction: column; align-items: flex-start; vertical-align: bottom; }
 .speak-shu-right {
   font: var(--weight-medium) var(--type-label) / 1.2 var(--font-reading);
-  color: var(--color-signal);
+  color: var(--speak-shu);
   white-space: nowrap;
 }
 .speak-shu-right .japanese-lookup-word { color: inherit; }
@@ -92,11 +95,11 @@ body.has-primary-tabs[data-view='speak'] #app { padding-bottom: calc(var(--nav-c
 .speak-bridge-t { margin: 0; font: var(--weight-regular) var(--type-label) / var(--leading-ui) var(--font-ui); color: var(--color-quiet); }
 .speak-kana { margin: var(--space-2) 0 0; font: var(--weight-regular) var(--type-lead) / var(--leading-body) var(--font-reading); letter-spacing: 0.04em; }
 .speak-kana .kana-same { color: var(--color-ink); }
-.speak-kana .kana-missing { color: var(--color-signal); }
+.speak-kana .kana-missing { color: var(--speak-shu); }
 .speak-kana .kana-missing::before { content: '〔'; }
 .speak-kana .kana-missing::after { content: '〕'; }
 .speak-kana .kana-extra { color: var(--color-quiet); text-decoration: line-through; text-decoration-color: var(--color-signal); }
-.speak-kana .kana-swap { color: var(--color-signal); text-decoration: underline; text-decoration-color: var(--color-signal); text-underline-offset: 0.25em; }
+.speak-kana .kana-swap { color: var(--speak-shu); text-decoration: underline; text-decoration-color: var(--color-signal); text-underline-offset: 0.25em; }
 .speak-kana .kana-was { font-size: var(--type-caption); }
 .speak-kana .is-particle { font-weight: var(--weight-semibold); }
 
@@ -155,6 +158,8 @@ body.has-primary-tabs[data-view='speak'] #app { padding-bottom: calc(var(--nav-c
 /* ---- the ensō: 72 drawn, 88 to touch. Rest: a thin ring in the world's ink, still. */
 .speak-enso {
   all: unset;
+  /* after the reset: the dock lets taps through around its controls, never through the ring */
+  pointer-events: auto;
   box-sizing: border-box;
   display: grid;
   justify-items: center;
@@ -194,7 +199,7 @@ body.has-primary-tabs[data-view='speak'] #app { padding-bottom: calc(var(--nav-c
 .speak-enso[data-phase='speaking'] .enso-closed { opacity: 0; }
 .speak-enso[data-phase='speaking'] .enso-red { opacity: 1; }
 .speak-enso[data-phase='speaking'] .enso-art { animation: speak-breathe 3.2s var(--ease-ink) infinite alternate; }
-.speak-enso[data-phase='speaking'] .speak-enso-label { color: var(--color-signal); }
+.speak-enso[data-phase='speaking'] .speak-enso-label { color: var(--speak-shu); }
 @keyframes speak-breathe { from { transform: scale(1); } to { transform: scale(1.025); } }
 .speak-room[data-mode='sayit'] .speak-enso-label { color: var(--color-ink); font-weight: var(--weight-semibold); }
 

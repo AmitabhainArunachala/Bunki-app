@@ -25151,8 +25151,8 @@ const speakOwnedAudio = new WeakSet();
 const speakAvailable = () => window.__CORRIDOR_STANDALONE__ !== true;
 const SPEAK_JA = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
 function loadSpeakRoom() {
-  // the module override is honoured only on 127.0.0.1, where the verification suites run
-  const url = location.hostname === '127.0.0.1' && typeof window.__KAIRO_SPEAK_URL__ === 'string' ? window.__KAIRO_SPEAK_URL__ : './speak.js';
+  // the module override is honoured only on this machine (127.0.0.1 or localhost), where the verification suites run
+  const url = ['127.0.0.1', 'localhost'].includes(location.hostname) && typeof window.__KAIRO_SPEAK_URL__ === 'string' ? window.__KAIRO_SPEAK_URL__ : './speak.js';
   speakModulePromise ||= import(url).then(
     (module) => { speakModule = module; speakFailed = false; return module; },
     (error) => { speakModulePromise = null; speakFailed = true; throw error; },

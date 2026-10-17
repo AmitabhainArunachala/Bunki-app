@@ -105,13 +105,15 @@ export function createSpeakRoom(host) {
     return config;
   }
   function lockNow() { return core.voiceLockFrom(host.voiceLock?.()); }
-  /** The test endpoint, honoured only when the page itself is on 127.0.0.1 and the endpoint is too. */
+  /** The test endpoint, honoured only when the page itself is on this machine (127.0.0.1 or localhost, the house's
+   * loopback) and the endpoint is too: the mock partner of the verification suites, never a remote origin. */
+  const LOOPBACK = new Set(['127.0.0.1', 'localhost']);
   function endpointOverride() {
     try {
       const value = window.__KAIRO_SPEAK_ENDPOINT__;
-      if (typeof value !== 'string' || location.hostname !== '127.0.0.1') return null;
+      if (typeof value !== 'string' || !LOOPBACK.has(location.hostname)) return null;
       const url = new URL(value);
-      return url.protocol === 'http:' && url.hostname === '127.0.0.1' ? url.href.replace(/\/+$/u, '') : null;
+      return url.protocol === 'http:' && LOOPBACK.has(url.hostname) ? url.href.replace(/\/+$/u, '') : null;
     } catch { return null; }
   }
   /** One snapshot per turn: where requests go and with which key, so two settings can never be spliced. A key bound to
@@ -164,7 +166,7 @@ export function createSpeakRoom(host) {
           cache: 'no-store',
         });
       } catch (error) {
-        throw failure(0, null, controller.signal.aborted ? 'timeout' : 'network');
+        throw failure(0, null, controller.byRoom ? 'aborted' : controller.signal.aborted ? 'timeout' : 'network');
       }
       const text = await res.text();
       let json = null;
@@ -177,8 +179,9 @@ export function createSpeakRoom(host) {
       st.requests.delete(controller);
     }
   }
+  /** The room stops its own requests (the talk ended, the room was left): an abort, never a failed voice. */
   function abortRequests() {
-    for (const controller of st.requests) controller.abort();
+    for (const controller of st.requests) { controller.byRoom = true; controller.abort(); }
     st.requests.clear();
   }
 
@@ -231,6 +234,7 @@ export function createSpeakRoom(host) {
           const wavBytes = /wav/iu.test(part.inlineData.mimeType || '') ? pcm : core.wavFromPcm16Bytes(pcm, core.pcmRate(part.inlineData.mimeType));
           return { url: URL.createObjectURL(new Blob([wavBytes], { type: 'audio/wav' })), wav: wavBytes, text: sentence.text };
         } catch (error) {
+          if (error.kind === 'aborted') { line.aborted = true; return null; }
           if (error.kind === 'not-found') {
             st.voiceRetired = true;
             setStatus('voice-replaced');
@@ -242,7 +246,8 @@ export function createSpeakRoom(host) {
       previous = job;
     }
     Promise.all(line.voice).then((clips) => {
-      line.silent = clips.length > 0 && clips.every((clip) => !clip);
+      // silent means the voice was asked and failed; a request the room itself stopped says nothing about the voice
+      line.silent = clips.length > 0 && clips.every((clip) => !clip) && !line.aborted && !st.voiceRetired;
       if (line.silent) paintLineState(line);
     });
     return line.voice;
@@ -594,6 +599,7 @@ export function createSpeakRoom(host) {
   }
   function failTurn(error) {
     const kind = error?.kind || 'error';
+    if (kind === 'aborted') return;
     if (kind === 'network') { st.offline = !navigator.onLine; setStatus(st.offline ? 'offline' : 'error'); return; }
     if (kind === 'busy') { setStatus('busy', { seconds: error.retryDelay || 0 }); return; }
     setStatus({ 'no-key': 'no-key', key: 'key', unclear: 'unclear', timeout: 'timeout', 'not-found': 'ears-gone', server: 'error', malformed: 'unclear' }[kind] || 'error');
@@ -1044,15 +1050,16 @@ export function createSpeakRoom(host) {
     const listening = st.phase === 'listening';
     enso.setAttribute('aria-pressed', String(listening));
     const sayit = st.mode === 'sayit';
-    const word = phase === 'listening' ? t('聞いています', 'Listening')
+    // Bridge, say-it and shadowing keep their own word while the ring listens: what he is doing, not what it does
+    const modeWord = sayit ? t('言ってみる', 'Say it') : st.mode === 'bridge' ? t('橋', 'Bridge') : st.mode === 'shadow' ? t('影', 'Shadow') : null;
+    const word = phase === 'listening' ? modeWord || t('聞いています', 'Listening')
       : phase === 'speaking' ? t('話しています', 'Speaking')
       : phase === 'thinking' ? t('考えています', 'Thinking')
-      : sayit ? t('言ってみる', 'Say it')
-      : st.mode === 'bridge' ? t('橋', 'Bridge')
-      : st.mode === 'shadow' ? t('影', 'Shadow') : t('話す', 'Speak');
+      : modeWord || t('話す', 'Speak');
     els.ensoLabel.textContent = word;
     els.ensoLabel.lang = host.english() ? 'en' : 'ja';
-    const name = phase === 'listening' ? t('聞いています — 話し終えたら押す', 'Listening — tap when you’re done')
+    const name = phase === 'listening' && sayit ? t('言ってみる — 聞いています。言い終えたら押す', 'Say it — listening; tap when you’re done')
+      : phase === 'listening' ? t('聞いています — 話し終えたら押す', 'Listening — tap when you’re done')
       : phase === 'speaking' ? t('Kore が話しています — 押すと止めて話せる', 'Kore is speaking — tap to stop her and talk')
       : phase === 'thinking' ? t('Kore が考えています', 'Kore is thinking')
       : phase === 'open' ? t('話す — いまは使えない', 'Speak — not available now')
