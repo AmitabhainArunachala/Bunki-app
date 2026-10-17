@@ -9322,7 +9322,9 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
       box.dataset.list = listName;
       box.checked = member(listName);
       box.disabled = busy || !recordWritable();
-      box.addEventListener('change', () => void setMembership(listName, box.checked));
+      // Q · the keyboard stays on the box the hand just ticked, in every engine: WebKit (Safari) never focuses a checkbox
+      // on a click, so the repaint lost the menu's place and the keyboard left the menu (verify-personal-host, WebKit)
+      box.addEventListener('change', () => { focusList = listName; void setMembership(listName, box.checked); });
       row.append(box, el('span', 'vocabulary-list-name', listName), el('span', 'vocabulary-list-count', String(S.lists[listName].length)));
       choices.append(row);
     }
@@ -9331,7 +9333,8 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
     if (!busy && focusList != null) {
       const box = [...choices.querySelectorAll('input[type="checkbox"]')].find((input) => input.dataset.list === focusList);
       focusList = null;
-      if (pop.contains(document.activeElement) && document.activeElement !== document.body) return;
+      // a control inside the menu the hand moved to meanwhile keeps the keyboard; the menu itself hands it to the box
+      if (pop.contains(document.activeElement) && document.activeElement !== pop && document.activeElement !== document.body) return;
       (box || pop).focus({ preventScroll: true });
     }
   };

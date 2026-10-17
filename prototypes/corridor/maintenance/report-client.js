@@ -261,7 +261,12 @@
     // A stored draft keeps its screenshots under `screenshots`, so an earlier version
     // sees the draft without them instead of a screenshot it cannot preview.
     const blobOf = item => item.blob || new Blob([item.bytes], { type: item.mime_type });
+    // Q · a screenshot is read once, when it is chosen, and kept as its bytes: a save never reads the file again, so a
+    // report saves offline (WebKit's offline mode fails every Blob read: NotReadableError) and a picked file that goes
+    // away later cannot break it. Bytes held already are used as they are.
+    const sizeOf = item => item.bytes ? item.bytes.byteLength : item.blob?.size || 0;
     async function asBytes(item) {
+      if (item.bytes) { const { blob, ...rest } = item; return rest; }
       if (!item.blob) return item;
       const { blob, ...rest } = item;
       return { ...rest, bytes: await blob.arrayBuffer() };
@@ -274,7 +279,7 @@
       if (!value || typeof value !== 'object' || (!Array.isArray(value.attachments) && !Array.isArray(value.screenshots))) return value;
       const { screenshots, ...rest } = value;
       const items = [...(Array.isArray(rest.attachments) ? rest.attachments : []), ...(Array.isArray(screenshots) ? screenshots : [])];
-      return { ...rest, attachments: items.map(({ bytes, ...item }) => item.blob ? item : { ...item, blob: new Blob([bytes], { type: item.mime_type }) }) };
+      return { ...rest, attachments: items.map((item) => item) };
     }
     function announce(value) { root.querySelector('#br-live').textContent = value; }
     function setMessage(value) { message = value; announce(value); const element = body.querySelector('.br-notice'); if (element) { element.textContent = value; element.hidden = !value; } if (closing) protectClosingDialog(); }
@@ -579,7 +584,7 @@
     }
     function close() { if (dialog.open) dialog.close(); }
     function clearPreviews() { previewUrls.forEach(url => URL.revokeObjectURL(url)); previewUrls = []; }
-    function preview(item) { const url = URL.createObjectURL(item.blob); previewUrls.push(url); return `<figure><img src="${esc(url)}" alt="Selected screenshot: ${esc(item.name)}"><figcaption>${esc(item.name)} · ${Math.ceil(item.blob.size / 1024)} KB</figcaption><button type="button" data-br="remove" data-id="${esc(item.id)}" aria-label="Remove ${esc(item.name)}">Remove screenshot</button></figure>`; }
+    function preview(item) { const url = URL.createObjectURL(blobOf(item)); previewUrls.push(url); return `<figure><img src="${esc(url)}" alt="Selected screenshot: ${esc(item.name)}"><figcaption>${esc(item.name)} · ${Math.ceil(sizeOf(item) / 1024)} KB</figcaption><button type="button" data-br="remove" data-id="${esc(item.id)}" aria-label="Remove ${esc(item.name)}">Remove screenshot</button></figure>`; }
     function notice() { return `<p class="br-notice" role="status" ${message ? '' : 'hidden'}>${esc(message)}</p>`; }
     // Q · a learner reads learner words (Q/DESIGN.md §8; Grok's walk: the sheet named the screen by its internal id and
     // sent him to GitHub): the screen by its name, the next step plainly, and everything technical — the screen's id,
@@ -719,7 +724,7 @@
         if (targetDraft.attachments.length + selected.length > limits.attachment_count) throw new Error(`Choose at most ${limits.attachment_count} screenshots.`);
         if (selected.some(file => !['image/png', 'image/jpeg', 'image/webp'].includes(file.type))) throw new Error('Choose PNG, JPEG, or WebP images. No files were added.');
         if (selected.some(file => file.size > limits.attachment_bytes)) throw new Error(`Each screenshot must be at most ${Math.floor(limits.attachment_bytes / 1048576)} MB. No files were added.`);
-        if ([...targetDraft.attachments.map(item => item.blob), ...selected].reduce((sum, file) => sum + file.size, 0) > limits.total_attachment_bytes) throw new Error('The screenshots exceed the combined size limit. Choose smaller images.');
+        if ([...targetDraft.attachments.map(sizeOf), ...selected.map(file => file.size)].reduce((sum, size) => sum + size, 0) > limits.total_attachment_bytes) throw new Error('The screenshots exceed the combined size limit. Choose smaller images.');
       }
       try {
         checkLimits();
@@ -728,9 +733,10 @@
           if (!bitmap || bitmap.width > 16000 || bitmap.height > 16000 || bitmap.width * bitmap.height > 40000000) { bitmap?.close(); throw new Error('A screenshot cannot be previewed safely. Choose a valid image smaller than 40 megapixels.'); }
           bitmap.close();
         }
+        const bytes = await Promise.all(selected.map(file => file.arrayBuffer()));
         if (draft !== targetDraft || draftSlot !== targetSlot) throw new Error('The draft changed while checking the screenshots. No files were added; select them again in this draft.');
         checkLimits();
-        targetDraft.attachments.push(...selected.map(file => ({ id: id('attachment'), name: clip(file.name.replace(/[\\/]/g, '_'), 160) || 'screenshot', mime_type: file.type, blob: file })));
+        targetDraft.attachments.push(...selected.map((file, i) => ({ id: id('attachment'), name: clip(file.name.replace(/[\\/]/g, '_'), 160) || 'screenshot', mime_type: file.type, bytes: bytes[i] })));
         draftDirty = true;
         await persistDraft(); message = '';
       } catch (error) { message = errorText(error); }
