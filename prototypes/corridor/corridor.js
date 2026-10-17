@@ -9788,7 +9788,8 @@ function miniKanjiWeb(word, anchor) {
  * ruby, which WebKit gives no box at all. The card keeps its 10 px from all of it. */
 function anchorBox(anchor) {
   const r = anchor.getBoundingClientRect();
-  let { top, bottom, left, right } = r;
+  let { top, left } = r;
+  let bottom = r.bottom ?? top + r.height, right = r.right ?? left + r.width;
   const grow = (b) => { top = Math.min(top, b.top); bottom = Math.max(bottom, b.bottom); left = Math.min(left, b.left); right = Math.max(right, b.right); };
   for (const ruby of anchor.querySelectorAll?.('ruby') || []) {
     const box = ruby.getBoundingClientRect();

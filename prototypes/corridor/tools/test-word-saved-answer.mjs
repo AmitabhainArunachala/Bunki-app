@@ -102,6 +102,9 @@ function defineRows() {
     'wordSaveFacts', 'paintWordSave', 'paintMiniPath', 'refreshWordSaveControls', 'toggleWordSave', 'READER_TOAST_MS', 'readerToastTimer',
     'hideReaderToast', 'showReaderToast', 'miniAnchor', 'SAVE_PRESS_MS', 'placeFloating', 'keepFloatingBeside',
     'miniKanjiWeb', 'revealFloatingFocus',
+    // Q (2026-10-17): the slip stands clear of its word with the word's reading (anchorBox); a kanji's part is named by
+    // its plain meaning (partGloss); the bar's Save fits its bar (fitChromeKeep)
+    'anchorBox', 'partGloss', 'partMeaning', 'PART_WRITTEN', 'RADICAL_VARIANT', 'fitChromeKeep', 'chromeKeepFitting',
     // Save ▾ (bea9517f, 2026-10-14): a press on Saved ✓ unfolds the word's menu inside the actual mini, and its Review
     // row is the remove route (one statement declares vocabularyListInvoker and vocabularyListNode)
     'openVocabularyListPopover', 'closeVocabularyListPopover', 'vocabularyListInvoker',
