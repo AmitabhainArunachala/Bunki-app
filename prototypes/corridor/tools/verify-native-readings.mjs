@@ -243,6 +243,40 @@ async function openQuickLook(page, preferredIndex = 0) {
   return null;
 }
 
+// G3: furigana=2 keeps native ruby at rest; only the temporary word visit folds.
+// Keep the actual origin handle across page/Back, not merely another equal-looking word.
+const quickStageState = (page, origin) => page.evaluate((node) => {
+  const reader = document.getElementById('reader'), mini = document.getElementById('mini');
+  const index = node?.dataset.index;
+  return {
+    connected: !!node?.isConnected,
+    sameOccurrence: !!node && reader?.querySelector(`.tok[data-index="${index}"]`) === node,
+    passage: document.querySelector('.listen-row[data-passage]')?.dataset.passage ?? null,
+    index: index === undefined ? null : Number(index),
+    surface: node?.dataset.proseLabel ?? null,
+    rung: node?.dataset.ladderRung ?? null,
+    focused: document.activeElement === node,
+    always: !!reader?.classList.contains('fg-always'),
+    lit: !!node?.classList.contains('lit'),
+    inlineGloss: !!node?.querySelector('.tok-en'),
+    activeRungs: reader?.querySelectorAll('[data-ladder-rung]').length ?? 0,
+    sheet: !!document.getElementById('sheet'),
+    ruby: [...(node?.querySelectorAll('rt') ?? [])].map((rt) => {
+      const style = getComputedStyle(rt);
+      return { text: rt.textContent, visible: !rt.classList.contains('hidden-rt') &&
+        style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 &&
+        [...rt.getClientRects()].some((rect) => rect.width > 0 && rect.height > 0) };
+    }),
+    mini: mini ? {
+      kind: mini.dataset.kind ?? null, key: mini.dataset.key ?? null,
+      word: mini.querySelector('.mini-word')?.textContent ?? '',
+      reading: mini.querySelector('.mini-reading')?.textContent ?? '',
+      gloss: mini.querySelector('.mini-gloss')?.textContent ?? '',
+      glosses: [...mini.querySelectorAll('.mini-gloss')].map((node) => node.textContent),
+    } : null,
+  };
+}, origin);
+
 function expectedBaseText(record) {
   return record.tokens.map((token) => token.s).join('');
 }
@@ -955,8 +989,20 @@ try {
     }
 
     const quick = await openQuickLook(page, quickTokenIndex.get(id));
-    let fullEntry = null;
+    let fullEntry = null, ladderReturn = null;
     if (quick) {
+      const quickOrigin = await page.locator('#reader .tok[data-ladder-rung="stage"]').elementHandle();
+      if (!quickOrigin) throw new Error(`G3 quick look has no stage occurrence: ${id}`);
+      const before = await quickStageState(page, quickOrigin);
+      const token = body.tokens[before.index];
+      const expectedRuby = (token?.f ?? []).filter((pair) => pair.r).map((pair) => pair.r);
+      const sameRuby = (state) => JSON.stringify(state.ruby.map((row) => row.text)) === JSON.stringify(expectedRuby) &&
+        state.ruby.every((row) => row.visible);
+      if (!before.connected || !before.sameOccurrence || before.passage !== id || before.surface !== token?.s ||
+          before.rung !== 'stage' || before.activeRungs !== 1 || before.sheet || !before.always || !sameRuby(before) ||
+          !before.mini?.key || before.mini.word !== quick.word || before.mini.reading !== quick.reading || before.mini.gloss !== quick.gloss) {
+        throw new Error(`G3 pre-page stage identity/readings differ: ${JSON.stringify({ id, before, quick, expectedRuby })}`);
+      }
       await touchAt(page, page.locator('#mini button.mini-word'));
       await page.waitForSelector('#sheet .headword', { timeout: 6_000 });
       fullEntry = await page.evaluate(() => ({
@@ -972,6 +1018,23 @@ try {
       await page.waitForSelector('#sheet', { state: 'detached', timeout: 5000 });
       await page.waitForFunction(() => document.querySelector('#reader .tok') &&
         !document.querySelector('#reader')?.closest('[inert]'), null, { timeout: 5000 });
+      const returned = await quickStageState(page, quickOrigin);
+      if (!returned.connected || !returned.sameOccurrence || returned.passage !== id || returned.index !== before.index ||
+          returned.surface !== before.surface || returned.rung !== 'stage' || returned.activeRungs !== 1 || returned.sheet ||
+          !returned.focused || !returned.always || !sameRuby(returned) || JSON.stringify(returned.mini) !== JSON.stringify(before.mini)) {
+        throw new Error(`G3 Back did not restore the same occurrence/stage/meaning: ${JSON.stringify({ id, before, returned })}`);
+      }
+      // Back returns to the stage. One native Escape folds that final rung;
+      // always-visible ruby must survive, while temporary reading/meaning does not.
+      await page.keyboard.press('Escape');
+      const folded = await quickStageState(page, quickOrigin);
+      if (!folded.connected || !folded.sameOccurrence || folded.passage !== id || folded.index !== before.index ||
+          folded.surface !== before.surface || folded.rung !== null || folded.activeRungs !== 0 || folded.mini || folded.sheet ||
+          !folded.focused || !folded.always || !sameRuby(folded) || folded.lit || folded.inlineGloss) {
+        throw new Error(`G3 final fold did not leave the same always-reading occurrence at rest: ${JSON.stringify({ id, before, returned, folded })}`);
+      }
+      ladderReturn = { before, returned, folded };
+      await quickOrigin.dispose();
     }
 
     // Completion and exact per-article bookmark are both persisted. Back must
@@ -1062,6 +1125,7 @@ try {
       dialCommit,
       quick,
       fullEntry,
+      ladderReturn,
       ownFileLoaded,
       intendedPosition,
       persistedPosition: persisted.position,
