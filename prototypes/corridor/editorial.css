@@ -5382,8 +5382,9 @@ html[data-room='tray'] .today-star:is([data-depth], [data-kept])::after {
 .sheet .depth-basis-said { flex: 1 1 100%; min-width: 0; }
 .sheet .depth-basis .depth-dot { margin: 0 0.5em 0 0; vertical-align: 0.12em; }
 .sheet .depth-word {
-  min-height: 32px;
-  padding: 0 2px;
+  /* quiet as a link, but a whole finger's reach (the app's 44 px floor, verify-corridor) */
+  min-height: 44px;
+  padding: 0 4px;
   border: 0;
   background: none;
   font: 500 13px/1.3 var(--font-ui, var(--sans));
