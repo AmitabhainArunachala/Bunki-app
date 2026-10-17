@@ -10408,6 +10408,8 @@ function openReadingSlip(anchor, token, draw) {
     else if ((door.seq || door.kanjiOnly || door.shown || !dictionaryRowsForForm(door.b).length ||
       drawn.querySelector('.mini-wait, .mini-miss')) && document.getElementById('mini') === drawn && !drawn.matches(':active')) drawn = draw(door);
     else settled();
+    // R2 · the bar's Save names what the card now stands for (解せ: 解す once the answer names it, never the asked 解する)
+    syncChromeKeep();
   });
   return drawn;
 }
