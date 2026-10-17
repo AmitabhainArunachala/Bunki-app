@@ -36,7 +36,8 @@
  *   sentence · save · ask the tutor · practice"), stays under 40 % of the screen and covers no button and not the word;
  *   a word held inside the word's page keeps its strip in the page, over no button; the bookmark lands on the kept
  *   words, and browsing them never starts a review; layers open only from 層, never move the paragraph's lines, and fold
- *   on any tap, Escape or the mark; with reduced motion nothing travels; a Save in a bar stands inside it, 8 px clear of
+ *   on any tap, Escape or the mark; with reduced motion nothing travels; on a deck card the front stays sealed and a back
+ *   word's hold keeps it once and opens the strip; a Save in a bar stands inside it, 8 px clear of
  *   every screen edge, its target its doors' height (L-2); frames of the seal and the landing (WebKit ≤ 24 ms).
  *   --g5-only runs only these; --g5-controls adds: a second hold that un-keeps, a strip over a button, a layer that stays.
  * G3 negative controls: --controls replays stalled tap2, uncleared ruby and a front door; harness failures are incomplete.
@@ -1273,6 +1274,86 @@ try {
       await delay(250);
       const gone = await g5Facts(page);
       check('G5.page.escape', 'Escape takes the strip away and leaves the page as it was', !gone.strip && gone.page, gone);
+    });
+
+    // the deck's card: its front stays sealed (a hold there keeps nothing, reveals nothing, opens no strip); on its back a
+    // hold keeps the word once through the corridor's one keep and opens the strip beside it, a second hold un-keeps
+    // nothing, Escape puts the strip away, and a right-click is the same hold
+    await walk('G5-deck', async (page) => {
+      await page.goto(`${host.origin}/index.html?deck=mcd&ui=bi`);
+      await page.waitForFunction(() => document.body.dataset.ready === '1');
+      await page.locator('#kp-start').click();
+      await page.locator('#kp-card .kp-sentence').waitFor();
+      await delay(400);
+      const front = await page.locator('#kp-card .kp-sentence').evaluate((sentence) => {
+        const walker = document.createTreeWalker(sentence, NodeFilter.SHOW_TEXT), range = document.createRange();
+        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+          if (!node.textContent.trim()) continue;
+          range.selectNodeContents(node);
+          for (const r of range.getClientRects()) {
+            const x = Math.max(1, Math.min(innerWidth - 1, r.left + Math.min(r.width / 2, 12))), y = r.top + r.height / 2;
+            if (y > 0 && y < innerHeight && sentence.contains(document.elementFromPoint(x, y))) return { x, y };
+          }
+        }
+        return null;
+      });
+      assert(front, 'an uncovered front glyph is required for the sealed-front hold');
+      const record0 = await readAppRecord(page);
+      await page.evaluate(({ x, y }) => { document.elementFromPoint(x, y)?.setAttribute('data-g5-front', ''); }, front);
+      await holdOn(page, page.locator('[data-g5-front]'), { id: 70, settle: 0 });
+      await delay(500);
+      const sealedFront = await page.evaluate(() => ({ strip: !!document.getElementById('seal-strip'), rings: document.querySelectorAll('.hold-ring').length,
+        seals: document.querySelectorAll('.seal-flight').length, stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'),
+        unanswered: !!document.getElementById('kp-reveal') }));
+      const record1 = await readAppRecord(page);
+      check('G5.deck.front-sealed', 'a hold on the card’s front keeps nothing, reveals nothing and opens no strip: the front stays sealed',
+        !sealedFront.strip && sealedFront.rings === 0 && sealedFront.seals === 0 && !sealedFront.stage && !sealedFront.page && sealedFront.unanswered &&
+        (record1.taken || []).length === (record0.taken || []).length, { sealedFront, taken: [(record0.taken || []).length, (record1.taken || []).length] });
+      await page.locator('#kp-reveal').click();
+      // the back's sentence words (mount.js tapNode: .kp-tok); a kanji word, so it has an entry to keep
+      const backWord = page.locator('#kp-card .kp-tok').filter({ visible: true, hasText: /[\u4e00-\u9fff]/u }).first();
+      await backWord.waitFor();
+      await delay(400);
+      await backWord.evaluate((node) => node.setAttribute('data-g5-deck-held', ''));
+      const held = page.locator('[data-g5-deck-held]');
+      const start = await g5Facts(page);
+      await holdOn(page, held, { id: 71 });
+      await page.locator('#seal-strip').waitFor({ timeout: 8000 });
+      await landed(page);
+      const first = await g5Facts(page), record2 = await readAppRecord(page);
+      const place = await stripCover(page, '[data-g5-deck-held]');
+      check('G5.deck.back-hold', 'a hold on a word of the card’s back keeps it once, through the one keep, and opens the strip beside it',
+        first.strip && /Saved/u.test(first.status) && (record2.taken || []).length === (record1.taken || []).length + 1 &&
+        (Number.isNaN(start.count) || first.count === start.count + 1), { start: { count: start.count }, first, taken: (record2.taken || []).length });
+      check('G5.deck.back-strip', 'its strip stands under 40 % of the screen, over no button and not over the word', !!place && place.share <= 0.4 &&
+        place.covered.length === 0 && !place.overWord, place);
+      await holdOn(page, held, { id: 72 });
+      await delay(500);
+      const second = await g5Facts(page), record3 = await readAppRecord(page);
+      check('G5.deck.second-hold', 'a second hold on the kept back word un-keeps nothing: the same one card, its strip again',
+        second.strip && (record3.taken || []).length === (record2.taken || []).length && (Number.isNaN(first.count) || second.count === first.count), { second, taken: (record3.taken || []).length });
+      await page.keyboard.press('Escape'); await delay(300);
+      const away = await g5Facts(page);
+      check('G5.deck.escape', 'Escape puts the deck’s strip away; the card stays answered', !away.strip && !(await page.locator('#kp-reveal').count()), away);
+      // another kanji word of the back, a different word from the one held
+      const heldText = await held.evaluate((node) => { const c = node.cloneNode(true); c.querySelectorAll('rt, rp').forEach((n) => n.remove()); return c.textContent.trim(); });
+      const others = page.locator('#kp-card .kp-tok:not([data-g5-deck-held])').filter({ visible: true, hasText: /[\u4e00-\u9fff]/u });
+      let other = null;
+      for (let i = 0, n = await others.count(); i < n && !other; i++) {
+        const text = await others.nth(i).evaluate((node) => { const c = node.cloneNode(true); c.querySelectorAll('rt, rp').forEach((m) => m.remove()); return c.textContent.trim(); });
+        if (text !== heldText) other = others.nth(i);
+      }
+      if (other) {
+        await other.scrollIntoViewIfNeeded(); await delay(200);
+        await other.click({ button: 'right' });
+        await page.locator('#seal-strip').waitFor({ timeout: 8000 });
+        await landed(page).catch(() => {});
+        const right = await g5Facts(page), record4 = await readAppRecord(page);
+        check('G5.deck.right-click', 'a right-click on another back word is the same hold: the strip, and that word kept (one more card)',
+          right.strip && /Saved/u.test(right.status) && (record4.taken || []).length === (record3.taken || []).length + 1, { right, taken: (record4.taken || []).length });
+        await page.keyboard.press('Escape'); await delay(200);
+      }
+      await page.screenshot({ path: resolve(evidence, `${engine}-G5-deck.png`) });
     });
 
     // L-2 (MISSION/FINDINGS.md; MASTER_SPEC D5): a Save in a bar is a door of the bar. On the word's page its face stands
