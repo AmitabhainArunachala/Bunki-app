@@ -5244,7 +5244,9 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
     animation: feel-fade var(--motion-room) linear both !important;
     animation-delay: 0ms !important;
   }
-  ::view-transition-old(kairo-room) { animation: kairo-room-fade-out var(--motion-room) linear both; }
+  /* !important as the arriving room's has it: rooms/motion.css loads after this sheet, and its directional leave
+     (a 6 px lift, a 24 px slide) was taking the old frame back under reduced motion */
+  ::view-transition-old(kairo-room) { animation: kairo-room-fade-out var(--motion-room) linear both !important; }
   html[data-room-transition] #app > main[data-room-arrival] {
     animation: kairo-room-arrive var(--motion-room) linear both !important;
     animation-delay: var(--room-arrival-delay, 0ms) !important;

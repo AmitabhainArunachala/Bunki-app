@@ -8062,19 +8062,28 @@ function readerPicture(p) {
   const figure = el('figure', 'reader-picture');
   figure.dataset.japaneseLookup = 'off';
   figure.style.setProperty('--topic', storyAccent(owner));
-  const img = el('img', 'reader-picture-img');
+  // F · one picture element per picture across the reader's redraws (its text arriving late draws the room again):
+  // the story's picture is the shared element of the room change, and a redraw mid-move keeps it, never replaces it
+  const kept = readerPictureImg?.getAttribute('src') === `data/${pic.src}` ? readerPictureImg : null;
+  const img = kept || el('img', 'reader-picture-img');
+  readerPictureImg = img;
+  if (kept) { figure.append(img, readerPictureCredit()); return figure; }
   img.src = `data/${pic.src}`;
   img.alt = String(pic.alt || '');
   if (pic.w && pic.h) { img.width = pic.w; img.height = pic.h; }
   img.decoding = 'async';
-  img.addEventListener('error', () => figure.remove(), { once: true });
-  // D3 (John: "回廊 KAIRO"): the credit names the app; 回廊 is a named mark in either language
+  img.addEventListener('error', () => img.closest('figure')?.remove(), { once: true });
+  figure.append(img, readerPictureCredit());
+  return figure;
+}
+let readerPictureImg = null;
+/** D3 (John: "回廊 KAIRO"): the credit names the app; 回廊 is a named mark in either language */
+function readerPictureCredit() {
   const credit = el('figcaption', 'reader-picture-caption', tx('挿絵 · ', 'Illustration · '));
   const mark = el('span', 'kairo-mark', '回廊');
   mark.lang = 'ja';
   credit.append(mark, ' KAIRO');
-  figure.append(img, credit);
-  return figure;
+  return credit;
 }
 
 /** One shelf card, text first (polish pass 2026-10-01: a brushed headline kanji on a navy slab
@@ -8140,7 +8149,13 @@ function shelfCard(p, rank = 'grid') {
     if (titleEn) open.append(titleEn);
     open.append(foot);
   }
-  open.addEventListener('click', () => openPassage(p.id));
+  open.addEventListener('click', () => {
+    // F · this card's picture becomes the reader's picture (roomTransition's story hero)
+    const img = open.querySelector('.story-img');
+    storyHeroIntent = img ? { img, passageId: p.id, rank: `story-${rank}` } : null;
+    storyHeroFrom = { passageId: p.id, rank: `story-${rank}` };
+    openPassage(p.id);
+  });
   item.append(open);
   return item;
 }
@@ -32539,6 +32554,61 @@ function roomDirection(from, to) {
   if (a < 0 || b < 0 || a === b) return '';
   return b > a ? 'right' : 'left';
 }
+/* F · the story's picture carries across the room change, shelf ↔ reader (contract §3, "things come from where they
+ * were"): the one picture on screen before and after is one element to the view transition (view-transition-name
+ * hero), named on the departing picture before the capture and on the arriving one once the room is drawn and
+ * scrolled. Only when both are the same picture (one file) and both are on screen; never under reduced motion. On this
+ * path the departing room fades out before the arriving one fades in (two rooms' text never show at once), and the
+ * transition layer is clipped to the room, so the picture travels under the top bar and the tabs (rooms/motion.css). */
+let storyHeroIntent = null; // the tapped shelf card's picture, for the room change it starts
+let storyHeroFrom = null; // { passageId, rank }: the shelf card a story was opened from, where Back takes its picture
+let storyHeroSerial = 0;
+function storyHeroOnScreen(img) {
+  if (!img?.isConnected || !img.complete || !img.naturalWidth) return false;
+  const r = img.getBoundingClientRect();
+  return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+}
+function storyHeroDeparting() {
+  const intent = storyHeroIntent;
+  storyHeroIntent = null;
+  if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+  for (const named of document.querySelectorAll('.story-img, .reader-picture-img')) {
+    if (named.style.viewTransitionName === 'hero') named.style.removeProperty('view-transition-name');
+  }
+  if (S.view === 'shelf' && intent && storyHeroOnScreen(intent.img)) return { ...intent, to: 'reader', id: ++storyHeroSerial };
+  if (S.view === 'reader' && S.passageId) {
+    const img = document.querySelector('#app > main .reader-picture-img');
+    const rank = storyHeroFrom?.passageId === S.passageId ? storyHeroFrom.rank : null;
+    if (storyHeroOnScreen(img)) return { img, passageId: S.passageId, rank, to: 'shelf', id: ++storyHeroSerial };
+  }
+  return null;
+}
+/** The same picture where the room change arrives: the reader's picture, or the shelf card it was opened from. */
+function storyHeroArriving(hero) {
+  if (S.view !== hero.to || S.passageId !== hero.passageId) return null;
+  const src = hero.img.getAttribute('src');
+  const candidates = hero.to === 'reader'
+    ? [document.querySelector('#app > main .reader-picture-img')]
+    : [...document.querySelectorAll('#shelf-body .shelf-item[data-passage] .story-img')]
+      .filter((img) => img.closest('.shelf-item')?.dataset.passage === hero.passageId)
+      .sort((a, b) => Number(!(hero.rank && a.closest(`.${hero.rank}`))) - Number(!(hero.rank && b.closest(`.${hero.rank}`))));
+  const img = candidates.find((node) => node && node.getAttribute('src') === src && node.getBoundingClientRect().height > 0);
+  if (!img) return null;
+  const r = img.getBoundingClientRect();
+  return r.bottom > 0 && r.top < innerHeight ? img : null;
+}
+function nameStoryHero(img, id) {
+  img.style.viewTransitionName = 'hero';
+  img.dataset.storyHero = String(id);
+}
+function clearStoryHero(hero) {
+  for (const img of [hero?.img, hero?.arrived]) {
+    if (img?.dataset.storyHero === String(hero.id)) {
+      img.style.removeProperty('view-transition-name');
+      delete img.dataset.storyHero;
+    }
+  }
+}
 function withoutRoomTransition(change) {
   roomTransitionUpdating = true;
   try { return change(); } finally { roomTransitionUpdating = false; }
@@ -32552,11 +32622,22 @@ function roomTransition(change) {
   activeRoomTransition?.skipTransition();
   const html = document.documentElement;
   const departing = document.querySelector('#app > main');
+  // F · a story's picture carries across shelf ↔ reader (its room's text fades through the paper, rooms/motion.css)
+  const hero = document.startViewTransition ? storyHeroDeparting() : null;
   // Capture only the departing room. Captured incoming DOM cannot receive a
   // pointer until the native transition finishes, so the next room stays live.
   departing?.removeAttribute('data-room-arrival');
   departing?.style.removeProperty('--room-arrival-delay');
   if (departing && document.startViewTransition) departing.style.viewTransitionName = 'kairo-room';
+  if (hero) {
+    nameStoryHero(hero.img, hero.id);
+    // the layer that draws the travelling picture is clipped to the room: the top bar and the tabs stay above it
+    const bar = document.querySelector('#app > .chrome')?.getBoundingClientRect();
+    const tabs = document.querySelector('#primary-tabs')?.getBoundingClientRect();
+    html.style.setProperty('--room-hero-top', `${Math.max(0, Math.round(bar && bar.height ? bar.bottom : 0))}px`);
+    html.style.setProperty('--room-hero-bottom', `${Math.max(0, Math.round(tabs && tabs.height ? innerHeight - tabs.top : 0))}px`);
+    html.dataset.roomHero = String(hero.id);
+  }
   html.dataset.roomTransition = '1';
   const from = S.view;
   let incoming = null;
@@ -32570,6 +32651,12 @@ function roomTransition(change) {
       const direction = roomDirection(from, S.view);
       if (direction) html.dataset.roomDir = direction;
       else delete html.dataset.roomDir;
+      // the departing picture gives up the name before the arriving one takes it: one name, one element
+      if (hero?.img.isConnected) clearStoryHero({ id: hero.id, img: hero.img });
+      if (hero) {
+        hero.arrived = storyHeroArriving(hero);
+        if (hero.arrived) nameStoryHero(hero.arrived, hero.id);
+      }
       if (incoming) {
         // With no departing snapshot (for example the universe), native
         // finished can settle first. Keep the live fade for its actual length.
@@ -32600,6 +32687,15 @@ function roomTransition(change) {
     delete html.dataset.roomTransition;
     delete html.dataset.roomDir;
   };
+  // the picture's names go with its own transition, whatever came after it (a later room change skips this one)
+  const clearHero = () => {
+    clearStoryHero(hero);
+    if (html.dataset.roomHero === String(hero.id)) {
+      delete html.dataset.roomHero;
+      html.style.removeProperty('--room-hero-top');
+      html.style.removeProperty('--room-hero-bottom');
+    }
+  };
   if (!document.startViewTransition) {
     // Unsupported browsers still change routes and restore focus synchronously.
     // Only their arriving, live room fades; no native snapshot is needed.
@@ -32610,7 +32706,14 @@ function roomTransition(change) {
   const transition = document.startViewTransition(update);
   activeRoomTransition = transition;
   transition.ready.catch(() => {});
-  transition.finished.catch(() => {}).then(arrivalDone).finally(() => clear(transition));
+  // F · on the picture's path the arriving room's rise counts from the moment the departing room starts to fade (the
+  // transition's first frame, not the update before it), so the two fades never overlap
+  if (hero) transition.ready.then(() => {
+    if (!arrival || activeRoomArrival !== arrival) return;
+    arrival.startedAt = performance.now();
+    for (const animation of arrival.animations) animation.currentTime = 0;
+  }, () => {});
+  transition.finished.catch(() => {}).then(arrivalDone).finally(() => { if (hero) clearHero(); clear(transition); });
   return transition;
 }
 /* ------------------------------------------------------ corridor paper worlds

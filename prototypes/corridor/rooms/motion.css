@@ -78,6 +78,32 @@ html[data-room-transition][data-room-dir='left'] #app > main[data-room-arrival] 
 }
 :root[data-room-dir='right']::view-transition-old(kairo-room) { animation-name: kairo-room-leave-to-left; }
 :root[data-room-dir='left']::view-transition-old(kairo-room) { animation-name: kairo-room-leave-to-right; }
+/* F · the story's picture carries across shelf ↔ reader (corridor.js names it hero on the departing picture
+   before the capture and on the arriving one once the room is drawn): the one group that moves. It travels and
+   resizes in the room's beat and curve; the two crops meet as one picture (cover, clipped to the moving box).
+   The layer that draws it is clipped to the room, so the picture passes under the top bar and the tabs, never
+   over them. Around it the rooms fade through the paper: the departing room is gone within the first two fifths
+   of the beat and only then does the arriving one rise, so two rooms' text never show at once. */
+html[data-room-hero]::view-transition { clip-path: inset(var(--room-hero-top, 0px) 0 var(--room-hero-bottom, 0px) 0); }
+html[data-room-hero]::view-transition-old(kairo-room) { animation: kairo-room-fade-out calc(var(--motion-room) * 0.4) var(--ease-exit) both; }
+html[data-room-hero][data-room-transition] #app > main[data-room-arrival] {
+  animation-name: kairo-room-arrive;
+  animation-duration: calc(var(--motion-room) * 0.6);
+  animation-delay: calc(var(--motion-room) * 0.4 + var(--room-arrival-delay, 0ms));
+}
+::view-transition-group(hero) {
+  animation: revert;
+  animation-duration: var(--motion-room);
+  animation-timing-function: var(--ease-enter);
+  overflow: clip;
+}
+::view-transition-old(hero),
+::view-transition-new(hero) {
+  block-size: 100%;
+  object-fit: cover;
+  animation-duration: var(--motion-room);
+  animation-timing-function: var(--ease-enter);
+}
 @keyframes kairo-room-fade-out { to { opacity: 0; } }
 @keyframes kairo-room-leave { to { opacity: 0; transform: translateY(-6px); } }
 @keyframes kairo-room-leave-to-left { to { opacity: 0; transform: translateX(-24px); } }
