@@ -1985,6 +1985,8 @@ function publishRecordSnapshot(snapshot) {
   sentenceDraftController?.refresh();
   // K · every confirmed save is measured (idle, throttled) against the ceiling
   scheduleRecordMeasure(snapshot);
+  // G2 · every word on the glass is read again against the confirmed record (the dot never runs ahead of a save)
+  if (typeof scheduleDepthPaint === 'function') scheduleDepthPaint();
 }
 
 /** Foreground reads publish only derived views. Command callbacks keep their
@@ -3377,9 +3379,15 @@ async function obsFlush() {
 }
 function obsLog(kind, key, ...detail) {
   const row = [Date.now(), kind, key, ...detail];
+  // G2 · a reader word's tap row carries its look-up into the encounter ledger, in the same write (readerTapEncounter)
+  const node = kind === 'tap' && typeof readerTapEncounter === 'function' ? readerTapEncounter(key, detail[1]) : null;
+  const ticket = node ? JSON.stringify([encounterKey(encounterIdentity(node)), localDayOrdinal(row[0]), detail[1]]) : null;
+  if (ticket) encounterPending.add(ticket);
   // Taps may reveal text immediately, but the model only sees an observation
   // after its foreground transaction commits. Pagehide is not a save promise.
-  return commitStorePatch((latest) => ({ obslog: [...latest.obslog, row] }));
+  const write = commitStorePatch((latest) => ({ obslog: [...latest.obslog, row],
+    ...(node ? encounterPatch(latest, node, row[0], { article: detail[1] }) : {}) }));
+  return ticket ? write.finally(() => encounterPending.delete(ticket)) : write;
 }
 /** R3-D · when a stored learner parameter set cannot drive the scheduler,
  * the pinned defaults rule and ONE quiet append-only row says why:
@@ -9356,6 +9364,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   mini.dataset.uiContentValue = label; // the word in the dialog's name is the learning content, not interface text
   mini.dataset.kind = kind;
   mini.dataset.key = key ?? (captureNode ? `${captureNode.t}:${captureNode.id}` : '');
+  // G2 · the slip in every room wears its word's dot, and a fresh arrival is his look-up (noteSlipDepth)
+  if (typeof noteSlipDepth === 'function') noteSlipDepth(mini, token, kind, { arriving, from });
   if (source) mini.dataset.from = source;
   // the word band: the word, its reading and its meaning, with the deeper door in its corner
   const head = el('div', 'mini-head');
@@ -10911,7 +10921,8 @@ async function commitReadDone(articleId, now = Date.now()) {
       const readDone = { ...latest.readDone };
       if (finished) setOwnRecordValue(readDone, articleId, now);
       else delete readDone[articleId];
-      return { readDone };
+      // G2 · the first finish seals the article's first reading for the help signal, in this same write
+      return { readDone, ...(finished && typeof readHelpFinishPatch === 'function' ? readHelpFinishPatch(latest, articleId, now) : {}) };
     });
   } finally { readDonePending.delete(articleId); }
 }
@@ -11834,7 +11845,8 @@ function openSlip(node, { anchor, from = 'lookup', host = null, look = null, not
     save = 'none';
     entryAvailable = typeof entry === 'function';
   } else if (kind === 'word') {
-    record = lookup(node.id, node.seq ?? null, node.reading || '');
+    // G2 · a kept word's door names its entry: when the dictionary cannot (cold, offline), its card's own answer speaks
+    record = lookup(node.id, node.seq ?? null, node.reading || '') || savedNodeRecord(node);
     token = { s: look?.surface || node.id, b: node.id, r: node.reading || record?.r || look?.reading || '', c: !!record,
       ...(node.seq != null && node.seq !== '' ? { seq: node.seq } : {}) };
     // R · a reading of its own the quick dictionary does not carry asks the full dictionary now: its entry sheet
@@ -13201,6 +13213,10 @@ function todaySky(dayWord, today, readPick) {
       star.hidden = true;
       star.dataset.why = why;
       star.dataset.rank = String(rank);
+      // G2 · a word star wears its dot: a kept word as he saved it, a family word as the dictionary has it
+      const starNode = item ? learningItemNode(item) : [...word].length === 1 && D.kanji?.[word] ? null : { t: 'word', id: word };
+      if (starNode?.t === 'word') star.dataset.depthNode = JSON.stringify({ id: starNode.id,
+        ...(starNode.seq ? { seq: String(starNode.seq) } : {}), reading: starNode.reading || '' });
       star.style.setProperty('--d', `${(i % 4) * 1.7}s`);
       // the slip first (contract §1 — the one surface slice B did not reach): the band then opens the entry, and the
       // same star again dives. A star drifts with its lane, so the slip follows it; the slip says why the star is here
@@ -14275,6 +14291,8 @@ function trayLine(item, dueKeys) {
   line.setAttribute('role', 'button');
   const key = srsKey(item.t, item.id);
   line.append(el('span', 'w', item.label));
+  // G2 · the saved word's dot, for the entry and reading it was saved as
+  if (item.t === 'word') line.append(depthDot(learningItemNode(item)));
   // a words list wearing a [word] chip on every row was chip noise
   // (operator, 2026-08-20): the kind speaks only when it differs from
   // the default. Rows stored before the kind fields existed still heal.
@@ -17315,10 +17333,13 @@ function renderKagami(main) {
       const row = el('button', 'entry-row kagami-row');
       row.type = 'button';
       row.dataset.kagamiFrontier = item.key;
+      // G2 · a kept word's door is its capture (keptItemNode): the entry and reading he saved, never the spelling alone
+      const door = keptItemNode(t, id);
       row.append(el('span', 'row-glyph', glyph(name)));
       row.append(el('span', 'row-main', `${name}　${item.right}/${item.seen}`));
+      if (door.t === 'word') kagamiKeptReading(row, door);
       row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go({ t, id }));
+      row.addEventListener('click', () => go(door));
       list.append(row);
     }
     main.append(list);
@@ -17335,10 +17356,12 @@ function renderKagami(main) {
       const row = el('button', 'entry-row kagami-row');
       row.type = 'button';
       row.dataset.kagamiLeech = key;
+      const door = keptItemNode(t, id);
       row.append(el('span', 'row-glyph', glyph(name)));
       row.append(el('span', 'row-main', name));
+      if (door.t === 'word') kagamiKeptReading(row, door);
       row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go({ t, id }));
+      row.addEventListener('click', () => go(door));
       list.append(row);
     }
     main.append(list);
@@ -22027,6 +22050,578 @@ function learningItemNode(item) {
     ...(saved.entrySeq ? { seq: saved.entrySeq } : {}),
     ...(saved.cueReading ? { reading: saved.cueReading } : {}),
     ...(context ? { sourceContext: context, sourceContextRef } : {}) };
+}
+
+/* ------------------------------------------------ G2 · 深さ — the quiet dot that knows him
+ * John (10-15): "I do like the color dot idea… in the most subtle way possible… layers of depth dictated by a subtle color
+ * schema and delicately placed in every session it would help deepen retention". Every word he can touch wears one quiet
+ * dot in its world's pigment, darker as it goes deeper: unmet (bare) · met · again (seen again) · recalled · owned ("familiar"
+ * wherever it is named; never "mastered"). A red ring round the dot means kept (Review or any list), one meaning everywhere.
+ *
+ * What the dot stands on (EncounterEvidence ≠ ScheduledRecallEvidence; the page names which, depthBasisParts):
+ *   encounters  S.met (below): the local days on which he opened this word as it reads here
+ *   reviews     the spelling's FSRS card, borrowed only by the SAME lexical identity (depthIdentityMatch): a different
+ *               reading or entry is at most "met"; an identity nothing establishes borrows nothing
+ *   now         recalled and owned need present recall (FSRS retrievability ≥ 0.9) as well as stability (7 · 30 days)
+ *   his word    "Not yet" caps the dot at "again" until an unrevoked Good or Easy scheduled review of the same identity
+ *               after it; "I know this" is his statement — at most "again", never a review's rank
+ * Looking words up moves the dot only: nothing here writes taken, lists, srs, revlog, stats or suspended (product lock §3C).
+ *
+ * The met root (absent on every record written before G2; a boot never creates it):
+ *   met: { version: 1, entries: { [key]: { first, last, days, said? } } }
+ *     key    JSON.stringify([1, 'word', id, kind, seq, reading]) — what he met (encounterIdentity), never the spelling
+ *            alone and never a joined string
+ *     first · last   local calendar day ordinals: Date.UTC(local year, month, date) / 86 400 000 at the moment of the
+ *            look-up, the device's own clock and zone; first never moves
+ *     days   counted days: +1 only on a day after last, so a clock moved back, or a flight west, counts nothing
+ *     said   { value: 'known' | 'not-yet', at, cursor }: his own word, and the review log's length when he said it
+ * A met of a later version is someone else's: kept byte for byte, neither read nor written by this build. */
+const DEPTH_ORDER = Object.freeze(['unmet', 'met', 'again', 'recalled', 'owned']);
+const DEPTH_RECALL_R = 0.9;
+const DEPTH_RECALLED_S = 7;
+const DEPTH_OWNED_S = 30;
+const depthRank = (depth) => DEPTH_ORDER.indexOf(depth);
+const deeperDepth = (a, b) => (depthRank(a) >= depthRank(b) ? a : b);
+const shallowerDepth = (a, b) => (depthRank(a) <= depthRank(b) ? a : b);
+
+function localDayOrdinal(ms) {
+  const d = new Date(ms);
+  return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+}
+function localMonthKey(ms) {
+  const d = new Date(ms);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+/** What he met: a word door's lexical identity as it reads where he met it. `node` is { id, seq?, reading? }: the reading is
+ * the one shown (the text's), never assumed.
+ *   seq          an entry that lists this reading (its own kana form, kanaReadingKey'd); a door whose entry is not at hand
+ *                keeps the entry and reading it names, as its capture would
+ *   core         the quick dictionary's record, read its way (a door without a reading on a core spelling stands for it)
+ *   text         no entry: the spelling read this way, nothing more
+ *   unresolved   read otherwise than the entry or record at hand (訳 read やく beside わけ's #1538330, 年 read ねん before
+ *                the full dictionary names its entry), or no reading at all: it borrows no entry, sense or card */
+function encounterIdentity(node) {
+  if (!node || (node.t && node.t !== 'word') || !nonEmptyString(node.id)) return null;
+  const id = node.id;
+  const shown = nonEmptyString(node.reading) ? node.reading : null;
+  const reading = shown ? kanaReadingKey(shown) || null : null;
+  const make = (kind, seq, read) => ({ t: 'word', id, kind, seq, reading: read });
+  if (node.seq != null && node.seq !== '') {
+    const seq = String(node.seq);
+    if (!reading) return make('unresolved', null, null);
+    const row = dictionaryRowBySeq(seq);
+    if (Array.isArray(row) && String(row[0]) === seq) {
+      const kana = entryKanaIndex(row, shown);
+      return kana >= 0 ? make('seq', seq, kanaReadingKey(row[5][kana]) || reading) : make('unresolved', null, reading);
+    }
+    return make('seq', seq, reading);
+  }
+  const core = D.dict?.[id];
+  if (core) {
+    const coreReading = kanaReadingKey(core.r || '') || null;
+    return !reading || reading === coreReading ? make('core', null, coreReading) : make('unresolved', null, reading);
+  }
+  return reading ? make('text', null, reading) : make('unresolved', null, null);
+}
+const encounterKey = (identity) => JSON.stringify([1, 'word', identity.id, identity.kind, identity.seq, identity.reading]);
+
+/** How what he met stands to the identity his card (or list row) holds for the spelling (wordCardIdentity):
+ *   same        established: one entry and one known reading, or the core record itself — the card's depth may be borrowed
+ *   compatible  not contradicted (the same known reading, the entry not established): the ring may show, the rank may not
+ *   other       a different reading or a different entry (ポンド#1126030 is not #2855351): at most "met", no ring
+ *   unknown     nothing to compare (a reading nothing records): no ring, no rank */
+function depthIdentityMatch(occ, card) {
+  if (!occ || !card || card.kind === 'unknown') return 'unknown';
+  const cardReading = card.kind === 'core' ? kanaReadingKey(D.dict?.[occ.id]?.r || '') || null
+    : nonEmptyString(card.reading) ? kanaReadingKey(card.reading) || null : null;
+  const readings = occ.reading && cardReading ? (occ.reading === cardReading ? 'same' : 'other') : 'unknown';
+  if (readings === 'other') return 'other';
+  if (occ.kind === 'seq' && card.kind === 'seq') {
+    if (occ.seq !== String(card.seq)) return 'other';
+    return readings === 'same' ? 'same' : 'compatible';
+  }
+  if (occ.kind === 'core' && card.kind === 'core') return 'same';
+  if (occ.kind === 'text' && card.kind === 'text') return readings === 'same' ? 'same' : 'unknown';
+  if (readings !== 'same') return 'unknown';
+  // the core record beside an entry read alike: one word only where the full dictionary, asked for this spelling, has exactly
+  // one entry written and read so, and it is the entry named (the core is that entry's editorial pick). Not asked: compatible.
+  if ((occ.kind === 'core' && card.kind === 'seq') || (occ.kind === 'seq' && card.kind === 'core')) {
+    const seq = String(occ.kind === 'seq' ? occ.seq : card.seq);
+    const rows = dictionaryAnsweredForm(occ.id) ? dictionaryRowsReadAs(occ.id, occ.reading) : [];
+    return rows.length === 1 && String(rows[0][0]) === seq ? 'same' : 'compatible';
+  }
+  return 'compatible';
+}
+
+/** The record read once per change for the dot: who is kept, which keys have review history, and the undo revocations.
+ * Keyed on the roots' own objects, which a confirmed write replaces, so a stale index is never read. */
+const depthIndexMemo = new WeakMap();
+function depthIndex(record) {
+  const anchor = Array.isArray(record.revlog) ? record.revlog : depthIndex;
+  const memo = depthIndexMemo.get(anchor);
+  if (memo && memo.taken === record.taken && memo.lists === record.lists && memo.srs === record.srs) return memo;
+  const taken = new Map();
+  for (const row of Array.isArray(record.taken) ? record.taken : []) if (row?.t === 'word' && !taken.has(row.id)) taken.set(row.id, row);
+  const listed = new Set();
+  for (const items of Object.values(plainRecord(record.lists) ? record.lists : {}))
+    for (const item of Array.isArray(items) ? items : []) if (item?.t === 'word') listed.add(item.id);
+  const reviewed = new Set();
+  for (const row of Array.isArray(record.revlog) ? record.revlog : []) if (Array.isArray(row)) reviewed.add(row[1]);
+  const index = { taken: record.taken, lists: record.lists, srs: record.srs, takenRows: taken, listed, reviewed };
+  if (anchor !== depthIndex) depthIndexMemo.set(anchor, index);
+  return index;
+}
+
+/** Present recall: the pinned scheduler's retrievability of the stored card now, at the clamped scheduler instant
+ * (srsSchedulerInstant, so a clock behind the card's last review reads as that review). No scheduler, no last review, or
+ * an unreadable card: null, and the card lends no rank. An estimate, never stored. */
+function depthRetrievability(stored, now) {
+  if (!scheduler || !nonEmptyString(stored?.last_review)) return null;
+  try {
+    const card = { ...stored, due: new Date(stored.due), last_review: new Date(stored.last_review) };
+    if (!Number.isFinite(card.due.getTime()) || !Number.isFinite(card.last_review.getTime())) return null;
+    const r = scheduler.get_retrievability(card, srsSchedulerInstant(card, new Date(now)), false);
+    return typeof r === 'number' && Number.isFinite(r) ? r : null;
+  } catch { return null; }
+}
+
+/** "Not yet" lasts until an unrevoked Good or Easy scheduled review of this key, appended after he said it. Append order and
+ * the log's own revocations decide, never the wall clock; Hard, Again and drills (never in the review log) release nothing. */
+function notYetReleased(record, skey, cursor) {
+  const log = Array.isArray(record.revlog) ? record.revlog : [];
+  const revoked = new Set();
+  for (const row of log) if (Array.isArray(row) && row[1] === skey && row[2] === 0) revoked.add(row[3]);
+  for (let at = Math.max(0, cursor); at < log.length; at += 1) {
+    const row = log[at];
+    if (Array.isArray(row) && row[1] === skey && (row[2] === 3 || row[2] === 4) && !revoked.has(at)) return true;
+  }
+  return false;
+}
+
+/** The depth of one word door for this learner, now. Pure: reads the record only. null for anything that is not a word.
+ * { depth, kept, otherKept, match, identity, key, days, first, last, said, review: { state, stability, r } | null, cap } */
+function wordDepth(node, record = S, now = Date.now()) {
+  const identity = encounterIdentity(node);
+  if (!identity) return null;
+  const key = encounterKey(identity);
+  const met = metReadable(record.met) && owns(record.met.entries, key) && plainRecord(record.met.entries[key]) ? record.met.entries[key] : null;
+  const index = depthIndex(record);
+  const skey = srsKey('word', identity.id);
+  const stored = plainRecord(record.srs) && owns(record.srs, skey) && plainRecord(record.srs[skey]) ? record.srs[skey] : null;
+  const row = index.takenRows.get(identity.id) || null;
+  const listed = index.listed.has(identity.id);
+  const held = !!row || listed || !!stored || index.reviewed.has(skey);
+  const match = held ? depthIdentityMatch(identity, wordCardIdentity(record, identity.id)) : 'none';
+  const days = met ? met.days : 0;
+  let depth = days >= 2 ? 'again' : days >= 1 ? 'met' : 'unmet';
+  let review = null;
+  if (match === 'same' && stored) {
+    const state = Number.isInteger(stored.state) ? stored.state : 0;
+    const stability = finiteNumber(stored.stability) ? stored.stability : 0;
+    const r = depthRetrievability(stored, now);
+    review = { state, stability, r };
+    const recalling = state === 2 && r !== null && r >= DEPTH_RECALL_R;
+    depth = deeperDepth(depth, recalling && stability >= DEPTH_OWNED_S ? 'owned'
+      : recalling && stability >= DEPTH_RECALLED_S ? 'recalled' : state >= 1 ? 'again' : 'met');
+  } else if (match === 'same' && row) depth = deeperDepth(depth, 'met');
+  const said = met && plainRecord(met.said) ? met.said : null;
+  if (said?.value === 'known') depth = deeperDepth(depth, 'again');
+  let cap = null;
+  if (said?.value === 'not-yet' && !(match === 'same' && notYetReleased(record, skey, said.cursor))) {
+    if (depthRank(depth) > depthRank('again')) cap = 'not-yet';
+    depth = shallowerDepth(depth, 'again');
+  }
+  if (identity.kind === 'unresolved' || match === 'other') {
+    if (depthRank(depth) > depthRank('met')) cap = 'identity';
+    depth = shallowerDepth(depth, 'met');
+  }
+  const keptRow = !!row || listed;
+  return { depth, kept: keptRow && (match === 'same' || match === 'compatible'), otherKept: keptRow && match === 'other',
+    match, identity, key, days, first: met?.first ?? null, last: met?.last ?? null, said: said?.value || null, review, cap };
+}
+
+/* ----- the ledger's writes: at his own activation only (a reading raised, a card opened, a page opened), never at render,
+ * restore, a network retry or the one-time demonstration (G3), and never a review: a look-up is friction, not a grade. */
+function copyRecordWith(record, key, value) {
+  const copy = {};
+  for (const [name, item] of Object.entries(record)) setOwnRecordValue(copy, name, item);
+  setOwnRecordValue(copy, key, value);
+  return copy;
+}
+/** The text he reads in a bundled article, frozen for the help signal: its fingerprint (FNV-1a 32 over the tokens'
+ * surfaces), its length in code points without whitespace, and its one level (storyLevel). */
+function articleFingerprint(p) {
+  const text = (p?.tokens || []).map((token) => String(token?.s || '')).join('');
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i += 1) { hash ^= text.charCodeAt(i); hash = Math.imul(hash, 0x01000193) >>> 0; }
+  const level = storyLevel(p).step;
+  return { src: hash.toString(16).padStart(8, '0'), chars: [...text].filter((ch) => !/\s/u.test(ch)).length,
+    level: /^N[1-5]$/u.test(level) ? level : null };
+}
+/** One distinct word he asked about in an article he has not yet finished for the first time. An article finished before
+ * counting began is not a first reading (no row); after the first finish, or once its text changed, nothing more counts. */
+function readHelpPatch(latest, articleId, key, now) {
+  const p = D.passages?.find((entry) => entry.id === articleId);
+  if (!p?.tokens?.length) return null;
+  const root = latest.readHelp;
+  if (root != null && !readHelpReadable(root)) return null;
+  const articles = root?.articles || {};
+  const print = articleFingerprint(p);
+  let row = owns(articles, articleId) ? articles[articleId] : null;
+  if (!row) {
+    if (owns(latest.readDone || {}, articleId)) return null;
+    row = { ...print, helped: [] };
+  }
+  if (owns(row, 'done') || row.src !== print.src || row.helped.includes(key) || row.helped.length >= 4096) return null;
+  return { ...(root || {}), version: 1, since: root?.since ?? now,
+    articles: copyRecordWith(articles, articleId, { ...row, helped: [...row.helped, key] }) };
+}
+/** The first finish seals the article's first reading — its month, characters, level and the words asked — in the same
+ * write as readDone. Unfinishing and finishing again never move it; a text changed since counting began is not sealed. */
+function readHelpFinishPatch(latest, articleId, now) {
+  const p = D.passages?.find((entry) => entry.id === articleId);
+  if (!p?.tokens?.length) return {};
+  const root = latest.readHelp;
+  if (root != null && !readHelpReadable(root)) return {};
+  const articles = root?.articles || {};
+  const print = articleFingerprint(p);
+  const prior = owns(articles, articleId) ? articles[articleId] : null;
+  if (prior && (owns(prior, 'done') || prior.src !== print.src)) return {};
+  const row = { ...(prior || { ...print, helped: [] }), done: now, month: localMonthKey(now) };
+  return { readHelp: { ...(root || {}), version: 1, since: root?.since ?? now, articles: copyRecordWith(articles, articleId, row) } };
+}
+/** The copied roots one activation adds: met's day for this identity (none on a day already counted) and, in an article,
+ * the help signal's word. {} when nothing would change. */
+function encounterPatch(latest, node, now, { article = null } = {}) {
+  const identity = encounterIdentity(node);
+  if (!identity || !Number.isFinite(now)) return {};
+  const key = encounterKey(identity);
+  const patch = {};
+  const root = latest.met;
+  if (root == null || metReadable(root)) {
+    const entries = root?.entries || {};
+    const prior = owns(entries, key) && plainRecord(entries[key]) ? entries[key] : null;
+    const day = localDayOrdinal(now);
+    if (!prior || day > prior.last) {
+      const next = prior ? { ...prior, last: day, days: prior.days + 1 } : { first: day, last: day, days: 1 };
+      patch.met = { ...(root || {}), version: 1, entries: copyRecordWith(entries, key, next) };
+    }
+  }
+  const help = article ? readHelpPatch(latest, article, key, now) : null;
+  if (help) patch.readHelp = help;
+  return patch;
+}
+/** One look-up's write. Coalesced: an identical activation already on its way, or one the confirmed record already holds
+ * (encounterPatch says nothing changes), writes nothing. Returns whether a write was made and confirmed. */
+const encounterPending = new Set();
+function noteEncounter(node, { article = null, now = Date.now() } = {}) {
+  // the private collection may capture words but writes no other root (commitStorePatch's personal host): it notes nothing
+  if (personalHost || !recordWritable()) return Promise.resolve(false);
+  const identity = encounterIdentity(node);
+  if (!identity) return Promise.resolve(false);
+  const ticket = JSON.stringify([encounterKey(identity), localDayOrdinal(now), article]);
+  if (encounterPending.has(ticket) || !Object.keys(encounterPatch(S, node, now, { article })).length) return Promise.resolve(false);
+  encounterPending.add(ticket);
+  return commitStorePatch((latest) => encounterPatch(latest, node, now, { article }))
+    .finally(() => encounterPending.delete(ticket));
+}
+/** The reader's content word, from its tap row: the word he touched is the reader's current take (setReaderTake runs before
+ * every tap row it writes), read as its door reads it (readingToken). null for any other row. */
+function readerTapEncounter(key, articleId) {
+  const take = S.readerTake;
+  if (personalHost || !take || take.p !== articleId || S.passageId !== articleId || key !== srsKey('word', take.id)) return null;
+  const token = readerTokenAt(articleId, take.index);
+  if (!token) return null;
+  // a word whose entry the full dictionary must still name is not counted under a guess: its card, once it arrives with
+  // the entry, counts it (noteSlipDepth)
+  const door = readingForm(token);
+  if ((readingAsksIndex(door.b, tokenReading(door)) || door.unfit) && !dictionaryAnsweredForm(door.b)) return null;
+  const node = readerTokenNode(token);
+  return node && node.id === take.id ? node : null;
+}
+/** A reader token as its door stands for it: a katakana run the reader joined into one word is that word (readerRenderedTokens). */
+function readerTokenAt(articleId, index) {
+  const p = D.passages?.find((entry) => entry.id === articleId);
+  if (!p?.tokens || !Number.isInteger(index) || !p.tokens[index]) return null;
+  const span = typeof document !== 'undefined' ? document.querySelector(`#reader .tok[data-index="${index}"]`) : null;
+  const end = span?.dataset.indexEnd != null ? Number(span.dataset.indexEnd) : null;
+  if (!Number.isInteger(end) || end <= index) return p.tokens[index];
+  const pieces = p.tokens.slice(index, end + 1);
+  const surface = pieces.map((piece) => piece.s).join('');
+  return { s: surface, b: surface, p: '名詞', r: pieces.map((piece) => piece.r || '').join(''), f: [{ t: surface }], c: false, readerSourceEnd: end };
+}
+function readerTokenNode(token) {
+  if (!token || !/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(String(token.s || ''))) return null;
+  if (!token.c && PARTICLE_BY_SURFACE[token.s]) return null;
+  const door = readingToken(token);
+  if (!door || door.kanjiOnly || !nonEmptyString(door.b)) return null;
+  return { t: 'word', id: door.b, ...(door.seq != null && door.seq !== '' ? { seq: String(door.seq) } : {}), reading: tokenReading(door) || '' };
+}
+/** The slip, in every room: what it stands for (the dot on its headword) and, on a fresh arrival, the look-up itself. A
+ * slip drawn again on the same word, and the one-time demonstration (G3 marks its slip data-demo), count nothing. */
+function noteSlipDepth(mini, token, kind, { arriving = true, from = null } = {}) {
+  if (kind !== 'word' || !nonEmptyString(token?.b)) return;
+  const node = { t: 'word', id: token.b, ...(token.seq != null && token.seq !== '' ? { seq: String(token.seq) } : {}),
+    reading: String(token.r || '') };
+  mini.dataset.depthNode = JSON.stringify({ id: node.id, ...(node.seq ? { seq: node.seq } : {}), reading: node.reading });
+  if (!arriving || mini.dataset.demo === 'true') return;
+  void noteEncounter(node, { article: from?.passage && from.passage === S.passageId ? from.passage : null });
+}
+
+/** "I know this" / "Not yet": his own statement about the word as it reads here, kept in met with the review log's length.
+ * Pressing the standing one again takes it back. Writes met only — never taken, srs, revlog, stats or suspended. */
+function correctionPatch(latest, node, value, now) {
+  const identity = encounterIdentity(node);
+  if (!identity || !['known', 'not-yet'].includes(value)) return {};
+  const root = latest.met;
+  if (root != null && !metReadable(root)) return {};
+  const entries = root?.entries || {};
+  const key = encounterKey(identity);
+  const prior = owns(entries, key) && plainRecord(entries[key]) ? entries[key] : null;
+  const day = localDayOrdinal(now);
+  const base = prior ? (day > prior.last ? { ...prior, last: day, days: prior.days + 1 } : { ...prior }) : { first: day, last: day, days: 1 };
+  if (prior?.said?.value === value) delete base.said;
+  else base.said = { value, at: now, cursor: Array.isArray(latest.revlog) ? latest.revlog.length : 0 };
+  return { met: { ...(root || {}), version: 1, entries: copyRecordWith(entries, key, base) } };
+}
+function correctDepth(node, value, now = Date.now()) {
+  if (personalHost || !recordWritable()) return Promise.resolve(false);
+  return commitStorePatch((latest) => correctionPatch(latest, node, value, now));
+}
+
+/* ----- the dot itself: one painter for every room. A word element says what it stands for in data-depth-node ({ id, seq?,
+ * reading }), or is a reader token (its passage token) or a prose word (its spelling: a door that names no entry stands for
+ * the core record); the painter writes data-depth and data-kept, and the CSS (editorial.css, G2) draws the dot and the
+ * ring from the world's pigments. Painting never writes the record and never moves a line box. */
+const DEPTH_TARGETS = '#reader .tok[data-index], [data-depth-node], .japanese-lookup-word[data-lookup-text]';
+let depthMemo = null;
+function depthNodeOf(element) {
+  const raw = element.dataset.depthNode;
+  if (raw) {
+    try {
+      const node = JSON.parse(raw);
+      return plainRecord(node) && nonEmptyString(node.id) ? { t: 'word', id: node.id,
+        ...(nonEmptyString(node.seq) ? { seq: node.seq } : {}), reading: nonEmptyString(node.reading) ? node.reading : '' } : null;
+    } catch { return null; }
+  }
+  if (element.matches('.japanese-lookup-word')) {
+    const text = element.dataset.lookupText;
+    // the page's own headword stays bare: its dot stands at the head of the basis line under it, with the words that say why
+    if (element.closest('.headword')) return null;
+    return /[\p{Script=Han}\p{Script=Katakana}]/u.test(text) || D.dict?.[text] ? { t: 'word', id: text } : null;
+  }
+  if (!element.closest('#reader') || element.dataset.targetKind === 'particle' || element.classList.contains('annotation')) return null;
+  return readerTokenNode(readerTokenAt(S.passageId, Number(element.dataset.index)));
+}
+function paintDepth(element, now) {
+  const node = depthNodeOf(element);
+  let result = null;
+  if (node) {
+    const memoKey = JSON.stringify([node.id, node.seq || null, node.reading || '']);
+    result = depthMemo?.get(memoKey);
+    if (result === undefined) { result = wordDepth(node, S, now); depthMemo?.set(memoKey, result); }
+  }
+  const depth = result && (result.depth !== 'unmet' || result.kept) ? result.depth : null;
+  if (depth) { if (element.dataset.depth !== depth) element.dataset.depth = depth; }
+  else if (element.dataset.depth != null) delete element.dataset.depth;
+  if (result?.kept) { if (element.dataset.kept == null) element.dataset.kept = ''; }
+  else if (element.dataset.kept != null) delete element.dataset.kept;
+}
+let depthPaintFrame = 0;
+let depthPaintEverything = false;
+const depthPaintRoots = new Set();
+function scheduleDepthPaint(root = null) {
+  if (typeof document === 'undefined' || typeof requestAnimationFrame !== 'function') return;
+  if (root) depthPaintRoots.add(root);
+  else depthPaintEverything = true;
+  if (depthPaintFrame) return;
+  depthPaintFrame = requestAnimationFrame(() => {
+    depthPaintFrame = 0;
+    const roots = depthPaintEverything || depthPaintRoots.size > 64 ? [document.body] : [...depthPaintRoots].filter((node) => node.isConnected);
+    depthPaintEverything = false;
+    depthPaintRoots.clear();
+    const now = Date.now();
+    depthMemo = new Map();
+    try {
+      for (const root of roots) {
+        if (root.matches?.(DEPTH_TARGETS)) paintDepth(root, now);
+        for (const element of root.querySelectorAll?.(DEPTH_TARGETS) || []) paintDepth(element, now);
+      }
+    } finally { depthMemo = null; }
+  });
+}
+let depthObserver = null;
+function installDepthPainter() {
+  if (depthObserver || typeof MutationObserver !== 'function' || !document.body) return;
+  depthObserver = new MutationObserver((changes) => {
+    for (const change of changes) for (const added of change.addedNodes) if (added.nodeType === 1) scheduleDepthPaint(added);
+  });
+  depthObserver.observe(document.body, { childList: true, subtree: true });
+  // present recall moves with time: a page he returns to is read again, never trusted from when it was drawn
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) scheduleDepthPaint(); });
+  window.addEventListener('focus', () => scheduleDepthPaint());
+  scheduleDepthPaint();
+}
+if (typeof window !== 'undefined' && typeof document !== 'undefined' && window.__CORRIDOR_STANDALONE__ !== 'depth-off') {
+  if (document.body) installDepthPainter();
+  else document.addEventListener('DOMContentLoaded', installDepthPainter, { once: true });
+}
+/** A dot of its own beside a word that is not in running text (a headword, a list row, a star): aria-hidden — the page's
+ * basis line says in words what it shows. */
+function depthDot(node) {
+  const dot = el('span', 'depth-dot');
+  dot.setAttribute('aria-hidden', 'true');
+  dot.dataset.depthNode = JSON.stringify({ id: node.id, ...(node.seq != null && node.seq !== '' ? { seq: String(node.seq) } : {}),
+    reading: String(node.reading || '') });
+  return dot;
+}
+
+/* ----- the page names the basis: one quiet line under the reading — the days he met it, its review state, the reading —
+ * and his two words, "I know this" and "Not yet" (Fugu R3.3). A dot is "familiar" at most, never "mastered". */
+const DEPTH_NAMES = { unmet: ['はじめて', 'New to you'], met: ['出会った', 'Met'], again: ['再会', 'Seen again'],
+  recalled: ['思い出せる', 'Recalled'], owned: ['なじみ', 'Familiar'] };
+function depthBasisParts(result) {
+  const parts = [];
+  const name = DEPTH_NAMES[result.depth] || DEPTH_NAMES.unmet;
+  const days = result.days;
+  parts.push(!days ? tx(name[0], name[1])
+    : result.depth === 'met' ? (days === 1 ? tx('一度出会った', 'Met once') : tx(`${days}日出会った`, `Met on ${days} days`))
+      : result.depth === 'again' ? (days === 1 ? tx(name[0], name[1]) : tx(`再会・${days}日`, `Seen again, on ${days} days`))
+        : tx(`${name[0]}・${days}日出会った`, `${name[1]} · met on ${days} day${days === 1 ? '' : 's'}`));
+  const review = result.review;
+  if (review) {
+    const r = review.r === null ? null : Math.round(review.r * 100);
+    parts.push(review.state === 0 ? tx('保存済み・まだ復習なし', 'saved, not yet reviewed')
+      : review.state === 2 ? (r === null ? tx('復習中', 'in review') : tx(`復習中・いま思い出せる見込み ${r}%`, `in review · recall now ${r}%`))
+        : tx('覚えている途中', 'still learning'));
+  } else if (result.match === 'other') parts.push(tx('保存したのは別の読み', 'your saved card is another reading'));
+  else if (result.identity.kind === 'unresolved') parts.push(tx('この読みの項目はまだ定まらない', 'this reading’s entry is not settled'));
+  if (result.identity.reading) parts.push(tx(`読み ${result.identity.reading}`, `read ${result.identity.reading}`));
+  if (result.said === 'known') parts.push(tx('自分で「知っている」', 'you said you know it'));
+  if (result.said === 'not-yet') parts.push(result.cap === 'not-yet' || result.depth === 'again' || result.depth === 'met'
+    ? tx('「まだ」— 次によく思い出せるまで', '“not yet” — until your next good review') : tx('「まだ」', '“not yet”'));
+  return parts;
+}
+function renderDepthBasis(sheet, node, reading = '') {
+  if (personalHost || node?.t !== 'word' || !nonEmptyString(node.id)) return null;
+  const shown = { t: 'word', id: node.id, ...(node.seq != null && node.seq !== '' ? { seq: String(node.seq) } : {}),
+    reading: String(reading || node.reading || '') };
+  const draw = () => {
+    const result = wordDepth(shown);
+    if (!result) return null;
+    const line = el('p', 'depth-basis');
+    line.id = 'depth-basis';
+    line.dataset.depth = result.depth;
+    if (result.kept) line.dataset.kept = '';
+    const said = el('span', 'depth-basis-said');
+    said.append(depthDot(shown), document.createTextNode(depthBasisParts(result).join(' · ')));
+    if (result.otherKept) said.append(document.createTextNode(tx(' · この綴りは別の読みで保存', ' · this spelling is kept in another reading')));
+    line.append(said);
+    const word = (id, ja, en, value) => {
+      const button = el('button', 'depth-word', tx(ja, en));
+      button.type = 'button';
+      button.id = id;
+      button.setAttribute('aria-pressed', String(result.said === value));
+      button.addEventListener('click', async () => {
+        button.disabled = true;
+        const saved = await correctDepth(shown, value);
+        if (saved && line.isConnected) { const next = draw(); if (next) line.replaceWith(next); }
+        else button.disabled = false;
+      });
+      return button;
+    };
+    line.append(word('depth-known', '知っている', 'I know this', 'known'), word('depth-not-yet', 'まだ', 'Not yet', 'not-yet'));
+    return line;
+  };
+  const line = draw();
+  if (line) sheet.append(line);
+  return line;
+}
+
+/* ----- the help signal in Me (Fugu R4.1; Codex: a declared denominator): help per 1,000 characters of the first readings of
+ * articles he finished that month — repeats and the same word asked twice count once — shown beside the month's exposure
+ * and its average level. A signal, never proof; nothing before `since` is counted or estimated. */
+function helpByMonth(record = S) {
+  const root = readHelpReadable(record.readHelp) ? record.readHelp : null;
+  if (!root) return null;
+  const months = new Map();
+  for (const row of Object.values(root.articles)) {
+    if (!owns(row, 'done')) continue;
+    const month = months.get(row.month) || { month: row.month, articles: 0, chars: 0, help: 0, levels: [], unlevelled: 0 };
+    month.articles += 1;
+    month.chars += row.chars;
+    month.help += row.helped.length;
+    if (row.level) month.levels.push(Number(row.level.slice(1)));
+    else month.unlevelled += 1;
+    months.set(row.month, month);
+  }
+  return { since: root.since, months: [...months.values()].sort((a, b) => (a.month < b.month ? 1 : -1)).map((month) => ({
+    month: month.month, articles: month.articles, chars: month.chars, help: month.help, unlevelled: month.unlevelled,
+    per1000: month.chars > 0 ? (1000 * month.help) / month.chars : null,
+    level: month.levels.length ? `N${Math.round(month.levels.reduce((sum, n) => sum + n, 0) / month.levels.length)}` : null })) };
+}
+function meHelpLine() {
+  const signal = helpByMonth();
+  const line = el('p', 'me-help');
+  line.id = 'me-help';
+  const since = signal ? meDate(new Date(signal.since), true) : null;
+  const month = signal?.months[0];
+  if (!month) {
+    line.textContent = since
+      ? tx(`千字あたりの手助けは、次に読み終えた記事から数える（${since}から）。`, `Help per 1,000 characters counts from the next article you finish (since ${since}).`)
+      : tx('千字あたりの手助けは、次に読み終えた記事から数える。', 'Help per 1,000 characters counts from the next article you finish.');
+    return line;
+  }
+  const [year, mm] = month.month.split('-').map(Number);
+  const label = bi() ? new Date(year, mm - 1, 1).toLocaleDateString('en-GB', { month: 'long' }) : `${mm}月`;
+  const per = month.per1000 === null ? '—' : month.per1000.toFixed(1);
+  line.append(el('b', 'me-help-n', per), el('span', 'me-help-l', tx('千字あたりの手助け', 'help per 1,000 characters')),
+    el('span', 'me-help-m', tx(
+      `${label}・はじめて読み終えた ${month.articles} 編、${month.chars.toLocaleString('ja-JP')} 字、調べた語 ${month.help}${month.level ? `・平均 ${month.level}` : ''}。${since}から数えた目安で、証明ではない`,
+      `${label} · ${month.articles} first reading${month.articles === 1 ? '' : 's'}, ${month.chars.toLocaleString('en-GB')} characters, ${month.help} word${month.help === 1 ? '' : 's'} asked${month.level ? ` · about ${month.level}` : ''} · counted since ${since}; a signal, not proof`)));
+  return line;
+}
+
+/* ----- R's identity wherever a kept word shows (G2): a saved card's own answer stands in for the dictionary when the
+ * dictionary cannot name its entry (cold, offline, the full index not open), and every door to a kept word carries the
+ * capture's entry and reading — never the spelling alone, which would open 年 read とし for a card saved as ねん. */
+/** A kept word's own record for a node that names its entry: the card's saved answer (savedAnswerFor), when it stands for
+ * exactly that entry. null for anything else; never the first row of the spelling. */
+function savedNodeRecord(node, record = S) {
+  if (node?.t !== 'word' || node.seq == null || node.seq === '') return null;
+  const answer = savedAnswerFor({ t: 'word', id: node.id }, record);
+  if (answer?.status !== 'available' || String(answer.seq || '') !== String(node.seq)) return null;
+  if (nonEmptyString(node.reading) && nonEmptyString(answer.reading) && kanaReadingKey(answer.reading) !== kanaReadingKey(node.reading)) return null;
+  const head = nonEmptyString(answer.head) ? answer.head : node.id;
+  return { seq: String(node.seq), head, r: answer.reading, m: answer.meanings, k: [...head].filter((c) => /[一-鿌々]/.test(c)), saved: true };
+}
+/** The door to a word he keeps: the capture's own node (learningItemNode — its entry and reading); any other key as it was. */
+function keptItemNode(t, id) {
+  return S.taken.some((row) => row.t === t && row.id === id) ? learningItemNode({ t, id }) : { t, id };
+}
+/** A mirror row for a word he keeps names the reading he kept it as, and wears its dot. */
+function kagamiKeptReading(row, door) {
+  if (!S.taken.some((item) => item.t === 'word' && item.id === door.id)) return;
+  const answer = savedAnswerFor({ t: 'word', id: door.id });
+  const reading = door.reading || (answer?.status === 'available' ? answer.reading : '');
+  if (reading) {
+    const span = el('span', 'row-reading', reading);
+    span.lang = 'ja';
+    row.append(span);
+  }
+  row.append(depthDot(door));
+}
+/** The tutor's and the examples' archive key for a word page: the core record keeps the spelling's own key (its replies were
+ * written for that record); an entry, and a reading nothing at hand settles, each key by spelling + reading (+ entry), so
+ * 訳's archived わけ reply never answers 訳 read やく. Old rows are read, never rewritten. */
+function wordArchiveRef(node, rec) {
+  const id = node.id;
+  const reading = kanaReadingKey(nonEmptyString(rec?.r) ? rec.r : node.reading || '') || '';
+  if (rec?.seq != null && rec.seq !== '') return `word:${id}${JSON.stringify({ seq: String(rec.seq), r: reading })}`;
+  const core = D.dict?.[id];
+  if (core && Array.isArray(rec?.m) && rec.m.length && reading === (kanaReadingKey(core.r || '') || '')) return `word:${id}`;
+  return `word:${id}${JSON.stringify({ r: reading })}`;
 }
 
 function renderLearningSource(container, item, review = false, disclosure = item) {
@@ -27828,7 +28423,8 @@ function renderAiTutor(sheet, node, rec) {
     node.from?.passage || node.sourceContext ? 'ask about the word alone' : 'ask the tutor');
   btn.type = 'button';
   const out = el('div', 'ai-answer');
-  const ref = `word:${node.id}`;
+  // G2 · the archive is read back by the word as this page reads it: 訳's わけ reply never answers 訳 read やく
+  const ref = wordArchiveRef(node, rec);
   const note = aiSheetNotes.get(`word-tutor|${ref}`);
   if (note) out.textContent = note;
   else aiLastReply('word-tutor', ref).then((prev) => {
@@ -27893,7 +28489,7 @@ function renderAiExamples(sheet, node, rec) {
     }
     return shown;
   };
-  const exRef = `word:${node.id}`;
+  const exRef = wordArchiveRef(node, rec);
   const note = aiSheetNotes.get(`examples|${exRef}`);
   if (note) out.append(el('p', 'ai-ex-note', note));
   else aiLastReply('examples', exRef).then((prev) => {
@@ -29148,7 +29744,8 @@ function renderWordNode(sheet, node) {
     renderReaderChoice(sheet, node);
     return;
   }
-  const found = lookup(node.id, node.seq, node.reading, node.matchedGloss);
+  // G2 · a kept word's page opened cold or offline: its card's own answer, never the spelling's first row (savedNodeRecord)
+  const found = lookup(node.id, node.seq, node.reading, node.matchedGloss) || savedNodeRecord(node);
   // a reader-chosen entry is shown by the spelling and exact reading it was chosen by: the shared
   // lookup keys readings by normalised kana and can head 結う/いう as いう (Codex D11 11:15Z)
   // lookup's alt was computed for its own head: beside the chosen spelling it can only repeat it (結う／結う)
@@ -29174,6 +29771,8 @@ function renderWordNode(sheet, node) {
   sheet.append(head);
   const shownReading = unresolved ? node.reading : rec?.r;
   if (shownReading) sheet.append(el('p', 'reading', shownReading));
+  // G2 · the dot's basis in one quiet line — days met, review state, the reading — and his "I know this" / "Not yet"
+  renderDepthBasis(sheet, node, shownReading || '');
 
   // KANJI IN THIS WORD — each row opens that kanji's full entry. G1: right under the word and its reading
   // (John, 09-29: "kanji in the word needs to be more at the top!"; MASTER_SPEC §7.22)
@@ -34404,6 +35003,8 @@ function renderMe(main) {
         `in ${reading.articles} finished article${reading.articles === 1 ? '' : 's'}, less the ${reading.looked} word${reading.looked === 1 ? '' : 's'} you looked up`)));
     head.append(lead);
   }
+  // G2 · beside it, the help signal: help per 1,000 characters of the month's first readings (meHelpLine, read-only)
+  head.append(meHelpLine());
   book.append(head);
   let horizons = meHorizonsPart(decks);
   let home = meCameHomePart(decks, !!first);
