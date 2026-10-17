@@ -224,6 +224,32 @@
 body:not(.ui-bi) #drift-layer [data-l='en'],
 body.ui-bi #drift-layer [data-l='ja'] { display: none; }
 
+
+/* Active constellation glyphs sit above the free field, below existing
+ * word satellites (5), centres (6) and component plaques (7). */
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) {
+  z-index: 1;
+}
+
+/* Native hit regions: preserve field doors through transparent caption/rt
+   space. The actual ruby base (or unannotated .g) retains native handlers. */
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center),
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g {
+  pointer-events: none;
+}
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g > ruby.drift-reading,
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g:not(:has(> ruby.drift-reading)),
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph.unfolded:not(.comp):not(.center) > small {
+  pointer-events: auto;
+}
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g > ruby.drift-reading > rt {
+  pointer-events: none;
+}
+body[data-furigana='1'] #drift-layer.active #sky > .glyph.hosted-constellation-glyph.hosted-reading-shown:not(.comp):not(.center) > .g > ruby.drift-reading > rt,
+body[data-furigana='2'] #drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g > ruby.drift-reading > rt {
+  pointer-events: auto;
+}
+
 /* Interface arrivals stay short and still when motion is reduced. The card
  * occupies its final position throughout its fade; direct field gestures
  * and the separate teaching renderer retain their own geometry. */
