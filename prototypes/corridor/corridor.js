@@ -34911,7 +34911,7 @@ function render() {
     // …and a page nobody is looking at is a room they have left: the galaxy is the
     // default entry, and its loop held the main thread even in a background tab
     // (PR #77 ef524842). The same public seam the view switch uses; nothing reaches in.
-    if (S.view === 'drift' && !S.stack.length && !document.hidden) window.__DRIFT__.show();
+    if (S.view === 'drift' && !S.stack.length && !document.hidden) { ensureSkyMargin(); window.__DRIFT__.show(); }
     else window.__DRIFT__.hide();
   }
 
@@ -35029,6 +35029,20 @@ function maintenanceContext() {
     // G1 · the phone's own truth: this device's five roughest moves this week (kairo-frames, never the record)
     frames: roughestThisWeek(5),
   };
+}
+/** Q · the sky keeps a margin (Q/DESIGN.md §5; Grok's walks: 印刷, 日, 出, 順, 人 cut by the glass). The sky's own engine
+ * fades a word out as it slides under the host's chrome ([data-drift-chrome]) instead of letting an edge cut it; four
+ * empty bands along the phone's edges are declared as that chrome, so every drifting word dissolves before it reaches
+ * the glass and stands whole inside the margin. They paint nothing and take no touch (corridor.css .sky-edge); the
+ * glyphs and the faint hub kanji the engine does not fade dissolve under the same margin's mask (corridor.css). */
+function ensureSkyMargin() {
+  if (document.querySelector('.sky-edge')) return;
+  for (const side of ['top', 'right', 'bottom', 'left']) {
+    const band = el('div', `sky-edge sky-edge-${side}`);
+    band.dataset.driftChrome = '';
+    band.setAttribute('aria-hidden', 'true');
+    document.body.append(band);
+  }
 }
 let maintenanceReports = null;
 let deckPresentation = null;
