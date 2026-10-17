@@ -54,13 +54,14 @@ const EXPECTED = Object.freeze({
   }),
   sourceEntries: 218_290,
   // 69,996 from the base rule + 6 article entries (R2, 2026-10-17: 私 わたくし, 銭 ぜに, 異 こと, 作物 さくぶつ, 解す げす,
-  // 帰す きす) + 168 for the twenty of batches 3r and 4r (N2, 2026-10-17). A content slice that adds article entries moves
-  // these two counts together, named in its commit
-  selectedEntries: 70_170,
+  // 帰す きす) + 168 for the twenty of batches 3r and 4r (N2, 2026-10-17) + 2 the shelf's grammar words are read as (R3,
+  // 2026-10-18: なり 1536290, the classical copula; つ 2220330, the general counter of 一つ). A content slice that adds
+  // article entries moves these two counts together, named in its commit
+  selectedEntries: 70_172,
   selectedCommon: 22_626,
   selectedKanaOnly: 36_683,
   selectedTop151: 10_687,
-  selectedArticleEntries: 174,
+  selectedArticleEntries: 176,
 });
 
 const SHARD_COUNT = 16;
