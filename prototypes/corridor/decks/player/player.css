@@ -131,11 +131,17 @@
 .kp-st-known { color: var(--kp-green); border-color: currentColor; }
 .kp-st-hard { color: var(--kp-red); border-color: currentColor; }
 
-.kp-sentence { margin: 0; font-size: var(--type-reading); line-height: 2.3; font-weight: 500; letter-spacing: 0.02em; color: var(--kp-ink); overflow-wrap: anywhere; }
+/* the card's passage reads a step above the reader's body (base: clamp(22px, 6.2vw, 30px), 24.2 px at 390): the
+   nearest step, title, and section on a phone up to 420 px (below 427 px the base sat nearer 24 than 29) */
+.kp-sentence { margin: 0; font-size: var(--type-title); line-height: 2.3; font-weight: 500; letter-spacing: 0.02em; color: var(--kp-ink); overflow-wrap: anywhere; }
 .kp-blank { display: inline-block; min-width: 2.4em; border-bottom: 3px solid var(--kp-cyan); background: var(--kp-cyan-wash); border-radius: var(--radius-control, 6px) var(--radius-control, 6px) 0 0; margin: 0 2px; line-height: 1.3; }
 .kp-target { color: var(--kp-cyan); font-weight: 700; text-decoration: underline 2px; text-underline-offset: 0.28em; }
-/* one hue on the asked word: its reading takes the word's own colour (the one ruby reads --color-reading) */
-.kp-sentence .kp-target { --color-reading: currentColor; }
+/* the deck's readings are its quiet ink, --kp-ink-2 at full strength (base: 88 % of it in the corridor, full on the
+   study pages; the world's red reads under 4.5:1 on a night card: nami 4.40, hakuu 4.39); one hue on the asked word: its
+   reading takes the word's own colour. The one ruby reads --color-reading, handed to the ruby only: the word's own mark
+   under the pointer (.kp-tok, the house's one word mark) keeps the house's reading colour */
+.kp-sentence ruby { --color-reading: var(--kp-ink-2); }
+.kp-sentence .kp-target ruby { --color-reading: currentColor; }
 /* 読み off: the clean original, keeping the asked word's reading and the one on a word you tap. A concealed
    reading keeps its place, so the line never moves between on and off or while a word is open. */
 .kp[data-readings='off'] .kp-sentence ruby:not(:is(.kp-target, .kp-tok.kp-lit) ruby) > rt { visibility: hidden; }
@@ -296,6 +302,7 @@
 .kp-toast-btn { justify-self: start; min-height: 40px; padding: 0 14px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: var(--type-chrome); font-weight: 700; }
 
 @media (max-width: 420px) {
+  .kp-sentence { font-size: var(--type-section); }
   .kp-row { grid-template-columns: minmax(0, 6rem) minmax(0, 1fr) auto; }
   .kp-row .kp-dots { display: none; }
 }
@@ -385,7 +392,7 @@
    * proscenium (--color-lacquer), and the card is the lit paper on it; its text is the lacquer's ink.
    * --kp-shu is the 朱 of the marked word's brackets, the rail and the slash on もう一度 (never text):
    * the world's seal red. Measured: contrast-kotoba stage row */
-  --kp-stage: var(--color-lacquer, #141a28); --kp-stage-ink: var(--color-lacquer-ink, #e9e2d2); --kp-stage-mute: color-mix(in srgb, var(--color-lacquer-ink) 76%, var(--world-ground)); --kp-shu: var(--color-seal, #c4401f);
+  --kp-stage: var(--color-lacquer, #141a28); --kp-stage-ink: var(--color-lacquer-ink, #e9e2d2); --kp-stage-mute: color-mix(in srgb, var(--color-lacquer-ink, #e9e2d2) 76%, var(--world-ground, var(--color-lacquer, #141a28))); --kp-shu: var(--color-seal, #c4401f);
   /* the dock (the ground under 答えを見る and the grade pads, and the page below the last card) is the
    * stage; the whole study screen is the stage, lit softly from the top. Measured: contrast-kotoba dock row */
   --kp-dock: var(--kp-stage); --kp-dock-ink: var(--kp-stage-ink); --kp-dock-mute: var(--kp-stage-mute);
@@ -584,7 +591,7 @@
 .kp-done { gap: 18px; }
 .kp .kp-done .kp-title { font-family: var(--kp-jp); font-size: var(--type-caption); font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--kp-mute); }
 .kp .kp-done .kp-title:lang(ja) { text-transform: none; letter-spacing: 0.24em; }
-.kp-done-title { margin: 0; font-family: var(--kp-head); font-weight: 800; font-size: var(--type-hero); line-height: 1.2; letter-spacing: 0.01em; color: var(--kp-ink); text-wrap: balance; word-break: keep-all; overflow-wrap: anywhere; }
+.kp-done-title { margin: 0; font-family: var(--kp-head); font-weight: 800; font-size: clamp(var(--type-hero), 9vw, var(--type-headword)); line-height: 1.2; letter-spacing: 0.01em; color: var(--kp-ink); text-wrap: balance; word-break: keep-all; overflow-wrap: anywhere; }
 .kp-rise { position: relative; display: flex; flex-wrap: wrap; gap: 10px 22px; padding: 4px 2px 8px; }
 .kp-rise-w { font-family: var(--kp-head); font-weight: 800; font-size: var(--type-lead); color: var(--kp-ink-2); animation: kp-rise-up var(--motion-fast, 180ms) var(--ease-enter, ease-out) calc(40ms + var(--i, 0) * 10ms) backwards; }
 .kp-rise-w.is-again { color: var(--kp-red); }
