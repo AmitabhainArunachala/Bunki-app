@@ -18257,13 +18257,15 @@ function renderAiSetup(main) {
     main.append(fudaBtn, fudaNote);
     main.append(withEn(el('p', 'eyebrow key-head', '鍵'), 'the key', 'en-inline'));
   }
+  // Q · the tutor's door in his words (Q/DESIGN.md §8; Grok's walk: the room read as a raw API form): what the tutor needs
+  // and where his key stays, then the key; the service's address and model fold under one quiet Details, as they were set
   main.append(
     el(
       'p',
       'gloss',
       tx(
-        '接続先と鍵はこの端末にだけ保存され、学習記録には含まれない。鍵は設定した接続先だけに送る。別の接続先には、そのための鍵を入力して保存する。',
-        'Provider settings and keys stay on this device, outside your learning record. A key is sent only to its configured provider. To use another provider, enter and save its own key.',
+        '先生に質問するには、使っている AI サービス（Anthropic など）の鍵をここに入れる。鍵はこの端末にだけ残り、学習記録には入らない。送るのは、そのサービスだけ。',
+        'To ask the tutor, add the key from your AI service (Anthropic, or one like it). The key stays on this device, outside your learning record, and goes only to that service.',
       ),
     ),
   );
@@ -18273,6 +18275,11 @@ function renderAiSetup(main) {
     label.htmlFor = id;
     return label;
   };
+  const connection = el('details', 'ai-connection');
+  connection.id = 'ai-connection';
+  // open while it needs him: the device's settings could not be read, or the key's service was never recorded
+  connection.open = !!(configured.invalid || configured.requiresBinding);
+  connection.append(el('summary', 'ai-connection-head', tx('接続の詳細', 'Connection details')));
   const endpoint = el('input', 'search-field');
   endpoint.type = 'url';
   endpoint.id = 'ai-base-url';
@@ -18280,8 +18287,8 @@ function renderAiSetup(main) {
   endpoint.spellcheck = false;
   endpoint.maxLength = 2048;
   endpoint.value = configured.baseUrl;
-  main.append(fieldLabel(endpoint.id, '接続先 (HTTPS)', 'Provider URL (HTTPS)'), endpoint);
-  main.append(el('p', 'airead-note', tx(
+  connection.append(fieldLabel(endpoint.id, '接続先 (HTTPS)', 'Provider URL (HTTPS)'), endpoint);
+  connection.append(el('p', 'airead-note', tx(
     'Anthropic、または互換 API の接続先。通常は https://api.anthropic.com。',
     'Use Anthropic or a compatible API provider. The default is https://api.anthropic.com.',
   )));
@@ -18291,15 +18298,19 @@ function renderAiSetup(main) {
   model.spellcheck = false;
   model.maxLength = 200;
   model.value = configured.model;
-  main.append(fieldLabel(model.id, 'モデル', 'Model'), model);
+  connection.append(fieldLabel(model.id, 'モデル', 'Model'), model);
+  connection.append(el('p', 'airead-note', tx(
+    '鍵は、設定した接続先だけに送る。別の接続先には、そのための鍵を入力して保存する。',
+    'A key is sent only to its configured provider. To use another provider, enter and save its own key.',
+  )));
   const input = el('input', 'search-field');
   input.type = 'password';
   input.id = 'ai-key-input';
-  input.placeholder = tx('この接続先の API キー', 'API key for this provider');
+  input.placeholder = tx('鍵を貼り付ける', 'Paste your key');
   input.autocomplete = 'off';
   input.maxLength = 8192;
   input.value = configured.key;
-  main.append(fieldLabel(input.id, '鍵', 'API key'), input);
+  main.append(fieldLabel(input.id, 'あなたの鍵', 'Your key'), input);
   const configNote = el('p', 'airead-note');
   configNote.id = 'ai-config-note';
   configNote.setAttribute('role', 'status');
@@ -18346,7 +18357,7 @@ function renderAiSetup(main) {
     S.view = 'ai';
     render();
   });
-  main.append(save, configNote);
+  main.append(save, configNote, connection);
   if (aiKey()) {
     const rm = biLabel('button', 'take taken', '鍵を消す', 'remove the key');
     rm.type = 'button';
@@ -35164,6 +35175,17 @@ function ensureSkyMargin() {
     document.body.append(band);
   }
 }
+/** Q · the screen a report is about, in the learner's words: the room's own name, the story he is reading, the word or
+ * kanji whose page is open (never an internal id; the ids stay in the report's Details). */
+function maintenanceScreenName() {
+  try {
+    const story = S.view === 'reader' ? passage() : null;
+    const name = story ? null : ROOM_NAMES.rooms[S.view];
+    const detail = S.stack.at(-1);
+    return [story ? tx(`読み物「${story.title}」`, `the story ${story.title}`) : name ? tx(...name) : '',
+      detail?.id ? tx(`「${detail.id}」のページ`, `the page for ${detail.id}`) : ''].filter(Boolean).join(' · ');
+  } catch { return ''; }
+}
 let maintenanceReports = null;
 let deckPresentation = null;
 let olderStartToken = 0;
@@ -35239,9 +35261,10 @@ function renderReportRelaySettings() {
   section.append(el('h2', 'eyebrow', tx('不具合の報告', 'Bug reports')));
   let host;
   try { host = REPORT_RELAY_URL ? new URL(REPORT_RELAY_URL).host : ''; } catch { host = ''; }
+  // Q · in his words (the developer's GitHub and its prefilled page stay inside the report's own Details)
   const status = el('p', 'teacher-note', host
-    ? tx(`この端末の報告は GitHub に自動で送られる（${host}）。`, `Reports from this device go to GitHub automatically (${host}).`)
-    : tx('この端末は未設定。報告は入力済みの GitHub ページを開くので、そこで送信する。', 'Not set up on this device. A report opens a prefilled GitHub page for you to submit.'));
+    ? tx(`この端末の報告は、直す人に自動で届く（${host}）。`, `Reports from this device reach the app's makers automatically (${host}).`)
+    : tx('この端末では、報告を送ると開くページで、送信を仕上げる。', 'On this device, sending a report opens a page where you finish sending it.'));
   status.id = 'settings-reports-status';
   const form = el('form', 'listening-form settings-report-form'); form.id = 'settings-report-form';
   const field = listeningField(form, 'settings-report-link', tx('報告用リンクを貼り付ける', 'Paste your report setup link'));
@@ -35290,6 +35313,8 @@ function mountMaintenanceReports() {
     // picks up that label either way.
     github: { newIssueUrl: 'https://github.com/AmitabhainArunachala/Bunki-app/issues/new', label: 'kairo-report', version: APP_RELEASE.version },
     getContext: maintenanceContext,
+    // Q · the sheet names the screen in his words (the room, the story, the word open), its ids under Details
+    describeScreen: maintenanceScreenName,
     clockNotice: () => {
       try { const selected = currentAssessmentV2(); return selected?.attempt?.status === 'in-progress' && selected.attempt.mode === 'timed' ? 'The test clock continues while this report is open.' : ''; }
       catch { return ''; }

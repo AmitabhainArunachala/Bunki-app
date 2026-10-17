@@ -5,7 +5,8 @@
  * client's /api/config probe gets the host's 404. github.com is stubbed so no real
  * issue is ever opened, and the relay runs locally against a mock GitHub API.
  * Checks, per engine, for the prefilled-issue fallback:
- *   1. the sheet offers "Send to GitHub" and opens one prefilled new-issue page
+ *   1. the sheet offers its Send (data-delivery github; Q: "Send to GitHub" became learner words, GitHub under
+ *      Details) and opens one prefilled new-issue page
  *      in the same tap (title, label, marker, words, version, screen, report ID);
  *   2. the saved copy names the same report and is marked "Opened on GitHub";
  *   3. very long words are shortened to fit GitHub's address limit;
@@ -95,8 +96,9 @@ async function openSheet(page, beforeProbe) {
   await page.locator('#bunki-report-bug').click();
   await page.locator('#br-actual').waitFor();
   if (beforeProbe) await beforeProbe();
-  // The sheet settles once the service probe has answered with the host's 404.
-  await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.textContent === 'Send to GitHub', null, { timeout: 15_000 });
+  // The sheet settles once the service probe has answered with the host's 404. Q · its button says Send in the learner's
+  // words; the way it sends is its data-delivery (github: the prefilled issue page)
+  await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.dataset.delivery === 'github', null, { timeout: 15_000 });
 }
 // What the sheet shows, for a failure message.
 const sheetState = (page) =>
@@ -209,9 +211,9 @@ try {
         // the sheet must not offer GitHub (a real service may still answer).
         const { context, page, errors } = await fresh({ blockWindows: true, probeDelayMs: 2500 });
         let pendingLabel = '';
-        await openSheet(page, async () => { pendingLabel = await page.locator('#br-form .br-primary').textContent(); });
+        await openSheet(page, async () => { pendingLabel = await page.locator('#br-form .br-primary').getAttribute('data-delivery'); });
         check(`${engine} · GitHub is offered only after the probe confirms there is no service`,
-          !!pendingLabel && pendingLabel !== 'Send to GitHub', `while pending: ${pendingLabel}`);
+          !!pendingLabel && pendingLabel !== 'github', `while pending: ${pendingLabel}`);
         await page.locator('#br-actual').fill('Saved while the window was blocked.');
         await page.locator('#br-form .br-primary').click();
         await page.waitForFunction(() => document.querySelector('#br-title')?.textContent === 'Your report');

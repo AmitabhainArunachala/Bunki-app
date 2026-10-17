@@ -760,6 +760,7 @@ async function ui() {
     await page.context().route('https://source-context.synthetic.invalid/**', async (route) => {
       providerRequests += 1; await route.abort();
     });
+    await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
     await page.locator('#ai-base-url').fill('https://source-context.synthetic.invalid');
     await page.locator('#ai-model-input').fill('synthetic-source-context-check');
     await page.locator('#ai-key-input').fill('synthetic-fixture-not-a-real-credential');

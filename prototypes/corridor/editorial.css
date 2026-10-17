@@ -5507,3 +5507,8 @@ html[data-save-drawer='sheet'] #sheet > .sheet-bar[data-bar='sheet'] {
    inset above the foot as well, and the page showed beneath it */
 body.has-primary-tabs:has(#app :is(.kp-study, .kp-done)) .kp-grades { bottom: 0; }
 
+/* Q · the technical rest folds under one quiet Details (Q/DESIGN.md §8): the tutor's service address and model; the report
+   sheet keeps its own (report-client.css) */
+#app .ai-connection { margin: var(--space-4, 16px) 0 var(--space-2, 8px); }
+#app .ai-connection > summary { display: flex; align-items: center; min-height: 44px; font: 500 14px/1.3 var(--font-ui); color: var(--color-muted); cursor: pointer; }
+#app .ai-connection[open] > summary { color: var(--color-ink-2); }

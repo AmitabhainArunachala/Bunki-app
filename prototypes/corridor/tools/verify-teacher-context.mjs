@@ -397,6 +397,7 @@ async function chooseContext(page, context) {
 }
 
 async function configureProvider(page) {
+  await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
   await page.locator('#ai-base-url').fill(FAKE_ORIGIN);
   await page.locator('#ai-model-input').fill(FAKE_MODEL);
   await page.locator('#ai-key-input').fill(FAKE_KEY);

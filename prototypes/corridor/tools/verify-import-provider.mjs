@@ -203,6 +203,7 @@ try {
         assert.match(await page.locator('#ai-config-note').textContent(), /Reconnect/);
         assert.equal(await page.evaluate((name) => localStorage.getItem(name), LEGACY_KEY), key, 'upgrade preserves the old key locally');
         assert.equal(await page.evaluate((name) => localStorage.getItem(name), DEVICE_KEY), null);
+        await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
         await page.fill('#ai-base-url', origin);
         await page.fill('#ai-model-input', 'synthetic-reconnected-model');
         await page.fill('#ai-key-input', key);
@@ -299,6 +300,7 @@ try {
     await test('explicit-custom-provider-and-origin-switch', async ({ page, calls }) => {
       await openShelfDoor(page, '#ai-link');
       assert.equal(await page.inputValue('#ai-key-input'), DEFAULT_CREDENTIAL);
+      await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
       await page.fill('#ai-base-url', 'https://custom-provider.invalid/proxy/');
       assert.equal(await page.inputValue('#ai-key-input'), '', 'switching origin clears the previous key');
       await page.fill('#ai-model-input', 'synthetic-custom-model');
@@ -312,6 +314,7 @@ try {
       assert.equal(await page.evaluate((key) => localStorage.getItem(key), DEVICE_KEY), configured, 'restore cannot change device provider settings');
       await ask(page, 'The explicitly configured provider survives a restore.');
       assert.ok(calls.every((call) => call.origin === 'https://custom-provider.invalid' && call.credential === 'custom-synthetic'));
+      await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
       await page.fill('#ai-base-url', 'https://second-provider.invalid');
       assert.equal(await page.inputValue('#ai-key-input'), '');
       await page.click('#ai-key-save');
@@ -327,6 +330,7 @@ try {
       await openShelfDoor(page, '#ai-link');
       const before = await page.evaluate((key) => localStorage.getItem(key), DEVICE_KEY);
       for (const url of ['http://unsafe.invalid', 'https://user:secret@unsafe.invalid', '/relative', 'https://unsafe.invalid?key=x', 'https://unsafe.invalid#route', 'https://unsafe.invalid\\elsewhere']) {
+        await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
         await page.fill('#ai-base-url', url);
         await page.click('#ai-key-save');
         assert.equal(await page.evaluate((key) => localStorage.getItem(key), DEVICE_KEY), before);
