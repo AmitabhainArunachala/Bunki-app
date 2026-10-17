@@ -10357,7 +10357,7 @@ async function keepWord(node, label) {
   capturePending.add(key);
   const write = commitCapture(node, label).catch(() => false).finally(() => capturePending.delete(key));
   keepInFlight.set(key, write);
-  let ok = false;
+  let ok;
   try { ok = await write; } finally { keepInFlight.delete(key); }
   if (!allowed()) return { status: 'held', key };
   return { status: ok && keptState(node) === 'taken' ? 'created' : 'failed', key };
@@ -10414,7 +10414,7 @@ async function writeListMembership(node, label, listName, on) {
     if (kept.status === 'failed') return 'capture-failed';
     refreshWordSaveControls(node, label);
   }
-  let saved = false;
+  let saved;
   try {
     saved = await commitStorePatch((latest) => {
       if (!allowed()) throw new Error('personal-capture-not-allowed');
@@ -10516,7 +10516,6 @@ function sealTarget() {
   }
   return null;
 }
-let sealFlights = 0;
 function flySeal(anchor, { countFrom = null } = {}) {
   const word = glyphBox(anchor) || anchor.getBoundingClientRect();
   if (!word?.width || !word.height) return null;
@@ -10534,8 +10533,7 @@ function flySeal(anchor, { countFrom = null } = {}) {
   flight.style.left = `${x}px`;
   flight.style.top = `${y}px`;
   document.body.append(flight);
-  sealFlights += 1;
-  const done = () => { sealFlights -= 1; flight.remove(); };
+  const done = () => flight.remove();
   if (!pageCutAllowed()) {
     flight.classList.add('is-still');
     setTimeout(done, 700);
@@ -10766,7 +10764,7 @@ let sealFacesAsked = false;
 function warmSealStripFaces() {
   if (sealFacesAsked || typeof document === 'undefined' || !document.fonts?.load) return;
   sealFacesAsked = true;
-  const idle = typeof requestIdleCallback === 'function' ? (fn) => requestIdleCallback(fn, { timeout: 2000 }) : (fn) => setTimeout(fn, 800);
+  const idle = typeof window.requestIdleCallback === 'function' ? (fn) => window.requestIdleCallback(fn, { timeout: 2000 }) : (fn) => setTimeout(fn, 800);
   idle(() => {
     const text = ['保存済み ✓ Saved ✓ 保存しました', '新しいリスト… New list… 作る Add すべてのリスト All lists ·', '全項目 · Full entry 文を保存 Save the sentence',
       'コピー Copy この語を先生に聞く Ask the tutor about the word 外す Remove リスト Lists', ...Object.keys(S.lists || {})].join(' ');
@@ -10908,8 +10906,9 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
       if (busy) return;
       busy = true;
       paint();
-      let result = 'list-failed';
+      let result;
       try { result = await writeListMembership(node, label, listName, on); }
+      catch { result = 'list-failed'; }
       finally { busy = false; }
       if (!strip.isConnected) return;
       if (result === 'ok') {
