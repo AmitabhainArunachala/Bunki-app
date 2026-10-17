@@ -165,6 +165,7 @@ test('DIALOGUE · the shelf’s scripts render single-voice until John casts the
   const pieces = dialoguePieces();
   const ids = pieces.map((piece) => piece.id);
   for (const id of ['bunki-read-n3-honda-quarter', 'bunki-read-n3-transistor-class']) assert(ids.includes(id), `${id} is found as a script`);
+  assert(!ids.includes('bunki-essay-n2-creator-god'), 'prose opening lines with 一方、「…」 is not a script');
   const job = plan();
   const second = job.placements.filter((p) => p.voice === LOCK.second || p.role === 'speaker-b');
   assert.deepEqual(second.map((p) => p.path), [], 'no clip in the second voice is ever placed');

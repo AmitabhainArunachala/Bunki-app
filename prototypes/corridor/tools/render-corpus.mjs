@@ -167,15 +167,19 @@ export function articleCorpus() {
   return out;
 }
 
-/** The shelf's labelled scripts: an article in which four or more lines open with a speaker's
- * name and a quote (ユキ「…」). Reported, and rendered single-voice; never cast by this tool. */
-const SPEAKER_LINE = /^([^\s「」『』（）()]{1,8})「/u;
+/** The shelf's labelled scripts: an article in which at least two speakers, each named by a bare
+ * name (letters only, no punctuation) before a quote, speak at least two lines each (ユキ「…」
+ * 森「…」). Prose that opens a line with 一方、「…」 is not a script. Reported, and rendered
+ * single-voice; never cast by this tool. */
+const SPEAKER_LINE = /^([\p{L}ー]{1,6})「/u;
 export function dialoguePieces() {
   const found = [];
   for (const row of json('data/articles/index.json').articles) {
     const lines = String(json(`data/articles/${row.file}`).text || '').split(/\n+/u);
-    const speakers = lines.map((line) => SPEAKER_LINE.exec(line.trim())?.[1]).filter(Boolean);
-    if (speakers.length >= 4) found.push({ id: row.id, lines: speakers.length, speakers: [...new Set(speakers)] });
+    const counts = new Map();
+    for (const line of lines) { const name = SPEAKER_LINE.exec(line.trim())?.[1]; if (name) counts.set(name, (counts.get(name) || 0) + 1); }
+    const speakers = [...counts].filter(([, n]) => n >= 2).map(([name]) => name);
+    if (speakers.length >= 2) found.push({ id: row.id, lines: [...counts.values()].reduce((a, b) => a + b, 0), speakers });
   }
   return found;
 }
