@@ -9,13 +9,18 @@
  *
  *   S1 doors · S2 rest · S3 microphone · S4 a turn · S5 every word · S6 one sound · S7 Bridge · S8 look back ·
  *   S9 voice lock · S10 Japanese · S11 memory · S12 offline · S13 key hygiene and cost · S14 interruption ·
- *   S15 motion and contrast · S16 access
+ *   S15 motion and contrast · S16 access · S17 leaving retires voice work · S18 a pending microphone · S19 accounting and
+ *   settings fail closed · S20 an unsaved note · S21 an untyped correction · S22 one turn at a time · S23 影 end to end
+ *   A full run (no SPEAK_CASES) adds one row per engine: no request tried any origin but the site and the provider.
  *
  * Usage:
  *   KAIRO_EVIDENCE_DIR=~/.dharma/… KAIRO_SITE_DIR=<built site> KAIRO_BROWSER=all|webkit|chromium \
  *     node prototypes/corridor/tools/verify-speak.mjs
  *   SPEAK_CASES=S4,S9 runs only those cases. SPEAK_FAULT=<name> serves one one-line mutant (below).
- *   --negatives runs every mutant (WebKit, its named cases) in a child and reports whether each was caught.
+ *   --negatives runs every mutant (WebKit, its named cases) in a child and reports whether each was caught: caught means
+ *   the named case ran to its end with no page error and its own witness check went red; a setup failure is "not run".
+ *   SPEAK_NEGATIVES=a,b picks mutants; SPEAK_NEGATIVES_PARALLEL=n runs n at once; SPEAK_NEGATIVES_BREAK_SETUP=1 is the
+ *   runner's own control (every child's setup fails, so every row must read "not run").
  *   SPEAK_SHOTS_DIR=<dir> also takes the WebKit shots (藍, 墨) and records one mock conversation (webm).
  *
  * Negative controls (each must fail the case named):
@@ -27,6 +32,20 @@
  *   tracks-kept   tracks not stopped at the end of a take           → S3
  *   key-in-url    the key placed in the request URL                 → S13
  *   no-gate       the evidence gate removed (an invented word kept) → S4
+ *   late-opening-voice  the opening voiced after Back                → S17
+ *   queued-voice  sentence two dispatched after End                 → S17
+ *   pending-mic   a microphone granted after the page hid is kept   → S18
+ *   spend-unchecked  an unrecorded cost leaves the next turn open   → S19
+ *   settings-claim   "Saved" for a write the device refused         → S19
+ *   notes-claim   a note the record refused called remembered       → S20
+ *   untyped-word  an untyped correction admitted as a word          → S21
+ *   overlap       a second turn sent while one is in flight         → S22
+ *   pin-only      the room keeps to its pin over V's lock in the app → S9
+ *   token-dropped the top bar's Save given the base alone           → S5
+ *   blob-kept     a kept line played from a blob: URL               → S12 (WebKit offline refuses it)
+ *   no-his-pitch  his pitch line not drawn                          → S23
+ *   residue-target  a corrected line checked against its kana alone → S23
+ *   ended-no-shadow shadowing refused once the talk has ended       → S23
  *
  * Claim boundary: this proves the room's behaviour against a mock partner in headless engines. It does not prove a
  * live model's answers, latency, forgiveness or Kore's readings (LIVE-1), nor the iPhone's microphone prompt, audio
@@ -35,6 +54,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -86,6 +106,21 @@ const FAULTS = {
     from: '    if (!result?.ok) { s.notesFailed = pending; return false; }', to: '    void result;' },
   'untyped-word': { file: 'speak.js', witness: { S21: /untyped correction/u },
     from: 'subjectType: c.subjectType, polarity: 1, code: c.code });', to: "subjectType: c.subjectType || 'word', polarity: 1, code: c.code });" },
+  // the canonical lock: the room must read V's lock where the app carries it, not keep to its own pin
+  'pin-only': { file: 'corridor.js', witness: { S9: /not its own pin/u },
+    from: "    voiceLock: () => (typeof VOICE_LOCK !== 'undefined' ? VOICE_LOCK : null),", to: '    voiceLock: () => null,' },
+  // 影 end to end: his pitch line over hers, and shadowing still listening after End
+  'no-his-pitch': { file: 'speak.js', witness: { S23: /shadowing Kore's line/u },
+    from: '    if (hisLine) pic.append(hisLine);', to: '    void hisLine;' },
+  'residue-target': { file: 'speak.js', witness: { S23: /after End/u },
+    from: "    const targetKana = tokened ? readingOf(line) : tr.targetKana || '';", to: '    const targetKana = readingOf(line);' },
+  // the top bar's Save takes the whole token (Codex: the surface was dropped before R could derive identity)
+  'token-dropped': { file: 'corridor.js', witness: { S5: /whole token he touched/u },
+    from: '      speakKeepWord = word ? { word, surface: surface || word, reading } : null;', to: "      speakKeepWord = word ? { word, surface: word, reading: '' } : null;" },
+  'blob-kept': { file: 'speak.js', witness: { S12: /plays on, not only starts/u },
+    from: "  const keptUrl = (wav) => `data:audio/wav;base64,${core.bytesToBase64(wav)}`;", to: "  const keptUrl = (wav) => URL.createObjectURL(new Blob([wav], { type: 'audio/wav' }));" },
+  'ended-no-shadow': { file: 'speak.js', witness: { S23: /after End/u },
+    from: "    const open = () => !s.ended || mode === 'shadow';", to: '    const open = () => !s.ended;' },
   overlap: { file: 'speak.js', witness: { S22: /never overlap/u },
     from: '    if (st.turnBusy) return false;\n    const token = ++st.turnToken;', to: '    const token = ++st.turnToken;' },
 };
@@ -104,7 +139,7 @@ if (process.argv.includes('--negatives')) {
     mkdirSync(evidence, { recursive: true });
     const child = spawn(process.execPath, [fileURLToPath(import.meta.url)], {
       env: { ...process.env, SPEAK_FAULT: name, SPEAK_CASES: cases.join(','), KAIRO_BROWSER: process.env.KAIRO_BROWSER || 'webkit',
-        KAIRO_EVIDENCE_DIR: evidence, SPEAK_SHOTS_DIR: '' },
+        KAIRO_EVIDENCE_DIR: evidence, SPEAK_SHOTS_DIR: '', SPEAK_BREAK_SETUP: process.env.SPEAK_NEGATIVES_BREAK_SETUP === '1' ? '1' : '' },
       stdio: 'ignore',
     });
     const timer = setTimeout(() => child.kill('SIGKILL'), 900_000);
@@ -158,7 +193,7 @@ const SITE_LOCK = (() => {
 const SILENT_WAV = `data:audio/wav;base64,${core.bytesToBase64(core.wavFromInt16(new Int16Array(24000), 24000))}`;
 
 const results = [];
-const engines = {};
+const engines = { offOrigin: [], served: {} };
 const pageErrors = [];
 let current = '';
 function check(name, pass, detail = '') {
@@ -198,6 +233,9 @@ const BRIDGE = `
     ownedNow: () => { const s = speakRoom?.snapshot(); return s && s.phase === 'speaking' && !s.audioPaused ? !!recAudioEl : null; },
     otherSound: (uri) => { void playRecClip(uri, null); },
     keepWord: () => document.getElementById('speak-keep')?.dataset.saveWord || '',
+    keepToken: () => (speakKeepWord ? { ...speakKeepWord } : null),
+    soundState: () => (recAudioEl ? { src: String(recAudioEl.currentSrc || '').slice(0, 24), t: recAudioEl.currentTime, d: recAudioEl.duration, paused: recAudioEl.paused,
+      ended: recAudioEl.ended, error: recAudioEl.error?.code || null, ready: recAudioEl.readyState } : null),
     hold: (on) => { if (on && !holdGate) holdGate = new Promise((done) => { releaseHold = done; }); if (!on && holdGate) { holdGate = null; releaseHold(); } },
     refuseNotes: (on) => { refuseNotes = !!on; },
     gateAgree: async (fixture) => {
@@ -232,13 +270,19 @@ function seedRecord() {
   };
 }
 
-async function newRoom(browser, { key = true, cap = 10, usd = 0, reducedMotion = 'no-preference', deny = false, video = null, theme = null } = {}) {
+async function newRoom(browser, { key = true, cap = 10, usd = 0, reducedMotion = 'no-preference', deny = false, video = null, theme = null, mirror = null } = {}) {
+  // the runner's own control (SPEAK_NEGATIVES_BREAK_SETUP=1): a case whose setup fails must count as not run, never a kill
+  if (process.env.SPEAK_BREAK_SETUP === '1') throw new Error('the room could not be set up (the runner\'s control)');
   const context = await browser.newContext({ ...PHONE, reducedMotion, ...(video ? { recordVideo: { dir: video, size: { width: 390, height: 844 } } } : {}) });
   const f = { context, page: null, console: [], requests: [], errors: [] };
   await silenceBrowserAudio(context);
   const base = engines.origin;
   // the site: corridor.js carries the test's hands; a fault serves its one-line mutant; nothing leaves 127.0.0.1
-  await context.route((url) => url.origin !== base && url.origin !== engines.mock.origin, (route) => route.abort());
+  await context.route((url) => url.origin !== base && url.origin !== engines.mock.origin, (route) => {
+    const request = route.request();
+    engines.offOrigin.push({ case: current, method: request.method(), url: request.url().slice(0, 300), body: (request.postData() || '').slice(0, 4000) });
+    return route.abort();
+  });
   await context.route((url) => url.origin === base && /\/(corridor\.js|speak\.js|speak-core\.mjs|rooms\/speak\.css)$/u.test(url.pathname), async (route) => {
     const path = new URL(route.request().url()).pathname.replace(/^\//u, '');
     const name = path.split('/').pop();
@@ -248,6 +292,13 @@ async function newRoom(browser, { key = true, cap = 10, usd = 0, reducedMotion =
       assert.equal(body.split(FAULT.from).length, 2, `fault anchor must occur once in ${name}`);
       body = body.replace(FAULT.from, FAULT.to);
     }
+    // V's lock as the app carries it: its generated mirror in corridor.js (replaced where the merge brought it, else added)
+    if (name === 'corridor.js' && mirror) {
+      const block = `/* === VOICE_LOCK · generated from audio/voice-lock.json by tools/sync-voice-lock.mjs — do not hand-edit === */\nconst VOICE_LOCK = ${JSON.stringify(mirror, null, 2)};\n/* === end VOICE_LOCK === */\n`;
+      const at = /\/\* === VOICE_LOCK[^\n]*\n[\s\S]*?\/\* === end VOICE_LOCK === \*\/\n?/u;
+      body = at.test(body) ? body.replace(at, block) : `${body}\n${block}`;
+    }
+    (engines.served[name] ||= new Set()).add(createHash('sha256').update(body).digest('hex'));
     if (name === 'corridor.js') body += BRIDGE;
     await route.fulfill({ status: 200, body, contentType: name.endsWith('.css') ? 'text/css; charset=utf-8' : 'text/javascript; charset=utf-8' });
   });
@@ -260,8 +311,18 @@ async function newRoom(browser, { key = true, cap = 10, usd = 0, reducedMotion =
       Object.defineProperty(speechProto, 'speak', { configurable: true, writable: true, value(...args) { spy.speech += 1; return real.apply(this, args); } });
     }
     const media = HTMLMediaElement.prototype;
+    // how far any sound actually played: each element that plays reports its own time (the room's <audio> need not be in
+    // the document, where a document listener would never hear it)
+    const timed = new WeakSet();
     const realPlay = media.play;
     media.play = function play(...args) {
+      if (!timed.has(this)) {
+        timed.add(this);
+        this.addEventListener('timeupdate', () => { spy.advanced = Math.max(spy.advanced || 0, this.currentTime || 0); });
+        // a clip that played through: its whole length counts (an element ends only after playing, never on an error)
+        this.addEventListener('ended', () => { spy.ends = (spy.ends || 0) + 1; spy.advanced = Math.max(spy.advanced || 0, this.currentTime || 0, Number.isFinite(this.duration) ? this.duration : 0); });
+        this.addEventListener('error', () => { spy.mediaErrors = [...(spy.mediaErrors || []), this.error?.code || 0]; });
+      }
       spy.plays.push({ at: performance.now(), src: String(this.currentSrc || this.src || '').slice(0, 24), rate: this.playbackRate });
       return realPlay.apply(this, args);
     };
@@ -723,6 +784,17 @@ const CASES = {
       const afterMine = await T(page).record();
       check('a word in his own line opens the slip and counts nothing', afterMine.obslog.length === beforeMine.obslog.length);
       check('the top bar\'s Save names the last word touched, in any line', (await page.evaluate(() => window.__SPEAK_TEST__.keepWord())) === mine, mine);
+      // an inflected word (入 of 入れた, base 入れる): the top bar's Save is handed the whole token he touched — surface, base
+      // and reading — so the reading's owner can derive its identity (Codex at acb125d2: the surface was dropped)
+      await page.keyboard.press('Escape');
+      await page.evaluate(() => document.getElementById('mini')?.remove());
+      const inflected = page.locator('.speak-line[data-who="kore"] .speak-text [data-speak-s="入"][data-speak-b="入れる"]').last();
+      const door = await inflected.evaluate((node) => ({ s: node.dataset.speakS, b: node.dataset.speakB, r: node.dataset.speakR }));
+      await inflected.click();
+      await page.waitForTimeout(400);
+      const handed = await page.evaluate(() => window.__SPEAK_TEST__.keepToken());
+      check('the top bar\'s Save is handed the whole token he touched: surface, base and reading', !!handed && handed.word === door.b && handed.surface === door.s && handed.reading === door.r && door.s !== door.b,
+        JSON.stringify({ door, handed }));
     } finally { await f.context.close(); }
   },
 
@@ -835,6 +907,23 @@ const CASES = {
       const spy = await T(page).spy();
       check('the device voice is never asked', spy.speech === 0, `speech ${spy.speech}`);
     } finally { await f.context.close(); }
+    // V's lock, where the app carries it (corridor.js's generated mirror), is the room's lock and the pin only its fallback.
+    // The control: a mirror naming another model is followed — so the room reads the lock, never its own pin.
+    const other = SITE_LOCK.approvedReference?.model && SITE_LOCK.approvedReference.model !== SITE_LOCK.model ? SITE_LOCK.approvedReference.model : 'gemini-3.1-flash-tts-preview';
+    const mirror = { model: other, voices: { [SITE_LOCK.mainVoice.id]: SITE_LOCK.mainVoice.prebuilt, [SITE_LOCK.secondaryVoice.id]: SITE_LOCK.secondaryVoice.prebuilt },
+      main: SITE_LOCK.mainVoice.id, second: SITE_LOCK.secondaryVoice.id,
+      roles: { narrator: SITE_LOCK.mainVoice.id, word: SITE_LOCK.mainVoice.id, example: SITE_LOCK.mainVoice.id, 'speaker-b': SITE_LOCK.secondaryVoice.id } };
+    const m = await newRoom(browser, { mirror });
+    try {
+      const n = engines.mock.requests.length;
+      await enter(m.page);
+      await opened(m.page);
+      await talk(m.page, '003', 1000);
+      await settled(m.page);
+      const voices = mockSince(n).filter((r) => r.kind === 'voice');
+      check('with V\'s lock in the app, the room voices in the lock\'s model, not its own pin', voices.length >= 2 && voices.every((r) => r.model === other && r.voiceName === SITE_LOCK.mainVoice.prebuilt),
+        [...new Set(voices.map((r) => `${r.model}/${r.voiceName}`))].join(','));
+    } finally { await m.context.close(); }
     // the two-person scene: Charon only as the second character
     const g = await newRoom(browser);
     try {
@@ -979,9 +1068,28 @@ const CASES = {
       await page.locator('[data-foot="shadow"]').click();
       await waitPage(page, () => document.querySelectorAll('.speak-saved .speak-row').length >= 1, null, 8000, 'S12 saved lines listed');
       const plays = (await T(page).spy()).plays.length;
+      await page.evaluate(() => { const spy = window.__SPEAK_SPY__; spy.advanced = 0; spy.ends = 0; spy.mediaErrors = []; });
       await page.locator('.speak-saved .speak-row button', { hasText: /Listen|聞く/u }).first().click();
-      await page.waitForTimeout(600);
-      check('saved lines open and play offline', (await T(page).spy()).plays.length > plays && mockSince(n).length === 0);
+      await waitPage(page, () => (window.__SPEAK_SPY__.advanced || 0) > 0.2, null, 8000, 'S12 the saved line plays').catch(() => {});
+      const sound = await page.evaluate(() => ({ advanced: window.__SPEAK_SPY__.advanced || 0, ends: window.__SPEAK_SPY__.ends || 0, errors: window.__SPEAK_SPY__.mediaErrors || [],
+        now: window.__SPEAK_TEST__.soundState() }));
+      check('saved lines open and play offline: her kept voice plays on, not only starts', (await T(page).spy()).plays.length > plays && sound.advanced > 0.2 && !sound.errors.length && mockSince(n).length === 0,
+        `played to ${sound.advanced.toFixed(2)} s · ended ${sound.ends} · media errors ${JSON.stringify(sound.errors)} · now ${JSON.stringify(sound.now)} · requests ${mockSince(n).length}`);
+      // the kept line outlives the page: after a reload (online: this harness serves no offline app shell) it is still kept
+      await context.setOffline(false);
+      await page.reload();
+      await page.waitForFunction(() => window.__SPEAK_TEST__?.ready(), null, { timeout: 30000 });
+      await enter(page);
+      await opened(page);
+      await page.locator('[data-foot="shadow"]').click();
+      await until(page, "s.layer === 'shadow'", 5000);
+      const reloaded = await waitPage(page, () => document.querySelectorAll('.speak-saved .speak-row').length === 1, null, 8000, 'S12 the kept line after a reload').then(() => true, () => false);
+      check('a kept line outlives the page: after a reload it is still in the saved lines', reloaded);
+      await page.evaluate(() => { const spy = window.__SPEAK_SPY__; spy.advanced = 0; spy.ends = 0; spy.mediaErrors = []; });
+      await page.locator('.speak-saved .speak-row button', { hasText: /Listen|聞く/u }).first().click();
+      await waitPage(page, () => (window.__SPEAK_SPY__.advanced || 0) > 0.2, null, 8000, 'S12 the saved line plays after the reload').catch(() => {});
+      const again = await page.evaluate(() => ({ advanced: window.__SPEAK_SPY__.advanced || 0, ends: window.__SPEAK_SPY__.ends || 0, errors: window.__SPEAK_SPY__.mediaErrors || [], now: window.__SPEAK_TEST__.soundState() }));
+      check('and after the reload it plays on', again.advanced > 0.2 && !again.errors.length, JSON.stringify(again));
       // Remove, in the Save's menu, is the one way a kept line is un-kept
       await page.locator('.speak-saved .speak-row button', { hasText: /^(Shadow|影)$/u }).first().click();
       await waitPage(page, (sel) => document.querySelector(sel)?.getAttribute('aria-pressed') === 'true', lineSave, 8000, 'S12 the kept line shows Saved');
@@ -1287,9 +1395,12 @@ const CASES = {
       check('hidden while the microphone was pending: no take starts, and the stream that came back is stopped',
         !snap.take && snap.phase === 'rest' && spy.tracks.length >= 1 && spy.tracks.every((x) => x === 'ended'), JSON.stringify({ take: snap.take, phase: snap.phase, tracks: spy.tracks }));
       await hide(page, false);
+      // whatever the first half left (a live take, if the fix is gone) is ended before the second half's tap
+      if ((await T(page).snap()).take) { await ring(page).click(); await page.waitForTimeout(600); await settled(page).catch(() => {}); }
+      await until(page, "s.phase === 'rest'", 15000).catch(() => {});
       await ring(page).click();
-      await until(page, "s.phase === 'listening' && s.take", 15000);
-      check('in view again, the next tap listens as before', true);
+      const listens = await until(page, "s.phase === 'listening' && s.take", 15000).then(() => true, () => false);
+      check('in view again, the next tap listens as before', listens);
     } finally { await f.context.close(); }
   },
 
@@ -1372,10 +1483,13 @@ const CASES = {
       check('a note the record did not take is shown as not kept, with a way to try again; none is called remembered',
         failed.pending === 2 && failed.kept === 0 && failed.retry && rows.length === 0 && (await T(page).snap()).session.notes.length === 0, JSON.stringify({ ...failed, rows: rows.length }));
       await page.evaluate(() => window.__SPEAK_TEST__.refuseNotes(false));
-      await page.locator('.speak-notes-retry').click();
-      await waitPage(page, () => document.querySelectorAll('.speak-note-row:not(.is-pending) button').length === 2, null, 8000, 'S20 the notes kept on the retry');
+      let retried = false;
+      if (await page.locator('.speak-notes-retry').count()) {
+        await page.locator('.speak-notes-retry').click();
+        retried = await waitPage(page, () => document.querySelectorAll('.speak-note-row:not(.is-pending) button').length === 2, null, 8000, 'S20 the notes kept on the retry').then(() => true, () => false);
+      }
       const after = await page.evaluate(() => window.__SPEAK_TEST__.archive('speak-notes'));
-      check('trying again keeps them, once each', after.length === 2 && new Set(after.map((r) => JSON.parse(r.content).id)).size === 2);
+      check('trying again keeps them, once each', retried && after.length === 2 && new Set(after.map((r) => JSON.parse(r.content).id)).size === 2, `retried ${retried} · rows ${after.length}`);
     } finally { await f.context.close(); }
   },
 
@@ -1425,6 +1539,61 @@ const CASES = {
       const second = mockSince(n).filter((r) => r.kind === 'brain')[1];
       check('the kept line goes once the answer is in, after it, never beside it', !!second && second.at - first.at >= 1500, `gap ${second ? second.at - first.at : '—'} ms`);
     } finally { engines.mock.set({ brainDelayMs: 0 }); await f.context.close(); }
+  },
+
+  // ---- 影 end to end (DESIGN §1, Codex's coverage note): Kore's line during the talk, a corrected line from the look back
+  // after End, and a saved line from the saved list each give the three honest things — the kana heard with what was
+  // missing, his pitch line over hers, both times — and never a score
+  async S23(browser) {
+    const f = await newRoom(browser);
+    const { page } = f;
+    const shadowOnce = async (label) => {
+      await until(page, "s.layer === 'shadow' && s.phase === 'rest' && s.mode === 'shadow'", 10000);
+      await ring(page).click();
+      await until(page, "s.phase === 'listening' && s.take", 25000);
+      await page.waitForTimeout(1800);
+      await ring(page).click();
+      // a result never drawn is a red check below, not a broken case: the case goes on to its end
+      try { await waitPage(page, () => !!document.querySelector('.speak-shadow-result .speak-pitch'), null, 15000, `S23 ${label}: the result drawn`); } catch {
+        return { drawn: false, kana: '', missing: 0, extra: 0, hers: 0, his: 0, times: '', seconds: 0, score: false };
+      }
+      return page.evaluate(() => {
+        const r = document.querySelector('.speak-shadow-result');
+        const points = (sel) => (r.querySelector(sel)?.getAttribute('d') || '').split(/[ML]/u).filter((x) => x.trim()).length;
+        const times = r.querySelector('.speak-times')?.textContent || '';
+        return { kana: (r.querySelector('.speak-kana')?.textContent || '').trim(), missing: r.querySelectorAll('.speak-kana .kana-missing').length,
+          extra: r.querySelectorAll('.speak-kana .kana-extra').length,
+          hers: points('path.pitch-hers'), his: points('path.pitch-his'), times, seconds: (times.match(/\d+\.\d\s*s/gu) || []).length,
+          score: /%|score|点数|正解|✓|✗/iu.test(r.textContent || '') };
+      });
+    };
+    const honest = (x) => x.kana.length > 0 && x.missing === 1 && x.extra === 0 && x.hers >= 5 && x.his >= 5 && x.seconds === 2 && !x.score;
+    try {
+      await enter(page);
+      await opened(page);
+      await talk(page, '003', 1100);
+      await settled(page);
+      if ((await T(page).snap()).take) { await ring(page).click(); await page.waitForTimeout(600); await settled(page); }
+      await page.locator('[data-foot="shadow"]').click();
+      const a = await shadowOnce('Kore\'s line');
+      check('shadowing Kore\'s line: the kana heard with what was missing, both pitch lines, both times — and no score', honest(a), JSON.stringify(a));
+      await page.evaluate(() => window.__SPEAK_TEST__.back());
+      await until(page, '!s.layer', 5000);
+      await page.locator('[data-foot="end"]').click();
+      await until(page, "s.layer === 'lookback'", 10000);
+      await page.locator('.speak-page-lookback .speak-acts button', { hasText: /^(Shadow|影)$/u }).first().click();
+      const b = await shadowOnce('a corrected line');
+      // its kanji's sounds are in the reading it is checked against (ないかく for 内閣), not only its kana
+      check('a corrected line, shadowed from the look back after End: the same three things, against its whole reading', honest(b) && b.kana.includes('ないかく'), JSON.stringify(b));
+      const lineSave = '.speak-shadow .speak-keep-line button.save-one[data-save-one]';
+      await page.waitForSelector(lineSave, { timeout: 8000 });
+      await page.locator(lineSave).click();
+      await waitPage(page, (sel) => document.querySelector(sel)?.getAttribute('aria-pressed') === 'true', lineSave, 15000, 'S23 keep the corrected line');
+      await page.keyboard.press('Escape');
+      await page.locator('.speak-saved .speak-row button', { hasText: /^(Shadow|影)$/u }).first().click();
+      const c = await shadowOnce('a saved line');
+      check('a saved line, shadowed from the saved list: the same three things, her line from the kept audio', honest(c), JSON.stringify(c));
+    } finally { await f.context.close(); }
   },
 };
 
@@ -1554,6 +1723,8 @@ try {
   engines.mock = await startMockPartner({ corridorDir: SITE });
   engines.ffmpeg = [process.env.FFMPEG, '/opt/homebrew/bin/ffmpeg', '/usr/local/bin/ffmpeg'].find((p) => p && existsSync(p)) || null;
   receipt.mock = engines.mock.endpoint;
+  // the instruments themselves, by digest, so a receipt names the verifier and the mock that judged it
+  receipt.instruments = Object.fromEntries(['verify-speak.mjs', 'speak-mock-partner.mjs'].map((f) => [f, createHash('sha256').update(readFileSync(join(HERE, f))).digest('hex')]));
   try { receipt.artifact = JSON.parse(readFileSync(join(SITE, 'build-identity.json'), 'utf8')).artifactSha256 || null; } catch { receipt.artifact = null; }
   const names = WHICH === 'all' ? ['webkit', 'chromium'] : [WHICH];
   for (const name of names) {
@@ -1579,6 +1750,15 @@ try {
         const rows = results.slice(before);
         receipt.cases.push({ engine: name, case: id, pass: rows.length > 0 && rows.every((r) => r.pass), checks: rows.length, ms: Date.now() - started });
       }
+      if (!ONLY) {
+        // across every case: nothing left for any origin but the site and his configured provider (the harness blocks such a
+        // request; this says whether the app ever tried, with what)
+        current = `${name} egress`;
+        const tried = engines.offOrigin.filter((x) => x.case.startsWith(`${name} `));
+        check('across every case, the app tried no request to any origin but the site and his configured provider', tried.length === 0,
+          `${tried.length} tried${tried.length ? `: ${tried.slice(0, 4).map((x) => `${x.case} ${x.method} ${x.url}${x.body ? ` (${x.body.length} bytes)` : ''}`).join(' | ')}` : ''}`);
+        receipt.cases.push({ engine: name, case: 'egress', pass: tried.length === 0, checks: 1, ms: 0 });
+      }
       if (SHOTS && name === 'webkit' && !FAULT) { current = `${name} shots`; await shots(browser); }
     } finally { await browser.close(); }
   }
@@ -1587,6 +1767,7 @@ try {
   console.error(error);
 } finally {
   if (pageErrors.length) receipt.cases.push({ engine: 'all', case: 'late page errors', pass: false, checks: pageErrors.length });
+  receipt.served = Object.fromEntries(Object.entries(engines.served).map(([name, digests]) => [name, [...digests]]));
   receipt.pass = !receipt.error && receipt.cases.length > 0 && receipt.cases.every((c) => c.pass);
   writeFileSync(join(EVIDENCE, 'verify-speak.json'), `${JSON.stringify(receipt, null, 2)}\n`);
   await engines.mock?.close().catch(() => {});
