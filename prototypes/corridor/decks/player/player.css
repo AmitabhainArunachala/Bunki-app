@@ -66,24 +66,24 @@
 .kp button:focus-visible, .kp input:focus-visible, .kp textarea:focus-visible { outline: 2px solid var(--kp-cyan); outline-offset: 2px; }
 
 .kp-top { display: flex; align-items: center; gap: 12px; min-height: 44px; }
-.kp-icon { width: 44px; height: 44px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel); font-size: 18px; flex: none; position: relative; }
+.kp-icon { width: 44px; height: 44px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel); font-size: var(--type-lead); flex: none; position: relative; }
 /* Keep the rounded mark while its transparent square owns the whole tap floor. */
 .kp-icon::before { content: ''; position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; transform: translate(-50%, -50%); }
-.kp-title { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.02em; }
-.kp-sub { margin: 0; color: var(--kp-ink-2); font-size: 14px; line-height: 1.6; }
-.kp-h2 { margin: 8px 0 0; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; color: var(--kp-mute); }
+.kp-title { margin: 0; font-size: var(--type-reading); font-weight: 700; letter-spacing: 0.02em; }
+.kp-sub { margin: 0; color: var(--kp-ink-2); font-size: var(--type-chrome); line-height: 1.6; }
+.kp-h2 { margin: 8px 0 0; font-size: var(--type-label); font-weight: 700; letter-spacing: 0.12em; color: var(--kp-mute); }
 
 .kp-tiles { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; row-gap: 4px; padding: 10px 0; border-block: 1px solid var(--kp-line); font-family: var(--kp-num); font-variant-numeric: tabular-nums; }
 /* the deck's state: one quiet mono line, "0 due · 15 new · 0 known · 0 difficult", no coloured tiles */
 .kp-tile { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; }
 .kp-tile + .kp-tile::before { content: '·'; margin: 0 10px; color: var(--kp-mute); }
-.kp-tile b { font-size: 15px; font-weight: 600; color: var(--kp-ink); }
-.kp-tile span { font-size: 12.5px; letter-spacing: 0.04em; color: var(--kp-mute); }
+.kp-tile b { font-size: var(--type-control); font-weight: 600; color: var(--kp-ink); }
+.kp-tile span { font-size: var(--type-label); letter-spacing: 0.04em; color: var(--kp-mute); }
 .kp-c-known b, .kp-verdict.kp-c-known { color: var(--kp-green); }
 .kp-c-hard b, .kp-verdict.kp-c-hard { color: var(--kp-red); }
 .kp-tiles .kp-tile b { color: var(--kp-ink); }
 
-.kp-start { width: 100%; min-height: 56px; border: 0; border-radius: var(--radius-control, 6px); background: var(--kp-cyan); color: #00131d; font-size: 18px; font-weight: 700; letter-spacing: 0.04em; }
+.kp-start { width: 100%; min-height: 56px; border: 0; border-radius: var(--radius-control, 6px); background: var(--kp-cyan); color: #00131d; font-size: var(--type-lead); font-weight: 700; letter-spacing: 0.04em; }
 .kp-start:disabled { background: var(--kp-panel-2); color: var(--kp-mute); cursor: default; }
 
 .kp-groups { display: grid; gap: 6px; }
@@ -91,9 +91,9 @@
 .kp-group input { width: 20px; height: 20px; accent-color: var(--kp-cyan); margin: 0; }
 .kp-group.is-off { opacity: 0.45; }
 .kp-gname { min-width: 0; display: grid; }
-.kp-gname b { font-size: 16px; }
-.kp-gname small { color: var(--kp-mute); font-size: 12px; }
-.kp-gcount { font-family: var(--kp-num); font-size: 13px; color: var(--kp-ink-2); }
+.kp-gname b { font-size: var(--type-body); }
+.kp-gname small { color: var(--kp-mute); font-size: var(--type-caption); }
+.kp-gcount { font-family: var(--kp-num); font-size: var(--type-label); color: var(--kp-ink-2); }
 .kp-bar { grid-column: 1 / -1; display: flex; height: 6px; border-radius: var(--radius-seal, 3px); overflow: hidden; background: var(--kp-panel-2); }
 .kp-bar i { display: block; height: 100%; }
 .kp-bar .kp-c-known { background: var(--kp-green); }
@@ -101,7 +101,7 @@
 .kp-bar .kp-c-learn { background: var(--kp-amber); }
 
 .kp-foot { display: flex; gap: 20px; justify-content: center; }
-.kp-link { min-height: 44px; background: none; border: 0; color: var(--kp-ink-2); font-size: 14px; text-decoration: underline; text-underline-offset: 4px; padding: 8px; }
+.kp-link { min-height: 44px; background: none; border: 0; color: var(--kp-ink-2); font-size: var(--type-chrome); text-decoration: underline; text-underline-offset: 4px; padding: 8px; }
 
 /* study */
 .kp-top-study { gap: 10px; }
@@ -112,7 +112,7 @@
 .kp-progress { flex: 1; height: 6px; border-radius: var(--radius-seal, 3px); background: var(--kp-panel-2); overflow: hidden; }
 /* the rail ticks per card on the compositor: scaleX, never width */
 .kp-progress i { display: block; height: 100%; width: 100%; background: var(--kp-cyan); transform-origin: left center; transform: scaleX(var(--kp-frac, 0)); transition: transform var(--motion-ma, 120ms) var(--ease-enter, ease-out); }
-.kp-count { font-family: var(--kp-num); font-size: 13px; color: var(--kp-ink-2); font-variant-numeric: tabular-nums; }
+.kp-count { font-family: var(--kp-num); font-size: var(--type-label); color: var(--kp-ink-2); font-variant-numeric: tabular-nums; }
 
 .kp-card { --kp-kind: var(--kp-kind-go); background: var(--kp-panel); border: 1px solid var(--kp-line); border-left: 4px solid var(--kp-kind); border-radius: var(--radius-card, 4px); padding: 18px 18px 20px; display: grid; gap: 14px; touch-action: pan-y; user-select: none; transition: transform 0.12s; min-height: 220px; }
 /* item kind: the left edge and the kind chip, nothing else */
@@ -121,7 +121,7 @@
 .kp-card[data-swipe='good'] { box-shadow: 0 0 0 2px var(--kp-green); }
 .kp-card[data-swipe='again'] { box-shadow: 0 0 0 2px var(--kp-red); }
 .kp-chips { display: flex; gap: 6px; flex-wrap: wrap; }
-.kp-chip { font-size: 12px; padding: 2px 8px; border-radius: var(--radius-seal, 3px); border: 1px solid var(--kp-line); color: var(--kp-ink-2); white-space: nowrap; }
+.kp-chip { font-size: var(--type-caption); padding: 2px 8px; border-radius: var(--radius-seal, 3px); border: 1px solid var(--kp-line); color: var(--kp-ink-2); white-space: nowrap; }
 .kp-kindchip { color: var(--kp-kind); border-color: currentColor; font-weight: 700; }
 /* level: a monochrome text chip, only when the word has one (aesthetics.md §3) */
 .kp-levelchip { color: var(--kp-ink-2); background: var(--kp-panel-2); font-family: var(--kp-num); letter-spacing: 0.04em; }
@@ -131,81 +131,81 @@
 .kp-st-known { color: var(--kp-green); border-color: currentColor; }
 .kp-st-hard { color: var(--kp-red); border-color: currentColor; }
 
-.kp-sentence { margin: 0; font-size: clamp(22px, 6.2vw, 30px); line-height: 2.05; font-weight: 500; letter-spacing: 0.02em; color: var(--kp-ink); overflow-wrap: anywhere; }
+.kp-sentence { margin: 0; font-size: var(--type-reading); line-height: 2.05; font-weight: 500; letter-spacing: 0.02em; color: var(--kp-ink); overflow-wrap: anywhere; }
 .kp-sentence rt { font-size: 0.45em; color: var(--kp-ink-2); font-weight: 400; letter-spacing: 0; }
 .kp-blank { display: inline-block; min-width: 2.4em; border-bottom: 3px solid var(--kp-cyan); background: var(--kp-cyan-wash); border-radius: var(--radius-control, 6px) var(--radius-control, 6px) 0 0; margin: 0 2px; line-height: 1.3; }
 .kp-target { color: var(--kp-cyan); font-weight: 700; text-decoration: underline 2px; text-underline-offset: 0.28em; }
 .kp-target rt { color: inherit; }
-.kp-taphint { margin: 0; font-size: 12px; color: var(--kp-mute); letter-spacing: 0.08em; }
+.kp-taphint { margin: 0; font-size: var(--type-caption); color: var(--kp-mute); letter-spacing: 0.08em; }
 
 .kp-answer { display: grid; gap: 6px; border-top: 1px solid var(--kp-line); padding-top: 14px; }
 .kp-word { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-.kp-term { font-size: 30px; font-weight: 700; color: var(--kp-cyan); line-height: 1.2; }
-.kp-reading { font-size: 18px; color: var(--kp-ink-2); }
-.kp-def { margin: 0; font-size: 17px; line-height: 1.6; }
-.kp-note { margin: 0; font-size: 15px; line-height: 1.6; color: var(--kp-ink-2); }
-.kp-pitch { font-family: var(--kp-num); font-size: 13px; color: var(--kp-ink-2); border: 1px solid var(--kp-line); border-radius: var(--radius-seal, 3px); padding: 0 5px; }
-.kp-en { margin: 0; font-size: 14px; color: var(--kp-ink-2); line-height: 1.5; }
-.kp-tip { margin: 4px 0 0; font-size: 13px; color: var(--kp-ink-2); line-height: 1.5; }
+.kp-term { font-size: var(--type-title); font-weight: 700; color: var(--kp-cyan); line-height: 1.2; }
+.kp-reading { font-size: var(--type-lead); color: var(--kp-ink-2); }
+.kp-def { margin: 0; font-size: var(--type-lead); line-height: 1.6; }
+.kp-note { margin: 0; font-size: var(--type-control); line-height: 1.6; color: var(--kp-ink-2); }
+.kp-pitch { font-family: var(--kp-num); font-size: var(--type-label); color: var(--kp-ink-2); border: 1px solid var(--kp-line); border-radius: var(--radius-seal, 3px); padding: 0 5px; }
+.kp-en { margin: 0; font-size: var(--type-chrome); color: var(--kp-ink-2); line-height: 1.5; }
+.kp-tip { margin: 4px 0 0; font-size: var(--type-label); color: var(--kp-ink-2); line-height: 1.5; }
 .kp-tip-label { color: var(--kp-mute); }
-.kp-en-none { font-size: 13px; color: var(--kp-mute); }
-.kp-src { margin: 0; display: grid; gap: 2px; font-size: 12px; color: var(--kp-ink-2); letter-spacing: .02em; line-height: 1.6; }
+.kp-en-none { font-size: var(--type-label); color: var(--kp-mute); }
+.kp-src { margin: 0; display: grid; gap: 2px; font-size: var(--type-caption); color: var(--kp-ink-2); letter-spacing: .02em; line-height: 1.6; }
 .kp-src-label { color: var(--kp-mute); }
 
 /* the back's second tier: one tap each, the same order on every card */
 .kp-folds { display: grid; margin-top: 6px; border-top: 1px solid var(--kp-line); }
 .kp-fold { border-bottom: 1px solid var(--kp-line); }
-.kp-fold > summary { list-style: none; cursor: pointer; min-height: 40px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--kp-ink-2); letter-spacing: .04em; }
+.kp-fold > summary { list-style: none; cursor: pointer; min-height: 40px; display: flex; align-items: center; gap: 8px; font-size: var(--type-label); color: var(--kp-ink-2); letter-spacing: .04em; }
 .kp-fold > summary::-webkit-details-marker { display: none; }
-.kp-fold > summary::before { content: '▶'; color: var(--kp-mute); font-size: 11px; width: 1em; }
+.kp-fold > summary::before { content: '▶'; color: var(--kp-mute); font-size: var(--type-caption); width: 1em; }
 .kp-fold[open] > summary::before { content: '▼'; }
 .kp-fold > :not(summary) { margin-bottom: 10px; }
-.kp-gloss { margin: 0; font-size: 15px; line-height: 1.5; color: var(--kp-ink-2); font-weight: 400; }
-.kp-sem, .kp-others { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; color: var(--kp-ink-2); }
+.kp-gloss { margin: 0; font-size: var(--type-control); line-height: 1.5; color: var(--kp-ink-2); font-weight: 400; }
+.kp-sem, .kp-others { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: var(--type-chrome); color: var(--kp-ink-2); }
 .kp-sem b { color: var(--kp-ink); font-weight: 600; margin-right: 8px; }
-.kp-sem-rel { font-size: 12px; color: var(--kp-mute); margin-right: 8px; }
-.kp-sem small { display: block; font-size: 12px; color: var(--kp-mute); }
+.kp-sem-rel { font-size: var(--type-caption); color: var(--kp-mute); margin-right: 8px; }
+.kp-sem small { display: block; font-size: var(--type-caption); color: var(--kp-mute); }
 
 /* the kanji family inside 漢字の形と意味: the learner's own words sharing a kanji (同) or a
  * reading (読), each a link to 語の一覧; text marks, no hue */
 /* rows 44px apart, so each link's 44px reach never overlaps the next row's */
 .kp-kfam { margin: 6px 0 12px; padding: 0; list-style: none; display: grid; gap: 14px; }
 .kp-kfam li { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 6px; }
-.kp-kfam-c { font-size: 20px; font-weight: 600; min-width: 3.2em; display: inline-flex; align-items: baseline; gap: 4px; }
-.kp-kfam-c small { font-size: 12px; font-weight: 400; color: var(--kp-mute); }
-.kp-fam, .kp-see-link { position: relative; display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 0 10px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); font-size: 15px; color: var(--kp-ink); }
+.kp-kfam-c { font-size: var(--type-lead); font-weight: 600; min-width: 3.2em; display: inline-flex; align-items: baseline; gap: 4px; }
+.kp-kfam-c small { font-size: var(--type-caption); font-weight: 400; color: var(--kp-mute); }
+.kp-fam, .kp-see-link { position: relative; display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 0 10px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); font-size: var(--type-control); color: var(--kp-ink); }
 /* 44px reach: from inside the 1px border, 28 + 16 */
 .kp-fam::after, .kp-see-link::after { content: ''; position: absolute; inset: -8px 0; }
-.kp-fam-mark { font-size: 11px; color: var(--kp-ink-2); border: 1px solid currentColor; border-radius: var(--radius-card, 4px); padding: 0 3px; line-height: 1.3; }
+.kp-fam-mark { font-size: var(--type-caption); color: var(--kp-ink-2); border: 1px solid currentColor; border-radius: var(--radius-card, 4px); padding: 0 3px; line-height: 1.3; }
 .kp-fam[data-mark='読'] .kp-fam-mark { border-style: dashed; }
-.kp-fam-more { font-size: 12px; color: var(--kp-mute); }
-.kp-see { margin: 0; padding: 8px 0; border-bottom: 1px solid var(--kp-line); display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; color: var(--kp-ink-2); }
+.kp-fam-more { font-size: var(--type-caption); color: var(--kp-mute); }
+.kp-see { margin: 0; padding: 8px 0; border-bottom: 1px solid var(--kp-line); display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: var(--type-label); color: var(--kp-ink-2); }
 .kp-see-label { color: var(--kp-mute); letter-spacing: .04em; margin-left: 2px; }
 .kp-see-label + .kp-see-label, .kp-see-link + .kp-see-label, .kp-see-item + .kp-see-label { margin-left: 10px; }
-.kp-see-item { font-size: 15px; color: var(--kp-ink); }
+.kp-see-item { font-size: var(--type-control); color: var(--kp-ink); }
 
 /* a leech (CARD_CONTRACT_V2 §4): the repair ladder after tier one, before the folds, in order; quiet
    (line and ink-2), the lapse count a state chip */
 .kp-ladder { border: 1px solid var(--kp-line); border-radius: var(--radius-card, 4px); padding: 10px 12px; margin-top: 4px; display: grid; gap: 8px; }
-.kp-ladder-head { margin: 0; font-size: 14px; color: var(--kp-ink-2); display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
+.kp-ladder-head { margin: 0; font-size: var(--type-chrome); color: var(--kp-ink-2); display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
 .kp-ladder-n { margin: 0 4px; font-family: var(--kp-num); font-variant-numeric: tabular-nums; }
 .kp-ladder-steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
 .kp-ladder-step { width: 100%; min-height: 48px; display: grid; justify-items: start; gap: 1px; padding: 6px 12px; text-align: left; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); }
-.kp-ladder-step b { font-size: 15px; }
-.kp-ladder-step small { font-size: 12px; color: var(--kp-ink-2); }
+.kp-ladder-step b { font-size: var(--type-control); }
+.kp-ladder-step small { font-size: var(--type-caption); color: var(--kp-ink-2); }
 .kp-ladder-step:disabled { cursor: default; opacity: 0.55; }
 .kp-ladder-keep { justify-self: start; padding: 6px 2px; min-height: 36px; }
 /* a repaired card's front hint: marked as a repair, this card only */
-.kp-rhint { margin: 0; display: flex; align-items: baseline; gap: 8px; font-size: 16px; color: var(--kp-ink-2); }
-.kp-rhint-label { font-size: 11px; color: var(--kp-mute); border: 1px dashed currentColor; border-radius: var(--radius-card, 4px); padding: 0 4px; }
+.kp-rhint { margin: 0; display: flex; align-items: baseline; gap: 8px; font-size: var(--type-body); color: var(--kp-ink-2); }
+.kp-rhint-label { font-size: var(--type-caption); color: var(--kp-mute); border: 1px dashed currentColor; border-radius: var(--radius-card, 4px); padding: 0 4px; }
 /* 削除: quiet, one tap, at the right end of the study top bar (44px, like ✕); undone from the toast */
-.kp-delete { flex: none; height: 44px; padding: 0 12px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-ink-2); font-size: 13px; }
+.kp-delete { flex: none; height: 44px; padding: 0 12px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-ink-2); font-size: var(--type-label); }
 .kp-toast.is-info { border-color: var(--kp-line); grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
 .kp-seg button:disabled { opacity: 0.5; cursor: default; }
 
 /* zoom: 全文 or 焦点 (the sentences around the target dimmed, never removed) */
 .kp-zoom { margin-left: auto; display: inline-flex; border: 1px solid var(--kp-line); border-radius: var(--radius-control, 6px); position: relative; z-index: 1; } /* its hit area stays above the passage, even while the readings fade in */
-.kp-zoom-btn { position: relative; border: 0; background: none; border-radius: var(--radius-control, 6px); font-size: 12px; padding: 2px 10px; min-height: 28px; color: var(--kp-ink-2); }
+.kp-zoom-btn { position: relative; border: 0; background: none; border-radius: var(--radius-control, 6px); font-size: var(--type-caption); padding: 2px 10px; min-height: 28px; color: var(--kp-ink-2); }
 /* 44px touch targets without a bigger look: the hit area reaches past the drawn button */
 .kp-zoom-btn::after, .kp-rule-x::after { content: ''; position: absolute; inset: -8px 0; }
 .kp-rule-x::after { inset: -7px; } /* from inside the 1px border: 30 + 14 */
@@ -225,25 +225,25 @@
 .kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'] .kp-more { display: inline-flex; }
 /* the ⋯ keeps its own gutter (44px pill + gap), open or folded, so it never sits on a glyph */
 .kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'] .kp-ctx-in { padding-right: 56px; }
-.kp-more { position: absolute; right: 0; z-index: 1; align-items: center; justify-content: center; min-width: 44px; height: 28px; padding: 0 10px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); color: var(--kp-ink-2); font-size: 16px; line-height: 1; }
+.kp-more { position: absolute; right: 0; z-index: 1; align-items: center; justify-content: center; min-width: 44px; height: 28px; padding: 0 10px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); color: var(--kp-ink-2); font-size: var(--type-body); line-height: 1; }
 .kp-ctx[data-side='before'] .kp-more { top: 0; }
 .kp-ctx[data-side='after'] .kp-more { bottom: 0; }
 .kp-more::after { content: ''; position: absolute; inset: -8px 0; } /* 44px reach */
 .kp-more[aria-expanded='true'] { color: var(--kp-cyan); border-color: currentColor; }
 .kp-src a { color: inherit; text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
 
-.kp-reveal, .kp-next { width: 100%; min-height: 56px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 17px; font-weight: 700; }
+.kp-reveal, .kp-next { width: 100%; min-height: 56px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: var(--type-lead); font-weight: 700; }
 .kp-grades { display: grid; grid-template-columns: 1fr 1.2fr; gap: 8px; position: sticky; bottom: 0; z-index: 2; padding-top: 8px; padding-bottom: env(safe-area-inset-bottom); background: var(--kp-bg); }
 .kp-grade { min-height: 64px; border-radius: var(--radius-seal, 3px); border: 1px solid var(--kp-line); background: var(--kp-panel); display: grid; place-content: center; gap: 2px; }
-.kp-grade b { font-size: 15px; }
-.kp-grade small { font-family: var(--kp-num); font-size: 12px; color: var(--kp-ink-2); }
+.kp-grade b { font-size: var(--type-control); }
+.kp-grade small { font-family: var(--kp-num); font-size: var(--type-caption); color: var(--kp-ink-2); }
 .kp-again { border-color: var(--kp-red); } .kp-again b { color: var(--kp-red); }
 .kp-good { border-color: var(--kp-green); background: color-mix(in srgb, var(--kp-green) 12%, var(--kp-panel)); } .kp-good b { color: var(--kp-green); }
-.kp-swipehint { grid-column: 1 / -1; margin: 2px 0 0; text-align: center; font-size: 11px; color: var(--kp-mute); letter-spacing: 0.1em; }
-.kp-rule { grid-column: 1 / -1; margin: 0; display: flex; align-items: center; justify-content: flex-start; gap: 6px; font-size: 13px; color: var(--kp-ink-2); text-align: left; }
+.kp-swipehint { grid-column: 1 / -1; margin: 2px 0 0; text-align: center; font-size: var(--type-caption); color: var(--kp-mute); letter-spacing: 0.1em; }
+.kp-rule { grid-column: 1 / -1; margin: 0; display: flex; align-items: center; justify-content: flex-start; gap: 6px; font-size: var(--type-label); color: var(--kp-ink-2); text-align: left; }
 .kp-rule > span { flex: 1; min-width: 0; }
 /* The report control occupies the lower-right corner; keep the rule dismissal on the left. */
-.kp-rule-x { position: relative; order: -1; width: 32px; height: 32px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: 14px; flex: none; }
+.kp-rule-x { position: relative; order: -1; width: 32px; height: 32px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: var(--type-chrome); flex: none; }
 /* the one press (editorial.css owns it in the corridor): the frozen study pages stand alone, so the deck
    carries the same rule for them — every control dims to .55 at once and lets go over the press beat;
    the deck's word tokens keep their own mark */
@@ -261,36 +261,36 @@
   .kp-grades { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-width: 40rem; margin: 0 auto; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--kp-line); }
   .kp-study.has-bar { padding-bottom: var(--kp-bar-h, 140px); }
 }
-.kp-undo { justify-self: center; min-width: 44px; min-height: 44px; background: none; border: 0; color: var(--kp-mute); font-size: 13px; padding: 8px; }
-.kp-verdict { margin: 0; text-align: center; font-size: 18px; font-weight: 700; }
+.kp-undo { justify-self: center; min-width: 44px; min-height: 44px; background: none; border: 0; color: var(--kp-mute); font-size: var(--type-label); padding: 8px; }
+.kp-verdict { margin: 0; text-align: center; font-size: var(--type-lead); font-weight: 700; }
 
 .kp-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.kp-choice { min-height: 56px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); font-size: 20px; font-weight: 600; overflow-wrap: anywhere; padding: 6px; }
+.kp-choice { min-height: 56px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); font-size: var(--type-lead); font-weight: 600; overflow-wrap: anywhere; padding: 6px; }
 
 /* word list */
-.kp-search { width: 100%; min-height: 48px; padding: 0 14px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font: inherit; font-size: 16px; }
+.kp-search { width: 100%; min-height: 48px; padding: 0 14px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font: inherit; font-size: var(--type-body); }
 .kp-rows { display: grid; gap: 4px; }
 .kp-row { display: grid; grid-template-columns: minmax(0, 8rem) minmax(0, 1fr) auto auto; gap: 10px; align-items: center; text-align: left; padding: 10px 12px; border-radius: var(--radius-card, 4px); border: 1px solid var(--kp-line); background: var(--kp-panel); }
 .kp-rw { display: grid; min-width: 0; }
-.kp-rw b { font-size: 17px; overflow-wrap: anywhere; }
-.kp-rw small { font-size: 12px; color: var(--kp-mute); }
-.kp-rm { font-size: 13px; color: var(--kp-ink-2); min-width: 0; }
+.kp-rw b { font-size: var(--type-lead); overflow-wrap: anywhere; }
+.kp-rw small { font-size: var(--type-caption); color: var(--kp-mute); }
+.kp-rm { font-size: var(--type-label); color: var(--kp-ink-2); min-width: 0; }
 .kp-dots { display: flex; gap: 3px; }
 .kp-dots i { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--kp-mute); }
 .kp-dots i.half { background: var(--kp-amber); border-color: var(--kp-amber); }
 .kp-dots i.on { background: var(--kp-green); border-color: var(--kp-green); }
 .kp-detail { padding: 6px 12px 14px; display: grid; gap: 10px; }
-.kp-detail .kp-sentence { font-size: 20px; line-height: 1.9; }
+.kp-detail .kp-sentence { font-size: var(--type-reading); line-height: 1.9; }
 .kp-ex { display: grid; gap: 2px; border-left: 2px solid var(--kp-line); padding-left: 10px; }
 
 /* settings */
 .kp-field { display: grid; gap: 8px; }
 .kp-seg { display: flex; flex-wrap: wrap; gap: 6px; }
-.kp-seg button { min-width: 44px; min-height: 44px; padding: 0 14px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel); font-size: 14px; }
+.kp-seg button { min-width: 44px; min-height: 44px; padding: 0 14px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel); font-size: var(--type-chrome); }
 .kp-seg button.is-on { border-color: var(--kp-cyan); color: var(--kp-cyan); background: var(--kp-cyan-wash); font-weight: 700; }
-.kp-backup { width: 100%; min-height: 5rem; font-family: var(--kp-num); font-size: 11px; background: var(--kp-panel); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: var(--radius-control, 6px); padding: 8px; }
-.kp-toast { position: sticky; top: calc(8px + env(safe-area-inset-top, 0px)); z-index: 5; display: grid; gap: 8px; margin-bottom: 12px; background: var(--kp-panel-2); border: 1px solid var(--kp-red); border-radius: var(--radius-overlay, 18px); padding: 10px 16px; font-size: 14px; line-height: 1.5; }
-.kp-toast-btn { justify-self: start; min-height: 40px; padding: 0 14px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 14px; font-weight: 700; }
+.kp-backup { width: 100%; min-height: 5rem; font-family: var(--kp-num); font-size: var(--type-caption); background: var(--kp-panel); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: var(--radius-control, 6px); padding: 8px; }
+.kp-toast { position: sticky; top: calc(8px + env(safe-area-inset-top, 0px)); z-index: 5; display: grid; gap: 8px; margin-bottom: 12px; background: var(--kp-panel-2); border: 1px solid var(--kp-red); border-radius: var(--radius-overlay, 18px); padding: 10px 16px; font-size: var(--type-chrome); line-height: 1.5; }
+.kp-toast-btn { justify-self: start; min-height: 40px; padding: 0 14px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: var(--type-chrome); font-weight: 700; }
 
 @media (max-width: 420px) {
   .kp-row { grid-template-columns: minmax(0, 6rem) minmax(0, 1fr) auto; }
@@ -342,7 +342,7 @@
 }
 .kp-method { margin: 4px 0; border: 1px solid var(--kp-line, #26303b); border-radius: var(--radius-card, 4px); padding: 10px 14px; }
 .kp-method summary { cursor: pointer; font-weight: 700; color: var(--kp-ink); }
-.kp-method p { margin: 8px 0 0; font-size: 14px; line-height: 1.65; color: var(--kp-ink-2); }
+.kp-method p { margin: 8px 0 0; font-size: var(--type-chrome); line-height: 1.65; color: var(--kp-ink-2); }
 .kp-blank { color: var(--kp-cyan); }
 
 /* tap → define → 覚える, after the reveal only (CARD_CONTRACT_V2 §3, STANDARD A44). A word of the
@@ -360,13 +360,13 @@
    the standalone study pages' only word card */
 .kp-pop { position: fixed; z-index: 40; width: min(320px, calc(100vw - 32px)); background: var(--kp-panel-2); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: var(--radius-overlay, 18px); padding: 10px 12px 12px; display: grid; gap: 6px; box-shadow: var(--kp-depth); animation: kp-fade var(--motion-ma, 120ms) var(--ease-enter, ease-out) both; }
 .kp-pop-head { display: flex; align-items: baseline; gap: 8px; }
-.kp-pop-term { font-size: 20px; }
-.kp-pop-reading { font-size: 14px; color: var(--kp-ink-2); flex: 1; }
-.kp-pop-x { margin-left: auto; position: relative; width: 32px; height: 32px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: 14px; flex: none; align-self: center; }
+.kp-pop-term { font-size: var(--type-lead); }
+.kp-pop-reading { font-size: var(--type-chrome); color: var(--kp-ink-2); flex: 1; }
+.kp-pop-x { margin-left: auto; position: relative; width: 32px; height: 32px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: var(--type-chrome); flex: none; align-self: center; }
 .kp-pop-x::after { content: ''; position: absolute; inset: -7px; }
-.kp-pop-def { margin: 0; font-size: 15px; line-height: 1.6; }
+.kp-pop-def { margin: 0; font-size: var(--type-control); line-height: 1.6; }
 .kp-pop .kp-fold > summary { min-height: 36px; }
-.kp-pop-note { margin: 0; font-size: 11px; line-height: 1.5; color: var(--kp-mute); }
+.kp-pop-note { margin: 0; font-size: var(--type-caption); line-height: 1.5; color: var(--kp-mute); }
 
 /* ---------------------------------------------------------------- the material's second set
  * The same meaning per colour in every world (accent = the asked word, red/green = again/good). */
@@ -393,14 +393,14 @@
 .kp-pos-adv .kp-target, .kp-pos-adv .kp-term { color: var(--kp-adv); }
 .kp-pos-expr .kp-target, .kp-pos-expr .kp-term { color: var(--kp-expr); }
 .kp-pos-sound .kp-target, .kp-pos-sound .kp-term { color: var(--kp-sound); }
-.kp-posbadge { font-size: 12px; padding: 1px 8px; border-radius: var(--radius-seal, 3px); border: 1px solid currentColor; margin-left: 8px; vertical-align: middle; }
+.kp-posbadge { font-size: var(--type-caption); padding: 1px 8px; border-radius: var(--radius-seal, 3px); border: 1px solid currentColor; margin-left: 8px; vertical-align: middle; }
 
 /* kanji anatomy on the back: each character large, with its meaning and parts */
 .kp-kanji { display: flex; gap: 10px; flex-wrap: wrap; margin: 4px 0 2px; }
 .kp-kj { display: grid; grid-template-columns: auto 1fr; gap: 0 10px; align-items: center; padding: 8px 12px; border-radius: var(--radius-card, 4px); background: var(--kp-panel-2); border: 1px solid var(--kp-line); min-width: 9.5rem; }
-.kp-kj b { grid-row: span 2; font-size: 40px; line-height: 1; font-weight: 600; }
-.kp-kj span { font-size: 13px; color: var(--kp-ink-2); }
-.kp-kj small { font-size: 12px; color: var(--kp-mute); }
+.kp-kj b { grid-row: span 2; font-size: var(--type-headword); line-height: 1; font-weight: 600; }
+.kp-kj span { font-size: var(--type-label); color: var(--kp-ink-2); }
+.kp-kj small { font-size: var(--type-caption); color: var(--kp-mute); }
 
 .kp-pos-noun .kp-posbadge { color: var(--kp-noun); }
 .kp-pos-verb .kp-posbadge { color: var(--kp-verb); }
@@ -409,12 +409,12 @@
 .kp-pos-expr .kp-posbadge { color: var(--kp-expr); }
 .kp-pos-sound .kp-posbadge { color: var(--kp-sound); }
 /* a written passage's register and topic (CARD_CONTRACT_V2 §6): text chips, a size down, no hue */
-.kp-chip-sm { font-size: 11px; padding: 2px 6px; }
+.kp-chip-sm { font-size: var(--type-caption); padding: 2px 6px; }
 
 /* Full English metadata stays on one phone row without abbreviating the labels. */
 @media (max-width: 640px) {
   .kp-chips { gap: 3px; }
-  .kp-chip { font-size: 11px; padding-inline: 2px; }
+  .kp-chip { font-size: var(--type-caption); padding-inline: 2px; }
   .kp-chip-sm { padding-inline: 0; }
 }
 
@@ -433,7 +433,7 @@
 .kp[data-host='none'] .kp-top-study { background: var(--kp-stage); }
 
 /* the top bar: ‹ (the house's one back glyph), the rail (one segment per card on a short sitting), the count, 削除 */
-.kp-top-study .kp-icon { background: transparent; border-color: transparent; color: var(--kp-stage-ink); font-size: 20px; font-weight: 300; }
+.kp-top-study .kp-icon { background: transparent; border-color: transparent; color: var(--kp-stage-ink); font-size: var(--type-lead); font-weight: 300; }
 .kp-top-study .kp-icon:focus-visible { border-color: var(--kp-stage-ink); }
 .kp-top-study .kp-progress { height: 3px; border-radius: 0; background: color-mix(in srgb, var(--kp-stage-ink) 24%, transparent); }
 .kp-top-study .kp-progress[style*='--kp-n'] {
@@ -441,8 +441,8 @@
   mask-image: repeating-linear-gradient(90deg, #000 0 calc(100% / var(--kp-n) - 4px), transparent 0 calc(100% / var(--kp-n)));
 }
 .kp-top-study .kp-progress i { background: var(--kp-stage-ink); }
-.kp-top-study .kp-count { color: var(--kp-stage-ink); font-size: 13px; letter-spacing: 0.12em; min-width: 3.4em; text-align: right; }
-.kp-top-study .kp-delete { border-color: color-mix(in srgb, var(--kp-stage-ink) 18%, transparent); color: var(--kp-stage-ink); border-radius: var(--radius-seal, 3px); font-size: 12px; letter-spacing: 0.06em; padding: 0 10px; }
+.kp-top-study .kp-count { color: var(--kp-stage-ink); font-size: var(--type-label); letter-spacing: 0.12em; min-width: 3.4em; text-align: right; }
+.kp-top-study .kp-delete { border-color: color-mix(in srgb, var(--kp-stage-ink) 18%, transparent); color: var(--kp-stage-ink); border-radius: var(--radius-seal, 3px); font-size: var(--type-caption); letter-spacing: 0.06em; padding: 0 10px; }
 
 /* the sheet: nearly square paper, a hairline edge, relief, トンボ registration marks in its
  * corners (a pseudo-element, so the card's own surface stays plain under the ruby) */
@@ -460,8 +460,8 @@
 
 /* the card's head: its one instruction as an eyebrow, then the facts as a quiet slip line */
 .kp-chips { align-items: center; row-gap: 8px; }
-.kp-eyebrow { flex: 0 0 100%; order: -1; display: flex; align-items: center; gap: 10px; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--kp-mute); }
-.kp-eyebrow:lang(ja) { font-size: 12px; letter-spacing: 0.22em; text-transform: none; }
+.kp-eyebrow { flex: 0 0 100%; order: -1; display: flex; align-items: center; gap: 10px; font-size: var(--type-caption); letter-spacing: 0.16em; text-transform: uppercase; color: var(--kp-mute); }
+.kp-eyebrow:lang(ja) { font-size: var(--type-caption); letter-spacing: 0.22em; text-transform: none; }
 .kp-eyebrow::before { content: ''; width: 18px; height: 2px; background: var(--kp-shu); flex: none; }
 .kp .kp-chip { border-radius: var(--radius-seal, 3px); border-color: color-mix(in srgb, var(--kp-ink) 16%, transparent); }
 .kp .kp-kindchip, .kp .kp-st-learn, .kp .kp-st-grow, .kp .kp-st-known, .kp .kp-st-hard { border-color: currentColor; }
@@ -486,7 +486,7 @@
     color-mix(in srgb, var(--kp-shu) 10%, transparent);
 }
 .kp .kp-blank { border-bottom-color: var(--kp-shu); background: color-mix(in srgb, var(--kp-shu) 9%, transparent); border-radius: var(--radius-seal, 3px) var(--radius-seal, 3px) 0 0; }
-.kp .kp-taphint { font-size: 11.5px; letter-spacing: 0.14em; padding-top: 12px; border-top: 1px solid var(--kp-line); }
+.kp .kp-taphint { font-size: var(--type-caption); letter-spacing: 0.14em; padding-top: 12px; border-top: 1px solid var(--kp-line); }
 
 /* 研ぎ出し: one polish band crosses the card on the reveal (transform and opacity only; removed after) */
 .kp-polish { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit; z-index: 1; }
@@ -501,61 +501,61 @@
 /* the back: the headword in Shippori 800 with its reading beside it, the Japanese definition in Mincho */
 .kp .kp-answer { gap: 6px; padding-top: 10px; }
 .kp .kp-word { column-gap: 12px; row-gap: 2px; }
-.kp .kp-word .kp-term { font-family: var(--kp-head); font-weight: 800; font-size: 34px; line-height: 1.15; letter-spacing: 0.04em; }
-.kp .kp-word .kp-reading { font-size: 16px; letter-spacing: 0.14em; color: var(--kp-ink-2); }
-.kp .kp-word .kp-posbadge { margin-left: auto; border-radius: var(--radius-seal, 3px); font-size: 11.5px; letter-spacing: 0.08em; }
-.kp .kp-def { font-family: var(--kp-serif); font-size: 18px; line-height: 1.7; letter-spacing: 0.02em; }
+.kp .kp-word .kp-term { font-family: var(--kp-head); font-weight: 800; font-size: var(--type-display); line-height: 1.15; letter-spacing: 0.04em; }
+.kp .kp-word .kp-reading { font-size: var(--type-body); letter-spacing: 0.14em; color: var(--kp-ink-2); }
+.kp .kp-word .kp-posbadge { margin-left: auto; border-radius: var(--radius-seal, 3px); font-size: var(--type-caption); letter-spacing: 0.08em; }
+.kp .kp-def { font-family: var(--kp-serif); font-size: var(--type-lead); line-height: 1.7; letter-spacing: 0.02em; }
 .kp .kp-note { font-family: var(--kp-serif); }
 /* 英語: the first fold reads as a dashed slip you can lift ("Show English") */
 .kp .kp-folds { margin-top: 10px; border-top: 0; gap: 0; }
 .kp .kp-f-gloss { border: 1px dashed color-mix(in srgb, var(--kp-ink) 30%, transparent); border-radius: var(--radius-seal, 3px); padding: 0 14px; margin-bottom: 8px; }
-.kp .kp-f-gloss > summary { min-height: 44px; font-size: 14px; color: var(--kp-ink); font-weight: 600; letter-spacing: 0.02em; }
+.kp .kp-f-gloss > summary { min-height: 44px; font-size: var(--type-chrome); color: var(--kp-ink); font-weight: 600; letter-spacing: 0.02em; }
 .kp .kp-f-gloss > summary::before { content: '＋'; color: var(--kp-mute); }
 .kp .kp-f-gloss[open] > summary::before { content: '－'; }
 .kp .kp-fold > summary { min-height: 44px; }
-.kp .kp-gloss { font-family: var(--kp-serif); font-style: italic; font-size: 16px; }
+.kp .kp-gloss { font-family: var(--kp-serif); font-style: italic; font-size: var(--type-body); }
 
 /* 漢字の形と意味: each kanji on a 田字格 plate (glyph, meaning, strokes, parts); a part two of the
  * word's kanji share is lit, and the bracket under the plates joins them (deck kanji data only) */
 .kp .kp-kanji { gap: 8px; }
 .kp .kp-kanji > * { flex: 1 1 100%; min-width: 0; }
 .kp .kp-kj { border-radius: var(--radius-seal, 3px); grid-template-columns: 58px 1fr; padding: 8px 10px 8px 8px; gap: 2px 10px; background: color-mix(in srgb, var(--kp-panel-2) 70%, transparent); }
-.kp .kp-kj b { width: 58px; height: 58px; display: grid; place-items: center; font-family: var(--kp-head); font-weight: 800; font-size: 40px; border: 1px solid var(--kp-line);
+.kp .kp-kj b { width: 58px; height: 58px; display: grid; place-items: center; font-family: var(--kp-head); font-weight: 800; font-size: var(--type-headword); border: 1px solid var(--kp-line);
   /* drawn: the kanji box's cross guide (十字), two hairlines */ background: linear-gradient(var(--kp-line), var(--kp-line)) 50% 0 / 1px 100% no-repeat, linear-gradient(var(--kp-line), var(--kp-line)) 0 50% / 100% 1px no-repeat, var(--kp-panel); }
-.kp .kp-kj > span { font-size: 14px; font-weight: 600; color: var(--kp-ink); }
-.kp-kj-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-size: 12px; color: var(--kp-mute); }
-.kp-kj-parts i { font-style: normal; font-family: var(--kp-head); font-weight: 800; font-size: 17px; color: var(--kp-ink); padding: 0 3px; border-radius: var(--radius-seal, 3px); }
+.kp .kp-kj > span { font-size: var(--type-chrome); font-weight: 600; color: var(--kp-ink); }
+.kp-kj-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-size: var(--type-caption); color: var(--kp-mute); }
+.kp-kj-parts i { font-style: normal; font-family: var(--kp-head); font-weight: 800; font-size: var(--type-lead); color: var(--kp-ink); padding: 0 3px; border-radius: var(--radius-seal, 3px); }
 .kp-kj-parts i[data-shared] { color: var(--kp-cyan); box-shadow: 0 0 0 1px currentColor; }
 .kp .kp-anatomy-door { display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; }
 .kp .kp-anatomy-kanji { grid-row: span 2; width: 58px; height: 58px; }
 .kp .kp-anatomy-component { vertical-align: middle; }
 .kp .kp-anatomy-door:focus-visible { outline: 2px solid var(--kp-cyan); outline-offset: 2px; }
-.kp-kshare { position: relative; margin: 6px 0 2px; padding: 12px 10px 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-size: 13px; color: var(--kp-ink-2); }
+.kp-kshare { position: relative; margin: 6px 0 2px; padding: 12px 10px 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-size: var(--type-label); color: var(--kp-ink-2); }
 .kp-kshare::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 8px; border: 1.5px solid var(--kp-cyan); border-top: 0; border-radius: 0 0 var(--radius-seal, 3px) var(--radius-seal, 3px); opacity: 0.8; }
-.kp-kshare b { font-family: var(--kp-head); font-weight: 800; font-size: 20px; color: var(--kp-cyan); }
-.kp-kshare span[lang='ja'] { font-family: var(--kp-head); font-weight: 800; font-size: 16px; color: var(--kp-ink); }
+.kp-kshare b { font-family: var(--kp-head); font-weight: 800; font-size: var(--type-reading); color: var(--kp-cyan); }
+.kp-kshare span[lang='ja'] { font-family: var(--kp-head); font-weight: 800; font-size: var(--type-body); color: var(--kp-ink); }
 .kp .kp-kfam-c { font-family: var(--kp-head); font-weight: 800; }
 .kp .kp-fam, .kp .kp-see-link { border-radius: var(--radius-seal, 3px); font-family: var(--kp-serif); }
 
 /* under the card: 答えを見る as a washi slab; the grade pads */
-.kp .kp-reveal, .kp .kp-next { min-height: 60px; border-radius: var(--radius-card, 4px); border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font-size: 18px; letter-spacing: 0.06em; box-shadow: var(--kp-depth); }
+.kp .kp-reveal, .kp .kp-next { min-height: 60px; border-radius: var(--radius-card, 4px); border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font-size: var(--type-lead); letter-spacing: 0.06em; box-shadow: var(--kp-depth); }
 .kp .kp-verdict { justify-self: center; padding: 6px 16px; border-radius: var(--radius-seal, 3px); background: var(--kp-panel); }
 .kp .kp-undo { color: var(--kp-dock-mute); }
 .kp .kp-grades { background: var(--kp-dock); column-gap: 10px; }
 .kp .kp-grade { position: relative; min-height: 64px; border-radius: var(--radius-card, 4px); grid-auto-flow: row; box-shadow: var(--kp-depth); }
-.kp .kp-grade b { font-size: 17px; letter-spacing: 0.04em; }
-.kp .kp-grade small { font-size: 12.5px; letter-spacing: 0.06em; }
+.kp .kp-grade b { font-size: var(--type-lead); letter-spacing: 0.04em; }
+.kp .kp-grade small { font-size: var(--type-label); letter-spacing: 0.06em; }
 .kp .kp-again { border-color: var(--kp-line); border-top: 2px solid var(--kp-red); }
-.kp-grade-seal { font-family: var(--font-seal, 'Kaisei Tokumin', serif); font-size: 24px; line-height: 1; justify-self: center; }
+.kp-grade-seal { font-family: var(--font-seal, 'Kaisei Tokumin', serif); font-size: var(--type-seal); line-height: 1; justify-self: center; }
 .kp-again .kp-grade-seal { color: var(--kp-red); }
 .kp-good .kp-grade-seal { color: var(--kp-green); }
 /* in 日本語 the seal is the pad's face and the word a quiet caption under it */
-.kp-grade:has(.kp-grade-seal) b { font-size: 12px; letter-spacing: 0.1em; }
+.kp-grade:has(.kp-grade-seal) b { font-size: var(--type-caption); letter-spacing: 0.1em; }
 /* the first back of a deck's first sitting only: the gesture as one quiet mono caption, the rule as one
  * line of small print with a bare ×. No boxes, nothing in the pads' way. */
-.kp .kp-swipehint { color: var(--kp-dock-mute); font-family: var(--kp-num); font-size: 10.5px; letter-spacing: 0.16em; margin: 0; }
-.kp .kp-rule { color: var(--kp-dock-ink); font-size: 12.5px; line-height: 1.45; gap: 2px; }
-.kp .kp-rule-x { color: var(--kp-dock-mute); border-color: transparent; background: none; font-size: 15px; }
+.kp .kp-swipehint { color: var(--kp-dock-mute); font-family: var(--kp-num); font-size: var(--type-caption); letter-spacing: 0.16em; margin: 0; }
+.kp .kp-rule { color: var(--kp-dock-ink); font-size: var(--type-label); line-height: 1.45; gap: 2px; }
+.kp .kp-rule-x { color: var(--kp-dock-mute); border-color: transparent; background: none; font-size: var(--type-control); }
 @media (max-width: 640px) {
   .kp .kp-grades { border-top-color: color-mix(in srgb, var(--kp-dock-ink) 16%, transparent); }
   /* the last lines of the passage and the folds stay above the pinned pads: the reserved room is
@@ -575,22 +575,22 @@
 
 /* the session close: the surface is clear */
 .kp-done { gap: 18px; }
-.kp .kp-done .kp-title { font-family: var(--kp-jp); font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--kp-mute); }
+.kp .kp-done .kp-title { font-family: var(--kp-jp); font-size: var(--type-caption); font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--kp-mute); }
 .kp .kp-done .kp-title:lang(ja) { text-transform: none; letter-spacing: 0.24em; }
-.kp-done-title { margin: 0; font-family: var(--kp-head); font-weight: 800; font-size: clamp(30px, 9vw, 44px); line-height: 1.2; letter-spacing: 0.01em; color: var(--kp-ink); text-wrap: balance; word-break: keep-all; overflow-wrap: anywhere; }
+.kp-done-title { margin: 0; font-family: var(--kp-head); font-weight: 800; font-size: var(--type-hero); line-height: 1.2; letter-spacing: 0.01em; color: var(--kp-ink); text-wrap: balance; word-break: keep-all; overflow-wrap: anywhere; }
 .kp-rise { position: relative; display: flex; flex-wrap: wrap; gap: 10px 22px; padding: 4px 2px 8px; }
-.kp-rise-w { font-family: var(--kp-head); font-weight: 800; font-size: 17px; color: var(--kp-ink-2); animation: kp-rise-up var(--motion-fast, 180ms) var(--ease-enter, ease-out) calc(40ms + var(--i, 0) * 10ms) backwards; }
+.kp-rise-w { font-family: var(--kp-head); font-weight: 800; font-size: var(--type-lead); color: var(--kp-ink-2); animation: kp-rise-up var(--motion-fast, 180ms) var(--ease-enter, ease-out) calc(40ms + var(--i, 0) * 10ms) backwards; }
 .kp-rise-w.is-again { color: var(--kp-red); }
 @keyframes kp-rise-up { from { opacity: 0.01; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 .kp-tally { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-block: 1px solid var(--kp-line); }
 .kp-tally-c { display: grid; gap: 6px; padding: 14px 12px 12px; }
 .kp-tally-c + .kp-tally-c { border-left: 1px solid var(--kp-line); }
-.kp-tally-c span { font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--kp-mute); }
-.kp-tally-c b { font-family: var(--kp-head); font-weight: 800; font-size: 38px; line-height: 1; font-variant-numeric: tabular-nums; color: var(--kp-ink); }
+.kp-tally-c span { font-size: var(--type-caption); letter-spacing: 0.14em; text-transform: uppercase; color: var(--kp-mute); }
+.kp-tally-c b { font-family: var(--kp-head); font-weight: 800; font-size: var(--type-hero); line-height: 1; font-variant-numeric: tabular-nums; color: var(--kp-ink); }
 .kp-tally-again b { color: var(--kp-red); }
-.kp-done-rate { margin: 0; display: flex; align-items: baseline; gap: 10px; font-size: 14px; color: var(--kp-ink-2); }
+.kp-done-rate { margin: 0; display: flex; align-items: baseline; gap: 10px; font-size: var(--type-chrome); color: var(--kp-ink-2); }
 .kp-done-rate b { font-family: var(--kp-num); font-variant-numeric: tabular-nums; color: var(--kp-ink); }
-.kp-done-rate span + b + span { margin-left: auto; font-family: var(--kp-num); font-size: 12.5px; color: var(--kp-mute); }
+.kp-done-rate span + b + span { margin-left: auto; font-family: var(--kp-num); font-size: var(--type-label); color: var(--kp-mute); }
 .kp-done .kp-start { border-radius: var(--radius-card, 4px); }
 
 /* the deck home: paper slips, not pills */
@@ -598,7 +598,7 @@
 .kp .kp-start { border-radius: var(--radius-card, 4px); letter-spacing: 0.06em; box-shadow: 0 2px 0 color-mix(in srgb, var(--kp-cyan) 55%, #000); }
 .kp .kp-start:disabled { box-shadow: none; }
 .kp .kp-title { font-family: var(--kp-head); font-weight: 800; letter-spacing: 0.03em; }
-.kp .kp-h2 { font-family: var(--kp-jp); font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; }
+.kp .kp-h2 { font-family: var(--kp-jp); font-size: var(--type-caption); letter-spacing: 0.18em; text-transform: uppercase; }
 .kp .kp-h2:lang(ja) { text-transform: none; }
 
 /* the themes: a quiet list, not a page of settings. Hairline rows, the name in Mincho, the count in
@@ -609,8 +609,8 @@
 .kp .kp-group > .kp-gname { grid-column: 1; grid-row: 1; }
 .kp .kp-group > .kp-gcount { grid-column: 2; grid-row: 1; }
 .kp .kp-group > input { grid-column: 3; grid-row: 1; justify-self: end; }
-.kp .kp-gname b { font-family: var(--kp-serif); font-size: 17px; font-weight: 500; letter-spacing: 0.01em; line-height: 1.4; }
-.kp .kp-gcount { font-size: 12px; letter-spacing: 0.06em; color: var(--kp-mute); font-variant-numeric: tabular-nums; }
+.kp .kp-gname b { font-family: var(--kp-serif); font-size: var(--type-lead); font-weight: 500; letter-spacing: 0.01em; line-height: 1.4; }
+.kp .kp-gcount { font-size: var(--type-caption); letter-spacing: 0.06em; color: var(--kp-mute); font-variant-numeric: tabular-nums; }
 .kp .kp-group .kp-bar { height: 2px; border-radius: 0; background: transparent; } /* progress only: an untouched theme draws no second line */
 .kp .kp-group input { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; margin: 0; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--kp-ink) 26%, transparent); background: none; cursor: pointer; }
 .kp .kp-group input:checked {
@@ -627,7 +627,7 @@
 
 /* ---- the room family, every look (Bunki fix round 2): one quiet exit, a docked 答えを見る ---- */
 /* the deck home's ← is bare, like the study ✕: the page's one way out */
-.kp-home > .kp-top .kp-icon { background: transparent; border-color: transparent; font-size: 20px; font-weight: 300; }
+.kp-home > .kp-top .kp-icon { background: transparent; border-color: transparent; font-size: var(--type-lead); font-weight: 300; }
 .kp-home > .kp-top .kp-icon:focus-visible { border-color: var(--kp-line); }
 /* 答えを見る (and わからない) is docked at the foot of the screen like the grade pads, so the reveal is
  * always one tap away on a long passage; its own place in the flow, under the card, is the room the
@@ -640,7 +640,7 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 /* a passage's eyebrow row is the 全文／焦点 toggle's height on the front too: on the back the toggle takes
  * the instruction's place on that row, so the reveal does not grow the card's head or move the passage */
 .kp .kp-eyebrow-zoom { min-height: 30px; }
-.kp .kp-eyebrow > .kp-zoom { margin-left: auto; text-transform: none; letter-spacing: normal; font-size: 12px; }
+.kp .kp-eyebrow > .kp-zoom { margin-left: auto; text-transform: none; letter-spacing: normal; font-size: var(--type-caption); }
 .kp .kp-eyebrow:has(> .kp-zoom) > .kp-eyebrow-t { display: none; }
 
 /* ---- the reveal does not move the page (fix round 3). At phone width a passage taller than the room
@@ -671,25 +671,25 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
  * that answer now. A press answers at once (scale, 90 ms). */
 .kp .kp-grades { grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 6px; }
 .kp .kp-grade { --kp-hue: var(--kp-ink-2); min-height: 58px; padding: 7px 2px 8px; border-radius: var(--radius-seal, 3px); border: 1px solid var(--kp-line); border-top: 2px solid var(--kp-hue); background: var(--kp-panel); gap: 3px; box-shadow: var(--kp-depth); }
-.kp .kp-grade b { color: var(--kp-hue); font-size: 15px; font-weight: 700; letter-spacing: 0.02em; line-height: 1.2; }
-.kp .kp-grade small { font-family: var(--kp-num); font-size: 12px; letter-spacing: 0.02em; color: var(--kp-ink-2); line-height: 1.2; }
+.kp .kp-grade b { color: var(--kp-hue); font-size: var(--type-control); font-weight: 700; letter-spacing: 0.02em; line-height: 1.2; }
+.kp .kp-grade small { font-family: var(--kp-num); font-size: var(--type-caption); letter-spacing: 0.02em; color: var(--kp-ink-2); line-height: 1.2; }
 .kp .kp-again { --kp-hue: var(--kp-red); }
 .kp .kp-hard { --kp-hue: var(--kp-amber); }
 .kp .kp-good { --kp-hue: var(--kp-green); background: color-mix(in srgb, var(--kp-green) 12%, var(--kp-panel)); }
 .kp .kp-easy { --kp-hue: var(--kp-blue); }
 /* in 日本語 the seal (再 難 良 易) is the pad's face, in its hue, and the word a caption under it */
-.kp .kp-grade-seal, .kp .kp-again .kp-grade-seal, .kp .kp-good .kp-grade-seal { font-size: 20px; color: var(--kp-hue); }
-.kp .kp-grade:has(.kp-grade-seal) b { font-size: 11px; letter-spacing: 0.04em; }
+.kp .kp-grade-seal, .kp .kp-again .kp-grade-seal, .kp .kp-good .kp-grade-seal { font-size: var(--type-seal); color: var(--kp-hue); }
+.kp .kp-grade:has(.kp-grade-seal) b { font-size: var(--type-caption); letter-spacing: 0.04em; }
 
 /* ---- T2: the deck home. A plain name, then "the four windows but maybe not so big" in the old home's
  * colours: due amber, new in ink, known green, difficult red, four small tiles in one row ---- */
-.kp-home .kp-title { font-size: 24px; line-height: 1.25; letter-spacing: 0.01em; }
-.kp-home .kp-sub { font-size: 13px; color: var(--kp-ink-2); font-variant-numeric: tabular-nums; }
+.kp-home .kp-title { font-size: var(--type-section); line-height: 1.25; letter-spacing: 0.01em; }
+.kp-home .kp-sub { font-size: var(--type-label); color: var(--kp-ink-2); font-variant-numeric: tabular-nums; }
 .kp .kp-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; border: 0; font-family: inherit; }
 .kp .kp-tile { display: grid; align-content: center; gap: 2px; min-height: 60px; padding: 8px 10px; border-radius: var(--radius-card, 4px); border: 1px solid var(--kp-line); background: var(--kp-panel); box-shadow: var(--kp-depth); }
 .kp .kp-tile + .kp-tile::before { content: none; }
-.kp .kp-tiles .kp-tile b { font-family: var(--kp-num); font-variant-numeric: tabular-nums; font-size: 22px; font-weight: 700; line-height: 1.1; color: var(--kp-ink); }
-.kp .kp-tiles .kp-tile span { font-size: 11.5px; letter-spacing: 0.02em; color: var(--kp-ink-2); white-space: nowrap; }
+.kp .kp-tiles .kp-tile b { font-family: var(--kp-num); font-variant-numeric: tabular-nums; font-size: var(--type-reading); font-weight: 700; line-height: 1.1; color: var(--kp-ink); }
+.kp .kp-tiles .kp-tile span { font-size: var(--type-caption); letter-spacing: 0.02em; color: var(--kp-ink-2); white-space: nowrap; }
 .kp .kp-tiles .kp-c-due b { color: var(--kp-amber); }
 .kp .kp-tiles .kp-c-known b { color: var(--kp-green); }
 .kp .kp-tiles .kp-c-hard b { color: var(--kp-red); }
@@ -713,28 +713,28 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 
 /* the head: the one instruction, then the facts as one quiet line. Only the kind is boxed and the level
  * keeps its tint; every chip is the same 20px box, so the line stays one line */
-.kp .kp-eyebrow { color: var(--kp-ink-2); font-weight: 600; font-size: 11px; letter-spacing: 0.14em; }
+.kp .kp-eyebrow { color: var(--kp-ink-2); font-weight: 600; font-size: var(--type-caption); letter-spacing: 0.14em; }
 .kp .kp-eyebrow::before { width: 14px; }
 /* on a passage's back the 全文／焦点 toggle takes the instruction's row: its 朱 dash goes with the words */
 .kp .kp-eyebrow:has(> .kp-zoom)::before { content: none; }
 /* every screen's ← (word list, settings, the session close) is the bare mark of the deck home and ✕ */
-.kp section > .kp-top .kp-icon { background: transparent; border-color: transparent; font-size: 20px; font-weight: 300; }
+.kp section > .kp-top .kp-icon { background: transparent; border-color: transparent; font-size: var(--type-lead); font-weight: 300; }
 .kp section > .kp-top .kp-icon:focus-visible { border-color: var(--kp-line); }
 .kp .kp-chips { gap: 6px 8px; }
-.kp .kp-chip { border: 1px solid transparent; border-radius: var(--radius-seal, 3px); padding: 0; font-size: 11.5px; line-height: 18px; letter-spacing: 0.01em; }
-.kp .kp-kindchip { border-color: currentColor; padding: 0 5px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.kp .kp-chip { border: 1px solid transparent; border-radius: var(--radius-seal, 3px); padding: 0; font-size: var(--type-caption); line-height: 18px; letter-spacing: 0.01em; }
+.kp .kp-kindchip { border-color: currentColor; padding: 0 5px; font-size: var(--type-caption); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
 .kp .kp-levelchip { padding: 0 5px; font-weight: 700; }
-.kp .kp-chip-sm { font-size: 11.5px; padding: 0; }
+.kp .kp-chip-sm { font-size: var(--type-caption); padding: 0; }
 @media (max-width: 640px) {
   .kp .kp-chips { gap: 6px; }
-  .kp .kp-chip, .kp .kp-chip-sm { font-size: 11px; padding-inline: 0; }
-  .kp .kp-kindchip { font-size: 10px; padding-inline: 4px; }
+  .kp .kp-chip, .kp .kp-chip-sm { font-size: var(--type-caption); padding-inline: 0; }
+  .kp .kp-kindchip { font-size: var(--type-caption); padding-inline: 4px; }
   .kp .kp-levelchip { padding-inline: 4px; }
 }
 /* the passage: a single sentence is the card's one line and stands heavier; a passage of four or five
  * sentences stays at reading weight */
 .kp .kp-sentence:not(:has(.kp-s)) { font-weight: 600; }
-.kp .kp-taphint { font-size: 11px; letter-spacing: 0.12em; color: var(--kp-mute); padding-top: 12px; }
+.kp .kp-taphint { font-size: var(--type-caption); letter-spacing: 0.12em; color: var(--kp-mute); padding-top: 12px; }
 
 /* 答えを見る: one clear key under the card, framed in the deck's accent (the old home's 答えを見る) */
 .kp .kp-reveal { border: 1.5px solid var(--kp-cyan); border-radius: var(--radius-control, 6px); min-height: 56px; color: var(--kp-cyan); font-weight: 700; letter-spacing: 0.08em;
@@ -771,22 +771,22 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
  * Japanese definition in full ink; the folds one grouped list, every row the same 44px with a chevron */
 .kp .kp-answer { border-top: 1px solid color-mix(in srgb, var(--kp-ink) 22%, transparent); padding-top: 14px; gap: 8px; }
 .kp .kp-word { align-items: baseline; }
-.kp .kp-word .kp-term { font-size: 36px; line-height: 1.1; }
-.kp .kp-word .kp-reading { font-size: 16px; letter-spacing: 0.1em; color: var(--kp-ink-2); }
-.kp .kp-word .kp-posbadge { align-self: center; border-radius: var(--radius-seal, 3px); border-width: 1.5px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; padding: 0 7px; line-height: 19px; }
-.kp .kp-def { font-size: 18px; line-height: 1.65; font-weight: 600; color: var(--kp-ink); }
-.kp .kp-note { font-size: 15px; line-height: 1.6; }
+.kp .kp-word .kp-term { font-size: var(--type-hero); line-height: 1.1; }
+.kp .kp-word .kp-reading { font-size: var(--type-body); letter-spacing: 0.1em; color: var(--kp-ink-2); }
+.kp .kp-word .kp-posbadge { align-self: center; border-radius: var(--radius-seal, 3px); border-width: 1.5px; font-size: var(--type-caption); font-weight: 700; letter-spacing: 0.06em; padding: 0 7px; line-height: 19px; }
+.kp .kp-def { font-size: var(--type-lead); line-height: 1.65; font-weight: 600; color: var(--kp-ink); }
+.kp .kp-note { font-size: var(--type-control); line-height: 1.6; }
 .kp .kp-folds { margin-top: 12px; border: 1px solid var(--kp-line); border-radius: var(--radius-card, 4px); background: var(--kp-panel-2); }
 .kp .kp-fold { border-bottom: 1px solid var(--kp-line); padding: 0 14px; }
 .kp .kp-fold:last-child { border-bottom: 0; }
-.kp .kp-fold > summary { min-height: 44px; position: relative; padding-right: 22px; font-size: 14px; color: var(--kp-ink); letter-spacing: 0.01em; }
+.kp .kp-fold > summary { min-height: 44px; position: relative; padding-right: 22px; font-size: var(--type-chrome); color: var(--kp-ink); letter-spacing: 0.01em; }
 .kp .kp-fold > summary::before { content: none; }
 .kp .kp-fold > summary::after { content: ''; position: absolute; right: 2px; top: 50%; width: 7px; height: 7px; margin-top: -5px; border-right: 1.5px solid var(--kp-mute); border-bottom: 1.5px solid var(--kp-mute); transform: rotate(-45deg); transition: transform var(--motion-ma, 120ms) var(--ease-enter, ease-out); }
 .kp .kp-fold[open] > summary::after { transform: rotate(45deg); margin-top: -7px; }
 .kp .kp-fold > :not(summary) { margin-bottom: 12px; }
 /* 英語 is the first row of the list, not a dashed slip of its own */
 .kp .kp-f-gloss { border: 0; border-bottom: 1px solid var(--kp-line); border-radius: 0; padding: 0 14px; margin-bottom: 0; }
-.kp .kp-f-gloss > summary { font-size: 14px; font-weight: 600; color: var(--kp-ink); }
+.kp .kp-f-gloss > summary { font-size: var(--type-chrome); font-weight: 600; color: var(--kp-ink); }
 .kp .kp-f-gloss > summary::before { content: none; }
 .kp .kp-see { padding: 10px 14px; border-bottom: 1px solid var(--kp-line); }
 

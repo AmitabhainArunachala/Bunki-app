@@ -5,10 +5,6 @@ body[data-view='levels'] main {
 }
 
 .reference-library {
-  --reference-small: var(--t-chrome, 13px);
-  --reference-body: var(--t-body, 16px);
-  --reference-title: clamp(24px, 3vw, 32px);
-  --reference-headword: clamp(23px, 3vw, 29px);
   color: var(--ink);
   padding-top: 4px;
 }
@@ -82,14 +78,14 @@ body[data-view='levels'] main {
 }
 
 .reference-eyebrow {
-  font-size: var(--reference-small);
+  font-size: var(--type-chrome);
   letter-spacing: 0.14em;
   color: var(--red);
   margin: 0 0 8px;
 }
 
 .reference-title {
-  font: 400 var(--reference-title)/1.45 var(--serif);
+  font: 400 var(--type-display)/1.45 var(--serif);
   letter-spacing: 0.025em;
   margin: 0 0 10px;
   overflow-wrap: anywhere;
@@ -99,7 +95,7 @@ body[data-view='levels'] main {
 .reference-intro {
   max-width: 57ch;
   color: var(--ink-2);
-  font-size: var(--reference-body);
+  font-size: var(--type-body);
   margin: 0;
 }
 
@@ -117,7 +113,7 @@ body[data-view='levels'] main {
 }
 
 .reference-family h2 {
-  font: 400 22px/1.5 var(--serif);
+  font: 400 var(--type-reading)/1.5 var(--serif);
   margin: 0;
 }
 
@@ -128,7 +124,7 @@ body[data-view='levels'] main {
 .reference-search-hint,
 .reference-quiet-note {
   color: var(--ink-2);
-  font-size: var(--reference-small);
+  font-size: var(--type-chrome);
 }
 
 .reference-footnote {
@@ -148,7 +144,7 @@ body[data-view='levels'] main {
   background: none;
   padding: 8px 2px;
   margin-bottom: -1px;
-  font-size: var(--reference-small);
+  font-size: var(--type-chrome);
 }
 
 .reference-tab[aria-pressed='true'] {
@@ -191,13 +187,13 @@ body[data-view='levels'] main {
 }
 
 .reference-level-name {
-  font: 400 25px/1.5 var(--serif);
+  font: 400 var(--type-section)/1.5 var(--serif);
   padding-right: 10px;
   overflow-wrap: anywhere;
 }
 
 .reference-level-count {
-  font-size: var(--reference-body);
+  font-size: var(--type-body);
   font-variant-numeric: tabular-nums;
   margin: 4px 0;
 }
@@ -207,7 +203,7 @@ body[data-view='levels'] main {
 }
 
 .reference-level-study {
-  font-size: 12px;
+  font-size: var(--type-caption);
 }
 
 .reference-library .reference-level-unknown {
@@ -220,11 +216,11 @@ body[data-view='levels'] main {
 
 .reference-library .reference-level-unknown .reference-level-name {
   font-family: var(--sans);
-  font-size: var(--reference-small);
+  font-size: var(--type-chrome);
 }
 
 .reference-level-unknown .reference-level-count {
-  font-size: var(--reference-small);
+  font-size: var(--type-chrome);
   margin: 0;
 }
 
@@ -237,7 +233,7 @@ body[data-view='levels'] main {
   top: 13px;
   right: 12px;
   color: var(--red);
-  font-size: var(--reference-small);
+  font-size: var(--type-chrome);
 }
 
 .reference-kanken-grid .reference-level {
@@ -245,17 +241,17 @@ body[data-view='levels'] main {
 }
 
 .reference-kanken-grid .reference-level-name {
-  font-size: 22px;
+  font-size: var(--type-reading);
 }
 
 .reference-collection-meta {
   margin: 0 0 8px;
-  font-size: var(--reference-body);
+  font-size: var(--type-body);
   font-variant-numeric: tabular-nums;
 }
 
 .reference-provenance {
-  font-size: var(--reference-small);
+  font-size: var(--type-chrome);
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   margin-bottom: 20px;
@@ -310,7 +306,7 @@ body[data-view='levels'] main {
 
 .reference-field-label {
   display: block;
-  font-size: var(--reference-small);
+  font-size: var(--type-chrome);
   margin-bottom: 6px;
 }
 
@@ -327,7 +323,7 @@ body[data-view='levels'] main {
   border-radius: var(--radius-seal);
   padding: 9px 10px;
   width: 100%;
-  font-size: 16px; /* prevents iOS focus zoom */
+  font-size: var(--type-body); /* prevents iOS focus zoom */
 }
 
 .reference-library input::placeholder {
@@ -344,7 +340,7 @@ body[data-view='levels'] main {
 }
 
 .reference-results-count {
-  font-size: var(--reference-small);
+  font-size: var(--type-chrome);
   margin: 14px 0 10px;
   font-variant-numeric: tabular-nums;
   scroll-margin-top: 100px;
@@ -396,7 +392,7 @@ body[data-view='levels'] main {
 
 .reference-jump,
 .reference-page-label {
-  font-size: var(--reference-small);
+  font-size: var(--type-chrome);
 }
 
 .reference-jump input {
@@ -427,7 +423,7 @@ body[data-view='levels'] main {
 }
 
 .reference-entry-number {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
@@ -441,12 +437,12 @@ body[data-view='levels'] main {
 }
 
 .reference-entry-headword {
-  font: 400 var(--reference-headword)/1.55 var(--serif);
+  font: 400 var(--type-title)/1.55 var(--serif);
 }
 
 .reference-entry-reading {
   font-family: var(--serif);
-  font-size: var(--reference-body);
+  font-size: var(--type-body);
   color: var(--red);
   line-height: 1.7;
 }
@@ -454,7 +450,7 @@ body[data-view='levels'] main {
 .reference-entry-meaning {
   grid-column: 1 / -1;
   color: var(--ink-2);
-  font-size: var(--reference-body);
+  font-size: var(--type-body);
   line-height: 1.65;
   margin-top: 5px;
 }
@@ -462,7 +458,7 @@ body[data-view='levels'] main {
 .reference-entry-source,
 .reference-entry-saved {
   grid-column: 1 / -1;
-  font-size: 12px;
+  font-size: var(--type-caption);
   margin-top: 7px;
 }
 
@@ -482,13 +478,13 @@ body[data-view='levels'] main {
 }
 
 .reference-empty h2 {
-  font: 400 22px/1.5 var(--serif);
+  font: 400 var(--type-reading)/1.5 var(--serif);
   margin: 0 0 10px;
 }
 
 .reference-empty p {
   color: var(--ink-2);
-  font-size: var(--reference-body);
+  font-size: var(--type-body);
   max-width: 55ch;
 }
 
@@ -530,7 +526,7 @@ body[data-view='levels'] main {
     padding: 14px 2px;
   }
   .reference-entry-meaning {
-    font-size: 15px;
+    font-size: var(--type-control);
   }
 }
 
@@ -567,13 +563,13 @@ body[data-view='levels'] main {
 .reference-sheet-context { border-bottom: 1px solid var(--line); margin-bottom: 14px; }
 .reference-sheet-return {
   border: 0; background: none; color: var(--ink-2); font: inherit;
-  font-size: var(--t-chrome); min-height: var(--tap, 44px);
+  font-size: var(--type-chrome); min-height: var(--tap, 44px);
   padding: 8px 0; text-align: left; cursor: pointer;
 }
 .reference-sheet-return:hover { color: var(--red); }
 .reference-entry-provenance {
   margin-top: 24px; padding: 12px 0; border-top: 1px solid var(--line);
-  color: var(--ink-2); font-size: var(--t-chrome); overflow-wrap: anywhere;
+  color: var(--ink-2); font-size: var(--type-chrome); overflow-wrap: anywhere;
 }
 .reference-entry-provenance summary { min-height: var(--tap, 44px); cursor: pointer; }
 .reference-sheet-return:focus-visible, .reference-entry-provenance summary:focus-visible {

@@ -61,7 +61,7 @@ html[data-room='tray'] .today-head { position: relative; z-index: 3; align-self:
 html[data-room='tray'] .today-head .today-date { margin: 0 0 4px; }
 html[data-room='tray'] .today-head .view-title {
   margin: 0;
-  font: 800 clamp(38px, 11vw, 46px)/1.02 var(--font-headword);
+  font: 800 var(--type-headword)/1.02 var(--font-headword);
   letter-spacing: 0.005em;
   color: var(--color-ink);
 }
@@ -176,12 +176,12 @@ html:is([data-room='tray'], [data-room='search']) .today-dayword::before {
 }
 html:is([data-room='tray'], [data-room='search']) .dw-label {
   margin: 0;
-  font: 600 11.5px/1 var(--font-ui);
+  font: 600 var(--type-caption)/1 var(--font-ui);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-muted);
 }
-html:is([data-room='tray'], [data-room='search']) body:not(.ui-bi) .dw-label { letter-spacing: 0.32em; font-size: 12px; }
+html:is([data-room='tray'], [data-room='search']) body:not(.ui-bi) .dw-label { letter-spacing: 0.32em; font-size: var(--type-caption); }
 html:is([data-room='tray'], [data-room='search']) .dw-word {
   display: flex;
   flex-direction: column;
@@ -196,7 +196,7 @@ html:is([data-room='tray'], [data-room='search']) .dw-word {
 html:is([data-room='tray'], [data-room='search']) .dw-glyph {
   display: flex;
   gap: 0.02em;
-  font: 800 min(92px, calc(72vw / var(--n, 2)))/1.06 var(--font-headword);
+  font: 800 min(calc(var(--type-headword) * 2.25), calc(72vw / var(--n, 2)))/1.06 var(--font-headword);
   letter-spacing: 0.02em;
 }
 html:is([data-room='tray'], [data-room='search']) .dw-k { display: inline-block; animation: today-ink var(--motion-long) var(--ease-ink) both; }
@@ -206,25 +206,25 @@ html:is([data-room='tray'], [data-room='search']) .dw-k:nth-child(n + 4) { anima
 @keyframes today-ink { from { opacity: 0.01; transform: scale(1.04); } 60% { opacity: 0.9; } to { opacity: 1; transform: none; } }
 html:is([data-room='tray'], [data-room='search']) .dw-r {
   margin: 4px 0 0;
-  font: 500 13px/1 var(--font-ui);
+  font: 500 var(--type-label)/1 var(--font-ui);
   letter-spacing: 0.34em;
   color: var(--color-muted);
 }
 html:is([data-room='tray'], [data-room='search']) .dw-hook {
   margin: 14px 0 0;
   max-width: 300px;
-  font: 400 15px/1.5 var(--font-ui);
+  font: 400 var(--type-control)/1.5 var(--font-ui);
   color: var(--color-ink-2);
   text-wrap: balance;
 }
 html:is([data-room='tray'], [data-room='search']) .dw-pk {
   padding: 0 2px;
-  font: 800 19px/1 var(--font-headword);
+  font: 800 var(--type-reading)/1 var(--font-headword);
   color: var(--color-ink);
 }
 html:is([data-room='tray'], [data-room='search']) .dw-fam {
   margin: 6px 0 0;
-  font: 400 11.5px/1.4 var(--font-data);
+  font: 400 var(--type-caption)/1.4 var(--font-data);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   color: var(--color-muted);
@@ -238,12 +238,12 @@ html:is([data-room='tray'], [data-room='search']) .dw-go {
   padding: 0 8px;
   border: 0;
   background: none;
-  font: 600 14px/1 var(--font-ui);
+  font: 600 var(--type-chrome)/1 var(--font-ui);
   letter-spacing: 0.02em;
   color: var(--color-accent);
   cursor: pointer;
 }
-html:is([data-room='tray'], [data-room='search']) .dw-go .dw-pk { font-size: 17px; color: inherit; padding: 0; }
+html:is([data-room='tray'], [data-room='search']) .dw-go .dw-pk { font-size: var(--type-lead); color: inherit; padding: 0; }
 html:is([data-room='tray'], [data-room='search']) .dw-go-l:empty { display: none; }
 html:is([data-room='tray'], [data-room='review'], [data-room='search']) .today-arrow {
   position: relative;
@@ -310,10 +310,10 @@ html[data-room='tray'] .today-line > :is(#review-start, .today-then) {
 html[data-room='tray'] .today-line > :last-child { border-bottom: var(--stroke-hairline) solid var(--color-rule); }
 html[data-room='tray'] .today-line > :is(#review-start, .today-then):hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-ink) 4%, transparent); }
 html[data-room='tray'] .today-line > :is(#review-start, .today-then):focus-visible { outline: none; box-shadow: var(--focus-ring); }
-html[data-room='tray'] .today-line #review-start > .l-ja { grid-area: l; min-width: 0; font: 600 17px/1.3 var(--font-ui); letter-spacing: 0; color: var(--color-ink); }
+html[data-room='tray'] .today-line #review-start > .l-ja { grid-area: l; min-width: 0; font: 600 var(--type-lead)/1.3 var(--font-ui); letter-spacing: 0; color: var(--color-ink); }
 html[data-room='tray'] .today-line #review-start .review-start-min {
   grid-area: t;
-  font: 500 13px/1 var(--font-data);
+  font: 500 var(--type-label)/1 var(--font-data);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
   color: var(--color-muted);
@@ -324,7 +324,7 @@ html[data-room='tray'] .today-line #review-start.quiet > .l-ja { font-weight: 50
 html[data-room='tray'] .today-line :is(#review-start, .today-then) .today-arrow { grid-area: a; color: var(--color-accent); }
 html[data-room='tray'] .today-then-l {
   grid-area: l;
-  font: 600 11px/1.2 var(--font-ui);
+  font: 600 var(--type-caption)/1.2 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted);
@@ -340,12 +340,12 @@ html[data-room='tray'] .today-then-title {
   overflow-wrap: anywhere;
   display: block;
   text-wrap: balance;
-  font: 600 16px/1.4 var(--font-reading);
+  font: 600 var(--type-body)/1.4 var(--font-reading);
   color: var(--color-ink);
 }
 html[data-room='tray'] .today-then-n {
   grid-area: n;
-  font: 400 12px/1 var(--font-data);
+  font: 400 var(--type-caption)/1 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-muted);
 }
@@ -368,15 +368,15 @@ html[data-room='tray'] .today-detail-toggle {
   cursor: pointer;
 }
 html[data-room='tray'] .today-detail-name {
-  font: 600 11.5px/1 var(--font-ui);
+  font: 600 var(--type-caption)/1 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted);
 }
-html[data-room='tray'] body:not(.ui-bi) .today-detail-name { letter-spacing: 0.2em; font-size: 12px; }
+html[data-room='tray'] body:not(.ui-bi) .today-detail-name { letter-spacing: 0.2em; font-size: var(--type-caption); }
 html[data-room='tray'] .today-detail-sum {
   margin-left: auto;
-  font: 400 12px/1 var(--font-data);
+  font: 400 var(--type-caption)/1 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-ink-2);
 }
@@ -408,13 +408,13 @@ html[data-room='tray'] .today-detail-body .deck-count {
 }
 html[data-room='tray'] .today-detail-body .deck-count:first-child { padding-left: 2px; border-left: 0; }
 html[data-room='tray'] .today-detail-body .deck-count .deck-count-n {
-  font: 500 26px/1.1 var(--font-data);
+  font: 500 var(--type-section)/1.1 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-ink);
 }
 html[data-room='tray'] .today-detail-body .deck-count .deck-count-l {
   margin-top: 4px;
-  font: 500 11px/1.2 var(--font-ui);
+  font: 500 var(--type-caption)/1.2 var(--font-ui);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-muted);
@@ -422,7 +422,7 @@ html[data-room='tray'] .today-detail-body .deck-count .deck-count-l {
 html[data-room='tray'] .today-detail-body .deck-count.c-due .deck-count-n { color: var(--color-accent); }
 html[data-room='tray'] .today-detail-body .srs-forecast {
   margin: 6px 0;
-  font: 400 12px/1.6 var(--font-data);
+  font: 400 var(--type-caption)/1.6 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-muted);
 }
@@ -432,11 +432,11 @@ html[data-room='tray'] .today-detail-body .deck-row {
   min-height: 46px;
   padding: 8px 2px;
   border-bottom: var(--stroke-hairline) solid var(--color-line);
-  font: 400 15px/1.3 var(--font-ui);
+  font: 400 var(--type-control)/1.3 var(--font-ui);
   color: var(--color-ink);
 }
 html[data-room='tray'] .today-detail-body .deck-row > span:not(.d-name) {
-  font: 500 14px/1 var(--font-data);
+  font: 500 var(--type-chrome)/1 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-ink);
 }
@@ -444,7 +444,7 @@ html[data-room='tray'] .today-detail-body .deck-row > span.zero { color: var(--c
 html[data-room='tray'] .today-detail-body .deck-row > span.c-due:not(.zero) { color: var(--color-accent); }
 html[data-room='tray'] .today-detail-body .deck-row.deck-head { min-height: 0; padding-block: 8px; }
 html[data-room='tray'] .today-detail-body .deck-row.deck-head > span {
-  font: 500 10.5px/1 var(--font-ui);
+  font: 500 var(--type-caption)/1 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted);
@@ -485,13 +485,13 @@ html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero >
   border-radius: var(--radius-control);
   background: none;
   color: var(--color-accent);
-  font: 600 13px/1 var(--font-ui);
+  font: 600 var(--type-label)/1 var(--font-ui);
   letter-spacing: 0.01em;
   cursor: pointer;
   transition: transform var(--motion-press) var(--ease-standard);
 }
 html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero > .today-sky + .today-universe { margin-top: -44px; }
-html[data-room='tray'] body:not(.ui-bi) #app > main > .today-hero > .today-universe { font: 800 13px/1 var(--font-headword); letter-spacing: 0.06em; }
+html[data-room='tray'] body:not(.ui-bi) #app > main > .today-hero > .today-universe { font: 800 var(--type-label)/1 var(--font-headword); letter-spacing: 0.06em; }
 html[data-room='tray'] .today-universe .today-arrow { width: 16px; margin-left: 0; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-universe {
   color: color-mix(in srgb, var(--color-gold) 70%, var(--color-ink));
@@ -523,7 +523,7 @@ html[data-arrive='sky'] #drift-layer.active {
 html[data-room='review'] body:not(.zen) .view-title:has(.review-clear) { margin-bottom: 18px; }
 html[data-room='review'] .review-clear {
   display: block;
-  font: 800 clamp(30px, 9vw, 40px)/1.15 var(--font-headword);
+  font: 800 var(--type-hero)/1.15 var(--font-headword);
   color: var(--color-ink);
   text-wrap: balance;
   animation: today-ink var(--motion-long) var(--ease-ink) both;
@@ -531,7 +531,7 @@ html[data-room='review'] .review-clear {
 html[data-room='review'] .review-clear + .review-clear-count {
   display: block;
   margin-top: 12px;
-  font: 400 13px/1.3 var(--font-data);
+  font: 400 var(--type-label)/1.3 var(--font-data);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   color: var(--color-muted);
@@ -546,7 +546,7 @@ html[data-room='review'] .review-rise {
   padding: 0 4px;
 }
 html[data-room='review'] .review-rise-w {
-  font: 600 19px/1.2 var(--font-reading);
+  font: 600 var(--type-reading)/1.2 var(--font-reading);
   color: var(--color-muted);
   opacity: 0.62;
   transform: translateY(calc(var(--i, 0) % 3 * 6px));
@@ -567,14 +567,14 @@ html[data-room='review'] .review-summary > div { display: flex; flex-direction: 
 html[data-room='review'] .review-summary > div + div { border-left: 0.5px solid var(--color-rule); }
 html[data-room='review'] .review-summary > div:first-child { padding-left: 4px; }
 html[data-room='review'] .review-summary .sum-l {
-  font: 600 11px/1 var(--font-ui);
+  font: 600 var(--type-caption)/1 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted);
 }
 html[data-room='review'] .review-summary .sum-n {
   margin: 0;
-  font: 800 34px/1 var(--font-headword);
+  font: 800 var(--type-display)/1 var(--font-headword);
   font-variant-numeric: tabular-nums;
   color: var(--color-ink);
 }
@@ -599,7 +599,7 @@ html[data-room='review'] .review-next-door {
 html[data-room='review'] .review-next-door .review-next-pic { width: 112px; aspect-ratio: 3 / 2; height: auto; border-radius: var(--radius-card); overflow: hidden; }
 html[data-room='review'] .review-next-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 html[data-room='review'] .review-next-l {
-  font: 600 11px/1 var(--font-ui);
+  font: 600 var(--type-caption)/1 var(--font-ui);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-muted);
@@ -609,10 +609,10 @@ html[data-room='review'] .review-next-title {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  font: 600 17px/1.35 var(--font-reading);
+  font: 600 var(--type-lead)/1.35 var(--font-reading);
 }
 html[data-room='review'] .review-next-n {
-  font: 400 12px/1 var(--font-data);
+  font: 400 var(--type-caption)/1 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-muted);
 }
@@ -636,13 +636,13 @@ html[data-room='review'] .review-tomorrow {
   padding: 0 2px;
 }
 html[data-room='review'] .review-tomorrow-l {
-  font: 400 13px/1.3 var(--font-data);
+  font: 400 var(--type-label)/1.3 var(--font-data);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   color: var(--color-muted);
 }
 html[data-room='review'] .review-tomorrow-w {
-  font: 800 26px/1.2 var(--font-headword);
+  font: 800 var(--type-section)/1.2 var(--font-headword);
   color: var(--color-ink);
   -webkit-mask-image: linear-gradient(180deg, #000 68%, rgb(0 0 0 / 35%) 100%);
   mask-image: linear-gradient(180deg, #000 68%, rgb(0 0 0 / 35%) 100%);
@@ -660,7 +660,7 @@ html[data-room='review'] body:not(.zen) #app .close-doors :is(button.take.quiet,
   background: none;
   box-shadow: none;
   color: var(--color-accent);
-  font: 500 14px/1.2 var(--font-ui);
+  font: 500 var(--type-chrome)/1.2 var(--font-ui);
   letter-spacing: 0.01em;
   text-decoration: underline;
   text-decoration-thickness: 0.5px;
@@ -703,13 +703,13 @@ html[data-room='saved'] .saved-cards .deck-count {
 }
 html[data-room='saved'] .saved-cards .deck-count:first-child { padding-left: 2px; border-left: 0; }
 html[data-room='saved'] .saved-cards .deck-count .deck-count-n {
-  font: 500 26px/1.1 var(--font-data);
+  font: 500 var(--type-section)/1.1 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-ink);
 }
 html[data-room='saved'] .saved-cards .deck-count .deck-count-l {
   margin-top: 4px;
-  font: 500 11px/1.2 var(--font-ui);
+  font: 500 var(--type-caption)/1.2 var(--font-ui);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-muted);
@@ -717,7 +717,7 @@ html[data-room='saved'] .saved-cards .deck-count .deck-count-l {
 html[data-room='saved'] .saved-cards .deck-count.c-due .deck-count-n { color: var(--color-accent); }
 html[data-room='saved'] .saved-cards .srs-forecast {
   margin: 6px 0;
-  font: 400 12px/1.6 var(--font-data);
+  font: 400 var(--type-caption)/1.6 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-muted);
 }
@@ -727,11 +727,11 @@ html[data-room='saved'] .saved-cards .deck-row {
   min-height: 46px;
   padding: 8px 2px;
   border-bottom: var(--stroke-hairline) solid var(--color-line);
-  font: 400 15px/1.3 var(--font-ui);
+  font: 400 var(--type-control)/1.3 var(--font-ui);
   color: var(--color-ink);
 }
 html[data-room='saved'] .saved-cards .deck-row > span:not(.d-name) {
-  font: 500 14px/1 var(--font-data);
+  font: 500 var(--type-chrome)/1 var(--font-data);
   font-variant-numeric: tabular-nums;
   color: var(--color-ink);
 }
@@ -739,7 +739,7 @@ html[data-room='saved'] .saved-cards .deck-row > span.zero { color: var(--color-
 html[data-room='saved'] .saved-cards .deck-row > span.c-due:not(.zero) { color: var(--color-accent); }
 html[data-room='saved'] .saved-cards .deck-row.deck-head { min-height: 0; padding-block: 8px; }
 html[data-room='saved'] .saved-cards .deck-row.deck-head > span {
-  font: 500 10.5px/1 var(--font-ui);
+  font: 500 var(--type-caption)/1 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted);
