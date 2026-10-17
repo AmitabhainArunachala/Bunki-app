@@ -1455,9 +1455,10 @@ async function verifyBack(browser, base) {
     await o.page.waitForSelector('.kp-grade');
     const b = await o.page.evaluate(BACK);
     const tier1 = b.order.slice(0, b.order.indexOf('kp-folds'));
+    // Q (the comb): the definition may carry .kp-words, the app's word rule for its Japanese line breaks; nothing else
     check(
       'b) tier one under the passage: the word (reading, part of speech, no pitch), a reading over every kanji, the Japanese definition, no English; the part-of-speech badge is chrome in the interface language (EN: noun)',
-      b.word.join() === 'kp-term,kp-reading,kp-posbadge' && !b.pitch && !b.bare && b.rt > 0 && tier1[0] === 'kp-word' && tier1[1] === 'kp-def' && tier1.every((k) => ['kp-word', 'kp-def', 'kp-note'].includes(k.split(' ')[0])) && b.def === w.defJa && !/[A-Za-z]/.test(b.tier1) && zf === null &&
+      b.word.join() === 'kp-term,kp-reading,kp-posbadge' && !b.pitch && !b.bare && b.rt > 0 && tier1[0] === 'kp-word' && ['kp-def', 'kp-def kp-words'].includes(tier1[1]) && tier1.every((k) => ['kp-word', 'kp-def', 'kp-note'].includes(k.split(' ')[0])) && b.def === w.defJa && !/[A-Za-z]/.test(b.tier1) && zf === null &&
         // the badge follows the interface (this run is EN): the English name, marked lang=en, never 名詞 in EN chrome
         b.pos?.lang === 'en' && /^[a-z -]+$/.test(b.pos.text) && !/[\u3040-\u30ff\u3400-\u9fff]/u.test(b.pos.text),
       JSON.stringify({ card: c.id, order: b.order, word: b.word, rt: b.rt, bare: b.bare, pos: b.pos }),
