@@ -535,13 +535,13 @@
 /* the attempt: a sheet of washi on the ground */
 .gs-sheet {
   background-color: var(--ground-0);
+  /* drawn: the attempt sheet's laid lines — hairlines of the world's ink at a breath, hard-edged (its white sheen of its own is gone: no pigment is lighter than the paper) */
   background-image:
     repeating-linear-gradient(
       0deg,
       color-mix(in srgb, var(--ink) 2.5%, transparent) 0 1px,
       transparent 1px 3px
-    ),
-    radial-gradient(ellipse at 20% 0%, color-mix(in srgb, #fff 45%, transparent), transparent 60%);
+    );
   border: 1px solid color-mix(in srgb, var(--ink) 32%, transparent);
   border-radius: var(--radius-card);
   box-shadow: var(--gs-sheet-shadow);
@@ -556,6 +556,7 @@
   )
   .gs-sheet:not(.gs-lacquer) {
   /* night paper keeps its grain but no sheen: on a dark ground a light sheen reads as glow */
+  /* drawn: the night sheet's laid lines, hairlines of its ink */
   background-image: repeating-linear-gradient(
     0deg,
     color-mix(in srgb, var(--ink) 2.5%, transparent) 0 1px,

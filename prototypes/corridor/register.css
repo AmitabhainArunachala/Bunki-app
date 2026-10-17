@@ -49,6 +49,7 @@ html[data-register="attempt"] .chrome::after {
   position: absolute;
   left: 0; right: 0; bottom: -1px;
   height: 3px;
+  /* drawn: the register's stage line — ink up to the stage reached, hard-edged */
   background: linear-gradient(to right, var(--ink) 0 calc(var(--stage) * 100%), transparent calc(var(--stage) * 100%));
   transition: none;
 }
