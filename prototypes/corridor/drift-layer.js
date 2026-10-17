@@ -810,6 +810,7 @@ function spawnGlyph(ch,x,y,comp){
   const n={kind:"glyph",ch,comp:!!comp,el,x,y,z:1,baseOp:.95,ci,s:.3,ts:1,tx:x,ty:y,op:0,top:.95,
     rot:0,cr:0,vx:0,vy:0,dragX:0,dragY:0,mode:"orbit",orbit:null,blur:0,gone:false,removed:false};
   nodes.push(n); nodeOf.set(el,n);
+  mountHostedNodeReading(n);
   return n;
 }
 function spawnPart(ch,x,y){
@@ -820,6 +821,7 @@ function spawnPart(ch,x,y){
   const n={kind:"part",ch,el,x,y,z:1,baseOp:.9,s:.3,ts:1,tx:x,ty:y,op:0,top:.9,
     rot:0,cr:0,vx:0,vy:0,dragX:0,dragY:0,mode:"orbit",orbit:null,blur:0,gone:false,removed:false};
   nodes.push(n); nodeOf.set(el,n);
+  mountHostedNodeReading(n);
   return n;
 }
 // ---- the vault-field: a world plane of galaxies, seen through a camera ----
@@ -3145,6 +3147,25 @@ function slipAway(){
   // A reading-only visit has no popup yet, but must fold when its scene leaves.
   if(h&&typeof h.close==="function") h.close();
 }
+function mountHostedNodeReading(n,reading){
+  if(n.kind!=="glyph"&&n.kind!=="part")return null;
+  const kind=n.kind==="glyph"?"kanji":"particle";
+  const h=slipHost(kind,n.ch);
+  if(!h)return null; // standalone retains its own unannotated field
+  reading=reading||h.reading?.(kind,n.ch)||"";
+  const kana=s=>String(s).replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
+  if(!reading||kana(reading)===kana(n.ch))return null;
+  const base=n.el.querySelector(n.kind==="glyph"?".g":".pch");
+  if(!base)return null;
+  let ruby=base.querySelector(":scope > ruby.drift-reading");
+  if(!ruby){
+    ruby=document.createElement("ruby");ruby.className="drift-reading";ruby.lang="ja";
+    ruby.append(...base.childNodes);
+    const rt=document.createElement("rt");rt.textContent=reading;ruby.append(rt);base.append(ruby);
+  }
+  n.r=reading;
+  return ruby;
+}
 function hostedSlip(n,{redo=false,bloom=false}={}){
   const kind=n.kind==="word"?"word":n.kind==="glyph"?"kanji":n.kind==="part"?"particle":null;
   const key=kind==="word"?n.w:n.ch;
@@ -3154,25 +3175,17 @@ function hostedSlip(n,{redo=false,bloom=false}={}){
     bloomFocus(n); // keep the existing family response, without an extra tap rung
     bloomLast=performance.now();
   }
-  let ruby=null,base=null,children=null;
   const clearReveal=()=>{
-    n.el.classList.remove("unfolded","glossed");
+    n.el.classList.remove("unfolded","glossed","hosted-reading-shown");
     if(unfolded===n)unfolded=null;
-    if(ruby&&ruby.parentNode===base)ruby.replaceWith(...children);
-    ruby=null;
   };
   const reveal=reading=>{
     if(n.kind==="word"){
       collapseUnfold();
       n.el.classList.add("unfolded");n.el.classList.remove("glossed");unfolded=n;
     }else if(reading){
-      // The gloss/particle caption is a sibling, never part of the ruby base.
-      base=n.el.querySelector(n.kind==="glyph"?".g":".pch");
-      if(base){
-        children=[...base.childNodes];ruby=document.createElement("ruby");
-        ruby.append(...children);
-        const rt=document.createElement("rt");rt.textContent=reading;ruby.append(rt);base.append(ruby);
-      }
+      // Reuse the resting annotation; its caption remains a sibling.
+      if(mountHostedNodeReading(n,reading))n.el.classList.add("hosted-reading-shown");
     }
     return clearReveal;
   };

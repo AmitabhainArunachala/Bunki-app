@@ -75,8 +75,9 @@ const controlsOnly = process.argv.includes('--controls-only');
 const roomsOnly = process.argv.includes('--rooms-only');
 const sentencesOnly = process.argv.includes('--sentences-only');
 const kanaOnly = process.argv.includes('--kana-only');
-assert([controlsOnly, roomsOnly, sentencesOnly, kanaOnly].filter(Boolean).length <= 1, 'Choose one explicit narrow schedule');
-const g3Only = controlsOnly || roomsOnly || sentencesOnly || kanaOnly || process.argv.includes('--g3-only');
+const skyReadingsOnly = process.argv.includes('--sky-readings-only');
+assert([controlsOnly, roomsOnly, sentencesOnly, kanaOnly, skyReadingsOnly].filter(Boolean).length <= 1, 'Choose one explicit narrow schedule');
+const g3Only = controlsOnly || roomsOnly || sentencesOnly || kanaOnly || skyReadingsOnly || process.argv.includes('--g3-only');
 const withControls = controlsOnly || process.argv.includes('--controls');
 
 const host = await startStaticHost({ site, port: 0 });
@@ -352,9 +353,10 @@ try {
     const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true, control = null, init = null, demo = false } = {}) => {
       if (g3Only && !name.startsWith('G3')) return;
       if (controlsOnly && !['G3-stalled', 'G3-clear', 'G3-front'].includes(name)) return;
-      if (roomsOnly && !['G3-words', 'G3-words-family', 'G3-sky'].includes(name)) return;
+      if (roomsOnly && !['G3-words', 'G3-words-family', 'G3-sky', 'G3-sky-glyph', 'G3-particle'].includes(name)) return;
       if (sentencesOnly && name !== 'G3-front' && !name.startsWith('G3-sentence-')) return;
-      if (kanaOnly && name !== 'G3-kana') return;
+      if (kanaOnly && name !== 'G3-kana' && name !== 'G3-particle') return;
+      if (skyReadingsOnly && name !== 'G3-sky-glyph' && name !== 'G3-particle') return;
       const context = await browser.newContext({ viewport, isMobile: mobile, hasTouch: true, deviceScaleFactor: 2, serviceWorkers: 'block' });
       await context.addInitScript(GLYPHS);
       if (!demo) await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
@@ -761,6 +763,100 @@ try {
         const folded = await facts();
         check(`${id}.reading-close`, 'Escape also closes a reading-only sky visit', !folded.skyReading && !folded.skyGloss && !folded.stages && !folded.page && !folded.rung, folded);
       }
+      }
+    });
+
+    await walk('G3-sky-glyph', async (page) => {
+      for (const [mode, name] of [[0, 'off'], [1, 'on-touch'], [2, 'always']]) {
+        await openStory(page); await furigana(page, mode);
+        await page.goto(`${host.origin}/?entry=drift&ui=bi`);
+        await page.waitForFunction(() => document.body.dataset.ready === '1' && !!window.__lockWord);
+        await delay(1200);
+        const canonical = await page.evaluate(() => ({
+          kanji: window.__BUNKI_OPEN_SLIP.reading('kanji', '言'),
+          particle: window.__BUNKI_OPEN_SLIP.reading('particle', 'は'),
+          particleId: window.__BUNKI_OPEN_SLIP.reading('particle', 'wa'),
+          identical: window.__BUNKI_OPEN_SLIP.reading('particle', 'の'),
+          unknown: window.__BUNKI_OPEN_SLIP.reading('kanji', '☃'),
+          stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'),
+        }));
+        const id = `G3.sky-glyph.${name}`;
+        check(`${id}.canonical`, 'the pure host getter uses canonical kanji/particle readings without opening a visit',
+          canonical.kanji === 'げん' && canonical.particle === 'わ' && canonical.particleId === 'わ' &&
+          canonical.identical === 'の' && canonical.unknown === '' && !canonical.stage && !canonical.page, canonical);
+        // This installed navigation seam creates the real constellation glyphs.
+        // Hosted particle nodes have no reachable scene entry: spawnPart remains
+        // behind legacy diveWord. Do not fabricate one or claim rendered coverage.
+        assert.equal(await page.evaluate(() => window.__lockWord('言葉')), true, 'the authored 言葉 constellation exists');
+        await page.waitForFunction(() => [...document.querySelectorAll('#drift-layer .glyph .g')].some(n => n.childNodes[0]?.textContent?.includes('言')));
+        await delay(1800);
+        const target = page.locator('#drift-layer .glyph').filter({ has: page.locator('.g ruby.drift-reading') }).filter({ hasText: '言' }).first();
+        await target.waitFor();
+        const state = async () => ({ ...await ladderFacts(page, target), ...await target.evaluate(node => {
+          const base = node.querySelector('.g').cloneNode(true); base.querySelectorAll('rt').forEach(n => n.remove());
+          const rt = node.querySelector('.g > ruby.drift-reading > rt'), style = rt && getComputedStyle(rt);
+          return { base: base.textContent, annotation: rt?.textContent, opacity: style?.opacity,
+            caption: node.querySelector(':scope > small')?.textContent,
+            captionWrapped: !!node.querySelector('ruby small'), wholeNodeRuby: !!node.querySelector(':scope > ruby'),
+            rung: node.dataset.ladderRung || null };
+        }) });
+        const tap = async () => {
+          const point = await target.locator('.g').evaluate(node => { const r = node.getBoundingClientRect();
+            const x = r.left + r.width / 2, y = r.top + r.height / 2;
+            return { x, y, hit: node.contains(document.elementFromPoint(x, y)) }; });
+          assert(point.hit, `the actual glyph must be hit-testable: ${JSON.stringify(point)}`);
+          await page.touchscreen.tap(point.x, point.y); await delay(450);
+        };
+        const resting = await state();
+        check(`${id}.bare`, `${name}: a spawned sky glyph follows the dial before its first activation`,
+          resting.base === '言' && resting.annotation === 'げん' && resting.reading === (mode === 2) &&
+          !resting.stages && !resting.page && !resting.captionWrapped && !resting.wholeNodeRuby, resting);
+        await tap(); const first = await state();
+        check(`${id}.first`, `${name}: first glyph activation follows the shared ladder`, mode === 1
+          ? first.reading && first.rung === 'reading' && !first.stages && !first.page
+          : first.stages === 1 && first.word === '言' && first.reading === (mode === 2) && !first.page, first);
+        if (mode === 1) await tap();
+        const staged = await state();
+        check(`${id}.stage`, 'the glyph stage preserves its base, reading policy and separate caption',
+          staged.stages === 1 && staged.word === '言' && staged.reading === (mode !== 0) &&
+          staged.base === '言' && staged.caption === resting.caption && !staged.captionWrapped && !staged.wholeNodeRuby, staged);
+        await tap(); await pageSettled(page); const full = await pageFacts(page);
+        check(`${id}.page`, 'the next glyph activation enters its own whole-screen kanji page',
+          coversViewport(full) && full.node === 'kanji:言', full);
+        await page.locator('#sheet-back').tap(); await bare(page);
+        const returned = await state();
+        check(`${id}.return`, 'kanji page Back restores the same sky glyph stage',
+          returned.stages === 1 && returned.word === '言' && !returned.page && returned.reading === (mode !== 0), returned);
+        await page.keyboard.press('Escape'); await delay(250);
+        const gone = await state();
+        check(`${id}.clear`, 'glyph dismissal retains only the always-on reading',
+          !gone.stages && !gone.page && !gone.rung && gone.reading === (mode === 2) &&
+          gone.annotation === 'げん' && gone.base === '言' && gone.caption === resting.caption, gone);
+      }
+    });
+    await walk('G3-particle', async (page) => {
+      for (const [mode, name] of [[0, 'off'], [1, 'on-touch'], [2, 'always']]) {
+        await openStory(page); await furigana(page, mode);
+        const target = page.locator('#reader .tok[data-index="10"][data-prose-label="は"]');
+        await target.scrollIntoViewIfNeeded();
+        const state = async () => ({ ...await ladderFacts(page, target), ...await target.evaluate(node => ({
+          annotations: [...node.querySelectorAll('rt')].map(rt => rt.textContent), rung: node.dataset.ladderRung || null,
+        })) });
+        const id = `G3.particle.${name}`, resting = await state();
+        check(`${id}.bare`, `${name}: the actual は particle shows only the dial's resting reading`,
+          !resting.stages && !resting.page && resting.reading === (mode === 2) &&
+          (mode !== 2 || resting.annotations.includes('わ')), resting);
+        await target.tap(); await delay(350); const first = await state();
+        check(`${id}.first`, `${name}: meaningful は → わ uses the reading rung only on touch`, mode === 1
+          ? first.reading && first.annotations.includes('わ') && first.rung === 'reading' && !first.stages
+          : first.stages === 1 && first.word === 'は' && first.reading === (mode === 2), first);
+        if (mode === 1) { await target.tap(); await delay(350); }
+        const staged = await state();
+        check(`${id}.stage`, 'the particle stage keeps its meaningful reading and has no Save',
+          staged.stages === 1 && staged.word === 'は' && staged.reading === (mode !== 0) && staged.save === null, staged);
+        await page.keyboard.press('Escape'); await delay(250); const gone = await state();
+        check(`${id}.clear`, 'particle dismissal retains only the always-on reading',
+          !gone.stages && !gone.page && !gone.rung && gone.reading === (mode === 2), gone);
       }
     });
 
@@ -1199,7 +1295,7 @@ try {
 
 function innerHeightOf(facts) { return facts?.inner?.height || 844; }
 
-writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: controlsOnly ? 'G3 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words and sky only; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana and particle bar Save only; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : 'G1 and G3', rows, frames, controls }, null, 1));
+writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : 'G1 and G3', rows, frames, controls }, null, 1));
 const failed = rows.filter((row) => !row.ok);
 console.log(`\n${rows.length - failed.length}/${rows.length} — evidence ${evidence}`);
 process.exit(failed.length ? 1 : 0);

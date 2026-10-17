@@ -722,9 +722,16 @@ async function openReaderWordStage(page, word) {
   await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
   if (await word.getAttribute('data-ladder-rung') === 'reading') {
     assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
-    assert(await word.evaluate(node => [...node.querySelectorAll('rt')].some(rt => {
-      const style = getComputedStyle(rt); return rt.textContent.trim() && style.visibility !== 'hidden' && style.display !== 'none' && Number(style.opacity) > 0;
-    })), 'The reading is actually visible');
+    // On-touch reader ruby paints through ::before; the native rt stays hidden
+    // to preserve the word's width. Require actual paint from either renderer.
+    await page.waitForFunction(node => [...node.querySelectorAll('ruby')].some(ruby => {
+      const rt = ruby.querySelector('rt');
+      if (!rt?.textContent.trim() || rt.classList.contains('hidden-rt')) return false;
+      const native = getComputedStyle(rt), floating = getComputedStyle(ruby, '::before');
+      return (rt.getClientRects().length > 0 && native.visibility !== 'hidden' && native.display !== 'none' && Number(native.opacity) > 0) ||
+        (ruby.getClientRects().length > 0 && ruby.dataset.r === rt.textContent && floating.content === JSON.stringify(rt.textContent) &&
+          floating.visibility !== 'hidden' && floating.display !== 'none' && Number(floating.opacity) > 0);
+    }), await word.elementHandle(), { timeout: 5000 });
     await word.click();
   }
   await page.locator('#mini').waitFor();

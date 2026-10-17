@@ -1668,7 +1668,18 @@ body.v-depth-layered #reader, #reader.reader {
   color: var(--text);
 }
 #reader .tok { padding: 0; }
-#reader .tok[data-para], .sentence-tok { cursor: pointer; }
+#reader .tok[data-para], .sentence-tok { cursor: pointer; position: relative; }
+/* Inline prose owns the same transparent reach as the former word button.
+ * Keep the hit box behind neighbouring glyphs so their centres remain theirs. */
+#reader .tok[data-para]::before, .sentence-tok::before {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  transform: translate(-50%, -50%);
+  z-index: -1;
+}
 /* Entry examples and the sentence page use the same hidden-reading marker
  * outside .reader. Keep native ruby layout; revealing removes this marker. */
 .sentence-tok rt.hidden-rt { opacity: 0; }
@@ -5474,3 +5485,8 @@ html[data-save-drawer='sheet'] #sheet > .sheet-bar[data-bar='sheet'] {
    existing in-place reveal; always/off are visible before any activation. */
 body[data-furigana='2'] #drift-layer .word .yomi { opacity: 1; }
 body[data-furigana='0'] #drift-layer .word .yomi { opacity: 0; }
+/* Hosted glyphs keep native reading markup at rest, including before their
+   first tap. A sibling gloss/particle caption is never part of the ruby. */
+body[data-furigana] #drift-layer .drift-reading rt { font-size: .45em; line-height: 1; opacity: 0; }
+body[data-furigana='1'] #drift-layer .hosted-reading-shown .drift-reading rt,
+body[data-furigana='2'] #drift-layer .drift-reading rt { opacity: 1; }

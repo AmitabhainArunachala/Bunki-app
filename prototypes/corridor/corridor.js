@@ -8281,6 +8281,7 @@ function inlineWordReading(anchor, reading) {
   }
   const children = [...anchor.childNodes];
   const row = el('ruby');
+  row.dataset.r = reading; // the reader's floating reading paints this value
   row.append(...children);
   row.append(el('rt', null, reading));
   anchor.append(row);
@@ -11785,7 +11786,10 @@ function renderReader(main) {
     // the word last tapped wears the one vermilion accent: current
     if (S.readerTake?.p === p.id && S.readerTake.index === index) span.classList.add('tok-current');
     span.append(
-      wordRow(displayPairs(token), {
+      // Authored particle pronunciation belongs to this same occurrence (は → わ).
+      // Keep its source token and spelling intact; the dial owns only the ruby.
+      wordRow(particle?.r && kataToHira(particle.r) !== kataToHira(token.s)
+        ? [{ t: token.s, r: particle.r }] : displayPairs(token), {
         // Off stays bare; on-touch owns only the current occurrence's reveal.
         furigana: S.dials.furigana,
         revealed: S.dials.furigana === 2 || (S.revealed && S.revealed.has(index)),
@@ -12059,6 +12063,13 @@ function kanjiSlipReading(k) {
   return kataToHira(String(k.on?.[0] || '')) || String(k.kun?.[0] || '').split('.')[0];
 }
 window.__BUNKI_OPEN_SLIP = {
+  /** Canonical hosted annotations; reading a label never opens or records a visit. */
+  reading(kind, key) {
+    if (!S.ready || !key) return '';
+    if (kind === 'kanji') return kanjiSlipReading(D.kanji?.[key]);
+    if (kind === 'particle') return (PARTICLE_BY_SURFACE[key] || PARTICLES.find(item => item.id === key))?.r || '';
+    return '';
+  },
   has(kind, key) {
     if (!S.ready || !key) return false;
     if (kind === 'word') return /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(key);
