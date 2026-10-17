@@ -23,6 +23,10 @@
  *                        same line of travel (card-arrive, the same beat): frames at 0/40/80/120/160/240 ms show the
  *                        copy moving right and fading and the card moving right and rising, monotonically.
  *   D2 deck Again      — the mirror: the copy leaves to the left, the card comes in from the right, the 朱 slash runs.
+ *                        D1 and D2 also hold (F, 2026-10-18) that the copy stands where the answered card stood, on
+ *                        the screen (a copy left in the flow had stood below the screen, its leave never seen), and
+ *                        that one card shows at a time: the copy has gone by the half-beat and the next card waits
+ *                        that half-beat (its delay) before it comes in — no frame shows both.
  *   D3 deck reduced    — under reduced motion no copy is inserted and the card fades in (opacity only, ≤ 120 ms).
  *   T  frame timing    — the open and the Good grade in real time, cold and warm: worst frame, p95 and the longest
  *                        stall from requestAnimationFrame (a measured proxy, recorded, never a phone).
@@ -425,7 +429,9 @@ try {
         ghostIds: ghosts[0] ? ghosts[0].id + ghosts[0].querySelectorAll('[id]').length : null,
         ghostInert: ghosts[0] ? ghosts[0].inert && ghosts[0].getAttribute('aria-hidden') === 'true' : null,
         leave: ghosts[0] ? { duration: anim(ghosts[0], 'card-leave')?.effect.getTiming().duration ?? null, dx: getComputedStyle(ghosts[0]).getPropertyValue('--card-dx').trim() } : null,
-        arrive: card ? { arriving: card.classList.contains('kp-arrive'), duration: anim(card, 'card-arrive')?.effect.getTiming().duration ?? null, dx: getComputedStyle(card).getPropertyValue('--card-dx').trim() } : null,
+        arrive: card ? { arriving: card.classList.contains('kp-arrive'), duration: anim(card, 'card-arrive')?.effect.getTiming().duration ?? null, delay: anim(card, 'card-arrive')?.effect.getTiming().delay ?? null, dx: getComputedStyle(card).getPropertyValue('--card-dx').trim() } : null,
+        ghostRect: ghosts[0] ? (() => { const r = ghosts[0].getBoundingClientRect(); return { left: r.left, top: r.top, width: r.width, height: r.height }; })() : null,
+        viewport: innerHeight,
         advance: document.querySelector('.kp-study')?.dataset.advance || null, slash: !!document.querySelector('.kp-slash'),
         quick: quick.endsWith('ms') ? parseFloat(quick) : parseFloat(quick) * 1000,
       };
@@ -444,6 +450,7 @@ try {
       await run(label, async ({ page }) => {
         await deckOpen(page);
         const before = await page.evaluate(() => document.getElementById('kp-card')?.dataset.card || null);
+        const answered = await page.evaluate(() => { const r = document.getElementById('kp-card').getBoundingClientRect(); return { left: r.left, top: r.top, width: r.width, height: r.height }; });
         await gradeFrozen(page, grade);
         const state = await deckState(page);
         assert.equal(state.ghosts, 1, 'one inert copy of the answered card');
@@ -453,6 +460,11 @@ try {
         assert.equal(state.leave.duration, state.quick, `card-leave runs --motion-quick: ${JSON.stringify(state.leave)}`);
         assert.equal(state.leave.dx, leaveDx, `the copy leaves ${leaveDx}`);
         assert(state.arrive.arriving && state.arrive.duration === state.quick, `card-arrive runs --motion-quick: ${JSON.stringify(state.arrive)}`);
+        assert(near(state.arrive.delay, state.quick / 2, 0.5), `the next card waits the half-beat the copy takes to go: ${JSON.stringify(state.arrive)}`);
+        // the copy stands where the answered card stood, on the screen (not left in the flow, under the next card)
+        const g = state.ghostRect;
+        assert(g && near(g.left, answered.left, 1) && near(g.top, answered.top, 1) && near(g.width, answered.width, 1) && g.top < state.viewport && g.top + g.height > 0,
+          `the copy stands where the answered card stood: ${JSON.stringify({ copy: g, answered })}`);
         assert.equal(state.arrive.dx, arriveDx, `the next card comes in from ${arriveDx}`);
         assert.equal(state.advance, grade);
         if (grade === 'again') assert(state.slash, 'the 朱 slash runs on Again');
@@ -469,6 +481,7 @@ try {
         assert(live.every((f, i) => i === 0 || (sign * f.ghost.tx >= sign * live[i - 1].ghost.tx && f.ghost.opacity <= live[i - 1].ghost.opacity)), 'the copy moves one way and fades');
         assert(frames.every((f, i) => i === 0 || (sign * f.card.tx >= sign * frames[i - 1].card.tx - 0.01 && f.card.opacity >= frames[i - 1].card.opacity - 0.001)), 'the card moves the same way and rises');
         assert(near(frames[0].card.tx, -sign * 24, 0.5) && frames[0].card.opacity < 0.05, `the card starts 24 px back on the line of travel: ${JSON.stringify(frames[0])}`);
+        assert(frames.every((f) => !(f.ghost && f.ghost.opacity > 0.02 && f.card.opacity > 0.02)), `one card at a time, never two layers of text: ${JSON.stringify(frames)}`);
         await release(page);
         await page.evaluate(() => { for (const a of document.getAnimations()) a.finish?.(); });
         await page.waitForTimeout(600);
