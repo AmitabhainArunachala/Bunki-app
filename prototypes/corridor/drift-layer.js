@@ -3746,6 +3746,8 @@ function drawScaleStars(){
   for(const star of scaleStars.values()){
     const p=w2s(star.scaleX,star.scaleY);
     const visible=!stack.length&&p.x>=30&&p.x<=vw()-30&&p.y>=80&&p.y<=vh()-100;
+    if(visible&&!star.scaleProjectedVisible&&!star.scaleFullSize)scaleLayoutDirty=true;
+    star.scaleProjectedVisible=visible;
     const fixed=visible&&star.scaleRenderPosition&&(star.scalePressIds?.size||document.activeElement===star)?star.scaleRenderPosition:null;
     projected.push({star,p,visible,fixed});
   }
@@ -3784,7 +3786,7 @@ function drawScaleStars(){
   }
   for(const {star,p,visible,fixed}of projected){
     if(!visible){if(star.scaleRenderKey!=='hidden'){star.hidden=true;star.scaleRenderKey='hidden';}continue;}
-    if(!star.scalePlan){star.hidden=true;continue;}
+    if(!star.scalePlan||!star.scaleFullSize){star.hidden=true;continue;}
     const plan=star.scalePlan,placed=fixed||scaleFitPoint({x:p.x+plan.dx,y:p.y+plan.dy},plan.width,plan.height);
     // The compact caption is visual only; the full accessible name remains on
     // the same focusable button. Its whole box stays inside the viewport.
