@@ -329,6 +329,23 @@ export function batteryGates(out, env = process.env) {
     },
     node('sentence-drafts-integration', tool('verify-sentence-drafts')),
     node('browser-audio-silence-contract', tool('browser-audio-silence.test')),
+    // V (2026-10-17). Both suites existed and neither was gated: test-approved-voice was a
+    // named by-design red, and test-excerpt-narration threw at import, so the quote audio John
+    // asked for on 09-29 had no executing test at all. voice-lock is the comparison that was
+    // missing between the renderer, the manifests and the runtime.
+    node('voice-lock', tool('verify-voice-lock')),
+    {
+      name: 'approved-voice-contract',
+      command: process.execPath,
+      args: ['--test', tool('test-approved-voice')],
+      requiredPath: tool('test-approved-voice'),
+    },
+    {
+      name: 'excerpt-narration-contract',
+      command: process.execPath,
+      args: ['--test', tool('test-excerpt-narration')],
+      requiredPath: tool('test-excerpt-narration'),
+    },
     node('source-kanji-practice-contract', tool('source-kanji-practice.test')),
     node('source-kanji-practice-integration', tool('verify-source-kanji-practice')),
     {
@@ -2431,6 +2448,9 @@ async function verifyRunner(out) {
     'sentence-drafts-contract',
     'sentence-drafts-integration',
     'browser-audio-silence-contract',
+    'voice-lock',
+    'approved-voice-contract',
+    'excerpt-narration-contract',
     'source-kanji-practice-contract',
     'source-kanji-practice-integration',
     'source-inbox-contract',
