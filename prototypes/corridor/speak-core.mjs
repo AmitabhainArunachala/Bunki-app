@@ -128,7 +128,7 @@ export const SCENE_KINDS = Object.freeze({
 });
 const scene = (value) => Object.freeze(value);
 export const SCENE_TEMPLATES = Object.freeze([
-  scene({ id: 'free', kind: 'free', title: { ja: '今日の話', en: 'Today' }, role: { ja: 'Kore', en: 'Kore' }, register: 'polite',
+  scene({ id: 'free', kind: 'free', title: { ja: '今日の話', en: 'Today' }, role: { ja: 'Kore', en: 'herself' }, register: 'polite',
     brief: 'Free conversation about whatever the learner wants to talk about today.' }),
   scene({ id: 'field-memory', kind: 'field', title: { ja: '忘却曲線は、本当は何を測ったのか', en: 'What the forgetting curve measured' },
     role: { ja: '「一日で67％忘れる」と信じている友人', en: 'a friend who believes we forget 67% in a day' }, register: 'casual',
