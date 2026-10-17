@@ -4276,7 +4276,23 @@ function jaFlow(node, text) {
   if (words.length < 2) return false;
   appendJaPieces(node, words);
   node.classList.add('ja-flow');
+  queueJaNowrap(node);
   return true;
+}
+/* A label set on one line (white-space: nowrap: a bar's Save, a chip) keeps its one line: Chromium honours a <wbr> even
+ * there (保存 / 語をタップ in two lines at 390), WebKit does not. Once the label is in the page, its breaks leave it. */
+let jaNowrapQueue = null;
+function queueJaNowrap(node) {
+  if (!jaNowrapQueue) {
+    jaNowrapQueue = [];
+    requestAnimationFrame(() => {
+      const nodes = jaNowrapQueue;
+      jaNowrapQueue = null;
+      const oneLine = nodes.filter((n) => n.isConnected && /^(nowrap|pre)$/u.test(getComputedStyle(n).whiteSpace));
+      for (const n of oneLine) for (const w of n.querySelectorAll('wbr')) w.remove();
+    });
+  }
+  jaNowrapQueue.push(node);
 }
 /** A node's text set as el() sets it (the word rule for Japanese, plain text otherwise). */
 function flowText(node, text) {
@@ -8917,7 +8933,9 @@ function paintWordSave(button, on) {
   // It never cuts and never wraps (Grok's walk: SAVE / a word, 保存 / 語をタ…): fitChromeKeep sheds the word, then the
   // ✓, until the line fits the room the bar's doors leave; its accessible name always says the whole of it
   if (button.dataset.saveBar != null) {
-    const name = el('span', `save-bar-word${word ? '' : ' is-rest'}`, word || tx('語をタップ', 'a word'));
+    // one word on one line: set as plain text, never with the word rule's breaks (Chromium honours a <wbr> in a no-break label)
+    const name = el('span', `save-bar-word${word ? '' : ' is-rest'}`);
+    name.textContent = word || tx('語をタップ', 'a word');
     button.replaceChildren(el('span', 'save-bar-verb', on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save')),
       document.createTextNode(' '), name);
     button.classList.remove('is-verb-only', 'is-short');
