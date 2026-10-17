@@ -31835,7 +31835,7 @@ function writeWord(word, { reading = null, after = null, elapsed = 0, onBegin = 
   if (reading) reading.dataset.inkHeld = '';
   const ink = { word, reading, strokes, per, total, anims: [], startedAt: null, ended: null, disposed: false };
   inkOwners.set(word, ink);
-  const interrupt = () => ink.end('input');
+  const interrupt = (event) => ink.end('input', event);
   // a tap or the start of a touch scroll (pointerdown), a key, or any scroll (a wheel, a trackpad, a scrollbar). Not a
   // wheel listener: one on the window makes WebKit rebuild its event regions as it is added and taken away (a 25–35 ms
   // frame at each end of the writing, measured), while a scroll listener costs nothing
@@ -31854,17 +31854,31 @@ function writeWord(word, { reading = null, after = null, elapsed = 0, onBegin = 
     if (word.querySelector('.ink-char')) word.textContent = text;
     delete word.dataset.ink;
   };
-  ink.end = (why) => {
+  ink.end = (why, event = null) => {
     if (ink.ended) return;
     ink.ended = why;
     listen(false);
     if (stageInk === ink) stageInk = null;
     if (reading) delete reading.dataset.inkHeld;
     word.dataset.inkEnded = why;
-    // written: the ink dries into the word's own type in one short crossfade; anything else ends it at once
     if (why === 'written' && word.isConnected) {
+      // written: the ink dries into the word's own type in one short crossfade
       word.dataset.ink = 'settling';
       setTimeout(ink.dispose, INK_SETTLE_MS + 40);
+    } else if (why === 'input' && event?.type === 'pointerdown' && word.isConnected) {
+      // a press finishes it at once — every stroke drawn now — but the word's own children stand as they are until that
+      // press is released: a press whose target is replaced under it loses its click (Chromium, measured), and the same
+      // tap must still act. The plain word follows the release.
+      for (const animation of ink.anims) animation.finish();
+      word.dataset.ink = 'finished';
+      const release = () => {
+        window.removeEventListener('pointerup', release, true);
+        window.removeEventListener('pointercancel', release, true);
+        setTimeout(ink.dispose, 0);
+      };
+      window.addEventListener('pointerup', release, true);
+      window.addEventListener('pointercancel', release, true);
+      setTimeout(release, 1500);
     } else ink.dispose();
     onEnd?.(why, ink);
   };

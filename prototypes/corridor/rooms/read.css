@@ -919,7 +919,9 @@ body[data-view='drift'] #mini .mini-take:not(.taken):not(.reader-capture-held) {
 #mini .mini-word .ink-wet path { stroke: var(--mini-head-ink); stroke-dasharray: 1 1; stroke-dashoffset: 1; }
 /* the word travels to the stage as its own お手本, and the ink writes over it where it lands */
 #mini .mini-word[data-ink='arriving'] { color: color-mix(in srgb, var(--mini-head-ink) 24%, transparent); }
-#mini .mini-word:is([data-ink='arriving'], [data-ink='writing']) .ink-char[data-strokes] { color: transparent; }
+#mini .mini-word:is([data-ink='arriving'], [data-ink='writing'], [data-ink='finished']) .ink-char[data-strokes] { color: transparent; }
+/* finished by a press: every stroke drawn at once, until the press is released and the plain word stands */
+#mini .mini-word[data-ink='finished'] .ink-wet path { stroke-dashoffset: 0; opacity: 1; }
 #mini .mini-word[data-ink='writing'] .ink-char:not([data-strokes]) { transition: color 160ms ease-out; }
 #mini .mini-word[data-ink='settling'] .ink-char[data-strokes] { color: var(--mini-head-ink); transition: color 180ms ease-out; }
 #mini .mini-word[data-ink='settling'] .ink-glyph { opacity: 0; transition: opacity 180ms ease-in; }
