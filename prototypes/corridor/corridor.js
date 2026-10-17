@@ -5883,7 +5883,6 @@ function renderShelfBody(search = null) {
   // the publication order
   const dropFirst = !['title', 'short', 'new', 'latest'].includes(filters.sort);
   const dropDays = dropFirst ? leadingDropDays(stories) : [];
-  const dropDay = dropDays[0] || '';
   const shelfOrder = filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : filters.sort==='latest' ? byNewest : byLeadingDrops(dropDays);
   // One slim chip bar. Each chip wears its current value; its native <select> lies over it,
   // transparent, so the platform's own picker opens and nothing is truncated on the surface.
@@ -6162,8 +6161,7 @@ function renderShelfBody(search = null) {
   let dropCount = 0;
   while (dropCount < matches.length && leading.has(matches[dropCount].addedAt)) dropCount += 1;
   if (filters.sort === 'today' && unfiltered) matches = [...matches.slice(0, dropCount), ...shelfDailyOrder(matches.slice(dropCount), day)];
-  // the bands follow the newest drop, with any earlier cut gathered into it, and never stand inside it
-  const newestEnd = dropDay ? matches.filter((p) => p.source !== 'isa-yasashii-glossary').reduce((end, p, i) => (p.addedAt === dropDay ? i + 1 : end), 0) : 0;
+
   const count=el('p','shelf-results-count',shelfTallyText(matches));count.setAttribute('role','status');controls.append(count);
   // unfiltered, the masthead already carries this same tally: the line stays for assistive tech only
   if (!Object.values(filters).some((v,i)=>i>0 && v)) count.classList.add('is-quiet');
@@ -6290,8 +6288,9 @@ function renderShelfBody(search = null) {
   for (const p of matches) {
     if (p.source === 'isa-yasashii-glossary') continue;
     if (rank >= 3 && inBand.has(p.id)) continue;
-    // the bands (today's six, words met again) follow the lead and its two seconds — and never stand inside the newest drop
-    if (rank === Math.max(3, newestEnd)) grid.append(...bands.splice(0));
+    // the bands (today's six, words met again) follow the lead and its two seconds — and never stand inside the leading
+    // drops, which stand together (N2: N's twenty follow the newest)
+    if (rank === Math.max(3, dropCount)) grid.append(...bands.splice(0));
     grid.append(shelfCard(p, rank === 0 ? 'lead' : rank < 3 ? 'second' : 'grid'));
     rank += 1;
   }
