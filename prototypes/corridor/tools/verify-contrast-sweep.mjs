@@ -16,8 +16,8 @@
  *             edge, reads at ≥ 3:1 against the ground just outside it (D1).
  *   C3 roots  every gradient painted on a key screen, and every paint on the surfaces Material II owns (the bars, the
  *             Line, the heroes, the page's head, the key-kanji sheets), resolves only to the world's own pigments — the
- *             colour tokens its block in corridor.css declares on :root — one of them, or a mix of two (any alpha). A
- *             literal off-world colour is red even where it happens to sit near one world's ink (D3).
+ *             twenty tokens its block in corridor.css declares, the house gold, and the five roles contract §6 tables —
+ *             one of them, or a mix of two (any alpha, within 3/255). A literal off-world colour is red (D3).
  *   C4 band   each painted gradient layer that is a gradation (not a hard-stop drawing), drawn alone at its own size in
  *             the engine: ≤ 1 visible tonal step per 24 px — steps = max(⌊ΔE76 across the window ÷ 2.3⌋, single-pixel
  *             jumps ≥ 2.3 ΔE76) over every 24-px window of rows and columns 6 px apart (2.3 = one just-noticeable
@@ -309,7 +309,12 @@ const IN_PAGE = () => {
     probe.style.cssText = 'position:fixed;left:-99px;top:-99px;width:1px;height:1px;pointer-events:none';
     body.append(probe);
     const colourOf = (value) => { probe.style.color = 'rgb(1, 2, 3)'; probe.style.color = value; return getComputedStyle(probe).color; };
-    // the world's pigments: every colour token the world blocks in corridor.css declare on :root
+    // the world's pigments: the twenty tokens every world block in corridor.css declares (the bare :root is ベロ藍's
+    // block), each found declared on :root in corridor.css, plus the house gold 金 (--gold, the same :root) — not the
+    // other house constants (the review card's, the lacquer sheet's, the SRS marks'), which no world chose
+    const WORLD_TOKENS = ['--zen-stage-deep', '--zen-stage', '--zen-stage-crown', '--zen-text', '--zen-accent', '--zen-red', '--zen-glow',
+      '--ground', '--ground-2', '--ground-0', '--ink', '--ink-2', '--red', '--red-wash', '--line', '--line-soft', '--faint', '--faint-2',
+      '--ai', '--ai-wash', '--gold'];
     const names = new Set();
     for (const sheet of document.styleSheets) {
       if (!/\/corridor\.css(\?|$)/.test(sheet.href || '')) continue;
@@ -318,7 +323,7 @@ const IN_PAGE = () => {
         if (!(rule instanceof CSSStyleRule) || !/^:root(\[|$)/.test(rule.selectorText)) continue;
         let hit = false; try { hit = root.matches(rule.selectorText); } catch { hit = false; }
         if (!hit) continue;
-        for (let i = 0; i < rule.style.length; i++) if (rule.style[i].startsWith('--')) names.add(rule.style[i]);
+        for (let i = 0; i < rule.style.length; i++) if (WORLD_TOKENS.includes(rule.style[i])) names.add(rule.style[i]);
       }
     }
     const rs = getComputedStyle(root), pigments = [];
@@ -842,7 +847,7 @@ try {
         if (result.figures.length) check(`${world}/${state}.C2`, `${world}/${state}: the overlay stands as a figure on its page (≥ 3:1 fill or lit edge on one whole side)`,
           result.figures.every((f) => f.ok), result.figures);
         check(`${world}/${state}.C3`, `${world}/${state}: every gradient and every owned surface roots in the world's ${result.pigmentCount} pigments`,
-          result.pigmentCount >= 15 && result.roots.length === 0, { pigments: result.pigmentCount, off: result.roots.slice(0, 12) });
+          result.pigmentCount >= 24 && result.roots.length === 0, { pigments: result.pigmentCount, off: result.roots.slice(0, 12) });
         const banded = result.banding.filter((b) => !b.ok);
         check(`${world}/${state}.C4`, `${world}/${state}: no banding, gentle slope — ≤ 1 visible tonal step per 24 px (${result.banding.length} gradation layers drawn)`,
           banded.length === 0, banded.slice(0, 8));
