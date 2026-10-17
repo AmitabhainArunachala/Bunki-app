@@ -4898,6 +4898,18 @@ body:not(.zen) #app > .chrome {
 [data-bar='guided'] .gs-nav[aria-current='page'] { color: var(--color-bar-ink); font-weight: 700; }
 /* the sheet's bar bleeds to the sheet's edges (its own .sheet-bar margins), its doors on the content's gutter */
 [data-bar='sheet'] { gap: 4px; padding-inline: 12px; }
+/* the deck's and the guided room's bars run to their host's edges as the sheet's does (E's leftover, F), its doors
+   kept on the content's gutter: the host's gutter taken back by the bar, less the back glyph's own 8. The hosts'
+   gutters: the deck's stage 18 on a phone (rooms/cards.css), 16 wider (player.css); the guided room's #app > main
+   18 on a phone, 24 to 760, then clamp(24px, 4vw, 52px) */
+[data-bar='deck'] { margin-inline: -16px; padding-inline: 8px; }
+[data-bar='guided'] { margin-inline: calc(-1 * clamp(24px, 4vw, 52px)); padding-inline: calc(clamp(24px, 4vw, 52px) - 8px); }
+@media (max-width: 760px) {
+  [data-bar='guided'] { margin-inline: -24px; padding-inline: 16px; }
+}
+@media (max-width: 520px) {
+  html[data-room='deckplay'] [data-bar='deck'], [data-bar='guided'] { margin-inline: -18px; padding-inline: 10px; }
+}
 /* G1 · the page's bar is the top of the screen: it carries the safe area as the room's chrome does, and on a wide window
    its doors stand over the page's measure */
 #sheet > .sheet-bar[data-bar] {
