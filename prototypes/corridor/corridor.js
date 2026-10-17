@@ -10461,23 +10461,31 @@ function sealListOrder() {
 }
 
 /* The ring under the finger: it begins at RING_MS and is whole at the commit (MENU_MS); a hold that moves, a second
- * finger, a cancel or a lift before the commit takes it away. Decorative (aria-hidden, no pointer events): the strip and
- * its status line answer the hold in words. Reduced motion draws it whole at once. */
+ * finger, a cancel or a lift before the commit takes it away. It fills clockwise from twelve by transform alone (the
+ * motion law: transform and opacity): two half rings, each clipped to its half of the disc, turn into view one after the
+ * other. Decorative (aria-hidden, no pointer events): the strip and its status line answer the hold in words. Reduced
+ * motion draws it whole at once. */
 function holdRing(x, y) {
   const ring = el('span', 'hold-ring');
   ring.setAttribute('aria-hidden', 'true');
-  ring.innerHTML = '<svg viewBox="0 0 64 64" width="64" height="64" focusable="false"><circle class="hold-ring-track" cx="32" cy="32" r="27"></circle><circle class="hold-ring-fill" cx="32" cy="32" r="27"></circle></svg>';
+  const track = el('span', 'hold-ring-track');
+  const right = el('span', 'hold-ring-half is-right');
+  const left = el('span', 'hold-ring-half is-left');
+  const rightArc = el('span', 'hold-ring-arc');
+  const leftArc = el('span', 'hold-ring-arc');
+  right.append(rightArc);
+  left.append(leftArc);
+  ring.append(track, right, left);
   ring.style.left = `${Math.round(x)}px`;
   ring.style.top = `${Math.round(y)}px`;
   document.body.append(ring);
-  const fill = ring.querySelector('.hold-ring-fill');
-  const length = 2 * Math.PI * 27;
-  fill.style.strokeDasharray = `${length}`;
-  let run = null;
+  const runs = [];
   if (pageCutAllowed()) {
-    run = fill.animate([{ strokeDashoffset: `${length}` }, { strokeDashoffset: '0' }],
-      { duration: GESTURE.MENU_MS - GESTURE.RING_MS, easing: 'linear', fill: 'forwards', id: 'kairo-hold-ring' });
-  } else fill.style.strokeDashoffset = '0';
+    const half = (GESTURE.MENU_MS - GESTURE.RING_MS) / 2;
+    const turn = [{ transform: 'rotate(-135deg)' }, { transform: 'rotate(45deg)' }];
+    runs.push(rightArc.animate(turn, { duration: half, easing: 'linear', fill: 'both', id: 'kairo-hold-ring' }));
+    runs.push(leftArc.animate(turn, { duration: half, delay: half, easing: 'linear', fill: 'both', id: 'kairo-hold-ring-2' }));
+  } else ring.classList.add('is-whole');
   let gone = false;
   const leave = (cls, ms) => {
     if (gone) return;
@@ -10486,8 +10494,11 @@ function holdRing(x, y) {
     setTimeout(() => ring.remove(), ms);
   };
   return {
-    cancel() { run?.cancel(); leave('is-leaving', 160); },
-    settle(kept) { try { run?.finish(); } catch { /* already done */ } leave(kept ? 'is-kept' : 'is-leaving', 220); },
+    cancel() { for (const run of runs) run.cancel(); leave('is-leaving', 160); },
+    settle(kept) {
+      for (const run of runs) { try { run.finish(); } catch { /* already done */ } }
+      leave(kept ? 'is-kept' : 'is-leaving', 220);
+    },
   };
 }
 

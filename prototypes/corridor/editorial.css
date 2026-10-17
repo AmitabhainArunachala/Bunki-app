@@ -2806,13 +2806,18 @@ body .token-actions button:hover { background: var(--ai-wash); }
    with a small toast; Save ▾'s lists unfold inside their card. The popup itself is skinned once, in rooms/read.css.
    ========================================================================== */
 
-/* G5 · the ring under the finger: the world's 朱 (--color-seal) on its own faint track; it fills from 150 ms to the
-   commit at 500 ms (corridor.js animates the stroke), and leaves in one beat — outward when the word was kept */
+/* G5 · the ring under the finger: the world's 朱 (--color-seal) on its own faint track; it fills clockwise from twelve between
+   150 ms and the commit at 500 ms by transform alone — two half rings, each clipped to its half, turn into view (corridor.js
+   holdRing) — and leaves in one beat, outward when the word was kept */
 .hold-ring { position: fixed; z-index: 95; width: 64px; height: 64px; margin: -32px 0 0 -32px; pointer-events: none; }
-.hold-ring svg { display: block; transform: rotate(-90deg); }
-.hold-ring circle { fill: none; stroke-width: 3; }
-.hold-ring .hold-ring-track { stroke: color-mix(in srgb, var(--color-seal) 20%, transparent); }
-.hold-ring .hold-ring-fill { stroke: var(--color-seal); stroke-linecap: round; }
+.hold-ring-track, .hold-ring-arc { position: absolute; box-sizing: border-box; width: 64px; height: 64px; border: 3px solid transparent; border-radius: 50%; }
+.hold-ring-track { inset: 0; border-color: color-mix(in srgb, var(--color-seal) 20%, transparent); }
+.hold-ring-half { position: absolute; top: 0; width: 32px; height: 64px; overflow: hidden; }
+.hold-ring-half.is-right { left: 32px; }
+.hold-ring-half.is-left { left: 0; }
+.hold-ring-half.is-right .hold-ring-arc { left: -32px; border-top-color: var(--color-seal); border-right-color: var(--color-seal); transform: rotate(-135deg); }
+.hold-ring-half.is-left .hold-ring-arc { left: 0; border-bottom-color: var(--color-seal); border-left-color: var(--color-seal); transform: rotate(-135deg); }
+.hold-ring.is-whole .hold-ring-arc { transform: rotate(45deg); }
 .hold-ring.is-leaving { opacity: 0; transition: opacity var(--motion-quick) var(--ease-exit); }
 .hold-ring.is-kept { opacity: 0; transform: scale(1.18); transition: opacity var(--motion-fast) var(--ease-exit), transform var(--motion-fast) var(--ease-enter); }
 
