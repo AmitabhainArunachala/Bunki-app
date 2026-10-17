@@ -33,9 +33,11 @@
  *   SWEEP every inflected token (surface ≠ base) of the twenty reviewed articles and of a fixed sample of 20 inherited
  *       ones, one tap per distinct token per article: the reading the card states comes from the token's own (a kana
  *       base; the shared stem read alike; a reading the served dictionary lists for the form whose stem the token's
- *       reading keeps; 来 → くる), or the card is the word as the text writes and reads it; any meaning it shows belongs
- *       to an entry that writes the card's word and reads it so, of the token's class (the served detail shards); never
- *       "Not in the quick dictionary" once settled. Counts and every exception are written to the report
+ *       reading keeps; 来 → くる), or the card states the text's own reading; any meaning it shows belongs to an entry a
+ *       served dictionary has (the quick one, the full one, the original word layer) that writes the card's word and reads
+ *       it so, of the token's class (parts of speech from the quick dictionary and the served detail shards; an entry no
+ *       served data gives a class is recorded as of unknown class); never "Not in the quick dictionary" once settled.
+ *       Counts and every exception are written to the report
  *   R   recorded, never asserted: 式 in 表彰式 and 改造 in 内閣改造 (sense: the tokens carry no sense data), ちかい in
  *       the phonetic parenthetical (G3), し of する (an inflected verb reads its dictionary form), the first paint
  * Every engine run logs browser.version(). READING_TRUTH_ONLY=<case,…> runs only the named cases (a negative control's
@@ -765,8 +767,9 @@ function derivedHow(token, label, stated) {
   if (/来る$/u.test(base) && stated.endsWith('くる') && /^[こきく]/u.test(r.slice(stated.length - 2))) return 'kuru';
   return '';
 }
-/** The entry (or the quick dictionary's word) a shown meaning belongs to: it writes `label` and reads it `stated` (or a
- * sound change of it, for a word read as written), and the meaning is one of its own. */
+/** The entry a shown meaning belongs to, in a dictionary the build serves: the quick dictionary's word, a full-dictionary
+ * entry, or a row of the original word layer (words.json) — it writes `label` and reads it `stated` (or a sound change of
+ * it, for a word read as written), and the meaning is one of its own. */
 function meaningEntry(label, stated, gloss, readings = [stated]) {
   if (core[label] && readings.includes(k2h(core[label].r)) && (core[label].m || []).includes(gloss)) {
     const seqs = readings.flatMap((reading) => readAs(label, reading)).map((row) => String(row[0]));
@@ -776,14 +779,22 @@ function meaningEntry(label, stated, gloss, readings = [stated]) {
     const row = readAs(label, reading).find((candidate) => [candidate[3], ...candidate[6]].includes(gloss));
     if (row) return { from: 'index', seq: String(row[0]), pos: posOf(String(row[0])) };
   }
+  const layer = legacyWords[label];
+  if (layer && String(layer.r || '').split(/;\s*/u).map(k2h).some((reading) => readings.includes(reading)) && layer.g === gloss) {
+    return { from: 'words', pos: [] };
+  }
   return null;
 }
-const classFits = (p, entry) => (p === '動詞' ? /verb/u.test(String(entry.p || '')) || entry.pos.some((code) => /^v/u.test(code))
-  : p === '形容詞' ? /i-adjective|adj-ix|adj-ku/u.test(String(entry.p || '')) || entry.pos.some((code) => /^adj-(i|ix|ku|shiku)$/u.test(code)) : true);
+// the token's class against the entry's: a verb by "verb" or a JMdict v… code; an adjective by its i-, ix-, ku- or shiku-
+// class. An entry no served data gives a part of speech for is of unknown class: recorded, never counted as a fit
+const verbal = (part) => /verb/u.test(part) || /^v[0-9a-z]/u.test(part);
+const adjectival = (part) => /i-adjective|^adj-(i|ix|ku|shiku)$|aux-adj/u.test(part);
+const classOf = (entry) => [...String(entry.p || '').split(' · ').filter(Boolean), ...entry.pos];
+const classFits = (p, entry) => (p === '動詞' ? classOf(entry).some(verbal) : p === '形容詞' ? classOf(entry).some(adjectival) : true);
 
 async function sweepCase(browser, contextOptions) {
   const report = { engine, articles: [], notOnShelf: [], totals: { tokens: 0, occurrences: 0, tapped: 0, entry: 0, quick: 0, kanji: 0, several: 0, noEntry: 0,
-    asWritten: 0, particle: 0, exceptions: 0, tapFailures: 0 }, exceptions: [] };
+    asWritten: 0, particle: 0, wordLayer: 0, classUnknown: 0, exceptions: 0, tapFailures: 0 }, exceptions: [] };
   const context = await browser.newContext(contextOptions);
   await silenceBrowserAudio(context);
   await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
@@ -851,7 +862,7 @@ async function sweepCase(browser, contextOptions) {
           const label = card.word || '', stated = k2h(card.reading || label), gloss = card.gloss || '';
           const asWritten = label === token.s && stated === k2h(token.r);
           out.how = card.kind === 'kanji' ? (asWritten ? 'kanji read as written' : '') : asWritten || (card.kind === 'particle' && label === token.s) ? 'as written'
-            : derivedHow(token, label, stated);
+            : derivedHow(token, label, stated) || (stated === k2h(token.r) ? 'the text\'s own reading' : '');
           if (!out.how) out.issues.push(`the card reads ${label} ${card.reading || '(no reading line)'}: not from ${token.s} read ${token.r}`);
           if (gloss === QUICK_MISS) out.issues.push('says "Not in the quick dictionary" once the full dictionary has answered');
           if (card.kind === 'particle') {
@@ -865,12 +876,14 @@ async function sweepCase(browser, contextOptions) {
             out.answer = /^Several entries: /u.test(gloss) ? 'several' : asWritten ? 'asWritten' : 'noEntry';
           } else {
             const entry = meaningEntry(label, stated, gloss, asWritten ? [stated, ...soundUndone(stated)] : [stated]);
-            out.answer = entry?.from === 'quick' ? 'quick' : 'entry';
+            out.answer = entry?.from === 'quick' ? 'quick' : entry?.from === 'words' ? 'wordLayer' : 'entry';
             out.entry = entry;
             if (!entry) out.issues.push(`"${gloss}" belongs to no entry that writes ${label} and reads it ${stated}`);
-            else if (!classFits(token.p, entry)) out.issues.push(`${entry.seq || 'the quick dictionary\'s word'} is not a ${token.p} (${[entry.p, ...entry.pos].filter(Boolean).join(' ')})`);
+            else if (['動詞', '形容詞'].includes(token.p) && !classOf(entry).length) out.classUnknown = true;
+            else if (!classFits(token.p, entry)) out.issues.push(`${entry.seq || `the ${entry.from === 'words' ? 'word layer' : 'quick dictionary'}'s word`} is not a ${token.p} (${classOf(entry).join(' ')})`);
           }
           report.totals[out.answer] = (report.totals[out.answer] || 0) + 1;
+          if (out.classUnknown) report.totals.classUnknown += 1;
         }
         if (out.issues.length) { report.totals.exceptions += 1; report.exceptions.push({ article: id, ...out }); }
         article.rows.push(out);
@@ -897,6 +910,8 @@ async function sweepCase(browser, contextOptions) {
     list((x) => x.issues.some((issue) => /quick dictionary/u.test(issue))));
   check('SWEEP.page-errors', 'the sweep: no page errors', errors.length === 0, errors.slice(0, 5));
   record('SWEEP.counts', 'the sweep\'s counts (distinct tokens per article; answers)', report.totals);
+  record('SWEEP.class-unknown', 'meanings whose entry no served data gives a part of speech for (not judged)', report.articles
+    .flatMap((article) => article.rows.filter((row) => row.classUnknown).map((row) => `${article.id} #${row.index} ${row.s}/${row.b}: ${row.card?.word} ${row.card?.gloss} (${row.entry?.from})`)));
 }
 
 try {
