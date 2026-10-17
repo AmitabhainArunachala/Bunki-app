@@ -15,18 +15,37 @@
  *   A9  the cold first tap (L): with the full dictionary held, 月 in 9月 (がつ) shows a quiet "…" and a held Save, never
  *       the quick dictionary's つき "Moon"; released, がつ's meaning; answered 500, the "…" stays. Every case counts every
  *       page error (L dropped R's ResizeObserver filter; the capture case listens too)
- *   A10 (N, 2026-10-17) a word no entry is read for: Kawaguchi's 訳 read やく; every dictionary the build serves reads
- *       訳 only わけ ("reason"). An entry read otherwise counts as missing. With the full dictionary held, the first tap
- *       shows 「やく …」 with Save held. Once it answers, the same card, with no second tap, says "No dictionary entry for
- *       this reading.", its Save held, with "So it can't be saved here.". Its meaning line never shows わけ's meaning,
- *       and its page (the second tap) lends nothing of わけ: no senses, no JLPT level, no other spelling, and it says so
+ *   A10 (N, 2026-10-17; rewritten by R2 to the lead's addendum class 2) a word no entry is read for: Kawaguchi's 訳 read
+ *       やく; every dictionary the build serves reads 訳 only わけ ("reason"), and an entry read otherwise counts as
+ *       missing. With the full dictionary held, the first tap shows 「やく …」 with Save held and silent. やく is 訳's
+ *       on'yomi, so once the dictionary answers, the same card, with no second tap, is the kanji's: 訳 · やく ·
+ *       "kanji · translate" (the kanji data's meaning), its Save the kanji's. Its meaning line never shows わけ's
+ *       meaning, and its page (the second tap) is the kanji page of 訳
+ *   R2  inflected words (Kimi 0258, Codex 0309/0323): the card reads the dictionary form the way the text reads it.
+ *       Named: 忘却曲線 #297 おい → おく · 置く's meaning (never おけ, 奥, 億); Sōseki #576 云っ → 云う · いう · to say (never
+ *       いい); #1414 解せ → 解す · げす · to understand (never かいする); Shosoin #483 来 read き and Sōseki #66 来 read こ →
+ *       来る · くる (never きる, こる). Save on 云う keeps entry 1587040 and cueReading いう, in the same row shape as 年's
+ *   R2.V  a sound change names the entry read the plain way, the card still showing the text's reading: 一 いっ, 本 ぽん,
+ *       八 はっ, 歩 ぽ, 金持ち がねもち
+ *   R2.K  a lone kanji read by its on'yomi, no word entry read so, is the kanji's card: 寺 じ, 国 こく, 仏 ぶつ (never
+ *       仏 ふつ "France", the quick dictionary's)
+ *   R2.C3 a reading the shipped dictionary now carries from the pinned JMdict: 私 read わたくし is entry 2842390
+ *   SWEEP every inflected token (surface ≠ base) of the twenty reviewed articles and of a fixed sample of 20 inherited
+ *       ones, one tap per distinct token per article: the reading the card states comes from the token's own (a kana
+ *       base; the shared stem read alike; a reading the served dictionary lists for the form whose stem the token's
+ *       reading keeps; 来 → くる), or the card is the word as the text writes and reads it; any meaning it shows belongs
+ *       to an entry that writes the card's word and reads it so, of the token's class (the served detail shards); never
+ *       "Not in the quick dictionary" once settled. Counts and every exception are written to the report
  *   R   recorded, never asserted: 式 in 表彰式 and 改造 in 内閣改造 (sense: the tokens carry no sense data), ちかい in
  *       the phonetic parenthetical (G3), し of する (an inflected verb reads its dictionary form), the first paint
+ * Every engine run logs browser.version(). READING_TRUTH_ONLY=<case,…> runs only the named cases (a negative control's
+ * scope); such a run is marked partial in the report and is never an acceptance result.
  * Negative control: the same run against a build with R's reading edits reverted fails A1 on 年 (とし). */
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { loadGuidedIndex, loadGuidedSet } from '../guided-session-content.mjs';
@@ -41,6 +60,10 @@ const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
 assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
+// a negative control's scope (READING_TRUTH_ONLY=r2,sweep,…): a partial run, never an acceptance result
+const ONLY = (process.env.READING_TRUTH_ONLY || '').split(',').filter(Boolean);
+const run = (name) => !ONLY.length || ONLY.includes(name);
+const versions = {};
 const json = (path) => JSON.parse(readFileSync(resolve(site, path), 'utf8'));
 const k2h = (s) => String(s || '').replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
 const delay = (ms) => new Promise((done) => setTimeout(done, ms));
@@ -81,6 +104,40 @@ const RECORDED = Object.freeze([
 const UNCONFIRMED = ['This entry’s answer cannot be confirmed yet, so it cannot be memorized.', 'この項目の答えをまだ確かめられないため、覚えられない。'];
 const NO_ENTRY = 'No dictionary entry for this spelling.';
 const SAVE_REASON = 'So it can’t be saved here.';
+const QUICK_MISS = 'Not in the quick dictionary. Full entry looks it up in the whole dictionary.';
+// R2 · inflected words: the card reads the dictionary form the way the text reads it (Kimi 0258, Codex 0309/0323)
+const FORGETTING = art('bunki-read-n2-forgetting-curve', 'bunki-read-n2-forgetting-curve.json', '忘却曲線は');
+const SOSEKI = art('aozora:000772-1', 'aozora-000772-1.json', '私の個人主義（抄）');
+const SHOSOIN = art('bunki-read-n2-shosoin-names', 'bunki-read-n2-shosoin-names.json', '第78回正倉院展');
+const BODHISENA = art('bunki-read-n2-bodhisena', 'bunki-read-n2-bodhisena.json', '大仏の目を開いた');
+const BENZAITEN = art('bunki-read-n2-benzaiten', 'bunki-read-n2-benzaiten.json', '弁才天の長い旅');
+const SOAI = art('bunki-read-n1-soai-nobel', 'bunki-read-n1-soai-nobel.json', '硤合憲三');
+const HONDA = art('bunki-read-n3-honda-quarter', 'bunki-read-n3-honda-quarter.json', '本多静六');
+// seq: the entry the card must stand for (its first gloss is the meaning shown); core: the quick dictionary's word;
+// legacy: the original word layer's row the old card borrowed its reading from (so the check can fail for its reason)
+const INFLECTED = Object.freeze([
+  { name: 'おい → おく · 置く', at: FORGETTING, index: 297, s: 'おい', b: 'おく', r: 'おい', label: 'おく', reading: 'おく', seq: '1421850', legacy: 'おけ', not: ['1179320', '1182620'] },
+  { name: '云っ → 云う いう', at: SOSEKI, index: 576, s: '云っ', b: '云う', r: 'いっ', label: '云う', reading: 'いう', seq: '1587040', legacy: 'いい' },
+  { name: '解せ → 解す げす', at: SOSEKI, index: 1414, s: '解せ', b: '解する', r: 'げせ', label: '解す', reading: 'げす', seq: '2410330', legacy: 'かいする' },
+  { name: '来 read き → 来る くる', at: SHOSOIN, index: 483, s: '来', b: '来る', r: 'き', label: '来る', reading: 'くる', core: true, never: 'きる' },
+  { name: '来 read こ → 来る くる', at: SOSEKI, index: 66, s: '来', b: '来る', r: 'こ', label: '来る', reading: 'くる', core: true, never: 'こる' },
+]);
+// R2.V · a sound change in a compound: the card shows the text's reading and the meaning of the entry read the plain way
+const SOUND = Object.freeze([
+  { name: '一 いっ (一本)', at: BODHISENA, index: 564, s: '一', r: 'いっ', plain: 'いち' },
+  { name: '本 ぽん (一本)', at: BODHISENA, index: 565, s: '本', r: 'ぽん', plain: 'ほん' },
+  { name: '八 はっ (八本)', at: BENZAITEN, index: 410, s: '八', r: 'はっ', plain: 'はち' },
+  { name: '歩 ぽ (一歩)', at: SOAI, index: 527, s: '歩', r: 'ぽ', plain: 'ほ' },
+  { name: '金持ち がねもち', at: HONDA, index: 385, s: '金持ち', r: 'がねもち', plain: 'かねもち' },
+]);
+// R2.K · a lone kanji read by its on'yomi with no word entry read so: the kanji's card
+const LONE = Object.freeze([
+  { name: '寺 じ', at: BODHISENA, index: 341, s: '寺', r: 'じ' },
+  { name: '国 こく', at: SHOSOIN, index: 329, s: '国', r: 'こく' },
+  { name: '仏 ぶつ (never ふつ, France)', at: KAWAGUCHI, index: 1359, s: '仏', r: 'ぶつ' },
+]);
+// R2.C3 · 私 read わたくし, an entry the pinned JMdict has and the build now ships (the article entries)
+const WATAKUSHI = { at: SOSEKI, index: 0, s: '私', r: 'わたくし', seq: '2842390' };
 
 /* ------------------------------------------------------------------ report */
 const rows = [];
@@ -132,6 +189,66 @@ check('F0.stable', `${STARTUP.id} #9 is 総理 read そうり, like the quick di
 for (const fixture of RECORDED) check(`F0.${fixture.name}`, `${fixture.at.id} #${fixture.index} is ${fixture.s}`, tokenAt(fixture)?.s === fixture.s, tokenAt(fixture));
 check('F0.no-sense', 'reader tokens carry no sense, gloss or entry number (s b p r f c, and rs)',
   [STARTUP, CABINET].every((a) => json(a.file).tokens.every((t) => Object.keys(t).every((key) => ['s', 'b', 'p', 'r', 'f', 'c', 'rs'].includes(key)))));
+/* ------------------------------------------------------------------ F0 · R2's served fixtures */
+const kanjiData = json('data/share_alike/kanji.json').kanji;
+const legacyWords = json('data/share_alike/words.json').words;
+const byForm = new Map();
+for (const row of entries) {
+  for (const form of new Set([row[1], ...row[4], ...row[5]])) {
+    if (!byForm.has(form)) byForm.set(form, []);
+    byForm.get(form).push(row);
+  }
+}
+// the served index's own reading restriction (cell 11: 0 every written form, 1 none, an array the permitted ones)
+const permits = (row, k, form) => row[5][k] === form ||
+  (row[4].includes(form) && (row[11][k] === 0 || (Array.isArray(row[11][k]) && row[11][k].includes(row[4].indexOf(form)))));
+const readAs = (form, reading) => (byForm.get(form) || []).filter((row) => row[5].some((kana, k) => k2h(kana) === k2h(reading) && permits(row, k, form)));
+const listedReadings = (form) => [...new Set([core[form]?.r, ...(byForm.get(form) || []).flatMap((row) =>
+  row[5].filter((kana, k) => permits(row, k, form)))].filter(Boolean).map(k2h))];
+// the served detail shards' parts of speech, by entry
+const shardCache = new Map();
+const shardIdOf = (seq) => {
+  let hash = 0x811c9dc5;
+  for (const character of String(seq)) { hash ^= character.charCodeAt(0); hash = Math.imul(hash, 0x01000193) >>> 0; }
+  return (hash & 15).toString(16).padStart(2, '0');
+};
+const posOf = (seq) => {
+  const id = shardIdOf(seq);
+  if (!shardCache.has(id)) shardCache.set(id, new Map(json(`data/share_alike/dict-v2/${id}.json`).entries.map((entry) => [String(entry[0]), entry])));
+  const detail = shardCache.get(id).get(String(seq));
+  return detail ? [...new Set(detail[3].flatMap((sense) => sense[0] || []))] : [];
+};
+const onyomi = (char) => (kanjiData[char]?.on || []).map(k2h);
+for (const fixture of INFLECTED) {
+  const token = tokenAt(fixture);
+  check(`F0.R2.${fixture.name}`, `${fixture.at.id} #${fixture.index} is ${fixture.s} (base ${fixture.b}) read ${fixture.r}, inflected`,
+    token?.s === fixture.s && token.b === fixture.b && token.r === fixture.r && token.s !== token.b, token);
+  if (fixture.core) {
+    check(`F0.R2.core.${fixture.name}`, `the quick dictionary reads ${fixture.label} ${fixture.reading}; no entry writes it read ${fixture.never}`,
+      k2h(core[fixture.label]?.r) === k2h(fixture.reading) && !readAs(fixture.label, fixture.never).length, core[fixture.label]);
+  } else {
+    check(`F0.R2.entry.${fixture.name}`, `the quick dictionary lacks ${fixture.b}; the original word layer reads it ${fixture.legacy} (what the old card showed); entry ${fixture.seq} writes ${fixture.label} and reads it ${fixture.reading}`,
+      !core[fixture.b] && legacyWords[fixture.b]?.r === fixture.legacy && readAs(fixture.label, fixture.reading).some((row) => String(row[0]) === fixture.seq)
+        && (fixture.not || []).every((seq) => readAs(fixture.label, fixture.reading).some((row) => String(row[0]) === seq)),
+      { legacy: legacyWords[fixture.b], rows: readAs(fixture.label, fixture.reading).map((row) => row.slice(0, 4)) });
+  }
+}
+for (const fixture of SOUND) {
+  const token = tokenAt(fixture);
+  check(`F0.R2.V.${fixture.name}`, `${fixture.at.id} #${fixture.index} is ${fixture.s} read ${fixture.r}, uninflected; no entry reads it so; the quick dictionary or one entry reads it ${fixture.plain}`,
+    token?.s === fixture.s && token.b === fixture.s && token.r === fixture.r && !readAs(fixture.s, fixture.r).length
+      && (k2h(core[fixture.s]?.r) === k2h(fixture.plain) || readAs(fixture.s, fixture.plain).length === 1), { token, core: core[fixture.s] });
+}
+for (const fixture of LONE) {
+  const token = tokenAt(fixture);
+  check(`F0.R2.K.${fixture.name}`, `${fixture.at.id} #${fixture.index} is ${fixture.s} read ${fixture.r}, uninflected; no entry reads it so; ${fixture.r} is one of its on'yomi in the kanji data`,
+    token?.s === fixture.s && token.b === fixture.s && token.r === fixture.r && !readAs(fixture.s, fixture.r).length && onyomi(fixture.s).includes(k2h(fixture.r)),
+    { token, on: kanjiData[fixture.s]?.on, core: core[fixture.s] });
+}
+check('F0.R2.K.france', 'the quick dictionary reads 仏 ふつ, "France" — the word a voicing change would wrongly lend ぶつ', core['仏']?.r === 'ふつ' && core['仏'].m[0] === 'France', core['仏']);
+check('F0.R2.C3', `${WATAKUSHI.at.id} #${WATAKUSHI.index} is 私 read わたくし; the quick dictionary reads 私 わたし; entry ${WATAKUSHI.seq} writes 私 and reads it わたくし`,
+  tokenAt(WATAKUSHI)?.s === '私' && tokenAt(WATAKUSHI).r === 'わたくし' && core['私']?.r === 'わたし'
+    && readAs('私', 'わたくし').some((row) => String(row[0]) === WATAKUSHI.seq), readAs('私', 'わたくし').map((row) => row.slice(0, 4)));
 const guidedJson = async (path) => json(path);
 const guided = await loadGuidedSet((await loadGuidedIndex(guidedJson))[0], guidedJson);
 check('F0.guided', 'every guided word reads as the quick dictionary reads it (so its card can only agree)',
@@ -172,7 +289,7 @@ const miniState = (page) => page.evaluate(() => {
   const mini = document.getElementById('mini');
   if (!mini) return null;
   const take = mini.querySelector('#mini-take');
-  return { word: mini.querySelector('.mini-word')?.childNodes[0]?.textContent ?? null, reading: mini.querySelector('.mini-reading')?.textContent ?? '',
+  return { kind: mini.dataset.kind ?? null, word: mini.querySelector('.mini-word')?.childNodes[0]?.textContent ?? null, reading: mini.querySelector('.mini-reading')?.textContent ?? '',
     gloss: mini.querySelector('.mini-gloss')?.textContent ?? '', take: take ? { disabled: take.disabled, text: take.textContent.trim() } : null,
     reason: mini.querySelector('#mini-take-reason')?.textContent ?? null };
 });
@@ -245,6 +362,23 @@ async function captureCase(browser, contextOptions) {
         && snap.selection?.seq === '2084840', { row, snap });
     await page.keyboard.press('Escape');
     await closeMini(page);
+    if (run('r2')) {
+      // R2 · an inflected word saves its dictionary form's entry and reading, in the same row shape as 年's (no new shape)
+      await openArticle(page, SOSEKI);
+      const iu = await slip(page, tok(page, 576));
+      check('R2.capture.ready', 'the card for 云っ (いっ) is 云う read いう and offers Save', iu.settled?.word === '云う' && k2h(iu.settled.reading) === 'いう'
+        && iu.settled.take && !iu.settled.take.disabled, iu.settled);
+      await page.locator('#mini #mini-take').click();
+      const both = await waitForAppRecord(page, (rec) => (rec.taken || []).some((r) => r.t === 'word' && r.id === '云う'),
+        { description: 'the 云う card', timeout: 15000 });
+      const iuRow = both.taken.find((r) => r.t === 'word' && r.id === '云う'), iuSnap = both.deepWords?.['云う'];
+      const yearRow = both.taken.find((r) => r.t === 'word' && r.id === '年');
+      check('R2.capture', 'Save keeps entry 1587040 and cueReading いう (the dictionary form as the text reads it), with its validated selection, in the same row shape as 年\'s',
+        iuRow?.entrySeq === '1587040' && iuRow.cueReading === 'いう' && iuSnap?.seq === '1587040' && iuSnap.r === 'いう' && iuSnap.selection?.r === 'いう'
+          && JSON.stringify(Object.keys(iuRow).sort()) === JSON.stringify(Object.keys(yearRow || {}).sort()), { iuRow, iuSnap, yearKeys: Object.keys(yearRow || {}) });
+      await page.keyboard.press('Escape');
+      await closeMini(page);
+    }
     if (!(await page.locator('#note-input').count())) await page.locator('#tray').click();
     const download = page.waitForEvent('download', { timeout: 15000 });
     await page.locator('#export-store').click();
@@ -272,6 +406,11 @@ async function captureCase(browser, contextOptions) {
     const row = back.taken.find((r) => r.t === 'word' && r.id === '年'), snap = back.deepWords?.['年'];
     check('A3.round-trip', 'export → import keeps entry 2084840, cueReading ねん and the snapshot',
       row?.entrySeq === '2084840' && row.cueReading === 'ねん' && snap?.seq === '2084840' && snap.r === 'ねん', { row, snap });
+    if (run('r2')) {
+      const iuRow = back.taken.find((r) => r.t === 'word' && r.id === '云う'), iuSnap = back.deepWords?.['云う'];
+      check('R2.round-trip', 'export → import keeps 云う\'s entry 1587040, cueReading いう and the snapshot',
+        iuRow?.entrySeq === '1587040' && iuRow.cueReading === 'いう' && iuSnap?.seq === '1587040' && iuSnap.r === 'いう', { iuRow, iuSnap });
+    }
   } finally { await fresh.close(); }
 }
 
@@ -442,23 +581,22 @@ async function unreadCase(browser, contextOptions) {
     await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 30000 });
     await delay(600);
     const settled = await miniState(page);
-    check(`${tag}.settled`, `answered, the same card — no second tap — says "${NO_READING}", reads やく, its Save held with "${SAVE_REASON}"`,
-      k2h(settled?.reading) === 'やく' && settled.gloss === NO_READING && settled.take?.disabled === true && settled.reason === SAVE_REASON, settled);
+    // R2 · やく is 訳's on'yomi: once answered, the card is the kanji's (the lead's addendum class 2)
+    const kanjiLine = `kanji · ${String(kanjiData['訳']?.m || '').toLowerCase()}`;
+    check(`${tag}.settled`, `answered, the same card — no second tap — is the kanji's: 訳 read やく, "${kanjiLine}" (the kanji data's meaning), its Save the kanji's`,
+      settled?.kind === 'kanji' && settled.word === '訳' && k2h(settled.reading) === 'やく' && settled.gloss === kanjiLine && settled.take
+        && !settled.take.disabled && settled.reason === null && !!kanjiData['訳']?.m, settled);
     const shown = await page.evaluate(() => window.__readingTruthGlosses);
     check(`${tag}.never-borrowed`, `the meaning line never showed わけ's meaning ("${other}")`,
-      shown.length > 0 && shown.every((text) => ['…', NO_READING].includes(text)), shown);
+      shown.length > 0 && shown.every((text) => ['…', kanjiLine].includes(text)), shown);
     await page.locator('#mini .mini-word').click();
     await page.locator('#sheet').waitFor({ timeout: 20000 });
     await delay(800);
     const sheet = await page.evaluate(() => {
       const node = document.getElementById('sheet');
-      return node ? { head: node.querySelector('.headword')?.textContent ?? null, reading: node.querySelector('.reading')?.textContent ?? null,
-        absent: node.querySelector('.gloss.absent')?.textContent ?? null, senses: node.querySelectorAll('.senses, .sense-list').length,
-        jlpt: [...node.querySelectorAll('.shelf-meta')].map((n) => n.textContent.trim()).filter((t) => /JLPT/u.test(t)),
-        alt: node.querySelector('.headword-alt')?.textContent ?? null } : null;
+      return node ? { node: node.dataset.node ?? null, glyph: node.querySelector('.hero-glyph')?.textContent ?? null } : null;
     });
-    check(`${tag}.page`, `the second tap's page is 訳 read やく and lends nothing of わけ: no senses, no JLPT level, no other spelling; its line says "${NO_READING}"`,
-      sheet?.head === '訳' && k2h(sheet.reading) === 'やく' && sheet.absent === NO_READING && sheet.senses === 0 && sheet.jlpt.length === 0 && !sheet.alt, sheet);
+    check(`${tag}.page`, 'the second tap\'s page is the kanji page of 訳', sheet?.node === 'kanji:訳' && sheet.glyph === '訳', sheet);
   } catch (error) {
     check(`${tag}.error`, `${tag} ran to the end`, false, String(error.stack || error).slice(0, 600));
   } finally {
@@ -545,10 +683,229 @@ async function guidedCase(page) {
   await closeMini(page);
 }
 
+/** R2 · the named inflected words, the sound changes, the lone kanji and 私 read わたくし: each a real tap in the reader,
+ * judged against fixed expectations (never against the app's own derivation). */
+async function r2Cases(page) {
+  // the card's own band (its word, reading and meaning lines), not the sentence row beneath it
+  const cardText = () => page.evaluate(() => document.querySelector('#mini .mini-head')?.textContent || '');
+  const glossLines = () => page.evaluate(() => [...document.querySelectorAll('#mini .mini-gloss')].map((node) => node.textContent));
+  for (const fixture of INFLECTED) {
+    await openArticle(page, fixture.at);
+    const { settled } = await slip(page, tok(page, fixture.index));
+    const meaning = fixture.core ? core[fixture.label].m[0] : firstGloss(fixture.seq, fixture.reading);
+    const text = await cardText();
+    const wrong = fixture.legacy || fixture.never;
+    check(`R2.${fixture.name}`, `${fixture.at.id} #${fixture.index} ${fixture.s} (${fixture.r}): the card is ${fixture.label} read ${fixture.reading}, "${meaning}", Save live; never ${wrong}`,
+      settled?.kind === 'word' && settled.word === fixture.label && k2h(settled.reading || settled.word) === k2h(fixture.reading) && settled.gloss === meaning
+        && settled.take && !settled.take.disabled && !k2h(text).includes(k2h(wrong)), { settled, text });
+  }
+  for (const fixture of SOUND) {
+    await openArticle(page, fixture.at);
+    const { settled } = await slip(page, tok(page, fixture.index));
+    const meaning = k2h(core[fixture.s]?.r) === k2h(fixture.plain) ? core[fixture.s].m[0] : readAs(fixture.s, fixture.plain)[0]?.[3];
+    check(`R2.V.${fixture.name}`, `${fixture.s} read ${fixture.r}: the card shows ${fixture.r} and the meaning of ${fixture.s} read ${fixture.plain} ("${meaning}"), Save live`,
+      settled?.word === fixture.s && settled.reading === fixture.r && settled.gloss === meaning && settled.take && !settled.take.disabled, settled);
+  }
+  for (const fixture of LONE) {
+    await openArticle(page, fixture.at);
+    const { settled } = await slip(page, tok(page, fixture.index));
+    const meaning = `kanji · ${String(kanjiData[fixture.s].m).toLowerCase()}`;
+    const lines = await glossLines();
+    check(`R2.K.${fixture.name}`, `${fixture.s} read ${fixture.r}: the kanji's card, ${fixture.r} · "${meaning}", Save live; no meaning line is the word ${fixture.s} read ${core[fixture.s]?.r}'s ("${core[fixture.s]?.m?.[0]}")`,
+      settled?.kind === 'kanji' && settled.word === fixture.s && settled.reading === fixture.r && settled.gloss === meaning && settled.take && !settled.take.disabled
+        && lines.length > 0 && !lines.some((line) => (core[fixture.s]?.m || []).includes(line)), { settled, lines });
+  }
+  await openArticle(page, WATAKUSHI.at);
+  const { settled } = await slip(page, tok(page, WATAKUSHI.index));
+  const meaning = firstGloss(WATAKUSHI.seq, WATAKUSHI.r);
+  check('R2.C3.私', `私 read わたくし: the card reads わたくし, "${meaning}" (entry ${WATAKUSHI.seq}), Save live`,
+    settled?.word === '私' && k2h(settled.reading) === 'わたくし' && settled.gloss === meaning && settled.take && !settled.take.disabled, settled);
+  await closeMini(page);
+}
+
+/* ------------------------------------------------------------------ SWEEP · every inflected token */
+const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+const reviewQueue = JSON.parse(readFileSync(resolve(REPO, 'docs/content/feed-review-queue.json'), 'utf8'));
+const TWENTY = reviewQueue.filter((row) => row.kind === 'original' && row.decision !== 'rejected').map((row) => row.id);
+const shelfRows = json('data/articles/index.json').articles;
+const inheritedRows = shelfRows.filter((row) => !TWENTY.includes(row.id)).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+// a fixed sample of 20 inherited articles the shelf shows: picks at an even step through the id order; a pick the shelf
+// does not show (a row held back from the shelf, 検収前) gives way to the next row in id order
+const SAMPLE_PICKS = Array.from({ length: 20 }, (_, i) => Math.floor((i * inheritedRows.length) / 20));
+const SWEEP_ONLY = (process.env.READING_TRUTH_SWEEP_IDS || '').split(',').filter(Boolean);
+const KANA_ONLY = /^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u;
+const SAYS_NONE = (line) => [NO_ENTRY, NO_READING, '…'].includes(line) || /^Several entries: /u.test(line);
+// the verifier's own sound changes (a final っ undone; a voiced or ぱ-row first kana made plain)
+const VOICED = 'がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ', PLAIN = 'かきくけこさしすせそたちつてとはひふへほはひふへほ';
+const soundUndone = (reading) => {
+  const r = k2h(reading), plain = (x) => (VOICED.includes(x[0]) ? PLAIN[VOICED.indexOf(x[0])] + x.slice(1) : '');
+  const out = [plain(r)];
+  if (r.endsWith('っ')) for (const end of 'ちつくきう') out.push(r.slice(0, -1) + end, plain(r.slice(0, -1) + end));
+  return out.filter(Boolean);
+};
+/** How the reading a card states comes from the token's own, by this verifier's own rules; '' when it does not. */
+function derivedHow(token, label, stated) {
+  const r = k2h(token.r), s = token.s;
+  let base = token.b;
+  if (label !== base) {
+    const swap = [['する', 'す'], ['ずる', 'じる']].find(([from, to]) => base.endsWith(from) && label === base.slice(0, -from.length) + to);
+    if (!swap) return '';
+    base = label;
+  }
+  if (KANA_ONLY.test(base)) return stated === k2h(base) ? 'kana base' : '';
+  const S = [...s], B = [...base];
+  let n = 0;
+  while (n < S.length && n < B.length && S[n] === B[n]) n += 1;
+  const tailS = k2h(S.slice(n).join('')), tailB = k2h(B.slice(n).join(''));
+  if (n && (!tailS || KANA_ONLY.test(tailS)) && (!tailB || KANA_ONLY.test(tailB)) && stated.endsWith(tailB) && r.endsWith(tailS)) {
+    const stem = stated.slice(0, stated.length - tailB.length);
+    if (stem && stem === r.slice(0, r.length - tailS.length)) return 'shared stem';
+  }
+  if (listedReadings(base).includes(stated) && (stated === r || (stated.length > 1 && r.startsWith(stated.slice(0, -1))))) return 'dictionary';
+  if (/来る$/u.test(base) && stated.endsWith('くる') && /^[こきく]/u.test(r.slice(stated.length - 2))) return 'kuru';
+  return '';
+}
+/** The entry (or the quick dictionary's word) a shown meaning belongs to: it writes `label` and reads it `stated` (or a
+ * sound change of it, for a word read as written), and the meaning is one of its own. */
+function meaningEntry(label, stated, gloss, readings = [stated]) {
+  if (core[label] && readings.includes(k2h(core[label].r)) && (core[label].m || []).includes(gloss)) {
+    const seqs = readings.flatMap((reading) => readAs(label, reading)).map((row) => String(row[0]));
+    return { from: 'quick', p: core[label].p, pos: [...new Set(seqs.flatMap(posOf))] };
+  }
+  for (const reading of readings) {
+    const row = readAs(label, reading).find((candidate) => [candidate[3], ...candidate[6]].includes(gloss));
+    if (row) return { from: 'index', seq: String(row[0]), pos: posOf(String(row[0])) };
+  }
+  return null;
+}
+const classFits = (p, entry) => (p === '動詞' ? /verb/u.test(String(entry.p || '')) || entry.pos.some((code) => /^v/u.test(code))
+  : p === '形容詞' ? /i-adjective|adj-ix|adj-ku/u.test(String(entry.p || '')) || entry.pos.some((code) => /^adj-(i|ix|ku|shiku)$/u.test(code)) : true);
+
+async function sweepCase(browser, contextOptions) {
+  const report = { engine, articles: [], notOnShelf: [], totals: { tokens: 0, occurrences: 0, tapped: 0, entry: 0, quick: 0, kanji: 0, several: 0, noEntry: 0,
+    asWritten: 0, particle: 0, exceptions: 0, tapFailures: 0 }, exceptions: [] };
+  const context = await browser.newContext(contextOptions);
+  await silenceBrowserAudio(context);
+  await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
+  const page = await context.newPage(), errors = [];
+  page.setDefaultTimeout(15000);
+  page.on('pageerror', (error) => errors.push(error.message));
+  // an article the learner can open: its shelf card, else the shelf's own search by its title
+  const opens = async (row) => {
+    await boot(page);
+    const direct = page.locator(`[data-passage="${row.id}"]:not([data-recommendation]) .shelf-open`).first();
+    if (await direct.count()) await direct.click();
+    else {
+      await openShelfTools(page);
+      await page.locator('#shelf-reading-search').fill(row.title);
+      await page.locator('#shelf-reading-search').press('Enter');
+      const found = page.locator(`#shelf-reading-results [data-passage="${row.id}"] .shelf-open`).first();
+      try { await found.waitFor({ timeout: 4000 }); } catch { return false; }
+      await found.click();
+    }
+    await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 20000 });
+    return true;
+  };
+  const queue = [...TWENTY.map((id) => ({ id, group: 'twenty' })), ...SAMPLE_PICKS.map((at) => ({ at, group: 'inherited' }))];
+  const swept = new Set();
+  try {
+    for (const item of queue) {
+      let row = item.id ? shelfRows.find((candidate) => candidate.id === item.id) : null;
+      if (item.group === 'inherited') {
+        for (let at = item.at; at < inheritedRows.length && !row; at += 1) {
+          const candidate = inheritedRows[at];
+          if (swept.has(candidate.id)) continue;
+          if (SWEEP_ONLY.length && !SWEEP_ONLY.includes(candidate.id)) break;
+          if (await opens(candidate)) row = candidate;
+          else report.notOnShelf.push(candidate.id);
+        }
+        if (!row) continue;
+      } else {
+        if (SWEEP_ONLY.length && !SWEEP_ONLY.includes(row.id)) continue;
+        if (!(await opens(row))) { report.notOnShelf.push(row.id); continue; }
+      }
+      swept.add(row.id);
+      const id = row.id;
+      const tokens = json(`data/articles/${row.file}`).tokens || [];
+      const distinct = new Map();
+      tokens.forEach((t, index) => {
+        if (!t.b || t.b === t.s) return;
+        const key = `${t.s}|${t.b}|${t.r}|${!!t.c}`;
+        if (distinct.has(key)) distinct.get(key).occurrences += 1;
+        else distinct.set(key, { index, token: t, occurrences: 1 });
+      });
+      const article = { id, group: item.group, tokens: distinct.size, occurrences: 0, rows: [] };
+      report.articles.push(article);
+      for (const { index, token, occurrences } of distinct.values()) {
+        report.totals.tokens += 1;
+        report.totals.occurrences += occurrences;
+        article.occurrences += occurrences;
+        let card = null, failure = null;
+        try { card = (await slip(page, tok(page, index))).settled; } catch (error) { failure = String(error.message || error).split('\n')[0].slice(0, 160); }
+        const out = { index, s: token.s, b: token.b, r: token.r, p: token.p, c: !!token.c, occurrences, card, how: '', answer: '', issues: [] };
+        if (!card) {
+          report.totals.tapFailures += 1;
+          out.issues.push(`no card: ${failure}`);
+        } else {
+          report.totals.tapped += 1;
+          const label = card.word || '', stated = k2h(card.reading || label), gloss = card.gloss || '';
+          const asWritten = label === token.s && stated === k2h(token.r);
+          out.how = card.kind === 'kanji' ? (asWritten ? 'kanji read as written' : '') : asWritten || (card.kind === 'particle' && label === token.s) ? 'as written'
+            : derivedHow(token, label, stated);
+          if (!out.how) out.issues.push(`the card reads ${label} ${card.reading || '(no reading line)'}: not from ${token.s} read ${token.r}`);
+          if (gloss === QUICK_MISS) out.issues.push('says "Not in the quick dictionary" once the full dictionary has answered');
+          if (card.kind === 'particle') {
+            // a particle's door (に, で of だ): the grammar layer's card for the word as written — no dictionary entry to judge
+            out.answer = 'particle';
+            if (label !== token.s || (card.reading && k2h(card.reading) !== k2h(token.r))) out.issues.push(`the particle card is not ${token.s} as written`);
+          } else if (card.kind === 'kanji') {
+            out.answer = 'kanji';
+            if (gloss !== `kanji · ${String(kanjiData[label]?.m || '').toLowerCase()}`) out.issues.push(`the kanji card's meaning is not ${label}'s kanji data`);
+          } else if (SAYS_NONE(gloss) || gloss === QUICK_MISS) {
+            out.answer = /^Several entries: /u.test(gloss) ? 'several' : asWritten ? 'asWritten' : 'noEntry';
+          } else {
+            const entry = meaningEntry(label, stated, gloss, asWritten ? [stated, ...soundUndone(stated)] : [stated]);
+            out.answer = entry?.from === 'quick' ? 'quick' : 'entry';
+            out.entry = entry;
+            if (!entry) out.issues.push(`"${gloss}" belongs to no entry that writes ${label} and reads it ${stated}`);
+            else if (!classFits(token.p, entry)) out.issues.push(`${entry.seq || 'the quick dictionary\'s word'} is not a ${token.p} (${[entry.p, ...entry.pos].filter(Boolean).join(' ')})`);
+          }
+          report.totals[out.answer] = (report.totals[out.answer] || 0) + 1;
+        }
+        if (out.issues.length) { report.totals.exceptions += 1; report.exceptions.push({ article: id, ...out }); }
+        article.rows.push(out);
+      }
+    }
+  } finally {
+    await context.close();
+    writeFileSync(resolve(evidence, `sweep-${engine}.json`), `${JSON.stringify(report, null, 1)}\n`);
+  }
+  const all = report.exceptions;
+  const list = (pick) => all.filter(pick).map((x) => `${x.article} #${x.index} ${x.s}/${x.b}/${x.r}: ${x.issues.join('; ')}`).slice(0, 12);
+  const twentySwept = report.articles.filter((article) => article.group === 'twenty').length;
+  const inheritedSwept = report.articles.filter((article) => article.group === 'inherited').length;
+  check('SWEEP.articles', `the sweep walked the twenty and 20 inherited articles the shelf shows (${twentySwept} + ${inheritedSwept}; not on the shelf: ${report.notOnShelf.join(', ') || 'none'})`,
+    SWEEP_ONLY.length ? report.articles.length > 0 : twentySwept === TWENTY.length && TWENTY.length === 20 && inheritedSwept === 20 && !report.notOnShelf.some((id) => TWENTY.includes(id)),
+    { twentySwept, inheritedSwept, notOnShelf: report.notOnShelf });
+  check('SWEEP.taps', `every inflected token opened its card (${report.totals.tapped} of ${report.totals.tokens} distinct, ${report.totals.occurrences} occurrences, ${report.articles.length} articles)`,
+    report.totals.tokens > 0 && report.totals.tapFailures === 0, list((x) => x.card === null));
+  check('SWEEP.readings', 'every card states a reading that comes from its token\'s own, or is the word as the text writes and reads it',
+    !all.some((x) => x.card && !x.how), list((x) => x.card && !x.how));
+  check('SWEEP.meanings', 'every meaning a card shows belongs to an entry that writes its word, reads it so, and is of the token\'s class',
+    !all.some((x) => x.issues.some((issue) => /belongs to no entry|is not a |kanji data/u.test(issue))), list((x) => x.issues.some((issue) => /belongs to no entry|is not a |kanji data/u.test(issue))));
+  check('SWEEP.no-quick-miss', 'no settled card says "Not in the quick dictionary"', !all.some((x) => x.issues.some((issue) => /quick dictionary/u.test(issue))),
+    list((x) => x.issues.some((issue) => /quick dictionary/u.test(issue))));
+  check('SWEEP.page-errors', 'the sweep: no page errors', errors.length === 0, errors.slice(0, 5));
+  record('SWEEP.counts', 'the sweep\'s counts (distinct tokens per article; answers)', report.totals);
+}
+
 try {
   if (!F0_OK) throw new Error('F0: the served fixtures moved; nothing below would mean what it says');
   for (engine of engines) {
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true });
+    // every run names the engine that actually ran (W: some verifiers launched Chromium whatever KAIRO_BROWSER said)
+    versions[engine] = browser.version();
+    console.log(`engine ${engine} · ${browser.browserType().name()} ${versions[engine]}`);
     const contextOptions = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2,
       serviceWorkers: 'block', reducedMotion: 'reduce' };
     const each = async (name, body) => {
@@ -569,26 +926,36 @@ try {
         await context.close();
       }
     };
-    await each('reader', readerCases);
-    await each('stable', stableCases);
-    await each('sentence', sentenceCase);
-    await each('deck', deckCase);
-    await each('guided', guidedCase);
-    try { await captureCase(browser, contextOptions); }
-    catch (error) { check('capture.error', 'capture ran to the end', false, String(error.stack || error).slice(0, 600)); }
-    for (const answer of ['held', 'fail']) {
+    if (run('reader')) await each('reader', readerCases);
+    if (run('stable')) await each('stable', stableCases);
+    if (run('sentence')) await each('sentence', sentenceCase);
+    if (run('deck')) await each('deck', deckCase);
+    if (run('guided')) await each('guided', guidedCase);
+    if (run('r2')) await each('r2', r2Cases);
+    if (run('capture')) {
+      try { await captureCase(browser, contextOptions); }
+      catch (error) { check('capture.error', 'capture ran to the end', false, String(error.stack || error).slice(0, 600)); }
+    }
+    for (const answer of run('cold') ? ['held', 'fail'] : []) {
       try { await coldCase(browser, contextOptions, answer); }
       catch (error) { check(`A9.${answer}.error`, `A9 (${answer}) ran to the end`, false, String(error.stack || error).slice(0, 600)); }
     }
-    try { await unreadCase(browser, contextOptions); }
-    catch (error) { check('A10.error', 'A10 ran to the end', false, String(error.stack || error).slice(0, 600)); }
+    if (run('unread')) {
+      try { await unreadCase(browser, contextOptions); }
+      catch (error) { check('A10.error', 'A10 ran to the end', false, String(error.stack || error).slice(0, 600)); }
+    }
+    if (run('sweep')) {
+      try { await sweepCase(browser, contextOptions); }
+      catch (error) { check('SWEEP.error', 'the sweep ran to the end', false, String(error.stack || error).slice(0, 600)); }
+    }
     await browser.close();
   }
 } finally {
   await host.close();
   const failed = rows.filter((row) => !row.recorded && !row.ok);
   writeFileSync(resolve(evidence, 'verify-reading-truth.json'), `${JSON.stringify({ site, served: identity.gitSha, artifactSha256: identity.artifactSha256,
-    engines, failed: failed.length, rows }, null, 2)}\n`);
-  console.log(`\n${rows.filter((row) => !row.recorded).length - failed.length} passed, ${failed.length} failed, ${rows.filter((row) => row.recorded).length} recorded · evidence ${evidence}`);
+    engines, versions, partial: ONLY.length ? ONLY : false, sweepIds: SWEEP_ONLY.length ? SWEEP_ONLY : false, failed: failed.length, rows }, null, 2)}\n`);
+  if (ONLY.length || SWEEP_ONLY.length) console.log(`PARTIAL RUN (${[...ONLY, ...SWEEP_ONLY].join(', ')}): a control's scope, not an acceptance result`);
+  console.log(`\n${rows.filter((row) => !row.recorded).length - failed.length} passed, ${failed.length} failed, ${rows.filter((row) => row.recorded).length} recorded · engines ${JSON.stringify(versions)} · evidence ${evidence}`);
   process.exitCode = failed.length ? 1 : 0;
 }
