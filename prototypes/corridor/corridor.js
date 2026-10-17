@@ -8798,6 +8798,7 @@ function annotationPieceReadings(piece, tokenReadings = []) {
   if (D.dict?.[piece]?.r) out.add(annotationKana(D.dict[piece].r));
   if ([...piece].length === 1) {
     const k = D.kanji?.[piece];
+    for (const name of D.annotationNameReadings?.[piece] || []) out.add(annotationKana(name));
     for (const on of k?.on || []) out.add(annotationKana(on));
     for (const kun of k?.kun || []) {
       const bare = String(kun).replace(/-/gu, '');
@@ -8837,9 +8838,13 @@ function annotationReadsAs(text, end, wanted, tokenReadings, wordStarts) {
 /** A kana-only parenthetical directly after a written form is its pronunciation, not a second set of lexical targets,
  * only when it reads that form (第2次高市改造内閣（だいにじたかいちかいぞうないかく）, 切り拓（ひら）く). One that reads
  * no written run before it stays prose with its own doors (要因（ボトルネック）, 鯨渓谷（エジプト）). */
+function phoneticAnnotationCandidates(text) {
+  return [...String(text).matchAll(/[\p{Script=Han}々〆ヶ][（(]([\p{Script=Hiragana}\p{Script=Katakana}ー・\s]+)[）)]/gu)]
+    .map(match => [match.index + [...match[0]][0].length, match.index + match[0].length, match[1]]);
+}
 function phoneticAnnotationRanges(text, tokens = null) {
   const source = String(text);
-  const matches = [...source.matchAll(/[\p{Script=Han}々〆ヶ][（(]([\p{Script=Hiragana}\p{Script=Katakana}ー・\s]+)[）)]/gu)];
+  const matches = phoneticAnnotationCandidates(source);
   if (!matches.length) return [];
   const tokenReadings = new Map();
   let wordStarts = null;
@@ -8856,9 +8861,116 @@ function phoneticAnnotationRanges(text, tokens = null) {
   } else if (typeof Intl.Segmenter === 'function') {
     wordStarts = new Set([...new Intl.Segmenter('ja', { granularity: 'word' }).segment(source)].map(part => part.index));
   }
-  return matches.map(match => [match.index + [...match[0]][0].length, match.index + match[0].length, match[1]])
+  return matches
     .filter(([open, , inner]) => annotationReadsAs(source, open, annotationKana(inner), tokenReadings, wordStarts))
     .map(([open, close]) => [open, close]);
+}
+let annotationNamesPending = null;
+let annotationNamesError = null;
+/** Name readings are lexical data, never a learner-record root. Demand them only for mounted prose whose
+ * parenthetical cannot yet be classified; boot, prefetch and ordinary kanji lookup stay sidecar-free. */
+function ensureAnnotationNameReadings() {
+  if (D.annotationNameReadings) return Promise.resolve(true);
+  if (annotationNamesPending) return annotationNamesPending;
+  annotationNamesPending = Promise.resolve().then(async () => {
+    try {
+      if (!window.BunkiSkipUI) throw new Error('Name readings unavailable');
+      const data = await window.BunkiSkipUI.ensureData(skipState());
+      const names = Object.create(null);
+      for (const entry of data.entries) {
+        if (Array.isArray(entry.readings?.nanori)) names[entry.literal] = entry.readings.nanori.filter(name => typeof name === 'string');
+      }
+      D.annotationNameReadings = names;
+      annotationNamesError = null;
+      return true;
+    } catch (error) {
+      annotationNamesError = error;
+      return false;
+    } finally { annotationNamesPending = null; }
+  });
+  return annotationNamesPending;
+}
+function waitForReaderNameReadings(main, reader, p) {
+  if (D.annotationNameReadings) return false;
+  const text = p.tokens.map(token => token.s).join('');
+  if (phoneticAnnotationCandidates(text).length === phoneticAnnotationRanges(text, p.tokens).length) return false;
+  const epoch = recordEpoch;
+  const current = () => main.isConnected && S.view === 'reader' && passage() === p && epoch === recordEpoch;
+  const note = el('div', 'note');
+  note.setAttribute('role', 'status');
+  note.textContent = annotationNamesError
+    ? tx('本文の読みを読み込めませんでした。', 'The text’s readings could not load.')
+    : tx('本文の読みを読み込んでいる…', 'Loading the text’s readings…');
+  reader.setAttribute('aria-busy', String(!annotationNamesError));
+  if (annotationNamesError) {
+    const retry = el('button', 'chip', tx('もう一度', 'Try again'));
+    retry.type = 'button';
+    retry.addEventListener('click', () => {
+      if (!current() || S.stack.length) return;
+      annotationNamesError = null;
+      render();
+    });
+    note.append(' ', retry);
+  } else {
+    void ensureAnnotationNameReadings().then(() => {
+      if (!current()) return;
+      if (S.stack.length) { S.roomStale = true; return; }
+      keepScroll(); render(); returnScroll();
+    });
+  }
+  main.append(reader, note);
+  return true;
+}
+/** Generic prose can also contain a name reading. Keep the authored text readable while proof arrives, with no
+ * provisional word doors. Publishing only this wrapper cannot resurrect a room or move the learner's focus. */
+const pendingLookupNameReadings = new WeakMap();
+function activatePendingLookupReadings(root) {
+  for (const wrapper of root.querySelectorAll('[data-lookup-readings-pending]')) pendingLookupNameReadings.get(wrapper)?.();
+}
+function waitForLookupNameReadings(wrapper, text, context, block) {
+  const epoch = recordEpoch, view = S.view;
+  const host = personalHost, allowed = host?.captureAccess();
+  const current = () => epoch === recordEpoch && view === S.view && wrapper.isConnected &&
+    personalHost === host && (!allowed || allowed());
+  let running = false, failedHere = false;
+  const retry = () => {
+    if (!current()) return;
+    annotationNamesError = null;
+    failedHere = false;
+    load();
+  };
+  const failed = () => {
+    failedHere = true;
+    wrapper.setAttribute('aria-busy', 'false');
+    const button = el('button', 'chip', tx('読みを再読込', 'Reload readings'));
+    button.type = 'button';
+    button.addEventListener('click', retry);
+    wrapper.append(' ', button);
+  };
+  const load = () => {
+    if (!current() || running || failedHere) return;
+    if (annotationNamesError) { failed(); return; }
+    running = true;
+    wrapper.textContent = String(text);
+    wrapper.setAttribute('aria-busy', 'true');
+    void ensureAnnotationNameReadings().then(ready => {
+      running = false;
+      if (!current()) return;
+      if (!ready) { failed(); return; }
+      const fragment = document.createDocumentFragment();
+      const rendered = appendJapaneseLookup(fragment, text, { ...context, block });
+      wrapper.replaceChildren(...rendered.childNodes);
+      wrapper.removeAttribute('aria-busy');
+      delete wrapper.dataset.lookupReadingsPending;
+      pendingLookupNameReadings.delete(wrapper);
+    });
+  };
+  wrapper.textContent = String(text);
+  wrapper.dataset.lookupReadingsPending = 'true';
+  wrapper.setAttribute('aria-busy', 'true');
+  pendingLookupNameReadings.set(wrapper, load);
+  // Normal prose is inserted synchronously. A detached page built ahead waits for mountPageEffects instead.
+  queueMicrotask(load);
 }
 function phoneticAnnotationIndices(tokens) {
   const ranges = phoneticAnnotationRanges(tokens.map(token => token.s).join(''), tokens);
@@ -8882,6 +8994,11 @@ function appendJapaneseLookup(container, text, context = {}) {
   block.dataset.lookupBlock = 'true';
   const help = japaneseLookupHelpId();
   const annotations = phoneticAnnotationRanges(text);
+  if (!D.annotationNameReadings && phoneticAnnotationCandidates(text).length > annotations.length) {
+    waitForLookupNameReadings(wrapper, text, context, block);
+    container.append(wrapper);
+    return wrapper;
+  }
   let offset = 0;
   for (const segment of segments) {
     const annotation = annotations.some(([start, end]) => offset >= start && offset < end);
@@ -10341,12 +10458,25 @@ function readerWordKey(event, span, door) {
   if (event.key !== 'Enter') return;
   if (event.ctrlKey || event.metaKey) {
     event.preventDefault();
-    door.openEntry('keyboard');
+    void openPreparedWordEntry(span, door);
   } else if (event.shiftKey) {
     event.preventDefault();
     interaction({ kind: 'quickLook.open', target: door.target }, 'keyboard', 'reader-alternative');
     door.quickLook('keyboard');
   }
+}
+
+/** The direct keyboard door needs the same lookup and assistance admission as the word menu.
+ * Assistance may repaint its own question; only that same occurrence may survive the await. */
+async function openPreparedWordEntry(span, door) {
+  const epoch = recordEpoch, view = S.view, passageId = S.passageId, stack = S.stack.slice();
+  const serial = S.wordEntrySerial = (S.wordEntrySerial || 0) + 1;
+  if (await door.prepare?.() === false) return;
+  if (serial !== S.wordEntrySerial || epoch !== recordEpoch || view !== S.view || passageId !== S.passageId ||
+      stack.length !== S.stack.length || stack.some((node, i) => node !== S.stack[i])) return;
+  const anchor = span.isConnected ? span : door.resolveAnchor?.();
+  if (!anchor?.isConnected || anchor.closest('[inert]')) return;
+  return door.openEntry('keyboard');
 }
 
 /** Press-and-hold (touch and pen) and right-click open the word menu; a hold that moves is a scroll. */
@@ -11791,6 +11921,8 @@ function renderReader(main) {
     main.append(reader, wait);
     return;
   }
+
+  if (waitForReaderNameReadings(main, reader, p)) return;
 
   const paraBreaks = new Set(p.paras || []);
   const readingAnnotations = phoneticAnnotationIndices(p.tokens);
@@ -23740,8 +23872,7 @@ function recordPickerSurface(node) {
 
 /** A page Save, including its context scope, redraws the page while the originating word keeps its ladder. */
 function refreshSavedPage(node, label = nodeTitle(node)) {
-  const path = layerPathFor();
-  if (path?.some(part => ladderPages.has(part))) {
+  if (layerPathFor() && S.stack.some(part => ladderPages.has(part))) {
     S.roomStale = true;
     refreshWordSaveControls(node, label);
     renderLayer();
@@ -31972,6 +32103,7 @@ function renderSheet(root, { prebuilt = null } = {}) {
  * re-render or the writing room carried), then the focus a re-render named, the door a deeper page was opened from, or
  * its Close. */
 function mountPageEffects(sheet, node) {
+  activatePendingLookupReadings(sheet);
   adoptSaveMenuOwner();
   // reading position survives the doors: Back hands a ~2,700px entry its place, never its top (P1, review)
   const savedSheetScroll = node.sheetScroll || 0;
@@ -32159,6 +32291,8 @@ function flyWord(leaves, target) {
 /** The page arrives. Called by go() after its bookkeeping; pushes the node (the page built ahead for it, when one is
  * waiting), mounts its page by the layer, or by render() in the rooms that keep it, and the word travels. */
 function enterWord(node, { from = null, invoker = null, instant = false } = {}) {
+  // A different page visit retires a pending keyboard lookup even if Back restores the same room and stack.
+  S.wordEntrySerial = (S.wordEntrySerial || 0) + 1;
   finishPageTransition();
   const layered = layerPathFor();
   const depth = S.stack.length + 1;
@@ -32193,6 +32327,7 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
  * when that still stands on the screen (the reader keeps its tokens under the layer; a kept page keeps its words). */
 function recede({ all = false, viaRender = false, instant = false } = {}) {
   if (!S.stack.length) return null;
+  S.wordEntrySerial = (S.wordEntrySerial || 0) + 1;
   finishPageTransition();
   const layered = !viaRender && layerPathFor();
   const leaving = all ? S.stack[0] : S.stack.at(-1);
