@@ -1341,7 +1341,11 @@ button.tok::before {
  * it become the single word row, holding the column to [word, gloss]. */
 .tok.content > .tok-word {
   display: block;
-  white-space: nowrap;
+  /* Q · a word stays whole (keep-all), and a word wider than the whole line — a long name, バグワン・マハビール
+     スワミ・ジェイン at 320 — wraps after its ・ inside its own box instead of pushing the page sideways */
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .token-door {

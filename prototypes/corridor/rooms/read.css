@@ -1645,3 +1645,7 @@ html[data-room='shelf'] .shelf-today-read:hover .shelf-today-read-arrow { transf
 @media (max-width: 520px) {
   html[data-room='shelf'] body:not(.zen) #app .shelf-today-read { width: calc(100% - 34px); }
 }
+
+/* Q · the reader never scrolls sideways: a reading drawn over the last word of a line (ruby::before) may overhang the
+   glass by a pixel or two at 320; the overhang is clipped, nothing scrolls (overflow-x: clip makes no scroll box) */
+html[data-room='reader'] #app > main { overflow-x: clip; }
