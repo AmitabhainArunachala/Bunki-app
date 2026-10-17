@@ -1229,11 +1229,31 @@ try {
     });
 
     // a word held inside the word's page: the strip stands in the page (it scrolls with it), under its bar, over no button
+    /** The word's page draws itself again when its dictionary row lands (reviveBuiltAhead → refreshWordSheet), later on a
+     * loaded machine: wait until the page has stood still — no node added or removed in it for 700 ms — before choosing
+     * anything inside it (a word chosen earlier can be swapped out under the gesture). Returns how long it took. */
+    const pageQuiet = (page) => page.evaluate(() => new Promise((done) => {
+      const began = performance.now();
+      let last = performance.now();
+      const sheet = () => document.getElementById('sheet');
+      const inPage = (n) => n?.nodeType === 1 && (n.id === 'sheet' || !!n.closest?.('#sheet') || !!n.querySelector?.('#sheet'));
+      const watch = new MutationObserver((list) => {
+        if (list.some((m) => inPage(m.target) || [...m.addedNodes, ...m.removedNodes].some(inPage))) last = performance.now();
+      });
+      watch.observe(document.body, { childList: true, subtree: true });
+      const tick = () => {
+        const now = performance.now();
+        if ((sheet() && now - last >= 700) || now - began > 12000) { watch.disconnect(); done({ quiet: now - began <= 12000, ms: Math.round(now - began) }); return; }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }));
     await walk('G5-page', async (page) => {
       await openStory(page);
       await stage(page, readerWord(page));
       await page.locator('#mini .mini-word').tap();
       await pageSettled(page);
+      await pageQuiet(page);
       const inside = page.locator('#sheet .example .sentence-tok, #sheet .japanese-lookup-word').filter({ hasText: /^(内閣|大臣|官邸|日本|表彰|出席|大賞)$/u }).first();
       await inside.scrollIntoViewIfNeeded();
       await delay(300);
@@ -1278,6 +1298,7 @@ try {
         await stage(page, readerWord(page));
         await page.locator('#mini .mini-word').tap();
         await pageSettled(page);
+        await pageQuiet(page);
         const before = await barSaveFacts(page);
         check(`G5.bar-save.${form}.save`, `${form}: the page bar’s Save stands inside its bar, at least 8 px from every screen edge, its target the height of Close and search`,
           barSaveOk(before) && /Save/u.test(before.text), before);
