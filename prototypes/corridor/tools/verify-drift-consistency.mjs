@@ -12,6 +12,9 @@
  *   node verify-drift-consistency.mjs [--mode fast|full] [--words N]
  *     [--chain-hops N] [--fuzz-seeds N,N,N] [--fuzz-gestures N]
  *     [--soak-ms N] [--shots DIR] [--out FILE]
+ *     [--scale-navigation hosted|legacy]
+ *   hosted (default): surface spread enters shelf; native inverse must restore sky.
+ *   legacy: camera-only pinch contract for an explicitly selected pre-G6 artifact.
  *
  * Battery per word (charter §2, v1 slice — the operator-reported cases):
  *   tap            → unfolds + blooms (C1, C2)   [kana words included]
@@ -48,6 +51,8 @@ const numberArg = (name, fallback, { min = 0 } = {}) => {
   return value;
 };
 const MODE = arg('--mode', 'fast');
+const SCALE_NAVIGATION = arg('--scale-navigation', 'hosted');
+assert(['hosted','legacy'].includes(SCALE_NAVIGATION), '--scale-navigation must be hosted or legacy');
 if (!['fast', 'full'].includes(MODE)) throw new Error('--mode must be fast or full');
 
 // `fast` is the bounded PR gate. `full` selects the binding A0 quantities,
@@ -367,6 +372,64 @@ const finishHostedVisit = async (label) => {
   return { stage, restored };
 };
 
+// G6 changes a surface spread into an actual scale edge. Legacy donor checks
+// require an explicit --scale-navigation legacy invocation; no feature is used
+// to silently downgrade this hosted contract when a bridge or rail is missing.
+const scaleSurfaceFacts = () => page.evaluate(() => ({
+  view: document.body.dataset.view,
+  active: document.getElementById('drift-layer')?.classList.contains('active'),
+  inert: document.getElementById('drift-layer')?.inert,
+  ready: window.__DRIFT__.canNavigate(), place: window.__DRIFT__.capturePlace(),
+  mini: !!document.getElementById('mini'), sheet: !!document.getElementById('sheet'),
+  centre: document.querySelector('#drift-layer .word.bctr .base')?.textContent || null,
+}));
+const beginScaleSpread = async (label) => {
+  // Observe the existing inertia/glide until it actually rests; never freeze
+  // physics or set a camera. Equality through the crossing remains exact.
+  const stability = [], stabilityStarted = Date.now();
+  let facts = await scaleSurfaceFacts(), equalSamples = 0;
+  for (let n = 0; n < 40 && equalSamples < 2; n++) {
+    await page.waitForTimeout(100);
+    const next = await scaleSurfaceFacts();
+    stability.push(next.place);
+    equalSamples = isDeepStrictEqual(next.place, facts.place) ? equalSamples + 1 : 0;
+    facts = next;
+  }
+  assert(equalSamples >= 2, 'natural camera reaches a stable precondition within four seconds');
+  assert(facts.view === 'drift' && facts.active && !facts.inert && facts.ready && !facts.mini && !facts.sheet,
+    'G6 spread starts in the admitted visible sky, without pending judgment or a stage');
+  assert.equal(facts.place?.path, '[]', 'surface scale contract is not a private dive');
+  assert.equal(facts.centre, label, 'the original held centre is current');
+  const occurrence = await page.evaluateHandle(label => [...document.querySelectorAll('#drift-layer .word.bctr')]
+    .find(n => n.querySelector('.base')?.textContent === label), label);
+  assert(occurrence.asElement(), 'capture the actual held DOM occurrence');
+  return { facts, occurrence, stability, stabilityDurationMs:Date.now()-stabilityStarted, record: await readAppRecordSnapshot(page) };
+};
+const returnScaleSpread = async (word, before, scope) => {
+  await page.waitForFunction(() => document.body.dataset.view === 'shelf', null, { timeout: 5000 });
+  const shelf = await scaleSurfaceFacts();
+  const arrived = shelf.view === 'shelf' && !shelf.active && shelf.inert && !shelf.mini && !shelf.sheet &&
+    shelf.centre === before.facts.centre && isDeepStrictEqual(shelf.place, before.facts.place);
+  await file(word, 'scale-shelf', 'native surface spread enters the shelf and retains the exact sky place',
+    arrived ? 'ok' : 'misfired', JSON.stringify({scope, before: before.facts, stability:before.stability, stabilityDurationMs:before.stabilityDurationMs, shelf}), {state:'scale', scope});
+  assert(arrived, 'native spread must take the intended scale edge without resetting the sky');
+  const inverse = page.locator('.scale-thread[data-scale="shelf"] [data-scale-out]');
+  assert.equal(await inverse.count(), 1, 'one real visible shelf-to-sky inverse');
+  assert(await inverse.isVisible() && await inverse.isEnabled(), 'native inverse is reachable');
+  assert(await inverse.evaluate(n => {const r=n.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return hit===n||n.contains(hit);}), 'inverse owns its native hit');
+  await inverse.tap();
+  await page.waitForFunction(() => document.body.dataset.view === 'drift' && document.getElementById('drift-layer')?.classList.contains('active') && !document.getElementById('drift-layer')?.inert, null, {timeout:5000});
+  const restored = await scaleSurfaceFacts(), record = await readAppRecordSnapshot(page);
+  const sameOccurrence = await before.occurrence.evaluate(n => n.isConnected && n.classList.contains('bctr') && n.getBoundingClientRect().width > 0);
+  const retained = restored.view === 'drift' && restored.active && !restored.inert && !restored.mini && !restored.sheet &&
+    sameOccurrence && restored.centre === before.facts.centre && isDeepStrictEqual(restored.place, before.facts.place) &&
+    isDeepStrictEqual(record.record, before.record.record) && record.revision === before.record.revision;
+  await file(word, 'scale-return', 'native visible inverse restores the exact camera and held occurrence without a learner write',
+    retained ? 'ok' : 'misfired', JSON.stringify({scope, restored, sameOccurrence, beforeRevision:before.record.revision, afterRevision:record.revision}), {state:'scale', scope});
+  assert(retained, 'the scale inverse must restore the held scene, not reset or reopen it');
+};
+
+
 const pickOne = (exclude) => page.evaluate(`(() => {
   const done = new Set(${JSON.stringify([...exclude])});
   const K = ${KANJI_RE};
@@ -388,7 +451,7 @@ const pickOne = (exclude) => page.evaluate(`(() => {
 })()`);
 
 /* ------------------------------------------------------------- battery */
-const waterPoint = () =>
+const legacyWaterPoint = () =>
   page.evaluate(`(() => {
     const boxes = [...document.querySelectorAll('#drift-layer .word, #drift-layer .glyph, .drift-door, #theme, #lvl')]
       .map((el) => el.getBoundingClientRect());
@@ -399,6 +462,27 @@ const waterPoint = () =>
     }
     return { x: 200, y: 150 };
   })()`);
+const waterPoint = async () => {
+  if (SCALE_NAVIGATION === 'legacy') return legacyWaterPoint();
+  const point = await page.evaluate(() => {
+    if (document.body.dataset.view !== 'drift' || !document.getElementById('drift-layer')?.classList.contains('active') || document.getElementById('drift-layer')?.inert) return null;
+    const ink = [...document.querySelectorAll('#drift-layer .word, #drift-layer .glyph, #drift-layer .part')]
+      .map(n => n.getBoundingClientRect()).filter(r => r.width && r.height);
+    const spots = [[200,210],[330,250],[120,300],[260,640],[90,560],[340,400]];
+    for (let y=150;y<=690;y+=32) for(let x=54;x<=336;x+=32) spots.push([x,y]);
+    for (const [x,y] of spots) {
+      // The touch footprint must belong to native water. Stars and chrome are
+      // real routes; a geometry exclusion list cannot stand in for ownership.
+      if (ink.some(r => Math.hypot(x-r.x-r.width/2,y-r.y-r.height/2)<44)) continue;
+      const disk = [[x,y],...Array.from({length:16},(_,i)=>[x+30*Math.cos(i*Math.PI/8),y+30*Math.sin(i*Math.PI/8)])];
+      if (disk.every(([px,py]) => document.elementFromPoint(px,py)?.id === 'sky')) return {x,y,ownershipRadius:30,samples:disk.length};
+    }
+    return null;
+  });
+  assert(point, 'a real native sky-owned touch footprint exists; never substitute a star or hidden scene');
+  return point;
+};
+
 const settle = async () => {
   // a deliberate tap on TRUE open water, found empirically — a fixed point
   // once landed on the shelf door and quietly navigated the whole app away
@@ -513,17 +597,36 @@ for (let round = 0; round < N_WORDS; round++) {
   }
   const bloomAlive = (await page.evaluate(worldProbe)).bloomCentre === word.w;
 
-  // C4/C5 — pinch over the constellation: camera zooms, bloom survives
-  if (bloomAlive) {
-    const before = await page.evaluate(worldProbe);
+  // G6 surface spread crosses a scale. Prove the native inverse before the
+  // original slow-drag/satellite checks; retained hidden DOM is not a pass.
+  if (bloomAlive && SCALE_NAVIGATION === 'hosted') {
+    const before = await beginScaleSpread(word.w);
     await pinchAt(195, 430, 40, 110);
     await page.waitForTimeout(600);
-    const afterPinch = await page.evaluate(worldProbe);
-    if (before.bloomCentre && afterPinch.bloomCentre !== before.bloomCentre)
-      await file(word, 'pinch', 'bloom survives zoom', 'dismissed', 'pinch killed the constellation');
-    else await file(word, 'pinch', 'bloom survives zoom', 'ok', '');
-    await pinchAt(195, 430, 110, 42); // zoom back out
+    await returnScaleSpread(word, before, 'matrix');
+    const restored = await scaleSurfaceFacts();
+    await pinchAt(195, 430, 110, 42);
     await page.waitForTimeout(500);
+    const contracted = await scaleSurfaceFacts();
+    const ok = contracted.view === 'drift' && contracted.active && !contracted.inert &&
+      contracted.centre === word.w && isDeepStrictEqual(contracted.place, restored.place);
+    await file(word, 'pinch', 'spread crosses and returns; outermost contraction retains the same visible sky',
+      ok ? 'ok' : 'misfired', JSON.stringify({restored, contracted}));
+    assert(ok, 'outermost contraction cannot hide or reset the held scene');
+  } else {
+    // C4/C5 — pinch over the constellation: camera zooms, bloom survives
+    if (bloomAlive) {
+      const before = await page.evaluate(worldProbe);
+      await pinchAt(195, 430, 40, 110);
+      await page.waitForTimeout(600);
+      const afterPinch = await page.evaluate(worldProbe);
+      if (before.bloomCentre && afterPinch.bloomCentre !== before.bloomCentre)
+        await file(word, 'pinch', 'bloom survives zoom', 'dismissed', 'pinch killed the constellation');
+      else await file(word, 'pinch', 'bloom survives zoom', 'ok', '');
+      await pinchAt(195, 430, 110, 42); // zoom back out
+      await page.waitForTimeout(500);
+    }
+
   }
 
   // C3 — slow horizontal drag: the word MOVES and SURVIVES (never a grade)
@@ -631,12 +734,15 @@ for (let round = 0; round < N_WORDS; round++) {
   await settle();
 }
 
+const matrixGestures = ['tap','tap-again','pinch','slow-drag','sat-flick','sat-tap','sat-recentre','cancel+tap'];
+const matrixCounts = Object.fromEntries(matrixGestures.map(name => [name, cases.filter(row => row.gesture === name).length]));
+
 await file(
   { w: 'matrix coverage', kanji: null },
   'sample-count',
   `${N_WORDS} distinct visible words complete the encoded battery`,
-  matrixWordsTested === N_WORDS ? 'ok' : 'error',
-  `${matrixWordsTested}/${N_WORDS} words completed`,
+  matrixWordsTested === N_WORDS && matrixGestures.every(name => matrixCounts[name] === N_WORDS) ? 'ok' : 'error',
+  `${matrixWordsTested}/${N_WORDS} words completed; exact gesture counts=${JSON.stringify(matrixCounts)}`,
   { state: 'coverage' },
 );
 
@@ -1059,6 +1165,7 @@ for (const seed of FUZZ_SEEDS) {
     let action = actionNames[Math.floor(random() * actionNames.length)];
     const beforeWorld = await page.evaluate(worldProbe);
     const beforeCentre = await page.evaluate(wordProbe(centre));
+    const scaleBefore = ['pinch-out','pinch-in'].includes(action) && SCALE_NAVIGATION === 'hosted' ? await beginScaleSpread(centre) : null;
     const errorsBefore = pageErrors.length;
     let actionDetail = '';
     let actionSpecificOk = true;
@@ -1069,11 +1176,18 @@ for (const seed of FUZZ_SEEDS) {
       coordinates = { cx: 195, cy: 430, fromRadius: 42, toRadius: radius };
       await pinchAt(195, 430, 42, radius, 150, 4);
       await page.waitForTimeout(180);
+      if (scaleBefore) await returnScaleSpread({w:centre,kanji:(centre.match(/[\u4e00-\u9fff]/g)??[]).length}, scaleBefore, `fuzz:${seed}:${step}`);
     } else if (action === 'pinch-in') {
       const radius = 38 + Math.floor(random() * 12);
       coordinates = { cx: 195, cy: 430, fromRadius: 94, toRadius: radius };
       await pinchAt(195, 430, 94, radius, 150, 4);
       await page.waitForTimeout(180);
+      if (scaleBefore) {
+        const contracted = await scaleSurfaceFacts();
+        actionSpecificOk = contracted.view === 'drift' && contracted.active && !contracted.inert &&
+          contracted.centre === centre && isDeepStrictEqual(contracted.place, scaleBefore.facts.place);
+        actionDetail = JSON.stringify({before:scaleBefore.facts,contracted});
+      }
     } else if (action === 'pan') {
       const water = await waterPoint();
       const dx = random() < 0.5 ? -36 : 36;
@@ -1298,6 +1412,7 @@ if (SOAK_MS > 0) {
     mode: MODE,
     configuration: {
       words: N_WORDS,
+      scaleNavigation: SCALE_NAVIGATION,
       chainHops: CHAIN_HOPS,
       fuzzSeeds: FUZZ_SEEDS,
       fuzzGesturesPerSeed: FUZZ_GESTURES,
