@@ -140,6 +140,15 @@ const LONE = Object.freeze([
 ]);
 // R2.C3 · 私 read わたくし, an entry the pinned JMdict has and the build now ships (the article entries)
 const WATAKUSHI = { at: SOSEKI, index: 0, s: '私', r: 'わたくし', seq: '2842390' };
+// R2 · what is left after the addendum's classes 1–3 keeps N's honest line: no entry the served dictionaries hold reads
+// these spellings this way, none is a sound change, none a lone kanji's on'yomi (the lead, 2026-10-17)
+const ZAZEN = art('bunki-read-n1-zazen-brainwaves', 'bunki-read-n1-zazen-brainwaves.json', '坐禅');
+const REMAINING = Object.freeze([
+  { name: '行 ゆき', at: KAWAGUCHI, index: 1261, s: '行', r: 'ゆき' }, { name: '行 ゆき (2)', at: KAWAGUCHI, index: 1337, s: '行', r: 'ゆき' },
+  { name: '足 たし', at: SOSEKI, index: 401, s: '足', r: 'たし' }, { name: '他 ひと', at: SOSEKI, index: 705, s: '他', r: 'ひと' },
+  { name: '行う おこのう', at: KAWAGUCHI, index: 1432, s: '行う', r: 'おこのう' }, { name: '源 みなもとの', at: BENZAITEN, index: 70, s: '源', r: 'みなもとの' },
+  { name: '章 あきら', at: ZAZEN, index: 115, s: '章', r: 'あきら' },
+]);
 
 /* ------------------------------------------------------------------ report */
 const rows = [];
@@ -221,6 +230,11 @@ const posOf = (seq) => {
   return detail ? [...new Set(detail[3].flatMap((sense) => sense[0] || []))] : [];
 };
 const onyomi = (char) => (kanjiData[char]?.on || []).map(k2h);
+const soundUndoneF0 = (reading) => {
+  const voiced = 'がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ', plain = 'かきくけこさしすせそたちつてとはひふへほはひふへほ', r = k2h(reading);
+  const flat = (x) => (voiced.includes(x[0]) ? plain[voiced.indexOf(x[0])] + x.slice(1) : '');
+  return [flat(r), ...(r.endsWith('っ') ? [...'ちつくきう'].flatMap((end) => [r.slice(0, -1) + end, flat(r.slice(0, -1) + end)]) : [])].filter(Boolean);
+};
 for (const fixture of INFLECTED) {
   const token = tokenAt(fixture);
   check(`F0.R2.${fixture.name}`, `${fixture.at.id} #${fixture.index} is ${fixture.s} (base ${fixture.b}) read ${fixture.r}, inflected`,
@@ -246,6 +260,14 @@ for (const fixture of LONE) {
   check(`F0.R2.K.${fixture.name}`, `${fixture.at.id} #${fixture.index} is ${fixture.s} read ${fixture.r}, uninflected; no entry reads it so; ${fixture.r} is one of its on'yomi in the kanji data`,
     token?.s === fixture.s && token.b === fixture.s && token.r === fixture.r && !readAs(fixture.s, fixture.r).length && onyomi(fixture.s).includes(k2h(fixture.r)),
     { token, on: kanjiData[fixture.s]?.on, core: core[fixture.s] });
+}
+for (const fixture of REMAINING) {
+  const token = tokenAt(fixture);
+  check(`F0.R2.remaining.${fixture.name}`, `${fixture.at.id} #${fixture.index} is ${fixture.s} read ${fixture.r}; the served dictionaries list the spelling, no entry reads it so (nor a sound change of it), and it is no lone kanji's on'yomi`,
+    token?.s === fixture.s && token.b === fixture.s && token.r === fixture.r && (byForm.get(fixture.s) || []).length > 0
+      && ![fixture.r, ...soundUndoneF0(fixture.r)].some((reading) => readAs(fixture.s, reading).length || k2h(core[fixture.s]?.r) === k2h(reading))
+      && !([...fixture.s].length === 1 && [fixture.r, ...soundUndoneF0(fixture.r)].some((reading) => onyomi(fixture.s).includes(k2h(reading)))),
+    { token, core: core[fixture.s], on: kanjiData[fixture.s]?.on });
 }
 check('F0.R2.K.france', 'the quick dictionary reads 仏 ふつ, "France" — the word a voicing change would wrongly lend ぶつ', core['仏']?.r === 'ふつ' && core['仏'].m[0] === 'France', core['仏']);
 check('F0.R2.C3', `${WATAKUSHI.at.id} #${WATAKUSHI.index} is 私 read わたくし; the quick dictionary reads 私 わたし; entry ${WATAKUSHI.seq} writes 私 and reads it わたくし`,
@@ -722,6 +744,12 @@ async function r2Cases(page) {
   const meaning = firstGloss(WATAKUSHI.seq, WATAKUSHI.r);
   check('R2.C3.私', `私 read わたくし: the card reads わたくし, "${meaning}" (entry ${WATAKUSHI.seq}), Save live`,
     settled?.word === '私' && k2h(settled.reading) === 'わたくし' && settled.gloss === meaning && settled.take && !settled.take.disabled, settled);
+  for (const fixture of REMAINING) {
+    await openArticle(page, fixture.at);
+    const left = (await slip(page, tok(page, fixture.index))).settled;
+    check(`R2.remaining.${fixture.name}`, `${fixture.s} read ${fixture.r}: the card reads ${fixture.r} and says "${NO_READING}", its Save held with "${SAVE_REASON}"`,
+      left?.word === fixture.s && left.reading === fixture.r && left.gloss === NO_READING && left.take?.disabled === true && left.reason === SAVE_REASON, left);
+  }
   await closeMini(page);
 }
 
