@@ -49,15 +49,15 @@ export function survey({ root = corridor, lock = runtimeLock() } = {}) {
 
 /** The two v2 manifests, as values. Writing them is a separate, explicit step. */
 export function buildManifests({ root = corridor, lock = runtimeLock(), ledgerFile = ledgerPathFor(lock.model) } = {}) {
-  const { job, have, want } = survey({ root, lock });
+  const { have, want } = survey({ root, lock });
   const ledger = readLedger(ledgerFile, lock.model);
   const vouchers = shippedVouchers(root);
-  const rows = new Map(job.renders.map((row) => [row.id, row]));
-  // only the two lanes this tool writes; the listening lane's copies are checked by verify-voice-lock
+  // only the two lanes this tool writes; the listening lane's copies are checked by verify-voice-lock.
+  // Each file is judged by its own key — model, voice, role, text hash, reading — and its digest.
   const unproven = [];
   const proven = have.filter((item) => {
     if (item.role !== 'word' && item.role !== 'narrator') return false;
-    const provenance = provenanceOf(root, item.path, rows.get(item.renderId), ledger, vouchers);
+    const provenance = provenanceOf(root, item, ledger, vouchers);
     if (!provenance || provenance.model !== lock.model) { unproven.push(item.path); return false; }
     return true;
   });
