@@ -336,25 +336,48 @@ const cases = [
   // G3 · plain prose has no tokens: a kana parenthetical is its word's reading only when the served dictionary or the kanji
   // data reads that word so (子供（こども）, 拓 ひら of ひら.く); a katakana word or a grammar mark in parentheses is prose
   ['plain-prose-parentheticals-are-annotations-only-when-they-read', async page => {
-    const observed = await page.evaluate(() => {
+    const fixture = await page.evaluateHandle(() => {
       const f = window.annotationFixture;
       const room = f.S.view; f.S.view = 'shelf';
       const box = document.createElement('section');
       box.innerHTML = '<p class="fixture-annotation">子供（こども）が下品(な)要因（ボトルネック）を切り拓（ひら）く。</p>';
       document.body.append(box);
-      const before = box.textContent; f.enhanceJapaneseProse(box);
-      const words = [...box.querySelectorAll('.japanese-lookup-word')].map(node => node.dataset.lookupText);
-      const sameText = box.textContent === before;
-      f.S.view = room; box.remove();
-      return { sameText, words };
+      const before = box.textContent;
+      try {
+        f.enhanceJapaneseProse(box);
+        return { box, room, before, pending: [...box.querySelectorAll('[data-lookup-readings-pending]')] };
+      } catch (error) { f.S.view = room; box.remove(); throw error; }
     });
-    assert(observed.sameText, 'Lookup wrapping preserves exact source text');
-    assert(['ボトル', 'ネック'].every(part => observed.words.some(word => word.includes(part))),
-      `A katakana word in parentheses that reads no word before it keeps its door: ${JSON.stringify(observed.words)}`);
-    assert(observed.words.includes('な'), `A grammar mark in parentheses keeps its door: ${JSON.stringify(observed.words)}`);
-    assert(['子供', '下品', '要因', '拓'].every(word => observed.words.includes(word)), `Each written word stays a door: ${JSON.stringify(observed.words)}`);
-    assert(!observed.words.some(word => /^(こども|ひ|ら|ひら)$/u.test(word)), `A reading that reads its word is text, not a door: ${JSON.stringify(observed.words)}`);
-    return observed;
+    try {
+      // Keep the exact mounted occurrence and room alive while queued lexical proof arrives.
+      await page.waitForFunction(({ box, pending }) => {
+        if (!box.isConnected || window.annotationFixture.S.view !== 'shelf' ||
+          pending.some(node => !node.isConnected || !box.contains(node))) {
+          throw new Error('The same annotation fixture must remain mounted in its room');
+        }
+        return !box.querySelector('[data-lookup-readings-pending]');
+      }, fixture, { timeout: 10000 });
+      const observed = await fixture.evaluate(({ box, before, pending }) => {
+        if (!box.isConnected || window.annotationFixture.S.view !== 'shelf' ||
+          pending.some(node => !node.isConnected || !box.contains(node))) {
+          throw new Error('The same annotation fixture must remain mounted through observation');
+        }
+        const words = [...box.querySelectorAll('.japanese-lookup-word')].map(node => node.dataset.lookupText);
+        const sameText = box.textContent === before;
+        return { sameText, words, pendingReadings: { initial: pending.length, remaining: box.querySelectorAll('[data-lookup-readings-pending]').length,
+          sameBoxConnected: box.isConnected, sameWrappersConnected: pending.every(node => node.isConnected && box.contains(node)) } };
+      });
+      assert(observed.sameText, 'Lookup wrapping preserves exact source text');
+      assert(['ボトル', 'ネック'].every(part => observed.words.some(word => word.includes(part))),
+        `A katakana word in parentheses that reads no word before it keeps its door: ${JSON.stringify(observed.words)}`);
+      assert(observed.words.includes('な'), `A grammar mark in parentheses keeps its door: ${JSON.stringify(observed.words)}`);
+      assert(['子供', '下品', '要因', '拓'].every(word => observed.words.includes(word)), `Each written word stays a door: ${JSON.stringify(observed.words)}`);
+      assert(!observed.words.some(word => /^(こども|ひ|ら|ひら)$/u.test(word)), `A reading that reads its word is text, not a door: ${JSON.stringify(observed.words)}`);
+      return observed;
+    } finally {
+      try { await fixture.evaluate(({ box, room }) => { window.annotationFixture.S.view = room; box.remove(); }); }
+      finally { await fixture.dispose(); }
+    }
   }],
 ];
 const filter = new Set(process.argv.slice(2).map(arg => { assert(arg.startsWith('--case=')); return arg.slice(7); }));

@@ -457,7 +457,7 @@ async function d5Detour(page, rec) {
   const clean = await readerMarks(page);
   // G3: first tap summons only this occurrence's reading; no English or stage.
   const knownTaps = [await tapCentre(page, D5.known.index)];
-  await page.waitForFunction(i => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung==='reading', D5.known.index,{timeout:5000}).catch(()=>{});
+  await page.waitForFunction(i => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung==='reading', D5.known.index,{timeout:3000}).catch(()=>{});
   const homeBefore = await readerMarks(page);
   const known = await tokenState(page, D5.known.index), named = await tokenState(page, DOOR.index);
   rec('D5.home-marks', `D5 ${D5.home} opens unmarked; one tap leaves token ${D5.known.index} ${D5.known.token.s} the touched word (${D5.known.token.r} shown), its only mark; token ${DOOR.index} ${SURFACE} is the hidden reading door`,
@@ -581,7 +581,7 @@ async function d6Visit(page, rec) {
   const clean = await readerMarks(page);
   // G3: first tap summons only this occurrence's reading; no English or stage.
   const knownTaps = [await tapCentre(page, D5.known.index)];
-  await page.waitForFunction(i => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung==='reading', D5.known.index,{timeout:5000}).catch(()=>{});
+  await page.waitForFunction(i => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung==='reading', D5.known.index,{timeout:3000}).catch(()=>{});
   const homeBefore = await readerMarks(page);
   const known = await tokenState(page, D5.known.index), named = await tokenState(page, DOOR.index);
   rec('D6.home-marks', `D6 ${D6.home} opens unmarked; one tap leaves token ${D5.known.index} ${D5.known.token.s} the touched word (${D5.known.token.r} shown), its only mark; token ${DOOR.index} ${SURFACE} is the hidden reading door`,
