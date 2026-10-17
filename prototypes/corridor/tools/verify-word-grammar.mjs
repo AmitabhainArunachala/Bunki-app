@@ -123,11 +123,20 @@ const visibleReading = (node) => [...node.querySelectorAll('ruby')].some((ruby) 
 });
 /** Advance only an observed reading rung; a dead door is never rescued with an unconditional extra tap. */
 async function stage(page, locator) {
-  await locator.tap();
+  // A revealed ruby changes textContent. Retain the selected occurrence so
+  // a text-filtered locator cannot silently move tap two to a neighboring word.
+  const occurrence = await locator.elementHandle();
+  assert(occurrence && await occurrence.evaluate((node) => node.isConnected), 'stage starts on a connected occurrence');
+  await occurrence.tap();
   await page.waitForFunction((node) => !!document.getElementById('mini') || node.dataset.ladderRung === 'reading',
-    await locator.elementHandle(), { timeout: 10000 });
-  if (!await page.locator('#mini').count()) await locator.tap();
+    occurrence, { timeout: 10000 });
+  assert(await occurrence.evaluate((node) => node.isConnected), 'first activation must retain the same occurrence');
+  if (!await page.locator('#mini').count()) {
+    assert.equal(await occurrence.evaluate((node) => node.dataset.ladderRung), 'reading', 'only an observed reading rung permits tap two');
+    await occurrence.tap();
+  }
   await page.locator('#mini .mini-word').waitFor();
+  assert(await occurrence.evaluate((node) => node.isConnected), 'the stage must retain its exact originating occurrence');
 }
 async function focusWord(page, locator) {
   const at = await locator.evaluate((node) => [...node.closest('[data-prose-roving]').querySelectorAll('.tok[data-para]')].indexOf(node));

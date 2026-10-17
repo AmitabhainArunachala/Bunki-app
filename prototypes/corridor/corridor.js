@@ -8208,17 +8208,14 @@ function dialRow(labelJa, labelEn, key, options) {
 }
 
 /* ------------------------------------------- the reader's click grammar
- * One tap is the meaning (John, 2026-10-02: the old tap ladder — reading, then English, then clear —
- * was "weird, awkward, not clear"):
- *   tap              → the popup: the word, its reading, its meaning, Save, Full entry ›
- *   tap another word → the popup moves there; a tap outside or Escape puts it away
+ * G3 follows John's October 14 request to cycle through the layers to the full entry:
+ *   tap              → reading in place, then the word's stage, then its page
+ *   tap another word → begin that occurrence's ladder; outside or Escape folds one rung
  *   right-click, or press and hold on a touch screen, or ContextMenu / Shift+F10
  *                    → the word menu: Save · Save the sentence · Full entry ·
  *                      Ask the tutor about this sentence · Copy
- * Readings on the text belong to the ふりがな setting, not to taps; with 触れて (on touch) the word
- * you touched shows its reading. Sentences outside the reader (renderSentenceTokens) keep the older
- * holds. A moved pointer is a scroll, never a gesture. Every action applies to the DOM directly — no
- * full re-render, so the reader never stutters. */
+ * The ふりがな dial skips the reading rung when off or always. A moved pointer is a scroll,
+ * never a tap. Rung changes keep the occurrence's DOM and its paragraph focus. */
 const GESTURE = { MENU_MS: 500, MOVE_PX: 9 };
 
 /* After a hold opens the full entry, the browser still synthesises a click
@@ -10984,7 +10981,7 @@ function clearReaderSummons() {
   for (const onClose of closing) onClose('entry');
 }
 
-/** A reader content word: one tap opens the popup (the meaning), the word menu does the rest. */
+/** A reader content word advances its occurrence's ladder; holds open the word menu. */
 function wireTokenGestures(span, token, index, p) {
   const target = { kind: 'word', id: token.b };
   const obsKey = srsKey('word', token.b);
@@ -29543,12 +29540,11 @@ function renderWordNode(sheet, node) {
   }
   const { first: leadExamples, more: moreExamples } = exampleOrder(node, findExamples(node.id, 6));
   if (leadExamples.length || moreExamples.length) {
-    // the eyebrow says the whole gesture, in both tongues: the hold that
-    // opens the dictionary was the ladder's unspoken rung (review P2)
+    // The words teach the shared ladder themselves; this heading names the examples.
     sheet.append(
       withEn(
-        el('p', 'eyebrow', '用例 — ことばに触れると意味'),
-        'examples — tap a word for its meaning',
+        el('p', 'eyebrow', '用例'),
+        'examples',
         'en-inline',
       ),
     );
@@ -29618,7 +29614,21 @@ function renderWordNode(sheet, node) {
 
   // S · the page's one Save stands in its bar (saveOne); D23: why it is held on this entry, another entry's card or an
   // answer not yet validated
-  if (!node.readerChoice) renderWordCaptureNote(sheet, node, label);
+  if (!node.readerChoice) {
+    // A covered page keeps its prose occurrence, but a child may save another
+    // entry of this spelling. Refresh the identity-dependent note in place.
+    const capturePlace = document.createComment('capture status');
+    sheet.append(capturePlace);
+    sheet.refreshCaptureNote = () => {
+      sheet.querySelector(':scope > #word-capture-note')?.remove();
+      const fragment = document.createDocumentFragment();
+      renderWordCaptureNote(fragment, node, label);
+      capturePlace.after(fragment);
+      const note = sheet.querySelector(':scope > #word-capture-note');
+      if (note && sheet.isConnected) enhanceJapaneseProse(note);
+    };
+    sheet.refreshCaptureNote();
+  }
   renderContextPicker(sheet, node);
   renderStudyFold(sheet, node, { id: node.id, from: node.from });
 }
@@ -31693,7 +31703,6 @@ function composePage(node, path) {
     // S · the page's one Save (saveOne), top right as directive §3 asked: one press keeps the item and opens its menu as a
     // drawer under this bar — review, the lists, Copy. The page's second keep at its foot (覚える and its "saved to" drawer)
     // is gone: one Save per page. D23: 'taken' only for this identity's card.
-    const capState = capNode.t === 'word' ? wordCaptureState(capNode) : null;
     const capLabel = nodeTitle(capNode);
     const savedNow = () => (capNode.t === 'word' ? wordCaptureState(capNode) === 'taken' : S.taken.some((t) => t.t === capNode.t && t.id === capNode.id));
     // the page's keep path, unchanged: the guarded capture, then the page drawn again with the item kept
@@ -31720,28 +31729,31 @@ function composePage(node, path) {
       review: { saved: savedNow, toggle: pageToggle },
       more: () => [{ id: 'sheet-take-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(capLabel) }],
     });
-    if (personalHost && capNode.t === 'word' && !lookup(capNode.id, capNode.seq, capNode.reading)) capture.disabled = true;
-    // a kanji with no meaning cannot be memorized: its Save holds, and says why (the foot's 覚える did)
-    if (capNode.t === 'kanji' && !savedNow()) {
-      const answer = retainedKanjiRecord(capNode.id) || D.kanji[capNode.id] || window.BunkiSkipUI?.getKanji(S.skipUi, capNode.id);
-      if (!answer?.m?.trim()) {
-        capture.disabled = true;
-        capture.classList.add('reader-capture-held');
-        capture.setAttribute('aria-label', tx('語義が未収録のため保存できません。', 'A meaning is needed before this kanji can be saved.'));
-      }
-    }
-    // one verb for one act (one-hand pass): the name is Save; aria-pressed says whether the word is saved
-    if (!capture.getAttribute('aria-label')) {
+    capture.saveOnePaint = () => {
+      paintWordSave(capture, savedNow());
+      capture.disabled = !!(personalHost && capNode.t === 'word' && !lookup(capNode.id, capNode.seq, capNode.reading));
+      capture.classList.remove('reader-capture-held', 'word-capture-held');
+      capture.removeAttribute('aria-describedby');
       capture.setAttribute('aria-label', capNode === node ? tx('保存', 'Save') : tx(`「${capNode.id}」を保存`, `Save ${capNode.id}`));
-    }
-    // a word matched from a reader token cannot be carried safely by a card (D11)
-    if (node.readerChoice) holdReaderCapture(capture);
-    else if (capState === 'conflict' || capState === 'unavailable') {
-      capture.disabled = true;
-      capture.classList.add('word-capture-held');
-      if (capNode === node) capture.setAttribute('aria-describedby', 'word-capture-note');
-      else capture.setAttribute('aria-label', wordCaptureHeldText(capNode, { route: false }));
-    }
+      // A kanji without a meaning stays held; a retained page rechecks this too.
+      if (capNode.t === 'kanji' && !savedNow()) {
+        const answer = retainedKanjiRecord(capNode.id) || D.kanji[capNode.id] || window.BunkiSkipUI?.getKanji(S.skipUi, capNode.id);
+        if (!answer?.m?.trim()) {
+          capture.disabled = true;
+          capture.classList.add('reader-capture-held');
+          capture.setAttribute('aria-label', tx('語義が未収録のため保存できません。', 'A meaning is needed before this kanji can be saved.'));
+        }
+      }
+      const state = capNode.t === 'word' ? wordCaptureState(capNode) : null;
+      if (node.readerChoice) holdReaderCapture(capture);
+      else if (state === 'conflict' || state === 'unavailable') {
+        capture.disabled = true;
+        capture.classList.add('word-capture-held');
+        if (capNode === node) capture.setAttribute('aria-describedby', 'word-capture-note');
+        else capture.setAttribute('aria-label', wordCaptureHeldText(capNode, { route: false }));
+      }
+    };
+    capture.saveOnePaint();
     bar.append(capture);
   }
   const closeBtn = el('button', 'sheet-close', '×');
@@ -31963,6 +31975,7 @@ function renderLayer({ prebuilt = null, preserveRoom = false } = {}) {
   removeMini();
   for (const old of root.querySelectorAll(':scope > #sheet')) old.remove();
   if (S.stack.length) renderSheet(root, { prebuilt });
+  if (prebuilt) prebuilt.refreshCaptureNote?.();
   for (const button of root.querySelectorAll('#sheet .save-one')) button.saveOnePaint?.();
   adoptSaveMenuOwner();
   applyLayerLaw(root);
@@ -35031,6 +35044,8 @@ function render() {
     const node = document.activeElement;
     if (!node || node === document.body || !$('#app').contains(node)) return null;
     if (node.id) return { sel: `#${CSS.escape(node.id)}` };
+    // Reader words share one action; their source index names the occurrence.
+    if (node.matches('#reader .tok[data-index]')) return { sel: `#reader .tok[data-index="${CSS.escape(node.dataset.index)}"]` };
     const action = node.dataset?.action;
     if (action) return { sel: `[data-action="${CSS.escape(action)}"]` };
     // Last resort: the filter chips in 字引, 文法 and the dojo lobby name themselves no other
@@ -35384,7 +35399,7 @@ function render() {
     const named = focusKey.text == null ? [] : all.filter((node) => (node.textContent || '').trim().slice(0, 16) === focusKey.text);
     const again = focusKey.ix == null ? $('#app').querySelector(focusKey.sel)
       : (named.length === 1 ? named[0] : null) || all[focusKey.ix];
-    if (again && typeof again.focus === 'function') again.focus({ preventScroll: true });
+    if (again && typeof again.focus === 'function') focusProseWord(again, { preventScroll: true });
   }
   adoptSaveMenuOwner();
   lastRenderedView = S.view;
