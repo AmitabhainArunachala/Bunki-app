@@ -41,6 +41,29 @@ if (controlName) {
   source = controls.applyControl(source, controls.LEARNING_RECORD_CONTROLS, controlName);
   console.log(`CONTROL-APPLIED ${controlName} ${createHash('sha256').update(source).digest('hex')}`);
 }
+// G2 controls: `--g2-control <name>` applies one literal edit (it must match exactly once) to the authored depth code; the
+// named rows must then fail on their behaviour, never on a harness error
+const G2_CONTROLS = {
+  // the shown reading ignored: 年 read ねん becomes the core とし and borrows its card's depth
+  'reading-check-dropped': { from: '  const reading = shown ? kanaReadingKey(shown) || null : null;\n  const make =', to: '  const reading = null;\n  const make =',
+    kills: ['g2-a-different-reading-or-entry-is-at-most-met-and-never-rings'] },
+  // a look-up that writes review scheduling (the card's due moved to the look-up)
+  'tap-schedules': { from: '  const help = article ? readHelpPatch(latest, article, key, now) : null;',
+    to: "  const help = article ? readHelpPatch(latest, article, key, now) : null;\n  if (plainRecord(latest.srs) && owns(latest.srs, srsKey('word', identity.id))) patch.srs = { ...latest.srs, [srsKey('word', identity.id)]: { ...latest.srs[srsKey('word', identity.id)], due: new Date(now).toISOString() } };",
+    kills: ['g2-a-look-up-writes-the-encounter-ledger-only-once-a-day'] },
+  // "Not yet" ignored once any card stands
+  'not-yet-ignored': { from: "  if (said?.value === 'not-yet' && !(match === 'same' && notYetReleased(record, skey, said.cursor))) {",
+    to: "  if (said?.value === 'not-yet' && !stored && !(match === 'same' && notYetReleased(record, skey, said.cursor))) {",
+    kills: ['g2-not-yet-outranks-until-an-unrevoked-good-review-after-it'] },
+};
+const g2ControlAt = process.argv.indexOf('--g2-control');
+const g2Control = g2ControlAt >= 0 ? G2_CONTROLS[process.argv[g2ControlAt + 1]] : null;
+assert(g2ControlAt < 0 || (g2Control && !browserMode), 'A G2 control is one of G2_CONTROLS, on the authored source');
+if (g2Control) {
+  assert.equal(source.split(g2Control.from).length, 2, 'the control\'s edit matches exactly once');
+  source = source.replace(g2Control.from, g2Control.to);
+  console.log(`G2-CONTROL-APPLIED ${process.argv[g2ControlAt + 1]} ${createHash('sha256').update(source).digest('hex')} kills ${g2Control.kills.join(', ')}`);
+}
 const ast = ts.createSourceFile('corridor.js', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const names = new Set([
   'srsKey', 'srsCardOf', 'srsStoredRecord', 'srsSchedulerInstant', 'srsReviewLogRow',
@@ -1169,6 +1192,324 @@ async function browserChecks() {
     }
   } finally { await new Promise((done) => server.close(done)); }
 }
+
+/* G2 · depth (slice G2, 2026-10-17): the encounter ledger, the dot's depth and the help signal, as the ACTUAL authored
+ * definitions lifted by name and run over synthetic records (no browser). What these rows hold, each one a named claim:
+ *   identity   a word met as it reads where it was met — never its spelling alone (年 read ねん is not the core とし; 訳 read
+ *              やく beside わけ's #1538330 is unresolved and carries no foreign entry)
+ *   depth      every boundary: stability 6.99 / 7 / 29.99 / 30 against present recall .8999 / .9; New, Learning,
+ *              Relearning; no scheduler; a future last review (clamped, srsSchedulerInstant)
+ *   capping    a different reading or entry is at most "met" and never rings; "Not yet" outranks any card state until an
+ *              unrevoked Good or Easy review after it; "I know this" is at most "again"
+ *   writes     a look-up or a correction writes met (and the help signal) only — taken, lists, srs, revlog, stats and
+ *              suspended are never in its patch; a day already counted writes nothing; a clock moved back counts nothing
+ *   schema     the validators refuse malformed roots, keep a later version as it is, and refuse a "Not yet" cursor past the log
+ *   metric     help per 1,000 characters of first readings by sealed month; repeats and rereads add nothing */
+const G2_NAMES = new Set([
+  'DEPTH_ORDER', 'DEPTH_RECALL_R', 'DEPTH_RECALLED_S', 'DEPTH_OWNED_S', 'depthRank', 'deeperDepth', 'shallowerDepth',
+  'localDayOrdinal', 'localMonthKey', 'encounterIdentity', 'encounterKey', 'depthIdentityMatch', 'depthIndexMemo', 'depthIndex',
+  'depthRetrievability', 'notYetReleased', 'wordDepth', 'copyRecordWith', 'articleFingerprint', 'readHelpPatch', 'readHelpFinishPatch',
+  'encounterPatch', 'correctionPatch', 'helpByMonth', 'savedNodeRecord', 'wordArchiveRef',
+  'MET_KEY_MAX', 'MET_KINDS', 'validMetKey', 'validMetEntry', 'validMetRoot', 'validReadHelpArticle', 'validReadHelp', 'metReadable',
+  'readHelpReadable', 'metCursorsFit', 'KANA_VOWEL_ROWS', 'kanaReadingKey', 'KATA_TO_HIRA_OFFSET', 'kataToHira', 'entryKanaIndex',
+  'wordCardIdentity', 'wordAnswerIdentity', 'savedAnswerFor', 'wordSelection', 'nonBlankMeanings', 'srsKey', 'srsSchedulerInstant',
+  'owns', 'plainRecord', 'nonEmptyString', 'finiteNumber', 'setOwnRecordValue', 'safeJsonValue', 'storyLevel',
+]);
+const g2Selected = ast.statements.filter((statement) => {
+  const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text] :
+    ts.isVariableStatement(statement) ? statement.declarationList.declarations.map((node) => node.name.getText(ast)) : [];
+  return declared.some((name) => G2_NAMES.has(name));
+});
+const g2Program = g2Selected.map((statement) => statement.getText(ast)).join('\n');
+// the index rows the fixtures name: [seq, head, reading, gloss, written, kana, glosses]
+const G2_ROWS = new Map([
+  ['2084840', [2084840, '年', 'ねん', 'year', ['年'], ['ねん'], ['year', 'counter for years']]],
+  ['1468060', [1468060, '年', 'とし', 'year', ['年'], ['とし'], ['year', 'age']]],
+  ['1538330', [1538330, '訳', 'わけ', 'reason', ['訳'], ['わけ'], ['reason', 'meaning']]],
+  ['1126030', [1126030, 'ポンド', 'ポンド', 'pound (weight)', [], ['ポンド'], ['pound (weight)']]],
+  ['2855351', [2855351, 'ポンド', 'ポンド', 'pound (currency)', [], ['ポンド'], ['pound (currency)']]],
+]);
+function g2Context({ retrievability = 0.95, scheduler = true, answered = [], passages = [] } = {}) {
+  const calls = [];
+  const sandbox = {
+    S: null, Date, Math, JSON, Set, Map, console,
+    D: { dict: { 年: { r: 'とし', m: ['year'] }, 訳: { r: 'わけ', m: ['reason'] }, 総理: { r: 'そうり', m: ['prime minister'] } },
+      words: {}, kanji: {}, passages },
+    scheduler: scheduler ? { get_retrievability: (card, at) => { calls.push({ card, at }); return typeof retrievability === 'function' ? retrievability(card, at) : retrievability; } } : null,
+    dictionaryRowBySeq: (seq) => G2_ROWS.get(String(seq)) || null,
+    dictionaryAnsweredForm: (form) => answered.includes(form),
+    dictionaryRowsReadAs: (form, reading) => [...G2_ROWS.values()].filter((row) => (row[1] === form || row[4].includes(form)) && row[5].includes(reading)),
+  };
+  const context = vm.createContext(sandbox);
+  // a const is a binding of the script, not a property of its global: the one the rows call is handed out by name
+  vm.runInContext(g2Program + '\n;globalThis.encounterKey = encounterKey;', context, { filename: 'authored-depth.js' });
+  context.calls = calls;
+  return context;
+}
+const DAY = 86400000;
+const T0 = new Date(2026, 9, 17, 9, 0, 0).getTime();
+const card = (overrides = {}) => ({ due: new Date(T0 + 20 * DAY).toISOString(), last_review: new Date(T0 - 5 * DAY).toISOString(),
+  stability: 40, difficulty: 5, elapsed_days: 5, scheduled_days: 25, reps: 6, lapses: 0, learning_steps: 0, state: 2, ...overrides });
+const g2Record = (overrides = {}) => freeze(clone({ taken: [], lists: {}, srs: {}, revlog: [], obslog: [], stats: {}, suspended: {}, deepWords: {},
+  readDone: {}, met: null, readHelp: null, ...overrides }));
+const keyOf = (c, node) => c.encounterKey(c.encounterIdentity(node));
+const SCHEDULING = ['taken', 'lists', 'srs', 'revlog', 'stats', 'suspended', 'deepWords', 'obslog', 'readDone'];
+
+await check('g2-definitions-lifted-from-the-authored-source', async () => {
+  assert.equal(g2Selected.length, G2_NAMES.size, 'every G2 definition comes from the current authored source');
+});
+await check('g2-identity-is-the-word-as-it-reads-never-the-spelling-alone', async () => {
+  const c = g2Context();
+  assert.deepEqual(clone(c.encounterIdentity({ id: '年', reading: 'とし' })), { t: 'word', id: '年', kind: 'core', seq: null, reading: 'とし' });
+  assert.deepEqual(clone(c.encounterIdentity({ id: '年' })), { t: 'word', id: '年', kind: 'core', seq: null, reading: 'とし' });
+  // the text reads ねん: before the full dictionary names its entry it is unresolved, never the core's とし
+  assert.deepEqual(clone(c.encounterIdentity({ id: '年', reading: 'ねん' })), { t: 'word', id: '年', kind: 'unresolved', seq: null, reading: 'ねん' });
+  assert.deepEqual(clone(c.encounterIdentity({ id: '年', seq: '2084840', reading: 'ねん' })), { t: 'word', id: '年', kind: 'seq', seq: '2084840', reading: 'ねん' });
+  // a fallback entry read otherwise lends nothing: 訳 read やく beside わけ's #1538330 is unresolved, with no entry number
+  assert.deepEqual(clone(c.encounterIdentity({ id: '訳', seq: '1538330', reading: 'やく' })), { t: 'word', id: '訳', kind: 'unresolved', seq: null, reading: 'やく' });
+  // katakana and hiragana read alike are one reading; no reading at all is unresolved, never a guess
+  assert.equal(c.encounterIdentity({ id: 'ポンド', seq: '1126030', reading: 'ぽんど' }).kind, 'seq');
+  assert.equal(c.encounterIdentity({ id: '未知語', reading: '' }).kind, 'unresolved');
+  assert.equal(c.encounterIdentity({ id: '未知語', reading: 'みちご' }).kind, 'text');
+  assert.equal(c.encounterIdentity({ t: 'kanji', id: '年' }), null);
+  const key = keyOf(c, { id: '年', seq: '2084840', reading: 'ねん' });
+  assert.equal(key, JSON.stringify([1, 'word', '年', 'seq', '2084840', 'ねん']));
+  assert.notEqual(key, keyOf(c, { id: '年', reading: 'とし' }));
+  assert.equal(c.validMetKey(key), true);
+  for (const bad of ['word:年:ねん', JSON.stringify([1, 'word', '年', 'seq', null, 'ねん']), JSON.stringify([1, 'word', '年', 'core', '2084840', 'ねん']),
+    JSON.stringify([2, 'word', '年', 'core', null, 'とし']), JSON.stringify([1, 'word', '年', 'core', null]), '[1, "word", "年", "core", null, "とし"]'])
+    assert.equal(c.validMetKey(bad), false, bad);
+});
+await check('g2-depth-boundaries-need-stability-and-present-recall', async () => {
+  const node = { id: '年', reading: 'とし' };
+  const cases = [[6.99, 0.95, 'again'], [7, 0.9, 'recalled'], [7, 0.8999, 'again'], [29.99, 0.95, 'recalled'], [30, 0.9, 'owned'], [30, 0.8999, 'again']];
+  for (const [stability, r, want] of cases) {
+    const c = g2Context({ retrievability: r });
+    const record = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': card({ stability }) } });
+    assert.equal(c.wordDepth(node, record, T0).depth, want, `S ${stability}, R ${r}`);
+  }
+  const states = [[0, 'met'], [1, 'again'], [3, 'again']];
+  for (const [state, want] of states) {
+    const c = g2Context({ retrievability: 0.99 });
+    const record = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': card({ state }) } });
+    assert.equal(c.wordDepth(node, record, T0).depth, want, `state ${state}`);
+  }
+  // no scheduler, no last review: the card lends no recall rank
+  const none = g2Context({ scheduler: false });
+  const reviewed = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': card() } });
+  assert.equal(none.wordDepth(node, reviewed, T0).depth, 'again');
+  const fresh = g2Context({ retrievability: 0.99 });
+  const unreviewed = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': (({ last_review, ...rest }) => rest)(card()) } });
+  assert.equal(fresh.wordDepth(node, unreviewed, T0).depth, 'again');
+  // a clock behind the card's last review reads at the review itself (srsSchedulerInstant), never a negative interval
+  const future = g2Context({ retrievability: 0.97 });
+  const ahead = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': card({ last_review: new Date(T0 + 3 * DAY).toISOString() }) } });
+  assert.equal(future.wordDepth(node, ahead, T0).depth, 'owned');
+  assert.equal(future.calls.at(-1).at.getTime(), T0 + 3 * DAY);
+  // encounters alone: one day met, two days again, nothing unmet
+  const c = g2Context();
+  const key = keyOf(c, node);
+  assert.equal(c.wordDepth(node, g2Record(), T0).depth, 'unmet');
+  assert.equal(c.wordDepth(node, g2Record({ met: { version: 1, entries: { [key]: { first: 1, last: 1, days: 1 } } } }), T0).depth, 'met');
+  assert.equal(c.wordDepth(node, g2Record({ met: { version: 1, entries: { [key]: { first: 1, last: 4, days: 2 } } } }), T0).depth, 'again');
+});
+await check('g2-a-different-reading-or-entry-is-at-most-met-and-never-rings', async () => {
+  const c = g2Context({ retrievability: 0.97, answered: ['年'] });
+  // his card is the core 年 read とし, owned; the text's 年 read ねん borrows none of it
+  const owned = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': card() } });
+  assert.equal(c.wordDepth({ id: '年', reading: 'とし' }, owned, T0).depth, 'owned');
+  assert.equal(c.wordDepth({ id: '年', reading: 'とし' }, owned, T0).kept, true);
+  for (const node of [{ id: '年', reading: 'ねん' }, { id: '年', seq: '2084840', reading: 'ねん' }]) {
+    const key = keyOf(c, node);
+    const seen = g2Record({ ...owned, met: { version: 1, entries: { [key]: { first: 1, last: 9, days: 5 } } } });
+    const result = c.wordDepth(node, seen, T0);
+    assert.equal(result.depth, 'met', JSON.stringify(node));
+    assert.equal(result.kept, false);
+    assert.equal(result.otherKept, true);
+    assert.equal(result.cap, 'identity');
+  }
+  // ポンド #1126030 is not #2855351, though both read ポンド
+  const pound = g2Record({ taken: [{ t: 'word', id: 'ポンド', label: 'ポンド', ts: 1, entrySeq: '1126030', cueReading: 'ポンド' }],
+    deepWords: { ポンド: { r: 'ポンド', m: ['pound (weight)'], seq: '1126030' } }, srs: { 'word:ポンド': card() } });
+  assert.equal(c.wordDepth({ id: 'ポンド', seq: '1126030', reading: 'ポンド' }, pound, T0).depth, 'owned');
+  assert.equal(c.wordDepth({ id: 'ポンド', seq: '2855351', reading: 'ポンド' }, pound, T0).depth, 'unmet');
+  assert.equal(c.wordDepth({ id: 'ポンド', seq: '2855351', reading: 'ポンド' }, pound, T0).kept, false);
+  // the core record beside its entry read alike: one word only where the dictionary, asked, has exactly that one entry
+  const nen = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1, entrySeq: '1468060', cueReading: 'とし' }],
+    deepWords: { 年: { r: 'とし', m: ['year'], seq: '1468060' } }, srs: { 'word:年': card() } });
+  assert.equal(c.wordDepth({ id: '年', reading: 'とし' }, nen, T0).match, 'same');
+  const unasked = g2Context({ retrievability: 0.97 });
+  assert.equal(unasked.wordDepth({ id: '年', reading: 'とし' }, nen, T0).match, 'compatible');
+  assert.equal(unasked.wordDepth({ id: '年', reading: 'とし' }, nen, T0).depth, 'unmet');
+  assert.equal(unasked.wordDepth({ id: '年', reading: 'とし' }, nen, T0).kept, true);
+});
+await check('g2-golden-訳-read-やく-never-inherits-わけ', async () => {
+  const c = g2Context({ retrievability: 0.98, answered: ['訳'] });
+  const owned = g2Record({ taken: [{ t: 'word', id: '訳', label: '訳', ts: 1 }], srs: { 'word:訳': card({ stability: 60 }) } });
+  assert.equal(c.wordDepth({ id: '訳', reading: 'わけ' }, owned, T0).depth, 'owned');
+  const kawaguchi = { id: '訳', seq: '1538330', reading: 'やく' };
+  const result = c.wordDepth(kawaguchi, owned, T0);
+  assert.equal(result.identity.kind, 'unresolved');
+  assert.equal(result.identity.seq, null, 'no foreign entry in the identity');
+  assert(['unmet', 'met'].includes(result.depth));
+  assert.equal(result.kept, false);
+  const patch = c.encounterPatch(owned, kawaguchi, T0);
+  assert.deepEqual(Object.keys(patch), ['met']);
+  const [key] = Object.keys(patch.met.entries);
+  assert.deepEqual(JSON.parse(key), [1, 'word', '訳', 'unresolved', null, 'やく']);
+  const after = g2Record({ ...owned, ...clone(patch) });
+  assert.equal(c.wordDepth(kawaguchi, after, T0).depth, 'met');
+  assert.equal(c.wordDepth({ id: '訳', reading: 'わけ' }, after, T0).depth, 'owned', 'わけ is untouched');
+  // the tutor's and the examples' archive: やく never reads わけ's spelling-keyed rows
+  assert.equal(c.wordArchiveRef({ id: '訳' }, { r: 'わけ', m: ['reason'] }), 'word:訳');
+  assert.notEqual(c.wordArchiveRef({ id: '訳', reading: 'やく' }, { r: 'やく', m: [] }), 'word:訳');
+  assert.notEqual(c.wordArchiveRef({ id: '年', seq: '2084840' }, { seq: 2084840, r: 'ねん', m: ['year'] }), 'word:年');
+});
+await check('g2-not-yet-outranks-until-an-unrevoked-good-review-after-it', async () => {
+  const c = g2Context({ retrievability: 0.97 });
+  const node = { id: '年', reading: 'とし' };
+  const key = keyOf(c, node);
+  const said = (cursor) => ({ version: 1, entries: { [key]: { first: 1, last: 1, days: 1, said: { value: 'not-yet', at: T0, cursor } } } });
+  const base = { taken: [{ t: 'word', id: '年', label: '年', ts: 1 }], srs: { 'word:年': card() } };
+  const row = (g) => [T0 + 1000, 'word:年', g, 2, 1, 0.9, 40, 5, 41, 5, 30, T0 + 30 * DAY];
+  const before = [row(3)];
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: before, met: said(1) }), T0).depth, 'again');
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: before, met: said(1) }), T0).cap, 'not-yet');
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: [...before, row(2), row(1)], met: said(1) }), T0).depth, 'again', 'Hard and Again release nothing');
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: [...before, row(3)], met: said(1) }), T0).depth, 'owned', 'a Good review after it releases');
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: [...before, row(4)], met: said(1) }), T0).depth, 'owned', 'so does Easy');
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: [...before, row(3), [T0 + 2000, 'word:年', 0, 1]], met: said(1) }), T0).depth, 'again',
+    'an undone Good restores the cap');
+  assert.equal(c.wordDepth(node, g2Record({ ...base, revlog: [...before, [T0, 'word:学校', 3, 2, 1, 0.9, 1, 5, 2, 5, 3, T0]], met: said(1) }), T0).depth, 'again',
+    'another word\'s review releases nothing');
+  // "I know this" is his statement: at most "again", never a review's rank; and capped by identity
+  const known = { version: 1, entries: { [key]: { first: 1, last: 1, days: 1, said: { value: 'known', at: T0, cursor: 0 } } } };
+  assert.equal(c.wordDepth(node, g2Record({ met: known }), T0).depth, 'again');
+  assert.equal(c.wordDepth(node, g2Record({ met: known }), T0).kept, false);
+});
+await check('g2-kept-is-review-or-a-list-for-the-same-word-only', async () => {
+  const c = g2Context({ retrievability: 0.97 });
+  const node = { id: '総理', reading: 'そうり' };
+  assert.equal(c.wordDepth(node, g2Record({ taken: [{ t: 'word', id: '総理', label: '総理', ts: 1 }] }), T0).kept, true);
+  assert.equal(c.wordDepth(node, g2Record({ taken: [{ t: 'word', id: '総理', label: '総理', ts: 1 }] }), T0).depth, 'met');
+  assert.equal(c.wordDepth(node, g2Record({ lists: { 政治: [{ t: 'word', id: '総理', label: '総理', ts: 1 }] } }), T0).kept, true);
+  // a card's history outlives its removal, but history alone is not kept
+  const removed = c.wordDepth(node, g2Record({ srs: { 'word:総理': card() } }), T0);
+  assert.equal(removed.kept, false);
+  assert.equal(removed.depth, 'owned');
+  assert.equal(c.wordDepth(node, g2Record(), T0).kept, false);
+});
+await check('g2-a-look-up-writes-the-encounter-ledger-only-once-a-day', async () => {
+  const c = g2Context();
+  const node = { id: '総理', reading: 'そうり' };
+  const record = g2Record({ taken: [{ t: 'word', id: '総理', label: '総理', ts: 1 }], srs: { 'word:総理': card() }, revlog: [[1, 'word:総理', 3]],
+    met: { version: 1, entries: {}, future: { kept: 'as is' } } });
+  const first = c.encounterPatch(record, node, T0);
+  assert.deepEqual(Object.keys(first), ['met'], 'no scheduling root in a look-up');
+  for (const root of SCHEDULING) assert.equal(Object.hasOwn(first, root), false, root);
+  assert.equal(first.met.future.kept, 'as is', 'an unknown field of the root is kept');
+  const day = c.localDayOrdinal(T0);
+  assert.deepEqual(clone(first.met.entries[keyOf(c, node)]), { first: day, last: day, days: 1 });
+  const once = g2Record({ ...record, met: clone(first.met) });
+  assert.deepEqual(clone(c.encounterPatch(once, node, T0 + 3600000)), {}, 'the same day writes nothing');
+  assert.deepEqual(clone(c.encounterPatch(once, node, T0 - 2 * DAY)), {}, 'a clock moved back counts nothing');
+  const next = c.encounterPatch(once, node, T0 + DAY);
+  assert.deepEqual(clone(next.met.entries[keyOf(c, node)]), { first: day, last: day + 1, days: 2 });
+  // a later version of the root is someone else's: read-only here, never written, never reset
+  const later = g2Record({ met: { version: 2, opaque: ['kept'] } });
+  assert.deepEqual(clone(c.encounterPatch(later, node, T0)), {});
+  assert.equal(c.wordDepth(node, later, T0).depth, 'unmet');
+  // an extension field on an entry survives the next day's count
+  const extended = g2Record({ met: { version: 1, entries: { [keyOf(c, node)]: { first: day, last: day, days: 1, note: 'kept' } } } });
+  assert.equal(c.encounterPatch(extended, node, T0 + DAY).met.entries[keyOf(c, node)].note, 'kept');
+});
+await check('g2-his-correction-writes-met-only-and-toggles', async () => {
+  const c = g2Context();
+  const node = { id: '総理', reading: 'そうり' };
+  const record = g2Record({ taken: [{ t: 'word', id: '総理', label: '総理', ts: 1 }], srs: { 'word:総理': card() }, revlog: [[1, 'word:総理', 3], [2, 'word:総理', 4]] });
+  const notYet = c.correctionPatch(record, node, 'not-yet', T0);
+  assert.deepEqual(Object.keys(notYet), ['met']);
+  const entry = notYet.met.entries[keyOf(c, node)];
+  assert.deepEqual(clone(entry.said), { value: 'not-yet', at: T0, cursor: 2 });
+  const withSaid = g2Record({ ...record, met: clone(notYet.met) });
+  const undone = c.correctionPatch(withSaid, node, 'not-yet', T0 + 1);
+  assert.equal(Object.hasOwn(undone.met.entries[keyOf(c, node)], 'said'), false, 'pressing it again takes it back');
+  const known = c.correctionPatch(withSaid, node, 'known', T0 + 2);
+  assert.equal(known.met.entries[keyOf(c, node)].said.value, 'known');
+  assert.deepEqual(clone(c.correctionPatch(record, node, 'mastered', T0)), {});
+});
+await check('g2-the-roots-validate-strictly-and-keep-later-versions', async () => {
+  const c = g2Context();
+  const key = JSON.stringify([1, 'word', '年', 'core', null, 'とし']);
+  assert.equal(c.validMetRoot(null), true);
+  assert.equal(c.validMetRoot({ version: 1, entries: { [key]: { first: 3, last: 9, days: 4 } } }), true);
+  assert.equal(c.validMetRoot({ version: 3, anything: { at: 'all' } }), true, 'a later version is kept as it is');
+  for (const bad of [{ version: 1 }, { version: 1, entries: { [key]: { first: 9, last: 3, days: 1 } } }, { version: 1, entries: { [key]: { first: 3, last: 4, days: 3 } } },
+    { version: 1, entries: { [key]: { first: 3, last: 3, days: 0 } } }, { version: 1, entries: { 'word:年': { first: 3, last: 3, days: 1 } } },
+    { version: 1, entries: { [key]: { first: 3, last: 3, days: 1, said: { value: 'mastered', at: 1, cursor: 0 } } } }, [], 'met', { version: 0, entries: {} }])
+    assert.equal(c.validMetRoot(bad), false, JSON.stringify(bad));
+  const said = { version: 1, entries: { [key]: { first: 3, last: 3, days: 1, said: { value: 'not-yet', at: 1, cursor: 2 } } } };
+  assert.equal(c.metCursorsFit({ met: said, revlog: [[1], [2]] }), true);
+  assert.equal(c.metCursorsFit({ met: said, revlog: [[1]] }), false, 'a cursor past the log it travels with is refused');
+  const article = { src: '0000abcd', chars: 10, level: 'N3', helped: [key], done: 5, month: '2026-10' };
+  assert.equal(c.validReadHelp({ version: 1, since: 1, articles: { a: article } }), true);
+  assert.equal(c.validReadHelp({ version: 1, since: 1, articles: { a: { ...article, helped: [key, key] } } }), false, 'a word asked twice is one row');
+  assert.equal(c.validReadHelp({ version: 1, since: 1, articles: { a: { ...article, month: undefined } } }), false);
+  assert.equal(c.validReadHelp({ version: 1, since: 1, articles: { a: { ...article, src: 'nope' } } }), false);
+});
+await check('g2-help-per-1000-characters-counts-first-readings-once', async () => {
+  const tokens = (text) => [...text].map((s) => ({ s, b: s, r: '', c: true }));
+  const A = { id: 'a', tokens: tokens('あ'.repeat(1000)), authorLevel: 'N3' };
+  const B = { id: 'b', tokens: tokens('い'.repeat(500)), readingFacets: { jlpt: 'N5' } };
+  const C = { id: 'c', tokens: tokens('う'.repeat(300)) };
+  const c = g2Context({ passages: [A, B, C] });
+  const k1 = keyOf(c, { id: '総理', reading: 'そうり' });
+  const k2 = keyOf(c, { id: '年', reading: 'とし' });
+  let record = g2Record();
+  const apply = (patch) => { record = g2Record({ ...record, ...clone(patch) }); };
+  apply({ readHelp: c.readHelpPatch(record, 'a', k1, T0) });
+  assert.equal(c.readHelpPatch(record, 'a', k1, T0 + 1), null, 'the same word asked again in the same reading counts once');
+  apply({ readHelp: c.readHelpPatch(record, 'a', k2, T0 + 2) });
+  apply(c.readHelpFinishPatch(record, 'a', new Date(2026, 9, 31, 23, 59).getTime()));
+  apply(c.readHelpFinishPatch(record, 'b', T0 + 5));
+  assert.equal(c.readHelpPatch(record, 'a', keyOf(c, { id: '訳', reading: 'わけ' }), T0 + 6), null, 'nothing counts after the first finish');
+  assert.deepEqual(clone(c.readHelpFinishPatch(record, 'a', T0 + 7)), {}, 'finishing again never moves the first reading');
+  const signal = c.helpByMonth(record);
+  assert.equal(signal.months.length, 1);
+  const [october] = signal.months;
+  assert.equal(october.month, '2026-10');
+  assert.equal(october.chars, 1500);
+  assert.equal(october.help, 2);
+  assert.equal(Math.round(october.per1000 * 1000) / 1000, 1.333);
+  assert.equal(october.level, 'N4', 'the month\'s average level (N3 and N5)');
+  // a reading finished before counting began is not a first reading; a text changed under its id is not sealed
+  const before = g2Record({ readDone: { c: 1 } });
+  assert.equal(c.readHelpPatch(before, 'c', k1, T0), null);
+  const changed = g2Context({ passages: [A, B, { ...C, tokens: tokens('え'.repeat(300)) }] });
+  const begun = g2Record({ readHelp: c.readHelpPatch(g2Record(), 'c', k1, T0) });
+  assert.deepEqual(clone(changed.readHelpFinishPatch(begun, 'c', T0 + 1)), {});
+  assert.equal(changed.readHelpPatch(begun, 'c', k2, T0 + 1), null);
+  // no level, no help, no exposure: said as such, never estimated
+  const quiet = g2Record({ readHelp: c.readHelpFinishPatch(g2Record(), 'c', T0).readHelp });
+  assert.equal(c.helpByMonth(quiet).months[0].level, null);
+  assert.equal(c.helpByMonth(quiet).months[0].unlevelled, 1);
+  assert.equal(c.helpByMonth(quiet).months[0].per1000, 0);
+  assert.equal(c.helpByMonth(g2Record()), null);
+  assert.deepEqual(clone(c.helpByMonth(g2Record({ readHelp: { version: 1, since: T0, articles: {} } })).months), []);
+});
+await check('g2-a-kept-word-answers-cold-from-its-own-card', async () => {
+  const c = g2Context();
+  const saved = g2Record({ taken: [{ t: 'word', id: '年', label: '年', ts: 1, entrySeq: '2084840', cueReading: 'ねん' }],
+    deepWords: { 年: { r: 'ねん', m: ['year', 'counter for years'], seq: '2084840' } } });
+  const rec = c.savedNodeRecord({ t: 'word', id: '年', seq: '2084840', reading: 'ねん' }, saved);
+  assert.equal(rec.r, 'ねん');
+  assert.equal(rec.seq, '2084840');
+  assert.deepEqual(clone(rec.m), ['year', 'counter for years']);
+  assert.equal(c.savedNodeRecord({ t: 'word', id: '年', seq: '1468060', reading: 'とし' }, saved), null, 'another entry is not this card');
+  assert.equal(c.savedNodeRecord({ t: 'word', id: '年', seq: '2084840', reading: 'とし' }, saved), null);
+  assert.equal(c.savedNodeRecord({ t: 'word', id: '年' }, saved), null, 'a door that names no entry is the dictionary\'s');
+});
+
 if (browserMode) await browserChecks();
 
 const receipt = { format: 'kairo-learning-acknowledgment-tests', version: 1,
@@ -1177,7 +1518,7 @@ const receipt = { format: 'kairo-learning-acknowledgment-tests', version: 1,
   artifactSha256: artifact?.artifactSha256,
   ...(propertyMode ? { properties: properties || { pass: false, receipt: 'learning-properties.json' } } : {}),
   ...(referenceMode ? { reference: reference ? { pass: reference.pass, receipt: 'learning-reference.json' } : { pass: false, receipt: 'learning-reference.json' } } : {}),
-  testedDefinitions: [...names], scope: browserMode ? 'Actual immutable staged browser UI and independently read native IndexedDB, plus controlled frozen-root acknowledgment tests' : 'Actual authored handlers with frozen synthetic roots and controlled save acknowledgments; no browser-storage claim',
+  testedDefinitions: [...names, ...G2_NAMES], scope: browserMode ? 'Actual immutable staged browser UI and independently read native IndexedDB, plus controlled frozen-root acknowledgment tests' : 'Actual authored handlers with frozen synthetic roots and controlled save acknowledgments; no browser-storage claim',
   results, pass: results.every((result) => result.pass) };
 writeFileSync(resolve(out, 'learning-record.json'), JSON.stringify(receipt, null, 2) + '\n');
 if (!receipt.pass) process.exitCode = 1;
