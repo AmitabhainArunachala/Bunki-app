@@ -5279,16 +5279,17 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
 #mini[data-depth='recalled'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 78%, transparent); }
 #mini[data-depth='owned'] { --depth-fill: var(--depth-band-ink); }
 #mini[data-kept] { --depth-edge: 0 0 0 1.5px var(--mini-reading, var(--depth-ring)); }
-#mini:is([data-depth], [data-kept]) .mini-word { position: relative; }
-/* beside the word, at its middle, like a seal set by a name: under it the dot would sit in the reading's line */
+/* beside the word, at its middle, like a seal set by a name: under it the dot would sit in the reading's line. (F, the
+   merge: set inline after the word, not absolute on it — an absolute dot made the word its own containing block, so the
+   band's one door, #mini button.mini-word::before at inset 0 on the band, shrank to the word: verify-design-reader-shelf
+   G5-galaxy read the band's end as no door) */
 #mini:is([data-depth], [data-kept]) .mini-word::after {
   content: '';
-  position: absolute;
-  left: calc(100% + 9px);
-  top: 50%;
+  display: inline-block;
+  vertical-align: middle;
   width: 6px;
   height: 6px;
-  margin-top: -3px;
+  margin-inline-start: 9px;
   border-radius: 50%;
   background: var(--depth-fill, transparent);
   box-shadow: var(--depth-edge, none);
