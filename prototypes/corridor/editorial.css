@@ -5490,3 +5490,20 @@ html[data-save-drawer='sheet'] #sheet > .sheet-bar[data-bar='sheet'] {
 .port-row { flex-wrap: wrap; }
 .port-row > .chip { white-space: nowrap; }
 
+/* ==========================================================================
+   Q · EVERY SCROLLING ROOM CLEARS THE BARS AND THE SAFE AREAS (Q/DESIGN.md §4). On his home-screen app the page runs
+   edge to edge (viewport-fit=cover): the status bar and the island over the top 47–59 px, the home indicator over the
+   last 34. Measured with those insets (Chromium; WebKit cannot set them), two surfaces did not clear them:
+   ========================================================================== */
+/* the report sheet is the whole screen on a phone: its title and Close sat under the status bar, its end on the home
+   indicator. Its head clears the one, its body's end the other (env() is 0 outside the home-screen app) */
+#bunki-reports-root .br-heading { padding-top: calc(24px + env(safe-area-inset-top, 0px)); }
+#bunki-reports-root .br-body { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+@media (max-width: 480px) {
+  #bunki-reports-root .br-heading { padding-top: calc(18px + env(safe-area-inset-top, 0px)); }
+  #bunki-reports-root .br-body { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+}
+/* in the focus room the grade bar stands on the foot: its own padding holds the home indicator's inset. It rested that
+   inset above the foot as well, and the page showed beneath it */
+body.has-primary-tabs:has(#app :is(.kp-study, .kp-done)) .kp-grades { bottom: 0; }
+
