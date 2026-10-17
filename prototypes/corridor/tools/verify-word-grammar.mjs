@@ -36,7 +36,7 @@
  *   sentence · save · ask the tutor · practice"), stays under 40 % of the screen and covers no button and not the word;
  *   a word held inside the word's page keeps its strip in the page, over no button; the bookmark lands on the kept
  *   words, and browsing them never starts a review; layers open only from 層, never move the paragraph's lines, and fold
- *   on any tap, Escape or the mark; frames of the seal and the landing (WebKit ≤ 24 ms).
+ *   on any tap, Escape or the mark; with reduced motion nothing travels; frames of the seal and the landing (WebKit ≤ 24 ms).
  *   --g5-only runs only these; --g5-controls adds: a second hold that un-keeps, a strip over a button, a layer that stays.
  * G3 negative controls: --controls replays stalled tap2, uncleared ruby and a front door; harness failures are incomplete.
  * --controls-only runs only the three candidate schedules, mutants and restores, with no frame measurements.
@@ -1252,6 +1252,33 @@ try {
       await delay(250);
       const gone = await g5Facts(page);
       check('G5.page.escape', 'Escape takes the strip away and leaves the page as it was', !gone.strip && gone.page, gone);
+    });
+
+    // reduced motion: the same keep and strip, and nothing travels (no ring sweep, no flight; the seal shows where it pressed)
+    await walk('G5-reduced', async (page) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await openStory(page);
+      const word = readerWord(page);
+      const start = await g5Facts(page);
+      await page.evaluate(() => {
+        window.__g5Anims = [];
+        const seen = window.__g5Anims;
+        const tick = () => {
+          if (window.__g5Anims !== seen) return;
+          for (const a of document.getAnimations()) if (/^kairo-(seal|hold-ring)/u.test(String(a.id))) seen.push(a.id);
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+      const { mid } = await holdOn(page, word);
+      await page.locator('#seal-strip').waitFor();
+      const pressed = await page.evaluate(() => ({ still: document.querySelectorAll('.seal-flight.is-still').length, moving: document.querySelectorAll('.seal-flight:not(.is-still)').length }));
+      await delay(1000);
+      const anims = await page.evaluate(() => { const list = [...new Set(window.__g5Anims || [])]; window.__g5Anims = null; return list; });
+      const done = await g5Facts(page), record = await readAppRecord(page);
+      check('G5.reduced', 'with reduced motion a hold still keeps the word once and opens its strip, and nothing travels: the ring is drawn whole, the seal shows where it pressed and leaves',
+        mid.rings === 1 && done.strip && cardsOf(record) === 1 && done.count === start.count + 1 && anims.length === 0 && pressed.moving === 0 && done.seals === 0,
+        { mid: { rings: mid.rings }, pressed, anims, done: { strip: done.strip, count: done.count, seals: done.seals } });
     });
 
     await walk('G5-tray', async (page) => {
