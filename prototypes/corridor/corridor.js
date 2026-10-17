@@ -578,6 +578,12 @@ const S = {
   readDone: {},
   /** where you left each article: { passageId: scrollY } */
   readerPos: {},
+  /** G2 · the encounter ledger (wordDepth): counted days he opened each word, keyed by what he met (its identity, never
+   * its spelling alone), and his own "I know this" / "Not yet". Absent (null) on a record until his first look-up. */
+  met: null,
+  /** G2 · the help signal (helpByMonth): his first readings' characters and the distinct words he asked about in them,
+   * counted from the day this build first saw him read. Absent (null) until then; never filled from older history. */
+  readHelp: null,
   /** tokens whose English gloss is shown beneath (double-tap) */
   glossed: null,
   /** the reader's current thing for the top-right capture door: the word the
@@ -650,6 +656,8 @@ const STORE_KNOWN_KEYS = [
   'readDone',
   'readerPos',
   'dials',
+  'met',
+  'readHelp',
 ];
 
 function plainRecord(value) {
@@ -1358,6 +1366,57 @@ function validStats(stats) {
   });
 }
 
+/* G2 · the two optional roots of slice G2 (the encounter ledger and the help signal). Both are additive: absent or null on
+ * every record written before them, never initialised by a boot, and never written except by his own look-ups and his
+ * first finish of an article. A root of a later version is kept exactly as it is and neither read nor written here. */
+const MET_KEY_MAX = 512;
+const MET_KINDS = ['core', 'seq', 'text', 'unresolved'];
+/** An encounter's identity key: the canonical JSON of [1, t, id, kind, seq, reading] (encounterKey). */
+function validMetKey(key) {
+  if (typeof key !== 'string' || key.length > MET_KEY_MAX) return false;
+  let tuple;
+  try { tuple = JSON.parse(key); } catch { return false; }
+  return Array.isArray(tuple) && tuple.length === 6 && tuple[0] === 1 && tuple[1] === 'word' && nonEmptyString(tuple[2]) &&
+    MET_KINDS.includes(tuple[3]) && (tuple[4] === null || nonEmptyString(tuple[4])) && (tuple[5] === null || nonEmptyString(tuple[5])) &&
+    (tuple[3] === 'seq') === (tuple[4] !== null) && JSON.stringify(tuple) === key;
+}
+/** { first, last, days, said? }: local day ordinals, first ≤ last, 1 ≤ days ≤ the days between them; his own word, if said. */
+function validMetEntry(entry) {
+  if (!plainRecord(entry)) return false;
+  const { first, last, days } = entry;
+  if (![first, last, days].every(Number.isSafeInteger) || first < 0 || last < first || days < 1 || days > last - first + 1) return false;
+  if (!owns(entry, 'said')) return true;
+  const said = entry.said;
+  return plainRecord(said) && ['known', 'not-yet'].includes(said.value) && finiteNumber(said.at) && said.at >= 0 &&
+    Number.isSafeInteger(said.cursor) && said.cursor >= 0;
+}
+function validMetRoot(value) {
+  if (value === null) return true;
+  if (!plainRecord(value) || !safeJsonValue(value) || !Number.isSafeInteger(value.version) || value.version < 1) return false;
+  if (value.version !== 1) return true;
+  return plainRecord(value.entries) && Object.entries(value.entries).every(([key, entry]) => validMetKey(key) && validMetEntry(entry));
+}
+/** The help signal's articles: { src, chars, level, helped, done?, month? } per bundled article id. */
+function validReadHelpArticle(row) {
+  if (!plainRecord(row) || typeof row.src !== 'string' || !/^[0-9a-f]{8}$/u.test(row.src) ||
+      !Number.isSafeInteger(row.chars) || row.chars < 0 || !(row.level === null || /^N[1-5]$/u.test(String(row.level))) ||
+      !Array.isArray(row.helped) || row.helped.length > 4096 || !row.helped.every(validMetKey) ||
+      new Set(row.helped).size !== row.helped.length) return false;
+  if (owns(row, 'done') !== owns(row, 'month')) return false;
+  return !owns(row, 'done') || (finiteNumber(row.done) && row.done >= 0 && typeof row.month === 'string' &&
+    /^\d{4}-(0[1-9]|1[0-2])$/u.test(row.month));
+}
+function validReadHelp(value) {
+  if (value === null) return true;
+  if (!plainRecord(value) || !safeJsonValue(value) || !Number.isSafeInteger(value.version) || value.version < 1) return false;
+  if (value.version !== 1) return true;
+  return finiteNumber(value.since) && value.since >= 0 && plainRecord(value.articles) &&
+    Object.entries(value.articles).every(([id, row]) => id.length > 0 && id.length <= 512 && validReadHelpArticle(row));
+}
+/** Version 1 is the one this build reads and writes; anything else is someone else's and stays untouched. */
+const metReadable = (value) => plainRecord(value) && value.version === 1 && plainRecord(value.entries);
+const readHelpReadable = (value) => plainRecord(value) && value.version === 1 && plainRecord(value.articles);
+
 const STORE_ROOT_VALIDATORS = {
   taken: (value) => Array.isArray(value) && value.every(validTakenItem),
   lists: (value) =>
@@ -1410,6 +1469,8 @@ const STORE_ROOT_VALIDATORS = {
     ['kanji', 'furigana', 'spacing'].every(
       (key) => !owns(value, key) || (Number.isInteger(value[key]) && value[key] >= 0 && value[key] <= 2),
     ),
+  met: validMetRoot,
+  readHelp: validReadHelp,
 };
 
 function validStoreEnvelope(value) {
@@ -1424,7 +1485,14 @@ function validStoreEnvelope(value) {
       !sentencePracticeModule?.validateSentencePracticeRecord(value)) return false;
   return Object.entries(STORE_ROOT_VALIDATORS).every(
     ([key, validate]) => !owns(value, key) || validate(value[key]),
-  );
+  ) && metCursorsFit(value);
+}
+/** G2 · his "Not yet" holds the review log's length when he said it; a cursor past the log it travels with is a broken
+ * boundary, refused here rather than silently reinterpreted. */
+function metCursorsFit(value) {
+  if (!metReadable(value.met)) return true;
+  const length = Array.isArray(value.revlog) ? value.revlog.length : 0;
+  return Object.values(value.met.entries).every((entry) => !owns(entry, 'said') || entry.said.cursor <= length);
 }
 
 /** Never overwrite what cannot be read. A store that fails to parse, or that
@@ -1824,6 +1892,8 @@ function hydrateStore(s) {
   }
   if (plainRecord(s.readDone)) S.readDone = s.readDone;
   if (plainRecord(s.readerPos)) S.readerPos = s.readerPos;
+  S.met = owns(s, 'met') ? s.met : null;
+  S.readHelp = owns(s, 'readHelp') ? s.readHelp : null;
   if (plainRecord(s.dials)) {
     for (const key of ['kanji', 'furigana', 'spacing']) {
       if ([0, 1, 2].includes(s.dials[key])) S.dials[key] = s.dials[key];
@@ -2007,6 +2077,8 @@ function storeEnvelope(state) {
     readDone: state.readDone,
     readerPos: state.readerPos,
     dials: state.dialsUrlOverride ? state.dialsStored : state.dials,
+    met: state.met ?? null,
+    readHelp: state.readHelp ?? null,
   };
 }
 
