@@ -249,7 +249,7 @@ async function studyFontEvidence(page) {
           for (const rule of rules) {
             const family = unquote(rule.style.fontFamily), alias = aliases.get(family);
             if (!alias) continue;
-            const face = new FontFace(alias, rule.style.getPropertyValue('src'), { weight: rule.style.fontWeight || 'normal', style: rule.style.fontStyle || 'normal', unicodeRange: rule.style.getPropertyValue('unicode-range') || 'U+0-10FFFF' });
+            const face = new window.FontFace(alias, rule.style.getPropertyValue('src'), { weight: rule.style.fontWeight || 'normal', style: rule.style.fontStyle || 'normal', unicodeRange: rule.style.getPropertyValue('unicode-range') || 'U+0-10FFFF' });
             document.fonts.add(face); added.push(face);
           }
           const missingFamilies = families.filter(family => !rules.some(rule => unquote(rule.style.fontFamily) === family));
@@ -1518,10 +1518,11 @@ async function verifyBack(browser, base) {
     return JSON.stringify(s);
   };
   /** a fresh page with this deck's prefs (and ledger) stored before the player boots */
-  const open = async (q, deck, { prefs = null, state = null, sem = false } = {}) => {
+  const open = async (q, deck, { prefs = null, state = null, sem = false, world = null } = {}) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(SEEDED);
     await context.addInitScript(`try { if (!sessionStorage.getItem('__back_seeded')) { sessionStorage.setItem('__back_seeded', '1');
+      ${world ? `localStorage.setItem('kairo-theme', ${JSON.stringify(world)});` : ''}
       ${prefs ? `localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify(prefs))});` : ''}
       ${state ? `localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)});` : ''} } } catch {}`);
     if (sem) {
@@ -1738,6 +1739,9 @@ async function verifyBack(browser, base) {
       await o.page.click('#kp-reveal');
       await o.page.waitForSelector('.kp-grade');
       await o.page.evaluate(RESTING);
+      const actualWorld = await o.page.evaluate(() => document.documentElement.dataset.theme || 'hokusai');
+      check(`1) ellipsis fixture ${id} actually renders in ${world} before geometry is measured`, actualWorld === world,
+        JSON.stringify({ requested: world, actual: actualWorld }));
       // the ⋯ in mid-screen, so the lines beside it are measured
       const look1 = async (g) => { await o.page.locator('#kp-card .kp-ctx .kp-more').nth(g).evaluate((n) => n.scrollIntoView({ block: 'center' })); return o.page.evaluate(PILL_CLEAR); };
       const pills = await o.page.locator('#kp-card .kp-ctx .kp-more:visible').count();
@@ -1748,14 +1752,14 @@ async function verifyBack(browser, base) {
         await o.page.locator('#kp-card .kp-ctx .kp-more').nth(g).click();
         opened.push((await look1(g))[g]);
       }
-      seen.push({ id, world, card, rest, opened });
+      seen.push({ id, world, actualWorld, card, rest, opened });
       await close(o);
     }
     const all = seen.flatMap((x) => [...x.rest, ...x.opened]);
     check(
       '1) in 焦点 the ⋯ never sits on the passage: no visible glyph of a folded group intersects its ⋯, at rest or opened (km-109-m05 by day and at night in 紺紙, km-298-m02)',
-      seen.every((x) => x.card === x.id && x.rest.length >= 1 && x.opened.length === x.rest.length) && all.every((g) => g && g.glyphs > 0 && g.hits === 0),
-      JSON.stringify(seen.map(({ id, world, rest, opened }) => ({ id, world, rest, opened }))),
+      seen.every((x) => x.actualWorld === x.world && x.card === x.id && x.rest.length >= 1 && x.opened.length === x.rest.length) && all.every((g) => g && g.glyphs > 0 && g.hits === 0),
+      JSON.stringify(seen.map(({ id, world, actualWorld, rest, opened }) => ({ id, world, actualWorld, rest, opened }))),
     );
   }
 

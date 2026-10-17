@@ -77,7 +77,7 @@ await ctx.addInitScript(() => {
       // it aimed at (a moving-target miss), which is the only ground on
       // which re-staging is honest
       word: event.target?.closest?.('.word')?.querySelector?.('.base')?.textContent ?? null,
-      card: !!event.target?.closest?.('#card.open'),
+      card: !!event.target?.closest?.('#card.open,#mini'),
     });
   }, true);
   const cap = (items, item) => {
@@ -201,7 +201,8 @@ const world = `(() => ({
   sats: document.querySelectorAll('#drift-layer .word.bsat').length,
   tray: document.getElementById('drift-tray')?.textContent ?? '',
   depth: document.getElementById('depth')?.textContent ?? '',
-  card: document.getElementById('card')?.classList.contains('open') ?? false,
+  card: !!document.getElementById('mini') || (document.getElementById('card')?.classList.contains('open') ?? false),
+  sheet: document.getElementById('sheet')?.dataset.node ?? null,
   radoc: document.getElementById('radoc')?.classList.contains('open') ?? false,
   members: [...document.querySelectorAll('#drift-layer .word.bsat')]
     .map((el) => el.querySelector('.base')?.textContent ?? '').filter(Boolean).sort(),
@@ -264,7 +265,8 @@ const check = (name, pass, detail = '') => {
 };
 
 const targetPoint = (selector, label) => page.evaluate(({ selector, label }) => {
-  const candidates = [...document.querySelectorAll(selector)].filter((el) => el.querySelector('.base,.g,.pch')?.textContent === label);
+  const text = (el) => { const copy = el.querySelector('.base,.g,.pch')?.cloneNode(true); copy?.querySelectorAll('rt').forEach((rt) => rt.remove()); return copy?.textContent; };
+  const candidates = [...document.querySelectorAll(selector)].filter((el) => text(el) === label);
   const point = candidates.map((el) => {
     const r = el.getBoundingClientRect(), x = r.x + r.width / 2, y = r.y + r.height / 2;
     return { el, label, x, y, hit: el.contains(document.elementFromPoint(x, y)), classes: el.className };
@@ -275,7 +277,7 @@ const targetPoint = (selector, label) => page.evaluate(({ selector, label }) => 
     const actual = event.target?.closest?.(selector);
     window.__driftHuntMemberHit = {
       sameNode: actual === point.el,
-      label: actual?.querySelector('.base,.g,.pch')?.textContent ?? null,
+      label: actual ? text(actual) : null,
       trusted: event.isTrusted, type: event.pointerType,
     };
   }, { capture: true, once: true });
@@ -303,63 +305,53 @@ async function tapMember(selector, label, trace) {
   }
   await page.waitForTimeout(1100);
 }
-async function stageMessage(trace) {
-  await boot(1729);
-  const water = await page.evaluate(() => {
-    for (let y = 200; y < 520; y += 20) for (let x = 220; x < 330; x += 20) {
-      if (!document.elementFromPoint(x, y)?.closest('.word,.glyph,.part,#lvl,#theme,#ginga-symbol,#ginga-theme-seal')) return { x, y };
-    }
-    return null;
-  });
-  assert(water, 'The staged subject needs a real open-water camera pan');
-  let x = water.x, y = water.y;
-  const points = [];
-  await T('touchStart', [[x, y]]);
-  for (let step = 0; step < 40; step++) {
-    const subject = await page.evaluate(wordAt('伝言'));
-    assert(subject.exists, 'The rendered message subject must survive the camera pan');
-    const dx = 195 - subject.x, dy = 420 - subject.y;
-    if (Math.hypot(dx, dy) < 4) break;
-    x += Math.max(-12, Math.min(12, dx * 0.35)); y += Math.max(-12, Math.min(12, dy * 0.35));
-    points.push([x, y]);
-    await T('touchMove', [[x, y]]); await page.waitForTimeout(20);
-    await T('touchMove', [[x, y]]); await page.waitForTimeout(90);
-  }
-  await T('touchEnd', []); await page.waitForTimeout(700);
-  trace.actions.push({ kind: 'camera-pan', subject: '伝言', from: water, points });
-  for (let rung = 0; rung < 3; rung++) await tapMember('#drift-layer .word', '伝言', trace);
-  assert.equal((await page.evaluate(world)).depth, '伝言');
+async function stageHubDive(name) {
+  const hub = await stageHubBloom(name);
+  const trace = stagings[stagings.length - 1];
+  await tap(hub.x, hub.y); await page.waitForTimeout(700);
+  const released = await page.evaluate(world);
+  assert.equal(released.ctr, null, 'The first hub touch releases the held family');
+  assert.equal(released.depth, '', 'Release must not also dive');
+  await tap(hub.x, hub.y); await page.waitForTimeout(1200);
+  const dived = await page.evaluate(world);
+  assert.equal(dived.depth, hub.label, 'The next actual canvas-hub touch enters its own kanji');
+  trace.actions.push({ kind: 'canvas-hub-release-then-dive', hub, released, dived });
+  trace.subject = hub.label;
+  return trace;
 }
 async function stageCard(kind) {
-  const trace = { name: `${kind}-card`, seed: 1729, actions: [] };
-  stagings.push(trace);
-  for (let attempt = 1; attempt <= 3; attempt++) {
   try {
-    await stageMessage(trace);
-    if (kind === 'radical') {
-      await tapMember('#drift-layer .glyph', '伝', trace);
-      await tapMember('#drift-layer .glyph.comp', '亻', trace);
-      await tapMember('#drift-layer .glyph.center', '亻', trace);
-    } else {
-      await tapMember('#drift-layer .glyph', '言', trace);
-      for (let rung = 0; rung < 3; rung++) await tapMember('#drift-layer .word', '言葉', trace);
-      await tapMember('#drift-layer .part', 'を', trace);
-      await tapMember('#drift-layer .part.center', 'を', trace);
+    const trace = await stageHubDive(`hosted-${kind}`);
+    const selector = '#drift-layer .glyph.center';
+    await tapMember(selector, trace.subject, trace);
+    const first = await page.locator(selector).getAttribute('data-ladder-rung');
+    assert(['reading', 'stage'].includes(first), 'A supported hosted kanji answers on the shared ladder');
+    if (first === 'reading') {
+      assert.equal(await page.locator('#mini,#sheet').count(), 0);
+      await tapMember(selector, trace.subject, trace);
+    }
+    await page.locator('#mini').waitFor();
+    assert.equal(await page.locator('#mini .mini-word').textContent(), trace.subject);
+    assert.equal(await page.locator(selector).getAttribute('data-ladder-rung'), 'stage');
+    trace.meaning = await page.locator('#mini .mini-gloss').textContent();
+    const kanji = JSON.parse(readFileSync(resolve(CORRIDOR, 'data/share_alike/kanji.json'), 'utf8')).kanji[trace.subject];
+    trace.expectedMeaning = String(kanji?.m || '').toLowerCase();
+    assert(trace.expectedMeaning, 'The pinned kanji source supplies this meaning');
+    assert.equal(trace.meaning?.trim().toLowerCase(), trace.expectedMeaning, 'The shared kanji stage names its own canonical meaning, never a missing word entry');
+    if (kind === 'page') {
+      await tapMember(selector, trace.subject, trace);
+      await page.locator(`#sheet[data-node="kanji:${trace.subject}"]`).waitFor();
+      assert.equal(await page.locator('#mini').count(), 0);
     }
     trace.state = await page.evaluate(world);
-    assert(trace.state.card && trace.state.depth, 'The real dive must retain an open Drift card');
-    await shot(`staging-${kind}-card.png`);
+    await shot(`staging-hosted-${kind}.png`);
     return true;
   } catch (error) {
-    trace.error = error.message;
-    trace.attempt = attempt;
-    console.log(JSON.stringify({ staging: trace }));
-    // Only a recorded native touch of the wrong moving body can restart setup.
-    // A correctly delivered interaction that fails its contract remains a failure.
-    if (error.code !== 'OBSERVED_TARGET_MISS' || attempt === 3) return false;
+    const trace = stagings[stagings.length - 1];
+    if (trace) trace.error = error.message;
+    console.log(JSON.stringify({ staging: trace, error: error.message }));
+    return false;
   }
-  }
-  return false;
 }
 async function stageHubBloom(name) {
   await boot(1729);
@@ -400,93 +392,60 @@ check('hunt · a lifting pinch finger never grades the word beneath a third fing
   `A id=${liftAId}; tray "${before.tray}" → "${after.tray}", word present=${word.exists}`);
 await T('touchCancel', []);
 
-/* 2 · the radical explainer is a modal, not a hole (P0) — its taps must not
- * dismantle the dive stack, and its close button must be reachable. */
-await stageCard('radical');
+/* 2 · the hosted entry explanation replaces the private radical card.
+ * Its content and Back control preserve the exact underlying canvas dive.
+ * The shared entry page retains the modal-isolation obligation. */
+const pageReady = await stageCard('page');
+const modalTrace = stagings[stagings.length - 1];
 const depthBefore = (await page.evaluate(world)).depth;
-const radQ = await page.evaluate(`(() => {
-  const c = document.getElementById('card');
-  if (!c || !c.classList.contains('open')) {
-    const ctr = document.querySelector('#drift-layer .word.center, #drift-layer .glyph.center');
-    if (ctr) { const r = ctr.getBoundingClientRect(); return { openFirst: { x: r.x + r.width / 2, y: r.y + r.height / 2 } }; }
-  }
-  const b = document.querySelector('#drift-layer .radq');
-  if (!b) return null;
-  const r = b.getBoundingClientRect();
-  return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
-})()`);
-if (radQ?.openFirst) {
-  await tap(radQ.openFirst.x, radQ.openFirst.y);
-  await page.waitForTimeout(900);
-}
-const radQ2 = await page.evaluate(`(() => {
-  const b = document.querySelector('#drift-layer .radq');
-  if (!b) return null;
-  const r = b.getBoundingClientRect();
-  return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
-})()`);
-if (radQ2) {
-  await tap(radQ2.x, radQ2.y);
-  await page.waitForTimeout(700);
-  const openState = await page.evaluate(world);
-  await tap(195, 400); // a paragraph of the explainer
-  await page.waitForTimeout(500);
-  const afterP = await page.evaluate(world);
-  check('hunt · explainer taps do not dismantle the world beneath it',
-    openState.radoc && afterP.depth === openState.depth && afterP.radoc,
-    `depth "${openState.depth}" → "${afterP.depth}", still open=${afterP.radoc}`);
-  const xBtn = await page.evaluate(`(() => {
-    const b = document.getElementById('radocX');
-    const r = b.getBoundingClientRect();
-    const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-    return { x: r.x + r.width / 2, y: r.y + r.height / 2, hitsSelf: b.contains(hit) || hit === b };
-  })()`);
-  check('hunt · the explainer close button is reachable by a finger', xBtn.hitsSelf,
-    `hit-test at (${xBtn.x.toFixed(0)},${xBtn.y.toFixed(0)}) reaches the X: ${xBtn.hitsSelf}`);
-  await tap(xBtn.x, xBtn.y);
-  await page.waitForTimeout(600);
+if (pageReady) {
+  const heading = page.locator('#sheet .hero-mean').first();
+  const r = await heading.boundingBox();
+  assert(r, 'The actual hosted entry heading is visible');
+  await tap(r.x + r.width / 2, r.y + r.height / 2);
+  const contentAfter = await page.evaluate(world);
+  check('hunt · shared entry explanation taps do not dismantle the canvas dive',
+    contentAfter.sheet === `kanji:${modalTrace.subject}` && contentAfter.depth === depthBefore,
+    `canonical entry ${contentAfter.sheet}; canvas depth ${depthBefore} → ${contentAfter.depth}`);
+  const back = await page.locator('#sheet-back').evaluate((node) => {
+    const r = node.getBoundingClientRect(), x = r.x + r.width / 2, y = r.y + r.height / 2;
+    return { x, y, hitsSelf: node.contains(document.elementFromPoint(x, y)) };
+  });
+  check('hunt · the shared entry Back control is reachable by a finger', back.hitsSelf, JSON.stringify(back));
+  await tap(back.x, back.y); await page.locator('#mini').waitFor();
   const closed = await page.evaluate(world);
-  check('hunt · the explainer closes without navigating the app away',
-    !closed.radoc && closed.depth === depthBefore,
-    `radoc open=${closed.radoc}, depth "${depthBefore}" → "${closed.depth}"`);
+  check('hunt · shared entry Back restores the exact stage and canvas dive',
+    !closed.sheet && closed.depth === depthBefore &&
+      await page.locator('#mini .mini-word').textContent() === modalTrace.subject &&
+      await page.locator('#mini .mini-gloss').textContent() === modalTrace.meaning,
+    `Back restores exact ${modalTrace.subject} stage; canvas depth ${closed.depth}`);
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#mini,#sheet').count(), 0);
 } else {
-  check('hunt · explainer reachable in a dive', false, 'no 部首とは？ button found');
+  check('hunt · shared entry explanation taps do not dismantle the canvas dive', false, 'Actual canvas hub → canonical entry staging failed');
+  check('hunt · the shared entry Back control is reachable by a finger', false, 'Canonical entry staging failed');
+  check('hunt · shared entry Back restores the exact stage and canvas dive', false, 'Canonical entry staging failed');
 }
 
-/* 3 · inside a dive, only a deliberate tap surfaces (P1) */
-await boot();
-w = await page.evaluate(anyWord);
-for (let i = 0; i < 3; i++) {
-  const at = await page.evaluate(wordAt(w.w));
-  if (!at.exists) break;
-  await tap(at.x, at.y);
-  await page.waitForTimeout(i === 2 ? 1500 : 450);
-}
+/* 3 · a real canvas-hub dive retains its level through the shared ladder,
+ * then slow/held open-water gestures remain navigation-neutral. */
+const stageReady = await stageCard('stage');
+const visitTrace = stagings[stagings.length - 1];
 const inDive = await page.evaluate(world);
-/* 3b · the one-hand pass (2026-10-15): the dive's centre is the ladder's end — a tap on it opens the app's one
- * slip beside the centre (word · reading · meaning · Save ▾ · kanji band), the same centre again its full entry
- * (as the slip's band does), and Back returns to the dive with the slip gone */
-{
-  const centre = await page.evaluate(`(() => { const el = document.querySelector('#drift-layer .word.center'); if (!el) return null; const r = el.getBoundingClientRect(); return { w: el.querySelector('.base')?.textContent ?? '', x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
-  let slip = null, entry = null, after = null;
-  if (centre) {
-    await tap(centre.x, centre.y);
-    await page.waitForTimeout(700);
-    slip = await page.evaluate(`(() => { const m = document.getElementById('mini'); return m ? { from: m.dataset.from, word: m.querySelector('.mini-word')?.textContent, gloss: m.querySelector('.mini-gloss')?.textContent || '', door: m.querySelector('.mini-word')?.getAttribute('aria-label'), depth: document.getElementById('depth')?.textContent ?? '' } : null; })()`);
-    await tap(centre.x, centre.y);
-    await page.waitForTimeout(700);
-    entry = await page.evaluate(`({ sheet: !!document.getElementById('sheet'), names: !!document.getElementById('sheet')?.innerText.includes(${JSON.stringify(centre.w)}), slip: !!document.getElementById('mini') })`);
-    if (entry.sheet) {
-      await page.evaluate(`document.getElementById('sheet-back')?.click()`);
-      await page.waitForTimeout(700);
-    }
-    after = await page.evaluate(`({ sheet: !!document.getElementById('sheet'), slip: !!document.getElementById('mini'), depth: document.getElementById('depth')?.textContent ?? '', centre: document.querySelector('#drift-layer .word.center')?.querySelector('.base')?.textContent ?? null })`);
-  }
-  check('hunt · the dive’s centre opens the app’s slip; the centre again its full entry; Back returns to the dive',
-    !!centre && inDive.depth !== '' && slip?.from === 'drift' && slip.word === centre.w && slip.gloss !== '' && slip.door === 'Open the full entry' && slip.depth === inDive.depth &&
-      entry?.sheet === true && entry.names && !entry.slip && after?.sheet === false && !after.slip && after.depth === inDive.depth && after.centre === centre.w,
-    `centre=${centre?.w ?? null}; slip=${JSON.stringify(slip)}; entry=${JSON.stringify(entry)}; after=${JSON.stringify(after)}`);
+let visitOk = false;
+if (stageReady) {
+  await tapMember('#drift-layer .glyph.center', visitTrace.subject, visitTrace);
+  await page.locator(`#sheet[data-node="kanji:${visitTrace.subject}"]`).waitFor();
+  await page.locator('#sheet-back').click(); await page.locator('#mini').waitFor();
+  const sameStage = await page.locator('#mini .mini-word').textContent() === visitTrace.subject &&
+    await page.locator('#mini .mini-gloss').textContent() === visitTrace.meaning;
+  await page.keyboard.press('Escape');
+  visitOk = sameStage && await page.locator('#mini,#sheet').count() === 0 &&
+    await page.locator('#drift-layer .glyph.center').getAttribute('data-ladder-rung') === null &&
+    (await page.evaluate(world)).depth === inDive.depth;
 }
+check('hunt · the dive’s centre follows reading, stage and page; Back restores stage and folding keeps the dive',
+  visitOk, JSON.stringify({ subject: visitTrace?.subject, depth: inDive.depth, sameMeaning: visitOk }));
 await drag(300, 620, 210, 620, 560); // slow drag on water
 await page.waitForTimeout(700);
 const afterDrag = await page.evaluate(world);
@@ -555,13 +514,14 @@ for (let hop = 0; hop < 2; hop++) {
     return null;
   })()`);
   if (!sat) break;
-  await tap(sat.x, sat.y);
-  await page.waitForTimeout(600);
-  const fresh = await page.evaluate(wordAt(sat.w));
-  if (fresh.exists) {
-    await tap(fresh.x, fresh.y);
-    await page.waitForTimeout(1600);
-  }
+  const trace = { name: `walk-hop-${hop + 1}`, actions: [] }; stagings.push(trace);
+  await tapMember('#drift-layer .word.bsat', sat.w, trace);
+  assert.equal((await page.evaluate(world)).ctr, sat.w, 'The actual satellite becomes the next family centre');
+  const rung = await page.locator('#drift-layer .word.bctr').getAttribute('data-ladder-rung');
+  assert(['reading', 'stage'].includes(rung));
+  if (rung === 'stage') assert.equal(await page.locator('#mini .mini-word').textContent(), sat.w);
+  await page.keyboard.press('Escape');
+  assert.equal((await page.evaluate(world)).ctr, sat.w, 'Folding lookup retains the walked family');
 }
 await page.waitForTimeout(2000); // two recycler passes
 const origin = await page.evaluate(wordAt(w.w));
@@ -645,11 +605,10 @@ if (sat9) {
   await page.waitForTimeout(500);
   const st = await page.evaluate(lockState);
   const answered = await page.evaluate(
-    `document.querySelectorAll('#drift-layer .word.unfolded, #drift-layer .word.glossed').length`);
+    `document.querySelectorAll('#drift-layer .word[data-ladder-rung]').length`);
   // a label we hold no reading for must reach its gloss on the FIRST tap:
   // its furigana stage would answer with nothing visible
-  const muteOk = !sat9.mute || st.glossed > 0 || (await page.evaluate(
-    `document.querySelectorAll('#drift-layer .word.glossed').length`)) > 0;
+  const muteOk = !sat9.mute || await page.locator('#mini .mini-word').textContent().catch(() => '') === sat9.w;
   check('hunt · tapping a constellation label answers instead of razing it',
     st.ctr !== null && answered > 0 && muteOk,
     `"${sat9.w}" mute=${sat9.mute} · centre survived=${st.ctr !== null}, answered=${answered}, glossed=${st.glossed}`);
@@ -710,7 +669,8 @@ check('hunt · a release on a hub sun releases the constellation instead of divi
  * ownership check; #card swallows pointerdown and has no pointermove
  * listener at all, so a thumb resting on the open card was invisible to the
  * touch set while its every move still reached the drag branch, P1).
- * Run inside a dive with the card open: no camera pan, no tide rail, so a
+ * The exact outside owner touch folds the shared stage before a foreign finger arrives.
+ * Run inside a real hub dive: no camera pan, no tide rail, so a
  * raw pixel delta is honest here. */
 // Orbiters keep circling on their own inside a dive. Keep the same field
 // displacement baseline and compare the held word with its moving peers.
@@ -724,7 +684,7 @@ let p0 = null;
 let confirmedOwner = null;
 let ownerStagingFailure = 'no owner touch attempted';
 for (let attempt = 1; attempt <= 3; attempt++) {
-  const cardReady = await stageCard('particle');
+  const cardReady = await stageCard('stage');
   const trace = stagings[stagings.length - 1];
   const staging = trace.ownerStaging = { attempt, status: 'preparing' };
   if (!cardReady) {
@@ -738,16 +698,17 @@ for (let attempt = 1; attempt <= 3; attempt++) {
     window.__driftHuntPointerDowns.length = 0;
     window.__driftHuntOwnerHit = null;
     const p0 = ${fieldPos};
-    const card = document.getElementById('card');
-    const cr = card && card.classList.contains('open') ? card.getBoundingClientRect() : null;
+    const card = document.getElementById('mini');
+    const cr = card ? card.getBoundingClientRect() : null;
     const words = [...document.querySelectorAll('#drift-layer .word')];
-    // Keep the original highest/leftmost clear orbiter and far card corner.
+    // Keep the highest/leftmost hit-owned orbiter at least 20px clear of the shared stage, on any side.
     const orb = words.map((el) => {
       const r = el.getBoundingClientRect();
       return { el, r, x: r.left + r.width / 2, y: r.top + r.height / 2 };
     }).filter((o) => o.r.width && !o.el.classList.contains('center') &&
       parseFloat(o.el.style.opacity || '1') > 0.4 && o.r.top > 110 && o.r.bottom < 560 &&
-      (!cr || o.r.bottom < cr.top - 20) && o.el.contains(document.elementFromPoint(o.x, o.y)))
+      (!cr || o.r.bottom < cr.top - 20 || o.r.top > cr.bottom + 20 || o.r.right < cr.left - 20 || o.r.left > cr.right + 20) &&
+      o.el.contains(document.elementFromPoint(o.x, o.y)))
       .sort((a, b) => (a.y + a.x) - (b.y + b.x))[0];
     const corner = cr ? { x: cr.right - 26, y: cr.top + 20 } : null;
     const stage = {
@@ -767,7 +728,7 @@ for (let attempt = 1; attempt <= 3; attempt++) {
           id: event.pointerId, type: event.pointerType, isPrimary: event.isPrimary,
           isTrusted: event.isTrusted, x: event.clientX, y: event.clientY,
           word: word?.querySelector('.base')?.textContent ?? null,
-          card: !!event.target?.closest?.('#card.open'),
+          card: !!event.target?.closest?.('#card.open,#mini'),
           sameNode: word === orb.el, at: performance.now(),
         };
       }, { capture: true, once: true });
@@ -786,6 +747,8 @@ for (let attempt = 1; attempt <= 3; attempt++) {
     hit: window.__driftHuntOwnerHit,
     downs: window.__driftHuntPointerDowns.slice(),
     observedAt: performance.now(),
+    stagePresent: !!document.getElementById('mini'),
+    depth: document.getElementById('depth')?.textContent ?? '',
   }));
   staging.confirmation = confirmation;
   const first = confirmation.downs.length === 1 ? confirmation.downs[0] : null;
@@ -828,15 +791,19 @@ if (confirmedOwner) {
   const target = p0[stage.orb.w] && p1[stage.orb.w]
     ? Math.hypot(p1[stage.orb.w][0] - p0[stage.orb.w][0], p1[stage.orb.w][1] - p0[stage.orb.w][1]) : -1;
   const ownerFinger = observedFingers.find((finger) => finger.word === stage.orb.w);
-  const cardFinger = observedFingers.find((finger) => finger.card);
+  const foreignFinger = observedFingers.find((finger) => finger.id !== ownerFinger?.id &&
+    Math.hypot(finger.x - stage.card.x, finger.y - stage.card.y) < 1);
+  const ownerConfirmation = stagings[stagings.length - 1].ownerStaging.confirmation;
   stagings[stagings.length - 1].fingers = { stage, observedFingers, target, median, confirmedOwner, p0, p1 };
-  check('hunt · a finger the gesture never owned cannot carry a held word',
-    ownerFinger && cardFinger && ownerFinger.id !== cardFinger.id && target >= 0 && target - median < 30,
+  check('hunt · a foreign finger cannot carry the owned word after its shared stage folds',
+    ownerFinger && foreignFinger && ownerFinger.id !== foreignFinger.id &&
+      ownerConfirmation.stagePresent === false && ownerConfirmation.depth !== '' && foreignFinger.card === false &&
+      target >= 0 && target - median < 30,
     `held ${target.toFixed(1)}px vs orbiter median ${median.toFixed(1)}px of ${live.length} moving ` +
     `(all-words median ${(deltas[Math.floor(deltas.length / 2)] ?? 0).toFixed(1)}px, max ${(deltas[deltas.length - 1] ?? 0).toFixed(1)}px); ` +
-    `owner id=${ownerFinger?.id ?? null}, card id=${cardFinger?.id ?? null}`);
+    `owner id=${ownerFinger?.id ?? null}, foreign id=${foreignFinger?.id ?? null}; stage folded=${ownerConfirmation.stagePresent === false}`);
 } else {
-  check('hunt · a finger the gesture never owned cannot carry a held word', false,
+  check('hunt · a foreign finger cannot carry the owned word after its shared stage folds', false,
     `staging failed: ${ownerStagingFailure}; card=${!!stage?.card} orbiter=${!!stage?.orb}`);
 }
 
@@ -893,6 +860,7 @@ const semanticMember = (label) => page.evaluate((target) => {
         reading: el.querySelector('.yomi')?.textContent ?? '',
         unfolded: el.classList.contains('unfolded'),
         glossed: el.classList.contains('glossed'),
+        rung: el.dataset.ladderRung || null,
       };
       if (state.hitSelf) return state;
       fallback ??= state;
@@ -975,13 +943,14 @@ for (let staging = 1; staging <= 3; staging++) {
     await page.waitForTimeout(500);
   }
   const semanticRevealTwo = await semanticMember('残酷');
+  const semanticStage = await page.locator('#mini').evaluate(n => ({word:n.querySelector('.mini-word')?.textContent,gloss:n.querySelector('.mini-gloss')?.textContent})).catch(() => null);
   const semanticAfterTwo = await page.evaluate(world);
   const ok =
     lockStarted && semanticTarget?.dom === true && semanticTarget.hitSelf === true &&
     semanticTarget.reading !== '' &&
     semanticBefore.ctr === '過酷' && semanticAfterOne.ctr === '過酷' && semanticAfterTwo.ctr === '過酷' &&
-    semanticRevealOne?.unfolded === true && semanticRevealOne.glossed === false && slipOne === null &&
-    semanticRevealTwo?.unfolded === true && semanticRevealTwo.glossed === true;
+    semanticRevealOne?.rung === 'reading' && semanticRevealOne.unfolded === true && semanticRevealOne.glossed === false && slipOne === null &&
+    semanticRevealTwo?.rung === 'stage' && semanticRevealTwo.unfolded === true && semanticStage?.word === '残酷' && !!semanticStage.gloss?.trim();
   semanticFinal = {
     ok,
     detail:
@@ -993,7 +962,7 @@ for (let staging = 1; staging <= 3; staging++) {
   };
   if (ok || !(missed(tapOne) || missed(tapTwo))) break;
 }
-check('hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction (no slip over a lock member\'s reveal)',
+check('hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction (reading then shared stage, same lock identity)',
   semanticFinal.ok, semanticFinal.detail);
 
 // Start the lock afresh so the old canvas failure cannot mask the kana-only
@@ -1010,6 +979,7 @@ for (let staging = 1; staging <= 3; staging++) {
   }
   const kanaAnswered = await semanticMember('きつい');
   const kanaCentreAfterAnswer = await page.evaluate(world);
+  const kanaStage = await page.locator('#mini').evaluate(n => ({word:n.querySelector('.mini-word')?.textContent,gloss:n.querySelector('.mini-gloss')?.textContent})).catch(() => null);
   const kanaForLock = await aimSemantic('きつい');
   let kanaPress = { attempted: false, delivered: false, reason: 'not attempted' };
   if (kanaForLock?.hitSelf) {
@@ -1026,7 +996,7 @@ for (let staging = 1; staging <= 3; staging++) {
   // none at all. No strangers, honest emptiness.
   const ok =
     kanaTarget?.dom === true && kanaTarget.hitSelf === true && kanaTarget.reading === '' &&
-    kanaAnswered?.unfolded === true && kanaAnswered.glossed === true &&
+    kanaAnswered?.rung === 'stage' && kanaStage?.word === 'きつい' && !!kanaStage.gloss?.trim() &&
     kanaCentreAfterAnswer.ctr === '厳しい' && kanaFallback.ctr === 'きつい' &&
     kanaFallback.members.length === kanaFallback.sats;
   kanaFinal = {

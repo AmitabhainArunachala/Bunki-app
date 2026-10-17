@@ -7986,6 +7986,12 @@ function storyVersions(p) {
 const WORD_LADDER_DEMO_KEY = 'kairo-word-ladder-demo-v1';
 let wordLadderDemoSeen = false;
 function freshWordLadderRecord() {
+  // Native notes and imported practice have history outside the portable roots.
+  // Wait for the admitted snapshot rather than calling an unread record fresh.
+  const notes = currentRecordNoteView();
+  if (!notes || ['noteViews', 'readingViews', 'sourceReferenceViews', 'examAttemptViews', 'assessmentResultViewsV2']
+    .some(key => !Array.isArray(notes[key]) || notes[key].length) ||
+    notes.assessmentLearningViewsV2?.followups?.length || notes.assessmentLearningViewsV2?.suppressions?.length) return false;
   // The sky persists its empty default at boot; that alone is not learner history.
   // Unknown extensions remain history: the demonstration never guesses them away.
   const keysAre = (value, keys) => value && typeof value === 'object' && !Array.isArray(value) &&
@@ -8272,6 +8278,23 @@ let ladderVisit = null;
 let ladderOpening = null;
 let ladderRefreshing = false;
 const ladderPages = new WeakMap();
+// A Save may change the room beneath a visit. Keep the actual occurrence until
+// its last rung folds, then refresh after the activating finger has released.
+const ladderPointers = new Set();
+let ladderRoomFrame = 0;
+function refreshLadderRoom() {
+  if (!S.roomStale || S.stack.length || ladderVisit || ladderPointers.size || ladderRoomFrame) return;
+  ladderRoomFrame = requestAnimationFrame(() => {
+    ladderRoomFrame = 0;
+    if (S.roomStale && !S.stack.length && !ladderVisit && !ladderPointers.size) render();
+  });
+}
+window.addEventListener('pointerdown', event => ladderPointers.add(event.pointerId), { capture: true, passive: true });
+for (const type of ['pointerup', 'pointercancel']) window.addEventListener(type, event => {
+  ladderPointers.delete(event.pointerId);
+  refreshLadderRoom();
+}, { capture: true, passive: true });
+window.addEventListener('blur', () => { ladderPointers.clear(); refreshLadderRoom(); });
 function inlineWordReading(anchor, reading) {
   const ruby = anchor.querySelector('ruby');
   if (ruby) {
@@ -8294,6 +8317,7 @@ function clearWordLadder(visit = ladderVisit) {
   visit.clearReveal?.();
   readingSlipSerial++;
   syncChromeKeep();
+  refreshLadderRoom();
 }
 function foldWordLadder() {
   if (!ladderVisit) return false;
@@ -8958,6 +8982,7 @@ function saveOne({ id = '', cls = '', label = '', saved, keep, review = null, no
     ? openVocabularyListPopover(node, label, button, { menu: true, review: review || { saved, toggle: keep }, more: more(), place })
     : openPlainSaveMenu(button, { more: more(), place }));
   button.saveOneOpen = openMenu;
+  button.saveOnePaint = () => paintWordSave(button, !!saved());
   button.addEventListener('click', (event) => {
     event.stopPropagation();
     if (button.disabled || button.getAttribute('aria-busy') === 'true' || Date.now() - pressedAt < SAVE_PRESS_MS) return undefined;
@@ -10787,7 +10812,7 @@ function readerGlossLine(token) {
  * confusing"). The text settings keep the longer form, with the word menu's press and hold. */
 /** How the reader's words work, in plain words: the text settings say it whole (John, 2026-10-02 #8). */
 function tapLadderHint() {
-  return tx('語をタップすると意味が出ます。右クリック（または長押し）で、ほかの操作も。',
+  return tx('タップするたびに、読み、意味、詳しい項目へと進みます。長押し（または右クリック）で、ほかの操作も。',
     'Tap for the reading, tap again for the meaning, then open the word. Press and hold for more.');
 }
 
@@ -10795,7 +10820,7 @@ function tapLadderHint() {
  * ride as its description: the kind and the keyboard help are shared by the whole reader
  * (#reader-help-*); only a word that shows its reading carries a state line of its own. */
 function readerWordHint() {
-  return tx('Enterで読みと意味。Shift+F10でほかの操作。Ctrl+Enterで全項目。',
+  return tx('Enterで次の表示へ。Shift+F10でほかの操作。Ctrl+Enterで詳しい項目。',
     'Enter: next word layer · Shift+F10: more actions · Ctrl+Enter: full entry');
 }
 function readerTokenState(token, index, kind) {
@@ -10841,7 +10866,7 @@ function nameReaderToken(span, token, index, kind) {
 function readerHelp() {
   const help = el('div', 'visually-hidden reader-help');
   for (const [id, text] of [['reader-help-kind', tx('語', 'word')], ['reader-help-word', readerWordHint()],
-    ['reader-help-named', tx('Enterで読みと意味。Shift+F10でほかの操作。', 'Enter: reading and meaning · Shift+F10: more actions')],
+    ['reader-help-named', tx('Enterで次の表示へ。Shift+F10でほかの操作。', 'Enter: next word layer · Shift+F10: more actions')],
     ['reader-help-lookup', tx('読みと意味', 'reading and meaning')]]) {
     const line = el('span', null, text); line.id = id; help.append(line);
   }
@@ -12031,7 +12056,8 @@ function openSlip(node, { anchor, from = 'lookup', host = null, look = null, not
   } else if (kind === 'kanji') {
     const k = D.kanji?.[node.id];
     token = { s: node.id, b: node.id, r: look?.reading || kanjiSlipReading(k), c: !!k };
-    look = { ...(String(k?.m || '') ? { gloss: String(k.m).toLowerCase(), glossLang: 'en' } : {}), ...(look || {}) };
+    look = { ...(look || {}), ...(!String(look?.gloss || '').trim() && String(k?.m || '').trim()
+      ? { gloss: String(k.m).toLowerCase(), glossLang: 'en' } : {}) };
     kanji = false;
     if (entry === undefined) entryAvailable = !!k;
   } else if (kind === 'particle') {
@@ -31676,7 +31702,11 @@ function composePage(node, path) {
       const epoch = recordEpoch, currentSurface = retainActionSurface(document.getElementById('sheet-take'));
       const saved = await toggleTaken(capNode, capLabel);
       if (!saved || !recordWritable(epoch) || !currentSurface()) return false;
-      render();
+      if (layerPathFor() && path.some(part => ladderPages.has(part))) {
+        S.roomStale = true;
+        refreshWordSaveControls(capNode, capLabel);
+        renderLayer();
+      } else render();
       return true;
     };
     const capture = saveOne({
@@ -31923,9 +31953,9 @@ function applyLayerLaw(root) {
 
 /** The page layer, alone: the top node's page mounted (or none), the layer law, the crumb under it, the store alert's
  * description, the walk sentinel. No room is rebuilt. */
-function renderLayer({ prebuilt = null } = {}) {
+function renderLayer({ prebuilt = null, preserveRoom = false } = {}) {
   // back on a room whose lists a page's Save changed: the room is drawn again, the whole app as render() draws it
-  if (!S.stack.length && S.roomStale) { render(); return; }
+  if (!S.stack.length && S.roomStale && !preserveRoom) { render(); return; }
   const root = document.getElementById('app');
   syncSheetActionVisit();
   closeReaderWordMenu();
@@ -31933,6 +31963,7 @@ function renderLayer({ prebuilt = null } = {}) {
   removeMini();
   for (const old of root.querySelectorAll(':scope > #sheet')) old.remove();
   if (S.stack.length) renderSheet(root, { prebuilt });
+  for (const button of root.querySelectorAll('#sheet .save-one')) button.saveOnePaint?.();
   adoptSaveMenuOwner();
   applyLayerLaw(root);
   const crumb = root.querySelector(':scope > .chrome .crumb');
@@ -32086,7 +32117,8 @@ function recede({ all = false, viaRender = false, instant = false } = {}) {
   if (!S.stack.length && !origin) clearReaderSummons();
   const kept = layered && top ? keptPages.get(top) : null;
   if (top) keptPages.delete(top);
-  if (layered) renderLayer({ prebuilt: kept && kept.epoch === pageEpoch ? kept.page : null });
+  if (layered) renderLayer({ prebuilt: kept && kept.epoch === pageEpoch ? kept.page : null,
+    preserveRoom: !!origin?.anchor.isConnected && !all });
   else render();
   if (!S.stack.length) {
     returnScroll();

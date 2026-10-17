@@ -168,6 +168,9 @@ const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all'
 assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
 const browserVersions = {};
 const g3Only = process.argv.includes('--g3-only');
+const spacingOnly = process.argv.includes('--spacing-only');
+const fixesOnly = process.argv.includes('--design-fixes-only');
+assert([g3Only, spacingOnly, fixesOnly].filter(Boolean).length <= 1, 'Choose one explicit narrow design schedule');
 const verifierSha256 = createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex');
 const DEMO_KEY = 'kairo-word-ladder-demo-v1';
 const withControl = process.argv.includes('--control');
@@ -227,7 +230,9 @@ const measureGaps = (count) => {
     }
     if (!rects.length) continue;
     probe.textContent = base;
-    const excess = word.getBoundingClientRect().width - probe.getBoundingClientRect().width;
+    // Native prose may wrap within one token. Its union spans the empty
+    // distance between line ends; only the actual fragment widths carry ink.
+    const excess = [...word.getClientRects()].reduce((sum, rect) => sum + rect.width, 0) - probe.getBoundingClientRect().width;
     boxes.push({ text: base, index: Number(tok.dataset.index), first: rects[0], last: rects.at(-1), excess });
   }
   probe.remove();
@@ -295,7 +300,7 @@ const measureReaderMotion = () => {
   let transitions = 0, animations = 0;
   const nodes = [...document.querySelectorAll('#app, #app *, #mini, #mini *, #reader-word-menu, #reader-word-menu *, #reader-toast, #reader-toast *, #vocabulary-list-popover, #vocabulary-list-popover *')];
   const groups = { topBar: '#app > .chrome button', tabBar: '#primary-tabs .primary-tab', titleCard: '.reader-card button, .reader-card summary',
-    bookmark: '#reader-place-save', playBar: '.listen-row', words: '#reader button', finished: '#read-fin', settings: '.dials .seg button',
+    bookmark: '#reader-place-save', playBar: '.listen-row', words: '#reader .tok[data-prose-label]', finished: '#read-fin', settings: '.dials .seg button',
     menu: '#reader-word-menu', popup: '#mini button', toast: '#reader-toast', listAdd: '#vocabulary-list-create' };
   const covered = Object.fromEntries(Object.entries(groups).map(([group, selector]) => [group, nodes.filter((node) => node.matches(selector)).length]));
   for (const node of nodes) for (const pseudo of [null, '::before', '::after']) {
@@ -358,9 +363,9 @@ async function focusToken(page, index) {
   assert.equal(await page.evaluate(() => document.activeElement?.dataset.index), String(index), 'paragraph rover selected the wrong word');
 }
 
-async function tapToken(page, index) {
+async function tapToken(page, index, { scroll = true } = {}) {
   const tok = page.locator(`#reader .tok[data-index="${index}"]`);
-  await tok.evaluate((node) => node.scrollIntoView({ block: 'center' }));
+  if (scroll) await tok.evaluate((node) => node.scrollIntoView({ block: 'center' }));
   const box = await tok.evaluate((node) => { const r = node.getClientRects()[0]; return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
   await page.mouse.click(box.x, box.y);
   // Lookup-only words may still be resolving their dictionary index after
@@ -413,6 +418,8 @@ try {
     };
     const run = async (name, viewport, body, init, options) => {
       if (g3Only && !/^(P1-fresh-word-demo-|P1-history-only-no-demo$|G1-stage-meaning-|G4-keyboard-menu$|K1-keyboard-roving$)/u.test(name)) return;
+      if (spacingOnly && !/^R1-flush-tokens-(1368|390)$/u.test(name)) return;
+      if (fixesOnly && !/^(R1-flush-tokens-(1368|390)|W2-one-word-one-card-reverse|G6-sentence-below-seat-390|G8-reader-popup-motion-(390|320))$/u.test(name)) return;
       const { ctx, page } = await context(viewport, init, options);
       const pageErrors = [], pageErrorDetails = [], networkEvents = [];
       const traceRequest = (event, request) => {
@@ -438,6 +445,7 @@ try {
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
       await run(`R1-flush-tokens-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
+        if (withControl) await page.addStyleTag({ content: '#reader .tok[data-index="1"] .tok-word { padding-inline-end: 8px !important; }' });
         const resting = await page.evaluate(measureGaps, 220);
         assert(resting.tokens > 100, `measured only ${resting.tokens} tokens`);
         assert.equal(resting.strayWhitespace, 0, 'whitespace text nodes stand between reader tokens');
@@ -842,8 +850,8 @@ try {
         return { demonstration, navigationReplay: false, reloadReplay: false, historyReplay: false, lookupHistoryReplay: false };
       }, () => {
         window.__g3DemoAudio = 0;
-        const play = HTMLMediaElement.prototype.play;
-        HTMLMediaElement.prototype.play = function (...args) { window.__g3DemoAudio++; return play.apply(this, args); };
+        const play = window.HTMLMediaElement.prototype.play;
+        window.HTMLMediaElement.prototype.play = function (...args) { window.__g3DemoAudio++; return play.apply(this, args); };
         if (window.speechSynthesis) {
           const speak = window.speechSynthesis.speak.bind(window.speechSynthesis);
           window.speechSynthesis.speak = (...args) => { window.__g3DemoAudio++; return speak(...args); };
@@ -1255,7 +1263,7 @@ try {
       await page.evaluate(() => document.fonts.ready);
       await page.waitForTimeout(500);
       await page.evaluate(() => window.scrollTo(0, 4716));
-      await tapToken(page, 816);
+      await tapToken(page, 816, { scroll: false }); // this fixture deliberately pins article scroll at 4716
       await page.waitForSelector('#mini #mini-sentence-open');
       await page.waitForTimeout(400);
       const seat = () => page.evaluate(() => {
@@ -1622,12 +1630,12 @@ try {
   const receipt = {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256,
-    control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the silent fresh-record word demonstration with no permanent tip, ダマスカス savable, one word one card; reader lane: reading then stage shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row and phone seating, sentence Save without activation, the version switch with 44px hit boxes, transform/opacity-only motion across the reader room and the popup Save and list path, the same one path in the galaxy, return from Practice on lookup and content words with motion enabled, a public below-word sentence seat with unchanged anchor and article scroll, and Japanese punctuation line breaks with source text preserved',
+    control: withControl ? (spacingOnly ? '8px padding after the actual 郊外 token' : '8px token padding; rt and ruby::before forced to 0.46em') : null,
+    scope: fixesOnly ? 'R1 fragment spacing, W2 saved page return, G6 pinned below seat, and G8 motion coverage only; other design gates not run' : spacingOnly ? 'R1 actual inline-fragment widths and same-line printed-token gaps at 1368/390 only; no other design gates' : 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the silent fresh-record word demonstration with no permanent tip, ダマスカス savable, one word one card; reader lane: reading then stage shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row and phone seating, sentence Save without activation, the version switch with 44px hit boxes, transform/opacity-only motion across the reader room and the popup Save and list path, the same one path in the galaxy, return from Practice on lookup and content words with motion enabled, a public below-word sentence seat with unchanged anchor and article scroll, and Japanese punctuation line breaks with source text preserved',
     browserVersions,
-    selectedScope: g3Only ? 'G3 demonstration, stage, keyboard and prose; older design gates not run' : 'all design gates',
+    selectedScope: fixesOnly ? 'Six exact changed or diagnosed design cases per engine' : spacingOnly ? 'R1 spacing only, both viewport sizes' : g3Only ? 'G3 demonstration, stage, keyboard and prose; older design gates not run' : 'all design gates',
     results,
-    passed: results.length === engines.length * (g3Only ? 7 : 50) && results.every((row) => row.passed),
+    passed: results.length === engines.length * (fixesOnly ? 6 : spacingOnly ? 2 : g3Only ? 7 : 50) && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);

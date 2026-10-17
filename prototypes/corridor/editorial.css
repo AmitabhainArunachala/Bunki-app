@@ -435,6 +435,7 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
   z-index: -1;
 }
 .japanese-lookup-word:hover { text-decoration: underline; text-decoration-color: var(--ai); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+.reader-card h1.view-title .japanese-lookup-word { white-space: nowrap; }
 /* Keyboard focus on a prose word wears the app's one focus token, the same ink underline and
  * vermilion wash as a reader word; never the browser's ring. The transparent outline still
  * draws in forced-colors mode. */
@@ -1668,6 +1669,9 @@ body.v-depth-layered #reader, #reader.reader {
   color: var(--text);
 }
 #reader .tok { padding: 0; }
+/* One shared paragraph layer keeps transparent hit areas above the page,
+ * while every neighbouring glyph remains above those areas. */
+#reader [data-reader-prose] { position: relative; isolation: isolate; }
 #reader .tok[data-para], .sentence-tok { cursor: pointer; position: relative; }
 /* Inline prose owns the same transparent reach as the former word button.
  * Keep the hit box behind neighbouring glyphs so their centres remain theirs. */
@@ -1694,7 +1698,7 @@ body.v-depth-layered #reader, #reader.reader {
   position: absolute;
   left: 50%;
   bottom: calc(100% - 0.1em);
-  transform: translateX(-50%);
+  transform: translate(-50%, 0.18em);
   font-size: 0.6em;
   line-height: 1.2;
   letter-spacing: 0.02em;
@@ -1702,12 +1706,11 @@ body.v-depth-layered #reader, #reader.reader {
   color: var(--accent);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 180ms ease-out, translate 180ms ease-out;
-  translate: 0 0.18em;
+  transition: opacity 180ms ease-out, transform 180ms ease-out;
 }
-#reader:not(.fg-always) ruby:has(> rt:not(.hidden-rt))::before { opacity: 1; translate: 0 0; }
+#reader:not(.fg-always) ruby:has(> rt:not(.hidden-rt))::before { opacity: 1; transform: translate(-50%, 0); }
 @media (prefers-reduced-motion: reduce) {
-  #reader:not(.fg-always) ruby::before { transition: none; translate: none; }
+  #reader:not(.fg-always) ruby::before { transition: none; transform: translate(-50%, 0); }
 }
 .reader rt, #reader rt { font-size: 0.6em; letter-spacing: 0.02em; color: var(--accent); pointer-events: none; }
 .reader .para-break { height: 1.5em; }
@@ -3216,6 +3219,7 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 /* ─ the sheet: one paper, one hairline edge (no kind stripe), a little fibre, lifted by two shadows:
    a close one that says it rests, a long one that says it is lit from above */
 #app .kp-study .kp-card {
+  grid-template-columns: minmax(0, 1fr); /* inline prose cannot widen the phone card */
   gap: 14px; padding: 20px 22px 24px; border-radius: var(--radius-card);
   border: 1px solid color-mix(in srgb, var(--kp-ink) 9%, transparent);
   /* plain paper: a texture never sits under the readings (the deck's own rule, 和紙・黒板・桜) */

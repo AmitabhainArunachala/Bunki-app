@@ -800,11 +800,24 @@ try {
             captionWrapped: !!node.querySelector('ruby small'), wholeNodeRuby: !!node.querySelector(':scope > ruby'),
             rung: node.dataset.ladderRung || null };
         }) });
+        let activation = 0;
         const tap = async () => {
-          const point = await target.locator('.g').evaluate(node => { const r = node.getBoundingClientRect();
-            const x = r.left + r.width / 2, y = r.top + r.height / 2;
-            return { x, y, hit: node.contains(document.elementFromPoint(x, y)) }; });
-          assert(point.hit, `the actual glyph must be hit-testable: ${JSON.stringify(point)}`);
+          const started = Date.now(), samples = [];
+          let point;
+          do {
+            point = await target.evaluate(owner => {
+              const node = owner.querySelector('.g'), r = node.getBoundingClientRect();
+              const x = r.left + r.width / 2, y = r.top + r.height / 2, hit = document.elementFromPoint(x, y);
+              return { x, y, hit: hit?.closest('.glyph') === owner, childHit: node.contains(hit),
+                blocker: hit?.outerHTML.slice(0, 400), rect: { x: r.x, y: r.y, width: r.width, height: r.height } };
+            });
+            samples.push(point);
+            if (point.hit) break;
+            await delay(50);
+          } while (Date.now() - started < 2000);
+          check(`${id}.hit-${++activation}`, 'the same actual glyph owns the native tap point before one activation',
+            point.hit, { waitedMs: Date.now() - started, samples });
+          assert(point.hit, `the actual glyph remains obstructed: ${JSON.stringify(samples)}`);
           await page.touchscreen.tap(point.x, point.y); await delay(450);
         };
         const resting = await state();
