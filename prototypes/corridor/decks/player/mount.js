@@ -189,7 +189,7 @@ function backFits() {
   const windowed = passage.classList.contains('kp-window');
   const clearTarget = mark.top >= Math.max(top, windowed ? view.top : top) - 1 && mark.bottom <= Math.min(bottom, windowed ? view.bottom : bottom) + 1;
   const clearToggle = !toggle || (toggle.getBoundingClientRect().top >= top - 1 && toggle.getBoundingClientRect().bottom <= bottom + 1);
-  const clearFolds = [...face.querySelectorAll('.kp-folds > details > summary')].every(node => {
+  const clearFolds = [...face.querySelectorAll(FOLD_ROWS)].every(node => {
     const row = node.getBoundingClientRect();
     return !(row.top - lift < barTop - 0.5 && row.bottom - lift > barTop + 0.5);
   });
@@ -2238,6 +2238,12 @@ function paintResponse({ resetScroll = false, front = false, hold = true } = {})
  */
 /** A fitted reading window sits directly under the fixed chrome, so the card's chip row
  * (level, kind and Full/Focus) moves below it; an unwindowed passage keeps the row above. */
+/** Q · the last part of the answer that says something (its word, definition, note, a leech's ladder): the parts before
+ * its folds, whose rows are doors */
+function answerSaid(def) {
+  const parts = [...(def.parentElement?.children || [])].filter((n) => !n.classList.contains('kp-folds') && n.getClientRects().length);
+  return parts[parts.length - 1] || def;
+}
 function placeWindowControls(face, passage, windowed) {
   face.toggleAttribute('data-window-controls', !!windowed);
   const chips = face.querySelector('.kp-chips');
@@ -2248,6 +2254,9 @@ function placeWindowControls(face, passage, windowed) {
   held?.focus({ preventScroll: true });
 }
 const WINDOW_LINES = 3;
+/** Q · the rows of the answer's folds the pads may never cut: each fold's summary, and a row of the folds that is not a
+ * fold (the see-also line of grammar links, which the pads cut in the MCD deck) */
+const FOLD_ROWS = '.kp-folds > details > summary, .kp-folds > :not(details)';
 const WINDOW_REACH = 12;
 function windowPassage(from, page = from) {
   const face = ctx.root.querySelector('#kp-card');
@@ -2266,8 +2275,14 @@ function windowPassage(from, page = from) {
   const line = parseFloat(getComputedStyle(passage).lineHeight) || 48;
   // The window seats directly under the chrome; the chip row, word and definition are budgeted below it.
   const seat = box.top - WINDOW_REACH - topInset() - SETTLE_GAP;
-  let over = def.getBoundingClientRect().bottom - lift - seat - (barTop - SETTLE_GAP);
-  for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
+  // Q · nothing he must read sits under the pads (Grok's walk: the answer's note went grey under them): the window makes
+  // room for the whole of what the answer says (its word, definition, note: every part before its folds), and only when
+  // that would leave the passage fewer than WINDOW_LINES lines, for the definition, as before
+  const overFor = (n) => n.getBoundingClientRect().bottom - lift - seat - (barTop - SETTLE_GAP);
+  let over = overFor(def);
+  const said = answerSaid(def);
+  if (said !== def && box.height - overFor(said) >= WINDOW_LINES * line) over = Math.max(over, overFor(said));
+  for (const s of face.querySelectorAll(FOLD_ROWS)) {
     const r = s.getBoundingClientRect();
     const [top, bottom] = [r.top - lift - over, r.bottom - lift - over];
     if (!(top < barTop && bottom > barTop)) continue;
@@ -2383,7 +2398,9 @@ function settleBack() {
   if (windowed && target.getBoundingClientRect().height > windowed.clientHeight) target = marked || windowed;
   const toggle = windowed && face.querySelector('.kp-zoom');
   const top = Math.min(target.getBoundingClientRect().top, toggle ? toggle.getBoundingClientRect().top : Infinity);
-  const bottom = def.getBoundingClientRect().bottom - lift;
+  // Q · the whole of what the answer says stays above the pads when it fits beside the target; else its definition
+  const said = answerSaid(def).getBoundingClientRect().bottom - lift;
+  const bottom = said - top <= bottomLimit - topLimit ? said : def.getBoundingClientRect().bottom - lift;
   let dy = 0;
   if (bottom - top <= bottomLimit - topLimit) {
     if (top < topLimit) dy = top - topLimit;
@@ -2396,7 +2413,7 @@ function settleBack() {
   // so the plan is made in whole-pixel moves: a row seated against the bar here is seated there
   const whole = (d) => Math.round(window.scrollY + d) - window.scrollY;
   dy = Math.abs(dy) < 1 ? 0 : whole(dy); // under a pixel off is at rest
-  const rows = [...face.querySelectorAll('.kp-folds > details > summary')].map((s) => {
+  const rows = [...face.querySelectorAll(FOLD_ROWS)].map((s) => {
     const r = s.getBoundingClientRect();
     return [r.top - lift, r.bottom - lift];
   });
