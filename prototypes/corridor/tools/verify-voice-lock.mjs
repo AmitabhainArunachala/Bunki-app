@@ -211,9 +211,12 @@ export async function checkLock({ requireComplete = false } = {}) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  let report;
+  // exitCode, never exit(): a red receipt is long, and exit() cuts a piped stdout mid-write
+  let report = null;
   try { report = await checkLock({ requireComplete: process.argv.includes('--require-complete') }); }
-  catch (error) { console.error(JSON.stringify({ verdict: 'red', fatal: String(error.message) }, null, 2)); process.exit(1); }
-  console.log(JSON.stringify({ verdict: report.problems.length ? 'red' : 'green', ...report }, null, 2));
-  process.exit(report.problems.length ? 1 : 0);
+  catch (error) { console.error(JSON.stringify({ verdict: 'red', fatal: String(error.message) }, null, 2)); process.exitCode = 1; }
+  if (report) {
+    console.log(JSON.stringify({ verdict: report.problems.length ? 'red' : 'green', ...report }, null, 2));
+    process.exitCode = report.problems.length ? 1 : 0;
+  }
 }
