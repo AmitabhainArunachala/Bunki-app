@@ -11,7 +11,8 @@
  * It measures: per-leg latency (upload, ears-and-brain, first voice byte, voice done; p50 and p95 over 16 turns × 2
  * runs); transcription fidelity on the known clips (character error rate); forgiveness (which planted mistakes the ears
  * report and which they silently correct); Kore's reading of the trap words (年, 月, 今日, 同年) by a kana round trip
- * through the same ears; the real usageMetadata against §3.4. It renders the same 16 replies in the lock's voice (V's
+ * through the same ears, and whether the target reading they give back in shadow mode (targetKana) reads it right; the
+ * real usageMetadata against §3.4. It renders the same 16 replies in the lock's voice (V's
  * render.model) and in the voice John heard on 09-29 (the lock's approvedReference, shut down 2026-11-17), so the
  * side-by-side for his ear exists before that date as a by-product.
  *
@@ -162,7 +163,7 @@ async function main() {
         turns.push({ kind: 'planted', id: `${take.id}-${take.n}`, mistake: take.mistake, heard, reported: heard.includes(take.wrong.replace(/[。]/gu, '').slice(0, 6)) || (result.turn?.corrections || []).length > 0,
           corrections: result.turn?.corrections || [], brainMs: Math.round(result.ms), reply: result.turn?.reply?.text || null });
       }
-      // her replies, in the locked voice and in 3.8 Flash TTS: latency to the first byte and to the end, and the files
+      // her replies, in the lock's voice and in the approved reference: latency to the first byte and to the end, and the files
       for (const [t, turn] of turns.entries()) {
         if (!turn.reply) continue;
         for (const model of [core.VOICE_LOCK.model, COMPARE_VOICE]) {
@@ -173,13 +174,15 @@ async function main() {
       }
       report.runs.push({ run, turns });
     }
-    // Kore's reading of the trap words: her line, heard back by the same ears, compared in kana
+    // Kore's reading of the trap words: her line, heard back by the same ears in shadow mode, compared in kana — and the
+    // target reading the ears give back with it (targetKana: how a corrected line, which has no tokens, is checked)
     report.traps = [];
     for (const trap of TRAPS) {
       const said = await voice(core.VOICE_LOCK.model, trap.line);
       if (!said.pcm) continue;
       const back = await ears(to16k(said.pcm), 'shadow', trap.line);
-      report.traps.push({ ...trap, heardKana: back.turn?.heardKana || '', read: (back.turn?.heardKana || '').includes(trap.want) });
+      report.traps.push({ ...trap, heardKana: back.turn?.heardKana || '', read: (back.turn?.heardKana || '').includes(trap.want),
+        targetKana: back.turn?.targetKana || '', targetRead: (back.turn?.targetKana || '').includes(trap.want) });
     }
   } catch (error) {
     report.stopped = String(error.message);
