@@ -10227,13 +10227,18 @@ function readingForm(token) {
   const reading = lemmaReading(token);
   if (!reading) return { ...token, b: token.s };
   // a verb whose kana dictionary form the quick dictionary has only as a word of another class (かえる is 蛙 "frog", なす
-  // 茄子 "eggplant", さる 猿 "monkey", かり 雁 "wild goose") is not that word: the form keeps its own reading — the label and
-  // the reading always name the same form — and is marked unfit, so the quick dictionary's noun never answers for it and
-  // its entry is chosen among the verbs read so (readingToken: かえり → 帰る, なさ → 為す), or none (its class: a "verb" or
-  // a JMdict v… code among the quick dictionary's parts)
+  // 茄子 "eggplant", さる 猿 "monkey", かり 雁 "wild goose"), or as a verb of a class that cannot take the text's form (a
+  // godan verb never stands as its bare stem: the い of ている is the ichidan 居る's, never the quick dictionary's godan
+  // いる, 要る "to be needed"), is not that word: the form keeps its own reading — the label and the reading always name
+  // the same form — and is marked unfit, so the quick dictionary's word never answers for it and its entry is chosen
+  // among the verbs read so (readingToken: かえり → 帰る, なさ → 為す, い → いる 居る), or none (the quick dictionary's
+  // class: its parts — "godan verb", "ichidan verb", a JMdict v… code)
   const core = D.dict?.[token.b];
+  const parts = String(core?.p || '').split(' · ');
+  const stemOnly = parts.some((part) => /^godan verb$|^v5/u.test(part)) && !parts.some((part) => /^ichidan verb$|^v1/u.test(part)) &&
+    /る$/u.test(reading) && kataToHira(String(token.r || '')) === kataToHira(reading).slice(0, -1);
   const unfit = token.p === '動詞' && !!core?.p && kataToHira(String(core.r || '')) === kataToHira(reading) &&
-    !String(core.p).split(' · ').some((part) => /verb/u.test(part) || /^v[0-9a-z]/u.test(part));
+    (!parts.some((part) => /verb/u.test(part) || /^v[0-9a-z]/u.test(part)) || stemOnly);
   return { ...token, s: token.b, r: reading, inflected: token.s, ...(unfit ? { unfit: true } : {}) };
 }
 
