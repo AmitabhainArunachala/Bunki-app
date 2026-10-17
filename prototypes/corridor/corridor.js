@@ -30286,6 +30286,15 @@ function syncStrokeNumbers(page, shown = Number(page.dataset.strokeShown || 0)) 
     );
 }
 
+/** G4 · the お手本 under the living ink rides above its canvas (the lifted layer), so each written stroke leaves the
+ * ghost on the same clock as the numbers: strokes before `written` have gone into ink, the one being written keeps its
+ * ghost ahead of the brush, and a rewrite brings the whole ghost back. The classic diagram draws its ink over its
+ * ghost already and is left alone. */
+function syncStrokeGhost(page, written) {
+  const root = inkRoom?.page === page && inkRoom?.lift ? inkRoom.lift : page;
+  root.querySelectorAll('.stroke-guide path').forEach((path, i) => path.classList.toggle('is-written', i < written));
+}
+
 /** Put the page into a definite state: `shown` strokes complete, the last of
  * them `progress` of the way drawn. Called by the animation every frame and
  * by the step-through control once per press. */
@@ -31065,15 +31074,18 @@ async function mountInkRoom(room2, ch, paths, reduced) {
       const shown = Math.min(strokes.length, ix + 1);
       fillPips(shown);
       syncStrokeNumbers(page, shown);
+      syncStrokeGhost(page, ix);
     };
     spec.onPhase = (phase) => {
       if (phase === 'writing') {
         fillPips(0);
         syncStrokeNumbers(page, 0);
+        syncStrokeGhost(page, 0);
       }
       if (phase === 'done') {
         fillPips(strokes.length);
         syncStrokeNumbers(page, strokes.length);
+        syncStrokeGhost(page, strokes.length);
       }
     };
     const handle = await INK.startInk(canvas, spec);

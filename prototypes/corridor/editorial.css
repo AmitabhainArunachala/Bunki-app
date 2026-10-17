@@ -2245,6 +2245,29 @@ body .sheet .stroke-door {
 }
 #stroke-page .stroke-speed-label { font: 600 14px/1.5 var(--sans); color: var(--text); }
 #stroke-page .stroke-speed-labels { font: 12px/1.5 var(--sans); color: var(--text-2); }
+/* G4 · the stroke page never shows an empty board (Grok's G-9: 海 stood as a blank board for about 13 s while the living
+   ink woke). The whole character rests as a faint お手本 from the first frame — in the stage while the renderer is still
+   being chosen and under the classic hand, and in the body-level layer that rides the living ink once it writes (a
+   positioned sibling over a live GL canvas can blank that canvas in Safari, so the ghost travels with the numbers) —
+   and the writing goes over it. One pigment: the room's own ink, at a breath. */
+#stroke-page[data-minimal='on'] .stroke-guide { display: inline; }
+/* the ghost is one layer at a breath (its opacity is the group's, so crossing strokes never darken where they meet) */
+:is(#stroke-page, .stroke-nums-lift) .stroke-guide { opacity: 0.13; }
+:is(#stroke-page, .stroke-nums-lift) .stroke-guide path { stroke: var(--stroke-ink, var(--ink)); }
+/* while the renderer is still being chosen the stage's diagram lies over the sheet's place, so its ghost is seen from the
+   first frame (the canvas is not yet live; once it is, the diagram has moved up into the lifted layer) */
+#stroke-page[data-ink-ready='pending'] .stroke-stage svg.stroke-canvas { position: absolute; inset: 0; }
+body:has(#stroke-page[data-living='on']) .stroke-nums-lift { display: block; }
+.stroke-nums-lift .stroke-guide { display: inline; }
+/* over the living ink the ghost is a soft, broad brush; each stroke leaves it as the ink writes it (syncStrokeGhost) */
+.stroke-nums-lift .stroke-guide path { stroke-width: 6; transition: opacity 120ms ease-out; }
+.stroke-nums-lift .stroke-guide path.is-written { opacity: 0; }
+/* …and the bug rail never stands over the readings: under the classic room's bar its fixed 44 px column (right 14 px,
+   top 86 px, report-client.css) met the glyph header's right-hand readings (訓 うみ under the bug, at base). On a phone
+   the header keeps that column clear at every scroll; a wider window already leaves it free. */
+@media (max-width: 540px) {
+  #stroke-page[data-minimal='off'] .stroke-khead { padding-inline-end: 52px; box-sizing: border-box; }
+}
 @media (max-width: 520px) {
   body .sheet .hero { gap: var(--s2); }
   body .sheet .hero-glyph { width: 104px; height: 104px; font-size: 80px; }
