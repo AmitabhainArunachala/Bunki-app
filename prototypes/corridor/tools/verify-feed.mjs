@@ -28,6 +28,12 @@
  *     page (no review value, no 検収前); every cull that acted on the shelf
  *     (where "shelf", decided) took the row off the shelf, out of the archive and
  *     its body with it — and the shelf census counts both.
+ *   · (N2, 2026-10-17) a real text chosen for the shelf by hand takes its source family's own queue kind — "aozora",
+ *     "gv" (Global Voices, CC BY 3.0), "mext" or "govonline" (PDL1.0) — and is held to the original's checks plus its
+ *     family's credit and licence: the publisher and the licence with its URL in the attribution the reader shows (the
+ *     footer links it to the page), the PDL's 加工して作成 statement, and for Global Voices the page URL in the
+ *     attribution and the changes made to the text (CC BY
+ *     requires it), every declared spelling swap ("X → Y") applied to the body and never left undone.
  *
  * Usage:
  *   node tools/verify-feed.mjs [--report FILE]
@@ -58,7 +64,10 @@ const EVIDENCE_DIR = resolve(REPO, 'docs/build-evidence/renkan/feed');
 
 const PRE_FEED_SHELF = 70; // the curated shelf the feed inherited (40 + recovered 30)
 const TITLE_EN_SOURCE = 'renkan-ai-2026-08';
-const KINDS = new Set(['mint', 'cull', 'legacy', 'rights', 'fresh', 'original']);
+// N2 · the real texts chosen by hand take their source family's kind; each is counted beside the originals
+const REAL_KINDS = ['aozora', 'gv', 'mext', 'govonline'];
+const HAND_KINDS = new Set(['original', ...REAL_KINDS]);
+const KINDS = new Set(['mint', 'cull', 'legacy', 'rights', 'fresh', ...HAND_KINDS]);
 const DECISIONS = new Set(['pending', 'approved', 'rejected']);
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const FORBIDDEN_LICENCE = /\bNC\b|\bND\b|Non-?Commercial|No-?Deriv/i;
@@ -129,7 +138,7 @@ for (const row of queue) {
   if (!KINDS.has(row.kind)) problems.push('kind');
   if (!DECISIONS.has(row.decision)) problems.push('decision');
   if (typeof row.title !== 'string' || !row.title) problems.push('title');
-  if ((row.kind === 'mint' || row.kind === 'legacy' || row.kind === 'fresh' || row.kind === 'original') && (typeof row.titleEn !== 'string' || !row.titleEn.trim()))
+  if ((row.kind === 'mint' || row.kind === 'legacy' || row.kind === 'fresh' || HAND_KINDS.has(row.kind)) && (typeof row.titleEn !== 'string' || !row.titleEn.trim()))
     problems.push('titleEn');
   if (typeof row.lane !== 'string') problems.push('lane');
   if (typeof row.licence !== 'string') problems.push('licence');
@@ -148,8 +157,9 @@ const liveMints = mintRows.filter((row) => row.decision !== 'rejected');
 const freshRows = queue.filter((row) => row.kind === 'fresh');
 const liveFresh = freshRows.filter((row) => row.decision !== 'rejected');
 const freshIds = new Set(freshRows.map((row) => row.id));
-const originalRows = queue.filter((row) => row.kind === 'original');
+const originalRows = queue.filter((row) => HAND_KINDS.has(row.kind));
 const liveOriginals = originalRows.filter((row) => row.decision !== 'rejected');
+const handTally = [...HAND_KINDS].map((kind) => `${kind} ${liveOriginals.filter((row) => row.kind === kind).length}`).join(', ');
 // a cull that acted on the shelf: decided, and naming the shelf as where it acted (the curation report's word)
 const shelfCulls = cullRows.filter((row) => row.decision === 'approved' && row.where === 'shelf');
 
@@ -187,11 +197,12 @@ check(
   strayDeckRows.map((row) => row.id).slice(0, 4).join(', ') || `${deckRows.length} deck passages`,
 );
 // N (2026-10-17) rewrites the census pin "the inherited 70 plus the queue's live mints and fresh readings": the ten glossary
-// definitions of the inherited 70 left through the cull queue, and the hand-made articles joined as queue kind "original"
+// definitions of the inherited 70 left through the cull queue, and the hand-made articles joined as queue kind "original".
+// N2 (2026-10-17) rewrites it again, strictly: the real texts chosen by hand join under their own kinds, counted here too
 check(
-  `the curated shelf is exactly the inherited ${PRE_FEED_SHELF} less the queue's shelf culls, plus its live mints, fresh readings and originals (deck passages aside)`,
+  `the curated shelf is exactly the inherited ${PRE_FEED_SHELF} less the queue's shelf culls, plus its live mints, fresh readings and hand-chosen articles (deck passages aside)`,
   feedShelf.length === PRE_FEED_SHELF - shelfCulls.length + liveMints.length + liveFresh.length + liveOriginals.length,
-  `${feedShelf.length} = ${PRE_FEED_SHELF} − ${shelfCulls.length} culled + ${liveMints.length} + ${liveFresh.length} fresh + ${liveOriginals.length} originals · ${deckRows.length} deck passages`,
+  `${feedShelf.length} = ${PRE_FEED_SHELF} − ${shelfCulls.length} culled + ${liveMints.length} + ${liveFresh.length} fresh + ${liveOriginals.length} hand-chosen (${handTally}) · ${deckRows.length} deck passages`,
 );
 // and what stands of the inherited shelf is exactly that remainder: every row neither a mint, a fresh reading nor an original
 const queuedOnShelf = new Set([...liveMints, ...liveFresh, ...liveOriginals].map((row) => row.id));
@@ -535,11 +546,31 @@ for (const original of originalRows) {
   if (!(body.grading?.signals?.lexical_coverage !== undefined || typeof body.grading?.unavailable?.lexical_coverage === 'string'))
     problems.push('ninjal-absence-unrecorded');
   const real = row.pool !== 'original';
-  const provenanceOk = real
-    ? row.pool === 'proprietary_safe' && /^PD\b/.test(row.licence ?? '') && /^https:\/\/www\.aozora\.gr\.jp\//.test(row.url ?? '') &&
-      String(row.attribution ?? '').startsWith('青空文庫 ') && String(row.sourceLabel ?? '').startsWith('青空文庫 · ')
+  const aozoraOk = () => row.pool === 'proprietary_safe' && /^PD\b/.test(row.licence ?? '') && /^https:\/\/www\.aozora\.gr\.jp\//.test(row.url ?? '') &&
+    String(row.attribution ?? '').startsWith('青空文庫 ') && String(row.sourceLabel ?? '').startsWith('青空文庫 · ');
+  // N2 · a real source family's credit and licence, in the attribution the reader's footer shows
+  const attribution = String(row.attribution ?? '');
+  const PDL = 'PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）';
+  const pdlOk = (source, host, credit) => row.pool === 'proprietary_safe' && row.source === source && row.licence === 'PDL1.0 (CC BY 4.0 互換)' &&
+    // the page is the link the footer sets on the attribution (row.url); the attribution names the source, the licence with
+    // its URL, and that the text was processed (加工して作成)
+    new RegExp(`^https://${host.replace(/\./g, '\\.')}/`).test(row.url ?? '') && attribution.startsWith(`出典：${credit}`) &&
+    attribution.includes(PDL) && attribution.includes('を加工して作成');
+  // Global Voices (CC BY 3.0): the credit and the page, the licence with its deed, and the changes made — layout left
+  // out, the rest of the text copied — every declared spelling swap applied to the body, none left undone
+  const swaps = [...attribution.matchAll(/([^\s(（,、]+) → ([^\s)）,、;]+)/gu)].map((m) => [m[1], m[2]]);
+  const gvOk = () => row.pool === 'proprietary_safe' && row.source === 'jp.globalvoices.org' && row.licence === 'CC BY 3.0' &&
+    /^https:\/\/jp\.globalvoices\.org\//.test(row.url ?? '') && attribution.startsWith('Global Voices 日本語 — 原文: ') &&
+    attribution.includes(row.url) && attribution.includes('CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)') &&
+    /omitted/.test(attribution) && /otherwise copied/.test(attribution) &&
+    (!/made consistent/.test(attribution) || swaps.length > 0) && swaps.every(([from, to]) => body.text.includes(to) && !body.text.includes(from));
+  const provenanceOk = original.kind === 'aozora' ? aozoraOk() && row.source === 'aozorabunko-clean'
+    : original.kind === 'gv' ? gvOk()
+    : original.kind === 'mext' ? pdlOk('mext.go.jp', 'www.mext.go.jp', '「')
+    : original.kind === 'govonline' ? pdlOk('gov-online.go.jp', 'www.gov-online.go.jp', '政府広報オンライン')
+    : real ? aozoraOk()
     : row.licence === 'Bunki original' && row.attribution === 'Bunki original text' && row.url === '';
-  if (!provenanceOk) problems.push('licence/pool/attribution');
+  if (!provenanceOk) problems.push(original.kind === 'gv' ? 'licence/pool/attribution/changes' : 'licence/pool/attribution');
   if (row.title !== original.title || row.licence !== original.licence || row.lane !== original.lane) problems.push('queue≠row');
   if (row.titleEn !== original.titleEn || !CHECKED_TITLE_SOURCE.test(row.titleEnSource ?? '')) problems.push('titleEn');
   if (!ISO_DATE.test(String(row.addedAt)) || row.addedAt !== original.addedAt) problems.push('addedAt');
@@ -557,10 +588,12 @@ for (const original of originalRows) {
   if (RESIDUAL_MARKERS.some((marker) => body.text.includes(marker))) problems.push('residual-markup');
   if (DROPPED_TEXT.some((pattern) => pattern.test(body.text))) problems.push('dropped-link-text');
   if (archiveIds.has(original.id)) problems.push('still-listed-in-archive');
+  const what = { aozora: 'Aozora excerpt', gv: `Global Voices excerpt, CC BY 3.0, changes stated${swaps.length ? ` (${swaps.map(([a, b]) => `${a} → ${b}`).join(', ')})` : ''}`,
+    mext: 'MEXT column, PDL1.0', govonline: '政府広報オンライン column, PDL1.0' }[original.kind] || (real ? 'Aozora excerpt' : 'Bunki original');
   check(
-    `${original.id} · original: full schema, its pool and credit, a checked title, its review in the data and no learner label`,
+    `${original.id} · ${original.kind}: full schema, its pool and credit, a checked title, its review in the data and no learner label`,
     problems.length === 0,
-    problems.join(',') || `${real ? 'Aozora excerpt' : 'Bunki original'} · ${row.authorLevel} · ${jread.band} · ${row.chars}字`,
+    problems.join(',') || `${what} · ${row.authorLevel} · ${jread.band} · ${row.chars}字`,
   );
 }
 // a cull that acted on the shelf took the row off the shelf for good: not on the shelf, not moved to the archive, its
@@ -652,6 +685,7 @@ writeFileSync(
         shelfCulls: shelfCulls.length,
         originals: originalRows.length,
         liveOriginals: liveOriginals.length,
+        handChosenByKind: Object.fromEntries([...HAND_KINDS].map((kind) => [kind, liveOriginals.filter((row) => row.kind === kind).length])),
       },
       results,
       failures: failures.map((row) => row.name),
