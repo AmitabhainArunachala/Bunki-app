@@ -5301,7 +5301,7 @@ function scaleOut() {
     S.view = 'shelf'; S.tabRoot = null;
     withoutRoomTransition(render);
     window.scrollTo(0, S.shelfScroll);
-    focusScaleControl('.scale-article-return');
+    focusScaleControl('.scale-article-return, #app .scale-thread [data-scale-in]');
   } else if (scale === 'shelf') {
     keepScroll();
     const home = S.scaleVisit;
@@ -5553,6 +5553,15 @@ function installScaleBridge() {
   // The shared pointer gate must exclude overlays, not strand this first rung.
   const skyReady = () => S.view === 'drift' && !S.stack.length && !standingSlip() && (!ladderVisit || ladderVisit.rung === 'reading') && scaleNavigationAllowed();
   window.__DRIFT__?.setScaleBridge?.({
+    // Continuing the visible G3 occurrence is a tap, not scale authority.
+    beginSourceTap(target) {
+      const visit = ladderVisit, anchor = visit?.anchor, entry = miniEntry, slip = standingSlip(), epoch = recordEpoch;
+      const isCurrent = () => recordEpoch === epoch && S.view === 'drift' && !S.stack.length && scaleNavigationAllowed() &&
+        !!visit && ladderVisit === visit && visit.rung === 'stage' && anchor?.isConnected &&
+        !!entry && miniEntry === entry && !!slip && standingSlip() === slip;
+      if (!anchor?.closest('#drift-layer') || !(target === anchor || anchor.contains(target)) || !isCurrent()) return null;
+      return Object.freeze({ anchor, isCurrent });
+    },
     canStep(direction, target = {}) {
       if (!skyReady()) return false;
       if (direction === undefined) return true;

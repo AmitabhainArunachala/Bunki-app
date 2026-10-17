@@ -1114,17 +1114,21 @@ function setRecordBridge(bridge){
 
 // G6 · the scale bridge extends the generated host, never the frozen donor.
 patch("  if(!DRIFT_ON||recordPending.size)return;\n  if(e.isPrimary&&touches.size){touches.clear();pinch=null;}",
-  "  if(!skyPointerAllowed(e))return;\n  if(scaleBridge){\n    scalePhysicalPointers.add(e.pointerId);\n    if(scaleDrain){scaleBlocked=true;return;}\n  }\n  if(!touches.size){scaleConsumedAt=0;scaleHandConsumed=false;}", "G6 pointer origins belong to the visible sky only");
+  "  if(!skyPointerAllowed(e))return;\n  const scaleReady=scaleSceneReady();\n  const sourceTap=!scaleReady&&canNavigate()&&scaleBridge?.beginSourceTap?.(e.target);\n  if(!scaleReady&&!sourceTap){\n    // Rejected sky fingers stay physical members until every one lifts, even\n    // if a pending record acknowledges or a stage closes while they are down.\n    if(scaleBridge){\n      scalePhysicalPointers.add(e.pointerId);\n      scaleDrain=true;\n      if(touches.size)touches.set(e.pointerId,{x:e.clientX,y:e.clientY});\n      blockScaleHand();\n    }\n    return;\n  }\n  if(scaleBridge){\n    scalePhysicalPointers.add(e.pointerId);\n    if(scaleDrain){scaleBlocked=true;return;}\n  }\n  if(!touches.size){scaleConsumedAt=0;scaleHandConsumed=false;}", "G6 pointer origins belong to the visible sky only");
 patch("  touches.set(e.pointerId,{x:e.clientX,y:e.clientY});",
-  "  touches.set(e.pointerId,{x:e.clientX,y:e.clientY});\n  if(scaleBridge&&scaleBlocked)return;", "G6 cancelled hand stays cancelled until all pointers leave");
+  "  touches.set(e.pointerId,{x:e.clientX,y:e.clientY,sourceTap:sourceTap||null});\n  if(scaleBridge&&scaleBlocked)return;", "G6 cancelled hand stays cancelled until all pointers leave");
 patch("  if(touches.size===2){\n    rebasePinch();",
-  "  if(touches.size===2){\n    if(scaleBridge){scaleHandConsumed=true;scaleConsumedAt=performance.now();}\n    rebasePinch();", "G6 every two-pointer hand consumes its compatibility click");
+  "  if(touches.size===2){\n    if(scaleBridge&&[...touches.values()].some(t=>t.sourceTap)){blockScaleHand();return;}\n    if(scaleBridge){scaleHandConsumed=true;scaleConsumedAt=performance.now();}\n    rebasePinch();", "G6 every two-pointer hand consumes its compatibility click");
 patch("  const t2=touches.get(e.pointerId);",
-  "  const t2=touches.get(e.pointerId);\n  if(scaleBridge&&t2&&!scaleSceneReady()){blockScaleHand();return;}", "G6 a hosted overlay cancels an already tracked hand");
+  "  const t2=touches.get(e.pointerId);\n  if(t2?.sourceTap){\n    if(!sourceTapReady(t2)||Math.abs(e.clientX-px)>8||Math.abs(e.clientY-py)>8)blockScaleHand();\n    return; // A stage continuation has no drag, pan or judgment authority.\n  }\n  if(scaleBridge&&t2&&!scaleSceneReady()){blockScaleHand();return;}", "G6 a hosted overlay cancels an already tracked hand");
 patch("  const owner=e.pointerId===gestureId;",
-  "  if(scaleBridge&&touches.has(e.pointerId)&&!scaleSceneReady()){cancelPointer(e);return;}\n  const owner=e.pointerId===gestureId;", "G6 an admitted hand cannot finish behind a hosted overlay or pending record");
+  "  const tracked=touches.get(e.pointerId);\n  if(scaleBridge&&tracked&&(tracked.sourceTap?\n      (!sourceTapReady(tracked,e.target)||Math.abs(e.clientX-px)>8||Math.abs(e.clientY-py)>8):!scaleSceneReady())){cancelPointer(e);return;}\n  const owner=e.pointerId===gestureId;", "G6 an admitted hand cannot finish behind a hosted overlay or pending record");
 patch("      if(pn===tn&&!moved&&touches.size===1&&!tn.gone){",
   "      if(pn===tn&&!moved&&touches.size===1&&!tn.gone&&(!scaleBridge||scaleSceneReady())){", "G6 long press preserves current scene admission");
+patch("  if(pn&&pn.gone) pn=null;",
+  "  if(pn&&pn.gone) pn=null;\n  if(sourceTap&&pn?.el!==sourceTap.anchor){blockScaleHand();return;}", "G6 source continuation belongs to its exact live occurrence");
+patch('  if(pn&&(pn.kind==="word"||pn.kind==="glyph")&&stack.length===0){',
+  '  if(!sourceTap&&pn&&(pn.kind==="word"||pn.kind==="glyph")&&stack.length===0){', "G6 source continuation never arms a hold");
 patch("function rebasePinch(){\n  if(touches.size!==2)",
   "function rebasePinch(){\n  if(scaleBridge&&scaleBlocked){pinch=null;return;}\n  if(touches.size!==2)", "G6 no pinch rebasing after third pointer");
 patch("  if(touches.size>2){\n    pinch=null;",
@@ -1155,8 +1159,15 @@ function scaleSceneReady(){
 }
 function skyPointerAllowed(e){
   const target=e.target;
-  return scaleSceneReady()&&target instanceof Element&&__layer.contains(target)&&
+  return DRIFT_ON&&target instanceof Element&&__layer.contains(target)&&
     !hostChrome(target)&&!target.closest('#card,#radoc,#lvl,.scale-star');
+}
+function sourceTapReady(tracked,target){
+  const lease=tracked?.sourceTap;
+  return DRIFT_ON&&canNavigate()&&!scaleBlocked&&touches.size===1&&Date.now()-pt<430&&
+    !!lease&&typeof lease.isCurrent==='function'&&lease.isCurrent()===true&&
+    !!pn&&!pn.gone&&pn.el===lease.anchor&&
+    (!target||target===lease.anchor||lease.anchor.contains(target));
 }
 function clearScalePointers(){
   // A scene can sleep while its physical hand is still on the glass.
