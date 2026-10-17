@@ -5495,9 +5495,8 @@ function rubyNode(pairs, { furigana, revealed }) {
       frag.append(document.createTextNode(pair.t));
       continue;
     }
+    // native ruby: the house's one ruby rule sets the reading (rooms/motion.css)
     const ruby = document.createElement('ruby');
-    // the reader draws a reading from this attribute when it floats the reading over its word
-    ruby.dataset.r = pair.r;
     ruby.append(document.createTextNode(pair.t));
     const rt = document.createElement('rt');
     rt.textContent = pair.r;
@@ -11563,8 +11562,8 @@ function renderReader(main) {
   reader.id = 'reader';
   if (S.dials.spacing === 1) reader.classList.add('sp-word');
   if (S.dials.spacing === 2) reader.classList.add('sp-bunsetsu');
-  // readings always on keep true ruby layout; otherwise a reading floats over its word and never
-  // pries the line apart (the gaps in 「ダマスカス 郊外」 were hidden readings still taking width)
+  // every reading is native ruby (the one rule, rooms/motion.css): always-on readings earn their space;
+  // a concealed one takes none (the gaps in 「ダマスカス 郊外」 were hidden readings still taking width)
   if (S.dials.furigana === 2) reader.classList.add('fg-always');
 
   if (!p.tokens) {

@@ -131,11 +131,14 @@
 .kp-st-known { color: var(--kp-green); border-color: currentColor; }
 .kp-st-hard { color: var(--kp-red); border-color: currentColor; }
 
-.kp-sentence { margin: 0; font-size: var(--type-reading); line-height: 2.05; font-weight: 500; letter-spacing: 0.02em; color: var(--kp-ink); overflow-wrap: anywhere; }
-.kp-sentence rt { font-size: 0.45em; color: var(--kp-ink-2); font-weight: 400; letter-spacing: 0; }
+.kp-sentence { margin: 0; font-size: var(--type-reading); line-height: 2.3; font-weight: 500; letter-spacing: 0.02em; color: var(--kp-ink); overflow-wrap: anywhere; }
 .kp-blank { display: inline-block; min-width: 2.4em; border-bottom: 3px solid var(--kp-cyan); background: var(--kp-cyan-wash); border-radius: var(--radius-control, 6px) var(--radius-control, 6px) 0 0; margin: 0 2px; line-height: 1.3; }
 .kp-target { color: var(--kp-cyan); font-weight: 700; text-decoration: underline 2px; text-underline-offset: 0.28em; }
-.kp-target rt { color: inherit; }
+/* one hue on the asked word: its reading takes the word's own colour (the one ruby reads --color-reading) */
+.kp-sentence .kp-target { --color-reading: currentColor; }
+/* 読み off: the clean original, keeping the asked word's reading and the one on a word you tap. A concealed
+   reading keeps its place, so the line never moves between on and off or while a word is open. */
+.kp[data-readings='off'] .kp-sentence ruby:not(:is(.kp-target, .kp-tok.kp-lit) ruby) > rt { visibility: hidden; }
 .kp-taphint { margin: 0; font-size: var(--type-caption); color: var(--kp-mute); letter-spacing: 0.08em; }
 
 .kp-answer { display: grid; gap: 6px; border-top: 1px solid var(--kp-line); padding-top: 14px; }
@@ -473,8 +476,6 @@
  * Fronts have no tap nodes and keep their original compact line spacing. */
 .kp .kp-sentence:has(.kp-tok) { line-height: 2.5; }
 .kp .kp-card[data-zoom='focus'] .kp-sentence:has(.kp-tok) .kp-ctx:not([data-open='1']) .kp-ctx-in { max-height: 5em; }
-/* readings never under 11px; no tracking of their own, so a long reading stretches its base as little as it can */
-.kp .kp-sentence rt { font-family: var(--kp-jp); font-size: max(11px, 0.5em); letter-spacing: -0.02em; }
 /* the marked word: 朱 corner brackets and a faint wash (backgrounds, so its ::before keeps the 44px
  * reach it has as a tap target on the back); its own colour stays its part of speech */
 .kp .kp-target {

@@ -29,6 +29,26 @@
 @media (max-width: 520px) {
   :root { --type-reading: 21px; --type-display: 29px; }
 }
+/* ── One ruby: every reading in the house is a native <rt>, set by this one rule. Half its word (so 10 CSS
+   px or more over Japanese set at the reading step or larger, D5), over it, one line high, in the
+   reading's colour (--color-reading, the one red; a host may hand a word's own colour down, as the deck's
+   asked word does). A word with a reading never breaks across a line, so its reading never crosses one;
+   a reading wider than its word centres over it instead of prying the word apart (拡張, never 拡 張).
+   Two readings side by side keep a breath of paper between them (--reading-gap), so each reads as its
+   own word's (だいじん かんてい, never だいじんかんてい); where a reading stands alone — the reader's
+   on-touch readings — a host may set the gap to 0 so the reading pries nothing apart.
+   A concealed reading (.hidden-rt) takes no room; a deck that keeps its lines still hides its readings
+   in place (player.css). The pseudo readings (::before / ::after labels) are gone. ── */
+ruby { ruby-position: over; ruby-align: center; white-space: nowrap; }
+rt { padding-inline: var(--reading-gap, 0.125em); font-size: 0.5em; line-height: 1; font-weight: 400; letter-spacing: 0; color: var(--color-reading, currentColor); }
+rt.hidden-rt { display: none; }
+/* WebKit sets a reading on its word's content box, Chromium on the word's em box (the placement CSS Ruby
+   describes), a few px lower; this lays WebKit's reading on the em box too, so both engines draw one line
+   (measured: the reading's foot 5.7 / 6.0 px into the word's content box at 21 px). */
+@supports (font: -apple-system-body) {
+  rt { margin-block-end: -0.54em; }
+}
+
 /* The departing frame fades over the live incoming room. Capturing the new
    room would disable its hit testing until the native transition finishes.
    Slice C (one hand): rooms travel along the Line. Going to a tab to the right,

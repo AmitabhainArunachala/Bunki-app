@@ -1229,33 +1229,11 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
   margin-top: 6px;
 }
 
-.reader ruby {
-  ruby-position: over;
-  /* A reading wider than its word must OVERHANG, not pry the word apart:
-   * the browser default justifies base glyphs to the ruby's width, which
-   * splits 拡張 into 拡 張 mid-word. Center keeps the word whole. */
-  ruby-align: center;
-}
-
 /* paragraph break — the article files carry paragraph starts, the reader
  * honours them; a block gap, not an indent, so ruby never collides */
 .reader .para-break {
   display: block;
   height: 1.05em;
-}
-
-.reader rt {
-  font-size: 0.46em;
-  color: var(--red);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1.1;
-  opacity: 1;
-  transition: opacity 0.18s ease;
-}
-
-.reader rt.hidden-rt {
-  opacity: 0;
 }
 
 .tok {
@@ -1488,11 +1466,6 @@ span.tok.named {
   font-size: var(--type-hero);
   line-height: 1.5;
   margin: 0 0 2px;
-}
-
-.headword rt {
-  font-size: 0.4em;
-  color: var(--red);
 }
 
 .reading {
@@ -4783,12 +4756,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   margin: 0 0 14px;
 }
 
-.airead-body rt {
-  font-size: var(--type-caption);
-  color: var(--ink-2);
-  letter-spacing: 0;
-}
-
 .airead-hit {
   position: relative;
   touch-action: manipulation;
@@ -7434,7 +7401,6 @@ body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a
 .paper-underline { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .3em; }
 .paper-box { display: inline-block; min-width: 1.6em; margin: 0 .15em; padding: 0 .25em; border: 1px solid currentColor;
   font-family: var(--sans, system-ui, sans-serif); font-size: var(--type-lead); line-height: 1.3; text-align: center; }
-.assessment-room ruby rt { font-size: .5em; }
 .exam-official-pages { margin: 1rem 0; }
 .exam-official-pages summary { cursor: pointer; padding: .5rem 0; min-height: var(--tap, 44px); }
 .exam-official-page { display: block; max-width: 100%; height: auto; margin: .5rem 0; border: 1px solid var(--line); }

@@ -588,12 +588,10 @@ function displayUnits(card, units) {
     ? { ...unit, word: null, tok: { ...unit.tok, r: 'こむら', personContext: 'komura-jutaro' } } : unit);
 }
 
-/** a reading over its kanji; data-rt lets a host draw the reading as a label above the word
- * instead of as ruby, so showing or hiding it never moves the line */
+/** a reading over its kanji: native ruby, set by the house's one ruby rule (rooms/motion.css); the deck
+ * hides a reading in place (player.css), so showing or hiding it never moves the line */
 function rubyNode(text, reading) {
-  const ruby = el('ruby', null, text, el('rt', null, reading));
-  ruby.dataset.rt = reading;
-  return ruby;
+  return el('ruby', null, text, el('rt', null, reading));
 }
 export function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'none' : 'all', split = false, clamp = false, taps = null }) {
   if (front) {
@@ -683,78 +681,22 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     }
   });
   if (clamp && split) clampContext(out);
-  if (taps || ruby === 'all') {
-    reflowWatch?.observe(out);
-    document.fonts?.ready.then(() => out.isConnected && seatReadings(out));
-  }
+  if (taps || ruby === 'all') reflowWatch?.observe(out);
   return out;
 }
 
 /** Whenever a passage reflows (width, zoom, an opened fold, fonts): a word that wraps onto a second
  * line would centre its 44px reach (.kp-tok::before) on the gap between the two lines and reach over
- * the words of both, so it keeps only its printed boxes (kp-split); and the readings are re-seated. */
+ * the words of both, so it keeps only its printed boxes (kp-split). Readings are native ruby: the
+ * line lays them out itself, so nothing is seated by hand. */
 const reflowWatch = typeof ResizeObserver === 'function'
   ? new ResizeObserver((entries) => {
     for (const { target } of entries) {
       if (!target.isConnected) { reflowWatch.unobserve(target); continue; }
       for (const tok of target.querySelectorAll('.kp-tok')) tok.classList.toggle('kp-split', tok.getClientRects().length > 1);
-      seatReadings(target);
     }
   })
   : null;
-let rtMeasure = null;
-/** A host may draw each reading above its word (ruby[data-rt]::after; the app does, so the line
- * never moves) instead of laying it out as ruby. A reading wider than its word would then run into
- * its neighbour's reading or past the edge of the line. Each line's readings are seated left to
- * right: centred on the word where there is room, nudged apart (and inside the line) where there is
- * not, and narrowed to the word plus one reading character at most (--kp-rt-dx, --kp-rt-fit). */
-function seatReadings(sentence) {
-  const rubies = [...sentence.querySelectorAll('ruby[data-rt]')];
-  if (!rubies.length) return;
-  const style = getComputedStyle(rubies[0], '::after');
-  const size = parseFloat(style.fontSize);
-  if (!size) return;
-  rtMeasure ||= document.createElement('canvas').getContext('2d');
-  if (rtMeasure) rtMeasure.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-  const spacing = parseFloat(style.letterSpacing) || 0;
-  const gap = size * 0.2;
-  const lines = new Map();
-  for (const ruby of rubies) {
-    ruby.style.removeProperty('--kp-rt-dx');
-    ruby.style.removeProperty('--kp-rt-fit');
-    const rects = ruby.getClientRects();
-    if (rects.length !== 1 || !rects[0].width) continue;
-    const r = rects[0];
-    let block = ruby.parentElement;
-    while (block !== sentence && !/^(block|flex|flow-root|list-item)$/.test(getComputedStyle(block).display)) block = block.parentElement;
-    const text = ruby.dataset.rt;
-    const natural = (rtMeasure ? rtMeasure.measureText(text).width : [...text].length * size) + spacing * [...text].length;
-    const width = Math.min(natural, r.width + size);
-    const key = `${Math.round(r.bottom / 4)}`; // one line of the block
-    if (!lines.has(block)) lines.set(block, new Map());
-    const row = lines.get(block);
-    if (!row.has(key)) row.set(key, []);
-    row.get(key).push({ ruby, centre: (r.left + r.right) / 2, natural, width, x: (r.left + r.right) / 2 - width / 2 });
-  }
-  for (const [block, rows] of lines) {
-    const b = block.getBoundingClientRect(), cs = getComputedStyle(block);
-    const lo = b.left + parseFloat(cs.paddingLeft), hi = b.right - parseFloat(cs.paddingRight);
-    for (const items of rows.values()) {
-      items.sort((p, q) => p.centre - q.centre);
-      items.forEach((it, i) => { it.x = Math.max(it.x, i ? items[i - 1].x + items[i - 1].width + gap : lo); });
-      for (let i = items.length - 1; i >= 0; i--) {
-        const it = items[i], limit = i < items.length - 1 ? items[i + 1].x - gap : hi;
-        if (it.x + it.width > limit) it.x = limit - it.width;
-      }
-      for (const it of items) {
-        const dx = it.x + it.width / 2 - it.centre;
-        if (Math.abs(dx) >= 0.5) it.ruby.style.setProperty('--kp-rt-dx', `${dx.toFixed(1)}px`);
-        if (it.width < it.natural - 0.5) it.ruby.style.setProperty('--kp-rt-fit', (it.width / it.natural).toFixed(3));
-      }
-    }
-  }
-}
-
 /** 焦点 on a long passage: the sentences before the target and those after it each become one
  * group. 全文 lays the groups out inline (nothing changes); 焦点 folds each to two dimmed lines
  * (the before group shows its last two, the after group its first two) and fitClamps adds a ⋯

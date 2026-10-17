@@ -352,7 +352,6 @@ body.v-depth-layered .sheet, .sheet {
 }
 .sheet-bar .sheet-depth { font-size: var(--type-chrome); }
 .sheet .headword { font-family: var(--display); font-size: var(--type-headword); line-height: 1.65; letter-spacing: -0.02em; margin: 4px 0 2px; }
-.sheet .headword rt { font-family: var(--serif); font-size: var(--type-lead); }
 .sheet .reading { font-size: var(--type-reading); letter-spacing: 0.03em; line-height: 1.65; margin-bottom: 14px; }
 .sheet :is(.gloss, .sense-list) { color: var(--ed-ink); font-size: var(--type-lead); line-height: 1.75; }
 .sheet .sense-list { padding-left: 26px; }
@@ -442,7 +441,6 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
-.japanese-lookup-word rt { font-size: 0.63em; color: var(--red); }
 /* A source you quote from stays selectable: a drag across its words picks an excerpt to keep. */
 .publisher-body .japanese-lookup-word { -webkit-user-select: text; user-select: text; }
 .vocabulary-list-dialog {
@@ -622,7 +620,6 @@ html[data-register='attempt'] .exam-paper :not(.exam-prompt, .exam-instruction) 
 .exam-option-number:is([aria-checked='true'], [aria-pressed='true']),
 .exam-option-row:is(.selected, .chosen) .exam-option-number { color: var(--ed-paper); background: var(--ed-ink); border-color: var(--ed-ink); }
 .exam-option-text { min-width: 0; padding: 3px 0; font: var(--type-reading)/1.9 var(--serif); color: var(--ed-ink); }
-.exam-paper rt { font-size: 0.63em; color: var(--red); }
 html[data-register='attempt'] .exam-paper .mock-opt {
   padding: 16px 12px;
   border: 0;
@@ -723,7 +720,6 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
   .sheet-bar .sheet-depth { font-size: var(--type-label); }
   .sheet-bar .sheet-back { padding-inline: 10px; }
   .sheet .headword { font-size: var(--type-hero); }
-  .sheet .headword rt { font-size: var(--type-body); }
   .sheet .kv { grid-template-columns: 70px minmax(0, 1fr); gap: 8px 12px; }
   .sheet .kv dd { font-size: var(--type-lead); }
   .sheet .row-word { font-size: var(--type-reading); }
@@ -1651,34 +1647,16 @@ body.v-depth-layered #reader, #reader.reader {
   background: transparent;
   box-shadow: none;
   font-size: var(--type-reading);
-  line-height: 2.15;
+  /* the line houses its reading (the one ruby, rooms/motion.css): a reading shown on a tap, or every
+     reading at once, sits in this leading, so no line moves and every line keeps one pitch */
+  line-height: 2.3;
   letter-spacing: 0.01em;
   color: var(--text);
 }
 #reader .tok { padding: 0; }
-/* Off or on-touch readings float over their word and never widen it. A hidden <rt> still takes
- * layout width (that was every gap in 「ダマスカス 郊外」), and WebKit will not position an <rt>,
- * so the <rt> stays in the DOM as the reading's record while ::before draws it. Always-on keeps
- * true ruby layout, where the reading is on the page and its space is earned. */
-#reader:not(.fg-always) ruby { display: inline-block; position: relative; }
-#reader:not(.fg-always) rt { display: none; }
-#reader:not(.fg-always) ruby::before {
-  content: attr(data-r);
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% - 0.1em);
-  transform: translateX(-50%);
-  font-size: 0.6em;
-  line-height: 1.2;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  color: var(--accent);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 180ms ease-out;
-}
-#reader:not(.fg-always) ruby:has(> rt:not(.hidden-rt))::before { opacity: 1; }
-.reader rt, #reader rt { font-size: 0.6em; letter-spacing: 0.02em; color: var(--accent); pointer-events: none; }
+/* a reading is the one ruby (rooms/motion.css): native, half its word, over it. On touch a reading stands
+   alone over the word you tapped, so it keeps no gap at its sides and pries no air into the line (R1) */
+#reader:not(.fg-always) { --reading-gap: 0; }
 .reader .para-break { height: 1.5em; }
 .reader .tok-en {
   margin-top: 0.1em;
@@ -1698,7 +1676,6 @@ body[data-view='reader'] main > blockquote {
   font: var(--type-reading)/2.25 var(--serif);
   color: var(--text);
 }
-body[data-view='reader'] main > blockquote rt { font-size: 0.6em; color: var(--accent); }
 
 /* the floating sentence bar, and the one-time tip that holds its place */
 .teacher-door.reader-actions {
@@ -1906,10 +1883,9 @@ body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { 
   .reader-meta .reader-source { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .reader-meta .shelf-date, .reader-meta .level-chip { flex: 0 0 auto; white-space: nowrap; }
   .reader-meta .date-rel, .reader-meta .date-year.is-current { display: none; }
-  #reader:not(.fg-always) ruby::before, .reader rt, #reader rt { font-size: 0.63em; }
   body[data-view='reader'] #app > main > h1.view-title { font-size: var(--type-section); line-height: 1.45; }
   body[data-view='reader'] #app > main > .view-title-en { margin-bottom: 12px; font-size: var(--type-control); }
-  body.v-depth-layered #reader, #reader.reader { font-size: var(--type-reading); line-height: 2.15; }
+  body.v-depth-layered #reader, #reader.reader { font-size: var(--type-reading); line-height: 2.3; }
   .reader .tok-en { font-size: var(--type-control); }
   /* the phone reader's dock: a slim paper strip at the foot where the bug rests in its corner and
      the voice state lives (the Kore player's home); the sentence bar and the tip rise over it, beside
@@ -3148,28 +3124,10 @@ body:has(#app .kp-study) #app .kp-top-study { position: sticky; top: env(safe-ar
 /* no report button while a card is up (John, 2026-10-13) */
 body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: none; }
 /* The back reads clean, like the reader: a reading shows on the answer, and on a word you tap
-   while its meaning is open. Hidden readings keep their line, so nothing moves. */
-#app .kp-sentence rt { display: none; }
-#app .kp-sentence ruby { position: relative; }
-/* Readings are drawn above their kanji in the line's own leading, not laid out as ruby, so the line is
-   the same before the reveal, after it, with readings on or off, and while a word is open. After the
-   reveal every kanji carries its reading (learner brief 2026-10-04); 読み off returns the clean
-   original (2026-10-13), keeping only the answer's reading and the one on a word you tap. */
-/* a word that carries a reading stays on one line (its reading is drawn over the whole word), on the
-   front too (kp-nb), so the lines break the same before and after the reveal */
-#app .kp-sentence :is(ruby, .kp-nb) { white-space: nowrap; }
-/* the player seats each line's readings so none runs into the next or past the line's edge:
-   --kp-rt-dx moves a reading off its word's centre, --kp-rt-fit narrows one that cannot fit */
-#app .kp-sentence ruby[data-rt]::after {
-  content: none; position: absolute; left: 50%; bottom: calc(100% + 1px); transform: translateX(calc(-50% + var(--kp-rt-dx, 0px))) scaleX(var(--kp-rt-fit, 1));
-  font: 400 max(11px, 0.5em)/1 var(--kp-jp, var(--sans, system-ui)); letter-spacing: -0.04em; white-space: nowrap;
-  color: color-mix(in srgb, var(--kp-ink-2) 88%, transparent); pointer-events: none;
-}
-#app .kp[data-readings='on'] .kp-sentence ruby[data-rt]::after,
-#app .kp-sentence :is(.kp-target, .kp-tok.kp-lit) ruby[data-rt]::after { content: attr(data-rt); }
-#app .kp-sentence .kp-target ruby[data-rt]::after { color: inherit; }
-#app .kp-sentence.kp-enter ruby[data-rt]::after { animation: kp-fade var(--motion-quick) var(--ease-enter) 60ms both; }
-#app .kp-sentence .kp-tok.kp-lit ruby[data-rt]::after { animation: kp-fade var(--motion-ma) var(--ease-enter) both; }
+   while its meaning is open (the one ruby, rooms/motion.css; which readings show is the deck's own,
+   player.css). A word with a reading never breaks across a line, on the front too (kp-nb), so the
+   lines break the same before and after the reveal. */
+#app .kp-sentence .kp-nb { white-space: nowrap; }
 #app .kp-study .kp-readings { margin-left: 14px; }
 /* ── The focus room, refined (John, 2026-10-13: "more detail, more sensibility, more subtle awareness,
    more precision, more depth"). One sheet of washi under a lamp on the 藍 stage; the passage is the

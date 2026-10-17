@@ -257,7 +257,6 @@ ruby.cd-ruby {
 
 ruby.cd-ruby rt {
   font-family: var(--brush);
-  font-size: max(11px, 0.58em); /* readings never under 11px */
   letter-spacing: 0.04em;
   color: var(--cd-indigo);
   line-height: 1;
@@ -368,10 +367,6 @@ ruby.cd-ruby rt {
   font-family: var(--brush);
   font-size: calc(var(--type-headword) * 1.25);
   line-height: 1.4;
-}
-
-.cd-plate rt {
-  font-size: max(11px, 0.28em);
 }
 
 .cd-title {
