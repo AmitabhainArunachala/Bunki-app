@@ -71,21 +71,31 @@ html[data-room='me'] .me-head .view-title {
   text-wrap: balance;
 }
 html[data-room='me'] body:not(.ui-bi) .me-head .view-title { letter-spacing: 0.04em; word-break: keep-all; line-break: strict; }
-html[data-room='me'] :is(.me-dateline, .me-hz-sub, .me-cal-foot, .me-home-when, .me-line-src, .me-part-aside, .me-hz-n, .me-lead-m) {
-  font-family: var(--font-data);
+/* the book's faces (F, L-5: one ladder, no monospace in the book): its labels and figures-in-a-line are the interface's
+   face (--font-ui) with tabular numerals, its prose the reading face, its titles and its big numerals the headword
+   face — three faces, each with one job */
+html[data-room='me'] :is(.me-dateline, .me-hz-sub, .me-cal-foot, .me-home-when, .me-line-src, .me-part-aside, .me-hz-n) {
+  font-family: var(--font-ui);
   font-variant-numeric: tabular-nums;
 }
+html[data-room='me'] .me-lead-m { font-family: var(--font-reading); font-variant-numeric: tabular-nums; }
 html[data-room='me'] .me-dateline { margin: 0; font-size: var(--type-caption); line-height: 1.7; letter-spacing: 0.06em; color: var(--color-muted); }
 html[data-room='me'] body.ui-bi .me-dateline { text-transform: uppercase; }
 html[data-room='me'] body:not(.ui-bi) .me-dateline { font-family: var(--font-reading); letter-spacing: 0.04em; }
-html[data-room='me'] body:not(.ui-bi) .me-dateline b { font-family: var(--font-data); }
 html[data-room='me'] .me-clause { white-space: nowrap; }
 html[data-room='me'] body .me-dateline.is-blank { font: 400 var(--type-control)/1.65 var(--font-reading); letter-spacing: 0.02em; text-transform: none; color: var(--color-ink-2); }
 html[data-room='me'] :is(.me-dateline, .me-hz-sub, .me-line-src) b { color: var(--color-ink); font-weight: 700; }
 html[data-room='me'] .me-lead { display: grid; gap: 3px; margin: var(--space-4) 0 0; }
-html[data-room='me'] .me-lead-n { font: 700 var(--type-headword)/1 var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; color: var(--color-ink); }
+html[data-room='me'] .me-lead-n { font: 800 var(--type-headword)/1 var(--font-headword); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; color: var(--color-ink); }
 html[data-room='me'] .me-lead-l { font: 800 var(--type-lead)/1.3 var(--font-headword); }
-html[data-room='me'] .me-lead-m { font-size: var(--type-caption); line-height: 1.5; color: var(--color-muted); }
+html[data-room='me'] .me-lead-m { font-size: var(--type-label); line-height: 1.5; color: var(--color-muted); }
+/* G2's help line (on integration 7f1912be; its own rules there, editorial.css:5405–5409, set 24 / 15 / 13 px and the
+   mono face, and give way to these on the merge): set as the lead above it — the figure in the headword face, its
+   label as the lead's, its note as prose */
+html[data-room='me'] .me-help-n { font: 800 var(--type-section)/1 var(--font-headword); font-variant-numeric: tabular-nums; color: var(--color-ink); }
+html[data-room='me'] .me-help-l { font: 800 var(--type-lead)/1.3 var(--font-headword); }
+html[data-room='me'] .me-help-m { font: 400 var(--type-label)/1.5 var(--font-reading); font-variant-numeric: tabular-nums; color: var(--color-muted); }
+html[data-room='me'] .me-help:not(:has(.me-help-n)) { font: 400 var(--type-label)/1.55 var(--font-reading); color: var(--color-muted); }
 
 /* ruled sections */
 html[data-room='me'] .me-part {
@@ -150,7 +160,8 @@ html[data-room='me'] .me-n1-seal {
   letter-spacing: 0.04em;
 }
 html[data-room='me'] .me-n1-when {
-  font: 600 var(--type-caption)/1 var(--font-data);
+  font: 600 var(--type-caption)/1 var(--font-ui);
+  font-variant-numeric: tabular-nums;
   letter-spacing: 0.12em;
   color: var(--color-ink);
 }
@@ -170,7 +181,8 @@ html[data-room='me'] body:not(.ui-bi) .me-n1-unit { font: 800 var(--type-lead)/1
 html[data-room='me'] .me-n1-count.is-done .me-n1-unit { font: 800 var(--type-reading)/1.25 var(--font-headword); color: var(--color-ink); }
 html[data-room='me'] .me-n1-date {
   margin: 8px 0 0;
-  font: 400 var(--type-caption)/1.5 var(--font-data);
+  font: 400 var(--type-caption)/1.5 var(--font-ui);
+  font-variant-numeric: tabular-nums;
   letter-spacing: 0.05em;
   color: var(--color-muted);
 }
@@ -250,7 +262,7 @@ html[data-room='me'] .me-home-when b { color: var(--color-gold); font-weight: 70
 html[data-room='me'] .me-month { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; }
 html[data-room='me'] .me-month-title { margin: 0; display: flex; justify-content: center; align-items: baseline; gap: 8px; }
 html[data-room='me'] .me-month-name { font: 800 var(--type-section)/1.1 var(--font-headword); }
-html[data-room='me'] .me-month-year { font: 500 var(--type-caption)/1 var(--font-data); color: var(--color-muted); letter-spacing: 0.08em; }
+html[data-room='me'] .me-month-year { font: 500 var(--type-caption)/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--color-muted); letter-spacing: 0.08em; }
 html[data-room='me'] .me-turn {
   width: 44px; height: 44px; display: grid; place-items: center; padding: 0;
   border: 0; background: transparent; color: var(--color-ink-2); border-radius: var(--radius-control); cursor: pointer;
@@ -263,14 +275,14 @@ html[data-room='me'] .me-turn-on::before { transform: translateX(-2px) rotate(-1
 html[data-room='me'] .me-turn:disabled { opacity: 0.25; cursor: default; }
 html[data-room='me'] .me-turn:not(:disabled):hover { background: var(--color-fill); }
 html[data-room='me'] :is(.me-dow, .me-cal) { display: grid; grid-template-columns: repeat(7, 1fr); }
-html[data-room='me'] .me-dow { margin: var(--space-2) 0 4px; text-align: center; font: 500 var(--type-caption)/1 var(--font-data); letter-spacing: 0.08em; color: var(--color-muted); }
+html[data-room='me'] .me-dow { margin: var(--space-2) 0 4px; text-align: center; font: 500 var(--type-caption)/1 var(--font-ui); letter-spacing: 0.08em; color: var(--color-muted); }
 html[data-room='me'] .me-cal { gap: 4px; }
 html[data-room='me'] .me-day {
   position: relative; display: block; aspect-ratio: 1; font-style: normal;
   box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-line);
 }
 html[data-room='me'] .me-day.blank { box-shadow: none; }
-html[data-room='me'] .me-day-n { position: absolute; left: 3px; top: 2px; z-index: 2; font: 400 var(--type-caption)/1 var(--font-data); color: var(--color-muted); }
+html[data-room='me'] .me-day-n { position: absolute; left: 3px; top: 2px; z-index: 2; font: 400 var(--type-caption)/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--color-muted); }
 html[data-room='me'] .me-seal {
   position: absolute; inset: 24% 16% 14% 20%; display: grid; place-items: center;
   border-radius: var(--radius-seal);
