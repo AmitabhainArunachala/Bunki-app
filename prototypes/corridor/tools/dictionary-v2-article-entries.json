@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 1,
+  "about": "Entries a reviewed article reads that the base selection (common, kana-only, top-151 kanji) leaves out. build-dictionary-v2.mjs adds each listed seq to the shipped dictionary only after proving, against the pinned JMdict, that the entry writes the spelling and reads it the reading, and that every receipt is a token of a shipped article exactly as recorded: an uninflected token is that spelling read that reading; an inflected token has that spelling (or its する form) as its base. A content slice adds its articles’ entries here, receipts included, and rebuilds; nothing else in the entry is typed by hand.",
+  "pin": "3.6.2+20260803141815",
+  "entries": [
+    {
+      "seq": "1297940",
+      "spelling": "作物",
+      "reading": "さくぶつ",
+      "receipts": [
+        {
+          "article": "aozora:000772-1",
+          "token": 737,
+          "s": "作物",
+          "b": "作物",
+          "r": "さくぶつ"
+        }
+      ]
+    },
+    {
+      "seq": "2175880",
+      "spelling": "銭",
+      "reading": "ぜに",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-benzaiten",
+          "token": 117,
+          "s": "銭",
+          "b": "銭",
+          "r": "ぜに"
+        },
+        {
+          "article": "bunki-read-n2-benzaiten",
+          "token": 128,
+          "s": "銭",
+          "b": "銭",
+          "r": "ぜに"
+        }
+      ]
+    },
+    {
+      "seq": "2229780",
+      "spelling": "異",
+      "reading": "こと",
+      "receipts": [
+        {
+          "article": "aozora:049966-1",
+          "token": 194,
+          "s": "異",
+          "b": "異",
+          "r": "こと"
+        }
+      ]
+    },
+    {
+      "seq": "2410330",
+      "spelling": "解す",
+      "reading": "げす",
+      "receipts": [
+        {
+          "article": "aozora:000772-1",
+          "token": 1414,
+          "s": "解せ",
+          "b": "解する",
+          "r": "げせ"
+        }
+      ]
+    },
+    {
+      "seq": "2410530",
+      "spelling": "帰す",
+      "reading": "きす",
+      "receipts": [
+        {
+          "article": "aozora:049966-1",
+          "token": 777,
+          "s": "帰し",
+          "b": "帰す",
+          "r": "きし"
+        }
+      ]
+    },
+    {
+      "seq": "2842390",
+      "spelling": "私",
+      "reading": "わたくし",
+      "receipts": [
+        {
+          "article": "aozora:000772-1",
+          "token": 0,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 31,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 151,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 153,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 238,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 311,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 373,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 440,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 466,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 523,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 716,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 961,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 975,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 996,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 1056,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 1058,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 1071,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 1088,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 1274,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 1311,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 1425,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 1445,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 1459,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:000772-1",
+          "token": 1503,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:049966-1",
+          "token": 4,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:049966-1",
+          "token": 89,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:049966-1",
+          "token": 979,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:049966-1",
+          "token": 996,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:049966-1",
+          "token": 1093,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:049966-1",
+          "token": 1112,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:049966-1",
+          "token": 1210,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        },
+        {
+          "article": "aozora:049966-1",
+          "token": 1283,
+          "s": "私",
+          "b": "私",
+          "r": "わたくし"
+        }
+      ]
+    }
+  ]
+}

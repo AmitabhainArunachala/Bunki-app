@@ -37,6 +37,9 @@ const PROVENANCE = resolve(
 );
 const DEFAULT_SOURCE_DIR = resolve(REPO, 'corpus', 'data', 'jmdict');
 const OUTPUT_DIR = resolve(CORRIDOR, 'data', 'share_alike', 'dict-v2');
+// R2 (2026-10-17) · the entries reviewed articles read that the base selection leaves out, each with its receipts
+const ARTICLE_ENTRIES = resolve(HERE, 'dictionary-v2-article-entries.json');
+const ARTICLES_DIR = resolve(CORRIDOR, 'data', 'articles');
 const SCHEMA_VERSION = 3;
 
 const EXPECTED = Object.freeze({
@@ -50,10 +53,13 @@ const EXPECTED = Object.freeze({
     sha256: '5dfb850ee88c7bccecf4694cc4d7b1338e608440c5edcb8fefc93216b3471fe6',
   }),
   sourceEntries: 218_290,
-  selectedEntries: 69_996,
+  // 69,996 from the base rule + 6 article entries (R2, 2026-10-17: 私 わたくし, 銭 ぜに, 異 こと, 作物 さくぶつ, 解す げす,
+  // 帰す きす). A content slice that adds article entries moves these two counts together, named in its commit
+  selectedEntries: 70_002,
   selectedCommon: 22_626,
   selectedKanaOnly: 36_683,
   selectedTop151: 10_687,
+  selectedArticleEntries: 6,
 });
 
 const SHARD_COUNT = 16;
@@ -721,13 +727,65 @@ function validateSourceShape(jmdict, kanjidic2) {
   }
 }
 
+/** The article entries (dictionary-v2-article-entries.json): entries a reviewed article reads that the base rule leaves
+ * out. Each receipt must be a token of a shipped article exactly as recorded: an uninflected token is the spelling read
+ * the reading; an inflected token's base is the spelling or its する form (解する for 解す). The entry itself is proved
+ * against the pinned JMdict in buildOutputs; nothing in it is typed by hand. */
+function readArticleEntries() {
+  let file;
+  try {
+    file = JSON.parse(readFileSync(ARTICLE_ENTRIES, 'utf8'));
+  } catch (error) {
+    die(`${ARTICLE_ENTRIES}: ${error.message}`);
+  }
+  if (file?.schemaVersion !== 1 || file.pin !== EXPECTED.pin || !Array.isArray(file.entries)) {
+    die(`${ARTICLE_ENTRIES}: expected schemaVersion 1, pin ${EXPECTED.pin} and an entries array`);
+  }
+  const index = JSON.parse(readFileSync(resolve(ARTICLES_DIR, 'index.json'), 'utf8'));
+  const files = new Map((index.articles || []).map((row) => [row.id, row.file]));
+  const bodies = new Map();
+  const tokensOf = (id) => {
+    if (!bodies.has(id)) {
+      const name = files.get(id);
+      if (!name) die(`article entry receipt names ${JSON.stringify(id)}, which the shelf does not ship`);
+      bodies.set(id, JSON.parse(readFileSync(resolve(ARTICLES_DIR, name), 'utf8')).tokens || []);
+    }
+    return bodies.get(id);
+  };
+  const seen = new Set();
+  let previous = -1;
+  for (const item of file.entries) {
+    const { seq, spelling, reading, receipts } = item || {};
+    if (!/^\d+$/.test(String(seq)) || typeof seq !== 'string') die(`article entry ${JSON.stringify(seq)}: seq must be a decimal string`);
+    if (seen.has(seq) || Number(seq) <= previous) die(`article entry ${seq}: seqs must be unique and ascending`);
+    seen.add(seq);
+    previous = Number(seq);
+    if (typeof spelling !== 'string' || !spelling || typeof reading !== 'string' || !reading) {
+      die(`article entry ${seq}: spelling and reading are required`);
+    }
+    if (!Array.isArray(receipts) || !receipts.length) die(`article entry ${seq}: at least one receipt is required`);
+    for (const receipt of receipts) {
+      const token = Number.isInteger(receipt?.token) ? tokensOf(receipt.article)[receipt.token] : null;
+      if (!token || token.s !== receipt.s || token.b !== receipt.b || (token.r || '') !== receipt.r) {
+        die(`article entry ${seq}: receipt ${receipt?.article} #${receipt?.token} is not that article's token as recorded`);
+      }
+      const inflected = !!token.b && token.b !== token.s;
+      const fits = inflected
+        ? token.b === spelling || (spelling.endsWith('す') && token.b === `${spelling.slice(0, -1)}する`)
+        : token.s === spelling && token.r === reading;
+      if (!fits) die(`article entry ${seq}: receipt ${receipt.article} #${receipt.token} does not read ${spelling} ${reading}`);
+    }
+  }
+  return file.entries;
+}
+
 function buildOutputs(jmdict, kanjidic2, pin) {
   validateSourceShape(jmdict, kanjidic2);
   const frequencyByKanji = new Map(
     kanjidic2.characters.map((entry) => [entry.literal, entry.misc?.frequency ?? null]),
   );
   const selected = [];
-  const buckets = { common: 0, kanaOnly: 0, top151: 0 };
+  const buckets = { common: 0, kanaOnly: 0, top151: 0, articles: 0 };
 
   let sourceKanjiForms = 0;
   let sourceKanaForms = 0;
@@ -759,11 +817,33 @@ function buildOutputs(jmdict, kanjidic2, pin) {
     }
   }
 
+  // R2 · the article entries: each listed seq is an entry of the pinned JMdict that the rule above left out, that writes
+  // the spelling (a kana spelling: lists it) and reads it the reading, the reading permitted with that spelling
+  const chosen = new Set(selected.map((entry) => entry.id));
+  const sourceBySeq = new Map(jmdict.words.map((entry) => [entry.id, entry]));
+  const articleSeqs = [];
+  for (const item of readArticleEntries()) {
+    const entry = sourceBySeq.get(item.seq);
+    if (!entry) die(`article entry ${item.seq} is not in the pinned JMdict`);
+    if (chosen.has(item.seq)) die(`article entry ${item.seq} is already selected by the base rule; drop it from the list`);
+    const kana = entry.kana.find((form) => form.text === item.reading);
+    const written = entry.kanji.find((form) => form.text === item.spelling);
+    const kanaSpelling = !written && item.spelling === item.reading && !!kana;
+    if (!kana || !(kanaSpelling || (written && restrictionAllows(kana.appliesToKanji, item.spelling)))) {
+      die(`article entry ${item.seq} does not write ${item.spelling} read ${item.reading} in the pinned JMdict`);
+    }
+    buckets.articles += 1;
+    chosen.add(item.seq);
+    articleSeqs.push(item.seq);
+    selected.push(entry);
+  }
+
   if (
     selected.length !== EXPECTED.selectedEntries ||
     buckets.common !== EXPECTED.selectedCommon ||
     buckets.kanaOnly !== EXPECTED.selectedKanaOnly ||
-    buckets.top151 !== EXPECTED.selectedTop151
+    buckets.top151 !== EXPECTED.selectedTop151 ||
+    buckets.articles !== EXPECTED.selectedArticleEntries
   ) {
     die(
       'selection invariant changed: ' +
@@ -929,6 +1009,7 @@ function buildOutputs(jmdict, kanjidic2, pin) {
     selectedCommonEntries: buckets.common,
     selectedAdditionalKanaOnly: buckets.kanaOnly,
     selectedAdditionalTop151: buckets.top151,
+    selectedAdditionalArticleEntries: buckets.articles,
     selectedKanjiForms,
     selectedKanaForms,
     selectedForms: selectedKanjiForms + selectedKanaForms,
@@ -979,9 +1060,11 @@ function buildOutputs(jmdict, kanjidic2, pin) {
     provenance: 'corpus/src/corpus/sources/jmdict/PROVENANCE.yml',
   };
   const selection = {
-    id: 'common-kana-only-top151-kanji-v1',
+    id: 'common-kana-only-top151-kanji-article-v2',
     rule:
-      'Include an entry when any form is JMdict-common, or it has no written form, or at least one written form has every Unicode unified ideograph ranked 151 or better by KANJIDIC2 misc.frequency.',
+      'Include an entry when any form is JMdict-common, or it has no written form, or at least one written form has every Unicode unified ideograph ranked 151 or better by KANJIDIC2 misc.frequency; and every entry listed with its article receipts in prototypes/corridor/tools/dictionary-v2-article-entries.json.',
+    articleEntries:
+      'Entries a reviewed article reads that the rest of the rule leaves out. Each is proved at build time against the pinned JMdict (it writes the spelling and reads it the reading) and against its receipts (shipped article tokens).',
     topKanjiFrequencyRank: TOP_KANJI_FREQUENCY_RANK,
     disclosure:
       'KANJIDIC2 misc.frequency is a newspaper character-frequency rank. This tier broadens orthographic coverage; it is not a whole-word frequency ranking.',
@@ -1057,7 +1140,53 @@ function buildOutputs(jmdict, kanjidic2, pin) {
         `(${(maxDetailBytes / minDetailBytes).toFixed(6)} > 1.15)`,
     );
   }
-  return { files, counts };
+  return { files, counts, articleSeqs, shardEntryCounts };
+}
+
+/** R2 · what this build changed against the build already in the output directory, proved: every detail shard equals
+ * the previous one once the article entries are taken out of it and the shard header's global per-shard counts
+ * (sharding.entryCounts, min, max, ratio) are those of the build without them — so a shard holding no article entry
+ * differs from the previous build in that header alone, and a shard holding one gains that entry and nothing else; and
+ * every previous index row is still there, unchanged and in order, beside the article rows. Returns one line per file;
+ * with no previous build (a fresh directory) there is nothing to prove against. */
+function proveAgainstPrevious(files, outputDir, articleSeqs, shardEntryCounts) {
+  const previousIndex = resolve(outputDir, 'index.json');
+  if (!existsSync(previousIndex)) return ['no previous build to prove against'];
+  // the article entries this build adds: listed, and not in the previous build (a later batch adds only its own)
+  const shipped = new Set(JSON.parse(readFileSync(previousIndex, 'utf8')).entries.map((row) => row[0]));
+  const newly = articleSeqs.filter((seq) => !shipped.has(seq));
+  const added = new Set(newly);
+  const lines = [];
+  const before = shardEntryCounts.map((count, shard) =>
+    count - newly.filter((seq) => shardForSeq(seq) === shard).length);
+  for (const [name, text] of files) {
+    const path = resolve(outputDir, name);
+    if (!existsSync(path)) return ['no previous build to prove against'];
+    const previous = readFileSync(path, 'utf8');
+    if (previous === text) {
+      lines.push(`${name}: byte-identical`);
+      continue;
+    }
+    const now = JSON.parse(text);
+    if (name === 'index.json') {
+      const old = JSON.parse(previous).entries.map((row) => JSON.stringify(row));
+      const kept = now.entries.filter((row) => !added.has(row[0])).map((row) => JSON.stringify(row));
+      if (JSON.stringify(old) !== JSON.stringify(kept)) die('index.json: a previous row changed, moved or was lost');
+      lines.push(`index.json: every previous row unchanged and in order, + ${now.entries.length - kept.length} article rows`);
+      continue;
+    }
+    const gained = now.entries.filter((entry) => added.has(entry[0])).map((entry) => entry[0]);
+    const without = { ...now, sharding: { ...now.sharding, entryCounts: before }, counts: { entries: now.entries.length - gained.length },
+      entries: now.entries.filter((entry) => !added.has(entry[0])) };
+    const minBefore = Math.min(...before), maxBefore = Math.max(...before);
+    without.sharding.minEntries = minBefore;
+    without.sharding.maxEntries = maxBefore;
+    without.sharding.maxToMinEntryRatio = Number((maxBefore / minBefore).toFixed(6));
+    if (JSON.stringify(without) !== previous) die(`${name}: changed beyond its article entries and the shard counts header`);
+    lines.push(gained.length ? `${name}: previous bytes + article entries ${gained.join(', ')} (and the counts header)`
+      : `${name}: previous bytes except the shard counts header (sharding.entryCounts)`);
+  }
+  return lines;
 }
 
 function verifyOrWrite(files, check, outputDir) {
@@ -1097,8 +1226,11 @@ const jmdictPath = resolve(options.sourceDir, pin.jmdict.asset);
 const kanjidicPath = resolve(options.sourceDir, pin.kanjidic2.asset);
 const jmdict = unzipJson(jmdictPath, pin.jmdict.sha256);
 const kanjidic2 = unzipJson(kanjidicPath, pin.kanjidic2.sha256);
-const { files, counts } = buildOutputs(jmdict, kanjidic2, pin);
+const { files, counts, articleSeqs, shardEntryCounts } = buildOutputs(jmdict, kanjidic2, pin);
+// R2 · before anything is written, the change against the build already there is proved (or the build stops)
+const proof = options.check ? [] : proveAgainstPrevious(files, options.outputDir, articleSeqs, shardEntryCounts);
 const totalBytes = verifyOrWrite(files, options.check, options.outputDir);
+if (proof.length) console.log(`against the previous build:\n  ${proof.join('\n  ')}`);
 const action = options.check ? 'current' : 'written';
 const outputSizes = [...files.keys()].map((name) =>
   `${name}=${statSync(resolve(options.outputDir, name)).size}`,

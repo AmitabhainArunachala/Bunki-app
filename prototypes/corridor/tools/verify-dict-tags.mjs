@@ -172,14 +172,26 @@ const workerV2 = await initialiseWorker(baselineIndex, baselineCore);
 check('new worker rejects old schema-v2 index and CORE loudly',
   workerV2?.ok === false && workerV2?.error === 'dictionary worker received an unsupported index');
 
-check('zero index rows lost vs ca07a8e',
-  index.entries.length === baselineIndex.entries.length &&
-    index.entries.every((row, position) => row[0] === baselineIndex.entries[position][0]),
-  `${index.entries.length} entries in identical sequence order`);
-check('source sense/gloss counts retained',
-  index.counts.selectedSenses === baselineIndex.counts.selectedSenses &&
-    index.counts.selectedEnglishGlosses === baselineIndex.counts.selectedEnglishGlosses,
-  `${index.counts.selectedSenses} senses · ${index.counts.selectedEnglishGlosses} glosses`);
+// R2 (2026-10-17) · the shipped rows are the baseline's, every one, in the same order, plus exactly the article entries
+// listed with their receipts (tools/dictionary-v2-article-entries.json) — each in the pinned JMdict, none a baseline row
+const articleSeqs = json(resolve(HERE, 'dictionary-v2-article-entries.json')).entries.map((item) => item.seq);
+const articleSet = new Set(articleSeqs);
+const baselineSeqs = baselineIndex.entries.map((row) => row[0]);
+const baselineSet = new Set(baselineSeqs);
+check('zero index rows lost vs ca07a8e; the only rows added are the listed article entries',
+  JSON.stringify(index.entries.filter((row) => !articleSet.has(row[0])).map((row) => row[0])) === JSON.stringify(baselineSeqs) &&
+    index.entries.length === baselineSeqs.length + articleSeqs.length &&
+    articleSeqs.length === articleSet.size && articleSeqs.every((seq) => !baselineSet.has(seq) && sourceBySeq.has(seq)) &&
+    index.entries.every((row, position) => position === 0 || Number(row[0]) > Number(index.entries[position - 1][0])),
+  `${baselineSeqs.length} baseline rows in identical sequence order + ${articleSeqs.length} article entries`);
+const articleSenses = articleSeqs.reduce((sum, seq) => sum + sourceBySeq.get(seq).sense.length, 0);
+const articleGlosses = articleSeqs.reduce((sum, seq) => sum + sourceBySeq.get(seq).sense
+  .reduce((count, sense) => count + sense.gloss.filter((gloss) => gloss.lang === 'eng').length, 0), 0);
+check('source sense/gloss counts retained: the baseline\'s plus the article entries\' own, counted in the pinned JMdict',
+  index.counts.selectedSenses === baselineIndex.counts.selectedSenses + articleSenses &&
+    index.counts.selectedEnglishGlosses === baselineIndex.counts.selectedEnglishGlosses + articleGlosses &&
+    index.counts.selectedAdditionalArticleEntries === articleSeqs.length,
+  `${index.counts.selectedSenses} senses · ${index.counts.selectedEnglishGlosses} glosses (+${articleSenses} · +${articleGlosses})`);
 
 const details = new Map();
 for (let shard = 0; shard < 16; shard += 1) {
@@ -192,7 +204,9 @@ for (let shard = 0; shard < 16; shard += 1) {
       file.entries.every((entry) => shardId(entry[0]) === id));
   for (const entry of file.entries) details.set(entry[0], entry);
 }
-check('zero detail rows lost', details.size === baselineIndex.entries.length, `${details.size} rows`);
+check('zero detail rows lost; the article entries have theirs',
+  details.size === baselineSeqs.length + articleSeqs.length && baselineSeqs.every((seq) => details.has(seq)) &&
+    articleSeqs.every((seq) => details.has(seq)), `${details.size} rows`);
 
 let abbreviationSenses = 0;
 let sensitiveSenses = 0;
