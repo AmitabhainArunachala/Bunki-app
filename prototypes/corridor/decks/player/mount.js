@@ -1654,7 +1654,9 @@ function tapNode(node, unit, onTap) {
   }
   if (unit.word) node.dataset.deckWord = unit.word.id;
   node.kpTap = () => onTap(unit, node);
-  wireHold(node, unit);
+  // G5 · the player root's one hold finds the word it is held on by this (wireDeckHold); the word keeps only its tap's
+  // own listeners
+  node.kpHoldUnit = unit;
   node.addEventListener('click', (e) => {
     e.stopPropagation();
     if (dragged(e)) return;
@@ -1690,10 +1692,15 @@ function tapNode(node, unit, onTap) {
 /* G5 · hold = seal on the card's back (MASTER_SPEC §4 G; the front stays sealed until the answer): a finger held still on a
  * back word, a right-click or Shift+F10 keeps it through the corridor's one keep (host.take, add-only) and opens the strip
  * beside it (host.addToList, seal). The ring under the finger is the corridor's own (its seam, when the page is hosted). A
- * hold that moves is a scroll; a hold belongs to its pointer; its release is never a tap. Standalone pages have no host and
- * no hold. */
+ * hold that moves is a scroll; a hold belongs to its pointer; its release is never a tap. One set of listeners on the
+ * player's root serves every back word (each carries its unit as kpHoldUnit), so a tap target keeps only its tap's own.
+ * Standalone pages have no host and no hold. */
 const HOLD_MS = 500, HOLD_RING_MS = 150, HOLD_MOVE = 9;
-function wireHold(node, unit) {
+function holdWord(root, target) {
+  for (let node = target; node && node !== root; node = node.parentNode) if (node.kpHoldUnit) return node;
+  return null;
+}
+function wireDeckHold(root) {
   let hold = null;
   const clear = () => {
     const h = hold;
@@ -1708,35 +1715,38 @@ function wireHold(node, unit) {
     h.done = true;
     clearTimeout(h.timer);
     clearTimeout(h.ringTimer);
-    node.kpHeldAt = Date.now();
-    void held(unit, node, { ring: h.ring });
+    h.node.kpHeldAt = Date.now();
+    void held(h.node.kpHoldUnit, h.node, { ring: h.ring });
   };
-  node.addEventListener('pointerdown', (e) => {
+  root.addEventListener('pointerdown', (e) => {
     clear();
     if (e.pointerType === 'mouse' || e.isPrimary === false || !ctx?.host?.take) return;
-    const h = { x: e.clientX, y: e.clientY, id: e.pointerId, ring: null, done: false };
+    const node = holdWord(root, e.target);
+    if (!node) return;
+    const h = { node, x: e.clientX, y: e.clientY, id: e.pointerId, ring: null, done: false };
     h.ringTimer = setTimeout(() => {
       if (hold === h && !h.done) h.ring = safely(() => globalThis.__KAIRO_HOLD_RING__?.(h.x, h.y) || null, null);
     }, HOLD_RING_MS);
     h.timer = setTimeout(() => commit(h), HOLD_MS);
     hold = h;
   });
-  node.addEventListener('pointermove', (e) => {
+  root.addEventListener('pointermove', (e) => {
     if (hold && !hold.done && e.pointerId === hold.id && Math.hypot(e.clientX - hold.x, e.clientY - hold.y) > HOLD_MOVE) clear();
   });
-  node.addEventListener('pointerup', (e) => {
+  root.addEventListener('pointerup', (e) => {
     if (!hold || e.pointerId !== hold.id) return;
-    if (hold.done) node.kpHeldAt = Date.now();
+    if (hold.done) hold.node.kpHeldAt = Date.now();
     clear();
   });
-  node.addEventListener('pointercancel', (e) => { if (hold && e.pointerId === hold.id) clear(); });
-  node.addEventListener('contextmenu', (e) => {
-    if (!ctx?.host?.take) return;
+  root.addEventListener('pointercancel', (e) => { if (hold && e.pointerId === hold.id) clear(); });
+  root.addEventListener('contextmenu', (e) => {
+    const node = holdWord(root, e.target);
+    if (!node || !ctx?.host?.take) return;
     e.preventDefault();
     // a touch hold some engines also report as a contextmenu is the same hold: one seal, never two
-    if (hold && !hold.done) { commit(hold); return; }
+    if (hold && !hold.done && hold.node === node) { commit(hold); return; }
     if (node.kpHeldAt && Date.now() - node.kpHeldAt < 1200) return;
-    void held(unit, node, { keyboard: !e.clientX && !e.clientY });
+    void held(node.kpHoldUnit, node, { keyboard: !e.clientX && !e.clientY });
   });
 }
 async function held(unit, node, { keyboard = false, ring = null } = {}) {
@@ -3075,6 +3085,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     prefs: prefsFor(storage, deck),
   };
   root.addEventListener('pointerdown', onDown, true);
+  wireDeckHold(root);
   ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));
   if (!sameDeck || start === false) {
     ui.screen = 'home';
