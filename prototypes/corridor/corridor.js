@@ -31993,6 +31993,14 @@ function dressStage(visit, stage, { word, label, token, kind, nodeFor, reading, 
     voice.lang = 'ja';
     voice.title = tx('読み上げる — 収録音声', 'Hear it — the recorded voice');
     voice.setAttribute('aria-label', voice.title);
+    // what the voice door said in this visit stays said: the stage drawn again (a return from the page, a redraw) shows it
+    if (plan.voiceSaid) {
+      voice.dataset.voiceUnavailable = plan.voiceSaid.state;
+      voice.title = plan.voiceSaid.title;
+    }
+    new MutationObserver(() => {
+      plan.voiceSaid = voice.dataset.voiceUnavailable ? { state: voice.dataset.voiceUnavailable, title: voice.title } : null;
+    }).observe(voice, { attributes: true, attributeFilter: ['data-voice-unavailable', 'title'] });
     voice.addEventListener('click', (event) => {
       event.stopPropagation();
       sayStageWord(voice, { surface: label, reading, manual: true });

@@ -1434,6 +1434,10 @@ try {
       await page.locator('#mini .mini-word').tap(); await pageSettled(page);
       await page.locator('#sheet-back').tap(); await bare(page);
       await delay(400);
+      const kept = await page.evaluate(() => { const voice = document.querySelector('#mini #mini-voice');
+        return { voice: !!voice, flag: voice?.dataset.voiceUnavailable || null, name: voice?.title || '' }; });
+      check('G4.voice.return-keeps', 'back from the page, the stage drawn again keeps what the voice door said: 音 still struck, its reason its name',
+        kept.voice && !!kept.flag && kept.flag === passive.flag && kept.name === passive.name, { passive, kept });
       const spy = await voiceSpy(page);
       check('G4.voice.never-device', 'recorded audio only: no device speech, no Audio made and nothing played without an admitted recording — on arrival, on 音, on a return from the page',
         spy.speak === 0 && spy.utterances === 0 && spy.audio === 0 && spy.plays === 0, spy);
