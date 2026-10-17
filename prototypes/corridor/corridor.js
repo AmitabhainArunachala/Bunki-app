@@ -35385,6 +35385,46 @@ function renderLayoutChoice() {
     'New layout: five places — Review, Bookshelf, Dictionary, Tests, Progress. Your cards are the same in both; switch back any time.')));
   return section;
 }
+/** Settings → 筆 and 声 (G4): when a word he brings closer writes itself (first meeting · always · never) and whether it is
+ * said in the recorded voice (on · off). Device choices, never the learner record. The writing's speed is not here: it
+ * is his one 書く速さ slider, in one place — the writing room — and this note says where. */
+function renderWritingChoice() {
+  const section = el('section', 'foundation-section settings-writing');
+  section.id = 'settings-writing';
+  section.append(el('h2', 'eyebrow', tx('筆と声', 'Writing and voice')));
+  const row = (id, ja, en, options, current, choose) => {
+    const line = el('div', 'settings-writing-row');
+    const name = el('p', 'settings-writing-name', tx(ja, en));
+    name.id = `${id}-name`;
+    const choices = el('div', 'lang-seg settings-layout-choice settings-writing-choice');
+    choices.id = id;
+    choices.setAttribute('role', 'group');
+    choices.setAttribute('aria-labelledby', name.id);
+    for (const [value, optionJa, optionEn] of options) {
+      const button = el('button', '', tx(optionJa, optionEn));
+      button.type = 'button';
+      button.dataset.value = value;
+      button.setAttribute('aria-pressed', String(current === value));
+      button.addEventListener('click', () => {
+        const chosen = choose(value);
+        for (const other of choices.querySelectorAll('button')) other.setAttribute('aria-pressed', String(other.dataset.value === chosen));
+      });
+      choices.append(button);
+    }
+    line.append(name, choices);
+    return line;
+  };
+  section.append(
+    row('settings-brush', '筆 — 語が自分で書かれる', '筆 — a word writes itself',
+      [['first', '初めての語', 'First meeting'], ['always', 'いつも', 'Always'], ['never', '書かない', 'Never']],
+      wordBrush(), (value) => setWordPref(WORD_BRUSH_KEY, 'wordBrush', WORD_BRUSH, value)),
+    row('settings-voice', '声 — 収録音声で読み上げる', '声 — say it in the recorded voice',
+      [['on', 'オン', 'On'], ['off', 'オフ', 'Off']],
+      wordVoice(), (value) => setWordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE, value)),
+    el('p', 'settings-layout-note', tx('書く速さは、書の間のスライダー一つで決まります。',
+      'The writing speed is set in one place: the writing room’s slider.')));
+  return section;
+}
 function renderSettings(main) {
   const places = placesLayout();
   main.append(el('p', 'eyebrow me-kicker', places ? tx('記録', 'Progress') : tx('私', 'Me')));
@@ -35445,7 +35485,7 @@ function renderSettings(main) {
     renderPortRow(record);
     const builder = el('section', 'foundation-section settings-builder');
     renderNoteDoor(builder);
-    main.append(language, renderLayoutChoice(), doors, pace, record, renderReportRelaySettings(), builder, about);
+    main.append(language, renderLayoutChoice(), renderWritingChoice(), doors, pace, record, renderReportRelaySettings(), builder, about);
     return;
   }
   doors.append(world,
@@ -35459,7 +35499,7 @@ function renderSettings(main) {
     foundationDoor('settings-backup', 'バックアップ', 'Backup', 'tray', showRecordBackup),
   );
   // K · one plain line under the Backup door: is this device keeping the record, and how full is it
-  main.append(language, renderLayoutChoice(), doors, recordKeepLine(), renderReportRelaySettings(), about);
+  main.append(language, renderLayoutChoice(), renderWritingChoice(), doors, recordKeepLine(), renderReportRelaySettings(), about);
 }
 function renderWordsDoors(main) {
   // the layout under test: the day's word, large, with its reading and the part its kanji share —
