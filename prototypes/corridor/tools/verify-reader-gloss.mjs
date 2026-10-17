@@ -154,8 +154,10 @@ const EDITS = Object.freeze({
     to: '  const rec = found;\n' }),
   altKept: Object.freeze({ file: 'corridor.js', from: 'r: node.reading || found.r, alt: found.alt === node.matchedHead ? null : found.alt }',
     to: 'r: node.reading || found.r, alt: found.alt }' }),
-  coreWrongEntry: Object.freeze({ file: 'corridor.js', from: '  if (D.dict[door.b]) return node;\n',
-    to: "  if (D.dict[door.b]) return { ...node, seq: '1254600' };\n" }),
+  // R2 (41cd22a6) · the core hit's line now also says "&& !door.unfit" (a kana verb read like the quick dictionary's noun
+  // never opens the noun's page); the mutation is unchanged: a core hit's full entry opened on 結う's row
+  coreWrongEntry: Object.freeze({ file: 'corridor.js', from: '  if (D.dict[door.b] && !door.unfit) return node;\n',
+    to: "  if (D.dict[door.b] && !door.unfit) return { ...node, seq: '1254600' };\n" }),
   captureInert: Object.freeze({ file: 'corridor.js', from: 'async function toggleTaken(node, label) {\n',
     to: 'async function toggleTaken(node, label) {\n  return false;\n' }),
   miniUnheld: Object.freeze({ file: 'corridor.js', from: "  const held = (reader && !D.dict[token.b]) || !g?.m?.some(meaning => typeof meaning === 'string' && meaning.trim());\n", to: '  const held = false;\n' }),
@@ -190,9 +192,12 @@ const CONTROLS = Object.freeze([
     witness: (rows) => (seen(rows, 'M.dare.chooser').candidates?.[0]?.head === 'たれ' ? '' : 'だれ did not list たれ first') }),
   Object.freeze({ name: 'c5', title: "the r3 overlay removed (lookup()'s own head and reading)", edits: ['noOverlay'], run: 'match',
     requires: ['M.iu.chooser', 'M.iu.choose', 'M.dare.chooser'],
-    // R2 · ゆけ's page is its named entry's own (no overlay): the overlay's chosen rows still die without it
+    // the overlay's chosen rows die without it
     kills: ['M.dare.tare', 'M.iu.yuu'],
-    allowed: [],
+    // R2 (Kimi 1632) · ゆけ's Full entry may open through D11's reading match (noteBy "reading") when the full dictionary has
+    // not yet named its entry on the door; that page's Save then rides the same overlay, so without it ゆけ's Save is held.
+    // Whether it does depends on which arrives first, so it may die here, never must
+    allowed: ['M.yuke.named'],
     witness: (rows) => (seen(rows, 'M.dare.tare').headword === 'だれ／垂れ・垂' && seen(rows, 'M.iu.yuu').headword === 'いう／結う'
       ? '' : '垂れ and 結う were not displayed under lookup()\'s heads だれ and いう') }),
   Object.freeze({ name: 'c9', title: "lookup()'s alt kept beside the chosen head (r4 reverted)", edits: ['altKept'], run: 'match',
