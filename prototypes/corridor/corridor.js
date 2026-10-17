@@ -8911,14 +8911,18 @@ function paintWordSave(button, on) {
   // a bar's Save names its word (the reader's keep: Save 総理 · Saved 総理 ✓)
   const word = button.dataset.saveWord || '';
   const all = button.dataset.saveAll || '';
-  // the reader's bar holds its Save as two lines in the bar's own type: the verb small over the word it keeps (Save /
-  // 総理), so a word of any length fits the bar's last 75 px beside its five doors
+  // Q · the reader's bar holds its Save on ONE line in the bar's own type, the verb and then the word it keeps (Save 総理).
+  // It never cuts and never wraps (Grok's walk: SAVE / a word, 保存 / 語をタ…): fitChromeKeep sheds the word, then the
+  // ✓, until the line fits the room the bar's doors leave; its accessible name always says the whole of it
   if (button.dataset.saveBar != null) {
+    const name = el('span', `save-bar-word${word ? '' : ' is-rest'}`, word || tx('語をタップ', 'a word'));
     button.replaceChildren(el('span', 'save-bar-verb', on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save')),
-      document.createTextNode(' '), el('span', 'save-bar-word', word || tx('語をタップ', 'a word')));
+      document.createTextNode(' '), name);
+    button.classList.remove('is-verb-only', 'is-short');
     button.classList.toggle('taken', on);
     button.setAttribute('aria-pressed', String(on));
     button.title = '';
+    if (button.isConnected) fitChromeKeep(button);
     return;
   }
   button.textContent = all
@@ -23223,6 +23227,30 @@ function syncChromeKeep() {
     return;
   }
   old.replaceWith(fresh);
+  fitChromeKeep(fresh);
+}
+/** Q · the bar's Save says as much as fits whole in the room its bar leaves it (it takes that room, flex 1, so touching
+ * a word never moves another door): the verb and the word (Save 総理 · Saved ✓ 総理); else the verb (Save · Saved ✓);
+ * else the verb without its ✓ (Saved · 保存済み). Never a cut word, never a second line (Q/DESIGN.md §2). */
+let chromeKeepFitting = false;
+function fitChromeKeep(button = document.getElementById('chrome-keep')) {
+  if (!button?.isConnected || button.dataset.saveBar == null) return;
+  if (!chromeKeepFitting) {
+    chromeKeepFitting = true;
+    window.addEventListener('resize', () => fitChromeKeep(), { passive: true });
+    document.fonts?.ready?.then(() => fitChromeKeep());
+  }
+  const verb = button.querySelector('.save-bar-verb');
+  if (!verb) return;
+  const on = button.getAttribute('aria-pressed') === 'true';
+  button.classList.remove('is-verb-only', 'is-short');
+  verb.textContent = on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save');
+  const fits = () => button.scrollWidth <= button.clientWidth + 0.5;
+  if (fits()) return;
+  button.classList.add('is-verb-only');
+  if (fits() || !on) return;
+  button.classList.add('is-short');
+  verb.textContent = tx('保存済み', 'Saved');
 }
 
 /** The capture node the reader's door commits: the word as encountered —
@@ -34851,6 +34879,7 @@ function render() {
   // in the layout under test Review is a station on the tab bar; the bookmark stands without it
   if (barDoors) chrome.append(trayBtn);
   if (!heroMode && !zenReview) root.append(chrome);
+  fitChromeKeep();
   enableTouchPress();
   buildPrimaryTabs(root);
   syncThemeColor();
