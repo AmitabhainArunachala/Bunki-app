@@ -67,6 +67,11 @@ const delay = (ms) => new Promise((done) => setTimeout(done, ms));
 
 // the story every part walks: its 総理, 大賞 and 令和8年 are the doors (R's fixture, verify-reading-truth)
 const STORY = Object.freeze({ id: 'kantei:jp-105-actions-202609-25startup', search: 'スタートアップ大賞' });
+// G5 · the story's own tokens, from the pinned build, so a layer's reading line is checked against the text's data
+const storyTokens = (() => {
+  const row = JSON.parse(readFileSync(resolve(site, 'data/articles/index.json'), 'utf8')).articles.find((article) => article.id === STORY.id);
+  return JSON.parse(readFileSync(resolve(site, 'data/articles', row.file.split('/').at(-1)), 'utf8')).tokens;
+})();
 const WORD = '総理';
 const WORLDS = Object.freeze(['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'keyblock', 'hakuu', 'kaku']);
 const FRAME_WINDOW = 1400;
@@ -1086,7 +1091,7 @@ try {
       await page.locator('#layers-mark').tap();
       await delay(300);
       const open = await g5Facts(page);
-      check('G5.layers.open', 'the 層 mark opens one paragraph’s layers', open.layers === 1 && open.layerBlock === 1, open);
+      check('G5.layers.mark-opens', 'the 層 mark opens one paragraph’s layers', open.layers === 1 && open.layerBlock === 1, open);
       // the paper beside the text: the reader's own margin, no word under it
       const paper = await page.evaluate(() => {
         const reader = document.getElementById('reader').getBoundingClientRect();
@@ -1285,15 +1290,23 @@ try {
       const open = await page.evaluate(() => {
         const node = document.querySelector('#reader > [data-layers="open"]');
         const words = node ? [...node.querySelectorAll('.tok[data-index] ruby')] : [];
+        // nothing is painted over the paragraph's words: its layers stand under it
         const shown = words.filter((ruby) => { const ink = getComputedStyle(ruby, '::before'); return ink.content !== 'none' && Number(ink.opacity) > 0.5; }).length;
         const block = document.getElementById('reader-layers');
-        return { open: document.querySelectorAll('[data-layers]').length, rubies: words.length, shown, block: !!block, text: block?.innerText || '',
+        return { open: document.querySelectorAll('[data-layers]').length, rubies: words.length, shown, block: !!block, after: node?.nextElementSibling === block,
+          indices: node ? [...node.querySelectorAll('.tok[data-index]')].map((tok) => Number(tok.dataset.index)) : [],
+          kana: block?.querySelector('.reader-layers-reading .reader-layers-kana')?.textContent ?? null,
+          meanings: block ? [...block.querySelectorAll('.reader-layers-meanings .reader-layers-ja')].map((word) => word.textContent) : [],
+          labels: block ? [...block.querySelectorAll('.reader-layers-label')].map((label) => label.textContent) : [],
           pressed: document.getElementById('layers-mark')?.getAttribute('aria-pressed'), index: [...document.querySelectorAll('#reader > [data-reader-prose]')].indexOf(node) };
       });
       const during = await geometry();
-      check('G5.layers.open', 'the 層 mark opens one paragraph: every reading over its words, and its words’ meanings under it', open.open === 1 && open.block && open.rubies > 0 &&
-        open.shown === open.rubies && open.text.length > 0 && open.pressed === 'true', open);
-      check('G5.layers.lines-hold', 'the paragraph’s own lines never move while its layers are open (readings over the words, not between the lines)',
+      // the reading line is the paragraph read in kana: each written piece by the text's own reading, kana and marks as written
+      const expectedKana = open.indices.map((index) => { const token = storyTokens[index]; return token?.f?.length ? token.f.map((pair) => pair.r || pair.t).join('') : token?.s ?? '\u0000'; }).join('');
+      check('G5.layers.open', 'the 層 mark opens one paragraph’s layers in one block under it: the paragraph read in kana, its words’ meanings, and nothing painted over its words',
+        open.open === 1 && open.block && open.after && open.rubies > 0 && open.shown === 0 && open.kana === expectedKana && open.meanings.length > 0 &&
+        open.labels[0] === '読' && open.labels[1] === '意' && open.pressed === 'true', { ...open, expectedKana });
+      check('G5.layers.lines-hold', 'the paragraph’s own lines never move while its layers are open (its layers stand under it)',
         open.index >= 0 && JSON.stringify(during.slice(0, open.index + 1)) === JSON.stringify(plain.slice(0, open.index + 1)), { open: open.index, plain: plain.slice(0, open.index + 1), during: during.slice(0, open.index + 1) });
       await page.screenshot({ path: resolve(evidence, `${engine}-G5-layers.png`) });
       // the layers, then a tap on a word: the layers fold, and the word's own ladder still runs
