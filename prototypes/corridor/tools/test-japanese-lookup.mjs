@@ -22,7 +22,10 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   // its headword is the match cut's source
   'slipAllowed', 'standingSlip', 'slipHeadword',
   // S (2026-10-16): the slip's Save is the one Save, built by one component (saveOne) for every keep in the app
-  'saveOne'];
+  'saveOne',
+  // R2 (2026-10-17): a reader word's sound change, at the lookup door and the reader's (Codex's f2e3015e review: 仏 ぶっ)
+  'soundChangeReadings', 'SOUND_VOICED', 'SOUND_PLAIN', 'kanjiReadingsOf', 'readerLookupAnswer', 'dictionaryAnsweredForm',
+  'soundChangeDoor', 'dictionaryRowsReadAs', 'readerReadingFits'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
@@ -34,6 +37,7 @@ const program = [...new Set(declarations.values())].join('\n');
 const dict = JSON.parse(readFileSync(new URL('../data/share_alike/dict.json', import.meta.url), 'utf8')).words;
 const words = JSON.parse(readFileSync(new URL('../data/share_alike/words.json', import.meta.url), 'utf8')).words;
 const index = JSON.parse(readFileSync(new URL('../data/share_alike/dict-v2/index.json', import.meta.url), 'utf8'));
+const kanjiTable = JSON.parse(readFileSync(new URL('../data/share_alike/kanji.json', import.meta.url), 'utf8')).kanji;
 const copy = value => JSON.parse(JSON.stringify(value));
 
 class Element {
@@ -88,9 +92,9 @@ class Element {
 const find = (node, className) => node.querySelector('.' + className);
 const text = value => new Element('#text', '', value);
 
-function app({ withIndex = true } = {}) {
+function app({ withIndex = true, withKanji = false } = {}) {
   const body = new Element('body'), opened = [], chosen = [], menus = [];
-  const D = { dict, words, kanji: {}, dictionaryIndex: withIndex ? index : null,
+  const D = { dict, words, kanji: withKanji ? copy(kanjiTable) : {}, dictionaryIndex: withIndex ? index : null,
     dictionaryByForm: new Map(), dictionaryCompleteForms: new Set(), dictionaryBySeq: new Map() };
   const document = { body, querySelectorAll: selector => body.querySelectorAll(selector),
     getElementById: id => body.querySelector(`#${id}`),
@@ -239,4 +243,27 @@ test('Each prose block is one Tab stop of plain-word names sharing one keyboard 
   assert.equal(help.length, 1);
   assert.equal(help[0].hidden, true);
   assert(!root.textContent.includes(help[0].textContent), 'The help stays outside the prose it describes');
+});
+
+test('R2 · a sound change keeps the text\'s voicing first: 仏 read ぶっ is the kanji (its on\'yomi ぶつ), never 仏 ふつ, France', () => {
+  const f = app({ withKanji: true });
+  f.context.D.dictionaryMode = 'main';
+  const plain = (value) => (value ? JSON.parse(JSON.stringify(value)) : value);
+  const answer = (word, reading) => plain(f.context.readerLookupAnswer(word, { reading }));
+  const door = (word, reading) => plain(f.context.soundChangeDoor({ s: word, b: word, r: reading, p: '名詞', c: true }));
+  // the premise: the quick dictionary reads 仏 ふつ, "France"; no entry reads 仏 ぶつ (nor ぶっ); ぶつ is one of 仏's on'yomi
+  assert.equal(dict['仏'].r, 'ふつ');
+  assert.equal(dict['仏'].m[0], 'France');
+  assert(!index.entries.some((row) => (row[1] === '仏' || row[4].includes('仏')) && row[5].some((kana) => ['ぶつ', 'ぶっ'].includes(kana))));
+  assert(kanjiTable['仏'].on.includes('ブツ'));
+  // the lookup door and the reader's door: the kanji, never the voicing change's France
+  assert.deepEqual(answer('仏', 'ぶっ'), { kanjiOnly: true });
+  assert.deepEqual(door('仏', 'ぶっ'), { s: '仏', b: '仏', r: 'ぶっ', p: '名詞', c: true, kanjiOnly: true });
+  // the same rule still restores what the text's voicing allows, and a voicing change where nothing else does (so a door
+  // answering nothing cannot pass): 一 read いっ is 一 いち, 本 read ぽん is 本 ほん; 仏 read ぶつ stays the kanji
+  assert.deepEqual(answer('一', 'いっ'), { reading: 'いち', shown: 'いっ' });
+  assert.deepEqual(answer('本', 'ぽん'), { reading: 'ほん', shown: 'ぽん' });
+  assert.deepEqual(answer('仏', 'ぶつ'), { kanjiOnly: true });
+  assert.deepEqual(door('一', 'いっ'), { s: '一', b: '一', r: 'いち', p: '名詞', c: true, shown: 'いっ' });
+  assert.deepEqual(door('本', 'ぽん'), { s: '本', b: '本', r: 'ほん', p: '名詞', c: true, shown: 'ぽん' });
 });
