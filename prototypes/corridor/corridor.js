@@ -23241,9 +23241,10 @@ function meHelpLine() {
   const since = signal ? meDate(new Date(signal.since), true) : null;
   const month = signal?.months[0];
   if (!month) {
-    line.textContent = since
+    // Q · through the one word rule (flowText), as every line the app sets: it broke 読み終｜えた at 320
+    flowText(line, since
       ? tx(`千字あたりの手助けは、次に読み終えた記事から数える（${since}から）。`, `Help per 1,000 characters counts from the next article you finish (since ${since}).`)
-      : tx('千字あたりの手助けは、次に読み終えた記事から数える。', 'Help per 1,000 characters counts from the next article you finish.');
+      : tx('千字あたりの手助けは、次に読み終えた記事から数える。', 'Help per 1,000 characters counts from the next article you finish.'));
     return line;
   }
   const [year, mm] = month.month.split('-').map(Number);

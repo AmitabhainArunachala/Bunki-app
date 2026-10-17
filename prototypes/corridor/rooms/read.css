@@ -716,6 +716,12 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
   --mini-gold: var(--tone-gold);
   --mini-edge: color-mix(in srgb, var(--tone-gold) 34%, transparent);
   --mini-rule: color-mix(in srgb, var(--color-ink) 14%, transparent);
+  /* Q · the slip's own outer edge is its lit hairline, so it stands as a figure wherever placeFloating seats it (C2). At
+     64 % the house gold, laid over the slip's raised paper, reads at least 3:1 against every ground a night world
+     paints, from its deepest coat to that raised paper (浪 is the closest, 3.49:1). At 34 % it read 2.82–2.9:1 in
+     夜, 浪 and 白雨. The slip's inner rules keep --mini-edge. */
+  --mini-lit-edge: color-mix(in srgb, var(--tone-gold) 64%, transparent);
+  border-color: var(--mini-lit-edge);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 3px 8px -3px rgb(0 0 0 / 55%),
     0 16px 48px -14px rgb(0 0 0 / 62%);
 }

@@ -220,7 +220,8 @@ const CONTROLS = Object.freeze([
       ? '' : 'a door captured something') }),
   // S · the bar's keep reads the slip's own save facts (chromeKeepTarget → wordSaveFacts), so the hold this removes is the
   // bar's too: G5.bar-none (the bar's one keep held with the word) now dies with the mini's hold — it was a prerequisite
-  // while the bar carried no Save
+  // while the bar carried no Save. Q · G5.bar-none reads the bar as いう is selected, before the mini's capture: after
+  // it, G2's identity rule holds the bar on its own (a conflict), and c8 survived (INT smoke-3)
   Object.freeze({ name: 'c8', title: "the mini's hold removed for a core miss", edits: ['miniUnheld'], run: 'held',
     requires: ['G5.iu-chooser-held'],
     kills: ['G5.mini-held', 'G5.bar-none', 'G5.after-iu'],
@@ -760,7 +761,11 @@ async function heldRun(open, rec) {
     await openArticle(page, IU.passage);
     const before = await installedRecord(page);
     await openPopup(page, IU);
-    const mini = (await captureState(page)).mini;
+    // Q · the bar is read as いう is selected, before any press, and again after the mini's. Once the mini lets a capture
+    // through (c8), G2's identity rule holds the bar's keep (a saved いう against an entry not yet named is a conflict),
+    // so only the first reading shows the hold c8 removes
+    const selected = await captureState(page);
+    const mini = selected.mini;
     once('G5.mini-held', `G5 ${at(IU)}: the miss-state mini holds its 覚 and shows why`, mini?.takeDisabled === true && mini.held
       && mini.describedBy === 'mini-take-reason' && mini.reasonVisible && mini.reason === 'So it can’t be saved here.', JSON.stringify(mini), { mini });
     await press(page, '#mini-take');
@@ -771,7 +776,8 @@ async function heldRun(open, rec) {
     // S · it pinned "the bar carries no Save"; the new truth: the bar's one keep names the word and is held with it (its press
     // says why, as the mini does); no panel
     once('G5.bar-none', `G5 with ${IU.token.s} selected, the bar's one keep is held with the word and no panel opens: the reason lives in the mini`,
-      bar.saves.length === 1 && bar.saves[0] === 'chrome-keep' && bar.keep?.one && bar.keep.held && !bar.panel, JSON.stringify(bar), { bar });
+      [selected.bar, bar].every((b) => b.saves.length === 1 && b.saves[0] === 'chrome-keep' && b.keep?.one && b.keep.held && !b.panel),
+      JSON.stringify({ selected: selected.bar, afterPress: bar }), { bar, selected: selected.bar });
     await fullEntry(page, IU);
     await settleSheet(page);
     await press(page, '#sheet-take');
@@ -974,8 +980,9 @@ try {
         mini?.word === IU.token.b && IU.token.r === IU.token.b && mini.reading === null
           // R2: the full dictionary's answer (SEVERAL, never the MISS line). Q (the comb): its Japanese is set by the app's one
           // word rule (a <wbr> between words, a word holding a mark in a no-break .ja-unit, the line marked .ja-flow), and
-          // nothing else may differ
-          && wordRuleOff(mini.gloss) === `<span class="mini-gloss mini-miss${lang === 'ja' ? ' ja-flow' : ''}">${SEVERAL[lang]}</span>`
+          // nothing else may differ. SEVERAL names its Japanese heads in both languages (結う · 言う), so the line is
+          // .ja-flow in both
+          && wordRuleOff(mini.gloss) === `<span class="mini-gloss mini-miss ja-flow">${SEVERAL[lang]}</span>`
           && !mini.text.includes(MISS[lang])
           && !/no gloss yet|語釈なし|No dictionary entry for this spelling\.|この表記の辞書項目はありません。/u.test(mini.text), JSON.stringify(mini), { id: `G2.${lang}.popup` });
       check(`G2 ${lang}: prose keeps its surface and plain word name with keyboard instructions`,
