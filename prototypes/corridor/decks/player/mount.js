@@ -2438,20 +2438,33 @@ function ghostOf(face, dir) {
   const rect = face.getBoundingClientRect();
   const node = face.cloneNode(true);
   stripCloneIdentity(node);
+  // a still copy: nothing inside it fades in again while it leaves
   node.classList.remove('kp-arrive');
+  for (const moving of node.querySelectorAll('.kp-enter, .kp-arrive')) moving.classList.remove('kp-enter', 'kp-arrive');
   node.classList.add('kp-ghost', `kp-out-${dir}`);
   node.style.transform = '';
   node.setAttribute('aria-hidden', 'true');
   node.inert = true;
   return { node, rect };
 }
+let arrivalSerial = 0;
 function arrive(ghost, dir) {
   const box = ctx.root.querySelector('.kp-study');
   if (!box) return; // the done screen
   if (dir) box.dataset.advance = dir;
   const card = box.querySelector('#kp-card');
-  card?.classList.add('kp-arrive');
-  setTimeout(() => card?.classList.remove('kp-arrive'), 200);
+  if (card) {
+    // the arrival's class leaves with its own animation (or, bounded, its computed length), never a later card's:
+    // each paint builds a new card, and a reveal that keeps this one cancels the wait
+    card.classList.add('kp-arrive');
+    const arrival = ++arrivalSerial;
+    const settle = () => { if (card.dataset.arrival === String(arrival)) { card.classList.remove('kp-arrive'); delete card.dataset.arrival; } };
+    card.dataset.arrival = String(arrival);
+    card.addEventListener('animationend', (e) => { if (e.target === card) settle(); });
+    const cs = getComputedStyle(card);
+    const ms = (v) => (String(v).trim().endsWith('ms') ? parseFloat(v) : parseFloat(v) * 1000) || 0;
+    setTimeout(settle, ms(cs.animationDuration) + ms(cs.animationDelay) + 60);
+  }
   if (!motionOk()) return;
   // もう一度: one brief 朱 slash across the screen as the answered card leaves (inert, removed after)
   if (dir === 'again') {
@@ -2467,7 +2480,8 @@ function arrive(ghost, dir) {
   Object.assign(ghost.node.style, { top: `${ghost.rect.top - at.top}px`, left: `${ghost.rect.left - at.left}px`, width: `${ghost.rect.width}px`, height: `${ghost.rect.height}px` });
   box.append(ghost.node);
   const drop = () => ghost.node.remove();
-  ghost.node.addEventListener('animationend', drop, { once: true });
+  // its own leave ends it (an animation that ends inside the copy does not), or, bounded, 400 ms
+  ghost.node.addEventListener('animationend', (e) => { if (e.target === ghost.node) drop(); });
   setTimeout(drop, 400);
 }
 

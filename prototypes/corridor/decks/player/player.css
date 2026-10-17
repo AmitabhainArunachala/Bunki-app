@@ -306,7 +306,6 @@
 /* 研ぎ出し: each reading surfaces as the polish band passes it (mount.js polish() sets --kp-rt-delay, 0–60 ms, by place) */
 .kp-sentence.kp-enter rt { animation: kp-fade var(--motion-ma, 120ms) var(--ease-enter, ease-out) var(--kp-rt-delay, 40ms) both; }
 .kp-answer.kp-enter { animation: kp-rise var(--motion-fast, 180ms) var(--ease-enter, ease-out) both; }
-.kp-card.kp-arrive { animation: kp-arrive var(--motion-fast, 180ms) var(--ease-enter, ease-out) both; }
 .kp-study { position: relative; overflow-anchor: none; }
 .kp .kp-study.kp-reveal-hold { position: fixed; z-index: 5; margin: 0; pointer-events: none; background: var(--kp-stage); animation: kp-fade-out var(--motion-ma, 120ms) linear both; }
 .kp-reveal-hold *, .kp-reveal-hold *::before, .kp-reveal-hold *::after { pointer-events: none !important; animation: none !important; transition: none !important; }
@@ -314,15 +313,22 @@
 .kp-screen-hold *, .kp-screen-hold *::before, .kp-screen-hold *::after { pointer-events: none !important; animation: none !important; transition: none !important; }
 .kp .kp-screen-enter { animation: kp-fade var(--motion-fast, 180ms) var(--ease-enter, ease-out) both; }
 .kp .kp-answer .kp-fold[open] > :not(summary) { animation: kp-rise var(--motion-quick, 160ms) var(--ease-enter, ease-out) both; }
-.kp-ghost { position: absolute; margin: 0; pointer-events: none; z-index: 1; }
-.kp-ghost.kp-out-good { animation: kp-out-good var(--motion-ma, 120ms) var(--ease-exit, ease-in) both; }
-.kp-ghost.kp-out-again { animation: kp-out-again var(--motion-ma, 120ms) var(--ease-exit, ease-in) both; }
+/* F · the next card arrives the way the last one left (contract §3): one pair of keyframes. A grade sends the
+   answered card 24 px the way it was thrown — Good to the right, as the swipe throws it; Again to the left — while
+   it fades (card-leave), and the next card comes in on the same line of travel, from the other side, in the same
+   beat (card-arrive), so the deck moves one way. No grade (the first card) is a plain fade. Reduced motion: no
+   ghost and no travel, the next card fades in 100 ms (below). */
+.kp-ghost { position: absolute; margin: 0; pointer-events: none; z-index: 1; animation: card-leave var(--motion-quick, 160ms) var(--ease-exit, ease-in) both; }
+.kp-ghost.kp-out-good { --card-dx: 24px; }
+.kp-ghost.kp-out-again { --card-dx: -24px; }
+.kp-card.kp-arrive { animation: card-arrive var(--motion-quick, 160ms) var(--ease-enter, ease-out) both; }
+.kp-study[data-advance='good'] .kp-card.kp-arrive { --card-dx: -24px; }
+.kp-study[data-advance='again'] .kp-card.kp-arrive { --card-dx: 24px; }
 @keyframes kp-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes kp-fade-out { from { opacity: 1; } to { opacity: 0; } }
 @keyframes kp-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-@keyframes kp-arrive { from { opacity: 0.4; transform: scale(0.98); } to { opacity: 1; transform: none; } }
-@keyframes kp-out-good { to { opacity: 0; transform: translateX(24px); } }
-@keyframes kp-out-again { to { opacity: 0; transform: translateX(-24px); } }
+@keyframes card-leave { to { opacity: 0; transform: translateX(var(--card-dx, 0px)); } }
+@keyframes card-arrive { from { opacity: 0; transform: translateX(var(--card-dx, 0px)); } }
 /* Reduced motion keeps the held frame, with a short opacity crossfade and no movement. */
 /* the deck's own reduced-motion contract (it stands alone on the frozen study pages, outside the corridor's one rule) */
 @media (prefers-reduced-motion: reduce) {
