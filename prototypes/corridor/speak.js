@@ -88,6 +88,12 @@ export function createSpeakRoom(host) {
     lastTakeEnd: 0, lastGesture: 0, voiceRetired: false, unlocked: false, ctx: null, workletReady: null, take: null,
     micDenied: false, offline: false, requests: new Set(), playToken: 0, playing: null, keep: null, pastOpen: null,
     shadow: null, savedLines: null, epoch: 0, wavInfo: null, lastHeard: null, gum: 0,
+    // cancellation generations: a voice job or a pending microphone belongs to the generation that started it
+    voiceGen: 0, captureGen: 0,
+    // accounting fails closed: a cost the device could not record is held here and blocks new paid work
+    unrecorded: 0, accountingFailed: false,
+    // one turn at a time, from the ring or the typed line
+    turnBusy: false, turnToken: 0,
   };
   let els = {};
   let silentUrl = null;
@@ -128,13 +134,27 @@ export function createSpeakRoom(host) {
     return Object.freeze({ endpoint, origin, key, ears, lock });
   }
   const spend = () => readJson(SPEND_KEY);
+  /** A device write counts only when it reads back: a storage that throws, or silently keeps the old value, fails. */
+  function persistSpend(next) {
+    if (!writeJson(SPEND_KEY, next)) return false;
+    const back = readJson(SPEND_KEY);
+    return !!back && back.month === next.month && back.usd === next.usd && back.cap === next.cap;
+  }
+  /** Every cost is owed to the meter until the device holds it. */
   function addCost(model, usage) {
-    const usd = core.usageCost(model, usage);
-    const next = core.addSpend(spend(), usd ?? 0);
-    writeJson(SPEND_KEY, next);
-    if (st.session) st.session.cost += usd ?? 0;
+    const usd = core.usageCost(model, usage) ?? 0;
+    if (st.session) st.session.cost += usd;
+    st.unrecorded += usd;
+    flushSpend();
     paintCost();
     return usd;
+  }
+  /** Write what is owed; true only when the device holds every cost so far. Until then no new paid work starts. */
+  function flushSpend() {
+    if (st.unrecorded <= 0 && !st.accountingFailed) return true;
+    if (persistSpend(core.addSpend(spend(), st.unrecorded))) { st.unrecorded = 0; st.accountingFailed = false; return true; }
+    st.accountingFailed = true;
+    return false;
   }
 
   /* ---------------------------------------------------------------- requests */
@@ -181,13 +201,14 @@ export function createSpeakRoom(host) {
   }
   /** The room stops its own requests (the talk ended, the room was left): an abort, never a failed voice. */
   function abortRequests() {
+    st.voiceGen += 1;
     for (const controller of st.requests) { controller.byRoom = true; controller.abort(); }
     st.requests.clear();
   }
 
   /** Ears and brain: one call per turn. Returns the parsed turn and its usage; an English reply outside Bridge is asked
    * once more, then shown as text with a quiet note. */
-  async function brain({ mode, wav = null, typed = null, target = null }) {
+  async function brain({ mode, wav = null, typed = null, target = null, live = null }) {
     const tp = transport();
     if (!tp.key) throw failure(0, null, 'no-key');
     const s = st.session;
@@ -206,6 +227,8 @@ export function createSpeakRoom(host) {
     let englishNote = false;
     const replyText = answer.turn.reply.text;
     if (mode !== 'bridge' && replyText && !core.isJapaneseLine(replyText)) {
+      // asked again only while the turn's session is still the room's
+      if (live && !live()) throw failure(0, null, 'aborted');
       const again = await ask('Your last reply was not in Japanese. Reply only in Japanese.');
       if (again.turn) answer = { ...again, ms: answer.ms + again.ms, usd: (answer.usd || 0) + (again.usd || 0), asked: 2 };
       englishNote = !answer.turn.reply.text || !core.isJapaneseLine(answer.turn.reply.text);
@@ -219,10 +242,13 @@ export function createSpeakRoom(host) {
     const tp = transport();
     const name = core.voiceFor(line.speaker || 'main', st.scene, tp.lock);
     const sentences = splitLine(line);
+    const gen = st.voiceGen;
     line.voice = [];
     let previous = Promise.resolve();
     for (const sentence of sentences) {
       const job = previous.then(async () => {
+        // the room was left, the talk ended or the scene changed since this line was queued: nothing more is asked
+        if (gen !== st.voiceGen) { line.aborted = true; return null; }
         if (!name || st.voiceRetired || !tp.key || st.offline) return null;
         const text = core.voiceText(sentence.tokens, sentence.text, (token) => readingTrap(token));
         try {
@@ -372,8 +398,11 @@ export function createSpeakRoom(host) {
   /** The ring opens to listen: getUserMedia now and only now; the track is stopped at the end of every take. */
   async function startListening() {
     if (st.take || st.phase === 'listening') return;
-    if (!navigator.mediaDevices?.getUserMedia) { st.micDenied = true; setStatus('mic-missing'); setPhase('rest'); return; }
+    if (!navigator.mediaDevices?.getUserMedia) { st.micDenied = true; st.typeOnly = true; setStatus('mic-missing'); setPhase('rest'); return; }
     const epoch = st.epoch;
+    const capture = ++st.captureGen;
+    // still wanted: the same capture, the same session, the ring still listening and the page in view
+    const wanted = () => capture === st.captureGen && epoch === st.epoch && st.phase === 'listening' && !document.hidden;
     setPhase('listening');
     let stream = null;
     try {
@@ -385,11 +414,12 @@ export function createSpeakRoom(host) {
         st.ctx = makeContext();
         await st.ctx.resume().catch(() => {});
       }
+      if (!wanted()) return;
       st.gum += 1;
       stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true } });
-      if (epoch !== st.epoch || st.phase !== 'listening') { stream.getTracks().forEach((track) => track.stop()); return; }
+      if (!wanted()) { stream.getTracks().forEach((track) => track.stop()); return; }
       await ensureWorklet(st.ctx);
-      if (epoch !== st.epoch || st.phase !== 'listening') { stream.getTracks().forEach((track) => track.stop()); return; }
+      if (!wanted()) { stream.getTracks().forEach((track) => track.stop()); return; }
       const source = st.ctx.createMediaStreamSource(stream);
       const node = new AudioWorkletNode(st.ctx, 'speak-take');
       const take = { stream, source, node, chunks: [], rate: st.ctx.sampleRate, started: performance.now(), level: 0, flushed: null };
@@ -406,6 +436,7 @@ export function createSpeakRoom(host) {
       }
       st.take = take;
       st.micDenied = false;
+      st.typeOnly = false;
       if (st.status?.kind === 'mic-denied' || st.status?.kind === 'interrupted') setStatus(null);
       levelLoop(take);
     } catch (error) {
@@ -414,6 +445,7 @@ export function createSpeakRoom(host) {
       st.micError = `${stream ? 'graph' : 'getUserMedia'}: ${error?.name || 'Error'}: ${String(error?.message || '').slice(0, 120)}`;
       if (epoch !== st.epoch) return;
       st.micDenied = !stream && (error?.name === 'NotAllowedError' || error?.name === 'SecurityError');
+      st.typeOnly = !stream;
       setStatus(st.micDenied ? 'mic-denied' : 'mic-missing');
       setPhase('rest');
     }
@@ -450,13 +482,14 @@ export function createSpeakRoom(host) {
   }
   /** Something outside the room took the microphone or the page: the take is discarded and the ring rests. */
   function interrupt(kind) {
+    st.captureGen += 1;
     if (st.take) void endTake(false);
     if (st.phase === 'listening') setPhase('rest');
     setStatus(kind);
   }
 
   /* ---------------------------------------------------------------- sessions and turns */
-  async function startSession() {
+  async function startSession({ tapped = false } = {}) {
     const scene = st.scene;
     const epoch = st.epoch;
     const id = core.sessionId();
@@ -468,6 +501,7 @@ export function createSpeakRoom(host) {
     st.session = {
       id, contextRef: `speak:${id}`, lines: [], plants: core.selectPlants(learning), notes, avoid, level: host.level?.() || null,
       reached: [], bridges: [], used: new Set(), looked: new Set(), remember: [], cost: 0, xid: 0, ended: false, opened: false, savedNotes: [],
+      notesFailed: null, firstTapDone: tapped,
     };
     paintAll();
     void openLine();
@@ -480,8 +514,8 @@ export function createSpeakRoom(host) {
     s.opened = true;
     const epoch = st.epoch;
     try {
-      const answer = await brain({ mode: 'open' });
-      if (epoch !== st.epoch || s !== st.session) return;
+      const answer = await brain({ mode: 'open', live: () => epoch === st.epoch && s === st.session && !s.ended });
+      if (epoch !== st.epoch || s !== st.session || s.ended) return;
       const line = addLine({ who: answer.turn.reply.speaker === 'second' ? 'second' : 'kore', kind: 'opening', text: answer.turn.reply.text,
         tokens: answer.turn.reply.tokens, speaker: answer.turn.reply.speaker, englishNote: answer.englishNote });
       const xid = nextXid();
@@ -489,6 +523,8 @@ export function createSpeakRoom(host) {
         row('assistant', line.text, answer.model, xid),
         row('app', JSON.stringify({ kind: 'opening', text: line.text, scene: st.scene.id, ms: answer.ms, usage: answer.usage }), answer.model, xid),
       ], [], xid);
+      // the record answered: if the room was left, the talk ended or the scene changed meanwhile, her voice is not asked
+      if (epoch !== st.epoch || s !== st.session || s.ended) return;
       voiceLine(line);
       if (st.waitingForOpening) { st.waitingForOpening = false; void speakThenListen(line); }
     } catch (error) {
@@ -524,31 +560,47 @@ export function createSpeakRoom(host) {
   // the ring opens on its own only when the next turn could be sent: never a microphone for a turn the cap or a missing
   // key would refuse
   const autoListenAllowed = () => !st.layer && Date.now() - Math.max(st.lastTakeEnd, st.lastGesture) < AUTO_LISTEN_MS && !st.micDenied &&
-    st.session && !st.session.ended && !st.offline && !!transport().key && core.spendAllows(spend());
+    st.session && !st.session.ended && !st.offline && !!transport().key && !st.accountingFailed && core.spendAllows(spend());
   function canRequest() {
     if (st.offline || navigator.onLine === false) { st.offline = true; setStatus('offline'); return false; }
     if (!transport().key) { setStatus('no-key'); return false; }
+    if (!flushSpend()) { setStatus('accounting'); return false; }
     if (!core.spendAllows(spend())) { setStatus(Number(spend()?.cap) > 0 ? 'cap' : 'no-cap'); return false; }
     if (!host.recordWritable()) { setStatus('record'); return false; }
     return true;
   }
 
+  /** The one way into a turn, for the ring and the typed line alike: refused while a turn is in flight, so two never
+   * overlap and none answers on stale context. Returns whether the turn was taken. */
+  function startTurn(input) {
+    if (st.turnBusy) return false;
+    const token = ++st.turnToken;
+    st.turnBusy = true;
+    void turn(input).finally(() => {
+      if (st.turnToken !== token) return;
+      st.turnBusy = false;
+      if (st.status?.kind === 'still-answering') setStatus(null);
+      else paintStatus();
+    });
+    return true;
+  }
   /** One turn: his take (or typed line) → ears and brain → his line as heard, her reply → one atomic write → her voice. */
   async function turn({ wav = null, pcm16k = null, typed = null }) {
     const s = st.session;
-    if (!s || !canRequest()) { setPhase('rest'); return; }
+    if (!s || s.ended || !canRequest()) { setPhase('rest'); return; }
     const epoch = st.epoch;
     const mode = st.mode === 'bridge' ? 'bridge' : st.mode === 'sayit' ? 'sayit' : st.mode === 'shadow' ? 'shadow' : 'talk';
     const target = mode === 'sayit' ? s.bridgeLine?.text : mode === 'shadow' ? st.shadow?.line?.text : null;
     setPhase('thinking');
     let answer;
     try {
-      answer = await brain({ mode, wav, typed, target });
+      answer = await brain({ mode, wav, typed, target, live: () => epoch === st.epoch && s === st.session && !s.ended });
     } catch (error) {
       if (epoch === st.epoch) { setPhase('rest'); failTurn(error); }
       return;
     }
-    if (epoch !== st.epoch || s !== st.session) return;
+    const live = () => epoch === st.epoch && s === st.session && !s.ended;
+    if (!live()) return;
     setStatus(null);
     const tr = answer.turn;
     if (mode === 'shadow') return shadowResult(tr, pcm16k, answer);
@@ -583,7 +635,8 @@ export function createSpeakRoom(host) {
     }
     // the evidence: what his own line proves, gated by the host (dictionary or deck confirms the subject) to four rows
     const found = [];
-    for (const c of tr.corrections) if (c.subject) found.push({ kind: 'sensei', subject: c.subject, subjectType: c.subjectType || 'word', polarity: 1, code: c.code });
+    // a correction without a type stays without one: the gate admits only an explicit word or kanji
+    for (const c of tr.corrections) if (c.subject) found.push({ kind: 'sensei', subject: c.subject, subjectType: c.subjectType, polarity: 1, code: c.code });
     for (const r of tr.reached) found.push({ kind: 'sensei', subject: r.word, subjectType: 'word', polarity: 1, code: 'prod-gap' });
     for (const w of usedNow) found.push({ kind: 'sensei', subject: w, subjectType: 'word', polarity: 3, code: 'prod-gap' });
     const xid = nextXid();
@@ -596,10 +649,11 @@ export function createSpeakRoom(host) {
       row('app', JSON.stringify(analysis), answer.model, xid),
     ], found, xid);
     if (!saved?.ok) setStatus('not-saved');
-    if (epoch !== st.epoch) return;
+    if (!live()) return;
     voiceLine(reply);
     paintScript();
-    await speakThenListen(reply);
+    // the turn is done once her voice is asked for; she speaks and the ring listens again outside the turn lock
+    void speakThenListen(reply);
   }
   function readingOf(line) {
     return Array.isArray(line?.tokens) ? line.tokens.map((token) => token.r || token.s).join('') : core.kana(line?.text || '');
@@ -623,6 +677,15 @@ export function createSpeakRoom(host) {
     if (phase === 'thinking') return;
     if (!st.session) return;
     if (st.mode === 'shadow' && st.shadow) { void shadowPlay(); return; }
+    if (st.session.ended) {
+      // the talk was ended: this tap begins a new one in the same scene, her opening said as soon as it comes
+      leaveSession();
+      if (!canRequest()) return;
+      st.waitingForOpening = true;
+      setPhase('thinking');
+      void startSession({ tapped: true });
+      return;
+    }
     const s = st.session;
     const opening = s.lines.find((line) => line.kind === 'opening');
     if (opening && !s.firstTapDone) {
@@ -642,7 +705,7 @@ export function createSpeakRoom(host) {
     if (!result) { setPhase('rest'); return; }
     if (result.pcm16k.length < 1600) { setPhase('rest'); setStatus('too-short'); return; }
     if (st.mode === 'shadow' && st.shadow) st.shadow.mine = result.pcm16k;
-    await turn(result);
+    if (!startTurn(result)) { setPhase('rest'); setStatus('still-answering'); }
   }
   function setPhase(phase) {
     st.phase = phase;
@@ -686,6 +749,7 @@ export function createSpeakRoom(host) {
   }
   async function shadowResult(tr, mine, answer) {
     const line = st.shadow?.line;
+    const epoch = st.epoch, shadow = st.shadow;
     if (!line) { setPhase('rest'); return; }
     const targetKana = readingOf(line);
     const check = core.moraDiff(tr.heardKana || core.kana(tr.heard), targetKana, { targetTokens: line.tokens });
@@ -702,6 +766,7 @@ export function createSpeakRoom(host) {
         herSeconds = at16.length / 16000;
       }
     } catch { hers = null; }
+    if (epoch !== st.epoch || shadow !== st.shadow) return;
     const his = mine ? core.pitchTrack(mine, 16000) : null;
     st.shadow.result = { heard: tr.heard, heardKana: tr.heardKana, check, his, hers, mySeconds: mine ? mine.length / 16000 : null, herSeconds };
     const xid = nextXid();
@@ -729,17 +794,24 @@ export function createSpeakRoom(host) {
     abortRequests();
     s.ended = true;
     st.mode = 'talk';
-    // Kore will remember: what he said about himself, written as notebook rows he can take back with 消す
-    if (!s.notesWritten && s.remember.length) {
-      s.notesWritten = true;
-      const rows = s.remember.slice(0, 3).map((text, i) => {
-        const id = `${s.id}-${i}`;
-        s.savedNotes.push({ id, text, removed: false });
-        return { surface: 'speak-notes', role: 'app', content: JSON.stringify({ op: 'add', id, text }), ts: Date.now(), contextRef: s.contextRef };
-      });
-      await host.commitTurn(rows, [], null);
-    }
+    // Kore will remember what he said about himself — once the record has taken it (a second 了 tries again)
+    await saveNotes(s);
+    if (s !== st.session) return;
     openLayer('lookback');
+  }
+  /** The notebook rows for what he said about himself, at most three, written in one acknowledged write. Only an
+   * acknowledged write makes a note "remembered"; a failed one stays pending with a way to try again. */
+  async function saveNotes(s) {
+    const pending = s.remember.slice(0, 3).map((text, i) => ({ id: `${s.id}-n${i}`, text }))
+      .filter((note) => !s.savedNotes.some((kept) => kept.id === note.id));
+    if (!pending.length) { s.notesFailed = null; return true; }
+    const rows = pending.map((note) => ({ surface: 'speak-notes', role: 'app', content: JSON.stringify({ op: 'add', id: note.id, text: note.text }),
+      ts: Date.now(), contextRef: s.contextRef }));
+    const result = await host.commitTurn(rows, [], null);
+    if (!result?.ok) { s.notesFailed = pending; return false; }
+    for (const note of pending) s.savedNotes.push({ ...note, removed: false });
+    s.notesFailed = null;
+    return true;
   }
   async function removeNote(note, button) {
     if (note.removed) return;
@@ -1110,6 +1182,8 @@ export function createSpeakRoom(host) {
     error: ['Kore と話せませんでした。言ったことは残っています。', 'Kore couldn’t answer. Nothing you said is lost.'],
     'voice-replaced': ['Kore の声は入れ替えの途中です。文字はそのまま続きます。', 'Kore’s voice is being replaced. The words go on.'],
     'not-saved': ['この一往復は記録に残せませんでした。', 'This turn wasn’t saved to your record.'],
+    accounting: ['この端末に費用を記録できませんでした。記録できるまで、次の一往復は始めません。', 'This device couldn’t record what the last turn cost. The next turn waits until it can.'],
+    'still-answering': ['Kore がまだ答えています。書いたことはそのまま残っています。', 'Kore is still answering. What you wrote is still here.'],
   };
   function setStatus(kind, detail = {}) {
     st.status = kind ? { kind, ...detail } : null;
@@ -1121,8 +1195,11 @@ export function createSpeakRoom(host) {
     if (!box) return;
     box.replaceChildren();
     const kind = st.status?.kind;
-    if (!kind || !STATUS[kind] || (st.layer && st.layer !== 'shadow')) { box.hidden = true; return; }
+    const typing = st.typeOnly && !!st.session && !st.session.ended;
+    if ((!kind || !STATUS[kind]) && !typing || (st.layer && st.layer !== 'shadow')) { box.hidden = true; return; }
     box.hidden = false;
+    // with no microphone the typed way stays on the page across turns, never a dead end
+    if (!kind || !STATUS[kind]) { box.append(st.typedFormEl ||= typedForm()); return; }
     let text = t(...STATUS[kind]);
     if (kind === 'busy' && st.status.seconds) text += t(` ${st.status.seconds}秒後にもう一度。`, ` Try again in ${st.status.seconds} s.`);
     box.append(el('p', 'speak-status-t', text));
@@ -1134,7 +1211,7 @@ export function createSpeakRoom(host) {
     };
     if (['no-key', 'no-cap', 'cap', 'key'].includes(kind)) door('設定', 'Settings', () => openLayer('connect'));
     if (kind === 'offline') door('これまでの会話', 'Past conversations', () => openLayer('past'));
-    if (kind === 'mic-denied' || kind === 'mic-missing') box.append(typedForm());
+    if (kind === 'mic-denied' || kind === 'mic-missing' || typing) box.append(st.typedFormEl ||= typedForm());
   }
   /** Never a dead end: with no microphone he can type what he means, and Kore answers as if he had said it. */
   function typedForm() {
@@ -1152,16 +1229,18 @@ export function createSpeakRoom(host) {
       event.preventDefault();
       const typed = input.value.trim();
       if (!typed || !st.session) return;
+      // one turn at a time, decided by the shared entrypoint: while Kore answers, the line stays in the field unsent
+      const before = st.mode;
       if (!core.isJapaneseLine(typed)) st.mode = 'bridge';
+      if (!startTurn({ typed })) { st.mode = before; setStatus('still-answering'); return; }
       input.value = '';
-      void turn({ typed });
     });
     return form;
   }
   function paintCost() {
     if (!els.cost) return;
     const s = spend();
-    const month = s && s.month === core.spendMonth() ? s.usd : 0;
+    const month = (s && s.month === core.spendMonth() ? s.usd : 0) + st.unrecorded;
     const cap = Number(s?.cap) > 0 ? s.cap : null;
     els.cost.textContent = cap ? t(`今月 $${month.toFixed(2)} · 上限 $${cap}`, `This month $${month.toFixed(2)} · limit $${cap}`) : t('鍵と上限', 'Key and limit');
     els.cost.hidden = !!(st.layer && st.layer !== 'shadow');
@@ -1264,7 +1343,21 @@ export function createSpeakRoom(host) {
     words.append(wl);
     // Kore will remember: zero to three notes, each one he can take back
     const notes = section(page, 'Kore が覚えておくこと', 'Kore will remember');
-    if (!s.savedNotes.length) notes.append(el('p', 'speak-quiet-line', t('今日はありません。', 'Nothing new.')));
+    if (s.notesFailed?.length) {
+      // not remembered: the record did not take them; nothing claims otherwise, and one tap tries again
+      for (const note of s.notesFailed) {
+        const item = el('div', 'speak-row speak-note-row is-pending');
+        const text = el('p', 'speak-row-word', note.text);
+        text.lang = 'ja';
+        item.append(text, el('p', 'speak-row-why', t('記録に残せませんでした。', 'Not kept: your record didn’t take it.')));
+        notes.append(item);
+      }
+      const retry = el('button', 'btn-tertiary speak-quiet speak-notes-retry', t('もう一度残す', 'Try keeping them again'));
+      retry.type = 'button';
+      retry.addEventListener('click', async () => { retry.disabled = true; await saveNotes(s); paintLayer(); });
+      notes.append(retry);
+    }
+    if (!s.savedNotes.length && !s.notesFailed?.length) notes.append(el('p', 'speak-quiet-line', t('今日はありません。', 'Nothing new.')));
     for (const note of s.savedNotes) {
       const item = el('div', 'speak-row speak-note-row');
       const text = el('p', 'speak-row-word', note.text);
@@ -1313,8 +1406,9 @@ export function createSpeakRoom(host) {
       const forget = el('button', 'btn-tertiary speak-quiet', t('鍵を消す', 'Remove the key'));
       forget.type = 'button';
       forget.addEventListener('click', () => {
-        try { localStorage.removeItem(DEVICE_KEY); } catch { /* nothing kept */ }
-        note.textContent = t('鍵を消しました。', 'The key is removed.');
+        try { localStorage.removeItem(DEVICE_KEY); } catch { /* checked below */ }
+        // removed only when the device no longer holds it
+        note.textContent = device() ? t('この端末から鍵を消せませんでした。', 'Couldn’t remove the key from this device.') : t('鍵を消しました。', 'The key is removed.');
         paintRing();
       });
       form.append(forget);
@@ -1325,16 +1419,28 @@ export function createSpeakRoom(host) {
       const limit = Math.max(1, Math.round(Number(cap.value) || 0));
       const typedKey = key.value.trim();
       const endpoint = endpointOverride() || lockNow().endpoint;
+      let saved = true;
       if (typedKey) {
         if (typedKey.length > 512 || /[\s\0]/u.test(typedKey)) { note.textContent = t('鍵の形が違います。', 'That doesn’t look like a key.'); return; }
-        writeJson(DEVICE_KEY, { v: 1, configId: crypto.randomUUID(), credential: { origin: new URL(endpoint).origin, key: typedKey }, models: { ears: core.EARS_MODEL } });
+        const config = { v: 1, configId: crypto.randomUUID(), credential: { origin: new URL(endpoint).origin, key: typedKey }, models: { ears: core.EARS_MODEL } };
+        // the key counts as saved only when the device reads it back
+        saved = writeJson(DEVICE_KEY, config) && device()?.configId === config.configId && device()?.credential?.key === typedKey;
       }
-      const current = spend();
-      writeJson(SPEND_KEY, { ...core.addSpend(current, 0), cap: limit });
+      if (saved) {
+        const next = { ...core.addSpend(spend(), st.unrecorded), cap: limit };
+        saved = persistSpend(next);
+        if (saved) { st.unrecorded = 0; st.accountingFailed = false; }
+      }
+      if (!saved) {
+        // nothing is claimed and nothing typed is lost: the field keeps the key for another try
+        note.textContent = t('この端末に保存できませんでした。入力はそのままです。', 'Couldn’t save on this device. What you typed is still here.');
+        return;
+      }
       key.value = '';
       note.textContent = t('保存しました。', 'Saved.');
       setStatus(null);
       paintCost();
+      paintRing();
     });
     page.append(form);
     const est = core.hourEstimate(lockNow().model);
@@ -1572,11 +1678,12 @@ export function createSpeakRoom(host) {
     if (!word || !els.root?.contains(word)) return;
     const b = word.dataset.speakB || word.dataset.lookupText || word.textContent || '';
     const r = word.dataset.speakR || '';
+    const surface = word.dataset.speakS || b;
     if (st.session) {
       st.session.looked.add(b);
       for (const p of st.session.plants) if (p.word === b) st.session.looked.add(p.word);
     }
-    host.setKeep({ word: b, reading: r });
+    host.setKeep({ word: b, surface, reading: r });
   }
   function onRoomKey(event) {
     // Space toggles the ensō from anywhere in the room that is not itself a control
@@ -1595,7 +1702,8 @@ export function createSpeakRoom(host) {
     observer.observe(app, { childList: true });
   }
   function onVisibility() {
-    if (document.hidden && st.take) interrupt('interrupted');
+    // hidden while listening, or while the microphone is still being granted: the capture is withdrawn either way
+    if (document.hidden && (st.take || st.phase === 'listening')) interrupt('interrupted');
     if (document.hidden && st.phase === 'speaking') { stopVoice(); setPhase('rest'); }
   }
   function onOnline() {
@@ -1611,6 +1719,9 @@ export function createSpeakRoom(host) {
 
   function leaveSession() {
     st.epoch += 1;
+    st.captureGen += 1;
+    st.turnToken += 1;
+    st.turnBusy = false;
     stopVoice();
     if (st.take) void endTake(false);
     abortRequests();
@@ -1675,7 +1786,7 @@ export function createSpeakRoom(host) {
       audioRate: audio ? audio.playbackRate : null, shadow: st.shadow?.result ? { missing: st.shadow.result.check.missing, extra: st.shadow.result.check.extra,
         swaps: st.shadow.result.check.swaps, his: !!st.shadow.result.his, hers: !!st.shadow.result.hers, mySeconds: st.shadow.result.mySeconds,
         herSeconds: st.shadow.result.herSeconds } : null,
-      ctxState: st.ctx ? st.ctx.state : null,
+      ctxState: st.ctx ? st.ctx.state : null, turnBusy: st.turnBusy,
     }));
   }
   return Object.freeze({ render, enter, back, leave, snapshot, interruptForTest: () => interrupt('interrupted') });

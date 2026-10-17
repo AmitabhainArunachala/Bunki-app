@@ -25196,19 +25196,22 @@ function speakSentence(container, tokens, { contextId }) {
     if (!SPEAK_JA.test(s)) { renderSentenceTokens(container, [{ s, b: s, r: '', c: false }], { contextId }); continue; }
     if (!lookup(b)) {
       const wrap = appendJapaneseLookup(container, s, { block: container, kinsoku: true });
-      for (const word of wrap.querySelectorAll('.japanese-lookup-word')) { word.dataset.speakB = word.dataset.lookupText; word.dataset.speakR = ''; }
+      for (const word of wrap.querySelectorAll('.japanese-lookup-word')) { word.dataset.speakS = word.dataset.speakB = word.dataset.lookupText; word.dataset.speakR = ''; }
       continue;
     }
     const f = Array.isArray(raw.f) && raw.f.length ? raw.f : [{ t: s, ...(r && r !== s ? { r } : {}) }];
     renderSentenceTokens(container, [{ s, b, r, c: true, f }], { contextId });
     const door = container.lastElementChild;
-    if (door?.matches('button.sentence-tok')) { door.dataset.speakB = b; door.dataset.speakR = b === s ? r : ''; }
+    // the whole token rides the door (surface, base, the surface's reading): an inflected form keeps what R needs
+    if (door?.matches('button.sentence-tok')) { door.dataset.speakS = s; door.dataset.speakB = b; door.dataset.speakR = r; }
   }
 }
 /** The word last touched in any line, as the top bar's Save keeps it: its reading truth from R (readingToken). */
 function speakKeepTarget() {
   if (!speakKeepWord?.word || !lookup(speakKeepWord.word)) return null;
-  const door = readingToken({ s: speakKeepWord.word, b: speakKeepWord.word, r: speakKeepWord.reading || '' });
+  // the token as the line carried it: readingToken and wordSaveFacts give an inflected surface's reading no say over
+  // its dictionary form, exactly as for a sentence's word anywhere
+  const door = readingToken({ s: speakKeepWord.surface || speakKeepWord.word, b: speakKeepWord.word, r: speakKeepWord.reading || '' });
   return { label: door.b, ...wordSaveFacts(door) };
 }
 /** The top bar's one Save in the room, naming the word last touched in any line (the reader's keep, for talk). */
@@ -25301,7 +25304,7 @@ function speakHost() {
     // his own lines: every word a door that opens the slip and counts nothing (it is his own word)
     words: (container, text) => {
       const wrap = appendJapaneseLookup(container, text, { block: container, kinsoku: true });
-      for (const word of wrap.querySelectorAll('.japanese-lookup-word')) word.dataset.speakB = word.dataset.lookupText;
+      for (const word of wrap.querySelectorAll('.japanese-lookup-word')) word.dataset.speakS = word.dataset.speakB = word.dataset.lookupText;
       return wrap;
     },
     openSlip: (node, options = {}) => openSlip(node, { ...options, from: 'speak' }),
@@ -25315,8 +25318,8 @@ function speakHost() {
         keep: () => (node ? toggleWordSave(node, word) : false),
         review: { saved, toggle: () => (node ? toggleWordSave(node, word) : false) } });
     },
-    setKeep: ({ word, reading = '' }) => {
-      speakKeepWord = word ? { word, reading } : null;
+    setKeep: ({ word, surface = '', reading = '' }) => {
+      speakKeepWord = word ? { word, surface: surface || word, reading } : null;
       syncSpeakKeep();
       setTimeout(syncSpeakKeep, 600);
     },
@@ -25341,8 +25344,11 @@ function speakHost() {
     recordWritable: () => recordWritable(),
     archive: (surface) => aiLogAll(surface),
     openTutor: () => { keepNavigationReturn('ai', document.activeElement); S.view = 'ai'; render(); window.scrollTo(0, 0); },
-    // V ships audio/voice-lock.json; until it does the room keeps the pinned lock (speak-core.mjs VOICE_LOCK)
-    voiceLock: () => null,
+    // V's lock as the app carries it: the VOICE_LOCK mirror that tools/sync-voice-lock.mjs generates from
+    // audio/voice-lock.json (no fetch, no race). Where this build has no mirror yet, the room keeps speak-core's
+    // checked fallback (VOICE_LOCK_FILE, equal to V's file whenever the file is in the tree).
+    // eslint-disable-next-line no-undef
+    voiceLock: () => (typeof VOICE_LOCK !== 'undefined' ? VOICE_LOCK : null),
   });
 }
 /** A door into the room: the place it was opened from is kept, so Back returns to it (an article's line within 4 px). */
