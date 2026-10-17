@@ -1004,13 +1004,18 @@ try {
       await page.locator('#me-settings').click();
       await page.locator('#settings-writing').waitFor();
     };
-    /** A tap on a staged-and-writing word's own control, read the moment the tap has landed: the ink is gone at once. */
+    /** A tap on a staged-and-writing word's own control, read the moment the tap has landed: the writing has finished at once
+     * — ended by that input, and every stroke drawn (or already the plain word) — and the plain word follows the release. */
     const tapMidWriting = async (page, locator) => {
       await midWriting(page);
       const before = await inkFacts(page);
       await locator.tap();
-      const after = await page.evaluate(() => ({ ended: [...(window.__ink || [])].filter((row) => row.ended === 'input').length,
-        chars: document.querySelectorAll('#mini .mini-word .ink-char').length }));
+      const after = await page.evaluate(() => {
+        const word = document.querySelector('#mini .mini-word');
+        const offsets = [...(word?.querySelectorAll('.ink-wet path') || [])].map((path) => parseFloat(getComputedStyle(path).strokeDashoffset));
+        return { ended: [...(window.__ink || [])].filter((row) => row.ended === 'input').length,
+          chars: word?.querySelectorAll('.ink-char').length ?? 0, drawn: offsets.every((value) => value <= 0.001) };
+      });
       return { before, after };
     };
     /* The interrupt schedule the negative control replays: a tap on Save during the writing finishes it at once and still
@@ -1020,7 +1025,9 @@ try {
       await stage(page, readerWord(page));
       const { before, after } = await tapMidWriting(page, page.locator('#mini #mini-take'));
       check('G4.interrupt.save-writing', 'Save was pressed while the word was writing itself, strokes still to come', before.ink === 'writing' && before.wet.some((v) => v >= 0.98), before);
-      check('G4.interrupt.save-at-once', 'the tap finished the writing at once: no ink left, ended by input', after.ended >= 1 && after.chars === 0, after);
+      const plain = await page.waitForFunction(() => { const word = document.querySelector('#mini .mini-word'); return !!word && !word.querySelector('.ink-char') && !word.dataset.ink; }, null, { timeout: 1000 }).then(() => true, () => false);
+      check('G4.interrupt.save-at-once', 'the tap finished the writing at once — ended by that input, every stroke drawn — and the plain word stood once the tap was released',
+        after.ended >= 1 && (after.chars === 0 || after.drawn) && plain, { ...after, plain });
       const saved = await page.waitForFunction(() => {
         const seal = document.querySelector('#mini #mini-take');
         return seal?.getAttribute('aria-pressed') === 'true' || seal?.classList.contains('taken') ? true : null;
@@ -1273,6 +1280,27 @@ try {
       const trace = await inkTrace(page);
       const y1 = await page.evaluate(() => scrollY);
       check('G4.interrupt.wheel', 'a wheel during the writing finishes it at once and the page still scrolls (a Mac window)', trace.some((row) => row.ended === 'input') && y1 > y0, { y0, y1, trace: trace.slice(-3) });
+      // a mouse: the press that finishes the writing still clicks — the word opens its page, Save saves
+      await page.keyboard.press('Escape'); await delay(300);
+      await page.evaluate(() => { window.__ink = []; window.scrollTo(0, 0); });
+      await delay(200);
+      await stage(page, readerWord(page));
+      await midWriting(page);
+      await page.locator('#mini .mini-word').click();
+      const opened = await page.locator('#sheet').waitFor({ timeout: 5000 }).then(() => true, () => false);
+      const facts = opened ? await pageFacts(page) : null;
+      check('G4.interrupt.mouse-word', 'a mouse click on the writing word finishes it at once and still opens its page', opened && facts?.headword.startsWith(WORD) &&
+        (await inkTrace(page)).some((row) => row.ended === 'input'), { opened, headword: facts?.headword });
+      if (opened) { await page.locator('#sheet-back').click(); await bare(page); }
+      await page.keyboard.press('Escape'); await delay(300);
+      await stage(page, readerWord(page, DEPTH_WORDS.met));
+      await midWriting(page);
+      await page.locator('#mini #mini-take').click();
+      const saved = await page.waitForFunction(() => { const seal = document.querySelector('#mini #mini-take'); return seal?.getAttribute('aria-pressed') === 'true' || seal?.classList.contains('taken') ? true : null; },
+        null, { timeout: 5000 }).then(() => true, () => false);
+      const record = await readAppRecord(page);
+      check('G4.interrupt.mouse-save', 'a mouse click on Save during the writing finishes it and still saves the word', saved && record.taken.some((item) => item.t === 'word' && item.id === DEPTH_WORDS.met),
+        { saved, taken: record.taken.map((item) => `${item.t}:${item.id}`) });
     }, { viewport: { width: 1280, height: 800 }, mobile: false });
 
     await g4Walk('G4-brush', async (page) => {
@@ -1488,7 +1516,8 @@ try {
             from: '    taps = null; // the front has nothing to tap, whatever is asked',
             to: '    /* G3 negative: retain the front tap cover */' }] },
       ];
-      for (const spec of specs) {
+      // --g4-only replays G4's three controls alone; G3's controls need G3's candidate schedules
+      for (const spec of g4Only ? [] : specs) {
         const control = { engine, id: spec.id, edits: spec.edits, served: [], pageErrors: [] };
         const begin = rows.length;
         await walk(spec.run, spec.probe, { control });
@@ -1518,8 +1547,8 @@ try {
       const g4Specs = [
         { id: 'writing-blocks-tap', run: 'G4-interrupt-save', probe: interruptSaveProbe, kills: ['G4.interrupt.save-acts'],
           witness: (row) => row.observed.saved === false && !row.observed.taken.includes(`word:${WORD}`),
-          edits: [{ file: 'corridor.js', key: 'ink-eats-its-tap', from: "  const interrupt = () => ink.end('input');",
-            to: "  const interrupt = (event) => { if (event.type === 'pointerdown') window.addEventListener('click', (click) => click.stopImmediatePropagation(), { capture: true, once: true }); ink.end('input'); }; // G4 negative: the tap that finishes the writing is consumed" }] },
+          edits: [{ file: 'corridor.js', key: 'ink-eats-its-tap', from: "  const interrupt = (event) => ink.end('input', event);",
+            to: "  const interrupt = (event) => { if (event.type === 'pointerdown') window.addEventListener('click', (click) => click.stopImmediatePropagation(), { capture: true, once: true }); ink.end('input', event); }; // G4 negative: the tap that finishes the writing is consumed" }] },
         { id: 'empty-first-board', run: 'G4-ghost', probe: ghostProbe, kills: ['G4.ghost.first-frame', 'G4.ghost.first-pixels'],
           witness: (row) => row.id.endsWith('first-frame') ? row.observed.painted === 0 : row.observed.ink < 0.012,
           edits: [
