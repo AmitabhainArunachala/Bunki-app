@@ -1067,27 +1067,32 @@ async function main() {
   }));
   check('grammar · folding the restored stage leaves the original word bare', !folded.stage && !folded.page && !folded.lit && !folded.rung, JSON.stringify(folded));
 
-  // press and hold → the word menu (John #11: "right click and choose save"); a tap anywhere else puts it away
+  // press and hold → the seal and its strip (John #11: "right click and choose save"; G5 hold = seal): the word is kept,
+  // the strip opens beside it with the word's acts; a tap anywhere else puts it away
+  const keptBefore = await page.evaluate(`Number(document.getElementById('tray')?.dataset.count ?? NaN)`);
   await touchAt(page, '#reader .tok.content', 6, 700);
+  await page.waitForSelector('#seal-strip', { timeout: 6000 }).catch(() => {});
   await page.waitForTimeout(200);
   const menu = await page.evaluate(`(() => {
-    const m = document.querySelector('#reader-word-menu');
-    return m ? { role: m.getAttribute('role'), items: [...m.querySelectorAll('[role="menuitem"]')].map((n) => n.dataset.menuAction) } : null;
+    const m = document.querySelector('#seal-strip');
+    return m ? { role: m.getAttribute('role'), status: document.getElementById('seal-strip-status')?.textContent.trim() ?? '',
+      items: [...m.querySelectorAll('[data-strip-action]')].filter((n) => !n.hidden).map((n) => n.dataset.stripAction),
+      kept: Number(document.getElementById('tray')?.dataset.count ?? NaN) } : null;
   })()`);
-  check('grammar · a press and hold opens the word menu', !!menu && menu.role === 'menu' &&
-    menu.items.join(',') === 'save-word,save-sentence,entry,ask-tutor,copy', JSON.stringify(menu));
+  check('grammar · a press and hold seals the word and opens its strip', !!menu && menu.role === 'dialog' && /^Saved/u.test(menu.status) &&
+    menu.kept === keptBefore + 1 && menu.items.join(',') === 'entry,sentence,copy,ask-tutor,remove', JSON.stringify({ keptBefore, ...menu }));
   // "anywhere else": a point on the page's own margin, beside the text, that carries no control
   const elsewhere = await page.evaluate(`(() => {
     for (const x of [innerWidth - 3, 3]) for (const y of [0.35, 0.5, 0.65].map((f) => Math.round(innerHeight * f))) {
       const hit = document.elementFromPoint(x, y);
-      if (hit && !hit.closest('button, a, input, [role="menu"], #mini, .tok')) return { x, y };
+      if (hit && !hit.closest('button, a, input, [role="menu"], [role="dialog"], #mini, #seal-strip, .tok')) return { x, y };
     }
     return null;
   })()`);
   if (elsewhere) await page.mouse.click(elsewhere.x, elsewhere.y);
   await page.waitForTimeout(120);
-  check('grammar · one tap anywhere else puts the menu away',
-    !!elsewhere && (await page.locator('#reader-word-menu').count()) === 0, elsewhere ? 'menu dismissed' : 'no empty margin found');
+  check('grammar · one tap anywhere else puts the strip away',
+    !!elsewhere && (await page.locator('#seal-strip').count()) === 0, elsewhere ? 'strip dismissed' : 'no empty margin found');
 
   // Always-on ruby skips the reading rung: stage then full entry from the clean word.
   if (await page.locator('#sheet').count()) {
@@ -2663,13 +2668,13 @@ async function main() {
   await page.keyboard.press('Escape');
   const bareAgain = await cycleState();
   check('bare cycle · Escape also folds reading directly to bare', !bareAgain.rung && bareAgain.rt === 0 && !bareAgain.popup && !bareAgain.page, JSON.stringify(bareAgain));
-  // The full entry is also one choice in the word menu; Back answers immediately.
+  // The full entry is also one choice in the strip; Back answers immediately.
   await touchAt(page, '#reader .tok.content', 4, 700); // past GESTURE.MENU_MS
-  await page.waitForSelector('#reader-word-menu', { timeout: 6000 });
-  const menuUp = await page.evaluate(`[...document.querySelectorAll('#reader-word-menu [role="menuitem"]')].map((n) => n.dataset.menuAction)`);
-  check('a press and hold opens the word menu, the full entry in it', menuUp.includes('entry') && menuUp.includes('save-word'),
-    `menu: ${menuUp.join(' · ')}`);
-  await page.evaluate(`document.querySelector('#reader-word-menu [data-menu-action="entry"]')?.click()`);
+  await page.waitForSelector('#seal-strip', { timeout: 6000 });
+  const menuUp = await page.evaluate(`[...document.querySelectorAll('#seal-strip [data-strip-action]')].filter((n) => !n.hidden).map((n) => n.dataset.stripAction)`);
+  check('a press and hold opens the strip, the full entry in it and the word kept (Remove offered)', menuUp.includes('entry') && menuUp.includes('remove'),
+    `strip: ${menuUp.join(' · ')}`);
+  await page.evaluate(`document.querySelector('#seal-strip [data-strip-action="entry"]')?.click()`);
   await page.waitForSelector('#sheet', { timeout: 8000 });
   await page.evaluate(`document.querySelector('#sheet-back')?.click()`); // immediately — no dead window
   await page.waitForTimeout(300);

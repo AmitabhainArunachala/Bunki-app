@@ -181,12 +181,13 @@ for (const world of WORLDS) {
   await page.waitForSelector('#vocabulary-list-popover', { state: 'detached', timeout: 5000 });
   await page.keyboard.press('Escape');
   await page.waitForSelector('#mini', { state: 'detached', timeout: 5000 });
+  // G5: the word menu became the strip (a right-click seals the word); it is opaque on its world's paper too
   await page.locator('#reader .tok.content').first().click({ button: 'right' });
-  await page.waitForSelector('.reader-word-menu', { timeout: 10000 });
+  await page.waitForSelector('#seal-strip', { timeout: 10000 });
   await shoot('8-word-menu');
-  await opaque('word-menu', '.reader-word-menu');
+  await opaque('word-menu', '#seal-strip');
   await page.keyboard.press('Escape');
-  await page.waitForSelector('.reader-word-menu', { state: 'detached', timeout: 5000 }).catch(() => {});
+  await page.waitForSelector('#seal-strip', { state: 'detached', timeout: 5000 }).catch(() => {});
   await page.locator('#theme-seal').click();
   await page.waitForSelector('.world-picker', { timeout: 10000 });
   await shoot('9-world-picker');

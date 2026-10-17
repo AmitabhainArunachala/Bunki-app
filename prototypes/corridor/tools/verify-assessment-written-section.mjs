@@ -1600,7 +1600,7 @@ try {
         const node = document.getElementById('japanese-lookup-help');
         return node && { text: node.textContent, hidden: node.hidden, inPaper: !!node.closest('.exam-paper') };
       });
-      assert.deepEqual(help, { text: '←/→: choose a word · Enter: open · Shift+F10: more actions', hidden: true, inPaper: false });
+      assert.deepEqual(help, { text: '←/→: choose a word · Enter: open · Shift+F10: save and more', hidden: true, inPaper: false });
       for (const block of blocks) {
         assert.equal(block.stops, 0, `No word enters the sequential Tab order: ${block.words.join('')}`);
         assert.equal(block.paragraphStop, 0, 'The paragraph itself is the stop');

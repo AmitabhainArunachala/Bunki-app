@@ -75,7 +75,7 @@ const SURFACE = DOOR.token.s, READING = DOOR.token.r;
 const WRONG_READING = 'たにかわ';
 // The door's whole accessible label, as nameReaderToken builds it in the bilingual UI (ui=bi, pinned in the D2/D4
 // URLs; it is also the default): the surface, the reading only while shown, the keyboard help. Nothing else may appear.
-const DOOR_HINT = 'Enter: next word layer · Shift+F10: more actions';
+const DOOR_HINT = 'Enter: next word layer · Shift+F10: save and more';
 const doorLabel = (reading = null) => [SURFACE, ...(reading ? [reading] : []), DOOR_HINT].join(' · ');
 const D4_QUERY = '?entry=shelf&dials=0,1,0&ui=bi';
 // D5, copied from the committed articles by the same read-only script (2026-09-25). Home is やまなし: its own marks go on
