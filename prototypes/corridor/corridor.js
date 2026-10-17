@@ -5273,6 +5273,7 @@ function scaleOut() {
     retireScaleTransients();
     window.bunkiDriftSurface();
     render();
+    focusScaleControl('#app .scale-thread [data-scale-out], #app .scale-thread [data-scale-in]');
     return true;
   }
   if (scale === 'article' && !scaleSource(visit)) {

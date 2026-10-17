@@ -186,7 +186,7 @@ body.ui-bi #drift-layer [data-l='ja'] { display: none; }
 /* Active constellation glyphs sit above the free field, below existing
  * word satellites (5), centres (6) and component plaques (7). */
 #drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) {
-  z-index: 1;
+  z-index: 2;
 }
 
 /* Native hit regions: preserve field doors through transparent caption/rt
@@ -1278,25 +1278,28 @@ function paintScaleStars(){
   if(!scaleBridge)return;
   const rows=recordReady?recordView?.keptWords||[]:[];
   scaleWorldKey=WR.w+','+WR.h;
-  const signature=JSON.stringify([scaleArticle,recordView?.scopeId,rows,WR.w,WR.h]);
+  const signature=JSON.stringify([scaleArticle,recordView?.scopeId,rows,WR.w,WR.h,document.body.classList.contains('ui-bi')]);
   if(signature!==scaleProjectionKey){
     scaleProjectionKey=signature;
     if(!scaleLayer){
-      scaleLayer=document.createElement('div');scaleLayer.className='scale-stars';scaleLayer.setAttribute('aria-label',uiT('読んだ星と残した言葉','Your article and kept words'));
-      __layer.append(scaleLayer);
+      scaleLayer=document.createElement('div');scaleLayer.className='scale-stars';
+      sky.insertBefore(scaleLayer,sky.firstChild);
     }
+    scaleLayer.setAttribute('aria-label',uiT('読んだ星と残した言葉','Your article and kept words'));
     const next=new Set();
     const mount=(key,label,attrs,x,y,action)=>{
       next.add(key);let star=scaleStars.get(key);
-      if(!star){star=document.createElement('button');star.type='button';star.className='scale-star';star.addEventListener('click',()=>star.scaleActivate?.());scaleStars.set(key,star);scaleLayer.append(star);}
-      star.textContent=label;
+      if(!star){star=document.createElement('button');star.type='button';star.className='scale-star';star.addEventListener('click',()=>star.scaleActivate?.());scaleStars.set(key,star);scaleLayer.append(star);bindScaleStarPress(star);}
+      star.replaceChildren();
+      const caption=document.createElement('span');caption.className='scale-star-caption';
+      star.append(caption);star.title=label;star.scaleFullSize=null;scaleLayoutDirty=true;
       if(attrs.articleId){
-        star.replaceChildren();
         for(const part of label.split(/([0-9０-９]+)/u)){
-          if(/^[0-9０-９]+$/u.test(part)){const number=document.createElement('span');number.className='scale-star-number';number.textContent=part;star.append(number);}
-          else star.append(document.createTextNode(part));
+          if(/^[0-9０-９]+$/u.test(part)){const number=document.createElement('span');number.className='scale-star-number';number.textContent=part;caption.append(number);}
+          else caption.append(document.createTextNode(part));
         }
       }
+      if(!attrs.articleId)caption.textContent=label;
       star.setAttribute('aria-label',attrs.articleId?uiT('読み物の棚へ：','Article shelf: ')+label:uiT('残した言葉：','Kept word: ')+label);
       if(attrs.articleId)star.dataset.articleId=attrs.articleId;else star.dataset.keptKey=attrs.keptKey;
       star.classList.toggle('scale-star-article',!!attrs.articleId);star.classList.toggle('scale-star-kept',!attrs.articleId);
@@ -1313,15 +1316,133 @@ function paintScaleStars(){
   }
   drawScaleStars();
 }
+let scaleLayoutAt=-Infinity,scaleLayoutDirty=true,scaleMetricsKey='';
+const SCALE_LAYOUT_MS=250,SCALE_CELL=64;
+// Bundled font shards can finish after the sky first becomes visible.
+document.fonts?.addEventListener?.('loadingdone',()=>{scaleMetricsKey='';});
+const scalePressedStars=new Set();
+function bindScaleStarPress(star){
+  star.scalePressIds=new Set();
+  star.addEventListener('pointerdown',event=>{star.scalePressIds.add(event.pointerId);scalePressedStars.add(star);},{passive:true});
+  star.addEventListener('blur',()=>{scaleLayoutDirty=true;});
+}
+function releaseScaleStarPress(event){
+  for(const star of scalePressedStars){
+    if(!star.scalePressIds.delete(event.pointerId)||star.scalePressIds.size)continue;
+    scalePressedStars.delete(star);scaleLayoutDirty=true;
+  }
+}
+addEventListener('pointerup',releaseScaleStarPress,{capture:true,passive:true});
+addEventListener('pointercancel',releaseScaleStarPress,{capture:true,passive:true});
+function scaleBox(x,y,w,h){return {left:x-w/2,top:y-h/2,right:x+w/2,bottom:y+h/2,width:w,height:h};}
+function scaleCells(box){
+  const cells=[];
+  for(let x=Math.max(0,Math.floor(box.left/SCALE_CELL));x<=Math.min(Math.floor(vw()/SCALE_CELL),Math.floor(box.right/SCALE_CELL));x++)
+    for(let y=Math.max(0,Math.floor(box.top/SCALE_CELL));y<=Math.min(Math.floor(vh()/SCALE_CELL),Math.floor(box.bottom/SCALE_CELL));y++)cells.push(x+','+y);
+  return cells;
+}
+function occupyScaleBox(grid,box){for(const key of scaleCells(box)){let cell=grid.get(key);if(!cell){cell=[];grid.set(key,cell);}cell.push(box);}}
+function scaleOverlap(grid,box){
+  let area=0;const seen=new Set();
+  for(const key of scaleCells(box))for(const other of grid.get(key)||[]){
+    if(seen.has(other))continue;seen.add(other);
+    const w=Math.min(box.right,other.right)-Math.max(box.left,other.left),h=Math.min(box.bottom,other.bottom)-Math.max(box.top,other.top);
+    if(w>0&&h>0)area+=w*h;
+  }
+  return area;
+}
+function scaleFitPoint(point,w,h){
+  return {x:Math.max(16+w/2,Math.min(vw()-16-w/2,point.x)),y:Math.max(116+h/2,Math.min(vh()-100-h/2,point.y))};
+}
+function placeScaleStar(point,full,grid,previous){
+  let least=null,attempts=0;
+  for(const compact of [false,true]){
+    const w=compact?44:full.width,h=compact?44:full.height;
+    if(w>vw()-32||h>vh()-216)continue;
+    const candidates=[];
+    // Reuse a clear placement before considering a different projected offset.
+    if(previous&&previous.compact===compact)candidates.push({x:point.x+previous.dx,y:point.y+previous.dy});
+    candidates.push(point);
+    for(const radius of [32,64,96,144,208,288,384,512])for(let i=0;i<12;i++)candidates.push({x:point.x+radius*Math.cos(i*Math.PI/6),y:point.y+radius*Math.sin(i*Math.PI/6)});
+    for(const candidate of candidates){
+      const p=scaleFitPoint(candidate,w,h),box=scaleBox(p.x,p.y,w,h),area=scaleOverlap(grid,box);attempts++;
+      const choice={dx:p.x-point.x,dy:p.y-point.y,width:w,height:h,compact,crowded:area>0,box,attempts};
+      if(!area)return choice;
+      if(compact&&(!least||area<least.area))least={...choice,area};
+    }
+  }
+  // Fully packed: retain a bounded real keyboard-operable button. Native ink
+  // keeps pointer priority; this does not promise an empty pointer target.
+  if(least)return {...least,attempts};
+  const p=scaleFitPoint(point,44,44);return {dx:p.x-point.x,dy:p.y-point.y,width:44,height:44,compact:true,crowded:true,box:scaleBox(p.x,p.y,44,44),attempts};
+}
 function drawScaleStars(){
   if(scaleBridge&&scaleWorldKey!==WR.w+','+WR.h){paintScaleStars();return;}
-  const cameraKey=[cam.x,cam.y,cam.z,cam.rot,vw(),vh(),WR.w,WR.h,stack.length].join(',');
-  if(cameraKey===scaleCameraKey)return;
-  scaleCameraKey=cameraKey;
+  if(!DRIFT_ON||__layer.inert){scaleMetricsKey='';return;}
+  const metricsKey=[vw(),vh(),themeIx].join(',');
+  if(metricsKey!==scaleMetricsKey){
+    scaleMetricsKey=metricsKey;scaleLayoutDirty=true;
+    for(const star of scaleStars.values())star.scaleFullSize=null;
+  }
+  const now=performance.now(),projected=[];
   for(const star of scaleStars.values()){
-    const p=w2s(star.scaleX,star.scaleY),visible=!stack.length&&p.x>=30&&p.x<=vw()-30&&p.y>=80&&p.y<=vh()-100;
-    star.hidden=!visible;
-    if(visible)star.style.transform='translate('+p.x+'px,'+p.y+'px) translate(-50%,-50%)';
+    const p=w2s(star.scaleX,star.scaleY);
+    const visible=!stack.length&&p.x>=30&&p.x<=vw()-30&&p.y>=80&&p.y<=vh()-100;
+    const fixed=visible&&star.scaleRenderPosition&&(star.scalePressIds?.size||document.activeElement===star)?star.scaleRenderPosition:null;
+    projected.push({star,p,visible,fixed});
+  }
+  const active=projected.filter(row=>row.visible);
+  const snapshot=scaleLayoutDirty||now-scaleLayoutAt>=SCALE_LAYOUT_MS;
+  if(snapshot){
+    // Prepare all new measurements together, then read the whole batch before
+    // any placement write. No native-node layout reads occur between snapshots.
+    for(const {star}of active)if(!star.scaleFullSize){star.hidden=false;star.classList.remove('is-compact');star.scaleRenderKey='';}
+    const grid=new Map();
+    for(const n of nodes){
+      if(n.gone||n.removed||!n.el.isConnected||Number(n._lop||n.el.style.opacity||1)<=0)continue;
+      const r=n.el.getBoundingClientRect();
+      if(r.width&&r.height&&r.right>0&&r.left<vw()&&r.bottom>0&&r.top<vh())occupyScaleBox(grid,{left:r.left-6,top:r.top-6,right:r.right+6,bottom:r.bottom+6});
+    }
+    // Canvas hub doors have native hit disks even when no DOM ink occupies
+    // them. Reserve the exact native radius by arithmetic, without layout reads.
+    const hubRadius=Math.max(34,46*cam.z*0.7);
+    for(const h of HUBS){
+      const anchor=HUBPOS[h];if(!anchor)continue;
+      const p=w2s(anchor.x,anchor.y);
+      if(p.x+hubRadius>0&&p.x-hubRadius<vw()&&p.y+hubRadius>0&&p.y-hubRadius<vh())occupyScaleBox(grid,scaleBox(p.x,p.y,hubRadius*2,hubRadius*2));
+    }
+    for(const r of hostRects)occupyScaleBox(grid,{left:r.x,top:r.y,right:r.x+r.w,bottom:r.y+r.h});
+    for(const {star}of active)if(!star.scaleFullSize){
+      const width=star.offsetWidth,height=star.offsetHeight;
+      if(width>0&&height>0)star.scaleFullSize={width,height};
+    }
+    for(const {star,p,fixed}of active){
+      if(!star.scaleFullSize){star.scalePlan=null;continue;}
+      if(fixed&&star.scalePlan){occupyScaleBox(grid,scaleBox(fixed.x,fixed.y,star.scalePlan.width,star.scalePlan.height));continue;}
+      star.scalePlan=placeScaleStar(p,star.scaleFullSize,grid,star.scalePlan);
+      occupyScaleBox(grid,star.scalePlan.box);
+    }
+    scaleLayoutAt=now;scaleLayoutDirty=false;
+  }
+  for(const {star,p,visible,fixed}of projected){
+    if(!visible){if(star.scaleRenderKey!=='hidden'){star.hidden=true;star.scaleRenderKey='hidden';}continue;}
+    if(!star.scalePlan){star.hidden=true;continue;}
+    const plan=star.scalePlan,placed=fixed||scaleFitPoint({x:p.x+plan.dx,y:p.y+plan.dy},plan.width,plan.height);
+    // The compact caption is visual only; the full accessible name remains on
+    // the same focusable button. Its whole box stays inside the viewport.
+    const cw=Math.min(210,vw()-32),ch=Math.min(120,Math.max(44,star.scaleFullSize.height));
+    const captionX=Math.max(16,Math.min(vw()-16-cw,placed.x-cw/2));
+    const captionY=placed.y+22+ch<=vh()-16?placed.y+22:Math.max(16,placed.y-22-ch);
+    const renderKey=[placed.x,placed.y,plan.compact,plan.crowded,captionX,captionY,cw,ch].join(',');
+    if(star.scaleRenderKey===renderKey)continue;
+    star.scaleRenderKey=renderKey;star.scaleRenderPosition=placed;star.hidden=false;
+    star.classList.toggle('is-compact',plan.compact);
+    star.dataset.scalePlacement=plan.crowded?'crowded':plan.compact?'compact':'clear';
+    star.style.transform='translate('+placed.x+'px,'+placed.y+'px) translate(-50%,-50%)';
+    star.style.setProperty('--scale-caption-left',(captionX-(placed.x-22))+'px');
+    star.style.setProperty('--scale-caption-top',(captionY-(placed.y-22))+'px');
+    star.style.setProperty('--scale-caption-width',cw+'px');
+    star.style.setProperty('--scale-caption-height',ch+'px');
   }
 }
 
@@ -1371,10 +1492,16 @@ window.__DRIFT__ = {
 renameId('tray', 'drift-tray');
 const cssOut = (css + `
 /* The article and kept words are real targets in the retained sky. */
-#drift-layer .scale-stars { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+/* Inside sky's stacking context, all native ink keeps its hit plane. */
+#drift-layer .scale-stars { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+#drift-layer .word, #drift-layer .glyph, #drift-layer .part { z-index: 1; }
 #drift-layer .scale-star { position: absolute; left: 0; top: 0; max-width: 210px; min-width: 44px; min-height: 44px; padding: 8px 14px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 13px; line-height: 1.5; text-align: center; cursor: pointer; pointer-events: auto; }
 #drift-layer .scale-star[hidden] { display: none; }
 #drift-layer .scale-star-number { white-space: nowrap; }
+#drift-layer .scale-star-caption { display: block; overflow-wrap: anywhere; }
+#drift-layer .scale-star.is-compact { width: 44px; height: 44px; min-height: 44px; max-width: 44px; padding: 0; display: grid; place-items: center; }
+#drift-layer .scale-star.is-compact .scale-star-caption { position: absolute; box-sizing: border-box; left: var(--scale-caption-left); top: var(--scale-caption-top); width: var(--scale-caption-width); max-height: var(--scale-caption-height); overflow: auto; padding: 8px; border: 1px solid var(--line); background: var(--ground); visibility: hidden; pointer-events: none; }
+#drift-layer .scale-star.is-compact:is(:hover,:focus-visible) .scale-star-caption { visibility: visible; }
 #drift-layer .scale-star::before { content: '✦'; display: block; font-size: 22px; line-height: 1; }
 #drift-layer .scale-star-kept { color: var(--verm, #b34836); }
 #drift-layer .scale-star-kept::before { content: '・'; font-size: 30px; }

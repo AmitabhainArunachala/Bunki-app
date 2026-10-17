@@ -40,6 +40,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { inflateSync } from 'node:zlib';
+import vm from 'node:vm';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
@@ -691,6 +692,121 @@ const g6SkyFacts=page=>page.evaluate(()=>({view:document.body.dataset.view,mini:
   allowed:window.__DRIFT__?.canNavigate(),place:window.__DRIFT__?.capturePlace(),cuePending:document.querySelector('#drift-layer')?.hasAttribute('data-record-cue-pending'),
   grades:[...document.querySelectorAll('#drift-layer [data-record-pending][aria-busy="true"]')].map(n=>n.textContent),
   stars:[...document.querySelectorAll('#drift-layer .scale-star-kept')].map(n=>({key:n.dataset.keptKey,label:n.textContent,hidden:n.hidden,color:getComputedStyle(n).color}))}));
+// Read only the tested asset's immutable vocabulary/hub construction. The VM
+// has no browser state or host callbacks; the live camera is observed below.
+let g6StaticHubCache = null;
+function g6StaticSkyHubs() {
+  if (g6StaticHubCache) return g6StaticHubCache;
+  const source = readFileSync(resolve(site, 'drift-layer.js'), 'utf8');
+  const sha256 = createHash('sha256').update(source).digest('hex');
+  assert.equal(sha256, identity.files.find(f => f.path === 'drift-layer.js')?.sha256, 'hub geometry comes from pinned served bytes');
+  const arrayLiteral = name => {
+    const declaration = source.indexOf('const ' + name + '=');
+    assert(declaration >= 0, `static ${name} declaration`);
+    const start = source.indexOf('[', declaration);
+    let depth = 0, quote = null, escape = false;
+    for (let i = start; i < source.length; i++) {
+      const c = source[i];
+      if (quote) {
+        if (escape) escape = false;
+        else if (c === '\\') escape = true;
+        else if (c === quote) quote = null;
+      } else if (c === '"' || c === "'") quote = c;
+      else if (c === '[') depth++;
+      else if (c === ']' && --depth === 0) return source.slice(start, i + 1);
+    }
+    assert.fail(`unclosed static ${name} array`);
+  };
+  const wallStart = source.indexOf('const SEEDSET='), wallEnd = source.indexOf('// the semantic tier:', wallStart);
+  const hubStart = source.indexOf('const HUBS='), hubEnd = source.indexOf('const HUBPOS=', hubStart);
+  assert(wallStart >= 0 && wallEnd > wallStart && hubStart >= 0 && hubEnd > hubStart, 'static hub dependencies retain their declared boundaries');
+  const hubs = vm.runInNewContext(`const W=${arrayLiteral('W')},WBIG=${arrayLiteral('WBIG')};const LVLOF={};for(const e of WBIG)LVLOF[e[0]]=e[3];const isKanji=c=>c>='\u3400'&&c<='\u9fff';${source.slice(wallStart,wallEnd)}${source.slice(hubStart,hubEnd)}HUBS;`, {}, { timeout: 1000 });
+  assert(hubs.length > 0 && hubs.length <= 42, 'actual static hub list');
+  return g6StaticHubCache = { hubs: [...hubs], sha256 };
+}
+async function g6PrivateHubPoint(page, hubs) {
+  return page.evaluate(hubs => {
+    const place = window.__DRIFT__?.capturePlace();
+    if (!place) return null;
+    const { camera: c, world: w } = place, cs = Math.cos(c.rot), sn = Math.sin(c.rot);
+    for (const [index, label] of hubs.entries()) {
+      const a = index * 2.39996, r = .10 + .38 * Math.sqrt(index / hubs.length);
+      const wx = w.width / 2 + Math.cos(a) * r * w.width * .92;
+      const wy = w.height / 2 + Math.sin(a) * r * w.height * .92;
+      const dx = wx - c.x, dy = wy - c.y;
+      const sx = innerWidth / 2 + (dx * cs - dy * sn) * c.z;
+      const sy = innerHeight / 2 + (dx * sn + dy * cs) * c.z;
+      // A native touch footprint must stay on canvas, not merely its center.
+      const offsets = [[0, 0], ...Array.from({ length: 16 }, (_, i) => [32 * Math.cos(i * Math.PI / 8), 32 * Math.sin(i * Math.PI / 8)])];
+      for (const [ox, oy] of offsets) {
+        const x = sx + ox, y = sy + oy;
+        if (x < 54 || x > innerWidth - 30 || y < 135 || y > innerHeight - 140) continue;
+        const disk = [{ x, y }, ...Array.from({ length: 16 }, (_, i) => ({ x: x + 30 * Math.cos(i * Math.PI / 8), y: y + 30 * Math.sin(i * Math.PI / 8) }))];
+        if (disk.every(p => document.elementFromPoint(p.x, p.y)?.id === 'sky'))
+          return { index, label, x, y, hub: { x: sx, y: sy }, touchFootprintRadius: 30, place };
+      }
+    }
+    return null;
+  }, hubs);
+}
+const g6PrivateFocusFacts = page => page.evaluate(() => {
+  const n = document.activeElement, b = n?.getBoundingClientRect(), style = n ? getComputedStyle(n) : null;
+  return { tag: n?.tagName, id: n?.id || null, out: !!n?.hasAttribute('data-scale-out'), inward: !!n?.hasAttribute('data-scale-in'),
+    connected: !!n?.isConnected, disabled: !!n?.matches?.(':disabled'),
+    visible: !!(b?.width && b?.height && b.right > 0 && b.left < innerWidth && b.bottom > 0 && b.top < innerHeight &&
+      style.visibility !== 'hidden' && Number(style.opacity) > 0 && !n.closest('[inert],[hidden],[aria-hidden="true"]')) };
+});
+async function g6PrivateSkyKeyboardReturn(page, { emit }) {
+  const home = await g6SkyHome(page);
+  const before = await g6SkyFacts(page), sourceBefore = await g6ScaleFacts(page);
+  const record = await readAppRecordSnapshot(page), geometry = g6StaticSkyHubs();
+  assert.equal(JSON.parse(before.place.path).length, 0, 'fixture begins at actual outer sky');
+  assert.equal(sourceBefore.tokenIndex, String(home.origin.index), 'fixture retains a real nonzero source occurrence');
+  const point = await g6PrivateHubPoint(page, geometry.hubs);
+  assert(point, 'one actual canvas-owned hub with full native touch footprint');
+  await page.evaluate(() => {
+    window.__g6PrivateInputs = [];
+    for (const type of ['pointerdown', 'pointerup', 'keydown']) addEventListener(type, e => window.__g6PrivateInputs.push({ type, key: e.key || null,
+      trusted: e.isTrusted, target: e.target.tagName, out: !!e.target.hasAttribute?.('data-scale-out'), inward: !!e.target.hasAttribute?.('data-scale-in') }), { capture: true, passive: true });
+  });
+  await page.touchscreen.tap(point.x, point.y);
+  await page.waitForFunction(() => document.body.classList.contains('drift-dived'), null, { timeout: 5000 });
+  const entered = await g6SkyFacts(page);
+  emit('private.entry', 'one native canvas hub tap enters one private depth without opening a word',
+    JSON.parse(entered.place.path).length === 1 && !entered.mini && !entered.sheet, { point, entered, driftSha256: geometry.sha256 });
+  assert.equal(JSON.parse(entered.place.path).length, 1, 'depth1 is the declared keyboard-return fixture');
+  // This is the only explicit focus in the keyboard continuity test.
+  const rail = page.locator('#app > .scale-thread [data-scale-out]');
+  await rail.focus();
+  const initialFocus = await g6PrivateFocusFacts(page);
+  assert(initialFocus.out && initialFocus.visible && !initialFocus.disabled, 'the initial outward control owns the keyboard');
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => !document.body.classList.contains('drift-dived'), null, { timeout: 5000 });
+  await page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
+  const root = await g6SkyFacts(page), focus = await g6PrivateFocusFacts(page), rootSource = await g6ScaleFacts(page);
+  emit('private.root-focus', 'private depth1→root retains visible enabled inward keyboard focus',
+    root.view === 'drift' && JSON.parse(root.place.path).length === 0 && focus.inward && focus.connected && focus.visible && !focus.disabled,
+    { initialFocus, focus, root });
+  await page.keyboard.press('Enter'); // No locator activation, Tab, or focus repair.
+  let reached = true;
+  try { await page.waitForFunction(() => document.body.dataset.view === 'shelf', null, { timeout: 1500 }); }
+  catch { reached = false; }
+  const next = await g6SkyFacts(page), nextSource = await g6ScaleFacts(page);
+  const inputs = await page.evaluate(() => window.__g6PrivateInputs), keys = inputs.filter(e => e.type === 'keydown');
+  emit('private.next-enter', 'the next unrepaired trusted Enter opens shelf', reached && next.view === 'shelf' && keys.length === 2 &&
+    keys.every(e => e.trusted && e.key === 'Enter') && keys[0].out && keys[1].inward, { next, inputs });
+  const sameSource = facts => ['passage', 'tokenIndex', 'sentenceStart', 'sentenceEnd'].every(k => facts[k] === sourceBefore[k]);
+  const sameCamera = place => !!place && ['x', 'y', 'z', 'rot'].every(k => Math.abs(place.camera[k] - before.place.camera[k]) <= .5) &&
+    ['scopeId', 'generation', 'sceneGeneration', 'path'].every(k => place[k] === before.place[k]);
+  emit('private.source-camera', 'the private return and shelf step preserve the actual article occurrence and sky place',
+    sameSource(rootSource) && sameSource(nextSource) && sameCamera(root.place) && sameCamera(next.place),
+    { sourceBefore, rootSource, nextSource, beforePlace: before.place, rootPlace: root.place, nextPlace: next.place });
+  const afterRecord = await readAppRecordSnapshot(page);
+  emit('private.no-record-work', 'private return and keyboard scale travel make no record revision or learner work',
+    record.revision === afterRecord.revision && JSON.stringify(record.record) === JSON.stringify(afterRecord.record),
+    { beforeRevision: record.revision, afterRevision: afterRecord.revision });
+}
+
 async function g6SkyPoint(page){
   return page.evaluate(()=>{
     const layer=document.getElementById('drift-layer'),sky=document.getElementById('sky');
@@ -1026,6 +1142,7 @@ async function runG6Suite(browser){
           await run(`${modality}.abandoned-${kind}`,[`abandoned.${kind}`],(page,{emit})=>g6AbandonedReturn(page,{modality,emit,kind}),{control,init:g6InstallReturnFrameFixture});
         }
       }
+      await run('sky.private-keyboard', ['private.entry','private.root-focus','private.next-enter','private.source-camera','private.no-record-work'], (page,{emit})=>g6PrivateSkyKeyboardReturn(page,{emit}));
       for(const native of engine==='chromium'?[false,true]:[false]){
         for(const kind of native?['spread','third','cancel','contract']:['spread','third','cancel','foreign','contract']){
           await run(`sky.${native?'native':'handlers'}.${kind}`,[...(kind==='spread'?[]:['hand.gate']),'hand.one-edge','hand.no-record-write'],(page,{context,emit})=>g6SkyGesture(page,{context,emit,kind,native}));
