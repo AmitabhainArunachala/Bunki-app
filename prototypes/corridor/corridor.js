@@ -11017,8 +11017,6 @@ function readerGlossLine(token) {
   return line;
 }
 
-/** The first-visit tip: one plain line (round 4, John T4: the explanation was "too verbose and..
- * confusing"). The text settings keep the longer form, with the word menu's press and hold. */
 /** How the reader's words work, in plain words: the text settings say it whole (John, 2026-10-02 #8). */
 function tapLadderHint() {
   return tx('タップするたびに、読み、意味、詳しい項目へと進みます。長押し（または右クリック）で、ほかの操作も。',
@@ -27539,12 +27537,12 @@ async function ensureBankExamples(word) {
 
 /* ---------------------------------- the reader's grammar, outside the reader
  * Any sentence the app shows — a sheet's 用例, a review cloze, a probe's
- * context line — carries the reader's click grammar, and starts BARE:
- * no furigana until it is asked for (operator's law, 2026-08-12 — the
- * sentence is the exercise; readings on request only, whatever the
- * reader's own dial says). One tap opens the word's popup, as in the
- * reader (reader lane 2026-10-02): the reading and the meaning at once,
- * Save, and Full entry ›. Taps land in the obslog. */
+ * context line — carries the reader's click grammar: the reading in place,
+ * then the stage, then the page. G3 gives every word one ladder, so its
+ * readings follow the reader's ふりがな dial: on tap (the default) and off
+ * start BARE (operator's law, 2026-08-12 — the sentence is the exercise;
+ * readings on request only), and only always shows them. Taps land in the
+ * obslog. */
 function renderSentenceTokens(container, tokens, opts = {}) {
   const target = opts.targetId || null;
   const contextId = opts.contextId || 'sentence';
