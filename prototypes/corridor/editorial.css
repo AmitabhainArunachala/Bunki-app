@@ -370,7 +370,8 @@ body.v-depth-layered .sheet, .sheet {
 body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background: transparent; padding: 0; }
 .sheet .entry-rows { border-top-color: var(--ed-rule); }
 .sheet .entry-row { border-bottom-color: var(--ed-rule-light); padding: 14px 2px; gap: 16px; }
-.sheet .entry-row:hover { background: var(--ai-wash); }
+/* (F: a row's hover wash is for a pointer that hovers — the (hover: hover) rule below; on a phone a tap's hover stuck to
+   whatever row the touch emulation left under the screen's middle, a lit row no one had touched) */
 .sheet .row-glyph { font-size: var(--type-display); min-width: 42px; }
 .sheet .row-main { font-size: var(--type-lead); line-height: 1.7; color: var(--ed-ink); }
 .sheet .row-word { font-size: var(--type-reading); line-height: 1.6; }
