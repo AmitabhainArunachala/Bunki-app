@@ -336,8 +336,13 @@ function titleReceiptProblem(record) {
   let home, there;
   try { home = new URL(record.url).host; there = new URL(url).host; } catch { return `${record.id}: unreadable URL`; }
   if (!(ENGLISH_EDITIONS[home] ?? []).includes(there)) return `${record.id}: ${there} is not ${home}'s English edition`;
-  const same = sameHeadline(receipt.pageHeadline, record.titleEn);
-  const shorter = normalHeadline(record.titleEn).length < normalHeadline(receipt.pageHeadline).length;
+  // N2 (2026-10-17) · the house marks an excerpt in both its titles: a Japanese title ending （抄） carries " (excerpt)"
+  // after the English one. Only that mark, only on such a row, is set aside before the headline is compared; the rest
+  // must still be the publisher's own headline, character for character (as normalHeadline reads it)
+  const excerpt = /（抄）$/u.test(record.title ?? '') && / \(excerpt\)$/u.test(record.titleEn ?? '');
+  const titleEn = excerpt ? record.titleEn.replace(/ \(excerpt\)$/u, '') : record.titleEn;
+  const same = sameHeadline(receipt.pageHeadline, titleEn);
+  const shorter = normalHeadline(titleEn).length < normalHeadline(receipt.pageHeadline).length;
   if (label === 'publisher' && !same) return `${record.id}: labelled the publisher's headline, but the page says "${receipt.pageHeadline}"`;
   if (label === 'publisher, shortened' && !shorter) return `${record.id}: labelled shortened, but the title is no shorter than the page headline on file`;
   if (label === 'publisher, adapted' && (!receipt.pageHeadline || same || shorter))
