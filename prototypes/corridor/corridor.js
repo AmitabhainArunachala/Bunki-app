@@ -9316,7 +9316,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     if (look.glossLang) gloss.lang = look.glossLang;
     said.append(gloss);
     if (look.gloss2) { const second = el('span', 'mini-gloss mini-gloss-2', look.gloss2); second.lang = 'en'; said.append(second); }
-  } else if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText(token.b, own || token.r)));
+  } else if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText(token.b, own || token.r, token.several)));
   else if (waiting) {
     const wait = el('span', 'mini-gloss mini-wait', '…');
     wait.style.fontWeight = '400';
@@ -10101,17 +10101,17 @@ function readerWordNote(p, token) {
   return hit ? hit.note : null;
 }
 
-function readerGlossMissText(form = '', reading = '') {
+function readerGlossMissText(form = '', reading = '', several = null) {
   if (form && D.dictionaryIndex && (D.dictionaryMode === 'main' || D.dictionaryCompleteForms?.has(String(form)))) {
     // R · asked, the full dictionary lists nothing for this spelling: the line says so, and promises no other look
     const rows = dictionaryRowsForForm(form);
     if (!rows.length) return tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.');
     // R2 · asked and answered, it never says "Not in the quick dictionary" again: several entries read the text's way
-    // stay the full entry's choice and are named; none read so is said plainly (N's line)
+    // stay the full entry's choice and are named (those the door narrowed to, when it did); none read so is said plainly
     const wanted = kataToHira(String(reading || ''));
     const read = wanted ? rows.filter((row) => row[5].some((kana, k) => kataToHira(kana) === wanted && readerReadingFits(row, k, form))) : [];
-    if (read.length > 1) {
-      const heads = [...new Set(read.map((row) => row[1]))].slice(0, 4);
+    if ((Array.isArray(several) && several.length > 1) || read.length > 1) {
+      const heads = (Array.isArray(several) && several.length > 1 ? several : [...new Set(read.map((row) => row[1]))]).slice(0, 4);
       return tx(`複数の項目：${heads.join('・')}`, `Several entries: ${heads.join(' · ')}`);
     }
     if (wanted && !read.length) return tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.');
@@ -10217,7 +10217,14 @@ function lemmaReading(token) {
 function readingForm(token) {
   if (!token?.b || token.b === token.s) return token;
   const reading = lemmaReading(token);
-  return reading ? { ...token, s: token.b, r: reading, inflected: token.s } : { ...token, b: token.s };
+  if (!reading) return { ...token, b: token.s };
+  // a verb whose kana dictionary form the quick dictionary has only as a word of another class (かえる is 蛙 "frog", なす
+  // 茄子 "eggplant", さる 猿 "monkey", かり 雁 "wild goose") is not that word: the form keeps the text's own reading, so the
+  // card says no entry is read so and lends nothing of the noun (its class: a "verb" or a JMdict v… code among its parts)
+  const core = D.dict?.[token.b];
+  const unfit = token.p === '動詞' && !!core?.p && kataToHira(String(core.r || '')) === kataToHira(reading) &&
+    !String(core.p).split(' · ').some((part) => /verb/u.test(part) || /^v[0-9a-z]/u.test(part));
+  return { ...token, s: token.b, r: unfit ? String(token.r || '') : reading, inflected: token.s };
 }
 
 /** R2 · among several entries that write a dictionary form and read it the derived way, the one that fits the token:
@@ -10374,7 +10381,8 @@ function readingToken(token) {
   // R2 · for a dictionary form, several narrow to the one that fits the token (おく: 置く, never 奥 or 億)
   let read = dictionaryRowsReadAs(door.b, own);
   if (door.inflected && read.length > 1) read = narrowLemmaEntries(read, own, door.b, door.p);
-  return read.length === 1 ? { ...door, seq: String(read[0][0]) } : read.length ? door : unnamed();
+  // several left: the card names them (the narrowed ones: 炊く · 焚く for a verb, never the nouns 卓 · 宅)
+  return read.length === 1 ? { ...door, seq: String(read[0][0]) } : read.length ? { ...door, several: [...new Set(read.map((row) => row[1]))] } : unnamed();
 }
 
 /** A word slip for a token whose own reading needs the full dictionary. With the dictionary open, its answer is a
@@ -10529,7 +10537,7 @@ function readerTokenState(token, index, kind) {
     : own && !(record?.r && kataToHira(String(record.r)) === kataToHira(own)) ? own : record?.r;
   if (showing && said && said !== token.s) parts.push(said);
   if (S.glossed?.has(index)) parts.push(kanji ? String(kanji.m || '').toLowerCase() : record?.m?.length ? inlineGloss(record)
-    : quick && !record ? readerReadingMissText(door.b) : readerGlossMissText(door.b, door.r));
+    : quick && !record ? readerReadingMissText(door.b) : readerGlossMissText(door.b, door.r, door.several));
   return parts.join(' · ');
 }
 function nameReaderToken(span, token, index, kind) {
