@@ -146,10 +146,13 @@ export async function checkLock({ requireComplete = false } = {}) {
     }
   }
   for (const { where, clip } of clips) {
-    const role = clip.speakerRole || 'narrator';
-    if (clip.voice !== voiceForRole(role, runtime))
+    // as the runtime reads it: identity is stated, never defaulted, and one refused clip refuses
+    // the whole narration manifest, so a missing role or model here is a silent build
+    const role = clip.speakerRole;
+    if (typeof role !== 'string') problems.push(`${where}: clip states no speakerRole`);
+    else if (clip.voice !== voiceForRole(role, runtime))
       problems.push(`${where}: voice '${clip.voice}' is not admissible for role '${role}'`);
-    if (clip.model && clip.model !== runtime.model) problems.push(`${where}: clip names another model`);
+    if (clip.model !== runtime.model) problems.push(`${where}: clip names ${clip.model ? 'another model' : 'no model'}`);
     const file = resolve(corridor, clip.src || '');
     if (!clip.src || !existsSync(file)) { problems.push(`${where}: names a missing clip ${clip.src}`); continue; }
     const bytes = readFileSync(file);
