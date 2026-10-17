@@ -5291,13 +5291,14 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
   --depth-size: 5px;
 }
 :where(:root[data-theme='shu']) :where(body, #sheet, #mini) { --depth-pigment: var(--world-ink); }
-/* the state's fill: one rule per state, read by every dot below */
-:is(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-depth='met'] { --depth-fill: var(--depth-met); }
-:is(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-depth='again'] { --depth-fill: var(--depth-again); }
-:is(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-depth='recalled'] { --depth-fill: var(--depth-recalled); }
-:is(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-depth='owned'] { --depth-fill: var(--depth-owned); }
+/* the state's fill: one rule per state, read by every dot below (zero-specificity list, so a surface of its own — the slip's
+   band — can set its own steps) */
+:where(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-depth='met'] { --depth-fill: var(--depth-met); }
+:where(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-depth='again'] { --depth-fill: var(--depth-again); }
+:where(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-depth='recalled'] { --depth-fill: var(--depth-recalled); }
+:where(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-depth='owned'] { --depth-fill: var(--depth-owned); }
 /* kept: a hairline of the page between the dot and its seal-red ring (a kept word not yet met is the ring alone) */
-:is(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-kept] {
+:where(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-kept] {
   --depth-edge: 0 0 0 1px var(--depth-ground), 0 0 0 2px var(--depth-ring);
 }
 
