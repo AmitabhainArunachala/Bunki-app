@@ -427,7 +427,7 @@ async function g6Activate(page, locator, modality) {
   assert(await locator.isVisible() && await locator.isEnabled(),'scale control is exposed and enabled');
   if(modality==='touch') return locator.tap();
   await locator.focus();
-  assert(await locator.evaluate(node=>document.activeElement===node),'native keyboard focus reaches actual control');
+  assert(await locator.evaluateAll(nodes=>nodes.length===1&&document.activeElement===nodes[0]),'native keyboard focus reaches actual control');
   await page.keyboard.press('Enter');
 }
 async function g6TabReach(page, locator) {
