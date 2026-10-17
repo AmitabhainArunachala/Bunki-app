@@ -717,6 +717,8 @@ const CASES = {
     try {
       await enter(page);
       await opened(page);
+      // the record as the talk begins: nothing he reached for may be kept without his tap, during the talk or after
+      const start = await T(page).record();
       await talk(page, '003', 1500);
       await settled(page);
       await talk(page, '004', 1200);
@@ -728,7 +730,8 @@ const CASES = {
       const rows = await page.evaluate(() => [...document.querySelectorAll('.speak-reached')].map((row) => ({ word: row.querySelector('.speak-row-word')?.textContent || '', save: !!row.querySelector('button.save-one') })));
       check('the words he reached for are listed, each with the one Save ▾', rows.length === 2 && rows.every((r) => r.save), JSON.stringify(rows));
       const mid = await T(page).record();
-      check('nothing is saved without his tap', mid.taken.length === before.taken.length && JSON.stringify(mid.taken) === JSON.stringify(before.taken));
+      check('nothing is saved without his tap, during the talk or in the look back', JSON.stringify(start.taken) === JSON.stringify(before.taken) &&
+        JSON.stringify(mid.taken) === JSON.stringify(start.taken), `${start.taken.length} at the start · ${before.taken.length} before 了 · ${mid.taken.length} in the look back`);
       const sensei = mid.obslog.filter((row) => row[1] === 'sensei');
       check('the evidence rows were written on their own, during the talk', sensei.length >= 2 && sensei.some((row) => row[2] === 'word:命名'), JSON.stringify(sensei));
       check('FSRS untouched: no review row, no card state', JSON.stringify(mid.srs) === '{}' && mid.revlog.length === 0);
