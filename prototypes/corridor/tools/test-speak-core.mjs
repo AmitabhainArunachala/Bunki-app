@@ -30,21 +30,40 @@ function test(name, fn) {
 const near = (actual, expected, tolerance, label) =>
   assert.ok(Math.abs(actual - expected) <= tolerance, `${label}: ${actual} is not within ${tolerance} of ${expected}`);
 
-/* ---- the voice lock: one value, the one John approved (V/PREP-fugu.md §1), followed when V ships its file */
-test('lock · the pinned lock is the approved tuple (3.1 TTS preview, Kore main, Charon second)', () => {
-  assert.equal(core.VOICE_LOCK.model, 'gemini-3.1-flash-tts-preview');
-  assert.equal(core.VOICE_LOCK.mainVoice.prebuilt, 'Kore');
-  assert.equal(core.VOICE_LOCK.secondaryVoice.prebuilt, 'Charon');
-  assert.equal(core.VOICE_LOCK.endpoint, 'https://generativelanguage.googleapis.com/v1beta');
-  assert.equal(core.VOICE_LOCK.retires, '2026-11-17');
+/* ---- the voice lock: V's audio/voice-lock.json is the one value; the room keeps a copy only as a checked fallback */
+const V_LOCK_8CA5BFD2 = { model: 'gemini-3.8-flash-tts', main: 'Kore', second: 'Charon', endpoint: 'https://generativelanguage.googleapis.com/v1beta',
+  approvedReference: 'gemini-3.1-flash-tts-preview', live: { model: 'gemini-3.8-live', approved: false } };
+test('lock · the fallback is V\'s lock as of 8ca5bfd2: 3.8 Flash TTS, Kore main, Charon second, 3.1 the approved reference', () => {
+  assert.equal(core.VOICE_LOCK.model, V_LOCK_8CA5BFD2.model);
+  assert.equal(core.VOICE_LOCK.mainVoice.prebuilt, V_LOCK_8CA5BFD2.main);
+  assert.equal(core.VOICE_LOCK.secondaryVoice.prebuilt, V_LOCK_8CA5BFD2.second);
+  assert.equal(core.VOICE_LOCK.endpoint, V_LOCK_8CA5BFD2.endpoint);
+  assert.equal(core.VOICE_LOCK.approvedReference.model, V_LOCK_8CA5BFD2.approvedReference);
+  assert.deepEqual({ ...core.VOICE_LOCK_FILE.live }, V_LOCK_8CA5BFD2.live, 'the live slot stays unapproved and is never the room\'s');
 });
-test('lock · equals V\'s audio/voice-lock.json once it ships (absent today: the pin stands)', () => {
+test('lock · the fallback equals V\'s audio/voice-lock.json whenever the file is in the tree', () => {
   const file = resolve(CORRIDOR, 'audio/voice-lock.json');
   if (!existsSync(file)) return;
   const v = JSON.parse(readFileSync(file, 'utf8'));
-  assert.equal(core.VOICE_LOCK.model, v.model, 'the pin must be rewritten to V\'s model');
-  assert.equal(core.VOICE_LOCK.mainVoice.prebuilt, v.mainVoice.prebuilt);
-  assert.equal(core.VOICE_LOCK.secondaryVoice.prebuilt, v.secondaryVoice.prebuilt);
+  const pin = core.VOICE_LOCK_FILE;
+  assert.equal(pin.render.model, v.render.model, 'rewrite VOICE_LOCK_FILE to V\'s render.model');
+  assert.equal(pin.endpoint, v.endpoint);
+  for (const slot of ['main', 'second']) {
+    assert.equal(pin.voices[slot].id, v.voices[slot].id);
+    assert.equal(pin.voices[slot].prebuilt, v.voices[slot].prebuilt);
+  }
+  assert.equal(pin.approvedReference.model, v.approvedReference?.model);
+  assert.deepEqual({ ...pin.live }, { model: v.live?.model, approved: v.live?.approved });
+  assert.deepEqual(core.voiceLockFrom(v), core.VOICE_LOCK, 'the room reads the file exactly as its fallback');
+});
+test('lock · the room reads V\'s lock in each of its shapes, and refuses a malformed one', () => {
+  const mirror = { model: 'gemini-3.8-flash-tts', voices: { kore: 'Kore', charon: 'Charon' }, main: 'kore', second: 'charon', roles: { 'speaker-b': 'charon' } };
+  assert.deepEqual(core.voiceLockFrom(mirror), core.VOICE_LOCK, 'corridor.js\'s generated mirror');
+  assert.deepEqual(core.voiceLockFrom(core.VOICE_LOCK_FILE), core.VOICE_LOCK, 'the file shape');
+  assert.equal(core.voiceLockFrom({ ...mirror, model: 'gemini-9-flash-tts' }).model, 'gemini-9-flash-tts', 'a swap in the lock is followed');
+  assert.equal(core.voiceLockFrom(null), core.VOICE_LOCK);
+  assert.equal(core.voiceLockFrom({ model: 'x' }), core.VOICE_LOCK);
+  assert.equal(core.voiceLockFrom({ ...mirror, voices: { kore: 'Kore', charon: 'Kore' } }), core.VOICE_LOCK, 'one voice for both roles is refused');
 });
 test('lock · a line\'s voice: Kore always; Charon only for a two-person scene\'s second character; nothing else', () => {
   const two = core.SCENE_TEMPLATES.find((s) => s.kind === 'two');
@@ -54,24 +73,22 @@ test('lock · a line\'s voice: Kore always; Charon only for a two-person scene\'
   assert.equal(core.voiceFor('second', two), 'Charon');
   assert.equal(core.voiceFor('second', one), null, 'no Charon stand-in outside a two-person scene');
 });
-test('lock · the room names no model: every model id lives in speak-core.mjs (the lock and the price table)', () => {
+test('lock · the room names no model and no voice; corridor.js names no TTS model outside V\'s generated mirror', () => {
   const room = readFileSync(resolve(CORRIDOR, 'speak.js'), 'utf8');
   assert.ok(!/gemini-\d/u.test(room), 'speak.js names a model literally');
   assert.ok(!/['"]Charon['"]|['"]Kore['"]\s*[,}]/u.test(room), 'speak.js names a voice literally');
   const hook = readFileSync(resolve(CORRIDOR, 'corridor.js'), 'utf8');
-  assert.ok(!/gemini-3\.1-flash-tts-preview/u.test(hook), 'corridor.js names the locked model');
+  const generated = /\/\* === VOICE_LOCK[\s\S]*?\/\* === end VOICE_LOCK === \*\//u.exec(hook)?.[0] || '';
+  const outside = hook.replace(generated, '');
+  assert.deepEqual(outside.match(/gemini-[0-9][A-Za-z0-9.-]*tts[A-Za-z0-9.-]*/gu) || [], [], 'corridor.js names a TTS model outside the lock');
   const coreText = readFileSync(resolve(CORRIDOR, 'speak-core.mjs'), 'utf8');
-  assert.equal(coreText.split(`model: '${core.VOICE_LOCK.model}'`).length, 2, 'the lock names its model once');
+  assert.equal(coreText.split(`model: '${core.VOICE_LOCK.model}'`).length, 2, 'the fallback names its render model once');
 });
-test('lock · the lock\'s model and the ears are priced (the meter never guesses)', () => {
+test('lock · the lock\'s model, its approved reference and the ears are priced (the meter never guesses)', () => {
   assert.ok(core.RATES.models[core.VOICE_LOCK.model], 'no published rate for the locked model');
+  assert.ok(core.RATES.models[core.VOICE_LOCK.approvedReference.model]);
   assert.ok(core.RATES.models[core.EARS_MODEL]);
   assert.equal(core.usageCost('gemini-unknown', { promptTokenCount: 10 }), null);
-});
-test('lock · a malformed lock from a file keeps the pin', () => {
-  assert.equal(core.voiceLockFrom(null), core.VOICE_LOCK);
-  assert.equal(core.voiceLockFrom({ model: 'x' }), core.VOICE_LOCK);
-  assert.equal(core.voiceLockFrom({ model: 'm2', mainVoice: { prebuilt: 'Kore' }, secondaryVoice: { prebuilt: 'Charon' } }).model, 'm2');
 });
 
 /* ---- plants: the sky's order and reasons, the reading he met */
@@ -251,8 +268,9 @@ test('base64 · round trips bytes of every length', () => {
 });
 
 /* ---- cost: §3.4's arithmetic from the published rates */
-test('cost · an hour is ≈ $0.95 in the locked voice, ≈ $0.53 in 3.8 Flash TTS this year, ≈ $0.87 from 2027', () => {
-  near(core.hourEstimate(core.VOICE_LOCK.model, core.EARS_MODEL, new Date('2026-10-17')), 0.95, 0.005, '3.1 hour');
+test('cost · an hour is ≈ $0.95 in the 3.1 voice he heard, ≈ $0.53 in 3.8 Flash TTS (the lock) this year, ≈ $0.87 from 2027', () => {
+  near(core.hourEstimate('gemini-3.1-flash-tts-preview', core.EARS_MODEL, new Date('2026-10-17')), 0.95, 0.005, '3.1 hour');
+  near(core.hourEstimate(core.VOICE_LOCK.model, core.EARS_MODEL, new Date('2026-10-17')), 0.533, 0.005, 'the lock\'s hour');
   near(core.hourEstimate('gemini-3.8-flash-tts', core.EARS_MODEL, new Date('2026-10-17')), 0.533, 0.005, '3.8 hour');
   near(core.hourEstimate('gemini-3.8-flash-tts', core.EARS_MODEL, new Date('2027-02-01')), 0.875, 0.005, '3.8 hour, 2027');
 });
@@ -260,7 +278,9 @@ test('cost · one turn\'s usage × the published rates; the meter rolls by month
   const brain = { promptTokenCount: 3480, candidatesTokenCount: 350, promptTokensDetails: [{ modality: 'TEXT', tokenCount: 3000 }, { modality: 'AUDIO', tokenCount: 480 }] };
   near(core.usageCost(core.EARS_MODEL, brain), (3480 * 0.30 + 350 * 2.50) / 1e6, 1e-12, 'brain');
   const voice = { promptTokenCount: 80, candidatesTokenCount: 375 };
-  near(core.usageCost(core.VOICE_LOCK.model, voice), (80 * 1.00 + 375 * 20.00) / 1e6, 1e-12, 'voice');
+  near(core.usageCost('gemini-3.1-flash-tts-preview', voice), (80 * 1.00 + 375 * 20.00) / 1e6, 1e-12, 'voice, 3.1');
+  near(core.usageCost('gemini-3.8-flash-tts', voice, new Date('2026-10-17')), (80 * 0.50 + 375 * 9.00) / 1e6, 1e-12, 'voice, 3.8 in 2026');
+  near(core.usageCost('gemini-3.8-flash-tts', voice, new Date('2027-01-02')), (80 * 1.00 + 375 * 18.00) / 1e6, 1e-12, 'voice, 3.8 from 2027');
   const when = new Date('2026-10-17T12:00:00');
   let spend = core.addSpend({ v: 1, month: '2026-09', usd: 9, cap: 0.01 }, 0.004, when);
   assert.deepEqual(spend, { v: 1, month: '2026-10', usd: 0.004, cap: 0.01 });

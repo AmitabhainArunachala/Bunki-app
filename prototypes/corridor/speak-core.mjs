@@ -8,28 +8,63 @@
  */
 
 /* ---------------------------------------------------------------- the voice lock
- * John, 2026-09-29 22:39 JST: "ok, let:s lock these in for now" — Kore as the main voice, Charon for the second
- * speaker in conversations, on gemini-3.1-flash-tts-preview. Slice V ships audio/voice-lock.json; until then this
- * pinned value is the lock, and the room reads the model from here and nowhere else. Google shuts the model down
- * on 2026-11-17 (deprecations page, 2026-10-12): the room follows the lock when V changes it, never by itself. */
-export const VOICE_LOCK = Object.freeze({
+ * Slice V's audio/voice-lock.json is the one value (V, 8ca5bfd2): render.model is the TTS model every Kore clip is
+ * made with (the lead's 10-17 decision on John's "for now just anything decent and we can swap later"), Kore is the
+ * main voice and Charon the second, for speaker-b only. The room is a pipeline: Kore's turns are TTS in render.model,
+ * the same Kore as every clip in the app, and it never calls the lock's separate, unapproved `live` slot.
+ * The room reads the lock the app carries (corridor.js's generated VOICE_LOCK mirror, through host.voiceLock()).
+ * VOICE_LOCK_FILE below is a fallback only, a copy of V's file that test-speak-core holds equal to the file whenever
+ * the file is in the tree. approvedReference is what John heard on 09-29; Google shuts it down on 2026-11-17. */
+export const VOICE_LOCK_FILE = Object.freeze({
   v: 1,
   provider: 'Google Generative Language API',
   endpoint: 'https://generativelanguage.googleapis.com/v1beta',
-  model: 'gemini-3.1-flash-tts-preview',
-  retires: '2026-11-17',
-  mainVoice: Object.freeze({ id: 'kore', prebuilt: 'Kore', role: 'main' }),
-  secondaryVoice: Object.freeze({ id: 'charon', prebuilt: 'Charon', role: 'second speaker in conversations only' }),
+  render: Object.freeze({ model: 'gemini-3.8-flash-tts' }),
+  live: Object.freeze({ model: 'gemini-3.8-live', approved: false }),
+  voices: Object.freeze({
+    main: Object.freeze({ id: 'kore', prebuilt: 'Kore', roles: Object.freeze(['narrator', 'word', 'example']) }),
+    second: Object.freeze({ id: 'charon', prebuilt: 'Charon', roles: Object.freeze(['speaker-b']) }),
+  }),
+  approvedReference: Object.freeze({ model: 'gemini-3.1-flash-tts-preview', heardOn: '2026-09-29' }),
 });
 
-/** A lock read from V's file is used only when it has the shape the room needs; anything else keeps the pin. */
+const ENDPOINT_RE = /^https:\/\//u;
+const nonEmpty = (value) => typeof value === 'string' && value.trim().length > 0 && value.length < 120;
+/** The room's view of a lock, from any of its three shapes: V's file (render.model, voices.main/second), corridor.js's
+ * generated mirror (model, voices {id: Prebuilt}, main, second) or the room's own (model, mainVoice, secondaryVoice).
+ * Anything malformed is refused (null): silence is better than a wrong voice. */
+function lockView(candidate) {
+  if (!candidate || typeof candidate !== 'object') return null;
+  let model = null, main = null, second = null;
+  if (candidate.render && candidate.voices?.main) {
+    model = candidate.render.model; main = candidate.voices.main; second = candidate.voices.second;
+  } else if (typeof candidate.main === 'string' && candidate.voices && typeof candidate.voices === 'object') {
+    model = candidate.model;
+    main = { id: candidate.main, prebuilt: candidate.voices[candidate.main] };
+    second = { id: candidate.second, prebuilt: candidate.voices[candidate.second] };
+  } else {
+    model = candidate.model; main = candidate.mainVoice; second = candidate.secondaryVoice;
+  }
+  const endpoint = candidate.endpoint || VOICE_LOCK_FILE.endpoint;
+  if (!nonEmpty(model) || !ENDPOINT_RE.test(endpoint) || !nonEmpty(main?.prebuilt) || !nonEmpty(second?.prebuilt) || main.prebuilt === second.prebuilt) return null;
+  return Object.freeze({
+    v: 1, endpoint, model,
+    mainVoice: Object.freeze({ id: String(main.id || 'main'), prebuilt: main.prebuilt }),
+    secondaryVoice: Object.freeze({ id: String(second.id || 'second'), prebuilt: second.prebuilt }),
+    // what he heard, by model and day only; the mirror carries none, so the file's own (or the fallback's) stands
+    approvedReference: Object.freeze({
+      model: nonEmpty(candidate.approvedReference?.model) ? candidate.approvedReference.model : VOICE_LOCK_FILE.approvedReference.model,
+      heardOn: String(candidate.approvedReference?.heardOn || VOICE_LOCK_FILE.approvedReference.heardOn),
+    }),
+  });
+}
+
+/** The fallback lock, in the room's shape. */
+export const VOICE_LOCK = lockView(VOICE_LOCK_FILE);
+
+/** The lock the room uses: the app's when it carries a sound one, else the fallback. */
 export function voiceLockFrom(candidate) {
-  const ok = candidate && typeof candidate === 'object' && typeof candidate.model === 'string' && candidate.model.length < 120 &&
-    /^https:\/\//u.test(String(candidate.endpoint || VOICE_LOCK.endpoint)) &&
-    typeof candidate.mainVoice?.prebuilt === 'string' && candidate.mainVoice.prebuilt &&
-    typeof candidate.secondaryVoice?.prebuilt === 'string' && candidate.secondaryVoice.prebuilt;
-  if (!ok) return VOICE_LOCK;
-  return Object.freeze({ ...VOICE_LOCK, ...candidate, endpoint: candidate.endpoint || VOICE_LOCK.endpoint });
+  return lockView(candidate) || VOICE_LOCK;
 }
 
 /** The voice a line is said in: Kore for every line, Charon only for the second character of a two-person scene.

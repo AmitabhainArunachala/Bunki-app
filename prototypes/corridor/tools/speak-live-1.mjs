@@ -11,8 +11,9 @@
  * It measures: per-leg latency (upload, ears-and-brain, first voice byte, voice done; p50 and p95 over 16 turns × 2
  * runs); transcription fidelity on the known clips (character error rate); forgiveness (which planted mistakes the ears
  * report and which they silently correct); Kore's reading of the trap words (年, 月, 今日, 同年) by a kana round trip
- * through the same ears; the real usageMetadata against §3.4. It renders the same 16 replies in the locked voice and in
- * gemini-3.8-flash-tts, so V's side-by-side for John's ear exists before 2026-11-17 as a by-product.
+ * through the same ears; the real usageMetadata against §3.4. It renders the same 16 replies in the lock's voice (V's
+ * render.model) and in the voice John heard on 09-29 (the lock's approvedReference, shut down 2026-11-17), so the
+ * side-by-side for his ear exists before that date as a by-product.
  *
  * The key is GEMINI_API_KEY from the environment, else read from ~/.dharma/agent_keys.env by a parser (the way
  * render-narration-gemini.mjs reads it); it is never printed, logged or written. Output goes outside the repository.
@@ -33,7 +34,8 @@ const arg = (flag) => { const at = process.argv.indexOf(flag); return at > 0 ? p
 const DRY = process.argv.includes('--dry-run');
 const CAP = Number(arg('--cap-usd'));
 const OUT = arg('--out');
-const COMPARE_VOICE = 'gemini-3.8-flash-tts';
+// the voice he heard on 09-29, from the lock itself: no model is named here
+const COMPARE_VOICE = core.VOICE_LOCK.approvedReference.model;
 
 if (!OUT) { console.error('--out <dir outside the repository> is required'); process.exit(2); }
 if (!DRY) {
