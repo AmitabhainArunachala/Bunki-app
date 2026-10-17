@@ -356,6 +356,8 @@ export function createSpeakRoom(host) {
     st.playToken += 1;
     st.playing = null;
     if (audio && !audio.paused) { try { audio.pause(); } catch { /* already quiet */ } }
+    // her voice stopped by the room (橋, 影, 了, his tap): the ring rests unless what stopped her starts something else
+    if (st.phase === 'speaking') setPhase('rest');
   }
 
   /* ---------------------------------------------------------------- the microphone */
@@ -405,8 +407,10 @@ export function createSpeakRoom(host) {
       levelLoop(take);
     } catch (error) {
       stream?.getTracks().forEach((track) => track.stop());
+      // what refused, for the instruments (never audio, never a key): which step and how
+      st.micError = `${stream ? 'graph' : 'getUserMedia'}: ${error?.name || 'Error'}: ${String(error?.message || '').slice(0, 120)}`;
       if (epoch !== st.epoch) return;
-      st.micDenied = error?.name === 'NotAllowedError' || error?.name === 'SecurityError';
+      st.micDenied = !stream && (error?.name === 'NotAllowedError' || error?.name === 'SecurityError');
       setStatus(st.micDenied ? 'mic-denied' : 'mic-missing');
       setPhase('rest');
     }
@@ -664,7 +668,8 @@ export function createSpeakRoom(host) {
     if (st.layer === 'shadow' && !line) { closeLayer(); return; }
     const target = line || [...(s?.lines || [])].reverse().find((l) => l.who !== 'me' && l.text);
     if (st.phase === 'speaking') stopVoice();
-    if (st.take) void endTake(false);
+    // a take in progress is not a shadowing take: it is dropped and the ring rests until he taps
+    if (st.take) { void endTake(false); setPhase('rest'); }
     st.shadow = { line: target || null, result: null, mine: null };
     st.mode = target ? 'shadow' : st.mode;
     openLayer('shadow');
@@ -1491,15 +1496,17 @@ export function createSpeakRoom(host) {
     if (!clips.length || used + bytes > AUDIO_DB_MAX_BYTES) { button.textContent = t('残せませんでした', 'Couldn’t keep it'); return; }
     const db = await openAudioDb();
     if (!db) { button.textContent = t('残せませんでした', 'Couldn’t keep it'); return; }
+    // her voice as bytes, not Blobs: WebKit refuses Blobs in IndexedDB in a private (ephemeral) session; bytes keep anywhere
     const item = { id: `${Date.now().toString(36)}`, text: line.text, tokens: line.tokens || null, bytes, ts: Date.now(),
-      audio: clips.map((clip) => new Blob([clip.wav], { type: 'audio/wav' })) };
-    await new Promise((resolve) => {
-      const tx = db.transaction('lines', 'readwrite');
-      tx.objectStore('lines').put(item);
-      tx.oncomplete = () => { db.close(); resolve(); };
-      tx.onerror = () => { db.close(); resolve(); };
+      audio: clips.map((clip) => Uint8Array.from(clip.wav)) };
+    const kept = await new Promise((resolve) => {
+      let tx;
+      try { tx = db.transaction('lines', 'readwrite'); tx.objectStore('lines').put(item); } catch { db.close(); resolve(false); return; }
+      tx.oncomplete = () => { db.close(); resolve(true); };
+      tx.onerror = tx.onabort = () => { db.close(); resolve(false); };
     });
-    button.textContent = t('残しました', 'Kept');
+    // "Kept" only for a write the store confirmed
+    button.textContent = kept ? t('残しました', 'Kept') : t('残せませんでした', 'Couldn’t keep it');
     st.savedLines = null;
   }
   function paintSavedLines(container) {
@@ -1521,8 +1528,8 @@ export function createSpeakRoom(host) {
         play.addEventListener('click', async () => {
           primeInGesture();
           const token = ++st.playToken;
-          for (const blob of item.audio || []) {
-            const url = URL.createObjectURL(blob);
+          for (const audioBytes of item.audio || []) {
+            const url = URL.createObjectURL(audioBytes instanceof Blob ? audioBytes : new Blob([audioBytes], { type: 'audio/wav' }));
             const result = await playClip(url, 1, token);
             URL.revokeObjectURL(url);
             if (result !== 'ended') break;
@@ -1532,9 +1539,9 @@ export function createSpeakRoom(host) {
         const shadow = el('button', 'btn-tertiary speak-quiet', t('影', 'Shadow'));
         shadow.type = 'button';
         shadow.addEventListener('click', () => {
-          const clips = (item.audio || []).map((blob) => Promise.resolve(null).then(async () => {
-            const wav = new Uint8Array(await blob.arrayBuffer());
-            return { url: URL.createObjectURL(blob), wav, text: item.text };
+          const clips = (item.audio || []).map((audioBytes) => Promise.resolve(null).then(async () => {
+            const wav = audioBytes instanceof Blob ? new Uint8Array(await audioBytes.arrayBuffer()) : Uint8Array.from(audioBytes);
+            return { url: URL.createObjectURL(new Blob([wav], { type: 'audio/wav' })), wav, text: item.text };
           }));
           onShadow({ who: 'kore', kind: 'saved', text: item.text, tokens: item.tokens, speaker: 'main', index: -1, voice: clips });
         });
@@ -1648,8 +1655,8 @@ export function createSpeakRoom(host) {
       phase: st.phase, mode: st.mode, layer: st.layer, status: st.status?.kind || null, scene: st.scene?.id || null,
       session: s ? { id: s.id, lines: s.lines.map((l) => ({ who: l.who, kind: l.kind, text: l.text, silent: !!l.silent, corrections: l.corrections?.length || 0 })),
         plants: s.plants.map((p) => p.word), reached: s.reached.map((r) => r.word), ended: s.ended, bridgeTries: s.bridgeTries || 0, notes: s.savedNotes } : null,
-      wav: st.wavInfo, gum: st.gum, take: !!st.take, voiceRetired: st.voiceRetired, offline: st.offline, micDenied: st.micDenied,
-      playing: st.playing ? { kind: st.playing.kind, rate: st.playing.rate || 1 } : null, audioPaused: audio ? audio.paused : true,
+      wav: st.wavInfo, gum: st.gum, take: !!st.take, voiceRetired: st.voiceRetired, offline: st.offline, micDenied: st.micDenied, micError: st.micError || null,
+      playing: st.playing ? { kind: st.playing.kind, rate: st.playing.rate || 1 } : null, audioPaused: audio ? audio.paused || audio.ended : true,
       audioRate: audio ? audio.playbackRate : null, shadow: st.shadow?.result ? { missing: st.shadow.result.check.missing, extra: st.shadow.result.check.extra,
         swaps: st.shadow.result.check.swaps, his: !!st.shadow.result.his, hers: !!st.shadow.result.hers, mySeconds: st.shadow.result.mySeconds,
         herSeconds: st.shadow.result.herSeconds } : null,
