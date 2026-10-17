@@ -9321,7 +9321,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     if (look.glossLang) gloss.lang = look.glossLang;
     said.append(gloss);
     if (look.gloss2) { const second = el('span', 'mini-gloss mini-gloss-2', look.gloss2); second.lang = 'en'; said.append(second); }
-  } else if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText(token.b, own || token.r, token.several)));
+  } else if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', token.noFit
+    ? tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.') : readerGlossMissText(token.b, own || token.r, token.several)));
   else if (waiting) {
     const wait = el('span', 'mini-gloss mini-wait', '…');
     wait.style.fontWeight = '400';
@@ -10093,7 +10094,8 @@ function readerQuickRecord(token) {
   // by it, and a core spelling read otherwise answers with the entry so read once the full dictionary has it
   const own = !token.b || token.b === token.s ? String(token.r || '') : '';
   if (token.seq != null && token.seq !== '') return lookup(token.b, token.seq, own);
-  if (D.dict[token.b]) return lookup(token.b, null, own);
+  // R2 · a door marked unfit (a verb whose kana form the quick dictionary has only as a noun) never takes that noun
+  if (D.dict[token.b] && !token.unfit) return lookup(token.b, null, own);
   const kept = S.deepWords?.[token.b];
   if (kept) return { r: kept.r || '', m: kept.m || [] };
   const old = D.words[token.b];
@@ -10225,12 +10227,14 @@ function readingForm(token) {
   const reading = lemmaReading(token);
   if (!reading) return { ...token, b: token.s };
   // a verb whose kana dictionary form the quick dictionary has only as a word of another class (かえる is 蛙 "frog", なす
-  // 茄子 "eggplant", さる 猿 "monkey", かり 雁 "wild goose") is not that word: the form keeps the text's own reading, so the
-  // card says no entry is read so and lends nothing of the noun (its class: a "verb" or a JMdict v… code among its parts)
+  // 茄子 "eggplant", さる 猿 "monkey", かり 雁 "wild goose") is not that word: the form keeps its own reading — the label and
+  // the reading always name the same form — and is marked unfit, so the quick dictionary's noun never answers for it and
+  // its entry is chosen among the verbs read so (readingToken: かえり → 帰る, なさ → 為す), or none (its class: a "verb" or
+  // a JMdict v… code among the quick dictionary's parts)
   const core = D.dict?.[token.b];
   const unfit = token.p === '動詞' && !!core?.p && kataToHira(String(core.r || '')) === kataToHira(reading) &&
     !String(core.p).split(' · ').some((part) => /verb/u.test(part) || /^v[0-9a-z]/u.test(part));
-  return { ...token, s: token.b, r: unfit ? String(token.r || '') : reading, inflected: token.s };
+  return { ...token, s: token.b, r: reading, inflected: token.s, ...(unfit ? { unfit: true } : {}) };
 }
 
 /** R2 · among several entries that write a dictionary form and read it the derived way, the one that fits the token:
@@ -10347,7 +10351,8 @@ function readingAsksIndex(form, reading) {
 function readyTokenReading(token) {
   const door = readingForm(token);
   const forms = new Set();
-  if (readingAsksIndex(door.b, tokenReading(door))) forms.add(door.b);
+  // R2 · a door the quick dictionary cannot answer for (another class's word read alike) asks the full one too
+  if (readingAsksIndex(door.b, tokenReading(door)) || door.unfit) forms.add(door.b);
   // R2 · an inflected word the quick dictionary does not settle asks for its dictionary form's rows (they may read it, or
   // name its entry), and a する/ずる form the quick dictionary lacks for its other spelling too (解する → 解す)
   if (token?.b && token.b !== token.s && (!D.dict?.[token.b] || door.b !== token.b)) {
@@ -10369,7 +10374,7 @@ function readingToken(token) {
   // R2 · the door is the token as its dictionary form, read the way the text reads it (readingForm)
   const door = readingForm(token);
   const own = tokenReading(door);
-  if (!own || (door.seq != null && door.seq !== '') || !readingAsksIndex(door.b, own) || !D.dictionaryIndex) return door;
+  if (!own || (door.seq != null && door.seq !== '') || (!readingAsksIndex(door.b, own) && !door.unfit) || !D.dictionaryIndex) return door;
   const rows = dictionaryRowsForForm(door.b);
   // R2 · once the full dictionary has answered for the spelling, a word no entry is read so for may still be named: a
   // dictionary form's other spelling (解する → 解す), a sound change of an entry's reading (いっ → いち), a lone kanji (寺 じ)
@@ -10378,7 +10383,7 @@ function readingToken(token) {
   if (!rows.length) return unnamed();
   // N · an entry read otherwise counts as missing: the door names the full dictionary's entry read the token's way, or
   // none — never the form's first row, whose meaning belongs to another reading (訳 read やく is not わけ · reason)
-  if (D.dict[door.b]) {
+  if (D.dict[door.b] && !door.unfit) {
     const named = lookup(door.b, null, own)?.seq;
     return named ? { ...door, seq: String(named) } : unnamed();
   }
@@ -10386,9 +10391,14 @@ function readingToken(token) {
   // reading's own restriction (readerReadingFits); several stay the full entry's explicit choice (D11's own matcher).
   // R2 · for a dictionary form, several narrow to the one that fits the token (おく: 置く, never 奥 or 億)
   let read = dictionaryRowsReadAs(door.b, own);
+  // R2 · an unfit door's entry is a verb, never the noun read alike (かえる: 帰る, 変える, 返る, 替える — never 蛙)
+  if (door.unfit) read = read.filter((row) => (row[6] || []).some((gloss) => /^to /u.test(String(gloss))));
   if (door.inflected && read.length > 1) read = narrowLemmaEntries(read, own, door.b, door.p);
   // several left: the card names them (the narrowed ones: 炊く · 焚く for a verb, never the nouns 卓 · 宅)
-  return read.length === 1 ? { ...door, seq: String(read[0][0]) } : read.length ? { ...door, several: [...new Set(read.map((row) => row[1]))] } : unnamed();
+  if (read.length === 1) return { ...door, seq: String(read[0][0]) };
+  if (read.length) return { ...door, several: [...new Set(read.map((row) => row[1]))] };
+  // an unfit door no verb is read so for (Kawaguchi's 同じかるべき: かり is only nouns) says so, never the nouns' names
+  return door.unfit && dictionaryAnsweredForm(door.b) ? { ...door, noFit: true } : unnamed();
 }
 
 /** A word slip for a token whose own reading needs the full dictionary. With the dictionary open, its answer is a
@@ -28809,8 +28819,10 @@ function readerEntryNode(token, index, p) {
   const node = { t: 'word', id: door.b, from: { passage: p.id, index }, ctxScope: 'sent' };
   const own = tokenReading(door);
   if (door.seq) return { ...node, seq: door.seq, reading: door.r || own };
-  if (D.dict[door.b] && readingAsksIndex(door.b, own)) return { ...node, reading: own };
-  if (D.dict[door.b]) return node;
+  // R2 · an unfit door (a verb read like the quick dictionary's noun) never opens that noun's page: it is matched like a
+  // word the quick dictionary lacks (D11), by its reading
+  if (D.dict[door.b] && readingAsksIndex(door.b, own) && !door.unfit) return { ...node, reading: own };
+  if (D.dict[door.b] && !door.unfit) return node;
   node.readerChoice = { passage: p.id, index, s: token.s, b: token.b, r: token.r || '', state: 'pending',
     ...(door !== token ? { form: door.b, reading: own } : {}) };
   return node;
