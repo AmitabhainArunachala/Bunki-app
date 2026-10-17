@@ -1244,7 +1244,7 @@ async function assistedWhyCase(page, section, log) {
     o.partition = await page.locator('.exam-independence').textContent();
     o.markedRows = await page.locator('[data-exam-assisted="true"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.examItem));
     assert.equal(o.score, `8 of ${items.length} correct, including 2 with help`);
-    assert.equal(o.partition, 'Independent 7 · with help 3 · Unanswered 2');
+    assert.equal(o.partition, 'Independent 7 · With help 3 · Unanswered 2');
     assert.deepEqual(o.markedRows, G1.assisted.map((q) => byQ[q].id));
   });
   await stage('F3-post-terminal-reload', 'behavior', async (o) => {
@@ -1287,7 +1287,7 @@ async function assistedWhyCase(page, section, log) {
     await page.locator('#assessment-question-feedback').waitFor();
     o.marks = await page.locator('.review-face .assessment-review-assisted').allInnerTexts();
     assert.equal(o.before, 0, 'No mark before the answer is checked');
-    assert.deepEqual(o.marks, ['with help · you opened the explanation after answering']);
+    assert.deepEqual(o.marks, ['With help · you opened the explanation after answering']);
   });
   return { attemptId, kept, counts: { correct: 8, incorrect: 2, independent: 7, assisted: 3, unanswered: 2 } };
 }
@@ -1573,6 +1573,92 @@ try {
       await page.screenshot({ path: resolve(evidence, `${engine}${suffix}-study-missed-without-bookmark.png`), fullPage: true });
       return { lookupText, mark, mistake: mistake.id, prioritySubjects: priorities.targets.map(row => row.subject),
         unanswered: followup.evidence.filter(row => row.outcome === 'unanswered' || row.outcome === 'not-reached').length };
+    });
+    // G3 · the word menu reveals nothing, so opening and dismissing it records no help; Full entry reveals the entry and
+    // records the dictionary help once, before the page opens.
+    await run(engine, `study-word-menu-records-help-only-on-reveal${suffix}`, async (page, context, log) => {
+      await start(page, section, 'practice');
+      const item = items[0];
+      const attempt = async () => selectAssessmentV2((await disk(page)).assessmentLibraryV2).attempt;
+      const word = '橋';
+      const lookupWord = page.locator(`.exam-prompt .japanese-lookup-word[data-lookup-text="${word}"]`);
+      assert.equal(await lookupWord.count(), 1, 'The real first study question has the selected dictionary occurrence');
+      const lookupText = await lookupWord.textContent();
+      const menu = page.locator('#reader-word-menu');
+      const before = await attempt();
+      const recordBefore = await disk(page);
+      assert.equal(assessmentItemAssistanceV2(before, item.id), null);
+      const bare = async (label) => {
+        assert.equal(await page.locator('#mini, #sheet, .exam-prompt [data-ladder-rung]').count(), 0, `${label} reveals no hint or page`);
+        assert.equal(await lookupWord.locator('rt').count(), 0, `${label} leaves the occurrence bare`);
+      };
+      const dismissals = {};
+      for (const [how, dismiss] of [['escape', () => page.keyboard.press('Escape')], ['outside', () => page.locator('.exam-heading').click()]]) {
+        await lookupWord.click({ button: 'right' });
+        await menu.waitFor();
+        const openAttempt = await attempt();
+        dismissals[how] = await menu.locator('[role="menuitem"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.menuAction));
+        await dismiss();
+        await menu.waitFor({ state: 'detached' });
+        await page.waitForTimeout(300);
+        const actualAttempt = await attempt();
+        log.stages.push({ name: `word-menu-dismiss-${how}`, modality: 'right-click', dismissal: how,
+          openAttempt, expectedAttempt: before, actualAttempt });
+        assert.deepEqual(actualAttempt, before, `Opening and dismissing the word menu (${how}) records nothing`);
+        assert.deepEqual(openAttempt, before, `The open word menu (${how}) records nothing`);
+        assert.deepEqual(await disk(page), recordBefore, `Opening and dismissing the menu (${how}) leaves the learner record unchanged`);
+        await bare(`The dismissed menu (${how})`);
+      }
+      assert(['entry', 'copy', 'save-word'].every(action => dismissals.escape.includes(action)), 'The word menu offers Full entry, Copy and Save');
+      await lookupWord.click({ button: 'right' });
+      await menu.locator('[data-menu-action="copy"]').click();
+      await menu.waitFor({ state: 'detached' });
+      const copyToast = page.locator('#reader-toast .reader-toast-text');
+      await copyToast.waitFor();
+      const copyOutcome = await copyToast.innerText();
+      // Native clipboard permissions differ by engine; this proves help attribution for the
+      // actual Copy action and its terminal UI, without claiming to inspect OS clipboard data.
+      assert([`Copied ${word}`, 'Could not copy'].includes(copyOutcome), 'The actual Copy action reports its outcome');
+      assert.deepEqual(await attempt(), before, 'Copy records no assistance');
+      assert.deepEqual(await disk(page), recordBefore, 'Copy leaves the learner record unchanged');
+      await bare('Copy');
+      log.stages.push({ name: 'word-menu-copy', copyOutcome, actualAttempt: await attempt(), expectedAttempt: before });
+
+      assert.equal(recordBefore.taken.some(row => row.t === 'word' && row.id === word), false, 'The fixture starts with this word unsaved');
+      await lookupWord.click({ button: 'right' });
+      const save = menu.locator('[data-menu-action="save-word"]');
+      assert.notEqual(await save.getAttribute('aria-disabled'), 'true', 'Save is available for the selected unsaved word');
+      await save.click();
+      await menu.waitFor({ state: 'detached' });
+      const savedRecord = await pollRecord(page, row => row.taken.some(saved => saved.t === 'word' && saved.id === word));
+      const savedRows = savedRecord.taken.filter(row => row.t === 'word' && row.id === word);
+      assert.equal(savedRows.length, 1, 'Save durably adds the selected word once');
+      assert.deepEqual(savedRecord.taken.filter(row => !(row.t === 'word' && row.id === word)), recordBefore.taken, 'Save preserves existing cards');
+      assert.deepEqual(savedRecord.srs, recordBefore.srs, 'Save does not invent a review grade');
+      assert.deepEqual(savedRecord.revlog, recordBefore.revlog);
+      assert.deepEqual(selectAssessmentV2(savedRecord.assessmentLibraryV2).attempt, before, 'Save records no assistance or answer');
+      await bare('Save');
+      log.stages.push({ name: 'word-menu-save', savedRows, actualAttempt: await attempt(), expectedAttempt: before });
+
+      await lookupWord.click({ button: 'right' });
+      const entry = menu.locator('[data-menu-action="entry"]');
+      await entry.waitFor();
+      assert.notEqual(await entry.getAttribute('aria-disabled'), 'true', `${lookupText} has a full entry to open`);
+      await entry.click();
+      await page.locator('#sheet').waitFor();
+      const after = await attempt();
+      const mark = assessmentItemAssistanceV2(after, item.id);
+      assert.equal(mark?.kind, 'dictionary', 'Full entry records the dictionary help');
+      assert.equal(after.events.length, before.events.length + 1, 'Full entry records exactly one assistance event');
+      assert.deepEqual(after.events.slice(0, -1), before.events, 'Full entry preserves the earlier attempt events');
+      const helpEvent = after.events.at(-1);
+      assert.equal(helpEvent.kind, 'assistance');
+      assert.equal(helpEvent.detail, `dictionary:${item.sha256}`, 'The one help event belongs to this exact question');
+      assert.deepEqual(after.answers, before.answers, 'Full entry leaves every first answer unchanged');
+      const recordAfter = await disk(page);
+      for (const field of ['taken', 'srs', 'revlog']) assert.deepEqual(recordAfter[field], savedRecord[field], `Full entry leaves ${field} unchanged`);
+      log.stages.push({ name: 'word-menu-entry', actualAttempt: after, helpEvent, mark });
+      return { lookupText, menu: dismissals.escape, copyOutcome, savedRows, mark, helpEvent };
     });
     // G3 · a long 読解 question: each prose paragraph is ONE Tab stop, reached word by word with
     // ←/→ and Home/End; only the selected word is named; Esc returns to the same occurrence. The Tab

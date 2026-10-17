@@ -29,8 +29,13 @@
  *   P15 the kanji tiles grow with their text (G1b; the critic's finding 3): each KANJI IN THIS WORD glyph at twice its size
  *       (both engines) — and, in Chromium, the whole page at 200 % text (-webkit-text-size-adjust, the critic's probe; WebKit
  *       on a desktop does not apply it) — stays inside its tile, and the tile keeps its 48 px floor
- * G3 negative controls: --controls replays stalled tap2, uncleared ruby and a front door; harness failures are incomplete.
- * --controls-only runs only the three candidate schedules, mutants and restores, with no frame measurements.
+ * G3 sky ownership: an active constellation glyph owns its printed ink above a later free word (言 / 誇り), and the transparent
+ *   caption width beside it stays the free word's, annotated or not (筆 of 鉛筆, plus fixture-only 嘩/眩/貰 mounted by the
+ *   actual missing-host-data branch). Geometry is explicitly controlled; this is not a natural scene/touch journey.
+ *   --sky-ownership-only runs only that walk. --controls adds its three strict mutations and clean restores.
+ * G3 negative controls: --controls replays stalled tap2, uncleared ruby, a front door, and the sky glyph's z-index, hit region
+ *   and caption width removed; harness failures are incomplete.
+ * --controls-only runs only the four candidate schedules, mutants and restores, with no frame measurements.
  * --g3-only is an explicit narrow slice, never a claim that the retained G1 gates passed.
  * Negative controls (one-hand/G1/neg-control): the 91dvh cap back → P1 red; the scrim re-appended → P1 red; the word not
  * sent travelling (enterWord) → P2 red; the page fading in over the reader instead of arriving whole → P14 red. */
@@ -70,15 +75,35 @@ const check = (id, title, ok, observed = '') => {
   console.log(`${ok ? 'ok  ' : 'FAIL'} ${engine}/${id} ${title}${ok ? '' : ` — ${JSON.stringify(observed).slice(0, 500)}`}`);
   return !!ok;
 };
-const frames = [], browserVersions = {}, controls = [];
+const frames = [], browserVersions = {}, controls = [], fixtures = [];
 const controlsOnly = process.argv.includes('--controls-only');
 const roomsOnly = process.argv.includes('--rooms-only');
 const sentencesOnly = process.argv.includes('--sentences-only');
 const kanaOnly = process.argv.includes('--kana-only');
 const skyReadingsOnly = process.argv.includes('--sky-readings-only');
-assert([controlsOnly, roomsOnly, sentencesOnly, kanaOnly, skyReadingsOnly].filter(Boolean).length <= 1, 'Choose one explicit narrow schedule');
-const g3Only = controlsOnly || roomsOnly || sentencesOnly || kanaOnly || skyReadingsOnly || process.argv.includes('--g3-only');
+const skyOwnershipOnly = process.argv.includes('--sky-ownership-only');
+assert([controlsOnly, roomsOnly, sentencesOnly, kanaOnly, skyReadingsOnly, skyOwnershipOnly].filter(Boolean).length <= 1, 'Choose one explicit narrow schedule');
+const g3Only = controlsOnly || roomsOnly || sentencesOnly || kanaOnly || skyReadingsOnly || skyOwnershipOnly || process.argv.includes('--g3-only');
 const withControls = controlsOnly || process.argv.includes('--controls');
+
+// Lead0235 names glyphs absent from the shipped sky and hosted kanji corpus. Supply only fixture word/caption DATA in
+// the served response: real __lockWord → constellationLock → spawnGlyph → mountHostedNodeReading still runs. Do not
+// invent production dictionary entries, alter the host's has/reading gate, or remove ruby to simulate these three cases.
+const SKY_OWNERSHIP_NAMED = Object.freeze([
+  { word: '喧嘩', glyph: '嘩' }, { word: '眩しい', glyph: '眩' }, { word: '貰う', glyph: '貰' },
+]);
+const SKY_FIXTURE_CAPTION = 'FIXTURE ONLY caption';
+const skyFixtureAnchor = '// the semantic tier: LLM-authored typed relations (pilot slice)';
+const skyFixtureRows = SKY_OWNERSHIP_NAMED.map(({ word }) => [word, '', 'fixture-only source', 'k', '', 3]);
+const skyFixtureCaptions = Object.fromEntries(SKY_OWNERSHIP_NAMED.map(({ glyph }) => [glyph, SKY_FIXTURE_CAPTION]));
+const skyFixtureEdit = Object.freeze({ file: 'drift-layer.js', key: 'fixture-only-named-glyph-data', from: skyFixtureAnchor,
+  to: `/* Verification-only corpus/caption data, never shipped dictionary authority. */
+if (${JSON.stringify(skyFixtureRows)}.some(row => WALL.some(entry => entry[0] === row[0])) ||
+    ${JSON.stringify(SKY_OWNERSHIP_NAMED.map(({ glyph }) => glyph))}.some(glyph => glossOf(glyph)))
+  throw new Error("named glyph fixture no longer matches the absent production corpus");
+WALL.push(...${JSON.stringify(skyFixtureRows)});
+Object.assign(K, ${JSON.stringify(skyFixtureCaptions)});
+${skyFixtureAnchor}` });
 
 const host = await startStaticHost({ site, port: 0 });
 async function boot(page, { world = null } = {}) {
@@ -359,10 +384,11 @@ try {
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true });
     browserVersions[engine] = browser.version();
     console.log(`${engine} ${browserVersions[engine]}`);
-    const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true, control = null, init = null, demo = false } = {}) => {
+    const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true, control = null, init = null, demo = false, phase = 'candidate' } = {}) => {
       if (g3Only && !name.startsWith('G3')) return;
-      if (controlsOnly && !['G3-stalled', 'G3-clear', 'G3-front'].includes(name)) return;
-      if (roomsOnly && !['G3-words', 'G3-words-family', 'G3-sky', 'G3-sky-glyph', 'G3-particle'].includes(name)) return;
+      if (controlsOnly && !['G3-stalled', 'G3-clear', 'G3-front', 'G3-sky-ownership'].includes(name)) return;
+      if (roomsOnly && !['G3-words', 'G3-words-family', 'G3-sky', 'G3-sky-glyph', 'G3-sky-ownership', 'G3-particle'].includes(name)) return;
+      if (skyOwnershipOnly && name !== 'G3-sky-ownership') return;
       if (sentencesOnly && name !== 'G3-front' && !name.startsWith('G3-sentence-')) return;
       if (kanaOnly && name !== 'G3-kana' && name !== 'G3-particle') return;
       if (skyReadingsOnly && name !== 'G3-sky-glyph' && name !== 'G3-particle') return;
@@ -372,6 +398,10 @@ try {
       if (init) await context.addInitScript(init);
       await silenceBrowserAudio(context);
       await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
+      const setup = name === 'G3-sky-ownership' ? { engine, name, phase: control ? `mutant:${control.id}` : phase,
+        scope: 'Fixture-only named word/caption data; actual product mount/hit code; controlled geometry',
+        edits: [skyFixtureEdit], served: [], pageErrors: [] } : null;
+      if (setup) await serveMutation(context, { origin: host.origin, manifest: new Map(identity.files.map((file) => [file.path, file.sha256])), control: setup, edits: setup.edits });
       if (control) await serveMutation(context, { origin: host.origin, manifest: new Map(identity.files.map((file) => [file.path, file.sha256])), control, edits: control.edits });
       const page = await context.newPage(), errors = [];
       page.setDefaultTimeout(15000);
@@ -382,6 +412,14 @@ try {
         check(`${name}.error`, `${name} ran to the end`, false, String(error.stack || error).slice(0, 700));
         await page.screenshot({ path: resolve(evidence, `${engine}-${name}-error.png`) }).catch(() => {});
       } finally {
+        if (setup) {
+          setup.pageErrors = errors;
+          setup.complete = !setup.setupError && setup.served.length > 0 && setup.served.every((served) =>
+            served.file === skyFixtureEdit.file && served.applied.length === 1 && served.applied[0].key === skyFixtureEdit.key) &&
+            new Set(setup.served.map((served) => served.mutantSha256)).size === 1;
+          fixtures.push(setup);
+          check('G3.sky-ownership.setup', 'each served ownership fixture starts from pinned bytes and applies the same data-only setup exactly once', setup.complete, setup);
+        }
         if (control) control.pageErrors = errors;
         check(`${name}.page-errors`, `${name}: no page errors`, errors.length === 0, errors);
         await context.close();
@@ -441,8 +479,140 @@ try {
       const after = await page.evaluate(() => ({ stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), answered: !document.getElementById('kp-reveal') }));
       check('G3.front.press', 'a front sentence press cannot expose lookup help or answer the card', !after.stage && !after.page && !after.answered, after);
     };
+    // A controlled CSS ownership fixture, not a natural scene/touch claim. Actual mounted nodes keep their product
+    // classes, z-index, hit rules and host admission; only their transforms/order are temporarily arranged in one task.
+    // 熾烈 supplies a real unhosted glyph, but no wide donor caption. Lead0235's exact absent glyphs use the separately
+    // receipted corpus/caption fixture above; 筆's unmounted-ruby case remains an additional structural regression.
+    const skyOwnershipProbe = async (page) => {
+      const lock = async (word, kanji) => {
+        await page.goto(`${host.origin}/?entry=drift&ui=bi`);
+        await page.waitForFunction(() => document.body.dataset.ready === '1' && !!window.__lockWord);
+        await delay(1200);
+        // Materialize the exact existing cover through the installed seam. Never substitute an arbitrary word.
+        const opened = await page.evaluate((w) => ({ cover: window.__lockWord('誇り'), target: window.__lockWord(w) }), word);
+        assert(opened.cover && opened.target, `the exact 誇り cover and ${word} constellation must exist`);
+        await page.waitForFunction((ch) => [...document.querySelectorAll('#drift-layer.active #sky > .glyph.hosted-constellation-glyph')]
+          .some((node) => {
+            const g = node.querySelector(':scope > .g'), copy = g?.cloneNode(true);
+            copy?.querySelectorAll('rt').forEach((rt) => rt.remove());
+            return copy?.textContent === ch;
+          }), kanji);
+        await delay(1800);
+        await page.evaluate(() => document.fonts.ready.then(() => true));
+      };
+      const own = (kanji, { sourceWord, bare = false, captionRequired = false } = {}) => page.evaluate(async ({ kanji, sourceWord, bare, captionRequired }) => {
+        // Always use the same setup path, never a rescue after a failed assertion. Materialize both exact nodes, then
+        // let the existing app frame mount their visible state before the single synchronous geometry task below.
+        const opened = { cover: window.__lockWord('誇り'), target: window.__lockWord(sourceWord) };
+        await new Promise(requestAnimationFrame);
+        const sky = document.querySelector('#drift-layer.active #sky');
+        const textOf = (node) => {
+          const holder = node.querySelector(':scope > .g > ruby.drift-reading') || node.querySelector(':scope > .g');
+          return holder && [...holder.childNodes].find((child) => child.nodeType === Node.TEXT_NODE);
+        };
+        const glyph = [...sky.querySelectorAll(':scope > .glyph.hosted-constellation-glyph')].find((node) => textOf(node)?.nodeValue === kanji);
+        const facts = { kanji, sourceWord, opened, frameBoundaryObserved: true, appTransformMounted: !!glyph?.style.transform,
+          glyph: !!glyph, controlledGeometry: true, admitted: false, attempts: [],
+          canonical: { has: window.__BUNKI_OPEN_SLIP.has('kanji', kanji), reading: window.__BUNKI_OPEN_SLIP.reading('kanji', kanji) } };
+        if (!glyph) return facts;
+        const style = (node) => getComputedStyle(node);
+        const word = [...sky.querySelectorAll(':scope > .word')].find((node) => node.querySelector('.base')?.textContent === '誇り');
+        if (!word) return { ...facts, cover: null, setupError: 'the exact 誇り cover is absent; no substitute permitted' };
+        const g = glyph.querySelector(':scope > .g'), caption = glyph.querySelector(':scope > small');
+        const original = { glyphTransform: glyph.style.transform, wordTransform: word.style.transform,
+          wordParent: word.parentNode, wordNext: word.nextSibling, children: [...g.childNodes] };
+        const ruby = bare ? g.querySelector(':scope > ruby.drift-reading') : null;
+        const rubyChildren = ruby ? [...ruby.childNodes] : [];
+        const rect = (r) => ({ x: r.x, y: r.y, left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height });
+        const identity = (node) => node ? { tag: node.tagName.toLowerCase(), id: node.id, classes: [...node.classList],
+          ancestor: node.closest('.word,.glyph,[data-drift-chrome],#lvl,.crumb')?.outerHTML.slice(0, 300) || null } : null;
+        const range = document.createRange(), coverRange = document.createRange();
+        const inkRect = () => { range.selectNodeContents(textOf(glyph)); return range.getBoundingClientRect(); };
+        const coverInk = () => { coverRange.selectNodeContents(word.querySelector('.base')); return coverRange.getBoundingClientRect(); };
+        try {
+          if (ruby) g.replaceChildren(...rubyChildren.filter((child) => child.nodeName !== 'RT'));
+          sky.append(word);
+          Object.assign(facts, { cover: word.querySelector('.base').textContent,
+            later: !!(glyph.compareDocumentPosition(word) & Node.DOCUMENT_POSITION_FOLLOWING),
+            annotated: !!g.querySelector(':scope > ruby.drift-reading'), unmountedForStructuralCase: !!ruby,
+            stacked: glyph.classList.contains('center') || glyph.classList.contains('comp'),
+            caption: caption?.textContent || '', captionOpacity: caption ? style(caption).opacity : null,
+            glyphOpacity: Number(style(glyph).opacity), coverOpacity: Number(style(word).opacity),
+            visiblyMounted: [glyph, word].every((node) => node.isConnected && node.getClientRects().length > 0 &&
+              style(node).display !== 'none' && style(node).visibility === 'visible' && Number(style(node).opacity) > 0 && !node.closest('[inert]')),
+            coverFree: style(word).zIndex === 'auto' && style(word).pointerEvents !== 'none' && style(word).visibility !== 'hidden',
+            original: { glyph: rect(glyph.getBoundingClientRect()), cover: rect(word.getBoundingClientRect()) } });
+          const skyBox = sky.getBoundingClientRect();
+          const clip = { left: Math.max(0, skyBox.left) + 8, top: Math.max(0, skyBox.top) + 8,
+            right: Math.min(innerWidth, skyBox.right) - 8, bottom: Math.min(innerHeight, skyBox.bottom) - 8 };
+          facts.viewport = { width: innerWidth, height: innerHeight }; facts.clip = clip;
+          const inside = (r) => r.width > 0 && r.height > 0 && r.left >= clip.left && r.right <= clip.right && r.top >= clip.top && r.bottom <= clip.bottom;
+          const placeCover = (point) => {
+            word.style.transform = original.wordTransform;
+            const start = coverInk();
+            word.style.transform = `translate(${point.x - start.left - start.width / 2}px, ${point.y - start.top - start.height / 2}px) ${original.wordTransform}`;
+            const ink = coverInk(), stack = document.elementsFromPoint(point.x, point.y), hit = document.elementFromPoint(point.x, point.y);
+            // Ignore only the tested glyph when checking the underlying target. A mutant that loses the glyph's hit
+            // region still has the same valid setup; unrelated chrome/words and offscreen points never qualify.
+            const underlying = stack.find((node) => !glyph.contains(node));
+            return { ...point, owner: glyph.contains(hit) ? 'glyph' : word.contains(hit) ? 'cover' : hit ? 'foreign' : null,
+              coverInk: rect(ink), coverRect: rect(word.getBoundingClientRect()), hit: identity(hit), stack: stack.slice(0, 8).map(identity),
+              admitted: point.x >= clip.left && point.x <= clip.right && point.y >= clip.top && point.y <= clip.bottom &&
+                ink.left <= point.x && point.x <= ink.right && ink.top <= point.y && point.y <= ink.bottom && word.contains(underlying) };
+          };
+          // A hard-bounded grid admits geometry without inspecting the desired glyph-vs-cover product outcome.
+          for (const fy of [.45, .3, .65]) for (const fx of [.5, .35, .65]) {
+            glyph.style.transform = original.glyphTransform;
+            const from = inkRect(), x = clip.left + (clip.right - clip.left) * fx, y = clip.top + (clip.bottom - clip.top) * fy;
+            glyph.style.transform = `translate(${x - from.left - from.width / 2}px, ${y - from.top - from.height / 2}px) ${original.glyphTransform}`;
+            const ink = inkRect(), box = glyph.getBoundingClientRect(), captionBox = caption?.getBoundingClientRect();
+            const gap = Math.min(ink.left - box.left, box.right - ink.right);
+            const trial = { grid: { fx, fy }, ink: rect(ink), box: rect(box), captionBox: captionBox && rect(captionBox), gap };
+            facts.attempts.push(trial);
+            if (!inside(box) || (captionRequired && (!captionBox || !inside(captionBox) || gap < 4))) continue;
+            trial.centre = placeCover({ x: ink.left + ink.width / 2, y: ink.top + ink.height / 2 });
+            if (captionRequired) trial.side = placeCover({ x: box.left + (ink.left - box.left) / 2, y: ink.top + ink.height / 2 });
+            if (!trial.centre.admitted || (captionRequired && !trial.side.admitted)) continue;
+            Object.assign(facts, { admitted: true, selected: trial, centre: trial.centre.owner, side: trial.side?.owner || null });
+            return facts;
+          }
+          facts.setupError = 'no clear in-viewport geometry among the nine fixed candidates';
+          return facts;
+        } finally {
+          glyph.style.transform = original.glyphTransform;
+          word.style.transform = original.wordTransform;
+          original.wordParent.insertBefore(word, original.wordNext?.parentNode === original.wordParent ? original.wordNext : null);
+          if (ruby) { ruby.replaceChildren(...rubyChildren); g.replaceChildren(...original.children); }
+          facts.restored = glyph.style.transform === original.glyphTransform && word.style.transform === original.wordTransform &&
+            word.parentNode === original.wordParent && word.nextSibling === original.wordNext &&
+            original.children.every((child, index) => g.childNodes[index] === child);
+        }
+      }, { kanji, sourceWord, bare, captionRequired });
+      await lock('言葉', '言');
+      const said = await own('言', { sourceWord: '言葉' });
+      await lock('鉛筆', '筆');
+      const brush = await own('筆', { sourceWord: '鉛筆', captionRequired: true });
+      const bare = await own('筆', { sourceWord: '鉛筆', bare: true, captionRequired: true });
+      const named = {};
+      for (const { word, glyph } of SKY_OWNERSHIP_NAMED) {
+        await lock(word, glyph);
+        named[glyph] = await own(glyph, { sourceWord: word, captionRequired: true });
+      }
+      const cases = { said, brush, bare, ...named }, captions = { brush, bare, ...named };
+      check('G3.sky-ownership.corpus', 'fixture-only 嘩/眩/貰 are actual mounted unannotated glyphs; hosted readings/pages remain absent',
+        Object.keys(named).length === 3 && Object.values(named).every((c) => c.glyph && !c.annotated && !c.unmountedForStructuralCase &&
+          c.canonical.has === false && c.canonical.reading === '' && c.caption === SKY_FIXTURE_CAPTION), named);
+      check('G3.sky-ownership.fixture', 'actual glyphs and exact 誇り use clear controlled geometry; only the tested pair owns each admitted point',
+        Object.values(cases).every((c) => c.opened.cover && c.opened.target && c.appTransformMounted && c.glyph && c.cover === '誇り' && c.later && !c.stacked && c.visiblyMounted && c.coverFree && c.coverOpacity > 0 &&
+          c.glyphOpacity > 0 && c.admitted && c.restored) && said.annotated && brush.annotated && !bare.annotated &&
+          Object.values(captions).every((c) => c.selected?.gap >= 4 && c.selected.side.admitted && c.captionOpacity === '0'), cases);
+      check('G3.sky-ownership.centre', 'each exact glyph owns its printed centre above the later 誇り, annotated or not',
+        Object.values(cases).every((c) => c.centre === 'glyph'), cases);
+      check('G3.sky-ownership.caption', 'each transparent caption side belongs to 誇り, including all three naturally unannotated fixture glyphs',
+        Object.values(captions).every((c) => c.side === 'cover'), captions);
+    };
     const schedules = {};
-    for (const [name, probe] of [['G3-stalled', stalledProbe], ['G3-clear', clearProbe], ['G3-front', frontProbe]]) {
+    for (const [name, probe] of [['G3-stalled', stalledProbe], ['G3-clear', clearProbe], ['G3-front', frontProbe], ['G3-sky-ownership', skyOwnershipProbe]]) {
       const begin = rows.length;
       await walk(name, probe);
       schedules[name] = rows.slice(begin);
@@ -918,8 +1088,21 @@ try {
           { file: 'decks/player/mount.js', key: 'front-door-gate',
             from: '    taps = null; // the front has nothing to tap, whatever is asked',
             to: '    /* G3 negative: retain the front tap cover */' }] },
+        { id: 'glyph-z-dropped', run: 'G3-sky-ownership', probe: skyOwnershipProbe, kill: 'G3.sky-ownership.centre',
+          witness: (row) => Object.values(row.observed).every((c) => c.centre === 'cover'),
+          edits: [{ file: 'drift-layer.css', key: 'drop-glyph-z',
+            from: '#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) {\n  z-index: 1;\n}',
+            to: '#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) {\n}' }] },
+        { id: 'glyph-hit-region-removed', run: 'G3-sky-ownership', probe: skyOwnershipProbe, kill: 'G3.sky-ownership.centre',
+          witness: (row) => Object.values(row.observed).every((c) => c.centre === 'cover'),
+          edits: [{ file: 'drift-layer.css', key: 'remove-glyph-hit-region',
+            from: ':not(.comp):not(.center) > small {\n  pointer-events: auto;\n}',
+            to: ':not(.comp):not(.center) > small {\n  pointer-events: none;\n}' }] },
+        { id: 'bare-glyph-caption-width', run: 'G3-sky-ownership', probe: skyOwnershipProbe, kill: 'G3.sky-ownership.caption',
+          witness: (row) => row.observed.brush.side === 'cover' && ['bare', '嘩', '眩', '貰'].every((key) => row.observed[key]?.side === 'glyph'),
+          edits: [{ file: 'drift-layer.css', key: 'bare-glyph-full-width', from: '  width: fit-content;\n  margin-inline: auto;\n', to: '' }] },
       ];
-      for (const spec of specs) {
+      for (const spec of specs.filter((spec) => !skyOwnershipOnly || spec.run === 'G3-sky-ownership')) {
         const control = { engine, id: spec.id, edits: spec.edits, served: [], pageErrors: [] };
         const begin = rows.length;
         await walk(spec.run, spec.probe, { control });
@@ -929,14 +1112,17 @@ try {
         const actual = control.rows.map((row) => row.id);
         const target = control.rows.find((row) => row.id === `${engine}/${spec.kill}`);
         const cleanCandidate = baseline.length > 1 && baseline.every((row) => row.ok) && new Set(expected).size === expected.length;
+        const fixtureReady = spec.run !== 'G3-sky-ownership' || ['corpus', 'fixture', 'setup'].every((part) =>
+          control.rows.some((row) => row.id === `${engine}/G3.sky-ownership.${part}` && row.ok));
         const complete = !control.error && !control.setupError && control.pageErrors.length === 0 &&
-          JSON.stringify(actual) === JSON.stringify(expected) && spec.edits.every((edit) => control.served.some((served) => served.file === edit.file && served.applied.some((applied) => applied.key === edit.key)));
+          fixtureReady && JSON.stringify(actual) === JSON.stringify(expected) && spec.edits.every((edit) => control.served.some((served) => served.file === edit.file && served.applied.some((applied) => applied.key === edit.key)));
         const killed = cleanCandidate && complete && target && !target.ok && spec.witness(target) &&
           control.rows.every((row) => row.id === target.id || row.ok);
         control.verdict = !cleanCandidate || !complete ? 'incomplete' : killed ? 'killed' : target?.ok ? 'survived' : 'contaminated';
-        // Re-run the exact unmodified schedule in a new context. Source bytes are never edited on disk.
+        // Re-run without the product mutant, retaining identical explicitly synthetic fixture data where declared.
+        // Source bytes are never edited on disk.
         const restoreBegin = rows.length;
-        await walk(spec.run, spec.probe);
+        await walk(spec.run, spec.probe, { phase: `restore:${spec.id}` });
         control.restore = rows.splice(restoreBegin);
         const restored = JSON.stringify(control.restore.map((row) => row.id)) === JSON.stringify(expected) && control.restore.every((row) => row.ok);
         controls.push(control);
@@ -1317,7 +1503,7 @@ try {
 
 function innerHeightOf(facts) { return facts?.inner?.height || 844; }
 
-writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : 'G1 and G3', rows, frames, controls }, null, 1));
+writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: skyOwnershipOnly ? `G3 controlled sky glyph hit ownership${withControls ? ' and its negative controls' : ''}; named 嘩/眩/貰 use fixture-only corpus/captions, actual product mount/hit code; no natural-input, G1 or frame claim` : skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : 'G1 and G3', rows, frames, controls, fixtures }, null, 1));
 const failed = rows.filter((row) => !row.ok);
 console.log(`\n${rows.length - failed.length}/${rows.length} — evidence ${evidence}`);
 process.exit(failed.length ? 1 : 0);

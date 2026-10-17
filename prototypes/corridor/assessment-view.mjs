@@ -296,11 +296,16 @@ export function createAssessmentView(host) {
   const owned = () => host.owned?.() !== false;
   const alive = generation => generation === lifecycle && owned();
   const deliveryUnits = selected => host.delivery?.(selected)?.units || [];
-  async function beforeLookup(attemptId, itemId) {
+  function lookupAdmitted(attemptId, itemId) {
     const current = selection();
     if (!owned() || !current || current.attempt.attemptId !== attemptId) return false;
     if (current.attempt.status !== 'in-progress') return true;
-    if (current.attempt.mode !== 'practice' || current.attempt.cursor.itemId !== itemId) return false;
+    return current.attempt.mode === 'practice' && current.attempt.cursor.itemId === itemId;
+  }
+  async function beforeLookup(attemptId, itemId) {
+    if (!lookupAdmitted(attemptId, itemId)) return false;
+    const current = selection();
+    if (current.attempt.status !== 'in-progress') return true;
     if (host.assistance?.(current, itemId)) return true;
     if (!await command({ kind: 'dictionary-lookup', itemId })) return false;
     const after = selection();
@@ -311,7 +316,8 @@ export function createAssessmentView(host) {
     const assistanceAllowed = selected.attempt.mode === 'practice' || selected.attempt.status !== 'in-progress';
     if (assistanceAllowed && host.appendLookupText) host.appendLookupText(container, text, {
       surface: 'assessment', attemptId: selected.attempt.attemptId, itemId, role, block,
-      furigana: 'on-demand', beforeOpen: () => beforeLookup(selected.attempt.attemptId, itemId),
+      furigana: 'on-demand', admit: () => lookupAdmitted(selected.attempt.attemptId, itemId),
+      beforeOpen: () => beforeLookup(selected.attempt.attemptId, itemId),
     });
     else container.append(document.createTextNode(text));
   }
@@ -958,7 +964,7 @@ export function createAssessmentView(host) {
         (!answer.assistance && answer.response.kind !== 'selected')) return;
     const line = node('p', 'exam-why');
     if (answer.assistance) {
-      const locked = node('span', 'exam-why-locked', tx('助けあり · 解説を見たので、この回答は確定しています', 'with help · you opened the explanation, so this answer is locked'));
+      const locked = node('span', 'exam-why-locked', tx('助けあり · 解説を見たので、この回答は確定しています', 'With help · you opened the explanation, so this answer is locked'));
       locked.id = 'exam-why-locked'; line.append(locked);
     }
     const door = button(answer.assistance ? tx('解説をもう\u4E00度見る', 'See the explanation again') : tx('なぜ？— 解説を見る', 'Why? — See the explanation'),
@@ -1215,7 +1221,7 @@ export function createAssessmentView(host) {
       paper.append(options);
     }
     if (!answer.assistance && host.assistance?.(selected, question.id)) main.append(node('p', 'exam-lookup-assisted', tx(
-      '助けあり · 辞書を使った問題です。回答は変更できます。', 'with help · dictionary used on this question. You can still change your answer.')));
+      '助けあり · 辞書を使った問題です。回答は変更できます。', 'With help · dictionary used on this question. You can still change your answer.')));
     renderWhy(main, selected, question, answer);
     if (official && host.officialPages) renderOfficialPages(main, selected, question.id);
     const flag = button(answer.flagged ? tx('目印を外す', 'Remove bookmark') : tx('あとで見直す', 'Bookmark for later'), 'exam-flag',
@@ -1282,9 +1288,9 @@ export function createAssessmentView(host) {
       main.append(node('p', 'exam-score-note', tx('この模試の正答数です。JLPT公式の換算点や合否予測ではありません。', 'This is your accuracy on this test, not an official JLPT score or pass prediction.')));
       if (independence) main.append(node('p', 'exam-independence', independence.independent === null
         ? tx(`問題ごとの助けの記録なし ${independence.answered - independence.assisted} · 助けあり ${independence.assisted} · 未回答 ${independence.unanswered}`,
-          `No item-level help recorded ${independence.answered - independence.assisted} · with help ${independence.assisted} · Unanswered ${independence.unanswered}`)
+          `No item-level help recorded ${independence.answered - independence.assisted} · With help ${independence.assisted} · Unanswered ${independence.unanswered}`)
         : tx(`自力 ${independence.independent} · 助けあり ${independence.assisted} · 未回答 ${independence.unanswered}`,
-          `Independent ${independence.independent} · with help ${independence.assisted} · Unanswered ${independence.unanswered}`)));
+          `Independent ${independence.independent} · With help ${independence.assisted} · Unanswered ${independence.unanswered}`)));
       const counts = node('dl', 'exam-counts');
       for (const [label, count] of [[tx('不正解', 'Incorrect'), score.incorrect], [tx('未回答', 'Unanswered'), score.unanswered], [tx('未到達', 'Not reached'), score.notReached]]) {
         const item = node('div'); item.append(node('dt', '', label), node('dd', '', String(count))); counts.append(item);
@@ -1356,7 +1362,7 @@ export function createAssessmentView(host) {
       // A real paper's prompt opens with its printed number; the list already numbers each question.
       const promptLine = official ? plain(question.prompt.replace(/^\uE005\d+\uE006\u3000?/u, '')).split('\n').at(-1) || tx('本文の空欄', 'Blank in the passage')
         : question.prompt.split('\n').at(-1);
-      const summary = node('summary', '', `${form.items.indexOf(question) + 1}. ${daimon ? `〔${daimon}〕 ` : ''}${promptLine}${helped ? tx(' · 助けあり', ' · with help') : ''}`);
+      const summary = node('summary', '', `${form.items.indexOf(question) + 1}. ${daimon ? `〔${daimon}〕 ` : ''}${promptLine}${helped ? tx(' · 助けあり', ' · With help') : ''}`);
       summary.dataset.uiContentValue = promptLine; details.append(summary);
       const choice = id => { const index = question.response.options.findIndex(row => row.id === id);
         return index < 0 ? '' : official ? `${index + 1}　${plain(question.response.options[index].text)}` : question.response.options[index].text; };

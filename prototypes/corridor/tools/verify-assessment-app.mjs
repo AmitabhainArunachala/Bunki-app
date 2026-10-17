@@ -633,9 +633,9 @@ try {
       // says only that a word was looked up on that question, with no timing claim; a received card says only
       // what its synced result records, with no kind of help, no event on this device and no time. The word
       // back and the sentence back are both read, for each source.
-      const assistedWording = { local: 'with help · you opened the explanation after answering',
-        dictionary: 'with help · you looked up a word on this question',
-        received: 'with help · the synced result records help on this question' };
+      const assistedWording = { local: 'With help · you opened the explanation after answering',
+        dictionary: 'With help · you looked up a word on this question',
+        received: 'With help · the synced result records help on this question' };
       const assistedKind = { local: 'explanation', dictionary: 'dictionary', received: null };
       for (const source of ['local', 'dictionary', 'received']) await run(engine, `${source}-assisted-card-backs-name-where-help-was-recorded`, async page => {
         await page.evaluate(() => { D.dict['assessment-fixture-word'] = { r: 'ご', m: ['Synthetic dictionary sense differs from test context'] }; });
