@@ -1654,7 +1654,24 @@ try {
       const helpEvent = after.events.at(-1);
       assert.equal(helpEvent.kind, 'assistance');
       assert.equal(helpEvent.detail, `dictionary:${item.sha256}`, 'The one help event belongs to this exact question');
-      assert.deepEqual(after.answers, before.answers, 'Full entry leaves every first answer unchanged');
+      // An admitted assistance command also accounts for time on the current question.
+      // Retain exact answer equality after accounting for that measured delta only.
+      assert.equal(before.clock.interrupted, false, 'This live question has uninterrupted elapsed accounting');
+      assert.deepEqual(after.cursor, before.cursor, 'Full entry keeps the same question and block');
+      assert.equal(after.clock.sessionId, before.clock.sessionId);
+      assert(Number.isFinite(before.clock.lastMonotonicMs) && Number.isFinite(after.clock.lastMonotonicMs));
+      const elapsedDelta = after.clock.elapsedMs - before.clock.elapsedMs;
+      assert(Number.isFinite(elapsedDelta) && elapsedDelta >= 0);
+      assert.equal(elapsedDelta, Math.max(0, after.clock.lastWallMs - before.clock.lastWallMs,
+        after.clock.lastMonotonicMs - before.clock.lastMonotonicMs), 'The retained clock advances by its observed wall/monotonic delta');
+      const beforeBlock = before.blocks.find(block => block.blockId === before.cursor.blockId);
+      const afterBlock = after.blocks.find(block => block.blockId === after.cursor.blockId);
+      assert.equal(beforeBlock.status, 'open');
+      assert.equal(afterBlock.status, 'open');
+      assert.equal(afterBlock.elapsedMs - beforeBlock.elapsedMs, elapsedDelta, 'The open block retains exactly the same elapsed delta');
+      const expectedAnswers = before.answers.map(answer => answer.item.id === before.cursor.itemId
+        ? { ...answer, elapsedMs: answer.elapsedMs + elapsedDelta } : answer);
+      assert.deepEqual(after.answers, expectedAnswers, 'Full entry preserves every answer field apart from the exact current-question elapsed delta');
       const recordAfter = await disk(page);
       for (const field of ['taken', 'srs', 'revlog']) assert.deepEqual(recordAfter[field], savedRecord[field], `Full entry leaves ${field} unchanged`);
       log.stages.push({ name: 'word-menu-entry', actualAttempt: after, helpEvent, mark });

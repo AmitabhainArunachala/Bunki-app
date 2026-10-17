@@ -501,23 +501,48 @@ try {
         await page.evaluate(() => document.fonts.ready.then(() => true));
       };
       const own = (kanji, { sourceWord, bare = false, captionRequired = false } = {}) => page.evaluate(async ({ kanji, sourceWord, bare, captionRequired }) => {
-        // Always use the same setup path, never a rescue after a failed assertion. Materialize both exact nodes, then
-        // let the existing app frame mount their visible state before the single synchronous geometry task below.
-        const opened = { cover: window.__lockWord('誇り'), target: window.__lockWord(sourceWord) };
-        await new Promise(requestAnimationFrame);
+        // First let the app bring the exact cover into view. Locking it and a distant target in the same task leaves
+        // its old world position edge-faded to zero, even if a later DOM transform puts its rectangle on the glass.
+        // This bounded lifecycle wait changes no camera, opacity, display or product hit rule. Every case uses it.
+        const opened = { cover: window.__lockWord('誇り'), target: false };
         const sky = document.querySelector('#drift-layer.active #sky');
+        const liveCover = () => [...sky.querySelectorAll(':scope > .word.bctr')]
+          .find((node) => node.querySelector('.base')?.textContent === '誇り');
+        const lifecycle = { samples: [], admitted: false }, start = performance.now();
+        let word = null, previous = null, stable = 0;
+        while (performance.now() - start < 5000) {
+          await new Promise(requestAnimationFrame);
+          word = liveCover();
+          const box = word?.querySelector('.base').getBoundingClientRect(), css = word && getComputedStyle(word);
+          const sample = { elapsed: performance.now() - start, connected: !!word?.isConnected,
+            mounted: !!word?.style.transform, opacity: css ? Number(css.opacity) : 0,
+            visible: css?.display !== 'none' && css?.visibility === 'visible' && !word?.closest('[inert]'),
+            box: box && { x: box.x, y: box.y, width: box.width, height: box.height },
+            inView: !!box && box.width > 0 && box.height > 0 && box.left >= 64 && box.right <= innerWidth - 64 &&
+              box.top >= 96 && box.bottom <= innerHeight - 96 };
+          lifecycle.samples.push(sample);
+          stable = sample.inView && previous && Math.abs(box.x - previous.x) < 1 && Math.abs(box.y - previous.y) < 1 ? stable + 1 : 0;
+          previous = sample.box;
+          if (sample.connected && sample.mounted && sample.visible && sample.opacity > 0 && stable >= 6) {
+            lifecycle.admitted = true; lifecycle.elapsed = sample.elapsed; lifecycle.stableFrames = stable; break;
+          }
+        }
+        if (!lifecycle.admitted) return { kanji, sourceWord, opened, lifecycle, controlledGeometry: true,
+          admitted: false, setupError: 'exact 誇り did not become visibly mounted and settled before target admission' };
+        opened.target = window.__lockWord(sourceWord);
+        await new Promise(requestAnimationFrame);
         const textOf = (node) => {
           const holder = node.querySelector(':scope > .g > ruby.drift-reading') || node.querySelector(':scope > .g');
           return holder && [...holder.childNodes].find((child) => child.nodeType === Node.TEXT_NODE);
         };
         const glyph = [...sky.querySelectorAll(':scope > .glyph.hosted-constellation-glyph')].find((node) => textOf(node)?.nodeValue === kanji);
-        const facts = { kanji, sourceWord, opened, frameBoundaryObserved: true, appTransformMounted: !!glyph?.style.transform,
+        const facts = { kanji, sourceWord, opened, lifecycle, frameBoundaryObserved: true, appTransformMounted: !!glyph?.style.transform,
           glyph: !!glyph, controlledGeometry: true, admitted: false, attempts: [],
           canonical: { has: window.__BUNKI_OPEN_SLIP.has('kanji', kanji), reading: window.__BUNKI_OPEN_SLIP.reading('kanji', kanji) } };
         if (!glyph) return facts;
         const style = (node) => getComputedStyle(node);
-        const word = [...sky.querySelectorAll(':scope > .word')].find((node) => node.querySelector('.base')?.textContent === '誇り');
-        if (!word) return { ...facts, cover: null, setupError: 'the exact 誇り cover is absent; no substitute permitted' };
+        if (!word?.isConnected || word.querySelector('.base')?.textContent !== '誇り')
+          return { ...facts, cover: null, setupError: 'the admitted exact 誇り cover is absent; no substitute permitted' };
         const g = glyph.querySelector(':scope > .g'), caption = glyph.querySelector(':scope > small');
         const original = { glyphTransform: glyph.style.transform, wordTransform: word.style.transform,
           wordParent: word.parentNode, wordNext: word.nextSibling, children: [...g.childNodes] };
@@ -603,7 +628,7 @@ try {
         Object.keys(named).length === 3 && Object.values(named).every((c) => c.glyph && !c.annotated && !c.unmountedForStructuralCase &&
           c.canonical.has === false && c.canonical.reading === '' && c.caption === SKY_FIXTURE_CAPTION), named);
       check('G3.sky-ownership.fixture', 'actual glyphs and exact 誇り use clear controlled geometry; only the tested pair owns each admitted point',
-        Object.values(cases).every((c) => c.opened.cover && c.opened.target && c.appTransformMounted && c.glyph && c.cover === '誇り' && c.later && !c.stacked && c.visiblyMounted && c.coverFree && c.coverOpacity > 0 &&
+        Object.values(cases).every((c) => c.lifecycle?.admitted && c.opened.cover && c.opened.target && c.appTransformMounted && c.glyph && c.cover === '誇り' && c.later && !c.stacked && c.visiblyMounted && c.coverFree && c.coverOpacity > 0 &&
           c.glyphOpacity > 0 && c.admitted && c.restored) && said.annotated && brush.annotated && !bare.annotated &&
           Object.values(captions).every((c) => c.selected?.gap >= 4 && c.selected.side.admitted && c.captionOpacity === '0'), cases);
       check('G3.sky-ownership.centre', 'each exact glyph owns its printed centre above the later 誇り, annotated or not',

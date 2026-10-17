@@ -304,7 +304,7 @@ try {
         assert.match(summaryLabel, / · With help$/u);
         await act(page, 'finish').click();
         const helpFact = page.locator('.gs-results-facts > div').nth(1);
-        assert.equal(await helpFact.locator('span').innerText(), 'With help');
+        assert.equal(await helpFact.locator(':scope > span').innerText(), 'With help');
         assert.equal(await helpFact.locator('strong').innerText(), '1');
         const finalState = await stored(page);
         assert.equal(finalState.events.filter(row => row.type === 'LOOKUP').length, 1);
