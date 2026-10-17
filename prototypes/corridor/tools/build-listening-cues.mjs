@@ -2,15 +2,16 @@
  * Counts and source bytes establish reproducibility, never editorial approval. */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
+import { runtimeLock } from './voice-lock.mjs';
 
 const source = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const compact = text => text.replace(/\s+/gu, '');
-export function buildListeningCues(root = source) {
+export function buildListeningCues(root = source, lock = runtimeLock()) {
   const read = name => JSON.parse(readFileSync(resolve(root, name)));
   const recordings = read('audio/manifest.json'), articles = read('data/articles/index.json').articles;
   const passages = {}, excluded = [];
@@ -32,16 +33,29 @@ export function buildListeningCues(root = source) {
         recordings: recording.have.length, textSentences: sentences.length, tokenSentences: ranges.length });
       continue;
     }
+    // V (2026-10-17): the cue's voice comes from the lock, never a literal. Before V this builder
+    // emitted voice:'ami' while the runtime's validator admitted only the locked roster, so every
+    // cue it produced was unplayable BY CONSTRUCTION — generator and validator green and flatly
+    // contradicting each other. A sentence now yields a cue only when the approved clip exists on
+    // disk; until the render runs, these passages are honestly excluded instead of silently dead.
+    const voice = lock.main;
+    const clipPath = (i) => `audio/s/${voice}/${row.id.replaceAll(':', '_')}-${String(i).padStart(3, '0')}.m4a`;
+    const missing = ranges.map((_, i) => clipPath(i)).filter((path) => !existsSync(resolve(root, path)));
+    if (missing.length) {
+      excluded.push({ sourceId: row.id, reason: 'no-approved-clips', voice, want: ranges.length, missing: missing.length });
+      continue;
+    }
     passages[row.id] = { sourceDigest: hash(JSON.stringify(surfaces)), sentences: ranges.map((range, sentenceIndex) => {
-      const path = `audio/s/ami/${row.id.replaceAll(':', '_')}-${String(sentenceIndex).padStart(3, '0')}.m4a`;
+      const path = clipPath(sentenceIndex);
       const bytes = readFileSync(resolve(root, path));
       return { ...range, quote: surfaces.slice(range.start, range.end).join(''), cue: {
-        version: 1, path, sha256: hash(bytes), bytes: bytes.length, sentenceIndex, voice: 'ami',
+        version: 1, path, sha256: hash(bytes), bytes: bytes.length, sentenceIndex, voice,
+        speakerRole: 'narrator', model: lock.model,
         alignment: 'sentence-order', transcriptStatus: 'unreviewed',
       } };
     }) };
   }
-  return { version: 1, passages, excluded };
+  return { version: 1, lock: { model: lock.model, voice: lock.main }, passages, excluded };
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
