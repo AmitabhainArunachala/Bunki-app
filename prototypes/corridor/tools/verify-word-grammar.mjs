@@ -680,7 +680,11 @@ try {
         const inside = page.locator('#sheet .example .sentence-tok, #sheet .japanese-lookup-word').filter({ hasText: /^(内閣|大臣|官邸|日本|表彰|出席|大賞)$/u }).first();
         await inside.scrollIntoViewIfNeeded();
         await delay(300);
-        const word = (await inside.textContent()).trim();
+        const word = await inside.evaluate((node) => {
+          const copy = node.cloneNode(true);
+          copy.querySelectorAll('rt, rp, .tok-state, .tok-en').forEach((annotation) => annotation.remove());
+          return copy.textContent.trim();
+        });
         await stage(page, inside);
         await delay(400);
         const slip = await slipFacts(page);
