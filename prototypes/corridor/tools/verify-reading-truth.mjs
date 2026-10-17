@@ -33,7 +33,8 @@
  *   SWEEP every inflected token (surface ≠ base) of the twenty reviewed articles and of a fixed sample of 20 inherited
  *       ones, one tap per distinct token per article: the reading the card states comes from the token's own (a kana
  *       base; the shared stem read alike; a reading the served dictionary lists for the form whose stem the token's
- *       reading keeps; 来 → くる), or the card states the text's own reading; any meaning it shows belongs to an entry a
+ *       reading keeps; 来 → くる), or the card is the word as written read as written (the label and the reading always
+ *       name the same form: never the dictionary form beside the surface's reading); any meaning it shows belongs to an entry a
  *       served dictionary has (the quick one, the full one, the original word layer) that writes the card's word and reads
  *       it so, of the token's class (parts of speech from the quick dictionary and the served detail shards; an entry no
  *       served data gives a class is recorded as of unknown class); never "Not in the quick dictionary" once settled.
@@ -123,6 +124,15 @@ const INFLECTED = Object.freeze([
   { name: '解せ → 解す げす', at: SOSEKI, index: 1414, s: '解せ', b: '解する', r: 'げせ', label: '解す', reading: 'げす', seq: '2410330', legacy: 'かいする' },
   { name: '来 read き → 来る くる', at: SHOSOIN, index: 483, s: '来', b: '来る', r: 'き', label: '来る', reading: 'くる', core: true, never: 'きる' },
   { name: '来 read こ → 来る くる', at: SOSEKI, index: 66, s: '来', b: '来る', r: 'こ', label: '来る', reading: 'くる', core: true, never: 'こる' },
+]);
+// R2 · a verb whose kana dictionary form the quick dictionary has only as a noun (Codex 1352): the card is the verb's
+// dictionary form read so, its entry the verb chosen among those read so — never the noun, never the surface's reading
+const GONGITSUNE = art('aozora:000628', 'aozora-000628.json', 'ごん狐');
+const MHLW = art('mhlw:stf-newpage_76126', 'mhlw-stf-newpage_76126.json', '高年齢者活躍企業コンテスト');
+const UNFIT = Object.freeze([
+  { name: 'かえり → かえる · 帰る (not 蛙)', at: GONGITSUNE, index: 2117, s: 'かえり', b: 'かえる', r: 'かえり', reading: 'かえる', seq: '1221270', noun: '蛙' },
+  { name: 'かえっ → かえる · 帰る (not 蛙)', at: GONGITSUNE, index: 2627, s: 'かえっ', b: 'かえる', r: 'かえっ', reading: 'かえる', seq: '1221270', noun: '蛙' },
+  { name: 'なさ → なす · 為す (not 茄子)', at: MHLW, index: 176, s: 'なさ', b: 'なす', r: 'なさ', reading: 'なす', seq: '2861111', noun: '茄子' },
 ]);
 // R2.V · a sound change in a compound: the card shows the text's reading and the meaning of the entry read the plain way
 const SOUND = Object.freeze([
@@ -248,6 +258,13 @@ for (const fixture of INFLECTED) {
         && (fixture.not || []).every((seq) => readAs(fixture.label, fixture.reading).some((row) => String(row[0]) === seq)),
       { legacy: legacyWords[fixture.b], rows: readAs(fixture.label, fixture.reading).map((row) => row.slice(0, 4)) });
   }
+}
+for (const fixture of UNFIT) {
+  const token = tokenAt(fixture);
+  check(`F0.R2.unfit.${fixture.name}`, `${fixture.at.id} #${fixture.index} is ${fixture.s} (base ${fixture.b}, a verb) read ${fixture.r}; the quick dictionary has ${fixture.b} only as the noun ${fixture.noun}; entry ${fixture.seq} is a verb that writes and reads ${fixture.b}`,
+    token?.s === fixture.s && token.b === fixture.b && token.r === fixture.r && token.p === '動詞' && k2h(core[fixture.b]?.r) === k2h(fixture.reading)
+      && !/verb/u.test(String(core[fixture.b]?.p || '')) && readAs(fixture.b, fixture.reading).some((row) => String(row[0]) === fixture.seq && row[6].some((g) => /^to /u.test(g)))
+      && posOf(fixture.seq).some((code) => /^v/u.test(code)), { token, core: core[fixture.b], pos: posOf(fixture.seq) });
 }
 for (const fixture of SOUND) {
   const token = tokenAt(fixture);
@@ -723,6 +740,15 @@ async function r2Cases(page) {
       settled?.kind === 'word' && settled.word === fixture.label && k2h(settled.reading || settled.word) === k2h(fixture.reading) && settled.gloss === meaning
         && settled.take && !settled.take.disabled && !k2h(text).includes(k2h(wrong)), { settled, text });
   }
+  for (const fixture of UNFIT) {
+    await openArticle(page, fixture.at);
+    const { settled } = await slip(page, tok(page, fixture.index));
+    const meaning = firstGloss(fixture.seq, fixture.reading), noun = core[fixture.b].m[0];
+    const lines = await glossLines();
+    check(`R2.unfit.${fixture.name}`, `${fixture.at.id} #${fixture.index} ${fixture.s} (${fixture.r}): the card is ${fixture.b} read ${fixture.reading} (one form), "${meaning}", Save live; never the noun's "${noun}", never ${fixture.r} beside ${fixture.b}`,
+      settled?.word === fixture.b && k2h(settled.reading || settled.word) === k2h(fixture.reading) && settled.gloss === meaning && settled.take && !settled.take.disabled
+        && !lines.includes(noun) && k2h(settled.reading) !== k2h(fixture.r), { settled, lines });
+  }
   for (const fixture of SOUND) {
     await openArticle(page, fixture.at);
     const { settled } = await slip(page, tok(page, fixture.index));
@@ -889,8 +915,10 @@ async function sweepCase(browser, contextOptions) {
           report.totals.tapped += 1;
           const label = card.word || '', stated = k2h(card.reading || label), gloss = card.gloss || '';
           const asWritten = label === token.s && stated === k2h(token.r);
+          // the label and the reading name one form: the dictionary form read the derived way, or the word as written read
+          // as written — never the dictionary form beside the surface's reading (かえる read かえり; Codex 1352)
           out.how = card.kind === 'kanji' ? (asWritten ? 'kanji read as written' : '') : asWritten || (card.kind === 'particle' && label === token.s) ? 'as written'
-            : derivedHow(token, label, stated) || (stated === k2h(token.r) ? 'the text\'s own reading' : '');
+            : derivedHow(token, label, stated);
           if (!out.how) out.issues.push(`the card reads ${label} ${card.reading || '(no reading line)'}: not from ${token.s} read ${token.r}`);
           if (gloss === QUICK_MISS) out.issues.push('says "Not in the quick dictionary" once the full dictionary has answered');
           if (card.kind === 'particle') {
