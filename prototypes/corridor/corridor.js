@@ -8521,9 +8521,14 @@ async function openJapaneseLookup(anchor, text, context = {}) {
   const hasKanjiEntry = [...text].length === 1 && !!D.kanji[text];
   // R2 · a reader word's answer (readerLookupAnswer): a sound change's entry keeps the text's reading on its card
   // (shown), and a lone kanji read by its own reading is the kanji's slip (kanjiOnly)
+  // and a reader word whose spelling the full dictionary lists, read otherwise than every entry (源 read みなもとの, 章 read
+  // あきら), says so as the reader's own word cards do — never "no entry for this spelling" (readMiss)
+  const listed = !record && !context.kanjiOnly && !!context.reading && !!D.dictionaryIndex &&
+    (D.dictionaryMode === 'main' || !!D.dictionaryCompleteForms?.has(String(text))) ? dictionaryRowsForForm(text) : [];
+  const readMiss = listed.length > 0 && !listed.some((row) => dictionaryReadingSupportsForm(row, context.reading, text));
   const token = { s: text, b: record?.head || text, r: context.reading || record?.r || '', c: !!record,
     ...(record?.seq ? { seq: record.seq } : {}), ...(context.shown ? { shown: context.shown } : {}),
-    ...(context.kanjiOnly ? { kanjiOnly: true } : {}) };
+    ...(context.kanjiOnly ? { kanjiOnly: true } : {}), ...(readMiss ? { readMiss: true } : {}) };
   const entryNode = hasKanjiEntry ? { t: 'kanji', id: text }
     : record ? { t: 'word', id: token.b, ...(record?.seq ? { seq: record.seq, reading: record.r } : {}) } : null;
   const mini = showMini(anchor, token, (modality) => {
@@ -9322,8 +9327,9 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     wait.style.fontWeight = '400';
     wait.style.color = 'var(--mini-head-ink-2)';
     said.append(wait);
-  } else said.append(el('span', `mini-gloss${readsOtherwise ? ' mini-miss' : ''}`, readsOtherwise
+  } else said.append(el('span', `mini-gloss${readsOtherwise || (token.readMiss && !g?.m?.[0]) ? ' mini-miss' : ''}`, readsOtherwise || (token.readMiss && !g?.m?.[0])
     // N · the dictionary has no entry read the text's way: the card says so, and lends no other reading's meaning
+    // (R2: a lookup door's word whose spelling is listed but not read so, too — token.readMiss)
     ? tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.')
     : g?.m?.[0] || tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.')));
   // N · the article's own note on this word (its index row's wordNotes, from the editorial word list): one quiet line

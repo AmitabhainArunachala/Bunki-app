@@ -183,7 +183,10 @@ test('Missing and mismatched readings cannot fall through to a different core an
   ]) {
     const f = app({ withIndex }), mini = await f.open(fixture.word, { reading: fixture.reading });
     assert.equal(find(mini, 'mini-reading').textContent, fixture.reading);
-    assert.equal(find(mini, 'mini-gloss').textContent, 'No dictionary entry for this spelling.');
+    // R2 (2026-10-17): a spelling the full dictionary lists, read otherwise than every entry, says so ("…this reading");
+    // one it does not list at all, or with no full dictionary to ask, keeps "…this spelling"
+    const listed = withIndex && index.entries.some((row) => row[1] === fixture.word || row[4].includes(fixture.word) || row[5].includes(fixture.word));
+    assert.equal(find(mini, 'mini-gloss').textContent, listed ? 'No dictionary entry for this reading.' : 'No dictionary entry for this spelling.');
     assert.equal(find(mini, 'mini-take').disabled, true);
     assert.equal(find(mini, 'mini-word').tag, 'span', 'an unresolved word has no door into an entry');
   }
