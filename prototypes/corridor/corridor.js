@@ -12897,6 +12897,9 @@ function todayWordOfDay(today) {
   const day = dayKey();
   const blocked = todayDueKeys(today);
   const reading = (w) => D.dict?.[w]?.r || D.words?.[w]?.r || '';
+  // G2 · R's identity: a saved word is read as he saved it — its card's own answer (年 kept as ねん is ねん, never the
+  // spelling's とし); a saved word whose answer cannot be confirmed shows no reading rather than another one
+  const savedReading = (w) => { const answer = savedAnswerFor({ t: 'word', id: w }); return answer?.status === 'available' ? answer.reading || '' : ''; };
   // a shared part of some weight (隹, 言, 門) makes the best hook; a bare 一 or 八 the weakest
   const tierOf = (w) => {
     const ks = todayKanji(w);
@@ -12910,10 +12913,10 @@ function todayWordOfDay(today) {
     if (best > 3) return null;
     const tier = tiers.filter(([, t]) => t === best).map(([w]) => w).sort();
     const word = tier[todayHash(`${day}:${from}`) % tier.length];
-    return { word, reading: reading(word), from, item: S.taken.find((i) => i.t === 'word' && i.id === word) || null };
+    return { word, reading: from === 'saved' ? savedReading(word) : reading(word), from, item: S.taken.find((i) => i.t === 'word' && i.id === word) || null };
   };
   const savedIds = new Set(S.taken.filter((i) => i.t === 'word').map((i) => i.id));
-  const saved = [...savedIds].filter((w) => !blocked.has(srsKey('word', w)) && TODAY_JA_WORD.test(w) && reading(w));
+  const saved = [...savedIds].filter((w) => !blocked.has(srsKey('word', w)) && TODAY_JA_WORD.test(w) && savedReading(w));
   const fromSaved = choose(saved, 'saved');
   if (fromSaved) return fromSaved;
   todayFreshPool ||= Object.keys(D.words || {}).filter((w) => TODAY_JA_WORD.test(w) && todaySharedPart(todayKanji(w)));
@@ -22358,14 +22361,19 @@ function readerTokenNode(token) {
   if (!door || door.kanjiOnly || !nonEmptyString(door.b)) return null;
   return { t: 'word', id: door.b, ...(door.seq != null && door.seq !== '' ? { seq: String(door.seq) } : {}), reading: tokenReading(door) || '' };
 }
-/** The slip, in every room: what it stands for (the dot on its headword) and, on a fresh arrival, the look-up itself. A
- * slip drawn again on the same word, and the one-time demonstration (G3 marks its slip data-demo), count nothing. */
+/** The slip, in every room: what it stands for (the dot on its headword) and the look-up itself. A card drawn again on the
+ * same word counts only what its arrival could not: the entry the full dictionary has just named for a reading the quick
+ * one lacked (a reading still being asked about is never counted under a guess; one the dictionary has answered with no
+ * entry counts as itself). The same day writes nothing twice; the one-time demonstration (G3: data-demo) counts nothing. */
 function noteSlipDepth(mini, token, kind, { arriving = true, from = null } = {}) {
   if (kind !== 'word' || !nonEmptyString(token?.b)) return;
   const node = { t: 'word', id: token.b, ...(token.seq != null && token.seq !== '' ? { seq: String(token.seq) } : {}),
     reading: String(token.r || '') };
   mini.dataset.depthNode = JSON.stringify({ id: node.id, ...(node.seq ? { seq: node.seq } : {}), reading: node.reading });
-  if (!arriving || mini.dataset.demo === 'true') return;
+  if (mini.dataset.demo === 'true') return;
+  const identity = encounterIdentity(node);
+  if (identity?.kind === 'unresolved' && !dictionaryAnsweredForm(node.id) && D.dictionaryState !== 'error') return;
+  if (!arriving && identity?.kind === 'unresolved') return;
   void noteEncounter(node, { article: from?.passage && from.passage === S.passageId ? from.passage : null });
 }
 
@@ -22448,6 +22456,7 @@ function scheduleDepthPaint(root = null) {
         if (root.matches?.(DEPTH_TARGETS)) paintDepth(root, now);
         for (const element of root.querySelectorAll?.(DEPTH_TARGETS) || []) paintDepth(element, now);
       }
+      document.getElementById('depth-basis')?.depthRefresh?.();
     } finally { depthMemo = null; }
   });
 }
@@ -22467,6 +22476,16 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined' && window._
   if (document.body) installDepthPainter();
   else document.addEventListener('DOMContentLoaded', installDepthPainter, { once: true });
 }
+/* An instrument handle for the verification suites (the __KAIRO_* idiom, as __KAIRO_KAGAMI__): read-only. The depth a node
+ * shows now, the key and the day the ledger would use, and a reader token's door as the painter reads it. Nothing here writes. */
+if (typeof window !== 'undefined') window.__KAIRO_DEPTH__ = Object.freeze({
+  depth: (node) => JSON.parse(JSON.stringify(wordDepth(node))),
+  key: (node) => { const identity = encounterIdentity(node); return identity ? encounterKey(identity) : null; },
+  identity: (node) => encounterIdentity(node),
+  readerNode: (index) => readerTokenNode(readerTokenAt(S.passageId, index)),
+  day: (ms = Date.now()) => localDayOrdinal(ms),
+  help: () => helpByMonth(),
+});
 /** A dot of its own beside a word that is not in running text (a headword, a list row, a star): aria-hidden — the page's
  * basis line says in words what it shows. */
 function depthDot(node) {
@@ -22507,35 +22526,43 @@ function renderDepthBasis(sheet, node, reading = '') {
   if (personalHost || node?.t !== 'word' || !nonEmptyString(node.id)) return null;
   const shown = { t: 'word', id: node.id, ...(node.seq != null && node.seq !== '' ? { seq: String(node.seq) } : {}),
     reading: String(reading || node.reading || '') };
-  const draw = () => {
-    const result = wordDepth(shown);
-    if (!result) return null;
-    const line = el('p', 'depth-basis');
-    line.id = 'depth-basis';
-    line.dataset.depth = result.depth;
-    if (result.kept) line.dataset.kept = '';
-    const said = el('span', 'depth-basis-said');
-    said.append(depthDot(shown), document.createTextNode(depthBasisParts(result).join(' · ')));
-    if (result.otherKept) said.append(document.createTextNode(tx(' · この綴りは別の読みで保存', ' · this spelling is kept in another reading')));
-    line.append(said);
-    const word = (id, ja, en, value) => {
-      const button = el('button', 'depth-word', tx(ja, en));
-      button.type = 'button';
-      button.id = id;
-      button.setAttribute('aria-pressed', String(result.said === value));
-      button.addEventListener('click', async () => {
-        button.disabled = true;
-        const saved = await correctDepth(shown, value);
-        if (saved && line.isConnected) { const next = draw(); if (next) line.replaceWith(next); }
-        else button.disabled = false;
-      });
-      return button;
-    };
-    line.append(word('depth-known', '知っている', 'I know this', 'known'), word('depth-not-yet', 'まだ', 'Not yet', 'not-yet'));
-    return line;
+  if (!wordDepth(shown)) return null;
+  const line = el('p', 'depth-basis');
+  line.id = 'depth-basis';
+  const said = el('span', 'depth-basis-said');
+  const words = document.createTextNode('');
+  said.append(depthDot(shown), words);
+  line.append(said);
+  const word = (id, ja, en, value) => {
+    const button = el('button', 'depth-word', tx(ja, en));
+    button.type = 'button';
+    button.id = id;
+    button.dataset.said = value;
+    button.addEventListener('click', async () => {
+      button.disabled = true;
+      await correctDepth(shown, value);
+      button.disabled = false;
+      refresh();
+    });
+    return button;
   };
-  const line = draw();
-  if (line) sheet.append(line);
+  const known = word('depth-known', '知っている', 'I know this', 'known');
+  const notYet = word('depth-not-yet', 'まだ', 'Not yet', 'not-yet');
+  line.append(known, notYet);
+  /** The line follows the confirmed record: the painter calls it after every save, in place (no node is added). */
+  const refresh = () => {
+    const result = wordDepth(shown);
+    if (!result) return;
+    line.dataset.depth = result.depth;
+    if (result.kept) line.dataset.kept = ''; else delete line.dataset.kept;
+    const text = depthBasisParts(result).join(' · ') +
+      (result.otherKept ? tx(' · この綴りは別の読みで保存', ' · this spelling is kept in another reading') : '');
+    if (words.nodeValue !== text) words.nodeValue = text;
+    for (const button of [known, notYet]) button.setAttribute('aria-pressed', String(result.said === button.dataset.said));
+  };
+  line.depthRefresh = refresh;
+  refresh();
+  sheet.append(line);
   return line;
 }
 
