@@ -35,7 +35,8 @@
  *       なす 為す (never 茄子) — Codex 1352
  *   R2.stem a godan verb never stands as its bare stem: the い of ている / いました is いる 居る (entry 1577980), never the
  *       quick dictionary's godan いる, 要る "to be needed"; its Save keeps entry 1577980 (R2.capture.stem, the round trip)
- *   SWEEP every inflected token (surface ≠ base) of the twenty reviewed articles and of a fixed sample of 20 inherited
+ *   SWEEP every inflected token (surface ≠ base) of the forty reviewed articles (N's twenty and N2's: the review queue's
+ *       hand-chosen kinds, original · aozora · gv · mext · govonline) and of a fixed sample of 20 inherited
  *       ones, one tap per distinct token per article: the reading the card states comes from the token's own (a kana
  *       base; the shared stem read alike; a reading the served dictionary lists for the form whose stem the token's
  *       reading keeps; 来 → くる), or the card is the word as written read as written (the label and the reading always
@@ -833,7 +834,10 @@ async function r2Cases(page) {
 /* ------------------------------------------------------------------ SWEEP · every inflected token */
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const reviewQueue = JSON.parse(readFileSync(resolve(REPO, 'docs/content/feed-review-queue.json'), 'utf8'));
-const TWENTY = reviewQueue.filter((row) => row.kind === 'original' && row.decision !== 'rejected').map((row) => row.id);
+// N2 (2026-10-17) rewrites the pin "the twenty (queue kind original)" strictly: the reviewed articles are every hand-chosen
+// queue kind — N's twenty and N2's twenty, forty in all; the inherited shelf they leave, and its sample, is unchanged
+const HAND_KINDS = new Set(['original', 'aozora', 'gv', 'mext', 'govonline']);
+const TWENTY = reviewQueue.filter((row) => HAND_KINDS.has(row.kind) && row.decision !== 'rejected').map((row) => row.id);
 const shelfRows = json('data/articles/index.json').articles;
 const inheritedRows = shelfRows.filter((row) => !TWENTY.includes(row.id)).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 // a fixed sample of 20 inherited articles the shelf shows: picks at an even step through the id order; a pick the shelf
@@ -1010,8 +1014,8 @@ async function sweepCase(browser, contextOptions) {
   const list = (pick) => all.filter(pick).map((x) => `${x.article} #${x.index} ${x.s}/${x.b}/${x.r}: ${x.issues.join('; ')}`).slice(0, 12);
   const twentySwept = report.articles.filter((article) => article.group === 'twenty').length;
   const inheritedSwept = report.articles.filter((article) => article.group === 'inherited').length;
-  check('SWEEP.articles', `the sweep walked the twenty and 20 inherited articles the shelf shows (${twentySwept} + ${inheritedSwept}; not on the shelf: ${report.notOnShelf.join(', ') || 'none'})`,
-    SWEEP_ONLY.length ? report.articles.length > 0 : twentySwept === TWENTY.length && TWENTY.length === 20 && inheritedSwept === 20 && !report.notOnShelf.some((id) => TWENTY.includes(id)),
+  check('SWEEP.articles', `the sweep walked the forty reviewed articles and 20 inherited articles the shelf shows (${twentySwept} + ${inheritedSwept}; not on the shelf: ${report.notOnShelf.join(', ') || 'none'})`,
+    SWEEP_ONLY.length ? report.articles.length > 0 : twentySwept === TWENTY.length && TWENTY.length === 40 && inheritedSwept === 20 && !report.notOnShelf.some((id) => TWENTY.includes(id)),
     { twentySwept, inheritedSwept, notOnShelf: report.notOnShelf });
   check('SWEEP.taps', `every inflected token opened its card (${report.totals.tapped} of ${report.totals.tokens} distinct, ${report.totals.occurrences} occurrences, ${report.articles.length} articles)`,
     report.totals.tokens > 0 && report.totals.tapFailures === 0, list((x) => x.card === null));
