@@ -5495,6 +5495,13 @@ body.record-not-saving #app > .chrome { margin-bottom: var(--record-band-h, 48px
 }
 /* in a bar it takes the bar's measure: 44, no lift */
 :is(#sheet, #app) [data-bar] button.save-one { height: 44px; min-height: 44px; box-shadow: none; }
+/* G5 · L-2 (MISSION/FINDINGS.md; MASTER_SPEC D5: no element within 8 px of an edge unless full-bleed). A Save in a bar
+   stood the bar's whole 44 and touched the screen's top edge. It is a door of its bar, as the seal is: its target the
+   bar's 44, the height of Close and search beside it, and its face a control inside the bar — 28 high, centred, 8 px
+   clear of the screen above it. The 8 px above and below the face are still the button's (::before), so nothing is
+   smaller to press. The room's keep has no face; its hover fill keeps the same 8 px. */
+:is(#sheet, #app) [data-bar] button.save-one:not(.chrome-keep) { position: relative; height: 28px; min-height: 28px; }
+:is(#sheet, #app) [data-bar] button.save-one:not(.chrome-keep)::before { content: ''; position: absolute; inset: -9px -1px; }
 /* a row that holds a Save keeps it on its own line end, the menu unfolding under the row (placeSaveMenu) */
 [data-save-row] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 /* the reader's keep stands in the room's bar in the bar's own type (corridor.js chromeKeep): its words in the bar's ink,
@@ -5534,7 +5541,16 @@ body:not(.ui-bi) #app > .chrome .chrome-keep .save-bar-verb { font-size: 10.5px;
   color: var(--color-bar-ink);
 }
 #app > .chrome .chrome-keep.taken .save-bar-verb { color: var(--color-accent); }
-#app > .chrome button.save-one.chrome-keep:hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-ink) 6%, transparent); }
+/* G5 · L-2: its hover fill (none once saved, as before) is a face inside the bar, 8 px clear of the bar's edges */
+#app > .chrome button.save-one.chrome-keep { position: relative; isolation: isolate; }
+#app > .chrome button.save-one.chrome-keep:not(.taken):hover:where(:not(:disabled))::before {
+  content: '';
+  position: absolute;
+  inset: 8px 0;
+  z-index: -1;
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
 #app > .chrome button.save-one.chrome-keep.taken { background: transparent; }
 #app > .chrome button.save-one.chrome-keep.reader-capture-held { border: 0; color: var(--color-bar-quiet, var(--color-muted)); cursor: help; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #app > .chrome button.save-one.chrome-keep:not(.taken) {
