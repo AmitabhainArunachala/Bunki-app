@@ -1654,9 +1654,12 @@ function tapNode(node, unit, onTap) {
   }
   if (unit.word) node.dataset.deckWord = unit.word.id;
   node.kpTap = () => onTap(unit, node);
+  wireHold(node, unit);
   node.addEventListener('click', (e) => {
     e.stopPropagation();
     if (dragged(e)) return;
+    // the release of a hold is never a tap (G5)
+    if (e.detail !== 0 && node.kpHeldAt && Date.now() - node.kpHeldAt < 700) return;
     // Transparent 44px reaches can overlap in prose. A pointer still chooses the printed
     // word nearest its point, rather than whichever neighbouring reach paints last.
     let chosen = node;
@@ -1682,6 +1685,74 @@ function tapNode(node, unit, onTap) {
     onTap(unit, node);
   });
   return node;
+}
+
+/* G5 · hold = seal on the card's back (MASTER_SPEC §4 G; the front stays sealed until the answer): a finger held still on a
+ * back word, a right-click or Shift+F10 keeps it through the corridor's one keep (host.take, add-only) and opens the strip
+ * beside it (host.addToList, seal). The ring under the finger is the corridor's own (its seam, when the page is hosted). A
+ * hold that moves is a scroll; a hold belongs to its pointer; its release is never a tap. Standalone pages have no host and
+ * no hold. */
+const HOLD_MS = 500, HOLD_RING_MS = 150, HOLD_MOVE = 9;
+function wireHold(node, unit) {
+  let hold = null;
+  const clear = () => {
+    const h = hold;
+    if (!h) return;
+    hold = null;
+    clearTimeout(h.timer);
+    clearTimeout(h.ringTimer);
+    if (!h.done) h.ring?.cancel();
+  };
+  const commit = (h) => {
+    if (hold !== h || h.done) return;
+    h.done = true;
+    clearTimeout(h.timer);
+    clearTimeout(h.ringTimer);
+    node.kpHeldAt = Date.now();
+    void held(unit, node, { ring: h.ring });
+  };
+  node.addEventListener('pointerdown', (e) => {
+    clear();
+    if (e.pointerType === 'mouse' || e.isPrimary === false || !ctx?.host?.take) return;
+    const h = { x: e.clientX, y: e.clientY, id: e.pointerId, ring: null, done: false };
+    h.ringTimer = setTimeout(() => {
+      if (hold === h && !h.done) h.ring = safely(() => globalThis.__KAIRO_HOLD_RING__?.(h.x, h.y) || null, null);
+    }, HOLD_RING_MS);
+    h.timer = setTimeout(() => commit(h), HOLD_MS);
+    hold = h;
+  });
+  node.addEventListener('pointermove', (e) => {
+    if (hold && !hold.done && e.pointerId === hold.id && Math.hypot(e.clientX - hold.x, e.clientY - hold.y) > HOLD_MOVE) clear();
+  });
+  node.addEventListener('pointerup', (e) => {
+    if (!hold || e.pointerId !== hold.id) return;
+    if (hold.done) node.kpHeldAt = Date.now();
+    clear();
+  });
+  node.addEventListener('pointercancel', (e) => { if (hold && e.pointerId === hold.id) clear(); });
+  node.addEventListener('contextmenu', (e) => {
+    if (!ctx?.host?.take) return;
+    e.preventDefault();
+    // a touch hold some engines also report as a contextmenu is the same hold: one seal, never two
+    if (hold && !hold.done) { commit(hold); return; }
+    if (node.kpHeldAt && Date.now() - node.kpHeldAt < 1200) return;
+    void held(unit, node, { keyboard: !e.clientX && !e.clientY });
+  });
+}
+async function held(unit, node, { keyboard = false, ring = null } = {}) {
+  // a late or synthetic hold never turns a sealed front into a door
+  if (ui.screen === 'study' && !ui.revealed) { ring?.cancel(); return; }
+  const host = ctx?.host;
+  const frame = frameOf(unit);
+  const entry = frame.entry || (frame.word
+    ? safely(() => host?.lookup?.({ s: frame.word.term, ref: frame.word.term, r: frame.word.reading || '', k: '語' }) || null, null) : null);
+  if (!host?.take || !host?.addToList || !entry) { ring?.cancel(); return; }
+  const was = !!safely(() => host.isTaken?.(entry), false);
+  let kept = was;
+  if (!was) { try { kept = !!(await host.take(entry)); } catch { kept = false; } }
+  ring?.settle(kept);
+  if (!kept || !node.isConnected) return;
+  safely(() => host.addToList(entry, node, { seal: true, created: !was, keyboard }));
 }
 
 /** text with its units as tap targets (a definition) */

@@ -10774,6 +10774,22 @@ function warmSealStripFaces() {
     document.fonts.load("800 16px 'Shippori Mincho B1'", '印').catch(() => {});
   });
 }
+/* A surface that keeps its words through its host (the deck's card back, G5): the word is already kept by the one keep when
+ * it asks, so the strip opens beside it, and a word this hold kept gets its seal. The keep's toast steps aside: the strip
+ * says it. A second hold on a kept word opens the same strip again; nothing is un-kept. */
+function sealHostedWord(node, label, anchor, { created = false, keyboard = false } = {}) {
+  if (!anchor?.isConnected || !closeSealStrip()) return;
+  if (!standingSlip()?.contains(anchor)) removeMini();
+  hideReaderToast();
+  const facts = { g: null, held: false, node, state: keptState(node), identityHeld: false };
+  const door = { label, copyText: label, entryAvailable: true, save: () => facts,
+    openEntry: (mode) => go(node, { invoker: anchor, instant: mode === 'keyboard' }) };
+  const countFrom = S.taken.length - (created ? 1 : 0);
+  openSealStrip(anchor, door, facts, { status: created ? 'created' : keptState(node) === 'taken' ? 'already-kept' : 'failed' }, { keyboard });
+  if (created) requestAnimationFrame(() => { if (anchor.isConnected) flySeal(anchor, { countFrom }); });
+}
+// the ring under the finger, for a surface that runs its own hold (the deck's card back): one ring in the house
+if (typeof window !== 'undefined') window.__KAIRO_HOLD_RING__ = (x, y) => holdRing(x, y);
 function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) {
   const keepable = !!facts && !facts.held && !facts.identityHeld;
   const node = keepable ? facts.node : null;
@@ -36617,8 +36633,10 @@ function deckHost() {
       // save, Saved toast and 元に戻す as the reader's dictionary visit, into the shared review
       // pool; no chooser. A row already held for this identity is left as it is, never toggled off.
       capture: (node, label) => (wordCaptureState(node) === 'taken' ? true : saveWord(node, label)),
-      // Save ▾'s menu from a deck card's word sheet: the same lists, copy, and the way back out of review
-      addToList: (node, label, invoker, { menu = false, onChange = null } = {}) => openVocabularyListPopover(node, label, invoker, menu ? { menu: true, more: [
+      // Save ▾'s menu from a deck card's word sheet: the same lists, copy, and the way back out of review; a held back
+      // word (G5, seal) opens the strip instead, the word already kept by the one keep
+      addToList: (node, label, invoker, { menu = false, onChange = null, seal = false, created = false, keyboard = false } = {}) => seal
+        ? sealHostedWord(node, label, invoker, { created, keyboard }) : openVocabularyListPopover(node, label, invoker, menu ? { menu: true, more: [
         { id: 'kp-take-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(label) },
         { id: 'kp-take-unsave', label: tx('復習から外す', 'Remove from review'), run: async () => { await toggleWordSave(node, label); onChange?.(); } },
       ] } : {}),
