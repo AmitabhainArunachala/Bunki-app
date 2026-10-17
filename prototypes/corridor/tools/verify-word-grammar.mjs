@@ -29,6 +29,14 @@
  *   P15 the kanji tiles grow with their text (G1b; the critic's finding 3): each KANJI IN THIS WORD glyph at twice its size
  *       (both engines) — and, in Chromium, the whole page at 200 % text (-webkit-text-size-adjust, the critic's probe; WebKit
  *       on a desktop does not apply it) — stays inside its tile, and the tile keeps its 48 px floor
+ * G5 (hold = seal; one-hand/G5 brief): a held word fills a ring and is kept once (the durable record +1, the bookmark +1); a
+ *   印 presses onto it and flies to the bookmark, landing on it; a failed keep shows no seal; a second hold opens the strip
+ *   and writes nothing; Remove is the one way out; right-click and Shift+F10 do what a hold does (全項目 routes the keyboard
+ *   to the page); New list… asks a name once; his lists are one tap each; the strip speaks plain full verbs (never "this
+ *   sentence · save · ask the tutor · practice"), stays under 40 % of the screen and covers no button and not the word;
+ *   the bookmark lands on the kept words, and browsing them never starts a review; layers open only from 層, never move
+ *   the paragraph's lines, and fold on any tap, Escape or the mark; frames of the seal and the landing (WebKit ≤ 24 ms).
+ *   --g5-only runs only these; --g5-controls adds: a second hold that un-keeps, a strip over a button, a layer that stays.
  * G3 negative controls: --controls replays stalled tap2, uncleared ruby and a front door; harness failures are incomplete.
  * --controls-only runs only the three candidate schedules, mutants and restores, with no frame measurements.
  * --g3-only is an explicit narrow slice, never a claim that the retained G1 gates passed.
@@ -44,7 +52,7 @@ import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
-import { readAppRecord } from './record-test-support.mjs';
+import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 import { serveMutation } from './reader-gloss-mutants.mjs';
 
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Pin an immutable built site and its digest');
@@ -79,6 +87,11 @@ const skyReadingsOnly = process.argv.includes('--sky-readings-only');
 assert([controlsOnly, roomsOnly, sentencesOnly, kanaOnly, skyReadingsOnly].filter(Boolean).length <= 1, 'Choose one explicit narrow schedule');
 const g3Only = controlsOnly || roomsOnly || sentencesOnly || kanaOnly || skyReadingsOnly || process.argv.includes('--g3-only');
 const withControls = controlsOnly || process.argv.includes('--controls');
+// G5: --g5-only runs only the G5 walks (hold = seal, the strip, the tray flight, layers); --g5-controls adds its three
+// negative controls (a second hold un-keeps, the strip covers a button, a layer stays open after a tap elsewhere)
+const g5Controls = process.argv.includes('--g5-controls');
+const g5Only = process.argv.includes('--g5-only');
+assert(!(g5Only && g3Only), 'Choose one explicit narrow schedule');
 
 const host = await startStaticHost({ site, port: 0 });
 async function boot(page, { world = null } = {}) {
@@ -361,6 +374,7 @@ try {
     console.log(`${engine} ${browserVersions[engine]}`);
     const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true, control = null, init = null, demo = false } = {}) => {
       if (g3Only && !name.startsWith('G3')) return;
+      if (g5Only && !name.startsWith('G5')) return;
       if (controlsOnly && !['G3-stalled', 'G3-clear', 'G3-front'].includes(name)) return;
       if (roomsOnly && !['G3-words', 'G3-words-family', 'G3-sky', 'G3-sky-glyph', 'G3-particle'].includes(name)) return;
       if (sentencesOnly && name !== 'G3-front' && !name.startsWith('G3-sentence-')) return;
@@ -945,6 +959,459 @@ try {
       }
     }
 
+    // ------------------------------------------------------------------------------------- G5 · hold = seal (MASTER_SPEC §4 G)
+    // Holds: real touch through CDP in Chromium; WebKit has no touch-hold API, so there the same pointer sequence is
+    // dispatched on the word and runs the app's own handlers. Every keep is read back from the durable native record.
+    const G5_HOLD_MS = 760;
+    const g5Facts = (page) => page.evaluate(() => {
+      const strip = document.getElementById('seal-strip');
+      const box = strip?.getBoundingClientRect();
+      const fill = document.getAnimations().find((animation) => animation.id === 'kairo-hold-ring');
+      return {
+        count: Number(document.getElementById('tray')?.dataset.count ?? NaN),
+        digit: document.querySelector('#tray .tray-count')?.textContent ?? null,
+        strip: !!strip, side: strip?.dataset.side ?? null,
+        box: box ? { top: box.top, bottom: box.bottom, left: box.left, right: box.right, height: box.height } : null,
+        status: document.getElementById('seal-strip-status')?.textContent ?? '',
+        lists: [...(strip?.querySelectorAll('.seal-list[data-list]') || [])].filter((node) => node.getClientRects().length)
+          .map((node) => ({ name: node.dataset.list, pressed: node.getAttribute('aria-pressed') })),
+        acts: [...(strip?.querySelectorAll('[data-strip-action]') || [])].filter((node) => !node.hidden).map((node) => ({ action: node.dataset.stripAction, text: node.textContent.trim() })),
+        text: strip?.innerText ?? '',
+        focusIn: !!strip?.contains(document.activeElement),
+        seals: document.querySelectorAll('.seal-flight').length, rings: document.querySelectorAll('.hold-ring').length,
+        ringRunning: fill?.playState === 'running' || (fill?.playState === 'finished'),
+        layers: document.querySelectorAll('[data-layers]').length, layerBlock: document.querySelectorAll('#reader-layers').length,
+        page: !!document.getElementById('sheet'), stage: !!document.getElementById('mini'), view: document.body.dataset.view || '',
+      };
+    });
+    const cardsOf = (record, id = WORD) => (record.taken || []).filter((row) => row.t === 'word' && row.id === id).length;
+    const g5Learning = (r) => Object.fromEntries(['taken', 'srs', 'revlog', 'lists', 'deepWords'].map((key) => [key, r[key] ?? null]));
+    /** A finger held still on the element's centre for `ms`; the facts are read `at` ms in, while the ring fills. */
+    const holdOn = async (page, locator, { ms = G5_HOLD_MS, at = 330, id = 41, settle = 220 } = {}) => {
+      if (settle) { await locator.scrollIntoViewIfNeeded(); await delay(settle); }
+      const box = await locator.boundingBox();
+      assert(box, 'the held word is on the glass');
+      const x = box.x + box.width / 2, y = box.y + box.height / 2;
+      let mid = null;
+      if (engine === 'chromium') {
+        const cdp = await page.context().newCDPSession(page);
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y, radiusX: 5, radiusY: 5, force: 1 }] });
+        await delay(at); mid = await g5Facts(page); await delay(ms - at);
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+        await cdp.detach();
+      } else {
+        const fire = (type) => page.evaluate(({ type, x, y, id }) => {
+          const target = type === 'pointerdown' ? document.elementFromPoint(x, y) : window.__g5HoldTarget;
+          window.__g5HoldTarget = target;
+          target.dispatchEvent(new PointerEvent(type, { bubbles: true, cancelable: true, composed: true, pointerId: id, pointerType: 'touch',
+            isPrimary: true, clientX: x, clientY: y, button: 0, buttons: type === 'pointerdown' ? 1 : 0, pressure: type === 'pointerdown' ? 0.5 : 0 }));
+        }, { type, x, y, id });
+        await fire('pointerdown'); await delay(at); mid = await g5Facts(page); await delay(ms - at); await fire('pointerup');
+      }
+      return { mid, point: { x, y } };
+    };
+    /** Every frame's seal: its centre and opacity while it is on the glass (null stops the sampler). */
+    const traceSeal = (page) => page.evaluate(() => {
+      window.__g5Trail = [];
+      const trail = window.__g5Trail;
+      const tick = () => {
+        if (window.__g5Trail !== trail) return;
+        const stamp = document.querySelector('.seal-stamp');
+        if (stamp) { const r = stamp.getBoundingClientRect(); trail.push([Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2), Number(getComputedStyle(stamp).opacity)]); }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+    const sealTrail = (page) => page.evaluate(() => { const trail = window.__g5Trail || []; window.__g5Trail = null; return trail; });
+    const landed = (page) => page.waitForFunction(() => !document.querySelector('.seal-flight'), null, { timeout: 5000 }).then(() => delay(120));
+    /** The strip's place: its height against the screen, and every control drawn under it (its centre or a corner on the glass
+     * under the strip), the held word's glyphs included. */
+    const stripCover = (page, wordSelector) => page.evaluate((wordSelector) => {
+      const strip = document.getElementById('seal-strip');
+      if (!strip) return null;
+      const r = strip.getBoundingClientRect();
+      const under = (x, y) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom && strip.contains(document.elementFromPoint(x, y));
+      const covered = [];
+      for (const node of document.querySelectorAll('button, a[href], input:not([type="hidden"]), select, textarea, summary, [role="button"], [role="link"], [role="tab"], [role="checkbox"], [role="menuitem"]')) {
+        if (strip.contains(node) || node.closest('[inert], [hidden]')) continue;
+        const b = node.getBoundingClientRect();
+        if (!b.width || !b.height || b.right <= r.left || b.left >= r.right || b.bottom <= r.top || b.top >= r.bottom) continue;
+        const style = getComputedStyle(node);
+        if (style.visibility === 'hidden' || style.display === 'none') continue;
+        const points = [[b.left + b.width / 2, b.top + b.height / 2], [b.left + 2, b.top + 2], [b.right - 2, b.top + 2], [b.left + 2, b.bottom - 2], [b.right - 2, b.bottom - 2]];
+        if (points.some(([x, y]) => under(x, y))) covered.push({ tag: node.tagName, id: node.id, text: (node.getAttribute('aria-label') || node.textContent || '').trim().slice(0, 30) });
+      }
+      const word = wordSelector ? window.__glyphs(document.querySelector(wordSelector)) : null;
+      const overWord = !!word && !(word.left + word.width <= r.left || word.left >= r.right || word.top + word.height <= r.top || word.top >= r.bottom);
+      return { top: r.top, bottom: r.bottom, height: r.height, inner: innerHeight, share: r.height / innerHeight, covered, overWord };
+    }, wordSelector);
+    const BANNED = /^(this sentence|save|ask the tutor|practice|open the web)$/iu;
+    const BANNED_ANYWHERE = /this sentence|open the web|この文/iu;
+    const labelsClean = (facts) => facts.acts.every((act) => !BANNED.test(act.text)) && !BANNED_ANYWHERE.test(facts.text);
+
+    // G5 schedules that the negative controls replay (each check always records the actual state)
+    const g5SecondProbe = async (page) => {
+      await openStory(page);
+      const word = readerWord(page);
+      await holdOn(page, word);
+      await page.locator('#seal-strip').waitFor();
+      await landed(page);
+      const first = await g5Facts(page), firstRecord = await readAppRecord(page);
+      check('G5.first-hold', 'the first hold keeps the word once and the bookmark counts +1', cardsOf(firstRecord) === 1 && first.strip && first.count === 1, { first, cards: cardsOf(firstRecord) });
+      await page.keyboard.press('Escape');
+      await delay(200);
+      await traceSeal(page);
+      await holdOn(page, word, { id: 42 });
+      await page.locator('#seal-strip').waitFor();
+      await delay(1000);
+      const trail = await sealTrail(page);
+      const second = await g5Facts(page), secondRecord = await readAppRecord(page);
+      check('G5.second-hold', 'a second hold opens the strip and writes nothing: one card, the same learning record, the same count, no new seal',
+        second.strip && second.count === first.count && cardsOf(secondRecord) === 1 && trail.length === 0 &&
+        JSON.stringify(g5Learning(secondRecord)) === JSON.stringify(g5Learning(firstRecord)), { second, cards: cardsOf(secondRecord), trail: trail.length });
+    };
+    const g5PlaceProbe = async (page) => {
+      await openStory(page);
+      const word = readerWord(page);
+      await word.evaluate((node) => node.setAttribute('data-g5-held', ''));
+      await holdOn(page, word);
+      await page.locator('#seal-strip').waitFor();
+      await landed(page);
+      const place = await stripCover(page, '[data-g5-held]');
+      check('G5.strip.place', 'the strip stands beside the word under 40 % of the screen and covers no button and not the word',
+        !!place && place.share <= 0.4 && place.covered.length === 0 && !place.overWord, place);
+    };
+    const g5LayerProbe = async (page) => {
+      await openStory(page);
+      await page.locator('#layers-mark').tap();
+      await delay(300);
+      const open = await g5Facts(page);
+      check('G5.layers.open', 'the 層 mark opens one paragraph’s layers', open.layers === 1 && open.layerBlock === 1, open);
+      // the paper beside the text: the reader's own margin, no word under it
+      const paper = await page.evaluate(() => {
+        const reader = document.getElementById('reader').getBoundingClientRect();
+        for (let y = Math.max(reader.top + 8, 140); y < Math.min(reader.bottom, innerHeight - 160); y += 6) {
+          const x = Math.max(4, reader.left - 6);
+          const hit = document.elementFromPoint(x, y);
+          if (hit && !hit.closest('.tok, button, a, [role="button"], #reader-layers')) return { x, y };
+        }
+        return null;
+      });
+      assert(paper, 'a point of paper beside the text is required');
+      await page.touchscreen.tap(paper.x, paper.y);
+      await delay(300);
+      const folded = await g5Facts(page);
+      check('G5.layers.fold-paper', 'a tap anywhere else folds the layers: no layer and no layer block stays', folded.layers === 0 && folded.layerBlock === 0, folded);
+    };
+    const g5Schedules = {};
+    for (const [name, probe] of [['G5-second', g5SecondProbe], ['G5-place', g5PlaceProbe], ['G5-layer-fold', g5LayerProbe]]) {
+      const begin = rows.length;
+      await walk(name, probe);
+      g5Schedules[name] = rows.slice(begin);
+    }
+
+    await walk('G5-seal', async (page) => {
+      await openStory(page);
+      const word = readerWord(page);
+      const start = await g5Facts(page), startRecord = await readAppRecord(page);
+      await traceSeal(page);
+      const { mid } = await holdOn(page, word);
+      check('G5.ring', 'a held finger fills a ring under it before the hold commits; nothing is kept yet', mid.rings === 1 && mid.ringRunning && !mid.strip && mid.count === start.count, mid);
+      await page.locator('#seal-strip').waitFor();
+      const opened = await g5Facts(page);
+      // the strip answers in the commit's frame; the seal presses in the next one
+      const pressed = await page.waitForFunction(() => document.querySelectorAll('.seal-flight').length, null, { timeout: 2000 }).then((handle) => handle.jsonValue()).catch(() => 0);
+      await landed(page);
+      const trail = await sealTrail(page);
+      const done = await g5Facts(page), record = await readAppRecord(page);
+      const tray = await boxOf(page, '#tray');
+      const wordBox = await page.evaluate(() => window.__glyphs(document.querySelector('#reader .tok[data-prose-label="総理"]')));
+      const shown = trail.filter(([, , opacity]) => opacity > 0.05);
+      const from = shown[0], to = shown.at(-1);
+      const centre = tray && [tray.x + tray.width / 2, tray.y + tray.height / 2];
+      check('G5.seal.kept', 'the hold keeps the word once: one card in the durable record, the bookmark +1 in its name and its digit',
+        cardsOf(record) === cardsOf(startRecord) + 1 && cardsOf(record) === 1 && done.count === start.count + 1 && done.digit === String(start.count + 1), { start: start.count, done, cards: cardsOf(record) });
+      check('G5.seal.flight', 'a 印 presses onto the word and flies to the bookmark, landing on it', pressed === 1 && shown.length >= 6 && !!from && !!to && !!centre &&
+        Math.hypot(from[0] - (wordBox.left + wordBox.width), from[1] - wordBox.top) <= 40 && Math.hypot(to[0] - centre[0], to[1] - centre[1]) <= 24 && done.seals === 0,
+        { pressed, frames: shown.length, from, to, centre, wordBox });
+      check('G5.seal.strip', 'the strip opens with the word kept: Saved, his lists, New list…, then 全項目 · Full entry, Save the sentence, Copy, the tutor and Remove',
+        opened.strip && /Saved/u.test(opened.status) && JSON.stringify(opened.acts.map((act) => act.action)) === JSON.stringify(['entry', 'sentence', 'copy', 'ask-tutor', 'remove']) &&
+        await page.locator('#seal-strip-new').isVisible(), opened);
+      check('G5.labels', 'plain full verbs: never the rejected row "this sentence · save · ask the tutor · practice", nor "Open the web"', labelsClean(opened), opened.acts);
+      await page.screenshot({ path: resolve(evidence, `${engine}-G5-strip.png`) });
+      // Remove: the one way out, its review history kept
+      const beforeRemove = await readAppRecord(page);
+      await page.locator('#seal-strip [data-strip-action="remove"]').tap();
+      const removed = await waitForAppRecord(page, (r) => cardsOf(r) === 0, { description: 'the explicit Remove' }).catch(() => null);
+      await delay(250);
+      const out = await g5Facts(page);
+      check('G5.remove', 'Remove is the one way out: the card leaves the record, the bookmark counts it, its schedule and history stay', !!removed &&
+        out.count === done.count - 1 && !out.strip && JSON.stringify(removed.srs || {}) === JSON.stringify(beforeRemove.srs || {}) &&
+        JSON.stringify(removed.revlog || []) === JSON.stringify(beforeRemove.revlog || []), { out, cards: removed && cardsOf(removed) });
+      // a failed keep shows no seal and no count (the seal is a consequence of durable success)
+      await armRecordWriteFailure(page, 'quota', { roots: ['taken'] });
+      await traceSeal(page);
+      await holdOn(page, word, { id: 43 });
+      await page.locator('#seal-strip').waitFor();
+      await delay(1000);
+      const failedTrail = await sealTrail(page);
+      const fault = await clearRecordWriteFailure(page);
+      const failed = await g5Facts(page), failedRecord = await readAppRecord(page);
+      check('G5.seal.durable', 'a keep that fails to persist presses no seal and counts nothing; the strip says so',
+        fault.fired > 0 && failedTrail.length === 0 && failed.count === out.count && cardsOf(failedRecord) === 0 && /Could not save|not ready|protected/iu.test(failed.status), { fault, failed, trail: failedTrail.length });
+    });
+
+    await walk('G5-keys', async (page) => {
+      await openStory(page);
+      const word = readerWord(page);
+      await word.scrollIntoViewIfNeeded();
+      await delay(250);
+      const start = await g5Facts(page);
+      await word.click({ button: 'right' });
+      await page.locator('#seal-strip').waitFor();
+      await landed(page);
+      const right = await g5Facts(page), rightRecord = await readAppRecord(page);
+      check('G5.right-click', 'a right-click does what a hold does: the word is kept once and the strip opens', right.strip && cardsOf(rightRecord) === 1 && right.count === start.count + 1, right);
+      await page.keyboard.press('Escape');
+      await delay(200);
+      const back = await page.evaluate(() => ({ strip: !!document.getElementById('seal-strip'), focus: document.activeElement?.dataset?.proseLabel || null }));
+      check('G5.escape', 'Escape closes the strip and gives the keyboard back to the word', !back.strip && back.focus === WORD, back);
+      await focusWord(page, word);
+      await page.keyboard.press('Shift+F10');
+      await page.locator('#seal-strip').waitFor();
+      await delay(300);
+      const keyed = await g5Facts(page), keyedRecord = await readAppRecord(page);
+      check('G5.shift-f10', 'Shift+F10 opens the same strip with the keyboard inside it and 全項目 in it; nothing is kept twice',
+        keyed.strip && keyed.focusIn && keyed.acts.some((act) => act.action === 'entry' && /全項目/u.test(act.text)) && cardsOf(keyedRecord) === 1 && keyed.count === right.count, keyed);
+      await page.locator('#seal-strip [data-strip-action="entry"]').focus();
+      await page.keyboard.press('Enter');
+      await pageSettled(page);
+      const full = await pageFacts(page);
+      check('G5.full-entry', '全項目 · Full entry routes the keyboard to the word’s whole-screen page', coversViewport(full) && full.headword.startsWith(WORD), full);
+    });
+
+    await walk('G5-lists', async (page) => {
+      await openStory(page);
+      const word = readerWord(page);
+      await holdOn(page, word);
+      await page.locator('#seal-strip').waitFor();
+      await landed(page);
+      for (const name of ['仕事', '旅']) {
+        await page.locator('#seal-strip-new').tap();
+        await page.locator('#seal-strip-name').fill(name);
+        await page.locator('#seal-strip-create').tap();
+        await waitForAppRecord(page, (r) => r.lists?.[name]?.some((row) => row.id === WORD), { description: `the new list ${name}` }).catch(() => {});
+        await page.locator(`#seal-strip .seal-list[data-list="${name}"]`).waitFor().catch(() => {});
+      }
+      const made = await g5Facts(page), madeRecord = await readAppRecord(page);
+      check('G5.new-list', 'New list… asks a name once and puts the word on it', ['仕事', '旅'].every((name) => madeRecord.lists?.[name]?.length === 1 &&
+        made.lists.some((row) => row.name === name && row.pressed === 'true')), { lists: madeRecord.lists, strip: made.lists });
+      await page.keyboard.press('Escape');
+      const other = page.locator('#reader .tok[data-prose-label="大賞"]').first();
+      await holdOn(page, other, { id: 44 });
+      await page.locator('#seal-strip').waitFor();
+      await landed(page);
+      const offered = await g5Facts(page);
+      await page.locator('#seal-strip .seal-list[data-list="旅"]').tap();
+      const onList = await waitForAppRecord(page, (r) => r.lists?.['旅']?.some((row) => row.id === '大賞'), { description: 'one tap on a list' }).catch(() => null);
+      await delay(250);
+      const after = await g5Facts(page);
+      check('G5.list.one-tap', 'his lists stand in the strip, and one tap puts the word on one', offered.lists.map((row) => row.name).sort().join() === ['仕事', '旅'].sort().join() &&
+        offered.lists.every((row) => row.pressed === 'false') && !!onList && after.lists.find((row) => row.name === '旅')?.pressed === 'true' && after.strip, { offered: offered.lists, after: after.lists });
+      check('G5.list.labels', 'the strip with lists still speaks in plain full verbs', labelsClean(after), after.acts);
+    });
+
+    await walk('G5-tray', async (page) => {
+      await openStory(page);
+      const word = readerWord(page);
+      await holdOn(page, word);
+      await page.locator('#seal-strip').waitFor();
+      await landed(page);
+      await page.keyboard.press('Escape');
+      await page.locator('#tray').tap();
+      await delay(700);
+      const land = await page.evaluate((key) => {
+        const row = [...document.querySelectorAll('#app main .tray-line[data-kept-key]')].filter((node) => node.dataset.keptKey === key).at(-1);
+        const box = row?.getBoundingClientRect();
+        const ceiling = document.querySelector('#app > .chrome')?.getBoundingClientRect().bottom || 0;
+        const floor = document.getElementById('primary-tabs')?.getBoundingClientRect().top || innerHeight;
+        return { view: document.body.dataset.view, scrollY: Math.round(scrollY), row: box ? { top: Math.round(box.top), bottom: Math.round(box.bottom) } : null,
+          ceiling: Math.round(ceiling), floor: Math.round(floor), focused: !!row && document.activeElement === row };
+      }, `word:${WORD}`);
+      check('G5.bookmark.lands', 'the bookmark lands on the kept words: Today scrolled to the newest kept word, on the glass under the bar, the keyboard on it',
+        land.view === 'tray' && land.scrollY > 0 && !!land.row && land.row.top >= land.ceiling && land.row.bottom <= land.floor && land.focused, land);
+      await page.screenshot({ path: resolve(evidence, `${engine}-G5-bookmark.png`) });
+      // browsing never starts a review: a row opens its word's page; a list's name opens its page; Review this list is its own button
+      const row = page.locator(`#app main .tray-line[data-kept-key="word:${WORD}"]`).last();
+      await row.tap();
+      await pageSettled(page);
+      const opened = await page.evaluate(() => ({ view: document.body.dataset.view, page: !!document.getElementById('sheet') }));
+      await page.locator('#sheet-back').tap();
+      await bare(page);
+      await page.locator('#app main .list-open').last().tap();
+      await delay(400);
+      const list = await page.evaluate(() => ({ view: document.body.dataset.view,
+        reviews: [...document.querySelectorAll('#app main .list-review')].map((node) => ({ text: node.textContent.trim(), tag: node.tagName })) }));
+      check('G5.browse.no-review', 'browsing the kept words never starts a review: a row opens its page, a list’s name its list; "Review this list" is a button of its own',
+        opened.view === 'tray' && opened.page && list.view === 'list' && list.reviews.every((button) => button.tag === 'BUTTON' && /^Review this list · \d+$/u.test(button.text)), { opened, list });
+    });
+
+    await walk('G5-layers', async (page) => {
+      await openStory(page);
+      const rest = await page.evaluate(() => ({ layers: document.querySelectorAll('[data-layers]').length, block: document.querySelectorAll('#reader-layers').length,
+        marks: document.querySelectorAll('#layers-mark').length, pressed: document.getElementById('layers-mark')?.getAttribute('aria-pressed') }));
+      check('G5.layers.rest', 'at rest the reading is bare: no layer is open; 層 is one quiet mark', rest.layers === 0 && rest.block === 0 && rest.marks === 1 && rest.pressed === 'false', rest);
+      const word = readerWord(page);
+      await word.tap(); await delay(350);
+      const tapped = await g5Facts(page);
+      await page.keyboard.press('Escape'); await delay(200);
+      await holdOn(page, word);
+      await page.locator('#seal-strip').waitFor();
+      const held = await g5Facts(page);
+      await page.keyboard.press('Escape'); await delay(200);
+      check('G5.layers.only-mark', 'a tap and a hold never open layers: only the 層 mark does', tapped.layers === 0 && tapped.layerBlock === 0 && held.layers === 0 && held.layerBlock === 0, { tapped, held });
+      const paragraph = '#reader > [data-reader-prose]';
+      // measured from the reader's own top, so a scroll is never mistaken for a line that moved
+      const geometry = () => page.evaluate((paragraph) => {
+        const origin = document.getElementById('reader').getBoundingClientRect().top;
+        return [...document.querySelectorAll(paragraph)].map((node) => {
+          const r = node.getBoundingClientRect();
+          return [Math.round(r.top - origin), Math.round(r.height), [...node.querySelectorAll('.tok[data-index]')].slice(0, 12)
+            .map((tok) => { const b = tok.getBoundingClientRect(); return [Math.round(b.left), Math.round(b.top - origin)]; })];
+        });
+      }, paragraph);
+      const plain = await geometry();
+      await page.locator('#layers-mark').tap(); await delay(350);
+      const open = await page.evaluate(() => {
+        const node = document.querySelector('#reader > [data-layers="open"]');
+        const words = node ? [...node.querySelectorAll('.tok[data-index] ruby')] : [];
+        const shown = words.filter((ruby) => { const ink = getComputedStyle(ruby, '::before'); return ink.content !== 'none' && Number(ink.opacity) > 0.5; }).length;
+        const block = document.getElementById('reader-layers');
+        return { open: document.querySelectorAll('[data-layers]').length, rubies: words.length, shown, block: !!block, text: block?.innerText || '',
+          pressed: document.getElementById('layers-mark')?.getAttribute('aria-pressed'), index: [...document.querySelectorAll('#reader > [data-reader-prose]')].indexOf(node) };
+      });
+      const during = await geometry();
+      check('G5.layers.open', 'the 層 mark opens one paragraph: every reading over its words, and its words’ meanings under it', open.open === 1 && open.block && open.rubies > 0 &&
+        open.shown === open.rubies && open.text.length > 0 && open.pressed === 'true', open);
+      check('G5.layers.lines-hold', 'the paragraph’s own lines never move while its layers are open (readings over the words, not between the lines)',
+        open.index >= 0 && JSON.stringify(during.slice(0, open.index + 1)) === JSON.stringify(plain.slice(0, open.index + 1)), { open: open.index, plain: plain.slice(0, open.index + 1), during: during.slice(0, open.index + 1) });
+      await page.screenshot({ path: resolve(evidence, `${engine}-G5-layers.png`) });
+      // the layers, then a tap on a word: the layers fold, and the word's own ladder still runs
+      const other = page.locator('#reader .tok[data-prose-label="大賞"]').first();
+      await other.tap(); await delay(350);
+      const folded = await page.evaluate(() => ({ layers: document.querySelectorAll('[data-layers]').length, block: document.querySelectorAll('#reader-layers').length,
+        rung: document.querySelector('#reader .tok[data-prose-label="大賞"]')?.dataset.ladderRung || null, stage: !!document.getElementById('mini'),
+        pressed: document.getElementById('layers-mark')?.getAttribute('aria-pressed') }));
+      check('G5.layers.fold-word', 'with the layers open, a tap on a word folds them and still climbs that word’s ladder', folded.layers === 0 && folded.block === 0 &&
+        (folded.rung === 'reading' || folded.stage) && folded.pressed === 'false', folded);
+      const bareAgain = await geometry();
+      check('G5.layers.bare-again', 'folded, the reading is bare and every line where it was', JSON.stringify(bareAgain) === JSON.stringify(plain), { plain: plain.length, bareAgain: bareAgain.length });
+      await page.keyboard.press('Escape'); await delay(200);
+      await page.locator('#layers-mark').tap(); await delay(250);
+      await page.keyboard.press('Escape'); await delay(250);
+      const escaped = await g5Facts(page);
+      await page.locator('#layers-mark').tap(); await delay(250);
+      await page.locator('#layers-mark').tap(); await delay(250);
+      const toggled = await g5Facts(page);
+      check('G5.layers.fold-keys', 'Escape folds the layers, and so does the mark again', escaped.layers === 0 && escaped.layerBlock === 0 && toggled.layers === 0 && toggled.layerBlock === 0, { escaped, toggled });
+    });
+
+    /** P7's method over a window that holds the whole move: rAF deltas from just before the gesture. */
+    const measureMove = async (page, action, windowMs) => {
+      await delay(250);
+      await page.evaluate((ms) => new Promise((done) => {
+        window.__g5f = [];
+        requestAnimationFrame((t0) => {
+          window.__g5f.push(t0);
+          const until = t0 + ms;
+          const tick = (t) => { window.__g5f.push(t); if (t < until) requestAnimationFrame(tick); };
+          requestAnimationFrame(tick);
+          done();
+        });
+      }), windowMs);
+      const began = Date.now();
+      await action();
+      await delay(Math.max(0, windowMs + 250 - (Date.now() - began)));
+      const t = await page.evaluate(() => window.__g5f);
+      const deltas = t.slice(1).map((v, i) => Math.round((v - t[i]) * 10) / 10);
+      const sorted = [...deltas].sort((a, b) => a - b);
+      return { worst: Math.max(...deltas), p95: sorted[Math.ceil(deltas.length * 0.95) - 1], over24: deltas.filter((d) => d > 24).length, frames: deltas.length, window: windowMs };
+    };
+    await walk('G5-frames', async (page) => {
+      // P7's method: rAF deltas over the move's window, from just before the gesture, three samples (the first cold)
+      for (let sample = 0; sample < 3; sample++) {
+        await openStory(page);
+        const word = readerWord(page);
+        await word.scrollIntoViewIfNeeded(); await delay(400);
+        const seal = await measureMove(page, () => holdOn(page, word, { id: 50 + sample, settle: 0 }), 1900);
+        if (seal) frames.push({ engine, move: `G5 hold → seal → bookmark #${sample + 1}`, ...seal, deltas: undefined });
+        await landed(page).catch(() => {});
+        await page.keyboard.press('Escape'); await delay(250);
+        const tray = await measureMove(page, () => page.locator('#tray').tap(), 1400);
+        if (tray) frames.push({ engine, move: `G5 bookmark → kept words #${sample + 1}`, ...tray, deltas: undefined });
+        // keep the record fresh for the next sample: take the word out by its explicit Remove
+        await openStory(page);
+        await holdOn(page, readerWord(page), { id: 60 + sample });
+        await page.locator('#seal-strip').waitFor();
+        await page.locator('#seal-strip [data-strip-action="remove"]').tap();
+        await delay(400);
+      }
+      if (engine === 'webkit') {
+        // one gate per move, never averaged: the hold's seal and its flight to the bookmark; the bookmark's landing
+        for (const [id, prefix, title] of [['seal', 'G5 hold → seal', 'the hold, the 印 pressed and its flight to the bookmark'],
+          ['landing', 'G5 bookmark → kept words', 'the bookmark’s landing on the kept words (a room change)']]) {
+          const mine = frames.filter((row) => row.engine === engine && row.move.startsWith(prefix));
+          const worst = Math.max(...mine.map((row) => row.worst));
+          check(`G5.frames.${id}`, `${title}: the worst frame ≤ 24 ms in WebKit (a proxy; the phone is the truth)`, mine.length === 3 && worst <= 24,
+            mine.map((row) => ({ move: row.move, worst: row.worst, p95: row.p95, over24: row.over24 })));
+        }
+      }
+    });
+
+    if (g5Controls) {
+      const specs = [
+        { id: 'second-hold-unkeeps', run: 'G5-second', probe: g5SecondProbe, kill: 'G5.second-hold',
+          witness: (row) => row.observed.cards === 0,
+          edits: [{ file: 'corridor.js', key: 'second-hold-toggles',
+            from: "  if (before === 'taken') return { status: 'already-kept', key };",
+            to: "  if (before === 'taken') { await toggleTaken(node, label); return { status: 'already-kept', key }; } // G5 negative: the naive toggle" }] },
+        { id: 'strip-covers-a-button', run: 'G5-place', probe: g5PlaceProbe, kill: 'G5.strip.place',
+          witness: (row) => row.observed?.covered?.length > 0,
+          edits: [{ file: 'corridor.js', key: 'strip-over-the-foot',
+            from: '  let seat = seats.find((s) => !controlsUnder(rect(s.top, s.tall), strip, anchor).length) || null;',
+            to: "  let seat = { top: (document.getElementById('dials-toggle')?.getBoundingClientRect().top ?? ceiling) - 8, tall: h, side: 'below' }; // G5 negative: laid over a button" }] },
+        { id: 'layer-stays-open', run: 'G5-layer-fold', probe: g5LayerProbe, kill: 'G5.layers.fold-paper',
+          witness: (row) => row.observed.layers > 0 || row.observed.layerBlock > 0,
+          edits: [{ file: 'corridor.js', key: 'layers-never-fold',
+            from: "  if (!readerLayers || event.target?.closest?.('#layers-mark')) return;\n  foldReaderLayers();",
+            to: "  if (!readerLayers || event.target?.closest?.('#layers-mark')) return; // G5 negative: the layers stay" }] },
+      ];
+      for (const spec of specs) {
+        const control = { engine, id: spec.id, edits: spec.edits, served: [], pageErrors: [] };
+        const begin = rows.length;
+        await walk(spec.run, spec.probe, { control });
+        control.rows = rows.splice(begin);
+        const baseline = g5Schedules[spec.run] || [];
+        const expected = baseline.map((row) => row.id);
+        const actual = control.rows.map((row) => row.id);
+        const target = control.rows.find((row) => row.id === `${engine}/${spec.kill}`);
+        const cleanCandidate = baseline.length > 1 && baseline.every((row) => row.ok) && new Set(expected).size === expected.length;
+        const complete = !control.error && control.pageErrors.length === 0 && JSON.stringify(actual) === JSON.stringify(expected) &&
+          spec.edits.every((edit) => control.served.some((served) => served.file === edit.file && served.applied.some((applied) => applied.key === edit.key)));
+        let witnessed = false;
+        try { witnessed = !!target && spec.witness(target); } catch { witnessed = false; }
+        const killed = cleanCandidate && complete && !!target && !target.ok && witnessed && control.rows.every((row) => row.id === target.id || row.ok);
+        control.verdict = !cleanCandidate || !complete ? 'incomplete' : killed ? 'killed' : target?.ok ? 'survived' : 'contaminated';
+        const restoreBegin = rows.length;
+        await walk(spec.run, spec.probe);
+        control.restore = rows.splice(restoreBegin);
+        const restored = JSON.stringify(control.restore.map((row) => row.id)) === JSON.stringify(expected) && control.restore.every((row) => row.ok);
+        controls.push(control);
+        check(`G5.negative.${spec.id}`, 'candidate passes, the named product mutation fails its intended assertion, and the unmodified restore passes',
+          killed && restored, { verdict: control.verdict, cleanCandidate, complete, restored, target, error: control.error });
+      }
+    }
+
     // P1 · P2 · P3 · P9 · P10 · P12 — one walk through the reader's word into its page and out
     await walk('page', async (page) => {
       await openStory(page);
@@ -1317,7 +1784,7 @@ try {
 
 function innerHeightOf(facts) { return facts?.inner?.height || 844; }
 
-writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : 'G1 and G3', rows, frames, controls }, null, 1));
+writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : g5Only ? `G5 only${g5Controls ? ' with its negative controls' : ''}; G1 and G3 gates not run` : `G1, G3 and G5${g5Controls ? ' with G5 negative controls' : ''}`, rows, frames, controls }, null, 1));
 const failed = rows.filter((row) => !row.ok);
 console.log(`\n${rows.length - failed.length}/${rows.length} — evidence ${evidence}`);
 process.exit(failed.length ? 1 : 0);
