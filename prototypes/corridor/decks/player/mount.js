@@ -602,18 +602,81 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     taps = null; // the front has nothing to tap, whatever is asked
   }
   const cover = taps ? coverOf(card.ja.length, displayUnits(card, taps.units)) : null;
+  // Q · the passage breaks only between its words, the same on both faces (the lead, inbox 1447; MASTER_SPEC §7: the
+  // front stays sealed). Its words are the back's own tap units where it has them (on the front, plain: never a door,
+  // nothing to tap) and, between them, the host's one rule (jaWords); each word of 12 characters or fewer is one
+  // no-break span (.kp-w). A word that is not whole on one face would break the lines apart at the reveal.
+  const frontUnits = front && ctx?.host && !blank ? passageUnits(card) : null;
+  const wordCover = frontUnits ? coverOf(card.ja.length, displayUnits(card, frontUnits)) : cover;
+  const wordEnd = new Array(card.ja.length).fill(0);
+  let wordStart = 0;
+  // the passage's own tokens are the truest words when they have arrived (the same tokens on both faces); the host's
+  // rule glues them as it glues any words, and cuts the text itself (Intl.Segmenter) until they arrive
+  const toks = ctx?.host && ctx.tokenFile ? cardTokens(card, ctx.tokenFile) : null;
+  let segments = null;
+  if (toks?.length) {
+    segments = [];
+    let cursor = 0;
+    for (const t of [...toks].sort((a, b) => a.at - b.at)) {
+      if (!(t.at >= cursor) || card.ja.slice(t.at, t.at + t.s.length) !== t.s) continue;
+      if (t.at > cursor) segments.push(card.ja.slice(cursor, t.at));
+      segments.push(t.s);
+      cursor = t.at + t.s.length;
+    }
+    if (cursor < card.ja.length) segments.push(card.ja.slice(cursor));
+  }
+  for (const group of (ctx?.words ? ctx.words(card.ja, segments) : [])) {
+    const len = group.join('').length;
+    for (let i = wordStart; i < wordStart + len && i < wordEnd.length; i++) wordEnd[i] = wordStart + len;
+    wordStart += len;
+  }
+  // a tap unit is one word too: the rule's word around it grows to hold it whole
+  for (const u of wordCover ? new Set(wordCover.filter(Boolean)) : []) {
+    const end = Math.max(...Array.from({ length: u.len }, (_, j) => wordEnd[u.at + j] || 0), u.at + u.len);
+    for (let i = u.at; i < end && i < wordEnd.length; i++) wordEnd[i] = Math.max(wordEnd[i], end);
+  }
   const out = el('p', 'kp-sentence');
   out.lang = 'ja';
+  if (segments) out.dataset.words = 'tokens';
   const ends = split ? sentenceEnds(card.ja) : [card.ja.length];
   let host = out;
   let at = 0; // offset in card.ja of the next character
   let k = 0; // the sentence being filled
+  let word = null, wordUntil = -1; // the no-break span of the word being filled, and where that word ends
+  // a line may end between two words: an explicit <wbr> stands between them, outside their no-break spans (WebKit
+  // offers no break between two no-break spans side by side: the back ran on one line, 4,000 px wide, at 320)
+  const breakBefore = (parent) => {
+    const last = parent.lastChild;
+    if (last && !(last.nodeType === 1 && last.tagName === 'WBR')) parent.append(document.createElement('wbr'));
+  };
   const open = () => {
+    word = null;
     if (!split) return;
     host = el('span', 'kp-s');
+    breakBefore(out);
     out.append(host);
   };
   open();
+  /** the box a piece at [at, at + len) goes into: the current word's span while the piece is inside that word */
+  const plain = () => {
+    if (host.lastChild?.nodeType === 1 && host.lastChild.classList.contains('kp-w')) breakBefore(host);
+    word = null;
+    return host;
+  };
+  const boxFor = (len) => {
+    if (!wordEnd[at]) return plain();
+    if (word && word.parentNode === host && at < wordUntil) {
+      wordUntil = Math.max(wordUntil, wordEnd[Math.min(at + len, wordEnd.length) - 1] || 0);
+      return word;
+    }
+    const end = Math.max(wordEnd[at], wordEnd[Math.min(at + len, wordEnd.length) - 1] || 0);
+    if (end - at > 12) return plain();
+    word = el('span', 'kp-w');
+    breakBefore(host);
+    host.append(word);
+    wordUntil = end;
+    return word;
+  };
   // A word kept on one line (ruby, kp-nb: a host may set white-space: nowrap on it) must still leave
   // a line break open before a kept word right after it (小村|寿太郎), or the pair would move to the
   // next line as one and leave a short line behind: a <wbr> goes between them, where the next one goes.
@@ -624,19 +687,23 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
   // (one word, several ruby segments) until a sentence starts a new host
   const put = (node, isTarget, len, unit = null) => {
     if (split && isTarget === 1) host.dataset.focus = '1';
-    const gap = keptBefore && kept(edge(node, false)) ? document.createElement('wbr') : null;
+    let gap = keptBefore && kept(edge(node, false)) ? document.createElement('wbr') : null;
     keptBefore = kept(edge(node, true));
+    const box = boxFor(len);
+    // Q · the break between two kept words is a break between words: never inside one word's span or one tap unit
+    // (Chromium honours a <wbr> inside a no-break span: 先入｜観); a word's span already has its own break before it
+    if (box !== host) gap = null;
     if (unit) {
-      let tok = host.lastChild;
+      let tok = box.lastChild;
       if (!(tok && tok.kpUnit === unit)) {
         tok = tapNode(el('span', 'kp-tok'), unit, taps.onTap);
-        host.append(tok);
+        if (gap) box.append(gap);
+        box.append(tok);
       }
-      if (gap) tok.append(gap);
       tok.append(node);
     } else {
-      if (gap) host.append(gap);
-      host.append(node);
+      if (gap) box.append(gap);
+      box.append(node);
     }
     at += len;
     while (split && k < ends.length - 1 && at >= ends[k]) {
@@ -667,7 +734,7 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     if (hasRuby) return put(rubyNode(text, reading), 0, len, unitOver(at, len));
     if (keep && !cover) return put(el('span', 'kp-nb', text), 0, len);
     // plain text may hold a sentence end or a word edge: cut it there so each sentence keeps its
-    // own words and each word its own tap target
+    // own words and each word its own tap target (and, Q, its own no-break span)
     let rest = text;
     while (rest) {
       let cut = rest.length;
@@ -678,6 +745,7 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
         while (j < cut && cover[at + j] === u) j++;
         cut = j;
       }
+      if (wordEnd[at] && wordEnd[at] - at < cut) cut = wordEnd[at] - at;
       put(document.createTextNode(rest.slice(0, cut)), 0, cut, cover ? cover[at] : null);
       rest = rest.slice(cut);
     }
@@ -1532,7 +1600,22 @@ function wantTokens() {
     if (ctx?.deck !== deck || ctx.tokenFile) return;
     ctx.tokenFile = file;
     if (ui.screen === 'study' && ui.revealed) upgradeTaps();
+    else if (ui.screen === 'study') upgradeFront();
   });
+}
+
+/** Q · the front's words from the passage's own tokens once they arrive (Intl.Segmenter cut 簡単なんだ｜ろうと where
+ * the tokens hold だろう): the same text, its words as the back's, still sealed: plain, no doors */
+function upgradeFront() {
+  const id = ui.queue[ui.pos];
+  const face = ctx.root.querySelector('#kp-card');
+  const old = face?.querySelector(':scope > .kp-sentence');
+  if (!id || !face || face.dataset.card !== id || !old || old.dataset.words === 'tokens') return;
+  const { card } = ctx.index.cards.get(id);
+  const sentence = sentenceNodes(card, { front: true, blank: cardMode() !== 'read', split: !!card.type });
+  if (sentence.dataset.words !== 'tokens') return;
+  if (old.classList.contains('kp-enter')) sentence.classList.add('kp-enter');
+  old.replaceWith(sentence);
 }
 
 /** character offset → the unit covering it, or null */
@@ -2911,7 +2994,7 @@ function ensureCss() {
   document.head.append(link);
 }
 
-export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false } = {}) {
+export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false, words = null } = {}) {
   const request = ++mountRequest;
   if (autoStart !== undefined) pendingStart = { deckId, autoStart };
   ensureCss();
@@ -2950,6 +3033,9 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     tokenFile: lexicon ? tokensReady.get(deckId) || null : null,
     gloss: lexicon ? null : glossFor(deckId, deck),
     prefs: prefsFor(storage, deck),
+    // Q · the host's one rule for Japanese line breaks: text → its words, as groups of segments (the app's jaWordGroups);
+    // the standalone pages have none and keep the browser's breaks
+    words: typeof words === 'function' ? words : null,
   };
   root.addEventListener('pointerdown', onDown, true);
   ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));

@@ -1167,7 +1167,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
 #shelf-body .shelf-study-tools button.grammar-link:hover { background: var(--tint-wash); }
 /* register.css spaces a door's last span out (0.12em) and can hide it; a tile's name is always shown, set tight */
 #shelf-body .shelf-study-tools button.grammar-link .l-ja,
-#shelf-body .shelf-study-tools button.grammar-link[data-grade] .l-ja { display: block; margin: 0; font: inherit; letter-spacing: normal; color: inherit; word-break: auto-phrase; }
+#shelf-body .shelf-study-tools button.grammar-link[data-grade] .l-ja { display: block; margin: 0; font: inherit; letter-spacing: normal; color: inherit; }
 #shelf-body .shelf-study-tools button.grammar-link .en-sub,
 #shelf-body .shelf-study-tools button.grammar-link[data-grade] .en-sub {
   display: block;
@@ -1294,7 +1294,9 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture.is-kanji {
   letter-spacing: -0.005em;
   color: var(--label);
   text-wrap: pretty;
-  word-break: auto-phrase;
+  /* Q · breaks only between its words (corridor.js setJaWords gives them); auto-phrase was Chromium's alone */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 #shelf-body .story-card .shelf-title-en {
   font: 400 15px/1.45 var(--sans);
@@ -3166,6 +3168,10 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 /* a word that carries a reading stays on one line (its reading is drawn over the whole word), on the
    front too (kp-nb), so the lines break the same before and after the reveal */
 #app .kp-sentence :is(ruby, .kp-nb) { white-space: nowrap; }
+/* Q · a word of the passage is whole on both faces (mount.js sentenceNodes, from the app's one rule): its no-break span
+   (.kp-w), and on the back each word you can tap (.kp-tok); the lines break between words, the same before and after
+   the reveal */
+#app .kp-sentence :is(.kp-w, .kp-tok) { white-space: nowrap; }
 /* the player seats each line's readings so none runs into the next or past the line's edge:
    --kp-rt-dx moves a reading off its word's centre, --kp-rt-fit narrows one that cannot fit */
 #app .kp-sentence ruby[data-rt]::after {
@@ -5461,3 +5467,21 @@ html[data-save-drawer='sheet'] #sheet > .sheet-bar[data-bar='sheet'] {
 #app .kp-top-study[data-bar='deck'] :is(.kp-icon, .kp-delete):focus-visible { outline: 2px solid var(--deck-band-ink); outline-offset: -4px; box-shadow: none; }
 #app .kp-top-study[data-bar='deck'] .kp-progress { background: color-mix(in srgb, var(--deck-band-ink) 22%, transparent); }
 #app .kp-top-study[data-bar='deck'] .kp-progress i { background: var(--deck-band-ink); }
+
+/* ==========================================================================
+   Q · JAPANESE BREAKS ONLY BETWEEN WORDS (Q/DESIGN.md §1; John, 2026-10-16: "be systematic about everythign!!").
+   One rule wherever the app sets Japanese: a line ends only where a word ends, never inside a word, a name or a number.
+   Plain text set by setJaWords carries a <wbr> at each word's edge and keeps its words whole (keep-all); a word wider
+   than the whole line may still break (break-word). Lookup prose keeps its doors and wraps each word's doors in one
+   .ja-unit. The reader's own tokens are whole: a token set as text (a number, a Latin word, a mark) never splits.
+   ========================================================================== */
+.ja-words { word-break: keep-all; overflow-wrap: break-word; line-break: strict; }
+/* the same rule for every line el() sets (corridor.js jaFlow); a word wider than its whole line may still break
+   (break-word). Not anywhere: a box that shrinks to its content then broke inside its words (保存していな｜い) */
+.ja-flow { word-break: keep-all; overflow-wrap: break-word; line-break: strict; }
+.ja-unit { white-space: nowrap; }
+#reader span.tok.plain { white-space: nowrap; }
+/* a row of chips wraps whole chips, never a chip's own label (接続す｜る at 320) */
+.port-row { flex-wrap: wrap; }
+.port-row > .chip { white-space: nowrap; }
+
