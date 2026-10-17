@@ -800,22 +800,47 @@ async function g6HoldDriftCommit(page){
   },{databaseName:snapshot.installation.databaseName,baseline:JSON.stringify(snapshot.record.driftState)});
   return snapshot;
 }
+async function g6NativeSkyGrade(page,word,aim){
+  // Observe the real input, including whether the printed center still owns it.
+  await word.evaluate(node=>{
+    const events=[];
+    const observer=event=>{const target=event.target?.closest?.('.word');const row={type:event.type,id:event.pointerId,pointerType:event.pointerType,trusted:event.isTrusted,at:Date.now(),timeStamp:event.timeStamp,x:event.clientX,y:event.clientY,owner:target===node,label:target?.querySelector('.base')?.textContent||null,center:!!target?.classList.contains('bctr')};queueMicrotask(()=>events.push({...row,prevented:event.defaultPrevented}));};
+    window.__g6GradeInput={events,stop:()=>{for(const type of ['pointerdown','pointermove','pointerup','pointercancel'])removeEventListener(type,observer,true);}};
+    for(const type of ['pointerdown','pointermove','pointerup','pointercancel'])addEventListener(type,observer,{capture:true,passive:true});
+  });
+  let events;
+  try{
+    await page.mouse.move(aim.x,aim.y);await page.mouse.down();
+    await page.mouse.move(aim.x+65,aim.y,{steps:1});await page.mouse.move(aim.x+105,aim.y,{steps:1});await page.mouse.up();
+  }finally{events=await page.evaluate(()=>{const p=window.__g6GradeInput;p.stop();return p.events;});}
+  const down=events.find(e=>e.type==='pointerdown'),up=events.find(e=>e.type==='pointerup'&&e.id===down?.id);
+  const dx=up&&down?up.x-down.x:0,dy=up&&down?up.y-down.y:0,held=up&&down?up.at-down.at:Infinity;
+  const valid=!!down?.owner&&down.label===aim.label&&!!up&&events.every(e=>e.trusted&&!e.prevented)&&!events.some(e=>e.type==='pointercancel')&&dx>52&&Math.abs(dy)<90&&(held<330||Math.abs(dx)/Math.max(held,1)>.45);
+  const receipt={label:aim.label,dx,dy,held,valid,events};
+  assert(valid,`one native flick must satisfy the existing input contract: ${JSON.stringify(receipt)}`);
+  return receipt;
+}
 async function g6PendingGuard(page,{context,emit,kind}){
   // A fresh native sky cue is needed: no prior word lookup can retire it.
   await page.goto(`${host.origin}/index.html?entry=drift&ui=bi`);await page.waitForFunction(()=>document.body.dataset.ready==='1'&&window.__DRIFT__?.canNavigate()&&document.querySelector('#drift-layer')?.dataset.recordState==='active');
   let word=await g6PickSkyWord(page);
   if(kind==='grade'){
-    const at=await g6AimSkyWord(page,word);await page.touchscreen.tap(at.x,at.y);await page.waitForFunction(()=>!document.querySelector('#drift-layer[data-record-cue-pending]'));
+    const at=await g6AimSkyWord(page,word);await page.touchscreen.tap(at.x,at.y);await page.waitForFunction(()=>!document.querySelector('#drift-layer[data-record-cue-pending]')&&window.__DRIFT__?.canNavigate()===true);
     await waitForAppRecord(page,r=>r.driftState?.store?.cue===1,{description:'native cue-retirement acknowledgment'});
     await page.keyboard.press('Escape');if(await page.locator('#mini').count())await page.keyboard.press('Escape');
-    word=await g6PickSkyWord(page);
+    // Escape folds the reading, not its native constellation. A satellite is
+    // deliberately movable but not gradeable while that center is retained.
+    await page.waitForFunction(node=>node.isConnected&&!node.dataset.ladderRung&&!document.getElementById('mini')&&window.__DRIFT__?.canNavigate()===true,word,{timeout:10000});
+    const owner=await word.evaluate(node=>({label:node.querySelector('.base')?.textContent,center:node.classList.contains('bctr'),hasCenter:!!document.querySelector('#sky .word.bctr')}));
+    assert(!owner.hasCenter||owner.center,`the original cue word must remain the gradeable bloom center: ${JSON.stringify(owner)}`);
   }
   const before=await g6HoldDriftCommit(page);
   try{
     const gestureAt=await g6AimSkyWord(page,word);
+    let gradeInput=null;
     if(kind==='cue')await page.touchscreen.tap(gestureAt.x,gestureAt.y);
-    else{await page.mouse.move(gestureAt.x,gestureAt.y);await page.mouse.down();await page.mouse.move(gestureAt.x+65,gestureAt.y,{steps:1});await page.mouse.move(gestureAt.x+105,gestureAt.y,{steps:1});await page.mouse.up();}
-    await page.waitForFunction(kind=>window.__g6CommitHold.fired===1&&window.__DRIFT__.canNavigate()===false&&(kind==='cue'?document.querySelector('#drift-layer[data-record-cue-pending]'):document.querySelector('#drift-layer [data-record-pending][aria-busy="true"]')),kind,{timeout:10000});
+    else gradeInput=await g6NativeSkyGrade(page,word,gestureAt);
+    await page.waitForFunction(kind=>window.__g6CommitHold.fired===1&&window.__DRIFT__.canNavigate()===false&&(kind==='cue'?document.querySelector('#drift-layer[data-record-cue-pending]'):document.querySelector('#drift-layer [data-record-pending][aria-busy="true"]')),kind,{timeout:10000}).catch(async error=>{const hold=await page.evaluate(()=>({fired:window.__g6CommitHold.fired,completed:window.__g6CommitHold.completed,aborted:window.__g6CommitHold.aborted,puts:window.__g6CommitHold.puts}));throw new Error(`${error.message}\nPending input receipt: ${JSON.stringify({kind,gestureAt,gradeInput,hold})}`,{cause:error});});
     if(kind==='cue'){await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.getElementById('mini')&&!document.querySelector('#drift-layer [data-ladder-rung="reading"]'));}
     // No DB read while the real write transaction is deliberately outstanding.
     const held=await g6SkyFacts(page),point=await g6SkyPoint(page);assert(point);
@@ -823,7 +848,7 @@ async function g6PendingGuard(page,{context,emit,kind}){
     const hand=await g6Hand(page,context,false);try{await g6Spread(hand,point);}finally{await hand.close();}
     const out=page.locator(`${G6_RAIL} [data-scale-in]`);if(await out.count()&&await out.isEnabled())await out.tap();
     const after=await g6SkyFacts(page),hold=await page.evaluate(()=>({fired:window.__g6CommitHold.fired,completed:window.__g6CommitHold.completed,aborted:window.__g6CommitHold.aborted}));
-    emit('pending.block','real pending cue/judgment blocks sky gesture and scale controls before native acknowledgment',!after.allowed&&after.view==='drift'&&after.sheet===held.sheet&&hold.fired===1&&!hold.completed&&!hold.aborted,{kind,held,after,hold});
+    emit('pending.block','real pending cue/judgment blocks sky gesture and scale controls before native acknowledgment',!after.allowed&&after.view==='drift'&&after.sheet===held.sheet&&hold.fired===1&&!hold.completed&&!hold.aborted,{kind,held,after,hold,gradeInput});
     await page.evaluate(()=>window.__g6CommitHold.release());await page.waitForFunction(()=>window.__g6CommitHold.completed&&window.__DRIFT__.canNavigate());
     const durable=await readAppRecordSnapshot(page);
     const b=before.record.driftState?.store||{cue:0,lk:0,lu:0},a=durable.record.driftState.store;
