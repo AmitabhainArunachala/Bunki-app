@@ -7886,14 +7886,15 @@ const TOPIC_KICKERS = {
 };
 const TOPIC_ORDER = ['politics', 'economy', 'science', 'technology', 'international', 'environment', 'health', 'society',
   'culture', 'sports', 'weather', 'disaster', 'local', 'news digest', 'literature', 'news'];
-/* Each topic's colour (FEEL pass 2026-10-02): the kicker, the calm block that stands in for a
- * picture not yet drawn, and the lead's mark. Matte print colours, each dark enough for small
- * text on white (≥ 4.5:1). A record's own "accent" wins over its topic's. */
-const TOPIC_COLOURS = {
-  politics: '#3b4a6b', economy: '#1f6b5c', science: '#3d4f9c', technology: '#36587a', international: '#1f6491',
-  environment: '#3f6d33', health: '#2a7466', society: '#6a4a7a', culture: '#9a4a2a', sports: '#a8461c',
-  literature: '#7a2e44', weather: '#2f6c9a', disaster: '#8f5300', local: '#5b6628', 'news digest': '#4a4f57',
-  news: '#4a4f57', essay: '#7a5a2e', graded: '#5b4a8a', primary: '#5a5148', glossary: '#4a5d70', reading: '#4a5d70',
+/* Each topic prints from one of its world's own blocks (Material II, slice M; it was a matte colour of its own, from no
+ * world): 藍 (the world's accent), 朱 lowered by the world's 墨, or 墨 itself. The blocks are tokens on body
+ * (editorial.css --kicker-ai / --kicker-shu / --kicker-sumi), so a kicker always belongs to its page. A record's own
+ * "accent" (its picture's colour) still backs its own picture while it loads. */
+const TOPIC_BLOCKS = {
+  politics: 'ai', economy: 'sumi', science: 'ai', technology: 'ai', international: 'ai',
+  environment: 'sumi', health: 'sumi', society: 'sumi', culture: 'shu', sports: 'shu',
+  literature: 'shu', weather: 'ai', disaster: 'shu', local: 'sumi', 'news digest': 'ai',
+  news: 'ai', essay: 'sumi', graded: 'sumi', primary: 'sumi', glossary: 'ai', reading: 'ai',
 };
 /** The key a story's topic is known by: its own topic, its first facet in the filter's order, or its lane. */
 function storyTopicKey(p) {
@@ -7910,8 +7911,12 @@ function storyTopic(p) {
   if (TOPIC_KICKERS[key]) return TOPIC_KICKERS[key];
   return { essay: ['随筆', 'Essay'], graded: ['読み物', 'Graded reading'], primary: ['資料', 'Source'] }[key] || ['読み物', 'Reading'];
 }
+/** The world block a story's topic prints from, as a CSS value (`var(--kicker-ai)` …). */
+function storyBlock(p) {
+  return `var(--kicker-${TOPIC_BLOCKS[storyTopicKey(p)] || 'ai'})`;
+}
 function storyAccent(p) {
-  return /^#[0-9a-f]{6}$/iu.test(p.accent || '') ? p.accent : TOPIC_COLOURS[storyTopicKey(p)] || TOPIC_COLOURS.reading;
+  return /^#[0-9a-f]{6}$/iu.test(p.accent || '') ? p.accent : storyBlock(p);
 }
 /* A story's picture (FEEL pass 2026-10-02): data/articles/index.json may carry
  *   "picture": { "src": "articles/pictures/<file>.webp", "alt": "…", "w": 1200, "h": 800 }
@@ -8085,6 +8090,7 @@ function shelfCard(p, rank = 'grid') {
   const item = el('article', `shelf-item story-card story-${rank}${glossary ? ' story-glossary' : ''}`);
   item.dataset.passage = p.id;
   item.style.setProperty('--topic', storyAccent(p));
+  item.style.setProperty('--kicker', storyBlock(p));
   const open = el('button', 'shelf-open');
   open.type = 'button';
   // every article wears a picture slot. A spine (今日の６本) keeps its level badge on the picture; the
