@@ -233,7 +233,7 @@ a wash of ≥ 2.2 ΔE76 heart to corners and their kanji read at ≥ 8.4:1. The 
 | 雷 | the page's reading そう | 4.97 · 4.97 (4.5) |
 | 殻 | Settings' storage line · the reader's N3 seal | 5.52 · 6.27 (4.5) |
 
-At 4b0d1600 the same instrument read 444 and 446 of 667: Today's far field at 1.7–2.3:1 in every world, the fold's
+At 4b0d1600 the same instrument read 443 and 445 of 667: Today's far field at 1.7–2.3:1 in every world, the fold's
 arrow at 3.0–3.7, the night level seals at 3.8, literal paints in every room, the deck dock's smear and the night
 lanterns' rings, the flat key-kanji sheets, and two muddy surfaces (the Tools door, the search field).
 
