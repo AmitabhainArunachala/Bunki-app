@@ -173,6 +173,7 @@ async function tutor(page) {
   await openShelfDoor(page, '#ai-link'); await page.locator('#chat-input').waitFor();
 }
 async function configure(page, model = FAKE_MODEL) {
+  await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
   await page.locator('#ai-base-url').fill(FAKE_ORIGIN); await page.locator('#ai-model-input').fill(model);
   await page.locator('#ai-key-input').fill(FAKE_KEY); await page.locator('#ai-key-save').click();
   await page.locator('#chat-input').waitFor();

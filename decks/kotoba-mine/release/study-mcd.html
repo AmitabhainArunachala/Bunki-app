@@ -4422,6 +4422,10 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
   .kp .kp-card[data-window-controls] .kp-answer { padding-top: 0; }
 }
 
+/* Q · the answer's definition and note break only between their words (mount.js answerWords gives the <wbr>); a word
+   wider than its whole line may still break */
+.kp .kp-words { word-break: keep-all; overflow-wrap: break-word; line-break: strict; }
+
 /* The departing frame fades over the live incoming room. Capturing the new
    room would disable its hit testing until the native transition finishes.
    Slice C (one hand): rooms travel along the Line. Going to a tab to the right,
@@ -7110,7 +7114,7 @@ function backFits() {
   const windowed = passage.classList.contains('kp-window');
   const clearTarget = mark.top >= Math.max(top, windowed ? view.top : top) - 1 && mark.bottom <= Math.min(bottom, windowed ? view.bottom : bottom) + 1;
   const clearToggle = !toggle || (toggle.getBoundingClientRect().top >= top - 1 && toggle.getBoundingClientRect().bottom <= bottom + 1);
-  const clearFolds = [...face.querySelectorAll('.kp-folds > details > summary')].every(node => {
+  const clearFolds = [...face.querySelectorAll(FOLD_ROWS)].every(node => {
     const row = node.getBoundingClientRect();
     return !(row.top - lift < barTop - 0.5 && row.bottom - lift > barTop + 0.5);
   });
@@ -7523,18 +7527,81 @@ function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'non
     taps = null; // the front has nothing to tap, whatever is asked
   }
   const cover = taps ? coverOf(card.ja.length, displayUnits(card, taps.units)) : null;
+  // Q · the passage breaks only between its words, the same on both faces (the lead, inbox 1447; MASTER_SPEC §7: the
+  // front stays sealed). Its words are the back's own tap units where it has them (on the front, plain: never a door,
+  // nothing to tap) and, between them, the host's one rule (jaWords); each word of 12 characters or fewer is one
+  // no-break span (.kp-w). A word that is not whole on one face would break the lines apart at the reveal.
+  const frontUnits = front && ctx?.host && !blank ? passageUnits(card) : null;
+  const wordCover = frontUnits ? coverOf(card.ja.length, displayUnits(card, frontUnits)) : cover;
+  const wordEnd = new Array(card.ja.length).fill(0);
+  let wordStart = 0;
+  // the passage's own tokens are the truest words when they have arrived (the same tokens on both faces); the host's
+  // rule glues them as it glues any words, and cuts the text itself (Intl.Segmenter) until they arrive
+  const toks = ctx?.host && ctx.tokenFile ? cardTokens(card, ctx.tokenFile) : null;
+  let segments = null;
+  if (toks?.length) {
+    segments = [];
+    let cursor = 0;
+    for (const t of [...toks].sort((a, b) => a.at - b.at)) {
+      if (!(t.at >= cursor) || card.ja.slice(t.at, t.at + t.s.length) !== t.s) continue;
+      if (t.at > cursor) segments.push(card.ja.slice(cursor, t.at));
+      segments.push(t.s);
+      cursor = t.at + t.s.length;
+    }
+    if (cursor < card.ja.length) segments.push(card.ja.slice(cursor));
+  }
+  for (const group of (ctx?.words ? ctx.words(card.ja, segments) : [])) {
+    const len = group.join('').length;
+    for (let i = wordStart; i < wordStart + len && i < wordEnd.length; i++) wordEnd[i] = wordStart + len;
+    wordStart += len;
+  }
+  // a tap unit is one word too: the rule's word around it grows to hold it whole
+  for (const u of wordCover ? new Set(wordCover.filter(Boolean)) : []) {
+    const end = Math.max(...Array.from({ length: u.len }, (_, j) => wordEnd[u.at + j] || 0), u.at + u.len);
+    for (let i = u.at; i < end && i < wordEnd.length; i++) wordEnd[i] = Math.max(wordEnd[i], end);
+  }
   const out = el('p', 'kp-sentence');
   out.lang = 'ja';
+  if (segments) out.dataset.words = 'tokens';
   const ends = split ? sentenceEnds(card.ja) : [card.ja.length];
   let host = out;
   let at = 0; // offset in card.ja of the next character
   let k = 0; // the sentence being filled
+  let word = null, wordUntil = -1; // the no-break span of the word being filled, and where that word ends
+  // a line may end between two words: an explicit <wbr> stands between them, outside their no-break spans (WebKit
+  // offers no break between two no-break spans side by side: the back ran on one line, 4,000 px wide, at 320)
+  const breakBefore = (parent) => {
+    const last = parent.lastChild;
+    if (last && !(last.nodeType === 1 && last.tagName === 'WBR')) parent.append(document.createElement('wbr'));
+  };
   const open = () => {
+    word = null;
     if (!split) return;
     host = el('span', 'kp-s');
+    breakBefore(out);
     out.append(host);
   };
   open();
+  /** the box a piece at [at, at + len) goes into: the current word's span while the piece is inside that word */
+  const plain = () => {
+    if (host.lastChild?.nodeType === 1 && host.lastChild.classList.contains('kp-w')) breakBefore(host);
+    word = null;
+    return host;
+  };
+  const boxFor = (len) => {
+    if (!wordEnd[at]) return plain();
+    if (word && word.parentNode === host && at < wordUntil) {
+      wordUntil = Math.max(wordUntil, wordEnd[Math.min(at + len, wordEnd.length) - 1] || 0);
+      return word;
+    }
+    const end = Math.max(wordEnd[at], wordEnd[Math.min(at + len, wordEnd.length) - 1] || 0);
+    if (end - at > 12) return plain();
+    word = el('span', 'kp-w');
+    breakBefore(host);
+    host.append(word);
+    wordUntil = end;
+    return word;
+  };
   // A word kept on one line (ruby, kp-nb: a host may set white-space: nowrap on it) must still leave
   // a line break open before a kept word right after it (小村|寿太郎), or the pair would move to the
   // next line as one and leave a short line behind: a <wbr> goes between them, where the next one goes.
@@ -7545,19 +7612,23 @@ function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'non
   // (one word, several ruby segments) until a sentence starts a new host
   const put = (node, isTarget, len, unit = null) => {
     if (split && isTarget === 1) host.dataset.focus = '1';
-    const gap = keptBefore && kept(edge(node, false)) ? document.createElement('wbr') : null;
+    let gap = keptBefore && kept(edge(node, false)) ? document.createElement('wbr') : null;
     keptBefore = kept(edge(node, true));
+    const box = boxFor(len);
+    // Q · the break between two kept words is a break between words: never inside one word's span or one tap unit
+    // (Chromium honours a <wbr> inside a no-break span: 先入｜観); a word's span already has its own break before it
+    if (box !== host) gap = null;
     if (unit) {
-      let tok = host.lastChild;
+      let tok = box.lastChild;
       if (!(tok && tok.kpUnit === unit)) {
         tok = tapNode(el('span', 'kp-tok'), unit, taps.onTap);
-        host.append(tok);
+        if (gap) box.append(gap);
+        box.append(tok);
       }
-      if (gap) tok.append(gap);
       tok.append(node);
     } else {
-      if (gap) host.append(gap);
-      host.append(node);
+      if (gap) box.append(gap);
+      box.append(node);
     }
     at += len;
     while (split && k < ends.length - 1 && at >= ends[k]) {
@@ -7588,7 +7659,7 @@ function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'non
     if (hasRuby) return put(rubyNode(text, reading), 0, len, unitOver(at, len));
     if (keep && !cover) return put(el('span', 'kp-nb', text), 0, len);
     // plain text may hold a sentence end or a word edge: cut it there so each sentence keeps its
-    // own words and each word its own tap target
+    // own words and each word its own tap target (and, Q, its own no-break span)
     let rest = text;
     while (rest) {
       let cut = rest.length;
@@ -7599,6 +7670,7 @@ function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'non
         while (j < cut && cover[at + j] === u) j++;
         cut = j;
       }
+      if (wordEnd[at] && wordEnd[at] - at < cut) cut = wordEnd[at] - at;
       put(document.createTextNode(rest.slice(0, cut)), 0, cut, cover ? cover[at] : null);
       rest = rest.slice(cut);
     }
@@ -8265,7 +8337,7 @@ function answerBlock(card, word) {
   // has one, else the word's; the deck's English notes go behind 英語
   const jaNote = word.tip && !/[A-Za-z]/.test(word.tip);
   const note = (typeof card.tipJa === 'string' && card.tipJa) || (jaNote ? word.tip : '');
-  if (note) a.append(el('p', `kp-note${note === card.tipJa ? ' kp-note-passage' : ''}`, note));
+  if (note) a.append(answerWords(el('p', `kp-note${note === card.tipJa ? ' kp-note-passage' : ''}`), note));
   // a leech's repair ladder (§4) sits after tier one and before the folds, so the word, its
   // reading and the definition stay pinned under the passage on every card (learning-design L1)
   if (isLeech(ctx.state, card.id)) a.append(leechLadder(card, word));
@@ -8453,7 +8525,22 @@ function wantTokens() {
     if (ctx?.deck !== deck || ctx.tokenFile) return;
     ctx.tokenFile = file;
     if (ui.screen === 'study' && ui.revealed) upgradeTaps();
+    else if (ui.screen === 'study') upgradeFront();
   });
+}
+
+/** Q · the front's words from the passage's own tokens once they arrive (Intl.Segmenter cut 簡単なんだ｜ろうと where
+ * the tokens hold だろう): the same text, its words as the back's, still sealed: plain, no doors */
+function upgradeFront() {
+  const id = ui.queue[ui.pos];
+  const face = ctx.root.querySelector('#kp-card');
+  const old = face?.querySelector(':scope > .kp-sentence');
+  if (!id || !face || face.dataset.card !== id || !old || old.dataset.words === 'tokens') return;
+  const { card } = ctx.index.cards.get(id);
+  const sentence = sentenceNodes(card, { front: true, blank: cardMode() !== 'read', split: !!card.type });
+  if (sentence.dataset.words !== 'tokens') return;
+  if (old.classList.contains('kp-enter')) sentence.classList.add('kp-enter');
+  old.replaceWith(sentence);
 }
 
 /** character offset → the unit covering it, or null */
@@ -8586,10 +8673,35 @@ function tapText(text, units, onTap) {
   return out;
 }
 
+/** Q · the answer's Japanese breaks only between its words, as the passage does (the host's one rule, ctx.words; the
+ * lead, inbox 1447): a <wbr> at each word's edge, never inside a word or a tap unit, and keep-all inside the words
+ * (player.css .kp-words). 話し合いによって条件をまとめるこ｜と and 定｜番 broke at the line's end. Without a host
+ * the text stands as it did. */
+function answerWords(node, text, units = null, onTap = null) {
+  const pieces = units?.length ? tapText(text, units, onTap) : [text];
+  const groups = ctx?.words && text ? ctx.words(text) : null;
+  if (!groups || groups.length < 2) { node.append(...pieces); return node; }
+  const cuts = new Set();
+  let end = 0;
+  for (const g of groups) { end += g.join('').length; cuts.add(end); }
+  let at = 0;
+  for (const piece of pieces) {
+    const len = typeof piece === 'string' ? piece.length : piece.textContent.length;
+    if (at && cuts.has(at)) node.append(document.createElement('wbr'));
+    if (typeof piece === 'string') {
+      let from = 0;
+      for (let i = 1; i < piece.length; i += 1) if (cuts.has(at + i)) { node.append(piece.slice(from, i), document.createElement('wbr')); from = i; }
+      node.append(piece.slice(from));
+    } else node.append(piece);
+    at += len;
+  }
+  node.classList.add('kp-words');
+  return node;
+}
 /** tier one's Japanese definition, its words tappable on the back */
 function defLine(card, word) {
   const p = el('p', 'kp-def');
-  p.append(...tapText(word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 })));
+  answerWords(p, word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 }));
   reflowWatch?.observe(p);
   return p;
 }
@@ -9076,6 +9188,13 @@ function paintResponse({ resetScroll = false, front = false, hold = true } = {})
  */
 /** A fitted reading window sits directly under the fixed chrome, so the card's chip row
  * (level, kind and Full/Focus) moves below it; an unwindowed passage keeps the row above. */
+/** Q · the last part of the answer that says something (its word, definition, note): the parts before its folds, whose
+ * rows are doors. A leech's ladder is controls, not the answer: it may wait below the pads (the first screen keeps the
+ * word and its definition without a scroll, CARD_CONTRACT_V2 §4) */
+function answerSaid(def) {
+  const parts = [...(def.parentElement?.children || [])].filter((n) => !n.classList.contains('kp-folds') && !n.classList.contains('kp-ladder') && n.getClientRects().length);
+  return parts[parts.length - 1] || def;
+}
 function placeWindowControls(face, passage, windowed) {
   face.toggleAttribute('data-window-controls', !!windowed);
   const chips = face.querySelector('.kp-chips');
@@ -9086,6 +9205,9 @@ function placeWindowControls(face, passage, windowed) {
   held?.focus({ preventScroll: true });
 }
 const WINDOW_LINES = 3;
+/** Q · the rows of the answer's folds the pads may never cut: each fold's summary, and a row of the folds that is not a
+ * fold (the see-also line of grammar links, which the pads cut in the MCD deck) */
+const FOLD_ROWS = '.kp-folds > details > summary, .kp-folds > :not(details)';
 const WINDOW_REACH = 12;
 function windowPassage(from, page = from) {
   const face = ctx.root.querySelector('#kp-card');
@@ -9104,8 +9226,14 @@ function windowPassage(from, page = from) {
   const line = parseFloat(getComputedStyle(passage).lineHeight) || 48;
   // The window seats directly under the chrome; the chip row, word and definition are budgeted below it.
   const seat = box.top - WINDOW_REACH - topInset() - SETTLE_GAP;
-  let over = def.getBoundingClientRect().bottom - lift - seat - (barTop - SETTLE_GAP);
-  for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
+  // Q · nothing he must read sits under the pads (Grok's walk: the answer's note went grey under them): the window makes
+  // room for the whole of what the answer says (its word, definition, note: every part before its folds), and only when
+  // that would leave the passage fewer than WINDOW_LINES lines, for the definition, as before
+  const overFor = (n) => n.getBoundingClientRect().bottom - lift - seat - (barTop - SETTLE_GAP);
+  let over = overFor(def);
+  const said = answerSaid(def);
+  if (said !== def && box.height - overFor(said) >= WINDOW_LINES * line) over = Math.max(over, overFor(said));
+  for (const s of face.querySelectorAll(FOLD_ROWS)) {
     const r = s.getBoundingClientRect();
     const [top, bottom] = [r.top - lift - over, r.bottom - lift - over];
     if (!(top < barTop && bottom > barTop)) continue;
@@ -9221,7 +9349,9 @@ function settleBack() {
   if (windowed && target.getBoundingClientRect().height > windowed.clientHeight) target = marked || windowed;
   const toggle = windowed && face.querySelector('.kp-zoom');
   const top = Math.min(target.getBoundingClientRect().top, toggle ? toggle.getBoundingClientRect().top : Infinity);
-  const bottom = def.getBoundingClientRect().bottom - lift;
+  // Q · the whole of what the answer says stays above the pads when it fits beside the target; else its definition
+  const said = answerSaid(def).getBoundingClientRect().bottom - lift;
+  const bottom = said - top <= bottomLimit - topLimit ? said : def.getBoundingClientRect().bottom - lift;
   let dy = 0;
   if (bottom - top <= bottomLimit - topLimit) {
     if (top < topLimit) dy = top - topLimit;
@@ -9234,7 +9364,7 @@ function settleBack() {
   // so the plan is made in whole-pixel moves: a row seated against the bar here is seated there
   const whole = (d) => Math.round(window.scrollY + d) - window.scrollY;
   dy = Math.abs(dy) < 1 ? 0 : whole(dy); // under a pixel off is at rest
-  const rows = [...face.querySelectorAll('.kp-folds > details > summary')].map((s) => {
+  const rows = [...face.querySelectorAll(FOLD_ROWS)].map((s) => {
     const r = s.getBoundingClientRect();
     return [r.top - lift, r.bottom - lift];
   });
@@ -9832,7 +9962,7 @@ function ensureCss() {
   document.head.append(link);
 }
 
-async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false } = {}) {
+async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false, words = null } = {}) {
   const request = ++mountRequest;
   if (autoStart !== undefined) pendingStart = { deckId, autoStart };
   ensureCss();
@@ -9871,6 +10001,9 @@ async function render(main, { deckId, storage = window.localStorage, onLeave, op
     tokenFile: lexicon ? tokensReady.get(deckId) || null : null,
     gloss: lexicon ? null : glossFor(deckId, deck),
     prefs: prefsFor(storage, deck),
+    // Q · the host's one rule for Japanese line breaks: text → its words, as groups of segments (the app's jaWordGroups);
+    // the standalone pages have none and keep the browser's breaks
+    words: typeof words === 'function' ? words : null,
   };
   root.addEventListener('pointerdown', onDown, true);
   ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));

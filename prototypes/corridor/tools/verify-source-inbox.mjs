@@ -259,6 +259,7 @@ for (const engine of engines) for (const width of sizes) {
     // ensure the refusal is enforced beyond the absent-key/disabled-UI state.
     await page.locator(`[data-source-capture="${source.id}"]`).click(); await selectWord(page);
     await page.locator('#source-context-open').click(); await page.locator('#chat-input').waitFor();
+    await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
     await page.locator('#ai-base-url').fill('https://source-capture.synthetic.invalid');
     await page.locator('#ai-model-input').fill('synthetic-capture-policy-check');
     await page.locator('#ai-key-input').fill('synthetic-fixture-not-a-real-credential');

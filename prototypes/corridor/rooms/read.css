@@ -53,7 +53,9 @@ html[data-room='shelf'] #shelf-body .story-card .shelf-title {
   font-family: var(--font-headword);
   font-weight: 800;
   color: var(--color-ink);
-  word-break: auto-phrase;
+  /* Q · breaks only between its words (setJaWords); auto-phrase was Chromium's alone, WebKit broke anywhere */
+  word-break: keep-all;
+  overflow-wrap: break-word;
   line-break: strict;
   text-wrap: pretty;
 }
@@ -304,7 +306,9 @@ html[data-room='reader'] main > h1.view-title {
   font-family: var(--font-headword);
   font-weight: 800;
   letter-spacing: 0.01em;
-  word-break: auto-phrase;
+  /* Q · its words are lookup doors kept whole in .ja-unit; the same break in both engines */
+  word-break: keep-all;
+  overflow-wrap: break-word;
   line-break: strict;
   text-wrap: pretty;
 }
@@ -1375,7 +1379,9 @@ html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h
   font: 800 clamp(26px, 3vw, 34px)/1.4 var(--font-headword);
   letter-spacing: 0.01em;
   color: var(--reader-ink);
-  word-break: auto-phrase;
+  /* Q · its words are lookup doors kept whole in .ja-unit; the same break in both engines */
+  word-break: keep-all;
+  overflow-wrap: break-word;
   line-break: strict;
   text-wrap: pretty;
 }
@@ -1653,3 +1659,7 @@ html[data-room='shelf'] .shelf-today-read:hover .shelf-today-read-arrow { transf
 @media (max-width: 520px) {
   html[data-room='shelf'] body:not(.zen) #app .shelf-today-read { width: calc(100% - 34px); }
 }
+
+/* Q · the reader never scrolls sideways: a reading drawn over the last word of a line (ruby::before) may overhang the
+   glass by a pixel or two at 320; the overhang is clipped, nothing scrolls (overflow-x: clip makes no scroll box) */
+html[data-room='reader'] #app > main { overflow-x: clip; }

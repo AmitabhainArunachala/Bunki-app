@@ -429,3 +429,5 @@ html[data-room='progress'] main .kagami-cell { border-radius: var(--radius-seal)
 
 /* round 4 review (D5): the fields deck's "not begun" is said once, under the group's name */
 html[data-room='me'] .me-hz-group-note { margin: 4px 0 2px; }
+/* Q · a goal not begun says so in a plain sentence, in the house voice: never set in capitals and tracked like a figure */
+html[data-room='me'] body .me-hz-sub.is-sentence { font: 400 13.5px/1.5 var(--font-ui); letter-spacing: 0.01em; text-transform: none; color: var(--color-ink-2); }

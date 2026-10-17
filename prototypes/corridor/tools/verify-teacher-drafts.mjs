@@ -155,6 +155,7 @@ async function createTopic(fixture, { articleId = 'bunki-graded-n3-river', index
 }
 async function configure(fixture) {
   const page = fixture.page;
+  await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
   await page.locator('#ai-base-url').fill(FAKE_ORIGIN); await page.locator('#ai-model-input').fill(FAKE_MODEL);
   await page.locator('#ai-key-input').fill(FAKE_KEY); await page.locator('#ai-key-save').click();
   await tutor(fixture); await page.waitForFunction(() => document.querySelector('#chat-send')?.disabled === false);

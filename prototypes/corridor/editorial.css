@@ -1168,7 +1168,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
 #shelf-body .shelf-study-tools button.grammar-link:hover { background: var(--tint-wash); }
 /* register.css spaces a door's last span out (0.12em) and can hide it; a tile's name is always shown, set tight */
 #shelf-body .shelf-study-tools button.grammar-link .l-ja,
-#shelf-body .shelf-study-tools button.grammar-link[data-grade] .l-ja { display: block; margin: 0; font: inherit; letter-spacing: normal; color: inherit; word-break: auto-phrase; }
+#shelf-body .shelf-study-tools button.grammar-link[data-grade] .l-ja { display: block; margin: 0; font: inherit; letter-spacing: normal; color: inherit; }
 #shelf-body .shelf-study-tools button.grammar-link .en-sub,
 #shelf-body .shelf-study-tools button.grammar-link[data-grade] .en-sub {
   display: block;
@@ -1288,7 +1288,9 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture.is-kanji {
   letter-spacing: -0.005em;
   color: var(--label);
   text-wrap: pretty;
-  word-break: auto-phrase;
+  /* Q · breaks only between its words (corridor.js setJaWords gives them); auto-phrase was Chromium's alone */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 #shelf-body .story-card .shelf-title-en {
   font: 400 15px/1.45 var(--sans);
@@ -3165,6 +3167,10 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 /* a word that carries a reading stays on one line (its reading is drawn over the whole word), on the
    front too (kp-nb), so the lines break the same before and after the reveal */
 #app .kp-sentence :is(ruby, .kp-nb) { white-space: nowrap; }
+/* Q · a word of the passage is whole on both faces (mount.js sentenceNodes, from the app's one rule): its no-break span
+   (.kp-w), and on the back each word you can tap (.kp-tok); the lines break between words, the same before and after
+   the reveal */
+#app .kp-sentence :is(.kp-w, .kp-tok) { white-space: nowrap; }
 /* the player seats each line's readings so none runs into the next or past the line's edge:
    --kp-rt-dx moves a reading off its word's centre, --kp-rt-fit narrows one that cannot fit */
 #app .kp-sentence ruby[data-rt]::after {
@@ -4606,11 +4612,11 @@ body.has-primary-tabs:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-g
 body.has-primary-tabs:not(.zen) #app > .chrome > button#tray .l-ja { font: 500 12px/1 var(--font-data); font-variant-numeric: tabular-nums; }
 @media (max-width: 360px) {
   /* the narrowest phones keep ONE row: the Learn door yields to the Learn tab one thumb away,
-     and Lists becomes its bookmark with the count set small at its shoulder. The reader is the
-     exception: verify-corridor pins >= 7 reachable 44px chrome doors there at 320px beside the
-     capture slot it reserves, which cannot share one 320px row, so its chrome keeps two rows. */
+     and Lists becomes its bookmark with the count set small at its shoulder. Q · the reader too: it was the exception,
+     and at 320 its eight (seven doors and the Save) overflowed the phone (the bookmark off screen; Chromium widened the
+     page to 376 px). With Learn in the tab bar its seven (verify-corridor's >= 7 reachable 44 px) fit one row. */
   body.has-primary-tabs:not(.zen) #app > .chrome { padding-inline: 2px; }
-  body.has-primary-tabs:not(.zen):not([data-view='reader']) #app > .chrome > button.chrome-dojo { display: none; }
+  body.has-primary-tabs:not(.zen) #app > .chrome > button.chrome-dojo { display: none; }
   body.has-primary-tabs:not(.zen) #app > .chrome .lang-seg { padding-right: 3px; background-position: right 1px center; }
   body.has-primary-tabs:not(.zen) #app > .chrome > button#tray {
     position: relative;
@@ -5640,41 +5646,46 @@ body.record-not-saving #app > .chrome { margin-bottom: var(--record-band-h, 48px
 /* a row that holds a Save keeps it on its own line end, the menu unfolding under the row (placeSaveMenu) */
 [data-save-row] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 /* the reader's keep stands in the room's bar in the bar's own type (corridor.js chromeKeep): its words in the bar's ink,
-   no fill, the caret; once saved, the accent. Night keeps it the same words on the bar, never a lit key there. */
+   no fill; once saved, the accent. Night keeps it the same words on the bar, never a lit key there.
+   Q · ONE line (Grok's walk: SAVE / a word read as a wrap; 保存 / 語をタ… was cut): it takes the room the bar's doors
+   leave (flex 1, so touching a word never moves another door), its words set end to end at the bar's end, and
+   corridor.js fitChromeKeep sheds the word, then the ✓, until the line fits whole — it is never cut (overflow: hidden is
+   only the measure fitChromeKeep reads). Its accessible name always says the whole of it. */
 #app > .chrome button.save-one.chrome-keep {
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 2px;
+  display: block;
+  flex: 1 1 0;
   min-width: 44px;
-  max-width: 76px;
+  max-width: none;
   height: 44px;
   min-height: 44px;
   padding: 0 6px;
+  overflow: hidden;
   border: 0;
   background: transparent;
   box-shadow: none;
   color: var(--color-bar-ink);
-  font: 600 15px/1 var(--font-ui);
+  font: 600 12px/44px var(--font-ui);
   letter-spacing: 0;
+  white-space: nowrap;
+  text-align: end;
 }
-/* one press keeps the word and opens its drawer: no caret beside two lines */
+/* one press keeps the word and opens its drawer: the words say Save, no caret */
 #app > .chrome button.save-one.chrome-keep::after { content: none; }
 #app > .chrome .chrome-keep .save-bar-verb {
-  font: 600 10px/1.1 var(--font-ui);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font: 600 12px/1 var(--font-ui);
+  letter-spacing: 0.02em;
+  text-transform: none;
   color: var(--color-bar-quiet, var(--color-muted));
 }
-body:not(.ui-bi) #app > .chrome .chrome-keep .save-bar-verb { font-size: 10.5px; letter-spacing: 0.14em; text-transform: none; }
 #app > .chrome .chrome-keep .save-bar-word {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
-  font: 600 15px/1.15 var(--font-reading, var(--font-ui));
+  font: 600 15px/1 var(--font-reading, var(--font-ui));
   color: var(--color-bar-ink);
 }
+/* at rest it says what it does, in the verb's own type (Save a word) */
+#app > .chrome .chrome-keep .save-bar-word.is-rest { font: 600 12px/1 var(--font-ui); color: var(--color-bar-quiet, var(--color-muted)); }
+/* the room is short: the word is said to the ear only (aria-label), never shown in part */
+#app > .chrome .chrome-keep.is-verb-only .save-bar-word { display: none; }
 #app > .chrome .chrome-keep.taken .save-bar-verb { color: var(--color-accent); }
 #app > .chrome button.save-one.chrome-keep:hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-ink) 6%, transparent); }
 #app > .chrome button.save-one.chrome-keep.taken { background: transparent; }
@@ -5743,3 +5754,43 @@ html[data-save-drawer='sheet'] #sheet > .sheet-bar[data-bar='sheet'] {
 #app .kp-top-study[data-bar='deck'] :is(.kp-icon, .kp-delete):focus-visible { outline: 2px solid var(--deck-band-ink); outline-offset: -4px; box-shadow: none; }
 #app .kp-top-study[data-bar='deck'] .kp-progress { background: color-mix(in srgb, var(--deck-band-ink) 22%, transparent); }
 #app .kp-top-study[data-bar='deck'] .kp-progress i { background: var(--deck-band-ink); }
+
+/* ==========================================================================
+   Q · JAPANESE BREAKS ONLY BETWEEN WORDS (Q/DESIGN.md §1; John, 2026-10-16: "be systematic about everythign!!").
+   One rule wherever the app sets Japanese: a line ends only where a word ends, never inside a word, a name or a number.
+   Plain text set by setJaWords carries a <wbr> at each word's edge and keeps its words whole (keep-all); a word wider
+   than the whole line may still break (break-word). Lookup prose keeps its doors and wraps each word's doors in one
+   .ja-unit. The reader's own tokens are whole: a token set as text (a number, a Latin word, a mark) never splits.
+   ========================================================================== */
+.ja-words { word-break: keep-all; overflow-wrap: break-word; line-break: strict; }
+/* the same rule for every line el() sets (corridor.js jaFlow); a word wider than its whole line may still break
+   (break-word). Not anywhere: a box that shrinks to its content then broke inside its words (保存していな｜い) */
+.ja-flow { word-break: keep-all; overflow-wrap: break-word; line-break: strict; }
+.ja-unit { white-space: nowrap; }
+#reader span.tok.plain { white-space: nowrap; }
+/* a row of chips wraps whole chips, never a chip's own label (接続す｜る at 320) */
+.port-row { flex-wrap: wrap; }
+.port-row > .chip { white-space: nowrap; }
+
+/* ==========================================================================
+   Q · EVERY SCROLLING ROOM CLEARS THE BARS AND THE SAFE AREAS (Q/DESIGN.md §4). On his home-screen app the page runs
+   edge to edge (viewport-fit=cover): the status bar and the island over the top 47–59 px, the home indicator over the
+   last 34. Measured with those insets (Chromium; WebKit cannot set them), two surfaces did not clear them:
+   ========================================================================== */
+/* the report sheet is the whole screen on a phone: its title and Close sat under the status bar, its end on the home
+   indicator. Its head clears the one, its body's end the other (env() is 0 outside the home-screen app) */
+#bunki-reports-root .br-heading { padding-top: calc(24px + env(safe-area-inset-top, 0px)); }
+#bunki-reports-root .br-body { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+@media (max-width: 480px) {
+  #bunki-reports-root .br-heading { padding-top: calc(18px + env(safe-area-inset-top, 0px)); }
+  #bunki-reports-root .br-body { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+}
+/* in the focus room the grade bar stands on the foot: its own padding holds the home indicator's inset. It rested that
+   inset above the foot as well, and the page showed beneath it */
+body.has-primary-tabs:has(#app :is(.kp-study, .kp-done)) .kp-grades { bottom: 0; }
+
+/* Q · the technical rest folds under one quiet Details (Q/DESIGN.md §8): the tutor's service address and model; the report
+   sheet keeps its own (report-client.css) */
+#app .ai-connection { margin: var(--space-4, 16px) 0 var(--space-2, 8px); }
+#app .ai-connection > summary { display: flex; align-items: center; min-height: 44px; font: 500 14px/1.3 var(--font-ui); color: var(--color-muted); cursor: pointer; }
+#app .ai-connection[open] > summary { color: var(--color-ink-2); }

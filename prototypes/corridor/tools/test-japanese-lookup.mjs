@@ -25,7 +25,11 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'saveOne',
   // R2 (2026-10-17): a reader word's sound change, at the lookup door and the reader's (Codex's f2e3015e review: 仏 ぶっ)
   'soundChangeReadings', 'SOUND_VOICED', 'SOUND_PLAIN', 'kanjiReadingsOf', 'readerLookupAnswer', 'dictionaryAnsweredForm',
-  'soundChangeDoor', 'dictionaryRowsReadAs', 'readerReadingFits'];
+  'soundChangeDoor', 'dictionaryRowsReadAs', 'readerReadingFits',
+  // Q (2026-10-17): the slip stands clear of its word with the word's reading (anchorBox); lookup prose keeps each word's
+  // doors in one no-break unit, by the app's one word rule (jaGroupSegments); the bar's Save fits its bar (fitChromeKeep)
+  'anchorBox', 'fitChromeKeep', 'chromeKeepFitting', 'jaGroupSegments', 'jaMendSegments', 'JA_KANA_WORDS', 'JA_KANJI', 'JA_KANA_RUN',
+  'JA_COUNTER', 'JA_OPENS_WORD', 'JA_CLOSES'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
@@ -52,6 +56,7 @@ class Element {
         if (on) this.classList.add(name); else this.classList.remove(name); return on; } };
   }
   get textContent() { return this.ownText + this.children.map(child => child.textContent).join(''); }
+  get lastChild() { return this.children[this.children.length - 1] ?? null; }
   set textContent(text) { this.ownText = text; this.children = []; }
   append(...nodes) { for (const node of nodes) { this.children.push(node); node.parentElement = this; } }
   setAttribute(name, value) { this.attributes[name] = String(value); }
@@ -98,7 +103,7 @@ function app({ withIndex = true, withKanji = false } = {}) {
     dictionaryByForm: new Map(), dictionaryCompleteForms: new Set(), dictionaryBySeq: new Map() };
   const document = { body, querySelectorAll: selector => body.querySelectorAll(selector),
     getElementById: id => body.querySelector(`#${id}`),
-    createTextNode: text, createDocumentFragment: () => new Element('#fragment'),
+    createTextNode: text, createDocumentFragment: () => new Element('#fragment'), createElement: tag => new Element(tag),
     createTreeWalker(parent) {
       const nodes = [];
       const visit = node => { for (const child of node.children) { if (child.tag === '#text') nodes.push(child); visit(child); } };

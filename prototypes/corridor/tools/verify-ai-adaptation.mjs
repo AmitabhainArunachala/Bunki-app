@@ -136,6 +136,7 @@ async function importFixture(name, record, { navigate = true } = {}) {
 }
 async function configure(model = modelName) {
   if (!await page.locator('#ai-base-url').count()) await openShelfDoor(page, '#ai-link');
+  await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
   await page.locator('#ai-base-url').fill(endpoint);
   await page.locator('#ai-model-input').fill(model);
   await page.locator('#ai-key-input').fill('SYNTHETIC_TEST_KEY');

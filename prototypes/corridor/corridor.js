@@ -4333,9 +4333,84 @@ const $ = (sel, root = document) => root.querySelector(sel);
 const el = (tag, cls, text) => {
   const node = document.createElement(tag);
   if (cls) node.className = cls;
-  if (text != null) node.textContent = text;
+  if (text != null && !(typeof text === 'string' && jaFlow(node, text))) node.textContent = text;
   return node;
 };
+/* Q · the one word rule (jaWords, below) for every line of Japanese the app sets through el(): a line may end only
+ * between words (Q/DESIGN.md §1; the census of every room in WebKit found 待｜っている, 意｜味, 保｜存, 端｜末, おそら｜く).
+ * The text keeps its characters; a <wbr> stands between its words and the element keeps them whole (.ja-flow:
+ * keep-all; a word wider than its whole line still breaks, overflow-wrap: anywhere, so no layout grows). Short labels,
+ * a single word and form controls are set as they were. jaRuleReady: el() also runs before the rule's own constants. */
+var jaRuleReady;
+const JA_FLOW_SKIP = new Set(['OPTION', 'TEXTAREA', 'TITLE', 'STYLE', 'SCRIPT', 'RT', 'RP', 'INPUT', 'SELECT', 'CODE', 'PRE', 'KBD', 'SAMP']);
+const jaFlowCache = new Map();
+function jaFlow(node, text) {
+  if (!jaRuleReady || JA_FLOW_SKIP.has(node.tagName) || /\btok\b/.test(node.className)) return false;
+  if ((text.match(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/gu) || []).length < 4) return false;
+  let words = jaFlowCache.get(text);
+  if (!words) {
+    words = jaWords(text);
+    if (jaFlowCache.size > 4000) jaFlowCache.clear();
+    jaFlowCache.set(text, words);
+  }
+  if (words.length < 2) return false;
+  appendJaPieces(node, words);
+  node.classList.add('ja-flow');
+  queueJaNowrap(node);
+  return true;
+}
+/* A label set on one line (white-space: nowrap: a bar's Save, a chip) keeps its one line: Chromium honours a <wbr> even
+ * there (保存 / 語をタップ in two lines at 390), WebKit does not. Once the label is in the page, its breaks leave it. */
+let jaNowrapQueue = null;
+function queueJaNowrap(node) {
+  if (!jaNowrapQueue) {
+    jaNowrapQueue = [];
+    requestAnimationFrame(() => {
+      const nodes = jaNowrapQueue;
+      jaNowrapQueue = null;
+      const oneLine = nodes.filter((n) => n.isConnected && /^(nowrap|pre)$/u.test(getComputedStyle(n).whiteSpace));
+      for (const n of oneLine) for (const w of n.querySelectorAll('wbr')) w.remove();
+    });
+  }
+  jaNowrapQueue.push(node);
+}
+/** A node's text set as el() sets it (the word rule for Japanese, plain text otherwise). */
+function flowText(node, text) {
+  node.replaceChildren();
+  if (!(typeof text === 'string' && jaFlow(node, text))) node.textContent = text;
+  return node;
+}
+/** Japanese appended into a node that holds other inline parts (a bold target word): its words, and a break allowed at
+ * the edges of the run where a line may end there (never before a closing mark or after an opening one). */
+function appendJaFlow(node, text) {
+  const s = String(text ?? '');
+  if (!s) return node;
+  const words = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(s) ? jaWords(s) : [s];
+  const prev = node.lastChild?.textContent || '';
+  if (prev && !/[「『（〈《〔［｛(“"\s]$/u.test(prev) && !JA_CLOSES.test(s) && !/^\s/u.test(s)) node.append(document.createElement('wbr'));
+  appendJaPieces(node, words);
+  node.classList.add('ja-flow');
+  return node;
+}
+/** Words into a node: a <wbr> between two words. A word that holds a mark is one no-break span, whole: WebKit's
+ * keep-all still ends a line on 「 (の「｜不思議), its text-wrap: pretty inside 文化財！｜？, and it offers a break at
+ * the edge of a no-break span (感じ｜る」), so a mark's span is never smaller than its word. A word too long to be sure
+ * of its line (over 10 ems) keeps only its marks glued to their neighbours. */
+function appendJaPieces(node, words) {
+  const unit = (text) => { const span = document.createElement('span'); span.className = 'ja-unit'; span.textContent = text; return span; };
+  words.forEach((word, i) => {
+    // a plain space already lets the line end; an ideographic space (旅行記　入蔵) does not under keep-all in WebKit, so
+    // the break stands after it (never before it: no line opens on a space)
+    if (i && !/^\s/u.test(word) && !/[ \u00a0]$/u.test(words[i - 1])) node.append(document.createElement('wbr'));
+    if (!/^[「『（〈《〔［｛(“"]|.[、。，．！？」』）〉》〕］｝〜…‥・：；!?]/u.test(word)) { node.append(word); return; }
+    if (jaEms(word) <= 10) { node.append(unit(word)); return; }
+    const open = /^[「『（〈《〔［｛(“"]+./u.exec(word);
+    if (open) node.append(unit(open[0]));
+    (open ? word.slice(open[0].length) : word).split(/(.[、。，．！？」』）〉》〕］｝〜…‥・：；!?]+)/u).forEach((part, k) => {
+      if (part) node.append(k % 2 ? unit(part) : part);
+    });
+  });
+}
 
 /* -------------------------------- substrate-neutral interaction adapter
  * The pure semantics live in @bunki/domain. This static prototype cannot
@@ -5954,7 +6029,7 @@ function renderShelfBody(search = null) {
     todayRead.append(el('span', 'shelf-today-read-l', readPick.count
       ? tx(`今日の読み物 · あなたの語 ${readPick.count}`, `Today's reading · ${readPick.count} of your words`)
       : tx('今日の読み物', "Today's reading")),
-    todayLearning('span', 'shelf-today-read-t', readPick.passage.title), el('i', 'shelf-today-read-arrow'));
+    setJaWords(todayLearning('span', 'shelf-today-read-t'), readPick.passage.title), el('i', 'shelf-today-read-arrow'));
     todayRead.addEventListener('click', () => openPassage(readPick.passage.id));
     body.append(todayRead);
   }
@@ -8192,8 +8267,9 @@ function shelfCard(p, rank = 'grid') {
     head.append(storyKicker(p));
   }
   else head.append(storyInstrument(p, rank === 'lead'));
-  const headline = el('div', 'shelf-title', p.title);
-  headline.lang = 'ja'; // so a headline breaks between phrases, never inside a word (word-break: auto-phrase)
+  // Q · a headline breaks only between its words, in every engine (setJaWords: WebKit ignored word-break: auto-phrase)
+  const headline = setJaWords(el('div', 'shelf-title'), p.title);
+  headline.lang = 'ja';
   head.append(headline);
   // the English title travels with the record (titleEn + titleEnSource in
   // data/articles/index.json), never in a code-side map
@@ -8203,7 +8279,7 @@ function shelfCard(p, rank = 'grid') {
   if (rank === 'lead') {
     const lede = storyLede(p);
     if (lede) {
-      const line = el('p', 'story-lede', lede);
+      const line = setJaWords(el('p', 'story-lede'), lede);
       line.lang = 'ja';
       head.append(line);
     }
@@ -8637,12 +8713,172 @@ async function openJapaneseLookup(anchor, text, context = {}) {
   });
 }
 
+/* Q · Japanese breaks only between words (John, 2026-10-16: "be systematic about everythign!!"; Grok's walks: 新｜田,
+ * 藤｜井, ２０｜２６, 第78｜回, ノーベ｜ル, 挑ん｜だ). One rule for every line of Japanese the app sets from plain text (a
+ * shelf title, a lede, Today's reading, lookup prose): a line may end only where a word ends, never inside a word, a
+ * name or a number. word-break: auto-phrase gave Chromium phrase breaks, but WebKit (the iPhone) ignores it and broke
+ * anywhere. The words come from Intl.Segmenter, glued where it cuts too fine:
+ *   a kana ending, a particle or an auxiliary joins the word before it (挑|ん|だ → 挑んだ, 国|が → 国が);
+ *   a lone kanji joins its kanji neighbours (an unknown name or compound comes back cut: 正|倉|院 → 正倉院, 高|市);
+ *   katakana runs join (スタート|アップ), and a number keeps its 第 and what it counts (第|78|回 → 第78回, 40|盗塁);
+ *   a closing mark joins the word before it and an opening mark the word after it (禁則).
+ * Text the reader already holds as tokens keeps its tokens (renderReader). */
+const JA_KANJI = /[\p{Script=Han}々〆ヶ]/u;
+const JA_KANA_RUN = /[\p{Script=Katakana}ー]/u;
+const JA_COUNTER = /^[年月日時分秒回号人本件個円歳条位度階巻章話部点名社台枚冊匹頭羽杯軒週代種目期次世紀万億兆割倍％%]/u;
+const JA_OPENS_WORD = /^[\p{Script=Han}々〆ヶ\p{Script=Katakana}0-9０-９A-Za-zＡ-Ｚａ-ｚ「『（〈《〔［｛(“"]/u;
+const JA_CLOSES = /^[、。，．！？」』）〉》〕］｝ー〜…‥・：；)”"!?.,％%ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ]/u;
+let jaSegmenter;
+jaRuleReady = true; // the rule's constants stand from here (el() may run before them)
+/** The words of a Japanese text, as the one rule above cuts them: an array of strings whose concatenation is the text. */
+function jaWords(text) {
+  return jaWordGroups(text).map((group) => group.join(''));
+}
+/** The same words as groups of Intl.Segmenter's own segments (lookup prose keeps one door per segment). */
+function jaWordGroups(text) {
+  const s = String(text ?? '');
+  if (!s) return [];
+  if (jaSegmenter === undefined) {
+    try { jaSegmenter = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('ja', { granularity: 'word' }) : null; } catch { jaSegmenter = null; }
+  }
+  return jaGroupSegments(jaSegmenter ? [...jaSegmenter.segment(s)].map((part) => part.segment)
+    : s.split(/([\p{Script=Han}々〆ヶ]+|[\p{Script=Katakana}ー]+|[0-9０-９]+)/u).filter(Boolean));
+}
+/** Segments grouped into words by the one rule (the glue above). */
+// kana words the segmenter cuts into pieces (ご|ざ|い|ます, くだ|さい): the pieces are put back together first
+const JA_KANA_WORDS = ['ございます', 'ございました', 'ございません', 'ござる', 'ください', 'くださる', 'くださった', 'ありがとう', 'すみません', 'いただきます', 'おはよう', 'こんにちは', 'こんばんは'];
+function jaMendSegments(segments) {
+  const out = [];
+  for (let i = 0; i < segments.length; i += 1) {
+    let merged = null;
+    if (/^\p{Script=Hiragana}/u.test(segments[i])) {
+      let joined = '';
+      for (let j = i; j < segments.length && joined.length < 8; j += 1) {
+        joined += segments[j];
+        if (j > i && JA_KANA_WORDS.includes(joined)) merged = [joined, j];
+      }
+    }
+    if (merged) { out.push(merged[0]); i = merged[1]; continue; }
+    // a verb's て fused with the helper after it (し|てい|ない): て stands apart, so the helper can open a phrase
+    const te = /^([てで])((?:い|お|しま|くだ|み|あ)\p{Script=Hiragana}*)$/u.exec(segments[i]);
+    if (te && out.length) out.push(te[1], te[2]);
+    else out.push(segments[i]);
+  }
+  return out;
+}
+function jaGroupSegments(segments) {
+  const groups = [];
+  let prev = '';
+  for (const seg of jaMendSegments(segments)) {
+    const last = groups.length ? groups[groups.length - 1].join('') : '';
+    const a = last.slice(-1), b = seg.charAt(0);
+    const digitA = /[0-9０-９]/u.test(a), digitB = /[0-9０-９]/u.test(b);
+    let join = false;
+    if (!last) join = false;
+    // a closing mark, a small kana or ー never opens a line; an opening mark never ends one
+    else if (JA_CLOSES.test(seg) || /[「『（〈《〔［｛(“"]$/u.test(last)) join = true;
+    else if (/\s$/u.test(last) || /^\s/u.test(seg)) join = false;
+    // hiragana: a word's ending or a particle stays with the word (or the quotation) before it (挑|ん|だ, 国|が, 」|に,
+    // 読む|こと, ご|ざ|い|ます); a hiragana word of its own (どんな, ところ) and the words after a long run start their own
+    else if (/^\p{Script=Hiragana}/u.test(seg)) {
+      const tail = /\p{Script=Hiragana}*$/u.exec(last)[0];
+      // a verb's て and the helper after it are two phrases (待って｜いる, 保存して｜いない, 置いて｜おく): a line may
+      // end between them, as in any phrase break
+      if (/[てで]$/u.test(last) && /^(い|お|しま|くだ|み|あ)/u.test(seg)) join = false;
+      else join = JA_KANJI.test(a) || JA_KANA_RUN.test(a) || /[」』）〉》〕］｝)”"]/u.test(a)
+        || (!/[、。，．！？!?,.・：；…‥―]/u.test(a) && [...seg].length <= 2 && [...tail].length + [...seg].length <= 5);
+    }
+    // a mark that is not a word (――) clings to the word before it
+    else if (!JA_OPENS_WORD.test(seg)) join = true;
+    // a compound verb: a verb's stem (貼り, 取り, 書き, 申し) and the verb after it are one word (貼り付けた, 取り消す);
+    // a particle (に, で, て) or an adjective's い is no stem, so 日本に｜来る and 高い｜山 still part
+    else if (JA_KANJI.test(b) && /^[\p{Script=Han}々]{1,2}[きぎしじちひびみりえけげせぜべめれ]$/u.test(last)
+      && [...last].length + [.../^[\p{Script=Han}々]*/u.exec(seg)[0]].length <= 5) join = true;
+    else join = (
+      // a lone kanji is an unknown name or compound cut too fine: it joins its kanji neighbours, and the katakana word
+      // before it (スポーツ|庁, ノーベル|賞); a run of kanji up to six long is one word too, a name or a compound the
+      // segmenter cut (天之御中|主神, 締約国|会議)
+      (JA_KANJI.test(b) && (JA_KANJI.test(a) || JA_KANA_RUN.test(a)) && ([...seg].length === 1 || (JA_KANJI.test(a) && [...prev].length === 1)))
+      || (JA_KANJI.test(a) && JA_KANJI.test(b) && [.../[\p{Script=Han}々〆ヶ]*$/u.exec(last)[0]].length + [.../^[\p{Script=Han}々〆ヶ]*/u.exec(seg)[0]].length <= 6)
+      // a katakana run is one word
+      || (JA_KANA_RUN.test(a) && JA_KANA_RUN.test(b))
+      // a number keeps its 第, its digits and what it counts (第78回, ２０２６年, 40盗塁)
+      || (digitA && digitB) || (a === '第' && digitB) || (digitA && (JA_COUNTER.test(seg) || JA_KANJI.test(b))));
+    if (join) groups[groups.length - 1].push(seg);
+    else groups.push([seg]);
+    prev = seg;
+  }
+  return groups;
+}
+/** Set Japanese text into a node by the one rule: its words, with a break allowed only between them (keep-all on the
+ * node, a <wbr> at each word's edge; a word wider than the whole line may still break, overflow-wrap). WebKit's keep-all
+ * still lets a line end on an opening mark (ネット（｜ナビイ）, の「｜不思議): the mark and the character after it share
+ * a no-break span. */
+function setJaWords(node, text) {
+  // a long word's kana ending may take the next line (マイクロプロセッサ｜は、): the word itself stays whole
+  const words = jaWords(text).flatMap((w) => {
+    const m = /^([\p{Script=Katakana}\p{Script=Han}ー々0-9０-９A-Za-zＡ-Ｚａ-ｚ「『（〈《〔［｛]*[\p{Script=Katakana}\p{Script=Han}ー々])(\p{Script=Hiragana}[\p{Script=Hiragana}、。，．！？」』）〉》〕］｝〜…‥・：；!?]*)$/u.exec(w);
+    return m && jaEms(m[1]) >= 6 ? [m[1], m[2]] : [w];
+  });
+  node.replaceChildren();
+  appendJaPieces(node, words);
+  const long = Math.max(0, ...words.map(jaEms));
+  node.classList.add('ja-words');
+  // a word wider than the whole line would have to break inside itself (マイクロプロセ｜ッサ in a 320 card): the block
+  // steps its type down until its longest word fits (fitJaWords), never under JA_FIT_FLOOR
+  node.dataset.jaLong = String(Math.round(long * 100) / 100);
+  queueJaFit(node);
+  return node;
+}
+/** a text's width in ems, as a Japanese face sets it: a full-width character one em, anything narrower about 0.6 */
+function jaEms(text) {
+  let ems = 0;
+  for (const ch of String(text)) ems += ch === '\u3000' ? 1 : /\s/u.test(ch) ? 0.3 : /[ᄀ-ᅟ⺀-꓏가-힣豈-﫿︰-﹏＀-｠￠-￦　-〿]|[\u{20000}-\u{3fffd}]/u.test(ch) ? 1 : 0.6;
+  return ems;
+}
+const JA_FIT_FLOOR = 0.72;
+let jaFitQueue = null;
+function queueJaFit(node) {
+  if (!jaFitQueue) {
+    jaFitQueue = new Set();
+    requestAnimationFrame(() => { const nodes = jaFitQueue; jaFitQueue = null; fitJaWords(nodes); });
+  }
+  jaFitQueue.add(node);
+}
+let jaFitResize = false;
+function fitJaWords(nodes) {
+  if (!jaFitResize) {
+    jaFitResize = true;
+    let frame = 0;
+    window.addEventListener('resize', () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => { frame = 0; fitJaWords(document.querySelectorAll('.ja-words[data-ja-long]')); });
+    }, { passive: true });
+    document.fonts?.ready?.then(() => fitJaWords(document.querySelectorAll('.ja-words[data-ja-long]')));
+  }
+  const live = [...nodes].filter((n) => n.isConnected);
+  for (const n of live) if (n.dataset.jaFit) { n.style.removeProperty('font-size'); delete n.dataset.jaFit; }
+  // every read first, then every write: one layout for the lot
+  const sizes = live.map((n) => {
+    const s = getComputedStyle(n);
+    // a title set upright (縦書き: the shelf's teasers) runs its lines down the card; its width is one column, not a line
+    if (/^vertical|^sideways/.test(s.writingMode)) return 0;
+    const px = parseFloat(s.fontSize) || 0;
+    const room = n.clientWidth - (parseFloat(s.paddingLeft) || 0) - (parseFloat(s.paddingRight) || 0);
+    // the estimate's own margin: digits and Latin run a little wider than 0.6 em in a Japanese face
+    const need = Number(n.dataset.jaLong || 0) * (px + Math.max(0, parseFloat(s.letterSpacing) || 0)) * 1.04;
+    return room > 0 && need > room ? Math.max(JA_FIT_FLOOR, (room / need) * 0.98) * px : 0;
+  });
+  live.forEach((n, i) => { if (sizes[i]) { n.style.fontSize = `${Math.floor(sizes[i] * 10) / 10}px`; n.dataset.jaFit = '1'; } });
+}
+
 /* 禁則処理 (round 4, T4: "more polished … clarity"). A word you can tap is a button, an atomic box, and CSS
  * allows a line break beside an atomic box even where Japanese forbids one, so 、 could open a line and 「
  * end one (the sentence cards fixed this for closing marks with .kinsoku-glue). Here a closing mark joins
  * the box before it, and an opening bracket waits in its no-break span for the word after it. */
 const KINSOKU_CLOSING = /^[、。，．！？」』）〉》〕］｝ー〜…‥・]+$/u;
 const KINSOKU_OPENING = /^[「『（〈《〔［｛]+$/u;
+const KINSOKU_SMALL = /^[ぁぃぅぇぉっゃゅょゎゕゖァィゥェォッャュョヮヵヶー]/u;
 function placeKinsoku(container, node, surface) {
   const last = container.lastChild;
   const glue = last?.nodeType === 1 && last.classList.contains('kinsoku-glue') ? last : null;
@@ -8657,8 +8893,9 @@ function placeKinsoku(container, node, surface) {
     container.append(open);
     return;
   }
-  // a closing mark clings to the box before it: a word, or a glue already holding one (never a paragraph's break)
-  if (KINSOKU_CLOSING.test(surface) && last?.nodeType === 1 && !last.matches('.para-break, .sent-door')) {
+  // a closing mark clings to the box before it: a word, or a glue already holding one (never a paragraph's break); so
+  // does a word that opens on a small kana or ー (Q: 』｜っていう, んだ｜って put っ at a line's start)
+  if ((KINSOKU_CLOSING.test(surface) || KINSOKU_SMALL.test(surface)) && last?.nodeType === 1 && !last.matches('.para-break, .sent-door')) {
     if (glue) glue.append(node);
     else {
       const joined = el('span', 'kinsoku-glue');
@@ -8670,10 +8907,34 @@ function placeKinsoku(container, node, surface) {
   container.append(node);
 }
 
+/* Q · a number keeps its 第 and what it counts on its line (the one rule, jaWords): in the reader the tokenizer gives
+ * 1965 and 年, 第 and 78, as tokens of their own, and a line could end between them (1965｜年, 10｜月, 4｜人). A
+ * numeral token holds the token after it when that is a counter or a kanji word, and 第 holds the numeral after it. */
+const READER_NUMERAL = /^[0-9０-９.．,，〇一二三四五六七八九十百千万億兆]+$/u;
+function placeReaderNumber(container, node, token, prev) {
+  if (!prev) return false;
+  const before = String(prev.s || ''), now = String(token.s || '');
+  const counts = READER_NUMERAL.test(before) && /[0-9０-９]/u.test(before) && (prev.p !== '補助記号')
+    && (token.p === '接尾辞' || JA_COUNTER.test(now) || JA_KANJI.test(now.charAt(0)));
+  const ordinal = before === '第' && READER_NUMERAL.test(now);
+  if (!counts && !ordinal) return false;
+  const last = container.lastChild;
+  if (!last || last.nodeType !== 1 || last.matches?.('.para-break, .sent-door')) return false;
+  if (last.classList.contains('kinsoku-glue') && !last.classList.contains('kinsoku-open')) { last.append(node); return true; }
+  const glue = el('span', 'kinsoku-glue');
+  container.replaceChild(glue, last);
+  glue.append(last, node);
+  return true;
+}
+
 function appendJapaneseLookup(container, text, context = {}) {
   const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('ja', { granularity: 'word' }) : null;
   const segments = segmenter ? [...segmenter.segment(String(text))].map(part => part.segment)
     : String(text).split(/([\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]+)/u);
+  // Q · one door per segment, as before; the segments of one word (jaGroupSegments) share a no-break span, so a line
+  // never ends inside a word (挑|ん|だ, 正|倉|院) or a number (２０２６); a word too long for a short line (over 12
+  // characters) keeps its doors' own breaks
+  const groups = segmenter ? jaGroupSegments(segments.filter(Boolean)) : segments.map((segment) => [segment]);
   const wrapper = el('span', 'japanese-lookup-text');
   wrapper.dataset.japaneseLookup = 'true';
   // A caller whose block is split across several calls (a prompt around its underlined
@@ -8682,29 +8943,41 @@ function appendJapaneseLookup(container, text, context = {}) {
   block.dataset.lookupBlock = 'true';
   let stopPlaced = !!block.querySelector('.japanese-lookup-word');
   const help = japaneseLookupHelpId();
-  for (const segment of segments) {
-    if (!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(segment)) {
-      if (context.kinsoku) placeKinsoku(wrapper, document.createTextNode(segment), segment);
-      else wrapper.append(document.createTextNode(segment));
-      continue;
+  for (const group of groups) {
+    // a number or a Latin word set as text is one unit too (full-width digits otherwise break between them: ２０|２６)
+    const whole = group.length > 1 || /^[0-9０-９A-Za-zＡ-Ｚａ-ｚ.．,，%％]{2,}$/u.test(group[0]);
+    const unit = whole && [...group.join('')].length <= 12 ? el('span', 'ja-unit') : null;
+    // a line may end between two words: WebKit offers no break between two no-break spans side by side (Guided's lede
+    // ran 考え方をひらき、 off the phone), so a <wbr> stands between the words
+    if (wrapper.lastChild && !/^\s/u.test(group[0]) && !/[ \u00a0]$/u.test(wrapper.lastChild.textContent || '')) wrapper.append(document.createElement('wbr'));
+    if (unit) wrapper.append(unit);
+    const place = (node, segment) => {
+      if (unit) unit.append(node);
+      else if (context.kinsoku) placeKinsoku(wrapper, node, segment);
+      else wrapper.append(node);
+    };
+    for (const segment of group) {
+      if (!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(segment)) {
+        place(document.createTextNode(segment), segment);
+        continue;
+      }
+      // The visible word is its own accessible name; the shared help says what it does.
+      const word = el('button', 'japanese-lookup-word', segment);
+      word.type = 'button'; word.lang = 'ja';
+      word.dataset.lookupText = segment;
+      if (context.itemId) word.dataset.lookupItem = context.itemId;
+      word.tabIndex = stopPlaced ? -1 : 0; stopPlaced = true;
+      word.setAttribute('aria-describedby', help);
+      word.setAttribute('aria-haspopup', 'dialog');
+      word.addEventListener('click', event => {
+        event.stopPropagation();
+        if (diveFromMini(word, event)) return;
+        void openJapaneseLookup(word, segment, context);
+      });
+      word.addEventListener('keydown', event => lookupWordKey(event, word));
+      word.addEventListener('focus', () => setLookupStop(word));
+      place(word, segment);
     }
-    // The visible word is its own accessible name; the shared help says what it does.
-    const word = el('button', 'japanese-lookup-word', segment);
-    word.type = 'button'; word.lang = 'ja';
-    word.dataset.lookupText = segment;
-    if (context.itemId) word.dataset.lookupItem = context.itemId;
-    word.tabIndex = stopPlaced ? -1 : 0; stopPlaced = true;
-    word.setAttribute('aria-describedby', help);
-    word.setAttribute('aria-haspopup', 'dialog');
-    word.addEventListener('click', event => {
-      event.stopPropagation();
-      if (diveFromMini(word, event)) return;
-      void openJapaneseLookup(word, segment, context);
-    });
-    word.addEventListener('keydown', event => lookupWordKey(event, word));
-    word.addEventListener('focus', () => setLookupStop(word));
-    if (context.kinsoku) placeKinsoku(wrapper, word, segment);
-    else wrapper.append(word);
   }
   container.append(wrapper);
   return wrapper;
@@ -8759,14 +9032,20 @@ function paintWordSave(button, on) {
   // a bar's Save names its word (the reader's keep: Save 総理 · Saved 総理 ✓)
   const word = button.dataset.saveWord || '';
   const all = button.dataset.saveAll || '';
-  // the reader's bar holds its Save as two lines in the bar's own type: the verb small over the word it keeps (Save /
-  // 総理), so a word of any length fits the bar's last 75 px beside its five doors
+  // Q · the reader's bar holds its Save on ONE line in the bar's own type, the verb and then the word it keeps (Save 総理).
+  // It never cuts and never wraps (Grok's walk: SAVE / a word, 保存 / 語をタ…): fitChromeKeep sheds the word, then the
+  // ✓, until the line fits the room the bar's doors leave; its accessible name always says the whole of it
   if (button.dataset.saveBar != null) {
+    // one word on one line: set as plain text, never with the word rule's breaks (Chromium honours a <wbr> in a no-break label)
+    const name = el('span', `save-bar-word${word ? '' : ' is-rest'}`);
+    name.textContent = word || tx('語をタップ', 'a word');
     button.replaceChildren(el('span', 'save-bar-verb', on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save')),
-      document.createTextNode(' '), el('span', 'save-bar-word', word || tx('語をタップ', 'a word')));
+      document.createTextNode(' '), name);
+    button.classList.remove('is-verb-only', 'is-short');
     button.classList.toggle('taken', on);
     button.setAttribute('aria-pressed', String(on));
     button.title = '';
+    if (button.isConnected) fitChromeKeep(button);
     return;
   }
   button.textContent = all
@@ -9166,7 +9445,9 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
       box.dataset.list = listName;
       box.checked = member(listName);
       box.disabled = busy || !recordWritable();
-      box.addEventListener('change', () => void setMembership(listName, box.checked));
+      // Q · the keyboard stays on the box the hand just ticked, in every engine: WebKit (Safari) never focuses a checkbox
+      // on a click, so the repaint lost the menu's place and the keyboard left the menu (verify-personal-host, WebKit)
+      box.addEventListener('change', () => { focusList = listName; void setMembership(listName, box.checked); });
       row.append(box, el('span', 'vocabulary-list-name', listName), el('span', 'vocabulary-list-count', String(S.lists[listName].length)));
       choices.append(row);
     }
@@ -9175,7 +9456,8 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
     if (!busy && focusList != null) {
       const box = [...choices.querySelectorAll('input[type="checkbox"]')].find((input) => input.dataset.list === focusList);
       focusList = null;
-      if (pop.contains(document.activeElement) && document.activeElement !== document.body) return;
+      // a control inside the menu the hand moved to meanwhile keeps the keyboard; the menu itself hands it to the box
+      if (pop.contains(document.activeElement) && document.activeElement !== pop && document.activeElement !== document.body) return;
       (box || pop).focus({ preventScroll: true });
     }
   };
@@ -9587,7 +9869,7 @@ function miniKanjiWeb(word, anchor) {
         // the part's name follows the page's language (review round 2 #7): in English its meaning, from
         // the kanji data; in 日本語 its reading, from the radical names. A part with neither shows none.
         if (bi()) {
-          const meaning = String(D.kanji?.[part]?.m || '').toLowerCase();
+          const meaning = partGloss(c, part);
           if (meaning) set.append(el('span', 'mini-kanji-part-name mini-kanji-part-meaning', meaning));
         } else {
           const name = D.radicals?.[part]?.name;
@@ -9637,9 +9919,38 @@ function miniKanjiWeb(word, anchor) {
   return box;
 }
 
+/** Q · a word's box with its reading (Q/DESIGN.md §3): a card set 10 px from the word's own box stood on its reading
+ * (Grok's walk: そうり under the card's edge), because the reading is drawn outside that box: the reader's label over a
+ * word (ruby::before, attr(data-r): shown while its <rt> is not hidden), the deck's (ruby[data-rt]::after), or true
+ * ruby, which WebKit gives no box at all. The card keeps its 10 px from all of it. */
+function anchorBox(anchor) {
+  const r = anchor.getBoundingClientRect();
+  let { top, left } = r;
+  let bottom = r.bottom ?? top + r.height, right = r.right ?? left + r.width;
+  const grow = (b) => { top = Math.min(top, b.top); bottom = Math.max(bottom, b.bottom); left = Math.min(left, b.left); right = Math.max(right, b.right); };
+  for (const ruby of anchor.querySelectorAll?.('ruby') || []) {
+    const box = ruby.getBoundingClientRect();
+    const rt = ruby.querySelector(':scope > rt');
+    // a label drawn above the word: its line counted by its own size (the label sits on the word's top edge)
+    for (const pseudo of ['::before', '::after']) {
+      const label = getComputedStyle(ruby, pseudo);
+      if (!label.content || label.content === 'none' || label.content === 'normal' || label.display === 'none') continue;
+      const shown = pseudo === '::before' ? !!rt && !rt.classList.contains('hidden-rt') : !!ruby.dataset.rt;
+      if (shown) grow({ top: box.top - (parseFloat(label.fontSize) || 0) * 1.2, bottom: box.bottom, left: box.left, right: box.right });
+    }
+    // true ruby: its text's own boxes where the engine gives them, else one ruby line above the word
+    if (!rt || getComputedStyle(rt).display === 'none' || !rt.textContent.trim()) continue;
+    const range = document.createRange();
+    range.selectNodeContents(rt);
+    const boxes = [...range.getClientRects()].filter((b) => b.width >= 0.5 && b.height >= 0.5);
+    for (const b of boxes) grow(b);
+    if (!boxes.length) grow({ top: box.top - (parseFloat(getComputedStyle(rt).fontSize) || 0) * 1.25 - 1, bottom: box.bottom, left: box.left, right: box.right });
+  }
+  return { top, bottom, left, right, width: right - left, height: bottom - top, x: left, y: top };
+}
 /** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
 function keepFloatingBeside(card, anchor, { follow = false } = {}) {
-  placeFloating(card, anchor.getBoundingClientRect());
+  placeFloating(card, anchorBox(anchor));
   card.addEventListener('focusin', () => {
     requestAnimationFrame(() => { if (card.isConnected) revealFloatingFocus(card); });
   });
@@ -9651,7 +9962,7 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
       const now = anchor.getBoundingClientRect();
       if (Math.abs(now.left - was.left) < 1 && Math.abs(now.top - was.top) < 1) return;
       was = now;
-      placeFloating(card, now);
+      placeFloating(card, anchorBox(anchor));
     }, 120);
   }
   if (typeof ResizeObserver !== 'function') return;
@@ -9660,7 +9971,7 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
   const seat = () => {
     if (!card.isConnected || !anchor.isConnected) { watch.disconnect(); grow?.disconnect(); return; }
     if (Math.abs(card.getBoundingClientRect().height - last) < 1) return;
-    placeFloating(card, anchor.getBoundingClientRect());
+    placeFloating(card, anchorBox(anchor));
     last = card.getBoundingClientRect().height;
   };
   // L · seating the card resizes the very element the ResizeObserver watches (maxHeight), and a size changed inside
@@ -9931,7 +10242,7 @@ function readerSentenceRow(node, index, sourceEnd = index) {
     door.hidden = open;
     door.setAttribute('aria-expanded', String(open));
     card?.classList.toggle('is-sentence', open);
-    if (card && miniAnchor?.isConnected) placeFloating(card, miniAnchor.getBoundingClientRect());
+    if (card && miniAnchor?.isConnected) placeFloating(card, anchorBox(miniAnchor));
     if (focus) (open ? back : door).focus({ preventScroll: true });
     if (card) revealFloatingFocus(card);
   };
@@ -11674,11 +11985,13 @@ function renderReader(main) {
   // counter, a 接頭辞 for its stem
   let groupHolds = false;
   let para = 0;
+  let prevToken = null;
   for (const { index, token } of readerRenderedTokens(p, crossRefs)) {
     if (index > 0 && paraBreaks.has(index)) {
       reader.append(el('span', 'para-break'));
       group = null;
       groupHolds = false;
+      prevToken = null;
       para += 1;
     }
     if (crossRefs) {
@@ -11797,10 +12110,11 @@ function renderReader(main) {
       }
       groupHolds = numeral || prefix;
       placeKinsoku(group, rendered, token.s);
-    } else {
+    } else if (!placeReaderNumber(reader, rendered, token, prevToken)) {
       // 禁則処理: a closing mark clings to the word before it, an opening bracket to the word after it
       placeKinsoku(reader, rendered, token.s);
     }
+    prevToken = token;
   }
   main.append(readerHelp(), reader);
   installReaderRoving(reader);
@@ -11871,15 +12185,17 @@ function renderReader(main) {
 
   // S · a story's review state (p.review, pendingVerification) stays in its record; the learner's page says nothing of it
 
+  // Q · the attribution's Japanese breaks between its words too (日本ス｜タートアップ in the foot); its addresses, one long
+  // word each, still break where the line ends (setJaWords: overflow-wrap)
   const attribution = el('div', 'note');
   if (p.url) {
-    const a = el('a', 'inline-link', p.attribution);
+    const a = setJaWords(el('a', 'inline-link'), p.attribution);
     a.href = p.url;
     a.rel = 'noreferrer';
     a.target = '_blank';
     attribution.append(a);
   } else {
-    attribution.textContent = p.attribution;
+    setJaWords(attribution, p.attribution);
   }
   about.append(attribution);
 
@@ -13000,18 +13316,27 @@ function todayKanji(word) {
 function todayPartStrokes(part) {
   return D.radicals?.[part]?.st || D.kanji?.[part]?.st || 0;
 }
-/** The one part every kanji of the word carries, from D.kanji parts only; the part with the most
- * strokes wins, so 隹 outranks the 亻 hiding inside it. */
+/* Q · a hook is true and useful, or it is not shown (Q/DESIGN.md §7; Grok's walks: Today taught 冋 "desert" as the part
+ * 高 and 尚 share — the shape is in both, but the desert is in neither; 128 of the 225 first-tier day words named a part
+ * like it). Today names a part only when that part is the classical radical (部首) of every kanji it is said to hide in:
+ * the radical is the kanji's meaning family, so its meaning is a true clue (洗濯: 水 water; 議論: 言 say). */
+function todayIsRadical(part, c) {
+  const row = D.radByGlyph?.[part] || D.radByGlyph?.[(PART_WRITTEN[part] || [])[0]];
+  return !!row && row.n === D.kanji?.[c]?.rad;
+}
+/** The one part every kanji of the word carries, from D.kanji parts only, and that is every one's radical; the part
+ * with the most strokes wins, so 隹 outranks the 亻 hiding inside it. */
 function todaySharedPart(ks) {
   if (ks.length < 2) return null;
   const lists = ks.map((c) => D.kanji[c].parts || []);
   const shared = [...new Set(lists[0])]
-    .filter((p) => !ks.includes(p) && D.radicals?.[p] && lists.slice(1).every((l) => l.includes(p)));
+    .filter((p) => !ks.includes(p) && D.radicals?.[p] && lists.slice(1).every((l) => l.includes(p)) && ks.every((c) => todayIsRadical(p, c)));
   shared.sort((a, b) => todayPartStrokes(b) - todayPartStrokes(a) || (a < b ? -1 : 1));
   return shared[0] || null;
 }
+/** A kanji's own radical, when the kanji's parts name it (海 → 氵): the one part of a single kanji worth a hook. */
 function todayLargestPart(c) {
-  const parts = [...new Set(D.kanji?.[c]?.parts || [])].filter((p) => p !== c && D.radicals?.[p]);
+  const parts = [...new Set(D.kanji?.[c]?.parts || [])].filter((p) => p !== c && D.radicals?.[p] && todayIsRadical(p, c));
   parts.sort((a, b) => todayPartStrokes(b) - todayPartStrokes(a) || (a < b ? -1 : 1));
   return parts[0] || null;
 }
@@ -13071,7 +13396,8 @@ function todayHook(word) {
   const cap = wwPartCap(part, wwMine());
   const family = cap.count;
   const mine = cap.mine;
-  const meaning = String(D.kanji?.[part]?.m || '').toLowerCase();
+  // its plain meaning (the written form's own, else its standalone form's: 氵 is water), never the catalogue's words
+  const meaning = partMeaning(D.kanji?.[part]?.m) || partMeaning(D.kanji?.[(PART_WRITTEN[part] || [])[0]]?.m);
   return { part, shared, host: host?.[0] || null, count: ks.length, family, mine, meaning };
 }
 /** Seconds a card takes this learner: the median gap between consecutive grades in their own
@@ -13116,28 +13442,9 @@ function todayLearning(tag, cls, text) {
   node.dataset.uiContent = 'learning';
   return node;
 }
-/** Japanese that breaks only between phrases, never inside one (「虚構 / か」): a line may end before
- * a word that begins with kanji, katakana or an opening bracket, unless the word before it opened a
- * bracket. Pairs with word-break: keep-all in the room's CSS; plain text without Intl.Segmenter. */
+/** Japanese that breaks only between its words, never inside one (「虚構 / か」): the app's one rule (jaWords). */
 function todayPhrases(node, text) {
-  const s = String(text || '');
-  let seg;
-  try {
-    seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('ja', { granularity: 'word' }) : null;
-  } catch {
-    seg = null;
-  }
-  if (!seg) {
-    node.textContent = s;
-    return node;
-  }
-  let prev = '';
-  for (const { segment } of seg.segment(s)) {
-    if (prev && /^[\p{Script=Han}\p{Script=Katakana}「『（(]/u.test(segment) && !/[「『（(\s]$/u.test(prev)) node.append(document.createElement('wbr'));
-    node.append(segment);
-    prev = segment;
-  }
-  return node;
+  return setJaWords(node, text);
 }
 function todayDateline() {
   const now = new Date();
@@ -18504,13 +18811,15 @@ function renderAiSetup(main) {
     main.append(fudaBtn, fudaNote);
     main.append(withEn(el('p', 'eyebrow key-head', '鍵'), 'the key', 'en-inline'));
   }
+  // Q · the tutor's door in his words (Q/DESIGN.md §8; Grok's walk: the room read as a raw API form): what the tutor needs
+  // and where his key stays, then the key; the service's address and model fold under one quiet Details, as they were set
   main.append(
     el(
       'p',
       'gloss',
       tx(
-        '接続先と鍵はこの端末にだけ保存され、学習記録には含まれない。鍵は設定した接続先だけに送る。別の接続先には、そのための鍵を入力して保存する。',
-        'Provider settings and keys stay on this device, outside your learning record. A key is sent only to its configured provider. To use another provider, enter and save its own key.',
+        '先生に質問するには、使っている AI サービス（Anthropic など）の鍵をここに入れる。鍵はこの端末にだけ残り、学習記録には入らない。送るのは、そのサービスだけ。',
+        'To ask the tutor, add the key from your AI service (Anthropic, or one like it). The key stays on this device, outside your learning record, and goes only to that service.',
       ),
     ),
   );
@@ -18520,6 +18829,11 @@ function renderAiSetup(main) {
     label.htmlFor = id;
     return label;
   };
+  const connection = el('details', 'ai-connection');
+  connection.id = 'ai-connection';
+  // open while it needs him: the device's settings could not be read, or the key's service was never recorded
+  connection.open = !!(configured.invalid || configured.requiresBinding);
+  connection.append(el('summary', 'ai-connection-head', tx('接続の詳細', 'Connection details')));
   const endpoint = el('input', 'search-field');
   endpoint.type = 'url';
   endpoint.id = 'ai-base-url';
@@ -18527,8 +18841,8 @@ function renderAiSetup(main) {
   endpoint.spellcheck = false;
   endpoint.maxLength = 2048;
   endpoint.value = configured.baseUrl;
-  main.append(fieldLabel(endpoint.id, '接続先 (HTTPS)', 'Provider URL (HTTPS)'), endpoint);
-  main.append(el('p', 'airead-note', tx(
+  connection.append(fieldLabel(endpoint.id, '接続先 (HTTPS)', 'Provider URL (HTTPS)'), endpoint);
+  connection.append(el('p', 'airead-note', tx(
     'Anthropic、または互換 API の接続先。通常は https://api.anthropic.com。',
     'Use Anthropic or a compatible API provider. The default is https://api.anthropic.com.',
   )));
@@ -18538,15 +18852,19 @@ function renderAiSetup(main) {
   model.spellcheck = false;
   model.maxLength = 200;
   model.value = configured.model;
-  main.append(fieldLabel(model.id, 'モデル', 'Model'), model);
+  connection.append(fieldLabel(model.id, 'モデル', 'Model'), model);
+  connection.append(el('p', 'airead-note', tx(
+    '鍵は、設定した接続先だけに送る。別の接続先には、そのための鍵を入力して保存する。',
+    'A key is sent only to its configured provider. To use another provider, enter and save its own key.',
+  )));
   const input = el('input', 'search-field');
   input.type = 'password';
   input.id = 'ai-key-input';
-  input.placeholder = tx('この接続先の API キー', 'API key for this provider');
+  input.placeholder = tx('鍵を貼り付ける', 'Paste your key');
   input.autocomplete = 'off';
   input.maxLength = 8192;
   input.value = configured.key;
-  main.append(fieldLabel(input.id, '鍵', 'API key'), input);
+  main.append(fieldLabel(input.id, 'あなたの鍵', 'Your key'), input);
   const configNote = el('p', 'airead-note');
   configNote.id = 'ai-config-note';
   configNote.setAttribute('role', 'status');
@@ -18593,7 +18911,7 @@ function renderAiSetup(main) {
     S.view = 'ai';
     render();
   });
-  main.append(save, configNote);
+  main.append(save, configNote, connection);
   if (aiKey()) {
     const rm = biLabel('button', 'take taken', '鍵を消す', 'remove the key');
     rm.type = 'button';
@@ -20020,7 +20338,8 @@ const WW_KANJI_ANGLES = { 1: [-90], 2: [-126, -54], 3: [-150, -90, -30], 4: [-16
 function wwKanjiCap(c) {
   const k = D.kanji[c];
   if (!k) return { en: '', ja: '' };
-  return { en: String(k.m || '').toLowerCase(), ja: String((k.kun || [])[0] || (k.on || [])[0] || '').replace(/\..*$/, '') };
+  // Q · a caption is a name: the plain meaning a part's row gives (partMeaning); the whole meaning is the slip's, a hold away
+  return { en: partMeaning(k.m), ja: String((k.kun || [])[0] || (k.on || [])[0] || '').replace(/\..*$/, '') };
 }
 /** A part's name, never a reading posing as one: the official 部首 name (radicals214: 日 → ひへん),
  * else the part table's own name when it is more than the kanji's kun or on reading; else none. */
@@ -20038,7 +20357,7 @@ function wwPartCap(p, mine) {
   const members = wwPartMembers(p);
   const count = D.radicals?.[p]?.kanjiCount || members.size;
   return {
-    en: D.kanji[p]?.m ? String(D.kanji[p].m).toLowerCase() : `${count} kanji`,
+    en: partGloss(null, p) || `${count} kanji`,
     ja: wwPartName(p),
     count,
     mine: [...members].filter((c) => mine.kanji.has(c)).length,
@@ -20213,7 +20532,7 @@ function wwModel(centre, mine) {
   if (D.kanji[p]?.kk) marks.push([tx('漢検', 'Kanken'), bi() ? kankenGradeLabel(D.kanji[p].kk) : D.kanji[p].kk]);
   if (D.kanjiFreq?.[p]) marks.push([tx('頻度順位', 'Frequency rank'), String(D.kanjiFreq[p])]);
   return {
-    centre: { ...centre, glyph: p, reading: cap.ja, gloss: bi() ? (D.kanji[p]?.m ? String(D.kanji[p].m).toLowerCase() : '') : '', strokes: st },
+    centre: { ...centre, glyph: p, reading: cap.ja, gloss: bi() ? partGloss(null, p) : '', strokes: st },
     nodes, marks, senses: [], examples: [], family: members, familyCount: cap.count, familyMine: cap.mine,
   };
 }
@@ -20465,8 +20784,13 @@ function wwDetail(model, section) {
       if (cut.full && cut.ti >= 0) {
         // the word stays inside the three visible lines: a long run-in is cut to its last clause
         const lead = ex.tokens.slice(0, cut.ti).map((t) => t.s).join('');
-        text.append(lead.length > 26 ? `…${lead.slice(-22)}` : lead, el('b', null, ex.tokens[cut.ti].s), ex.tokens.slice(cut.ti + 1).map((t) => t.s).join(''));
-      } else text.textContent = ex.tokens.map((t) => t.s).join('');
+        // Q · its Japanese breaks only between words (南海フェリ｜ー), around the word in bold too
+        appendJaFlow(text, lead.length > 26 ? `…${lead.slice(-22)}` : lead);
+        const word = ex.tokens[cut.ti].s;
+        if (text.lastChild && !/[「『（〈《〔［｛(“"\s]$/u.test(text.lastChild.textContent || '') && !JA_CLOSES.test(word)) text.append(document.createElement('wbr'));
+        text.append(el('b', null, word));
+        appendJaFlow(text, ex.tokens.slice(cut.ti + 1).map((t) => t.s).join(''));
+      } else flowText(text, ex.tokens.map((t) => t.s).join(''));
       row.append(text);
       const home = ex.passage && D.passages.some((p) => p.id === ex.passage);
       row.append(el('span', 'ww-pass-go', home ? tx('記事のこの行へ戻る', 'Return to this line in the article') : tx('この文をひらく', 'Open this sentence')));
@@ -24152,6 +24476,30 @@ function syncChromeKeep() {
     return;
   }
   old.replaceWith(fresh);
+  fitChromeKeep(fresh);
+}
+/** Q · the bar's Save says as much as fits whole in the room its bar leaves it (it takes that room, flex 1, so touching
+ * a word never moves another door): the verb and the word (Save 総理 · Saved ✓ 総理); else the verb (Save · Saved ✓);
+ * else the verb without its ✓ (Saved · 保存済み). Never a cut word, never a second line (Q/DESIGN.md §2). */
+let chromeKeepFitting = false;
+function fitChromeKeep(button = document.getElementById('chrome-keep')) {
+  if (!button?.isConnected || button.dataset.saveBar == null) return;
+  if (!chromeKeepFitting) {
+    chromeKeepFitting = true;
+    window.addEventListener('resize', () => fitChromeKeep(), { passive: true });
+    document.fonts?.ready?.then(() => fitChromeKeep());
+  }
+  const verb = button.querySelector('.save-bar-verb');
+  if (!verb) return;
+  const on = button.getAttribute('aria-pressed') === 'true';
+  button.classList.remove('is-verb-only', 'is-short');
+  verb.textContent = on ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save');
+  const fits = () => button.scrollWidth <= button.clientWidth + 0.5;
+  if (fits()) return;
+  button.classList.add('is-verb-only');
+  if (fits() || !on) return;
+  button.classList.add('is-short');
+  verb.textContent = tx('保存済み', 'Saved');
 }
 
 /** The capture node the reader's door commits: the word as encountered —
@@ -27335,6 +27683,9 @@ function renderDeckPlay(main) {
       english: bi(),
       presentation: deckPresentation,
       storage: localStorage, host: deckHost(),
+      // Q · the app's one rule for Japanese line breaks (jaWords): the card's sentence breaks only between its words,
+      // the same on its front and its back
+      words: (text, segments = null) => (segments ? jaGroupSegments(segments) : jaWordGroups(text)),
       // the app opens its decks in the focus room in every layout (John, 2026-10-13: "SRS section very
       // clear and smooth with NO CLUTTER at all"): the clean card, the right half that turns it, every
       // reading on the back, one door forward from the close
@@ -27420,7 +27771,9 @@ function renderFocusSitting(focus, n = '03') {
     const b = el('button', 'focus-mode' + (S.focusMode === id ? ' on' : ''));
     b.type = 'button';
     b.setAttribute('aria-pressed', String(S.focusMode === id));
-    b.append(el('span', 'focus-mode-t', tx(ja, en)));
+    // Q · a mode's name is one word that must fit its narrow column whole (漢字だ｜け at 320): the word rule and its fit
+    const name = tx(ja, en);
+    b.append(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(name) ? setJaWords(el('span', 'focus-mode-t'), name) : el('span', 'focus-mode-t', name));
     b.append(el('span', 'focus-mode-sub', sub));
     b.addEventListener('click', () => {
       S.focusMode = id;
@@ -30509,16 +30862,69 @@ function _allSub(q) {
   }
   return seen;
 }
+/* Q · each part once, at its own level (Q/DESIGN.md §6; Grok's walk: 総 read 糸 + 忩 + 公, and 公 is 忩's own part; the
+ * inventory found 364 kanji showing a part beside its own part or twice in two forms, 月 + 肉 in 42 of them):
+ *  - a part the list names twice, as it is written and as its standalone form, is shown once, as written: the written
+ *    forms below, and 月 where the list also names 肉 (the 肉 of 胃 and 腕, which it writes as 月; partGloss gives it
+ *    its meaning, meat). This comes first, so the form written is never taken for a piece of the other;
+ *  - a part inside another part shown beside it goes (the data's own lists, _allSub);
+ *  - the kanji's strokes are the budget: the list names a part before its own parts, so walking it in order, a part that
+ *    would take the parts shown past the kanji's own stroke count is a piece of one already shown (総 14: 糸 6 + 忩 8,
+ *    and 公 4 would make 18). */
+const PART_WRITTEN = Object.fromEntries([...Object.entries(RADICAL_VARIANT).map(([v, s]) => [v, [s]]),
+  ['刂', ['刀']], ['攵', ['攴']], ['罒', ['网']], ['灬', ['火']], ['氺', ['水']], ['冫', ['氷', '水']], ['月', ['肉']]]);
+/** a part's strokes as it is written in a Japanese kanji, where the data has none or counts the older form (辶: 4 → 3) */
+const PART_STROKES = { 辶: 3, 亻: 2, 彳: 3, 氵: 3, 冫: 2, 扌: 3, 忄: 3, 犭: 3, 阝: 3, 艹: 3, 礻: 4, 衤: 5, 刂: 2, 灬: 4, 罒: 5, 攵: 4, '⺍': 3 };
 function mainParts(c) {
   const k = D.kanji[c];
   if (!k || !k.parts || !k.parts.length) return [];
-  const P = [...new Set(k.parts)];
+  const listed = [...new Set(k.parts)];
+  // a part named twice, as written and as its standalone form, is the written one (first, so neither is taken for a
+  // piece of the other)
+  const P = listed.filter((p) => p !== c && !listed.some((v) => v !== p && (PART_WRITTEN[v] || []).includes(p)));
   const subs = new Map(P.map((q) => [q, _allSub(q)]));
+  const st = P.map((p) => PART_STROKES[p] ?? _strokeOf(p));
+  // the parts that make the kanji exactly, stroke for stroke, none inside another: the fewest (its own level: 総 = 糸 +
+  // 忩, not 糸 + 公 + 心; 党 = 尚 + 儿), and of those the ones the list names first
+  if (k.st && P.length > 1 && P.length <= 12) {
+    let best = null;
+    for (let mask = 1; mask < 1 << P.length; mask += 1) {
+      const order = P.map((_, i) => i).filter((i) => mask & (1 << i));
+      if (order.length < 2 || (best && order.length > best.length)) continue;
+      if (order.some((i) => !st[i]) || order.reduce((sum, i) => sum + st[i], 0) !== k.st) continue;
+      if (order.some((i) => order.some((j) => j !== i && subs.get(P[j]).has(P[i])))) continue;
+      if (!best || order.length < best.length || order.join() < best.join()) best = order;
+    }
+    if (best) return best.map((i) => P[i]).slice(0, 3);
+  }
+  // no exact cover in the data: the top level by the lists alone, and the stroke budget (a part before its own parts:
+  // one that would take the parts shown past the kanji's strokes is a piece of one already shown)
   let keep = P.filter((p) => !P.some((q) => q !== p && subs.get(q).has(p)));
-  const present = new Set(keep);
-  keep = keep.filter((p) => ![...present].some((v) => RADICAL_VARIANT[v] === p));
   if (keep.length > 1) keep = keep.filter((p) => !GLUE_STROKE.has(p));
+  if (k.st) {
+    let strokes = 0;
+    keep = keep.filter((p) => {
+      if (strokes >= k.st) return false;
+      const n = PART_STROKES[p] ?? _strokeOf(p);
+      if (!n) return true;
+      if (strokes + n > k.st) return false;
+      strokes += n;
+      return true;
+    });
+  }
   return keep.slice(0, 3);
+}
+/** Q · a part's name in English: its plain meaning (月 standing for the 肉 the list also names, in 胃 and 腕, is meat),
+ * without the catalogue's words: the name before "Radical" ("Net Radical Variant (no. 122)" → net), before a note in
+ * brackets (the kanji table stops its meanings at 36 letters, mid-note: "Bud (plants, Mushrooms Not Yet Opene" → bud),
+ * the first sense. The word web names its kanji and parts by the same rule. */
+function partGloss(c, part) {
+  const flesh = part === '月' && (D.kanji?.[c]?.parts || []).includes('肉');
+  // a written form with no meaning of its own takes its standalone form's (亻 is person)
+  return partMeaning(D.kanji?.[flesh ? '肉' : part]?.m) || partMeaning(D.kanji?.[(PART_WRITTEN[part] || [])[0]]?.m);
+}
+function partMeaning(text) {
+  return String(text || '').split('(')[0].replace(/\s*\bradical\b.*$/iu, '').split(/[;,]/u)[0].replace(/\s{2,}/gu, ' ').trim().toLowerCase();
 }
 
 /** The label on a 部品 row. 729 of the 926 components in the KANJIDIC/漢検
@@ -34129,6 +34535,36 @@ function openSearchPage({ sourceContext = null } = {}) {
   }
 }
 
+/** Q · a strip of lenses shows whole lenses only (Q/DESIGN.md §2; Grok's walk: the word web's strip read "radica" cut at
+ * its edge). While the strip scrolls sideways (a phone), a lens not wholly inside it fades out whole (data-out), and the
+ * strip says where more wait (data-more: left, right): a quiet ‹ · › at that edge. A lens the keyboard reaches scrolls
+ * in whole and shows. Where every lens fits, nothing changes. */
+function wireLensStrip(strip) {
+  let frame = 0;
+  const sync = () => {
+    frame = 0;
+    if (!strip.isConnected) return;
+    const lenses = [...strip.querySelectorAll(':scope > .kdx-lens')];
+    const scrolls = strip.scrollWidth > strip.clientWidth + 1;
+    const box = strip.getBoundingClientRect();
+    const reserve = 22; // the ‹ › mark's own room
+    let left = false, right = false;
+    for (const lens of lenses) {
+      const r = lens.getBoundingClientRect();
+      const before = r.left < box.left + (strip.scrollLeft > 1 ? reserve : 0) - 0.5;
+      const after = r.right > box.right - (strip.scrollLeft + strip.clientWidth < strip.scrollWidth - 1 ? reserve : 0) + 0.5;
+      const out = scrolls && (before || after);
+      if (out && before) left = true;
+      if (out && after) right = true;
+      lens.toggleAttribute('data-out', out);
+    }
+    strip.dataset.more = [left && 'left', right && 'right'].filter(Boolean).join(' ');
+  };
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(sync); };
+  strip.addEventListener('scroll', schedule, { passive: true });
+  if (typeof ResizeObserver === 'function') new ResizeObserver(schedule).observe(strip);
+  schedule();
+}
 function renderSearchPage(main) {
   main.append(placesLayout() ? withEn(el('p', 'eyebrow', '辞書'), 'Dictionary') : withEn(el('p', 'eyebrow', '検索'), 'search', 'en-inline'));
   const wrap = el('div', 'search-page');
@@ -34220,6 +34656,7 @@ function renderSearchPage(main) {
     });
     lensRow.append(b);
   }
+  wireLensStrip(lensRow);
   const FINDER_LENSES = {
     parts: (host) => renderKdxParts(host),
     radical: (host) => renderKdxRadical(host),
@@ -35187,10 +35624,11 @@ function meBreakable(tag, cls, text) {
   for (const part of String(text).split(/(?<=[・、])/u)) node.append(el('span', 'me-nb', part));
   return node;
 }
-/** Where an unbegun goal's deck lives: Learn in the current layout, Review in the layout under test. */
+/** Where an unbegun goal's deck lives: Learn in the current layout, Review in the layout under test. Q · in the house voice
+ * (G-14; Grok's walk: "THE FIELDS DECK IS IN LEARN"): a plain sentence, never set in capitals (.is-sentence). */
 function fieldsDeckHome() {
-  return placesLayout() ? tx('まだ始めていない · 専門デッキは復習に', 'not begun · the fields deck is in Review')
-    : tx('まだ始めていない · 専門デッキは学ぶの部屋に', 'not begun · the fields deck is in Learn');
+  return placesLayout() ? tx('まだ始めていない。専門デッキは「復習」にある。', 'Not started yet. The fields deck is in Review.')
+    : tx('まだ始めていない。専門デッキは「学ぶ」にある。', 'Not started yet. The fields deck is in Learn.');
 }
 /** One horizon: its name (a field also carries his own gloss), the figure held, the ruled scale. */
 function meHorizonRow(h, { quiet = false } = {}) {
@@ -35216,13 +35654,13 @@ function meHorizonRow(h, { quiet = false } = {}) {
   const fill = el('i', 'me-hz-fill');
   fill.style.setProperty('--f', h.of && shown ? Math.min(1, h.n / h.of).toFixed(4) : '0');
   rule.append(fill);
-  const sub = el('p', 'me-hz-sub');
-  if (!h.begun) sub.textContent = {
-    saved: tx('まだ札がない · 読みながら言葉を集める', 'no cards yet · save words as you read'),
-    kanken: tx('集めた言葉の漢字が、ここに数えられる', 'counted from the kanji in your words'),
-    n1: placesLayout() ? tx('まだ始めていない · N1デッキは復習に', 'not begun · the N1 deck is in Review')
-      : tx('まだ始めていない · N1デッキは学ぶの部屋に', 'not begun · the N1 deck is in Learn'),
-  }[h.id] || fieldsDeckHome();
+  const sub = el('p', `me-hz-sub${h.begun ? '' : ' is-sentence'}`);
+  if (!h.begun) flowText(sub, {
+    saved: tx('まだ札がない。読みながら言葉を保存する。', 'No cards yet. Save words as you read.'),
+    kanken: tx('保存した言葉の漢字から数える。', 'Counted from the kanji in your saved words.'),
+    n1: placesLayout() ? tx('まだ始めていない。N1デッキは「復習」にある。', 'Not started yet. The N1 deck is in Review.')
+      : tx('まだ始めていない。N1デッキは「学ぶ」にある。', 'Not started yet. The N1 deck is in Learn.'),
+  }[h.id] || fieldsDeckHome());
   else if (h.counting) sub.textContent = tx('専門デッキの札を数えている…', 'counting your fields deck…');
   else {
     sub.append(el('span', '', h.measure));
@@ -35269,7 +35707,7 @@ function meHorizonsPart(decks) {
   const fields = rows.filter((h) => h.field);
   // until the fields deck is opened, the three fields say so once, not three times
   const unbegun = fields.length > 0 && fields.every((h) => !h.begun);
-  if (unbegun) sec.append(el('p', 'me-hz-sub me-hz-group-note', fieldsDeckHome()));
+  if (unbegun) sec.append(el('p', 'me-hz-sub me-hz-group-note is-sentence', fieldsDeckHome()));
   for (const h of fields) sec.append(meHorizonRow(h, { quiet: unbegun }));
   sec.append(el('h3', 'me-hz-group', tx('あなたの言葉', 'Your words')));
   for (const h of rows) if (h.id === 'kanken' || h.id === 'saved') sec.append(meHorizonRow(h));
@@ -35480,7 +35918,7 @@ function renderMe(main) {
     clauses.forEach((c, i) => dateline.append(...(i ? [' · ', c] : [c])));
   } else {
     dateline.classList.add('is-blank');
-    dateline.textContent = tx('最初の札か記事から、この帳が始まる。', 'Your book begins with your first card or article.');
+    flowText(dateline, tx('最初の札か記事から、この帳が始まる。', 'Your book begins with your first card or article.'));
   }
   head.append(dateline);
   const reading = meReadUnaided();
@@ -36079,6 +36517,7 @@ function render() {
   // in the layout under test Review is a station on the tab bar; the bookmark stands without it
   if (barDoors) chrome.append(trayBtn);
   if (!heroMode && !zenReview) root.append(chrome);
+  fitChromeKeep();
   enableTouchPress();
   buildPrimaryTabs(root);
   syncThemeColor();
@@ -36110,7 +36549,7 @@ function render() {
     // …and a page nobody is looking at is a room they have left: the galaxy is the
     // default entry, and its loop held the main thread even in a background tab
     // (PR #77 ef524842). The same public seam the view switch uses; nothing reaches in.
-    if (S.view === 'drift' && !S.stack.length && !document.hidden) window.__DRIFT__.show();
+    if (S.view === 'drift' && !S.stack.length && !document.hidden) { ensureSkyMargin(); window.__DRIFT__.show(); }
     else window.__DRIFT__.hide();
   }
 
@@ -36230,6 +36669,31 @@ function maintenanceContext() {
     frames: roughestThisWeek(5),
   };
 }
+/** Q · the sky keeps a margin (Q/DESIGN.md §5; Grok's walks: 印刷, 日, 出, 順, 人 cut by the glass). The sky's own engine
+ * fades a word out as it slides under the host's chrome ([data-drift-chrome]) instead of letting an edge cut it; four
+ * empty bands along the phone's edges are declared as that chrome, so every drifting word dissolves before it reaches
+ * the glass and stands whole inside the margin. They paint nothing and take no touch (corridor.css .sky-edge); the
+ * glyphs and the faint hub kanji the engine does not fade dissolve under the same margin's mask (corridor.css). */
+function ensureSkyMargin() {
+  if (document.querySelector('.sky-edge')) return;
+  for (const side of ['top', 'right', 'bottom', 'left']) {
+    const band = el('div', `sky-edge sky-edge-${side}`);
+    band.dataset.driftChrome = '';
+    band.setAttribute('aria-hidden', 'true');
+    document.body.append(band);
+  }
+}
+/** Q · the screen a report is about, in the learner's words: the room's own name, the story he is reading, the word or
+ * kanji whose page is open (never an internal id; the ids stay in the report's Details). */
+function maintenanceScreenName() {
+  try {
+    const story = S.view === 'reader' ? passage() : null;
+    const name = story ? null : ROOM_NAMES.rooms[S.view];
+    const detail = S.stack.at(-1);
+    return [story ? tx(`読み物「${story.title}」`, `the story ${story.title}`) : name ? tx(...name) : '',
+      detail?.id ? tx(`「${detail.id}」のページ`, `the page for ${detail.id}`) : ''].filter(Boolean).join(' · ');
+  } catch { return ''; }
+}
 let maintenanceReports = null;
 let deckPresentation = null;
 let olderStartToken = 0;
@@ -36305,9 +36769,10 @@ function renderReportRelaySettings() {
   section.append(el('h2', 'eyebrow', tx('不具合の報告', 'Bug reports')));
   let host;
   try { host = REPORT_RELAY_URL ? new URL(REPORT_RELAY_URL).host : ''; } catch { host = ''; }
+  // Q · in his words (the developer's GitHub and its prefilled page stay inside the report's own Details)
   const status = el('p', 'teacher-note', host
-    ? tx(`この端末の報告は GitHub に自動で送られる（${host}）。`, `Reports from this device go to GitHub automatically (${host}).`)
-    : tx('この端末は未設定。報告は入力済みの GitHub ページを開くので、そこで送信する。', 'Not set up on this device. A report opens a prefilled GitHub page for you to submit.'));
+    ? tx(`この端末の報告は、直す人に自動で届く（${host}）。`, `Reports from this device reach the app's makers automatically (${host}).`)
+    : tx('この端末では、報告を送ると開くページで、送信を仕上げる。', 'On this device, sending a report opens a page where you finish sending it.'));
   status.id = 'settings-reports-status';
   const form = el('form', 'listening-form settings-report-form'); form.id = 'settings-report-form';
   const field = listeningField(form, 'settings-report-link', tx('報告用リンクを貼り付ける', 'Paste your report setup link'));
@@ -36356,6 +36821,8 @@ function mountMaintenanceReports() {
     // picks up that label either way.
     github: { newIssueUrl: 'https://github.com/AmitabhainArunachala/Bunki-app/issues/new', label: 'kairo-report', version: APP_RELEASE.version },
     getContext: maintenanceContext,
+    // Q · the sheet names the screen in his words (the room, the story, the word open), its ids under Details
+    describeScreen: maintenanceScreenName,
     clockNotice: () => {
       try { const selected = currentAssessmentV2(); return selected?.attempt?.status === 'in-progress' && selected.attempt.mode === 'timed' ? 'The test clock continues while this report is open.' : ''; }
       catch { return ''; }

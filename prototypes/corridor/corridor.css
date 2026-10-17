@@ -1342,7 +1342,11 @@ button.tok::before {
  * it become the single word row, holding the column to [word, gloss]. */
 .tok.content > .tok-word {
   display: block;
-  white-space: nowrap;
+  /* Q · a word stays whole (keep-all), and a word wider than the whole line — a long name, バグワン・マハビール
+     スワミ・ジェイン at 320 — wraps after its ・ inside its own box instead of pushing the page sideways */
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .token-door {
@@ -7934,3 +7938,34 @@ main .browse-filters .chip.browse-filter.on {
   color: var(--ink-2);
 }
 
+
+/* ==========================================================================
+   Q · THE SKY KEEPS A MARGIN (Q/DESIGN.md §5; Grok's walks: 印刷, 日, 出, 順, 人 cut by the glass at every edge). The
+   word universe's words and glyphs (#sky) and its big quiet hub kanji and lights (#fx, a canvas) dissolve within a band
+   at each edge of the phone, so the glass cuts none of them: whole inside the margin, nothing at the edge itself. The top
+   band also clears the status bar and the island on the home-screen app. The ink washes (#ink) stay full bleed. The
+   placement and the scale of the sky stay the G6 slice's.
+   ========================================================================== */
+/* the bands the sky's engine reads as the host's chrome (corridor.js ensureSkyMargin): words fade out as they reach them.
+   They paint nothing and take no touch; outside the sky they are not shown at all */
+/* the bands are thin: the engine's own rim fade (its last ~70 px) still dims the field near the glass, and a wide band
+   dimmed edge words to nothing while they kept their Tab stop (the galaxy's first Tab landed on a word at 0.04) */
+.sky-edge { --sky-margin: 8px; position: fixed; z-index: 16; display: none; pointer-events: none; background: transparent; opacity: 1; }
+body[data-view='drift'] .sky-edge { display: block; }
+.sky-edge-top { top: 0; left: 0; right: 0; height: calc(var(--sky-margin, 24px) + env(safe-area-inset-top, 0px)); }
+.sky-edge-bottom { bottom: 0; left: 0; right: 0; height: calc(var(--sky-margin, 24px) + env(safe-area-inset-bottom, 0px)); }
+.sky-edge-left { top: 0; bottom: 0; left: 0; width: var(--sky-margin, 24px); }
+.sky-edge-right { top: 0; bottom: 0; right: 0; width: var(--sky-margin, 24px); }
+#drift-layer :is(#sky, #fx) {
+  --sky-edge: 24px;
+  --sky-top: calc(var(--sky-edge) + env(safe-area-inset-top, 0px));
+  --sky-foot: calc(var(--sky-edge) + env(safe-area-inset-bottom, 0px));
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, #000 var(--sky-edge), #000 calc(100% - var(--sky-edge)), transparent),
+    linear-gradient(to bottom, transparent, #000 var(--sky-top), #000 calc(100% - var(--sky-foot)), transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent, #000 var(--sky-edge), #000 calc(100% - var(--sky-edge)), transparent),
+    linear-gradient(to bottom, transparent, #000 var(--sky-top), #000 calc(100% - var(--sky-foot)), transparent);
+  mask-composite: intersect;
+}
