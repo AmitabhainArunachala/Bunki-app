@@ -278,6 +278,7 @@ body[data-furigana='2'] #drift-layer.active #sky > .glyph.hosted-constellation-g
 #drift-layer .scale-stars { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
 #drift-layer .scale-star { position: absolute; left: 0; top: 0; max-width: 210px; min-width: 44px; min-height: 44px; padding: 8px 14px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 13px; line-height: 1.5; text-align: center; cursor: pointer; pointer-events: auto; }
 #drift-layer .scale-star[hidden] { display: none; }
+#drift-layer .scale-star-number { white-space: nowrap; }
 #drift-layer .scale-star::before { content: '✦'; display: block; font-size: 22px; line-height: 1; }
 #drift-layer .scale-star-kept { color: var(--verm, #b34836); }
 #drift-layer .scale-star-kept::before { content: '・'; font-size: 30px; }

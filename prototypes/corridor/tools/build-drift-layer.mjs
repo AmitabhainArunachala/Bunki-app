@@ -1278,7 +1278,15 @@ function paintScaleStars(){
     const mount=(key,label,attrs,x,y,action)=>{
       next.add(key);let star=scaleStars.get(key);
       if(!star){star=document.createElement('button');star.type='button';star.className='scale-star';star.addEventListener('click',()=>star.scaleActivate?.());scaleStars.set(key,star);scaleLayer.append(star);}
-      star.textContent=label;star.setAttribute('aria-label',attrs.articleId?uiT('読み物の棚へ：','Article shelf: ')+label:uiT('残した言葉：','Kept word: ')+label);
+      star.textContent=label;
+      if(attrs.articleId){
+        star.replaceChildren();
+        for(const part of label.split(/([0-9０-９]+)/u)){
+          if(/^[0-9０-９]+$/u.test(part)){const number=document.createElement('span');number.className='scale-star-number';number.textContent=part;star.append(number);}
+          else star.append(document.createTextNode(part));
+        }
+      }
+      star.setAttribute('aria-label',attrs.articleId?uiT('読み物の棚へ：','Article shelf: ')+label:uiT('残した言葉：','Kept word: ')+label);
       if(attrs.articleId)star.dataset.articleId=attrs.articleId;else star.dataset.keptKey=attrs.keptKey;
       star.classList.toggle('scale-star-article',!!attrs.articleId);star.classList.toggle('scale-star-kept',!attrs.articleId);
       star.scaleActivate=action;star.scaleX=x;star.scaleY=y;
@@ -1355,6 +1363,7 @@ const cssOut = (css + `
 #drift-layer .scale-stars { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
 #drift-layer .scale-star { position: absolute; left: 0; top: 0; max-width: 210px; min-width: 44px; min-height: 44px; padding: 8px 14px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 13px; line-height: 1.5; text-align: center; cursor: pointer; pointer-events: auto; }
 #drift-layer .scale-star[hidden] { display: none; }
+#drift-layer .scale-star-number { white-space: nowrap; }
 #drift-layer .scale-star::before { content: '✦'; display: block; font-size: 22px; line-height: 1; }
 #drift-layer .scale-star-kept { color: var(--verm, #b34836); }
 #drift-layer .scale-star-kept::before { content: '・'; font-size: 30px; }
