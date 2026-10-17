@@ -21,7 +21,7 @@ function app() {
     window: { scrollY: 180, scrollTo(_x, y) { this.scrollY = y; } },
     document: { activeElement: null }, referenceLibrary: null,
     learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
-    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, readerWordMenu: null, personalHost: null,
+    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, sealStrip: null, readerLayers: null, personalHost: null,
     roomTransitionUpdating: false, activeRoomTransition: null,
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
     restoreDialogInvoker() {}, stopReadAloud() {}, clearTimeout() {},
@@ -31,7 +31,8 @@ function app() {
     stopSentenceListening() { throw drawingBoundary; },
   });
   vm.runInContext(actualFunction('syncSheetActionVisit'), context);
-  vm.runInContext(actualFunction('closeReaderWordMenu'), context);
+  // G5 (2026-10-18): a render puts away the hold's strip and the 層 layers, where it once closed the word menu
+  vm.runInContext(['closeSealStrip', 'foldReaderLayers'].map(actualFunction).join('\n'), context);
   vm.runInContext(actualFunction('render').replace('function render(', 'function renderUntilDOM('), context);
   context.render = () => {
     try { context.renderUntilDOM(); }
