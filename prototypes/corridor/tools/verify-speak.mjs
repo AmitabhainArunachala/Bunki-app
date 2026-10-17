@@ -1040,6 +1040,8 @@ const CASES = {
         others: [...document.querySelectorAll('.speak-shadow button:not(.save-one)')].map((b) => (b.textContent || '').trim()).filter((x) => /keep|残す|保存/iu.test(x)) }), lineSave);
       await page.locator(lineSave).click();
       await waitPage(page, (sel) => document.querySelector(sel)?.getAttribute('aria-pressed') === 'true', lineSave, 15000, 'S12 keep a line');
+      // the saved list is drawn again from the store after the keep (an IndexedDB read): its row comes a moment after Saved
+      await waitPage(page, () => document.querySelectorAll('.speak-saved .speak-row').length >= 1, null, 5000, 'S12 the kept line listed').catch(() => {});
       const after = await page.evaluate(() => ({ rows: document.querySelectorAll('.speak-saved .speak-row').length, menu: !!document.getElementById('speak-line-remove') }));
       check('a line is kept for 影 by the one Save ▾ alone: Saved once the store holds it, its menu open with Remove',
         before.pressed === 'false' && before.others.length === 0 && after.rows === 1 && after.menu, JSON.stringify({ before, after }));
