@@ -2882,6 +2882,10 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .seal-strip .seal-act[data-strip-action='remove'] { color: var(--color-ink-2); }
 .seal-strip-room { display: block; }
 
+/* G5 · the bookmark lands on the kept words: the newest kept word's row is marked a moment in the world's 朱 wash */
+.tray-line[data-landed] { animation: kept-landed 1800ms var(--ease-standard) both; }
+@keyframes kept-landed { 0%, 35% { background: var(--color-seal-wash); } 100% { background: transparent; } }
+
 
 .reader-toast {
   position: fixed;

@@ -14737,6 +14737,9 @@ function renderTray(main) {
   for (const sec of sections) {
     const label = sec.manual ? sec.name : monthLabel(sec.name);
     const head = el('p', 'eyebrow list-head');
+    // G5 · the bookmark lands here: the kept words begin at the first list (landOnKeptWords)
+    head.dataset.keptSection = sec.manual ? 'list' : 'month';
+    if (sec === sections[0]) head.id = 'kept-words';
     // the name is a door: every list, named or monthly, opens to its own
     // page with its rows, its review, and its export (operator, 2026-08-27)
     const openList = el('button', 'list-open');
@@ -14756,7 +14759,7 @@ function renderTray(main) {
     // the filtered deck, one tap wide: review only what today serves in this list
     const dueHere = scheduler ? todayQueue(new Date(), sec.items).order : [];
     if (dueHere.length && scheduler) {
-      const only = el('button', 'chip list-review', tx(`この組だけ復習 ${dueHere.length}`, `review these ${dueHere.length}`));
+      const only = el('button', 'chip list-review', tx(`このリストを復習 ${dueHere.length}`, `Review this list · ${dueHere.length}`));
       only.type = 'button';
       only.dataset.listReview = sec.name;
       only.addEventListener('click', () => startReview(sec.items));
@@ -15103,6 +15106,9 @@ function renderSavedLists(main) {
   for (const sec of sections) {
     const label = sec.manual ? sec.name : monthLabel(sec.name);
     const head = el('p', 'eyebrow list-head');
+    // G5 · the bookmark lands here: the kept words begin at the first list (landOnKeptWords)
+    head.dataset.keptSection = sec.manual ? 'list' : 'month';
+    if (sec === sections[0]) head.id = 'kept-words';
     // the name is a door: every list, named or monthly, opens to its own
     // page with its rows, its review, and its export (operator, 2026-08-27)
     const openList = el('button', 'list-open');
@@ -15122,7 +15128,7 @@ function renderSavedLists(main) {
     // the filtered deck, one tap wide: review only what today serves in this list
     const dueHere = scheduler ? todayQueue(new Date(), sec.items).order : [];
     if (dueHere.length && scheduler) {
-      const only = el('button', 'chip list-review', tx(`この組だけ復習 ${dueHere.length}`, `Review these ${dueHere.length}`));
+      const only = el('button', 'chip list-review', tx(`このリストを復習 ${dueHere.length}`, `Review this list · ${dueHere.length}`));
       only.type = 'button';
       only.dataset.listReview = sec.name;
       only.addEventListener('click', () => startReview(sec.items));
@@ -15250,12 +15256,33 @@ function renderSavedLists(main) {
  * door does — it stays a div (it CONTAINS the rest/start button; a button
  * inside a button is invalid nesting) and takes the role, the tab stop,
  * and Enter/Space instead. */
+/* G5 · the bookmark lands on the kept words (MASTER_SPEC §4 G: "the bookmark lands on the kept words, scrolled to them;
+ * browsing a list never starts a review — 'Review this list' is its own button"). Today opens at its kept words, not at
+ * the sky above them: the newest kept word's row in its month stands a third of the way down the glass under the bar,
+ * marked a moment, with the keyboard on it. A row opens its word's page; only "Review this list" starts a review. */
+function landOnKeptWords() {
+  if (S.view !== 'tray' || !S.taken.length) return;
+  const newest = S.taken.reduce((best, row) => (!best || (row.ts || 0) >= (best.ts || 0) ? row : best), null);
+  const key = newest ? srsKey(newest.t, newest.id) : '';
+  // a named list carries copies; the month buckets follow the lists, so the last row for the word is its month's
+  const row = [...document.querySelectorAll('#app main .tray-line[data-kept-key]')].filter((node) => node.dataset.keptKey === key).at(-1)
+    || document.getElementById('kept-words');
+  if (!row) return;
+  const ceiling = Math.max(0, document.querySelector('#app > .chrome')?.getBoundingClientRect().bottom || 0);
+  const box = row.getBoundingClientRect();
+  window.scrollTo({ top: Math.max(0, Math.round(window.scrollY + box.top - ceiling - (innerHeight - ceiling) * 0.3)), behavior: 'instant' });
+  if (!row.matches('.tray-line')) return;
+  row.dataset.landed = '';
+  setTimeout(() => { if (row.isConnected) delete row.dataset.landed; }, 2000);
+  row.focus({ preventScroll: true });
+}
 function trayLine(item, dueKeys) {
   const currentSurface = recordViewSurface();
   const line = el('div', 'tray-line');
   line.tabIndex = 0;
   line.setAttribute('role', 'button');
   const key = srsKey(item.t, item.id);
+  line.dataset.keptKey = key;
   line.append(el('span', 'w', item.label));
   // a words list wearing a [word] chip on every row was chip noise
   // (operator, 2026-08-20): the kind speaks only when it differs from
@@ -15413,7 +15440,7 @@ function renderListPage(main) {
   const ops = el('div', 'list-page-ops');
   const dueHere = scheduler ? todayQueue(new Date(), items).order : [];
   if (dueHere.length && scheduler) {
-    const only = el('button', 'chip list-review', tx(`この組だけ復習 ${dueHere.length}`, `review these ${dueHere.length}`));
+    const only = el('button', 'chip list-review', tx(`このリストを復習 ${dueHere.length}`, `Review this list · ${dueHere.length}`));
     only.type = 'button';
     only.addEventListener('click', () => startReview(items));
     ops.append(only);
@@ -36057,6 +36084,8 @@ function render() {
     // EVERY surface did not, so the tray opened at the previous surface's
     // offset — often past its own end (E3 round-A, dead-ends lens)
     window.scrollTo(0, 0);
+    // G5 · the bookmark is the kept words' door: it lands on them, once the room has laid itself out (the sky's band)
+    requestAnimationFrame(() => requestAnimationFrame(landOnKeptWords));
   }));
   // in the layout under test Review is a station on the tab bar; the bookmark stands without it
   if (barDoors) chrome.append(trayBtn);
