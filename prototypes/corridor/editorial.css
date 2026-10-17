@@ -1810,8 +1810,10 @@ body .article-about .note .inline-link:hover { color: var(--ai); text-decoration
    the page does not grow under the reader when the first word is chosen (the tip itself is inline) */
 body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
 :root body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 176px; }
-/* pending (no recording in the locked voice): the same mark, dimmed; its reason is its description, out of sight */
-.play-pending { display: none; }
+/* pending (no recording in the locked voice): the same mark, dimmed; its reason is its description, out of sight.
+   The reader's bar only: sentence practice has no mark, so there its reason is the one visible sign that the
+   recording is missing (V, 2026-10-17 — unscoped, this hid it too and left the listening section blank) */
+.listen-row .play-pending { display: none; }
 
 /* bug report: smaller on a phone (its one home is the tab slot — the ONE TOP BAR pass) */
 @media (max-width: 520px) {

@@ -14,7 +14,7 @@ corridor's rights discipline.
 | 四国めたん (N5–N3 words) | VOICEVOX ENGINE 0.24.1 | free incl. commercial — credit: VOICEVOX:四国めたん |
 | ずんだもん (N5–N3 words) | VOICEVOX ENGINE 0.24.1 | free incl. commercial — credit: VOICEVOX:ずんだもん |
 | 玄野武宏 (N5–N3 words) | VOICEVOX ENGINE 0.24.1 | free incl. commercial — credit: VOICEVOX:玄野武宏 |
-| Kore (article narration — `narration/kore/`, first clips 2026-10-15) | Google Gemini TTS · `gemini-3.8-flash-tts` via the Generative Language API, rendered by `tools/render-narration-gemini.mjs` | Gemini API Additional Terms of Service (https://ai.google.dev/gemini-api/terms): generated output belongs to the developer, no credit line required. Each narration is an adaptation of its article's text and carries that article's licence and attribution (see `data/articles/index.json`; `jawiki:5294446` is CC BY-SA 4.0). |
+| Kore (article narration — `narration/kore/`, first clips 2026-10-15) | Google Gemini TTS · `gemini-3.8-flash-tts` via the Generative Language API. The 2026-10-15 probe clips were rendered by `tools/render-narration-gemini.mjs` (retired 2026-10-17; in git history); every later clip by `tools/render-corpus.mjs`, the one governed render job (the voice lock, the admission gate, a digest-bound go-ahead) | Gemini API Additional Terms of Service (https://ai.google.dev/gemini-api/terms): generated output belongs to the developer, no credit line required. Each narration is an adaptation of its article's text and carries that article's licence and attribution (see `data/articles/index.json`; `jawiki:5294446` is CC BY-SA 4.0). |
 
 Format: AAC 32kbps mono 24kHz (`.m4a`). Every word clip passed a g2p
 reading gate against the dictionary reading before shipping; mismatched

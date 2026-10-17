@@ -59,6 +59,10 @@ const FAST = new Set([
   'source-processing-contract',
   'reading-position-contract',
   'browser-audio-silence-contract',
+  // V (2026-10-17): node-only, no browser, well under a second each
+  'voice-lock',
+  'approved-voice-contract',
+  'excerpt-narration-contract',
   'source-kanji-practice-contract',
   'later-encounters-contracts',
   'bundled-listening-catalog',

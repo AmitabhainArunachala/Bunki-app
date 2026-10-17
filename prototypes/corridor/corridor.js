@@ -8662,7 +8662,9 @@ function enhanceJapaneseProse(root) {
     if (quote.nextElementSibling?.classList.contains('excerpt-listen')) continue;
     const text = quote.textContent;
     const listen = el('button', 'chip excerpt-listen', excerptListenLabel()); listen.type = 'button';
-    listen.addEventListener('click', () => void playNarratedExcerpt(text, listen)); quote.after(listen);
+    // the quote carries its own source, so the clip that plays is this article's and no other
+    const owner = quote.dataset.sourceId || null;
+    listen.addEventListener('click', () => void playNarratedExcerpt(text, listen, owner)); quote.after(listen);
   }
 }
 
@@ -10879,23 +10881,67 @@ function glossaryCrossRefPlan(p) {
 const readAloud = { on: false, timer: null, failed: null, generation: 0, clip: 0, total: 0, rate: 1, barOpen: false };
 /* The narration voice is locked (operator, blind audition 2026-09-29): Google Gemini TTS Kore
  * reads, Charon is the second speaker. JVNV F1 was rated 1/5 and withdrawn; it never plays.
- * Narration ships as audio/article-narration.json ({ v: 1, voice, articles: { id: { clips } } })
- * and is fetched only when index.html raises __KAIRO_NARRATION__. Until the Kore clips exist the
+ * Narration ships as audio/article-narration.json v2 ({ v: 2, lock: { model }, articles: { id:
+ * { clips: [{ text, src, voice, speakerRole, model }] } } }) — each clip owns its voice and role —
+ * and is fetched only when index.html raises __KAIRO_NARRATION__. Until the locked clips exist the
  * flag stays down and the reader's play bar explains its pending state with nothing to play:
  * no picker, no stand-in voice. Its accessible description retains the locked voice provenance. */
-const NARRATION_VOICES = { kore: 'Kore', charon: 'Charon' };
+/* === VOICE_LOCK · generated from audio/voice-lock.json by tools/sync-voice-lock.mjs — do not hand-edit === */
+const VOICE_LOCK = {
+  "model": "gemini-3.8-flash-tts",
+  "voices": {
+    "kore": "Kore",
+    "charon": "Charon"
+  },
+  "main": "kore",
+  "second": "charon",
+  "roles": {
+    "narrator": "kore",
+    "word": "kore",
+    "example": "kore",
+    "speaker-b": "charon"
+  }
+};
+/* === end VOICE_LOCK === */
+/* The roster, the model and the role law all come from the lock above: one value, one place.
+ * `main` narrates and says every word and example; `second` is admissible only for a dialogue's
+ * speaker-b and is NEVER a fallback for a missing main-voice clip (role law, voice-lock.json). */
+const NARRATION_VOICES = VOICE_LOCK.voices;
+/** Which voice a surface may use. An unnamed surface is single-speaker, so it resolves to the
+ * main voice — never to the second one. */
+function voiceForRole(role) {
+  return (role && VOICE_LOCK.roles[role]) || VOICE_LOCK.main;
+}
 const LISTEN_RATES = [1, 1.25, 0.8];
 let articleNarration, articleNarrationWait;
 let excerptPlayback = 0, excerptControl = null;
 /** The shipped manifest may name only local clips belonging to its approved
  * voice. A renamed legacy manifest must not revive a withdrawn recording. */
+/** One clip's admission. Identity is per clip, never per manifest: its own voice, its own role,
+ * its own model. v1 carried ONE global voice, so a dialogue's second speaker was unreachable and
+ * no clip could state what it was. */
+function approvedNarrationClip(clip, article = null) {
+  if (!clip || typeof clip.text !== 'string' || !clip.text.trim() || typeof clip.src !== 'string') return false;
+  // v2 identity is stated, never defaulted: a clip that does not say its role and model is not one
+  const role = clip.speakerRole;
+  if (typeof role !== 'string' || clip.model !== VOICE_LOCK.model) return false;
+  if (!Object.hasOwn(NARRATION_VOICES, clip.voice)) return false;
+  // the role law at the point of load: a clip whose voice disagrees with its role is refused,
+  // which is what keeps the second speaker from reading prose
+  if (clip.voice !== voiceForRole(role)) return false;
+  // a second speaker exists only in a dialogue: prose cannot promote itself to one by its label
+  if (role !== 'narrator' && article?.kind !== 'dialogue') return false;
+  return new RegExp(`^audio/narration/${clip.voice}/[a-zA-Z0-9_-]+\\.(?:m4a|mp3|wav|ogg)$`, 'u').test(clip.src);
+}
+/** Narration manifest v2 only: { v:2, lock:{model}, articles:{ <id>:{ clips:[…] } } }. A v1
+ * manifest is legacy — readable, but it declares no approved clips. A manifest from any other
+ * model is refused outright: that is how an unauditioned voice would otherwise slip in. */
 function approvedNarrationManifest(value) {
-  if (value?.v !== 1 || !Object.hasOwn(NARRATION_VOICES, value.voice) ||
-      !value.articles || typeof value.articles !== 'object' || Array.isArray(value.articles)) return null;
-  const clipPath = new RegExp(`^audio/narration/${value.voice}/[a-zA-Z0-9_-]+\\.(?:m4a|mp3|wav|ogg)$`, 'u');
+  if (!value || typeof value !== 'object') return null;
+  if (value.v !== 2 || value.lock?.model !== VOICE_LOCK.model) return null;
+  if (!value.articles || typeof value.articles !== 'object' || Array.isArray(value.articles)) return null;
   for (const article of Object.values(value.articles)) {
-    if (!Array.isArray(article?.clips) || article.clips.some(clip =>
-      typeof clip?.text !== 'string' || !clip.text.trim() || typeof clip.src !== 'string' || !clipPath.test(clip.src))) return null;
+    if (!Array.isArray(article?.clips) || !article.clips.every((clip) => approvedNarrationClip(clip, article))) return null;
   }
   return value;
 }
@@ -10910,7 +10956,9 @@ function ensureArticleNarration() {
   return articleNarrationWait;
 }
 if (typeof window !== 'undefined') void ensureArticleNarration();
-const narrationVoiceName = () => NARRATION_VOICES[articleNarration?.voice] || '';
+/** The voice a narrated surface carries, named for the learner. It comes from the role law, not
+ * from a manifest-wide field: v2 has no global voice, because each clip owns its own. */
+const narrationVoiceName = (role = 'narrator') => NARRATION_VOICES[voiceForRole(role)] || '';
 const narrationClips = (p) => (p && articleNarration?.articles?.[p.id]?.clips) || [];
 
 function excerptListenLabel() {
@@ -10927,27 +10975,64 @@ function retireExcerptControl() {
   previous.textContent = excerptListenLabel();
   stopRecAudio();
 }
-
-async function playNarratedExcerpt(text, button) {
-  const original = excerptListenLabel();
-  if (button.classList.contains('is-speaking')) { excerptPlayback += 1; retireExcerptControl(); stopRecAudio(); button.classList.remove('is-speaking'); button.textContent = original; return; }
-  const generation = ++excerptPlayback;
+/** Cancel whatever excerpt is speaking: raise the generation so an in-flight clip's completion
+ * cannot repaint a control the learner has left, return that control to its idle label, and stop
+ * the sound. The generation bump lives HERE and not in retireExcerptControl, because a run that
+ * retires the previous control must still be able to take the next generation for itself. */
+function cancelExcerptPlayback() {
+  excerptPlayback += 1;
   retireExcerptControl();
+  stopRecAudio();
+}
+
+async function playNarratedExcerpt(text, button, sourceId = null) {
+  const original = excerptListenLabel();
+  if (button.classList.contains('is-speaking')) { cancelExcerptPlayback(); button.classList.remove('is-speaking'); button.textContent = original; return; }
+  // the handoff first, then this run's claim: taking the generation before cancelling would
+  // cancel this very run, and the quote would answer a tap with nothing at all
+  cancelExcerptPlayback();
+  const generation = ++excerptPlayback;
   const manifest = await ensureArticleNarration();
   if (generation !== excerptPlayback || !button.isConnected) return;
   const normalize = value => String(value || '').replace(/[\s「」『』“”"']/gu, '');
   const quote = normalize(text);
-  let clips = null;
-  for (const article of Object.values(manifest?.articles || {})) {
+  // A quote belongs to ITS OWN source. Before V this searched every article and took the first
+  // global substring hit, so a sentence that occurs in two articles played the other article's
+  // recording. The excerpt's own id decides; where the DOM cannot name it, a quote found in more
+  // than one article is refused rather than guessed.
+  const within = (article) => {
     const source = article.clips.map(clip => normalize(clip.text));
-    const joined = source.join(''); const at = joined.indexOf(quote);
-    if (at < 0 || !quote) continue;
+    const at = source.join('').indexOf(quote);
+    if (at < 0 || !quote) return null;
     let position = 0;
-    clips = article.clips.filter((clip,index) => { const begin = position; position += source[index].length; return position > at && begin < at + quote.length; });
-    break;
+    const run = article.clips.filter((clip, index) => {
+      const begin = position; position += source[index].length;
+      return position > at && begin < at + quote.length;
+    });
+    return run.length ? run : null;
+  };
+  // A known source fails closed: when the quote names its article and that article is not
+  // narrated, nothing plays — another article holding the same words is not this quote's voice.
+  // Only a quote with no source at all may be matched across the shelf, and only uniquely.
+  const own = sourceId ? manifest?.articles?.[sourceId] : null;
+  let clips = null, ambiguous = false;
+  if (sourceId) clips = own ? within(own) : null;
+  else {
+    for (const article of Object.values(manifest?.articles || {})) {
+      const run = within(article);
+      if (!run) continue;
+      if (clips) { ambiguous = true; break; }
+      clips = run;
+    }
   }
+  if (ambiguous) {
+    button.dataset.excerptUnresolved = 'ambiguous';
+    button.textContent = tx('この引用はどの記事のものか決められません', 'This excerpt matches more than one article');
+    return;
+  }
+  delete button.dataset.excerptUnresolved;
   if (!clips?.length) { button.textContent = tx('この引用の収録音声はありません', 'No recording for this excerpt'); return; }
-  stopReadAloud();
+  stopPassageRead();   // the reader's read yields to the quote; the excerpt lane is already clear
   excerptControl = button;
   button.classList.add('is-speaking'); button.textContent = tx(`止める · ${narrationVoiceName()}`, `Stop · ${narrationVoiceName()}`);
   let failed = false;
@@ -10971,7 +11056,17 @@ async function playNarratedExcerpt(text, button) {
 }
 
 
+/** ONE PLAYBACK OWNER (V): an excerpt is this room's audio too. Before V, leaving the passage,
+ * the view or pressing Back stopped the read but left the excerpt's control reading "Stop ·"
+ * for ever, and a late finish could repaint a button the learner had already left. Every caller
+ * of stopReadAloud — openPassage, Back, the view change in render — now ends both voices. */
 function stopReadAloud() {
+  cancelExcerptPlayback();
+  stopPassageRead();
+}
+/** Stop the passage read and nothing else. The quote is the room's other voice and it is
+ * retired on its own, so a quote can take over from a read without cancelling itself. */
+function stopPassageRead() {
   if (!readAloud.on) return;
   readAloud.on = false;
   readAloud.generation += 1;
@@ -10996,7 +11091,7 @@ function speakPassage(p, onDone) {
       const played = await playRecClip(clips[i].src, null, { rate: readAloud.rate, onTime: paintListenProgress });
       // null is an intentional stop (the engine's contract), false a failure
       if (!current() || played === null) return;
-      if (played === false) { readAloud.failed = { pid: p.id, voice: articleNarration?.voice }; break; }
+      if (played === false) { readAloud.failed = { pid: p.id, voice: clips[i].voice || voiceForRole('narrator') }; break; }
     }
     if (current()) {
       if (!readAloud.failed) readAloud.clip = 0;
@@ -11022,22 +11117,15 @@ function paintListenProgress(fraction = 0) {
  * to play. The old device preference is left intact; the learner record never
  * changes here. Without an approved clip the answer card explains its absence
  * and stays silent. Licences ride audio/LICENCES.md. */
-const REC_VOICE_KEY = 'kairo-rec-voice-v1';
-const REC_ROSTER = Object.keys(NARRATION_VOICES);
+/* V (2026-10-17): the voice a surface plays is decided by its CONTENT ROLE. The chooser is gone,
+ * roster, preference reader and all — a half-removed chooser is how a stale `kairo-rec-voice-v1`
+ * of 'charon', or of a withdrawn interim voice, could make the second speaker read every word.
+ * The stored key is never read and never written: an old value simply sits there, inert, so an
+ * export of the learner's record still round-trips byte for byte. `voiceForRole` is the one
+ * answer to "which voice", for the card and the reader alike. */
 let recManifest; // undefined = not asked · null = absent · object = loaded
 let recManifestWait = null;
 let recAudioEl = null;
-
-let sessionVoicePref = null; // the explicit choice for this session when storage cannot keep it
-function recVoicePref() {
-  if (REC_ROSTER.includes(sessionVoicePref)) return sessionVoicePref;
-  try {
-    const v = localStorage.getItem(REC_VOICE_KEY);
-    return REC_ROSTER.includes(v) ? v : 'kore';
-  } catch {
-    return 'kore';
-  }
-}
 
 function ensureRecManifest() {
   // the flag is stamped into index.html by the audio ship itself: a build
@@ -11053,7 +11141,10 @@ function ensureRecManifest() {
       .then((r) => (r.ok ? r.json() : null))
       .catch(() => null)
       .then((m) => {
-        recManifest = m && m.v ? m : null;
+        // Manifest v2 or nothing. A v1 manifest is READABLE but carries no approved clips: its
+        // words are keyed by spelling alone and its clips predate the lock, so admitting one
+        // would speak a homograph's wrong reading (年 とし over a sentence that reads ねん).
+        recManifest = approvedWordManifest(m);
         // the reader may have drawn while this was loading ('Checking…'): repaint its listen row
         // once, never mid-read and never under an open sheet
         // …by swapping only that row: focused tokens and glossary entries elsewhere are never
@@ -11081,6 +11172,10 @@ if (typeof window !== 'undefined') ensureRecManifest();
  * could not play, and null when it was stopped (a replay, another clip, or 止める). */
 function playRecClip(src, btn, { rate = 1, onTime = null } = {}) {
   return new Promise((done) => {
+    // ONE PLAYBACK OWNER (V): the sentence-listening lane plays through its own element, so a word,
+    // a read or a quote taking the room must end it too. (typeof: the voice suites run this file
+    // in slices, where that lane is not loaded.)
+    if (typeof stopSentenceListening === 'function') stopSentenceListening();
     stopRecAudio();
     const a = new Audio(src);
     recAudioEl = a;
@@ -11107,6 +11202,40 @@ function playRecClip(src, btn, { rate = 1, onTime = null } = {}) {
   });
 }
 
+/** Manifest v2 only: { v:2, lock:{model}, words:{ "<surface>|<reading>": {...} } }. A v1 manifest
+ * is legacy — readable, but it declares no approved clips, because its keys are spellings and a
+ * spelling cannot choose between 年 ねん and 年 とし. A manifest whose lock names another model is
+ * refused outright: that is how an unauditioned voice would otherwise slip in. */
+function approvedWordManifest(m) {
+  if (!m || typeof m !== 'object') return null;
+  if (m.v !== 2) return { v: 1, legacy: true, words: {} };
+  if (m.lock?.model !== VOICE_LOCK.model) return { v: 1, legacy: true, words: {} };
+  return m && m.words && typeof m.words === 'object' ? m : { v: 1, legacy: true, words: {} };
+}
+/** The word-clip key. Identity is the surface AND the reading the learner was shown — the same
+ * identity R persists as cueReading/entrySeq. A spelling alone is never a key. */
+function wordClipKey(surface, reading) {
+  return surface && reading ? `${surface}|${reading}` : null;
+}
+/** The one admissible clip for a (surface, reading) on a single-speaker surface. Returns null
+ * rather than guessing: no spelling-only match, no other reading, no other voice, no other
+ * model. `entrySeq`, when the card knows which dictionary entry it is showing, must agree too. */
+function wordClipFor(m, surface, reading, role = 'word', entrySeq = null) {
+  const key = wordClipKey(surface, reading);
+  if (!m || m.legacy || !key) return null;
+  const entry = m.words?.[key];
+  if (!entry || typeof entry.src !== 'string') return null;
+  const wanted = voiceForRole(role);
+  // the role law, enforced at the point of play: the second voice is not a fallback
+  if (entry.voice !== wanted) return null;
+  // identity is stated, never defaulted: the clip names the very role it is asked for, and the
+  // locked model; a clip with no role or no model is not an approved clip
+  if (entry.speakerRole !== role || entry.model !== VOICE_LOCK.model) return null;
+  // the clip must live in its own voice's folder: a path is a claim and it is checked
+  if (!new RegExp(`^audio/w/${entry.voice}/[a-zA-Z0-9_-]+\\.(?:m4a|mp3|wav|ogg)$`, 'u').test(entry.src)) return null;
+  if (entrySeq && entry.entrySeq && String(entry.entrySeq) !== String(entrySeq)) return null;
+  return entry;
+}
 /** 音 — the answer card's voice door. The recorded clip in the approved voice, when
  * the word has one; otherwise a visible reason and silence. One tap speaks; a retap restarts. */
 let cardAudioSerial = 0, cardFaceKey = '';
@@ -11123,36 +11252,35 @@ function speakCardReading(text, btn, word) {
   // the clip belongs to the card face that asked: a grade, undo, reveal change or leave before
   // the manifest answers retires it, and a playing clip stops when the face changes
   const serial = ++cardAudioSerial;
+  const say = (reason, flag) => {
+    if (!btn) return;
+    btn.dataset.voiceUnavailable = flag;
+    btn.title = reason;
+    const note = btn.parentElement?.querySelector('.say-note');
+    if (note) note.textContent = reason;
+  };
   ensureRecManifest().then((m) => {
     if (serial !== cardAudioSerial) return;
-    const entry = m && word && m.words ? m.words[word] : null;
-    const pref = recVoicePref();
-    if (entry && pref && entry.voices.includes(pref)) {
+    // `text` is the reading the card is showing. It is the key, not decoration.
+    const entry = wordClipFor(m, word, text, 'word');
+    if (entry) {
       if (btn) {
         btn.title = '';
         delete btn.dataset.voiceUnavailable;
         const note = btn.parentElement?.querySelector('.say-note');
         if (note) note.textContent = '';
       }
-      playRecClip(`audio/w/${pref}/${entry.id}.m4a`, btn).then((played) => {
+      playRecClip(entry.src, btn).then((played) => {
         if (serial !== cardAudioSerial || played !== false || !btn) return;
-        const reason = tx('この環境では再生できませんでした', 'This recording could not play here');
-        btn.title = reason;
-        const note = btn.parentElement?.querySelector('.say-note');
-        if (note) note.textContent = reason;
+        say(tx('この環境では再生できませんでした', 'This recording could not play here'), 'play-failed');
       });
       return;
     }
-    // no recording in the approved voice yet: say so where it can be seen, never fall back to the device voice
-    const voice = NARRATION_VOICES[pref];
-    const reason = !m ? tx('この版には収録音声がありません', 'This build has no recorded voices')
-      : tx(`${voice} の収録音声はありません`, `No ${voice} recording`);
-    if (btn) {
-      btn.dataset.voiceUnavailable = !m ? 'no-recordings' : 'not-recorded';
-      btn.title = reason;
-      const note = btn.parentElement?.querySelector('.say-note');
-      if (note) note.textContent = reason;
-    }
+    // Nothing admissible: say so where it can be seen. Never the device voice, never the second
+    // speaker, never this word's other reading.
+    const voice = NARRATION_VOICES[voiceForRole('word')];
+    if (!m || m.legacy) say(tx('この版には収録音声がありません', 'This build has no recorded voices'), 'no-recordings');
+    else say(tx(`${voice} の収録音声はありません（準備中）`, `No ${voice} recording yet — on its way`), 'not-recorded');
   });
 }
 
@@ -11192,8 +11320,10 @@ function voicePendingNote(id) {
   pending.id = id;
   // a status label, like a button's: not prose, so no lookup doors (they were three Tab stops)
   pending.dataset.japaneseLookup = 'off';
-  pending.setAttribute('aria-description', tx('音声は Kore、第二話者は Charon に固定されています。',
-    'Approved voices: Kore (main), Charon (second).'));
+  // the two names come from the lock, never from a literal: one value decides what this says
+  const mainName = NARRATION_VOICES[VOICE_LOCK.main], secondName = NARRATION_VOICES[VOICE_LOCK.second];
+  pending.setAttribute('aria-description', tx(`音声は ${mainName}、第二話者は ${secondName} に固定されています。`,
+    `Approved voices: ${mainName} (main), ${secondName} (second).`));
   const sentence = id === 'sentence-listening-pending';
   pending.append(uiIcon('speaker'), el('span', 'l-ja', sentence
     ? tx('この文の収録音声はありません', 'No recording for this sentence')
@@ -22032,7 +22162,13 @@ function ensureSentenceListeningCatalog() {
     });
   return sentenceListeningCatalogWait;
 }
+/* A listening cue plays only as the lock allows (V, 2026-10-17): a roster voice, and exactly the
+ * voice its own role resolves to (a sentence is single-speaker, so the second voice is never its
+ * fallback), from the locked model, from that voice's own folder. A roster check alone admitted a
+ * second-voice cue on a single-speaker sentence, and a cue from any model. */
 const approvedSentenceCue = cue => !!cue && Object.hasOwn(NARRATION_VOICES, cue.voice) &&
+  typeof cue.speakerRole === 'string' && cue.speakerRole !== 'speaker-b' &&
+  cue.voice === voiceForRole(cue.speakerRole) && cue.model === VOICE_LOCK.model &&
   typeof cue.path === 'string' && cue.path.startsWith(`audio/s/${cue.voice}/`);
 function currentSentenceListeningCue(context) {
   const cue = sentencePracticeModule.selectBundledListeningCue(context,
@@ -22489,7 +22625,10 @@ function renderKanjiReadingPractice(main, context, state, entry) {
   main.append(el('p', 'eyebrow', tx('出会った文から', 'From a sentence I met')),
     heading,
     el('p', 'teacher-source-credit', context.title));
-  const quote = el('blockquote', 'sentence-original', context.quote); quote.lang = 'ja'; main.append(quote);
+  // the quote names its own source so its Listen plays this article's clips and no other's
+  const quote = el('blockquote', 'sentence-original', context.quote); quote.lang = 'ja';
+  if (context.sourceId) quote.dataset.sourceId = context.sourceId;
+  main.append(quote);
   const selected = el('p', 'sentence-production-prompt', tx(`「${cue.token.s}」の読みを練習する。`, `Practice the reading of 「${cue.token.s}」.`));
   selected.lang = 'ja'; main.append(selected,
     el('p', 'teacher-note', tx('文中の語全体の読みと照合します。',
@@ -22555,7 +22694,9 @@ function renderSentencePractice(main) {
   main.append(el('p', 'eyebrow', tx('出会った文から', 'From a sentence I met')),
     el('h1', 'view-title', entry ? tx('この文を使ってみる', 'Make this sentence useful') : tx('この文をどう練習する？', 'How would you like to practice?')),
     el('p', 'teacher-source-credit', context.title));
-  const quote = el('blockquote', 'sentence-original', context.quote); quote.lang = 'ja'; main.append(quote);
+  const quote = el('blockquote', 'sentence-original', context.quote); quote.lang = 'ja';
+  if (context.sourceId) quote.dataset.sourceId = context.sourceId;
+  main.append(quote);
   const start = entry?.plan.origin.start ?? state.start, end = entry?.plan.origin.end ?? state.end;
   const selected = context.quote.slice(start, end);
   const preview = el('p', 'sentence-cloze-preview'); preview.lang = 'ja';
@@ -22757,6 +22898,9 @@ function renderSentenceListening(main, entry, state) {
   play.addEventListener('click', async () => {
     if (run.pending || !current()) return;
     if (sentenceListeningOwner) { stopSentenceListening(); return; }
+    // ONE PLAYBACK OWNER (V): the quote above this transcript, a passage read and a card clip all
+    // yield before the sentence speaks, so two voices never share the room
+    stopReadAloud(); stopRecAudio();
     const owner = { controller: new AbortController(), audio: null, url: null, completed: false, failed: false };
     sentenceListeningOwner = owner;
     const active = () => current() && sentenceListeningOwner === owner;
@@ -22801,6 +22945,7 @@ function renderSentenceListening(main, entry, state) {
   const actions = el('div', 'teacher-actions'); actions.append(play, reveal); surface.append(actions, audioStatus);
   if (run.revealed) {
     const quote = el('blockquote', 'sentence-original', entry.context.quote); quote.id = 'sentence-listening-transcript'; quote.lang = 'ja';
+    if (entry.context.sourceId) quote.dataset.sourceId = entry.context.sourceId;
     surface.append(quote, el('p', 'teacher-note', tx('この回答の下書きを書く間に本文を開いた。回答と一緒に残す。',
       'The transcript was opened while drafting this response. This will be kept with your saved response.')));
   }
@@ -24487,7 +24632,9 @@ function renderReview(main) {
       const say = el('button', 'say');
       say.type = 'button';
       say.id = 'card-say';
-      say.setAttribute('aria-label', tx('読み上げ — Kore・Charon の収録音声', 'speak the reading (Kore or Charon recording)'));
+      // the card's voice door names the locked voice, from the lock: a swap renames it everywhere
+      const sayVoice = NARRATION_VOICES[voiceForRole('word')];
+      say.setAttribute('aria-label', tx(`読み上げ — ${sayVoice} の収録音声`, `speak the reading (${sayVoice} recording)`));
       say.innerHTML =
         '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.25"/><text x="12" y="12.8" text-anchor="middle" dominant-baseline="central" font-size="11" fill="currentColor" font-family="Noto Serif JP, serif">音</text></svg>';
       say.addEventListener('click', () => speakCardReading(spoken, say, item.label));

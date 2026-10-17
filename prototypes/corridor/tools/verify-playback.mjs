@@ -16,9 +16,11 @@
  *   stale-clip restart         → speakPassage's `current` drops its generation (`() => readAloud.on`):
  *                                the stopped read's late onended asks for a third clip
  *   passage switch             → delete openPassage's `stopReadAloud();`: the clip keeps playing
- *   withdrawn manifest         → drop `!Object.hasOwn(NARRATION_VOICES, value.voice) ||` from
- *                                approvedNarrationManifest: an F1 manifest opens the bar
- *   interim card voice         → recVoicePref returns any stored value: a stored アミ plays her clip
+ *   withdrawn manifest         → drop `if (!Object.hasOwn(NARRATION_VOICES, clip.voice)) return false;`
+ *                                from approvedNarrationClip: an F1 manifest opens the bar
+ *   interim card voice         → drop `if (entry.voice !== wanted) return null;` from wordClipFor:
+ *                                a clip in a withdrawn voice plays (see also
+ *                                tools/adjudicate-voice-mutants.mjs, which runs this family)
  *   pending grade/undo/leave   → delete `if (serial !== cardAudioSerial) return;` in speakCardReading
  *   playing grade / leave      → delete `if (!readAloud.on) stopRecAudio();` in retireCardAudioOnFaceChange
  *   late page error            → throw an uncaught error from the page during the final observation:
@@ -28,16 +30,24 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { chromium, webkit } from 'playwright-core';
 // verify-corridor.mjs resolves the site when it loads, so it is imported inside the receipt's try
 let CORRIDOR_DIR = null, startCorridorServer;
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
+import { runtimeLock } from './voice-lock.mjs';
 
 const out = resolve(process.env.KAIRO_EVIDENCE_DIR || resolve(homedir(), '.dharma/bunki_audit/playback'));
 mkdirSync(out, { recursive: true });
 const filter = process.argv.find((arg) => arg.startsWith('--case='))?.slice(7);
 // server and browser start inside the receipt's try below, so a launch failure still writes JSON
-let server = null, base = null, browser = null;
+let server = null, base = null, browser = null, browserVersion = null;
+/* V (2026-10-17): the engine is the one KAIRO_BROWSER names, and the receipt records the exact
+ * build that ran. A verifier that silently picks its own engine cannot be read as evidence for
+ * the engine the operator asked for. This file drives one engine per process; `all` therefore
+ * runs the default here and is recorded as such, never claimed as two. */
+const LAUNCHERS = { chromium, webkit };
+const REQUESTED = process.env.KAIRO_BROWSER || '(unset)';
+const ENGINE = LAUNCHERS[process.env.KAIRO_BROWSER] ? process.env.KAIRO_BROWSER : 'chromium';
 const results = [];
 // N (2026-10-17) rewrites the fixture pin "yasashii:7 and yasashii:6 stand on the shelf, one a glossary-ref door from the
 // other": the ten glossary definitions left the shelf through the cull queue. The two passages are now a shelf story and
@@ -47,18 +57,37 @@ const FIRST = 'govonline:article-202609-radio-3741';
 const OTHER = `adapt-n3:${FIRST}`;
 const clipName = (passage, i) => `${passage.replaceAll(':', '_')}-${String(i).padStart(3, '0')}.m4a`;
 const clipAt = (passage, i) => new RegExp(`${clipName(passage, i).replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')}$`, 'u');
-// synthetic Kore narration: FIRST has three clips, so a stop at the second is visible as a third never asked for
+// V (2026-10-17): the fixtures speak manifest v2, because the runtime now reads v2 only. Every
+// clip carries its own voice, role and model, and a word is keyed by (surface, reading) — a
+// spelling cannot choose between 年 ねん and 年 とし. The model and the roster come from the lock,
+// so swapping the voice does not leave this gate asserting a name nobody ships.
+const LOCK = runtimeLock();
+const MAIN = LOCK.main;
+const lockBlock = { model: LOCK.model, main: LOCK.main, second: LOCK.second };
+// synthetic narration in the locked voice: FIRST has three clips, so a stop at the second is
+// visible as a third never asked for
 const kore = (passage, n) => Array.from({ length: n }, (_, i) =>
-  ({ text: `${passage} sentence ${i + 1}`, src: `audio/narration/kore/${clipName(passage, i)}` }));
-const narration = { v: 1, voice: 'kore', articles: { [FIRST]: { clips: kore(FIRST, 3) }, [OTHER]: { clips: kore(OTHER, 2) } } };
+  ({ text: `${passage} sentence ${i + 1}`, src: `audio/narration/${MAIN}/${clipName(passage, i)}`,
+    voice: MAIN, speakerRole: 'narrator', model: LOCK.model }));
+const narration = { v: 2, lock: lockBlock, articles: { [FIRST]: { clips: kore(FIRST, 3) }, [OTHER]: { clips: kore(OTHER, 2) } } };
 // FIRST absent from a manifest that exists: the article is simply not narrated yet
-const partialNarration = { v: 1, voice: 'kore', articles: { [OTHER]: { clips: kore(OTHER, 2) } } };
+const partialNarration = { v: 2, lock: lockBlock, articles: { [OTHER]: { clips: kore(OTHER, 2) } } };
 // the withdrawn F1 voice, shaped exactly like an approved manifest: it must never open the bar
-const withdrawnNarration = { v: 1, voice: 'f1', articles: { [FIRST]: { clips: kore(FIRST, 3)
-  .map((clip) => ({ ...clip, src: clip.src.replace('/kore/', '/f1/') })) } } };
-// two answer cards whose words are recorded in the approved voice (ids from the shipped manifest)
-const CARD_WORDS = [['会う', 'f4c916752a'], ['青', '1ca69c4be0']];
-const cardManifest = (voices) => ({ v: 1, words: Object.fromEntries(CARD_WORDS.map(([word, id]) => [word, { id, voices }])), sentences: {} });
+const withdrawnNarration = { v: 2, lock: lockBlock, articles: { [FIRST]: { clips: kore(FIRST, 3)
+  .map((clip) => ({ ...clip, voice: 'f1', src: clip.src.replace(`/${MAIN}/`, '/f1/') })) } } };
+// two answer cards whose words are recorded in the approved voice. The readings come from the
+// shipped word data, never from a guess: the card's 音 is handed the reading it is showing.
+const WORD_DATA = JSON.parse(readFileSync(new URL('../data/share_alike/words.json', import.meta.url), 'utf8')).words;
+// [surface, reading, clip id]. The reading comes from the shipped word data, never a guess:
+// the card's 音 is handed the reading it is showing, and that reading is half of the key.
+const CARD_WORDS = [['会う', 'f4c916752a'], ['青', '1ca69c4be0']]
+  .map(([surface, id]) => [surface, WORD_DATA[surface].r, id]);
+const cardManifest = (voice) => ({
+  v: 2, lock: lockBlock, sentences: {},
+  words: Object.fromEntries(CARD_WORDS.map(([surface, reading, id]) => [`${surface}|${reading}`,
+    { surface, reading, voice, speakerRole: 'word', model: LOCK.model,
+      src: `audio/w/${voice}/${id}.m4a` }])),
+});
 const MODES = {
   // the build as it ships: no narration flag, the shipped word manifest
   quiet: {},
@@ -67,12 +96,14 @@ const MODES = {
   'narration-delayed-fail': { narration: 404, hold: true },
   'narration-partial': { narration: partialNarration },
   'narration-withdrawn': { narration: withdrawnNarration },
-  card: { words: cardManifest(['kore']) },
-  'card-held': { words: cardManifest(['kore']), hold: true },
-  // a legacy stored voice that is no longer on the roster: it reads as Kore
-  'card-invalid': { words: cardManifest(['kore']), pref: 'bogus' },
-  // interim voices only, and a stored interim choice: nothing plays
-  'card-interim': { words: cardManifest(['ami', 'zundamon']), pref: 'ami' },
+  card: { words: cardManifest(MAIN) },
+  'card-held': { words: cardManifest(MAIN), hold: true },
+  // a legacy stored voice that is no longer an authority at all: the clip still plays, in the
+  // locked voice, because the content role decides and the stored value decides nothing
+  'card-invalid': { words: cardManifest(MAIN), pref: 'bogus' },
+  // an interim voice only: nothing plays, and the card says why — never the second speaker,
+  // never the device
+  'card-interim': { words: cardManifest('ami'), pref: 'ami' },
 };
 const NARRATION_PATH = '/audio/article-narration.json';
 
@@ -108,7 +139,8 @@ async function fixture(mode) {
       }
       return route.continue();
     });
-    // the test, not index.html, raises the narration flag: the shipped build keeps it down
+    // index.html raises the narration flag since the 10-15 Kore probe; the test raises it too, so a
+    // narration case never depends on the shipped page for the flag it is testing
     if (spec.narration) await context.addInitScript(() => { window.__KAIRO_NARRATION__ = 1; });
     if (spec.pref) {
       await context.addInitScript((value) => {
@@ -178,6 +210,11 @@ async function fixture(mode) {
     if (spec.words) {
       await page.locator('#tray').click();
       await page.locator('#review-start').click();
+      // the sealed front (V): before the answer is revealed there is no voice door and nothing has
+      // played — 声 can only ever speak a revealed card
+      await page.waitForSelector('#reveal');
+      assert.equal(await page.locator('#card-say').count(), 0, 'the sealed front has no voice door');
+      assert.equal(await page.evaluate(() => window.__playbackFixture.clips.length), 0, 'nothing plays before the reveal');
       await page.locator('#reveal').click();
       await page.waitForSelector('#card-say', { timeout: 10000 });
     } else {
@@ -255,7 +292,7 @@ async function freshTapPlays(page) {
   await page.evaluate(() => new Promise((done) => setTimeout(done, 100)));
   const state = await cardState(page);
   assert.equal(state.clips.length, 1, 'exactly one clip: the fresh tap, never the retired one');
-  assert.match(state.clips[0].src, new RegExp(`^audio/w/kore/(${CARD_WORDS.map(([, id]) => id).join('|')})\\.m4a$`),
+  assert.match(state.clips[0].src, new RegExp(`^audio/w/${MAIN}/(${CARD_WORDS.map(([, , id]) => id).join('|')})\\.m4a$`),
     'the fresh tap plays a seeded word in the approved voice');
 }
 const cardState = (page) => page.evaluate(() => ({
@@ -310,7 +347,10 @@ async function check(name, mode, body, { learnerRecord = 'untouched' } = {}) {
 try {
   ({ CORRIDOR_DIR, startCorridorServer } = await import('./verify-corridor.mjs'));
   ({ server, base } = await startCorridorServer());
-  browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+  browser = await LAUNCHERS[ENGINE].launch(ENGINE === 'chromium'
+    ? { executablePath: process.env.CHROMIUM_PATH || undefined } : {});
+  browserVersion = browser.version();
+  console.log(`engine ${ENGINE} ${browserVersion} (KAIRO_BROWSER=${REQUESTED})`);
 
   // --- the shipped state: no narration flag, no approved clip ---
   await check('the-shipped-play-bar-is-a-quiet-pending-line-and-silent', 'quiet', async (f) => {
@@ -328,7 +368,12 @@ try {
     const after = await counts(page);
     assert.equal(after.clips.length, 0, 'nothing plays');
     assert.equal((await markState(page)).open, 'false', 'the dimmed mark opens nothing');
-    assert.equal(f.narrationAsked, 0, 'a build without the flag never asks for narration');
+    // V (2026-10-17): narration HAS shipped — one article, six real clips in the locked voice —
+    // so index.html raises the flag and the build asks once. Before V this asserted zero, which
+    // was true only while nothing was recorded: it was a test of the silence, and it passed
+    // every day the silence lasted. The contract now is that the ask is made exactly once and
+    // that a 404 answer is the quiet pending line, never a stand-in voice.
+    assert.equal(f.narrationAsked, 1, 'the build asks for narration exactly once');
     assert.equal(await page.evaluate(() => localStorage.getItem('kairo-rec-voice-v1')), null, 'no preference is written');
   });
   await check('a-withdrawn-voice-manifest-cannot-open-the-bar', 'narration-withdrawn', async (f) => {
@@ -690,7 +735,9 @@ try {
   writeFileSync(resolve(out, 'verify-playback.json'), `${JSON.stringify({
     site: CORRIDOR_DIR,
     corridorSha256,
-    simulatedBrowser: 'Chromium', audio: 'deterministic media doubles; the speech double must never be called; no voice-quality claim',
+    engine: ENGINE, browserVersion, requestedBrowser: REQUESTED, enginesCovered: [ENGINE],
+    simulatedBrowser: ENGINE, audio: 'deterministic media doubles; the speech double must never be called; no voice-quality claim',
+    limits: ['one engine per process; KAIRO_BROWSER=all runs the default engine named above and is not evidence for any other'],
     results, failures: results.filter((row) => !row.pass).length,
   }, null, 2)}\n`);
   const failures = results.filter((row) => !row.pass).length;

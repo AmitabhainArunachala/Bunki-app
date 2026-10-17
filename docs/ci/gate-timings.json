@@ -894,6 +894,162 @@
       ]
     },
     {
+      "name": "voice-lock",
+      "sampleCount": 5,
+      "medianSeconds": 0.841,
+      "meanSeconds": 0.84,
+      "maxSeconds": 0.866,
+      "minSeconds": 0.806,
+      "successfulMedianSeconds": 0.841,
+      "provenance": "LOCAL measurement, V finisher, 2026-10-17, Apple silicon, node v22.23.3. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Re-measured: the gate now builds the domain module and stages 1,388 cues.",
+      "samples": [
+        {
+          "runId": null,
+          "seconds": 0.841,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 0.806,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 0.824,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 0.866,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 0.865,
+          "status": "passed",
+          "source": "local"
+        }
+      ]
+    },
+    {
+      "name": "narration-media",
+      "sampleCount": 3,
+      "medianSeconds": 44.408,
+      "meanSeconds": 44.727,
+      "maxSeconds": 45.809,
+      "minSeconds": 43.965,
+      "successfulMedianSeconds": 44.408,
+      "provenance": "LOCAL measurement, V finisher, 2026-10-17, Apple silicon, node v22.23.3. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Both engines (KAIRO_BROWSER unset).",
+      "samples": [
+        {
+          "runId": null,
+          "seconds": 43.965,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 44.408,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 45.809,
+          "status": "passed",
+          "source": "local"
+        }
+      ]
+    },
+    {
+      "name": "approved-voice-contract",
+      "sampleCount": 5,
+      "medianSeconds": 0.143,
+      "meanSeconds": 0.144,
+      "maxSeconds": 0.148,
+      "minSeconds": 0.142,
+      "successfulMedianSeconds": 0.143,
+      "provenance": "LOCAL measurement, slice V, 2026-10-17, Apple silicon, node v22.23.3. This gate is new: no CI run has executed it yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers.",
+      "samples": [
+        {
+          "runId": null,
+          "seconds": 0.142,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 0.143,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 0.143,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 0.146,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 0.148,
+          "status": "passed",
+          "source": "local"
+        }
+      ]
+    },
+    {
+      "name": "excerpt-narration-contract",
+      "sampleCount": 5,
+      "medianSeconds": 0.115,
+      "meanSeconds": 0.116,
+      "maxSeconds": 0.117,
+      "minSeconds": 0.114,
+      "successfulMedianSeconds": 0.115,
+      "provenance": "LOCAL measurement, slice V, 2026-10-17, Apple silicon, node v22.23.3. This gate is new: no CI run has executed it yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers.",
+      "samples": [
+        {
+          "runId": null,
+          "seconds": 0.114,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 0.115,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 0.115,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 0.116,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 0.117,
+          "status": "passed",
+          "source": "local"
+        }
+      ]
+    },
+    {
       "name": "bundled-listening-catalog",
       "sampleCount": 5,
       "medianSeconds": 0.21,
@@ -1364,7 +1520,7 @@
       "samples": [
         {
           "runId": 37326384597,
-          "seconds": 9.0,
+          "seconds": 9,
           "status": "passed",
           "startedAt": "2026-10-05T19:11:24.688Z",
           "completedAt": "2026-10-05T19:11:33.688Z"
