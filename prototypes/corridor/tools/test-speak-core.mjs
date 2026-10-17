@@ -215,6 +215,14 @@ test('pitch · the tracker finds a median within 150–260 Hz on the shipped Kor
   assert.ok(summary.voicedShare > 0.3 && summary.voicedShare < 0.8, `voiced share ${summary.voicedShare}`);
   near(pcm.length / 16000, 6.6, 0.1, 'clip seconds');
 });
+test('pitch · the drawn line drops octave slips and stray frames, and keeps the contour', () => {
+  const f0 = [0, 200, 202, 204, 500, 206, 208, 0, 0, 180, 0, 0, 220, 222, 224, 226, 113, 228, 0];
+  const line = core.smoothPitch(f0);
+  assert.equal(line[4], 0, 'the 500 Hz slip is gone');
+  assert.equal(line[16], 0, 'the octave-down slip is gone');
+  assert.equal(line[9], 0, 'a one-frame run is gone');
+  assert.ok(line.slice(1, 4).every((v) => v >= 200 && v <= 206) && line.slice(12, 16).every((v) => v >= 220 && v <= 228), JSON.stringify(line));
+});
 test('resample · 48 kHz → 16 kHz keeps the take\'s length and a tone\'s pitch', () => {
   const seconds = 2.5, from = 48000, to = 16000;
   const tone = Float32Array.from({ length: seconds * from }, (_, i) => Math.sin((2 * Math.PI * 220 * i) / from) * 0.5);
