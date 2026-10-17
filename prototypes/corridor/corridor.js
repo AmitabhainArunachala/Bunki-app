@@ -19814,7 +19814,8 @@ const WW_KANJI_ANGLES = { 1: [-90], 2: [-126, -54], 3: [-150, -90, -30], 4: [-16
 function wwKanjiCap(c) {
   const k = D.kanji[c];
   if (!k) return { en: '', ja: '' };
-  return { en: String(k.m || '').toLowerCase(), ja: String((k.kun || [])[0] || (k.on || [])[0] || '').replace(/\..*$/, '') };
+  // Q · a caption is a name: the plain meaning a part's row gives (partMeaning); the whole meaning is the slip's, a hold away
+  return { en: partMeaning(k.m), ja: String((k.kun || [])[0] || (k.on || [])[0] || '').replace(/\..*$/, '') };
 }
 /** A part's name, never a reading posing as one: the official 部首 name (radicals214: 日 → ひへん),
  * else the part table's own name when it is more than the kanji's kun or on reading; else none. */
@@ -19832,7 +19833,7 @@ function wwPartCap(p, mine) {
   const members = wwPartMembers(p);
   const count = D.radicals?.[p]?.kanjiCount || members.size;
   return {
-    en: D.kanji[p]?.m ? String(D.kanji[p].m).toLowerCase() : `${count} kanji`,
+    en: partGloss(null, p) || `${count} kanji`,
     ja: wwPartName(p),
     count,
     mine: [...members].filter((c) => mine.kanji.has(c)).length,
@@ -20007,7 +20008,7 @@ function wwModel(centre, mine) {
   if (D.kanji[p]?.kk) marks.push([tx('漢検', 'Kanken'), bi() ? kankenGradeLabel(D.kanji[p].kk) : D.kanji[p].kk]);
   if (D.kanjiFreq?.[p]) marks.push([tx('頻度順位', 'Frequency rank'), String(D.kanjiFreq[p])]);
   return {
-    centre: { ...centre, glyph: p, reading: cap.ja, gloss: bi() ? (D.kanji[p]?.m ? String(D.kanji[p].m).toLowerCase() : '') : '', strokes: st },
+    centre: { ...centre, glyph: p, reading: cap.ja, gloss: bi() ? partGloss(null, p) : '', strokes: st },
     nodes, marks, senses: [], examples: [], family: members, familyCount: cap.count, familyMine: cap.mine,
   };
 }
@@ -29445,14 +29446,16 @@ function mainParts(c) {
   return keep.slice(0, 3);
 }
 /** Q · a part's name in English: its plain meaning (月 standing for the 肉 the list also names, in 胃 and 腕, is meat),
- * without the catalogue's words: the name before "Radical" ("Net Radical Variant (no. 122)" → net), the first sense. */
+ * without the catalogue's words: the name before "Radical" ("Net Radical Variant (no. 122)" → net), before a note in
+ * brackets (the kanji table stops its meanings at 36 letters, mid-note: "Bud (plants, Mushrooms Not Yet Opene" → bud),
+ * the first sense. The word web names its kanji and parts by the same rule. */
 function partGloss(c, part) {
   const flesh = part === '月' && (D.kanji?.[c]?.parts || []).includes('肉');
   // a written form with no meaning of its own takes its standalone form's (亻 is person)
   return partMeaning(D.kanji?.[flesh ? '肉' : part]?.m) || partMeaning(D.kanji?.[(PART_WRITTEN[part] || [])[0]]?.m);
 }
 function partMeaning(text) {
-  return String(text || '').replace(/\s*\bradical\b.*$/iu, '').split(/[;,]/u)[0].replace(/\s{2,}/gu, ' ').trim().toLowerCase();
+  return String(text || '').split('(')[0].replace(/\s*\bradical\b.*$/iu, '').split(/[;,]/u)[0].replace(/\s{2,}/gu, ' ').trim().toLowerCase();
 }
 
 /** The label on a 部品 row. 729 of the 926 components in the KANJIDIC/漢検

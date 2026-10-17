@@ -151,6 +151,17 @@ html:is([data-room='search'], [data-room='word-web']) .ww-cap {
   max-width: 92px; padding: 0 3px; overflow: hidden; background: var(--ww-solid);
   font: 500 10.5px/1.3 var(--font-ui); color: var(--color-muted); text-overflow: ellipsis; white-space: nowrap;
 }
+/* Q · a caption never crosses the plate (its edge cut "dotted cliff radical (no…" in two): one line, in either language,
+   ending in an ellipsis past its width (a hold opens the slip with the whole meaning). On a 390 phone it keeps its 92 px;
+   on a narrower plate it is as wide as the plate leaves it around its node, down to 72 px (moved in further, it ran into
+   the kanji beside it). Where it would still cross the plate's edge it moves in to stand 4 px clear. The nodes' layer is
+   the container whose width --x is a share of; a translate's 50% is half the caption's own width. (Two lines were tried
+   and dropped: in 4 of the 206 webs scanned, the second line ran into the kanji or the word beside it.) */
+html:is([data-room='search'], [data-room='word-web']) .ww-nodes { container-type: inline-size; }
+html:is([data-room='search'], [data-room='word-web']) .ww-cap {
+  max-width: clamp(clamp(72px, calc(100cqw - 276px), 92px), calc(2 * min(var(--x), 100 - var(--x)) * 1cqw - 8px), 92px);
+  translate: clamp(calc(4px + 50% - var(--x) * 1cqw), 0px, calc((100 - var(--x)) * 1cqw - 4px - 50%)) 0;
+}
 /* kanji: a 藍 disc by day, a lit ring at night */
 html:is([data-room='search'], [data-room='word-web']) .ww-n-kanji .ww-nb {
   width: 46px; height: 46px; border-radius: 50%; background: var(--color-accent); color: #f6f0e3;

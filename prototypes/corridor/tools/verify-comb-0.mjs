@@ -12,7 +12,9 @@
  *   G11  every room clears its bars (top and end); in Chromium, which alone can set the phone's insets, the report sheet
  *        and the focus room's grade bar clear the status bar and the home indicator;
  *   G6   the sky cuts no word at the glass: every word or glyph across an edge is dissolved (under 0.02) 3 px inside it;
- *   G7   the word web fits: every lens whole or not shown, the legend over no node's words, no label outside the plate;
+ *   G7   the word web fits: every lens whole or not shown, the legend over no node's words, no label's ink outside the
+ *        plate, no catalogue words in a caption; on the day's web (from today's word: it changes with the date) and on a
+ *        fixed set seeded beside it, so the verdict cannot depend on the date (G7_FIXED);
  *   G4   a word's card keeps 8 px clear of the word and the reading drawn over it; each kanji's parts shown once, at
  *        their own level (none inside another shown part, never two forms of one part, strokes within the kanji's),
  *        named in plain meanings; 総 = 糸 + 忩;
@@ -23,10 +25,10 @@
  *   G1   the shelf's count is the number of stories on the shelf, the same in both languages;
  *   13a  ticking a list in the Save menu keeps the keyboard on that box (WebKit never focuses a clicked checkbox);
  *   13b  a report with a screenshot saves with the device offline (the screenshot is read once, when chosen).
- * Negative controls (COMB_NEGATIVE=<one>): breaks, save, gradebar, safe, sky, web, card, parts, hook, details, me, count,
- * focus, offline, guided. Each puts its defect back (CSS over the page, or the base's own code served for the changed
- * lines) and its class's check must go red. Claim boundary: headless engines on a desk, not a phone; the insets are
- * emulated in Chromium only; the sky is sampled, not watched.
+ * Negative controls (COMB_NEGATIVE=<one>): breaks, save, gradebar, safe, sky, web, labels, plain, card, parts, hook,
+ * details, me, count, focus, offline, guided. Each puts its defect back (CSS over the page, or the base's own code served
+ * for the changed lines) and its class's check must go red. Claim boundary: headless engines on a desk, not a phone; the
+ * insets are emulated in Chromium only; the sky is sampled, not watched.
  */
 /* global window, document, getComputedStyle, innerWidth, innerHeight, Node, NodeFilter, indexedDB */
 import assert from 'node:assert/strict';
@@ -53,6 +55,12 @@ const engines = process.env.KAIRO_BROWSER === 'chromium' ? { chromium }
 const WIDTHS = [390, 320];
 const LANGS = ['bi', 'ja'];
 const STARTUP = 'kantei:jp-105-actions-202609-25startup';
+// G7's fixed webs, seeded so its verdict cannot depend on the date: 健康 (the day's web on 2026-10-18, where the
+// critic measured "dotted cliff radical (no…" 45 px past the plate at 390); the webs whose captions pressed hardest on
+// the plate's edge in a scan of 206 webs at both widths in both languages (Q/probe/webscan2.mjs): 同局 (冂 upside-down
+// box), 噴出 (凵), 免許証 (勹), 特製 (寺), 臼's family, 行楽地 (彳 ぎょうにんべん in 日本語); and the three the check began with
+const G7_FIXED = [['word', '健康'], ['word', '同局'], ['word', '噴出'], ['word', '免許証'], ['word', '特製'], ['part', '臼'],
+  ['word', '行楽地'], ['kanji', '総'], ['part', '冋'], ['word', '会社']].map(([type, key]) => ({ type, key }));
 // the rooms whose text the app sets itself (el(), setJaWords); the JLPT room, Guided, the reference library's title and the
 // deck home set theirs in their own modules, outside this slice (Q/DESIGN.md, the last line)
 const ROOMS_JA = ['tray', 'saved', 'list', 'dojo', 'probe', 'lessons', 'feed', 'settings', 'me', 'kagami', 'search', 'thesaurus', 'ai', 'airead',
@@ -73,6 +81,8 @@ const NEG_CSS = {
   sky: `#drift-layer :is(#sky, #fx) { -webkit-mask-image: none !important; mask-image: none !important; } .sky-edge { display: none !important; }`,
   web: `html:is([data-room='search'], [data-room='word-web']) .ww-plate { height: 404px !important; } html:is([data-room='search'], [data-room='word-web']) .ww-plate-in { position: absolute !important; inset: 0 !important; height: auto !important; } html:is([data-room='search'], [data-room='word-web']) .ww-legend { position: absolute !important; left: 12px !important; right: 12px !important; bottom: 9px !important; padding: 0 !important; } #search-lenses > .kdx-lens[data-out] { opacity: 1 !important; }`,
   me: `html[data-room='me'] body.ui-bi .me-hz-sub.is-sentence { text-transform: uppercase !important; }`,
+  // the label rule removed: a caption 92 px wide wherever it stands, centred under its node, whatever the plate's edge
+  labels: `html:is([data-room='search'], [data-room='word-web']) .ww-cap { max-width: 92px !important; translate: none !important; }`,
 };
 const NEG_SOURCE = {
   card: [['corridor.js', 'function anchorBox(anchor) {', 'function anchorBox(anchor) { return anchor.getBoundingClientRect();']],
@@ -85,6 +95,9 @@ const NEG_SOURCE = {
   gradebar: [['decks/player/mount.js', 'function answerSaid(def) {', 'function answerSaid(def) { return def;'],
     ['decks/player/mount.js', "const FOLD_ROWS = '.kp-folds > details > summary, .kp-folds > :not(details)';", "const FOLD_ROWS = '.kp-folds > details > summary';"]],
   offline: [['maintenance/report-client.js', 'mime_type: file.type, bytes: bytes[i] })', 'mime_type: file.type, blob: file })']],
+  // the web's kanji and parts named by the table's whole meaning again ("dotted cliff radical (no. 53)")
+  plain: [['corridor.js', '  return { en: partMeaning(k.m), ja:', "  return { en: String(k.m || '').toLowerCase(), ja:"],
+    ['corridor.js', '    en: partGloss(null, p) || `${count} kanji`,', '    en: D.kanji[p]?.m ? String(D.kanji[p].m).toLowerCase() : `${count} kanji`,']],
   guided: [['corridor.js', 'function openGuidedRoom(from) {', 'function openGuidedRoom(from) { const until = performance.now() + 1500; while (performance.now() < until) { /* the negative control: a slow open */ }']],
 };
 
@@ -453,15 +466,19 @@ try {
           await context.close();
         }
 
-        // G7 · the word web fits the phone
-        if (want('web')) {
+        // G7 · the word web fits the phone: the day's web, then the fixed set
+        if (want('web') || want('labels') || want('plain')) {
           const { context, page } = await session(browser, width, lang, { query: 'entry=shelf&room=search' });
           await settle(page, 1200);
           const faults = [];
-          for (const centre of [null, { key: '総', type: 'kanji' }, { key: '冋', type: 'part' }, { key: '会社', type: 'word' }]) {
-            if (centre) { await page.evaluate((c) => window.openWordWeb?.(c.key, { type: c.type }), centre); await settle(page, 1000); }
+          let stress = 0;
+          let reached = 0;
+          for (const centre of [null, ...G7_FIXED]) {
+            if (centre) { await page.evaluate((c) => window.openWordWeb?.(c.key, { type: c.type }), centre); await settle(page, 700); }
             const f = await page.evaluate(() => {
               const out = [];
+              const cut = [];
+              let stress = 0;
               const strip = document.querySelector('#search-lenses');
               if (strip && strip.scrollWidth > strip.clientWidth + 1) {
                 const box = strip.getBoundingClientRect();
@@ -471,15 +488,46 @@ try {
               if (plate) {
                 const p = plate.getBoundingClientRect(), vw = document.documentElement.clientWidth;
                 const labels = [...plate.querySelectorAll('.ww-g, .ww-cap, .ww-c-r, .ww-c-m, .ww-st')].filter((n) => window.__I__.shown(n));
-                const ink = (n) => { const rs = window.__I__.rects(n); return rs.length ? { l: Math.min(...rs.map((r) => r.left)), r: Math.max(...rs.map((r) => r.right)), t: Math.min(...rs.map((r) => r.top)), b: Math.max(...rs.map((r) => r.bottom)) } : null; };
-                for (const n of labels) { const b = ink(n); if (b && (b.l < Math.max(0, p.left) - 0.5 || b.r > Math.min(vw, p.right) + 0.5)) out.push(`outside: ${n.textContent.trim().slice(0, 12)}`); }
+                // a label's ink: its text as its own box paints it (a caption that ends in an ellipsis is measured to its
+                // box, never to the text it hides); the plate is never taken as a clip: crossing it is the fault
+                const ink = (n) => {
+                  const clip = getComputedStyle(n).overflow !== 'visible' ? n.getBoundingClientRect() : null;
+                  const rs = window.__I__.rects(n).map((r) => (clip ? { left: Math.max(r.left, clip.left), right: Math.min(r.right, clip.right), top: Math.max(r.top, clip.top), bottom: Math.min(r.bottom, clip.bottom) } : r))
+                    .filter((r) => r.right - r.left > 0.5 && r.bottom - r.top > 0.5);
+                  return rs.length ? { l: Math.min(...rs.map((r) => r.left)), r: Math.max(...rs.map((r) => r.right)), t: Math.min(...rs.map((r) => r.top)), b: Math.max(...rs.map((r) => r.bottom)) } : null;
+                };
+                for (const n of labels) { const b = ink(n); if (b && (b.l < Math.max(0, p.left) - 0.5 || b.r > Math.min(vw, p.right) + 0.5)) out.push(`outside: ${n.textContent.trim().slice(0, 16)} by ${Math.round(Math.max(Math.max(0, p.left) - b.l, b.r - Math.min(vw, p.right)))} px`); }
                 for (const item of plate.querySelector('.ww-legend')?.children || []) { const a = ink(item); if (!a) continue; for (const n of labels) { const b = ink(n); if (b && a.l < b.r - 1 && b.l < a.r - 1 && a.t < b.b - 1 && b.t < a.b - 1) out.push(`legend ${item.textContent.trim()} over ${n.textContent.trim().slice(0, 12)}`); } }
+                // a caption is a name: never the catalogue's words
+                for (const n of plate.querySelectorAll('.ww-cap, .ww-c-m')) if (/\bradical\b|\(no\.|\bvariant\b/i.test(n.textContent)) out.push(`catalogue words: ${n.textContent.trim().slice(0, 24)}`);
+                // the case's own pressure: captions that one line up to 92 px wide, centred under their node, would ink past
+                // the plate (what the base drew); a fixed set with none would prove nothing about the edge
+                for (const n of plate.querySelectorAll('.ww-cap')) {
+                  const r = document.createRange(); r.selectNodeContents(n); const text = r.getBoundingClientRect().width;
+                  const node = n.closest('.ww-node').getBoundingClientRect(); const cx = (node.left + node.right) / 2; const w = Math.min(text + 6, 92);
+                  if (cx - w / 2 + 3 < p.left - 0.5 || cx + w / 2 - 3 > p.right + 0.5) stress += 1;
+                }
+                // an English caption its width cuts short, on a node that has a slip (a word, a kanji, a part)
+                if (document.body.classList.contains('ui-bi')) [...plate.querySelectorAll('.ww-node')].forEach((n, i) => { const c = n.querySelector('.ww-cap'); if (c && c.scrollWidth > c.clientWidth + 1 && ['word', 'kanji', 'part'].includes(n.dataset.wwType)) cut.push({ i, text: c.textContent.trim() }); });
               }
-              return out;
+              return { out, stress, cut };
             });
-            faults.push(...f.map((x) => `${centre ? centre.key : 'day'}: ${x}`));
+            faults.push(...f.out.map((x) => `${centre ? centre.key : 'day'}: ${x}`));
+            if (centre) stress += f.stress;
+            // a caption cut short keeps its whole text a hold away: the slip the node opens says it
+            for (const c of f.cut) {
+              await page.locator('.ww-plate .ww-node').nth(c.i).click({ button: 'right' });
+              const said = await page.waitForFunction(() => document.getElementById('mini')?.innerText || '', null, { timeout: 4000 }).then((h) => h.jsonValue()).catch(() => '');
+              const plain = (t) => t.toLowerCase().replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
+              if (!plain(said).includes(plain(c.text))) faults.push(`${centre ? centre.key : 'day'}: "${c.text.slice(0, 16)}" cut short, and the slip its hold opens does not say it whole`);
+              await run(page, 'removeMini()');
+              reached += 1;
+            }
           }
-          check(`G7 · ${tag} · the word web fits: lenses whole, legend clear of the nodes, labels inside the plate`, !faults.length, faults.slice(0, 6).join(' · '));
+          // in English at 320 the base pushed captions past the plate; the fixed set must still hold such captions
+          const pressed = !(lang === 'bi' && width === 320) || stress > 0;
+          check(`G7 · ${tag} · the word web fits: lenses whole, legend clear of the nodes, labels inside the plate and plainly named (the day's web and ${G7_FIXED.length} fixed)`,
+            !faults.length && pressed, `${stress} captions under edge pressure · ${reached} cut short, read whole in their slips${pressed ? '' : ' · the fixed set holds no caption under edge pressure'}${faults.length ? ` · ${faults.slice(0, 6).join(' · ')}` : ''}`);
           await context.close();
         }
 
