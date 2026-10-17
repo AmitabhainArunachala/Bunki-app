@@ -176,6 +176,15 @@ test('parser · keeps what is sound: tokens that do not rebuild the text drop to
   assert.equal(turn.reply.speaker, 'main');
   assert.ok(core.parseTurn({ heard: 'x', reply: { text: '', tokens: [] } }, { mode: 'shadow' }), 'a shadow turn may have no reply');
 });
+test('parser · a shadow answer may carry the target\'s reading (kana, optional); a line without one gets none', () => {
+  assert.ok(core.TURN_SCHEMA.properties.targetKana && !core.TURN_SCHEMA.required.includes('targetKana'));
+  const withReading = core.parseTurn({ heard: 'たかちそうりは', heardKana: 'たかちそうりは', targetKana: 'タカイチソウリハ', reply: { text: '', tokens: [] } }, { mode: 'shadow' });
+  assert.equal(withReading.targetKana, 'たかいちそうりは');
+  assert.equal(core.parseTurn({ heard: 'x', reply: { text: '', tokens: [] } }, { mode: 'shadow' }).targetKana, '');
+  const system = core.buildSystemInstruction({ scene: core.sceneById('free'), plants: [], notes: [], avoidOpenings: [], level: null });
+  assert.match(system, /"shadow"[^"]*targetKana/u);
+});
+
 test('parser · Japanese replies pass, English replies are refused', () => {
   assert.equal(core.isJapaneseLine('ああ、真珠の加工ですね。'), true);
   assert.equal(core.isJapaneseLine('Oh, pearl processing, right?'), false);

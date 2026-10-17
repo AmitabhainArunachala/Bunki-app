@@ -58,7 +58,9 @@ const TURNS = {
     ],
     reached: [{ word: '命名', reading: 'めいめい' }],
     used: ['内閣'],
-    remember: ['政治のニュースをよく読む'] },
+    remember: ['政治のニュースをよく読む'],
+    // the natural line (his line with the corrections made) and its reading, for shadowing it from the look back
+    naturalReading: 'たかいちそうりは、そのないかくに「けつだんとちょうせん、じっこうのないかく」となづけました。' },
   '004': { heard: 'えっと、LEDの工事で、竹の間を使いました。',
     reply: line(['竹', 'たけ'], 'の', ['間', 'ま'], 'に', ['変', 'か', '変わる'], 'わった', 'ん', 'です', 'ね', '。'),
     reached: [{ word: '認証', reading: 'にんしょう' }],
@@ -72,7 +74,8 @@ const TURNS = {
     corrections: [
       { wrong: '日本', right: '日本', rightReading: 'にっぽん', code: 'misread', subject: '日本' },
       { wrong: '働いています', right: '勤めています', rightReading: 'つとめています', code: 'collocation', subject: '勤める', subjectType: 'word' },
-    ] },
+    ],
+    naturalReading: 'にっぽんのかいしゃでつとめています。' },
 };
 const BRIDGE = line(['真珠', 'しんじゅ'], 'の', ['加工', 'かこう'], 'の', 'ため', 'です', '。');
 const BRIDGE_KANA = 'しんじゅのかこうのためです';
@@ -81,6 +84,8 @@ const ENGLISH = { text: 'That sounds interesting. What did you think of it?', to
 
 /** The kana of a canned line, for the shadowing case (what was "heard" when he repeats it, one sound short). */
 const kanaOf = (l) => l.tokens.map((t) => core.kana(t.r || t.s)).join('').replace(/[^\p{Script=Hiragana}ー]/gu, '');
+const naturalOf = (t) => t.corrections.reduce((text, c) => text.replace(c.wrong.trim(), c.right), t.heard);
+const hira = (text) => core.kana(String(text || '')).replace(/[^\p{Script=Hiragana}ー]/gu, '');
 const KNOWN_LINES = [...Object.values(OPENINGS), ...Object.values(TURNS).flatMap((t) => [t.reply, t.second].filter(Boolean)), BRIDGE, SAYIT_REPLY];
 
 function findFfmpeg() {
@@ -149,10 +154,13 @@ export async function startMockPartner({ port = 0, corridorDir = CORRIDOR } = {}
       turn = { heard: state.sayit === 'match' ? BRIDGE.text : '真珠のかこのためです。', heardKana, reply: { ...SAYIT_REPLY, speaker: 'main' }, corrections: [], reached: [], used: [], remember: [] };
     } else if (mode === 'shadow') {
       const known = KNOWN_LINES.find((l) => l.text === target);
-      const kana = known ? kanaOf(known) : core.kana(String(target || ''));
-      // he repeated it one sound short: the third sound is missing
-      const heardKana = kana.length > 3 ? kana.slice(0, 2) + kana.slice(3) : kana;
-      turn = { heard: heardKana, heardKana, reply: { text: '', tokens: [] }, corrections: [], reached: [], used: [], remember: [] };
+      const natural = Object.values(TURNS).find((t) => t.naturalReading && naturalOf(t) === target);
+      // the target's reading as a model would give it; a line the mock does not know gets none (the room then marks nothing)
+      const reading = known ? kanaOf(known) : natural ? hira(natural.naturalReading) : '';
+      // he repeated it one sound short: the third mora is missing
+      const mora = core.toMora(reading || hira(target));
+      const heardKana = mora.length > 3 ? [...mora.slice(0, 2), ...mora.slice(3)].join('') : mora.join('');
+      turn = { heard: heardKana, heardKana, targetKana: reading, reply: { text: '', tokens: [] }, corrections: [], reached: [], used: [], remember: [] };
     } else {
       const canned = TURNS[state.clip] || TURNS['003'];
       const second = two && canned.second;

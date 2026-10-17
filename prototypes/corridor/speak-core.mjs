@@ -291,7 +291,7 @@ export function buildSystemInstruction({ scene: sc, plants = [], notes = [], avo
     'REMEMBER: In "remember", at most one short note in Japanese of a lasting fact he said about himself; otherwise an empty list.',
     'TOKENS: reply.tokens splits reply.text into words exactly, so that joining every s gives reply.text: s the surface, b its dictionary form, r the reading of s in hiragana as said here (年 in 令和8年 is ねん).',
     'SPEAKER: reply.speaker is "main" for your line' + (sc.second ? ' and "second" when the second person speaks.' : '.'),
-    'MODES: "open" — no audio: open the scene with one short line. "talk" — his audio: answer it. "bridge" — he says what he means, in English or mixed: put the natural Japanese line in bridge (text, tokens, kana) and also as reply. "sayit" — his audio tries the bridge line: hear it exactly, then answer as if he had said it. "shadow" — his audio repeats a target line: hear it exactly; reply.text may be empty.',
+    'MODES: "open" — no audio: open the scene with one short line. "talk" — his audio: answer it. "bridge" — he says what he means, in English or mixed: put the natural Japanese line in bridge (text, tokens, kana) and also as reply. "sayit" — his audio tries the bridge line: hear it exactly, then answer as if he had said it. "shadow" — his audio repeats a target line: hear it exactly (heardKana is what he said, in hiragana); put the target line\'s own correct reading, in hiragana, in targetKana; reply.text may be empty.',
   );
   return lines.join('\n');
 }
@@ -339,6 +339,8 @@ export const TURN_SCHEMA = Object.freeze({
   properties: {
     heard: { type: 'STRING' },
     heardKana: { type: 'STRING' },
+    // shadowing only: the target line's own reading, so a line without tokens (a corrected line) is checked honestly
+    targetKana: { type: 'STRING' },
     reply: { type: 'OBJECT', properties: { text: { type: 'STRING' }, tokens: { type: 'ARRAY', items: TOKEN_SCHEMA }, speaker: { type: 'STRING', enum: ['main', 'second'] } }, required: ['text', 'tokens'] },
     corrections: { type: 'ARRAY', items: { type: 'OBJECT', properties: { wrong: { type: 'STRING' }, right: { type: 'STRING' }, rightReading: { type: 'STRING' }, code: { type: 'STRING', enum: [...SENSEI_CODES] }, subject: { type: 'STRING' }, subjectType: { type: 'STRING', enum: ['word', 'kanji'] } }, required: ['wrong', 'right', 'code'] } },
     reached: { type: 'ARRAY', items: { type: 'OBJECT', properties: { word: { type: 'STRING' }, reading: { type: 'STRING' } }, required: ['word'] } },
@@ -402,7 +404,8 @@ export function parseTurn(raw, { mode = 'talk' } = {}) {
   const remember = (Array.isArray(data.remember) ? data.remember : []).filter((w) => typeof w === 'string' && w.trim() && w.length <= 80).slice(0, 1);
   const bridge = data.bridge == null ? null : parseLine(data.bridge);
   if (data.bridge != null && !bridge) return null;
-  return { heard: heard.trim(), heardKana: kana(str(data.heardKana || '', 600) || ''), reply: { ...reply, speaker }, corrections, reached, used, bridge, remember };
+  return { heard: heard.trim(), heardKana: kana(str(data.heardKana || '', 600) || ''), targetKana: kana(str(data.targetKana || '', 600) || ''),
+    reply: { ...reply, speaker }, corrections, reached, used, bridge, remember };
 }
 
 /** A line is Japanese when most of its letters are Japanese script; an English reply outside Bridge is refused. */

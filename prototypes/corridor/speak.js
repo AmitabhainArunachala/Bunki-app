@@ -587,19 +587,21 @@ export function createSpeakRoom(host) {
   /** One turn: his take (or typed line) → ears and brain → his line as heard, her reply → one atomic write → her voice. */
   async function turn({ wav = null, pcm16k = null, typed = null }) {
     const s = st.session;
-    if (!s || s.ended || !canRequest()) { setPhase('rest'); return; }
-    const epoch = st.epoch;
     const mode = st.mode === 'bridge' ? 'bridge' : st.mode === 'sayit' ? 'sayit' : st.mode === 'shadow' ? 'shadow' : 'talk';
+    // an ended talk takes no new turn; shadowing its lines from the look back still listens (it adds no line to the talk)
+    const open = () => !s.ended || mode === 'shadow';
+    if (!s || !open() || !canRequest()) { setPhase('rest'); return; }
+    const epoch = st.epoch;
     const target = mode === 'sayit' ? s.bridgeLine?.text : mode === 'shadow' ? st.shadow?.line?.text : null;
     setPhase('thinking');
     let answer;
     try {
-      answer = await brain({ mode, wav, typed, target, live: () => epoch === st.epoch && s === st.session && !s.ended });
+      answer = await brain({ mode, wav, typed, target, live: () => epoch === st.epoch && s === st.session && open() });
     } catch (error) {
       if (epoch === st.epoch) { setPhase('rest'); failTurn(error); }
       return;
     }
-    const live = () => epoch === st.epoch && s === st.session && !s.ended;
+    const live = () => epoch === st.epoch && s === st.session && open();
     if (!live()) return;
     setStatus(null);
     const tr = answer.turn;
@@ -751,8 +753,11 @@ export function createSpeakRoom(host) {
     const line = st.shadow?.line;
     const epoch = st.epoch, shadow = st.shadow;
     if (!line) { setPhase('rest'); return; }
-    const targetKana = readingOf(line);
-    const check = core.moraDiff(tr.heardKana || core.kana(tr.heard), targetKana, { targetTokens: line.tokens });
+    // the target's reading: its tokens' (the furigana he saw), else the reading Kore gave with this answer (a corrected
+    // line has no tokens); with neither, no mark is drawn — kana alone would call the kanji's sounds extra
+    const tokened = Array.isArray(line.tokens) && line.tokens.length > 0;
+    const targetKana = tokened ? readingOf(line) : tr.targetKana || '';
+    const check = targetKana ? core.moraDiff(tr.heardKana || core.kana(tr.heard), targetKana, { targetTokens: tokened ? line.tokens : null }) : null;
     let hers = null, herSeconds = null;
     try {
       const clips = await Promise.all(line.voice || []);
@@ -772,7 +777,8 @@ export function createSpeakRoom(host) {
     const xid = nextXid();
     await host.commitTurn([
       row('user', tr.heard, answer.model, xid),
-      row('app', JSON.stringify({ kind: 'shadow', scene: st.scene.id, target: line.text, heardKana: tr.heardKana, missing: check.missing, extra: check.extra, swaps: check.swaps, ms: answer.ms, usage: answer.usage }), answer.model, xid),
+      row('app', JSON.stringify({ kind: 'shadow', scene: st.scene.id, target: line.text, heardKana: tr.heardKana, targetKana: targetKana || null,
+        missing: check?.missing ?? null, extra: check?.extra ?? null, swaps: check?.swaps ?? null, ms: answer.ms, usage: answer.usage }), answer.model, xid),
     ], [], xid);
     setPhase('rest');
     paintLayer();
@@ -1556,7 +1562,8 @@ export function createSpeakRoom(host) {
     const fig = el('figure', 'speak-shadow-result');
     const kanaLine = el('p', 'speak-kana');
     kanaLine.lang = 'ja';
-    paintKanaDiff(kanaLine, result.check);
+    if (result.check) paintKanaDiff(kanaLine, result.check);
+    else kanaLine.textContent = result.heardKana || core.kana(result.heard || '');
     fig.append(kanaLine);
     if (result.his || result.hers) fig.append(pitchPicture(result));
     const times = el('figcaption', 'speak-times');
@@ -1675,6 +1682,10 @@ export function createSpeakRoom(host) {
     old.remove();
     paintSavedLines(box);
   }
+  // a kept line plays from its own bytes as a data: URL, not a blob: URL — WebKit loads blob: media through its network
+  // layer, which an offline phone may refuse (as WebKit's emulated offline does); a data: URL plays with no network at all
+  const keptUrl = (wav) => `data:audio/wav;base64,${core.bytesToBase64(wav)}`;
+  const keptBytes = async (stored) => (stored instanceof Blob ? new Uint8Array(await stored.arrayBuffer()) : Uint8Array.from(stored));
   function paintSavedLines(container) {
     const sec = el('section', 'speak-sec speak-saved');
     sec.append(el('h3', 'speak-sec-title', t('保存した影', 'Saved lines')));
@@ -1695,9 +1706,7 @@ export function createSpeakRoom(host) {
           primeInGesture();
           const token = ++st.playToken;
           for (const audioBytes of item.audio || []) {
-            const url = URL.createObjectURL(audioBytes instanceof Blob ? audioBytes : new Blob([audioBytes], { type: 'audio/wav' }));
-            const result = await playClip(url, 1, token);
-            URL.revokeObjectURL(url);
+            const result = await playClip(keptUrl(await keptBytes(audioBytes)), 1, token);
             if (result !== 'ended') break;
           }
           setPhase('rest');
@@ -1706,8 +1715,8 @@ export function createSpeakRoom(host) {
         shadow.type = 'button';
         shadow.addEventListener('click', () => {
           const clips = (item.audio || []).map((audioBytes) => Promise.resolve(null).then(async () => {
-            const wav = audioBytes instanceof Blob ? new Uint8Array(await audioBytes.arrayBuffer()) : Uint8Array.from(audioBytes);
-            return { url: URL.createObjectURL(new Blob([wav], { type: 'audio/wav' })), wav, text: item.text };
+            const wav = await keptBytes(audioBytes);
+            return { url: keptUrl(wav), wav, text: item.text };
           }));
           onShadow({ who: 'kore', kind: 'saved', text: item.text, tokens: item.tokens, speaker: 'main', index: -1, voice: clips });
         });
@@ -1828,8 +1837,8 @@ export function createSpeakRoom(host) {
         plants: s.plants.map((p) => p.word), reached: s.reached.map((r) => r.word), ended: s.ended, bridgeTries: s.bridgeTries || 0, notes: s.savedNotes } : null,
       wav: st.wavInfo, gum: st.gum, take: !!st.take, voiceRetired: st.voiceRetired, offline: st.offline, micDenied: st.micDenied, micError: st.micError || null,
       playing: st.playing ? { kind: st.playing.kind, rate: st.playing.rate || 1 } : null, audioPaused: audio ? audio.paused || audio.ended : true,
-      audioRate: audio ? audio.playbackRate : null, shadow: st.shadow?.result ? { missing: st.shadow.result.check.missing, extra: st.shadow.result.check.extra,
-        swaps: st.shadow.result.check.swaps, his: !!st.shadow.result.his, hers: !!st.shadow.result.hers, mySeconds: st.shadow.result.mySeconds,
+      audioRate: audio ? audio.playbackRate : null, shadow: st.shadow?.result ? { missing: st.shadow.result.check?.missing ?? null, extra: st.shadow.result.check?.extra ?? null,
+        swaps: st.shadow.result.check?.swaps ?? null, his: !!st.shadow.result.his, hers: !!st.shadow.result.hers, mySeconds: st.shadow.result.mySeconds,
         herSeconds: st.shadow.result.herSeconds } : null,
       ctxState: st.ctx ? st.ctx.state : null, turnBusy: st.turnBusy,
     }));
