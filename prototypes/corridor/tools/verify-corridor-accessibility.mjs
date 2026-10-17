@@ -1,7 +1,7 @@
 /**
  * KAIRO A0.5 accessibility verifier.
  *
- * Proves the reader's pointer/keyboard/switch-shaped routes, the one-tap popup's
+ * Proves the reader's pointer/keyboard/switch-shaped routes, the word ladder's
  * geometry, non-hold alternatives (the word menu), dialog focus lifecycle,
  * hidden-control tab discipline, and meaningful reduced motion in real Chromium.
  *
@@ -9,6 +9,7 @@
  *   CHROMIUM_PATH=/path/to/chromium node verify-corridor-accessibility.mjs
  */
 
+import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -144,6 +145,36 @@ async function touchAt(page, selector, index = 0, holdMs = 0, scroll = true) {
   }
 }
 
+/** Reach the exact prose occurrence through its paragraph's real keyboard controller. */
+async function focusProseOccurrence(page, target) {
+  const offset = await target.evaluate(word => {
+    const block = word.closest('[data-prose-roving]');
+    if (!block) return -1;
+    return [...block.querySelectorAll('.tok[data-para],.sentence-tok,.japanese-lookup-word,.gs-word,.kp-tok')]
+      .filter(node => node.closest('[data-prose-roving]') === block).indexOf(word);
+  });
+  assert(offset >= 0, 'The intended occurrence belongs to a prose keyboard controller');
+  await target.locator('xpath=ancestor::*[@data-prose-roving][1]').focus();
+  await page.keyboard.press('Home');
+  for (let step = 0; step < offset; step++) await page.keyboard.press('ArrowRight');
+  assert(await target.evaluate(word => document.activeElement === word), 'Home/Arrows select the exact intended occurrence');
+}
+
+/** Setup for checks whose subject is the stage: only an observed reading rung permits the second activation. */
+async function openWordStage(page, selector, index = 0, scroll = true) {
+  const target = page.locator(selector).nth(index);
+  assert.notEqual(await target.getAttribute('data-ladder-rung'), 'stage', 'Stage setup begins on a word without its stage');
+  await touchAt(page, selector, index, 0, scroll);
+  await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await target.elementHandle());
+  if (await target.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'Reading rung has no meaning stage');
+    assert(await target.evaluate(node => [...node.querySelectorAll('rt')].some(rt => !rt.classList.contains('hidden-rt') && getComputedStyle(rt).visibility !== 'hidden')), 'Reading rung reveals the pronunciation');
+    await touchAt(page, selector, index, 0, scroll);
+  }
+  await page.locator('#mini .mini-word').waitFor();
+  assert.equal(await target.getAttribute('data-ladder-rung'), 'stage', 'The exact occurrence reached its stage');
+}
+
 /** How long the page held the last touch down (pointerdown → pointerup), as the app measures it. */
 async function lastPressMs(page) {
   return page.evaluate(() => window.__a11yLastPressMs ?? null);
@@ -194,7 +225,7 @@ async function centreWord(page, index) {
 async function openWordDialog(page) {
   // the full entry's non-hold door from the word itself: Ctrl+Enter (the word menu's Full entry is the other)
   const token = page.locator('#reader .tok.content').nth(2);
-  await token.focus();
+  await focusProseOccurrence(page, token);
   await page.keyboard.press('Control+Enter');
   await page.waitForSelector('#sheet');
 }
@@ -223,6 +254,8 @@ async function main() {
       hasTouch: true,
       isMobile: true,
     });
+    // This is an existing-device journey; G3's fresh-device demonstration has its own verifier.
+    await context.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
     await context.clock.setSystemTime(SHELF_DAY);
     // a passive observer: how long each press was held, as the app's own Date.now() clock sees it
     await context.addInitScript(() => {
@@ -354,8 +387,9 @@ async function main() {
       return {
         words: words.length,
         particles: particles.length,
-        nativeButtons: words.filter((node) => node.matches('button')).length,
-        named: words.filter((node) => !!node.getAttribute('aria-label')).length,
+        nativeSpans: words.filter(node => node.matches('span')).length,
+        idleWords: words.filter(node => node.getAttribute('role') === 'presentation' && !node.hasAttribute('tabindex') && !node.hasAttribute('aria-label') && !node.hasAttribute('aria-describedby')).length,
+        paragraphs: [...document.querySelectorAll('#reader [data-reader-prose]')].map(node => ({ tag: node.tagName, tab: node.tabIndex })),
         actionKinds: [...new Set(words.map((node) => node.dataset.action).filter(Boolean))],
         hitFloor: [...words, ...particles].reduce((floor, node) => {
           const rect = node.getBoundingClientRect();
@@ -367,10 +401,10 @@ async function main() {
       };
     })()`);
     check(
-      'reader words are named native controls on the common target.activate action',
+      'reader prose has one paragraph stop and idle inline words on the common target.activate action',
       semantics.words > 10 &&
-        semantics.nativeButtons === semantics.words &&
-        semantics.named === semantics.words &&
+        semantics.nativeSpans === semantics.words && semantics.idleWords === semantics.words &&
+        semantics.paragraphs.length > 0 && semantics.paragraphs.every(node => node.tag === 'P' && node.tab === 0) &&
         semantics.actionKinds.join(',') === 'target.activate',
       JSON.stringify(semantics),
     );
@@ -381,10 +415,11 @@ async function main() {
     );
 
     const word = page.locator('#reader .tok.content').nth(2);
-    await word.focus();
+    await focusProseOccurrence(page, word);
     const focusProbe = await page.evaluate(`(() => ({
       tokenFocused: document.activeElement?.matches('#reader .tok.content') ?? false,
-      shortcuts: document.activeElement?.getAttribute('aria-keyshortcuts') ?? '',
+      help: (document.activeElement?.getAttribute('aria-describedby') || '').split(/\\s+/u).map(id => document.getElementById(id)?.textContent || '').join(' '),
+      role: document.activeElement?.getAttribute('role'), name: document.activeElement?.getAttribute('aria-label'),
       hiddenTabStops: [...document.querySelectorAll('#app [hidden]')].flatMap((root) =>
         [...root.querySelectorAll('button, a, input, [tabindex]')]
       ).filter((node) => node.tabIndex >= 0 && !node.disabled && node.offsetParent !== null).length,
@@ -401,7 +436,7 @@ async function main() {
     const menuBack = await page.evaluate('document.activeElement?.matches("#reader .tok.content") && !document.getElementById("reader-word-menu")');
     check(
       'focused word exposes the word menu (Shift+F10) and the full entry (Ctrl+Enter) as non-hold alternatives',
-      focusProbe.tokenFocused && /Shift\+F10/.test(focusProbe.shortcuts) && /Control\+Enter/.test(focusProbe.shortcuts) &&
+      focusProbe.tokenFocused && focusProbe.role === 'group' && !!focusProbe.name && /Shift\+F10/.test(focusProbe.help) && /Ctrl\+Enter/.test(focusProbe.help) &&
         menuProbe.menu === 'menu' && menuProbe.focusInMenu && menuProbe.items.includes('Full entry') && menuProbe.items.includes('Save') && menuBack,
       JSON.stringify({ ...focusProbe, ...menuProbe, menuBack }),
     );
@@ -413,10 +448,14 @@ async function main() {
     // R4 (2026-09-30): the pill's buttons left the Tab order (one stop per paragraph); the keyboard
     // reaches them from the word itself, and assistive technology still finds them in the tree
     await page.keyboard.press('Shift+Enter');
+    const alternativeReading = await word.evaluate(node => ({ rung: node.dataset.ladderRung, visible: node.querySelectorAll('rt:not(.hidden-rt)').length, stage: !!document.getElementById('mini') }));
+    check('Shift+Enter first exposes only the reading', alternativeReading.rung === 'reading' && alternativeReading.visible > 0 && !alternativeReading.stage, JSON.stringify(alternativeReading));
+    await page.keyboard.press('Shift+Enter');
+    await page.locator('#mini').waitFor();
     const firstAlternative = await page.evaluate('document.querySelector("#mini") ? "quickLook.open" : null');
     await page.keyboard.press('Escape');
     const backOnWord = await page.evaluate('document.activeElement?.matches("#reader .tok.content") && !document.querySelector("#mini")');
-    await word.focus();
+    await focusProseOccurrence(page, word);
     await page.keyboard.press('Control+Enter');
     const secondAlternative = await page.evaluate('document.querySelector("#sheet") ? "entry.open" : null');
     check(
@@ -425,7 +464,7 @@ async function main() {
       `${firstAlternative} → back on word ${backOnWord} → ${secondAlternative}`,
     );
     if (await page.locator('#sheet').count()) await page.keyboard.press('Escape');
-    await word.focus();
+    await focusProseOccurrence(page, word);
     await page.keyboard.press('Shift+F10');
     await page.waitForSelector('#reader-word-menu');
     const accessibilitySession = await page.context().newCDPSession(page);
@@ -435,24 +474,23 @@ async function main() {
       .filter((node) => node.role?.value === 'menuitem' && node.name?.value)
       .map((node) => node.name.value);
     // R4: a word is named by itself; how to work it (Enter, Shift+F10, Ctrl+Enter) is its shared description
-    const describedButtons = accessibilityTree.nodes
-      .filter((node) => node.role?.value === 'button' && node.description?.value)
+    const describedProse = accessibilityTree.nodes
+      .filter((node) => ['group', 'paragraph'].includes(node.role?.value) && node.description?.value)
       .map((node) => node.description.value);
     check(
-      'screen-reader tree exposes named token, its keyboard help and the word menu items',
-      describedButtons.some((text) => /Shift\+F10/.test(text) && /Enter/.test(text)) &&
+      'screen-reader tree exposes prose keyboard help and the word menu items',
+      describedProse.some((text) => /Shift\+F10/.test(text) && /Enter/.test(text)) &&
         menuItems.includes('Save') && menuItems.includes('Full entry') &&
         menuItems.includes('Ask the tutor about this sentence'),
       `${menuItems.length} menu item(s): ${menuItems.join(' · ')}`,
     );
     await page.keyboard.press('Escape');
-    await word.focus();
+    await focusProseOccurrence(page, word);
     await page.waitForTimeout(80);
     await page.screenshot({ path: resolve(SHOTS_DIR, '01-reader-focus-alternatives.png') });
 
-    console.log('\n— one action, the meaning: parity and geometry');
-    // reader lane 2026-10-02 (John #8): one tap opens the word's popup — reading and meaning at once;
-    // there is no tap ladder, no English line under the word and no floating sentence bar
+    console.log('\n— reading, stage and page: parity and geometry');
+    // Every layer is observed separately; setup never retries a missing stage.
     const tokenIndex = 2;
     const popupProbe = () => page.evaluate(`(() => {
       const mini = document.getElementById('mini');
@@ -470,10 +508,15 @@ async function main() {
     const anchorBefore = await glyphBottom(page, tokenIndex);
     const scrollBefore = await page.evaluate(() => window.scrollY);
     await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
+    const readingOnly = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate(node => ({ rung: node.dataset.ladderRung, visible: node.querySelectorAll('rt:not(.hidden-rt)').length, stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), under: !!node.querySelector('.tok-en') }));
+    check('pointer action one exposes only the reading', readingOnly.rung === 'reading' && readingOnly.visible > 0 && !readingOnly.stage && !readingOnly.page && !readingOnly.under, JSON.stringify(readingOnly));
+    check('the reading reveal keeps its glyph anchor still', Math.abs(await glyphBottom(page, tokenIndex) - anchorBefore) < 2);
+    await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
+    await page.locator('#mini').waitFor();
     const firstPopup = await popupProbe();
     const firstReach = await tapGeometry(page, '#reader .tok.content', tokenIndex);
     check(
-      'pointer action one opens the popup with the reading and the meaning, and writes nothing under the word',
+      'pointer action two opens the stage with the reading and meaning, and writes nothing under the word',
       firstPopup.open && firstPopup.reading && firstPopup.gloss && firstPopup.save === 'Save' && firstPopup.under === 0 && firstPopup.inside,
       JSON.stringify({ firstPopup, taps: tapAttempts.slice(-2) }),
     );
@@ -492,30 +535,34 @@ async function main() {
       popup: Boolean(document.querySelector('#mini')), sheet: Boolean(document.querySelector('#sheet')),
       current: node.classList.contains('tok-current'), gloss: Boolean(node.querySelector('.tok-en')),
     }));
-    // 1.3.0: the second action on the same word is its full entry; closing the entry returns the original word
+    // The third action opens the page; Back restores the stage.
     check(
-      'a second action on the same word opens its full entry — the popup gone, no English under the word, the word still the chosen one',
+      'a third action on the same word opens its full entry — the popup gone, no English under the word, the word still the chosen one',
       secondState.sheet && !secondState.popup && !secondState.gloss && secondState.current,
       JSON.stringify(secondState),
     );
     await page.locator(await entryCloseSelector(page)).click();
     await page.waitForFunction(() => !document.getElementById('sheet'));
+    await page.locator('#mini').waitFor();
     const closedState = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate((node) => ({
       popup: Boolean(document.querySelector('#mini')), sheet: Boolean(document.querySelector('#sheet')),
       current: node.classList.contains('tok-current'), lit: node.classList.contains('lit'),
     }));
     check(
-      'closing the entry returns the original word: no popup, no sheet, nothing lit — the word still the chosen one',
-      !closedState.popup && !closedState.sheet && !closedState.lit && closedState.current,
+      'Back from the entry restores its stage and reading on the chosen word',
+      closedState.popup && !closedState.sheet && closedState.lit && closedState.current,
       JSON.stringify(closedState),
     );
-    await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
+    await page.keyboard.press('Escape');
+    const bare = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate(node => ({ rung: node.dataset.ladderRung, lit: node.classList.contains('lit'), stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet') }));
+    check('folding the restored stage returns to bare prose', !bare.rung && !bare.lit && !bare.stage && !bare.page, JSON.stringify(bare));
+    await openWordStage(page, '#reader .tok.content', tokenIndex, false);
     const reopened = await popupProbe();
-    check('a third action opens it again: one tap is always the meaning', reopened.open && reopened.gloss, JSON.stringify(reopened));
+    check('a new visit reaches the same meaning through its reading rung', reopened.open && reopened.gloss === firstPopup.gloss && reopened.reading === firstPopup.reading, JSON.stringify(reopened));
     const pointerReceipts = await page.evaluate(
       `window.__KAIRO_INTERACTION__?.receipts?.filter((r) => r.action.kind === 'target.activate') ?? []`,
     );
-    // two taps opened the popup (the dive between them opened the entry)
+    // Reading and stage activations retain pointer provenance on both visits.
     check(
       'pointer route emits target.activate envelopes with pointer provenance',
       pointerReceipts.length >= 2 && pointerReceipts.slice(-2).every((r) => r.provenance.modality === 'pointer'),
@@ -530,17 +577,17 @@ async function main() {
       if (!scenario.settingsOpen) await page.locator('#dials-toggle').click();
       await centreWord(page, tokenIndex);
       const before = await glyphBottom(page, tokenIndex);
-      await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
+      await openWordStage(page, '#reader .tok.content', tokenIndex, false);
       const reach = await tapGeometry(page, '#reader .tok.content', tokenIndex);
       const shown = await popupProbe();
       const held = await glyphBottom(page, tokenIndex);
       check(`${scenario.width}px settings-${scenario.settingsOpen ? 'open' : 'closed'} selection stays reachable and still, and its popup fits the screen`,
         reach.reachesTarget && Math.abs(held - before) < 2 && shown.open && shown.inside, JSON.stringify({ before, held, reach, shown }));
       const anchor = await glyphBottom(page, tokenIndex);
-      await touchAt(page, '#reader .tok.content', tokenIndex + 1, 0, false);
+      await openWordStage(page, '#reader .tok.content', tokenIndex + 1, false);
       const moved = await popupProbe();
       const after = await tapGeometry(page, '#reader .tok.content', tokenIndex + 1);
-      check(`${scenario.width}px a tap on the next word moves the popup there and keeps both words still`,
+      check(`${scenario.width}px the next word’s reading and stage move the popup there and keep both words still`,
         moved.open && moved.inside && after.reachesTarget && after.scrollY === reach.scrollY &&
           Math.abs(await glyphBottom(page, tokenIndex) - anchor) < 2, JSON.stringify({ moved, reach, after }));
     }
@@ -549,12 +596,15 @@ async function main() {
     await openReader(page, base);
     await setRevealOnTouch(page);
     const keyboardWord = page.locator('#reader .tok.content').nth(tokenIndex);
-    await keyboardWord.focus();
+    await focusProseOccurrence(page, keyboardWord);
     const keyboardFocusable = await page.evaluate(
       `document.activeElement?.matches('#reader .tok.content') ?? false`,
     );
     let keyboardPopup = null;
     if (keyboardFocusable) {
+      await page.keyboard.press('Enter');
+      const reading = await keyboardWord.evaluate(node => ({ rung: node.dataset.ladderRung, visible: node.querySelectorAll('rt:not(.hidden-rt)').length, stage: !!document.getElementById('mini'), focused: document.activeElement === node }));
+      check('keyboard Enter first reveals reading and keeps the selected occurrence', reading.rung === 'reading' && reading.visible > 0 && !reading.stage && reading.focused, JSON.stringify(reading));
       await page.keyboard.press('Enter');
       await page.waitForSelector('#mini');
       keyboardPopup = await page.evaluate(`({ focus: document.activeElement?.id ?? null, gloss: document.querySelector('#mini .mini-gloss')?.textContent ?? '' })`);
@@ -566,8 +616,8 @@ async function main() {
       `window.__KAIRO_INTERACTION__?.receipts?.filter((r) => r.action.kind === 'target.activate') ?? []`,
     );
     check(
-      'keyboard/switch-shaped activation opens the same popup, focus on Save; Escape returns to the word',
-      keyboardFocusable && keyboardPopup?.focus === 'mini-take' && keyboardPopup.gloss && keyboardBack.word && !keyboardBack.popup && !keyboardBack.sheet,
+      'keyboard/switch-shaped reading then stage matches pointer meaning, focus on Save; Escape returns to the word',
+      keyboardFocusable && keyboardPopup?.focus === 'mini-take' && keyboardPopup.gloss === firstPopup.gloss && keyboardBack.word && !keyboardBack.popup && !keyboardBack.sheet,
       `focusable=${keyboardFocusable} popup=${JSON.stringify(keyboardPopup)} back=${JSON.stringify(keyboardBack)}`,
     );
     check(
@@ -596,7 +646,7 @@ async function main() {
     await particle.press('Escape');
     check('Escape on the particle closes its quick look', (await page.locator('#mini').count()) === 0);
     // a fresh particle, from the keyboard: the word menu (Shift+F10) carries its full entry
-    await page.locator('#reader .tok.particle').nth(1).focus();
+    await focusProseOccurrence(page, page.locator('#reader .tok.particle').nth(1));
     await page.keyboard.press('Shift+F10');
     const particleDoor = page.locator('#reader-word-menu [data-menu-action="entry"]');
     const hasParticleDoor = (await particleDoor.count()) === 1;
@@ -611,7 +661,7 @@ async function main() {
     console.log('\n— named modal sheet focus lifecycle');
     await openReader(page, base);
     const invoker = page.locator('#reader .tok.content').nth(2);
-    await invoker.focus();
+    await focusProseOccurrence(page, invoker);
     const invokerIndex = await invoker.getAttribute('data-index');
     await openWordDialog(page);
     const dialog = await page.evaluate(`(() => {
@@ -670,6 +720,8 @@ async function main() {
       isMobile: true,
       reducedMotion: 'reduce',
     });
+    // This is an existing-device journey; G3's fresh-device demonstration has its own verifier.
+    await reducedContext.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
     await reducedContext.clock.setSystemTime(SHELF_DAY);
     const reducedPage = await reducedContext.newPage();
     await openReader(reducedPage, base);
@@ -729,6 +781,8 @@ async function main() {
       hasTouch: true,
       isMobile: true,
     });
+    // This is an existing-device journey; G3's fresh-device demonstration has its own verifier.
+    await pressContext.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
     await pressContext.clock.setSystemTime(SHELF_DAY);
     const pressPage = await pressContext.newPage();
     await openReader(pressPage, base);

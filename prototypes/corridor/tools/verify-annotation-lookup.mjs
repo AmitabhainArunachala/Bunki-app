@@ -37,7 +37,7 @@ assert.equal(sha(original), sourceFiles.get('corridor.js'));
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
 assert(engines.every(engine => ['chromium', 'webkit'].includes(engine)));
 const host = await startStaticHost({ site, port: 0 });
-const results = [], failures = [];
+const results = [], failures = [], browserVersions = {};
 const state = page => readAppRecordSnapshot(page);
 const targetRows = record => ({ taken: record.taken, srs: record.srs, revlog: record.revlog, deepWords: record.deepWords });
 
@@ -50,7 +50,14 @@ async function openLookup(page, text = '電車') {
     document.body.append(anchor);
     await window.annotationFixture.openJapaneseLookup(anchor, text);
   }, text);
+  await page.locator('#annotation-anchor[data-ladder-rung="reading"] rt').waitFor();
+  assert.equal(await page.locator('#mini').count(), 0, 'The first activation exposes reading only');
+  const shown = await page.locator('#annotation-anchor rt').evaluate(node => ({ text: node.textContent,
+    opacity: Number(getComputedStyle(node).opacity), visibility: getComputedStyle(node).visibility }));
+  assert(shown.text && shown.opacity > 0 && shown.visibility !== 'hidden', 'The first reading must actually paint');
+  await page.evaluate(text => window.annotationFixture.openJapaneseLookup(document.getElementById('annotation-anchor'), text), text);
   await page.locator('#mini').waitFor();
+  assert.equal(await page.locator('#annotation-anchor').getAttribute('data-ladder-rung'), 'stage');
 }
 // Save ▾ (1.3.0; one-hand pass 2026-10-15): the popup has one Save and no list button. On a word not yet saved the
 // press saves it and unfolds its menu (Review · lists · + New list · Copy) inside the card, under the button; on a
@@ -224,18 +231,22 @@ const cases = [
     });
     const word = page.locator('#assistance-fixture [data-lookup-text="電車"]');
     await word.click(); await page.waitForFunction(() => window.annotationGate.calls === 1);
-    assert.equal(await page.locator('#mini').count(), 0, 'No hint may appear while assistance persistence is pending');
+    assert.equal(await page.locator('#mini, #assistance-fixture rt').count(), 0, 'Neither reading nor stage may appear while assistance persistence is pending');
     await page.evaluate(() => window.annotationGate.resolve(false));
     await page.waitForTimeout(50);
-    assert.equal(await page.locator('#mini').count(), 0, 'Rejected assistance cannot reveal a hint');
+    assert.equal(await page.locator('#mini, #assistance-fixture rt').count(), 0, 'Rejected assistance cannot reveal a reading or stage');
     await word.click(); await page.waitForFunction(() => window.annotationGate.calls === 2);
     await page.evaluate(() => {
       const old = document.querySelector('#assistance-fixture [data-lookup-text="電車"]');
       const replacement = old.cloneNode(true); old.replaceWith(replacement);
       window.annotationGate.resolve(true);
     });
-    await page.locator('#mini').waitFor();
-    assert.equal(await page.locator('#mini .mini-reading').textContent(), 'でんしゃ');
+    await page.locator('#assistance-fixture [data-ladder-rung="reading"] rt').waitFor();
+    assert.equal(await page.locator('#mini').count(), 0, 'Approved first help reveals only the reading on the replacement occurrence');
+    assert.equal(await page.locator('#assistance-fixture rt').textContent(), 'でんしゃ');
+    assert.equal(await page.locator('#assistance-fixture rt').evaluate(node => {
+      const style = getComputedStyle(node); return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0;
+    }), true, 'The approved reading actually paints');
   }],
   ['skip-search-stroke-door', async page => {
     await page.locator('#chrome-search').click();
@@ -327,6 +338,8 @@ let browser;
 try {
   for (const engine of engines) {
     browser = await ({ chromium, webkit })[engine].launch();
+    browserVersions[engine] = browser.version();
+    console.log(`BROWSER ${engine} ${browserVersions[engine]}`);
     for (const { name, run, body, expect } of jobs) {
       const context = await browser.newContext({ viewport: { width: 1200, height: 900 }, locale: 'en-US', serviceWorkers: 'block' });
       await silenceBrowserAudio(context);
@@ -363,7 +376,7 @@ try {
   }
 } finally {
   await browser?.close(); await host.close();
-  writeFileSync(resolve(evidence, 'annotation-lookup.json'), JSON.stringify({ passed: failures.length === 0, identity,
+  writeFileSync(resolve(evidence, 'annotation-lookup.json'), JSON.stringify({ passed: failures.length === 0, identity, browserVersions,
     sourceSha256: sha(original), fixtureSha256: sha(fixture), shimSha256: sha(shim), verifierSha256: sha(readFileSync(new URL(import.meta.url))),
     controls: controls.map(([target, name, body]) => ({ case: target, name, fixtureSha256: sha(body) })),
     results, failures, limits: ['Test-only export shim and synthetic anchors; no operator profile or external service.', 'Native database writes and reload durability are exercised; visual acceptance belongs to the uninstrumented app.'] }, null, 2) + '\n');

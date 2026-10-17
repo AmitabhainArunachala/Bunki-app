@@ -360,6 +360,15 @@ const miniState = (page) => page.evaluate(() => {
     gloss: mini.querySelector('.mini-gloss')?.textContent ?? '', take: take ? { disabled: take.disabled, text: take.textContent.trim() } : null,
     reason: mini.querySelector('#mini-take-reason')?.textContent ?? null };
 });
+/** Reach the stage without waiting for dictionary settlement (cold-index gates hold that promise). */
+async function activateStage(page, locator, activate = () => tapAt(page, locator)) {
+  await activate();
+  // Advance only an observed reading rung; no blind second tap can rescue a dead door.
+  await page.waitForFunction((node) => !!document.getElementById('mini') || node.dataset.ladderRung === 'reading',
+    await locator.elementHandle(), { timeout: 20000 });
+  if (!await page.locator('#mini').count()) await activate();
+  await page.locator('#mini').waitFor({ timeout: 20000 });
+}
 /** The slip as it first paints, and as it settles: a slip drawn before the full dictionary answered is aria-busy
  * until the answer redraws it (or the answer changes nothing). */
 async function slip(page, locator, { keyboard = false } = {}) {
@@ -368,26 +377,27 @@ async function slip(page, locator, { keyboard = false } = {}) {
     if (keyboard) {
       const rover = await locator.evaluate((node) => {
         const block = node.closest('[data-prose-roving]');
-        if (!block) return null;
-        const selector = block.hasAttribute('data-reader-prose') ? '.tok[data-para]' : '.japanese-lookup-word';
-        return { index: [...block.querySelectorAll(selector)].filter((word) => word.closest('[data-prose-roving]') === block).indexOf(node) };
+        const native = node.matches('button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary');
+        if (!block) return { index: -1, native };
+        const selector = block.hasAttribute('data-reader-prose') ? '.tok[data-para]'
+          : node.matches('.sentence-tok') ? '.sentence-tok'
+            : node.matches('.kp-tok') ? '.kp-tok'
+              : block.querySelector('.gs-word') ? '.japanese-lookup-word,.gs-word' : '.japanese-lookup-word';
+        return { index: [...block.querySelectorAll(selector)].filter((word) => word.closest('[data-prose-roving]') === block).indexOf(node), native };
       });
-      if (rover) {
-        assert(rover.index >= 0, 'the requested word belongs to its prose rover');
+      if (rover.index >= 0) {
         await locator.locator('xpath=ancestor::*[@data-prose-roving][1]').focus();
         await page.keyboard.press('Home');
         for (let n = 0; n < rover.index; n++) await page.keyboard.press('ArrowRight');
-      } else await locator.focus();
+      } else {
+        assert(rover.native, 'a keyboard target outside its selector-specific rover must be a native focusable control');
+        await locator.focus();
+      }
+      assert(await locator.evaluate((node) => document.activeElement === node), 'keyboard activation must target the requested occurrence');
       await page.keyboard.press('Enter');
     } else await tapAt(page, locator);
   };
-  await activate();
-  // G3: a known on-touch reading is a real first rung. Advance only after observing the explicit reading rung;
-  // never conceal a dead door with an unconditional second tap. All entry assertions below remain unchanged.
-  await page.waitForFunction((node) => !!document.getElementById('mini') || node.dataset.ladderRung === 'reading',
-  await locator.elementHandle(), { timeout: 20000 });
-  if (!await page.locator('#mini').count()) await activate();
-  await page.locator('#mini').waitFor({ timeout: 20000 });
+  await activateStage(page, locator, activate);
   const first = await miniState(page);
   await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 30000 });
   await delay(100);
@@ -571,7 +581,7 @@ async function sentenceCase(page) {
   await slip(page, tok(page, 4));
   await tapAt(page, tok(page, 4));
   await page.locator('#sheet').waitFor({ timeout: 15000 });
-  const year = page.locator('#sheet .example-ja .sentence-tok').filter({ hasText: /^年$/u });
+  const year = page.locator('#sheet .example-ja .sentence-tok[data-prose-label="年"]');
   await year.first().waitFor({ timeout: 20000 });
   await stillFor(page, '#sheet');
   const counting = await year.evaluateAll((nodes) => nodes.findIndex((node) => /[0-9０-９〇一二三四五六七八九十]$/u.test(node.previousSibling?.textContent || '')));
@@ -618,8 +628,7 @@ async function coldCase(browser, contextOptions, answer) {
       };
       new MutationObserver(seen).observe(document.body, { childList: true, subtree: true, characterData: true });
     });
-    await tapAt(page, tok(page, COLD.index));
-    await page.locator('#mini').waitFor({ timeout: 20000 });
+    await activateStage(page, tok(page, COLD.index));
     for (let attempt = 0; attempt < 80 && !asked; attempt++) await delay(250);
     const held = await miniState(page);
     const line = await page.evaluate(() => {
@@ -694,8 +703,7 @@ async function unreadCase(browser, contextOptions) {
       };
       new MutationObserver(seen).observe(document.body, { childList: true, subtree: true, characterData: true });
     });
-    await tapAt(page, tok(page, UNREAD.index));
-    await page.locator('#mini').waitFor({ timeout: 20000 });
+    await activateStage(page, tok(page, UNREAD.index));
     for (let attempt = 0; attempt < 80 && !asked; attempt++) await delay(250);
     const held = await miniState(page);
     check(`${tag}.held`, 'with the full dictionary held, the card for 訳 reads やく, its meaning line is a quiet "…", Save is held and says nothing',

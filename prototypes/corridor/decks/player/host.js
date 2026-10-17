@@ -103,6 +103,7 @@ export function createHost(deps) {
   const taken = (entry) => (deps.taken() || []).some((row) => row.t === entry?.t && row.id === entry?.id);
   return {
     name: 'corridor',
+    installProseWords(block, selector) { deps.installProseWords?.(block, selector); },
     lookup(token) {
       if (!token?.s) return null;
       if (token.k === '部品') {

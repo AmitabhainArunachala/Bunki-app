@@ -24,12 +24,13 @@
  *   KAIRO_BROWSER=chromium|webkit|all (default all); GUIDED_PORT (default 57091).
  */
 import assert from 'node:assert/strict';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { chromium, webkit } from 'playwright-core';
 import AxeBuilder from '@axe-core/playwright';
+import { loadGuidedIndex, loadGuidedSet } from '../guided-session-content.mjs';
 import {
   resolveCorridorEvidence,
   resolveCorridorSite,
@@ -92,6 +93,8 @@ async function newContext(browser, options) {
   return context;
 }
 const KEY = 'kairo-guided-session-v1:kairo-guided-n2-living-thread-01';
+const readGuidedJson = async path => JSON.parse(readFileSync(join(SITE, path), 'utf8'));
+const guidedSet = await loadGuidedSet((await loadGuidedIndex(readGuidedJson)).find(entry => KEY.endsWith(entry.id)), readGuidedJson);
 const Q = [
   'kairo-original-jlpt-n2-short-01:q01',
   'kairo-original-jlpt-n2-short-01:q03',
@@ -128,6 +131,30 @@ const activeAction = (page) =>
   page.evaluate(
     () => document.activeElement?.dataset?.action || document.activeElement?.tagName || '',
   );
+
+/** Activate one known teaching occurrence through its exact visible-reading branch, never a retry loop. */
+async function teachingStage(page, door) {
+  const id = await door.getAttribute('data-word'), word = guidedSet.words[id];
+  assert(word?.reading, `The teaching fixture supplies the exact reading for ${id}`);
+  const printed = await door.locator('.gs-reading').evaluateAll(nodes => nodes.some(n => {
+    const style = getComputedStyle(n); return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0;
+  }));
+  const before = await stored(page);
+  await door.click();
+  if (!printed && word.reading !== word.surface) {
+    await page.waitForFunction(id => document.querySelector(`.guided-room .gs-word[data-word="${id}"][data-ladder-rung="reading"]`), id);
+    assert.equal(await door.getAttribute('data-ladder-rung'), 'reading');
+    assert.equal(await page.locator('#mini').count(), 0, 'A hidden reading appears before the teaching stage');
+    assert.equal(await door.locator('rt').textContent(), word.reading);
+    assert.equal(await door.locator('rt').evaluate(n => {
+      const style = getComputedStyle(n); return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0;
+    }), true, 'The exact teaching reading is visible');
+    await door.click();
+  }
+  await page.locator('#mini[data-from="guided"]').waitFor({ timeout: 5_000 });
+  assert.equal(await door.getAttribute('data-ladder-rung'), 'stage');
+  assert.deepEqual(await stored(page), before, 'Teaching lookup preserves the already recorded answer and help');
+}
 
 async function ready(page) {
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 60_000 });
@@ -335,11 +362,11 @@ async function journey(browser, browserName, viewport) {
     check('J6 teaching words are doors', (await page.locator('.guided-room .gs-word').count()) > 3);
     const occurrence = (await doors.count()) - 1;
     // one slip everywhere (the one-hand pass): a word door opens the app's slip beside it, from the session,
-    // with the word, its reading and its meaning; the same word again opens the full entry; closing that
-    // returns the explanation with the bare word, the room never having left its stage
+    // with the word, its reading and its meaning, after the hidden reading rung; the next activation
+    // opens the full entry, and Back restores this exact stage without another learning event.
     await doors.nth(occurrence).evaluate((n) => n.scrollIntoView({ block: 'center' }));
-    await doors.nth(occurrence).click();
-    await page.locator('#mini[data-from="guided"]').waitFor({ timeout: 5_000 });
+    const originalDoor = await doors.nth(occurrence).elementHandle();
+    await teachingStage(page, doors.nth(occurrence));
     const slip = await page.evaluate(() => {
       const m = document.getElementById('mini');
       return {
@@ -354,6 +381,7 @@ async function journey(browser, browserName, viewport) {
       JSON.stringify(slip),
     );
     await shot(page, dir, '07-word');
+    const beforeEntry = await stored(page);
     await doors.nth(occurrence).click();
     await page.locator('#sheet').waitFor({ timeout: 10_000 });
     check(
@@ -362,13 +390,16 @@ async function journey(browser, browserName, viewport) {
     );
     await page.locator('#sheet-back').click();
     await page.locator('#sheet').waitFor({ state: 'detached', timeout: 5_000 });
+    await page.locator('#mini[data-from="guided"]').waitFor();
     check(
-      'J7c closing the entry returns the explanation with the bare word (no slip), the room on its stage',
-      (await room(page).getAttribute('data-stage')) === 'insight' && (await page.locator('#mini').count()) === 0,
+      'J7c Back restores the exact teaching occurrence and stage, with focus and no extra learning event',
+      (await room(page).getAttribute('data-stage')) === 'insight'
+        && await originalDoor.evaluate(n => n.isConnected && n.dataset.ladderRung === 'stage' && document.activeElement === n)
+        && await page.locator('#mini .mini-word').textContent() === '専門家'
+        && JSON.stringify(await stored(page)) === JSON.stringify(beforeEntry),
     );
     const trayBefore = await page.locator('#tray').innerText();
     const answersBeforeSave = JSON.stringify((await stored(page)).answers);
-    await doors.nth(occurrence).click();
     await page.locator('#mini[data-from="guided"] #mini-take').waitFor({ timeout: 5_000 });
     await page.locator('#mini #mini-take').click();
     if (MOMENTS) {
@@ -457,8 +488,7 @@ async function journey(browser, browserName, viewport) {
     await act(page, 'explain').click();
     const door58 = page.locator('.guided-room .gs-word[data-word="word_58"]').first();
     await door58.evaluate((n) => n.scrollIntoView({ block: 'center' }));
-    await door58.click();
-    await page.locator('#mini[data-from="guided"]').waitFor({ timeout: 5_000 });
+    await teachingStage(page, door58);
     await door58.click();
     await page.locator('#sheet').waitFor({ timeout: 10_000 });
     await page.locator('#sheet #sheet-take').click();
@@ -471,7 +501,6 @@ async function journey(browser, browserName, viewport) {
     );
     await page.locator('#sheet-back').click();
     await page.locator('#sheet').waitFor({ state: 'detached', timeout: 5_000 });
-    await door58.click();
     await page.locator('#mini[data-from="guided"] #mini-take').waitFor({ timeout: 5_000 });
     check(
       'S0b the word’s slip reads that card as already saved: Saved ✓, live, its lists menu one press away',
@@ -1008,7 +1037,7 @@ async function switches(browser, browserName) {
     );
     await act(reduced, 'explain').click();
     // the first word door of whichever explanation is open: its slip, then Save (the walk is about the crane)
-    await reduced.locator('.guided-room .gs-word').first().evaluate((n) => n.click());
+    await teachingStage(reduced, reduced.locator('.guided-room .gs-word').first());
     await reduced.locator('#mini[data-from="guided"] #mini-take').waitFor({ timeout: 5_000 });
     await reduced.locator('#mini #mini-take').click();
     await reduced.locator('.bunki-moment').waitFor();

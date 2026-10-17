@@ -70,6 +70,27 @@ async function openStage(page) {
   await page.locator('#mini').waitFor();
   assert.equal(await lookup(page).getAttribute('data-ladder-rung'), 'stage', 'The repeated tap advances the same occurrence');
 }
+async function visitEntryAndReturn(page) {
+  const occurrence = await lookup(page).elementHandle();
+  const stageKey = await page.locator('#mini').getAttribute('data-key');
+  const before = await stored(page);
+  await lookup(page).click();
+  await page.locator('#sheet').waitFor();
+  assert.equal(await page.locator('#sheet').getAttribute('data-node'), stageKey, 'The full page names the same entry as the stage');
+  assert.equal(await occurrence.evaluate(n => n.isConnected && !!n.closest('[inert]') && !!n.closest('[aria-hidden="true"]')), true,
+    'The original guided occurrence remains under the page, inert and hidden from accessibility');
+  await page.locator('#sheet').focus();
+  for (const key of ['3', 'u', 'Enter', 'Space']) await page.keyboard.press(key);
+  assert.deepEqual(await stored(page), before, 'Covered-room keys cannot answer, advance or rewrite help');
+  assert.equal(await page.locator('#sheet').count(), 1, 'The full page still owns the keys');
+  await page.locator('#sheet-back').click();
+  await page.locator('#mini').waitFor();
+  assert.equal(await page.locator('#mini').getAttribute('data-key'), stageKey, 'Back restores the same stage');
+  assert.equal(await occurrence.evaluate(n => n.isConnected && document.activeElement === n && n.dataset.ladderRung === 'stage'), true,
+    'Back returns focus and stage to the exact original occurrence');
+  assert.deepEqual(await stored(page), before, 'Page entry and return create no extra assistance event');
+  return { stageKey, retainedOccurrence: true, helpUnchanged: true };
+}
 try {
   for (const engine of engines) {
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true });
@@ -130,6 +151,7 @@ try {
         await openStage(page);
         const atStage = await page.evaluate(() => window.__guidedHintSnapshots.find(row => row.rung === 'stage')?.state);
         assert.deepEqual(atStage?.answers[first], atHint.answers[first], 'Advancing to the stage does not change assistance or the answer');
+        const returned = await visitEntryAndReturn(page);
         await closeMini(page);
         await answer(page, 0);
         assert.match(await page.locator('.gs-feedback').innerText(), /looked up a word before answering/u);
@@ -148,7 +170,7 @@ try {
         await page.reload();
         await page.waitForFunction(() => document.body.dataset.ready === '1');
         assert.deepEqual((await stored(page)).answers, state.answers, 'Help and first responses survive reload');
-        return { beforeHint: atHint.answers[first], first: state.answers[first], second: state.answers[second] };
+        return { beforeHint: atHint.answers[first], first: state.answers[first], second: state.answers[second], returned };
       });
       await check('refused-write-retry-and-retired-question', async page => {
         const first = Q[0].id, second = Q[1].id, before = await stored(page);
@@ -187,7 +209,7 @@ try {
   writeFileSync(resolve(evidence, 'guided-lookup.json'), JSON.stringify({
     artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
-    scope: 'Real guided question lookup lifecycle, before-hint durability, after-answer honesty, refused write retry and retired-question guard; no design or voice claim',
+    scope: 'Real guided question lookup lifecycle, before-hint durability, retained full-page return, after-answer honesty, refused write retry and retired-question guard; no design or voice claim',
     results, passed,
   }, null, 2) + '\n');
   if (!passed) process.exitCode = 1;

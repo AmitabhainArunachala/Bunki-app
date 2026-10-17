@@ -8,7 +8,7 @@ import { openShelfTools } from './shelf-tools-support.mjs';
  * spells its passage with exactly one marked word, and the marked word carries
  * a kana reading.
  *
- * Half two drives the corridor in real Chromium:
+ * Half two drives the selected real browser (KAIRO_BROWSER=chromium|webkit|all):
  *   · 集中道場 › デッキ lists the deck; opening it shows the deck home;
  *   · a card shows the sentence with the word marked, reveals readings,
  *     meaning and source, and a grade lands in
@@ -126,18 +126,26 @@ import { openShelfTools } from './shelf-tools-support.mjs';
 
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { AxeBuilder } from '@axe-core/playwright';
-import { chromium } from 'playwright-core';
-import { resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { chromium, webkit } from 'playwright-core';
+import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 
 import { contrastByWorld, contrastTable, KIND_JI_FLOOR, kindJiTable } from './contrast-kotoba.mjs';
 
+const requestedEngine = process.env.KAIRO_BROWSER || 'chromium';
+if (!['chromium', 'webkit', 'all'].includes(requestedEngine)) throw new Error('KAIRO_BROWSER must be chromium, webkit or all');
+const engines = requestedEngine === 'all' ? ['chromium', 'webkit'] : [requestedEngine];
+const only = process.argv.find(arg => arg.startsWith('--case='))?.slice(7) || null;
+if (only && !['tap', 'host'].includes(only)) throw new Error('--case supports tap or host; omit it for the complete verifier');
+const evidence = resolveCorridorEvidence();
+let actualEngine = null;
+const browserVersions = {}, results = [];
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
 // The battery's law: verify the built artifact, not the source tree. Deck sources, the release
 // folder and the build tools live in the repository, outside the built site.
@@ -184,6 +192,7 @@ function startServer(rootDir = CORRIDOR_DIR) {
 let failures = 0;
 function check(name, pass, detail = '') {
   if (!pass) failures += 1;
+  results.push({ engine: actualEngine, name, pass: !!pass, detail });
   console.log(`${pass ? '  ok  ' : ' FAIL '} ${name}${detail ? `  — ${detail}` : ''}`);
 }
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'));
@@ -211,6 +220,59 @@ async function studyFontEvidence(page) {
     nodes.forEach((node, i) => node.setAttribute('data-kp-font-probe', String(i)));
     return { faces: faces.length, embedded: faces.every((rule) => /^url\(["']?data:font\/woff2;base64,/.test(rule.style.getPropertyValue('src'))), registered: document.fonts.size, status: document.fonts.status, errorFaces: [...document.fonts].filter((face) => face.status === 'error').length, textNodes: nodes.length };
   });
+  if (actualEngine === 'webkit') {
+    // WebKit exposes no public CDP font-attribution API. Compare the renderer's
+    // actual text rasters with independently named copies of the embedded faces;
+    // a fallback-family mutation must fail that same comparison. This is raster
+    // evidence, not a fabricated native/custom glyph census.
+    try {
+      const raster = await page.evaluate(async () => {
+        const rules = [...document.styleSheets].flatMap(sheet => [...sheet.cssRules]).filter(rule => rule.type === 5);
+        const unquote = text => text.trim().replace(/^["']|["']$/gu, '');
+        const nodes = [...document.querySelectorAll('[data-kp-font-probe]')];
+        const cases = nodes.map(node => {
+          const cs = getComputedStyle(node);
+          return { node, family: unquote(cs.fontFamily.split(',')[0]), stack: cs.fontFamily, weight: cs.fontWeight, style: cs.fontStyle,
+            text: [...node.childNodes].filter(child => child.nodeType === Node.TEXT_NODE).map(child => child.textContent).join('') };
+        });
+        const families = [...new Set(cases.map(row => row.family))], aliases = new Map(families.map((family, i) => [family, `kp-probe-${i}`])), added = [];
+        const canvas = document.createElement('canvas'); canvas.width = 4096; canvas.height = 100;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const raster = (row, family) => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.font = `${row.style} ${row.weight} 32px ${family}`; ctx.fillStyle = '#000';
+          ctx.fillText(row.text, 2, 60);
+          return { width: ctx.measureText(row.text).width, data: ctx.getImageData(0, 0, canvas.width, canvas.height).data };
+        };
+        const same = (a, b) => a.width === b.width && a.data.every((v, i) => v === b.data[i]);
+        try {
+          for (const rule of rules) {
+            const family = unquote(rule.style.fontFamily), alias = aliases.get(family);
+            if (!alias) continue;
+            const face = new FontFace(alias, rule.style.getPropertyValue('src'), { weight: rule.style.fontWeight || 'normal', style: rule.style.fontStyle || 'normal', unicodeRange: rule.style.getPropertyValue('unicode-range') || 'U+0-10FFFF' });
+            document.fonts.add(face); added.push(face);
+          }
+          const missingFamilies = families.filter(family => !rules.some(rule => unquote(rule.style.fontFamily) === family));
+          for (const row of cases) await document.fonts.load(`${row.style} ${row.weight} 32px "${aliases.get(row.family)}"`, row.text);
+          const rows = cases.map(row => {
+            const expectedStack = row.stack.split(',').map(family => aliases.has(unquote(family)) ? `"${aliases.get(unquote(family))}"` : family).join(',');
+            const expected = raster(row, expectedStack), actual = raster(row, getComputedStyle(row.node).fontFamily);
+            const oldStyle = row.node.getAttribute('style');
+            row.node.style.setProperty('font-family', 'monospace', 'important');
+            const mutant = raster(row, getComputedStyle(row.node).fontFamily);
+            if (oldStyle === null) row.node.removeAttribute('style'); else row.node.setAttribute('style', oldStyle);
+            return { family: row.family, text: row.text, matchesEmbedded: same(actual, expected), fallbackRejected: !same(mutant, expected), unclipped: expected.width < canvas.width - 4 };
+          });
+          return { method: 'webkit-embedded-face-raster', families, cases: rows.length, missingFamilies,
+            matched: rows.filter(row => row.matchesEmbedded).length, unclipped: rows.every(row => row.unclipped),
+            fallbackRejected: rows.filter(row => row.fallbackRejected).length, failures: rows.filter(row => !row.matchesEmbedded || !row.unclipped) };
+        } finally { for (const face of added) document.fonts.delete(face); }
+      });
+      return { ...census, ...raster, statusAfterGlyphs: await page.evaluate(() => document.fonts.status) };
+    } finally {
+      await page.evaluate(() => { for (const node of document.querySelectorAll('[data-kp-font-probe]')) node.removeAttribute('data-kp-font-probe'); });
+    }
+  }
   const cdp = await page.context().newCDPSession(page);
   try {
     await cdp.send('DOM.enable');
@@ -220,13 +282,15 @@ async function studyFontEvidence(page) {
     const fonts = [];
     for (const nodeId of nodeIds) fonts.push(...(await cdp.send('CSS.getPlatformFontsForNode', { nodeId })).fonts);
     const statusAfterGlyphs = await page.evaluate(() => document.fonts.status);
-    return { ...census, statusAfterGlyphs, glyphs: fonts.reduce((n, f) => n + f.glyphCount, 0), nativeGlyphs: fonts.filter((f) => !f.isCustomFont).reduce((n, f) => n + f.glyphCount, 0), families: [...new Set(fonts.filter((f) => f.glyphCount).map((f) => f.familyName))] };
+    return { ...census, method: 'chromium-native-glyph-attribution', statusAfterGlyphs, glyphs: fonts.reduce((n, f) => n + f.glyphCount, 0), nativeGlyphs: fonts.filter((f) => !f.isCustomFont).reduce((n, f) => n + f.glyphCount, 0), families: [...new Set(fonts.filter((f) => f.glyphCount).map((f) => f.familyName))] };
   } finally {
     await page.evaluate(() => { for (const node of document.querySelectorAll('[data-kp-font-probe]')) node.removeAttribute('data-kp-font-probe'); });
     await cdp.detach();
   }
 }
-const studyFontsPass = (f) => f.faces === 451 && f.embedded && f.registered === 451 && f.status === 'loaded' && f.statusAfterGlyphs === 'loaded' && f.errorFaces === 0 && f.textNodes > 0 && f.glyphs > 0 && f.nativeGlyphs === 0;
+const studyFontsPass = (f) => f.faces === 451 && f.embedded && f.registered === 451 && f.status === 'loaded' && f.statusAfterGlyphs === 'loaded' && f.errorFaces === 0 && f.textNodes > 0 &&
+  (f.method === 'chromium-native-glyph-attribution' ? f.glyphs > 0 && f.nativeGlyphs === 0
+    : f.method === 'webkit-embedded-face-raster' && f.cases === f.textNodes && f.matched === f.cases && f.missingFamilies.length === 0 && f.unclipped && f.fallbackRejected > 0);
 
 /* ------------------------------------------------- half one: the deck */
 function verifyDeck() {
@@ -816,18 +880,19 @@ async function verifyHost(browser, base) {
       const toks = await m.tokensFor('kotoba-mcd', ${JSON.stringify(id)});
       const pick = (k) => toks.find((t) => t.k === k && t.ref);
       const word = h.lookup(pick('語')), kanji = h.lookup(pick('字')), grammar = h.lookup(pick('文法'));
-      const other = h.lookup(toks.find((t) => t.k === 'other'));
+      const other = h.lookup({ s: '。', b: '。', k: 'other' });
+      const particle = h.lookup({ s: 'は', b: 'は', r: 'は', k: 'other' });
       const takenBefore = h.isTaken(word);
       const took = await h.take(word);
       const again = await h.take(word);
       const kanjiTook = await h.take(kanji);
       return {
         host: document.querySelector('.kp')?.dataset.host,
-        methods: ['lookup', 'open', 'isTaken', 'take', 'addToList'].filter((k) => typeof h?.[k] === 'function').length,
+        methods: ['lookup', 'open', 'isTaken', 'take', 'addToList', 'installProseWords'].filter((k) => typeof h?.[k] === 'function').length,
         lists: typeof h?.lists,
         tokens: toks.length, spells: toks.map((t) => t.s).join('').length,
         word, kanji: kanji && { t: kanji.t, id: kanji.id, gloss: kanji.gloss }, grammar: grammar && { t: grammar.t, id: grammar.id, label: grammar.label },
-        other,
+        other, particle,
         takenBefore, took, again, kanjiTook,
         takenAfter: h.isTaken(word), kanjiTaken: h.isTaken(kanji),
         // the toast's own words, without its Undo action's
@@ -844,14 +909,14 @@ async function verifyHost(browser, base) {
     const loaded = fetched.filter((p) => p.endsWith('/tokens.json')).length - before;
     const ledgerAfter = await page.evaluate(`localStorage.getItem('bunki-cloze:kotoba-mcd')`);
     check(
-      'host: the corridor mounts the deck with its lexicon adapter (lookup, open, isTaken, take, addToList; no lists() chooser feed); the tokens side file loads only when asked',
-      o.host === 'corridor' && o.methods === 5 && o.lists === 'undefined' && before === 0 && loaded === 1,
+      'host: the corridor mounts the deck with its lexicon adapter (lookup, open, isTaken, take, addToList, installProseWords; no lists() chooser feed); the tokens side file loads only when asked',
+      o.host === 'corridor' && o.methods === 6 && o.lists === 'undefined' && before === 0 && loaded === 1,
       JSON.stringify({ host: o.host, methods: o.methods, tokensFetchedAtStart: before, onAsk: loaded }),
     );
     check(
-      `host: lookup of known tokens on ${id} returns entries — a 語 with its reading and gloss, a 字 from kanji.json, a 文法 point from the grammar table; a particle returns null`,
-      o.word?.t === 'word' && !!o.word.label && !!o.word.reading && !!o.word.gloss && o.kanji?.t === 'kanji' && !!o.kanji.gloss && o.grammar?.t === 'grammar' && !!o.grammar.label && o.other === null && o.spells > 0,
-      JSON.stringify({ word: o.word && { id: o.word.id, label: o.word.label, reading: o.word.reading, gloss: o.word.gloss }, kanji: o.kanji, grammar: o.grammar, other: o.other }),
+      `host: lookup of known tokens on ${id} returns entries — a 語 with its reading and gloss, a 字 from kanji.json, a 文法 point from the grammar table; punctuation stays plain while known Japanese は resolves`,
+      o.word?.t === 'word' && !!o.word.label && !!o.word.reading && !!o.word.gloss && o.kanji?.t === 'kanji' && !!o.kanji.gloss && o.grammar?.t === 'grammar' && !!o.grammar.label && o.other === null && o.particle?.t === 'word' && o.particle.id === 'は' && o.spells > 0,
+      JSON.stringify({ word: o.word && { id: o.word.id, label: o.word.label, reading: o.word.reading, gloss: o.word.gloss }, kanji: o.kanji, grammar: o.grammar, other: o.other, particle: o.particle }),
     );
     check(
       'host: take() is the corridor’s one-tap save (A51) — the word and a 字 land in the shared review pool (覚えるの札) of the durable record at once, with the Saved toast and 元に戻す and no chooser; a second take writes nothing; isTaken() then says so; the deck ledger, the observation log and the schedule are untouched',
@@ -897,7 +962,7 @@ async function verifyHost(browser, base) {
     seen.every((x) => x.host === 'none' && x.tokens === 0) && html.every((t) => !t.includes('createHost') && !t.includes('bunki-cloze-tokens","version') && !/"tokens":"tokens/.test(t) && t.includes('function hostAdapter')),
     JSON.stringify(seen),
   );
-  check('host: both actual release study pages embed all 451 font faces and paint visible home text entirely with bundled fonts',
+  check('host: both actual release study pages embed 451 faces; Chromium attributes visible glyphs to bundled fonts, WebKit matches embedded-face rasters and rejects fallback',
     seen.length === 2 && seen.every((x) => studyFontsPass(x.fonts)), JSON.stringify(seen.map(({ page, fonts }) => ({ page, fonts }))));
 }
 
@@ -1088,18 +1153,52 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
 const SCHEDULE_OF = (key) => `(() => { const s = JSON.parse(localStorage.getItem(${JSON.stringify(key)}) || '{}'); return JSON.stringify({ cards: s.cards || {}, log: s.log || [], groupsOff: s.groupsOff || [], suspended: s.suspended || {}, repairs: s.repairs || {}, repairLog: s.repairLog || [] }); })()`;
 const LOOKUPS_OF = (key) => `(JSON.parse(localStorage.getItem(${JSON.stringify(key)}) || '{}').lookups || [])`;
 const RESTING = `new Promise((ok, fail) => { let last = -1; let same = 0; const started = performance.now(); const tick = () => { if (performance.now() - started > 5000) return fail(new Error('The revealed card did not reach its resting scroll and ink within 5 seconds')); const moving = document.getElementById('kp-card').getAnimations({ subtree: true }).some((a) => a.playState === 'running' && a.effect?.getComputedTiming().endTime !== Infinity); if (scrollY === last) { if (++same >= 6 && !moving) return ok(Math.round(scrollY)); } else { same = 0; last = scrollY; } requestAnimationFrame(tick); }; tick(); })`;
-/** the tap targets' reach: elementFromPoint 21px above and below each sampled word's centre lands on that word */
-const REACH = `(() => {
-  const bar = document.querySelector('.kp-grades')?.getBoundingClientRect().top ?? innerHeight;
-  const toks = [...document.querySelectorAll('#kp-card .kp-sentence .kp-tok:not(.kp-target)')].filter((t) => { const r = t.getClientRects(); if (r.length !== 1) return false; const c = (r[0].top + r[0].bottom) / 2; return c > 80 && c < bar - 30; }).slice(0, 12);
-  const miss = [];
-  for (const t of toks) {
-    const r = t.getClientRects()[0];
-    const x = (r.left + r.right) / 2, y = (r.top + r.bottom) / 2;
-    for (const dy of [-21, 21]) { const hit = document.elementFromPoint(x, y + dy); if (!hit || !t.contains(hit)) miss.push(t.textContent + (dy < 0 ? '↑' : '↓')); }
+/** Overlapping transparent reaches route to the nearest printed word. Prove the actual
+ * activation, including occurrence identity; raw elementFromPoint ownership is only a witness.
+ * The caller supplies a fresh context with readings off, so every first activation is stage 2. */
+async function wordReach(page, key) {
+  const samples = await page.evaluate(async () => {
+    const host = (await import(new URL('decks/player/mount.js', location.href).href)).hostAdapter();
+    const all = [...document.querySelectorAll('#kp-card .kp-sentence .kp-tok')];
+    const bar = document.querySelector('.kp-grades')?.getBoundingClientRect().top ?? innerHeight;
+    return all.filter(n => {
+      const rects = n.getClientRects(), r = rects[0];
+      return !n.classList.contains('kp-target') && rects.length === 1 && r.width > 0
+        && (r.top + r.bottom) / 2 > 80 && (r.top + r.bottom) / 2 < bar - 30;
+    }).slice(0, 12).map(n => {
+      const unit = n.kpUnit, entry = unit.word ? null : host.lookup(unit.tok);
+      return { index: all.indexOf(n), surface: unit.tok?.s || unit.word.term,
+        key: unit.word ? `deck:${unit.word.id}` : entry ? `${entry.t}:${entry.id}` : '',
+        card: document.getElementById('kp-card').dataset.card, height: n.getClientRects()[0].height };
+    });
+  });
+  const baseline = await page.evaluate(SCHEDULE_OF(key));
+  const points = [];
+  for (const sample of samples) for (const dy of [-21, 21]) {
+    const target = page.locator('#kp-card .kp-sentence .kp-tok').nth(sample.index);
+    const point = await target.evaluate((n, offset) => {
+      const r = n.getClientRects()[0], x = (r.left + r.right) / 2, y = (r.top + r.bottom) / 2 + offset;
+      return { x, y, rawHit: document.elementFromPoint(x, y)?.closest('.kp-tok')?.dataset.proseLabel || '' };
+    }, dy);
+    const before = await page.evaluate(LOOKUPS_OF(key));
+    await page.mouse.click(point.x, point.y);
+    const actual = await target.evaluate(n => ({ occurrence: n.isConnected && n.dataset.ladderRung === 'stage'
+        && [...document.querySelectorAll('#kp-card [data-ladder-rung]')].length === 1,
+      rung: n.dataset.ladderRung || '', key: document.getElementById('mini')?.dataset.key,
+      from: document.getElementById('mini')?.dataset.from, sheet: !!document.getElementById('sheet') }));
+    const after = await page.evaluate(LOOKUPS_OF(key)), row = after.at(-1);
+    const oneRow = after.length === before.length + 1 && JSON.stringify(after.slice(0, -1)) === JSON.stringify(before)
+      && row[1] === sample.card && row[2] === 'p' && row[3] === sample.surface && row[4] === sample.key && row[5] === 2;
+    const scheduleSame = await page.evaluate(SCHEDULE_OF(key)) === baseline;
+    await page.keyboard.press('Escape');
+    const folded = await target.evaluate(n => !n.dataset.ladderRung && !document.getElementById('mini') && !document.getElementById('sheet'));
+    const foldQuiet = JSON.stringify(await page.evaluate(LOOKUPS_OF(key))) === JSON.stringify(after);
+    points.push({ ...sample, expectedKey: sample.key, dy, ...point, ...actual, oneRow, scheduleSame, folded, foldQuiet,
+      pass: actual.occurrence && actual.rung === 'stage' && actual.key === sample.key && actual.from === 'deck'
+        && !actual.sheet && oneRow && scheduleSame && folded && foldQuiet });
   }
-  return { sampled: toks.length, miss, height: toks[0] ? toks[0].getClientRects()[0].height : 0 };
-})()`;
+  return { sampled: samples.length, height: samples[0]?.height || 0, points, miss: points.filter(p => !p.pass) };
+}
 
 async function verifyTap(browser, base) {
   const mcd = readJson(DECK_PATH);
@@ -1127,8 +1226,19 @@ async function verifyTap(browser, base) {
   };
   const KEY = 'bunki-cloze:kotoba-mcd';
 
+  // Reach observations live in their own record; the ladder fixture below must still start at zero.
+  const reachRun = await open('?deck=mcd&dials=0,0,0', 'kotoba-mcd', { prefs: { readings: 'off' } });
+  let reach;
+  try {
+    await reachRun.page.click('#kp-reveal');
+    await reachRun.page.waitForSelector('#kp-card .kp-sentence .kp-tok');
+    await reachRun.page.evaluate(RESTING);
+    reach = await wordReach(reachRun.page, KEY);
+    check('tap: reach fixture has no page errors', reachRun.errors.length === 0, reachRun.errors.join(' | '));
+  } finally { await reachRun.context.close(); }
+
   // 1. the corridor: a new card of 財政 (km-064-m01), then a due card of 金利 (km-109-m01), whose definition names 利息
-  let o = await open('?deck=mcd', 'kotoba-mcd');
+  let o = await open('?deck=mcd&dials=0,1,0', 'kotoba-mcd', { prefs: { readings: 'off' } });
   try {
     const { page } = o;
     await page.waitForLoadState('networkidle');
@@ -1165,16 +1275,16 @@ async function verifyTap(browser, base) {
       const rest = getComputedStyle(t).textDecorationLine;
       const restShadow = getComputedStyle(t).boxShadow;
       return { toks, restShadow, def: [...document.querySelectorAll('#kp-card .kp-def .kp-tok')].map((n) => n.textContent), target: document.querySelectorAll('#kp-card .kp-sentence .kp-target.kp-tok').length, rest,
-        roles: [...document.querySelectorAll('#kp-card .kp-tok')].every((n) => n.getAttribute('role') === 'button' && n.tabIndex === 0) };
+        roles: [...document.querySelectorAll('#kp-card .kp-tok')].every(n => n.tagName === 'SPAN' && n.getAttribute('role') === 'presentation' && !n.hasAttribute('tabindex') && !n.hasAttribute('aria-label') && !n.hasAttribute('aria-haspopup')),
+        paragraphs: [...document.querySelectorAll('#kp-card .kp-sentence, #kp-card .kp-def')].filter(n => n.querySelector('.kp-tok')).every(n => n.dataset.proseRoving === 'true' && n.tabIndex === 0) };
     })()`);
     const missing = want.filter((w) => !back.toks.includes(w.s)).map((w) => w.s);
     check(
-      `tap: after the reveal every word of ${front.card}'s passage (語・字・文法, ${want.length}) and of its definition is a tap target, the target too; buttons by role, in the tab order`,
-      missing.length === 0 && back.toks.length >= want.length && back.def.length >= 2 && back.target >= 1 && back.roles,
-      JSON.stringify({ want: want.length, got: back.toks.length, missing: missing.slice(0, 5), def: back.def, target: back.target }),
+      `tap: after the reveal every word of ${front.card}'s passage (語・字・文法, ${want.length}) and of its definition is a tap target, the target too; native inline prose with one Tab stop per paragraph`,
+      missing.length === 0 && back.toks.length >= want.length && back.def.length >= 2 && back.target >= 1 && back.roles && back.paragraphs,
+      JSON.stringify({ want: want.length, got: back.toks.length, missing: missing.slice(0, 5), def: back.def, target: back.target, roles: back.roles, paragraphs: back.paragraphs }),
     );
     await page.evaluate(RESTING);
-    const reach = await page.evaluate(REACH);
     await page.hover('#kp-card .kp-sentence .kp-tok:not(.kp-target)');
     const hover = await page.evaluate(`(() => { const t = document.querySelector('#kp-card .kp-sentence .kp-tok:not(.kp-target)'); const cs = getComputedStyle(t);
       const p = document.createElement('i'); document.body.append(p); p.style.color = 'var(--color-reading)'; const reading = getComputedStyle(p).color; p.remove();
@@ -1182,21 +1292,64 @@ async function verifyTap(browser, base) {
     // the one-hand pass: the house's one word mark (family H) — a hairline underline in the reading's colour,
     // drawn as an inset shadow, no text-decoration, nothing at rest
     check(
-      "tap: each word reaches 44px tall (a press 21px above or below its centre lands on it), wears no mark at rest, and under the pointer wears the house's one word mark: a hairline underline in the reading's colour (an inset shadow, no text-decoration)",
-      reach.sampled >= 5 && reach.miss.length === 0 && back.rest === 'none' && back.restShadow === 'none' && hover.deco === 'none' && hover.shadow.includes('inset') && hover.shadow.includes(hover.reading) && /-0\.5px/.test(hover.shadow),
+      "tap: each word reaches 44px tall (real presses 21px above and below activate its exact occurrence, stage and key once without scheduling), wears no mark at rest, and under the pointer wears the house's one word mark: a hairline underline in the reading's colour (an inset shadow, no text-decoration)",
+      reach.sampled >= 5 && reach.points.length === reach.sampled * 2 && reach.miss.length === 0 && back.rest === 'none' && back.restShadow === 'none' && hover.deco === 'none' && hover.shadow.includes('inset') && hover.shadow.includes(hover.reading) && /-0\.5px/.test(hover.shadow),
       JSON.stringify({ ...reach, rest: back.rest, restShadow: back.restShadow, hover }),
     );
 
     const before = { sched: await page.evaluate(SCHEDULE_OF(KEY)), env: await env(page) };
     // a word of the passage that is not this deck's: 人口
-    const tok = page.locator('#kp-card .kp-sentence .kp-tok:not(.kp-target):not([data-deck-word])').first();
+    const candidates = page.locator('#kp-card .kp-sentence .kp-tok:not(.kp-target):not([data-deck-word])');
+    const candidateIndex = await candidates.evaluateAll(nodes => nodes.findIndex(node => node.querySelector('ruby[data-rt]') && node.kpUnit?.tok?.k === '語'));
+    if (candidateIndex < 0) throw new Error('Fixture has no hidden-reading lexical word');
+    const tok = candidates.nth(candidateIndex);
     const tokText = await tok.evaluate((n) => { const c = n.cloneNode(true); c.querySelectorAll('rt').forEach((r) => r.remove()); return c.textContent; });
-    await tok.click();
-    // one slip everywhere (the one-hand pass): the app's slip opens beside the word, from the deck
+    const wordIndex = await tok.evaluate(n => [...n.closest('.kp-sentence').querySelectorAll('.kp-tok')].indexOf(n));
+    await page.locator('#kp-card .kp-sentence').focus();
+    await page.keyboard.press('Home');
+    for (let index = 0; index < wordIndex; index++) await page.keyboard.press('ArrowRight');
+    check('tap: paragraph arrows select the exact occurrence without opening or logging',
+      await tok.evaluate(n => document.activeElement === n && n.getAttribute('role') === 'group' && n.tabIndex === -1)
+        && await page.locator('#mini').count() === 0 && (await page.evaluate(LOOKUPS_OF(KEY))).length === 0);
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(() => document.querySelector('#kp-card [data-ladder-rung="reading"]'));
+    await page.waitForFunction(() => [...document.querySelectorAll('#kp-card [data-ladder-rung="reading"] ruby')].every(n => Number(getComputedStyle(n, '::after').opacity) === 1));
+    const reading = await tok.evaluate(n => ({ expected: [...n.querySelectorAll('ruby[data-rt]')].map(r=>r.dataset.rt).join(''),
+      shown: [...n.querySelectorAll('ruby[data-rt]')].map(r => { const style=getComputedStyle(r,'::after'); const content=style.content;
+        return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity)>0
+          ? content.startsWith('attr(') ? r.dataset.rt : /^["'].*["']$/u.test(content) ? content.slice(1,-1) : '' : ''; }).join(''),
+      rung:n.dataset.ladderRung, lit:n.classList.contains('kp-lit') }));
+    check('tap: first Enter exposes the exact reading only, logs depth1 once and leaves the schedule unchanged',
+      reading.expected && reading.shown === reading.expected && reading.rung === 'reading' && reading.lit && await page.locator('#mini').count() === 0
+        && (await page.evaluate(LOOKUPS_OF(KEY))).map(row=>row[5]).join(',') === '1' && (await page.evaluate(SCHEDULE_OF(KEY))) === before.sched, JSON.stringify(reading));
+    await page.keyboard.press('Enter');
     await page.waitForSelector('#mini[data-from="deck"]');
     await page.waitForTimeout(250);
     const sheet = await page.evaluate(`(() => { const s = document.getElementById('mini'); const gloss = s.querySelector('.mini-gloss'); const word = s.querySelector('.mini-word'); return { key: s.dataset.key, term: word?.textContent, reading: s.querySelector('.mini-reading')?.textContent || '', ja: gloss?.textContent || '', jaLang: gloss?.lang || '', en2: !!s.querySelector('.mini-gloss-2'), door: word?.dataset.action === 'entry.open' && word.getAttribute('aria-label') === 'Open the full entry', take: !!s.querySelector('#mini-take'), inDeck: !!s.querySelector('.mini-note'), role: s.getAttribute('role'), modal: s.getAttribute('aria-modal'), focusLit: !!document.activeElement?.classList.contains('kp-lit'), kanji: s.querySelectorAll('.mini-kanji-row[data-kanji]').length }; })()`);
+    const stageRows = await page.evaluate(LOOKUPS_OF(KEY));
+    const occurrence = await tok.elementHandle();
+    await tok.click();
+    await page.waitForSelector('#sheet');
+    const pageNode = await page.locator('#sheet').getAttribute('data-node');
+    const pageRows = await page.evaluate(LOOKUPS_OF(KEY));
+    const covered = await occurrence.evaluate(n => n.isConnected && !!n.closest('[inert]') && !!n.closest('[aria-hidden="true"]'));
+    await page.locator('#sheet').focus();
+    for (const key of ['3', 'u', 'Enter', 'Space']) await page.keyboard.press(key);
+    check('tap: the full page retains an inert, hidden deck occurrence; grade, undo and advance keys cannot change its schedule or observations',
+      covered && await page.locator('#sheet').count() === 1 && await page.evaluate(SCHEDULE_OF(KEY)) === before.sched
+        && JSON.stringify(await page.evaluate(LOOKUPS_OF(KEY))) === JSON.stringify(pageRows)
+        && await page.locator('#kp-card').getAttribute('data-card') === front.card, JSON.stringify({ covered, pageNode }));
+    await page.locator('#sheet-back').click();
+    await page.waitForSelector('#mini[data-from="deck"]');
     const ledger1 = await page.evaluate(LOOKUPS_OF(KEY));
+    const returnedOccurrence = await occurrence.evaluate(n => ({ connected: n.isConnected, focused: document.activeElement === n,
+      rung: n.dataset.ladderRung, active: document.activeElement?.outerHTML.slice(0, 400) }));
+    check('tap: third activation opens the exact entry; Back restores its stage without another observation',
+      stageRows.map(row=>row[5]).join(',') === '1,2' && pageRows.map(row=>row[5]).join(',') === '1,2,3'
+        && pageNode === sheet.key && JSON.stringify(ledger1) === JSON.stringify(pageRows)
+        && returnedOccurrence.connected && returnedOccurrence.focused && returnedOccurrence.rung === 'stage'
+        && await page.locator('#mini').getAttribute('data-key') === sheet.key,
+      JSON.stringify({pageNode, key:sheet.key, depths:ledger1.map(row=>row[5]), returnedOccurrence}));
     check(
       `tap: a word of the passage (${tokText}) opens the slip through the host — its reading, the Japanese sense (or the slip's miss line), no English line under the deck's default (the band is the door into the full entry, where English lives), Save, its kanji band; a dialog that is not modal, the lit word keeping the keyboard`,
       /^(word|kanji|grammar):/.test(sheet.key) && !!sheet.term && !!sheet.ja && sheet.jaLang === 'ja' && !sheet.en2 && sheet.door && sheet.take && !sheet.inDeck && sheet.role === 'dialog' && sheet.modal === null && sheet.focusLit && sheet.kanji >= 1,
@@ -1216,17 +1369,21 @@ async function verifyTap(browser, base) {
       JSON.stringify({ ...saved, taken: after.env.taken }),
     );
     // the menu is the corridor's own list popover, inside the slip under its button: a list written here is the same guarded commit
-    const pop = await page.evaluate(`(() => { const p = document.getElementById('vocabulary-list-popover'); const m = document.getElementById('mini'); const r = p.getBoundingClientRect(); const mr = m.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + Math.min(20, r.height / 2); const top = document.elementFromPoint(x, y); return { title: p.querySelector('.vocabulary-list-title')?.textContent || '', onTop: !!top && p.contains(top), inside: r.left >= mr.left - 0.5 && r.right <= mr.right + 0.5 && r.top >= mr.top - 0.5 && r.bottom <= mr.bottom + 0.5 && r.top >= document.getElementById('mini-take').getBoundingClientRect().bottom - 0.5, inSlip: m.contains(p) }; })()`);
+    // Its 220ms unfold begins 6px above the resting box; measure the final layout,
+    // not an arbitrary frame during that documented entry animation.
+    await page.waitForFunction(() => document.getElementById('vocabulary-list-popover')?.getAnimations()
+      .every(animation => animation.playState === 'finished'), null, { timeout: 5000 });
+    const pop = await page.evaluate(`(() => { const p = document.getElementById('vocabulary-list-popover'); const m = document.getElementById('mini'); const r = p.getBoundingClientRect(); const mr = m.getBoundingClientRect(); const br = document.getElementById('mini-take').getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + Math.min(20, r.height / 2); const top = document.elementFromPoint(x, y); return { title: p.querySelector('.vocabulary-list-title')?.textContent || '', onTop: !!top && p.contains(top), inside: r.left >= mr.left - 0.5 && r.right <= mr.right + 0.5 && r.top >= mr.top - 0.5 && r.bottom <= mr.bottom + 0.5 && r.top >= br.bottom - 0.5, inSlip: m.contains(p), boxes: { menu: r.toJSON(), stage: mr.toJSON(), save: br.toJSON() } }; })()`);
     check(
-      'tap: Save ▾’s menu is the corridor’s own list popover (リスト · Lists) for the saved word, inside the slip under its Save button and covering no other control',
+      'tap: after its entry animation Save ▾’s list popover rests inside the slip under Save, covering no other control',
       ['リスト', 'Lists'].includes(pop.title) && pop.onTop && pop.inside && pop.inSlip,
       JSON.stringify(pop),
     );
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'), null, { timeout: 5000 }).catch(() => {});
     check(
-      'tap: a tap is capture, never evidence — the deck ledger’s cards, log, suspensions and repairs are byte-identical, no card was added, the observation log and the corridor schedule did not move; the tap is one lookups[] row',
-      before.sched === after.sched && after.env.obs === before.env.obs && after.env.srs === before.env.srs && ledger1.length === 1 && ledger1[0][1] === front.card && ledger1[0][2] === 'p' && ledger1[0][4] === sheet.key && ledger1[0][5] === 1,
+      'tap: a tap is capture, never evidence — the deck ledger’s cards, log, suspensions and repairs are byte-identical, no card was added, the observation log and the corridor schedule did not move; the three activations are exactly depths1/2/3 in lookups[]',
+      before.sched === after.sched && after.env.obs === before.env.obs && after.env.srs === before.env.srs && ledger1.length === 3 && ledger1.every(row => row[1] === front.card && row[2] === 'p' && row[4] === sheet.key) && ledger1.map(row=>row[5]).join(',') === '1,2,3',
       JSON.stringify({ same: before.sched === after.sched, obs: [before.env.obs, after.env.obs], lookups: ledger1 }),
     );
     // keys behind an open slip do not grade; Escape closes it on the same card, and the word is bare again
@@ -1255,33 +1412,39 @@ async function verifyTap(browser, base) {
       self.key === 'deck:km-109' && self.term === '金利' && self.indeck === 'Already in this deck' && self.take === 0 && self.door && self.ja.includes('利息') && self.toks === 0,
       JSON.stringify(self),
     );
-    // the same word again: the dictionary's full entry over the card (the slip goes); closing it returns the bare word
+    // The same word again opens the dictionary; Back restores this stage without a new tap.
     await page.click('#kp-card .kp-sentence .kp-target.kp-tok');
     await page.waitForSelector('#sheet');
     const entry = await page.evaluate(`({ mini: !!document.getElementById('mini'), names: document.getElementById('sheet')?.innerText.includes('金利') })`);
     await page.click('#sheet-back');
     await page.waitForFunction(() => !document.getElementById('sheet'), null, { timeout: 5000 });
-    const bare = await page.evaluate(`({ mini: !!document.getElementById('mini'), lit: !!document.querySelector('#kp-card .kp-lit'), card: document.getElementById('kp-card')?.dataset.card })`);
+    const bare = await page.evaluate(`({ mini: document.getElementById('mini')?.dataset.key, rung: document.querySelector('#kp-card .kp-target')?.dataset.ladderRung, card: document.getElementById('kp-card')?.dataset.card, depths: ${LOOKUPS_OF(KEY)}.map(row=>row[5]) })`);
     check(
-      'tap: the same word again opens its full dictionary entry (the slip goes with it); closing the entry returns the bare word on the same card — no slip, not lit',
-      entry.names && !entry.mini && !bare.mini && !bare.lit && bare.card === 'km-109-m01',
+      'tap: the same word again opens its full dictionary entry (the slip goes with it); Back restores its stage on the same card with no new observation',
+      entry.names && !entry.mini && bare.mini === 'deck:km-109' && bare.rung === 'stage' && bare.depths.join(',') === '2,3' && bare.card === 'km-109-m01',
       JSON.stringify({ entry, bare }),
     );
-    // a word of the card's definition (お金) opens its slip too
-    await page.click('#kp-card .kp-def .kp-tok >> nth=0');
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('#mini', { state: 'detached' });
+    // Definition prose carries no printed reading: one reveal, then its stage.
+    const definitionWord = page.locator('#kp-card .kp-def .kp-tok').filter({ hasText: /\p{Script=Han}/u }).first();
+    await definitionWord.click();
+    await page.waitForFunction(() => document.querySelector('#kp-card .kp-def [data-ladder-rung="reading"]'));
+    check('tap: definition first activation reveals ruby without stage', await page.locator('#mini').count() === 0 && await definitionWord.locator('rt').count() > 0);
+    await definitionWord.click();
     await page.waitForSelector('#mini[data-from="deck"]');
     const fromDef = await page.evaluate(`document.getElementById('mini').dataset.key`);
     const lookups = await page.evaluate(LOOKUPS_OF(KEY));
     const same = (await page.evaluate(SCHEDULE_OF(KEY))) === sched;
     check(
-      'tap: lookups[] keeps where and how deep each tap was (passage target: the slip at 1, the same word again: its entry at 2; card definition at 1) and the schedule is unchanged',
-      same && lookups.map((r) => `${r[2]}${r[5]}`).join(',') === 'p1,p2,d1' && lookups[0][4] === 'deck:km-109' && lookups[1][4] === 'deck:km-109' && lookups[2][4] === fromDef,
+      'tap: lookups[] keeps where and how deep each tap was (already-visible passage target: stage2 then page3; definition: reveal1 then stage2) and the schedule is unchanged',
+      same && lookups.map((r) => `${r[2]}${r[5]}`).join(',') === 'p2,p3,d1,d2' && lookups[0][4] === 'deck:km-109' && lookups[1][4] === 'deck:km-109' && lookups[2][4] === fromDef && lookups[3][4] === fromDef,
       JSON.stringify({ same, lookups }),
     );
     await page.keyboard.press('Escape');
     await page.click('#kp-grade-good');
     const graded = await page.evaluate(`JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mcd'))`);
-    check('tap: the card still grades as before, and its lookups stay in the ledger beside the answer', graded.log.length === 1 && graded.lookups.length === 3, JSON.stringify({ log: graded.log.length, lookups: graded.lookups.length }));
+    check('tap: the card still grades as before, and its lookups stay in the ledger beside the answer', graded.log.length === 1 && graded.lookups.length === 4, JSON.stringify({ log: graded.log.length, lookups: graded.lookups.length }));
     if (o.errors.length) check('no page errors in the slip and entry cycle', false, o.errors.slice(0, 2).join(' | '));
   } finally {
     await o.context.close();
@@ -1330,7 +1493,7 @@ async function verifyTap(browser, base) {
       seen.length === 2 && seen.every((x) => x.front === 0 && x.toks.rt > 0 && x.toks.other.length >= 1 && x.toks.other.every(Boolean) && x.pop.key === 'deck:km-107' && x.self === `deck:${x.shown.slice(0, 6)}` && !!x.pop.term && !!x.pop.reading && !!x.pop.def && x.pop.enOpen === false && !!x.pop.en && /^Can't save from here\.$/u.test(x.pop.note) && x.pop.noteLines === 1 && x.pop.take === 0 && x.pop.inside && !x.pop.sheet && x.lookups === 1 && x.same && x.closed),
       JSON.stringify(seen.map((x) => ({ file: x.file, card: x.shown, front: x.front, toks: x.toks.other, self: x.self, pop: { key: x.pop.key, term: x.pop.term, note: x.pop.note, noteLines: x.pop.noteLines, take: x.pop.take, inside: x.pop.inside }, lookups: x.lookups, same: x.same, closed: x.closed }))),
     );
-    check('tap, standalone: both actual release backs and their word popovers use bundled fonts for every visible text glyph',
+    check('tap, standalone: both release backs and popovers pass bundled-font evidence (Chromium glyph attribution; WebKit embedded-face raster match and fallback rejection)',
       seen.length === 2 && seen.every((x) => studyFontsPass(x.fonts)), JSON.stringify(seen.map(({ file, fonts }) => ({ file, fonts }))));
   } finally {
     release.server.close();
@@ -2718,9 +2881,19 @@ async function main() {
   const said = (d) => (d.method ?? []).join('');
   check('the method text names the same four grades the player shows (もう一度・難しい・正解・簡単), never the retired 思い出せた button or 覚えた', said(deck).includes('「もう一度・難しい・正解・簡単」') && ['「正解」', '「難しい」', '「簡単」', '「もう一度」'].every((g) => said(sentences).includes(g)) && !said(deck).includes('「思い出せた」') && !said(sentences).includes('「思い出せた」') && !said(deck).includes('覚えた') && !said(sentences).includes('覚えた'), deck.method?.at(-1) ?? '');
 
-  console.log('\n— 集中道場 › デッキ, in a real browser');
+  for (const engine of engines) {
+  actualEngine = engine;
+  console.log(`\n— 集中道場 › デッキ, ${engine}${only ? ` (partial: ${only})` : ''}`);
   const { server, base } = await startServer();
-  const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+  const browser = await ({ chromium, webkit })[engine].launch(engine === 'chromium' ? { executablePath: process.env.CHROMIUM_PATH || undefined } : {});
+  browserVersions[engine] = browser.version();
+  console.log(`BROWSER ${engine} ${browserVersions[engine]}`);
+  if (only) {
+    try { await (only === 'tap' ? verifyTap : verifyHost)(browser, base); }
+    catch (error) { check(`${only} terminal`, false, error.stack || String(error)); }
+    finally { await browser.close(); await new Promise(done => server.close(done)); }
+    continue;
+  }
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(`try {
     if (!localStorage.getItem('__deck_seeded')) {
@@ -2890,10 +3063,15 @@ async function main() {
     console.log('\n— the review loop (CARD_CONTRACT_V2 §3.7, §4): delete, leech ladder, kanji family, see-also');
     await verifyReviewData([deck, sentences]);
     await verifyReview(browser, base);
+  } catch (error) {
+    check('browser journey terminal', false, error.stack || String(error));
   } finally {
     await browser.close();
-    server.close();
+    await new Promise(done => server.close(done));
   }
+  }
+  writeFileSync(resolve(evidence, 'kotoba-mine.json'), JSON.stringify({ engines, browserVersions, scope: only ? `partial:${only}` : 'full',
+    artifactSha256: process.env.KAIRO_ARTIFACT_SHA256 || null, verifierSha256: createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex'), results, failures }, null, 2) + '\n');
   console.log(failures ? `\n${failures} check(s) failed` : '\nall checks green');
   process.exit(failures ? 1 : 0);
 }

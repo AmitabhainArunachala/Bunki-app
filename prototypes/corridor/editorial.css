@@ -1668,6 +1668,10 @@ body.v-depth-layered #reader, #reader.reader {
   color: var(--text);
 }
 #reader .tok { padding: 0; }
+#reader .tok[data-para], .sentence-tok { cursor: pointer; }
+/* Entry examples and the sentence page use the same hidden-reading marker
+ * outside .reader. Keep native ruby layout; revealing removes this marker. */
+.sentence-tok rt.hidden-rt { opacity: 0; }
 /* Off or on-touch readings float over their word and never widen it. A hidden <rt> still takes
  * layout width (that was every gap in 「ダマスカス 郊外」), and WebKit will not position an <rt>,
  * so the <rt> stays in the DOM as the reading's record while ::before draws it. Always-on keeps
@@ -4059,7 +4063,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   :where(#reader .tok.tok-current) > .tok-word, :where(#reader .tok:hover) > .tok-word,
   .kp-tok:where(.kp-lit), .kp-tok:hover, .kp-tok:focus-visible,
-  .gs-word:hover, .gs-word:focus-visible, .japanese-lookup-word:hover,
+  .gs-word:hover, .gs-word:focus-visible, .japanese-lookup-word:hover, .japanese-lookup-word:focus-visible,
   :where(.ww-node:hover) .ww-g, :where(.ww-node:focus-visible) .ww-g
 ) {
   background: transparent;
@@ -5465,3 +5469,8 @@ html[data-save-drawer='sheet'] #sheet > .sheet-bar[data-bar='sheet'] {
 #app .kp-top-study[data-bar='deck'] :is(.kp-icon, .kp-delete):focus-visible { outline: 2px solid var(--deck-band-ink); outline-offset: -4px; box-shadow: none; }
 #app .kp-top-study[data-bar='deck'] .kp-progress { background: color-mix(in srgb, var(--deck-band-ink) 22%, transparent); }
 #app .kp-top-study[data-bar='deck'] .kp-progress i { background: var(--deck-band-ink); }
+
+/* G3: the hosted sky uses the same reading dial as prose. On-tap keeps its
+   existing in-place reveal; always/off are visible before any activation. */
+body[data-furigana='2'] #drift-layer .word .yomi { opacity: 1; }
+body[data-furigana='0'] #drift-layer .word .yomi { opacity: 0; }

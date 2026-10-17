@@ -255,8 +255,7 @@ async function holdEntry(page, index, word) {
   await token.scrollIntoViewIfNeeded();
   const box = await token.boundingBox();
   assert(box && box.width > 0 && box.height > 0, 'Word has a real pointer target');
-  // one tap opens the word's popup; its band (the word) opens the entry (1.3.0)
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await openReaderWordStage(page, token);
   await page.locator('#mini button.mini-word').click();
   await page
     .locator(`#sheet[data-node="word:${word}"]`)
@@ -636,6 +635,7 @@ async function runCase(name, synthetic, body) {
     serviceWorkers: 'block',
     recordVideo: { dir: join(out, 'recordings'), size: { width: 1120, height: 940 } },
   });
+  await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device; demonstration has its own gate.
   const transport = captureTransport(context, synthetic);
   await transport.install();
   await context.tracing.start({ screenshots: true, snapshots: true, sources: false });
@@ -1271,3 +1271,19 @@ writeFileSync(join(OUT, 'receipt.json'), `${JSON.stringify(receipt, null, 2)}\n`
 writeFileSync(join(EVIDENCE, 'latest.json'), `${JSON.stringify(receipt, null, 2)}\n`);
 console.log(JSON.stringify(receipt, null, 2));
 process.exitCode = receipt.failures ? 1 : 0;
+
+// These source-context checks enter through the G3 ladder; the grammar itself is
+// checked separately. A second activation is allowed only after a real reading rung.
+async function openReaderWordStage(page, word) {
+  await word.click();
+  await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
+    assert(await word.evaluate(node => [...node.querySelectorAll('rt')].some(rt => {
+      const style = getComputedStyle(rt); return rt.textContent.trim() && style.visibility !== 'hidden' && style.display !== 'none' && Number(style.opacity) > 0;
+    })), 'The reading is actually visible');
+    await word.click();
+  }
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'stage', 'The exact source word reaches its stage');
+}

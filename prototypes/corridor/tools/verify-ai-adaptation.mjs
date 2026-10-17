@@ -3,7 +3,6 @@
  * reads are observations; the one negative write test uses the existing host
  * transaction fault. This does not establish provider quality or JLPT ability.
  */
-import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { closeShelfTools, openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -207,6 +206,7 @@ try {
   browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true });
   handles.browserVersion = browser.version(); handles.executablePath = process.env.CHROMIUM_PATH || chromium.executablePath();
   context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device fixture.
   handles.browserContextsCreated++;
   handles.audio = await silenceBrowserAudio(context);
   timer = setTimeout(() => { timedOut = true; void browser.close(); }, 420000);
@@ -411,8 +411,7 @@ try {
   await runCase('source-context', async () => {
     await importFixture('source-conversation', fixture()); await openShelf();
     await page.locator('[data-passage="wikinews:1403"]').first().click();
-    await page.locator('#reader .tok[data-index="18"]').click();
-    if (await page.locator('#sheet').isVisible()) await page.locator(await entryCloseSelector(page)).click();
+    await openReaderWordStage(page, page.locator('#reader .tok[data-index="18"]'));
     await page.locator('#mini-sentence-open').click(); await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
     const deniedQuestion = 'この文の「世界」の意味を教えてください。', deniedCount = requests.length;
     await page.locator('#chat-input').fill(deniedQuestion); await page.locator('#chat-send').click();
@@ -425,8 +424,7 @@ try {
     write('source-policy-denied.json', denied);
     await openShelf();
     await page.locator('[data-passage="bunki-graded-n5-morning"]').first().click();
-    await page.locator('#reader .tok[data-index="0"]').click();
-    if (await page.locator('#sheet').isVisible()) await page.locator(await entryCloseSelector(page)).click();
+    await openReaderWordStage(page, page.locator('#reader .tok[data-index="0"]'));
     await page.locator('#mini-sentence-open').click(); await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
     const before = await readAppRecord(page), source = before.teacherContexts.entries.find((entry) => entry.id === before.teacherContexts.activeRef);
     assert.ok(source?.quote && source.sourceKind === 'bundled-passage');
@@ -467,4 +465,20 @@ finally {
       'Bundled source conversation only; personal-source approval lifecycle and multi-context ownership remain separate gates.'] });
   console.log(JSON.stringify({ pass, cases: results.filter((row) => row.pass).length, total: results.length, checks: checks.length, requests: requests.length, out, handles }));
   if (!pass) process.exitCode = 1;
+}
+
+// These source-context checks enter through the G3 ladder; the grammar itself is
+// checked separately. A second activation is allowed only after a real reading rung.
+async function openReaderWordStage(page, word) {
+  await word.click();
+  await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
+    assert(await word.evaluate(node => [...node.querySelectorAll('rt')].some(rt => {
+      const style = getComputedStyle(rt); return rt.textContent.trim() && style.visibility !== 'hidden' && style.display !== 'none' && Number(style.opacity) > 0;
+    })), 'The reading is actually visible');
+    await word.click();
+  }
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'stage', 'The exact source word reaches its stage');
 }

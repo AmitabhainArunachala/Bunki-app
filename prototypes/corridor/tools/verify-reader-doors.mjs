@@ -101,7 +101,7 @@ const EDITS = Object.freeze({
   stalled: { file: 'corridor.js', from: "      return ladderVisit.openStage({ restore: false, demo: false });", to: "      return 'reading';" },
   keepReading: { file: 'corridor.js', from: '  visit.clearReveal?.();', to: '  // control: leave the summoned reading painted' },
   offRuby: { file: 'corridor.js', from: "  anchor.dataset.ladderRung = 'stage';\n  return visit.openStage({ restore: !!options.restore, demo: !!options.demo });",
-    to: "  anchor.dataset.ladderRung = 'stage';\n  if (S.dials.furigana === 0) inlineWordReading(anchor, reading);\n  return visit.openStage({ restore: !!options.restore, demo: !!options.demo });" },
+    to: "  anchor.dataset.ladderRung = 'stage';\n  if (S.dials.furigana === 0) { inlineWordReading(anchor, reading); anchor.querySelectorAll('ruby').forEach(ruby => ruby.dataset.r = reading); }\n  return visit.openStage({ restore: !!options.restore, demo: !!options.demo });" },
 });
 const RUN_ROWS = Object.freeze({
   d2: [1, 0].flatMap(f => ['door','first-rung','popup-reading','visible-reading','accessible-reading','no-english','focus-returns','neighbour-unchanged','no-navigation','bare-after-fold'].map(row => `D2.f${f}.${row}`)),
@@ -132,7 +132,7 @@ const CONTROLS = Object.freeze([
 ]);
 
 async function openPage(viewport, query, mutation = null) {
-  const context = await browser.newContext({ viewport, deviceScaleFactor: viewport.width > 1000 ? 2 : 3,
+  const context = await browser.newContext({ viewport, reducedMotion: 'reduce', deviceScaleFactor: viewport.width > 1000 ? 2 : 3,
     ...(mutation ? { serviceWorkers: 'block' } : {}) });
   const sink = mutation ? mutation.control.pageErrors : pageErrors;
   context.on('page', (page) => page.on('pageerror', (error) => {
@@ -140,7 +140,9 @@ async function openPage(viewport, query, mutation = null) {
   }));
   try {
     // This suite models an already-seen demo on this device; the fresh-device demo has its own G3 verifier.
-    await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
+    await context.addInitScript(ownOrigin => {
+      if (location.origin === ownOrigin) localStorage.setItem('kairo-word-ladder-demo-v1', '1');
+    }, origin);
     if (mutation) await serveMutation(context, mutation);
     const page = await context.newPage();
     await page.goto(`${origin}/index.html${query}`);
@@ -195,9 +197,21 @@ const tokenState = (page, index) => page.evaluate((i) => {
   for (const extra of bare.querySelectorAll('rt, .tok-en')) extra.remove();
   const rts = [...node.querySelectorAll('rt')];
   const en = node.querySelector('.tok-en');
+  // On-touch reader ruby is painted by ::before (rt is the semantic record), while always-on uses native rt.
+  const painted = [...node.querySelectorAll('ruby')].map(ruby => {
+    const style = getComputedStyle(ruby, '::before');
+    let text = style.content;
+    if (text?.startsWith('attr(')) text = ruby.getAttribute('data-r') || '';
+    else if (/^["'].*["']$/u.test(text)) text = text.slice(1, -1);
+    else text = '';
+    return { text, opacity: Number(style.opacity), display: style.display, visibility: style.visibility };
+  }).filter(row => row.text && row.opacity > 0 && row.display !== 'none' && row.visibility !== 'hidden');
+  const native = rts.filter(rt => { const style = getComputedStyle(rt);
+    return !rt.classList.contains('hidden-rt') && style.visibility !== 'hidden' && style.display !== 'none' && Number(style.opacity) > 0;
+  }).map(rt => rt.textContent).join('');
   return { tag: node.tagName.toLowerCase(), cls: node.className, surface: bare.textContent,
     ruby: rts.map((rt) => rt.textContent).join(''),
-    visibleRuby: rts.filter((rt) => !rt.classList.contains('hidden-rt') && getComputedStyle(rt).visibility !== 'hidden' && getComputedStyle(rt).display !== 'none').map((rt) => rt.textContent).join(''),
+    visibleRuby: native || painted.map(row => row.text).join(''), paintedRuby: painted,
     rung: node.dataset.ladderRung || null, name: node.getAttribute('aria-label'), role: node.getAttribute('role'),
     preparedDescription: (node.dataset.proseDescription || '').split(/\s+/u).filter(Boolean).map(id => document.getElementById(id)?.textContent || '').filter(Boolean).join(' · '),
     description: (node.getAttribute('aria-describedby') || '').split(/\s+/u).filter(Boolean).map(id => document.getElementById(id)?.textContent || '').filter(Boolean).join(' · '),

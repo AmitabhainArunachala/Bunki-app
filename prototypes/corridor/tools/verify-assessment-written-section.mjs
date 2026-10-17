@@ -1740,10 +1740,10 @@ try {
         const style = getComputedStyle(document.activeElement);
         return { outline: style.outlineColor, shadow: style.boxShadow, wash: style.backgroundColor };
       });
-      // the app's one focus token (--focus-ring over --focus-wash), the same look as a reader word
+      // The final H inline-word policy uses a reading-color hairline without a box or fill.
       assert.equal(focusStyle.outline, 'rgba(0, 0, 0, 0)', 'Never the browser ring on a prose word');
       assert.match(focusStyle.shadow, /inset/u, 'The focus token draws its ink underline');
-      assert.notEqual(focusStyle.wash, 'rgba(0, 0, 0, 0)', 'The focus token lays its vermilion wash');
+      assert.equal(focusStyle.wash, 'rgba(0, 0, 0, 0)', 'The selected inline word keeps the H no-fill policy');
       await page.screenshot({ path: resolve(evidence, `${engine}${suffix}-prose-roving-focus.png`) });
       const final = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
       assert.equal(final.attempt.answers.find((row) => row.item.id === longReading.id).response.kind, 'unanswered');

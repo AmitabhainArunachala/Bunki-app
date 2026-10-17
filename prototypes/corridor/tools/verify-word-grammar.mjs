@@ -30,6 +30,7 @@
  *       (both engines) — and, in Chromium, the whole page at 200 % text (-webkit-text-size-adjust, the critic's probe; WebKit
  *       on a desktop does not apply it) — stays inside its tile, and the tile keeps its 48 px floor
  * G3 negative controls: --controls replays stalled tap2, uncleared ruby and a front door; harness failures are incomplete.
+ * --controls-only runs only the three candidate schedules, mutants and restores, with no frame measurements.
  * --g3-only is an explicit narrow slice, never a claim that the retained G1 gates passed.
  * Negative controls (one-hand/G1/neg-control): the 91dvh cap back → P1 red; the scrim re-appended → P1 red; the word not
  * sent travelling (enterWord) → P2 red; the page fading in over the reader instead of arriving whole → P14 red. */
@@ -70,8 +71,13 @@ const check = (id, title, ok, observed = '') => {
   return !!ok;
 };
 const frames = [], browserVersions = {}, controls = [];
-const g3Only = process.argv.includes('--g3-only');
-const withControls = process.argv.includes('--controls');
+const controlsOnly = process.argv.includes('--controls-only');
+const roomsOnly = process.argv.includes('--rooms-only');
+const sentencesOnly = process.argv.includes('--sentences-only');
+const kanaOnly = process.argv.includes('--kana-only');
+assert([controlsOnly, roomsOnly, sentencesOnly, kanaOnly].filter(Boolean).length <= 1, 'Choose one explicit narrow schedule');
+const g3Only = controlsOnly || roomsOnly || sentencesOnly || kanaOnly || process.argv.includes('--g3-only');
+const withControls = controlsOnly || process.argv.includes('--controls');
 
 const host = await startStaticHost({ site, port: 0 });
 async function boot(page, { world = null } = {}) {
@@ -105,7 +111,9 @@ const visibleReading = (node) => [...node.querySelectorAll('ruby')].some((ruby) 
   const rt = ruby.querySelector('rt');
   if (!rt?.textContent.trim()) return false;
   const style = getComputedStyle(rt);
-  if (!rt.classList.contains('hidden-rt') && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0) return true;
+  // The marker alone is not evidence of hidden ink: outside .reader it once
+  // had no matching CSS at all. Judge the browser's actual rendered style.
+  if (style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && rt.getClientRects().length > 0) return true;
   // The reader paints on-touch ruby in ::before to keep line geometry; deck backs use ::after.
   return ['::before', '::after'].some((pseudo) => {
     const ink = getComputedStyle(ruby, pseudo);
@@ -343,6 +351,10 @@ try {
     console.log(`${engine} ${browserVersions[engine]}`);
     const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true, control = null, init = null, demo = false } = {}) => {
       if (g3Only && !name.startsWith('G3')) return;
+      if (controlsOnly && !['G3-stalled', 'G3-clear', 'G3-front'].includes(name)) return;
+      if (roomsOnly && !['G3-words', 'G3-words-family', 'G3-sky'].includes(name)) return;
+      if (sentencesOnly && name !== 'G3-front' && !name.startsWith('G3-sentence-')) return;
+      if (kanaOnly && name !== 'G3-kana') return;
       const context = await browser.newContext({ viewport, isMobile: mobile, hasTouch: true, deviceScaleFactor: 2, serviceWorkers: 'block' });
       await context.addInitScript(GLYPHS);
       if (!demo) await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
@@ -519,6 +531,237 @@ try {
       await particle.tap(); await delay(600);
       const part = await ladderFacts(page, particle);
       check('G3.kana.particle', 'a one-character particle is a word door and reaches a nonempty stage', part.stages === 1 && !!part.word && !part.page, part);
+      const particleSave = await page.evaluate(() => ({ miniSave: !!document.querySelector('#mini #mini-take'),
+        barRest: document.getElementById('chrome-keep')?.hasAttribute('data-save-rest'),
+        barKey: document.getElementById('chrome-keep')?.dataset.saveKey, barName: document.getElementById('chrome-keep')?.getAttribute('aria-label') }));
+      check('G3.kana.particle-save-rest', 'a particle stage with no Save leaves the bar at rest with no previous target',
+        !particleSave.miniSave && particleSave.barRest === true && particleSave.barKey === '', particleSave);
+      const beforeParticleSave = await readAppRecord(page);
+      await page.locator('#chrome-keep').click(); await delay(400);
+      const afterParticleSave = await readAppRecord(page);
+      check('G3.kana.particle-no-card', 'pressing the resting bar creates no particle card or stale previous-word card',
+        JSON.stringify(beforeParticleSave.taken) === JSON.stringify(afterParticleSave.taken), { before: beforeParticleSave.taken, after: afterParticleSave.taken });
+    });
+
+    for (const surface of ['example', 'page']) for (const [mode, name] of [[0, 'off'], [1, 'on-touch'], [2, 'always']]) {
+      await walk(`G3-sentence-${surface}-${name}`, async (page) => {
+        await openStory(page); await furigana(page, mode);
+        const month = page.locator('#reader .tok[data-index="4"]');
+        assert.equal(await month.getAttribute('data-prose-label'), '月', 'the authored counting-month fixture stays exact');
+        await stage(page, month); await page.locator('#mini .mini-word').tap(); await pageSettled(page);
+        let target = page.locator('#sheet .example-ja .sentence-tok[data-prose-label="年"]').first();
+        await target.waitFor();
+        if (surface === 'page') {
+          await target.locator('xpath=ancestor::p[contains(@class,"example-ja")][1]').locator('.sent-door').tap();
+          await page.locator('#sheet .sent-reader').waitFor(); await delay(350);
+          target = page.locator('#sheet .sent-reader .sentence-tok[data-prose-label="年"]').first();
+        }
+        await target.scrollIntoViewIfNeeded(); await delay(300);
+        const id = `G3.sentence.${surface}.${name}`;
+        const state = async () => ({ ...await ladderFacts(page, target), ...await target.evaluate(node => ({
+          surface: node.dataset.proseLabel, outsideReader: !node.closest('.reader'), rung: node.dataset.ladderRung || null,
+          annotations: [...node.querySelectorAll('rt')].map(rt => { const s = getComputedStyle(rt); return { text: rt.textContent,
+            class: rt.className, display: s.display, visibility: s.visibility, opacity: s.opacity, boxes: rt.getClientRects().length }; }),
+          parentPage: document.getElementById('sheet')?.dataset.node,
+        })) });
+        const resting = await state(), parentPage = resting.parentPage;
+        check(`${id}.bare`, `${surface}/${name}: actual ruby ink is ${mode === 2 ? 'visible' : 'absent'} before activation outside .reader`,
+          resting.surface === '年' && resting.outsideReader && !resting.stages && resting.reading === (mode === 2) &&
+          (mode === 0 ? resting.annotations.length === 0 : resting.annotations.some(rt => rt.text === 'ねん')), resting);
+        await target.tap(); await delay(350);
+        const first = await state();
+        check(`${id}.first`, `${surface}/${name}: first activation ${mode === 1 ? 'visibly reveals only reading' : 'opens the stage without an empty rung'}`,
+          first.parentPage === parentPage && (mode === 1
+            ? first.reading && first.rung === 'reading' && !first.stages
+            : first.stages === 1 && first.word === '年' && first.reading === (mode === 2)), first);
+        if (mode === 1) { await target.tap(); await delay(350); }
+        const staged = await state();
+        check(`${id}.stage`, `${surface}/${name}: one stage retains the occurrence and the rendered reading policy`,
+          staged.stages === 1 && staged.word === '年' && staged.parentPage === parentPage && staged.reading === (mode !== 0), staged);
+        if (staged.stages !== 1) return;
+        await page.locator('#mini .mini-word').tap(); await pageSettled(page);
+        const full = await pageFacts(page);
+        check(`${id}.page`, 'the sentence word opens its own whole-screen entry', coversViewport(full) && full.headword.startsWith('年'), full);
+        await page.locator('#sheet-back').tap(); await delay(550);
+        const returned = await state();
+        check(`${id}.return-stage`, 'Back restores the same sentence stage above its original page',
+          returned.stages === 1 && returned.word === '年' && returned.parentPage === parentPage && returned.reading === (mode !== 0), returned);
+        await page.keyboard.press('Escape'); await delay(350);
+        const gone = await state();
+        check(`${id}.clear`, `${surface}/${name}: dismissal ${mode === 2 ? 'keeps always-on ruby' : 'leaves no rendered reading'} and restores the parent page`,
+          !gone.stages && gone.parentPage === parentPage && gone.reading === (mode === 2), gone);
+      });
+    }
+
+    // These fixed-count room walks replace the old up-to-twelve sky taps as G3
+    // evidence. The separate G5 list/save journey keeps its original scope.
+    const openWeb = async (page, key, type = 'word') => {
+      assert.equal(await page.evaluate(({ key, type }) => window.openWordWeb(key, { type }), { key, type }), true,
+        `the installed Words navigation seam accepts ${type}:${key}`);
+      await page.locator(`section.ww[data-ww-centre="${type}:${key}"] .ww-c-glyph`).waitFor();
+      // Real focus keeps the asynchronous passage enrichment from replacing the
+      // plate under the walk; no application state or animation is replaced.
+      await page.locator('section.ww .ww-c-glyph').focus();
+      await delay(350);
+    };
+    const webFacts = async (page, target) => ({ ...await ladderFacts(page, target), ...await target.evaluate(node => ({
+      centre: node.closest('section.ww')?.dataset.wwCentre,
+      rung: node.dataset.ladderRung || null,
+      caption: node.querySelector('.ww-cap')?.textContent || '',
+      captionRuby: !!node.querySelector('.ww-cap ruby'),
+      glyphRuby: !!node.querySelector('.ww-g ruby'),
+    })), recenter: await page.locator('#mini [data-action="word-web.centre"]').count() });
+    const webPeripheral = async (page, target, id, centre, { caption = false } = {}) => {
+      const word = await target.getAttribute('data-ww-key');
+      const type = await target.getAttribute('data-ww-type') || 'kanji';
+      assert(word, `${id}: a real typed web node is required`);
+      await target.focus();
+      const before = await webFacts(page, target);
+      await target.tap(); await delay(350);
+      const first = await webFacts(page, target);
+      check(`${id}.reading`, 'first peripheral activation reveals only its own reading and keeps the plate',
+        first.reading && !first.stages && !first.page && first.centre === centre && first.rung === 'reading' &&
+        (!caption || (first.glyphRuby && !first.captionRuby && first.caption === before.caption)), first);
+      await target.tap(); await delay(500);
+      const second = await webFacts(page, target);
+      check(`${id}.stage`, 'second peripheral activation opens one current stage with a separate recenter action',
+        second.stages === 1 && second.word === word && !second.page && second.centre === centre && second.recenter === 1, second);
+      await target.click({ button: 'right' }); await delay(350);
+      const held = await webFacts(page, target);
+      check(`${id}.hold-same-stage`, 'holding the staged occurrence refreshes that one stage without diving or re-centring',
+        held.stages === 1 && held.word === word && !held.page && held.centre === centre && held.recenter === 1 && held.reading, held);
+      if (held.page) return; // a named hold failure is never repaired with Back or extra taps
+      await target.tap(); await delay(600);
+      const third = await pageFacts(page);
+      check(`${id}.page`, 'third peripheral activation opens its whole-screen entry', coversViewport(third) && third.headword.startsWith(word), third);
+      if (!third) return; // keep the named assertion, never rescue the ladder with more taps
+      await page.locator('#sheet-back').tap(); await bare(page);
+      const returned = await webFacts(page, target);
+      check(`${id}.return`, 'page Back restores the same stage, plate and explicit recenter action',
+        returned.stages === 1 && returned.word === word && returned.centre === centre && returned.recenter === 1 && !returned.page, returned);
+      await page.keyboard.press('Escape'); await delay(250);
+      const gone = await webFacts(page, target);
+      check(`${id}.bare`, 'stage Escape clears the summoned reading while preserving the plate',
+        !gone.stages && !gone.page && !gone.reading && gone.centre === centre, gone);
+      // Re-enter with exactly two taps before using the separate navigation door.
+      await target.tap(); await delay(250); await target.tap(); await delay(350);
+      const action = page.locator('#mini [data-action="word-web.centre"]');
+      if (await action.count() === 1) {
+        await action.tap(); await delay(550);
+        const actual = await page.locator('section.ww').getAttribute('data-ww-centre');
+        check(`${id}.recenter`, 'only the explicit stage action recentres the web and closes the stage',
+          actual === `${type}:${word}` && !await page.locator('#mini, #sheet').count(), { actual, word });
+      } else check(`${id}.recenter`, 'the explicit recenter action remains reachable on the next visit', false, await slipFacts(page));
+    };
+    await walk('G3-words', async (page) => {
+      await openStory(page); await furigana(page, 1);
+      await openWeb(page, '海');
+      const centre = page.locator('section.ww .ww-c-glyph');
+      check('G3.words.centre-fixture', 'Words centre already displays the actual 海 reading',
+        await page.locator('section.ww .ww-c-r').isVisible() && (await page.locator('section.ww .ww-c-r').textContent()).trim() === 'うみ');
+      await centre.tap(); await delay(500);
+      const first = await webFacts(page, centre);
+      check('G3.words.centre-stage', 'a visibly read centre opens its stage on the first activation', first.stages === 1 && first.word === '海' && !first.page, first);
+      await centre.tap(); await delay(600);
+      const full = await pageFacts(page);
+      check('G3.words.centre-page', 'the centre second activation opens its whole-screen entry', coversViewport(full) && full.headword.startsWith('海'), full);
+      if (full) {
+        await page.locator('#sheet-back').tap(); await bare(page);
+        check('G3.words.centre-return', 'centre page Back restores its own stage over the unchanged plate',
+          (await slipFacts(page)).word === '海' && await page.locator('section.ww').getAttribute('data-ww-centre') === 'word:海', await slipFacts(page));
+        await leaveStage(page);
+        check('G3.words.centre-bare', 'centre dismissal keeps its pre-existing reading and leaves no stage/page',
+          await page.locator('section.ww .ww-c-r').isVisible() && !await page.locator('#mini, #sheet').count());
+      }
+      await openWeb(page, '海');
+      await webPeripheral(page, page.locator('.ww-node[data-ww-type="word"][data-ww-key="海洋"]'), 'G3.words.peripheral', 'word:海', { caption: true });
+    });
+    await walk('G3-words-family', async (page) => {
+      await openStory(page); await furigana(page, 1);
+      await openWeb(page, '休', 'kanji');
+      const unknown = page.locator('.ww-node[data-ww-type="part"][data-ww-key="亻"]');
+      await unknown.tap(); await delay(550);
+      const noReading = await page.evaluate(() => ({ centre: document.querySelector('section.ww')?.dataset.wwCentre,
+        stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), summoned: !!document.querySelector('section.ww [data-ladder-rung], section.ww ruby') }));
+      check('G3.words.unknown-part', 'a radical without a kanji reading still recentres and invents no reading or stage',
+        noReading.centre === 'part:亻' && !noReading.stage && !noReading.page && !noReading.summoned, noReading);
+      if (noReading.centre !== 'part:亻') return;
+      await webPeripheral(page, page.locator('.ww-fam').first(), 'G3.words.family', 'part:亻');
+    });
+    await walk('G3-sky', async (page) => {
+      for (const [mode, name] of [[1, 'on-touch'], [0, 'off'], [2, 'always']]) {
+      await openStory(page); await furigana(page, mode);
+      assert.equal((await readAppRecord(page)).dials.furigana, mode, 'the actual dial choice must be durable before sky navigation');
+      await page.goto(`${host.origin}/?entry=drift&ui=bi`);
+      await page.waitForFunction(() => document.body.dataset.ready === '1');
+      await page.locator('#drift-layer.active .word').first().waitFor(); await delay(2300);
+      const fixture = await page.evaluate(() => {
+        const node = [...document.querySelectorAll('#drift-layer.active .word')].find(el => {
+          const r = el.getBoundingClientRect(), word = el.querySelector('.base')?.textContent, reading = el.querySelector('.yomi')?.textContent;
+          return /[\p{Script=Han}]/u.test(word || '') && reading && window.__BUNKI_OPEN_ENTRY?.has('word', word) &&
+            r.left > 50 && r.right < innerWidth - 50 && r.top > 200 && r.bottom < innerHeight - 160 &&
+            Number(getComputedStyle(el).opacity) > .5 && !el.classList.contains('unfolded');
+        });
+        if (!node) return null;
+        node.dataset.g3Fixture = 'sky';
+        return { word: node.querySelector('.base').textContent, reading: node.querySelector('.yomi').textContent };
+      });
+      assert(fixture, 'the actual sky must expose a visible known word carrying an authored reading');
+      const id = `G3.sky.${name}`;
+      const target = page.locator('#drift-layer .word[data-g3-fixture="sky"]');
+      const facts = async () => ({ ...await ladderFacts(page, target), ...await target.evaluate(el => {
+        const shown = selector => { const n = el.querySelector(selector), s = n && getComputedStyle(n); return !!n?.textContent.trim() && n.getClientRects().length > 0 && s.display !== 'none' && s.visibility !== 'hidden' && Number(s.opacity) > 0; };
+        const opacity = selector => { const n = el.querySelector(selector); return n ? Number(getComputedStyle(n).opacity) : null; };
+        return { skyReading: shown('.yomi'), skyGloss: shown('.gloss'), base: el.querySelector('.base')?.textContent,
+          skyReadingOpacity: opacity('.yomi'), skyGlossOpacity: opacity('.gloss'),
+          wholeNodeRuby: !!el.querySelector(':scope > ruby'),
+          rung: el.dataset.ladderRung || null, classes: el.className, view: document.body.dataset.view };
+      }) });
+      const tap = async () => {
+        const point = await target.locator('.base').evaluate(el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, hit: el.contains(document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)) }; });
+        assert(point.hit, `the fixed sky occurrence must be hit-testable: ${JSON.stringify(point)}`);
+        await page.touchscreen.tap(point.x, point.y); await delay(650);
+      };
+      const waitForReadingFade = async () => {
+        // The authored sky reading has a 500 ms opacity transition. Require its
+        // actual paint to finish before beginning a new visit; do not use a
+        // class marker or a near-zero opacity threshold as evidence of absence.
+        const deadline = Date.now() + 1100;
+        while (Date.now() < deadline) {
+          const current = await facts();
+          if (current.skyReading === (mode === 2) && !current.skyGloss) return;
+          await delay(25);
+        }
+      };
+      const resting = await facts();
+      check(`${id}.bare`, `${name}: the actual sky follows the global reading dial before activation`,
+        resting.skyReading === (mode === 2) && !resting.skyGloss && !resting.stages && !resting.page && !resting.wholeNodeRuby, resting);
+      await tap(); const first = await facts();
+      check(`${id}.first`, `${name}: sky tap one ${mode === 1 ? 'reveals only its authored reading' : 'opens its stage without an empty reading rung'}`,
+        !first.wholeNodeRuby && first.base === fixture.word && !first.skyGloss && !first.page && (mode === 1
+          ? first.skyReading && !first.stages && first.rung === 'reading'
+          : first.stages === 1 && first.word === fixture.word && first.skyReading === (mode === 2)), { fixture, ...first });
+      if (mode === 1) await tap();
+      const second = await facts();
+      check(`${id}.stage`, `${name}: sky ${mode === 1 ? 'tap two' : 'tap one'} opens the shared stage with the current word and Save`, second.stages === 1 && second.word === fixture.word && second.save === false && !second.page && second.view === 'drift' && !second.wholeNodeRuby, second);
+      await tap(); const third = await pageFacts(page);
+      check(`${id}.page`, `${name}: sky ${mode === 1 ? 'tap three' : 'tap two'} opens the same whole-screen word page`, coversViewport(third) && third.headword.startsWith(fixture.word), third);
+      if (!third) continue;
+      await page.locator('#sheet-back').tap(); await bare(page);
+      const returned = await facts();
+      check(`${id}.return-stage`, 'sky page Back restores its original stage', returned.stages === 1 && returned.word === fixture.word && !returned.page && returned.view === 'drift', returned);
+      await page.keyboard.press('Escape'); await waitForReadingFade();
+      const gone = await facts();
+      check(`${id}.clear`, `sky stage Escape clears summoned help${mode === 2 ? ' while retaining always-on reading' : ''}`, !gone.stages && !gone.page && !gone.reading && gone.skyReading === (mode === 2) && !gone.skyGloss && !gone.wholeNodeRuby, gone);
+      if (mode === 1) {
+        await tap();
+        const revealed = await facts();
+        check(`${id}.revisit-reading`, 'a fresh visit starts again at the reading-only rung', revealed.skyReading && !revealed.stages && revealed.rung === 'reading', revealed);
+        await page.keyboard.press('Escape'); await waitForReadingFade();
+        const folded = await facts();
+        check(`${id}.reading-close`, 'Escape also closes a reading-only sky visit', !folded.skyReading && !folded.skyGloss && !folded.stages && !folded.page && !folded.rung, folded);
+      }
+      }
     });
 
     await walk('G3-demo', async (page) => {
@@ -547,11 +790,13 @@ try {
         { id: 'ruby-survives-back', run: 'G3-clear', probe: clearProbe, kill: 'G3.clear.bare',
           witness: (row) => row.observed.reading && row.observed.stages === 0 && !row.observed.page,
           edits: [{ file: 'corridor.js', key: 'omit-clear-reveal', from: '  visit.clearReveal?.();', to: '  /* G3 negative: retain the raised reading */' }] },
+        // The target word is available before the lazy token file; a non-null tap adapter
+        // makes sentenceNodes use its existing tapNode on that real target even on the front.
         { id: 'front-door', run: 'G3-front', probe: frontProbe, kill: 'G3.front.sealed',
           witness: (row) => row.observed.doors > 0 && row.observed.reveal,
           edits: [{ file: 'decks/player/mount.js', key: 'front-tap-cover',
             from: "sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage })",
-            to: "sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage, taps: backTaps(card, word) })" },
+            to: "sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage, taps: backTaps(card, word) || { units: [], onTap: (unit, node) => tapped({ word }, node, { card, where: 'p', depth: 1 }) } })" },
           { file: 'decks/player/mount.js', key: 'front-door-gate',
             from: '    taps = null; // the front has nothing to tap, whatever is asked',
             to: '    /* G3 negative: retain the front tap cover */' }] },
@@ -954,7 +1199,7 @@ try {
 
 function innerHeightOf(facts) { return facts?.inner?.height || 844; }
 
-writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: g3Only ? 'G3 only; G1 gates not run' : 'G1 and G3', rows, frames, controls }, null, 1));
+writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: controlsOnly ? 'G3 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words and sky only; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana and particle bar Save only; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : 'G1 and G3', rows, frames, controls }, null, 1));
 const failed = rows.filter((row) => !row.ok);
 console.log(`\n${rows.length - failed.length}/${rows.length} — evidence ${evidence}`);
 process.exit(failed.length ? 1 : 0);

@@ -2164,6 +2164,10 @@ addEventListener("keydown",e=>{ if(!DRIFT_ON||e.key!=="Escape")return; const sli
 function tapNode(n){
   if(recordPending.size){setHint("判断を保存しています。");return;}
   cueRetire(n,"tap");   // retain the identity of the answered gesture
+  // Hosted occurrences use the app's ladder before the standalone field's
+  // private rung counter. Cue retirement keeps its existing durable path;
+  // the lookup does not await it, duplicate it, or turn it into a grade.
+  if(hostedSlip(n,{bloom:true})!==false)return;
   const lvl=stack[stack.length-1];
   if(lvl&&lvl.center===n){ openCard(n); return; }
   if(n.kind==="glyph"){ diveKanji(n); return; }
@@ -3126,10 +3130,10 @@ if(DRIFT_ON){rafOn=true;requestAnimationFrame(frame);}
 // Round 4 review (T1): the universe speaks the interface language the corridor set on <body>.
 function uiT(ja,en){return document.body&&document.body.classList.contains("ui-bi")?en:ja;}
 // The one-hand pass (contract §1): the host's one slip, asked for the way the entry door is asked for —
-//   window.__BUNKI_OPEN_SLIP = { has(kind,key), open(kind,key,{anchor,redo,onClose}), isOpen(anchor), close() }
-// and drawn only when has() says the far side exists. slipFor(n) opens it beside a dive's centre at the
-// ladder's end; true when this tap opened it, false when it already stands there (then the centre's tap goes
-// on to the entry, as the band does). redo: the sky owns its taps, so no press is the slip's own dive.
+//   window.__BUNKI_OPEN_SLIP = { has(kind,key), open(kind,key,options), isOpen(anchor), close() }
+// Ordinary hosted taps share its reading → stage → page visit. Held/dive-centre
+// callers retain slipFor's idempotent stage request. Standalone keeps its own
+// field grammar; camera, pinch, lock and flick handlers do not pass through here.
 function slipHost(kind,key){
   const h=typeof window!=="undefined"&&window.__BUNKI_OPEN_SLIP;
   if(!h||typeof h.open!=="function") return null;
@@ -3138,15 +3142,58 @@ function slipHost(kind,key){
 }
 function slipAway(){
   const h=typeof window!=="undefined"&&window.__BUNKI_OPEN_SLIP;
-  if(h&&typeof h.isOpen==="function"&&h.isOpen()&&typeof h.close==="function") h.close();
+  // A reading-only visit has no popup yet, but must fold when its scene leaves.
+  if(h&&typeof h.close==="function") h.close();
 }
-function slipFor(n){
-  const kind=n.kind==="word"?"word":n.kind==="glyph"?"kanji":null;
+function hostedSlip(n,{redo=false,bloom=false}={}){
+  const kind=n.kind==="word"?"word":n.kind==="glyph"?"kanji":n.kind==="part"?"particle":null;
   const key=kind==="word"?n.w:n.ch;
   const h=kind&&key?slipHost(kind,key):null;
   if(!h||!n.el||!n.el.isConnected) return false;
+  if(bloom&&n.kind==="word"&&!n.el.dataset.ladderRung&&stack.length===0&&!lockOn){
+    bloomFocus(n); // keep the existing family response, without an extra tap rung
+    bloomLast=performance.now();
+  }
+  let ruby=null,base=null,children=null;
+  const clearReveal=()=>{
+    n.el.classList.remove("unfolded","glossed");
+    if(unfolded===n)unfolded=null;
+    if(ruby&&ruby.parentNode===base)ruby.replaceWith(...children);
+    ruby=null;
+  };
+  const reveal=reading=>{
+    if(n.kind==="word"){
+      collapseUnfold();
+      n.el.classList.add("unfolded");n.el.classList.remove("glossed");unfolded=n;
+    }else if(reading){
+      // The gloss/particle caption is a sibling, never part of the ruby base.
+      base=n.el.querySelector(n.kind==="glyph"?".g":".pch");
+      if(base){
+        children=[...base.childNodes];ruby=document.createElement("ruby");
+        ruby.append(...children);
+        const rt=document.createElement("rt");rt.textContent=reading;ruby.append(rt);base.append(ruby);
+      }
+    }
+    return clearReveal;
+  };
+  const readingVisible=()=>{
+    const reading=n.el.querySelector(n.kind==="word"?".yomi":"ruby rt");
+    if(!reading?.textContent.trim())return false;
+    const s=getComputedStyle(reading);
+    return reading.getClientRects().length>0&&s.display!=="none"&&s.visibility!=="hidden"&&Number(s.opacity)>0;
+  };
+  const look={surface:key,label:key,reading:n.r||"",gloss:n.g||""};
+  return h.open(kind,key,{anchor:n.el,redo,look,reveal,clearReveal,readingVisible,
+    onClose:reason=>{if(reason!=="dive")clearReveal();}});
+}
+function slipFor(n){
+  const kind=n.kind==="word"?"word":n.kind==="glyph"?"kanji":n.kind==="part"?"particle":null;
+  const key=kind==="word"?n.w:n.ch;
+  const h=kind&&key?slipHost(kind,key):null;
+  if(!h||!n.el||!n.el.isConnected)return false;
   if(typeof h.isOpen==="function"&&h.isOpen(n.el)) return false;
-  return h.open(kind,key,{anchor:n.el,redo:true})==="opened";
+  const result=hostedSlip(n,{redo:true});
+  return result==="opened"||result==="reading";
 }
 // Round 4 review (T1, fix 2): by day the universe keeps a sky of its own (the donor's own cool
 // ground), and by night it stands on the host world's ground only when every word ink keeps its

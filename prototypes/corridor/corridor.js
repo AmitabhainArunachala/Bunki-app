@@ -5440,7 +5440,7 @@ function openPassage(id, anchor = null) {
     const token = readerTokenAtIndex(anchor.index);
     if (!token) return;
     token.scrollIntoView({ block: 'center' });
-    if (token.matches('button')) token.focus({ preventScroll: true });
+    if (token.matches('button, .tok[data-para]')) focusProseWord(token, { preventScroll: true });
     const selected = passage()?.tokens?.[anchor.index];
     if (anchor.selectTarget !== false && selected?.b && selected.c && token.classList.contains('content')) setReaderTake(selected.b, anchor.index, id);
     S.readerScroll = window.scrollY;
@@ -7986,11 +7986,23 @@ function storyVersions(p) {
 const WORD_LADDER_DEMO_KEY = 'kairo-word-ladder-demo-v1';
 let wordLadderDemoSeen = false;
 function freshWordLadderRecord() {
-  return !['taken', 'revlog', 'obslog', 'sessions', 'writing', 'sentenceDrafts'].some(key =>
+  // The sky persists its empty default at boot; that alone is not learner history.
+  // Unknown extensions remain history: the demonstration never guesses them away.
+  const keysAre = (value, keys) => value && typeof value === 'object' && !Array.isArray(value) &&
+    Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
+  const empty = value => keysAre(value, []);
+  const pristineExtras = Object.entries(S.storeExtras || {}).every(([key, value]) => key === 'driftState' &&
+    keysAre(value, ['format', 'version', 'store']) && value.format === 'kairo-drift-state' && value.version === 1 &&
+    keysAre(value.store, ['known', 'unknown', 'lk', 'lu']) && empty(value.store.known) && empty(value.store.unknown) &&
+    value.store.lk === 0 && value.store.lu === 0);
+  return !S.storeReadOnly && pristineExtras &&
+    !Object.entries(S.readerPos || {}).some(([id, position]) => id !== S.passageId || position > 0) &&
+    !['taken', 'revlog', 'obslog', 'sessions', 'writing', 'sentenceDrafts'].some(key =>
     Array.isArray(S[key]) ? S[key].length : S[key] && Object.keys(S[key]).length) &&
     !['srs', 'readDone', 'assessmentLibrary', 'assessmentLibraryV2', 'assessmentLearning',
       'assessmentReceived', 'assessmentQuestionPractice', 'guidedProgress', 'calibration', 'lessonsDone', 'mockDone', 'deepWords', 'lists',
-      'sentencePractice', 'teacherContexts', 'teacherDrafts', 'aiReadings', 'aiChat', 'sourceInbox'].some(key =>
+      'sentencePractice', 'teacherContexts', 'teacherDrafts', 'aiReading', 'aiReadings', 'aiChat', 'aiQuiz',
+      'mockRun', 'suspended', 'stats', 'feedLibrary', 'publisherLibrary', 'sourceInbox'].some(key =>
       S[key] && Object.keys(S[key]).length);
 }
 function demonstrateWordLadder(reader) {
@@ -8299,6 +8311,12 @@ document.addEventListener('keydown', event => {
 function activateWordLadder(anchor, options) {
   if (!anchor?.isConnected || !slipAllowed(anchor)) return null;
   if (ladderVisit?.anchor === anchor) {
+    // Holds and a caller-managed refresh ask for this stage, never a dive.
+    if (options.redo) {
+      ladderVisit.rung = anchor.dataset.ladderRung = 'stage';
+      ladderVisit.openStage = options.openStage;
+      return ladderVisit.openStage({ restore: true, demo: false });
+    }
     if (ladderVisit.rung === 'stage' && standingSlip()) {
       if (miniEntry) slipDive(miniEntry, options.modality || 'pointer');
       else removeMini();
@@ -8318,9 +8336,9 @@ function activateWordLadder(anchor, options) {
     const style = getComputedStyle(rt);
     return !rt.classList.contains('hidden-rt') && style.visibility !== 'hidden' && style.display !== 'none' && style.opacity !== '0';
   });
-  if (!options.demo && !options.restore && S.dials.furigana === 1 && reading && kataToHira(reading) !== kataToHira(String(options.surface || '')) && !visible) {
+  if (!options.demo && !options.restore && !options.redo && S.dials.furigana === 1 && reading && kataToHira(reading) !== kataToHira(String(options.surface || '')) && !visible) {
     visit.rung = anchor.dataset.ladderRung = 'reading';
-    const undo = options.reveal ? options.reveal() : inlineWordReading(anchor, reading);
+    const undo = options.reveal ? options.reveal(reading) : inlineWordReading(anchor, reading);
     visit.clearReveal = options.clearReveal || (typeof undo === 'function' ? undo : null);
     options.onReveal?.();
     return 'reading';
@@ -8355,10 +8373,9 @@ function slipHeadword() {
 
 /* One tap grammar for every Japanese word (John, 2026-10-14: "I should be able to tap ANY word … and it
  * should be able to cycle through the layers to full entry"; "there is NO WAY to return to the
- * original word without the furigana"). A word cycles: the original text → one tap: its reading above
- * it and the popup (the meaning, Save) → the same word again: the full entry → closing it (Close, Back,
- * Escape, device Back), a tap off the words, or Escape on the popup: the original again, every reading a
- * tap summoned taken back. Words inside the popup and the entry follow the same grammar, so the layers
+ * original word without the furigana"). A word cycles: the original text → its reading above it → the stage (meaning, Save) → the full entry.
+ * An already visible reading, or readings off, skips the reading rung. Back from a stage-origin page
+ * restores that stage; folding the stage or reading leaves the original word bare, with always-on ruby retained. Words inside the popup and the entry follow the same grammar, so the layers
  * nest and always unwind.
  *
  * A press on the word whose popup is open keeps the popup for that press's click, which dives into the
@@ -8423,8 +8440,8 @@ document.addEventListener(
         !target.closest?.('#reader-word-menu, #vocabulary-list-popover')) clearWordLadder();
     const inText = ev.button === 0 && !!target.closest?.('#reader');
     if (mini && !mini.contains(target) && !target.closest?.('#vocabulary-list-popover, #reader-toast')) {
-      if (ev.button === 0 && miniAnchor?.isConnected && miniAnchor.contains(target)) {
-        miniDiveOnAnchor = miniAnchor;
+      if (miniAnchor?.isConnected && miniAnchor.contains(target)) {
+        if (ev.button === 0) miniDiveOnAnchor = miniAnchor;
         return;
       }
       removeMini();
@@ -8506,11 +8523,11 @@ function installProseWordRoving(block, selector = '.japanese-lookup-word') {
   if (!block?.querySelectorAll) return;
   let rover = proseWordRovers.get(block);
   if (!rover) {
-    rover = { selector, word: null };
+    rover = { selector, selectors: new Set(), word: null };
     proseWordRovers.set(block, rover);
     block.dataset.proseRoving = 'true';
     block.tabIndex = 0;
-    if (!block.matches('p,blockquote,h1,h2,h3,h4,h5,h6') && !block.hasAttribute('role')) block.setAttribute('role', 'paragraph');
+    if (block.matches('div,span') && !block.hasAttribute('role')) block.setAttribute('role', 'paragraph');
     block.setAttribute('aria-describedby', [block.getAttribute('aria-describedby'), japaneseLookupHelpId()].filter(Boolean).join(' '));
     block.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight Home End Enter Shift+F10');
     const words = () => [...block.querySelectorAll(rover.selector)].filter(word => word.closest('[data-prose-roving]') === block);
@@ -8585,8 +8602,10 @@ function installProseWordRoving(block, selector = '.japanese-lookup-word') {
       }
     });
   }
-  rover.selector = selector;
-  for (const word of block.querySelectorAll(selector)) {
+  // Enhancing plain text must not replace a sentence, teaching or deck renderer's word set.
+  rover.selectors.add(selector);
+  rover.selector = [...rover.selectors].join(',');
+  for (const word of block.querySelectorAll(rover.selector)) {
     if (word.closest('[data-prose-roving]') !== block || word.dataset.proseSelected) continue;
     // Do not mask a native-button regression: the renderer must provide actual inline text spans.
     rover.retire(word);
@@ -8600,7 +8619,7 @@ function lookupBlockWords(block) {
 function setLookupStop(word) {
   const block = word.closest('[data-lookup-block]');
   if (!block) return;
-  installProseWordRoving(block);
+  if (!proseWordRovers.has(block)) installProseWordRoving(block);
   proseWordRovers.get(block).word = word;
 }
 
@@ -8683,8 +8702,8 @@ async function openJapaneseLookup(anchor, text, context = {}) {
   const token = { s: text, b: record?.head || text, r: context.reading || record?.r || '', c: !!record,
     ...(record?.seq ? { seq: record.seq } : {}), ...(context.shown ? { shown: context.shown } : {}),
     ...(context.kanjiOnly ? { kanjiOnly: true } : {}), ...(readMiss ? { readMiss: true } : {}) };
-  const entryNode = hasKanjiEntry ? { t: 'kanji', id: text }
-    : record ? { t: 'word', id: token.b, ...(record?.seq ? { seq: record.seq, reading: record.r } : {}) } : null;
+  const entryNode = record ? { t: 'word', id: token.b, ...(record.seq ? { seq: record.seq, reading: record.r } : {}) }
+    : hasKanjiEntry ? { t: 'kanji', id: text } : null;
   return activateWordLadder(anchor, { surface: context.surface || text, reading: context.surfaceReading || token.r,
     reveal: context.reveal, clearReveal: context.clearReveal, readingVisible: context.readingVisible,
     restore: context.restore, openStage: () => {
@@ -8820,6 +8839,9 @@ function appendJapaneseLookup(container, text, context = {}) {
   }
   container.append(wrapper);
   installProseWordRoving(block, '.japanese-lookup-word');
+  // A fragment or underlined assessment target may not be inside its named block yet.
+  // Retire these newly created words directly; insertion order must not expose word controls.
+  for (const word of wrapper.querySelectorAll('.japanese-lookup-word')) proseWordRovers.get(block).retire(word);
   return wrapper;
 }
 
@@ -8827,7 +8849,7 @@ function enhanceJapaneseProse(root) {
   // The assessment room owns assistance and test conditions; review-card fronts
   // likewise must remain a recall prompt until the learner reveals the answer.
   if (['mock', 'review', 'probe', 'aiquiz'].includes(S.view) || (S.view === 'lessons' && S.lessonRun?.phase !== 'learn')) return;
-  const parents = root.querySelectorAll('p, blockquote, dd, li, h1, h2, h3, .view-title, .meaning, .publisher-body, .dictionary-forms, .review-face');
+  const parents = root.querySelectorAll('p, blockquote, dd, li, h1, h2, h3, .view-title, .meaning, .publisher-body, .dictionary-forms, .review-face, .gs-passage');
   for (const parent of parents) {
     // The writing room's own hints are room chrome above the popup's layer, not text to study.
     if (parent.closest('button,a,label,summary,[data-japanese-lookup],#reader,.reader,input,textarea,.gs-choices,.stroke-hint,.stroke-missing')) continue;
@@ -8846,10 +8868,15 @@ function enhanceJapaneseProse(root) {
     while (walker.nextNode()) {
       const node = walker.currentNode;
       if (!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(node.textContent || '')) continue;
-      if (node.parentElement?.closest('button,a,label,summary,rt,ruby,[data-japanese-lookup],input,textarea,code,pre')) continue;
+      if (node.parentElement?.closest('button,a,label,summary,rt,ruby,[data-japanese-lookup],.sentence-tok,.gs-reading,input,textarea,code,pre')) continue;
       textNodes.push(node);
     }
     for (const node of textNodes) { const fragment = document.createDocumentFragment(); appendJapaneseLookup(fragment, node.textContent, context); node.replaceWith(fragment); }
+  }
+  // Teaching words retain their session click/Save path; generic words retain the guarded
+  // beforeOpen path. One controller owns both kinds in each guided prose block.
+  if (S.view === 'guided') for (const block of parents) {
+    if (block.querySelector('.gs-word')) installProseWordRoving(block, '.japanese-lookup-word,.gs-word');
   }
   // an excerpt offers listening only when the locked narration voice has shipped
   for (const quote of articleNarration ? root.querySelectorAll('blockquote.sentence-original') : []) {
@@ -9472,7 +9499,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     : { g: null, held: false, node: other, state: save === 'default' ? wordCaptureState(other) : null, identityHeld: false };
   const label = look?.label || token.b;
   if (ladderVisit?.anchor === span) {
-    ladderVisit.saveFacts = () => ({ label, g, held, node: captureNode, state: wordCaptureState(captureNode), identityHeld });
+    ladderVisit.saveFacts = save === 'none' ? () => null
+      : () => ({ label, g, held, node: captureNode, state: wordCaptureState(captureNode), identityHeld });
   }
   const mini = el('div', null);
   mini.id = 'mini';
@@ -10949,7 +10977,7 @@ function wireTokenGestures(span, token, index, p) {
   };
   const sentence = () => readerTakeNode({ id: token.b, index, p: p.id });
   const quickLook = (modality = 'pointer', { restore = false, demo = false } = {}) => activateWordLadder(span, {
-    surface: token.s, reading: token.r, modality, restore, demo,
+    surface: displayPairs(token).map(pair => pair.t).join(''), reading: token.r, modality, restore, demo,
     reveal: () => { setReaderTake(token.b, index, p.id); markReaderReading(index); },
     clearReveal: () => clearReaderReadings(),
     readingVisible: () => S.dials.furigana === 2 || !!S.revealed?.has(index),
@@ -11017,7 +11045,7 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
   const quickLook = async (modality = 'pointer', { restore = false } = {}) => {
     await prepare();
     setReaderTake(token.b || text, index, p.id);
-    return openJapaneseLookup(span, text, { ...lookupContext, ...answer, from, restore, surface: token.s, surfaceReading: token.r,
+    return openJapaneseLookup(span, text, { ...lookupContext, ...answer, from, restore, surface: displayPairs(token).map(pair => pair.t).join(''), surfaceReading: token.r,
       ...(named ? { reveal: () => markReaderReading(index), clearReveal: () => clearReaderReadings(),
         readingVisible: () => S.dials.furigana === 2 || !!S.revealed?.has(index) } : {}),
       sentence: () => readerSentenceRow(sentence(), index, token.readerSourceEnd ?? index),
@@ -11959,8 +11987,9 @@ window.__BUNKI_OPEN_ENTRY = {
 /* ------------------------------------------- the slip, for every surface (the one-hand pass, contract §1)
  * One slip for every Japanese word, kanji or particle the learner can touch: the reader, the exam paper, the
  * deck card's back, the sky, the guided session and the Words room all open this one, and it behaves the same
- * everywhere — tap 1: the reading and the slip (word · reading · meaning · Save ▾ · kanji band · sentence row);
- * the same word again: the full entry; elsewhere, Close or Escape: the bare word.
+ * everywhere — reading in place, then the stage (word · meaning · Save ▾), then the full entry.
+ * Already visible readings and the off/always settings skip the first rung. Returning from the entry
+ * restores its stage; folding that stage clears only the reading this visit summoned.
  *   node    the dictionary node ({ t: 'word' | 'kanji' | 'particle' | 'grammar', id, seq?, reading? }), or null for
  *           a spelling the dictionary lacks (the slip then shows what the surface knows, and has no door)
  *   anchor  the element that was tapped: the slip grows beside it, and the next tap on it is the door
@@ -11971,9 +12000,9 @@ window.__BUNKI_OPEN_ENTRY = {
  *   note    a line in Save's place (the deck's own word is already in its deck)
  *   entry   false: no door; a function: the surface's own way into the entry; otherwise go(node)
  *   redo    the caller already read the press (the reader's doors): never treat this call as the second tap
- * Returns the slip, or null when this activation was the second tap and dived into the entry instead. */
+ * Returns 'reading', the stage element, or null after entering the page or dismissing a held stage. */
 function openSlip(node, { anchor, from = 'lookup', host = null, look = null, note = null, sentence = null, focus = false,
-  onClose = null, entry, key = null, redo = false, why = '', reveal = null, clearReveal = null, readingVisible = null } = {}) {
+  onClose = null, entry, key = null, redo = false, why = '', reveal = null, clearReveal = null, readingVisible = null, onStage = null } = {}) {
   if (!anchor?.isConnected) return null;
   if (!redo && diveFromSlip(anchor)) return null;
   const kind = node?.t === 'kanji' ? 'kanji' : node?.t === 'particle' ? 'particle' : node?.t === 'grammar' ? 'grammar' : 'word';
@@ -12002,7 +12031,7 @@ function openSlip(node, { anchor, from = 'lookup', host = null, look = null, not
     kanji = false;
     if (entry === undefined) entryAvailable = !!k;
   } else if (kind === 'particle') {
-    token = { s: node.id, b: look?.label || node.id, r: '' };
+    token = { s: look?.surface || look?.label || node.id, b: look?.label || node.id, r: look?.reading || '' };
     save = 'none';
     kanji = false;
   } else {
@@ -12015,10 +12044,14 @@ function openSlip(node, { anchor, from = 'lookup', host = null, look = null, not
       entry(modality);
     } else if (node) go(node, { invoker: anchor, from: slipHeadword() || anchor, instant: modality === 'keyboard' }); // the slip leaves inside the cut (enterWord)
   };
-  return activateWordLadder(anchor, { surface: token.s, reading: look?.reading || token.r, reveal, clearReveal, readingVisible,
-    openStage: () => showMini(anchor, token, onEntry, { focusEntry: focus, record, entryAvailable, sentence, look, kind, save, host, note,
-    source: from, key, kanji, onClose, follow: from === 'drift' || from === 'sky', nodeFor: node && kind !== 'word' ? { t: node.t, id: node.id } : null,
-    entryNode: typeof entry === 'function' ? null : node, why }) });
+  return activateWordLadder(anchor, { surface: token.s, reading: look?.reading || token.r, reveal, clearReveal, readingVisible, redo, from,
+    openStage: () => {
+      const stage = showMini(anchor, token, onEntry, { focusEntry: focus, record, entryAvailable, sentence, look, kind, save, host, note,
+        source: from, key, kanji, onClose, follow: from === 'drift' || from === 'sky', nodeFor: node && kind !== 'word' ? { t: node.t, id: node.id } : null,
+        entryNode: typeof entry === 'function' ? null : node, why });
+      if (stage) onStage?.(stage);
+      return stage;
+    } });
 }
 /** A kanji's first reading for the slip's band: its first on reading in kana, else its first kun stem. */
 function kanjiSlipReading(k) {
@@ -12027,15 +12060,23 @@ function kanjiSlipReading(k) {
 }
 window.__BUNKI_OPEN_SLIP = {
   has(kind, key) {
+    if (!S.ready || !key) return false;
+    if (kind === 'word') return /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(key);
+    if (kind === 'particle') return !!PARTICLE_BY_SURFACE[key] || PARTICLES.some(item => item.id === key);
     return window.__BUNKI_OPEN_ENTRY.has(kind, key);
   },
-  /** The sky taps a word (or a kanji at a dive's centre): the slip opens beside the tapped element. With
-   * redo the sky keeps its own ladder under the slip (a press on the word is never the slip's dive; the band
-   * is the door); without it the next tap on the element dives into the entry. 'opened' | 'dived' | false. */
-  open(kind, key, { anchor = null, onClose = null, redo = false } = {}) {
+  /** The hosted sky shares the occurrence ladder. The sky supplies its in-place reading paint;
+   * holds use redo for an idempotent stage. Returns 'reading' | 'opened' | 'dived' | false. */
+  open(kind, key, { anchor = null, onClose = null, redo = false, look = null, reveal = null,
+    clearReveal = null, readingVisible = null } = {}) {
     if (S.view !== 'drift' || !this.has(kind, key) || !anchor?.isConnected) return false;
+    const particle = kind === 'particle' && (PARTICLE_BY_SURFACE[key] || PARTICLES.find(item => item.id === key));
+    const node = { t: kind, id: particle ? particle.id : key,
+      ...(kind === 'word' && look?.reading ? { reading: look.reading } : {}) };
+    const shown = particle ? { label: particle.p, surface: particle.p, reading: particle.r, gloss: bi() ? particle.role : particle.roleJa } : look;
     const before = !!standingSlip();
-    const slip = openSlip({ t: kind, id: key }, { anchor, from: 'drift', onClose, redo });
+    const slip = openSlip(node, { anchor, from: 'drift', onClose, redo, look: shown, reveal, clearReveal, readingVisible });
+    if (slip === 'reading') return 'reading';
     if (slip) {
       interaction({ kind: 'quickLook.open' }, 'pointer', `drift-slip-${kind}`);
       return 'opened';
@@ -12052,6 +12093,7 @@ window.__BUNKI_OPEN_SLIP = {
   },
   close() {
     if (document.getElementById('mini')) removeMini();
+    else if (ladderVisit?.from === 'drift') clearWordLadder();
   },
 };
 
@@ -20338,7 +20380,7 @@ function wwPlate(model, section) {
       box.append(n.type === 'word' ? wwInkLabel(n.key, n.hi) : wwLearn('span', 'ww-g', n.key));
       b.dataset.uiContentValue = n.key;
       const kind = { word: tx('語', 'word'), kanji: tx('漢字', 'kanji'), part: tx('部品', 'part') }[n.type];
-      b.setAttribute('aria-label', tx(`${kind}「${n.key}」を中心に`, `Centre the web on the ${kind} ${n.key}`));
+      b.setAttribute('aria-label', tx(`${kind}「${n.key}」をひらく`, `Open the ${kind} ${n.key}`));
     }
     // a drafting annotation: the kanji's real stroke count at the disc's shoulder
     if (n.type === 'kanji' && D.kanji[n.key]?.st) {
@@ -20352,11 +20394,12 @@ function wwPlate(model, section) {
       if (event.detail !== 0 && Date.now() < swallowClickUntil) return; // the hold's own release
       if (n.type === 'passage') wwOpenPassage(n.ex, n.target, b);
       else if (n.type === 'grammar') go({ t: 'grammar', id: n.key }, { invoker: b });
-      else wwRecentre({ type: n.type, key: n.key }, section, b);
+      else openWordWebLadder(n, section, b, event.detail === 0);
     });
-    // a tap walks the web (the node comes to the centre); a hold, or a right-click, opens the node's slip in
-    // place instead (contract §1): the word's reading and meaning, Save ▾, the band into its entry
-    if (n.type === 'word' || n.type === 'kanji' || n.type === 'part') wireWordWebHold(b, () => wwSlipNode({ type: n.type, key: n.key }));
+    // The word follows the same ladder in place; its stage offers the web's
+    // separate re-centring action, so exploring the graph remains one tap.
+    if (n.type === 'word' || n.type === 'kanji' || n.type === 'part') wireWordWebHold(b, () => wwSlipNode({ type: n.type, key: n.key }),
+      () => openWordWebLadder(n, section, b, true, true));
     layer.append(b);
   });
   inner.append(layer);
@@ -20443,8 +20486,10 @@ function wwDetail(model, section) {
       b.dataset.wwKey = k;
       b.dataset.uiContentValue = k;
       b.append(wwLearn('span', null, k));
-      b.setAttribute('aria-label', tx(`漢字「${k}」を中心に`, `Centre the web on the kanji ${k}`));
-      b.addEventListener('click', () => wwRecentre({ type: 'kanji', key: k }, section, b));
+      b.setAttribute('aria-label', tx(`漢字「${k}」をひらく`, `Open the kanji ${k}`));
+      b.addEventListener('click', event => openWordWebLadder({ type: 'kanji', key: k }, section, b, event.detail === 0));
+      wireWordWebHold(b, () => ({ t: 'kanji', id: k }),
+        () => openWordWebLadder({ type: 'kanji', key: k }, section, b, true, true));
       grid.append(b);
     }
     box.append(grid);
@@ -20490,12 +20535,35 @@ function wwSlipNode(n) {
   if (n.type === 'kanji' || (n.type === 'part' && D.kanji?.[n.key])) return { t: 'kanji', id: n.key };
   return null;
 }
+/** A peripheral word is still a word. Keep the plate intact through its
+ * reading, stage and page; re-centring is an explicit action on that stage. */
+function openWordWebLadder(item, section, anchor, keyboard = false, redo = false) {
+  const node = wwSlipNode(item);
+  if (!node) { wwRecentre({ type: item.type, key: item.key }, section, anchor); return; }
+  const reading = node.t === 'kanji' ? kanjiSlipReading(D.kanji?.[node.id]) : lookup(node.id)?.r || '';
+  const glyph = anchor.querySelector('.ww-g') || anchor.querySelector('span') || anchor;
+  openSlip(node, { anchor, from: 'lookup', focus: keyboard, redo,
+    reveal: () => inlineWordReading(glyph, reading),
+    readingVisible: () => !!reading && !bi() && kataToHira(anchor.querySelector('.ww-cap')?.textContent || '') === kataToHira(reading),
+    onStage(stage) {
+      const follow = stage.querySelector('.mini-web-open') || el('button', 'mini-web-open');
+      if (!follow.isConnected) { follow.type = 'button'; stage.append(follow); }
+      // Replace the generic Related words callback with this exact typed node.
+      const action = follow.cloneNode(false);
+      action.dataset.action = 'word-web.centre';
+      action.textContent = tx('この語を中心に', 'Centre the web here');
+      action.addEventListener('click', event => { event.stopPropagation(); wwRecentre({ type: item.type, key: item.key }, section, anchor); });
+      follow.replaceWith(action);
+    },
+  });
+}
 /** Press-and-hold (touch and pen) or right-click on a web node opens its slip in place; a hold that moves is
  * a scroll, and the hold's release never counts as the walking tap (swallowClickUntil, as the reader's menu). */
-function wireWordWebHold(button, nodeOf) {
+function wireWordWebHold(button, nodeOf, activate = null) {
   let hold = null;
   const clear = () => { if (hold) clearTimeout(hold.timer); hold = null; };
   const open = () => {
+    if (activate) { activate(); return; }
     const node = nodeOf();
     if (!node) return;
     openSlip(node, { anchor: button, from: 'lookup', redo: true });
@@ -20728,8 +20796,8 @@ function wireParticleGestures(span, particle, index, p) {
   // not a card), and its band opens the particle's page
   const quickLook = (modality = 'pointer', { restore = false } = {}) => {
     openSlip({ t: 'particle', id: particle.id }, {
-      anchor: span, from: 'reader', key: `particle:${particle.id}`, redo: true,
-      look: { label: particle.p, gloss: bi() ? particle.role : particle.roleJa },
+      anchor: span, from: 'reader', key: `particle:${particle.id}`, redo: restore,
+      look: { label: particle.p, reading: particle.r, gloss: bi() ? particle.role : particle.roleJa },
       sentence: readerSentenceRow(sentence(), index), focus: modality === 'keyboard',
       entry: (entryModality) => openFull(entryModality),
     });
@@ -27253,18 +27321,14 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       container.append(el('span', 'example-hit', token.s));
       return;
     }
-    // A sentence outside the reader is still a sentence: 用例, the 文 page and
-    // the review answer face all ride this ladder, and all three were
-    // pointer-only spans — no tab stop, no name, nothing a screen reader
-    // could reach, while the reader's own tokens are labelled buttons
-    // (E3 round-A, dead-ends lens; CONFIRMED on the head). Same element,
-    // same grammar.
+    // Examples, the sentence page and review answers share the prose controller:
+    // one paragraph stop, then an explicit word selection and the same ladder.
     const span = el('span', 'tok content sentence-tok' + (isTarget ? ' example-hit' : ''));
     span.lang = 'ja';
     span.dataset.proseLabel = token.s;
     span.append(wordRow(displayPairs(token), { furigana: S.dials.furigana, revealed: S.dials.furigana === 2 }));
-    // the reader's grammar (reader lane 2026-10-02): one tap opens the word's popup — reading and meaning
-    // at once, Save, and Full entry ›, which opens the entry with this sentence as its provenance
+    // The reading rises in place, the next activation opens the stage, and its
+    // page retains this sentence as provenance.
     const from = source ? { passage: source.passage, index: source.index + index } : null;
     // R · the entry is the one this token's own reading names, as its slip showed it (readingToken); before the
     // full dictionary answers, a core spelling carries the reading and its sheet resolves it
@@ -27283,7 +27347,7 @@ function renderSentenceTokens(container, tokens, opts = {}) {
     const quickLook = (modality = 'pointer') => {
       if (!token.c) return openJapaneseLookup(span, token.b || token.s, { surface: token.s, reading: token.r, from,
         focusPopup: modality === 'keyboard' });
-      return activateWordLadder(span, { surface: token.s, reading: token.r, modality,
+      return activateWordLadder(span, { surface: displayPairs(token).map(pair => pair.t).join(''), reading: token.r, modality,
         onReveal: () => obsLog('tap', srsKey('word', token.b), 1, contextId),
         openStage: ({ restore }) => {
           if (!restore) obsLog('tap', srsKey('word', token.b), 2, contextId);
@@ -31815,7 +31879,7 @@ function mountPageEffects(sheet, node) {
  * that run a live session keep render(); the page is the same element either way (buildPage). */
 const LAYER_ROOMS = new Set(['reader', 'shelf', 'archive', 'search', 'tray', 'saved', 'list', 'browse', 'srs-stats',
   'kanjidex', 'grammar', 'yoji', 'thesaurus', 'feed', 'publisher', 'source-inbox', 'source-reader', 'airead', 'me',
-  'settings', 'kagami']);
+  'settings', 'kagami', 'deckplay', 'guided']);
 function layerPathFor(view = S.view) {
   return !!S.ready && !personalHost && !S.strokes && LAYER_ROOMS.has(view) && !!document.querySelector('#app > main');
 }
@@ -31900,7 +31964,7 @@ function finishPageTransition() {
 /** Where a word's own glyphs stand on the screen — its text, not its box (a heading is a whole line, a door has padding):
  * the union of its text's boxes, its readings, glosses and a headword's other spellings left out. Null when it has no
  * text on the screen. */
-const GLYPH_SKIP = 'rt, rp, .tok-en, .tok-state, .visually-hidden, .headword-alt';
+const GLYPH_SKIP = 'rt, rp, .tok-en, .tok-state, .visually-hidden, .headword-alt, .ww-cap, .ww-st';
 function glyphBox(element) {
   if (!element?.isConnected) return null;
   const range = document.createRange();
@@ -32023,6 +32087,7 @@ function recede({ all = false, viaRender = false, instant = false } = {}) {
     origin.restoreNext = true;
     origin.rung = origin.anchor.dataset.ladderRung = 'stage';
     origin.openStage({ restore: true, demo: origin.demo });
+    focusProseWord(origin.anchor, { preventScroll: true });
   } else if (origin) clearWordLadder(origin);
   const flight = leaves && home?.isConnected ? flyWord(leaves, home) : null;
   sampleTransition('back', where);
@@ -34960,6 +35025,7 @@ function render() {
   // the reading measure is per-view: a column for the texts, the full window
   // for the landscapes (野 and 墨流し). CSS reads this, nothing else does.
   document.body.dataset.view = S.view;
+  document.body.dataset.furigana = String(S.dials.furigana);
   // the layout under test stamps the root for its styles; the current layout leaves it unmarked
   if (placesLayout()) document.documentElement.dataset.layout = 'places';
   else delete document.documentElement.dataset.layout;
@@ -35497,6 +35563,7 @@ function deckHost() {
       // say they are already in the deck where Save would stand; a word the dictionary lacks shows the deck's
       // sense and has no door
       openSlip: (node, options) => openSlip(node, options),
+      installProseWords: (block, selector) => installProseWordRoving(block, selector),
       slipOpen: () => !!standingSlip(),
       closeSlip: () => { if (document.getElementById('mini')) removeMini(); },
       inDeckNote: () => tx('このデッキにあります', 'Already in this deck'),

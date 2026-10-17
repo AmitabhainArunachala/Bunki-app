@@ -683,6 +683,7 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
     }
   });
   if (clamp && split) clampContext(out);
+  if (taps) ctx?.host?.installProseWords?.(out, '.kp-tok');
   if (taps || ruby === 'all') {
     reflowWatch?.observe(out);
     document.fonts?.ready.then(() => out.isConnected && seatReadings(out));
@@ -1639,13 +1640,18 @@ function onDown(e) {
   if (ui.pop && !e.target.closest?.('.kp-pop')) closePop();
 }
 
-/** make node one tap target: role button, in the tab order, no look of its own until hover or focus */
+/** Hosted prose uses the shared paragraph controller; standalone keeps its native keyboard fallback. */
 function tapNode(node, unit, onTap) {
   node.classList.add('kp-tok');
   node.kpUnit = unit;
-  node.setAttribute('role', 'button');
-  node.tabIndex = 0;
-  node.setAttribute('aria-haspopup', 'dialog');
+  node.dataset.japaneseLookup = 'deck-word';
+  if (unit.word?.term || unit.tok?.s) node.dataset.proseLabel = unit.tok?.s || unit.word.term;
+  const hostedProse = typeof ctx?.host?.installProseWords === 'function';
+  if (!hostedProse) {
+    node.setAttribute('role', 'button');
+    node.tabIndex = 0;
+    node.setAttribute('aria-haspopup', 'dialog');
+  }
   if (unit.word) node.dataset.deckWord = unit.word.id;
   node.kpTap = () => onTap(unit, node);
   node.addEventListener('click', (e) => {
@@ -1670,7 +1676,7 @@ function tapNode(node, unit, onTap) {
     chosen.kpTap();
   });
   node.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (hostedProse || e.defaultPrevented || (e.key !== 'Enter' && e.key !== ' ')) return;
     e.preventDefault();
     e.stopPropagation();
     onTap(unit, node);
@@ -1697,6 +1703,7 @@ function tapText(text, units, onTap) {
 function defLine(card, word) {
   const p = el('p', 'kp-def');
   p.append(...tapText(word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 })));
+  if (p.querySelector('.kp-tok')) ctx?.host?.installProseWords?.(p, '.kp-tok');
   reflowWatch?.observe(p);
   return p;
 }
@@ -2915,7 +2922,11 @@ function restoreButton(ta, msg) {
 }
 
 function onKey(e) {
-  if (!ctx?.root?.isConnected || ui.screen !== 'study' || e.target.closest?.('input, textarea')) return;
+  // A retained card still has this document listener while a full entry owns the keys.
+  if (e.defaultPrevented || !ctx?.root?.isConnected || ui.screen !== 'study'
+    || ctx.root.closest('[inert], [aria-hidden="true"], [hidden]')
+    || (ctx.host && document.querySelector('#sheet, #stroke-page'))
+    || e.target.closest?.('input, textarea')) return;
   // an open slip (the host's) or popover takes the keys: Escape closes it, and nothing grades behind it
   const slip = !!ctx.host && safely(() => !!ctx.host.slipOpen?.(), false);
   if (slip || ui.pop) {

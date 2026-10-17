@@ -28,7 +28,7 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { chromium, webkit } from 'playwright-core';
 // verify-corridor.mjs resolves the site when it loads, so it is imported inside the receipt's try
 let CORRIDOR_DIR = null, startCorridorServer;
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
@@ -36,8 +36,11 @@ import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 const out = resolve(process.env.KAIRO_EVIDENCE_DIR || resolve(homedir(), '.dharma/bunki_audit/playback'));
 mkdirSync(out, { recursive: true });
 const filter = process.argv.find((arg) => arg.startsWith('--case='))?.slice(7);
+const engine = process.env.KAIRO_BROWSER || 'chromium';
+assert(['chromium', 'webkit'].includes(engine), 'KAIRO_BROWSER must be chromium or webkit; run each engine separately');
 // server and browser start inside the receipt's try below, so a launch failure still writes JSON
 let server = null, base = null, browser = null;
+let browserVersion = null;
 const results = [];
 // N (2026-10-17) rewrites the fixture pin "yasashii:7 and yasashii:6 stand on the shelf, one a glossary-ref door from the
 // other": the ten glossary definitions left the shelf through the cull queue. The two passages are now a shelf story and
@@ -310,7 +313,9 @@ async function check(name, mode, body, { learnerRecord = 'untouched' } = {}) {
 try {
   ({ CORRIDOR_DIR, startCorridorServer } = await import('./verify-corridor.mjs'));
   ({ server, base } = await startCorridorServer());
-  browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+  browser = await ({ chromium, webkit })[engine].launch(engine === 'chromium' ? { executablePath: process.env.CHROMIUM_PATH || undefined } : {});
+  browserVersion = browser.version();
+  console.log(`BROWSER ${engine} ${browserVersion}`);
 
   // --- the shipped state: no narration flag, no approved clip ---
   await check('the-shipped-play-bar-is-a-quiet-pending-line-and-silent', 'quiet', async (f) => {
@@ -358,6 +363,22 @@ try {
   // reader lane 2026-10-02: the floating sentence bar is gone; what floats over the text now is the tapped word's popup
   await check('approved-player-is-touch-sized-and-clear-of-the-word-popup-on-phones', 'narration', async ({ page }) => {
     await openBar(page);
+    assert.equal(await page.locator('body').getAttribute('data-furigana'), '1', 'This fixture exercises on-touch reading then stage');
+    const selected = await page.locator('#reader .tok[data-word]').evaluateAll(nodes => {
+      const n = nodes.find(n => /\p{Script=Han}/u.test(n.dataset.word) && n.dataset.word.length > 1 && n.querySelector('rt.hidden-rt'));
+      if (!n) return null;
+      const paragraphs = [...document.querySelectorAll('#reader [data-prose-roving]')], paragraph = n.closest('[data-prose-roving]');
+      return { index: n.dataset.index, word: n.dataset.word, reading: [...n.querySelectorAll('rt')].map(rt => rt.textContent).join(''),
+        paragraph: paragraphs.indexOf(paragraph), wordIndex: [...paragraph.querySelectorAll('.tok[data-para]')].indexOf(n) };
+    });
+    assert(selected?.reading && selected.paragraph >= 0 && selected.wordIndex >= 0, 'A hidden-reading occurrence belongs to a real paragraph controller');
+    const word = page.locator(`#reader .tok[data-index="${selected.index}"]`);
+    const selectWord = async () => {
+      await page.locator('#reader [data-prose-roving]').nth(selected.paragraph).focus();
+      await page.keyboard.press('Home');
+      for (let index = 0; index < selected.wordIndex; index++) await page.keyboard.press('ArrowRight');
+      assert.equal(await word.evaluate(n => document.activeElement === n), true, 'Paragraph arrows select the exact occurrence');
+    };
     const measure = () => page.evaluate(() => {
       const bar = document.querySelector('.listen-row.play-bar').getBoundingClientRect();
       const popup = document.querySelector('#mini').getBoundingClientRect();
@@ -375,12 +396,31 @@ try {
     const measurements = [];
     for (const width of [320, 390]) {
       await page.setViewportSize({ width, height: 844 });
-      // a popup left from the wider screen goes first: Escape on its word
-      await page.locator('#reader .tok').first().focus();
+      // Fold the prior stage, then select through the actual paragraph keyboard path.
       await page.keyboard.press('Escape');
       await page.waitForFunction(() => !document.getElementById('mini'));
-      await page.locator('#reader .tok').first().click();
+      await selectWord();
+      assert.equal(await word.getAttribute('data-ladder-rung'), null);
+      const before = (await readAppRecord(page)).obslog || [];
+      await page.keyboard.press('Enter');
+      await page.waitForFunction(({ index, reading }) => {
+        const n = document.querySelector(`#reader .tok[data-index="${index}"]`);
+        const painted = [...n.querySelectorAll('ruby')].map(ruby => {
+          const style = getComputedStyle(ruby, '::before'), content = style.content;
+          if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) !== 1) return '';
+          return content.startsWith('attr(') ? ruby.dataset.r : /^["'].*["']$/u.test(content) ? content.slice(1, -1) : '';
+        }).join('');
+        return n.dataset.ladderRung === 'reading' && painted === reading && !document.getElementById('mini');
+      }, selected);
+      const revealed = await waitForAppRecord(page, record => record.obslog.length === before.length + 1);
+      assert.deepEqual(revealed.obslog.slice(0, -1), before);
+      assert.deepEqual(revealed.obslog.at(-1).slice(1), ['tap', `word:${selected.word}`, 1, FIRST]);
+      await page.keyboard.press('Enter');
       await page.locator('#mini').waitFor({ state: 'visible' });
+      assert.equal(await word.getAttribute('data-ladder-rung'), 'stage');
+      const staged = await waitForAppRecord(page, record => record.obslog.length === before.length + 2);
+      assert.deepEqual(staged.obslog.slice(0, -1), revealed.obslog);
+      assert.deepEqual(staged.obslog.at(-1).slice(1), ['tap', `word:${selected.word}`, 2, FIRST]);
       const observed = await measure();
       measurements.push(observed);
       writeFileSync(resolve(out, 'phone-player-geometry.json'), JSON.stringify(measurements, null, 2));
@@ -395,9 +435,9 @@ try {
     await overlap.evaluate(node => node.remove());
     assert.equal((await measure()).valid, true, 'removing the controls restores the usable layout');
     // the mark folds the bar (the slip goes first: a tap outside it puts it away by the mini's law)
-    await page.locator('#reader .tok').first().focus();
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => !document.getElementById('mini'));
+    assert.equal(await word.getAttribute('data-ladder-rung'), null, 'Folding the stage returns the occurrence bare');
     await page.locator('#listen-open').click();
     await page.waitForSelector('.listen-row.play-bar[data-open="false"]', { timeout: 5000 });
     const foldedState = await markState(page);
@@ -690,7 +730,8 @@ try {
   writeFileSync(resolve(out, 'verify-playback.json'), `${JSON.stringify({
     site: CORRIDOR_DIR,
     corridorSha256,
-    simulatedBrowser: 'Chromium', audio: 'deterministic media doubles; the speech double must never be called; no voice-quality claim',
+    engine, browserVersion,
+    simulatedBrowser: engine === 'webkit' ? 'WebKit' : 'Chromium', audio: 'deterministic media doubles; the speech double must never be called; no voice-quality claim',
     results, failures: results.filter((row) => !row.pass).length,
   }, null, 2)}\n`);
   const failures = results.filter((row) => !row.pass).length;

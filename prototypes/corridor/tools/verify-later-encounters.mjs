@@ -118,6 +118,7 @@ for (const engine of engines) for (const width of sizes) {
       acceptDownloads: true, ignoreHTTPSErrors: true, ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
       recordVideo: { dir: videoDir, size: { width, height: width === 390 ? 844 : 1050 } },
     });
+    await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device fixture.
     await context.route('**/*', route => {
       const url = new URL(route.request().url()); if (url.origin === ORIGIN) return route.continue();
       result.externalRequests.push({ origin: url.origin, path: url.pathname }); return route.abort();
@@ -227,7 +228,7 @@ for (const engine of engines) for (const width of sizes) {
       await openShelfDoor(page, '#airead-link'); await page.locator('#airead-startingLevel').selectOption('N5');
       await waitForAppRecord(page, r => r.readingSettings?.startingLevel === 'N5'); await page.locator('#back').click();
       const item = page.locator('.shelf-item:not([data-recommendation])').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
-      await item.locator('.shelf-open').click(); await page.locator('#reader .tok[data-index="9"][data-word="窓"]').click();
+      await item.locator('.shelf-open').click(); await openReaderWordStage(page, page.locator('#reader .tok[data-index="9"][data-word="窓"]'));
       await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-choose-production').check();
       await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-production-text').waitFor();
       await page.locator('#sentence-production-text').fill('  私の部屋の窓を開けます。\n e\u0301 🚀  ');
@@ -250,8 +251,8 @@ for (const engine of engines) for (const width of sizes) {
     await atToken(120, '駅で待つ時間'); await page.locator('#reader-source-back').click();
     assert.equal(await page.locator('#sentence-production-text').inputValue(), draft);
     await suggestion('new-context').click(); await atToken(120, '駅で待つ時間');
-    // the reader opens on the focused word; Enter opens its popup, whose last row practises the sentence (reader lane 2026-10-02)
-    await page.keyboard.press('Enter'); await page.locator('#mini').waitFor();
+    // The exact restored word stays selected while Enter climbs its ladder.
+    await openReaderWordStage(page, page.locator('#reader .tok[data-index="120"]'), true);
     await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
     unchanged(initial, await snapshot('later-choice-neutral')); await page.locator('#sentence-practice-confirm').click();
     await page.locator('#sentence-review-start').waitFor();
@@ -409,3 +410,21 @@ const receipt = { version: 1, startedAt, finishedAt: new Date().toISOString(), s
   passed: results.filter(r => r.passed).length, failed: results.filter(r => !r.passed).length, results };
 writeFileSync(join(OUT, 'receipt.json'), JSON.stringify(receipt, null, 2) + '\n');
 if (receipt.failed) process.exitCode = 1;
+
+// These source-context checks enter through the G3 ladder; the grammar itself is
+// checked separately. A second activation is allowed only after a real reading rung.
+async function openReaderWordStage(page, word, keyboard = false) {
+  if (keyboard) assert(await word.evaluate(node => document.activeElement === node), 'Return selected the exact source occurrence');
+  const activate = () => keyboard ? page.keyboard.press('Enter') : word.click();
+  await activate();
+  await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
+    assert(await word.evaluate(node => [...node.querySelectorAll('rt')].some(rt => {
+      const style = getComputedStyle(rt); return rt.textContent.trim() && style.visibility !== 'hidden' && style.display !== 'none' && Number(style.opacity) > 0;
+    })), 'The reading is actually visible');
+    await activate();
+  }
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'stage', 'The exact source word reaches its stage');
+}

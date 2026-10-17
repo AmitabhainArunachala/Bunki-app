@@ -240,6 +240,7 @@ export function createGuidedSession(host) {
   const answered = () => Q.filter((q) => answer(q).choice !== null).length;
   const countRight = () => Q.filter((q) => answer(q).correct === true).length;
   const last = () => state.index >= Q.length - 1;
+  const roomInteractive = () => root?.isConnected && !root.closest('[inert], [aria-hidden="true"], [hidden]');
   const kindLabel = (q) => KIND[q.kind] || [q.kind, q.kind];
   const wordNode = (key) => ({ t: 'word', id: words[key].surface });
   const saveText = () =>
@@ -460,7 +461,7 @@ export function createGuidedSession(host) {
       announce(text);
       if (status === 'added')
         setTimeout(() => {
-          if (root?.isConnected) moments?.carry({ text, target: '#tray' });
+          if (roomInteractive()) moments?.carry({ text, target: '#tray' });
         }, 0);
       return status;
     }
@@ -734,7 +735,7 @@ export function createGuidedSession(host) {
         const word = words[key];
         if (!word) return esc(part);
         const reading = showReadings || q.target.label.includes(word.surface);
-        return `<button type="button" class="gs-word" data-ui-content="learning" data-action="word" data-word="${key}" lang="ja">${esc(part)}${reading ? `<span class="gs-reading">（${esc(word.reading)}）</span>` : ''}</button>`;
+        return `<span class="gs-word" data-japanese-lookup="guided-word" data-prose-label="${esc(part)}" data-ui-content="learning" data-action="word" data-word="${key}" lang="ja">${esc(part)}${reading ? `<span class="gs-reading">（${esc(word.reading)}）</span>` : ''}</span>`;
       })
       .join('');
   }
@@ -1023,7 +1024,7 @@ export function createGuidedSession(host) {
     // still appends to #app, and a moment ends itself on any later change there
     if (request.samurai || request.crane) {
       setTimeout(() => {
-        if (!root?.isConnected) return;
+        if (!roomInteractive()) return;
         if (request.samurai) moments?.play({ ...request.samurai, returnFocus: focus || undefined });
         if (request.crane) moments?.carry({ text: request.crane, target: '#tray' });
       }, 0);
@@ -1044,6 +1045,7 @@ export function createGuidedSession(host) {
 
   /* ----------------------------------------------------------------- events */
   function onChange(event) {
+    if (!roomInteractive()) return;
     const node = event.target;
     if (node.matches('[data-moment-mode]')) {
       moments?.setMode(node.value);
@@ -1065,6 +1067,7 @@ export function createGuidedSession(host) {
     }
   }
   function onInput(event) {
+    if (!roomInteractive()) return;
     if (event.target.id !== 'guided-draft') return;
     emit('DRAFT', { text: event.target.value });
     const status = root.querySelector('#guided-draft-status');
@@ -1129,6 +1132,7 @@ export function createGuidedSession(host) {
   }
 
   function onClick(event) {
+    if (!roomInteractive()) return;
     const b = event.target.closest('[data-action]');
     if (!b || b.disabled || !root.contains(b)) return;
     const action = b.dataset.action;

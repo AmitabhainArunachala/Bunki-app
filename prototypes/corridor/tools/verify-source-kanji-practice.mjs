@@ -1,7 +1,8 @@
 /** Source-connected whole-token reading through ordinary UI and native storage.
  * Test-authored responses exercise the unreviewed annotation contract. They do
  * not establish character mastery, comprehension, or human journey acceptance.
- * Profiles begin empty; the only profile copy is a closed, ordinarily evolved
+ * Learner stores begin empty; only the device demonstration-seen marker is seeded.
+ * The only profile copy is a closed, ordinarily evolved
  * checkpoint of the same installation. Native record probes are read-only.
  */
 import assert from 'node:assert/strict';
@@ -149,6 +150,8 @@ async function launch(fixture, { offline = false } = {}) {
   });
   activeContexts += 1; fixture.browserVersion = fixture.context.browser()?.version();
   fixture.lifecycle.push({ action: 'launch', episode: fixture.episode, profile: fixture.profile, offline, at: new Date().toISOString() });
+  // This existing-device practice journey excludes only the separately tested fresh-device demonstration.
+  await fixture.context.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
   await silenceBrowserAudio(fixture.context);
   await fixture.context.tracing.start({ screenshots: true, snapshots: true, sources: true });
   fixture.traceActive = true;
@@ -284,13 +287,24 @@ async function atSource(fixture, { focus = false } = {}) {
 async function openSource(fixture) {
   await shelf(fixture); await fixture.page.locator(`[data-passage="${fixture.source.id}"] .shelf-open`).click(); await atSource(fixture);
 }
+async function focusSourceWord(page, token) {
+  const offset = await token.evaluate(word => {
+    const block = word.closest('[data-prose-roving]');
+    return block ? [...block.querySelectorAll('.tok[data-para]')].filter(node => node.closest('[data-prose-roving]') === block).indexOf(word) : -1;
+  });
+  assert(offset >= 0, 'The exact source token belongs to a prose paragraph');
+  await token.locator('xpath=ancestor::*[@data-prose-roving][1]').focus();
+  await page.keyboard.press('Home');
+  for (let step = 0; step < offset; step++) await page.keyboard.press('ArrowRight');
+  assert(await token.evaluate(word => document.activeElement === word), 'Paragraph navigation selects the exact source token');
+}
 async function openWord(fixture) {
   // Wait in real time before the native baseline so that the preceding reader
   // bookmark debounce can settle.
   await delay(950);
   const { page, source } = fixture, before = await readAppRecordSnapshot(page), earliest = Date.now();
   // the full entry's keyboard door on the word itself (Ctrl+Enter; reader lane 2026-10-02 retired the focus pill)
-  const token = page.locator(`#reader .tok[data-index="${source.index}"]`); await token.focus();
+  const token = page.locator(`#reader .tok[data-index="${source.index}"]`); await focusSourceWord(page, token);
   await page.keyboard.press('Control+Enter');
   await page.locator(`#sheet[data-node="word:${source.token.b}"]`).waitFor();
   await waitForAppRecord(page, record => record.obslog.length === before.record.obslog.length + 1);
@@ -531,15 +545,32 @@ async function ordinary(fixture) {
   const { page, source } = fixture;
   await openSource(fixture);
   const sourceBefore = await readAppRecordSnapshot(page), tapStarted = Date.now();
-  await page.locator(`#reader .tok[data-index="${source.index}"]`).click();
+  const token = page.locator(`#reader .tok[data-index="${source.index}"]`);
+  await token.click();
   await waitForAppRecord(page, record => record.obslog.length === sourceBefore.record.obslog.length + 1);
+  const read = await readAppRecordSnapshot(page), readingObservation = read.record.obslog.at(-1);
+  assert(readingObservation[0] >= tapStarted && readingObservation[0] <= Date.now());
+  assert.deepEqual(readingObservation.slice(1), ['tap', `word:${source.token.b}`, 1, source.id]);
+  assert.deepEqual(read.record.obslog, [...sourceBefore.record.obslog, readingObservation]); unchangedExcept(sourceBefore, read, ['obslog']);
+  assert.equal(await token.getAttribute('data-ladder-rung'), 'reading');
+  assert.equal(await token.locator('rt:not(.hidden-rt)').allTextContents().then(parts => parts.join('')), source.token.r);
+  assert.equal(await page.locator('#mini,#sheet').count(), 0, 'The first activation exposes only the source reading');
+  const stageStarted = Date.now();
+  await token.click();
+  await page.locator('#mini').waitFor();
+  await waitForAppRecord(page, record => record.obslog.length === read.record.obslog.length + 1);
   const tapped = await readAppRecordSnapshot(page), tap = tapped.record.obslog.at(-1);
-  assert(tap[0] >= tapStarted && tap[0] <= Date.now());
-  // one tap shows the meaning (reader lane 2026-10-02): the observation's depth is 2, gloss shown
+  assert(tap[0] >= stageStarted && tap[0] <= Date.now());
   assert.deepEqual(tap.slice(1), ['tap', `word:${source.token.b}`, 2, source.id]);
-  assert.deepEqual(tapped.record.obslog, [...sourceBefore.record.obslog, tap]); unchangedExcept(sourceBefore, tapped, ['obslog']);
-  // the tap's popup floats over the page: a second tap on the same word puts it away (and records nothing)
-  await page.locator(`#reader .tok[data-index="${source.index}"]`).click(); await page.waitForFunction(() => !document.getElementById('mini'));
+  assert.deepEqual(tapped.record.obslog, [...read.record.obslog, tap]); unchangedExcept(read, tapped, ['obslog']);
+  assert.equal(await token.getAttribute('data-ladder-rung'), 'stage');
+  assert.equal(await page.locator('#mini .mini-word').textContent(), source.token.b);
+  assert.equal(await page.locator('#mini .mini-reading').textContent(), source.token.r);
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.getElementById('mini'));
+  assert.equal(await token.getAttribute('data-ladder-rung'), null);
+  assert.equal(await token.locator('rt:not(.hidden-rt)').count(), 0, 'Escape restores bare prose');
+  retained(tapped, await snapshot(fixture, 'reading-stage-escape-neutral'));
   await page.locator('#reader-place-save').click();
   await page.waitForFunction(() => document.getElementById('reader-place-note')?.textContent.includes('is saved'));
   const savedPlace = await snapshot(fixture, 'ordinary-reading-place');

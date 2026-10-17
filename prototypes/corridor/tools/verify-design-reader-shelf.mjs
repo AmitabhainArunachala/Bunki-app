@@ -363,7 +363,14 @@ async function tapToken(page, index) {
   await tok.evaluate((node) => node.scrollIntoView({ block: 'center' }));
   const box = await tok.evaluate((node) => { const r = node.getClientRects()[0]; return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
   await page.mouse.click(box.x, box.y);
-  await page.waitForTimeout(250);
+  // Lookup-only words may still be resolving their dictionary index after
+  // 250 ms. Observe this activation on the exact node; never add a retry tap.
+  const activated = await tok.elementHandle();
+  try {
+    await page.waitForFunction((node) => node?.isConnected &&
+      (node.dataset.ladderRung === 'reading' ||
+        (node.dataset.ladderRung === 'stage' && !!document.querySelector('#mini'))), activated, { timeout: 5000 });
+  } finally { await activated?.dispose(); }
   if (!await page.locator('#mini').count()) {
     const revealed = await tok.evaluate((node) => node.dataset.ladderRung === 'reading');
     assert(revealed, `token ${index}: first activation produced neither the reading rung nor a stage`);
@@ -405,10 +412,16 @@ try {
       return { ctx, page };
     };
     const run = async (name, viewport, body, init, options) => {
-      if (g3Only && !/^(P1-fresh-word-demo-|G1-stage-meaning-|G4-keyboard-menu$|K1-keyboard-roving$)/u.test(name)) return;
+      if (g3Only && !/^(P1-fresh-word-demo-|P1-history-only-no-demo$|G1-stage-meaning-|G4-keyboard-menu$|K1-keyboard-roving$)/u.test(name)) return;
       const { ctx, page } = await context(viewport, init, options);
-      const pageErrors = [];
-      page.on('pageerror', (error) => pageErrors.push(error.message));
+      const pageErrors = [], pageErrorDetails = [], networkEvents = [];
+      const traceRequest = (event, request) => {
+        if (/\/dict-v2\//u.test(request.url())) networkEvents.push({ event, phase: page.__verifierPhase || 'walk', url: request.url(), failure: request.failure()?.errorText || null });
+      };
+      page.on('request', (request) => traceRequest('request', request));
+      page.on('requestfinished', (request) => traceRequest('finished', request));
+      page.on('requestfailed', (request) => traceRequest('failed', request));
+      page.on('pageerror', (error) => { pageErrors.push(error.message); pageErrorDetails.push({ phase: page.__verifierPhase || 'walk', message: error.message }); });
       try {
         const observations = await body(page);
         assert.deepEqual(pageErrors, [], 'unfiltered browser page errors');
@@ -417,7 +430,7 @@ try {
       } catch (error) {
         const screenshot = resolve(evidence, `${engine}-${name}.png`);
         await page.screenshot({ path: screenshot, animations: 'disabled' }).catch(() => {});
-        results.push({ engine, name, passed: false, error: String(error.message || error), screenshot });
+        results.push({ engine, name, passed: false, error: String(error.message || error), pageErrorDetails, networkEvents, screenshot });
         console.log(`FAIL ${engine}/${name}: ${String(error.message || error).split('\n')[0]}`);
       } finally { await ctx.close(); }
     };
@@ -765,10 +778,12 @@ try {
 
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
       await run(`P1-fresh-word-demo-${label}`, viewport, async (page) => {
+        page.__verifierPhase = 'fresh shelf';
         await open(page);
-        const learning = (record) => Object.fromEntries(['taken', 'srs', 'obslog', 'revlog', 'vocabularyLists', 'teacherContexts']
+        const learning = (record) => Object.fromEntries(['taken', 'srs', 'obslog', 'revlog', 'lists', 'teacherContexts']
           .map((key) => [key, record[key] ?? null]));
         const before = learning(await readAppRecord(page));
+        page.__verifierPhase = 'open article';
         await openArticle(page, ARTICLE);
         await page.locator('#mini[data-demo="true"] .mini-word').waitFor();
         const demonstration = await page.evaluate(() => ({
@@ -786,31 +801,39 @@ try {
         await page.waitForTimeout(800);
         assert.deepEqual(learning(await readAppRecord(page)), before, 'the demonstration created learner history or review work');
         await page.keyboard.press('Escape');
+        page.__verifierPhase = 'navigation after demo';
         await openArticle(page, ARTICLE);
         await page.waitForTimeout(1000);
         assert.equal(await page.locator('#mini[data-demo="true"], #reader-tip').count(), 0, 'demonstration/tip replayed after navigation');
+        page.__verifierPhase = 'reload after demo';
         await page.reload();
         await page.waitForFunction(() => document.body.dataset.ready === '1');
         await page.waitForTimeout(1000);
         assert.equal(await page.locator('#mini[data-demo="true"], #reader-tip').count(), 0, 'demonstration/tip replayed after reload');
+        page.__verifierPhase = 'lookup-only setup';
         // A lookup alone is history too: no saved card is needed to suppress the demo.
         await openArticle(page, ARTICLE);
         const beforeLookup = await readAppRecord(page);
+        page.__verifierPhase = 'deliberate lookup';
         await tapToken(page, 1);
         const looked = await waitForAppRecord(page, (r) => r.obslog.length > beforeLookup.obslog.length, { description: 'lookup-only history' });
         assert.equal(looked.taken.length, 0, 'lookup-only fixture accidentally saved a card');
+        page.__verifierPhase = 'navigate after lookup';
         await page.evaluate((key) => localStorage.removeItem(key), DEMO_KEY);
         await openArticle(page, ARTICLE);
         await page.waitForTimeout(1000);
         assert.equal(await page.locator('#mini[data-demo="true"]').count(), 0, 'lookup-only history received a demonstration');
         assert.deepEqual(learning(await readAppRecord(page)), learning(looked), 'suppressed lookup-history demo changed learning roots');
+        page.__verifierPhase = 'saved-history setup';
         // Establish real saved history through its UI, then remove only the device mark. The
         // durable record, not this mark, must prevent teaching an existing learner again.
         await openArticle(page, ARTICLE);
         await tapToken(page, 1);
         await page.locator('#mini #mini-take:not([disabled])').click();
+        page.__verifierPhase = 'save history';
         const saved = await waitForAppRecord(page, (r) => r.taken.some((item) => item.t === 'word' && item.id === '郊外'),
           { description: 'history fixture saved through the real stage' });
+        page.__verifierPhase = 'navigate after Save';
         await page.evaluate((key) => localStorage.removeItem(key), DEMO_KEY);
         await openArticle(page, ARTICLE);
         await page.waitForTimeout(1000);
@@ -827,6 +850,28 @@ try {
         }
       }, { demo: true });
     }
+
+    await run('P1-history-only-no-demo', PHONE, async (page) => {
+      await open(page);
+      const before = await readAppRecord(page);
+      assert.equal(before.readerPos?.['aozora:049966-1'], 120, 'real migration must retain the history-only position fixture');
+      assert.equal(before.taken.length, 0, 'history-only fixture has no saved card');
+      assert.equal((before.obslog || []).length, 0, 'history-only fixture has no lookup');
+      assert.equal(await page.evaluate(key => localStorage.getItem(key), DEMO_KEY), null, 'no device seen key may suppress this fixture');
+      await openArticle(page, ARTICLE); await page.waitForTimeout(1200);
+      assert.equal(await page.locator('#mini[data-demo="true"], #reader-tip').count(), 0, 'existing reader-position history must suppress the demonstration');
+      const after = await readAppRecord(page);
+      for (const key of ['taken', 'srs', 'obslog', 'revlog', 'lists', 'teacherContexts']) assert.deepEqual(after[key], before[key], `suppressed demonstration changed ${key}`);
+      assert.equal(after.readerPos?.['aozora:049966-1'], 120, 'opening another article lost existing reading position');
+      return { savedCards: 0, lookups: 0, priorArticlePosition: 120, demonstration: false };
+    }, () => {
+      // Migration input only. The app installs and reads its normal native record;
+      // the verifier never writes the active database or replaces a state reducer.
+      if (!localStorage.getItem('g3-history-fixture-installed')) {
+        localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1, taken: [], srs: {}, readerPos: { 'aozora:049966-1': 120 } }));
+        localStorage.setItem('g3-history-fixture-installed', '1');
+      }
+    }, { demo: true });
 
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
       await run(`W1-damascus-can-be-saved-${label}`, viewport, async (page) => {
@@ -1195,8 +1240,14 @@ try {
     });
 
     await run('G6-sentence-below-seat-390', PHONE, async (page) => {
-      const pageErrors = [];
-      page.on('pageerror', (error) => pageErrors.push(error.message));
+      const pageErrors = [], pageErrorDetails = [], networkEvents = [];
+      const traceRequest = (event, request) => {
+        if (/\/dict-v2\//u.test(request.url())) networkEvents.push({ event, phase: page.__verifierPhase || 'walk', url: request.url(), failure: request.failure()?.errorText || null });
+      };
+      page.on('request', (request) => traceRequest('request', request));
+      page.on('requestfinished', (request) => traceRequest('finished', request));
+      page.on('requestfailed', (request) => traceRequest('failed', request));
+      page.on('pageerror', (error) => { pageErrors.push(error.message); pageErrorDetails.push({ phase: page.__verifierPhase || 'walk', message: error.message }); });
       await open(page);
       await page.locator('#shelf-body [data-passage="aozora:046605"] .shelf-open').first().click();
       const token = page.locator('#reader .tok[data-index="816"]');
@@ -1576,7 +1627,7 @@ try {
     browserVersions,
     selectedScope: g3Only ? 'G3 demonstration, stage, keyboard and prose; older design gates not run' : 'all design gates',
     results,
-    passed: results.length === engines.length * (g3Only ? 6 : 49) && results.every((row) => row.passed),
+    passed: results.length === engines.length * (g3Only ? 7 : 50) && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);
