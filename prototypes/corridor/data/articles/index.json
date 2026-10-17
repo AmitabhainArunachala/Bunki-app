@@ -30453,7 +30453,7 @@
     "kind": "bunki-original",
     "writtenBy": "Claude Opus 5.5 (Anthropic) as Bunki content lead, 2026-10-16",
     "editorialRecord": "batch-2r/bunki-read-n1-neocognitron.editorial.json",
-    "factsChecked": 26,
+    "factsChecked": 28,
     "reviews": [
      {
       "by": "codex",

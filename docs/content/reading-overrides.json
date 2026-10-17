@@ -684,6 +684,14 @@
       "readings": [null, null, "じょ"],
       "kind": "place",
       "note": "ベル研究所 reads ベルけんきゅうじょ (ブリタニカ via kotobank: ベルけんきゅうじょ【ベル研究所】); UniDic gives 所 しょ (Bunki batch-2r, bunki-read-n3-transistor-class)"
+    },
+    {
+      "word": "放送科学基礎研究所",
+      "reading": "じょ",
+      "surfaces": ["放送", "科学", "基礎", "研究", "所"],
+      "readings": [null, null, null, null, "じょ"],
+      "kind": "place",
+      "note": "放送科学基礎研究所 (NHK's basic-research laboratory) reads ほうそうかがくきそけんきゅうじょ: NDL Authorities 00293698 (NHK ホウソウ カガク キソ ケンキュウジョ) and CiNii DA03565060 (ホウソウ カガク キソ ケンキュウジョ); UniDic gives 所 しょ. Name-only, like ベル研究所: there is no global 研究所 rule (RIKEN reads しょ) (Bunki batch-2r, bunki-read-n1-neocognitron)"
     }
   ],
   "accepts": [
