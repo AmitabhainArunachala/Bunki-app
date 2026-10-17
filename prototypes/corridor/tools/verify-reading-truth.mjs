@@ -33,6 +33,8 @@
  *   R2.unfit a kana verb whose dictionary form the quick dictionary has only as a noun is that verb, read as its dictionary
  *       form (one form: never the surface's reading beside it): ごん狐 かえり, かえっ → かえる 帰る (never 蛙), MHLW なさ →
  *       なす 為す (never 茄子) — Codex 1352
+ *   R2.stem a godan verb never stands as its bare stem: the い of ている / いました is いる 居る (entry 1577980), never the
+ *       quick dictionary's godan いる, 要る "to be needed"; its Save keeps entry 1577980 (R2.capture.stem, the round trip)
  *   SWEEP every inflected token (surface ≠ base) of the twenty reviewed articles and of a fixed sample of 20 inherited
  *       ones, one tap per distinct token per article: the reading the card states comes from the token's own (a kana
  *       base; the shared stem read alike; a reading the served dictionary lists for the form whose stem the token's
@@ -140,6 +142,12 @@ const UNFIT = Object.freeze([
   { name: 'かえり → かえる · 帰る (not 蛙)', at: GONGITSUNE, index: 2117, s: 'かえり', b: 'かえる', r: 'かえり', reading: 'かえる', seq: '1221270', noun: '蛙' },
   { name: 'かえっ → かえる · 帰る (not 蛙)', at: GONGITSUNE, index: 2627, s: 'かえっ', b: 'かえる', r: 'かえっ', reading: 'かえる', seq: '1221270', noun: '蛙' },
   { name: 'なさ → なす · 為す (not 茄子)', at: MHLW, index: 176, s: 'なさ', b: 'なす', r: 'なさ', reading: 'なす', seq: '2861111', noun: '茄子' },
+]);
+// R2 · a godan verb never stands as its bare stem: the い of ている and of いました is the ichidan 居る's (entry 1577980,
+// written いる), never the quick dictionary's godan いる (要る, "to be needed"): 296 occurrences on the shelf
+const STEM = Object.freeze([
+  { name: 'い (ている) → いる · 居る (not 要る)', at: FORGETTING, index: 431, s: 'い', b: 'いる', r: 'い', reading: 'いる', seq: '1577980', never: 'to be needed' },
+  { name: 'い (いました) → いる · 居る (not 要る)', at: GONGITSUNE, index: 83, s: 'い', b: 'いる', r: 'い', reading: 'いる', seq: '1577980', never: 'to be needed' },
 ]);
 // R2.V · a sound change in a compound: the card shows the text's reading and the meaning of the entry read the plain way
 const SOUND = Object.freeze([
@@ -272,6 +280,14 @@ for (const fixture of UNFIT) {
     token?.s === fixture.s && token.b === fixture.b && token.r === fixture.r && token.p === '動詞' && k2h(core[fixture.b]?.r) === k2h(fixture.reading)
       && !/verb/u.test(String(core[fixture.b]?.p || '')) && readAs(fixture.b, fixture.reading).some((row) => String(row[0]) === fixture.seq && row[6].some((g) => /^to /u.test(g)))
       && posOf(fixture.seq).some((code) => /^v/u.test(code)), { token, core: core[fixture.b], pos: posOf(fixture.seq) });
+}
+for (const fixture of STEM) {
+  const token = tokenAt(fixture), parts = String(core[fixture.b]?.p || '').split(' · ');
+  check(`F0.R2.stem.${fixture.name}`, `${fixture.at.id} #${fixture.index} is ${fixture.s} (base ${fixture.b}, a verb) read ${fixture.r}, its bare stem; the quick dictionary's ${fixture.b} is a godan verb, "${fixture.never}"; entry ${fixture.seq} is headed and read ${fixture.b}, an ichidan verb`,
+    token?.s === fixture.s && token.b === fixture.b && token.r === fixture.r && token.p === '動詞' && k2h(fixture.reading).slice(0, -1) === k2h(fixture.r)
+      && k2h(core[fixture.b]?.r) === k2h(fixture.reading) && parts.includes('godan verb') && !parts.includes('ichidan verb') && core[fixture.b].m[0] === fixture.never
+      && readAs(fixture.b, fixture.reading).some((row) => String(row[0]) === fixture.seq && row[1] === fixture.b) && posOf(fixture.seq).includes('v1'),
+    { token, core: core[fixture.b], pos: posOf(fixture.seq) });
 }
 for (const fixture of SOUND) {
   const token = tokenAt(fixture);
@@ -426,6 +442,22 @@ async function captureCase(browser, contextOptions) {
           && JSON.stringify(Object.keys(iuRow).sort()) === JSON.stringify(Object.keys(yearRow || {}).sort()), { iuRow, iuSnap, yearKeys: Object.keys(yearRow || {}) });
       await page.keyboard.press('Escape');
       await closeMini(page);
+      // R2 · the い of ている saves the ichidan 居る (entry 1577980), never the quick dictionary's godan いる (要る)
+      const [stem] = STEM;
+      await openArticle(page, stem.at);
+      const iru = await slip(page, tok(page, stem.index));
+      check('R2.capture.stem.ready', `the card for い (ている) is いる read いる, entry ${stem.seq}'s meaning, and offers Save`, iru.settled?.word === 'いる'
+        && iru.settled.gloss === firstGloss(stem.seq, stem.reading) && iru.settled.take && !iru.settled.take.disabled, iru.settled);
+      await page.locator('#mini #mini-take').click();
+      const three = await waitForAppRecord(page, (rec) => (rec.taken || []).some((r) => r.t === 'word' && r.id === 'いる'),
+        { description: 'the いる card', timeout: 15000 });
+      const iruRow = three.taken.find((r) => r.t === 'word' && r.id === 'いる'), iruSnap = three.deepWords?.['いる'];
+      const yearKeys = Object.keys(three.taken.find((r) => r.t === 'word' && r.id === '年') || {}).sort();
+      check('R2.capture.stem', `Save keeps entry ${stem.seq} and cueReading いる, with its validated selection, in the same row shape as 年's — never the quick dictionary's いる`,
+        iruRow?.entrySeq === stem.seq && iruRow.cueReading === 'いる' && iruSnap?.seq === stem.seq && iruSnap.r === 'いる' && iruSnap.selection?.r === 'いる'
+          && iruSnap.selection?.seq === stem.seq && JSON.stringify(Object.keys(iruRow).sort()) === JSON.stringify(yearKeys), { iruRow, iruSnap, yearKeys });
+      await page.keyboard.press('Escape');
+      await closeMini(page);
     }
     if (!(await page.locator('#note-input').count())) await page.locator('#tray').click();
     const download = page.waitForEvent('download', { timeout: 15000 });
@@ -458,6 +490,9 @@ async function captureCase(browser, contextOptions) {
       const iuRow = back.taken.find((r) => r.t === 'word' && r.id === '云う'), iuSnap = back.deepWords?.['云う'];
       check('R2.round-trip', 'export → import keeps 云う\'s entry 1587040, cueReading いう and the snapshot',
         iuRow?.entrySeq === '1587040' && iuRow.cueReading === 'いう' && iuSnap?.seq === '1587040' && iuSnap.r === 'いう', { iuRow, iuSnap });
+      const iruRow = back.taken.find((r) => r.t === 'word' && r.id === 'いる'), iruSnap = back.deepWords?.['いる'];
+      check('R2.round-trip.stem', 'export → import keeps いる\'s entry 1577980, cueReading いる and the snapshot',
+        iruRow?.entrySeq === '1577980' && iruRow.cueReading === 'いる' && iruSnap?.seq === '1577980' && iruSnap.r === 'いる', { iruRow, iruSnap });
     }
   } finally { await fresh.close(); }
 }
@@ -755,6 +790,15 @@ async function r2Cases(page) {
     check(`R2.unfit.${fixture.name}`, `${fixture.at.id} #${fixture.index} ${fixture.s} (${fixture.r}): the card is ${fixture.b} read ${fixture.reading} (one form), "${meaning}", Save live; never the noun's "${noun}", never ${fixture.r} beside ${fixture.b}`,
       settled?.word === fixture.b && k2h(settled.reading || settled.word) === k2h(fixture.reading) && settled.gloss === meaning && settled.take && !settled.take.disabled
         && !lines.includes(noun) && k2h(settled.reading) !== k2h(fixture.r), { settled, lines });
+  }
+  for (const fixture of STEM) {
+    await openArticle(page, fixture.at);
+    const { settled } = await slip(page, tok(page, fixture.index));
+    const meaning = firstGloss(fixture.seq, fixture.reading);
+    const lines = await glossLines();
+    check(`R2.stem.${fixture.name}`, `${fixture.at.id} #${fixture.index} ${fixture.s} (${fixture.r}): the card is ${fixture.b} read ${fixture.reading}, entry ${fixture.seq}'s "${meaning}", Save live; never the quick dictionary's "${fixture.never}"`,
+      settled?.word === fixture.b && k2h(settled.reading || settled.word) === k2h(fixture.reading) && settled.gloss === meaning && settled.take && !settled.take.disabled
+        && !lines.includes(fixture.never), { settled, lines });
   }
   for (const fixture of SOUND) {
     await openArticle(page, fixture.at);
