@@ -2263,10 +2263,11 @@ function paintResponse({ resetScroll = false, front = false, hold = true } = {})
  */
 /** A fitted reading window sits directly under the fixed chrome, so the card's chip row
  * (level, kind and Full/Focus) moves below it; an unwindowed passage keeps the row above. */
-/** Q · the last part of the answer that says something (its word, definition, note, a leech's ladder): the parts before
- * its folds, whose rows are doors */
+/** Q · the last part of the answer that says something (its word, definition, note): the parts before its folds, whose
+ * rows are doors. A leech's ladder is controls, not the answer: it may wait below the pads (the first screen keeps the
+ * word and its definition without a scroll, CARD_CONTRACT_V2 §4) */
 function answerSaid(def) {
-  const parts = [...(def.parentElement?.children || [])].filter((n) => !n.classList.contains('kp-folds') && n.getClientRects().length);
+  const parts = [...(def.parentElement?.children || [])].filter((n) => !n.classList.contains('kp-folds') && !n.classList.contains('kp-ladder') && n.getClientRects().length);
   return parts[parts.length - 1] || def;
 }
 function placeWindowControls(face, passage, windowed) {
