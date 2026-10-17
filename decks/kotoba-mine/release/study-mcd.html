@@ -9290,8 +9290,52 @@ function settleBack() {
       break;
     }
   }
-  if (!dy) return;
-  window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
+  if (dy) window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
+  if (windowed) seatUnderHeader(windowed, marked);
+}
+
+/** A long answer can carry the page past the window's seat, so the window's first lines run under the pinned header
+ * (WebKit, whose answer sets taller, lands there). A line at the header's edge is then wholly under it or wholly
+ * below it, its readings included (F, one ruby: a reading is the line's own ink, never half of one left under the
+ * bar): the passage moves by the least whole pixels that does it, the marked word kept in view. */
+function seatUnderHeader(passage, mark) {
+  const view = passage.getBoundingClientRect();
+  const clip = topInset();
+  if (clip <= view.top + 0.5) return;
+  const lines = new Map();
+  for (const n of passage.querySelectorAll('.kp-tok, ruby')) {
+    if (n.matches('ruby') && n.closest('.kp-tok')) continue;
+    for (const r of n.getClientRects()) {
+      if (!r.width || !r.height) continue;
+      const key = Math.round(r.bottom);
+      const line = lines.get(key) || { top: r.top, bottom: r.bottom, base: r.top };
+      line.top = Math.min(line.top, r.top); line.base = Math.min(line.base, r.top); line.bottom = Math.max(line.bottom, r.bottom);
+      lines.set(key, line);
+    }
+  }
+  // a reading belongs to the line its word sits on (WebKit seats an rt's box a little into its word's own box)
+  for (const rt of passage.querySelectorAll('rt')) {
+    const word = [...rt.parentElement.childNodes].find((c) => c.nodeType === 3 && c.textContent.trim());
+    if (!word) continue;
+    const range = document.createRange();
+    range.selectNodeContents(word);
+    const b = [...range.getClientRects()].find((r) => r.width);
+    const line = b && [...lines.values()].find((l) => Math.abs(l.bottom - b.bottom) <= 2);
+    if (!line) continue;
+    for (const r of rt.getClientRects()) if (r.width && r.height) line.top = Math.min(line.top, r.top);
+  }
+  const cut = [...lines.values()].find((l) => l.top < clip - 0.5 && l.bottom > clip + 0.5);
+  if (!cut) return;
+  const target = mark?.getBoundingClientRect();
+  const max = passage.scrollHeight - passage.clientHeight;
+  const prior = passage.scrollTop;
+  const shifts = [Math.floor(cut.top - clip), Math.ceil(cut.bottom - clip)].sort((a, b) => Math.abs(a) - Math.abs(b));
+  for (const shift of shifts) {
+    if (prior + shift < 0 || prior + shift > max) continue;
+    if (target && (target.top - shift < clip || target.bottom - shift > view.bottom)) continue;
+    passage.scrollTo({ top: prior + shift, behavior: 'instant' });
+    break;
+  }
 }
 /** the height of a header the host pins over the top of the page (the corridor's chrome); with
  * none, the study top bar pins itself (player.css, data-host none): where it rests once stuck */
