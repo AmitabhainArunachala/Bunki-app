@@ -84,6 +84,8 @@ for (const engine of engines) {
     headless:true,viewport:{width:390,height:844},locale:'en-US',serviceWorkers:'allow',ignoreHTTPSErrors:true,
     ...(engine==='chromium'?{args:['--ignore-certificate-errors']}:{}),recordVideo:{dir:join(out,'video'),size:{width:390,height:844}}
   });
+  // the exact engine build that ran, so the receipt is evidence for that engine (V, 2026-10-17)
+  result.browserVersion=context.browser()?.version()??null; console.log(`engine ${engine} ${result.browserVersion}`);
   await context.route('**/*',route=>{const url=new URL(route.request().url());if(url.origin===ORIGIN)return route.continue();
     result.externalRequests.push({origin:url.origin,path:url.pathname});return route.abort();});
   const page=context.pages()[0]||await context.newPage();page.setDefaultTimeout(15000);
