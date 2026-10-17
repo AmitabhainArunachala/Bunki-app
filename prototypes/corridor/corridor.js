@@ -32933,6 +32933,36 @@ function openSearchPage({ sourceContext = null } = {}) {
   }
 }
 
+/** Q · a strip of lenses shows whole lenses only (Q/DESIGN.md §2; Grok's walk: the word web's strip read "radica" cut at
+ * its edge). While the strip scrolls sideways (a phone), a lens not wholly inside it fades out whole (data-out), and the
+ * strip says where more wait (data-more: left, right): a quiet ‹ · › at that edge. A lens the keyboard reaches scrolls
+ * in whole and shows. Where every lens fits, nothing changes. */
+function wireLensStrip(strip) {
+  let frame = 0;
+  const sync = () => {
+    frame = 0;
+    if (!strip.isConnected) return;
+    const lenses = [...strip.querySelectorAll(':scope > .kdx-lens')];
+    const scrolls = strip.scrollWidth > strip.clientWidth + 1;
+    const box = strip.getBoundingClientRect();
+    const reserve = 22; // the ‹ › mark's own room
+    let left = false, right = false;
+    for (const lens of lenses) {
+      const r = lens.getBoundingClientRect();
+      const before = r.left < box.left + (strip.scrollLeft > 1 ? reserve : 0) - 0.5;
+      const after = r.right > box.right - (strip.scrollLeft + strip.clientWidth < strip.scrollWidth - 1 ? reserve : 0) + 0.5;
+      const out = scrolls && (before || after);
+      if (out && before) left = true;
+      if (out && after) right = true;
+      lens.toggleAttribute('data-out', out);
+    }
+    strip.dataset.more = [left && 'left', right && 'right'].filter(Boolean).join(' ');
+  };
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(sync); };
+  strip.addEventListener('scroll', schedule, { passive: true });
+  if (typeof ResizeObserver === 'function') new ResizeObserver(schedule).observe(strip);
+  schedule();
+}
 function renderSearchPage(main) {
   main.append(placesLayout() ? withEn(el('p', 'eyebrow', '辞書'), 'Dictionary') : withEn(el('p', 'eyebrow', '検索'), 'search', 'en-inline'));
   const wrap = el('div', 'search-page');
@@ -33024,6 +33054,7 @@ function renderSearchPage(main) {
     });
     lensRow.append(b);
   }
+  wireLensStrip(lensRow);
   const FINDER_LENSES = {
     parts: (host) => renderKdxParts(host),
     radical: (host) => renderKdxRadical(host),

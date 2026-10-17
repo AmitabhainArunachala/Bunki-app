@@ -77,7 +77,9 @@ html:is([data-room='search'], [data-room='word-web']) .ww-crumb.ww-here {
 
 /* ---- the plate ---- */
 html:is([data-room='search'], [data-room='word-web']) .ww-plate {
-  position: relative; height: 404px; margin: 0;
+  /* Q · the nodes keep their 404 px field (WW_H); the legend takes its own band under it (it lay over the lowest nodes'
+     captions whenever it wrapped to two lines: part under society, word under assembly hall) */
+  position: relative; height: auto; margin: 0;
   border: 1px solid var(--color-rule);
   background-color: var(--ww-paper);
   background-image:
@@ -91,7 +93,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-plate {
   border-color: color-mix(in srgb, var(--color-live) 42%, transparent);
   box-shadow: inset 0 0 60px color-mix(in srgb, var(--color-live) 7%, transparent), 0 0 0 0.5px color-mix(in srgb, var(--color-live) 18%, transparent), 0 18px 40px -24px rgb(0 0 0 / 70%);
 }
-html:is([data-room='search'], [data-room='word-web']) .ww-plate-in { position: absolute; inset: 0; }
+html:is([data-room='search'], [data-room='word-web']) .ww-plate-in { position: relative; height: 404px; }
 html:is([data-room='search'], [data-room='word-web']) .ww-wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 html:is([data-room='search'], [data-room='word-web']) .ww-wire {
   fill: none; stroke: var(--ww-wire); stroke-width: 1; vector-effect: non-scaling-stroke;
@@ -202,7 +204,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-n-grammar .ww-nb { bor
 
 /* ---- legend ---- */
 html:is([data-room='search'], [data-room='word-web']) .ww-legend {
-  position: absolute; left: 12px; right: 12px; bottom: 9px; z-index: 1; display: flex; flex-wrap: wrap; gap: 6px 10px;
+  position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 6px 10px; padding: 4px 12px 10px;
   font: 500 9.5px/1 var(--font-data); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-muted);
 }
 body:not(.ui-bi) .ww-legend { font-size: 10.5px; letter-spacing: 0.04em; text-transform: none; }
@@ -363,6 +365,21 @@ html:is([data-room='search'], [data-room='word-web']) :is(.ww-c-r, .ww-c-m) { po
   }
   html[data-room='search'] .search-page .kdx-lenses.search-lenses > .kdx-lens { scroll-snap-align: start; padding-inline: 12px; }
   html[data-room='search'] .search-page .kdx-lenses.search-lenses > .kdx-lens:last-child { margin-right: 52px; }
+  /* Q · a lens is whole or it is not shown (corridor.js wireLensStrip): the fade that left "radica" cut at the strip's
+     edge gives way to lenses that fade out whole, and a quiet ‹ · › where more wait */
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses { -webkit-mask-image: none; mask-image: none; }
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses > .kdx-lens { transition: opacity var(--motion-quick, 120ms) linear; }
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses > .kdx-lens[data-out] { opacity: 0; pointer-events: none; }
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses::before,
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses::after {
+    position: sticky; z-index: 1; flex: none; display: none; align-items: center; justify-content: center;
+    width: 22px; min-height: 44px; margin: 0; color: var(--color-muted); font: 500 18px/1 var(--font-ui); pointer-events: none;
+  }
+  /* each mark takes no room of its own (its width and the strip's 6 px gap given back), so no lens moves when it shows */
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses::before { content: '‹'; left: 0; order: -1; margin-right: -28px; }
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses::after { content: '›'; right: 0; margin-left: -28px; }
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses[data-more~='left']::before,
+  html[data-room='search'] .search-page .kdx-lenses.search-lenses[data-more~='right']::after { display: flex; }
 }
 html[data-room='search'] body .search-page .skip-search-opener:not([aria-expanded='true']) {
   display: flex;
