@@ -33,7 +33,7 @@
  * session or volume after a take (LIVE-2). Frame times are a headless proxy; the phone is the truth.
  */
 import assert from 'node:assert/strict';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
@@ -49,51 +49,92 @@ const SOURCE = resolve(HERE, '..');
 const require = createRequire(import.meta.url);
 
 const FAULTS = {
-  'device-voice': { file: 'speak.js', fails: ['S2', 'S9'],
+  'device-voice': { file: 'speak.js', witness: { S2: /no device voice after a line/u, S9: /device voice is never asked/u },
     from: '    host.stopAudio();\n    const clips = line.voice || voiceLine(line);',
     to: '    host.stopAudio(); window.speechSynthesis?.speak(new SpeechSynthesisUtterance(line.text));\n    const clips = line.voice || voiceLine(line);' },
-  'charon-main': { file: 'speak-core.mjs', fails: ['S9'],
+  'charon-main': { file: 'speak-core.mjs', witness: { S9: /said by Kore/u },
     from: '  return lock.mainVoice.prebuilt;\n}', to: '  return lock.secondaryVoice.prebuilt;\n}' },
-  revlog: { file: 'corridor.js', fails: ['S4'],
+  revlog: { file: 'corridor.js', witness: { S4: /byte-identical/u },
     from: 'const ok = await commitStorePatch((latest) => (evidence.length ? { obslog: [...latest.obslog, ...evidence] } : {}), archiveRows);',
     to: 'const ok = await commitStorePatch((latest) => (evidence.length ? { obslog: [...latest.obslog, ...evidence], revlog: [...latest.revlog, [Date.now(), evidence[0][2], 3, 2, null, null, null, null, 0, 0, 0, 0]] } : {}), archiveRows);' },
-  'auto-save': { file: 'speak.js', fails: ['S8'],
+  'auto-save': { file: 'speak.js', witness: { S8: /nothing is saved without his tap/u },
     from: '    for (const r of tr.reached) if (!s.reached.some((x) => x.word === r.word)) s.reached.push(r);',
     to: '    for (const r of tr.reached) if (!s.reached.some((x) => x.word === r.word)) { s.reached.push(r); host.saveOne({ word: r.word, reading: r.reading }).click(); }' },
-  'mic-on-entry': { file: 'speak.js', fails: ['S3'],
+  'mic-on-entry': { file: 'speak.js', witness: { S3: /never called on entry/u },
     from: '    st.offline = navigator.onLine === false;\n    st.sceneAsked = scene;',
     to: '    st.offline = navigator.onLine === false; navigator.mediaDevices?.getUserMedia({ audio: true }).catch(() => {});\n    st.sceneAsked = scene;' },
-  'tracks-kept': { file: 'speak.js', fails: ['S3'],
+  'tracks-kept': { file: 'speak.js', witness: { S3: /all tracks stopped/u },
     from: '    for (const track of take.stream.getTracks()) track.stop();', to: '    for (const track of take.stream.getTracks()) void track;' },
-  'key-in-url': { file: 'speak.js', fails: ['S13'],
+  'key-in-url': { file: 'speak.js', witness: { S13: /absent from every URL/u },
     from: '        res = await fetch(`${tp.endpoint}${path}`, {', to: '        res = await fetch(`${tp.endpoint}${path}?key=${tp.key}`, {' },
-  'no-gate': { file: 'corridor.js', fails: ['S4'],
+  'no-gate': { file: 'corridor.js', witness: { S4: /none invented|gates agree/u },
     from: 'function speakGateEvidence(found, xid, now = Date.now()) {\n  const subjectKey = (raw, type) => {',
     to: 'function speakGateEvidence(found, xid, now = Date.now()) {\n  const subjectKey = (raw, type) => (String(raw || \'\').trim() ? `${type || \'word\'}:${String(raw).trim()}` : null);\n  const subjectKeyGated = (raw, type) => {' },
+  // Codex at acb125d2, the six groups: each fix with its own witness
+  'late-opening-voice': { file: 'speak.js', witness: { S17: /Back while the opening waits/u },
+    from: '      if (epoch !== st.epoch || s !== st.session || s.ended) return;\n      voiceLine(line);', to: '      voiceLine(line);' },
+  'queued-voice': { file: 'speak.js', witness: { S17: /sentence two/u },
+    from: '        if (gen !== st.voiceGen) { line.aborted = true; return null; }', to: '        void gen;' },
+  'pending-mic': { file: 'speak.js', witness: { S18: /hidden while the microphone was pending/u },
+    from: "    const wanted = () => capture === st.captureGen && epoch === st.epoch && st.phase === 'listening' && !document.hidden;",
+    to: '    const wanted = () => true;' },
+  'spend-unchecked': { file: 'speak.js', witness: { S19: /could not record/u },
+    from: "    if (!flushSpend()) { setStatus('accounting'); return false; }", to: '    flushSpend();' },
+  'settings-claim': { file: 'speak.js', witness: { S19: /say Saved only/u },
+    from: '      if (!saved) {\n        // nothing is claimed and nothing typed is lost', to: '      if (false) {\n        // nothing is claimed and nothing typed is lost' },
+  'notes-claim': { file: 'speak.js', witness: { S20: /not kept/u },
+    from: '    if (!result?.ok) { s.notesFailed = pending; return false; }', to: '    void result;' },
+  'untyped-word': { file: 'speak.js', witness: { S21: /untyped correction/u },
+    from: 'subjectType: c.subjectType, polarity: 1, code: c.code });', to: "subjectType: c.subjectType || 'word', polarity: 1, code: c.code });" },
+  overlap: { file: 'speak.js', witness: { S22: /never overlap/u },
+    from: '    if (st.turnBusy) return false;\n    const token = ++st.turnToken;', to: '    const token = ++st.turnToken;' },
 };
 
-/* ---------------------------------------------------------------- the negative-control runner */
+/* ---------------------------------------------------------------- the negative-control runner
+ * A mutant counts as caught only when its child ran every named case to its end with no page error, and the intended
+ * witness check went red. A setup failure, a timeout, a page error or a red elsewhere is "not run", never a kill. */
 if (process.argv.includes('--negatives')) {
-  const rows = [];
-  for (const [name, fault] of Object.entries(FAULTS)) {
+  const only = process.env.SPEAK_NEGATIVES ? new Set(process.env.SPEAK_NEGATIVES.split(',')) : null;
+  const jobs = Object.entries(FAULTS).filter(([name]) => !only || only.has(name));
+  const parallel = Math.max(1, Math.min(4, Number(process.env.SPEAK_NEGATIVES_PARALLEL) || 1));
+  /** One mutant in its own child: its named cases only, its own evidence folder. */
+  const runOne = ([name, fault]) => new Promise((done) => {
+    const cases = Object.keys(fault.witness);
     const evidence = join(resolveCorridorEvidence(), `negative-${name}`);
     mkdirSync(evidence, { recursive: true });
-    const child = spawnSync(process.execPath, [fileURLToPath(import.meta.url)], {
-      env: { ...process.env, SPEAK_FAULT: name, SPEAK_CASES: fault.fails.join(','), KAIRO_BROWSER: process.env.KAIRO_BROWSER || 'webkit',
+    const child = spawn(process.execPath, [fileURLToPath(import.meta.url)], {
+      env: { ...process.env, SPEAK_FAULT: name, SPEAK_CASES: cases.join(','), KAIRO_BROWSER: process.env.KAIRO_BROWSER || 'webkit',
         KAIRO_EVIDENCE_DIR: evidence, SPEAK_SHOTS_DIR: '' },
-      encoding: 'utf8', timeout: 900_000,
+      stdio: 'ignore',
     });
-    let receipt = null;
-    try { receipt = JSON.parse(readFileSync(join(evidence, 'verify-speak.json'), 'utf8')); } catch { /* no receipt */ }
-    const failed = new Set((receipt?.cases || []).filter((c) => !c.pass).map((c) => c.case));
-    const caught = child.status !== 0 && fault.fails.every((c) => failed.has(c));
-    rows.push({ fault: name, file: fault.file, expect: fault.fails, failedCases: [...failed], exit: child.status, caught });
-    console.log(`  ${caught ? 'caught' : 'MISSED'} ${name} (${fault.file}) → expected ${fault.fails.join(', ')} red; red: ${[...failed].join(', ') || 'none'}; exit ${child.status}`);
-  }
+    const timer = setTimeout(() => child.kill('SIGKILL'), 900_000);
+    child.on('close', (code) => {
+      clearTimeout(timer);
+      let receipt = null;
+      try { receipt = JSON.parse(readFileSync(join(evidence, 'verify-speak.json'), 'utf8')); } catch { /* no receipt */ }
+      const reds = (receipt?.checks || []).filter((c) => !c.pass);
+      const perCase = cases.map((id) => {
+        const ran = (receipt?.cases || []).some((c) => c.case === id && c.checks > 0) && !reds.some((c) => c.case === id && c.name === 'the case ran to its end');
+        const witness = reds.find((c) => c.case === id && fault.witness[id].test(c.name));
+        return { case: id, ran, witness: witness ? witness.name : null };
+      });
+      const clean = !!receipt && !receipt.error && (receipt.pageErrors || []).length === 0;
+      const status = !clean || perCase.some((c) => !c.ran) ? 'not-run' : code !== 0 && perCase.every((c) => c.witness) ? 'caught' : 'missed';
+      const row = { fault: name, file: fault.file, status, exit: code, cases: perCase,
+        otherReds: reds.filter((c) => !perCase.some((p) => p.witness === c.name)).map((c) => `${c.case}: ${c.name}`) };
+      console.log(`  ${status.padEnd(7)} ${name} (${fault.file}) → ${perCase.map((c) => `${c.case} ${c.witness ? `red at "${c.witness}"` : c.ran ? 'witness green' : 'did not run'}`).join('; ')}; exit ${code}`);
+      done(row);
+    });
+  });
+  const rows = [];
+  const queue = [...jobs];
+  await Promise.all(Array.from({ length: parallel }, async () => { while (queue.length) rows.push(await runOne(queue.shift())); }));
+  rows.sort((a, b) => jobs.findIndex(([n]) => n === a.fault) - jobs.findIndex(([n]) => n === b.fault));
   const out = join(resolveCorridorEvidence(), 'verify-speak-negatives.json');
-  writeFileSync(out, `${JSON.stringify({ at: new Date().toISOString(), rows }, null, 2)}\n`);
-  console.log(`negatives: ${rows.filter((r) => r.caught).length}/${rows.length} caught · ${out}`);
-  process.exit(rows.every((r) => r.caught) ? 0 : 1);
+  writeFileSync(out, `${JSON.stringify({ at: new Date().toISOString(), parallel, rows }, null, 2)}\n`);
+  const caught = rows.filter((r) => r.status === 'caught').length;
+  console.log(`negatives: ${caught}/${rows.length} caught · ${rows.filter((r) => r.status === 'not-run').length} not run · ${out}`);
+  process.exit(caught === rows.length ? 0 : 1);
 }
 
 /* ---------------------------------------------------------------- the run */
@@ -109,7 +150,11 @@ const OVERLAY = process.env.SPEAK_OVERLAY_SOURCE === '1';
 const KEY = 'speak-test-dummy-key-7f3a';
 const PHONE = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: 'block' };
 const WORLDS = ['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'keyblock', 'rokusho', 'yoru', 'nami', 'hakuu', 'kaku'];
-const RATE = { brain: { in: 0.30, out: 2.50 }, voice: { in: 1.00, out: 20.00 } };
+// Google's published rates (pricing page, 2026-10-15), written here independently of speak-core's table
+const RATE = { 'gemini-3.5-flash-lite': { in: 0.30, out: 2.50 }, 'gemini-3.1-flash-tts-preview': { in: 1.00, out: 20.00 }, 'gemini-3.8-flash-tts': { in: 0.50, out: 9.00 } };
+const SITE_LOCK = (() => {
+  try { return core.voiceLockFrom(JSON.parse(readFileSync(join(SITE, 'audio/voice-lock.json'), 'utf8'))); } catch { return core.VOICE_LOCK; }
+})();
 const SILENT_WAV = `data:audio/wav;base64,${core.bytesToBase64(core.wavFromInt16(new Int16Array(24000), 24000))}`;
 
 const results = [];
@@ -127,8 +172,11 @@ const BRIDGE = `
 ;{
   const speakCommits = [];
   const realCommit = commitStorePatch;
+  let holdGate = null, releaseHold = null, refuseNotes = false;
   commitStorePatch = async (patch, appendArchive = []) => {
     if (appendArchive.length) speakCommits.push({ archive: appendArchive.map((r) => ({ surface: r.surface, role: r.role, xid: r.xid || null })), at: Date.now() });
+    if (refuseNotes && appendArchive.some((r) => r.surface === 'speak-notes')) return false;
+    if (holdGate && appendArchive.length) await holdGate;
     return realCommit(patch, appendArchive);
   };
   window.__SPEAK_TEST__ = {
@@ -150,6 +198,8 @@ const BRIDGE = `
     ownedNow: () => { const s = speakRoom?.snapshot(); return s && s.phase === 'speaking' && !s.audioPaused ? !!recAudioEl : null; },
     otherSound: (uri) => { void playRecClip(uri, null); },
     keepWord: () => document.getElementById('speak-keep')?.dataset.saveWord || '',
+    hold: (on) => { if (on && !holdGate) holdGate = new Promise((done) => { releaseHold = done; }); if (!on && holdGate) { holdGate = null; releaseHold(); } },
+    refuseNotes: (on) => { refuseNotes = !!on; },
     gateAgree: async (fixture) => {
       const xid = 'xgate-1';
       const speak = speakGateEvidence(fixture, xid).map((row) => row.slice(1));
@@ -215,6 +265,16 @@ async function newRoom(browser, { key = true, cap = 10, usd = 0, reducedMotion =
       spy.plays.push({ at: performance.now(), src: String(this.currentSrc || this.src || '').slice(0, 24), rate: this.playbackRate });
       return realPlay.apply(this, args);
     };
+    // device storage that can refuse: the meter's write, the key's write, the key's removal (inert unless a case asks)
+    const store = Storage.prototype, realSet = store.setItem, realRemove = store.removeItem;
+    store.setItem = function setItem(key, value) {
+      if ((spy.failSpend && key === 'kairo-speak-spend-v1') || (spy.failDevice && key === 'kairo-speak-device-v1')) throw new DOMException('refused (test)', 'QuotaExceededError');
+      return realSet.call(this, key, value);
+    };
+    store.removeItem = function removeItem(key) {
+      if (spy.failRemove && key === 'kairo-speak-device-v1') throw new DOMException('refused (test)', 'SecurityError');
+      return realRemove.call(this, key);
+    };
     const realFetch = window.fetch;
     window.fetch = function fetchSpy(input, init = {}) {
       const url = String(input?.url || input);
@@ -239,6 +299,8 @@ async function newRoom(browser, { key = true, cap = 10, usd = 0, reducedMotion =
     const standIn = async (constraints) => {
       spy.gum.push({ at: performance.now(), constraints: JSON.stringify(constraints) });
       if (spy.deny) throw new DOMException('Permission denied', 'NotAllowedError');
+      // a permission still being asked: the stream comes only when the case releases it
+      if (spy.holdMic) await new Promise((done) => { spy.releaseMic = done; });
       let step = 'context';
       try {
         const ctx = spy.micContext ||= new RealContext();
@@ -363,8 +425,8 @@ const ring = (page) => ({
   evaluate: (fn) => ensoLocator(page).evaluate(fn),
 });
 /** One turn: the clip is "said" for holdMs, his tap ends the take, Kore answers and (her voice done) the ring listens again. */
-async function talk(page, clip, holdMs = 1800, { expectReply = true } = {}) {
-  engines.mock.set({ clip });
+async function talk(page, clip, holdMs = 1800, { expectReply = true, mockClip = clip } = {}) {
+  engines.mock.set({ clip: mockClip });
   await page.evaluate((c) => { window.__SPEAK_SPY__.clip = c; }, clip);
   let s = await T(page).snap();
   if (s.phase !== 'listening') {
@@ -380,6 +442,19 @@ async function talk(page, clip, holdMs = 1800, { expectReply = true } = {}) {
 /** Kore's voice for the last line has finished and the ring listens again (within the minute). */
 const settled = (page) => until(page, "s.phase === 'listening' || s.phase === 'rest'", 25000);
 const mockSince = (n) => engines.mock.requests.slice(n);
+/** Wait (in node) until the mock has received a request that matches. */
+async function mockSaw(match, timeout = 15000) {
+  const until = Date.now() + timeout;
+  while (Date.now() < until) { if (engines.mock.requests.some(match)) return true; await new Promise((done) => setTimeout(done, 40)); }
+  throw new Error(`the mock never saw the expected request · ${engines.mock.requests.slice(-4).map((r) => `${r.kind}:${r.mode || r.text || ''}`).join(' ')}`);
+}
+const hide = (page, hidden) => page.evaluate((h) => {
+  if (h) {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+    Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' });
+  } else { delete document.hidden; delete document.visibilityState; }
+  document.dispatchEvent(new Event('visibilitychange'));
+}, hidden);
 function contrast(a, b) {
   const lum = (rgb) => {
     const [r, g, bl] = rgb.map((v) => { const c = v / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; });
@@ -545,6 +620,7 @@ const CASES = {
       const brain = mockSince(n).find((r) => r.kind === 'brain' && r.mode === 'talk');
       const wav = brain?.wav;
       check('the mock receives a 16 kHz mono 16-bit WAV', wav?.mimeType === 'audio/wav' && wav.sampleRate === 16000 && wav.channels === 1 && wav.bits === 16, JSON.stringify(wav));
+      check('the take carries his voice, not silence (RMS of the received WAV)', wav && wav.rms > 0.01, `rms ${wav?.rms?.toFixed(4)}`);
       check('the WAV\'s length matches the take', wav && s.wav && Math.abs(wav.seconds - s.wav.seconds) < 0.01 && Math.abs(s.wav.seconds - s.wav.tookMs / 1000) <= 0.35,
         `wav ${wav?.seconds?.toFixed(2)} s · take ${(s.wav?.tookMs / 1000).toFixed(2)} s · input ${s.wav?.inputRate} Hz`);
       const lines = s.session.lines;
@@ -753,8 +829,8 @@ const CASES = {
       await talk(page, '000', 1200);
       await settled(page);
       const voices = mockSince(n).filter((r) => r.kind === 'voice');
-      check('every voice request names the lock\'s model', voices.length >= 2 && voices.every((r) => r.model === core.VOICE_LOCK.model), [...new Set(voices.map((r) => r.model))].join(','));
-      check('every line in a one-person scene is said by Kore', voices.every((r) => r.voiceName === core.VOICE_LOCK.mainVoice.prebuilt), [...new Set(voices.map((r) => r.voiceName))].join(','));
+      check('every voice request names the lock\'s model', voices.length >= 2 && voices.every((r) => r.model === SITE_LOCK.model), [...new Set(voices.map((r) => r.model))].join(','));
+      check('every line in a one-person scene is said by Kore', voices.every((r) => r.voiceName === SITE_LOCK.mainVoice.prebuilt), [...new Set(voices.map((r) => r.voiceName))].join(','));
       check('a reading trap is said in kana (令和8年 → ねん)', voices.some((r) => r.text.includes('ねん') && !r.text.includes('年')), voices.map((r) => r.text).join(' | '));
       const spy = await T(page).spy();
       check('the device voice is never asked', spy.speech === 0, `speech ${spy.speech}`);
@@ -769,9 +845,9 @@ const CASES = {
       await settled(g.page);
       const voices = mockSince(n).filter((r) => r.kind === 'voice');
       const lines = (await T(g.page).snap()).session.lines;
-      const charon = voices.filter((r) => r.voiceName === core.VOICE_LOCK.secondaryVoice.prebuilt);
+      const charon = voices.filter((r) => r.voiceName === SITE_LOCK.secondaryVoice.prebuilt);
       check('a two-person scene uses Charon only for the second character', lines.some((l) => l.who === 'second') && charon.length >= 1 &&
-        charon.every((r) => r.text.includes('棚')) && voices.filter((r) => r.voiceName === core.VOICE_LOCK.mainVoice.prebuilt).length >= 1, voices.map((r) => `${r.voiceName}:${r.text}`).join(' | '));
+        charon.every((r) => r.text.includes('棚')) && voices.filter((r) => r.voiceName === SITE_LOCK.mainVoice.prebuilt).length >= 1, voices.map((r) => `${r.voiceName}:${r.text}`).join(' | '));
     } finally { await g.context.close(); }
     // a failed voice: the line is visibly silent — never Charon, never the device
     const h = await newRoom(browser);
@@ -920,11 +996,10 @@ const CASES = {
       const fetches = (await T(page).spy()).fetches;
       check('requests carry credentials:\'omit\' and redirect:\'error\'', fetches.length === reqs.length && fetches.every((x) => x.credentials === 'omit' && x.redirect === 'error' && x.referrerPolicy === 'no-referrer'),
         JSON.stringify(fetches.slice(0, 2)));
-      const expected = reqs.reduce((sum, r) => {
-        if (!r.usage) return sum;
-        if (r.kind === 'voice') return sum + (r.usage.promptTokenCount * RATE.voice.in + r.usage.candidatesTokenCount * RATE.voice.out) / 1e6;
-        return sum + (r.usage.promptTokenCount * RATE.brain.in + r.usage.candidatesTokenCount * RATE.brain.out) / 1e6;
-      }, 0);
+      const unpriced = reqs.filter((r) => r.usage && !RATE[r.model]).map((r) => r.model);
+      const expected = reqs.reduce((sum, r) => (r.usage && RATE[r.model]
+        ? sum + (r.usage.promptTokenCount * RATE[r.model].in + r.usage.candidatesTokenCount * RATE[r.model].out) / 1e6 : sum), 0);
+      check('every metered request has a published rate here', unpriced.length === 0, unpriced.join(','));
       const spend = await page.evaluate(() => JSON.parse(localStorage.getItem('kairo-speak-spend-v1')));
       check('the meter equals the mock\'s usage × the official rates', Math.abs(spend.usd - expected) < 1e-5, `meter ${spend.usd} · expected ${expected.toFixed(6)}`);
       // the cap: the next turn is blocked with one plain line
@@ -1107,6 +1182,228 @@ const CASES = {
       });
       check('arrow keys move inside a line', roving);
     } finally { await f.context.close(); }
+  },
+
+  // ---- Codex at acb125d2, group 1: leaving retires every voice job, by session and by generation
+  async S17(browser) {
+    // Back while the opening's record write is still unanswered: when the record answers, no voice is asked
+    {
+      const f = await newRoom(browser);
+      const { page } = f;
+      try {
+        await page.evaluate(() => window.__SPEAK_TEST__.hold(true));
+        await enter(page);
+        await mockSaw((r) => r.kind === 'brain' && r.mode === 'open');
+        await page.waitForTimeout(400);
+        const n = engines.mock.requests.length;
+        await page.evaluate(() => window.__SPEAK_TEST__.back());
+        await waitPage(page, () => window.__SPEAK_TEST__.view() !== 'speak', null, 8000, 'S17 leave the room');
+        await page.evaluate(() => window.__SPEAK_TEST__.hold(false));
+        await page.waitForTimeout(1600);
+        const late = mockSince(n).filter((r) => r.kind === 'voice');
+        check('Back while the opening waits on the record: no voice is asked after he left', late.length === 0, late.map((r) => r.text).join(' | '));
+      } finally { await f.context.close(); }
+    }
+    // End while sentence one is still being made: sentence two is never asked
+    {
+      const f = await newRoom(browser);
+      const { page } = f;
+      try {
+        await enter(page);
+        await opened(page);
+        await page.waitForTimeout(600);
+        engines.mock.set({ voiceDelayMs: 2600 });
+        await talk(page, '003', 1200);
+        await mockSaw((r) => r.kind === 'voice' && r.text.startsWith('名前に'));
+        const n = engines.mock.requests.length;
+        await page.locator('[data-foot="end"]').click();
+        await until(page, "s.layer === 'lookback'", 10000);
+        await page.waitForTimeout(3200);
+        const late = mockSince(n).filter((r) => r.kind === 'voice');
+        check('End while sentence one is being made: sentence two is never asked', late.length === 0, late.map((r) => r.text).join(' | '));
+      } finally { engines.mock.set({ voiceDelayMs: 0 }); await f.context.close(); }
+    }
+    // a new scene while the old opening waits on the record: only the new scene's line is voiced
+    {
+      const f = await newRoom(browser);
+      const { page } = f;
+      try {
+        await page.evaluate(() => window.__SPEAK_TEST__.hold(true));
+        await enter(page);
+        await mockSaw((r) => r.kind === 'brain' && r.mode === 'open');
+        await page.waitForTimeout(300);
+        await page.locator('.speak-scene-door').click();
+        await until(page, "s.layer === 'scenes'", 5000);
+        const n = engines.mock.requests.length;
+        await page.locator('.speak-scene', { hasText: /shelf|棚/u }).first().click();
+        await mockSaw((r, i) => engines.mock.requests.indexOf(r) >= n && r.kind === 'brain' && r.mode === 'open');
+        await page.evaluate(() => window.__SPEAK_TEST__.hold(false));
+        await page.waitForTimeout(1800);
+        const voices = mockSince(n).filter((r) => r.kind === 'voice');
+        const old = voices.filter((r) => r.text.includes('話をしましょう') || r.text.includes('はなしをしましょう'));
+        check('a new scene while the old opening waits: the old line is never voiced, the new one is', old.length === 0 && voices.length >= 1,
+          voices.map((r) => r.text).join(' | '));
+      } finally { await f.context.close(); }
+    }
+  },
+
+  // ---- group 2: a microphone still being granted when the page hides is withdrawn, and its stream stopped
+  async S18(browser) {
+    const f = await newRoom(browser);
+    const { page } = f;
+    try {
+      await enter(page);
+      await opened(page);
+      await page.evaluate(() => { window.__SPEAK_SPY__.holdMic = true; });
+      await ring(page).click();
+      await waitPage(page, () => window.__SPEAK_SPY__.gum.length >= 1 && typeof window.__SPEAK_SPY__.releaseMic === 'function', null, 20000, 'S18 the microphone is asked');
+      await hide(page, true);
+      await until(page, "s.phase !== 'listening'", 5000);
+      await page.evaluate(() => { window.__SPEAK_SPY__.holdMic = false; window.__SPEAK_SPY__.releaseMic(); });
+      await page.waitForTimeout(900);
+      const snap = await T(page).snap();
+      const spy = await T(page).spy();
+      check('hidden while the microphone was pending: no take starts, and the stream that came back is stopped',
+        !snap.take && snap.phase === 'rest' && spy.tracks.length >= 1 && spy.tracks.every((x) => x === 'ended'), JSON.stringify({ take: snap.take, phase: snap.phase, tracks: spy.tracks }));
+      await hide(page, false);
+      await ring(page).click();
+      await until(page, "s.phase === 'listening' && s.take", 15000);
+      check('in view again, the next tap listens as before', true);
+    } finally { await f.context.close(); }
+  },
+
+  // ---- group 3: accounting fails closed; settings say Saved only for what the device holds
+  async S19(browser) {
+    const f = await newRoom(browser, { cap: 1, usd: 0.99 });
+    const { page } = f;
+    try {
+      await enter(page);
+      await opened(page);
+      // the opening's voice is made ahead: arm the fault only once its cost is written, so only the turn's costs meet it
+      await mockSaw((r) => r.kind === 'voice' && r.usage);
+      await waitPage(page, () => (JSON.parse(localStorage.getItem('kairo-speak-spend-v1'))?.usd || 0) > 0.9901, null, 8000, 'S19 the opening\'s cost written');
+      await page.evaluate(() => { window.__SPEAK_SPY__.failSpend = true; });
+      engines.mock.set({ usageBoost: 40 });
+      await talk(page, '003', 900);
+      await settled(page);
+      await page.waitForTimeout(400);
+      if ((await T(page).snap()).take) { await ring(page).click(); await page.waitForTimeout(600); }
+      const n = engines.mock.requests.length;
+      await ring(page).click();
+      await page.waitForTimeout(700);
+      check('a cost the device could not record keeps the next turn closed', (await T(page).snap()).status === 'accounting' &&
+        mockSince(n).filter((r) => r.kind === 'brain').length === 0, `status ${(await T(page).snap()).status}`);
+      // the control: once the device takes the owed cost, it counts — past the cap the next turn is refused for the cap
+      await page.evaluate(() => { window.__SPEAK_SPY__.failSpend = false; });
+      await ring(page).click();
+      await page.waitForTimeout(700);
+      const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('kairo-speak-spend-v1')));
+      check('written at last, the owed cost counts: past the cap the next turn is refused', (await T(page).snap()).status === 'cap' && stored.usd >= stored.cap &&
+        mockSince(n).filter((r) => r.kind === 'brain').length === 0, JSON.stringify({ status: (await T(page).snap()).status, stored }));
+      engines.mock.set({ usageBoost: 1 });
+      // settings: a key and a limit the device refused are not "Saved", and what he typed stays
+      await page.locator('.speak-cost').click();
+      await until(page, "s.layer === 'connect'", 5000);
+      const before = await page.evaluate(() => ({ device: localStorage.getItem('kairo-speak-device-v1'), spend: localStorage.getItem('kairo-speak-spend-v1') }));
+      await page.evaluate(() => { window.__SPEAK_SPY__.failDevice = true; });
+      await page.fill('.speak-connect input[name="speak-key"]', 'test-new-key-not-real');
+      await page.fill('.speak-connect input[type="number"]', '7');
+      await page.locator('.speak-connect button[type="submit"]').click();
+      await page.waitForTimeout(300);
+      const refused = await page.evaluate(() => ({ note: document.querySelector('.speak-connect [role="status"]')?.textContent || '',
+        typed: document.querySelector('.speak-connect input[name="speak-key"]')?.value || '', device: localStorage.getItem('kairo-speak-device-v1'),
+        spend: localStorage.getItem('kairo-speak-spend-v1') }));
+      check('settings say Saved only for what the device holds: a refused key is not "Saved", and what he typed stays',
+        !/Saved|保存しました/u.test(refused.note) && refused.typed === 'test-new-key-not-real' && refused.device === before.device && refused.spend === before.spend, JSON.stringify(refused));
+      await page.evaluate(() => { window.__SPEAK_SPY__.failDevice = false; window.__SPEAK_SPY__.failRemove = true; });
+      await page.locator('.speak-connect button', { hasText: /Remove the key|鍵を消す/u }).click();
+      await page.waitForTimeout(300);
+      const kept = await page.evaluate(() => ({ note: document.querySelector('.speak-connect [role="status"]')?.textContent || '', device: !!localStorage.getItem('kairo-speak-device-v1') }));
+      check('a removal the device refused is not called a removal', kept.device && !/The key is removed|鍵を消しました/u.test(kept.note), JSON.stringify(kept));
+      await page.evaluate(() => { window.__SPEAK_SPY__.failRemove = false; });
+      await page.locator('.speak-connect button[type="submit"]').click();
+      await page.waitForTimeout(300);
+      const ok = await page.evaluate(() => ({ note: document.querySelector('.speak-connect [role="status"]')?.textContent || '',
+        typed: document.querySelector('.speak-connect input[name="speak-key"]')?.value || '', cap: JSON.parse(localStorage.getItem('kairo-speak-spend-v1')).cap,
+        key: JSON.parse(localStorage.getItem('kairo-speak-device-v1')).credential.key }));
+      check('and when the device takes them, Saved — the key and the limit are both held', /Saved|保存しました/u.test(ok.note) && ok.typed === '' && ok.cap === 7 && ok.key === 'test-new-key-not-real',
+        JSON.stringify({ ...ok, key: ok.key === 'test-new-key-not-real' }));
+    } finally { engines.mock.set({ usageBoost: 1 }); await f.context.close(); }
+  },
+
+  // ---- group 4: a note the record did not take is not "remembered"
+  async S20(browser) {
+    const f = await newRoom(browser);
+    const { page } = f;
+    try {
+      await enter(page);
+      await opened(page);
+      await talk(page, '003', 1100);
+      await settled(page);
+      await talk(page, '004', 1100);
+      await settled(page);
+      await page.evaluate(() => window.__SPEAK_TEST__.refuseNotes(true));
+      await page.locator('[data-foot="end"]').click();
+      await until(page, "s.layer === 'lookback'", 10000);
+      const failed = await page.evaluate(() => ({ pending: document.querySelectorAll('.speak-note-row.is-pending').length,
+        kept: document.querySelectorAll('.speak-note-row:not(.is-pending)').length, retry: !!document.querySelector('.speak-notes-retry') }));
+      const rows = await page.evaluate(() => window.__SPEAK_TEST__.archive('speak-notes'));
+      check('a note the record did not take is shown as not kept, with a way to try again; none is called remembered',
+        failed.pending === 2 && failed.kept === 0 && failed.retry && rows.length === 0 && (await T(page).snap()).session.notes.length === 0, JSON.stringify({ ...failed, rows: rows.length }));
+      await page.evaluate(() => window.__SPEAK_TEST__.refuseNotes(false));
+      await page.locator('.speak-notes-retry').click();
+      await waitPage(page, () => document.querySelectorAll('.speak-note-row:not(.is-pending) button').length === 2, null, 8000, 'S20 the notes kept on the retry');
+      const after = await page.evaluate(() => window.__SPEAK_TEST__.archive('speak-notes'));
+      check('trying again keeps them, once each', after.length === 2 && new Set(after.map((r) => JSON.parse(r.content).id)).size === 2);
+    } finally { await f.context.close(); }
+  },
+
+  // ---- group 5: an untyped correction is not evidence; only what the gate admits is
+  async S21(browser) {
+    const f = await newRoom(browser);
+    const { page } = f;
+    try {
+      await enter(page);
+      await opened(page);
+      const before = await T(page).record();
+      await talk(page, '002', 1100, { mockClip: 'untyped' });
+      await settled(page);
+      const added = (await T(page).record()).obslog.slice(before.obslog.length).filter((row) => row[1] === 'sensei');
+      check('an untyped correction never becomes evidence; the typed one beside it does',
+        !added.some((row) => row[2] === 'word:日本') && added.some((row) => row[2] === 'word:勤める' && row[4] === 'collocation'), JSON.stringify(added));
+    } finally { await f.context.close(); }
+  },
+
+  // ---- group 6: turns never overlap; a line typed while Kore answers stays unsent in its field
+  async S22(browser) {
+    const f = await newRoom(browser, { deny: true });
+    const { page } = f;
+    try {
+      await enter(page);
+      await opened(page);
+      await ring(page).click();
+      await until(page, "s.status === 'mic-denied'", 20000);
+      engines.mock.set({ brainDelayMs: 1600 });
+      const n = engines.mock.requests.length;
+      await page.fill('.speak-type-input', 'First, a line in English.');
+      await page.locator('.speak-type button[type="submit"]').click();
+      // the first line's request has arrived (its answer is still 1.6 s away)
+      await mockSaw((r) => engines.mock.requests.indexOf(r) >= n && r.kind === 'brain');
+      await page.fill('.speak-type-input', 'Second, while she answers.');
+      await page.locator('.speak-type button[type="submit"]').click();
+      await page.waitForTimeout(300);
+      const during = { brains: mockSince(n).filter((r) => r.kind === 'brain').length, field: await page.inputValue('.speak-type-input'), status: (await T(page).snap()).status,
+        busy: (await T(page).snap()).turnBusy, sent: mockSince(n).filter((r) => r.kind === 'brain').map((r) => (r.body.contents.at(-1).parts.find((p) => (p.text || '').startsWith('TYPED'))?.text || '').slice(0, 60)) };
+      check('turns never overlap: a second line while Kore answers is not sent, and stays in its field',
+        during.brains === 1 && during.field === 'Second, while she answers.' && during.status === 'still-answering', JSON.stringify(during));
+      await until(page, 's.session.lines.length >= 3', 15000);
+      const first = mockSince(n).find((r) => r.kind === 'brain');
+      await page.waitForTimeout(400);
+      await page.locator('.speak-type button[type="submit"]').click();
+      await mockSaw((r) => engines.mock.requests.indexOf(r) > engines.mock.requests.indexOf(first) && r.kind === 'brain');
+      const second = mockSince(n).filter((r) => r.kind === 'brain')[1];
+      check('the kept line goes once the answer is in, after it, never beside it', !!second && second.at - first.at >= 1500, `gap ${second ? second.at - first.at : '—'} ms`);
+    } finally { engines.mock.set({ brainDelayMs: 0 }); await f.context.close(); }
   },
 };
 

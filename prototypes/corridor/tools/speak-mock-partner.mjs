@@ -65,6 +65,14 @@ const TURNS = {
     remember: ['皇居の行事に興味がある'] },
   '005': { heard: '国務大臣の任命は、一生に一度の晴れ舞台です。',
     reply: line(['晴', 'は', '晴れる'], 'れ', ['舞台', 'ぶたい'], '、', 'いい', ['言葉', 'ことば'], 'です', 'ね', '。') },
+  // a correction the model left untyped (subjectType is optional in the schema) beside a typed one: only the typed one
+  // may become evidence, because the gate admits only an explicit word or kanji
+  untyped: { heard: '日本の会社で働いています。',
+    reply: line(['会社', 'かいしゃ'], 'で', 'は', ['何', 'なに'], 'を', 'して', 'います', 'か', '？'),
+    corrections: [
+      { wrong: '日本', right: '日本', rightReading: 'にっぽん', code: 'misread', subject: '日本' },
+      { wrong: '働いています', right: '勤めています', rightReading: 'つとめています', code: 'collocation', subject: '勤める', subjectType: 'word' },
+    ] },
 };
 const BRIDGE = line(['真珠', 'しんじゅ'], 'の', ['加工', 'かこう'], 'の', 'ため', 'です', '。');
 const BRIDGE_KANA = 'しんじゅのかこうのためです';
@@ -91,7 +99,7 @@ function decodeClips(corridorDir) {
 
 export async function startMockPartner({ port = 0, corridorDir = CORRIDOR } = {}) {
   const pcm = decodeClips(corridorDir);
-  const state = { requests: [], clip: '003', fault: null, sayit: 'match', voiceDelayMs: 0, brainDelayMs: 0, hung: [], englishLeft: 0, voiceN: 0 };
+  const state = { requests: [], clip: '003', fault: null, sayit: 'match', voiceDelayMs: 0, brainDelayMs: 0, usageBoost: 1, hung: [], englishLeft: 0, voiceN: 0 };
   const cors = (req) => ({
     'access-control-allow-origin': req.headers.origin || '*',
     'access-control-allow-methods': 'POST, OPTIONS',
@@ -116,7 +124,13 @@ export async function startMockPartner({ port = 0, corridorDir = CORRIDOR } = {}
     record.nudge = note;
     if (audio) {
       const bytes = core.base64ToBytes(audio.inlineData.data);
-      record.wav = { mimeType: audio.inlineData.mimeType, ...core.readWavHeader(bytes) };
+      const header = core.readWavHeader(bytes);
+      // the signal itself, not only its shape: the take's RMS (a silent or zeroed take reads near 0)
+      let sum = 0;
+      const n = header ? Math.floor(header.dataBytes / 2) : 0;
+      const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      for (let i = 0; i < n; i += 1) { const v = view.getInt16(44 + i * 2, true) / 0x8000; sum += v * v; }
+      record.wav = { mimeType: audio.inlineData.mimeType, ...header, rms: n ? Math.sqrt(sum / n) : 0 };
     }
     record.typed = last.some((p) => (p.text || '').startsWith('TYPED'));
     if (state.fault === 'busy') return error(req, res, 429, 'RESOURCE_EXHAUSTED', 'Quota exceeded (mock).', [{ '@type': 'type.googleapis.com/google.rpc.RetryInfo', retryDelay: '2s' }]);
@@ -152,7 +166,9 @@ export async function startMockPartner({ port = 0, corridorDir = CORRIDOR } = {}
     const text = state.fault === 'malformed' ? '{"heard": "まだ", "reply": ' : JSON.stringify(turn);
     const audioTokens = record.wav ? Math.round(record.wav.seconds * core.AUDIO_TOKENS_PER_SECOND_IN) : 0;
     const textTokens = 900 + Math.round(system.length / 4);
-    const usageMetadata = { promptTokenCount: textTokens + audioTokens, candidatesTokenCount: 220, totalTokenCount: textTokens + audioTokens + 220,
+    // usageBoost makes one answer cost more (a long reply), to bring a cap within one turn
+    const outTokens = 220 * (state.usageBoost || 1);
+    const usageMetadata = { promptTokenCount: textTokens + audioTokens, candidatesTokenCount: outTokens, totalTokenCount: textTokens + audioTokens + outTokens,
       promptTokensDetails: [{ modality: 'TEXT', tokenCount: textTokens }, ...(audioTokens ? [{ modality: 'AUDIO', tokenCount: audioTokens }] : [])] };
     record.usage = usageMetadata;
     return send(req, res, 200, { candidates: [{ content: { role: 'model', parts: [{ text }] }, finishReason: 'STOP' }], usageMetadata, modelVersion: record.model });
@@ -200,6 +216,7 @@ export async function startMockPartner({ port = 0, corridorDir = CORRIDOR } = {}
       if (!body) { error(req, res, 400, 'INVALID_ARGUMENT', 'Body is not JSON.'); return; }
       const isVoice = Array.isArray(body.generationConfig?.responseModalities) && body.generationConfig.responseModalities.includes('AUDIO');
       record.kind = isVoice ? 'voice' : 'brain';
+      if (!isVoice) record.typed = (body.contents?.at(-1)?.parts || []).some((p) => (p.text || '').startsWith('TYPED'));
       if (isVoice) void voice(req, res, body, record, match[2] === 'streamGenerateContent');
       else if (state.brainDelayMs) setTimeout(() => brain(req, res, body, record), state.brainDelayMs);
       else brain(req, res, body, record);
@@ -220,7 +237,7 @@ export async function startMockPartner({ port = 0, corridorDir = CORRIDOR } = {}
     reset() {
       state.requests.length = 0;
       for (const res of state.hung.splice(0)) { try { res.destroy(); } catch { /* gone */ } }
-      Object.assign(state, { clip: '003', fault: null, sayit: 'match', voiceDelayMs: 0, brainDelayMs: 0, englishLeft: 0, voiceN: 0 });
+      Object.assign(state, { clip: '003', fault: null, sayit: 'match', voiceDelayMs: 0, brainDelayMs: 0, usageBoost: 1, englishLeft: 0, voiceN: 0 });
     },
     close: () => new Promise((resolve) => {
       for (const res of state.hung.splice(0)) { try { res.destroy(); } catch { /* gone */ } }
