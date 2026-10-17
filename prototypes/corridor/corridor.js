@@ -8364,6 +8364,8 @@ function activateWordLadder(anchor, options) {
   if (standingSlip()) removeMini();
   clearWordLadder();
   const visit = { ...options, anchor, rung: 'stage' };
+  // G4 · the visit carries its stage's ceremony (ink by depth, 読 · 意, the 筆 and 音 marks), decided at its own arrival
+  visit.ceremony = (stage, parts) => dressStage(visit, stage, parts);
   ladderVisit = visit;
   const reading = String(options.reading || '');
   const visible = typeof options.readingVisible === 'function' ? options.readingVisible() : [...anchor.querySelectorAll('rt')].some(rt => {
@@ -8385,6 +8387,8 @@ function removeMini() {
   // (adoptSaveMenuOwner): arriving data that redraws the page keeps it open, a page or room that goes takes it along
   if (!document.getElementById('vocabulary-list-popover')?.classList.contains('is-drawer')) closeVocabularyListPopover();
   const slip = document.getElementById('mini');
+  // G4 · its writing ends where it stands (a stage drawn again resumes it), and its voice stops unless only redrawn
+  if (slip) retireStage({ refreshing: ladderRefreshing });
   if (slip && !miniDiving && !ladderRefreshing) finishPageTransition();
   slip?.remove();
   miniAnchor = null;
@@ -9885,15 +9889,21 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     focusProseWord(span, { preventScroll: true });
   });
   if (span.closest?.('#sheet')) mini.dataset.page = '';
+  // G4 · the visit's ceremony dresses its stage before it stands: the ink by depth and 筆, a bare word's 読 · 意, the 筆
+  // and 音 marks in its row
+  const ceremony = ladderVisit?.anchor === span
+    ? ladderVisit.ceremony?.(mini, { word, label, token, kind, nodeFor, reading, actions, arriving }) : null;
   document.body.append(mini);
   miniAnchor = span;
   miniEntry = entryAvailable ? onEntry : null;
   miniOnClose = onClose;
   keepFloatingBeside(mini, span, { follow });
+  let flight = null;
   if (arriving && ladderVisit?.anchor === span && !ladderVisit.restoreNext && !focusEntry && pageCutAllowed()) {
     finishPageTransition();
-    flyWord(glyphBox(span), word);
+    flight = flyWord(glyphBox(span), word);
   }
+  ceremony?.start(flight);
   if (ladderVisit?.anchor === span) ladderVisit.restoreNext = false;
   if (focusEntry) ([seal, word].find((button) => button && button.tagName === 'BUTTON' && !button.disabled) || mini).focus({ preventScroll: true });
   if (arriving) sampleTransition('card', sampleWhere());
@@ -31679,6 +31689,356 @@ function renderStrokePage(root) {
   });
 }
 
+/* ================================================ 墨 · the word writes itself (G4) ===
+ * At the ladder's second rung the word comes closer, and how well he knows it decides the ceremony (MASTER_SPEC §4 G;
+ * John, 2026-10-15: "i like the word writign itslef in real time. but i don:t want that to be the only optoin"):
+ *   new or met  → it writes itself in ink, stroke by stroke over its own faint お手本, its reading flowing in over the
+ *                 last 40 % of the writing (per 筆: first meeting · always · never);
+ *   seen again  → it arrives written, with its reading;
+ *   recalled    → it arrives bare: its reading and its meaning one tap each (読 · 意);
+ *   owned       → it only comes closer: bare, the same two taps.
+ * The tempo is the ruled one: each stroke min(110 ms, 1400 ms ÷ strokes), never under 45 ms, at the middle of his one
+ * 書く速さ slider (the writing room's three steps) — slow and fast scale it; 筆 decides only WHEN the ink writes.
+ * Any tap, key or wheel during the writing finishes it at once, and that same input still acts: nothing is prevented
+ * or stopped, and the ink takes no pointer. The ink writes only when he brings a word closer himself — his second tap,
+ * or Enter — never on the first rung, the one-time demonstration, a hold, a return from the page or a redraw; so a cold
+ * record (no import, no calibration: every word new) writes only the words he chose. Reduced motion: the word arrives
+ * written. The ink is an aria-hidden SVG of the word's own stroke data (KanjiVG, D.strokes) laid over its glyphs; the
+ * word's text stays the word — its name, its glyph boxes, its Save — and the ink settles into it. A character with no
+ * stroke data (kana, a rare glyph) stands written from the first frame. */
+const WORD_BRUSH_KEY = 'kairo-word-brush-v1';
+const WORD_BRUSH = Object.freeze(['first', 'always', 'never']);
+const WORD_VOICE_KEY = 'kairo-word-voice-v1';
+const WORD_VOICE = Object.freeze(['on', 'off']);
+/** A device choice (never the learner record), read once and kept for the session when storage cannot keep it — the
+ * writing speed's own way. The first of `allowed` is the default. */
+function wordPref(key, field, allowed) {
+  if (allowed.includes(S[field])) return S[field];
+  let stored = null;
+  try { stored = localStorage.getItem(key); } catch { /* no device preference */ }
+  S[field] = allowed.includes(stored) ? stored : allowed[0];
+  return S[field];
+}
+function setWordPref(key, field, allowed, value) {
+  if (!allowed.includes(value)) return wordPref(key, field, allowed);
+  S[field] = value;
+  try { localStorage.setItem(key, value); } catch { /* kept for this session */ }
+  return value;
+}
+/** 筆 — when a word writes itself: 'first' (a first meeting: new or met), 'always', 'never'. */
+const wordBrush = () => wordPref(WORD_BRUSH_KEY, 'wordBrush', WORD_BRUSH);
+/** 声 — whether a word he brings closer is said in the locked recorded voice: 'on' or 'off'. */
+const wordVoice = () => wordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE);
+
+/** One stroke's time: min(110 ms, 1400 ms ÷ strokes), never under 45 ms, at the middle 書く速さ — a word of up to 31
+ * strokes writes in 1.4 s, 32 take 1.44 s — scaled by the one slider (slow 0.7 → longer, fast 1.6 → shorter). */
+const INK_TEMPO = Object.freeze({ budget: 1400, ceiling: 110, floor: 45 });
+function inkStrokeMs(strokes, speed = strokeSpeed()) {
+  if (!(strokes > 0)) return 0;
+  return Math.max(INK_TEMPO.floor, Math.min(INK_TEMPO.ceiling, INK_TEMPO.budget / strokes)) * (STROKE_SPEED_DEFAULT / speed);
+}
+
+/** How well he knows what the stage stands for: 'unmet' · 'met' · 'again' · 'recalled' · 'owned'. Until G2 merges, the
+ * card answers (the brief: depth from the current S.srs), read as G2's depth reads it: no card → unmet (kept without one
+ * → met); never reviewed → met; learning or relearning → seen again; in review → recalled once its present recall (FSRS
+ * retrievability) is ≥ 0.9 with a stability of 7 days, owned at 30, else seen again. A reading or an entry unlike the
+ * one he keeps is at most met: help, never owned. MERGE (G2): this one call becomes G2's wordDepth(node)?.depth — its
+ * encounter ledger beside the card — with the card's answer kept for a kanji, which wordDepth does not rank. */
+const INK_DEPTH = Object.freeze({ recall: 0.9, recalled: 7, owned: 30 });
+function stageDepth(node, now = Date.now()) {
+  return cardDepth(node, now);
+}
+function cardDepth(node, now = Date.now()) {
+  if (!node?.id || (node.t !== 'word' && node.t !== 'kanji')) return 'unmet';
+  const key = srsKey(node.t, node.id);
+  const card = plainRecord(S.srs) && owns(S.srs, key) && plainRecord(S.srs[key]) ? S.srs[key] : null;
+  const kept = (Array.isArray(S.taken) ? S.taken : []).find((row) => row?.t === node.t && row.id === node.id) || null;
+  if (!card) return kept ? 'met' : 'unmet';
+  const shown = nonEmptyString(node.reading) ? kataToHira(node.reading) : '';
+  if ((shown && nonEmptyString(kept?.cueReading) && kataToHira(kept.cueReading) !== shown) ||
+    (node.seq != null && node.seq !== '' && nonEmptyString(kept?.entrySeq) && kept.entrySeq !== String(node.seq))) return 'met';
+  const state = Number.isInteger(card.state) ? card.state : 0;
+  if (state === 0) return 'met';
+  if (state !== 2) return 'again';
+  const recall = cardRecall(card, now);
+  const stability = Number.isFinite(card.stability) ? card.stability : 0;
+  if (recall === null || recall < INK_DEPTH.recall) return 'again';
+  return stability >= INK_DEPTH.owned ? 'owned' : stability >= INK_DEPTH.recalled ? 'recalled' : 'again';
+}
+/** The pinned scheduler's present recall of a stored card, at its clamped instant; null when it cannot say. */
+function cardRecall(card, now) {
+  if (!scheduler || !nonEmptyString(card?.last_review)) return null;
+  try {
+    const live = { ...card, due: new Date(card.due), last_review: new Date(card.last_review) };
+    if (!Number.isFinite(live.due.getTime()) || !Number.isFinite(live.last_review.getTime())) return null;
+    const r = scheduler.get_retrievability(live, srsSchedulerInstant(live, new Date(now)), false);
+    return typeof r === 'number' && Number.isFinite(r) ? r : null;
+  } catch { return null; }
+}
+/** The ceremony for a depth: whether the ink writes, and whether the word stands bare (読 · 意 on request). */
+function inkCeremony(depth, deliberate, brush = wordBrush()) {
+  const bare = depth === 'recalled' || depth === 'owned';
+  const write = !!deliberate && !strokeReduced() &&
+    (brush === 'always' || (brush === 'first' && (depth === 'unmet' || depth === 'met')));
+  return { depth, bare, write };
+}
+
+/** The writing on the stage now — one at a time. The stage that replaces it, a page, Back and pagehide end it, so a
+ * late callback never paints a successor or reopens a closed stage. */
+let stageInk = null;
+const inkOwners = new WeakMap(); // headword → the writing that dresses it now
+const INK_SETTLE_MS = 180;
+/** Write `word` (a stage's headword) in ink over its own faint お手本. Its text is kept — one span per character, an
+ * aria-hidden SVG laid over each written one — and the ink settles into that text at the end. `after` holds the first
+ * stroke until the word's flight has landed; `elapsed` resumes a writing whose stage was drawn again mid-way. Null when
+ * nothing in the word has stroke data: it stands written. */
+function writeWord(word, { reading = null, after = null, elapsed = 0, onBegin = null, onEnd = null } = {}) {
+  if (!word?.isConnected || typeof word.animate !== 'function') return null;
+  const chars = [...word.textContent].map((ch) => ({ ch, paths: strokePathsFor(ch) }));
+  const strokes = chars.reduce((sum, { paths }) => sum + paths.length, 0);
+  if (!strokes) return null;
+  const prior = inkOwners.get(word);
+  if (prior) { prior.end('replaced'); prior.dispose(); }
+  const per = inkStrokeMs(strokes), total = per * strokes;
+  const wet = [];
+  word.textContent = '';
+  for (const { ch, paths } of chars) {
+    const cell = el('span', 'ink-char', ch);
+    if (paths.length) {
+      cell.dataset.strokes = String(paths.length);
+      const svg = document.createElementNS(SVG_NS, 'svg');
+      svg.setAttribute('viewBox', STROKE_VIEWBOX);
+      svg.setAttribute('class', 'ink-glyph');
+      svg.setAttribute('aria-hidden', 'true');
+      svg.setAttribute('focusable', 'false');
+      const ghost = document.createElementNS(SVG_NS, 'g');
+      ghost.setAttribute('class', 'ink-ghost');
+      const ink = document.createElementNS(SVG_NS, 'g');
+      ink.setAttribute('class', 'ink-wet');
+      for (const d of paths) for (const layer of [ghost, ink]) {
+        const path = document.createElementNS(SVG_NS, 'path');
+        path.setAttribute('d', d);
+        // a stroke's length is one, whatever its geometry: nothing is measured on the tap
+        path.setAttribute('pathLength', '1');
+        layer.append(path);
+        if (layer === ink) wet.push(path);
+      }
+      svg.append(ghost, ink);
+      cell.append(svg);
+    }
+    word.append(cell);
+  }
+  word.dataset.ink = after ? 'arriving' : 'writing';
+  word.dataset.inkStrokes = String(strokes);
+  word.dataset.inkMs = String(Math.round(total));
+  delete word.dataset.inkEnded;
+  if (reading) reading.dataset.inkHeld = '';
+  const ink = { word, reading, strokes, per, total, anims: [], startedAt: null, ended: null, disposed: false };
+  inkOwners.set(word, ink);
+  const interrupt = () => ink.end('input');
+  // a tap or the start of a touch scroll (pointerdown), a key, or any scroll (a wheel, a trackpad, a scrollbar). Not a
+  // wheel listener: one on the window makes WebKit rebuild its event regions as it is added and taken away (a 25–35 ms
+  // frame at each end of the writing, measured), while a scroll listener costs nothing
+  const listen = (on) => {
+    for (const type of ['pointerdown', 'keydown', 'scroll'])
+      window[on ? 'addEventListener' : 'removeEventListener'](type, interrupt, { capture: true, passive: true });
+  };
+  ink.dispose = () => {
+    if (ink.disposed) return;
+    ink.disposed = true;
+    for (const animation of ink.anims) animation.cancel();
+    if (inkOwners.get(word) !== ink) return;
+    inkOwners.delete(word);
+    // the plain word again: its own text, one node, as G3 drew it
+    const text = word.textContent;
+    if (word.querySelector('.ink-char')) word.textContent = text;
+    delete word.dataset.ink;
+  };
+  ink.end = (why) => {
+    if (ink.ended) return;
+    ink.ended = why;
+    listen(false);
+    if (stageInk === ink) stageInk = null;
+    if (reading) delete reading.dataset.inkHeld;
+    word.dataset.inkEnded = why;
+    // written: the ink dries into the word's own type in one short crossfade; anything else ends it at once
+    if (why === 'written' && word.isConnected) {
+      word.dataset.ink = 'settling';
+      setTimeout(ink.dispose, INK_SETTLE_MS + 40);
+    } else ink.dispose();
+    onEnd?.(why, ink);
+  };
+  const begin = () => {
+    if (ink.ended) return;
+    if (!word.isConnected) { ink.end('replaced'); return; }
+    word.dataset.ink = 'writing';
+    ink.startedAt = (document.timeline?.currentTime ?? performance.now()) - elapsed;
+    const keyframes = [{ strokeDashoffset: 1, opacity: 0 }, { strokeDashoffset: 0.97, opacity: 1, offset: 0.03 },
+      { strokeDashoffset: 0, opacity: 1 }];
+    ink.anims = wet.map((path, index) => path.animate(keyframes,
+      { duration: per, delay: index * per - elapsed, fill: 'both', easing: 'cubic-bezier(0.45, 0.05, 0.35, 1)' }));
+    if (reading) {
+      // the reading's place is kept from the first frame; it flows in over the writing's last 40 %
+      ink.anims.push(reading.animate([{ opacity: 0 }, { opacity: 1 }],
+        { duration: total * 0.4, delay: total * 0.6 - elapsed, fill: 'both', easing: 'ease-out' }));
+      delete reading.dataset.inkHeld;
+    }
+    Promise.all(ink.anims.map((animation) => animation.finished)).then(() => ink.end('written'), () => {});
+    onBegin?.(ink);
+  };
+  listen(true);
+  stageInk = ink;
+  if (after) after.then(begin, begin);
+  else begin();
+  return ink;
+}
+/** The stage leaves (or is drawn again): its writing ends where it stands; its voice stops unless the same stage is only
+ * being drawn again. */
+let stageVoiceSpoke = false;
+function retireStage({ refreshing = false } = {}) {
+  stageInk?.end('replaced');
+  if (refreshing || !stageVoiceSpoke) return;
+  stageVoiceSpoke = false;
+  cardAudioSerial += 1;
+  if (!readAloud.on) stopRecAudio();
+}
+if (typeof window !== 'undefined') window.addEventListener('pagehide', () => retireStage());
+
+/** 音 / 声 — the word in the locked recorded voice, through the card's own voice door: keyed by the surface and the
+ * reading the stage shows (V's resolver under audio/voice-lock.json, Kore for a word), never the device's voice and
+ * never another speaker. Only ever after his own gesture, on an unsealed stage. A missing recording marks the 音 quietly
+ * (its name says so); asked for with a tap, its note also says why. */
+function sayStageWord(button, { surface, reading, manual = false }) {
+  if (!button?.isConnected || !nonEmptyString(reading)) return;
+  if (manual && !button.parentElement.querySelector('.say-note')) {
+    const note = el('span', 'say-note mini-say-note');
+    note.setAttribute('role', 'status');
+    note.setAttribute('aria-live', 'polite');
+    button.parentElement.append(note);
+  }
+  stageVoiceSpoke = true;
+  speakCardReading(reading, button, surface);
+}
+
+/** A visit dresses the stage it opens before the stage mounts (showMini calls the visit's ceremony): the ceremony is
+ * decided once, at his own arrival, and kept by the visit — a redraw, a return from the page and a hold keep it, and
+ * a writing a redraw interrupted resumes where it stood. Returns the stage's start, called once the stage stands and
+ * its word has begun to travel (`flight`, the word's own flight from the text). */
+function dressStage(visit, stage, { word, label, token, kind, nodeFor, reading, actions, arriving }) {
+  const node = { t: kind === 'kanji' ? 'kanji' : 'word', id: nodeFor?.id || token.b,
+    ...(nonEmptyString(reading) ? { reading } : {}), ...(token.seq != null && token.seq !== '' ? { seq: token.seq } : {}) };
+  // only a word with stroke data can write itself (kana and a rare glyph stand written)
+  const written = [...String(label || '')].some((ch) => strokePathsFor(ch).length);
+  const deliberate = arriving && !visit.restore && !visit.restoreNext && !visit.redo && !visit.demo;
+  visit.ink ||= { ...inkCeremony(stageDepth(node), deliberate && written), startedAt: null, ended: null, asked: {} };
+  const plan = visit.ink;
+  stage.dataset.depth = plan.depth;
+  stage.dataset.ceremony = plan.bare ? 'bare' : plan.write ? 'write' : 'written';
+  // a word about to write itself travels to the stage as its own お手本 (its flight reads this colour) and lands as one
+  if (plan.write && !plan.ended && plan.startedAt == null) word.dataset.ink = 'arriving';
+  const readingLine = stage.querySelector('.mini-reading');
+  if (plan.bare) askOnRequest(stage, plan, readingLine);
+  let voice = null;
+  const marks = el('span', 'mini-marks');
+  // speak: 'first' says the word once per visit as it first writes (声 on); 'again' with the 筆 mark's own rewrite
+  const write = ({ after = null, elapsed = 0, speak = null } = {}) => {
+    const ink = writeWord(word, { reading: plan.bare ? null : readingLine, after, elapsed,
+      onBegin: (begun) => { plan.startedAt = begun.startedAt; },
+      // a redraw resumes the writing; anything else ends it for the visit
+      onEnd: (why) => { if (why !== 'replaced') plan.ended = why; } });
+    // a browser that cannot animate the ink shows the word written
+    if (!ink && word.dataset.ink === 'arriving') delete word.dataset.ink;
+    if (ink && voice && wordVoice() === 'on' && (speak === 'again' || (speak === 'first' && !plan.spoke))) {
+      plan.spoke = true;
+      sayStageWord(voice, { surface: label, reading });
+    }
+    return ink;
+  };
+  if (written && !strokeReduced()) {
+    const brush = el('button', 'mini-mark mini-brush', '筆');
+    brush.type = 'button';
+    brush.id = 'mini-brush';
+    brush.lang = 'ja';
+    brush.title = tx('もう一度書く', 'Write it again');
+    brush.setAttribute('aria-label', brush.title);
+    // the 筆 mark writes the word again at any depth and under any 筆 setting; depth and scheduling never change
+    brush.addEventListener('click', (event) => {
+      event.stopPropagation();
+      plan.ended = null;
+      plan.startedAt = null;
+      write({ speak: 'again' });
+    });
+    marks.append(brush);
+  }
+  if (nonEmptyString(reading) && recManifest !== null) {
+    voice = el('button', 'mini-mark mini-voice', '音');
+    voice.type = 'button';
+    voice.id = 'mini-voice';
+    voice.lang = 'ja';
+    voice.title = tx('読み上げる — 収録音声', 'Hear it — the recorded voice');
+    voice.setAttribute('aria-label', voice.title);
+    voice.addEventListener('click', (event) => {
+      event.stopPropagation();
+      sayStageWord(voice, { surface: label, reading, manual: true });
+    });
+    marks.append(voice);
+  }
+  if (marks.childElementCount) {
+    actions.append(marks);
+    if (!actions.parentElement) (stage.querySelector('#mini-why') || stage.querySelector('.mini-head')).after(actions);
+  }
+  return {
+    start(flight = null) {
+      if (!plan.write || plan.ended) return;
+      // a stage drawn again mid-writing resumes it; a writing already done stays done
+      if (plan.startedAt != null) {
+        write({ elapsed: (document.timeline?.currentTime ?? performance.now()) - plan.startedAt, speak: 'first' });
+        return;
+      }
+      // the first stroke waits for the word to land and for its page to be built ahead (G1, at idle, a moment after the
+      // stage stands): the heavy work happens while the お手本 rests, never under a moving stroke — at most 400 ms
+      const landed = flight ? flight.finished.then(() => {}, () => {}) : Promise.resolve();
+      write({ after: landed.then(() => Promise.race([pagePrebuildSettled, new Promise((done) => setTimeout(done, 400))])), speak: 'first' });
+    },
+  };
+}
+/** A bare word's two asks (recalled, owned): 読 heads the reading's own line, 意 the meaning's — one tap each shows it in
+ * place, kept for the visit, so a redraw or a return from the page shows what he asked for. A held line keeps its whole
+ * size while unseen, so asking changes nothing's size: the card is not re-seated and nothing moves under the finger. */
+function askOnRequest(stage, plan, readingLine) {
+  const said = stage.querySelector('.mini-head-text');
+  const meaning = [...stage.querySelectorAll('.mini-gloss, .mini-word-note')];
+  const asks = [];
+  if (readingLine) asks.push(['reading', '読', tx('読みを見る', 'Show the reading'), [readingLine]]);
+  if (meaning.length) asks.push(['meaning', '意', tx('意味を見る', 'Show the meaning'), meaning]);
+  if (!said || !asks.length) return;
+  for (const [what, glyph, name, held] of asks) {
+    const line = el('div', 'mini-asked');
+    line.dataset.ask = what;
+    const ask = el('button', 'mini-ask-seal', glyph);
+    ask.type = 'button';
+    ask.lang = 'ja';
+    ask.dataset.ask = what;
+    ask.title = name;
+    ask.setAttribute('aria-label', name);
+    const answer = el('div', 'mini-asked-answer');
+    held[0].before(line);
+    answer.append(...held);
+    line.append(ask, answer);
+    const paint = () => {
+      const open = !!plan.asked[what];
+      ask.setAttribute('aria-expanded', String(open));
+      answer.toggleAttribute('data-ask-held', !open);
+    };
+    ask.addEventListener('click', (event) => {
+      event.stopPropagation();
+      plan.asked[what] = !plan.asked[what];
+      paint();
+    });
+    paint();
+  }
+}
+
 function renderRadicalNode(sheet, node) {
   const r = D.radicals[node.id];
   if (!r) {
@@ -32424,14 +32784,20 @@ function whenIdle(fn, { after = 0, timeout = 800 } = {}) {
     if (idleHandle != null && typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idleHandle);
   };
 }
+/** G4 · settles once the page scheduled here has been built or its build called off: the stage's brush waits for it, so
+ * the heavy build never shares a frame with a moving stroke. */
+let pagePrebuildSettled = Promise.resolve();
 function schedulePagePrebuild(node, anchor) {
   pagePrebuildCancel?.();
   pagePrebuildCancel = null;
   if (!node || !anchor || !layerPathFor()) return;
-  pagePrebuildCancel = whenIdle(() => {
+  let settle = null;
+  pagePrebuildSettled = new Promise((done) => { settle = done; });
+  const cancel = whenIdle(() => {
     pagePrebuildCancel = null;
-    prebuildPage(node, anchor);
+    try { prebuildPage(node, anchor); } finally { settle(); }
   }, { after: PREBUILD_AFTER_MS });
+  pagePrebuildCancel = () => { cancel(); settle(); };
 }
 function prebuildPage(node, anchor) {
   if (!anchor.isConnected || miniAnchor !== anchor || !standingSlip() || pageTransition || !layerPathFor()) return;
