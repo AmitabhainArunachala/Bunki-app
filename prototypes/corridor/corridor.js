@@ -10611,7 +10611,7 @@ function placeSealStrip(open) {
   const onPage = !!anchor.closest('#sheet');
   const ceiling = Math.max(8, (onPage ? fixedEdge('#sheet > .sheet-bar', 'bottom') : null) ?? fixedEdge('#app > .chrome', 'bottom') ?? 0);
   const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
-    fixedEdge('.kp-grades', 'top') ?? height) - 8;
+    fixedEdge('.kp-grades', 'top') ?? height, fixedEdge('#layers-mark', 'top') ?? height) - 8;
   const view = window.visualViewport?.height || height;
   const cap = Math.max(96, Math.floor(Math.min(view * 0.4, floor - ceiling)));
   strip.style.maxHeight = `${cap}px`;
@@ -11529,15 +11529,17 @@ function dictionaryAnsweredForm(form = '') {
 /** The line under a content word on the ladder's English rung: its gloss
  * exactly as before, or an honest dash when the quick dictionary has none. N · a word whose entry at hand is read
  * otherwise shows the dash until the full dictionary answers, then that answer's gloss if it has one read so. */
+/** R2 · a reader word's gloss speaks for its door (readingToken): an inflected word's dictionary form read the text's
+ * way, a sound change's entry, a lone kanji's meaning; '' when the entry at hand has none read so. */
+function readerDoorGloss(door) {
+  const kanji = door.kanjiOnly ? D.kanji?.[door.b] : null;
+  if (kanji) return String(kanji.m || '').toLowerCase();
+  const record = readerQuickRecordAsRead(door);
+  return record?.m?.length ? inlineGloss(record) : '';
+}
+const readerTokenGloss = (token) => readerDoorGloss(readingToken(token));
 function readerGlossLine(token) {
-  // R2 · the line speaks for the word's door (readingToken): an inflected word's dictionary form read the text's way, a
-  // sound change's entry, a lone kanji's meaning
-  const gloss = (door) => {
-    const kanji = door.kanjiOnly ? D.kanji?.[door.b] : null;
-    if (kanji) return String(kanji.m || '').toLowerCase();
-    const record = readerQuickRecordAsRead(door);
-    return record?.m?.length ? inlineGloss(record) : '';
-  };
+  const gloss = readerDoorGloss;
   const now = gloss(readingToken(token));
   const line = now ? el('span', 'tok-en', now) : el('span', 'tok-en tok-en-miss', '—');
   if (!now) readyTokenReading(token)?.then(() => {
@@ -12306,6 +12308,122 @@ function buildListenRow(p) {
   listenRow.append(mark, listen, track, listenNote, rate);
   return listenRow;
 }
+/* G5 · LAYERS, only from their 層 mark (John, 2026-10-15: "layers is kinda cool too… as long as we don:t get stuck
+ * there" · "with layers the reading experince is too jagged… we still want a clean elegant reading expereince as our
+ * base"). The reader at rest is bare text; the mark is one quiet glyph at the foot, above 音. It opens the layers of ONE
+ * paragraph — the one his last word stands in while it is on the glass, else the one at the reading line: every word's
+ * reading over it, drawn where an on-touch reading is drawn, so no line box moves; and under the paragraph one quiet
+ * block — the meanings of its words in order and its particles' roles, from the shipped dictionary and particle table
+ * only (nothing invented, no model asked). Any press or activation anywhere else folds them, and that press still does
+ * its own work; so do Escape, the mark again, and leaving the article. Nothing persists; no other gesture opens them. */
+let readerLayers = null; // { paragraph, block, mark, rebuilt: [{ index, span }] }
+const READER_LAYER_WORDS = 24;
+function readerLayerParagraph() {
+  const paragraphs = [...document.querySelectorAll('#reader > [data-reader-prose]')].filter((node) => node.querySelector('.tok[data-index]'));
+  if (!paragraphs.length) return null;
+  const ceiling = Math.max(0, document.querySelector('#app > .chrome')?.getBoundingClientRect().bottom || 0);
+  const floor = Math.min(innerHeight, document.getElementById('primary-tabs')?.getBoundingClientRect().top || innerHeight);
+  const box = (node) => node.getBoundingClientRect();
+  const onGlass = (node) => box(node).bottom > ceiling + 24 && box(node).top < floor - 24;
+  const current = readerTakeCurrent();
+  const own = current ? readerTokenAtIndex(current.index)?.closest('[data-reader-prose]') : null;
+  if (own && onGlass(own)) return own;
+  const line = ceiling + (floor - ceiling) / 3;
+  return paragraphs.find((node) => box(node).top <= line && box(node).bottom >= line)
+    || paragraphs.find((node) => box(node).top >= ceiling && onGlass(node)) || paragraphs.find(onGlass) || null;
+}
+function foldReaderLayers() {
+  const open = readerLayers;
+  if (!open) return false;
+  readerLayers = null;
+  open.block.remove();
+  if (open.paragraph.isConnected) delete open.paragraph.dataset.layers;
+  // readings off: the words the layer gave a reading are painted back exactly as the dial draws them
+  for (const { index } of open.rebuilt) readerTokenPainters.get(index)?.();
+  if (open.mark.isConnected) {
+    open.mark.setAttribute('aria-pressed', 'false');
+    open.mark.removeAttribute('aria-controls');
+  }
+  return true;
+}
+function openReaderLayers(mark) {
+  const paragraph = readerLayerParagraph();
+  const p = passage();
+  if (!paragraph || !p?.tokens) return false;
+  const rebuilt = [];
+  const meanings = [], roles = [], seen = new Set(), seenRoles = new Set();
+  for (const span of paragraph.querySelectorAll('.tok[data-index]')) {
+    const index = Number(span.dataset.index);
+    const token = p.tokens[index];
+    if (!token) continue;
+    if (span.classList.contains('particle') || span.dataset.targetKind === 'particle') {
+      const particle = PARTICLE_BY_SURFACE[token.s];
+      if (particle && !seenRoles.has(particle.id)) { seenRoles.add(particle.id); roles.push([particle.p, bi() ? particle.role : particle.roleJa]); }
+      continue;
+    }
+    // readings off: this word gets its reading for as long as the layer is open (the dial's own painter restores it)
+    if (S.dials.furigana === 0 && token.f?.some((pair) => pair.r) && !span.querySelector('ruby')) {
+      const row = span.querySelector('.tok-word');
+      if (row) { row.replaceWith(wordRow(displayPairs(token), { furigana: 1, revealed: true })); rebuilt.push({ index, span }); }
+    }
+    if (!token.c || seen.has(token.b) || meanings.length >= READER_LAYER_WORDS) continue;
+    const gloss = readerTokenGloss(token);
+    if (!gloss) continue;
+    seen.add(token.b);
+    meanings.push([token.b, gloss]);
+  }
+  const block = el('div', 'reader-layers');
+  block.id = 'reader-layers';
+  block.dataset.japaneseLookup = 'off';
+  block.setAttribute('role', 'note');
+  block.setAttribute('aria-label', tx('この段落の層', 'Layers of this paragraph'));
+  const line = (cls, pairs) => {
+    const row = el('p', cls);
+    pairs.forEach(([ja, en], i) => {
+      if (i) row.append(document.createTextNode(' · '));
+      const word = el('span', 'reader-layers-ja', ja);
+      word.lang = 'ja';
+      row.append(word, document.createTextNode(` ${en}`));
+    });
+    return row;
+  };
+  if (meanings.length) block.append(line('reader-layers-meanings', meanings));
+  if (roles.length) block.append(line('reader-layers-roles', roles));
+  paragraph.dataset.layers = 'open';
+  paragraph.after(block);
+  readerLayers = { paragraph, block, mark, rebuilt };
+  mark.setAttribute('aria-pressed', 'true');
+  mark.setAttribute('aria-controls', block.id);
+  return true;
+}
+function readerLayersMark() {
+  const mark = el('button', 'layers-mark', '層');
+  mark.type = 'button';
+  mark.id = 'layers-mark';
+  mark.lang = 'ja';
+  mark.setAttribute('aria-pressed', 'false');
+  mark.setAttribute('aria-label', tx('層 · この段落の読みと意味', 'Layers · readings and meanings of this paragraph'));
+  mark.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (readerLayers) { foldReaderLayers(); return; }
+    openReaderLayers(mark);
+  });
+  return mark;
+}
+// any press, and any activation, anywhere but the mark folds the layers; the press still does its own work
+for (const type of ['pointerdown', 'click']) document.addEventListener(type, (event) => {
+  if (!readerLayers || event.target?.closest?.('#layers-mark')) return;
+  foldReaderLayers();
+}, true);
+document.addEventListener('keydown', (event) => {
+  if (!readerLayers) return;
+  if (event.key === 'Escape') {
+    foldReaderLayers();
+    event.preventDefault();
+    event.stopPropagation();
+  } else if (event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey)) foldReaderLayers();
+}, true);
+
 function renderReader(main) {
   readerTokenPainters.clear();
   const p = passage();
@@ -12447,8 +12565,9 @@ function renderReader(main) {
     main.append(dials);
   }
 
-  // a narrated article's listen door — one tap to hear the article, one tap to stop
-  main.append(listenRow);
+  // a narrated article's listen door — one tap to hear the article, one tap to stop; above it, G5's 層 mark (the only way
+  // into the layers)
+  main.append(listenRow, readerLayersMark());
   // the sentence's actions live in the word popup and the word menu: no bar floats over the text (#18)
 
   const reader = el('div', 'reader');
@@ -32758,6 +32877,7 @@ function renderLayer({ prebuilt = null, preserveRoom = false } = {}) {
   const root = document.getElementById('app');
   syncSheetActionVisit();
   closeSealStrip();
+  foldReaderLayers();
   stopSentenceListening();
   removeMini();
   for (const old of root.querySelectorAll(':scope > #sheet')) old.remove();
@@ -35814,8 +35934,9 @@ function render() {
   // retain it, but leaving the room cannot redirect a later overview visit.
   if (S.view !== 'levels') pendingReferenceCollection = null;
   if (S.view !== 'tray') S.todayDetailHeld = false;
-  // the strip belongs to a word this render replaces
+  // the strip and the layers belong to words this render replaces
   closeSealStrip();
+  foldReaderLayers();
   stopSentenceListening();
   stopAssessmentQuestionForRender();
   syncPracticeClock();

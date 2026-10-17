@@ -2886,6 +2886,44 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .tray-line[data-landed] { animation: kept-landed 1800ms var(--ease-standard) both; }
 @keyframes kept-landed { 0%, 35% { background: var(--color-seal-wash); } 100% { background: transparent; } }
 
+/* G5 · 層, the one way into the layers: a quiet disc like the folded 音 mark, above it at the foot */
+.layers-mark {
+  position: fixed;
+  z-index: 45;
+  right: var(--s2);
+  bottom: calc(var(--nav-clearance, 0px) + 16px + env(safe-area-inset-bottom));
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-ink-2);
+  font: 400 19px/1 var(--font-reading);
+  cursor: pointer;
+}
+.layers-mark[aria-pressed='true'] { color: var(--color-seal); }
+.layers-mark:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+@media (max-width: 520px) {
+  body[data-view='reader'] .layers-mark { bottom: calc(8px + 44px + 8px + env(safe-area-inset-bottom)); }
+  body.has-primary-tabs[data-view='reader'] .layers-mark { bottom: calc(var(--nav-clearance) + 8px + 44px + 8px); }
+}
+/* the layers: every word's reading over it where an on-touch reading is drawn (no line box moves), and one quiet block
+   under the paragraph — its words' meanings and its particles' roles — that folds on any tap */
+#reader:not(.fg-always) [data-layers='open'] ruby::before { opacity: 1; transform: translate(-50%, 0); }
+.reader-layers {
+  margin: 0.2em 0 0.9em;
+  padding: 2px 0 2px 12px;
+  border-left: 2px solid color-mix(in srgb, var(--color-accent) 46%, transparent);
+  font: 400 14px/1.6 var(--font-ui);
+  color: var(--color-ink-2);
+  animation: reader-pop-in var(--motion-fast) var(--ease-enter);
+}
+.reader-layers p { margin: 0; }
+.reader-layers-ja { font-family: var(--font-reading); color: var(--color-ink); }
+.reader-layers-roles { margin-top: 4px; color: var(--color-muted); }
 
 .reader-toast {
   position: fixed;
@@ -5259,7 +5297,7 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
   body > :is(.sheet, .world-picker, .world-picker-scrim),
   body::after,
   body #mini,
-  body :is(.seal-strip, .vocabulary-list-popover),
+  body :is(.seal-strip, .vocabulary-list-popover, .reader-layers),
   body .reader-toast:not([hidden]),
   body #bunki-reports-root .br-sheet[open] {
     animation: feel-fade var(--motion-room) linear both !important;
