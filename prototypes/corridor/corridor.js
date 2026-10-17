@@ -5879,10 +5879,12 @@ function renderShelfBody(search = null) {
   }
   const filters = S.shelfFilters ||= { sort: 'today', topic: '', jlpt: '', grade: '', text: '' };
   const unfiltered = !filters.text && !filters.topic && !filters.jlpt && !filters.grade;
-  // the default order (今日の棚) opens on the newest drop, in its own order; 最新 Latest keeps the publication order
+  // the default order (今日の棚) opens on the leading drops, newest first, each in its own order (N, N2); 最新 Latest keeps
+  // the publication order
   const dropFirst = !['title', 'short', 'new', 'latest'].includes(filters.sort);
-  const dropDay = dropFirst ? newestDropDay(stories) : '';
-  const shelfOrder = filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : filters.sort==='latest' ? byNewest : byNewestDrop(dropDay);
+  const dropDays = dropFirst ? leadingDropDays(stories) : [];
+  const dropDay = dropDays[0] || '';
+  const shelfOrder = filters.sort==='title' ? (a,b)=>a.title.localeCompare(b.title,'ja') : filters.sort==='short' ? (a,b)=>(a.chars || 0)-(b.chars || 0) : filters.sort==='new' ? (a,b)=>String(b.addedAt || '').localeCompare(String(a.addedAt || '')) || byNewest(a,b) : filters.sort==='latest' ? byNewest : byLeadingDrops(dropDays);
   // One slim chip bar. Each chip wears its current value; its native <select> lies over it,
   // transparent, so the platform's own picker opens and nothing is truncated on the surface.
   const controls = el('div', 'shelf-controls shelf-chipbar');
@@ -6151,11 +6153,17 @@ function renderShelfBody(search = null) {
     return (!filters.topic || (f.topics || [p.topic]).includes(filters.topic)) && (!filters.jlpt || storyLevel(p).step===filters.jlpt) && (!filters.grade || f.schoolGrade===filters.grade) && (!filters.text || `${p.title} ${p.titleEn || ''} ${p.snippet || ''} ${(f.topics || []).join(' ')}`.toLocaleLowerCase().includes(filters.text.toLocaleLowerCase()));
   });
   matches.sort(shelfOrder);
-  // the newest drop keeps its own reading order at the head — the newest dated news leads, and every new reading stands
-  // ahead of every inherited one (N); the daily turn freshens the shelf after it
+  // a series stands together in book order where its first member stands (N2): an earlier cut is pulled forward beside
+  // the later cut a newer drop brought
+  if (dropFirst) matches = gatherSeries(matches);
+  // the leading drops keep their own reading order at the head — the newest dated news leads, and every new reading
+  // stands ahead of every inherited one (N, N2); the daily turn freshens the shelf after them
+  const leading = new Set(dropDays);
   let dropCount = 0;
-  while (dropDay && dropCount < matches.length && matches[dropCount].addedAt === dropDay) dropCount += 1;
+  while (dropCount < matches.length && leading.has(matches[dropCount].addedAt)) dropCount += 1;
   if (filters.sort === 'today' && unfiltered) matches = [...matches.slice(0, dropCount), ...shelfDailyOrder(matches.slice(dropCount), day)];
+  // the bands follow the newest drop, with any earlier cut gathered into it, and never stand inside it
+  const newestEnd = dropDay ? matches.filter((p) => p.source !== 'isa-yasashii-glossary').reduce((end, p, i) => (p.addedAt === dropDay ? i + 1 : end), 0) : 0;
   const count=el('p','shelf-results-count',shelfTallyText(matches));count.setAttribute('role','status');controls.append(count);
   // unfiltered, the masthead already carries this same tally: the line stays for assistive tech only
   if (!Object.values(filters).some((v,i)=>i>0 && v)) count.classList.add('is-quiet');
@@ -6283,7 +6291,7 @@ function renderShelfBody(search = null) {
     if (p.source === 'isa-yasashii-glossary') continue;
     if (rank >= 3 && inBand.has(p.id)) continue;
     // the bands (today's six, words met again) follow the lead and its two seconds — and never stand inside the newest drop
-    if (rank === Math.max(3, dropCount)) grid.append(...bands.splice(0));
+    if (rank === Math.max(3, newestEnd)) grid.append(...bands.splice(0));
     grid.append(shelfCard(p, rank === 0 ? 'lead' : rank < 3 ? 'second' : 'grid'));
     rank += 1;
   }
@@ -7802,13 +7810,58 @@ function newestDropDay(rows) {
   for (const p of rows) if (ISO_DAY.test(String(p?.addedAt || '')) && p.addedAt > day) day = p.addedAt;
   return day;
 }
-function byNewestDrop(day) {
+/** The leading drops (N2, 2026-10-17): a drop is the rows that share one addedAt day. The newest drop, and every drop
+ * added within LEADING_DROP_DAYS of it, lead the shelf: newest drop first, each in its own reading order (the order it
+ * arrived in the index). A drop older than that has joined the shelf, and keeps byNewest with every other row. */
+const LEADING_DROP_DAYS = 7;
+function leadingDropDays(rows) {
+  const newest = newestDropDay(rows);
+  if (!newest) return [];
+  const floor = Date.parse(`${newest}T00:00:00Z`) - LEADING_DROP_DAYS * 86400000;
+  return [...new Set(rows.map((p) => String(p?.addedAt || '')).filter((day) => ISO_DAY.test(day) && Date.parse(`${day}T00:00:00Z`) >= floor))]
+    .sort((a, b) => (a < b ? 1 : a > b ? -1 : 0));
+}
+function byLeadingDrops(days) {
+  const rank = new Map(days.map((day, i) => [day, i]));
   return (a, b) => {
-    const da = !!day && a.addedAt === day;
-    const db = !!day && b.addedAt === day;
-    if (da !== db) return da ? -1 : 1;
-    return da ? 0 : byNewest(a, b);
+    const ra = rank.get(a.addedAt) ?? Infinity;
+    const rb = rank.get(b.addedAt) ?? Infinity;
+    if (ra !== rb) return ra - rb;
+    return ra === Infinity ? byNewest(a, b) : 0;
   };
+}
+/** Series in book order (N2; Kimi, via the writer: "a later cut of a work never precedes its earlier cut"). The pieces
+ * of one Aozora author on the shelf are one series: the cuts of one work in cut order (aozora:<work>-<cut>), works in
+ * the order they joined the shelf. In the default order a series stands together where its first member stands, so an
+ * earlier cut from an older drop is pulled forward beside the later cut a newer drop brought. The rule reads only the
+ * row's id and its Aozora credit (青空文庫 <author>「…」); no story is named here. */
+function storySeries(p) {
+  const cut = /^aozora:(\d+)(?:-(\d+))?$/u.exec(String(p?.id || ''));
+  const author = /^青空文庫\s+([^\s「『]+)[「『]/u.exec(String(p?.attribution || ''))?.[1];
+  return cut && author ? { key: author, work: cut[1], cut: Number(cut[2] || 1) } : null;
+}
+function gatherSeries(list) {
+  const arrived = new Map((D.passages || []).map((p, i) => [p.id, i]));
+  const members = new Map();
+  for (const p of list) {
+    const series = storySeries(p);
+    if (series) members.set(series.key, [...(members.get(series.key) || []), p]);
+  }
+  const bookOrder = (a, b) => {
+    const sa = storySeries(a), sb = storySeries(b);
+    if (sa.work === sb.work) return sa.cut - sb.cut;
+    const da = String(a.addedAt || ''), db = String(b.addedAt || '');
+    if (da !== db) return da < db ? -1 : 1;
+    return (arrived.get(a.id) ?? 0) - (arrived.get(b.id) ?? 0);
+  };
+  const placed = new Set();
+  const out = [];
+  for (const p of list) {
+    if (placed.has(p.id)) continue;
+    const group = members.get(storySeries(p)?.key) || [p];
+    for (const q of group.length > 1 ? [...group].sort(bookOrder) : group) { out.push(q); placed.add(q.id); }
+  }
+  return out;
 }
 
 /** Days since a calendar day, counted on the reader's own calendar. */
@@ -12863,17 +12916,18 @@ function todaySecondsPerCard() {
   gaps.sort((a, b) => a - b);
   return gaps[Math.floor(gaps.length / 2)] / 1000;
 }
-/** The reading on today's line (N, 2026-10-17): while the newest drop has an unread story, one of them — the one holding
- * the most of the learner's saved words (readingFacets.forms), else the first in the drop's own order — whatever else
- * the record holds; once the drop is read, the unread story holding the most saved words, else the shelf's first story
- * that awaits no one. */
+/** The reading on today's line (N, 2026-10-17; N2): while a leading drop has an unread story — the newest such drop —
+ * one of its stories: the one holding the most of the learner's saved words (readingFacets.forms), else the first in
+ * the drop's own order, whatever else the record holds; once every leading drop is read, the unread story holding the
+ * most saved words, else the shelf's first story that awaits no one. */
 function todayReadPick() {
   const curated = (D.passages || []).filter((p) => !String(p.file || '').startsWith('archive/'));
   const stories = shelfStories(curated);
   const pool = stories.filter((p) => p.source !== 'isa-yasashii-glossary' && !owns(S.readDone || {}, p.id));
   if (!pool.length) return null;
-  const dropDay = newestDropDay(stories);
-  const order = byNewestDrop(dropDay);
+  const dropDays = leadingDropDays(stories);
+  const order = byLeadingDrops(dropDays);
+  const dropDay = dropDays.find((day) => pool.some((p) => p.addedAt === day)) || '';
   const fresh = dropDay ? pool.filter((p) => p.addedAt === dropDay) : [];
   const mine = new Set(S.taken.filter((i) => i.t === 'word').map((i) => i.id));
   let best = null;
