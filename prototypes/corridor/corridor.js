@@ -8766,6 +8766,8 @@ function fitJaWords(nodes) {
   // every read first, then every write: one layout for the lot
   const sizes = live.map((n) => {
     const s = getComputedStyle(n);
+    // a title set upright (縦書き: the shelf's teasers) runs its lines down the card; its width is one column, not a line
+    if (/^vertical|^sideways/.test(s.writingMode)) return 0;
     const px = parseFloat(s.fontSize) || 0;
     const room = n.clientWidth - (parseFloat(s.paddingLeft) || 0) - (parseFloat(s.paddingRight) || 0);
     // the estimate's own margin: digits and Latin run a little wider than 0.6 em in a Japanese face
