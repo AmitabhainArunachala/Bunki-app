@@ -5237,13 +5237,19 @@ function replaceScalePages(path, { paint = true } = {}) {
   if (!path.length) returnScroll();
 }
 function focusScaleControl(selector, visit = S.scaleVisit) {
-  const view = S.view, epoch = pageEpoch;
+  const view = S.view, epoch = pageEpoch, owner = recordEpoch;
   const focus = () => {
-    if (S.view !== view || S.stack.length || pageEpoch !== epoch || S.scaleVisit !== visit) return false;
-    const target = document.querySelector(selector);
-    if (!target?.getClientRects().length) return false;
+    if (S.view !== view || S.stack.length || pageEpoch !== epoch || recordEpoch !== owner || S.scaleVisit !== visit) return false;
+    const target = [...document.querySelectorAll(selector)].find(node => {
+      if (!node.isConnected || node.matches(':disabled') || node.closest('[inert], [hidden], [aria-hidden="true"]') ||
+          !node.getClientRects().length) return false;
+      const style = getComputedStyle(node), box = node.getBoundingClientRect();
+      return style.visibility !== 'hidden' && style.visibility !== 'collapse' && Number(style.opacity) > 0 &&
+        box.width > 0 && box.height > 0 && box.right > 0 && box.left < innerWidth && box.bottom > 0 && box.top < innerHeight;
+    });
+    if (!target) return false;
     target.focus({ preventScroll: true });
-    return true;
+    return document.activeElement === target;
   };
   if (!focus()) requestAnimationFrame(focus);
 }
@@ -5543,7 +5549,9 @@ function freshScaleKeptWord(key) {
 function installScaleBridge() {
   const article = scalePassage() || passage() || D.passages.find(p => !String(p.file || '').startsWith('archive/'));
   if (article) window.__DRIFT__?.focusArticle?.({ articleId: article.id, title: article.title });
-  const skyReady = () => S.view === 'drift' && !S.stack.length && !standingSlip() && !ladderVisit && scaleNavigationAllowed();
+  // Reading alone stays on the sky: its next tap must still reach the stage.
+  // The shared pointer gate must exclude overlays, not strand this first rung.
+  const skyReady = () => S.view === 'drift' && !S.stack.length && !standingSlip() && (!ladderVisit || ladderVisit.rung === 'reading') && scaleNavigationAllowed();
   window.__DRIFT__?.setScaleBridge?.({
     canStep(direction, target = {}) {
       if (!skyReady()) return false;

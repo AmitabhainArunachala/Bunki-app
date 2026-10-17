@@ -650,8 +650,23 @@ async function g6AbandonedReturn(page,{modality,emit,kind}){
   const pending=await page.evaluate(()=>({queued:window.__g6ReturnFrames.count(),marker:document.querySelector('#reader')?.dataset.scaleReturnIndex||null}));
   assert.equal(pending.marker,null,'new source fixture has no stale completed-return marker');
   if(kind==='navigate'){await g6Activate(page,page.locator('#chrome-search'),modality);await page.locator('#nav-search-input').waitFor();await page.locator('#nav-search-input').focus();}
-  else if(kind==='key'){await page.keyboard.press('PageDown');await delay(150);}
-  else{assert.equal(kind,'wheel');await page.mouse.move(380,500);await page.mouse.wheel(0,240);await delay(150);}
+  else {
+    if(kind==='key')await page.keyboard.press('PageDown');
+    else{assert.equal(kind,'wheel');await page.mouse.move(380,500);await page.mouse.wheel(0,240);}
+    // Native scrolling can animate beyond 150ms in WebKit. Observe it settle
+    // before releasing the held app callback; do not mistake its own motion
+    // for a stale return stealing the user's position.
+    await page.evaluate(()=>new Promise((resolve,reject)=>{
+      const start=performance.now();let last=scrollY,stable=0;
+      function sample(){
+        const current=scrollY;stable=Math.abs(current-last)<.1?stable+1:0;last=current;
+        if(stable>=8)return resolve();
+        if(performance.now()-start>2000)return reject(new Error('native scroll did not settle before return-frame release'));
+        requestAnimationFrame(sample);
+      }
+      requestAnimationFrame(sample);
+    }));
+  }
   const before=await page.evaluate(()=>({view:document.body.dataset.view,scrollY,focused:document.activeElement?.id||null,marker:document.querySelector('#reader')?.dataset.scaleReturnIndex||null}));
   const released=await page.evaluate(()=>window.__g6ReturnFrames.release());await page.evaluate(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))));
   const after=await page.evaluate(()=>({view:document.body.dataset.view,scrollY,focused:document.activeElement?.id||null,marker:document.querySelector('#reader')?.dataset.scaleReturnIndex||null}));
@@ -757,7 +772,7 @@ async function g6AimSkyWord(page,word){
 async function g6SkyStageGate(page,{context,emit,native}){
   await g6SkyHome(page);const word=await g6PickSkyWord(page);
   const tapAt=await g6AimSkyWord(page,word);await page.touchscreen.tap(tapAt.x,tapAt.y);await page.waitForFunction(n=>n.dataset.ladderRung==='reading'||!!document.getElementById('mini'),word,{timeout:10000});
-  if(!await page.locator('#mini').count()){assert.equal(await word.getAttribute('data-ladder-rung'),'reading');const again=await g6AimSkyWord(page,word);await page.touchscreen.tap(again.x,again.y);}
+  if(!await page.locator('#mini').count()){assert.equal(await word.getAttribute('data-ladder-rung'),'reading');await page.waitForFunction(()=>window.__DRIFT__?.canNavigate()===true,null,{timeout:10000});const again=await g6AimSkyWord(page,word);await page.touchscreen.tap(again.x,again.y);}
   await page.locator('#mini .mini-word').waitFor();const mini=await slipFacts(page),before=await g6SkyFacts(page),record=await readAppRecordSnapshot(page);
   const witness=native?await g6NativeChromiumPinch(page,context,'#mini .mini-word'):await g6TwoPointerPolicy(page,'#mini .mini-word');
   const after=await g6SkyFacts(page),stage=await slipFacts(page),afterRecord=await readAppRecordSnapshot(page);
