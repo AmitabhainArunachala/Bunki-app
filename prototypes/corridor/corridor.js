@@ -10282,16 +10282,19 @@ function alternateLemmaDoor(door) {
   return null;
 }
 
-/** R2 (addendum 1) · the readings a sound change in a compound comes from: a final っ undone (いっ → いち, はっ → はち,
- * じゅっ → じゅう), a voiced or ぱ-row first kana made plain (ぽん, ぼん → ほん; がねもち → かねもち), and both. */
+/** R2 (addendum 1) · the readings a sound change in a compound comes from, those keeping the text's voicing first: a
+ * final っ undone (いっ → いち, はっ → はち, じゅっ → じゅう), then a voiced or ぱ-row first kana made plain (ぽん, ぼん →
+ * ほん; がねもち → かねもち), alone or with the っ undone. Given the readings the kanji data lists for a lone kanji, no
+ * voicing change is offered once a restoration keeping the voicing is one of them (仏 read ぶっ is ぶつ, its on'yomi —
+ * never ふつ, France: Codex's f2e3015e review). */
 const SOUND_VOICED = 'がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ';
 const SOUND_PLAIN = 'かきくけこさしすせそたちつてとはひふへほはひふへほ';
-function soundChangeReadings(reading) {
+function soundChangeReadings(reading, listed = []) {
   const r = kataToHira(String(reading || ''));
   const plain = (text) => { const at = SOUND_VOICED.indexOf(text[0]); return at >= 0 ? SOUND_PLAIN[at] + text.slice(1) : ''; };
-  const out = [plain(r)];
-  if (r.endsWith('っ')) for (const end of 'ちつくきう') { const undone = r.slice(0, -1) + end; out.push(undone, plain(undone)); }
-  return [...new Set(out)].filter((text) => text && text !== r);
+  const undone = r.endsWith('っ') ? [...'ちつくきう'].map((end) => r.slice(0, -1) + end) : [];
+  const out = [...new Set([...undone, plain(r), ...undone.map(plain)])].filter((text) => text && text !== r);
+  return undone.some((text) => listed.includes(text)) ? out.filter((text) => undone.includes(text)) : out;
 }
 
 /** The readings the kanji data lists for one kanji, in hiragana (on and kun; a kun reading's okurigana mark dropped). */
@@ -10303,14 +10306,15 @@ function kanjiReadingsOf(char) {
 /** R2 (addendum 1, 2) · a word no entry is read the text's way for, once the full dictionary has answered: a sound change
  * of an entry's reading names that entry, by the entry's own reading, and its card still shows the text's (一 read いっ
  * is 一 いち; 本 read ぽん is 本 ほん) — never when the text's reading is one the kanji data itself lists for a lone kanji
- * (仏 read ぶつ is not 仏 ふつ, France); a lone kanji read by one of its on'yomi, or a sound change of one (寺 じ, 国 こく,
- * 所 じょ), is that kanji (kanjiOnly: its meaning from the kanji data, its page, its Save). null when neither holds. */
+ * (仏 read ぶつ is not 仏 ふつ, France), nor by a voicing change once undoing the っ alone gives one (仏 read ぶっ); a lone
+ * kanji read by one of its on'yomi, or a sound change of one (寺 じ, 国 こく, 所 じょ, 仏 ぶっ), is that kanji (kanjiOnly:
+ * its meaning from the kanji data, its page, its Save). null when neither holds. */
 function soundChangeDoor(door) {
   const own = kataToHira(String(door.r || ''));
   const lone = [...String(door.b || '')].length === 1 ? kanjiReadingsOf(door.b) : null;
   if (!own) return null;
   if (!lone || ![...lone.on, ...lone.kun].includes(own)) {
-    for (const reading of soundChangeReadings(own)) {
+    for (const reading of soundChangeReadings(own, lone ? [...lone.on, ...lone.kun] : [])) {
       if (D.dict?.[door.b] && kataToHira(String(D.dict[door.b].r || '')) === reading) return { ...door, r: reading, shown: door.r };
       const named = D.dict?.[door.b] ? lookup(door.b, null, reading)?.seq : null;
       if (named) return { ...door, r: reading, shown: door.r, seq: String(named) };
@@ -10331,7 +10335,7 @@ function readerLookupAnswer(text, context = {}) {
   const lone = [...String(text)].length === 1 ? kanjiReadingsOf(text) : null;
   const own = kataToHira(reading);
   if (!lone || ![...lone.on, ...lone.kun].includes(own)) {
-    for (const variant of soundChangeReadings(own)) {
+    for (const variant of soundChangeReadings(own, lone ? [...lone.on, ...lone.kun] : [])) {
       if (japaneseLookupRecord(text, { ...context, reading: variant })) return { reading: variant, shown: reading };
     }
   }
