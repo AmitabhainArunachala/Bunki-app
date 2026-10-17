@@ -36,7 +36,8 @@
  *   sentence · save · ask the tutor · practice"), stays under 40 % of the screen and covers no button and not the word;
  *   a word held inside the word's page keeps its strip in the page, over no button; the bookmark lands on the kept
  *   words, and browsing them never starts a review; layers open only from 層, never move the paragraph's lines, and fold
- *   on any tap, Escape or the mark; with reduced motion nothing travels; frames of the seal and the landing (WebKit ≤ 24 ms).
+ *   on any tap, Escape or the mark; with reduced motion nothing travels; a Save in a bar stands inside it, 8 px clear of
+ *   every screen edge, its target its doors' height (L-2); frames of the seal and the landing (WebKit ≤ 24 ms).
  *   --g5-only runs only these; --g5-controls adds: a second hold that un-keeps, a strip over a button, a layer that stays.
  * G3 negative controls: --controls replays stalled tap2, uncleared ruby and a front door; harness failures are incomplete.
  * --controls-only runs only the three candidate schedules, mutants and restores, with no frame measurements.
@@ -1253,6 +1254,56 @@ try {
       const gone = await g5Facts(page);
       check('G5.page.escape', 'Escape takes the strip away and leaves the page as it was', !gone.strip && gone.page, gone);
     });
+
+    // L-2 (MISSION/FINDINGS.md; MASTER_SPEC D5): a Save in a bar is a door of the bar. On the word's page its face stands
+    // inside the bar, at least 8 px from every screen edge, and its target spans the height of the bar's other doors
+    // (Close, search) — as Save and as Saved ✓, on a phone and on a Mac window; the room's keep, hovered on the Mac, fills
+    // only a face 8 px clear of the bar's edges.
+    const barSaveFacts = (page) => page.evaluate(() => {
+      const bar = document.querySelector('#sheet > .sheet-bar'), save = document.getElementById('sheet-take');
+      if (!bar || !save) return null;
+      const box = (n) => { const b = n.getBoundingClientRect(); return { top: b.top, bottom: b.bottom, left: b.left, right: b.right, height: b.height }; };
+      const others = ['sheet-back', 'sheet-search'].map((id) => document.getElementById(id)).filter((n) => n?.getClientRects().length).map((n) => ({ id: n.id, ...box(n) }));
+      const face = box(save), x = (face.left + face.right) / 2;
+      const top = Math.min(...others.map((o) => o.top)), bottom = Math.max(...others.map((o) => o.bottom));
+      const reach = [top + 0.5, (top + bottom) / 2, bottom - 0.5].map((y) => save.contains(document.elementFromPoint(x, y)));
+      const rule = parseFloat(getComputedStyle(bar).borderBottomWidth) || 0;
+      return { inner: [innerWidth, innerHeight], bar: box(bar), rule, face, others, reach, text: save.textContent.replace(/\s+/g, ' ').trim() };
+    });
+    const barSaveOk = (f) => !!f && f.others.length === 2 && f.others.every((o) => Math.abs(o.height - f.others[0].height) < 0.5) &&
+      f.face.top >= 8 && f.face.left >= 8 && f.face.right <= f.inner[0] - 8 && f.face.bottom <= f.inner[1] - 8 &&
+      f.face.top >= f.bar.top && f.face.bottom <= f.bar.bottom - f.rule && f.face.height < f.others[0].height && f.reach.every(Boolean);
+    for (const [form, viewport, mobile] of [['phone', { width: 390, height: 844 }, true], ['mac', { width: 1280, height: 800 }, false]]) {
+      await walk(`G5-bar-save-${form}`, async (page) => {
+        await openStory(page);
+        if (!mobile) {
+          // the room's keep, hovered: its fill is a face 8 px clear of the bar's edges, never the whole bar
+          const keep = page.locator('#chrome-keep');
+          await keep.hover(); await delay(200);
+          const hovered = await keep.evaluate((node) => {
+            const b = node.getBoundingClientRect(), before = getComputedStyle(node, '::before'), own = getComputedStyle(node);
+            const painted = before.content !== 'none' && before.content !== 'normal' && before.backgroundColor !== 'rgba(0, 0, 0, 0)';
+            return { box: { top: b.top, bottom: b.bottom }, own: own.backgroundColor, painted, faceTop: b.top + (parseFloat(before.top) || 0), faceBottom: b.bottom - (parseFloat(before.bottom) || 0) };
+          });
+          check('G5.bar-save.room-keep', 'hovered on a Mac window, the room bar’s keep fills only a face at least 8 px from the screen’s top edge, inside the bar',
+            hovered.own === 'rgba(0, 0, 0, 0)' && hovered.painted && hovered.faceTop >= 8 && hovered.faceBottom <= hovered.box.bottom, hovered);
+          await page.mouse.move(8, 600); // off the keep, in the page's margin
+        }
+        await stage(page, readerWord(page));
+        await page.locator('#mini .mini-word').tap();
+        await pageSettled(page);
+        const before = await barSaveFacts(page);
+        check(`G5.bar-save.${form}.save`, `${form}: the page bar’s Save stands inside its bar, at least 8 px from every screen edge, its target the height of Close and search`,
+          barSaveOk(before) && /Save/u.test(before.text), before);
+        await page.locator('#sheet-take').tap();
+        await page.waitForFunction(() => /Saved/u.test(document.getElementById('sheet-take')?.textContent || ''), null, { timeout: 8000 });
+        await page.keyboard.press('Escape'); await delay(300);
+        const after = await barSaveFacts(page);
+        check(`G5.bar-save.${form}.saved`, `${form}: as Saved ✓ it stands the same way, inside its bar and 8 px clear of the screen’s edges`,
+          barSaveOk(after) && /Saved/u.test(after.text), after);
+        await page.screenshot({ path: resolve(evidence, `${engine}-G5-bar-save-${form}.png`), clip: { x: 0, y: 0, width: viewport.width, height: 96 } });
+      }, { viewport, mobile });
+    }
 
     // reduced motion: the same keep and strip, and nothing travels (no ring sweep, no flight; the seal shows where it pressed)
     await walk('G5-reduced', async (page) => {
