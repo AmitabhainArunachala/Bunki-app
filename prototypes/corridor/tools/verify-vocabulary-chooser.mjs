@@ -379,6 +379,9 @@ try {
         await last.scrollIntoViewIfNeeded();
         await last.click();
         const after = await waitForAppRecord(page, record => record.lists?.[names[11]]?.some(item => item.id === word), { description: 'one tap on the twelfth list' });
+        // the durable write lands a beat before the strip repaints its chip: wait for the strip, then assert it
+        await page.waitForFunction((name) => document.querySelector(`#seal-strip .seal-list[data-list="${name}"]`)?.getAttribute('aria-pressed') === 'true',
+          names[11], { timeout: 5000 }).catch(() => {});
         assert.equal(await last.getAttribute('aria-pressed'), 'true', 'the tapped list wears the chosen mark');
         for (const name of names.slice(0, 11)) assert.deepEqual(after.lists[name], before.lists[name], `one tap touched only its own list (${name})`);
         assert.equal(after.taken.filter(item => item.id === word).length, 1, 'a list tap never duplicates the card');
