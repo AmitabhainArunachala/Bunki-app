@@ -6081,6 +6081,13 @@ function openAssessmentResult(attemptId) {
 function openPassage(id, anchor = null) {
   // no id means no reading: callers show their own "source unavailable" note
   if (id == null) throw new Error('source-unavailable');
+  // An explicit source occurrence starts a new placement; it is not the
+  // enclosing journey's bookmark, even when both belong to the same article.
+  const sourceAnchor = !anchor?.scaleReturn && Number.isInteger(anchor?.index) && anchor.index >= 0;
+  if (sourceAnchor) {
+    retireScaleReturn();
+    S.scaleVisit = null;
+  }
   const scaleReturn = anchor?.scaleReturn || (S.scaleVisit && S.scaleVisit.passageId === id &&
     ['shelf', 'archive', 'drift'].includes(S.view) && scaleSource(S.scaleVisit) ? S.scaleVisit : null);
   if (scaleReturn && (S.scaleVisit !== scaleReturn || !scaleSource(scaleReturn) ||

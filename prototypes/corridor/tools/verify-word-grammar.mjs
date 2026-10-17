@@ -39,6 +39,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { inflateSync } from 'node:zlib';
 import vm from 'node:vm';
 import { chromium, webkit } from 'playwright-core';
@@ -46,6 +47,7 @@ import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/r
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import { readAppRecord, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { restoreAppFixture } from './record-fixture-support.mjs';
 import { serveMutation } from './reader-gloss-mutants.mjs';
 
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Pin an immutable built site and its digest');
@@ -992,6 +994,70 @@ async function g6PanToKept(page,key){
   }
   assert.fail(`Kept point was not reachable by sixteen native drags: ${JSON.stringify(observations)}`);
 }
+// RECEIVED-RECORD fixture, copied from verify-reader-doors D6. This is not a
+// fresh reader Save producer. The public file importer admits the complete
+// portable record; the actual served teacher module owns its content-derived ID.
+const G6_RECEIVED_SOURCE=Object.freeze({savedAt:Date.parse('2026-09-25T00:00:00Z'),encounter:Object.freeze({
+  sourceKind:'bundled-passage',sourceId:'aozora:000628',unit:'token-index',start:2347,end:2357,index:2351,
+  quote:'」「それがわからんのだよ。',title:'ごん狐',attribution:'青空文庫 新美南吉「ごん狐」',
+  url:'https://www.aozora.gr.jp/cards/000121/card628.html',target:Object.freeze({type:'word',id:'わかる'})
+})});
+async function g6ReceivedSourceReturn(page,{emit}){
+ const receipt={label:'RECEIVED-RECORD exact canonical D6; native same-passage source return',steps:[],checks:[]};
+ const RETAIN=989,PASSAGE_A=G6_RECEIVED_SOURCE.encounter.sourceId;
+ const tokenFacts=async index=>page.locator(`#reader .tok[data-index="${index}"]`).evaluate(n=>{const r=n.getBoundingClientRect(),clone=n.cloneNode(true);clone.querySelectorAll('rt,rp').forEach(t=>t.remove());return{index:Number(n.dataset.index),word:n.dataset.word,printed:clone.textContent,connected:n.isConnected,top:r.top,bottom:r.bottom,scrollY,focused:document.activeElement===n,painted:!!n.getClientRects().length};});
+ await boot(page);
+ const bytes=readFileSync(resolve(site,'data/articles/aozora-000628.json'));
+ assert.equal(createHash('sha256').update(bytes).digest('hex'),identity.files.find(f=>f.path==='data/articles/aozora-000628.json')?.sha256,'received fixture article equals served manifest');
+ const article=JSON.parse(bytes),sourceDigest=createHash('sha256').update(JSON.stringify(article.tokens.map(t=>t.s))).digest('hex');
+ const teacher=await import(pathToFileURL(resolve(site,'teacher-context.mjs')).href);
+ const encounter=await teacher.createTeacherContext({...G6_RECEIVED_SOURCE.encounter,target:{...G6_RECEIVED_SOURCE.encounter.target},sourceDigest});
+ assert.deepEqual(await teacher.verifyTeacherContext(encounter),encounter);
+ const saved={t:'word',id:'わかる',label:'わかる',kind:'語',kindEn:'word',from:null,ts:G6_RECEIVED_SOURCE.savedAt,started:G6_RECEIVED_SOURCE.savedAt,sourceContextRef:encounter.id};
+ await restoreAppFixture(page,{v:1,taken:[saved],teacherContexts:{version:1,activeRef:null,entries:[encounter]}});
+ receipt.encounter=encounter;
+ const imported=await readAppRecordSnapshot(page);receipt.imported={record:imported.record,revision:imported.revision};assert.equal(imported.record.taken[0].sourceContextRef,encounter.id);assert.equal(encounter.index,2351);
+ assert.equal(article.tokens[RETAIN].b,'家');assert.equal(article.tokens[RETAIN].s,'家');assert.equal(article.tokens[2351].b,'わかる');assert.equal(article.tokens.slice(encounter.start,encounter.end).map(t=>t.s).join(''),encounter.quote);
+ const direct=page.locator(`[data-passage="${PASSAGE_A}"]:not([data-recommendation]) .shelf-open`).first();
+ if(await direct.count())await direct.tap();else{await openShelfTools(page);await page.locator('#shelf-reading-search').fill('ごん狐');await page.locator('#shelf-reading-search').press('Enter');await page.locator(`#shelf-reading-results [data-passage="${PASSAGE_A}"] .shelf-open`).first().tap();}
+ const retained=page.locator(`#reader .tok[data-index="${RETAIN}"][data-word="家"]`);await retained.waitFor();await retained.scrollIntoViewIfNeeded();await stage(page,retained);await page.locator('#mini .mini-word').tap();await pageSettled(page);assert.equal(await page.locator('#sheet').getAttribute('data-node'),'word:家');await page.locator('#sheet-back').tap();await bare(page);await page.locator('#mini .mini-word').waitFor();await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.getElementById('mini'));await delay(300);
+ const original=await tokenFacts(RETAIN),sourceBefore=await tokenFacts(2351),state=await g6ScaleFacts(page);receipt.retained={original,sourceBefore,state};assert(original.scrollY>0&&original.top>=0&&original.bottom<=844,'retained actual nonzero visible source');assert.equal(state.tokenIndex,String(RETAIN));assert.equal(state.passage,PASSAGE_A);assert(Math.abs(original.top-sourceBefore.top)>844,'actual two occurrences are more than one viewport apart');
+
+ // Ordinary no-anchor shelf return is a control, not a substitute for explicit source navigation.
+ await g6Activate(page,page.locator(`${G6_RAIL}[data-scale="article"] button[data-scale-out]`),'touch');await page.waitForFunction(()=>document.body.dataset.view==='shelf');
+ await g6Activate(page,page.locator(`${G6_RAIL}[data-scale="shelf"] button[data-scale-in]`),'touch');
+ await page.waitForFunction(()=>document.querySelector('#reader')?.dataset.scaleReturnIndex==='989');await page.evaluate(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))));
+ const ordinary=await tokenFacts(RETAIN),ordinaryState=await g6ScaleFacts(page);receipt.ordinary={original,returned:ordinary,state:ordinaryState,delta:ordinary.top-original.top};
+ receipt.checks.push({id:'ordinary-no-anchor989',ok:ordinary.focused&&ordinary.scrollY>0&&Math.abs(ordinary.top-original.top)<=4&&ordinaryState.tokenIndex==='989'&&ordinaryState.passage===PASSAGE_A});
+ assert(receipt.checks.at(-1).ok,'ordinary no-anchor989 return must remain exact');
+
+ for(const [from,to]of [['article','shelf'],['shelf','sky']]){const before=await g6ScaleFacts(page);assert.equal(before.scale,from);await g6Activate(page,page.locator(`${G6_RAIL}[data-scale="${from}"] button[data-scale-out]`),'touch');await page.waitForFunction(v=>document.body.dataset.view===v,to==='sky'?'drift':'shelf');const after=await g6ScaleFacts(page);receipt.steps.push({name:`${from}->${to}`,before,after});assert.equal(after.passage,PASSAGE_A);assert.equal(after.tokenIndex,String(RETAIN));assert.equal(after.scale,to);}
+ await page.waitForFunction(()=>[...document.querySelectorAll('#drift-layer .scale-star-kept')].some(n=>JSON.parse(n.dataset.keptKey)[0]==='わかる'));
+ const stars=(await g6SkyFacts(page)).stars.filter(s=>JSON.parse(s.key)[0]==='わかる');assert.equal(stars.length,1);receipt.keptKey=stars[0].key;receipt.pan=await g6PanToKept(page,stars[0].key);const star=page.locator('#drift-layer .scale-star-kept').filter({hasText:'わかる'});assert.equal(await star.count(),1);await star.tap();await pageSettled(page);receipt.keptPage=await g6ScaleFacts(page);assert.equal(receipt.keptPage.node,'word:わかる');assert.equal(receipt.keptPage.tokenIndex,String(RETAIN));
+ const details=page.locator('#sheet details.learning-source');assert.equal(await details.count(),1,'canonical received source disclosure exists');assert.equal(await details.locator('.teacher-source-quote').textContent(),encounter.quote);if(!await details.evaluate(n=>n.open))await details.locator('summary').tap();
+ const sourceDoor=page.locator('#learning-source-return');assert.equal(await sourceDoor.count(),1);receipt.invoked={sourceIndex:encounter.index,sourceId:encounter.sourceId,retainedIndex:RETAIN,word:'わかる',quote:await details.locator('.teacher-source-quote').textContent(),before:await g6ScaleFacts(page),beforeRecordRevision:(await readAppRecordSnapshot(page)).revision};
+ await sourceDoor.tap();await page.waitForFunction(pid=>document.body.dataset.view==='reader'&&document.querySelector('.listen-row')?.dataset.passage===pid&&!document.getElementById('sheet'),PASSAGE_A);
+ await page.waitForFunction(({a,b})=>document.querySelector('#reader')?.dataset.scaleReturnIndex===String(a)||document.activeElement?.dataset?.index===String(b),{a:RETAIN,b:2351},{timeout:7000});
+ await page.evaluate(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))));
+ const after=await readAppRecordSnapshot(page);receipt.landed={retained:await tokenFacts(RETAIN),source:await tokenFacts(2351),state:await g6ScaleFacts(page),completion:await page.locator('#reader').evaluate(n=>({...n.dataset})),sourceBack:await page.locator('#reader-source-back').count(),revision:after.revision,learningUnchanged:JSON.stringify(g6Learning(imported.record))===JSON.stringify(g6Learning(after.record))};
+ receipt.landed.retainedDelta=receipt.landed.retained.top-original.top;receipt.sourceIndexMatches=receipt.landed.source.focused&&receipt.landed.source.top>=0&&receipt.landed.source.bottom<=844;receipt.reproducedWrongRetainedOccurrence=receipt.landed.retained.focused&&Math.abs(receipt.landed.retainedDelta)<=4&&!receipt.sourceIndexMatches;
+
+ receipt.checks.push({id:'explicit-source2351',ok:receipt.sourceIndexMatches,observed:receipt.landed});
+
+ const requestedBefore=await tokenFacts(2351);
+ await g6Activate(page,page.locator(`${G6_RAIL}[data-scale="article"] button[data-scale-out]`),'touch');await page.waitForFunction(()=>document.body.dataset.view==='shelf');
+ const outward=await g6ScaleFacts(page);
+ await g6Activate(page,page.locator(`${G6_RAIL}[data-scale="shelf"] button[data-scale-in]`),'touch');
+ await page.waitForFunction(()=>['989','2351'].includes(document.querySelector('#reader')?.dataset.scaleReturnIndex));await page.evaluate(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))));
+ const afterJourney=await tokenFacts(2351),journeyState=await g6ScaleFacts(page),journeyRecord=await readAppRecordSnapshot(page);
+ receipt.followup={before:requestedBefore,outward,after:afterJourney,state:journeyState,delta:afterJourney.top-requestedBefore.top,completion:await page.locator('#reader').evaluate(n=>({...n.dataset}))};
+ receipt.checks.push({id:'new-source-outward-inward2351',ok:outward.tokenIndex==='2351'&&journeyState.tokenIndex==='2351'&&afterJourney.focused&&afterJourney.top>=0&&afterJourney.bottom<=844&&afterJourney.scrollY>0&&Math.abs(receipt.followup.delta)<=4,observed:receipt.followup});
+ receipt.checks.push({id:'learning-unchanged',ok:JSON.stringify(g6Learning(imported.record))===JSON.stringify(g6Learning(journeyRecord.record)),observed:{before:g6Learning(imported.record),after:g6Learning(journeyRecord.record)}});
+
+ for(const row of receipt.checks)emit(row.id,{ 'ordinary-no-anchor989':'ordinary shelf return preserves retained989 exactly', 'explicit-source2351':'received saved source2351 overrides retained same-passage989', 'new-source-outward-inward2351':'outward/inward journey captures and returns the new source2351 within4px', 'learning-unchanged':'source/scale travel preserves saved learning roots' }[row.id],row.ok,row.observed||{label:receipt.label,ordinary:receipt.ordinary,encounter:receipt.encounter,retained:receipt.retained,steps:receipt.steps});
+
+}
+
 async function g6KeptProjection(page,{emit}){
   const home=await g6OpenOrigin(page,'touch'),origin=page.locator(`#reader .tok[data-index="${home.origin.index}"]`);
   await stage(page,origin);await page.locator('#mini-take').tap();
@@ -1150,6 +1216,7 @@ async function runG6Suite(browser){
         await run(`sky.${native?'native':'handlers'}.stage`,['stage.blocks-sky','stage.no-record-write'],(page,{context,emit})=>g6SkyStageGate(page,{context,emit,native}));
       }
       for(const kind of ['cue','grade'])await run(`sky.pending-${kind}`,['pending.block','pending.commit','pending.resume'],(page,{context,emit})=>g6PendingGuard(page,{context,emit,kind}));
+      await run('source.received-occurrence',['ordinary-no-anchor989','explicit-source2351','new-source-outward-inward2351','learning-unchanged'],(page,{emit})=>g6ReceivedSourceReturn(page,{emit}));
       await run('sky.kept-projection',['kept.identity','kept.native-door','kept.no-record-write','kept.list-only','kept.removed'],(page,{emit})=>g6KeptProjection(page,{emit}));
       const ids=['reader.synthetic','word.synthetic','sentence.synthetic','stage.synthetic'];
       await run('text-policy',ids,async(page,{context,emit})=>{
