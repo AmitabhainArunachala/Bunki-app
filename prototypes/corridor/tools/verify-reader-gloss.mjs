@@ -192,12 +192,11 @@ const CONTROLS = Object.freeze([
     witness: (rows) => (seen(rows, 'M.dare.chooser').candidates?.[0]?.head === 'たれ' ? '' : 'だれ did not list たれ first') }),
   Object.freeze({ name: 'c5', title: "the r3 overlay removed (lookup()'s own head and reading)", edits: ['noOverlay'], run: 'match',
     requires: ['M.iu.chooser', 'M.iu.choose', 'M.dare.chooser'],
-    // the overlay's chosen rows die without it
+    // the overlay's chosen rows die without it. R2 (Kimi 1632) · ゆけ and 分かっ died here too when their dive beat the full
+    // dictionary's answer and went D11's way, through this overlay; namedFixture now dives once the popup has answered, so
+    // their pages are their named entries' own and the kill set is exactly these two again
     kills: ['M.dare.tare', 'M.iu.yuu'],
-    // R2 (Kimi 1632) · ゆけ's Full entry may open through D11's reading match (noteBy "reading") when the full dictionary has
-    // not yet named its entry on the door; that page's Save then rides the same overlay, so without it ゆけ's Save is held.
-    // Whether it does depends on which arrives first, so it may die here, never must
-    allowed: ['M.yuke.named'],
+    allowed: [],
     witness: (rows) => (seen(rows, 'M.dare.tare').headword === 'だれ／垂れ・垂' && seen(rows, 'M.iu.yuu').headword === 'いう／結う'
       ? '' : '垂れ and 結う were not displayed under lookup()\'s heads だれ and いう') }),
   Object.freeze({ name: 'c9', title: "lookup()'s alt kept beside the chosen head (r4 reverted)", edits: ['altKept'], run: 'match',
@@ -593,7 +592,14 @@ async function chooserFixture(page, once, { fixture, id, choices, pick, pickRow,
  * displayed under the dictionary form as written, read the derived way, its first sense, complete, no chooser and no match
  * note, and its one Save the entry's (not held). */
 async function namedFixture(page, once, id, fixture, entry) {
-  await fullEntry(page, fixture);
+  // R2 · "its door names #…" holds once the full dictionary has answered: the dive waits for the popup's answer
+  // (aria-busy cleared), as M.itt's card does. A dive before the answer goes D11's way (the base's path for every
+  // inflected word: a reading match, its note, the matched head), which these rows are not about; under load in WebKit
+  // the second tap could beat the answer (R2 reader-gloss-final-load50: ゆけ and 分かっ opened by "reading"/"spelling")
+  await openPopup(page, fixture);
+  await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 30_000 });
+  await tap(page, fixture);
+  await page.locator('#sheet').waitFor();
   await settleSheet(page);
   const state = await sheetState(page);
   once(id, `${at(fixture)}: its door names #${entry.seq}; Full entry opens that entry's own page, displayed ${entry.headword} (head ${entry.head}) read ${entry.reading}, first sense "${entry.gloss}", no chooser or match note, its one Save the entry's`,
