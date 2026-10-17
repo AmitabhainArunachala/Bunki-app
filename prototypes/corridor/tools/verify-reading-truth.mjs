@@ -45,8 +45,9 @@
  *       served data gives a class is recorded as of unknown class); never "Not in the quick dictionary" once settled;
  *       never a card left at "…"; a card naming no entry holds its Save and says why.
  *       Counts and every exception are written to the report
- *   R   recorded, never asserted: 式 in 表彰式 and 改造 in 内閣改造 (sense: the tokens carry no sense data), ちかい in
- *       the phonetic parenthetical (G3), し of する (an inflected verb reads its dictionary form), the first paint
+ *   R   recorded, never asserted: 式 in 表彰式 and 改造 in 内閣改造 (sense: the tokens carry no sense data),
+ *       し of する (an inflected verb reads its dictionary form), the first paint. G3 explicitly asserts
+ *       that ちかい in the phonetic parenthetical is an annotation with no door, extra ruby or menu.
  * Every engine run logs browser.version(). READING_TRUTH_ONLY=<case,…> runs only the named cases (a negative control's
  * scope); such a run is marked partial in the report and is never an acceptance result. READING_TRUTH_PAST_F0=1 lets a
  * negative control that moves a fixture (the 私/わたくし entry dropped) watch the browser too: the run still fails on F0
@@ -323,6 +324,8 @@ const F0_OK = rows.every((row) => row.recorded || row.ok);
 /* ------------------------------------------------------------------ the browser */
 const host = await startStaticHost({ site, port: 0 });
 async function boot(page, query = '?entry=shelf&ui=bi') {
+  // The demo has its own fresh-record gate; reading-truth measures deliberate lookup.
+  await page.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
   await page.goto(`${host.origin}/index.html${query}`);
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
 }
@@ -361,7 +364,29 @@ const miniState = (page) => page.evaluate(() => {
  * until the answer redraws it (or the answer changes nothing). */
 async function slip(page, locator, { keyboard = false } = {}) {
   await closeMini(page);
-  if (keyboard) { await locator.focus(); await page.keyboard.press('Enter'); } else await tapAt(page, locator);
+  const activate = async () => {
+    if (keyboard) {
+      const rover = await locator.evaluate((node) => {
+        const block = node.closest('[data-prose-roving]');
+        if (!block) return null;
+        const selector = block.hasAttribute('data-reader-prose') ? '.tok[data-para]' : '.japanese-lookup-word';
+        return { index: [...block.querySelectorAll(selector)].filter((word) => word.closest('[data-prose-roving]') === block).indexOf(node) };
+      });
+      if (rover) {
+        assert(rover.index >= 0, 'the requested word belongs to its prose rover');
+        await locator.locator('xpath=ancestor::*[@data-prose-roving][1]').focus();
+        await page.keyboard.press('Home');
+        for (let n = 0; n < rover.index; n++) await page.keyboard.press('ArrowRight');
+      } else await locator.focus();
+      await page.keyboard.press('Enter');
+    } else await tapAt(page, locator);
+  };
+  await activate();
+  // G3: a known on-touch reading is a real first rung. Advance only after observing the explicit reading rung;
+  // never conceal a dead door with an unconditional second tap. All entry assertions below remain unchanged.
+  await page.waitForFunction((node) => !!document.getElementById('mini') || node.dataset.ladderRung === 'reading',
+  await locator.elementHandle(), { timeout: 20000 });
+  if (!await page.locator('#mini').count()) await activate();
   await page.locator('#mini').waitFor({ timeout: 20000 });
   const first = await miniState(page);
   await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 30000 });
@@ -519,7 +544,23 @@ async function stableCases(page) {
     name.settled?.gloss === NO_ENTRY && name.settled.take?.disabled && name.settled.reason === SAVE_REASON, name.settled);
   for (const fixture of RECORDED.filter((f) => f.at === STARTUP)) record(`R.${fixture.name}`, fixture.name, (await slip(page, tok(page, fixture.index))).settled);
   await openArticle(page, CABINET);
-  for (const fixture of RECORDED.filter((f) => f.at === CABINET)) record(`R.${fixture.name}`, fixture.name, (await slip(page, tok(page, fixture.index))).settled);
+  for (const fixture of RECORDED.filter((f) => f.at === CABINET)) {
+    if (fixture.index !== 11) { record(`R.${fixture.name}`, fixture.name, (await slip(page, tok(page, fixture.index))).settled); continue; }
+    await closeMini(page);
+    const annotation = page.locator('#reader span[data-index="11"][data-reader-annotation="true"]');
+    await annotation.waitFor();
+    const before = await annotation.evaluate((node) => ({ text: node.textContent, action: node.dataset.action ?? null,
+      role: node.getAttribute('role'), popup: node.getAttribute('aria-haspopup'), paragraphDoor: node.hasAttribute('data-para'),
+      ruby: node.querySelectorAll('ruby,rt').length }));
+    await annotation.tap(); await delay(200);
+    const afterTap = await page.evaluate(() => ({ mini: !!document.getElementById('mini'), page: !!document.getElementById('sheet'),
+      raised: document.querySelector('[data-index="11"][data-reader-annotation]')?.dataset.ladderRung ?? null }));
+    await annotation.click({ button: 'right' }); await delay(200);
+    const menu = await page.locator('#reader-word-menu').count();
+    check('G3.phonetic-annotation', 'Cabinet token11 ちかい remains source text, with no lookup door, extra ruby, stage or word menu',
+      before.text === fixture.s && !before.action && !before.role && !before.popup && !before.paragraphDoor && before.ruby === 0
+        && !afterTap.mini && !afterTap.page && !afterTap.raised && menu === 0, { before, afterTap, menu });
+  }
   await closeMini(page);
 }
 

@@ -26,7 +26,8 @@ const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all'
 assert(engines.every(engine => ['chromium', 'webkit'].includes(engine)));
 const act = (page, action) => page.locator(`.guided-room [data-action="${action}"]`).first();
 const stored = page => page.evaluate(key => JSON.parse(localStorage.getItem(key)), key);
-const lookup = page => page.locator('.guided-room .gs-question .japanese-lookup-word').first();
+// A written kanji with a hidden reading exercises both rungs; kana may correctly skip to stage.
+const lookup = page => page.locator('.guided-room .gs-question .japanese-lookup-word').filter({ hasText: /\p{Script=Han}/u }).first();
 const learning = async page => {
   const record = await readAppRecord(page);
   return { taken: record.taken || [], srs: record.srs || {}, revlog: record.revlog || [] };
@@ -50,10 +51,30 @@ async function closeMini(page) {
   // chrome) can lie over the room's eyebrows, so a click outside may land on the popup itself.
   await page.locator('#mini button').first().press('Escape');
   await page.locator('#mini').waitFor({ state: 'detached' });
+  assert.equal(await page.locator('.guided-room [data-ladder-rung]').count(), 0, 'Closing the stage clears its reading rung');
+  assert.equal(await lookup(page).locator('rt').count(), 0, 'The occurrence is bare again');
+}
+async function revealReading(page) {
+  assert.equal(await lookup(page).locator('rt').count(), 0, 'No reading before activation');
+  await lookup(page).click();
+  await page.locator('.guided-room .gs-question [data-ladder-rung="reading"]').waitFor();
+  assert.equal(await page.locator('#mini').count(), 0, 'First tap reveals only the reading');
+  const visible = await lookup(page).locator('rt').evaluateAll(nodes => nodes.some(node => {
+    const style = getComputedStyle(node);
+    return node.textContent.trim() && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0;
+  }));
+  assert.equal(visible, true, 'The reading is actually visible, not only marked in state');
+}
+async function openStage(page) {
+  await lookup(page).click();
+  await page.locator('#mini').waitFor();
+  assert.equal(await lookup(page).getAttribute('data-ladder-rung'), 'stage', 'The repeated tap advances the same occurrence');
 }
 try {
   for (const engine of engines) {
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true });
+    const browserVersion = browser.version();
+    console.log(`BROWSER ${engine} ${browserVersion}`);
     const check = async (name, body) => {
       const context = await browser.newContext({ viewport: { width: 1024, height: 900 }, serviceWorkers: 'block', reducedMotion: 'reduce' });
       await silenceBrowserAudio(context);
@@ -67,9 +88,11 @@ try {
         window.__guidedHintSnapshots = [];
         addEventListener('DOMContentLoaded', () => {
           new MutationObserver(() => {
-            if (!document.getElementById('mini') || window.__guidedHintSnapshots.length) return;
-            window.__guidedHintSnapshots.push(JSON.parse(localStorage.getItem(key)));
-          }).observe(document.body, { childList: true, subtree: true });
+            const rung = document.querySelector('.guided-room [data-ladder-rung="reading"]') ? 'reading'
+              : document.getElementById('mini') ? 'stage' : null;
+            if (!rung || window.__guidedHintSnapshots.some(row => row.rung === rung)) return;
+            window.__guidedHintSnapshots.push({ rung, state: JSON.parse(localStorage.getItem(key)) });
+          }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-ladder-rung'] });
         });
       }, key);
       const page = await context.newPage(), errors = [];
@@ -81,12 +104,12 @@ try {
         const observed = await body(page);
         assert.deepEqual(await learning(page), before, 'Lookup and answers never invent deck cards or review grades');
         assert.deepEqual(errors, []);
-        results.push({ engine, name, passed: true, observed });
+        results.push({ engine, browserVersion, name, passed: true, observed });
         console.log(`PASS ${engine}/${name}`);
       } catch (error) {
         const screenshot = resolve(evidence, `${engine}-${name}.png`);
         await page.screenshot({ path: screenshot, fullPage: true }).catch(() => {});
-        results.push({ engine, name, passed: false, error: error.stack || String(error), errors, screenshot });
+        results.push({ engine, browserVersion, name, passed: false, error: error.stack || String(error), errors, screenshot });
         console.log(`FAIL ${engine}/${name}: ${error.message}`);
       } finally {
         await context.close();
@@ -96,21 +119,24 @@ try {
       await check('lookup-before-and-after-answer', async page => {
         const first = Q[0].id, second = Q[1].id;
         assert.notEqual((await stored(page)).answers[first].lookupBefore, true, 'Rendering a lookup button is not help');
-        await lookup(page).click();
-        await page.locator('#mini').waitFor();
-        const atHint = await page.evaluate(() => window.__guidedHintSnapshots[0]);
-        assert.equal(atHint.answers[first].lookupBefore, true, 'Help is durable before the popup appears');
+        await revealReading(page);
+        const atHint = await page.evaluate(() => window.__guidedHintSnapshots.find(row => row.rung === 'reading')?.state);
+        assert(atHint, 'The initial reading exposure was observed');
+        assert.equal(atHint.answers[first].lookupBefore, true, 'Help is durable before the reading appears');
         assert.equal(atHint.answers[first].choice, null);
         assert.equal(atHint.answers[first].correct, null);
         assert.equal(atHint.answers[first].helpBefore, false);
         assert.equal(atHint.answers[first].explained, false, 'Dictionary help does not reveal the explanation');
+        await openStage(page);
+        const atStage = await page.evaluate(() => window.__guidedHintSnapshots.find(row => row.rung === 'stage')?.state);
+        assert.deepEqual(atStage?.answers[first], atHint.answers[first], 'Advancing to the stage does not change assistance or the answer');
         await closeMini(page);
         await answer(page, 0);
         assert.match(await page.locator('.gs-feedback').innerText(), /looked up a word before answering/u);
         await act(page, 'next').click();
         await answer(page, 1);
-        await lookup(page).click();
-        await page.locator('#mini').waitFor();
+        await revealReading(page);
+        await openStage(page);
         await closeMini(page);
         let state = await stored(page);
         assert.equal(state.answers[second].lookupBefore, false, 'Post-answer lookup does not rewrite an independent answer');
@@ -130,17 +156,21 @@ try {
         await lookup(page).click();
         await page.waitForTimeout(100);
         assert.equal(await page.locator('#mini').count(), 0, 'A refused help write cannot expose the hint');
+        assert.equal(await page.locator('.guided-room [data-ladder-rung]').count(), 0, 'A refused write cannot expose the reading rung');
+        assert.equal(await lookup(page).locator('rt').count(), 0, 'A refused write leaves the occurrence bare');
+        assert.deepEqual(await page.evaluate(() => window.__guidedHintSnapshots), [], 'No transient hint preceded the refused write');
         assert.deepEqual(await stored(page), before, 'A refused write leaves the saved session unchanged');
         assert.doesNotMatch(await page.locator('.gs-sheet').innerText(), /Word looked up/u);
         await page.evaluate(() => { window.__refuseGuidedSave = false; });
-        await lookup(page).click();
-        await page.locator('#mini').waitFor();
+        await revealReading(page);
+        await openStage(page);
         await closeMini(page);
         const stale = await lookup(page).elementHandle();
         await page.locator('.guided-room [data-action="source"][data-index="1"]').click();
         await stale.evaluate(node => node.click());
         await page.waitForTimeout(100);
         assert.equal(await page.locator('#mini').count(), 0, 'A retired question cannot expose a new hint');
+        assert.equal(await page.locator('.guided-room [data-ladder-rung]').count(), 0, 'A retired question cannot expose a reading');
         const state = await stored(page);
         assert.equal(state.answers[first].lookupBefore, true);
         assert.equal(state.answers[second].lookupBefore, false);

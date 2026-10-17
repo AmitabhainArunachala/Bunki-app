@@ -7,10 +7,10 @@
  *   P2  the match cut is one travelling word (G1b): the page is whole from the tap, no view transition runs, and a copy of
  *       the word (.cut-word, animation 'kairo-cut') leaves from the card's headword glyphs and lands on the page's headword
  *       glyphs (the same word), which wait unseen until it lands; the page was built ahead at idle (data-built="ahead")
- *   P3  the cycle: Close → no page, no card, the reading the tap raised is gone; the same word from bare opens its card again
+ *   P3  G3 cycle: page Back → original stage → Escape → bare; direct Ctrl+Enter page Back → bare
  *   P4  a word inside the page opens its OWN card — exactly one, on that word, clear of the page's bar (Back never covered);
- *       its band → depth 2 (‹ Back, a crumb of two); Back → depth 1 (the first word's page); Back → bare
- *   P5  Escape steps back one level: depth 2 → depth 1 → bare
+ *       its band → depth 2; Back → nested stage over depth 1; dismiss → depth 1; Back → original stage → bare
+ *   P5  Escape steps back one visible level through each page and its origin stage
  *   P6  no stale card: a reader word's card still on its way never floats over a page opened meanwhile (Ctrl+Enter)
  *   P7  frames: the worst rAF delta while the page opens and while it closes, ≤ 24 ms in WebKit (Chromium recorded, never
  *       averaged in); the method is one-hand/G1/probe/frames-probe.mjs's (1400 ms from just before a real tap)
@@ -29,9 +29,12 @@
  *   P15 the kanji tiles grow with their text (G1b; the critic's finding 3): each KANJI IN THIS WORD glyph at twice its size
  *       (both engines) — and, in Chromium, the whole page at 200 % text (-webkit-text-size-adjust, the critic's probe; WebKit
  *       on a desktop does not apply it) — stays inside its tile, and the tile keeps its 48 px floor
+ * G3 negative controls: --controls replays stalled tap2, uncleared ruby and a front door; harness failures are incomplete.
+ * --g3-only is an explicit narrow slice, never a claim that the retained G1 gates passed.
  * Negative controls (one-hand/G1/neg-control): the 91dvh cap back → P1 red; the scrim re-appended → P1 red; the word not
  * sent travelling (enterWord) → P2 red; the page fading in over the reader instead of arriving whole → P14 red. */
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
@@ -40,10 +43,13 @@ import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
+import { readAppRecord } from './record-test-support.mjs';
+import { serveMutation } from './reader-gloss-mutants.mjs';
 
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Pin an immutable built site and its digest');
 const site = resolveCorridorSite(), evidence = resolveCorridorEvidence();
 const identity = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), 'utf8'));
+const verifierSha256 = createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex');
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
@@ -63,7 +69,9 @@ const check = (id, title, ok, observed = '') => {
   console.log(`${ok ? 'ok  ' : 'FAIL'} ${engine}/${id} ${title}${ok ? '' : ` — ${JSON.stringify(observed).slice(0, 500)}`}`);
   return !!ok;
 };
-const frames = [];
+const frames = [], browserVersions = {}, controls = [];
+const g3Only = process.argv.includes('--g3-only');
+const withControls = process.argv.includes('--controls');
 
 const host = await startStaticHost({ site, port: 0 });
 async function boot(page, { world = null } = {}) {
@@ -79,19 +87,65 @@ async function boot(page, { world = null } = {}) {
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
 }
 async function openStory(page, opts) {
+  const story = opts?.story || STORY;
   await boot(page, opts);
-  const direct = page.locator(`[data-passage="${STORY.id}"]:not([data-recommendation]) .shelf-open`).first();
+  const direct = page.locator(`[data-passage="${story.id}"]:not([data-recommendation]) .shelf-open`).first();
   if (await direct.count()) await direct.click();
   else {
     await openShelfTools(page);
-    await page.locator('#shelf-reading-search').fill(STORY.search);
+    await page.locator('#shelf-reading-search').fill(story.search);
     await page.locator('#shelf-reading-search').press('Enter');
-    await page.locator(`#shelf-reading-results [data-passage="${STORY.id}"] .shelf-open`).first().click();
+    await page.locator(`#shelf-reading-results [data-passage="${story.id}"] .shelf-open`).first().click();
   }
   await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 20000 });
   await delay(900);
 }
-const readerWord = (page, label = WORD) => page.locator(`#reader .tok[aria-label="${label}"]`).first();
+const readerWord = (page, label = WORD) => page.locator(`#reader .tok[data-prose-label="${label}"]`).first();
+const visibleReading = (node) => [...node.querySelectorAll('ruby')].some((ruby) => {
+  const rt = ruby.querySelector('rt');
+  if (!rt?.textContent.trim()) return false;
+  const style = getComputedStyle(rt);
+  if (!rt.classList.contains('hidden-rt') && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0) return true;
+  // The reader paints on-touch ruby in ::before to keep line geometry; deck backs use ::after.
+  return ['::before', '::after'].some((pseudo) => {
+    const ink = getComputedStyle(ruby, pseudo);
+    return !['none', 'normal', '""', "''", ''].includes(ink.content) && ink.display !== 'none' && ink.visibility !== 'hidden' && Number(ink.opacity) > 0;
+  });
+});
+/** Advance only an observed reading rung; a dead door is never rescued with an unconditional extra tap. */
+async function stage(page, locator) {
+  await locator.tap();
+  await page.waitForFunction((node) => !!document.getElementById('mini') || node.dataset.ladderRung === 'reading',
+    await locator.elementHandle(), { timeout: 10000 });
+  if (!await page.locator('#mini').count()) await locator.tap();
+  await page.locator('#mini .mini-word').waitFor();
+}
+async function focusWord(page, locator) {
+  const at = await locator.evaluate((node) => [...node.closest('[data-prose-roving]').querySelectorAll('.tok[data-para]')].indexOf(node));
+  assert(at >= 0, 'the word belongs to its paragraph rover');
+  await locator.locator('xpath=ancestor::*[@data-prose-roving][1]').focus();
+  await page.keyboard.press('Home');
+  for (let i = 0; i < at; i++) await page.keyboard.press('ArrowRight');
+}
+async function furigana(page, value) {
+  await page.locator('#dials-toggle').click();
+  await page.locator(`[data-dial="furigana:${value}"]`).click();
+  await page.locator(`[data-dial="furigana:${value}"][aria-pressed="true"]`).waitFor();
+  await page.locator('#dials-toggle').click();
+}
+async function ladderFacts(page, locator) {
+  const reading = await locator.evaluate(visibleReading);
+  return { reading, ...await page.evaluate(() => ({
+    stages: document.querySelectorAll('#mini').length, page: !!document.getElementById('sheet'),
+    word: document.querySelector('#mini .mini-word')?.textContent.trim() ?? null,
+    save: document.querySelector('#mini #mini-take')?.disabled ?? null,
+  })) };
+}
+async function leaveStage(page) {
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.getElementById('mini'));
+  await delay(250);
+}
 /** The page has arrived: present, and no page transition still running. */
 async function pageSettled(page) {
   await page.locator('#sheet').waitFor({ timeout: 15000 });
@@ -137,10 +191,10 @@ const slipFacts = (page) => page.evaluate(() => {
 });
 /** rAF deltas over the window, from just before a real tap on the locator. */
 async function measure(page, locator) {
-  await locator.scrollIntoViewIfNeeded();
+  if (typeof locator !== 'function') await locator.scrollIntoViewIfNeeded();
   await delay(250);
-  const box = await locator.boundingBox();
-  if (!box) return null;
+  const box = typeof locator === 'function' ? null : await locator.boundingBox();
+  if (typeof locator !== 'function' && !box) return null;
   await page.evaluate((ms) => new Promise((done) => {
     window.__g1f = [];
     requestAnimationFrame((t0) => {
@@ -151,11 +205,12 @@ async function measure(page, locator) {
       done();
     });
   }), FRAME_WINDOW);
-  await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+  if (typeof locator === 'function') await locator();
+  else await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
   await delay(FRAME_WINDOW + 250);
   const t = await page.evaluate(() => window.__g1f);
   const deltas = t.slice(1).map((v, i) => Math.round((v - t[i]) * 10) / 10);
-  return { worst: Math.max(...deltas), over24: deltas.filter((d) => d > 24).length, frames: deltas.length, deltas };
+  return { worst: Math.max(...deltas), p95: [...deltas].sort((a, b) => a - b)[Math.ceil(deltas.length * 0.95) - 1], over24: deltas.filter((d) => d > 24).length, frames: deltas.length, deltas };
 }
 const luminance = (color) => {
   const m = String(color).match(/[\d.]+/g)?.map(Number) || [0, 0, 0];
@@ -284,30 +339,255 @@ const P14_LIMIT = 0.2; // % of the old state's ink still visible at any held mom
 try {
   for (engine of engines) {
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true });
-    const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true } = {}) => {
+    browserVersions[engine] = browser.version();
+    console.log(`${engine} ${browserVersions[engine]}`);
+    const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true, control = null, init = null, demo = false } = {}) => {
+      if (g3Only && !name.startsWith('G3')) return;
       const context = await browser.newContext({ viewport, isMobile: mobile, hasTouch: true, deviceScaleFactor: 2, serviceWorkers: 'block' });
       await context.addInitScript(GLYPHS);
+      if (!demo) await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
+      if (init) await context.addInitScript(init);
       await silenceBrowserAudio(context);
       await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
+      if (control) await serveMutation(context, { origin: host.origin, manifest: new Map(identity.files.map((file) => [file.path, file.sha256])), control, edits: control.edits });
       const page = await context.newPage(), errors = [];
       page.setDefaultTimeout(15000);
       page.on('pageerror', (error) => errors.push(error.message));
       try { await body(page); }
       catch (error) {
+        if (control) control.error = String(error.stack || error);
         check(`${name}.error`, `${name} ran to the end`, false, String(error.stack || error).slice(0, 700));
         await page.screenshot({ path: resolve(evidence, `${engine}-${name}-error.png`) }).catch(() => {});
       } finally {
+        if (control) control.pageErrors = errors;
         check(`${name}.page-errors`, `${name}: no page errors`, errors.length === 0, errors);
         await context.close();
       }
     };
 
+    // These short schedules also run against named product mutations. Their checks always
+    // record actual state; an exception, missing row or page error can never kill a mutant.
+    const stalledProbe = async (page) => {
+      await openStory(page);
+      const word = readerWord(page);
+      await word.tap(); await delay(300);
+      const first = await ladderFacts(page, word);
+      check('G3.control.reading', 'known on-touch first activation is reading only', first.reading && !first.stages && !first.page, first);
+      await word.tap(); await delay(650);
+      const second = await ladderFacts(page, word);
+      check('G3.control.stage', 'second activation advances the revealed word to its stage', second.stages === 1 && second.word === WORD && !second.page, second);
+    };
+    const clearProbe = async (page) => {
+      await openStory(page);
+      const word = readerWord(page);
+      await word.tap(); await delay(300);
+      const first = await ladderFacts(page, word);
+      check('G3.clear.reading', 'reading-clear fixture actually revealed its known reading', first.reading && !first.stages && !first.page, first);
+      await page.keyboard.press('Escape'); await delay(300);
+      const after = await ladderFacts(page, word);
+      check('G3.clear.bare', 'Escape from the reading rung clears the raised ruby', !after.reading && !after.stages && !after.page, after);
+    };
+    const frontProbe = async (page) => {
+      await page.goto(`${host.origin}/index.html?deck=mcd&ui=bi`);
+      await page.waitForFunction(() => document.body.dataset.ready === '1');
+      await page.locator('#kp-start').click();
+      await page.locator('#kp-card .kp-sentence').waitFor();
+      const facts = await page.evaluate(() => {
+        const card = document.getElementById('kp-card');
+        return { card: card.dataset.card, text: card.querySelector('.kp-sentence')?.textContent,
+          reveal: !!document.getElementById('kp-reveal'),
+          doors: card.querySelectorAll('.kp-sentence .kp-tok, .kp-sentence [data-deck-word], .kp-sentence [data-ladder-rung], .kp-sentence [role="button"]').length,
+          readings: card.querySelectorAll('.kp-sentence rt').length, stages: document.querySelectorAll('#mini').length };
+      });
+      check('G3.front.fixture', 'the real deck has an unanswered card and nonempty Japanese sentence', !!facts.card && !!facts.text && facts.reveal, facts);
+      check('G3.front.sealed', 'the unanswered sentence has no lookup doors, ruby or stage', facts.doors === 0 && facts.readings === 0 && facts.stages === 0, facts);
+      const point = await page.locator('#kp-card .kp-sentence').evaluate((sentence) => {
+        const walker = document.createTreeWalker(sentence, NodeFilter.SHOW_TEXT), range = document.createRange();
+        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+          if (!node.textContent.trim()) continue;
+          range.selectNodeContents(node);
+          for (const r of range.getClientRects()) {
+            const x = Math.max(1, Math.min(innerWidth - 1, r.left + Math.min(r.width / 2, 12))), y = r.top + r.height / 2;
+            if (x < innerWidth / 2 && y > 0 && y < innerHeight && sentence.contains(document.elementFromPoint(x, y))) return { x, y };
+          }
+        }
+        return null;
+      });
+      assert(point, 'an uncovered sentence glyph is required for the sealed-front press');
+      await page.touchscreen.tap(point.x, point.y); await delay(300);
+      const after = await page.evaluate(() => ({ stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), answered: !document.getElementById('kp-reveal') }));
+      check('G3.front.press', 'a front sentence press cannot expose lookup help or answer the card', !after.stage && !after.page && !after.answered, after);
+    };
+    const schedules = {};
+    for (const [name, probe] of [['G3-stalled', stalledProbe], ['G3-clear', clearProbe], ['G3-front', frontProbe]]) {
+      const begin = rows.length;
+      await walk(name, probe);
+      schedules[name] = rows.slice(begin);
+    }
+
+    await walk('G3-ladder', async (page) => {
+      for (const [mode, name] of [[1, 'on-touch'], [0, 'off'], [2, 'always']]) {
+        await openStory(page);
+        await furigana(page, mode);
+        const word = readerWord(page);
+        const moves = [];
+        const takeMove = async (name, action) => { const timing = await measure(page, action); moves.push({ name, ...timing }); };
+        await takeMove('bare→first', word);
+        let first = await ladderFacts(page, word);
+        check(`G3.${name}.first`, `${name}: first activation ${mode === 1 ? 'reveals only' : 'opens the stage without an empty reading rung'}`,
+          mode === 1 ? first.reading && !first.stages && !first.page : first.stages === 1 && first.word === WORD && !first.page && first.reading === (mode === 2), first);
+        if (mode === 1) await takeMove('reading→stage', word);
+        const second = await ladderFacts(page, word);
+        check(`G3.${name}.stage`, `${name}: one stage names the current word with a live Save`, second.stages === 1 && second.word === WORD && second.save === false && !second.page, second);
+        await delay(1200);
+        await takeMove('stage→page', page.locator('#mini .mini-word'));
+        await pageSettled(page);
+        check(`G3.${name}.page`, 'the stage band opens its own whole-screen page', coversViewport(await pageFacts(page)) && (await pageFacts(page)).headword.startsWith(WORD), await pageFacts(page));
+        await takeMove('page→stage', page.locator('#sheet-back'));
+        await bare(page);
+        const returned = await ladderFacts(page, word);
+        check(`G3.${name}.return-stage`, 'Back restores the same stage, not bare prose or another word', returned.stages === 1 && returned.word === WORD && !returned.page, returned);
+        await takeMove('stage→bare', () => page.keyboard.press('Escape'));
+        const gone = await ladderFacts(page, word);
+        check(`G3.${name}.bare`, `${name}: stage Escape leaves no popup/page and ${mode === 2 ? 'retains always ruby' : 'clears summoned ruby'}`,
+          !gone.stages && !gone.page && gone.reading === (mode === 2), gone);
+        frames.push({ engine, grammar: 'G3', mode: name, moves });
+        check(`G3.${name}.frames`, `${name}: per-move worst and p95 recorded${engine === 'webkit' ? ', every worst ≤ 24 ms' : ' (Chromium, never averaged with WebKit)'}`,
+          moves.length === (mode === 1 ? 5 : 4) && moves.every((row) => Number.isFinite(row.worst) && Number.isFinite(row.p95) && (engine !== 'webkit' || row.worst <= 24)), moves.map(({ name, worst, p95 }) => ({ name, worst, p95 })));
+      }
+    });
+
+    await walk('G3-direct-and-anchor', async (page) => {
+      await openStory(page);
+      const word = readerWord(page);
+      await stage(page, word);
+      await word.tap();
+      await pageSettled(page);
+      check('G3.anchor-third', 'tapping the same anchored word at the stage also opens its page', (await pageFacts(page)).headword.startsWith(WORD), await pageFacts(page));
+      await page.keyboard.press('Escape'); await bare(page);
+      check('G3.escape-stage', 'page Escape restores its stage', (await slipFacts(page)).word === WORD, await slipFacts(page));
+      await leaveStage(page);
+      await focusWord(page, word);
+      await page.keyboard.press('Control+Enter'); await pageSettled(page);
+      check('G3.direct-page', 'Ctrl+Enter opens the full entry directly', coversViewport(await pageFacts(page)), await pageFacts(page));
+      await page.locator('#sheet-back').tap(); await bare(page);
+      const direct = await ladderFacts(page, word);
+      check('G3.direct-bare', 'a direct page returns directly to bare prose without inventing a stage', !direct.page && !direct.stages && !direct.reading, direct);
+      await word.tap(); await delay(250);
+      await page.locator('.reader-meta').click(); await delay(250);
+      const outside = await ladderFacts(page, word);
+      check('G3.outside-reading', 'outside press folds the reading rung to bare', !outside.reading && !outside.stages && !outside.page, outside);
+      const pinch = await word.evaluate((node) => {
+        const actions = [];
+        for (let at = node; at; at = at.parentElement) actions.push({ tag: at.tagName, action: getComputedStyle(at).touchAction });
+        return { actions, viewport: document.querySelector('meta[name="viewport"]')?.content || '' };
+      });
+      check('G3.native-pinch', 'native pinch remains allowed by text ancestors and viewport policy (physical gesture excluded)',
+        pinch.actions.every(({ action }) => action !== 'none' && (!/pan-[xy]/u.test(action) || action.includes('pinch-zoom'))) && !/user-scalable\s*=\s*(no|0)|maximum-scale\s*=\s*1(?:\D|$)/iu.test(pinch.viewport), pinch);
+    });
+
+    await walk('G3-current-save', async (page) => {
+      await openStory(page, { story: { id: 'aozora:049966-1', search: '河口慧海' } });
+      const meaning = page.locator('#reader .tok[data-index="540"]');
+      const shina = page.locator('#reader .tok[data-index="547"]');
+      await stage(page, meaning);
+      const first = await page.locator('#chrome-keep').getAttribute('aria-label');
+      check('G3.save.fixture', 'the first stage and bar refer to 意味', (await slipFacts(page)).word === '意味' && /意味/u.test(first || ''), { first, stage: await slipFacts(page) });
+      await leaveStage(page);
+      await stage(page, shina);
+      await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true');
+      const state = await page.evaluate(() => { const bar = document.getElementById('chrome-keep'), save = document.querySelector('#mini #mini-take'); return {
+        word: document.querySelector('#mini .mini-word')?.textContent.trim(), held: save?.disabled, bar: bar && { name: bar.getAttribute('aria-label'), text: bar.textContent, disabled: bar.disabled, held: bar.classList.contains('reader-capture-held'), rest: bar.hasAttribute('data-save-rest') },
+      }; });
+      check('G3.save.current', 'unconfirmed シナ holds Save and never leaves live 意味 in the top bar', state.word === 'シナ' && state.held === true && (!state.bar || state.bar.rest || (state.bar.held && /シナ/u.test(`${state.bar.name} ${state.bar.text}`))) && !/意味/u.test(`${state.bar?.name} ${state.bar?.text}`), state);
+      const beforeSave = await readAppRecord(page);
+      if (state.bar && !state.bar.disabled) await page.locator('#chrome-keep').click();
+      await delay(500);
+      const record = await readAppRecord(page);
+      check('G3.save.no-phantom', 'changing stage never saves the previous word', JSON.stringify(record.taken) === JSON.stringify(beforeSave.taken) && !record.taken.some((item) => item.t === 'word' && item.id === '意味'), record.taken);
+    });
+
+    await walk('G3-kana', async (page) => {
+      await openStory(page, { story: { id: 'global-voices:2026-09-28-65726', search: 'ダマスカス' } });
+      const word = page.locator('#reader .tok[data-index="0"]');
+      check('G3.kana.fixture', 'the first word is the authored ダマスカス fixture', await word.getAttribute('data-prose-label') === 'ダマスカス', await word.textContent());
+      await word.tap(); await delay(600);
+      const same = await ladderFacts(page, word);
+      check('G3.kana.identical', 'identical kana, including hiragana/katakana equivalents, skips an empty reading rung', same.stages === 1 && same.word === 'ダマスカス' && !same.page && !same.reading, same);
+      await page.keyboard.press('Escape'); await delay(200);
+      const particle = readerWord(page, 'の');
+      await particle.tap(); await delay(600);
+      const part = await ladderFacts(page, particle);
+      check('G3.kana.particle', 'a one-character particle is a word door and reaches a nonempty stage', part.stages === 1 && !!part.word && !part.page, part);
+    });
+
+    await walk('G3-demo', async (page) => {
+      await boot(page);
+      const learning = (r) => Object.fromEntries(['taken', 'srs', 'obslog', 'revlog', 'deepWords', 'lists'].map((key) => [key, r[key] ?? null]));
+      const before = learning(await readAppRecord(page));
+      await openStory(page);
+      await page.locator('#mini[data-demo="true"] .mini-word').waitFor();
+      const seen = await page.evaluate(() => ({ stages: document.querySelectorAll('#mini').length, word: document.querySelector('#mini[data-demo="true"] .mini-word')?.textContent.trim(),
+        tip: document.querySelectorAll('#reader-tip').length, text: /Tap any word for its meaning\./u.test(document.body.innerText), key: localStorage.getItem('kairo-word-ladder-demo-v1') }));
+      check('G3.demo.once', 'one word demonstrates its stage without a permanent instructional tip', seen.stages === 1 && !!seen.word && !seen.tip && !seen.text && seen.key === '1', seen);
+      await delay(800);
+      check('G3.demo.no-work', 'the automatic demonstration creates no lookup, saved card or review work', JSON.stringify(learning(await readAppRecord(page))) === JSON.stringify(before), { before, after: learning(await readAppRecord(page)) });
+      await page.keyboard.press('Escape');
+      await openStory(page); await delay(900);
+      check('G3.demo.no-replay', 'navigation does not replay the demonstration', await page.locator('#mini[data-demo="true"], #reader-tip').count() === 0, await slipFacts(page));
+    }, { demo: true });
+
+    if (withControls) {
+      const specs = [
+        { id: 'stalled-second', run: 'G3-stalled', probe: stalledProbe, kill: 'G3.control.stage',
+          witness: (row) => row.observed.reading && row.observed.stages === 0 && !row.observed.page,
+          edits: [{ file: 'corridor.js', key: 'stall-reading-to-stage',
+            from: "      ladderVisit.rung = anchor.dataset.ladderRung = 'stage';\n      return ladderVisit.openStage({ restore: false, demo: false });",
+            to: "      return 'reading'; // G3 negative: the second activation stalls" }] },
+        { id: 'ruby-survives-back', run: 'G3-clear', probe: clearProbe, kill: 'G3.clear.bare',
+          witness: (row) => row.observed.reading && row.observed.stages === 0 && !row.observed.page,
+          edits: [{ file: 'corridor.js', key: 'omit-clear-reveal', from: '  visit.clearReveal?.();', to: '  /* G3 negative: retain the raised reading */' }] },
+        { id: 'front-door', run: 'G3-front', probe: frontProbe, kill: 'G3.front.sealed',
+          witness: (row) => row.observed.doors > 0 && row.observed.reveal,
+          edits: [{ file: 'decks/player/mount.js', key: 'front-tap-cover',
+            from: "sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage })",
+            to: "sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage, taps: backTaps(card, word) })" },
+          { file: 'decks/player/mount.js', key: 'front-door-gate',
+            from: '    taps = null; // the front has nothing to tap, whatever is asked',
+            to: '    /* G3 negative: retain the front tap cover */' }] },
+      ];
+      for (const spec of specs) {
+        const control = { engine, id: spec.id, edits: spec.edits, served: [], pageErrors: [] };
+        const begin = rows.length;
+        await walk(spec.run, spec.probe, { control });
+        control.rows = rows.splice(begin);
+        const baseline = schedules[spec.run];
+        const expected = baseline.map((row) => row.id);
+        const actual = control.rows.map((row) => row.id);
+        const target = control.rows.find((row) => row.id === `${engine}/${spec.kill}`);
+        const cleanCandidate = baseline.length > 1 && baseline.every((row) => row.ok) && new Set(expected).size === expected.length;
+        const complete = !control.error && !control.setupError && control.pageErrors.length === 0 &&
+          JSON.stringify(actual) === JSON.stringify(expected) && spec.edits.every((edit) => control.served.some((served) => served.file === edit.file && served.applied.some((applied) => applied.key === edit.key)));
+        const killed = cleanCandidate && complete && target && !target.ok && spec.witness(target) &&
+          control.rows.every((row) => row.id === target.id || row.ok);
+        control.verdict = !cleanCandidate || !complete ? 'incomplete' : killed ? 'killed' : target?.ok ? 'survived' : 'contaminated';
+        // Re-run the exact unmodified schedule in a new context. Source bytes are never edited on disk.
+        const restoreBegin = rows.length;
+        await walk(spec.run, spec.probe);
+        control.restore = rows.splice(restoreBegin);
+        const restored = JSON.stringify(control.restore.map((row) => row.id)) === JSON.stringify(expected) && control.restore.every((row) => row.ok);
+        controls.push(control);
+        check(`G3.negative.${spec.id}`, 'candidate passes, named product mutation fails its intended assertion, and unmodified restore passes',
+          killed && restored, { verdict: control.verdict, cleanCandidate, complete, restored, target, setupError: control.setupError, error: control.error });
+      }
+    }
+
     // P1 · P2 · P3 · P9 · P10 · P12 — one walk through the reader's word into its page and out
     await walk('page', async (page) => {
       await openStory(page);
-      await readerWord(page).tap();
+      await stage(page, readerWord(page));
       await page.locator('#mini .mini-word').waitFor();
-      check('P3.card', `a tap on ${WORD} opens its card`, (await slipFacts(page)).word === WORD, await slipFacts(page));
+      check('P3.card', `the reading rung then a tap on ${WORD} opens its stage`, (await slipFacts(page)).word === WORD, await slipFacts(page));
       await delay(1200); // the page is built ahead at idle once the card is up
       const leaves = await glyphsOf(page, '#mini .mini-word');
       // the flight read at its two ends: the first frame that runs 'kairo-cut' holds it at 0 and just short of its end
@@ -374,32 +654,34 @@ try {
       // P3 the cycle
       await page.locator('#sheet-back').tap();
       await bare(page);
+      const restored = await slipFacts(page);
+      check('P3.stage-return', 'Back from a stage-origin page restores that word stage', restored.count === 1 && restored.word === WORD, restored);
+      await leaveStage(page);
       const after = await page.evaluate((word) => {
-        const tok = document.querySelector(`#reader .tok[aria-label="${word}"]`);
+        const tok = document.querySelector(`#reader .tok[data-prose-label="${word}"]`);
         return { sheet: !!document.getElementById('sheet'), mini: !!document.getElementById('mini'), lit: tok?.classList.contains('lit') || false,
           rubyShown: [...(tok?.querySelectorAll('rt') || [])].some((rt) => !rt.classList.contains('hidden-rt') && getComputedStyle(rt).display !== 'none' && rt.textContent.trim()),
           inert: document.querySelector('#app > main')?.inert || false };
       }, WORD);
-      check('P3.close', 'Close leaves the reader bare: no page, no card, the raised reading gone, the room live again',
+      check('P3.close', 'Stage Escape leaves the reader bare: no page, no stage, the raised reading gone, the room live again',
         !after.sheet && !after.mini && !after.lit && !after.rubyShown && !after.inert, after);
-      await readerWord(page).tap();
+      await stage(page, readerWord(page));
       await page.locator('#mini .mini-word').waitFor();
-      check('P3.again', 'the same word from bare opens its card again', (await slipFacts(page)).word === WORD, await slipFacts(page));
+      check('P3.again', 'the same word from bare reveals then opens its stage again', (await slipFacts(page)).word === WORD, await slipFacts(page));
     });
 
     // P4 · P5 — a word inside the page, depth 2, Back twice; then Escape twice
     await walk('depth', async (page) => {
       await openStory(page);
       for (const way of ['back', 'escape']) {
-        await readerWord(page).tap();
+        await stage(page, readerWord(page));
         await page.locator('#mini .mini-word').tap();
         await pageSettled(page);
         const inside = page.locator('#sheet .example .sentence-tok, #sheet .japanese-lookup-word').filter({ hasText: /^(内閣|大臣|官邸|日本|表彰|出席|大賞)$/u }).first();
         await inside.scrollIntoViewIfNeeded();
         await delay(300);
         const word = (await inside.textContent()).trim();
-        await inside.tap();
-        await page.locator('#mini .mini-word').waitFor();
+        await stage(page, inside);
         await delay(400);
         const slip = await slipFacts(page);
         const facts = await pageFacts(page);
@@ -412,16 +694,23 @@ try {
         check(`P4.${way}.depth2`, 'its band opens depth 2: ‹ Back and a crumb of two', two?.back === 'Back' && two.depth.split('›').length === 2 && coversViewport(two), two);
         if (way === 'back') await page.locator('#sheet-back').tap();
         else await page.keyboard.press('Escape');
-        await delay(200);
-        await page.waitForFunction(() => document.getElementById('sheet-back')?.textContent.trim() === 'Close', null, { timeout: 5000 }).catch(() => {});
-        await delay(500);
+        await delay(600);
+        const nested = await slipFacts(page);
         const one = await pageFacts(page);
-        check(`P${way === 'back' ? 4 : 5}.${way}.depth1`, `${way === 'back' ? 'Back' : 'Escape'} steps out one level, to ${WORD}'s page`, one?.back === 'Close' && one.headword.startsWith(WORD), one);
+        check(`P${way === 'back' ? 4 : 5}.${way}.depth1`, `${way} restores the nested word stage over ${WORD}'s page`,
+          one?.headword.startsWith(WORD) && nested.count === 1 && nested.word === word, { one, nested });
+        await leaveStage(page);
+        check(`P${way === 'back' ? 4 : 5}.${way}.parent-page`, 'dismissing the nested stage leaves the parent page',
+          (await pageFacts(page))?.headword.startsWith(WORD) && (await slipFacts(page)).count === 0, await pageFacts(page));
         if (way === 'back') await page.locator('#sheet-back').tap();
         else await page.keyboard.press('Escape');
         await bare(page);
-        const gone = await page.evaluate(() => ({ sheet: !!document.getElementById('sheet'), mini: !!document.getElementById('mini') }));
-        check(`P${way === 'back' ? 4 : 5}.${way}.bare`, `${way === 'back' ? 'Back' : 'Escape'} again leaves the reader bare`, !gone.sheet && !gone.mini, gone);
+        check(`P${way === 'back' ? 4 : 5}.${way}.parent-stage`, 'parent page returns to its original stage',
+          (await slipFacts(page)).word === WORD, await slipFacts(page));
+        await leaveStage(page);
+        const gone = await ladderFacts(page, readerWord(page));
+        check(`P${way === 'back' ? 4 : 5}.${way}.bare`, 'dismissing the original stage leaves the reader bare',
+          !gone.page && !gone.stages && !gone.reading, gone);
       }
     });
 
@@ -429,7 +718,7 @@ try {
     // the reader word's own activation, dispatched while the page stands over it) never floats over the page
     await walk('stale', async (page) => {
       await openStory(page);
-      await readerWord(page).tap();
+      await stage(page, readerWord(page));
       await page.locator('#mini .mini-word').tap();
       await pageSettled(page);
       for (const index of [2, 5, 9]) {
@@ -444,8 +733,7 @@ try {
       // and a word on the page still gets its own card, clear of the bar
       const inside = page.locator('#sheet .japanese-lookup-word').first();
       await inside.scrollIntoViewIfNeeded();
-      await inside.tap();
-      await page.locator('#mini .mini-word').waitFor({ timeout: 8000 }).catch(() => {});
+      await stage(page, inside);
       const own = await slipFacts(page);
       check('P6.page-word', 'a word on the page still opens its own card there', own.count === 1 && own.onPage, own);
     });
@@ -455,15 +743,17 @@ try {
       await openStory(page);
       const own = [];
       for (let rep = 0; rep < 3; rep++) {
-        await readerWord(page).tap();
+        await stage(page, readerWord(page));
         await page.locator('#mini .mini-word').waitFor();
         await delay(1300);
         const open = await measure(page, page.locator('#mini .mini-word'));
         await pageSettled(page);
         const close = await measure(page, page.locator('#sheet-back'));
         await bare(page);
+        check(`P7.return-${rep}`, 'measured stage-origin Back restores the stage', (await slipFacts(page)).word === WORD, await slipFacts(page));
+        await leaveStage(page);
         own.push({ rep, open, close });
-        frames.push({ engine, rep, phase: rep === 0 ? 'cold' : 'warm', open: open && { worst: open.worst, over24: open.over24 }, close: close && { worst: close.worst, over24: close.over24 }, openDeltas: open?.deltas, closeDeltas: close?.deltas });
+        frames.push({ engine, rep, phase: rep === 0 ? 'cold' : 'warm', open: open && { worst: open.worst, p95: open.p95, over24: open.over24 }, close: close && { worst: close.worst, p95: close.p95, over24: close.over24 }, openDeltas: open?.deltas, closeDeltas: close?.deltas });
       }
       const worst = Math.max(...own.flatMap(({ open, close }) => [open?.worst ?? Infinity, close?.worst ?? Infinity]));
       if (engine === 'webkit') check('P7.frames', 'the worst frame while the page opens and closes is ≤ 24 ms in WebKit', worst <= 24, own.map(({ rep, open, close }) => ({ rep, open: open?.worst, close: close?.worst })));
@@ -474,7 +764,7 @@ try {
     await walk('worlds', async (page) => {
       for (const world of WORLDS) {
         await openStory(page, { world });
-        await readerWord(page).tap();
+        await stage(page, readerWord(page));
         await page.locator('#mini .mini-word').tap();
         await pageSettled(page);
         const facts = await page.evaluate(() => {
@@ -555,7 +845,7 @@ try {
     // P13 — a Mac window
     await walk('desktop', async (page) => {
       await openStory(page);
-      await readerWord(page).click();
+      await stage(page, readerWord(page));
       await page.locator('#mini .mini-word').click();
       await pageSettled(page);
       const facts = await pageFacts(page);
@@ -566,7 +856,7 @@ try {
     // P15 — the kanji tiles hold their glyphs at twice the text
     await walk('text-200', async (page) => {
       await openStory(page);
-      await readerWord(page).tap();
+      await stage(page, readerWord(page));
       await page.locator('#mini .mini-word').tap();
       await pageSettled(page);
       const tiles = (mode, keep = false) => page.evaluate(([how, stay]) => {
@@ -609,7 +899,7 @@ try {
         const scale = await page.evaluate(() => devicePixelRatio);
         const save = (buffer, way, t) => writeFileSync(resolve(evidence, `${engine}-P14-${world}-${way}-${String(t).padStart(3, '0')}ms.png`), buffer);
         // arriving: the reader and its card → the page
-        await readerWord(page).tap();
+        await stage(page, readerWord(page));
         await page.locator('#mini .mini-word').waitFor();
         await delay(1200);
         const leaves = await boxOf(page, '#mini .mini-word');
@@ -627,7 +917,14 @@ try {
         const arriveLate = MOMENTS.filter((t) => t >= 80).map((t) => arrive.share[t]);
         check(`P14.arrive-${world}`, `${world}: from 80 ms into the cut, nothing of the reader or its card shows above the arriving page`,
           arriveHeld > 0 && arrive.mask >= 2000 && arriveLate.every((share) => share !== null && share <= P14_LIMIT), { held: arriveHeld, ...arrive });
-        // Back: the page → the bare reader, the word travelling home
+        // Preserve G1's direct-page → bare-reader pixel gate separately from G3's stage return.
+        await page.locator('#sheet-back').tap();
+        await bare(page);
+        check(`P14.stage-return-${world}`, 'the stage-origin page restores its stage before the direct-entry probe', (await slipFacts(page)).word === WORD, await slipFacts(page));
+        await leaveStage(page);
+        await focusWord(page, readerWord(page));
+        await page.keyboard.press('Control+Enter');
+        await pageSettled(page);
         const leavingPage = decodePng(await page.screenshot());
         await armHold(page);
         await page.locator('#sheet-back').tap();
@@ -653,7 +950,7 @@ try {
 
 function innerHeightOf(facts) { return facts?.inner?.height || 844; }
 
-writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, rows, frames }, null, 1));
+writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: g3Only ? 'G3 only; G1 gates not run' : 'G1 and G3', rows, frames, controls }, null, 1));
 const failed = rows.filter((row) => !row.ok);
 console.log(`\n${rows.length - failed.length}/${rows.length} — evidence ${evidence}`);
 process.exit(failed.length ? 1 : 0);

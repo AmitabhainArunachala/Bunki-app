@@ -1687,9 +1687,13 @@ body.v-depth-layered #reader, #reader.reader {
   color: var(--accent);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 180ms ease-out;
+  transition: opacity 180ms ease-out, translate 180ms ease-out;
+  translate: 0 0.18em;
 }
-#reader:not(.fg-always) ruby:has(> rt:not(.hidden-rt))::before { opacity: 1; }
+#reader:not(.fg-always) ruby:has(> rt:not(.hidden-rt))::before { opacity: 1; translate: 0 0; }
+@media (prefers-reduced-motion: reduce) {
+  #reader:not(.fg-always) ruby::before { transition: none; translate: none; }
+}
 .reader rt, #reader rt { font-size: 0.6em; letter-spacing: 0.02em; color: var(--accent); pointer-events: none; }
 .reader .para-break { height: 1.5em; }
 .reader .tok-en {

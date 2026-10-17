@@ -1501,8 +1501,8 @@ function seeAlsoLine(card, word) {
 
 /* ------------------------------------------------ tap → define → 覚える (CARD_CONTRACT_V2 §3, STANDARD A44)
  * After the reveal only, every word of the passage and of the Japanese definition is a tap
- * target (a word, a kanji, a grammar cue as one, and any word of this deck; particles, endings
- * and punctuation are not words and stay plain). With a host lexicon (the corridor) a tap opens
+ * target (a word, a kanji, a grammar cue as one, particles and endings; punctuation and
+ * phonetic annotations stay plain). With a host lexicon (the corridor) taps use its shared ladder into
  * the entry sheet: the reading, the Japanese sense, English behind 英語, and the corridor's one-tap
  * 覚える (A51); a word of this deck says 「このデッキにあります」 and offers no 覚える (A17). A word in
  * the sheet's definition opens one more sheet, and that second one says 「ここで止めよう」 and offers
@@ -1555,13 +1555,41 @@ function deckWordOf(t) {
   return null;
 }
 
-/** tokens → tap units { at, len, tok, word }: a 語, a 字, a 文法 cue (its tokens joined), or any
- * token that is a word of this deck */
+/** Parenthetical kana matching the preceding written word are a reading annotation,
+ * not another occurrence. Keep the original token offsets and displayed text. */
+function phoneticAnnotationRanges(tokens) {
+  const text = tokens.map((token) => token.s).join('');
+  const kana = (value) => String(value || '').replace(/[ァ-ヶ]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60)).replace(/[\s・]/gu, '');
+  const ranges = [];
+  for (const match of text.matchAll(/[（(]([\p{Script=Hiragana}\p{Script=Katakana}ー・\s]+)[）)]/gu)) {
+    let reading = '', written = '', edge = match.index;
+    for (let i = tokens.length - 1; i >= 0; i -= 1) {
+      const token = tokens[i];
+      if (token.at + token.s.length > edge) continue;
+      if (token.at + token.s.length !== edge || !/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー々]+$/u.test(token.s)) break;
+      const r = token.r || (/^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u.test(token.s) ? token.s : '');
+      if (!r) break;
+      reading = kana(r) + reading;
+      written = token.s + written;
+      edge = token.at;
+      if (reading === kana(match[1]) && /\p{Script=Han}/u.test(written)) {
+        ranges.push([match.index, match.index + match[0].length]);
+        break;
+      }
+      if (reading.length >= kana(match[1]).length) break;
+    }
+  }
+  return ranges;
+}
+
+/** Tokens → tap units, preserving grammar cues and every other Japanese occurrence. */
 function unitsOfTokens(tokens) {
   const out = [];
+  const annotations = phoneticAnnotationRanges(tokens);
   for (const t of tokens) {
+    if (annotations.some(([start, end]) => t.at < end && t.at + t.s.length > start)) continue;
     const word = deckWordOf(t);
-    if (t.k === 'other' && !word) continue;
+    if (t.k === 'other' && !word && !/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(t.s)) continue;
     const last = out.at(-1);
     if (!word && t.k === '文法' && last && !last.word && last.tok.k === '文法' && last.tok.ref === t.ref && last.at + last.len === t.at) {
       last.len += t.s.length;
@@ -1774,19 +1802,30 @@ function lightWord(node) {
   node?.classList.add('kp-lit');
 }
 function tapped(unit, node, { card, where, depth }) {
+  // A late or synthetic activation must not turn a sealed front into a lookup door.
+  if (ui.screen === 'study' && !ui.revealed) return;
   const frame = frameOf(unit);
-  lightWord(node);
   if (!ctx.host) {
+    lightWord(node);
     logTap(card, where, frame, depth);
     openPop(frame, node);
     return;
   }
-  // the app's one slip beside the word (the one-hand pass, contract §1): the host draws it, and the next tap on
-  // the same word dives into the full entry; the word's reading stays lit until the slip, or that entry, goes
-  const opened = safely(() => ctx.host.openSlip?.(frame, node, { english: ctx.prefs.gloss === 'show', onClose: (reason) => { if (reason !== 'dive') lightWord(null); } }), false);
-  // the ledger keeps how deep each tap went: the slip at the tap's own depth, the full entry one deeper
-  logTap(card, where, frame, opened === 'dived' ? depth + 1 : depth);
-  if (!opened) lightWord(null);
+  // The host owns the ladder. Existing ruby needs only presentation callbacks; plain
+  // definition text uses the host's inline reading. Nothing is revealed before activation.
+  const hasRuby = !!node.querySelector('ruby[data-rt]');
+  const opened = safely(() => ctx.host.openSlip?.(frame, node, {
+    english: ctx.prefs.gloss === 'show',
+    ...(hasRuby ? {
+      reveal: () => node.classList.add('kp-lit'),
+      clearReveal: () => node.classList.remove('kp-lit'),
+      readingVisible: () => ctx.prefs.readings !== 'off' || node.classList.contains('kp-lit') || node.classList.contains('kp-target'),
+    } : {}),
+    onClose: (reason) => { if (reason !== 'dive') node.classList.remove('kp-lit'); },
+  }), false);
+  // Keep the existing tuple: hosted reveal, stage and page are distinct observation depths.
+  logTap(card, where, frame, opened === 'dived' ? depth + 2 : opened === 'opened' ? depth + 1 : depth);
+  if (!opened) node.classList.remove('kp-lit');
 }
 
 /** what the host answers, or fallback when it throws: a host fault never breaks the card */

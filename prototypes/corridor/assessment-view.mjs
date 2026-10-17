@@ -709,7 +709,7 @@ export function createAssessmentView(host) {
       }
       section.append(node('p', 'exam-study-help', tx(
         '学習モードでは時間制限なし。日本語を押すと読みや意味を確認できます。調べた問題は「助けあり」と保存します。解説は回答後に開けます。',
-        'Study mode is untimed. Tap Japanese to see its reading and meaning. Looking up a word marks that question assisted; explanations open after you answer.')));
+        'Study mode is untimed. Tap Japanese to see its reading and meaning. Looking up a word marks that question with help; explanations open after you answer.')));
       section.append(node('p', 'exam-timed-help', tx(
         '本番形式モードでは時間制限があり、辞書・ふりがな・訳・解説は表示しません。終了したパートには戻れません。',
         'Timed exam mode has no dictionary, furigana, translations or explanations. A finished section cannot be reopened.')));
@@ -958,14 +958,14 @@ export function createAssessmentView(host) {
         (!answer.assistance && answer.response.kind !== 'selected')) return;
     const line = node('p', 'exam-why');
     if (answer.assistance) {
-      const locked = node('span', 'exam-why-locked', tx('助けあり · 解説を見たので、この回答は確定しています', 'Assisted · you opened the explanation, so this answer is locked'));
+      const locked = node('span', 'exam-why-locked', tx('助けあり · 解説を見たので、この回答は確定しています', 'with help · you opened the explanation, so this answer is locked'));
       locked.id = 'exam-why-locked'; line.append(locked);
     }
     const door = button(answer.assistance ? tx('解説をもう\u4E00度見る', 'See the explanation again') : tx('なぜ？— 解説を見る', 'Why? — See the explanation'),
       'exam-why', () => openWhy(question.id), 'chip exam-why-door');
     door.disabled = host.pending(); line.append(door);
     if (!answer.assistance) {
-      const cost = node('span', 'exam-why-cost', tx('見ると、この回答は確定し「助けあり」になります', 'Opening it locks this answer and marks it assisted'));
+      const cost = node('span', 'exam-why-cost', tx('見ると、この回答は確定し「助けあり」になります', 'Opening it locks this answer and records it as answered with help'));
       cost.id = 'exam-why-cost'; door.setAttribute('aria-describedby', 'exam-why-cost'); line.append(cost);
     }
     main.append(line);
@@ -986,7 +986,7 @@ export function createAssessmentView(host) {
       const spent = minutes(score.items.filter(item => row.skills.includes(item.skill)).reduce((n, item) => n + item.elapsedMs, 0));
       const raw = node('p', 'exam-official-raw', row.total
         ? tx(`${row.correct} / ${row.total} 問正解${helped ? `（助けあり ${helped}）` : ''} · ${spent}分`,
-          `${row.correct} of ${row.total} correct${helped ? ` (${helped} assisted)` : ''} · ${spent} min`)
+          `${row.correct} of ${row.total} correct${helped ? ` (${helped} with help)` : ''} · ${spent} min`)
         : tx('この練習にはありません', 'Not in this practice'));
       raw.dataset.raw = row.total ? `${row.correct}/${row.total}` : 'none';
       const fact = node('p', 'exam-official-fact', tx(
@@ -1215,7 +1215,7 @@ export function createAssessmentView(host) {
       paper.append(options);
     }
     if (!answer.assistance && host.assistance?.(selected, question.id)) main.append(node('p', 'exam-lookup-assisted', tx(
-      '助けあり · 辞書を使った問題です。回答は変更できます。', 'Assisted · dictionary used on this question. You can still change your answer.')));
+      '助けあり · 辞書を使った問題です。回答は変更できます。', 'with help · dictionary used on this question. You can still change your answer.')));
     renderWhy(main, selected, question, answer);
     if (official && host.officialPages) renderOfficialPages(main, selected, question.id);
     const flag = button(answer.flagged ? tx('目印を外す', 'Remove bookmark') : tx('あとで見直す', 'Bookmark for later'), 'exam-flag',
@@ -1237,7 +1237,7 @@ export function createAssessmentView(host) {
       const control = button(`${i + 1}${saved.flagged ? tx(' 目印', ' Mark') : saved.response.kind !== 'unanswered' ? ' ✓' : ''}${saved.assistance ? ' 助' : ''}`, null,
         () => command({ kind: 'visit', itemId: id }));
       control.setAttribute('aria-label', tx(`${i + 1}問目${saved.flagged ? '、要見直し' : ''}${saved.assistance ? '、助けあり' : ''}`,
-        `Question ${i + 1}${saved.flagged ? ', flagged' : ''}${saved.assistance ? ', assisted' : ''}`));
+        `Question ${i + 1}${saved.flagged ? ', flagged' : ''}${saved.assistance ? ', with help' : ''}`));
       control.dataset.examVisit = id;
       control.disabled = host.pending() || advancingAudio || !canVisit(selected, id); grid.append(control);
     }); map.append(grid); main.append(map);
@@ -1278,13 +1278,13 @@ export function createAssessmentView(host) {
     else {
       // an assisted answer was committed before its explanation opened; the headline says how many
       main.append(node('p', 'exam-score', tx(`${score.correct} / ${score.totalItems} 問正解`, `${score.correct} of ${score.totalItems} correct`) +
-        (independence?.assistedCorrect ? tx(`（うち助けあり ${independence.assistedCorrect}）`, `, including ${independence.assistedCorrect} assisted`) : '')));
+        (independence?.assistedCorrect ? tx(`（うち助けあり ${independence.assistedCorrect}）`, `, including ${independence.assistedCorrect} with help`) : '')));
       main.append(node('p', 'exam-score-note', tx('この模試の正答数です。JLPT公式の換算点や合否予測ではありません。', 'This is your accuracy on this test, not an official JLPT score or pass prediction.')));
       if (independence) main.append(node('p', 'exam-independence', independence.independent === null
         ? tx(`問題ごとの助けの記録なし ${independence.answered - independence.assisted} · 助けあり ${independence.assisted} · 未回答 ${independence.unanswered}`,
-          `No item-level help recorded ${independence.answered - independence.assisted} · Assisted ${independence.assisted} · Unanswered ${independence.unanswered}`)
+          `No item-level help recorded ${independence.answered - independence.assisted} · with help ${independence.assisted} · Unanswered ${independence.unanswered}`)
         : tx(`自力 ${independence.independent} · 助けあり ${independence.assisted} · 未回答 ${independence.unanswered}`,
-          `Independent ${independence.independent} · Assisted ${independence.assisted} · Unanswered ${independence.unanswered}`)));
+          `Independent ${independence.independent} · with help ${independence.assisted} · Unanswered ${independence.unanswered}`)));
       const counts = node('dl', 'exam-counts');
       for (const [label, count] of [[tx('不正解', 'Incorrect'), score.incorrect], [tx('未回答', 'Unanswered'), score.unanswered], [tx('未到達', 'Not reached'), score.notReached]]) {
         const item = node('div'); item.append(node('dt', '', label), node('dd', '', String(count))); counts.append(item);
@@ -1300,7 +1300,7 @@ export function createAssessmentView(host) {
           const rows = score.items.filter(row => row.skill === skill); if (!rows.length) continue;
           const correct = rows.filter(row => row.result === 'correct').length;
           const helped = rows.filter(row => assistedItem(row.itemId)).length;
-          skills.append(node('p', '', `${tx(...labels)} · ${correct}/${rows.length}${helped ? tx(`（助けあり ${helped}）`, ` (${helped} assisted)`) : ''} · ${minutes(rows.reduce((n, row) => n + row.elapsedMs, 0))} ${tx('分', 'min')}`));
+          skills.append(node('p', '', `${tx(...labels)} · ${correct}/${rows.length}${helped ? tx(`（助けあり ${helped}）`, ` (${helped} with help)`) : ''} · ${minutes(rows.reduce((n, row) => n + row.elapsedMs, 0))} ${tx('分', 'min')}`));
         } main.append(skills);
       }
       const conditions = node('details', 'exam-conditions');
@@ -1356,7 +1356,7 @@ export function createAssessmentView(host) {
       // A real paper's prompt opens with its printed number; the list already numbers each question.
       const promptLine = official ? plain(question.prompt.replace(/^\uE005\d+\uE006\u3000?/u, '')).split('\n').at(-1) || tx('本文の空欄', 'Blank in the passage')
         : question.prompt.split('\n').at(-1);
-      const summary = node('summary', '', `${form.items.indexOf(question) + 1}. ${daimon ? `〔${daimon}〕 ` : ''}${promptLine}${helped ? tx(' · 助けあり', ' · Assisted') : ''}`);
+      const summary = node('summary', '', `${form.items.indexOf(question) + 1}. ${daimon ? `〔${daimon}〕 ` : ''}${promptLine}${helped ? tx(' · 助けあり', ' · with help') : ''}`);
       summary.dataset.uiContentValue = promptLine; details.append(summary);
       const choice = id => { const index = question.response.options.findIndex(row => row.id === id);
         return index < 0 ? '' : official ? `${index + 1}　${plain(question.response.options[index].text)}` : question.response.options[index].text; };

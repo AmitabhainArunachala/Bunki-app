@@ -112,7 +112,13 @@ export function createHost(deps) {
       if (token.k === '文法') return grammarEntry(deps, token) || wordEntry(deps, token);
       if (token.k === '字') return kanjiEntry(deps, token);
       if (token.k === '語') return wordEntry(deps, token) || (token.s.length === 1 ? kanjiEntry(deps, { ...token, ref: token.s }) : null);
-      return null; // particles, endings, punctuation: nothing to open
+      // G3: particles and endings are Japanese doors too. A dictionary miss keeps the
+      // player's contextual frame; punctuation and non-Japanese text remain plain.
+      if (token.k === 'other' && /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(token.s)) {
+        return wordEntry(deps, { ...token, k: '語' }) ||
+          (/^\p{Script=Han}$/u.test(token.s) ? kanjiEntry(deps, { ...token, ref: token.s }) : null);
+      }
+      return null;
     },
     open(entry) {
       if (entry?.t && entry.id) deps.open(nodeOf(entry, deps));
@@ -133,8 +139,9 @@ export function createHost(deps) {
      * The deck's own word says it is already in the deck where Save would stand, and its band opens the
      * dictionary's entry when the dictionary has it. Save goes through the corridor's one path on the node,
      * the path take() wraps. english: show the English sense under the Japanese one.
-     * 'opened' | 'dived' (this tap was the second on the word: the slip went into the entry) | false. */
-    openSlip(frame, anchor, { english = false, onClose = null } = {}) {
+     * 'reading' | 'opened' | 'dived' | false. Rung ownership stays with the corridor;
+     * the player's callbacks only show or clear its existing in-place ruby. */
+    openSlip(frame, anchor, { english = false, onClose = null, reveal, clearReveal, readingVisible } = {}) {
       if (typeof deps.openSlip !== 'function' || !frame || !anchor) return false;
       const entry = frame.entry || (frame.word
         ? wordEntry(deps, { s: frame.word.term, ref: frame.word.term, r: frame.word.reading || '', k: '語' })
@@ -147,9 +154,10 @@ export function createHost(deps) {
       };
       const before = !!deps.slipOpen?.();
       const slip = deps.openSlip(node, {
-        anchor, from: 'deck', look, key: frame.key || '', onClose,
+        anchor, from: 'deck', look, key: frame.key || '', onClose, reveal, clearReveal, readingVisible,
         ...(frame.word ? { note: deps.inDeckNote?.() || 'このデッキにあります' } : {}),
       });
+      if (slip === 'reading') return 'reading';
       if (slip) return 'opened';
       return before && !deps.slipOpen?.() ? 'dived' : false;
     },

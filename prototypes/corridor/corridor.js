@@ -4849,7 +4849,7 @@ function restoreDialogInvoker() {
     } else if (key.kind === 'id') {
       target = document.getElementById(key.id);
     }
-    target?.focus({ preventScroll: true });
+    focusProseWord(target, { preventScroll: true });
   });
 }
 
@@ -5023,6 +5023,7 @@ function back({ instant = false } = {}) {
     closeStrokePage();
     return;
   }
+  if (foldWordLadder()) return;
   if (S.stack.length) {
     recede({ instant: instant === true });
     return;
@@ -6882,11 +6883,11 @@ function focusLearningSourceCaller(focusId) {
       const target = document.getElementById(popup[2]);
       // a choice inside the popup's sentence pane: the pane opens first, so the reader lands where it left
       if (target?.closest('.mini-sentence-pane')?.hidden) target.closest('.mini-sentence-wrap')?.openSentence?.();
-      (target || word)?.focus({ preventScroll: true });
+      focusProseWord(target || word, { preventScroll: true });
     };
     const reopened = word ? readerTokenDoors.get(word)?.reopen() : null;
     if (typeof reopened?.then !== 'function') { land(); return; }
-    word.focus({ preventScroll: true });
+    focusProseWord(word, { preventScroll: true });
     void reopened.then(() => {
       if (word.isConnected && miniAnchor === word && document.activeElement === word) land();
     });
@@ -7981,58 +7982,32 @@ function storyVersions(p) {
   return easy ? { original: p, easy } : null;
 }
 
-/* How to read here is said once, in plain words, by a short note set in the page just above the article's
- * text (glance pass 2026-10-01: a tip floating over the text covered the very words it was about; John
- * 2026-10-02 #8: the old tap-ladder wording was "weird, awkward, not clear"). The first word that opens
- * its popup retires it for good: it fades where it stands, keeping its room for the rest of that visit so
- * the text never jumps under the finger, and the next article opens without it. */
-const READER_TIP_KEY = 'kairo-tip-reader-v1';
-let readerTipVisit = null; // the article whose visit still holds the note's place
-function readerTipSeen() {
-  let seen = !!S.readerTipSeen;
-  try { seen ||= localStorage.getItem(READER_TIP_KEY) === '1'; } catch { /* the session flag stands in */ }
-  return seen;
+// This is a device demonstration, never a learner observation or review event.
+const WORD_LADDER_DEMO_KEY = 'kairo-word-ladder-demo-v1';
+let wordLadderDemoSeen = false;
+function freshWordLadderRecord() {
+  return !['taken', 'revlog', 'obslog', 'sessions', 'writing', 'sentenceDrafts'].some(key =>
+    Array.isArray(S[key]) ? S[key].length : S[key] && Object.keys(S[key]).length) &&
+    !['srs', 'readDone', 'assessmentLibrary', 'assessmentLibraryV2', 'assessmentLearning',
+      'assessmentReceived', 'assessmentQuestionPractice', 'guidedProgress', 'calibration', 'lessonsDone', 'mockDone', 'deepWords', 'lists',
+      'sentencePractice', 'teacherContexts', 'teacherDrafts', 'aiReadings', 'aiChat', 'sourceInbox'].some(key =>
+      S[key] && Object.keys(S[key]).length);
 }
-function renderReaderTip(main) {
-  const seen = readerTipSeen();
-  if (seen && readerTipVisit !== S.passageId) { readerTipVisit = null; return; }
-  readerTipVisit = S.passageId;
-  const tip = el('aside', seen ? 'reader-tip is-done' : 'reader-tip');
-  tip.id = 'reader-tip';
-  // the note is the app speaking about itself, not prose to look up
-  tip.dataset.japaneseLookup = 'off';
-  tip.setAttribute('aria-label', tx('読み方のヒント', 'how to read here'));
-  if (seen) { tip.setAttribute('aria-hidden', 'true'); tip.inert = true; tip.dataset.faded = ''; }
-  tip.append(el('p', 'reader-tip-text', readerTipText()));
-  const close = el('button', 'icon-button reader-tip-close');
-  close.type = 'button';
-  close.setAttribute('aria-label', tx('ヒントを閉じる', 'dismiss this tip'));
-  if (seen) close.tabIndex = -1;
-  close.append(uiIcon('close'));
-  close.addEventListener('click', () => {
-    rememberReaderTipSeen();
-    readerTipVisit = null;
-    tip.remove();
-  });
-  tip.append(close);
-  main.append(tip);
-}
-function rememberReaderTipSeen() {
-  S.readerTipSeen = true;
-  try { localStorage.setItem(READER_TIP_KEY, '1'); } catch { /* dismissed for this session */ }
-}
-/** The first successful tap: the note has done its work. */
-function retireReaderTip() {
-  if (readerTipSeen()) return;
-  rememberReaderTipSeen();
-  const tip = document.getElementById('reader-tip');
-  if (!tip) return;
-  tip.classList.add('is-done');
-  tip.setAttribute('aria-hidden', 'true');
-  tip.inert = true;
-  const close = tip.querySelector('.reader-tip-close');
-  if (close) close.tabIndex = -1;
-  settleFade(tip, true);
+function demonstrateWordLadder(reader) {
+  if (wordLadderDemoSeen || !freshWordLadderRecord()) return;
+  try { if (localStorage.getItem(WORD_LADDER_DEMO_KEY) === '1') return; } catch { /* session guard below */ }
+  setTimeout(() => {
+    if (!reader.isConnected || S.stack.length || ladderVisit || !freshWordLadderRecord()) return;
+    const anchor = [...reader.querySelectorAll('.tok.content')].find(node => {
+      const box = node.getBoundingClientRect();
+      return box.top > 80 && box.bottom < innerHeight - 80;
+    });
+    const door = anchor && readerTokenDoors.get(anchor);
+    if (!door) return;
+    wordLadderDemoSeen = true;
+    try { localStorage.setItem(WORD_LADDER_DEMO_KEY, '1'); } catch { /* session only */ }
+    door.quickLook('programmatic', { demo: true });
+  }, 650);
 }
 
 /** The kanji school grade an article's characters reach (the 学年 filter's measure), as a quiet tag. */
@@ -8279,18 +8254,94 @@ document.addEventListener(
 let miniOnClose = null;
 let miniDiving = false; // the slip is opening the full entry (the band, the second tap)
 const slipSummons = []; // the onClose of every slip whose entry is open, called when the entry closes
+// A visit belongs to an occurrence, not a spelling. Covered pages keep their own
+// visit, so a nested word returns to the stage that actually opened it.
+let ladderVisit = null;
+let ladderOpening = null;
+let ladderRefreshing = false;
+const ladderPages = new WeakMap();
+function inlineWordReading(anchor, reading) {
+  const ruby = anchor.querySelector('ruby');
+  if (ruby) {
+    const hidden = [...ruby.querySelectorAll('rt.hidden-rt')];
+    hidden.forEach(rt => rt.classList.remove('hidden-rt'));
+    return () => hidden.forEach(rt => rt.classList.add('hidden-rt'));
+  }
+  const children = [...anchor.childNodes];
+  const row = el('ruby');
+  row.append(...children);
+  row.append(el('rt', null, reading));
+  anchor.append(row);
+  return () => { if (row.parentNode === anchor) row.replaceWith(...children); };
+}
+function clearWordLadder(visit = ladderVisit) {
+  if (!visit) return;
+  if (ladderVisit === visit) ladderVisit = null;
+  delete visit.anchor.dataset.ladderRung;
+  visit.clearReveal?.();
+  readingSlipSerial++;
+  syncChromeKeep();
+}
+function foldWordLadder() {
+  if (!ladderVisit) return false;
+  if (standingSlip()) removeMini();
+  else clearWordLadder();
+  return true;
+}
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Escape' || !ladderVisit || readerWordMenu || document.getElementById('vocabulary-list-popover')) return;
+  event.preventDefault();
+  event.stopPropagation();
+  const anchor = ladderVisit.anchor;
+  foldWordLadder();
+  if (anchor.isConnected) focusProseWord(anchor, { preventScroll: true });
+}, true);
+function activateWordLadder(anchor, options) {
+  if (!anchor?.isConnected || !slipAllowed(anchor)) return null;
+  if (ladderVisit?.anchor === anchor) {
+    if (ladderVisit.rung === 'stage' && standingSlip()) {
+      if (miniEntry) slipDive(miniEntry, options.modality || 'pointer');
+      else removeMini();
+      return null;
+    }
+    if (ladderVisit.rung === 'reading') {
+      ladderVisit.rung = anchor.dataset.ladderRung = 'stage';
+      return ladderVisit.openStage({ restore: false, demo: false });
+    }
+  }
+  if (standingSlip()) removeMini();
+  clearWordLadder();
+  const visit = { ...options, anchor, rung: 'stage' };
+  ladderVisit = visit;
+  const reading = String(options.reading || '');
+  const visible = typeof options.readingVisible === 'function' ? options.readingVisible() : [...anchor.querySelectorAll('rt')].some(rt => {
+    const style = getComputedStyle(rt);
+    return !rt.classList.contains('hidden-rt') && style.visibility !== 'hidden' && style.display !== 'none' && style.opacity !== '0';
+  });
+  if (!options.demo && !options.restore && S.dials.furigana === 1 && reading && kataToHira(reading) !== kataToHira(String(options.surface || '')) && !visible) {
+    visit.rung = anchor.dataset.ladderRung = 'reading';
+    const undo = options.reveal ? options.reveal() : inlineWordReading(anchor, reading);
+    visit.clearReveal = options.clearReveal || (typeof undo === 'function' ? undo : null);
+    options.onReveal?.();
+    return 'reading';
+  }
+  anchor.dataset.ladderRung = 'stage';
+  return visit.openStage({ restore: !!options.restore, demo: !!options.demo });
+}
 function removeMini() {
   // the card's own menu goes with the card; a bar's drawer belongs to its bar, and the render that follows decides it
   // (adoptSaveMenuOwner): arriving data that redraws the page keeps it open, a page or room that goes takes it along
   if (!document.getElementById('vocabulary-list-popover')?.classList.contains('is-drawer')) closeVocabularyListPopover();
   const slip = document.getElementById('mini');
+  if (slip && !miniDiving && !ladderRefreshing) finishPageTransition();
   slip?.remove();
   miniAnchor = null;
   miniEntry = null;
   const closing = miniOnClose;
   miniOnClose = null;
-  if (!slip || !closing) return;
-  if (miniDiving) slipSummons.push(closing);
+  if (!ladderRefreshing && !miniDiving) clearWordLadder();
+  if (!slip || !closing || ladderRefreshing) return;
+  if (miniDiving && !ladderOpening) slipSummons.push(closing);
   closing(miniDiving ? 'dive' : 'dismiss');
 }
 /** The slip that stands for a word now. */
@@ -8365,6 +8416,11 @@ document.addEventListener(
       else closeVocabularyListPopover();
     }
     const mini = standingSlip();
+    // Back owns its own one-level fold on click; do not consume a second
+    // level by dismissing the stage at pointerdown first.
+    if (ladderVisit && target.closest?.('#sheet-back, #chrome-back, [data-action="navigation.back"]')) return;
+    if (!mini && ladderVisit?.rung === 'reading' && !ladderVisit.anchor.contains(target) &&
+        !target.closest?.('#reader-word-menu, #vocabulary-list-popover')) clearWordLadder();
     const inText = ev.button === 0 && !!target.closest?.('#reader');
     if (mini && !mini.contains(target) && !target.closest?.('#vocabulary-list-popover, #reader-toast')) {
       if (ev.button === 0 && miniAnchor?.isConnected && miniAnchor.contains(target)) {
@@ -8398,7 +8454,8 @@ function diveFromMini(span, event) {
 /** The slip opens its full entry: the slip's close is a dive, not a dismissal (removeMini tells the surface so). */
 function slipDive(entry, modality) {
   miniDiving = true;
-  try { entry(modality); } finally { miniDiving = false; }
+  ladderOpening = ladderVisit?.rung === 'stage' ? ladderVisit : null;
+  try { entry(modality); } finally { miniDiving = false; ladderOpening = null; }
 }
 /** A surface that activates its own word (the deck's card, the sky, the Words room) asks whether this
  * activation is the second tap on the word whose slip is open: then the slip dives into the full entry
@@ -8436,15 +8493,115 @@ function japaneseLookupRecord(text, { reading = '', pos = '' } = {}) {
   return kept && fits(kept.r) ? kept : null;
 }
 
-/* Each prose block (a paragraph, heading, prompt or answer choice) is one Tab stop; its words are
- * reached with ←/→ and Home/End. ↑/↓ are left to the page so it still scrolls. */
+/* Prose remains prose in the accessibility tree. Only its paragraph is in the Tab order;
+ * an explicitly selected word temporarily becomes a named group while it has keyboard focus. */
+const proseWordRovers = new WeakMap();
+function focusProseWord(word, options = { preventScroll: true }) {
+  const block = word?.closest?.('[data-prose-roving]');
+  const rover = block && proseWordRovers.get(block);
+  if (rover && word.matches(rover.selector)) rover.focus(word, options);
+  else word?.focus?.(options);
+}
+function installProseWordRoving(block, selector = '.japanese-lookup-word') {
+  if (!block?.querySelectorAll) return;
+  let rover = proseWordRovers.get(block);
+  if (!rover) {
+    rover = { selector, word: null };
+    proseWordRovers.set(block, rover);
+    block.dataset.proseRoving = 'true';
+    block.tabIndex = 0;
+    if (!block.matches('p,blockquote,h1,h2,h3,h4,h5,h6') && !block.hasAttribute('role')) block.setAttribute('role', 'paragraph');
+    block.setAttribute('aria-describedby', [block.getAttribute('aria-describedby'), japaneseLookupHelpId()].filter(Boolean).join(' '));
+    block.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight Home End Enter Shift+F10');
+    const words = () => [...block.querySelectorAll(rover.selector)].filter(word => word.closest('[data-prose-roving]') === block);
+    const label = (word) => {
+      if (word.dataset.proseLabel || word.dataset.lookupText) return word.dataset.proseLabel || word.dataset.lookupText;
+      const text = word.cloneNode(true);
+      for (const annotation of text.querySelectorAll('rt,.tok-en,.tok-state')) annotation.remove();
+      return text.textContent || '';
+    };
+    const retire = (word) => {
+      if (!word || word.tagName === 'BUTTON') return;
+      if (word.getAttribute('aria-describedby')) word.dataset.proseDescription = word.getAttribute('aria-describedby');
+      delete word.dataset.proseSelected;
+      // Even tabindex=-1 or global ARIA revives click-bearing inline spans as AX groups in WebKit.
+      word.removeAttribute('tabindex');
+      for (const attribute of ['aria-label', 'aria-describedby', 'aria-haspopup', 'aria-keyshortcuts']) word.removeAttribute(attribute);
+      word.setAttribute('role', 'presentation');
+    };
+    const select = (word) => {
+      if (!word) return;
+      if (rover.word !== word) retire(rover.word);
+      rover.word = word;
+      word.dataset.proseSelected = 'true';
+      word.tabIndex = -1;
+      word.setAttribute('role', 'group');
+      word.setAttribute('aria-label', label(word));
+      if (word.dataset.proseDescription) word.setAttribute('aria-describedby', word.dataset.proseDescription);
+    };
+    const focus = (word, options = { preventScroll: true }) => {
+      select(word);
+      word?.focus(options);
+      if (options.preventScroll !== false) word?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    };
+    rover.focus = focus;
+    rover.retire = retire;
+    block.addEventListener('focusin', (event) => {
+      const word = event.target.closest?.(rover.selector);
+      if (word && words().includes(word)) select(word);
+    });
+    block.addEventListener('focusout', (event) => {
+      const word = event.target.closest?.(rover.selector);
+      if (word && word !== event.relatedTarget) retire(word);
+    });
+    block.addEventListener('keydown', (event) => {
+      // A reader word's own handler already owns Shift+Enter, Ctrl/Cmd+Enter and its menu.
+      if (event.defaultPrevented || event.altKey) return;
+      const list = words();
+      if (!list.length) return;
+      const target = event.target.closest?.(rover.selector);
+      if (event.target !== block && !list.includes(target)) return;
+      const current = list.includes(target) ? target : list.includes(rover.word) ? rover.word : null;
+      if (event.ctrlKey || event.metaKey) {
+        if (event.key !== 'Enter' || event.target !== block) return;
+        event.preventDefault(); event.stopPropagation();
+        const word = current || list[0]; focus(word);
+        word.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Enter', ctrlKey: event.ctrlKey, metaKey: event.metaKey, bubbles: true, cancelable: true }));
+        return;
+      }
+      const at = list.indexOf(current);
+      const next = { ArrowRight: list[Math.min(list.length - 1, at + 1)], ArrowLeft: list[Math.max(0, at - 1)], Home: list[0], End: list.at(-1) };
+      if (Object.hasOwn(next, event.key)) {
+        event.preventDefault(); event.stopPropagation(); focus(next[event.key]);
+        return;
+      }
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault(); event.stopPropagation();
+        const word = current || list[0]; focus(word); word.click();
+      } else if (event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey)) {
+        event.preventDefault(); event.stopPropagation();
+        const word = current || list[0]; focus(word);
+        word.dispatchEvent(new window.MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
+      }
+    });
+  }
+  rover.selector = selector;
+  for (const word of block.querySelectorAll(selector)) {
+    if (word.closest('[data-prose-roving]') !== block || word.dataset.proseSelected) continue;
+    // Do not mask a native-button regression: the renderer must provide actual inline text spans.
+    rover.retire(word);
+  }
+}
+
 function lookupBlockWords(block) {
   return [...block.querySelectorAll('.japanese-lookup-word')].filter(word => word.closest('[data-lookup-block]') === block);
 }
 
 function setLookupStop(word) {
   const block = word.closest('[data-lookup-block]');
-  for (const other of block ? lookupBlockWords(block) : [word]) other.tabIndex = other === word ? 0 : -1;
+  if (!block) return;
+  installProseWordRoving(block);
+  proseWordRovers.get(block).word = word;
 }
 
 /** The keyboard help every lookup word shares. It lives outside the prose so that no question
@@ -8457,7 +8614,7 @@ function japaneseLookupHelpId() {
     help.hidden = true;
     document.body.append(help);
   }
-  help.textContent = tx('Enter: 読みと意味 · ←→: 次の語', 'Enter: reading and meaning · ←/→: next word');
+  help.textContent = tx('←→: 語を選ぶ · Enter: ひらく · Shift+F10: ほかの操作', '←/→: choose a word · Enter: open · Shift+F10: more actions');
   return help.id;
 }
 
@@ -8494,12 +8651,9 @@ function lookupWordKey(event, word) {
     removeMini();
     return;
   }
+  // The paragraph controller owns roving and activation, including when focus is on the paragraph.
   const block = word.closest('[data-lookup-block]');
-  const words = block ? lookupBlockWords(block) : [word], at = words.indexOf(word);
-  const moves = { ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: words.length - 1 };
-  if (!Object.hasOwn(moves, event.key)) return;
-  event.preventDefault();
-  words[moves[event.key]]?.focus();
+  if (block && !proseWordRovers.has(block)) installProseWordRoving(block);
 }
 
 /** A shared lookup door for Japanese prose, including questions and source quotations.
@@ -8511,7 +8665,7 @@ async function openJapaneseLookup(anchor, text, context = {}) {
   if (!anchor.isConnected && occurrence) {
     anchor = findLookupOccurrence(occurrence);
     // A re-render that saved the help took the focused word with it; keyboard users stay put.
-    if (anchor && hadFocus && (!document.activeElement || document.activeElement === document.body)) anchor.focus({ preventScroll: true });
+    if (anchor && hadFocus && (!document.activeElement || document.activeElement === document.body)) focusProseWord(anchor, { preventScroll: true });
   }
   if (!anchor?.isConnected) return;
   if (anchor.classList.contains('japanese-lookup-word')) setLookupStop(anchor);
@@ -8531,6 +8685,9 @@ async function openJapaneseLookup(anchor, text, context = {}) {
     ...(context.kanjiOnly ? { kanjiOnly: true } : {}), ...(readMiss ? { readMiss: true } : {}) };
   const entryNode = hasKanjiEntry ? { t: 'kanji', id: text }
     : record ? { t: 'word', id: token.b, ...(record?.seq ? { seq: record.seq, reading: record.r } : {}) } : null;
+  return activateWordLadder(anchor, { surface: context.surface || text, reading: context.surfaceReading || token.r,
+    reveal: context.reveal, clearReveal: context.clearReveal, readingVisible: context.readingVisible,
+    restore: context.restore, openStage: () => {
   const mini = showMini(anchor, token, (modality) => {
     // An unresolved spelling must not reopen lookup(text)'s rejected first row.
     if (!entryNode) return;
@@ -8546,8 +8703,11 @@ async function openJapaneseLookup(anchor, text, context = {}) {
     event.preventDefault(); event.stopPropagation();
     removeMini();
     const origin = anchor.isConnected ? anchor : findLookupOccurrence(occurrence);
-    origin?.focus({ preventScroll: true });
+    if (origin) focusProseWord(origin, { preventScroll: true });
   });
+  syncChromeKeep();
+  return mini;
+  } });
 }
 
 /* 禁則処理 (round 4, T4: "more polished … clarity"). A word you can tap is a button, an atomic box, and CSS
@@ -8583,6 +8743,22 @@ function placeKinsoku(container, node, surface) {
   container.append(node);
 }
 
+function phoneticAnnotationRanges(text) {
+  // A kana-only parenthetical directly following a Japanese written form is
+  // its pronunciation, not a second set of lexical targets (高市…（たかいち…）).
+  return [...String(text).matchAll(/[\p{Script=Han}々〆ヶ][（(][\p{Script=Hiragana}\p{Script=Katakana}ー・\s]+[）)]/gu)]
+    .map(match => [match.index + [...match[0]][0].length, match.index + match[0].length]);
+}
+function phoneticAnnotationIndices(tokens) {
+  const ranges = phoneticAnnotationRanges(tokens.map(token => token.s).join(''));
+  const marked = new Set();
+  let offset = 0;
+  tokens.forEach((token, index) => {
+    if (ranges.some(([start, end]) => offset >= start && offset < end)) marked.add(index);
+    offset += token.s.length;
+  });
+  return marked;
+}
 function appendJapaneseLookup(container, text, context = {}) {
   const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('ja', { granularity: 'word' }) : null;
   const segments = segmenter ? [...segmenter.segment(String(text))].map(part => part.segment)
@@ -8593,20 +8769,22 @@ function appendJapaneseLookup(container, text, context = {}) {
   // target) names it, so the block still keeps exactly one Tab stop.
   const block = context.block || (container.dataset ? container : wrapper);
   block.dataset.lookupBlock = 'true';
-  let stopPlaced = !!block.querySelector('.japanese-lookup-word');
   const help = japaneseLookupHelpId();
+  const annotations = phoneticAnnotationRanges(text);
+  let offset = 0;
   for (const segment of segments) {
-    if (!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(segment)) {
+    const annotation = annotations.some(([start, end]) => offset >= start && offset < end);
+    offset += segment.length;
+    if (annotation || !/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(segment)) {
       if (context.kinsoku) placeKinsoku(wrapper, document.createTextNode(segment), segment);
       else wrapper.append(document.createTextNode(segment));
       continue;
     }
     // The visible word is its own accessible name; the shared help says what it does.
-    const word = el('button', 'japanese-lookup-word', segment);
-    word.type = 'button'; word.lang = 'ja';
+    const word = el('span', 'japanese-lookup-word', segment);
+    word.lang = 'ja';
     word.dataset.lookupText = segment;
     if (context.itemId) word.dataset.lookupItem = context.itemId;
-    word.tabIndex = stopPlaced ? -1 : 0; stopPlaced = true;
     word.setAttribute('aria-describedby', help);
     word.setAttribute('aria-haspopup', 'dialog');
     word.addEventListener('click', event => {
@@ -8616,10 +8794,32 @@ function appendJapaneseLookup(container, text, context = {}) {
     });
     word.addEventListener('keydown', event => lookupWordKey(event, word));
     word.addEventListener('focus', () => setLookupStop(word));
+    let menuRecord = null;
+    const occurrence = () => context.itemId ? lookupOccurrence(word) : null;
+    let menuOccurrence = null;
+    const current = () => word.isConnected ? word : menuOccurrence && findLookupOccurrence(menuOccurrence);
+    const entry = () => [...segment].length === 1 && D.kanji[segment] ? { t: 'kanji', id: segment }
+      : menuRecord ? { t: 'word', id: menuRecord.head || segment, ...(menuRecord.seq ? { seq: menuRecord.seq, reading: menuRecord.r } : {}) } : null;
+    wireReaderWordMenu(word, {
+      target: { kind: 'word', id: segment }, label: segment, copyText: segment,
+      prepare: async () => {
+        menuOccurrence = occurrence();
+        if (context.beforeOpen && !(await context.beforeOpen())) return false;
+        await ensureDictionaryRowsForForm(segment).catch(() => {});
+        menuRecord = japaneseLookupRecord(segment, context);
+      },
+      resolveAnchor: current,
+      get entryAvailable() { return !!entry(); },
+      save: () => wordSaveFacts({ s: segment, b: menuRecord?.head || segment, r: menuRecord?.r || '', c: !!menuRecord,
+        ...(menuRecord?.seq ? { seq: menuRecord.seq } : {}) }, { record: menuRecord }),
+      quickLook: () => { const anchor = current(); if (anchor) void openJapaneseLookup(anchor, segment, context); },
+      openEntry: mode => { const node = entry(), anchor = current(); if (node && anchor) go(node, { invoker: anchor, instant: mode === 'keyboard' }); },
+    });
     if (context.kinsoku) placeKinsoku(wrapper, word, segment);
     else wrapper.append(word);
   }
   container.append(wrapper);
+  installProseWordRoving(block, '.japanese-lookup-word');
   return wrapper;
 }
 
@@ -9264,14 +9464,19 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   }
   // a fresh arrival is a move the frame sampler names; a slip drawn again on the same word (its entry arrived) is not
   const arriving = !(standingSlip() && miniAnchor === span);
-  removeMini();
+  ladderRefreshing = ladderVisit?.anchor === span;
+  try { removeMini(); } finally { ladderRefreshing = false; }
   const other = nodeFor || { t: kind, id: token.b };
   const { g, held, node: captureNode, state: miniState, identityHeld } = kind === 'word'
     ? wordSaveFacts(token, { reader, from, record })
     : { g: null, held: false, node: other, state: save === 'default' ? wordCaptureState(other) : null, identityHeld: false };
   const label = look?.label || token.b;
+  if (ladderVisit?.anchor === span) {
+    ladderVisit.saveFacts = () => ({ label, g, held, node: captureNode, state: wordCaptureState(captureNode), identityHeld });
+  }
   const mini = el('div', null);
   mini.id = 'mini';
+  if (ladderVisit?.demo) mini.dataset.demo = 'true';
   mini.tabIndex = -1;
   mini.setAttribute('role', 'dialog');
   mini.setAttribute('aria-label', tx(`${label} の語釈`, `${label} quick look`));
@@ -9432,7 +9637,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     // word stays the chosen one, so the chrome's Save still stands for it
     removeMini();
     clearReaderReadings();
-    span.focus({ preventScroll: true });
+    focusProseWord(span, { preventScroll: true });
   });
   if (span.closest?.('#sheet')) mini.dataset.page = '';
   document.body.append(mini);
@@ -9440,10 +9645,16 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   miniEntry = entryAvailable ? onEntry : null;
   miniOnClose = onClose;
   keepFloatingBeside(mini, span, { follow });
+  if (arriving && ladderVisit?.anchor === span && !ladderVisit.restoreNext && !focusEntry && pageCutAllowed()) {
+    finishPageTransition();
+    flyWord(glyphBox(span), word);
+  }
+  if (ladderVisit?.anchor === span) ladderVisit.restoreNext = false;
   if (focusEntry) ([seal, word].find((button) => button && button.tagName === 'BUTTON' && !button.disabled) || mini).focus({ preventScroll: true });
   if (arriving) sampleTransition('card', sampleWhere());
   // G1 · the page this slip's door opens is built at idle, so the next tap only mounts it
   if (entryAvailable && entryNode) schedulePagePrebuild(entryNode, span);
+  syncChromeKeep();
   return mini;
 }
 
@@ -9888,7 +10099,7 @@ function closeReaderWordMenu({ restoreFocus = false } = {}) {
   readerWordMenu = null;
   if (!open) return;
   open.menu.remove();
-  if (restoreFocus && open.anchor.isConnected) open.anchor.focus({ preventScroll: true });
+  if (restoreFocus && open.anchor.isConnected) focusProseWord(open.anchor, { preventScroll: true });
 }
 
 async function openReaderWordMenu(anchor, door, { x = null, y = null, keyboard = false } = {}) {
@@ -9896,7 +10107,8 @@ async function openReaderWordMenu(anchor, door, { x = null, y = null, keyboard =
   removeMini();
   closeReaderWordMenu();
   const serial = ++readerWordMenuSerial;
-  await door.prepare?.();
+  if (await door.prepare?.() === false) return;
+  if (!anchor.isConnected) anchor = door.resolveAnchor?.() || anchor;
   if (serial !== readerWordMenuSerial || !anchor.isConnected) return;
   const menu = el('div', 'reader-word-menu');
   menu.id = 'reader-word-menu';
@@ -9995,6 +10207,7 @@ function readerWordKey(event, span, door) {
   // Escape steps out one layer at a time: the word menu; or the popup together with the reading its tap
   // summoned; then the chosen word's mark (the chrome's Save stands down), back to the original text
   if (event.key === 'Escape') {
+    if (ladderVisit) { event.preventDefault(); event.stopPropagation(); foldWordLadder(); return; }
     const slip = !!document.getElementById('mini');
     const marked = !!(S.revealed?.size || S.readerTake);
     if (!slip && !readerWordMenu && !marked) return;
@@ -10439,7 +10652,19 @@ function openReadingSlip(anchor, token, draw) {
     // The "…" never outlives the answer (Codex 0304: the cold first tap kept it after aria-busy cleared)
     // R2 · and so is a card whose answer is a kanji, a sound change, or a miss said before the answer came
     else if ((door.seq || door.kanjiOnly || door.shown || !dictionaryRowsForForm(door.b).length ||
-      drawn.querySelector('.mini-wait, .mini-miss')) && document.getElementById('mini') === drawn && !drawn.matches(':active')) drawn = draw(door);
+      drawn.querySelector('.mini-wait, .mini-miss')) && document.getElementById('mini') === drawn) {
+      if (!drawn.matches(':active')) drawn = draw(door);
+      else {
+        const release = () => {
+          document.removeEventListener('pointerup', release, true);
+          document.removeEventListener('pointercancel', release, true);
+          // Let the held control's click land before replacing its card.
+          setTimeout(() => { if (live() && document.getElementById('mini') === drawn) { drawn = draw(door); syncChromeKeep(); } }, 0);
+        };
+        document.addEventListener('pointerup', release, true);
+        document.addEventListener('pointercancel', release, true);
+      }
+    }
     else settled();
     // R2 · the bar's Save names what the card now stands for (解せ: 解す once the answer names it, never the asked 解する)
     syncChromeKeep();
@@ -10520,20 +10745,21 @@ function readerGlossLine(token) {
   const line = now ? el('span', 'tok-en', now) : el('span', 'tok-en tok-en-miss', '—');
   if (!now) readyTokenReading(token)?.then(() => {
     const found = line.isConnected ? gloss(readingToken(token)) : '';
-    if (found) { line.className = 'tok-en'; line.textContent = found; }
+    if (found) {
+      line.className = 'tok-en'; line.textContent = found;
+      const word = line.closest('.tok[data-index]');
+      if (word) nameReaderToken(word, token, Number(word.dataset.index), 'word');
+    }
   });
   return line;
 }
 
 /** The first-visit tip: one plain line (round 4, John T4: the explanation was "too verbose and..
  * confusing"). The text settings keep the longer form, with the word menu's press and hold. */
-function readerTipText() {
-  return tx('語をタップすると、意味が出ます。', 'Tap any word for its meaning.');
-}
 /** How the reader's words work, in plain words: the text settings say it whole (John, 2026-10-02 #8). */
 function tapLadderHint() {
   return tx('語をタップすると意味が出ます。右クリック（または長押し）で、ほかの操作も。',
-    'Tap any word to see what it means. Right-click (or press and hold) for more.');
+    'Tap for the reading, tap again for the meaning, then open the word. Press and hold for more.');
 }
 
 /* R4 (2026-09-30) — a reader word is named by the word itself. How to work it and what it shows now
@@ -10541,7 +10767,7 @@ function tapLadderHint() {
  * (#reader-help-*); only a word that shows its reading carries a state line of its own. */
 function readerWordHint() {
   return tx('Enterで読みと意味。Shift+F10でほかの操作。Ctrl+Enterで全項目。',
-    'Enter: reading and meaning · Shift+F10: more actions · Ctrl+Enter: full entry');
+    'Enter: next word layer · Shift+F10: more actions · Ctrl+Enter: full entry');
 }
 function readerTokenState(token, index, kind) {
   if (kind === 'named') return S.revealed?.has(index) ? token.r || '' : '';
@@ -10566,17 +10792,22 @@ function readerTokenState(token, index, kind) {
   return parts.join(' · ');
 }
 function nameReaderToken(span, token, index, kind) {
-  span.setAttribute('aria-label', token.s || token.b);
+  span.dataset.proseLabel = token.s || token.b;
+  if (span.dataset.proseSelected === 'true') span.setAttribute('aria-label', token.s || token.b);
+  else span.removeAttribute('aria-label');
   const state = readerTokenState(token, index, kind);
   const host = span.parentElement?.classList.contains('token-door') ? span.parentElement : null;
   let node = host?.querySelector(':scope > .tok-state') || null;
   if (state && host) {
     if (!node) { node = el('span', 'tok-state visually-hidden'); node.id = `tok-state-${index}`; host.append(node); }
+    node.hidden = true;
     node.textContent = state;
   } else { node?.remove(); node = null; }
   const ids = kind === 'word' ? ['reader-help-kind', node?.id, 'reader-help-word']
     : [node?.id, kind === 'named' ? 'reader-help-named' : 'reader-help-lookup'];
-  span.setAttribute('aria-describedby', ids.filter(Boolean).join(' '));
+  span.dataset.proseDescription = ids.filter(Boolean).join(' ');
+  if (span.dataset.proseSelected === 'true') span.setAttribute('aria-describedby', span.dataset.proseDescription);
+  else span.removeAttribute('aria-describedby');
 }
 function readerHelp() {
   const help = el('div', 'visually-hidden reader-help');
@@ -10587,34 +10818,29 @@ function readerHelp() {
   }
   return help;
 }
-/** One Tab stop per paragraph; ←/→ walk its words, Home/End its ends; ↑/↓ stay the page's. */
+/** Keep the existing inline layout and paragraph breaks, but give the accessibility tree real paragraphs.
+ * The paragraph owns Tab; explicit word selection uses the shared prose controller. */
 function installReaderRoving(reader) {
-  const byPara = new Map();
-  for (const tok of reader.querySelectorAll('button.tok[data-para]')) {
-    tok.tabIndex = -1;
-    if (!byPara.has(tok.dataset.para)) byPara.set(tok.dataset.para, []);
-    byPara.get(tok.dataset.para).push(tok);
+  if (!reader.querySelector(':scope > [data-reader-prose]')) {
+    let paragraph = null;
+    for (const node of [...reader.childNodes]) {
+      if (node.nodeType === 1 && node.classList.contains('para-break')) { paragraph = null; continue; }
+      if (!paragraph) {
+        paragraph = el('p', 'reader-prose');
+        paragraph.dataset.readerProse = 'true';
+        paragraph.style.margin = '0';
+        reader.insertBefore(paragraph, node);
+      }
+      paragraph.append(node);
+    }
   }
-  const current = S.readerTake?.p === S.passageId ? readerTokenAtIndex(S.readerTake.index, reader) : null;
-  for (const [para, list] of byPara) (current?.dataset.para === para ? current : list[0]).tabIndex = 0;
-  reader.addEventListener('focusin', (event) => {
-    const tok = event.target.closest?.('button.tok[data-para]');
-    if (tok) for (const other of byPara.get(tok.dataset.para) || []) other.tabIndex = other === tok ? 0 : -1;
-  });
-  reader.addEventListener('keydown', (event) => {
-    const tok = event.target.closest?.('button.tok[data-para]');
-    if (!tok || event.altKey || event.ctrlKey || event.metaKey) return;
-    const list = byPara.get(tok.dataset.para) || [];
-    const at = list.indexOf(tok);
-    const next = { ArrowRight: list[at + 1], ArrowLeft: list[at - 1], Home: list[0], End: list.at(-1) }[event.key];
-    if (!(event.key in { ArrowRight: 1, ArrowLeft: 1, Home: 1, End: 1 })) return;
-    event.preventDefault();
-    next?.focus();
-  });
+  for (const paragraph of reader.querySelectorAll(':scope > [data-reader-prose]')) {
+    if (paragraph.querySelector('.tok[data-para]')) installProseWordRoving(paragraph, '.tok[data-para]');
+  }
 }
 /** Reading only: never a gloss, whatever the shared per-index state holds. */
 function paintNamedTok(span, token, index) {
-  const shown = !!S.revealed?.has(index);
+  const shown = S.dials.furigana !== 0 && !!S.revealed?.has(index);
   if (S.dials.furigana === 1) {
     for (const rt of span.querySelectorAll('rt')) rt.classList.toggle('hidden-rt', !shown);
   } else if (S.dials.furigana === 0) {
@@ -10630,16 +10856,13 @@ function paintNamedTok(span, token, index) {
 }
 /** Apply one token's reveal state straight to its DOM — no re-render. */
 function paintTok(span, token, index) {
-  const hasReading = S.dials.furigana === 2 || S.revealed?.has(index);
+  const hasReading = S.dials.furigana === 2 || (S.dials.furigana === 1 && S.revealed?.has(index));
   const hasEn = S.glossed?.has(index);
   if (S.dials.furigana === 1) {
     for (const rt of span.querySelectorAll('rt')) rt.classList.toggle('hidden-rt', !hasReading);
   } else if (S.dials.furigana === 0) {
-    // the dial says no ruby — a per-word reveal builds it on the spot.
-    // Swap the WORD ROW alone: the column must stay [word row, gloss row], so
-    // wiping the whole span (and re-appending) would both drop the wrapper and
-    // land a rebuilt word AFTER an existing gloss. replaceWith keeps the order
-    // and leaves any mounted .tok-en untouched for the block below.
+    // Off never borrows the reveal rung. Replacing only the word row keeps
+    // an explicitly requested English gloss in its original position.
     const built = span.querySelector('ruby');
     if (hasReading !== !!built) {
       const next = wordRow(displayPairs(token), {
@@ -10674,7 +10897,7 @@ function paintTok(span, token, index) {
 const readerTokenPainters = new Map();
 const readerTokenDoors = new WeakMap();
 function markReaderReading(index) {
-  if (S.dials.furigana === 2) return;
+  if (S.dials.furigana !== 1) return;
   const before = S.revealed ? [...S.revealed] : [];
   S.revealed = new Set([index]);
   for (const at of new Set([...before, index])) readerTokenPainters.get(at)?.();
@@ -10725,19 +10948,25 @@ function wireTokenGestures(span, token, index, p) {
     go(readerEntryNode(token, index, p), { invoker: span, from: (fromSlip && slipHeadword()) || span, instant: modality === 'keyboard' });
   };
   const sentence = () => readerTakeNode({ id: token.b, index, p: p.id });
-  const quickLook = (modality = 'pointer', { restore = false } = {}) => {
+  const quickLook = (modality = 'pointer', { restore = false, demo = false } = {}) => activateWordLadder(span, {
+    surface: token.s, reading: token.r, modality, restore, demo,
+    reveal: () => { setReaderTake(token.b, index, p.id); markReaderReading(index); },
+    clearReveal: () => clearReaderReadings(),
+    readingVisible: () => S.dials.furigana === 2 || !!S.revealed?.has(index),
+    onReveal: () => obsLog('tap', obsKey, 1, p.id),
+    openStage: ({ restore, demo }) => {
+    if (!demo) {
     setReaderTake(token.b, index, p.id);
     // the meaning is shown: the observation log's depth 2, as the mini always wrote it
     if (!restore) obsLog('tap', obsKey, 2, p.id);
-    markReaderReading(index);
+    }
     // R · the slip stands for the entry the token's own reading names (readingToken). A word the core lacks whose
     // reading names the full dictionary's one entry is that entry's own door (D23 answers it), not D11's held look
-    openReadingSlip(span, token, (door) => showMini(span, door, (entryModality) => openFull(entryModality, { fromSlip: true }), {
+    return openReadingSlip(span, token, (door) => showMini(span, door, (entryModality) => openFull(entryModality, { fromSlip: true }), {
       focusEntry: modality === 'keyboard', from, reader: !(door.seq && !D.dict[door.b]), kanji: true,
       sentence: readerSentenceRow(sentence(), index), entryNode: readerEntryNode(token, index, p), wordNote: readerWordNote(p, token),
     }));
-    if (!restore) retireReaderTip();
-  };
+  } });
   span.addEventListener('click', (event) => {
     // Activation lives on the CLICK: inside scrollable surfaces iOS
     // pointercancels a plain tap and pointerup never arrives — activating
@@ -10761,7 +10990,7 @@ function wireTokenGestures(span, token, index, p) {
       const door = readingToken(token);
       return wordSaveFacts(door, { reader: !(door.seq && !D.dict[door.b]), from });
     },
-    quickLook: (modality) => quickLook(modality), openEntry: (modality) => openFull(modality),
+    quickLook: (modality, options) => quickLook(modality, options), openEntry: (modality) => openFull(modality),
     reopen: () => quickLook('programmatic', { restore: true }),
   };
   wireReaderWordMenu(span, door);
@@ -10786,10 +11015,13 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
     record = answer.kanjiOnly ? null : japaneseLookupRecord(text, { ...lookupContext, ...answer });
   };
   const quickLook = async (modality = 'pointer', { restore = false } = {}) => {
-    if (named) markReaderReading(index);
     await prepare();
-    return openJapaneseLookup(span, text, { ...lookupContext, ...answer, from, sentence: () => readerSentenceRow(sentence(), index, token.readerSourceEnd ?? index),
-      focusPopup: modality === 'keyboard', wordNote: readerWordNote(p, token) }).then(() => { if (!restore && document.getElementById('mini')) retireReaderTip(); });
+    setReaderTake(token.b || text, index, p.id);
+    return openJapaneseLookup(span, text, { ...lookupContext, ...answer, from, restore, surface: token.s, surfaceReading: token.r,
+      ...(named ? { reveal: () => markReaderReading(index), clearReveal: () => clearReaderReadings(),
+        readingVisible: () => S.dials.furigana === 2 || !!S.revealed?.has(index) } : {}),
+      sentence: () => readerSentenceRow(sentence(), index, token.readerSourceEnd ?? index),
+      focusPopup: modality === 'keyboard', wordNote: readerWordNote(p, token) });
   };
   span.addEventListener('click', (event) => {
     if (event.detail !== 0 && Date.now() < swallowClickUntil) return;
@@ -11420,7 +11652,6 @@ function renderReader(main) {
   // a narrated article's listen door — one tap to hear the article, one tap to stop
   main.append(listenRow);
   // the sentence's actions live in the word popup and the word menu: no bar floats over the text (#18)
-  renderReaderTip(card);
 
   const reader = el('div', 'reader');
   reader.id = 'reader';
@@ -11441,6 +11672,7 @@ function renderReader(main) {
   }
 
   const paraBreaks = new Set(p.paras || []);
+  const readingAnnotations = phoneticAnnotationIndices(p.tokens);
   // the shared learner model, visible in the text itself: words on the
   // memorize list carry a quiet under-ink — deeper when the card is due
   // right now. The reader and the review pile never disagree about what
@@ -11490,21 +11722,22 @@ function renderReader(main) {
     // A name whose reading the dial leaves to reveal shows it while it is the touched word (触れて).
     // Every Japanese token still opens lookup, including names already shown in kana.
     const namedDoor = namedReading && S.dials.furigana !== 2 && displayPairs(token).some((pair) => pair.r);
-    const interactive = !!token.c || !!particle || namedDoor || /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(token.s || '');
+    const interactive = !readingAnnotations.has(index) && (!!token.c || !!particle || namedDoor || /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(token.s || ''));
     // its own class: a door, but never mistaken for a graded content word —
     // the app and its verifiers both select on .tok.content, and a name with
     // no dictionary entry answering to that name breaks both
     const span = el(
-      interactive ? 'button' : 'span',
-      token.c ? 'tok content' : namedReading ? 'tok named' : 'tok plain',
+      'span',
+      readingAnnotations.has(index) ? 'tok annotation' : token.c ? 'tok content' : namedReading ? 'tok named' : 'tok plain',
     );
-    if (interactive) span.type = 'button';
+
     span.dataset.index = String(index);
+    if (readingAnnotations.has(index)) span.dataset.readerAnnotation = 'true';
     if (token.readerSourceEnd !== undefined) {
       span.dataset.indexEnd = String(token.readerSourceEnd);
       span.dataset.targetKind = 'word';
     }
-    if (token.c) {
+    if (token.c && interactive) {
       span.dataset.word = token.b;
       span.dataset.action = 'target.activate';
       span.dataset.targetKind = 'word';
@@ -11514,7 +11747,7 @@ function renderReader(main) {
         if (rec && new Date(rec.due) <= dueNow) span.classList.add('tok-due');
       }
       span.setAttribute('aria-haspopup', 'dialog');
-    } else if (particle) {
+    } else if (particle && interactive) {
       span.dataset.action = 'target.activate';
       span.dataset.targetKind = 'particle';
       span.setAttribute('aria-haspopup', 'dialog');
@@ -11525,10 +11758,8 @@ function renderReader(main) {
     if (S.readerTake?.p === p.id && S.readerTake.index === index) span.classList.add('tok-current');
     span.append(
       wordRow(displayPairs(token), {
-        // a per-word reveal survives a full re-render even at ふりがな なし
-        // (mode 0 never prints rt, so a revealed token is promoted to 1 —
-        // the same promotion paintTok applies on the spot)
-        furigana: S.dials.furigana === 0 && S.revealed?.has(index) ? 1 : S.dials.furigana,
+        // Off stays bare; on-touch owns only the current occurrence's reveal.
+        furigana: S.dials.furigana,
         revealed: S.dials.furigana === 2 || (S.revealed && S.revealed.has(index)),
       }),
     );
@@ -11584,6 +11815,7 @@ function renderReader(main) {
   }
   main.append(readerHelp(), reader);
   installReaderRoving(reader);
+  demonstrateWordLadder(reader);
   main.append(renderReadingPlaces(p));
 
   // The article's foot: finish the reading, then everything about the text itself — source,
@@ -11741,7 +11973,7 @@ window.__BUNKI_OPEN_ENTRY = {
  *   redo    the caller already read the press (the reader's doors): never treat this call as the second tap
  * Returns the slip, or null when this activation was the second tap and dived into the entry instead. */
 function openSlip(node, { anchor, from = 'lookup', host = null, look = null, note = null, sentence = null, focus = false,
-  onClose = null, entry, key = null, redo = false, why = '' } = {}) {
+  onClose = null, entry, key = null, redo = false, why = '', reveal = null, clearReveal = null, readingVisible = null } = {}) {
   if (!anchor?.isConnected) return null;
   if (!redo && diveFromSlip(anchor)) return null;
   const kind = node?.t === 'kanji' ? 'kanji' : node?.t === 'particle' ? 'particle' : node?.t === 'grammar' ? 'grammar' : 'word';
@@ -11783,9 +12015,10 @@ function openSlip(node, { anchor, from = 'lookup', host = null, look = null, not
       entry(modality);
     } else if (node) go(node, { invoker: anchor, from: slipHeadword() || anchor, instant: modality === 'keyboard' }); // the slip leaves inside the cut (enterWord)
   };
-  return showMini(anchor, token, onEntry, { focusEntry: focus, record, entryAvailable, sentence, look, kind, save, host, note,
+  return activateWordLadder(anchor, { surface: token.s, reading: look?.reading || token.r, reveal, clearReveal, readingVisible,
+    openStage: () => showMini(anchor, token, onEntry, { focusEntry: focus, record, entryAvailable, sentence, look, kind, save, host, note,
     source: from, key, kanji, onClose, follow: from === 'drift' || from === 'sky', nodeFor: node && kind !== 'word' ? { t: node.t, id: node.id } : null,
-    entryNode: typeof entry === 'function' ? null : node, why });
+    entryNode: typeof entry === 'function' ? null : node, why }) });
 }
 /** A kanji's first reading for the slip's band: its first on reading in kana, else its first kun stem. */
 function kanjiSlipReading(k) {
@@ -15788,11 +16021,11 @@ function assessmentCardAssistance(card) {
  * device or time. */
 function assessmentAssistedMark({ assistedOrigin: origin, assistedKind: kind }) {
   const text = origin === 'received'
-    ? tx('助けあり · 同期された結果に、この問題の助けの記録がある', 'Assisted · the synced result records help on this question')
+    ? tx('助けあり · 同期された結果に、この問題の助けの記録がある', 'with help · the synced result records help on this question')
     : origin === 'local' && kind === 'explanation'
-      ? tx('助けあり · 答えたあとに解説を見た問題', 'Assisted · you opened the explanation after answering')
+      ? tx('助けあり · 答えたあとに解説を見た問題', 'with help · you opened the explanation after answering')
       : origin === 'local' && kind === 'dictionary'
-        ? tx('助けあり · この問題で語を調べた', 'Assisted · you looked up a word on this question') : null;
+        ? tx('助けあり · この問題で語を調べた', 'with help · you looked up a word on this question') : null;
   if (!text) throw new TypeError(`assessment-assisted-origin:${origin}:${kind}`);
   return el('p', 'assessment-review-assisted', text);
 }
@@ -20059,7 +20292,7 @@ function wwPlate(model, section) {
   glyph.addEventListener('click', (event) => {
     event.stopPropagation();
     if (!centreNode) { go({ t: 'radical', id: c.key }, { invoker: glyph }); return; }
-    openSlip(centreNode, { anchor: glyph, from: 'lookup', focus: event.detail === 0 });
+    openSlip(centreNode, { anchor: glyph, from: 'lookup', focus: event.detail === 0, readingVisible: () => !!c.reading });
   });
   glyph.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !document.getElementById('mini')) return;
@@ -20500,7 +20733,6 @@ function wireParticleGestures(span, particle, index, p) {
       sentence: readerSentenceRow(sentence(), index), focus: modality === 'keyboard',
       entry: (entryModality) => openFull(entryModality),
     });
-    if (!restore) retireReaderTip();
   };
   span.classList.add('particle');
   span.addEventListener('click', (event) => {
@@ -23221,6 +23453,7 @@ function readerTakeCurrent() {
 /** S · what the reader's keep stands for: the word last touched, read as the slip reads it (readingToken, the R slice's
  * reading truth), with the slip's own save facts — so the bar and the card can never disagree about what Save keeps. */
 function chromeKeepTarget() {
+  if (ladderVisit?.rung === 'stage' && ladderVisit.saveFacts) return ladderVisit.saveFacts();
   const cur = readerTakeCurrent();
   const token = cur ? passage()?.tokens?.[cur.index] : null;
   if (!token || token.b !== cur.id) return null;
@@ -25424,7 +25657,7 @@ function guidedHost() {
     openEntry: (node) => go(node, { invoker: document.activeElement }),
     // a word in the session's teaching text opens the app's one slip beside it (contract §1); Save goes through
     // the session's own path (host), so its ledger and its crane keep their word
-    openSlip: (node, { anchor, host, look, onClose } = {}) => openSlip(node, { anchor, from: 'guided', host, look, onClose }),
+    openSlip: (node, options = {}) => openSlip(node, { ...options, from: 'guided' }),
     // the one honest note (contract §5), as markup for the room's templates
     noteHtml: (kind) => (NOTE_TEXT[kind] ? note(kind).outerHTML : ''),
     openTutor: () => {
@@ -26988,8 +27221,9 @@ function renderSentenceTokens(container, tokens, opts = {}) {
   const target = opts.targetId || null;
   const contextId = opts.contextId || 'sentence';
   const source = sentenceSource(tokens, contextId, opts.start);
+  const annotations = phoneticAnnotationIndices(tokens);
   tokens.forEach((token, index) => {
-    if (!token.c || !token.f?.length) {
+    if (annotations.has(index) || !/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(token.s || '')) {
       // 禁則処理 — a line must never open with a closing mark. WebKit
       // breaks between an atomic token box (the inline-flex word button)
       // and the text run after it, so a bare 、 could start a line
@@ -27025,17 +27259,10 @@ function renderSentenceTokens(container, tokens, opts = {}) {
     // could reach, while the reader's own tokens are labelled buttons
     // (E3 round-A, dead-ends lens; CONFIRMED on the head). Same element,
     // same grammar.
-    const span = el(
-      'button',
-      'tok content sentence-tok' + (isTarget ? ' example-hit' : ''),
-    );
-    span.type = 'button';
-    span.setAttribute('aria-haspopup', 'dialog');
-    span.setAttribute(
-      'aria-label',
-      tx(`${token.s} · 語 · 押すと読みと意味`, `${token.s} · word · activate for the reading and meaning`),
-    );
-    span.append(wordRow(displayPairs(token), { furigana: 0, revealed: false }));
+    const span = el('span', 'tok content sentence-tok' + (isTarget ? ' example-hit' : ''));
+    span.lang = 'ja';
+    span.dataset.proseLabel = token.s;
+    span.append(wordRow(displayPairs(token), { furigana: S.dials.furigana, revealed: S.dials.furigana === 2 }));
     // the reader's grammar (reader lane 2026-10-02): one tap opens the word's popup — reading and meaning
     // at once, Save, and Full entry ›, which opens the entry with this sentence as its provenance
     const from = source ? { passage: source.passage, index: source.index + index } : null;
@@ -27053,18 +27280,31 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       // G1 · the page arrives from the slip's headword; the slip leaves inside the cut
       go(entryNodeFor(door), { invoker: span, from: slipHeadword() || span, instant: modality === 'keyboard' });
     };
-    span.addEventListener('contextmenu', (ev) => ev.preventDefault());
+    const quickLook = (modality = 'pointer') => {
+      if (!token.c) return openJapaneseLookup(span, token.b || token.s, { surface: token.s, reading: token.r, from,
+        focusPopup: modality === 'keyboard' });
+      return activateWordLadder(span, { surface: token.s, reading: token.r, modality,
+        onReveal: () => obsLog('tap', srsKey('word', token.b), 1, contextId),
+        openStage: ({ restore }) => {
+          if (!restore) obsLog('tap', srsKey('word', token.b), 2, contextId);
+          return openReadingSlip(span, token, (door) => showMini(span, door, (mode) => openEntry(door, mode), {
+            focusEntry: modality === 'keyboard', from, entryNode: entryNodeFor(door) }));
+        } });
+    };
     span.addEventListener('click', (ev) => {
       ev.stopPropagation();
       if (ev.detail !== 0 && Date.now() < swallowClickUntil) return;
-      // the second tap on the popup's word dives into its full entry
       if (diveFromMini(span, ev)) return;
-      obsLog('tap', srsKey('word', token.b), 2, contextId);
-      openReadingSlip(span, token, (door) => showMini(span, door, (modality) => openEntry(door, modality), { focusEntry: ev.detail === 0, from,
-        entryNode: entryNodeFor(door) }));
+      void quickLook(ev.detail === 0 ? 'keyboard' : 'pointer');
     });
+    wireReaderWordMenu(span, { target: { kind: 'word', id: token.b || token.s }, label: token.b || token.s,
+      copyText: token.s, entryAvailable: !!token.c,
+      quickLook, openEntry: mode => openEntry(readingToken(token), mode),
+      save: () => wordSaveFacts(readingToken(token), { from }),
+      reopen: () => quickLook('programmatic') });
     container.append(span);
   });
+  installProseWordRoving(container, '.sentence-tok');
 }
 
 /* ------------------------------------------------------------- AI in the app
@@ -31728,6 +31968,12 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
   const depth = S.stack.length + 1;
   const ready = layered ? takePrebuiltPage(node, depth) : null;
   const pushed = ready?.node || node;
+  if (ladderOpening) {
+    ladderOpening.rung = 'page';
+    ladderOpening.anchor.dataset.ladderRung = 'page';
+    ladderPages.set(pushed, ladderOpening);
+    ladderVisit = null;
+  }
   if (invoker?.isConnected) heroSource.set(pushed, invoker);
   const source = from?.isConnected ? from : invoker?.isConnected ? invoker : null;
   const where = sampleWhere();
@@ -31754,13 +32000,15 @@ function recede({ all = false, viaRender = false, instant = false } = {}) {
   finishPageTransition();
   const layered = !viaRender && layerPathFor();
   const leaving = all ? S.stack[0] : S.stack.at(-1);
+  const origin = ladderPages.get(leaving);
+  ladderPages.delete(leaving);
   const where = sampleWhere();
   const leaves = !instant && pageCutAllowed() ? glyphBox(heroOf(document.getElementById('sheet'))) : null;
   if (all) S.stack = [];
   else S.stack.pop();
   const top = S.stack.at(-1);
   S.sheetReturnFocus = top?.returnFocus || null;
-  if (!S.stack.length) clearReaderSummons();
+  if (!S.stack.length && !origin) clearReaderSummons();
   const kept = layered && top ? keptPages.get(top) : null;
   if (top) keptPages.delete(top);
   if (layered) renderLayer({ prebuilt: kept && kept.epoch === pageEpoch ? kept.page : null });
@@ -31770,6 +32018,12 @@ function recede({ all = false, viaRender = false, instant = false } = {}) {
     restoreDialogInvoker();
   }
   const home = heroSource.get(leaving);
+  if (origin?.anchor.isConnected && !all) {
+    ladderVisit = origin;
+    origin.restoreNext = true;
+    origin.rung = origin.anchor.dataset.ladderRung = 'stage';
+    origin.openStage({ restore: true, demo: origin.demo });
+  } else if (origin) clearWordLadder(origin);
   const flight = leaves && home?.isConnected ? flyWord(leaves, home) : null;
   sampleTransition('back', where);
   return flight;
@@ -34947,7 +35201,7 @@ function render() {
   }
 
   // the interim voice belongs to the reader: leaving the room ends it
-  if (S.view !== 'reader') { stopReadAloud(); readerTipVisit = null; }
+  if (S.view !== 'reader') stopReadAloud();
   // The context deck's focus state belongs only to its own room.
   if (S.view !== 'contextdeck') delete document.documentElement.dataset.cdFocus;
 

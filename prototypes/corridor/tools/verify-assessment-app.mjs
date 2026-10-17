@@ -383,6 +383,8 @@ async function run(engine, name, body, { assessmentRetry = false } = {}) {
   // An isolated durable profile exercises the actual reload/offline contract.
   const profile = mkdtempSync(resolve(evidence, `${engine}-${name}-`));
   const context = await ({ chromium, webkit }[engine]).launchPersistentContext(profile, { headless: true });
+  const browserVersion = context.browser().version();
+  console.log(`BROWSER ${engine} ${browserVersion}`);
   const page = context.pages()[0] || await context.newPage();
   const pageErrors = [], lifecycle = [];
   pageLifecycles.set(page, lifecycle);
@@ -409,7 +411,7 @@ async function run(engine, name, body, { assessmentRetry = false } = {}) {
         assert.equal(load.scripts[0].status, 'read'); assert.equal(load.scripts[0].sha256, sha(corridorFixture));
       }
     }
-    assert.deepEqual(pageErrors, []); results.push({ engine, name, passes: true, lifecycle });
+    assert.deepEqual(pageErrors, []); results.push({ engine, browserVersion, name, passes: true, lifecycle });
     if (proof) proof.status = 'passed';
     console.log(`PASS ${engine}/${name}`);
   } catch (error) {
@@ -434,7 +436,7 @@ async function run(engine, name, body, { assessmentRetry = false } = {}) {
         revealed: !!S.review.revealed, declared: S.review.declared ?? null },
       gradeDiagnostic: JSON.parse(JSON.stringify(window.__assessmentGradeDiagnostic || null)),
       deletionSetup: window.__assessmentDeletionSetup || null })).catch(() => null);
-    failures.push({ engine, name, error: String(error), pageErrors, lifecycle, state });
+    failures.push({ engine, browserVersion, name, error: String(error), pageErrors, lifecycle, state });
     console.error(`FAIL ${engine}/${name}: ${String(error)}`);
     writeFileSync(resolve(evidence, 'assessment-app-failures.json'), `${JSON.stringify(failures, null, 2)}\n`);
     await page.screenshot({ path: resolve(evidence, `${engine}-${name}.png`), fullPage: true }).catch(() => {});
@@ -631,9 +633,9 @@ try {
       // says only that a word was looked up on that question, with no timing claim; a received card says only
       // what its synced result records, with no kind of help, no event on this device and no time. The word
       // back and the sentence back are both read, for each source.
-      const assistedWording = { local: 'Assisted · you opened the explanation after answering',
-        dictionary: 'Assisted · you looked up a word on this question',
-        received: 'Assisted · the synced result records help on this question' };
+      const assistedWording = { local: 'with help · you opened the explanation after answering',
+        dictionary: 'with help · you looked up a word on this question',
+        received: 'with help · the synced result records help on this question' };
       const assistedKind = { local: 'explanation', dictionary: 'dictionary', received: null };
       for (const source of ['local', 'dictionary', 'received']) await run(engine, `${source}-assisted-card-backs-name-where-help-was-recorded`, async page => {
         await page.evaluate(() => { D.dict['assessment-fixture-word'] = { r: 'ご', m: ['Synthetic dictionary sense differs from test context'] }; });

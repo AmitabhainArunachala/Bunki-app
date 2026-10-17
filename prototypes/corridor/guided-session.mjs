@@ -467,7 +467,7 @@ export function createGuidedSession(host) {
     return status === 'held' ? 'held' : 'failed';
   }
 
-  /** A word of the teaching text, tapped: the app's one slip beside it (contract §1), with Save through
+  /** A word of the teaching text, tapped: the app's shared reading/stage/page ladder, with Save through
    * saveWord above. The session keeps no word room of its own any more. */
   function openWordSlip(key, sourceId, anchor) {
     const word = words[key];
@@ -477,6 +477,9 @@ export function createGuidedSession(host) {
     host.openSlip(node, {
       anchor,
       look: { label: word.surface, reading: word.reading, gloss: word.meaning },
+      // A reading already printed by the teaching view skips the reveal rung. Otherwise
+      // the host supplies inline ruby and clears it on return; this room keeps no rung state.
+      readingVisible: () => !!anchor.querySelector('.gs-reading'),
       host: {
         // the one Save ▾ menu as everywhere (the one-hand pass): the lists are written through the app's own record;
         // Save itself stays the session's path (its ledger row, its crane), and the menu's Review row takes the card
