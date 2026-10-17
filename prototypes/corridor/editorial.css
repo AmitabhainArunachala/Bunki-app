@@ -1657,6 +1657,11 @@ body.v-depth-layered #reader, #reader.reader {
 /* a reading is the one ruby (rooms/motion.css): native, half its word, over it. On touch a reading stands
    alone over the word you tapped, so it keeps no gap at its sides and pries no air into the line (R1) */
 #reader:not(.fg-always) { --reading-gap: 0; }
+/* at 200 % text on a phone (a column under 240 CSS px) a bracketed word can be wider than the line: there the
+   closing mark may start a line rather than run off the screen (the kinsoku rule yields to the page's edge) */
+@media (max-width: 240px) {
+  #reader.reader { line-break: anywhere; }
+}
 .reader .para-break { height: 1.5em; }
 .reader .tok-en {
   margin-top: 0.1em;
