@@ -34,8 +34,9 @@
  *   and writes nothing; Remove is the one way out; right-click and Shift+F10 do what a hold does (全項目 routes the keyboard
  *   to the page); New list… asks a name once; his lists are one tap each; the strip speaks plain full verbs (never "this
  *   sentence · save · ask the tutor · practice"), stays under 40 % of the screen and covers no button and not the word;
- *   the bookmark lands on the kept words, and browsing them never starts a review; layers open only from 層, never move
- *   the paragraph's lines, and fold on any tap, Escape or the mark; frames of the seal and the landing (WebKit ≤ 24 ms).
+ *   a word held inside the word's page keeps its strip in the page, over no button; the bookmark lands on the kept
+ *   words, and browsing them never starts a review; layers open only from 層, never move the paragraph's lines, and fold
+ *   on any tap, Escape or the mark; frames of the seal and the landing (WebKit ≤ 24 ms).
  *   --g5-only runs only these; --g5-controls adds: a second hold that un-keeps, a strip over a button, a layer that stays.
  * G3 negative controls: --controls replays stalled tap2, uncleared ruby and a front door; harness failures are incomplete.
  * --controls-only runs only the three candidate schedules, mutants and restores, with no frame measurements.
@@ -1224,6 +1225,33 @@ try {
       check('G5.list.one-tap', 'his lists stand in the strip, and one tap puts the word on one', offered.lists.map((row) => row.name).sort().join() === ['仕事', '旅'].sort().join() &&
         offered.lists.every((row) => row.pressed === 'false') && !!onList && after.lists.find((row) => row.name === '旅')?.pressed === 'true' && after.strip, { offered: offered.lists, after: after.lists });
       check('G5.list.labels', 'the strip with lists still speaks in plain full verbs', labelsClean(after), after.acts);
+    });
+
+    // a word held inside the word's page: the strip stands in the page (it scrolls with it), under its bar, over no button
+    await walk('G5-page', async (page) => {
+      await openStory(page);
+      await stage(page, readerWord(page));
+      await page.locator('#mini .mini-word').tap();
+      await pageSettled(page);
+      const inside = page.locator('#sheet .example .sentence-tok, #sheet .japanese-lookup-word').filter({ hasText: /^(内閣|大臣|官邸|日本|表彰|出席|大賞)$/u }).first();
+      await inside.scrollIntoViewIfNeeded();
+      await delay(300);
+      await inside.evaluate((node) => node.setAttribute('data-g5-held', ''));
+      const start = await g5Facts(page), before = await readAppRecord(page);
+      await holdOn(page, inside, { id: 46 });
+      await page.locator('#sheet #seal-strip').waitFor();
+      await landed(page);
+      const held = await g5Facts(page), after = await readAppRecord(page);
+      const place = await stripCover(page, '[data-g5-held]');
+      const word = await inside.evaluate((node) => { const copy = node.cloneNode(true); copy.querySelectorAll('rt, rp, .tok-state, .tok-en').forEach((n) => n.remove()); return copy.textContent.trim(); });
+      check('G5.page.kept', `a word held inside the page (${word}) is kept once, and the page stays`, held.page && (after.taken || []).length === (before.taken || []).length + 1 &&
+        held.count === start.count + 1 && /Saved/u.test(held.status), { held, word });
+      check('G5.page.strip', 'its strip stands in the page under 40 % of the screen, over no button and not over the word', held.strip && !!place &&
+        place.share <= 0.4 && place.covered.length === 0 && !place.overWord, place);
+      await page.keyboard.press('Escape');
+      await delay(250);
+      const gone = await g5Facts(page);
+      check('G5.page.escape', 'Escape takes the strip away and leaves the page as it was', !gone.strip && gone.page, gone);
     });
 
     await walk('G5-tray', async (page) => {

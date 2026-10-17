@@ -31,6 +31,8 @@ const failures = [];
 const norm = (c) => c.replace(/\s/g, '');
 for (const world of WORLDS) {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true });
+  // G3's one-time demonstration opens a word by itself on a fresh record; not under test here, so marked seen
+  await page.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
   const shoot = async (n) => { await page.waitForTimeout(420); await page.screenshot({ path: join(OUT, `${world}-${n}.png`) }); };
   const tokens = async () => page.evaluate(`(() => {
     const cs = getComputedStyle(document.documentElement);
@@ -152,7 +154,12 @@ for (const world of WORLDS) {
   await page.locator('#shelf-body [data-passage] .shelf-open').first().click();
   await page.waitForFunction(() => document.querySelectorAll('#reader .tok.content').length > 3, null, { timeout: 30000 });
   await page.waitForTimeout(500);
-  await page.locator('#reader .tok.content').first().click();
+  // G3's ladder: on touch the first activation raises only the reading; the second, on that observed rung only, the stage
+  // (this walk reached its later overlays, the strip among them, only through the stage)
+  const first = page.locator('#reader .tok.content').first();
+  await first.click();
+  await page.waitForFunction(() => !!document.getElementById('mini') || document.querySelector('#reader .tok.content')?.dataset.ladderRung === 'reading', null, { timeout: 10000 });
+  if (!await page.locator('#mini').count() && await first.getAttribute('data-ladder-rung') === 'reading') await first.click();
   await page.waitForSelector('#mini', { timeout: 10000 });
   await shoot('6-slip');
   await opaque('slip', '#mini');
