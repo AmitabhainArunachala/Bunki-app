@@ -313,9 +313,11 @@ async function walkToSemPanel(page, tapFn) {
   return page.locator('#sheet .sem-row').count();
 }
 
+// F (one ladder, 2026-10-18): the reader's body on a phone is the ladder's reading step, 21 px (was the approved 19 px
+// fixture); a reading over it is half its size, 10.5 px, the floor D5 sets. Navigation labels stay at or under 17 px.
 function hasApprovedPhoneHierarchy(probe) {
   const reader = probe.text.find(t => t.label === 'reading body (focused)');
-  return reader?.fontSize === 19 && probe.navigationLabelSize > 0 && probe.navigationLabelSize <= 17;
+  return reader?.fontSize === 21 && probe.navigationLabelSize > 0 && probe.navigationLabelSize <= 17;
 }
 
 function articleSummaries(probe) {
@@ -1557,9 +1559,9 @@ async function main() {
   check('reader navigation · an undersized clipped control fails both geometry and the 44px sweep',
     !narrowProbe.valid && narrowSweep.targets.some(t => t.id === 'chrome-search' && t.hitW < MIN_TAP));
   await narrowControl.evaluate(n => n.remove());
-  const smallReading = await page.addStyleTag({ content: '#reader.reader { font-size: 18px !important; }' });
+  const smallReading = await page.addStyleTag({ content: '#reader.reader { font-size: 19px !important; }' });
   const smallProbe = await page.evaluate(MEASURE_FN);
-  check('reader hierarchy · a smaller reading body fails the approved 19px fixture',
+  check('reader hierarchy · a smaller reading body (the old 19px) fails the ladder\'s 21px reading step',
     !hasApprovedPhoneHierarchy(smallProbe));
   await smallReading.evaluate(n => n.remove());
   const largeNavigation = await page.addStyleTag({ content: '.chrome .l-ja { font-size: 19px !important; }' });

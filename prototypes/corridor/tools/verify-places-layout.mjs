@@ -357,11 +357,27 @@ try {
       }
       return [...rows.values()].slice(0, 8);
     });
-    const readings = () => page.evaluate(() => [...document.querySelectorAll('#kp-card .kp-sentence ruby[data-rt]')].filter((r) => getComputedStyle(r, '::after').content !== 'none').length);
+    // each line's top, for its pitch
+    const tops = () => page.evaluate(() => {
+      const p = document.querySelector('#kp-card .kp-sentence');
+      const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest('rt') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+      const seen = new Set();
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) for (const b of (() => { const r = document.createRange(); r.selectNodeContents(n); return [...r.getClientRects()]; })()) if (b.width) seen.add(Math.round(b.top));
+      return [...seen].sort((a, b) => a - b).filter((t, i, a) => i === 0 || t - a[i - 1] > 4).slice(0, 8);
+    });
+    // the passage's own text as drawn: its rendered text nodes, readings and the ⋯ fold buttons (kp-more) left out
+    const text = () => page.evaluate(() => {
+      const p = document.querySelector('#kp-card .kp-sentence');
+      const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest('rt, .kp-more') || !n.parentElement.checkVisibility() ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+      let all = ''; for (let n = walker.nextNode(); n; n = walker.nextNode()) all += n.data;
+      return all.replace(/\s+/gu, '');
+    });
+    // F (one ruby): a reading is a native <rt>, shown when it is laid out and visible (the deck hides one in place)
+    const readings = () => page.evaluate(() => [...document.querySelectorAll('#kp-card .kp-sentence ruby > rt')].filter((rt) => { const cs = getComputedStyle(rt); return cs.display !== 'none' && cs.visibility !== 'hidden'; }).length);
     let s = await room();
     check('focus · while a card is up: no top bar, no tab bar, no report button', !s.chrome && !s.tabs && !s.rail, JSON.stringify(s));
     check('focus · the front shows no readings', !(await page.locator('#kp-card ruby').count()));
-    const front = await lines();
+    const front = await lines(), frontText = await text();
     const width = await page.evaluate(() => innerWidth);
     await page.touchscreen.tap(Math.round(width * 0.22), 420);
     await page.waitForTimeout(500);
@@ -370,13 +386,21 @@ try {
     await page.waitForTimeout(800);
     check('focus · a tap on the right half turns the card', (await room()).revealed);
     await gradesColourCoded(page, 'day');
-    const total = await page.locator('#kp-card .kp-sentence ruby[data-rt]').count();
+    const total = await page.locator('#kp-card .kp-sentence ruby > rt').count();
     check('focus · after the turn every kanji carries its reading', total > 0 && (await readings()) === total, `${await readings()}/${total}`);
-    check('focus · the readings move no line', JSON.stringify(await lines()) === JSON.stringify(front));
+    // F (one ruby, native, 2026-10-18): a reading earns its width (PREP §2: never squeezed or shrunk to keep the old
+    // breaks), so the turn may re-break a line where a word's reading is wider than the word; it was pinned as
+    // identical rows when readings were labels drawn over the line. The turn still keeps the passage whole and its
+    // lines at one pitch (no reading grows its line), and the Readings switch below moves nothing at all.
+    const back = await lines(), backTops = await tops();
+    const pitches = backTops.slice(1).map((t, i) => t - backTops[i]);
+    const backText = await text();
+    check('focus · the turn keeps the passage whole, its lines at one pitch', backText.length > 0 && backText === frontText &&
+      pitches.length > 2 && Math.max(...pitches) - Math.min(...pitches) <= 1, JSON.stringify({ pitches, same: backText === frontText, front: front.slice(0, 2), back: back.slice(0, 2) }));
     await page.locator('#kp-readings').click();
     await page.waitForTimeout(500);
     check('focus · the Readings switch returns the clean text', (await readings()) <= 2, `${await readings()} shown`);
-    check('focus · turning readings off moves no line', JSON.stringify(await lines()) === JSON.stringify(front));
+    check('focus · turning readings off moves no line', JSON.stringify(await lines()) === JSON.stringify(back) && JSON.stringify(await tops()) === JSON.stringify(backTops), JSON.stringify({ back: back.slice(0, 2), off: (await lines()).slice(0, 2) }));
     // the same pads in a night world (夜)
     await page.evaluate(() => localStorage.setItem('kairo-theme', 'yoru'));
     await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi`);

@@ -192,6 +192,21 @@ const BRIDGE = `window.__F__ = {
   dials: (k, f, s) => { S.dials = { kanji: k, furigana: f, spacing: s }; render(); },
   visit: (v) => { removeMini(); S.stack = []; S.strokes = null; S.view = v; render(); window.scrollTo(0, 0); },
 };`;
+/** the deck's back with its readings on, as a learner reaches it: the deck, Begin, 答えを見る, 読み on */
+async function openDeckBack(page) {
+  await page.goto(`${host.origin}/?deck=kotoba&ui=bi`);
+  await page.waitForFunction(() => document.body.dataset.ready === '1');
+  await page.locator('#app .kp').waitFor();
+  await page.waitForTimeout(700);
+  if (await page.locator('#app .kp-study #kp-quit').count()) { await page.locator('#kp-quit').click(); await page.waitForTimeout(500); }
+  const begin = page.locator('#app .kp-home button.kp-primary, #app .kp-home .kp-begin, #app button[data-kp="begin"]').first();
+  if (await begin.count()) await begin.click(); else await page.getByRole('button', { name: /Begin|始める|はじめる|Study|学習/u }).first().click();
+  await page.locator('#kp-reveal').waitFor();
+  await page.waitForTimeout(400);
+  await page.locator('#kp-reveal').click();
+  await page.waitForTimeout(800);
+  if ((await page.locator('#app .kp').getAttribute('data-readings')) !== 'on') { await page.locator('#kp-readings').click(); await page.waitForTimeout(400); }
+}
 async function session(browser, viewport, { scale = 2, zoomed = false } = {}) {
   // 200 % text is a page laid out at half the width and drawn at twice the scale; a phone emulation would zoom such a page
   // out to fit its widest box (Chromium reported innerWidth 376 for a 195 px page), so the zoomed page is laid out as is
@@ -326,6 +341,7 @@ try {
       await tok.scrollIntoViewIfNeeded(); await tok.click(); await page.locator('#mini').waitFor(); await page.waitForTimeout(300); await take('slip');
       await page.locator('#mini button.mini-word').click(); await page.waitForTimeout(900); await take('page');
       for (const room of ['tray', 'thesaurus', 'dojo', 'me']) { await page.evaluate((v) => window.__F__.visit(v), room); await page.waitForTimeout(900); await take(room); }
+      await openDeckBack(page); await take('deck-back');
       const off = Object.entries(rooms).flatMap(([room, c]) => c.off.map((o) => ({ room, ...o })));
       assert.deepEqual(off, [], `text off the ladder: ${JSON.stringify(off.slice(0, 12))}`);
       return Object.fromEntries(Object.entries(rooms).map(([room, c]) => [room, { checked: c.checked, inline: c.inline.length, inlineSizes: [...new Set(c.inline.map((i) => i.size))], scene: c.scene }]));
@@ -376,18 +392,7 @@ try {
       });
     }
     await run('R3-deck-back-390', { width: 390, height: 844 }, async ({ page }) => {
-      await page.goto(`${host.origin}/?deck=kotoba&ui=bi`);
-      await page.waitForFunction(() => document.body.dataset.ready === '1');
-      await page.locator('#app .kp').waitFor();
-      await page.waitForTimeout(700);
-      if (await page.locator('#app .kp-study #kp-quit').count()) { await page.locator('#kp-quit').click(); await page.waitForTimeout(500); }
-      const begin = page.locator('#app .kp-home button.kp-primary, #app .kp-home .kp-begin, #app button[data-kp="begin"]').first();
-      if (await begin.count()) await begin.click(); else await page.getByRole('button', { name: /Begin|始める|はじめる|Study|学習/u }).first().click();
-      await page.locator('#kp-reveal').waitFor();
-      await page.waitForTimeout(400);
-      await page.locator('#kp-reveal').click();
-      await page.waitForTimeout(800);
-      if ((await page.locator('#app .kp').getAttribute('data-readings')) !== 'on') { await page.locator('#kp-readings').click(); await page.waitForTimeout(400); }
+      await openDeckBack(page);
       const found = await page.evaluate(READINGS, '#kp-card .kp-sentence');
       assert(found.rows.length > 3, `the back's readings: ${found.rows.length}`);
       const judged = judgeReadings(found);
