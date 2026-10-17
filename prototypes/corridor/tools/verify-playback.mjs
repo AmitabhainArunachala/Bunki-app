@@ -139,7 +139,8 @@ async function fixture(mode) {
       }
       return route.continue();
     });
-    // the test, not index.html, raises the narration flag: the shipped build keeps it down
+    // index.html raises the narration flag since the 10-15 Kore probe; the test raises it too, so a
+    // narration case never depends on the shipped page for the flag it is testing
     if (spec.narration) await context.addInitScript(() => { window.__KAIRO_NARRATION__ = 1; });
     if (spec.pref) {
       await context.addInitScript((value) => {
@@ -209,6 +210,11 @@ async function fixture(mode) {
     if (spec.words) {
       await page.locator('#tray').click();
       await page.locator('#review-start').click();
+      // the sealed front (V): before the answer is revealed there is no voice door and nothing has
+      // played — 声 can only ever speak a revealed card
+      await page.waitForSelector('#reveal');
+      assert.equal(await page.locator('#card-say').count(), 0, 'the sealed front has no voice door');
+      assert.equal(await page.evaluate(() => window.__playbackFixture.clips.length), 0, 'nothing plays before the reveal');
       await page.locator('#reveal').click();
       await page.waitForSelector('#card-say', { timeout: 10000 });
     } else {
