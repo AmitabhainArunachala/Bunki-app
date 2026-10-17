@@ -1397,7 +1397,7 @@ export function createSpeakRoom(host) {
     cap.inputMode = 'numeric';
     cap.value = String(Number(spend()?.cap) > 0 ? spend().cap : 10);
     capLabel.append(cap);
-    const save = el('button', 'chip', t('保存', 'Save'));
+    const save = el('button', 'chip', t('保存する', 'Save on this device'));
     save.type = 'submit';
     const note = el('p', 'speak-quiet-line');
     note.setAttribute('role', 'status');
@@ -1538,10 +1538,14 @@ export function createSpeakRoom(host) {
       roving(target);
       box.append(target);
       box.append(el('p', 'speak-quiet-line', t('輪を押すと Kore が言います。あとについて言い、終わったらもう一度押す。', 'Tap the ring: Kore says it. Say it after her, then tap again.')));
-      const keep = el('button', 'btn-tertiary speak-quiet', t('この文を残す', 'Keep this line'));
-      keep.type = 'button';
-      keep.addEventListener('click', () => void keepLine(sh.line, keep));
-      box.append(keep);
+      // a line is kept for 影 (her voice, on this device) by the one Save ▾, as everything is kept; its menu removes it
+      const slot = el('div', 'speak-keep-line');
+      box.append(slot);
+      void keptLines().then((kept) => {
+        if (!slot.isConnected || st.shadow !== sh) return;
+        slot.prepend(host.saveLine({ text: sh.line.text, saved: () => kept.has(sh.line.text),
+          keep: () => keepLine(sh.line, slot), remove: () => removeLine(sh.line.text) }));
+      });
     }
     if (sh?.result) box.append(shadowFigure(sh.result));
     paintSavedLines(box);
@@ -1608,15 +1612,31 @@ export function createSpeakRoom(host) {
       tx.oncomplete = () => db.close();
     });
   }
-  async function keepLine(line, button) {
-    button.disabled = true;
+  /** The lines kept for 影 on this device, by their text (each text's ids): read once, then kept in step here. */
+  async function keptLines() {
+    if (!st.savedLines) {
+      const kept = new Map();
+      for (const item of await savedLines()) kept.set(item.text, [...(kept.get(item.text) || []), item.id]);
+      st.savedLines ||= kept;
+    }
+    return st.savedLines;
+  }
+  /** Keep a line for 影: true only once the store confirmed the write (the one Save shows Saved only then). */
+  async function keepLine(line, slot) {
+    slot.querySelector('.speak-keep-note')?.remove();
+    const refused = () => {
+      const note = el('p', 'speak-quiet-line speak-keep-note', t('残せませんでした。', 'Couldn’t keep it.'));
+      note.setAttribute('role', 'status');
+      slot.append(note);
+      return false;
+    };
     const clips = (await Promise.all(line.voice || voiceLine(line))).filter(Boolean);
     const bytes = clips.reduce((n, clip) => n + clip.wav.length, 0);
     const existing = await savedLines();
     const used = existing.reduce((n, item) => n + (item.bytes || 0), 0);
-    if (!clips.length || used + bytes > AUDIO_DB_MAX_BYTES) { button.textContent = t('残せませんでした', 'Couldn’t keep it'); return; }
+    if (!clips.length || used + bytes > AUDIO_DB_MAX_BYTES) return refused();
     const db = await openAudioDb();
-    if (!db) { button.textContent = t('残せませんでした', 'Couldn’t keep it'); return; }
+    if (!db) return refused();
     // her voice as bytes, not Blobs: WebKit refuses Blobs in IndexedDB in a private (ephemeral) session; bytes keep anywhere
     const item = { id: `${Date.now().toString(36)}`, text: line.text, tokens: line.tokens || null, bytes, ts: Date.now(),
       audio: clips.map((clip) => Uint8Array.from(clip.wav)) };
@@ -1626,9 +1646,34 @@ export function createSpeakRoom(host) {
       tx.oncomplete = () => { db.close(); resolve(true); };
       tx.onerror = tx.onabort = () => { db.close(); resolve(false); };
     });
-    // "Kept" only for a write the store confirmed
-    button.textContent = kept ? t('残しました', 'Kept') : t('残せませんでした', 'Couldn’t keep it');
-    st.savedLines = null;
+    // Saved only for a write the store confirmed
+    if (!kept) return refused();
+    const map = await keptLines();
+    map.set(line.text, [...(map.get(line.text) || []), item.id]);
+    refreshSavedLines(slot);
+    return true;
+  }
+  /** Remove: the one way a kept line is un-kept (every copy of its text), then the layer is drawn again. */
+  async function removeLine(text) {
+    const map = await keptLines();
+    const ids = map.get(text) || [];
+    const db = ids.length ? await openAudioDb() : null;
+    const removed = !!db && await new Promise((resolve) => {
+      let tx;
+      try { tx = db.transaction('lines', 'readwrite'); for (const id of ids) tx.objectStore('lines').delete(id); } catch { db.close(); resolve(false); return; }
+      tx.oncomplete = () => { db.close(); resolve(true); };
+      tx.onerror = tx.onabort = () => { db.close(); resolve(false); };
+    });
+    if (removed) map.delete(text);
+    host.render();
+    return removed;
+  }
+  function refreshSavedLines(from) {
+    const box = from.closest('.speak-shadow');
+    const old = box?.querySelector('.speak-saved');
+    if (!box || !old) return;
+    old.remove();
+    paintSavedLines(box);
   }
   function paintSavedLines(container) {
     const sec = el('section', 'speak-sec speak-saved');

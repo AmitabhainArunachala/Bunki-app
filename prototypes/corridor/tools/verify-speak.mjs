@@ -942,11 +942,20 @@ const CASES = {
       await opened(page);
       await talk(page, '003', 1000);
       await settled(page);
-      // keep one line for 影 while online
+      // keep one line for 影 while online: with the one Save ▾, as everything is kept (MASTER_SPEC: one Save everywhere)
       await page.locator('[data-foot="shadow"]').click();
       await until(page, "s.layer === 'shadow'", 5000);
-      await page.locator('.speak-shadow button', { hasText: /Keep this line|この文を残す/u }).click();
-      await waitPage(page, () => /Kept|残しました/u.test(document.querySelector('.speak-shadow')?.textContent || ''), null, 15000, 'S12 keep a line');
+      const lineSave = '.speak-shadow .speak-keep-line button.save-one[data-save-one]';
+      await page.waitForSelector(lineSave, { timeout: 8000 });
+      const before = await page.evaluate((sel) => ({ pressed: document.querySelector(sel)?.getAttribute('aria-pressed'),
+        others: [...document.querySelectorAll('.speak-shadow button:not(.save-one)')].map((b) => (b.textContent || '').trim()).filter((x) => /keep|残す|保存/iu.test(x)) }), lineSave);
+      await page.locator(lineSave).click();
+      await waitPage(page, (sel) => document.querySelector(sel)?.getAttribute('aria-pressed') === 'true', lineSave, 15000, 'S12 keep a line');
+      const after = await page.evaluate(() => ({ rows: document.querySelectorAll('.speak-saved .speak-row').length, menu: !!document.getElementById('speak-line-remove') }));
+      check('a line is kept for 影 by the one Save ▾ alone: Saved once the store holds it, its menu open with Remove',
+        before.pressed === 'false' && before.others.length === 0 && after.rows === 1 && after.menu, JSON.stringify({ before, after }));
+      await page.keyboard.press('Escape');
+      await waitPage(page, () => !document.getElementById('vocabulary-list-popover'), null, 5000, 'S12 the menu closes');
       await page.evaluate(() => window.__SPEAK_TEST__.back());
       await until(page, '!s.layer', 5000);
       await page.evaluate(() => window.__SPEAK_TEST__.back());
@@ -973,6 +982,18 @@ const CASES = {
       await page.locator('.speak-saved .speak-row button', { hasText: /Listen|聞く/u }).first().click();
       await page.waitForTimeout(600);
       check('saved lines open and play offline', (await T(page).spy()).plays.length > plays && mockSince(n).length === 0);
+      // Remove, in the Save's menu, is the one way a kept line is un-kept
+      await page.locator('.speak-saved .speak-row button', { hasText: /^(Shadow|影)$/u }).first().click();
+      await waitPage(page, (sel) => document.querySelector(sel)?.getAttribute('aria-pressed') === 'true', lineSave, 8000, 'S12 the kept line shows Saved');
+      await page.locator(lineSave).click();
+      await page.locator('#speak-line-remove').click();
+      await waitPage(page, (sel) => document.querySelectorAll('.speak-saved .speak-row').length === 0 && document.querySelector(sel)?.getAttribute('aria-pressed') === 'false', lineSave, 8000, 'S12 remove the line');
+      const stored = await page.evaluate(() => new Promise((done) => {
+        const open = indexedDB.open('kairo-speak-audio');
+        open.onsuccess = () => { const db = open.result; const req = db.transaction('lines').objectStore('lines').count(); req.onsuccess = () => { done(req.result); db.close(); }; };
+        open.onerror = () => done(-1);
+      }));
+      check('Remove in its menu un-keeps the line: the store holds none and the Save stands unpressed', stored === 0, `stored ${stored}`);
     } finally { await context.setOffline(false).catch(() => {}); await f.context.close(); }
   },
 

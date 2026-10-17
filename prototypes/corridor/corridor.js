@@ -25318,6 +25318,9 @@ function speakHost() {
         keep: () => (node ? toggleWordSave(node, word) : false),
         review: { saved, toggle: () => (node ? toggleWordSave(node, word) : false) } });
     },
+    // a line kept for 影 (her voice, on this device) is kept by the one Save ▾ too: one press keeps it, its menu removes it
+    saveLine: ({ text, saved, keep, remove }) => saveOne({ cls: 'speak-save speak-save-line', label: text, saved, keep,
+      more: () => (saved() ? [{ id: 'speak-line-remove', label: tx('外す', 'Remove'), run: remove }] : []) }),
     setKeep: ({ word, surface = '', reading = '' }) => {
       speakKeepWord = word ? { word, surface: surface || word, reading } : null;
       syncSpeakKeep();
