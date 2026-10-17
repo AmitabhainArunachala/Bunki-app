@@ -8517,10 +8517,13 @@ async function openJapaneseLookup(anchor, text, context = {}) {
   if (anchor.classList.contains('japanese-lookup-word')) setLookupStop(anchor);
   await ensureDictionaryRowsForForm(text).catch(() => {});
   if (!anchor.isConnected) return;
-  const record = japaneseLookupRecord(text, context);
+  const record = context.kanjiOnly ? null : japaneseLookupRecord(text, context);
   const hasKanjiEntry = [...text].length === 1 && !!D.kanji[text];
+  // R2 · a reader word's answer (readerLookupAnswer): a sound change's entry keeps the text's reading on its card
+  // (shown), and a lone kanji read by its own reading is the kanji's slip (kanjiOnly)
   const token = { s: text, b: record?.head || text, r: context.reading || record?.r || '', c: !!record,
-    ...(record?.seq ? { seq: record.seq } : {}) };
+    ...(record?.seq ? { seq: record.seq } : {}), ...(context.shown ? { shown: context.shown } : {}),
+    ...(context.kanjiOnly ? { kanjiOnly: true } : {}) };
   const entryNode = hasKanjiEntry ? { t: 'kanji', id: text }
     : record ? { t: 'word', id: token.b, ...(record?.seq ? { seq: record.seq, reading: record.r } : {}) } : null;
   const mini = showMini(anchor, token, (modality) => {
@@ -9245,6 +9248,15 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   nodeFor = null, entryNode = null, why = '', wordNote = null } = {}) {
   // G1 · no card from the layer below ever floats over a page: with a page open, only a word on that page gets a slip
   if (!slipAllowed(span)) return null;
+  // R2 · a lone kanji the text reads by one of its own readings, with no word entry read so (寺 read じ, 訳 read やく), is
+  // that kanji's slip: the text's reading, the kanji's meaning from the kanji data said as a kanji's, its Save the kanji
+  if (kind === 'word' && token.kanjiOnly && D.kanji?.[token.b]) {
+    const meaning = String(D.kanji[token.b].m || '').toLowerCase();
+    kind = 'kanji';
+    nodeFor = { t: 'kanji', id: token.b };
+    look = { reading: token.r, ...(meaning ? { gloss: tx(`漢字 · ${meaning}`, `kanji · ${meaning}`), glossLang: 'en' } : {}), ...(look || {}) };
+    kanji = false;
+  }
   // a fresh arrival is a move the frame sampler names; a slip drawn again on the same word (its entry arrived) is not
   const arriving = !(standingSlip() && miniAnchor === span);
   removeMini();
@@ -9286,7 +9298,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // at hand read otherwise counts as missing, and lends no meaning (訳 read やく never shows わけ · reason)
   const own = kind === 'word' && (!token.b || token.b === token.s) ? String(token.r || '') : '';
   const readsOtherwise = !!own && !!g?.r && kataToHira(String(g.r)) !== kataToHira(own);
-  const reading = look?.reading ?? (readsOtherwise ? own : (g?.r || token.r));
+  // R2 · a door named through a sound change (いっ of 一 いち) shows the text's reading beside the entry's meaning
+  const reading = look?.reading ?? token.shown ?? (readsOtherwise ? own : (g?.r || token.r));
   // L · a word written exactly as it is read (ます, いう, スタートアップ) does not say itself twice: no reading line
   if (reading && reading !== label) said.append(el('span', 'mini-reading', reading));
   // L · until the full dictionary names the entry read the text's way, a card read otherwise than the entry at hand
@@ -9303,7 +9316,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     if (look.glossLang) gloss.lang = look.glossLang;
     said.append(gloss);
     if (look.gloss2) { const second = el('span', 'mini-gloss mini-gloss-2', look.gloss2); second.lang = 'en'; said.append(second); }
-  } else if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText(token.b)));
+  } else if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', readerGlossMissText(token.b, own || token.r)));
   else if (waiting) {
     const wait = el('span', 'mini-gloss mini-wait', '…');
     wait.style.fontWeight = '400';
@@ -10088,10 +10101,21 @@ function readerWordNote(p, token) {
   return hit ? hit.note : null;
 }
 
-function readerGlossMissText(form = '') {
-  // R · asked, the full dictionary lists nothing for this spelling: the line says so, and promises no other look
-  if (form && D.dictionaryIndex && (D.dictionaryMode === 'main' || D.dictionaryCompleteForms?.has(String(form)))
-    && !dictionaryRowsForForm(form).length) return tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.');
+function readerGlossMissText(form = '', reading = '') {
+  if (form && D.dictionaryIndex && (D.dictionaryMode === 'main' || D.dictionaryCompleteForms?.has(String(form)))) {
+    // R · asked, the full dictionary lists nothing for this spelling: the line says so, and promises no other look
+    const rows = dictionaryRowsForForm(form);
+    if (!rows.length) return tx('この表記の辞書項目はありません。', 'No dictionary entry for this spelling.');
+    // R2 · asked and answered, it never says "Not in the quick dictionary" again: several entries read the text's way
+    // stay the full entry's choice and are named; none read so is said plainly (N's line)
+    const wanted = kataToHira(String(reading || ''));
+    const read = wanted ? rows.filter((row) => row[5].some((kana, k) => kataToHira(kana) === wanted && readerReadingFits(row, k, form))) : [];
+    if (read.length > 1) {
+      const heads = [...new Set(read.map((row) => row[1]))].slice(0, 4);
+      return tx(`複数の項目：${heads.join('・')}`, `Several entries: ${heads.join(' · ')}`);
+    }
+    if (wanted && !read.length) return tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.');
+  }
   return tx('この語は簡易辞書にありません。「全項目」で全辞書を引けます。', 'Not in the quick dictionary. Full entry looks it up in the whole dictionary.');
 }
 
@@ -10102,10 +10126,200 @@ function readerGlossMissText(form = '') {
  * dictionary exactly as before (lookup's guarantee). lookup and the slip's own functions spell tokenReading's rule
  * inline, so each stays whole by itself. */
 
-/** The reading a token carries for its dictionary form: its own when the token is that form (uninflected). An
- * inflected surface's reading (し of する, 聞い of 聞く) says nothing about the dictionary form's. */
+/** The reading a token carries for its dictionary form: its own when the token is that form (uninflected). R2: an
+ * inflected token's is its dictionary form's reading, derived from its own (lemmaReading), or '' when it cannot be. */
 function tokenReading(token) {
-  return !token?.b || token.b === token.s ? String(token?.r || '') : '';
+  return !token?.b || token.b === token.s ? String(token?.r || '') : lemmaReading(token);
+}
+
+/* R2 · reading truth for inflected words (2026-10-17). An inflected token's door stands for its dictionary form read
+ * the way the text reads it: おい (base おく) is おく, 云っ read いっ is 云う read いう, 開か read ひらか is 開く read ひらく,
+ * 解せ read げせ is 解する read げする — never the reading of a row made from another inflected surface (the original
+ * word layer's おく read おけ, 云う read いい, 解する read かいする). A token whose dictionary form cannot be shown to be read
+ * so is the word as the text writes and reads it. readingToken then names the entry as R and N do for any word. */
+
+/** The euphonic stems of a godan ending: 書い 泳い 言っ 待っ 取っ 死ん 呼ん 読ん 出し. */
+const LEMMA_ONBIN = { う: ['っ', 'う'], つ: ['っ'], る: ['っ'], ぬ: ['ん'], ぶ: ['ん'], む: ['ん'], く: ['い'], ぐ: ['い'], す: ['し'] };
+/** 文語 二段: the う-row kana an ichidan stem's last kana takes in its old forms (教える → 教うる, 起きる → 起くる). */
+const LEMMA_NIDAN = Object.fromEntries([...'えけげせぜてでねへべぺめれいきぎしじちぢにひびぴみり']
+  .map((kana, at) => [kana, 'うくぐすずつづぬふぶぷむる'[at % 13]]));
+
+/** Whether a word whose dictionary form reads `lemma` can read `reading` in a text: its own reading, or one of the forms
+ * its class takes before an ending — godan (書か 書き 書く 書け 書こ 書こう 書い), ichidan (食べ 食べれ 食べろ 食べよう),
+ * サ変 (愛し 愛さ 愛せ; 信じ), カ変 (来 read こ き く), the i-adjective (高 高く 高かっ 高けれ) and the 文語 forms (教うる, 高き,
+ * しかれ). A word that does not inflect reads only its own reading. */
+function lemmaTakesForm(lemma, reading, pos = '', base = '') {
+  const L = kataToHira(String(lemma || '')), r = kataToHira(String(reading || ''));
+  if (!L || !r) return false;
+  if (L === r) return true;
+  const last = L.slice(-1), stem = L.slice(0, -1);
+  const verb = ['動詞', '助動詞', '接尾辞', ''].includes(pos);
+  const adjective = ['形容詞', '助動詞', '接尾辞', ''].includes(pos);
+  const forms = [];
+  if (adjective && last === 'い') forms.push(...['', 'く', 'かっ', 'けれ', 'かろ', 'き', 'し', 'かれ', 'から', 'かり', 'う', 'さ', 'け'].map((end) => stem + end));
+  if (adjective && last === 'し') forms.push(...['', 'く', 'き', 'けれ', 'から', 'かり', 'かれ', 'かる', 'う'].map((end) => stem + end));
+  if (verb) {
+    if (/[すず]る$/u.test(L)) {
+      const root = L.slice(0, -2);
+      const ends = L.endsWith('ずる') ? ['じ', 'ざ', 'ぜ', 'ず', 'ずる', 'ずれ', 'じろ', 'ぜよ', 'じよう'] : ['し', 'さ', 'せ', 'す', 'する', 'すれ', 'しろ', 'せよ', 'しよう'];
+      forms.push(...ends.map((end) => root + end));
+    }
+    if (L === 'くる' || (L.endsWith('くる') && /来る$/u.test(String(base)))) {
+      forms.push(...['こ', 'き', 'く', 'くる', 'くれ', 'こい', 'こよ', 'こよう'].map((end) => L.slice(0, -2) + end));
+    }
+    const row = GODAN_ROW[last];
+    if (row) {
+      forms.push(...[...row, last, ...(LEMMA_ONBIN[last] || [])].map((kana) => stem + kana), `${stem}${row[3]}う`);
+      if (/[いゆ]く$/u.test(L)) forms.push(`${stem}っ`);
+    }
+    if (last === 'る') {
+      forms.push(...['', 'れ', 'ろ', 'よ', 'よう', 'ん'].map((end) => stem + end));
+      const u = LEMMA_NIDAN[stem.slice(-1)];
+      if (u) forms.push(...['', 'る', 'れ'].map((end) => stem.slice(0, -1) + u + end));
+    }
+    if (last === 'り') forms.push(...['ら', 'り', 'る', 'れ'].map((kana) => stem + kana));
+  }
+  return forms.includes(r);
+}
+
+/** The reading of an inflected token's dictionary form, from the token's own: a kana dictionary form is its own
+ * reading; otherwise the reading of the stem the surface and the dictionary form share (the token's reading less its
+ * written kana ending) plus the dictionary form's own kana ending, if that form can read the token's reading
+ * (lemmaTakesForm). Where the stem itself reads otherwise as the word inflects (来 read き or こ is 来る, read くる), or the
+ * ruby hides the ending (生 read うま is 生む, read うむ), a reading the dictionary lists for the form, one that can read
+ * the token's, stands instead; an adjective's bare stem (古 read こ) needs the dictionary to confirm it. '' when nothing
+ * can be shown: the token is then read as the text writes it (readingForm). */
+function lemmaReading(token) {
+  const s = String(token?.s || ''), b = String(token?.b || ''), r = kataToHira(String(token?.r || ''));
+  if (!b || b === s || !r) return '';
+  if (READER_KANA.test(b)) return b;
+  const pos = String(token.p || '');
+  const takes = (lemma) => lemmaTakesForm(lemma, r, pos, b);
+  const listed = [...new Set([D.dict?.[b]?.r, ...dictionaryRowsForForm(b).flatMap((row) =>
+    row[5].filter((kana, k) => readerReadingFits(row, k, b)))].filter(Boolean).map((kana) => kataToHira(String(kana))))];
+  const surface = [...s], base = [...b];
+  let shared = 0;
+  while (shared < surface.length && shared < base.length && surface[shared] === base[shared]) shared += 1;
+  const sTail = surface.slice(shared).join(''), bTail = base.slice(shared).join('');
+  const kanaOnly = /^[\p{Script=Hiragana}\p{Script=Katakana}ー]*$/u;
+  const ending = kataToHira(sTail);
+  const aligned = shared && kanaOnly.test(sTail) && kanaOnly.test(bTail) && r.endsWith(ending) && r.length > ending.length
+    ? r.slice(0, r.length - ending.length) + kataToHira(bTail) : '';
+  const confirmed = listed.includes(aligned);
+  if (aligned && takes(aligned) && (confirmed || (!(sTail === '' && pos === '形容詞') && !listed.some(takes)))) return aligned;
+  const read = listed.filter(takes);
+  return read.length === 1 ? read[0] : '';
+}
+
+/** R2 · a token as its dictionary form, read the way the text reads it: an inflected token with a derived reading is
+ * that form read so (おい → おく; the surface it came from rides as `inflected`); one without is the word as the text
+ * writes and reads it, so its door never shows a reading the text does not use. An uninflected token is itself. */
+function readingForm(token) {
+  if (!token?.b || token.b === token.s) return token;
+  const reading = lemmaReading(token);
+  return reading ? { ...token, s: token.b, r: reading, inflected: token.s } : { ...token, b: token.s };
+}
+
+/** R2 · among several entries that write a dictionary form and read it the derived way, the one that fits the token:
+ * its class (a verb's English glosses begin "to …"; an adjective by the quick dictionary's part of speech), then the
+ * entry whose own first reading this is, then the entry headed by the spelling itself, then — a form the text writes
+ * in kana, read alike by several words — the one the quick dictionary teaches earliest (its JLPT level). Each step
+ * keeps at least one (おく: 奥, 億, 置く → 置く; いう: 結う, 言う → 言う; くる: 繰る, 来る → 来る); a tie stays the full
+ * entry's explicit choice (きる: 切る and 着る, both N5). */
+function narrowLemmaEntries(rows, reading, form, pos = '') {
+  const wanted = kataToHira(String(reading || ''));
+  const level = (row) => Number(String(D.dict?.[row[1]]?.jlpt || '').match(/^N?([1-5])$/u)?.[1] || 0);
+  const steps = [
+    pos === '動詞' ? (row) => (row[6] || []).some((gloss) => /^to /u.test(String(gloss))) : null,
+    pos === '形容詞' ? (row) => [row[1], ...row[4]].some((spelling) => /i-adjective|adj-ix|adj-ku/u.test(String(D.dict?.[spelling]?.p || ''))) : null,
+    (row) => kataToHira(String(row[2] || '')) === wanted,
+    (row) => row[1] === form,
+    READER_KANA.test(String(form)) ? (row, kept) => level(row) > 0 && level(row) === Math.max(...kept.map(level)) : null,
+  ];
+  let kept = rows;
+  for (const step of steps) {
+    if (!step || kept.length < 2) continue;
+    const fit = kept.filter((row) => step(row, kept));
+    if (fit.length) kept = fit;
+  }
+  return kept;
+}
+
+/** The entries (at hand) that write `form` and read it `reading`, by that reading's own restriction (readerReadingFits). */
+function dictionaryRowsReadAs(form, reading) {
+  const wanted = kataToHira(String(reading || ''));
+  return wanted ? dictionaryRowsForForm(form).filter((row) => row[5].some((kana, k) => kataToHira(kana) === wanted && readerReadingFits(row, k, form))) : [];
+}
+
+/** R2 · a lemma door read so by no entry: a サ変 dictionary form's other spelling (解する read げする is 解す read げす,
+ * 応ずる read おうずる is 応じる read おうじる), when the quick dictionary or one entry at hand reads it so. */
+function alternateLemmaDoor(door) {
+  const pairs = [[/する$/u, 'す', /する$/u, 'す'], [/ずる$/u, 'じる', /ずる$/u, 'じる']];
+  for (const [spelt, written, read, reading] of pairs) {
+    if (!spelt.test(door.b) || !read.test(door.r)) continue;
+    const b = door.b.replace(spelt, written), r = door.r.replace(read, reading);
+    if (D.dict?.[b] && kataToHira(String(D.dict[b].r || '')) === kataToHira(r)) return { ...door, s: b, b, r };
+    const rows = narrowLemmaEntries(dictionaryRowsReadAs(b, r), r, b, door.p);
+    if (rows.length === 1) return { ...door, s: b, b, r, seq: String(rows[0][0]) };
+  }
+  return null;
+}
+
+/** R2 (addendum 1) · the readings a sound change in a compound comes from: a final っ undone (いっ → いち, はっ → はち,
+ * じゅっ → じゅう), a voiced or ぱ-row first kana made plain (ぽん, ぼん → ほん; がねもち → かねもち), and both. */
+const SOUND_VOICED = 'がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ';
+const SOUND_PLAIN = 'かきくけこさしすせそたちつてとはひふへほはひふへほ';
+function soundChangeReadings(reading) {
+  const r = kataToHira(String(reading || ''));
+  const plain = (text) => { const at = SOUND_VOICED.indexOf(text[0]); return at >= 0 ? SOUND_PLAIN[at] + text.slice(1) : ''; };
+  const out = [plain(r)];
+  if (r.endsWith('っ')) for (const end of 'ちつくきう') { const undone = r.slice(0, -1) + end; out.push(undone, plain(undone)); }
+  return [...new Set(out)].filter((text) => text && text !== r);
+}
+
+/** The readings the kanji data lists for one kanji, in hiragana (on and kun; a kun reading's okurigana mark dropped). */
+function kanjiReadingsOf(char) {
+  const k = D.kanji?.[char];
+  return k ? { on: (k.on || []).map((on) => kataToHira(String(on))), kun: (k.kun || []).map((kun) => String(kun).replace(/\./gu, '')) } : null;
+}
+
+/** R2 (addendum 1, 2) · a word no entry is read the text's way for, once the full dictionary has answered: a sound change
+ * of an entry's reading names that entry, by the entry's own reading, and its card still shows the text's (一 read いっ
+ * is 一 いち; 本 read ぽん is 本 ほん) — never when the text's reading is one the kanji data itself lists for a lone kanji
+ * (仏 read ぶつ is not 仏 ふつ, France); a lone kanji read by one of its on'yomi, or a sound change of one (寺 じ, 国 こく,
+ * 所 じょ), is that kanji (kanjiOnly: its meaning from the kanji data, its page, its Save). null when neither holds. */
+function soundChangeDoor(door) {
+  const own = kataToHira(String(door.r || ''));
+  const lone = [...String(door.b || '')].length === 1 ? kanjiReadingsOf(door.b) : null;
+  if (!own) return null;
+  if (!lone || ![...lone.on, ...lone.kun].includes(own)) {
+    for (const reading of soundChangeReadings(own)) {
+      if (D.dict?.[door.b] && kataToHira(String(D.dict[door.b].r || '')) === reading) return { ...door, r: reading, shown: door.r };
+      const named = D.dict?.[door.b] ? lookup(door.b, null, reading)?.seq : null;
+      if (named) return { ...door, r: reading, shown: door.r, seq: String(named) };
+      const rows = D.dict?.[door.b] ? [] : dictionaryRowsReadAs(door.b, reading);
+      if (rows.length === 1) return { ...door, r: reading, shown: door.r, seq: String(rows[0][0]) };
+    }
+  }
+  if (lone && [own, ...soundChangeReadings(own)].some((reading) => lone.on.includes(reading))) return { ...door, kanjiOnly: true };
+  return null;
+}
+
+/** R2 (addendum 1, 2) · the same answer for a reader word the lookup door opens (a counter, a suffix, an ending): with no
+ * entry read the text's way, { reading, shown } names the entry a sound change comes from, or { kanjiOnly } the lone
+ * kanji; {} otherwise. The form's rows must be at hand (openJapaneseLookup asks for them first). */
+function readerLookupAnswer(text, context = {}) {
+  const reading = String(context.reading || '');
+  if (!reading || !dictionaryAnsweredForm(text) || japaneseLookupRecord(text, context)) return {};
+  const lone = [...String(text)].length === 1 ? kanjiReadingsOf(text) : null;
+  const own = kataToHira(reading);
+  if (!lone || ![...lone.on, ...lone.kun].includes(own)) {
+    for (const variant of soundChangeReadings(own)) {
+      if (japaneseLookupRecord(text, { ...context, reading: variant })) return { reading: variant, shown: reading };
+    }
+  }
+  if (lone && [own, ...soundChangeReadings(own)].some((variant) => lone.on.includes(variant))) return { kanjiOnly: true };
+  return {};
 }
 
 /** Whether a reading needs the full dictionary: the quick one lacks the spelling, or reads it otherwise. */
@@ -10118,9 +10332,18 @@ function readingAsksIndex(form, reading) {
 /** Ask the full dictionary for a token's spelling when its own reading needs it and the form's rows are not at
  * hand: a promise that settles once they are, or once the index cannot answer; null when nothing needs asking. */
 function readyTokenReading(token) {
-  if (!readingAsksIndex(token?.b, tokenReading(token))) return null;
-  if (D.dictionaryIndex && (D.dictionaryMode === 'main' || D.dictionaryCompleteForms?.has(String(token.b)))) return null;
-  return ensureDictionaryRowsForForm(token.b).then(() => undefined, () => undefined);
+  const door = readingForm(token);
+  const forms = new Set();
+  if (readingAsksIndex(door.b, tokenReading(door))) forms.add(door.b);
+  // R2 · an inflected word the quick dictionary does not settle asks for its dictionary form's rows (they may read it, or
+  // name its entry), and a する/ずる form the quick dictionary lacks for its other spelling too (解する → 解す)
+  if (token?.b && token.b !== token.s && (!D.dict?.[token.b] || door.b !== token.b)) {
+    forms.add(token.b);
+    if (!D.dict?.[token.b]) forms.add(token.b.replace(/する$/u, 'す').replace(/ずる$/u, 'じる'));
+  }
+  const asked = [...forms].filter((form) => form && !dictionaryAnsweredForm(form));
+  if (!asked.length) return null;
+  return Promise.all(asked.map((form) => ensureDictionaryRowsForForm(form))).then(() => undefined, () => undefined);
 }
 
 /** The token a word door stands for. One whose own reading the quick dictionary does not carry stands, by entry
@@ -10130,21 +10353,28 @@ function readyTokenReading(token) {
  * one entry so read and so permitted (several stay the full entry's explicit choice, D11). Until the form's rows are
  * at hand, and for every other token, it is the token as it was. */
 function readingToken(token) {
-  const own = tokenReading(token);
-  if (!own || (token.seq != null && token.seq !== '') || !readingAsksIndex(token.b, own) || !D.dictionaryIndex) return token;
-  const rows = dictionaryRowsForForm(token.b);
-  if (!rows.length) return token;
+  // R2 · the door is the token as its dictionary form, read the way the text reads it (readingForm)
+  const door = readingForm(token);
+  const own = tokenReading(door);
+  if (!own || (door.seq != null && door.seq !== '') || !readingAsksIndex(door.b, own) || !D.dictionaryIndex) return door;
+  const rows = dictionaryRowsForForm(door.b);
+  // R2 · once the full dictionary has answered for the spelling, a word no entry is read so for may still be named: a
+  // dictionary form's other spelling (解する → 解す), a sound change of an entry's reading (いっ → いち), a lone kanji (寺 じ)
+  const unnamed = () => (!dictionaryAnsweredForm(door.b) ? door
+    : door.inflected ? alternateLemmaDoor(door) || door : soundChangeDoor(door) || door);
+  if (!rows.length) return unnamed();
   // N · an entry read otherwise counts as missing: the door names the full dictionary's entry read the token's way, or
   // none — never the form's first row, whose meaning belongs to another reading (訳 read やく is not わけ · reason)
-  if (D.dict[token.b]) {
-    const named = lookup(token.b, null, own)?.seq;
-    return named ? { ...token, seq: String(named) } : token;
+  if (D.dict[door.b]) {
+    const named = lookup(door.b, null, own)?.seq;
+    return named ? { ...door, seq: String(named) } : unnamed();
   }
   // a spelling the core lacks: only the one entry that lists this reading and permits it with this spelling, by that
-  // reading's own restriction (readerReadingFits); several stay the full entry's explicit choice (D11's own matcher)
-  const wanted = kataToHira(own);
-  const read = rows.filter((row) => row[5].some((kana, k) => kataToHira(kana) === wanted && readerReadingFits(row, k, token.b)));
-  return read.length === 1 ? { ...token, seq: String(read[0][0]) } : token;
+  // reading's own restriction (readerReadingFits); several stay the full entry's explicit choice (D11's own matcher).
+  // R2 · for a dictionary form, several narrow to the one that fits the token (おく: 置く, never 奥 or 億)
+  let read = dictionaryRowsReadAs(door.b, own);
+  if (door.inflected && read.length > 1) read = narrowLemmaEntries(read, own, door.b, door.p);
+  return read.length === 1 ? { ...door, seq: String(read[0][0]) } : read.length ? door : unnamed();
 }
 
 /** A word slip for a token whose own reading needs the full dictionary. With the dictionary open, its answer is a
@@ -10174,8 +10404,9 @@ function openReadingSlip(anchor, token, draw) {
     // N · a card still saying "…" is drawn again once the answer is in, whatever it is — the entry read the text's way,
     // no entry for the spelling, or none read the text's way (訳 read やく: "No dictionary entry for this reading.").
     // The "…" never outlives the answer (Codex 0304: the cold first tap kept it after aria-busy cleared)
-    else if ((door.seq || !dictionaryRowsForForm(token.b).length || drawn.querySelector('.mini-wait')) &&
-      document.getElementById('mini') === drawn && !drawn.matches(':active')) drawn = draw(door);
+    // R2 · and so is a card whose answer is a kanji, a sound change, or a miss said before the answer came
+    else if ((door.seq || door.kanjiOnly || door.shown || !dictionaryRowsForForm(door.b).length ||
+      drawn.querySelector('.mini-wait, .mini-miss')) && document.getElementById('mini') === drawn && !drawn.matches(':active')) drawn = draw(door);
     else settled();
   });
   return drawn;
@@ -10242,13 +10473,19 @@ function dictionaryAnsweredForm(form = '') {
  * exactly as before, or an honest dash when the quick dictionary has none. N · a word whose entry at hand is read
  * otherwise shows the dash until the full dictionary answers, then that answer's gloss if it has one read so. */
 function readerGlossLine(token) {
-  const record = readerQuickRecordAsRead(token);
-  const line = record?.m?.length
-    ? el('span', 'tok-en', inlineGloss(record))
-    : el('span', 'tok-en tok-en-miss', '—');
-  if (!record) readyTokenReading(token)?.then(() => {
-    const found = line.isConnected ? readerQuickRecordAsRead(token) : null;
-    if (found?.m?.length) { line.className = 'tok-en'; line.textContent = inlineGloss(found); }
+  // R2 · the line speaks for the word's door (readingToken): an inflected word's dictionary form read the text's way, a
+  // sound change's entry, a lone kanji's meaning
+  const gloss = (door) => {
+    const kanji = door.kanjiOnly ? D.kanji?.[door.b] : null;
+    if (kanji) return String(kanji.m || '').toLowerCase();
+    const record = readerQuickRecordAsRead(door);
+    return record?.m?.length ? inlineGloss(record) : '';
+  };
+  const now = gloss(readingToken(token));
+  const line = now ? el('span', 'tok-en', now) : el('span', 'tok-en tok-en-miss', '—');
+  if (!now) readyTokenReading(token)?.then(() => {
+    const found = line.isConnected ? gloss(readingToken(token)) : '';
+    if (found) { line.className = 'tok-en'; line.textContent = found; }
   });
   return line;
 }
@@ -10274,15 +10511,23 @@ function readerWordHint() {
 function readerTokenState(token, index, kind) {
   if (kind === 'named') return S.revealed?.has(index) ? token.r || '' : '';
   if (kind !== 'word') return '';
+  const showing = S.dials.furigana === 2 || S.revealed?.has(index);
+  if (!showing && !S.glossed?.has(index)) return '';
+  // R2 · the word's door (readingToken): an inflected word speaks for its dictionary form read the text's way
+  const door = readingToken(token);
+  const kanji = door.kanjiOnly ? D.kanji?.[door.b] : null;
   // N · as the text reads it: a word whose entry at hand is read otherwise says no meaning of another reading
-  const quick = readerQuickRecord(token);
-  const record = readerQuickRecordAsRead(token, quick);
+  const quick = kanji ? null : readerQuickRecord(door);
+  const record = kanji ? null : readerQuickRecordAsRead(door, quick);
   const parts = [];
-  // R · the reading said is the one its ruby shows: the token's own, where its entry is read otherwise
-  const own = tokenReading(token);
-  const said = own && !(record?.r && kataToHira(String(record.r)) === kataToHira(own)) ? own : record?.r;
-  if ((S.dials.furigana === 2 || S.revealed?.has(index)) && said && said !== token.s) parts.push(said);
-  if (S.glossed?.has(index)) parts.push(record?.m?.length ? inlineGloss(record) : quick && !record ? readerReadingMissText(token.b) : readerGlossMissText(token.b));
+  // R · the reading said is the one its ruby shows: the token's own, where its entry is read otherwise (R2: an inflected
+  // word's ruby is its own reading too, never another row's reading of its dictionary form)
+  const own = door.shown || tokenReading(door);
+  const said = token.b && token.b !== token.s ? String(token.r || '')
+    : own && !(record?.r && kataToHira(String(record.r)) === kataToHira(own)) ? own : record?.r;
+  if (showing && said && said !== token.s) parts.push(said);
+  if (S.glossed?.has(index)) parts.push(kanji ? String(kanji.m || '').toLowerCase() : record?.m?.length ? inlineGloss(record)
+    : quick && !record ? readerReadingMissText(door.b) : readerGlossMissText(door.b, door.r));
   return parts.join(' · ');
 }
 function nameReaderToken(span, token, index, kind) {
@@ -10497,14 +10742,18 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
   const from = { passage: p.id, index };
   const sentence = () => ({ t: 'word', id: text, from });
   let record = null;
+  // R2 · with no entry read the text's way: a sound change's entry ({ reading, shown }) or the lone kanji ({ kanjiOnly })
+  let answer = {};
   const hasKanjiEntry = () => [...text].length === 1 && !!D.kanji[text];
   const prepare = async () => {
     await ensureDictionaryRowsForForm(text).catch(() => {});
-    record = japaneseLookupRecord(text, lookupContext);
+    answer = readerLookupAnswer(text, lookupContext);
+    record = answer.kanjiOnly ? null : japaneseLookupRecord(text, { ...lookupContext, ...answer });
   };
-  const quickLook = (modality = 'pointer', { restore = false } = {}) => {
+  const quickLook = async (modality = 'pointer', { restore = false } = {}) => {
     if (named) markReaderReading(index);
-    return openJapaneseLookup(span, text, { ...lookupContext, from, sentence: () => readerSentenceRow(sentence(), index, token.readerSourceEnd ?? index),
+    await prepare();
+    return openJapaneseLookup(span, text, { ...lookupContext, ...answer, from, sentence: () => readerSentenceRow(sentence(), index, token.readerSourceEnd ?? index),
       focusPopup: modality === 'keyboard', wordNote: readerWordNote(p, token) }).then(() => { if (!restore && document.getElementById('mini')) retireReaderTip(); });
   };
   span.addEventListener('click', (event) => {
@@ -10516,8 +10765,12 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
     target: { kind: 'word', id: text }, copyText: token.s || text, sentence, prepare,
     get label() { return record?.head || text; },
     get entryAvailable() { return !!record || hasKanjiEntry(); },
-    save: () => wordSaveFacts({ s: text, b: record?.head || text, r: lookupContext.reading || record?.r || '', c: !!record,
-      ...(record?.seq ? { seq: record.seq } : {}) }, { from, record }),
+    save: () => {
+      // R2 · a lone kanji's door keeps the kanji, as its slip does
+      if (answer.kanjiOnly) { const node = { t: 'kanji', id: text }; return { g: null, held: false, node, state: wordCaptureState(node), identityHeld: false }; }
+      return wordSaveFacts({ s: text, b: record?.head || text, r: answer.reading || lookupContext.reading || record?.r || '', c: !!record,
+        ...(record?.seq ? { seq: record.seq } : {}) }, { from, record });
+    },
     quickLook: (modality) => quickLook(modality),
     openEntry: (modality) => {
       if (!record && !hasKanjiEntry()) return;
@@ -22937,6 +23190,11 @@ function chromeKeepTarget() {
   const token = cur ? passage()?.tokens?.[cur.index] : null;
   if (!token || token.b !== cur.id) return null;
   const door = readingToken(token);
+  // R2 · a lone kanji's door keeps the kanji, as its slip does
+  if (door.kanjiOnly) {
+    const node = { t: 'kanji', id: door.b };
+    return { label: door.b, g: null, held: false, node, state: wordCaptureState(node), identityHeld: false };
+  }
   const facts = wordSaveFacts(door, { reader: !(door.seq && !D.dict[door.b]), from: { passage: cur.p, index: cur.index } });
   return { label: door.b, ...facts };
 }
@@ -26748,10 +27006,12 @@ function renderSentenceTokens(container, tokens, opts = {}) {
     const from = source ? { passage: source.passage, index: source.index + index } : null;
     // R · the entry is the one this token's own reading names, as its slip showed it (readingToken); before the
     // full dictionary answers, a core spelling carries the reading and its sheet resolves it
+    // R2 · the page is the door's (an inflected word's dictionary form, a sound change's entry, a lone kanji)
     const entryNodeFor = (door) => {
-      const own = tokenReading(token);
-      return { t: 'word', id: token.b, ...(door.seq ? { seq: door.seq, reading: own }
-        : D.dict[token.b] && readingAsksIndex(token.b, own) ? { reading: own } : {}), ...(from ? { from, ctxScope: 'sent' } : {}) };
+      if (door.kanjiOnly) return { t: 'kanji', id: door.b, ...(from ? { from } : {}) };
+      const own = tokenReading(door);
+      return { t: 'word', id: door.b, ...(door.seq ? { seq: door.seq, reading: door.r || own }
+        : D.dict[door.b] && readingAsksIndex(door.b, own) ? { reading: own } : {}), ...(from ? { from, ctxScope: 'sent' } : {}) };
     };
     const openEntry = (door = readingToken(token), modality = 'pointer') => {
       obsLog('tap', srsKey('word', token.b), 3, contextId);
@@ -28465,7 +28725,8 @@ const READER_KANA = /^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u;
  *   (c) with no base form, or one in neither script (JR, No), the token's own
  *       reading stands in for it. */
 function readerChoiceMatch(choice, rows) {
-  const base = choice.b || '';
+  // R2 · an inflected token is matched as its dictionary form read the text's way (choice.form, choice.reading)
+  const base = choice.form || choice.b || '';
   const spelled = READER_KANJI.test(base);
   const key = (spelled || READER_KANA.test(base) ? base : choice.r) || '';
   const reading = spelled ? '' : kataToHira(key);
@@ -28486,8 +28747,9 @@ function readerChoiceMatch(choice, rows) {
   if (!spelled) return { by, key, rows: collect((row, kana) => kataToHira(kana) === reading) };
   const written = (row, kana, index) => readerReadingFits(row, index, base);
   // an uninflected token's own reading is evidence: 産 read さん in 産巣日 is not ウブ.
-  // An inflected one (分かっ for 分かる) says nothing about the dictionary form's reading.
-  const surface = choice.s === base ? kataToHira(choice.r || '') : '';
+  // An inflected one (分かっ for 分かる) says nothing about the dictionary form's reading by itself; R2: the reading
+  // derived from it (choice.reading) is the dictionary form's
+  const surface = choice.form ? kataToHira(choice.reading || '') : choice.s === base ? kataToHira(choice.r || '') : '';
   if (!surface) return { by, key, rows: collect(written) };
   const matching = collect((row, kana, index) => written(row, kana, index) && kataToHira(kana) === surface);
   if (matching.length) return { by, key, rows: matching };
@@ -28495,7 +28757,7 @@ function readerChoiceMatch(choice, rows) {
   // fragment): its entries are offered as explicit candidates under their own readings — never opened
   // for the learner, never called absent (産 is listed, as うぶ). With no entry at all, it is absent.
   const offered = collect(written);
-  return offered.length ? { by, key, rows: offered, mismatch: choice.r || surface } : { by, key, rows: [] };
+  return offered.length ? { by, key, rows: offered, mismatch: (choice.form ? choice.reading : choice.r) || surface } : { by, key, rows: [] };
 }
 
 /** Whether the listed reading at kanaIndex may be printed with this spelling, by that
@@ -28522,15 +28784,19 @@ function readerSummaryFor(row, kanaIndex) {
 }
 
 function readerEntryNode(token, index, p) {
-  const node = { t: 'word', id: token.b, from: { passage: p.id, index }, ctxScope: 'sent' };
   // R · the entry the token's own reading names, as its slip showed it (readingToken): 年 read ねん opens ねん's
-  // entry; before the full dictionary answers, a core spelling carries the reading and its sheet resolves it
+  // entry; before the full dictionary answers, a core spelling carries the reading and its sheet resolves it.
+  // R2 · the page is the door's: an inflected word's dictionary form read the text's way (its entry, or its D11 choice
+  // matched by that reading), a sound change's entry by the entry's own reading, a lone kanji's page
   const door = readingToken(token);
-  const own = tokenReading(token);
-  if (door.seq) return { ...node, seq: door.seq, reading: own };
-  if (D.dict[token.b] && readingAsksIndex(token.b, own)) return { ...node, reading: own };
-  if (D.dict[token.b]) return node;
-  node.readerChoice = { passage: p.id, index, s: token.s, b: token.b, r: token.r || '', state: 'pending' };
+  if (door.kanjiOnly) return { t: 'kanji', id: door.b, from: { passage: p.id, index } };
+  const node = { t: 'word', id: door.b, from: { passage: p.id, index }, ctxScope: 'sent' };
+  const own = tokenReading(door);
+  if (door.seq) return { ...node, seq: door.seq, reading: door.r || own };
+  if (D.dict[door.b] && readingAsksIndex(door.b, own)) return { ...node, reading: own };
+  if (D.dict[door.b]) return node;
+  node.readerChoice = { passage: p.id, index, s: token.s, b: token.b, r: token.r || '', state: 'pending',
+    ...(door !== token ? { form: door.b, reading: own } : {}) };
   return node;
 }
 
@@ -28554,7 +28820,7 @@ function resolveReaderChoice(node) {
     else choice.state = 'moved';
     refreshWordSheet(node);
   };
-  ensureDictionaryRowsForForm(choice.b || choice.s).then(
+  ensureDictionaryRowsForForm(choice.form || choice.b || choice.s).then(
     (rows) => settle(() => {
       const match = readerChoiceMatch(choice, rows);
       const matching = match.rows;
@@ -28610,7 +28876,9 @@ function renderReaderChoice(sheet, node) {
   const head = el('h2', 'headword');
   head.append(document.createTextNode(node.id));
   sheet.append(head);
-  if (choice.r) sheet.append(el('p', 'reading', choice.r));
+  // R2 · an inflected word's page reads as its dictionary form is read in the text (おい → おく), never the surface's ruby
+  const shownReading = choice.form ? choice.reading : choice.r;
+  if (shownReading) sheet.append(el('p', 'reading', shownReading));
   const box = el('div', 'reader-choice');
   box.id = 'reader-choice';
   box.dataset.state = choice.state;
