@@ -40,6 +40,8 @@ import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
+import { readAppRecordSnapshot } from './record-test-support.mjs';
+import { serveMutation } from './reader-gloss-mutants.mjs';
 
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Pin an immutable built site and its digest');
 const site = resolveCorridorSite(), evidence = resolveCorridorEvidence();
@@ -64,6 +66,9 @@ const check = (id, title, ok, observed = '') => {
   return !!ok;
 };
 const frames = [];
+// G2 · --g2-only runs the G2 walks alone (never a claim that the G1 parts passed); --g2-control <name> runs them on a mutant
+const g2Only = process.argv.includes('--g2-only') || process.argv.includes('--g2-control');
+const g2Versions = {}, controlsRun = [];
 
 const host = await startStaticHost({ site, port: 0 });
 async function boot(page, { world = null } = {}) {
@@ -281,10 +286,284 @@ const pathOf = (a, b, m = 12) => (a && b ? { x: Math.min(a.x, b.x) - m, y: Math.
   width: Math.max(a.x + a.width, b.x + b.width) - Math.min(a.x, b.x) + 2 * m, height: Math.max(a.y + a.height, b.y + b.height) - Math.min(a.y, b.y) + 2 * m } : null);
 const P14_LIMIT = 0.2; // % of the old state's ink still visible at any held moment from 80 ms on
 
+/* ── G2 · depth: the quiet dot (MASTER_SPEC §4 G, the G2 lines; §7 lines 13–14) ─────────────────────────────────────────
+ * The article's first paragraph, seeded straight into the installation's own record (one word per depth, the record a
+ * year of use leaves; no app reducer), in WebKit and Chromium at 390×844, every page error a failure:
+ *   G2.1 states   出席 unmet (bare) · 官邸 met · 大賞 again · 表彰 recalled · 大臣 owned: each reader token wears exactly its
+ *                 state; the four dots are four fills, each deeper than the last against the page; no line box moves
+ *   G2.2 ring     kept = Review or a list: 大臣 (Review) and 式 (a list only) ring in the world's seal red; 官邸, 大賞, 表彰
+ *                 (history, no longer kept) and 出席 never do
+ *   G2.3 rooms    大臣's dot and ring in its slip, on its page's basis line, in its saved-words row, among Today's stars and
+ *                 in the mirror (Kagami); Me's help line stands beside characters read unaided
+ *   G2.4 reading  年 in 令和８年 reads ねん and 日 in ２５日 reads か; his owned, kept cards are 年 read とし and 日 read ひ:
+ *                 each token is at most "met" and never rings; 年's slip and page do the same, and its page says the kept
+ *                 card is another reading
+ *   G2.5 not yet  挨拶 owned with his "Not yet": "again"; a Good review appended after it releases it to "owned"
+ *   G2.6 basis    the page's one line names the days, the review state with present recall, and the reading; "I know this"
+ *                 and "Not yet" are its two words
+ *   G2.7 taps     looking up, opening pages and pressing both words leave taken, lists, srs, revlog, stats, suspended and
+ *                 deepWords byte-identical, and change met
+ * G2 controls (--g2-control <name>, an edit served in place of corridor.js, serveMutation): reading-check-dropped →
+ * G2.4 red; tap-schedules → G2.7 red. The browser version is logged for every engine. */
+const G2_PARA = Object.freeze({ unmet: 23, met: 14, again: 18, recalled: 20, owned: 13, listed: 21, capped: 6, homograph: 2, notYet: 31 });
+const G2_DAY = 86400000;
+const G2_SCHEDULING = ['taken', 'lists', 'srs', 'revlog', 'stats', 'suspended', 'deepWords'];
+const g2Card = (now, { stability, daysAgo, state = 2 }) => ({ due: new Date(now + Math.round(stability * 0.6) * G2_DAY).toISOString(),
+  last_review: new Date(now - daysAgo * G2_DAY).toISOString(), stability, difficulty: 5.1, elapsed_days: daysAgo,
+  scheduled_days: Math.round(stability * 0.6) + daysAgo, reps: 7, lapses: 0, learning_steps: 0, state });
+const g2Row = (t, key, g) => [t, key, g, 2, 3, 0.95, 40, 5, 42, 5, 30, t + 30 * G2_DAY];
+const G2_CONTROLS = {
+  'reading-check-dropped': { kills: ['G2.4'], edits: [{ file: 'corridor.js', key: 'reading', from: '  const reading = shown ? kanaReadingKey(shown) || null : null;\n  const make =',
+    to: '  const reading = null;\n  const make =' }] },
+  'tap-schedules': { kills: ['G2.7'], edits: [{ file: 'corridor.js', key: 'schedules', from: '  const help = article ? readHelpPatch(latest, article, key, now) : null;',
+    to: "  const help = article ? readHelpPatch(latest, article, key, now) : null;\n  if (plainRecord(latest.srs) && owns(latest.srs, srsKey('word', identity.id))) patch.srs = { ...latest.srs, [srsKey('word', identity.id)]: { ...latest.srs[srsKey('word', identity.id)], due: new Date(now).toISOString() } };" }] },
+};
+/** The first paragraph just under the top bar, for the eye. */
+async function g2ShowParagraph(page) {
+  await page.evaluate(() => {
+    const first = document.querySelector('#reader .tok[data-index]');
+    const bar = [...document.querySelectorAll('.chrome, .nav-symbol')].reduce((edge, node) => Math.max(edge, node.getBoundingClientRect().bottom), 0);
+    window.scrollTo(0, Math.max(0, first.getBoundingClientRect().top + window.scrollY - bar - 28));
+  });
+  await delay(400);
+}
+async function g2Walks(walk, browser) {
+  const version = browser.version();
+  console.log(`G2 ${engine} ${version}`);
+  g2Versions[engine] = version;
+  const controlAt = process.argv.indexOf('--g2-control');
+  const control = controlAt >= 0 ? G2_CONTROLS[process.argv[controlAt + 1]] : null;
+  assert(controlAt < 0 || control, `--g2-control is one of ${Object.keys(G2_CONTROLS).join(', ')}`);
+  const manifest = new Map(identity.files.map((file) => [file.path, file.sha256]));
+  const served = { served: [], setupError: null };
+  /** The record this boot left, changed off the page and committed straight into the installation's own store. */
+  const seed = async (page, mutate) => {
+    const snapshot = await readAppRecordSnapshot(page);
+    const record = mutate(JSON.parse(JSON.stringify(snapshot.record)));
+    await page.goto(`${host.origin}/__g2-blank`);
+    const result = await page.evaluate(async (recordText) => {
+      const core = await import('/modules/record-core.mjs');
+      const installation = JSON.parse(localStorage.getItem('kairo-local-record-binding-v1'));
+      const policy = { binding: installation.binding, schemaEpoch: 1, deletionEpoch: 0, mergePolicy: 'kairo-conservative-merge/1' };
+      const store = await core.IndexedDbReplicationStore.open({ databaseName: installation.databaseName, policy, actor: installation.actor });
+      try {
+        const before = await store.snapshot();
+        await store.commitLocal({ changeId: `g2-seed-${crypto.randomUUID()}`, binding: policy.binding, expectedRevision: before.revision,
+          occurredAt: new Date().toISOString(), mutations: [{ kind: 'put', collection: 'learner-record', id: 'current', value: JSON.parse(recordText) }], operations: [] });
+        return { stored: true };
+      } catch (error) { return { stored: false, message: String(error?.message || error) }; }
+      finally { await store.close(); }
+    }, JSON.stringify(record));
+    assert(result.stored, `seeded: ${result.message}`);
+    return record;
+  };
+  const prepare = async (page) => {
+    await page.route('**/__g2-blank', (route) => route.fulfill({ contentType: 'text/html', body: '<!doctype html><meta charset="utf-8"><title>g2</title>' }));
+    if (control) await serveMutation(page.context(), { origin: host.origin, manifest, control: served, edits: control.edits });
+  };
+  const token = (page, index) => page.locator(`#reader .tok[data-index="${index}"]`).first();
+  /** What the reader shows of one token: its state, its ring, its painted dot and its row's box. */
+  const tokenFacts = (page, index) => page.evaluate((at) => {
+    const tok = document.querySelector(`#reader .tok[data-index="${at}"]`);
+    const row = tok?.querySelector('.tok-word');
+    if (!tok || !row) return null;
+    const dot = getComputedStyle(row, '::after');
+    return { text: row.textContent, depth: tok.dataset.depth || null, kept: tok.dataset.kept != null,
+      dot: dot.content === 'none' ? null : { background: dot.backgroundColor, shadow: dot.boxShadow, position: dot.position,
+        width: parseFloat(dot.width), events: dot.pointerEvents }, rowHeight: Math.round(row.getBoundingClientRect().height * 10) / 10 };
+  }, index);
+  const record = (page) => readAppRecordSnapshot(page).then((snapshot) => snapshot.record);
+  const scheduling = (value) => JSON.stringify(G2_SCHEDULING.map((key) => [key, value[key] ?? null]));
+  /** The one paragraph, every state: the record a learner leaves after weeks of reading and review. */
+  const seedParagraph = async (page) => {
+    await openStory(page);
+    const nodes = await page.evaluate((map) => Object.fromEntries(Object.entries(map).map(([name, at]) =>
+      [name, { node: window.__KAIRO_DEPTH__.readerNode(at), key: window.__KAIRO_DEPTH__.key(window.__KAIRO_DEPTH__.readerNode(at) || {}),
+        kind: window.__KAIRO_DEPTH__.identity(window.__KAIRO_DEPTH__.readerNode(at) || {})?.kind }])), G2_PARA);
+    const today = await page.evaluate(() => window.__KAIRO_DEPTH__.day());
+    const now = Date.now();
+    const words = Object.fromEntries(Object.entries(nodes).map(([name, value]) => [name, value.node?.id]));
+    check('G2.F0.fixture', 'the paragraph names its words, each the quick dictionary\'s own record (so no index decides them)',
+      words.unmet === '出席' && words.met === '官邸' && words.again === '大賞' && words.recalled === '表彰' && words.owned === '大臣' &&
+      words.listed === '式' && words.notYet === '挨拶' && ['unmet', 'met', 'again', 'recalled', 'owned', 'listed', 'notYet'].every((name) => nodes[name].kind === 'core'), nodes);
+    const seeded = await seed(page, (value) => {
+      const item = (id) => ({ t: 'word', id, label: id, ts: now - 40 * G2_DAY, started: now - 40 * G2_DAY });
+      value.taken = [...value.taken, item('大臣'), item('挨拶'), item('日'), item('年')];
+      value.lists = { ...value.lists, 式典: [{ t: 'word', id: '式', label: '式', ts: now - 3 * G2_DAY }] };
+      value.srs = { ...value.srs, 'word:大臣': g2Card(now, { stability: 64, daysAgo: 3 }), 'word:表彰': g2Card(now, { stability: 12, daysAgo: 1 }),
+        'word:挨拶': g2Card(now, { stability: 48, daysAgo: 2 }), 'word:日': g2Card(now, { stability: 80, daysAgo: 4 }),
+        'word:年': g2Card(now, { stability: 90, daysAgo: 5 }) };
+      // the mirror's frontier and Today's sky: 大臣 met twice in review lately, once missed
+      value.revlog = [...value.revlog, g2Row(now - 3 * G2_DAY, 'word:大臣', 1), g2Row(now - 2 * G2_DAY, 'word:大臣', 3)];
+      value.met = { version: 1, entries: {
+        [nodes.met.key]: { first: today - 2, last: today - 2, days: 1 },
+        [nodes.again.key]: { first: today - 9, last: today - 1, days: 3 },
+        [nodes.recalled.key]: { first: today - 30, last: today - 4, days: 6 },
+        [nodes.owned.key]: { first: today - 60, last: today - 2, days: 11 },
+        [nodes.notYet.key]: { first: today - 20, last: today - 1, days: 4, said: { value: 'not-yet', at: now - G2_DAY, cursor: value.revlog.length } },
+      } };
+      return value;
+    });
+    await openStory(page);
+    await page.waitForFunction(() => !!document.querySelector('#reader .tok[data-depth]'), null, { timeout: 8000 }).catch(() => {});
+    await delay(400);
+    return { nodes, seeded, now, today };
+  };
+
+  // G2.1 · G2.2 · G2.3 · G2.4 · G2.5 · G2.6 — one walk through the seeded paragraph and every room it reaches
+  await walk('g2-depth', async (page) => {
+    await prepare(page);
+    const { seeded, now } = await seedParagraph(page);
+    const facts = {};
+    for (const [name, at] of Object.entries(G2_PARA)) facts[name] = await tokenFacts(page, at);
+    await g2ShowParagraph(page);
+    await page.screenshot({ path: resolve(evidence, `${engine}-G2-reader-ai.png`) });
+    const want = { unmet: null, met: 'met', again: 'again', recalled: 'recalled', owned: 'owned' };
+    const states = Object.entries(want).every(([name, depth]) => facts[name]?.depth === depth && (depth ? !!facts[name].dot : !facts[name].dot));
+    const fills = ['met', 'again', 'recalled', 'owned'].map((name) => facts[name]?.dot?.background);
+    const page0 = await page.evaluate(() => { const probe = document.createElement('i'); probe.style.cssText = 'position:fixed;width:1px;height:1px;background:var(--depth-ground)';
+      document.querySelector('#reader').append(probe); const color = getComputedStyle(probe).backgroundColor; probe.remove(); return color; });
+    const steps = fills.map((fill) => contrast(fill, page0));
+    check('G2.1', 'the paragraph: 出席 bare · 官邸 met · 大賞 again · 表彰 recalled · 大臣 owned, four fills each deeper against the page, '
+      + 'each dot out of the line (absolute, untouchable) and every row its natural height',
+    states && new Set(fills).size === 4 && steps.every((ratio, i) => i === 0 || ratio > steps[i - 1]) &&
+      ['met', 'again', 'recalled', 'owned'].every((name) => facts[name].dot.position === 'absolute' && facts[name].dot.events === 'none') &&
+      ['met', 'again', 'recalled', 'owned'].every((name) => Math.abs(facts[name].rowHeight - facts.unmet.rowHeight) <= 0.5), { facts, fills, steps });
+    const seal = await page.evaluate(() => { const probe = document.createElement('i'); probe.style.color = 'var(--color-seal)'; document.body.append(probe);
+      const color = getComputedStyle(probe).color; probe.remove(); return color; });
+    const rings = (fact) => !!fact?.dot && fact.kept && String(fact.dot.shadow).includes(seal.replace(/\s+/g, ' '));
+    check('G2.2', 'kept rings, one meaning: 大臣 (Review) and 式 (a list only) wear the seal-red ring; 官邸, 大賞, 表彰 (history only) and 出席 never',
+      rings(facts.owned) && rings(facts.listed) && ['met', 'again', 'recalled', 'unmet'].every((name) => !facts[name]?.kept && !/rgb|color/u.test(String(facts[name]?.dot?.shadow || 'none').replace('none', ''))),
+      { owned: facts.owned, listed: facts.listed, seal });
+    check('G2.4', '年 read ねん and 日 read か beside his owned, kept 年 read とし and 日 read ひ: each at most "met", and no ring',
+      [facts.capped, facts.homograph].every((fact) => fact && ['met', null].includes(fact.depth) && !fact.kept), { capped: facts.capped, homograph: facts.homograph });
+    check('G2.5', '挨拶, owned, with his "Not yet": the dot is "again"', facts.notYet?.depth === 'again', facts.notYet);
+    // the rooms: 大臣's slip, its page's basis line
+    await token(page, G2_PARA.owned).tap();
+    await page.locator('#mini .mini-word').waitFor();
+    await delay(500);
+    const slip = await page.evaluate(() => { const mini = document.getElementById('mini'); const dot = getComputedStyle(mini.querySelector('.mini-word'), '::after');
+      return { depth: mini.dataset.depth || null, kept: mini.dataset.kept != null, dot: dot.content === 'none' ? null : dot.backgroundColor, shadow: dot.boxShadow }; });
+    await page.locator('#mini .mini-word').tap();
+    await pageSettled(page);
+    await page.locator('#depth-basis').waitFor({ timeout: 8000 });
+    await delay(400);
+    const basis = await page.evaluate(() => { const line = document.getElementById('depth-basis'); const dot = line.querySelector('.depth-dot');
+      return { text: line.querySelector('.depth-basis-said')?.textContent || '', depth: dot?.dataset.depth || null, kept: dot?.dataset.kept != null,
+        words: [...line.querySelectorAll('.depth-word')].map((button) => button.textContent), painted: !!dot && getComputedStyle(dot).display !== 'none' }; });
+    await page.screenshot({ path: resolve(evidence, `${engine}-G2-page-basis-ai.png`) });
+    check('G2.6', 'the page names the basis in one line — days met (eleven seeded and today\'s look-up), review state with present recall, the reading — and offers "I know this" / "Not yet"; never "mastered"',
+      /Familiar · met on 12 days/u.test(basis.text) && /in review · recall now \d+%/u.test(basis.text) && /read だいじん/u.test(basis.text) &&
+      !/master/iu.test(basis.text) && basis.words.join('|') === 'I know this|Not yet', basis);
+    // the saved-words row, Today's stars, the mirror, Me
+    await page.locator('#sheet-back').tap();
+    await bare(page);
+    if (await page.locator('#mini').count()) { await page.keyboard.press('Escape'); await delay(300); }
+    await page.locator('#tray').click();
+    await page.waitForFunction(() => !!document.querySelector('.tray-line'), null, { timeout: 10000 });
+    await delay(500);
+    const row = await page.evaluate(() => { const line = [...document.querySelectorAll('.tray-line')].find((node) => node.querySelector('.w')?.textContent === '大臣');
+      const dot = line?.querySelector('.depth-dot'); return dot ? { depth: dot.dataset.depth || null, kept: dot.dataset.kept != null, shown: getComputedStyle(dot).display } : null; });
+    await page.locator('#tab-today').click().catch(() => {});
+    await page.waitForFunction(() => document.querySelectorAll('.today-star').length > 0, null, { timeout: 10000 }).catch(() => {});
+    await page.evaluate(() => { for (const star of document.querySelectorAll('.today-star')) star.hidden = false; });
+    await delay(500);
+    const star = await page.evaluate(() => { const node = [...document.querySelectorAll('.today-star')].find((s) => s.textContent.trim() === '大臣');
+      return node ? { depth: node.dataset.depth || null, kept: node.dataset.kept != null, dot: getComputedStyle(node, '::after').content !== 'none' } : null; });
+    await page.locator('#tab-me, #tab-progress').first().click();
+    await page.waitForFunction(() => document.body.dataset.view === 'me' || !!document.getElementById('me-progress'), null, { timeout: 10000 });
+    await delay(400);
+    const help = await page.evaluate(() => { const line = document.getElementById('me-help'); return line ? { text: line.textContent, beside: !!line.previousElementSibling } : null; });
+    await page.locator('#me-progress').click();
+    await page.waitForFunction(() => document.body.dataset.view === 'kagami', null, { timeout: 10000 });
+    await delay(500);
+    const mirror = await page.evaluate(() => { const rowNode = [...document.querySelectorAll('.kagami-row')].find((node) => node.querySelector('.row-glyph')?.textContent === '大臣');
+      const dot = rowNode?.querySelector('.depth-dot'); return rowNode ? { depth: dot?.dataset.depth || null, kept: dot?.dataset.kept != null,
+        reading: rowNode.querySelector('.row-reading')?.textContent || '' } : null; });
+    check('G2.3', '大臣 wears the same dot and ring in every room: its slip, its page\'s basis line, its saved-words row, Today\'s sky and the mirror; Me says its help line',
+      slip.depth === 'owned' && slip.kept && !!slip.dot && basis.depth === 'owned' && basis.kept && basis.painted && row?.depth === 'owned' && row.kept &&
+      row.shown !== 'none' && star?.depth === 'owned' && star.kept && star.dot && mirror?.depth === 'owned' && mirror.kept && mirror.reading === 'だいじん' &&
+      !!help && /1,000/u.test(help.text), { slip, basis: { depth: basis.depth, kept: basis.kept }, row, star, mirror, help });
+    // G2.5 · a Good review after his "Not yet" releases it
+    const latest = await record(page);
+    await seed(page, (value) => ({ ...value, revlog: [...value.revlog, g2Row(Date.now(), 'word:挨拶', 3)] }));
+    await openStory(page);
+    await page.waitForFunction((at) => !!document.querySelector(`#reader .tok[data-index="${at}"][data-depth]`), G2_PARA.notYet, { timeout: 8000 }).catch(() => {});
+    await delay(300);
+    const released = await tokenFacts(page, G2_PARA.notYet);
+    check('G2.5.release', 'a Good review of 挨拶 appended after his "Not yet" releases it to "owned"', released?.depth === 'owned' && latest.met && Object.keys(latest.met.entries).length >= 5, released);
+    if (engine === 'webkit' && !control) {
+      // the same paragraph in 墨: the dot is the print's own ink at the same steps
+      await boot(page, { world: 'sumi' });
+      await openStory(page);
+      await page.waitForFunction(() => !!document.querySelector('#reader .tok[data-depth]'), null, { timeout: 8000 }).catch(() => {});
+      await g2ShowParagraph(page);
+      await page.screenshot({ path: resolve(evidence, `${engine}-G2-reader-sumi.png`) });
+    }
+    void seeded; void now;
+  });
+
+  // G2.4 · the capped homograph opened: its slip and its page
+  await walk('g2-reading', async (page) => {
+    await prepare(page);
+    await seedParagraph(page);
+    await token(page, G2_PARA.homograph).tap();
+    await page.locator('#mini .mini-word').waitFor();
+    // the full dictionary names 年 read ねん (#2084840): the card is drawn again with it
+    await page.waitForFunction(() => /ねん/u.test(document.querySelector('#mini .mini-reading')?.textContent || '') && !!document.querySelector('#mini button.mini-word'), null, { timeout: 10000 }).catch(() => {});
+    await delay(600);
+    const slip = await page.evaluate(() => { const mini = document.getElementById('mini'); return { depth: mini.dataset.depth || null, kept: mini.dataset.kept != null,
+      reading: mini.querySelector('.mini-reading')?.textContent || '' }; });
+    let basis = null;
+    if (await page.locator('#mini button.mini-word').count()) {
+      await page.locator('#mini .mini-word').tap();
+      await pageSettled(page);
+      await page.locator('#depth-basis').waitFor({ timeout: 8000 }).catch(() => {});
+      basis = await page.evaluate(() => { const line = document.getElementById('depth-basis'); const dot = line?.querySelector('.depth-dot');
+        return line ? { text: line.textContent, depth: dot?.dataset.depth || null, kept: dot?.dataset.kept != null } : null; });
+    }
+    check('G2.4.rooms', '年 read ねん: its slip is at most "met" and unringed, and its page says, at most "met" and unringed, that the kept card is another reading',
+      ['met', null].includes(slip.depth) && !slip.kept && slip.reading === 'ねん' && !!basis &&
+      ['met', 'unmet'].includes(basis.depth) && !basis.kept && /another reading/u.test(basis.text), { slip, basis });
+  });
+
+  // G2.7 · looking up never schedules
+  await walk('g2-taps', async (page) => {
+    await prepare(page);
+    await seedParagraph(page);
+    const before = await record(page);
+    for (const at of [G2_PARA.met, G2_PARA.owned, G2_PARA.unmet]) {
+      await token(page, at).tap();
+      await page.locator('#mini .mini-word').waitFor();
+      await delay(500);
+      await page.keyboard.press('Escape');
+      await delay(300);
+    }
+    await token(page, G2_PARA.owned).tap();
+    await page.locator('#mini .mini-word').waitFor();
+    await delay(400);
+    await page.locator('#mini .mini-word').tap();
+    await pageSettled(page);
+    await page.locator('#depth-known').click();
+    await page.waitForFunction(() => document.getElementById('depth-known')?.getAttribute('aria-pressed') === 'true', null, { timeout: 8000 });
+    await page.locator('#depth-not-yet').click();
+    await page.waitForFunction(() => document.getElementById('depth-not-yet')?.getAttribute('aria-pressed') === 'true', null, { timeout: 8000 });
+    await delay(600);
+    const after = await record(page);
+    const moved = G2_SCHEDULING.filter((key) => JSON.stringify(before[key] ?? null) !== JSON.stringify(after[key] ?? null));
+    const ownedKey = Object.keys(after.met?.entries || {}).find((key) => JSON.parse(key)[2] === '大臣');
+    check('G2.7', 'three look-ups, a page and both of his words leave taken, lists, srs, revlog, stats, suspended and deepWords byte-identical; met holds his "Not yet"',
+      scheduling(before) === scheduling(after) && moved.length === 0 && after.met?.entries?.[ownedKey]?.said?.value === 'not-yet' &&
+      Object.keys(after.met.entries).length > Object.keys(before.met.entries).length, { moved, said: after.met?.entries?.[ownedKey]?.said });
+  });
+  if (control) controlsRun.push({ engine, control: process.argv[controlAt + 1], served: served.served, setupError: served.setupError });
+}
+
 try {
   for (engine of engines) {
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true });
     const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true } = {}) => {
+      if (g2Only && !name.startsWith('g2')) return;
       const context = await browser.newContext({ viewport, isMobile: mobile, hasTouch: true, deviceScaleFactor: 2, serviceWorkers: 'block' });
       await context.addInitScript(GLYPHS);
       await silenceBrowserAudio(context);
@@ -645,6 +924,7 @@ try {
       }
     });
 
+    await g2Walks(walk, browser);
     await browser.close();
   }
 } finally {
@@ -653,7 +933,8 @@ try {
 
 function innerHeightOf(facts) { return facts?.inner?.height || 844; }
 
-writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, rows, frames }, null, 1));
+writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256,
+  browsers: g2Versions, ...(g2Only ? { scope: 'G2 walks only' } : {}), ...(controlsRun.length ? { control: controlsRun } : {}), rows, frames }, null, 1));
 const failed = rows.filter((row) => !row.ok);
 console.log(`\n${rows.length - failed.length}/${rows.length} — evidence ${evidence}`);
 process.exit(failed.length ? 1 : 0);
