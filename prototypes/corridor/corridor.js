@@ -9729,7 +9729,7 @@ function miniKanjiWeb(word, anchor) {
         // the part's name follows the page's language (review round 2 #7): in English its meaning, from
         // the kanji data; in 日本語 its reading, from the radical names. A part with neither shows none.
         if (bi()) {
-          const meaning = String(D.kanji?.[part]?.m || '').toLowerCase();
+          const meaning = partGloss(c, part);
           if (meaning) set.append(el('span', 'mini-kanji-part-name mini-kanji-part-meaning', meaning));
         } else {
           const name = D.radicals?.[part]?.name;
@@ -9779,9 +9779,37 @@ function miniKanjiWeb(word, anchor) {
   return box;
 }
 
+/** Q · a word's box with its reading (Q/DESIGN.md §3): a card set 10 px from the word's own box stood on its reading
+ * (Grok's walk: そうり under the card's edge), because the reading is drawn outside that box: the reader's label over a
+ * word (ruby::before, attr(data-r): shown while its <rt> is not hidden), the deck's (ruby[data-rt]::after), or true
+ * ruby, which WebKit gives no box at all. The card keeps its 10 px from all of it. */
+function anchorBox(anchor) {
+  const r = anchor.getBoundingClientRect();
+  let { top, bottom, left, right } = r;
+  const grow = (b) => { top = Math.min(top, b.top); bottom = Math.max(bottom, b.bottom); left = Math.min(left, b.left); right = Math.max(right, b.right); };
+  for (const ruby of anchor.querySelectorAll?.('ruby') || []) {
+    const box = ruby.getBoundingClientRect();
+    const rt = ruby.querySelector(':scope > rt');
+    // a label drawn above the word: its line counted by its own size (the label sits on the word's top edge)
+    for (const pseudo of ['::before', '::after']) {
+      const label = getComputedStyle(ruby, pseudo);
+      if (!label.content || label.content === 'none' || label.content === 'normal' || label.display === 'none') continue;
+      const shown = pseudo === '::before' ? !!rt && !rt.classList.contains('hidden-rt') : !!ruby.dataset.rt;
+      if (shown) grow({ top: box.top - (parseFloat(label.fontSize) || 0) * 1.2, bottom: box.bottom, left: box.left, right: box.right });
+    }
+    // true ruby: its text's own boxes where the engine gives them, else one ruby line above the word
+    if (!rt || getComputedStyle(rt).display === 'none' || !rt.textContent.trim()) continue;
+    const range = document.createRange();
+    range.selectNodeContents(rt);
+    const boxes = [...range.getClientRects()].filter((b) => b.width >= 0.5 && b.height >= 0.5);
+    for (const b of boxes) grow(b);
+    if (!boxes.length) grow({ top: box.top - (parseFloat(getComputedStyle(rt).fontSize) || 0) * 1.25 - 1, bottom: box.bottom, left: box.left, right: box.right });
+  }
+  return { top, bottom, left, right, width: right - left, height: bottom - top, x: left, y: top };
+}
 /** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
 function keepFloatingBeside(card, anchor, { follow = false } = {}) {
-  placeFloating(card, anchor.getBoundingClientRect());
+  placeFloating(card, anchorBox(anchor));
   card.addEventListener('focusin', () => {
     requestAnimationFrame(() => { if (card.isConnected) revealFloatingFocus(card); });
   });
@@ -9793,7 +9821,7 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
       const now = anchor.getBoundingClientRect();
       if (Math.abs(now.left - was.left) < 1 && Math.abs(now.top - was.top) < 1) return;
       was = now;
-      placeFloating(card, now);
+      placeFloating(card, anchorBox(anchor));
     }, 120);
   }
   if (typeof ResizeObserver !== 'function') return;
@@ -9802,7 +9830,7 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
   const seat = () => {
     if (!card.isConnected || !anchor.isConnected) { watch.disconnect(); grow?.disconnect(); return; }
     if (Math.abs(card.getBoundingClientRect().height - last) < 1) return;
-    placeFloating(card, anchor.getBoundingClientRect());
+    placeFloating(card, anchorBox(anchor));
     last = card.getBoundingClientRect().height;
   };
   // L · seating the card resizes the very element the ResizeObserver watches (maxHeight), and a size changed inside
@@ -10073,7 +10101,7 @@ function readerSentenceRow(node, index, sourceEnd = index) {
     door.hidden = open;
     door.setAttribute('aria-expanded', String(open));
     card?.classList.toggle('is-sentence', open);
-    if (card && miniAnchor?.isConnected) placeFloating(card, miniAnchor.getBoundingClientRect());
+    if (card && miniAnchor?.isConnected) placeFloating(card, anchorBox(miniAnchor));
     if (focus) (open ? back : door).focus({ preventScroll: true });
     if (card) revealFloatingFocus(card);
   };
@@ -12748,18 +12776,27 @@ function todayKanji(word) {
 function todayPartStrokes(part) {
   return D.radicals?.[part]?.st || D.kanji?.[part]?.st || 0;
 }
-/** The one part every kanji of the word carries, from D.kanji parts only; the part with the most
- * strokes wins, so 隹 outranks the 亻 hiding inside it. */
+/* Q · a hook is true and useful, or it is not shown (Q/DESIGN.md §7; Grok's walks: Today taught 冋 "desert" as the part
+ * 高 and 尚 share — the shape is in both, but the desert is in neither; 128 of the 225 first-tier day words named a part
+ * like it). Today names a part only when that part is the classical radical (部首) of every kanji it is said to hide in:
+ * the radical is the kanji's meaning family, so its meaning is a true clue (洗濯: 水 water; 議論: 言 say). */
+function todayIsRadical(part, c) {
+  const row = D.radByGlyph?.[part] || D.radByGlyph?.[(PART_WRITTEN[part] || [])[0]];
+  return !!row && row.n === D.kanji?.[c]?.rad;
+}
+/** The one part every kanji of the word carries, from D.kanji parts only, and that is every one's radical; the part
+ * with the most strokes wins, so 隹 outranks the 亻 hiding inside it. */
 function todaySharedPart(ks) {
   if (ks.length < 2) return null;
   const lists = ks.map((c) => D.kanji[c].parts || []);
   const shared = [...new Set(lists[0])]
-    .filter((p) => !ks.includes(p) && D.radicals?.[p] && lists.slice(1).every((l) => l.includes(p)));
+    .filter((p) => !ks.includes(p) && D.radicals?.[p] && lists.slice(1).every((l) => l.includes(p)) && ks.every((c) => todayIsRadical(p, c)));
   shared.sort((a, b) => todayPartStrokes(b) - todayPartStrokes(a) || (a < b ? -1 : 1));
   return shared[0] || null;
 }
+/** A kanji's own radical, when the kanji's parts name it (海 → 氵): the one part of a single kanji worth a hook. */
 function todayLargestPart(c) {
-  const parts = [...new Set(D.kanji?.[c]?.parts || [])].filter((p) => p !== c && D.radicals?.[p]);
+  const parts = [...new Set(D.kanji?.[c]?.parts || [])].filter((p) => p !== c && D.radicals?.[p] && todayIsRadical(p, c));
   parts.sort((a, b) => todayPartStrokes(b) - todayPartStrokes(a) || (a < b ? -1 : 1));
   return parts[0] || null;
 }
@@ -12816,7 +12853,8 @@ function todayHook(word) {
   const cap = wwPartCap(part, wwMine());
   const family = cap.count;
   const mine = cap.mine;
-  const meaning = String(D.kanji?.[part]?.m || '').toLowerCase();
+  // its plain meaning (the written form's own, else its standalone form's: 氵 is water), never the catalogue's words
+  const meaning = partMeaning(D.kanji?.[part]?.m) || partMeaning(D.kanji?.[(PART_WRITTEN[part] || [])[0]]?.m);
   return { part, shared, host: host?.[0] || null, count: ks.length, family, mine, meaning };
 }
 /** Seconds a card takes this learner: the median gap between consecutive grades in their own
@@ -29313,16 +29351,67 @@ function _allSub(q) {
   }
   return seen;
 }
+/* Q · each part once, at its own level (Q/DESIGN.md §6; Grok's walk: 総 read 糸 + 忩 + 公, and 公 is 忩's own part; the
+ * inventory found 364 kanji showing a part beside its own part or twice in two forms, 月 + 肉 in 42 of them):
+ *  - a part the list names twice, as it is written and as its standalone form, is shown once, as written: the written
+ *    forms below, and 月 where the list also names 肉 (the 肉 of 胃 and 腕, which it writes as 月; partGloss gives it
+ *    its meaning, meat). This comes first, so the form written is never taken for a piece of the other;
+ *  - a part inside another part shown beside it goes (the data's own lists, _allSub);
+ *  - the kanji's strokes are the budget: the list names a part before its own parts, so walking it in order, a part that
+ *    would take the parts shown past the kanji's own stroke count is a piece of one already shown (総 14: 糸 6 + 忩 8,
+ *    and 公 4 would make 18). */
+const PART_WRITTEN = Object.fromEntries([...Object.entries(RADICAL_VARIANT).map(([v, s]) => [v, [s]]),
+  ['刂', ['刀']], ['攵', ['攴']], ['罒', ['网']], ['灬', ['火']], ['氺', ['水']], ['冫', ['氷', '水']], ['月', ['肉']]]);
+/** a part's strokes as it is written in a Japanese kanji, where the data has none or counts the older form (辶: 4 → 3) */
+const PART_STROKES = { 辶: 3, 亻: 2, 彳: 3, 氵: 3, 冫: 2, 扌: 3, 忄: 3, 犭: 3, 阝: 3, 艹: 3, 礻: 4, 衤: 5, 刂: 2, 灬: 4, 罒: 5, 攵: 4, '⺍': 3 };
 function mainParts(c) {
   const k = D.kanji[c];
   if (!k || !k.parts || !k.parts.length) return [];
-  const P = [...new Set(k.parts)];
+  const listed = [...new Set(k.parts)];
+  // a part named twice, as written and as its standalone form, is the written one (first, so neither is taken for a
+  // piece of the other)
+  const P = listed.filter((p) => p !== c && !listed.some((v) => v !== p && (PART_WRITTEN[v] || []).includes(p)));
   const subs = new Map(P.map((q) => [q, _allSub(q)]));
+  const st = P.map((p) => PART_STROKES[p] ?? _strokeOf(p));
+  // the parts that make the kanji exactly, stroke for stroke, none inside another: the fewest (its own level: 総 = 糸 +
+  // 忩, not 糸 + 公 + 心; 党 = 尚 + 儿), and of those the ones the list names first
+  if (k.st && P.length > 1 && P.length <= 12) {
+    let best = null;
+    for (let mask = 1; mask < 1 << P.length; mask += 1) {
+      const order = P.map((_, i) => i).filter((i) => mask & (1 << i));
+      if (order.length < 2 || (best && order.length > best.length)) continue;
+      if (order.some((i) => !st[i]) || order.reduce((sum, i) => sum + st[i], 0) !== k.st) continue;
+      if (order.some((i) => order.some((j) => j !== i && subs.get(P[j]).has(P[i])))) continue;
+      if (!best || order.length < best.length || order.join() < best.join()) best = order;
+    }
+    if (best) return best.map((i) => P[i]).slice(0, 3);
+  }
+  // no exact cover in the data: the top level by the lists alone, and the stroke budget (a part before its own parts:
+  // one that would take the parts shown past the kanji's strokes is a piece of one already shown)
   let keep = P.filter((p) => !P.some((q) => q !== p && subs.get(q).has(p)));
-  const present = new Set(keep);
-  keep = keep.filter((p) => ![...present].some((v) => RADICAL_VARIANT[v] === p));
   if (keep.length > 1) keep = keep.filter((p) => !GLUE_STROKE.has(p));
+  if (k.st) {
+    let strokes = 0;
+    keep = keep.filter((p) => {
+      if (strokes >= k.st) return false;
+      const n = PART_STROKES[p] ?? _strokeOf(p);
+      if (!n) return true;
+      if (strokes + n > k.st) return false;
+      strokes += n;
+      return true;
+    });
+  }
   return keep.slice(0, 3);
+}
+/** Q · a part's name in English: its plain meaning (月 standing for the 肉 the list also names, in 胃 and 腕, is meat),
+ * without the catalogue's words: the name before "Radical" ("Net Radical Variant (no. 122)" → net), the first sense. */
+function partGloss(c, part) {
+  const flesh = part === '月' && (D.kanji?.[c]?.parts || []).includes('肉');
+  // a written form with no meaning of its own takes its standalone form's (亻 is person)
+  return partMeaning(D.kanji?.[flesh ? '肉' : part]?.m) || partMeaning(D.kanji?.[(PART_WRITTEN[part] || [])[0]]?.m);
+}
+function partMeaning(text) {
+  return String(text || '').replace(/\s*\bradical\b.*$/iu, '').split(/[;,]/u)[0].replace(/\s{2,}/gu, ' ').trim().toLowerCase();
 }
 
 /** The label on a 部品 row. 729 of the 926 components in the KANJIDIC/漢検
