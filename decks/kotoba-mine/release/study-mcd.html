@@ -4535,8 +4535,9 @@ html[data-room-hero]::view-transition { clip-path: inset(var(--room-hero-top, 0p
 html[data-room-hero]::view-transition-old(kairo-room) { animation: kairo-room-fade-out calc(var(--motion-room) * 0.4) var(--ease-exit) both; }
 html[data-room-hero][data-room-transition] #app > main[data-room-arrival] {
   animation-name: kairo-room-arrive;
-  animation-duration: calc(var(--motion-room) * 0.6);
-  animation-delay: calc(var(--motion-room) * 0.4 + var(--room-arrival-delay, 0ms));
+  /* a frame of bare paper (16 ms) between the departing room's last ink and the arriving room's first */
+  animation-duration: calc(var(--motion-room) * 0.6 - 16ms);
+  animation-delay: calc(var(--motion-room) * 0.4 + 16ms + var(--room-arrival-delay, 0ms));
 }
 ::view-transition-group(hero) {
   animation: revert;

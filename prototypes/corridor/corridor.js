@@ -33457,6 +33457,13 @@ function roomTransition(change) {
     if (!arrival || activeRoomArrival !== arrival) return;
     arrival.startedAt = performance.now();
     for (const animation of arrival.animations) animation.currentTime = 0;
+    // one clock: the rise counts from the very frame the departing room's fade starts on (that animation takes its start
+    // a frame after ready under load, and a rise a frame early showed both rooms at once in a loaded Chromium)
+    const leave = document.getAnimations().find((a) => String(a.effect?.pseudoElement || '') === '::view-transition-old(kairo-room)');
+    leave?.ready.then(() => {
+      if (activeRoomArrival !== arrival || leave.startTime == null) return;
+      for (const animation of arrival.animations) animation.startTime = leave.startTime;
+    }, () => {});
   }, () => {});
   transition.finished.catch(() => {}).then(arrivalDone).finally(() => { if (hero) clearHero(); clear(transition); });
   return transition;
