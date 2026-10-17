@@ -449,7 +449,9 @@ export const MEASURE_FN = `(() => {
       !(n.matches('.article-about a.inline-link[href]') && getComputedStyle(n).display === 'inline'))
     .map((n) => {
       const r = n.getBoundingClientRect();
-      const expanded = n.matches('.tok, button.sent-door, button.rest-toggle') ? getComputedStyle(n, '::before') : null;
+      // a control whose press region is its ::before is measured by that region (the reader's words, the sentence and rest
+      // doors; G5 · L-2: a Save in a bar, its 28 px face inside the bar and its ::before the bar's full 44, as Close)
+      const expanded = n.matches('.tok, button.sent-door, button.rest-toggle, [data-bar] button.save-one:not(.chrome-keep)') ? getComputedStyle(n, '::before') : null;
       const expandedW = expanded ? parseFloat(expanded.width) : 0;
       const expandedH = expanded ? parseFloat(expanded.height) : 0;
       return {

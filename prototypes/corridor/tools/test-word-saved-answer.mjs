@@ -129,7 +129,9 @@ function defineRows() {
     'dictionarySearchInFlight', 'dictionarySearchQueued', 'dictionarySearchTimer',
     'dictionaryHomographChoices', 'renderDictionaryHomographs', 'dictionaryRowsFor', 'dictionaryDetailRowsFor',
     // G1 (2026-10-16): one line per gloss — the homograph doors are drawn from homographLines
-    'homographLines'];
+    'homographLines',
+    // G5 (2026-10-18): the slip's floor stops above the 層 mark where the two would share a column (placeFloating)
+    'layersMarkTop'];
   /** The authored top-level statements declaring `names`, each exactly once. */
   const liftFrom = (tree, names) => {
     const found = tree.statements.filter((statement) => {
