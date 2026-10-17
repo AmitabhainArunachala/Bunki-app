@@ -180,7 +180,18 @@ export async function checkLock({ requireComplete = false } = {}) {
       }
     return count;
   };
-  const cueCount = judge(buildListeningCues(corridor, runtime), 'shipped');
+  const shippedCatalog = buildListeningCues(corridor, runtime);
+  const cueCount = judge(shippedCatalog, 'shipped');
+  // the listening lane's provenance: the render job places each example clip as a byte copy of its
+  // narration twin (same model, voice and text), so a shipped cue whose bytes are not its twin's
+  // has no provenance this repository can show, ledger or not
+  const twins = narration?.v === 2 ? narration.articles || {} : {};
+  for (const [id, passage] of Object.entries(shippedCatalog.passages || {}))
+    for (const sentence of passage.sentences || []) {
+      const twin = twins[id]?.clips?.[sentence.cue.sentenceIndex];
+      if (!twin || twin.text.replace(/\s+/gu, '') !== sentence.quote.replace(/\s+/gu, '') || twin.sha256 !== sentence.cue.sha256)
+        problems.push(`shipped: cue ${id} #${sentence.cue.sentenceIndex} is not a byte copy of its narration twin`);
+    }
   const staged = stagedListeningRoot(runtime);
   let stagedCues = 0;
   try {
