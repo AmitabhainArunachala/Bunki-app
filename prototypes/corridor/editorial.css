@@ -5588,7 +5588,8 @@ html[data-save-drawer='sheet'] #sheet > .sheet-bar[data-bar='sheet'] {
   color: var(--deck-band-ink);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #app .kp-top-study[data-bar='deck'] {
-  --deck-band: color-mix(in srgb, var(--color-ground) 48%, #000000);
+  /* Material II: the card band's night value, amended — the world's ground 30 % in its own deepest coat, not in black */
+  --deck-band: color-mix(in srgb, var(--color-ground) 30%, var(--zen-stage-deep));
   --deck-band-ink: var(--color-ink);
 }
 #app .kp-top-study[data-bar='deck'] .kp-icon { color: var(--deck-band-ink); }
