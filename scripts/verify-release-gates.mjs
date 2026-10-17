@@ -595,9 +595,10 @@ export function batteryGates(out, env = process.env) {
     ),
     node('import-provider', tool('verify-import-provider')),
     node('playback', tool('verify-playback')),
-    // V finisher (2026-10-17): the shipped narration through real media elements, in both engines —
-    // every other playback gate replaces Audio with a double, so none had ever played a real clip
-    node('narration-media', tool('verify-narration-media')),
+    // V finisher (2026-10-17): the shipped narration through real media elements — every other
+    // playback gate replaces Audio with a double, so none had ever played a real clip. Both engines:
+    // the CI default is one, so the gate asks for all, as guided-session does
+    { ...node('narration-media', tool('verify-narration-media')), env: { KAIRO_BROWSER: 'all' } },
     // the living-thread guided session (operator-approved 2026-09-23): journey, real deck, moments
     { ...node('guided-session', tool('verify-guided-session')), env: { KAIRO_BROWSER: 'all' } },
     // …its engine rules and set-versus-bank checks, and its offline and single-file claims
