@@ -182,6 +182,32 @@ ${scopedRules.join('\n')}
 body:not(.ui-bi) #drift-layer [data-l='en'],
 body.ui-bi #drift-layer [data-l='ja'] { display: none; }
 
+
+/* Active constellation glyphs sit above the free field, below existing
+ * word satellites (5), centres (6) and component plaques (7). */
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) {
+  z-index: 1;
+}
+
+/* Native hit regions: preserve field doors through transparent caption/rt
+   space. The actual ruby base (or unannotated .g) retains native handlers. */
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center),
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g {
+  pointer-events: none;
+}
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g > ruby.drift-reading,
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g:not(:has(> ruby.drift-reading)),
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph.unfolded:not(.comp):not(.center) > small {
+  pointer-events: auto;
+}
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g > ruby.drift-reading > rt {
+  pointer-events: none;
+}
+body[data-furigana='1'] #drift-layer.active #sky > .glyph.hosted-constellation-glyph.hosted-reading-shown:not(.comp):not(.center) > .g > ruby.drift-reading > rt,
+body[data-furigana='2'] #drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g > ruby.drift-reading > rt {
+  pointer-events: auto;
+}
+
 /* Interface arrivals stay short and still when motion is reduced. The card
  * occupies its final position throughout its fade; direct field gestures
  * and the separate teaching renderer retain their own geometry. */
@@ -726,6 +752,37 @@ patch(
   '  const lvl=stack[stack.length-1];',
   'G3 ordinary hosted taps use the shared ladder',
 );
+
+// A satellite promoted by the hosted first tap stays where it was touched.
+// Its old constellation offset belongs to that old parent, not a return trip
+// for the new centre. Fold the rendered location into its world anchor first.
+patch(
+  'function bloomFocus(n){\n  if(recordPending.size)return;\n  clearBloom(n.el?n:undefined);',
+  'function bloomFocus(n){\n  if(recordPending.size)return;\n' +
+    '  const promoted=n.wref&&n.el?.classList.contains("bsat")?s2wl(n.x,n.y):null;\n' +
+    '  clearBloom(n.el?n:undefined);\n' +
+    '  if(promoted){\n' +
+    '    const wr=n.wref;\n' +
+    '    n.wx=wr.wx=promoted.x;n.wy=wr.wy=promoted.y;\n' +
+    '    wr.ox=wr.oy=wr.hx=wr.hy=wr.px=wr.py=0;wr.ret=false;\n' +
+    '  }',
+  'hosted satellite promotion keeps its displayed world anchor',
+);
+
+// Active constellation glyphs retain native hit ownership above free words.
+// Remove the marker on every release, including a kept/relocked glyph.
+patch('focusN.el.classList.remove("bctr"); focusN.top=focusN.baseOp;',
+  'focusN.el.classList.remove("bctr","hosted-constellation-glyph"); focusN.top=focusN.baseOp;',
+  'clear constellation glyph centre marker');
+patch('  for(const g of LOCKG){\n    if(g===keep)',
+  '  for(const g of LOCKG){\n    g.el.classList.remove("hosted-constellation-glyph");\n    if(g===keep)',
+  'clear constellation glyph satellite marker');
+patch('  if(n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97);}',
+  '  if(n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97); if(n.kind==="glyph")n.el.classList.add("hosted-constellation-glyph");}',
+  'mark active constellation glyph centre');
+patch('    LOCKG.push(g); pinOf[c]=g; g.hlDom=true;',
+  '    LOCKG.push(g); pinOf[c]=g; g.hlDom=true;\n    g.el.classList.add("hosted-constellation-glyph");',
+  'mark active constellation glyph satellite');
 
 // A receipt is evidence only for its exact command and current local scope.
 // Lazy reuse of the controller codec prevents a second Drift schema here.
