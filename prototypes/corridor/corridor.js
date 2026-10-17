@@ -10874,10 +10874,11 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
     // one draft per word, shared with Save ▾'s field: a name typed in either survives a failed write and a reload
     name.dataset.recordDraftKey = `vocabulary-list:${JSON.stringify([node.t, node.id, node.seq ?? null, node.reading ?? null])}`;
     attachRecordDraft(name);
-    const create = el('button', 'chip btn-secondary seal-strip-create', tx('作る', 'Add'));
-    create.type = 'submit';
-    create.id = 'seal-strip-create';
-    form.append(name, create);
+    // the strip's own Add (its line differs from the list popover's, whose form a control mutates by its exact line)
+    const addList = el('button', 'chip btn-secondary seal-strip-create', tx('作る', 'Add'));
+    addList.type = 'submit';
+    addList.id = 'seal-strip-create';
+    form.append(name, addList);
     if (name.value) { form.hidden = false; fresh.hidden = true; }
     fresh.addEventListener('click', (event) => {
       event.stopPropagation();
@@ -10899,7 +10900,7 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
         button.setAttribute('aria-pressed', String(member(button.dataset.list)));
         button.disabled = busy || !recordWritable();
       }
-      create.disabled = busy || !recordWritable();
+      addList.disabled = busy || !recordWritable();
       name.readOnly = busy;
     };
     open.paint = paint;
