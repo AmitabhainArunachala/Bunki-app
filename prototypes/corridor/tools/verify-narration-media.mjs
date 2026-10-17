@@ -74,7 +74,9 @@ const results = [];
 for (const engine of engines) {
   const result = { engine, passed: false, clips: [], errors: [] };
   results.push(result);
-  const browser = await ({ chromium, webkit }[engine]).launch();
+  // the engine KAIRO_BROWSER names; CHROMIUM_PATH pins CI's Chromium build, as verify-playback does
+  const browser = await ({ chromium, webkit }[engine]).launch(engine === 'chromium'
+    ? { executablePath: process.env.CHROMIUM_PATH || undefined } : {});
   result.browserVersion = browser.version();
   console.log(`engine ${engine} ${result.browserVersion}`);
   const context = await browser.newContext({ viewport: { width: 1024, height: 900 }, serviceWorkers: 'block' });
