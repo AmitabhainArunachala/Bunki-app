@@ -2801,42 +2801,87 @@ body .token-actions button:hover { background: var(--ai-wash); }
 }
 
 /* ==========================================================================
-   The reader's word doors (reader lane, 2026-10-02 — John's notes 8, 9, 11, 17, 18).
-   A right-click or a hold opens the word menu; Save answers with a small toast; lists open in a
-   compact popover (a short sheet on a phone). The popup itself is skinned once, in rooms/read.css.
+   The reader's word doors (reader lane, 2026-10-02 — John's notes 8, 9, 11, 17, 18; G5, 2026-10-18).
+   A hold, a right-click or Shift+F10 seals the word (corridor.js, sealWord) and opens the strip beside it; Save answers
+   with a small toast; Save ▾'s lists unfold inside their card. The popup itself is skinned once, in rooms/read.css.
    ========================================================================== */
 
-.reader-word-menu {
-  position: fixed;
-  z-index: 90;
+/* G5 · the ring under the finger: the world's 朱 (--color-seal) on its own faint track; it fills from 150 ms to the
+   commit at 500 ms (corridor.js animates the stroke), and leaves in one beat — outward when the word was kept */
+.hold-ring { position: fixed; z-index: 95; width: 64px; height: 64px; margin: -32px 0 0 -32px; pointer-events: none; }
+.hold-ring svg { display: block; transform: rotate(-90deg); }
+.hold-ring circle { fill: none; stroke-width: 3; }
+.hold-ring .hold-ring-track { stroke: color-mix(in srgb, var(--color-seal) 20%, transparent); }
+.hold-ring .hold-ring-fill { stroke: var(--color-seal); stroke-linecap: round; }
+.hold-ring.is-leaving { opacity: 0; transition: opacity var(--motion-quick) var(--ease-exit); }
+.hold-ring.is-kept { opacity: 0; transform: scale(1.18); transition: opacity var(--motion-fast) var(--ease-exit), transform var(--motion-fast) var(--ease-enter); }
+
+/* G5 · the seal: a 白文 印 — the world's 朱 pressed solid, the paper showing through the character — at the word's
+   shoulder; it flies to the bookmark on two nested layers (X and Y on their own house curves), transform and opacity only */
+.seal-flight, .seal-rise { position: fixed; z-index: 95; display: block; width: 26px; height: 26px; pointer-events: none; }
+.seal-rise { position: static; }
+.seal-stamp {
   display: grid;
-  min-width: 232px;
-  max-width: calc(100vw - 16px);
-  padding: 6px;
-  border: 1px solid var(--raised-edge);
+  place-items: center;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-seal);
+  background: var(--color-seal);
+  color: var(--color-paper, #f5efe0);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--color-ink) 28%, transparent);
+  font: 800 16px/1 var(--font-seal);
+  transform: rotate(-9deg);
+}
+
+/* G5 · the strip: the slip's paper and edge (rooms/read.css #mini), laid in its word's own scroller (the document, or the
+   page) so it scrolls with the word; under the chrome's bar and the page's bar (it never covers them), over the text.
+   Row 1 is his lists — B slips, the chosen mark when the word is on one; row 2 the word's acts — C, quiet, under a
+   hairline. corridor.js caps it at 40 % of the screen; it scrolls inside itself. */
+.seal-strip {
+  position: absolute;
+  z-index: 19;
+  box-sizing: border-box;
+  width: min(360px, calc(100vw - 16px));
+  max-height: 40vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 10px 10px 4px;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 26%, transparent);
   border-radius: var(--radius-overlay);
   background: var(--color-paper, #f5efe0);
-  background: var(--raised);
-  box-shadow: var(--float-shadow);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), 0 0 0 0.5px rgb(20 24 34 / 6%), 0 3px 8px -3px rgb(20 24 34 / 26%),
+    0 14px 40px -12px rgb(20 24 34 / 32%);
+  color: var(--color-ink);
+  text-align: start;
+  animation: seal-strip-rise var(--motion-room) var(--ease-enter) backwards;
 }
-.reader-word-menu:focus { outline: none; }
-.reader-word-menu-item {
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: var(--radius-control);
-  background: transparent;
-  color: var(--text);
-  font: 500 15px/1.25 var(--sans);
-  text-align: left;
-  cursor: pointer;
+.seal-strip.in-page { z-index: 3; }
+.seal-strip[data-side='above'] { animation-name: seal-strip-fall; }
+.seal-strip:focus { outline: none; }
+@keyframes seal-strip-rise { from { opacity: 0.01; transform: translate3d(0, 6px, 0); } }
+@keyframes seal-strip-fall { from { opacity: 0.01; transform: translate3d(0, -6px, 0); } }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .seal-strip {
+  /* night: the slip's lit edge and its deep shade (rooms/read.css #mini) */
+  border-color: color-mix(in srgb, var(--color-gold, #e2bd6c) 34%, transparent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 3px 8px -3px rgb(0 0 0 / 55%), 0 16px 48px -14px rgb(0 0 0 / 62%);
 }
-.reader-word-menu-item:hover, .reader-word-menu-item:focus { outline: none; background: var(--ai-wash); }
-.reader-word-menu-item:focus-visible { background: var(--focus-wash); box-shadow: var(--focus-ring); }
-.reader-word-menu-item[aria-disabled='true'] { color: var(--text-2); background: transparent; cursor: default; }
-.reader-word-menu-item[aria-disabled='true']:focus-visible { background: var(--focus-wash); }
+.seal-strip-status { margin: 0 4px 8px; font: 500 13px/1.45 var(--font-ui); color: var(--color-ink-2); }
+.seal-strip-status:empty { display: none; }
+.seal-strip-lists { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+/* in the lists row the status is the row's first word: "Saved ✓  仕事  旅  New list…" */
+.seal-strip-lists > .seal-strip-status { display: inline-flex; align-items: center; min-height: 44px; margin: 0 6px 0 4px; }
+.seal-strip-lists > .seal-strip-status:empty { display: none; }
+.seal-strip-more { display: contents; }
+.seal-strip-more[hidden], .seal-strip-form[hidden], .seal-strip [hidden] { display: none; }
+.seal-strip .seal-list { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seal-strip .seal-list[aria-pressed='true']::after { content: ' ✓'; }
+.seal-strip-form { display: flex; flex: 1 1 100%; gap: 6px; }
+.seal-strip-form .vocabulary-list-field { flex: 1 1 auto; min-width: 0; }
+.seal-strip-acts { display: flex; flex-wrap: wrap; gap: 0 2px; margin: 8px -4px 0; padding-top: 4px; border-top: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent); }
+.seal-strip .seal-act[data-strip-action='remove'] { color: var(--color-ink-2); }
+.seal-strip-room { display: block; }
+
 
 .reader-toast {
   position: fixed;
@@ -2974,7 +3019,7 @@ body .token-actions button:hover { background: var(--ai-wash); }
   .version-toggle .version-choice { flex: 1 1 0; flex-wrap: wrap; justify-content: center; column-gap: 4px; row-gap: 0; padding: 4px 8px; font-size: 13px; }
 }
 .reader-toast:not([hidden]) { animation: reader-toast-in var(--motion-fast) var(--ease-standard); }
-.reader-word-menu, .vocabulary-list-popover { animation: reader-pop-in var(--motion-ma) var(--ease-enter); }
+.vocabulary-list-popover { animation: reader-pop-in var(--motion-ma) var(--ease-enter); }
 @keyframes reader-toast-in { from { opacity: 0; transform: translate(-50%, 8px); } }
 @keyframes reader-pop-in { from { opacity: 0; } }
 
@@ -5210,7 +5255,7 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
   body > :is(.sheet, .world-picker, .world-picker-scrim),
   body::after,
   body #mini,
-  body :is(.reader-word-menu, .vocabulary-list-popover),
+  body :is(.seal-strip, .vocabulary-list-popover),
   body .reader-toast:not([hidden]),
   body #bunki-reports-root .br-sheet[open] {
     animation: feel-fade var(--motion-room) linear both !important;

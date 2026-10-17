@@ -8217,7 +8217,7 @@ function dialRow(labelJa, labelEn, key, options) {
  *                      Ask the tutor about this sentence · Copy
  * The ふりがな dial skips the reading rung when off or always. A moved pointer is a scroll,
  * never a tap. Rung changes keep the occurrence's DOM and its paragraph focus. */
-const GESTURE = { MENU_MS: 500, MOVE_PX: 9 };
+const GESTURE = { MENU_MS: 500, MOVE_PX: 9, RING_MS: 150 };
 
 /* After a hold opens the full entry, the browser still synthesises a click
  * when the finger lifts — and it lands on whatever the new sheet put under
@@ -8333,7 +8333,7 @@ function foldWordLadder() {
   return true;
 }
 document.addEventListener('keydown', event => {
-  if (event.key !== 'Escape' || !ladderVisit || readerWordMenu || document.getElementById('vocabulary-list-popover')) return;
+  if (event.key !== 'Escape' || !ladderVisit || sealStrip || document.getElementById('vocabulary-list-popover')) return;
   const anchor = ladderVisit.anchor;
   if (!foldWordLadder()) return;
   event.preventDefault();
@@ -8453,7 +8453,7 @@ document.addEventListener(
     miniDiveOnAnchor = null;
     menuFoldPending?.();
     const target = ev.target;
-    if (readerWordMenu && !readerWordMenu.menu.contains(target)) closeReaderWordMenu();
+    if (sealStrip && !sealStrip.strip.contains(target)) closeSealStrip();
     const pop = document.getElementById('vocabulary-list-popover');
     if (pop && !pop.contains(target) && !target.closest?.('#mini-take, #personal-add-list, #kp-take, .save-one')) {
       const card = pop.classList.contains('is-inline') ? pop.closest('#mini') : null;
@@ -8471,7 +8471,7 @@ document.addEventListener(
     // level by dismissing the stage at pointerdown first.
     if (ladderVisit && target.closest?.('#sheet-back, #chrome-back, [data-action="navigation.back"]')) return;
     if (!mini && ladderVisit?.rung === 'reading' && !ladderVisit.anchor.contains(target) &&
-        !target.closest?.('#reader-word-menu, #vocabulary-list-popover')) clearWordLadder();
+        !target.closest?.('#seal-strip, #vocabulary-list-popover')) clearWordLadder();
     const inText = ev.button === 0 && !!target.closest?.('#reader');
     if (mini && !mini.contains(target) && !target.closest?.('#vocabulary-list-popover, #reader-toast')) {
       if (miniAnchor?.isConnected && miniAnchor.contains(target)) {
@@ -8667,7 +8667,8 @@ function japaneseLookupHelpId() {
     help.hidden = true;
     document.body.append(help);
   }
-  help.textContent = tx('←→: 語を選ぶ · Enter: ひらく · Shift+F10: ほかの操作', '←/→: choose a word · Enter: open · Shift+F10: more actions');
+  // G5 · Shift+F10 is a hold: it keeps the word and opens its strip, and the help says so
+  help.textContent = tx('←→: 語を選ぶ · Enter: ひらく · Shift+F10: 保存とほかの操作', '←/→: choose a word · Enter: open · Shift+F10: save and more');
   return help.id;
 }
 
@@ -10430,94 +10431,514 @@ async function writeListMembership(node, label, listName, on) {
   return 'ok';
 }
 
-/* The word menu (John #11: "I want to be able to 'right click' and choose save"). A right-click, a press and
- * hold on a touch screen, or the menu key (ContextMenu, Shift+F10) on the focused word opens it at the
- * pointer: Save · Save the sentence · Full entry · Ask the tutor about this sentence · Copy. ↑/↓ move,
- * Enter picks, Escape closes and gives focus back to the word. Only words lose the browser's own menu. */
-let readerWordMenu = null;
-function closeReaderWordMenu({ restoreFocus = false } = {}) {
-  const open = readerWordMenu;
-  readerWordMenu = null;
-  if (!open) return;
-  open.menu.remove();
-  if (restoreFocus && open.anchor.isConnected) focusProseWord(open.anchor, { preventScroll: true });
+/* G5 · HOLD = SEAL (MASTER_SPEC §4 G; John: "Save and add to list are confusing??? shouldn't they be one or the other?"
+ * 10-08 · "I want to be able to 'right click' and choose save" 10-02 · "existing list should just be clickable from the
+ * same menu" 10-15). Hold any word — a finger held still (a ring fills under it from RING_MS; the hold commits at
+ * MENU_MS), a right-click on a Mac, or Shift+F10 / the menu key on the focused word — and the word is kept by the one
+ * keep (keepWord: add-only, durable). Only on that keep's durable success does a vermilion 印 press onto the word and fly
+ * to the top bar's bookmark (#tray). Then the strip opens beside the word: his lists, one tap each (past six, "All lists"
+ * unfolds inside the strip), New list… (asks its name once); a quiet second row of the word's acts in plain full verbs —
+ * 全項目 · Full entry, Save the sentence, Copy, Ask the tutor about the sentence — and Remove, the one way a kept word goes
+ * out. A second hold is the same strip: nothing written twice, nothing un-kept. The strip stays under 40 % of the screen,
+ * beside the word, and covers no button. The old word menu became it. */
+const SEAL_LISTS_SHOWN = 6;
+/** His lists in the strip's order: the ones he used this session first, newest first, then the record's own order. */
+function sealListOrder() {
+  const names = Object.keys(S.lists);
+  const recent = sealListRecency.filter((name) => owns(S.lists, name));
+  return [...recent, ...names.filter((name) => !recent.includes(name))];
 }
 
-async function openReaderWordMenu(anchor, door, { x = null, y = null, keyboard = false } = {}) {
-  if (readerWordMenu?.anchor === anchor) return;
-  removeMini();
-  closeReaderWordMenu();
-  const serial = ++readerWordMenuSerial;
-  if (await door.prepare?.() === false) return;
+/* The ring under the finger: it begins at RING_MS and is whole at the commit (MENU_MS); a hold that moves, a second
+ * finger, a cancel or a lift before the commit takes it away. Decorative (aria-hidden, no pointer events): the strip and
+ * its status line answer the hold in words. Reduced motion draws it whole at once. */
+function holdRing(x, y) {
+  const ring = el('span', 'hold-ring');
+  ring.setAttribute('aria-hidden', 'true');
+  ring.innerHTML = '<svg viewBox="0 0 64 64" width="64" height="64" focusable="false"><circle class="hold-ring-track" cx="32" cy="32" r="27"></circle><circle class="hold-ring-fill" cx="32" cy="32" r="27"></circle></svg>';
+  ring.style.left = `${Math.round(x)}px`;
+  ring.style.top = `${Math.round(y)}px`;
+  document.body.append(ring);
+  const fill = ring.querySelector('.hold-ring-fill');
+  const length = 2 * Math.PI * 27;
+  fill.style.strokeDasharray = `${length}`;
+  let run = null;
+  if (pageCutAllowed()) {
+    run = fill.animate([{ strokeDashoffset: `${length}` }, { strokeDashoffset: '0' }],
+      { duration: GESTURE.MENU_MS - GESTURE.RING_MS, easing: 'linear', fill: 'forwards', id: 'kairo-hold-ring' });
+  } else fill.style.strokeDashoffset = '0';
+  let gone = false;
+  const leave = (cls, ms) => {
+    if (gone) return;
+    gone = true;
+    ring.classList.add(cls);
+    setTimeout(() => ring.remove(), ms);
+  };
+  return {
+    cancel() { run?.cancel(); leave('is-leaving', 160); },
+    settle(kept) { try { run?.finish(); } catch { /* already done */ } leave(kept ? 'is-kept' : 'is-leaving', 220); },
+  };
+}
+
+/* The seal flies: on a keep's durable success a vermilion 印 presses onto the word at its shoulder, rests a beat, and
+ * travels — the X and the Y on two nested layers, each on its own house curve, so the path bows — to the top bar's
+ * bookmark (#tray, the kept-words count), which takes it with one small press. The count is the record's: #tray's name
+ * and data-count already say it; the digit the eye reads turns as the seal lands. Transform and opacity only. Reduced
+ * motion, a hidden page or no Web Animations: the seal shows where it pressed and leaves; nothing travels. Decorative
+ * throughout (aria-hidden, no pointer events): the strip's status line says it in words. */
+function sealTarget() {
+  for (const id of ['tray', 'tab-review', 'tab-today']) {
+    const node = document.getElementById(id);
+    const box = node?.getBoundingClientRect();
+    if (box?.width && box.height && getComputedStyle(node).visibility !== 'hidden') return node;
+  }
+  return null;
+}
+let sealFlights = 0;
+function flySeal(anchor, { countFrom = null } = {}) {
+  const word = glyphBox(anchor) || anchor.getBoundingClientRect();
+  if (!word?.width || !word.height) return null;
+  const size = 26;
+  const flight = el('span', 'seal-flight');
+  flight.setAttribute('aria-hidden', 'true');
+  const rise = el('span', 'seal-rise');
+  const stamp = el('span', 'seal-stamp', '印');
+  stamp.lang = 'ja';
+  rise.append(stamp);
+  flight.append(rise);
+  // pressed at the word's upper right shoulder, over its last glyph's corner, never over the whole word
+  const x = Math.round(word.left + word.width - size * 0.4);
+  const y = Math.round(word.top - size * 0.45);
+  flight.style.left = `${x}px`;
+  flight.style.top = `${y}px`;
+  document.body.append(flight);
+  sealFlights += 1;
+  const done = () => { sealFlights -= 1; flight.remove(); };
+  if (!pageCutAllowed()) {
+    flight.classList.add('is-still');
+    setTimeout(done, 700);
+    return null;
+  }
+  const press = stamp.animate([
+    { transform: 'scale(1.6) rotate(-9deg)', opacity: 0 },
+    { transform: 'scale(0.94) rotate(-9deg)', opacity: 1, offset: 0.72 },
+    { transform: 'scale(1) rotate(-9deg)', opacity: 1 },
+  ], { duration: motionMs('--motion-fast', 180), easing: motionEase('--ease-enter'), fill: 'both', id: 'kairo-seal-press' });
+  const target = sealTarget();
+  const count = target?.querySelector('.tray-count');
+  const truth = count?.textContent;
+  if (count && countFrom != null) count.textContent = String(countFrom);
+  if (!target) {
+    press.finished.then(() => stamp.animate([{ opacity: 1 }, { opacity: 0 }],
+      { duration: motionMs('--motion-quick', 160), delay: motionMs('--motion-long', 400), fill: 'both' }).finished).then(done, done);
+    return press;
+  }
+  const to = target.getBoundingClientRect();
+  const dx = to.left + to.width / 2 - (x + size / 2), dy = to.top + to.height / 2 - (y + size / 2);
+  const wait = motionMs('--motion-fast', 180) + motionMs('--motion-ma', 120);
+  const travel = motionMs('--motion-long', 400);
+  const across = flight.animate([{ transform: 'translate3d(0, 0, 0)' }, { transform: `translate3d(${dx}px, 0, 0)` }],
+    { duration: travel, delay: wait, easing: motionEase('--ease-ink'), fill: 'both', id: 'kairo-seal' });
+  rise.animate([{ transform: 'translate3d(0, 0, 0)' }, { transform: `translate3d(0, ${dy}px, 0)` }],
+    { duration: travel, delay: wait, easing: motionEase('--ease-enter'), fill: 'both', id: 'kairo-seal-rise' });
+  stamp.animate([
+    { transform: 'scale(1) rotate(-9deg)', opacity: 1 },
+    { transform: 'scale(0.62) rotate(0deg)', opacity: 1, offset: 0.82 },
+    { transform: 'scale(0.4) rotate(0deg)', opacity: 0 },
+  ], { duration: travel, delay: wait, easing: 'linear', fill: 'forwards', composite: 'replace', id: 'kairo-seal-shrink' });
+  across.finished.then(() => {
+    if (count?.isConnected && countFrom != null && count.textContent === String(countFrom)) count.textContent = truth;
+    if (target.isConnected) {
+      target.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }, { transform: 'scale(1)' }],
+        { duration: motionMs('--motion-quick', 160), easing: motionEase('--ease-standard'), id: 'kairo-seal-land' });
+    }
+  }, () => { if (count?.isConnected && truth != null) count.textContent = truth; }).finally(done);
+  return across;
+}
+
+/* The strip. role=dialog (it holds a name field), labelled by its word; ↑↓←→ walk its controls, Home/End, Tab stays
+ * inside, Escape closes and gives focus back to the word. A press anywhere else closes it (the document's pointerdown).
+ * It is laid out in the word's own scroller (the page's, or the document's), so it scrolls with its word and never
+ * floats loose over other text. */
+let sealStrip = null; // { strip, anchor, door, node, room }
+let sealSerial = 0;
+const SEAL_CONTROLS = 'button, a[href], input:not([type="hidden"]), select, textarea, summary, [role="button"], [role="link"], [role="tab"], [role="menuitem"], [role="checkbox"], [role="radio"], [role="switch"], [role="slider"]';
+function closeSealStrip({ restoreFocus = false } = {}) {
+  const open = sealStrip;
+  if (!open) return true;
+  const field = open.strip.querySelector('#seal-strip-name');
+  if (field && !rememberRecordDraft(field)) {
+    const notice = open.strip.querySelector('.seal-strip-status');
+    if (notice) notice.textContent = tx('下書きを保存できません。このリスト名をコピーしてから、閉じて再読み込みしてください。',
+      'The draft could not be preserved. Copy this list name, then close and reload.');
+    return false;
+  }
+  sealStrip = null;
+  sealSerial += 1;
+  open.strip.remove();
+  open.room?.remove();
+  if (restoreFocus && open.anchor.isConnected) focusProseWord(open.anchor, { preventScroll: true });
+  return true;
+}
+/** Every control that is drawn on the glass and meets this rectangle (the word itself and the strip excepted). */
+function controlsUnder(rect, strip, anchor) {
+  const hits = [];
+  for (const node of document.querySelectorAll(SEAL_CONTROLS)) {
+    if (strip.contains(node) || node === anchor || node.contains(anchor) || anchor.contains(node)) continue;
+    if (node.closest('[inert], [hidden], [aria-hidden="true"]')) continue;
+    const box = node.getBoundingClientRect();
+    if (!box.width || !box.height) continue;
+    if (box.right <= rect.left || box.left >= rect.right || box.bottom <= rect.top || box.top >= rect.bottom) continue;
+    const style = getComputedStyle(node);
+    if (style.visibility === 'hidden' || style.display === 'none' || Number(style.opacity) === 0) continue;
+    hits.push(box);
+  }
+  return hits;
+}
+/** Beside its word, in the band between the fixed bars, under 40 % of the screen, covering no button: below the word,
+ * else above it, else shortened to the room before the first control it would meet; where no seat of two rows is left,
+ * the strip takes a room of its own in the text under the word's paragraph (the text below steps down while it is open,
+ * as Save ▾'s drawer does), so it still covers nothing. */
+function placeSealStrip(open) {
+  const { strip, anchor } = open;
+  const fixedEdge = (selector, edge) => {
+    const node = document.querySelector(selector);
+    if (!node || !['fixed', 'sticky'].includes(getComputedStyle(node).position)) return null;
+    const box = node.getBoundingClientRect();
+    return box.height ? box[edge] : null;
+  };
+  const height = window.innerHeight;
+  const onPage = !!anchor.closest('#sheet');
+  const ceiling = Math.max(8, (onPage ? fixedEdge('#sheet > .sheet-bar', 'bottom') : null) ?? fixedEdge('#app > .chrome', 'bottom') ?? 0);
+  const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
+    fixedEdge('.kp-grades', 'top') ?? height) - 8;
+  const view = window.visualViewport?.height || height;
+  const cap = Math.max(96, Math.floor(Math.min(view * 0.4, floor - ceiling)));
+  strip.style.maxHeight = `${cap}px`;
+  strip.style.left = '0px';
+  strip.style.top = '0px';
+  const word = glyphBox(anchor) || anchor.getBoundingClientRect();
+  const w = strip.offsetWidth, h = Math.min(strip.offsetHeight, cap);
+  const left = Math.max(8, Math.min(window.innerWidth - w - 8, word.left + word.width / 2 - w / 2));
+  const rect = (top, tall) => ({ left, right: left + w, top, bottom: top + tall });
+  const below = word.top + word.height + 10, above = word.top - 10;
+  const seats = [];
+  if (below + h <= floor) seats.push({ top: below, tall: h, side: 'below' });
+  if (above - h >= ceiling) seats.push({ top: above - h, tall: h, side: 'above' });
+  let seat = seats.find((s) => !controlsUnder(rect(s.top, s.tall), strip, anchor).length) || null;
+  if (!seat) {
+    // shortened to the room before the nearest control on either side, two rows at least
+    const room = (top, tall, side) => {
+      const hits = controlsUnder(rect(top, tall), strip, anchor);
+      if (side === 'below') {
+        const edge = Math.min(floor, ...hits.map((box) => box.top)) - 6;
+        return { top, tall: Math.min(tall, edge - top), side };
+      }
+      const edge = Math.max(ceiling, ...hits.map((box) => box.bottom)) + 6;
+      return { top: Math.max(edge, top + tall - (above - edge)), tall: Math.min(tall, above - edge), side };
+    };
+    const tries = [room(below, Math.max(0, Math.min(h, floor - below)), 'below'), room(Math.max(ceiling, above - h), Math.min(h, above - ceiling), 'above')]
+      .filter((s) => s.tall >= 104 && !controlsUnder(rect(s.top, s.tall), strip, anchor).length)
+      .sort((a, b) => b.tall - a.tall);
+    seat = tries[0] || null;
+  }
+  const scroller = onPage ? anchor.closest('#sheet') : null;
+  const origin = scroller ? scroller.getBoundingClientRect() : { left: -window.scrollX, top: -window.scrollY };
+  const scrollTop = scroller ? scroller.scrollTop : 0, scrollLeft = scroller ? scroller.scrollLeft : 0;
+  if (seat) {
+    open.room?.remove();
+    open.room = null;
+    strip.style.maxHeight = `${Math.floor(seat.tall)}px`;
+    strip.dataset.side = seat.side;
+    strip.style.left = `${Math.round(left - origin.left + scrollLeft)}px`;
+    strip.style.top = `${Math.round(seat.top - origin.top + scrollTop)}px`;
+    return seat;
+  }
+  // a room of its own under the word's paragraph: nothing is laid over a control
+  const block = anchor.closest('p, li, dd, blockquote, [data-reader-prose], [data-lookup-block], .example-ja, .sent-reader') || anchor.parentElement;
+  if (!open.room) {
+    open.room = el('div', 'seal-strip-room');
+    open.room.setAttribute('aria-hidden', 'true');
+    block.after(open.room);
+  }
+  open.room.style.height = `${Math.ceil(Math.min(h, cap)) + 12}px`;
+  const box = open.room.getBoundingClientRect();
+  strip.dataset.side = 'room';
+  strip.style.maxHeight = `${Math.floor(Math.min(h, cap))}px`;
+  strip.style.left = `${Math.round(left - origin.left + scrollLeft)}px`;
+  strip.style.top = `${Math.round(box.top + 6 - origin.top + scrollTop)}px`;
+  return { top: box.top + 6, tall: Math.min(h, cap), side: 'room' };
+}
+function focusSealStrip(keyboard) {
+  const open = sealStrip;
+  if (!open) return;
+  const first = [...open.strip.querySelectorAll('button:not([disabled]):not([hidden]), input:not([hidden])')]
+    .find((node) => !node.closest('[hidden]') && node.getClientRects().length);
+  (keyboard && first ? first : open.strip).focus({ preventScroll: true });
+}
+/** Hold = seal: the hold, a right-click or Shift+F10 on one word. */
+async function sealWord(anchor, door, { keyboard = false, ring = null } = {}) {
+  if (sealStrip?.anchor === anchor && sealStrip.strip.isConnected) {
+    // a second hold on the word whose strip stands open is the same strip: nothing written, nothing un-kept
+    ring?.settle(sealStrip.kept);
+    focusSealStrip(keyboard);
+    return;
+  }
+  if (!closeSealStrip()) { ring?.cancel(); return; }
+  // a word inside the stage keeps its stage; any other word puts the stage away, as a tap elsewhere does
+  if (!standingSlip()?.contains(anchor)) removeMini();
+  const serial = ++sealSerial;
+  if (await door.prepare?.() === false) { ring?.cancel(); return; }
   if (!anchor.isConnected) anchor = door.resolveAnchor?.() || anchor;
-  if (serial !== readerWordMenuSerial || !anchor.isConnected) return;
-  const menu = el('div', 'reader-word-menu');
-  menu.id = 'reader-word-menu';
-  menu.dataset.driftChrome = 'true';
-  menu.setAttribute('role', 'menu');
-  menu.setAttribute('aria-label', tx(`「${door.label}」の操作`, `${door.label}: actions`));
-  const items = [];
-  const add = (action, text, run, { disabled = false, hint = '' } = {}) => {
-    const item = el('button', 'reader-word-menu-item', text);
-    item.type = 'button';
-    item.tabIndex = -1;
-    item.dataset.menuAction = action;
-    item.setAttribute('role', 'menuitem');
-    if (disabled) item.setAttribute('aria-disabled', 'true');
-    if (hint) item.title = hint;
-    item.addEventListener('click', (event) => {
+  if (serial !== sealSerial || !anchor.isConnected) { ring?.cancel(); return; }
+  const facts = door.save?.() || null;
+  const keepable = !!facts && !facts.held && !facts.identityHeld;
+  const countFrom = S.taken.length;
+  let outcome = null;
+  if (keepable) outcome = await keepWord(facts.node, door.label);
+  else if (facts) outcome = { status: 'held' };
+  if (serial !== sealSerial) { ring?.cancel(); return; }
+  if (!anchor.isConnected) anchor = door.resolveAnchor?.() || anchor;
+  if (!anchor.isConnected) { ring?.cancel(); return; }
+  const kept = outcome?.status === 'created' || outcome?.status === 'already-kept';
+  ring?.settle(kept);
+  // the answer first: the strip, in this frame; the word's marks, the count and the seal's flight in the next, so no one
+  // frame carries the whole commit (WebKit, the iPhone's engine, held the glass ~35 ms when they shared one)
+  openSealStrip(anchor, door, facts, outcome, { keyboard });
+  if (outcome?.status !== 'created') return;
+  requestAnimationFrame(() => {
+    refreshWordSaveControls(facts.node, door.label);
+    if (anchor.isConnected) flySeal(anchor, { countFrom });
+  });
+}
+/* The strip's words are set in the interface face, whose characters arrive in slices (fonts.css: one file per range): the
+ * first strip of a visit would wait on them mid-gesture. Its words, his list names and the marks it uses are asked for
+ * once, when the browser is idle, before any hold. */
+let sealFacesAsked = false;
+function warmSealStripFaces() {
+  if (sealFacesAsked || typeof document === 'undefined' || !document.fonts?.load) return;
+  sealFacesAsked = true;
+  const idle = typeof requestIdleCallback === 'function' ? (fn) => requestIdleCallback(fn, { timeout: 2000 }) : (fn) => setTimeout(fn, 800);
+  idle(() => {
+    const text = ['保存済み ✓ Saved ✓ 保存しました', '新しいリスト… New list… 作る Add すべてのリスト All lists ·', '全項目 · Full entry 文を保存 Save the sentence',
+      'コピー Copy この語を先生に聞く Ask the tutor about the word 外す Remove リスト Lists', ...Object.keys(S.lists || {})].join(' ');
+    for (const face of ['500 13px', '500 15px', '600 15px']) document.fonts.load(`${face} 'Noto Sans JP'`, text).catch(() => {});
+    document.fonts.load("800 16px 'Shippori Mincho B1'", '印').catch(() => {});
+  });
+}
+function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) {
+  const keepable = !!facts && !facts.held && !facts.identityHeld;
+  const node = keepable ? facts.node : null;
+  const label = door.label;
+  const strip = el('div', 'seal-strip');
+  strip.id = 'seal-strip';
+  strip.dataset.driftChrome = 'true';
+  strip.tabIndex = -1;
+  strip.setAttribute('role', 'dialog');
+  strip.setAttribute('aria-label', label);
+  const open = { strip, anchor, door, node, room: null, kept: outcome?.status === 'created' || outcome?.status === 'already-kept' };
+  const status = el('p', 'seal-strip-status');
+  status.id = 'seal-strip-status';
+  status.setAttribute('role', 'status');
+  strip.setAttribute('aria-describedby', status.id);
+  const say = (text) => { status.textContent = text; };
+  const kept = () => !!node && keptState(node) === 'taken';
+  const statusFor = () => {
+    if (!facts) return '';
+    if (facts.held) return readerCaptureReasonText(label);
+    if (facts.identityHeld) return wordCaptureHeldText(facts.node, { route: false });
+    if (outcome?.status === 'held') return wordCaptureHeldText(facts.node, { route: false });
+    if (outcome?.status === 'failed') return outcome.reason === 'not-ready' || !recordWritable()
+      ? tx('記録の準備ができていません。少し待ってから、もう一度試してください。', 'Your record is not ready yet. Please try again in a moment.')
+      : tx('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.');
+    return kept() ? tx('保存済み ✓', 'Saved ✓') : '';
+  };
+  say(statusFor());
+  // a keepable word's status opens its lists row ("Saved ✓  仕事  旅  New list…"); any other stands alone above the acts
+  if (!node) strip.append(status);
+  const controls = [];
+  let busy = false;
+  // row 1 · his lists, one tap each: a toggle per list (pressed when the word is on it), the rest unfolding inside the
+  // strip past six, and New list… which asks its name once
+  if (node) {
+    const lists = el('div', 'seal-strip-lists');
+    lists.setAttribute('role', 'group');
+    lists.setAttribute('aria-label', tx('リスト', 'Lists'));
+    lists.append(status);
+    const more = el('div', 'seal-strip-more');
+    more.hidden = true;
+    const member = (name) => (S.lists[name] || []).some((row) => row.t === node.t && row.id === node.id);
+    const order = sealListOrder();
+    const chip = (name) => {
+      const button = el('button', 'chip seal-list', name);
+      button.type = 'button';
+      button.dataset.list = name;
+      button.setAttribute('aria-pressed', String(member(name)));
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        void toggleList(name, !member(name), button);
+      });
+      return button;
+    };
+    for (const name of order.slice(0, SEAL_LISTS_SHOWN)) lists.append(chip(name));
+    let all = null;
+    if (order.length > SEAL_LISTS_SHOWN) {
+      for (const name of order.slice(SEAL_LISTS_SHOWN)) more.append(chip(name));
+      all = el('button', 'chip seal-list-all', tx(`すべてのリスト · ${order.length}`, `All lists · ${order.length}`));
+      all.type = 'button';
+      all.id = 'seal-strip-all';
+      all.setAttribute('aria-expanded', 'false');
+      all.addEventListener('click', (event) => {
+        event.stopPropagation();
+        more.hidden = !more.hidden;
+        all.setAttribute('aria-expanded', String(!more.hidden));
+        if (!more.hidden) more.querySelector('button')?.focus({ preventScroll: true });
+      });
+      lists.append(all, more);
+    }
+    const fresh = el('button', 'chip seal-list-new', tx('新しいリスト…', 'New list…'));
+    fresh.type = 'button';
+    fresh.id = 'seal-strip-new';
+    const form = el('form', 'seal-strip-form');
+    form.hidden = true;
+    const name = el('input', 'vocabulary-list-field');
+    name.type = 'text';
+    name.id = 'seal-strip-name';
+    name.maxLength = 80;
+    name.placeholder = tx('新しいリスト', 'New list');
+    name.setAttribute('aria-label', tx('新しいリストの名前', 'Name a new list'));
+    // one draft per word, shared with Save ▾'s field: a name typed in either survives a failed write and a reload
+    name.dataset.recordDraftKey = `vocabulary-list:${JSON.stringify([node.t, node.id, node.seq ?? null, node.reading ?? null])}`;
+    attachRecordDraft(name);
+    const create = el('button', 'chip btn-secondary seal-strip-create', tx('作る', 'Add'));
+    create.type = 'submit';
+    create.id = 'seal-strip-create';
+    form.append(name, create);
+    if (name.value) { form.hidden = false; fresh.hidden = true; }
+    fresh.addEventListener('click', (event) => {
       event.stopPropagation();
-      if (item.getAttribute('aria-disabled') === 'true') return;
-      closeReaderWordMenu({ restoreFocus: true });
+      fresh.hidden = true;
+      form.hidden = false;
+      name.focus({ preventScroll: true });
+      placeSealStrip(open);
+    });
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const value = name.value.trim();
+      if (!value) { name.focus(); return; }
+      void toggleList(value, true, null, true);
+    });
+    lists.append(fresh, form);
+    strip.append(lists);
+    const paint = () => {
+      for (const button of strip.querySelectorAll('.seal-list[data-list]')) {
+        button.setAttribute('aria-pressed', String(member(button.dataset.list)));
+        button.disabled = busy || !recordWritable();
+      }
+      create.disabled = busy || !recordWritable();
+      name.readOnly = busy;
+    };
+    open.paint = paint;
+    const toggleList = async (listName, on, button, typed = false) => {
+      if (busy) return;
+      busy = true;
+      paint();
+      let result = 'list-failed';
+      try { result = await writeListMembership(node, label, listName, on); }
+      finally { busy = false; }
+      if (!strip.isConnected) return;
+      if (result === 'ok') {
+        if (typed) {
+          name.value = '';
+          rememberRecordDraft(name);
+          form.hidden = true;
+          fresh.hidden = false;
+          if (!lists.querySelector(`.seal-list[data-list="${CSS.escape(listName)}"]`)) fresh.before(chip(listName));
+        }
+        open.kept = kept();
+        say(on ? tx(`「${listName}」に追加しました。`, `Added to ${listName}.`) : tx(`「${listName}」から外しました。`, `Taken off ${listName}.`));
+        removeButton.hidden = !kept();
+      } else if (result === 'held') say(wordCaptureHeldText(node, { route: false }));
+      else if (result === 'not-writable' || !recordWritable()) {
+        say(tx('記録を保護しています。リスト名の下書きはここに残ります。再読み込みしてから、もう一度試してください。',
+          'Your record is protected. The list name is kept here. Reload before retrying.'));
+      } else if (result === 'capture-failed') say(tx('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.'));
+      else if (result === 'list-failed') say(tx('単語は保存済みです。リストへの追加をもう一度試してください。', 'The word is saved. Please retry adding it to the list.'));
+      else say(tx('リストから外せませんでした。もう一度試してください。', 'Could not take it off the list. Please try again.'));
+      paint();
+      const again = button?.isConnected ? button : typed ? lists.querySelector(`.seal-list[data-list="${CSS.escape(listName)}"]`) : null;
+      again?.focus({ preventScroll: true });
+      placeSealStrip(open);
+    };
+    paint();
+  }
+  // row 2 · the word's acts, quiet, in plain full verbs; Remove only while the word is kept
+  const acts = el('div', 'seal-strip-acts');
+  acts.setAttribute('role', 'group');
+  acts.setAttribute('aria-label', tx('ほかの操作', 'More'));
+  const act = (action, text, run, { hidden = false, name = '' } = {}) => {
+    const button = el('button', 'btn-tertiary seal-act', text);
+    button.type = 'button';
+    button.dataset.stripAction = action;
+    if (name) button.setAttribute('aria-label', name);
+    button.hidden = hidden;
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (button.disabled) return;
+      if (!closeSealStrip({ restoreFocus: true })) return;
       void run();
     });
-    items.push(item);
-    menu.append(item);
+    acts.append(button);
+    return button;
   };
-  const save = door.save?.();
-  if (save) {
-    const saved = save.state === 'taken';
-    add('save-word', saved ? tx('保存済み ✓', 'Saved ✓') : tx('保存', 'Save'), () => toggleWordSave(save.node, door.label),
-      { disabled: saved || save.held || save.identityHeld, hint: save.held ? readerCaptureReasonText(door.label)
-        : save.identityHeld ? wordCaptureHeldText(save.node, { route: false }) : '' });
-  }
   const sentence = door.sentence?.();
   const here = { view: S.view, passageId: S.passageId };
   const stillHere = () => S.view === here.view && S.passageId === here.passageId && !S.stack.length;
-  if (sentence) add('save-sentence', tx('この文を保存', 'Save the sentence'), () => sendSentenceToTutor(sentence, false, stillHere, showReaderToast),
-    { disabled: !recordWritable() });
-  add('entry', tx('全項目', 'Full entry'), () => door.openEntry('keyboard'), { disabled: door.entryAvailable === false });
-  if (sentence) add('ask-tutor', tx('この文について先生に聞く', 'Ask the tutor about this sentence'),
-    () => sendSentenceToTutor(sentence, true, stillHere, showReaderToast), { disabled: !recordWritable() });
-  add('copy', tx('コピー', 'Copy'), () => copyReaderText(door.copyText));
-  menu.addEventListener('keydown', (event) => {
-    const at = items.indexOf(document.activeElement);
-    const moves = { ArrowDown: at + 1, ArrowUp: at < 0 ? items.length - 1 : at - 1, Home: 0, End: items.length - 1 };
-    if (Object.hasOwn(moves, event.key)) {
-      event.preventDefault();
-      items[(moves[event.key] + items.length) % items.length].focus({ preventScroll: true });
-      return;
-    }
-    if (event.key === 'Escape' || event.key === 'Tab') {
+  if (door.entryAvailable !== false) act('entry', tx('全項目', '全項目 · Full entry'), () => door.openEntry(keyboard ? 'keyboard' : 'pointer'));
+  if (sentence) {
+    const keep = act('sentence', tx('文を保存', 'Save the sentence'), () => sendSentenceToTutor(sentence, false, stillHere, showReaderToast));
+    keep.disabled = !recordWritable();
+  }
+  act('copy', tx('コピー', 'Copy'), () => copyReaderText(door.copyText));
+  if (sentence) {
+    // the tutor receives the word in its sentence (contextFromTeacherNode's target), so the verb names the word
+    const ask = act('ask-tutor', tx('この語を先生に聞く', 'Ask the tutor about the word'), () => sendSentenceToTutor(sentence, true, stillHere, showReaderToast));
+    ask.disabled = !recordWritable();
+  }
+  const removeButton = act('remove', tx('外す', 'Remove'), () => removeKept(facts.node, label),
+    { hidden: !(node && kept()), name: tx(`「${label}」の保存を外す`, `Remove ${label} from your saved words`) });
+  strip.append(acts);
+  for (const control of strip.querySelectorAll('button, input')) controls.push(control);
+  strip.addEventListener('keydown', (event) => {
+    const live = [...strip.querySelectorAll('button, input')].filter((node) => !node.disabled && !node.hidden && !node.closest('[hidden]') && node.getClientRects().length);
+    const at = live.indexOf(document.activeElement);
+    if (event.key === 'Escape') {
       event.preventDefault();
       event.stopPropagation();
-      closeReaderWordMenu({ restoreFocus: true });
+      closeSealStrip({ restoreFocus: true });
+      return;
     }
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      const next = event.shiftKey ? (at <= 0 ? live.length - 1 : at - 1) : (at + 1) % live.length;
+      live[next]?.focus({ preventScroll: true });
+      return;
+    }
+    if (document.activeElement?.tagName === 'INPUT') return;
+    const moves = { ArrowDown: at + 1, ArrowRight: at + 1, ArrowUp: at < 0 ? live.length - 1 : at - 1, ArrowLeft: at < 0 ? live.length - 1 : at - 1, Home: 0, End: live.length - 1 };
+    if (!Object.hasOwn(moves, event.key) || !live.length) return;
+    event.preventDefault();
+    event.stopPropagation();
+    live[(moves[event.key] + live.length) % live.length].focus({ preventScroll: true });
   });
-  document.body.append(menu);
-  readerWordMenu = { menu, anchor };
-  const box = menu.getBoundingClientRect();
-  const r = anchor.getBoundingClientRect();
-  const left = x ?? r.left, top = y ?? r.bottom + 4;
-  menu.style.left = `${Math.max(8, Math.min(window.innerWidth - box.width - 8, left))}px`;
-  menu.style.top = `${top + box.height <= window.innerHeight - 8 ? top : Math.max(8, top - box.height)}px`;
-  // the keyboard lands on the first item it can use; a pointer opens the menu without marking an item,
-  // and ↓ then walks it from the top
-  menu.tabIndex = -1;
-  if (keyboard) (items.find((item) => item.getAttribute('aria-disabled') !== 'true') || items[0]).focus({ preventScroll: true });
-  else menu.focus({ preventScroll: true });
+  const scroller = anchor.closest('#sheet');
+  (scroller || document.body).append(strip);
+  strip.classList.toggle('in-page', !!scroller);
+  sealStrip = open;
+  placeSealStrip(open);
+  focusSealStrip(keyboard);
+  return strip;
 }
-let readerWordMenuSerial = 0;
 
 /** The selection route, for an older engine or a page without clipboard permission. */
 function copyBySelection(text) {
@@ -10542,7 +10963,7 @@ function readerWordKey(event, span, door) {
   if (event.altKey) return;
   if (event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey)) {
     event.preventDefault();
-    void openReaderWordMenu(span, door, { keyboard: true });
+    void sealWord(span, door, { keyboard: true });
     return;
   }
   // Escape steps out one layer at a time: the word menu; or the popup together with the reading its tap
@@ -10551,9 +10972,9 @@ function readerWordKey(event, span, door) {
     if (ladderVisit) { event.preventDefault(); event.stopPropagation(); foldWordLadder(); return; }
     const slip = !!document.getElementById('mini');
     const marked = !!(S.revealed?.size || S.readerTake);
-    if (!slip && !readerWordMenu && !marked) return;
+    if (!slip && !sealStrip && !marked) return;
     event.preventDefault();
-    if (readerWordMenu) closeReaderWordMenu();
+    if (sealStrip) closeSealStrip({ restoreFocus: true });
     else if (slip) { removeMini(); clearReaderReadings(); }
     else clearReaderReadings({ marked: true });
     return;
@@ -10582,42 +11003,64 @@ async function openPreparedWordEntry(span, door) {
   return door.openEntry('keyboard');
 }
 
-/** Press-and-hold (touch and pen) and right-click open the word menu; a hold that moves is a scroll. */
+/** Press-and-hold (touch and pen), right-click and the menu key seal the word (sealWord, G5); a hold that moves is a
+ * scroll. A hold belongs to the pointer that began it: another finger, a cancel, a lift or a move past MOVE_PX before
+ * the commit ends it, its ring with it. A touch hold some engines also report as a contextmenu is the same hold: one
+ * seal, never two. */
 function wireReaderWordMenu(span, door) {
   span.setAttribute('aria-keyshortcuts', 'Shift+F10 Control+Enter');
+  warmSealStripFaces();
   let hold = null;
-  const clear = () => { if (hold) clearTimeout(hold.timer); hold = null; };
+  const clear = () => {
+    const h = hold;
+    if (!h) return;
+    hold = null;
+    clearTimeout(h.timer);
+    clearTimeout(h.ringTimer);
+    window.removeEventListener('pointerdown', h.other, true);
+    if (!h.committed) h.ring?.cancel();
+  };
+  const commit = (h) => {
+    if (hold !== h || h.committed) return;
+    h.committed = Date.now();
+    clearTimeout(h.timer);
+    clearTimeout(h.ringTimer);
+    // the finger's release may synthesise a click: it belongs to the hold, never to the strip under it
+    swallowClickUntil = Date.now() + 700;
+    void sealWord(span, door, { ring: h.ring });
+  };
   span.addEventListener('contextmenu', (event) => {
     event.preventDefault();
+    if (hold && !hold.committed && event.pointerType !== 'mouse') { commit(hold); return; }
+    if (hold?.committed && Date.now() - hold.committed < 1200) return;
     clear();
-    // a contextmenu the keyboard raised has no pointer position: the menu opens under the word
+    // a contextmenu the keyboard raised has no pointer position: the strip takes the keyboard
     const keyboard = !event.clientX && !event.clientY;
-    void openReaderWordMenu(span, door, keyboard ? { keyboard } : { x: event.clientX, y: event.clientY });
+    void sealWord(span, door, { keyboard });
   });
-  let heldOpen = false;
   span.addEventListener('pointerdown', (event) => {
     clear();
-    heldOpen = false;
     if (event.pointerType === 'mouse' || event.isPrimary === false) return;
-    const start = { x: event.clientX, y: event.clientY };
-    hold = { start, timer: setTimeout(() => {
-      hold = null;
-      heldOpen = true;
-      // the finger's release may synthesise a click: it belongs to the hold, never to the menu under it
-      swallowClickUntil = Date.now() + 700;
-      // just below and beside the finger, so the first choice is not under it
-      void openReaderWordMenu(span, door, { x: start.x + 8, y: start.y + 16 });
-    }, GESTURE.MENU_MS) };
+    const start = { x: event.clientX, y: event.clientY, id: event.pointerId };
+    const h = { start, ring: null, committed: 0 };
+    h.other = (other) => { if (other.pointerId !== start.id && hold === h && !h.committed) clear(); };
+    window.addEventListener('pointerdown', h.other, true);
+    h.ringTimer = setTimeout(() => { if (hold === h && !h.committed) h.ring = holdRing(start.x, start.y); }, GESTURE.RING_MS);
+    h.timer = setTimeout(() => commit(h), GESTURE.MENU_MS);
+    hold = h;
   });
   span.addEventListener('pointermove', (event) => {
-    if (hold && Math.hypot(event.clientX - hold.start.x, event.clientY - hold.start.y) > GESTURE.MOVE_PX) clear();
+    if (!hold || hold.committed || event.pointerId !== hold.start.id) return;
+    if (Math.hypot(event.clientX - hold.start.x, event.clientY - hold.start.y) > GESTURE.MOVE_PX) clear();
   });
-  span.addEventListener('pointerup', () => {
+  span.addEventListener('pointerup', (event) => {
+    if (!hold || event.pointerId !== hold.start.id) return;
+    if (hold.committed) swallowClickUntil = Date.now() + 700;
     clear();
-    if (heldOpen) swallowClickUntil = Date.now() + 700;
-    heldOpen = false;
   });
-  span.addEventListener('pointercancel', clear);
+  span.addEventListener('pointercancel', (event) => {
+    if (hold && event.pointerId === hold.start.id) clear();
+  });
   span.addEventListener('keydown', (event) => readerWordKey(event, span, door));
 }
 
@@ -11112,16 +11555,17 @@ function readerGlossLine(token) {
  * confusing"). The text settings keep the longer form, with the word menu's press and hold. */
 /** How the reader's words work, in plain words: the text settings say it whole (John, 2026-10-02 #8). */
 function tapLadderHint() {
-  return tx('タップするたびに、読み、意味、詳しい項目へと進みます。長押し（または右クリック）で、ほかの操作も。',
-    'Tap for the reading, tap again for the meaning, then open the word. Press and hold for more.');
+  // G5 · a hold keeps the word (hold = seal) and opens its strip
+  return tx('タップするたびに、読み、意味、詳しい項目へと進みます。長押し（または右クリック）で保存し、ほかの操作も。',
+    'Tap for the reading, tap again for the meaning, then open the word. Press and hold to save it, and for more.');
 }
 
 /* R4 (2026-09-30) — a reader word is named by the word itself. How to work it and what it shows now
  * ride as its description: the kind and the keyboard help are shared by the whole reader
  * (#reader-help-*); only a word that shows its reading carries a state line of its own. */
 function readerWordHint() {
-  return tx('Enterで次の表示へ。Shift+F10でほかの操作。Ctrl+Enterで詳しい項目。',
-    'Enter: next word layer · Shift+F10: more actions · Ctrl+Enter: full entry');
+  return tx('Enterで次の表示へ。Shift+F10で保存とほかの操作。Ctrl+Enterで詳しい項目。',
+    'Enter: next word layer · Shift+F10: save and more · Ctrl+Enter: full entry');
 }
 function readerTokenState(token, index, kind) {
   if (kind === 'named') return S.revealed?.has(index) ? token.r || '' : '';
@@ -11166,7 +11610,7 @@ function nameReaderToken(span, token, index, kind) {
 function readerHelp() {
   const help = el('div', 'visually-hidden reader-help');
   for (const [id, text] of [['reader-help-kind', tx('語', 'word')], ['reader-help-word', readerWordHint()],
-    ['reader-help-named', tx('Enterで次の表示へ。Shift+F10でほかの操作。', 'Enter: next word layer · Shift+F10: more actions')],
+    ['reader-help-named', tx('Enterで次の表示へ。Shift+F10で保存とほかの操作。', 'Enter: next word layer · Shift+F10: save and more')],
     ['reader-help-lookup', tx('読みと意味', 'reading and meaning')]]) {
     const line = el('span', null, text); line.id = id; help.append(line);
   }
@@ -32286,7 +32730,7 @@ function renderLayer({ prebuilt = null, preserveRoom = false } = {}) {
   if (!S.stack.length && S.roomStale && !preserveRoom) { render(); return; }
   const root = document.getElementById('app');
   syncSheetActionVisit();
-  closeReaderWordMenu();
+  closeSealStrip();
   stopSentenceListening();
   removeMini();
   for (const old of root.querySelectorAll(':scope > #sheet')) old.remove();
@@ -35343,8 +35787,8 @@ function render() {
   // retain it, but leaving the room cannot redirect a later overview visit.
   if (S.view !== 'levels') pendingReferenceCollection = null;
   if (S.view !== 'tray') S.todayDetailHeld = false;
-  // the word menu belongs to a word this render replaces
-  closeReaderWordMenu();
+  // the strip belongs to a word this render replaces
+  closeSealStrip();
   stopSentenceListening();
   stopAssessmentQuestionForRender();
   syncPracticeClock();
