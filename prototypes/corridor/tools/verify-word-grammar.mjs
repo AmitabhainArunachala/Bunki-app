@@ -1428,7 +1428,8 @@ try {
         // one gate per move, never averaged: the hold's seal and its flight to the bookmark; the bookmark's landing
         for (const [id, prefix, title] of [['seal', 'G5 hold → seal', 'the hold, the 印 pressed and its flight to the bookmark'],
           ['landing', 'G5 bookmark → kept words', 'the bookmark’s landing on the kept words (a room change)']]) {
-          const mine = frames.filter((row) => row.engine === engine && row.move.startsWith(prefix));
+          // the frames list also holds G3's mode rows and P7's reps (no .move): only this walk's own rows are read
+          const mine = frames.filter((row) => row.engine === engine && typeof row.move === 'string' && row.move.startsWith(prefix));
           const worst = Math.max(...mine.map((row) => row.worst));
           check(`G5.frames.${id}`, `${title}: the worst frame ≤ 24 ms in WebKit (a proxy; the phone is the truth)`, mine.length === 3 && worst <= 24,
             mine.map((row) => ({ move: row.move, worst: row.worst, p95: row.p95, over24: row.over24 })));
