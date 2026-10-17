@@ -10626,14 +10626,17 @@ let excerptPlayback = 0, excerptControl = null;
 /** One clip's admission. Identity is per clip, never per manifest: its own voice, its own role,
  * its own model. v1 carried ONE global voice, so a dialogue's second speaker was unreachable and
  * no clip could state what it was. */
-function approvedNarrationClip(clip) {
+function approvedNarrationClip(clip, article = null) {
   if (!clip || typeof clip.text !== 'string' || !clip.text.trim() || typeof clip.src !== 'string') return false;
-  const role = clip.speakerRole || 'narrator';
+  // v2 identity is stated, never defaulted: a clip that does not say its role and model is not one
+  const role = clip.speakerRole;
+  if (typeof role !== 'string' || clip.model !== VOICE_LOCK.model) return false;
   if (!Object.hasOwn(NARRATION_VOICES, clip.voice)) return false;
   // the role law at the point of load: a clip whose voice disagrees with its role is refused,
   // which is what keeps the second speaker from reading prose
   if (clip.voice !== voiceForRole(role)) return false;
-  if (clip.model && clip.model !== VOICE_LOCK.model) return false;
+  // a second speaker exists only in a dialogue: prose cannot promote itself to one by its label
+  if (role !== 'narrator' && article?.kind !== 'dialogue') return false;
   return new RegExp(`^audio/narration/${clip.voice}/[a-zA-Z0-9_-]+\\.(?:m4a|mp3|wav|ogg)$`, 'u').test(clip.src);
 }
 /** Narration manifest v2 only: { v:2, lock:{model}, articles:{ <id>:{ clips:[…] } } }. A v1
@@ -10644,7 +10647,7 @@ function approvedNarrationManifest(value) {
   if (value.v !== 2 || value.lock?.model !== VOICE_LOCK.model) return null;
   if (!value.articles || typeof value.articles !== 'object' || Array.isArray(value.articles)) return null;
   for (const article of Object.values(value.articles)) {
-    if (!Array.isArray(article?.clips) || !article.clips.every(approvedNarrationClip)) return null;
+    if (!Array.isArray(article?.clips) || !article.clips.every((clip) => approvedNarrationClip(clip, article))) return null;
   }
   return value;
 }
@@ -10714,9 +10717,12 @@ async function playNarratedExcerpt(text, button, sourceId = null) {
     });
     return run.length ? run : null;
   };
+  // A known source fails closed: when the quote names its article and that article is not
+  // narrated, nothing plays — another article holding the same words is not this quote's voice.
+  // Only a quote with no source at all may be matched across the shelf, and only uniquely.
   const own = sourceId ? manifest?.articles?.[sourceId] : null;
   let clips = null, ambiguous = false;
-  if (own) clips = within(own);
+  if (sourceId) clips = own ? within(own) : null;
   else {
     for (const article of Object.values(manifest?.articles || {})) {
       const run = within(article);
@@ -10872,6 +10878,10 @@ if (typeof window !== 'undefined') ensureRecManifest();
  * could not play, and null when it was stopped (a replay, another clip, or 止める). */
 function playRecClip(src, btn, { rate = 1, onTime = null } = {}) {
   return new Promise((done) => {
+    // ONE PLAYBACK OWNER (V): the sentence-listening lane plays through its own element, so a word,
+    // a read or a quote taking the room must end it too. (typeof: the voice suites run this file
+    // in slices, where that lane is not loaded.)
+    if (typeof stopSentenceListening === 'function') stopSentenceListening();
     stopRecAudio();
     const a = new Audio(src);
     recAudioEl = a;
@@ -10924,9 +10934,9 @@ function wordClipFor(m, surface, reading, role = 'word', entrySeq = null) {
   const wanted = voiceForRole(role);
   // the role law, enforced at the point of play: the second voice is not a fallback
   if (entry.voice !== wanted) return null;
-  // a clip whose declared role disagrees with its own voice is refused, as narration clips are
-  if (entry.speakerRole && entry.voice !== voiceForRole(entry.speakerRole)) return null;
-  if (entry.model && entry.model !== VOICE_LOCK.model) return null;
+  // identity is stated, never defaulted: the clip names the very role it is asked for, and the
+  // locked model; a clip with no role or no model is not an approved clip
+  if (entry.speakerRole !== role || entry.model !== VOICE_LOCK.model) return null;
   // the clip must live in its own voice's folder: a path is a claim and it is checked
   if (!new RegExp(`^audio/w/${entry.voice}/[a-zA-Z0-9_-]+\\.(?:m4a|mp3|wav|ogg)$`, 'u').test(entry.src)) return null;
   if (entrySeq && entry.entrySeq && String(entry.entrySeq) !== String(entrySeq)) return null;
@@ -21863,7 +21873,8 @@ function ensureSentenceListeningCatalog() {
  * fallback), from the locked model, from that voice's own folder. A roster check alone admitted a
  * second-voice cue on a single-speaker sentence, and a cue from any model. */
 const approvedSentenceCue = cue => !!cue && Object.hasOwn(NARRATION_VOICES, cue.voice) &&
-  cue.voice === voiceForRole(cue.speakerRole || 'example') && cue.model === VOICE_LOCK.model &&
+  typeof cue.speakerRole === 'string' && cue.speakerRole !== 'speaker-b' &&
+  cue.voice === voiceForRole(cue.speakerRole) && cue.model === VOICE_LOCK.model &&
   typeof cue.path === 'string' && cue.path.startsWith(`audio/s/${cue.voice}/`);
 function currentSentenceListeningCue(context) {
   const cue = sentencePracticeModule.selectBundledListeningCue(context,
@@ -22593,6 +22604,9 @@ function renderSentenceListening(main, entry, state) {
   play.addEventListener('click', async () => {
     if (run.pending || !current()) return;
     if (sentenceListeningOwner) { stopSentenceListening(); return; }
+    // ONE PLAYBACK OWNER (V): the quote above this transcript, a passage read and a card clip all
+    // yield before the sentence speaks, so two voices never share the room
+    stopReadAloud(); stopRecAudio();
     const owner = { controller: new AbortController(), audio: null, url: null, completed: false, failed: false };
     sentenceListeningOwner = owner;
     const active = () => current() && sentenceListeningOwner === owner;

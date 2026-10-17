@@ -40,7 +40,10 @@ import { checkManifests, NARRATION_FILE, WORDS_FILE } from './build-voice-manife
 import { buildCorridorModules, LEARNING_MODULE_PATH } from '../../../scripts/build-reading-module.mjs';
 
 const corridor = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const read = (file) => readFileSync(resolve(corridor, file), 'utf8');
+// KAIRO_CORRIDOR_SOURCE points the corridor.js checks at a mutant (tools/adjudicate-voice-mutants.mjs);
+// unset, which is every real run, it is the shipped file
+const read = (file) => readFileSync(file === 'corridor.js' && process.env.KAIRO_CORRIDOR_SOURCE
+  ? process.env.KAIRO_CORRIDOR_SOURCE : resolve(corridor, file), 'utf8');
 const json = (file) => JSON.parse(read(file));
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 

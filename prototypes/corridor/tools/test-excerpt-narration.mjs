@@ -92,6 +92,7 @@ function fixture({ language = 'en', preference = null, results = [], quotes = 1,
       return result;
     },
     stopPassageRead: () => stops.push('reader'),
+    stopSentenceListening: () => stops.push('listening'),
     stopReadAloud: () => { stops.push('reader'); },
     stopRecAudio: () => stops.push('audio'),
     el(tagName, className, textContent = '') {
@@ -293,4 +294,41 @@ test('Cancelling the excerpt lane returns the control and makes a late finish in
   assert.equal(f.requests.length, 1, 'the retired run asks for no further clip');
   assert.equal(f.button.textContent, `Listen · ${VOICE}`, 'and a late completion cannot repaint it');
   assert.deepEqual(f.writes, []);
+});
+
+test('A quote that names its own article plays nothing when that article is unrendered', async () => {
+  // the article the quote belongs to has no clips; another article happens to hold the same words.
+  // Global uniqueness is not ownership: the known source fails closed.
+  const articles = { 'article:other': { clips: clipSet('other') } };
+  const f = fixture({ articles, sourceId: 'article:mine' });
+  await f.context.playNarratedExcerpt(quoteText, f.button, 'article:mine');
+  assert.deepEqual(f.requests, [], 'another article\u2019s recording is never borrowed');
+  assert.equal(f.button.textContent, 'No recording for this excerpt');
+  // the control built by the page passes the quote's own id on the click as well
+  const page = fixture({ articles, sourceId: 'article:mine' });
+  await page.button.handlers.click();
+  await settle();
+  assert.deepEqual(page.requests, []);
+});
+
+test('ONE OWNER · a recorded clip ends the sentence-listening lane before it plays', async () => {
+  const media = mediaFixture();
+  const f = fixture({ media });
+  const playing = f.context.playRecClip(`audio/w/${MAIN}/one.m4a`, null);
+  assert.deepEqual(f.stops, ['listening'], 'the other lane is stopped first');
+  assert.equal(media.created.length, 1);
+  media.created[0].end();
+  assert.equal(await playing, true);
+});
+
+test('ONE OWNER · the sentence-listening lane silences every other voice before it speaks', () => {
+  // structural: the listening player is wired deep in its room, so the law is pinned where it
+  // lives — inside its play handler, before its own media element exists
+  const at = source.indexOf('function renderSentenceListening(');
+  assert(at > 0, 'renderSentenceListening moved; this control no longer knows where to look');
+  const handler = source.indexOf("play.addEventListener('click', async () => {", at);
+  const media = source.indexOf('new Audio(owner.url)', handler);
+  const yields = source.indexOf('stopReadAloud(); stopRecAudio();', handler);
+  assert(handler > at && media > handler, 'the listening play handler moved');
+  assert(yields > handler && yields < media, 'the quote, the read and the card clip yield before the sentence speaks');
 });

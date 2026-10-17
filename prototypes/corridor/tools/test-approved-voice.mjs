@@ -174,10 +174,14 @@ test('REAL · the shipped build is pending and silent, and no stale interim choi
   const onDisk = clipsOnDisk(`w/${MAIN}`);
   if (!approved) assert.equal(onDisk.length, 0,
     `audio/w/${MAIN} holds ${onDisk.length} clip(s) while the manifest approves none — run tools/build-voice-manifest.mjs --write`);
+  // the probe is a word no manifest will ever hold, so this case stays true after the render: a
+  // word with a real clip is the positive case's to prove, never this one's to deny
+  const probe = ['未収録の語', 'みしゅうろくのご'];
+  assert.equal(Object.hasOwn(words?.words || {}, probe.join('|')), false, 'the absent probe must stay absent');
   for (const language of ['en', 'ja']) for (const preference of [null, 'f1', 'ami', 'metan', 'zundamon', 'takehiro', SECOND]) {
     const f = await fixture({ flags: boot.window, words, preference, language });
     const { button, note } = f.card();
-    f.context.speakCardReading('でんしゃ', button, '電車');
+    f.context.speakCardReading(probe[1], button, probe[0]);
     await settle();
     assert.equal(f.created.length, 0, `a saved ${preference} choice cannot play an interim word clip`);
     assert.equal(f.deviceVoiceCalls.length, 0, 'never the device voice');
@@ -292,6 +296,43 @@ test('CONTROL · the device voice is never reached by any absence path', async (
     assert.equal(f.created.length, 0);
     assert(button.dataset.voiceUnavailable, 'the absence is said where it can be seen');
   }
+});
+
+test('CONTROL · identity is stated, never defaulted', async () => {
+  // a clip that does not say its role or its model is not an approved clip, in either lane
+  for (const drop of ['model', 'speakerRole']) {
+    const narration = approvedManifest();
+    for (const clip of narration.articles.fixture.clips) delete clip[drop];
+    assert.equal((await fixture({ narration })).loadedNarration(), null, `a narration clip without ${drop} is refused`);
+    const words = approvedWords();
+    delete words.words['電車|でんしゃ'][drop];
+    assert.equal((await fixture({ words })).wordClip('電車', 'でんしゃ', 'word'), null, `a word clip without ${drop} is refused`);
+  }
+  // and the role it states is the role it is asked for: a narrator clip is not a word clip
+  const borrowed = await fixture({ words: approvedWords({ role: 'narrator' }) });
+  assert.equal(borrowed.wordClip('電車', 'でんしゃ', 'word'), null);
+});
+
+test('CONTROL · the second voice exists only inside a declared dialogue', async () => {
+  const dialogueClips = () => [
+    { text: '最初の台詞。', src: `audio/narration/${MAIN}/a.m4a`, voice: MAIN, speakerRole: 'narrator', model: LOCK.model },
+    { text: '次の台詞。', src: `audio/narration/${SECOND}/b.m4a`, voice: SECOND, speakerRole: 'speaker-b', model: LOCK.model },
+  ];
+  // prose that labels a clip speaker-b does not become a dialogue by saying so
+  const prose = { v: 2, lock: lockBlock, articles: { fixture: { clips: dialogueClips() } } };
+  assert.equal((await fixture({ narration: prose })).loadedNarration(), null, 'speaker-b in prose is refused');
+  // a dialogue, declared as one, admits its second speaker in the second voice
+  const dialogue = { v: 2, lock: lockBlock, articles: { fixture: { kind: 'dialogue', clips: dialogueClips() } } };
+  const f = await fixture({ narration: dialogue });
+  assert.equal(f.loadedNarration()?.v, 2, 'the lawful use of the second voice still loads');
+  f.bar().querySelector('#listen-open').handlers.click();
+  f.bar().querySelector('#listen-toggle').handlers.click(); await settle();
+  f.created[0].end(); await settle();
+  assert.equal(f.created[1].src, `audio/narration/${SECOND}/b.m4a`, 'the second speaker reads the second line');
+  // even in a dialogue the second voice never reads as the narrator
+  const swapped = dialogueClips(); swapped[0].voice = SECOND; swapped[0].src = `audio/narration/${SECOND}/a.m4a`;
+  assert.equal((await fixture({ narration: { v: 2, lock: lockBlock, articles: { fixture: { kind: 'dialogue', clips: swapped } } } }))
+    .loadedNarration(), null);
 });
 
 test('CONTROL · a manifest from another model is refused in both lanes', async () => {
