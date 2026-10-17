@@ -5,6 +5,7 @@
 /* ---- Skin frame (Skin lane): Words is a drafting plate: vellum over a 10/50px 罫線 grid,
    even and shadowless; at night a blueprint of phosphor wires. Values only. ---- */
 html:is([data-room='search'], [data-room='kanji'], [data-room='grammar'], [data-room='word-web'], [data-room='idioms'], [data-room='reference']) body:not([data-view='drift']) {
+  /* drawn: the drafting plate's 罫線 — half-pixel rules every 50 and 10 px in the world's 藍, hard-edged */
   --skin-ground:
     linear-gradient(90deg, var(--color-rule-soft) 0.5px, transparent 0.5px) 0 0 / 50px 50px,
     linear-gradient(0deg, var(--color-rule-soft) 0.5px, transparent 0.5px) 0 0 / 50px 50px,
@@ -13,14 +14,17 @@ html:is([data-room='search'], [data-room='kanji'], [data-room='grammar'], [data-
   --skin-light: none;
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='kanji'], [data-room='grammar'], [data-room='word-web'], [data-room='idioms'], [data-room='reference']) body:not([data-view='drift']) {
-  --color-rule: color-mix(in srgb, var(--color-live) 40%, transparent);
-  --color-rule-soft: color-mix(in srgb, var(--color-live) 12%, transparent);
+  /* Material II: the night blueprint is drawn in the world's own light (its lit accent), not a teal of the house's */
+  --color-rule: color-mix(in srgb, var(--color-accent) 40%, transparent);
+  --color-rule-soft: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  /* drawn: the blueprint's wires — half-pixel rules in the world's lit accent, hard-edged */
   --skin-ground:
     linear-gradient(90deg, var(--color-rule-soft) 0.5px, transparent 0.5px) 0 0 / 50px 50px,
     linear-gradient(0deg, var(--color-rule-soft) 0.5px, transparent 0.5px) 0 0 / 50px 50px,
-    linear-gradient(90deg, color-mix(in srgb, var(--color-live) 4%, transparent) 0.5px, transparent 0.5px) 0 0 / 10px 10px,
-    linear-gradient(0deg, color-mix(in srgb, var(--color-live) 4%, transparent) 0.5px, transparent 0.5px) 0 0 / 10px 10px;
-  --skin-light: radial-gradient(80% 40% at 50% 30%, color-mix(in srgb, var(--color-live) 6%, transparent), transparent 70%);
+    linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 4%, transparent) 0.5px, transparent 0.5px) 0 0 / 10px 10px,
+    linear-gradient(0deg, color-mix(in srgb, var(--color-accent) 4%, transparent) 0.5px, transparent 0.5px) 0 0 / 10px 10px;
+  /* bokashi: urushi — the blueprint's glow — light: the world's lit accent held under the coat at the plate's heart */
+  --skin-light: radial-gradient(80% 40% at 50% 30%, color-mix(in srgb, var(--color-accent) 6%, transparent), transparent 70%);
 }
 
 /* ==========================================================================
@@ -39,10 +43,10 @@ html:is([data-room='search'], [data-room='word-web']) body:not([data-view='drift
   --ww-node-ink: var(--color-accent);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) body:not([data-view='drift']) {
-  --ww-paper: color-mix(in srgb, var(--color-ground) 84%, #000);
-  --ww-solid: color-mix(in srgb, var(--color-ground) 84%, #000);
-  --ww-grid: color-mix(in srgb, var(--color-live) 5%, transparent);
-  --ww-grid-major: color-mix(in srgb, var(--color-live) 11%, transparent);
+  --ww-paper: color-mix(in srgb, var(--color-ground) 84%, var(--tone-shade));
+  --ww-solid: color-mix(in srgb, var(--color-ground) 84%, var(--tone-shade));
+  --ww-grid: color-mix(in srgb, var(--color-accent) 5%, transparent);
+  --ww-grid-major: color-mix(in srgb, var(--color-accent) 11%, transparent);
   --ww-wire: color-mix(in srgb, var(--color-live) 48%, transparent);
   --ww-node-ink: color-mix(in srgb, var(--color-live) 30%, #eaf6f2);
 }
@@ -72,6 +76,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-crumb:hover { color: v
 html:is([data-room='search'], [data-room='word-web']) .ww-crumb:not(.ww-here) span { box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--color-accent) 50%, transparent); }
 html:is([data-room='search'], [data-room='word-web']) .ww-crumb.ww-here {
   color: var(--color-ink); font-size: 28px; cursor: default;
+  /* drawn: the current step's ink underline, hard-edged */
   background: linear-gradient(var(--color-ink), var(--color-ink)) 4px calc(100% - 3px) / calc(100% - 8px) 2.5px no-repeat;
 }
 
@@ -80,6 +85,7 @@ html:is([data-room='search'], [data-room='word-web']) .ww-plate {
   position: relative; height: 404px; margin: 0;
   border: 1px solid var(--color-rule);
   background-color: var(--ww-paper);
+  /* drawn: the plate's grid — half-pixel rules every 50 and 10 px, hard-edged */
   background-image:
     linear-gradient(var(--ww-grid-major) 0.5px, transparent 0.5px), linear-gradient(90deg, var(--ww-grid-major) 0.5px, transparent 0.5px),
     linear-gradient(var(--ww-grid) 0.5px, transparent 0.5px), linear-gradient(90deg, var(--ww-grid) 0.5px, transparent 0.5px);

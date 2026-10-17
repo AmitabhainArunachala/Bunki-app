@@ -8,11 +8,15 @@
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) {
   /* r4 skin (T7 "carry on", the contrast pass): the working paper is the shared washi (the R4
      block's page, each world's own), not a beige of its own */
+  /* bokashi: ichimonji — the Learn room's sky — depth: the stage's lacquer (the world's own ink) laid across the top of the page, gone by 180 px */
   --skin-ground: linear-gradient(180deg, color-mix(in srgb, var(--color-lacquer) 9%, transparent), transparent 180px);
-  --skin-light: radial-gradient(70% 36% at 50% 0%, rgb(255 250 236 / 40%), transparent 70%);
+  /* bokashi: atenashi — the Learn room's light — light: the world's raised paper wiped in from above, edgeless */
+  --skin-light: radial-gradient(70% 36% at 50% 0%, color-mix(in srgb, var(--tone-raised) 75%, transparent), transparent 70%);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) {
+  /* bokashi: urushi — the Learn room's sky at night — depth: the world's lacquer at the top, its coats thinning into the ground by 220 px */
   --skin-ground: linear-gradient(180deg, var(--color-lacquer), transparent 220px);
+  /* bokashi: urushi — the Learn room's light at night — light: the world's own ink held as a glow under the coat */
   --skin-light: radial-gradient(60% 34% at 50% 4%, color-mix(in srgb, var(--color-ink) 9%, transparent), transparent 72%);
 }
 
@@ -27,7 +31,7 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) {
   --learn-card: color-mix(in srgb, var(--color-surface) 62%, #efe5cf);
   --learn-card-ink: var(--color-ink);
-  --learn-card-muted: color-mix(in srgb, var(--color-ink) 66%, transparent);
+  --learn-card-muted: color-mix(in srgb, var(--color-ink) 74%, transparent);
   --learn-stage-ink: var(--color-lacquer-ink);
   --learn-stage-quiet: color-mix(in srgb, var(--color-lacquer-ink) 78%, transparent);
   --learn-gutter: 34px;
@@ -36,7 +40,7 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   /* the card stays paper under stage light */
   --learn-card: color-mix(in srgb, var(--color-ink) 86%, #c8b48c);
   --learn-card-ink: color-mix(in srgb, var(--color-lacquer) 70%, #000);
-  --learn-card-muted: color-mix(in srgb, var(--color-lacquer) 62%, transparent);
+  --learn-card-muted: color-mix(in srgb, var(--color-lacquer) 72%, transparent);
 }
 :root[data-theme='kaku']:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) {
   --learn-card: #f3eee2;
@@ -52,8 +56,9 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   padding: 22px 18px 22px;
   color: var(--learn-stage-ink);
   border-radius: var(--radius-card);
+  /* bokashi: urushi — the Learn stage — depth: the world's lacquer stepping from its coat to its deeper coat, the lit washi card's glow held inside it */
   background:
-    radial-gradient(70% 52% at 50% 40%, rgb(255 238 205 / 11%), transparent 70%),
+    radial-gradient(70% 52% at 50% 40%, color-mix(in srgb, var(--world-paper) 12%, transparent), transparent 70%),
     linear-gradient(180deg, var(--color-lacquer-2), var(--color-lacquer));
   box-shadow: inset 0 -1px 0 rgb(255 255 255 / 7%), 0 1px 0 color-mix(in srgb, var(--color-seal) 70%, #000), 0 3px 0 var(--color-lacquer);
 }
@@ -66,8 +71,9 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   }
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app > main > .learn-stage {
+  /* bokashi: urushi — the Learn stage at night — depth: lantern gold held inside the world's lacquer coats */
   background:
-    radial-gradient(56% 46% at 50% 36%, color-mix(in srgb, var(--color-gold) 16%, transparent), transparent 72%),
+    radial-gradient(56% 46% at 50% 36%, color-mix(in srgb, var(--tone-gold) 16%, transparent), transparent 72%),
     linear-gradient(180deg, var(--color-lacquer-2), var(--color-lacquer));
   box-shadow: inset 0 -1px 0 rgb(255 255 255 / 6%), 0 1px 0 color-mix(in srgb, var(--color-seal) 55%, transparent);
 }
@@ -86,7 +92,7 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage h1.view-title {
   margin: 0;
   font: 800 34px/1.1 var(--font-headword);
-  color: color-mix(in srgb, var(--color-lacquer-ink) 70%, #fff);
+  color: var(--color-lacquer-ink);
   letter-spacing: 0.01em;
 }
 /* the fan: two ghost cards behind the lit one */
@@ -170,7 +176,7 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-due { display: flex; align-items: baseline; gap: 10px; margin: 0; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-due-n {
   font: 800 56px/0.9 var(--font-headword);
-  color: color-mix(in srgb, var(--color-lacquer-ink) 60%, #fff);
+  color: var(--color-lacquer-ink);
   font-variant-numeric: tabular-nums;
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-due-u { font: 500 14px/1.25 var(--font-ui); color: var(--learn-stage-quiet); max-width: 5.6em; }

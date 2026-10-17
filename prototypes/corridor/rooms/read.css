@@ -5,12 +5,14 @@
 /* ---- Skin frame (Skin lane): Read is warm, thick kōzo print paper in a morning window;
    at night the same paper under lantern light. Values only; build on them. ---- */
 html:is([data-room='shelf'], [data-room='archive'], [data-room='feed'], [data-room='publisher'], [data-room='source-inbox'], [data-room='source-reader'], [data-room='personal-reading']) body:not([data-view='drift']) {
-  --skin-light: radial-gradient(110% 55% at 100% 0%, rgb(255 246 226 / 44%), transparent 65%);
+  /* bokashi: atenashi — the reading room's morning window — light: the world's raised paper wiped in from the upper right, edgeless */
+  --skin-light: radial-gradient(110% 55% at 100% 0%, color-mix(in srgb, var(--tone-raised) 80%, transparent), transparent 65%);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='shelf'], [data-room='archive'], [data-room='feed'], [data-room='publisher'], [data-room='source-inbox'], [data-room='source-reader'], [data-room='personal-reading']) body:not([data-view='drift']) {
+  /* bokashi: urushi — the reading room under lantern light — light: the house gold held in the lacquer at the upper right and low across the foot */
   --skin-light:
-    radial-gradient(70% 34% at 88% 6%, color-mix(in srgb, var(--color-gold) 13%, transparent), transparent 70%),
-    radial-gradient(120% 40% at 50% 110%, color-mix(in srgb, var(--color-gold) 9%, transparent), transparent 70%);
+    radial-gradient(70% 34% at 88% 6%, color-mix(in srgb, var(--tone-gold) 13%, transparent), transparent 70%),
+    radial-gradient(120% 40% at 50% 110%, color-mix(in srgb, var(--tone-gold) 9%, transparent), transparent 70%);
 }
 
 /* =====================================================================================
@@ -104,6 +106,12 @@ html[data-room='shelf'] #shelf-body .story-instrument .story-mine { color: var(-
   color: var(--color-signal);
   font: 800 13px/1 var(--font-headword);
   letter-spacing: 0.02em;
+}
+
+/* at night the seal's red is lifted by the world's light ink so its level reads at 4.5:1 on the raised lacquer (it read
+   3.8:1 in 浪 and 雷) */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(html[data-room='shelf'] #shelf-body .story-instrument, html[data-room='reader'] .reader-meta) .level-chip {
+  color: color-mix(in srgb, var(--color-signal) 70%, var(--color-ink));
 }
 
 /* ---------- the lead: a woodblock at its own 3:2 crop, clean to its edges (no registration marks) ---------- */
@@ -245,7 +253,7 @@ html[data-room='shelf'] #shelf-body .story-teaser .level-badge {
   filter: brightness(0.8) saturate(0.85);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] #shelf-body .story-kicker {
-  color: color-mix(in srgb, var(--topic, var(--color-accent)) 30%, var(--color-ink-2));
+  color: var(--kicker, color-mix(in srgb, var(--topic, var(--color-accent)) 30%, var(--color-ink-2)));
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='shelf'] #shelf-today.shelf-today-strip {
   border-bottom-color: color-mix(in srgb, var(--color-gold) 70%, transparent);
@@ -399,10 +407,11 @@ html[data-room='reader'] .listen-row .play-pending::after {
   z-index: 1;
   pointer-events: none;
   mix-blend-mode: screen;
+  /* bokashi: emitted — the night print's lamplight — light: two lanterns and the street's glow in the house gold, soft enough that no ring shows */
   background:
-    radial-gradient(14% 18% at 30% 70%, rgb(255 196 120 / 42%), transparent 70%),
-    radial-gradient(10% 13% at 66% 64%, rgb(255 206 140 / 34%), transparent 70%),
-    radial-gradient(60% 40% at 50% 100%, rgb(226 189 108 / 16%), transparent 75%);
+    radial-gradient(40% 72% at 30% 70%, color-mix(in srgb, var(--tone-gold) 8%, transparent), transparent 72%),
+    radial-gradient(30% 60% at 66% 64%, color-mix(in srgb, var(--tone-gold) 6%, transparent), transparent 72%),
+    radial-gradient(70% 70% at 50% 100%, color-mix(in srgb, var(--tone-gold) 6.5%, transparent), transparent 75%);
   animation: read-lamp 6.8s ease-in-out infinite alternate;
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='reader'] main > .reader-hero::after {
@@ -411,7 +420,8 @@ html[data-room='reader'] .listen-row .play-pending::after {
   inset: -60% -10% 0;
   z-index: 1;
   pointer-events: none;
-  background: repeating-linear-gradient(104deg, transparent 0 11px, rgb(214 226 255 / 16%) 11px 12px, transparent 12px 29px);
+  /* drawn: the night print's rain — hairline streaks of the world's own light ink, hard-edged */
+  background: repeating-linear-gradient(104deg, transparent 0 11px, color-mix(in srgb, var(--color-ink) 16%, transparent) 11px 12px, transparent 12px 29px);
   animation: read-rain 8s linear infinite;
 }
 @keyframes read-rain { from { transform: translate3d(0, -12%, 0); } to { transform: translate3d(-4%, 0, 0); } }
@@ -651,7 +661,8 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
   --mini-paper: var(--color-paper, #f5efe0);
   --mini-band: color-mix(in srgb, var(--color-ground) 36%, var(--mini-paper));
   --mini-head: var(--color-ink);
-  --mini-head-2: color-mix(in srgb, var(--color-ink) 90%, var(--color-paper));
+  /* Material II: the brush lifts to ink 93 % + paper (90 % read as more than one tonal step in 24 px) */
+  --mini-head-2: color-mix(in srgb, var(--color-ink) 93%, var(--color-paper));
   --mini-head-ink: var(--color-paper, #f5efe0);
   --mini-head-ink-2: color-mix(in srgb, var(--color-paper) 78%, var(--color-ink));
   --mini-reading: color-mix(in srgb, var(--color-reading, var(--color-signal)) 40%, var(--color-paper));
@@ -691,13 +702,15 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
      ink; the reading the world's own lit red (≥ 6.2:1 on the lacquer); Save the lit A (an emitted accent edge, never
      a solid phosphor fill). A lit accent hairline on the band's top edge keeps it figure on the dark ground. */
   --mini-band: color-mix(in srgb, var(--color-ground) 64%, var(--mini-paper));
-  --mini-head: color-mix(in srgb, var(--color-ground) 48%, #000000);
-  --mini-head-2: color-mix(in srgb, var(--color-ground) 72%, #000000);
+  /* Material II: the lacquer is the world's own — its ground in its deepest coat (zen-stage-deep), not a neutral black, so
+     夜's band stays indigo, 浪's the deep sea, 雷's the storm */
+  --mini-head: color-mix(in srgb, var(--color-ground) 30%, var(--tone-shade));
+  --mini-head-2: color-mix(in srgb, var(--color-ground) 62%, var(--tone-shade));
   --mini-head-ink: var(--color-ink);
   --mini-head-ink-2: color-mix(in srgb, var(--color-ink) 78%, var(--mini-head));
   --mini-reading: var(--color-reading, var(--color-signal));
-  --mini-gold: var(--color-gold, #e2bd6c);
-  --mini-edge: color-mix(in srgb, var(--color-gold, #e2bd6c) 34%, transparent);
+  --mini-gold: var(--tone-gold);
+  --mini-edge: color-mix(in srgb, var(--tone-gold) 34%, transparent);
   --mini-rule: color-mix(in srgb, var(--color-ink) 14%, transparent);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 3px 8px -3px rgb(0 0 0 / 55%),
     0 16px 48px -14px rgb(0 0 0 / 62%);
@@ -719,7 +732,7 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
   position: relative;
   padding: 10px 8px 11px 18px;
   background-color: var(--mini-head);
-  /* the stroke: full ink over the word and its reading, lifting to the wash at the foot */
+  /* bokashi: ichimonji — the slip's head band — brush: the world's ink as one straight stroke across the top, full over the word and its reading, lifting at its foot (at night the band is the world's lacquer, its depth to its sheen) */
   background-image: linear-gradient(180deg, var(--mini-head) 0 56%, var(--mini-head-2) 100%);
   color: var(--mini-head-ink);
   isolation: isolate;
@@ -735,6 +748,7 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
   z-index: -1;
   opacity: 0.1;
   pointer-events: none;
+  /* drawn: 青海波, Hokusai's waves — hard-edged rings of the band's gold on its ink, faint (opacity .1) */
   background-image:
     radial-gradient(circle at 100% 150%, transparent 24%, var(--mini-gold) 24% 26%, transparent 26% 36%, var(--mini-gold) 36% 38%, transparent 38%),
     radial-gradient(circle at 0 150%, transparent 24%, var(--mini-gold) 24% 26%, transparent 26% 36%, var(--mini-gold) 36% 38%, transparent 38%),

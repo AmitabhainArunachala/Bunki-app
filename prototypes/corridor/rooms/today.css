@@ -5,14 +5,16 @@
 /* ---- Skin frame (Skin lane): Today is thin washi at dawn, cool left to warm right; at
    night the city seen from above, its windows glowing low. Values only; build on them. ---- */
 html:is([data-room='tray'], [data-room='list'], [data-room='browse']) body:not([data-view='drift']) {
+  /* bokashi: atenashi — Today's dawn sky — light: the world's 藍 cool at the left, its 朱 warming the right, its raised paper's light from above (thin washi at dawn, every tint the world's own) */
   --skin-light:
-    linear-gradient(100deg, rgb(196 214 226 / 34%), transparent 42%, transparent 62%, rgb(240 204 168 / 26%)),
-    radial-gradient(120% 50% at 50% 0%, rgb(255 255 255 / 36%), transparent 70%);
+    linear-gradient(100deg, color-mix(in srgb, var(--world-accent) 7%, transparent), transparent 42%, transparent 62%, color-mix(in srgb, var(--world-signal) 5%, transparent)),
+    radial-gradient(120% 50% at 50% 0%, color-mix(in srgb, var(--tone-raised) 80%, transparent), transparent 70%);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='tray'], [data-room='list'], [data-room='browse']) body:not([data-view='drift']) {
+  /* bokashi: urushi — Today's night city — light: lantern gold low under the word, the world's own light in the windows to the right, its accent cool above */
   --skin-light:
-    radial-gradient(140% 36% at 50% 108%, color-mix(in srgb, var(--color-gold) 20%, transparent), transparent 72%),
-    radial-gradient(60% 30% at 82% 100%, color-mix(in srgb, var(--color-live) 9%, transparent), transparent 70%),
+    radial-gradient(140% 36% at 50% 108%, color-mix(in srgb, var(--tone-gold) 20%, transparent), transparent 72%),
+    radial-gradient(60% 30% at 82% 100%, color-mix(in srgb, var(--world-accent) 9%, transparent), transparent 70%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 7%, transparent), transparent 40%);
 }
 
@@ -32,7 +34,7 @@ html[data-room='tray'] body:not([data-view='drift']) {
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] body:not([data-view='drift']) {
   --today-sky-ink: color-mix(in srgb, var(--color-ink) 86%, var(--color-accent));
   --today-halo: var(--color-ground);
-  --today-roof: color-mix(in srgb, var(--color-ground) 55%, #000);
+  --today-roof: color-mix(in srgb, var(--color-ground) 55%, var(--tone-shade));
   --today-win: var(--color-gold);
   --today-lamp: var(--color-signal);
 }
@@ -167,6 +169,7 @@ html:is([data-room='tray'], [data-room='search']) .today-dayword::before {
   inset: -6px -30px -10px;
   z-index: -1;
   border-radius: 50%;
+  /* bokashi: atenashi — the day's word, its halo — focus: the page's own ground drawn up behind the word so the sky's stars recede, edgeless */
   background: radial-gradient(closest-side, color-mix(in srgb, var(--today-halo) 94%, transparent),
     color-mix(in srgb, var(--today-halo) 62%, transparent) 64%, transparent);
   pointer-events: none;
@@ -453,17 +456,20 @@ html[data-room='tray'] .today-detail-body .deck-row:disabled { color: var(--colo
    Every star is a real word; open sky in the band is the door up; the caption says so in words. */
 /* near to far, told by size and ink alone: the day's family in the room's ink-blue nearest the
    word, his own words in full ink, the reading half-lit, the far field and its kanji faint */
-html[data-room='tray'] .today-star.kin { opacity: 0.86; color: var(--color-accent); }
-html[data-room='tray'] .today-star.mine { opacity: 0.72; }
-html[data-room='tray'] .today-star.read { opacity: 0.62; }
-html[data-room='tray'] .today-star.far { opacity: 0.42; color: var(--color-ink-2); }
-html[data-room='tray'] .today-star.glyph { opacity: 0.28; color: var(--color-ink); }
+/* Material II (slice M): the far field was faint below reading (its kanji 1.7:1, the half-lit readings 2.6:1 in 凱風快晴).
+   Depth is still near to far — size first, then ink lifting toward the paper the way a bokashi lifts — but every star now
+   reads: a reading ≥ 4.5:1, a far kanji (large) ≥ 3:1, in every world */
+html[data-room='tray'] .today-star.kin { opacity: 1; color: var(--color-accent); }
+html[data-room='tray'] .today-star.mine { opacity: 0.9; }
+html[data-room='tray'] .today-star.read { opacity: 0.92; color: color-mix(in srgb, var(--color-accent) 72%, var(--color-ink)); }
+html[data-room='tray'] .today-star.far { opacity: 0.78; color: var(--color-ink-2); }
+html[data-room='tray'] .today-star.glyph { opacity: 0.56; color: var(--color-ink); }
 /* at night his due words burn gold and the day's family keeps the room's blue, as by day */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-star.kin {
   color: var(--color-accent);
   text-shadow: 0 0 10px color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-star.far { color: var(--color-ink); opacity: 0.38; }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray'] .today-star.far { color: var(--color-ink); opacity: 0.64; }
 html[data-room='tray'] body:not([data-view='drift']) #app > main > .today-hero > .today-universe {
   /* the band's own caption, at the right end of its near lane: it never meets the date line */
   position: relative;
