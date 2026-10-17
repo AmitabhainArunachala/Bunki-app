@@ -195,7 +195,8 @@ uses only world tokens and their two-token mixes, and lifts at most one visible 
 The kanji wash is the key at 7 % by day, 5 % at night (`--kanji-wash`), a `radial-gradient(closest-side)` over the
 raised paper. The slip's band (the tables above, E) is amended: by day the brush lifts to ink 93 % + paper (90 % read
 as two tonal steps in 24 px); at night its lacquer is the world's ground 30 % → 62 % in its own deepest coat, not ground
-48 % → 72 % in black. verify-theme-consistency pins the new night formula as exactly as it pinned the old.
+48 % → 72 % in black. verify-theme-consistency pins the new night formula as exactly as it pinned the old. S's deck band,
+which takes "the card band's night value", follows it at night (the world's ground 30 % in its deepest coat), still flat.
 
 **Every gradient, by kind** (C7: 101 declarations in the sheets the screens load — 44 bokashi, 26 drawn, 24 masks,
 7 scene art):
