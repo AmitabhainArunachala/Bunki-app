@@ -4729,7 +4729,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   margin: 32px 0 8px;
   font-family: var(--serif);
   line-height: 1.65;
-  font-size: var(--type-section);
+  font-size: clamp(var(--type-section), 3vw, var(--type-title));
   overflow-wrap: anywhere;
 }
 
@@ -7195,7 +7195,7 @@ body.zen .grade-row .grade:nth-child(4) {
 /* Deliberate practice from an exact source sentence. */
 .sentence-practice { max-width: 780px; margin-inline: auto; }
 .sentence-original, .sentence-cloze-preview, .sentence-recall-cue {
-  margin: 1.4rem 0; line-height: 1.9; font-size: var(--type-reading);
+  margin: 1.4rem 0; line-height: 1.9; font-size: clamp(var(--type-reading), 2.6vw, var(--type-title));
   white-space: pre-wrap; overflow-wrap: anywhere;
 }
 .sentence-original { border-inline-start: 2px solid var(--line); padding-inline-start: 1rem; }

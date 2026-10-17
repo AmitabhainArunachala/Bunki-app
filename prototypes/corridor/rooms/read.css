@@ -768,8 +768,11 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
   /* G1 · a one-glyph word (手, the page's short example leads now) keeps the door's own 44 across, as it keeps its 44
      down; the glyph stays where it stands (design-reader-shelf G5-galaxy) */
   min-inline-size: 44px;
-  margin-block: -5px;
-  padding-block: 5px;
+  /* its 44 down whatever the step its word is set at (the ladder's title, 29, left 43.4 with a fixed 5): the reach is
+     what the line leaves to 44, rounded up to a whole pixel (layout's 1/64 px would leave 43.97), given back in
+     margin, so it moves nothing */
+  margin-block: calc(-1 * max(5px, round(up, (44px - 1.15em) / 2, 1px)));
+  padding-block: max(5px, round(up, (44px - 1.15em) / 2, 1px));
   padding-inline: 0;
   border: 0;
   background: none;

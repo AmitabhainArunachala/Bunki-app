@@ -169,7 +169,7 @@
   writing-mode: vertical-rl;
   letter-spacing: 0.15em;
   color: #d8be8670;
-  font: 400 var(--type-body)/1.5 var(--serif, serif);
+  font: 400 clamp(var(--type-body), 2.5vw, var(--type-title))/1.5 var(--serif, serif);
 }
 .samurai-effect__samurai {
   position: absolute;
@@ -302,7 +302,7 @@
 .samurai-effect__footer p {
   margin: 0;
   max-width: 33ch;
-  font-size: var(--type-caption);
+  font-size: clamp(var(--type-caption), 1.3vw, var(--type-chrome));
   line-height: 1.55;
   color: #f5ebd3bd;
 }

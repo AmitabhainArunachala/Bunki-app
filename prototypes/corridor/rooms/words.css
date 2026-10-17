@@ -131,7 +131,8 @@ html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph:focus-visible 
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph[data-len='1'] { font-size: calc(var(--type-headword) * 1.5); }
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph[data-len='3'] { font-size: var(--type-display); }
 html:is([data-room='search'], [data-room='word-web']) .ww-c-glyph[data-len='4'] { font-size: var(--type-section); }
-html:is([data-room='search'], [data-room='word-web']) .ww-c-m { max-width: 104px; overflow: hidden; font: 500 var(--type-caption)/1.25 var(--font-data); color: var(--color-muted); text-overflow: ellipsis; white-space: nowrap; }
+/* the centre's meaning keeps the room it had for its text (104 px at 11 px, the caption step now 12) */
+html:is([data-room='search'], [data-room='word-web']) .ww-c-m { max-width: 9.5em; overflow: hidden; font: 500 var(--type-caption)/1.25 var(--font-data); color: var(--color-muted); text-overflow: ellipsis; white-space: nowrap; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='search'], [data-room='word-web']) .ww-c-glyph {
   text-shadow: 0 0 18px color-mix(in srgb, var(--color-live) 38%, transparent);
 }
@@ -152,7 +153,8 @@ html:is([data-room='search'], [data-room='word-web']) .ww-nb { position: relativ
 /* a word in the web keeps the word family's own mark under the finger (the reader token's wash), never the press-dim */
 html:is([data-room='search'], [data-room='word-web']) .ww-g { display: block; }
 html:is([data-room='search'], [data-room='word-web']) .ww-cap {
-  max-width: 92px; padding: 0 3px; overflow: hidden; background: var(--ww-solid);
+  /* a node's caption keeps the room it had for its text (92 px at 10.5 px, the caption step now 12) */
+  max-width: 8.75em; padding: 0 3px; overflow: hidden; background: var(--ww-solid);
   font: 500 var(--type-caption)/1.3 var(--font-ui); color: var(--color-muted); text-overflow: ellipsis; white-space: nowrap;
 }
 /* kanji: a 藍 disc by day, a lit ring at night */

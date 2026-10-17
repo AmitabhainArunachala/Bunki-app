@@ -1302,7 +1302,7 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture.is-kanji {
 
 /* the lead: a large picture, then the topic, the headline, the English line, the first sentence */
 #shelf-body .story-lead .shelf-head { gap: 10px; padding: 26px 28px 26px; }
-#shelf-body .story-lead .shelf-title { font-size: var(--type-display); line-height: 1.4; letter-spacing: -0.015em; }
+#shelf-body .story-lead .shelf-title { font-size: clamp(var(--type-display), 2.6vw, var(--type-hero)); line-height: 1.4; letter-spacing: -0.015em; }
 #shelf-body .story-lead .shelf-title-en { font-size: var(--type-lead); line-height: 1.5; color: var(--label); }
 #shelf-body .story-lead .story-kicker { font-size: var(--type-chrome); }
 #shelf-body .story-lead .story-lede {
@@ -1461,7 +1461,7 @@ body[data-view='reader'] #app > main .reader-meta {
 .grade-tag { font: 600 var(--type-caption)/1 var(--sans); color: var(--label-2); white-space: nowrap; }
 body[data-view='reader'] #app > main > h1.view-title {
   margin: 0 0 var(--s1);
-  font: 800 var(--type-display)/1.45 var(--display);
+  font: 800 clamp(var(--type-display), 3.3vw, var(--type-hero))/1.45 var(--display);
   letter-spacing: -0.012em;
   color: var(--label);
   text-wrap: pretty;
@@ -2224,7 +2224,7 @@ body, body.v-contrast-wcag {
 }
 .reference-library .reference-navigation { border-bottom: 2px solid var(--rule-strong); }
 .reference-library .reference-eyebrow { font: 700 var(--type-label)/1.4 var(--sans); letter-spacing: 0.08em; color: var(--accent); }
-.reference-library .reference-title { font: 800 var(--type-hero)/1.2 var(--display); letter-spacing: -0.02em; color: var(--text); }
+.reference-library .reference-title { font: 800 clamp(var(--type-hero), 4vw, var(--type-headword))/1.2 var(--display); letter-spacing: -0.02em; color: var(--text); }
 .reference-library .reference-intro { max-width: 60ch; font: var(--type-lead)/1.75 var(--sans); color: var(--text-2); }
 .reference-library .reference-family { margin: var(--s5) 0; }
 .reference-library .reference-family-heading { padding-top: var(--s2); border-top: 2px solid var(--rule-strong); }
@@ -2325,7 +2325,7 @@ html[data-register='jlpt'] body:not(.zen):not([data-view='entry']):not([data-vie
   background: transparent;
   box-shadow: none;
 }
-html[data-register='jlpt'] .assessment-room > h1.view-title { margin: 0 0 var(--s1); font: 800 var(--type-display)/1.2 var(--display); letter-spacing: -0.02em; color: var(--text); }
+html[data-register='jlpt'] .assessment-room > h1.view-title { margin: 0 0 var(--s1); font: 800 clamp(var(--type-display), 4vw, var(--type-headword))/1.2 var(--display); letter-spacing: -0.02em; color: var(--text); }
 html[data-register='jlpt'] .assessment-room > h1.view-title .en-inline { display: block; margin-top: 6px; font: 400 var(--type-body)/1.4 var(--sans); letter-spacing: 0.02em; text-transform: none; color: var(--text-2); }
 html[data-register='jlpt'] .exam-intro { margin: 0 0 var(--s3); font: var(--type-body)/1.6 var(--sans); color: var(--text-2); }
 
@@ -3223,7 +3223,7 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 #app .kp:has(> .kp-done) { background: var(--kp-study-ground); min-height: 100dvh; }
 #app .kp-done { gap: 20px; padding: calc(env(safe-area-inset-top, 0px) + 44px) 4px calc(32px + env(safe-area-inset-bottom, 0px)); color: var(--kp-stage-ink); }
 #app .kp-done > .kp-top { display: none; }
-#app .kp-done .kp-done-title { color: var(--kp-stage-ink); font-size: var(--type-hero); font-weight: 700; letter-spacing: 0.02em; }
+#app .kp-done .kp-done-title { color: var(--kp-stage-ink); font-size: clamp(var(--type-hero), 8.6vw, var(--type-headword)); font-weight: 700; letter-spacing: 0.02em; }
 #app .kp-done .kp-rise { gap: 14px 20px; padding: 6px 0 2px; }
 #app .kp-done .kp-rise-w { display: inline-flex; flex-direction: column; align-items: center; gap: 5px; font-family: var(--kp-serif); font-weight: 600; font-size: var(--type-reading); color: color-mix(in srgb, var(--kp-stage-ink) 86%, transparent); }
 #app .kp-done .kp-rise-w.is-again { color: var(--kp-stage-ink); }
@@ -5456,7 +5456,8 @@ body.record-not-saving #app > .chrome { margin-bottom: var(--record-band-h, 48px
 #app > .chrome button.save-one.chrome-keep::after { content: none; }
 #app > .chrome .chrome-keep .save-bar-verb {
   font: 600 var(--type-caption)/1.1 var(--font-ui);
-  letter-spacing: 0.1em;
+  /* at the ladder's floor (12, was 10) the word SAVE keeps the bar's 44: its tracking gives back what its size took */
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--color-bar-quiet, var(--color-muted));
 }

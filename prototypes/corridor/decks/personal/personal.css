@@ -33,12 +33,12 @@
 .pc-state { flex:none; font-size:var(--type-caption); letter-spacing:.12em; text-transform:uppercase; border:1px solid var(--line); padding:4px 8px; }
 .pc-focus { padding:clamp(24px,4vw,42px) clamp(20px,4vw,44px) 20px; }
 .pc-focus .pc-eyebrow { color:var(--red); margin:0 0 10px; }
-.pc-focus h2 { font:500 var(--type-reading)/1.55 var(--sans); margin:0; letter-spacing:-.02em; }
+.pc-focus h2 { font:500 clamp(var(--type-reading), 3vw, var(--type-title))/1.55 var(--sans); margin:0; letter-spacing:-.02em; }
 .pc-focus .pc-small { margin:12px 0 0; }
 .pc-context { padding:4px clamp(20px,4vw,44px) 36px; }
 .pc-context-label { display:flex; align-items:center; gap:10px; margin:14px 0; }
 .pc-context-label::after { content:''; height:1px; flex:1; background:var(--line); }
-.pc-japanese { font:400 var(--type-reading)/2.1 var(--serif); line-break:strict; word-break:normal; overflow-wrap:anywhere; letter-spacing:.035em; margin:0!important; }
+.pc-japanese { font:400 clamp(var(--type-reading), 2.4vw, var(--type-section))/2.1 var(--serif); line-break:strict; word-break:normal; overflow-wrap:anywhere; letter-spacing:.035em; margin:0!important; }
 .pc mark { color:inherit; background:transparent; border-bottom:2px solid var(--red); padding-bottom:3px; }
 .pc ruby { ruby-position:over; }
 .pc rt { font-family:var(--sans); letter-spacing:.02em; font-weight:400; color:var(--ink-2); }
@@ -61,7 +61,7 @@
 .pc-answer .pc-notes { margin-top:10px; padding-top:5px; }
 .pc-answer-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:24px; }
 .pc-answer-head .pc-eyebrow { margin:0 0 6px; color:var(--red); }
-.pc-answer-head h3 { font:500 var(--type-title)/1.45 var(--serif); margin:0; }
+.pc-answer-head h3 { font:500 clamp(var(--type-title), 3vw, var(--type-hero))/1.45 var(--serif); margin:0; }
 .pc-reading { display:block; color:var(--ink-2); font:400 var(--type-control)/1.6 var(--sans); margin-top:7px; letter-spacing:.04em; }
 .pc-answer-kind { padding:5px 8px; border:1px solid var(--line); font-size:var(--type-caption); flex:none; }
 .pc-definition { font:500 var(--type-lead)/1.85 var(--sans); max-width:65ch; }

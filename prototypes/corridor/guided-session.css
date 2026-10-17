@@ -152,11 +152,11 @@
   padding-top: 22px;
 }
 .gs-hero {
-  font-size: var(--type-display) !important;
+  font-size: clamp(var(--type-display), 7vw, calc(var(--type-headword) * 1.25)) !important;
   line-height: 1.15;
 }
 .gs-title {
-  font-size: var(--type-section);
+  font-size: clamp(var(--type-section), 4.2vw, var(--type-display));
   line-height: 1.25;
   margin-bottom: 4px !important;
 }
@@ -564,7 +564,7 @@
   );
 }
 .gs-sheet .gs-title {
-  font-size: var(--type-reading);
+  font-size: clamp(var(--type-reading), 3vw, var(--type-section));
   margin-bottom: 14px !important;
 }
 .gs-passage {
@@ -1114,7 +1114,7 @@ legend.gs-instruction {
   padding-top: 20px;
 }
 .gs-score {
-  font-size: var(--type-headword) !important;
+  font-size: clamp(var(--type-headword), 9vw, calc(var(--type-headword) * 1.25)) !important;
   line-height: 1.05;
 }
 .gs-of {
