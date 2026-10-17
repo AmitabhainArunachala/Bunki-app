@@ -704,16 +704,39 @@ patch(
   'boot rAF deferred',
 );
 
+// G3: preserve the accepted hosted reading/stage/page adapter in generated output.
+// Exact-once anchors leave the frozen standalone donor and its own grammar intact.
+patch(
+  '  nodes.push(n); nodeOf.set(el,n);\n  return n;\n}\nfunction spawnPart(ch,x,y){',
+  '  nodes.push(n); nodeOf.set(el,n);\n  mountHostedNodeReading(n);\n  return n;\n}\nfunction spawnPart(ch,x,y){',
+  'G3 resting hosted glyph reading',
+);
+patch(
+  '  nodes.push(n); nodeOf.set(el,n);\n  return n;\n}\n// ---- the vault-field: a world plane of galaxies, seen through a camera ----',
+  '  nodes.push(n); nodeOf.set(el,n);\n  mountHostedNodeReading(n);\n  return n;\n}\n// ---- the vault-field: a world plane of galaxies, seen through a camera ----',
+  'G3 resting hosted particle reading',
+);
+patch(
+  '  cueRetire(n,"tap");   // retain the identity of the answered gesture\n  const lvl=stack[stack.length-1];',
+  '  cueRetire(n,"tap");   // retain the identity of the answered gesture\n' +
+  '  // Hosted occurrences use the app\'s ladder before the standalone field\'s\n' +
+  '  // private rung counter. Cue retirement keeps its existing durable path;\n' +
+  '  // the lookup does not await it, duplicate it, or turn it into a grade.\n' +
+  '  if(hostedSlip(n,{bloom:true})!==false)return;\n' +
+  '  const lvl=stack[stack.length-1];',
+  'G3 ordinary hosted taps use the shared ladder',
+);
+
 // A receipt is evidence only for its exact command and current local scope.
 // Lazy reuse of the controller codec prevents a second Drift schema here.
 js += `
 // Round 4 review (T1): the universe speaks the interface language the corridor set on <body>.
 function uiT(ja,en){return document.body&&document.body.classList.contains("ui-bi")?en:ja;}
 // The one-hand pass (contract §1): the host's one slip, asked for the way the entry door is asked for —
-//   window.__BUNKI_OPEN_SLIP = { has(kind,key), open(kind,key,{anchor,redo,onClose}), isOpen(anchor), close() }
-// and drawn only when has() says the far side exists. slipFor(n) opens it beside a dive's centre at the
-// ladder's end; true when this tap opened it, false when it already stands there (then the centre's tap goes
-// on to the entry, as the band does). redo: the sky owns its taps, so no press is the slip's own dive.
+//   window.__BUNKI_OPEN_SLIP = { has(kind,key), open(kind,key,options), isOpen(anchor), close() }
+// Ordinary hosted taps share its reading → stage → page visit. Held/dive-centre
+// callers retain slipFor's idempotent stage request. Standalone keeps its own
+// field grammar; camera, pinch, lock and flick handlers do not pass through here.
 function slipHost(kind,key){
   const h=typeof window!=="undefined"&&window.__BUNKI_OPEN_SLIP;
   if(!h||typeof h.open!=="function") return null;
@@ -722,15 +745,69 @@ function slipHost(kind,key){
 }
 function slipAway(){
   const h=typeof window!=="undefined"&&window.__BUNKI_OPEN_SLIP;
-  if(h&&typeof h.isOpen==="function"&&h.isOpen()&&typeof h.close==="function") h.close();
+  // A reading-only visit has no popup yet, but must fold when its scene leaves.
+  if(h&&typeof h.close==="function") h.close();
 }
-function slipFor(n){
-  const kind=n.kind==="word"?"word":n.kind==="glyph"?"kanji":null;
+function mountHostedNodeReading(n,reading){
+  if(n.kind!=="glyph"&&n.kind!=="part")return null;
+  const kind=n.kind==="glyph"?"kanji":"particle";
+  const h=slipHost(kind,n.ch);
+  if(!h)return null; // standalone retains its own unannotated field
+  reading=reading||h.reading?.(kind,n.ch)||"";
+  const kana=s=>String(s).replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
+  if(!reading||kana(reading)===kana(n.ch))return null;
+  const base=n.el.querySelector(n.kind==="glyph"?".g":".pch");
+  if(!base)return null;
+  let ruby=base.querySelector(":scope > ruby.drift-reading");
+  if(!ruby){
+    ruby=document.createElement("ruby");ruby.className="drift-reading";ruby.lang="ja";
+    ruby.append(...base.childNodes);
+    const rt=document.createElement("rt");rt.textContent=reading;ruby.append(rt);base.append(ruby);
+  }
+  n.r=reading;
+  return ruby;
+}
+function hostedSlip(n,{redo=false,bloom=false}={}){
+  const kind=n.kind==="word"?"word":n.kind==="glyph"?"kanji":n.kind==="part"?"particle":null;
   const key=kind==="word"?n.w:n.ch;
   const h=kind&&key?slipHost(kind,key):null;
   if(!h||!n.el||!n.el.isConnected) return false;
+  if(bloom&&n.kind==="word"&&!n.el.dataset.ladderRung&&stack.length===0&&!lockOn){
+    bloomFocus(n); // keep the existing family response, without an extra tap rung
+    bloomLast=performance.now();
+  }
+  const clearReveal=()=>{
+    n.el.classList.remove("unfolded","glossed","hosted-reading-shown");
+    if(unfolded===n)unfolded=null;
+  };
+  const reveal=reading=>{
+    if(n.kind==="word"){
+      collapseUnfold();
+      n.el.classList.add("unfolded");n.el.classList.remove("glossed");unfolded=n;
+    }else if(reading){
+      // Reuse the resting annotation; its caption remains a sibling.
+      if(mountHostedNodeReading(n,reading))n.el.classList.add("hosted-reading-shown");
+    }
+    return clearReveal;
+  };
+  const readingVisible=()=>{
+    const reading=n.el.querySelector(n.kind==="word"?".yomi":"ruby rt");
+    if(!reading?.textContent.trim())return false;
+    const s=getComputedStyle(reading);
+    return reading.getClientRects().length>0&&s.display!=="none"&&s.visibility!=="hidden"&&Number(s.opacity)>0;
+  };
+  const look={surface:key,label:key,reading:n.r||"",gloss:n.g||""};
+  return h.open(kind,key,{anchor:n.el,redo,look,reveal,clearReveal,readingVisible,
+    onClose:reason=>{if(reason!=="dive")clearReveal();}});
+}
+function slipFor(n){
+  const kind=n.kind==="word"?"word":n.kind==="glyph"?"kanji":n.kind==="part"?"particle":null;
+  const key=kind==="word"?n.w:n.ch;
+  const h=kind&&key?slipHost(kind,key):null;
+  if(!h||!n.el||!n.el.isConnected)return false;
   if(typeof h.isOpen==="function"&&h.isOpen(n.el)) return false;
-  return h.open(kind,key,{anchor:n.el,redo:true})==="opened";
+  const result=hostedSlip(n,{redo:true});
+  return result==="opened"||result==="reading";
 }
 // Round 4 review (T1, fix 2): by day the universe keeps a sky of its own (the donor's own cool
 // ground), and by night it stands on the host world's ground only when every word ink keeps its
