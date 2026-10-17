@@ -5027,6 +5027,7 @@ function back({ instant = false } = {}) {
     recede({ instant: instant === true });
     return;
   }
+  if (S.view === 'speak' && speakBack()) return;
   if (!roomTransitionUpdating && !['drift', 'guided'].includes(S.view)) return roomTransition(() => back());
   if (returnFromNavigation()) return;
   // the guided session walks its own layers first (word → sentence, branch → sentence,
@@ -11746,6 +11747,7 @@ function renderReader(main) {
     returnScroll();
   });
   fin.append(finBtn);
+  fin.append(speakChip(p));
   footer.append(fin);
 
   const about = el('section', 'article-about');
@@ -25653,6 +25655,285 @@ function renderGuided(main) {
   }
   ensureGuidedModule().then(() => { if (S.view === 'guided') { guidedRoom?.enter(); render(); } }, () => { if (S.view === 'guided') render(); });
 }
+
+/* 話す · Speak (track C, 2026-10-17; one-hand/SPEAK/DESIGN.md §4). John: "if we could have our own verion of jumpseak
+ * also in the app it would make it 10x better". The room lives in its own files (speak.js, speak-core.mjs,
+ * rooms/speak.css), loaded like the guided session; this block is its only way into the app, and deleting it with its
+ * one-line registrations (ROOM_NAMES, the two tab tables, the render dispatch, back(), the study door and its two
+ * places, the article's foot, the top bar's Save) removes the room. It writes additively: archive rows (surfaces
+ * 'speak' and 'speak-notes') and gated 'sensei' rows in ONE atomic write per turn, 'tap' rows through the existing
+ * doors, a card only on his tap. Never a revlog row, never S.srs, never a new obslog kind, never an edit of a row. */
+let speakModule = null;
+let speakModulePromise = null;
+let speakFailed = false;
+let speakRoom = null;
+let speakEntered = false;
+let speakFrom = 'dojo';
+let speakPending = null;
+let speakKeepWord = null;
+const speakOwnedAudio = new WeakSet();
+const speakAvailable = () => window.__CORRIDOR_STANDALONE__ !== true;
+const SPEAK_JA = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
+function loadSpeakRoom() {
+  // the module override is honoured only on this machine (127.0.0.1 or localhost), where the verification suites run
+  const url = ['127.0.0.1', 'localhost'].includes(location.hostname) && typeof window.__KAIRO_SPEAK_URL__ === 'string' ? window.__KAIRO_SPEAK_URL__ : './speak.js';
+  speakModulePromise ||= import(url).then(
+    (module) => { speakModule = module; speakFailed = false; return module; },
+    (error) => { speakModulePromise = null; speakFailed = true; throw error; },
+  );
+  return speakModulePromise;
+}
+/** The sensei mine's subject gate (aiMineObservations), copied whole so the speaking room keeps its law without an edit
+ * to it: a subject counts only when the dictionary or his deck confirms it, a code only from SENSEI_OBS_CODES, at most
+ * AI_MINE_MAX_ROWS rows per exchange. verify-speak asserts that the two gates agree on one fixture. */
+function speakGateEvidence(found, xid, now = Date.now()) {
+  const subjectKey = (raw, type) => {
+    if (type !== 'word' && type !== 'kanji') return null;
+    const w = String(raw || '').trim();
+    if (!w || w.length > 12 || !/[぀-ヿ㐀-鿿豈-﫿]/u.test(w)) return null;
+    if (type === 'kanji' && [...w].length !== 1) return null;
+    const inDeck = S.taken.some((item) => item.t === type && item.id === w);
+    const inDict = type === 'kanji' ? !!D.kanji?.[w] : !!lookup(w);
+    return inDeck || inDict ? srsKey(type, w) : null;
+  };
+  const rows = [];
+  for (const f of Array.isArray(found) ? found : []) {
+    if (rows.length >= AI_MINE_MAX_ROWS || !plainRecord(f)) continue;
+    const key = subjectKey(f.subject, f.subjectType);
+    if (!key) continue;
+    if (f.kind === 'sensei' && [1, 3].includes(f.polarity) && SENSEI_OBS_CODES.has(f.code)) {
+      rows.push([now, 'sensei', key, f.polarity, f.code, xid]);
+    } else if (f.kind === 'confuse') {
+      const other = subjectKey(f.other, f.otherType);
+      if (other && other !== key) rows.push([now, 'confuse', key, other]);
+    }
+  }
+  return rows;
+}
+/** Kore's lines: each token she gave ({s, b, r, f}) becomes the door a sentence's word is everywhere
+ * (renderSentenceTokens: a tap writes 'tap' evidence under the conversation's id); a word the dictionary does not
+ * confirm still opens, as a plain lookup door. Each door carries its word and reading for the top bar's Save. */
+function speakSentence(container, tokens, { contextId }) {
+  for (const raw of tokens) {
+    const s = String(raw?.s || ''), b = String(raw?.b || s), r = String(raw?.r || '');
+    if (!s) continue;
+    if (!SPEAK_JA.test(s)) { renderSentenceTokens(container, [{ s, b: s, r: '', c: false }], { contextId }); continue; }
+    if (!lookup(b)) {
+      const wrap = appendJapaneseLookup(container, s, { block: container, kinsoku: true });
+      for (const word of wrap.querySelectorAll('.japanese-lookup-word')) { word.dataset.speakS = word.dataset.speakB = word.dataset.lookupText; word.dataset.speakR = ''; }
+      continue;
+    }
+    const f = Array.isArray(raw.f) && raw.f.length ? raw.f : [{ t: s, ...(r && r !== s ? { r } : {}) }];
+    renderSentenceTokens(container, [{ s, b, r, c: true, f }], { contextId });
+    const door = container.lastElementChild;
+    // the whole token rides the door (surface, base, the surface's reading): an inflected form keeps what R needs
+    if (door?.matches('button.sentence-tok')) { door.dataset.speakS = s; door.dataset.speakB = b; door.dataset.speakR = r; }
+  }
+}
+/** The word last touched in any line, as the top bar's Save keeps it: its reading truth from R (readingToken). */
+function speakKeepTarget() {
+  if (!speakKeepWord?.word || !lookup(speakKeepWord.word)) return null;
+  // the token as the line carried it: readingToken and wordSaveFacts give an inflected surface's reading no say over
+  // its dictionary form, exactly as for a sentence's word anywhere
+  const door = readingToken({ s: speakKeepWord.surface || speakKeepWord.word, b: speakKeepWord.word, r: speakKeepWord.reading || '' });
+  return { label: door.b, ...wordSaveFacts(door) };
+}
+/** The top bar's one Save in the room, naming the word last touched in any line (the reader's keep, for talk). */
+function speakKeep() {
+  const target = speakKeepTarget();
+  const savedNow = () => {
+    const now = speakKeepTarget();
+    return !!now && !now.held && wordCaptureState(now.node) === 'taken';
+  };
+  const button = saveOne({
+    id: 'speak-keep', cls: 'chrome-keep', label: target?.label || '', word: target?.label || '', data: { saveBar: '' },
+    node: target && !target.held && !target.identityHeld ? target.node : null, place: 'drawer', saved: savedNow,
+    keep: () => {
+      const now = speakKeepTarget();
+      if (!now) { showReaderToast(tx('会話の語をタップしてから、保存する。', 'Tap a word in the conversation, then Save.')); return false; }
+      if (now.held || now.identityHeld) {
+        showReaderToast(now.held ? readerCaptureReasonText(now.label) : wordCaptureHeldText(now.node, { route: false }));
+        return false;
+      }
+      return toggleWordSave(now.node, now.label);
+    },
+    review: { saved: savedNow, toggle: () => { const now = speakKeepTarget(); return now ? toggleWordSave(now.node, now.label) : false; } },
+    more: () => [{ id: 'speak-keep-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(speakKeepTarget()?.label || '') }],
+  });
+  button.dataset.saveKey = target ? `${target.node.t}:${target.node.id}:${target.node.reading || ''}` : '';
+  if (!target) button.dataset.saveRest = '';
+  if (target && (target.held || target.identityHeld)) button.classList.add('reader-capture-held');
+  paintWordSave(button, savedNow());
+  button.setAttribute('aria-label', target
+    ? (savedNow() ? tx(`「${target.label}」保存済み`, `Saved ${target.label}`) : tx(`「${target.label}」を保存`, `Save ${target.label}`))
+    : tx('語を保存 — 会話の語をタップしてから', 'Save a word — tap a word in the conversation first'));
+  return button;
+}
+function syncSpeakKeep() {
+  const old = document.getElementById('speak-keep');
+  if (!old) return;
+  const fresh = speakKeep();
+  if (fresh.dataset.saveKey === old.dataset.saveKey && old.getAttribute('aria-expanded') === 'true') {
+    paintWordSave(old, fresh.getAttribute('aria-pressed') === 'true');
+    return;
+  }
+  old.replaceWith(fresh);
+}
+/** The room's one door into the app: closures over the app's own lexicon, doors, Save, record and sound. */
+function speakHost() {
+  return Object.freeze({
+    english: bi,
+    isCurrent: () => S.view === 'speak',
+    render: () => { if (S.view === 'speak') render(); },
+    // an article he read, for its scene: its title, its level and its text (a bounded excerpt is quoted to Kore)
+    article: async (id) => {
+      const p = D.passages.find((x) => x.id === id);
+      if (!p) return null;
+      try { await ensureArticle(p); } catch { /* the title still makes a scene */ }
+      return { id: p.id, title: p.title, titleEn: p.titleEn || '', level: p.readingFacets?.jlpt || null,
+        text: p.text || (p.tokens || []).map((token) => token.s).join('') };
+    },
+    // what he finished lately, newest first, with today's story ahead of them
+    recentArticles: () => {
+      const done = Object.entries(S.readDone || {}).sort((a, b) => Number(b[1]) - Number(a[1])).map(([id]) => id);
+      const today = todayReadPick()?.passage?.id;
+      const ids = [...new Set([...(today ? [today] : []), ...done])].slice(0, 4);
+      return ids.map((id) => D.passages.find((p) => p.id === id)).filter(Boolean)
+        .map((p) => ({ id: p.id, title: p.title, titleEn: p.titleEn || '', level: p.readingFacets?.jlpt || null }));
+    },
+    // his words for the conversation: Today's sky's picks in their order and with their reasons (read only), each with
+    // the reading he met it in, and the words he looked up in the scene's article
+    learning: (articleId) => {
+      const today = S.taken.length && scheduler ? todayQueue() : null;
+      let picks = [];
+      try { picks = todaySkyPicks(todayWordOfDay(today)?.word || '', today, todayReadPick()); } catch { picks = []; }
+      const out = { picks: picks.map((p) => ({ word: p.word, kind: p.kind, why: p.why, reading: p.item?.cueReading || lookup(p.word)?.r || '' })), articleTaps: [] };
+      if (articleId) {
+        const p = D.passages.find((x) => x.id === articleId);
+        const seen = new Set();
+        for (const row of [...(S.obslog || [])].reverse()) {
+          if (!Array.isArray(row) || row[1] !== 'tap' || row[4] !== articleId || !String(row[2]).startsWith('word:')) continue;
+          const word = String(row[2]).slice(5);
+          if (!word || seen.has(word)) continue;
+          seen.add(word);
+          const token = p?.tokens?.find((tk) => tk.b === word);
+          out.articleTaps.push({ word, reading: (token && tokenReading(token)) || lookup(word)?.r || '' });
+        }
+      }
+      return out;
+    },
+    defaultReading: (word) => D.dict?.[word]?.r || '',
+    level: () => null,
+    sentence: speakSentence,
+    // his own lines: every word a door that opens the slip and counts nothing (it is his own word)
+    words: (container, text) => {
+      const wrap = appendJapaneseLookup(container, text, { block: container, kinsoku: true });
+      for (const word of wrap.querySelectorAll('.japanese-lookup-word')) word.dataset.speakS = word.dataset.speakB = word.dataset.lookupText;
+      return wrap;
+    },
+    openSlip: (node, options = {}) => openSlip(node, { ...options, from: 'speak' }),
+    // the one Save ▾ for a word in the look back: one tap makes the card, exactly as everywhere
+    saveOne: ({ word, reading = '' }) => {
+      const door = readingToken({ s: word, b: word, r: reading });
+      const facts = lookup(word) ? wordSaveFacts(door) : null;
+      const node = facts && !facts.held && !facts.identityHeld ? facts.node : null;
+      const saved = () => !!node && wordCaptureState(node) === 'taken';
+      return saveOne({ cls: 'speak-save', label: word, word, node, saved, held: !node,
+        keep: () => (node ? toggleWordSave(node, word) : false),
+        review: { saved, toggle: () => (node ? toggleWordSave(node, word) : false) } });
+    },
+    // a line kept for 影 (her voice, on this device) is kept by the one Save ▾ too: one press keeps it, its menu removes it
+    saveLine: ({ text, saved, keep, remove }) => saveOne({ cls: 'speak-save speak-save-line', label: text, saved, keep,
+      more: () => (saved() ? [{ id: 'speak-line-remove', label: tx('外す', 'Remove'), run: remove }] : []) }),
+    setKeep: ({ word, surface = '', reading = '' }) => {
+      speakKeepWord = word ? { word, surface: surface || word, reading } : null;
+      syncSpeakKeep();
+      setTimeout(syncSpeakKeep, 600);
+    },
+    // one sound at a time: Kore's element becomes the app's one playback owner while she speaks
+    ownAudio: (audioEl) => {
+      if (recAudioEl !== audioEl) stopRecAudio();
+      recAudioEl = audioEl;
+      if (speakOwnedAudio.has(audioEl)) return;
+      speakOwnedAudio.add(audioEl);
+      const release = () => { if (recAudioEl === audioEl) recAudioEl = null; };
+      audioEl.addEventListener('ended', release);
+      audioEl.addEventListener('pause', release);
+    },
+    stopAudio: () => stopRecAudio(),
+    // one acknowledged write per turn: the archive rows and the gated evidence together, or nothing
+    commitTurn: async (archiveRows, found, xid) => {
+      if (!recordWritable() || !archiveRows.length || !archiveRows.every(validArchiveTurn)) return { ok: false, evidence: [] };
+      const evidence = xid ? speakGateEvidence(found, xid) : [];
+      const ok = await commitStorePatch((latest) => (evidence.length ? { obslog: [...latest.obslog, ...evidence] } : {}), archiveRows);
+      return { ok, evidence: ok ? evidence : [] };
+    },
+    recordWritable: () => recordWritable(),
+    archive: (surface) => aiLogAll(surface),
+    openTutor: () => { keepNavigationReturn('ai', document.activeElement); S.view = 'ai'; render(); window.scrollTo(0, 0); },
+    // V's lock as the app carries it: the VOICE_LOCK mirror that tools/sync-voice-lock.mjs generates from
+    // audio/voice-lock.json (no fetch, no race). Where this build has no mirror yet, the room keeps speak-core's
+    // checked fallback (VOICE_LOCK_FILE, equal to V's file whenever the file is in the tree).
+    // eslint-disable-next-line no-undef
+    voiceLock: () => (typeof VOICE_LOCK !== 'undefined' ? VOICE_LOCK : null),
+  });
+}
+/** A door into the room: the place it was opened from is kept, so Back returns to it (an article's line within 4 px). */
+function openSpeakRoom(from, scene = null, invoker = document.activeElement) {
+  if (!speakAvailable()) return;
+  roomTransition(() => {
+    keepNavigationReturn('speak', invoker);
+    speakFrom = plainRecord(from) && from.reader ? 'reader' : from === 'tests' ? 'tests' : 'dojo';
+    S.view = 'speak';
+    speakPending = scene || { id: 'free' };
+    if (speakRoom) { speakRoom.enter(speakPending); speakPending = null; speakEntered = true; }
+    render();
+    window.scrollTo(0, 0);
+  });
+}
+function renderSpeak(main) {
+  if (speakModule) {
+    speakRoom ||= speakModule.createSpeakRoom(speakHost());
+    if (speakPending || !speakEntered) { speakRoom.enter(speakPending || { id: 'free' }); speakPending = null; speakEntered = true; }
+    speakRoom.render(main);
+    return;
+  }
+  main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.speak)));
+  const state = el('p', 'gloss', speakFailed
+    ? tx('この部屋を開けなかった。保存した記録はそのまま残っている。', 'This room didn’t open. Nothing you saved is affected.')
+    : tx('部屋を開いています…', 'Opening the room…'));
+  state.setAttribute('role', 'status');
+  main.append(state);
+  if (speakFailed) {
+    const retry = el('button', 'chip', tx('もう一度', 'Try again'));
+    retry.type = 'button'; retry.dataset.speakRetry = '';
+    retry.addEventListener('click', () => { speakFailed = false; render(); });
+    main.append(retry);
+    return;
+  }
+  loadSpeakRoom().then(() => { if (S.view === 'speak') render(); }, () => { if (S.view === 'speak') render(); });
+}
+/** Back in the room: its own layers recede first; from its front it returns through the door it came in. */
+function speakBack() {
+  if (speakRoom?.back()) return true;
+  if (!roomTransitionUpdating) { roomTransition(() => back()); return true; }
+  speakRoom?.leave();
+  if (returnFromNavigation()) return true;
+  S.view = speakFrom === 'tests' ? 'tests' : speakFrom === 'reader' && S.passageId ? 'reader' : 'dojo';
+  render();
+  if (S.view === 'reader') returnScroll(); else window.scrollTo(0, 0);
+  return true;
+}
+/** The article's foot: one quiet chip beside 読み終えた. */
+function speakChip(p) {
+  if (!speakAvailable()) return document.createDocumentFragment();
+  const chip = el('button', 'chip speak-door', tx('話してみる', '話す · Talk it over'));
+  chip.type = 'button';
+  chip.id = 'read-speak';
+  chip.lang = bi() ? 'en' : 'ja';
+  chip.addEventListener('click', (event) => openSpeakRoom({ reader: p.id, scroll: Math.round(window.scrollY) }, { kind: 'article', id: p.id }, event.currentTarget));
+  return chip;
+}
 /** The JLPT room's own door to the guided session, beside the level and length chooser. */
 function guidedDoorInJlptRoom(main) {
   const lengths = main.querySelector('.exam-lengths');
@@ -25725,6 +26006,7 @@ function studyHallDoors() {
     }],
     ['guided', '案内つきの練習', 'Guided test practice', tx('N2 筆記 6問 · 一問ごとに解説', 'N2 written · 6 questions · every question explained'),
       () => openGuidedRoom(placesLayout() ? 'tests' : 'dojo')],
+    ...(speakAvailable() ? [['speak', '話す', 'Speak', tx('Kore と、今日のことばで', 'with Kore, in your words'), (event) => openSpeakRoom(placesLayout() ? 'tests' : 'dojo', null, event?.currentTarget)]] : []),
     ['lessons', 'レッスン', 'lessons', tx('語彙の稽古', 'vocabulary lessons'), () => {
       keepScroll(); S.view = 'lessons'; render(); window.scrollTo(0, 0);
     }],
@@ -26033,6 +26315,7 @@ function renderStudyHall(main, doors) {
   more.append(learnHead('05', 'ほかの稽古', 'More practice', ''));
   const list = el('div', 'learn-more-list');
   list.append(doors.lessons, doors.sentence, doors.probe, doors.levels);
+  if (doors.speak) list.prepend(doors.speak);
   more.append(list);
 
   hall.append(guided, decks, focus, tests, more);
@@ -26158,6 +26441,7 @@ function renderTests(main) {
   more.append(learnHead('03', 'ほかの練習', 'More practice', ''));
   const list = el('div', 'learn-more-list');
   list.append(doors.lessons, doors.sentence, doors.levels);
+  if (doors.speak) list.prepend(doors.speak);
   more.append(list);
   more.append(el('p', 'fine study-hall-note', tx(
     '試験で間違えた語は、保存して復習に回せる。',
@@ -33674,6 +33958,7 @@ const ROOM_NAMES = Object.freeze({
     saved: ['保存した語とリスト', 'Saved words & lists'], list: ['保存した語とリスト', 'Saved words & lists'],
     browse: ['札を探す', 'Browse cards'], aiquiz: ['小テスト', 'Quiz'],
     mock: ['模擬試験', 'Practice tests'], tests: ['試験', 'Tests'], guided: ['案内つきの練習', 'Guided practice'], lessons: ['レッスン', 'Lessons'],
+    speak: ['話す', 'Speak'],
     levels: ['JLPT・漢検の一覧', 'JLPT & Kanken lists'], 'sentence-practice': ['文の練習', 'Sentence practice'],
     search: ['辞書', 'Dictionary'], kanjidex: ['漢字を調べる', 'Kanji by shape'], grammar: ['文法', 'Grammar'],
     yoji: ['四字熟語', 'Four-character idioms'], thesaurus: ['言葉のつながり', 'Word web'],
@@ -33695,7 +33980,7 @@ const tabWords = ([ja, en]) => ({ ja, en });
 const PRIMARY_TABS = [
   { id: 'today', ...tabWords(ROOM_NAMES.line.tray), view: 'tray', views: ['tray', 'list', 'browse', 'review', 'aiquiz'] },
   { id: 'read', ...tabWords(ROOM_NAMES.line.shelf), view: 'shelf', views: ['shelf', 'reader', 'archive', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader'] },
-  { id: 'learn', ...tabWords(ROOM_NAMES.line.dojo), view: 'dojo', views: ['dojo', 'deckplay', 'contextdeck', 'personaldeck', 'probe', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice', 'ai'] },
+  { id: 'learn', ...tabWords(ROOM_NAMES.line.dojo), view: 'dojo', views: ['dojo', 'deckplay', 'contextdeck', 'personaldeck', 'probe', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice', 'ai', 'speak'] },
   { id: 'words', ...tabWords(ROOM_NAMES.line.search), view: 'search', views: ['search', 'kanjidex', 'grammar', 'yoji', 'thesaurus'] },
   { id: 'me', ...tabWords(ROOM_NAMES.line.me), view: 'me', views: ['me', 'kagami', 'srs-stats', 'settings'] },
   // r4 skin: your own texts are a deck; the page's way back and its Learn row both lead to Learn,
@@ -33713,7 +33998,7 @@ const PLACES_TABS = [
   { id: 'review', ...tabWords(ROOM_NAMES.places.dojo), view: 'dojo', due: true, views: ['dojo', 'review', 'deckplay', 'contextdeck', 'personaldeck', 'probe', 'saved', 'list', 'browse', 'aiquiz'] },
   { id: 'bookshelf', ...tabWords(ROOM_NAMES.places.shelf), view: 'shelf', views: ['shelf', 'reader', 'archive', 'airead', 'feed', 'publisher', 'source-inbox', 'source-reader'] },
   { id: 'dictionary', ...tabWords(ROOM_NAMES.places.search), view: 'search', views: ['search', 'kanjidex', 'grammar', 'yoji', 'thesaurus'] },
-  { id: 'tests', ...tabWords(ROOM_NAMES.places.tests), view: 'tests', views: ['tests', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice'] },
+  { id: 'tests', ...tabWords(ROOM_NAMES.places.tests), view: 'tests', views: ['tests', 'mock', 'guided', 'lessons', 'levels', 'sentence-practice', 'speak'] },
   { id: 'progress', ...tabWords(ROOM_NAMES.places.me), view: 'me', views: ['me', 'kagami', 'srs-stats', 'settings'] },
 ];
 /** The tab table of the layout in use. */
@@ -35017,6 +35302,7 @@ function render() {
   // something"): where the + stood, the one Save in the bar's own type, naming the word last touched (Save 総理); before a
   // word is touched it says what it does (Save a word). Its path is the slip's Save on the same word (chromeKeep).
   if (S.view === 'reader' && passage()) chrome.append(chromeKeep());
+  if (S.view === 'speak') chrome.append(speakKeep());
   // Today: a quiet bookmark and its saved-word count. The on-screen bookmark stays quiet; its
   // name states the room it opens and that the number is saved words, not today's cards.
   const trayBtn = biLabel('button', null, `今日 ${S.taken.length}`, `Today ${S.taken.length}`);
@@ -35138,6 +35424,7 @@ function render() {
     else if (S.view === 'yoji') renderYoji(main);
     else if (S.view === 'grammar') renderGrammar(main);
     else if (S.view === 'guided') renderGuided(main);
+    else if (S.view === 'speak') renderSpeak(main);
     else if (S.view === 'contextdeck') renderContextDeck(main);
     else if (S.view === 'search') { renderSearchPage(main); renderWordsDoors(main); }
     else if (S.view === 'me') renderMe(main);
