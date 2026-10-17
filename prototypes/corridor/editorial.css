@@ -5499,3 +5499,17 @@ body[data-furigana='0'] #drift-layer .word .yomi { opacity: 0; }
 body[data-furigana] #drift-layer .drift-reading rt { font-size: .45em; line-height: 1; opacity: 0; }
 body[data-furigana='1'] #drift-layer .hosted-reading-shown .drift-reading rt,
 body[data-furigana='2'] #drift-layer .drift-reading rt { opacity: 1; }
+
+/* G6 · scale thread */
+.scale-thread { display: inline-flex; align-items: center; gap: 2px; max-width: 100%; min-width: 0; min-height: 44px; overflow-x: auto; overscroll-behavior-x: contain; touch-action: pan-x pan-y pinch-zoom; color: var(--color-bar-ink, currentColor); vertical-align: middle; scrollbar-width: thin; }
+.scale-thread > :is(button, .scale-current) { box-sizing: border-box; flex: 0 0 auto; display: inline-block; max-width: 100px; min-width: 44px; min-height: 44px; padding: 12px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; background: transparent; color: inherit; font: inherit; font-size: 13px; line-height: 20px; text-align: center; }
+.scale-thread > button { cursor: pointer; }
+.scale-thread > button:focus-visible { outline: 1px solid currentColor; outline-offset: -3px; }
+.scale-thread > [data-scale-out] { position: sticky; left: 0; z-index: 1; width: 44px; max-width: 44px; padding-inline: 4px; background: var(--color-bar, var(--ed-paper)); font-size: 19px; }
+.scale-thread > [aria-current='step'] { font-weight: 600; }
+.scale-thread > button:disabled { cursor: default; opacity: 1; }
+#sheet > .scale-thread { position: sticky; top: calc(45px + env(safe-area-inset-top, 0px)); z-index: 3; display: flex; max-width: none; margin: -24px calc(-1 * var(--page-gutter, 32px)) 20px; padding-inline: max(12px, calc(var(--page-gutter, 20px) - 8px)); background: var(--color-bar, var(--ed-paper)); box-shadow: 0 1px 0 color-mix(in srgb, currentColor 12%, transparent); }
+#app > .scale-thread { position: sticky; top: calc(45px + env(safe-area-inset-top, 0px)); z-index: 19; flex: 0 0 auto; width: 100%; background: var(--color-bar, var(--ed-paper)); box-shadow: 0 1px 0 color-mix(in srgb, currentColor 12%, transparent); }
+body.ginga #app > .scale-thread { position: fixed; left: 0; top: calc(56px + env(safe-area-inset-top, 0px)); }
+/* The deck's one-finger vertical scroll must still allow the phone's text zoom. */
+#kp-card { touch-action: pan-y pinch-zoom; }

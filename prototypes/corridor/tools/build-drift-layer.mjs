@@ -404,6 +404,7 @@ patch(
     `__layer.innerHTML = ${'__MARKUP_JSON__'};\n` +
     'document.body.prepend(__layer);\n' +
     'let DRIFT_ON = false;\nlet rafOn = false;\n' +
+    "// G6: the host owns the scale chain. Drift retains only its own live scene.\nlet scaleBridge=null,scaleBusy=false,scaleBlocked=false,scaleHandConsumed=false,scaleConsumedAt=0,scaleDrain=false;\nlet scaleArticle=null,scaleLayer=null,scaleProjectionKey='',scaleCameraKey='',scaleWorldKey='';\nlet scaleSceneGeneration=0;\nconst scaleStars=new Map(),scaleNodeIds=new WeakMap();\nlet scaleNodeSerial=0;\nconst scalePhysicalPointers=new Set();\n" +
     'let recordBridge=null,recordGeneration=0,recordView=null,recordReady=false,recordRead=null,recordCodec=null;\n' +
     'const recordPending=new Set();\nlet recordCueIntent=null,recordCueRun=null;',
   'IIFE head + gate flag',
@@ -1111,6 +1112,209 @@ function setRecordBridge(bridge){
 }
 `;
 
+// G6 · the scale bridge extends the generated host, never the frozen donor.
+patch("  if(!DRIFT_ON||recordPending.size)return;\n  if(e.isPrimary&&touches.size){touches.clear();pinch=null;}",
+  "  if(!skyPointerAllowed(e))return;\n  if(scaleBridge){\n    scalePhysicalPointers.add(e.pointerId);\n    if(scaleDrain){scaleBlocked=true;return;}\n  }\n  if(!touches.size){scaleConsumedAt=0;scaleHandConsumed=false;}", "G6 pointer origins belong to the visible sky only");
+patch("  touches.set(e.pointerId,{x:e.clientX,y:e.clientY});",
+  "  touches.set(e.pointerId,{x:e.clientX,y:e.clientY});\n  if(scaleBridge&&scaleBlocked)return;", "G6 cancelled hand stays cancelled until all pointers leave");
+patch("  if(touches.size===2){\n    rebasePinch();",
+  "  if(touches.size===2){\n    if(scaleBridge){scaleHandConsumed=true;scaleConsumedAt=performance.now();}\n    rebasePinch();", "G6 every two-pointer hand consumes its compatibility click");
+patch("  const t2=touches.get(e.pointerId);",
+  "  const t2=touches.get(e.pointerId);\n  if(scaleBridge&&t2&&!scaleSceneReady()){blockScaleHand();return;}", "G6 a hosted overlay cancels an already tracked hand");
+patch("  const owner=e.pointerId===gestureId;",
+  "  if(scaleBridge&&touches.has(e.pointerId)&&!scaleSceneReady()){cancelPointer(e);return;}\n  const owner=e.pointerId===gestureId;", "G6 an admitted hand cannot finish behind a hosted overlay or pending record");
+patch("      if(pn===tn&&!moved&&touches.size===1&&!tn.gone){",
+  "      if(pn===tn&&!moved&&touches.size===1&&!tn.gone&&(!scaleBridge||scaleSceneReady())){", "G6 long press preserves current scene admission");
+patch("function rebasePinch(){\n  if(touches.size!==2)",
+  "function rebasePinch(){\n  if(scaleBridge&&scaleBlocked){pinch=null;return;}\n  if(touches.size!==2)", "G6 no pinch rebasing after third pointer");
+patch("  if(touches.size>2){\n    pinch=null;",
+  "  if(touches.size>2){\n    if(scaleBridge)scaleBlocked=true;\n    pinch=null;", "G6 third pointer cancels whole hand");
+patch("    const mid={x:(v[0].x+v[1].x)/2,y:(v[0].y+v[1].y)/2};",
+  "    const mid={x:(v[0].x+v[1].x)/2,y:(v[0].y+v[1].y)/2};\n    if(scalePinchMove(d,mid))return;", "G6 one scale crossing with the actual sky midpoint");
+patch("  if(!touches.delete(e.pointerId)) return false;\n  if(FOCUS.length)",
+  "  if(!touches.delete(e.pointerId)) return false;\n  if(scaleBridge&&scaleHandConsumed)scaleConsumedAt=performance.now();\n  if(!touches.size){scaleBlocked=false;scaleHandConsumed=false;}\n  if(FOCUS.length)", "G6 release cancelled hand only when empty");
+patch("function cancelPointer(e){",
+  "function cancelPointer(e){\n  if(scaleBridge){\n    if(!touches.delete(e.pointerId))return;\n    const consumed=scaleHandConsumed||touches.size>0;\n    blockScaleHand();scaleBlocked=touches.size>0;scaleHandConsumed=scaleBlocked&&consumed;\n    return;\n  }", "G6 cancelled owned pointer cannot promote a remainder");
+patch("function buildWorld(){",
+  "function buildWorld(){\n  scaleSceneGeneration++;", "G6 retained sky place pins actual world generation");
+patch("  drawTrail(t);\n  if(DRIFT_ON)",
+  "  drawTrail(t);\n  drawScaleStars();\n  if(DRIFT_ON)", "G6 star projection follows the real camera");
+patch("driftState:parseDriftState(raw.driftState)});",
+  "driftState:parseDriftState(raw.driftState),keptWords:checkedKeptWords(raw.keptWords)});", "G6 validate immutable kept projection");
+patch("if(view.revision===recordView.revision&&JSON.stringify(view.driftState)!==JSON.stringify(recordView.driftState))",
+  "if(view.revision===recordView.revision&&(JSON.stringify(view.driftState)!==JSON.stringify(recordView.driftState)||JSON.stringify(view.keptWords)!==JSON.stringify(recordView.keptWords)))", "G6 reject conflicting projection at same revision");
+patch("  recordView=view;recordReady=true;",
+  "  recordView=view;recordReady=true;\n  paintScaleStars();", "G6 publish kept points only after committed record view");
+patch("  recordReady=false;__layer.dataset.recordState=\"recovery-required\";",
+  "  recordReady=false;__layer.dataset.recordState=\"recovery-required\";\n  paintScaleStars();", "G6 retire unconfirmed record projection");
+
+js += `
+function canNavigate(){return !recordPending.size&&!recordCueRun;}
+function scaleSceneReady(){
+  return DRIFT_ON&&canNavigate()&&(!scaleBridge||scaleBridge.canStep()===true);
+}
+function skyPointerAllowed(e){
+  const target=e.target;
+  return scaleSceneReady()&&target instanceof Element&&__layer.contains(target)&&
+    !hostChrome(target)&&!target.closest('#card,#radoc,#lvl,.scale-star');
+}
+function clearScalePointers(){
+  // A scene can sleep while its physical hand is still on the glass.
+  if(scalePhysicalPointers.size){scaleDrain=true;scaleConsumedAt=performance.now();}
+  clearTimeout(lpTimer);lpFired=false;
+  if(pn){pn.dragX=0;pn.dragY=0;}
+  pn=null;touches.clear();pinch=null;gestureActive=false;gestureId=null;moved=false;scaleBlocked=scaleDrain;scaleHandConsumed=scaleDrain;
+  cam.vx=0;cam.vy=0;
+}
+function drainScalePointer(event){
+  // Passive observation only: foreign text/chrome pointers are never acquired.
+  if(!scalePhysicalPointers.delete(event.pointerId)||scalePhysicalPointers.size||!scaleDrain)return;
+  scaleDrain=false;scaleBlocked=false;scaleHandConsumed=false;scaleConsumedAt=performance.now();
+}
+function requestScaleStep(direction,target){
+  if(!scaleBridge||scaleBusy||!scaleSceneReady()||scaleBridge.canStep(direction,target)!==true)return false;
+  scaleBusy=true;
+  let result;
+  try{result=scaleBridge.step(direction,target);}
+  catch(error){scaleBusy=false;throw error;}
+  if(result&&typeof result.then==='function'){
+    // A second control cannot race a host transition that is still settling.
+    return Promise.resolve(result).then(value=>value!==false,error=>{
+      console.error('Scale transition failed',error);
+      setHint(uiT('移動できませんでした。もう一度試してください。','Could not move. Please try again.'));
+      return false;
+    }).finally(()=>{scaleBusy=false;});
+  }
+  scaleBusy=false;return result!==false;
+}
+function blockScaleHand(){
+  scaleBlocked=true;scaleHandConsumed=true;scaleConsumedAt=performance.now();
+  pinch=null;clearTimeout(lpTimer);lpFired=false;
+  if(pn){pn.dragX=0;pn.dragY=0;}
+  pn=null;gestureActive=false;gestureId=null;moved=false;
+}
+function scalePinchMove(distance,mid){
+  if(!scaleBridge)return false;
+  if(scaleBlocked||pinch.fired)return true;
+  const ratio=distance/pinch.d0;
+  const direction=ratio>1.28?'in':ratio<0.74?'out':null;
+  if(!direction)return true;
+  // One crossing, even when the host refuses it. A new intent needs a new hand.
+  pinch.fired=true;scaleConsumedAt=performance.now();
+  gestureId=null;gestureActive=false;clearTimeout(lpTimer);
+  if(stack.length&&direction==='in'){
+    if(scaleSceneReady()&&!scaleBusy)pinchDive(mid);
+    return true;
+  }
+  requestScaleStep(direction,scaleArticle?{articleId:scaleArticle.articleId}:undefined);
+  return true;
+}
+function setScaleBridge(bridge){
+  if(!bridge||typeof bridge.canStep!=='function'||typeof bridge.step!=='function')throw new Error('scale-bridge-required');
+  if(!canNavigate())return false;
+  clearScalePointers();scaleBridge=bridge;paintScaleStars();return true;
+}
+function scenePath(){
+  if(stack.length>64||stack.some(level=>!level.center?.el?.isConnected||level.center.gone||level.center.removed))return null;
+  return stack.map(level=>{
+    const n=level.center;
+    if(!scaleNodeIds.has(n))scaleNodeIds.set(n,++scaleNodeSerial);
+    const retained=scaleNodeIds.get(n);
+    return n.kind==='word'?['word',n.w,n.r||'',n.g||'',retained]:[n.kind,n.ch,!!n.comp,retained];
+  });
+}
+function capturePlace(){
+  if(!canNavigate())return null;
+  const path=scenePath();if(!path)return null;
+  return Object.freeze({version:1,scopeId:recordView?.scopeId||null,generation:recordGeneration,
+    sceneGeneration:scaleSceneGeneration,path:JSON.stringify(path),
+    world:Object.freeze({width:WR.w,height:WR.h}),camera:Object.freeze({x:cam.x,y:cam.y,z:cam.z,rot:cam.rot})});
+}
+function restorePlace(place){
+  const path=scenePath();
+  if(!path||!canNavigate()||!place||place.version!==1||place.scopeId!==(recordView?.scopeId||null)||
+    place.generation!==recordGeneration||place.sceneGeneration!==scaleSceneGeneration||place.path!==JSON.stringify(path)||
+    place.world?.width!==WR.w||place.world?.height!==WR.h)return false;
+  const c=place.camera;
+  if(!c||!['x','y','z','rot'].every(key=>Number.isFinite(c[key]))||c.z<0.34||c.z>2.6||Math.abs(c.rot)>Math.PI||
+    c.x<0||c.x>WR.w||c.y<0||c.y>WR.h)return false;
+  clearScalePointers();Object.assign(cam,{x:c.x,y:c.y,z:c.z,rot:c.rot});camT=null;camClamp();hostDepth();paintScaleStars();return true;
+}
+function focusArticle(article){
+  if(article===null){scaleArticle=null;paintScaleStars();return true;}
+  if(!article||typeof article.articleId!=='string'||!article.articleId||typeof article.title!=='string')return false;
+  if(scaleArticle?.articleId!==article.articleId||article.reveal===true){
+    // The star is anchored in the retained camera's world, never in a donor word.
+    const p=s2wl(vw()/2,vh()*0.34);
+    scaleArticle={articleId:article.articleId,title:article.title,x:p.x,y:p.y};
+  }else scaleArticle.title=article.title;
+  paintScaleStars();return true;
+}
+function checkedKeptWords(rows){
+  if(rows===undefined)return []; // older bridge consumers have no kept projection
+  if(!Array.isArray(rows))throw new Error('kept-projection-invalid');
+  const seen=new Set();
+  return rows.map(row=>{
+    if(!row||typeof row.key!=='string'||seen.has(row.key)||typeof row.id!=='string'||!row.id||
+      typeof row.label!=='string'||typeof row.reading!=='string'||!['available','mismatch','unavailable'].includes(row.status))
+      throw new Error('kept-projection-invalid');
+    seen.add(row.key);
+    return Object.freeze({key:row.key,id:row.id,label:row.label,reading:row.reading,status:row.status});
+  });
+}
+function scaleHash(key){let h=2166136261;for(const ch of key)h=Math.imul(h^ch.codePointAt(0),16777619)>>>0;return h;}
+function paintScaleStars(){
+  if(!scaleBridge)return;
+  const rows=recordReady?recordView?.keptWords||[]:[];
+  scaleWorldKey=WR.w+','+WR.h;
+  const signature=JSON.stringify([scaleArticle,recordView?.scopeId,rows,WR.w,WR.h]);
+  if(signature!==scaleProjectionKey){
+    scaleProjectionKey=signature;
+    if(!scaleLayer){
+      scaleLayer=document.createElement('div');scaleLayer.className='scale-stars';scaleLayer.setAttribute('aria-label',uiT('読んだ星と残した言葉','Your article and kept words'));
+      __layer.append(scaleLayer);
+    }
+    const next=new Set();
+    const mount=(key,label,attrs,x,y,action)=>{
+      next.add(key);let star=scaleStars.get(key);
+      if(!star){star=document.createElement('button');star.type='button';star.className='scale-star';star.addEventListener('click',()=>star.scaleActivate?.());scaleStars.set(key,star);scaleLayer.append(star);}
+      star.textContent=label;star.setAttribute('aria-label',attrs.articleId?uiT('読み物の棚へ：','Article shelf: ')+label:uiT('残した言葉：','Kept word: ')+label);
+      if(attrs.articleId)star.dataset.articleId=attrs.articleId;else star.dataset.keptKey=attrs.keptKey;
+      star.classList.toggle('scale-star-article',!!attrs.articleId);star.classList.toggle('scale-star-kept',!attrs.articleId);
+      star.scaleActivate=action;star.scaleX=x;star.scaleY=y;
+    };
+    if(scaleArticle)mount('article:'+scaleArticle.articleId,scaleArticle.title,{articleId:scaleArticle.articleId},scaleArticle.x,scaleArticle.y,()=>requestScaleStep('in',{articleId:scaleArticle.articleId}));
+    for(const row of rows){
+      const h=scaleHash(row.key),h2=scaleHash(row.key+'y');
+      const x=WR.w*(0.12+(h%100000)/100000*0.76),y=WR.h*(0.12+(h2%100000)/100000*0.76);
+      mount('kept:'+row.key,row.label,{keptKey:row.key},x,y,()=>requestScaleStep('word',{wordKey:row.key}));
+    }
+    for(const [key,star]of scaleStars)if(!next.has(key)){star.remove();scaleStars.delete(key);}
+    scaleCameraKey='';
+  }
+  drawScaleStars();
+}
+function drawScaleStars(){
+  if(scaleBridge&&scaleWorldKey!==WR.w+','+WR.h){paintScaleStars();return;}
+  const cameraKey=[cam.x,cam.y,cam.z,cam.rot,vw(),vh(),WR.w,WR.h,stack.length].join(',');
+  if(cameraKey===scaleCameraKey)return;
+  scaleCameraKey=cameraKey;
+  for(const star of scaleStars.values()){
+    const p=w2s(star.scaleX,star.scaleY),visible=!stack.length&&p.x>=30&&p.x<=vw()-30&&p.y>=80&&p.y<=vh()-100;
+    star.hidden=!visible;
+    if(visible)star.style.transform='translate('+p.x+'px,'+p.y+'px) translate(-50%,-50%)';
+  }
+}
+
+// Observe terminal events even when a newly opened control stops bubbling.
+// No pointer capture, preventDefault or propagation changes are involved.
+addEventListener('pointerup',drainScalePointer,{capture:true,passive:true});
+addEventListener('pointercancel',drainScalePointer,{capture:true,passive:true});
+__layer.addEventListener('click',event=>{
+  if(event.detail>0&&scaleConsumedAt&&performance.now()-scaleConsumedAt<600){event.preventDefault();event.stopImmediatePropagation();scaleConsumedAt=0;}
+},{capture:true});
+`;
+
 // 4 · the public seam the corridor drives
 js += `
 window.__DRIFT__ = {
@@ -1118,6 +1322,7 @@ window.__DRIFT__ = {
   setRecordBridge,
   refreshRecord,
   setPracticePriorities,
+  setScaleBridge, canNavigate, capturePlace, restorePlace, focusArticle,
   show() {
     if(recordBridge)void refreshRecord();
     DRIFT_ON = true;
@@ -1127,6 +1332,7 @@ window.__DRIFT__ = {
     if (!rafOn) { rafOn = true; requestAnimationFrame(frame); }
   },
   hide() {
+    clearScalePointers();
     DRIFT_ON = false;
     __layer.inert = true;
     document.getElementById('drift-layer').classList.remove('active');
@@ -1144,7 +1350,17 @@ window.__DRIFT__ = {
 `;
 
 renameId('tray', 'drift-tray');
-const cssOut = css.replace(/#tray\b/g, '#drift-tray');
+const cssOut = (css + `
+/* The article and kept words are real targets in the retained sky. */
+#drift-layer .scale-stars { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+#drift-layer .scale-star { position: absolute; left: 0; top: 0; max-width: 210px; min-width: 44px; min-height: 44px; padding: 8px 14px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 13px; line-height: 1.5; text-align: center; cursor: pointer; pointer-events: auto; }
+#drift-layer .scale-star[hidden] { display: none; }
+#drift-layer .scale-star::before { content: '✦'; display: block; font-size: 22px; line-height: 1; }
+#drift-layer .scale-star-kept { color: var(--verm, #b34836); }
+#drift-layer .scale-star-kept::before { content: '・'; font-size: 30px; }
+#drift-layer .scale-star:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; border-radius: 4px; }
+/* The scale thread shares the world's bar ink and keeps every ancestor in reach. */
+`).replace(/#tray\b/g, '#drift-tray');
 
 // splice the markup into the mount snippet; guard the one sequence that can
 // end an inline <script> early when the standalone build embeds this file

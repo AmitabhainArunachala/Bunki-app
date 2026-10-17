@@ -433,6 +433,7 @@ const S = {
   tabRoot: null,
   // Disposable detours, never learner evidence or scheduler state.
   navigationReturns: [],
+  scaleVisit: null, // G6 origin only; current scale is S.view / S.stack.
   sheetReturnFocus: null,
   fwd: null,
   /* 文字設定 — persisted (operator, 2026-08-12): a chosen setting must
@@ -3341,6 +3342,54 @@ function noteIgnoredSrsParams(reason) {
 // waits for the same async record transaction to confirm both roots before
 // publishing a judgment. Drift grades words, kanji glyphs, and
 // particle satellites; each keeps its own modality-true target type.
+/** G6 projection: a seal is membership in Review or a learner list, never a
+ * Drift grade. Read one committed snapshot; preserve its saved lexical identity.
+ * This function never mutates the record or invents a second persisted shape. */
+function keptWordProjection(record) {
+  const words = new Map();
+  const remember = row => {
+    if (row?.t === 'word' && nonEmptyString(row.id) && !words.has(row.id)) words.set(row.id, row);
+  };
+  for (const row of record.taken || []) remember(row);
+  for (const list of Object.values(record.lists || {})) for (const row of list || []) remember(row);
+  return [...words.values()].map(row => {
+    const identity = wordCardIdentity(record, row.id);
+    const answer = savedAnswerFor({ t: 'word', id: row.id }, record);
+    const key = JSON.stringify([row.id, identity.kind, identity.seq || null,
+      identity.reading ?? null, identity.gloss ?? null]);
+    return { key, id: row.id, label: row.label || row.id, identity,
+      reading: identity.reading || answer?.reading || '', status: answer?.status || 'unavailable', answer };
+  }).sort((a, b) => a.key < b.key ? -1 : a.key > b.key ? 1 : 0);
+}
+
+/** A kept star opens the saved answer it names. Broken snapshots stay visible
+ * without silently borrowing today's dictionary answer for a different entry. */
+function renderKeptWordNode(sheet, node) {
+  const answer = node.keptAnswer;
+  sheet.append(el('h2', 'headword', answer?.head || node.id));
+  const reading = node.reading || answer?.reading;
+  if (reading) sheet.append(el('p', 'reading', reading));
+  sheet.append(el('p', 'eyebrow', tx('残した言葉', 'Kept word')));
+  if (answer?.status === 'available') {
+    const senses = el('ol', 'sense-list');
+    for (const meaning of answer.meanings) senses.append(el('li', null, meaning));
+    sheet.append(senses);
+  } else {
+    const line = el('p', 'gloss absent', tx('残した語釈を確認できません。言葉は残っています。', 'The saved answer is unavailable. Your word is still kept.'));
+    line.dataset.keptStatus = answer?.status || 'unavailable';
+    sheet.append(line);
+  }
+  const rows = el('div', 'entry-rows');
+  for (const ch of [...new Set([...node.id])].filter(ch => D.kanji[ch])) {
+    const row = el('button', 'entry-row');row.type = 'button';row.dataset.kanjirow = ch;
+    const glyph = el('span', 'row-glyph', ch);
+    row.append(glyph, el('span', 'row-main', D.kanji[ch].m), el('span', 'row-go', '›'));
+    row.addEventListener('click', () => go({ t: 'kanji', id: ch, from: node.from }, { invoker: row, from: glyph }));
+    rows.append(row);
+  }
+  if (rows.childElementCount) sheet.append(rows);
+}
+
 async function installDriftRecord() {
   if (!window.__DRIFT__?.setRecordBridge || !recordApp) return;
   const epoch = recordEpoch;
@@ -3350,7 +3399,8 @@ async function installDriftRecord() {
     const current = recordApp.current();
     if (!isCurrent(scopeId) || current.status !== 'active') return { status: 'recovery-required' };
     return { status: 'active', scopeId, revision: current.snapshot.revision,
-      driftState: recordControllerModule.readDriftState(current.snapshot.record) };
+      driftState: recordControllerModule.readDriftState(current.snapshot.record),
+      keptWords: keptWordProjection(current.snapshot.record).map(({ key, id, label, reading, status }) => ({ key, id, label, reading, status })) };
   };
   const commands = new Map();
   await window.__DRIFT__.setRecordBridge({ version: 1, isCurrent,
@@ -3426,7 +3476,7 @@ async function installDriftRecord() {
 // seal, nav, bubbles, or any overlay is never read by the water as an
 // open-water tap (which razed the learner's constellation — P1, review)
 window.bunkiDriftChrome =
-  '#ginga-symbol, #ginga-theme-seal, .ginga-seal, .nav-scrim, .nav-bar, .corner-bubble, .world-picker, .world-picker-scrim, #variants, #chrome';
+  '#ginga-symbol, #ginga-theme-seal, .ginga-seal, .nav-scrim, .nav-bar, .corner-bubble, .world-picker, .world-picker-scrim, #variants, #chrome, .scale-thread, .scale-article-return';
 // 深さの橋 — the water reports its dive depth so the fused chrome can offer
 // a way OUT of a dive (the in-water return hint is chrome-hidden and the
 // nav back arrow knew only the corridor stack — P1, review: "no visible
@@ -3440,6 +3490,10 @@ window.bunkiDriftDepth = (depth) => {
   // consumes it — device Back then means leave, as it should
   syncWalkSentinel();
   if (S.navOpen) render(); // the open nav's back arrow re-arms live
+  else if (S.ready && S.view === 'drift' && !S.stack.length) {
+    const root = document.getElementById('app');
+    if (root) paintRoomScaleThread(root);
+  }
 };
 addEventListener('pagehide', () => {
   if (mockClock && S.assessmentLibrary?.activeAttemptId && recordReady()) {
@@ -4823,6 +4877,8 @@ function invokerKey(node) {
   // a 銀河 search row has no id and dies with the bar; its index survives so
   // the restored results can hand focus back to the row that was left
   if (node.matches?.('.nav-search-row')) return { kind: 'nav-row', ix: node.dataset.ix || '0' };
+  if (node.matches?.('#drift-layer [data-kept-key]')) return { kind: 'sky-kept', key: node.dataset.keptKey };
+  if (node.matches?.('#drift-layer [data-article-id]')) return { kind: 'sky-article', id: node.dataset.articleId };
   if (node.id) return { kind: 'id', id: node.id };
   return null;
 }
@@ -4831,7 +4887,9 @@ function restoreDialogInvoker() {
   const key = S.dialogInvoker;
   S.dialogInvoker = null;
   if (!key) return;
+  const view = S.view, passageId = S.passageId, top = S.stack.at(-1);
   requestAnimationFrame(() => {
+    if (S.view !== view || S.passageId !== passageId || S.stack.at(-1) !== top) return;
     let target = null;
     if (key.kind === 'reader-token') {
       target = document.querySelector(
@@ -4846,6 +4904,10 @@ function restoreDialogInvoker() {
       target =
         document.querySelector(`.nav-search-row[data-ix="${key.ix}"]`) ||
         document.getElementById('nav-search-input');
+    } else if (key.kind === 'sky-kept') {
+      target = document.querySelector(`#drift-layer [data-kept-key="${CSS.escape(key.key)}"]`);
+    } else if (key.kind === 'sky-article') {
+      target = document.querySelector(`#drift-layer [data-article-id="${CSS.escape(key.id)}"]`);
     } else if (key.kind === 'id') {
       target = document.getElementById(key.id);
     }
@@ -4926,13 +4988,603 @@ function rememberSheet(invoker = document.activeElement) {
   parent.returnFocus = sheetDoorKey(invoker, sheet);
 }
 
+/* G6 · a scale is a projection of the room and canonical page stack. The one
+ * retained visit records where this journey began; it is neither a second
+ * history nor learner evidence. Ordinary Back still owns recursion and the
+ * G3 page → stage → bare ladder. 宙 walks one enclosing structural edge. */
+function scaleName(node = S.stack.at(-1)) {
+  if (node) return ({ radical: 'part', kanji: 'kanji', word: 'word', sent: 'sentence' })[node.t] || null;
+  return ({ reader: 'article', shelf: 'shelf', archive: 'shelf', drift: 'sky' })[S.view] || null;
+}
+function scaleLabel(scale) {
+  const names = { part: ['部品', 'part'], kanji: ['漢字', 'kanji'], word: ['語', 'word'],
+    sentence: ['文', 'sentence'], article: ['記事', 'article'], shelf: ['本棚', 'shelf'], sky: ['宙', 'sky'] };
+  return names[scale] ? tx(...names[scale]) : '';
+}
+function scaleTokenFingerprint(token) {
+  return token ? JSON.stringify([token.s || '', token.b || '', token.r || '']) : null;
+}
+function scalePassage(visit = S.scaleVisit) {
+  if (!visit) return null;
+  if (visit.recordEpoch !== recordEpoch) {
+    if (S.scaleVisit === visit) S.scaleVisit = null;
+    return null;
+  }
+  return visit.passageId ? D.passages.find(item => item.id === visit.passageId) || null : null;
+}
+function scaleSource(visit = S.scaleVisit) {
+  const p = scalePassage(visit);
+  if (!p || !Number.isInteger(visit.index)) return null;
+  const token = p?.tokens?.[visit.index];
+  return token && scaleTokenFingerprint(token) === visit.fingerprint ? { p, token } : null;
+}
+function scaleNodeFrom(node) {
+  if (node?.from?.passage && Number.isInteger(node.from.index)) return node.from;
+  const context = node?.sourceContext;
+  return context?.sourceKind === 'bundled-passage' && Number.isInteger(context.index)
+    ? { passage: context.sourceId, index: context.index } : null;
+}
+function scaleNodeBelongs(node, visit = S.scaleVisit) {
+  if (!scaleSource(visit)) return false;
+  if (node?.t === 'sent') return node.passage === visit.passageId && node.start === visit.sentence.start &&
+    node.tokens.length === visit.sentence.tokens.length;
+  const from = scaleNodeFrom(node);
+  return from?.passage === visit.passageId && from.index >= visit.sentence.start &&
+    from.index < visit.sentence.start + visit.sentence.tokens.length;
+}
+function scaleReaderIndex() {
+  const p = passage();
+  if (!p?.tokens || S.view !== 'reader' || S.stack.length) return null;
+  const visible = (index) => {
+    const token = readerTokenAtIndex(index);
+    if (!token?.isConnected || !token.hasAttribute('data-para')) return false;
+    const box = token.getBoundingClientRect();
+    return box.width > 0 && box.height > 0 && box.bottom > 0 && box.top < innerHeight;
+  };
+  const selected = S.readerTake;
+  if (selected?.p === p.id && visible(selected.index)) return selected.index;
+  const focused = document.activeElement?.closest?.('#reader .tok[data-index]');
+  if (focused && visible(Number(focused.dataset.index))) return Number(focused.dataset.index);
+  const token = [...document.querySelectorAll('#reader .tok[data-index][data-para]')]
+    .find(item => visible(Number(item.dataset.index)));
+  return token ? Number(token.dataset.index) : null;
+}
+function captureScaleVisit(index, word = null) {
+  const p = passage(), anchor = readerTokenAtIndex(index);
+  if (S.view !== 'reader' || !p?.tokens?.[index] || !anchor?.isConnected) return null;
+  const source = teacherSentence({ from: { passage: p.id, index } });
+  if (!source) return null;
+  const token = p.tokens[index];
+  const prior = S.scaleVisit;
+  const sentence = { t: 'sent', id: `${p.id}:${source.start}`, passage: p.id,
+    start: source.start, tokens: p.tokens.slice(source.start, source.end),
+    source: learnerSourceLabel(p), target: word?.id || token.b || null, targetOffset: index - source.start };
+  const visit = { origin: 'reader', recordEpoch, passageId: p.id, index,
+    indexEnd: Number(anchor.dataset.indexEnd || index), fingerprint: scaleTokenFingerprint(token),
+    viewportY: anchor.getBoundingClientRect().top, scroll: window.scrollY,
+    viewport: { width: innerWidth, height: innerHeight }, focus: invokerKey(anchor),
+    sentence, word, learningSourceVisit, skyPlace: prior?.recordEpoch === recordEpoch ? prior.skyPlace || null : null, returnRequest: null, returnJob: null };
+  S.scaleVisit = visit;
+  return visit;
+}
+function rememberScaleEntry(node) {
+  const from = scaleNodeFrom(node);
+  if (!from || S.view !== 'reader' || from.passage !== S.passageId) return;
+  // A fresh reader occurrence owns a fresh origin, including a second identical word.
+  if (!S.stack.length) captureScaleVisit(from.index, node.t === 'word' ? node : null);
+  else if (node.t === 'word' && S.stack.at(-1)?.t === 'sent' && scaleNodeBelongs(node)) {
+    // The sentence's own selected word, not an unrelated recursive dictionary hit.
+    S.scaleVisit.word = node;
+    S.scaleVisit.sentence.target = node.id;
+    S.scaleVisit.sentence.targetOffset = from.index - S.scaleVisit.sentence.start;
+  }
+}
+function retireScaleReturn() {
+  if (!S.scaleVisit) return;
+  S.scaleVisit.returnRequest = null;
+  S.scaleVisit.returnJob = null;
+}
+// A real action after a return cancels its still-pending placement. These
+// observers never prevent native scrolling, text zoom or keyboard input.
+for (const type of ['pointerdown', 'touchstart', 'wheel', 'keydown']) {
+  addEventListener(type, event => { if (event.isTrusted) retireScaleReturn(); }, { capture: true, passive: true });
+}
+function requestScaleReturn(visit) {
+  if (S.scaleVisit !== visit || !scaleSource(visit)) return false;
+  visit.returnRequest = {};
+  visit.returnJob = null;
+  const reader = document.getElementById('reader');
+  if (reader) {
+    delete reader.dataset.scaleReturnIndex;
+    delete reader.dataset.scaleReturnDelta;
+  }
+  return true;
+}
+function settleScaleReturn(reader) {
+  const visit = S.scaleVisit, request = visit?.returnRequest;
+  const source = scaleSource(visit);
+  if (!request || !source || S.view !== 'reader' || S.stack.length || S.passageId !== visit.passageId) return;
+  const anchor = readerTokenAtIndex(visit.index, reader);
+  if (!anchor || Number(anchor.dataset.indexEnd || visit.index) !== visit.indexEnd) return; // Await the actual retained occurrence.
+  const epoch = pageEpoch, owner = recordEpoch, job = {};
+  visit.returnJob = job;
+  const current = () => S.scaleVisit === visit && visit.returnRequest === request && visit.returnJob === job &&
+    pageEpoch === epoch && recordEpoch === owner && S.view === 'reader' && !S.stack.length &&
+    S.passageId === visit.passageId && reader.isConnected && anchor.isConnected &&
+    readerTokenAtIndex(visit.index, reader) === anchor && !!scaleSource(visit);
+  let attempts = 0, stable = 0;
+  // The live source owns the keyboard immediately; pixel placement settles
+  // over the following frames without leaving focus on a removed page.
+  focusProseWord(anchor, { preventScroll: true });
+  requestAnimationFrame(() => {
+    if (!current()) return;
+    window.scrollTo(0, visit.scroll);
+    const correct = () => {
+      if (!current()) return;
+      const delta = anchor.getBoundingClientRect().top - visit.viewportY;
+      if (Math.abs(delta) > 0.5) window.scrollBy(0, delta);
+      const remaining = anchor.getBoundingClientRect().top - visit.viewportY;
+      stable = Math.abs(remaining) <= 0.5 ? stable + 1 : 0;
+      attempts += 1;
+      if (stable >= 2 || attempts >= 8) {
+        focusProseWord(anchor, { preventScroll: true });
+        // The prose rover may reveal its focused token with nearest-scroll;
+        // the source-line constraint remains the final owner of placement.
+        const afterFocus = anchor.getBoundingClientRect().top - visit.viewportY;
+        if (Math.abs(afterFocus) > 0.5) window.scrollBy(0, afterFocus);
+        S.readerScroll = window.scrollY;
+        reader.dataset.scaleReturnIndex = String(visit.index);
+        reader.dataset.scaleReturnDelta = String(anchor.getBoundingClientRect().top - visit.viewportY);
+        visit.returnRequest = null;
+        visit.returnJob = null;
+        return;
+      }
+      requestAnimationFrame(correct);
+    };
+    requestAnimationFrame(correct);
+  });
+}
+function scaleWordKanji(node) {
+  if (node?.t !== 'word') return [];
+  if (Object.hasOwn(node, 'keptAnswer')) return [...node.id].filter(ch => D.kanji[ch]);
+  const rec = lookup(node.id, node.seq, node.reading, node.matchedGloss);
+  return (rec?.k?.length ? rec.k : [...node.id]).filter(ch => D.kanji[ch]);
+}
+function scaleKanjiParts(node) {
+  if (node?.t !== 'kanji') return [];
+  const parts = mainParts(node.id).filter(ch => D.radicals[ch]);
+  const rad = D.radInfo?.[D.kanji[node.id]?.rad]?.c;
+  if (rad && D.radicals[rad] && !parts.includes(rad)) parts.push(rad);
+  return parts;
+}
+function scaleParentIndex() {
+  const node = S.stack.at(-1), scale = scaleName(node);
+  for (let index = S.stack.length - 2; index >= 0; index -= 1) {
+    const parent = S.stack[index];
+    if (scale === 'part' && parent.t === 'kanji' && scaleKanjiParts(parent).includes(node.id)) return index;
+    if (scale === 'kanji' && parent.t === 'word' && scaleWordKanji(parent).includes(node.id)) return index;
+    if (scale === 'word' && parent.t === 'sent' && scaleNodeBelongs(parent) && scaleNodeBelongs(node)) return index;
+  }
+  return -1;
+}
+function scaleNavigationAllowed() {
+  if (S.scaleVisit && S.scaleVisit.recordEpoch !== recordEpoch) S.scaleVisit = null;
+  return !S.strokes && !worldPickerEls && !S.navOpen && window.__DRIFT__?.canNavigate?.() !== false;
+}
+function adjacentScaleOutTarget() {
+  const scale = scaleName(), node = S.stack.at(-1);
+  if (scale === 'part' || scale === 'kanji') return scaleParentIndex() >= 0 ? (scale === 'part' ? 'kanji' : 'word') : null;
+  if (scale === 'word') return scaleNodeBelongs(node) ? 'sentence' : null;
+  if (scale === 'sentence') return scaleNodeBelongs(node) ? 'article' : null;
+  if (scale === 'article') return 'shelf';
+  if (scale === 'shelf') return 'sky';
+  return null;
+}
+function scaleFallbackOut() {
+  if (!S.stack.length) return null;
+  if (S.stack.length > 1) {
+    const index = S.stack.length - 2, node = S.stack[index];
+    return { index, node, scale: scaleName(node) || 'entry' };
+  }
+  return { view: S.view, scale: ({ reader: 'article', shelf: 'shelf', archive: 'shelf', drift: 'sky' })[S.view] || 'room' };
+}
+function scaleOutTarget() {
+  return adjacentScaleOutTarget() || scaleFallbackOut()?.scale ||
+    (S.view === 'drift' && !S.stack.length && S.driftDepth > 0 ? 'sky' : null);
+}
+function retireScaleDestination(view = S.view) {
+  // Explicitly leaving this destination abandons this one detour. Its older,
+  // unrelated review/source callers keep their own canonical frames.
+  if (S.navigationReturns.at(-1)?.destination === view) S.navigationReturns.pop();
+}
+function scaleInTarget() {
+  const scale = scaleName(), node = S.stack.at(-1), visit = S.scaleVisit;
+  if (scale === 'sky') return 'shelf';
+  if (scale === 'shelf') return scalePassage(visit) ? 'article' : null;
+  if (scale === 'article') return passage()?.tokens?.length ? 'sentence' : null;
+  if (scale === 'sentence' && scaleNodeBelongs(node)) {
+    const source = scaleSource(visit), word = visit.word || readerEntryNode(source.token, visit.index, source.p);
+    return word?.t === 'word' ? 'word' : null;
+  }
+  if (scale === 'word') return scaleWordKanji(node).length ? 'kanji' : null;
+  if (scale === 'kanji') return scaleKanjiParts(node).length ? 'part' : null;
+  return null;
+}
+function retireScaleTransients() {
+  retireScaleReturn();
+  finishPageTransition();
+  removeMini();
+  clearWordLadder();
+  clearReaderReadings();
+  clearReaderSummons();
+  stopReadAloud();
+  stopSentenceListening();
+}
+function replaceScalePages(path, { paint = true } = {}) {
+  const retained = new Set(path);
+  for (const node of S.stack) if (!retained.has(node)) {
+    const visit = ladderPages.get(node);
+    ladderPages.delete(node);
+    if (visit) clearWordLadder(visit);
+    keptPages.delete(node);
+  }
+  S.wordEntrySerial = (S.wordEntrySerial || 0) + 1;
+  S.stack = path;
+  S.sheetReturnFocus = path.at(-1)?.returnFocus || null;
+  if (!paint) return;
+  if (layerPathFor()) renderLayer({ preserveRoom: true });
+  else render();
+  if (!path.length) returnScroll();
+}
+function focusScaleControl(selector, visit = S.scaleVisit) {
+  const view = S.view, epoch = pageEpoch;
+  const focus = () => {
+    if (S.view !== view || S.stack.length || pageEpoch !== epoch || S.scaleVisit !== visit) return false;
+    const target = document.querySelector(selector);
+    if (!target?.getClientRects().length) return false;
+    target.focus({ preventScroll: true });
+    return true;
+  };
+  if (!focus()) requestAnimationFrame(focus);
+}
+function scaleOut() {
+  const target = scaleOutTarget();
+  if (!target || !scaleNavigationAllowed()) return false;
+  const scale = scaleName(), visit = S.scaleVisit;
+  const fallback = !adjacentScaleOutTarget() && scaleFallbackOut();
+  if (fallback) {
+    retireScaleTransients();
+    if (fallback.node) replaceScalePages(S.stack.slice(0, fallback.index + 1));
+    else {
+      if (S.view === 'drift' && S.scaleVisit?.skyPlace) window.__DRIFT__?.restorePlace?.(S.scaleVisit.skyPlace);
+      replaceScalePages([]);
+      restoreDialogInvoker();
+    }
+    syncWalkSentinel();
+    return true;
+  }
+  if (scale === 'sky' && S.driftDepth > 0 && window.bunkiDriftSurface) {
+    retireScaleTransients();
+    window.bunkiDriftSurface();
+    render();
+    return true;
+  }
+  if (scale === 'article' && !scaleSource(visit)) {
+    const index = scaleReaderIndex();
+    if (index != null) captureScaleVisit(index);
+  }
+  retireScaleTransients();
+  if (scale === 'part' || scale === 'kanji') {
+    replaceScalePages(S.stack.slice(0, scaleParentIndex() + 1));
+  } else if (scale === 'word') {
+    const index = scaleParentIndex();
+    replaceScalePages(index >= 0 ? S.stack.slice(0, index + 1) : [S.scaleVisit.sentence]);
+  } else if (scale === 'sentence') {
+    replaceScalePages([]);
+    requestScaleReturn(S.scaleVisit);
+    // The original reader stayed mounted beneath the page; no re-render or
+    // deferred article opening can revive a different occurrence.
+    const reader = document.getElementById('reader');
+    if (reader) settleScaleReturn(reader);
+  } else if (scale === 'article') {
+    keepScroll();
+    clearTimeout(readerPosTimer);
+    void saveReaderPosition(S.passageId, Math.round(window.scrollY));
+    retireScaleDestination();
+    S.dialogInvoker = null;
+    S.view = 'shelf'; S.tabRoot = null;
+    withoutRoomTransition(render);
+    window.scrollTo(0, S.shelfScroll);
+    focusScaleControl('.scale-article-return');
+  } else if (scale === 'shelf') {
+    keepScroll();
+    const home = S.scaleVisit;
+    if (home?.skyPlace) window.__DRIFT__?.restorePlace?.(home.skyPlace);
+    const article = scalePassage(home);
+    if (article) window.__DRIFT__?.focusArticle?.({ articleId: article.id, title: article.title, reveal: !home?.skyPlace });
+    retireScaleDestination();
+    S.view = 'drift'; S.tabRoot = null;
+    withoutRoomTransition(render);
+    focusScaleControl('#drift-layer button[data-article-id], #app .scale-thread [data-scale-in]');
+  }
+  syncWalkSentinel();
+  return true;
+}
+function scaleIn(target = {}) {
+  if (!scaleNavigationAllowed()) return false;
+  const scale = scaleName(), visit = S.scaleVisit;
+  if (scale === 'sky') {
+    const id = target.articleId || scalePassage(visit)?.id || passage()?.id ||
+      D.passages.find(p => !String(p.file || '').startsWith('archive/'))?.id;
+    if (id && !D.passages.some(p => p.id === id)) return false;
+    const place = window.__DRIFT__?.capturePlace?.();
+    if (visit?.recordEpoch === recordEpoch && visit.passageId === id) visit.skyPlace = place || visit.skyPlace;
+    else S.scaleVisit = { origin: 'sky', recordEpoch, passageId: id || null, index: null,
+      sentence: null, word: null, skyPlace: place || null, returnRequest: null, returnJob: null };
+    retireScaleTransients();
+    S.dialogInvoker = null;
+    S.view = 'shelf'; S.tabRoot = null;
+    withoutRoomTransition(render);
+    window.scrollTo(0, S.shelfScroll);
+    focusScaleControl('.scale-article-return, #app .scale-thread [data-scale-in]');
+    return true;
+  }
+  if (scale === 'shelf') {
+    const id = target.articleId || scalePassage(visit)?.id;
+    if (!id || !D.passages.some(p => p.id === id)) return false;
+    retireScaleTransients();
+    withoutRoomTransition(() => openPassage(id));
+    return true;
+  }
+  if (scale === 'article') {
+    // Reaching the thread with Tab may scroll past the selected line. The
+    // retained occurrence owns this route; focus traversal cannot replace it.
+    const retained = visit?.passageId === S.passageId && scaleSource(visit) ? visit : null;
+    const index = retained ? retained.index : scaleReaderIndex();
+    if (index == null) return false;
+    const origin = retained || captureScaleVisit(index);
+    if (!origin) return false;
+    retireScaleTransients();
+    go(origin.sentence, { invoker: document.activeElement, instant: keyboardActivated() });
+    return true;
+  }
+  const node = S.stack.at(-1);
+  let next = null;
+  if (scale === 'sentence' && scaleNodeBelongs(node)) {
+    const source = scaleSource(visit);
+    next = visit.word || readerEntryNode(source.token, visit.index, source.p);
+    if (next?.t !== 'word') return false;
+    visit.word = next;
+  } else if (scale === 'word') {
+    const id = scaleWordKanji(node)[0];
+    if (id) next = { t: 'kanji', id, from: node.from, sourceContext: node.sourceContext };
+  } else if (scale === 'kanji') {
+    const id = scaleKanjiParts(node)[0];
+    if (id) next = { t: 'radical', id, from: node.from, sourceContext: node.sourceContext };
+  }
+  if (!next) return false;
+  retireScaleTransients();
+  go(next, { invoker: document.activeElement, instant: keyboardActivated() });
+  return true;
+}
+/** Structural source parents precede the actual canonical ancestry. Repeated
+ * dictionary exploration keeps every actual node; a source-less example never
+ * acquires a fabricated sentence or article. The first 宙 is always ONE edge. */
+function scaleThreadPath() {
+  const path = [{ scale: 'sky', label: '宙', out: true }];
+  if (['reader', 'shelf', 'archive'].includes(S.view)) {
+    path.push({ scale: 'shelf', label: scaleLabel('shelf'), view: S.view === 'archive' ? 'archive' : 'shelf' });
+    if (S.view === 'reader') {
+      path.push({ scale: 'article', label: passage()?.title || scaleLabel('article'), view: 'reader' });
+      const visit = S.scaleVisit;
+      if (S.stack.length && visit?.recordEpoch === recordEpoch && visit.passageId === S.passageId &&
+          scaleSource(visit) && !S.stack.some(node => node.t === 'sent' && scaleNodeBelongs(node))) {
+        path.push({ scale: 'sentence', label: scaleLabel('sentence'), sourceSentence: true });
+      }
+    }
+  } else if (S.view !== 'drift') {
+    const name = roomName(S.view);
+    path.push({ scale: 'room', label: name ? tx(...name) : S.view, view: S.view });
+  }
+  for (const [index, node] of S.stack.entries()) {
+    const label = nodeTitle(node);
+    const description = `${label}${node.reading ? `（${node.reading}）` : ''} · ${index + 1}`;
+    path.push({ scale: scaleName(node) || 'entry', label, description, index, node });
+  }
+  return path;
+}
+function returnToScaleBead(bead) {
+  if (!scaleNavigationAllowed()) return false;
+  if (Number.isInteger(bead.index)) {
+    if (S.stack[bead.index] !== bead.node) return false;
+    retireScaleTransients();
+    replaceScalePages(S.stack.slice(0, bead.index + 1));
+    return true;
+  }
+  if (bead.sourceSentence) {
+    if (S.view !== 'reader' || !scaleSource()) return false;
+    retireScaleTransients();
+    replaceScalePages([S.scaleVisit.sentence]);
+    return true;
+  }
+  if (bead.scale === 'article') {
+    if (S.view !== 'reader') return false;
+    retireScaleTransients();
+    replaceScalePages([]);
+    if (scaleSource() && requestScaleReturn(S.scaleVisit)) {
+      const reader = document.getElementById('reader');
+      if (reader) settleScaleReturn(reader);
+    } else restoreDialogInvoker();
+    return true;
+  }
+  if (bead.scale === 'shelf') {
+    if (!['reader', 'shelf', 'archive'].includes(S.view)) return false;
+    keepScroll();
+    if (S.view === 'reader' && S.passageId) {
+      clearTimeout(readerPosTimer);
+      void saveReaderPosition(S.passageId, Math.round(window.scrollY));
+    }
+    retireScaleTransients();
+    replaceScalePages([], { paint: false });
+    S.dialogInvoker = null;
+    if (S.view !== bead.view) retireScaleDestination();
+    S.view = bead.view; S.tabRoot = null;
+    withoutRoomTransition(render);
+    window.scrollTo(0, bead.view === 'archive' ? S.archiveScroll : S.shelfScroll);
+    focusScaleControl('.scale-article-return, #app .scale-thread [data-scale-in]');
+    return true;
+  }
+  if (bead.scale === 'room' && bead.view === S.view) {
+    retireScaleTransients();
+    replaceScalePages([]);
+    restoreDialogInvoker();
+    return true;
+  }
+  return false;
+}
+function scaleThread() {
+  const scale = scaleName() || (S.stack.length ? 'entry' : null);
+  if (!scale) return null;
+  const thread = el('nav', 'scale-thread');
+  thread.dataset.scale = scale;
+  thread.setAttribute('aria-label', tx('ことばの道すじ', 'The way through the text'));
+  thread.setAttribute('data-drift-chrome', '');
+  const visit = S.scaleVisit;
+  if (scaleSource(visit)) {
+    thread.dataset.passageId = visit.passageId;
+    thread.dataset.tokenIndex = String(visit.index);
+    thread.dataset.sentenceStart = String(visit.sentence.start);
+    thread.dataset.sentenceEnd = String(visit.sentence.start + visit.sentence.tokens.length);
+  }
+  const path = scaleThreadPath(), top = S.stack.at(-1), view = S.view;
+  for (const [index, bead] of path.entries()) {
+    const current = index === path.length - 1;
+    const button = el(current && !bead.out ? 'span' : 'button',
+      bead.out ? 'scale-out' : current ? 'scale-current' : 'scale-bead', bead.label);
+    if (button.tagName === 'BUTTON') button.type = 'button';
+    button.dataset.scaleBead = bead.scale;
+    button.title = bead.description || bead.label;
+    if (current) button.setAttribute('aria-current', 'step');
+    if (bead.node) {
+      button.dataset.node = `${bead.node.t}:${bead.node.id}`;
+      button.dataset.stackIndex = String(bead.index);
+      button.dataset.reading = bead.node.reading || '';
+      if (bead.node.seq != null) button.dataset.seq = String(bead.node.seq);
+    }
+    if (bead.out) {
+      const outside = scaleOutTarget();
+      button.dataset.scaleOut = ''; button.dataset.scaleTarget = outside || '';
+      const shortcut = !adjacentScaleOutTarget() && scaleFallbackOut();
+      if (shortcut) button.dataset.scaleShortcut = 'caller';
+      button.disabled = !outside || !scaleNavigationAllowed();
+      button.setAttribute('aria-label', shortcut ? tx('この項目をひらいた場所へ戻る', 'Return to the place that opened this entry')
+        : outside ? tx(`ひとつ外へ · ${scaleLabel(outside)}`, `One scale out · ${scaleLabel(outside)}`)
+        : scale === 'sky' ? tx('宙 · いちばん外側', 'Sky · outermost scale')
+          : tx('この訪問の外側の出典はありません', 'No enclosing source in this visit'));
+      button.addEventListener('click', event => {
+        event.stopPropagation();
+        if (button.isConnected && S.view === view && S.stack.at(-1) === top) scaleOut();
+      });
+    } else {
+      if (!current) button.disabled = !scaleNavigationAllowed();
+      const label = bead.description || bead.label;
+      button.setAttribute('aria-label', current ? tx(`現在 · ${label}`, `Current · ${label}`)
+        : tx(`${label}へ戻る`, `Return to ${label}`));
+      if (!current) button.addEventListener('click', event => {
+        event.stopPropagation();
+        if (button.isConnected && S.view === view && S.stack.at(-1) === top) returnToScaleBead(bead);
+      });
+    }
+    thread.append(button);
+  }
+  const inside = scaleInTarget();
+  if (inside) {
+    const enter = el('button', 'scale-in', `${scaleLabel(inside)} ›`);
+    enter.type = 'button'; enter.dataset.scaleIn = ''; enter.dataset.scaleTarget = inside;
+    enter.disabled = !scaleNavigationAllowed();
+    enter.setAttribute('aria-label', tx(`ひとつ内へ · ${scaleLabel(inside)}`, `One scale in · ${scaleLabel(inside)}`));
+    enter.addEventListener('click', event => {
+      event.stopPropagation();
+      if (enter.isConnected && S.view === view && S.stack.at(-1) === top) scaleIn();
+    });
+    thread.append(enter);
+  }
+  return thread;
+}
+function paintRoomScaleThread(root) {
+  const old = root.querySelector(':scope > .scale-thread');
+  const thread = scaleThread();
+  if (!thread) { old?.remove(); return; }
+  thread.dataset.scaleRoom = '';
+  if (old) old.replaceWith(thread);
+  else {
+    const chrome = root.querySelector(':scope > .chrome');
+    if (chrome) chrome.after(thread);
+    else root.prepend(thread);
+  }
+}
+function renderScaleArticleReturn(main) {
+  const visit = S.scaleVisit, article = scalePassage(visit);
+  if (!article) return;
+  const source = scaleSource(visit);
+  const door = el('button', 'scale-article-return', article.title);
+  door.type = 'button'; door.dataset.articleId = visit.passageId;
+  door.setAttribute('aria-label', source ? tx(`同じ行へ戻る · ${article.title}`, `Return to the same line · ${article.title}`)
+    : tx(`記事をひらく · ${article.title}`, `Open article · ${article.title}`));
+  door.addEventListener('click', () => scaleIn({ articleId: visit.passageId }));
+  main.append(door);
+}
+function freshScaleKeptWord(key) {
+  if (!recordReady()) return null;
+  const state = recordApp?.current();
+  const record = state?.status === 'active' ? state.snapshot?.record : null;
+  return record && typeof key === 'string' ? keptWordProjection(record).find(row => row.key === key) || null : null;
+}
+function installScaleBridge() {
+  const article = scalePassage() || passage() || D.passages.find(p => !String(p.file || '').startsWith('archive/'));
+  if (article) window.__DRIFT__?.focusArticle?.({ articleId: article.id, title: article.title });
+  const skyReady = () => S.view === 'drift' && !S.stack.length && !standingSlip() && !ladderVisit && scaleNavigationAllowed();
+  window.__DRIFT__?.setScaleBridge?.({
+    canStep(direction, target = {}) {
+      if (!skyReady()) return false;
+      if (direction === undefined) return true;
+      if (direction === 'word') return !!freshScaleKeptWord(target.wordKey);
+      if (direction === 'out') return S.driftDepth > 0 && typeof window.bunkiDriftSurface === 'function';
+      if (direction !== 'in') return false;
+      return !target.articleId || D.passages.some(p => p.id === target.articleId);
+    },
+    step(direction, target = {}) {
+      if (!skyReady()) return false;
+      if (direction === 'out') return S.driftDepth > 0 ? scaleOut() : false;
+      if (direction === 'in') {
+        if (target.articleId && !D.passages.some(p => p.id === target.articleId)) return false;
+        return scaleIn(target);
+      }
+      if (direction !== 'word') return false;
+      const row = freshScaleKeptWord(target.wordKey);
+      if (!row) return false;
+      const place = window.__DRIFT__?.capturePlace?.();
+      if (S.scaleVisit?.recordEpoch === recordEpoch) S.scaleVisit.skyPlace = place || S.scaleVisit.skyPlace;
+      else S.scaleVisit = { origin: 'sky', recordEpoch, passageId: null, skyPlace: place || null,
+        returnRequest: null, returnJob: null };
+      retireScaleTransients();
+      go({ t: 'word', id: row.id, seq: row.identity?.seq || null,
+        reading: row.identity?.reading || row.answer?.reading || '', keptAnswer: row.answer },
+      { invoker: document.activeElement, instant: keyboardActivated() });
+      return true;
+    },
+  });
+}
+
+
 /** Search and source reading are detours, not destructive replacements.
  * A frame holds the same canonical nodes, with their exact place and origin. */
 function keepNavigationReturn(destination, invoker = document.activeElement) {
+  if (S.scaleVisit) retireScaleReturn();
   keepScroll();
   rememberSheet(invoker);
   S.navigationReturns.push({
-    destination, view: S.view, stack: S.stack, dialogInvoker: S.dialogInvoker,
+    destination, view: S.view, stack: S.stack, dialogInvoker: S.dialogInvoker, scaleVisit: S.scaleVisit,
     focus: invokerKey(invoker), scroll: window.scrollY,
     passageId: S.passageId, readerScroll: S.readerScroll, readerTake: S.readerTake,
     // reveal/gloss marks are part of the place this detour leaves (see returnFromNavigation)
@@ -4945,6 +5597,7 @@ function keepNavigationReturn(destination, invoker = document.activeElement) {
   });
   S.stack = [];
   S.dialogInvoker = null;
+  S.scaleVisit = null;
 }
 function returnFromNavigation() {
   const home = S.navigationReturns.at(-1);
@@ -4967,6 +5620,7 @@ function returnFromNavigation() {
   }
   Object.assign(S, {
     view: home.view, stack: home.stack, dialogInvoker: home.dialogInvoker,
+    scaleVisit: home.scaleVisit && home.scaleVisit.recordEpoch === recordEpoch ? home.scaleVisit : null,
     passageId: home.passageId, readerScroll: home.readerScroll, readerTake: home.readerTake,
     searchFrom: home.searchFrom, navQ: home.navQ, navSourceContext: home.navSourceContext,
     sheetReturnFocus: home.stack.at(-1)?.returnFocus || null,
@@ -4995,6 +5649,8 @@ function go(node, { invoker = null, from = null, instant = keyboardActivated() }
     (S.view === 'search' ? S.navSourceContext : null);
   if (sourceContext && !node.from?.passage) node = { ...node, sourceContext };
   if (node.t === 'kanji' && !node.referenceEntry) node.referenceEntry = referenceLibrary?.entry('kanji', node.id) || null;
+  if (S.scaleVisit) retireScaleReturn();
+  rememberScaleEntry(node);
   keepScroll();
   rememberSheet(invoker || document.activeElement);
   if (!S.stack.length && !S.dialogInvoker) {
@@ -5004,6 +5660,7 @@ function go(node, { invoker = null, from = null, instant = keyboardActivated() }
 }
 
 function back({ instant = false } = {}) {
+  if (S.scaleVisit) retireScaleReturn();
   // The chrome's own overlays are the topmost layers of all: an open nav,
   // the world stones, the capture panel. Device Back could not see them, so
   // a learner who opened one and pressed Back left the app entirely with it
@@ -5113,6 +5770,7 @@ function back({ instant = false } = {}) {
   if (S.view === 'source-reader') { leaveSourceReading(); return; }
   if (S.view === 'sentence-practice') { leaveSentencePractice(); return; }
   if (S.view === 'reader' && learningSourceVisit) { leaveBundledSourceVisit(); return; }
+  if (S.view === 'reader' && S.scaleVisit && scaleSource() && scaleOut()) return;
   // the search room returns to the view its door was opened from — and
   // leaving the room is a deliberate dismissal: the session ends with it
   if (S.view === 'search') {
@@ -5188,16 +5846,7 @@ function back({ instant = false } = {}) {
     window.scrollTo(0, S.shelfScroll);
     return;
   }
-  if (S.view === 'shelf' && S.variants.entry === 'field') {
-    keepScroll();
-    S.view = 'entry';
-    render();
-  }
-  if (S.view === 'shelf' && S.variants.entry === 'drift') {
-    keepScroll();
-    S.view = 'drift';
-    render();
-  }
+  if (S.view === 'shelf') scaleOut();
 }
 
 function dismissSheet(options) {
@@ -5316,7 +5965,7 @@ function canWalkBack() {
   if (S.strokes || S.stack.length) return true;
   if (S.view === 'drift') return S.driftDepth > 0;
   if (S.view === 'entry') return false;
-  if (S.view === 'shelf') return S.variants.entry !== 'shelf';
+  if (S.view === 'shelf') return true;
   return true; // every inner room walks back somewhere
 }
 
@@ -5414,9 +6063,26 @@ function openAssessmentResult(attemptId) {
 function openPassage(id, anchor = null) {
   // no id means no reading: callers show their own "source unavailable" note
   if (id == null) throw new Error('source-unavailable');
-  if (!roomTransitionUpdating && (S.view !== 'reader' || S.passageId !== id)) return roomTransition(() => openPassage(id, anchor));
+  const scaleReturn = anchor?.scaleReturn || (S.scaleVisit && S.scaleVisit.passageId === id &&
+    ['shelf', 'archive', 'drift'].includes(S.view) && scaleSource(S.scaleVisit) ? S.scaleVisit : null);
+  if (scaleReturn && (S.scaleVisit !== scaleReturn || !scaleSource(scaleReturn) ||
+    (anchor?.scaleReturn && anchor.scaleEpoch !== pageEpoch))) return false;
+  const scaleEpoch = pageEpoch;
+  if (!roomTransitionUpdating && (S.view !== 'reader' || S.passageId !== id)) {
+    const retainedAnchor = scaleReturn ? { ...(anchor || {}), scaleReturn, scaleEpoch } : anchor;
+    if (scaleReturn && !requestScaleReturn(scaleReturn)) return false;
+    const scaleRequest = scaleReturn?.returnRequest;
+    return roomTransition(() => {
+      // A newer input or page-layer action can leave pageEpoch unchanged.
+      // The same cancellation token must still own this delayed return.
+      if (scaleReturn && scaleReturn.returnRequest !== scaleRequest) return false;
+      return openPassage(id, retainedAnchor);
+    });
+  }
   keepScroll();
-  learningSourceVisit = anchor?.visit || null;
+  if (S.scaleVisit && S.scaleVisit.passageId !== id) S.scaleVisit = null;
+  if (scaleReturn) { clearReaderReadings(); S.glossed = new Set(); requestScaleReturn(scaleReturn); }
+  learningSourceVisit = scaleReturn?.learningSourceVisit || anchor?.visit || null;
   // a running 聞く belongs to the passage it was started in: the glossary
   // cross-ref door and the word sheet's この記事を読む door switch passages
   // WITHOUT leaving the reader view, so the view-change guard never fires
@@ -5431,12 +6097,13 @@ function openPassage(id, anchor = null) {
   S.passageId = id;
   S.view = 'reader';
   // an article you have visited opens where you left it, like a bookmark
-  S.readerScroll = S.readerPos[id] || 0;
+  S.readerScroll = scaleReturn ? scaleReturn.scroll : S.readerPos[id] || 0;
   S.stack = [];
   S.loadError = false;
   render();
   window.scrollTo(0, S.readerScroll);
   const restoreAnchor = () => {
+    if (scaleReturn) return; // G6 placement belongs to the exact rendered occurrence, never centering.
     if (S.view !== 'reader' || S.passageId !== id || !Number.isInteger(anchor?.index)) return;
     const token = readerTokenAtIndex(anchor.index);
     if (!token) return;
@@ -5803,6 +6470,7 @@ function renderContextDeck(main) {
 
 function renderShelf(main) {
   main.append(withEn(el('p', 'eyebrow', '回廊 · 図書館'), 'KAIRO · the library', 'en-inline'));
+  renderScaleArticleReturn(main);
 
   // the quiet field — kanji, kana, romaji, or English; four doors, one box
   const search = el('input', 'search-field');
@@ -6843,6 +7511,7 @@ function learningSourceBackLabel() {
 function learningSourceCaller(focusId) {
   return { epoch: recordEpoch, view: S.view, stack: S.stack.slice(), scroll: window.scrollY,
     dialogInvoker: S.dialogInvoker, focusId, review: S.review, parent: learningSourceVisit,
+    scaleVisit: S.scaleVisit?.recordEpoch === recordEpoch ? S.scaleVisit : null,
     sentencePracticeView: S.sentencePracticeView,
     // the caller's reveal/gloss marks travel with its passage coordinates (D22b)
     revealed: S.revealed ? new Set(S.revealed) : null, glossed: S.glossed ? new Set(S.glossed) : null,
@@ -6866,6 +7535,7 @@ function restoreLearningSourceCaller(visit) {
     S.glossed = visit.glossed ? new Set(visit.glossed) : null;
   }
   Object.assign(S, visit.sourceState);
+  S.scaleVisit = visit.scaleVisit?.recordEpoch === recordEpoch ? visit.scaleVisit : null;
   S.sentencePracticeView = visit.sentencePracticeView || null;
   S.view = visit.view; S.stack = visit.stack; S.dialogInvoker = visit.dialogInvoker;
   if (S.stack.length) S.sheetFocus = visit.focusId;
@@ -8128,6 +8798,7 @@ function shelfCard(p, rank = 'grid') {
     if (titleEn) open.append(titleEn);
     open.append(foot);
   }
+  open.dataset.articleId = p.id;
   open.addEventListener('click', () => openPassage(p.id));
   item.append(open);
   return item;
@@ -12076,8 +12747,10 @@ function renderReader(main) {
       placeKinsoku(reader, rendered, token.s);
     }
   }
-  main.append(readerHelp(), reader);
+  // Finish the paragraph/word accessibility tree before it joins the live reader.
+  // The same token elements and handlers are mounted; no layout or focus is needed here.
   installReaderRoving(reader);
+  main.append(readerHelp(), reader);
   demonstrateWordLadder(reader);
   main.append(renderReadingPlaces(p));
 
@@ -12175,6 +12848,7 @@ function renderReader(main) {
   if (S.detailsOpen?.has(p.id)) about.append(renderSignals(p.grading, { compact: true }));
   footer.append(about);
   main.append(footer);
+  if (S.scaleVisit?.returnRequest) settleScaleReturn(reader);
 }
 
 /* The Drift entry (Phase 2): the real 墨流し universe fills the viewport on
@@ -12186,6 +12860,7 @@ function renderDrift(main) {
   // over it here. The way in to the shelf, the tutor, search and the dojo all
   // live behind the single symbol (buildGingaChrome) — the galaxy stays clear.
   main.style.padding = '0';
+  installScaleBridge();
   window.__DRIFT__?.setPracticePriorities?.(allAssessmentEvidence().priorities);
 }
 
@@ -21851,9 +22526,10 @@ function renderSentenceNode(sheet, node) {
     door.type = 'button';
     door.id = 'sent-home';
     door.addEventListener('click', () => {
+      if (scaleNodeBelongs(node) && scaleOut()) return;
       keepNavigationReturn('reader', door);
       const from = sentenceSource(node.tokens, home, node.start);
-      const targetIndex = node.tokens.findIndex((token) => token.b === node.target);
+      const targetIndex = Number.isInteger(node.targetOffset) ? node.targetOffset : node.tokens.findIndex((token) => token.b === node.target);
       openPassage(home, from ? { index: from.index + Math.max(0, targetIndex) } : null);
     });
     doorRow.append(door);
@@ -29624,6 +30300,7 @@ function ownSentenceExample(node) {
   return { tokens: p.tokens.slice(start, end + 1), source: learnerSourceLabel(p), passage: p.id, start, own: true };
 }
 function renderWordNode(sheet, node) {
+  if (node.keptAnswer) { renderKeptWordNode(sheet, node); return; }
   // D11: a reader token the core lacks is matched by reading before any entry opens
   if (node.readerChoice && !node.seq) {
     renderReaderChoice(sheet, node);
@@ -31891,7 +32568,8 @@ function composePage(node, path) {
     back({ instant: event.detail === 0 });
   });
   bar.append(backBtn);
-  if (depth > 1) {
+  const thread = scaleThread();
+  if (depth > 1 && !thread) {
     bar.append(el('span', 'sheet-depth', path.map((n) => nodeTitle(n)).join(' › ')));
   }
   // the search ghost reaches the sheets too — the layer law makes the fixed
@@ -31912,7 +32590,8 @@ function composePage(node, path) {
   // and its seal says whose it is. A catalog is a grouping, not a thing,
   // and honestly carries none.
   const sentenceFrom = node.t === 'sent' ? sentenceSource(node.tokens, node.passage, node.start) : null;
-  const sentenceTarget = node.t === 'sent' ? node.tokens.findIndex((token) => token.b === node.target) : -1;
+  const sentenceTarget = node.t === 'sent' ? (Number.isInteger(node.targetOffset) ? node.targetOffset
+    : node.tokens.findIndex((token) => token.b === node.target)) : -1;
   const capNode = NODE_KIND[node.t]
     ? node
     : node.t === 'sent' && node.target
@@ -31992,6 +32671,7 @@ function composePage(node, path) {
   });
   bar.append(closeBtn);
   sheet.append(bar);
+  if (thread) sheet.append(thread);
   if (S.view === 'levels' && referenceLibrary) {
     const path = el('div', 'reference-sheet-context');
     const returnDoor = el('button', 'reference-sheet-return', `← ${referenceLibrary.locationName()}`);
@@ -32112,6 +32792,11 @@ function renderSheet(root, { prebuilt = null } = {}) {
  * re-render or the writing room carried), then the focus a re-render named, the door a deeper page was opened from, or
  * its Close. */
 function mountPageEffects(sheet, node) {
+  // A detached/prebuilt page predates the visit captured by go(). Paint its thread against the actual mounted ancestry.
+  const oldThread = sheet.querySelector(':scope > .scale-thread'), thread = scaleThread();
+  if (oldThread && thread) oldThread.replaceWith(thread);
+  else if (thread) sheet.querySelector(':scope > .sheet-bar')?.after(thread);
+  else oldThread?.remove();
   activatePendingLookupReadings(sheet);
   adoptSaveMenuOwner();
   // reading position survives the doors: Back hands a ~2,700px entry its place, never its top (P1, review)
@@ -32196,6 +32881,7 @@ function renderLayer({ prebuilt = null, preserveRoom = false } = {}) {
   if (prebuilt) prebuilt.refreshCaptureNote?.();
   for (const button of root.querySelectorAll('#sheet .save-one')) button.saveOnePaint?.();
   adoptSaveMenuOwner();
+  paintRoomScaleThread(root);
   applyLayerLaw(root);
   const crumb = root.querySelector(':scope > .chrome .crumb');
   if (crumb) paintCrumb(crumb);
@@ -32307,6 +32993,7 @@ function enterWord(node, { from = null, invoker = null, instant = false } = {}) 
   const depth = S.stack.length + 1;
   const ready = layered ? takePrebuiltPage(node, depth) : null;
   const pushed = ready?.node || node;
+  if (pushed.t === 'word' && scaleNodeBelongs(pushed) && (!S.stack.length || S.stack.at(-1)?.t === 'sent')) S.scaleVisit.word = pushed;
   if (ladderOpening) {
     ladderOpening.rung = 'page';
     ladderOpening.anchor.dataset.ladderRung = 'page';
@@ -35237,6 +35924,7 @@ function render() {
   if (S.view === 'tray' && placesLayout()) S.view = 'dojo';
   // a page built ahead, or kept for Back, was built against the state this render is about to replace
   pageEpoch += 1;
+  if (S.scaleVisit && S.scaleVisit.recordEpoch !== recordEpoch) S.scaleVisit = null;
   S.roomStale = false;
   syncSheetActionVisit();
   if (personalHost) { personalHost.paint(); return; }
@@ -35365,7 +36053,7 @@ function render() {
   const atTabRoot = S.variants.nav === 'tabs' && !!S.tabRoot && S.view === S.tabRoot;
   const atHome =
     !S.stack.length &&
-    (atTabRoot || S.view === 'entry' || S.view === 'drift' || (S.view === 'shelf' && S.variants.entry === 'shelf'));
+    ((atTabRoot && S.view !== 'shelf') || S.view === 'entry' || S.view === 'drift');
   backBtn.disabled = atHome;
   // a finished review is a close, not a room: the tab bar and its own "Back to Today" are the
   // ways home, so the chrome's Back steps aside (one route, not three)
@@ -35519,6 +36207,7 @@ function render() {
   // in the layout under test Review is a station on the tab bar; the bookmark stands without it
   if (barDoors) chrome.append(trayBtn);
   if (!heroMode && !zenReview) root.append(chrome);
+  if (S.ready) paintRoomScaleThread(root);
   enableTouchPress();
   buildPrimaryTabs(root);
   syncThemeColor();
