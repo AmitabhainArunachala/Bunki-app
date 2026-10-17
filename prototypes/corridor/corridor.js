@@ -10024,6 +10024,13 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
 
 /** A card beside its word: short cards fit above or below the fixed chrome; a tall sentence on a
  * phone becomes a full document card below its word, with the page carrying the text and actions. */
+/** The 層 mark's top, when a box spanning [left, left + width] would stand over it; null otherwise (or when it is hidden). */
+function layersMarkTop(left, width) {
+  const mark = document.getElementById('layers-mark');
+  const box = mark?.getBoundingClientRect();
+  if (!box?.height || box.right <= left || box.left >= left + width) return null;
+  return box.top;
+}
 function placeFloating(card, r) {
   const wasDocument = card.dataset.flow === 'document';
   if (wasDocument && !card.classList.contains('is-sentence')) {
@@ -10049,9 +10056,12 @@ function placeFloating(card, r) {
   const onPage = !!card.dataset.page;
   const ceiling = Math.max(8, (onPage ? fixedEdge('#sheet > .sheet-bar', 'bottom') : null) ?? fixedEdge('#app > .chrome', 'bottom') ?? 0);
   // the deck's grade dock is a floor too: the slip never covers the four grades (it sits above a word in the lower third)
-  // G5 · nor the 層 mark at the foot
+  // G5 · nor the 層 mark at the foot, where the card would stand over it (it sits beside 音, so on a phone it takes no
+  // more room than 音 does)
+  const cardLeft = m.width >= window.innerWidth - 48 ? Math.max(0, (window.innerWidth - m.width) / 2)
+    : Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2));
   const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
-    fixedEdge('.kp-grades', 'top') ?? height, fixedEdge('#layers-mark', 'top') ?? height) - 8;
+    fixedEdge('.kp-grades', 'top') ?? height, layersMarkTop(cardLeft, m.width) ?? height) - 8;
   const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
   const sentence = card.classList.contains('is-sentence');
   let seatHeight = m.height;
@@ -10611,16 +10621,18 @@ function placeSealStrip(open) {
   const height = window.innerHeight;
   const onPage = !!anchor.closest('#sheet');
   const ceiling = Math.max(8, (onPage ? fixedEdge('#sheet > .sheet-bar', 'bottom') : null) ?? fixedEdge('#app > .chrome', 'bottom') ?? 0);
-  const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
-    fixedEdge('.kp-grades', 'top') ?? height, fixedEdge('#layers-mark', 'top') ?? height) - 8;
   const view = window.visualViewport?.height || height;
-  const cap = Math.max(96, Math.floor(Math.min(view * 0.4, floor - ceiling)));
-  strip.style.maxHeight = `${cap}px`;
+  strip.style.maxHeight = `${Math.max(96, Math.floor(view * 0.4))}px`;
   strip.style.left = '0px';
   strip.style.top = '0px';
   const word = glyphBox(anchor) || anchor.getBoundingClientRect();
-  const w = strip.offsetWidth, h = Math.min(strip.offsetHeight, cap);
+  const w = strip.offsetWidth;
   const left = Math.max(8, Math.min(window.innerWidth - w - 8, word.left + word.width / 2 - w / 2));
+  const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
+    fixedEdge('.kp-grades', 'top') ?? height, layersMarkTop(left, w) ?? height) - 8;
+  const cap = Math.max(96, Math.floor(Math.min(view * 0.4, floor - ceiling)));
+  strip.style.maxHeight = `${cap}px`;
+  const h = Math.min(strip.offsetHeight, cap);
   const rect = (top, tall) => ({ left, right: left + w, top, bottom: top + tall });
   const below = word.top + word.height + 10, above = word.top - 10;
   const seats = [];

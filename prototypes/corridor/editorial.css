@@ -2897,7 +2897,8 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .tray-line[data-landed] { animation: kept-landed 1800ms var(--ease-standard) both; }
 @keyframes kept-landed { 0%, 35% { background: var(--color-seal-wash); } 100% { background: transparent; } }
 
-/* G5 · 層, the one way into the layers: a quiet disc like the folded 音 mark, above it at the foot */
+/* G5 · 層, the one way into the layers: a quiet disc like the folded 音 mark, beside it at the foot (層 音, as the Together
+   sketch set them); while the player stands open across the foot, 層 waits */
 .layers-mark {
   position: fixed;
   z-index: 45;
@@ -2918,8 +2919,9 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .layers-mark[aria-pressed='true'] { color: var(--color-seal); }
 .layers-mark:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 @media (max-width: 520px) {
-  body[data-view='reader'] .layers-mark { bottom: calc(8px + 44px + 8px + env(safe-area-inset-bottom)); }
-  body.has-primary-tabs[data-view='reader'] .layers-mark { bottom: calc(var(--nav-clearance) + 8px + 44px + 8px); }
+  body[data-view='reader'] .layers-mark { right: calc(var(--s2) + 44px + 8px); bottom: calc(8px + env(safe-area-inset-bottom)); }
+  body.has-primary-tabs[data-view='reader'] .layers-mark { bottom: calc(var(--nav-clearance) + 8px); }
+  body[data-view='reader']:has(.listen-row.play-bar[data-open='true']) .layers-mark { display: none; }
 }
 /* the layers: the paragraph stays as it is; one quiet block under it — the paragraph read in kana (読), its words' meanings
    (意) and its particles' roles (文), each line led by its glyph — folds on any tap */
