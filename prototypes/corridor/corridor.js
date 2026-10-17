@@ -9554,38 +9554,14 @@ function openVocabularyListPopover(node, label, invoker, { menu = false, more = 
     busy = true;
     paint();
     try {
-      if (on && !S.taken.some(row => row.t === node.t && row.id === node.id)) {
-        const captured = await toggleTaken(node, label);
-        if (!allowed()) return;
-        if (!captured) { failed('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.'); return; }
-        refreshWordSaveControls(node, label);
-      }
-      const saved = await commitStorePatch(latest => {
-        if (!allowed()) throw new Error('personal-capture-not-allowed');
-        const lists = { ...latest.lists };
-        const members = owns(lists, listName) ? lists[listName] : [];
-        if (!on) {
-          if (!owns(lists, listName)) return {};
-          setOwnRecordValue(lists, listName, members.filter(row => !(row.t === node.t && row.id === node.id)));
-          return { lists };
-        }
-        const item = latest.taken.find(row => row.t === node.t && row.id === node.id);
-        if (!item) throw new Error('captured-item-no-longer-available');
-        if (node.t === 'word' && wordCaptureState(node, latest) !== 'taken') throw new Error('word-identity-conflict');
-        setOwnRecordValue(lists, listName, members.some(row => row.t === node.t && row.id === node.id) ? members : [...members,
-          { t: node.t, id: node.id, label, kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1], ts: item.ts,
-            ...(item.sourceContextRef ? { sourceContextRef: item.sourceContextRef } : {}) }]);
-        return { lists };
-      });
-      if (!saved) {
-        if (on) failed('単語は保存済みです。リストへの追加をもう一度試してください。', 'The word is saved. Please retry adding it to the list.');
-        else failed('リストから外せませんでした。もう一度試してください。', 'Could not take it off the list. Please try again.');
-        return;
-      }
+      // G5 · one list transaction for Save ▾ and the strip (writeListMembership): the word is kept first by the one keep
+      const result = await writeListMembership(node, label, listName, on);
+      if (!allowed()) return;
+      if (result === 'held') { notice.textContent = wordCaptureHeldText(node, { route: false }); return; }
+      if (result === 'capture-failed' || result === 'not-writable') { failed('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.'); return; }
+      if (result === 'list-failed') { failed('単語は保存済みです。リストへの追加をもう一度試してください。', 'The word is saved. Please retry adding it to the list.'); return; }
+      if (result === 'remove-failed') { failed('リストから外せませんでした。もう一度試してください。', 'Could not take it off the list. Please try again.'); return; }
       notice.textContent = on ? tx(`「${listName}」に追加しました。`, `Added to ${listName}.`) : tx(`「${listName}」から外しました。`, `Taken off ${listName}.`);
-      // S · made from a page's Save, the change is also the room's beneath (its lists, their counts): it is drawn again
-      // when the page closes (the foot's old picker drew the whole app after each change)
-      if (S.stack.length) S.roomStale = true;
       if (typed) { name.value = ''; rememberRecordDraft(name); }
       // in Save ▾'s menu the name field folds back into its row once the list is made
       if (typed && newList) { form.hidden = true; newList.hidden = false; }
@@ -9824,7 +9800,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
       label,
       node: canSave && (save === 'default' || hostMenu) ? captureNode : null,
       saved: save === 'host' ? hostSaved : appSaved,
-      keep: save === 'host' ? () => host.take() : () => toggleWordSave(captureNode, label),
+      // G5 · the one keep: add-only (a Save never un-keeps; Save ▾'s Review row and Remove are the ways out)
+      keep: save === 'host' ? () => host.take() : () => saveWord(captureNode, label),
       review: save === 'host'
         ? { saved: hostSaved, toggle: () => (host.saved?.() ? host.untake?.() : host.take()) }
         : { saved: appSaved, toggle: () => toggleWordSave(captureNode, label) },
@@ -10332,6 +10309,125 @@ async function sendSentenceToTutor(node, discuss, currentSurface, say) {
     if (recordReady(epoch)) say(teacherSourceError(error));
     return false;
   }
+}
+
+/* G5 · his lists in the order he uses them this session (the strip's first row reads it) */
+const sealListRecency = []; // list names this session touched, newest first (no learner-history timestamp is invented)
+function noteSealListUse(name) {
+  const at = sealListRecency.indexOf(name);
+  if (at >= 0) sealListRecency.splice(at, 1);
+  sealListRecency.unshift(name);
+}
+/* G5 · THE ONE KEEP. Add-only: it never calls the door that swings both ways (toggleTaken), whose second press removes —
+ * reused for a hold, a second hold would un-keep (Codex's G5 prep). One card, one write: a keep already on its way for the
+ * same card is joined, a toggle already on its way is waited out, and the latest record decides inside the transaction
+ * (captureStorePatch dedupes a card that is already there). "Kept" is read back from the record the write published:
+ * the seal, the count and the ring are consequences of durable success, never a guess. */
+const keepInFlight = new Map(); // srsKey → Promise<boolean>
+function keptState(node) {
+  if (node.t === 'word') return wordCaptureState(node);
+  return S.taken.some((row) => row.t === node.t && row.id === node.id) ? 'taken' : 'take';
+}
+async function keepWord(node, label) {
+  const key = srsKey(node.t, node.id);
+  const allowed = personalHost?.captureAccess?.() || (() => true);
+  if (!allowed()) return { status: 'held', key };
+  if (keepInFlight.has(key)) {
+    await keepInFlight.get(key);
+    return { status: keptState(node) === 'taken' ? 'already-kept' : 'failed', key };
+  }
+  for (let waited = 0; capturePending.has(key) && waited < 8000; waited += 40) await new Promise((done) => setTimeout(done, 40));
+  const before = keptState(node);
+  if (before === 'taken') return { status: 'already-kept', key };
+  if (before === 'conflict' || before === 'unavailable') return { status: 'held', key };
+  if (!recordWritable()) return { status: 'failed', key, reason: 'not-ready' };
+  if (capturePending.has(key)) return { status: 'failed', key, reason: 'busy' };
+  capturePending.add(key);
+  const write = commitCapture(node, label).catch(() => false).finally(() => capturePending.delete(key));
+  keepInFlight.set(key, write);
+  let ok = false;
+  try { ok = await write; } finally { keepInFlight.delete(key); }
+  if (!allowed()) return { status: 'held', key };
+  return { status: ok && keptState(node) === 'taken' ? 'created' : 'failed', key };
+}
+/** The one Save's keep (the stage's Save ▾, a deck card's Save): the one keep, then the toast and its Undo. Never a
+ * removal: a Save on a word that is already kept only says so (saveOne opens its menu for a kept word before this). */
+async function saveWord(node, label) {
+  const allowed = personalHost?.captureAccess?.() || (() => true);
+  if (!allowed()) return false;
+  if (!recordWritable()) {
+    showReaderToast(tx('記録の準備ができていません。少し待ってから、もう一度試してください。', 'Your record is not ready yet. Please try again in a moment.'));
+    return false;
+  }
+  const outcome = await keepWord(node, label);
+  if (!allowed()) return outcome.status === 'created' || outcome.status === 'already-kept';
+  if (outcome.status === 'held') { showReaderToast(wordCaptureHeldText(node, { route: false })); return false; }
+  if (outcome.status === 'failed') {
+    showReaderToast(outcome.reason === 'not-ready'
+      ? tx('記録の準備ができていません。少し待ってから、もう一度試してください。', 'Your record is not ready yet. Please try again in a moment.')
+      : tx('保存できませんでした。もう一度試してください。', 'Could not save. Please try again.'));
+    return false;
+  }
+  refreshWordSaveControls(node, label);
+  // S · the toast says what the Save says, nothing about review (John, 2026-10-16: "the Save itself says enough")
+  if (outcome.status === 'created') showReaderToast(tx('保存しました', 'Saved'), [tx('元に戻す', 'Undo'), () => allowed() && removeKept(node, label)]);
+  return true;
+}
+/** Remove: the one way a kept word goes out — the strip's Remove, a Save's toast Undo. Explicit only; its review history
+ * stays whole (toggleTaken's removal), so keeping it again resumes the schedule. */
+async function removeKept(node, label) {
+  if (keptState(node) !== 'taken') return true;
+  const allowed = personalHost?.captureAccess?.() || (() => true);
+  if (!allowed()) return false;
+  const removed = await toggleTaken(node, label);
+  if (!removed) {
+    showReaderToast(tx('変更を保存できませんでした。もう一度試してください。', 'Could not save the change. Please try again.'));
+    return false;
+  }
+  refreshWordSaveControls(node, label);
+  showReaderToast(tx('外しました', 'Removed'), [tx('元に戻す', 'Undo'), () => allowed() && saveWord(node, label)]);
+  return true;
+}
+/** One list transaction for the strip and Save ▾'s menu: the word is kept first (the one keep) when a list is added and
+ * it is not kept yet; a list is his curation — taking the word off a list never un-keeps it. */
+async function writeListMembership(node, label, listName, on) {
+  const allowed = personalHost?.captureAccess?.() || (() => true);
+  if (!allowed()) return 'held';
+  if (!recordWritable()) return 'not-writable';
+  if (node.t === 'word' && ['conflict', 'unavailable'].includes(wordCaptureState(node))) return 'held';
+  if (on && !S.taken.some((row) => row.t === node.t && row.id === node.id)) {
+    const kept = await keepWord(node, label);
+    if (!allowed()) return 'held';
+    if (kept.status === 'held') return 'held';
+    if (kept.status === 'failed') return 'capture-failed';
+    refreshWordSaveControls(node, label);
+  }
+  let saved = false;
+  try {
+    saved = await commitStorePatch((latest) => {
+      if (!allowed()) throw new Error('personal-capture-not-allowed');
+      const lists = { ...latest.lists };
+      const members = owns(lists, listName) ? lists[listName] : [];
+      if (!on) {
+        if (!owns(lists, listName)) return {};
+        setOwnRecordValue(lists, listName, members.filter((row) => !(row.t === node.t && row.id === node.id)));
+        return { lists };
+      }
+      const item = latest.taken.find((row) => row.t === node.t && row.id === node.id);
+      if (!item) throw new Error('captured-item-no-longer-available');
+      if (node.t === 'word' && wordCaptureState(node, latest) !== 'taken') throw new Error('word-identity-conflict');
+      setOwnRecordValue(lists, listName, members.some((row) => row.t === node.t && row.id === node.id) ? members : [...members,
+        { t: node.t, id: node.id, label, kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1], ts: item.ts,
+          ...(item.sourceContextRef ? { sourceContextRef: item.sourceContextRef } : {}) }]);
+      return { lists };
+    });
+  } catch { saved = false; }
+  if (!saved) return on ? 'list-failed' : 'remove-failed';
+  if (on) noteSealListUse(listName);
+  // S · made from a page's Save, the change is also the room's beneath (its lists, their counts): it is drawn again when
+  // the page closes
+  if (S.stack.length) S.roomStale = true;
+  return 'ok';
 }
 
 /* The word menu (John #11: "I want to be able to 'right click' and choose save"). A right-click, a press and
@@ -23797,7 +23893,8 @@ function chromeKeep() {
         showReaderToast(now.held ? readerCaptureReasonText(now.label) : wordCaptureHeldText(now.node, { route: false }));
         return false;
       }
-      return toggleWordSave(now.node, now.label);
+      // G5 · the one keep: a Save never un-keeps
+      return saveWord(now.node, now.label);
     },
     review: { saved: savedNow, toggle: () => { const now = chromeKeepTarget(); return now ? toggleWordSave(now.node, now.label) : false; } },
     more: () => [{ id: 'chrome-keep-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(chromeKeepTarget()?.label || '') }],
@@ -31938,7 +32035,8 @@ function composePage(node, path) {
     const capture = saveOne({
       id: 'sheet-take', cls: 'sheet-take', label: capLabel, node: capNode, place: 'drawer', saved: savedNow,
       keep: async () => {
-        const kept = await pageToggle();
+        // G5 · a Save never un-keeps: the toggle only ever takes here (its review row is the way back out)
+        const kept = savedNow() || await pageToggle();
         // the page was drawn again: its fresh Save opens the menu where the pressed one stood
         if (kept && savedNow()) document.getElementById('sheet-take')?.saveOneOpen?.();
         return kept;
@@ -35859,7 +35957,7 @@ function deckHost() {
       // 覚える from a deck card is the corridor's one save path (STANDARD A51): the same one-tap
       // save, Saved toast and 元に戻す as the reader's dictionary visit, into the shared review
       // pool; no chooser. A row already held for this identity is left as it is, never toggled off.
-      capture: (node, label) => (wordCaptureState(node) === 'taken' ? true : toggleWordSave(node, label)),
+      capture: (node, label) => (wordCaptureState(node) === 'taken' ? true : saveWord(node, label)),
       // Save ▾'s menu from a deck card's word sheet: the same lists, copy, and the way back out of review
       addToList: (node, label, invoker, { menu = false, onChange = null } = {}) => openVocabularyListPopover(node, label, invoker, menu ? { menu: true, more: [
         { id: 'kp-take-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(label) },
