@@ -12924,7 +12924,9 @@ function renderRecordNote(view, existing) {
       `同じ内容の保存記録 ${version.operationRefs.length} 件`,
       `${version.operationRefs.length} saved copies of this version`)));
     for (const segment of version.payload.segments) {
-      const text = el('p', 'record-note-segment', segment.text);
+      const text = el('p', 'record-note-segment');
+      // A committed note mounts without a room redraw; give its new prose the same doors immediately.
+      appendJapaneseLookup(text, segment.text);
       text.dataset.segmentKind = segment.kind;
       body.append(text);
       if (segment.kind === 'source-quote') {
