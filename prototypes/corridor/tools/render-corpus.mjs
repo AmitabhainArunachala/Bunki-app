@@ -37,16 +37,21 @@
  * is the input itself and no g2p step exists to go wrong; a one-second clip is too short for ASR to
  * judge, so words meet the duration and loudness gates only.
  *
- * Spend gate: `--render` needs the lead's authorization file, MISSION/authorizations/V-render.json:
- * { authorized: true, by: "lead", head_sha, max_usd, john_words, time } — head_sha must be the HEAD
- * of this checkout with no change outside audio/, and the job's estimate must fit max_usd, which
- * also caps the run as it goes. Inbox prose is never read. `--confirm` is still required. The key is
- * never read from disk: `dkeys exec GEMINI_API_KEY -- node tools/render-corpus.mjs --render --confirm`.
+ * Spend gate: `--render` reads ONE file, the canonical MISSION/authorizations/V-render.json written by
+ * the lead — { authorized: true, by: "lead", head_sha, max_usd, john_words, time } — and accepts no
+ * other path. head_sha must be the HEAD of this checkout, with no change outside audio/ and none to
+ * audio/voice-lock.json (the lock is an input, so it is held to the HEAD too). The job's estimate must
+ * fit max_usd, and every attempt — retries included — is debited against max_usd before it is made.
+ * Before the first provider call the ledger and its attempt log are created and written, and the
+ * pronunciation gate is started: a run that could not record or judge what it buys buys nothing.
+ * Every sentence purchase outside a mock run needs that gate; `--asr off` is for mock runs only.
+ * Inbox prose is never read. `--confirm` is still required. The key is never read from disk:
+ * `dkeys exec GEMINI_API_KEY -- node tools/render-corpus.mjs --render --confirm`.
  *
  *   node tools/render-corpus.mjs [--dry-run] [--corpus words|articles|examples|all] [--limit N]
  *                                [--subset name=ids.json]
  *   node tools/render-corpus.mjs --render --confirm [--corpus …] [--limit N] [--render-limit N]
- *                                [--asr small|base|off] [--pace ms] [--ledger file] [--authorization file]
+ *                                [--asr small|base] [--pace ms] [--ledger file]
  *   node tools/render-corpus.mjs --render --mock --root /tmp/outside-the-repo [--corpus …] [--limit N]
  */
 import { createHash } from 'node:crypto';
@@ -258,8 +263,10 @@ export function plan({ corpora = Object.keys(CORPORA), limit = 0, lock = LOCK } 
   const chars = buy.reduce((n, r) => n + r.text.length, 0);
   const seconds = buy.reduce((n, r) => n + r.seconds, 0);
   const rate = RATES[lock.model];
-  const digest = createHash('sha256').update(JSON.stringify(placements.map((p) => [p.path, p.fileKey])
-    .sort((a, b) => (a[0] < b[0] ? -1 : 1)))).digest('hex').slice(0, 16);
+  // the digest names the placements AND the whole lock (endpoint, prebuilt voice names), so a job
+  // digest written into an authorization cannot survive a change to either
+  const digest = createHash('sha256').update(JSON.stringify([readVoiceLock(), lock, placements.map((p) => [p.path, p.fileKey])
+    .sort((a, b) => (a[0] < b[0] ? -1 : 1))])).digest('hex').slice(0, 16);
   return {
     placements, renders: buy, perCorpus: per, digest, model: lock.model,
     billable: { clips: buy.length, chars, seconds, standard: price(chars, seconds, rate?.standard),
@@ -279,6 +286,15 @@ export function readLedger(file, model = LOCK.model) {
     if (ledger.v === 3 && ledger.model === model && ledger.files && ledger.renders) return ledger;
   } catch { /* absent or unreadable: an empty ledger trusts nothing */ }
   return { v: 3, model, renders: {}, files: {} };
+}
+/** Storage first: create the ledger's directory, write the ledger and open the attempt log, or
+ * throw — before any provider call. A run that cannot record what it buys must buy nothing. */
+export function preflightLedger(file, model) {
+  mkdirSync(dirname(file), { recursive: true });
+  const ledger = readLedger(file, model);
+  writeLedger(file, ledger);
+  appendFileSync(`${file}.attempts.jsonl`, `${JSON.stringify({ at: new Date().toISOString(), event: 'preflight', model })}\n`);
+  return ledger;
 }
 function writeLedger(file, ledger) {
   mkdirSync(dirname(file), { recursive: true });
@@ -340,7 +356,7 @@ export function characterErrorRate(heard, said) {
 
 /** A clip enters the manifest only if it passes every check. A failure is reported and the clip
  * is never placed — a wrong or empty recording must never become an approved asset. */
-export async function admit(file, item, { asr = null } = {}) {
+export async function admit(file, item, { asr = null, requireAsr = false } = {}) {
   const fails = [];
   let seconds = 0;
   try { seconds = ffprobeSeconds(file); } catch (error) { return { ok: false, fails: [`unreadable: ${String(error.message).slice(0, 80)}`] }; }
@@ -362,6 +378,7 @@ export async function admit(file, item, { asr = null } = {}) {
     if (peak > -0.1) fails.push(`clipping: peak ${peak} dB`);
   }
   let heard = null, cer = null;
+  if (requireAsr && !asr && item.role !== 'word') fails.push('asr required: no pronunciation gate for a sentence clip');
   if (asr && item.role !== 'word') {
     try { heard = await asr.transcribe(file); cer = characterErrorRate(heard, item.spoken); }
     catch (error) { fails.push(`asr failed: ${String(error.message).slice(0, 80)}`); }
@@ -383,6 +400,8 @@ export function startAsr(model = 'small') {
   let buffer = '', serial = 0, readyResolve, readyReject;
   const ready = new Promise((ok, no) => { readyResolve = ok; readyReject = no; });
   child.on('exit', (code) => { readyReject(new Error(`asr worker exited ${code}`)); for (const [, w] of waiting) w.reject(new Error(`asr worker exited ${code}`)); });
+  child.on('error', (error) => { readyReject(error); for (const [, w] of waiting) w.reject(error); });
+  ready.catch(() => {});
   child.stdout.setEncoding('utf8');
   child.stdout.on('data', (chunk) => {
     buffer += chunk;
@@ -399,6 +418,7 @@ export function startAsr(model = 'small') {
   });
   return {
     model,
+    ready,
     async transcribe(file) {
       await ready;
       const id = ++serial;
@@ -411,12 +431,14 @@ export function startAsr(model = 'small') {
 /* ---------------------------------------------------------------- the spend gate
  * One structured file, written by the lead alone. Inbox prose is never read: a sentence that only
  * mentions rendering, quotes it or negates it can authorize nothing. */
-export function checkoutState() {
-  const git = (...args) => execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8' }).trim();
+export function checkoutState(dir = repo) {
+  const git = (...args) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8' }).trim();
   const head = git('rev-parse', 'HEAD');
-  // the job's own outputs live under audio/; any other change means HEAD is not the code that runs
-  const dirty = git('status', '--porcelain', '--', '.', ':(exclude)prototypes/corridor/audio').length > 0;
-  return { head, dirty };
+  // the job's own outputs live under audio/; any other change means HEAD is not the code that runs.
+  // The lock is not an output: it is the job's main input, so it is held to HEAD like the code.
+  const outside = git('status', '--porcelain', '--', '.', ':(exclude)prototypes/corridor/audio');
+  const lock = git('status', '--porcelain', '--', 'prototypes/corridor/audio/voice-lock.json');
+  return { head, dirty: outside.length > 0 || lock.length > 0, lockChanged: lock.length > 0 };
 }
 export function authorization({ file = AUTHORIZATION_FILE, head, dirty, estimateUsd, digest } = {}) {
   let doc;
@@ -427,7 +449,7 @@ export function authorization({ file = AUTHORIZATION_FILE, head, dirty, estimate
   if (doc.by !== 'lead') problems.push('by is not "lead"');
   if (typeof doc.head_sha !== 'string' || !/^[0-9a-f]{7,40}$/u.test(doc.head_sha)) problems.push('head_sha missing');
   else if (!head?.startsWith(doc.head_sha)) problems.push(`head_sha ${doc.head_sha} is not the HEAD being rendered (${head})`);
-  if (dirty) problems.push('the checkout has changes outside audio/, so its HEAD is not the code that would run');
+  if (dirty) problems.push('the checkout has changes outside audio/ or to audio/voice-lock.json, so its HEAD is not what would run');
   if (!(typeof doc.max_usd === 'number' && Number.isFinite(doc.max_usd) && doc.max_usd > 0)) problems.push('max_usd missing');
   else if (estimateUsd !== null && estimateUsd > doc.max_usd)
     problems.push(`the job's estimate $${estimateUsd.toFixed(2)} exceeds max_usd $${doc.max_usd}`);
@@ -471,8 +493,10 @@ export async function synthesize({ text, voice, model, outFile, mock = false, se
     return { ok: false, status: response.status, retryAfterMs: Number.isFinite(retry) ? retry * 1000 : null,
       error: redact(body.slice(0, 300), key) };
   }
-  const part = JSON.parse(body).candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data);
-  if (!part) return { ok: false, status: response.status, error: 'no inlineData audio in the response' };
+  const parsed = JSON.parse(body);
+  const usage = parsed.usageMetadata || null;
+  const part = parsed.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data);
+  if (!part) return { ok: false, status: response.status, usage, error: 'no inlineData audio in the response' };
   const raw = `${outFile}.raw`;
   writeFileSync(raw, Buffer.from(part.inlineData.data, 'base64'));
   const mime = part.inlineData.mimeType || '';
@@ -482,22 +506,26 @@ export async function synthesize({ text, voice, model, outFile, mock = false, se
   execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', ...input, '-ac', '1', '-ar', '24000',
     '-c:a', 'aac', '-b:a', '64k', '-movflags', '+faststart', '-f', 'mp4', outFile], { stdio: ['ignore', 'pipe', 'pipe'] });
   rmSync(raw, { force: true });
-  return { ok: true };
+  return { ok: true, usage };
 }
 
 /** Synthesis with the provider's manners: back off on 429 and 5xx and network errors (honouring
- * Retry-After), stop the whole run on an authentication failure, never retry a 4xx request error. */
-export async function synthesizeWithRetry(args, { attempts = 6, baseMs = 2000, note = () => {} } = {}) {
+ * Retry-After), stop the whole run on an authentication failure, never retry a 4xx request error.
+ * Every attempt — the first and each retry — must first `reserve()` its budget: an attempt whose
+ * outcome is uncertain may be billed, so it is debited before it is made, never after. */
+export async function synthesizeWithRetry(args, { attempts = 6, baseMs = 2000, note = () => {}, reserve = () => true,
+  synth = synthesize, sleepFn = sleep } = {}) {
   let last = null;
   for (let attempt = 1; attempt <= attempts; attempt++) {
-    try { last = await synthesize(args); }
+    if (!reserve()) return { ...(last || {}), ok: false, budgetStop: true, attempt };
+    try { last = await synth(args); }
     catch (error) { last = { ok: false, status: 'convert', error: String(error.message).slice(0, 200) }; }
     note({ attempt, status: last.ok ? 200 : last.status, error: last.ok ? null : last.error });
     if (last.ok || last.fatal) return last;
     if (last.status === 401 || last.status === 403) return { ...last, fatal: true };
     const transient = last.status === 0 || last.status === 429 || last.status >= 500;
     if (!transient) return last;
-    await sleep(last.retryAfterMs ?? Math.min(60000, baseMs * 2 ** (attempt - 1)));
+    await sleepFn(last.retryAfterMs ?? Math.min(60000, baseMs * 2 ** (attempt - 1)));
   }
   return { ...last, ok: false, exhausted: true };
 }
@@ -505,11 +533,12 @@ export async function synthesizeWithRetry(args, { attempts = 6, baseMs = 2000, n
 /** Buy what is missing, restore every copy from proven bytes, keep the ledger honest. Never
  * called without the gate. Every attempt is appended to `<ledger>.attempts.jsonl`. `maxUsd`
  * caps the run by the published-rate estimate of what it has bought. */
-export async function run({ plan: job, root, ledgerFile, mock = false, pace = 600, limit = 0, asr = null, maxUsd = null, log = () => {} }) {
-  const ledger = readLedger(ledgerFile, job.model);
+export async function run({ plan: job, root, ledgerFile, mock = false, pace = 600, limit = 0, asr = null, maxUsd = null,
+  requireAsr = !mock, synth = synthesize, baseMs = 2000, log = () => {} }) {
+  const ledger = preflightLedger(ledgerFile, job.model);    // throws before any provider call
   const vouchers = shippedVouchers(root);
   const attemptsFile = `${ledgerFile}.attempts.jsonl`;
-  const out = { rendered: 0, reused: 0, placed: 0, rejected: [], failed: [], stopped: null, spentEstimateUsd: 0 };
+  const out = { rendered: 0, reused: 0, placed: 0, rejected: [], failed: [], stopped: null, spentEstimateUsd: 0, attemptsReserved: 0 };
   const byRender = new Map();
   for (const placement of job.placements) (byRender.get(placement.renderId) || byRender.set(placement.renderId, []).get(placement.renderId)).push(placement);
   const rate = RATES[job.model]?.standard;
@@ -526,25 +555,37 @@ export async function run({ plan: job, root, ledgerFile, mock = false, pace = 60
         out.reused += 1;
       } else {
         if (limit && bought >= limit) continue;
+        // a sentence clip is never bought without the gate that can hear whether it says its sentence
+        if (requireAsr && !asr && row.kind !== 'word') { out.stopped = { reason: 'asr-required', id: row.id }; break; }
         const cost = price(row.text.length, row.seconds, rate) ?? 0;
-        if (maxUsd !== null && out.spentEstimateUsd + cost > maxUsd) { out.stopped = { reason: 'max_usd', maxUsd, spentEstimateUsd: out.spentEstimateUsd }; break; }
+        const reserve = () => {
+          if (mock) return true;
+          if (maxUsd !== null && out.spentEstimateUsd + cost > maxUsd) return false;
+          out.spentEstimateUsd += cost; out.attemptsReserved += 1;
+          return true;
+        };
         bought += 1;
         const part = join(work, `${row.id}.m4a`);
         const result = await synthesizeWithRetry({ ...row, outFile: part, mock },
-          { note: (attempt) => appendFileSync(attemptsFile, `${JSON.stringify({ id: row.id, at: new Date().toISOString(), ...attempt })}\n`) });
-        out.spentEstimateUsd += mock ? 0 : cost;
+          { reserve, synth, baseMs, note: (attempt) => appendFileSync(attemptsFile, `${JSON.stringify({ id: row.id, at: new Date().toISOString(), ...attempt })}\n`) });
+        if (result.budgetStop) { out.stopped = { reason: 'max_usd', maxUsd, spentEstimateUsd: out.spentEstimateUsd, id: row.id }; break; }
+        // the provider's own count, where it gives one, replaces the estimate when it is larger
+        const actual = !mock && result.usage && rate ? ((result.usage.promptTokenCount || 0) * rate.inPerM
+          + (result.usage.candidatesTokenCount || 0) * rate.outPerM) / 1e6 : null;
+        if (actual !== null && actual > cost) out.spentEstimateUsd += actual - cost;
         // paced whatever the outcome: a run of refusals must not become a burst of requests
         if (pace && !mock) await sleep(pace);
         if (result.fatal) { out.stopped = { id: row.id, status: result.status, error: result.error }; break; }
         if (!result.ok) { out.failed.push({ id: row.id, status: result.status, error: result.error }); continue; }
-        const verdict = await admit(part, { role: row.kind === 'word' ? 'word' : 'narrator', spoken: row.text }, { asr });
+        const verdict = await admit(part, { role: row.kind === 'word' ? 'word' : 'narrator', spoken: row.text }, { asr, requireAsr });
         appendFileSync(attemptsFile, `${JSON.stringify({ id: row.id, at: new Date().toISOString(), admission: verdict })}\n`);
         if (!verdict.ok) { rmSync(part, { force: true }); out.rejected.push({ id: row.id, fails: verdict.fails }); continue; }
         bytes = readFileSync(part);
         rmSync(part, { force: true });
         ledger.renders[row.id] = { id: row.id, voice: row.voice, model: row.model, textSha256: textDigest(row.text),
           seconds: verdict.seconds, sha256: sha256(bytes), bytes: bytes.length, admission: { mean: verdict.mean,
-            peak: verdict.peak, ...(verdict.asr ? { asr: verdict.asr } : {}) }, renderedAt: new Date().toISOString(), mock: !!mock };
+            peak: verdict.peak, ...(verdict.asr ? { asr: verdict.asr } : {}) }, ...(result.usage ? { usage: result.usage } : {}),
+          ...(actual !== null ? { actualUsd: +actual.toFixed(6) } : {}), renderedAt: new Date().toISOString(), mock: !!mock };
         out.rendered += 1;
         renderId = row.id;
       }
@@ -601,7 +642,12 @@ async function main() {
   const usd = (n) => (n === null ? null : +n.toFixed(2));
   const fmt = (e) => ({ clips: e.clips, chars: e.chars, audioHours: +(e.seconds / 3600).toFixed(2),
     standardUSD: usd(e.standard), standardFrom2027USD: usd(e.standard2027) });
-  const authorizationFile = resolve(arg('authorization', AUTHORIZATION_FILE));
+  // the go-ahead is the canonical file and nothing else: no flag may point the gate elsewhere
+  if (process.argv.includes('--authorization')) {
+    console.error('--authorization is not accepted: the go-ahead is MISSION/authorizations/V-render.json, written by the lead');
+    return 2;
+  }
+  const authorizationFile = AUTHORIZATION_FILE;
 
   if (!flag('render')) {
     const remaining = owed(job);
@@ -644,6 +690,11 @@ async function main() {
 
   let ledgerFile = resolve(arg('ledger', ledgerPathFor(job.model)));
   let maxUsd = null;
+  const asrModel = arg('asr', mock ? 'off' : 'small');
+  if (!mock && asrModel === 'off' && job.renders.some((row) => row.kind !== 'word')) {
+    console.error('--asr off is for mock runs only: every sentence clip bought for real meets the pronunciation gate');
+    return 2;
+  }
   if (mock) {
     // a mock run writes tones; it may never write them where a real run or the app could take them
     // for recordings, so it needs its own root outside the repository and keeps its ledger there
@@ -669,14 +720,21 @@ async function main() {
     }
     maxUsd = go.maxUsd;
   }
-  const asrModel = arg('asr', mock ? 'off' : 'small');
+  // storage and judgement before spend: the ledger is written and the pronunciation gate is loaded
+  // before the first provider call, or nothing is bought
+  try { preflightLedger(ledgerFile, job.model); }
+  catch (error) { console.error(`REFUSING TO SPEND: the ledger cannot be written at ${ledgerFile}: ${error.message}`); return 3; }
   const asr = asrModel === 'off' ? null : startAsr(asrModel);
+  if (asr) {
+    try { await Promise.race([asr.ready, new Promise((_, no) => setTimeout(() => no(new Error('not ready in 180 s')), 180000).unref())]); }
+    catch (error) { asr.close(); console.error(`REFUSING TO SPEND: the pronunciation gate did not start: ${error.message}`); return 3; }
+  }
   try {
     const result = await run({ plan: job, root, ledgerFile, mock, pace: Number(arg('pace', '600')),
       limit: Number(arg('render-limit', '0')) || 0, asr, maxUsd });
     console.log(JSON.stringify({ rendered: result.rendered, reused: result.reused, placed: result.placed,
       rejected: result.rejected.length, failed: result.failed.length, stopped: result.stopped, mock, asr: asrModel,
-      spentEstimateUsd: +result.spentEstimateUsd.toFixed(2), maxUsd, ledgerFile,
+      attemptsReserved: result.attemptsReserved, spentEstimateUsd: +result.spentEstimateUsd.toFixed(2), maxUsd, ledgerFile,
       next: 'node tools/build-voice-manifest.mjs --write && node tools/build-listening-cues.mjs --write' }, null, 2));
     if (result.stopped) return 6;
     return result.failed.length || result.rejected.length ? 5 : 0;

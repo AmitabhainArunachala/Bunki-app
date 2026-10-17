@@ -14,8 +14,8 @@ import { fileURLToPath } from 'node:url';
 // KAIRO_RENDER_CORPUS points this suite at a one-law mutant of the job (tools/adjudicate-render-job-mutants.mjs);
 // unset, which is every real run, it is the shipped file
 const JOB = process.env.KAIRO_RENDER_CORPUS || './render-corpus.mjs';
-const { admit, ASR_MAX_CER, authorization, dialoguePieces, fileKey, owed, placementPath, plan, provenanceOf, readLedger,
-  run, sentenceUnits, shippedVouchers, startAsr } = await import(JOB);
+const { admit, ASR_MAX_CER, authorization, checkoutState, dialoguePieces, fileKey, owed, placementPath, plan, provenanceOf,
+  readLedger, run, sentenceUnits, shippedVouchers, startAsr } = await import(JOB);
 import { buildManifests } from './build-voice-manifest.mjs';
 import { runtimeLock } from './voice-lock.mjs';
 
@@ -195,10 +195,6 @@ test('MOCK · tones never enter the app tree, resume reuses, and a real run neve
   assert.equal(placementPath(placement, placement.voice), placement.path);
   rmSync(join(root, placement.path));
   assert.equal(JSON.parse(cli('--render', '--mock', '--root', root, '--corpus', 'words', '--limit', '3').stdout).rendered, 1);
-  // and a real render refuses without the lead's file, before any network
-  const real = cli('--render', '--confirm', '--corpus', 'words', '--limit', '1', '--authorization', join(root, 'absent.json'));
-  assert.equal(real.status, 3, real.stderr);
-  assert.match(real.stderr, /REFUSING TO SPEND/u);
 });
 
 test('MOCK · a missing copy is restored from the proven bytes, never bought twice', async () => {
@@ -220,12 +216,105 @@ test('MOCK · a missing copy is restored from the proven bytes, never bought twi
   assert.deepEqual(Object.values(ledger.files).map((row) => row.role).sort(), ['example', 'narrator']);
 });
 
-test('SPEND CAP · max_usd stops a run before the purchase that would pass it', async () => {
-  const root = join(scratch, 'cap'); mkdirSync(root);
-  const job = plan({ corpora: ['articles'], limit: 4 });
-  const result = await run({ plan: job, root, ledgerFile: join(root, '.mock-ledger.json'), mock: false, pace: 0, maxUsd: 0.000001,
-    // never reached: the cap refuses the first purchase before any synthesis
-    asr: null });
-  assert.equal(result.rendered, 0);
-  assert.equal(result.stopped?.reason, 'max_usd');
+/* ---------- the four of the 90152098 recheck (V-R1..R4). Synthesis is an inert stand-in that counts
+ * its calls; no network, no key. */
+const counting = (answer) => { const calls = []; const fn = async (args) => { calls.push(args.id); return answer(args); }; fn.calls = calls; return fn; };
+const toneSynth = counting(async ({ outFile, seconds }) => { mkdirSync(dirname(outFile), { recursive: true }); tone(outFile, Math.max(0.6, seconds)); return { ok: true }; });
+const cli = (args, env = {}) => spawnSync(process.execPath, [join('tools', JOB), ...args], { cwd: corridor, encoding: 'utf8', env: { ...process.env, ...env } });
+
+test('V-R1 · the ledger is created and written before any provider call; an unwritable one stops the run first', async () => {
+  const root = join(scratch, 'ledger'); mkdirSync(root);
+  const job = plan({ corpora: ['words'], limit: 1 });
+  const fresh = join(root, 'never', 'made', 'ledger.json');
+  const synth = counting(toneSynth);
+  const done = await run({ plan: job, root, ledgerFile: fresh, pace: 0, synth, baseMs: 0 });
+  assert.equal(done.rendered, 1, JSON.stringify(done));
+  assert.equal(synth.calls.length, 1);
+  const lines = readFileSync(`${fresh}.attempts.jsonl`, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
+  assert.equal(lines[0].event, 'preflight', 'the log was opened before the attempt it records');
+  assert(JSON.parse(readFileSync(fresh, 'utf8')).files[job.placements[0].path], 'the purchase is in the ledger');
+  // a resumed run finds its own row and buys nothing
+  const again = counting(toneSynth);
+  assert.equal((await run({ plan: job, root, ledgerFile: fresh, pace: 0, synth: again, baseMs: 0 })).rendered, 0);
+  assert.equal(again.calls.length, 0);
+  // a ledger that cannot be written: refused before the first provider call
+  const blocker = join(root, 'a-file'); writeFileSync(blocker, 'x');
+  const never = counting(toneSynth);
+  await assert.rejects(run({ plan: job, root, ledgerFile: join(blocker, 'ledger.json'), pace: 0, synth: never, baseMs: 0 }));
+  assert.equal(never.calls.length, 0, 'nothing was attempted');
+});
+
+test('V-R2 · production reads only the canonical authorization, and the lock is held to HEAD', () => {
+  // no flag may point the gate at another file
+  const pointed = cli(['--render', '--confirm', '--corpus', 'words', '--limit', '1', '--authorization', join(scratch, 'elsewhere.json')]);
+  assert.equal(pointed.status, 2, pointed.stderr);
+  assert.match(pointed.stderr, /--authorization is not accepted/u);
+  // the canonical file absent (a home with no MISSION tree): refused before any network or storage
+  const home = join(scratch, 'empty-home'); mkdirSync(home);
+  const absent = cli(['--render', '--confirm', '--corpus', 'words', '--limit', '1'], { HOME: home });
+  assert.equal(absent.status, 3, absent.stderr);
+  assert.match(absent.stderr, /REFUSING TO SPEND[\s\S]*no readable authorization/u);
+  // the lock is an input: a change to it is a change to what would run; the job's outputs are not
+  const repo = join(scratch, 'git-repo');
+  mkdirSync(join(repo, 'prototypes/corridor/audio/w/kore'), { recursive: true });
+  writeFileSync(join(repo, 'prototypes/corridor/audio/voice-lock.json'), '{"v":1}\n');
+  writeFileSync(join(repo, 'prototypes/corridor/tool.mjs'), '// code\n');
+  const git = (...args) => execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8' });
+  git('init', '-q'); git('add', '.'); git('-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '-m', 'fixture');
+  assert.equal(checkoutState(repo).dirty, false, 'a clean checkout');
+  writeFileSync(join(repo, 'prototypes/corridor/audio/w/kore/clip.m4a'), 'a rendered clip');
+  assert.equal(checkoutState(repo).dirty, false, 'the job\u2019s own output does not unpin HEAD');
+  writeFileSync(join(repo, 'prototypes/corridor/audio/voice-lock.json'), '{"v":1,"render":{"model":"another"}}\n');
+  assert.deepEqual([checkoutState(repo).dirty, checkoutState(repo).lockChanged], [true, true], 'a changed lock does');
+  git('checkout', '-q', '--', 'prototypes/corridor/audio/voice-lock.json');
+  writeFileSync(join(repo, 'prototypes/corridor/tool.mjs'), '// changed\n');
+  assert.equal(checkoutState(repo).dirty, true, 'and so does changed code');
+});
+
+test('V-R3 · no sentence clip is bought without the pronunciation gate', async () => {
+  // a two-second tone is a "sentence" by length and loudness; only the gate can refuse it
+  const toneFile = join(scratch, 'two-seconds.m4a'); tone(toneFile, 2.0);
+  const said = '今日は天気がいいですね。';   // ~2.5 s expected: the length check alone passes it
+  assert.equal((await admit(toneFile, { role: 'narrator', spoken: said })).ok, true, 'without the requirement it would pass');
+  const required = await admit(toneFile, { role: 'narrator', spoken: said }, { requireAsr: true });
+  assert.equal(required.ok, false);
+  assert(required.fails.some((fail) => /asr required/u.test(fail)), JSON.stringify(required.fails));
+  const wrong = await admit(toneFile, { role: 'narrator', spoken: said }, { requireAsr: true,
+    asr: { model: 'inert', transcribe: async () => 'ぜんぜんちがうおんせいです' } });
+  assert(wrong.fails.some((fail) => /^asr:/u.test(fail)), 'a wrong transcript is refused');
+  // the run refuses to buy a sentence with no gate, before any provider call
+  const root = join(scratch, 'asr'); mkdirSync(root);
+  const synth = counting(toneSynth);
+  const result = await run({ plan: plan({ corpora: ['articles'], limit: 1 }), root, ledgerFile: join(root, 'ledger.json'), pace: 0, synth, baseMs: 0 });
+  assert.equal(result.stopped?.reason, 'asr-required');
+  assert.equal(synth.calls.length, 0);
+  // and the command line refuses --asr off outside a mock run, before reading any authorization
+  const off = cli(['--render', '--confirm', '--asr', 'off', '--corpus', 'articles', '--limit', '1'], { HOME: join(scratch, 'empty-home') });
+  assert.equal(off.status, 2, off.stderr);
+  assert.match(off.stderr, /--asr off is for mock runs only/u);
+});
+
+test('V-R4 · every attempt, retries included, is debited before it is made', async () => {
+  const root = join(scratch, 'retry'); mkdirSync(root);
+  const job = plan({ corpora: ['words'], limit: 1 });
+  const row = job.renders[0];
+  const one = (row.text.length * 0.7283 / 1e6) * 0.5 + (row.seconds * 25 / 1e6) * 9.0;
+  const unavailable = () => counting(async () => ({ ok: false, status: 503, error: 'inert 503' }));
+  // six attempts cannot fit under a cap of 1.1 attempts: the second is refused before it is made
+  const tight = unavailable();
+  const capped = await run({ plan: job, root, ledgerFile: join(root, 'a.json'), pace: 0, synth: tight, baseMs: 0, maxUsd: one * 1.1 });
+  assert.equal(tight.calls.length, 1, 'one attempt, not six');
+  assert.equal(capped.stopped?.reason, 'max_usd');
+  assert(Math.abs(capped.spentEstimateUsd - one) < 1e-12, 'and that one attempt is on the account');
+  // with room for all six, all six are made and all six are debited
+  const roomy = unavailable();
+  const all = await run({ plan: job, root, ledgerFile: join(root, 'b.json'), pace: 0, synth: roomy, baseMs: 0, maxUsd: one * 6.5 });
+  assert.equal(roomy.calls.length, 6);
+  assert.equal(all.attemptsReserved, 6);
+  assert(Math.abs(all.spentEstimateUsd - one * 6) < 1e-12, 'every retry is debited, not just the first');
+  assert.equal(all.failed.length, 1);
+  // a cap below one attempt buys nothing at all
+  const none = unavailable();
+  await run({ plan: job, root, ledgerFile: join(root, 'c.json'), pace: 0, synth: none, baseMs: 0, maxUsd: one * 0.5 });
+  assert.equal(none.calls.length, 0);
 });
