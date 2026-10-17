@@ -3725,55 +3725,178 @@ async function main() {
       readerYKept > 200 && Math.abs(backFromSheet.y - readerYKept) <= 20,
     `${JSON.stringify(backFromSheet)} (kept ${readerYKept})`);
 
-  // (b) from a drift dive: one press surfaces ONE level of the water
-  await open('');
-  await page.waitForTimeout(2200);
-  const divePickText = await page.evaluate(`(() => {
-    const K = /[\\u4e00-\\u9fff]/;
-    for (const w of document.querySelectorAll('#drift-layer .word')) {
-      const r = w.getBoundingClientRect();
-      if (!r.width || r.left < 60 || r.right > 320 || r.top < 260 || r.bottom > 640) continue;
-      if (!K.test(w.textContent)) continue;
-      w.dataset.r3b = '1';
-      return w.textContent;
+  // (b) Hosted taps use the shared reading/stage/page visit. Device Back
+  // must fold every rung on the SAME occurrence without leaving this document.
+  const r3bState = () => page.evaluate(() => ({
+    stamp: window.__r3bDocument, view: document.body.dataset.view, history: history.state,
+    active: document.getElementById('drift-layer')?.classList.contains('active'),
+    mini: document.querySelector('#mini .mini-word')?.textContent ?? null,
+    sheet: document.querySelector('#sheet')?.dataset.node ?? null,
+    dived: document.body.classList.contains('drift-dived'), depth: document.getElementById('depth')?.textContent,
+  }));
+  const r3bTouch = async (point) => {
+    const offset = await page.evaluate(() => ({ x: visualViewport?.offsetLeft || 0, y: visualViewport?.offsetTop || 0 }));
+    const cdp = await context.newCDPSession(page);
+    try {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [
+        { x: point.x - offset.x, y: point.y - offset.y, radiusX: 6, radiusY: 6, force: 1 },
+      ] });
+      await page.waitForTimeout(60);
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    } finally { await cdp.detach(); }
+  };
+  const r3bWordTap = async (target) => {
+    let point = null;
+    // Wait before input for this exact printed occurrence, never replay a delivered tap.
+    for (let i = 0; i < 50 && !point; i++) {
+      point = await target.evaluate(owner => {
+        const r = owner.querySelector('.base')?.getBoundingClientRect();
+        if (!owner.isConnected || !r?.width) return null;
+        const x = r.x + r.width / 2, y = r.y + r.height / 2;
+        if (document.elementFromPoint(x, y)?.closest('.word') !== owner) return null;
+        window.__r3bPointer = null;
+        addEventListener('pointerdown', event => { window.__r3bPointer = {
+          same: event.target.closest('.word') === owner, trusted: event.isTrusted, type: event.pointerType,
+        }; }, { capture: true, once: true });
+        return { x, y };
+      });
+      if (!point) await page.waitForTimeout(100);
     }
-    return null;
-  })()`);
-  check('R3-B · a kanji word stands in the field to dive into', !!divePickText, divePickText ?? 'none');
-  const diveCdp = await page.context().newCDPSession(page);
-  let dived = false;
-  for (let i = 0; i < 5 && !dived && divePickText; i++) {
-    const at = await page.evaluate(`(() => {
-      const w = document.querySelector('#drift-layer .word[data-r3b]');
-      if (!w) return null;
-      const r = w.getBoundingClientRect();
-      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    })()`);
-    if (!at) break;
-    await diveCdp.send('Input.dispatchTouchEvent', {
-      type: 'touchStart',
-      touchPoints: [{ x: at.x, y: at.y }],
-    });
-    await page.waitForTimeout(70);
-    await diveCdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    await page.waitForTimeout(650);
-    dived = await page.evaluate(`document.body.classList.contains('drift-dived')`);
+    assert(point, 'R3-B: original word has an eligible printed hit target');
+    await r3bTouch(point);
+    const actual = await page.evaluate(() => window.__r3bPointer);
+    assert(actual?.same && actual.trusted && actual.type === 'touch', `R3-B native target: ${JSON.stringify(actual)}`);
+    await page.waitForTimeout(500);
+  };
+  for (const rung of ['reading', 'stage', 'page']) {
+    try {
+      await open('?entry=drift');
+      await page.waitForSelector('#drift-layer[data-record-state="active"]');
+      await page.waitForTimeout(2200);
+      assert.equal(await page.getAttribute('body', 'data-furigana'), '1', 'R3-B uses the restored on-touch dial');
+      const target = await page.evaluateHandle(() => [...document.querySelectorAll('#drift-layer .word')].find(n => {
+        const base = n.querySelector('.base'), reading = n.querySelector('.yomi'), r = base?.getBoundingClientRect();
+        return /[\u4e00-\u9fff]/.test(base?.textContent || '') && reading?.textContent &&
+          Number(getComputedStyle(reading).opacity) === 0 && r?.left > 60 && r.right < 330 && r.top > 230 && r.bottom < 620 &&
+          document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)?.closest('.word') === n;
+      }));
+      assert(await target.evaluate(n => !!n), 'R3-B: a visible known word supplies the reading rung');
+      const label = await target.evaluate(n => n.querySelector('.base').textContent);
+      await page.evaluate(rung => { window.__r3bDocument = `hosted-${rung}`; }, rung);
+      await r3bWordTap(target);
+      await page.waitForFunction(n => n.isConnected && n.dataset.ladderRung === 'reading', target);
+      if (rung !== 'reading') {
+        await r3bWordTap(target);
+        await page.waitForSelector('#mini');
+        assert.equal(await target.evaluate(n => n.dataset.ladderRung), 'stage');
+        assert.equal(await page.locator('#mini .mini-word').textContent(), label);
+      }
+      if (rung === 'page') {
+        await r3bWordTap(target);
+        await page.waitForSelector('#sheet');
+        assert.equal(await page.getAttribute('#sheet', 'data-node'), `word:${label}`);
+        assert(await target.evaluate(n => n.isConnected), 'Original occurrence survives page entry');
+      }
+      const before = await r3bState();
+      await page.goBack(); await page.waitForTimeout(800);
+      const after = await r3bState();
+      const origin = after.stamp === before.stamp ? await target.evaluate(n => ({
+        connected: n.isConnected, label: n.querySelector('.base')?.textContent, rung: n.dataset.ladderRung ?? null,
+        readingOpacity: getComputedStyle(n.querySelector('.yomi')).opacity,
+      })) : null;
+      const returned = after.stamp === before.stamp && after.view === 'drift' && after.active && !after.sheet &&
+        origin?.connected && origin.label === label && (rung === 'page'
+          ? origin.rung === 'stage' && after.mini === label
+          : !origin.rung && !after.mini && Number(origin.readingOpacity) === 0);
+      check(`R3-B · device Back from hosted ${rung} returns the exact occurrence`, returned,
+        JSON.stringify({ label, before, after, origin }));
+      if (rung === 'page') {
+        // Do not count a return after failed staging as evidence of a deeper Back.
+        let folded = null;
+        if (returned) { await page.goBack(); await page.waitForTimeout(800); folded = await r3bState(); }
+        const bareOrigin = folded?.stamp === before.stamp ? await target.evaluate(n => ({
+          connected: n.isConnected, rung: n.dataset.ladderRung ?? null, opacity: getComputedStyle(n.querySelector('.yomi')).opacity,
+        })) : null;
+        check('R3-B · another device Back folds the restored hosted stage in place',
+          !!returned && folded?.stamp === before.stamp && folded.view === 'drift' && folded.active &&
+          !folded.mini && !folded.sheet && bareOrigin?.connected && !bareOrigin.rung && Number(bareOrigin.opacity) === 0,
+          JSON.stringify({ folded, bareOrigin }));
+      }
+    } catch (error) {
+      check(`R3-B · hosted ${rung} native setup and return complete`, false, error.stack || String(error));
+    }
   }
-  await diveCdp.detach();
-  check('R3-B · the tap ladder carries into the dive', dived, `drift-dived after ladder taps`);
-  await page.evaluate('window.__r3bDive = 1');
-  await page.goBack();
-  await page.waitForTimeout(800);
-  const backFromDive = await page.evaluate(`({
-    sameDocument: window.__r3bDive === 1,
-    view: document.body.dataset.view,
-    dived: document.body.classList.contains('drift-dived'),
-    layerActive: document.getElementById('drift-layer')?.classList.contains('active'),
-  })`);
-  check('R3-B · device Back from a dive surfaces one level, never leaves the water',
-    backFromDive.sameDocument && backFromDive.view === 'drift' && !backFromDive.dived &&
-      backFromDive.layerActive,
-    JSON.stringify(backFromDive));
+
+  // (b2) The retained PRIVATE sky dive is still a separate Back obligation.
+  // Observe real hub-sprite paint calls (as verify-drift-hunt does), then one
+  // native touch enters the rendered hub. No app-state/API dive or tap loop.
+  await context.addInitScript(() => {
+    window.__r3bHubs = [];
+    const symbols = new WeakMap(), proto = window.CanvasRenderingContext2D.prototype;
+    const fillText = proto.fillText, drawImage = proto.drawImage;
+    proto.fillText = function (text, ...args) {
+      if (this.canvas.width === 96 && this.canvas.height === 96) symbols.set(this.canvas, String(text));
+      return fillText.call(this, text, ...args);
+    };
+    proto.drawImage = function (...args) {
+      if (this.canvas.id === 'fx' && args.length === 5 && args[0] instanceof window.HTMLCanvasElement &&
+          args[0].width === 96 && args[0].height === 96) {
+        window.__r3bHubs.push({ label: symbols.get(args[0]), x: args[1] + args[3] / 2, y: args[2] + args[4] / 2, at: performance.now() });
+        if (window.__r3bHubs.length > 1200) window.__r3bHubs.splice(0, 600);
+      }
+      return drawImage.apply(this, args);
+    };
+  });
+  try {
+    await open('?entry=drift');
+    await page.waitForSelector('#drift-layer[data-record-state="active"]');
+    await page.waitForTimeout(2200);
+    await page.evaluate(() => { window.__r3bDocument = 'private-dive'; });
+    const before = await r3bState();
+    assert(!before.dived && before.depth === '' && !before.mini && !before.sheet, 'Private dive starts at bare depth zero');
+    const hub = await page.waitForFunction(() => {
+      const now = performance.now(), seen = new Set(), options = [];
+      const rects = [...document.querySelectorAll('#drift-layer .word,#drift-layer .glyph,#drift-layer .part')]
+        .map(n => n.getBoundingClientRect());
+      for (const h of window.__r3bHubs.slice().reverse()) {
+        if (now - h.at >= 220 || !h.label || seen.has(h.label)) continue;
+        seen.add(h.label);
+        // Same visible hub-body samples as verify-drift-hunt, all within its
+        // existing 34px door. Clearance prevents native touch target adjustment
+        // from choosing a nearby word; the delivered target is asserted below.
+        for (const [dx, dy] of [[0,0],[24,0],[-24,0],[0,-24],[0,24],[17,-17],[-17,-17],[17,17],[-17,17]]) {
+          const x = h.x + dx, y = h.y + dy, hit = document.elementFromPoint(x, y);
+          if (x < 52 || x > 338 || y < 170 || y > 690 ||
+              hit?.closest('.word,.glyph,.part,#lvl,#theme,.drift-door,#ginga-symbol,#ginga-theme-seal,#chrome,.nav-bar')) continue;
+          const clearance = Math.min(...rects.map(r => Math.hypot(Math.max(r.left-x, 0, x-r.right), Math.max(r.top-y, 0, y-r.bottom))));
+          options.push({ ...h, canvas: { x: h.x, y: h.y }, x, y, dx, dy, clearance });
+        }
+      }
+      return options.sort((a, b) => b.clearance - a.clearance).find(h => h.clearance >= 12) || null;
+    }, null, { timeout: 6000 });
+    const point = await hub.jsonValue();
+    await page.evaluate(() => {
+      window.__r3bPointer = null;
+      addEventListener('pointerdown', event => { window.__r3bPointer = {
+        trusted: event.isTrusted, type: event.pointerType, node: event.target.closest('.word,.glyph,.part')?.className ?? null,
+      }; }, { capture: true, once: true });
+    });
+    await r3bTouch(point);
+    const actual = await page.evaluate(() => window.__r3bPointer);
+    assert(actual?.trusted && actual.type === 'touch' && !actual.node, `Native canvas hub target: ${JSON.stringify(actual)}`);
+    await page.waitForFunction(label => document.body.classList.contains('drift-dived') &&
+      document.getElementById('depth')?.textContent === label, point.label, { timeout: 5000 });
+    const dived = await r3bState();
+    const entered = dived.stamp === before.stamp && dived.dived && dived.depth === point.label && dived.history?.bunkiWalk?.v === 1;
+    check('R3-B · native canvas hub enters exactly one private sky level', entered, JSON.stringify({ point, actual, dived }));
+    await page.goBack(); await page.waitForTimeout(800);
+    const returned = await r3bState();
+    check('R3-B · device Back from a private dive surfaces one level, never leaves the water',
+      entered && returned.stamp === before.stamp && returned.view === 'drift' && returned.active &&
+      !returned.dived && returned.depth === '' && !returned.mini && !returned.sheet, JSON.stringify(returned));
+  } catch (error) {
+    check('R3-B · private dive native setup and return complete', false, error.stack || String(error));
+  }
 
   // (c) the archive keeps BOTH scroll contexts across Back — the year list
   // where a row was opened, and the shelf where its door stands ~20,000px deep
