@@ -157,15 +157,16 @@ for (const world of WORLDS) {
   await shoot('6-slip');
   await opaque('slip', '#mini');
   // the slip wears the world (CONTINUITY_CONTRACT §6): by day its band is the world's ink, the band's word the world's
-  // paper and Save the world's accent; at night the band is the world's lacquer (ground 48% + black), the word the
-  // world's ink and Save the lit accent (accent 9% on the ground). Every expected value is resolved by the page itself.
+  // paper and Save the world's accent; at night the band is the world's lacquer — its ground 30 % in its own deepest coat,
+  // the world block's --zen-stage-deep (Material II: never a neutral black) — the word the world's ink and Save the lit
+  // accent (accent 9% on the ground). Every expected value is resolved by the page itself.
   const band = await page.evaluate(`(() => {
     const head = document.querySelector('#mini .mini-head'), take = document.querySelector('#mini #mini-take');
     const resolve = (value) => { const i = document.createElement('i'); i.style.background = value; document.body.append(i); const c = getComputedStyle(i).backgroundColor; i.remove(); return c; };
     const night = ${JSON.stringify(['rokusho', 'yoru', 'nami', 'hakuu', 'kaku'].includes(world))};
     return { night, head: head && getComputedStyle(head).backgroundColor, headInk: head && getComputedStyle(head).color,
       take: take && getComputedStyle(take).backgroundColor,
-      wantHead: resolve(night ? 'color-mix(in srgb, var(--color-ground) 48%, #000000)' : 'var(--color-ink)'),
+      wantHead: resolve(night ? 'color-mix(in srgb, var(--color-ground) 30%, var(--zen-stage-deep))' : 'var(--color-ink)'),
       wantHeadInk: resolve(night ? 'var(--color-ink)' : 'var(--color-paper)'),
       wantTake: resolve(night ? 'color-mix(in srgb, var(--color-accent) 9%, var(--color-ground))' : 'var(--color-accent)') };
   })()`);
