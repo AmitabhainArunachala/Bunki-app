@@ -1412,7 +1412,7 @@ function answerBlock(card, word) {
   // has one, else the word's; the deck's English notes go behind 英語
   const jaNote = word.tip && !/[A-Za-z]/.test(word.tip);
   const note = (typeof card.tipJa === 'string' && card.tipJa) || (jaNote ? word.tip : '');
-  if (note) a.append(el('p', `kp-note${note === card.tipJa ? ' kp-note-passage' : ''}`, note));
+  if (note) a.append(answerWords(el('p', `kp-note${note === card.tipJa ? ' kp-note-passage' : ''}`), note));
   // a leech's repair ladder (§4) sits after tier one and before the folds, so the word, its
   // reading and the definition stay pinned under the passage on every card (learning-design L1)
   if (isLeech(ctx.state, card.id)) a.append(leechLadder(card, word));
@@ -1748,10 +1748,35 @@ function tapText(text, units, onTap) {
   return out;
 }
 
+/** Q · the answer's Japanese breaks only between its words, as the passage does (the host's one rule, ctx.words; the
+ * lead, inbox 1447): a <wbr> at each word's edge, never inside a word or a tap unit, and keep-all inside the words
+ * (player.css .kp-words). 話し合いによって条件をまとめるこ｜と and 定｜番 broke at the line's end. Without a host
+ * the text stands as it did. */
+function answerWords(node, text, units = null, onTap = null) {
+  const pieces = units?.length ? tapText(text, units, onTap) : [text];
+  const groups = ctx?.words && text ? ctx.words(text) : null;
+  if (!groups || groups.length < 2) { node.append(...pieces); return node; }
+  const cuts = new Set();
+  let end = 0;
+  for (const g of groups) { end += g.join('').length; cuts.add(end); }
+  let at = 0;
+  for (const piece of pieces) {
+    const len = typeof piece === 'string' ? piece.length : piece.textContent.length;
+    if (at && cuts.has(at)) node.append(document.createElement('wbr'));
+    if (typeof piece === 'string') {
+      let from = 0;
+      for (let i = 1; i < piece.length; i += 1) if (cuts.has(at + i)) { node.append(piece.slice(from, i), document.createElement('wbr')); from = i; }
+      node.append(piece.slice(from));
+    } else node.append(piece);
+    at += len;
+  }
+  node.classList.add('kp-words');
+  return node;
+}
 /** tier one's Japanese definition, its words tappable on the back */
 function defLine(card, word) {
   const p = el('p', 'kp-def');
-  p.append(...tapText(word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 })));
+  answerWords(p, word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 }));
   reflowWatch?.observe(p);
   return p;
 }

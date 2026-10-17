@@ -796,3 +796,7 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
   .kp .kp-card[data-window-controls] .kp-zoom-btn { padding-inline: 4px; min-width: 44px; }
   .kp .kp-card[data-window-controls] .kp-answer { padding-top: 0; }
 }
+
+/* Q · the answer's definition and note break only between their words (mount.js answerWords gives the <wbr>); a word
+   wider than its whole line may still break */
+.kp .kp-words { word-break: keep-all; overflow-wrap: break-word; line-break: strict; }

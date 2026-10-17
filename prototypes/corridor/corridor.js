@@ -4303,7 +4303,9 @@ function appendJaFlow(node, text) {
 function appendJaPieces(node, words) {
   const unit = (text) => { const span = document.createElement('span'); span.className = 'ja-unit'; span.textContent = text; return span; };
   words.forEach((word, i) => {
-    if (i && !/^\s/u.test(word) && !/\s$/u.test(words[i - 1])) node.append(document.createElement('wbr'));
+    // a plain space already lets the line end; an ideographic space (旅行記　入蔵) does not under keep-all in WebKit, so
+    // the break stands after it (never before it: no line opens on a space)
+    if (i && !/^\s/u.test(word) && !/[ \u00a0]$/u.test(words[i - 1])) node.append(document.createElement('wbr'));
     if (!/^[「『（〈《〔［｛(“"]|.[、。，．！？」』）〉》〕］｝〜…‥・：；!?]/u.test(word)) { node.append(word); return; }
     if (jaEms(word) <= 10) { node.append(unit(word)); return; }
     const open = /^[「『（〈《〔［｛(“"]+./u.exec(word);
@@ -8716,7 +8718,7 @@ function setJaWords(node, text) {
 /** a text's width in ems, as a Japanese face sets it: a full-width character one em, anything narrower about 0.6 */
 function jaEms(text) {
   let ems = 0;
-  for (const ch of String(text)) ems += /\s/u.test(ch) ? 0.3 : /[ᄀ-ᅟ⺀-꓏가-힣豈-﫿︰-﹏＀-｠￠-￦　-〿]|[\u{20000}-\u{3fffd}]/u.test(ch) ? 1 : 0.6;
+  for (const ch of String(text)) ems += ch === '\u3000' ? 1 : /\s/u.test(ch) ? 0.3 : /[ᄀ-ᅟ⺀-꓏가-힣豈-﫿︰-﹏＀-｠￠-￦　-〿]|[\u{20000}-\u{3fffd}]/u.test(ch) ? 1 : 0.6;
   return ems;
 }
 const JA_FIT_FLOOR = 0.72;
@@ -8830,7 +8832,7 @@ function appendJapaneseLookup(container, text, context = {}) {
     const unit = whole && [...group.join('')].length <= 12 ? el('span', 'ja-unit') : null;
     // a line may end between two words: WebKit offers no break between two no-break spans side by side (Guided's lede
     // ran 考え方をひらき、 off the phone), so a <wbr> stands between the words
-    if (wrapper.lastChild && !/^\s/u.test(group[0]) && !/\s$/u.test(wrapper.lastChild.textContent || '')) wrapper.append(document.createElement('wbr'));
+    if (wrapper.lastChild && !/^\s/u.test(group[0]) && !/[ \u00a0]$/u.test(wrapper.lastChild.textContent || '')) wrapper.append(document.createElement('wbr'));
     if (unit) wrapper.append(unit);
     const place = (node, segment) => {
       if (unit) unit.append(node);
