@@ -11389,10 +11389,28 @@ function refreshListenRow() {
   if (!row || !p || row.dataset.passage !== p.id) return;
   const focusedId = row.contains(document.activeElement) ? document.activeElement.id : null;
   const next = buildListenRow(p);
-  // in place: the row swaps where it stands (the foot of a phone, its own line on a desk), so the text under
-  // it does not move; the keyboard stays on the mark or the control it was on
-  row.replaceWith(next);
+  // the row swaps in its state's place (placeListenRow); the keyboard stays on the mark or the control it was on
+  placeListenRow(row, next);
   if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
+}
+/** F · the listen door's two places (the lead's ruling on Grok f-86, 2026-10-18): folded, its one glyph stands at the
+ * right end of the reader's instrument line, in the head's flow, so it never sits over the reading column at any scroll;
+ * open (playing, or held open), the bar stands where it always has — the phone's foot, a desk's own line under the head,
+ * just before the text. With no recording the row is an empty, hidden place in the head (buildListenRow). */
+function placeListenRow(row, next) {
+  const head = document.querySelector('#app > main .reader-head');
+  if (next.dataset.open === 'false' && head) {
+    if (row !== next) row?.remove();
+    head.prepend(next);
+    return;
+  }
+  const reader = document.getElementById('reader');
+  if (row?.closest('.reader-head') && reader) {
+    row.remove();
+    reader.before(next);
+    return;
+  }
+  row.replaceWith(next);
 }
 /* One drawn icon set for the reader and the shelf: a 24-unit grid, 1.6 stroke, round joins,
  * currentColor — never a font glyph standing in for an icon. */
@@ -11431,10 +11449,11 @@ function voicePendingNote(id) {
 
 /** The reader's play bar, built on its own so a late narration manifest can refresh just this
  * row in place — the focused token or glossary entry elsewhere in the reader is never replaced.
- * It carries only the locked narration voice. One glyph when idle (John, 2026-10-15 17:20): a speaker
- * mark, 44 px, quiet, bottom-right above the tabs; a tap opens the clean bar (play · progress · voice ·
- * speed), a tap on the mark closes it. With no clips for this article in that voice it is the same mark,
- * dimmed, the absence and the voice provenance in its description: no picker, no stand-in voice. */
+ * It carries only the locked narration voice. One glyph when idle (John, 2026-10-15 17:20: "a simple
+ * character… elegant and nearly hidden but obvious"): a speaker mark, 44 px, quiet, at the right end of the
+ * reader's instrument line (F, the lead's ruling 2026-10-18: never over the reading column); a tap opens the clean
+ * bar (play · progress · voice · speed) where it has always stood, a tap on the mark closes it. With no clips for this
+ * article in that voice there is no mark at all (no dead control): no picker, no stand-in voice. */
 function buildListenRow(p) {
   const listenRow = el('div', 'listen-row play-bar');
   listenRow.dataset.passage = p.id;
@@ -11444,14 +11463,11 @@ function buildListenRow(p) {
   mark.id = 'listen-open';
   mark.append(uiIcon('speaker'));
   if (!clips.length) {
+    // F (the lead's ruling, 2026-10-18): with no recording for this article there is no mark at all — no dead control.
+    // The row stays as an empty, hidden place (its passage named, so a late manifest can arm it in place)
     listenRow.classList.add('is-pending');
     listenRow.dataset.open = 'false';
-    mark.setAttribute('aria-disabled', 'true');
-    // it opens nothing, so it is not a stop on the keyboard's way through the text (as a disabled control is not)
-    mark.tabIndex = -1;
-    mark.setAttribute('aria-label', tx('聞く', 'Listen'));
-    mark.setAttribute('aria-describedby', 'listen-note');
-    listenRow.append(mark, voicePendingNote('listen-note'));
+    listenRow.hidden = true;
     return listenRow;
   }
   if (readAloud.pid !== p.id) { readAloud.pid = p.id; readAloud.clip = 0; readAloud.failed = null; readAloud.barOpen = false; }
@@ -11584,10 +11600,12 @@ function renderReader(main) {
     S.dialsOpen = !S.dialsOpen;
     render();
   });
-  // the listen door: one mark in one place (John, 2026-10-15): the bar stands below the head, folded to its
-  // speaker mark until the learner opens it — dimmed when this article has no recording
+  // the listen door: one mark in one place (John, 2026-10-15): folded, its speaker mark ends the instrument line until
+  // the learner opens it; none at all when this article has no recording
   const listenRow = buildListenRow(p);
   head.append(meta, dialsToggle);
+  // folded (or absent), the door's place is the head: its glyph at the instrument line's right end (placeListenRow)
+  if (listenRow.dataset.open === 'false') head.prepend(listenRow);
   card.append(head);
   const versions = storyVersions(p);
   if (versions) {
@@ -11651,8 +11669,8 @@ function renderReader(main) {
     main.append(dials);
   }
 
-  // a narrated article's listen door — one tap to hear the article, one tap to stop
-  main.append(listenRow);
+  // a narrated article's listen door, open: one tap to hear the article, one tap to stop (folded, it is in the head)
+  if (listenRow.dataset.open !== 'false') main.append(listenRow);
   // the sentence's actions live in the word popup and the word menu: no bar floats over the text (#18)
   renderReaderTip(card);
 

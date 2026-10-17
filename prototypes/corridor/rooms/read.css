@@ -1412,6 +1412,25 @@ html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-car
   border-top: 1px solid color-mix(in srgb, var(--color-ink) 9%, transparent);
 }
 html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .reader-head > .reader-meta { padding-top: 8px; }
+/* F · the folded listen mark (the lead's ruling on Grok f-86, 2026-10-18): one glyph at the right end of the instrument
+   line, in the head's flow — a float the line's text steps around, beside the settings icon (whose 34 px in the head its
+   right margin keeps) — so it never sits over the reading column at any scroll. Open, the bar stands where it always has
+   (editorial.css: the phone's foot, a desk's own line). With no recording the head holds no mark. */
+html[data-room='reader'] body:not([data-view='drift']) #app .reader-head > .listen-row.play-bar[data-open='false'] {
+  position: static;
+  float: right;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  max-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  margin: 0 34px 0 8px;
+  padding: 0;
+}
+html[data-room='reader'] body[data-view='reader'] #app > main .reader-head:has(> .listen-row:not([hidden])) > .reader-meta::before { width: 0; }
+/* the head holds its float: what follows starts under the mark, never beside it */
+html[data-room='reader'] body:not([data-view='drift']) #app > main .reader-head:has(> .listen-row:not([hidden])) { display: flow-root; }
 html[data-room='reader'] body:not([data-view='drift']) #app > main > .reader-card > .reader-head > .dials-toggle {
   position: absolute;
   top: 0;
