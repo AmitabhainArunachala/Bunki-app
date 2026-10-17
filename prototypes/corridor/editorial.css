@@ -53,7 +53,7 @@ body, body.v-contrast-wcag {
 /* a night world lifts each topic's colour toward its own light ink, so a kicker or a calm block's
    word still reads on a dark card */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(.story-kicker, .story-picture-word) {
-  color: color-mix(in srgb, var(--topic, var(--tint)) 45%, var(--ink));
+  color: var(--kicker, color-mix(in srgb, var(--topic, var(--tint)) 45%, var(--ink)));
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body {
   --surface: var(--ground-0);
@@ -149,11 +149,12 @@ body:not(.zen) #app > .chrome > button.theme-seal {
   width: 44px;
   padding: 0;
   border-radius: 999px;
+  /* drawn: the world seal's disc, hard-edged */
   background: radial-gradient(circle, var(--fill) 15px, transparent 15.5px);
   color: var(--label);
   font: 500 15px/1 var(--serif);
 }
-body:not(.zen) #app > .chrome > button.theme-seal:hover { background: radial-gradient(circle, var(--fill-strong) 15px, transparent 15.5px); }
+body:not(.zen) #app > .chrome > button.theme-seal:hover { /* drawn: the world seal's hover disc, hard-edged */ background: radial-gradient(circle, var(--fill-strong) 15px, transparent 15.5px); }
 /* EN | 日本語: an iOS segmented control, a 32px track inside 44px doors */
 body:not(.zen) #app > .chrome .lang-seg {
   position: relative;
@@ -868,7 +869,7 @@ body .chip .big { font-family: var(--serif); }
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0 6px;
-  color: var(--topic, var(--tint));
+  color: var(--kicker, var(--topic, var(--tint)));
   font: 700 13px/1.3 var(--sans);
   letter-spacing: 0.04em;
 }
@@ -1245,14 +1246,7 @@ body #shelf-body .story-card:focus-within { outline: 2px solid var(--tint); outl
   object-fit: cover;
   transition: transform 600ms var(--ease-standard);
 }
-/* until a picture exists: a calm block in the story's colour, its topic word in small capitals */
-.story-picture.is-placeholder {
-  display: grid;
-  place-items: center;
-  background:
-    radial-gradient(120% 90% at 18% 12%, color-mix(in srgb, #fff 55%, transparent) 0%, transparent 60%),
-    linear-gradient(150deg, color-mix(in srgb, var(--topic, var(--tint)) 14%, var(--surface)) 0%, color-mix(in srgb, var(--topic, var(--tint)) 30%, var(--surface)) 100%);
-}
+/* (the calm topic-coloured placeholder block is gone: a picture-less story wears its key-kanji sheet, Material II) */
 .story-picture-word {
   padding: 0 12px;
   font: 600 13px/1.2 var(--sans);
@@ -1512,7 +1506,8 @@ body[data-view='reader'] #app > main > .view-title-en {
   margin: 0;
   padding: 18px 12px 8px;
   border-radius: 0 0 var(--radius-card) var(--radius-card);
-  background: linear-gradient(180deg, transparent, rgb(0 0 0 / 34%));
+  /* bokashi: atenashi — a picture's caption ground — depth: the world's deepest coat rising under the caption so its words read on any print */
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--tone-shade, var(--zen-stage-deep)) 40%, transparent));
   font: 600 11px/1.3 var(--sans);
   letter-spacing: 0.04em;
   color: #fff;
@@ -2321,6 +2316,7 @@ body .reference-library .reference-level {
   transition: transform 180ms ease-out;
 }
 body .reference-library .reference-level[data-level] {
+  /* bokashi: ichimonji — a level's card — light: the level's own colour wiped across the card's top, gone into the raised paper by 70 % */
   background: linear-gradient(180deg, color-mix(in srgb, var(--lv) 9%, var(--raised)) 0%, var(--raised) 70%);
   border-color: color-mix(in srgb, var(--lv) 30%, var(--raised-edge));
 }
@@ -2370,6 +2366,7 @@ html[data-register='jlpt'] .exam-levels .chip.exam-level-card {
   padding: var(--s2) var(--s2) 20px;
   border: 1px solid color-mix(in srgb, var(--lv) 28%, var(--raised-edge));
   border-radius: var(--radius-card);
+  /* bokashi: ichimonji — a level's card — light: the level's own colour wiped across the card's top, gone into the raised paper by 75 % */
   background: linear-gradient(180deg, color-mix(in srgb, var(--lv) 8%, var(--raised)) 0%, var(--raised) 75%);
   box-shadow: var(--raised-shadow);
   color: var(--text);
@@ -3184,8 +3181,9 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
    only bold thing; every other mark is quiet, and nothing moves that does not have to.
    ─ the stage: a faint lamp above the card gives it depth (a light, not a gradient wash) */
 #app .kp:has(> .kp-study) {
+  /* bokashi: urushi — the deck's stage — light: a lamp above the card, the world's raised paper held as light in its lacquer */
   background:
-    radial-gradient(120% 55% at 50% 22%, color-mix(in srgb, var(--kp-stage) 86%, #9db0d4) 0%, transparent 72%),
+    radial-gradient(120% 55% at 50% 22%, color-mix(in srgb, var(--world-paper) 10%, transparent) 0%, transparent 72%),
     var(--kp-study-ground);
 }
 /* ─ the bar: ×, one hairline of progress, the count in plain figures, Remove as a quiet word */
@@ -3293,7 +3291,9 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
    Easy) — and color coded"), red · amber · green · blue as in the decks. Each word takes its hue at a
    lightness drawn from the dock's own ink, so it reads on every stage, dark or light (measured ≥ 5.9:1);
    Good, the usual answer, is tinted. Words in the interface face, intervals as tabular figures */
-#app .kp-study .kp-grades { column-gap: 8px; border-top: 0; background: linear-gradient(transparent, var(--kp-dock) 14px); padding-top: 16px; }
+#app .kp-study .kp-grades { column-gap: 8px; border-top: 0;
+  /* drawn: the deck's grade dock — its top edge one hard line where the dock begins (a 14 px fade read as a smear) */
+  background: linear-gradient(transparent 0 15px, var(--kp-dock) 15px); padding-top: 16px; }
 #app .kp-study .kp-grade {
   --kp-grade-ink: var(--kp-dock-ink);
   min-height: 60px; gap: 4px; border-radius: var(--radius-seal); box-shadow: none;
@@ -4131,8 +4131,8 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
   --elevation-float: 0 -1px 0 rgb(25 28 34 / 8%), 0 -16px 48px rgb(25 28 34 / 18%);
   --elevation-press: 0 2px 0 var(--color-press), 0 8px 18px -6px rgb(20 26 40 / 30%);
 
-  /* room light (rooms/*.css set --skin-light; the default is morning from the upper left) */
-  --skin-light: radial-gradient(120% 60% at 0% 0%, rgb(255 255 255 / 34%), transparent 60%);
+  /* room light: rooms/*.css set --skin-light; the default (morning from the upper left, the world's raised paper) is
+     Material II's, below */
   --skin-ground: none;
 }
 /* ベロ藍・浪, the default world, is the concept's day palette exactly: sumi ink, 藍 structure */
@@ -4177,10 +4177,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
   --elevation-card: inset 0 1px 0 rgb(255 255 255 / 5%), 0 14px 32px -8px rgb(0 0 0 / 60%);
   --elevation-lift: inset 0 1px 0 rgb(255 255 255 / 6%), 0 22px 48px -10px rgb(0 0 0 / 70%);
   --elevation-float: 0 -1px 0 color-mix(in srgb, var(--color-accent) 16%, transparent), 0 -18px 56px rgb(0 0 0 / 60%);
-  /* the city through the paper: a low glow from below, cool above */
-  --skin-light:
-    radial-gradient(130% 42% at 50% 112%, color-mix(in srgb, var(--color-gold) 16%, transparent), transparent 70%),
-    radial-gradient(90% 40% at 100% 0%, color-mix(in srgb, var(--color-accent) 10%, transparent), transparent 70%);
+  /* the city through the paper (a low glow from below, cool above) is Material II's urushi light, below */
 }
 /* 夜 is the 藍 room itself: its light is 藍 (the world's gold stays as lantern gold) */
 :where(:root[data-theme='yoru'] body:not([data-view='drift'])) { --color-accent: #9db8e6; --color-accent-wash: rgb(157 184 230 / 10%); }
@@ -4599,6 +4596,7 @@ body.has-primary-tabs .primary-tabs {
 body.has-primary-tabs:not(.zen) #app > .chrome .lang-seg {
   margin-right: 0;
   padding-right: 7px;
+  /* drawn: the language pair's divider, one hairline */
   background: linear-gradient(var(--color-rule), var(--color-rule)) right 3px center / 1px 16px no-repeat;
 }
 body.has-primary-tabs:not(.zen) #app > .chrome > button:is(.chrome-search, .chrome-dojo, #tray) { color: var(--color-muted); }
@@ -4844,7 +4842,7 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
      weight, tracking and leading */
   --leading-ui: 1.35;
   --leading-body: 1.55;
-  --skin-light: radial-gradient(120% 50% at 0% 0%, rgb(255 255 255 / 22%), transparent 60%);
+  /* the page's light is Material II's (a white haze of its own here also fell on every night world: toward grey) */
 }
 /* ベロ藍・浪, the default world: sumi ink near-black, 藍 structure, a cleaner washi */
 :where(:root:is(:not([data-theme]), [data-theme='']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
@@ -5133,6 +5131,145 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg button { min-width: 44px; padding-inline: 0; }
 }
 /* END BUNKI R4 SKIN ======================================================== */
+
+/* ==========================================================================
+   BEGIN BUNKI MATERIAL II · bokashi 暈し — contrast and gradation (slice M, 17 October 2026)
+   John (10-15): "things can be their own color. That is not a problem. But the contrast should be deeply
+   considered and have roots in artistic or aesthetic inspiration… Color gradation throughout the app is
+   actually preferred and can bring deeper focus and texture and professionalism but it has to be done right".
+   The worlds are prints, so their gradation is the printer's: one of the world's own pigments wiped into its
+   paper. 一文字ぼかし (ichimonji), the straight band of pigment across the top of a print's sky: the one top bar
+   and the Line. あてなしぼかし (atenashi), soft and edgeless, laid without a guide: the page's light, the room
+   heroes, the word's page at its headword, the key-kanji sheets. 漆の深み (urushi), at night: light held inside
+   the coats, surfaces stepping from the world's deepest coat to its sheen, never toward grey. 殻 emits: edges
+   and glows from the phosphor, never a lit fill. Every value is a world token (corridor.css) or a mix of two;
+   every gradient names its bokashi, its surface and why (depth | light | brush | focus); contract §6 "Material
+   II" tables them, and verify-contrast-sweep measures them in all eleven worlds, in WebKit and Chromium.
+   ========================================================================== */
+:where(body:not([data-view='drift']), body[data-view='drift'] #sheet) {
+  /* the ramp: ground (the page) · raised (the world's raised paper) · sunk (a breath under the page — half its
+     second ground, so a sunk surface never sits 8 % below the page: no muddy surface) · shade (its deepest coat) */
+  --tone-ground: var(--world-ground);
+  --tone-raised: var(--world-paper);
+  --tone-sunk: color-mix(in srgb, var(--world-ground-2) 50%, var(--world-ground));
+  --tone-shade: var(--zen-stage-deep);
+  /* the key pigment the printer wipes into the sky (each world names its own below), and its share at the edge */
+  --tone-key: var(--world-ink);
+  --tone-key-share: 6%;
+  --tone-wash: color-mix(in srgb, var(--tone-key) var(--tone-key-share), var(--tone-raised));
+  /* the house gold (金, corridor.css :root), lowered by day into the world's ink so it reads on paper */
+  --tone-gold: color-mix(in srgb, var(--gold) 55%, var(--world-ink));
+  /* the frame is the world's raised paper (it was a white of its own) */
+  --color-bar: var(--tone-raised);
+  --color-bar-quiet: color-mix(in srgb, var(--color-ink) 76%, var(--color-bar));
+  /* bokashi: ichimonji — the one top bar — light: the world's key pigment wiped across the top of its sky, gone into the raised paper by the hairline */
+  --tone-bar-paint: linear-gradient(180deg, var(--tone-wash), var(--tone-raised));
+  /* bokashi: ichimonji — the Line — light: the same band laid under the track, the stations standing in it */
+  --tone-line-paint: linear-gradient(180deg, var(--tone-wash), var(--tone-raised) 52px);
+  /* bokashi: atenashi — the page's light — light: the world's raised paper wiped into its ground from the upper left, morning */
+  --skin-light: radial-gradient(120% 50% at 0% 0%, color-mix(in srgb, var(--tone-raised) 72%, transparent), transparent 60%);
+  /* the stage's and the reader mat's lacquer is the world's own: its ink, deepened toward its deepest coat (墨 is sumi
+     lacquer, 赤 umber, 柿 焦茶; ベロ藍 keeps its Berlin-blue lacquer) — never a navy of the house's in every world */
+  --color-lacquer: color-mix(in srgb, var(--world-ink) 74%, var(--tone-shade));
+  --color-lacquer-2: var(--world-ink);
+  --color-lacquer-ink: var(--world-paper);
+  /* the kicker prints from one of the world's own blocks (corridor.js storyTopicBlock): 藍, 朱 lowered by 墨, or 墨 */
+  --kicker-ai: var(--color-accent);
+  --kicker-shu: color-mix(in srgb, var(--color-signal) 80%, var(--color-ink));
+  --kicker-sumi: var(--color-ink-2);
+}
+/* each day world's key pigment — the block its sky is printed from */
+/* ベロ藍・浪: Hokusai's Berlin blue, the sky band of the Thirty-six Views */
+:where(:root:is(:not([data-theme]), [data-theme='']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --tone-key: var(--world-accent); --tone-key-share: 8%; }
+/* 墨・楮紙: sumi itself, its 濃淡 */
+:where(:root[data-theme='sumi'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --tone-key: var(--world-ink); --tone-key-share: 6%; }
+/* 朱・胡粉: the vermilion as a dawn band, at a whisper (the seal keeps its full red) */
+:where(:root[data-theme='shu'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --tone-key: var(--world-signal); --tone-key-share: 5%; }
+/* 凱風快晴: the Prussian-blue sky over the red mountain */
+:where(:root[data-theme='akafuji'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --tone-key: var(--world-accent); --tone-key-share: 8%; }
+/* 焦茶・柿渋: the umber deepening of the persimmon tannin */
+:where(:root[data-theme='iwa'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --tone-key: var(--world-ink); --tone-key-share: 6%; }
+/* 板木・墨: the keyblock's sumi line */
+:where(:root[data-theme='keyblock'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --tone-key: var(--world-ink); --tone-key-share: 6%; }
+/* night: 漆の深み. The frame is the deepest coat, the page the world's ground, its sheen the raised lacquer; the light
+   that crosses it is the world's own (lantern gold, its accent) */
+:where(:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+  --tone-sunk: color-mix(in srgb, var(--tone-shade) 40%, var(--world-ground));
+  --tone-depth: color-mix(in srgb, var(--tone-shade) 55%, var(--world-ground));
+  --tone-sheen: var(--world-paper);
+  --tone-key: var(--world-accent);
+  --tone-key-share: 10%;
+  --tone-gold: var(--gold);
+  /* the night's rules (the Line's track, the language pair's divider) are drawn in the world's own lit accent, not a
+     teal of the house's */
+  --color-rule: color-mix(in srgb, var(--color-accent) 36%, transparent);
+  --color-rule-soft: color-mix(in srgb, var(--color-accent) 11%, transparent);
+  --color-bar: var(--tone-depth);
+  /* bokashi: urushi — the one top bar — depth: the deepest coat at the top, the lacquer's held light rising to its lit hairline */
+  --tone-bar-paint: linear-gradient(180deg, var(--tone-shade), var(--tone-depth));
+  /* bokashi: urushi — the Line — depth: the coat nearest the page stepping down into the deepest coat at the foot */
+  --tone-line-paint: linear-gradient(180deg, var(--tone-depth), var(--tone-shade));
+  /* bokashi: urushi — the page's light at night — light: lantern gold glowing up from below, the world's own light cool above; held in the lacquer, never a grey haze */
+  --skin-light: radial-gradient(130% 42% at 50% 112%, color-mix(in srgb, var(--tone-gold) 16%, transparent), transparent 70%), radial-gradient(90% 40% at 100% 0%, color-mix(in srgb, var(--world-accent) 10%, transparent), transparent 70%);
+  --color-lacquer: color-mix(in srgb, var(--world-ground) 45%, var(--tone-shade));
+  --color-lacquer-2: color-mix(in srgb, var(--world-ground) 75%, var(--tone-shade));
+  --color-lacquer-ink: var(--world-ink);
+  /* at night the kicker's blocks are quieter, so the level's 朱 seal stays the screen's one red */
+  --kicker-ai: color-mix(in srgb, var(--color-accent) 55%, var(--color-ink));
+  --kicker-shu: color-mix(in srgb, var(--color-signal) 45%, var(--color-ink));
+  /* the bar's quiet ink at night: the world's ink into its ground (two pigments; the bar itself is already a mix) */
+  --color-bar-quiet: color-mix(in srgb, var(--color-ink) 76%, var(--world-ground));
+}
+/* 殻 · the electric night emits: its frame is the deep coat, flat, and the phosphor bleeds from the lit hairlines */
+:where(:root[data-theme='kaku'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+  /* bokashi: emitted — the one top bar — light: phosphor rising from the bar's lit hairline, never a lit fill */
+  --tone-bar-paint: linear-gradient(0deg, color-mix(in srgb, var(--world-accent) 4%, transparent), transparent 28px);
+  /* bokashi: emitted — the Line — light: phosphor falling from the Line's lit hairline */
+  --tone-line-paint: linear-gradient(180deg, color-mix(in srgb, var(--world-accent) 4%, transparent), transparent 28px);
+}
+/* the one top bar (every instance: the room's chrome, the page's bar, the writing room's, the deck's, the guided room's)
+   and the Line wear their band over the opaque frame */
+body:not(.zen) #app > .chrome, [data-bar] { background-image: var(--tone-bar-paint); }
+.primary-tabs, body.has-primary-tabs .primary-tabs { background-image: var(--tone-line-paint); }
+/* the word's page at night: the world's own light gathered behind its headword, a breath lighter at the word, settling to the
+   page's flat paper (it scrolls with the words, so the reading below stays bare). By day no pigment is lighter than the
+   page's own raised paper — a pigment cloud there read as a shadow under the bar (the 墨 page) — so by day the head is bare. */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(body .sheet, body.v-depth-layered .sheet) {
+  /* bokashi: atenashi — the word's page at night, at its headword — focus: the world's lit accent gathered behind the word, edgeless */
+  background-image: radial-gradient(120% 150px at 50% 96px, color-mix(in srgb, var(--tone-key) 6%, transparent), transparent);
+  background-attachment: local;
+  background-repeat: no-repeat;
+}
+/* the key-kanji sheet of a picture-less article: the glyph on the world's raised paper, the world's key pigment soaked
+   in behind it like ink into washi (lead lead's ask, 10-17: "they read stark beside the woodblock prints") */
+.story-picture.is-kanji,
+html[data-room='shelf'] #shelf-body .story-lead .story-picture.is-kanji {
+  --kanji-wash: 7%;
+  /* bokashi: atenashi — the key-kanji sheet — focus: the world's key pigment soaked into its raised paper behind the glyph, deepest at the heart, gone by the edge */
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--tone-key) var(--kanji-wash), var(--tone-raised)), var(--tone-raised)) var(--tone-raised);
+}
+/* at night the wash is the world's lit accent, which stands far from its dark paper: a lighter hand */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .story-picture.is-kanji { --kanji-wash: 5%; }
+/* the word's page at night: its reading (the world's lit red) lifted a step by the world's light ink, so it reads at 4.5:1
+   on the lit focus around the headword and on the homographs' rows (浪 read 4.0:1) */
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #sheet :is(.reading, .reading .japanese-lookup-word, .row-reading) {
+  color: color-mix(in srgb, var(--color-signal) 72%, var(--color-ink));
+}
+/* 柿渋's paper is mid-tone: its quiet print takes more ink to read at 4.5:1 on the persimmon (it stood at 4.5 on the bare
+   page and fell under it on any tint) */
+:where(:root[data-theme='iwa'] body:not([data-view='drift'])) {
+  --color-quiet: color-mix(in srgb, var(--color-ink) 82%, var(--color-paper));
+  --color-muted: color-mix(in srgb, var(--color-ink) 84%, var(--color-paper));
+  --color-label-2: color-mix(in srgb, var(--color-ink) 86%, var(--color-paper));
+}
+/* the picture slot's backing (seen only while a picture loads) is the world's sunk paper, not a topic's ink */
+.story-picture { background-color: var(--tone-sunk); }
+/* the shelf's Tools door: a 藍 wash dimmed up into the raised paper (it sat 13 % under the page: muddy) */
+.shelf-tools-toggle { background: color-mix(in srgb, var(--tint) 6%, var(--tone-raised)); }
+/* the search field: the ramp's sunk paper (its fill sat 10 % under the page) */
+body .search-page .nav-search-input { background: var(--tone-sunk); }
+/* END BUNKI MATERIAL II ==================================================== */
+
 /* Settings owns its two preferences; the same choices do not repeat above it. */
 body[data-view='settings'] #app > .chrome :is(#lang, #theme-seal) { visibility: hidden; pointer-events: none; }
 /* Read's inline lookup lives in Tools. Exactly one lookup door is visible. */
@@ -5451,7 +5588,8 @@ html[data-save-drawer='sheet'] #sheet > .sheet-bar[data-bar='sheet'] {
   color: var(--deck-band-ink);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #app .kp-top-study[data-bar='deck'] {
-  --deck-band: color-mix(in srgb, var(--color-ground) 48%, #000000);
+  /* Material II: the card band's night value, amended — the world's ground 30 % in its own deepest coat, not in black */
+  --deck-band: color-mix(in srgb, var(--color-ground) 30%, var(--zen-stage-deep));
   --deck-band-ink: var(--color-ink);
 }
 #app .kp-top-study[data-bar='deck'] .kp-icon { color: var(--deck-band-ink); }

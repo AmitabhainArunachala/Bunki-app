@@ -5,16 +5,20 @@
 /* ---- Skin frame (Skin lane): Me is a stab-bound book (和綴じ): its binding holes and a
    gold thread run down the left margin, in late gold light; at night a lamp. Values only. ---- */
 html:is([data-room='me'], [data-room='progress'], [data-room='settings'], [data-room='saved']) body:not([data-view='drift']) {
+  /* drawn: the stab binding's holes and its gold thread down the left margin — dots and a hairline, hard-edged, the world's ink and the house gold */
   --skin-ground:
     radial-gradient(circle at 9px 50%, color-mix(in srgb, var(--color-ink) 30%, transparent) 2px, transparent 2.6px) 0 0 / 18px 64px repeat-y,
-    linear-gradient(90deg, transparent 8.5px, color-mix(in srgb, var(--color-gold) 55%, transparent) 8.5px, color-mix(in srgb, var(--color-gold) 55%, transparent) 9.5px, transparent 9.5px) 0 0 / 18px 100% no-repeat;
-  --skin-light: radial-gradient(90% 50% at 100% 0%, rgb(232 196 120 / 18%), transparent 70%);
+    linear-gradient(90deg, transparent 8.5px, color-mix(in srgb, var(--tone-gold) 55%, transparent) 8.5px, color-mix(in srgb, var(--tone-gold) 55%, transparent) 9.5px, transparent 9.5px) 0 0 / 18px 100% no-repeat;
+  /* bokashi: atenashi — the Me room's late light — light: the house gold, lowered by the world's ink, wiped in from the upper right */
+  --skin-light: radial-gradient(90% 50% at 100% 0%, color-mix(in srgb, var(--tone-gold) 14%, transparent), transparent 70%);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='me'], [data-room='progress'], [data-room='settings'], [data-room='saved']) body:not([data-view='drift']) {
+  /* drawn: the binding's holes, pierced to the world's deepest coat, and its gold thread — hard-edged */
   --skin-ground:
-    radial-gradient(circle at 9px 50%, rgb(0 0 0 / 55%) 2px, transparent 2.6px) 0 0 / 18px 64px repeat-y,
-    linear-gradient(90deg, transparent 8.5px, color-mix(in srgb, var(--color-gold) 50%, transparent) 8.5px, color-mix(in srgb, var(--color-gold) 50%, transparent) 9.5px, transparent 9.5px) 0 0 / 18px 100% no-repeat;
-  --skin-light: radial-gradient(70% 40% at 92% 2%, color-mix(in srgb, var(--color-gold) 16%, transparent), transparent 70%);
+    radial-gradient(circle at 9px 50%, color-mix(in srgb, var(--tone-shade) 70%, transparent) 2px, transparent 2.6px) 0 0 / 18px 64px repeat-y,
+    linear-gradient(90deg, transparent 8.5px, color-mix(in srgb, var(--tone-gold) 50%, transparent) 8.5px, color-mix(in srgb, var(--tone-gold) 50%, transparent) 9.5px, transparent 9.5px) 0 0 / 18px 100% no-repeat;
+  /* bokashi: urushi — the Me room's lamp — light: lantern gold held in the lacquer at the upper right */
+  --skin-light: radial-gradient(70% 40% at 92% 2%, color-mix(in srgb, var(--tone-gold) 14%, transparent), transparent 70%);
 }
 
 /* ==========================================================================================
@@ -27,15 +31,17 @@ html:is([data-room='me'], [data-room='progress'], [data-room='settings'], [data-
 html[data-room='me'] body:not([data-view='drift']) { --skin-ground: none; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] body:not([data-view='drift']) {
   --skin-ground: none;
+  /* bokashi: urushi — the Me room's lamp at night — light: lantern gold over the book's right shoulder, a low warmth at the left foot */
   --skin-light:
-    radial-gradient(60% 34% at 96% 0%, color-mix(in srgb, var(--color-gold) 20%, transparent), transparent 72%),
-    radial-gradient(80% 40% at 0% 100%, color-mix(in srgb, var(--color-gold) 7%, transparent), transparent 70%);
+    radial-gradient(80% 44% at 96% 0%, color-mix(in srgb, var(--tone-gold) 15%, transparent), transparent 72%),
+    radial-gradient(80% 40% at 0% 100%, color-mix(in srgb, var(--tone-gold) 7%, transparent), transparent 70%);
 }
 html[data-room='me'] .me-book {
   position: relative;
   margin: 2px 4px 8px 0;
   padding: 22px 18px 24px 30px;
-  background: var(--color-surface);
+  /* bokashi: atenashi — the Me book — light: the world's raised paper, a breath of its key pigment settling toward the binding, edgeless */
+  background: radial-gradient(130% 90% at 100% 0%, var(--tone-raised), color-mix(in srgb, var(--tone-key) 3%, var(--tone-raised))) var(--tone-raised);
   border-radius: var(--radius-seal) var(--radius-control) var(--radius-control) var(--radius-seal);
   box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-line), var(--elevation-card);
   transform-origin: 0 50%;
@@ -43,14 +49,16 @@ html[data-room='me'] .me-book {
 html[data-room='me'] .me-spine {
   position: absolute; left: 0; top: 0; bottom: 0; width: 16px;
   border-right: var(--stroke-hairline) solid var(--color-line);
+  /* bokashi: atenashi — the book's spine — depth: the fold's shade, the world's ink at a breath (gentle across its 16 px); the stab holes are drawn over it */
   background:
     radial-gradient(circle at 8px 50%, color-mix(in srgb, var(--color-ink) 34%, transparent) 1.6px, transparent 2.2px) 0 26px / 16px 76px repeat-y,
-    linear-gradient(90deg, color-mix(in srgb, var(--color-ink) 11%, transparent), transparent 80%);
+    linear-gradient(90deg, color-mix(in srgb, var(--color-ink) 5%, transparent), transparent 80%);
 }
 html[data-room='me'] .me-edges {
   position: absolute; right: -5px; top: 5px; bottom: 5px; width: 5px;
   border-radius: 0 var(--radius-seal) var(--radius-seal) 0;
-  background: repeating-linear-gradient(90deg, var(--color-surface) 0 1px, var(--color-line) 1px 1.5px);
+  /* drawn: the book's page edges — hairlines of raised paper and ink line, hard-edged */
+  background: repeating-linear-gradient(90deg, var(--tone-raised) 0 1px, var(--color-line) 1px 1.5px);
   box-shadow: 2px 2px 4px -2px rgb(0 0 0 / 20%);
 }
 
@@ -98,6 +106,7 @@ html[data-room='me'] .me-hz-n { font-size: 13px; white-space: nowrap; color: var
 html[data-room='me'] .me-hz-n b { color: var(--color-ink); font-weight: 700; }
 html[data-room='me'] .me-hz-rule {
   position: relative; height: 9px; margin: 6px 0 4px;
+  /* drawn: a horizon's rule and its ten ticks, hairlines of the edge ink */
   background:
     linear-gradient(var(--color-edge-strong), var(--color-edge-strong)) 0 4.25px / 100% 0.5px no-repeat,
     repeating-linear-gradient(90deg, transparent 0 calc(10% - 0.5px), var(--color-edge-strong) calc(10% - 0.5px) 10%) 0 1.5px / 100% 6px no-repeat;
@@ -107,7 +116,10 @@ html[data-room='me'] .me-hz-rule i {
   transform: scaleX(var(--f, 0)); transform-origin: 0 50%;
   animation: me-fill var(--motion-long) var(--ease-ink) 160ms backwards;
 }
-html[data-room='me'] .me-hz-rule .me-hz-fill { background: linear-gradient(90deg, color-mix(in srgb, var(--color-gold) 78%, var(--color-ink)), var(--color-gold)); }
+html[data-room='me'] .me-hz-rule .me-hz-fill {
+  /* bokashi: atenashi — a horizon's earned fill — brush: the house gold drawn along the rule, deepest where it began */
+  background: linear-gradient(90deg, color-mix(in srgb, var(--gold) 70%, var(--color-ink)), var(--tone-gold));
+}
 html[data-room='me'] .me-hz-rule .me-hz-met { top: 3.5px; height: 2px; background: color-mix(in srgb, var(--color-gold) 28%, transparent); }
 @keyframes me-fill { from { transform: scaleX(0); } }
 html[data-room='me'] .me-hz-sub { margin: 0; font-size: 11px; line-height: 1.5; letter-spacing: 0.05em; color: var(--color-muted); }
@@ -222,7 +234,8 @@ html[data-room='me'] .me-seam .me-seam-branch { stroke-width: 1.1; }
 /* the seam catches the light once: a glint travels its length */
 html[data-room='me'] .me-gleam {
   position: absolute; top: 0; bottom: 0; left: 0; width: 28%;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, #fff 70%, var(--color-gold)) 50%, transparent);
+  /* bokashi: emitted — the seam's glint — light: the world's raised paper lit with the house gold, travelling once */
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--tone-raised) 70%, var(--gold)) 50%, transparent);
   opacity: 0; pointer-events: none;
   animation: me-gleam var(--motion-sheet) var(--ease-ink) backwards;
   animation-delay: min(240ms, calc(120ms + var(--i, 0) * 40ms));
@@ -323,20 +336,23 @@ html[data-room='me'] .me-seg button[aria-pressed='true'] { background: var(--col
 
 /* night: a lamp-lit book on 藍 — the page glows warm at the top right, the gold is lit */
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-book {
+  /* bokashi: urushi — the Me book at night — light: the lamp's gold on the page's shoulder, its foot sinking toward the world's deepest coat */
   background:
-    radial-gradient(110% 40% at 96% 0%, color-mix(in srgb, var(--color-gold) 15%, transparent), transparent 72%),
-    radial-gradient(90% 50% at 0% 100%, rgb(0 0 0 / 22%), transparent 70%),
-    var(--color-surface);
+    radial-gradient(110% 40% at 96% 0%, color-mix(in srgb, var(--tone-gold) 15%, transparent), transparent 72%),
+    radial-gradient(90% 50% at 0% 100%, color-mix(in srgb, var(--tone-shade) 30%, transparent), transparent 70%),
+    var(--tone-sheen);
   box-shadow: inset 0 0 0 var(--stroke-hairline) color-mix(in srgb, var(--color-gold) 24%, transparent), inset 0 1px 0 rgb(255 255 255 / 5%), 0 24px 60px -18px rgb(0 0 0 / 70%);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-spine {
+  /* bokashi: urushi — the book's spine at night — depth: the fold sinking a breath toward the world's deepest coat; the stab holes drawn into it */
   background:
-    radial-gradient(circle at 8px 50%, rgb(0 0 0 / 60%) 1.6px, transparent 2.2px) 0 26px / 16px 76px repeat-y,
-    linear-gradient(90deg, rgb(0 0 0 / 30%), transparent 80%);
+    radial-gradient(circle at 8px 50%, color-mix(in srgb, var(--tone-shade) 80%, transparent) 1.6px, transparent 2.2px) 0 26px / 16px 76px repeat-y,
+    linear-gradient(90deg, color-mix(in srgb, var(--tone-shade) 22%, transparent), transparent 80%);
   border-right-color: color-mix(in srgb, var(--color-gold) 32%, transparent);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-edges {
-  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--color-gold) 30%, var(--color-surface)) 0 1px, rgb(0 0 0 / 40%) 1px 1.5px);
+  /* drawn: the page edges at night — gilt hairlines on the sheen, the deepest coat between them */
+  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--tone-gold) 30%, var(--tone-sheen)) 0 1px, color-mix(in srgb, var(--tone-shade) 60%, transparent) 1px 1.5px);
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='me'] .me-hz-rule .me-hz-fill {
   background: var(--color-gold);

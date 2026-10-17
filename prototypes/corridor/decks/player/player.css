@@ -376,11 +376,11 @@
    * proscenium (--color-lacquer), and the card is the lit paper on it; its text is the lacquer's ink.
    * --kp-shu is the 朱 of the marked word's brackets, the rail and the slash on もう一度 (never text):
    * the world's seal red. Measured: contrast-kotoba stage row */
-  --kp-stage: var(--color-lacquer, #141a28); --kp-stage-ink: var(--color-lacquer-ink, #e9e2d2); --kp-stage-mute: #b5ad9c; --kp-shu: var(--color-seal, #c4401f);
+  --kp-stage: var(--color-lacquer, #141a28); --kp-stage-ink: var(--color-lacquer-ink, #e9e2d2); --kp-stage-mute: color-mix(in srgb, var(--color-lacquer-ink) 76%, var(--world-ground)); --kp-shu: var(--color-seal, #c4401f);
   /* the dock (the ground under 答えを見る and the grade pads, and the page below the last card) is the
    * stage; the whole study screen is the stage, lit softly from the top. Measured: contrast-kotoba dock row */
   --kp-dock: var(--kp-stage); --kp-dock-ink: var(--kp-stage-ink); --kp-dock-mute: var(--kp-stage-mute);
-  --kp-study-ground: radial-gradient(130% 60% at 50% 0%, rgba(233, 226, 210, 0.07), transparent 72%), var(--kp-stage); }
+  /* bokashi: urushi — the deck's study ground — light: the world's raised paper held as a faint lamp at the top of its lacquer stage */ --kp-study-ground: radial-gradient(130% 60% at 50% 0%, color-mix(in srgb, var(--world-paper) 7%, transparent), transparent 72%), var(--kp-stage); }
 /* depth: the card is a physical object; its surface stays plain so the ruby reads cleanly
  * (the texture is on the page, see .kp above) */
 .kp .kp-card { background-color: var(--kp-panel); background-image: none; box-shadow: var(--kp-depth); }
@@ -450,6 +450,7 @@
 .kp .kp-card::before {
   content: ''; position: absolute; inset: 8px; pointer-events: none; opacity: 0.55;
   --reg: color-mix(in srgb, var(--kp-ink) 55%, transparent);
+  /* drawn: the card's registration marks (見当), eight hairlines of the deck's ink */
   background:
     linear-gradient(var(--reg), var(--reg)) 0 5px / 11px 1px no-repeat, linear-gradient(var(--reg), var(--reg)) 5px 0 / 1px 11px no-repeat,
     linear-gradient(var(--reg), var(--reg)) 100% 5px / 11px 1px no-repeat, linear-gradient(var(--reg), var(--reg)) calc(100% - 5px) 0 / 1px 11px no-repeat,
@@ -478,6 +479,7 @@
  * reach it has as a tap target on the back); its own colour stays its part of speech */
 .kp .kp-target {
   padding: 0 0.16em; margin: 0 0.04em; text-decoration-thickness: 1.5px; -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  /* drawn: the cloze target's 朱 corner marks, four hairlines, over its 朱 mark */
   background:
     linear-gradient(var(--kp-shu), var(--kp-shu)) 0 0 / 0.36em 2px no-repeat, linear-gradient(var(--kp-shu), var(--kp-shu)) 0 0 / 2px 0.36em no-repeat,
     linear-gradient(var(--kp-shu), var(--kp-shu)) 100% 100% / 0.36em 2px no-repeat, linear-gradient(var(--kp-shu), var(--kp-shu)) 100% 100% / 2px 0.36em no-repeat,
@@ -490,6 +492,7 @@
 .kp-polish { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit; z-index: 1; }
 .kp-polish::before {
   content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; width: 55%; opacity: 0;
+  /* bokashi: atenashi — the reveal's polish band (研ぎ出し) — brush: 朱 and the deck's ink wiped once across the card */
   background: linear-gradient(100deg, transparent 0 26%, color-mix(in srgb, var(--kp-shu) 12%, transparent) 38%, color-mix(in srgb, var(--kp-ink) 14%, transparent) 47%, color-mix(in srgb, var(--kp-ink) 6%, transparent) 56%, transparent 70%);
   animation: kp-polish var(--motion-fast, 180ms) var(--ease-ink, ease-in-out) both;
 }
@@ -518,7 +521,7 @@
 .kp .kp-kanji > * { flex: 1 1 100%; min-width: 0; }
 .kp .kp-kj { border-radius: var(--radius-seal, 3px); grid-template-columns: 58px 1fr; padding: 8px 10px 8px 8px; gap: 2px 10px; background: color-mix(in srgb, var(--kp-panel-2) 70%, transparent); }
 .kp .kp-kj b { width: 58px; height: 58px; display: grid; place-items: center; font-family: var(--kp-head); font-weight: 800; font-size: 40px; border: 1px solid var(--kp-line);
-  background: linear-gradient(var(--kp-line), var(--kp-line)) 50% 0 / 1px 100% no-repeat, linear-gradient(var(--kp-line), var(--kp-line)) 0 50% / 100% 1px no-repeat, var(--kp-panel); }
+  /* drawn: the kanji box's cross guide (十字), two hairlines */ background: linear-gradient(var(--kp-line), var(--kp-line)) 50% 0 / 1px 100% no-repeat, linear-gradient(var(--kp-line), var(--kp-line)) 0 50% / 100% 1px no-repeat, var(--kp-panel); }
 .kp .kp-kj > span { font-size: 14px; font-weight: 600; color: var(--kp-ink); }
 .kp-kj-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-size: 12px; color: var(--kp-mute); }
 .kp-kj-parts i { font-style: normal; font-family: var(--kp-head); font-weight: 800; font-size: 17px; color: var(--kp-ink); padding: 0 3px; border-radius: var(--radius-seal, 3px); }
@@ -563,6 +566,7 @@
 /* もう一度: a brief 朱 slash crosses the screen as the answered card leaves (transform and opacity only) */
 .kp-slash {
   position: fixed; left: 4%; right: 4%; top: 44%; height: 3px; z-index: 3; pointer-events: none; border-radius: var(--radius-seal, 3px);
+  /* bokashi: atenashi — the もう一度 slash — brush: one 朱 stroke across the screen, its ends lifting */
   background: linear-gradient(90deg, transparent, var(--kp-shu) 10%, var(--kp-shu) 85%, transparent);
   transform-origin: left center; transform: rotate(-12deg) scaleX(0); opacity: 0;
   animation: kp-slash var(--motion-fast, 180ms) var(--ease-ink, ease-in-out) both;
@@ -734,11 +738,11 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 
 /* 答えを見る: one clear key under the card, framed in the deck's accent (the old home's 答えを見る) */
 .kp .kp-reveal { border: 1.5px solid var(--kp-cyan); border-radius: var(--radius-control, 6px); min-height: 56px; color: var(--kp-cyan); font-weight: 700; letter-spacing: 0.08em;
-  background: linear-gradient(var(--kp-cyan-wash), var(--kp-cyan-wash)), var(--kp-dock); }
+  /* drawn: the reveal key's wash, one flat layer of the deck's accent over the dock */ background: linear-gradient(var(--kp-cyan-wash), var(--kp-cyan-wash)), var(--kp-dock); }
 .kp .kp-next { border-radius: var(--radius-control, 6px); }
 /* on the lacquer stage the key is lit in the stage's own ink */
 .kp .kp-study > .kp-reveal { border-color: var(--kp-stage-ink); color: var(--kp-stage-ink);
-  background: linear-gradient(color-mix(in srgb, var(--kp-stage-ink) 9%, transparent), color-mix(in srgb, var(--kp-stage-ink) 9%, transparent)), var(--kp-dock); }
+  /* drawn: the lit key's wash, one flat layer of the stage's ink over the dock */ background: linear-gradient(color-mix(in srgb, var(--kp-stage-ink) 9%, transparent), color-mix(in srgb, var(--kp-stage-ink) 9%, transparent)), var(--kp-dock); }
 /* docked at the foot of a long passage, the key stands on a straight band of the dock that runs to both
  * screen edges (the ring alone drew a rounded frame over the card) */
 .kp .kp-study > .kp-reveal { box-shadow: var(--kp-depth), 0 0 0 10px var(--kp-dock), -48px 0 0 10px var(--kp-dock), 48px 0 0 10px var(--kp-dock); }

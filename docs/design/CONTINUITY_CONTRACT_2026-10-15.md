@@ -145,6 +145,106 @@ its lit edge, the slip's gold hairline and the raised paper under it.
 gold (#e5c27a) in every world; the slip's and the sheet's paper came only through `color-mix()` chains. The grade
 pigments, the seal red, the reader's lacquer mat and the toast are untouched.
 
+### 6b. Material II: every gradient a bokashi (暈し) — slice M, 2026-10-17
+
+**His words (10-15).** "things can be their own color. That is not a problem. But the contrast should be deeply
+considered and have roots in artistic or aesthetic inspiration… Color gradation throughout the app is actually
+preferred and can bring deeper focus and texture and professionalism but it has to be done right". On the 墨 screenshot:
+"The shading is all wrong… the new 'word' windows seem to pop up in a random blue color with no sense of contrast or
+connection to the background".
+
+**The root.** The worlds are prints, so their gradation is the printer's: one of the world's own pigments wiped into its
+paper. 一文字ぼかし (ichimonji), the straight band of pigment across the top of a Hiroshige or Hokusai sky, for the one top
+bar and the Line. あてなしぼかし (atenashi), soft and edgeless, laid without a guide, for the page's light, the room heroes
+and the key-kanji sheets. 漆の深み (urushi), at night: light held inside the coats, surfaces stepping from the world's
+deepest coat to its sheen, never toward grey. 殻 emits: edges and glows from the phosphor, never a lit fill. Every
+gradient carries `/* bokashi: <kind> — <surface> — <depth|light|brush|focus> */` (a hard-stop drawing carries `drawn:`),
+uses only world tokens and their two-token mixes, and lifts at most one visible tonal step (2.3 ΔE76) per 24 px.
+
+**The ramp** (editorial.css, the MATERIAL II block; zero specificity, on body):
+
+| token | value | why |
+|---|---|---|
+| `--tone-ground` | `--world-ground` | the page |
+| `--tone-raised` | `--world-paper` (`--ground-0`) | the world's raised paper; the frame is now this paper, not a white of its own |
+| `--tone-sunk` | `--ground-2` 50 % + `--ground` (night: deepest coat 40 % + ground) | a breath under the page: a sunk surface never sits 8 % below it (the search field, the picture backing) |
+| `--tone-shade` | `--zen-stage-deep` | the world's deepest coat, every world's own (indigo-black in 夜, the deep sea in 浪), never a neutral black |
+| `--tone-key` · share | the world's key pigment (table below) | the block its sky is printed from |
+| `--tone-wash` | key at its share + raised | the band at the top edge |
+| `--tone-depth` · `--tone-sheen` (night) | shade 55 % + ground · `--world-paper` | the lacquer's coats |
+| `--tone-gold` | day `--gold` 55 % + `--world-ink`; night `--gold` | the house's 金 (corridor.css :root), lowered by day so it reads on paper |
+| `--color-lacquer` · `-2` · `-ink` | day: ink 74 % + shade · ink · paper; night: ground 45 % + shade · ground 75 % + shade · ink | the Learn stage, the deck stage and the reader's mat are the world's own lacquer, no longer one house navy in every world |
+| `--kicker-ai` · `-shu` · `-sumi` | accent · signal 80 % + ink · ink-2 (night: quieter, mixed into ink-2) | a kicker prints from one of its world's blocks (corridor.js TOPIC_BLOCKS replaces the topic table of literal colours) |
+
+**Per world** (resolved on the built site, `M/final/tone-table.json`):
+
+| world | key (share) | the bar's band: wash → raised (night: shade → depth) | lacquer (stage, mat) | key-kanji wash heart | the slip's band (amended): head → foot | why |
+|---|---|---|---|---|---|---|
+| 藍 ベロ藍・浪 | 藍 #2e4d6e (8 %) | #eae8e0 → #faf6ea | #172737 | #eceae1 | #14171d → #24272b | Hokusai's Berlin-blue sky band |
+| 墨 墨・楮紙 | 墨 #211e17 (6 %) | #ede9dd → #faf6ea | #1c1913 | #ebe7db | #211e17 → #302d26 | sumi's own 濃淡; the stage is sumi lacquer |
+| 朱 朱・胡粉 | 朱 #b02318 (5 %) | #f9efe7 → #fdfaf2 | #241f1b | #f8ebe3 | #2b2620 → #3a352f | a dawn band at a whisper; the seal keeps its full red |
+| 赤 凱風快晴 | 藍 #2a5d8a (8 %) | #e8e1d5 → #f8ecdc | #382115 | #eae2d6 | #45291a → #523728 | the print's blue sky over the red mountain; Fuji's umber stage |
+| 柿 焦茶・柿渋 | 焦茶 #2e1a0c (6 %) | #dbb38a → #e6bd92 | #26150a | #d9b289 | #2e1a0c → #3b2515 | the umber deepening of the tannin |
+| 板 板木・墨 | 墨 #26221c (6 %) | #ede9de → #faf6ea | #1f1c17 | #ebe7dc | #26221c → #35312a | the keyblock's sumi line |
+| 漆 胡粉・黒漆 | 金 #d9b25f (night) | #0a0807 → #100d0b | #100d0b | #2e251a | #0e0b0a → #120f0d | the deepest coat to its depth; maki-e gold behind the kanji |
+| 金 紺紙金泥 | 金 #d9b25f | #090c18 → #0e1223 | #0e1223 | #262d46 | #0c101f → #0f1527 | indigo lacquer, the band stays indigo |
+| 浪 神奈川沖浪裏 | spray #8fb3d1 | #081420 → #0c1d2c | #0c1d2c | #203a56 | #0b1a28 → #0e2031 | the deep sea's coats |
+| 雷 山下白雨 | 金 #d9a93f | #0b0906 → #15110b | #15110b | #382d1d | #120e0a → #19140d | storm lacquer, lightning gold |
+| 殻 攻殻・燐光 | phosphor #37e8b0 | flat #030a0e, phosphor 4 % rising 28 px from the lit hairline | #030a0e | #0f2328 | #03090c → #040b0f | emitted only |
+
+The kanji wash is the key at 7 % by day, 5 % at night (`--kanji-wash`), a `radial-gradient(closest-side)` over the
+raised paper. The slip's band (the tables above, E) is amended: by day the brush lifts to ink 93 % + paper (90 % read
+as two tonal steps in 24 px); at night its lacquer is the world's ground 30 % → 62 % in its own deepest coat, not ground
+48 % → 72 % in black. verify-theme-consistency pins the new night formula as exactly as it pinned the old. S's deck band,
+which takes "the card band's night value", follows it at night (the world's ground 30 % in its deepest coat), still flat.
+
+**Every gradient, by kind** (C7: 101 declarations in the sheets the screens load — 44 bokashi, 26 drawn, 24 masks,
+7 scene art):
+- *ichimonji*: the one top bar (every instance) and the Line (light); Learn's and the deck room's sky (the stage's
+  lacquer across the top of the page, depth); the slip's head band (brush); a level card's top (light).
+- *atenashi*: the page's morning light (raised paper from the upper left) and each room's (the reading window, Learn,
+  Me's late light, Today's dawn of 藍 left and 朱 right), light; the key-kanji sheets and the day word's halo, focus;
+  the Me book, its spine, the writing stage, a picture's caption ground, the band scale, depth; the deck's polish band
+  and もう一度 slash, a horizon's gold fill, brush.
+- *urushi*: the night bar and Line, the night page light (lantern gold below, the world's light above), the Learn
+  stage, the deck stage and its study ground, the dojo stage, the Me lamp and book, the reading room's lanterns, the
+  Words blueprint's glow.
+- *emitted*: 殻's bar and Line; the night print's lamplight; the seam's glint.
+- *drawn* (hard stops, not gradation): binding holes and gilt thread, page edges, horizon ticks, washi tooth and laid
+  lines, registration and corner marks, cross guides, the drafting grid, the language divider, the deck dock's edge.
+- *scene art*: the samurai moment's paper theatre keeps its own palette (guided/SAMURAI-PROVENANCE.md), named as such.
+
+**Receipts** (verify-contrast-sweep, the handed-back build, WebKit and Chromium, 11 worlds × 12 states):
+every row green in both engines (667 of 667 each); 7,043 text runs measured in WebKit, 6,858 in Chromium, none
+unresolved; 620 gradation layers drawn alone per engine, the steepest one visible tonal step in 24 px (2.8 ΔE76); the
+slip and the deck card stand as figures at ≥ 3.19:1 (浪's slip, by its lit edge); the 22 key-kanji sheets in view wear
+a wash of ≥ 2.2 ΔE76 heart to corners and their kanji read at ≥ 8.4:1. The worst pair per world (WebKit · Chromium):
+
+| world | worst pair | ratio (needs) |
+|---|---|---|
+| 藍 | the N1 seal on the shelf | 4.97 · 4.83 (4.5) |
+| 墨 | Today's far kanji 世 (large) | 3.70 · 3.70 (3) |
+| 朱 | Today's far kanji 世 (large) | 3.51 · 3.52 (3) |
+| 赤 | Today's far kanji 世 (large) | 3.16 · 3.17 (3) |
+| 柿 | Today's far kanji 世 (large) | 3.07 · 3.08 (3) |
+| 板 | the N1 seal on the shelf | 5.02 · 4.88 (4.5) |
+| 漆 | the page's reading そう | 5.58 · 5.58 (4.5) |
+| 金 | the page's "Dictionary entry" | 5.59 · 5.59 (4.5) |
+| 浪 | the reader's English title in 藍 | 4.55 · 4.53 (4.5) |
+| 雷 | the page's reading そう | 4.97 · 4.97 (4.5) |
+| 殻 | Settings' storage line · the reader's N3 seal | 5.52 · 6.27 (4.5) |
+
+At 4b0d1600 the same instrument read 443 and 445 of 667: Today's far field at 1.7–2.3:1 in every world, the fold's
+arrow at 3.0–3.7, the night level seals at 3.8, literal paints in every room, the deck dock's smear and the night
+lanterns' rings, the flat key-kanji sheets, and two muddy surfaces (the Tools door, the search field).
+
+**What was replaced.** The frame's own whites (#fcfbf8, mixes with #fdfcf9/#fffefb); the page lights' white and cream
+literals (rgb(255 255 255 / 22–36 %), #fff6e2, #fffaec, Today's #c4d6e2/#f0cca8 dawn); R4's white haze that also fell on
+the night worlds; the house navy lacquer #141a28 in every day world; #000 in the night slip band, the Me book and the
+Words plate; the house teal (#5df2d6) in the night rules and grids; the night reader's literal lantern colours; the
+topic table of literal colours; #b5ad9c, #9db0d4 and the deck dock's 14 px smear. The grade pigments, the seal red and
+the article pictures are untouched.
+
 ## Order of slices (one worker each, in sequence on this branch; the lead reviews screenshots between slices)
 
 A. **The word.** §1 for the reader/exam/guided-host lookups (the #mini slip): cycle, clear-on-close, Save ▾ inline

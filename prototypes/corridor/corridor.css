@@ -1185,6 +1185,7 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
   position: relative;
   height: 8px;
   border-radius: var(--radius-seal);
+  /* bokashi: atenashi — the band scale — depth: the world's paper deepening into its ink across the scale, the legend of the bands */
   background: linear-gradient(90deg, var(--ground) 0%, var(--ink-2) 100%);
   margin: 7px 0 6px;
   border: 1px solid var(--line-soft);
@@ -3524,9 +3525,10 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
    * ink on the night worlds, so the diagram never sinks into its ground
    * (it was hard-coded #1c1e21 and unreadable on 漆金浪殻) */
   --stroke-ink: var(--ink);
+  /* drawn: the writing page's washi tooth — single-pixel flecks of the world's ink, hard-edged */
   background:
-    radial-gradient(circle at 18% 12%, rgba(20, 24, 28, 0.016) 0 1px, transparent 1px),
-    radial-gradient(circle at 67% 61%, rgba(20, 24, 28, 0.012) 0 1px, transparent 1px),
+    radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--ink) 1.6%, transparent) 0 1px, transparent 1px),
+    radial-gradient(circle at 67% 61%, color-mix(in srgb, var(--ink) 1.2%, transparent) 0 1px, transparent 1px),
     var(--ground);
   background-size: 13px 13px, 19px 19px, auto;
 }
@@ -3560,9 +3562,9 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
 
 /* the sheet of paper the hand writes on */
 .stroke-stage {
+  /* bokashi: atenashi — the writing stage — depth: a breath of the world's ink settling into the lower right of its raised paper (the white sheen of its own is gone: no pigment is lighter than the paper) */
   background:
-    radial-gradient(120% 90% at 30% 20%, rgba(255, 253, 246, 0.9), transparent 60%),
-    radial-gradient(90% 120% at 75% 80%, rgba(20, 24, 28, 0.025), transparent 55%),
+    radial-gradient(90% 120% at 75% 80%, color-mix(in srgb, var(--ink) 2.5%, transparent), transparent 55%),
     var(--ground-0);
   border: 1px solid rgba(20, 24, 28, 0.07);
   border-radius: var(--radius-card);
@@ -4068,9 +4070,10 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   color: var(--ink);
   background: var(--ground-0);
   /* S2 raised paper: fine washi tooth + one soft shadow — never a flat rectangle */
+  /* drawn: the card's washi tooth — single-pixel flecks of its ink, hard-edged */
   background-image:
-    radial-gradient(circle at 18% 12%, rgba(20, 24, 28, 0.018) 0 1px, transparent 1px),
-    radial-gradient(circle at 67% 61%, rgba(20, 24, 28, 0.014) 0 1px, transparent 1px);
+    radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--ink) 1.8%, transparent) 0 1px, transparent 1px),
+    radial-gradient(circle at 67% 61%, color-mix(in srgb, var(--ink) 1.4%, transparent) 0 1px, transparent 1px);
   background-size: 13px 13px, 19px 19px;
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
@@ -6436,6 +6439,7 @@ body.zen {
   /* the urushi stage: warm black, an andon light pool above the card,
    * never #000 — warm channel order R>G>B */
   background-color: var(--zen-stage);
+  /* bokashi: urushi — the dojo's stage — depth: the world's night coats from crown to deep, an andon's pool of its accent above the card */
   background-image:
     radial-gradient(130% 90% at 50% 26%, color-mix(in srgb, var(--zen-accent) 6%, transparent), transparent 55%),
     radial-gradient(140% 110% at 50% 0%, var(--zen-stage-crown) 0%, var(--zen-stage) 52%, var(--zen-stage-deep) 100%);
@@ -6465,9 +6469,10 @@ body.zen .review-face {
   background-color: var(--card-ground-0, var(--card-ground));
   /* kōzo fibers (anisotropic turbulence) + su-no-me laid lines — the paper
    * is real; texture alpha ≤6% so the ink never loses contrast */
+  /* drawn: su-no-me, the washi's laid lines — hairlines of the card's ink at a breath, hard-edged */
   background-image:
-    repeating-linear-gradient(180deg, rgba(58, 46, 32, 0.022) 0 1px, transparent 1px 6px),
-    repeating-linear-gradient(90deg, rgba(58, 46, 32, 0.012) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(180deg, color-mix(in srgb, var(--card-ink) 2.2%, transparent) 0 1px, transparent 1px 6px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--card-ink) 1.2%, transparent) 0 1px, transparent 1px 34px),
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='0.04 0.008' numOctaves='4' seed='7' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.45 0 0 0 0 0.38 0 0 0 0 0.25 0 0 0 0.06 0'/></filter><rect width='400' height='400' filter='url(%23w)'/></svg>");
   /* lacquerware radii stay small; the rim is maki-e gold, one hair wide */
   border: 0;
@@ -6890,7 +6895,7 @@ body.zen .grade-row .grade:nth-child(4) {
 .fold-head .fold-sub {
   margin-left: auto;
   font-size: 12px;
-  opacity: 0.7;
+  opacity: 0.86;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -6898,7 +6903,7 @@ body.zen .grade-row .grade:nth-child(4) {
 }
 .fold-head .fold-arrow {
   flex: none;
-  opacity: 0.6;
+  opacity: 0.86;
 }
 .fold-head.open {
   border-bottom-left-radius: 0;

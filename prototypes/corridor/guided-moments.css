@@ -27,6 +27,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+  /* picture: the samurai moment's paper theatre — the scene's own palette (guided/SAMURAI-PROVENANCE.md), drawn in CSS like a print */
   background:
     radial-gradient(ellipse at 53% 45%, #244255 0, transparent 66%),
     repeating-linear-gradient(0deg, transparent 0 3px, #fff1 4px, transparent 5px);
@@ -147,6 +148,7 @@
   left: 3%;
   right: 3%;
   height: 1px;
+  /* picture: the samurai moment's paper theatre — the scene's own palette (guided/SAMURAI-PROVENANCE.md), drawn in CSS like a print */
   background: linear-gradient(90deg, transparent, #d8be8660 25%, #d8be8660 80%, transparent);
 }
 .samurai-effect__horizon::after {
@@ -215,6 +217,7 @@
   width: 47%;
   height: 7px;
   opacity: 0;
+  /* picture: the samurai moment's paper theatre — the scene's own palette (guided/SAMURAI-PROVENANCE.md), drawn in CSS like a print */
   background: linear-gradient(90deg, transparent, #f5ebd3 25%, #f5ebd3 67%, transparent);
   clip-path: polygon(0 70%, 98% 0, 100% 25%, 19% 100%);
   transform: rotate(-22deg) scaleX(0.08);
@@ -667,6 +670,7 @@
   content: '';
   position: absolute;
   inset: 8px 5px;
+  /* picture: the samurai moment's paper theatre — the scene's own palette (guided/SAMURAI-PROVENANCE.md), drawn in CSS like a print */
   background: repeating-linear-gradient(0deg, #9b805980 0 1px, transparent 1px 5px);
 }
 .bunki-moment__message {
@@ -850,6 +854,7 @@
 }
 /* the wake of the blade: paper-white to the cut, crimson past it */
 .samurai-effect--incorrect .samurai-effect__stroke {
+  /* picture: the samurai moment's paper theatre — the scene's own palette (guided/SAMURAI-PROVENANCE.md), drawn in CSS like a print */
   background: linear-gradient(90deg, transparent, #f5ebd3 22%, #f5ebd3 52%, var(--se-blood) 74%, transparent);
 }
 /* one dark-red frame inside the cut to black */
@@ -858,6 +863,7 @@
   position: absolute;
   inset: 0;
   opacity: 0;
+  /* picture: the samurai moment's paper theatre — the scene's own palette (guided/SAMURAI-PROVENANCE.md), drawn in CSS like a print */
   background: radial-gradient(75% 65% at 66% 46%, #8e1020 0%, #5c0810 52%, #22040a 100%);
 }
 .samurai-effect--incorrect.samurai-effect--impact .samurai-effect__blackout::after {
@@ -1040,6 +1046,7 @@
   pointer-events: none;
   opacity: 0;
   transform-origin: 50% 100%;
+  /* picture: the samurai moment's paper theatre — the scene's own palette (guided/SAMURAI-PROVENANCE.md), drawn in CSS like a print */
   background: radial-gradient(farthest-side at 50% 100%, transparent 86%, var(--se-blood) 88%, var(--se-blood-deep) 93.5%, transparent 95.5%);
   -webkit-mask-image: linear-gradient(90deg, transparent 6%, #000 34%, #000 64%, transparent 94%);
   mask-image: linear-gradient(90deg, transparent 6%, #000 34%, #000 64%, transparent 94%);
