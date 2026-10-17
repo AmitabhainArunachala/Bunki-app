@@ -5342,14 +5342,15 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
 #mini[data-depth='owned'] { --depth-fill: var(--depth-band-ink); }
 #mini[data-kept] { --depth-edge: 0 0 0 1.5px var(--mini-reading, var(--depth-ring)); }
 #mini:is([data-depth], [data-kept]) .mini-word { position: relative; }
+/* beside the word, at its middle, like a seal set by a name: under it the dot would sit in the reading's line */
 #mini:is([data-depth], [data-kept]) .mini-word::after {
   content: '';
   position: absolute;
-  left: 50%;
-  bottom: -2px;
+  left: calc(100% + 9px);
+  top: 50%;
   width: 6px;
   height: 6px;
-  margin-left: -3px;
+  margin-top: -3px;
   border-radius: 50%;
   background: var(--depth-fill, transparent);
   box-shadow: var(--depth-edge, none);

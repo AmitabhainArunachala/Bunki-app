@@ -22556,6 +22556,8 @@ function renderDepthBasis(sheet, node, reading = '') {
   if (!wordDepth(shown)) return null;
   const line = el('p', 'depth-basis');
   line.id = 'depth-basis';
+  // a status line about the word, not study prose: its reading is the page's own, already a door in the line above
+  line.dataset.japaneseLookup = 'off';
   const said = el('span', 'depth-basis-said');
   const words = document.createTextNode('');
   said.append(depthDot(shown), words);
