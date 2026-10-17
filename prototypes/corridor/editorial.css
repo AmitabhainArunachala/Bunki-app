@@ -5499,7 +5499,7 @@ body.record-not-saving #app > .chrome { margin-bottom: var(--record-band-h, 48px
    stood the bar's whole 44 and touched the screen's top edge. It is a door of its bar, as the seal is: its target the
    bar's 44, the height of Close and search beside it, and its face a control inside the bar — 28 high, centred, 8 px
    clear of the screen above it. The 8 px above and below the face are still the button's (::before), so nothing is
-   smaller to press. The room's keep has no face; its hover fill keeps the same 8 px. */
+   smaller to press. The room's keep has no face (its two lines of words in the bar's ink); it is untouched. */
 :is(#sheet, #app) [data-bar] button.save-one:not(.chrome-keep) { position: relative; height: 28px; min-height: 28px; }
 :is(#sheet, #app) [data-bar] button.save-one:not(.chrome-keep)::before { content: ''; position: absolute; inset: -9px -1px; }
 /* a row that holds a Save keeps it on its own line end, the menu unfolding under the row (placeSaveMenu) */
@@ -5541,16 +5541,7 @@ body:not(.ui-bi) #app > .chrome .chrome-keep .save-bar-verb { font-size: 10.5px;
   color: var(--color-bar-ink);
 }
 #app > .chrome .chrome-keep.taken .save-bar-verb { color: var(--color-accent); }
-/* G5 · L-2: its hover fill (none once saved, as before) is a face inside the bar, 8 px clear of the bar's edges */
-#app > .chrome button.save-one.chrome-keep { position: relative; isolation: isolate; }
-#app > .chrome button.save-one.chrome-keep:not(.taken):hover:where(:not(:disabled))::before {
-  content: '';
-  position: absolute;
-  inset: 8px 0;
-  z-index: -1;
-  border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
-}
+#app > .chrome button.save-one.chrome-keep:hover:where(:not(:disabled)) { background: color-mix(in srgb, var(--color-ink) 6%, transparent); }
 #app > .chrome button.save-one.chrome-keep.taken { background: transparent; }
 #app > .chrome button.save-one.chrome-keep.reader-capture-held { border: 0; color: var(--color-bar-quiet, var(--color-muted)); cursor: help; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #app > .chrome button.save-one.chrome-keep:not(.taken) {

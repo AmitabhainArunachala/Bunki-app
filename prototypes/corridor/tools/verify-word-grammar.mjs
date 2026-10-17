@@ -1257,8 +1257,7 @@ try {
 
     // L-2 (MISSION/FINDINGS.md; MASTER_SPEC D5): a Save in a bar is a door of the bar. On the word's page its face stands
     // inside the bar, at least 8 px from every screen edge, and its target spans the height of the bar's other doors
-    // (Close, search) — as Save and as Saved ✓, on a phone and on a Mac window; the room's keep, hovered on the Mac, fills
-    // only a face 8 px clear of the bar's edges.
+    // (Close, search) — as Save and as Saved ✓, on a phone and on a Mac window.
     const barSaveFacts = (page) => page.evaluate(() => {
       const bar = document.querySelector('#sheet > .sheet-bar'), save = document.getElementById('sheet-take');
       if (!bar || !save) return null;
@@ -1276,19 +1275,6 @@ try {
     for (const [form, viewport, mobile] of [['phone', { width: 390, height: 844 }, true], ['mac', { width: 1280, height: 800 }, false]]) {
       await walk(`G5-bar-save-${form}`, async (page) => {
         await openStory(page);
-        if (!mobile) {
-          // the room's keep, hovered: its fill is a face 8 px clear of the bar's edges, never the whole bar
-          const keep = page.locator('#chrome-keep');
-          await keep.hover(); await delay(200);
-          const hovered = await keep.evaluate((node) => {
-            const b = node.getBoundingClientRect(), before = getComputedStyle(node, '::before'), own = getComputedStyle(node);
-            const painted = before.content !== 'none' && before.content !== 'normal' && before.backgroundColor !== 'rgba(0, 0, 0, 0)';
-            return { box: { top: b.top, bottom: b.bottom }, own: own.backgroundColor, painted, faceTop: b.top + (parseFloat(before.top) || 0), faceBottom: b.bottom - (parseFloat(before.bottom) || 0) };
-          });
-          check('G5.bar-save.room-keep', 'hovered on a Mac window, the room bar’s keep fills only a face at least 8 px from the screen’s top edge, inside the bar',
-            hovered.own === 'rgba(0, 0, 0, 0)' && hovered.painted && hovered.faceTop >= 8 && hovered.faceBottom <= hovered.box.bottom, hovered);
-          await page.mouse.move(8, 600); // off the keep, in the page's margin
-        }
         await stage(page, readerWord(page));
         await page.locator('#mini .mini-word').tap();
         await pageSettled(page);
