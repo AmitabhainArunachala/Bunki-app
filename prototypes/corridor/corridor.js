@@ -22403,7 +22403,16 @@ function correctDepth(node, value, now = Date.now()) {
  * the core record); the painter writes data-depth and data-kept, and the CSS (editorial.css, G2) draws the dot and the
  * ring from the world's pigments. Painting never writes the record and never moves a line box. */
 const DEPTH_TARGETS = '#reader .tok[data-index], [data-depth-node], .japanese-lookup-word[data-lookup-text]';
-let depthMemo = null;
+/* The painter never holds the glass: it works in slices of a few milliseconds between frames (a long article is fifteen
+ * hundred words), it reads a reader token's door again only when the dictionary has learned something (dictionaryEpoch),
+ * and each identity's depth once per confirmed record. */
+const DEPTH_SLICE_MS = 6;
+const depthNodeCache = new WeakMap();
+let depthMemo = new Map();
+let depthMemoRoots = null;
+function dictionaryEpoch() {
+  return `${D.dictionaryIndex ? 1 : 0}:${D.dictionaryMode || ''}:${D.dictionaryState || ''}:${D.dictionaryCompleteForms?.size || 0}:${D.dictionaryByForm?.size || 0}`;
+}
 function depthNodeOf(element) {
   const raw = element.dataset.depthNode;
   if (raw) {
@@ -22420,15 +22429,20 @@ function depthNodeOf(element) {
     return /[\p{Script=Han}\p{Script=Katakana}]/u.test(text) || D.dict?.[text] ? { t: 'word', id: text } : null;
   }
   if (!element.closest('#reader') || element.dataset.targetKind === 'particle' || element.classList.contains('annotation')) return null;
-  return readerTokenNode(readerTokenAt(S.passageId, Number(element.dataset.index)));
+  const epoch = dictionaryEpoch();
+  const cached = depthNodeCache.get(element);
+  if (cached && cached.epoch === epoch && cached.passage === S.passageId && cached.index === element.dataset.index) return cached.node;
+  const node = readerTokenNode(readerTokenAt(S.passageId, Number(element.dataset.index)));
+  depthNodeCache.set(element, { epoch, passage: S.passageId, index: element.dataset.index, node });
+  return node;
 }
 function paintDepth(element, now) {
   const node = depthNodeOf(element);
   let result = null;
   if (node) {
     const memoKey = JSON.stringify([node.id, node.seq || null, node.reading || '']);
-    result = depthMemo?.get(memoKey);
-    if (result === undefined) { result = wordDepth(node, S, now); depthMemo?.set(memoKey, result); }
+    result = depthMemo.get(memoKey);
+    if (result === undefined) { result = wordDepth(node, S, now); depthMemo.set(memoKey, result); }
   }
   const depth = result && (result.depth !== 'unmet' || result.kept) ? result.depth : null;
   if (depth) { if (element.dataset.depth !== depth) element.dataset.depth = depth; }
@@ -22436,29 +22450,41 @@ function paintDepth(element, now) {
   if (result?.kept) { if (element.dataset.kept == null) element.dataset.kept = ''; }
   else if (element.dataset.kept != null) delete element.dataset.kept;
 }
-let depthPaintFrame = 0;
+let depthPaintTimer = 0;
 let depthPaintEverything = false;
 const depthPaintRoots = new Set();
+let depthQueue = [];
+let depthQueueAt = 0;
 function scheduleDepthPaint(root = null) {
-  if (typeof document === 'undefined' || typeof requestAnimationFrame !== 'function') return;
+  if (typeof document === 'undefined' || typeof setTimeout !== 'function') return;
   if (root) depthPaintRoots.add(root);
   else depthPaintEverything = true;
-  if (depthPaintFrame) return;
-  depthPaintFrame = requestAnimationFrame(() => {
-    depthPaintFrame = 0;
-    const roots = depthPaintEverything || depthPaintRoots.size > 64 ? [document.body] : [...depthPaintRoots].filter((node) => node.isConnected);
+  if (!depthPaintTimer) depthPaintTimer = setTimeout(depthPaintSlice, 0);
+}
+function depthPaintSlice() {
+  depthPaintTimer = 0;
+  if (depthPaintEverything || depthPaintRoots.size) {
+    // a confirmed record or a whole room: everything on the glass is read again; new nodes only add their own words
+    const everything = depthPaintEverything || depthPaintRoots.size > 64;
+    const found = everything ? [...document.querySelectorAll(DEPTH_TARGETS)] : [...depthPaintRoots].filter((node) => node.isConnected)
+      .flatMap((node) => [...(node.matches?.(DEPTH_TARGETS) ? [node] : []), ...(node.querySelectorAll?.(DEPTH_TARGETS) || [])]);
+    depthQueue = everything ? found : [...new Set([...depthQueue.slice(depthQueueAt), ...found])];
+    depthQueueAt = 0;
     depthPaintEverything = false;
     depthPaintRoots.clear();
-    const now = Date.now();
-    depthMemo = new Map();
-    try {
-      for (const root of roots) {
-        if (root.matches?.(DEPTH_TARGETS)) paintDepth(root, now);
-        for (const element of root.querySelectorAll?.(DEPTH_TARGETS) || []) paintDepth(element, now);
-      }
-      document.getElementById('depth-basis')?.depthRefresh?.();
-    } finally { depthMemo = null; }
-  });
+  }
+  const roots = [S.taken, S.lists, S.srs, S.revlog, S.met, S.deepWords];
+  if (!depthMemoRoots || roots.some((value, i) => value !== depthMemoRoots[i])) { depthMemo = new Map(); depthMemoRoots = roots; }
+  const began = performance.now();
+  const now = Date.now();
+  while (depthQueueAt < depthQueue.length && performance.now() - began < DEPTH_SLICE_MS) {
+    const element = depthQueue[depthQueueAt++];
+    if (element.isConnected) paintDepth(element, now);
+  }
+  if (depthQueueAt < depthQueue.length) { depthPaintTimer = setTimeout(depthPaintSlice, 16); return; }
+  depthQueue = [];
+  depthQueueAt = 0;
+  document.getElementById('depth-basis')?.depthRefresh?.();
 }
 let depthObserver = null;
 function installDepthPainter() {
@@ -22468,8 +22494,9 @@ function installDepthPainter() {
   });
   depthObserver.observe(document.body, { childList: true, subtree: true });
   // present recall moves with time: a page he returns to is read again, never trusted from when it was drawn
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) scheduleDepthPaint(); });
-  window.addEventListener('focus', () => scheduleDepthPaint());
+  const again = () => { depthMemoRoots = null; scheduleDepthPaint(); };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) again(); });
+  window.addEventListener('focus', again);
   scheduleDepthPaint();
 }
 if (typeof window !== 'undefined' && typeof document !== 'undefined' && window.__CORRIDOR_STANDALONE__ !== 'depth-off') {
