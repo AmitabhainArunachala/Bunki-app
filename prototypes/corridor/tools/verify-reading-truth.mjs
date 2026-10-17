@@ -30,6 +30,9 @@
  *   R2.K  a lone kanji read by its on'yomi, no word entry read so, is the kanji's card: 寺 じ, 国 こく, 仏 ぶつ (never
  *       仏 ふつ "France", the quick dictionary's)
  *   R2.C3 a reading the shipped dictionary now carries from the pinned JMdict: 私 read わたくし is entry 2842390
+ *   R2.unfit a kana verb whose dictionary form the quick dictionary has only as a noun is that verb, read as its dictionary
+ *       form (one form: never the surface's reading beside it): ごん狐 かえり, かえっ → かえる 帰る (never 蛙), MHLW なさ →
+ *       なす 為す (never 茄子) — Codex 1352
  *   SWEEP every inflected token (surface ≠ base) of the twenty reviewed articles and of a fixed sample of 20 inherited
  *       ones, one tap per distinct token per article: the reading the card states comes from the token's own (a kana
  *       base; the shared stem read alike; a reading the served dictionary lists for the form whose stem the token's
@@ -37,12 +40,15 @@
  *       name the same form: never the dictionary form beside the surface's reading); any meaning it shows belongs to an entry a
  *       served dictionary has (the quick one, the full one, the original word layer) that writes the card's word and reads
  *       it so, of the token's class (parts of speech from the quick dictionary and the served detail shards; an entry no
- *       served data gives a class is recorded as of unknown class); never "Not in the quick dictionary" once settled.
+ *       served data gives a class is recorded as of unknown class); never "Not in the quick dictionary" once settled;
+ *       never a card left at "…"; a card naming no entry holds its Save and says why.
  *       Counts and every exception are written to the report
  *   R   recorded, never asserted: 式 in 表彰式 and 改造 in 内閣改造 (sense: the tokens carry no sense data), ちかい in
  *       the phonetic parenthetical (G3), し of する (an inflected verb reads its dictionary form), the first paint
  * Every engine run logs browser.version(). READING_TRUTH_ONLY=<case,…> runs only the named cases (a negative control's
- * scope); such a run is marked partial in the report and is never an acceptance result.
+ * scope); such a run is marked partial in the report and is never an acceptance result. READING_TRUTH_PAST_F0=1 lets a
+ * negative control that moves a fixture (the 私/わたくし entry dropped) watch the browser too: the run still fails on F0
+ * and is marked partial.
  * Negative control: the same run against a build with R's reading edits reverted fails A1 on 年 (とし). */
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -65,6 +71,7 @@ const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all'
 assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
 // a negative control's scope (READING_TRUTH_ONLY=r2,sweep,…): a partial run, never an acceptance result
 const ONLY = (process.env.READING_TRUTH_ONLY || '').split(',').filter(Boolean);
+const PAST_F0 = process.env.READING_TRUTH_PAST_F0 === '1';
 const run = (name) => !ONLY.length || ONLY.includes(name);
 const versions = {};
 const json = (path) => JSON.parse(readFileSync(resolve(site, path), 'utf8'));
@@ -790,7 +797,8 @@ const inheritedRows = shelfRows.filter((row) => !TWENTY.includes(row.id)).sort((
 const SAMPLE_PICKS = Array.from({ length: 20 }, (_, i) => Math.floor((i * inheritedRows.length) / 20));
 const SWEEP_ONLY = (process.env.READING_TRUTH_SWEEP_IDS || '').split(',').filter(Boolean);
 const KANA_ONLY = /^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u;
-const SAYS_NONE = (line) => [NO_ENTRY, NO_READING, '…'].includes(line) || /^Several entries: /u.test(line);
+// a card still saying "…" has not answered: it is never counted as saying none (Codex's f2e3015e review)
+const SAYS_NONE = (line) => [NO_ENTRY, NO_READING].includes(line) || /^Several entries: /u.test(line);
 // the verifier's own sound changes (a final っ undone; a voiced or ぱ-row first kana made plain)
 const VOICED = 'がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ', PLAIN = 'かきくけこさしすせそたちつてとはひふへほはひふへほ';
 const soundUndone = (reading) => {
@@ -848,7 +856,7 @@ const classFits = (p, entry) => (p === '動詞' ? classOf(entry).some(verbal) : 
 
 async function sweepCase(browser, contextOptions) {
   const report = { engine, articles: [], notOnShelf: [], totals: { tokens: 0, occurrences: 0, tapped: 0, entry: 0, quick: 0, kanji: 0, several: 0, noEntry: 0,
-    asWritten: 0, particle: 0, wordLayer: 0, classUnknown: 0, exceptions: 0, tapFailures: 0 }, exceptions: [] };
+    asWritten: 0, particle: 0, wordLayer: 0, unanswered: 0, classUnknown: 0, exceptions: 0, tapFailures: 0 }, exceptions: [] };
   const context = await browser.newContext(contextOptions);
   await silenceBrowserAudio(context);
   await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
@@ -928,8 +936,13 @@ async function sweepCase(browser, contextOptions) {
           } else if (card.kind === 'kanji') {
             out.answer = 'kanji';
             if (gloss !== `kanji · ${String(kanjiData[label]?.m || '').toLowerCase()}`) out.issues.push(`the kanji card's meaning is not ${label}'s kanji data`);
+          } else if (gloss === '…') {
+            out.answer = 'unanswered';
+            out.issues.push('the card still says "…": it never answered');
           } else if (SAYS_NONE(gloss) || gloss === QUICK_MISS) {
             out.answer = /^Several entries: /u.test(gloss) ? 'several' : asWritten ? 'asWritten' : 'noEntry';
+            // a card naming no entry holds its Save and says why (D23's honest line)
+            if (!(card.take?.disabled === true && card.reason)) out.issues.push(`names no entry, yet its Save is not held with a reason (${JSON.stringify({ take: card.take, reason: card.reason })})`);
           } else {
             const entry = meaningEntry(label, stated, gloss, asWritten ? [stated, ...soundUndone(stated)] : [stated]);
             out.answer = entry?.from === 'quick' ? 'quick' : entry?.from === 'words' ? 'wordLayer' : 'entry';
@@ -964,6 +977,10 @@ async function sweepCase(browser, contextOptions) {
     !all.some((x) => x.issues.some((issue) => /belongs to no entry|is not a |kanji data/u.test(issue))), list((x) => x.issues.some((issue) => /belongs to no entry|is not a |kanji data/u.test(issue))));
   check('SWEEP.no-quick-miss', 'no settled card says "Not in the quick dictionary"', !all.some((x) => x.issues.some((issue) => /quick dictionary/u.test(issue))),
     list((x) => x.issues.some((issue) => /quick dictionary/u.test(issue))));
+  check('SWEEP.answered', 'no card is left saying "…"', !all.some((x) => x.issues.some((issue) => /never answered/u.test(issue))),
+    list((x) => x.issues.some((issue) => /never answered/u.test(issue))));
+  check('SWEEP.held', 'every card naming no entry (none read so, several, or the word as written) holds its Save and says why',
+    !all.some((x) => x.issues.some((issue) => /Save is not held/u.test(issue))), list((x) => x.issues.some((issue) => /Save is not held/u.test(issue))));
   check('SWEEP.page-errors', 'the sweep: no page errors', errors.length === 0, errors.slice(0, 5));
   record('SWEEP.counts', 'the sweep\'s counts (distinct tokens per article; answers)', report.totals);
   record('SWEEP.class-unknown', 'meanings whose entry no served data gives a part of speech for (not judged)', report.articles
@@ -971,7 +988,8 @@ async function sweepCase(browser, contextOptions) {
 }
 
 try {
-  if (!F0_OK) throw new Error('F0: the served fixtures moved; nothing below would mean what it says');
+  if (!F0_OK && !PAST_F0) throw new Error('F0: the served fixtures moved; nothing below would mean what it says');
+  if (!F0_OK) console.log('F0 failed; READING_TRUTH_PAST_F0=1 watches the browser anyway (a control\'s observation, never an acceptance)');
   for (engine of engines) {
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true });
     // every run names the engine that actually ran (W: some verifiers launched Chromium whatever KAIRO_BROWSER said)
@@ -1025,8 +1043,8 @@ try {
   await host.close();
   const failed = rows.filter((row) => !row.recorded && !row.ok);
   writeFileSync(resolve(evidence, 'verify-reading-truth.json'), `${JSON.stringify({ site, served: identity.gitSha, artifactSha256: identity.artifactSha256,
-    engines, versions, partial: ONLY.length ? ONLY : false, sweepIds: SWEEP_ONLY.length ? SWEEP_ONLY : false, failed: failed.length, rows }, null, 2)}\n`);
-  if (ONLY.length || SWEEP_ONLY.length) console.log(`PARTIAL RUN (${[...ONLY, ...SWEEP_ONLY].join(', ')}): a control's scope, not an acceptance result`);
+    engines, versions, partial: ONLY.length ? ONLY : false, sweepIds: SWEEP_ONLY.length ? SWEEP_ONLY : false, pastF0: PAST_F0, failed: failed.length, rows }, null, 2)}\n`);
+  if (ONLY.length || SWEEP_ONLY.length || PAST_F0) console.log(`PARTIAL RUN (${[...ONLY, ...SWEEP_ONLY, ...(PAST_F0 ? ['past F0'] : [])].join(', ')}): a control's scope, not an acceptance result`);
   console.log(`\n${rows.filter((row) => !row.recorded).length - failed.length} passed, ${failed.length} failed, ${rows.filter((row) => row.recorded).length} recorded · engines ${JSON.stringify(versions)} · evidence ${evidence}`);
   process.exitCode = failed.length ? 1 : 0;
 }
