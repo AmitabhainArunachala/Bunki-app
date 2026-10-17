@@ -69,8 +69,10 @@
  *                         the popup with the word, its reading こうがい, its meaning "suburb", a filled
  *                         Save ▾ and the band as the door into the full entry, inside the screen; nothing is
  *                         written under the word.
- *                         A tap on another word moves the popup; Escape puts it away and gives focus back
- *                         to the word. Control: 3166ded3, whose first tap showed only the reading.
+ *                         A tap on another word moves the popup (N2: waited for, up to 5 s, not a fixed
+ *                         250 ms: that word's popup comes when the full dictionary first answers); Escape
+ *                         puts it away and gives focus back to the word. Control: 3166ded3, whose first tap
+ *                         showed only the reading.
  *   G2 menu → one card  — (John #11 "right click and choose save") a right-click on 郊外 opens the word menu
  *                         at the pointer: Save · Save the sentence · Full entry · Ask the tutor about
  *                         this sentence · Copy. Save makes exactly one 郊外 card carrying its sentence
@@ -895,6 +897,13 @@ try {
         assert(one.door?.name === 'Open the full entry' && one.door.chevron && !one.door.entryButton, `the band is not the door into the full entry: ${JSON.stringify(one.door)}`);
         assert(one.inside && one.underWord === 0, `the popup is off screen, or English was written under the word: ${JSON.stringify(one)}`);
         await tapToken(page, 2);
+        // N2 (the lead, on Grok 0036 and N2/verify-1/TABLE.md) · ジャラマナ is the first word the core lacks: its popup comes
+        // when the full dictionary first answers, about 300 ms after the tap on both builds (every WebKit sample over the
+        // old fixed 250 ms). The check waits for the popup to move, up to 5 s, then asserts exactly as before.
+        await page.waitForFunction(() => {
+          const word = document.querySelector('#mini .mini-word')?.textContent;
+          return document.querySelectorAll('#mini').length === 1 && !!word && word !== '郊外';
+        }, null, { timeout: 5_000 }).catch(() => {});
         const moved = await page.evaluate(() => ({ count: document.querySelectorAll('#mini').length, word: document.querySelector('#mini .mini-word')?.textContent }));
         const third = await page.evaluate(() => document.querySelector('#reader .tok[data-index="2"] .tok-word')?.textContent.replace(/\s/gu, ''));
         assert(moved.count === 1 && moved.word && moved.word !== '郊外' && third.includes(moved.word.slice(0, 1)), `another word did not move the popup: ${JSON.stringify({ moved, third })}`);

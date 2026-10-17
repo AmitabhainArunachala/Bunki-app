@@ -110,7 +110,7 @@ window.__SWEEP__ = {
   // N · the shelf's rows as the page holds them (archive rows aside), the cards as drawn, Today's story, one row read
   rows: () => D.passages.filter((p) => !String(p.file || '').startsWith('archive/')).map((p) => ({
     id: p.id, review: Object.hasOwn(p, 'review') ? p.review : null, pending: !!p.pendingVerification,
-    sourceLabel: p.sourceLabel || '', learnerLabel: learnerSourceLabel(p), attribution: p.attribution || '',
+    sourceLabel: p.sourceLabel || '', learnerLabel: learnerSourceLabel(p), attribution: p.attribution || '', licence: p.licence || '',
     title: p.title || '', titleEn: p.titleEn || '', context: p.context?.ja ?? null, authorLevel: p.authorLevel || null,
     jlpt: p.readingFacets?.jlpt || null, addedAt: p.addedAt || null, lane: p.lane || null, date: p.date || '',
     folded: !!(p.adaptation?.basedOn && D.passages.some((x) => x.id === p.adaptation.basedOn && !String(x.file || '').startsWith('archive/'))),
@@ -174,6 +174,8 @@ window.__SWEEP__ = {
       })),
       chips: [...document.querySelectorAll('#app main .reader-meta .level-chip')].map((n) => n.textContent.trim()),
       text: (document.querySelector('#app main')?.innerText ?? '') + ' ' + (document.querySelector('#app > .chrome')?.innerText ?? ''),
+      // N2 · the reader's footer, where a source's credit and licence are shown
+      about: document.querySelector('#app main .article-about')?.textContent ?? '',
     };
   },
   // a real selection of the first occurrence of text inside a surface (the source reader keeps what is selected)
@@ -395,14 +397,29 @@ const inventory = [];
 const summary = { P: 0, C: 0, K: 0, Kone: 0, M: 0, rooms: 0 };
 
 /* N · the shelf's rows and cards. The provenance words are scanPage's own (checked identical below); the originals are
- * the review queue's rows of kind "original" (docs/content/feed-review-queue.json), the twenty that joined in slice N. */
+ * the review queue's rows of kind "original" (docs/content/feed-review-queue.json), the twenty that joined in slice N.
+ * N2 (2026-10-17) · the hand-chosen articles are the queue's rows of kind "original" and of the real texts' own kinds
+ * (aozora, gv, mext, govonline), in drops by their addedAt day, newest first: batches 3r and 4r, then N's twenty. */
 const PROV_N = /made by ai|ai[- ]?(made|generated|written)|written by ai|questions made by ai|unreviewed|un-reviewed|not yet checked|checked by a person|awaiting (john'?s )?review|machine[- ]checked|human[- ]review|provisional|AI作成|AIが(書|作)|未確認|検収|人の(目|確認)|人による確認|\b\d+ of \d+ not yet/iu;
 assert(scanPage.toString().includes(PROV_N.source), "N's provenance words are scanPage's own");
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
+const HAND_KINDS = new Set(['original', 'aozora', 'gv', 'mext', 'govonline']);
 const QUEUE_ORIGINALS = JSON.parse(readFileSync(resolve(REPO, 'docs/content/feed-review-queue.json'), 'utf8'))
-  .filter((row) => row.kind === 'original' && row.decision !== 'rejected');
+  .filter((row) => HAND_KINDS.has(row.kind) && row.decision !== 'rejected');
 const ORIGINALS = QUEUE_ORIGINALS.map((row) => row.id);
 const ORIGINAL_ROWS = new Map(QUEUE_ORIGINALS.map((row) => [row.id, row]));
+// the drops, newest first, each the hand-chosen rows of one addedAt day
+const DROP_DAYS = [...new Set(QUEUE_ORIGINALS.map((row) => row.addedAt))].sort().reverse();
+const DROPS = DROP_DAYS.map((day) => QUEUE_ORIGINALS.filter((row) => row.addedAt === day).map((row) => row.id));
+// the brief's series rule (N2, Kimi via the writer), derived here from the rows alone: an Aozora author's pieces are one
+// series (the id names the work and the cut: aozora:<work>-<cut>; the credit names the author: 青空文庫 <author>「…」)
+const seriesOf = (row) => {
+  const cut = /^aozora:(\d+)(?:-(\d+))?$/u.exec(String(row?.id || ''));
+  const author = /^青空文庫\s+([^\s「『]+)[「『]/u.exec(String(row?.attribution || ''))?.[1];
+  return cut && author ? { key: author, work: cut[1], cut: Number(cut[2] || 1) } : null;
+};
+// Kimi's placement note (FIXES-batch-4): Nakaya's portrait of Terada sits near Terada's pieces
+const NAKAYA_ON_TERADA = 'aozora:053224-1';
 const levelOf = (row) => (/^N[1-5]\+?$/u.test(row.authorLevel || '') ? row.authorLevel : null) ?? row.jlpt;
 const stepOf = (row) => String(levelOf(row) || '').replace(/\+$/u, '');
 // the brief's neighbour rules for the newest drop (N brief §3): no two neighbours share a field (the queue row's `fields`)
@@ -410,7 +427,9 @@ const stepOf = (row) => String(levelOf(row) || '').replace(/\+$/u, '');
 const genreOf = (row, q) => (row?.lane === 'news' ? 'news' : /explainer/u.test(q.style) ? 'explainer' : /column|コラム/u.test(q.style) ? 'column'
   : /essay|随筆/u.test(q.style) ? 'essay' : /dialogue|対話/u.test(q.style) ? 'dialogue' : /history narrative/u.test(q.style) ? 'history' : q.style);
 const APART = [['bunki-read-n3-transistor-class', 'bunki-read-n3-honda-quarter'], ['bunki-read-n3-transistor-class', 'bunki-read-n2-shima-4004'],
-  ['bunki-read-n3-transistor-class', 'bunki-read-n1-neocognitron'], ['bunki-read-n2-sleep-memory', 'bunki-read-n2-forgetting-curve']];
+  ['bunki-read-n3-transistor-class', 'bunki-read-n1-neocognitron'], ['bunki-read-n2-sleep-memory', 'bunki-read-n2-forgetting-curve'],
+  // N2 · Kimi (FIXES-batch-3): the rule of 72 is also taught in N's Honda dialogue; keep the two apart
+  ['bunki-read-n3-rule-of-72', 'bunki-read-n3-honda-quarter']];
 const plusDays = (day, n) => new Date(Date.parse(`${day}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
 async function shelfRowsAndCards(page, engine, lang) {
   const label = `${engine} ${lang} · N`;
@@ -446,31 +465,59 @@ async function shelfRowsAndCards(page, engine, lang) {
     levels: levels.map(({ level, cards: kept }) => ({ level, ids: kept.map((c) => c.id) })),
     rows: walked.map(({ row, seen }) => ({ id: row.id, review: row.review, level: levelOf(row), chips: seen.chips, contexts: seen.contexts })) });
   if (MODE !== 'verify') return;
-  check(`${label} the shelf's originals are the queue's (${ORIGINALS.length})`, drop.length === ORIGINALS.length && ORIGINALS.length > 0,
-    `${drop.length} of ${ORIGINALS.length}`);
-  const newestNews = drop.map((id) => byId.get(id)).filter((row) => row.lane === 'news' && /^\d{4}-\d{2}-\d{2}$/u.test(row.date)).map((row) => row.date).sort().at(-1);
+  check(`${label} the shelf's hand-chosen articles are the queue's (${ORIGINALS.length}, in ${DROPS.length} drops: ${DROPS.map((ids, i) => `${DROP_DAYS[i]} ${ids.length}`).join(', ')})`,
+    drop.length === ORIGINALS.length && ORIGINALS.length > 0 && DROPS.length >= 2, `${drop.length} of ${ORIGINALS.length}`);
+  // N2 · the series the shelf holds, from the rows alone; a series with a member in the newest drop gathers there
+  const seriesRows = rows.filter((row) => !row.folded && seriesOf(row));
+  const series = [...new Set(seriesRows.map((row) => seriesOf(row).key))].map((key) => seriesRows.filter((row) => seriesOf(row).key === key))
+    .filter((group) => group.length > 1);
+  const bookOrder = (a, b) => (seriesOf(a).work === seriesOf(b).work ? seriesOf(a).cut - seriesOf(b).cut
+    : String(a.addedAt || '') < String(b.addedAt || '') ? -1 : String(a.addedAt || '') > String(b.addedAt || '') ? 1 : 0);
+  const pulled = new Set(series.filter((group) => group.some((row) => DROPS[0].includes(row.id)))
+    .flatMap((group) => group.filter((row) => !DROPS[0].includes(row.id)).map((row) => row.id)));
+  const blocks = [[...DROPS[0], ...pulled], ...DROPS.slice(1).map((ids) => ids.filter((id) => !pulled.has(id)))];
+  const seriesPair = (a, b) => series.some((group) => {
+    const ids = [...group].sort(bookOrder).map((row) => row.id);
+    return ids.indexOf(b) === ids.indexOf(a) + 1 && ids.includes(a);
+  });
+  const newestNews = DROPS[0].map((id) => byId.get(id)).filter((row) => row.lane === 'news' && /^\d{4}-\d{2}-\d{2}$/u.test(row.date)).map((row) => row.date).sort().at(-1);
   const orders = [];
   for (const { day: d, cards: all } of shelves) {
     const ids = all.map((c) => c.id);
-    const head = ids.slice(0, drop.length);
+    const lead = byId.get(ids[0]);
+    // the drops stand first, the newest whole (with what its series pulled in), then each older one whole; then the rest
+    let at = 0;
+    const drawnBlocks = blocks.map((block) => { const got = ids.slice(at, at + block.length); at += block.length; return got; });
+    const blocksOk = blocks.every((block, i) => drawnBlocks[i].length === block.length && drawnBlocks[i].every((id) => block.includes(id)));
     const firstOther = ids.findIndex((id) => !ORIGINALS.includes(id));
     const lastDrop = Math.max(...drop.map((id) => ids.indexOf(id)));
-    const lead = byId.get(ids[0]);
-    const broken = head.slice(1).map((id, i) => [head[i], id]).filter(([a, b]) => {
+    check(`${label} ${d}: the drops stand first — the newest whole, then N's whole — and every new reading stands ahead of every inherited card, today's six included`,
+      drop.length > 0 && blocksOk && firstOther > lastDrop,
+      JSON.stringify(all.slice(0, drop.length + 2).map((c) => `${c.id}${c.band ? ` [${c.band}]` : ''}`)));
+    check(`${label} ${d}: the shelf opens on the newest drop's newest dated news piece (${newestNews})`,
+      !!newestNews && lead?.lane === 'news' && lead.date === newestNews && DROPS[0].includes(lead.id), `${ids[0]} · ${lead?.lane} · ${lead?.date}`);
+    const broken = drawnBlocks.flatMap((block) => block.slice(1).map((id, i) => [block[i], id])).filter(([a, b]) => {
+      if (seriesPair(a, b)) return false;  // a series stands together, in book order
       const qa = ORIGINAL_ROWS.get(a), qb = ORIGINAL_ROWS.get(b);
       return !qa || !qb || qa.fields.some((f) => qb.fields.includes(f)) || genreOf(byId.get(a), qa) === genreOf(byId.get(b), qb)
         || APART.some(([x, y]) => (a === x && b === y) || (a === y && b === x));
     }).map(([a, b]) => `${a}|${b}`);
-    check(`${label} ${d}: every new reading stands ahead of every inherited card, today's six included`,
-      drop.length > 0 && head.every((id) => ORIGINALS.includes(id)) && new Set(head).size === drop.length && firstOther > lastDrop,
-      JSON.stringify(all.slice(0, drop.length + 2).map((c) => `${c.id}${c.band ? ` [${c.band}]` : ''}`)));
-    check(`${label} ${d}: the shelf opens on the newest dated news piece (${newestNews})`,
-      !!newestNews && lead?.lane === 'news' && lead.date === newestNews, `${ids[0]} · ${lead?.lane} · ${lead?.date}`);
-    check(`${label} ${d}: no two neighbours in the drop share a field or a style, and the reviewers' pairs stand apart`,
-      head.length === drop.length && broken.length === 0, broken.join(', '));
-    orders.push(head.join(','));
+    check(`${label} ${d}: within each drop no two neighbours share a field or a style (a series' own neighbours aside), and the reviewers' pairs stand apart`,
+      blocksOk && broken.length === 0, broken.join(', '));
+    // series in book order: every series the shelf holds stands together, a later cut never before an earlier one
+    const seriesTrouble = series.filter((group) => {
+      const want = [...group].sort(bookOrder).map((row) => row.id);
+      const start = ids.indexOf(want[0]);
+      return start < 0 || want.some((id, i) => ids[start + i] !== id);
+    }).map((group) => group.map((row) => `${row.id}@${ids.indexOf(row.id)}`).join(' '));
+    check(`${label} ${d}: every series stands together in book order (${series.map((group) => `${seriesOf(group[0]).key} ×${group.length}`).join(', ')}) — a later cut never precedes its earlier one`,
+      series.length >= 2 && seriesTrouble.length === 0, seriesTrouble.join(' | '));
+    const terada = series.find((group) => group.some((row) => row.id !== NAKAYA_ON_TERADA && /寺田/u.test(row.attribution)));
+    const near = terada ? Math.min(...terada.map((row) => Math.abs(ids.indexOf(row.id) - ids.indexOf(NAKAYA_ON_TERADA)))) : Infinity;
+    check(`${label} ${d}: Nakaya's portrait of Terada stands within two places of Terada's pieces (Kimi, FIXES-batch-4)`, near <= 2, `${near} places`);
+    orders.push(ids.slice(0, drop.length).join(','));
   }
-  check(`${label} the drop keeps one order on all four days — the daily turn moves only the shelf after it`, new Set(orders).size === 1,
+  check(`${label} the drops keep one order on all four days — the daily turn moves only the shelf after them`, new Set(orders).size === 1,
     orders.map((o) => o.slice(0, 60)).join(' | '));
   const firstInherited = shelves.map(({ cards: all }) => all.find((c) => !c.band && !ORIGINALS.includes(c.id))?.id);
   check(`${label} after the drop the shelf still turns daily: its first inherited story changes across four days`,
@@ -479,7 +526,8 @@ async function shelfRowsAndCards(page, engine, lang) {
   // N (round 2; Codex A–E) · Today's reading offers the newest drop first, whatever the record holds: five in-memory
   // records, each restored. The expectation is the brief's rule, computed here from the rows' forms and the drawn order
   // (the drop as the shelf draws it, then the shelf after it) — never by calling the app's own selector
-  const dropOrder = [...new Set(shelves[0].cards.map((c) => c.id).filter((id) => ORIGINALS.includes(id)))];
+  const dropOrder = [...new Set(shelves[0].cards.map((c) => c.id).filter((id) => DROPS[0].includes(id)))];
+  const nextOrder = [...new Set(shelves[0].cards.map((c) => c.id).filter((id) => DROPS[1].includes(id)))];
   const shelfOrder = [...new Set(shelves[0].cards.map((c) => c.id))];
   const formsOf = await page.evaluate((ids) => window.__SWEEP__.formsOf(ids), rows.map((row) => row.id));
   const overlap = (id, words) => (formsOf[id] || []).filter((f) => words.includes(f)).length;
@@ -494,8 +542,8 @@ async function shelfRowsAndCards(page, engine, lang) {
   const tb = ['結核'];
   const tbInherited = inherited.filter((id) => overlap(id, tb));
   check(`${label} Today fixture: 結核 stands in an inherited story (${tbInherited.slice(0, 2).join(', ')}) and in no new one`,
-    tbInherited.length > 0 && dropOrder.every((id) => !overlap(id, tb)), `${tbInherited.length} inherited`);
-  await todayCase('B saved 結核, the twenty unread', { taken: tb }, bestIn(dropOrder, tb),
+    tbInherited.length > 0 && ORIGINALS.every((id) => !overlap(id, tb)), `${tbInherited.length} inherited`);
+  await todayCase('B saved 結核, the drops unread', { taken: tb }, bestIn(dropOrder, tb),
     'a new story — the drop\'s first, since none holds 結核 — never the inherited story that does');
   // C · a word one later new story holds, and some inherited story too: Today names that new story
   const cId = dropOrder.slice(1).find((id) => (formsOf[id] || []).some((f) => dropOrder.filter((x) => (formsOf[x] || []).includes(f)).length === 1
@@ -510,10 +558,15 @@ async function shelfRowsAndCards(page, engine, lang) {
   const aPool = dropOrder.filter((id) => !aRead.includes(id));
   await todayCase('D aged record (lead read, 15 inherited read, 60 saved words)', { taken: aWords, readDone: aRead }, bestIn(aPool, aWords),
     'an unread new story — the one holding most of the saved words, first in the drop\'s order on a tie — never the read lead or an inherited story');
-  // E · the drop read through: Today falls back to an unread inherited story, a live door with its title
+  // E1 (N2) · the newest drop read through: Today turns to the next drop, its first story as the shelf draws it (no saved
+  // words), never an inherited one
+  const pulledIds = [...pulled];
+  await todayCase('E1 the newest drop read', { readDone: DROPS[0] }, nextOrder.filter((id) => !pulledIds.includes(id))[0] ?? nextOrder[0],
+    'the next drop\'s first story — N\'s twenty follow the newest — never an inherited story');
+  // E2 · every drop read through: Today falls back to an unread inherited story, a live door with its title
   const eSeen = await page.evaluate((r) => window.__SWEEP__.todayUnder(r), { readDone: ORIGINALS });
   const eRow = byId.get(eSeen.pick);
-  check(`${label} Today E the twenty read: an unread inherited story, drawn with its title, one door`,
+  check(`${label} Today E2 every drop read: an unread inherited story, drawn with its title, one door`,
     !!eRow && !ORIGINALS.includes(eSeen.pick) && !eRow.folded && eSeen.doors === 1 && eSeen.title === eRow.title,
     `picked ${eSeen.pick} · drawn "${eSeen.title}" · ${eSeen.doors} door(s)`);
   const after = await page.evaluate(() => window.__SWEEP__.todayPick());
@@ -555,6 +608,24 @@ async function shelfRowsAndCards(page, engine, lang) {
     if (shown.length) problems.push(`authoring drawn: ${shown.join(' / ')}`);
     if (problems.length) rowTrouble.push(`${row.id}: ${problems.join(', ')}`);
   }
+  // N2 · every hand-chosen real text shows its credit and licence where the app shows a source's attribution (the reader's
+  // footer): the whole attribution as written and the licence; for Global Voices (CC BY 3.0) that attribution states the
+  // changes made to the text, and every declared spelling swap is named there
+  const fold = (value) => String(value || '').replace(/\s+/gu, ' ').trim();
+  const realTrouble = [];
+  let realRead = 0;
+  for (const { row, seen } of walked) {
+    const kind = ORIGINAL_ROWS.get(row.id)?.kind;
+    if (!kind || (kind === 'original' && !seriesOf(row))) continue;
+    realRead += 1;
+    const problems = [];
+    if (!fold(seen.about).includes(fold(row.attribution))) problems.push('attribution not shown');
+    if (!fold(seen.about).includes(fold(row.licence))) problems.push('licence not shown');
+    if (kind === 'gv' && !(/omitted/u.test(seen.about) && /otherwise copied/u.test(seen.about))) problems.push('changes not stated');
+    if (problems.length) realTrouble.push(`${row.id} (${kind}): ${problems.join(', ')}`);
+  }
+  check(`${label} every hand-chosen real text (${realRead}) shows its credit and licence in the reader's footer; Global Voices states its changes`,
+    realRead >= 8 && realTrouble.length === 0, realTrouble.slice(0, 6).join(' | '));
   const withContext = rows.filter((row) => row.context).length;
   check(`${label} every row read (${walked.length}): one level, no provenance, no authoring drawn; the context line on the ${withContext} rows that carry it, under the title, and on no other`,
     walked.length === rows.length && withContext > 0 && rowTrouble.length === 0, rowTrouble.slice(0, 6).join(' | '));

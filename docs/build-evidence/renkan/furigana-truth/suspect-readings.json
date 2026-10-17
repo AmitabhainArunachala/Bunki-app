@@ -4,11 +4,11 @@
  "generatedBy": "prototypes/corridor/tools/check_suspect_readings.py (deterministic — no clock, no rng)",
  "lexicon": "docs/content/reading-overrides.json",
  "scanned": {
-  "articles": 136,
-  "tokens": 80235
+  "articles": 156,
+  "tokens": 95731
  },
  "statusCounts": {
-  "lexicon-fixed": 465,
+  "lexicon-fixed": 545,
   "accepted": 30
  },
  "openCount": 0,
@@ -4962,6 +4962,806 @@
    "status": "lexicon-fixed",
    "context": "、アメリカのベル研究所で、バーディーンと",
    "note": "ベル研究所"
+  },
+  {
+   "article": "bunki-read-n2-shoten-ganesha",
+   "token": 39,
+   "rule": "override-site",
+   "surface": "中腹",
+   "reading": "ちゅうふく",
+   "status": "lexicon-fixed",
+   "context": "ている。山の中腹にある宝山寺へ",
+   "note": "中腹"
+  },
+  {
+   "article": "bunki-read-n2-shoten-ganesha",
+   "token": 43,
+   "rule": "override-site",
+   "surface": "寺",
+   "reading": "じ",
+   "status": "lexicon-fixed",
+   "context": "の中腹にある宝山寺へ参る人々を運ぶ",
+   "note": "宝山寺"
+  },
+  {
+   "article": "bunki-read-n2-shoten-ganesha",
+   "token": 76,
+   "rule": "override-site",
+   "surface": "歓喜",
+   "reading": "かんぎ",
+   "status": "lexicon-fixed",
+   "context": "だ。聖天は、歓喜天ともいう。",
+   "note": "歓喜天"
+  },
+  {
+   "article": "bunki-read-n2-shoten-ganesha",
+   "token": 209,
+   "rule": "override-site",
+   "surface": "七",
+   "reading": "なの",
+   "status": "lexicon-fixed",
+   "context": "を像に注いで七日間祈る作法が書か",
+   "note": "七日間"
+  },
+  {
+   "article": "bunki-read-n2-shoten-ganesha",
+   "token": 289,
+   "rule": "override-site",
+   "surface": "寺",
+   "reading": "じ",
+   "status": "lexicon-fixed",
+   "context": "いる。生駒の宝山寺は、1678年に",
+   "note": "宝山寺"
+  },
+  {
+   "article": "bunki-read-n2-shoten-ganesha",
+   "token": 338,
+   "rule": "override-site",
+   "surface": "聖天",
+   "reading": "しょうでん",
+   "status": "lexicon-fixed",
+   "context": "県熊谷市の妻沼聖天山では、聖天",
+   "note": "妻沼聖天山"
+  },
+  {
+   "article": "bunki-read-n2-shoten-ganesha",
+   "token": 339,
+   "rule": "override-site",
+   "surface": "山",
+   "reading": "ざん",
+   "status": "lexicon-fixed",
+   "context": "熊谷市の妻沼聖天山では、聖天堂",
+   "note": "妻沼聖天山"
+  },
+  {
+   "article": "aozora:058059-1",
+   "token": 150,
+   "rule": "override-site",
+   "surface": "如何",
+   "reading": "いか",
+   "status": "lexicon-fixed",
+   "context": "なりを洗う水の如何にも少なかったこと",
+   "note": "如何にも"
+  },
+  {
+   "article": "aozora:058059-1",
+   "token": 516,
+   "rule": "override-site",
+   "surface": "宗",
+   "reading": "しゅう",
+   "status": "lexicon-fixed",
+   "context": "はならぬ。一向宗の人は何か",
+   "note": "一向宗"
+  },
+  {
+   "article": "aozora:058059-1",
+   "token": 834,
+   "rule": "override-site",
+   "surface": "忠孝",
+   "reading": "ちゅうこう",
+   "status": "lexicon-fixed",
+   "context": "では形式的の忠孝主義や愛国心の",
+   "note": "忠孝"
+  },
+  {
+   "article": "aozora:058059-1",
+   "token": 1440,
+   "rule": "override-site",
+   "surface": "両個",
+   "reading": "りょうこ",
+   "status": "lexicon-fixed",
+   "context": "して見ると此等両個の原理に対するあこがれ",
+   "note": "両個"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 11,
+   "rule": "override-site",
+   "surface": "ソニトプル",
+   "reading": "そにとぷる",
+   "status": "lexicon-fixed",
+   "context": "北東部アッサム州のソニトプル地区のジャングルでほの",
+   "note": "ソニトプル"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 30,
+   "rule": "override-site",
+   "surface": "プリヤンカ",
+   "reading": "ぷりやんか",
+   "status": "lexicon-fixed",
+   "context": "聞こえる微かな音でプリヤンカは浅い眠りから覚め",
+   "note": "プリヤンカ"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 162,
+   "rule": "override-site",
+   "surface": "カジランガ",
+   "reading": "かじらんが",
+   "status": "lexicon-fixed",
+   "context": "か月前にあったカジランガ国立公園でのその",
+   "note": "カジランガ"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 175,
+   "rule": "override-site",
+   "surface": "プリヤンカ",
+   "reading": "ぷりやんか",
+   "status": "lexicon-fixed",
+   "context": "語ってくれた。プリヤンカはアッサム州ジブサガル地区",
+   "note": "プリヤンカ"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 179,
+   "rule": "override-site",
+   "surface": "ジブサガル",
+   "reading": "じぶさがる",
+   "status": "lexicon-fixed",
+   "context": "。プリヤンカはアッサム州ジブサガル地区のガルバガ村出身",
+   "note": "ジブサガル"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 253,
+   "rule": "override-site",
+   "surface": "ラキンプル",
+   "reading": "らきんぷる",
+   "status": "lexicon-fixed",
+   "context": "覚悟でした」とラキンプル地区のガーマラ村出身",
+   "note": "ラキンプル"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 290,
+   "rule": "override-site",
+   "surface": "カジランガ",
+   "reading": "かじらんが",
+   "status": "lexicon-fixed",
+   "context": "に選ばれた。カジランガ国立公園での仕事",
+   "note": "カジランガ"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 296,
+   "rule": "override-site",
+   "surface": "カジランガ",
+   "reading": "かじらんが",
+   "status": "lexicon-fixed",
+   "context": "国立公園での仕事カジランガ国立公園は430平方",
+   "note": "カジランガ"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 315,
+   "rule": "override-site",
+   "surface": "ブラマプトラ",
+   "reading": "ぶらまぷとら",
+   "status": "lexicon-fixed",
+   "context": "アングロン丘陵から北はブラマプトラ川まで広がる。国道",
+   "note": "ブラマプトラ"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 324,
+   "rule": "override-site",
+   "surface": "ブルハパハール",
+   "reading": "ぶるはぱはーる",
+   "status": "lexicon-fixed",
+   "context": "。国道37号がブルハパハール、バゴリ、コホラ、",
+   "note": "ブルハパハール"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 326,
+   "rule": "override-site",
+   "surface": "バゴリ",
+   "reading": "ばごり",
+   "status": "lexicon-fixed",
+   "context": "37号がブルハパハール、バゴリ、コホラ、アゴラトリ、",
+   "note": "バゴリ"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 328,
+   "rule": "override-site",
+   "surface": "コホラ",
+   "reading": "こほら",
+   "status": "lexicon-fixed",
+   "context": "がブルハパハール、バゴリ、コホラ、アゴラトリ、ビスワナートの",
+   "note": "コホラ"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 332,
+   "rule": "override-site",
+   "surface": "ビスワナート",
+   "reading": "びすわなーと",
+   "status": "lexicon-fixed",
+   "context": "、コホラ、アゴラトリ、ビスワナートの５つの地域",
+   "note": "ビスワナート"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 357,
+   "rule": "override-site",
+   "surface": "カジランガ",
+   "reading": "かじらんが",
+   "status": "lexicon-fixed",
+   "context": "頻発している。カジランガはイッカクサイ（インドサイ）",
+   "note": "カジランガ"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 431,
+   "rule": "override-site",
+   "surface": "ドゥルガス",
+   "reading": "どぅるがす",
+   "status": "lexicon-fixed",
+   "context": "ます」とヴァン・ドゥルガスのリーダー、スニヤ・",
+   "note": "ドゥルガス"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 442,
+   "rule": "override-site",
+   "surface": "ディパンジャリ",
+   "reading": "でぃぱんじゃり",
+   "status": "lexicon-fixed",
+   "context": "ペグは説明する。ディパンジャリはこう語る「私",
+   "note": "ディパンジャリ"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 492,
+   "rule": "override-site",
+   "surface": "沿い",
+   "reading": "ぞい",
+   "status": "lexicon-fixed",
+   "context": "ライフル銃を抱えフェンス沿いを歩き、夜の",
+   "note": "フェンス沿い"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 510,
+   "rule": "override-site",
+   "surface": "カジランガ",
+   "reading": "かじらんが",
+   "status": "lexicon-fixed",
+   "context": "ことがあります」カジランガ国立公園のソナリ・",
+   "note": "カジランガ"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 620,
+   "rule": "override-site",
+   "surface": "カジランガ",
+   "reading": "かじらんが",
+   "status": "lexicon-fixed",
+   "context": "ありませんが、カジランガ国立公園の内側に",
+   "note": "カジランガ"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 782,
+   "rule": "override-site",
+   "surface": "スワナプール",
+   "reading": "すわなぷーる",
+   "status": "lexicon-fixed",
+   "context": "語るのはジョルハート地区スワナプール茶農園から来た",
+   "note": "スワナプール"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 829,
+   "rule": "override-site",
+   "surface": "カジランガ",
+   "reading": "かじらんが",
+   "status": "lexicon-fixed",
+   "context": "2023年8月、カジランガ国立公園のヴァン・",
+   "note": "カジランガ"
+  },
+  {
+   "article": "global-voices:2026-08-03-65560",
+   "token": 835,
+   "rule": "override-site",
+   "surface": "ドゥルガス",
+   "reading": "どぅるがす",
+   "status": "lexicon-fixed",
+   "context": "国立公園のヴァン・ドゥルガス（森の女神）",
+   "note": "ドゥルガス"
+  },
+  {
+   "article": "bunki-read-n1-kukai-sanskrit",
+   "token": 211,
+   "rule": "override-site",
+   "surface": "日",
+   "reading": "にち",
+   "status": "lexicon-fixed",
+   "context": "806年10月22日付で朝廷に差し出さ",
+   "note": "22日付"
+  },
+  {
+   "article": "bunki-read-n1-kukai-sanskrit",
+   "token": 212,
+   "rule": "override-site",
+   "surface": "付",
+   "reading": "づけ",
+   "status": "lexicon-fixed",
+   "context": "年10月22日付で朝廷に差し出され",
+   "note": "22日付"
+  },
+  {
+   "article": "bunki-read-n1-kukai-sanskrit",
+   "token": 237,
+   "rule": "override-site",
+   "surface": "巻",
+   "reading": "かん",
+   "status": "lexicon-fixed",
+   "context": "は計216部461巻に上り、うち42",
+   "note": "461巻"
+  },
+  {
+   "article": "bunki-read-n1-kukai-sanskrit",
+   "token": 245,
+   "rule": "override-site",
+   "surface": "巻",
+   "reading": "かん",
+   "status": "lexicon-fixed",
+   "context": "、うち42部44巻は梵字による真言",
+   "note": "44巻"
+  },
+  {
+   "article": "global-voices:2026-07-28-65374",
+   "token": 311,
+   "rule": "override-site",
+   "surface": "中",
+   "reading": "じゅう",
+   "status": "lexicon-fixed",
+   "context": "に興味を持つ世界中の非英語話者に",
+   "note": "世界中"
+  },
+  {
+   "article": "aozora:004668-1",
+   "token": 197,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "、とうの昔に何かしら相当な対策を",
+   "note": "何かしら"
+  },
+  {
+   "article": "aozora:004668-1",
+   "token": 521,
+   "rule": "override-site",
+   "surface": "辛い",
+   "reading": "がらい",
+   "status": "lexicon-fixed",
+   "context": "のことなどこのせち辛い世の中でとても覚えて",
+   "note": "せち辛い"
+  },
+  {
+   "article": "aozora:004668-1",
+   "token": 978,
+   "rule": "override-site",
+   "surface": "一",
+   "reading": "いっ",
+   "status": "lexicon-fixed",
+   "context": "がおおよそ百年に一遍くらいちょっとした",
+   "note": "一遍"
+  },
+  {
+   "article": "aozora:004668-1",
+   "token": 1127,
+   "rule": "override-site",
+   "surface": "四",
+   "reading": "よ",
+   "status": "lexicon-fixed",
+   "context": "というものが二十四時間ごとに繰返される",
+   "note": "二十四時間"
+  },
+  {
+   "article": "bunki-read-n2-carson-nobel",
+   "token": 5,
+   "rule": "override-site",
+   "surface": "ゲリュオン",
+   "reading": "げりゅおん",
+   "status": "lexicon-fixed",
+   "context": "赤い翼を持つ怪物ゲリュオンは、ギリシア神話で",
+   "note": "ゲリュオン"
+  },
+  {
+   "article": "bunki-read-n2-carson-nobel",
+   "token": 175,
+   "rule": "override-site",
+   "surface": "博士",
+   "reading": "はくし",
+   "status": "lexicon-fixed",
+   "context": "年に古典学の博士論文を発表し、",
+   "note": "博士論文"
+  },
+  {
+   "article": "bunki-read-n2-carson-nobel",
+   "token": 328,
+   "rule": "override-site",
+   "surface": "前",
+   "reading": "ぜん",
+   "status": "lexicon-fixed",
+   "context": "自伝』だ。紀元前6世紀の詩人ステシコロス",
+   "note": "紀元前"
+  },
+  {
+   "article": "bunki-read-n2-carson-nobel",
+   "token": 333,
+   "rule": "override-site",
+   "surface": "ステシコロス",
+   "reading": "すてしころす",
+   "status": "lexicon-fixed",
+   "context": "前6世紀の詩人ステシコロスが残した詩の",
+   "note": "ステシコロス"
+  },
+  {
+   "article": "bunki-read-n2-carson-nobel",
+   "token": 345,
+   "rule": "override-site",
+   "surface": "ゲリュオン",
+   "reading": "げりゅおん",
+   "status": "lexicon-fixed",
+   "context": "から出発し、怪物ゲリュオンが成長していく",
+   "note": "ゲリュオン"
+  },
+  {
+   "article": "bunki-read-n2-carson-nobel",
+   "token": 366,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "2022年に出た日本語訳の出版社",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-carson-nobel",
+   "token": 367,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "年に出た日本語訳の出版社は",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-carson-nobel",
+   "token": 401,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "、2冊目の日本語訳『かみあわない",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-carson-nobel",
+   "token": 402,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "2冊目の日本語訳『かみあわないノーマ",
+   "note": "日本語"
+  },
+  {
+   "article": "aozora:053224-1",
+   "token": 96,
+   "rule": "override-site",
+   "surface": "ボツリボツリ",
+   "reading": "ぼつりぼつり",
+   "status": "lexicon-fixed",
+   "context": "れた御様子でボツリボツリと思い出を語られ",
+   "note": "ボツリボツリ"
+  },
+  {
+   "article": "aozora:053224-1",
+   "token": 833,
+   "rule": "override-site",
+   "surface": "一言",
+   "reading": "いちごん",
+   "status": "lexicon-fixed",
+   "context": "た。そのような一言半句にも先生は",
+   "note": "一言半句"
+  },
+  {
+   "article": "bunki-read-n2-imf-outlook",
+   "token": 85,
+   "rule": "override-site",
+   "surface": "年",
+   "reading": "ねん",
+   "status": "lexicon-fixed",
+   "context": "、春と秋の年2回まとめる「世界",
+   "note": "年2回"
+  },
+  {
+   "article": "bunki-read-n2-imf-outlook",
+   "token": 102,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "を公表した。日本語版には「",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-imf-outlook",
+   "token": 103,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "公表した。日本語版には「試さ",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-imf-outlook",
+   "token": 474,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "いる。IMF自身、日本語版の要旨で",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-imf-outlook",
+   "token": 475,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "。IMF自身、日本語版の要旨で「",
+   "note": "日本語"
+  },
+  {
+   "article": "aozora:049966-2",
+   "token": 93,
+   "rule": "override-site",
+   "surface": "八",
+   "reading": "はっ",
+   "status": "lexicon-fixed",
+   "context": "老僧はその時分七十八歳でなかなかの学者",
+   "note": "八歳"
+  },
+  {
+   "article": "aozora:049966-2",
+   "token": 194,
+   "rule": "override-site",
+   "surface": "哩",
+   "reading": "まいる",
+   "status": "lexicon-fixed",
+   "context": "。それから毎日三哩あるこの寺へ通う",
+   "note": "哩"
+  },
+  {
+   "article": "aozora:049966-2",
+   "token": 466,
+   "rule": "override-site",
+   "surface": "一",
+   "reading": "いっ",
+   "status": "lexicon-fixed",
+   "context": "たから私とてももう一遍行くことは出来",
+   "note": "一遍"
+  },
+  {
+   "article": "aozora:049966-2",
+   "token": 959,
+   "rule": "override-site",
+   "surface": "一",
+   "reading": "いっ",
+   "status": "lexicon-fixed",
+   "context": "ですからその金で一ヵ年半を支うる",
+   "note": "一ヵ年"
+  },
+  {
+   "article": "bunki-read-n2-pillay-peace-nobel",
+   "token": 34,
+   "rule": "override-site",
+   "surface": "ナバネセム",
+   "reading": "なばねせむ",
+   "status": "lexicon-fixed",
+   "context": "法廷で判事を務めるナバネセム（ナビ）・ピレイ",
+   "note": "ナバネセム"
+  },
+  {
+   "article": "bunki-read-n2-pillay-peace-nobel",
+   "token": 39,
+   "rule": "override-site",
+   "surface": "ピレイ",
+   "reading": "ぴれい",
+   "status": "lexicon-fixed",
+   "context": "ナバネセム（ナビ）・ピレイ氏である。白人",
+   "note": "ピレイ"
+  },
+  {
+   "article": "bunki-read-n2-pillay-peace-nobel",
+   "token": 100,
+   "rule": "override-site",
+   "surface": "ピレイ",
+   "reading": "ぴれい",
+   "status": "lexicon-fixed",
+   "context": "のノーベル平和賞をピレイ氏に贈ると発表",
+   "note": "ピレイ"
+  },
+  {
+   "article": "bunki-read-n2-pillay-peace-nobel",
+   "token": 169,
+   "rule": "override-site",
+   "surface": "ピレイ",
+   "reading": "ぴれい",
+   "status": "lexicon-fixed",
+   "context": "としている。ピレイ氏は10月12",
+   "note": "ピレイ"
+  },
+  {
+   "article": "bunki-read-n2-pillay-peace-nobel",
+   "token": 209,
+   "rule": "override-site",
+   "surface": "ピレイ",
+   "reading": "ぴれい",
+   "status": "lexicon-fixed",
+   "context": "た。1967年、ピレイ氏はダーバンで自分",
+   "note": "ピレイ"
+  },
+  {
+   "article": "bunki-read-n2-pillay-peace-nobel",
+   "token": 332,
+   "rule": "override-site",
+   "surface": "ピレイ",
+   "reading": "ぴれい",
+   "status": "lexicon-fixed",
+   "context": "た。1998年、ピレイ氏を含む3人",
+   "note": "ピレイ"
+  },
+  {
+   "article": "bunki-read-n2-pillay-peace-nobel",
+   "token": 347,
+   "rule": "override-site",
+   "surface": "アカイェス",
+   "reading": "あかいぇす",
+   "status": "lexicon-fixed",
+   "context": "ルワンダの町長だったアカイェスにジェノサイドの罪で",
+   "note": "アカイェス"
+  },
+  {
+   "article": "bunki-read-n2-pillay-peace-nobel",
+   "token": 398,
+   "rule": "override-site",
+   "surface": "ピレイ",
+   "reading": "ぴれい",
+   "status": "lexicon-fixed",
+   "context": "は、この判断にピレイ氏の影響が大きかっ",
+   "note": "ピレイ"
+  },
+  {
+   "article": "bunki-read-n1-suzuki-zen",
+   "token": 524,
+   "rule": "override-site",
+   "surface": "何",
+   "reading": "なに",
+   "status": "lexicon-fixed",
+   "context": "取り上げ、禅とは何よりも体験だと",
+   "note": "何より"
+  },
+  {
+   "article": "bunki-read-n2-grit-checked",
+   "token": 93,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "やり抜く力』の日本語版が出た",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-grit-checked",
+   "token": 94,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "抜く力』の日本語版が出た。",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-grit-checked",
+   "token": 120,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "なっていた。日本語版の副題は",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-grit-checked",
+   "token": 121,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "ていた。日本語版の副題は「",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-grit-checked",
+   "token": 603,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "12の文に答える日本語版の尺度を",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-grit-checked",
+   "token": 604,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "の文に答える日本語版の尺度を発表",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-hofstadter-law",
+   "token": 209,
+   "rule": "override-site",
+   "surface": "トヴェルスキー",
+   "reading": "とゔぇるすきー",
+   "status": "lexicon-fixed",
+   "context": "呼び名は、カーネマンとトヴェルスキーの二人による1977",
+   "note": "トヴェルスキー"
+  },
+  {
+   "article": "bunki-read-n2-hofstadter-law",
+   "token": 490,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "勉強時間をたずね、日本語が母語でない",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-hofstadter-law",
+   "token": 491,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "時間をたずね、日本語が母語でない留学",
+   "note": "日本語"
   }
  ]
 }

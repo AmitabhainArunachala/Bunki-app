@@ -34,15 +34,33 @@
  *       form (one form: never the surface's reading beside it): ごん狐 かえり, かえっ → かえる 帰る (never 蛙), MHLW なさ →
  *       なす 為す (never 茄子) — Codex 1352
  *   R2.stem a godan verb never stands as its bare stem: the い of ている / いました is いる 居る (entry 1577980), never the
- *       quick dictionary's godan いる, 要る "to be needed"; its Save keeps entry 1577980 (R2.capture.stem, the round trip)
- *   SWEEP every inflected token (surface ≠ base) of the twenty reviewed articles and of a fixed sample of 20 inherited
+ *       quick dictionary's godan いる, 要る "to be needed"; its Save keeps entry 1577980 (R2.capture.stem, the round trip).
+ *       N2: the い of 済んでいます stands right after the te-form, so its card shows 居る's senses for the te-form ("to be
+ *       ...-ing", "to have ...-ed"), no longer its first gloss; the い of 狐がいました, the verb of being, still does
+ *   N2.te  (Grok 0036; the lead, 2026-10-18) a verb written in kana right after the te-form (the particle て or で after a
+ *       verb or an auxiliary verb) is its auxiliary use: the card is the entry JMdict lists for that use (a sense of part of
+ *       speech aux-v, or an expression, noted as following the te-form), read as the verb's dictionary form or, with none,
+ *       as the text writes it; its lines are those senses' first glosses in JMdict's order, Save live, never the
+ *       homograph's. Named: 津浪と人間 #103 いる (残っている) and the chip plant #210 いる (予定している), the two Grok found
+ *       teaching 要る "to be needed", each with its full entry (1577980 stands; 要る is one of the others); the chip plant
+ *       #604 い; おく 置く (never 奥); くる 来る (never 繰る); ください 下さい "please (do for me)" (never 下さる "to give")
+ *   N2.alone a kana いる outside the te-form is 居る's "to be (of animate objects)", never "to be needed"; its full entry
+ *       lists 要る among the form's entries, one tap away
+ *   AUX  every token in every article on the shelf that is a verb written in kana right after the te-form, one tap per
+ *       distinct token: where JMdict lists such a use, the card is that entry (expected from the served index and detail
+ *       shards by this verifier's own reading, never the app's); no いる shows "to be needed"; a verb JMdict lists no such use
+ *       for is recorded, answered as any word
+ *   SWEEP every inflected token (surface ≠ base) of the forty reviewed articles (N's twenty and N2's: the review queue's
+ *       hand-chosen kinds, original · aozora · gv · mext · govonline) and of a fixed sample of 20 inherited
  *       ones, one tap per distinct token per article: the reading the card states comes from the token's own (a kana
  *       base; the shared stem read alike; a reading the served dictionary lists for the form whose stem the token's
  *       reading keeps; 来 → くる), or the card is the word as written read as written (the label and the reading always
  *       name the same form: never the dictionary form beside the surface's reading); any meaning it shows belongs to an entry a
  *       served dictionary has (the quick one, the full one, the original word layer) that writes the card's word and reads
  *       it so, of the token's class (parts of speech from the quick dictionary and the served detail shards; an entry no
- *       served data gives a class is recorded as of unknown class); never "Not in the quick dictionary" once settled;
+ *       served data gives a class is recorded as of unknown class; N2: the one card of another class a verb may show is,
+ *       right after the te-form, JMdict's own expression for that use as the text writes it, 下さい for 〜てください);
+ *       never "Not in the quick dictionary" once settled;
  *       never a card left at "…"; a card naming no entry holds its Save and says why.
  *       Counts and every exception are written to the report
  *   R   recorded, never asserted: 式 in 表彰式 and 改造 in 内閣改造 (sense: the tokens carry no sense data), ちかい in
@@ -51,7 +69,8 @@
  * scope); such a run is marked partial in the report and is never an acceptance result. READING_TRUTH_PAST_F0=1 lets a
  * negative control that moves a fixture (the 私/わたくし entry dropped) watch the browser too: the run still fails on F0
  * and is marked partial.
- * Negative control: the same run against a build with R's reading edits reverted fails A1 on 年 (とし). */
+ * Negative control: the same run against a build with R's reading edits reverted fails A1 on 年 (とし). N2: with the te-form
+ * rule reverted (no token marked) N2.te, R2.stem and AUX fail; with the kana いる rule reverted N2.alone fails. */
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -145,10 +164,36 @@ const UNFIT = Object.freeze([
 ]);
 // R2 · a godan verb never stands as its bare stem: the い of ている and of いました is the ichidan 居る's (entry 1577980,
 // written いる), never the quick dictionary's godan いる (要る, "to be needed"): 296 occurrences on the shelf
+// N2 (Grok 0036): the first stands right after the te-form (済んで い ます), so its card shows 居る's senses for the
+// te-form (te), no longer its first gloss; the second (狐が い ました) is the verb of being, its first gloss as before
 const STEM = Object.freeze([
-  { name: 'い (ている) → いる · 居る (not 要る)', at: FORGETTING, index: 431, s: 'い', b: 'いる', r: 'い', reading: 'いる', seq: '1577980', never: 'to be needed' },
+  { name: 'い (ている) → いる · 居る (not 要る)', at: FORGETTING, index: 431, s: 'い', b: 'いる', r: 'い', reading: 'いる', seq: '1577980', never: 'to be needed',
+    te: ['to be ...-ing', 'to have ...-ed'] },
   { name: 'い (いました) → いる · 居る (not 要る)', at: GONGITSUNE, index: 83, s: 'い', b: 'いる', r: 'い', reading: 'いる', seq: '1577980', never: 'to be needed' },
 ]);
+// N2 (Grok 0036; the lead, 2026-10-18) · a verb the text writes in kana right after the te-form is its auxiliary use: the
+// card is the entry JMdict lists for that use (a sense of part of speech aux-v, or an expression, noted as following the
+// te-form) read as the verb's dictionary form, or, with none, as the text writes it (ください → 下さい); its lines are those
+// senses' first glosses in JMdict's order (lines), never the homograph's (never)
+const TSUNAMI = art('aozora:004668-1', 'aozora-004668-1.json', '津浪と人間');
+const CHIP = art('bunki-read-n2-japan-us-chip-fab', 'bunki-read-n2-japan-us-chip-fab.json', '半導体工場');
+const NOBARA = art('aozora:051034', 'aozora-051034.json', '野ばら');
+const AI_ESSAY = art('bunki-essay-n1-ai', 'bunki-essay-n1-ai.json', 'AI時代の知識');
+const CITY = art('bunki-essay-n1-city', 'bunki-essay-n1-city.json', '都市の匿名性');
+const TE = Object.freeze([
+  { name: 'いる (残っている, Grok 0036)', at: TSUNAMI, index: 103, s: 'いる', b: 'いる', r: 'いる', form: 'いる', seq: '1577980',
+    lines: ['to be ...-ing', 'to have ...-ed'], never: 'to be needed', entry: true },
+  { name: 'いる (予定している, Grok 0036)', at: CHIP, index: 210, s: 'いる', b: 'いる', r: 'いる', form: 'いる', seq: '1577980',
+    lines: ['to be ...-ing', 'to have ...-ed'], never: 'to be needed', entry: true },
+  { name: 'い (なっていた)', at: CHIP, index: 604, s: 'い', b: 'いる', r: 'い', form: 'いる', seq: '1577980', lines: ['to be ...-ing', 'to have ...-ed'], never: 'to be needed' },
+  { name: 'おく (暗記しておく)', at: AI_ESSAY, index: 58, s: 'おく', b: 'おく', r: 'おく', form: 'おく', seq: '1421850',
+    lines: ['to do something in advance', 'to leave something in a certain state'], never: 'inner part' },
+  { name: 'くる (廻り合せてくる)', at: TSUNAMI, index: 1155, s: 'くる', b: 'くる', r: 'くる', form: 'くる', seq: '1547720', lines: ['to come back', 'to come to be'], never: 'to reel' },
+  { name: 'ください (いてください)', at: NOBARA, index: 854, s: 'ください', b: 'くださる', r: 'ください', form: 'ください', seq: '1184270', lines: ['please (do for me)'], never: 'to give' },
+]);
+// N2 · a kana いる outside the te-form is 居る (the entry headed いる): its first gloss, never 要る's "to be needed"; 要る stays
+// one tap away, among the full entry's entries of the form
+const IRU_ALONE = Object.freeze({ name: 'いる (ここにいる)', at: CITY, index: 95, s: 'いる', b: 'いる', r: 'いる', seq: '1577980', other: '1546640', never: 'to be needed' });
 // R2.V · a sound change in a compound: the card shows the text's reading and the meaning of the entry read the plain way
 const SOUND = Object.freeze([
   { name: '一 いっ (一本)', at: BODHISENA, index: 564, s: '一', r: 'いっ', plain: 'いち' },
@@ -248,12 +293,26 @@ const shardIdOf = (seq) => {
   for (const character of String(seq)) { hash ^= character.charCodeAt(0); hash = Math.imul(hash, 0x01000193) >>> 0; }
   return (hash & 15).toString(16).padStart(2, '0');
 };
-const posOf = (seq) => {
+const detailOf = (seq) => {
   const id = shardIdOf(seq);
   if (!shardCache.has(id)) shardCache.set(id, new Map(json(`data/share_alike/dict-v2/${id}.json`).entries.map((entry) => [String(entry[0]), entry])));
-  const detail = shardCache.get(id).get(String(seq));
+  return shardCache.get(id).get(String(seq)) || null;
+};
+const posOf = (seq) => {
+  const detail = detailOf(seq);
   return detail ? [...new Set(detail[3].flatMap((sense) => sense[0] || []))] : [];
 };
+// N2 · the senses the served detail shard lists for an entry's use after the te-form: part of speech aux-v (or an
+// expression), with a note that it follows the te-form ("after the -te form of a verb", "after the ～て form",
+// 'follows a verb in "-te" form', "after te-form"), in JMdict's order; the lines a card shows are their first glosses
+const TE_NOTE = /-te form|"-te" form|te-form|[～〜]て/iu;
+const teSensesOf = (seq) => (detailOf(seq)?.[3] || []).filter((sense) => (sense[0] || []).some((pos) => pos === 'aux-v' || pos === 'exp')
+  && (sense[8] || []).some((note) => TE_NOTE.test(String(note))));
+const teLinesOf = (seq) => teSensesOf(seq).map((sense) => String(sense[10]?.[0]?.[0] || ''));
+const teEntries = (form, reading) => readAs(form, reading).filter((row) => teSensesOf(String(row[0])).length);
+// a token right after the te-form: the particle て or で, after a verb or an auxiliary verb
+const afterTeForm = (tokens, index) => index >= 2 && tokens[index - 1]?.p === '助詞' && ['て', 'で'].includes(tokens[index - 1].s)
+  && ['動詞', '助動詞'].includes(tokens[index - 2]?.p);
 const onyomi = (char) => (kanjiData[char]?.on || []).map(k2h);
 const soundUndoneF0 = (reading) => {
   const voiced = 'がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ', plain = 'かきくけこさしすせそたちつてとはひふへほはひふへほ', r = k2h(reading);
@@ -288,6 +347,36 @@ for (const fixture of STEM) {
       && k2h(core[fixture.b]?.r) === k2h(fixture.reading) && parts.includes('godan verb') && !parts.includes('ichidan verb') && core[fixture.b].m[0] === fixture.never
       && readAs(fixture.b, fixture.reading).some((row) => String(row[0]) === fixture.seq && row[1] === fixture.b) && posOf(fixture.seq).includes('v1'),
     { token, core: core[fixture.b], pos: posOf(fixture.seq) });
+  const tokens = json(fixture.at.file).tokens || [];
+  if (fixture.te) {
+    check(`F0.N2.stem.${fixture.name}`, `#${fixture.index} stands right after the te-form (${tokens[fixture.index - 2]?.s}${tokens[fixture.index - 1]?.s}); entry ${fixture.seq}'s senses for the te-form begin ${JSON.stringify(fixture.te)}`,
+      afterTeForm(tokens, fixture.index) && JSON.stringify(teLinesOf(fixture.seq).slice(0, 2)) === JSON.stringify(fixture.te), teLinesOf(fixture.seq));
+  } else {
+    check(`F0.N2.stem.${fixture.name}`, `#${fixture.index} does not stand after the te-form: the verb of being, its first gloss`, !afterTeForm(tokens, fixture.index),
+      tokens.slice(fixture.index - 2, fixture.index + 1).map((t) => t.s));
+  }
+}
+for (const fixture of TE) {
+  const tokens = json(fixture.at.file).tokens || [], token = tokens[fixture.index];
+  const others = readAs(fixture.form, fixture.form).filter((row) => String(row[0]) !== fixture.seq);
+  check(`F0.N2.te.${fixture.name}`, `${fixture.at.id} #${fixture.index} is ${fixture.s} (base ${fixture.b}, a verb in kana) read ${fixture.r}, right after the te-form; of the entries read ${fixture.form}, only ${fixture.seq} has senses for the te-form, and their first glosses are ${JSON.stringify(fixture.lines)}, no other entry's gloss; "${fixture.never}" is what the homograph says`,
+    token?.s === fixture.s && token.b === fixture.b && token.r === fixture.r && token.p === '動詞' && /^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u.test(token.s)
+      && afterTeForm(tokens, fixture.index)
+      && JSON.stringify(teEntries(fixture.form, fixture.form).map((row) => String(row[0]))) === JSON.stringify([fixture.seq])
+      && (fixture.form === fixture.b || !teEntries(fixture.b, fixture.b).length)
+      && JSON.stringify(teLinesOf(fixture.seq).slice(0, 2)) === JSON.stringify(fixture.lines)
+      && !others.some((row) => fixture.lines.some((line) => row[6].includes(line)))
+      && (core[fixture.b]?.m?.[0] === fixture.never || others.some((row) => row[3] === fixture.never)),
+    { token, before: tokens.slice(fixture.index - 2, fixture.index).map((t) => `${t.s}/${t.p}`), te: teEntries(fixture.form, fixture.form).map((row) => String(row[0])),
+      lines: teLinesOf(fixture.seq), core: core[fixture.b]?.m?.[0] });
+}
+{
+  const fixture = IRU_ALONE, tokens = json(fixture.at.file).tokens || [], token = tokens[fixture.index];
+  check(`F0.N2.alone.${fixture.name}`, `${fixture.at.id} #${fixture.index} is いる (a verb in kana, uninflected), not after the te-form; the quick dictionary's いる is 要る, "${fixture.never}"; entries ${fixture.seq} (headed いる) and ${fixture.other} (要る) both read いる`,
+    token?.s === 'いる' && token.b === 'いる' && token.r === 'いる' && token.p === '動詞' && !afterTeForm(tokens, fixture.index)
+      && core['いる']?.m?.[0] === fixture.never && core['いる'].alt === '要る'
+      && readAs('いる', 'いる').some((row) => String(row[0]) === fixture.seq && row[1] === 'いる') && readAs('いる', 'いる').some((row) => String(row[0]) === fixture.other),
+    { token, before: tokens.slice(fixture.index - 2, fixture.index).map((t) => t.s), core: core['いる'] });
 }
 for (const fixture of SOUND) {
   const token = tokenAt(fixture);
@@ -446,8 +535,9 @@ async function captureCase(browser, contextOptions) {
       const [stem] = STEM;
       await openArticle(page, stem.at);
       const iru = await slip(page, tok(page, stem.index));
-      check('R2.capture.stem.ready', `the card for い (ている) is いる read いる, entry ${stem.seq}'s meaning, and offers Save`, iru.settled?.word === 'いる'
-        && iru.settled.gloss === firstGloss(stem.seq, stem.reading) && iru.settled.take && !iru.settled.take.disabled, iru.settled);
+      // N2 · the card shows entry 1577980's first sense for the te-form, "to be ...-ing" (STEM[0].te)
+      check('R2.capture.stem.ready', `the card for い (ている) is いる read いる, entry ${stem.seq}'s meaning for the te-form ("${stem.te[0]}"), and offers Save`, iru.settled?.word === 'いる'
+        && iru.settled.gloss === stem.te[0] && iru.settled.take && !iru.settled.take.disabled, iru.settled);
       await page.locator('#mini #mini-take').click();
       const three = await waitForAppRecord(page, (rec) => (rec.taken || []).some((r) => r.t === 'word' && r.id === 'いる'),
         { description: 'the いる card', timeout: 15000 });
@@ -794,11 +884,12 @@ async function r2Cases(page) {
   for (const fixture of STEM) {
     await openArticle(page, fixture.at);
     const { settled } = await slip(page, tok(page, fixture.index));
-    const meaning = firstGloss(fixture.seq, fixture.reading);
+    // N2 · right after the te-form the card shows 居る's senses for the te-form (te); elsewhere its first gloss, as before
+    const meaning = fixture.te ? fixture.te[0] : firstGloss(fixture.seq, fixture.reading);
     const lines = await glossLines();
-    check(`R2.stem.${fixture.name}`, `${fixture.at.id} #${fixture.index} ${fixture.s} (${fixture.r}): the card is ${fixture.b} read ${fixture.reading}, entry ${fixture.seq}'s "${meaning}", Save live; never the quick dictionary's "${fixture.never}"`,
+    check(`R2.stem.${fixture.name}`, `${fixture.at.id} #${fixture.index} ${fixture.s} (${fixture.r}): the card is ${fixture.b} read ${fixture.reading}, entry ${fixture.seq}'s ${fixture.te ? JSON.stringify(fixture.te) : `"${meaning}"`}, Save live; never the quick dictionary's "${fixture.never}"`,
       settled?.word === fixture.b && k2h(settled.reading || settled.word) === k2h(fixture.reading) && settled.gloss === meaning && settled.take && !settled.take.disabled
-        && !lines.includes(fixture.never), { settled, lines });
+        && !lines.includes(fixture.never) && (!fixture.te || JSON.stringify(lines) === JSON.stringify(fixture.te)), { settled, lines });
   }
   for (const fixture of SOUND) {
     await openArticle(page, fixture.at);
@@ -833,7 +924,10 @@ async function r2Cases(page) {
 /* ------------------------------------------------------------------ SWEEP · every inflected token */
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const reviewQueue = JSON.parse(readFileSync(resolve(REPO, 'docs/content/feed-review-queue.json'), 'utf8'));
-const TWENTY = reviewQueue.filter((row) => row.kind === 'original' && row.decision !== 'rejected').map((row) => row.id);
+// N2 (2026-10-17) rewrites the pin "the twenty (queue kind original)" strictly: the reviewed articles are every hand-chosen
+// queue kind — N's twenty and N2's twenty, forty in all; the inherited shelf they leave, and its sample, is unchanged
+const HAND_KINDS = new Set(['original', 'aozora', 'gv', 'mext', 'govonline']);
+const TWENTY = reviewQueue.filter((row) => HAND_KINDS.has(row.kind) && row.decision !== 'rejected').map((row) => row.id);
 const shelfRows = json('data/articles/index.json').articles;
 const inheritedRows = shelfRows.filter((row) => !TWENTY.includes(row.id)).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 // a fixed sample of 20 inherited articles the shelf shows: picks at an even step through the id order; a pick the shelf
@@ -897,6 +991,10 @@ const verbal = (part) => /verb/u.test(part) || /^v[0-9a-z]/u.test(part);
 const adjectival = (part) => /i-adjective|^adj-(i|ix|ku|shiku)$|aux-adj/u.test(part);
 const classOf = (entry) => [...String(entry.p || '').split(' · ').filter(Boolean), ...entry.pos];
 const classFits = (p, entry) => (p === '動詞' ? classOf(entry).some(verbal) : p === '形容詞' ? classOf(entry).some(adjectival) : true);
+// N2 · the one card of another class a verb may show: right after the te-form, JMdict's own expression for that use,
+// written as the text writes it (〜てください: 下さい, an expression whose sense follows the te-form)
+const teExpressionFits = (tokens, index, label, stated) => afterTeForm(tokens, index)
+  && readAs(label, stated).some((row) => teSensesOf(String(row[0])).some((sense) => (sense[0] || []).includes('exp')));
 
 async function sweepCase(browser, contextOptions) {
   const report = { engine, articles: [], notOnShelf: [], totals: { tokens: 0, occurrences: 0, tapped: 0, entry: 0, quick: 0, kanji: 0, several: 0, noEntry: 0,
@@ -993,7 +1091,7 @@ async function sweepCase(browser, contextOptions) {
             out.entry = entry;
             if (!entry) out.issues.push(`"${gloss}" belongs to no entry that writes ${label} and reads it ${stated}`);
             else if (['動詞', '形容詞'].includes(token.p) && !classOf(entry).length) out.classUnknown = true;
-            else if (!classFits(token.p, entry)) out.issues.push(`${entry.seq || `the ${entry.from === 'words' ? 'word layer' : 'quick dictionary'}'s word`} is not a ${token.p} (${classOf(entry).join(' ')})`);
+            else if (!classFits(token.p, entry) && !teExpressionFits(tokens, index, label, stated)) out.issues.push(`${entry.seq || `the ${entry.from === 'words' ? 'word layer' : 'quick dictionary'}'s word`} is not a ${token.p} (${classOf(entry).join(' ')})`);
           }
           report.totals[out.answer] = (report.totals[out.answer] || 0) + 1;
           if (out.classUnknown) report.totals.classUnknown += 1;
@@ -1010,8 +1108,8 @@ async function sweepCase(browser, contextOptions) {
   const list = (pick) => all.filter(pick).map((x) => `${x.article} #${x.index} ${x.s}/${x.b}/${x.r}: ${x.issues.join('; ')}`).slice(0, 12);
   const twentySwept = report.articles.filter((article) => article.group === 'twenty').length;
   const inheritedSwept = report.articles.filter((article) => article.group === 'inherited').length;
-  check('SWEEP.articles', `the sweep walked the twenty and 20 inherited articles the shelf shows (${twentySwept} + ${inheritedSwept}; not on the shelf: ${report.notOnShelf.join(', ') || 'none'})`,
-    SWEEP_ONLY.length ? report.articles.length > 0 : twentySwept === TWENTY.length && TWENTY.length === 20 && inheritedSwept === 20 && !report.notOnShelf.some((id) => TWENTY.includes(id)),
+  check('SWEEP.articles', `the sweep walked the forty reviewed articles and 20 inherited articles the shelf shows (${twentySwept} + ${inheritedSwept}; not on the shelf: ${report.notOnShelf.join(', ') || 'none'})`,
+    SWEEP_ONLY.length ? report.articles.length > 0 : twentySwept === TWENTY.length && TWENTY.length === 40 && inheritedSwept === 20 && !report.notOnShelf.some((id) => TWENTY.includes(id)),
     { twentySwept, inheritedSwept, notOnShelf: report.notOnShelf });
   check('SWEEP.taps', `every inflected token opened its card (${report.totals.tapped} of ${report.totals.tokens} distinct, ${report.totals.occurrences} occurrences, ${report.articles.length} articles)`,
     report.totals.tokens > 0 && report.totals.tapFailures === 0, list((x) => x.card === null));
@@ -1029,6 +1127,149 @@ async function sweepCase(browser, contextOptions) {
   record('SWEEP.counts', 'the sweep\'s counts (distinct tokens per article; answers)', report.totals);
   record('SWEEP.class-unknown', 'meanings whose entry no served data gives a part of speech for (not judged)', report.articles
     .flatMap((article) => article.rows.filter((row) => row.classUnknown).map((row) => `${article.id} #${row.index} ${row.s}/${row.b}: ${row.card?.word} ${row.card?.gloss} (${row.entry?.from})`)));
+}
+
+/* ------------------------------------------------------------------ N2 · the te-form's auxiliaries */
+const miniLines = (page) => page.evaluate(() => [...document.querySelectorAll('#mini .mini-gloss')].map((node) => node.textContent));
+/** The full entry the slip's band opens: its headword, the form's entries listed, and the one standing (active). */
+async function slipEntry(page) {
+  await page.locator('#mini .mini-word').click();
+  await page.locator('#sheet .headword').waitFor({ timeout: 15000 });
+  await stillFor(page, '#sheet');
+  return page.evaluate(() => ({ head: document.querySelector('#sheet .headword')?.textContent ?? null,
+    entries: [...document.querySelectorAll('#sheet .dictionary-homograph')].map((row) => row.dataset.dictionaryEntry),
+    active: [...document.querySelectorAll('#sheet .dictionary-homograph.active')].map((row) => row.dataset.dictionaryEntry) }));
+}
+/** Named (Grok 0036): each a real tap, judged against fixed expectations. The two いる cases Grok found and the lone いる
+ * also open their full entry: entry 1577980 stands, and 要る is one of the form's other entries. */
+async function auxCases(page) {
+  for (const fixture of TE) {
+    await openArticle(page, fixture.at);
+    const { settled } = await slip(page, tok(page, fixture.index));
+    const lines = await miniLines(page);
+    check(`N2.te.${fixture.name}`, `${fixture.at.id} #${fixture.index} ${fixture.s} after the te-form: the card is ${fixture.form}, its lines ${JSON.stringify(fixture.lines)} (entry ${fixture.seq}'s senses for the te-form, in JMdict's words), Save live; never "${fixture.never}"`,
+      settled?.kind === 'word' && settled.word === fixture.form && k2h(settled.reading || settled.word) === k2h(fixture.form)
+        && JSON.stringify(lines) === JSON.stringify(fixture.lines) && settled.take && !settled.take.disabled && !lines.includes(fixture.never), { settled, lines });
+    if (fixture.entry) {
+      const sheet = await slipEntry(page);
+      check(`N2.te.entry.${fixture.name}`, `its full entry is entry ${fixture.seq}, one of the form's entries with 要る (${IRU_ALONE.other})`,
+        JSON.stringify(sheet.active) === JSON.stringify([fixture.seq]) && sheet.entries.includes(IRU_ALONE.other), sheet);
+    }
+  }
+  const fixture = IRU_ALONE;
+  await openArticle(page, fixture.at);
+  const { settled } = await slip(page, tok(page, fixture.index));
+  const lines = await miniLines(page);
+  const meaning = firstGloss(fixture.seq, 'いる');
+  check(`N2.alone.${fixture.name}`, `${fixture.at.id} #${fixture.index} いる, not after the te-form: the card is いる, entry ${fixture.seq}'s "${meaning}", one line, Save live; never "${fixture.never}"`,
+    settled?.word === 'いる' && settled.gloss === meaning && JSON.stringify(lines) === JSON.stringify([meaning]) && settled.take && !settled.take.disabled
+      && !lines.includes(fixture.never), { settled, lines });
+  const sheet = await slipEntry(page);
+  check(`N2.alone.entry.${fixture.name}`, `its full entry is entry ${fixture.seq}; 要る (entry ${fixture.other}) is one tap away among the form's entries`,
+    JSON.stringify(sheet.active) === JSON.stringify([fixture.seq]) && sheet.entries.includes(fixture.other), sheet);
+}
+/** The entry JMdict lists for a token's use after the te-form, by this verifier's own reading of the served data: the one
+ * entry read as its dictionary form with senses for the te-form, else the one read as the text writes it; its lines (the
+ * first glosses of those senses, at most two) and the other entries read alike. null when JMdict lists no such use. */
+function auxExpected(token) {
+  const pick = (rows, label, reading) => (rows.length === 1
+    ? { label, seq: String(rows[0][0]), lines: teLinesOf(String(rows[0][0])).slice(0, 2), others: readAs(label, reading).filter((row) => String(row[0]) !== String(rows[0][0])) }
+    : { ambiguous: rows.map((row) => String(row[0])) });
+  const lemma = teEntries(token.b, token.b);
+  if (lemma.length) return pick(lemma, token.b, token.b);
+  const written = teEntries(token.s, token.r);
+  return written.length ? pick(written, token.s, token.r) : null;
+}
+/** AUX · every token in every article on the shelf that is a verb written in kana right after the te-form, one tap per
+ * distinct token (its first place, each article opened once). */
+async function auxSweepCase(browser, contextOptions) {
+  const keys = new Map();
+  for (const row of shelfRows) {
+    const tokens = json(`data/articles/${row.file}`).tokens || [];
+    tokens.forEach((t, index) => {
+      if (t.p !== '動詞' || !KANA_ONLY.test(String(t.s || '')) || !afterTeForm(tokens, index)) return;
+      const key = `${t.s}|${t.b}|${t.r}`;
+      if (!keys.has(key)) keys.set(key, { row, index, token: t, occurrences: 0, articles: new Set() });
+      keys.get(key).occurrences += 1;
+      keys.get(key).articles.add(row.id);
+    });
+  }
+  const report = { engine, keys: keys.size, occurrences: 0, articles: [], tapped: 0, auxiliary: 0, plain: 0, notOnShelf: [], rows: [], exceptions: [] };
+  const context = await browser.newContext(contextOptions);
+  await silenceBrowserAudio(context);
+  await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
+  const page = await context.newPage(), errors = [];
+  page.setDefaultTimeout(15000);
+  page.on('pageerror', (error) => errors.push(error.message));
+  const opens = async (row) => {
+    await boot(page);
+    const direct = page.locator(`[data-passage="${row.id}"]:not([data-recommendation]) .shelf-open`).first();
+    if (await direct.count()) await direct.click();
+    else {
+      await openShelfTools(page);
+      await page.locator('#shelf-reading-search').fill(row.title);
+      await page.locator('#shelf-reading-search').press('Enter');
+      const found = page.locator(`#shelf-reading-results [data-passage="${row.id}"] .shelf-open`).first();
+      try { await found.waitFor({ timeout: 4000 }); } catch { return false; }
+      await found.click();
+    }
+    await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 20000 });
+    return true;
+  };
+  const byArticle = new Map();
+  for (const item of keys.values()) {
+    if (!byArticle.has(item.row.id)) byArticle.set(item.row.id, []);
+    byArticle.get(item.row.id).push(item);
+  }
+  const articles = new Set();
+  try {
+    for (const [id, items] of byArticle) {
+      if (!(await opens(items[0].row))) { report.notOnShelf.push(id); continue; }
+      for (const item of items.sort((a, b) => a.index - b.index)) {
+        const { token } = item;
+        report.occurrences += item.occurrences;
+        item.articles.forEach((article) => articles.add(article));
+        const expected = auxExpected(token);
+        let card = null, lines = [], failure = null;
+        try { card = (await slip(page, tok(page, item.index))).settled; lines = await miniLines(page); }
+        catch (error) { failure = String(error.message || error).split('\n')[0].slice(0, 160); }
+        const out = { article: id, index: item.index, s: token.s, b: token.b, r: token.r, occurrences: item.occurrences, articles: item.articles.size, card, lines,
+          expected: expected?.seq ? { label: expected.label, seq: expected.seq, lines: expected.lines } : expected?.ambiguous ? { ambiguous: expected.ambiguous } : null, issues: [] };
+        if (!card) out.issues.push(`no card: ${failure}`);
+        else {
+          report.tapped += 1;
+          if (expected?.ambiguous) out.issues.push(`several entries have senses for the te-form: ${expected.ambiguous.join(' ')}`);
+          else if (expected) {
+            report.auxiliary += 1;
+            if (card.word !== expected.label) out.issues.push(`the card is ${card.word}, not ${expected.label}`);
+            if (JSON.stringify(lines) !== JSON.stringify(expected.lines)) out.issues.push(`its lines ${JSON.stringify(lines)} are not entry ${expected.seq}'s ${JSON.stringify(expected.lines)}`);
+            if (!card.take || card.take.disabled) out.issues.push('its Save is not live');
+            const borrowed = lines.filter((line) => expected.others.some((other) => other[6].includes(line)));
+            if (borrowed.length) out.issues.push(`a line is another entry's read alike: ${borrowed.join(' / ')}`);
+          } else report.plain += 1;
+          if (token.b === 'いる' && lines.includes('to be needed')) out.issues.push('いる shows "to be needed"');
+        }
+        if (out.issues.length) report.exceptions.push(out);
+        report.rows.push(out);
+      }
+    }
+  } finally {
+    await context.close();
+    report.articles = [...articles];
+    writeFileSync(resolve(evidence, `aux-sweep-${engine}.json`), `${JSON.stringify(report, null, 1)}\n`);
+  }
+  const list = (pick) => report.exceptions.filter(pick).map((x) => `${x.article} #${x.index} ${x.s}/${x.b}/${x.r}: ${x.issues.join('; ')}`).slice(0, 12);
+  const iru = report.rows.filter((row) => row.b === 'いる');
+  check('AUX.taps', `every verb written in kana right after the te-form, in every article on the shelf, opened its card (${report.tapped} of ${keys.size} distinct, ${report.occurrences} occurrences, ${report.articles.length} articles; not on the shelf: ${report.notOnShelf.join(', ') || 'none'})`,
+    keys.size > 0 && report.tapped === keys.size && !report.notOnShelf.length, list((x) => !x.card));
+  check('AUX.entries', `every one JMdict lists a use after the te-form for (${report.auxiliary} distinct) is that entry: its senses for the te-form as its lines, in JMdict's words; Save live; no line another entry's read alike`,
+    report.auxiliary > 0 && !report.exceptions.some((x) => x.card && x.expected), list((x) => x.card && x.expected));
+  check('AUX.iru', `no いる after the te-form shows "to be needed" (${iru.length} distinct, ${iru.reduce((n, row) => n + row.occurrences, 0)} occurrences)`,
+    iru.length > 0 && !iru.some((row) => row.lines.includes('to be needed')), iru.filter((row) => row.lines.includes('to be needed')).map((row) => `${row.article} #${row.index}`));
+  check('AUX.page-errors', 'the auxiliary sweep: no page errors', errors.length === 0, errors.slice(0, 5));
+  record('AUX.plain', 'verbs after the te-form JMdict lists no such use for, answered as any word', report.rows.filter((row) => row.card && !row.expected)
+    .map((row) => `${row.article} #${row.index} ${row.s}/${row.b}: ${row.card.word} ${row.lines.join(' / ')} (×${row.occurrences})`));
+  record('AUX.counts', 'the auxiliary sweep\'s counts', { keys: report.keys, occurrences: report.occurrences, articles: report.articles.length, tapped: report.tapped, auxiliary: report.auxiliary, plain: report.plain });
 }
 
 try {
@@ -1065,6 +1306,11 @@ try {
     if (run('deck')) await each('deck', deckCase);
     if (run('guided')) await each('guided', guidedCase);
     if (run('r2')) await each('r2', r2Cases);
+    if (run('aux')) await each('aux', auxCases);
+    if (run('auxsweep')) {
+      try { await auxSweepCase(browser, contextOptions); }
+      catch (error) { check('AUX.error', 'the auxiliary sweep ran to the end', false, String(error.stack || error).slice(0, 600)); }
+    }
     if (run('capture')) {
       try { await captureCase(browser, contextOptions); }
       catch (error) { check('capture.error', 'capture ran to the end', false, String(error.stack || error).slice(0, 600)); }

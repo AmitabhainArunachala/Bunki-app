@@ -4,6 +4,454 @@
   "pin": "3.6.2+20260803141815",
   "entries": [
     {
+      "seq": "1002230",
+      "spelling": "御神酒",
+      "reading": "おみき",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 506,
+          "s": "御神酒",
+          "b": "御神酒",
+          "r": "おみき"
+        }
+      ]
+    },
+    {
+      "seq": "1170440",
+      "spelling": "陰徳",
+      "reading": "いんとく",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 17,
+          "s": "陰徳",
+          "b": "陰徳",
+          "r": "いんとく"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 99,
+          "s": "陰徳",
+          "b": "陰徳",
+          "r": "いんとく"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 226,
+          "s": "陰徳",
+          "b": "陰徳",
+          "r": "いんとく"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 465,
+          "s": "陰徳",
+          "b": "陰徳",
+          "r": "いんとく"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 1336,
+          "s": "陰徳",
+          "b": "陰徳",
+          "r": "いんとく"
+        }
+      ]
+    },
+    {
+      "seq": "1170770",
+      "spelling": "隠退",
+      "reading": "いんたい",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 664,
+          "s": "隠退",
+          "b": "隠退",
+          "r": "いんたい"
+        }
+      ]
+    },
+    {
+      "seq": "1183420",
+      "spelling": "温情",
+      "reading": "おんじょう",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 635,
+          "s": "温情",
+          "b": "温情",
+          "r": "おんじょう"
+        }
+      ]
+    },
+    {
+      "seq": "1183680",
+      "spelling": "音韻",
+      "reading": "おんいん",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 284,
+          "s": "音韻",
+          "b": "音韻",
+          "r": "おんいん"
+        }
+      ]
+    },
+    {
+      "seq": "1194390",
+      "spelling": "禍害",
+      "reading": "かがい",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 648,
+          "s": "禍害",
+          "b": "禍害",
+          "r": "かがい"
+        }
+      ]
+    },
+    {
+      "seq": "1197030",
+      "spelling": "牙",
+      "reading": "きば",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 114,
+          "s": "牙",
+          "b": "牙",
+          "r": "きば"
+        }
+      ]
+    },
+    {
+      "seq": "1205860",
+      "spelling": "確証",
+      "reading": "かくしょう",
+      "receipts": [
+        {
+          "article": "govonline:202403-entry-5920-column",
+          "token": 91,
+          "s": "確証",
+          "b": "確証",
+          "r": "かくしょう"
+        }
+      ]
+    },
+    {
+      "seq": "1207840",
+      "spelling": "割り切れる",
+      "reading": "わりきれる",
+      "receipts": [
+        {
+          "article": "bunki-read-n3-rule-of-72",
+          "token": 182,
+          "s": "割り切れる",
+          "b": "割り切れる",
+          "r": "わりきれる"
+        }
+      ]
+    },
+    {
+      "seq": "1223630",
+      "spelling": "貴賤",
+      "reading": "きせん",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 763,
+          "s": "貴賤",
+          "b": "貴賤",
+          "r": "きせん"
+        }
+      ]
+    },
+    {
+      "seq": "1230220",
+      "spelling": "給う",
+      "reading": "たまう",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 954,
+          "s": "給え",
+          "b": "給う",
+          "r": "たまえ"
+        }
+      ]
+    },
+    {
+      "seq": "1237770",
+      "spelling": "矯める",
+      "reading": "ためる",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 1378,
+          "s": "矯める",
+          "b": "矯める",
+          "r": "ためる"
+        }
+      ]
+    },
+    {
+      "seq": "1242330",
+      "spelling": "近似",
+      "reading": "きんじ",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 307,
+          "s": "近似",
+          "b": "近似",
+          "r": "きんじ"
+        }
+      ]
+    },
+    {
+      "seq": "1249300",
+      "spelling": "係る",
+      "reading": "かかる",
+      "receipts": [
+        {
+          "article": "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3",
+          "token": 378,
+          "s": "係る",
+          "b": "係る",
+          "r": "かかる"
+        }
+      ]
+    },
+    {
+      "seq": "1251620",
+      "spelling": "経典",
+      "reading": "きょうてん",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 186,
+          "s": "経典",
+          "b": "経典",
+          "r": "きょうてん"
+        },
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 248,
+          "s": "経典",
+          "b": "経典",
+          "r": "きょうてん"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 3,
+          "s": "経典",
+          "b": "経典",
+          "r": "きょうてん"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 195,
+          "s": "経典",
+          "b": "経典",
+          "r": "きょうてん"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 228,
+          "s": "経典",
+          "b": "経典",
+          "r": "きょうてん"
+        }
+      ]
+    },
+    {
+      "seq": "1254650",
+      "spelling": "結びつける",
+      "reading": "むすびつける",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-hofstadter-law",
+          "token": 571,
+          "s": "結びつけ",
+          "b": "結びつける",
+          "r": "むすびつけ"
+        }
+      ]
+    },
+    {
+      "seq": "1259790",
+      "spelling": "見積もる",
+      "reading": "みつもる",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-hofstadter-law",
+          "token": 24,
+          "s": "見積もっ",
+          "b": "見積もる",
+          "r": "みつもっ"
+        },
+        {
+          "article": "bunki-read-n2-hofstadter-law",
+          "token": 183,
+          "s": "見積もっ",
+          "b": "見積もる",
+          "r": "みつもっ"
+        },
+        {
+          "article": "bunki-read-n2-hofstadter-law",
+          "token": 419,
+          "s": "見積もっ",
+          "b": "見積もる",
+          "r": "みつもっ"
+        },
+        {
+          "article": "bunki-read-n2-hofstadter-law",
+          "token": 423,
+          "s": "見積もっ",
+          "b": "見積もる",
+          "r": "みつもっ"
+        },
+        {
+          "article": "bunki-read-n2-hofstadter-law",
+          "token": 640,
+          "s": "見積もる",
+          "b": "見積もる",
+          "r": "みつもる"
+        }
+      ]
+    },
+    {
+      "seq": "1261330",
+      "spelling": "原語",
+      "reading": "げんご",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 35,
+          "s": "原語",
+          "b": "原語",
+          "r": "げんご"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 73,
+          "s": "原語",
+          "b": "原語",
+          "r": "げんご"
+        }
+      ]
+    },
+    {
+      "seq": "1266290",
+      "spelling": "呼び寄せる",
+      "reading": "よびよせる",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 680,
+          "s": "呼び寄せ",
+          "b": "呼び寄せる",
+          "r": "よびよせ"
+        }
+      ]
+    },
+    {
+      "seq": "1267950",
+      "spelling": "鼓吹",
+      "reading": "こすい",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 840,
+          "s": "鼓吹",
+          "b": "鼓吹",
+          "r": "こすい"
+        }
+      ]
+    },
+    {
+      "seq": "1271190",
+      "spelling": "語弊",
+      "reading": "ごへい",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 472,
+          "s": "語弊",
+          "b": "語弊",
+          "r": "ごへい"
+        }
+      ]
+    },
+    {
+      "seq": "1277060",
+      "spelling": "向き合う",
+      "reading": "むきあう",
+      "receipts": [
+        {
+          "article": "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3",
+          "token": 577,
+          "s": "向き合い",
+          "b": "向き合う",
+          "r": "むきあい"
+        },
+        {
+          "article": "bunki-read-n2-pillay-peace-nobel",
+          "token": 443,
+          "s": "向き合っ",
+          "b": "向き合う",
+          "r": "むきあっ"
+        }
+      ]
+    },
+    {
+      "seq": "1292450",
+      "spelling": "再帰",
+      "reading": "さいき",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-hofstadter-law",
+          "token": 144,
+          "s": "再帰",
+          "b": "再帰",
+          "r": "さいき"
+        }
+      ]
+    },
+    {
+      "seq": "1296730",
+      "spelling": "罪業",
+      "reading": "ざいごう",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 866,
+          "s": "罪業",
+          "b": "罪業",
+          "r": "ざいごう"
+        }
+      ]
+    },
+    {
+      "seq": "1296980",
+      "spelling": "財物",
+      "reading": "ざいぶつ",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 44,
+          "s": "財物",
+          "b": "財物",
+          "r": "ざいぶつ"
+        }
+      ]
+    },
+    {
       "seq": "1297940",
       "spelling": "作物",
       "reading": "さくぶつ",
@@ -14,6 +462,2141 @@
           "s": "作物",
           "b": "作物",
           "r": "さくぶつ"
+        }
+      ]
+    },
+    {
+      "seq": "1298880",
+      "spelling": "すり抜ける",
+      "reading": "すりぬける",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-icecube-nobel",
+          "token": 211,
+          "s": "すり抜け",
+          "b": "すり抜ける",
+          "r": "すりぬけ"
+        }
+      ]
+    },
+    {
+      "seq": "1299590",
+      "spelling": "雑用",
+      "reading": "ざつよう",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 936,
+          "s": "雑用",
+          "b": "雑用",
+          "r": "ざつよう"
+        },
+        {
+          "article": "aozora:053224-1",
+          "token": 970,
+          "s": "雑用",
+          "b": "雑用",
+          "r": "ざつよう"
+        }
+      ]
+    },
+    {
+      "seq": "1316260",
+      "spelling": "時勢",
+      "reading": "じせい",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 445,
+          "s": "時勢",
+          "b": "時勢",
+          "r": "じせい"
+        }
+      ]
+    },
+    {
+      "seq": "1319770",
+      "spelling": "失せる",
+      "reading": "うせる",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 243,
+          "s": "失せ",
+          "b": "失せる",
+          "r": "うせ"
+        }
+      ]
+    },
+    {
+      "seq": "1333380",
+      "spelling": "襲来",
+      "reading": "しゅうらい",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 20,
+          "s": "襲来",
+          "b": "襲来",
+          "r": "しゅうらい"
+        },
+        {
+          "article": "aozora:004668-1",
+          "token": 1110,
+          "s": "襲来",
+          "b": "襲来",
+          "r": "しゅうらい"
+        }
+      ]
+    },
+    {
+      "seq": "1343870",
+      "spelling": "書きつける",
+      "reading": "かきつける",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 1585,
+          "s": "書きつけ",
+          "b": "書きつける",
+          "r": "かきつけ"
+        }
+      ]
+    },
+    {
+      "seq": "1345600",
+      "spelling": "徐々",
+      "reading": "じょじょ",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-imf-outlook",
+          "token": 525,
+          "s": "徐々",
+          "b": "徐々",
+          "r": "じょじょ"
+        }
+      ]
+    },
+    {
+      "seq": "1359060",
+      "spelling": "信じ込む",
+      "reading": "しんじこむ",
+      "receipts": [
+        {
+          "article": "govonline:202403-entry-5920-column",
+          "token": 423,
+          "s": "信じ込み",
+          "b": "信じ込む",
+          "r": "しんじこみ"
+        }
+      ]
+    },
+    {
+      "seq": "1360430",
+      "spelling": "審美",
+      "reading": "しんび",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 1526,
+          "s": "審美",
+          "b": "審美",
+          "r": "しんび"
+        }
+      ]
+    },
+    {
+      "seq": "1360700",
+      "spelling": "心持",
+      "reading": "こころもち",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 443,
+          "s": "心持",
+          "b": "心持",
+          "r": "こころもち"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 561,
+          "s": "心持",
+          "b": "心持",
+          "r": "こころもち"
+        }
+      ]
+    },
+    {
+      "seq": "1363030",
+      "spelling": "申し分",
+      "reading": "もうしぶん",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 375,
+          "s": "申し分",
+          "b": "申し分",
+          "r": "もうしぶん"
+        }
+      ]
+    },
+    {
+      "seq": "1363460",
+      "spelling": "真下",
+      "reading": "ました",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-icecube-nobel",
+          "token": 3,
+          "s": "真下",
+          "b": "真下",
+          "r": "ました"
+        }
+      ]
+    },
+    {
+      "seq": "1363670",
+      "spelling": "真言",
+      "reading": "しんごん",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 58,
+          "s": "真言",
+          "b": "真言",
+          "r": "しんごん"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 250,
+          "s": "真言",
+          "b": "真言",
+          "r": "しんごん"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 493,
+          "s": "真言",
+          "b": "真言",
+          "r": "しんごん"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 521,
+          "s": "真言",
+          "b": "真言",
+          "r": "しんごん"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 638,
+          "s": "真言",
+          "b": "真言",
+          "r": "しんごん"
+        }
+      ]
+    },
+    {
+      "seq": "1367850",
+      "spelling": "人士",
+      "reading": "じんし",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 724,
+          "s": "人士",
+          "b": "人士",
+          "r": "じんし"
+        }
+      ]
+    },
+    {
+      "seq": "1370690",
+      "spelling": "吹き飛ばす",
+      "reading": "ふきとばす",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 1041,
+          "s": "吹き飛ばさ",
+          "b": "吹き飛ばす",
+          "r": "ふきとばさ"
+        }
+      ]
+    },
+    {
+      "seq": "1373390",
+      "spelling": "趨勢",
+      "reading": "すうせい",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 938,
+          "s": "趨勢",
+          "b": "趨勢",
+          "r": "すうせい"
+        }
+      ]
+    },
+    {
+      "seq": "1376320",
+      "spelling": "星雲",
+      "reading": "せいうん",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-icecube-nobel",
+          "token": 321,
+          "s": "星雲",
+          "b": "星雲",
+          "r": "せいうん"
+        }
+      ]
+    },
+    {
+      "seq": "1385880",
+      "spelling": "折りたたむ",
+      "reading": "おりたたむ",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-carson-nobel",
+          "token": 452,
+          "s": "折りたたみ",
+          "b": "折りたたむ",
+          "r": "おりたたみ"
+        }
+      ]
+    },
+    {
+      "seq": "1389240",
+      "spelling": "千万",
+      "reading": "せんばん",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 351,
+          "s": "千万",
+          "b": "千万",
+          "r": "せんばん"
+        }
+      ]
+    },
+    {
+      "seq": "1390920",
+      "spelling": "洗い流す",
+      "reading": "あらいながす",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 33,
+          "s": "洗い流し",
+          "b": "洗い流す",
+          "r": "あらいながし"
+        }
+      ]
+    },
+    {
+      "seq": "1392490",
+      "spelling": "閃光",
+      "reading": "せんこう",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 986,
+          "s": "閃光",
+          "b": "閃光",
+          "r": "せんこう"
+        }
+      ]
+    },
+    {
+      "seq": "1398190",
+      "spelling": "僧堂",
+      "reading": "そうどう",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 1266,
+          "s": "僧堂",
+          "b": "僧堂",
+          "r": "そうどう"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 1281,
+          "s": "僧堂",
+          "b": "僧堂",
+          "r": "そうどう"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 1392,
+          "s": "僧堂",
+          "b": "僧堂",
+          "r": "そうどう"
+        }
+      ]
+    },
+    {
+      "seq": "1401680",
+      "spelling": "総説",
+      "reading": "そうせつ",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-hofstadter-law",
+          "token": 634,
+          "s": "総説",
+          "b": "総説",
+          "r": "そうせつ"
+        }
+      ]
+    },
+    {
+      "seq": "1405460",
+      "spelling": "俗人",
+      "reading": "ぞくじん",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 1167,
+          "s": "俗人",
+          "b": "俗人",
+          "r": "ぞくじん"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 1511,
+          "s": "俗人",
+          "b": "俗人",
+          "r": "ぞくじん"
+        }
+      ]
+    },
+    {
+      "seq": "1406510",
+      "spelling": "尊崇",
+      "reading": "そんすう",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 304,
+          "s": "尊崇",
+          "b": "尊崇",
+          "r": "そんすう"
+        },
+        {
+          "article": "aozora:049966-2",
+          "token": 331,
+          "s": "尊崇",
+          "b": "尊崇",
+          "r": "そんすう"
+        }
+      ]
+    },
+    {
+      "seq": "1411660",
+      "spelling": "代価",
+      "reading": "だいか",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 828,
+          "s": "代価",
+          "b": "代価",
+          "r": "だいか"
+        }
+      ]
+    },
+    {
+      "seq": "1419240",
+      "spelling": "団子",
+      "reading": "だんご",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 226,
+          "s": "団子",
+          "b": "団子",
+          "r": "だんご"
+        }
+      ]
+    },
+    {
+      "seq": "1426130",
+      "spelling": "忠孝",
+      "reading": "ちゅうこう",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 834,
+          "s": "忠孝",
+          "b": "忠孝",
+          "r": "ちゅうこう"
+        }
+      ]
+    },
+    {
+      "seq": "1427760",
+      "spelling": "張り",
+      "reading": "はり",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 241,
+          "s": "張り",
+          "b": "張り",
+          "r": "はり"
+        }
+      ]
+    },
+    {
+      "seq": "1427860",
+      "spelling": "張り上げる",
+      "reading": "はりあげる",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-suzuki-zen",
+          "token": 628,
+          "s": "張り上げる",
+          "b": "張り上げる",
+          "r": "はりあげる"
+        }
+      ]
+    },
+    {
+      "seq": "1428490",
+      "spelling": "朝廷",
+      "reading": "ちょうてい",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 239,
+          "s": "朝廷",
+          "b": "朝廷",
+          "r": "ちょうてい"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 214,
+          "s": "朝廷",
+          "b": "朝廷",
+          "r": "ちょうてい"
+        }
+      ]
+    },
+    {
+      "seq": "1432580",
+      "spelling": "追想",
+      "reading": "ついそう",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 62,
+          "s": "追想",
+          "b": "追想",
+          "r": "ついそう"
+        }
+      ]
+    },
+    {
+      "seq": "1440440",
+      "spelling": "天与",
+      "reading": "てんよ",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 233,
+          "s": "天与",
+          "b": "天与",
+          "r": "てんよ"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 277,
+          "s": "天与",
+          "b": "天与",
+          "r": "てんよ"
+        }
+      ]
+    },
+    {
+      "seq": "1442020",
+      "spelling": "伝授",
+      "reading": "でんじゅ",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 124,
+          "s": "伝授",
+          "b": "伝授",
+          "r": "でんじゅ"
+        }
+      ]
+    },
+    {
+      "seq": "1442450",
+      "spelling": "伝来",
+      "reading": "でんらい",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 28,
+          "s": "伝来",
+          "b": "伝来",
+          "r": "でんらい"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 458,
+          "s": "伝来",
+          "b": "伝来",
+          "r": "でんらい"
+        }
+      ]
+    },
+    {
+      "seq": "1444720",
+      "spelling": "渡米",
+      "reading": "とべい",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-suzuki-zen",
+          "token": 153,
+          "s": "渡米",
+          "b": "渡米",
+          "r": "とべい"
+        }
+      ]
+    },
+    {
+      "seq": "1447010",
+      "spelling": "投げかける",
+      "reading": "なげかける",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-suzuki-zen",
+          "token": 536,
+          "s": "投げかけ",
+          "b": "投げかける",
+          "r": "なげかけ"
+        }
+      ]
+    },
+    {
+      "seq": "1448970",
+      "spelling": "当該",
+      "reading": "とうがい",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 187,
+          "s": "当該",
+          "b": "当該",
+          "r": "とうがい"
+        },
+        {
+          "article": "aozora:004668-1",
+          "token": 685,
+          "s": "当該",
+          "b": "当該",
+          "r": "とうがい"
+        }
+      ]
+    },
+    {
+      "seq": "1452680",
+      "spelling": "同書",
+      "reading": "どうしょ",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 357,
+          "s": "同書",
+          "b": "同書",
+          "r": "どうしょ"
+        }
+      ]
+    },
+    {
+      "seq": "1453710",
+      "spelling": "導体",
+      "reading": "どうたい",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-japan-us-chip-fab",
+          "token": 35,
+          "s": "導体",
+          "b": "導体",
+          "r": "どうたい"
+        },
+        {
+          "article": "bunki-read-n2-japan-us-chip-fab",
+          "token": 82,
+          "s": "導体",
+          "b": "導体",
+          "r": "どうたい"
+        },
+        {
+          "article": "bunki-read-n2-japan-us-chip-fab",
+          "token": 113,
+          "s": "導体",
+          "b": "導体",
+          "r": "どうたい"
+        },
+        {
+          "article": "bunki-read-n2-japan-us-chip-fab",
+          "token": 171,
+          "s": "導体",
+          "b": "導体",
+          "r": "どうたい"
+        },
+        {
+          "article": "bunki-read-n2-japan-us-chip-fab",
+          "token": 493,
+          "s": "導体",
+          "b": "導体",
+          "r": "どうたい"
+        },
+        {
+          "article": "bunki-read-n2-japan-us-chip-fab",
+          "token": 535,
+          "s": "導体",
+          "b": "導体",
+          "r": "どうたい"
+        }
+      ]
+    },
+    {
+      "seq": "1459670",
+      "spelling": "薙ぎ倒す",
+      "reading": "なぎたおす",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 32,
+          "s": "薙ぎ倒し",
+          "b": "薙ぎ倒す",
+          "r": "なぎたおし"
+        }
+      ]
+    },
+    {
+      "seq": "1466700",
+      "spelling": "入費",
+      "reading": "にゅうひ",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 800,
+          "s": "入費",
+          "b": "入費",
+          "r": "にゅうひ"
+        }
+      ]
+    },
+    {
+      "seq": "1466960",
+      "spelling": "如何なる",
+      "reading": "いかなる",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 708,
+          "s": "如何なる",
+          "b": "如何なる",
+          "r": "いかなる"
+        },
+        {
+          "article": "aozora:004668-1",
+          "token": 1164,
+          "s": "如何なる",
+          "b": "如何なる",
+          "r": "いかなる"
+        }
+      ]
+    },
+    {
+      "seq": "1469250",
+      "spelling": "年利",
+      "reading": "ねんり",
+      "receipts": [
+        {
+          "article": "bunki-read-n3-rule-of-72",
+          "token": 3,
+          "s": "年利",
+          "b": "年利",
+          "r": "ねんり"
+        },
+        {
+          "article": "bunki-read-n3-rule-of-72",
+          "token": 155,
+          "s": "年利",
+          "b": "年利",
+          "r": "ねんり"
+        },
+        {
+          "article": "bunki-read-n3-rule-of-72",
+          "token": 196,
+          "s": "年利",
+          "b": "年利",
+          "r": "ねんり"
+        }
+      ]
+    },
+    {
+      "seq": "1474650",
+      "spelling": "博士号",
+      "reading": "はくしごう",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-pillay-peace-nobel",
+          "token": 254,
+          "s": "博士号",
+          "b": "博士号",
+          "r": "はくしごう"
+        }
+      ]
+    },
+    {
+      "seq": "1478710",
+      "spelling": "判別",
+      "reading": "はんべつ",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 325,
+          "s": "判別",
+          "b": "判別",
+          "r": "はんべつ"
+        }
+      ]
+    },
+    {
+      "seq": "1479170",
+      "spelling": "半球",
+      "reading": "はんきゅう",
+      "receipts": [
+        {
+          "article": "global-voices:2026-07-28-65374",
+          "token": 36,
+          "s": "半球",
+          "b": "半球",
+          "r": "はんきゅう"
+        }
+      ]
+    },
+    {
+      "seq": "1479220",
+      "spelling": "半句",
+      "reading": "はんく",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 834,
+          "s": "半句",
+          "b": "半句",
+          "r": "はんく"
+        }
+      ]
+    },
+    {
+      "seq": "1481750",
+      "spelling": "般若",
+      "reading": "はんにゃ",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 135,
+          "s": "般若",
+          "b": "般若",
+          "r": "はんにゃ"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 188,
+          "s": "般若",
+          "b": "般若",
+          "r": "はんにゃ"
+        }
+      ]
+    },
+    {
+      "seq": "1483530",
+      "spelling": "比する",
+      "reading": "ひする",
+      "receipts": [
+        {
+          "article": "govonline:202403-entry-5920-column",
+          "token": 244,
+          "s": "比し",
+          "b": "比する",
+          "r": "ひし"
+        }
+      ]
+    },
+    {
+      "seq": "1485430",
+      "spelling": "飛び立つ",
+      "reading": "とびたつ",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-suzuki-zen",
+          "token": 635,
+          "s": "飛び立っ",
+          "b": "飛び立つ",
+          "r": "とびたっ"
+        }
+      ]
+    },
+    {
+      "seq": "1488830",
+      "spelling": "標榜",
+      "reading": "ひょうぼう",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 1487,
+          "s": "標榜",
+          "b": "標榜",
+          "r": "ひょうぼう"
+        }
+      ]
+    },
+    {
+      "seq": "1495760",
+      "spelling": "付",
+      "reading": "づけ",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 212,
+          "s": "付",
+          "b": "付",
+          "r": "づけ"
+        }
+      ]
+    },
+    {
+      "seq": "1497150",
+      "spelling": "普請",
+      "reading": "ふしん",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 53,
+          "s": "普請",
+          "b": "普請",
+          "r": "ふしん"
+        }
+      ]
+    },
+    {
+      "seq": "1499930",
+      "spelling": "風雪",
+      "reading": "ふうせつ",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 942,
+          "s": "風雪",
+          "b": "風雪",
+          "r": "ふうせつ"
+        }
+      ]
+    },
+    {
+      "seq": "1502310",
+      "spelling": "仏法",
+      "reading": "ぶっぽう",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 345,
+          "s": "仏法",
+          "b": "仏法",
+          "r": "ぶっぽう"
+        }
+      ]
+    },
+    {
+      "seq": "1510460",
+      "spelling": "偏在",
+      "reading": "へんざい",
+      "receipts": [
+        {
+          "article": "global-voices:2026-07-28-65374",
+          "token": 38,
+          "s": "偏在",
+          "b": "偏在",
+          "r": "へんざい"
+        }
+      ]
+    },
+    {
+      "seq": "1511740",
+      "spelling": "片端",
+      "reading": "かたはし",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 30,
+          "s": "片端",
+          "b": "片端",
+          "r": "かたはし"
+        }
+      ]
+    },
+    {
+      "seq": "1515030",
+      "spelling": "母語",
+      "reading": "ぼご",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-hofstadter-law",
+          "token": 493,
+          "s": "母語",
+          "b": "母語",
+          "r": "ぼご"
+        }
+      ]
+    },
+    {
+      "seq": "1517080",
+      "spelling": "方便",
+      "reading": "ほうべん",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 594,
+          "s": "方便",
+          "b": "方便",
+          "r": "ほうべん"
+        }
+      ]
+    },
+    {
+      "seq": "1524520",
+      "spelling": "埋め込む",
+      "reading": "うめこむ",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-icecube-nobel",
+          "token": 32,
+          "s": "埋め込ま",
+          "b": "埋め込む",
+          "r": "うめこま"
+        }
+      ]
+    },
+    {
+      "seq": "1524740",
+      "spelling": "毎秒",
+      "reading": "まいびょう",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-icecube-nobel",
+          "token": 177,
+          "s": "毎秒",
+          "b": "毎秒",
+          "r": "まいびょう"
+        }
+      ]
+    },
+    {
+      "seq": "1526260",
+      "spelling": "万端",
+      "reading": "ばんたん",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 1351,
+          "s": "万端",
+          "b": "万端",
+          "r": "ばんたん"
+        }
+      ]
+    },
+    {
+      "seq": "1528230",
+      "spelling": "密教",
+      "reading": "みっきょう",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 171,
+          "s": "密教",
+          "b": "密教",
+          "r": "みっきょう"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 122,
+          "s": "密教",
+          "b": "密教",
+          "r": "みっきょう"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 496,
+          "s": "密教",
+          "b": "密教",
+          "r": "みっきょう"
+        }
+      ]
+    },
+    {
+      "seq": "1531660",
+      "spelling": "名状",
+      "reading": "めいじょう",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 1173,
+          "s": "名状",
+          "b": "名状",
+          "r": "めいじょう"
+        }
+      ]
+    },
+    {
+      "seq": "1538390",
+      "spelling": "訳注",
+      "reading": "やくちゅう",
+      "receipts": [
+        {
+          "article": "global-voices:2026-07-28-65374",
+          "token": 32,
+          "s": "訳注",
+          "b": "訳注",
+          "r": "やくちゅう"
+        }
+      ]
+    },
+    {
+      "seq": "1538750",
+      "spelling": "癒やす",
+      "reading": "いやす",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 650,
+          "s": "癒やし",
+          "b": "癒やす",
+          "r": "いやし"
+        }
+      ]
+    },
+    {
+      "seq": "1542090",
+      "spelling": "遊び心",
+      "reading": "あそびごころ",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-carson-nobel",
+          "token": 127,
+          "s": "遊び心",
+          "b": "遊び心",
+          "r": "あそびごころ"
+        }
+      ]
+    },
+    {
+      "seq": "1552720",
+      "spelling": "留意",
+      "reading": "りゅうい",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 544,
+          "s": "留意",
+          "b": "留意",
+          "r": "りゅうい"
+        }
+      ]
+    },
+    {
+      "seq": "1567000",
+      "spelling": "罹災",
+      "reading": "りさい",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 361,
+          "s": "罹災",
+          "b": "罹災",
+          "r": "りさい"
+        },
+        {
+          "article": "aozora:004668-1",
+          "token": 508,
+          "s": "罹災",
+          "b": "罹災",
+          "r": "りさい"
+        }
+      ]
+    },
+    {
+      "seq": "1568160",
+      "spelling": "梵語",
+      "reading": "ぼんご",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 129,
+          "s": "梵語",
+          "b": "梵語",
+          "r": "ぼんご"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 160,
+          "s": "梵語",
+          "b": "梵語",
+          "r": "ぼんご"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 193,
+          "s": "梵語",
+          "b": "梵語",
+          "r": "ぼんご"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 560,
+          "s": "梵語",
+          "b": "梵語",
+          "r": "ぼんご"
+        }
+      ]
+    },
+    {
+      "seq": "1568180",
+      "spelling": "梵字",
+      "reading": "ぼんじ",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 76,
+          "s": "梵字",
+          "b": "梵字",
+          "r": "ぼんじ"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 158,
+          "s": "梵字",
+          "b": "梵字",
+          "r": "ぼんじ"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 247,
+          "s": "梵字",
+          "b": "梵字",
+          "r": "ぼんじ"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 265,
+          "s": "梵字",
+          "b": "梵字",
+          "r": "ぼんじ"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 316,
+          "s": "梵字",
+          "b": "梵字",
+          "r": "ぼんじ"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 360,
+          "s": "梵字",
+          "b": "梵字",
+          "r": "ぼんじ"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 375,
+          "s": "梵字",
+          "b": "梵字",
+          "r": "ぼんじ"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 456,
+          "s": "梵字",
+          "b": "梵字",
+          "r": "ぼんじ"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 548,
+          "s": "梵字",
+          "b": "梵字",
+          "r": "ぼんじ"
+        }
+      ]
+    },
+    {
+      "seq": "1589100",
+      "spelling": "押し上げる",
+      "reading": "おしあげる",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-imf-outlook",
+          "token": 410,
+          "s": "押し上げ",
+          "b": "押し上げる",
+          "r": "おしあげ"
+        },
+        {
+          "article": "bunki-read-n2-imf-outlook",
+          "token": 423,
+          "s": "押し上げ",
+          "b": "押し上げる",
+          "r": "おしあげ"
+        }
+      ]
+    },
+    {
+      "seq": "1589940",
+      "spelling": "書き添える",
+      "reading": "かきそえる",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-hofstadter-law",
+          "token": 97,
+          "s": "書き添え",
+          "b": "書き添える",
+          "r": "かきそえ"
+        }
+      ]
+    },
+    {
+      "seq": "1594130",
+      "spelling": "死骸",
+      "reading": "しがい",
+      "receipts": [
+        {
+          "article": "global-voices:2026-08-03-65560",
+          "token": 464,
+          "s": "死骸",
+          "b": "死骸",
+          "r": "しがい"
+        }
+      ]
+    },
+    {
+      "seq": "1595130",
+      "spelling": "真個",
+      "reading": "しんこ",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 863,
+          "s": "真個",
+          "b": "真個",
+          "r": "しんこ"
+        }
+      ]
+    },
+    {
+      "seq": "1596620",
+      "spelling": "卒塔婆",
+      "reading": "そとば",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 545,
+          "s": "卒塔婆",
+          "b": "卒塔婆",
+          "r": "そとば"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 554,
+          "s": "卒塔婆",
+          "b": "卒塔婆",
+          "r": "そとば"
+        }
+      ]
+    },
+    {
+      "seq": "1598510",
+      "spelling": "天変",
+      "reading": "てんぺん",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 932,
+          "s": "天変",
+          "b": "天変",
+          "r": "てんぺん"
+        }
+      ]
+    },
+    {
+      "seq": "1607180",
+      "spelling": "使える",
+      "reading": "つかえる",
+      "receipts": [
+        {
+          "article": "bunki-read-n3-rule-of-72",
+          "token": 602,
+          "s": "使える",
+          "b": "使える",
+          "r": "つかえる"
+        }
+      ]
+    },
+    {
+      "seq": "1616190",
+      "spelling": "忍びやか",
+      "reading": "しのびやか",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 859,
+          "s": "忍びやか",
+          "b": "忍びやか",
+          "r": "しのびやか"
+        }
+      ]
+    },
+    {
+      "seq": "1620870",
+      "spelling": "究竟",
+      "reading": "きゅうきょう",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 575,
+          "s": "究竟",
+          "b": "究竟",
+          "r": "きゅうきょう"
+        }
+      ]
+    },
+    {
+      "seq": "1626940",
+      "spelling": "比類",
+      "reading": "ひるい",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 462,
+          "s": "比類",
+          "b": "比類",
+          "r": "ひるい"
+        }
+      ]
+    },
+    {
+      "seq": "1631440",
+      "spelling": "講じる",
+      "reading": "こうじる",
+      "receipts": [
+        {
+          "article": "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3",
+          "token": 170,
+          "s": "講じる",
+          "b": "講じる",
+          "r": "こうじる"
+        }
+      ]
+    },
+    {
+      "seq": "1646260",
+      "spelling": "説法",
+      "reading": "せっぽう",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 592,
+          "s": "説法",
+          "b": "説法",
+          "r": "せっぽう"
+        }
+      ]
+    },
+    {
+      "seq": "1653400",
+      "spelling": "守り神",
+      "reading": "まもりがみ",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 317,
+          "s": "守り神",
+          "b": "守り神",
+          "r": "まもりがみ"
+        }
+      ]
+    },
+    {
+      "seq": "1653790",
+      "spelling": "村落",
+      "reading": "そんらく",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 28,
+          "s": "村落",
+          "b": "村落",
+          "r": "そんらく"
+        }
+      ]
+    },
+    {
+      "seq": "1665570",
+      "spelling": "官立",
+      "reading": "かんりつ",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 768,
+          "s": "官立",
+          "b": "官立",
+          "r": "かんりつ"
+        }
+      ]
+    },
+    {
+      "seq": "1673310",
+      "spelling": "無暗",
+      "reading": "むやみ",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 375,
+          "s": "無暗",
+          "b": "無暗",
+          "r": "むやみ"
+        }
+      ]
+    },
+    {
+      "seq": "1687350",
+      "spelling": "通航",
+      "reading": "つうこう",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-imf-outlook",
+          "token": 577,
+          "s": "通航",
+          "b": "通航",
+          "r": "つうこう"
+        }
+      ]
+    },
+    {
+      "seq": "1696940",
+      "spelling": "祖師",
+      "reading": "そし",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 1406,
+          "s": "祖師",
+          "b": "祖師",
+          "r": "そし"
+        }
+      ]
+    },
+    {
+      "seq": "1700680",
+      "spelling": "罪深い",
+      "reading": "つみぶかい",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 690,
+          "s": "罪深い",
+          "b": "罪深い",
+          "r": "つみぶかい"
+        }
+      ]
+    },
+    {
+      "seq": "1701810",
+      "spelling": "書き残す",
+      "reading": "かきのこす",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-suzuki-zen",
+          "token": 612,
+          "s": "書き残し",
+          "b": "書き残す",
+          "r": "かきのこし"
+        }
+      ]
+    },
+    {
+      "seq": "1711170",
+      "spelling": "途次",
+      "reading": "とじ",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 165,
+          "s": "途次",
+          "b": "途次",
+          "r": "とじ"
+        }
+      ]
+    },
+    {
+      "seq": "1717810",
+      "spelling": "居士",
+      "reading": "こじ",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 1,
+          "s": "居士",
+          "b": "居士",
+          "r": "こじ"
+        },
+        {
+          "article": "aozora:049966-2",
+          "token": 65,
+          "s": "居士",
+          "b": "居士",
+          "r": "こじ"
+        },
+        {
+          "article": "aozora:049966-2",
+          "token": 153,
+          "s": "居士",
+          "b": "居士",
+          "r": "こじ"
+        },
+        {
+          "article": "aozora:049966-2",
+          "token": 218,
+          "s": "居士",
+          "b": "居士",
+          "r": "こじ"
+        },
+        {
+          "article": "aozora:049966-2",
+          "token": 369,
+          "s": "居士",
+          "b": "居士",
+          "r": "こじ"
+        },
+        {
+          "article": "aozora:049966-2",
+          "token": 615,
+          "s": "居士",
+          "b": "居士",
+          "r": "こじ"
+        },
+        {
+          "article": "aozora:049966-2",
+          "token": 678,
+          "s": "居士",
+          "b": "居士",
+          "r": "こじ"
+        },
+        {
+          "article": "aozora:049966-2",
+          "token": 813,
+          "s": "居士",
+          "b": "居士",
+          "r": "こじ"
+        },
+        {
+          "article": "bunki-read-n1-suzuki-zen",
+          "token": 122,
+          "s": "居士",
+          "b": "居士",
+          "r": "こじ"
+        }
+      ]
+    },
+    {
+      "seq": "1738740",
+      "spelling": "論集",
+      "reading": "ろんしゅう",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-suzuki-zen",
+          "token": 496,
+          "s": "論集",
+          "b": "論集",
+          "r": "ろんしゅう"
+        }
+      ]
+    },
+    {
+      "seq": "1741610",
+      "spelling": "考究",
+      "reading": "こうきゅう",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 601,
+          "s": "考究",
+          "b": "考究",
+          "r": "こうきゅう"
+        }
+      ]
+    },
+    {
+      "seq": "1763800",
+      "spelling": "地異",
+      "reading": "ちい",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 935,
+          "s": "地異",
+          "b": "地異",
+          "r": "ちい"
+        }
+      ]
+    },
+    {
+      "seq": "1772990",
+      "spelling": "海猫",
+      "reading": "うみねこ",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 874,
+          "s": "海猫",
+          "b": "海猫",
+          "r": "うみねこ"
+        }
+      ]
+    },
+    {
+      "seq": "1775400",
+      "spelling": "良薬",
+      "reading": "りょうやく",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 654,
+          "s": "良薬",
+          "b": "良薬",
+          "r": "りょうやく"
+        }
+      ]
+    },
+    {
+      "seq": "1778320",
+      "spelling": "寄寓",
+      "reading": "きぐう",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 737,
+          "s": "寄寓",
+          "b": "寄寓",
+          "r": "きぐう"
+        }
+      ]
+    },
+    {
+      "seq": "1786680",
+      "spelling": "大御所",
+      "reading": "おおごしょ",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 717,
+          "s": "大御所",
+          "b": "大御所",
+          "r": "おおごしょ"
+        }
+      ]
+    },
+    {
+      "seq": "1797920",
+      "spelling": "張合い",
+      "reading": "はりあい",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 211,
+          "s": "張合い",
+          "b": "張合い",
+          "r": "はりあい"
+        },
+        {
+          "article": "aozora:053224-1",
+          "token": 287,
+          "s": "張合い",
+          "b": "張合い",
+          "r": "はりあい"
+        },
+        {
+          "article": "aozora:053224-1",
+          "token": 442,
+          "s": "張合い",
+          "b": "張合い",
+          "r": "はりあい"
+        }
+      ]
+    },
+    {
+      "seq": "1802270",
+      "spelling": "禅堂",
+      "reading": "ぜんどう",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 40,
+          "s": "禅堂",
+          "b": "禅堂",
+          "r": "ぜんどう"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 94,
+          "s": "禅堂",
+          "b": "禅堂",
+          "r": "ぜんどう"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 137,
+          "s": "禅堂",
+          "b": "禅堂",
+          "r": "ぜんどう"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 591,
+          "s": "禅堂",
+          "b": "禅堂",
+          "r": "ぜんどう"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 1095,
+          "s": "禅堂",
+          "b": "禅堂",
+          "r": "ぜんどう"
+        }
+      ]
+    },
+    {
+      "seq": "1816690",
+      "spelling": "詩作",
+      "reading": "しさく",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-carson-nobel",
+          "token": 181,
+          "s": "詩作",
+          "b": "詩作",
+          "r": "しさく"
+        }
+      ]
+    },
+    {
+      "seq": "1840710",
+      "spelling": "老僧",
+      "reading": "ろうそう",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 81,
+          "s": "老僧",
+          "b": "老僧",
+          "r": "ろうそう"
+        },
+        {
+          "article": "aozora:049966-2",
+          "token": 88,
+          "s": "老僧",
+          "b": "老僧",
+          "r": "ろうそう"
+        }
+      ]
+    },
+    {
+      "seq": "1850170",
+      "spelling": "推し進める",
+      "reading": "おしすすめる",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-pillay-peace-nobel",
+          "token": 124,
+          "s": "推し進め",
+          "b": "推し進める",
+          "r": "おしすすめ"
+        }
+      ]
+    },
+    {
+      "seq": "1851920",
+      "spelling": "かき消す",
+      "reading": "かきけす",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-suzuki-zen",
+          "token": 647,
+          "s": "かき消さ",
+          "b": "かき消す",
+          "r": "かきけさ"
+        }
+      ]
+    },
+    {
+      "seq": "1854700",
+      "spelling": "通弁",
+      "reading": "つうべん",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 155,
+          "s": "通弁",
+          "b": "通弁",
+          "r": "つうべん"
+        }
+      ]
+    },
+    {
+      "seq": "1856500",
+      "spelling": "温かみ",
+      "reading": "あたたかみ",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 481,
+          "s": "温かみ",
+          "b": "温かみ",
+          "r": "あたたかみ"
+        }
+      ]
+    },
+    {
+      "seq": "1868780",
+      "spelling": "基教",
+      "reading": "ききょう",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 552,
+          "s": "基教",
+          "b": "基教",
+          "r": "ききょう"
+        }
+      ]
+    },
+    {
+      "seq": "1870280",
+      "spelling": "協働",
+      "reading": "きょうどう",
+      "receipts": [
+        {
+          "article": "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3",
+          "token": 260,
+          "s": "協働",
+          "b": "協働",
+          "r": "きょうどう"
+        }
+      ]
+    },
+    {
+      "seq": "1879460",
+      "spelling": "三蔵",
+      "reading": "さんぞう",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 136,
+          "s": "三蔵",
+          "b": "三蔵",
+          "r": "さんぞう"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 189,
+          "s": "三蔵",
+          "b": "三蔵",
+          "r": "さんぞう"
+        }
+      ]
+    },
+    {
+      "seq": "1953140",
+      "spelling": "切に",
+      "reading": "せつに",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 496,
+          "s": "切に",
+          "b": "切に",
+          "r": "せつに"
+        }
+      ]
+    },
+    {
+      "seq": "1982960",
+      "spelling": "事案",
+      "reading": "じあん",
+      "receipts": [
+        {
+          "article": "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3",
+          "token": 416,
+          "s": "事案",
+          "b": "事案",
+          "r": "じあん"
+        },
+        {
+          "article": "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3",
+          "token": 510,
+          "s": "事案",
+          "b": "事案",
+          "r": "じあん"
+        }
+      ]
+    },
+    {
+      "seq": "1985370",
+      "spelling": "闡明",
+      "reading": "せんめい",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 904,
+          "s": "闡明",
+          "b": "闡明",
+          "r": "せんめい"
+        }
+      ]
+    },
+    {
+      "seq": "2006050",
+      "spelling": "注力",
+      "reading": "ちゅうりょく",
+      "receipts": [
+        {
+          "article": "global-voices:2026-07-28-65374",
+          "token": 595,
+          "s": "注力",
+          "b": "注力",
+          "r": "ちゅうりょく"
+        }
+      ]
+    },
+    {
+      "seq": "2008910",
+      "spelling": "因む",
+      "reading": "ちなむ",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 126,
+          "s": "因ん",
+          "b": "因む",
+          "r": "ちなん"
+        }
+      ]
+    },
+    {
+      "seq": "2009470",
+      "spelling": "馬鹿げる",
+      "reading": "ばかげる",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 976,
+          "s": "馬鹿げ",
+          "b": "馬鹿げる",
+          "r": "ばかげ"
+        }
+      ]
+    },
+    {
+      "seq": "2011060",
+      "spelling": "辞する",
+      "reading": "じする",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 888,
+          "s": "辞し",
+          "b": "辞する",
+          "r": "じし"
+        }
+      ]
+    },
+    {
+      "seq": "2012510",
+      "spelling": "東証",
+      "reading": "とうしょう",
+      "receipts": [
+        {
+          "article": "bunki-read-n3-rule-of-72",
+          "token": 362,
+          "s": "東証",
+          "b": "東証",
+          "r": "とうしょう"
+        }
+      ]
+    },
+    {
+      "seq": "2036140",
+      "spelling": "奪い去る",
+      "reading": "うばいさる",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 46,
+          "s": "奪い去っ",
+          "b": "奪い去る",
+          "r": "うばいさっ"
+        }
+      ]
+    },
+    {
+      "seq": "2073120",
+      "spelling": "拓く",
+      "reading": "ひらく",
+      "receipts": [
+        {
+          "article": "global-voices:2026-07-28-65374",
+          "token": 16,
+          "s": "拓く",
+          "b": "拓く",
+          "r": "ひらく"
+        }
+      ]
+    },
+    {
+      "seq": "2088400",
+      "spelling": "満つ",
+      "reading": "みつ",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-hofstadter-law",
+          "token": 353,
+          "s": "満た",
+          "b": "満つ",
+          "r": "みた"
+        }
+      ]
+    },
+    {
+      "seq": "2089960",
+      "spelling": "天平",
+      "reading": "てんぴょう",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 477,
+          "s": "天平",
+          "b": "天平",
+          "r": "てんぴょう"
         }
       ]
     },
@@ -39,6 +2622,34 @@
       ]
     },
     {
+      "seq": "2176820",
+      "spelling": "青龍",
+      "reading": "せいりゅう",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 114,
+          "s": "青龍",
+          "b": "青龍",
+          "r": "せいりゅう"
+        }
+      ]
+    },
+    {
+      "seq": "2185520",
+      "spelling": "特任",
+      "reading": "とくにん",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-pillay-peace-nobel",
+          "token": 488,
+          "s": "特任",
+          "b": "特任",
+          "r": "とくにん"
+        }
+      ]
+    },
+    {
       "seq": "2229780",
       "spelling": "異",
       "reading": "こと",
@@ -49,6 +2660,97 @@
           "s": "異",
           "b": "異",
           "r": "こと"
+        }
+      ]
+    },
+    {
+      "seq": "2251400",
+      "spelling": "悉曇",
+      "reading": "しったん",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 361,
+          "s": "悉曇",
+          "b": "悉曇",
+          "r": "しったん"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 475,
+          "s": "悉曇",
+          "b": "悉曇",
+          "r": "しったん"
+        },
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 526,
+          "s": "悉曇",
+          "b": "悉曇",
+          "r": "しったん"
+        }
+      ]
+    },
+    {
+      "seq": "2265840",
+      "spelling": "聖天",
+      "reading": "しょうでん",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 64,
+          "s": "聖天",
+          "b": "聖天",
+          "r": "しょうでん"
+        },
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 73,
+          "s": "聖天",
+          "b": "聖天",
+          "r": "しょうでん"
+        },
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 271,
+          "s": "聖天",
+          "b": "聖天",
+          "r": "しょうでん"
+        },
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 338,
+          "s": "聖天",
+          "b": "聖天",
+          "r": "しょうでん"
+        },
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 343,
+          "s": "聖天",
+          "b": "聖天",
+          "r": "しょうでん"
+        },
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 381,
+          "s": "聖天",
+          "b": "聖天",
+          "r": "しょうでん"
+        },
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 404,
+          "s": "聖天",
+          "b": "聖天",
+          "r": "しょうでん"
+        },
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 473,
+          "s": "聖天",
+          "b": "聖天",
+          "r": "しょうでん"
         }
       ]
     },
@@ -77,6 +2779,132 @@
           "s": "帰し",
           "b": "帰す",
           "r": "きし"
+        }
+      ]
+    },
+    {
+      "seq": "2525100",
+      "spelling": "霧消",
+      "reading": "むしょう",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 869,
+          "s": "霧消",
+          "b": "霧消",
+          "r": "むしょう"
+        }
+      ]
+    },
+    {
+      "seq": "2525450",
+      "spelling": "尊む",
+      "reading": "とうとむ",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 490,
+          "s": "尊む",
+          "b": "尊む",
+          "r": "とうとむ"
+        }
+      ]
+    },
+    {
+      "seq": "2585180",
+      "spelling": "引き移る",
+      "reading": "ひきうつる",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 689,
+          "s": "引き移っ",
+          "b": "引き移る",
+          "r": "ひきうつっ"
+        },
+        {
+          "article": "aozora:049966-2",
+          "token": 731,
+          "s": "引き移り",
+          "b": "引き移る",
+          "r": "ひきうつり"
+        }
+      ]
+    },
+    {
+      "seq": "2651980",
+      "spelling": "香",
+      "reading": "か",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 553,
+          "s": "香",
+          "b": "香",
+          "r": "か"
+        }
+      ]
+    },
+    {
+      "seq": "2748140",
+      "spelling": "利活用",
+      "reading": "りかつよう",
+      "receipts": [
+        {
+          "article": "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3",
+          "token": 163,
+          "s": "利活用",
+          "b": "利活用",
+          "r": "りかつよう"
+        },
+        {
+          "article": "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3",
+          "token": 284,
+          "s": "利活用",
+          "b": "利活用",
+          "r": "りかつよう"
+        }
+      ]
+    },
+    {
+      "seq": "2827996",
+      "spelling": "師家",
+      "reading": "しけ",
+      "receipts": [
+        {
+          "article": "aozora:058059-1",
+          "token": 1097,
+          "s": "師家",
+          "b": "師家",
+          "r": "しけ"
+        }
+      ]
+    },
+    {
+      "seq": "2833270",
+      "spelling": "供え物",
+      "reading": "そなえもの",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 219,
+          "s": "供え物",
+          "b": "供え物",
+          "r": "そなえもの"
+        }
+      ]
+    },
+    {
+      "seq": "2841543",
+      "spelling": "福禄",
+      "reading": "ふくろく",
+      "receipts": [
+        {
+          "article": "aozora:049966-2",
+          "token": 872,
+          "s": "福禄",
+          "b": "福禄",
+          "r": "ふくろく"
         }
       ]
     },
@@ -308,6 +3136,125 @@
           "s": "私",
           "b": "私",
           "r": "わたくし"
+        }
+      ]
+    },
+    {
+      "seq": "2844412",
+      "spelling": "阿",
+      "reading": "あ",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-kukai-sanskrit",
+          "token": 414,
+          "s": "阿",
+          "b": "阿",
+          "r": "あ"
+        }
+      ]
+    },
+    {
+      "seq": "2845104",
+      "spelling": "金沢",
+      "reading": "かなざわ",
+      "receipts": [
+        {
+          "article": "bunki-read-n1-suzuki-zen",
+          "token": 100,
+          "s": "金沢",
+          "b": "金沢",
+          "r": "かなざわ"
+        }
+      ]
+    },
+    {
+      "seq": "2845387",
+      "spelling": "三陸",
+      "reading": "さんりく",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 66,
+          "s": "三陸",
+          "b": "三陸",
+          "r": "さんりく"
+        }
+      ]
+    },
+    {
+      "seq": "2864818",
+      "spelling": "挙げる",
+      "reading": "あげる",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 282,
+          "s": "挙げ",
+          "b": "挙げる",
+          "r": "あげ"
+        },
+        {
+          "article": "bunki-read-n2-carson-nobel",
+          "token": 152,
+          "s": "挙げ",
+          "b": "挙げる",
+          "r": "あげ"
+        },
+        {
+          "article": "bunki-read-n2-hofstadter-law",
+          "token": 723,
+          "s": "挙げ",
+          "b": "挙げる",
+          "r": "あげ"
+        }
+      ]
+    },
+    {
+      "seq": "5228599",
+      "spelling": "近鉄",
+      "reading": "きんてつ",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-shoten-ganesha",
+          "token": 22,
+          "s": "近鉄",
+          "b": "近鉄",
+          "r": "きんてつ"
+        }
+      ]
+    },
+    {
+      "seq": "5319328",
+      "spelling": "三菱",
+      "reading": "みつびし",
+      "receipts": [
+        {
+          "article": "bunki-read-n3-rule-of-72",
+          "token": 247,
+          "s": "三菱",
+          "b": "三菱",
+          "r": "みつびし"
+        },
+        {
+          "article": "bunki-read-n3-felt-prices",
+          "token": 379,
+          "s": "三菱",
+          "b": "三菱",
+          "r": "みつびし"
+        }
+      ]
+    },
+    {
+      "seq": "5743195",
+      "spelling": "理研",
+      "reading": "りけん",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 883,
+          "s": "理研",
+          "b": "理研",
+          "r": "りけん"
         }
       ]
     }
