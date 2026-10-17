@@ -5215,8 +5215,10 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
   --color-lacquer-2: color-mix(in srgb, var(--world-ground) 75%, var(--tone-shade));
   --color-lacquer-ink: var(--world-ink);
   /* at night the kicker's blocks are quieter, so the level's 朱 seal stays the screen's one red */
-  --kicker-ai: color-mix(in srgb, var(--color-accent) 55%, var(--color-ink-2));
-  --kicker-shu: color-mix(in srgb, var(--color-signal) 45%, var(--color-ink-2));
+  --kicker-ai: color-mix(in srgb, var(--color-accent) 55%, var(--color-ink));
+  --kicker-shu: color-mix(in srgb, var(--color-signal) 45%, var(--color-ink));
+  /* the bar's quiet ink at night: the world's ink into its ground (two pigments; the bar itself is already a mix) */
+  --color-bar-quiet: color-mix(in srgb, var(--color-ink) 76%, var(--world-ground));
 }
 /* 殻 · the electric night emits: its frame is the deep coat, flat, and the phosphor bleeds from the lit hairlines */
 :where(:root[data-theme='kaku'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
