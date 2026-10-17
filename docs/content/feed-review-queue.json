@@ -1788,5 +1788,330 @@
   "style": "column",
   "decision": "pending",
   "reason": "written or chosen for John's four fields; reviewed by two model families (Codex, Grok) with every fix applied (FIXES.md, FIXES-batch-2.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "bunki-read-n2-japan-us-chip-fab",
+  "kind": "original",
+  "title": "日本のお金でニューヨークに半導体工場――「成熟ノード」と「2ナノ」",
+  "titleEn": "Japanese money for a chip plant in New York: 'mature nodes' and '2 nanometres'",
+  "lane": "news",
+  "licence": "Bunki original",
+  "gradingSummary": "中級後半 · jread 2.86 · JLPT語彙 75% · 1092字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "technology and money",
+   "current news"
+  ],
+  "style": "business news explainer (経済ニュース解説)",
+  "decision": "pending",
+  "reason": "written for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "bunki-read-n2-shoten-ganesha",
+  "kind": "original",
+  "title": "象の神に大根を――ガネーシャと日本の聖天",
+  "titleEn": "Radishes for an elephant god: Ganesha and Japan's Shōten",
+  "lane": "essay",
+  "licence": "Bunki original",
+  "gradingSummary": "中級後半 · jread 3.11 · JLPT語彙 73% · 824字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "religion and Japanese history"
+  ],
+  "style": "history feature (歴史読み物)",
+  "decision": "pending",
+  "reason": "written for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "bunki-read-n2-icecube-nobel",
+  "kind": "original",
+  "title": "南極の氷で宇宙を見る――ノーベル物理学賞にハルツェン氏",
+  "titleEn": "Watching the universe through Antarctic ice: the physics Nobel goes to Francis Halzen",
+  "lane": "news",
+  "licence": "Bunki original",
+  "gradingSummary": "中級後半 · jread 3.24 · JLPT語彙 72% · 1137字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "current news"
+  ],
+  "style": "science news feature",
+  "decision": "pending",
+  "reason": "written for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "aozora:058059-1",
+  "kind": "aozora",
+  "title": "僧堂教育論（抄）",
+  "titleEn": "On Education in the Zen Monastery (excerpt) — Suzuki Daisetsu",
+  "lane": "literature",
+  "licence": "PD (著作権フラグ なし) · 新字新仮名",
+  "gradingSummary": "中級後半 · jread 2.64 · JLPT語彙 65% · 2403字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "religion and Japanese history",
+   "learning psychology"
+  ],
+  "style": "letter-essay (書簡体の論)",
+  "decision": "pending",
+  "reason": "a real text chosen for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "bunki-read-n3-rule-of-72",
+  "kind": "original",
+  "title": "お金が2倍になるのは何年後？――「72の法則」を株価指数で試す",
+  "titleEn": "When does money double? Testing the rule of 72 on a stock index",
+  "lane": "graded",
+  "licence": "Bunki original",
+  "gradingSummary": "中級前半 · jread 4.44 · JLPT語彙 74% · 908字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "technology and money"
+  ],
+  "style": "worked explainer (計算で読む)",
+  "decision": "pending",
+  "reason": "written for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "global-voices:2026-08-03-65560",
+  "kind": "gv",
+  "title": "インドの野生動物を守る女性警備隊（抄）",
+  "titleEn": "Women guards of Kaziranga brave all challenges to protect wildlife in India (excerpt)",
+  "lane": "news",
+  "licence": "CC BY 3.0",
+  "gradingSummary": "中級後半 · jread 3.45 · JLPT語彙 71% · 1534字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "current news"
+  ],
+  "style": "reportage (ルポ)",
+  "decision": "pending",
+  "reason": "a real text chosen for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "bunki-read-n1-kukai-sanskrit",
+  "kind": "original",
+  "title": "訳さずに伝える――空海が唐から持ち帰った梵字",
+  "titleEn": "Passed on untranslated: the Sanskrit letters Kūkai brought back from Tang China",
+  "lane": "essay",
+  "licence": "Bunki original",
+  "gradingSummary": "上級前半 · jread 2.19 · JLPT語彙 71% · 1031字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "religion and Japanese history"
+  ],
+  "style": "history essay (歴史エッセイ)",
+  "decision": "pending",
+  "reason": "written for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "global-voices:2026-07-28-65374",
+  "kind": "gv",
+  "title": "AIにおける言語格差（抄）",
+  "titleEn": "Lost in translation: How AI models impact low-resource language communities (excerpt)",
+  "lane": "essay",
+  "licence": "CC BY 3.0",
+  "gradingSummary": "上級前半 · jread 2.26 · JLPT語彙 69% · 1438字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "technology and money"
+  ],
+  "style": "opinion analysis (論考)",
+  "decision": "pending",
+  "reason": "a real text chosen for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "govonline:202403-entry-5920-column",
+  "kind": "govonline",
+  "title": "偽・誤情報に惑わされてしまうのは心理現象？AIなどの最新技術の影響？",
+  "titleEn": "Is it the mind, or new technology like AI, that leads us to believe false information?",
+  "lane": "primary",
+  "licence": "PDL1.0 (CC BY 4.0 互換)",
+  "gradingSummary": "上級前半 · jread 1.55 · JLPT語彙 79% · 919字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "learning psychology",
+   "current news"
+  ],
+  "style": "government explainer column (政府広報コラム)",
+  "decision": "pending",
+  "reason": "a real text chosen for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3",
+  "kind": "mext",
+  "title": "AI国家戦略最前線",
+  "titleEn": "The front line of Japan's national AI strategy",
+  "lane": "primary",
+  "licence": "PDL1.0 (CC BY 4.0 互換)",
+  "gradingSummary": "上級前半 · jread 1.93 · JLPT語彙 70% · 964字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "technology and money"
+  ],
+  "style": "white paper column (白書コラム)",
+  "decision": "pending",
+  "reason": "a real text chosen for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "aozora:004668-1",
+  "kind": "aozora",
+  "title": "津浪と人間（抄）",
+  "titleEn": "Tsunamis and People (excerpt) — Terada Torahiko",
+  "lane": "literature",
+  "licence": "PD (著作権フラグ なし) · 新字新仮名",
+  "gradingSummary": "上級前半 · jread 2.23 · JLPT語彙 68% · 1861字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "learning psychology"
+  ],
+  "style": "science essay (科学随筆)",
+  "decision": "pending",
+  "reason": "a real text chosen for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "bunki-read-n2-carson-nobel",
+  "kind": "original",
+  "title": "怪物を主人公にした詩人――ノーベル文学賞にアン・カーソン氏",
+  "titleEn": "The poet who made the monster the hero: the literature Nobel goes to Anne Carson",
+  "lane": "news",
+  "licence": "Bunki original",
+  "gradingSummary": "中級後半 · jread 3.23 · JLPT語彙 79% · 789字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "current news"
+  ],
+  "style": "literary news feature (文学ニュース)",
+  "decision": "pending",
+  "reason": "written for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "aozora:053224-1",
+  "kind": "aozora",
+  "title": "指導者としての寺田先生（抄）",
+  "titleEn": "Professor Terada as a Mentor (excerpt) — Nakaya Ukichirō",
+  "lane": "literature",
+  "licence": "PD (著作権フラグ なし) · 新字新仮名",
+  "gradingSummary": "上級前半 · jread 1.79 · JLPT語彙 78% · 1646字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "learning psychology"
+  ],
+  "style": "memoir essay (随筆)",
+  "decision": "pending",
+  "reason": "a real text chosen for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "bunki-read-n2-imf-outlook",
+  "kind": "original",
+  "title": "0.7％の中身――IMFの世界経済見通しを読む",
+  "titleEn": "What is inside 0.7 percent: reading the IMF's World Economic Outlook",
+  "lane": "news",
+  "licence": "Bunki original",
+  "gradingSummary": "中級後半 · jread 2.74 · JLPT語彙 75% · 935字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "current news",
+   "technology and money"
+  ],
+  "style": "economic data explainer (読み解き)",
+  "decision": "pending",
+  "reason": "written for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "aozora:049966-2",
+  "kind": "aozora",
+  "title": "チベット旅行記　語学の研究（抄）",
+  "titleEn": "Three Years in Tibet: Studying the Language (excerpt) — Kawaguchi Ekai",
+  "lane": "literature",
+  "licence": "PD (著作権フラグ なし) · 新字新仮名",
+  "gradingSummary": "上級前半 · jread 2.43 · JLPT語彙 68% · 2144字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "learning psychology"
+  ],
+  "style": "travel memoir (旅行記)",
+  "decision": "pending",
+  "reason": "a real text chosen for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "bunki-read-n2-pillay-peace-nobel",
+  "kind": "original",
+  "title": "平和には正義が要る――ノーベル平和賞にナビ・ピレイ氏",
+  "titleEn": "Peace needs justice: the Peace Prize goes to Navi Pillay",
+  "lane": "news",
+  "licence": "Bunki original",
+  "gradingSummary": "中級後半 · jread 2.57 · JLPT語彙 76% · 951字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "current news"
+  ],
+  "style": "news profile (人物ニュース)",
+  "decision": "pending",
+  "reason": "written for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "bunki-read-n1-suzuki-zen",
+  "kind": "original",
+  "title": "禅を英語で語った人――鈴木大拙と、その本の前書き",
+  "titleEn": "The man who spoke of Zen in English: D. T. Suzuki and the forewords to his books",
+  "lane": "essay",
+  "licence": "Bunki original",
+  "gradingSummary": "上級前半 · jread 2.37 · JLPT語彙 77% · 1035字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "religion and Japanese history"
+  ],
+  "style": "critical profile (評伝)",
+  "decision": "pending",
+  "reason": "written for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "bunki-read-n2-grit-checked",
+  "kind": "original",
+  "title": "「やり抜く力」は確かめられたか――グリット研究のその後",
+  "titleEn": "Did grit hold up? What later studies found",
+  "lane": "essay",
+  "licence": "Bunki original",
+  "gradingSummary": "中級後半 · jread 2.72 · JLPT語彙 77% · 1174字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "learning psychology"
+  ],
+  "style": "research review column (研究を読む)",
+  "decision": "pending",
+  "reason": "written for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "bunki-read-n3-felt-prices",
+  "kind": "original",
+  "title": "物価は何％上がった？――感じた数字と統計の数字",
+  "titleEn": "How much have prices risen? The felt number and the measured one",
+  "lane": "news",
+  "licence": "Bunki original",
+  "gradingSummary": "中級前半 · jread 3.57 · JLPT語彙 82% · 778字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "technology and money",
+   "current news"
+  ],
+  "style": "survey explainer (調査を読む)",
+  "decision": "pending",
+  "reason": "written for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
+ },
+ {
+  "id": "bunki-read-n2-hofstadter-law",
+  "kind": "original",
+  "title": "いつも予想より長くかかる――ホフスタッターの法則と計画錯誤",
+  "titleEn": "It always takes longer than you expect: Hofstadter's law and the planning fallacy",
+  "lane": "essay",
+  "licence": "Bunki original",
+  "gradingSummary": "中級後半 · jread 3.02 · JLPT語彙 82% · 1190字",
+  "addedAt": "2026-10-17",
+  "fields": [
+   "learning psychology"
+  ],
+  "style": "science column (コラム)",
+  "decision": "pending",
+  "reason": "written for John's four fields; reviewed by two model families (Grok, Kimi) with every fix applied (FIXES-batch-3.md, FIXES-batch-4.md); John's own read pending; no learner label, by his ruling of 2026-10-16"
  }
 ]

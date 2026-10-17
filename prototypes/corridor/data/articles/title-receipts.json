@@ -108,6 +108,24 @@
       "url": "https://www.gutenberg.org/ebooks/52594",
       "pageHeadline": "Three Years in Tibet by Ekai Kawaguchi",
       "checkedOn": "2026-10-16"
+    },
+    "global-voices:2026-08-03-65560": {
+      "label": "publisher",
+      "url": "https://globalvoices.org/2025/11/03/women-guards-of-kaziranga-brave-all-challenges-to-protect-wildlife-in-india/",
+      "pageHeadline": "Women guards of Kaziranga brave all challenges to protect wildlife in India",
+      "checkedOn": "2026-10-17"
+    },
+    "global-voices:2026-07-28-65374": {
+      "label": "publisher",
+      "url": "https://globalvoices.org/2026/04/08/lost-in-translation-how-ai-models-impact-low-resource-language-communities/",
+      "pageHeadline": "Lost in translation: How AI models impact low-resource language communities",
+      "checkedOn": "2026-10-17"
+    },
+    "aozora:049966-2": {
+      "label": "established English title, adapted",
+      "url": "https://www.gutenberg.org/ebooks/52594",
+      "pageHeadline": "Three Years in Tibet by Ekai Kawaguchi",
+      "checkedOn": "2026-10-17"
     }
   },
   "translations": {
@@ -1972,6 +1990,312 @@
         "checkedEn": "Where 208 billion switches began: a lesson on the transistor",
         "verdict": "ok",
         "proposedEn": "Where 208 billion switches began: a lesson on the transistor"
+      }
+    ],
+    "bunki-read-n2-icecube-nobel": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Watching the universe through Antarctic ice: the physics Nobel goes to Francis Halzen",
+        "checkedEn": "Watching the universe through Antarctic ice: the physics Nobel goes to Francis Halzen",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Watching the universe through Antarctic ice: the physics Nobel goes to Francis Halzen",
+        "checkedEn": "Watching the universe through Antarctic ice: the physics Nobel goes to Francis Halzen",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n1-kukai-sanskrit": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Passed on untranslated: the Sanskrit letters Kūkai brought back from Tang China",
+        "checkedEn": "Passed on untranslated: the Sanskrit letters Kūkai brought back from Tang China",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Passed on untranslated: the Sanskrit letters Kūkai brought back from Tang China",
+        "checkedEn": "Passed on untranslated: the Sanskrit letters Kūkai brought back from Tang China",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n3-rule-of-72": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "When does money double? Testing the rule of 72 on a stock index",
+        "checkedEn": "When does money double? Testing the rule of 72 on a stock index",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "When does money double? Testing the rule of 72 on a stock index",
+        "checkedEn": "When does money double? Testing the rule of 72 on a stock index",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n2-pillay-peace-nobel": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Peace needs justice: the Peace Prize goes to Navi Pillay",
+        "checkedEn": "Peace needs justice: the Peace Prize goes to Navi Pillay",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Peace needs justice: the Peace Prize goes to Navi Pillay",
+        "checkedEn": "Peace needs justice: the Peace Prize goes to Navi Pillay",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "aozora:053224-1": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "issue",
+        "proposedEn": "Professor Terada as a Mentor (excerpt) — Ukichirō Nakaya",
+        "checkedEn": "Professor Terada as a Mentor (excerpt) — Nakaya Ukichirō",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Professor Terada as a Mentor (excerpt) — Nakaya Ukichirō",
+        "checkedEn": "Professor Terada as a Mentor (excerpt) — Nakaya Ukichirō",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n2-grit-checked": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Did grit hold up? What later studies found",
+        "checkedEn": "Did grit hold up? What later studies found",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Did grit hold up? What later studies found",
+        "checkedEn": "Did grit hold up? What later studies found",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n2-imf-outlook": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "What is inside 0.7 percent: reading the IMF's World Economic Outlook",
+        "checkedEn": "What is inside 0.7 percent: reading the IMF's World Economic Outlook",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "What is inside 0.7 percent: reading the IMF's World Economic Outlook",
+        "checkedEn": "What is inside 0.7 percent: reading the IMF's World Economic Outlook",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n1-suzuki-zen": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "The man who spoke of Zen in English: D. T. Suzuki and the forewords to his books",
+        "checkedEn": "The man who spoke of Zen in English: D. T. Suzuki and the forewords to his books",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "The man who spoke of Zen in English: D. T. Suzuki and the forewords to his books",
+        "checkedEn": "The man who spoke of Zen in English: D. T. Suzuki and the forewords to his books",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "The front line of Japan's national AI strategy",
+        "checkedEn": "The front line of Japan's national AI strategy",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "The front line of Japan's national AI strategy",
+        "checkedEn": "The front line of Japan's national AI strategy",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n2-japan-us-chip-fab": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Japanese money for a chip plant in New York: 'mature nodes' and '2 nanometres'",
+        "checkedEn": "Japanese money for a chip plant in New York: 'mature nodes' and '2 nanometres'",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Japanese money for a chip plant in New York: 'mature nodes' and '2 nanometres'",
+        "checkedEn": "Japanese money for a chip plant in New York: 'mature nodes' and '2 nanometres'",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "bunki-read-n2-hofstadter-law": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "It always takes longer than you expect: Hofstadter's law and the planning fallacy",
+        "checkedEn": "It always takes longer than you expect: Hofstadter's law and the planning fallacy",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "It always takes longer than you expect: Hofstadter's law and the planning fallacy",
+        "checkedEn": "It always takes longer than you expect: Hofstadter's law and the planning fallacy",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "bunki-read-n2-shoten-ganesha": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Radishes for an elephant god: Ganesha and Japan's Shōten",
+        "checkedEn": "Radishes for an elephant god: Ganesha and Japan's Shōten",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Radishes for an elephant god: Ganesha and Japan's Shōten",
+        "checkedEn": "Radishes for an elephant god: Ganesha and Japan's Shōten",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "aozora:004668-1": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Tsunamis and People (excerpt) — Terada Torahiko",
+        "checkedEn": "Tsunamis and People (excerpt) — Terada Torahiko",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Tsunamis and People (excerpt) — Terada Torahiko",
+        "checkedEn": "Tsunamis and People (excerpt) — Terada Torahiko",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "bunki-read-n3-felt-prices": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "How much have prices risen? The felt number and the measured one",
+        "checkedEn": "How much have prices risen? The felt number and the measured one",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "How much have prices risen? The felt number and the measured one",
+        "checkedEn": "How much have prices risen? The felt number and the measured one",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "govonline:202403-entry-5920-column": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Is it the mind, or new technology like AI, that leads us to believe false information?",
+        "checkedEn": "Is it the mind, or new technology like AI, that leads us to believe false information?",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Is it the mind, or new technology like AI, that leads us to believe false information?",
+        "checkedEn": "Is it the mind, or new technology like AI, that leads us to believe false information?",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "bunki-read-n2-carson-nobel": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "The poet who made the monster the hero: the literature Nobel goes to Anne Carson",
+        "checkedEn": "The poet who made the monster the hero: the literature Nobel goes to Anne Carson",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "The poet who made the monster the hero: the literature Nobel goes to Anne Carson",
+        "checkedEn": "The poet who made the monster the hero: the literature Nobel goes to Anne Carson",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "aozora:058059-1": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "On Education in the Zen Monastery (excerpt) — Suzuki Daisetsu",
+        "checkedEn": "On Education in the Zen Monastery (excerpt) — Suzuki Daisetsu",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "On Education in the Zen Monastery (excerpt) — Suzuki Daisetsu",
+        "checkedEn": "On Education in the Zen Monastery (excerpt) — Suzuki Daisetsu",
+        "receipt": "review-kimi/title-checks-batch-4.json"
       }
     ]
   },
