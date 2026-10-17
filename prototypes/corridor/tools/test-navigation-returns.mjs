@@ -22,7 +22,7 @@ function app() {
     document: { activeElement: null }, referenceLibrary: null,
     learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
     activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, readerWordMenu: null, personalHost: null,
-    roomTransitionUpdating: false, activeRoomTransition: null,
+    roomTransitionUpdating: false, activeRoomTransition: null, pageEpoch: 0,
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
     restoreDialogInvoker() {}, stopReadAloud() {}, clearTimeout() {},
     requestAnimationFrame() {}, passage: () => null,
@@ -108,7 +108,9 @@ test('abandoning a pending collection retires its destination before another lib
 test('same-visit retry and a reversible nested detour preserve the pending collection', () => {
   const { context: c } = app();
   c.openReferenceCollection('jlpt:N1');
+  const beforeRender = c.pageEpoch;
   c.render(); c.render();
+  assert.equal(c.pageEpoch, beforeRender + 2, 'Every actual room render invalidates retained page generations');
   assert.equal(c.pendingReferenceCollection, 'jlpt:N1');
   c.keepNavigationReturn('search'); c.S.view = 'search'; c.render();
   assert.equal(c.pendingReferenceCollection, null);
