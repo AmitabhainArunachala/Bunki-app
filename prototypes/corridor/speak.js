@@ -287,9 +287,12 @@ export function createSpeakRoom(host) {
       silentUrl ||= URL.createObjectURL(new Blob([core.wavFromInt16(new Int16Array(1200), 24000)], { type: 'audio/wav' }));
       a.src = silentUrl;
       st.playing = { kind: 'silent' };
+      // even the silence is the app's one sound while it lasts
+      host.ownAudio(a);
       const played = a.play();
       st.unlocked = true;
-      played?.catch?.(() => { st.unlocked = false; });
+      // her line replacing the silence aborts its play, and the element stays blessed; only a refusal un-blesses it
+      played?.catch?.((error) => { if (error?.name === 'NotAllowedError') st.unlocked = false; });
     }
     try {
       // a context the system interrupted is replaced here, inside the tap, where a new one may start
