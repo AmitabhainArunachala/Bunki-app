@@ -6,15 +6,19 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
-import { runtimeLock } from './voice-lock.mjs';
+import { runtimeLock, voiceForRole } from './voice-lock.mjs';
 
 const source = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const compact = text => text.replace(/\s+/gu, '');
-export function buildListeningCues(root = source, lock = runtimeLock()) {
+/** The listening lane's sentences, in shelf order: for each passage the sentence index has, either
+ * its exact token ranges and text sentences, or the reason it cannot be cued. This is the one
+ * source of the lane's sentence numbering; the render job places its example clips from it, so
+ * clip i and cue i can never name two different sentences. */
+export function listeningSentences(root = source) {
   const read = name => JSON.parse(readFileSync(resolve(root, name)));
   const recordings = read('audio/manifest.json'), articles = read('data/articles/index.json').articles;
-  const passages = {}, excluded = [];
+  const rows = [];
   for (const row of articles) {
     const recording = recordings.sentences?.[row.id];
     if (!recording) continue;
@@ -29,16 +33,25 @@ export function buildListeningCues(root = source, lock = runtimeLock()) {
     if (!surfaces || !sentences.length || recording.have.length !== sentences.length ||
         recording.have.some((index, position) => index !== position) || ranges.length !== sentences.length ||
         ranges.some((range, index) => compact(surfaces.slice(range.start, range.end).join('')) !== compact(sentences[index]))) {
-      excluded.push({ sourceId: row.id, reason: 'sentence-boundary-or-count-mismatch',
-        recordings: recording.have.length, textSentences: sentences.length, tokenSentences: ranges.length });
+      rows.push({ row, eligible: false, excluded: { sourceId: row.id, reason: 'sentence-boundary-or-count-mismatch',
+        recordings: recording.have.length, textSentences: sentences.length, tokenSentences: ranges.length } });
       continue;
     }
+    rows.push({ row, eligible: true, surfaces, ranges, sentences });
+  }
+  return rows;
+}
+export function buildListeningCues(root = source, lock = runtimeLock()) {
+  const passages = {}, excluded = [];
+  for (const { row, eligible, excluded: reason, surfaces, ranges } of listeningSentences(root)) {
+    if (!eligible) { excluded.push(reason); continue; }
     // V (2026-10-17): the cue's voice comes from the lock, never a literal. Before V this builder
     // emitted voice:'ami' while the runtime's validator admitted only the locked roster, so every
     // cue it produced was unplayable BY CONSTRUCTION — generator and validator green and flatly
     // contradicting each other. A sentence now yields a cue only when the approved clip exists on
     // disk; until the render runs, these passages are honestly excluded instead of silently dead.
-    const voice = lock.main;
+    // the lane is the example role, the role the render job places these clips under
+    const voice = voiceForRole('example', lock);
     const clipPath = (i) => `audio/s/${voice}/${row.id.replaceAll(':', '_')}-${String(i).padStart(3, '0')}.m4a`;
     const missing = ranges.map((_, i) => clipPath(i)).filter((path) => !existsSync(resolve(root, path)));
     if (missing.length) {
@@ -50,7 +63,7 @@ export function buildListeningCues(root = source, lock = runtimeLock()) {
       const bytes = readFileSync(resolve(root, path));
       return { ...range, quote: surfaces.slice(range.start, range.end).join(''), cue: {
         version: 1, path, sha256: hash(bytes), bytes: bytes.length, sentenceIndex, voice,
-        speakerRole: 'narrator', model: lock.model,
+        speakerRole: 'example', model: lock.model,
         alignment: 'sentence-order', transcriptStatus: 'unreviewed',
       } };
     }) };

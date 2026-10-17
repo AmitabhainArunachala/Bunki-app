@@ -13,18 +13,31 @@
  *   4. the shipped manifests agree with the clips actually on disk, lane by lane;
  *   5. every clip a manifest names exists, with the bytes and digest it claims;
  *   6. every clip's voice is admissible for its own declared role;
- *   7. the listening cues the generator emits are exactly the cues the runtime would admit.
+ *   7. the listening cues the generator emits are admitted by BOTH validators a cue meets on its
+ *      way to the ear, each executed rather than mirrored: the runtime's own approvedSentenceCue,
+ *      evaluated from corridor.js, and the domain contract's parseSourceListeningCue, built the
+ *      way the site builds it. The shipped catalog holds no cue until the render, so the same
+ *      comparison also runs on a staged copy where every clip the render will place exists:
+ *      the check bites today, before any spend, and the validators must still refuse a cue in
+ *      the second voice, in a withdrawn voice, from another model and from another voice's folder.
+ *
+ * `--require-complete` adds coverage (PREP R3): red while any clip the plan owes is missing. It
+ * is the after-render gate; the battery runs without it, because before the render that red is
+ * the known state, not a regression.
  *
  * Exit 0 green, 1 red. Receipt on stdout.
  */
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, statSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import vm from 'node:vm';
 import { readVoiceLock, runtimeLock, voiceForRole } from './voice-lock.mjs';
 import { currentBlock, lockBlock } from './sync-voice-lock.mjs';
-import { buildListeningCues } from './build-listening-cues.mjs';
+import { buildListeningCues, listeningSentences } from './build-listening-cues.mjs';
 import { checkManifests, NARRATION_FILE, WORDS_FILE } from './build-voice-manifest.mjs';
+import { buildCorridorModules, LEARNING_MODULE_PATH } from '../../../scripts/build-reading-module.mjs';
 
 const corridor = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (file) => readFileSync(resolve(corridor, file), 'utf8');
@@ -37,7 +50,50 @@ const MODEL_ALLOWED = /^(?:audio\/voice-lock\.json|audio\/[a-z-]+\.json)$/u;
 const SOURCE_SCOPE = ['corridor.js', 'index.html'];
 const MODEL_PATTERN = /gemini-[0-9][A-Za-z0-9.-]*tts[A-Za-z0-9.-]*/gu;
 
-export function checkLock() {
+/** The runtime's cue rule, executed from corridor.js itself: the lock mirror, the roster, the role
+ * law and approvedSentenceCue, evaluated together in a bare context. A text mirror of the rule is
+ * what let the old verifier agree with a builder the app refused. */
+export function runtimeCueRule(source = read('corridor.js')) {
+  const slice = (start, end) => {
+    const from = source.indexOf(start), to = source.indexOf(end, from);
+    if (from < 0 || to < 0) throw new Error(`corridor.js boundary moved: ${start}`);
+    return source.slice(from, to);
+  };
+  return vm.runInNewContext(`${slice('/* === VOICE_LOCK', 'const LISTEN_RATES =')}
+${slice('const approvedSentenceCue', 'function currentSentenceListeningCue(')}
+approvedSentenceCue;`, {});
+}
+
+/** The domain contract's cue parser, compiled exactly as the site build compiles it. */
+export async function domainCueParser() {
+  const repo = resolve(corridor, '../..');
+  const learning = buildCorridorModules(repo).find((module) => module.path === LEARNING_MODULE_PATH);
+  const domain = await import(`data:text/javascript;base64,${Buffer.from(learning.bytes).toString('base64')}`);
+  return (cue, sourceId) => domain.parseSourceListeningCue(cue, { sourceId, tokenSpan: {} });
+}
+
+/** A copy of the corridor's inputs in which every clip the listening lane will own exists as a
+ * placeholder, so the generator emits every cue the render will make possible. */
+function stagedListeningRoot(runtime) {
+  const dir = mkdtempSync(join(tmpdir(), 'voice-lock-cues-'));
+  mkdirSync(join(dir, 'audio'), { recursive: true });
+  symlinkSync(resolve(corridor, 'data'), join(dir, 'data'));
+  copyFileSync(resolve(corridor, 'audio/manifest.json'), join(dir, 'audio/manifest.json'));
+  const voice = voiceForRole('example', runtime);
+  let placed = 0;
+  for (const passage of listeningSentences(corridor)) {
+    if (!passage.eligible) continue;
+    passage.ranges.forEach((_, index) => {
+      const file = join(dir, `audio/s/${voice}/${passage.row.id.replaceAll(':', '_')}-${String(index).padStart(3, '0')}.m4a`);
+      mkdirSync(dirname(file), { recursive: true });
+      writeFileSync(file, `placeholder ${passage.row.id} ${index}`);
+      placed += 1;
+    });
+  }
+  return { dir, placed };
+}
+
+export async function checkLock({ requireComplete = false } = {}) {
   const problems = [];
   const lock = readVoiceLock();                       // throws on a malformed lock: fatal by design
   const runtime = runtimeLock(lock);
@@ -98,38 +154,65 @@ export function checkLock() {
     if (clip.sha256 && sha256(bytes) !== clip.sha256) problems.push(`${where}: digest changed`);
   }
 
-  // 7 — the generator and the validator, compared at last. Every cue the builder emits must be
-  // one the runtime would admit, by the runtime's own rule, read from its source.
-  const runtimeRule = (() => {
-    const source = read('corridor.js');
-    const at = source.indexOf('const approvedSentenceCue');
-    return source.slice(at, source.indexOf('\n', source.indexOf('cue.path.startsWith', at)));
-  })();
-  const admits = (cue) => Object.hasOwn(runtime.voices, cue.voice)
-    && typeof cue.path === 'string' && cue.path.startsWith(`audio/s/${cue.voice}/`);
-  if (!runtimeRule.includes('Object.hasOwn(NARRATION_VOICES, cue.voice)') || !runtimeRule.includes('audio/s/'))
-    problems.push('the runtime cue rule moved; this verifier no longer mirrors it');
-  const built = buildListeningCues(corridor, runtime);
-  let cueCount = 0;
-  for (const [id, passage] of Object.entries(built.passages || {}))
-    for (const sentence of passage.sentences || []) {
-      cueCount += 1;
-      if (!admits(sentence.cue)) problems.push(`the builder emits a cue the runtime refuses: ${id} #${sentence.cue.sentenceIndex}`);
-      if (sentence.cue.voice !== voiceForRole(sentence.cue.speakerRole || 'example', runtime))
-        problems.push(`cue ${id} #${sentence.cue.sentenceIndex}: voice disagrees with its role`);
+  // 7 — the generator against both validators, executed. Every cue the builder emits must be
+  // admitted by the runtime's rule and by the domain contract; and the two must still refuse the
+  // cues the lock forbids, or a green here would prove nothing.
+  const admits = runtimeCueRule();
+  const parses = await domainCueParser();
+  const judge = (catalog, where) => {
+    let count = 0;
+    for (const [id, passage] of Object.entries(catalog.passages || {}))
+      for (const sentence of passage.sentences || []) {
+        count += 1;
+        const cue = sentence.cue;
+        if (!admits(cue)) problems.push(`${where}: the runtime refuses a cue the builder emits: ${id} #${cue.sentenceIndex}`);
+        try { parses(cue, id); } catch (error) {
+          problems.push(`${where}: the domain contract refuses a cue the builder emits: ${id} #${cue.sentenceIndex} (${error.message.slice(0, 80)})`);
+        }
+        if (cue.voice !== voiceForRole(cue.speakerRole || 'example', runtime))
+          problems.push(`${where}: cue ${id} #${cue.sentenceIndex}: voice disagrees with its role`);
+      }
+    return count;
+  };
+  const cueCount = judge(buildListeningCues(corridor, runtime), 'shipped');
+  const staged = stagedListeningRoot(runtime);
+  let stagedCues = 0;
+  try {
+    const catalog = buildListeningCues(staged.dir, runtime);
+    stagedCues = judge(catalog, 'staged');
+    if (stagedCues !== staged.placed) problems.push(`staged: ${staged.placed} clips placed but ${stagedCues} cues emitted`);
+    if (!stagedCues) problems.push('staged: the builder emitted no cue, so the comparison proved nothing');
+    const [id, passage] = Object.entries(catalog.passages)[0] || [];
+    const cue = passage?.sentences?.[0]?.cue;
+    if (cue) {
+      const moved = (voice) => ({ ...cue, voice, path: cue.path.replace(`audio/s/${cue.voice}/`, `audio/s/${voice}/`) });
+      for (const [name, forbidden] of [
+        ['the second voice on a single-speaker sentence', moved(runtime.second)],
+        ['a withdrawn voice', moved((lock.rejected || [])[0] || 'ami')],
+        ['another model', { ...cue, model: `${runtime.model}-other` }],
+        ['no model at all', (({ model, ...rest }) => rest)(cue)],
+      ]) if (admits(forbidden)) problems.push(`control: the runtime admits ${name}`);
+      let refused = false;
+      try { parses({ ...cue, path: cue.path.replace(`audio/s/${cue.voice}/`, 'audio/s/another-voice/') }, id); } catch { refused = true; }
+      if (!refused) problems.push('control: the domain contract admits a clip in another voice\u2019s folder');
     }
+  } finally { rmSync(staged.dir, { recursive: true, force: true }); }
+
+  // coverage (PREP R3), on request: every clip the plan owes must exist
+  if (requireComplete && lanes.clipsOwed > 0) problems.push(`coverage: ${lanes.clipsOwed} clip(s) the plan owes are not on disk`);
 
   return {
     model: runtime.model, main: runtime.main, second: runtime.second,
     approvedWords: lanes.approvedWords, narratedArticles: lanes.narratedArticles,
-    clipsChecked: clips.length, cuesChecked: cueCount, clipsOwed: lanes.clipsOwed,
+    clipsChecked: clips.length, cuesChecked: cueCount, stagedCuesChecked: stagedCues, clipsOwed: lanes.clipsOwed,
+    coverageRequired: requireComplete,
     problems,
   };
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   let report;
-  try { report = checkLock(); }
+  try { report = await checkLock({ requireComplete: process.argv.includes('--require-complete') }); }
   catch (error) { console.error(JSON.stringify({ verdict: 'red', fatal: String(error.message) }, null, 2)); process.exit(1); }
   console.log(JSON.stringify({ verdict: report.problems.length ? 'red' : 'green', ...report }, null, 2));
   process.exit(report.problems.length ? 1 : 0);

@@ -21858,7 +21858,12 @@ function ensureSentenceListeningCatalog() {
     });
   return sentenceListeningCatalogWait;
 }
+/* A listening cue plays only as the lock allows (V, 2026-10-17): a roster voice, and exactly the
+ * voice its own role resolves to (a sentence is single-speaker, so the second voice is never its
+ * fallback), from the locked model, from that voice's own folder. A roster check alone admitted a
+ * second-voice cue on a single-speaker sentence, and a cue from any model. */
 const approvedSentenceCue = cue => !!cue && Object.hasOwn(NARRATION_VOICES, cue.voice) &&
+  cue.voice === voiceForRole(cue.speakerRole || 'example') && cue.model === VOICE_LOCK.model &&
   typeof cue.path === 'string' && cue.path.startsWith(`audio/s/${cue.voice}/`);
 function currentSentenceListeningCue(context) {
   const cue = sentencePracticeModule.selectBundledListeningCue(context,
