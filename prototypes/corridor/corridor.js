@@ -8695,6 +8695,10 @@ function jaGroupSegments(segments) {
     }
     // a mark that is not a word (――) clings to the word before it
     else if (!JA_OPENS_WORD.test(seg)) join = true;
+    // a compound verb: a verb's stem (貼り, 取り, 書き, 申し) and the verb after it are one word (貼り付けた, 取り消す);
+    // a particle (に, で, て) or an adjective's い is no stem, so 日本に｜来る and 高い｜山 still part
+    else if (JA_KANJI.test(b) && /^[\p{Script=Han}々]{1,2}[きぎしじちひびみりえけげせぜべめれ]$/u.test(last)
+      && [...last].length + [.../^[\p{Script=Han}々]*/u.exec(seg)[0]].length <= 5) join = true;
     else join = (
       // a lone kanji is an unknown name or compound cut too fine: it joins its kanji neighbours, and the katakana word
       // before it (スポーツ|庁, ノーベル|賞); a run of kanji up to six long is one word too, a name or a compound the
