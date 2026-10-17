@@ -1060,6 +1060,70 @@
       "readings": ["りょうこ"],
       "kind": "term",
       "note": "両個 (both) reads りょうこ; UniDic gives the mahjong word りゃんこ (Bunki batch-4r, aozora:058059-1)"
+    },
+    {
+      "word": "9月",
+      "reading": "くがつ",
+      "surfaces": ["9", "月"],
+      "readings": [null, "がつ"],
+      "kind": "date",
+      "note": "9月 is the month, read がつ after its number; UniDic read 月 つき (Moon) here (Grok 0315, R3)"
+    },
+    {
+      "word": "7月",
+      "reading": "しちがつ",
+      "surfaces": ["7", "月"],
+      "readings": [null, "がつ"],
+      "kind": "date",
+      "note": "7月 is the month, read がつ after its number; UniDic read 月 つき (Moon) here (Grok 0315, R3)"
+    },
+    {
+      "word": "７月",
+      "reading": "しちがつ",
+      "surfaces": ["７", "月"],
+      "readings": [null, "がつ"],
+      "kind": "date",
+      "note": "７月 is the month, read がつ after its number; UniDic read 月 つき (Moon) here (Grok 0315, R3)"
+    },
+    {
+      "word": "3月",
+      "reading": "さんがつ",
+      "surfaces": ["3", "月"],
+      "readings": [null, "がつ"],
+      "kind": "date",
+      "note": "3月 is the month, read がつ after its number; UniDic read 月 つき (Moon) here (Grok 0315, R3)"
+    },
+    {
+      "word": "10月",
+      "reading": "じゅうがつ",
+      "surfaces": ["10", "月"],
+      "readings": [null, "がつ"],
+      "kind": "date",
+      "note": "10月 is the month, read がつ after its number; UniDic read 月 つき (Moon) here (Grok 0315, R3)"
+    },
+    {
+      "word": "四月",
+      "reading": "しがつ",
+      "surfaces": ["四", "月"],
+      "readings": ["し", "がつ"],
+      "kind": "date",
+      "note": "四月 (April) reads しがつ; UniDic read it よん つき (ごん狐: 四月のいい晩) (Grok 0315, R3)"
+    },
+    {
+      "word": "60分",
+      "reading": "ろくじゅっぷん",
+      "surfaces": ["時間", "60", "分"],
+      "readings": [null, null, "ぷん"],
+      "kind": "time",
+      "note": "制作時間60分 (sixty minutes) reads ぷん; UniDic read 分 ぶん (part, share). Bound to 時間 so 60分の1 (a fraction, ぶん) stays UniDic's (R3, mext:b_menu-houdou-mext_01683)"
+    },
+    {
+      "word": "59分",
+      "reading": "ごじゅうきゅうふん",
+      "surfaces": ["59", "分", "、"],
+      "readings": [null, "ふん", null],
+      "kind": "time",
+      "note": "迎えた59分、 (the 59th minute of the match) reads ふん; UniDic read 分 ぶん (part, share). Bound to the comma so 59分の1 (a fraction, ぶん) stays UniDic's (R3, wikinews:44384)"
     }
   ],
   "accepts": [

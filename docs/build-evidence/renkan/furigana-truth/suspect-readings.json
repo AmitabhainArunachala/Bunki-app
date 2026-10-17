@@ -8,11 +8,21 @@
   "tokens": 95731
  },
  "statusCounts": {
-  "lexicon-fixed": 545,
+  "lexicon-fixed": 662,
   "accepted": 30
  },
  "openCount": 0,
  "rows": [
+  {
+   "article": "wikinews:1403",
+   "token": 3,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "2005年7月14日、南アフリカ共和",
+   "note": "7月"
+  },
   {
    "article": "wikinews:1403",
    "token": 102,
@@ -54,6 +64,86 @@
    "note": "日本語"
   },
   {
+   "article": "wikinews:1403",
+   "token": 695,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "世界遺産会議は7月17日まで続き、",
+   "note": "7月"
+  },
+  {
+   "article": "wikinews:12024",
+   "token": 31,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "キロの区間が3月15日から部分開業",
+   "note": "3月"
+  },
+  {
+   "article": "wikinews:20090",
+   "token": 410,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "判決（2000年3月）や、遺族に",
+   "note": "3月"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 12,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "財団理事会が3月30日に全言語",
+   "note": "3月"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 107,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "た。2025年7月、ウィキメディア財団の",
+   "note": "7月"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 144,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "、理事会は3月、運営中であっ",
+   "note": "3月"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 238,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "後、2004年10月にデモサイトが公開",
+   "note": "10月"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 305,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "た。2004年10月26日にはコンテンツ",
+   "note": "10月"
+  },
+  {
    "article": "wikinews:45227",
    "token": 426,
    "rule": "override-site",
@@ -72,6 +162,16 @@
    "status": "lexicon-fixed",
    "context": "作成され、日本語版は同年7月",
    "note": "日本語"
+  },
+  {
+   "article": "wikinews:45227",
+   "token": 432,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "語版は同年7月14日に開設さ",
+   "note": "7月"
   },
   {
    "article": "wikinews:45227",
@@ -102,6 +202,26 @@
    "status": "lexicon-fixed",
    "context": "ました。ここは都から遠い、国境で",
    "note": "都"
+  },
+  {
+   "article": "aozora:000628",
+   "token": 2174,
+   "rule": "override-site",
+   "surface": "四",
+   "reading": "し",
+   "status": "lexicon-fixed",
+   "context": "ていきました。四月のいい晩でし",
+   "note": "四月"
+  },
+  {
+   "article": "aozora:000628",
+   "token": 2175,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "いきました。四月のいい晩でした",
+   "note": "四月"
   },
   {
    "article": "bunki-graded-n5-morning",
@@ -3394,6 +3514,36 @@
    "note": "藤田譲瑠チマ"
   },
   {
+   "article": "wikinews:45208",
+   "token": 5,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "南海電気鉄道は3月30日、子会社",
+   "note": "3月"
+  },
+  {
+   "article": "wikinews:45208",
+   "token": 105,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "ては2028年3月末を目処とし",
+   "note": "3月"
+  },
+  {
+   "article": "wikinews:45095",
+   "token": 62,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "愛さんが、3月27日に配信予定",
+   "note": "3月"
+  },
+  {
    "article": "wikinews:45095",
    "token": 149,
    "rule": "override-site",
@@ -3474,6 +3624,26 @@
    "note": "神谷宗幣"
   },
   {
+   "article": "wikinews:44384",
+   "token": 105,
+   "rule": "override-site",
+   "surface": "分",
+   "reading": "ふん",
+   "status": "lexicon-fixed",
+   "context": "に。迎えた59分、ゴール前での",
+   "note": "59分"
+  },
+  {
+   "article": "wikinews:45089",
+   "token": 155,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "任期は2027年3月末まで。小川新",
+   "note": "3月"
+  },
+  {
    "article": "wikinews:45089",
    "token": 93,
    "rule": "miyako",
@@ -3485,6 +3655,16 @@
   },
   {
    "article": "env:press-press_05585",
+   "token": 99,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "、令和８年10月３日（土）",
+   "note": "10月"
+  },
+  {
+   "article": "env:press-press_05585",
    "token": 434,
    "rule": "miyako",
    "surface": "都",
@@ -3492,6 +3672,16 @@
    "status": "accepted",
    "context": "、申請により、都道府県知事・",
    "note": "都道府県"
+  },
+  {
+   "article": "env:press-press_04591",
+   "token": 319,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "参加し、同年10月に共同で試料採取",
+   "note": "10月"
   },
   {
    "article": "env:press-press_05584",
@@ -3515,6 +3705,26 @@
   },
   {
    "article": "env:press-press_05582",
+   "token": 148,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "：令和８年10月６日（火）",
+   "note": "10月"
+  },
+  {
+   "article": "env:press-press_05582",
+   "token": 250,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "、令和８年10月５日（月）",
+   "note": "10月"
+  },
+  {
+   "article": "env:press-press_05582",
    "token": 179,
    "rule": "miyako",
    "surface": "都",
@@ -3532,6 +3742,26 @@
    "status": "accepted",
    "context": "第１項に基づき都道府県・保健",
    "note": "都道府県"
+  },
+  {
+   "article": "mhlw:stf-newpage_76233",
+   "token": 119,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "（月）から10月４日（日）",
+   "note": "10月"
+  },
+  {
+   "article": "mhlw:stf-newpage_76233",
+   "token": 184,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "（別紙１）10月２日（金）",
+   "note": "10月"
   },
   {
    "article": "mhlw:stf-newpage_76233",
@@ -3575,6 +3805,16 @@
   },
   {
    "article": "mhlw:stf-newpage_76330",
+   "token": 122,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "、令和７年10月に各都道府",
+   "note": "10月"
+  },
+  {
+   "article": "mhlw:stf-newpage_76330",
    "token": 125,
    "rule": "miyako",
    "surface": "都",
@@ -3582,6 +3822,66 @@
    "status": "accepted",
    "context": "年10月に各都道府県に対し",
    "note": "都道府県"
+  },
+  {
+   "article": "govonline:article-202609-radio-3741",
+   "token": 20,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "言語です。」9月23日は「手話",
+   "note": "9月"
+  },
+  {
+   "article": "kantei:jp-105-discourse-20260923message",
+   "token": 112,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "には、今年７月、世界遺産に登録",
+   "note": "７月"
+  },
+  {
+   "article": "kantei:jp-105-discourse-20260923message",
+   "token": 384,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "中には、７月に地震に見舞われ",
+   "note": "７月"
+  },
+  {
+   "article": "mext:b_menu-houdou-mext_01683",
+   "token": 195,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "期間令和8年10月24日（土曜日",
+   "note": "10月"
+  },
+  {
+   "article": "mext:b_menu-houdou-mext_01683",
+   "token": 211,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "～16時・10月25日（日曜日",
+   "note": "10月"
+  },
+  {
+   "article": "mext:b_menu-houdou-mext_01683",
+   "token": 409,
+   "rule": "override-site",
+   "surface": "分",
+   "reading": "ぷん",
+   "status": "lexicon-fixed",
+   "context": "て、制作時間60分の間に、テーマ",
+   "note": "60分"
   },
   {
    "article": "mext:b_menu-houdou-mext_01683",
@@ -3592,6 +3892,66 @@
    "status": "accepted",
    "context": "場として、都道府県教育委員",
    "note": "都道府県"
+  },
+  {
+   "article": "env:press-press_05614",
+   "token": 128,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "、令和８年７月14日（火）",
+   "note": "７月"
+  },
+  {
+   "article": "env:press-press_05616",
+   "token": 11,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "＞１．　10月１日は「浄化槽",
+   "note": "10月"
+  },
+  {
+   "article": "env:press-press_05616",
+   "token": 46,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "、昭和60年10月１日に全面施行さ",
+   "note": "10月"
+  },
+  {
+   "article": "env:press-press_05616",
+   "token": 224,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "しました。10月１日という日付は",
+   "note": "10月"
+  },
+  {
+   "article": "env:press-press_05616",
+   "token": 252,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "、昭和60年10月１日に全面施行さ",
+   "note": "10月"
+  },
+  {
+   "article": "env:press-press_05616",
+   "token": 304,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "日時令和8年10月１日（木）14",
+   "note": "10月"
   },
   {
    "article": "env:press-press_05616",
@@ -3624,6 +3984,36 @@
    "note": "東京都"
   },
   {
+   "article": "jawiki:5238864-s63",
+   "token": 5,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "気象庁は、9月10日3時頃",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki:5238864-s63",
+   "token": 313,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "上1位・9月の月間1位など",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki:5294446",
+   "token": 49,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "令和8年）9月17日に成立し",
+   "note": "9月"
+  },
+  {
    "article": "jawiki:5294446",
    "token": 75,
    "rule": "override-site",
@@ -3654,6 +4044,86 @@
    "note": "自維連立"
   },
   {
+   "article": "jawiki:5294446",
+   "token": 155,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "間は8〜9月はLED工事中で",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki:5294446",
+   "token": 175,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "行われた。9月頃は自民党役員",
+   "note": "9月"
+  },
+  {
+   "article": "env:press-press_05591",
+   "token": 393,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "　　程：10月下旬から12月中旬",
+   "note": "10月"
+  },
+  {
+   "article": "env:press-press_05591",
+   "token": 580,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "　　時：10月28日（水）",
+   "note": "10月"
+  },
+  {
+   "article": "env:press-press_05591",
+   "token": 798,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "申込み申込期日：10月4日（日）",
+   "note": "10月"
+  },
+  {
+   "article": "mhlw:stf-newpage_76340",
+   "token": 47,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "促進するため、10月４日（日）",
+   "note": "10月"
+  },
+  {
+   "article": "mhlw:stf-newpage_76340",
+   "token": 893,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "【その他】10月は、医薬品を",
+   "note": "10月"
+  },
+  {
+   "article": "mhlw:stf-newpage_76340",
+   "token": 957,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "の週間」（10月16日から23日",
+   "note": "10月"
+  },
+  {
    "article": "mhlw:stf-newpage_76340",
    "token": 250,
    "rule": "miyako",
@@ -3662,6 +4132,186 @@
    "status": "accepted",
    "context": "師会をはじめ、都道府県や地方",
    "note": "都道府県"
+  },
+  {
+   "article": "jawiki-news:2026-09-14",
+   "token": 1,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "9月19日　（スポーツ",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki-news:2026-09-14",
+   "token": 22,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "スタジアムで開幕。9月18日　（経済",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki-news:2026-09-14",
+   "token": 54,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "を決めた。9月17日　（政治",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki-news:2026-09-14",
+   "token": 89,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "」が結党。9月17日　（政治",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki-news:2026-09-14",
+   "token": 109,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "発足した。9月17日　（スポーツ",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki-news:2026-09-14",
+   "token": 148,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "パ・リーグ3連覇。9月17日　（政治",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki-news:2026-09-14",
+   "token": 190,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "は辞意表明。9月16日　（政治",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki-news:2026-09-14",
+   "token": 210,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "発足した。9月16日　（政治",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki-news:2026-09-14",
+   "token": 253,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "会」に。9月14日　（経済",
+   "note": "9月"
+  },
+  {
+   "article": "sports:sports-b_menu-houdou-jsa_00246",
+   "token": 176,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "日時令和8年9月30日（水曜日",
+   "note": "9月"
+  },
+  {
+   "article": "sports:sports-b_menu-houdou-jsa_00246",
+   "token": 274,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "交換令和8年10月1日（木曜日",
+   "note": "10月"
+  },
+  {
+   "article": "sports:sports-b_menu-houdou-jsa_00246",
+   "token": 530,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "、令和8年9月29日（火曜日",
+   "note": "9月"
+  },
+  {
+   "article": "sports:sports-b_menu-houdou-jsa_00246",
+   "token": 597,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "：令和8年9月30日(水曜日",
+   "note": "9月"
+  },
+  {
+   "article": "sports:sports-b_menu-houdou-jsa_00246",
+   "token": 635,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "：令和8年9月30日(水曜日",
+   "note": "9月"
+  },
+  {
+   "article": "global-voices:2026-09-28-65726",
+   "token": 91,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "取り組みが2026年3月初めに開始され",
+   "note": "3月"
+  },
+  {
+   "article": "global-voices:2026-09-28-65726",
+   "token": 703,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "』は2026年3月に設立されまし",
+   "note": "3月"
+  },
+  {
+   "article": "jawiki-news:2026-09-21",
+   "token": 1,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "9月25日　（政治",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki-news:2026-09-21",
+   "token": 60,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "は退ける判決。9月24日　（政治",
+   "note": "9月"
   },
   {
    "article": "jawiki-news:2026-09-21",
@@ -3684,6 +4334,56 @@
    "note": "習近平"
   },
   {
+   "article": "jawiki-news:2026-09-21",
+   "token": 102,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "行われた。9月24日　（スポーツ",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki-news:2026-09-21",
+   "token": 143,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "金メダルに。9月22日　（気象",
+   "note": "9月"
+  },
+  {
+   "article": "jawiki-news:2026-09-21",
+   "token": 193,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "は6人。9月21日　（政治",
+   "note": "9月"
+  },
+  {
+   "article": "adapt-n3:govonline:article-202609-radio-3741",
+   "token": 1,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "9月23日は「手話",
+   "note": "9月"
+  },
+  {
+   "article": "adapt-n3:env:press-press_05643",
+   "token": 1,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "9月14日、神戸港",
+   "note": "9月"
+  },
+  {
    "article": "adapt-n3:jawiki:3492442",
    "token": 28,
    "rule": "miyako",
@@ -3694,6 +4394,76 @@
    "note": "東京都"
   },
   {
+   "article": "adapt-n3:jawiki:5238864-s63",
+   "token": 3,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "2026年9月、台風25号（",
+   "note": "9月"
+  },
+  {
+   "article": "adapt-n3:jawiki:5238864-s63",
+   "token": 27,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "この台風は、9月16日の夜、",
+   "note": "9月"
+  },
+  {
+   "article": "adapt-n3:global-voices:2026-09-28-65726",
+   "token": 27,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "ます。2026年3月の初め、ここで",
+   "note": "3月"
+  },
+  {
+   "article": "mhlw:stf-newpage_76126",
+   "token": 24,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "はじめ入賞企業を10月９日（金）",
+   "note": "10月"
+  },
+  {
+   "article": "mhlw:stf-newpage_76126",
+   "token": 286,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "表彰式は、10月９日（金）",
+   "note": "10月"
+  },
+  {
+   "article": "mhlw:stf-newpage_76126",
+   "token": 550,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "　令和８年10月９日（金）",
+   "note": "10月"
+  },
+  {
+   "article": "mhlw:stf-newpage_76126",
+   "token": 687,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "では、毎年10月を「高年齢者",
+   "note": "10月"
+  },
+  {
    "article": "mhlw:stf-newpage_76126",
    "token": 573,
    "rule": "miyako",
@@ -3702,6 +4472,16 @@
    "status": "accepted",
    "context": "HALL&CONFERENCE（東京都中央区日本橋兜町7",
    "note": "東京都"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 37,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "機構は、毎年10月を中小企業退職",
+   "note": "10月"
   },
   {
    "article": "mhlw:stf-newpage_76152",
@@ -3792,6 +4572,26 @@
    "status": "lexicon-fixed",
    "context": "共済制度（林退共）」があります",
    "note": "林退共"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 439,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "期間令和８年10月１日（木）から",
+   "note": "10月"
+  },
+  {
+   "article": "mhlw:stf-newpage_76152",
+   "token": 446,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "（木）から10月31日（土）",
+   "note": "10月"
   },
   {
    "article": "mhlw:stf-newpage_76152",
@@ -3985,6 +4785,16 @@
   },
   {
    "article": "sports:sports-b_menu-houdou-31-09-1420919_00007",
+   "token": 177,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "：令和8年10月16日（金曜日",
+   "note": "10月"
+  },
+  {
+   "article": "sports:sports-b_menu-houdou-31-09-1420919_00007",
    "token": 88,
    "rule": "miyako",
    "surface": "都",
@@ -3992,6 +4802,16 @@
    "status": "accepted",
    "context": "上決定する。・都道府県・公益",
    "note": "都道府県"
+  },
+  {
+   "article": "bunki-read-n2-shosoin-names",
+   "token": 60,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "国立博物館で10月24日に始まる第78",
+   "note": "10月"
   },
   {
    "article": "bunki-read-n2-shosoin-names",
@@ -4145,6 +4965,16 @@
   },
   {
    "article": "bunki-read-n2-shima-4004",
+   "token": 427,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "たという。10月、レイアウトがほぼ仕上がっ",
+   "note": "10月"
+  },
+  {
+   "article": "bunki-read-n2-shima-4004",
    "token": 690,
    "rule": "override-site",
    "surface": "ファジン",
@@ -4152,6 +4982,16 @@
    "status": "lexicon-fixed",
    "context": "には、ホフ、ファジン、スタンレー・メイザーと",
    "note": "ファジン"
+  },
+  {
+   "article": "bunki-read-n1-optogenetics-nobel",
+   "token": 110,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "スカ研究所は10月5日、2026年の",
+   "note": "10月"
   },
   {
    "article": "bunki-read-n1-optogenetics-nobel",
@@ -4275,6 +5115,16 @@
   },
   {
    "article": "bunki-read-n2-kobe-jain",
+   "token": 542,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "は、2024年3月末に968人の",
+   "note": "3月"
+  },
+  {
+   "article": "bunki-read-n2-kobe-jain",
    "token": 549,
    "rule": "override-site",
    "surface": "人",
@@ -4292,196 +5142,6 @@
    "status": "lexicon-fixed",
    "context": "人は最後は大金持ちに？」森「",
    "note": "大金持ち"
-  },
-  {
-   "article": "aozora:049966-1",
-   "token": 118,
-   "rule": "override-site",
-   "surface": "日本",
-   "reading": "にほん",
-   "status": "lexicon-fixed",
-   "context": "考えで、漢訳を日本語に翻訳した",
-   "note": "日本語"
-  },
-  {
-   "article": "aozora:049966-1",
-   "token": 119,
-   "rule": "override-site",
-   "surface": "語",
-   "reading": "ご",
-   "status": "lexicon-fixed",
-   "context": "で、漢訳を日本語に翻訳したところ",
-   "note": "日本語"
-  },
-  {
-   "article": "aozora:049966-1",
-   "token": 548,
-   "rule": "override-site",
-   "surface": "訳",
-   "reading": "やく",
-   "status": "lexicon-fixed",
-   "context": "からいうてもシナ訳よりも余程確かで",
-   "note": "シナ訳"
-  },
-  {
-   "article": "aozora:049966-1",
-   "token": 563,
-   "rule": "override-site",
-   "surface": "人",
-   "reading": "じん",
-   "status": "lexicon-fixed",
-   "context": "その説はほとんど西洋人の間には確定",
-   "note": "西洋人"
-  },
-  {
-   "article": "aozora:049966-1",
-   "token": 752,
-   "rule": "override-site",
-   "surface": "人",
-   "reading": "じん",
-   "status": "lexicon-fixed",
-   "context": "で、有力なる西洋人が沢山の金を",
-   "note": "西洋人"
-  },
-  {
-   "article": "aozora:049966-1",
-   "token": 1470,
-   "rule": "override-site",
-   "surface": "天下",
-   "reading": "てんげ",
-   "status": "lexicon-fixed",
-   "context": "あります。殊に天上天下唯我独尊の釈迦牟尼",
-   "note": "天上天下唯我独尊"
-  },
-  {
-   "article": "bunki-read-n2-forgetting-curve",
-   "token": 14,
-   "rule": "override-site",
-   "surface": "日",
-   "reading": "にち",
-   "status": "lexicon-fixed",
-   "context": "の67％を1日で忘れる」という",
-   "note": "1日で"
-  },
-  {
-   "article": "bunki-read-n2-forgetting-curve",
-   "token": 131,
-   "rule": "override-site",
-   "surface": "日",
-   "reading": "にち",
-   "status": "lexicon-fixed",
-   "context": "表す値です。1日後の節約率は",
-   "note": "1日後"
-  },
-  {
-   "article": "bunki-read-n2-forgetting-curve",
-   "token": 327,
-   "rule": "override-site",
-   "surface": "日",
-   "reading": "にち",
-   "status": "lexicon-fixed",
-   "context": ".2％、1日後に33.7",
-   "note": "1日後"
-  },
-  {
-   "article": "bunki-read-n2-forgetting-curve",
-   "token": 344,
-   "rule": "override-site",
-   "surface": "日",
-   "reading": "にち",
-   "status": "lexicon-fixed",
-   "context": ".4％、31日後でも21.",
-   "note": "31日後"
-  },
-  {
-   "article": "bunki-read-n2-forgetting-curve",
-   "token": 548,
-   "rule": "override-site",
-   "surface": "カーピキ",
-   "reading": "かーぴき",
-   "status": "lexicon-fixed",
-   "context": "心理学者ローディガーとカーピキは、大学生に",
-   "note": "カーピキ"
-  },
-  {
-   "article": "bunki-read-n2-forgetting-curve",
-   "token": 692,
-   "rule": "override-site",
-   "surface": "日本",
-   "reading": "にほん",
-   "status": "lexicon-fixed",
-   "context": "した知見は、日本語の学習にどう",
-   "note": "日本語"
-  },
-  {
-   "article": "bunki-read-n2-forgetting-curve",
-   "token": 693,
-   "rule": "override-site",
-   "surface": "語",
-   "reading": "ご",
-   "status": "lexicon-fixed",
-   "context": "た知見は、日本語の学習にどう生かせ",
-   "note": "日本語"
-  },
-  {
-   "article": "bunki-read-n2-forgetting-curve",
-   "token": 775,
-   "rule": "override-site",
-   "surface": "日本",
-   "reading": "にほん",
-   "status": "lexicon-fixed",
-   "context": "みましょう。例えば、日本語の単語を見",
-   "note": "日本語"
-  },
-  {
-   "article": "bunki-read-n2-forgetting-curve",
-   "token": 776,
-   "rule": "override-site",
-   "surface": "語",
-   "reading": "ご",
-   "status": "lexicon-fixed",
-   "context": "ましょう。例えば、日本語の単語を見て",
-   "note": "日本語"
-  },
-  {
-   "article": "bunki-read-n1-neocognitron",
-   "token": 35,
-   "rule": "override-site",
-   "surface": "日本",
-   "reading": "にほん",
-   "status": "lexicon-fixed",
-   "context": "に、こう題した日本語の論文が載っ",
-   "note": "日本語"
-  },
-  {
-   "article": "bunki-read-n1-neocognitron",
-   "token": 36,
-   "rule": "override-site",
-   "surface": "語",
-   "reading": "ご",
-   "status": "lexicon-fixed",
-   "context": "、こう題した日本語の論文が載った",
-   "note": "日本語"
-  },
-  {
-   "article": "bunki-read-n1-neocognitron",
-   "token": 62,
-   "rule": "override-site",
-   "surface": "所",
-   "reading": "じょ",
-   "status": "lexicon-fixed",
-   "context": "NHK放送科学基礎研究所に在籍してい",
-   "note": "放送科学基礎研究所"
-  },
-  {
-   "article": "bunki-read-n1-neocognitron",
-   "token": 169,
-   "rule": "override-site",
-   "surface": "所",
-   "reading": "じょ",
-   "status": "lexicon-fixed",
-   "context": "た放送科学基礎研究所に移り、生理学",
-   "note": "放送科学基礎研究所"
   },
   {
    "article": "bunki-read-n2-bodhisena",
@@ -4664,6 +5324,266 @@
    "note": "縷"
   },
   {
+   "article": "aozora:049966-1",
+   "token": 43,
+   "rule": "override-site",
+   "surface": "四",
+   "reading": "し",
+   "status": "lexicon-fixed",
+   "context": "明治二十四年の四月から宇治の黄檗",
+   "note": "四月"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 44,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "二十四年の四月から宇治の黄檗山",
+   "note": "四月"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 118,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "考えで、漢訳を日本語に翻訳した",
+   "note": "日本語"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 119,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "で、漢訳を日本語に翻訳したところ",
+   "note": "日本語"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 548,
+   "rule": "override-site",
+   "surface": "訳",
+   "reading": "やく",
+   "status": "lexicon-fixed",
+   "context": "からいうてもシナ訳よりも余程確かで",
+   "note": "シナ訳"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 563,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "その説はほとんど西洋人の間には確定",
+   "note": "西洋人"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 717,
+   "rule": "override-site",
+   "surface": "四",
+   "reading": "し",
+   "status": "lexicon-fixed",
+   "context": "明治二十六年の四月で今より満",
+   "note": "四月"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 718,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "二十六年の四月で今より満十",
+   "note": "四月"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 752,
+   "rule": "override-site",
+   "surface": "人",
+   "reading": "じん",
+   "status": "lexicon-fixed",
+   "context": "で、有力なる西洋人が沢山の金を",
+   "note": "西洋人"
+  },
+  {
+   "article": "aozora:049966-1",
+   "token": 1470,
+   "rule": "override-site",
+   "surface": "天下",
+   "reading": "てんげ",
+   "status": "lexicon-fixed",
+   "context": "あります。殊に天上天下唯我独尊の釈迦牟尼",
+   "note": "天上天下唯我独尊"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 14,
+   "rule": "override-site",
+   "surface": "日",
+   "reading": "にち",
+   "status": "lexicon-fixed",
+   "context": "の67％を1日で忘れる」という",
+   "note": "1日で"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 131,
+   "rule": "override-site",
+   "surface": "日",
+   "reading": "にち",
+   "status": "lexicon-fixed",
+   "context": "表す値です。1日後の節約率は",
+   "note": "1日後"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 327,
+   "rule": "override-site",
+   "surface": "日",
+   "reading": "にち",
+   "status": "lexicon-fixed",
+   "context": ".2％、1日後に33.7",
+   "note": "1日後"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 344,
+   "rule": "override-site",
+   "surface": "日",
+   "reading": "にち",
+   "status": "lexicon-fixed",
+   "context": ".4％、31日後でも21.",
+   "note": "31日後"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 548,
+   "rule": "override-site",
+   "surface": "カーピキ",
+   "reading": "かーぴき",
+   "status": "lexicon-fixed",
+   "context": "心理学者ローディガーとカーピキは、大学生に",
+   "note": "カーピキ"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 692,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "した知見は、日本語の学習にどう",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 693,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "た知見は、日本語の学習にどう生かせ",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 775,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "みましょう。例えば、日本語の単語を見",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-forgetting-curve",
+   "token": 776,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "ましょう。例えば、日本語の単語を見て",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n1-neocognitron",
+   "token": 20,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "」。1979年10月、当時の電子通信",
+   "note": "10月"
+  },
+  {
+   "article": "bunki-read-n1-neocognitron",
+   "token": 35,
+   "rule": "override-site",
+   "surface": "日本",
+   "reading": "にほん",
+   "status": "lexicon-fixed",
+   "context": "に、こう題した日本語の論文が載っ",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n1-neocognitron",
+   "token": 36,
+   "rule": "override-site",
+   "surface": "語",
+   "reading": "ご",
+   "status": "lexicon-fixed",
+   "context": "、こう題した日本語の論文が載った",
+   "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n1-neocognitron",
+   "token": 62,
+   "rule": "override-site",
+   "surface": "所",
+   "reading": "じょ",
+   "status": "lexicon-fixed",
+   "context": "NHK放送科学基礎研究所に在籍してい",
+   "note": "放送科学基礎研究所"
+  },
+  {
+   "article": "bunki-read-n1-neocognitron",
+   "token": 169,
+   "rule": "override-site",
+   "surface": "所",
+   "reading": "じょ",
+   "status": "lexicon-fixed",
+   "context": "た放送科学基礎研究所に移り、生理学",
+   "note": "放送科学基礎研究所"
+  },
+  {
+   "article": "bunki-read-n2-kokugo-survey",
+   "token": 61,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "。文化庁が10月2日に公表した",
+   "note": "10月"
+  },
+  {
+   "article": "bunki-read-n2-kokugo-survey",
+   "token": 89,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "年1月から3月にかけて、全国",
+   "note": "3月"
+  },
+  {
    "article": "bunki-read-n1-strange-loop",
    "token": 119,
    "rule": "override-site",
@@ -4825,6 +5745,16 @@
   },
   {
    "article": "bunki-read-n1-soai-nobel",
+   "token": 6,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "王立科学アカデミーは10月7日、2026年の",
+   "note": "10月"
+  },
+  {
+   "article": "bunki-read-n1-soai-nobel",
    "token": 21,
    "rule": "override-site",
    "surface": "硤合",
@@ -4954,6 +5884,16 @@
    "note": "何かしら"
   },
   {
+   "article": "bunki-read-n1-nobel-economics",
+   "token": 58,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "王立科学アカデミーは10月12日、2026年",
+   "note": "10月"
+  },
+  {
    "article": "bunki-read-n3-transistor-class",
    "token": 249,
    "rule": "override-site",
@@ -4962,6 +5902,46 @@
    "status": "lexicon-fixed",
    "context": "、アメリカのベル研究所で、バーディーンと",
    "note": "ベル研究所"
+  },
+  {
+   "article": "bunki-read-n3-transistor-class",
+   "token": 483,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "。そして1955年9月、日本で初めての",
+   "note": "9月"
+  },
+  {
+   "article": "bunki-read-n3-transistor-class",
+   "token": 555,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "社が1954年10月に発表したラジオ",
+   "note": "10月"
+  },
+  {
+   "article": "bunki-read-n2-japan-us-chip-fab",
+   "token": 59,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "。米国時間の10月14日、日米両政府",
+   "note": "10月"
+  },
+  {
+   "article": "bunki-read-n2-japan-us-chip-fab",
+   "token": 265,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "政府が2025年9月に署名した覚書",
+   "note": "9月"
   },
   {
    "article": "bunki-read-n2-shoten-ganesha",
@@ -5034,6 +6014,26 @@
    "note": "妻沼聖天山"
   },
   {
+   "article": "bunki-read-n2-icecube-nobel",
+   "token": 76,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "王立科学アカデミーは10月6日、2026年の",
+   "note": "10月"
+  },
+  {
+   "article": "bunki-read-n2-icecube-nobel",
+   "token": 567,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "た。2017年9月23日の朝（",
+   "note": "9月"
+  },
+  {
    "article": "aozora:058059-1",
    "token": 150,
    "rule": "override-site",
@@ -5072,6 +6072,26 @@
    "status": "lexicon-fixed",
    "context": "して見ると此等両個の原理に対するあこがれ",
    "note": "両個"
+  },
+  {
+   "article": "bunki-read-n3-rule-of-72",
+   "token": 300,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "。この銀行は9月18日に、11",
+   "note": "9月"
+  },
+  {
+   "article": "bunki-read-n3-rule-of-72",
+   "token": 486,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "後の2024年7月4日は2898.47",
+   "note": "7月"
   },
   {
    "article": "global-voices:2026-08-03-65560",
@@ -5295,6 +6315,16 @@
   },
   {
    "article": "bunki-read-n1-kukai-sanskrit",
+   "token": 209,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "いる。806年10月22日付で朝廷",
+   "note": "10月"
+  },
+  {
+   "article": "bunki-read-n1-kukai-sanskrit",
    "token": 211,
    "rule": "override-site",
    "surface": "日",
@@ -5342,6 +6372,16 @@
    "status": "lexicon-fixed",
    "context": "に興味を持つ世界中の非英語話者に",
    "note": "世界中"
+  },
+  {
+   "article": "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3",
+   "token": 4,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "令和7年9月、「AI法」",
+   "note": "9月"
   },
   {
    "article": "aozora:004668-1",
@@ -5392,6 +6432,16 @@
    "status": "lexicon-fixed",
    "context": "赤い翼を持つ怪物ゲリュオンは、ギリシア神話で",
    "note": "ゲリュオン"
+  },
+  {
+   "article": "bunki-read-n2-carson-nobel",
+   "token": 61,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "スウェーデン・アカデミーは10月8日、2026年の",
+   "note": "10月"
   },
   {
    "article": "bunki-read-n2-carson-nobel",
@@ -5495,6 +6545,16 @@
   },
   {
    "article": "bunki-read-n2-imf-outlook",
+   "token": 79,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "（IMF）は10月、春と秋の",
+   "note": "10月"
+  },
+  {
+   "article": "bunki-read-n2-imf-outlook",
    "token": 85,
    "rule": "override-site",
    "surface": "年",
@@ -5525,6 +6585,26 @@
   },
   {
    "article": "bunki-read-n2-imf-outlook",
+   "token": 223,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "みている。7月に出した改訂見通し",
+   "note": "7月"
+  },
+  {
+   "article": "bunki-read-n2-imf-outlook",
+   "token": 267,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "なる。ただし、7月の予測は4月",
+   "note": "7月"
+  },
+  {
+   "article": "bunki-read-n2-imf-outlook",
    "token": 474,
    "rule": "override-site",
    "surface": "日本",
@@ -5542,6 +6622,26 @@
    "status": "lexicon-fixed",
    "context": "。IMF自身、日本語版の要旨で「",
    "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n2-imf-outlook",
+   "token": 582,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "通航が2027年3月に再開して、",
+   "note": "3月"
+  },
+  {
+   "article": "bunki-read-n2-imf-outlook",
+   "token": 590,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "して、同年10月までにおおむね戦争前",
+   "note": "10月"
   },
   {
    "article": "aozora:049966-2",
@@ -5585,6 +6685,16 @@
   },
   {
    "article": "bunki-read-n2-pillay-peace-nobel",
+   "token": 3,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "1941年9月、南アフリカのダーバンで",
+   "note": "9月"
+  },
+  {
+   "article": "bunki-read-n2-pillay-peace-nobel",
    "token": 34,
    "rule": "override-site",
    "surface": "ナバネセム",
@@ -5605,6 +6715,16 @@
   },
   {
    "article": "bunki-read-n2-pillay-peace-nobel",
+   "token": 90,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "ノーベル委員会は10月9日、2026年の",
+   "note": "10月"
+  },
+  {
+   "article": "bunki-read-n2-pillay-peace-nobel",
    "token": 100,
    "rule": "override-site",
    "surface": "ピレイ",
@@ -5622,6 +6742,16 @@
    "status": "lexicon-fixed",
    "context": "としている。ピレイ氏は10月12",
    "note": "ピレイ"
+  },
+  {
+   "article": "bunki-read-n2-pillay-peace-nobel",
+   "token": 173,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "。ピレイ氏は10月12日、オランダ・",
+   "note": "10月"
   },
   {
    "article": "bunki-read-n2-pillay-peace-nobel",
@@ -5672,6 +6802,16 @@
    "status": "lexicon-fixed",
    "context": "取り上げ、禅とは何よりも体験だと",
    "note": "何より"
+  },
+  {
+   "article": "bunki-read-n2-grit-checked",
+   "token": 80,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "だ。2016年9月には、ダックワースの",
+   "note": "9月"
   },
   {
    "article": "bunki-read-n2-grit-checked",
@@ -5732,6 +6872,36 @@
    "status": "lexicon-fixed",
    "context": "の文に答える日本語版の尺度を発表",
    "note": "日本語"
+  },
+  {
+   "article": "bunki-read-n3-felt-prices",
+   "token": 52,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "いる。結果は10月13日に発表さ",
+   "note": "10月"
+  },
+  {
+   "article": "bunki-read-n3-felt-prices",
+   "token": 123,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "8月3日から9月4日まで、郵送で",
+   "note": "9月"
+  },
+  {
+   "article": "bunki-read-n3-felt-prices",
+   "token": 175,
+   "rule": "override-site",
+   "surface": "月",
+   "reading": "がつ",
+   "status": "lexicon-fixed",
+   "context": "。総務省が9月18日に発表し",
+   "note": "9月"
   },
   {
    "article": "bunki-read-n2-hofstadter-law",
