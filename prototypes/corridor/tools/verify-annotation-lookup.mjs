@@ -200,10 +200,19 @@ const cases = [
     const card = saved.taken.find(row => row.id === '上手');
     assert.equal(card.entrySeq, '1580400'); assert.equal(card.cueReading, 'うわて');
     await closeChooser(page);
-    const before = await state(page);
+    const prior = await state(page);
     await openLookup(page, '上手');
     assert.equal(await page.locator('#mini .mini-reading').textContent(), 'じょうず');
     assert.equal(await page.locator('#mini-take').isDisabled(), true, 'The different core homograph cannot overwrite the existing card');
+    // G2 · the look-up is itself his encounter with the core 上手 read じょうず: it writes the encounter ledger (met) and
+    // nothing else — never the うわて card, a list or a schedule. The refusals below must then change nothing at all.
+    const core = JSON.stringify([1, 'word', '上手', 'core', null, 'じょうず']);
+    await waitForAppRecord(page, record => !!record.met?.entries?.[core], { description: 'the look-up\'s own encounter' });
+    const before = await state(page);
+    assert.deepEqual(Object.keys({ ...prior.record, ...before.record }).filter(key => JSON.stringify(prior.record[key]) !== JSON.stringify(before.record[key])), ['met'],
+      'A look-up writes the encounter ledger and no other root');
+    assert.deepEqual(Object.keys(before.record.met.entries).filter(key => !Object.hasOwn(prior.record.met?.entries || {}, key)), [core],
+      'It adds exactly its own identity: 上手 read じょうず, the core record');
     // Also exercise the list popover's own guard; a stale caller cannot bypass it.
     await page.evaluate(() => window.annotationFixture.openVocabularyListPopover({ t: 'word', id: '上手' }, '上手', document.getElementById('annotation-anchor')));
     await createList(page, 'Wrong homograph');
