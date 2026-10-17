@@ -10049,8 +10049,9 @@ function placeFloating(card, r) {
   const onPage = !!card.dataset.page;
   const ceiling = Math.max(8, (onPage ? fixedEdge('#sheet > .sheet-bar', 'bottom') : null) ?? fixedEdge('#app > .chrome', 'bottom') ?? 0);
   // the deck's grade dock is a floor too: the slip never covers the four grades (it sits above a word in the lower third)
+  // G5 · nor the 層 mark at the foot
   const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
-    fixedEdge('.kp-grades', 'top') ?? height) - 8;
+    fixedEdge('.kp-grades', 'top') ?? height, fixedEdge('#layers-mark', 'top') ?? height) - 8;
   const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
   const sentence = card.classList.contains('is-sentence');
   let seatHeight = m.height;
@@ -10648,10 +10649,21 @@ function placeSealStrip(open) {
   if (seat) {
     open.room?.remove();
     open.room = null;
-    strip.style.maxHeight = `${Math.floor(seat.tall)}px`;
+    // a strip shortened to its room ends between two rows, never across a control; what is below it scrolls inside it
+    const tall = Math.floor(seat.tall);
+    let fit = tall;
+    if (strip.scrollHeight > tall) {
+      const bottoms = [...strip.querySelectorAll('button, input, .seal-strip-status')]
+        .filter((node) => node.getClientRects().length && !node.closest('[hidden]')).map((node) => node.offsetTop + node.offsetHeight);
+      const rows = bottoms.filter((bottom) => bottom + 6 <= tall);
+      if (rows.length) fit = Math.max(...rows) + 6;
+    }
+    strip.style.maxHeight = `${fit}px`;
     strip.dataset.side = seat.side;
+    if (seat.side === 'above') seat.top += tall - fit;
     strip.style.left = `${Math.round(left - origin.left + scrollLeft)}px`;
     strip.style.top = `${Math.round(seat.top - origin.top + scrollTop)}px`;
+    markStripMore(strip);
     return seat;
   }
   // a room of its own under the word's paragraph: nothing is laid over a control
@@ -10668,6 +10680,19 @@ function placeSealStrip(open) {
   strip.style.left = `${Math.round(left - origin.left + scrollLeft)}px`;
   strip.style.top = `${Math.round(box.top + 6 - origin.top + scrollTop)}px`;
   return { top: box.top + 6, tall: Math.min(h, cap), side: 'room' };
+}
+// Escape closes the strip wherever the keyboard stands (a touch hold can leave focus on the paragraph); the strip's own
+// keydown closes it when focus is inside it
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || !sealStrip || sealStrip.strip.contains(event.target)) return;
+  event.preventDefault();
+  event.stopPropagation();
+  closeSealStrip({ restoreFocus: true });
+}, true);
+/** A strip with more below its fold says so with a soft fade at its foot (focus: the eye goes where there is more). */
+function markStripMore(strip) {
+  const more = strip.scrollHeight - strip.scrollTop - strip.clientHeight > 1;
+  if (strip.dataset.more !== String(more)) strip.dataset.more = String(more);
 }
 function focusSealStrip(keyboard) {
   const open = sealStrip;
@@ -10934,6 +10959,7 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
   const scroller = anchor.closest('#sheet');
   (scroller || document.body).append(strip);
   strip.classList.toggle('in-page', !!scroller);
+  strip.addEventListener('scroll', () => markStripMore(strip), { passive: true });
   sealStrip = open;
   placeSealStrip(open);
   focusSealStrip(keyboard);
@@ -12311,12 +12337,13 @@ function buildListenRow(p) {
 /* G5 · LAYERS, only from their 層 mark (John, 2026-10-15: "layers is kinda cool too… as long as we don:t get stuck
  * there" · "with layers the reading experince is too jagged… we still want a clean elegant reading expereince as our
  * base"). The reader at rest is bare text; the mark is one quiet glyph at the foot, above 音. It opens the layers of ONE
- * paragraph — the one his last word stands in while it is on the glass, else the one at the reading line: every word's
- * reading over it, drawn where an on-touch reading is drawn, so no line box moves; and under the paragraph one quiet
- * block — the meanings of its words in order and its particles' roles, from the shipped dictionary and particle table
- * only (nothing invented, no model asked). Any press or activation anywhere else folds them, and that press still does
- * its own work; so do Escape, the mark again, and leaving the article. Nothing persists; no other gesture opens them. */
-let readerLayers = null; // { paragraph, block, mark, rebuilt: [{ index, span }] }
+ * paragraph — the one his last word stands in while it is on the glass, else the one at the reading line — in one quiet
+ * block under it, the paragraph itself untouched (readings painted over every word at once crowded each other: 高市総理
+ * and its は collided): 読, the paragraph read in kana; 意, its words' meanings in order; 文, its particles' roles — from
+ * the text's own readings, the shipped dictionary and the particle table only (nothing invented, no model asked). Any
+ * press or activation anywhere else folds them, and that press still does its own work; so do Escape, the mark again and
+ * leaving the article. Nothing persists; no other gesture opens them. */
+let readerLayers = null; // { paragraph, block, mark }
 const READER_LAYER_WORDS = 24;
 function readerLayerParagraph() {
   const paragraphs = [...document.querySelectorAll('#reader > [data-reader-prose]')].filter((node) => node.querySelector('.tok[data-index]'));
@@ -12338,8 +12365,6 @@ function foldReaderLayers() {
   readerLayers = null;
   open.block.remove();
   if (open.paragraph.isConnected) delete open.paragraph.dataset.layers;
-  // readings off: the words the layer gave a reading are painted back exactly as the dial draws them
-  for (const { index } of open.rebuilt) readerTokenPainters.get(index)?.();
   if (open.mark.isConnected) {
     open.mark.setAttribute('aria-pressed', 'false');
     open.mark.removeAttribute('aria-controls');
@@ -12350,21 +12375,17 @@ function openReaderLayers(mark) {
   const paragraph = readerLayerParagraph();
   const p = passage();
   if (!paragraph || !p?.tokens) return false;
-  const rebuilt = [];
-  const meanings = [], roles = [], seen = new Set(), seenRoles = new Set();
+  // the paragraph itself is never touched: its layers stand in one quiet block under it — the paragraph read in kana (読),
+  // its words' meanings in order (意) and its particles' roles (文) — so no reading crowds another and no line moves
+  const reading = [], meanings = [], roles = [], seen = new Set(), seenRoles = new Set();
   for (const span of paragraph.querySelectorAll('.tok[data-index]')) {
-    const index = Number(span.dataset.index);
-    const token = p.tokens[index];
+    const token = p.tokens[Number(span.dataset.index)];
     if (!token) continue;
+    reading.push(readerLayerReading(token));
     if (span.classList.contains('particle') || span.dataset.targetKind === 'particle') {
       const particle = PARTICLE_BY_SURFACE[token.s];
       if (particle && !seenRoles.has(particle.id)) { seenRoles.add(particle.id); roles.push([particle.p, bi() ? particle.role : particle.roleJa]); }
       continue;
-    }
-    // readings off: this word gets its reading for as long as the layer is open (the dial's own painter restores it)
-    if (S.dials.furigana === 0 && token.f?.some((pair) => pair.r) && !span.querySelector('ruby')) {
-      const row = span.querySelector('.tok-word');
-      if (row) { row.replaceWith(wordRow(displayPairs(token), { furigana: 1, revealed: true })); rebuilt.push({ index, span }); }
     }
     if (!token.c || seen.has(token.b) || meanings.length >= READER_LAYER_WORDS) continue;
     const gloss = readerTokenGloss(token);
@@ -12377,24 +12398,45 @@ function openReaderLayers(mark) {
   block.dataset.japaneseLookup = 'off';
   block.setAttribute('role', 'note');
   block.setAttribute('aria-label', tx('この段落の層', 'Layers of this paragraph'));
-  const line = (cls, pairs) => {
+  const labelled = (cls, glyph, name) => {
     const row = el('p', cls);
-    pairs.forEach(([ja, en], i) => {
-      if (i) row.append(document.createTextNode(' · '));
-      const word = el('span', 'reader-layers-ja', ja);
-      word.lang = 'ja';
-      row.append(word, document.createTextNode(` ${en}`));
-    });
+    const label = el('span', 'reader-layers-label', glyph);
+    label.lang = 'ja';
+    label.setAttribute('aria-label', name);
+    row.append(label);
     return row;
   };
-  if (meanings.length) block.append(line('reader-layers-meanings', meanings));
-  if (roles.length) block.append(line('reader-layers-roles', roles));
+  // each word with its meaning (or each particle with its role) is one piece, set apart by space, never by a mark: a role
+  // can carry its own · (place-of-action · means)
+  const pairs = (cls, glyph, name, list) => {
+    const row = labelled(cls, glyph, name);
+    for (const [ja, en] of list) {
+      const piece = el('span', 'reader-layers-pair');
+      const word = el('span', 'reader-layers-ja', ja);
+      word.lang = 'ja';
+      piece.append(word, document.createTextNode(` ${en}`));
+      row.append(piece, document.createTextNode(' '));
+    }
+    return row;
+  };
+  const kana = labelled('reader-layers-reading', '読', tx('読み', 'Reading'));
+  const line = el('span', 'reader-layers-kana', reading.join(''));
+  line.lang = 'ja';
+  kana.append(line);
+  block.append(kana);
+  if (meanings.length) block.append(pairs('reader-layers-meanings', '意', tx('意味', 'Meanings'), meanings));
+  if (roles.length) block.append(pairs('reader-layers-roles', '文', tx('助詞の役割', 'Particles'), roles));
   paragraph.dataset.layers = 'open';
   paragraph.after(block);
-  readerLayers = { paragraph, block, mark, rebuilt };
+  readerLayers = { paragraph, block, mark };
   mark.setAttribute('aria-pressed', 'true');
   mark.setAttribute('aria-controls', block.id);
   return true;
+}
+/** A token as read: each written piece by its reading where it has one (the text's own furigana), kana and marks as written. */
+function readerLayerReading(token) {
+  const pairs = Array.isArray(token.f) && token.f.length ? token.f : null;
+  return pairs ? pairs.map((pair) => pair.r || pair.t).join('') : String(token.s || '');
 }
 function readerLayersMark() {
   const mark = el('button', 'layers-mark', '層');
