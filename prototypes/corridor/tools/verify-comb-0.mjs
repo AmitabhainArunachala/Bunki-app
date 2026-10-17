@@ -102,14 +102,27 @@ const HIRA = /[ぁ-ゖ]/u;
 const DIGIT = /[0-9０-９]/u;
 const CLOSE = /[、。，．！？」』）〉》〕］｝ー〜…‥ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ]/u;
 const OPEN = /[「『（〈《〔［｛]/u;
+// what a number counts (年, 月, 回, 人 …): a number and its counter are one word; any other kanji word after a number
+// (1.2.1｜通常版) is a word of its own
+const COUNTER = /[年月日時分秒回号人本件個円歳条位度階巻章話部点名社台枚冊匹頭羽杯軒週代種目期次世紀万億兆割倍％%]/u;
+// a word's kana ending, as the plain oracle can know it without a dictionary: the okurigana of a one-kanji stem (並｜ぶ,
+// 始｜まる, 思｜う) or a one-kana particle on a kanji or katakana word (熟語｜の, 決心｜の): a kana word of its own after
+// a longer word (先生｜ことば, 通常版｜この) is not an ending
+const PARTICLE = /[はがをにでとのもへや]/u;
+function kanaEnding(text, i) {
+  const stem = /[\p{Script=Han}々]+$/u.exec(text.slice(0, i))?.[0] || '';
+  const kana = /^\p{Script=Hiragana}+/u.exec(text.slice(i))?.[0] || '';
+  if ([...stem].length === 1 && !/\p{Script=Han}/u.test(text[i - 2] || '')) return true;
+  return PARTICLE.test(kana[0] || '') && kana.length === 1;
+}
 function badBreak(text, i) {
   const a = text[i - 1], b = text[i];
   if (!a || !b || /\s/u.test(a) || /\s/u.test(b)) return '';
   if (DIGIT.test(a) && DIGIT.test(b)) return 'inside a number';
   if (a === '第' && DIGIT.test(b)) return 'between 第 and its number';
-  if (DIGIT.test(a) && KANJI.test(b)) return 'between a number and its counter';
+  if (DIGIT.test(a) && COUNTER.test(b)) return 'between a number and its counter';
   if (KATA.test(a) && KATA.test(b)) return 'inside a katakana word';
-  if (HIRA.test(b) && (KANJI.test(a) || KATA.test(a))) return 'before a word\'s kana ending';
+  if (HIRA.test(b) && (KANJI.test(a) || KATA.test(a)) && kanaEnding(text, i)) return 'before a word\'s kana ending';
   if (CLOSE.test(b)) return 'before a closing mark';
   if (OPEN.test(a)) return 'after an opening mark';
   return '';

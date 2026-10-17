@@ -80,6 +80,9 @@ const FIXTURES = [CORE, IU, MIKOMI, DARE, ITT, YUKE, HI, WAKAT, SAN, SAN_TWIN];
 /** The fixture foundation, exactly: no control kill is admitted unless each of these F0 rows ran once and passed. */
 const F0_IDS = Object.freeze([...FIXTURES.map((fixture) => `F0.${fixture.passage.id}#${fixture.index}`),
   'F0.core', 'F0.misses', 'F0.iu', 'F0.dare', 'F0.yuku', 'F0.san', 'F0.hi', 'F0.bases', 'F0.glosses', 'F0.senses']);
+/** Q · a gloss's markup with the app's word rule taken out (its <wbr> and its .ja-unit wrappers), so an exact check of the
+ * markup still compares every other character and attribute */
+const wordRuleOff = (html) => String(html ?? '').replace(/<wbr>/gu, '').replace(/<span class="ja-unit">([^<]*)<\/span>/gu, '$1');
 const MISS_BASES = ['いう', '見込', 'だれ', 'ゆく', 'ひ', '分かる', '産'];
 
 // what each door must show: candidates as the chooser lists them, entries as the full sheet displays them
@@ -899,7 +902,9 @@ try {
       // L · いう is written exactly as it is read, so its popup says it once: no reading line (G2 kanji, below, keeps one)
       check(`G2 ${lang}: one tap shows the honest dictionary miss in the popup, the word written as it is read saying itself once`,
         mini?.word === IU.token.b && IU.token.r === IU.token.b && mini.reading === null
-          && mini.gloss === `<span class="mini-gloss mini-miss">${MISS[lang]}</span>`
+          // Q (the comb): its Japanese is set by the app's one word rule — a <wbr> between words, a word holding a mark in a
+          // no-break .ja-unit, the line marked .ja-flow — and nothing else may differ from the exact miss
+          && wordRuleOff(mini.gloss) === `<span class="mini-gloss mini-miss${lang === 'ja' ? ' ja-flow' : ''}">${MISS[lang]}</span>`
           && !/no gloss yet|語釈なし|No dictionary entry for this spelling\.|この表記の辞書項目はありません。/u.test(mini.text), JSON.stringify(mini), { id: `G2.${lang}.popup` });
       check(`G2 ${lang}: prose keeps its surface and plain word name with keyboard instructions`,
         one?.surface === IU.token.s && one.lines === 0 && !one.hasEn
