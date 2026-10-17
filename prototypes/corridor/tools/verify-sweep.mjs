@@ -104,6 +104,8 @@ window.__SWEEP__ = {
   grammar: () => { S.stack = []; S.strokes = null; go({ t: 'grammar', id: GRAMMARS()[0]?.id }); window.scrollTo(0, 0); },
   idiom: () => { S.stack = []; S.strokes = null; go({ t: 'idiom', id: Object.keys(D.idioms || {})[0] }); window.scrollTo(0, 0); },
   closeLayers: () => { closeVocabularyListPopover(); removeMini(); S.stack = []; S.strokes = null; render(); },
+  // 話す · Speak, opened fresh on free talk (no key in the walk: the room asks for nothing)
+  speak: () => { S.stack = []; S.strokes = null; openSpeakRoom('dojo', { id: 'free' }); window.scrollTo(0, 0); },
   saved: (id) => S.taken.some((t) => t.id === id),
   // N · the shelf's rows as the page holds them (archive rows aside), the cards as drawn, Today's story, one row read
   rows: () => D.passages.filter((p) => !String(p.file || '').startsWith('archive/')).map((p) => ({
@@ -686,6 +688,17 @@ try {
         }
         await page.evaluate(() => window.__SWEEP__.theme('hokusai'));
         await room('guided', async () => { await page.evaluate(() => window.__SWEEP__.visit('guided')); await settle(1500); });
+        // 話す · Speak (Codex at acb125d2): the room at rest, Bridge, shadowing, the look back, its settings, its scenes and past talks
+        const speakFresh = async () => { await page.evaluate(() => window.__SWEEP__.speak()); await page.waitForSelector('#speak-enso', { timeout: 15000 }); await settle(700); };
+        for (const [id, act] of [
+          ['speak', speakFresh],
+          ['speak-bridge', async () => { await speakFresh(); await tap('[data-foot="bridge"]'); }],
+          ['speak-shadow', async () => { await speakFresh(); await tap('[data-foot="shadow"]'); }],
+          ['speak-lookback', async () => { await speakFresh(); await tap('[data-foot="end"]'); await settle(500); }],
+          ['speak-settings', async () => { await speakFresh(); await tap('.speak-cost'); }],
+          ['speak-scenes', async () => { await speakFresh(); await tap('.speak-scene-door'); }],
+          ['speak-past', async () => { await speakFresh(); await tap('.speak-scene-door'); await tap('.speak-page-scenes > .speak-quiet'); await settle(600); }],
+        ]) await room(id, act);
         // Words: search, results, kanji by shape, grammar, idioms, the word web
         await room('search', async () => { await page.evaluate(() => window.__SWEEP__.visit('search')); await settle(800); });
         await room('search-results', async () => { await page.evaluate(() => window.__SWEEP__.search('海')); await settle(1500); });
