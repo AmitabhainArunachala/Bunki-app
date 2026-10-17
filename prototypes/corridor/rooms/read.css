@@ -901,7 +901,8 @@ body[data-view='drift'] #mini .mini-take:not(.taken):not(.reader-capture-held) {
    new colour (contract §6). Each character keeps its place and its text; while the ink stands in for a written character
    its type is held clear, and at the end the ink dries into the type in one short crossfade. Nothing here takes a
    pointer: the word is still the door to its page, mid-stroke included. */
-#mini .mini-word .ink-char { position: relative; pointer-events: none; }
+#mini .mini-word :is(.ink-word, .ink-char) { pointer-events: none; }
+#mini .mini-word .ink-char { position: relative; }
 #mini .mini-word .ink-glyph {
   position: absolute;
   left: 50%;

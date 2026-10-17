@@ -971,7 +971,9 @@ try {
         wet: [...(word?.querySelectorAll('.ink-wet path') || [])].map((path) => Math.round(parseFloat(getComputedStyle(path).strokeDashoffset) * 1000) / 1000),
         ghostPaths: ghost.reduce((n, g) => n + g.querySelectorAll('path').length, 0),
         ghostShown: ghost.length > 0 && ghost.every((g) => Number(getComputedStyle(g).opacity) > 0 && getComputedStyle(g).visibility !== 'hidden'),
-        inkPointer: [...(word?.querySelectorAll('.ink-char, .ink-glyph') || [])].every((node) => getComputedStyle(node).pointerEvents === 'none'),
+        inkPointer: [...(word?.querySelectorAll('.ink-word, .ink-char, .ink-glyph') || [])].every((node) => getComputedStyle(node).pointerEvents === 'none'),
+        // the band holds the word as one child while it writes, as G3 drew it (readers take its first node as the word)
+        oneChild: !!word && word.childNodes.length === 1 && word.childNodes[0].textContent === word.textContent,
         ariaHidden: [...(word?.querySelectorAll('.ink-glyph') || [])].every((svg) => svg.getAttribute('aria-hidden') === 'true'),
         reading: reading ? { text: reading.textContent, shown: shown(reading), opacity: Number(getComputedStyle(reading).opacity),
           height: reading.getBoundingClientRect().height } : null,
@@ -1121,9 +1123,10 @@ try {
         await stage(page, word);
         const first = await inkFacts(page);
         if (depth === 'unmet' || depth === 'met') {
-          check(`G4.depth.${depth}.write`, `${depth} (${label}): the word comes closer to write itself — its whole お手本 there from the first frame, the type held for the ink, the reading's place kept but unwritten`,
+          check(`G4.depth.${depth}.write`, `${depth} (${label}): the word comes closer to write itself — its whole お手本 there from the first frame, the type held for the ink, the reading's place kept but unwritten, the word still one child of its band`,
             first.ceremony === 'write' && first.depth === depth && ['arriving', 'writing'].includes(first.ink) && first.chars === [...label].length &&
-            first.ghostShown && first.ghostPaths === first.strokes && first.strokes > 0 && first.reading?.shown && first.reading.opacity === 0 && first.inkPointer && first.ariaHidden, first);
+            first.ghostShown && first.ghostPaths === first.strokes && first.strokes > 0 && first.reading?.shown && first.reading.opacity === 0 && first.inkPointer && first.ariaHidden &&
+            first.oneChild && first.word === label, first);
           await midWriting(page);
           const mid = await inkFacts(page);
           const ordered = mid.wet.every((value, i) => i === 0 || value >= mid.wet[i - 1] - 0.001);

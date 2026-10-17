@@ -31801,7 +31801,8 @@ function writeWord(word, { reading = null, after = null, elapsed = 0, onBegin = 
   if (prior) { prior.end('replaced'); prior.dispose(); }
   const per = inkStrokeMs(strokes), total = per * strokes;
   const wet = [];
-  word.textContent = '';
+  // the word stays one child of its band while it writes: one span holding its characters, whose text is the word's
+  const written = el('span', 'ink-word');
   for (const { ch, paths } of chars) {
     const cell = el('span', 'ink-char', ch);
     if (paths.length) {
@@ -31826,8 +31827,9 @@ function writeWord(word, { reading = null, after = null, elapsed = 0, onBegin = 
       svg.append(ghost, ink);
       cell.append(svg);
     }
-    word.append(cell);
+    written.append(cell);
   }
+  word.replaceChildren(written);
   word.dataset.ink = after ? 'arriving' : 'writing';
   word.dataset.inkStrokes = String(strokes);
   word.dataset.inkMs = String(Math.round(total));
