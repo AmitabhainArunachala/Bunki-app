@@ -1,7 +1,11 @@
 /** Bundled reading and explicit text practice through normal controls, and the sentence
- * listening lock: the voice is Kore (Charon second), so a bundled Ami cue is never offered or
- * requested and the listening mode explains the absence with Kore/Charon in its accessible description. A negative
- * control re-allows Ami in a copy of the staged corridor.js and must fail the same lock check.
+ * listening lock: the voice is Kore (Charon second), and the shipped catalog names no cue until the
+ * locked clips are rendered, so the listening mode explains the absence with Kore/Charon in its
+ * accessible description and requests nothing. Two controls (V, 2026-10-17) prove that check can see
+ * a cue at all, since an empty catalog would pass it trivially: a catalog naming a cue in the locked
+ * voice, served with real bytes, must be offered, fetched and bound — and so FAIL the lock check; the
+ * same cue in the withdrawn Ami shape must still be refused and request nothing. (The old control
+ * re-allowed Ami by rewriting a roster literal that V removed, so it had become a no-op.)
  * Persistent profiles, real record output, no injected learner state or provider responses.
  * This is a scoped technical subjourney. */
 import { openShelfDoor } from './shelf-tools-support.mjs';
@@ -9,7 +13,8 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { createServer } from 'node:https';
-import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
@@ -17,6 +22,8 @@ import { chromium, webkit } from 'playwright-core';
 import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { buildListeningCues, listeningSentences } from './build-listening-cues.mjs';
+import { runtimeLock, voiceForRole } from './voice-lock.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -53,9 +60,34 @@ const TITLE = '静かな朝', WORD = '窓', INDEX = 9;
 const QUESTION = '「窓」の読み方と、この文での使い方を教えてください。';
 const PRODUCTION = '  私の部屋の窓を開けます。\n e\u0301 🚀  ';
 const results = [], startedAt = new Date().toISOString();
-const ROSTER = "const NARRATION_VOICES = { kore: 'Kore', charon: 'Charon' };";
-const stagedCorridor = readFileSync(join(SITE, 'corridor.js'), 'utf8');
-const amiAllowed = stagedCorridor.replace(ROSTER, "const NARRATION_VOICES = { kore: 'Kore', charon: 'Charon', ami: 'Ami' };");
+// The control catalogs: what build-listening-cues emits for 静かな朝 once its locked clips exist,
+// staged from the site's own data with the site's own sentence bytes standing in for the clips (so
+// every digest is true of the bytes served), and the same cues in the withdrawn pre-lock Ami shape.
+const LOCK = runtimeLock(), CUE_VOICE = voiceForRole('example', LOCK), MORNING = 'bunki-graded-n5-morning';
+const controlCatalogs = (() => {
+  const dir = mkdtempSync(join(tmpdir(), 'bundled-listening-cues-'));
+  try {
+    mkdirSync(join(dir, 'audio'), { recursive: true });
+    symlinkSync(join(SITE, 'data'), join(dir, 'data'));
+    copyFileSync(join(SITE, 'audio/manifest.json'), join(dir, 'audio/manifest.json'));
+    const passage = listeningSentences(dir).find(row => row.row.id === MORNING && row.eligible);
+    assert(passage, '静かな朝 is a listening passage');
+    passage.ranges.forEach((_, i) => {
+      const file = `${MORNING.replaceAll(':', '_')}-${String(i).padStart(3, '0')}.m4a`;
+      mkdirSync(join(dir, 'audio/s', CUE_VOICE), { recursive: true });
+      copyFileSync(join(SITE, 'audio/s/ami', file), join(dir, 'audio/s', CUE_VOICE, file));
+    });
+    const locked = buildListeningCues(dir, LOCK);
+    assert(locked.passages[MORNING]?.sentences.length, 'the builder emits the morning cues once the clips exist');
+    const legacy = structuredClone(locked);
+    for (const sentence of legacy.passages[MORNING].sentences) {
+      const { speakerRole, model, ...cue } = sentence.cue;
+      sentence.cue = { ...cue, voice: 'ami', path: cue.path.replace(`audio/s/${CUE_VOICE}/`, 'audio/s/ami/') };
+    }
+    return { locked: { ...locked, passages: { [MORNING]: locked.passages[MORNING] } },
+      legacy: { ...legacy, passages: { [MORNING]: legacy.passages[MORNING] } } };
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+})();
 const listeningControls = '#sentence-choose-listening, #sentence-add-listening, #sentence-listening-start, #sentence-listening-play';
 async function listeningLocked(page, requested) {
   const pending = page.locator('#sentence-listening-pending');
@@ -292,16 +324,18 @@ for (const engine of engines) for (const width of sizes) {
     try { if (page) await screenshot('failure'); } catch { /* Preserve the original failure. */ }
   } finally { disconnected = false; await close(); }
 }
-// Negative control: the same lock check against a copy of the staged corridor.js whose roster
-// re-allows Ami must fail, and that copy must request an Ami recording.
-for (const engine of engines) {
-  const out = join(OUT, `${engine}-ami-allowed-control`); mkdirSync(out, { recursive: true });
-  const result = { engine, width: 1440, negativeControl: true, passed: false, errors: [] };
+// Controls: the lock check above must be able to SEE a cue. The shipped catalog is served as-is
+// except for its cue file; every other byte is the staged build's.
+for (const engine of engines) for (const [name, catalog] of [['locked-cue-offered-control', controlCatalogs.locked],
+  ['withdrawn-cue-refused-control', controlCatalogs.legacy]]) {
+  const out = join(OUT, `${engine}-${name}`); mkdirSync(out, { recursive: true });
+  const result = { engine, width: 1440, control: name, passed: false, errors: [] };
   results.push(result);
   const context = await ({ chromium, webkit }[engine]).launchPersistentContext(join(out, 'profile'), {
     headless: true, viewport: { width: 1440, height: 1050 }, locale: 'en-US', serviceWorkers: 'block', ignoreHTTPSErrors: true,
     ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
   });
+  result.browserVersion = context.browser()?.version();
   try {
     await silenceBrowserAudio(context);
     const requested = [];
@@ -309,7 +343,12 @@ for (const engine of engines) {
     await context.route('**/*', route => {
       const url = new URL(route.request().url());
       if (url.origin !== ORIGIN) return route.abort();
-      if (url.pathname === '/corridor.js') return route.fulfill({ status: 200, contentType: 'text/javascript', body: amiAllowed });
+      if (url.pathname === '/audio/sentence-cues.json')
+        return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(catalog) });
+      // the locked voice's clips do not exist yet; the staged sentence bytes stand in, digest-true
+      if (url.pathname.startsWith(`/audio/s/${CUE_VOICE}/`))
+        return route.fulfill({ status: 200, contentType: 'audio/mp4',
+          body: readFileSync(join(SITE, 'audio/s/ami', url.pathname.slice(`/audio/s/${CUE_VOICE}/`.length))) });
       return route.continue();
     });
     const page = context.pages()[0] || await context.newPage(); page.setDefaultTimeout(15000);
@@ -317,14 +356,27 @@ for (const engine of engines) {
     await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page); await shelf(page);
     await page.locator('.shelf-item').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) }).locator('.shelf-open').click();
     await sourceToken(page).click(); await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click();
-    await page.locator('#sentence-choose-listening').check();
-    await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-listening-start').waitFor();
-    let lockFailure = null;
-    try { await listeningLocked(page, requested); } catch (error) { lockFailure = error.message; }
-    assert(lockFailure, 'The lock check fails when the roster re-allows Ami');
-    const amiRequests = requested.filter(path => path.startsWith('/audio/s/ami/'));
-    assert(amiRequests.length > 0, 'Re-allowing Ami requests an Ami recording');
-    result.lockFailure = lockFailure; result.amiRequests = amiRequests; result.passed = true;
+    await page.locator('#sentence-practice-confirm').waitFor();
+    if (name === 'locked-cue-offered-control') {
+      await page.locator('#sentence-choose-listening').check();
+      await page.locator('#sentence-practice-confirm').click(); await page.locator('#sentence-listening-start').waitFor();
+      let lockFailure = null;
+      try { await listeningLocked(page, requested); } catch (error) { lockFailure = error.message; }
+      assert(lockFailure, 'The lock check fails when a cue in the locked voice is offered');
+      const fetched = requested.filter(path => path.startsWith(`/audio/s/${CUE_VOICE}/`));
+      assert(fetched.length > 0, 'Confirming the listening mode fetched the locked voice\u2019s clip');
+      const record = await waitForAppRecord(page, value => value.sentencePractice?.entries?.some(entry => entry.plan.listeningCue));
+      const cue = record.sentencePractice.entries.find(entry => entry.plan.listeningCue).plan.listeningCue;
+      assert.equal(cue.voice, CUE_VOICE); assert.equal(cue.model, LOCK.model); assert.equal(cue.speakerRole, 'example');
+      Object.assign(result, { lockFailure, fetched, boundCue: { voice: cue.voice, model: cue.model, path: cue.path } });
+    } else {
+      await page.waitForTimeout(500);
+      assert.equal(await page.locator('#sentence-choose-listening').count(), 0, 'A withdrawn-voice cue is never offered');
+      assert.deepEqual(requested.filter(path => path.startsWith('/audio/s/')), [], 'and nothing is requested for it');
+      assert(requested.includes('/audio/sentence-cues.json'), 'The control catalog was consulted');
+    }
+    assert.deepEqual(result.errors, [], 'No uncaught page error');
+    result.passed = true;
   } catch (error) {
     result.failure = error?.stack || String(error);
   } finally { await context.close(); }
@@ -333,7 +385,7 @@ await new Promise(done => server.close(done));
 const receipt = { version: 1, startedAt, finishedAt: new Date().toISOString(), artifactSha256: manifest.artifactSha256,
   sourceAssetSha256: manifest.sourceAssetSha256, site: SITE, verifierSha256,
   audioOutput: TEST_AUDIO_OUTPUT, audioSilenceHelperSha256,
-  qualification: 'Ordinary controls on bundled authored text and root-authored writing in headless persistent profiles, plus restarts, UI restore and worker offline. Sentence listening is locked to the Kore/Charon roster: the bundled Ami cues are never offered or requested, and a negative control that re-allows Ami in a copy of the staged corridor.js fails the same lock check. No provider response, native GUI, physical device or complete learner acceptance.',
+  qualification: 'Ordinary controls on bundled authored text and root-authored writing in headless persistent profiles, plus restarts, UI restore and worker offline. Sentence listening is locked to the Kore/Charon roster and the shipped catalog names no cue until the locked clips exist; two controls prove the check can see a cue: a locked-voice cue served with real bytes is offered, fetched and bound (failing the lock check), and the same cue in the withdrawn Ami shape is refused and requests nothing. No provider response, native GUI, physical device or complete learner acceptance.',
   passed: results.filter(result => result.passed).length, failed: results.filter(result => !result.passed).length, results };
 writeFileSync(join(OUT, 'receipt.json'), JSON.stringify(receipt, null, 2) + '\n');
 console.log(JSON.stringify({ passed: receipt.passed, failed: receipt.failed, failures: results.filter(result => !result.passed)
