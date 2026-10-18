@@ -1036,10 +1036,11 @@ try {
         JSON.stringify({ stageReturned, back }), { id: `G2.${lang}.original` });
       await tap(page, IU);
       const again = await miniState(page), lit = await tokenState(page, IU);
-      // G3 · the word the cycle begins on is marked by its ladder rung: いう is read as written, so its stage (no raised
-      // reading lights it)
-      check(`G2 ${lang}: one more tap begins the cycle again: the popup with the word at its stage, and no sheet`,
-        again?.word === IU.token.b && lit?.rung === 'stage' && lit.lines === 0 && await page.locator('#sheet').count() === 0, JSON.stringify({ again, lit }), { id: `G2.${lang}.again` });
+      // G3 · the cycle begins again exactly where the first tap began it: いう is read as written, so the ladder skips its
+      // reading rung and the word stands at its stage, lit only if the first tap lit it (no raised reading lights it)
+      check(`G2 ${lang}: one more tap begins the cycle again: the popup with the word at its stage, as the first tap left it, and no sheet`,
+        again?.word === IU.token.b && one?.rung === 'stage' && lit?.rung === 'stage' && lit.lit === one.lit && lit.lines === 0
+          && await page.locator('#sheet').count() === 0, JSON.stringify({ again, lit, first: one }), { id: `G2.${lang}.again` });
       const word = page.locator(`#reader .tok[data-index="${IU.index}"]`);
       await selectWord(page, IU);
       await page.keyboard.press('Escape');

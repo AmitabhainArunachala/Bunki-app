@@ -14,7 +14,8 @@
  *       dictionary refused: ねん everywhere, とし nowhere.
  *   T   the tutor's and the examples' archive by identity: a spelling-keyed 訳 reply (STALE_WAKE_REASON) and an examples
  *       sentinel never fill the page of 訳 read やく (Kawaguchi, token 548, opened by the keyboard before the full dictionary
- *       answers), with no provider reachable; the archive rows stay exactly as seeded.
+ *       answers: G3's keyboard door waits up to READING_WAIT_MS for the reading, so the full dictionary is held until the
+ *       page has opened), with no provider reachable; the archive rows stay exactly as seeded.
  *   --control kagami-spelling-only  the mirror's doors open the spelling alone (serveMutation of corridor.js): R.mirror red.
  *   --control tutor-spelling-key    the tutor's archive is read back by the spelling alone, as before G2: T.archive red.
  * Claim boundary: headless engines on a Mac, not his phone; the record and archive are seeded straight into the
@@ -207,7 +208,7 @@ try {
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true });
     versions[engine] = browser.version();
     console.log(`engine ${engine} ${versions[engine]}`);
-    const kase = async (name, body, { cold = false } = {}) => {
+    const kase = async (name, body, { cold = false, held = false } = {}) => {
       if (only && !only.includes(name)) return;
       const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2,
         serviceWorkers: 'block', acceptDownloads: true });
@@ -215,15 +216,23 @@ try {
       await context.route('**/__g2-blank', (route) => route.fulfill({ contentType: 'text/html', body: '<!doctype html><meta charset="utf-8"><title>g2</title>' }));
       if (cold) await context.route((url) => url.origin === host.origin && (url.pathname.includes('/dict-v2/') || url.pathname.endsWith('/dictionary-worker.js')),
         (route) => route.abort());
+      // held: the full dictionary answers only once the case lets it through (release), every request it made meanwhile intact
+      let release = () => {};
+      if (held) {
+        const gate = new Promise((done) => { release = done; });
+        await context.route((url) => url.origin === host.origin && (url.pathname.includes('/dict-v2/') || url.pathname.endsWith('/dictionary-worker.js')),
+          async (route) => { await gate; await route.continue().catch(() => {}); });
+      }
       if (control) await serveMutation(context, { origin: host.origin, manifest, control: served, edits: control.edits });
       const page = await context.newPage(), errors = [];
       page.setDefaultTimeout(30000);
       page.on('pageerror', (error) => errors.push(error.message));
-      try { await body(page); }
+      try { await body(page, { release }); }
       catch (error) {
         check(`${name}.error`, `${name} ran to the end`, false, String(error.stack || error).slice(0, 900));
         await page.screenshot({ path: resolve(evidence, `${engine}-${name}-error.png`) }).catch(() => {});
       } finally {
+        release();
         check(`${name}.page-errors`, `${name}: no page errors`, errors.length === 0, errors);
         await context.close();
       }
@@ -405,7 +414,7 @@ try {
     }, { cold: true });
 
     // T · the archive read back by identity
-    await kase('T', async (page) => {
+    await kase('T', async (page, { release }) => {
       await boot(page);
       const snapshot = await readAppRecordSnapshot(page);
       const sentinels = [
@@ -424,23 +433,21 @@ try {
       await word.scrollIntoViewIfNeeded();
       const text = await word.evaluate((node) => node.textContent);
       await selectWord(page, word);
+      // G3 · the keyboard's page waits up to READING_WAIT_MS for the word's reading (openPreparedWordEntry); held past it, the
+      // page opens before the full dictionary answers, and the dictionary answers after, as T states
       await page.keyboard.press('Control+Enter');
       await page.locator('#sheet').waitFor();
+      release();
       await delay(1800);
       const shown = await page.evaluate(() => ({ head: document.querySelector('#sheet .headword')?.textContent?.trim() || '',
         reading: document.querySelector('#sheet .reading')?.textContent?.trim() || '', tutor: !!document.querySelector('#sheet .ai-tutor'),
-        glyph: document.querySelector('#sheet .hero-glyph')?.textContent?.trim() || '',
         answer: [...document.querySelectorAll('#sheet .ai-answer, #sheet .ai-examples')].map((node) => node.textContent).join(' | '),
         page: document.getElementById('sheet')?.innerText || '' }));
       const after = await readAppRecordSnapshot(page);
-      // G3 · Ctrl+Enter is the ladder's own page, and the page of 訳 read やく is the kanji's: no entry is read やく (R2,
-      // reading-truth A10: "the second tap's page is the kanji page of 訳"). Before G3 the keyboard alone opened a word page
-      // for it. The page must carry neither the spelling-keyed わけ reply nor the examples sentinel, and the rows stay as seeded
-      const ownPage = shown.glyph === '訳' && !shown.tutor;
-      check('T.archive', '訳 read やく (opened before the full dictionary answers) opens 訳\'s kanji page: neither the spelling-keyed わけ reply nor the examples sentinel fills it; the rows stay as seeded',
-        /訳/u.test(text) && ownPage && !/STALE_/u.test(shown.page) &&
+      check('T.archive', '訳 read やく (opened before the full dictionary answers): neither the spelling-keyed わけ reply nor the examples sentinel fills its page; the rows stay as seeded',
+        /訳/u.test(text) && shown.head.startsWith('訳') && shown.reading === 'やく' && shown.tutor && !/STALE_/u.test(shown.page) &&
         canonical(after.archive.turns.filter((turn) => String(turn.content).includes('STALE_'))) === canonical(sentinels), shown);
-    });
+    }, { held: true });
     await browser.close();
   }
 } finally {
