@@ -22,6 +22,7 @@
  *       scrolls inside itself; 390 keeps all six;
  *   14  W-2: a load the page abandons as it goes settles caught (no page error), and loads work again after pageshow;
  *       W-1: a dictionary shard that fails once is asked again, and the stage still lands on its sense;
+ *   15  R3-3: さもなければかの is ば + かの (that), never ばか (idiot);
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -86,6 +87,9 @@ const CONTROL = {
   'fetch-abort': { item: '14.abort', source: [['corridor.js', "addEventListener('pagehide', () => pageLoads.abort());", 'void pageLoads;']] },
   'fetch-retry': { item: '14.retry', source: [['corridor.js', "if (error?.name === 'AbortError' || signal.aborted || attempt >= 1) throw error;",
     "if (error?.name === 'AbortError' || signal.aborted || attempt >= 0) throw error;"]] },
+  'seg-baka': { item: '15.', source: [['data/articles/aozora-049966-2.json',
+    '{"s":"ば","b":"ば","p":"助詞","r":"ば","f":[{"t":"ば"}],"c":false,"rs":"segment"},{"s":"かの","b":"かの","p":"連体詞","r":"かの","f":[{"t":"かの"}],"c":true,"rs":"segment"}',
+    '{"s":"ばか","b":"ばか","p":"名詞","r":"ばか","f":[{"t":"ばか"}],"c":true},{"s":"の","b":"の","p":"助詞","r":"の","f":[{"t":"の"}],"c":false}']] },
   thread: { item: '3.', css: '.scale-thread { scroll-snap-type: none !important; }',
     source: [['corridor.js', '    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);', '    if (delta) thread.scrollLeft += delta;']] },
 };
@@ -682,6 +686,30 @@ async function itemFetches(browser, engine) {
   }
 }
 
+async function itemSegment(browser, engine) {
+  // 15 · R3-3: in チベット旅行記, さもなければかの国に is さもなければ + かの: no ばか ("idiot") in the sentence, and the
+  // slip on かの reads かの and means "that"
+  const { context, page, errors } = await session(browser);
+  try {
+    assert(await page.evaluate(() => window.__H1A__.open('aozora:049966-2')), 'the article opens');
+    await page.locator('#reader .tok[data-index="582"]').first().waitFor({ timeout: 20_000 });
+    await settle(page, 600);
+    const toks = await page.evaluate(() => [579, 580, 581, 582, 583].map((i) => { const n = document.querySelector(`#reader .tok[data-index="${i}"]`);
+      const c = n?.cloneNode(true); c?.querySelectorAll('rt,rp,.tok-en').forEach((x) => x.remove()); return c ? c.textContent : null; }));
+    const kano = page.locator('#reader .tok[data-index="582"]').first();
+    let slip = null;
+    if (toks[3] === 'かの') {
+      await stage(page, '#reader .tok[data-index="582"]');
+      slip = await page.evaluate(() => { const m = document.getElementById('mini'); return m ? { word: m.querySelector('.mini-word')?.childNodes[0]?.textContent ?? null,
+        gloss: m.querySelector('.mini-gloss')?.textContent ?? '' } : null; });
+    }
+    void kano;
+    check(`15.samonakereba · ${engine} · さもなければかの: ば + かの, no ばか; the slip on かの means "that", never "idiot"`,
+      JSON.stringify(toks) === JSON.stringify(['さも', 'なけれ', 'ば', 'かの', '国']) && slip?.word === 'かの' && /\bthat\b/iu.test(slip.gloss) && !/idiot|fool/iu.test(slip.gloss) && !errors.length,
+      { toks, slip, errors });
+  } finally { await context.close(); }
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
   { id: 'layers', prefix: '2.', run: itemLayers },
@@ -696,6 +724,7 @@ const ITEMS = [
   { id: 'fullwidth', prefix: '11.', run: itemFullWidth },
   { id: 'strip-lists', prefix: '12.', run: itemStripLists },
   { id: 'fetches', prefix: '14.', run: itemFetches },
+  { id: 'segment', prefix: '15.', run: itemSegment },
 ];
 
 const log = { engines: {} };

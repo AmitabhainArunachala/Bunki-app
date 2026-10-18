@@ -51,6 +51,8 @@ FIXED = [
     ("まどのそとを見た", ("まど", "窓"), [("ま", "ま"), ("どの", "どの")]),
     ("ぶちょうに話した", ("ぶちょう", "部長"), [("ぶちょう", "ふちょう")]),
     ("戻ってくるのは相変わらずなんで、最後は", ("な", "だ"), [("なん", "なん"), ("で", "で")]),
+    # R3-3 (Hfix-1A): after なけれ, ばか (idiot) + の is ば + かの (that)
+    ("さもなければかの国に入るに困難", ("かの", "かの"), [("ばか", "ばか"), ("の", "の")]),
 ]
 for text, want, mistake in FIXED:
     got = split(text)
@@ -70,7 +72,7 @@ copula = split("戻ってくるのは相変わらずなんで、最後は")
 ok("相変わらずなんで: な + ん + で, no 何 left", ("ん", "ん") in copula and not any(s == "なん" for s, _ in copula), json.dumps(copula, ensure_ascii=False))
 
 # 2. the guards
-for text in ["いまどの駅？", "なんでそう思うの", "暇なんで、行きます"]:
+for text in ["いまどの駅？", "なんでそう思うの", "暇なんで、行きます", "あいつはばかの一つ覚えだ"]:
     ok(f"{text}: UniDic's split is kept", split(text) == raw(text), json.dumps(split(text), ensure_ascii=False))
 
 # 3. a bad entry is refused
