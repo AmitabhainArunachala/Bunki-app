@@ -416,12 +416,20 @@ const cardState = (page) => page.evaluate(() => {
     lines: [...mini.querySelectorAll('.mini-gloss')].map((node) => node.textContent), more: mini.querySelector('.mini-gloss-more')?.textContent ?? '',
     sense: mini.dataset.senseEntry || '', take: take ? { disabled: take.disabled } : null };
 });
+/** G3 · a tap climbs the word's ladder: a word whose reading the dial hides (the reader's on-touch default) raises it in
+ * place first, and the next tap draws its card. The second tap is made only once that reading rung is observed. */
+async function climbToCard(page, target, index) {
+  await target.tap({ timeout: 30000 });
+  await page.waitForFunction((i) => !!document.getElementById('mini')
+    || document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung === 'reading', index, { timeout: OPEN_MS });
+  if (!(await page.locator('#mini').count())) await target.tap({ timeout: 30000 });
+  await page.locator('#mini').waitFor({ timeout: OPEN_MS });
+}
 /** A real tap; the card as it settles: no longer busy (aria-busy), its sense no longer pending (data-sense). */
 async function card(page, index) {
   await closeMini(page);
   const target = page.locator(`#reader .tok[data-index="${index}"]`).first();
-  await target.tap({ timeout: 30000 });
-  await page.locator('#mini').waitFor({ timeout: OPEN_MS });
+  await climbToCard(page, target, index);
   await page.waitForFunction(() => {
     const mini = document.getElementById('mini');
     return mini && mini.getAttribute('aria-busy') !== 'true' && mini.dataset.sense !== 'pending';
@@ -506,6 +514,8 @@ async function flashCase(browser, contextOptions, fixture, hold) {
   const tag = `W.${hold ? 'held' : 'free'}.${fixture.name}`;
   const context = await browser.newContext(contextOptions);
   await silenceBrowserAudio(context);
+  // G3 · the first-use demonstration of a word's stage is a fresh device's alone: these readers have seen it
+  await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
   await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
   let release = () => {}, asked = 0;
   const gate = new Promise((done) => { release = done; });
@@ -538,8 +548,7 @@ async function flashCase(browser, contextOptions, fixture, hold) {
       new MutationObserver(seen).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true });
     });
     const target = page.locator(`#reader .tok[data-index="${fixture.index}"]`).first();
-    await target.tap({ timeout: 30000 });
-    await page.locator('#mini').waitFor({ timeout: OPEN_MS });
+    await climbToCard(page, target, fixture.index);
     if (hold) {
       for (let attempt = 0; attempt < 80 && !asked; attempt++) await delay(250);
       await delay(1500);
@@ -695,6 +704,7 @@ try {
     const each = async (name, body) => {
       const context = await browser.newContext(contextOptions);
       await silenceBrowserAudio(context);
+      await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
       await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
       const page = await context.newPage(), errors = [];
       page.setDefaultTimeout(15000);
@@ -704,6 +714,7 @@ try {
       const fresh = async () => {
         const own = await browser.newContext(contextOptions);
         await silenceBrowserAudio(own);
+        await own.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
         await own.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
         const p = await own.newPage();
         p.setDefaultTimeout(15000);

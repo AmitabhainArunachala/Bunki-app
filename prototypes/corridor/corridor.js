@@ -5216,6 +5216,21 @@ function scaleReaderIndex() {
     .find(item => visible(Number(item.dataset.index)));
   return token ? Number(token.dataset.index) : null;
 }
+/** The source line's place: its word's glyphs, never a reading raised over them. F's one ruby sets a reading as the
+ * word's own native rt, which grows the word's box upward, so a line left with its reading up (the stage's) and
+ * returned to bare would otherwise come back a reading's height lower (F × G6, the merge). */
+function scaleLineTop(anchor) {
+  const walker = document.createTreeWalker(anchor, NodeFilter.SHOW_TEXT,
+    { acceptNode: (node) => (node.parentElement?.closest('rt, rp') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+  let top = Infinity;
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (!node.textContent.trim()) continue;
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    for (const box of range.getClientRects()) if (box.width > 0 && box.height > 0) top = Math.min(top, box.top);
+  }
+  return Number.isFinite(top) ? top : anchor.getBoundingClientRect().top;
+}
 function captureScaleVisit(index, word = null) {
   const p = passage(), anchor = readerTokenAtIndex(index);
   if (S.view !== 'reader' || !p?.tokens?.[index] || !anchor?.isConnected) return null;
@@ -5228,7 +5243,7 @@ function captureScaleVisit(index, word = null) {
     source: learnerSourceLabel(p), target: word?.id || token.b || null, targetOffset: index - source.start };
   const visit = { origin: 'reader', recordEpoch, passageId: p.id, index,
     indexEnd: Number(anchor.dataset.indexEnd || index), fingerprint: scaleTokenFingerprint(token),
-    viewportY: anchor.getBoundingClientRect().top, scroll: window.scrollY,
+    viewportY: scaleLineTop(anchor), scroll: window.scrollY,
     viewport: { width: innerWidth, height: innerHeight }, focus: invokerKey(anchor),
     sentence, word, learningSourceVisit, skyPlace: prior?.recordEpoch === recordEpoch ? prior.skyPlace || null : null, returnRequest: null, returnJob: null };
   S.scaleVisit = visit;
@@ -5321,20 +5336,20 @@ function settleScaleReturn(reader) {
     window.scrollTo(0, visit.scroll);
     const correct = () => {
       if (!current()) return;
-      const delta = anchor.getBoundingClientRect().top - visit.viewportY;
+      const delta = scaleLineTop(anchor) - visit.viewportY;
       if (Math.abs(delta) > 0.5) window.scrollBy(0, delta);
-      const remaining = anchor.getBoundingClientRect().top - visit.viewportY;
+      const remaining = scaleLineTop(anchor) - visit.viewportY;
       stable = Math.abs(remaining) <= 0.5 ? stable + 1 : 0;
       attempts += 1;
       if (stable >= 2 || attempts >= 8) {
         focusProseWord(anchor, { preventScroll: true });
         // The prose rover may reveal its focused token with nearest-scroll;
         // the source-line constraint remains the final owner of placement.
-        const afterFocus = anchor.getBoundingClientRect().top - visit.viewportY;
+        const afterFocus = scaleLineTop(anchor) - visit.viewportY;
         if (Math.abs(afterFocus) > 0.5) window.scrollBy(0, afterFocus);
         S.readerScroll = window.scrollY;
         reader.dataset.scaleReturnIndex = String(visit.index);
-        reader.dataset.scaleReturnDelta = String(anchor.getBoundingClientRect().top - visit.viewportY);
+        reader.dataset.scaleReturnDelta = String(scaleLineTop(anchor) - visit.viewportY);
         visit.returnRequest = null;
         visit.returnJob = null;
         return;
@@ -5666,7 +5681,11 @@ function scaleThread() {
   for (const [index, bead] of path.entries()) {
     const current = index === path.length - 1;
     const button = el(current && !bead.out ? 'span' : 'button',
-      bead.out ? 'scale-out' : current ? 'scale-current' : 'scale-bead', bead.label);
+      bead.out ? 'scale-out' : current ? 'scale-current' : 'scale-bead');
+    // a bead is one ellipsized line (white-space: nowrap), so its label is set as text, never through the word rule's
+    // <wbr>: Blink and WebKit break at a <wbr> even in a nowrap line (Q × G6, the merge: the article's title stood three
+    // lines tall in the room's rail, and the reader under it jumped when the rail settled to one line)
+    button.textContent = bead.label;
     if (button.tagName === 'BUTTON') button.type = 'button';
     button.dataset.scaleBead = bead.scale;
     button.title = bead.description || bead.label;
@@ -5705,7 +5724,8 @@ function scaleThread() {
   }
   const inside = scaleInTarget();
   if (inside) {
-    const enter = el('button', 'scale-in', `${scaleLabel(inside)} ›`);
+    const enter = el('button', 'scale-in');
+    enter.textContent = `${scaleLabel(inside)} ›`; // one nowrap line, as a bead (above)
     enter.type = 'button'; enter.dataset.scaleIn = ''; enter.dataset.scaleTarget = inside;
     enter.disabled = !scaleNavigationAllowed();
     enter.setAttribute('aria-label', tx(`ひとつ内へ · ${scaleLabel(inside)}`, `One scale in · ${scaleLabel(inside)}`));
