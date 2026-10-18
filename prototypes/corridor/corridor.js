@@ -24599,6 +24599,9 @@ function wireParticleGestures(span, particle, index, p) {
   // the same slip as every word's (contract §1): the particle, its role, its sentence row; no Save (a particle is
   // not a card), and its band opens the particle's page
   const quickLook = (modality = 'pointer', { restore = false } = {}) => {
+    // Hfix-1A · the word last touched has no Save: the bar's keep, back once the slip folds, rests — it never names the
+    // word touched before the particle (G3: "no stale previous-word card")
+    if (S.readerTake) { S.readerTake = null; syncReaderTakeSeal(); }
     openSlip({ t: 'particle', id: particle.id }, {
       anchor: span, from: 'reader', key: `particle:${particle.id}`, redo: restore,
       look: { label: particle.p, reading: particle.r, gloss: bi() ? particle.role : particle.roleJa },
