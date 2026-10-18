@@ -1574,8 +1574,9 @@ try {
       return { lookupText, mark, mistake: mistake.id, prioritySubjects: priorities.targets.map(row => row.subject),
         unanswered: followup.evidence.filter(row => row.outcome === 'unanswered' || row.outcome === 'not-reached').length };
     });
-    // G3 · the word menu reveals nothing, so opening and dismissing it records no help; Full entry reveals the entry and
-    // records the dictionary help once, before the page opens.
+    // G3 · the word's menu reveals nothing, so opening and dismissing it records no help; Full entry reveals the entry and
+    // records the dictionary help once, before the page opens. G5 · the menu is the hold's strip: a right-click (a hold,
+    // Shift+F10) keeps the word once and opens the strip, and a second one opens the same strip and writes nothing.
     await run(engine, `study-word-menu-records-help-only-on-reveal${suffix}`, async (page, context, log) => {
       await start(page, section, 'practice');
       const item = items[0];
@@ -1584,7 +1585,7 @@ try {
       const lookupWord = page.locator(`.exam-prompt .japanese-lookup-word[data-lookup-text="${word}"]`);
       assert.equal(await lookupWord.count(), 1, 'The real first study question has the selected dictionary occurrence');
       const lookupText = await lookupWord.textContent();
-      const menu = page.locator('#reader-word-menu');
+      const menu = page.locator('#seal-strip');
       const before = await attempt();
       const recordBefore = await disk(page);
       assert.equal(assessmentItemAssistanceV2(before, item.id), null);
@@ -1592,26 +1593,48 @@ try {
         assert.equal(await page.locator('#mini, #sheet, .exam-prompt [data-ladder-rung]').count(), 0, `${label} reveals no hint or page`);
         assert.equal(await lookupWord.locator('rt').count(), 0, `${label} leaves the occurrence bare`);
       };
+      const stripActions = () => menu.evaluate((node) => ({
+        actions: [...node.querySelectorAll('[data-strip-action]')].filter((button) => !button.hidden).map((button) => button.dataset.stripAction),
+        status: node.querySelector('.seal-strip-status')?.textContent || '' }));
+
+      // the deliberate keep: the first right-click seals the word once, invents no grade and records no assistance
+      assert.equal(recordBefore.taken.some(row => row.t === 'word' && row.id === word), false, 'The fixture starts with this word unsaved');
+      await lookupWord.click({ button: 'right' });
+      await menu.waitFor();
+      const savedRecord = await pollRecord(page, row => row.taken.some(saved => saved.t === 'word' && saved.id === word));
+      const sealed = await stripActions();
+      const savedRows = savedRecord.taken.filter(row => row.t === 'word' && row.id === word);
+      assert.equal(savedRows.length, 1, 'The keep durably adds the selected word once');
+      assert.deepEqual(savedRecord.taken.filter(row => !(row.t === 'word' && row.id === word)), recordBefore.taken, 'The keep preserves existing cards');
+      assert.deepEqual(savedRecord.srs, recordBefore.srs, 'The keep does not invent a review grade');
+      assert.deepEqual(savedRecord.revlog, recordBefore.revlog);
+      assert.deepEqual(selectAssessmentV2(savedRecord.assessmentLibraryV2).attempt, before, 'The keep records no assistance or answer');
+      assert(/Saved ✓/u.test(sealed.status) && sealed.actions.includes('remove'), `The strip says the word is kept: ${JSON.stringify(sealed)}`);
+      await page.keyboard.press('Escape');
+      await menu.waitFor({ state: 'detached' });
+      await bare('The kept word');
+      log.stages.push({ name: 'word-strip-keep', savedRows, strip: sealed, actualAttempt: await attempt(), expectedAttempt: before });
+
       const dismissals = {};
       for (const [how, dismiss] of [['escape', () => page.keyboard.press('Escape')], ['outside', () => page.locator('.exam-heading').click()]]) {
         await lookupWord.click({ button: 'right' });
         await menu.waitFor();
         const openAttempt = await attempt();
-        dismissals[how] = await menu.locator('[role="menuitem"]').evaluateAll((nodes) => nodes.map((node) => node.dataset.menuAction));
+        dismissals[how] = (await stripActions()).actions;
         await dismiss();
         await menu.waitFor({ state: 'detached' });
         await page.waitForTimeout(300);
         const actualAttempt = await attempt();
-        log.stages.push({ name: `word-menu-dismiss-${how}`, modality: 'right-click', dismissal: how,
+        log.stages.push({ name: `word-strip-dismiss-${how}`, modality: 'right-click', dismissal: how,
           openAttempt, expectedAttempt: before, actualAttempt });
-        assert.deepEqual(actualAttempt, before, `Opening and dismissing the word menu (${how}) records nothing`);
-        assert.deepEqual(openAttempt, before, `The open word menu (${how}) records nothing`);
-        assert.deepEqual(await disk(page), recordBefore, `Opening and dismissing the menu (${how}) leaves the learner record unchanged`);
-        await bare(`The dismissed menu (${how})`);
+        assert.deepEqual(actualAttempt, before, `Opening and dismissing the word's strip (${how}) records nothing`);
+        assert.deepEqual(openAttempt, before, `The open strip (${how}) records nothing`);
+        assert.deepEqual(await disk(page), savedRecord, `Opening and dismissing the strip again (${how}) leaves the learner record as the keep left it`);
+        await bare(`The dismissed strip (${how})`);
       }
-      assert(['entry', 'copy', 'save-word'].every(action => dismissals.escape.includes(action)), 'The word menu offers Full entry, Copy and Save');
+      assert(['entry', 'copy', 'remove'].every(action => dismissals.escape.includes(action)), 'The kept word\'s strip offers Full entry, Copy and Remove');
       await lookupWord.click({ button: 'right' });
-      await menu.locator('[data-menu-action="copy"]').click();
+      await menu.locator('[data-strip-action="copy"]').click();
       await menu.waitFor({ state: 'detached' });
       const copyToast = page.locator('#reader-toast .reader-toast-text');
       await copyToast.waitFor();
@@ -1620,30 +1643,14 @@ try {
       // actual Copy action and its terminal UI, without claiming to inspect OS clipboard data.
       assert([`Copied ${word}`, 'Could not copy'].includes(copyOutcome), 'The actual Copy action reports its outcome');
       assert.deepEqual(await attempt(), before, 'Copy records no assistance');
-      assert.deepEqual(await disk(page), recordBefore, 'Copy leaves the learner record unchanged');
+      assert.deepEqual(await disk(page), savedRecord, 'Copy leaves the learner record unchanged');
       await bare('Copy');
-      log.stages.push({ name: 'word-menu-copy', copyOutcome, actualAttempt: await attempt(), expectedAttempt: before });
-
-      assert.equal(recordBefore.taken.some(row => row.t === 'word' && row.id === word), false, 'The fixture starts with this word unsaved');
-      await lookupWord.click({ button: 'right' });
-      const save = menu.locator('[data-menu-action="save-word"]');
-      assert.notEqual(await save.getAttribute('aria-disabled'), 'true', 'Save is available for the selected unsaved word');
-      await save.click();
-      await menu.waitFor({ state: 'detached' });
-      const savedRecord = await pollRecord(page, row => row.taken.some(saved => saved.t === 'word' && saved.id === word));
-      const savedRows = savedRecord.taken.filter(row => row.t === 'word' && row.id === word);
-      assert.equal(savedRows.length, 1, 'Save durably adds the selected word once');
-      assert.deepEqual(savedRecord.taken.filter(row => !(row.t === 'word' && row.id === word)), recordBefore.taken, 'Save preserves existing cards');
-      assert.deepEqual(savedRecord.srs, recordBefore.srs, 'Save does not invent a review grade');
-      assert.deepEqual(savedRecord.revlog, recordBefore.revlog);
-      assert.deepEqual(selectAssessmentV2(savedRecord.assessmentLibraryV2).attempt, before, 'Save records no assistance or answer');
-      await bare('Save');
-      log.stages.push({ name: 'word-menu-save', savedRows, actualAttempt: await attempt(), expectedAttempt: before });
+      log.stages.push({ name: 'word-strip-copy', copyOutcome, actualAttempt: await attempt(), expectedAttempt: before });
 
       await lookupWord.click({ button: 'right' });
-      const entry = menu.locator('[data-menu-action="entry"]');
+      const entry = menu.locator('[data-strip-action="entry"]');
       await entry.waitFor();
-      assert.notEqual(await entry.getAttribute('aria-disabled'), 'true', `${lookupText} has a full entry to open`);
+      assert.equal(await entry.isDisabled(), false, `${lookupText} has a full entry to open`);
       await entry.click();
       await page.locator('#sheet').waitFor();
       const after = await attempt();
@@ -1674,7 +1681,7 @@ try {
       assert.deepEqual(after.answers, expectedAnswers, 'Full entry preserves every answer field apart from the exact current-question elapsed delta');
       const recordAfter = await disk(page);
       for (const field of ['taken', 'srs', 'revlog']) assert.deepEqual(recordAfter[field], savedRecord[field], `Full entry leaves ${field} unchanged`);
-      log.stages.push({ name: 'word-menu-entry', actualAttempt: after, helpEvent, mark });
+      log.stages.push({ name: 'word-strip-entry', actualAttempt: after, helpEvent, mark });
       return { lookupText, menu: dismissals.escape, copyOutcome, savedRows, mark, helpEvent };
     });
     // G3 · a long 読解 question: each prose paragraph is ONE Tab stop, reached word by word with

@@ -297,12 +297,16 @@ async function sheetViewportGeometry(page) {
   return page.evaluate((closeSelector) => {
     const sheet = document.querySelector('#sheet').getBoundingClientRect();
     const close = document.querySelector(closeSelector).getBoundingClientRect();
-    // G1: the entry is a whole-screen page; its measure is its content's column (the first block under its bar)
-    const content = document.querySelector('#sheet > :not(.sheet-bar)')?.getBoundingClientRect();
+    // The page's measure belongs to its content; the bar and scale thread are chrome.
+    const contentNode = document.querySelector('#sheet > :not(.sheet-bar):not(.scale-thread)');
+    const content = contentNode?.getBoundingClientRect();
+    const rails = [...document.querySelectorAll('#sheet > .scale-thread')];
     return { innerWidth, innerHeight, clientWidth: document.documentElement.clientWidth,
       scrollWidth: document.documentElement.scrollWidth,
       visualWidth: window.visualViewport?.width ?? innerWidth,
-      sheet: sheet.toJSON(), close: close.toJSON(), content: content ? content.toJSON() : null };
+      sheet: sheet.toJSON(), close: close.toJSON(), content: content ? content.toJSON() : null,
+      contentTag: contentNode?.tagName ?? null, contentClass: contentNode?.className ?? null,
+      rails: rails.map((rail) => rail.getBoundingClientRect().toJSON()) };
   }, await entryCloseSelector(page));
 }
 
@@ -368,14 +372,27 @@ async function measureChromeTargets(page) {
     const popupOpen = !!document.querySelector('#mini');
     const targets = [...document.querySelectorAll('.chrome button')];
     if (popupOpen && popupSave) targets.push(popupSave);
+    const bar = document.querySelector('#app > .chrome');
+    const barBox = bar?.getBoundingClientRect();
+    const port = bar ? { left: barBox.left + bar.clientLeft, right: barBox.left + bar.clientLeft + bar.clientWidth,
+      scrollLeft: bar.scrollLeft, scrollMax: bar.scrollWidth - bar.clientWidth } : null;
+    const vv = window.visualViewport;
+    const reader = document.querySelector('#reader');
+    const pageState = { view: document.body.dataset.view, innerWidth, innerHeight, scrollX, scrollY,
+      documentWidth: document.documentElement.scrollWidth, bodyWidth: document.body.scrollWidth,
+      readerWidth: reader ? reader.scrollWidth : null,
+      visual: vv ? Object.fromEntries(['offsetLeft', 'offsetTop', 'pageLeft', 'pageTop', 'scale', 'width', 'height'].map(k => [k, vv[k]])) : null };
     const rows = targets.filter(n => {
       const r = n.getBoundingClientRect();
       return r.width > 1 && r.height > 1 && getComputedStyle(n).visibility !== 'hidden' && n.checkVisibility();
     }).map(n => {
       const r = n.getBoundingClientRect();
       const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      const inBar = !!bar && bar.contains(n);
       return { id: n.id || n.textContent.trim(), x: r.x, y: r.y, width: r.width, height: r.height,
-        reachable: !!hit && (hit === n || n.contains(hit)), right: r.right, bottom: r.bottom };
+        reachable: !!hit && (hit === n || n.contains(hit)), right: r.right, bottom: r.bottom, bar: inBar,
+        whole: r.x >= 0 && r.right <= innerWidth && r.y >= 0 && r.bottom <= innerHeight
+          && (!inBar || (!!port && r.x >= port.left && r.right <= port.right)) };
     });
     const overlaps = [];
     for (let i = 0; i < rows.length; i++) for (let j = i + 1; j < rows.length; j++) {
@@ -386,9 +403,128 @@ async function measureChromeTargets(page) {
     const saveOwnership = barSaves.length <= 1 && barSaves.every((n) => n.id === 'chrome-keep' && n.matches('button.save-one[data-save-one]'))
       && (!popupOpen || (!!popupSave && popupSave.checkVisibility({ visibilityProperty: true })
       && rows.some(row => row.id === 'mini-take' && row.reachable && row.width >= 44 && row.height >= 44)));
-    return { width: innerWidth, rows, overlaps, barSaves: barSaves.length, popupOpen, saveOwnership, valid: saveOwnership && rows.length >= 7 && !overlaps.length &&
+    return { width: innerWidth, rows, overlaps, barSaves: barSaves.length, popupOpen, saveOwnership, port, page: pageState,
+      valid: saveOwnership && rows.length >= 7 && !overlaps.length &&
       rows.every(r => r.width >= 44 && r.height >= 44 && r.x >= 0 && r.right <= innerWidth && r.y >= 0 && r.bottom <= innerHeight && r.reachable) };
   });
+}
+
+/** One native touch stroke across the reader's toolbar. It counts only when every protocol command is
+ * acknowledged and the document observes, at dispatch, a complete trusted stream on connected toolbar targets
+ * that scrolls without activating anything. */
+async function strokeChrome(page, from, to) {
+  await page.evaluate(() => {
+    const events = [];
+    const types = ['pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'click'];
+    const observe = (e) => events.push({ type: e.type, trusted: e.isTrusted, target: e.target?.id || e.target?.tagName || null,
+      connected: !!e.target?.isConnected, inBar: !!e.target?.closest?.('#app > .chrome'), touches: e.touches ? e.touches.length : null });
+    for (const type of types) document.addEventListener(type, observe, { capture: true, passive: true });
+    window.__chromeStroke = () => { for (const type of types) document.removeEventListener(type, observe, true); return events; };
+  });
+  const vv = await page.evaluate(() => ({ x: window.visualViewport?.offsetLeft || 0, y: window.visualViewport?.offsetTop || 0 }));
+  const cdp = await page.context().newCDPSession(page);
+  let acknowledged = 0;
+  let inputError = null;
+  try {
+    for (let i = 0; i <= 6; i++) {
+      const point = { id: 1, x: from.x + (to.x - from.x) * i / 6 - vv.x, y: from.y + (to.y - from.y) * i / 6 - vv.y, radiusX: 1, radiusY: 1, force: 1 };
+      await cdp.send('Input.dispatchTouchEvent', { type: i ? 'touchMove' : 'touchStart', touchPoints: [point] });
+      acknowledged += 1;
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    acknowledged += 1;
+  } catch (error) {
+    inputError = String(error?.message || error);
+  }
+  await cdp.detach();
+  const settled = await page.evaluate(() => new Promise((done) => {
+    const began = performance.now();
+    let still = 0;
+    let last = '';
+    const frame = () => {
+      const bar = document.querySelector('#app > .chrome');
+      const vv = window.visualViewport;
+      const now = JSON.stringify([bar?.scrollLeft, scrollX, scrollY, vv?.offsetLeft, vv?.offsetTop]);
+      still = now === last ? still + 1 : 0;
+      last = now;
+      if (still >= 8) return done(true);
+      if (performance.now() - began > 3000) return done(false);
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }));
+  const events = await page.evaluate(() => window.__chromeStroke());
+  const start = events.find(e => e.type === 'touchstart');
+  const end = events.filter(e => e.type === 'touchend' || e.type === 'touchcancel').at(-1);
+  const complete = !inputError && acknowledged === 8 && settled && events.every(e => e.trusted && e.connected)
+    && !!start && start.inBar && events.some(e => e.type === 'touchmove') && end?.type === 'touchend' && end.touches === 0
+    && !events.some(e => e.type === 'click');
+  return { from, to, acknowledged, inputError, settled, events, complete };
+}
+
+/** The reader saves its place 900ms after the page last scrolled, so the setup's own scroll can still be writing.
+ * A record is a baseline only once two reads further apart than that agree; one still changing is none. */
+async function settledAppRecord(page, timeout = 10000) {
+  const deadline = Date.now() + timeout;
+  let text = JSON.stringify(await readAppRecord(page));
+  while (Date.now() < deadline) {
+    await page.waitForTimeout(1500);
+    const next = JSON.stringify(await readAppRecord(page));
+    if (next === text) return { text, settled: true };
+    text = next;
+  }
+  return { text, settled: false };
+}
+
+/** Where the toolbar holds more doors than the phone is wide, a thumb reaches them by scrolling the toolbar.
+ * Native strokes alone move it; every door must then be seen whole inside the toolbar's port and the viewport,
+ * owning its own centre at 44px, while the page, its width, the visual viewport and the settled record stay exactly
+ * put. A stroke begins on a whole door other than the keep: the outside press that puts a slip away renews the keep
+ * in place, and a stroke whose own target leaves the document is no evidence. */
+async function reachChromeNatively(page, width) {
+  const baseline = await settledAppRecord(page);
+  const recordBefore = baseline.text;
+  const positions = [await measureChromeTargets(page)];
+  const strokes = [];
+  const last = () => positions.at(-1);
+  const stroke = async (forward) => {
+    const at = last();
+    const doors = at.rows.filter(r => r.bar && r.whole && r.reachable && r.id !== 'chrome-keep');
+    const origin = forward ? doors.at(-1) : doors[0];
+    if (!origin || !at.port) return false;
+    const y = origin.y + origin.height / 2;
+    const done = await strokeChrome(page, { x: origin.x + origin.width / 2, y },
+      { x: forward ? at.port.left + 8 : at.port.right - 8, y });
+    strokes.push({ forward, origin: origin.id, ...done });
+    positions.push(await measureChromeTargets(page));
+    const moved = forward ? last().port.scrollLeft > at.port.scrollLeft : last().port.scrollLeft < at.port.scrollLeft;
+    return done.complete && moved;
+  };
+  for (let i = 0; i < 3 && last().port && last().port.scrollLeft < last().port.scrollMax; i++) if (!await stroke(true)) break;
+  for (let i = 0; i < 3 && last().port && last().port.scrollLeft > 0; i++) if (!await stroke(false)) break;
+  const recordAfter = JSON.stringify(await readAppRecord(page));
+  const [first] = positions;
+  const keys = (at) => at.rows.filter(r => r.bar).map(r => r.id);
+  const doors = keys(first);
+  const seen = new Set(positions.flatMap(at => at.rows
+    .filter(r => r.bar && r.whole && r.reachable && r.width >= 44 && r.height >= 44).map(r => r.id)));
+  const verdict = {
+    eightDistinctDoors: doors.length === 8 && new Set(doors).size === 8 && positions.every(at => JSON.stringify(keys(at)) === JSON.stringify(doors)),
+    everyDoorReached: doors.every(id => seen.has(id)),
+    targetsAtLeast44: positions.every(at => at.rows.every(r => r.width >= 44 && r.height >= 44)),
+    noOverlap: positions.every(at => !at.overlaps.length),
+    saveOwnership: positions.every(at => at.saveOwnership),
+    strokesComplete: strokes.every(s => s.complete) && (first.port?.scrollMax > 0 ? strokes.length > 0 : true),
+    restored: !!first.port && last().port?.scrollLeft === first.port.scrollLeft,
+    pageSteady: positions.every(at => JSON.stringify(at.page) === JSON.stringify(first.page)),
+    viewportWidth: first.page.view === 'reader' && first.page.innerWidth === width && first.page.documentWidth <= width
+      && first.page.bodyWidth <= width && (first.page.readerWidth ?? 0) <= width
+      && first.page.visual?.width === width && first.page.visual?.scale === 1,
+    recordSettled: baseline.settled,
+    recordUnchanged: recordBefore === recordAfter,
+  };
+  return { valid: Object.values(verdict).every(Boolean), verdict, doors, seen: [...seen], positions,
+    strokes: strokes.map(({ events, ...s }) => ({ ...s, events: events.map(e => `${e.type}:${e.target}${e.connected ? '' : '(detached)'}`) })) };
 }
 
 /* measurement helpers evaluated in the page */
@@ -1201,6 +1337,11 @@ async function main() {
   await waitForFiniteMotion(page, '#sheet');
   const phoneSheet = await sheetViewportGeometry(page);
   report.measurements.kanjiPhoneViewport = phoneSheet;
+  check('phone kanji: the scale thread is one full-width 44px rail above real content',
+    !!phoneSheet.content && phoneSheet.rails.length === 1 &&
+    phoneSheet.rails[0].left === 0 && phoneSheet.rails[0].width === VIEWPORT.width &&
+    phoneSheet.rails[0].height === 44 && phoneSheet.content.top >= phoneSheet.rails[0].bottom,
+    JSON.stringify(phoneSheet));
   check('phone thesaurus → kanji keeps the close control on the 390px viewport',
     phoneSheet.innerWidth === VIEWPORT.width && phoneSheet.clientWidth === VIEWPORT.width &&
     phoneSheet.scrollWidth <= VIEWPORT.width && phoneSheet.visualWidth === VIEWPORT.width &&
@@ -1237,6 +1378,11 @@ async function main() {
     const desktopSheet = await sheetViewportGeometry(desktopPage);
     report.measurements.kanjiDesktopViewport = desktopSheet;
     const column = desktopSheet.content;
+    check('desktop kanji: the scale thread is one full-width 44px rail above real content',
+      !!column && desktopSheet.rails.length === 1 &&
+      desktopSheet.rails[0].left === 0 && desktopSheet.rails[0].width === 1280 &&
+      desktopSheet.rails[0].height === 44 && column.top >= desktopSheet.rails[0].bottom,
+      JSON.stringify(desktopSheet));
     check('desktop kanji: the page covers the window, its content keeps a centred measure, its close is reachable',
       desktopSheet.scrollWidth <= 1280 && desktopSheet.sheet.left === 0 && desktopSheet.sheet.top === 0 &&
       desktopSheet.sheet.width === 1280 && desktopSheet.sheet.height === desktopSheet.innerHeight &&
@@ -1586,24 +1732,47 @@ async function main() {
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
   await settleReader(page);
+  // At 320 the eight doors are wider than the phone, so they are reached by native strokes on the toolbar; a stroke
+  // is an outside press that puts the slip away, so the selected 390 row is measured before it.
   const chromeGeometry = [];
   for (const selected of [false, true]) {
     if (selected) {
       await openWordStage(page, '#reader .tok.content', 1);
       await page.waitForSelector('#mini #mini-take');
     }
-    for (const width of [320, 390]) {
+    for (const width of selected ? [390, 320] : [320, 390]) {
       await page.setViewportSize({ width, height: VIEWPORT.height });
       await page.evaluate(() => { window.scrollTo(0, 0); });
       await waitForFiniteMotion(page, '.chrome');
+      await shoot(page, shotsDir, `07-reader-chrome-${width}-${selected ? 'selected' : 'unselected'}`);
+      if (width === 320) {
+        const reach = await reachChromeNatively(page, width);
+        chromeGeometry.push({ selected, width, ...reach });
+        check(`reader navigation · ${width}px ${selected ? 'selected' : 'unselected'} controls remain reachable by native toolbar scroll`,
+          reach.valid, JSON.stringify({ verdict: reach.verdict, doors: reach.doors, seen: reach.seen,
+            strokes: reach.strokes.map(s => ({ origin: s.origin, forward: s.forward, complete: s.complete, acknowledged: s.acknowledged, inputError: s.inputError })),
+            scroll: reach.positions.map(at => at.port?.scrollLeft), page: reach.positions[0].page }));
+        continue;
+      }
       const geometry = await measureChromeTargets(page);
       chromeGeometry.push({ selected, ...geometry });
       check(`reader navigation · ${width}px ${selected ? 'selected' : 'unselected'} controls remain reachable`,
         geometry.valid, JSON.stringify(geometry));
-      await shoot(page, shotsDir, `07-reader-chrome-${width}-${selected ? 'selected' : 'unselected'}`);
     }
   }
   report.measurements.readerChrome = chromeGeometry;
+  const lockedBar = await page.addStyleTag({ content: '#app > .chrome { overflow-x: hidden !important; }' });
+  const lockedReach = await reachChromeNatively(page, 320);
+  check('reader navigation · a 320px toolbar that native strokes cannot scroll leaves its last door unreached',
+    !lockedReach.valid && !lockedReach.verdict.everyDoorReached && !lockedReach.seen.includes('tray')
+      && lockedReach.strokes.length > 0 && lockedReach.strokes.every(s => s.complete)
+      && Object.entries(lockedReach.verdict).every(([premise, held]) => premise === 'everyDoorReached' || held),
+    JSON.stringify({ verdict: lockedReach.verdict, seen: lockedReach.seen,
+      strokes: lockedReach.strokes.map(s => ({ origin: s.origin, forward: s.forward, complete: s.complete, acknowledged: s.acknowledged, inputError: s.inputError })) }));
+  await lockedBar.evaluate(n => n.remove());
+  await page.setViewportSize(VIEWPORT);
+  await page.evaluate(() => { window.scrollTo(0, 0); });
+  await waitForFiniteMotion(page, '.chrome');
   const narrowControl = await page.addStyleTag({ content: '#chrome-search { min-width: 20px !important; width: 20px !important; max-width: 20px !important; clip-path: inset(0); }' });
   const narrowProbe = await measureChromeTargets(page);
   const narrowSweep = await page.evaluate(MEASURE_FN);

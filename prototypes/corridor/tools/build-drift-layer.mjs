@@ -98,6 +98,56 @@ cssPatch('font-family:Georgia,serif;font-style:italic}',
 cssPatch('font-size:12px;color:var(--faint);font-family:Georgia,serif;font-style:italic',
   'font-size:12px;color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic', 'bundled radical gloss');
 
+// F-4: the frozen donor reads the house's existing type ladder from rooms/motion.css.
+// Each selector and size is asserted once; no local numeric ladder or fallback is emitted.
+const typeSize = (selector, before, token) => {
+  const normal = value => value.split(',').map(part => part.trim()).join(',');
+  const rules = [...rawCss.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .filter(rule => normal(rule[1]) === normal(selector));
+  if (rules.length !== 1) throw new Error(`CSS type rule missing or ambiguous: ${selector}`);
+  const rule = rules[0], sizes = [...rule[2].matchAll(/\bfont-size\s*:\s*([^;]+)/g)];
+  if (sizes.length !== 1 || sizes[0][1].trim() !== before)
+    throw new Error(`CSS type size changed: ${selector}`);
+  cssPatch(rule[0], rule[0].replace(sizes[0][0], `font-size:var(${token})`), `type ${selector}`);
+};
+typeSize(".word .yomi", ".44em", "--type-label");
+typeSize(".word .gloss", ".4em", "--type-label");
+typeSize(".glyph .g", "36px", "--type-hero");
+typeSize(".glyph.center small", "8px", "--type-label");
+typeSize(".glyph.comp .g", "24px", "--type-section");
+typeSize(".glyph small,.part small", "11px", "--type-label");
+typeSize(".part .pch", "19px", "--type-lead");
+typeSize("#brand", "13px", "--type-label");
+typeSize("#seal", "11px", "--type-caption");
+typeSize("#depth", "12px", "--type-caption");
+typeSize("#theme", "12px", "--type-caption");
+typeSize("#tray", "12px", "--type-caption");
+typeSize("#hint", "12px", "--type-caption");
+typeSize("#card .yomi", "13px", "--type-label");
+typeSize("#card h1", "42px", "--type-headword");
+typeSize("#card .gloss", "15px", "--type-control");
+typeSize("#card .row .k", "24px", "--type-section");
+typeSize("#card .row .kg", "11px", "--type-label");
+typeSize("#card .note", "11px", "--type-label");
+typeSize("#card .bt", "12px", "--type-caption");
+typeSize("#card .rhead", "11px", "--type-caption");
+typeSize("#card .rrow .rk", "22px", "--type-seal");
+typeSize("#card .rrow .rr", "12px", "--type-caption");
+typeSize("#card .rrow .rr i", "11px", "--type-caption");
+typeSize("#card .rds", "13px", "--type-label");
+typeSize("#lvlLabels", "10px", "--type-caption");
+typeSize("#lvl.hot #lvlLabels", "13px", "--type-label");
+typeSize("#lvlInfo", "11px", "--type-caption");
+typeSize("#card .rrow .rm", "12px", "--type-label");
+typeSize("#card .study", "13px", "--type-label");
+typeSize("#card .rhead .radq", "10px", "--type-caption");
+typeSize("#radoc h2", "26px", "--type-section");
+typeSize("#radoc .sub", "12px", "--type-caption");
+typeSize("#radoc p", "15px", "--type-control");
+typeSize("#radoc .rex .rc", "34px", "--type-display");
+typeSize("#radoc .rex .rt", "13px", "--type-label");
+typeSize("#radoc .x", "13px", "--type-label");
+
 // Scope every rule under #drift-layer. The file has no at-rules (verified
 // below); selectors are :root / * / html,body / body / canvas / #id / .class.
 if (/@(keyframes|media|font-face|import)/.test(rawCss)) {
@@ -186,7 +236,7 @@ body.ui-bi #drift-layer [data-l='ja'] { display: none; }
 /* Active constellation glyphs sit above the free field, below existing
  * word satellites (5), centres (6) and component plaques (7). */
 #drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) {
-  z-index: 1;
+  z-index: 2;
 }
 
 /* Native hit regions: preserve field doors through transparent caption/rt
@@ -212,10 +262,10 @@ body[data-furigana='2'] #drift-layer.active #sky > .glyph.hosted-constellation-g
   pointer-events: auto;
 }
 /* G3: hosted glyphs keep native reading markup at rest, including before their first tap, and the hosted sky follows
-   the same reading dial as prose. A sibling gloss/particle caption is never part of the ruby. (At F's merge these moved
-   here from editorial.css: the sky's reading rules stand in the sky's own sheet, so the house's one ruby stays the one
-   rule that sizes a reading everywhere else.) */
-body[data-furigana] #drift-layer .drift-reading rt { font-size: .45em; line-height: 1; opacity: 0; }
+   the same reading dial as prose. A sibling gloss/particle caption is never part of the ruby. (F's merge moved these
+   here from editorial.css; G6's merge leaves a reading's size to the one ruby, half its word, as the sky emits no literal
+   size: G3's .45em is now .5em.) */
+body[data-furigana] #drift-layer .drift-reading rt { line-height: 1; opacity: 0; }
 body[data-furigana='1'] #drift-layer .hosted-reading-shown .drift-reading rt,
 body[data-furigana='2'] #drift-layer .drift-reading rt { opacity: 1; }
 
@@ -415,6 +465,7 @@ patch(
     `__layer.innerHTML = ${'__MARKUP_JSON__'};\n` +
     'document.body.prepend(__layer);\n' +
     'let DRIFT_ON = false;\nlet rafOn = false;\n' +
+    "// G6: the host owns the scale chain. Drift retains only its own live scene.\nlet scaleBridge=null,scaleBusy=false,scaleBlocked=false,scaleHandConsumed=false,scaleConsumedAt=0,scaleDrain=false;\nlet scaleArticle=null,scaleLayer=null,scaleProjectionKey='',scaleWorldKey='';\nlet scaleSceneGeneration=0;\nconst scaleStars=new Map(),scaleNodeIds=new WeakMap();\nlet scaleNodeSerial=0;\nconst scalePhysicalPointers=new Map();\n" +
     'let recordBridge=null,recordGeneration=0,recordView=null,recordReady=false,recordRead=null,recordCodec=null;\n' +
     'const recordPending=new Set();\nlet recordCueIntent=null,recordCueRun=null;',
   'IIFE head + gate flag',
@@ -1122,6 +1173,407 @@ function setRecordBridge(bridge){
 }
 `;
 
+// G6 · the scale bridge extends the generated host, never the frozen donor.
+patch("  if(!DRIFT_ON||recordPending.size)return;\n  if(e.isPrimary&&touches.size){touches.clear();pinch=null;}",
+  "  if(!skyPointerAllowed(e))return;\n  const scaleReady=scaleSceneReady();\n  const sourceTap=!scaleReady&&canNavigate()&&scaleBridge?.beginSourceTap?.(e.target);\n  if(!scaleReady&&!sourceTap){\n    // Rejected sky fingers stay physical members until every one lifts, even\n    // if a pending record acknowledges or a stage closes while they are down.\n    if(scaleBridge){\n      scalePhysicalPointers.set(e.pointerId,e.pointerType);\n      scaleDrain=true;\n      if(touches.size)touches.set(e.pointerId,{x:e.clientX,y:e.clientY});\n      blockScaleHand();\n    }\n    return;\n  }\n  if(scaleBridge){\n    scalePhysicalPointers.set(e.pointerId,e.pointerType);\n    if(scaleDrain){scaleBlocked=true;return;}\n  }\n  if(!touches.size){scaleConsumedAt=0;scaleHandConsumed=false;}", "G6 pointer origins belong to the visible sky only");
+patch("  touches.set(e.pointerId,{x:e.clientX,y:e.clientY});",
+  "  touches.set(e.pointerId,{x:e.clientX,y:e.clientY,sourceTap:sourceTap||null});\n  if(scaleBridge&&scaleBlocked)return;", "G6 cancelled hand stays cancelled until all pointers leave");
+patch("  if(touches.size===2){\n    rebasePinch();",
+  "  if(touches.size===2){\n    if(scaleBridge&&[...touches.values()].some(t=>t.sourceTap)){blockScaleHand();return;}\n    if(scaleBridge){scaleHandConsumed=true;scaleConsumedAt=performance.now();}\n    rebasePinch();", "G6 every two-pointer hand consumes its compatibility click");
+patch("  const t2=touches.get(e.pointerId);",
+  "  const t2=touches.get(e.pointerId);\n  if(t2?.sourceTap){\n    if(!sourceTapReady(t2)||Math.abs(e.clientX-px)>8||Math.abs(e.clientY-py)>8)blockScaleHand();\n    return; // A stage continuation has no drag, pan or judgment authority.\n  }\n  if(scaleBridge&&t2&&!scaleSceneReady()){blockScaleHand();return;}", "G6 a hosted overlay cancels an already tracked hand");
+patch("  const owner=e.pointerId===gestureId;",
+  "  const tracked=touches.get(e.pointerId);\n  if(scaleBridge&&tracked&&(tracked.sourceTap?\n      (!sourceTapReady(tracked,e.target)||Math.abs(e.clientX-px)>8||Math.abs(e.clientY-py)>8):!scaleSceneReady())){cancelPointer(e);return;}\n  const owner=e.pointerId===gestureId;", "G6 an admitted hand cannot finish behind a hosted overlay or pending record");
+patch("      if(pn===tn&&!moved&&touches.size===1&&!tn.gone){",
+  "      if(pn===tn&&!moved&&touches.size===1&&!tn.gone&&(!scaleBridge||scaleSceneReady())){", "G6 long press preserves current scene admission");
+patch("  if(pn&&pn.gone) pn=null;",
+  "  if(pn&&pn.gone) pn=null;\n  if(sourceTap&&pn?.el!==sourceTap.anchor){blockScaleHand();return;}", "G6 source continuation belongs to its exact live occurrence");
+patch('  if(pn&&(pn.kind==="word"||pn.kind==="glyph")&&stack.length===0){',
+  '  if(!sourceTap&&pn&&(pn.kind==="word"||pn.kind==="glyph")&&stack.length===0){', "G6 source continuation never arms a hold");
+patch("function rebasePinch(){\n  if(touches.size!==2)",
+  "function rebasePinch(){\n  if(scaleBridge&&scaleBlocked){pinch=null;return;}\n  if(touches.size!==2)", "G6 no pinch rebasing after third pointer");
+patch("  if(touches.size>2){\n    pinch=null;",
+  "  if(touches.size>2){\n    if(scaleBridge)scaleBlocked=true;\n    pinch=null;", "G6 third pointer cancels whole hand");
+patch("    const mid={x:(v[0].x+v[1].x)/2,y:(v[0].y+v[1].y)/2};",
+  "    const mid={x:(v[0].x+v[1].x)/2,y:(v[0].y+v[1].y)/2};\n    if(scalePinchMove(d,mid))return;", "G6 one scale crossing with the actual sky midpoint");
+patch("  if(!touches.delete(e.pointerId)) return false;\n  if(FOCUS.length)",
+  "  if(!touches.delete(e.pointerId)) return false;\n  if(scaleBridge&&scaleHandConsumed)scaleConsumedAt=performance.now();\n  if(!touches.size){scaleBlocked=false;scaleHandConsumed=false;}\n  if(FOCUS.length)", "G6 release cancelled hand only when empty");
+patch("function cancelPointer(e){",
+  "function cancelPointer(e){\n  if(scaleBridge){\n    if(!touches.delete(e.pointerId))return;\n    const consumed=scaleHandConsumed||touches.size>0;\n    blockScaleHand();scaleBlocked=touches.size>0;scaleHandConsumed=scaleBlocked&&consumed;\n    return;\n  }", "G6 cancelled owned pointer cannot promote a remainder");
+patch("function buildWorld(){",
+  "function buildWorld(){\n  scaleSceneGeneration++;", "G6 retained sky place pins actual world generation");
+patch("  drawTrail(t);\n  if(DRIFT_ON)",
+  "  drawTrail(t);\n  drawScaleStars();\n  if(DRIFT_ON)", "G6 star projection follows the real camera");
+patch("driftState:parseDriftState(raw.driftState)});",
+  "driftState:parseDriftState(raw.driftState),keptWords:checkedKeptWords(raw.keptWords)});", "G6 validate immutable kept projection");
+patch("if(view.revision===recordView.revision&&JSON.stringify(view.driftState)!==JSON.stringify(recordView.driftState))",
+  "if(view.revision===recordView.revision&&(JSON.stringify(view.driftState)!==JSON.stringify(recordView.driftState)||JSON.stringify(view.keptWords)!==JSON.stringify(recordView.keptWords)))", "G6 reject conflicting projection at same revision");
+patch("  recordView=view;recordReady=true;",
+  "  recordView=view;recordReady=true;\n  paintScaleStars();", "G6 publish kept points only after committed record view");
+patch("  recordReady=false;__layer.dataset.recordState=\"recovery-required\";",
+  "  recordReady=false;__layer.dataset.recordState=\"recovery-required\";\n  paintScaleStars();", "G6 retire unconfirmed record projection");
+
+js += `
+function canNavigate(){return !recordPending.size&&!recordCueRun;}
+function scaleSceneReady(){
+  return DRIFT_ON&&canNavigate()&&(!scaleBridge||scaleBridge.canStep()===true);
+}
+function skyPointerAllowed(e){
+  const target=e.target;
+  return DRIFT_ON&&target instanceof Element&&__layer.contains(target)&&
+    !hostChrome(target)&&!target.closest('#card,#radoc,#lvl,.scale-star');
+}
+function sourceTapReady(tracked,target){
+  const lease=tracked?.sourceTap;
+  return DRIFT_ON&&canNavigate()&&!scaleBlocked&&touches.size===1&&Date.now()-pt<430&&
+    !!lease&&typeof lease.isCurrent==='function'&&lease.isCurrent()===true&&
+    !!pn&&!pn.gone&&pn.el===lease.anchor&&
+    (!target||target===lease.anchor||lease.anchor.contains(target));
+}
+function clearScalePointers(){
+  // A scene can sleep while its physical hand is still on the glass.
+  if(scalePhysicalPointers.size){scaleDrain=true;scaleConsumedAt=performance.now();}
+  clearTimeout(lpTimer);lpFired=false;
+  if(pn){pn.dragX=0;pn.dragY=0;}
+  pn=null;touches.clear();pinch=null;gestureActive=false;gestureId=null;moved=false;scaleBlocked=scaleDrain;scaleHandConsumed=scaleDrain;
+  cam.vx=0;cam.vy=0;
+}
+function releaseScaleDrain(){
+  if(scalePhysicalPointers.size||!scaleDrain)return;
+  scaleDrain=false;scaleBlocked=false;scaleHandConsumed=false;scaleConsumedAt=performance.now();
+}
+function drainScalePointer(event){
+  // Passive observation only: foreign text/chrome pointers are never acquired.
+  if(scalePhysicalPointers.delete(event.pointerId))releaseScaleDrain();
+}
+function retireScalePointers(ids){
+  if(!ids.length)return;
+  const live=ids.some(id=>touches.has(id));
+  for(const id of ids)scalePhysicalPointers.delete(id);
+  if(live)clearScalePointers();
+  releaseScaleDrain();
+}
+function scaleTouchesLifted(event){
+  if(!event.isTrusted||event.touches.length)return;
+  retireScalePointers([...scalePhysicalPointers].filter(([,type])=>type==='touch').map(([id])=>id));
+}
+function scaleMouseReleased(event){
+  if(event.isTrusted&&event.pointerType==='mouse'&&scalePhysicalPointers.get(event.pointerId)==='mouse'&&
+    (event.type==='pointerdown'||event.buttons===0))retireScalePointers([event.pointerId]);
+}
+function interruptScaleHand(event){
+  if(!scaleBridge)return;
+  if(event.type==='blur'?event.target===window:document.visibilityState==='hidden')clearScalePointers();
+}
+function requestScaleStep(direction,target){
+  if(!scaleBridge||scaleBusy||!scaleSceneReady()||scaleBridge.canStep(direction,target)!==true)return false;
+  scaleBusy=true;
+  let result;
+  try{result=scaleBridge.step(direction,target);}
+  catch(error){scaleBusy=false;throw error;}
+  if(result&&typeof result.then==='function'){
+    // A second control cannot race a host transition that is still settling.
+    return Promise.resolve(result).then(value=>value!==false,error=>{
+      console.error('Scale transition failed',error);
+      setHint(uiT('移動できませんでした。もう一度試してください。','Could not move. Please try again.'));
+      return false;
+    }).finally(()=>{scaleBusy=false;});
+  }
+  scaleBusy=false;return result!==false;
+}
+function blockScaleHand(){
+  scaleBlocked=true;scaleHandConsumed=true;scaleConsumedAt=performance.now();
+  pinch=null;clearTimeout(lpTimer);lpFired=false;
+  if(pn){pn.dragX=0;pn.dragY=0;}
+  pn=null;gestureActive=false;gestureId=null;moved=false;
+}
+function scalePinchMove(distance,mid){
+  if(!scaleBridge)return false;
+  if(scaleBlocked||pinch.fired)return true;
+  const ratio=distance/pinch.d0;
+  const direction=ratio>1.28?'in':ratio<0.74?'out':null;
+  if(!direction)return true;
+  // One crossing, even when the host refuses it. A new intent needs a new hand.
+  pinch.fired=true;scaleConsumedAt=performance.now();
+  gestureId=null;gestureActive=false;clearTimeout(lpTimer);
+  if(stack.length&&direction==='in'){
+    if(scaleSceneReady()&&!scaleBusy)pinchDive(mid);
+    return true;
+  }
+  requestScaleStep(direction,scaleArticle?{articleId:scaleArticle.articleId}:undefined);
+  return true;
+}
+function setScaleBridge(bridge){
+  if(!bridge||typeof bridge.canStep!=='function'||typeof bridge.step!=='function')throw new Error('scale-bridge-required');
+  if(!canNavigate())return false;
+  clearScalePointers();scaleBridge=bridge;paintScaleStars();return true;
+}
+function scenePath(){
+  if(stack.length>64||stack.some(level=>!level.center?.el?.isConnected||level.center.gone||level.center.removed))return null;
+  return stack.map(level=>{
+    const n=level.center;
+    if(!scaleNodeIds.has(n))scaleNodeIds.set(n,++scaleNodeSerial);
+    const retained=scaleNodeIds.get(n);
+    return n.kind==='word'?['word',n.w,n.r||'',n.g||'',retained]:[n.kind,n.ch,!!n.comp,retained];
+  });
+}
+function capturePlace(){
+  if(!canNavigate())return null;
+  const path=scenePath();if(!path)return null;
+  return Object.freeze({version:1,scopeId:recordView?.scopeId||null,generation:recordGeneration,
+    sceneGeneration:scaleSceneGeneration,path:JSON.stringify(path),
+    world:Object.freeze({width:WR.w,height:WR.h}),camera:Object.freeze({x:cam.x,y:cam.y,z:cam.z,rot:cam.rot})});
+}
+function restorePlace(place){
+  const path=scenePath();
+  if(!path||!canNavigate()||!place||place.version!==1||place.scopeId!==(recordView?.scopeId||null)||
+    place.generation!==recordGeneration||place.sceneGeneration!==scaleSceneGeneration||place.path!==JSON.stringify(path)||
+    place.world?.width!==WR.w||place.world?.height!==WR.h)return false;
+  const c=place.camera;
+  if(!c||!['x','y','z','rot'].every(key=>Number.isFinite(c[key]))||c.z<0.34||c.z>2.6||Math.abs(c.rot)>Math.PI||
+    c.x<0||c.x>WR.w||c.y<0||c.y>WR.h)return false;
+  clearScalePointers();Object.assign(cam,{x:c.x,y:c.y,z:c.z,rot:c.rot});camT=null;camClamp();hostDepth();paintScaleStars();return true;
+}
+function focusArticle(article){
+  if(article===null){scaleArticle=null;paintScaleStars();return true;}
+  if(!article||typeof article.articleId!=='string'||!article.articleId||typeof article.title!=='string')return false;
+  if(scaleArticle?.articleId!==article.articleId||article.reveal===true){
+    // The star is anchored in the retained camera's world, never in a donor word.
+    const p=s2wl(vw()/2,vh()*0.34);
+    scaleArticle={articleId:article.articleId,title:article.title,x:p.x,y:p.y};
+  }else scaleArticle.title=article.title;
+  paintScaleStars();return true;
+}
+function checkedKeptWords(rows){
+  if(rows===undefined)return []; // older bridge consumers have no kept projection
+  if(!Array.isArray(rows))throw new Error('kept-projection-invalid');
+  const seen=new Set();
+  return rows.map(row=>{
+    if(!row||typeof row.key!=='string'||seen.has(row.key)||typeof row.id!=='string'||!row.id||
+      typeof row.label!=='string'||typeof row.reading!=='string'||!['available','mismatch','unavailable'].includes(row.status))
+      throw new Error('kept-projection-invalid');
+    seen.add(row.key);
+    return Object.freeze({key:row.key,id:row.id,label:row.label,reading:row.reading,status:row.status});
+  });
+}
+function scaleHash(key){let h=2166136261;for(const ch of key)h=Math.imul(h^ch.codePointAt(0),16777619)>>>0;return h;}
+function paintScaleStars(){
+  if(!scaleBridge)return;
+  const rows=recordReady?recordView?.keptWords||[]:[];
+  scaleWorldKey=WR.w+','+WR.h;
+  const signature=JSON.stringify([scaleArticle,recordView?.scopeId,rows,WR.w,WR.h,document.body.classList.contains('ui-bi')]);
+  if(signature!==scaleProjectionKey){
+    scaleProjectionKey=signature;
+    if(!scaleLayer){
+      scaleLayer=document.createElement('div');scaleLayer.className='scale-stars';
+      sky.insertBefore(scaleLayer,sky.firstChild);
+    }
+    scaleLayer.setAttribute('aria-label',uiT('読んだ星と残した言葉','Your article and kept words'));
+    const next=new Set();
+    const mount=(key,label,attrs,x,y,action)=>{
+      next.add(key);let star=scaleStars.get(key);
+      if(!star){star=document.createElement('button');star.type='button';star.className='scale-star';star.addEventListener('click',()=>star.scaleActivate?.());scaleStars.set(key,star);scaleLayer.append(star);bindScaleStarPress(star);}
+      star.replaceChildren();
+      const caption=document.createElement('span');caption.className='scale-star-caption';
+      star.append(caption);star.title=label;star.scaleFullSize=null;scaleLayoutDirty=true;
+      if(attrs.articleId){
+        for(const part of label.split(/([0-9０-９]+)/u)){
+          if(/^[0-9０-９]+$/u.test(part)){const number=document.createElement('span');number.className='scale-star-number';number.textContent=part;caption.append(number);}
+          else caption.append(document.createTextNode(part));
+        }
+      }
+      if(!attrs.articleId)caption.textContent=label;
+      star.setAttribute('aria-label',attrs.articleId?uiT('読み物の棚へ：','Article shelf: ')+label:uiT('残した言葉：','Kept word: ')+label);
+      if(attrs.articleId)star.dataset.articleId=attrs.articleId;else star.dataset.keptKey=attrs.keptKey;
+      star.classList.toggle('scale-star-article',!!attrs.articleId);star.classList.toggle('scale-star-kept',!attrs.articleId);
+      star.scaleActivate=action;star.scaleX=x;star.scaleY=y;
+    };
+    if(scaleArticle)mount('article:'+scaleArticle.articleId,scaleArticle.title,{articleId:scaleArticle.articleId},scaleArticle.x,scaleArticle.y,()=>requestScaleStep('in',{articleId:scaleArticle.articleId}));
+    for(const row of rows){
+      const h=scaleHash(row.key),h2=scaleHash(row.key+'y');
+      const x=WR.w*(0.12+(h%100000)/100000*0.76),y=WR.h*(0.12+(h2%100000)/100000*0.76);
+      mount('kept:'+row.key,row.label,{keptKey:row.key},x,y,()=>requestScaleStep('word',{wordKey:row.key}));
+    }
+    for(const [key,star]of scaleStars)if(!next.has(key)){star.remove();scaleStars.delete(key);}
+  }
+  drawScaleStars();
+}
+let scaleLayoutAt=-Infinity,scaleLayoutDirty=true,scaleMetricsKey='',scaleRail=null;
+const SCALE_LAYOUT_MS=250,SCALE_CELL=64;
+// Bundled font shards can finish after the sky first becomes visible.
+document.fonts?.addEventListener?.('loadingdone',()=>{scaleMetricsKey='';});
+const scalePressedStars=new Set();
+function bindScaleStarPress(star){
+  star.scalePressIds=new Set();
+  star.addEventListener('pointerdown',event=>{star.scalePressIds.add(event.pointerId);scalePressedStars.add(star);},{passive:true});
+  star.addEventListener('blur',()=>{scaleLayoutDirty=true;});
+}
+function releaseScaleStarPress(event){
+  for(const star of scalePressedStars){
+    if(!star.scalePressIds.delete(event.pointerId)||star.scalePressIds.size)continue;
+    scalePressedStars.delete(star);scaleLayoutDirty=true;
+  }
+}
+addEventListener('pointerup',releaseScaleStarPress,{capture:true,passive:true});
+addEventListener('pointercancel',releaseScaleStarPress,{capture:true,passive:true});
+function scaleBox(x,y,w,h){return {left:x-w/2,top:y-h/2,right:x+w/2,bottom:y+h/2,width:w,height:h};}
+function scaleCells(box){
+  const cells=[];
+  for(let x=Math.max(0,Math.floor(box.left/SCALE_CELL));x<=Math.min(Math.floor(vw()/SCALE_CELL),Math.floor(box.right/SCALE_CELL));x++)
+    for(let y=Math.max(0,Math.floor(box.top/SCALE_CELL));y<=Math.min(Math.floor(vh()/SCALE_CELL),Math.floor(box.bottom/SCALE_CELL));y++)cells.push(x+','+y);
+  return cells;
+}
+function occupyScaleBox(grid,box){for(const key of scaleCells(box)){let cell=grid.get(key);if(!cell){cell=[];grid.set(key,cell);}cell.push(box);}}
+function scaleOverlap(grid,box){
+  let area=0;const seen=new Set();
+  for(const key of scaleCells(box))for(const other of grid.get(key)||[]){
+    if(seen.has(other))continue;seen.add(other);
+    const w=Math.min(box.right,other.right)-Math.max(box.left,other.left),h=Math.min(box.bottom,other.bottom)-Math.max(box.top,other.top);
+    if(w>0&&h>0)area+=w*h;
+  }
+  return area;
+}
+function scaleRailHit(box,rail=scaleRail){
+  return !!rail&&box.left<rail.right&&box.right>rail.left&&box.top<rail.bottom&&box.bottom>rail.top;
+}
+function scaleFitPoint(point,w,h){
+  const top=116+h/2,bottom=vh()-100-h/2;
+  let x=Math.max(16+w/2,Math.min(vw()-16-w/2,point.x)),y=Math.max(top,Math.min(bottom,point.y));
+  const rail=scaleRail;
+  if(scaleRailHit(scaleBox(x,y,w,h),rail)){
+    if(rail.right+w/2<=vw()-16-w/2)x=rail.right+w/2;
+    else{
+      const above=rail.top-h/2,below=rail.bottom+h/2;
+      const room=[above,below].filter(edge=>edge>=top&&edge<=bottom);
+      if(room.length)y=room.reduce((best,edge)=>Math.abs(edge-y)<Math.abs(best-y)?edge:best);
+    }
+  }
+  return {x,y};
+}
+function readScaleRail(){
+  if(!lvlEl.isConnected||!lvlEl.getClientRects().length)return null;
+  const style=getComputedStyle(lvlEl);
+  if(style.display==='none'||style.visibility==='hidden'||style.pointerEvents==='none'||Number(style.opacity)<=0)return null;
+  const r=lvlEl.getBoundingClientRect();
+  if(r.width<1||r.height<1||r.right<=0||r.left>=vw()||r.bottom<=0||r.top>=vh())return null;
+  // A focused or held star keeps its screen position across viewport changes.
+  // Reserve the visible rail's hot column for the full height so the moving
+  // vertical rail cannot cross that fixed target when browser chrome resizes.
+  return {left:r.left-6,top:-6,right:Math.max(r.right,r.left+56)+6,bottom:vh()+6};
+}
+function placeScaleStar(point,full,grid,previous){
+  let least=null,attempts=0;
+  for(const compact of [false,true]){
+    const w=compact?44:full.width,h=compact?44:full.height;
+    if(w>vw()-32||h>vh()-216)continue;
+    const candidates=[];
+    // Reuse a clear placement before considering a different projected offset.
+    if(previous&&previous.compact===compact)candidates.push({x:point.x+previous.dx,y:point.y+previous.dy});
+    candidates.push(point);
+    for(const radius of [32,64,96,144,208,288,384,512])for(let i=0;i<12;i++)candidates.push({x:point.x+radius*Math.cos(i*Math.PI/6),y:point.y+radius*Math.sin(i*Math.PI/6)});
+    for(const candidate of candidates){
+      const p=scaleFitPoint(candidate,w,h),box=scaleBox(p.x,p.y,w,h);attempts++;
+      if(scaleRailHit(box))continue;
+      const area=scaleOverlap(grid,box);
+      const choice={dx:p.x-point.x,dy:p.y-point.y,width:w,height:h,compact,crowded:area>0,box,attempts};
+      if(!area)return choice;
+      if(compact&&(!least||area<least.area))least={...choice,area};
+    }
+  }
+  // Fully packed: retain a bounded real keyboard-operable button. Native ink
+  // keeps pointer priority; this does not promise an empty pointer target.
+  if(least)return {...least,attempts};
+  const p=scaleFitPoint(point,44,44),box=scaleBox(p.x,p.y,44,44);
+  return {dx:p.x-point.x,dy:p.y-point.y,width:44,height:44,compact:true,crowded:true,blocked:scaleRailHit(box),box,attempts};
+}
+function drawScaleStars(){
+  if(scaleBridge&&scaleWorldKey!==WR.w+','+WR.h){paintScaleStars();return;}
+  if(!DRIFT_ON||__layer.inert){scaleMetricsKey='';return;}
+  const metricsKey=[vw(),vh(),themeIx].join(',');
+  if(metricsKey!==scaleMetricsKey){
+    scaleMetricsKey=metricsKey;scaleLayoutDirty=true;
+    for(const star of scaleStars.values())star.scaleFullSize=null;
+  }
+  const now=performance.now(),projected=[];
+  for(const star of scaleStars.values()){
+    const p=w2s(star.scaleX,star.scaleY);
+    const visible=!stack.length&&p.x>=30&&p.x<=vw()-30&&p.y>=80&&p.y<=vh()-100;
+    if(visible&&!star.scaleProjectedVisible&&!star.scaleFullSize)scaleLayoutDirty=true;
+    star.scaleProjectedVisible=visible;
+    const fixed=visible&&star.scaleRenderPosition&&(star.scalePressIds?.size||document.activeElement===star)?star.scaleRenderPosition:null;
+    projected.push({star,p,visible,fixed});
+  }
+  const active=projected.filter(row=>row.visible);
+  const snapshot=scaleLayoutDirty||now-scaleLayoutAt>=SCALE_LAYOUT_MS;
+  if(snapshot){
+    // Prepare all new measurements together, then read the whole batch before
+    // any placement write. No native-node layout reads occur between snapshots.
+    for(const {star}of active)if(!star.scaleFullSize){star.hidden=false;star.classList.remove('is-compact');star.scaleRenderKey='';}
+    const grid=new Map();
+    scaleRail=readScaleRail();
+    for(const n of nodes){
+      if(n.gone||n.removed||!n.el.isConnected||Number(n._lop||n.el.style.opacity||1)<=0)continue;
+      const r=n.el.getBoundingClientRect();
+      if(r.width&&r.height&&r.right>0&&r.left<vw()&&r.bottom>0&&r.top<vh())occupyScaleBox(grid,{left:r.left-6,top:r.top-6,right:r.right+6,bottom:r.bottom+6});
+    }
+    // Canvas hub doors have native hit disks even when no DOM ink occupies
+    // them. Reserve the exact native radius by arithmetic, without layout reads.
+    const hubRadius=Math.max(34,46*cam.z*0.7);
+    for(const h of HUBS){
+      const anchor=HUBPOS[h];if(!anchor)continue;
+      const p=w2s(anchor.x,anchor.y);
+      if(p.x+hubRadius>0&&p.x-hubRadius<vw()&&p.y+hubRadius>0&&p.y-hubRadius<vh())occupyScaleBox(grid,scaleBox(p.x,p.y,hubRadius*2,hubRadius*2));
+    }
+    for(const r of hostRects)occupyScaleBox(grid,{left:r.x,top:r.y,right:r.x+r.w,bottom:r.y+r.h});
+    for(const {star}of active)if(!star.scaleFullSize){
+      const width=star.offsetWidth,height=star.offsetHeight;
+      if(width>0&&height>0)star.scaleFullSize={width,height};
+    }
+    for(const {star,p,fixed}of active){
+      if(!star.scaleFullSize){star.scalePlan=null;continue;}
+      if(fixed&&star.scalePlan){occupyScaleBox(grid,scaleBox(fixed.x,fixed.y,star.scalePlan.width,star.scalePlan.height));continue;}
+      star.scalePlan=placeScaleStar(p,star.scaleFullSize,grid,star.scalePlan);
+      occupyScaleBox(grid,star.scalePlan.box);
+    }
+    scaleLayoutAt=now;scaleLayoutDirty=false;
+  }
+  for(const {star,p,visible,fixed}of projected){
+    if(!visible){if(star.scaleRenderKey!=='hidden'){star.hidden=true;star.scaleRenderKey='hidden';}continue;}
+    if(!star.scalePlan||!star.scaleFullSize){star.hidden=true;continue;}
+    const plan=star.scalePlan,placed=fixed||scaleFitPoint({x:p.x+plan.dx,y:p.y+plan.dy},plan.width,plan.height);
+    // The compact caption is visual only; the full accessible name remains on
+    // the same focusable button. Its whole box stays inside the viewport.
+    const cw=Math.min(210,vw()-32),ch=Math.min(120,Math.max(44,star.scaleFullSize.height));
+    const captionX=Math.max(16,Math.min(vw()-16-cw,placed.x-cw/2));
+    const captionY=placed.y+22+ch<=vh()-16?placed.y+22:Math.max(16,placed.y-22-ch);
+    const renderKey=[placed.x,placed.y,plan.compact,plan.crowded,captionX,captionY,cw,ch].join(',');
+    if(star.scaleRenderKey===renderKey)continue;
+    star.scaleRenderKey=renderKey;star.scaleRenderPosition=placed;star.hidden=false;
+    star.classList.toggle('is-compact',plan.compact);
+    star.dataset.scalePlacement=plan.blocked||scaleRailHit(scaleBox(placed.x,placed.y,plan.width,plan.height))?'blocked':plan.crowded?'crowded':plan.compact?'compact':'clear';
+    star.style.transform='translate('+placed.x+'px,'+placed.y+'px) translate(-50%,-50%)';
+    star.style.setProperty('--scale-caption-left',(captionX-(placed.x-22))+'px');
+    star.style.setProperty('--scale-caption-top',(captionY-(placed.y-22))+'px');
+    star.style.setProperty('--scale-caption-width',cw+'px');
+    star.style.setProperty('--scale-caption-height',ch+'px');
+  }
+}
+
+// Observe terminal events even when a newly opened control stops bubbling.
+// No pointer capture, preventDefault or propagation changes are involved.
+addEventListener('pointerup',drainScalePointer,{capture:true,passive:true});
+addEventListener('pointercancel',drainScalePointer,{capture:true,passive:true});
+addEventListener('touchend',scaleTouchesLifted,{capture:true,passive:true});
+addEventListener('touchcancel',scaleTouchesLifted,{capture:true,passive:true});
+addEventListener('pointermove',scaleMouseReleased,{capture:true,passive:true});
+addEventListener('pointerdown',scaleMouseReleased,{capture:true,passive:true});
+addEventListener('blur',interruptScaleHand);
+document.addEventListener('visibilitychange',interruptScaleHand);
+__layer.addEventListener('click',event=>{
+  if(event.detail>0&&scaleConsumedAt&&performance.now()-scaleConsumedAt<600){event.preventDefault();event.stopImmediatePropagation();scaleConsumedAt=0;}
+},{capture:true});
+`;
+
 // 4 · the public seam the corridor drives
 js += `
 window.__DRIFT__ = {
@@ -1129,6 +1581,7 @@ window.__DRIFT__ = {
   setRecordBridge,
   refreshRecord,
   setPracticePriorities,
+  setScaleBridge, canNavigate, capturePlace, restorePlace, focusArticle,
   show() {
     if(recordBridge)void refreshRecord();
     DRIFT_ON = true;
@@ -1138,6 +1591,7 @@ window.__DRIFT__ = {
     if (!rafOn) { rafOn = true; requestAnimationFrame(frame); }
   },
   hide() {
+    clearScalePointers();
     DRIFT_ON = false;
     __layer.inert = true;
     document.getElementById('drift-layer').classList.remove('active');
@@ -1155,7 +1609,28 @@ window.__DRIFT__ = {
 `;
 
 renameId('tray', 'drift-tray');
-const cssOut = css.replace(/#tray\b/g, '#drift-tray');
+const cssOut = (css + `
+/* The article and kept words are real targets in the retained sky. */
+/* Inside sky's stacking context, all native ink keeps its hit plane. */
+#drift-layer .scale-stars { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+#drift-layer .word, #drift-layer .glyph, #drift-layer .part { z-index: 1; }
+#drift-layer .scale-star { position: absolute; left: 0; top: 0; max-width: 210px; min-width: 44px; min-height: 44px; padding: 8px 14px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: var(--type-label); line-height: 1.5; text-align: center; cursor: pointer; pointer-events: auto; }
+#drift-layer .scale-star[hidden] { display: none; }
+#drift-layer .scale-star-number { white-space: nowrap; }
+#drift-layer .scale-star-caption { display: block; overflow-wrap: anywhere; }
+#drift-layer .scale-star.is-compact { width: 44px; height: 44px; min-height: 44px; max-width: 44px; padding: 0; display: grid; place-items: center; }
+#drift-layer .scale-star.is-compact .scale-star-caption { position: absolute; box-sizing: border-box; left: var(--scale-caption-left); top: var(--scale-caption-top); width: var(--scale-caption-width); max-height: var(--scale-caption-height); overflow: auto; padding: 8px; border: 1px solid var(--line); background: var(--ground); visibility: hidden; pointer-events: none; }
+#drift-layer .scale-star.is-compact:is(:hover,:focus-visible) .scale-star-caption { visibility: visible; }
+#drift-layer .scale-star::before { content: '✦'; display: block; font-size: var(--type-seal); line-height: 1; }
+#drift-layer .scale-star-kept { color: var(--verm, #b34836); }
+#drift-layer .scale-star-kept::before { content: '・'; font-size: var(--type-title); }
+#drift-layer .scale-star:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; border-radius: 4px; }
+/* The scale thread shares the world's bar ink and keeps every ancestor in reach. */
+`).replace(/#tray\b/g, '#drift-tray');
+
+// The hosted sky emits shared type steps only. A new literal requires an explicit role mapping.
+if (/\bfont-size\s*:\s*[\d.]+(?:px|rem|em)\b/.test(cssOut))
+  throw new Error('literal font-size in extracted Drift CSS; map it to the shared F type ladder');
 
 // splice the markup into the mount snippet; guard the one sequence that can
 // end an inline <script> early when the standalone build embeds this file

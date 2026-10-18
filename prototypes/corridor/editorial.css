@@ -5218,12 +5218,13 @@ body:not(.zen) #app > .chrome > button#tray:not([data-count='0'])::before {
 body:not(.zen) #app > .chrome > button.theme-seal::after { inset: 12px; }
 body:not(.zen) #app > .chrome .lang-seg button { letter-spacing: 0; }
 body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { background: var(--color-bar-ink); height: 2px; }
-/* ---- the reader's top line holds ONE row at every phone width (T2 "tighter and crisper"; it put
-   the bookmark on a second row at 320px, and at 375px once the count reached three digits). Every
-   door keeps its 44px box and stays reachable, selected or not (verify-corridor counts seven). ---- */
+/* ---- The reader's top line stays one row at every phone width. With Save present,
+   all eight doors keep their 44px targets; excess width scrolls inside this toolbar,
+   so the page and its fixed layers retain the viewport width. ---- */
 @media (max-width: 520px) {
-  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { flex-wrap: nowrap; padding-inline: 2px; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { flex-wrap: nowrap; padding-inline: 2px; min-width: 0; max-width: 100%; overflow-x: auto; }
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg { padding-right: 3px; background-position: right 1px center; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome :focus-visible { outline: 2px solid var(--tint); outline-offset: -2px; }
   /* the saved count sits at the bookmark's shoulder, so the bookmark is always one 44px door */
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#tray {
     position: relative; width: 44px; min-width: 44px; padding: 0; justify-content: center; gap: 0;
@@ -5235,7 +5236,7 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
   }
 }
 @media (max-width: 374px) {
-  /* the narrowest phones: seven 44px doors on one row (the bar's own Save is gone, so the Learn door keeps its place) */
+  /* the narrowest phones: the eight 44px doors close their gaps; what still exceeds the row scrolls inside the toolbar */
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { gap: 0; }
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg button { min-width: 44px; padding-inline: 0; }
 }
@@ -5909,3 +5910,17 @@ body[data-furigana='2'] #drift-layer .word .yomi { opacity: 1; }
 body[data-furigana='0'] #drift-layer .word .yomi { opacity: 0; }
 /* Hosted glyphs keep native reading markup at rest, including before their first tap: their reading rules stand in
    the drift sky's own sheet (drift-layer.css, from tools/build-drift-layer.mjs), beside its hit regions. */
+
+/* G6 · scale thread */
+.scale-thread { display: inline-flex; align-items: center; gap: 2px; max-width: 100%; min-width: 0; min-height: 44px; overflow-x: auto; overscroll-behavior-x: contain; touch-action: pan-x pan-y pinch-zoom; color: var(--color-bar-ink, currentColor); vertical-align: middle; scrollbar-width: thin; }
+.scale-thread > :is(button, .scale-current) { box-sizing: border-box; flex: 0 0 auto; display: inline-block; max-width: 100px; min-width: 44px; min-height: 44px; padding: 12px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; background: transparent; color: inherit; font: inherit; font-size: var(--type-label); line-height: 20px; text-align: center; }
+.scale-thread > button { cursor: pointer; }
+.scale-thread > button:focus-visible { outline: 1px solid currentColor; outline-offset: -3px; }
+.scale-thread > [data-scale-out] { position: sticky; left: 0; z-index: 1; width: 44px; max-width: 44px; padding-inline: 4px; background: var(--color-bar, var(--ed-paper)); font-size: var(--type-lead); }
+.scale-thread > [aria-current='step'] { font-weight: 600; }
+.scale-thread > button:disabled { cursor: default; opacity: 1; }
+#sheet > .scale-thread { position: sticky; top: calc(45px + env(safe-area-inset-top, 0px)); z-index: 3; display: flex; max-width: none; margin: 0 calc(-1 * var(--page-gutter, 32px)) 20px; padding-inline: max(12px, calc(var(--page-gutter, 20px) - 8px)); background: var(--color-bar, var(--ed-paper)); box-shadow: 0 1px 0 color-mix(in srgb, currentColor 12%, transparent); }
+#app > .scale-thread { position: sticky; top: calc(45px + env(safe-area-inset-top, 0px)); z-index: 19; flex: 0 0 auto; width: 100%; background: var(--color-bar, var(--ed-paper)); box-shadow: 0 1px 0 color-mix(in srgb, currentColor 12%, transparent); }
+body.ginga #app > .scale-thread { position: fixed; left: 0; top: calc(56px + env(safe-area-inset-top, 0px)); }
+/* The deck's one-finger vertical scroll must still allow the phone's text zoom. */
+#kp-card { touch-action: pan-y pinch-zoom; }

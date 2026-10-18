@@ -19,17 +19,19 @@ function app() {
       readerScroll: 180, readerPos: {}, readerTake: { p: 'source-a', id: '世界', index: 3 },
       taken: [], srs: {}, revlog: [], dialogInvoker: null },
     window: { scrollY: 180, scrollTo(_x, y) { this.scrollY = y; } },
-    document: { activeElement: null }, referenceLibrary: null,
+    document: { activeElement: null, getElementById: () => null }, referenceLibrary: null,
     learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
-    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, sealStrip: null, readerLayers: null, personalHost: null,
-    roomTransitionUpdating: false, activeRoomTransition: null,
+    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, sealStrip: null, sealSerial: 0, sealPending: null, readerLayers: null, personalHost: null,
+    roomTransitionUpdating: false, activeRoomTransition: null, pageEpoch: 0, recordEpoch: 4,
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
     restoreDialogInvoker() {}, stopReadAloud() {}, clearTimeout() {},
+    clearReaderReadings() {},
     requestAnimationFrame() {}, passage: () => null,
-    recordReady: () => true,
+    recordReady: epoch => epoch === undefined || epoch === 4,
     saveReaderPosition: async (id, y) => { positions.push({ id, y }); return true; },
     stopSentenceListening() { throw drawingBoundary; },
   });
+  context.scaleSource = visit => visit?.recordEpoch === context.recordEpoch ? { token: {} } : null;
   vm.runInContext(actualFunction('syncSheetActionVisit'), context);
   // G5 (2026-10-18): a render puts away the hold's strip and the 層 layers, where it once closed the word menu
   vm.runInContext(['closeSealStrip', 'foldReaderLayers'].map(actualFunction).join('\n'), context);
@@ -39,7 +41,8 @@ function app() {
     catch (error) { if (error !== drawingBoundary) throw error; }
   };
   vm.runInContext(['withoutRoomTransition', 'roomTransition', 'keepNavigationReturn', 'returnFromNavigation', 'openPassage',
-    'openReferenceCollection', 'restoreLearningSourceCaller', 'resumeLearningSource']
+    'openReferenceCollection', 'learningSourceCaller', 'restoreLearningSourceCaller', 'resumeLearningSource',
+    'requestScaleReturn', 'retireScaleReturn']
     .map(actualFunction).join('\n'), context);
   return { context, positions };
 }
@@ -93,6 +96,109 @@ test('restoring navigation cannot resume a replaced learner epoch or review sess
   assert.equal(c.S.view, 'reader');
 });
 
+test('a recursive source detour restores its own scale origin and rejects a replaced learner', () => {
+  const { context: c } = app();
+  const origin = { recordEpoch: 4, passageId: 'source-a', index: 3, viewportY: 220 };
+  const word = { t: 'word', id: '世界', from: { passage: 'source-a', index: 3 } };
+  c.S.scaleVisit = origin; c.S.stack = [word];
+  const caller = c.learningSourceCaller('source-word');
+  c.S.passageId = 'source-b'; c.S.stack = [];
+  c.S.scaleVisit = { recordEpoch: 4, passageId: 'source-b', index: 8, viewportY: 340 };
+  assert.equal(c.restoreLearningSourceCaller(caller), true);
+  assert.equal(c.S.passageId, 'source-a');
+  assert.equal(c.S.stack[0], word);
+  assert.equal(c.S.scaleVisit, origin, 'The caller retains its exact line identity, not the source detour');
+  c.recordEpoch = 5; c.recordReady = epoch => epoch === undefined || epoch === 5;
+  c.S.passageId = 'source-b'; c.S.scaleVisit = null;
+  assert.equal(c.restoreLearningSourceCaller(caller), false);
+  assert.equal(c.S.passageId, 'source-b');
+  assert.equal(c.S.scaleVisit, null, 'A replaced learner cannot revive the older origin');
+});
+
+test('a queued scale return yields to a newer page action even without a room render', () => {
+  for (const interrupted of [false, true]) {
+    const { context: c } = app();
+    const pending = [];
+    const origin = { recordEpoch: 4, passageId: 'source-a', index: 3, scroll: 180 };
+    c.S.view = 'shelf'; c.S.scaleVisit = origin;
+    c.roomTransition = change => pending.push(change);
+    c.openPassage('source-a');
+    assert.equal(pending.length, 1);
+    const epoch = c.pageEpoch;
+    const newer = { t: 'word', id: '学校' };
+    if (interrupted) { c.retireScaleReturn(); c.S.stack = [newer]; }
+    assert.equal(c.pageEpoch, epoch, 'A page-layer action need not render the room');
+    c.roomTransitionUpdating = true;
+    const result = pending.shift()();
+    c.roomTransitionUpdating = false;
+    if (interrupted) {
+      assert.equal(result, false, 'A retired source return cannot overwrite newer input');
+      assert.equal(c.S.view, 'shelf');
+      assert.equal(c.S.stack[0], newer);
+    } else {
+      assert.equal(c.S.view, 'reader');
+      assert.equal(c.S.passageId, 'source-a');
+      assert.equal(c.S.stack.length, 0);
+      assert.equal(c.window.scrollY, origin.scroll);
+    }
+  }
+});
+
+test('an origin read past yields to the newer bookmark; an unread origin keeps its exact line', () => {
+  for (const readOn of [false, true]) {
+    const { context: c } = app();
+    const pending = [];
+    c.S.view = 'shelf'; c.S.readerPos = { 'source-a': 900 };
+    c.S.scaleVisit = { recordEpoch: 4, passageId: 'source-a', index: 3, scroll: 180, ...(readOn ? { readOn } : {}) };
+    c.roomTransition = change => pending.push(change);
+    c.openPassage('source-a');
+    assert.equal(pending.length, 1);
+    c.roomTransitionUpdating = true;
+    pending.shift()();
+    c.roomTransitionUpdating = false;
+    assert.equal(c.S.view, 'reader');
+    assert.equal(c.S.passageId, 'source-a');
+    assert.equal(c.window.scrollY, readOn ? 900 : 180, readOn ? 'The durable bookmark wins' : 'The retained origin owns the return');
+  }
+});
+
+// G5 replaced the word menu with the hold's strip (sealWord); G6's pending-menu ownership is carried onto it: a hold whose
+// door is still preparing is owned by its newest request until it settles or a close retires it
+test('a pending hold is owned by its newest request until it is closed', async () => {
+  const { context: c } = app();
+  const mounted = new Error('strip mounted');
+  const focused = [];
+  Object.assign(c, { removeMini() {}, standingSlip: () => null, openSealStrip() { throw mounted; }, focusProseWord: anchor => focused.push(anchor) });
+  vm.runInContext(actualFunction('sealWord'), c);
+  const anchor = name => ({ name, isConnected: true, closest: () => null });
+  const held = () => {
+    const gate = {};
+    gate.promise = new Promise((resolve, reject) => { gate.settle = resolve; gate.fail = reject; });
+    return gate;
+  };
+  const a = anchor('a'), b = anchor('b'), first = held(), second = held();
+  const openA = c.sealWord(a, { prepare: () => first.promise });
+  assert.equal(c.sealPending.anchor, a);
+  const openB = c.sealWord(b, { prepare: () => second.promise });
+  assert.equal(c.sealPending.anchor, b, 'The newer hold owns cancellation');
+  first.settle();
+  await openA;
+  assert.equal(c.sealPending.anchor, b, 'An older completion cannot clear the newer owner');
+  c.closeSealStrip({ restoreFocus: true });
+  assert.equal(c.sealPending, null);
+  assert.deepEqual(focused, [b], 'Closing returns focus to the pending word');
+  second.settle();
+  await openB;
+  const failed = held(), openFailed = c.sealWord(a, { prepare: () => failed.promise });
+  failed.fail(new Error('prepare failed'));
+  await assert.rejects(openFailed, /prepare failed/);
+  assert.equal(c.sealPending, null, 'A rejected preparation leaves no stale owner');
+  const live = held(), openLive = c.sealWord(b, { prepare: () => live.promise });
+  live.settle();
+  await assert.rejects(openLive, error => error === mounted, 'An uncancelled preparation still mounts its strip');
+  assert.equal(c.sealPending, null);
+});
+
 test('abandoning a pending collection retires its destination before another library visit', () => {
   const { context: c } = app();
   c.openReferenceCollection('jlpt:N5');
@@ -109,7 +215,9 @@ test('abandoning a pending collection retires its destination before another lib
 test('same-visit retry and a reversible nested detour preserve the pending collection', () => {
   const { context: c } = app();
   c.openReferenceCollection('jlpt:N1');
+  const beforeRender = c.pageEpoch;
   c.render(); c.render();
+  assert.equal(c.pageEpoch, beforeRender + 2, 'Every actual room render invalidates retained page generations');
   assert.equal(c.pendingReferenceCollection, 'jlpt:N1');
   c.keepNavigationReturn('search'); c.S.view = 'search'; c.render();
   assert.equal(c.pendingReferenceCollection, null);

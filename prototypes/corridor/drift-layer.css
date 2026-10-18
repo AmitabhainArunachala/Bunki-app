@@ -42,10 +42,10 @@
     text-align:center;transition:none}
 #drift-layer .word .base{display:block;line-height:1.15;text-shadow:0 0 1px currentColor}
 #drift-layer .word .yomi{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
-    font-size:.44em;letter-spacing:.16em;color:var(--pig2);opacity:0;
+    font-size:var(--type-label);letter-spacing:.16em;color:var(--pig2);opacity:0;
     transition:opacity .5s;padding-bottom:.12em;pointer-events:none}
 #drift-layer .word .gloss{position:absolute;top:100%;left:50%;transform:translateX(-50%);
-    font-size:.4em;font-style:italic;font-family:"Noto Serif","Noto Serif JP",Georgia,serif;color:var(--faint);
+    font-size:var(--type-label);font-style:italic;font-family:"Noto Serif","Noto Serif JP",Georgia,serif;color:var(--faint);
     opacity:0;transition:opacity .5s;padding-top:.16em;pointer-events:none}
 #drift-layer .word.unfolded .yomi{opacity:1}
 #drift-layer .word.unfolded .base{box-shadow:inset 0 calc(0px - var(--stroke-hairline, 0.5px)) 0 var(--color-reading)}
@@ -63,12 +63,12 @@
 #drift-layer .word.center,
 #drift-layer .glyph.center,
 #drift-layer .part.center{z-index:6}
-#drift-layer .glyph .g{display:block;font-size:36px;line-height:1.1;text-shadow:0 0 1px currentColor}
-#drift-layer .glyph.center small{font-size:8px}
-#drift-layer .glyph.comp .g{font-size:24px;color:var(--pig2);border:1px solid var(--line);
+#drift-layer .glyph .g{display:block;font-size:var(--type-hero);line-height:1.1;text-shadow:0 0 1px currentColor}
+#drift-layer .glyph.center small{font-size:var(--type-label)}
+#drift-layer .glyph.comp .g{font-size:var(--type-section);color:var(--pig2);border:1px solid var(--line);
     border-radius:var(--radius-control);padding:2px 7px;background:var(--plaque)}
 #drift-layer .glyph small,
-#drift-layer .part small{display:block;font-size:11px;font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;
+#drift-layer .part small{display:block;font-size:var(--type-label);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;
     color:var(--faint);letter-spacing:.03em;opacity:0;transition:opacity .5s}
 #drift-layer .glyph.center small,
 #drift-layer .glyph.unfolded small,
@@ -76,26 +76,26 @@
 #drift-layer .part.unfolded small{opacity:1}
 #drift-layer .part .pch{display:flex;align-items:center;justify-content:center;margin:0 auto;
     width:38px;height:38px;border:1.5px solid var(--pig2);border-radius:50%;
-    font-size:19px;color:var(--pig2);background:var(--plaque)}
+    font-size:var(--type-lead);color:var(--pig2);background:var(--plaque)}
 #drift-layer #brand{position:fixed;top:calc(12px + env(safe-area-inset-top));left:16px;z-index:8;
-    font-size:13px;letter-spacing:.3em;color:var(--faint)}
+    font-size:var(--type-label);letter-spacing:.3em;color:var(--faint)}
 #drift-layer #seal{display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;
-    background:#B13A2F;color:#FFF8EE;border-radius:var(--radius-seal);font-size:11px;margin-right:8px;
+    background:#B13A2F;color:#FFF8EE;border-radius:var(--radius-seal);font-size:var(--type-caption);margin-right:8px;
     vertical-align:-3px;letter-spacing:0}
 #drift-layer #depth{position:fixed;top:calc(13px + env(safe-area-inset-top));left:50%;
-    transform:translateX(-50%);z-index:8;font-size:12px;letter-spacing:.14em;
+    transform:translateX(-50%);z-index:8;font-size:var(--type-caption);letter-spacing:.14em;
     color:var(--faint);max-width:46vw;overflow:hidden;text-overflow:ellipsis;
     white-space:nowrap;pointer-events:none}
 #drift-layer #theme{position:fixed;top:calc(8px + env(safe-area-inset-top));right:14px;z-index:8;
-    font-size:12px;letter-spacing:.12em;color:var(--ink);background:var(--plaque);
+    font-size:var(--type-caption);letter-spacing:.12em;color:var(--ink);background:var(--plaque);
     border:1px solid var(--line);border-radius:var(--radius-control);padding:6px 14px;font-family:inherit;cursor:pointer}
 #drift-layer #theme:focus-visible{outline:2px solid var(--pig1);outline-offset:2px}
 #drift-layer #drift-tray{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:16px;z-index:8;
-    font-size:12px;color:var(--faint);letter-spacing:.1em}
+    font-size:var(--type-caption);color:var(--faint);letter-spacing:.1em}
 #drift-layer #drift-tray b{color:var(--accent);font-weight:500}
 #drift-layer #hint{position:fixed;bottom:calc(40px + env(safe-area-inset-bottom));left:50%;
     transform:translateX(-50%);z-index:8;max-width:82vw;
-    text-align:center;font-size:12px;letter-spacing:.14em;color:var(--ink);
+    text-align:center;font-size:var(--type-caption);letter-spacing:.14em;color:var(--ink);
     background:var(--plaque);border:1px solid var(--line);border-radius:var(--radius-control);
     padding:7px 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
@@ -108,33 +108,33 @@
     backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
     box-shadow:inset 0 0 0 1px var(--line),0 -10px 44px rgba(0,0,0,.14)}
 #drift-layer #card.open{transform:translateY(0)}
-#drift-layer #card .yomi{font-size:13px;letter-spacing:.2em;color:var(--pig2)}
-#drift-layer #card h1{font-size:42px;font-weight:500;margin:2px 0 4px}
-#drift-layer #card .gloss{font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;color:var(--faint);font-size:15px}
+#drift-layer #card .yomi{font-size:var(--type-label);letter-spacing:.2em;color:var(--pig2)}
+#drift-layer #card h1{font-size:var(--type-headword);font-weight:500;margin:2px 0 4px}
+#drift-layer #card .gloss{font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;color:var(--faint);font-size:var(--type-control)}
 #drift-layer #card .row{display:flex;gap:10px;margin-top:14px}
 #drift-layer #card .row div{flex:1;border:1px solid var(--line);border-radius:var(--radius-card);padding:10px;text-align:center}
-#drift-layer #card .row .k{font-size:24px}
-#drift-layer #card .row .kg{font-size:11px;color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic}
-#drift-layer #card .note{margin-top:13px;font-size:11px;color:var(--faint);text-align:center;
+#drift-layer #card .row .k{font-size:var(--type-section)}
+#drift-layer #card .row .kg{font-size:var(--type-label);color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic}
+#drift-layer #card .note{margin-top:13px;font-size:var(--type-label);color:var(--faint);text-align:center;
     font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic}
 #drift-layer #card .kx{display:flex;align-items:center;gap:14px}
 #drift-layer #card .kx h1{margin:0}
-#drift-layer #card .bt{margin-left:auto;font-size:12px;letter-spacing:.1em;color:var(--pig2);
+#drift-layer #card .bt{margin-left:auto;font-size:var(--type-caption);letter-spacing:.1em;color:var(--pig2);
     background:none;border:1px solid var(--line);border-radius:var(--radius-control);
     padding:6px 12px;font-family:inherit;cursor:pointer}
 #drift-layer .scell{margin:12px auto 0;width:150px;height:150px;background:var(--plaque);
     border:1px solid var(--line);border-radius:var(--radius-control);color:var(--ink)}
 #drift-layer .scell svg{display:block;width:100%;height:100%}
-#drift-layer #card .rhead{margin-top:12px;font-size:11px;letter-spacing:.14em;color:var(--faint)}
+#drift-layer #card .rhead{margin-top:12px;font-size:var(--type-caption);letter-spacing:.14em;color:var(--faint)}
 #drift-layer #card .rlist{max-height:34vh;overflow-y:auto;margin-top:6px;border-top:1px solid var(--line);
     touch-action:pan-y;-webkit-overflow-scrolling:touch}
 #drift-layer #card .rrow{display:flex;align-items:baseline;gap:12px;padding:9px 2px;
     border-bottom:1px solid var(--line);cursor:pointer}
-#drift-layer #card .rrow .rk{font-size:22px}
-#drift-layer #card .rrow .rr{font-size:12px;color:var(--pig2);letter-spacing:.06em;min-width:4.4em;
+#drift-layer #card .rrow .rk{font-size:var(--type-seal)}
+#drift-layer #card .rrow .rr{font-size:var(--type-caption);color:var(--pig2);letter-spacing:.06em;min-width:4.4em;
     display:flex;flex-direction:column;line-height:1.35}
-#drift-layer #card .rrow .rr i{font-style:normal;color:var(--faint);font-size:11px}
-#drift-layer #card .rds{font-size:13px;color:var(--pig2);letter-spacing:.08em;line-height:1.4}
+#drift-layer #card .rrow .rr i{font-style:normal;color:var(--faint);font-size:var(--type-caption)}
+#drift-layer #card .rds{font-size:var(--type-label);color:var(--pig2);letter-spacing:.08em;line-height:1.4}
 #drift-layer #card .rds .kun{color:var(--faint)}
 #drift-layer #lvl{position:fixed;left:0;top:50%;transform:translateY(-50%);height:46vh;width:44px;
     z-index:8;opacity:.4;transition:opacity .4s;touch-action:none}
@@ -148,23 +148,23 @@
 #drift-layer #lvl.hot #lvlHandle{left:6px;width:22px;height:22px;margin-top:-11px;
     background:var(--accent);border-width:2px;
     box-shadow:0 0 16px var(--halo),0 3px 12px rgba(0,0,0,.28)}
-#drift-layer #lvlLabels{position:absolute;left:22px;top:0;bottom:0;font-size:10px;color:var(--faint);
+#drift-layer #lvlLabels{position:absolute;left:22px;top:0;bottom:0;font-size:var(--type-caption);color:var(--faint);
     letter-spacing:.05em;opacity:0;transition:opacity .3s;pointer-events:none}
-#drift-layer #lvl.hot #lvlLabels{opacity:1;left:34px;font-size:13px;color:var(--ink);font-weight:600}
+#drift-layer #lvl.hot #lvlLabels{opacity:1;left:34px;font-size:var(--type-label);color:var(--ink);font-weight:600}
 #drift-layer .lvlab{position:absolute;transform:translateY(-50%);white-space:nowrap}
-#drift-layer #lvlInfo{position:absolute;left:42px;top:50%;transform:translateY(-50%);font-size:11px;
+#drift-layer #lvlInfo{position:absolute;left:42px;top:50%;transform:translateY(-50%);font-size:var(--type-caption);
     color:var(--pig2);letter-spacing:.08em;white-space:nowrap;opacity:0;transition:opacity .3s;
     background:var(--plaque);border:1px solid var(--line);border-radius:var(--radius-control);padding:5px 10px;
     pointer-events:none}
 #drift-layer #lvl.hot #lvlInfo{opacity:1}
-#drift-layer #card .rrow .rm{font-size:12px;color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;
+#drift-layer #card .rrow .rm{font-size:var(--type-label);color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 #drift-layer #card .study{display:block;width:100%;box-sizing:border-box;margin-top:13px;
     min-height:46px;padding:14px 16px;text-align:center;font-family:inherit;
-    font-size:13px;letter-spacing:.14em;text-decoration:none;cursor:pointer;
+    font-size:var(--type-label);letter-spacing:.14em;text-decoration:none;cursor:pointer;
     color:var(--ink);background:none;border:1px solid var(--pig2);
     border-radius:var(--radius-control)}
-#drift-layer #card .rhead .radq{margin-left:10px;font-size:10px;letter-spacing:.1em;color:var(--pig2);
+#drift-layer #card .rhead .radq{margin-left:10px;font-size:var(--type-caption);letter-spacing:.1em;color:var(--pig2);
     background:none;border:1px solid var(--line);border-radius:var(--radius-control);padding:3px 9px;
     font-family:inherit;cursor:pointer;vertical-align:1px}
 #drift-layer #radoc{position:fixed;inset:0;z-index:11;background:var(--plaque);
@@ -173,16 +173,16 @@
     padding:calc(28px + env(safe-area-inset-top)) 22px calc(28px + env(safe-area-inset-bottom))}
 #drift-layer #radoc.open{opacity:1;pointer-events:auto}
 #drift-layer #radoc .wrap{max-width:560px;margin:0 auto;color:var(--ink)}
-#drift-layer #radoc h2{font-size:26px;font-weight:500;letter-spacing:.06em;margin-bottom:4px}
-#drift-layer #radoc .sub{font-size:12px;letter-spacing:.2em;color:var(--pig2);margin-bottom:20px}
-#drift-layer #radoc p{font-size:15px;line-height:1.85;margin-bottom:15px}
+#drift-layer #radoc h2{font-size:var(--type-section);font-weight:500;letter-spacing:.06em;margin-bottom:4px}
+#drift-layer #radoc .sub{font-size:var(--type-caption);letter-spacing:.2em;color:var(--pig2);margin-bottom:20px}
+#drift-layer #radoc p{font-size:var(--type-control);line-height:1.85;margin-bottom:15px}
 #drift-layer #radoc .rex{display:flex;gap:14px;align-items:baseline;margin:10px 0;
     border-top:1px solid var(--line);padding-top:12px}
-#drift-layer #radoc .rex .rc{font-size:34px;color:var(--pig1);font-family:inherit;min-width:1.4em;text-align:center}
-#drift-layer #radoc .rex .rt{font-size:13px;color:var(--faint);line-height:1.6}
+#drift-layer #radoc .rex .rc{font-size:var(--type-display);color:var(--pig1);font-family:inherit;min-width:1.4em;text-align:center}
+#drift-layer #radoc .rex .rt{font-size:var(--type-label);color:var(--faint);line-height:1.6}
 #drift-layer #radoc .rex .rt b{color:var(--ink);font-weight:500;font-style:normal}
 #drift-layer #radoc .x{position:fixed;top:calc(16px + env(safe-area-inset-top));right:18px;
-    font-size:13px;letter-spacing:.1em;color:var(--pig2);background:var(--plaque);
+    font-size:var(--type-label);letter-spacing:.1em;color:var(--pig2);background:var(--plaque);
     border:1px solid var(--line);border-radius:var(--radius-control);padding:8px 15px;cursor:pointer;font-family:inherit}
 
 /* Hosted in the corridor the drift keeps no chrome of its own (the one top bar, slice E): its brand, depth
@@ -228,7 +228,7 @@ body.ui-bi #drift-layer [data-l='ja'] { display: none; }
 /* Active constellation glyphs sit above the free field, below existing
  * word satellites (5), centres (6) and component plaques (7). */
 #drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) {
-  z-index: 1;
+  z-index: 2;
 }
 
 /* Native hit regions: preserve field doors through transparent caption/rt
@@ -254,10 +254,10 @@ body[data-furigana='2'] #drift-layer.active #sky > .glyph.hosted-constellation-g
   pointer-events: auto;
 }
 /* G3: hosted glyphs keep native reading markup at rest, including before their first tap, and the hosted sky follows
-   the same reading dial as prose. A sibling gloss/particle caption is never part of the ruby. (At F's merge these moved
-   here from editorial.css: the sky's reading rules stand in the sky's own sheet, so the house's one ruby stays the one
-   rule that sizes a reading everywhere else.) */
-body[data-furigana] #drift-layer .drift-reading rt { font-size: .45em; line-height: 1; opacity: 0; }
+   the same reading dial as prose. A sibling gloss/particle caption is never part of the ruby. (F's merge moved these
+   here from editorial.css; G6's merge leaves a reading's size to the one ruby, half its word, as the sky emits no literal
+   size: G3's .45em is now .5em.) */
+body[data-furigana] #drift-layer .drift-reading rt { line-height: 1; opacity: 0; }
 body[data-furigana='1'] #drift-layer .hosted-reading-shown .drift-reading rt,
 body[data-furigana='2'] #drift-layer .drift-reading rt { opacity: 1; }
 
@@ -284,3 +284,20 @@ body[data-furigana='2'] #drift-layer .drift-reading rt { opacity: 1; }
   }
   #drift-layer #card.open { opacity: 1; pointer-events: auto; }
 }
+
+/* The article and kept words are real targets in the retained sky. */
+/* Inside sky's stacking context, all native ink keeps its hit plane. */
+#drift-layer .scale-stars { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+#drift-layer .word, #drift-layer .glyph, #drift-layer .part { z-index: 1; }
+#drift-layer .scale-star { position: absolute; left: 0; top: 0; max-width: 210px; min-width: 44px; min-height: 44px; padding: 8px 14px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: var(--type-label); line-height: 1.5; text-align: center; cursor: pointer; pointer-events: auto; }
+#drift-layer .scale-star[hidden] { display: none; }
+#drift-layer .scale-star-number { white-space: nowrap; }
+#drift-layer .scale-star-caption { display: block; overflow-wrap: anywhere; }
+#drift-layer .scale-star.is-compact { width: 44px; height: 44px; min-height: 44px; max-width: 44px; padding: 0; display: grid; place-items: center; }
+#drift-layer .scale-star.is-compact .scale-star-caption { position: absolute; box-sizing: border-box; left: var(--scale-caption-left); top: var(--scale-caption-top); width: var(--scale-caption-width); max-height: var(--scale-caption-height); overflow: auto; padding: 8px; border: 1px solid var(--line); background: var(--ground); visibility: hidden; pointer-events: none; }
+#drift-layer .scale-star.is-compact:is(:hover,:focus-visible) .scale-star-caption { visibility: visible; }
+#drift-layer .scale-star::before { content: '✦'; display: block; font-size: var(--type-seal); line-height: 1; }
+#drift-layer .scale-star-kept { color: var(--verm, #b34836); }
+#drift-layer .scale-star-kept::before { content: '・'; font-size: var(--type-title); }
+#drift-layer .scale-star:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; border-radius: 4px; }
+/* The scale thread shares the world's bar ink and keeps every ancestor in reach. */

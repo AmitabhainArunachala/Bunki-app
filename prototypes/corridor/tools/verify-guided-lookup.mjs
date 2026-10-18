@@ -22,12 +22,17 @@ const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 const cases = ['lookup-before-and-after-answer', 'refused-write-retry-and-retired-question', 'menu-records-help-only-on-reveal'];
 const caseFilter = process.argv.find(arg => arg.startsWith('--case='))?.slice('--case='.length) || null;
+const requiredEngines = ['chromium', 'webkit'];
+const requireFull = process.argv.includes('--require-full');
 assert(!caseFilter || cases.includes(caseFilter), `Unknown Guided lookup case: ${caseFilter}`);
 const planned = [];
-const host = await startStaticHost({ site, port: 0 }), results = [];
+const results = [];
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all'
   ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
 assert(engines.every(engine => ['chromium', 'webkit'].includes(engine)));
+assert(!requireFull || (!caseFilter && engines.length === requiredEngines.length && requiredEngines.every(engine => engines.includes(engine))),
+  '--require-full requires all three cases in both actual engines');
+const host = await startStaticHost({ site, port: 0 });
 const act = (page, action) => page.locator(`.guided-room [data-action="${action}"]`).first();
 const stored = page => page.evaluate(key => JSON.parse(localStorage.getItem(key)), key);
 // A written kanji with a hidden reading exercises both rungs; kana may correctly skip to stage.
@@ -214,63 +219,73 @@ try {
       });
       await check('menu-records-help-only-on-reveal', async (page, stages) => {
         // This is generic Japanese prose in the real bank question, not a gs-word teaching door.
+        // G5 · the word's menu is the hold's strip: a right-click (or a hold, or Shift+F10) keeps the word once and opens the
+        // strip; a second one opens the same strip and writes nothing. The strip offers Full entry and Copy, and Remove
+        // beside Saved ✓; only Full entry reveals anything, so only it records Guided help.
         const word = '橋', first = Q[0].id;
         const occurrence = page.locator(`.guided-room .gs-question .japanese-lookup-word[data-lookup-text="${word}"]`);
         assert.equal(await occurrence.count(), 1, 'The real first question has the selected generic lookup occurrence');
-        const menu = page.locator('#reader-word-menu');
+        const strip = page.locator('#seal-strip');
         const before = await stored(page), recordBefore = await readAppRecord(page);
         assert.notEqual(before.answers[first].lookupBefore, true);
         const bare = async label => {
           assert.equal(await page.locator('#mini, #sheet, .guided-room [data-ladder-rung]').count(), 0, `${label} reveals no hint or page`);
           assert.equal(await occurrence.locator('rt').count(), 0, `${label} leaves the occurrence bare`);
         };
+        const stripFacts = () => strip.evaluate(node => ({
+          actions: [...node.querySelectorAll('[data-strip-action]')].filter(button => !button.hidden).map(button => button.dataset.stripAction),
+          status: node.querySelector('.seal-strip-status')?.textContent || '' }));
+
+        // the deliberate keep: the first right-click seals the word, exactly one saved row, no Guided assistance
+        assert.equal(recordBefore.taken.some(row => row.t === 'word' && row.id === word), false);
+        await occurrence.click({ button: 'right' });
+        await strip.waitFor();
+        const savedRecord = await waitForAppRecord(page, row => row.taken.some(saved => saved.t === 'word' && saved.id === word),
+          { description: 'the deliberate keep (right-click = hold = seal)' });
+        const sealed = await stripFacts();
+        assert.deepEqual(await stored(page), before, 'The keep records no Guided assistance or session change');
+        const savedRows = savedRecord.taken.filter(row => row.t === 'word' && row.id === word);
+        assert.equal(savedRows.length, 1);
+        assert(/Saved ✓/u.test(sealed.status) && sealed.actions.includes('remove'), `The strip says the word is kept: ${JSON.stringify(sealed)}`);
+        await page.keyboard.press('Escape');
+        await strip.waitFor({ state: 'detached' });
+        await bare('The kept word');
+        stages.push({ name: 'word-strip-keep', savedRows, strip: sealed, actualState: await stored(page), expectedState: before });
+
+        // a second right-click opens the same strip and writes nothing, however it is dismissed
         const menuActions = {};
         for (const [how, dismiss] of [['escape', () => page.keyboard.press('Escape')],
           ['outside', () => page.locator('.guided-room .gs-title').first().click()]]) {
           await occurrence.click({ button: 'right' });
-          await menu.waitFor();
+          await strip.waitFor();
           const openState = await stored(page);
-          menuActions[how] = await menu.locator('[role="menuitem"]').evaluateAll(nodes => nodes.map(node => node.dataset.menuAction));
+          menuActions[how] = (await stripFacts()).actions;
           await dismiss();
-          await menu.waitFor({ state: 'detached' });
+          await strip.waitFor({ state: 'detached' });
           const actualState = await stored(page);
-          stages.push({ name: `word-menu-dismiss-${how}`, modality: 'right-click', dismissal: how,
+          stages.push({ name: `word-strip-dismiss-${how}`, modality: 'right-click', dismissal: how,
             openState, expectedState: before, actualState });
-          assert.deepEqual(actualState, before, `Opening and dismissing the Guided word menu (${how}) records nothing`);
-          assert.deepEqual(openState, before, `The open Guided menu (${how}) records nothing`);
-          assert.deepEqual(await readAppRecord(page), recordBefore, `The dismissed Guided menu (${how}) leaves the learner record unchanged`);
-          await bare(`The dismissed Guided menu (${how})`);
+          assert.deepEqual(actualState, before, `Opening and dismissing the Guided word's strip (${how}) records nothing`);
+          assert.deepEqual(openState, before, `The open Guided strip (${how}) records nothing`);
+          assert.deepEqual(await readAppRecord(page), savedRecord, `The dismissed Guided strip (${how}) leaves the learner record as the keep left it`);
+          await bare(`The dismissed Guided strip (${how})`);
         }
-        assert(['entry', 'copy', 'save-word'].every(action => menuActions.escape.includes(action)), 'The generic word menu offers Full entry, Copy and Save');
+        assert(['entry', 'copy', 'remove'].every(action => menuActions.escape.includes(action)), 'The kept word\'s strip offers Full entry, Copy and Remove');
         await occurrence.click({ button: 'right' });
-        await menu.locator('[data-menu-action="copy"]').click();
-        await menu.waitFor({ state: 'detached' });
+        await strip.locator('[data-strip-action="copy"]').click();
+        await strip.waitFor({ state: 'detached' });
         const copyToast = page.locator('#reader-toast .reader-toast-text');
         await copyToast.waitFor();
         const copyOutcome = await copyToast.innerText();
         assert([`Copied ${word}`, 'Could not copy'].includes(copyOutcome), 'Native Copy reports its terminal outcome; OS clipboard contents are not asserted');
         assert.deepEqual(await stored(page), before, 'Copy records no Guided assistance or session change');
-        assert.deepEqual(await readAppRecord(page), recordBefore, 'Copy leaves the learner record unchanged');
+        assert.deepEqual(await readAppRecord(page), savedRecord, 'Copy leaves the learner record unchanged');
         await bare('Copy');
-        stages.push({ name: 'word-menu-copy', copyOutcome, actualState: await stored(page), expectedState: before });
-
-        assert.equal(recordBefore.taken.some(row => row.t === 'word' && row.id === word), false);
-        await occurrence.click({ button: 'right' });
-        const save = menu.locator('[data-menu-action="save-word"]');
-        assert.notEqual(await save.getAttribute('aria-disabled'), 'true', 'The selected word can be deliberately saved');
-        await save.click();
-        await menu.waitFor({ state: 'detached' });
-        const savedRecord = await waitForAppRecord(page, row => row.taken.some(saved => saved.t === 'word' && saved.id === word),
-          { description: 'the deliberate menu Save' });
-        assert.deepEqual(await stored(page), before, 'Save records no Guided assistance or session change');
-        await bare('Save');
-        const savedRows = savedRecord.taken.filter(row => row.t === 'word' && row.id === word);
-        assert.equal(savedRows.length, 1);
-        stages.push({ name: 'word-menu-save', savedRows, actualState: await stored(page), expectedState: before });
+        stages.push({ name: 'word-strip-copy', copyOutcome, actualState: await stored(page), expectedState: before });
 
         await occurrence.click({ button: 'right' });
-        const entry = menu.locator('[data-menu-action="entry"]');
-        assert.notEqual(await entry.getAttribute('aria-disabled'), 'true', 'The selected occurrence has a full entry');
+        const entry = strip.locator('[data-strip-action="entry"]');
+        assert.equal(await entry.isDisabled(), false, 'The selected occurrence has a full entry');
         await entry.click();
         await page.locator('#sheet').waitFor();
         const after = await stored(page), event = after.events.at(-1);
@@ -287,7 +302,7 @@ try {
         const atEntry = await page.evaluate(() => window.__guidedHintSnapshots.find(row => row.rung === 'entry')?.state);
         assert.deepEqual(atEntry, after, 'The help is durable before the full entry first appears');
         assert.deepEqual(await readAppRecord(page), savedRecord, 'Full entry leaves the saved learner record unchanged');
-        stages.push({ name: 'word-menu-entry', actualState: after, event, atEntry });
+        stages.push({ name: 'word-strip-entry', actualState: after, event, atEntry });
         await page.locator('#sheet-back').click();
         await page.locator('#sheet').waitFor({ state: 'detached' });
         assert.deepEqual(await stored(page), after, 'Returning from Full entry does not record help twice');
@@ -309,7 +324,7 @@ try {
         const finalState = await stored(page);
         assert.equal(finalState.events.filter(row => row.type === 'LOOKUP').length, 1);
         assert.equal(finalState.answers[first].lookupBefore, true);
-        return { word, menu: menuActions, copyOutcome, savedRows, event, atEntry,
+        return { word, strip: { sealed, actions: menuActions }, copyOutcome, savedRows, event, atEntry,
           labels: { anchor: anchorLabel, summary: summaryLabel, results: await helpFact.innerText() } };
       }, { savedWord: '橋' });
     } finally {
@@ -319,12 +334,19 @@ try {
 } finally {
   await host.close();
   const expectedCases = engines.length * (caseFilter ? 1 : cases.length);
-  const passed = planned.filter(row => row.selected).length === expectedCases && results.length === expectedCases && results.every(row => row.passed);
+  const selectedPassed = planned.filter(row => row.selected).length === expectedCases && results.length === expectedCases && results.every(row => row.passed);
+  const requiredKeys = requiredEngines.flatMap(engine => cases.map(name => `${engine}/${name}`));
+  const observedKeys = results.map(row => `${row.engine}/${row.name}`);
+  const fullCoverage = !caseFilter && engines.length === requiredEngines.length && requiredEngines.every(engine => engines.includes(engine)) &&
+    requiredKeys.length === 6 && observedKeys.length === 6 && new Set(observedKeys).size === 6 && requiredKeys.every(key => observedKeys.includes(key));
+  const passed = fullCoverage && selectedPassed;
+  const acceptance = { passed, fullCoverage, requiredCases: 6, requiredKeys, observedKeys,
+    mode: caseFilter || engines.length !== 2 ? 'diagnostic' : 'full', requireFull };
   writeFileSync(resolve(evidence, 'guided-lookup.json'), JSON.stringify({
     artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
     scope: 'Real guided question lookup lifecycle, before-hint durability, retained full-page return, after-answer honesty, refused write retry, retired-question guard, generic prose menu non-assistance, deliberate Save and With help labels; no design or voice claim',
-    caseFilter, caseInventory: { planned, expectedCases, observedCases: results.length }, results, passed,
+    caseFilter, caseInventory: { planned, expectedCases, observedCases: results.length }, results, selectedPassed, acceptance, passed,
   }, null, 2) + '\n');
-  if (!passed) process.exitCode = 1;
+  if (!selectedPassed || (requireFull && !passed)) process.exitCode = 1;
 }

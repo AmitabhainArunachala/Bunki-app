@@ -1,7 +1,8 @@
 /**
  * Browser acceptance for every one of the 30 added native 本棚 readings.
  *
- * This drives the real served corridor at 390×844 with touch input, on a
+ * This drives the real served corridor at 390×844 with touch actions and a
+ * native wheel gesture for reading onward, on a
  * pinned shelf day. Each article is opened from its one `.shelf-item` card
  * (in the grid or today's six), then exercises its own
  * JSON load, reader/ruby/paragraphs, text settings, quick look, full entry,
@@ -186,6 +187,57 @@ async function settleReader(page) {
     null,
     { polling: 180, timeout: 15_000 },
   );
+}
+
+// Reading onward requires real reading input: a layout/fixture scroll must not
+// replace the exact source line retained by the word ladder. Use one native
+// wheel gesture to the original 620px target, and retain its passive witness.
+async function scrollToBookmark(page) {
+  const trace = await page.evaluateHandle(() => {
+    const reader = document.querySelector('#reader');
+    const from = window.scrollY;
+    const target = Math.min(620, document.body.scrollHeight - innerHeight);
+    const wheels = [], scrolls = [];
+    const onWheel = (event) => wheels.push({
+      trusted: event.isTrusted, deltaY: event.deltaY, deltaMode: event.deltaMode,
+      at: performance.now(),
+    });
+    const onScroll = () => scrolls.push({ y: window.scrollY, at: performance.now() });
+    window.addEventListener('wheel', onWheel, { capture: true, passive: true });
+    window.addEventListener('scroll', onScroll, { capture: true, passive: true });
+    return {
+      from, target,
+      snapshot: () => ({ from, target, requestedDeltaY: target - from,
+        position: Math.round(window.scrollY), wheels, scrolls,
+        devicePixelRatio: window.devicePixelRatio, viewportScale: window.visualViewport?.scale,
+        sameReader: reader?.isConnected && reader === document.querySelector('#reader') }),
+      close: () => {
+        window.removeEventListener('wheel', onWheel, true);
+        window.removeEventListener('scroll', onScroll, true);
+      },
+    };
+  });
+  try {
+    const { from, target } = await trace.evaluate((value) => ({ from: value.from, target: value.target }));
+    if (!(target > 0) || from === target) throw new Error('bookmark fixture needs a nonzero native scroll');
+    await page.mouse.move(VIEWPORT.width / 2, VIEWPORT.height / 2);
+    await page.mouse.wheel(0, target - from);
+    await page.waitForFunction((expected) => Math.round(window.scrollY) === expected, target, { timeout: 5000 });
+    await page.waitForTimeout(80);
+    const witness = await trace.evaluate((value) => value.snapshot());
+    if (!witness.sameReader || witness.position !== target || !witness.scrolls.length ||
+        !witness.wheels.some((event) => event.trusted && event.deltaMode === 0 &&
+          Number.isFinite(event.deltaY) && Math.sign(event.deltaY) === Math.sign(target - from))) {
+      throw new Error('native bookmark scroll did not preserve the reader and exact target');
+    }
+    return witness;
+  } catch (error) {
+    const witness = await trace.evaluate((value) => value.snapshot());
+    throw new Error(`${error.message}: ${JSON.stringify(witness)}`, { cause: error });
+  } finally {
+    await trace.evaluate((value) => value.close());
+    await trace.dispose();
+  }
 }
 
 async function setReaderDial(page, key, index) {
@@ -1052,11 +1104,8 @@ try {
     await waitForAppRecord(page, (record) => !!record.readDone?.[id],
       { description: `one acknowledged completion write for ${id}` });
     await page.waitForSelector('#read-fin.finished');
-    await page.evaluate(() =>
-      window.scrollTo(0, Math.min(620, document.body.scrollHeight - innerHeight)),
-    );
-    await page.waitForTimeout(80);
-    const intendedPosition = await page.evaluate(() => Math.round(window.scrollY));
+    const bookmarkScroll = await scrollToBookmark(page);
+    const intendedPosition = bookmarkScroll.position;
     await touchAt(page, page.locator('#back'));
     await page.waitForSelector(storyCard(id));
     const returnedShelfY = await page.evaluate(() => window.scrollY);
@@ -1133,6 +1182,7 @@ try {
       ladderReturn,
       ownFileLoaded,
       intendedPosition,
+      bookmarkScroll,
       persistedPosition: persisted.position,
       restoredPosition,
       shelfY,
