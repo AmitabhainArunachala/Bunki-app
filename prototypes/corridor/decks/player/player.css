@@ -398,7 +398,7 @@
   --kp-noun: var(--kp-cyan); --kp-verb: #93301a; --kp-adj: #805300; --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
   /* the study stage (the ground around the card while studying) is the room's lacquer, Learn's own
    * proscenium (--color-lacquer), and the card is the lit paper on it; its text is the lacquer's ink.
-   * --kp-shu is the 朱 of the marked word's brackets, the rail and the slash on もう一度 (never text):
+   * --kp-shu is the 朱 of the marked word's wash, the rail and the slash on もう一度 (never text):
    * the world's seal red. Measured: contrast-kotoba stage row */
   --kp-stage: var(--color-lacquer, #141a28); --kp-stage-ink: var(--color-lacquer-ink, #e9e2d2); --kp-stage-mute: color-mix(in srgb, var(--color-lacquer-ink, #e9e2d2) 76%, var(--world-ground, var(--color-lacquer, #141a28))); --kp-shu: var(--color-seal, #c4401f);
   /* the dock (the ground under 答えを見る and the grade pads, and the page below the last card) is the
@@ -496,15 +496,13 @@
  * Fronts have no tap nodes and keep their original compact line spacing. */
 .kp .kp-sentence:has(.kp-tok) { line-height: 2.5; }
 .kp .kp-card[data-zoom='focus'] .kp-sentence:has(.kp-tok) .kp-ctx:not([data-open='1']) .kp-ctx-in { max-height: 5em; }
-/* the marked word: 朱 corner brackets and a faint wash (backgrounds, so its ::before keeps the 44px
- * reach it has as a tap target on the back); its own colour stays its part of speech */
+/* the marked word: a wash of 朱 under its ink (a background, so its ::before keeps the 44px reach it has as a tap target
+ * on the back); its own colour stays its part of speech. No corner marks (Hfix-1B, H-yoru-01; §7 line 38 "no corner marks",
+ * S's class M): the two 朱 corner brackets that framed it were the crop-mark ornament John asked to go */
 .kp .kp-target {
   padding: 0 0.16em; margin: 0 0.04em; text-decoration-thickness: 1.5px; -webkit-box-decoration-break: clone; box-decoration-break: clone;
-  /* drawn: the cloze target's 朱 corner marks, four hairlines, over its 朱 mark */
-  background:
-    linear-gradient(var(--kp-shu), var(--kp-shu)) 0 0 / 0.36em 2px no-repeat, linear-gradient(var(--kp-shu), var(--kp-shu)) 0 0 / 2px 0.36em no-repeat,
-    linear-gradient(var(--kp-shu), var(--kp-shu)) 100% 100% / 0.36em 2px no-repeat, linear-gradient(var(--kp-shu), var(--kp-shu)) 100% 100% / 2px 0.36em no-repeat,
-    color-mix(in srgb, var(--kp-shu) 10%, transparent);
+  background: color-mix(in srgb, var(--kp-shu) 14%, transparent);
+  border-radius: var(--radius-seal, 3px);
 }
 .kp .kp-blank { border-bottom-color: var(--kp-shu); background: color-mix(in srgb, var(--kp-shu) 9%, transparent); border-radius: var(--radius-seal, 3px) var(--radius-seal, 3px) 0 0; }
 .kp .kp-taphint { font-size: var(--type-caption); letter-spacing: 0.14em; padding-top: 12px; border-top: 1px solid var(--kp-line); }
