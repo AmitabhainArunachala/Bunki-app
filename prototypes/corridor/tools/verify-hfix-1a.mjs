@@ -23,6 +23,7 @@
  *   14  W-2: a load the page abandons as it goes settles caught (no page error), and loads work again after pageshow;
  *       W-1: a dictionary shard that fails once is asked again, and the stage still lands on its sense;
  *   15  R3-3: さもなければかの is ば + かの (that), never ばか (idiot);
+ *   16  H0-1: Today's note field shows its whole hint at 390 and 320, in English and 日本語;
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -90,6 +91,7 @@ const CONTROL = {
   'seg-baka': { item: '15.', source: [['data/articles/aozora-049966-2.json',
     '{"s":"ば","b":"ば","p":"助詞","r":"ば","f":[{"t":"ば"}],"c":false,"rs":"segment"},{"s":"かの","b":"かの","p":"連体詞","r":"かの","f":[{"t":"かの"}],"c":true,"rs":"segment"}',
     '{"s":"ばか","b":"ばか","p":"名詞","r":"ばか","f":[{"t":"ばか"}],"c":true},{"s":"の","b":"の","p":"助詞","r":"の","f":[{"t":"の"}],"c":false}']] },
+  'note-hint': { item: '16.', css: '.chat-row:has(> #note-input) { flex-wrap: nowrap !important; } .chat-row > #note-input { flex: 1 !important; padding-inline: 20px !important; } .chat-row > #note-input::placeholder { font-size: var(--type-chrome) !important; }' },
   thread: { item: '3.', css: '.scale-thread { scroll-snap-type: none !important; }',
     source: [['corridor.js', '    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);', '    if (delta) thread.scrollLeft += delta;']] },
 };
@@ -704,10 +706,34 @@ async function itemSegment(browser, engine) {
         gloss: m.querySelector('.mini-gloss')?.textContent ?? '' } : null; });
     }
     void kano;
-    check(`15.samonakereba · ${engine} · さもなければかの: ば + かの, no ばか; the slip on かの means "that", never "idiot"`,
-      JSON.stringify(toks) === JSON.stringify(['さも', 'なけれ', 'ば', 'かの', '国']) && slip?.word === 'かの' && /\bthat\b/iu.test(slip.gloss) && !/idiot|fool/iu.test(slip.gloss) && !errors.length,
+    // (かの has no meaning in the bundled dictionaries: its slip says so plainly; it must never be ばか's "idiot")
+    check(`15.samonakereba · ${engine} · さもなければかの: ば + かの, no ばか; the slip on かの is かの, never "idiot"`,
+      JSON.stringify(toks) === JSON.stringify(['さも', 'なけれ', 'ば', 'かの', '国']) && slip?.word === 'かの' && !/idiot|fool/iu.test(slip.gloss) && !errors.length,
       { toks, slip, errors });
   } finally { await context.close(); }
+}
+
+async function itemNoteHint(browser, engine) {
+  // 16 · H0-1: Today's note field shows its whole hint (measured in its own placeholder font against the field's content
+  // box), at 390 and 320, in English and 日本語; its "keep it" stays whole and clear of it
+  for (const [width, ui] of [[390, 'bi'], [320, 'bi'], [390, 'ja'], [320, 'ja']]) {
+    const { context, page, errors } = await session(browser, { width, ui, query: 'entry=shelf&room=tray' });
+    try {
+      await page.waitForSelector('#note-input', { timeout: 15_000 });
+      await settle(page, 400);
+      const f = await page.evaluate(() => {
+        const input = document.getElementById('note-input'), cs = getComputedStyle(input), ph = getComputedStyle(input, '::placeholder');
+        const ctx = document.createElement('canvas').getContext('2d');
+        ctx.font = `${ph.fontStyle} ${ph.fontWeight} ${ph.fontSize} ${ph.fontFamily}`;
+        const need = ctx.measureText(input.placeholder).width, room = input.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        const a = input.getBoundingClientRect(), b = document.getElementById('note-send')?.getBoundingClientRect();
+        const overlap = !!b && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+        return { hint: input.placeholder, need: Math.round(need), room: Math.round(room), overlap, send: !!b && b.width > 0 && b.right <= document.documentElement.clientWidth };
+      });
+      check(`16.note-hint · ${engine} ${width} ${ui} · Today's note field shows its whole hint ("${f.hint}"), its keep clear of it`,
+        f.need <= f.room && !f.overlap && f.send && !errors.length, { ...f, errors });
+    } finally { await context.close(); }
+  }
 }
 
 const ITEMS = [
@@ -725,6 +751,7 @@ const ITEMS = [
   { id: 'strip-lists', prefix: '12.', run: itemStripLists },
   { id: 'fetches', prefix: '14.', run: itemFetches },
   { id: 'segment', prefix: '15.', run: itemSegment },
+  { id: 'note-hint', prefix: '16.', run: itemNoteHint },
 ];
 
 const log = { engines: {} };

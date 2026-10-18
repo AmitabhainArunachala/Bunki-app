@@ -5808,6 +5808,14 @@ body.record-not-saving #app > .chrome { margin-bottom: var(--record-band-h, 48px
 }
 /* one press keeps the word and opens its drawer: the words say Save, no caret */
 #app > .chrome button.save-one.chrome-keep::after { content: none; }
+/* Hfix-1A (H0-1: Today's note field cut its hint to "anything that felt wrong or mi" at 390, "anything that felt w" at
+   320) · on a phone the note's field takes the whole row and its "keep it" stands under it, so the hint fits whole */
+@media (max-width: 520px) {
+  .chat-row:has(> #note-input) { flex-wrap: wrap; justify-content: flex-end; row-gap: 8px; }
+  .chat-row > #note-input { flex: 1 1 100%; padding-inline: 16px; }
+}
+/* a 320 phone's Today keeps its sign's margin: the hint takes the ladder's label step (13 px) there */
+@media (max-width: 360px) { .chat-row > #note-input::placeholder { font-size: var(--type-label); } }
 /* Hfix-1A · one Save on screen: while a stage or a word page stands the bar's keep steps aside, keeping its room so no
    other door moves (corridor.js paintKeepAside, which also makes it inert); it returns when they close */
 #app > .chrome button.save-one.chrome-keep[data-aside] { visibility: hidden; }
