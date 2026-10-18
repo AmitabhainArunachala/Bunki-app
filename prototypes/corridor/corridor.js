@@ -36749,13 +36749,26 @@ function renderRadicalNode(sheet, node) {
   hero.append(meta);
   sheet.append(hero);
 
+  // Hfix-1A · the part in plain words (round 1, H-kaku-06: "Official Kangxi radical no. 120 — いとへん (へん · left). Below:
+  // the characters that contain this part."): its name, what it means, where it sits and in how many kanji; its number and
+  // strokes stand in the chips above
   const note = el('div', 'note');
+  const meaning = partGloss(null, r.c);
+  const count = r.kanjiCount || 0;
+  const WHERE = {
+    へん: [`${count}字の左側にある`, `on the left of ${count} kanji`], つくり: [`${count}字の右側にある`, `on the right of ${count} kanji`],
+    かんむり: [`${count}字の上にのる`, `across the top of ${count} kanji`], あし: [`${count}字の下に置かれる`, `along the foot of ${count} kanji`],
+    たれ: [`${count}字の上から左へ垂れる`, `hanging over the top and left of ${count} kanji`],
+    にょう: [`${count}字の左から下を囲む`, `wrapping the left and foot of ${count} kanji`],
+    かまえ: [`${count}字のまわりを囲む`, `enclosing ${count} kanji`], 独立: [`${count}字に含まれる`, `in ${count} kanji`],
+  };
+  const where = official ? WHERE[official.pos] || WHERE.独立 : null;
   note.textContent = official
     ? tx(
-        `康熙部首の第 ${official.n} 番「${official.name}」。位置は${posText}。下は、この部品を含む字。`,
-        `Official Kangxi radical no. ${official.n} — ${official.name} (${posText}). Below: the characters that contain this part.`,
+        `${official.name}は${official.base && official.base !== official.name ? `「${official.base}」の部首` : '部首のひとつ'}。${where[0]}。`,
+        `${official.name}, ${meaning ? `the ${meaning} radical` : 'a radical'}, ${where[1]}.`,
       )
-    : tx('「この部品を含む」族。康熙部首ではない部品。', 'The family of characters containing this part — a shape component, not one of the Kangxi radicals.');
+    : tx(`${count}字に見られる形。214の部首には入らない。`, `A shape found in ${count} kanji; it is not one of the 214 radicals.`);
   sheet.append(note);
 
   if (r.isKanji && D.kanji[r.c]) {

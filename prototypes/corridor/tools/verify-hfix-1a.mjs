@@ -12,6 +12,8 @@
  *   5   Speak's top bar carries no Save;
  *   6   a word page shows its dictionary entry once (a lone door is the head of its senses) and names parts of speech in
  *       plain words, English or Japanese, with no JMdict romaji;
+ *   7   a part page says what the part is in plain words (name, meaning, where it sits, in how many kanji); its number and
+ *       strokes stay in its chips;
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -64,6 +66,8 @@ const CONTROL = {
     "  if ((S.view === 'reader' && passage()) || S.view === 'speak') chrome.append(chromeKeep());"]] },
   'one-entry': { item: '6.one', source: [['corridor.js', '  const lone = !node.readerChoice && dictionaryLoneDoor(node) &&', '  const lone = false &&']] },
   'plain-pos': { item: '6.plain', source: [['corridor.js', 'function dictionaryTag(tag) {', 'function dictionaryTag(tag) { return D.dictionaryIndex?.tags?.[tag] || tag;']] },
+  'part-plain': { item: '7.', source: [['corridor.js', "        `${official.name}, ${meaning ? `the ${meaning} radical` : 'a radical'}, ${where[1]}.`,",
+    '        `Official Kangxi radical no. ${official.n} — ${official.name} (${posText}). Below: the characters that contain this part.`,']] },
   thread: { item: '3.', css: '.scale-thread { scroll-snap-type: none !important; }',
     source: [['corridor.js', '    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);', '    if (delta) thread.scrollLeft += delta;']] },
 };
@@ -430,6 +434,38 @@ async function itemEntry(browser, engine) {
   }
 }
 
+// 7 · the part page's sentence, word for word, for 糸 (round 1's page) and three other positions, in both languages
+const PART_ORACLE = {
+  bi: { 糸: 'いとへん, the thread radical, on the left of 68 kanji.', 艹: 'くさかんむり, the grass radical, across the top of 82 kanji.',
+    辶: 'しんにょう, the walk radical, wrapping the left and foot of 57 kanji.', 戈: 'ほこづくり, the halberd radical, on the right of 48 kanji.' },
+  ja: { 糸: 'いとへんは「いと」の部首。68字の左側にある。', 艹: 'くさかんむりは「くさ」の部首。82字の上にのる。',
+    辶: 'しんにょうは部首のひとつ。57字の左から下を囲む。', 戈: 'ほこづくりは「ほこ」の部首。48字の右側にある。' },
+};
+async function itemPart(browser, engine) {
+  // 7 · the part page says what the part is in plain words; its number and strokes stay in its chips
+  for (const ui of ['bi', 'ja']) {
+    const { context, page, errors } = await session(browser, { ui });
+    try {
+      const seen = {};
+      for (const part of Object.keys(PART_ORACLE[ui])) {
+        await page.evaluate((id) => window.__H1A__.run(`(() => { S.stack = []; go({ t: 'radical', id: ${JSON.stringify(id)} }); })()`), part);
+        await page.locator('#sheet .note').waitFor({ timeout: 10_000 });
+        await settle(page, 250);
+        seen[part] = await page.evaluate(() => ({ note: document.querySelector('#sheet .note')?.textContent ?? null,
+          chips: [...document.querySelectorAll('#sheet .hero .pool-tag')].map((n) => n.textContent) }));
+        await page.evaluate(() => window.__H1A__.run('(() => { S.stack = []; render(); })()'));
+        await delay(200);
+      }
+      const wrong = Object.entries(PART_ORACLE[ui]).filter(([part, want]) => seen[part]?.note !== want);
+      const chips = seen['糸']?.chips || [];
+      const facts = chips.some((t) => /(部首|radical) 120/u.test(t)) && chips.some((t) => /68 (字|kanji)/u.test(t)) && chips.some((t) => /6 (画|strokes)/u.test(t));
+      const technical = Object.values(seen).filter((f) => /Kangxi|康熙|Below:|下は、/u.test(f.note || ''));
+      check(`7.part-plain · ${engine} ${ui} · the part page says what the part is in plain words (${PART_ORACLE[ui]['糸']}); radical 120, 6 strokes and 68 kanji stay in its chips`,
+        !wrong.length && facts && !technical.length && !errors.length, { wrong: wrong.map(([p]) => `${p}: "${seen[p]?.note}"`), chips, errors });
+    } finally { await context.close(); }
+  }
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
   { id: 'layers', prefix: '2.', run: itemLayers },
@@ -437,6 +473,7 @@ const ITEMS = [
   { id: 'one-save', prefix: '4.', run: itemOneSave },
   { id: 'speak-bar', prefix: '5.', run: itemSpeakBar },
   { id: 'entry', prefix: '6.', run: itemEntry },
+  { id: 'part', prefix: '7.', run: itemPart },
 ];
 
 const log = { engines: {} };
