@@ -1008,12 +1008,17 @@ const teExpressionFits = (tokens, index, label, stated) => afterTeForm(tokens, i
 // R3 (Grok 0315) · the card of an expression the text writes around the token, read whole (について, にとって, いけない,
 // 一枚岩, 方がいい, もったいない, ちがいない, 間もなく, なりに, んだ): two to four tokens holding this one, whose spelling is
 // the card's word or whose reading is its reading line. Its meaning must still be an entry's that writes that word and
-// reads it so (meaningEntry); つく's "to be attached" for について was the wrong sense this sweep's class rule pinned
+// reads it so (meaningEntry); つく's "to be attached" for について was the wrong sense this sweep's class rule pinned.
+// R3 (Grok 2029) · the must family runs to five (なく て は いけ ない), and a card names an expression by its dictionary
+// form, as a verb's card does: the run's last word may be written inflected (床につい: 床につく; ならなく: ならない), or as
+// a negative ending ぬ, ん or ず where the form says ない (しなければならん, ならぬ, ならず: なければならない)
+const NEGATIVE_ENDINGS = new Set(['ぬ', 'ん', 'ず']);
 const expressionFits = (tokens, index, label, stated) => {
-  for (let from = Math.max(0, index - 3); from <= index; from += 1) {
-    for (let to = Math.max(index, from + 1); to <= Math.min(tokens.length - 1, from + 3); to += 1) {
-      const run = tokens.slice(from, to + 1);
+  for (let from = Math.max(0, index - 4); from <= index; from += 1) {
+    for (let to = Math.max(index, from + 1); to <= Math.min(tokens.length - 1, from + 4); to += 1) {
+      const run = tokens.slice(from, to + 1), last = run.at(-1), head = run.slice(0, -1).map((t) => t.s).join('');
       if (run.map((t) => t.s).join('') === label || k2h(run.map((t) => t.r || t.s).join('')) === k2h(stated)) return true;
+      if ((last.b && last.b !== last.s && head + last.b === label) || (NEGATIVE_ENDINGS.has(last.s) && `${head}ない` === label)) return true;
     }
   }
   return false;
