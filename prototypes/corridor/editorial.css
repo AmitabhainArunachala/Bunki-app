@@ -2841,8 +2841,9 @@ body .token-actions button:hover { background: var(--ai-wash); }
 
 /* G5 · the strip: the slip's paper and edge (rooms/read.css #mini), laid in its word's own scroller (the document, or the
    page) so it scrolls with the word; under the chrome's bar and the page's bar (it never covers them), over the text.
-   Row 1 is his lists — B slips, the chosen mark when the word is on one; row 2 the word's acts — C, quiet, under a
-   hairline. corridor.js caps it at 40 % of the screen; it scrolls inside itself. */
+   Row 1 is the word's state and its one way out (Saved ✓, Remove), then his lists — B slips, the chosen mark when the
+   word is on one; row 2 the word's acts — C, quiet, under a hairline. corridor.js caps it at 40 % of the screen; its
+   ordinary rows fit inside that with no scroll of their own (only past six lists can it scroll inside itself). */
 .seal-strip {
   position: absolute;
   z-index: 19;
@@ -2885,8 +2886,9 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .seal-strip-status { margin: 0 4px 8px; font: 500 13px/1.45 var(--font-ui); color: var(--color-ink-2); }
 .seal-strip-status:empty { display: none; }
 .seal-strip-lists { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-/* in the lists row the status is the row's first word: "Saved ✓  仕事  旅  New list…" */
+/* in the first row the status is the row's first word, its one way out beside it: "Saved ✓  Remove  仕事  旅  New list…" */
 .seal-strip-lists > .seal-strip-status { display: inline-flex; align-items: center; min-height: 44px; margin: 0 6px 0 4px; }
+.seal-strip-lists > .seal-act[data-strip-action='remove'] { margin-inline: -4px 6px; }
 .seal-strip-lists > .seal-strip-status:empty { display: none; }
 .seal-strip-more { display: contents; }
 .seal-strip-more[hidden], .seal-strip-form[hidden], .seal-strip [hidden] { display: none; }
@@ -2894,7 +2896,9 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .seal-strip .seal-list[aria-pressed='true']::after { content: ' ✓'; }
 .seal-strip-form { display: flex; flex: 1 1 100%; gap: 6px; }
 .seal-strip-form .vocabulary-list-field { flex: 1 1 auto; min-width: 0; }
-.seal-strip-acts { display: flex; flex-wrap: wrap; gap: 0 2px; margin: 8px -4px 0; padding-top: 4px; border-top: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent); }
+.seal-strip-acts { display: flex; flex-wrap: wrap; gap: 0 2px; margin: 8px -6px 0; padding-top: 4px; border-top: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent); }
+/* two verbs to a line even on a 320 phone (全項目 · Full entry | Save the sentence), so the acts take two lines, not three */
+.seal-strip .seal-strip-acts > button.seal-act { padding-inline: 6px; }
 .seal-strip .seal-act[data-strip-action='remove'] { color: var(--color-ink-2); }
 .seal-strip-room { display: block; }
 

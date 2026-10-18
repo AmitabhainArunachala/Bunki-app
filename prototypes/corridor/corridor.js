@@ -10861,8 +10861,9 @@ function markStripMore(strip) {
 function focusSealStrip(keyboard) {
   const open = sealStrip;
   if (!open) return;
+  // the keyboard lands on his lists (or New list…), never on Remove beside Saved ✓: Enter after Shift+F10 never un-keeps
   const first = [...open.strip.querySelectorAll('button:not([disabled]):not([hidden]), input:not([hidden])')]
-    .find((node) => !node.closest('[hidden]') && node.getClientRects().length);
+    .find((node) => !node.closest('[hidden]') && node.getClientRects().length && node.dataset.stripAction !== 'remove');
   (keyboard && first ? first : open.strip).focus({ preventScroll: true });
 }
 /** Hold = seal: the hold, a right-click or Shift+F10 on one word. */
@@ -10959,16 +10960,19 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
     return kept() ? tx('保存済み ✓', 'Saved ✓') : '';
   };
   say(statusFor());
-  // a keepable word's status opens its lists row ("Saved ✓  仕事  旅  New list…"); any other stands alone above the acts
+  // a keepable word's status opens its first row ("Saved ✓  Remove  仕事  旅  New list…"); any other stands alone above
+  // the acts
   if (!node) strip.append(status);
   const controls = [];
   let busy = false;
-  // row 1 · his lists, one tap each: a toggle per list (pressed when the word is on it), the rest unfolding inside the
-  // strip past six, and New list… which asks its name once
+  // row 1 · the word's state and its one way out (Saved ✓, Remove: the lead's ruling, 2026-10-18 — the state's natural
+  // pair, and a line saved, so every control stands in the strip with no scroll inside it), then his lists, one tap
+  // each: a toggle per list (pressed when the word is on it), the rest unfolding inside the strip past six, and
+  // New list… which asks its name once
   if (node) {
     const lists = el('div', 'seal-strip-lists');
     lists.setAttribute('role', 'group');
-    lists.setAttribute('aria-label', tx('リスト', 'Lists'));
+    lists.setAttribute('aria-label', tx('保存とリスト', 'Saved and lists'));
     lists.append(status);
     const more = el('div', 'seal-strip-more');
     more.hidden = true;
@@ -11079,7 +11083,8 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
     };
     paint();
   }
-  // row 2 · the word's acts, quiet, in plain full verbs; Remove only while the word is kept
+  // row 2 · the word's acts, quiet, in plain full verbs; Remove (only while the word is kept) stands in row 1 beside
+  // Saved ✓
   const acts = el('div', 'seal-strip-acts');
   acts.setAttribute('role', 'group');
   acts.setAttribute('aria-label', tx('ほかの操作', 'More'));
@@ -11114,6 +11119,7 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
   }
   const removeButton = act('remove', tx('外す', 'Remove'), () => removeKept(facts.node, label),
     { hidden: !(node && kept()), name: tx(`「${label}」の保存を外す`, `Remove ${label} from your saved words`) });
+  if (node) status.after(removeButton);
   strip.append(acts);
   for (const control of strip.querySelectorAll('button, input')) controls.push(control);
   strip.addEventListener('keydown', (event) => {
