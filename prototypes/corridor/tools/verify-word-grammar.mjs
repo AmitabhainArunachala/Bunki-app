@@ -4383,7 +4383,18 @@ try {
     for (const [form, viewport] of [['320x568', { width: 320, height: 568 }], ['390x844', { width: 390, height: 844 }], ['430x932', { width: 430, height: 932 }]]) {
       await walk(`G5-glass-${form}`, async (page) => {
         await openStory(page);
-        const cases = [['first', async () => { const w = readerWord(page); await w.evaluate((n) => { document.querySelector('[data-g5-held]')?.removeAttribute('data-g5-held'); n.setAttribute('data-g5-held', ''); }); return w; }],
+        // G6 · the room's scale rail sits under the bar, so at 320×568 the story's first 総理 opens under the 層 mark and the
+        // foot: the word is brought wholly onto the glass first (only if it is not already), as a reader brings a word up
+        // before holding it
+        const cases = [['first', async () => { const w = readerWord(page); await w.evaluate((n) => {
+          document.querySelector('[data-g5-held]')?.removeAttribute('data-g5-held'); n.setAttribute('data-g5-held', '');
+          const edge = (sel, side) => { const e = document.querySelector(sel); if (!e || !['fixed', 'sticky'].includes(getComputedStyle(e).position)) return null; const b = e.getBoundingClientRect(); return b.height ? b[side] : null; };
+          const vv = window.visualViewport, glass = vv ? vv.offsetTop + vv.height : innerHeight;
+          const top = Math.max(edge('#app > .chrome', 'bottom') ?? 0, edge('#app > .scale-thread', 'bottom') ?? 0);
+          const foot = Math.min(glass, edge('#primary-tabs', 'top') ?? glass, edge('.listen-row', 'top') ?? glass, edge('#layers-mark', 'top') ?? glass);
+          const r = n.getBoundingClientRect();
+          if (r.top < top + 4 || r.bottom > foot - 4) window.scrollBy(0, r.top - (top + (foot - top) / 2));
+        }); await delay(300); return w; }],
           ['foot', () => wordAt(page, 'foot')], ['top', () => wordAt(page, 'top')]];
         let id = 80;
         for (const [name, choose] of cases) {

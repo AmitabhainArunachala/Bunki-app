@@ -1155,12 +1155,16 @@ const SWEEP_PRONUNCIATION_PROOFS = [
     sha256: '830d99e8e1c86e273f6ed334de1cc6dbcbf030972c9424465735af42557fff0d',
     bracket: [348, 354], written: '悉曇', reading: 'しったん', tokenReadingIndex: 230,
     basis: 'Authored source phrase and token230.r independently agree exactly with bracket content.' },
+  // re-reviewed at the five-merge integration: R3's 657dd4da changed only the article's month tokens (月 read がつ after a
+  // number); its text, this bracket and its written form are unchanged
   { id: 'cabinet-pronunciation', article: 'jawiki:5294446',
-    sha256: 'fdc707e444625169cc39d1a06a4dc1f64489fd131ab0aa898c001e26df29b51d',
+    sha256: '16b4d1f863d4c32f84994f4d6ed1009bc217abd5203e9473b93faf0f7ea31881',
     bracket: [9, 27], written: '第2次高市改造内閣', reading: 'だいにじたかいちかいぞうないかく',
     basis: 'Reviewed literal source title pronunciation; same complete bracket as accepted Cabinet token11 fixture. Tokenizer readings are imperfect; do not infer equality from token.r concatenation.' },
+  // re-reviewed at the five-merge integration: R3's 657dd4da changed only one month token's fields (月 #155); the text,
+  // this bracket and its written form are unchanged
   { id: 'shina-name-pronunciation', article: 'wikinews:45089',
-    sha256: '70e8acfb88c662b028569d231525cfe3b8834184d0cb9c59eebcaa57f14395c5',
+    sha256: 'a03f12824cc1664490ff95a0979059ef7aabc89657801812969e55f8ff5424b0',
     bracket: [40, 48], written: '階猛', reading: 'しな・たけし',
     basis: 'Reviewed literal source name pronunciation 階猛（しな・たけし）氏. Tokenizer 階.r=かい is not the name reading; fixture is explicit, not guessed from that token.' },
 ];
