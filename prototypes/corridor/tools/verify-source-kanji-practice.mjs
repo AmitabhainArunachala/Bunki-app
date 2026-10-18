@@ -532,12 +532,23 @@ async function ordinary(fixture) {
   await openSource(fixture);
   const sourceBefore = await readAppRecordSnapshot(page), tapStarted = Date.now();
   await page.locator(`#reader .tok[data-index="${source.index}"]`).click();
-  await waitForAppRecord(page, record => record.obslog.length === sourceBefore.record.obslog.length + 1);
+  // G2 · the tap that shows the meaning is also his encounter with the word as it reads here: it writes the encounter
+  // ledger (met) beside the observation. Exactly one new identity, the core word read as it reads here; no other root.
+  const met = JSON.stringify([1, 'word', source.token.b, 'core', null, source.token.r]);
+  await waitForAppRecord(page, record => record.obslog.length === sourceBefore.record.obslog.length + 1 && !!record.met?.entries?.[met],
+    { description: 'the tap\'s observation and its encounter' });
   const tapped = await readAppRecordSnapshot(page), tap = tapped.record.obslog.at(-1);
   assert(tap[0] >= tapStarted && tap[0] <= Date.now());
   // one tap shows the meaning (reader lane 2026-10-02): the observation's depth is 2, gloss shown
   assert.deepEqual(tap.slice(1), ['tap', `word:${source.token.b}`, 2, source.id]);
-  assert.deepEqual(tapped.record.obslog, [...sourceBefore.record.obslog, tap]); unchangedExcept(sourceBefore, tapped, ['obslog']);
+  assert.deepEqual(tapped.record.obslog, [...sourceBefore.record.obslog, tap]); unchangedExcept(sourceBefore, tapped, ['obslog', 'met']);
+  assert.deepEqual(Object.keys(tapped.record.met.entries).filter(key => !Object.hasOwn(sourceBefore.record.met?.entries || {}, key)), [met],
+    'The tap adds exactly its own encounter: the core word, read as it reads here');
+  for (const [key, entry] of Object.entries(sourceBefore.record.met?.entries || {}))
+    assert.deepEqual(tapped.record.met.entries[key], entry, 'The tap leaves every other encounter as it was');
+  const today = tapped.record.met.entries[met];
+  assert(Number.isSafeInteger(today.first) && today.last === today.first && today.days === 1,
+    `A first encounter is one day, first = last: ${JSON.stringify(today)}`);
   // the tap's popup floats over the page: a second tap on the same word puts it away (and records nothing)
   await page.locator(`#reader .tok[data-index="${source.index}"]`).click(); await page.waitForFunction(() => !document.getElementById('mini'));
   await page.locator('#reader-place-save').click();
