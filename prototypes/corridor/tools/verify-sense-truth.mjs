@@ -17,7 +17,8 @@
  *          "nonexistent"
  *       C4 every row of the sense sidecar, tapped: the card shows the row's sense (or a name)
  *   S   recorded: taps, the sidecar's rows, coverage and agreement (from its receipts)
- * Negative controls: the sense rules off → G and C1–C3 go red; one sidecar row moved to another sense → C4 goes red.
+ * Negative controls: the sense rules off → G and C1–C3 go red; one sidecar row moved to another sense → F0 goes red
+ * (the row and its receipts' agreement), and F0 stops the run.
  * SENSE_TRUTH_ONLY=<f0,g,p,c,…> runs only those cases (a control's scope; marked partial, never an acceptance). */
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -273,7 +274,7 @@ async function openArticle(page, id) {
     await page.locator('#shelf-reading-search').fill(row.title);
     await page.locator('#shelf-reading-search').press('Enter');
     const found = page.locator(`#shelf-reading-results [data-passage="${id}"] .shelf-open`).first();
-    try { await found.waitFor({ timeout: 5000 }); } catch { return false; }
+    try { await found.waitFor({ timeout: OPEN_MS }); } catch { return false; }
     await found.click();
   }
   await readerDrawn(page);
@@ -387,7 +388,9 @@ function classCases() {
         add('C1', row.id, index, token, `C1|${token.s}|${token.b}`);
       }
       // a suffix after a number, written by a served entry read the text's way that has a counter's or a suffix's sense
-      if (token.p === '接尾辞' && prev && (SENSE_NUMBER.test(prev.s) || NUMBER_WORDS.has(prev.s))
+      // (a counter inside an idiom is the idiom's: 一枚岩's 枚, pinned by G as Grok's row asks)
+      const idiom = token.s === '枚' && tokens[index + 1]?.s === '岩';
+      if (token.p === '接尾辞' && !idiom && prev && (SENSE_NUMBER.test(prev.s) || NUMBER_WORDS.has(prev.s))
         && (byForm.get(token.s) || []).filter((entry) => (entry[1] === token.s || entry[4].includes(token.s)) && entry[5].some((kana) => k2h(kana) === k2h(token.r || token.s)))
           .some((entry) => (detailOf(entry[0])?.[3] || []).some((sense) => sense[0].some((code) => /^(?:ctr|suf|n-suf)$/u.test(code))))) {
         add('C2', row.id, index, token, `C2|${token.s}|${token.r}`);
@@ -410,10 +413,17 @@ async function classSweep(fresh, cases) {
   for (const item of cases) { if (!byArticle.has(item.at)) byArticle.set(item.at, []); byArticle.get(item.at).push(item); }
   for (const [at, items] of byArticle) {
     // each text in its own context (see fresh); a text that cannot be opened fails its rows, with the reason
-    const { page, close } = await fresh();
+    let { page, close } = await fresh();
     try {
+    // a text that does not open (a stalled load, a slow shelf search) is opened once more in a fresh context
     let opened = false;
     try { opened = await openArticle(page, at); } catch (error) { opened = false; }
+    if (!opened) {
+      retried.push(`${engine}:C:${at}: the text did not open`);
+      await close();
+      ({ page, close } = await fresh());
+      try { opened = await openArticle(page, at); } catch (error) { opened = false; }
+    }
     if (!opened) {
       // a text that did not open fails every row of it (counted, never skipped)
       for (const item of items) {
