@@ -15,6 +15,7 @@
  *   7   a part page says what the part is in plain words (name, meaning, where it sits, in how many kanji); its number and
  *       strokes stay in its chips;
  *   8   a word page's thread offers no "kanji ›" before a kanji is entered from it; its way back in goes to the kanji entered;
+ *   9   the open screen's article title breaks only between its words (jaWords), at 390 and 320;
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -71,6 +72,7 @@ const CONTROL = {
     '        `Official Kangxi radical no. ${official.n} — ${official.name} (${posText}). Below: the characters that contain this part.`,']] },
   'kanji-bead': { item: '8.', source: [['corridor.js', "  if (scale === 'word') return node?.enteredKanji && scaleWordKanji(node).includes(node.enteredKanji) ? 'kanji' : null;",
     "  if (scale === 'word') return scaleWordKanji(node).length ? 'kanji' : null;"]] },
+  'open-title': { item: '9.', css: '#drift-layer .scale-star-caption.is-words { word-break: normal !important; overflow-wrap: anywhere !important; line-break: auto !important; }' },
   thread: { item: '3.', css: '.scale-thread { scroll-snap-type: none !important; }',
     source: [['corridor.js', '    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);', '    if (delta) thread.scrollLeft += delta;']] },
 };
@@ -501,6 +503,30 @@ async function itemKanjiBead(browser, engine) {
   } finally { await context.close(); }
 }
 
+async function itemOpenTitle(browser, engine) {
+  // 9 · the open screen's article star: its caption's lines end only between the title's own words (the app's one word
+  // rule, jaWords), at 390 and 320, in the world round 1 found 知床 broken in
+  for (const width of [390, 320]) {
+    const { context, page, errors } = await session(browser, { world: 'nami', width, query: 'entry=' });
+    try {
+      await page.waitForSelector('#drift-layer .scale-star-article .scale-star-caption', { timeout: 15_000 });
+      await settle(page, 900);
+      const f = await page.evaluate(() => {
+        const cap = document.querySelector('#drift-layer .scale-star-article .scale-star-caption');
+        const title = cap.textContent, words = window.__H1A__.run(`jaWords(${JSON.stringify(cap.textContent)})`);
+        const ends = new Set(); let at = 0; for (const w of words) { at += w.length; ends.add(at); }
+        const breaks = []; let prev = null, i = 0;
+        const walk = document.createTreeWalker(cap, NodeFilter.SHOW_TEXT);
+        while (walk.nextNode()) { const n = walk.currentNode; for (let k = 0; k < n.length; k += 1, i += 1) { const r = document.createRange(); r.setStart(n, k); r.setEnd(n, k + 1);
+          const b = [...r.getClientRects()].find((q) => q.width > 0.1); if (!b) continue; if (prev && b.top > prev.bottom - 2) breaks.push(i); prev = b; } }
+        return { title, words, breaks, inside: breaks.filter((x) => !ends.has(x) && !/\s/u.test(title[x - 1] || '')).map((x) => `${title.slice(Math.max(0, x - 4), x)}｜${title.slice(x, x + 4)}`) };
+      });
+      check(`9.open-title · ${engine} nami ${width} · the open screen's title breaks only between its words (${f.title})`,
+        f.words.join('') === f.title && !f.inside.length && !errors.length, { breaks: f.breaks, inside: f.inside, words: f.words, errors });
+    } finally { await context.close(); }
+  }
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
   { id: 'layers', prefix: '2.', run: itemLayers },
@@ -510,6 +536,7 @@ const ITEMS = [
   { id: 'entry', prefix: '6.', run: itemEntry },
   { id: 'part', prefix: '7.', run: itemPart },
   { id: 'kanji-bead', prefix: '8.', run: itemKanjiBead },
+  { id: 'open-title', prefix: '9.', run: itemOpenTitle },
 ];
 
 const log = { engines: {} };

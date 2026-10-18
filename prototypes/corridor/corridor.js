@@ -5571,7 +5571,7 @@ function scaleOut() {
     const home = S.scaleVisit;
     if (home?.skyPlace) window.__DRIFT__?.restorePlace?.(home.skyPlace);
     const article = scalePassage(home);
-    if (article) window.__DRIFT__?.focusArticle?.({ articleId: article.id, title: article.title, reveal: !home?.skyPlace });
+    if (article) window.__DRIFT__?.focusArticle?.({ articleId: article.id, title: article.title, words: jaWords(article.title), reveal: !home?.skyPlace });
     retireScaleDestination();
     S.view = 'drift'; S.tabRoot = null;
     withoutRoomTransition(render);
@@ -5899,7 +5899,8 @@ function freshScaleKeptWord(key) {
 }
 function installScaleBridge() {
   const article = scalePassage() || passage() || D.passages.find(p => !String(p.file || '').startsWith('archive/'));
-  if (article) window.__DRIFT__?.focusArticle?.({ articleId: article.id, title: article.title });
+  // Hfix-1A · the star's caption breaks only between the title's words (Q's one word rule)
+  if (article) window.__DRIFT__?.focusArticle?.({ articleId: article.id, title: article.title, words: jaWords(article.title) });
   // Reading alone stays on the sky: its next tap must still reach the stage.
   // The shared pointer gate must exclude overlays, not strand this first rung.
   const skyReady = () => S.view === 'drift' && !S.stack.length && !standingSlip() && (!ladderVisit || ladderVisit.rung === 'reading') && scaleNavigationAllowed();
