@@ -2926,6 +2926,16 @@ body .token-actions button:hover { background: var(--ai-wash); }
   body.has-primary-tabs[data-view='reader'] .layers-mark { bottom: calc(var(--nav-clearance) + 8px); }
   body[data-view='reader']:has(.listen-row.play-bar[data-open='true']) .layers-mark { display: none; }
 }
+/* Hfix-1A · open, the mark stands in its block's own corner (corridor.js dockLayersMark): the block's lines flow round it,
+   so it is never over a glyph or a gloss; the block holds it (flow-root) however short it is */
+#reader-layers > #layers-mark[data-docked] {
+  position: relative;
+  z-index: auto;
+  inset: auto;
+  float: right;
+  margin: 0 0 4px 10px;
+}
+#reader-layers { display: flow-root; }
 /* the layers: the paragraph stays as it is; one quiet block under it — the paragraph read in kana (読), its words' meanings
    (意) and its particles' roles (文), each line led by its glyph — folds on any tap */
 .reader-layers {

@@ -4,6 +4,8 @@
  * engine KAIRO_BROWSER names (webkit or chromium; both when unset), at 390×844 unless the row names another size:
  *   1   the stage stands whole beside its word (the reading moves the least that seats it, the word kept on the glass); a
  *       stage no seat can hold ends between two rows, says so with a fade at its foot, and scrolls by touch and keyboard;
+ *   2   the open layers lie under no part of the 層 mark (it stands in their corner), whole on the glass; it folds them and
+ *       goes home;
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -50,6 +52,7 @@ const CONTROL = {
     ['corridor.js', 'const fit = rowCut(card, Math.max(roomAbove, roomBelow, 96));', 'const fit = Math.max(roomAbove, roomBelow, 96);'],
   ] },
   'stage-fade': { item: '1.', css: "#mini[data-more='true']::after { content: none !important; }" },
+  layers: { item: '2.', source: [['corridor.js', 'dockLayersMark(mark, block, null, () => layersOnGlass(block));', 'void layersOnGlass;']] },
 };
 
 const rows = [];
@@ -209,8 +212,53 @@ async function itemStage(browser, engine) {
   }
 }
 
+async function itemLayers(browser, engine) {
+  // 2 · the 層 mark opens the layers and stands in their corner: no glyph or gloss of the block under it, the block whole on
+  // the glass (a press anywhere folds it, so a phone can never scroll to its foot), and the mark folds it and goes home
+  for (const world of WORLDS) {
+    const { context, page, errors } = await session(browser, { world });
+    try {
+      await openStory(page);
+      const home = await page.evaluate(() => { const r = document.getElementById('layers-mark').getBoundingClientRect(); return { left: r.left, top: r.top }; });
+      await page.locator('#layers-mark').tap();
+      await page.locator('#reader-layers').waitFor({ timeout: 6000 });
+      await settle(page, 500);
+      const f = await page.evaluate(() => {
+        const mark = document.getElementById('layers-mark'), m = mark.getBoundingClientRect();
+        const block = document.getElementById('reader-layers'), b = block.getBoundingClientRect();
+        const under = [];
+        const walk = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+        while (walk.nextNode()) {
+          const node = walk.currentNode;
+          if (!node.textContent.trim() || node.parentElement.closest('#layers-mark')) continue;
+          const range = document.createRange();
+          range.selectNodeContents(node);
+          for (const q of range.getClientRects()) if (q.width > 0.5 && q.right > m.left - 2 && q.left < m.right + 2 && q.bottom > m.top - 2 && q.top < m.bottom + 2) under.push(node.textContent.trim().slice(0, 14));
+        }
+        const edge = (q, side) => { const n = document.querySelector(q); if (!n || !['fixed', 'sticky'].includes(getComputedStyle(n).position)) return null; const r = n.getBoundingClientRect(); return r.height ? r[side] : null; };
+        const ceiling = Math.max(edge('#app > .chrome', 'bottom') ?? 0, edge('#app > .scale-thread', 'bottom') ?? 0);
+        const floor = Math.min(innerHeight, edge('#primary-tabs', 'top') ?? innerHeight);
+        return { under, block: [b.top, b.bottom], mark: [m.left, m.top, m.right, m.bottom], inBlock: m.top >= b.top - 1 && m.bottom <= b.bottom + 1 && m.left >= b.left - 1 && m.right <= b.right + 1,
+          ceiling, floor, pressed: mark.getAttribute('aria-pressed') };
+      });
+      const onGlass = f.block[0] >= f.ceiling - 0.5 && f.block[1] <= f.floor + 0.5;
+      check(`2.layers-clear · ${engine} ${world} · no glyph or gloss of the open layers under 層, the block whole on the glass`,
+        !f.under.length && onGlass && f.inBlock && f.pressed === 'true' && !errors.length,
+        { under: f.under, block: f.block.map(Math.round), mark: f.mark.map(Math.round), inBlock: f.inBlock, ceiling: f.ceiling, floor: f.floor, errors });
+      await page.locator('#layers-mark').tap();
+      await settle(page, 450);
+      const back = await page.evaluate(() => { const mark = document.getElementById('layers-mark'), r = mark.getBoundingClientRect();
+        return { block: !!document.getElementById('reader-layers'), left: r.left, top: r.top, docked: !!mark.dataset.docked, position: getComputedStyle(mark).position, pressed: mark.getAttribute('aria-pressed') }; });
+      check(`2.layers-home · ${engine} ${world} · the mark folds its layers and goes home to the foot`,
+        !back.block && !back.docked && back.position === 'fixed' && Math.abs(back.left - home.left) <= 1 && Math.abs(back.top - home.top) <= 1 && back.pressed === 'false',
+        { back, home });
+    } finally { await context.close(); }
+  }
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
+  { id: 'layers', prefix: '2.', run: itemLayers },
 ];
 
 const log = { engines: {} };

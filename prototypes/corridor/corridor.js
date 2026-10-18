@@ -11511,6 +11511,8 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
 /** The 層 mark's top, when a box spanning [left, left + width] would stand over it; null otherwise (or when it is hidden). */
 function layersMarkTop(left, width) {
   const mark = document.getElementById('layers-mark');
+  // docked in its open block (Hfix-1A) it stands in the text's flow, not at the foot: no card's floor
+  if (mark?.dataset.docked) return null;
   const box = mark?.getBoundingClientRect();
   if (!box?.height || box.right <= left || box.left >= left + width) return null;
   return box.top;
@@ -14995,6 +14997,7 @@ function foldReaderLayers() {
   const open = readerLayers;
   if (!open) return false;
   readerLayers = null;
+  dockLayersMark(open.mark, null, open.home);
   open.block.remove();
   if (open.paragraph.isConnected) delete open.paragraph.dataset.layers;
   if (open.mark.isConnected) {
@@ -15002,6 +15005,42 @@ function foldReaderLayers() {
     open.mark.removeAttribute('aria-controls');
   }
   return true;
+}
+/** Hfix-1A · the 層 mark goes with the layers it opened (H1: 層 stood over 大臣 cabinet minister in every world): it leaves
+ * its seat at the foot for the open block's own corner, where the block's lines flow round it, so it is never over a glyph
+ * or a gloss; it is still the one way to fold them, and folding sends it home. The same element travels (FLIP), at once
+ * under reduced motion. `home` is where it was: { parent, next }. */
+function dockLayersMark(mark, block, home = null, after = null) {
+  if (!mark?.isConnected) return;
+  const from = mark.getBoundingClientRect();
+  const focused = document.activeElement === mark;
+  if (block) {
+    mark.dataset.docked = 'true';
+    block.prepend(mark);
+    after?.();
+  } else {
+    if (!mark.dataset.docked) return;
+    delete mark.dataset.docked;
+    if (home?.parent?.isConnected) home.parent.insertBefore(mark, home.next?.parentNode === home.parent ? home.next : null);
+    else mark.remove();
+  }
+  if (focused && mark.isConnected) mark.focus({ preventScroll: true });
+  const to = mark.isConnected ? mark.getBoundingClientRect() : null;
+  if (!from.height || !to?.height || !pageCutAllowed()) return;
+  mark.animate([{ transform: `translate(${from.left - to.left}px, ${from.top - to.top}px)` }, { transform: 'none' }],
+    { duration: motionMs('--motion-room', 240), easing: motionEase('--ease-enter') });
+}
+/** Hfix-1A · open layers stand wholly on the glass: a press anywhere folds them, so a phone can never scroll to their foot
+ * (H1: the 意 line ran under the tab bar); the reading moves the least that brings the block up, never its top past the
+ * frame. */
+function layersOnGlass(block) {
+  const box = block.getBoundingClientRect();
+  const edge = (selector, side) => { const node = document.querySelector(selector); if (!node || !['fixed', 'sticky'].includes(getComputedStyle(node).position)) return null; const r = node.getBoundingClientRect(); return r.height ? r[side] : null; };
+  const ceiling = Math.max(edge('#app > .chrome', 'bottom') ?? 0, edge('#app > .scale-thread', 'bottom') ?? 0) + 8;
+  const floor = Math.min(innerHeight, edge('#primary-tabs', 'top') ?? innerHeight, edge('.listen-row', 'top') ?? innerHeight) - 8;
+  const down = document.documentElement.scrollHeight - innerHeight - window.scrollY;
+  const rise = Math.ceil(Math.min(box.bottom - floor, box.top - ceiling, down));
+  if (rise > 0) window.scrollTo({ top: window.scrollY + rise, behavior: 'instant' });
 }
 function openReaderLayers(mark) {
   const paragraph = readerLayerParagraph();
@@ -15060,9 +15099,11 @@ function openReaderLayers(mark) {
   if (roles.length) block.append(pairs('reader-layers-roles', '文', tx('助詞の役割', 'Particles'), roles));
   paragraph.dataset.layers = 'open';
   paragraph.after(block);
-  readerLayers = { paragraph, block, mark };
+  const home = { parent: mark.parentNode, next: mark.nextSibling };
+  readerLayers = { paragraph, block, mark, home };
   mark.setAttribute('aria-pressed', 'true');
   mark.setAttribute('aria-controls', block.id);
+  dockLayersMark(mark, block, null, () => layersOnGlass(block));
   return true;
 }
 /** A token as read: each written piece by its reading where it has one (the text's own furigana), kana and marks as written. */
