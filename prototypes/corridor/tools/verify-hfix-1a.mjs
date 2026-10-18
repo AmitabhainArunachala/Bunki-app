@@ -10,6 +10,8 @@
  *       moves it;
  *   4   one Save on screen through the ladder: the bar's keep steps aside while a stage or a page stands, no door moves;
  *   5   Speak's top bar carries no Save;
+ *   6   a word page shows its dictionary entry once (a lone door is the head of its senses) and names parts of speech in
+ *       plain words, English or Japanese, with no JMdict romaji;
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -60,6 +62,8 @@ const CONTROL = {
   'one-save': { item: '4.', source: [['corridor.js', 'function paintKeepAside(button) {', 'function paintKeepAside(button) { return;']] },
   'speak-bar': { item: '5.', source: [['corridor.js', "  if (S.view === 'reader' && passage()) chrome.append(chromeKeep());",
     "  if ((S.view === 'reader' && passage()) || S.view === 'speak') chrome.append(chromeKeep());"]] },
+  'one-entry': { item: '6.one', source: [['corridor.js', '  const lone = !node.readerChoice && dictionaryLoneDoor(node) &&', '  const lone = false &&']] },
+  'plain-pos': { item: '6.plain', source: [['corridor.js', 'function dictionaryTag(tag) {', 'function dictionaryTag(tag) { return D.dictionaryIndex?.tags?.[tag] || tag;']] },
   thread: { item: '3.', css: '.scale-thread { scroll-snap-type: none !important; }',
     source: [['corridor.js', '    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);', '    if (delta) thread.scrollLeft += delta;']] },
 };
@@ -369,12 +373,70 @@ async function itemSpeakBar(browser, engine) {
   }
 }
 
+// 6 · the first sense's part of speech on each fixture's page, as a learner names it, in each interface language
+const POS_ORACLE = {
+  bi: { 総理: 'noun · abbreviation', 高い: 'i-adjective', 書く: 'verb (godan) · transitive verb', 静か: 'na-adjective', 大きな: 'pre-noun adjective' },
+  ja: { 総理: '名詞 · 略語', 高い: 'い形容詞', 書く: '五段動詞 · 他動詞', 静か: 'な形容詞', 大きな: '連体詞' },
+};
+// the romaji JMdict writes into its descriptions (futsuumeishi, keiyoushi …): never shown
+const ROMAJI_TAG = /\((?:futsuumeishi|keiyoushi|keiyodoshi|fukushi|fukushitekimeishi|jisoumeishi|rentaishi|kandoushi|sonkeigo|kenjougo|teineigo)\)/u;
+const pageFacts = (page) => page.evaluate(() => {
+  const sheet = document.getElementById('sheet');
+  const leaves = [...sheet.querySelectorAll('*')].filter((n) => !n.children.length && n.getClientRects().length && getComputedStyle(n).visibility === 'visible');
+  return { node: sheet.dataset.node, blocks: [...sheet.querySelectorAll('.dictionary-homographs')].map((n) => ({ head: n.classList.contains('is-entry-head'), inSenses: !!n.closest('.senses') })),
+    doors: [...sheet.querySelectorAll('.dictionary-homograph[data-dictionary-entry]')].map((n) => ({ seq: n.dataset.dictionaryEntry, live: !n.disabled, text: n.textContent.replace(/\s+/gu, ' ').trim() })),
+    forms: sheet.querySelectorAll('.dictionary-forms').length, pos: [...sheet.querySelectorAll('.sense-pos')].map((n) => n.textContent),
+    texts: leaves.map((n) => n.textContent.trim()) };
+});
+async function itemEntry(browser, engine) {
+  // 6 · 総理's whole page, reached as he reaches it (stage → its band): one entry block — its door the head of its senses,
+  // no card of its own, the meaning shown once
+  {
+    const { context, page, errors } = await session(browser);
+    try {
+      await openStory(page);
+      await stage(page);
+      await page.locator('#mini .mini-word').tap();
+      await page.locator('#sheet').waitFor();
+      await page.waitForFunction(() => !!document.querySelector('#sheet .dictionary-senses .sense-pos'), null, { timeout: 15_000 });
+      await settle(page, 600);
+      const f = await pageFacts(page);
+      const meaning = 'prime minister (as the head of a cabinet government)';
+      const copies = f.texts.filter((t) => t.includes(meaning)).length;
+      check(`6.one-entry · ${engine} · 総理's page shows its dictionary entry once: the door is the head of its senses, no card of its own`,
+        f.blocks.length === 1 && f.blocks[0].head && f.blocks[0].inSenses && f.doors.length === 1 && f.doors[0].live && /総理/u.test(f.doors[0].text) &&
+        !f.doors[0].text.includes('prime minister') && f.forms === 0 && copies === 1 && !errors.length, { ...f, texts: undefined, copies, errors });
+    } finally { await context.close(); }
+  }
+  // 6 · parts of speech in plain words, in both interface languages (bi = English): the oracle's first sense, and no
+  // JMdict romaji anywhere; in 日本語 no Latin letters at all
+  for (const ui of ['bi', 'ja']) {
+    const { context, page, errors } = await session(browser, { ui });
+    try {
+      const seen = {};
+      for (const word of Object.keys(POS_ORACLE[ui])) {
+        await page.evaluate((id) => window.__H1A__.run(`(() => { S.stack = []; go({ t: 'word', id: ${JSON.stringify(id)} }); })()`), word);
+        await page.waitForFunction(() => !!document.querySelector('#sheet .dictionary-senses .sense-pos'), null, { timeout: 15_000 }).catch(() => {});
+        await settle(page, 250);
+        seen[word] = (await pageFacts(page)).pos;
+        await page.evaluate(() => window.__H1A__.run('(() => { S.stack = []; render(); })()'));
+        await delay(200);
+      }
+      const wrong = Object.entries(POS_ORACLE[ui]).filter(([word, want]) => seen[word]?.[0] !== want);
+      const romaji = Object.values(seen).flat().filter((t) => ROMAJI_TAG.test(t) || (ui === 'ja' && /[A-Za-z]/u.test(t)));
+      check(`6.plain-pos · ${engine} ${ui} · parts of speech in plain words: ${Object.values(POS_ORACLE[ui]).join(' / ')}; no romaji tags`,
+        !wrong.length && !romaji.length && !errors.length, { wrong: wrong.map(([w, want]) => `${w}: "${seen[w]?.[0]}" (want "${want}")`), romaji: romaji.slice(0, 6), errors });
+    } finally { await context.close(); }
+  }
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
   { id: 'layers', prefix: '2.', run: itemLayers },
   { id: 'thread', prefix: '3.', run: itemThread },
   { id: 'one-save', prefix: '4.', run: itemOneSave },
   { id: 'speak-bar', prefix: '5.', run: itemSpeakBar },
+  { id: 'entry', prefix: '6.', run: itemEntry },
 ];
 
 const log = { engines: {} };
@@ -385,7 +447,7 @@ async function runAll(only = null) {
     console.log(`— ${engine} ${browser.version()}${control ? ` · negative control: ${control}` : ''}`);
     try {
       for (const item of ITEMS) {
-        if (only && !only.includes(item.prefix)) continue;
+        if (only && !only.some((prefix) => prefix.startsWith(item.prefix))) continue;
         try { await item.run(browser, engine); }
         catch (error) { check(`${item.prefix}${item.id} · ${engine} · the walk ran`, false, String(error?.message || error).split('\n')[0]); }
       }
@@ -410,7 +472,7 @@ try {
         await runAll([CONTROL[id].item]);
         control = null;
         const mine = rows.slice(start);
-        const red = mine.filter((r) => !r.pass);
+        const red = mine.filter((r) => r.id.startsWith(CONTROL[id].item) && !r.pass);
         const erred = mine.filter((r) => /page errors|the walk ran/u.test(r.id) && !r.pass);
         check(`control.${id} · its item's rows go red with the defect back`, red.length > 0 && !erred.length,
           { red: red.map((r) => r.id).slice(0, 6), erred: erred.map((r) => r.id) });

@@ -4369,8 +4369,56 @@ function dictionaryDetailsFor(node) {
     .filter(Boolean);
 }
 
+/* Hfix-1A · a sense's tags in plain words (round 1: "noun (common) (futsuumeishi)", "adjective (keiyoushi)" on the word page,
+ * L-3, H-kaku-05, H-sumi-03): parts of speech as a learner names them, in the interface's language; usage, field and
+ * dialect tags by the tag contract's Japanese names (docs/briefs/DICT_TAGS_CONTRACT_2026-08-12.md) or JMdict's English
+ * without its romaji. */
+const POS_PLAIN = {
+  n: ['名詞', 'noun'], 'n-adv': ['副詞的名詞', 'adverbial noun'], 'n-t': ['時の名詞', 'noun (time)'], 'n-pr': ['固有名詞', 'proper noun'],
+  'n-pref': ['名詞（接頭）', 'noun (prefix)'], 'n-suf': ['名詞（接尾）', 'noun (suffix)'], pn: ['代名詞', 'pronoun'], num: ['数詞', 'number'],
+  ctr: ['助数詞', 'counter'], 'adj-i': ['い形容詞', 'i-adjective'], 'adj-ix': ['い形容詞（いい・よい）', 'i-adjective (いい/よい)'],
+  'adj-na': ['な形容詞', 'na-adjective'], 'adj-no': ['の形容詞', 'no-adjective'], 'adj-pn': ['連体詞', 'pre-noun adjective'],
+  'adj-t': ['タルト形容動詞', 'taru-adjective'], 'adj-f': ['連体修飾', 'used before a noun'], 'adj-ku': ['ク活用（古語）', 'ku-adjective (archaic)'],
+  'adj-shiku': ['シク活用（古語）', 'shiku-adjective (archaic)'], 'adj-nari': ['ナリ活用（古語）', 'nari-adjective (archaic)'],
+  'adj-kari': ['カリ活用（古語）', 'kari-adjective (archaic)'], adv: ['副詞', 'adverb'], 'adv-to': ['副詞（と）', 'adverb (with と)'],
+  aux: ['補助語', 'auxiliary'], 'aux-v': ['助動詞', 'auxiliary verb'], 'aux-adj': ['補助形容詞', 'auxiliary adjective'], conj: ['接続詞', 'conjunction'],
+  cop: ['断定（だ）', 'copula (だ)'], exp: ['表現', 'expression'], int: ['感動詞', 'interjection'], pref: ['接頭辞', 'prefix'], suf: ['接尾辞', 'suffix'],
+  prt: ['助詞', 'particle'], unc: ['分類なし', 'unclassified'], 'v-unspec': ['動詞', 'verb'], v1: ['一段動詞', 'verb (ichidan)'],
+  'v1-s': ['一段動詞（くれる）', 'verb (ichidan, くれる)'], v5aru: ['五段動詞（-ある）', 'verb (godan, -ある)'], 'v5k-s': ['五段動詞（行く）', 'verb (godan, 行く)'],
+  'v5r-i': ['五段動詞（不規則）', 'verb (godan, irregular)'], 'v5u-s': ['五段動詞（特殊）', 'verb (godan, special)'], v5uru: ['五段動詞（うる）', 'verb (godan, うる)'],
+  vk: ['カ変動詞', 'verb (くる)'], vn: ['ナ変動詞', 'verb (ぬ, irregular)'], vr: ['ラ変動詞', 'verb (り, irregular)'], vs: ['する動詞', 'suru verb'],
+  'vs-c': ['す動詞（古語）', 'su verb (archaic)'], 'vs-i': ['サ変動詞', 'suru verb (irregular)'], 'vs-s': ['サ変動詞（特殊）', 'suru verb (special)'],
+  vz: ['ずる動詞', 'zuru verb'], vi: ['自動詞', 'intransitive verb'], vt: ['他動詞', 'transitive verb'],
+};
+const POS_FAMILY = [[/^v5/u, ['五段動詞', 'verb (godan)']], [/^v2/u, ['二段動詞（古語）', 'verb (nidan, archaic)']], [/^v4/u, ['四段動詞（古語）', 'verb (yodan, archaic)']]];
+const SENSE_TAG_JA = {
+  abbr: '略語', arch: '古語', char: 'キャラクター名', chn: '幼児語', col: '口語', company: '会社名', creat: '生物名', dated: '古めかしい語',
+  dei: '神名', derog: '蔑称', euph: '婉曲表現', ev: 'イベント名', fam: '親しみのある語', fem: '女性語', fict: '架空名', form: '改まった語・文語',
+  given: '名', group: '集団名', hist: '歴史用語', hon: '尊敬語', hum: '謙譲語', id: '慣用表現', joc: '冗談・ユーモア', leg: '伝説',
+  'm-sl': '漫画俗語', male: '男性語', myth: '神話', 'net-sl': 'ネットスラング', obj: '物の名称', obs: '廃語', 'on-mim': '擬音語・擬態語',
+  organization: '組織名', person: '人物のフルネーム', place: '地名', poet: '詩語', pol: '丁寧語', product: '商品名', proverb: 'ことわざ',
+  quote: '引用句', rare: '稀な語', sens: '配慮を要する語', serv: 'サービス名', ship: '船名', sl: '俗語', surname: '姓', uk: '通常かな書き',
+  unclass: '未分類の固有名', vulg: '卑語', work: '作品名', yoji: '四字熟語', Buddh: '仏教', Christn: 'キリスト教', MA: '武道', Shinto: '神道',
+  agric: '農業', anat: '解剖学', archeol: '考古学', archit: '建築', art: '美術・美学', astron: '天文学', aviat: '航空', baseb: '野球',
+  biochem: '生化学', biol: '生物学', bot: '植物学', boxing: 'ボクシング', bus: 'ビジネス', cards: 'カードゲーム', chem: '化学', civeng: '土木工学',
+  cloth: '服飾', comp: 'コンピューター', cryst: '結晶学', dent: '歯学', ecol: '生態学', econ: '経済学', elec: '電気・電気工学', electr: '電子工学',
+  engr: '工学', ent: '昆虫学', figskt: 'フィギュアスケート', film: '映画', finc: '金融', fish: '漁業・釣り', food: '食・料理', gardn: '園芸',
+  genet: '遺伝学', geogr: '地理学', geol: '地質学', geom: '幾何学', go: '囲碁', golf: 'ゴルフ', gramm: '文法', grmyth: 'ギリシャ神話',
+  hanaf: '花札', horse: '競馬', internet: 'インターネット', jpmyth: '日本神話', kabuki: '歌舞伎', law: '法律', ling: '言語学', logic: '論理学',
+  mahj: '麻雀', manga: '漫画', math: '数学', mech: '機械工学', med: '医学', met: '気象学', mil: '軍事', min: '鉱物学', mining: '鉱業',
+  motor: 'モータースポーツ', music: '音楽', noh: '能', pathol: '病理学', pharm: '薬理学', phil: '哲学', photo: '写真', physics: '物理学',
+  physiol: '生理学', politics: '政治', print: '印刷', prowres: 'プロレス', psy: '精神医学', psyanal: '精神分析', psych: '心理学',
+  rail: '鉄道', rommyth: 'ローマ神話', shogi: '将棋', ski: 'スキー', sports: 'スポーツ', stat: '統計学', stockm: '株式市場', sumo: '相撲',
+  surg: '外科学', telec: '電気通信', tradem: '商標', tv: 'テレビ', vidg: 'ビデオゲーム', zool: '動物学', bra: 'ブラジル方言', hob: '北海道方言',
+  ksb: '関西方言', ktb: '関東方言', kyb: '京都方言', kyu: '九州方言', nab: '長野方言', osb: '大阪方言', rkb: '琉球方言', thb: '東北方言',
+  tsb: '土佐方言', tsug: '津軽方言'
+};
+const SENSE_TAG_EN = { hon: 'honorific language', hum: 'humble language', pol: 'polite language' };
 function dictionaryTag(tag) {
-  return D.dictionaryIndex?.tags?.[tag] || tag;
+  const pos = POS_PLAIN[tag] || POS_FAMILY.find(([family]) => family.test(tag))?.[1];
+  if (pos) return tx(pos[0], pos[1]);
+  const description = D.dictionaryIndex?.tags?.[tag] || tag;
+  return tx(SENSE_TAG_JA[tag] || description, SENSE_TAG_EN[tag] || description);
 }
 /* the core record's part of speech is plain words already, bar a few JMdict codes it kept */
 const CORE_POS_PLAIN = {
@@ -33656,15 +33704,44 @@ function homographLines(choices, isActive) {
   });
 }
 
-function renderDictionaryHomographs(container, node) {
+/** Hfix-1A · the entry's spellings line goes into its head: the head's word becomes every spelling (総理・綜理), and the
+ * readings the door does not open follow it quietly (ほかに じょうて); the line itself is not drawn twice. */
+function foldEntryForms(box) {
+  const head = box.querySelector(':scope > .is-entry-head .dictionary-homograph');
+  const forms = box.querySelector(':scope > .dictionary-entry > .dictionary-forms');
+  if (!head || !forms) return;
+  const word = head.querySelector('.row-word');
+  const spellings = forms.querySelector('.dictionary-spellings')?.textContent || '';
+  if (word?.firstChild?.nodeType === 3 && spellings) word.firstChild.textContent = spellings;
+  const reading = head.querySelector('.row-reading')?.textContent || '';
+  const others = (forms.querySelector('.dictionary-readings')?.textContent || '').split('・').filter((r) => r && kataToHira(r) !== kataToHira(reading));
+  if (others.length && word && !word.querySelector('.row-also')) {
+    const more = el('span', 'row-also', tx('ほかに ', 'also '));
+    const kana = el('span', null, others.join(tx('、', ', ')));
+    kana.lang = 'ja';
+    more.append(kana);
+    word.append(more);
+  }
+  forms.remove();
+}
+/** Hfix-1A · whether a seq-less core page's entries are one lone door (D23 B2): the door is then the head of that entry's
+ * own block (renderWordNode), never a second copy of it. */
+function dictionaryLoneDoor(node) {
+  if (node.seq != null && node.seq !== '') return false;
+  const choices = dictionaryHomographChoices(node.id);
+  return choices.length === 1 && choices[0].enabledOnCore;
+}
+function renderDictionaryHomographs(container, node, { head = false } = {}) {
   const choices = dictionaryHomographChoices(node.id);
   const seqless = node.seq == null || node.seq === '';
   // a seq-less core sheet shows even a lone entry, as a door (D23 B2)
   const coreDoors = seqless && choices.some((choice) => choice.enabledOnCore);
   if (choices.length <= 1 && !coreDoors) return;
+  // Hfix-1A · the lone door as the head of its entry's block: its spellings and reading, the senses under it say the rest
+  head = head && choices.length === 1;
   const currentSeq = String(node.seq || node.dictionaryResolvedSeq || '');
   const currentReading = kataToHira(node.reading || lookup(node.id, node.seq)?.r || '');
-  const block = el('div', 'dictionary-homographs');
+  const block = el('div', head ? 'dictionary-homographs is-entry-head' : 'dictionary-homographs');
   block.append(
     choices.length === 1
       ? withEn(el('p', 'dictionary-rel-title', '辞書の項目'), 'Dictionary entry', 'en-inline')
@@ -33699,7 +33776,8 @@ function renderDictionaryHomographs(container, node) {
       top.append(more);
     }
     stack.append(top);
-    if (primaryGloss) stack.append(el('span', 'row-gloss', primaryGloss));
+    if (primaryGloss && !head) stack.append(el('span', 'row-gloss', primaryGloss));
+    if (head) choice.setAttribute('aria-label', tx(`辞書の項目「${headForm}」${reading}をひらく`, `Open the dictionary entry ${headForm} ${reading}`));
     choice.append(stack, el('span', 'row-go', active ? '·' : '›'));
     choice.addEventListener('click', () => {
       // guard by CONTENT, not object identity — async dictionary resolution
@@ -34203,8 +34281,11 @@ function renderWordNode(sheet, node) {
 
   // an entry matched from a reader token offers no other rows of the form:
   // its reading already chose among them (D11)
+  // Hfix-1A · one entry block (round 1, H-hokusai-08: a card with the entry, then the entry's senses again): a lone door is
+  // the head of the senses' own block below, where it carries the entry's spellings and reading
+  const lone = !node.readerChoice && dictionaryLoneDoor(node) && (details.length > 0 || (!!rec?.m?.length && !unresolved));
   if (node.readerChoice) renderReaderChoiceNote(sheet, node);
-  else renderDictionaryHomographs(sheet, node);
+  else if (!lone) renderDictionaryHomographs(sheet, node);
 
   // TRANSLATION — every sense, most common first (JMdict order). Once the
   // word's shard arrives, the full source senses take this spot: homographs,
@@ -34213,10 +34294,13 @@ function renderWordNode(sheet, node) {
   if (details.length) {
     // each full sense names its own part of speech, so the core record's summary line would repeat it
     const box = el('div', 'senses dictionary-senses');
+    if (lone) renderDictionaryHomographs(box, node, { head: true });
     renderDictionaryDetails(box, details, node);
+    if (lone) foldEntryForms(box);
     sheet.append(box);
   } else if (rec?.m?.length && !unresolved) {
     const box = el('div', 'senses');
+    if (lone) renderDictionaryHomographs(box, node, { head: true });
     if (rec.p) box.append(el('p', 'sense-pos', plainPos(rec.p)));
     const immediate = rec.seq ? rec.m.slice(0, 1) : rec.m;
     if (immediate.length === 1) {

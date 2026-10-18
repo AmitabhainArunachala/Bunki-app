@@ -2003,6 +2003,11 @@ body .sheet .dictionary-homographs {
   border-radius: var(--radius-card);
   background: color-mix(in srgb, var(--ink) 4%, var(--raised));
 }
+/* Hfix-1A · one entry block (round 1, H-hokusai-08: the entry as a card, then its senses again): a page's lone door is the
+   head of its entry's own block, no card of its own and no meaning repeated — the eyebrow, then the entry's spellings
+   and reading as the door, then its senses (corridor.js renderWordNode, foldEntryForms) */
+body .sheet .senses > .dictionary-homographs.is-entry-head { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; }
+body .sheet .senses > .dictionary-homographs.is-entry-head .dictionary-homograph { border-bottom: 1px solid var(--hairline); }
 body .sheet .entry-rows { border-top: 0; }
 body .sheet .entry-row {
   gap: var(--s2);
