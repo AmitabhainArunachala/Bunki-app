@@ -31,7 +31,8 @@
  *             `bokashi: ichimonji|atenashi|urushi|emitted — surface — depth|light|brush|focus`, or `drawn:` for a hard-stop
  *             drawing — or is a mask (alpha only, no pigment); and no bokashi or drawing names a literal colour.
  *   C8 chrome (Hfix-1A, F-1) the fixed chrome is opaque enough that text under it never shows through: with the reading
- *             scrolled so text lies under the bars, each bar's pixels are the same with everything but the bars hidden.
+ *             scrolled so text lies under the bars, each bar's pixels are the same with what scrolls under them (the
+ *             room's, the page's, a deck's content) hidden as with it shown.
  *             And C1 reads each line where a reader reads it: inside the open reading area between the bars and clear of
  *             their shade (a run's every line probed, not its first alone); a line outside it is read again with the
  *             document or the page scrolled clear, the run keeping its worst pair (F-1's 9 reds were lines read under the
@@ -394,7 +395,7 @@ const IN_PAGE = () => {
       const s = getComputedStyle(el);
       if (!['fixed', 'sticky'].includes(s.position) || s.visibility !== 'visible' || s.display === 'none') continue;
       const r = el.getBoundingClientRect();
-      if (r.width < vw * 0.6 || r.height < 8 || r.bottom <= 0 || r.top >= vh) continue;
+      if (r.width < vw * 0.6 || r.height < 8 || r.height > vh * 0.3 || r.bottom <= 0 || r.top >= vh) continue;
       // a bar meets the glass's edge (the bar and the thread under it at the top; the tab bar, a player, a grade bar at the
       // foot): a fixed overlay standing mid-glass (the slip) is no bar
       const top = r.top <= 52, foot = r.bottom >= vh - 2;
@@ -958,8 +959,8 @@ try {
         reread.barred = waiting.filter((t) => !readKeys.has(t.key)).map((t) => `${t.text} ${t.sel}`.slice(0, 80));
         result.reread = reread;
         // C8 (F-1) · the fixed chrome is opaque enough that text under it never shows through: with the reading scrolled
-        // so text lies under the bars, each bar's pixels are the same with everything but the bars hidden as with the page
-        // whole (any channel within 8/255)
+        // so text lies under the bars, each bar's pixels are the same with what scrolls under them hidden as with it shown
+        // (any channel within 8/255)
         if (data.bars?.length) {
           const moved = await page.evaluate(() => {
             const sheet = document.getElementById('sheet'), y0 = scrollY, s0 = sheet?.scrollTop ?? 0;
@@ -974,7 +975,10 @@ try {
           await page.evaluate(() => {
             const style = document.createElement('style');
             style.id = 'sweep-isolate';
-            style.textContent = 'body *, body *::before, body *::after { visibility: hidden !important; transition: none !important; } [data-sweep-bar], [data-sweep-bar] *, [data-sweep-bar]::before, [data-sweep-bar]::after, [data-sweep-bar] *::before, [data-sweep-bar] *::after { visibility: visible !important; }';
+            // only what scrolls under the bars goes: the room's content, the page's, a deck's; overlays that stand on a bar
+            // (the report door, the 層 mark, the slip) stay in both shots
+            const under = ['#app > main', '#sheet > :not([data-sweep-bar])', '.kp-study > :not([data-sweep-bar])'];
+            style.textContent = `${under.map((q) => `${q}, ${q} *, ${q} *::before, ${q} *::after`).join(', ')} { visibility: hidden !important; transition: none !important; }`;
             document.head.append(style);
           });
           await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
