@@ -34866,6 +34866,19 @@ function buildPlacesMenu(root, bar) {
   root.append(sensei);
 }
 
+/** The narrow reader's top line scrolls inside itself, and neither engine finishes revealing a
+ * door that keyboard focus finds half outside it, so its ring is cut at the toolbar's edge. Only
+ * keyboard focus moves only this toolbar's own horizontal offset; the page never moves. */
+function revealFocusedChromeDoor(event) {
+  const bar = event.currentTarget, door = event.target;
+  if (!(door instanceof Element) || !door.matches(':focus-visible') || bar.scrollWidth <= bar.clientWidth) return;
+  const rect = bar.getBoundingClientRect(), box = door.getBoundingClientRect();
+  const left = rect.left + bar.clientLeft, right = left + bar.clientWidth;
+  if (!box.width || box.width > right - left) return;
+  const delta = box.right > right ? Math.ceil(box.right - right) : box.left < left ? Math.floor(box.left - left) : 0;
+  if (delta) bar.scrollLeft += delta;
+}
+
 /** iOS Safari applies :active only where a touch listener exists. One passive listener on the
  * document lets every control show its press at touch-down, as native controls do (T2: "native
  * ios expeirnce is alreayd way smoother and tighter and crisper"). It never blocks a scroll. */
@@ -36169,6 +36182,7 @@ function render() {
   chrome.setAttribute('data-drift-chrome', '');
   // the one top bar (contract §2): the room's chrome is the frame's first instance; its Back the one back glyph
   chrome.dataset.bar = 'room';
+  if (S.view === 'reader') chrome.addEventListener('focusin', revealFocusedChromeDoor);
   const backBtn = biLabel('button', null, '戻る', 'Back');
   backBtn.type = 'button';
   backBtn.id = 'back';

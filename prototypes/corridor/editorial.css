@@ -1714,7 +1714,9 @@ body.v-depth-layered #reader, #reader.reader {
   transition: opacity 180ms ease-out, transform 180ms ease-out;
 }
 #reader:not(.fg-always) ruby:has(> rt:not(.hidden-rt))::before { opacity: 1; transform: translate(-50%, 0); }
-#reader:not(.fg-always) ruby:has(> rt.hidden-rt)::before { width: 0; overflow: hidden; }
+/* A hidden reading holds no text: WebKit keeps a folded reading's old overflow while only its
+ * width collapses, and the narrow page stays wider than the screen. */
+#reader:not(.fg-always) ruby:has(> rt.hidden-rt)::before { content: ''; width: 0; overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   #reader:not(.fg-always) ruby::before { transition: none; transform: translate(-50%, 0); }
 }
