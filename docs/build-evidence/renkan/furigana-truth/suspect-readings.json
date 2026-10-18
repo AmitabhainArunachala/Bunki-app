@@ -8,7 +8,7 @@
   "tokens": 95731
  },
  "statusCounts": {
-  "lexicon-fixed": 671,
+  "lexicon-fixed": 672,
   "accepted": 30
  },
  "openCount": 0,
@@ -202,6 +202,16 @@
    "status": "lexicon-fixed",
    "context": "ました。ここは都から遠い、国境で",
    "note": "都"
+  },
+  {
+   "article": "aozora:000628",
+   "token": 1482,
+   "rule": "override-site",
+   "surface": "床",
+   "reading": "とこ",
+   "status": "lexicon-fixed",
+   "context": "のおっ母は、床についていて",
+   "note": "床につく"
   },
   {
    "article": "aozora:000628",

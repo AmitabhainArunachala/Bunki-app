@@ -1188,6 +1188,14 @@
       "readings": [null, null, "じゅう"],
       "kind": "term",
       "note": "そこら中 (all over the place) reads じゅう; UniDic read 中 ちゅう (Grok 0315, R3, aozora:046605)"
+    },
+    {
+      "word": "床につく",
+      "reading": "とこにつく",
+      "surfaces": ["床", "に", "つい"],
+      "readings": ["とこ", null, null],
+      "kind": "term",
+      "note": "床についていて (ごん狐: 兵十のおっ母は、床についていて, taken to her bed) reads とこ, the bed; UniDic read 床 ゆか (the floor) (Grok 0315 row つく, R3, aozora:000628)"
     }
   ],
   "accepts": [
