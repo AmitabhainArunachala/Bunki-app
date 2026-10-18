@@ -3292,9 +3292,10 @@ body:has(#app .kp-study) #app .kp-top-study { position: sticky; top: env(safe-ar
 /* the quiet report door while a card is up (Hfix-1B; §7 line 28, HG-1, H-sumi-06): the same bug every room has, quiet,
    in the study bar's own end slot (the slot Remove left), so it never lies over the card, the reveal or the grades; the
    session close keeps it in the same place. The bar starts at the top of the screen (no strip of stage above it), so the
-   fixed door and the sticky bar stand together at every scroll. */
-html[data-room='deckplay'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main:has(> .kp > .kp-study) { margin-top: 0; padding-top: 0; }
-#app .kp:has(> .kp-study) { padding-top: 0; }
+   fixed door and the sticky bar stand together at every scroll; and the study ends at the page's end (no padding of the
+   room under it), so the front's foot key and the back's last fold keep their own clearances, nothing more. */
+html[data-room='deckplay'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main:has(> .kp > .kp-study) { margin-block: 0; padding-block: 0; }
+#app .kp:has(> .kp-study) { padding-block: 0; }
 body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail {
   top: env(safe-area-inset-top, 0px); right: calc(4px + env(safe-area-inset-right, 0px)); bottom: auto;
 }
@@ -3310,6 +3311,9 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail .br-bug:is(
   background: color-mix(in srgb, var(--deck-band-ink) 14%, transparent); box-shadow: none;
 }
 body:has(#bunki-reports-root .br-rail) #app .kp-top-study[data-bar='deck'] { padding-right: calc(52px + env(safe-area-inset-right, 0px)); }
+/* with the door in the bar, the page's own report line under the stage is the same door twice (the FEEL pass, 10-02: "redundant
+   with the bug button"); it goes while a card is up or the sitting closes, so the page ends where the card's foot does */
+body:has(#app :is(.kp-study, .kp-done)) #app > .report-line-page { display: none; }
 /* The back reads clean, like the reader: a reading shows on the answer, and on a word you tap
    while its meaning is open (the one ruby, rooms/motion.css; which readings show is the deck's own,
    player.css). A word with a reading never breaks across a line, on the front too (kp-nb), so the
@@ -3375,21 +3379,38 @@ body:has(#bunki-reports-root .br-rail) #app .kp-top-study[data-bar='deck'] { pad
    One mark, not three (the underline goes) */
 #app .kp-study .kp-target { color: var(--kp-ink); font-weight: 700; text-decoration: none; padding: 0 0.1em; margin: 0 -0.1em; }
 #app .kp-study .kp-target.kp-tok:hover, #app .kp-study .kp-target.kp-tok:focus-visible { text-decoration: none; }
-/* ─ reveal: the right half of the screen turns the card (John, 2026-10-13: "Simply tapping the right
-   of the screen should show back of card. No need for 'reveal answer' button"). The button stays a
-   real, labelled control for keyboard and VoiceOver; it just has no look. Its keyboard focus shows as
-   a hairline at the zone's edge. */
-#app .kp-study > #kp-reveal {
-  position: fixed; z-index: 2; top: calc(env(safe-area-inset-top, 0px) + 60px); right: 0; bottom: 0; width: 50%;
-  min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none;
-  color: transparent; font-size: 0; -webkit-tap-highlight-color: transparent; cursor: pointer;
+/* ─ reveal: the right half of the card still turns it (John, 2026-10-13: "Simply tapping the right of the screen should
+   show back of card. No need for 'reveal answer' button"), and the key that names that turn stands at the foot of the
+   screen (Hfix-1B, the lead's round-1 ruling on H-hakuu-01): one quiet word at the thumb's right, on a band of the stage,
+   10 px clear of the home indicator. On the longest passage it is reachable without scrolling; the passage scrolls under
+   the band and, at its end, rests above it. The key never moves: a short front is the screen's height, so its place in
+   the flow is its pinned place. Undo, when there is one, stands on the same row at the left. */
+#app .kp-study:has(> .kp-reveal) { min-height: 100dvh; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+#app .kp .kp-study > .kp-reveal {
+  position: sticky; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 3; order: 2; flex: none;
+  align-self: flex-end; width: auto; min-width: 44px; min-height: 44px; margin: auto 0 0; padding: 0 6px 0 16px;
+  border: 0; border-radius: var(--radius-control); background: transparent; box-shadow: none;
+  font: 600 var(--type-control)/1 var(--sans, system-ui); letter-spacing: 0.02em; color: var(--kp-stage-ink);
+  -webkit-tap-highlight-color: transparent; cursor: pointer;
 }
-#app .kp-study > #kp-reveal:focus-visible { outline: none; box-shadow: inset 2px 0 0 color-mix(in srgb, var(--kp-stage-ink) 55%, transparent); }
-/* with no slab at the foot, the page runs to the bottom of the screen and can scroll clear of it */
-#app .kp-study:has(> #kp-reveal) { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
-/* Undo on the next front stands 10px off the foot (the safe area counted once), on its opaque
-   full-width dock band, so no passage ink shows through it */
-#app .kp .kp-study:has(> #kp-reveal) > .kp-undo { bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 3; }
+#app .kp .kp-study > .kp-reveal::after { content: '›'; margin-left: 8px; font-weight: 400; font-size: var(--type-lead); line-height: 0; }
+#app .kp .kp-study > .kp-reveal:focus-visible { outline: 2px solid var(--kp-stage-ink); outline-offset: -2px; box-shadow: none; }
+/* the foot's band: one strip of the stage under the foot's words, edge to edge and down to the glass, so no passage ink
+   shows around them; drawn by the study itself (under Undo's own band and Reveal), over the passage. Its top 18 px is an
+   alpha mask (no pigment), so a line scrolling under the band recedes into the stage instead of being cut */
+#app .kp-study:has(> .kp-reveal)::after {
+  content: ''; order: 3; flex: none; position: sticky; bottom: 0; z-index: 1; pointer-events: none;
+  height: calc(82px + env(safe-area-inset-bottom, 0px));
+  margin: -88px calc((100% - 100vw) / 2) calc(-10px - env(safe-area-inset-bottom, 0px));
+  background: var(--kp-dock);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18px);
+  mask-image: linear-gradient(to bottom, transparent, #000 18px);
+}
+/* Undo on the next front stands on the key's row at the left, 10px off the foot (the safe area counted once), on its
+   opaque full-width dock band, so no passage ink shows through it; the key paints over that band at the right */
+#app .kp .kp-study:has(> .kp-reveal) > .kp-undo {
+  order: 2; align-self: flex-start; margin: -60px 0 0; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 2;
+}
 #app .kp-study .kp-taphint { border-top: 0; padding-top: 4px; font: 500 var(--type-caption)/1.4 var(--sans, system-ui); letter-spacing: 0.02em; text-transform: none; color: var(--kp-mute); }
 #app .kp-study .kp-undo { font: 500 var(--type-label)/1 var(--sans, system-ui); letter-spacing: 0.01em; }
 /* ─ the answer: headword in ink, its reading and part of speech as quiet text, no badges */
