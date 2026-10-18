@@ -391,7 +391,21 @@ try {
             const end = await page.evaluate(() => {
               const dock = document.querySelector('.kp-grades');
               const d = dock.getBoundingClientRect();
-              return window.__I__.leaves(document.querySelector('.kp-study')).filter((el) => !dock.contains(el)).flatMap((el) => window.__I__.rects(el)).filter((r) => r.bottom > d.top + 1 && r.top < d.bottom && r.right > d.left && r.left < d.right).length;
+              // what is painted: a line of the passage's own scroll window (F: the window keeps its own scroll, seatUnderHeader)
+              // that its overflow clips away is no ink under the bar, so each text box is cut to its clipping ancestors first
+              const clipped = (el, r) => {
+                let top = r.top, bottom = r.bottom, left = r.left, right = r.right;
+                for (let a = el.parentElement; a && a !== document.documentElement; a = a.parentElement) {
+                  const cs = getComputedStyle(a);
+                  if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
+                  const c = a.getBoundingClientRect();
+                  top = Math.max(top, c.top); bottom = Math.min(bottom, c.bottom); left = Math.max(left, c.left); right = Math.min(right, c.right);
+                }
+                return { top, bottom, left, right };
+              };
+              return window.__I__.leaves(document.querySelector('.kp-study')).filter((el) => !dock.contains(el))
+                .flatMap((el) => window.__I__.rects(el).map((r) => clipped(el, r))).filter((r) => r.bottom > r.top + 0.5 && r.right > r.left + 0.5)
+                .filter((r) => r.bottom > d.top + 1 && r.top < d.bottom && r.right > d.left && r.left < d.right).length;
             });
             check(`G10 · ${tag} · ${id}: the answer stands above its grade bar, no fold row cut, nothing under it at the end`,
               rest.saidBottom <= rest.dockTop && rest.dockTop <= 844 && rest.cut === 0 && end === 0 && rest.wide <= 1,

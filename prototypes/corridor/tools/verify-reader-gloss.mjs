@@ -164,6 +164,10 @@ const EDITS = Object.freeze({
     to: "  if (D.dict[door.b] && !door.unfit) return { ...node, seq: '1254600' };\n" }),
   captureInert: Object.freeze({ file: 'corridor.js', from: 'async function toggleTaken(node, label) {\n',
     to: 'async function toggleTaken(node, label) {\n  return false;\n' }),
+  // G5 · the slip's Save and the bar's keep are the one keep (keepWord), which writes through commitCapture, not toggleTaken:
+  // the capture is made inert there too, so every door that looks enabled captures nothing
+  keepInert: Object.freeze({ file: 'corridor.js', from: 'async function commitCapture(node, label, now = Date.now(), options = {}) {\n',
+    to: 'async function commitCapture(node, label, now = Date.now(), options = {}) {\n  return false;\n' }),
   miniUnheld: Object.freeze({ file: 'corridor.js', from: "  const held = (reader && !D.dict[token.b]) || !g?.m?.some(meaning => typeof meaning === 'string' && meaning.trim());\n", to: '  const held = false;\n' }),
 });
 const RUN_ROWS = Object.freeze({
@@ -213,7 +217,7 @@ const CONTROLS = Object.freeze([
     kills: ['G1.entry'],
     allowed: [],
     witness: (rows) => (seen(rows, 'G1.entry').firstGloss === 'to do up (hair)' ? '' : 'the core sheet did not show 結う\'s first sense') }),
-  Object.freeze({ name: 'c7', title: 'toggleTaken() inert while every door still looks enabled', edits: ['captureInert'], run: 'capture',
+  Object.freeze({ name: 'c7', title: 'the capture inert (toggleTaken() and G5\'s one keep) while every door still looks enabled', edits: ['captureInert', 'keepInert'], run: 'capture',
     requires: ['G7.bar.none', 'G7.mini.door', 'G7.sheet.door', 'G7.chrome.door'],
     kills: ['G7.mini.captured', 'G7.sheet.captured', 'G7.chrome.captured'],
     allowed: [],
