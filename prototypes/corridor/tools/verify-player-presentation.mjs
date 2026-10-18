@@ -82,11 +82,18 @@ try {
       }
       // The app opens its decks in the focus room (John, 2026-10-13: "SRS section very clear and smooth with
       // NO CLUTTER at all"): while a card is up there is no top bar, so the language and world switches
-      // and the report entry are not on the card screen; the card's own Readings switch is. It is the
-      // comparison here: switching readings must keep the exact reading pose (nothing moves), off-window
-      // and fitted. The report entry's names are checked on the deck home, where the rail stands.
-      const chrome = await page.evaluate(() => ({ lang: !!document.querySelector('#lang')?.getClientRects().length, world: !!document.querySelector('#theme-seal')?.getClientRects().length, report: !!document.querySelector('#bunki-report-bug')?.getClientRects().length, readings: document.getElementById('kp-readings')?.getAttribute('aria-pressed') }));
-      check(`${width}/${zoom} the card screen has no top bar or report entry (no language or world switch, no report rail) and offers its Readings switch, on`, !chrome.lang && !chrome.world && !chrome.report && chrome.readings === 'true', chrome);
+      // are not on the card screen; the card's own Readings switch is. It is the comparison here: switching
+      // readings must keep the exact reading pose (nothing moves), off-window and fitted. Hfix-1B (§7 line 28,
+      // HG-1): the one quiet report door is on the card screen too, in the study bar's end slot, never over
+      // the card; its names are checked on the deck home above, and the same element serves both.
+      const chrome = await page.evaluate(() => {
+        const box = (sel) => { const r = document.querySelector(sel)?.getBoundingClientRect(); return r && r.width ? r : null; };
+        const glyph = box('#bunki-report-bug svg'), bar = box('.kp-top-study');
+        return { lang: !!document.querySelector('#lang')?.getClientRects().length, world: !!document.querySelector('#theme-seal')?.getClientRects().length,
+          report: !!glyph && !!bar && glyph.left >= bar.left && glyph.right <= bar.right && glyph.top >= bar.top && glyph.bottom <= bar.bottom,
+          readings: document.getElementById('kp-readings')?.getAttribute('aria-pressed') };
+      });
+      check(`${width}/${zoom} the card screen has no top bar (no language or world switch), keeps the one report door in its study bar's end slot, and offers its Readings switch, on`, !chrome.lang && !chrome.world && chrome.report && chrome.readings === 'true', chrome);
       const same = (a, b) => a.card === b.card && a.zoom === b.zoom && a.windowed === b.windowed && a.inner === b.inner && a.anchor.top === b.anchor.top && a.height === b.height && a.page === b.page && a.ledger === b.ledger && JSON.stringify(a.context) === JSON.stringify(b.context) && JSON.stringify(a.folds) === JSON.stringify(b.folds) && JSON.stringify(a.target) === JSON.stringify(b.target);
       // Deliberately off-window: trusted inner wheel chooses an earlier paragraph; where the window is tall
       // enough to keep the marked word inside, a trusted outer scroll then carries it above the screen.

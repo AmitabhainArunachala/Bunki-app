@@ -3289,8 +3289,27 @@ body:has(#app :is(.kp-study, .kp-done)) #app > .chrome,
 body:has(#app :is(.kp-study, .kp-done)) .primary-tabs { display: none; }
 body.has-primary-tabs:has(#app :is(.kp-study, .kp-done)) { --nav-clearance: env(safe-area-inset-bottom, 0px); }
 body:has(#app .kp-study) #app .kp-top-study { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; }
-/* no report button while a card is up (John, 2026-10-13) */
-body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: none; }
+/* the quiet report door while a card is up (Hfix-1B; §7 line 28, HG-1, H-sumi-06): the same bug every room has, quiet,
+   in the study bar's own end slot (the slot Remove left), so it never lies over the card, the reveal or the grades; the
+   session close keeps it in the same place. The bar starts at the top of the screen (no strip of stage above it), so the
+   fixed door and the sticky bar stand together at every scroll. */
+html[data-room='deckplay'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main:has(> .kp > .kp-study) { margin-top: 0; padding-top: 0; }
+#app .kp:has(> .kp-study) { padding-top: 0; }
+body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail {
+  top: env(safe-area-inset-top, 0px); right: calc(4px + env(safe-area-inset-right, 0px)); bottom: auto;
+}
+/* wider than a phone the bar stands centred (672 wide, the card's 40rem and its gutters): the door keeps to its end slot */
+@media (min-width: 521px) {
+  body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { right: max(14px, calc((100vw - 672px) / 2 + 4px)); }
+}
+body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail::before { content: none; }
+body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail .br-bug { color: var(--deck-band-quiet); }
+body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail .br-bug svg { width: 17px; height: 17px; }
+body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail .br-bug:is(:hover, :focus-visible) { color: var(--deck-band-ink); }
+body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail .br-bug:is(:hover, :focus-visible)::before {
+  background: color-mix(in srgb, var(--deck-band-ink) 14%, transparent); box-shadow: none;
+}
+body:has(#bunki-reports-root .br-rail) #app .kp-top-study[data-bar='deck'] { padding-right: calc(52px + env(safe-area-inset-right, 0px)); }
 /* The back reads clean, like the reader: a reading shows on the answer, and on a word you tap
    while its meaning is open (the one ruby, rooms/motion.css; which readings show is the deck's own,
    player.css). A word with a reading never breaks across a line, on the front too (kp-nb), so the
@@ -5859,18 +5878,21 @@ html[data-save-drawer='room'] body.ginga #app > .scale-thread {
    rail a paper hairline on a paper track; a lit hairline at its foot keeps it a band on the deck's lacquer stage (D1).
    Flat: no gradient, the band is one pigment.
    ========================================================================== */
-#app .kp-top-study[data-bar='deck'] {
+/* the band's three tokens reach the report door that stands in its end slot (Hfix-1B): one definition, day and night */
+:is(#app .kp-top-study[data-bar='deck'], body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail) {
   /* the world's own named pigment (corridor.css's world block --ink, THEME_UI's ink): ベロ藍 #1c2f42 Prussian blue, 墨
      #211e17, 朱's #2b2620 … — the house's --color-ink is a near-black in ベロ藍, so the band reads the world's pigment */
   --deck-band: var(--world-ink, var(--color-ink));
   --deck-band-ink: var(--color-paper, #f5efe0);
   --deck-band-quiet: color-mix(in srgb, var(--deck-band-ink) 82%, var(--deck-band));
+}
+#app .kp-top-study[data-bar='deck'] {
   background: var(--deck-band);
   border-bottom: 1px solid color-mix(in srgb, var(--deck-band-ink) 16%, var(--deck-band));
   box-shadow: 0 1px 0 rgb(0 0 0 / 22%);
   color: var(--deck-band-ink);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #app .kp-top-study[data-bar='deck'] {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(#app .kp-top-study[data-bar='deck'], body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail) {
   /* Material II: the card band's night value, amended — the world's ground 30 % in its own deepest coat, not in black */
   --deck-band: color-mix(in srgb, var(--color-ground) 30%, var(--zen-stage-deep));
   --deck-band-ink: var(--color-ink);

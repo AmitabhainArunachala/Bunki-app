@@ -17,7 +17,7 @@
  *                    brackets, glyph crosses;
  *   D  the deck    — the deck's study bar is a solid band in the world's deep pigment (藍 and 墨 walked), its
  *                    back and count at 4.5:1 or more on it, and nothing else on it: Remove lives on the card's back
- *                    (Hfix-1B);
+ *                    (Hfix-1B); the one quiet report door stands in its end slot at 3:1 or more (Hfix-1B);
  *   T  Today       — no box inside a box: the day's line carries no bordered box within it, and no + marks.
  *   N  the shelf's rows and cards (slice N, 2026-10-17: "made by AI!! do not write that", the twenty new articles) —
  *                    every card carries one level, the level its text was written for where the row has one; every
@@ -804,7 +804,10 @@ try {
           if (!bar) return null;
           const cs = getComputedStyle(bar);
           const parts = [...bar.querySelectorAll('button, .kp-count')].filter((n) => n.getClientRects().length).map((n) => ({ sig: n.id || n.className, color: getComputedStyle(n).color }));
-          return { bg: cs.backgroundColor, bgImage: cs.backgroundImage, parts, theme: document.documentElement.dataset.theme || '' };
+          // Hfix-1B · the one report door stands in the bar's end slot while a card is up
+          const bug = document.querySelector('#bunki-report-bug'), glyph = bug?.querySelector('svg')?.getBoundingClientRect(), band = bar.getBoundingClientRect();
+          const door = bug && glyph?.width ? { color: getComputedStyle(bug).color, inBand: glyph.left >= band.left && glyph.right <= band.right && glyph.top >= band.top && glyph.bottom <= band.bottom } : null;
+          return { bg: cs.backgroundColor, bgImage: cs.backgroundImage, parts, door, theme: document.documentElement.dataset.theme || '' };
         });
         for (const theme of ['hokusai', 'sumi']) {
           await room(`deck-home-${theme}`, async () => {
@@ -986,6 +989,10 @@ try {
       const sigs = (bar?.parts || []).map((p) => p.sig);
       check(`${label} · D its back and count hold 4.5:1 on the band, and nothing else is on it (no Remove)`,
         solid && JSON.stringify(sigs) === JSON.stringify(['kp-quit', 'kp-count']) && low >= 4.5, `${low.toFixed(2)}:1 ${JSON.stringify(bar?.parts)}`);
+      // Hfix-1B (§7 line 28, HG-1): the quiet report door is in the band's end slot, its glyph at 3:1 or more on it (a graphic)
+      const doorRatio = bar?.door && solid ? contrast(bar.door.color, bar.bg) : 0;
+      check(`${label} · D the quiet report door stands in the band's end slot, its glyph at 3:1 or more on it`,
+        solid && !!bar.door?.inBand && doorRatio >= 3, `${doorRatio.toFixed(2)}:1 ${JSON.stringify(bar?.door)}`);
     }
     // T: Today's line is one surface, no box inside it
     for (const row of inventory.filter((r) => r.room === 'today' || r.room === 'today-cards')) {

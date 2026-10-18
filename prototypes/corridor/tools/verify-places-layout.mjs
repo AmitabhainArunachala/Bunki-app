@@ -12,8 +12,8 @@
  *    Review and no tests there; Begin and the way back; Saved, its lists, Browse, the backup door
  *    and each way back; Tests and each of its rooms' way back; today's reading; the day's word;
  *    Progress → Saved and Settings; the opening screen's Review button and its described menu.
- * 3. The focus room (an empty record, so the stage offers the N2 deck): no top bar, tab bar or
- *    report button while a card is up; the left half of the card stays still and the right half
+ * 3. The focus room (an empty record, so the stage offers the N2 deck): no top bar or tab bar while a card
+ *    is up, and the quiet report door in the study bar's end slot (Hfix-1B, §7 line 28); the left half of the card stays still and the right half
  *    turns it; every reading on the back, with the passage's lines unmoved; the Readings switch
  *    returns the clean text and moves nothing.
  * 4. Switched back through Settings: the current layout returns, unmarked.
@@ -341,7 +341,12 @@ try {
     await page.waitForTimeout(800);
     const room = () => page.evaluate(() => {
       const shown = (s) => { const n = document.querySelector(s); return !!n && getComputedStyle(n).display !== 'none'; };
-      return { revealed: !!document.querySelector('#kp-grade-good'), chrome: shown('#app > .chrome'), tabs: shown('#primary-tabs'), rail: shown('#bunki-reports-root .br-rail') };
+      // Hfix-1B: the report door stands in the study bar's end slot (its glyph inside the bar, clear of the bar's own controls)
+      const box = (sel) => { const r = document.querySelector(sel)?.getBoundingClientRect(); return r && r.width ? r : null; };
+      const glyph = box('#bunki-report-bug svg'), bar = box('.kp-top-study'), quit = box('#kp-quit'), count = box('.kp-top-study .kp-count');
+      const apart = (a, b) => !a || !b || a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top;
+      const slotted = !!glyph && !!bar && glyph.left >= bar.left && glyph.right <= bar.right && glyph.top >= bar.top && glyph.bottom <= bar.bottom && apart(glyph, quit) && apart(glyph, count);
+      return { revealed: !!document.querySelector('#kp-grade-good'), chrome: shown('#app > .chrome'), tabs: shown('#primary-tabs'), rail: shown('#bunki-reports-root .br-rail'), slotted };
     });
     const lines = () => page.evaluate(() => {
       const p = document.querySelector('#kp-card .kp-sentence');
@@ -375,7 +380,7 @@ try {
     // F (one ruby): a reading is a native <rt>, shown when it is laid out and visible (the deck hides one in place)
     const readings = () => page.evaluate(() => [...document.querySelectorAll('#kp-card .kp-sentence ruby > rt')].filter((rt) => { const cs = getComputedStyle(rt); return cs.display !== 'none' && cs.visibility !== 'hidden'; }).length);
     let s = await room();
-    check('focus · while a card is up: no top bar, no tab bar, no report button', !s.chrome && !s.tabs && !s.rail, JSON.stringify(s));
+    check('focus · while a card is up: no top bar, no tab bar; the quiet report door stands in the study bar\'s end slot (Hfix-1B)', !s.chrome && !s.tabs && s.rail && s.slotted, JSON.stringify(s));
     check('focus · the front shows no readings', !(await page.locator('#kp-card ruby').count()));
     const front = await lines(), frontText = await text();
     const width = await page.evaluate(() => innerWidth);
@@ -437,10 +442,15 @@ try {
     await page.waitForTimeout(800);
     const bare = () => page.evaluate(() => {
       const shown = (s) => { const n = document.querySelector(s); return !!n && getComputedStyle(n).display !== 'none'; };
-      return { revealed: !!document.querySelector('#kp-grade-good'), chrome: shown('#app > .chrome'), tabs: shown('#primary-tabs'), rail: shown('#bunki-reports-root .br-rail') };
+      // Hfix-1B: the report door stands in the study bar's end slot (its glyph inside the bar, clear of the bar's own controls)
+      const box = (sel) => { const r = document.querySelector(sel)?.getBoundingClientRect(); return r && r.width ? r : null; };
+      const glyph = box('#bunki-report-bug svg'), bar = box('.kp-top-study'), quit = box('#kp-quit'), count = box('.kp-top-study .kp-count');
+      const apart = (a, b) => !a || !b || a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top;
+      const slotted = !!glyph && !!bar && glyph.left >= bar.left && glyph.right <= bar.right && glyph.top >= bar.top && glyph.bottom <= bar.bottom && apart(glyph, quit) && apart(glyph, count);
+      return { revealed: !!document.querySelector('#kp-grade-good'), chrome: shown('#app > .chrome'), tabs: shown('#primary-tabs'), rail: shown('#bunki-reports-root .br-rail'), slotted };
     });
     const up = await bare();
-    check('current · while a card is up: no top bar, no tab bar, no report button', !up.chrome && !up.tabs && !up.rail, JSON.stringify(up));
+    check('current · while a card is up: no top bar, no tab bar; the quiet report door stands in the study bar\'s end slot (Hfix-1B)', !up.chrome && !up.tabs && up.rail && up.slotted, JSON.stringify(up));
     const width = await page.evaluate(() => innerWidth);
     await page.touchscreen.tap(Math.round(width * 0.22), 420);
     await page.waitForTimeout(500);
