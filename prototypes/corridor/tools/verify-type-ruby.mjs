@@ -192,6 +192,15 @@ const BRIDGE = `window.__F__ = {
   dials: (k, f, s) => { S.dials = { kanji: k, furigana: f, spacing: s }; render(); },
   visit: (v) => { removeMini(); S.stack = []; S.strokes = null; S.view = v; render(); window.scrollTo(0, 0); },
 };`;
+/** G3 · a word in the reader is found by its prose name (an idle word carries no aria-label: its paragraph is the one
+ * Tab stop), and a tap climbs its ladder: on touch the first raises its reading in place, the next draws its card. */
+const readerTok = (page, label) => page.locator(`#reader .tok[data-prose-label="${label}"]`).first();
+async function climbToCard(page, tok) {
+  await tok.click();
+  await page.waitForFunction((node) => !!document.getElementById('mini') || node.dataset.ladderRung === 'reading', await tok.elementHandle(), { timeout: 10000 });
+  if (!(await page.locator('#mini').count())) await tok.click();
+  await page.locator('#mini').waitFor();
+}
 /** the deck's back with its readings on, as a learner reaches it: the deck, Begin, 答えを見る, 読み on */
 async function openDeckBack(page) {
   await page.goto(`${host.origin}/?deck=kotoba&ui=bi`);
@@ -212,7 +221,8 @@ async function session(browser, viewport, { scale = 2, zoomed = false } = {}) {
   // out to fit its widest box (Chromium reported innerWidth 376 for a 195 px page), so the zoomed page is laid out as is
   const ctx = await browser.newContext({ viewport, deviceScaleFactor: scale, isMobile: !zoomed && viewport.width < 600, hasTouch: viewport.width < 600, serviceWorkers: 'block', reducedMotion: 'reduce' });
   await silenceBrowserAudio(ctx);
-  await ctx.addInitScript(() => { try { localStorage.setItem('kairo-tip-reader-v1', '1'); } catch { /* storage refused */ } });
+  // the reader's first-visit tip, and (G3) its first-use demonstration of a word's stage, are a fresh device's alone
+  await ctx.addInitScript(() => { try { localStorage.setItem('kairo-tip-reader-v1', '1'); localStorage.setItem('kairo-word-ladder-demo-v1', '1'); } catch { /* storage refused */ } });
   await ctx.route('**/corridor.js', async (route) => { const r = await route.fetch(); await route.fulfill({ response: r, body: (await r.text()) + BRIDGE }); });
   await ctx.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.fallback() : route.abort()));
   const page = await ctx.newPage();
@@ -337,8 +347,8 @@ try {
       await page.evaluate(() => window.__F__.visit('shelf')); await page.waitForTimeout(600); await take('shelf');
       await openReader(page); await page.evaluate(() => window.__F__.dials(0, 2, 0)); await page.waitForTimeout(500); await take('reader-always');
       await page.evaluate(() => window.__F__.dials(0, 1, 0)); await page.waitForTimeout(400);
-      const tok = page.locator('#reader .tok[aria-label="大臣"]').first();
-      await tok.scrollIntoViewIfNeeded(); await tok.click(); await page.locator('#mini').waitFor(); await page.waitForTimeout(300); await take('slip');
+      const tok = readerTok(page, '大臣');
+      await tok.scrollIntoViewIfNeeded(); await climbToCard(page, tok); await page.waitForTimeout(300); await take('slip');
       await page.locator('#mini button.mini-word').click(); await page.waitForTimeout(900); await take('page');
       for (const room of ['tray', 'thesaurus', 'dojo', 'me']) { await page.evaluate((v) => window.__F__.visit(v), room); await page.waitForTimeout(900); await take(room); }
       await openDeckBack(page); await take('deck-back');
@@ -352,7 +362,7 @@ try {
         await openReader(page);
         const before = await page.evaluate(READINGS, '#reader');
         assert.equal(before.rows.length, 0, 'on touch, no reading shows before a tap');
-        const tok = page.locator('#reader .tok[aria-label="表彰"]').first();
+        const tok = readerTok(page, '表彰');
         await tok.scrollIntoViewIfNeeded();
         await page.waitForTimeout(200);
         const y0 = await page.evaluate(() => scrollY);
@@ -406,8 +416,8 @@ try {
     });
     await run('G1-glosses-390', { width: 390, height: 844 }, async ({ page }) => {
       await openReader(page);
-      const tok = page.locator('#reader .tok[aria-label="大臣"]').first();
-      await tok.scrollIntoViewIfNeeded(); await tok.click(); await page.locator('#mini').waitFor(); await page.waitForTimeout(400);
+      const tok = readerTok(page, '大臣');
+      await tok.scrollIntoViewIfNeeded(); await climbToCard(page, tok); await page.waitForTimeout(400);
       const slip = await page.evaluate(GLOSS, ['#mini .mini-gloss']);
       await page.locator('#mini button.mini-word').click(); await page.waitForTimeout(900);
       const pageGloss = await page.evaluate(GLOSS, ['#sheet .gloss', '#sheet .sense-list li', '#sheet .example-en', '.sheet .gloss', '.sheet .sense-list li']);
@@ -419,15 +429,18 @@ try {
     await run('Z1-200-percent', { width: 195, height: 422 }, async ({ page }) => {
       await openReader(page);
       assert.equal(await page.evaluate(() => innerWidth), 195, 'the page is laid out at 195 CSS px');
-      const tok = page.locator('#reader .tok[aria-label="表彰"]').first();
+      const tok = readerTok(page, '表彰');
       await tok.scrollIntoViewIfNeeded(); await tok.click(); await page.waitForTimeout(400);
       const touch = await page.evaluate(READINGS, '#reader');
       const shown = touch.rows.filter((r) => r.text === 'ひょうしょう');
       assert.equal(shown.length, 1, 'a tap shows its reading at 200 %');
       const j1 = judgeReadings({ rows: shown, glyphs: touch.glyphs });
       assert.deepEqual(j1.issues, [], j1.issues.join('; '));
+      // G3 · the next tap draws the card: its meaning is what is judged (one line at least, never an empty pass)
+      if (!(await page.locator('#mini').count())) await tok.click();
+      await page.locator('#mini').waitFor(); await page.waitForTimeout(400);
       const slip = await page.evaluate(GLOSS, ['#mini .mini-gloss']);
-      assert(slip.every((g) => g.size >= 13), `the slip's meaning at 200 %: ${JSON.stringify(slip)}`);
+      assert(slip.length > 0 && slip.every((g) => g.size >= 13), `the slip's meaning at 200 %: ${JSON.stringify(slip)}`);
       await page.keyboard.press('Escape');
       await page.evaluate(() => window.__F__.dials(0, 2, 0));
       await page.waitForTimeout(500);

@@ -815,13 +815,16 @@ async function g6Activate(page, locator, modality) {
   assert(await locator.evaluateAll(nodes=>nodes.length===1&&document.activeElement===nodes[0]),'native keyboard focus reaches actual control');
   await page.keyboard.press('Enter');
 }
+// The merged shelf (N2's twenty more articles and the rest) holds 171 focusable stops at 390 px, and focus lands on the
+// rail's inward door, after its 宙: forward Tab reaches 宙 at the 171st press. The budget covers the real order, not a count.
+const G6_TAB_BUDGET = 400;
 async function g6TabReach(page, locator) {
   // Start from the current real focus; no tabindex changes or private focus model.
-  for(let n=0;n<160;n++){
+  for(let n=0;n<G6_TAB_BUDGET;n++){
     if(await locator.evaluate(node=>document.activeElement===node)) return {found:true,tabs:n};
     await page.keyboard.press('Tab');
   }
-  return {found:false,tabs:160};
+  return {found:false,tabs:G6_TAB_BUDGET};
 }
 async function g6OpenOrigin(page, modality,{index=G6_ORIGIN.index,boot=true}={}) {
   if(boot){
@@ -1445,11 +1448,20 @@ async function g6AimSkyWord(page,word){
   const aim=await word.evaluate(node=>{const r=node.querySelector('.base')?.getBoundingClientRect();if(!r)return null;const x=r.left+r.width/2,y=r.top+r.height/2;return {x,y,label:node.querySelector('.base').textContent,connected:node.isConnected,hit:document.elementFromPoint(x,y)?.closest('.word')===node};});
   assert(aim?.connected&&aim.hit,'the same printed sky word must own the real input point');return aim;
 }
+/** The record once its revision has held still across three reads 200 ms apart (at most 6 s): a write the app makes
+ * on its own after an action (G2's encounter on a stage) lands before a baseline is taken. */
+async function g6SettledRecord(page){
+  let last=await readAppRecordSnapshot(page),still=0;
+  for(let n=0;n<30&&still<3;n++){await delay(200);const next=await readAppRecordSnapshot(page);still=next.revision===last.revision?still+1:0;last=next;}
+  return last;
+}
 async function g6SkyStageGate(page,{context,emit,native}){
   await g6SkyHome(page);const word=await g6PickSkyWord(page);
   const tapAt=await g6AimSkyWord(page,word);await page.touchscreen.tap(tapAt.x,tapAt.y);await page.waitForFunction(n=>n.dataset.ladderRung==='reading'||!!document.getElementById('mini'),word,{timeout:10000});
   if(!await page.locator('#mini').count()){assert.equal(await word.getAttribute('data-ladder-rung'),'reading');await page.waitForFunction(()=>window.__DRIFT__?.canNavigate()===true,null,{timeout:10000});const again=await g6AimSkyWord(page,word);await page.touchscreen.tap(again.x,again.y);}
-  await page.locator('#mini .mini-word').waitFor();const mini=await slipFacts(page),before=await g6SkyFacts(page),record=await readAppRecordSnapshot(page);
+  // G2 · a stage opened writes its encounter (met) a moment after it appears: the baseline is read once the record holds
+  // still, so only the hand under test can change it
+  await page.locator('#mini .mini-word').waitFor();const mini=await slipFacts(page),before=await g6SkyFacts(page),record=await g6SettledRecord(page);
   const witness=native?await g6NativeChromiumPinch(page,context,'#mini .mini-word'):await g6TwoPointerPolicy(page,'#mini .mini-word');
   const after=await g6SkyFacts(page),stage=await slipFacts(page),afterRecord=await readAppRecordSnapshot(page);
   emit('stage.blocks-sky','two pointers on actual hosted stage text retain native text policy and never enter sky scale navigation',witness.ok&&after.view==='drift'&&after.mini&&!after.sheet&&stage.word===mini.word,{before,after,mini,stage,witness});
@@ -1686,9 +1698,9 @@ document.addEventListener('pointermove', e => {
 function scaleThread() {`}],
     witness:r=>r.observed.events.some(e=>e.type==='pointermove'&&e.defaultPrevented)},
   {id:'lost-return-line',target:'return.line',schedule:'line',edits:[
-    {file:'corridor.js',key:'displace-return-target',from:'const delta = anchor.getBoundingClientRect().top - visit.viewportY;',to:'const delta = anchor.getBoundingClientRect().top - (visit.viewportY + 80);'},
-    {file:'corridor.js',key:'displace-stability-target',from:'const remaining = anchor.getBoundingClientRect().top - visit.viewportY;',to:'const remaining = anchor.getBoundingClientRect().top - (visit.viewportY + 80);'},
-    {file:'corridor.js',key:'displace-post-focus-target',from:'const afterFocus = anchor.getBoundingClientRect().top - visit.viewportY;',to:'const afterFocus = anchor.getBoundingClientRect().top - (visit.viewportY + 80);'},
+    {file:'corridor.js',key:'displace-return-target',from:'const delta = scaleLineTop(anchor) - visit.viewportY;',to:'const delta = scaleLineTop(anchor) - (visit.viewportY + 80);'},
+    {file:'corridor.js',key:'displace-stability-target',from:'const remaining = scaleLineTop(anchor) - visit.viewportY;',to:'const remaining = scaleLineTop(anchor) - (visit.viewportY + 80);'},
+    {file:'corridor.js',key:'displace-post-focus-target',from:'const afterFocus = scaleLineTop(anchor) - visit.viewportY;',to:'const afterFocus = scaleLineTop(anchor) - (visit.viewportY + 80);'},
   ],witness:r=>r.observed.delta>4&&g6SameToken(r.observed.origin,r.observed.current)&&r.observed.current.connected},
   {id:'late-bubble-pointer',target:'text.native-two-pointer',schedule:'native-pinch',engines:['chromium'],edits:[{file:'corridor.js',key:'late-bubble-two-pointer',
     from:'function scaleThread() {',
@@ -3349,11 +3361,16 @@ try {
         const word = readerWord(page, label);
         await word.scrollIntoViewIfNeeded();
         await page.evaluate(() => { window.__ink = []; });
+        // G2 · the encounter ledger counts the reading the first tap raises (a reading raised is an encounter), so a word
+        // never met before stands at "met" by its stage: still a first meeting, which writes itself. Its having no
+        // encounter before the tap is read from the record
+        const metBefore = Object.keys((await readAppRecord(page)).met?.entries || {}).some((key) => { try { return JSON.parse(key)[2] === label; } catch { return false; } });
         await stage(page, word);
         const first = await inkFacts(page);
+        const stageDepthOf = depth === 'unmet' ? (metBefore ? null : 'met') : depth;
         if (depth === 'unmet' || depth === 'met') {
           check(`G4.depth.${depth}.write`, `${depth} (${label}): the word comes closer to write itself — its whole お手本 there from the first frame, the type held for the ink, the reading's place kept but unwritten, the word still one child of its band`,
-            first.ceremony === 'write' && first.depth === depth && ['arriving', 'writing'].includes(first.ink) && first.chars === [...label].length &&
+            first.ceremony === 'write' && first.depth === stageDepthOf && ['arriving', 'writing'].includes(first.ink) && first.chars === [...label].length &&
             first.ghostShown && first.ghostPaths === first.strokes && first.strokes > 0 && first.reading?.shown && first.reading.opacity === 0 && first.inkPointer && first.ariaHidden &&
             first.oneChild && first.word === label, first);
           await midWriting(page);
@@ -3556,7 +3573,9 @@ try {
       const again = await inkFacts(page);
       await settledInk(page);
       check('G4.brush.mark', 'the 筆 mark writes the word again — any depth, any 筆 — and never changes depth, record or scheduling',
-        again.ink === 'writing' && again.depth === 'unmet' && (await inkFacts(page)).ended === 'written' && await record() === kept, { again, same: await record() === kept });
+        // G2 · the stage's depth is the ledger's (a never-met word stands at "met" once its first tap raised the reading): the
+        // mark leaves it as the stage had it
+        again.ink === 'writing' && again.depth === never.depth && (await inkFacts(page)).ended === 'written' && await record() === kept, { again, never: never.depth, same: await record() === kept });
       await page.keyboard.press('Escape');
       // always: a word he has seen again writes too
       await seedDepths(page);
@@ -3654,12 +3673,14 @@ try {
       const passive = await page.evaluate(() => { const voice = document.querySelector('#mini #mini-voice');
         return { voice: !!voice, flag: voice?.dataset.voiceUnavailable || null, name: voice?.title || '', note: document.querySelector('#mini .mini-say-note')?.textContent || null }; });
       check('G4.voice.passive', '声 on, a new word comes closer: no recording yet, so the 音 says so quietly (struck, its name) and nothing plays',
-        passive.voice && !!passive.flag && /recording|収録音声/u.test(passive.name) && passive.note === null, passive);
+        // the build's state decides which absence it names: no recording yet for this word, or (the merged build: the voice
+        // lane's word clips are withdrawn) no recorded voices at all — either is the honest reason, struck and silent
+        passive.voice && !!passive.flag && /record(?:ing|ed)|収録音声/u.test(passive.name) && passive.note === null, passive);
       await page.locator('#mini #mini-voice').tap();
       await page.waitForFunction(() => !!document.querySelector('#mini .mini-say-note')?.textContent, null, { timeout: 4000 }).catch(() => {});
       const asked = await page.evaluate(() => ({ note: document.querySelector('#mini .mini-say-note')?.textContent || '', live: document.querySelector('#mini .mini-say-note')?.getAttribute('aria-live') }));
       check('G4.voice.asked', 'a tap on 音 says why, in a line he can read (and a screen reader hears): no recording, nothing played',
-        /recording|収録音声/u.test(asked.note) && asked.live === 'polite', asked);
+        /record(?:ing|ed)|収録音声/u.test(asked.note) && asked.live === 'polite', asked);
       await page.locator('#mini .mini-word').tap(); await pageSettled(page);
       await page.locator('#sheet-back').tap(); await bare(page);
       await delay(400);
@@ -4338,9 +4359,11 @@ try {
         // the band between the fixed bar and the fixed foot (only what stays put on the glass counts)
         const fixedEdge = (sel, edge) => { const n = document.querySelector(sel); if (!n || !['fixed', 'sticky'].includes(getComputedStyle(n).position)) return null; const b = n.getBoundingClientRect(); return b.height ? b[edge] : null; };
         const vv = window.visualViewport, glassBottom = vv ? vv.offsetTop + vv.height : innerHeight;
-        const chrome = fixedEdge('#app > .chrome', 'bottom') ?? 0;
+        // G6 · the room's scale rail sticks under the bar: the band starts under whichever stays put lowest
+        const chrome = Math.max(fixedEdge('#app > .chrome', 'bottom') ?? 0, fixedEdge('#app > .scale-thread', 'bottom') ?? 0);
         const foot = Math.min(glassBottom, fixedEdge('#primary-tabs', 'top') ?? glassBottom, fixedEdge('.listen-row', 'top') ?? glassBottom);
-        const words = [...document.querySelectorAll('#reader .tok[data-index]')].filter((n) => /[一-鿿]/u.test(n.textContent) && !n.classList.contains('particle')
+        // R3 · a name (.named: the text uses it as a name, no dictionary meaning) cannot be kept, so it is never the held word
+        const words = [...document.querySelectorAll('#reader .tok[data-index]')].filter((n) => /[一-鿿]/u.test(n.textContent) && !n.classList.contains('particle') && !n.classList.contains('named')
           && n.getBoundingClientRect().left < innerWidth * 0.45);
         // a word far enough down the story that the reading can scroll it to that place (the story's first lines cannot
         // be brought down to the foot)
@@ -4568,7 +4591,11 @@ try {
       check('G5.layers.fold-word', 'with the layers open, a tap on a word folds them and still climbs that word’s ladder', folded.layers === 0 && folded.block === 0 &&
         (folded.rung === 'reading' || folded.stage) && folded.pressed === 'false', folded);
       const bareAgain = await geometry();
-      check('G5.layers.bare-again', 'folded, the reading is bare and every line where it was', JSON.stringify(bareAgain) === JSON.stringify(plain), { plain: plain.length, bareAgain: bareAgain.length });
+      // F · the tap that folded the layers raised 大賞's reading (G3's first rung), a native rt: in WebKit its line may settle by
+      // under a pixel, which F's own ruler calls no movement (a reading "moves no line", < 1 px). Every line and word is where
+      // it was within that, read whole-pixel
+      const within = (a, b) => (Array.isArray(a) ? Array.isArray(b) && a.length === b.length && a.every((x, i) => within(x, b[i])) : Math.abs(a - b) <= 1);
+      check('G5.layers.bare-again', 'folded, the reading is bare and every line where it was (within F\'s 1 px)', within(bareAgain, plain), { plain, bareAgain });
       await page.keyboard.press('Escape'); await delay(200);
       await page.locator('#layers-mark').tap(); await delay(250);
       await page.keyboard.press('Escape'); await delay(250);

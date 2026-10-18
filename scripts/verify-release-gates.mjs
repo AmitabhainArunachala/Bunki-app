@@ -606,14 +606,15 @@ export function batteryGates(out, env = process.env) {
     { ...node('continuity', tool('verify-continuity')), env: { KAIRO_BROWSER: 'all' } },
     // R3 (2026-10-18): the sense a word's text uses, for every one of the reviewed taps, the flash while a sense is still to
     // come, and the class sweeps. One gate per engine: each runs 15–25 minutes, past the battery's default, so each
-    // carries its own floor
-    { ...node('sense-truth', tool('verify-sense-truth')), env: { KAIRO_BROWSER: 'chromium' }, timeoutMs: 50 * 60 * 1000 },
-    { ...node('sense-truth-webkit', tool('verify-sense-truth')), env: { KAIRO_BROWSER: 'webkit' }, timeoutMs: 50 * 60 * 1000 },
+    // carries its own floor, twice its longest healthy run (battery.test: a measured run stays under half its timeout)
+    { ...node('sense-truth', tool('verify-sense-truth')), env: { KAIRO_BROWSER: 'chromium' }, timeoutMs: 60 * 60 * 1000 },
+    { ...node('sense-truth-webkit', tool('verify-sense-truth')), env: { KAIRO_BROWSER: 'webkit' }, timeoutMs: 60 * 60 * 1000 },
     // G1–G6 (one-hand): the word's grammar — the page and its cut (G1), depth and the help ledger (G2), the tap ladder
     // (G3), ink (G4), hold = seal (G5) and the scale thread (G6) — with every slice's negative controls. One gate per
-    // engine: each runs about 20 minutes with controls, so each carries its own floor
-    { ...node('word-grammar', tool('verify-word-grammar'), ['--controls']), env: { KAIRO_BROWSER: 'chromium' }, timeoutMs: 50 * 60 * 1000 },
-    { ...node('word-grammar-webkit', tool('verify-word-grammar'), ['--controls']), env: { KAIRO_BROWSER: 'webkit' }, timeoutMs: 50 * 60 * 1000 },
+    // engine: each runs 22–25 minutes with controls (site-5: 1,309 s Chromium, 1,521 s WebKit), so each carries its own
+    // floor, twice its longest healthy run
+    { ...node('word-grammar', tool('verify-word-grammar'), ['--controls']), env: { KAIRO_BROWSER: 'chromium' }, timeoutMs: 60 * 60 * 1000 },
+    { ...node('word-grammar-webkit', tool('verify-word-grammar'), ['--controls']), env: { KAIRO_BROWSER: 'webkit' }, timeoutMs: 60 * 60 * 1000 },
     // the living-thread guided session (operator-approved 2026-09-23): journey, real deck, moments
     { ...node('guided-session', tool('verify-guided-session')), env: { KAIRO_BROWSER: 'all' } },
     // …its engine rules and set-versus-bank checks, and its offline and single-file claims
