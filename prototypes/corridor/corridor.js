@@ -40767,7 +40767,12 @@ function mountMaintenanceReports() {
   maintenanceReports = window.BunkiReports.mount({
     rail: true,
     locale: S.lang === 'ja' ? 'ja' : 'en',
-    serviceUrl: window.__BUNKI_MAINTENANCE_URL__ || REPORT_RELAY_URL || (location.protocol === 'http:' || location.protocol === 'https:' ? location.origin : ''),
+    // Hfix-1B (H0-4): the sheet asks a report service only when it has one: the maintenance service the page declares, or
+    // the relay this device was set up with (Settings › Bug reports). It no longer guesses its own address: a host with no
+    // service (GitHub Pages, any static host) answered that guess's /api/config with a 404 on every opening of the sheet,
+    // an error in the console, and the sheet held its Send until the 404 came back. With none, a report goes by the
+    // prefilled GitHub page at once, as it did after the 404
+    serviceUrl: window.__BUNKI_MAINTENANCE_URL__ || REPORT_RELAY_URL || '',
     appVersion: APP_RELEASE.version,
     // Without a report service (a device not yet set up for the relay), a report is
     // filed as a prefilled GitHub issue that the learner submits; the fixer agent

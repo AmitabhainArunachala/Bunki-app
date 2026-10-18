@@ -238,8 +238,8 @@ function watchErrors(page, sink) {
   page.on('console', (message) => {
     if (message.type() !== 'error') return;
     const text = message.text();
-    // the report client asks its service for /api/config; this static host has none
-    if (/Failed to load resource/u.test(text) && /404/u.test(text)) return;
+    // Hfix-1B (H0-4): no exception for a 404 any more. It was the report client's guess at a service on this host
+    // (/api/config), which the sheet no longer makes; any 404 now is a fault
     sink.push(`console: ${text}`);
   });
 }

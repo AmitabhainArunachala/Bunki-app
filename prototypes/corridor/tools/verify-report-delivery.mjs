@@ -1,9 +1,10 @@
 /** Problem reports reach GitHub, through the report relay or, on a device not set
  * up for it, through a prefilled GitHub issue.
  *
- * Runs the built site as GitHub Pages serves it: with no service of its own, the
- * client's /api/config probe gets the host's 404. github.com is stubbed so no real
- * issue is ever opened, and the relay runs locally against a mock GitHub API.
+ * Runs the built site as GitHub Pages serves it, with no service of its own. Since Hfix-1B
+ * (H0-4) a device not set up asks no service at all: no /api/config probe of its own host,
+ * whose 404 was an error in the console on every opening of the sheet. github.com is stubbed
+ * so no real issue is ever opened, and the relay runs locally against a mock GitHub API.
  * Checks, per engine, for the prefilled-issue fallback:
  *   1. the sheet offers its Send (data-delivery github; Q: "Send to GitHub" became learner words, GitHub under
  *      Details) and opens one prefilled new-issue page
@@ -13,7 +14,7 @@
  *   4. when the browser blocks the window, the report is saved with a working
  *      "Send to GitHub" link (the path for reports saved by earlier versions);
  *   5. "Copy report text" copies the same issue text (Chromium only);
- *   6. no console errors.
+ *   6. no console errors, and no request to the host's /api/ (Hfix-1B, H0-4).
  * and for the relay (services/report-relay):
  *   7. the setup link, pasted in Settings (as in a home-screen app) or opened in
  *      the browser, sets up the device and leaves the address; an opened link
@@ -96,8 +97,8 @@ async function openSheet(page, beforeProbe) {
   await page.locator('#bunki-report-bug').click();
   await page.locator('#br-actual').waitFor();
   if (beforeProbe) await beforeProbe();
-  // The sheet settles once the service probe has answered with the host's 404. Q · its button says Send in the learner's
-  // words; the way it sends is its data-delivery (github: the prefilled issue page)
+  // With no service set up the sheet asks none and offers the prefilled issue page (Hfix-1B, H0-4). Q · its button says Send
+  // in the learner's words; the way it sends is its data-delivery (github: the prefilled issue page)
   await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.dataset.delivery === 'github', null, { timeout: 15_000 });
 }
 // What the sheet shows, for a failure message.
@@ -124,11 +125,15 @@ try {
     console.log(`\n— ${engine}`);
     const browser = await browserType.launch({ ...(engine === 'chromium' && process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}) });
     try {
-      const fresh = async ({ blockWindows = false, probeDelayMs = 0 } = {}) => {
+      const fresh = async ({ blockWindows = false, relayDelayMs = 0 } = {}) => {
         const context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
-        if (probeDelayMs) await context.route(`${host.origin}/api/config`, async (route) => {
-          await new Promise((resolve) => setTimeout(resolve, probeDelayMs));
-          await route.fulfill({ status: 404, contentType: 'application/json', body: '{}' });
+        // every request to this host's /api/ (Hfix-1B, H0-4: a device not set up asks no service there)
+        const asked = [];
+        context.on('request', (request) => { const url = new URL(request.url()); if (url.origin === host.origin && url.pathname.startsWith('/api/')) asked.push(`${request.method()} ${url.pathname}`); });
+        // a relay set up on this device whose config answers late
+        if (relayDelayMs) await context.route(`${relay.origin}/k/${RELAY_KEY}/api/config`, async (route) => {
+          await new Promise((resolve) => setTimeout(resolve, relayDelayMs));
+          await route.continue();
         });
         await context.route('https://github.com/**', (route) => route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>stub</title><p>GitHub stub</p>' }));
         if (engine === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: host.origin });
@@ -136,11 +141,11 @@ try {
         const page = await context.newPage();
         const errors = [];
         page.on('pageerror', (error) => errors.push(error.message));
-        // The service probe's own 404 is the published host's real answer, not a fault.
+        // Hfix-1B (H0-4): no exception for the host's /api/config any more; the sheet no longer asks it
         page.on('console', (message) => {
-          if (message.type() === 'error' && !/(\/api\/config|favicon\.ico)$/.test(message.location()?.url || '')) errors.push(message.text());
+          if (message.type() === 'error' && !/favicon\.ico$/.test(message.location()?.url || '')) errors.push(message.text());
         });
-        return { context, page, errors };
+        return { context, page, errors, asked };
       };
 
       // 1–2 · one tap opens the prefilled issue and saves the same report
@@ -207,13 +212,15 @@ try {
 
       // 4 · a blocked window still saves, and the link sends it (also covers older saved reports)
       await scenario(`${engine} · blocked window`, async () => {
-        // The service probe answers late here: until it confirms there is no service,
-        // the sheet must not offer GitHub (a real service may still answer).
-        const { context, page, errors } = await fresh({ blockWindows: true, probeDelayMs: 2500 });
-        let pendingLabel = '';
-        await openSheet(page, async () => { pendingLabel = await page.locator('#br-form .br-primary').getAttribute('data-delivery'); });
-        check(`${engine} · GitHub is offered only after the probe confirms there is no service`,
-          !!pendingLabel && pendingLabel !== 'github', `while pending: ${pendingLabel}`);
+        // Hfix-1B (H0-4), rewritten on purpose: this row pinned the old probe (the host's /api/config, answered late, with
+        // GitHub held back until its 404). A device not set up now asks no service: its first frame offers the prefilled
+        // page, and the host's /api/ is never asked. The hold for a service that may still answer is kept where a service
+        // can exist, a relay set up on this device (the "relay answering late" scenario below).
+        const { context, page, errors, asked } = await fresh({ blockWindows: true });
+        let firstLabel = '';
+        await openSheet(page, async () => { firstLabel = await page.locator('#br-form .br-primary').getAttribute('data-delivery'); });
+        check(`${engine} · with no service set up, the sheet offers the prefilled GitHub page from its first frame`,
+          firstLabel === 'github', `first frame: ${firstLabel}`);
         await page.locator('#br-actual').fill('Saved while the window was blocked.');
         await page.locator('#br-form .br-primary').click();
         await page.waitForFunction(() => document.querySelector('#br-title')?.textContent === 'Your report');
@@ -233,6 +240,8 @@ try {
         await page.locator('.br-report-list').waitFor();
         const listed = await page.locator('.br-report-list .br-status').first().textContent();
         check(`${engine} · My reports lists it as opened on GitHub`, listed === 'Opened on GitHub', listed);
+        check(`${engine} · with no service set up, the sheet asked this host's /api/ nothing (open, save, send, list)`,
+          asked.length === 0, asked.join(' | '));
         check(`${engine} · no console errors (blocked window)`, errors.length === 0, errors.join(' | '));
         await context.close();
       });
@@ -361,6 +370,22 @@ try {
           received && !!filed && filed.body.includes('Screenshot from a browser without Blob storage.') && !!bytes && bytes.equals(PIXEL_PNG),
           received ? shot || 'no screenshot link' : await sheetState(page));
         check(`${engine} · no console errors (no Blob storage)`, errors.length === 0, errors.join(' | '));
+        await context.close();
+      });
+
+      // 4b · Hfix-1B (H0-4): a relay set up on this device whose config answers late. Until it answers, the sheet must not
+      //      offer GitHub (the service may still answer), and once it does, the sheet sends reports itself
+      await scenario(`${engine} · relay answering late`, async () => {
+        const { context, page, errors, asked } = await fresh({ relayDelayMs: 2500 });
+        await acceptSetupLink(page);
+        await page.locator('#bunki-report-bug').click();
+        await page.locator('#br-actual').waitFor();
+        const pending = await page.locator('#br-form .br-primary').getAttribute('data-delivery');
+        check(`${engine} · while a set-up relay has not answered, the sheet does not offer GitHub`, !!pending && pending !== 'github', `while pending: ${pending}`);
+        const ready = await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.textContent === 'Send report', null, { timeout: 15_000 }).then(() => true, () => false);
+        check(`${engine} · once the relay answers, the sheet sends reports itself`, ready, await sheetState(page));
+        check(`${engine} · the relay is asked; this host's /api/ is not`, asked.length === 0, asked.join(' | '));
+        check(`${engine} · no console errors (relay answering late)`, errors.length === 0, errors.join(' | '));
         await context.close();
       });
 
