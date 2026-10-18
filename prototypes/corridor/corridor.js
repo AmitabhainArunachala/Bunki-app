@@ -4469,7 +4469,6 @@ async function boot() {
   if (await acquireRecordOwnership()) await openAppRecord();
   await resumeSavedPractice();
   await resumeAssessmentV2();
-  await installDriftRecord();
   setKairoTheme(themeId());
   // The layout under test can be chosen by link. The choice stays on this device and the word
   // leaves the address, so reloading the same page cannot undo a choice made since in Settings.
@@ -4678,6 +4677,11 @@ async function boot() {
     console.warn('FSRS unavailable', err);
   }
 
+  // A kept word's projection includes its core dictionary identity. Publish
+  // only after that catalog is hydrated, so loading it cannot change the
+  // projection at the same durable revision. Private decks return above and
+  // keep Drift hidden; record ownership and migration still happen first.
+  await installDriftRecord();
   S.ready = true;
   const retryRouteRendered = restoreRetryRoute();
   document.body.dataset.ready = '1';
@@ -4996,6 +5000,9 @@ function scaleName(node = S.stack.at(-1)) {
   if (node) return ({ radical: 'part', kanji: 'kanji', word: 'word', sent: 'sentence' })[node.t] || null;
   return ({ reader: 'article', shelf: 'shelf', archive: 'shelf', drift: 'sky' })[S.view] || null;
 }
+function scaleShelfView(article = passage()) {
+  return String(article?.file || '').startsWith('archive/') ? 'archive' : 'shelf';
+}
 function scaleLabel(scale) {
   const names = { part: ['部品', 'part'], kanji: ['漢字', 'kanji'], word: ['語', 'word'],
     sentence: ['文', 'sentence'], article: ['記事', 'article'], shelf: ['本棚', 'shelf'], sky: ['宙', 'sky'] };
@@ -5089,6 +5096,39 @@ function retireScaleReturn() {
 for (const type of ['pointerdown', 'touchstart', 'wheel', 'keydown']) {
   addEventListener(type, event => { if (event.isTrusted) retireScaleReturn(); }, { capture: true, passive: true });
 }
+let scaleReadingInput = false, scaleReadTimer = null;
+function refreshScaleOrigin() {
+  const index = scaleReaderIndex();
+  if (index != null) captureScaleVisit(index);
+}
+function settleScaleReading() {
+  clearTimeout(scaleReadTimer);
+  scaleReadTimer = null;
+  const visit = S.scaleVisit;
+  if (visit?.readOn && !visit.returnRequest && S.view === 'reader' && !S.stack.length && visit.passageId === S.passageId)
+    refreshScaleOrigin();
+}
+for (const type of ['pointerdown', 'keydown']) {
+  addEventListener(type, () => {
+    if (scaleReadTimer) settleScaleReading();
+    scaleReadingInput = false;
+  }, { capture: true, passive: true });
+}
+for (const type of ['wheel', 'touchmove']) addEventListener(type, event => { scaleReadingInput = event.isTrusted; }, { capture: true, passive: true });
+addEventListener('keydown', event => {
+  const control = event.target?.closest?.('input, textarea, select, [contenteditable]:not([contenteditable="false"])') ||
+    (event.key === ' ' && event.target?.closest?.('button, a[href], summary, [role="button"], [role="menuitem"]'));
+  scaleReadingInput = event.isTrusted && !event.defaultPrevented && !event.altKey && !event.ctrlKey && !event.metaKey &&
+    ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(event.key) && !control;
+}, { passive: true });
+addEventListener('scroll', () => {
+  const visit = S.scaleVisit;
+  if (!scaleReadingInput || !visit || visit.returnRequest || S.view !== 'reader' || S.stack.length ||
+      visit.passageId !== S.passageId) return;
+  visit.readOn = true;
+  clearTimeout(scaleReadTimer);
+  scaleReadTimer = setTimeout(settleScaleReading, 900);
+}, { passive: true });
 function requestScaleReturn(visit) {
   if (S.scaleVisit !== visit || !scaleSource(visit)) return false;
   visit.returnRequest = {};
@@ -5276,10 +5316,7 @@ function scaleOut() {
     focusScaleControl('#app .scale-thread [data-scale-out], #app .scale-thread [data-scale-in]');
     return true;
   }
-  if (scale === 'article' && !scaleSource(visit)) {
-    const index = scaleReaderIndex();
-    if (index != null) captureScaleVisit(index);
-  }
+  if (scale === 'article' && (!scaleSource(visit) || visit.readOn)) refreshScaleOrigin();
   retireScaleTransients();
   if (scale === 'part' || scale === 'kanji') {
     replaceScalePages(S.stack.slice(0, scaleParentIndex() + 1));
@@ -5299,9 +5336,9 @@ function scaleOut() {
     void saveReaderPosition(S.passageId, Math.round(window.scrollY));
     retireScaleDestination();
     S.dialogInvoker = null;
-    S.view = 'shelf'; S.tabRoot = null;
+    S.view = scaleShelfView(); S.tabRoot = null;
     withoutRoomTransition(render);
-    window.scrollTo(0, S.shelfScroll);
+    window.scrollTo(0, S.view === 'archive' ? S.archiveScroll : S.shelfScroll);
     focusScaleControl('.scale-article-return, #app .scale-thread [data-scale-in]');
   } else if (scale === 'shelf') {
     keepScroll();
@@ -5330,9 +5367,9 @@ function scaleIn(target = {}) {
       sentence: null, word: null, skyPlace: place || null, returnRequest: null, returnJob: null };
     retireScaleTransients();
     S.dialogInvoker = null;
-    S.view = 'shelf'; S.tabRoot = null;
+    S.view = scaleShelfView(D.passages.find(article => article.id === id)); S.tabRoot = null;
     withoutRoomTransition(render);
-    window.scrollTo(0, S.shelfScroll);
+    window.scrollTo(0, S.view === 'archive' ? S.archiveScroll : S.shelfScroll);
     focusScaleControl('.scale-article-return, #app .scale-thread [data-scale-in]');
     return true;
   }
@@ -5346,7 +5383,7 @@ function scaleIn(target = {}) {
   if (scale === 'article') {
     // Reaching the thread with Tab may scroll past the selected line. The
     // retained occurrence owns this route; focus traversal cannot replace it.
-    const retained = visit?.passageId === S.passageId && scaleSource(visit) ? visit : null;
+    const retained = visit?.passageId === S.passageId && scaleSource(visit) && !visit.readOn ? visit : null;
     const index = retained ? retained.index : scaleReaderIndex();
     if (index == null) return false;
     const origin = retained || captureScaleVisit(index);
@@ -5380,12 +5417,13 @@ function scaleIn(target = {}) {
 function scaleThreadPath() {
   const path = [{ scale: 'sky', label: '宙', out: true }];
   if (['reader', 'shelf', 'archive'].includes(S.view)) {
-    path.push({ scale: 'shelf', label: scaleLabel('shelf'), view: S.view === 'archive' ? 'archive' : 'shelf' });
+    path.push({ scale: 'shelf', label: scaleLabel('shelf'), view: S.view === 'reader' ? scaleShelfView() : S.view });
     if (S.view === 'reader') {
       path.push({ scale: 'article', label: passage()?.title || scaleLabel('article'), view: 'reader' });
       const visit = S.scaleVisit;
       if (S.stack.length && visit?.recordEpoch === recordEpoch && visit.passageId === S.passageId &&
-          scaleSource(visit) && !S.stack.some(node => node.t === 'sent' && scaleNodeBelongs(node))) {
+          scaleNodeBelongs(S.stack[0], visit) &&
+          !S.stack.some(node => node.t === 'sent' && scaleNodeBelongs(node, visit))) {
         path.push({ scale: 'sentence', label: scaleLabel('sentence'), sourceSentence: true });
       }
     }
@@ -5409,16 +5447,17 @@ function returnToScaleBead(bead) {
     return true;
   }
   if (bead.sourceSentence) {
-    if (S.view !== 'reader' || !scaleSource()) return false;
+    if (S.view !== 'reader' || !scaleNodeBelongs(S.stack[0])) return false;
     retireScaleTransients();
     replaceScalePages([S.scaleVisit.sentence]);
     return true;
   }
   if (bead.scale === 'article') {
     if (S.view !== 'reader') return false;
+    const sourceVisit = scaleNodeBelongs(S.stack[0]) ? S.scaleVisit : null;
     retireScaleTransients();
     replaceScalePages([]);
-    if (scaleSource() && requestScaleReturn(S.scaleVisit)) {
+    if (sourceVisit && requestScaleReturn(sourceVisit)) {
       const reader = document.getElementById('reader');
       if (reader) settleScaleReturn(reader);
     } else restoreDialogInvoker();
@@ -5533,7 +5572,7 @@ function paintRoomScaleThread(root) {
 function renderScaleArticleReturn(main) {
   const visit = S.scaleVisit, article = scalePassage(visit);
   if (!article) return;
-  const source = scaleSource(visit);
+  const source = scaleSource(visit) && !visit.readOn;
   const door = el('button', 'scale-article-return', article.title);
   door.type = 'button'; door.dataset.articleId = visit.passageId;
   door.setAttribute('aria-label', source ? tx(`同じ行へ戻る · ${article.title}`, `Return to the same line · ${article.title}`)
@@ -6088,7 +6127,7 @@ function openPassage(id, anchor = null) {
     retireScaleReturn();
     S.scaleVisit = null;
   }
-  const scaleReturn = anchor?.scaleReturn || (S.scaleVisit && S.scaleVisit.passageId === id &&
+  const scaleReturn = anchor?.scaleReturn || (S.scaleVisit && S.scaleVisit.passageId === id && !S.scaleVisit.readOn &&
     ['shelf', 'archive', 'drift'].includes(S.view) && scaleSource(S.scaleVisit) ? S.scaleVisit : null);
   if (scaleReturn && (S.scaleVisit !== scaleReturn || !scaleSource(scaleReturn) ||
     (anchor?.scaleReturn && anchor.scaleEpoch !== pageEpoch))) return false;
@@ -9029,7 +9068,14 @@ function foldWordLadder() {
   return true;
 }
 document.addEventListener('keydown', event => {
-  if (event.key !== 'Escape' || !ladderVisit || readerWordMenu || document.getElementById('vocabulary-list-popover')) return;
+  if (event.key !== 'Escape') return;
+  if (readerWordMenuPending) {
+    event.preventDefault();
+    event.stopPropagation();
+    closeReaderWordMenu({ restoreFocus: true });
+    return;
+  }
+  if (!ladderVisit || readerWordMenu || document.getElementById('vocabulary-list-popover')) return;
   const anchor = ladderVisit.anchor;
   if (!foldWordLadder()) return;
   event.preventDefault();
@@ -9149,7 +9195,7 @@ document.addEventListener(
     miniDiveOnAnchor = null;
     menuFoldPending?.();
     const target = ev.target;
-    if (readerWordMenu && !readerWordMenu.menu.contains(target)) closeReaderWordMenu();
+    if (readerWordMenuPending || (readerWordMenu && !readerWordMenu.menu.contains(target))) closeReaderWordMenu();
     const pop = document.getElementById('vocabulary-list-popover');
     if (pop && !pop.contains(target) && !target.closest?.('#mini-take, #personal-add-list, #kp-take, .save-one')) {
       const card = pop.classList.contains('is-inline') ? pop.closest('#mini') : null;
@@ -11040,13 +11086,16 @@ async function sendSentenceToTutor(node, discuss, currentSurface, say) {
  * pointer: Save · Save the sentence · Full entry · Ask the tutor about this sentence · Copy. ↑/↓ move,
  * Enter picks, Escape closes and gives focus back to the word. Only words lose the browser's own menu. */
 let readerWordMenu = null;
+let readerWordMenuPending = null;
 function closeReaderWordMenu({ restoreFocus = false } = {}) {
   readerWordMenuSerial += 1; // Retire pending preparation even before a menu mounts.
-  const open = readerWordMenu;
+  const open = readerWordMenu, pending = readerWordMenuPending;
   readerWordMenu = null;
-  if (!open) return;
-  open.menu.remove();
-  if (restoreFocus && open.anchor.isConnected) focusProseWord(open.anchor, { preventScroll: true });
+  readerWordMenuPending = null;
+  open?.menu.remove();
+  const anchor = open?.anchor || pending?.anchor;
+  if (restoreFocus && anchor?.isConnected && !anchor.closest('[inert], [aria-hidden="true"]'))
+    focusProseWord(anchor, { preventScroll: true });
 }
 
 async function openReaderWordMenu(anchor, door, { x = null, y = null, keyboard = false } = {}) {
@@ -11054,9 +11103,16 @@ async function openReaderWordMenu(anchor, door, { x = null, y = null, keyboard =
   removeMini();
   closeReaderWordMenu();
   const serial = ++readerWordMenuSerial;
-  if (await door.prepare?.() === false) return;
+  const pending = { serial, anchor };
+  readerWordMenuPending = pending;
+  let prepared;
+  try { prepared = await door.prepare?.(); }
+  finally {
+    if (readerWordMenuPending === pending) readerWordMenuPending = null;
+  }
+  if (prepared === false || serial !== readerWordMenuSerial) return;
   if (!anchor.isConnected) anchor = door.resolveAnchor?.() || anchor;
-  if (serial !== readerWordMenuSerial || !anchor.isConnected) return;
+  if (!anchor.isConnected) return;
   const menu = el('div', 'reader-word-menu');
   menu.id = 'reader-word-menu';
   menu.dataset.driftChrome = 'true';

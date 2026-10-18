@@ -21,7 +21,7 @@ function app() {
     window: { scrollY: 180, scrollTo(_x, y) { this.scrollY = y; } },
     document: { activeElement: null, getElementById: () => null }, referenceLibrary: null,
     learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
-    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, readerWordMenu: null, readerWordMenuSerial: 0, personalHost: null,
+    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, readerWordMenu: null, readerWordMenuSerial: 0, readerWordMenuPending: null, personalHost: null,
     roomTransitionUpdating: false, activeRoomTransition: null, pageEpoch: 0, recordEpoch: 4,
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
     restoreDialogInvoker() {}, stopReadAloud() {}, clearTimeout() {},
@@ -141,6 +141,59 @@ test('a queued scale return yields to a newer page action even without a room re
       assert.equal(c.window.scrollY, origin.scroll);
     }
   }
+});
+
+test('an origin read past yields to the newer bookmark; an unread origin keeps its exact line', () => {
+  for (const readOn of [false, true]) {
+    const { context: c } = app();
+    const pending = [];
+    c.S.view = 'shelf'; c.S.readerPos = { 'source-a': 900 };
+    c.S.scaleVisit = { recordEpoch: 4, passageId: 'source-a', index: 3, scroll: 180, ...(readOn ? { readOn } : {}) };
+    c.roomTransition = change => pending.push(change);
+    c.openPassage('source-a');
+    assert.equal(pending.length, 1);
+    c.roomTransitionUpdating = true;
+    pending.shift()();
+    c.roomTransitionUpdating = false;
+    assert.equal(c.S.view, 'reader');
+    assert.equal(c.S.passageId, 'source-a');
+    assert.equal(c.window.scrollY, readOn ? 900 : 180, readOn ? 'The durable bookmark wins' : 'The retained origin owns the return');
+  }
+});
+
+test('a pending word menu is owned by its newest request until it is closed', async () => {
+  const { context: c } = app();
+  const mounted = new Error('menu mounted');
+  const focused = [];
+  Object.assign(c, { removeMini() {}, el() { throw mounted; }, focusProseWord: anchor => focused.push(anchor) });
+  vm.runInContext(actualFunction('openReaderWordMenu'), c);
+  const anchor = name => ({ name, isConnected: true, closest: () => null });
+  const held = () => {
+    const gate = {};
+    gate.promise = new Promise((resolve, reject) => { gate.settle = resolve; gate.fail = reject; });
+    return gate;
+  };
+  const a = anchor('a'), b = anchor('b'), first = held(), second = held();
+  const openA = c.openReaderWordMenu(a, { prepare: () => first.promise });
+  assert.equal(c.readerWordMenuPending.anchor, a);
+  const openB = c.openReaderWordMenu(b, { prepare: () => second.promise });
+  assert.equal(c.readerWordMenuPending.anchor, b, 'The newer request owns cancellation');
+  first.settle();
+  await openA;
+  assert.equal(c.readerWordMenuPending.anchor, b, 'An older completion cannot clear the newer owner');
+  c.closeReaderWordMenu({ restoreFocus: true });
+  assert.equal(c.readerWordMenuPending, null);
+  assert.deepEqual(focused, [b], 'Closing returns focus to the pending word');
+  second.settle();
+  await openB;
+  const failed = held(), openFailed = c.openReaderWordMenu(a, { prepare: () => failed.promise });
+  failed.fail(new Error('prepare failed'));
+  await assert.rejects(openFailed, /prepare failed/);
+  assert.equal(c.readerWordMenuPending, null, 'A rejected preparation leaves no stale owner');
+  const live = held(), openLive = c.openReaderWordMenu(b, { prepare: () => live.promise });
+  live.settle();
+  await assert.rejects(openLive, error => error === mounted, 'An uncancelled preparation still mounts its menu');
+  assert.equal(c.readerWordMenuPending, null);
 });
 
 test('abandoning a pending collection retires its destination before another library visit', () => {

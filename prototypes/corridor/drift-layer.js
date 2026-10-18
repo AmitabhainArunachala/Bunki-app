@@ -13,11 +13,11 @@ let DRIFT_ON = false;
 let rafOn = false;
 // G6: the host owns the scale chain. Drift retains only its own live scene.
 let scaleBridge=null,scaleBusy=false,scaleBlocked=false,scaleHandConsumed=false,scaleConsumedAt=0,scaleDrain=false;
-let scaleArticle=null,scaleLayer=null,scaleProjectionKey='',scaleCameraKey='',scaleWorldKey='';
+let scaleArticle=null,scaleLayer=null,scaleProjectionKey='',scaleWorldKey='';
 let scaleSceneGeneration=0;
 const scaleStars=new Map(),scaleNodeIds=new WeakMap();
 let scaleNodeSerial=0;
-const scalePhysicalPointers=new Set();
+const scalePhysicalPointers=new Map();
 let recordBridge=null,recordGeneration=0,recordView=null,recordReady=false,recordRead=null,recordCodec=null;
 const recordPending=new Set();
 let recordCueIntent=null,recordCueRun=null;
@@ -2302,7 +2302,7 @@ addEventListener("pointerdown",e=>{
     // Rejected sky fingers stay physical members until every one lifts, even
     // if a pending record acknowledges or a stage closes while they are down.
     if(scaleBridge){
-      scalePhysicalPointers.add(e.pointerId);
+      scalePhysicalPointers.set(e.pointerId,e.pointerType);
       scaleDrain=true;
       if(touches.size)touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
       blockScaleHand();
@@ -2310,7 +2310,7 @@ addEventListener("pointerdown",e=>{
     return;
   }
   if(scaleBridge){
-    scalePhysicalPointers.add(e.pointerId);
+    scalePhysicalPointers.set(e.pointerId,e.pointerType);
     if(scaleDrain){scaleBlocked=true;return;}
   }
   if(!touches.size){scaleConsumedAt=0;scaleHandConsumed=false;}
@@ -3535,10 +3535,32 @@ function clearScalePointers(){
   pn=null;touches.clear();pinch=null;gestureActive=false;gestureId=null;moved=false;scaleBlocked=scaleDrain;scaleHandConsumed=scaleDrain;
   cam.vx=0;cam.vy=0;
 }
+function releaseScaleDrain(){
+  if(scalePhysicalPointers.size||!scaleDrain)return;
+  scaleDrain=false;scaleBlocked=false;scaleHandConsumed=false;scaleConsumedAt=performance.now();
+}
 function drainScalePointer(event){
   // Passive observation only: foreign text/chrome pointers are never acquired.
-  if(!scalePhysicalPointers.delete(event.pointerId)||scalePhysicalPointers.size||!scaleDrain)return;
-  scaleDrain=false;scaleBlocked=false;scaleHandConsumed=false;scaleConsumedAt=performance.now();
+  if(scalePhysicalPointers.delete(event.pointerId))releaseScaleDrain();
+}
+function retireScalePointers(ids){
+  if(!ids.length)return;
+  const live=ids.some(id=>touches.has(id));
+  for(const id of ids)scalePhysicalPointers.delete(id);
+  if(live)clearScalePointers();
+  releaseScaleDrain();
+}
+function scaleTouchesLifted(event){
+  if(!event.isTrusted||event.touches.length)return;
+  retireScalePointers([...scalePhysicalPointers].filter(([,type])=>type==='touch').map(([id])=>id));
+}
+function scaleMouseReleased(event){
+  if(event.isTrusted&&event.pointerType==='mouse'&&scalePhysicalPointers.get(event.pointerId)==='mouse'&&
+    (event.type==='pointerdown'||event.buttons===0))retireScalePointers([event.pointerId]);
+}
+function interruptScaleHand(event){
+  if(!scaleBridge)return;
+  if(event.type==='blur'?event.target===window:document.visibilityState==='hidden')clearScalePointers();
 }
 function requestScaleStep(direction,target){
   if(!scaleBridge||scaleBusy||!scaleSceneReady()||scaleBridge.canStep(direction,target)!==true)return false;
@@ -3670,11 +3692,10 @@ function paintScaleStars(){
       mount('kept:'+row.key,row.label,{keptKey:row.key},x,y,()=>requestScaleStep('word',{wordKey:row.key}));
     }
     for(const [key,star]of scaleStars)if(!next.has(key)){star.remove();scaleStars.delete(key);}
-    scaleCameraKey='';
   }
   drawScaleStars();
 }
-let scaleLayoutAt=-Infinity,scaleLayoutDirty=true,scaleMetricsKey='';
+let scaleLayoutAt=-Infinity,scaleLayoutDirty=true,scaleMetricsKey='',scaleRail=null;
 const SCALE_LAYOUT_MS=250,SCALE_CELL=64;
 // Bundled font shards can finish after the sky first becomes visible.
 document.fonts?.addEventListener?.('loadingdone',()=>{scaleMetricsKey='';});
@@ -3709,8 +3730,33 @@ function scaleOverlap(grid,box){
   }
   return area;
 }
+function scaleRailHit(box,rail=scaleRail){
+  return !!rail&&box.left<rail.right&&box.right>rail.left&&box.top<rail.bottom&&box.bottom>rail.top;
+}
 function scaleFitPoint(point,w,h){
-  return {x:Math.max(16+w/2,Math.min(vw()-16-w/2,point.x)),y:Math.max(116+h/2,Math.min(vh()-100-h/2,point.y))};
+  const top=116+h/2,bottom=vh()-100-h/2;
+  let x=Math.max(16+w/2,Math.min(vw()-16-w/2,point.x)),y=Math.max(top,Math.min(bottom,point.y));
+  const rail=scaleRail;
+  if(scaleRailHit(scaleBox(x,y,w,h),rail)){
+    if(rail.right+w/2<=vw()-16-w/2)x=rail.right+w/2;
+    else{
+      const above=rail.top-h/2,below=rail.bottom+h/2;
+      const room=[above,below].filter(edge=>edge>=top&&edge<=bottom);
+      if(room.length)y=room.reduce((best,edge)=>Math.abs(edge-y)<Math.abs(best-y)?edge:best);
+    }
+  }
+  return {x,y};
+}
+function readScaleRail(){
+  if(!lvlEl.isConnected||!lvlEl.getClientRects().length)return null;
+  const style=getComputedStyle(lvlEl);
+  if(style.display==='none'||style.visibility==='hidden'||style.pointerEvents==='none'||Number(style.opacity)<=0)return null;
+  const r=lvlEl.getBoundingClientRect();
+  if(r.width<1||r.height<1||r.right<=0||r.left>=vw()||r.bottom<=0||r.top>=vh())return null;
+  // A focused or held star keeps its screen position across viewport changes.
+  // Reserve the visible rail's hot column for the full height so the moving
+  // vertical rail cannot cross that fixed target when browser chrome resizes.
+  return {left:r.left-6,top:-6,right:Math.max(r.right,r.left+56)+6,bottom:vh()+6};
 }
 function placeScaleStar(point,full,grid,previous){
   let least=null,attempts=0;
@@ -3723,7 +3769,9 @@ function placeScaleStar(point,full,grid,previous){
     candidates.push(point);
     for(const radius of [32,64,96,144,208,288,384,512])for(let i=0;i<12;i++)candidates.push({x:point.x+radius*Math.cos(i*Math.PI/6),y:point.y+radius*Math.sin(i*Math.PI/6)});
     for(const candidate of candidates){
-      const p=scaleFitPoint(candidate,w,h),box=scaleBox(p.x,p.y,w,h),area=scaleOverlap(grid,box);attempts++;
+      const p=scaleFitPoint(candidate,w,h),box=scaleBox(p.x,p.y,w,h);attempts++;
+      if(scaleRailHit(box))continue;
+      const area=scaleOverlap(grid,box);
       const choice={dx:p.x-point.x,dy:p.y-point.y,width:w,height:h,compact,crowded:area>0,box,attempts};
       if(!area)return choice;
       if(compact&&(!least||area<least.area))least={...choice,area};
@@ -3732,7 +3780,8 @@ function placeScaleStar(point,full,grid,previous){
   // Fully packed: retain a bounded real keyboard-operable button. Native ink
   // keeps pointer priority; this does not promise an empty pointer target.
   if(least)return {...least,attempts};
-  const p=scaleFitPoint(point,44,44);return {dx:p.x-point.x,dy:p.y-point.y,width:44,height:44,compact:true,crowded:true,box:scaleBox(p.x,p.y,44,44),attempts};
+  const p=scaleFitPoint(point,44,44),box=scaleBox(p.x,p.y,44,44);
+  return {dx:p.x-point.x,dy:p.y-point.y,width:44,height:44,compact:true,crowded:true,blocked:scaleRailHit(box),box,attempts};
 }
 function drawScaleStars(){
   if(scaleBridge&&scaleWorldKey!==WR.w+','+WR.h){paintScaleStars();return;}
@@ -3758,6 +3807,7 @@ function drawScaleStars(){
     // any placement write. No native-node layout reads occur between snapshots.
     for(const {star}of active)if(!star.scaleFullSize){star.hidden=false;star.classList.remove('is-compact');star.scaleRenderKey='';}
     const grid=new Map();
+    scaleRail=readScaleRail();
     for(const n of nodes){
       if(n.gone||n.removed||!n.el.isConnected||Number(n._lop||n.el.style.opacity||1)<=0)continue;
       const r=n.el.getBoundingClientRect();
@@ -3797,7 +3847,7 @@ function drawScaleStars(){
     if(star.scaleRenderKey===renderKey)continue;
     star.scaleRenderKey=renderKey;star.scaleRenderPosition=placed;star.hidden=false;
     star.classList.toggle('is-compact',plan.compact);
-    star.dataset.scalePlacement=plan.crowded?'crowded':plan.compact?'compact':'clear';
+    star.dataset.scalePlacement=plan.blocked||scaleRailHit(scaleBox(placed.x,placed.y,plan.width,plan.height))?'blocked':plan.crowded?'crowded':plan.compact?'compact':'clear';
     star.style.transform='translate('+placed.x+'px,'+placed.y+'px) translate(-50%,-50%)';
     star.style.setProperty('--scale-caption-left',(captionX-(placed.x-22))+'px');
     star.style.setProperty('--scale-caption-top',(captionY-(placed.y-22))+'px');
@@ -3810,6 +3860,12 @@ function drawScaleStars(){
 // No pointer capture, preventDefault or propagation changes are involved.
 addEventListener('pointerup',drainScalePointer,{capture:true,passive:true});
 addEventListener('pointercancel',drainScalePointer,{capture:true,passive:true});
+addEventListener('touchend',scaleTouchesLifted,{capture:true,passive:true});
+addEventListener('touchcancel',scaleTouchesLifted,{capture:true,passive:true});
+addEventListener('pointermove',scaleMouseReleased,{capture:true,passive:true});
+addEventListener('pointerdown',scaleMouseReleased,{capture:true,passive:true});
+addEventListener('blur',interruptScaleHand);
+document.addEventListener('visibilitychange',interruptScaleHand);
 __layer.addEventListener('click',event=>{
   if(event.detail>0&&scaleConsumedAt&&performance.now()-scaleConsumedAt<600){event.preventDefault();event.stopImmediatePropagation();scaleConsumedAt=0;}
 },{capture:true});
