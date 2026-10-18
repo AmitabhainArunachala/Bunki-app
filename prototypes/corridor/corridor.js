@@ -9415,13 +9415,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // putting into practice"); the slip names the sense it shows (data-sense-entry: entry number and sense)
   const senseMore = kind === 'word' && !look?.gloss && !teSecond && Array.isArray(g?.senseGlosses) && g.m?.[0] === g.senseGlosses[0]
     ? senseMoreLine(g.senseGlosses) : '';
-  if (senseMore) {
-    const more = el('span', 'mini-gloss-more', senseMore);
-    more.lang = 'en';
-    more.style.fontWeight = '400';
-    more.style.color = 'var(--mini-head-ink-2)';
-    said.append(more);
-  }
+  if (senseMore) said.append(senseMoreElement(senseMore));
   if (kind === 'word' && g?.sense?.seq) {
     const sense = { seq: String(g.sense.seq), k: Number(g.sense.k) };
     mini.dataset.senseEntry = `${sense.seq}:${sense.k}`;
@@ -10707,6 +10701,17 @@ function senseRecord(rec, sense) {
   return { ...rec, m: [...new Set([...sense.glosses, ...(rec.m || [])])], senseGlosses: sense.glosses, sense: { seq: sense.seq, k: sense.k } };
 }
 
+/** The quiet second line itself: one line, never more (a long gloss ends in "…"; the page lists it whole), so the slip
+ * grows by one line at most and Save ▾'s menu still unfolds inside it on a phone. */
+function senseMoreElement(text) {
+  const more = el('span', 'mini-gloss-more', text);
+  more.lang = 'en';
+  more.title = text;
+  Object.assign(more.style, { fontWeight: '400', color: 'var(--mini-head-ink-2)', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden',
+    textOverflow: 'ellipsis', maxWidth: '100%' });
+  return more;
+}
+
 /** The second line of a sense on the slip: its next glosses, at most two more, while the line stays short. */
 function senseMoreLine(glosses) {
   const more = [];
@@ -10764,11 +10769,7 @@ function sensePatch(slip, token, door, anchor = null) {
   const more = senseMoreLine(choice.glosses);
   let quiet = slip.querySelector('.mini-gloss-more');
   if (more && !quiet) {
-    quiet = el('span', 'mini-gloss-more', more);
-    quiet.lang = 'en';
-    quiet.style.fontWeight = '400';
-    quiet.style.color = 'var(--mini-head-ink-2)';
-    line.after(quiet);
+    line.after(senseMoreElement(more));
   } else if (quiet) {
     if (more) quiet.textContent = more;
     else quiet.remove();
