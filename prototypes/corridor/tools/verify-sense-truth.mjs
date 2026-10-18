@@ -110,6 +110,8 @@ const RULES = Object.freeze([
   // the つく row's について (115 of its taps: "to be attached", "to be lit") and the idioms of the ない row (Grok's 727:
   // もったいない, ちがいない/違いない, 間もなく), read whole; たくない (an auxiliary's く form) is "not"
   fx('について (日本について)', 'wikinews:45227', 325, 'つい', '1009780', 0, 'to be lit (of a lamp, burner, etc.)', { label: 'について' }),
+  // the とる row's にとって ("take, catch, or にとって"; six of its taps read "to have (e.g. lunch)")
+  fx('にとって', 'bunki-essay-n1-city', 50, 'とっ', '1009600', 0, 'to have (e.g. lunch)', { label: 'にとって' }),
   fx('もったいない', 'bunki-essay-n2-translation', 27, 'ない', '1605250', 0, 'nonexistent', { label: '勿体ない' }),
   fx('ちがいない (言ったにちがいない)', 'aozora:000628', 1498, 'ない', '1610740', 0, 'nonexistent', { label: '違いない' }),
   fx('間もなく', 'aozora:046605', 1524, 'なく', '1215290', 0, 'nonexistent', { label: '間もなく' }),
