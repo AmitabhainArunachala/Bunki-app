@@ -578,41 +578,121 @@ async function g6Walk(page,{modality,itinerary,emit,timing=false}){
   emit('no-record-work','scale travel creates no saved card/list/grade work',JSON.stringify(home.learning)===JSON.stringify(after),{before:home.learning,after});
   return home;
 }
+function g6SyntheticInputIntegrity(observed){
+  const pointer=observed?.events||[],touch=observed?.touch||{},events=touch.events||[];
+  const pointerSequence=pointer.map(e=>[e.type,e.id]);
+  const touchSequence=events.map(e=>[e.type,e.count,e.changedCount]);
+  const pointerComplete=JSON.stringify(pointerSequence)===JSON.stringify([['pointerdown',601],['pointerdown',602],['pointermove',601],['pointermove',602],['pointercancel',601],['pointercancel',602]])&&
+    pointer.every(e=>e.cancelable&&e.afterDispatch&&e.connected&&e.accepted===!e.defaultPrevented);
+  const touchComplete=JSON.stringify(touchSequence)===JSON.stringify([['touchstart',1,1],['touchstart',2,1],['touchmove',2,2],['touchmove',2,2],['touchcancel',0,2]])&&
+    events.every(e=>e.cancelable&&e.afterDispatch&&e.connected&&e.accepted===!e.defaultPrevented);
+  const continuity=!!observed?.before&&[observed.pointerAfter,observed.after].every(after=>after&&['stamp','scale','node','miniCount'].every(key=>after[key]===observed.before[key]));
+  return {ok:touch.error==null&&pointerComplete&&touchComplete&&continuity,pointerComplete,touchComplete,continuity,error:touch.error??null,pointerSequence,touchSequence};
+}
+function g6NativeInputIntegrity(observed){
+  const events=observed?.events||[],inventory=observed?.inventory||{},commands=observed?.commands||[];
+  const commandSequence=commands.map(command=>command.type);
+  const commandsComplete=JSON.stringify(commandSequence)===JSON.stringify(['touchStart','touchMove','touchMove','touchMove','touchMove','touchEnd'])&&commands.every(command=>command.completed);
+  const downs=events.filter(e=>e.family==='pointer'&&e.type==='pointerdown');
+  const terminals=events.filter(e=>e.family==='pointer'&&['pointerup','pointercancel'].includes(e.type));
+  const terminalComplete=downs.length>=2&&new Set(downs.map(e=>e.pointerId)).size>=2&&downs.every(down=>terminals.some(end=>end.pointerId===down.pointerId&&end.timeStamp>=down.timeStamp))&&
+    events.some(e=>e.family==='touch'&&['touchend','touchcancel'].includes(e.type)&&e.count===0)&&inventory.remaining===0;
+  const continuity=events.length>0&&events.every(e=>e.trusted&&e.afterDispatch&&e.connected&&e.stamp===observed.before?.stamp)&&observed.before?.stamp===observed.after?.stamp;
+  const moves=inventory.pointerMoves>0&&inventory.touchMoves>0;
+  const sameContext=!!observed?.before&&!!observed?.after&&['scale','node','miniCount'].every(key=>observed.before[key]===observed.after[key]);
+  return {ok:observed?.inputError===null&&commandsComplete&&terminalComplete&&continuity&&moves&&sameContext,inputError:observed?.inputError??null,commandsComplete,terminalComplete,continuity,moves,sameContext,commandSequence};
+}
 async function g6TwoPointerPolicy(page,selector){
   const target=page.locator(selector).first();await target.waitFor();
   const before=await g6ScaleFacts(page);
   const witness=await target.evaluate(node=>{
     const r=node.getBoundingClientRect(),events=[],ancestors=[];
     for(let n=node;n;n=n.parentElement)ancestors.push({tag:n.tagName,id:n.id,action:getComputedStyle(n).touchAction});
-    const fire=(type,id,x,y,primary)=>{const event=new PointerEvent(type,{bubbles:true,cancelable:true,pointerId:id,pointerType:'touch',isPrimary:primary,clientX:x,clientY:y,buttons:type==='pointercancel'?0:1});node.dispatchEvent(event);events.push({type,id,defaultPrevented:event.defaultPrevented,isTrusted:event.isTrusted});};
+    const fire=(type,id,x,y,primary)=>{const event=new PointerEvent(type,{bubbles:true,cancelable:true,pointerId:id,pointerType:'touch',isPrimary:primary,clientX:x,clientY:y,buttons:type==='pointercancel'?0:1});const accepted=node.dispatchEvent(event);events.push({type,id,defaultPrevented:event.defaultPrevented,isTrusted:event.isTrusted,cancelable:event.cancelable,accepted,afterDispatch:event.eventPhase===Event.NONE,connected:node.isConnected});};
     const x=r.left+r.width/2,y=r.top+r.height/2;
     fire('pointerdown',601,x-12,y,true);fire('pointerdown',602,x+12,y,false);
     fire('pointermove',601,x-24,y,true);fire('pointermove',602,x+24,y,false);
     fire('pointercancel',601,x-24,y,true);fire('pointercancel',602,x+24,y,false);
     return {events,ancestors,viewport:document.querySelector('meta[name="viewport"]')?.content||'',label:'synthetic two-pointer actual-handler cancellation witness; not native pinch zoom'};
   });
+  await delay(250);const pointerAfter=await g6ScaleFacts(page);
+  const touch=await target.evaluate(node=>{
+    if(typeof window.TouchEvent!=='function')return {error:'TouchEvent unavailable: coverage incomplete, never a pass or skip'};
+    if(!node.isConnected)return {error:'source detached before the synthetic touch stream'};
+    const box=node.getBoundingClientRect(),x=box.left+box.width/2,y=box.top+box.height/2;
+    const legacy=typeof document.createTouch==='function'&&typeof document.createTouchList==='function';
+    if(!legacy&&typeof window.Touch!=='function')return {error:'Touch construction unavailable: coverage incomplete, never a pass or skip'};
+    const touch=(identifier,clientX)=>legacy?document.createTouch(window,node,identifier,clientX+scrollX,y+scrollY,clientX,y):
+      new window.Touch({identifier,target:node,clientX,clientY:y,pageX:clientX+scrollX,pageY:y+scrollY,screenX:clientX,screenY:y,radiusX:4,radiusY:4,force:1});
+    const list=touches=>legacy?document.createTouchList(...touches):touches;
+    const events=[];
+    const fire=(type,touches,changed)=>{
+      const event=new window.TouchEvent(type,{bubbles:true,cancelable:true,composed:true,touches:list(touches),targetTouches:list(touches),changedTouches:list(changed)});
+      const accepted=node.dispatchEvent(event);
+      events.push({type,count:event.touches.length,changedCount:event.changedTouches.length,cancelable:event.cancelable,isTrusted:event.isTrusted,
+        defaultPrevented:event.defaultPrevented,accepted,afterDispatch:event.eventPhase===Event.NONE,connected:node.isConnected});
+    };
+    try{
+      let pair=[touch(601,x-12),touch(602,x+12)];
+      fire('touchstart',[pair[0]],[pair[0]]);fire('touchstart',pair,[pair[1]]);
+      for(const radius of [24,36]){pair=[touch(601,x-radius),touch(602,x+radius)];fire('touchmove',pair,pair);}
+      fire('touchcancel',[],pair);
+    }catch(error){return {error:String(error),events};}
+    return {events,construction:legacy?'document.createTouch/createTouchList':'Touch constructor',label:'synthetic TouchEvents through actual handlers; not native WebKit or iPhone zoom'};
+  });
   await delay(250);const after=await g6ScaleFacts(page);
   const policy=witness.ancestors.every(({action})=>action!=='none'&&(!/pan-[xy]/u.test(action)||action.includes('pinch-zoom')))&&
     !/user-scalable\s*=\s*(no|0)|maximum-scale\s*=\s*1(?:\D|$)/iu.test(witness.viewport);
-  return {ok:policy&&witness.events.filter(e=>e.type==='pointermove').length===2&&witness.events.every(e=>!e.defaultPrevented)&&
-    after.scale===before.scale&&after.node===before.node&&after.miniCount===before.miniCount,
-    observed:{before,after,...witness}};
+  const touchSequence=JSON.stringify((touch.events||[]).map(e=>[e.type,e.count,e.changedCount]));
+  const touchOk=!touch.error&&touchSequence===JSON.stringify([['touchstart',1,1],['touchstart',2,1],['touchmove',2,2],['touchmove',2,2],['touchcancel',0,2]])&&
+    touch.events.every(e=>e.cancelable&&e.afterDispatch&&e.connected&&e.accepted===!e.defaultPrevented&&!e.defaultPrevented);
+  const inputIntegrity=g6SyntheticInputIntegrity({before,pointerAfter,after,...witness,touch});
+  const same=facts=>facts.scale===before.scale&&facts.node===before.node&&facts.miniCount===before.miniCount;
+  return {ok:inputIntegrity.ok&&policy&&witness.events.filter(e=>e.type==='pointermove').length===2&&witness.events.every(e=>!e.defaultPrevented)&&touchOk&&
+    same(pointerAfter)&&same(after),
+    observed:{before,pointerAfter,after,...witness,touch,touchOk,inputIntegrity}};
 }
 async function g6NativeChromiumPinch(page,context,selector){
   const target=page.locator(selector).first();await target.scrollIntoViewIfNeeded();const box=await target.boundingBox();assert(box);
   const before=await g6ScaleFacts(page),cdp=await context.newCDPSession(page);
-  await page.evaluate(()=>{window.__g6NativeEvents=[];const pointers=new Set();const capture=e=>{
-    if(e.pointerType!=='touch')return;
-    if(e.type==='pointerdown')pointers.add(e.pointerId);const count=pointers.size;
-    queueMicrotask(()=>window.__g6NativeEvents.push({type:e.type,isTrusted:e.isTrusted,cancelable:e.cancelable,defaultPrevented:e.defaultPrevented,count}));
-    if(e.type==='pointerup'||e.type==='pointercancel')pointers.delete(e.pointerId);
-  };for(const type of ['pointerdown','pointermove','pointerup','pointercancel'])document.addEventListener(type,capture,{capture:true});});
-  const send=(type,rad)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:type==='touchEnd'?[]:[-1,1].map((sign,id)=>({id,x:box.x+box.width/2+sign*rad,y:box.y+box.height/2,radiusX:4,radiusY:4,force:1}))});
+  await page.evaluate(()=>{
+    if(window.__g6PostDispatch)throw new Error('stale G6 post-dispatch witness');
+    const raw=[],pointers=new Set(),types=['pointerdown','pointermove','pointerup','pointercancel','touchstart','touchmove','touchend','touchcancel'];
+    const capture=event=>{
+      const pointer=event.type.startsWith('pointer');
+      if(pointer&&event.pointerType!=='touch')return;
+      if(event.type==='pointerdown')pointers.add(event.pointerId);
+      raw.push({event,captured:{type:event.type,family:pointer?'pointer':'touch',count:pointer?pointers.size:event.touches.length,
+        pointerId:pointer?event.pointerId:null,trusted:event.isTrusted,cancelable:event.cancelable,timeStamp:event.timeStamp,stamp:window.__g6DocumentStamp,
+        target:event.target?.id||String(event.target?.className||event.target?.nodeName||'')}});
+      if(event.type==='pointerup'||event.type==='pointercancel')pointers.delete(event.pointerId);
+    };
+    for(const type of types)window.addEventListener(type,capture,{capture:true,passive:true});
+    window.__g6PostDispatch={raw,pointers,stop:()=>{for(const type of types)window.removeEventListener(type,capture,true);}};
+  });
+  const commands=[];
+  const send=async(type,rad)=>{const command={type,rad:rad??null,completed:false};commands.push(command);await cdp.send('Input.dispatchTouchEvent',{type,touchPoints:type==='touchEnd'?[]:[-1,1].map((sign,id)=>({id,x:box.x+box.width/2+sign*rad,y:box.y+box.height/2,radiusX:4,radiusY:4,force:1}))});command.completed=true;};
+  let inputError=null;
   try{await send('touchStart',12);for(const rad of [16,20,24,28]){await delay(40);await send('touchMove',rad);}await send('touchEnd');}
+  catch(error){inputError=String(error.stack||error);}
   finally{await cdp.detach();}
-  await delay(300);const events=await page.evaluate(()=>window.__g6NativeEvents),after=await g6ScaleFacts(page);
-  return {ok:events.some(e=>e.isTrusted&&e.count===2)&&events.filter(e=>e.count===2).every(e=>!e.defaultPrevented)&&before.scale===after.scale&&before.node===after.node,
-    observed:{events,before,after,label:'Chromium native protocol multi-touch; does not establish physical iPhone zoom'}};
+  await delay(300);
+  const witness=await page.evaluate(()=>{
+    const state=window.__g6PostDispatch;
+    try{return {events:state.raw.map(({event,captured})=>({...captured,defaultPrevented:event.defaultPrevented,afterDispatch:event.eventPhase===Event.NONE,connected:!!event.target?.isConnected})),remaining:[...state.pointers]};}
+    finally{state.stop();delete window.__g6PostDispatch;}
+  });
+  const after=await g6ScaleFacts(page),events=witness.events;
+  const downs=events.filter(e=>e.family==='pointer'&&e.type==='pointerdown');
+  const pairs=events.filter(e=>e.count===2&&(e.family==='pointer'||e.type!=='touchend'));
+  const inventory={pointerDowns:downs.length,pointerMoves:events.filter(e=>e.family==='pointer'&&e.type==='pointermove'&&e.count===2).length,
+    touchMoves:events.filter(e=>e.family==='touch'&&e.type==='touchmove'&&e.count===2).length,
+    cancelableTouchMoves:events.filter(e=>e.family==='touch'&&e.type==='touchmove'&&e.count===2&&e.cancelable).length,remaining:witness.remaining.length};
+  const observed={events,inventory,commands,inputError,before,after,label:'trusted Chromium protocol multi-touch with post-dispatch cancellation observation; does not establish physical iPhone zoom'};
+  const inputIntegrity=g6NativeInputIntegrity(observed);
+  const ok=inputIntegrity.ok&&!inputError&&downs.length>=2&&inventory.pointerMoves>0&&inventory.touchMoves>0&&inventory.remaining===0&&events.every(e=>e.trusted&&e.afterDispatch&&e.stamp===before.stamp)&&
+    pairs.every(e=>!e.defaultPrevented)&&before.scale===after.scale&&before.node===after.node;
+  return {ok,observed:{...observed,inputIntegrity}};
 }
 // G6 thread assertions use actual stack occurrence metadata, never crumb text.
 function g6CanonicalBeads(facts){return facts.beads.filter(b=>b.stackIndex!==null);}
@@ -1101,6 +1181,8 @@ async function g6KeptProjection(page,{emit}){
   const target=page.locator('#drift-layer .scale-star-kept').filter({hasText:G6_ORIGIN.word});assert.equal(await target.count(),1);
   await target.tap();await pageSettled(page);const entry=await g6ScaleFacts(page),after=await readAppRecordSnapshot(page);
   emit('kept.native-door','native hit on the kept point opens its saved word and reading',entry.node===`word:${G6_ORIGIN.word}`&&entry.reading===G6_ORIGIN.reading&&await page.locator('#sheet .sense-list li').count()>0,{entry,key,pan});
+  const provenance=await g6FreshProvenance(page,row,saved.record);
+  emit('kept.source-provenance','a fresh Save shows a source door exactly when its own valid provenance exists',provenance.ok,provenance);
   emit('kept.no-record-write','projection, native pan and point opening do not change the native learner record',before.revision===after.revision&&JSON.stringify(before.record)===JSON.stringify(after.record),{beforeRevision:before.revision,afterRevision:after.revision});
   await page.locator('#sheet-back').tap();await page.waitForFunction(()=>!document.getElementById('sheet'));
   for(const [from,to]of [['sky','shelf'],['shelf','article']]){const result=await g6Move(page,{from,to,home,modality:'touch'});assert(result.ok);}
@@ -1125,6 +1207,13 @@ async function g6KeptProjection(page,{emit}){
   emit('kept.removed','new committed projection removes the old exact identity when final membership leaves',!removed.stars.some(n=>n.key===key)&&removedRecord.revision>listRecord.revision,{removed,listRevision:listRecord.revision,removedRevision:removedRecord.revision});
 }
 
+const G6_TOUCHMOVE_FAULT=Object.freeze({file:'corridor.js',key:'cancel-text-touchmove',from:'function scaleThread() {',to:`// G6 negative control: bubble-phase two-touch touchmove cancellation on text.
+document.addEventListener('touchmove', e => {
+ if(e.touches.length===2 && !e.target.closest?.('#drift-layer')) {
+  e.preventDefault(); window.__g6TouchmoveFault=(window.__g6TouchmoveFault||0)+1;
+ }
+}, {passive:false});
+function scaleThread() {`});
 const G6_MUTANTS = Object.freeze([
   {id:'missing-reverse',target:'reverse.part-kanji',schedule:'reverse',edits:[{file:'corridor.js',key:'remove-part-reverse',
     from:"function scaleOut() {\n  const target = scaleOutTarget();",
@@ -1148,6 +1237,28 @@ function scaleThread() {`}],
     {file:'corridor.js',key:'displace-stability-target',from:'const remaining = anchor.getBoundingClientRect().top - visit.viewportY;',to:'const remaining = anchor.getBoundingClientRect().top - (visit.viewportY + 80);'},
     {file:'corridor.js',key:'displace-post-focus-target',from:'const afterFocus = anchor.getBoundingClientRect().top - visit.viewportY;',to:'const afterFocus = anchor.getBoundingClientRect().top - (visit.viewportY + 80);'},
   ],witness:r=>r.observed.delta>4&&g6SameToken(r.observed.origin,r.observed.current)&&r.observed.current.connected},
+  {id:'late-bubble-pointer',target:'text.native-two-pointer',schedule:'native-pinch',engines:['chromium'],edits:[{file:'corridor.js',key:'late-bubble-two-pointer',
+    from:'function scaleThread() {',
+    to:`// G6 negative control: late bubble-phase two-touch pointer cancellation on text.
+const g6LatePointers = new Set();
+addEventListener('pointerdown', e => { if(e.pointerType==='touch') g6LatePointers.add(e.pointerId); }, true);
+for(const type of ['pointerup','pointercancel']) addEventListener(type,e=>g6LatePointers.delete(e.pointerId),true);
+document.addEventListener('pointermove', e => {
+ if(e.pointerType==='touch' && g6LatePointers.size===2 && !e.target.closest('#drift-layer')) {
+  e.preventDefault(); window.__g6LatePointerFault=(window.__g6LatePointerFault||0)+1;
+ }
+}, {passive:false});
+function scaleThread() {`}],
+    witness:r=>r.observed.faults?.latePointer>0&&r.observed.events.some(e=>e.family==='pointer'&&e.type==='pointermove'&&e.count===2&&e.trusted&&e.defaultPrevented)},
+  {id:'touchmove-cancel',target:'text.two-pointer',schedule:'pinch',edits:[G6_TOUCHMOVE_FAULT],
+    witness:r=>r.observed.faults?.touchmove>0&&!!r.observed.touch?.events?.some(e=>e.type==='touchmove'&&e.count===2&&e.defaultPrevented)},
+  {id:'touchmove-cancel-native',target:'text.native-two-pointer',schedule:'native-pinch',engines:['chromium'],edits:[G6_TOUCHMOVE_FAULT],
+    witness:r=>r.observed.faults?.touchmove>0&&r.observed.events.some(e=>e.family==='touch'&&e.type==='touchmove'&&e.count===2&&e.trusted&&e.defaultPrevented)},
+  {id:'invented-fresh-source',target:'kept.source-provenance',schedule:'provenance',modalities:['touch'],edits:[{file:'corridor.js',key:'invent-no-ref-source',
+    from:"  const ref = learningContextRef(item);\n  if (!ref) return;\n",
+    to:"  const ref = learningContextRef(item);\n  if (!ref) {\n    // G6 negative control: an invented source door on a word saved without provenance.\n    const fault = el('details', 'teacher-context learning-source'), door = el('button', 'chip learning-source-return', 'G6 fault');\n    door.type = 'button'; door.id = 'learning-source-return'; fault.append(el('summary', 'eyebrow', 'G6 fault'), door);\n    container.append(fault); window.__g6InventedSource = (window.__g6InventedSource || 0) + 1; return;\n  }\n"}],
+    premise:rows=>rows.find(r=>r.id==='kept.source-provenance')?.observed?.branch==='no-ref',
+    witness:r=>r.observed.branch==='no-ref'&&r.observed.counts.door>0&&r.observed.markers?.inventedSource>0},
 ]);
 function g6WalkIds(itinerary,timing){
   const ids=[];
@@ -1160,14 +1271,22 @@ function g6WalkIds(itinerary,timing){
 }
 function g6ControlIds(schedule){
   if(schedule==='pinch')return ['text.two-pointer'];
+  if(schedule==='native-pinch')return ['text.native-two-pointer'];
+  if(schedule==='provenance')return [...G6_KEPT_IDS];
   if(schedule==='reverse')return ['setup.article-sentence','setup.sentence-word','setup.word-kanji','setup.kanji-part','reverse.part-kanji'];
   return ['setup.article-shelf','setup.shelf-sky','setup.sky-shelf','setup.shelf-article','return.line'];
 }
-async function g6ControlSchedule(page,{modality,schedule,emit}){
+async function g6ControlSchedule(page,{context,modality,schedule,emit}){
+  if(schedule==='provenance')return g6KeptProjection(page,{emit});
   const home=await g6OpenOrigin(page,modality);
+  const faults=()=>page.evaluate(()=>({textPinch:window.__g6TextPinchFaultFired||0,latePointer:window.__g6LatePointerFault||0,touchmove:window.__g6TouchmoveFault||0}));
   if(schedule==='pinch'){
     const result=await g6TwoPointerPolicy(page,`#reader .tok[data-index="${G6_ORIGIN.index}"]`);
-    emit('text.two-pointer','two pointers on prose remain uncanceled and do not navigate',result.ok,result.observed);return;
+    emit('text.two-pointer','two pointers on prose remain uncanceled and do not navigate',result.ok,{...result.observed,faults:await faults()});return;
+  }
+  if(schedule==='native-pinch'){
+    const result=await g6NativeChromiumPinch(page,context,`#reader .tok[data-index="${G6_ORIGIN.index}"]`);
+    emit('text.native-two-pointer','trusted two-touch input on prose stays uncanceled after dispatch and does not navigate',result.ok,{...result.observed,faults:await faults()});return;
   }
   const itinerary=schedule==='reverse'?['article','sentence','word','kanji','part']:['article','shelf','sky','shelf','article'];
   for(let i=1;i<itinerary.length;i++){
@@ -1181,6 +1300,197 @@ async function g6ControlSchedule(page,{modality,schedule,emit}){
   }else{
     const row=await g6Line(page,home);emit('return.line','same source occurrence returns within4px',row.ok,row.observed);
   }
+}
+// G6 drain recovery: one synthetic owned sky pointerdown deliberately omits its
+// terminal. Keyboard sky→shelf→sky runs the real hide/show/renderDrift bridge refresh.
+async function g6LostTerminal(page,{context,emit,native}){
+  await g6SkyHome(page);
+  const point=await g6SkyPoint(page);assert(point,'actual unobstructed sky geometry for the lost and fresh hands');
+  const record=await readAppRecordSnapshot(page);
+  const ghost=await page.evaluate(({x,y})=>{
+    const target=document.elementFromPoint(x,y);
+    if(!target?.closest('#drift-layer'))throw new Error('lost-terminal fixture point is not owned by the sky');
+    target.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true,pointerId:9001,pointerType:'touch',isPrimary:true,clientX:x,clientY:y,buttons:1}));
+    return {pointerId:9001,target:target.id||target.className,trusted:false,terminal:'deliberately omitted'};
+  },point);
+  const refresh=[];
+  for(const [from,to,direction,view] of [['sky','shelf','in','shelf'],['shelf','sky','out','drift']]){
+    await g6Activate(page,page.locator(`${G6_RAIL}[data-scale="${from}"] button[data-scale-${direction}]`),'keyboard');
+    await page.waitForFunction(v=>document.body.dataset.view===v,view,{timeout:5000});refresh.push({from,to,view});
+  }
+  await page.waitForFunction(()=>window.__DRIFT__?.canNavigate()===true&&document.querySelector('#drift-layer')?.dataset.recordState==='active');
+  const before=await g6SkyFacts(page);
+  const evidence=await page.evaluate(()=>{
+    let touchEvent='TouchEvent';
+    let event;
+    try{event=new TouchEvent('touchend',{bubbles:true,cancelable:true,touches:[],targetTouches:[],changedTouches:[]});}
+    catch{touchEvent='Event with an empty touches list';event=new Event('touchend',{bubbles:true,cancelable:true});Object.defineProperty(event,'touches',{value:[]});}
+    document.dispatchEvent(event);
+    window.dispatchEvent(new PointerEvent('pointerup',{pointerId:799,pointerType:'touch',bubbles:true}));
+    return {untrustedEmptyTouchList:{type:touchEvent,trusted:event.isTrusted,touches:event.touches.length},foreignTerminal:799};
+  });
+  await page.mouse.move(point.x,point.y);await page.mouse.down();await page.mouse.up();evidence.freshPrimaryMouse='native mouse press on the same sky water';
+  await delay(300);
+  const hand=await g6Hand(page,context,native);
+  try{
+    await g6Spread(hand,point);await delay(400);
+    const consumed=await g6SkyFacts(page);
+    if(!native){
+      emit('lost.untrusted-drained','untrusted empty touch list, foreign terminal and a fresh primary mouse never release a lost owned touch',consumed.view==='drift'&&!consumed.mini&&!consumed.sheet&&consumed.place?.path===before.place?.path,{label:hand.label,ghost,refresh,evidence,before,consumed});
+    }else{
+      emit('lost.consumed','the first complete trusted hand after the lost terminal is consumed; untrusted, foreign and mouse evidence cannot release it',consumed.view==='drift'&&!consumed.mini&&!consumed.sheet&&consumed.place?.path===before.place?.path,{label:hand.label,ghost,refresh,evidence,before,consumed,events:await hand.events()});
+      await g6Spread(hand,point);
+      let reached=true;
+      try{await page.waitForFunction(()=>document.body.dataset.view==='shelf',null,{timeout:5000});}
+      catch(error){if(error.name!=='TimeoutError')throw error;reached=false;}
+      const recovered=await g6SkyFacts(page),events=await hand.events();
+      emit('lost.recovered','its trusted empty touch list retires the lost touch; the next fresh trusted spread takes one edge',reached&&recovered.view==='shelf'&&!recovered.mini&&!recovered.sheet&&events.every(e=>e.trusted),{label:hand.label,recovered,events});
+    }
+  }finally{await hand.close();}
+  const after=await readAppRecordSnapshot(page);
+  emit('lost.no-record-write','lost-terminal recovery makes no learner-record revision or data change',record.revision===after.revision&&JSON.stringify(record.record)===JSON.stringify(after.record),{beforeRevision:record.revision,afterRevision:after.revision});
+}
+async function g6InterruptedHold(page,{context,emit,native}){
+  await g6SkyHome(page);
+  const record=await readAppRecordSnapshot(page),learnerState=r=>JSON.stringify({driftState:r.driftState??null,...g6Learning(r)});
+  const facts=word=>page.evaluate(n=>({locked:!!document.querySelector('#drift-layer .bctr'),rung:n.dataset.ladderRung||null,
+    mini:!!document.getElementById('mini'),sheet:document.getElementById('sheet')?.dataset.node||null,view:document.body.dataset.view,
+    path:window.__DRIFT__?.capturePlace()?.path??null}),word);
+  const interrupt=kind=>page.evaluate(kind=>{
+    if(kind==='blur'){window.dispatchEvent(new Event('blur'));return 'synthetic window blur';}
+    Object.defineProperty(document,'visibilityState',{get:()=>'hidden',configurable:true});
+    Object.defineProperty(document,'hidden',{get:()=>true,configurable:true});
+    document.dispatchEvent(new Event('visibilitychange'));
+    delete document.visibilityState;delete document.hidden;
+    document.dispatchEvent(new Event('visibilitychange'));
+    return 'synthetic hidden visibility override, then visible';
+  },kind);
+  const hand=await g6Hand(page,context,native);
+  try{
+    for(const kind of ['blur','hidden']){
+      const word=await g6PickSkyWord(page),aim=await g6AimSkyWord(page,word),start=await facts(word);
+      assert(!start.locked&&!start.rung&&!start.mini,`interruption ${kind} starts without a held constellation`);
+      await hand.send('pointerdown',701,aim.x,aim.y);await delay(120);
+      const how=await interrupt(kind);await delay(400);
+      const held=await facts(word);
+      await hand.send('pointerup',701,aim.x,aim.y);await delay(700);
+      const after=await facts(word);
+      emit(`hold.${kind}`,'an interrupted press loses its pending hold, drag and compatibility tap',!held.locked&&!after.locked&&!after.rung&&!after.mini&&!after.sheet&&after.view==='drift'&&after.path===start.path,{label:hand.label,interruption:how,aim,start,held,after});
+    }
+    const afterRecord=await readAppRecordSnapshot(page);
+    emit('hold.no-record-write','interrupted holds make no cue, grade or saved-word change',learnerState(record.record)===learnerState(afterRecord.record),{beforeRevision:record.revision,afterRevision:afterRecord.revision});
+    const word=await g6PickSkyWord(page),aim=await g6AimSkyWord(page,word);
+    await hand.send('pointerdown',701,aim.x,aim.y);await delay(520);
+    const held=await facts(word);
+    await hand.send('pointerup',701,aim.x,aim.y);
+    emit('hold.premise','the same uninterrupted press does arm and fire the native hold',held.locked&&held.view==='drift',{label:hand.label,aim,held});
+  }finally{await hand.close();}
+}
+const g6StarProbe=(page,spec)=>page.evaluate(spec=>{
+  const star=[...document.querySelectorAll('#drift-layer .scale-star')].find(n=>spec.articleId?n.dataset.articleId===spec.articleId:!!n.dataset.keptKey&&JSON.parse(n.dataset.keptKey)[0]===spec.keptWord);
+  const lvl=document.querySelector('#drift-layer #lvl'),place=window.__DRIFT__?.capturePlace();
+  if(!star||!lvl||!place)return {found:!!star,lvl:!!lvl,place:place||null};
+  const c=place.camera,dx=(star.scaleX-c.x)*c.z,dy=(star.scaleY-c.y)*c.z,cs=Math.cos(c.rot),sn=Math.sin(c.rot);
+  const r=star.getBoundingClientRect(),l=lvl.getBoundingClientRect(),style=getComputedStyle(lvl);
+  const hot={left:l.left,top:l.top,right:l.left+56,bottom:l.bottom};
+  const column={left:hot.left,top:0,right:hot.right,bottom:innerHeight};
+  const x=r.left+r.width/2,y=r.top+r.height/2,hit=document.elementFromPoint(x,y);
+  return {found:true,place,anchor:{x:innerWidth/2+dx*cs-dy*sn,y:innerHeight/2+dx*sn+dy*cs},
+    star:{left:r.left,top:r.top,right:r.right,bottom:r.bottom},center:{x,y},hidden:star.hidden,placement:star.dataset.scalePlacement||null,
+    identity:{articleId:star.dataset.articleId||null,keptKey:star.dataset.keptKey||null},column,
+    hit:!!hit&&(hit===star||star.contains(hit)),hitOwner:hit?.id||hit?.className||null,
+    rail:{...hot,width:l.width,visible:!!lvl.getClientRects().length&&l.width>0&&style.display!=='none'&&style.visibility!=='hidden'&&style.pointerEvents!=='none'&&Number(style.opacity)>0,
+      level:lvl.getAttribute('aria-valuenow'),hotClass:lvl.classList.contains('hot')},
+    intersects:r.left<hot.right&&r.right>hot.left&&r.top<hot.bottom&&r.bottom>hot.top,
+    columnIntersects:r.left<column.right&&r.right>column.left&&r.top<column.bottom&&r.bottom>column.top};
+},spec);
+async function g6CameraSettled(page){
+  await page.evaluate(()=>new Promise((resolve,reject)=>{
+    const start=performance.now();let last=null,stable=0;
+    function sample(){
+      const c=window.__DRIFT__?.capturePlace()?.camera,key=c?[c.x,c.y,c.z,c.rot].map(v=>v.toFixed(2)).join():null;
+      stable=key&&key===last?stable+1:0;last=key;
+      if(stable>=10)return resolve();
+      if(performance.now()-start>12000)return reject(new Error('sky camera did not settle'));
+      requestAnimationFrame(sample);
+    }
+    requestAnimationFrame(sample);
+  }));
+}
+async function g6PanStarNearRail(page,spec){
+  const observations=[];
+  for(let attempt=0;attempt<16;attempt++){
+    await g6CameraSettled(page);await delay(320);
+    const probe=await g6StarProbe(page,spec);observations.push(probe);
+    if(!probe.found||!probe.place)return {reached:false,observations};
+    const target={x:42,y:(probe.rail.top+probe.rail.bottom)/2};
+    if(Math.abs(probe.anchor.x-target.x)<=10&&Math.abs(probe.anchor.y-target.y)<=60)return {reached:true,target,observations,probe};
+    const p=await g6SkyPoint(page);if(!p)return {reached:false,observations,error:'no unobstructed native pan start'};
+    // A native water drag also imparts momentum. Moving the entire error in one
+    // fast gesture overshoots and oscillates; approach the measured target with
+    // bounded smaller drags, retaining the same admission and tap hit checks.
+    const step=(delta,tolerance)=>Math.abs(delta)<=tolerance?0:Math.sign(delta)*Math.min(75,Math.max(12,Math.abs(delta)*.35));
+    const dx=step(target.x-probe.anchor.x,10),dy=step(target.y-probe.anchor.y,60),end={x:Math.max(8,p.x+dx),y:p.y+dy};
+    probe.panInput={from:p,to:end,terminalMotion:.25};
+    await page.mouse.move(p.x,p.y);await page.mouse.down();await page.mouse.move(end.x,end.y,{steps:15});
+    // End with a real small reversal while still pressed, rather than release
+    // the last large movement as a flick. The minimum displacement crosses the
+    // actual water pan's 8px admission threshold; no camera state is assigned.
+    await page.mouse.move(end.x+.25,end.y);await page.mouse.move(end.x,end.y);await page.mouse.up();
+  }
+  return {reached:false,observations};
+}
+async function g6StarNearRail(page,{emit,star}){
+  let spec;
+  if(star==='article'){await g6SkyHome(page);spec={articleId:G6_ORIGIN.passage};}
+  else{
+    const home=await g6OpenOrigin(page,'touch');
+    await stage(page,page.locator(`#reader .tok[data-index="${home.origin.index}"]`));await page.locator('#mini-take').tap();
+    await waitForAppRecord(page,r=>r.taken.some(n=>n.t==='word'&&n.id===G6_ORIGIN.word));
+    await page.keyboard.press('Escape');await leaveStage(page);
+    for(const [from,to]of [['article','shelf'],['shelf','sky']]){const moved=await g6Move(page,{from,to,home,modality:'touch'});assert(moved.ok,JSON.stringify(moved.observed));}
+    await page.waitForFunction(id=>[...document.querySelectorAll('#drift-layer .scale-star-kept')].some(n=>JSON.parse(n.dataset.keptKey)[0]===id),G6_ORIGIN.word,{timeout:10000});
+    spec={keptWord:G6_ORIGIN.word};
+  }
+  await page.waitForFunction(()=>window.__DRIFT__?.canNavigate()===true&&document.querySelector('#drift-layer')?.dataset.recordState==='active');
+  const pan=await g6PanStarNearRail(page,spec);let probe=pan.probe;
+  const admitted=pan.reached&&probe.rail.visible&&probe.rail.width>=40&&probe.anchor.x>=30&&probe.anchor.x<=probe.rail.right+6&&
+    probe.anchor.y>=probe.rail.top+22&&probe.anchor.y<=probe.rail.bottom-22;
+  emit('rail.admission','native pans place the star world anchor beside the visible level rail',admitted,{label:'native mouse pans; no camera setter',spec,pan});
+  assert(admitted,'near-rail geometry was not reached; no clear-target claim');
+  emit('rail.clear','the star stays outside the hot level-rail envelope and its full-height reserved column, and owns its own center',!probe.hidden&&!probe.intersects&&!probe.columnIntersects&&probe.hit&&probe.placement!=='blocked',{probe});
+  const starSelector=spec.articleId?`.scale-star-article[data-article-id=${JSON.stringify(spec.articleId)}]`:`.scale-star-kept[data-kept-key=${JSON.stringify(probe.identity.keptKey)}]`;
+  const starNode=page.locator(`#drift-layer ${starSelector}`),occurrence=await starNode.elementHandle();
+  assert(occurrence&&await occurrence.evaluate(n=>n.isConnected),'the exact admitted star remains connected');
+  const tab=await g6TabReach(page,starNode);assert(tab.found,'the admitted star is natively reachable by Tab');
+  const viewport=page.viewportSize(),resizes=[];
+  for(const height of [700,viewport.height]){
+    await page.setViewportSize({...viewport,height});
+    await page.evaluate(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))));
+    const resized=await g6StarProbe(page,spec),same=await occurrence.evaluate((n,selector)=>n.isConnected&&n===document.querySelector(selector)&&document.activeElement===n,`#drift-layer ${starSelector}`);
+    resizes.push({height,same,probe:resized});
+  }
+  emit('rail.resize-identity','native viewport resizing retains the focused exact star, keeps its hit center, and never moves it into the full-height rail column',
+    resizes.every(row=>row.same&&row.probe.hit&&!row.probe.hidden&&!row.probe.columnIntersects&&JSON.stringify(row.probe.identity)===JSON.stringify(probe.identity)),{tab,resizes,identity:probe.identity});
+  probe=await g6StarProbe(page,spec);
+  const record=await readAppRecordSnapshot(page),place=probe.place,level=probe.rail.level;
+  await page.touchscreen.tap(probe.center.x,probe.center.y);
+  let reached=true;
+  try{
+    if(star==='article')await page.waitForFunction(()=>document.body.dataset.view==='shelf',null,{timeout:5000});
+    else await page.locator(`#sheet[data-node="word:${G6_ORIGIN.word}"]`).waitFor({timeout:5000});
+  }catch(error){if(error.name!=='TimeoutError')throw error;reached=false;}
+  const landed=await page.evaluate(()=>{const lvl=document.querySelector('#drift-layer #lvl');return {view:document.body.dataset.view,sheet:document.getElementById('sheet')?.dataset.node||null,level:lvl?.getAttribute('aria-valuenow')??null,hot:!!lvl?.classList.contains('hot')};});
+  emit('rail.destination','one native tap opens the star destination without touching the level rail',reached&&landed.level===level&&!landed.hot,{star,landed,level});
+  if(star==='article')await g6Activate(page,page.locator(`${G6_RAIL}[data-scale="shelf"] button[data-scale-out]`),'touch');
+  else{if(reached)await pageSettled(page);await page.locator('#sheet-back').tap();await bare(page);}
+  await page.waitForFunction(()=>document.body.dataset.view==='drift'&&!document.getElementById('sheet')&&window.__DRIFT__?.canNavigate()===true,null,{timeout:5000});
+  await g6CameraSettled(page);
+  const returned=await page.evaluate(()=>({place:window.__DRIFT__?.capturePlace(),level:document.querySelector('#drift-layer #lvl')?.getAttribute('aria-valuenow')??null}));
+  const same=!!returned.place&&['x','y','z','rot'].every(k=>Math.abs(returned.place.camera[k]-place.camera[k])<=.5)&&['scopeId','generation','sceneGeneration','path'].every(k=>returned.place[k]===place[k]);
+  emit('rail.inverse','the native inverse returns to the exact prior sky place and level',same&&returned.level===level,{place,returned,level});
+  const after=await readAppRecordSnapshot(page);
+  emit('rail.no-record-write','near-rail star travel makes no learner-record revision or data change',record.revision===after.revision&&JSON.stringify(record.record)===JSON.stringify(after.record),{beforeRevision:record.revision,afterRevision:after.revision});
 }
 // G6 regression: a real dictionary preparation must not outlive its source layer.
 // Only the request is delayed; all navigation uses existing public controls.
@@ -1263,6 +1573,280 @@ async function g6PendingWordMenu(page,{context,emit}){
   }
 }
 
+async function g6PendingMenuCancel(page,{context,emit,kind}){
+  const requests=[],finished=[];
+  let phase='boot',releaseRequest,released=false;
+  const gate=new Promise(resolve=>{releaseRequest=resolve;});
+  const release=()=>{if(!released){released=true;releaseRequest();}};
+  const isIndex=url=>new URL(url).pathname.endsWith('/data/share_alike/dict-v2/index.json');
+  const onFinished=request=>{if(isIndex(request.url()))finished.push({url:request.url(),phase,time:Date.now()});};
+  const hold=async route=>{
+    const row={url:route.request().url(),phase,startedAt:Date.now(),releasedAt:null};requests.push(row);
+    await gate;row.releasedAt=Date.now();await route.continue();
+  };
+  context.on('requestfinished',onFinished);
+  await context.route('**/data/share_alike/dict-v2/index.json',hold);
+  try{
+    await openStory(page);
+    const words=page.locator('.reader-card h1 .japanese-lookup-word').filter({hasText:/\p{Script=Han}/u});
+    const first=words.first();await first.waitFor();await first.scrollIntoViewIfNeeded();
+    const anchor=await first.elementHandle();
+    let other=null;
+    if(kind==='overlap'){
+      const texts=await words.evaluateAll(nodes=>nodes.map(n=>n.dataset.lookupText));
+      const at=texts.findIndex((text,i)=>i>0&&!text.includes(texts[0])&&!texts[0].includes(text));
+      assert(at>0,'two distinct real title lookup words');
+      other=await words.nth(at).elementHandle();
+    }
+    let keyboardFocus=null;
+    if(kind==='escape'){
+      const block=first.locator('xpath=ancestor::*[@data-prose-roving][1]');
+      const at=await anchor.evaluate(n=>{const block=n.closest('[data-prose-roving]');return block?[...block.querySelectorAll('.japanese-lookup-word')].filter(w=>w.closest('[data-prose-roving]')===block).indexOf(n):-1;});
+      assert(at>=0&&await block.evaluate(n=>n.tabIndex===0&&!n.closest('[inert],[aria-hidden="true"]')),'the title word has an exposed native paragraph Tab stop');
+      keyboardFocus=await g6TabReach(page,block);
+      assert(keyboardFocus.found,'native Tab reaches the actual title paragraph');
+      await page.keyboard.press('Home');
+      for(let i=0;i<at;i++)await page.keyboard.press('ArrowRight');
+      assert(await anchor.evaluate(n=>n.isConnected&&document.activeElement===n),'native rover keys focus the exact title word before menu preparation');
+    }
+    const bookmarkPosition=await page.evaluate(()=>Math.round(scrollY));
+    const recordBefore=await waitForAppRecord(page,record=>record.readerPos?.[STORY.id]===bookmarkPosition,{description:'native title-scroll bookmark committed before menu'});
+    assert.equal(requests.length,0,'the controlled dictionary request must originate in the native menu action');
+    const sourceFacts=()=>anchor.evaluate(n=>({text:n.dataset.lookupText,connected:n.isConnected,inert:!!n.closest('[inert]'),
+      view:document.body.dataset.view,sheet:document.querySelector('#sheet')?.dataset.node||null,scrollY:Math.round(scrollY),focused:document.activeElement===n}));
+    const focusFacts=()=>page.evaluate(()=>{const n=document.activeElement;return {tag:n?.tagName||null,id:n?.id||null,text:n?.dataset?.lookupText||null,
+      className:String(n?.className||''),body:n===document.body,inMenu:!!n?.closest?.('#reader-word-menu'),connected:!!n?.isConnected};});
+    const before=await sourceFacts();
+    phase='menu-prepare';
+    if(kind==='escape')await page.keyboard.press('Shift+F10');
+    else await anchor.click({button:'right'});
+    const deadline=Date.now()+7000;while(!requests.length&&Date.now()<deadline)await delay(25);
+    if(other){await other.click({button:'right'});await delay(150);}
+    const pending=requests.length>=1&&requests.every(row=>row.phase==='menu-prepare')&&!released&&await page.locator('#reader-word-menu').count()===0;
+    emit('menu.pending-held','the native word menu awaits its own held real dictionary request',pending,{kind,before,keyboardFocus,requests:structuredClone(requests),released});
+    assert(pending,'the real menu preparation must be pending before its cancellation');
+    await page.evaluate(()=>{
+      const witness={mounted:[],focused:[]};
+      const observer=new MutationObserver(records=>{
+        for(const record of records)for(const node of record.addedNodes)if(node.nodeType===1){
+          const menus=[...(node.matches('#reader-word-menu')?[node]:[]),...node.querySelectorAll('#reader-word-menu')];
+          for(const menu of menus)witness.mounted.push({time:performance.now(),label:menu.getAttribute('aria-label')||'',text:menu.textContent});
+        }
+      });
+      observer.observe(document.body,{childList:true,subtree:true});
+      const focus=event=>{if(event.target.closest?.('#reader-word-menu'))witness.focused.push({time:performance.now(),id:event.target.id});};
+      document.addEventListener('focusin',focus,true);
+      window.__g6MenuCancelWitness={witness,stop:()=>{observer.disconnect();document.removeEventListener('focusin',focus,true);}};
+    });
+    phase='cancel';
+    let outside=null;
+    if(kind==='escape')await page.keyboard.press('Escape');
+    else if(kind==='outside'){
+      outside=await page.evaluate(()=>{
+        for(const y of [420,520,320,620])for(const x of [24,40,12]){
+          const n=document.elementFromPoint(x,y);
+          if(n&&!n.closest('button,a,input,textarea,select,summary,[role="button"],[tabindex],.tok,.japanese-lookup-word,#reader-word-menu,.scale-thread'))
+            return {x,y,tag:n.tagName,id:n.id,className:String(n.className||'')};
+        }
+        return null;
+      });
+      assert(outside,'an actual non-control point in the same reader room');
+      await page.mouse.click(outside.x,outside.y);
+    }else if(kind==='room'){
+      const back=page.locator('#back');assert.equal(await back.count(),1,'the room chrome Back control');
+      await back.click();await page.waitForFunction(()=>document.body.dataset.view==='shelf');
+    }
+    const cancelled=await sourceFacts(),cancelledFocus=await focusFacts();
+    phase='release';release();
+    const finishDeadline=Date.now()+10000;while(!finished.length&&Date.now()<finishDeadline)await delay(25);
+    assert(finished.length>=1,'the held real dictionary response must finish');
+    await page.waitForFunction(()=>window.__KAIRO_DICTIONARY_PERF__?.entries>0,null,{timeout:10000});
+    await delay(kind==='overlap'?1500:8000);
+    const afterRelease=await sourceFacts(),afterFocus=await focusFacts();
+    const witness=await page.evaluate(()=>{const state=window.__g6MenuCancelWitness;state.stop();return state.witness;});
+    const menus=await page.locator('body > #reader-word-menu').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('aria-label')||''));
+    if(kind==='overlap'){
+      const otherText=await other.evaluate(n=>n.dataset.lookupText);
+      const newest=menus.length===1&&witness.mounted.length===1&&menus[0].includes(otherText)&&!menus[0].includes(before.text);
+      emit('menu.newest-only','overlapping preparations mount only the newest request, never the superseded word',newest,{menus,witness,first:before.text,other:otherText,requests,finished});
+      await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.getElementById('reader-word-menu'));
+    }else{
+      const sameRoom=kind!=='room'?cancelled.view==='reader'&&cancelled.connected&&!cancelled.inert&&cancelled.scrollY===before.scrollY&&(kind!=='escape'||cancelled.focused):cancelled.view==='shelf';
+      emit('menu.cancel-state',kind==='escape'?'Escape retires the pending menu and leaves focus on its word':kind==='outside'?'an outside press retires the pending menu in the same room':'ordinary room navigation retires the pending menu',
+        sameRoom,{kind,before,cancelled,cancelledFocus,outside});
+      emit('menu.no-late-menu','the completed preparation never mounts a cancelled menu',menus.length===0&&witness.mounted.length===0,{menus,witness,requests,finished});
+      emit('menu.no-late-focus','the completed preparation cannot take focus',witness.focused.length===0&&!afterFocus.inMenu&&JSON.stringify(afterFocus)===JSON.stringify(cancelledFocus),{cancelledFocus,afterFocus,witness});
+      emit('menu.source-unchanged','the source word, room and scroll stay as the cancellation left them',JSON.stringify(afterRelease)===JSON.stringify(cancelled),{cancelled,afterRelease});
+    }
+    const recordAfter=await readAppRecord(page);
+    emit('menu.no-record-work','opening and cancelling the pending menu write no record',JSON.stringify(recordBefore)===JSON.stringify(recordAfter),{before:recordBefore,after:recordAfter});
+  }finally{
+    release();context.off('requestfinished',onFinished);
+    await page.evaluate(()=>window.__g6MenuCancelWitness?.stop()).catch(()=>{});
+    await context.unroute('**/data/share_alike/dict-v2/index.json',hold);
+  }
+}
+async function g6SourcelessParticle(page,{modality,emit}){
+  const home=await g6OpenOrigin(page,modality),end=Number(home.range[1]);
+  const index=await page.evaluate(end=>{const n=[...document.querySelectorAll('#reader .tok.particle[data-index][data-para]')].find(n=>Number(n.dataset.index)>=end);return n?Number(n.dataset.index):null;},end);
+  assert(Number.isInteger(index),'an actual reader particle outside the retained source sentence');
+  const token=page.locator(`#reader .tok.particle[data-index="${index}"]`);
+  await token.scrollIntoViewIfNeeded();await delay(300);
+  if(modality==='touch'){await stage(page,token);await g6Activate(page,page.locator('#mini .mini-word'),'touch');}
+  else{await focusWord(page,token);await page.keyboard.press('Control+Enter');}
+  await pageSettled(page);
+  const opened=await g6ScaleFacts(page),scales=opened.beads.map(b=>b.scale);
+  emit('particle.no-sentence-bead','a source-less particle page never gains the retained older sentence',
+    opened.node?.startsWith('particle:')&&scales.includes('article')&&!scales.includes('sentence')&&opened.tokenIndex===String(home.origin.index),
+    {index,origin:home.origin.index,range:home.range,opened});
+  const control=page.locator(`${G6_RAIL} button[data-scale-bead="article"]`);
+  if(modality==='keyboard')assert((await g6TabReach(page,control)).found,'article bead is reachable in native Tab order');
+  await g6Activate(page,control,modality);
+  await page.waitForFunction(()=>!document.getElementById('sheet'),null,{timeout:5000});await bare(page);
+  await page.evaluate(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))));
+  const landed=await page.evaluate(({index,origin})=>{
+    const token=document.querySelector(`#reader .tok[data-index="${index}"]`),old=document.querySelector(`#reader .tok[data-index="${origin}"]`),box=token?.getBoundingClientRect();
+    return {view:document.body.dataset.view,sheet:!!document.getElementById('sheet'),focusedParticle:document.activeElement===token,focusedOrigin:document.activeElement===old,
+      visible:!!box&&box.bottom>0&&box.top<innerHeight,returnIndex:document.querySelector('#reader')?.dataset.scaleReturnIndex??null,scrollY};
+  },{index,origin:home.origin.index});
+  emit('particle.article-return','the article bead returns to the particle that opened the page, never the retained older line',
+    landed.view==='reader'&&!landed.sheet&&landed.focusedParticle&&!landed.focusedOrigin&&landed.visible&&landed.returnIndex!==String(home.origin.index),{index,origin:home.origin.index,landed});
+  emit('particle.no-record-work','particle travel creates no saved card or grade work',JSON.stringify(home.learning)===JSON.stringify(g6Learning(await readAppRecord(page))));
+}
+async function g6ArchiveShelf(page,{emit}){
+  await page.goto(`${host.origin}/index.html?entry=drift&room=shelf&ui=bi`);
+  await page.waitForFunction(()=>document.body.dataset.ready==='1',null,{timeout:30000});
+  const learning=g6Learning(await readAppRecord(page));
+  const link=page.locator('#archive-link');await link.scrollIntoViewIfNeeded();await link.tap();
+  await page.locator('.archive-year').first().waitFor({timeout:15000});
+  const year=await page.evaluate(()=>{const toggles=[...document.querySelectorAll('.archive-year')];const count=t=>Number((t.textContent.match(/·\s*([0-9]+)/u)||[0,0])[1]);
+    return toggles.reduce((best,t)=>count(t)>count(best)?t:best,toggles[0]).dataset.year;});
+  await page.locator(`.archive-year[data-year="${year}"]`).tap();
+  await page.locator('.archive-row').first().waitFor();
+  const archiveFacts=()=>page.evaluate(()=>({view:document.body.dataset.view,scrollY:Math.round(scrollY),
+    expanded:[...document.querySelectorAll('.archive-year[aria-expanded="true"]')].map(n=>n.dataset.year),
+    focus:(()=>{const n=document.activeElement,r=n?.getBoundingClientRect();return {tag:n?.tagName||null,body:n===document.body,connected:!!n?.isConnected,
+      visible:!!r?.width&&!!r?.height&&r.bottom>0&&r.top<innerHeight&&!n.closest('[inert],[aria-hidden="true"]')};})()}));
+  const rows=page.locator('.archive-row');
+  const row=rows.nth(Math.min(12,await rows.count()-1));await row.scrollIntoViewIfNeeded();await delay(300);
+  const archive=await archiveFacts(),id=await row.getAttribute('data-passage');
+  assert(archive.view==='archive'&&archive.scrollY>0&&archive.expanded.includes(year),`an expanded year at a nonzero archive scroll: ${JSON.stringify(archive)}`);
+  const openRow=async()=>{
+    await page.locator(`.archive-row[data-passage=${JSON.stringify(id)}]`).tap();
+    await page.waitForFunction(id=>document.body.dataset.view==='reader'&&document.querySelector('.listen-row')?.dataset.passage===id&&!!document.querySelector('#reader .tok.content[data-index][data-para]'),id,{timeout:20000});
+    await delay(600);
+  };
+  await openRow();
+  const index=await page.evaluate(()=>{const n=[...document.querySelectorAll('#reader .tok.content[data-index][data-para]')].find(n=>{const r=n.getBoundingClientRect();return r.top>140&&r.bottom<innerHeight-160&&!n.classList.contains('particle');});return n?Number(n.dataset.index):null;});
+  assert(Number.isInteger(index),'an actual visible archive word');
+  const word=page.locator(`#reader .tok[data-index="${index}"]`);
+  const openPage=async()=>{await stage(page,word);await page.locator('#mini .mini-word').tap();await pageSettled(page);assert((await page.locator('#sheet').getAttribute('data-node'))?.startsWith('word:'));};
+  await openPage();await page.locator('#sheet-back').tap();await bare(page);await leaveStage(page);
+  const origin=await g6OriginFacts(page,index);
+  await page.locator('#back').tap();
+  await page.waitForFunction(()=>['archive','shelf'].includes(document.body.dataset.view));await delay(300);
+  const back=await archiveFacts();
+  emit('archive.back','ordinary Back from an archive article returns to its expanded year list at the same scroll',
+    back.view==='archive'&&back.scrollY===archive.scrollY&&back.expanded.includes(year)&&back.focus.connected&&back.focus.visible&&!back.focus.body,{archive,back,id,index});
+  await openRow();
+  let returned=true;
+  try{await page.waitForFunction(index=>document.querySelector('#reader')?.dataset.scaleReturnIndex===String(index),index,{timeout:5000});}catch(error){if(error.name!=='TimeoutError')throw error;returned=false;}
+  await page.evaluate(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))));
+  const reopened=await g6OriginFacts(page,index);
+  emit('archive.reopen-line','the archive row reopens the same archive occurrence within4px',returned&&reopened.focused&&Math.abs(reopened.top-origin.top)<=4,{origin,reopened,returned});
+  await openPage();
+  await page.locator(`${G6_RAIL} button[data-scale-bead="shelf"]`).tap();
+  await page.waitForFunction(()=>['archive','shelf'].includes(document.body.dataset.view)&&!document.getElementById('sheet'));await delay(300);
+  const bead=await archiveFacts();
+  emit('archive.shelf-bead','the shelf bead of an archive word page lands on its year list at the same scroll',
+    bead.view==='archive'&&bead.scrollY===archive.scrollY&&bead.expanded.includes(year),{archive,bead});
+  await page.locator(`${G6_RAIL}[data-scale="shelf"] button[data-scale-out]`).tap();
+  await page.waitForFunction(()=>document.body.dataset.view==='drift');
+  await page.waitForFunction(()=>window.__DRIFT__?.canNavigate()===true);
+  await page.locator(`${G6_RAIL}[data-scale="sky"] button[data-scale-in]`).tap();
+  await page.waitForFunction(()=>['archive','shelf'].includes(document.body.dataset.view));await delay(300);
+  const inward=await archiveFacts();
+  emit('archive.sky-inward','archive → sky → inward returns to the archive year list at its scroll',inward.view==='archive'&&inward.scrollY===archive.scrollY&&inward.expanded.includes(year),{archive,inward});
+  await page.locator(`${G6_RAIL}[data-scale="shelf"] button[data-scale-in]`).tap();
+  let skyReturned=true;
+  try{await page.waitForFunction(index=>document.body.dataset.view==='reader'&&document.querySelector('#reader')?.dataset.scaleReturnIndex===String(index),index,{timeout:8000});}catch(error){if(error.name!=='TimeoutError')throw error;skyReturned=false;}
+  await page.evaluate(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))));
+  const article=await g6OriginFacts(page,index),passage=await page.evaluate(()=>document.querySelector('.listen-row')?.dataset.passage||null);
+  emit('archive.sky-return-line','the next inward step returns the same archive article and occurrence within4px',skyReturned&&passage===id&&article.focused&&Math.abs(article.top-origin.top)<=4,{origin,article,passage,id});
+  await page.locator('#back').tap();await page.waitForFunction(()=>['archive','shelf'].includes(document.body.dataset.view));await delay(300);
+  const again=await archiveFacts();
+  await page.locator('#back').tap();await page.waitForFunction(()=>document.body.dataset.view!=='archive');await delay(300);
+  const curated=await archiveFacts();
+  emit('archive.back-to-shelf','Back from the archive itself still reaches the curated shelf',again.view==='archive'&&curated.view==='shelf',{again,curated});
+  emit('archive.no-record-work','archive scale travel creates no saved card or grade work',JSON.stringify(learning)===JSON.stringify(g6Learning(await readAppRecord(page))));
+}
+async function g6ReadOnBookmark(page,{modality,emit}){
+  const home=await g6OpenOrigin(page,modality);
+  const native=modality==='touch'&&engine==='chromium'?'touch-drag':'PageDown';
+  const start=await page.evaluate(()=>Math.round(scrollY));
+  const gestures=[];
+  const settleReading=()=>page.evaluate(()=>new Promise((resolve,reject)=>{const begun=performance.now();let last=scrollY,stable=0;
+    const sample=()=>{stable=Math.abs(scrollY-last)<.1?stable+1:0;last=scrollY;if(stable>=8)return resolve();if(performance.now()-begun>4000)return reject(new Error('native reading scroll did not settle'));requestAnimationFrame(sample);};requestAnimationFrame(sample);}));
+  if(native==='PageDown')for(let n=0;n<4&&await page.evaluate(()=>Math.round(scrollY))-start<=900;n++){await page.keyboard.press('PageDown');await delay(400);}
+  else{
+    const cdp=await page.context().newCDPSession(page);
+    try{for(let n=0;n<3&&await page.evaluate(()=>Math.round(scrollY))-start<=900;n++){
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:195,y:700,radiusX:3,radiusY:3,force:1}]});
+      for(let y=660;y>=180;y-=40){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:195,y,radiusX:3,radiusY:3,force:1}]});await delay(16);}
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await settleReading();
+      gestures.push({number:n+1,scrollY:await page.evaluate(()=>Math.round(scrollY))});
+    }}finally{await cdp.detach();}
+  }
+  await settleReading();
+  const reading=await page.evaluate(origin=>{
+    const tokens=[...document.querySelectorAll('#reader .tok[data-index][data-para]')],old=document.querySelector(`#reader .tok[data-index="${origin}"]`).getBoundingClientRect();
+    const tops=Object.fromEntries(tokens.filter(n=>{const r=n.getBoundingClientRect();return r.width>0&&r.height>0&&r.bottom>0&&r.top<innerHeight;}).map(n=>[n.dataset.index,n.getBoundingClientRect().top]));
+    return {scrollY:Math.round(scrollY),originVisible:old.bottom>0&&old.top<innerHeight,tops};
+  },home.origin.index);
+  const bookmark=await waitForAppRecord(page,record=>record.readerPos?.[STORY.id]===reading.scrollY,{description:'durable bookmark at the read-farther line'}).then(()=>true,()=>false);
+  await delay(300);
+  emit('readon.read-farther','native reading moves past the retained line and commits its durable bookmark',
+    reading.scrollY-start>844&&!reading.originVisible&&Object.keys(reading.tops).length>0&&bookmark,{native,start,gestures,reading:{...reading,tops:Object.keys(reading.tops).length},bookmark,origin:home.origin.index});
+  const back=page.locator('#back');
+  if(modality==='keyboard'){assert((await g6TabReach(page,back)).found,'room Back is reachable in native Tab order');await page.keyboard.press('Enter');}
+  else await back.tap();
+  await page.waitForFunction(()=>document.body.dataset.view==='shelf');await delay(300);
+  const shelf=await g6ScaleFacts(page),recaptured=shelf.tokenIndex;
+  emit('readon.exit-recaptured','the next exit retains the newer visible line, not the read-past origin',
+    recaptured!==null&&recaptured!==String(home.origin.index)&&Object.hasOwn(reading.tops,recaptured)&&Number(recaptured)>=Number(home.range[1]),{recaptured,origin:home.origin.index,range:home.range,shelf});
+  const card=page.locator(`[data-passage="${G6_ORIGIN.passage}"]:not([data-recommendation]) .shelf-open`).first();
+  if(modality==='keyboard'){assert((await g6TabReach(page,card)).found,'shelf card is reachable in native Tab order');await page.keyboard.press('Enter');}
+  else await card.tap();
+  let returned=true;
+  try{await page.waitForFunction(index=>document.body.dataset.view==='reader'&&document.querySelector('#reader')?.dataset.scaleReturnIndex===index,recaptured,{timeout:8000});}catch(error){if(error.name!=='TimeoutError')throw error;returned=false;}
+  await page.evaluate(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))));
+  const landed=recaptured!==null?await g6OriginFacts(page,Number(recaptured)):null;
+  const delta=landed?Math.abs(landed.top-reading.tops[recaptured]):null;
+  emit('readon.reopen-line','reopening lands on that newer line within4px, focused',returned&&!!landed?.focused&&landed.scrollY>0&&delta<=4,{recaptured,landed,delta,returned,
+    returnIndex:await page.evaluate(()=>document.querySelector('#reader')?.dataset.scaleReturnIndex??null)});
+  emit('readon.no-record-work','reading on and reopening create no saved card or grade work',JSON.stringify(home.learning)===JSON.stringify(g6Learning(await readAppRecord(page))));
+}
+const G6_KEPT_IDS=Object.freeze(['kept.identity','kept.native-door','kept.source-provenance','kept.no-record-write','kept.list-only','kept.removed']);
+async function g6FreshProvenance(page,row,record){
+  const sheet=page.locator(`#sheet[data-node="word:${G6_ORIGIN.word}"]`);
+  const counts={sheets:await sheet.count(),details:await sheet.locator('details.learning-source').count(),door:await sheet.locator('#learning-source-return').count()};
+  const markers=await page.evaluate(()=>({inventedSource:window.__g6InventedSource||0}));
+  const ref=row?.sourceContextRef||null,label=`actual fresh Save at token${G6_ORIGIN.index}; not the historical token43 observation`;
+  if(!ref)return {ok:counts.sheets===1&&counts.details===0&&counts.door===0,branch:'no-ref',counts,row,markers,label};
+  const entry=record.teacherContexts?.entries?.find(item=>item.id===ref)||null;
+  if(!entry)return {ok:false,branch:'dangling-ref',counts,row,ref,markers,label};
+  const path=`data/articles/${G6_ORIGIN.passage.replace(/:/gu,'-')}.json`,bytes=readFileSync(resolve(site,path));
+  const served=createHash('sha256').update(bytes).digest('hex')===identity.files.find(file=>file.path===path)?.sha256;
+  const tokens=JSON.parse(bytes).tokens,digest=createHash('sha256').update(JSON.stringify(tokens.map(token=>token.s))).digest('hex');
+  const teacher=await import(pathToFileURL(resolve(site,'teacher-context.mjs')).href);
+  let verified;
+  try{verified=JSON.stringify(await teacher.verifyTeacherContext(entry))===JSON.stringify(entry);}catch{verified=false;}
+  const matching=served&&verified&&entry.sourceKind==='bundled-passage'&&entry.sourceId===G6_ORIGIN.passage&&entry.index===G6_ORIGIN.index&&
+    entry.sourceDigest===digest&&entry.quote===tokens.slice(entry.start,entry.end).map(token=>token.s).join('')&&entry.target?.id===G6_ORIGIN.word;
+  const quote=counts.details===1?(await sheet.locator('details.learning-source .teacher-source-quote').textContent()):null;
+  return {ok:matching&&counts.sheets===1&&counts.details===1&&counts.door===1&&quote===entry.quote,branch:'valid-ref',counts,row,entry,verified,served,quote,markers,label};
+}
+
 async function runG6Suite(browser){
   const results=[];
   const run=async(name,ids,body,{control=null,publish=true,init=null,viewport={width:390,height:844},mobile=true}={})=>{
@@ -1306,6 +1890,13 @@ async function runG6Suite(browser){
     }
     if(!g6FramesOnly){
       await run('pending-word-menu',['menu.pending-real-request','menu.source-retained','menu.no-late-menu','menu.no-late-focus','menu.source-unchanged','menu.no-record-work'],g6PendingWordMenu,{viewport:{width:1024,height:900},mobile:false});
+      for(const kind of ['escape','outside','room','overlap'])await run(`pending-word-menu.${kind}`,kind==='overlap'?['menu.pending-held','menu.newest-only','menu.no-record-work']:
+        ['menu.pending-held','menu.cancel-state','menu.no-late-menu','menu.no-late-focus','menu.source-unchanged','menu.no-record-work'],(page,{context,emit})=>g6PendingMenuCancel(page,{context,emit,kind}),{viewport:{width:1024,height:900},mobile:false});
+      await run('archive.shelf',['archive.back','archive.reopen-line','archive.shelf-bead','archive.sky-inward','archive.sky-return-line','archive.back-to-shelf','archive.no-record-work'],(page,{emit})=>g6ArchiveShelf(page,{emit}));
+      for(const modality of ['touch','keyboard']){
+        await run(`${modality}.sourceless-particle`,['particle.no-sentence-bead','particle.article-return','particle.no-record-work'],(page,{emit})=>g6SourcelessParticle(page,{modality,emit}));
+        await run(`${modality}.read-on`,['readon.read-farther','readon.exit-recaptured','readon.reopen-line','readon.no-record-work'],(page,{emit})=>g6ReadOnBookmark(page,{modality,emit}));
+      }
       for(const modality of ['touch','keyboard']){
         await run(`${modality}.thread`,['bead.word','bead.kanji','bead.sentence','bead.article','bead.article.line','bead.shelf','bead.shelf.line','no-record-work'],(page,{emit})=>g6ThreadAncestors(page,{modality,emit}));
         await run(`${modality}.recursion`,['recursive.order','recursive.ancestor','recursive.no-record-work'],(page,{emit})=>g6RecursiveThread(page,{modality,emit}));
@@ -1323,10 +1914,16 @@ async function runG6Suite(browser){
         await run(`sky.${native?'native':'handlers'}.stage`,['stage.blocks-sky','stage.no-record-write'],(page,{context,emit})=>g6SkyStageGate(page,{context,emit,native}));
       }
       for(const kind of ['cue','grade'])await run(`sky.pending-${kind}`,['pending.block','pending.commit','pending.resume'],(page,{context,emit})=>g6PendingGuard(page,{context,emit,kind}));
+      for(const native of engine==='chromium'?[false,true]:[false]){
+        const mode=native?'native':'handlers';
+        await run(`sky.${mode}.lost-terminal`,native?['lost.consumed','lost.recovered','lost.no-record-write']:['lost.untrusted-drained','lost.no-record-write'],(page,{context,emit})=>g6LostTerminal(page,{context,emit,native}));
+        await run(`sky.${mode}.interrupted-hold`,['hold.blur','hold.hidden','hold.no-record-write','hold.premise'],(page,{context,emit})=>g6InterruptedHold(page,{context,emit,native}));
+      }
+      for(const star of ['article','kept'])await run(`sky.star-rail.${star}`,['rail.admission','rail.clear','rail.resize-identity','rail.destination','rail.inverse','rail.no-record-write'],(page,{emit})=>g6StarNearRail(page,{emit,star}));
       await run('source.received-occurrence',['ordinary-no-anchor989','explicit-source2351','new-source-outward-inward2351','learning-unchanged'],(page,{emit})=>g6ReceivedSourceReturn(page,{emit}));
-      await run('sky.kept-projection',['kept.identity','kept.native-door','kept.no-record-write','kept.list-only','kept.removed'],(page,{emit})=>g6KeptProjection(page,{emit}));
+      await run('sky.kept-projection',[...G6_KEPT_IDS],(page,{emit})=>g6KeptProjection(page,{emit}));
       const ids=['reader.synthetic','word.synthetic','sentence.synthetic','stage.synthetic'];
-      await run('text-policy',ids,async(page,{context,emit})=>{
+      await run('text-policy',ids,async(page,{emit})=>{
         const home=await g6OpenOrigin(page,'touch');
         let row=await g6TwoPointerPolicy(page,`#reader .tok[data-index="${G6_ORIGIN.index}"]`);emit('reader.synthetic','reader two-pointer policy',row.ok,row.observed);
         let moved=await g6Move(page,{from:'article',to:'sentence',modality:'touch',home});assert(moved.ok);
@@ -1360,7 +1957,8 @@ async function runG6Suite(browser){
   }
   if((withControls||g6ControlsOnly)&&!g6FramesOnly){
     for(const modality of ['touch','keyboard'])for(const spec of G6_MUTANTS){
-      const ids=g6ControlIds(spec.schedule),body=(page,{emit})=>g6ControlSchedule(page,{modality,schedule:spec.schedule,emit});
+      if((spec.engines&&!spec.engines.includes(engine))||(spec.modalities&&!spec.modalities.includes(modality)))continue;
+      const ids=g6ControlIds(spec.schedule),body=(page,{context,emit})=>g6ControlSchedule(page,{context,modality,schedule:spec.schedule,emit});
       const baseline=await run(`${modality}.control-${spec.id}.positive`,ids,body,{publish:false});
       const control={engine,id:`G6.${modality}.${spec.id}`,edits:spec.edits,served:[],pageErrors:[]};
       const mutant=await run(`${modality}.control-${spec.id}.mutant`,ids,body,{control,publish:false});
@@ -1369,16 +1967,18 @@ async function runG6Suite(browser){
       const equal=JSON.stringify(mutant.rows.map(r=>r.id))===JSON.stringify(baseline.rows.map(r=>r.id))&&JSON.stringify(restore.rows.map(r=>r.id))===JSON.stringify(baseline.rows.map(r=>r.id));
       const target=mutant.rows.find(r=>r.id===spec.target);
       const served=spec.edits.every(edit=>control.served.some(s=>s.file===edit.file&&s.applied.some(a=>a.key===edit.key)));
-      const complete=equal&&!mutant.error&&!control.setupError&&!mutant.pageErrors.length&&!mutant.consoleErrors.length&&served&&mutant.rows.every(r=>!r.observed?.unexecuted);
-      const killed=clean&&complete&&target&&!target.ok&&spec.witness(target)&&mutant.rows.every(r=>r.id===spec.target||r.ok);
-      control.verdict=!clean||!complete?'incomplete':killed?'killed':target?.ok?'survived':'contaminated';
+      const inputIntegrity=spec.schedule==='pinch'?g6SyntheticInputIntegrity(target?.observed):spec.schedule==='native-pinch'?g6NativeInputIntegrity(target?.observed):{ok:true};
+      const complete=equal&&!mutant.error&&!control.setupError&&!mutant.pageErrors.length&&!mutant.consoleErrors.length&&served&&mutant.rows.every(r=>!r.observed?.unexecuted)&&inputIntegrity.ok;
+      const exercised=!spec.premise||spec.premise(baseline.rows);
+      const killed=clean&&complete&&exercised&&target&&!target.ok&&spec.witness(target)&&mutant.rows.every(r=>r.id===spec.target||r.ok);
+      control.verdict=!clean||!complete?'incomplete':!exercised?'not-exercised':killed?'killed':target?.ok?'survived':'contaminated';
       control.baseline=baseline.rows;control.rows=mutant.rows;control.restore=restore.rows;controls.push(control);
-      check(`G6.${modality}.negative.${spec.id}`,'positive executes, exact fault fails its named assertion, and restore executes',killed&&restored,{verdict:control.verdict,clean,complete,restored,target,served,setupError:control.setupError||null});
+      check(`G6.${modality}.negative.${spec.id}`,'positive executes, exact fault fails its named assertion, and restore executes',killed&&restored,{verdict:control.verdict,clean,complete,exercised,restored,inputIntegrity,target,served,setupError:control.setupError||null});
     }
   }
   writeFileSync(resolve(evidence,`g6-${engine}.json`),JSON.stringify({site,gitSha:identity.gitSha,artifactSha256:identity.artifactSha256,verifierSha256,browserVersion:browserVersions[engine],node:process.version,
-    scope:g6FramesOnly?'G6 twelve directed edges × touch/keyboard plus per-edge frames only':g6ControlsOnly?'G6 three named controls × touch/keyboard with positives/restores only':'G6 directed edges, forty-step walks, exact thread ancestry, return lifecycle, sky actual-handler/native Chromium gestures, native pending records and kept membership projection; controls only when requested',
-    limitations:['WebKit two-pointer witness uses synthetic PointerEvents, not native iPhone zoom','Abandoned-return cases use one explicitly hashed served-byte scheduling seam; not untouched-candidate proof','Kept projection browser cases cover native membership revisions and retained saved identity; separate lifted-function tests cover conflicting seq/reading identities','Private sky dive routes remain covered by canonical Drift verifiers; these G6 gestures exercise surface scale admission'],results},null,2));
+    scope:g6FramesOnly?'G6 twelve directed edges × touch/keyboard plus per-edge frames only':g6ControlsOnly?`G6 named controls ${G6_MUTANTS.filter(spec=>!spec.engines||spec.engines.includes(engine)).map(spec=>`${spec.id} × ${(spec.modalities||['touch','keyboard']).join('/')}`).join(', ')} with positives/restores only`:'G6 directed edges, forty-step walks, exact thread ancestry, return lifecycle, sky actual-handler/native Chromium gestures, native pending records and kept membership projection; controls only when requested',
+    limitations:['WebKit two-pointer witness uses synthetic PointerEvents and TouchEvents through actual handlers, not native iPhone zoom','Chromium native text pinch is trusted protocol input sampled after dispatch, not physical-phone evidence','Abandoned-return cases use one explicitly hashed served-byte scheduling seam; not untouched-candidate proof','Kept projection browser cases cover native membership revisions and retained saved identity; separate lifted-function tests cover conflicting seq/reading identities','Private sky dive routes remain covered by canonical Drift verifiers; these G6 gestures exercise surface scale admission','Lost-terminal cases create the lost owned pointer with one synthetic sky pointerdown whose terminal is deliberately omitted; recovery is proven only with trusted Chromium protocol TouchEvents, while WebKit cases prove only that untrusted lists, foreign terminals and a fresh mouse cannot release the drain','Interrupted-hold cases dispatch a synthetic window blur and a synthetic hidden visibility override, not an operating-system app switch','A lost mouse terminal is retired only by a later trusted event from that same mouse with no button down; a lost pen terminal stays draining until that pen pointer terminates','Star/level-rail cases reach near-rail geometry by native mouse pans; rail exclusion in the compact and saturated fallbacks is proven by lifted-function tests only'],results},null,2));
 }
 
 

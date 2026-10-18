@@ -22,12 +22,17 @@ const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 const cases = ['lookup-before-and-after-answer', 'refused-write-retry-and-retired-question', 'menu-records-help-only-on-reveal'];
 const caseFilter = process.argv.find(arg => arg.startsWith('--case='))?.slice('--case='.length) || null;
+const requiredEngines = ['chromium', 'webkit'];
+const requireFull = process.argv.includes('--require-full');
 assert(!caseFilter || cases.includes(caseFilter), `Unknown Guided lookup case: ${caseFilter}`);
 const planned = [];
-const host = await startStaticHost({ site, port: 0 }), results = [];
+const results = [];
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all'
   ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
 assert(engines.every(engine => ['chromium', 'webkit'].includes(engine)));
+assert(!requireFull || (!caseFilter && engines.length === requiredEngines.length && requiredEngines.every(engine => engines.includes(engine))),
+  '--require-full requires all three cases in both actual engines');
+const host = await startStaticHost({ site, port: 0 });
 const act = (page, action) => page.locator(`.guided-room [data-action="${action}"]`).first();
 const stored = page => page.evaluate(key => JSON.parse(localStorage.getItem(key)), key);
 // A written kanji with a hidden reading exercises both rungs; kana may correctly skip to stage.
@@ -319,12 +324,19 @@ try {
 } finally {
   await host.close();
   const expectedCases = engines.length * (caseFilter ? 1 : cases.length);
-  const passed = planned.filter(row => row.selected).length === expectedCases && results.length === expectedCases && results.every(row => row.passed);
+  const selectedPassed = planned.filter(row => row.selected).length === expectedCases && results.length === expectedCases && results.every(row => row.passed);
+  const requiredKeys = requiredEngines.flatMap(engine => cases.map(name => `${engine}/${name}`));
+  const observedKeys = results.map(row => `${row.engine}/${row.name}`);
+  const fullCoverage = !caseFilter && engines.length === requiredEngines.length && requiredEngines.every(engine => engines.includes(engine)) &&
+    requiredKeys.length === 6 && observedKeys.length === 6 && new Set(observedKeys).size === 6 && requiredKeys.every(key => observedKeys.includes(key));
+  const passed = fullCoverage && selectedPassed;
+  const acceptance = { passed, fullCoverage, requiredCases: 6, requiredKeys, observedKeys,
+    mode: caseFilter || engines.length !== 2 ? 'diagnostic' : 'full', requireFull };
   writeFileSync(resolve(evidence, 'guided-lookup.json'), JSON.stringify({
     artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
     scope: 'Real guided question lookup lifecycle, before-hint durability, retained full-page return, after-answer honesty, refused write retry, retired-question guard, generic prose menu non-assistance, deliberate Save and With help labels; no design or voice claim',
-    caseFilter, caseInventory: { planned, expectedCases, observedCases: results.length }, results, passed,
+    caseFilter, caseInventory: { planned, expectedCases, observedCases: results.length }, results, selectedPassed, acceptance, passed,
   }, null, 2) + '\n');
-  if (!passed) process.exitCode = 1;
+  if (!selectedPassed || (requireFull && !passed)) process.exitCode = 1;
 }

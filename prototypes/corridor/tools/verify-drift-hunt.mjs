@@ -18,6 +18,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
+import { readAppRecordSnapshot } from './record-test-support.mjs';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { chromium } from 'playwright-core';
 
@@ -129,11 +131,9 @@ const M = (type, x, y) => cdp.send('Input.dispatchMouseEvent', {
   clickCount: 1,
 });
 const runtimePointer = async (type, x, y, pointerId, isPrimary = false) => {
-  // CDP Input cannot encode a partial touch lift: touchEnd/touchCancel require
-  // an empty point list. Preserve the browser-generated active identities,
-  // then deliver the one changed PointerEvent through CDP Runtime so the app
-  // receives the exact A-up / B+C-move sequence without an invalid protocol
-  // payload or a guessed pointer id.
+  // Historical synthetic control: preserve its exact browser-generated IDs.
+  // This is not a physical partial-lift witness; the G6 canceled-hand cases
+  // below use native CDP TouchLists and separately prove input completion.
   const terminal = type === 'pointerup' || type === 'pointercancel';
   const expression = `(() => {
     const target = document.elementFromPoint(${JSON.stringify(x)}, ${JSON.stringify(y)}) || document.body;
@@ -965,6 +965,23 @@ for (let staging = 1; staging <= 3; staging++) {
 check('hunt · a corpus-backed semantic member is staged, hit-testable DOM interaction (reading then shared stage, same lock identity)',
   semanticFinal.ok, semanticFinal.detail);
 
+const closeSemanticStage = async (expectedWord) => {
+  const before = await page.evaluate(world);
+  const actualWord = await page.locator('#mini .mini-word').textContent().catch(() => null);
+  if (actualWord !== expectedWord) return {ok:false,expectedWord,actualWord,reason:'expected stage was not mounted'};
+  await page.keyboard.press('Escape');
+  let closed = true;
+  try {
+    await page.waitForFunction(() => !document.getElementById('mini') && !document.getElementById('sheet') && window.__DRIFT__.canNavigate(),null,{timeout:5000});
+  } catch { closed = false; }
+  const after = await page.evaluate(world);
+  return {ok:closed && before.ctr === after.ctr,expectedWord,actualWord,before,after,closed};
+};
+// Native dismissal is a fixture precondition: the G6 stage intentionally
+// rejects a hold behind it. Preserve the already-observed stage facts.
+const semanticClosure = await closeSemanticStage('残酷');
+stagings.push({case:'semantic-stage-native-closure',...semanticClosure});
+
 // Start the lock afresh so the old canvas failure cannot mask the kana-only
 // fallback half of the hunt.
 let kanaFinal = null;
@@ -980,9 +997,11 @@ for (let staging = 1; staging <= 3; staging++) {
   const kanaAnswered = await semanticMember('きつい');
   const kanaCentreAfterAnswer = await page.evaluate(world);
   const kanaStage = await page.locator('#mini').evaluate(n => ({word:n.querySelector('.mini-word')?.textContent,gloss:n.querySelector('.mini-gloss')?.textContent})).catch(() => null);
+  const kanaClosure = await closeSemanticStage('きつい');
+  stagings.push({case:'kana-stage-native-closure',staging,...kanaClosure});
   const kanaForLock = await aimSemantic('きつい');
   let kanaPress = { attempted: false, delivered: false, reason: 'not attempted' };
-  if (kanaForLock?.hitSelf) {
+  if (semanticClosure.ok && kanaClosure.ok && kanaForLock?.hitSelf) {
     kanaPress = await touchMember('きつい', 620);
     await page.waitForTimeout(900);
   }
@@ -995,6 +1014,7 @@ for (let staging = 1; staging <= 3; staging++) {
   // cleanly and its bloom admits ONLY meaning-related members, which may be
   // none at all. No strangers, honest emptiness.
   const ok =
+    semanticClosure.ok && kanaClosure.ok &&
     kanaTarget?.dom === true && kanaTarget.hitSelf === true && kanaTarget.reading === '' &&
     kanaAnswered?.rung === 'stage' && kanaStage?.word === 'きつい' && !!kanaStage.gloss?.trim() &&
     kanaCentreAfterAnswer.ctr === '厳しい' && kanaFallback.ctr === 'きつい' &&
@@ -1006,7 +1026,7 @@ for (let staging = 1; staging <= 3; staging++) {
       `reading=${JSON.stringify(kanaTarget?.reading ?? null)}, first=${kanaAnswered?.unfolded ?? false}/${kanaAnswered?.glossed ?? false}; ` +
       `centre="${kanaCentreAfterAnswer.ctr}"→"${kanaFallback.ctr}", DOM sats=${kanaFallback.sats}, ` +
       `members=${kanaFallback.members.join('・')}` +
-      `; staging ${staging}/3 (tap ${kanaTap.reason}; press ${kanaPress.reason})`,
+      `; native closures=${semanticClosure.ok}/${kanaClosure.ok}; staging ${staging}/3 (tap ${kanaTap.reason}; press ${kanaPress.reason})`,
   };
   if (ok || !(missed(kanaTap) || missed(kanaPress))) break;
 }
@@ -1014,8 +1034,8 @@ check('hunt · a kana-only word focuses cleanly and its bloom admits no stranger
   kanaFinal.ok, kanaFinal.detail);
 
 /* 15 · pointer identity is part of gesture authority. A mouse/foreign pointer
- * may not move a touch-held word, and changing the active pair after a third
- * finger joins must rebase the pinch before its next 1px translation. */
+ * may not move a touch-held word. A third sky finger cancels the entire
+ * physical hand until all its fingers (including later joiners) end. */
 await boot();
 w = await page.evaluate(anyWord);
 await page.mouse.move(w.x, w.y);
@@ -1030,61 +1050,246 @@ const foreignDisplacement = identityAfter.exists
   : Infinity;
 await T('touchCancel', []);
 
-await boot();
-w = await page.evaluate(anyWord);
-await page.evaluate(`window.__driftHuntPointerDowns.length = 0`);
-const a0 = [45, 190, 31];
-const b0 = [145, 190, 32];
-const a1 = [35, 190, 31];
-const b1 = [155, 190, 32];
-await T('touchStart', [a0]);
-await T('touchStart', [a0, b0]);
-await T('touchMove', [a1, b1]);
-await page.waitForTimeout(180);
-const held = await page.evaluate(wordAt(w.w));
-const c0 = [held.x, held.y, 33];
-await T('touchStart', [a1, b1, c0]);
-await page.waitForTimeout(70);
-const aPointer = await pointerIdAt(a0[0], a0[1]);
-const bPointer = await pointerIdAt(b0[0], b0[1]);
-const cPointer = await pointerIdAt(c0[0], c0[1]);
-if (aPointer != null) await runtimePointer('pointerup', a1[0], a1[1], aPointer, true);
-await page.waitForTimeout(100);
-const pinchBefore = await page.evaluate(wordAt(w.w));
-if (bPointer != null) await runtimePointer('pointermove', b1[0] + 1, b1[1] + 1, bPointer);
-if (cPointer != null) await runtimePointer('pointermove', held.x + 1, held.y + 1, cPointer);
-await page.waitForTimeout(260);
-const pinchAfter = await page.evaluate(wordAt(w.w));
-const pinchScale = pinchBefore.exists && pinchAfter.exists && pinchBefore.width
-  ? pinchAfter.width / pinchBefore.width
-  : Infinity;
-let deliberateSpreadScale = Infinity;
-if (bPointer != null && cPointer != null && pinchAfter.exists) {
-  const bx = b1[0] + 1, by = b1[1] + 1;
-  const cx = held.x + 1, cy = held.y + 1;
-  const vx = cx - bx, vy = cy - by;
-  const length = Math.hypot(vx, vy) || 1;
-  const ux = vx / length, uy = vy / length;
-  await runtimePointer('pointermove', bx - ux * 24, by - uy * 24, bPointer);
-  await runtimePointer('pointermove', cx + ux * 24, cy + uy * 24, cPointer);
-  await page.waitForTimeout(260);
-  const pinchSpread = await page.evaluate(wordAt(w.w));
-  deliberateSpreadScale = pinchSpread.exists && pinchAfter.width
-    ? pinchSpread.width / pinchAfter.width
-    : Infinity;
-}
-await shot('08-pointer-identity-pinch-rebase.png');
-await T('touchCancel', []);
 check('hunt · a foreign pointermove cannot drag a touch-held word',
   foreignDisplacement < 8,
   `foreign-pointer displacement=${Number.isFinite(foreignDisplacement) ? foreignDisplacement.toFixed(1) : '∞'}px`);
-check('hunt · a replacement pinch pair rebases before its first translated move',
-  aPointer != null && bPointer != null && cPointer != null && pinchScale > 0.92 && pinchScale < 1.08,
-  `browser ids A/B/C=${aPointer}/${bPointer}/${cPointer}; ` +
-    `1px replacement-pair scale=${Number.isFinite(pinchScale) ? pinchScale.toFixed(3) : '∞'}×`);
-check('hunt · a rebased replacement pair remains a live pinch',
-  Number.isFinite(deliberateSpreadScale) && deliberateSpreadScale > 1.08 && deliberateSpreadScale < 1.8,
-  `deliberate replacement-pair spread scale=${Number.isFinite(deliberateSpreadScale) ? deliberateSpreadScale.toFixed(3) : '∞'}×`);
+
+// G6's surface scale hand is canceled by a third pointer. These mandatory
+// native streams keep the physical CDP TouchList honest across partial lifts;
+// historical synthetic pointer controls elsewhere remain separate evidence.
+const huntScaleFacts = async () => ({
+  ...await page.evaluate(() => ({
+    view: document.body.dataset.view,
+    active: document.getElementById('drift-layer')?.classList.contains('active'),
+    inert: document.getElementById('drift-layer')?.inert,
+    ready: window.__DRIFT__.canNavigate(), place: window.__DRIFT__.capturePlace(),
+    mini: !!document.getElementById('mini'), sheet: !!document.getElementById('sheet'),
+    viewportScale: visualViewport?.scale ?? 1,
+  })),
+  world: await page.evaluate(world),
+});
+const settleHuntScale = async (trace) => {
+  let facts = await huntScaleFacts(), equal = 0;
+  const started = Date.now();
+  trace.settling = [];
+  for (let n = 0; n < 40 && equal < 2; n++) {
+    await page.waitForTimeout(100);
+    const next = await huntScaleFacts();
+    trace.settling.push(next.place);
+    equal = isDeepStrictEqual(facts.place, next.place) ? equal + 1 : 0;
+    facts = next;
+  }
+  trace.settlingMs = Date.now() - started;
+  assert(equal >= 2, 'the actual camera settles within four seconds without a setter');
+  assert(facts.view === 'drift' && facts.active && !facts.inert && facts.ready && !facts.mini && !facts.sheet,
+    'the native hand starts in admitted visible sky');
+  assert.equal(facts.place?.path, '[]', 'surface scale fixture starts outside a private dive');
+  return facts;
+};
+const nativeSkyPoints = () => page.evaluate(() => {
+  const ink = [...document.querySelectorAll('#drift-layer .word, #drift-layer .glyph, #drift-layer .part')]
+    .map(n => n.getBoundingClientRect()).filter(r => r.width && r.height);
+  const safe = [];
+  for (let y = 230; y <= 614; y += 24) for (let x = 78; x <= 318; x += 24) {
+    if (ink.some(r => Math.hypot(x-r.x-r.width/2, y-r.y-r.height/2) < 44)) continue;
+    const disk = [[x,y], ...Array.from({length:16}, (_,i) => [x+30*Math.cos(i*Math.PI/8),y+30*Math.sin(i*Math.PI/8)])];
+    if (disk.every(([px,py]) => document.elementFromPoint(px,py)?.id === 'sky')) safe.push([x,y]);
+  }
+  // Bounded scan, native footprint ownership (including stars/chrome), and
+  // enough margin for the deliberately large canceled/fresh spread.
+  const compatible = (a,b) => Math.hypot(a[0]-b[0],a[1]-b[1]) >= 54 && [a,b].every((p,i) => {
+    const q = i ? a : b, x = (p[0]+q[0])/2+(p[0]-q[0])*0.8, y = (p[1]+q[1])/2+(p[1]-q[1])*0.8;
+    return x >= 35 && x <= 355 && y >= 100 && y <= 744;
+  });
+  for (const first of safe) {
+    const selected = [first];
+    for (const point of safe) {
+      if (selected.every(other => compatible(point,other))) selected.push(point);
+      if (selected.length === 4) return {points:selected,ownershipRadius:30,footprintSamples:17,wordForgiveness:44,candidates:safe.length};
+    }
+  }
+  return null;
+});
+const beginNativeHandWitness = async () => page.evaluate(() => {
+  const stamp = `${location.href}:${performance.timeOrigin}`;
+  const witness = { stamp, events:[], live:new Set(), routes:[document.body.dataset.view], listeners:[] };
+  for (const type of ['pointerdown','pointermove','pointerup','pointercancel','touchstart','touchmove','touchend','touchcancel']) {
+    const listener = event => {
+      if (event.pointerType && event.pointerType !== 'touch') return;
+      if (type === 'pointerdown') witness.live.add(event.pointerId);
+      if (type === 'pointerup' || type === 'pointercancel') witness.live.delete(event.pointerId);
+      witness.events.push({event, captured:{type,id:event.pointerId ?? null,count:event.touches?.length ?? null,
+        target:event.target?.id || null,word:event.target?.closest?.('.word')?.querySelector('.base')?.textContent || null,
+        x:event.clientX ?? null,y:event.clientY ?? null,trusted:event.isTrusted,cancelable:event.cancelable,
+        connected:event.target?.isConnected === true,stamp}});
+    };
+    addEventListener(type,listener,{capture:true,passive:true}); witness.listeners.push([type,listener]);
+  }
+  witness.observer = new MutationObserver(() => {
+    const view = document.body.dataset.view;
+    if (witness.routes.at(-1) !== view) witness.routes.push(view);
+  });
+  witness.observer.observe(document.body,{attributes:true,attributeFilter:['data-view']});
+  window.__huntNativeHandWitness = witness;
+});
+const readNativeHandWitness = (stop = false) => page.evaluate(stop => {
+  const w = window.__huntNativeHandWitness;
+  if (!w) return null;
+  const receipt = {stamp:w.stamp,live:[...w.live],routes:w.routes.slice(),events:w.events.map(({event,captured}) => ({...captured,
+    defaultPrevented:event.defaultPrevented,postDispatch:event.eventPhase === Event.NONE,
+    stillConnected:event.target?.isConnected === true,sameDocument:event.target?.ownerDocument === document}))};
+  if (stop) {
+    w.observer.disconnect(); for (const [type,listener] of w.listeners) removeEventListener(type,listener,true);
+    delete window.__huntNativeHandWitness;
+  }
+  return receipt;
+}, stop);
+const spreadHuntPair = (points, factor) => {
+  const [a,b,...rest] = points, mx = (a[0]+b[0])/2, my = (a[1]+b[1])/2;
+  return [[mx+(a[0]-mx)*factor,my+(a[1]-my)*factor,a[2]],
+    [mx+(b[0]-mx)*factor,my+(b[1]-my)*factor,b[2]],...rest];
+};
+const sameHuntSky = (actual,before) => actual.view === 'drift' && actual.active && !actual.inert &&
+  actual.ready && !actual.mini && !actual.sheet && actual.viewportScale === before.viewportScale &&
+  isDeepStrictEqual(actual.place,before.place) && isDeepStrictEqual(actual.world,before.world);
+const sameHuntRecord = (actual,before) => actual.revision === before.revision && isDeepStrictEqual(actual.record,before.record);
+const runCanceledHuntHand = async (schedule) => {
+  const trace = {case:'native-canceled-hand',schedule,inputError:null,commands:[],states:[],complete:false};
+  let active = [], witnessStarted = false;
+  const send = async (label,type,points) => {
+    // CDP partial touchEnd names the contacts being released. Keep the
+    // caller's desired remaining list separate and prove it from native events.
+    const protocolPoints = type === 'touchEnd' && points.length
+      ? active.filter(p=>!points.some(next=>next[2]===p[2])) : points;
+    const command = {label,type,points:points.map(p=>p.slice()),protocolPoints:protocolPoints.map(p=>p.slice()),acknowledged:false};
+    trace.commands.push(command);
+    try { await T(type,protocolPoints); command.acknowledged = true; active = points; }
+    catch (error) { trace.inputError = String(error); throw error; }
+    await page.waitForTimeout(35);
+    command.observed = await readNativeHandWitness();
+    const touch = command.observed.events.findLast(e=>e.type.startsWith('touch'));
+    command.physicalListMatches = command.observed.live.length === points.length && touch?.count === points.length;
+  };
+  const state = async label => {
+    const facts = await huntScaleFacts(); trace.states.push({label,facts}); return facts;
+  };
+  try {
+    await boot();
+    trace.before = await settleHuntScale(trace);
+    trace.recordBefore = await readAppRecordSnapshot(page);
+    trace.aim = await nativeSkyPoints();
+    assert(trace.aim, 'four native sky-owned footprints exist; never substitute words, stars or chrome');
+    const [a,b,c,d] = trace.aim.points.map(([x,y],i)=>[x,y,301+i]);
+    await beginNativeHandWitness(); witnessStarted = true;
+    await send('A down','touchStart',[a]);
+    await send('B down','touchStart',[a,b]);
+    await send('C cancels hand','touchStart',[a,b,c]);
+    const checks = [];
+    checks.push(await state('third pointer cancels'));
+    let remainder;
+    if (schedule === 'originals-first') {
+      await send('A up; B/C remain','touchEnd',[b,c]); checks.push(await state('A up'));
+      await send('B up; C remains','touchEnd',[c]); checks.push(await state('only third remains'));
+      await send('D down while C remains','touchStart',[c,d]); remainder = [c,d];
+    } else if (schedule === 'third-first') {
+      await send('C up; A/B remain','touchEnd',[a,b]); checks.push(await state('third up'));
+      remainder = [a,b];
+    } else remainder = [a,b,c];
+    remainder = remainder.map(([x,y,id])=>[x+1,y+1,id]);
+    await send('canceled remainder translates one pixel','touchMove',remainder);
+    trace.noJump = await state('one-pixel remainder');
+    trace.noJumpOk = checks.every(f=>sameHuntSky(f,trace.before)) && sameHuntSky(trace.noJump,trace.before);
+    remainder = spreadHuntPair(remainder,1.6);
+    await send('canceled remainder deliberately spreads 1.6x','touchMove',remainder);
+    checks.push(await state('deliberate canceled spread'));
+    if (schedule === 'third-first') {
+      await send('D joins canceled A/B remainder','touchStart',[...remainder,d]);
+      await send('A up; B/D remain','touchEnd',[remainder[1],d]);
+      await send('B/D still quarantined','touchMove',[[remainder[1][0]+1,remainder[1][1]+1,remainder[1][2]],[d[0]+1,d[1]+1,d[2]]]);
+      checks.push(await state('replacement after third-first lift'));
+      await send('B up; D remains','touchEnd',[[d[0]+1,d[1]+1,d[2]]]);
+    } else if (schedule === 'originals-first') {
+      await send('C up; D remains','touchEnd',[remainder[1]]);
+    }
+    if (schedule !== 'touchcancel') {
+      await send('last canceled finger moves','touchMove',active.map(([x,y,id])=>[x+1,y+1,id]));
+      checks.push(await state('last canceled finger'));
+    }
+    const recordCanceled = await readAppRecordSnapshot(page);
+    trace.canceledRecord = recordCanceled;
+    trace.noRevivalOk = checks.every(f=>sameHuntSky(f,trace.before)) && sameHuntRecord(recordCanceled,trace.recordBefore);
+    await send('physical all up',schedule === 'touchcancel' ? 'touchCancel' : 'touchEnd',[]);
+    trace.allUp = await readNativeHandWitness();
+    assert(trace.allUp.live.length === 0 && trace.allUp.events.at(-1)?.count === 0,
+      'native terminals and an empty physical TouchList precede the next hand');
+    trace.freshAim = await nativeSkyPoints();
+    assert(trace.freshAim, 'a fresh native pair has real sky-owned footprints');
+    const fresh = trace.freshAim.points.slice(0,2).map(([x,y],i)=>[x,y,401+i]);
+    await send('fresh A down','touchStart',[fresh[0]]);
+    await send('fresh B down','touchStart',fresh);
+    await send('fresh spread crosses once','touchMove',spreadHuntPair(fresh,1.6));
+    await page.waitForFunction(() => document.body.dataset.view === 'shelf',null,{timeout:5000});
+    trace.shelf = await state('fresh shelf crossing');
+    await send('crossed hand continues moving','touchMove',spreadHuntPair(fresh,1.8));
+    trace.afterExtraMove = await state('no second crossing');
+    await send('fresh physical all up','touchEnd',[]);
+    trace.input = await readNativeHandWitness(true); witnessStarted = false;
+    const events = trace.input.events, downs = events.filter(e=>e.type==='pointerdown');
+    const ids = [...new Set(downs.map(e=>e.id))];
+    const expectedDowns = schedule === 'touchcancel' ? 5 : 6;
+    const expectedCommands = {'originals-first':16,'third-first':17,touchcancel:11}[schedule];
+    const allUpCommand = trace.commands.findIndex(c=>c.label === 'physical all up');
+    trace.inputIntegrity = trace.inputError === null && trace.commands.length === expectedCommands &&
+      trace.commands.every(c=>c.acknowledged) && allUpCommand >= 0 &&
+      trace.commands.slice(0,allUpCommand+1).every(c=>c.physicalListMatches) &&
+      downs.length === expectedDowns && ids.length === expectedDowns && downs.every(e=>e.target==='sky' && !e.word) &&
+      ids.every(id=>events.some(e=>e.id===id && ['pointerup','pointercancel'].includes(e.type))) &&
+      events.some(e=>e.type==='pointermove') && events.some(e=>e.type==='touchmove') &&
+      events.every(e=>e.trusted && e.connected && e.stillConnected && e.sameDocument && e.postDispatch && e.stamp===trace.input.stamp) &&
+      trace.input.live.length === 0 && events.at(-1)?.count === 0 &&
+      (schedule !== 'touchcancel' || events.some(e=>e.type==='pointercancel') && events.some(e=>e.type==='touchcancel' && e.count===0));
+    trace.freshOk = trace.shelf.view === 'shelf' && !trace.shelf.active && trace.shelf.inert &&
+      !trace.shelf.mini && !trace.shelf.sheet && isDeepStrictEqual(trace.shelf.place,trace.before.place) &&
+      isDeepStrictEqual(trace.shelf.world,trace.before.world) && isDeepStrictEqual(trace.afterExtraMove,trace.shelf) &&
+      isDeepStrictEqual(trace.input.routes,['drift','shelf']);
+    const inverse = page.locator('.scale-thread[data-scale="shelf"] [data-scale-out]');
+    assert.equal(await inverse.count(),1,'one real shelf-to-sky inverse');
+    assert(await inverse.isVisible() && await inverse.isEnabled(),'the inverse is visibly enabled');
+    trace.inverseHit = await inverse.evaluate(n => {
+      const r=n.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
+      return {owned:hit===n||n.contains(hit),label:n.textContent,rect:{x:r.x,y:r.y,width:r.width,height:r.height}};
+    });
+    assert(trace.inverseHit.owned,'the visible inverse owns the native tap');
+    await inverse.tap();
+    await page.waitForFunction(() => document.body.dataset.view === 'drift' && document.getElementById('drift-layer')?.classList.contains('active') && !document.getElementById('drift-layer')?.inert,null,{timeout:5000});
+    trace.returned = await state('visible inverse returned');
+    trace.recordAfter = await readAppRecordSnapshot(page);
+    trace.returnOk = sameHuntSky(trace.returned,trace.before) && sameHuntRecord(trace.recordAfter,trace.recordBefore);
+    trace.complete = true;
+  } catch (error) {
+    trace.error = {message:error.message,stack:error.stack};
+  } finally {
+    // Cleanup is recorded and can never turn an incomplete stream into a pass.
+    if (active.length) {
+      try { await T('touchCancel',[]); trace.cleanupCanceled = true; }
+      catch (error) { trace.cleanupError = String(error); }
+    }
+    if (witnessStarted) trace.input = await readNativeHandWitness(true);
+    await shot(`08-native-canceled-${schedule}.png`);
+    stagings.push(trace);
+    writeFileSync(resolve(EVIDENCE,`${EVIDENCE_PHASE}-native-canceled-${schedule}.json`),JSON.stringify(trace,null,2)+'\n');
+  }
+  return trace;
+};
+
+const canceledHands = [];
+for (const schedule of ['originals-first','third-first','touchcancel']) canceledHands.push(await runCanceledHuntHand(schedule));
+const handPassed = (key) => canceledHands.length === 3 && canceledHands.every(t=>t.complete && t.inputIntegrity && t[key]);
+const handDetail = (key) => canceledHands.map(t=>`${t.schedule}: complete=${t.complete}, native=${t.inputIntegrity ?? false}, ${key}=${t[key] ?? false}${t.error ? `, error=${t.error.message}` : ''}`).join(' | ');
+check('hunt · a canceled three-pointer hand does not jump when a remainder moves',handPassed('noJumpOk'),handDetail('noJumpOk'));
+check('hunt · a canceled three-pointer hand cannot revive before all physical pointers end',handPassed('noRevivalOk'),handDetail('noRevivalOk'));
+check('hunt · a fully released canceled hand admits exactly one fresh native scale crossing',handPassed('freshOk'),handDetail('freshOk'));
+check('hunt · the fresh-hand visible inverse restores the retained sky place without record changes',handPassed('returnOk'),handDetail('returnOk'));
 
 /* 16 · lifecycle clocks yield to an active finger even when it is perfectly
  * still. This deliberately crosses the ten-second idle expiry boundary. */

@@ -5482,7 +5482,7 @@ body[data-furigana='2'] #drift-layer .drift-reading rt { opacity: 1; }
 .scale-thread > [data-scale-out] { position: sticky; left: 0; z-index: 1; width: 44px; max-width: 44px; padding-inline: 4px; background: var(--color-bar, var(--ed-paper)); font-size: 19px; }
 .scale-thread > [aria-current='step'] { font-weight: 600; }
 .scale-thread > button:disabled { cursor: default; opacity: 1; }
-#sheet > .scale-thread { position: sticky; top: calc(45px + env(safe-area-inset-top, 0px)); z-index: 3; display: flex; max-width: none; margin: -24px calc(-1 * var(--page-gutter, 32px)) 20px; padding-inline: max(12px, calc(var(--page-gutter, 20px) - 8px)); background: var(--color-bar, var(--ed-paper)); box-shadow: 0 1px 0 color-mix(in srgb, currentColor 12%, transparent); }
+#sheet > .scale-thread { position: sticky; top: calc(45px + env(safe-area-inset-top, 0px)); z-index: 3; display: flex; max-width: none; margin: 0 calc(-1 * var(--page-gutter, 32px)) 20px; padding-inline: max(12px, calc(var(--page-gutter, 20px) - 8px)); background: var(--color-bar, var(--ed-paper)); box-shadow: 0 1px 0 color-mix(in srgb, currentColor 12%, transparent); }
 #app > .scale-thread { position: sticky; top: calc(45px + env(safe-area-inset-top, 0px)); z-index: 19; flex: 0 0 auto; width: 100%; background: var(--color-bar, var(--ed-paper)); box-shadow: 0 1px 0 color-mix(in srgb, currentColor 12%, transparent); }
 body.ginga #app > .scale-thread { position: fixed; left: 0; top: calc(56px + env(safe-area-inset-top, 0px)); }
 /* The deck's one-finger vertical scroll must still allow the phone's text zoom. */

@@ -297,12 +297,16 @@ async function sheetViewportGeometry(page) {
   return page.evaluate((closeSelector) => {
     const sheet = document.querySelector('#sheet').getBoundingClientRect();
     const close = document.querySelector(closeSelector).getBoundingClientRect();
-    // G1: the entry is a whole-screen page; its measure is its content's column (the first block under its bar)
-    const content = document.querySelector('#sheet > :not(.sheet-bar)')?.getBoundingClientRect();
+    // The page's measure belongs to its content; the bar and scale thread are chrome.
+    const contentNode = document.querySelector('#sheet > :not(.sheet-bar):not(.scale-thread)');
+    const content = contentNode?.getBoundingClientRect();
+    const rails = [...document.querySelectorAll('#sheet > .scale-thread')];
     return { innerWidth, innerHeight, clientWidth: document.documentElement.clientWidth,
       scrollWidth: document.documentElement.scrollWidth,
       visualWidth: window.visualViewport?.width ?? innerWidth,
-      sheet: sheet.toJSON(), close: close.toJSON(), content: content ? content.toJSON() : null };
+      sheet: sheet.toJSON(), close: close.toJSON(), content: content ? content.toJSON() : null,
+      contentTag: contentNode?.tagName ?? null, contentClass: contentNode?.className ?? null,
+      rails: rails.map((rail) => rail.getBoundingClientRect().toJSON()) };
   }, await entryCloseSelector(page));
 }
 
@@ -1190,6 +1194,11 @@ async function main() {
   await waitForFiniteMotion(page, '#sheet');
   const phoneSheet = await sheetViewportGeometry(page);
   report.measurements.kanjiPhoneViewport = phoneSheet;
+  check('phone kanji: the scale thread is one full-width 44px rail above real content',
+    !!phoneSheet.content && phoneSheet.rails.length === 1 &&
+    phoneSheet.rails[0].left === 0 && phoneSheet.rails[0].width === VIEWPORT.width &&
+    phoneSheet.rails[0].height === 44 && phoneSheet.content.top >= phoneSheet.rails[0].bottom,
+    JSON.stringify(phoneSheet));
   check('phone thesaurus → kanji keeps the close control on the 390px viewport',
     phoneSheet.innerWidth === VIEWPORT.width && phoneSheet.clientWidth === VIEWPORT.width &&
     phoneSheet.scrollWidth <= VIEWPORT.width && phoneSheet.visualWidth === VIEWPORT.width &&
@@ -1226,6 +1235,11 @@ async function main() {
     const desktopSheet = await sheetViewportGeometry(desktopPage);
     report.measurements.kanjiDesktopViewport = desktopSheet;
     const column = desktopSheet.content;
+    check('desktop kanji: the scale thread is one full-width 44px rail above real content',
+      !!column && desktopSheet.rails.length === 1 &&
+      desktopSheet.rails[0].left === 0 && desktopSheet.rails[0].width === 1280 &&
+      desktopSheet.rails[0].height === 44 && column.top >= desktopSheet.rails[0].bottom,
+      JSON.stringify(desktopSheet));
     check('desktop kanji: the page covers the window, its content keeps a centred measure, its close is reachable',
       desktopSheet.scrollWidth <= 1280 && desktopSheet.sheet.left === 0 && desktopSheet.sheet.top === 0 &&
       desktopSheet.sheet.width === 1280 && desktopSheet.sheet.height === desktopSheet.innerHeight &&
