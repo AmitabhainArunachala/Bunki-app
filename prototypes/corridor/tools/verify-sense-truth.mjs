@@ -13,7 +13,8 @@
  *       C1 an auxiliary verb (助動詞) whose served entries headed by it have an auxiliary sense shows one
  *       C2 a suffix after a number (一つ, 一本, 12日, 二疋) written by a served entry read the text's way that has a
  *          counter's or a suffix's sense shows one
- *       C3 ない after a verb's stem or after the copula's or an adjective's conjunctive form never shows "nonexistent"
+ *       C3 ない after a verb's stem or after the copula's, an adjective's or an auxiliary's conjunctive form never shows
+ *          "nonexistent"
  *       C4 every row of the sense sidecar, tapped: the card shows the row's sense (or a name)
  *   S   recorded: taps, the sidecar's rows, coverage and agreement (from its receipts)
  * Negative controls: the sense rules off → G and C1–C3 go red; one sidecar row moved to another sense → C4 goes red.
@@ -105,6 +106,13 @@ const RULES = Object.freeze([
   fx('ただ, the adverb', 'aozora:000772-1', 157, 'ただ', '1538900', 3, 'ordinary'),
   fx('いけ in てはいけない', 'aozora:002359-1', 39, 'いけ', '1000730', 1, 'to be good (at)', { label: 'いけない' }),
   fx('一定, the noun', 'bunki-essay-n2-rain', 86, '一定', '1164950', 1, 'to fix'),
+  // the つく row's について (115 of its taps: "to be attached", "to be lit") and the idioms of the ない row (Grok's 727:
+  // もったいない, ちがいない/違いない, 間もなく), read whole; たくない (an auxiliary's く form) is "not"
+  fx('について (日本について)', 'wikinews:45227', 325, 'つい', '1009780', 0, 'to be lit (of a lamp, burner, etc.)', { label: 'について' }),
+  fx('もったいない', 'bunki-essay-n2-translation', 27, 'ない', '1605250', 0, 'nonexistent', { label: '勿体ない' }),
+  fx('ちがいない (言ったにちがいない)', 'aozora:000628', 1498, 'ない', '1610740', 0, 'nonexistent', { label: '違いない' }),
+  fx('間もなく', 'aozora:046605', 1524, 'なく', '1215290', 0, 'nonexistent', { label: '間もなく' }),
+  fx('たくない (〜たくない)', 'bunki-graded-n3-feel-jingu-forest', 462, 'ない', '1529520', 4, 'nonexistent'),
 ]);
 // Grok's "control, right" rows (and the adjective ない he left out of his tally): right before, right after
 const CONTROLS = Object.freeze([
@@ -176,8 +184,8 @@ const NAME = NAMES[0];
 const led = (glosses, lead) => (Number.isInteger(lead) && lead > 0 && lead < glosses.length
   ? [glosses[lead], ...glosses.filter((_, g) => g !== lead && g !== 0)] : glosses);
 // the fixtures whose word page is opened from the slip: a lookup word, a reading word the sidecar settles, a glossed
-// word, an expression
-const PAGE = new Set([RULES[0].name, SIDECAR[1].name, GLOSSED[0].name, SIDECAR[14].name]);
+// word, an expression (方がいい: a reading word; a single-kanji lookup word's band opens the kanji's page on this branch)
+const PAGE = new Set([RULES[0].name, SIDECAR[1].name, GLOSSED[0].name, IMPRECISE[6].name]);
 
 /* ------------------------------------------------------------------ F0 */
 const sidecarRow = (at, index) => sidecar.articles?.[at]?.[String(index)] || null;
@@ -236,9 +244,15 @@ const F0_OK = rows.every((row) => row.recorded || row.ok);
 
 /* ------------------------------------------------------------------ the browser */
 const host = await startStaticHost({ site, port: 0 });
+// an article's first word, waited for up to a minute: a long text (やまなし, 1,692 words) under a full battery's load has
+// taken over 20 s to draw; a wait, not an assertion
+const OPEN_MS = 60000;
+// the reader is drawn when any of its words has a box (a text may hold hidden words before its first paragraph)
+const readerDrawn = (page) => page.waitForFunction(() => [...document.querySelectorAll('#reader .tok[data-index]')]
+  .some((node) => node.getBoundingClientRect().height > 0), null, { timeout: OPEN_MS });
 async function boot(page) {
   await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi`);
-  await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
+  await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: OPEN_MS });
 }
 async function openArticle(page, id) {
   const row = fileOf.get(id);
@@ -247,8 +261,8 @@ async function openArticle(page, id) {
     if (!(await openArticle(page, row.adaptation.basedOn))) return false;
     await page.locator(`.version-choice[data-version="${id}"]`).click();
     await page.waitForFunction((pid) => document.querySelector(`.version-choice[data-version="${pid}"]`)?.getAttribute('aria-pressed') === 'true',
-      id, { timeout: 20000 });
-    await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 20000 });
+      id, { timeout: OPEN_MS });
+    await readerDrawn(page);
     return true;
   }
   await boot(page);
@@ -262,7 +276,7 @@ async function openArticle(page, id) {
     try { await found.waitFor({ timeout: 5000 }); } catch { return false; }
     await found.click();
   }
-  await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 20000 });
+  await readerDrawn(page);
   return true;
 }
 const tok = (page, index) => page.locator(`#reader .tok[data-index="${index}"], #reader .tok[data-index-end]`).filter({ has: page.locator(':scope') })
@@ -285,8 +299,8 @@ const cardState = (page) => page.evaluate(() => {
 async function card(page, index) {
   await closeMini(page);
   const target = page.locator(`#reader .tok[data-index="${index}"]`).first();
-  await target.tap({ timeout: 15000 });
-  await page.locator('#mini').waitFor({ timeout: 20000 });
+  await target.tap({ timeout: 30000 });
+  await page.locator('#mini').waitFor({ timeout: OPEN_MS });
   await page.waitForFunction(() => {
     const mini = document.getElementById('mini');
     return mini && mini.getAttribute('aria-busy') !== 'true' && mini.dataset.sense !== 'pending';
@@ -304,30 +318,51 @@ async function pageSense(page) {
     text: node.querySelector('.gloss, .dictionary-glosses li')?.textContent ?? '' })).filter((sense) => sense.marked));
 }
 
-async function grokCases(page) {
+async function grokCases(_, fresh) {
   const fixtures = [...RULES, ...CONTROLS, ...MORE, ...SIDECAR, ...IMPRECISE].map((f) => ({ ...f, kind: 'sense' }))
     .concat(GLOSSED.map((f) => ({ ...f, kind: 'gloss' })), NAMES.map((f) => ({ ...f, kind: 'name' })));
   for (const fixture of fixtures) {
-    if (!(await openArticle(page, fixture.at))) { check(`G.${fixture.name}`, `${fixture.at} opens from the shelf`, false); continue; }
+    // each row in its own context; a row that cannot be run (a timeout: the page stalled) runs once more in a fresh
+    // one, and fails alone, with its screenshot, if it still cannot; its checks are recorded once, from the run that ran
+    for (let attempt = 1; ; attempt += 1) {
+      const { page, close } = await fresh();
+      try {
+        const rows = await grokCase(page, fixture);
+        for (const row of rows) check(row[0], row[1], row[2], attempt > 1 ? { attempt, detail: row[3] } : row[3]);
+        break;
+      } catch (error) {
+        if (attempt < 2) { retried.push(`${engine}:${fixture.name}: ${String(error.message || error).split('\n')[0].slice(0, 120)}`); continue; }
+        check(`G.${fixture.name}`, `${fixture.at} #${fixture.index} ${fixture.s}: the row ran`, false, String(error.message || error).slice(0, 400));
+        await page.screenshot({ path: resolve(evidence, `${engine}-G-${fixture.at.replace(/[^a-z0-9]+/giu, '_')}-${fixture.index}.png`) }).catch(() => {});
+        break;
+      } finally { await close(); }
+    }
+  }
+}
+const retried = [];
+/** One row of Grok's tables, tapped: the checks it earns, as [name, description, ok, detail] (recorded by grokCases). */
+async function grokCase(page, fixture) {
+  const rows = [];
+  {
+    if (!(await openArticle(page, fixture.at))) return [[`G.${fixture.name}`, `${fixture.at} opens from the shelf`, false]];
     const got = await card(page, fixture.index);
     if (fixture.kind === 'name') {
-      check(`G.${fixture.name}`, `${fixture.at} #${fixture.index} ${fixture.s}: the card says it is a name in this text, never "${fixture.never}"`,
-        got?.word === fixture.s && got.lines[0] === 'a name in this text' && !got.lines.includes(fixture.never), got);
-      continue;
+      return [[`G.${fixture.name}`, `${fixture.at} #${fixture.index} ${fixture.s}: the card says it is a name in this text, never "${fixture.never}"`,
+        got?.word === fixture.s && got.lines[0] === 'a name in this text' && !got.lines.includes(fixture.never), got]];
     }
     const lead = fixture.kind === 'gloss' ? sidecarRow(fixture.at, fixture.index)?.[3] : undefined;
     const glosses = led(glossesOf(fixture.seq, fixture.k), lead);
     const lines = [...(got?.lines || []), ...(got?.more ? got.more.split('; ') : [])];
-    check(`G.${fixture.name}`, `${fixture.at} #${fixture.index} ${fixture.s}: the card is entry ${fixture.seq} sense ${fixture.k + 1}, "${glosses[0]}"${glosses.length > 1 ? ' then its next glosses' : ''}${fixture.kind === 'gloss' ? ` (led by the sidecar's gloss ${lead})` : ''}; never "${fixture.never}"`,
+    rows.push([`G.${fixture.name}`, `${fixture.at} #${fixture.index} ${fixture.s}: the card is entry ${fixture.seq} sense ${fixture.k + 1}, "${glosses[0]}"${glosses.length > 1 ? ' then its next glosses' : ''}${fixture.kind === 'gloss' ? ` (led by the sidecar's gloss ${lead})` : ''}; never "${fixture.never}"`,
       got?.lines?.[0] === glosses[0] && got.sense === `${fixture.seq}:${fixture.k}` && (!fixture.label || got.word === fixture.label)
         && (glosses.length < 2 || got.more.startsWith(glosses[1])) && (fixture.kind !== 'gloss' || fixture.leads.includes(lead))
-        && !lines.includes(fixture.never), got);
+        && !lines.includes(fixture.never), got]);
     if (PAGE.has(fixture.name)) {
       const marked = await pageSense(page);
-      check(`P.${fixture.name}`, `its word page marks sense ${fixture.k + 1} as the meaning in this text`, marked.length === 1 && marked[0].k === fixture.k, marked);
+      rows.push([`P.${fixture.name}`, `its word page marks sense ${fixture.k + 1} as the meaning in this text`, marked.length === 1 && marked[0].k === fixture.k, marked]);
     }
   }
-  await closeMini(page);
+  return rows;
 }
 
 /* ------------------------------------------------------------------ C · classes across the shelf */
@@ -357,8 +392,10 @@ function classCases() {
           .some((entry) => (detailOf(entry[0])?.[3] || []).some((sense) => sense[0].some((code) => /^(?:ctr|suf|n-suf)$/u.test(code))))) {
         add('C2', row.id, index, token, `C2|${token.s}|${token.r}`);
       }
+      // an adjective's or an auxiliary's く form (高くない, 行きたくない)
+      const ku = (t) => ['形容詞', '助動詞'].includes(t?.p) && /く$/u.test(String(t?.s || ''));
       if (['ない', '無い'].includes(token.b) && (token.p === '助動詞' || (token.p === '形容詞' && (['で', 'じゃ', 'じゃあ'].includes(prev?.s)
-        || (prev?.p === '形容詞' && /く$/u.test(prev.s)) || (['は', 'も'].includes(prev?.s) && (['で', 'じゃ'].includes(prev2?.s) || (prev2?.p === '形容詞' && /く$/u.test(prev2.s)))))))) {
+        || ku(prev) || (['は', 'も'].includes(prev?.s) && (['で', 'じゃ'].includes(prev2?.s) || ku(prev2))))))) {
         add('C3', row.id, index, token, `C3|${token.s}|${token.p}|${prev?.s}`);
       }
     });
@@ -367,16 +404,33 @@ function classCases() {
   return [...keys.values()];
 }
 
-async function classSweep(page, cases) {
+async function classSweep(fresh, cases) {
   const report = { cls: {}, failures: [] };
   const byArticle = new Map();
   for (const item of cases) { if (!byArticle.has(item.at)) byArticle.set(item.at, []); byArticle.get(item.at).push(item); }
   for (const [at, items] of byArticle) {
-    if (!(await openArticle(page, at))) { for (const item of items) report.failures.push({ ...item, issue: 'not on the shelf' }); continue; }
+    // each text in its own context (see fresh); a text that cannot be opened fails its rows, with the reason
+    const { page, close } = await fresh();
+    try {
+    let opened = false;
+    try { opened = await openArticle(page, at); } catch (error) { opened = false; }
+    if (!opened) {
+      // a text that did not open fails every row of it (counted, never skipped)
+      for (const item of items) {
+        const cls = report.cls[item.cls] ||= { tapped: 0, occurrences: 0, failed: 0 };
+        cls.failed += 1; cls.occurrences += item.occurrences;
+        report.failures.push({ cls: item.cls, at: item.at, index: item.index, s: item.token?.s, got: null, issue: 'the text did not open' });
+      }
+      continue;
+    }
     for (const item of items.sort((a, b) => a.index - b.index)) {
       const cls = report.cls[item.cls] ||= { tapped: 0, occurrences: 0, failed: 0 };
       let got = null;
-      try { got = await card(page, item.index); } catch (error) { got = null; }
+      // a tap that times out (the page stalled) gets one more try; a card that answers wrongly is never retried
+      try { got = await card(page, item.index); } catch (error) {
+        retried.push(`${engine}:C:${item.at}#${item.index}: ${String(error.message || error).split('\n')[0].slice(0, 120)}`);
+        try { got = await card(page, item.index); } catch (again) { got = null; }
+      }
       cls.tapped += 1; cls.occurrences += item.occurrences;
       const [seq, k] = String(got?.sense || ':').split(':');
       const pos = seq ? posOfSense(seq, Number(k)) : [];
@@ -392,6 +446,7 @@ async function classSweep(page, cases) {
       }
       if (!ok) { cls.failed += 1; report.failures.push({ cls: item.cls, at: item.at, index: item.index, s: item.token?.s, got }); }
     }
+    } finally { await close(); }
   }
   return report;
 }
@@ -412,7 +467,18 @@ try {
       const page = await context.newPage(), errors = [];
       page.setDefaultTimeout(15000);
       page.on('pageerror', (error) => errors.push(error.message));
-      try { return await body(page); }
+      // a fresh context for a part that opens many texts: one page load after another in the same context has stalled a
+      // tap for minutes in WebKit (both N2's build and R3's: R3/tools/boot-timing.mjs)
+      const fresh = async () => {
+        const own = await browser.newContext(contextOptions);
+        await silenceBrowserAudio(own);
+        await own.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
+        const p = await own.newPage();
+        p.setDefaultTimeout(15000);
+        p.on('pageerror', (error) => errors.push(error.message));
+        return { page: p, close: () => own.close() };
+      };
+      try { return await body(page, fresh); }
       catch (error) {
         check(`${name}.error`, `${name} ran to the end`, false, String(error.stack || error).slice(0, 600));
         await page.screenshot({ path: resolve(evidence, `${engine}-${name}.png`) }).catch(() => {});
@@ -424,7 +490,7 @@ try {
     };
     if (run('g')) await each('g', grokCases);
     if (run('c')) {
-      const report = await each('c', (page) => classSweep(page, cases));
+      const report = await each('c', (_, fresh) => classSweep(fresh, cases));
       if (report) {
         writeFileSync(resolve(evidence, `classes-${engine}.json`), `${JSON.stringify(report, null, 1)}\n`);
         const list = (cls) => report.failures.filter((x) => x.cls === cls).map((x) => `${x.at} #${x.index} ${x.s}: ${JSON.stringify(x.got)?.slice(0, 160)}`).slice(0, 10);
@@ -444,6 +510,7 @@ try {
 } finally {
   await host.close();
   const failed = rows.filter((row) => !row.recorded && !row.ok);
+  record('S.retried', 'rows and taps run once more after a timeout (never after a wrong answer)', { count: retried.length, retried: retried.slice(0, 40) });
   writeFileSync(resolve(evidence, 'verify-sense-truth.json'), `${JSON.stringify({ site, served: identity.gitSha, artifactSha256: identity.artifactSha256,
     engines, versions, partial: ONLY.length ? ONLY : false, failed: failed.length, rows }, null, 2)}\n`);
   if (ONLY.length) console.log(`PARTIAL RUN (${ONLY.join(', ')}): a control's scope, not an acceptance result`);
