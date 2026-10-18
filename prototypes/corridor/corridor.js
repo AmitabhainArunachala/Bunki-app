@@ -11461,7 +11461,8 @@ function frameFoot(onPage, fixedEdge) {
 }
 /** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
 function keepFloatingBeside(card, anchor, { follow = false } = {}) {
-  placeFloating(card, anchorBox(anchor));
+  placeFloating(card, anchorBox(anchor), anchor);
+  card.addEventListener('scroll', () => markCardMore(card), { passive: true });
   card.addEventListener('focusin', () => {
     requestAnimationFrame(() => { if (card.isConnected) revealFloatingFocus(card); });
   });
@@ -11473,7 +11474,7 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
       const now = anchor.getBoundingClientRect();
       if (Math.abs(now.left - was.left) < 1 && Math.abs(now.top - was.top) < 1) return;
       was = now;
-      placeFloating(card, anchorBox(anchor));
+      placeFloating(card, anchorBox(anchor), anchor);
     }, 120);
   }
   if (typeof ResizeObserver !== 'function') return;
@@ -11482,7 +11483,7 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
   const seat = () => {
     if (!card.isConnected || !anchor.isConnected) { watch.disconnect(); grow?.disconnect(); return; }
     if (Math.abs(card.getBoundingClientRect().height - last) < 1) return;
-    placeFloating(card, anchorBox(anchor));
+    placeFloating(card, anchorBox(anchor), anchor);
     last = card.getBoundingClientRect().height;
   };
   // L · seating the card resizes the very element the ResizeObserver watches (maxHeight), and a size changed inside
@@ -11510,7 +11511,59 @@ function layersMarkTop(left, width) {
   if (!box?.height || box.right <= left || box.left >= left + width) return null;
   return box.top;
 }
-function placeFloating(card, r) {
+/** Hfix-1A · how far the reading moves so a card taller than the room on either side of its word stands whole beside it:
+ * the hold strip's own rule (placeSealStrip), the least move, never so far that the word leaves the glass. The scroller is
+ * the page when the word is on one, else the document; a word in a layer that does not scroll with the reading (the sky,
+ * a deck, a list of its own) never moves. Returns the move in px (positive: the reading rises), or 0. With `most`, a card
+ * no seat can hold whole gets the move that gives it the most room the glass allows (its word at the glass's edge). */
+function readingMoveFor(anchor, r, tall, ceiling, floor, { most = false } = {}) {
+  if (!anchor?.isConnected) return 0;
+  const scroller = anchor.closest('#sheet');
+  for (let node = anchor.parentElement; node && node !== (scroller || document.body); node = node.parentElement) {
+    const style = getComputedStyle(node);
+    if (style.position === 'fixed' || style.position === 'sticky') return 0;
+    if (/(auto|scroll)/u.test(style.overflowY) && node.scrollHeight > node.clientHeight + 1) return 0;
+  }
+  const room = scroller
+    ? { up: scroller.scrollTop, down: scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop }
+    : { up: window.scrollY, down: document.documentElement.scrollHeight - window.innerHeight - window.scrollY };
+  const moves = [];
+  const rise = Math.ceil(r.bottom + 10 + tall - floor);
+  if (rise > 0 && rise <= room.down && r.top - rise >= ceiling) moves.push(rise);
+  const fall = Math.ceil(ceiling - (r.top - 10 - tall));
+  if (fall > 0 && fall <= room.up && r.bottom + fall <= floor) moves.push(-fall);
+  if (moves.length || !most) return moves.sort((a, b) => Math.abs(a) - Math.abs(b))[0] || 0;
+  const now = Math.max(r.top - 10 - ceiling, floor - (r.bottom + 10));
+  const up = Math.max(0, Math.min(Math.floor(r.top - ceiling), room.down));
+  const down = Math.max(0, Math.min(Math.floor(floor - r.bottom), room.up));
+  const best = [[up, floor - (r.bottom - up + 10)], [-down, r.top + down - 10 - ceiling]].sort((a, b) => b[1] - a[1])[0];
+  return best[1] >= now + 24 ? best[0] : 0;
+}
+/** Hfix-1A · a card shortened to its room ends between two of its rows, never across one (H1: 理's row sliced through
+ * its glyph): the deepest row foot inside the room, else the room. */
+function rowCut(card, room) {
+  const box = card.getBoundingClientRect();
+  let foot = 0;
+  for (const row of card.querySelectorAll(':scope > *, .mini-web > *, .mini-kanji > *, .mini-sentence-wrap > *')) {
+    if (!row.getClientRects().length) continue;
+    const bottom = row.getBoundingClientRect().bottom - box.top + card.scrollTop;
+    if (bottom + 1 <= room && bottom > foot) foot = bottom;
+  }
+  return foot >= 96 ? Math.ceil(foot + 1) : room;
+}
+/** Hfix-1A · a card with more below its cut says so: its foot fades into the band the cut falls in (data-more, the
+ * strip's own sign), and it scrolls by touch and by keyboard (its rows are buttons; revealFloatingFocus follows them). */
+function markCardMore(card) {
+  const more = card.style.overflowY === 'auto' && card.scrollHeight - card.scrollTop - card.clientHeight > 1;
+  if (card.dataset.more !== String(more)) card.dataset.more = String(more);
+  if (!more) return;
+  const box = card.getBoundingClientRect(), cut = box.top + card.clientHeight + card.scrollTop - 1;
+  const band = [...card.children].find((node) => { const b = node.getBoundingClientRect(); return b.top + card.scrollTop <= cut && b.bottom + card.scrollTop > cut; });
+  const ground = band ? getComputedStyle(band).backgroundColor : '';
+  if (ground && ground !== 'transparent' && !/[,/]\s*0\)$/u.test(ground)) card.style.setProperty('--mini-more-ground', ground);
+  else card.style.removeProperty('--mini-more-ground');
+}
+function placeFloating(card, r, anchor = null) {
   const wasDocument = card.dataset.flow === 'document';
   if (wasDocument && !card.classList.contains('is-sentence')) {
     const before = window.scrollY;
@@ -11541,7 +11594,7 @@ function placeFloating(card, r) {
     : Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2));
   const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
     fixedEdge('.kp-grades', 'top') ?? height, layersMarkTop(cardLeft, m.width) ?? height) - 8;
-  const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
+  let roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
   const sentence = card.classList.contains('is-sentence');
   let seatHeight = m.height;
   // Reserve the real sentence view's space before the word popup appears. The inert
@@ -11580,6 +11633,7 @@ function placeFloating(card, r) {
     card.style.top = `${r.bottom + 10 + window.scrollY}px`;
     delete card.dataset.floatingTop;
     card.dataset.side = 'below';
+    markCardMore(card);
     revealFloatingFocus(card);
     return;
   }
@@ -11592,22 +11646,40 @@ function placeFloating(card, r) {
       card.style.overflowY = 'auto';
     }
   }
-  else if (seatHeight <= roomAbove) top = r.top - 10 - seatHeight;
-  else if (seatHeight <= roomBelow) top = r.bottom + 10;
-  else if (seatHeight > m.height && seatHeight <= floor - ceiling) {
-    top = ceiling;
-    // The word view still ends before its anchor; only the expanded sentence uses
-    // the reserved room below it. The next printed word stays available to tap.
-    if (m.height > roomAbove) {
-      card.style.maxHeight = `${Math.max(96, roomAbove)}px`;
-      card.style.overflowY = 'auto';
-    }
-  }
   else {
-    const room = Math.max(roomAbove, roomBelow, 96);
-    card.style.maxHeight = `${room}px`;
-    card.style.overflowY = 'auto';
-    top = roomAbove >= roomBelow ? Math.max(ceiling, r.top - 10 - room) : r.bottom + 10;
+    // Hfix-1A · the word card stands whole beside its word first (the sentence's reserve only chooses between the seats
+    // that hold it whole); then the reading moves the least that seats it whole; only then is it cut, between two rows
+    const seatWhole = () => {
+      if (seatHeight <= roomAbove) return r.top - 10 - seatHeight;
+      if (seatHeight <= roomBelow) return r.bottom + 10;
+      // The word view still ends before its anchor; only the expanded sentence uses
+      // the reserved room below it. The next printed word stays available to tap.
+      if (seatHeight > m.height && seatHeight <= floor - ceiling && m.height <= roomAbove) return ceiling;
+      if (m.height <= roomBelow) return r.bottom + 10;
+      if (m.height <= roomAbove) return r.top - 10 - m.height;
+      return null;
+    };
+    top = seatWhole();
+    if (top == null && anchor && !sentence) {
+      const move = readingMoveFor(anchor, r, m.height, ceiling, floor, { most: true });
+      if (move) {
+        const scroller = anchor.closest('#sheet');
+        if (scroller) scroller.scrollTop += move;
+        else window.scrollTo({ top: window.scrollY + move, behavior: 'instant' });
+        r = anchorBox(anchor);
+        roomAbove = r.top - 10 - ceiling;
+        roomBelow = floor - (r.bottom + 10);
+        top = seatWhole();
+      }
+    }
+    if (top == null) {
+      const fit = rowCut(card, Math.max(roomAbove, roomBelow, 96));
+      card.style.maxHeight = `${fit}px`;
+      card.style.overflowY = 'auto';
+      // above its word a cut card still meets the chrome's edge (no strip of cut title glyphs over it); its foot, shortened
+      // to a row, ends further from the word
+      top = roomAbove >= roomBelow ? ceiling : r.bottom + 10;
+    }
   }
   // a card nearly as wide as the screen is centred, its two gutters equal (review round 2 #13);
   // a narrower card stays beside its word
@@ -11620,6 +11692,7 @@ function placeFloating(card, r) {
   else delete card.dataset.floatingTop;
   // which side of its word the card stands on: its shade falls away from the word, never across it
   card.dataset.side = top < r.top ? 'above' : 'below';
+  markCardMore(card);
   revealFloatingFocus(card);
 }
 

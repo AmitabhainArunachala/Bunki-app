@@ -730,6 +730,23 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
     0 -16px 48px -14px rgb(0 0 0 / 62%);
 }
 
+/* Hfix-1A · a stage cut short of its rows (no seat on the glass holds it whole) ends between two rows and says it scrolls:
+   its foot fades into the band the cut falls in (corridor.js markCardMore), the hold strip's own sign
+   (editorial.css .seal-strip[data-more]), and the fade leaves once the last row is in view */
+#mini[data-more='true']::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  flex: none;
+  display: block;
+  height: 22px;
+  margin-top: -22px;
+  /* bokashi: atenashi — the stage's foot — focus: the band's own ground rising over its last 22 px, where there is more */
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--mini-more-ground, var(--mini-paper)) 0%, transparent),
+    var(--mini-more-ground, var(--mini-paper)));
+  pointer-events: none;
+}
+
 /* 1. the word band */
 #mini .mini-head { display: grid; align-items: start; }
 #mini .mini-head-text { display: grid; gap: 2px; min-width: 0; }
