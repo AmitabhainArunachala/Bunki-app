@@ -529,6 +529,37 @@ async function reachChromeNatively(page, width) {
     strokes: strokes.map(({ events, ...s }) => ({ ...s, events: events.map(e => `${e.type}:${e.target}${e.connected ? '' : '(detached)'}`) })) };
 }
 
+/** Under 360 px the reader's bar yields its Learn door to the tab bar, as every room's does (the lead's ruling, 2026-10-19:
+ * Q's G-12 over G6's scrolling eight; Grok's H0-3), so its seven doors fit the phone. Each visible door stands whole on
+ * screen and inside the bar (nothing clipped by the toolbar's own scroller, which G6 keeps only as a safety net), is at
+ * least 44 px and its own hit target; nothing overlaps; Learn stays one tap away in the tab bar; the page stays the
+ * phone's width. */
+async function standChrome(page, width) {
+  const at = await measureChromeTargets(page);
+  const learn = await page.evaluate(() => {
+    const door = document.querySelector('#app > .chrome > #chrome-dojo');
+    const tab = document.querySelector('#tab-learn');
+    const shown = (n) => !!n && n.checkVisibility() && n.getBoundingClientRect().width > 1;
+    return { door: shown(door), tab: shown(tab) };
+  });
+  const doors = at.rows.filter(r => r.bar).map(r => r.id);
+  const verdict = {
+    sevenDistinctDoors: doors.length === 7 && new Set(doors).size === 7,
+    learnInTabBar: !learn.door && learn.tab,
+    everyDoorWhole: at.rows.every(r => r.whole),
+    toolbarFits: !!at.port && at.port.scrollMax <= 0,
+    targetsAtLeast44: at.rows.every(r => r.width >= 44 && r.height >= 44),
+    everyDoorReachable: at.rows.every(r => r.reachable),
+    noOverlap: !at.overlaps.length,
+    saveOwnership: at.saveOwnership,
+    viewportWidth: at.page.view === 'reader' && at.page.innerWidth === width && at.page.documentWidth <= width
+      && at.page.bodyWidth <= width && (at.page.readerWidth ?? 0) <= width
+      && at.page.visual?.width === width && at.page.visual?.scale === 1,
+  };
+  return { valid: Object.values(verdict).every(Boolean), verdict, doors, learn, port: at.port, page: at.page,
+    rows: at.rows.map(r => ({ id: r.id, x: Math.round(r.x), right: Math.round(r.right), width: Math.round(r.width), whole: r.whole, reachable: r.reachable })) };
+}
+
 /* measurement helpers evaluated in the page */
 export const MEASURE_FN = `(() => {
   const visible = (node) => {
@@ -1737,8 +1768,7 @@ async function main() {
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
   await settleReader(page);
-  // At 320 the eight doors are wider than the phone, so they are reached by native strokes on the toolbar; a stroke
-  // is an outside press that puts the slip away, so the selected 390 row is measured before it.
+  // At 320 the bar's seven doors fit the phone whole (Learn waits in the tab bar under 360 px); at 390 its eight do.
   const chromeGeometry = [];
   for (const selected of [false, true]) {
     if (selected) {
@@ -1751,30 +1781,31 @@ async function main() {
       await waitForFiniteMotion(page, '.chrome');
       await shoot(page, shotsDir, `07-reader-chrome-${width}-${selected ? 'selected' : 'unselected'}`);
       if (width === 320) {
-        const reach = await reachChromeNatively(page, width);
-        chromeGeometry.push({ selected, width, ...reach });
-        check(`reader navigation · ${width}px ${selected ? 'selected' : 'unselected'} controls remain reachable by native toolbar scroll`,
-          reach.valid, JSON.stringify({ verdict: reach.verdict, doors: reach.doors, seen: reach.seen,
-            strokes: reach.strokes.map(s => ({ origin: s.origin, forward: s.forward, complete: s.complete, acknowledged: s.acknowledged, inputError: s.inputError })),
-            scroll: reach.positions.map(at => at.port?.scrollLeft), page: reach.positions[0].page }));
+        const stand = await standChrome(page, width);
+        chromeGeometry.push({ selected, width, ...stand });
+        check(`reader navigation · ${width}px ${selected ? 'selected' : 'unselected'}: seven doors stand whole, each 44 px and its own target, Learn in the tab bar, the page ${width} wide`,
+          stand.valid, JSON.stringify(stand));
         continue;
       }
       const geometry = await measureChromeTargets(page);
       chromeGeometry.push({ selected, ...geometry });
       check(`reader navigation · ${width}px ${selected ? 'selected' : 'unselected'} controls remain reachable`,
         geometry.valid, JSON.stringify(geometry));
+      if (!selected) {
+        const learnDoor = await page.evaluate(() => !!document.querySelector('#app > .chrome > #chrome-dojo')?.checkVisibility());
+        check(`reader navigation · ${width}px the Learn door stands in the bar: it yields to the tab bar only under 360 px`, learnDoor, String(learnDoor));
+      }
     }
   }
   report.measurements.readerChrome = chromeGeometry;
-  const lockedBar = await page.addStyleTag({ content: '#app > .chrome { overflow-x: hidden !important; }' });
-  const lockedReach = await reachChromeNatively(page, 320);
-  check('reader navigation · a 320px toolbar that native strokes cannot scroll leaves its last door unreached',
-    !lockedReach.valid && !lockedReach.verdict.everyDoorReached && !lockedReach.seen.includes('tray')
-      && lockedReach.strokes.length > 0 && lockedReach.strokes.every(s => s.complete)
-      && Object.entries(lockedReach.verdict).every(([premise, held]) => premise === 'everyDoorReached' || held),
-    JSON.stringify({ verdict: lockedReach.verdict, seen: lockedReach.seen,
-      strokes: lockedReach.strokes.map(s => ({ origin: s.origin, forward: s.forward, complete: s.complete, acknowledged: s.acknowledged, inputError: s.inputError })) }));
-  await lockedBar.evaluate(n => n.remove());
+  // the negative control: the Learn door given back at 320 px crowds the bar past the phone. Its last door no longer
+  // stands whole, while the toolbar's own scroller (G6's safety net) still keeps the page 320 wide.
+  const learnBack = await page.addStyleTag({ content: 'body.has-primary-tabs:not(.zen) #app > .chrome > #chrome-dojo { display: inline-flex !important; }' });
+  const crowded = await standChrome(page, 320);
+  check('reader navigation · a 320px bar given its Learn door back no longer stands whole, and the page stays 320 wide',
+    !crowded.valid && !crowded.verdict.learnInTabBar && !crowded.verdict.toolbarFits && !crowded.verdict.everyDoorWhole
+      && crowded.verdict.viewportWidth, JSON.stringify(crowded));
+  await learnBack.evaluate(n => n.remove());
   await page.setViewportSize(VIEWPORT);
   await page.evaluate(() => { window.scrollTo(0, 0); });
   await waitForFiniteMotion(page, '.chrome');

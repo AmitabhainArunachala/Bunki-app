@@ -4698,12 +4698,11 @@ body.has-primary-tabs:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-g
 body.has-primary-tabs:not(.zen) #app > .chrome > button#tray .l-ja { font: 500 var(--type-caption)/1 var(--font-data); font-variant-numeric: tabular-nums; }
 @media (max-width: 360px) {
   /* the narrowest phones keep ONE row: the Learn door yields to the Learn tab one thumb away,
-     and Lists becomes its bookmark with the count set small at its shoulder. The reader is the exception again (G6, the
-     lead's 2135 decision, kept at the merge): its eight doors keep their 44 px targets on one row and what exceeds the
-     phone scrolls inside the toolbar (the 520 px rule), so the page stays the phone's width. Q's G-12 hid the reader's
-     Learn door here instead, so its seven fit without a scroll; the two cannot both hold at 320 px (see INTG3's hand-back). */
+     and Lists becomes its bookmark with the count set small at its shoulder. The reader too (Q's G-12; the lead's ruling
+     of 2026-10-19 over G6's scrolling eight, closing Grok's H0-3): its seven 44 px doors fit the phone whole. G6's
+     overflow-x on the reader's toolbar (the 520 px rule) stays as a safety net only, so the page never widens. */
   body.has-primary-tabs:not(.zen) #app > .chrome { padding-inline: 2px; }
-  body.has-primary-tabs:not(.zen):not([data-view='reader']) #app > .chrome > button.chrome-dojo { display: none; }
+  body.has-primary-tabs:not(.zen) #app > .chrome > button.chrome-dojo { display: none; }
   body.has-primary-tabs:not(.zen) #app > .chrome .lang-seg { padding-right: 3px; background-position: right 1px center; }
   body.has-primary-tabs:not(.zen) #app > .chrome > button#tray {
     position: relative;
@@ -5221,7 +5220,8 @@ body:not(.zen) #app > .chrome > button.theme-seal::after { inset: 12px; }
 body:not(.zen) #app > .chrome .lang-seg button { letter-spacing: 0; }
 body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { background: var(--color-bar-ink); height: 2px; }
 /* ---- The reader's top line stays one row at every phone width. With Save present,
-   all eight doors keep their 44px targets; excess width scrolls inside this toolbar,
+   all its doors keep their 44px targets (eight; seven under 360 px, where Learn waits in
+   the tab bar). Should they ever exceed the row, the excess scrolls inside this toolbar,
    so the page and its fixed layers retain the viewport width. ---- */
 @media (max-width: 520px) {
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { flex-wrap: nowrap; padding-inline: 2px; min-width: 0; max-width: 100%; overflow-x: auto; }
@@ -5238,7 +5238,8 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
   }
 }
 @media (max-width: 374px) {
-  /* the narrowest phones: the eight 44px doors close their gaps; what still exceeds the row scrolls inside the toolbar */
+  /* the narrowest phones: the doors close their gaps (under 360 px the reader's seven, Learn in the tab bar); the
+     toolbar's own scroller is only a safety net */
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { gap: 0; }
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg button { min-width: 44px; padding-inline: 0; }
 }
