@@ -5798,6 +5798,9 @@ body.record-not-saving #app > .chrome { margin-bottom: var(--record-band-h, 48px
 }
 /* one press keeps the word and opens its drawer: the words say Save, no caret */
 #app > .chrome button.save-one.chrome-keep::after { content: none; }
+/* Hfix-1A · one Save on screen: while a stage or a word page stands the bar's keep steps aside, keeping its room so no
+   other door moves (corridor.js paintKeepAside, which also makes it inert); it returns when they close */
+#app > .chrome button.save-one.chrome-keep[data-aside] { visibility: hidden; }
 #app > .chrome .chrome-keep .save-bar-verb {
   font: 600 var(--type-caption)/1 var(--font-ui);
   letter-spacing: 0.02em;

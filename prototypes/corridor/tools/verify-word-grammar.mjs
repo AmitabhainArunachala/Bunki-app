@@ -2801,18 +2801,27 @@ try {
       await openStory(page, { story: { id: 'aozora:049966-1', search: '河口慧海' } });
       const meaning = page.locator('#reader .tok[data-index="540"]');
       const shina = page.locator('#reader .tok[data-index="547"]');
+      // Hfix-1A (one Save on screen; it pinned "the bar names the stage's word" while the stage stood): while a stage stands
+      // the bar's Save steps aside (hidden, its room kept, inert) and still names that word; folded, it returns naming it
+      const keep = () => page.evaluate(() => { const bar = document.getElementById('chrome-keep'); return bar && { name: bar.getAttribute('aria-label'), text: bar.textContent,
+        disabled: bar.disabled, held: bar.classList.contains('reader-capture-held'), rest: bar.hasAttribute('data-save-rest'),
+        aside: bar.hasAttribute('data-aside') && bar.inert && getComputedStyle(bar).visibility === 'hidden', shown: !bar.inert && getComputedStyle(bar).visibility === 'visible' }; });
       await stage(page, meaning);
-      const first = await page.locator('#chrome-keep').getAttribute('aria-label');
-      check('G3.save.fixture', 'the first stage and bar refer to 意味', (await slipFacts(page)).word === '意味' && /意味/u.test(first || ''), { first, stage: await slipFacts(page) });
+      const first = await keep();
+      check('G3.save.fixture', 'the first stage refers to 意味, and while it stands the bar\'s Save steps aside, naming 意味', (await slipFacts(page)).word === '意味' && first?.aside === true && /意味/u.test(first.name || ''), { first, stage: await slipFacts(page) });
       await leaveStage(page);
+      const folded = await keep();
+      check('G3.save.folded', 'folded, the bar\'s Save returns and names 意味', folded?.shown === true && !folded.aside && /意味/u.test(folded.name || ''), folded);
       await stage(page, shina);
       await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true');
-      const state = await page.evaluate(() => { const bar = document.getElementById('chrome-keep'), save = document.querySelector('#mini #mini-take'); return {
-        word: document.querySelector('#mini .mini-word')?.textContent.trim(), held: save?.disabled, bar: bar && { name: bar.getAttribute('aria-label'), text: bar.textContent, disabled: bar.disabled, held: bar.classList.contains('reader-capture-held'), rest: bar.hasAttribute('data-save-rest') },
-      }; });
-      check('G3.save.current', 'unconfirmed シナ holds Save and never leaves live 意味 in the top bar', state.word === 'シナ' && state.held === true && (!state.bar || state.bar.rest || (state.bar.held && /シナ/u.test(`${state.bar.name} ${state.bar.text}`))) && !/意味/u.test(`${state.bar?.name} ${state.bar?.text}`), state);
+      const state = await page.evaluate(() => { const save = document.querySelector('#mini #mini-take'); return { word: document.querySelector('#mini .mini-word')?.textContent.trim(), held: save?.disabled }; });
+      state.bar = await keep();
+      check('G3.save.current', 'unconfirmed シナ holds Save; the bar\'s Save stands aside and never leaves live 意味 in the top bar', state.word === 'シナ' && state.held === true && state.bar?.aside === true && (state.bar.rest || (state.bar.held && /シナ/u.test(`${state.bar.name} ${state.bar.text}`))) && !/意味/u.test(`${state.bar?.name} ${state.bar?.text}`), state);
+      await leaveStage(page);
+      state.folded = await keep();
+      check('G3.save.current-folded', 'folded, the bar\'s Save returns and never names live 意味: at rest, or holding シナ', state.folded?.shown === true && (state.folded.rest || (state.folded.held && /シナ/u.test(`${state.folded.name} ${state.folded.text}`))) && !/意味/u.test(`${state.folded.name} ${state.folded.text}`), state.folded);
       const beforeSave = await readAppRecord(page);
-      if (state.bar && !state.bar.disabled) await page.locator('#chrome-keep').click();
+      if (state.folded && !state.folded.disabled) await page.locator('#chrome-keep').click();
       await delay(500);
       const record = await readAppRecord(page);
       check('G3.save.no-phantom', 'changing stage never saves the previous word', JSON.stringify(record.taken) === JSON.stringify(beforeSave.taken) && !record.taken.some((item) => item.t === 'word' && item.id === '意味'), record.taken);
@@ -2830,11 +2839,17 @@ try {
       await particle.tap(); await delay(600);
       const part = await ladderFacts(page, particle);
       check('G3.kana.particle', 'a one-character particle is a word door and reaches a nonempty stage', part.stages === 1 && !!part.word && !part.page, part);
-      const particleSave = await page.evaluate(() => ({ miniSave: !!document.querySelector('#mini #mini-take'),
-        barRest: document.getElementById('chrome-keep')?.hasAttribute('data-save-rest'),
-        barKey: document.getElementById('chrome-keep')?.dataset.saveKey, barName: document.getElementById('chrome-keep')?.getAttribute('aria-label') }));
-      check('G3.kana.particle-save-rest', 'a particle stage with no Save leaves the bar at rest with no previous target',
-        !particleSave.miniSave && particleSave.barRest === true && particleSave.barKey === '', particleSave);
+      const barState = () => page.evaluate(() => { const bar = document.getElementById('chrome-keep'); return { miniSave: !!document.querySelector('#mini #mini-take'),
+        barRest: bar?.hasAttribute('data-save-rest'), barKey: bar?.dataset.saveKey, barName: bar?.getAttribute('aria-label'),
+        aside: !!bar && bar.hasAttribute('data-aside') && bar.inert && getComputedStyle(bar).visibility === 'hidden' }; });
+      const particleSave = await barState();
+      // Hfix-1A: while the particle's stage stands the bar's Save stands aside (one Save on screen), still at rest
+      check('G3.kana.particle-save-rest', 'a particle stage with no Save leaves the bar at rest with no previous target, standing aside while the stage stands',
+        !particleSave.miniSave && particleSave.barRest === true && particleSave.barKey === '' && particleSave.aside, particleSave);
+      await page.keyboard.press('Escape'); await delay(300);
+      const particleFolded = await barState();
+      check('G3.kana.particle-folded-rest', 'folded, the bar\'s Save returns at rest with no previous target',
+        particleFolded.barRest === true && particleFolded.barKey === '' && !particleFolded.aside, particleFolded);
       const beforeParticleSave = await readAppRecord(page);
       await page.locator('#chrome-keep').click(); await delay(400);
       const afterParticleSave = await readAppRecord(page);

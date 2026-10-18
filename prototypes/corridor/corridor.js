@@ -28012,6 +28012,7 @@ function chromeKeep() {
   button.setAttribute('aria-label', target
     ? (savedNow() ? tx(`「${target.label}」保存済み`, `Saved ${target.label}`) : tx(`「${target.label}」を保存`, `Save ${target.label}`))
     : tx('語を保存 — 文中の語をタップしてから', 'Save a word — tap a word in the story first'));
+  paintKeepAside(button);
   return button;
 }
 /** After a touch, a save or an undo: the bar's keep names the word now under the finger, in place (no render). */
@@ -28021,10 +28022,20 @@ function syncChromeKeep() {
   const fresh = chromeKeep();
   if (fresh.dataset.saveKey === old.dataset.saveKey && old.getAttribute('aria-expanded') === 'true') {
     paintWordSave(old, fresh.getAttribute('aria-pressed') === 'true');
+    paintKeepAside(old);
     return;
   }
   old.replaceWith(fresh);
   fitChromeKeep(fresh);
+}
+/** Hfix-1A · one Save on screen (H1: "Save 総理" in the bar beside the stage's own Save, H-rokusho-05, H-shu-07): while a
+ * stage or a word page stands, the stage's or the page's Save is the one, and the bar's keep steps aside — it keeps its
+ * room, so no other door moves, and it is out of reach (inert); it returns when they close. */
+function paintKeepAside(button) {
+  const aside = !!standingSlip() || S.stack.length > 0;
+  if (aside === button.hasAttribute('data-aside')) return;
+  button.toggleAttribute('data-aside', aside);
+  button.inert = aside;
 }
 /** Q · the bar's Save says as much as fits whole in the room its bar leaves it (it takes that room, flex 1, so touching
  * a word never moves another door): the verb and the word (Save 総理 · Saved ✓ 総理); else the verb (Save · Saved ✓);
@@ -30360,55 +30371,6 @@ function speakSentence(container, tokens, { contextId }) {
     if (door?.matches('.sentence-tok')) { door.dataset.speakS = s; door.dataset.speakB = b; door.dataset.speakR = r; }
   }
 }
-/** The word last touched in any line, as the top bar's Save keeps it: its reading truth from R (readingToken). */
-function speakKeepTarget() {
-  if (!speakKeepWord?.word || !lookup(speakKeepWord.word)) return null;
-  // the token as the line carried it: readingToken and wordSaveFacts give an inflected surface's reading no say over
-  // its dictionary form, exactly as for a sentence's word anywhere
-  const door = readingToken({ s: speakKeepWord.surface || speakKeepWord.word, b: speakKeepWord.word, r: speakKeepWord.reading || '' });
-  return { label: door.b, ...wordSaveFacts(door) };
-}
-/** The top bar's one Save in the room, naming the word last touched in any line (the reader's keep, for talk). */
-function speakKeep() {
-  const target = speakKeepTarget();
-  const savedNow = () => {
-    const now = speakKeepTarget();
-    return !!now && !now.held && wordCaptureState(now.node) === 'taken';
-  };
-  const button = saveOne({
-    id: 'speak-keep', cls: 'chrome-keep', label: target?.label || '', word: target?.label || '', data: { saveBar: '' },
-    node: target && !target.held && !target.identityHeld ? target.node : null, place: 'drawer', saved: savedNow,
-    keep: () => {
-      const now = speakKeepTarget();
-      if (!now) { showReaderToast(tx('会話の語をタップしてから、保存する。', 'Tap a word in the conversation, then Save.')); return false; }
-      if (now.held || now.identityHeld) {
-        showReaderToast(now.held ? now.heldReason || readerCaptureReasonText(now.label) : wordCaptureHeldText(now.node, { route: false }));
-        return false;
-      }
-      return toggleWordSave(now.node, now.label);
-    },
-    review: { saved: savedNow, toggle: () => { const now = speakKeepTarget(); return now ? toggleWordSave(now.node, now.label) : false; } },
-    more: () => [{ id: 'speak-keep-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(speakKeepTarget()?.label || '') }],
-  });
-  button.dataset.saveKey = target ? `${target.node.t}:${target.node.id}:${target.node.reading || ''}` : '';
-  if (!target) button.dataset.saveRest = '';
-  if (target && (target.held || target.identityHeld)) button.classList.add('reader-capture-held');
-  paintWordSave(button, savedNow());
-  button.setAttribute('aria-label', target
-    ? (savedNow() ? tx(`「${target.label}」保存済み`, `Saved ${target.label}`) : tx(`「${target.label}」を保存`, `Save ${target.label}`))
-    : tx('語を保存 — 会話の語をタップしてから', 'Save a word — tap a word in the conversation first'));
-  return button;
-}
-function syncSpeakKeep() {
-  const old = document.getElementById('speak-keep');
-  if (!old) return;
-  const fresh = speakKeep();
-  if (fresh.dataset.saveKey === old.dataset.saveKey && old.getAttribute('aria-expanded') === 'true') {
-    paintWordSave(old, fresh.getAttribute('aria-pressed') === 'true');
-    return;
-  }
-  old.replaceWith(fresh);
-}
 /** The room's one door into the app: closures over the app's own lexicon, doors, Save, record and sound. */
 function speakHost() {
   return Object.freeze({
@@ -30477,10 +30439,10 @@ function speakHost() {
     // a line kept for 影 (her voice, on this device) is kept by the one Save ▾ too: one press keeps it, its menu removes it
     saveLine: ({ text, saved, keep, remove }) => saveOne({ cls: 'speak-save speak-save-line', label: text, saved, keep,
       more: () => (saved() ? [{ id: 'speak-line-remove', label: tx('外す', 'Remove'), run: remove }] : []) }),
+    // the word last touched in any line, kept whole (surface, base, reading); Hfix-1A: the bar no longer shows it (its
+    // slip's Save is the one)
     setKeep: ({ word, surface = '', reading = '' }) => {
       speakKeepWord = word ? { word, surface: surface || word, reading } : null;
-      syncSpeakKeep();
-      setTimeout(syncSpeakKeep, 600);
     },
     // one sound at a time: Kore's element becomes the app's one playback owner while she speaks
     ownAudio: (audioEl) => {
@@ -40652,8 +40614,9 @@ function render() {
   // S · the reader's keep (John, 2026-10-16: "why is the plus bar gone???? what replaced it?? how do we know where to add
   // something"): where the + stood, the one Save in the bar's own type, naming the word last touched (Save 総理); before a
   // word is touched it says what it does (Save a word). Its path is the slip's Save on the same word (chromeKeep).
+  // Hfix-1A · Speak stages no word in the bar: its words open their own slips, whose Save is the one (H1: "Save a…" cut
+  // in Speak's bar, H-hakuu-06, H-rokusho-02, H-nami-10)
   if (S.view === 'reader' && passage()) chrome.append(chromeKeep());
-  if (S.view === 'speak') chrome.append(speakKeep());
   // Today: a quiet bookmark and its saved-word count. The on-screen bookmark stays quiet; its
   // name states the room it opens and that the number is saved words, not today's cards.
   const trayBtn = biLabel('button', null, `今日 ${S.taken.length}`, `Today ${S.taken.length}`);

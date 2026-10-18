@@ -395,7 +395,9 @@ const captureState = (page) => page.evaluate(() => {
     bar: { saves: [...document.querySelectorAll('#app > .chrome button')].filter((n) => n.id === 'reader-take'
         || /^(保存|Save)/u.test((n.textContent || '').trim()) || /^(保存|Save)\b/u.test(n.getAttribute('aria-label') || '')).map((n) => n.id || n.textContent.trim()),
       keep: (() => { const k = document.getElementById('chrome-keep'); return k && { one: k.matches('button.save-one[data-save-one]'),
-        word: k.querySelector('.save-bar-word')?.textContent ?? null, held: k.classList.contains('reader-capture-held'), pressed: k.getAttribute('aria-pressed') }; })(),
+        word: k.querySelector('.save-bar-word')?.textContent ?? null, held: k.classList.contains('reader-capture-held'), pressed: k.getAttribute('aria-pressed'),
+        // Hfix-1A · one Save on screen: while a stage stands the keep steps aside (hidden, its room kept, inert)
+        aside: k.hasAttribute('data-aside') && k.inert && getComputedStyle(k).visibility === 'hidden' }; })(),
       panel: !!document.getElementById('capture-panel') },
     mini: mini && { takeDisabled: miniTake ? miniTake.disabled : null, takePressed: miniTake?.getAttribute('aria-pressed') ?? null,
       held: !!miniTake?.classList.contains('reader-capture-held'), describedBy: miniTake?.getAttribute('aria-describedby') ?? null,
@@ -556,9 +558,10 @@ async function coreRun(open, rec) {
         && token.label === `${CORE.token.s} · ${WORD.bi} · ${CORE_ENTRY.reading} · ${HINT.bi}`,
       JSON.stringify(token), { token });
     const bar = (await captureState(page)).bar;
-    // S · it pinned "the bar carries no Save of its own"; the new truth: one keep in the bar, the one Save, naming the word
-    once('G1.bar', `G1 with ${CORE.token.s} selected, the bar carries one keep — the one Save, naming ${CORE.token.b} — and no panel`,
-      bar.saves.length === 1 && bar.saves[0] === 'chrome-keep' && bar.keep?.one && bar.keep.word === CORE.token.b && !bar.keep.held && !bar.panel,
+    // S · it pinned "the bar carries no Save of its own"; the new truth: one keep in the bar, the one Save, naming the word.
+    // Hfix-1A (it pinned that keep standing beside the stage): with the stage open the keep stands aside, still naming it
+    once('G1.bar', `G1 with ${CORE.token.s} selected and its stage open, the bar's one keep — the one Save, naming ${CORE.token.b} — stands aside, and no panel`,
+      bar.saves.length === 1 && bar.saves[0] === 'chrome-keep' && bar.keep?.one && bar.keep.word === CORE.token.b && !bar.keep.held && bar.keep.aside && !bar.panel,
       JSON.stringify(bar), { bar });
     await openPopup(page, CORE);
     // R3 (Grok 2029) · a slip drawn before its word's sense is at hand shows a quiet "…" until it is (aria-busy, R2's
@@ -757,8 +760,9 @@ async function captureRun(open, rec) {
     await openPopup(page, CORE);
     await page.waitForSelector('#mini #mini-take');
     const bar = (await captureState(page)).bar;
-    once('G7.bar.none', `G7 with ${CORE.token.s} touched, the bar carries the one Save naming it and no panel: three doors (the mini's, the page bar's, the reader bar's)`,
-      bar.saves.length === 1 && bar.saves[0] === 'chrome-keep' && bar.keep?.one && bar.keep.word === CORE.token.b && !bar.panel, JSON.stringify(bar), { bar });
+    // Hfix-1A: with the mini open, the bar's keep stands aside (one Save on screen); the reader bar's door is taken folded
+    once('G7.bar.none', `G7 with ${CORE.token.s} touched and its mini open, the bar's one Save names it and stands aside, no panel: three doors (the mini's, the page bar's, the reader bar's once folded)`,
+      bar.saves.length === 1 && bar.saves[0] === 'chrome-keep' && bar.keep?.one && bar.keep.word === CORE.token.b && bar.keep.aside && !bar.panel, JSON.stringify(bar), { bar });
   });
   const doors = [
     { door: 'mini', name: "the mini's 覚", selector: '#mini-take', prepare: (page) => openPopup(page, CORE) },
@@ -815,8 +819,9 @@ async function heldRun(open, rec) {
     const bar = (await captureState(page)).bar;
     // S · it pinned "the bar carries no Save"; the new truth: the bar's one keep names the word and is held with it (its press
     // says why, as the mini does); no panel
-    once('G5.bar-none', `G5 with ${IU.token.s} selected, the bar's one keep is held with the word and no panel opens: the reason lives in the mini`,
-      [selected.bar, bar].every((b) => b.saves.length === 1 && b.saves[0] === 'chrome-keep' && b.keep?.one && b.keep.held && !b.panel),
+    // Hfix-1A: the mini stands, so the keep stands aside with it (one Save on screen)
+    once('G5.bar-none', `G5 with ${IU.token.s} selected, the bar's one keep is held with the word, stands aside while the mini stands, and no panel opens: the reason lives in the mini`,
+      [selected.bar, bar].every((b) => b.saves.length === 1 && b.saves[0] === 'chrome-keep' && b.keep?.one && b.keep.held && b.keep.aside && !b.panel),
       JSON.stringify({ selected: selected.bar, afterPress: bar }), { bar, selected: selected.bar });
     await fullEntry(page, IU);
     await settleSheet(page);

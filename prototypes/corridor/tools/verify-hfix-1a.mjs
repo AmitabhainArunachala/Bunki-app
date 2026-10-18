@@ -8,6 +8,8 @@
  *       goes home;
  *   3   at part depth the thread rests with no bead half under the sticky 宙, the current bead whole, also after a finger
  *       moves it;
+ *   4   one Save on screen through the ladder: the bar's keep steps aside while a stage or a page stands, no door moves;
+ *   5   Speak's top bar carries no Save;
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -55,6 +57,9 @@ const CONTROL = {
   ] },
   'stage-fade': { item: '1.', css: "#mini[data-more='true']::after { content: none !important; }" },
   layers: { item: '2.', source: [['corridor.js', 'dockLayersMark(mark, block, null, () => layersOnGlass(block));', 'void layersOnGlass;']] },
+  'one-save': { item: '4.', source: [['corridor.js', 'function paintKeepAside(button) {', 'function paintKeepAside(button) { return;']] },
+  'speak-bar': { item: '5.', source: [['corridor.js', "  if (S.view === 'reader' && passage()) chrome.append(chromeKeep());",
+    "  if ((S.view === 'reader' && passage()) || S.view === 'speak') chrome.append(chromeKeep());"]] },
   thread: { item: '3.', css: '.scale-thread { scroll-snap-type: none !important; }',
     source: [['corridor.js', '    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);', '    if (delta) thread.scrollLeft += delta;']] },
 };
@@ -306,10 +311,70 @@ async function itemThread(browser, engine) {
   }
 }
 
+/** Every Save a finger could press now: shown (visible, on the glass) and the topmost thing at its own centre. */
+const liveSaves = (page) => page.evaluate(() => [...new Set([...document.querySelectorAll('button.save-one, [data-save-one], #mini-take, #sheet-take, #chrome-keep')])]
+  .filter((n) => {
+    const r = n.getBoundingClientRect(), cs = getComputedStyle(n);
+    if (!r.width || !r.height || cs.visibility !== 'visible' || Number(cs.opacity) === 0 || r.bottom <= 0 || r.top >= innerHeight) return false;
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return !!hit && (hit === n || n.contains(hit));
+  }).map((n) => n.id || n.className.split(' ')[0]));
+async function itemOneSave(browser, engine) {
+  // 4 · one Save on screen through the ladder, in three worlds: bare (the bar's), the stage (its own), the page (its own),
+  // Back to the stage, folded (the bar's again, naming the word); the bar's other doors never move
+  for (const world of WORLDS) {
+    const { context, page, errors } = await session(browser, { world });
+    try {
+      await openStory(page);
+      const tray = () => page.evaluate(() => { const r = document.getElementById('tray')?.getBoundingClientRect(); return r ? [Math.round(r.left), Math.round(r.top)] : null; });
+      const at = { bare: { saves: await liveSaves(page), tray: await tray() } };
+      await stage(page);
+      at.stage = { saves: await liveSaves(page), tray: await tray() };
+      await page.locator('#mini .mini-word').tap();
+      await page.locator('#sheet').waitFor();
+      await settle(page, 700);
+      at.page = { saves: await liveSaves(page) };
+      await page.locator('#sheet-back').first().click();
+      await page.waitForFunction(() => !document.getElementById('sheet') && !!document.getElementById('mini'), null, { timeout: 8000 }).catch(() => {});
+      await settle(page, 500);
+      at.back = { saves: await liveSaves(page) };
+      await page.keyboard.press('Escape');
+      await settle(page, 400);
+      at.folded = { saves: await liveSaves(page), name: await page.locator('#chrome-keep').getAttribute('aria-label') };
+      const one = (list, id) => list.length === 1 && list[0] === id;
+      check(`4.one-save · ${engine} ${world} · one Save on screen: bare the bar's, the stage's, the page's, Back the stage's, folded the bar's naming 総理; no door moved`,
+        one(at.bare.saves, 'chrome-keep') && one(at.stage.saves, 'mini-take') && one(at.page.saves, 'sheet-take') && one(at.back.saves, 'mini-take') &&
+        one(at.folded.saves, 'chrome-keep') && /総理/u.test(at.folded.name || '') && JSON.stringify(at.bare.tray) === JSON.stringify(at.stage.tray) && !errors.length, { ...at, errors });
+    } finally { await context.close(); }
+  }
+}
+async function itemSpeakBar(browser, engine) {
+  // 5 · Speak's bar carries no Save (round 1: "Save a…" cut in hakuu, rokusho, nami): reached as he reaches it, Learn → Speak
+  for (const world of ['hakuu', 'hokusai']) {
+    const { context, page, errors } = await session(browser, { world });
+    try {
+      await page.locator('#tab-learn').tap();
+      await page.waitForFunction(() => ['dojo', 'tests'].includes(document.body.dataset.view), null, { timeout: 15_000 });
+      await settle(page, 500);
+      await page.locator('[data-study-door="speak"]').first().tap();
+      await page.waitForFunction(() => document.body.dataset.view === 'speak', null, { timeout: 15_000 });
+      await settle(page, 1200);
+      const bar = await page.evaluate(() => {
+        const chrome = document.querySelector('#app > .chrome');
+        return { saves: chrome ? chrome.querySelectorAll('[data-save-bar], button.save-one, [data-save-one]').length : -1,
+          words: chrome ? [...chrome.querySelectorAll('button')].map((n) => n.textContent.replace(/\s+/gu, ' ').trim()).filter((t) => /^(Save|保存)/u.test(t)) : [] };
+      });
+      check(`5.speak-bar · ${engine} ${world} · Speak's top bar carries no Save`, bar.saves === 0 && !bar.words.length && !errors.length, { ...bar, errors });
+    } finally { await context.close(); }
+  }
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
   { id: 'layers', prefix: '2.', run: itemLayers },
   { id: 'thread', prefix: '3.', run: itemThread },
+  { id: 'one-save', prefix: '4.', run: itemOneSave },
+  { id: 'speak-bar', prefix: '5.', run: itemSpeakBar },
 ];
 
 const log = { engines: {} };
