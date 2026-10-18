@@ -681,9 +681,11 @@ export const MEASURE_FN = `(() => {
 //   pending-save.during    the press lands while "…" shows: the menu opens; the meaning then arrives in place (the same
 //                          card, its menu still open, a meaning where the "…" stood, nothing busy);
 //   pending-save.inflight  the finger aims at Saved ✓ while "…" shows, the meaning arrives, the touch lands where it aimed:
-//                          the menu opens and the card stays.
-// Controls (KAIRO_CORRIDOR_NEGATIVE): pending-dismiss — a press inside the card dismisses it (both rows red);
-// pending-shift — the band keeps no room for the meaning to come (the in-flight row red).
+//                          the menu opens and the card stays (the word where D23 taps it, mid-glass);
+//   pending-save.inflight-below  the same with the word near the top of the glass, so the card stands below it and a
+//                          growing meaning would push Save down.
+// Controls (KAIRO_CORRIDOR_NEGATIVE, armed once the word is kept): pending-dismiss — a press inside the card dismisses it
+// (every row red); pending-shift — the band keeps no room for the meaning to come (inflight-below red).
 const PENDING_NEGATIVE = process.env.KAIRO_CORRIDOR_NEGATIVE || '';
 const PENDING_CONTROLS = {
   'pending-dismiss': ["    if (mini && !mini.contains(target) && !target.closest?.('#vocabulary-list-popover, #reader-toast')) {",
@@ -701,112 +703,121 @@ export async function pendingSaveRows(base) {
   for (const [engine, type] of Object.entries(engines)) {
     const browser = await type.launch();
     console.log(`\n— Hfix-1A · item 18 · Save pressed while the meaning is "…" · ${engine} ${browser.version()}${PENDING_NEGATIVE ? ` · control ${PENDING_NEGATIVE}` : ''}`);
-    try {
-      const context = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
-      await context.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
-      await silenceBrowserAudio(context);
-      let hold = false, release = () => {}, gate = Promise.resolve(), asked = 0;
-      await context.route((url) => PENDING_SHARD.test(url.pathname), async (route) => {
-        if (hold) { asked += 1; await gate; }
-        try { await route.continue(); } catch { /* the page went first */ }
-      });
-      if (PENDING_NEGATIVE) await context.route(/\/corridor\.js(\?.*)?$/u, async (route) => {
-        const reply = await route.fetch();
-        const [from, to] = PENDING_CONTROLS[PENDING_NEGATIVE];
-        const body = await reply.text();
-        assert.equal(body.split(from).length, 2, `control ${PENDING_NEGATIVE}: its line must be in corridor.js exactly once`);
-        await route.fulfill({ response: reply, body: body.replace(from, to) });
-      });
-      const page = await context.newPage();
-      const errors = [];
-      page.on('pageerror', (error) => errors.push(error.message));
-      page.setDefaultTimeout(20000);
-      const coldLetter = async () => {
-        await page.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
-        await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
-        await page.locator(PENDING_LETTER).first().click();
-        await settleReader(page);
-      };
-      const stage = async () => {
-        const word = page.locator(PENDING_WORD).first();
-        await word.evaluate((n) => n.scrollIntoView({ block: 'center' }));
-        await page.waitForTimeout(120);
-        for (let tap = 0; tap < 2 && !await page.locator('#mini #mini-take').count(); tap += 1) {
-          const box = await word.boundingBox();
-          await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
-          await page.waitForFunction((n) => !!document.getElementById('mini') || n.dataset.ladderRung === 'reading', await word.elementHandle(), { timeout: 10000 });
-        }
-        await page.locator('#mini #mini-take').waitFor({ timeout: 10000 });
-        await page.waitForTimeout(250);
-      };
-      const card = () => page.evaluate(() => {
-        const mini = document.getElementById('mini');
-        const take = document.getElementById('mini-take');
-        const menu = document.querySelector('#mini #vocabulary-list-popover.is-inline');
-        return { mini: !!mini, same: !!mini && mini === window.__pendingCard, menu: !!menu && menu.getClientRects().length > 0,
-          line: mini?.querySelector('.mini-gloss')?.textContent ?? null, wait: !!mini?.querySelector('[data-sense-wait]'),
-          busy: mini?.getAttribute('aria-busy') ?? null, saved: take?.textContent.trim() ?? null };
-      });
-      // the word is kept once, so every cold stage shows Saved ✓ (the record survives the reloads)
-      await coldLetter();
-      await stage();
-      await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 15000 }).catch(() => {});
-      if (!(await page.locator('#mini-take.taken').count())) {
-        const box = await page.locator('#mini-take').boundingBox();
-        await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
-        await waitForAppRecord(page, (record) => (record.taken || []).some((entry) => entry.t === 'word' && entry.id === '上手'), { description: 'the kept 上手' });
-      }
-      for (const kind of ['during', 'inflight']) {
-        let passes = 0;
-        const seen = [];
-        for (let run = 1; run <= 5; run += 1) {
-          hold = true; asked = 0; gate = new Promise((done) => { release = done; });
-          const before = errors.length;
-          let row = null;
-          try {
-            await coldLetter();
-            await stage();
-            const pending = await page.evaluate(() => { window.__pendingCard = document.getElementById('mini'); return { wait: !!document.querySelector('#mini [data-sense-wait]'), saved: document.getElementById('mini-take')?.textContent.trim() }; });
-            const aim = await page.locator('#mini-take').boundingBox();
-            const at = { x: aim.x + aim.width / 2, y: aim.y + aim.height / 2 };
-            if (kind === 'during') {
-              await page.touchscreen.tap(at.x, at.y);
-              const opened = await page.waitForSelector('#mini #vocabulary-list-popover.is-inline', { timeout: 3000 }).then(() => true, () => false);
-              const atPress = await card();
-              hold = false; release();
-              await page.waitForFunction(() => !document.querySelector('#mini [data-sense-wait]'), null, { timeout: 15000 }).catch(() => {});
-              await page.waitForTimeout(600);
-              const settled = await card();
-              row = { pending, opened, atPress, settled, asked };
-              row.pass = pending.wait && /✓/u.test(pending.saved || '') && opened && atPress.same && atPress.wait &&
-                settled.same && settled.menu && !settled.wait && settled.busy !== 'true' && !!settled.line && settled.line !== '…';
-            } else {
-              hold = false; release();
-              await page.waitForFunction(() => !document.querySelector('#mini [data-sense-wait]'), null, { timeout: 15000 }).catch(() => {});
-              await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
-              const landed = await page.evaluate(({ x, y }) => { const n = document.elementFromPoint(x, y); return n ? (n.id || n.className || n.tagName).toString().slice(0, 40) : null; }, at);
-              await page.touchscreen.tap(at.x, at.y);
-              const opened = await page.waitForSelector('#mini #vocabulary-list-popover.is-inline', { timeout: 3000 }).then(() => true, () => false);
-              const after = await card();
-              row = { pending, aim: { x: Math.round(at.x), y: Math.round(at.y) }, landed, opened, after, asked };
-              row.pass = pending.wait && /✓/u.test(pending.saved || '') && asked > 0 && opened && after.same && after.menu && !after.wait;
-            }
-            row.errors = errors.slice(before);
-            if (row.errors.length) row.pass = false;
-          } catch (error) {
-            row = { pass: false, error: String(error?.message || error).split('\n')[0] };
-          } finally { hold = false; release(); }
-          if (row.pass) passes += 1;
-          seen.push(row);
-        }
-        check(`Hfix-1A · 18 · ${engine} · pending-save.${kind} · ${kind === 'during'
-          ? 'Saved ✓ pressed while the meaning is "…" opens its menu; the meaning then arrives in place, the card and menu kept'
-          : 'Saved ✓ aimed during "…", touched after the meaning arrived: its menu opens, the card stays'} (5 of 5 on cold pages)`,
-        passes === 5, JSON.stringify({ passes, runs: seen }).slice(0, 2400));
-      }
-      await context.close();
-    } finally { await browser.close(); }
+    try { await pendingSaveEngine(browser, engine, base); }
+    catch (error) { check(`Hfix-1A · 18 · ${engine} · pending-save rows ran`, false, String(error?.message || error).split('\n')[0]); }
+    finally { await browser.close(); }
   }
+}
+async function pendingSaveEngine(browser, engine, base) {
+  const context = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  await context.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
+  await silenceBrowserAudio(context);
+  let hold = false, release = () => {}, gate = Promise.resolve(), asked = 0, armed = false;
+  await context.route((url) => PENDING_SHARD.test(url.pathname), async (route) => {
+    if (hold) { asked += 1; await gate; }
+    try { await route.continue(); } catch { /* the page went first */ }
+  });
+  if (PENDING_NEGATIVE) await context.route(/\/corridor\.js(\?.*)?$/u, async (route) => {
+    if (!armed) { await route.continue(); return; }
+    const reply = await route.fetch();
+    const [from, to] = PENDING_CONTROLS[PENDING_NEGATIVE];
+    const body = await reply.text();
+    assert.equal(body.split(from).length, 2, `control ${PENDING_NEGATIVE}: its line must be in corridor.js exactly once`);
+    await route.fulfill({ response: reply, body: body.replace(from, to) });
+  });
+  const page = await context.newPage();
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  page.setDefaultTimeout(20000);
+  const coldLetter = async () => {
+    await page.goto(`${base}/index.html?entry=shelf`, { waitUntil: 'load' });
+    await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
+    await page.locator(PENDING_LETTER).first().click();
+    await settleReader(page);
+  };
+  const stage = async (seat = 'center') => {
+    const word = page.locator(PENDING_WORD).first();
+    await word.evaluate((n) => n.scrollIntoView({ block: 'center' }));
+    if (seat === 'top') await word.evaluate((n) => window.scrollBy(0, n.getBoundingClientRect().top - 150));
+    await page.waitForTimeout(120);
+    for (let tap = 0; tap < 2 && !await page.locator('#mini #mini-take').count(); tap += 1) {
+      const box = await word.boundingBox();
+      await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+      await page.waitForFunction((n) => !!document.getElementById('mini') || n.dataset.ladderRung === 'reading', await word.elementHandle(), { timeout: 10000 });
+    }
+    await page.locator('#mini #mini-take').waitFor({ timeout: 10000 });
+    await page.waitForTimeout(250);
+  };
+  const card = () => page.evaluate(() => {
+    const mini = document.getElementById('mini');
+    const take = document.getElementById('mini-take');
+    const menu = document.querySelector('#mini #vocabulary-list-popover.is-inline');
+    return { mini: !!mini, same: !!mini && mini === window.__pendingCard, menu: !!menu && menu.getClientRects().length > 0,
+      line: mini?.querySelector('.mini-gloss')?.textContent ?? null, wait: !!mini?.querySelector('[data-sense-wait]'),
+      busy: mini?.getAttribute('aria-busy') ?? null, saved: take?.textContent.trim() ?? null };
+  });
+  // the word is kept once, so every cold stage shows Saved ✓ (the record survives the reloads); a control is armed only
+  // after it, on the measured pages
+  await coldLetter();
+  await stage();
+  await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 15000 }).catch(() => {});
+  if (!(await page.locator('#mini-take.taken').count())) {
+    const box = await page.locator('#mini-take').boundingBox();
+    await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+    await waitForAppRecord(page, (record) => (record.taken || []).some((entry) => entry.t === 'word' && entry.id === '上手'), { description: 'the kept 上手' });
+  }
+  armed = true;
+  for (const kind of ['during', 'inflight', 'inflight-below']) {
+    let passes = 0;
+    const seen = [];
+    for (let run = 1; run <= 5; run += 1) {
+      hold = true; asked = 0; gate = new Promise((done) => { release = done; });
+      const before = errors.length;
+      let row = null;
+      try {
+        await coldLetter();
+        await stage(kind === 'inflight-below' ? 'top' : 'center');
+        const pending = await page.evaluate(() => { window.__pendingCard = document.getElementById('mini'); return { wait: !!document.querySelector('#mini [data-sense-wait]'),
+          saved: document.getElementById('mini-take')?.textContent.trim(), side: document.getElementById('mini')?.dataset.side ?? null }; });
+        const aim = await page.locator('#mini-take').boundingBox();
+        const at = { x: aim.x + aim.width / 2, y: aim.y + aim.height / 2 };
+        if (kind === 'during') {
+          await page.touchscreen.tap(at.x, at.y);
+          const opened = await page.waitForSelector('#mini #vocabulary-list-popover.is-inline', { timeout: 3000 }).then(() => true, () => false);
+          const atPress = await card();
+          hold = false; release();
+          await page.waitForFunction(() => !document.querySelector('#mini [data-sense-wait]'), null, { timeout: 15000 }).catch(() => {});
+          await page.waitForTimeout(600);
+          const settled = await card();
+          row = { pending, opened, atPress, settled, asked };
+          row.pass = pending.wait && /✓/u.test(pending.saved || '') && opened && atPress.same && atPress.wait &&
+            settled.same && settled.menu && !settled.wait && settled.busy !== 'true' && !!settled.line && settled.line !== '…';
+        } else {
+          hold = false; release();
+          await page.waitForFunction(() => !document.querySelector('#mini [data-sense-wait]'), null, { timeout: 15000 }).catch(() => {});
+          await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+          const landed = await page.evaluate(({ x, y }) => { const n = document.elementFromPoint(x, y); return n ? (n.id || n.className || n.tagName).toString().slice(0, 40) : null; }, at);
+          await page.touchscreen.tap(at.x, at.y);
+          const opened = await page.waitForSelector('#mini #vocabulary-list-popover.is-inline', { timeout: 3000 }).then(() => true, () => false);
+          const after = await card();
+          row = { pending, aim: { x: Math.round(at.x), y: Math.round(at.y) }, landed, opened, after, asked };
+          row.pass = pending.wait && /✓/u.test(pending.saved || '') && asked > 0 && opened && after.same && after.menu && !after.wait &&
+            (kind !== 'inflight-below' || pending.side === 'below');
+        }
+        row.errors = errors.slice(before);
+        if (row.errors.length) row.pass = false;
+      } catch (error) {
+        row = { pass: false, error: String(error?.message || error).split('\n')[0] };
+      } finally { hold = false; release(); }
+      if (row.pass) passes += 1;
+      seen.push(row);
+    }
+    check(`Hfix-1A · 18 · ${engine} · pending-save.${kind} · ${kind === 'during'
+      ? 'Saved ✓ pressed while the meaning is "…" opens its menu; the meaning then arrives in place, the card and menu kept'
+      : `Saved ✓ aimed during "…", touched after the meaning arrived: its menu opens, the card stays${kind === 'inflight-below' ? ' (the card below its word)' : ''}`} (5 of 5 on cold pages)`,
+    passes === 5, JSON.stringify({ passes, runs: seen }).slice(0, 2400));
+  }
+  await context.close();
 }
 
 /* ------------------------------------------------------------------ main */
