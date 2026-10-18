@@ -98,6 +98,56 @@ cssPatch('font-family:Georgia,serif;font-style:italic}',
 cssPatch('font-size:12px;color:var(--faint);font-family:Georgia,serif;font-style:italic',
   'font-size:12px;color:var(--faint);font-family:"Noto Serif","Noto Serif JP",Georgia,serif;font-style:italic', 'bundled radical gloss');
 
+// F-4: the frozen donor reads the house's existing type ladder from rooms/motion.css.
+// Each selector and size is asserted once; no local numeric ladder or fallback is emitted.
+const typeSize = (selector, before, token) => {
+  const normal = value => value.split(',').map(part => part.trim()).join(',');
+  const rules = [...rawCss.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .filter(rule => normal(rule[1]) === normal(selector));
+  if (rules.length !== 1) throw new Error(`CSS type rule missing or ambiguous: ${selector}`);
+  const rule = rules[0], sizes = [...rule[2].matchAll(/\bfont-size\s*:\s*([^;]+)/g)];
+  if (sizes.length !== 1 || sizes[0][1].trim() !== before)
+    throw new Error(`CSS type size changed: ${selector}`);
+  cssPatch(rule[0], rule[0].replace(sizes[0][0], `font-size:var(${token})`), `type ${selector}`);
+};
+typeSize(".word .yomi", ".44em", "--type-label");
+typeSize(".word .gloss", ".4em", "--type-label");
+typeSize(".glyph .g", "36px", "--type-hero");
+typeSize(".glyph.center small", "8px", "--type-label");
+typeSize(".glyph.comp .g", "24px", "--type-section");
+typeSize(".glyph small,.part small", "11px", "--type-label");
+typeSize(".part .pch", "19px", "--type-lead");
+typeSize("#brand", "13px", "--type-label");
+typeSize("#seal", "11px", "--type-caption");
+typeSize("#depth", "12px", "--type-caption");
+typeSize("#theme", "12px", "--type-caption");
+typeSize("#tray", "12px", "--type-caption");
+typeSize("#hint", "12px", "--type-caption");
+typeSize("#card .yomi", "13px", "--type-label");
+typeSize("#card h1", "42px", "--type-headword");
+typeSize("#card .gloss", "15px", "--type-control");
+typeSize("#card .row .k", "24px", "--type-section");
+typeSize("#card .row .kg", "11px", "--type-label");
+typeSize("#card .note", "11px", "--type-label");
+typeSize("#card .bt", "12px", "--type-caption");
+typeSize("#card .rhead", "11px", "--type-caption");
+typeSize("#card .rrow .rk", "22px", "--type-seal");
+typeSize("#card .rrow .rr", "12px", "--type-caption");
+typeSize("#card .rrow .rr i", "11px", "--type-caption");
+typeSize("#card .rds", "13px", "--type-label");
+typeSize("#lvlLabels", "10px", "--type-caption");
+typeSize("#lvl.hot #lvlLabels", "13px", "--type-label");
+typeSize("#lvlInfo", "11px", "--type-caption");
+typeSize("#card .rrow .rm", "12px", "--type-label");
+typeSize("#card .study", "13px", "--type-label");
+typeSize("#card .rhead .radq", "10px", "--type-caption");
+typeSize("#radoc h2", "26px", "--type-section");
+typeSize("#radoc .sub", "12px", "--type-caption");
+typeSize("#radoc p", "15px", "--type-control");
+typeSize("#radoc .rex .rc", "34px", "--type-display");
+typeSize("#radoc .rex .rt", "13px", "--type-label");
+typeSize("#radoc .x", "13px", "--type-label");
+
 // Scope every rule under #drift-layer. The file has no at-rules (verified
 // below); selectors are :root / * / html,body / body / canvas / #id / .class.
 if (/@(keyframes|media|font-face|import)/.test(rawCss)) {
@@ -1501,19 +1551,23 @@ const cssOut = (css + `
 /* Inside sky's stacking context, all native ink keeps its hit plane. */
 #drift-layer .scale-stars { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
 #drift-layer .word, #drift-layer .glyph, #drift-layer .part { z-index: 1; }
-#drift-layer .scale-star { position: absolute; left: 0; top: 0; max-width: 210px; min-width: 44px; min-height: 44px; padding: 8px 14px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 13px; line-height: 1.5; text-align: center; cursor: pointer; pointer-events: auto; }
+#drift-layer .scale-star { position: absolute; left: 0; top: 0; max-width: 210px; min-width: 44px; min-height: 44px; padding: 8px 14px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: var(--type-label); line-height: 1.5; text-align: center; cursor: pointer; pointer-events: auto; }
 #drift-layer .scale-star[hidden] { display: none; }
 #drift-layer .scale-star-number { white-space: nowrap; }
 #drift-layer .scale-star-caption { display: block; overflow-wrap: anywhere; }
 #drift-layer .scale-star.is-compact { width: 44px; height: 44px; min-height: 44px; max-width: 44px; padding: 0; display: grid; place-items: center; }
 #drift-layer .scale-star.is-compact .scale-star-caption { position: absolute; box-sizing: border-box; left: var(--scale-caption-left); top: var(--scale-caption-top); width: var(--scale-caption-width); max-height: var(--scale-caption-height); overflow: auto; padding: 8px; border: 1px solid var(--line); background: var(--ground); visibility: hidden; pointer-events: none; }
 #drift-layer .scale-star.is-compact:is(:hover,:focus-visible) .scale-star-caption { visibility: visible; }
-#drift-layer .scale-star::before { content: '✦'; display: block; font-size: 22px; line-height: 1; }
+#drift-layer .scale-star::before { content: '✦'; display: block; font-size: var(--type-seal); line-height: 1; }
 #drift-layer .scale-star-kept { color: var(--verm, #b34836); }
-#drift-layer .scale-star-kept::before { content: '・'; font-size: 30px; }
+#drift-layer .scale-star-kept::before { content: '・'; font-size: var(--type-title); }
 #drift-layer .scale-star:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; border-radius: 4px; }
 /* The scale thread shares the world's bar ink and keeps every ancestor in reach. */
 `).replace(/#tray\b/g, '#drift-tray');
+
+// The hosted sky emits shared type steps only. A new literal requires an explicit role mapping.
+if (/\bfont-size\s*:\s*[\d.]+(?:px|rem|em)\b/.test(cssOut))
+  throw new Error('literal font-size in extracted Drift CSS; map it to the shared F type ladder');
 
 // splice the markup into the mount snippet; guard the one sequence that can
 // end an inline <script> early when the standalone build embeds this file

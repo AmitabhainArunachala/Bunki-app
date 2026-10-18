@@ -1,3 +1,28 @@
+/* Shared F type/leading catalog (track-f ed58fc1d); the remaining F styles integrate separately. */
+:root {
+  --type-caption: 12px;
+  --type-label: 13px;
+  --type-chrome: 14px;
+  --type-control: 15px;
+  --type-body: 16px;
+  --type-lead: 18px;
+  --type-seal: 22px;
+  --type-reading: 23px;
+  --type-section: 24px;
+  --type-title: 29px;
+  --type-display: 34px;
+  --type-hero: 38px;
+  --type-headword: 42px;
+  --leading-tight: 1.25;
+  --leading-ui: 1.35;
+  --leading-body: 1.55;
+  --leading-reading: 1.9;
+}
+/* a phone sets reading and display a step smaller: 21 is the smallest Japanese that carries a 10 px
+   reading. (Until F this compact pair applied only with the contrast variant off; type is not contrast.) */
+@media (max-width: 520px) {
+  :root { --type-reading: 21px; --type-display: 29px; }
+}
 /* The departing frame fades over the live incoming room. Capturing the new
    room would disable its hit testing until the native transition finishes.
    Slice C (one hand): rooms travel along the Line. Going to a tab to the right,

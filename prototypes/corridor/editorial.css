@@ -3584,23 +3584,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --font-display: var(--world-display);
   --font-brush: 'Yuji Syuku', 'Shippori Mincho B1', var(--font-reading);
   --font-seal: 'Kaisei Tokumin', 'Shippori Mincho B1', var(--font-reading);
-  --type-caption: 12px;
-  --type-label: 13px;
-  --type-chrome: 14px;
-  --type-control: 15px;
-  --type-body: 16px;
-  --type-lead: 18px;
-  --type-reading: 23px;
-  --type-section: 24px;
-  --type-title: 29px;
-  --type-display: 34px;
-  --type-hero: 38px;
-  --type-headword: 42px;
-  --type-seal: 22px;
-  --leading-tight: 1.25;
-  --leading-ui: 1.4;
-  --leading-body: 1.6;
-  --leading-reading: 1.9;
+  /* Shared type and leading steps live on :root in rooms/motion.css (slice F). */
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
@@ -3649,14 +3633,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   --elevation-card: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 34%);
   --elevation-lift: 0 2px 4px rgb(0 0 0 / 34%), 0 16px 36px rgb(0 0 0 / 44%);
   --elevation-float: 0 2px 6px rgb(0 0 0 / 36%), 0 20px 48px rgb(0 0 0 / 50%);
-}
-@media (max-width: 520px) {
-  /* The shipped contrast variant's body rule keeps the full reading/display
-     sizes; the compact scale applies only when that variant is switched off. */
-  :where(body:not([data-view='drift']):not(.v-contrast-wcag), body[data-view='drift']:not(.v-contrast-wcag) #sheet) {
-    --type-reading: 21px;
-    --type-display: 29px;
-  }
 }
 
 /* Compatibility bridge. Only aliases have the specificity needed to replace
@@ -4870,8 +4846,6 @@ html[data-room='door'] body.ginga #door-paper .today-horizon { stroke: none; }
   --elevation-press: 0 1px 0 var(--color-press), 0 6px 14px -8px rgb(20 26 40 / 34%);
   /* type: the foundation's sizes stay (one-line pins depend on them); tightness comes from
      weight, tracking and leading */
-  --leading-ui: 1.35;
-  --leading-body: 1.55;
   --skin-light: radial-gradient(120% 50% at 0% 0%, rgb(255 255 255 / 22%), transparent 60%);
 }
 /* ベロ藍・浪, the default world: sumi ink near-black, 藍 structure, a cleaner washi */
