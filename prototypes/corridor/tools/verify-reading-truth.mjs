@@ -708,8 +708,9 @@ async function stableCases(page) {
     const afterTap = await page.evaluate(() => ({ mini: !!document.getElementById('mini'), page: !!document.getElementById('sheet'),
       raised: document.querySelector('[data-index="11"][data-reader-annotation]')?.dataset.ladderRung ?? null }));
     await annotation.click({ button: 'right' }); await delay(200);
-    const menu = await page.locator('#reader-word-menu').count();
-    check('G3.phonetic-annotation', 'Cabinet token11 ちかい remains source text, with no lookup door, extra ruby, stage or word menu',
+    // G5: the word menu became the strip (hold = seal); an inert annotation opens neither
+    const menu = await page.locator('#seal-strip').count();
+    check('G3.phonetic-annotation', 'Cabinet token11 ちかい remains source text, with no lookup door, extra ruby, stage or strip',
       before.text === fixture.s && !before.action && !before.role && !before.popup && !before.paragraphDoor && before.ruby === 0
         && !afterTap.mini && !afterTap.page && !afterTap.raised && menu === 0, { before, afterTap, menu });
   }
@@ -1171,7 +1172,7 @@ async function checkSweepAnnotation(page, occurrence) {
   const observed = await locator.evaluate(node => ({ text: node.textContent, para: node.hasAttribute('data-para'),
     action: node.dataset.action ?? null, role: node.getAttribute('role'), popup: node.getAttribute('aria-haspopup'),
     ruby: node.querySelectorAll('ruby,rt').length, rung: node.dataset.ladderRung ?? null,
-    stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), menu: !!document.getElementById('reader-word-menu') }));
+    stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), menu: !!document.getElementById('seal-strip') }));
   const afterRecord = await readAppRecord(page);
   assert.equal(observed.text, occurrence.token.s);
   assert(!observed.para && !observed.action && !observed.role && !observed.popup && !observed.ruby && !observed.rung && !observed.stage && !observed.page && !observed.menu,

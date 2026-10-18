@@ -2825,42 +2825,154 @@ body .token-actions button:hover { background: var(--ai-wash); }
 }
 
 /* ==========================================================================
-   The reader's word doors (reader lane, 2026-10-02 — John's notes 8, 9, 11, 17, 18).
-   A right-click or a hold opens the word menu; Save answers with a small toast; lists open in a
-   compact popover (a short sheet on a phone). The popup itself is skinned once, in rooms/read.css.
+   The reader's word doors (reader lane, 2026-10-02 — John's notes 8, 9, 11, 17, 18; G5, 2026-10-18).
+   A hold, a right-click or Shift+F10 seals the word (corridor.js, sealWord) and opens the strip beside it; Save answers
+   with a small toast; Save ▾'s lists unfold inside their card. The popup itself is skinned once, in rooms/read.css.
    ========================================================================== */
 
-.reader-word-menu {
-  position: fixed;
-  z-index: 90;
+/* G5 · the ring under the finger: the world's 朱 (--color-seal) on its own faint track; it fills clockwise from twelve between
+   150 ms and the commit at 500 ms by transform alone — two half rings, each clipped to its half, turn into view (corridor.js
+   holdRing) — and leaves in one beat, outward when the word was kept */
+.hold-ring { position: fixed; z-index: 95; width: 64px; height: 64px; margin: -32px 0 0 -32px; pointer-events: none; }
+.hold-ring-track, .hold-ring-arc { position: absolute; box-sizing: border-box; width: 64px; height: 64px; border: 3px solid transparent; border-radius: 50%; }
+.hold-ring-track { inset: 0; border-color: color-mix(in srgb, var(--color-seal) 20%, transparent); }
+.hold-ring-half { position: absolute; top: 0; width: 32px; height: 64px; overflow: hidden; }
+.hold-ring-half.is-right { left: 32px; }
+.hold-ring-half.is-left { left: 0; }
+.hold-ring-half.is-right .hold-ring-arc { left: -32px; border-top-color: var(--color-seal); border-right-color: var(--color-seal); transform: rotate(-135deg); }
+.hold-ring-half.is-left .hold-ring-arc { left: 0; border-bottom-color: var(--color-seal); border-left-color: var(--color-seal); transform: rotate(-135deg); }
+.hold-ring.is-whole .hold-ring-arc { transform: rotate(45deg); }
+.hold-ring.is-leaving { opacity: 0; transition: opacity var(--motion-quick) var(--ease-exit); }
+.hold-ring.is-kept { opacity: 0; transform: scale(1.18); transition: opacity var(--motion-fast) var(--ease-exit), transform var(--motion-fast) var(--ease-enter); }
+
+/* G5 · the seal: a 白文 印 — the world's 朱 pressed solid, the paper showing through the character — at the word's
+   shoulder; it flies to the bookmark on two nested layers (X and Y on their own house curves), transform and opacity only */
+.seal-flight, .seal-rise { position: fixed; z-index: 95; display: block; width: 26px; height: 26px; pointer-events: none; }
+.seal-rise { position: static; }
+.seal-stamp {
   display: grid;
-  min-width: 232px;
-  max-width: calc(100vw - 16px);
-  padding: 6px;
-  border: 1px solid var(--raised-edge);
+  place-items: center;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-seal);
+  background: var(--color-seal);
+  color: var(--color-paper, #f5efe0);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--color-ink) 28%, transparent);
+  font: 800 16px/1 var(--font-seal);
+  transform: rotate(-9deg);
+}
+
+/* G5 · the strip: the slip's paper and edge (rooms/read.css #mini), laid in its word's own scroller (the document, or the
+   page) so it scrolls with the word; under the chrome's bar and the page's bar (it never covers them), over the text.
+   Row 1 is the word's state and its one way out (Saved ✓, Remove), then his lists — B slips, the chosen mark when the
+   word is on one; row 2 the word's acts — C, quiet, under a hairline. corridor.js caps it at 40 % of the screen; its
+   ordinary rows fit inside that with no scroll of their own (only past six lists can it scroll inside itself). */
+.seal-strip {
+  position: absolute;
+  z-index: 19;
+  box-sizing: border-box;
+  width: min(360px, calc(100vw - 16px));
+  max-height: 40vh;
+  overflow-y: auto;
+  padding: 10px 10px 4px;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 26%, transparent);
   border-radius: var(--radius-overlay);
   background: var(--color-paper, #f5efe0);
-  background: var(--raised);
-  box-shadow: var(--float-shadow);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), 0 0 0 0.5px rgb(20 24 34 / 6%), 0 3px 8px -3px rgb(20 24 34 / 26%),
+    0 14px 40px -12px rgb(20 24 34 / 32%);
+  color: var(--color-ink);
+  text-align: start;
+  animation: seal-strip-rise var(--motion-room) var(--ease-enter) backwards;
 }
-.reader-word-menu:focus { outline: none; }
-.reader-word-menu-item {
-  display: flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 12px;
+.seal-strip.in-page { z-index: 3; }
+/* more below the fold: the strip's own paper rises over its last 22 px (focus: the eye goes where there is more), and
+   leaves once the last row is in view; a sticky foot inside the scroller, so the strip keeps its edge and its shade */
+.seal-strip[data-more='true']::after {
+  content: '';
+  position: sticky;
+  bottom: -4px;
+  display: block;
+  height: 22px;
+  margin: -22px -10px -4px;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--color-paper, #f5efe0) 0%, transparent), var(--color-paper, #f5efe0));
+  pointer-events: none;
+}
+.seal-strip[data-side='above'] { animation-name: seal-strip-fall; }
+.seal-strip:focus { outline: none; }
+@keyframes seal-strip-rise { from { opacity: 0.01; transform: translate3d(0, 6px, 0); } }
+@keyframes seal-strip-fall { from { opacity: 0.01; transform: translate3d(0, -6px, 0); } }
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .seal-strip {
+  /* night: the slip's lit edge and its deep shade (rooms/read.css #mini) */
+  border-color: color-mix(in srgb, var(--color-gold, #e2bd6c) 34%, transparent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), 0 0 0 1px rgb(0 0 0 / 30%), 0 3px 8px -3px rgb(0 0 0 / 55%), 0 16px 48px -14px rgb(0 0 0 / 62%);
+}
+.seal-strip-status { margin: 0 4px 8px; font: 500 13px/1.45 var(--font-ui); color: var(--color-ink-2); }
+.seal-strip-status:empty { display: none; }
+.seal-strip-lists { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+/* in the first row the status is the row's first word, its one way out beside it: "Saved ✓  Remove  仕事  旅  New list…" */
+.seal-strip-lists > .seal-strip-status { display: inline-flex; align-items: center; min-height: 44px; margin: 0 6px 0 4px; }
+.seal-strip-lists > .seal-act[data-strip-action='remove'] { margin-inline: -4px 6px; }
+.seal-strip-lists > .seal-strip-status:empty { display: none; }
+.seal-strip-more { display: contents; }
+.seal-strip-more[hidden], .seal-strip-form[hidden], .seal-strip [hidden] { display: none; }
+.seal-strip .seal-list { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seal-strip .seal-list[aria-pressed='true']::after { content: ' ✓'; }
+.seal-strip-form { display: flex; flex: 1 1 100%; gap: 6px; }
+.seal-strip-form .vocabulary-list-field { flex: 1 1 auto; min-width: 0; }
+.seal-strip-acts { display: flex; flex-wrap: wrap; gap: 0 2px; margin: 8px -6px 0; padding-top: 4px; border-top: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent); }
+/* two verbs to a line even on a 320 phone (全項目 · Full entry | Save the sentence), so the acts take two lines, not three */
+.seal-strip .seal-strip-acts > button.seal-act { padding-inline: 6px; }
+.seal-strip .seal-act[data-strip-action='remove'] { color: var(--color-ink-2); }
+.seal-strip-room { display: block; }
+
+/* G5 · the bookmark lands on the kept words: the newest kept word's row is marked a moment in the world's 朱 wash */
+.tray-line[data-landed] { animation: kept-landed 1800ms var(--ease-standard) both; }
+@keyframes kept-landed { 0%, 35% { background: var(--color-seal-wash); } 100% { background: transparent; } }
+
+/* G5 · 層, the one way into the layers: a quiet disc like the folded 音 mark, beside it at the foot (層 音, as the Together
+   sketch set them); while the player stands open across the foot, 層 waits */
+.layers-mark {
+  position: fixed;
+  z-index: 45;
+  right: var(--s2);
+  bottom: calc(var(--nav-clearance, 0px) + 16px + env(safe-area-inset-bottom));
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
   border: 0;
-  border-radius: var(--radius-control);
-  background: transparent;
-  color: var(--text);
-  font: 500 15px/1.25 var(--sans);
-  text-align: left;
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-ink-2);
+  font: 400 19px/1 var(--font-reading);
   cursor: pointer;
 }
-.reader-word-menu-item:hover, .reader-word-menu-item:focus { outline: none; background: var(--ai-wash); }
-.reader-word-menu-item:focus-visible { background: var(--focus-wash); box-shadow: var(--focus-ring); }
-.reader-word-menu-item[aria-disabled='true'] { color: var(--text-2); background: transparent; cursor: default; }
-.reader-word-menu-item[aria-disabled='true']:focus-visible { background: var(--focus-wash); }
+.layers-mark[aria-pressed='true'] { color: var(--color-seal); }
+.layers-mark:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+@media (max-width: 520px) {
+  body[data-view='reader'] .layers-mark { right: calc(var(--s2) + 44px + 8px); bottom: calc(8px + env(safe-area-inset-bottom)); }
+  body.has-primary-tabs[data-view='reader'] .layers-mark { bottom: calc(var(--nav-clearance) + 8px); }
+  body[data-view='reader']:has(.listen-row.play-bar[data-open='true']) .layers-mark { display: none; }
+}
+/* the layers: the paragraph stays as it is; one quiet block under it — the paragraph read in kana (読), its words' meanings
+   (意) and its particles' roles (文), each line led by its glyph — folds on any tap */
+.reader-layers {
+  margin: 0.2em 0 0.9em;
+  padding: 2px 0 2px 12px;
+  border-left: 2px solid color-mix(in srgb, var(--color-accent) 46%, transparent);
+  font: 400 14px/1.6 var(--font-ui);
+  color: var(--color-ink-2);
+  animation: reader-pop-in var(--motion-fast) var(--ease-enter);
+}
+.reader-layers p { margin: 0; }
+.reader-layers p + p { margin-top: 4px; }
+.reader-layers-label { display: inline-block; min-width: 1.6em; margin-inline-end: 4px; color: var(--color-muted); font: 400 13px/1 var(--font-reading); }
+.reader-layers-kana { font: 400 15px/1.7 var(--font-reading); letter-spacing: 0.04em; color: var(--color-ink-2); }
+.reader-layers-pair { margin-inline-end: 0.85em; }
+.reader-layers-ja { font-family: var(--font-reading); color: var(--color-ink); }
+.reader-layers-roles { color: var(--color-muted); }
 
 .reader-toast {
   position: fixed;
@@ -2917,6 +3029,9 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .vocabulary-list-action#mini-unsave { color: var(--text-2); }
 .vocabulary-list-title { margin: 0 0 4px; font: 700 15px/1.4 var(--sans); overflow-wrap: anywhere; }
 .vocabulary-list-popover .vocabulary-list-choices { display: grid; max-height: 40vh; margin: 0 0 8px; overflow: auto; border: 0; }
+/* G5 · Save ▾'s menu, his lists and all, stays under 40 % of the screen: its title, Review, New list… and Copy take about
+   200 px, and the lists scroll inside what is left (two rows at least); outweighs read.css's inline 30vh */
+:is(#mini, body) .vocabulary-list-popover.is-save-menu.is-save-menu .vocabulary-list-choices { max-height: max(88px, calc(40vh - 200px)); }
 .vocabulary-list-choice { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 4px; border-radius: var(--radius-control); font: 15px/1.3 var(--sans); cursor: pointer; }
 .vocabulary-list-choice:hover { background: var(--ai-wash); }
 .vocabulary-list-choice input { flex: 0 0 auto; width: 18px; height: 18px; margin: 0; accent-color: var(--ai); }
@@ -2998,7 +3113,7 @@ body .token-actions button:hover { background: var(--ai-wash); }
   .version-toggle .version-choice { flex: 1 1 0; flex-wrap: wrap; justify-content: center; column-gap: 4px; row-gap: 0; padding: 4px 8px; font-size: 13px; }
 }
 .reader-toast:not([hidden]) { animation: reader-toast-in var(--motion-fast) var(--ease-standard); }
-.reader-word-menu, .vocabulary-list-popover { animation: reader-pop-in var(--motion-ma) var(--ease-enter); }
+.vocabulary-list-popover { animation: reader-pop-in var(--motion-ma) var(--ease-enter); }
 @keyframes reader-toast-in { from { opacity: 0; transform: translate(-50%, 8px); } }
 @keyframes reader-pop-in { from { opacity: 0; } }
 
@@ -5521,7 +5636,7 @@ body[data-view='search'] #chrome-search { visibility: hidden; pointer-events: no
   body > :is(.sheet, .world-picker, .world-picker-scrim),
   body::after,
   body #mini,
-  body :is(.reader-word-menu, .vocabulary-list-popover),
+  body :is(.seal-strip, .vocabulary-list-popover, .reader-layers),
   body .reader-toast:not([hidden]),
   body #bunki-reports-root .br-sheet[open] {
     animation: feel-fade var(--motion-room) linear both !important;
@@ -5695,6 +5810,13 @@ body.record-not-saving #app > .chrome { margin-bottom: var(--record-band-h, 48px
 }
 /* in a bar it takes the bar's measure: 44, no lift */
 :is(#sheet, #app) [data-bar] button.save-one { height: 44px; min-height: 44px; box-shadow: none; }
+/* G5 · L-2 (MISSION/FINDINGS.md; MASTER_SPEC D5: no element within 8 px of an edge unless full-bleed). A Save in a bar
+   stood the bar's whole 44 and touched the screen's top edge. It is a door of its bar, as the seal is: its target the
+   bar's 44, the height of Close and search beside it, and its face a control inside the bar — 28 high, centred, 8 px
+   clear of the screen above it. The 8 px above and below the face are still the button's (::before), so nothing is
+   smaller to press. The room's keep has no face (its two lines of words in the bar's ink); it is untouched. */
+:is(#sheet, #app) [data-bar] button.save-one:not(.chrome-keep) { position: relative; height: 28px; min-height: 28px; }
+:is(#sheet, #app) [data-bar] button.save-one:not(.chrome-keep)::before { content: ''; position: absolute; inset: -9px -1px; }
 /* a row that holds a Save keeps it on its own line end, the menu unfolding under the row (placeSaveMenu) */
 [data-save-row] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 /* the reader's keep stands in the room's bar in the bar's own type (corridor.js chromeKeep): its words in the bar's ink,

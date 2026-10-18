@@ -64,19 +64,22 @@
  *   G1 stage meaning   — G3's known on-touch word reveals its reading, then opens the stage with
  *                         its meaning, Save and full-entry band. Switching words yields exactly one stage;
  *                         Escape closes it and restores focus. verify-word-grammar pins every rung.
- *   G2 menu → one card  — (John #11 "right click and choose save") a right-click on 郊外 opens the word menu
- *                         at the pointer: Save · Save the sentence · Full entry · Ask the tutor about
- *                         this sentence · Copy. Save makes exactly one 郊外 card carrying its sentence
- *                         (the capture path's ctx), the menu closes, a polite toast says so, and the menu
- *                         then shows "Saved ✓" unavailable. A right-click off the words keeps the browser's
- *                         own menu. Control: 3166ded3, which had no word menu.
+ *   G2 hold → one card  — (John #11 "right click and choose save"; G5 hold = seal, 2026-10-18) a right-click on
+ *                         郊外 seals it: exactly one 郊外 card carrying its sentence (the capture path's ctx),
+ *                         and the strip opens beside the word (never over it) with a polite status that says
+ *                         Saved and the word's acts in plain full verbs: 全項目 · Full entry · Save the
+ *                         sentence · Copy · Ask the tutor about the word · Remove. A second right-click is the
+ *                         same strip and still one card. A right-click off the words keeps the browser's own
+ *                         menu. Control: 3166ded3, which had no word menu; 92e5492f, whose menu saved nothing
+ *                         until its Save was chosen.
  *   G3 Save + Review off — (John #17; 1.3.0 Save ▾) at 1368 and 390, the popup's Save makes one card in one
  *                         press, no list window opens, the button reads "Saved ✓" and its menu unfolds inside
  *                         the card with Review checked; Review off takes the card back out and the button
  *                         reads "Save" again.
  *                         Control: 3166ded3, whose Save opened dialog#vocabulary-list-dialog.
- *   G4 keyboard menu    — the focused word's Shift+F10 (and the ContextMenu key) opens the menu with the
- *                         first item focused; ↓ moves; Escape closes it and focus returns to the word.
+ *   G4 keyboard strip   — the focused word's Shift+F10 (and the ContextMenu key) seals it and opens the strip
+ *                         with its first control focused (New list… on a record with no lists); ↓ moves to
+ *                         全項目 · Full entry; Escape closes it and focus returns to the word.
  *                         Enter on the word opens the popup with focus on Save; Escape returns to the word.
  *                         Control: 3166ded3 (no menu).
  *   G5 lists popover    — (John #17; round 4 T5, "click save and then add to list from there") the popup
@@ -298,10 +301,10 @@ const measureReaderMotion = () => {
   const seconds = (value) => parseFloat(value) * (value.trim().endsWith('ms') ? 0.001 : 1);
   const violations = [];
   let transitions = 0, animations = 0;
-  const nodes = [...document.querySelectorAll('#app, #app *, #mini, #mini *, #reader-word-menu, #reader-word-menu *, #reader-toast, #reader-toast *, #vocabulary-list-popover, #vocabulary-list-popover *')];
+  const nodes = [...document.querySelectorAll('#app, #app *, #mini, #mini *, #seal-strip, #seal-strip *, #reader-toast, #reader-toast *, #vocabulary-list-popover, #vocabulary-list-popover *')];
   const groups = { topBar: '#app > .chrome button', tabBar: '#primary-tabs .primary-tab', titleCard: '.reader-card button, .reader-card summary',
     bookmark: '#reader-place-save', playBar: '.listen-row', words: '#reader .tok[data-prose-label]', finished: '#read-fin', settings: '.dials .seg button',
-    menu: '#reader-word-menu', popup: '#mini button', toast: '#reader-toast', listAdd: '#vocabulary-list-create' };
+    menu: '#seal-strip', popup: '#mini button', toast: '#reader-toast', listAdd: '#vocabulary-list-create' };
   const covered = Object.fromEntries(Object.entries(groups).map(([group, selector]) => [group, nodes.filter((node) => node.matches(selector)).length]));
   for (const node of nodes) for (const pseudo of [null, '::before', '::after']) {
     const style = getComputedStyle(node, pseudo);
@@ -995,30 +998,36 @@ try {
       const tok = page.locator(`#reader .tok[data-index="${SUBURB}"]`);
       await tok.evaluate((node) => node.scrollIntoView({ block: 'center' }));
       const at = await tok.evaluate((node) => { const r = node.getClientRects()[0]; return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
+      const wordBox = await tok.evaluate((node) => { const r = node.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom }; });
       await page.mouse.click(at.x, at.y, { button: 'right' });
-      await page.waitForSelector('#reader-word-menu');
-      const menu = await page.evaluate(() => {
-        const node = document.getElementById('reader-word-menu'), box = node.getBoundingClientRect();
-        return { role: node.getAttribute('role'), items: [...node.querySelectorAll('[role="menuitem"]')].map((item) => item.textContent), left: box.left, top: box.top };
-      });
-      assert.deepEqual(menu.items, ['Save', 'Save the sentence', 'Full entry', 'Ask the tutor about this sentence', 'Copy'], `the word menu: ${JSON.stringify(menu.items)}`);
-      assert(menu.role === 'menu' && Math.abs(menu.left - at.x) <= 2 && Math.abs(menu.top - at.y) <= 2, `the menu is not at the pointer: ${JSON.stringify({ menu, at })}`);
-      await page.locator('#reader-word-menu [data-menu-action="save-word"]').click();
-      const record = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length > 0, { description: '郊外 saved from the menu' });
-      await page.waitForFunction(() => !!document.querySelector('#reader-toast:not([hidden])'), null, { timeout: 5_000 }).catch(() => {});
+      await page.waitForSelector('#seal-strip');
+      const record = await waitForAppRecord(page, (r) => cardsFor(r, '郊外').length > 0, { description: '郊外 sealed by the right-click' });
       await page.waitForTimeout(300);
+      const strip = await page.evaluate(() => {
+        const node = document.getElementById('seal-strip'), box = node.getBoundingClientRect(), status = document.getElementById('seal-strip-status');
+        return { role: node.getAttribute('role'), items: [...node.querySelectorAll('[data-strip-action]')].filter((item) => !item.hidden).map((item) => item.textContent.trim()),
+          status: status && { text: status.textContent.trim(), role: status.getAttribute('role') }, top: box.top, bottom: box.bottom, left: box.left, right: box.right };
+      });
+      // the word's one way out stands beside Saved ✓ in the first row (lead's ruling, 2026-10-18); the acts follow under the hairline
+      assert.deepEqual(strip.items, ['Remove', '全項目 · Full entry', 'Save the sentence', 'Copy', 'Ask the tutor about the word'], `the strip: ${JSON.stringify(strip.items)}`);
+      assert.equal(await page.locator('#seal-strip .seal-strip-lists > #seal-strip-status + [data-strip-action="remove"]').count(), 1, 'Remove does not stand beside Saved ✓');
+      const overWord = !(strip.right <= wordBox.left || strip.left >= wordBox.right || strip.bottom <= wordBox.top || strip.top >= wordBox.bottom);
+      assert(strip.role === 'dialog' && !overWord, `the strip is not beside its word: ${JSON.stringify({ strip, wordBox })}`);
       const after = await readAppRecord(page);
       const cards = cardsFor(after, '郊外');
-      assert.equal(cards.length, 1, `the menu made ${cards.length} 郊外 cards`);
+      assert.equal(cards.length, 1, `the right-click made ${cards.length} 郊外 cards`);
       assert(cards[0].ctx?.scope === 'sent' && cards[0].ctx.p === ARTICLE && cards[0].ctx.i === SUBURB, `the card lost its sentence: ${JSON.stringify(cards[0])}`);
-      const toast = await page.evaluate(() => { const t = document.querySelector('#reader-toast:not([hidden])'); return t && { text: t.innerText.replace(/\s+/gu, ' ').trim(), role: t.getAttribute('role'), live: t.getAttribute('aria-live') }; });
-      // S · the toast says what Save says (保存しました · Saved) with its Undo, and nothing about review (it pinned "Saved to review")
-      assert(toast && /^Saved\b/u.test(toast.text) && !/review/iu.test(toast.text) && toast.role === 'status' && toast.live === 'polite', `no polite toast: ${JSON.stringify(toast)}`);
-      assert.equal(await page.locator('#reader-word-menu').count(), 0, 'the menu stayed open after Save word');
+      // S · what the keep says, it says once and politely (Saved), and nothing about review
+      assert(strip.status && /^Saved\b/u.test(strip.status.text) && !/review/iu.test(strip.status.text) && strip.status.role === 'status', `no polite status: ${JSON.stringify(strip.status)}`);
+      await page.keyboard.press('Escape');
+      assert.equal(await page.locator('#seal-strip').count(), 0, 'Escape left the strip open');
       await page.mouse.click(at.x, at.y, { button: 'right' });
-      await page.waitForSelector('#reader-word-menu');
-      const again = await page.evaluate(() => { const item = document.querySelector('#reader-word-menu [data-menu-action="save-word"]'); return { label: item.textContent, disabled: item.getAttribute('aria-disabled') }; });
-      assert.deepEqual(again, { label: 'Saved ✓', disabled: 'true' }, `the menu does not show the word saved: ${JSON.stringify(again)}`);
+      await page.waitForSelector('#seal-strip');
+      await page.waitForTimeout(300);
+      const again = await page.evaluate(() => ({ status: document.getElementById('seal-strip-status')?.textContent.trim(),
+        remove: !document.querySelector('#seal-strip [data-strip-action="remove"]')?.hidden }));
+      assert.deepEqual(again, { status: 'Saved ✓', remove: true }, `the second right-click does not show the word kept: ${JSON.stringify(again)}`);
+      assert.equal(cardsFor(await readAppRecord(page), '郊外').length, 1, 'a second right-click duplicated or removed the card');
       await page.keyboard.press('Escape');
       // the browser keeps its own menu off the words
       const offWord = await page.evaluate(() => {
@@ -1027,7 +1036,7 @@ try {
         return title.dispatchEvent(event);
       });
       assert.equal(offWord, true, 'a right-click off the words lost the browser menu');
-      return { items: menu.items.length, cards: cards.length, ctx: cards[0].ctx, srs: !!record.srs, toast: toast.text };
+      return { items: strip.items.length, cards: cards.length, ctx: cards[0].ctx, srs: !!record.srs, status: strip.status.text };
     });
 
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
@@ -1063,16 +1072,18 @@ try {
       const word = page.locator(`#reader .tok[data-index="${SUBURB}"]`);
       await focusToken(page, SUBURB);
       await page.keyboard.press('Shift+F10');
-      await page.waitForSelector('#reader-word-menu');
-      const first = await page.evaluate(() => document.activeElement?.dataset.menuAction);
+      await page.waitForSelector('#seal-strip');
+      const control = () => page.evaluate(() => document.activeElement?.closest('#seal-strip') ? document.activeElement.dataset.stripAction || document.activeElement.id : null);
+      const first = await control();
       await page.keyboard.press('ArrowDown');
-      const second = await page.evaluate(() => document.activeElement?.dataset.menuAction);
+      const second = await control();
       await page.keyboard.press('Escape');
-      const back = await page.evaluate(() => ({ menu: !!document.getElementById('reader-word-menu'), focus: document.activeElement?.dataset.index }));
-      assert.deepEqual([first, second, back.menu, back.focus], ['save-word', 'save-sentence', false, String(1)], `Shift+F10, ↓, Escape: ${JSON.stringify({ first, second, back })}`);
+      const back = await page.evaluate(() => ({ menu: !!document.getElementById('seal-strip'), focus: document.activeElement?.dataset.index }));
+      assert.deepEqual([first, second, back.menu, back.focus], ['seal-strip-new', 'entry', false, String(1)], `Shift+F10, ↓, Escape: ${JSON.stringify({ first, second, back })}`);
       await page.keyboard.press('ContextMenu');
-      const byKey = await page.evaluate(() => document.activeElement?.closest('#reader-word-menu') ? document.activeElement.dataset.menuAction : null);
-      assert.equal(byKey, 'save-word', 'the ContextMenu key did not open the menu');
+      await page.waitForSelector('#seal-strip');
+      const byKey = await control();
+      assert.equal(byKey, 'seal-strip-new', 'the ContextMenu key did not open the strip with the keyboard inside it');
       await page.keyboard.press('Escape');
       await page.keyboard.press('Enter');
       const reveal = await word.evaluate((node) => node.dataset.ladderRung === 'reading');
@@ -1513,10 +1524,10 @@ try {
         await page.locator('#dials-toggle').click();
         await focusToken(page, SUBURB);
         await page.keyboard.press('Shift+F10');
-        await page.waitForSelector('#reader-word-menu');
+        await page.waitForSelector('#seal-strip');
         const menu = await page.evaluate(measureReaderMotion);
-        assert.equal(menu.covered.menu, 1, `motion check did not observe the word menu: ${JSON.stringify(menu.covered)}`);
-        assert.deepEqual(menu.violations, [], 'The word menu may animate only transform and opacity');
+        assert.equal(menu.covered.menu, 1, `motion check did not observe the strip: ${JSON.stringify(menu.covered)}`);
+        assert.deepEqual(menu.violations, [], 'The strip may animate only transform and opacity');
         return { word, sentence, saved, lists, settings, menu };
       });
 

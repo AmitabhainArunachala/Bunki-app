@@ -1,4 +1,9 @@
 /** Real reader popup and optional list-popover journeys against one immutable artifact.
+ * G5 (hold = seal, 2026-10-18; MASTER_SPEC §7 line 10: "his lists open in one small menu, each one tap … it never covers
+ * another button; many lists scroll inside it"): with twelve of his lists, on a phone (390×844), the strip a hold opens
+ * shows six lists and "All lists · 12", which unfolds the other six inside the strip; the strip stays under 40 % of the
+ * screen, covers no button and not its word, and every list is one tap (the twelfth adds the word to that list alone);
+ * Save ▾'s menu, unfolded in the card with the same twelve, stays under 40 % and covers no button either.
  * Round 1 retired the modal chooser: Save captures immediately; the lists are checkboxes, and
  * card context remains available in the full entry. Round 4 (John T5, "click save and then add to
  * list from there") and 1.3.0's Save ▾: one Save, whose menu (Review · lists · + New list · Copy)
@@ -67,7 +72,17 @@ async function reader(page) {
   await token(page).waitFor();
 }
 async function openPopup(page) {
-  if (!await page.locator('#mini').count()) await token(page).click();
+  if (!await page.locator('#mini').count()) {
+    await token(page).click();
+    // G3's ladder: on touch the first activation raises only the reading, the second brings the stage. Only an observed
+    // reading rung permits the second activation; a dead door is never rescued with an unconditional extra tap.
+    await page.waitForFunction((index) => !!document.getElementById('mini') ||
+      document.querySelector(`#reader .tok.content[data-index="${index}"]`)?.dataset.ladderRung === 'reading', tokenIndex);
+    if (!await page.locator('#mini').count()) {
+      assert.equal(await token(page).getAttribute('data-ladder-rung'), 'reading', 'the first activation stopped at the reading rung');
+      await token(page).click();
+    }
+  }
   await page.locator('#mini-take').waitFor();
   assert.equal(await page.locator('#mini .mini-word').textContent(), word);
   assert.equal(await page.locator('#mini-take').isDisabled(), false);
@@ -134,8 +149,11 @@ function contextIs(record, scope) {
 try {
   for (const engine of engines) {
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true });
-    const check = async (name, body) => {
-      const context = await browser.newContext({ viewport: { width: 1024, height: 900 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
+    const check = async (name, body, { viewport = { width: 1024, height: 900 }, phone = false } = {}) => {
+      const context = await browser.newContext({ viewport, reducedMotion: 'reduce', serviceWorkers: 'block', ...(phone ? { isMobile: true, hasTouch: true, deviceScaleFactor: 2 } : {}) });
+      // G3's one-time demonstration opens a word by itself on a fresh record; it is not under test here (verify-word-grammar
+      // and verify-design-reader-shelf pin it), so it is marked seen, as verify-word-grammar does for every walk but its own
+      await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
       await silenceBrowserAudio(context);
       await context.route('**/*', route => new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort());
       const page = await context.newPage(), errors = [];
@@ -313,6 +331,76 @@ try {
         assert.equal(await listName(page).inputValue(), '', 'The saved name does not return as a draft');
         return { kept: ['review Save/Undo', 'existing list checkbox'], cleared: 'form submit of the typed name' };
       });
+      await check('twelve-lists-strip-and-save-menu-phone', async page => {
+        await reader(page);
+        const names = ['仕事', '旅', 'N1 読解', 'ニュースで出会った語', 'Kanji I keep missing', '漢字', '会話', 'Politics and the cabinet',
+          '経済', '科学', '料理', '映画の台詞'];
+        const seeded = await readAppRecord(page);
+        await restoreAppFixture(page, { ...seeded, lists: Object.fromEntries(names.map(name => [name, []])) });
+        await reader(page);
+        const place = (selector) => page.evaluate(({ selector, index }) => {
+          const menu = document.querySelector(selector);
+          if (!menu) return null;
+          const r = menu.getBoundingClientRect();
+          const under = (x, y) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom && menu.contains(document.elementFromPoint(x, y));
+          const covered = [];
+          for (const node of document.querySelectorAll('button, a[href], input:not([type="hidden"]), select, textarea, summary, [role="button"], [role="link"], [role="tab"], [role="checkbox"]')) {
+            if (menu.contains(node) || node.closest('[inert], [hidden]')) continue;
+            if (selector === '#vocabulary-list-popover' && node.closest('#mini')) continue; // the card that holds Save ▾'s menu is its own surface
+            const b = node.getBoundingClientRect();
+            if (!b.width || !b.height || b.right <= r.left || b.left >= r.right || b.bottom <= r.top || b.top >= r.bottom) continue;
+            const style = getComputedStyle(node);
+            if (style.visibility === 'hidden' || style.display === 'none') continue;
+            const points = [[b.left + b.width / 2, b.top + b.height / 2], [b.left + 2, b.top + 2], [b.right - 2, b.top + 2], [b.left + 2, b.bottom - 2], [b.right - 2, b.bottom - 2]];
+            if (points.some(([x, y]) => under(x, y))) covered.push((node.getAttribute('aria-label') || node.textContent || node.id).trim().slice(0, 30));
+          }
+          const word = document.querySelector(`#reader .tok.content[data-index="${index}"]`)?.getBoundingClientRect();
+          const overWord = !!word && !(word.right <= r.left || word.left >= r.right || word.bottom <= r.top || word.top >= r.bottom);
+          const chips = [...menu.querySelectorAll('.seal-list[data-list]')];
+          return { share: r.height / innerHeight, height: r.height, covered, overWord, scrolls: menu.scrollHeight > menu.clientHeight + 1,
+            shown: chips.filter(chip => chip.getClientRects().length).map(chip => chip.dataset.list), all: chips.map(chip => chip.dataset.list),
+            allButton: menu.querySelector('#seal-strip-all')?.textContent.trim() ?? null, expanded: menu.querySelector('#seal-strip-all')?.getAttribute('aria-expanded') ?? null };
+        }, { selector, index: tokenIndex });
+        // the mouse's hold: a right-click seals 底 and opens the strip beside it
+        await token(page).click({ button: 'right' });
+        await page.locator('#seal-strip').waitFor();
+        await waitForAppRecord(page, record => !!row(record), { description: 'the hold keeps 底' });
+        const folded = await place('#seal-strip');
+        assert.equal(folded.shown.length, 6, `the strip shows his first six lists: ${JSON.stringify(folded.shown)}`);
+        assert.equal(folded.allButton, 'All lists · 12', 'past six, All lists names how many');
+        assert(folded.share <= 0.4 && folded.covered.length === 0 && !folded.overWord, `the folded strip: ${JSON.stringify(folded)}`);
+        await page.locator('#seal-strip-all').click();
+        const open = await place('#seal-strip');
+        assert.equal(open.expanded, 'true');
+        assert.deepEqual([...open.all].sort(), [...names].sort(), 'every list stands inside the strip');
+        assert(open.share <= 0.4 && open.covered.length === 0 && !open.overWord, `the unfolded strip stays under 40 % and covers nothing: ${JSON.stringify(open)}`);
+        const before = await readAppRecord(page);
+        const last = page.locator(`#seal-strip .seal-list[data-list="${names[11]}"]`);
+        await last.scrollIntoViewIfNeeded();
+        await last.click();
+        const after = await waitForAppRecord(page, record => record.lists?.[names[11]]?.some(item => item.id === word), { description: 'one tap on the twelfth list' });
+        // the durable write lands a beat before the strip repaints its chip: wait for the strip, then assert it
+        await page.waitForFunction((name) => document.querySelector(`#seal-strip .seal-list[data-list="${name}"]`)?.getAttribute('aria-pressed') === 'true',
+          names[11], { timeout: 5000 }).catch(() => {});
+        assert.equal(await last.getAttribute('aria-pressed'), 'true', 'the tapped list wears the chosen mark');
+        for (const name of names.slice(0, 11)) assert.deepEqual(after.lists[name], before.lists[name], `one tap touched only its own list (${name})`);
+        assert.equal(after.taken.filter(item => item.id === word).length, 1, 'a list tap never duplicates the card');
+        const unfolded = await place('#seal-strip');
+        assert(unfolded.share <= 0.4 && unfolded.covered.length === 0, `after the tap the strip still covers nothing: ${JSON.stringify(unfolded)}`);
+        await page.keyboard.press('Escape');
+        await page.locator('#seal-strip').waitFor({ state: 'detached' });
+        // Save ▾'s menu, the same twelve lists, unfolded inside the card
+        await openPopup(page);
+        assert.equal(await page.locator('#mini-take').getAttribute('aria-pressed'), 'true', 'the stage knows the hold kept 底');
+        await page.waitForTimeout(650);
+        await page.locator('#mini-take').click();
+        await dialog(page).waitFor();
+        const menu = await place('#vocabulary-list-popover');
+        const boxes = await dialog(page).locator('input[type="checkbox"]').count();
+        assert(boxes >= 12, `Save ▾'s menu offers every list: ${boxes}`);
+        assert(menu.share <= 0.4 && menu.covered.length === 0, `Save ▾'s menu with twelve lists: ${JSON.stringify(menu)}`);
+        return { strip: { folded: folded.share, open: open.share, scrolls: open.scrolls }, saveMenu: menu.share, lists: names.length };
+      }, { viewport: { width: 390, height: 844 }, phone: true });
       await check('native-write-failures-preserve-draft-and-retry', async page => {
         await reader(page);
         // one path (round 4, T5): the capture is Save's, before any list is offered, so its fault is Save's
@@ -382,11 +470,11 @@ try {
   }
 } finally {
   await host.close();
-  const passed = results.length === engines.length * 5 && results.every(result => result.passed);
+  const passed = results.length === engines.length * 6 && results.every(result => result.passed);
   writeFileSync(resolve(evidence, 'vocabulary-chooser.json'), JSON.stringify({
     artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
-    scope: 'One-tap popup, direct Save, optional checkbox lists with keyboard focus, native durability, Full entry context scopes, typed-name drafts, preserved synthetic history, toast Undo, native failure/retry, popup reuse, and shelf article/definition census',
+    scope: 'One-tap popup, direct Save, optional checkbox lists with keyboard focus, native durability, Full entry context scopes, typed-name drafts, preserved synthetic history, toast Undo, native failure/retry, popup reuse, shelf article/definition census, and twelve lists in the hold strip and Save ▾ menu on a phone (≤ 40 %, no overlap, one tap each)',
     results, passed,
   }, null, 2) + '\n');
   if (!passed) process.exitCode = 1;

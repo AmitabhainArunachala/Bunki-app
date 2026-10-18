@@ -98,6 +98,13 @@ async function tapGeometry(page, selector, index = 0) {
   });
 }
 
+/** G5 · the focused word's Shift+F10 keeps it; its strip's Remove takes it out again and gives the keyboard back. */
+async function removeKeptByStrip(page) {
+  await page.keyboard.press('Shift+F10');
+  await page.waitForSelector('#seal-strip [data-strip-action="remove"]:not([hidden])', { timeout: 6000 });
+  await page.locator('#seal-strip [data-strip-action="remove"]').click();
+  await page.waitForSelector('#seal-strip', { state: 'detached', timeout: 6000 });
+}
 async function touchAt(page, selector, index = 0, holdMs = 0, scroll = true) {
   for (let attempt = 1; ; attempt += 1) {
     const target = page.locator(selector).nth(index);
@@ -424,22 +431,27 @@ async function main() {
         [...root.querySelectorAll('button, a, input, [tabindex]')]
       ).filter((node) => node.tabIndex >= 0 && !node.disabled && node.offsetParent !== null).length,
     }))()`);
-    // reader lane 2026-10-02: the press-and-hold's non-hold doors are the word menu (Shift+F10 or the
-    // ContextMenu key) and the full entry (Ctrl+Enter), declared on the word itself
+    // reader lane 2026-10-02; G5 (hold = seal, 2026-10-18): the press-and-hold's non-hold doors are the strip (Shift+F10
+    // or the ContextMenu key: the word is kept and its strip opens) and the full entry (Ctrl+Enter), declared on the word
     await page.keyboard.press('Shift+F10');
+    await page.waitForSelector('#seal-strip', { timeout: 6000 }).catch(() => {});
     const menuProbe = await page.evaluate(`(() => ({
-      menu: document.getElementById('reader-word-menu')?.getAttribute('role') ?? null,
-      items: [...document.querySelectorAll('#reader-word-menu [role="menuitem"]')].map((node) => node.textContent),
-      focusInMenu: !!document.activeElement?.closest('#reader-word-menu'),
+      menu: document.getElementById('seal-strip')?.getAttribute('role') ?? null,
+      items: [...document.querySelectorAll('#seal-strip [data-strip-action]')].filter((node) => !node.hidden).map((node) => node.textContent.trim()),
+      status: document.getElementById('seal-strip-status')?.textContent.trim() ?? '',
+      focusInMenu: !!document.activeElement?.closest('#seal-strip'),
     }))()`);
     await page.keyboard.press('Escape');
-    const menuBack = await page.evaluate('document.activeElement?.matches("#reader .tok.content") && !document.getElementById("reader-word-menu")');
+    const menuBack = await page.evaluate('document.activeElement?.matches("#reader .tok.content") && !document.getElementById("seal-strip")');
     check(
-      'focused word exposes the word menu (Shift+F10) and the full entry (Ctrl+Enter) as non-hold alternatives',
+      'focused word exposes the strip (Shift+F10: the word is kept) and the full entry (Ctrl+Enter) as non-hold alternatives',
       focusProbe.tokenFocused && focusProbe.role === 'group' && !!focusProbe.name && /Shift\+F10/.test(focusProbe.help) && /Ctrl\+Enter/.test(focusProbe.help) &&
-        menuProbe.menu === 'menu' && menuProbe.focusInMenu && menuProbe.items.includes('Full entry') && menuProbe.items.includes('Save') && menuBack,
+        menuProbe.menu === 'dialog' && menuProbe.focusInMenu && menuProbe.items.includes('全項目 · Full entry') && /^Saved/u.test(menuProbe.status) &&
+        menuProbe.items.includes('Remove') && menuBack,
       JSON.stringify({ ...focusProbe, ...menuProbe, menuBack }),
     );
+    // Shift+F10 kept the word (hold = seal): Remove, the one way out, leaves the record as this walk found it
+    await removeKeptByStrip(page);
     check(
       'hidden Corridor controls leave the tab order',
       focusProbe.hiddenTabStops === 0,
@@ -466,25 +478,36 @@ async function main() {
     if (await page.locator('#sheet').count()) await page.keyboard.press('Escape');
     await focusProseOccurrence(page, word);
     await page.keyboard.press('Shift+F10');
-    await page.waitForSelector('#reader-word-menu');
+    await page.waitForSelector('#seal-strip');
     const accessibilitySession = await page.context().newCDPSession(page);
     const accessibilityTree = await accessibilitySession.send('Accessibility.getFullAXTree');
     await accessibilitySession.detach();
+    // the strip is a dialog named by its word; its controls are buttons in plain full verbs
+    const stripDialog = accessibilityTree.nodes.find((node) => node.role?.value === 'dialog' && node.name?.value);
+    const stripIds = new Set();
+    const collectStrip = (id) => {
+      const node = accessibilityTree.nodes.find((candidate) => candidate.nodeId === id);
+      if (!node || stripIds.has(id)) return;
+      stripIds.add(id);
+      for (const child of node.childIds || []) collectStrip(child);
+    };
+    if (stripDialog) collectStrip(stripDialog.nodeId);
     const menuItems = accessibilityTree.nodes
-      .filter((node) => node.role?.value === 'menuitem' && node.name?.value)
+      .filter((node) => stripIds.has(node.nodeId) && node.role?.value === 'button' && node.name?.value)
       .map((node) => node.name.value);
     // R4: a word is named by itself; how to work it (Enter, Shift+F10, Ctrl+Enter) is its shared description
     const describedProse = accessibilityTree.nodes
       .filter((node) => ['group', 'paragraph'].includes(node.role?.value) && node.description?.value)
       .map((node) => node.description.value);
     check(
-      'screen-reader tree exposes prose keyboard help and the word menu items',
-      describedProse.some((text) => /Shift\+F10/.test(text) && /Enter/.test(text)) &&
-        menuItems.includes('Save') && menuItems.includes('Full entry') &&
-        menuItems.includes('Ask the tutor about this sentence'),
-      `${menuItems.length} menu item(s): ${menuItems.join(' · ')}`,
+      'screen-reader tree exposes prose keyboard help and the strip\'s actions',
+      describedProse.some((text) => /Shift\+F10/.test(text) && /Enter/.test(text)) && !!stripDialog &&
+        menuItems.includes('全項目 · Full entry') && menuItems.includes('Save the sentence') &&
+        menuItems.includes('Ask the tutor about the word') && menuItems.some((name) => /^Remove\b/u.test(name)),
+      `${menuItems.length} strip control(s): ${menuItems.join(' · ')}`,
     );
-    await page.keyboard.press('Escape');
+    await page.locator('#seal-strip [data-strip-action="remove"]').click();
+    await page.waitForSelector('#seal-strip', { state: 'detached', timeout: 6000 }).catch(() => {});
     await focusProseOccurrence(page, word);
     await page.waitForTimeout(80);
     await page.screenshot({ path: resolve(SHOTS_DIR, '01-reader-focus-alternatives.png') });
@@ -645,10 +668,11 @@ async function main() {
     // Escape on the particle puts its quick look away, as a learner would, before the next door
     await particle.press('Escape');
     check('Escape on the particle closes its quick look', (await page.locator('#mini').count()) === 0);
-    // a fresh particle, from the keyboard: the word menu (Shift+F10) carries its full entry
+    // a fresh particle, from the keyboard: the strip (Shift+F10) carries its full entry
     await focusProseOccurrence(page, page.locator('#reader .tok.particle').nth(1));
     await page.keyboard.press('Shift+F10');
-    const particleDoor = page.locator('#reader-word-menu [data-menu-action="entry"]');
+    await page.waitForSelector('#seal-strip', { timeout: 6000 }).catch(() => {});
+    const particleDoor = page.locator('#seal-strip [data-strip-action="entry"]');
     const hasParticleDoor = (await particleDoor.count()) === 1;
     if (hasParticleDoor) await particleDoor.click();
     check(

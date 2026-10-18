@@ -134,8 +134,8 @@ const MISS = { bi: 'Not in the quick dictionary. Full entry looks it up in the w
 // R2 · once the full dictionary has answered, いう's quick look names the entries read いう (結う, 言う: the index's order)
 const SEVERAL = { bi: `Several entries: ${IU_CHOICES.map((c) => c.head).join(' · ')}`, ja: `複数の項目：${IU_CHOICES.map((c) => c.head).join('・')}` };
 const WORD = { bi: 'word', ja: '語' };
-// G3 · the ladder's own help (readerWordHint): Enter climbs to the next layer
-const HINT = { bi: 'Enter: next word layer · Shift+F10: more actions · Ctrl+Enter: full entry', ja: 'Enterで次の表示へ。Shift+F10でほかの操作。Ctrl+Enterで詳しい項目。' };
+// G3 · the ladder's own help (readerWordHint): Enter climbs to the next layer; G5 · Shift+F10 saves and more
+const HINT = { bi: 'Enter: next word layer · Shift+F10: save and more · Ctrl+Enter: full entry', ja: 'Enterで次の表示へ。Shift+F10で保存とほかの操作。Ctrl+Enterで詳しい項目。' };
 const CHOOSER_TITLE = { ja: '候補から選ぶ（この文での意味は確かめてください）', en: 'Choose the word — check it fits this sentence' };
 const UNAVAILABLE = 'The full dictionary could not be opened, so no entry can be matched to this word. The reader and its quick dictionary still work.';
 const CAPTURE_REASON = (spelling) => `${spelling} isn't in the quick dictionary, so it can't be saved here. Full entry looks it up in the whole dictionary.`;

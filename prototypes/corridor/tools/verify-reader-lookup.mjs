@@ -11,6 +11,7 @@ import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
+import { readAppRecord } from './record-test-support.mjs';
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Choose an existing artifact and its exact digest');
@@ -176,13 +177,18 @@ try{
      assert.equal(await page.locator('#sheet').count(),0);assert.equal(await particle.textContent(),before);
      await tapOutside(page);
     }
-    // the grammar entry is one choice in the word menu (reader lane 2026-10-02): a right-click, then Full entry
+    // the grammar entry is one choice in the strip (reader lane 2026-10-02; G5 hold = seal): a right-click, then Full entry;
+    // a particle is not a card, so its strip keeps nothing, says nothing about saving and offers no lists
+    const recordBefore=await readAppRecord(page);
     const at=await center(particle);await page.mouse.click(at.x,at.y,{button:'right'});
-    await page.locator('#reader-word-menu').waitFor();
-    const items=await page.locator('#reader-word-menu [role="menuitem"]').allTextContents();
-    assert.deepEqual(items,['Save the sentence','Full entry','Ask the tutor about this sentence','Copy'],'A particle offers its menu without a word save');
-    assert.equal(await page.locator('#mini').count(),0,'The menu replaces a quick look, never sits over one');
-    await page.locator('#reader-word-menu [data-menu-action="entry"]').click();
+    await page.locator('#seal-strip').waitFor();
+    const items=(await page.locator('#seal-strip [data-strip-action]:not([hidden])').allTextContents()).map(text=>text.trim());
+    assert.deepEqual(items,['全項目 · Full entry','Save the sentence','Copy','Ask the tutor about the word'],'A particle offers its strip without a word save');
+    assert.equal(await page.locator('#seal-strip .seal-strip-lists, #seal-strip-new').count(),0,'A particle offers no lists');
+    assert.equal((await page.locator('#seal-strip-status').textContent()).trim(),'','A particle\'s strip says nothing about saving');
+    assert.deepEqual((await readAppRecord(page)).taken,recordBefore.taken,'Holding a particle keeps nothing');
+    assert.equal(await page.locator('#mini').count(),0,'The strip replaces a quick look, never sits over one');
+    await page.locator('#seal-strip [data-strip-action="entry"]').click();
     await page.locator('#sheet[data-node="particle:no"]').waitFor();
     assert.equal(await page.locator('#mini').count(),0,'Opening grammar must not leave a quick look over it');
     assert.match(await page.locator('#sheet .headword').textContent(),/^の/u);
