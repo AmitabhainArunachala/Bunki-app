@@ -460,13 +460,28 @@ async function strokeChrome(page, from, to) {
   return { from, to, acknowledged, inputError, settled, events, complete };
 }
 
+/** The reader saves its place 900ms after the page last scrolled, so the setup's own scroll can still be writing.
+ * A record is a baseline only once two reads further apart than that agree; one still changing is none. */
+async function settledAppRecord(page, timeout = 10000) {
+  const deadline = Date.now() + timeout;
+  let text = JSON.stringify(await readAppRecord(page));
+  while (Date.now() < deadline) {
+    await page.waitForTimeout(1500);
+    const next = JSON.stringify(await readAppRecord(page));
+    if (next === text) return { text, settled: true };
+    text = next;
+  }
+  return { text, settled: false };
+}
+
 /** Where the toolbar holds more doors than the phone is wide, a thumb reaches them by scrolling the toolbar.
  * Native strokes alone move it; every door must then be seen whole inside the toolbar's port and the viewport,
- * owning its own centre at 44px, while the page, its width, the visual viewport and the record stay exactly put.
- * A stroke begins on a whole door other than the keep: the outside press that puts a slip away renews the keep in
- * place, and a stroke whose own target leaves the document is no evidence. */
+ * owning its own centre at 44px, while the page, its width, the visual viewport and the settled record stay exactly
+ * put. A stroke begins on a whole door other than the keep: the outside press that puts a slip away renews the keep
+ * in place, and a stroke whose own target leaves the document is no evidence. */
 async function reachChromeNatively(page, width) {
-  const recordBefore = JSON.stringify(await readAppRecord(page));
+  const baseline = await settledAppRecord(page);
+  const recordBefore = baseline.text;
   const positions = [await measureChromeTargets(page)];
   const strokes = [];
   const last = () => positions.at(-1);
@@ -503,6 +518,7 @@ async function reachChromeNatively(page, width) {
     viewportWidth: first.page.view === 'reader' && first.page.innerWidth === width && first.page.documentWidth <= width
       && first.page.bodyWidth <= width && (first.page.readerWidth ?? 0) <= width
       && first.page.visual?.width === width && first.page.visual?.scale === 1,
+    recordSettled: baseline.settled,
     recordUnchanged: recordBefore === recordAfter,
   };
   return { valid: Object.values(verdict).every(Boolean), verdict, doors, seen: [...seen], positions,
