@@ -2422,6 +2422,9 @@ async function runG6Suite(browser){
         await page.goto(`${host.origin}/index.html?deck=mcd&ui=bi`);
         await page.waitForFunction(()=>document.body.dataset.ready==='1',null,{timeout:30000});
         await page.locator('#kp-start').tap();await page.locator('#kp-card .kp-sentence').waitFor();
+        // Q · the front's passage is drawn again once its own tokens arrive (data-words="tokens"): the witness is fired at
+        // the settled sentence, never at the one about to be replaced (site-6: six synthetic pointers on a detached <p>)
+        await page.waitForFunction(()=>document.querySelector('#kp-card .kp-sentence')?.dataset.words==='tokens',null,{timeout:10000}).catch(()=>{});
         const front=await page.locator('#kp-card').evaluate(n=>({card:n.dataset.card,reveal:!!document.getElementById('kp-reveal'),doors:n.querySelectorAll('.kp-tok,[data-deck-word],rt').length}));
         assert(front.card&&front.reveal&&front.doors===0,'actual unanswered sealed-front fixture');
         let row=await g6TwoPointerPolicy(page,'#kp-card .kp-sentence');emit('front.policy','sealed deck text retains two-pointer default',row.ok,row.observed);
