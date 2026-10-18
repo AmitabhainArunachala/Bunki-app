@@ -10538,10 +10538,16 @@ function senseExpression(token, near) {
   if (!near) return null;
   const next = String(near.next?.s || ''), prev = String(near.prev?.s || ''), prev2 = String(near.prev2?.s || '');
   // the explanatory ん is the particle (の); the auxiliary ん is negation (ませんでした, 知らん) and stays itself
-  if (token.s === 'ん' && token.p !== '助動詞' && ['だ', 'だっ', 'だろ', 'だろう'].includes(next)) return { s: 'んだ', b: 'んだ', r: 'んだ', seq: '2849387' };
+  // (and before じゃ: いうんじゃア, the explanatory ん of んじゃ, as Grok's row has it)
+  if (token.s === 'ん' && token.p !== '助動詞' && ['だ', 'だっ', 'だろ', 'だろう', 'じゃ', 'じゃあ', 'じゃア'].includes(next)) return { s: 'んだ', b: 'んだ', r: 'んだ', seq: '2849387' };
   if (token.s === 'ん' && token.p !== '助動詞' && ['です', 'でし', 'でしょ'].includes(next)) return { s: 'んです', b: 'んです', r: 'んです', seq: '2087820' };
-  if (token.b === 'いける' && token.s === 'いけ' && ['ない', 'ませ', 'ず'].includes(next)
-    && (['ちゃ', 'じゃ'].includes(prev) || (prev === 'は' && ['て', 'で'].includes(prev2)))) return { s: 'いけない', b: 'いけない', r: 'いけない', seq: '1000730' };
+  // いけない after ては/ちゃ is "must not" (its sense after the te-form); elsewhere "no good" (注意しないからいけない,
+  // なかなかいけない) — never いける "to be good (at)"; いけ after に/へ (学校へはいけない) may be 行ける "can go", and stays
+  if (token.b === 'いける' && token.s === 'いけ' && ['ない', 'ませ', 'ず'].includes(next)) {
+    if (['ちゃ', 'じゃ'].includes(prev) || (prev === 'は' && ['て', 'で'].includes(prev2))) return { s: 'いけない', b: 'いけない', r: 'いけない', seq: '1000730' };
+    const going = ['に', 'へ'].includes(prev) || (['は', 'も'].includes(prev) && ['に', 'へ'].includes(prev2));
+    if (!going) return { s: 'いけない', b: 'いけない', r: 'いけない', seq: '1000730', k: 2 };
+  }
   // について, "about" (日本について), never つく "to be attached" or "to be lit"; 床について + いる (taken to bed) stays つく
   if (token.s === 'つい' && prev === 'に' && next === 'て' && !['い', 'いる', 'いた', 'いて', 'おり', 'おる'].includes(String(near.next2?.s || ''))) {
     return { s: 'について', b: 'について', r: 'について', seq: '1009780' };
