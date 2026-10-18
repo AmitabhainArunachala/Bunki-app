@@ -134,7 +134,8 @@ const MISS = { bi: 'Not in the quick dictionary. Full entry looks it up in the w
 // R2 · once the full dictionary has answered, いう's quick look names the entries read いう (結う, 言う: the index's order)
 const SEVERAL = { bi: `Several entries: ${IU_CHOICES.map((c) => c.head).join(' · ')}`, ja: `複数の項目：${IU_CHOICES.map((c) => c.head).join('・')}` };
 const WORD = { bi: 'word', ja: '語' };
-const HINT = { bi: 'Enter: reading and meaning · Shift+F10: more actions · Ctrl+Enter: full entry', ja: 'Enterで読みと意味。Shift+F10でほかの操作。Ctrl+Enterで全項目。' };
+// G3 · the ladder's own help (readerWordHint): Enter climbs to the next layer
+const HINT = { bi: 'Enter: next word layer · Shift+F10: more actions · Ctrl+Enter: full entry', ja: 'Enterで次の表示へ。Shift+F10でほかの操作。Ctrl+Enterで詳しい項目。' };
 const CHOOSER_TITLE = { ja: '候補から選ぶ（この文での意味は確かめてください）', en: 'Choose the word — check it fits this sentence' };
 const UNAVAILABLE = 'The full dictionary could not be opened, so no entry can be matched to this word. The reader and its quick dictionary still work.';
 const CAPTURE_REASON = (spelling) => `${spelling} isn't in the quick dictionary, so it can't be saved here. Full entry looks it up in the whole dictionary.`;
@@ -239,6 +240,9 @@ let manifest = null; // path → sha256 from the served build-identity.json, rea
 async function newContext(sink, mutation = null) {
   const context = await browser.newContext({ viewport: DESK, deviceScaleFactor: 2, serviceWorkers: 'block' });
   await silenceBrowserAudio(context);
+  // G3 · the ladder's first-use demonstration opens a stage by itself 650 ms into a fresh reader: it is its own behaviour
+  // (verify-word-grammar's G3.demo rows), marked seen here as G3's verifiers mark it
+  await context.addInitScript(() => { try { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); } catch { /* private */ } });
   context.on('page', (page) => page.on('pageerror', (error) => {
     if (sink.length < 20) sink.push({ case: currentCase, message: error.message });
   }));
@@ -337,11 +341,32 @@ const tokenState = (page, fixture) => page.evaluate((index) => {
     // a summoned reading lights the word (lit) and the chrome's Save stands for it (tok-current): the
     // original text has neither
     lit: node.classList.contains('lit'), current: node.classList.contains('tok-current'),
-    // R4 (2026-09-30): the name is the word, the rest is its description — read together, in order
-    hasEn: node.classList.contains('has-en'), label: [node.getAttribute('aria-label') || '',
-      ...(node.getAttribute('aria-describedby') || '').split(/\s+/u).filter(Boolean).map((id) => document.getElementById(id)?.textContent || '')]
-      .filter(Boolean).join(' · ') };
+    // R4 (2026-09-30): the name is the word, the rest is its description — read together, in order. G3 · a word in a
+    // roving paragraph speaks only when the keyboard selects it (role group: its aria-label and aria-describedby); idle
+    // (role presentation) it carries neither, and its name and description wait in data-prose-label and
+    // data-prose-description. Anything else (an idle word still naming itself) reads as no label at all
+    hasEn: node.classList.contains('has-en'), role: node.getAttribute('role'), label: (() => {
+      const selected = node.getAttribute('role') === 'group';
+      if (!selected && (node.hasAttribute('aria-label') || node.hasAttribute('aria-describedby'))) return '';
+      const name = selected ? node.getAttribute('aria-label') || '' : node.dataset.proseLabel || '';
+      const ids = (selected ? node.getAttribute('aria-describedby') : node.dataset.proseDescription) || '';
+      return [name, ...ids.split(/\s+/u).filter(Boolean).map((id) => document.getElementById(id)?.textContent || '')].filter(Boolean).join(' · ');
+    })() };
 }, fixture.index);
+
+/** G3 · idle words are no focus stops: the keyboard selects one through its paragraph's controller (the paragraph's
+ * one Tab stop, Home, then the arrows), as verify-reader-doors does. */
+async function selectWord(page, fixture) {
+  const position = await page.locator(`#reader .tok[data-index="${fixture.index}"]`).evaluate((node) => {
+    const block = node.closest('[data-prose-roving]');
+    return { block: [...document.querySelectorAll('#reader [data-prose-roving]')].indexOf(block),
+      word: block ? [...block.querySelectorAll('.tok[data-para]')].indexOf(node) : -1 };
+  });
+  must(position.block >= 0 && position.word >= 0, `${fixture.passage.id} token #${fixture.index} has a place in its paragraph's keyboard order`);
+  await page.locator('#reader [data-prose-roving]').nth(position.block).focus();
+  await page.keyboard.press('Home');
+  for (let step = 0; step < position.word; step += 1) await page.keyboard.press('ArrowRight');
+}
 
 const miniState = (page) => page.evaluate(() => {
   const mini = document.getElementById('mini');
@@ -1001,23 +1026,26 @@ try {
       check(`G2 ${lang}: tapping the same word again opens its full entry, without a gloss rung`,
         await page.locator('#mini').count() === 0 && await page.locator('#sheet').count() === 1 && (await tokenState(page, IU))?.lines === 0, '', { id: `G2.${lang}.dismiss` });
       await closeIfOpen(page);
+      // G3 · the page's way back is the stage it came from (verify-word-grammar pins it); folding that stage is the way
+      // back to the original text by itself
+      const stageReturned = await page.locator('#mini').count() > 0;
+      if (stageReturned) { await page.keyboard.press('Escape'); await page.locator('#mini').waitFor({ state: 'detached' }); }
       const back = await tokenState(page, IU);
-      // one-hand pass (2026-10-15): closing the entry is the way back to the original text by itself
-      check(`G2 ${lang}: closing the entry returns the original word by itself: no popup, no summoned reading, nothing lit, no gloss rung`,
+      check(`G2 ${lang}: closing the entry, then folding its stage, returns the original word by itself: no popup, no summoned reading, nothing lit, no gloss rung`,
         await page.locator('#mini').count() === 0 && back?.surface === IU.token.s && back.visibleRuby === '' && !back.lit && back.lines === 0,
-        JSON.stringify(back), { id: `G2.${lang}.original` });
+        JSON.stringify({ stageReturned, back }), { id: `G2.${lang}.original` });
       await tap(page, IU);
       const again = await miniState(page), lit = await tokenState(page, IU);
       check(`G2 ${lang}: one more tap begins the cycle again: the popup with the word lit, and no sheet`,
         again?.word === IU.token.b && lit?.lit && lit.lines === 0 && await page.locator('#sheet').count() === 0, JSON.stringify({ again, lit }), { id: `G2.${lang}.again` });
       const word = page.locator(`#reader .tok[data-index="${IU.index}"]`);
-      await word.focus();
+      await selectWord(page, IU);
       await page.keyboard.press('Escape');
       await page.locator('#mini').waitFor({ state: 'detached' });
       const bare = await tokenState(page, IU);
       check(`G2 ${lang}: Escape on the word puts the popup and its summoned reading away: nothing lit`,
         bare?.surface === IU.token.s && bare.visibleRuby === '' && !bare.lit && bare.lines === 0, JSON.stringify(bare), { id: `G2.${lang}.escape-word` });
-      await word.focus();
+      await selectWord(page, IU);
       await page.keyboard.press('Enter');
       await page.locator('#mini').waitFor();
       check(`G2 ${lang}: Enter reopens the popup and focuses the word, its door into the full entry, for an unsavable word`,

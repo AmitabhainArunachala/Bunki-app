@@ -4874,10 +4874,11 @@ function renderArchive(main) {
     if (!years.has(y)) years.set(y, []);
     years.get(y).push(a);
   }
-  sub.textContent = tx(
+  // Q · through the one word rule (flowText), as every line the app sets: at 390 in Chromium it broke 凍結ア｜ーカイブ
+  flowText(sub, tx(
     `ウィキニュース ${D.archive.length} 本 · ${[...years.keys()].sort()[0]}–${[...years.keys()].sort().at(-1)} · CC BY 2.5 · 凍結アーカイブ`,
     `${D.archive.length} real news articles · ${[...years.keys()].sort()[0]}–${[...years.keys()].sort().at(-1)} · CC BY 2.5 · the frozen ja.wikinews archive`,
-  );
+  ));
   main.append(sub);
   S.archiveYears ||= new Set();
   for (const y of [...years.keys()].sort().reverse()) {

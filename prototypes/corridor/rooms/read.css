@@ -1666,6 +1666,10 @@ html[data-room='shelf'] .shelf-today-read:hover .shelf-today-read-arrow { transf
   html[data-room='shelf'] body:not(.zen) #app .shelf-today-read { width: calc(100% - 34px); }
 }
 
-/* Q · the reader never scrolls sideways: a reading drawn over the last word of a line (ruby::before) may overhang the
-   glass by a pixel or two at 320; the overhang is clipped, nothing scrolls (overflow-x: clip makes no scroll box) */
-html[data-room='reader'] #app > main { overflow-x: clip; }
+/* Q · the reader never scrolls sideways on a phone: a reading drawn over the last word of a line (ruby::before) may
+   overhang the glass by a pixel or two at 320; the overhang is clipped, nothing scrolls (overflow-x: clip makes no scroll
+   box). Phones only. On a wider glass the column never reaches the glass, and in WebKit the clipped main made the room's
+   view-transition snapshot take 20–35 s: 戻る from the reader at 600 to 1280 px (INTG3/probe/backvariant.mjs) */
+@media (max-width: 520px) {
+  html[data-room='reader'] #app > main { overflow-x: clip; }
+}
