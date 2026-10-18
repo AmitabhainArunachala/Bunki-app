@@ -1258,7 +1258,9 @@ async function main() {
       kept: Number(document.getElementById('tray')?.dataset.count ?? NaN) } : null;
   })()`);
   check('grammar · a press and hold seals the word and opens its strip', !!menu && menu.role === 'dialog' && /^Saved/u.test(menu.status) &&
-    menu.kept === keptBefore + 1 && menu.items.join(',') === 'remove,entry,sentence,copy,ask-tutor' && menu.removeBesideSaved, JSON.stringify({ keptBefore, ...menu }));
+    // Hfix-1B (item 11): no tutor is set up on this device, so the strip carries no "Ask the tutor" (verify-hfix-rooms holds
+    // the strip with a tutor set up, where it returns)
+    menu.kept === keptBefore + 1 && menu.items.join(',') === 'remove,entry,sentence,copy' && menu.removeBesideSaved, JSON.stringify({ keptBefore, ...menu }));
   // "anywhere else": a point on the page's own margin, beside the text, that carries no control
   const elsewhere = await page.evaluate(`(() => {
     for (const x of [innerWidth - 3, 3]) for (const y of [0.35, 0.5, 0.65].map((f) => Math.round(innerHeight * f))) {

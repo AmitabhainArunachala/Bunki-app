@@ -503,7 +503,8 @@ async function main() {
       'screen-reader tree exposes prose keyboard help and the strip\'s actions',
       describedProse.some((text) => /Shift\+F10/.test(text) && /Enter/.test(text)) && !!stripDialog &&
         menuItems.includes('全項目 · Full entry') && menuItems.includes('Save the sentence') &&
-        menuItems.includes('Ask the tutor about the word') && menuItems.some((name) => /^Remove\b/u.test(name)),
+        // Hfix-1B (item 11): no tutor is set up here, so the strip names no tutor action
+        !menuItems.some((name) => /tutor/iu.test(name)) && menuItems.some((name) => /^Remove\b/u.test(name)),
       `${menuItems.length} strip control(s): ${menuItems.join(' · ')}`,
     );
     await page.locator('#seal-strip [data-strip-action="remove"]').click();

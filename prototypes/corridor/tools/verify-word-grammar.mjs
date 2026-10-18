@@ -4043,8 +4043,9 @@ try {
       check('G5.seal.flight', 'a 印 presses onto the word and flies to the bookmark, landing on it', pressed === 1 && shown.length >= 6 && !!from && !!to && !!centre &&
         Math.hypot(from[0] - (wordBox.left + wordBox.width), from[1] - wordBox.top) <= 40 && Math.hypot(to[0] - centre[0], to[1] - centre[1]) <= 24 && done.seals === 0,
         { pressed, frames: shown.length, from, to, centre, wordBox });
-      check('G5.seal.strip', 'the strip opens with the word kept: Saved ✓ and Remove beside it, his lists, New list…, then 全項目 · Full entry, Save the sentence, Copy and the tutor',
-        opened.strip && /Saved/u.test(opened.status) && JSON.stringify(opened.acts.map((act) => act.action)) === JSON.stringify(['remove', 'entry', 'sentence', 'copy', 'ask-tutor']) &&
+      // Hfix-1B (item 11): no tutor is set up here, so no "Ask the tutor" (verify-hfix-rooms holds the strip with one)
+      check('G5.seal.strip', 'the strip opens with the word kept: Saved ✓ and Remove beside it, his lists, New list…, then 全項目 · Full entry, Save the sentence and Copy (no tutor set up: no tutor door)',
+        opened.strip && /Saved/u.test(opened.status) && JSON.stringify(opened.acts.map((act) => act.action)) === JSON.stringify(['remove', 'entry', 'sentence', 'copy']) &&
         await page.locator('#seal-strip .seal-strip-lists > #seal-strip-status + [data-strip-action="remove"]').count() === 1 &&
         await page.locator('#seal-strip-new').isVisible(), opened);
       check('G5.labels', 'plain full verbs: never the rejected row "this sentence · save · ask the tutor · practice", nor "Open the web"', labelsClean(opened), opened.acts);

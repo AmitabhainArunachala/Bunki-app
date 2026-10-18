@@ -11744,7 +11744,7 @@ function readerSentenceRow(node, index, sourceEnd = index) {
     try { await sendSentenceToTutor(node, true, () => ask.isConnected, say); }
     finally { for (const control of buttons) control.disabled = !recordWritable(); }
   });
-  choices.append(ask);
+  if (aiKey()) choices.append(ask); // Hfix-1B (item 11): the tutor's choice only while a tutor is set up
   if (sentencePracticeModule) {
     const practice = choice('reader-sentence-practice', tx('練習する', 'Practice it'), tx('思い出す・使う', 'Recall it or use it'),
       tx('この文を練習する', 'Practice this sentence'));
@@ -12628,7 +12628,8 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
     keep.disabled = !recordWritable();
   }
   act('copy', tx('コピー', 'Copy'), () => copyReaderText(door.copyText));
-  if (sentence) {
+  // Hfix-1B (item 11): the tutor's door only while a tutor is set up on this device
+  if (sentence && aiKey()) {
     // the tutor receives the word in its sentence (contextFromTeacherNode's target), so the verb names the word
     const ask = act('ask-tutor', tx('この語を先生に聞く', 'Ask the tutor about the word'), () => sendSentenceToTutor(sentence, true, stillHere, showReaderToast));
     ask.disabled = !recordWritable();
@@ -21653,7 +21654,7 @@ function renderTeacherDoor(container, getNode) {
   });
   keepSentence.disabled = !node || !recordWritable();
   actions.append(keepSentence);
-  {
+  if (aiKey()) { // Hfix-1B (item 11): the tutor's door only while a tutor is set up
     const button = biLabel('button', 'chip btn-tertiary teacher-discuss', '先生に聞く', 'Ask the tutor');
     button.type = 'button';
     button.disabled = !node || !recordWritable();
@@ -32997,7 +32998,9 @@ function renderAiReading(main) {
       interests.focus();
     } finally { if (btn.isConnected) btn.disabled = !!aiReadingJob || !recordWritable() || !aiKey(); }
   });
-  main.append(btn, note);
+  // Hfix-1B (item 11): with no tutor set up its "ask the tutor" is not drawn (it was a dead control); the door to set one up is
+  if (aiKey()) main.append(btn);
+  main.append(note);
   if (!aiKey()) {
     const connect = biLabel('button', 'chip', '先生につなぐ', 'connect the tutor to write more');
     connect.type = 'button'; connect.id = 'airead-connect';
