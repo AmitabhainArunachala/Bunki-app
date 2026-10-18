@@ -10551,6 +10551,8 @@ function senseExpression(token, near) {
   if (token.s === 'つい' && prev === 'に' && next === 'て' && !['い', 'いる', 'いた', 'いて', 'おり', 'おる'].includes(String(near.next2?.s || ''))) {
     return { s: 'について', b: 'について', r: 'について', seq: '1009780' };
   }
+  // にとって, "to; for; concerning" (私にとって), never とる "to have (e.g. lunch)" or "to take (e.g. a joke)"
+  if (token.s === 'とっ' && prev === 'に' && next === 'て') return { s: 'にとって', b: 'にとって', r: 'にとって', seq: '1009600' };
   // ない in its idioms: 勿体ない "wasteful", 違いない "sure", 間もなく "soon" — never "nonexistent"
   if (['ない', '無い'].includes(String(token.b || '')) && ['勿体', 'もったい'].includes(prev)) return { s: '勿体ない', b: '勿体ない', r: 'もったいない', seq: '1605250' };
   if (['ない', '無い'].includes(String(token.b || '')) && ['違い', 'ちがい'].includes(prev)) return { s: '違いない', b: '違いない', r: 'ちがいない', seq: '1610740' };
