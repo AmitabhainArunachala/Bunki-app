@@ -12458,6 +12458,10 @@ function placeSealStrip(open) {
   const ceiling = Math.max(glassTop + 8, frameFoot(onPage, fixedEdge) ?? 0);
   const view = vv?.height || window.innerHeight;
   strip.style.maxHeight = `${Math.max(96, Math.floor(view * 0.4))}px`;
+  // Hfix-1A · measured without its own "more" fade: in Chromium the fade's sticky foot adds 4 px of overflow, so a strip
+  // seated again while it showed measured as not fitting, was cut a row short, and kept its fade (markStripMore sets it
+  // again once seated)
+  delete strip.dataset.more;
   strip.style.left = '0px';
   strip.style.top = '0px';
   // as wide as the glass allows (a page wider than the phone's screen still shows the strip whole)
@@ -12720,10 +12724,13 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
       });
       return button;
     };
-    for (const name of order.slice(0, SEAL_LISTS_SHOWN)) lists.append(chip(name));
+    // Hfix-1A (G5-1, the lead's ruling: at 320 px a word on six lists wrapped row 1 to three lines and the strip scrolled
+    // inside itself): under 360 px three lists stand in row 1, then "All lists · N"
+    const shownLists = window.innerWidth < 360 ? 3 : SEAL_LISTS_SHOWN;
+    for (const name of order.slice(0, shownLists)) lists.append(chip(name));
     let all = null;
-    if (order.length > SEAL_LISTS_SHOWN) {
-      for (const name of order.slice(SEAL_LISTS_SHOWN)) more.append(chip(name));
+    const addAll = (before = null) => {
+      if (all) return;
       all = el('button', 'chip seal-list-all', tx(`すべてのリスト · ${order.length}`, `All lists · ${order.length}`));
       all.type = 'button';
       all.id = 'seal-strip-all';
@@ -12734,8 +12741,24 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
         all.setAttribute('aria-expanded', String(!more.hidden));
         if (!more.hidden) more.querySelector('button')?.focus({ preventScroll: true });
       });
-      lists.append(all, more);
+      if (before) before.before(all, more);
+      else lists.append(all, more);
+    };
+    if (order.length > shownLists) {
+      for (const name of order.slice(shownLists)) more.append(chip(name));
+      addAll();
     }
+    // and while a narrow strip would still scroll inside itself, his lists give way one at a time (down to one) to
+    // "All lists · N", which keeps every one a tap away
+    open.fitLists = () => {
+      if (window.innerWidth >= 360 || !more.hidden) return;
+      for (let shown = [...lists.querySelectorAll(':scope > .seal-list')]; shown.length > 1 && strip.scrollHeight > strip.clientHeight + 1;
+        shown = [...lists.querySelectorAll(':scope > .seal-list')]) {
+        more.prepend(shown.at(-1));
+        addAll(fresh);
+        placeSealStrip(open);
+      }
+    };
     const fresh = el('button', 'chip seal-list-new', tx('新しいリスト…', 'New list…'));
     fresh.type = 'button';
     fresh.id = 'seal-strip-new';
@@ -12881,6 +12904,7 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
   strip.addEventListener('scroll', () => markStripMore(strip), { passive: true });
   sealStrip = open;
   placeSealStrip(open);
+  open.fitLists?.();
   focusSealStrip(keyboard);
   return strip;
 }

@@ -18,6 +18,8 @@
  *   9   the open screen's article title breaks only between its words (jaWords), at 390 and 320;
  *   10  the shelf's vertical room sign stands whole: 8 px from the glass's edges, under the bar and thread, clear of Tools;
  *   11  full-width Latin and digits in the reader (Ｍｕｊｉｎ, ２０２６) set proportionally (palt), unbroken, text unchanged;
+ *   12  under 360 px a word on six lists shows at most three in the hold strip, then "All lists · 6", and the strip never
+ *       scrolls inside itself; 390 keeps all six;
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -77,6 +79,8 @@ const CONTROL = {
   'open-title': { item: '9.', css: '#drift-layer .scale-star-caption.is-words { word-break: normal !important; overflow-wrap: anywhere !important; line-break: auto !important; }' },
   'shelf-sign': { item: '10.', css: "body:not([data-view='drift']) #app:has(> .scale-thread) > main > .room-sign { top: calc(52px + env(safe-area-inset-top, 0px)) !important; right: 6px !important; }" },
   fullwidth: { item: '11.', css: '.tok-word .fw-run { font-feature-settings: normal !important; }' },
+  'strip-lists': { item: '12.', source: [['corridor.js', '    const shownLists = window.innerWidth < 360 ? 3 : SEAL_LISTS_SHOWN;', '    const shownLists = SEAL_LISTS_SHOWN;'],
+    ['corridor.js', '    open.fitLists = () => {', '    open.fitLists = () => { return;']] },
   thread: { item: '3.', css: '.scale-thread { scroll-snap-type: none !important; }',
     source: [['corridor.js', '    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);', '    if (delta) thread.scrollLeft += delta;']] },
 };
@@ -590,6 +594,38 @@ async function itemFullWidth(browser, engine) {
   } finally { await context.close(); }
 }
 
+async function itemStripLists(browser, engine) {
+  // 12 · G5-1: 総理 on six of his lists, held (a right-click is a hold): under 360 px at most three lists stand in the strip's
+  // first row, then "All lists · 6", and the strip never scrolls inside itself; All lists opens the rest; 390 keeps six
+  const LISTS = ['仕事', '旅', 'ニュース', '政治', '経済', '読書'];
+  for (const [width, height] of [[320, 568], [340, 700], [390, 844]]) {
+    const { context, page, errors } = await session(browser, { width, height });
+    try {
+      await openStory(page);
+      await page.evaluate((lists) => window.__H1A__.run(`(() => { const row = { t: 'word', id: '総理' }; S.lists = Object.fromEntries(${JSON.stringify(lists)}.map((n) => [n, [row]])); })()`), LISTS);
+      const word = page.locator(WORD_SEL).first();
+      await word.scrollIntoViewIfNeeded();
+      await delay(200);
+      await word.click({ button: 'right' });
+      await page.locator('#seal-strip').waitFor({ timeout: 8000 });
+      await settle(page, 600);
+      const strip = () => page.evaluate(() => { const s = document.getElementById('seal-strip');
+        return { chips: [...s.querySelectorAll('.seal-strip-lists > .seal-list')].filter((n) => n.getClientRects().length).map((n) => n.dataset.list),
+          all: document.getElementById('seal-strip-all')?.textContent ?? null, scrollHeight: s.scrollHeight, clientHeight: s.clientHeight, more: s.dataset.more,
+          everyList: [...s.querySelectorAll('.seal-list')].filter((n) => n.getClientRects().length).length }; });
+      const folded = await strip();
+      let opened = null;
+      if (folded.all) { await page.locator('#seal-strip-all').click(); await delay(300); opened = await strip(); }
+      const narrow = width < 360;
+      const ok = narrow
+        ? folded.chips.length >= 1 && folded.chips.length <= 3 && folded.all === 'All lists · 6' && folded.scrollHeight <= folded.clientHeight + 1 && folded.more !== 'true' && opened?.everyList === 6
+        : folded.chips.length === 6 && !folded.all && folded.scrollHeight <= folded.clientHeight + 1;
+      check(`12.strip-lists · ${engine} ${width}×${height} · ${narrow ? 'at most three of six lists, then "All lists · 6" opening the rest; no scroll inside the strip' : 'all six lists stand in the strip'}`,
+        ok && !errors.length, { folded, opened, errors });
+    } finally { await context.close(); }
+  }
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
   { id: 'layers', prefix: '2.', run: itemLayers },
@@ -602,6 +638,7 @@ const ITEMS = [
   { id: 'open-title', prefix: '9.', run: itemOpenTitle },
   { id: 'shelf-sign', prefix: '10.', run: itemShelfSign },
   { id: 'fullwidth', prefix: '11.', run: itemFullWidth },
+  { id: 'strip-lists', prefix: '12.', run: itemStripLists },
 ];
 
 const log = { engines: {} };
