@@ -574,9 +574,10 @@ try {
   const receipt = {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
-    scope: 'F type and ruby: one ladder (sheets and rendered), one ruby rule, readings at half their word and 10 px or more on touch and always at 320/390/430/1368, never touching, never crossing a line, never meeting a glyph, over their word, moving no line; the deck back the same; glosses 13 px or more; the reader at 200 % text',
+    scope: 'F type and ruby: one ladder (sheets and rendered), one ruby rule, readings at half their word and 10 px or more on touch and always at 320/390/430/1368, never touching another reading, never crossing or running off a line, over their word (a touch reading overhangs its neighbours instead of widening its word; an always reading never meets a glyph), moving and re-breaking no line; a fresh 320 reader 320 wide revealed and folded; the deck back the same; glosses 13 px or more; the reader at 200 % text',
     results,
-    passed: results.length === 2 + engines.length * 12 && results.every((row) => row.passed),
+    // per engine: L3, R1 ×4, R4 ×4, R2 ×4, W1, R3, G1, Z1
+    passed: results.length === 2 + engines.length * 17 && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'type-ruby.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);
