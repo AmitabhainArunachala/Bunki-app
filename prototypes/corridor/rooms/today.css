@@ -748,3 +748,7 @@ html[data-room='saved'] .saved-cards .deck-row.deck-all .d-name { font-weight: 6
 html[data-room='saved'] .saved-cards .deck-row:disabled { color: var(--color-ink-2); }
 html[data-room='saved'] .deck-row.deck-total,
 html[data-room='saved'] .deck-row.deck-total:hover { cursor: default; background: none; }
+
+/* Hfix-1B (L-7) · the record's sync, where it cannot run on this device: its buttons and its line of what it carries are
+   not drawn (corridor.js updateRecordSyncSurface sets hidden; the port row's own display would otherwise keep them) */
+.record-sync :is(.record-sync-actions, .record-sync-scope)[hidden] { display: none; }

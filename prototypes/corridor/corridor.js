@@ -16340,6 +16340,10 @@ function updateRecordSyncSurface(container) {
   const connect = container.querySelector('#record-sync-connect');
   const sync = container.querySelector('#record-sync-now');
   const disconnect = container.querySelector('#record-sync-disconnect');
+  // Hfix-1B (L-7): where syncing cannot run here, its three buttons and the line of what it carries are not drawn at all
+  // (three greyed buttons under "isn't available here" were dead controls); the status line says why and points to export
+  const idle = state === 'unavailable' && slot?.pending !== 'register';
+  for (const part of container.querySelectorAll('.record-sync-actions, .record-sync-scope')) part.hidden = idle;
   connect.disabled = !writable || !slot || !!slot.pending || ['unavailable', 'ready', 'syncing', 'connecting'].includes(state);
   sync.disabled = !writable || !slot?.registrationId || !!slot.pending || state !== 'ready';
   // Disconnect remains usable during an in-flight cycle. Its newer generation
@@ -16355,10 +16359,10 @@ function renderRecordSync() {
   const label = el('p', 'eyebrow', tx('端末の同期', 'Sync between devices'));
   const status = el('p', 'airead-note record-sync-status');
   status.setAttribute('aria-live', 'polite');
-  const scope = el('p', 'airead-note', tx(
+  const scope = el('p', 'airead-note record-sync-scope', tx(
     'メモ、読書の栞、そのまま保存したリンク、提出・中断した練習の回答を同期する。単語カード、設定、貼り付けた文章、読了履歴はこの端末に残る。',
     'Sync carries your notes, reading places, plain saved links, and finished or stopped practice answers. Cards, settings, pasted text and reading history stay on this device.'));
-  const row = el('div', 'port-row');
+  const row = el('div', 'port-row record-sync-actions');
   for (const [method, id, ja, en] of [['connect', 'record-sync-connect', '接続する', 'Connect'],
     ['sync', 'record-sync-now', '今すぐ同期', 'Sync now'], ['disconnect', 'record-sync-disconnect', '接続を切る', 'Disconnect']]) {
     const button = biLabel('button', 'chip', ja, en);
