@@ -1005,6 +1005,19 @@ const classFits = (p, entry) => (p === '動詞' ? classOf(entry).some(verbal) : 
 // written as the text writes it (〜てください: 下さい, an expression whose sense follows the te-form)
 const teExpressionFits = (tokens, index, label, stated) => afterTeForm(tokens, index)
   && readAs(label, stated).some((row) => teSensesOf(String(row[0])).some((sense) => (sense[0] || []).includes('exp')));
+// R3 (Grok 0315) · the card of an expression the text writes around the token, read whole (について, にとって, いけない,
+// 一枚岩, 方がいい, もったいない, ちがいない, 間もなく, なりに, んだ): two to four tokens holding this one, whose spelling is
+// the card's word or whose reading is its reading line. Its meaning must still be an entry's that writes that word and
+// reads it so (meaningEntry); つく's "to be attached" for について was the wrong sense this sweep's class rule pinned
+const expressionFits = (tokens, index, label, stated) => {
+  for (let from = Math.max(0, index - 3); from <= index; from += 1) {
+    for (let to = Math.max(index, from + 1); to <= Math.min(tokens.length - 1, from + 3); to += 1) {
+      const run = tokens.slice(from, to + 1);
+      if (run.map((t) => t.s).join('') === label || k2h(run.map((t) => t.r || t.s).join('')) === k2h(stated)) return true;
+    }
+  }
+  return false;
+};
 
 async function sweepCase(browser, contextOptions) {
   const report = { engine, articles: [], notOnShelf: [], totals: { tokens: 0, occurrences: 0, tapped: 0, entry: 0, quick: 0, kanji: 0, several: 0, noEntry: 0,
@@ -1079,6 +1092,7 @@ async function sweepCase(browser, contextOptions) {
           // as written — never the dictionary form beside the surface's reading (かえる read かえり; Codex 1352)
           out.how = card.kind === 'kanji' ? (asWritten ? 'kanji read as written' : '') : asWritten || (card.kind === 'particle' && label === token.s) ? 'as written'
             : derivedHow(token, label, stated);
+          if (!out.how && card.kind !== 'kanji' && expressionFits(tokens, index, label, stated)) out.how = 'an expression read whole';
           if (!out.how) out.issues.push(`the card reads ${label} ${card.reading || '(no reading line)'}: not from ${token.s} read ${token.r}`);
           if (gloss === QUICK_MISS) out.issues.push('says "Not in the quick dictionary" once the full dictionary has answered');
           if (card.kind === 'particle') {
@@ -1101,7 +1115,7 @@ async function sweepCase(browser, contextOptions) {
             out.entry = entry;
             if (!entry) out.issues.push(`"${gloss}" belongs to no entry that writes ${label} and reads it ${stated}`);
             else if (['動詞', '形容詞'].includes(token.p) && !classOf(entry).length) out.classUnknown = true;
-            else if (!classFits(token.p, entry) && !teExpressionFits(tokens, index, label, stated)) out.issues.push(`${entry.seq || `the ${entry.from === 'words' ? 'word layer' : 'quick dictionary'}'s word`} is not a ${token.p} (${classOf(entry).join(' ')})`);
+            else if (!classFits(token.p, entry) && !teExpressionFits(tokens, index, label, stated) && !expressionFits(tokens, index, label, stated)) out.issues.push(`${entry.seq || `the ${entry.from === 'words' ? 'word layer' : 'quick dictionary'}'s word`} is not a ${token.p} (${classOf(entry).join(' ')})`);
           }
           report.totals[out.answer] = (report.totals[out.answer] || 0) + 1;
           if (out.classUnknown) report.totals.classUnknown += 1;
