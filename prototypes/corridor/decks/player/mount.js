@@ -2507,14 +2507,18 @@ function settleBack() {
   if (windowed && target.getBoundingClientRect().height > windowed.clientHeight) target = marked || windowed;
   const toggle = windowed && face.querySelector('.kp-zoom');
   const top = Math.min(target.getBoundingClientRect().top, toggle ? toggle.getBoundingClientRect().top : Infinity);
-  // Q · the whole of what the answer says stays above the pads when it fits beside the target; else its definition
+  // Q · the whole of what the answer says (its word, definition and note) stays above the pads. Hfix-1B (G-10, Grok's
+  // 320×568 walk: the note ran under the pads): when it does not fit beside the target, the answer comes first and the
+  // passage gives way above it (it scrolls up under the header, where it is read again by scrolling); only an answer taller
+  // than the whole room keeps its word in view and lets its end go
   const said = answerSaid(def).getBoundingClientRect().bottom - lift;
-  const bottom = said - top <= bottomLimit - topLimit ? said : def.getBoundingClientRect().bottom - lift;
+  const word = answer.getBoundingClientRect().top - lift;
+  const bottom = said;
   let dy = 0;
   if (bottom - top <= bottomLimit - topLimit) {
     if (top < topLimit) dy = top - topLimit;
     else if (bottom > bottomLimit) dy = bottom - bottomLimit;
-  } else dy = bottom - bottomLimit;
+  } else dy = Math.min(bottom - bottomLimit, word - topLimit);
   const room = { up: -window.scrollY, down: document.documentElement.scrollHeight - innerHeight - window.scrollY };
   dy = Math.max(room.up, Math.min(room.down, dy));
   // then no fold row cut by the bar (backFits: none crosses its top edge by more than half a pixel on
