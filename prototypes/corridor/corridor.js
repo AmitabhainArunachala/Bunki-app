@@ -9341,6 +9341,85 @@ function inlineWordReading(anchor, reading) {
   anchor.append(row);
   return () => { if (row.parentNode === anchor) row.replaceWith(...children); };
 }
+/* A reading revealed on touch stands over its word without widening it (the lead's ruling, 2026-10-19; type-ruby R1 at
+ * 320 px: ひょうしょう over 表彰 widened the word 21 px and re-wrapped its line). When it is wider than its word it overhangs
+ * the neighbouring kana by half its excess on each side, as Japanese typesetting lets ruby overhang, so a tap never reflows
+ * the line. Two limits hold: it never runs off its line's edge (it slides inward there instead), and it never comes within
+ * TOUCH_READING_GAP px of another reading shown on the line. Whatever it cannot overhang, its word widens by, as an
+ * always-shown reading's word does. Readings shown always (#reader.fg-always) keep F's rule: no overhang.
+ * Every reveal path (the ladder's rung, the reader's lit word, a re-render) passes through the DOM, so one observer seats
+ * each reading before it is painted. */
+const TOUCH_READING_GAP = 2;
+function touchReading(rt) {
+  const ruby = rt?.parentElement;
+  if (!rt?.isConnected || ruby?.tagName !== 'RUBY' || rt.classList.contains('hidden-rt')) return false;
+  if (ruby.dataset.r != null) return true; // the ladder's own inline reading (inlineWordReading)
+  const reader = rt.closest('#reader');
+  return !!reader && !reader.classList.contains('fg-always');
+}
+function readingLine(rt) {
+  let block = rt.parentElement;
+  while (block && block !== document.body && /^inline|^ruby|^contents$/.test(getComputedStyle(block).display)) block = block.parentElement;
+  if (!block) return null;
+  const box = block.getBoundingClientRect(), cs = getComputedStyle(block);
+  return { left: box.left + parseFloat(cs.borderLeftWidth) + parseFloat(cs.paddingLeft),
+    right: box.right - parseFloat(cs.borderRightWidth) - parseFloat(cs.paddingRight), block };
+}
+function seatTouchReading(rt) {
+  if (!rt?.style) return;
+  rt.style.removeProperty('margin-inline');
+  if (!touchReading(rt)) return;
+  const style = getComputedStyle(rt);
+  if (style.display === 'none' || style.visibility === 'hidden') return;
+  // the word under this reading: the ruby's own text before it, back to the reading before
+  const range = document.createRange();
+  let left = Infinity, right = -Infinity;
+  for (let node = rt.previousSibling; node && node.nodeName !== 'RT'; node = node.previousSibling) {
+    if (node.nodeName === 'RP') continue;
+    range.selectNodeContents(node);
+    for (const box of range.getClientRects()) if (box.width > 0) { left = Math.min(left, box.left); right = Math.max(right, box.right); }
+  }
+  const own = rt.getBoundingClientRect();
+  const excess = own.width - (right - left);
+  if (!Number.isFinite(excess) || excess <= 0.5) return;
+  const line = readingLine(rt);
+  if (!line) return;
+  let roomLeft = Math.max(0, left - line.left), roomRight = Math.max(0, line.right - right);
+  // another reading shown on this line keeps its paper: the nearest on each side bounds the overhang
+  for (const other of line.block.querySelectorAll('rt')) {
+    if (other === rt || other.classList.contains('hidden-rt')) continue;
+    const box = other.getBoundingClientRect();
+    if (!box.width || box.bottom <= own.top || box.top >= own.bottom) continue;
+    if (box.right <= left) roomLeft = Math.min(roomLeft, Math.max(0, left - box.right - TOUCH_READING_GAP));
+    else if (box.left >= right) roomRight = Math.min(roomRight, Math.max(0, box.left - right - TOUCH_READING_GAP));
+  }
+  let start = Math.min(excess / 2, roomLeft), end = Math.min(excess / 2, roomRight);
+  // at a line's edge the reading slides inward: what one side cannot take, the other may
+  const short = excess - start - end;
+  if (short > 0) { const more = Math.min(roomLeft - start, short); start += more; end += Math.min(roomRight - end, short - more); }
+  if (start + end > 0.5) rt.style.marginInline = `${-start}px ${-end}px`;
+}
+if (typeof MutationObserver === 'function' && typeof document !== 'undefined' && document.documentElement) {
+  new MutationObserver((records) => {
+    const seen = new Set();
+    for (const record of records) {
+      if (record.type === 'attributes') { if (record.target.nodeName === 'RT') seen.add(record.target); continue; }
+      for (const node of record.addedNodes) {
+        if (node.nodeType !== 1) continue;
+        if (node.nodeName === 'RT') seen.add(node);
+        else for (const rt of node.querySelectorAll?.('rt:not(.hidden-rt)') || []) seen.add(rt);
+      }
+    }
+    for (const rt of seen) if (rt.style.marginInline || touchReading(rt)) seatTouchReading(rt);
+  }).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+  // a width or a late font changes what a reading needs: the shown ones are seated again
+  let touchReadingFrame = 0;
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(touchReadingFrame);
+    touchReadingFrame = requestAnimationFrame(() => { for (const rt of document.querySelectorAll('rt:not(.hidden-rt)')) if (touchReading(rt)) seatTouchReading(rt); });
+  }, { passive: true });
+  document.fonts?.ready?.then(() => { for (const rt of document.querySelectorAll('rt:not(.hidden-rt)')) if (touchReading(rt)) seatTouchReading(rt); });
+}
 function clearWordLadder(visit = ladderVisit) {
   if (!visit) return;
   if (ladderVisit === visit) ladderVisit = null;

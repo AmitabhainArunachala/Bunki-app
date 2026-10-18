@@ -14,16 +14,26 @@
  *                              or a reading at half its word; the drift sky, SVG drawing text and sizes a script sets
  *                              inline are counted apart and listed, never folded into the pass.
  *   R1 readings, on touch    — 320 / 390 / 430 and 1368: a tapped word's reading is half the reader's size and 10 px or
- *                              more, sits over its word (centres within 1 px) and moves no line (< 1 px).
+ *                              more and centres over its word (within 1 px). Wider than its word, it overhangs the
+ *                              neighbouring glyphs by half its excess on each side (ruby may overhang adjacent kana): it may
+ *                              stand over their columns, but it never comes within 2 px of another reading and never runs
+ *                              off its line's edge (at an edge it slides inward, flush with it). It moves no line (< 1 px).
+ *                              (The lead's ruling, 2026-10-19.)
+ *   R4 breaks, on touch      — the same widths: the line breaks of the reader's first 120 words are the same before and
+ *                              after a touch reveal.
+ *   W1 a fresh 320 reader    — on touch, a word near a line's end with a reading wider than itself: its reading stays
+ *                              on the line, and the document, body and reader stay exactly 320 px wide revealed and folded
+ *                              (G6's hidden-only width rule is gone with the pseudo readings it guarded).
  *   R2 readings, always      — the same widths with every reading shown: each 10 px or more at half its word; two
  *                              neighbouring readings never touch (2 px of paper or more between their texts); none
- *                              crosses a line; none meets the glyphs of its own line or of the line above; each sits over
- *                              its word.
+ *                              crosses a line; none meets the glyphs of its own line or of the line above (F's rule: an
+ *                              always-shown reading wider than its word widens it, never overhangs); each sits over its word.
  *   R3 the deck's readings   — the deck's back (readings on), 390: the same as R2 over the card's sentence.
  *   G1 glosses               — the slip's meaning, a word's page meanings, the deck's English: 13 px or more.
  *   Z1 200 % text            — the reader at 200 % (the phone's 390 CSS px at twice the size: 195 CSS px wide), on touch
- *                              and always: R1's and R2's readings hold (floor, half, never touching, never crossing a
- *                              line, never meeting a glyph), the slip's meaning 13 px or more; a word wider than the line
+ *                              and always: R1's and R2's readings hold (floor, half, never touching another reading, never
+ *                              crossing a line or running off it, on touch overhanging only its own line's neighbours,
+ *                              always never meeting a glyph), the slip's meaning 13 px or more; a word wider than the line
  *                              is recorded with its place, not judged (see the note at the check).
  * Usage: KAIRO_SITE_DIR=<artifact> KAIRO_ARTIFACT_SHA256=<digest> node verify-type-ruby.mjs
  *        KAIRO_BROWSER=chromium|webkit limits the engines (unset or all: both).
@@ -250,7 +260,11 @@ const READINGS = (rootSel) => {
     const baseBoxes = base.flatMap((n) => (n.nodeType === 3 ? textBox(n) : [...n.getClientRects()]));
     const rtBoxes = textBox(rt);
     if (!rtBoxes.length || !baseBoxes.length) continue;
-    rows.push({ text: rt.textContent, size: parseFloat(cs.fontSize), word: parseFloat(getComputedStyle(ruby).fontSize), rtFs: parseFloat(cs.fontSize),
+    let block = ruby.parentElement;
+    while (block && block !== document.body && /^inline|^ruby|^contents$/.test(getComputedStyle(block).display)) block = block.parentElement;
+    const bb = block.getBoundingClientRect(), bs = getComputedStyle(block);
+    const line = { l: bb.left + parseFloat(bs.borderLeftWidth) + parseFloat(bs.paddingLeft), r: bb.right - parseFloat(bs.borderRightWidth) - parseFloat(bs.paddingRight) };
+    rows.push({ text: rt.textContent, size: parseFloat(cs.fontSize), word: parseFloat(getComputedStyle(ruby).fontSize), rtFs: parseFloat(cs.fontSize), line,
       rt: { l: rtBoxes[0].left, r: rtBoxes.at(-1).right, t: Math.min(...rtBoxes.map((b) => b.top)), b: Math.max(...rtBoxes.map((b) => b.bottom)) },
       base: { l: Math.min(...baseBoxes.map((b) => b.left)), r: Math.max(...baseBoxes.map((b) => b.right)), t: Math.min(...baseBoxes.map((b) => b.top)), b: Math.max(...baseBoxes.map((b) => b.bottom)) },
       rubyRects: ruby.getClientRects().length });
@@ -264,23 +278,46 @@ const READINGS = (rootSel) => {
   }
   return { rows, glyphs, scrollWidth: document.scrollingElement.scrollWidth, innerWidth };
 };
+/** R4 · the reader's line breaks: the index of each word that starts a line (by its first glyph's top, its text and
+ * never its reading), over the first `count` words */
+const LINE_BREAKS = (count) => {
+  const starts = [];
+  let last = null, words = 0;
+  for (const t of [...document.querySelectorAll('#reader .tok')].slice(0, count)) {
+    const w = t.querySelector('.tok-word') || t;
+    const n = w.querySelector('ruby')?.firstChild || [...w.childNodes].find((c) => c.nodeType === 3);
+    if (!n) continue;
+    const r = document.createRange(); r.selectNodeContents(n);
+    const b = [...r.getClientRects()].find((x) => x.width > 0);
+    if (!b) continue;
+    words++;
+    const top = Math.round(b.top + scrollY);
+    if (last == null || Math.abs(top - last) > 4) { starts.push(t.dataset.index ?? String(words)); last = top; }
+  }
+  return { starts, words };
+};
 /** R2's geometry: floors, ratio, neighbours, lines, collisions, centring */
-function judgeReadings(found, { gap = 2, floor = 10 } = {}) {
+function judgeReadings(found, { gap = 2, floor = 10, touch = false } = {}) {
   const issues = [];
   const { rows, glyphs } = found;
   for (const r of rows) {
     if (r.size < floor) issues.push(`${r.text} ${r.size}px under ${floor}`);
     if (Math.abs(r.size - r.word / 2) > 0.06) issues.push(`${r.text} ${r.size}px is not half its word (${r.word}px)`);
     if (r.rubyRects !== 1) issues.push(`${r.text} crosses a line (${r.rubyRects} boxes)`);
+    // no reading runs off its line's edge (an always-shown one never overhangs; one shown on touch slides inward there)
+    if (r.line && (r.rt.l < r.line.l - 0.5 || r.rt.r > r.line.r + 0.5)) issues.push(`${r.text} runs off its line's edge (${r.rt.l.toFixed(1)}–${r.rt.r.toFixed(1)} on ${r.line.l.toFixed(1)}–${r.line.r.toFixed(1)})`);
     const centre = (r.rt.l + r.rt.r) / 2 - (r.base.l + r.base.r) / 2;
-    if (Math.abs(centre) > 1) issues.push(`${r.text} sits ${centre.toFixed(1)} px off its word`);
-    // no glyph of the line above, or of its own line beside its word, meets the reading. Ink, not boxes: a Japanese
+    const flush = touch && r.line && (Math.abs(r.rt.l - r.line.l) <= 1 || Math.abs(r.rt.r - r.line.r) <= 1);
+    if (Math.abs(centre) > 1 && !flush) issues.push(`${r.text} sits ${centre.toFixed(1)} px off its word`);
+    // no glyph of the line above, or (shown always) of its own line beside its word, meets the reading. On touch it may
+    // stand over its own line's neighbours: it overhangs them, never another reading (below). Ink, not boxes: a Japanese
     // face's text box runs from its ascent to its descent (Noto: 1.15 em above the baseline, 0.288 em below), while
     // its glyphs stand in the ideographic em box (0.88 em above, 0.12 em below); the two ink boxes must not overlap.
     const ink = (box, fs) => { const asc = (box.b - box.t) - 0.288 * fs; return { t: box.t + asc - 0.88 * fs, b: box.t + asc + 0.12 * fs }; };
     const rtInk = ink(r.rt, r.rtFs);
     for (const g of glyphs) {
       if (g.l >= r.base.l - 0.5 && g.r <= r.base.r + 0.5 && Math.abs(g.t - r.base.t) < 2) continue; // its own word
+      if (touch && Math.abs(g.t - r.base.t) < 2) continue; // its own line's neighbours: overhung, on touch
       const gInk = ink(g, g.fs);
       const overlapX = Math.min(g.r, r.rt.r) - Math.max(g.l, r.rt.l), overlapY = Math.min(gInk.b, rtInk.b) - Math.max(gInk.t, rtInk.t);
       if (overlapX > 0.5 && overlapY > 0.5) { issues.push(`${r.text} meets a glyph (${overlapX.toFixed(1)}×${overlapY.toFixed(1)} at ${g.fs}px)`); break; }
@@ -381,13 +418,29 @@ try {
         const after = await page.evaluate(READINGS, '#reader');
         const shown = after.rows.filter((r) => r.text === 'ひょうしょう');
         assert.equal(shown.length, 1, `the tapped word shows its reading: ${JSON.stringify(after.rows.map((r) => r.text))}`);
-        const judged = judgeReadings({ rows: shown, glyphs: after.glyphs });
+        const judged = judgeReadings({ rows: shown, glyphs: after.glyphs }, { touch: true });
         assert.deepEqual(judged.issues, [], judged.issues.join('; '));
         const y1 = await page.evaluate(() => scrollY);
         const tops2 = await page.evaluate(glyphFoot);
         const moved = tops.map((t, i) => (t == null || tops2[i] == null ? 0 : Math.abs(tops2[i] + (y1 - y0) - t))).filter((d) => d >= 1);
         assert.deepEqual(moved, [], `a shown reading moves no line: ${moved.slice(0, 5).join(', ')}`);
-        return { size: shown[0].size, word: shown[0].word };
+        const over = shown[0].rt.r - shown[0].rt.l - (shown[0].base.r - shown[0].base.l);
+        return { size: shown[0].size, word: shown[0].word, overhang: Math.round(Math.max(0, over) * 10) / 10 };
+      });
+      await run(`R4-breaks-on-touch-${w}`, viewport, async ({ page }) => {
+        await openReader(page);
+        const tok = readerTok(page, '表彰');
+        await tok.scrollIntoViewIfNeeded();
+        await page.waitForTimeout(200);
+        const before = await page.evaluate(LINE_BREAKS, 120);
+        await tok.click();
+        await page.waitForTimeout(400);
+        const shown = (await page.evaluate(READINGS, '#reader')).rows.filter((r) => r.text === 'ひょうしょう');
+        assert.equal(shown.length, 1, 'the tapped word shows its reading');
+        const after = await page.evaluate(LINE_BREAKS, 120);
+        assert(before.words >= 60, `the reader's first words are measured: ${before.words}`);
+        assert.deepEqual(after.starts, before.starts, `a touch reveal re-breaks no line: ${JSON.stringify({ before: before.starts, after: after.starts })}`);
+        return { words: before.words, lines: before.starts.length };
       });
       await run(`R2-always-${w}`, viewport, async ({ page }) => {
         await openReader(page);
@@ -401,6 +454,52 @@ try {
         return { readings: judged.readings, sizes: judged.sizes, closest: judged.closest };
       });
     }
+    await run('W1-fresh-320-reveal-fold', { width: 320, height: 700 }, async ({ page }) => {
+      await openReader(page);
+      const widths = () => page.evaluate(() => ({ doc: document.documentElement.scrollWidth, body: document.body.scrollWidth,
+        reader: document.querySelector('#reader')?.scrollWidth ?? null, inner: innerWidth, visual: visualViewport?.width ?? null, scale: visualViewport?.scale ?? null }));
+      const exact = (w) => w.doc === 320 && w.body <= 320 && w.reader != null && w.reader <= 320 && w.inner === 320 && w.visual === 320 && w.scale === 1;
+      const fresh = await widths();
+      assert(exact(fresh), `a fresh 320 reader is 320 wide: ${JSON.stringify(fresh)}`);
+      // the word nearest its line's end whose hidden reading is wider than it (ruby[data-...] aside: the reader's own)
+      const index = await page.evaluate(() => {
+        let best = null;
+        for (const tok of [...document.querySelectorAll('#reader .tok[data-index]')].slice(0, 200)) {
+          const rt = tok.querySelector('ruby > rt.hidden-rt'); const ruby = rt?.parentElement;
+          if (!rt || ruby.querySelectorAll('rt').length !== 1) continue;
+          const base = [...ruby.childNodes].filter((n) => n !== rt).map((n) => n.textContent).join('');
+          if ([...rt.textContent].length * 0.5 <= [...base].length + 0.5) continue;
+          let block = tok.parentElement;
+          while (block && /^inline|^ruby|^contents$/.test(getComputedStyle(block).display)) block = block.parentElement;
+          const lineRight = block.getBoundingClientRect().right - parseFloat(getComputedStyle(block).paddingRight);
+          const room = lineRight - ruby.getBoundingClientRect().right;
+          if (room >= 0 && (!best || room < best.room)) best = { index: tok.dataset.index, room };
+        }
+        return best?.index ?? null;
+      });
+      assert(index != null, 'a word with a wider reading near its line\'s end');
+      const tok = page.locator(`#reader .tok[data-index="${index}"]`);
+      await tok.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(200);
+      const before = await page.evaluate(LINE_BREAKS, 200);
+      await tok.click();
+      await page.waitForTimeout(400);
+      const shown = (await page.evaluate(READINGS, '#reader')).rows;
+      assert.equal(shown.length, 1, `one reading shows: ${JSON.stringify(shown.map((r) => r.text))}`);
+      const judged = judgeReadings({ rows: shown, glyphs: [] }, { touch: true });
+      assert.deepEqual(judged.issues, [], judged.issues.join('; '));
+      const revealed = await widths();
+      assert(exact(revealed), `revealed, the reader stays 320 wide: ${JSON.stringify(revealed)}`);
+      assert.deepEqual((await page.evaluate(LINE_BREAKS, 200)).starts, before.starts, 'the reveal re-breaks no line');
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(400);
+      const folded = await page.evaluate(READINGS, '#reader');
+      assert.equal(folded.rows.length, 0, `folded, no reading shows: ${JSON.stringify(folded.rows.map((r) => r.text))}`);
+      const after = await widths();
+      assert(exact(after), `folded, the reader stays 320 wide: ${JSON.stringify(after)}`);
+      return { word: index, reading: shown[0].text, base: Math.round(shown[0].base.r - shown[0].base.l), rt: Math.round(shown[0].rt.r - shown[0].rt.l),
+        flushRight: Math.abs(shown[0].rt.r - shown[0].line.r) <= 1, widths: { fresh, revealed, after } };
+    });
     await run('R3-deck-back-390', { width: 390, height: 844 }, async ({ page }) => {
       await openDeckBack(page);
       const found = await page.evaluate(READINGS, '#kp-card .kp-sentence');
@@ -434,7 +533,7 @@ try {
       const touch = await page.evaluate(READINGS, '#reader');
       const shown = touch.rows.filter((r) => r.text === 'ひょうしょう');
       assert.equal(shown.length, 1, 'a tap shows its reading at 200 %');
-      const j1 = judgeReadings({ rows: shown, glyphs: touch.glyphs });
+      const j1 = judgeReadings({ rows: shown, glyphs: touch.glyphs }, { touch: true });
       assert.deepEqual(j1.issues, [], j1.issues.join('; '));
       // G3 · the next tap draws the card: its meaning is what is judged (one line at least, never an empty pass)
       if (!(await page.locator('#mini').count())) await tok.click();
