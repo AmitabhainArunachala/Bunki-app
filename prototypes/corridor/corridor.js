@@ -10532,7 +10532,8 @@ const senseWeekdayBracket = (token, near) => /^[日月火水木金土]$/u.test(S
 function senseNegation(token, near) {
   if (token.p !== '形容詞' || !['ない', '無い'].includes(String(token.b || '')) || !near?.prev) return false;
   const prev = String(near.prev.s || ''), prev2 = String(near.prev2?.s || '');
-  const adjectiveKu = (t) => t?.p === '形容詞' && /く$/u.test(String(t.s || ''));
+  // an adjective's く form, or an auxiliary's (たく: 行きたくない)
+  const adjectiveKu = (t) => ['形容詞', '助動詞'].includes(t?.p) && /く$/u.test(String(t.s || ''));
   if (['で', 'じゃ', 'じゃあ'].includes(prev) || adjectiveKu(near.prev)) return true;
   return ['は', 'も', 'さえ'].includes(prev) && (['で', 'じゃ'].includes(prev2) || adjectiveKu(near.prev2));
 }
@@ -10546,6 +10547,14 @@ function senseExpression(token, near) {
   if (token.s === 'ん' && token.p !== '助動詞' && ['です', 'でし', 'でしょ'].includes(next)) return { s: 'んです', b: 'んです', r: 'んです', seq: '2087820' };
   if (token.b === 'いける' && token.s === 'いけ' && ['ない', 'ませ', 'ず'].includes(next)
     && (['ちゃ', 'じゃ'].includes(prev) || (prev === 'は' && ['て', 'で'].includes(prev2)))) return { s: 'いけない', b: 'いけない', r: 'いけない', seq: '1000730' };
+  // について, "about" (日本について), never つく "to be attached" or "to be lit"; 床について + いる (taken to bed) stays つく
+  if (token.s === 'つい' && prev === 'に' && next === 'て' && !['い', 'いる', 'いた', 'いて', 'おり', 'おる'].includes(String(near.next2?.s || ''))) {
+    return { s: 'について', b: 'について', r: 'について', seq: '1009780' };
+  }
+  // ない in its idioms: 勿体ない "wasteful", 違いない "sure", 間もなく "soon" — never "nonexistent"
+  if (['ない', '無い'].includes(String(token.b || '')) && ['勿体', 'もったい'].includes(prev)) return { s: '勿体ない', b: '勿体ない', r: 'もったいない', seq: '1605250' };
+  if (['ない', '無い'].includes(String(token.b || '')) && ['違い', 'ちがい'].includes(prev)) return { s: '違いない', b: '違いない', r: 'ちがいない', seq: '1610740' };
+  if (token.s === 'なく' && prev === 'も' && prev2 === '間') return { s: '間もなく', b: '間もなく', r: 'まもなく', seq: '1215290' };
   // 〜なりに, "in one's own way" (自分なりに), never the particle なり "or" nor 也's "sum of money"; a listing's last なり
   // before に (父母なり友なりに) is still the listing's
   if (token.s === 'なり' && ['接尾辞', '助詞'].includes(token.p) && next === 'に' && !(near.before || []).some((t) => t?.s === 'なり')) {
