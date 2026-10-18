@@ -10506,16 +10506,23 @@ function senseNeighbours(token) {
   const at = TOKEN_CONTEXT.get(token);
   if (!at) return null;
   const { tokens, index } = at;
-  return { prev: tokens[index - 1] || null, prev2: tokens[index - 2] || null, next: tokens[index + 1] || null, passage: at.passage, index };
+  return { prev: tokens[index - 1] || null, prev2: tokens[index - 2] || null, next: tokens[index + 1] || null,
+    next2: tokens[index + 2] || null, before: tokens.slice(Math.max(0, index - 8), index), passage: at.passage, index };
 }
 
-/** The sidecar's sense for this token in its article: { seq, k, source }, a name ({ name: true }), or null. */
+/** The sidecar's sense for this token in its article: { seq, k, source, lead }, a name ({ name: true }), or null. lead,
+ * when the row has one, is the gloss of that sense the sentence's meaning is (遺産 in 世界遺産: "heritage", its fourth). */
 function sidecarSense(near) {
   const row = near?.passage ? D.senseSidecar?.[near.passage]?.[near.index] : null;
   if (!Array.isArray(row)) return null;
   if (row[0] === 'name') return { name: true, source: String(row[1] || '') };
-  return { seq: String(row[0]), k: Number(row[1]), source: String(row[2] || '') };
+  return { seq: String(row[0]), k: Number(row[1]), source: String(row[2] || ''), ...(Number.isInteger(row[3]) ? { lead: row[3] } : {}) };
 }
+/** A sense's glosses led by the one the sidecar names, then the rest as JMdict lists them but its first: the sidecar
+ * names a lead only where that first gloss misleads in the sentence (遺産 "inheritance" in 世界遺産), so the slip never
+ * shows it there; the page still lists every gloss. */
+const senseLed = (glosses, lead) => (Number.isInteger(lead) && lead > 0 && lead < glosses.length
+  ? [glosses[lead], ...glosses.filter((_, g) => g !== lead && g !== 0)] : glosses);
 
 const senseNumberBefore = (near) => !!near?.prev && (SENSE_NUMBER.test(String(near.prev.s || '')) || SENSE_NUMBER_WORD.has(String(near.prev.s || '')));
 /** A suffix after a number: a counter's place (一つ, 二疋, 十本). */
@@ -10539,6 +10546,18 @@ function senseExpression(token, near) {
   if (token.s === 'ん' && token.p !== '助動詞' && ['です', 'でし', 'でしょ'].includes(next)) return { s: 'んです', b: 'んです', r: 'んです', seq: '2087820' };
   if (token.b === 'いける' && token.s === 'いけ' && ['ない', 'ませ', 'ず'].includes(next)
     && (['ちゃ', 'じゃ'].includes(prev) || (prev === 'は' && ['て', 'で'].includes(prev2)))) return { s: 'いけない', b: 'いけない', r: 'いけない', seq: '1000730' };
+  // 〜なりに, "in one's own way" (自分なりに), never the particle なり "or" nor 也's "sum of money"; a listing's last なり
+  // before に (父母なり友なりに) is still the listing's
+  if (token.s === 'なり' && ['接尾辞', '助詞'].includes(token.p) && next === 'に' && !(near.before || []).some((t) => t?.s === 'なり')) {
+    return { s: 'なりに', b: 'なりに', r: 'なりに', seq: '2038230' };
+  }
+  // 一枚岩, the idiom (monolith; unity), never 枚 the counter of flat things
+  if (token.s === '枚' && prev === '一' && next === '岩') return { s: '一枚岩', b: '一枚岩', r: 'いちまいいわ', seq: '1166750' };
+  // 〜方がいい after a verb: "had better", after a negative "had better not" (しない方がいい), never one side of a comparison
+  if (token.s === '方' && kataToHira(String(token.r || '')) === 'ほう' && next === 'が' && ['動詞', '助動詞'].includes(near.prev?.p)
+    && ['いい', 'よい', '良い', 'よかっ', '良かっ'].includes(String(near.next2?.s || ''))) {
+    return { s: '方がいい', b: '方がいい', r: 'ほうがいい', seq: '2160680', k: ['ない', 'ぬ', 'ん'].includes(prev) ? 1 : 0 };
+  }
   return null;
 }
 
@@ -10551,6 +10570,9 @@ const senseGlosses = (sense) => (sense?.[10] || []).map((gloss) => String(gloss?
 function senseChoice(token, door) {
   if (!door || door.te || door.kanjiOnly || door.noFit || door.senseName) return null;
   const near = senseNeighbours(token);
+  // the sidecar is asked for with its article; a word tapped before it came waits for it (ensureSense)
+  if (near?.passage && D.senseSidecar === undefined) return { need: { forms: [], shards: [] } };
+  const side = sidecarSense(near);
   const expression = senseExpression(token, near);
   if (expression) {
     if (!dictionaryAnsweredForm(expression.b)) return { need: { forms: [expression.b], shards: [] } };
@@ -10558,14 +10580,16 @@ function senseChoice(token, door) {
     const detail = row ? D.dictionaryDetails?.get(expression.seq) : null;
     if (row && !detail) return { need: { forms: [], shards: [dictionaryShardId(expression.seq)] } };
     if (!detail) return null;
-    // いけない: its sense noted as following the te-form ("must not"); んだ, んです: their one sense
-    const k = Math.max(0, detail[3].findIndex((sense) => (sense[8] || []).some((note) => TE_FORM_NOTE.test(String(note)))));
-    const sense = { seq: expression.seq, k, glosses: senseGlosses(detail[3][k]), why: ['expression'], left: 1, entry: true };
+    // the sidecar's sense of the expression where it names one (一枚岩: the rock, or unity); else the expression's own
+    // (方がいい after a negative: "had better not"), else the sense noted as following the te-form (いけない: "must
+    // not"), else its first (んだ, んです: their one sense)
+    const sided = side?.seq === expression.seq && detail[3][side.k] ? side : null;
+    const k = sided ? sided.k : Number.isInteger(expression.k) ? expression.k
+      : Math.max(0, detail[3].findIndex((sense) => (sense[8] || []).some((note) => TE_FORM_NOTE.test(String(note)))));
+    const sense = { seq: expression.seq, k, glosses: senseLed(senseGlosses(detail[3][k]), sided?.lead),
+      why: sided ? ['expression', `sidecar:${sided.source}`] : ['expression'], left: 1, entry: true };
     return { door: { ...door, s: expression.s, b: expression.b, r: expression.r, seq: expression.seq, sense, inflected: undefined, unfit: undefined, several: undefined } };
   }
-  // the sidecar is asked for with its article; a word tapped before it came waits for it (ensureSense)
-  if (near?.passage && D.senseSidecar === undefined) return { need: { forms: [], shards: [] } };
-  const side = sidecarSense(near);
   if (side?.name) return { door: { ...door, senseName: true, sense: { name: true, why: [`sidecar:${side.source}`] } } };
   const form = String(door.b || ''), reading = kataToHira(String(tokenReading(door) || ''));
   if (!form || !reading) return null;
@@ -10600,7 +10624,10 @@ function senseChoice(token, door) {
     candidates: pairs.map((candidate) => [candidate.seq, candidate.k]) });
   if (side) {
     const hit = pairs.find((pair) => pair.seq === side.seq && pair.k === side.k);
-    if (hit) return result(hit, [`sidecar:${side.source}`]);
+    if (hit) {
+      const chosen = result(hit, [`sidecar:${side.source}`]);
+      return Number.isInteger(side.lead) ? { ...chosen, glosses: senseLed(chosen.glosses, side.lead), lead: side.lead } : chosen;
+    }
   }
   // the rules, each a test a sense passes or fails; the shown sense stays while it passes them all
   const pos = (pair) => pair.sense[0] || [];
