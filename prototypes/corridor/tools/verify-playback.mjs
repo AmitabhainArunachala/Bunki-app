@@ -466,6 +466,30 @@ try {
     assert.equal(reopened.expanded === 'true' && reopened.toggleShown && reopened.rateShown && reopened.mark.w >= 44, true,
       `a tap on the mark opens the bar again: ${JSON.stringify(reopened)}`);
   });
+  // F, brief item 2 (Grok f-86): folded, the mark meets no text box in any of the eleven worlds, at 320 / 390 / 430. A world
+  // can change a face and so the head's line; each world is set as he sets it (stored, then the app opened again).
+  await check('the-folded-mark-meets-no-text-in-any-world-at-any-phone-width', 'narration', async ({ page }) => {
+    const WORLDS = ['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'keyblock', 'hakuu', 'kaku'];
+    const rows = [];
+    for (const width of [320, 390, 430]) {
+      await page.setViewportSize({ width, height: 844 });
+      for (const world of WORLDS) {
+        await page.evaluate((id) => localStorage.setItem('kairo-theme', id), world);
+        await page.goto(`${base}/index.html?entry=shelf&ui=bi`);
+        await page.waitForFunction(() => document.body.dataset.ready === '1');
+        await openPassage(page);
+        await page.waitForSelector('.listen-row.play-bar[data-open="false"] #listen-open', { timeout: 10000 });
+        const s = await markState(page);
+        const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme') || 'hokusai');
+        rows.push({ width, world, theme, folded: folded(s), mark: s.mark, inHead: s.inHead, position: s.position, textHits: s.textHits });
+      }
+    }
+    writeFileSync(resolve(out, `folded-mark-worlds-${ENGINE}.json`), JSON.stringify(rows, null, 2));
+    assert.equal(rows.length, 33, 'eleven worlds at three widths');
+    assert.deepEqual(rows.filter((r) => r.theme !== r.world).map((r) => `${r.width}/${r.world}→${r.theme}`), [], 'each world is the world asked for');
+    assert.deepEqual(rows.filter((r) => !r.folded).map((r) => `${r.width}/${r.world}: ${JSON.stringify({ inHead: r.inHead, position: r.position, mark: r.mark, textHits: r.textHits })}`), [],
+      'folded, the mark is one 44 px glyph in the head that meets no text box, in every world at 320 / 390 / 430');
+  });
   await check('stale-clip-events-cannot-change-a-restarted-read', 'narration', async ({ page }) => {
     await press(page);
     await started(page, 'clips');
