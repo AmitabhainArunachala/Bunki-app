@@ -2167,7 +2167,12 @@ async function verifyReview(browser, base) {
       await start(o.page);
       const front = await o.page.evaluate(`(() => { const top = document.querySelector('.kp-top-study'); const words = (n) => (n?.innerText || '').replace(/\\s+/g, ' ');
         return { del: document.querySelectorAll('#kp-delete, .kp-delete').length, topButtons: [...(top?.querySelectorAll('button') || [])].map((n) => n.id || n.className),
-          removeWords: /Remove|削除/.test(words(document.querySelector('.kp-study'))) }; })()`);
+          removeWords: /Remove|削除/.test(words(document.querySelector('.kp-study'))),
+          hang: getComputedStyle(document.querySelector('#kp-card .kp-sentence')).hangingPunctuation ?? null }; })()`);
+      // Hfix-1B: WebKit (the iPhone's engine) painted a line's hung 「ど、」 a second time at the next line's start; the deck's
+      // passage hangs no punctuation (Chromium has no such property: null there, and nothing to paint twice)
+      check(`a) ${deck}: the front's passage hangs no punctuation (${actualEngine}: ${front.hang ?? 'no such property'})`,
+        actualEngine === 'webkit' ? front.hang === 'none' : front.hang === null || front.hang === 'none', JSON.stringify({ hang: front.hang }));
       await revealCard(o.page);
       const first = await onScreen(o.page);
       const before = await read(o.page, deck);

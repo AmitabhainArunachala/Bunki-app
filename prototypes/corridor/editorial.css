@@ -3366,7 +3366,9 @@ body:has(#app :is(.kp-study, .kp-done)) #app > .report-line-page { display: none
 #app .kp-study .kp-sentence,
 #app .kp-study .kp-sentence:has(.kp-tok) {
   font-size: var(--type-reading); line-height: 2.3; letter-spacing: 0.05em; font-weight: 500;
-  text-align: start; line-break: strict; hanging-punctuation: allow-end;
+  /* no hanging punctuation (Hfix-1B): WebKit, the iPhone's engine, painted a line's hung 「ど、」 a second time at the
+     next line's start (会話のきっかけにできるけど、/ど、実際に…); a line now ends inside its measure, as Chromium's did */
+  text-align: start; line-break: strict;
   overflow-wrap: break-word;
   /* a Japanese page sits on a character grid: the block is a whole number of characters wide, so a
      full line ends flush; a line that ends before a word kept whole for its reading stays a little
