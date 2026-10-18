@@ -20,6 +20,8 @@
  *   11  full-width Latin and digits in the reader (Ｍｕｊｉｎ, ２０２６) set proportionally (palt), unbroken, text unchanged;
  *   12  under 360 px a word on six lists shows at most three in the hold strip, then "All lists · 6", and the strip never
  *       scrolls inside itself; 390 keeps all six;
+ *   14  W-2: a load the page abandons as it goes settles caught (no page error), and loads work again after pageshow;
+ *       W-1: a dictionary shard that fails once is asked again, and the stage still lands on its sense;
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -81,6 +83,9 @@ const CONTROL = {
   fullwidth: { item: '11.', css: '.tok-word .fw-run { font-feature-settings: normal !important; }' },
   'strip-lists': { item: '12.', source: [['corridor.js', '    const shownLists = window.innerWidth < 360 ? 3 : SEAL_LISTS_SHOWN;', '    const shownLists = SEAL_LISTS_SHOWN;'],
     ['corridor.js', '    open.fitLists = () => {', '    open.fitLists = () => { return;']] },
+  'fetch-abort': { item: '14.abort', source: [['corridor.js', "addEventListener('pagehide', () => pageLoads.abort());", 'void pageLoads;']] },
+  'fetch-retry': { item: '14.retry', source: [['corridor.js', "if (error?.name === 'AbortError' || signal.aborted || attempt >= 1) throw error;",
+    "if (error?.name === 'AbortError' || signal.aborted || attempt >= 0) throw error;"]] },
   thread: { item: '3.', css: '.scale-thread { scroll-snap-type: none !important; }',
     source: [['corridor.js', '    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);', '    if (delta) thread.scrollLeft += delta;']] },
 };
@@ -626,6 +631,57 @@ async function itemStripLists(browser, engine) {
   }
 }
 
+async function itemFetches(browser, engine) {
+  // 14 · W-2: a load the page abandons as it goes (pagehide) is caught: 総理's page asks for its examples (the manifest
+  // held), the page goes, and the load settles at once with no page error; back again (pageshow), loads work
+  {
+    const { context, page, errors } = await session(browser);
+    let held = 0;
+    await context.route(/\/data\/proprietary_safe\/examples\/manifest\.json$/u, async (route) => {
+      held += 1;
+      if (held === 1) await delay(8000);
+      try { await route.continue(); } catch { /* the page abandoned it */ }
+    });
+    try {
+      await openStory(page);
+      await stage(page);
+      await page.locator('#mini .mini-word').tap();
+      await page.locator('#sheet').waitFor();
+      await page.waitForFunction(() => window.__H1A__.run('D.examplePending?.size || 0') > 0, null, { timeout: 8000 });
+      const before = errors.length;
+      await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: false })));
+      const settled = await page.waitForFunction(() => (window.__H1A__.run('D.examplePending?.size || 0')) === 0, null, { timeout: 1500 }).then(() => true, () => false);
+      await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: false })));
+      await page.evaluate(() => window.__H1A__.run(`(() => { D.exampleBank?.delete('総理'); S.stack = []; render(); go({ t: 'word', id: '大臣' }); })()`));
+      const after = await page.waitForFunction(() => !!window.__H1A__.run('D.exampleManifest'), null, { timeout: 10_000 }).then(() => true, () => false);
+      check(`14.abort-quiet · ${engine} · a load the page abandons as it goes settles at once, caught (no page error); back again, loads work`,
+        held >= 1 && settled && after && errors.length === before && !errors.length, { held, settled, after, errors });
+    } finally { await context.close(); }
+  }
+  // 14 · W-1: every dictionary detail shard fails once (a network failure), then answers: 総理's stage still lands on its
+  // sense (the shard asked again), never on the fallback meaning
+  {
+    const { context, page, errors } = await session(browser);
+    const asked = new Map();
+    await context.route(/\/data\/share_alike\/dict-v2\/[0-9a-f]{2}\.json$/u, async (route) => {
+      const key = new URL(route.request().url()).pathname, n = (asked.get(key) || 0) + 1;
+      asked.set(key, n);
+      if (n === 1) return route.abort('failed');
+      return route.continue();
+    });
+    try {
+      await openStory(page);
+      await stage(page);
+      await delay(800);
+      const f = await page.evaluate(() => { const m = document.getElementById('mini');
+        return { sense: m?.dataset.senseEntry ?? null, line: m?.querySelector('.mini-gloss')?.textContent ?? null, busy: m?.getAttribute('aria-busy') ?? null }; });
+      check(`14.retry-shard · ${engine} · a detail shard that fails once is asked again: 総理's stage lands on its sense, not the fallback`,
+        !!f.sense && f.busy !== 'true' && !!f.line && f.line !== '…' && [...asked.values()].some((n) => n >= 2) && !errors.length,
+        { ...f, asked: Object.fromEntries(asked), errors });
+    } finally { await context.close(); }
+  }
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
   { id: 'layers', prefix: '2.', run: itemLayers },
@@ -639,6 +695,7 @@ const ITEMS = [
   { id: 'shelf-sign', prefix: '10.', run: itemShelfSign },
   { id: 'fullwidth', prefix: '11.', run: itemFullWidth },
   { id: 'strip-lists', prefix: '12.', run: itemStripLists },
+  { id: 'fetches', prefix: '14.', run: itemFetches },
 ];
 
 const log = { engines: {} };

@@ -3887,11 +3887,35 @@ function embeddedDictionaryJson(name) {
   return parsed;
 }
 
+/** Hfix-1A (W-2, W-1) · the app's own data loads. The page abandons them itself when it goes (pagehide): a load the
+ * navigation would cut became a page error in WebKit ("… examples/manifest.json due to access control checks", R3's
+ * reading-truth); abandoned, it is an AbortError its caller already answers. A network failure is asked again once,
+ * a moment later (a phone's network drops one request; W-1 saw a dict shard fail so under load), and only then counts;
+ * an HTTP answer is an answer, never asked again. */
+let pageLoads = new AbortController();
+// WebKit cancels in-flight loads before pagehide while the next document is pending (departArticlePrefetch's note): the
+// page lets go at beforeunload too
+addEventListener('beforeunload', () => pageLoads.abort(), { capture: true });
+addEventListener('pagehide', () => pageLoads.abort());
+addEventListener('pageshow', () => { if (pageLoads.signal.aborted) pageLoads = new AbortController(); });
+const DATA_RETRY_MS = 400;
+async function fetchData(path) {
+  for (let attempt = 0; ; attempt += 1) {
+    const signal = pageLoads.signal;
+    try {
+      return await fetch(path, { signal });
+    } catch (error) {
+      if (error?.name === 'AbortError' || signal.aborted || attempt >= 1) throw error;
+      await new Promise((done) => setTimeout(done, DATA_RETRY_MS));
+      if (signal.aborted) throw error;
+    }
+  }
+}
 async function loadDictionaryJson(name) {
   const embedded = embeddedDictionaryJson(name);
   if (embedded) return embedded;
   const path = name === 'index' ? DICTIONARY_INDEX_PATH : DICTIONARY_SHARD_PATH(name);
-  const res = await fetch(path);
+  const res = await fetchData(path);
   if (!res.ok) throw new Error(`${path} → ${res.status}`);
   return res.json();
 }
@@ -13374,7 +13398,7 @@ function markSenseContext(tokens, passage = null) {
 let senseSidecarPromise = null;
 function ensureSenseSidecar() {
   if (D.senseSidecar || senseSidecarPromise) return senseSidecarPromise || Promise.resolve(D.senseSidecar);
-  senseSidecarPromise = fetch('data/articles/senses.json')
+  senseSidecarPromise = fetchData('data/articles/senses.json')
     .then((res) => (res.ok ? res.json() : null))
     .then((data) => { D.senseSidecar = data?.schemaVersion === 1 && data.articles ? data.articles : {}; return D.senseSidecar; },
       () => { D.senseSidecar = {}; return D.senseSidecar; });
@@ -32080,7 +32104,7 @@ function inflateExampleToken(row) {
   return { s, b, r, c: !!c, p, f: (f || []).map((pair) => (pair[1] ? { t: pair[0], r: pair[1] } : { t: pair[0] })) };
 }
 async function fetchExampleJson(path) {
-  const res = await fetch(`${EXAMPLE_DIR}/${path}`);
+  const res = await fetchData(`${EXAMPLE_DIR}/${path}`);
   if (!res.ok) throw new Error(`${path} → ${res.status}`);
   return res.json();
 }
