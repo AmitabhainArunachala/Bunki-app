@@ -894,6 +894,114 @@
       ]
     },
     {
+      "name": "continuity",
+      "sampleCount": 2,
+      "medianSeconds": 88.0,
+      "meanSeconds": 88.0,
+      "maxSeconds": 88,
+      "minSeconds": 88,
+      "successfulMedianSeconds": 88,
+      "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Both engines in one gate (KAIRO_BROWSER=all): site-5 41+47 s (Chromium H1b red once, green on rerun), site-6 40+48 s.",
+      "samples": [
+        {
+          "runId": null,
+          "seconds": 88,
+          "status": "failed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 88,
+          "status": "passed",
+          "source": "local"
+        }
+      ]
+    },
+    {
+      "name": "sense-truth",
+      "sampleCount": 3,
+      "medianSeconds": 956,
+      "meanSeconds": 1042.0,
+      "maxSeconds": 1279,
+      "minSeconds": 891,
+      "successfulMedianSeconds": 923.5,
+      "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Chromium: site-5 1279 s (three rows timed out under load, before G3's ladder port), then 956 s, site-6 891 s.",
+      "samples": [
+        {
+          "runId": null,
+          "seconds": 1279,
+          "status": "failed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 956,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 891,
+          "status": "passed",
+          "source": "local"
+        }
+      ]
+    },
+    {
+      "name": "sense-truth-webkit",
+      "sampleCount": 2,
+      "medianSeconds": 1372.0,
+      "meanSeconds": 1372.0,
+      "maxSeconds": 1427,
+      "minSeconds": 1317,
+      "successfulMedianSeconds": 1372.0,
+      "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. WebKit: site-5 1427 s, site-6 1317 s.",
+      "samples": [
+        {
+          "runId": null,
+          "seconds": 1427,
+          "status": "passed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 1317,
+          "status": "passed",
+          "source": "local"
+        }
+      ]
+    },
+    {
+      "name": "type-ruby",
+      "sampleCount": 3,
+      "medianSeconds": 96,
+      "meanSeconds": 100.333,
+      "maxSeconds": 115,
+      "minSeconds": 90,
+      "successfulMedianSeconds": 115,
+      "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Both engines in one gate (KAIRO_BROWSER=all): site-5 39+57 s and site-6 36+54 s (R1-on-touch-320 red, since fixed), site-9 46+69 s (19/19 each).",
+      "samples": [
+        {
+          "runId": null,
+          "seconds": 96,
+          "status": "failed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 90,
+          "status": "failed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 115,
+          "status": "passed",
+          "source": "local"
+        }
+      ]
+    },
+    {
       "name": "voice-lock",
       "sampleCount": 5,
       "medianSeconds": 0.841,
@@ -6336,6 +6444,66 @@
           "status": "passed",
           "startedAt": "2026-10-06T11:30:47.772Z",
           "completedAt": "2026-10-06T11:32:26.788Z"
+        }
+      ]
+    },
+    {
+      "name": "word-grammar",
+      "sampleCount": 3,
+      "medianSeconds": 1277,
+      "meanSeconds": 1282.0,
+      "maxSeconds": 1309,
+      "minSeconds": 1260,
+      "successfulMedianSeconds": null,
+      "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Chromium, run with --controls --g5-controls (the gate runs --controls): site-5 1309 s and 1277 s, site-6 1260 s; each red on one row since fixed, none a timeout.",
+      "samples": [
+        {
+          "runId": null,
+          "seconds": 1309,
+          "status": "failed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 1277,
+          "status": "failed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 1260,
+          "status": "failed",
+          "source": "local"
+        }
+      ]
+    },
+    {
+      "name": "word-grammar-webkit",
+      "sampleCount": 3,
+      "medianSeconds": 1521,
+      "meanSeconds": 1518.0,
+      "maxSeconds": 1530,
+      "minSeconds": 1503,
+      "successfulMedianSeconds": null,
+      "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. WebKit, run with --controls --g5-controls (the gate runs --controls): site-5 1521 s and 1530 s, site-6 1503 s; red on the headless frame-timing proxies under load (FULL's quiet run judges those), none a timeout. No local run passed, so successfulMedianSeconds is null.",
+      "samples": [
+        {
+          "runId": null,
+          "seconds": 1521,
+          "status": "failed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 1530,
+          "status": "failed",
+          "source": "local"
+        },
+        {
+          "runId": null,
+          "seconds": 1503,
+          "status": "failed",
+          "source": "local"
         }
       ]
     },
