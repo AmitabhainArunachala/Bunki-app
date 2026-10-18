@@ -10391,13 +10391,110 @@ async function removeKept(node, label) {
   if (keptState(node) !== 'taken') return true;
   const allowed = personalHost?.captureAccess?.() || (() => true);
   if (!allowed()) return false;
-  const removed = await toggleTaken(node, label);
-  if (!removed) {
+  const took = await unsaveEverywhere(node);
+  if (!took) {
     showReaderToast(tx('変更を保存できませんでした。もう一度試してください。', 'Could not save the change. Please try again.'));
     return false;
   }
   refreshWordSaveControls(node, label);
-  showReaderToast(tx('外しました', 'Removed'), [tx('元に戻す', 'Undo'), () => allowed() && saveWord(node, label)]);
+  if (S.stack.length) S.roomStale = true;
+  else if (S.view === 'tray') render();
+  showReaderToast(tx('外しました', 'Removed'), [tx('元に戻す', 'Undo'), () => allowed() && restoreKept(node, label, took)]);
+  return true;
+}
+/* Remove un-saves the word everywhere (lead's ruling, 2026-10-18): out of taken and off every list he put it on, so Today
+ * shows it nowhere, in one durable write; its review history stays. What it took out — the card's row and each list
+ * row, with their places — comes back with Undo, in one write. A record that keeps assessment learning removes its card
+ * through that root's own suppression (the host's command), then its lists in a second write. */
+const sameItem = (node) => (row) => !!row && row.t === node.t && row.id === node.id;
+function listsWithout(latest, node) {
+  const same = sameItem(node), lists = { ...latest.lists }, memberships = [];
+  for (const name of Object.keys(latest.lists || {})) {
+    const rows = latest.lists[name];
+    if (!Array.isArray(rows) || !rows.some(same)) continue;
+    rows.forEach((row, index) => { if (same(row)) memberships.push({ name, index, row }); });
+    setOwnRecordValue(lists, name, rows.filter((row) => !same(row)));
+  }
+  return { lists, memberships };
+}
+async function unsaveEverywhere(node) {
+  const key = srsKey(node.t, node.id);
+  if (capturePending.has(key) || !recordWritable()) return null;
+  capturePending.add(key);
+  try {
+    const same = sameItem(node);
+    // D23: the removal names the card this control stood for when it was painted; another entry's card is never touched
+    const expected = node.t === 'word' ? wordNodeIdentity(node, S) : null;
+    const holds = (record) => {
+      if (expected && !sameWordIdentity(expected, wordCardIdentity(record, node.id))) {
+        throw Object.assign(new Error('word-identity-conflict'), { code: 'word-identity-conflict' });
+      }
+    };
+    if (S.assessmentLearning && ['word', 'kanji', 'grammar', 'particle', 'sentence', 'question'].includes(node.t)) {
+      const rows = S.taken.map((row, index) => ({ row, index })).filter(({ row }) => same(row));
+      if (!await suppressAssessmentCards({ kind: 'remove', key }, expected ? holds : null)) return null;
+      let memberships = [];
+      const listed = await commitStorePatch((latest) => {
+        const out = listsWithout(latest, node);
+        memberships = out.memberships;
+        return memberships.length ? { lists: out.lists } : {};
+      });
+      return listed ? { assessment: true, rows, memberships } : null;
+    }
+    let took = null;
+    const ok = await commitStorePatch((latest) => {
+      holds(latest);
+      const rows = latest.taken.map((row, index) => ({ row, index })).filter(({ row }) => same(row));
+      const out = listsWithout(latest, node);
+      took = { assessment: false, rows, memberships: out.memberships };
+      return { taken: latest.taken.filter((row) => !same(row)), ...(out.memberships.length ? { lists: out.lists } : {}) };
+    });
+    return ok ? took : null;
+  } catch { return null; }
+  finally { capturePending.delete(key); }
+}
+/** Undo of a Remove: the card's row and every list row it took out, back in their places, in one write (a row the word
+ * already has again is not doubled). */
+async function restoreKept(node, label, took) {
+  const allowed = personalHost?.captureAccess?.() || (() => true);
+  if (!took || !allowed() || !recordWritable()) return false;
+  const key = srsKey(node.t, node.id);
+  if (capturePending.has(key)) return false;
+  const same = sameItem(node);
+  const putAt = (rows, index, row) => { const next = [...rows]; next.splice(Math.min(index, next.length), 0, row); return next; };
+  const listsBack = (latest) => {
+    const lists = { ...latest.lists };
+    for (const { name, index, row } of took.memberships) {
+      const rows = owns(lists, name) && Array.isArray(lists[name]) ? lists[name] : [];
+      if (!rows.some(same)) setOwnRecordValue(lists, name, putAt(rows, index, row));
+    }
+    return lists;
+  };
+  let ok;
+  if (took.assessment) {
+    // the card comes back through the one keep (the assessment root's suppression is the host's own); then its lists
+    const kept = await keepWord(node, label);
+    ok = kept.status === 'created' || kept.status === 'already-kept';
+    if (ok && took.memberships.length) ok = await commitStorePatch((latest) => ({ lists: listsBack(latest) }));
+  } else {
+    capturePending.add(key);
+    try {
+      ok = await commitStorePatch((latest) => {
+        let taken = latest.taken;
+        if (!taken.some(same)) for (const { row, index } of took.rows) taken = putAt(taken, index, row);
+        return { taken, ...(took.memberships.length ? { lists: listsBack(latest) } : {}) };
+      });
+    } catch { ok = false; }
+    finally { capturePending.delete(key); }
+  }
+  if (!allowed()) return false;
+  if (!ok) {
+    showReaderToast(tx('元に戻せませんでした。もう一度試してください。', 'Could not undo. Please try again.'));
+    return false;
+  }
+  refreshWordSaveControls(node, label);
+  if (S.stack.length) S.roomStale = true;
+  else if (S.view === 'tray') render();
   return true;
 }
 /** One list transaction for the strip and Save ▾'s menu: the word is kept first (the one keep) when a list is added and
@@ -10627,29 +10724,66 @@ function placeSealStrip(open) {
     const box = node.getBoundingClientRect();
     return box.height ? box[edge] : null;
   };
-  const height = window.innerHeight;
+  // the glass is the visual viewport (a zoomed-out or keyboard-shortened page shows less than its layout viewport)
+  const vv = window.visualViewport;
+  const glassTop = vv ? vv.offsetTop : 0, glassBottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
+  const glassLeft = vv ? vv.offsetLeft : 0, glassRight = vv ? vv.offsetLeft + vv.width : window.innerWidth;
   const onPage = !!anchor.closest('#sheet');
-  const ceiling = Math.max(8, (onPage ? fixedEdge('#sheet > .sheet-bar', 'bottom') : null) ?? fixedEdge('#app > .chrome', 'bottom') ?? 0);
-  const view = window.visualViewport?.height || height;
+  const scroller = onPage ? anchor.closest('#sheet') : null;
+  const ceiling = Math.max(glassTop + 8, (onPage ? fixedEdge('#sheet > .sheet-bar', 'bottom') : null) ?? fixedEdge('#app > .chrome', 'bottom') ?? 0);
+  const view = vv?.height || window.innerHeight;
   strip.style.maxHeight = `${Math.max(96, Math.floor(view * 0.4))}px`;
   strip.style.left = '0px';
   strip.style.top = '0px';
-  const word = glyphBox(anchor) || anchor.getBoundingClientRect();
+  // as wide as the glass allows (a page wider than the phone's screen still shows the strip whole)
+  strip.style.maxWidth = `${Math.floor(glassRight - glassLeft - 16)}px`;
   const w = strip.offsetWidth;
-  const left = Math.max(8, Math.min(window.innerWidth - w - 8, word.left + word.width / 2 - w / 2));
-  const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
-    fixedEdge('.kp-grades', 'top') ?? height, layersMarkTop(left, w) ?? height) - 8;
+  const leftOf = (word) => Math.max(glassLeft + 8, Math.min(glassRight - w - 8, word.left + word.width / 2 - w / 2));
+  let word = glyphBox(anchor) || anchor.getBoundingClientRect();
+  let left = leftOf(word);
+  const floorAt = (x) => Math.min(glassBottom, fixedEdge('.listen-row', 'top') ?? glassBottom, fixedEdge('#primary-tabs', 'top') ?? glassBottom,
+    fixedEdge('.kp-grades', 'top') ?? glassBottom, layersMarkTop(x, w) ?? glassBottom) - 8;
+  let floor = floorAt(left);
   const cap = Math.max(96, Math.floor(Math.min(view * 0.4, floor - ceiling)));
   strip.style.maxHeight = `${cap}px`;
   const h = Math.min(strip.offsetHeight, cap);
   const rect = (top, tall) => ({ left, right: left + w, top, bottom: top + tall });
-  const below = word.top + word.height + 10, above = word.top - 10;
-  const seats = [];
-  if (below + h <= floor) seats.push({ top: below, tall: h, side: 'below' });
-  if (above - h >= ceiling) seats.push({ top: above - h, tall: h, side: 'above' });
-  let seat = seats.find((s) => !controlsUnder(rect(s.top, s.tall), strip, anchor).length) || null;
+  const free = (s) => !controlsUnder(rect(s.top, s.tall), strip, anchor).length;
+  const seatsNow = () => {
+    const below = word.top + word.height + 10, above = word.top - 10, seats = [];
+    if (below + h <= floor) seats.push({ top: below, tall: h, side: 'below' });
+    if (above - h >= ceiling) seats.push({ top: above - h, tall: h, side: 'above' });
+    return seats.find(free) || null;
+  };
+  // the reading moves only as far as the strip needs to stand wholly on the glass, and never so far the word leaves it
+  const scrollRoom = () => (scroller
+    ? { up: scroller.scrollTop, down: scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop }
+    : { up: window.scrollY, down: document.documentElement.scrollHeight - window.innerHeight - window.scrollY });
+  const scrollBy = (dy) => {
+    if (scroller) scroller.scrollTop += dy;
+    else window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
+  };
+  const remeasure = () => { word = glyphBox(anchor) || anchor.getBoundingClientRect(); left = leftOf(word); floor = floorAt(left); };
+  let seat = seatsNow();
+  if (!seat) {
+    const room = scrollRoom();
+    const moves = [];
+    const downBy = Math.ceil(word.top + word.height + 10 + h - floor);
+    if (downBy > 0 && downBy <= room.down && word.top - downBy >= ceiling) moves.push(downBy);
+    const upBy = Math.ceil(ceiling - (word.top - 10 - h));
+    if (upBy > 0 && upBy <= room.up && word.top + word.height + upBy <= floor) moves.push(-upBy);
+    for (const dy of moves.sort((a, b) => Math.abs(a) - Math.abs(b))) {
+      scrollBy(dy);
+      remeasure();
+      seat = seatsNow();
+      if (seat) break;
+      scrollBy(-dy);
+      remeasure();
+    }
+  }
   if (!seat) {
     // shortened to the room before the nearest control on either side, two rows at least
+    const below = word.top + word.height + 10, above = word.top - 10;
     const room = (top, tall, side) => {
       const hits = controlsUnder(rect(top, tall), strip, anchor);
       if (side === 'below') {
@@ -10660,11 +10794,10 @@ function placeSealStrip(open) {
       return { top: Math.max(edge, top + tall - (above - edge)), tall: Math.min(tall, above - edge), side };
     };
     const tries = [room(below, Math.max(0, Math.min(h, floor - below)), 'below'), room(Math.max(ceiling, above - h), Math.min(h, above - ceiling), 'above')]
-      .filter((s) => s.tall >= 104 && !controlsUnder(rect(s.top, s.tall), strip, anchor).length)
+      .filter((s) => s.tall >= 104 && free(s))
       .sort((a, b) => b.tall - a.tall);
     seat = tries[0] || null;
   }
-  const scroller = onPage ? anchor.closest('#sheet') : null;
   const origin = scroller ? scroller.getBoundingClientRect() : { left: -window.scrollX, top: -window.scrollY };
   const scrollTop = scroller ? scroller.scrollTop : 0, scrollLeft = scroller ? scroller.scrollLeft : 0;
   if (seat) {
@@ -10687,20 +10820,30 @@ function placeSealStrip(open) {
     markStripMore(strip);
     return seat;
   }
-  // a room of its own under the word's paragraph: nothing is laid over a control
+  // a room of its own under the word's paragraph: nothing is laid over a control; then the reading moves the least that
+  // brings the whole strip onto the glass
   const block = anchor.closest('p, li, dd, blockquote, [data-reader-prose], [data-lookup-block], .example-ja, .sent-reader') || anchor.parentElement;
   if (!open.room) {
     open.room = el('div', 'seal-strip-room');
     open.room.setAttribute('aria-hidden', 'true');
     block.after(open.room);
   }
-  open.room.style.height = `${Math.ceil(Math.min(h, cap)) + 12}px`;
-  const box = open.room.getBoundingClientRect();
+  const tall = Math.floor(Math.min(h, cap, floor - ceiling));
+  open.room.style.height = `${Math.ceil(tall) + 12}px`;
+  let box = open.room.getBoundingClientRect();
+  const past = box.top + 6 + tall - floor, before = ceiling - (box.top + 6);
+  if (past > 0) scrollBy(Math.min(past, scrollRoom().down));
+  else if (before > 0) scrollBy(-Math.min(before, scrollRoom().up));
+  remeasure();
+  box = open.room.getBoundingClientRect();
+  const placed = scroller ? scroller.getBoundingClientRect() : { left: -window.scrollX, top: -window.scrollY };
+  const placedTop = scroller ? scroller.scrollTop : 0, placedLeft = scroller ? scroller.scrollLeft : 0;
   strip.dataset.side = 'room';
-  strip.style.maxHeight = `${Math.floor(Math.min(h, cap))}px`;
-  strip.style.left = `${Math.round(left - origin.left + scrollLeft)}px`;
-  strip.style.top = `${Math.round(box.top + 6 - origin.top + scrollTop)}px`;
-  return { top: box.top + 6, tall: Math.min(h, cap), side: 'room' };
+  strip.style.maxHeight = `${tall}px`;
+  strip.style.left = `${Math.round(left - placed.left + placedLeft)}px`;
+  strip.style.top = `${Math.round(box.top + 6 - placed.top + placedTop)}px`;
+  markStripMore(strip);
+  return { top: box.top + 6, tall, side: 'room' };
 }
 // Escape closes the strip wherever the keyboard stands (a touch hold can leave focus on the paragraph); the strip's own
 // keydown closes it when focus is inside it
