@@ -10456,8 +10456,8 @@ function teFormRecord(rec, te) {
  * it: もの the noun 物, never the particle (a word written in kana prefers an entry JMdict usually writes in kana). Two
  * expressions are read whole: ん before だ or です is the explanatory んだ / んです; いけ between ては and ない is
  * いけない "must not". The slip shows the chosen sense's first glosses (two or three); the word page marks it. Senses
- * come from the entry's detail shard: a slip drawn before its shard is at hand is drawn again once it is
- * (senseRefine). */
+ * come from the entry's detail shard: a slip drawn before its shard is at hand is brought up to its sense once it is,
+ * in place (sensePatch), or drawn again where its word or entry moves (senseRefine). */
 const TOKEN_CONTEXT = new WeakMap();
 const SENSE_LATE = new Set(['arch', 'obs', 'obsc', 'rare', 'dated', 'sl', 'vulg', 'derog']);
 const SENSE_NUMBER = /^[0-9０-９〇一二三四五六七八九十百千万億兆]+$/u;
@@ -10727,7 +10727,7 @@ async function ensureSense(token, door) {
 /** A slip drawn before its word's sense was at hand: marked pending, then drawn again with it if it is still the open
  * slip and nobody has touched it (a press or a key inside it: a menu opened, Save pressed, a pane open stay as they are;
  * the sense shows on the next look). */
-function senseRefine(token, door, slip, redraw) {
+function senseRefine(token, door, slip, redraw, anchor = null) {
   if (!slip || !senseChoice(token, door)?.need) return;
   slip.dataset.sense = 'pending';
   let touched = false;
@@ -10738,9 +10738,44 @@ function senseRefine(token, door, slip, redraw) {
     slip.removeEventListener('pointerdown', touch, { capture: true });
     slip.removeEventListener('keydown', touch, { capture: true });
     if (!slip.isConnected) return;
-    if (!touched && document.getElementById('mini') === slip) redraw();
+    // brought up to its sense in place where its word and entry stay; drawn again only where they move
+    if (!touched && document.getElementById('mini') === slip && !sensePatch(slip, token, door, anchor)) redraw();
     else delete slip.dataset.sense;
   }, () => { delete slip.dataset.sense; });
+}
+
+/** A slip drawn before its word's sense was at hand, brought up to the sense in place while the slip's word and entry
+ * stay what they were: its meaning line, its quiet second line, the sense it names (and the page's mark). Nothing a
+ * finger may be on is replaced (a slip drawn again detaches the word's own button). Whether it could: an expression
+ * read whole, another entry, or a slip of another shape (te-form lines, a wait, a miss) is drawn again instead. */
+function sensePatch(slip, token, door, anchor = null) {
+  const choice = senseChoice(token, door);
+  if (!choice || choice.need) return true;
+  if (choice.door || choice.entry || !Array.isArray(choice.glosses) || !choice.glosses.length) return false;
+  if (slip.dataset.kind !== 'word' || slip.querySelector('.mini-gloss-2, .mini-wait, .mini-miss')) return false;
+  const line = slip.querySelector('.mini-gloss');
+  if (!line) return false;
+  line.textContent = choice.glosses[0];
+  const more = senseMoreLine(choice.glosses);
+  let quiet = slip.querySelector('.mini-gloss-more');
+  if (more && !quiet) {
+    quiet = el('span', 'mini-gloss-more', more);
+    quiet.lang = 'en';
+    quiet.style.fontWeight = '400';
+    quiet.style.color = 'var(--mini-head-ink-2)';
+    line.after(quiet);
+  } else if (quiet) {
+    if (more) quiet.textContent = more;
+    else quiet.remove();
+  }
+  const sense = { seq: String(choice.seq), k: Number(choice.k) };
+  slip.dataset.senseEntry = `${sense.seq}:${sense.k}`;
+  delete slip.dataset.sense;
+  if (anchor) SENSE_BY_ANCHOR.set(anchor, sense);
+  // a page built ahead from the slip's first draw carries no mark: it is built again on the way in
+  pagePrebuildCancel?.();
+  pagePrebuilt = null;
+  return true;
 }
 
 /** A lookup word's sense, waited for a moment at most (SENSE_WAIT_MS, as a reading's answer is): whether it is at hand. */
@@ -10761,7 +10796,7 @@ const SENSE_BY_ANCHOR = new WeakMap();
  * A sense that cannot be had leaves the slip as it is. */
 const SENSE_LATER = new WeakMap();
 function senseLater(token, doorOf, anchor, redraw) {
-  const entry = { ready: false, redraw };
+  const entry = { ready: false, redraw, token, doorOf };
   SENSE_LATER.set(anchor, entry);
   const done = () => {
     if (SENSE_LATER.get(anchor) !== entry) return;
@@ -10783,7 +10818,7 @@ function senseLaterDraw(anchor) {
   if (!entry?.ready || !open) return;
   SENSE_LATER.delete(anchor);
   delete open.dataset.sense;
-  if (!open.dataset.senseTouched) entry.redraw();
+  if (!open.dataset.senseTouched && !sensePatch(open, entry.token, entry.doorOf(), anchor)) entry.redraw();
 }
 
 /** R2 · among several entries that write a dictionary form and read it the derived way, the one that fits the token:
@@ -10981,10 +11016,11 @@ function openReadingSlip(anchor, token, draw) {
   // its door now has is drawn again at once, unless a press or a key touched it first
   const refine = (slip, door = null) => {
     if (door?.sense?.seq && slip && slip.dataset.senseEntry !== `${door.sense.seq}:${door.sense.k}` && !slip.dataset.senseTouched
-      && document.getElementById('mini') === slip && !slip.matches(':active')) slip = draw(door);
+      && document.getElementById('mini') === slip && !slip.matches(':active')
+      && !sensePatch(slip, token, readingTokenEntry(token), anchor)) slip = draw(door);
     senseRefine(token, readingTokenEntry(token), slip, () => {
       if (serial === readingSlipSerial && anchor.isConnected) { draw(readingToken(token)); syncChromeKeep(); }
-    });
+    }, anchor);
     return slip;
   };
   if (!ready) {
