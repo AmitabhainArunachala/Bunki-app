@@ -260,8 +260,11 @@ const READINGS = (rootSel) => {
     const baseBoxes = base.flatMap((n) => (n.nodeType === 3 ? textBox(n) : [...n.getClientRects()]));
     const rtBoxes = textBox(rt);
     if (!rtBoxes.length || !baseBoxes.length) continue;
+    // its line's block: past every inline box, and past a block that is the inside of an inline box (the reader's word
+    // is an inline-flex door around a block row)
+    const inlineLevel = (node) => !!node && /^inline|^ruby|^contents$/.test(getComputedStyle(node).display);
     let block = ruby.parentElement;
-    while (block && block !== document.body && /^inline|^ruby|^contents$/.test(getComputedStyle(block).display)) block = block.parentElement;
+    while (block && block !== document.body && (inlineLevel(block) || inlineLevel(block.parentElement))) block = block.parentElement;
     const bb = block.getBoundingClientRect(), bs = getComputedStyle(block);
     const line = { l: bb.left + parseFloat(bs.borderLeftWidth) + parseFloat(bs.paddingLeft), r: bb.right - parseFloat(bs.borderRightWidth) - parseFloat(bs.paddingRight) };
     rows.push({ text: rt.textContent, size: parseFloat(cs.fontSize), word: parseFloat(getComputedStyle(ruby).fontSize), rtFs: parseFloat(cs.fontSize), line,
@@ -469,8 +472,9 @@ try {
           if (!rt || ruby.querySelectorAll('rt').length !== 1) continue;
           const base = [...ruby.childNodes].filter((n) => n !== rt).map((n) => n.textContent).join('');
           if ([...rt.textContent].length * 0.5 <= [...base].length + 0.5) continue;
+          const inlineLevel = (node) => !!node && /^inline|^ruby|^contents$/.test(getComputedStyle(node).display);
           let block = tok.parentElement;
-          while (block && /^inline|^ruby|^contents$/.test(getComputedStyle(block).display)) block = block.parentElement;
+          while (block && (inlineLevel(block) || inlineLevel(block.parentElement))) block = block.parentElement;
           const lineRight = block.getBoundingClientRect().right - parseFloat(getComputedStyle(block).paddingRight);
           const room = lineRight - ruby.getBoundingClientRect().right;
           if (room >= 0 && (!best || room < best.room)) best = { index: tok.dataset.index, room };

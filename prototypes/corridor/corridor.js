@@ -9358,8 +9358,11 @@ function touchReading(rt) {
   return !!reader && !reader.classList.contains('fg-always');
 }
 function readingLine(rt) {
+  // the block whose lines the word stands in: past every inline box, and past a block that is itself the inside of an
+  // inline box (the reader's word is an inline-flex door around a block row: its line is the paragraph's)
+  const inlineLevel = (node) => !!node && /^inline|^ruby|^contents$/.test(getComputedStyle(node).display);
   let block = rt.parentElement;
-  while (block && block !== document.body && /^inline|^ruby|^contents$/.test(getComputedStyle(block).display)) block = block.parentElement;
+  while (block && block !== document.body && (inlineLevel(block) || inlineLevel(block.parentElement))) block = block.parentElement;
   if (!block) return null;
   const box = block.getBoundingClientRect(), cs = getComputedStyle(block);
   return { left: box.left + parseFloat(cs.borderLeftWidth) + parseFloat(cs.paddingLeft),
@@ -9371,14 +9374,18 @@ function seatTouchReading(rt) {
   if (!touchReading(rt)) return;
   const style = getComputedStyle(rt);
   if (style.display === 'none' || style.visibility === 'hidden') return;
-  // the word under this reading: the ruby's own text before it, back to the reading before
+  // the word under this reading: the ruby's own text before it, back to the reading before, measured with the reading
+  // set aside (Chromium reports a base already widened to its reading)
   const range = document.createRange();
   let left = Infinity, right = -Infinity;
+  const shown = rt.style.display;
+  rt.style.display = 'none';
   for (let node = rt.previousSibling; node && node.nodeName !== 'RT'; node = node.previousSibling) {
     if (node.nodeName === 'RP') continue;
     range.selectNodeContents(node);
     for (const box of range.getClientRects()) if (box.width > 0) { left = Math.min(left, box.left); right = Math.max(right, box.right); }
   }
+  rt.style.display = shown;
   const own = rt.getBoundingClientRect();
   const excess = own.width - (right - left);
   if (!Number.isFinite(excess) || excess <= 0.5) return;
