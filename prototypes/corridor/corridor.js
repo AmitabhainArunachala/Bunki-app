@@ -4807,8 +4807,10 @@ async function ensureArticle(p) {
   )
     .then((body) => {
       Object.assign(p, body);
-      // N2 · the text's te-form auxiliaries are marked as it arrives (markTeFormAuxiliaries)
+      // N2 · the text's te-form auxiliaries are marked as it arrives (markTeFormAuxiliaries); R3 · and every word's place
       markTeFormAuxiliaries(p.tokens);
+      markSenseContext(p.tokens, p.id);
+      void ensureSenseSidecar();
       return p;
     })
     .finally(() => {
@@ -8765,7 +8767,23 @@ const LOOKUP_HELPER_POS = new Set(['助動詞', '助詞', '接尾辞', '接頭�
  * entries of that spelling and is never replaced by another entry's reading. A kana spelling
  * (an ending, a helper word, a segmenter fragment) never borrows a kanji entry through its
  * kana form: ます is not 升. */
-function japaneseLookupRecord(text, { reading = '', pos = '' } = {}) {
+function japaneseLookupRecord(text, { reading = '', pos = '', sense = null } = {}) {
+  // R3 · the sense its text uses (senseChoice): an expression read whole (んだ, いけない), a name, another entry read
+  // alike (もの the noun), or a sense of its own entry — its glosses first (senseRecord)
+  if (sense?.door) {
+    const door = sense.door;
+    if (door.senseName) return senseRecord(null, door.sense);
+    const rec = lookup(door.b, door.seq, door.r);
+    return rec ? { ...senseRecord(rec, door.sense), head: door.b, r: door.r } : null;
+  }
+  const own = japaneseLookupEntryRecord(text, { reading, pos });
+  if (!sense?.seq) return own;
+  if (own?.seq ? String(own.seq) === sense.seq : senseIsQuick({ b: text, s: text, r: reading }, sense.seq)) return senseRecord(own, sense);
+  return senseRecord(lookup(text, sense.seq, reading), sense);
+}
+
+/** japaneseLookupRecord's entry before its sense (R, R2). */
+function japaneseLookupEntryRecord(text, { reading = '', pos = '' } = {}) {
   const wanted = kataToHira(String(reading || ''));
   const fits = (value) => !wanted || kataToHira(String(value || '')) === wanted;
   if (D.dict[text] && fits(D.dict[text].r)) return lookup(text);
@@ -9793,7 +9811,8 @@ function placeSaveMenu(pop, invoker, place = null) {
 function wordSaveFacts(token, { reader = false, from = null, record } = {}) {
   // a caller that already chose the entry (the shared lookup door) hands it over as is
   // N2 · a te-form auxiliary's card leads with its senses for the te-form, however its entry is looked up (teFormRecord)
-  const g = record !== undefined ? record : reader ? readerQuickRecord(token) : teFormRecord(lookup(token.b, token.seq, token.r), token.te);
+  const g = record !== undefined ? record : reader ? readerQuickRecord(token)
+    : senseRecord(teFormRecord(lookup(token.b, token.seq, token.r), token.te), token.sense);
   const held = (reader && !D.dict[token.b]) || !g?.m?.some(meaning => typeof meaning === 'string' && meaning.trim());
   const node = { t: 'word', id: token.b, ...(token.seq ? { seq: token.seq, reading: token.r || g?.r } : {}),
     ...(from ? { from, ctxScope: 'sent' } : {}) };
@@ -10203,6 +10222,9 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // L · while the right entry is still on its way (the full dictionary asked, not failed), the held Save says nothing:
   // D23's sentence is for a dead end (answered with nothing confirmable, or the dictionary cannot answer)
   const pending = waiting && D.dictionaryState !== 'error';
+  // R3 · a word whose sense is still to come shows no meaning until it is at hand: a reader word's door says so
+  // (openReadingSlip), a lookup word's anchor waits in SENSE_LATER (wireLookupToken)
+  const senseWaiting = kind === 'word' && !look?.gloss && (!!token.sensePending || SENSE_LATER.has(span)) && !readsOtherwise && !!g?.m?.[0];
   if (look?.gloss) {
     const gloss = el('span', 'mini-gloss', look.gloss);
     if (look.glossLang) gloss.lang = look.glossLang;
@@ -10210,10 +10232,13 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     if (look.gloss2) { const second = el('span', 'mini-gloss mini-gloss-2', look.gloss2); second.lang = 'en'; said.append(second); }
   } else if (reader && !g?.m?.[0]) said.append(el('span', 'mini-gloss mini-miss', token.noFit
     ? tx('この読みの辞書項目はありません。', 'No dictionary entry for this reading.') : readerGlossMissText(token.b, own || token.r, token.several)));
-  else if (waiting) {
+  else if (waiting || senseWaiting) {
     const wait = el('span', 'mini-gloss mini-wait', '…');
     wait.style.fontWeight = '400';
     wait.style.color = 'var(--mini-head-ink-2)';
+    // R3 · or the sense its sentence uses is still to come: the same quiet "…", never a meaning the sense would take back
+    // (床についていて: never "to be lit" first); filled in place once the sense is at hand (sensePatch)
+    if (senseWaiting) wait.dataset.senseWait = '1';
     said.append(wait);
   } else said.append(el('span', `mini-gloss${readsOtherwise || (token.readMiss && !g?.m?.[0]) ? ' mini-miss' : ''}`, readsOtherwise || (token.readMiss && !g?.m?.[0])
     // N · the dictionary has no entry read the text's way: the card says so, and lends no other reading's meaning
@@ -10224,6 +10249,27 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // words (居る: "to be ...-ing", then "to have ...-ed"); the first line is the first sense (teFormRecord)
   const teSecond = kind === 'word' && !look?.gloss && Array.isArray(token.te) && g?.m?.[0] === token.te[0]?.[0] ? token.te[1]?.[0] : '';
   if (teSecond) { const second = el('span', 'mini-gloss mini-gloss-2', teSecond); second.lang = 'en'; said.append(second); }
+  // R3 · the chosen sense's next glosses on a quiet line of their own (実施: "enforcement", then "implementation;
+  // putting into practice"); the slip names the sense it shows (data-sense-entry: entry number and sense)
+  const senseMore = kind === 'word' && !look?.gloss && !teSecond && !senseWaiting && Array.isArray(g?.senseGlosses) && g.m?.[0] === g.senseGlosses[0]
+    ? senseMoreLine(g.senseGlosses) : '';
+  if (senseMore) said.append(senseMoreElement(senseMore));
+  if (kind === 'word' && g?.sense?.seq) {
+    const sense = { seq: String(g.sense.seq), k: Number(g.sense.k) };
+    mini.dataset.senseEntry = `${sense.seq}:${sense.k}`;
+    // the word's page marks it: opened by this word (heroSource), or built ahead from this slip's entry node
+    SENSE_BY_ANCHOR.set(span, sense);
+    if (entryNode?.t === 'word' && !entryNode.sense && (entryNode.seq == null || String(entryNode.seq) === sense.seq)) entryNode.sense = sense;
+  }
+  if (entryNode) SLIP_NODE.set(mini, entryNode);
+  // a press or a key inside the slip keeps it as it is (senseRefine, senseLater); a lookup word's sense still to come
+  // marks it pending until it is drawn again with it
+  const senseTouch = () => { mini.dataset.senseTouched = '1'; };
+  mini.addEventListener('pointerdown', senseTouch, { capture: true, once: true });
+  mini.addEventListener('keydown', senseTouch, { capture: true, once: true });
+  if (SENSE_LATER.has(span)) { mini.dataset.sense = 'pending'; setTimeout(() => senseLaterDraw(span), 0); }
+  // a slip waiting for its sense says it is still being answered (aria-busy, R2's contract) until its meaning is in
+  if (senseWaiting) { mini.dataset.sense = 'pending'; mini.setAttribute('aria-busy', 'true'); }
   // N · the article's own note on this word (its index row's wordNotes, from the editorial word list): one quiet line
   // under the gloss, on this word in this article only
   if (wordNote?.en) {
@@ -11838,10 +11884,12 @@ function readerQuickRecord(token) {
   // R · read in the token's own reading (tokenReading's rule): a door that names its entry (readingToken) answers
   // by it, and a core spelling read otherwise answers with the entry so read once the full dictionary has it
   const own = !token.b || token.b === token.s ? String(token.r || '') : '';
-  // N2 · a te-form auxiliary's entry leads with its senses for the te-form (teFormRecord)
-  if (token.seq != null && token.seq !== '') return teFormRecord(lookup(token.b, token.seq, own), token.te);
+  // R3 · a name in its text has no dictionary meaning (senseRecord)
+  if (token.senseName) return senseRecord(null, token.sense);
+  // N2 · a te-form auxiliary's entry leads with its senses for the te-form (teFormRecord); R3 · any other with its sense
+  if (token.seq != null && token.seq !== '') return senseRecord(teFormRecord(lookup(token.b, token.seq, own), token.te), token.sense);
   // R2 · a door marked unfit (a verb whose kana form the quick dictionary has only as a noun) never takes that noun
-  if (D.dict[token.b] && !token.unfit) return lookup(token.b, null, own);
+  if (D.dict[token.b] && !token.unfit) return senseRecord(lookup(token.b, null, own), token.sense);
   const kept = S.deepWords?.[token.b];
   if (kept) return { r: kept.r || '', m: kept.m || [] };
   const old = D.words[token.b];
@@ -12079,6 +12127,560 @@ function teFormRecord(rec, te) {
   return { ...rec, m: [...new Set([...te.map((glosses) => glosses[0]), ...senses, ...(rec.m || []).filter((gloss) => !senses.includes(gloss))])] };
 }
 
+/* R3 · sense truth (Grok 0315; the lead's R3 brief, 2026-10-18). An entry has senses, and the slip showed its first
+ * gloss whatever the sentence meant: ない "nonexistent" for the auxiliary "not", 一つ's つ "indicates two contrasting
+ * actions", ため "good", もの "indicates reason or excuse", 性 "nature" for the suffix -ity. This section chooses, for a
+ * word in its text, the entry and the sense the sentence uses. The article's sense sidecar comes first (two models
+ * agreeing, R3 part 2). Then these rules, each stated once, each keeping at least one sense:
+ *   readings, spellings  a sense JMdict restricts to other readings, or to other kanji spellings, is not the text's
+ *   counters             after a number (一, 2, 十) or ひと, ふた, いく, 幾, 何, 数: a counter's or a suffix's sense
+ *   weekdays             日 月 火 水 木 金 土 between （ and ） is the day of the week
+ *   negation             the adjective ない after the copula's or an adjective's conjunctive form (ではない, でない,
+ *                        じゃない, 高くない) is its auxiliary "not"
+ *   part of speech       the tokenizer's class agrees with the sense's: an auxiliary verb takes an auxiliary sense, a
+ *                        noun a noun's, a verb a verb's, an adjective an adjective's, a suffix a suffix's or a counter's
+ *   late senses          within an entry, an archaic, obsolete, rare, abbreviated, dated, slang or vulgar sense
+ *                        comes after the others
+ * Else the first sense, as before. When no sense of the word's own entry is left, another entry read alike stands for
+ * it: もの the noun 物, never the particle (a word written in kana prefers an entry JMdict usually writes in kana).
+ * Expressions are read whole (senseExpression): ん before だ or です is the explanatory んだ / んです; いけ between ては and
+ * ない is いけない "must not"; the must family (なくてはいけない, なければならない, …) is "have to do"; について, にとって,
+ * にかけて, につき; the idioms of ない (相違ない, 何度となく, …); 床に就く, 一枚岩, 一発, 性暴力, 方がいい. A reading the text
+ * spells or talks about is a reading, not a word. The slip shows the chosen sense's first glosses (two or three); the
+ * word page marks it. Senses come from the entry's detail shard: until the sense is at hand the slip's meaning line is
+ * a quiet placeholder, never a meaning the sense would take back (Grok 2029: 床についていて showed "to be lit" first),
+ * filled in place once it is (sensePatch), or drawn again where its word or entry moves (senseRefine). */
+const TOKEN_CONTEXT = new WeakMap();
+const SENSE_LATE = new Set(['arch', 'obs', 'obsc', 'rare', 'dated', 'sl', 'vulg', 'derog']);
+const SENSE_NUMBER = /^[0-9０-９〇一二三四五六七八九十百千万億兆]+$/u;
+const SENSE_NUMBER_WORD = new Set(['ひと', 'ふた', 'いく', '幾', '何', '数']);
+const SENSE_WEEKDAY = /^(?:Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)$/u;
+// the part-of-speech agreement, by the tokenizer's class: whether a sense's JMdict codes can be that class's. A noun is
+// refused only a sense that is a verb's, a particle's, a conjunction's or an interjection's alone (JMdict calls some
+// formal nouns aux: はず "should (be)")
+const SENSE_CLASS = {
+  名詞: (pos) => !pos.every((code) => /^(?:v.*|prt|conj|int)$/u.test(code)),
+  代名詞: (pos) => !pos.every((code) => /^(?:v.*|prt|conj|int)$/u.test(code)),
+  動詞: (pos) => pos.some((code) => /^v(?![it]$)|^aux-v$/u.test(code)),
+  形容詞: (pos) => pos.some((code) => /^(?:adj-i|adj-ix|adj-ku|adj-shiku|aux-adj)$/u.test(code)),
+  形状詞: (pos) => pos.some((code) => /^(?:adj-na|adj-nari|adj-no|n)$/u.test(code)),
+  副詞: (pos) => pos.some((code) => /^(?:adv|adv-to)$/u.test(code)),
+  連体詞: (pos) => pos.includes('adj-pn'),
+  接続詞: (pos) => pos.includes('conj'),
+  感動詞: (pos) => pos.includes('int'),
+  接尾辞: (pos) => pos.some((code) => /^(?:suf|n-suf)$/u.test(code)),
+  接頭辞: (pos) => pos.some((code) => /^(?:pref|n-pref)$/u.test(code)),
+  助動詞: (pos) => pos.some((code) => /^(?:aux|aux-v|aux-adj|cop)$/u.test(code)),
+};
+
+/** Mark a text's tokens with their place in it (TOKEN_CONTEXT), for the rules that read a word's neighbours and for
+ * the sidecar, which is keyed by article and token index. A sentence's slice never overwrites an article's mark. */
+function markSenseContext(tokens, passage = null) {
+  if (!Array.isArray(tokens)) return;
+  tokens.forEach((token, index) => {
+    if (token && typeof token === 'object' && (passage || !TOKEN_CONTEXT.has(token))) TOKEN_CONTEXT.set(token, { tokens, index, passage });
+  });
+}
+
+/** The shelf's sense sidecar (data/articles/senses.json, R3 part 2), asked for once. */
+let senseSidecarPromise = null;
+function ensureSenseSidecar() {
+  if (D.senseSidecar || senseSidecarPromise) return senseSidecarPromise || Promise.resolve(D.senseSidecar);
+  senseSidecarPromise = fetch('data/articles/senses.json')
+    .then((res) => (res.ok ? res.json() : null))
+    .then((data) => { D.senseSidecar = data?.schemaVersion === 1 && data.articles ? data.articles : {}; return D.senseSidecar; },
+      () => { D.senseSidecar = {}; return D.senseSidecar; });
+  return senseSidecarPromise;
+}
+
+/** A word's neighbours in its text, with its article and index; null for a word no text was marked for. */
+function senseNeighbours(token) {
+  const at = TOKEN_CONTEXT.get(token);
+  if (!at) return null;
+  const { tokens, index } = at;
+  return { prev: tokens[index - 1] || null, prev2: tokens[index - 2] || null, next: tokens[index + 1] || null,
+    next2: tokens[index + 2] || null, before: tokens.slice(Math.max(0, index - 8), index), passage: at.passage, index,
+    at: (offset) => tokens[index + offset] || null };
+}
+
+/** The sidecar's sense for this token in its article: { seq, k, source, lead }, a name ({ name: true }), a reading the
+ * text talks about ({ reading: true }), or null. lead,
+ * when the row has one, is the gloss of that sense the sentence's meaning is (遺産 in 世界遺産: "heritage", its fourth). */
+function sidecarSense(near) {
+  const row = near?.passage ? D.senseSidecar?.[near.passage]?.[near.index] : null;
+  if (!Array.isArray(row)) return null;
+  if (row[0] === 'name') return { name: true, source: String(row[1] || '') };
+  // a reading the text talks about, not a word (「いちちゅう」「さんちゅう」とは読まない): no dictionary meaning
+  if (row[0] === 'reading') return { reading: true, source: String(row[1] || '') };
+  return { seq: String(row[0]), k: Number(row[1]), source: String(row[2] || ''), ...(Number.isInteger(row[3]) ? { lead: row[3] } : {}) };
+}
+/** A sense's glosses led by the one the sidecar names, then the rest as JMdict lists them but its first: the sidecar
+ * names a lead only where that first gloss misleads in the sentence (遺産 "inheritance" in 世界遺産), so the slip never
+ * shows it there; the page still lists every gloss. */
+const senseLed = (glosses, lead) => (Number.isInteger(lead) && lead > 0 && lead < glosses.length
+  ? [glosses[lead], ...glosses.filter((_, g) => g !== lead && g !== 0)] : glosses);
+
+const senseNumberBefore = (near) => !!near?.prev && (SENSE_NUMBER.test(String(near.prev.s || '')) || SENSE_NUMBER_WORD.has(String(near.prev.s || '')));
+/** A suffix after a number: a counter's place (一つ, 二疋, 十本). */
+const senseCounting = (token) => token?.p === '接尾辞' && senseNumberBefore(senseNeighbours(token));
+const senseWeekdayBracket = (token, near) => /^[日月火水木金土]$/u.test(String(token.s || '')) && /^[（(]$/u.test(String(near?.prev?.s || ''))
+  && /^[）)]$/u.test(String(near?.next?.s || ''));
+function senseNegation(token, near) {
+  if (token.p !== '形容詞' || !['ない', '無い'].includes(String(token.b || '')) || !near?.prev) return false;
+  const prev = String(near.prev.s || ''), prev2 = String(near.prev2?.s || '');
+  // an adjective's く form, or an auxiliary's (たく: 行きたくない)
+  const adjectiveKu = (t) => ['形容詞', '助動詞'].includes(t?.p) && /く$/u.test(String(t.s || ''));
+  if (['で', 'じゃ', 'じゃあ'].includes(prev) || adjectiveKu(near.prev)) return true;
+  // さも's: "if not so" (さもなくとも, さもなければ — 然もなければ is not in the shipped dictionary, and its ば is read
+  // into the next word by the tokenizer: さも/なけれ/ばか)
+  if (prev === 'さも') return true;
+  return ['は', 'も', 'さえ'].includes(prev) && (['で', 'じゃ'].includes(prev2) || adjectiveKu(near.prev2));
+}
+
+/** Whether a kana word stands inside brackets that spell the reading of the word before them (悉曇（しったん）: しっ, た
+ * and ん spell しったん): the bracket holds kana alone, and the one to four words before it read exactly that. */
+function senseSpelledReading(token, near) {
+  if (!near?.at || !READER_KANA.test(String(token?.s || ''))) return false;
+  const kana = (t) => !!t && READER_KANA.test(String(t.s || ''));
+  let open = -1, close = 1;
+  while (kana(near.at(open))) open -= 1;
+  while (kana(near.at(close))) close += 1;
+  if (!/^[（(]$/u.test(String(near.at(open)?.s || '')) || !/^[）)]$/u.test(String(near.at(close)?.s || ''))) return false;
+  let spelled = '';
+  for (let k = open + 1; k < close; k += 1) spelled += String(near.at(k).s || '');
+  spelled = kataToHira(spelled);
+  let read = '';
+  for (let back = 1; back <= 4 && near.at(open - back); back += 1) {
+    const word = near.at(open - back);
+    if (!word.r) return false;
+    read = kataToHira(String(word.r)) + read;
+    if (read === spelled) return true;
+  }
+  return false;
+}
+
+/** The must family, read whole (Grok 2029; the lead): なくてはいけない, なくてはならない, なければならない (なければいけない,
+ * なければなりません, ねばならない), なくちゃ. After a verb's, an adjective's or the copula's stem the run is "have to do";
+ * after anything else its ない is the existence ない and the run "cannot do without; indispensable" (、なくてはならない資源).
+ * The run's verb (いけ, なら, なり) shows it, and so does its ない where that is the existence ない, or a bare なくちゃ (an
+ * auxiliary ない stays "not"). h is the run's ない's place from the token; the answer { verb, expression, ownHead }, the
+ * verb's place from the token, or null where no run starts there. */
+const SENSE_MUST_NOT = new Set(['ない', 'ず', 'ぬ', 'ん', 'ませ', 'なかっ', 'なく', 'なけれ', 'ね']);
+const SENSE_MUST_END = /^(?:[」』）)。、！？!?…]|よ|ね|な|わ|ぞ)$/u;
+function senseMustRun(near, h) {
+  const head = near.at(h);
+  if (!head) return null;
+  const s = String(head.s || ''), nai = ['ない', '無い'].includes(String(head.b || ''));
+  const word = (k) => String(near.at(h + k)?.s || '');
+  // the stem it follows: a verb's, an adjective's, an auxiliary's, or the copula's (でなければ, じゃなくちゃ)
+  const before = near.at(h - 1);
+  const stem = head.p === '助動詞' || ['動詞', '形容詞', '助動詞'].includes(before?.p) || ['で', 'じゃ'].includes(String(before?.s || ''));
+  let verb = null, expression = null;
+  if (nai && s === 'なく' && word(1) === 'て' && word(2) === 'は' && ['いけ', 'なら'].includes(word(3))) {
+    verb = 3;
+    expression = word(3) === 'いけ'
+      ? { s: 'なくてはいけない', b: 'なくてはいけない', r: 'なくてはいけない', seq: '2255320', k: stem ? 1 : 0 }
+      : { s: 'なくてはならない', b: 'なくてはならない', r: 'なくてはならない', seq: '2098150', k: stem ? 1 : 0 };
+  } else if (nai && s === 'なく' && ['ちゃ', 'っちゃ'].includes(word(1))) {
+    verb = ['いけ', 'なら'].includes(word(2)) ? 2 : null;
+    // bare, it is "have to" only where the sentence ends on it (考えなくちゃ」); before a clause it is "unless"
+    const must = stem && (verb !== null || !near.at(h + 2) || SENSE_MUST_END.test(word(2)));
+    expression = { s: 'なくちゃ', b: 'なくちゃ', r: 'なくちゃ', seq: '2098160', k: must ? 1 : 0 };
+  } else if (((nai && s === 'なけれ') || (head.b === 'ぬ' && s === 'ね')) && word(1) === 'ば' && ['なら', 'いけ', 'なり'].includes(word(2))) {
+    verb = 2;
+    expression = { s: 'なければならない', b: 'なければならない', r: 'なければならない', seq: '1632350', k: 0 };
+  } else return null;
+  // the verb is itself negated (ならない, ならぬ, ならん, なりません, いけません, ならなくなる)
+  if (verb !== null && !SENSE_MUST_NOT.has(word(verb + 1))) return null;
+  return { verb: verb === null ? null : h + verb, expression,
+    ownHead: (head.p === '形容詞' && !stem) || (expression.seq === '2098160' && verb === null) };
+}
+
+/** The expressions read whole: { s, b, r, seq, k } for the expression's door, or null. */
+function senseExpression(token, near) {
+  if (!near) return null;
+  const next = String(near.next?.s || ''), prev = String(near.prev?.s || ''), prev2 = String(near.prev2?.s || '');
+  const word = (offset) => String(near.at(offset)?.s || '');
+  // the must family (senseMustRun): the token is the run's verb, its existence ない or a bare なくちゃ; the run's ん is
+  // ぬ "not" (しなければならん), never the interjection the tokenizer's む is
+  for (let h = 0; h >= -4; h -= 1) {
+    const run = senseMustRun(near, h);
+    if (!run) continue;
+    if (run.verb === 0 || (h === 0 && run.ownHead)) return run.expression;
+    if (run.verb === -1 && token.s === 'ん' && token.b === 'む') return { s: 'ん', b: 'ん', r: 'ん', seq: '2441300', k: 0 };
+  }
+  // the explanatory ん is the particle (の); the auxiliary ん is negation (ませんでした, 知らん) and stays itself
+  // (and before じゃ: いうんじゃア, the explanatory ん of んじゃ, as Grok's row has it)
+  if (token.s === 'ん' && token.p !== '助動詞' && ['だ', 'だっ', 'だろ', 'だろう', 'じゃ', 'じゃあ', 'じゃア'].includes(next)) return { s: 'んだ', b: 'んだ', r: 'んだ', seq: '2849387' };
+  if (token.s === 'ん' && token.p !== '助動詞' && ['です', 'でし', 'でしょ'].includes(next)) return { s: 'んです', b: 'んです', r: 'んです', seq: '2087820' };
+  // いけない after ては/ちゃ is "must not" (its sense after the te-form); elsewhere "no good" (注意しないからいけない,
+  // なかなかいけない) — never いける "to be good (at)"; いけ after に/へ (学校へはいけない) may be 行ける "can go", and stays
+  if (token.b === 'いける' && token.s === 'いけ' && ['ない', 'ませ', 'ず'].includes(next)) {
+    if (['ちゃ', 'じゃ'].includes(prev) || (prev === 'は' && ['て', 'で'].includes(prev2))) return { s: 'いけない', b: 'いけない', r: 'いけない', seq: '1000730' };
+    const going = ['に', 'へ'].includes(prev) || (['は', 'も'].includes(prev) && ['に', 'へ'].includes(prev2));
+    if (!going) return { s: 'いけない', b: 'いけない', r: 'いけない', seq: '1000730', k: 2 };
+  }
+  // 床に就く, "to go to bed; to be laid up" (床についていて, 床 read とこ), never 就く "to take (a seat)" nor 点く "to be lit"
+  if (token.b === 'つく' && prev === 'に' && prev2 === '床' && kataToHira(String(near.prev2?.r || '')) === 'とこ') {
+    return { s: '床につく', b: '床につく', r: 'とこにつく', seq: '1854590' };
+  }
+  // について, "about" (日本について), never つく "to be attached" or "to be lit"; 床について + いる (taken to bed) stays つく
+  if (token.s === 'つい' && prev === 'に' && next === 'て' && !['い', 'いる', 'いた', 'いて', 'おり', 'おる'].includes(String(near.next2?.s || ''))) {
+    return { s: 'について', b: 'について', r: 'について', seq: '1009780' };
+  }
+  // にとって, "to; for; concerning" (私にとって), never とる "to have (e.g. lunch)" or "to take (e.g. a joke)"
+  if (token.s === 'とっ' && prev === 'に' && next === 'て') return { s: 'にとって', b: 'にとって', r: 'にとって', seq: '1009600' };
+  // ない in its idioms: 勿体ない "wasteful", 違いない "sure", 間もなく "soon" — never "nonexistent"
+  if (['ない', '無い'].includes(String(token.b || '')) && ['勿体', 'もったい'].includes(prev)) return { s: '勿体ない', b: '勿体ない', r: 'もったいない', seq: '1605250' };
+  if (['ない', '無い'].includes(String(token.b || '')) && ['違い', 'ちがい'].includes(prev)) return { s: '違いない', b: '違いない', r: 'ちがいない', seq: '1610740' };
+  if (token.s === 'なく' && prev === 'も' && prev2 === '間') return { s: '間もなく', b: '間もなく', r: 'まもなく', seq: '1215290' };
+  // and more of them (Grok 2029): 相違ない "without doubt; certain", 間違いない "certain; sure", 何度となく "time after
+  // time" (each of 何, 度 and なく), ともなく "without knowing (it)" (いつともなく), となく after a count the dictionary has no
+  // entry for (何遍となく, いくつとなく), そこはかとなく "somehow; faintly" (そこ, かと and なく: the tokenizer's そこ/は/かと/なく)
+  const nai = ['ない', '無い'].includes(String(token.b || ''));
+  if (nai && prev === '相違') return { s: '相違ない', b: '相違ない', r: 'そういない', seq: '2027060' };
+  if (nai && prev === '間違い') return { s: '間違いない', b: '間違いない', r: 'まちがいない', seq: '2006640', k: 0 };
+  const nando = (h) => word(h) === '何' && word(h + 1) === '度' && word(h + 2) === 'と' && word(h + 3) === 'なく';
+  if ([0, -1, -3].some(nando)) return { s: '何度となく', b: '何度となく', r: 'なんどとなく', seq: '2840609' };
+  if (nai && token.s === 'なく' && prev === 'も' && prev2 === 'と') return { s: 'ともなく', b: 'ともなく', r: 'ともなく', seq: '2137120' };
+  if (nai && token.s === 'なく' && prev === 'と' && (['何遍', '何回', 'いくつ', '幾つ'].includes(prev2)
+    || (prev2 === 'つ' && ['いく', '幾'].includes(word(-3))))) return { s: 'となく', b: 'となく', r: 'となく', seq: '2208050' };
+  const sokohaka = (h) => word(h) === 'そこ' && word(h + 1) === 'は' && word(h + 2) === 'かと' && word(h + 3) === 'なく';
+  if ([0, -2, -3].some(sokohaka)) return { s: 'そこはかとなく', b: 'そこはかとなく', r: 'そこはかとなく', seq: '2569820' };
+  // にかけて, a span (1月から3月にかけて), never かける "to hang up": かけ between に and て, with から before it
+  if (token.s === 'かけ' && ['かける', '掛ける', '懸ける', '架ける'].includes(String(token.b || '')) && prev === 'に' && next === 'て'
+    && (near.before || []).some((t) => t?.s === 'から')) return { s: 'にかけて', b: 'にかけて', r: 'にかけて', seq: '2034300', k: 0 };
+  // につき, never つく "to be attached": "per" by a count (記事につき三行, １団体につき), につきまして "regarding" (never
+  // 目につきました, "caught the eye")
+  if (token.s === 'つき' && token.b === 'つく' && prev === 'に') {
+    if (next === 'まし' && String(near.next2?.s || '') === 'て') return { s: 'につきまして', b: 'につきまして', r: 'につきまして', seq: '2872401' };
+    const counted = (t) => !!t && (SENSE_NUMBER.test(String(t.s || '')) || SENSE_NUMBER_WORD.has(String(t.s || '')));
+    if (counted(near.next) || counted(near.at(-3))) return { s: 'につき', b: 'につき', r: 'につき', seq: '1009850', k: 2 };
+  }
+  // 一発退場, sent off at once: 一発 "one try", never 発 the counter of gunshots; 性暴力, "sexual violence", never 性
+  // "nature (of a person)"
+  if (token.s === '発' && ['一', '１', '1'].includes(prev) && next === '退場') return { s: '一発', b: '一発', r: 'いっぱつ', seq: '1165730', k: 3 };
+  if (token.s === '性' && next === '暴力') return { s: '性暴力', b: '性暴力', r: 'せいぼうりょく', seq: '2456730' };
+  // 〜なりに, "in one's own way" (自分なりに), never the particle なり "or" nor 也's "sum of money"; a listing's last なり
+  // before に (父母なり友なりに) is still the listing's
+  if (token.s === 'なり' && ['接尾辞', '助詞'].includes(token.p) && next === 'に' && !(near.before || []).some((t) => t?.s === 'なり')) {
+    return { s: 'なりに', b: 'なりに', r: 'なりに', seq: '2038230' };
+  }
+  // 一枚岩, the idiom (monolith; unity), never 枚 the counter of flat things
+  if (token.s === '枚' && prev === '一' && next === '岩') return { s: '一枚岩', b: '一枚岩', r: 'いちまいいわ', seq: '1166750' };
+  // 〜方がいい after a verb: "had better", after a negative "had better not" (しない方がいい), never one side of a comparison
+  if (token.s === '方' && kataToHira(String(token.r || '')) === 'ほう' && next === 'が' && ['動詞', '助動詞'].includes(near.prev?.p)
+    && ['いい', 'よい', '良い', 'よかっ', '良かっ'].includes(String(near.next2?.s || ''))) {
+    return { s: '方がいい', b: '方がいい', r: 'ほうがいい', seq: '2160680', k: ['ない', 'ぬ', 'ん'].includes(prev) ? 1 : 0 };
+  }
+  return null;
+}
+
+/** The glosses of one sense of a detail entry, as JMdict lists them. */
+const senseGlosses = (sense) => (sense?.[10] || []).map((gloss) => String(gloss?.[0] || '')).filter(Boolean);
+
+/** The sense a word in its text uses (the section's rules): { seq, k, glosses, why, left, entry } — entry true when it is
+ * another entry than the door's own — or { door } for an expression read whole or a name, { need: { forms, shards } }
+ * while rows or senses are still to come, null when there is nothing to choose. */
+function senseChoice(token, door) {
+  if (!door || door.te || door.senseName) return null;
+  const near = senseNeighbours(token);
+  // a reading, not a word: the kana the text spells a word's reading in after it (悉曇（しったん）: never 知る "to know"
+  // for しっ, nor "yes" for ん, whatever entry its kana could name), or one the sidecar names. It has no dictionary
+  // meaning; its card shows the text's own form
+  const asReading = (why) => ({ door: { ...door, s: token.s, b: token.s, r: token.r, seq: undefined, senseName: true, inflected: undefined,
+    unfit: undefined, several: undefined, noFit: undefined, readMiss: undefined, sense: { name: true, reading: true, why: [why] } } });
+  if (senseSpelledReading(token, near)) return asReading('reading');
+  if (door.kanjiOnly || door.noFit) return null;
+  // the sidecar is asked for with its article; a word tapped before it came waits for it (ensureSense)
+  if (near?.passage && D.senseSidecar === undefined) return { need: { forms: [], shards: [] } };
+  const side = sidecarSense(near);
+  if (side?.reading) return asReading(`sidecar:${side.source}`);
+  const expression = senseExpression(token, near);
+  if (expression) {
+    if (!dictionaryAnsweredForm(expression.b)) return { need: { forms: [expression.b], shards: [] } };
+    const row = dictionaryRowsReadAs(expression.b, expression.r).find((candidate) => String(candidate[0]) === expression.seq);
+    const detail = row ? D.dictionaryDetails?.get(expression.seq) : null;
+    if (row && !detail) return { need: { forms: [], shards: [dictionaryShardId(expression.seq)] } };
+    if (!detail) return null;
+    // the sidecar's sense of the expression where it names one (一枚岩: the rock, or unity); else the expression's own
+    // (方がいい after a negative: "had better not"), else the sense noted as following the te-form (いけない: "must
+    // not"), else its first (んだ, んです: their one sense)
+    const sided = side?.seq === expression.seq && detail[3][side.k] ? side : null;
+    const k = sided ? sided.k : Number.isInteger(expression.k) ? expression.k
+      : Math.max(0, detail[3].findIndex((sense) => (sense[8] || []).some((note) => TE_FORM_NOTE.test(String(note)))));
+    const sense = { seq: expression.seq, k, glosses: senseLed(senseGlosses(detail[3][k]), sided?.lead),
+      why: sided ? ['expression', `sidecar:${sided.source}`] : ['expression'], left: 1, entry: true };
+    return { door: { ...door, s: expression.s, b: expression.b, r: expression.r, seq: expression.seq, sense, inflected: undefined, unfit: undefined, several: undefined } };
+  }
+  if (side?.name) return { door: { ...door, senseName: true, sense: { name: true, why: [`sidecar:${side.source}`] } } };
+  const form = String(door.b || ''), reading = kataToHira(String(tokenReading(door) || ''));
+  if (!form || !reading) return null;
+  if (!dictionaryAnsweredForm(form)) return { need: { forms: [form], shards: [] } };
+  // a grammar word (an auxiliary verb, a suffix, a prefix) is only ever an entry headed by its own spelling, as the
+  // lookup door has always chosen (ます is never 升 "measuring container"), or — written in kana — one JMdict usually
+  // writes in kana (the classical copula なり: 也); a counter after a number may be one written otherwise and read
+  // alike (一つ's つ: 箇, the general counter)
+  const helper = LOOKUP_HELPER_POS.has(token.p);
+  const counting = token.p === '接尾辞' && senseNumberBefore(near);
+  const read = dictionaryRowsReadAs(form, reading);
+  const hasCounter = (row) => (D.dictionaryDetails?.get(String(row[0]))?.[3] || []).some((sense) => (sense[0] || []).includes('ctr'));
+  // the door's own entry: the one it names, else the one whose meaning the quick dictionary gives (お: 御, the polite prefix)
+  const shown = door.seq ? null : D.dict?.[form]?.m?.[0];
+  const mine = (row) => (door.seq ? String(row[0]) === String(door.seq) : !!shown && (row[6] || []).includes(shown));
+  const usuallyKana = (row) => READER_KANA.test(form) && (D.dictionaryDetails?.get(String(row[0]))?.[3] || []).some((sense) => (sense[7] || []).includes('uk'));
+  const rows = read.filter((row) => !helper || row[1] === form || mine(row) || usuallyKana(row) || (counting && hasCounter(row)))
+    .sort((a, b) => mine(b) - mine(a));
+  const asked = helper || counting ? read : rows;
+  const missing = asked.filter((row) => !D.dictionaryDetails?.get(String(row[0])));
+  if (missing.length) return { need: { forms: [], shards: [...new Set(missing.map((row) => dictionaryShardId(row[0])))] } };
+  if (!rows.length) return null;
+  let pairs = rows.flatMap((row, r) => (D.dictionaryDetails.get(String(row[0]))[3] || [])
+    .map((sense, k) => ({ row, r, k, sense, seq: String(row[0]) })));
+  // the sense the slip has shown: the door's own entry's sense holding the meaning it shows (the quick dictionary's
+  // first gloss for a spelling it has), else its first
+  const own = (pair) => pair.r === 0 && mine(pair.row);
+  const before = pairs.find((pair) => own(pair) && shown && senseGlosses(pair.sense).includes(shown)) || pairs.find(own) || pairs[0];
+  // candidates: the senses the rules left, [entry, sense], in order (the sidecar's builder asks two models among these)
+  const result = (pair, why) => ({ seq: pair.seq, k: pair.k, glosses: senseGlosses(pair.sense), why, left: pairs.length,
+    entries: new Set(pairs.map((candidate) => candidate.seq)).size, entry: !own(pair),
+    candidates: pairs.map((candidate) => [candidate.seq, candidate.k]) });
+  if (side) {
+    const hit = pairs.find((pair) => pair.seq === side.seq && pair.k === side.k);
+    if (hit) {
+      const chosen = result(hit, [`sidecar:${side.source}`]);
+      return Number.isInteger(side.lead) ? { ...chosen, glosses: senseLed(chosen.glosses, side.lead), lead: side.lead } : chosen;
+    }
+  }
+  // the rules, each a test a sense passes or fails; the shown sense stays while it passes them all
+  const pos = (pair) => pair.sense[0] || [];
+  const written = READER_KANA.test(form) ? '' : form;
+  const bracket = senseWeekdayBracket(token, near);
+  const weekday = (pair) => senseGlosses(pair.sense).some((gloss) => SENSE_WEEKDAY.test(gloss));
+  // a month counted: 月 read つき after a number (一月 ひとつき) or before に and a number (月に五十円), never the Moon
+  const month = form === '月' && reading === 'つき' && (senseNumberBefore(near)
+    || (String(near?.next?.s || '') === 'に' && SENSE_NUMBER.test(String(near?.next2?.s || ''))));
+  const rules = [
+    ['reading', (pair) => {
+      const kana = pair.sense[2] || [], kanji = pair.sense[1] || [];
+      return (!kana.length || kana[0] === '*' || kana.some((r) => kataToHira(String(r)) === reading))
+        && (!written || !kanji.length || kanji[0] === '*' || kanji.includes(written));
+    }],
+    ...(counting ? [['counter', (pair) => pos(pair).some((code) => code === 'ctr' || code === 'suf' || code === 'n-suf')]] : []),
+    ['weekday', (pair) => (bracket ? weekday(pair) : !weekday(pair))],
+    ...(month ? [['month', (pair) => senseGlosses(pair.sense).includes('month')]] : []),
+    ...(senseNegation(token, near) ? [['negation', (pair) => pos(pair).includes('aux-adj')]] : []),
+    ...(SENSE_CLASS[token.p] ? [['class', (pair) => SENSE_CLASS[token.p](pos(pair))]] : []),
+  ];
+  if (before && rules.every(([, test]) => test(before))) return result(before, []);
+  // the shown sense fails: each rule narrows the senses in turn, keeping at least one; within an entry a late sense
+  // (archaic, obsolete, rare, dated, slang, vulgar) comes after the others; across entries the door's own first, then —
+  // for a word written in kana — an entry JMdict usually writes in kana
+  const why = [];
+  for (const [name, test] of rules) {
+    const fit = pairs.filter(test);
+    if (fit.length && fit.length < pairs.length) { pairs = fit; why.push(name); }
+  }
+  const late = (pair) => (pair.sense[7] || []).some((code) => SENSE_LATE.has(code));
+  const kanaWord = (pair) => READER_KANA.test(String(token.s || '')) && (D.dictionaryDetails.get(pair.seq)[3] || []).some((sense) => (sense[7] || []).includes('uk'));
+  pairs = pairs.map((pair, at) => ({ pair, at }))
+    .sort((a, b) => (own(b.pair) - own(a.pair)) || (kanaWord(b.pair) - kanaWord(a.pair)) || a.pair.r - b.pair.r
+      || late(a.pair) - late(b.pair) || a.at - b.at)
+    .map(({ pair }) => pair);
+  return result(pairs[0], why);
+}
+
+/** A door with the sense its text uses (senseChoice): an expression read whole or a name is its own door; another
+ * entry, when the word's own has no sense left, is named by its entry number; a door that named several entries names
+ * one only when one entry is left. Any other door is unchanged. */
+function senseDoor(token, door) {
+  const choice = senseChoice(token, door);
+  if (!choice || choice.need) return door;
+  if (choice.door) return choice.door;
+  if (door.several && choice.entries > 1) return door;
+  // a door keeps its identity (the quick dictionary's word, or its named entry) unless a rule or the sidecar moved its
+  // sense to another entry; a door that named several entries is named by the one left
+  const renamed = door.several || (choice.why.length > 0 && choice.entry && !senseIsQuick(door, choice.seq));
+  return { ...door, ...(renamed ? { seq: choice.seq, several: undefined } : {}), sense: choice };
+}
+
+/** Whether an entry is the one the quick dictionary answers for this door: the entry read alike whose glosses hold the
+ * meaning the quick dictionary gives for its spelling. */
+function senseIsQuick(door, seq) {
+  const shown = !door.seq && D.dict?.[door.b]?.m?.[0];
+  if (!shown) return false;
+  const row = dictionaryRowsReadAs(door.b, tokenReading(door)).find((candidate) => (candidate[6] || []).includes(shown));
+  return !!row && String(row[0]) === String(seq);
+}
+
+/** A record shaped by its door's sense: the chosen sense's glosses first, then the rest (every one the entry's own);
+ * its glosses ride as senseGlosses for the slip's second line. A name has no dictionary meaning. */
+function senseRecord(rec, sense) {
+  if (!sense) return rec;
+  if (sense.name) return { r: rec?.r || '', m: [sense.reading ? tx('この文では読み方', 'a reading in this text') : tx('この文では名前', 'a name in this text')], senseName: true };
+  if (!rec || !Array.isArray(sense.glosses) || !sense.glosses.length) return rec;
+  return { ...rec, m: [...new Set([...sense.glosses, ...(rec.m || [])])], senseGlosses: sense.glosses, sense: { seq: sense.seq, k: sense.k } };
+}
+
+/** The quiet second line itself: one line, never more (a long gloss ends in "…"; the page lists it whole), so the slip
+ * grows by one line at most and Save ▾'s menu still unfolds inside it on a phone. */
+function senseMoreElement(text) {
+  const more = el('span', 'mini-gloss-more', text);
+  more.lang = 'en';
+  more.title = text;
+  Object.assign(more.style, { fontWeight: '400', color: 'var(--mini-head-ink-2)', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden',
+    textOverflow: 'ellipsis', maxWidth: '100%' });
+  return more;
+}
+
+/** The second line of a sense on the slip: its next glosses, at most two more, while the line stays short. */
+function senseMoreLine(glosses) {
+  const more = [];
+  for (const gloss of (glosses || []).slice(1, 3)) {
+    if ([...more, gloss].join('; ').length > 64 && more.length) break;
+    more.push(gloss);
+  }
+  return more.join('; ');
+}
+
+/** Ask for what a word's sense needs (its rows, its entries' senses, the sidecar) until it is answered. */
+async function ensureSense(token, door) {
+  await ensureSenseSidecar();
+  for (let round = 0; round < 4; round += 1) {
+    const need = senseChoice(token, door)?.need;
+    if (!need) return;
+    await Promise.all([...need.forms.map((form) => ensureDictionaryRowsForForm(form)), ...need.shards.map((id) => ensureDictionaryShard(id))]);
+  }
+}
+
+/** A slip drawn before its word's sense was at hand: marked pending, then drawn again with it if it is still the open
+ * slip and nobody has touched it (a press or a key inside it: a menu opened, Save pressed, a pane open stay as they are;
+ * the sense shows on the next look). */
+function senseRefine(token, door, slip, redraw, anchor = null) {
+  if (!slip || !senseChoice(token, door)?.need) return;
+  slip.dataset.sense = 'pending';
+  let touched = false;
+  const touch = () => { touched = true; };
+  slip.addEventListener('pointerdown', touch, { capture: true });
+  slip.addEventListener('keydown', touch, { capture: true });
+  const after = () => {
+    slip.removeEventListener('pointerdown', touch, { capture: true });
+    slip.removeEventListener('keydown', touch, { capture: true });
+    // a sense that cannot be had (the dictionary cannot answer) is not waited for again: the word's own meaning stands
+    if (senseChoice(token, door)?.need) SENSE_GAVE_UP.add(token);
+    if (!slip.isConnected) return;
+    const waiting = !!slip.querySelector('[data-sense-wait]');
+    // a word the sense leaves as it was (no sense chosen; several entries still named) keeps its slip untouched
+    if (senseDoor(token, door) === door && !waiting) { delete slip.dataset.sense; return; }
+    // a finger on a slip still waiting for its meaning: drawn once it lifts
+    if (waiting && slip.matches(':active')) { slip.addEventListener('pointerup', after, { once: true }); return; }
+    // brought up to its sense in place where its word and entry stay; drawn again only where they move — and a slip still
+    // at its placeholder is never left there, touched or not
+    if ((!touched || waiting) && document.getElementById('mini') === slip && !sensePatch(slip, token, door, anchor)) redraw();
+    else delete slip.dataset.sense;
+  };
+  ensureSense(token, door).then(after, after);
+}
+
+/** A slip drawn before its word's sense was at hand, brought up to the sense in place while the slip's word and entry
+ * stay what they were: its meaning line, its quiet second line, the sense it names (and the page's mark). Nothing a
+ * finger may be on is replaced (a slip drawn again detaches the word's own button). Whether it could: an expression
+ * read whole, another entry, or a slip of another shape (te-form lines, a wait, a miss) is drawn again instead. */
+function sensePatch(slip, token, door, anchor = null) {
+  const choice = senseChoice(token, door);
+  const wait = slip.querySelector('.mini-gloss[data-sense-wait]');
+  // nothing to bring it up to: a slip still at its placeholder is drawn again, with the word's own meaning
+  if (!choice || choice.need) return !wait;
+  if (choice.door || choice.entry || !Array.isArray(choice.glosses) || !choice.glosses.length) return false;
+  if (slip.dataset.kind !== 'word' || slip.querySelector('.mini-gloss-2, .mini-miss') || (!wait && slip.querySelector('.mini-wait'))) return false;
+  const line = wait || slip.querySelector('.mini-gloss');
+  if (!line) return false;
+  if (wait) {
+    // the placeholder becomes the meaning line, and the slip is answered
+    line.className = 'mini-gloss';
+    delete line.dataset.senseWait;
+    line.style.removeProperty('font-weight');
+    line.style.removeProperty('color');
+    if (!line.getAttribute('style')) line.removeAttribute('style');
+    slip.removeAttribute('aria-busy');
+  }
+  line.textContent = choice.glosses[0];
+  const more = senseMoreLine(choice.glosses);
+  let quiet = slip.querySelector('.mini-gloss-more');
+  if (more && !quiet) {
+    line.after(senseMoreElement(more));
+  } else if (quiet) {
+    if (more) quiet.textContent = more;
+    else quiet.remove();
+  }
+  const sense = { seq: String(choice.seq), k: Number(choice.k) };
+  slip.dataset.senseEntry = `${sense.seq}:${sense.k}`;
+  delete slip.dataset.sense;
+  if (anchor) SENSE_BY_ANCHOR.set(anchor, sense);
+  // the slip's entry node carries the mark to its page; a page already built ahead from it (G1: the tap only mounts
+  // it) is built ahead again, with the mark
+  const node = SLIP_NODE.get(slip);
+  if (node?.t === 'word' && (node.seq == null || String(node.seq) === sense.seq)) {
+    node.sense = sense;
+    if (pagePrebuilt?.node === node && anchor) { pagePrebuilt = null; schedulePagePrebuild(node, anchor); }
+  }
+  return true;
+}
+/** Each word slip's entry node (showMini), so a sense that arrives later reaches its page (sensePatch). */
+const SLIP_NODE = new WeakMap();
+
+/** A lookup word's sense, waited for a moment at most (SENSE_WAIT_MS, as a reading's answer is): whether it is at hand. */
+const SENSE_WAIT_MS = 400;
+async function senseWithin(token, door, ms = SENSE_WAIT_MS) {
+  if (!senseChoice(token, door)?.need) return true;
+  let timer = null;
+  await Promise.race([ensureSense(token, door).catch(() => {}), new Promise((resolve) => { timer = setTimeout(resolve, ms); })]);
+  clearTimeout(timer);
+  return !senseChoice(token, door)?.need;
+}
+
+/** The sense each word's slip showed, by the word in its text: the page that word opens marks it (heroSource). */
+const SENSE_BY_ANCHOR = new WeakMap();
+
+/** A lookup word whose slip opened before its sense was at hand: the slip is marked pending (showMini) and drawn again
+ * with the sense once it is, unless a press or a key touched it first; the slip and the sense may come in either order.
+ * A sense that cannot be had leaves the slip as it is. */
+const SENSE_LATER = new WeakMap();
+/** The words whose sense could not be had (the dictionary did not answer): their slips show their own meaning, never a
+ * placeholder again. */
+const SENSE_GAVE_UP = new WeakSet();
+function senseLater(token, doorOf, anchor, redraw) {
+  const entry = { ready: false, redraw, token, doorOf };
+  SENSE_LATER.set(anchor, entry);
+  const done = () => {
+    if (SENSE_LATER.get(anchor) !== entry) return;
+    if (senseChoice(token, doorOf())?.need) {
+      SENSE_LATER.delete(anchor);
+      // a sense that cannot be had is not waited for again: a slip still at its placeholder is drawn with the word's own
+      // meaning
+      SENSE_GAVE_UP.add(token);
+      const open = japaneseLookupMini?.anchor === anchor ? japaneseLookupMini.mini : null;
+      if (open) delete open.dataset.sense;
+      if (open?.querySelector('[data-sense-wait]') && document.getElementById('mini') === open) redraw();
+      return;
+    }
+    entry.ready = true;
+    senseLaterDraw(anchor);
+  };
+  ensureSense(token, doorOf()).then(done, done);
+}
+function senseLaterDraw(anchor) {
+  const entry = SENSE_LATER.get(anchor);
+  const open = japaneseLookupMini?.anchor === anchor && document.getElementById('mini') === japaneseLookupMini.mini
+    ? japaneseLookupMini.mini : null;
+  if (!entry?.ready || !open) return;
+  SENSE_LATER.delete(anchor);
+  delete open.dataset.sense;
+  // a slip still at its placeholder is brought up to its sense, touched or not; a touched one already answered stays
+  const waiting = !!open.querySelector('[data-sense-wait]');
+  if ((!open.dataset.senseTouched || waiting) && !sensePatch(open, entry.token, entry.doorOf(), anchor)) entry.redraw();
+}
+
 /** R2 · among several entries that write a dictionary form and read it the derived way, the one that fits the token:
  * its class (a verb's English glosses begin "to …"; an adjective by the quick dictionary's part of speech), then the
  * entry whose own first reading this is, then the entry headed by the spelling itself, then — a form the text writes
@@ -12220,6 +12822,12 @@ function readyTokenReading(token) {
  * one entry so read and so permitted (several stay the full entry's explicit choice, D11). Until the form's rows are
  * at hand, and for every other token, it is the token as it was. */
 function readingToken(token) {
+  // R3 · and the door carries the sense its text uses (senseDoor)
+  return senseDoor(token, readingTokenEntry(token));
+}
+
+/** readingToken's door before its sense: the entry the token's reading names (R, R2, N2). */
+function readingTokenEntry(token) {
   // R2 · the door is the token as its dictionary form, read the way the text reads it (readingForm)
   const door = readingForm(token);
   // N2 · a te-form auxiliary is its auxiliary's entry, once JMdict's senses for it are at hand (teFormAnswer)
@@ -12264,19 +12872,40 @@ let readingSlipSerial = 0;
 function openReadingSlip(anchor, token, draw) {
   const serial = ++readingSlipSerial;
   const ready = readyTokenReading(token);
-  if (!ready) return draw(readingToken(token));
+  // R3 · while the sense its text uses is still to come, the slip's meaning line is a quiet placeholder (showMini), never
+  // a meaning the sense would take back; a sense that could not be had leaves the word's own meaning
+  const sensing = () => !SENSE_GAVE_UP.has(token) && !!senseChoice(token, readingTokenEntry(token))?.need;
+  const doorNow = () => (sensing() ? { ...readingToken(token), sensePending: true } : readingToken(token));
+  // a slip drawn before its sense was at hand is brought up to it (senseRefine), and one drawn without the sense its door
+  // now has is drawn again at once, unless a press or a key touched it first
+  const refine = (slip, door = null) => {
+    if (door?.sense?.seq && slip && slip.dataset.senseEntry !== `${door.sense.seq}:${door.sense.k}` && !slip.dataset.senseTouched
+      && document.getElementById('mini') === slip && !slip.matches(':active')
+      && !sensePatch(slip, token, readingTokenEntry(token), anchor)) slip = draw(door);
+    senseRefine(token, readingTokenEntry(token), slip, () => {
+      if (serial === readingSlipSerial && anchor.isConnected) { draw(doorNow()); syncChromeKeep(); }
+    }, anchor);
+    return slip;
+  };
+  if (!ready) {
+    // at once, as before: with the sense still to come, its word and reading and the quiet placeholder
+    const slip = draw(doorNow());
+    refine(slip);
+    return slip;
+  }
   let drawn = null;
   // G1 · and never a card for a word a page has since covered (slipAllowed)
   const live = () => serial === readingSlipSerial && anchor.isConnected && slipAllowed(anchor) &&
     !(document.getElementById('mini') && miniAnchor !== anchor);
   // a slip drawn before the answer says it is still being answered (aria-busy), until the answer comes
-  const early = () => { drawn = draw(readingToken(token)); drawn?.setAttribute('aria-busy', 'true'); };
+  const early = () => { drawn = draw(doorNow()); drawn?.setAttribute('aria-busy', 'true'); };
   if (!D.dictionaryIndex) early();
   else setTimeout(() => { if (!drawn && live()) early(); }, READING_WAIT_MS);
   ready.then(() => {
-    const settled = () => drawn?.removeAttribute('aria-busy');
+    // answered — unless the slip still waits for its sense (its placeholder clears aria-busy when filled)
+    const settled = () => { if (!drawn?.querySelector('[data-sense-wait]')) drawn?.removeAttribute('aria-busy'); };
     if (!live()) return settled();
-    const door = readingToken(token);
+    const door = doorNow();
     if (!drawn) drawn = draw(door);
     // N · a card still saying "…" is drawn again once the answer is in, whatever it is — the entry read the text's way,
     // no entry for the spelling, or none read the text's way (訳 read やく: "No dictionary entry for this reading.").
@@ -12297,6 +12926,7 @@ function openReadingSlip(anchor, token, draw) {
       }
     }
     else settled();
+    drawn = refine(drawn, door);
     // R2 · the bar's Save names what the card now stands for (解せ: 解す once the answer names it, never the asked 解する)
     syncChromeKeep();
   });
@@ -12640,10 +13270,26 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
   let record = null;
   // R2 · with no entry read the text's way: a sound change's entry ({ reading, shown }) or the lone kanji ({ kanjiOnly })
   let answer = {};
+  // R3 · the entry its slip answers with, for the sense its text uses (senseChoice)
+  let entrySeq = '';
+  const lookupDoor = () => ({ ...token, s: text, b: text, r: answer.reading || lookupContext.reading || '', ...(entrySeq ? { seq: entrySeq } : {}) });
   const hasKanjiEntry = () => [...text].length === 1 && !!D.kanji[text];
   const prepare = async () => {
     await ensureDictionaryRowsForForm(text).catch(() => {});
     answer = readerLookupAnswer(text, lookupContext);
+    entrySeq = answer.kanjiOnly ? '' : String(japaneseLookupEntryRecord(text, { ...lookupContext, ...answer })?.seq || '');
+    // R3 · the sense its text uses rides in the answer every look at it spreads (japaneseLookupRecord): waited for a
+    // moment at most, else the slip opens without it and is drawn again once it is at hand (senseLater). A lone kanji
+    // after a number may be a counter's written form (疋 is 匹's): then the counter answers, not the kanji
+    const counting = answer.kanjiOnly && senseCounting(token);
+    if (!answer.kanjiOnly || counting) await senseWithin(token, lookupDoor());
+    const choice = answer.kanjiOnly && !counting ? null : senseChoice(token, lookupDoor());
+    if (choice && !choice.need && (!answer.kanjiOnly || choice.seq)) answer = { ...answer, kanjiOnly: undefined, sense: choice };
+    // still to come: the slip opens with a quiet placeholder for its meaning (showMini reads SENSE_LATER) and is brought
+    // up to the sense once it is at hand (senseLater); one that could not be had before opens with the word's own meaning
+    if (choice?.need && !SENSE_GAVE_UP.has(token)) senseLater(token, lookupDoor, span, () => quickLook('programmatic', { restore: true }));
+    else SENSE_LATER.delete(span);
+    if (choice && !choice.need && !choice.door?.senseName && choice.seq) SENSE_BY_ANCHOR.set(span, { seq: String(choice.seq), k: Number(choice.k) });
     record = answer.kanjiOnly ? null : japaneseLookupRecord(text, { ...lookupContext, ...answer });
   };
   const quickLook = async (modality = 'pointer', { restore = false } = {}) => {
@@ -13595,8 +14241,10 @@ function renderReader(main) {
   const learning = new Set();
   for (const t of S.taken) if (t.t === 'word') learning.add(t.id);
   const dueNow = new Date();
-  // N2 · whatever brought the text here, its te-form auxiliaries are marked before any of its words is drawn
+  // N2 · whatever brought the text here, its te-form auxiliaries are marked before any of its words is drawn; R3 · and
+  // every word's place in it (markSenseContext)
   markTeFormAuxiliaries(p.tokens);
+  markSenseContext(p.tokens, p.id);
   const crossRefs = glossaryCrossRefPlan(p);
   let group = null;
   // set when the token just placed reaches FORWARD for what completes it — a numeral for its
@@ -13628,7 +14276,7 @@ function renderReader(main) {
       }
       if (crossRefs.skip.has(index)) continue;
     }
-    const particle = !token.c ? PARTICLE_BY_SURFACE[token.s] : null;
+    const particle = !token.c && token.p !== '助動詞' ? PARTICLE_BY_SURFACE[token.s] : null;
     // A name is exactly what a learner cannot read. The `c` flag comes from
     // the GRADER, whose 固有名詞/数詞 exclusion means "do not count this as a
     // content word" — a readability rule that was doing double duty as the
@@ -30213,8 +30861,9 @@ async function ensureBankExamples(word) {
  * readings on request only), and only always shows them. Taps land in the
  * obslog. */
 function renderSentenceTokens(container, tokens, opts = {}) {
-  // N2 · a sentence's te-form auxiliaries answer as they do in the reader (markTeFormAuxiliaries)
+  // N2 · a sentence's te-form auxiliaries answer as they do in the reader (markTeFormAuxiliaries); R3 · its words' places
   markTeFormAuxiliaries(tokens);
+  markSenseContext(tokens);
   const target = opts.targetId || null;
   const contextId = opts.contextId || 'sentence';
   const source = sentenceSource(tokens, contextId, opts.start);
@@ -30266,7 +30915,8 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       if (door.kanjiOnly) return { t: 'kanji', id: door.b, ...(from ? { from } : {}) };
       const own = tokenReading(door);
       return { t: 'word', id: door.b, ...(door.seq ? { seq: door.seq, reading: door.r || own }
-        : D.dict[door.b] && readingAsksIndex(door.b, own) ? { reading: own } : {}), ...(from ? { from, ctxScope: 'sent' } : {}) };
+        : D.dict[door.b] && readingAsksIndex(door.b, own) ? { reading: own } : {}), ...(from ? { from, ctxScope: 'sent' } : {}),
+        ...(door.sense?.seq ? { sense: { seq: door.sense.seq, k: door.sense.k } } : {}) };
     };
     const openEntry = (door = readingToken(token), modality = 'pointer') => {
       obsLog('tap', srsKey('word', token.b), 3, contextId);
@@ -31758,6 +32408,14 @@ function renderDictionaryDetails(container, details, node) {
       }
       renderDictionaryRelations(body, '関連する語', 'related words', related, node);
       renderDictionaryRelations(body, '対義語', 'opposites', antonym, node);
+      // R3 · the sense the word's text uses, marked among them all (senseDoor): the node's, else the one the slip of the
+      // word it was opened from showed
+      const inText = node?.sense || SENSE_BY_ANCHOR.get(heroSource.get(node));
+      if (inText && String(inText.seq) === String(entry[0]) && Number(inText.k) === senseIndex) {
+        section.classList.add('dictionary-sense-in-text');
+        section.setAttribute('aria-current', 'true');
+        body.prepend(el('p', 'dictionary-info', tx('この文での意味', 'the meaning in this text')));
+      }
       section.append(body);
       block.append(section);
     });
@@ -32059,7 +32717,9 @@ function readerEntryNode(token, index, p) {
   // matched by that reading), a sound change's entry by the entry's own reading, a lone kanji's page
   const door = readingToken(token);
   if (door.kanjiOnly) return { t: 'kanji', id: door.b, from: { passage: p.id, index } };
-  const node = { t: 'word', id: door.b, from: { passage: p.id, index }, ctxScope: 'sent' };
+  // R3 · the page marks the sense its text uses (senseDoor)
+  const node = { t: 'word', id: door.b, from: { passage: p.id, index }, ctxScope: 'sent',
+    ...(door.sense?.seq ? { sense: { seq: door.sense.seq, k: door.sense.k } } : {}) };
   const own = tokenReading(door);
   if (door.seq) return { ...node, seq: door.seq, reading: door.r || own };
   // R2 · an unfit door (a verb read like the quick dictionary's noun) never opens that noun's page: it is matched like a

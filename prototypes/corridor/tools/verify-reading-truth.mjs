@@ -26,7 +26,7 @@
  *       いい); #1414 解せ → 解す · げす · to understand (never かいする); Shosoin #483 来 read き and Sōseki #66 来 read こ →
  *       来る · くる (never きる, こる). Save on 云う keeps entry 1587040 and cueReading いう, in the same row shape as 年's
  *   R2.V  a sound change names the entry read the plain way, the card still showing the text's reading: 一 いっ, 本 ぽん,
- *       八 はっ, 歩 ぽ, 金持ち がねもち
+ *       八 はっ, 歩 ぽ, 金持ち がねもち (R3, Grok 0315: 本 after a number shows that entry's counter sense, never "book")
  *   R2.K  a lone kanji read by its on'yomi, no word entry read so, is the kanji's card: 寺 じ, 国 こく, 仏 ぶつ (never
  *       仏 ふつ "France", the quick dictionary's)
  *   R2.C3 a reading the shipped dictionary now carries from the pinned JMdict: 私 read わたくし is entry 2842390
@@ -109,6 +109,7 @@ const STARTUP = art('kantei:jp-105-actions-202609-25startup', 'kantei-jp-105-act
 const MESSAGE = art('kantei:jp-105-discourse-20260923message', 'kantei-jp-105-discourse-20260923message.json', '観光・食文化交流');
 const WIKINEWS = art('wikinews:45227', 'wikinews-45227.json', '21年の歴史');
 const KOJIKI = art('bunki-essay-n2-kojiki-myth-history', 'bunki-essay-n2-kojiki-myth-history.json', '古事記');
+const YAMANASHI = art('aozora:046605', 'aozora-046605.json', 'やまなし');
 const DIARY = art('bunki-graded-n3-nakaima-diary', 'bunki-graded-n3-nakaima-diary.json', '中今');
 const CABINET = art('jawiki:5294446', 'jawiki-5294446.json', '高市内閣');
 const BOTTLENECK = art('env:press-press_05575', 'env-press-press_05575.json', 'ナッジ実証事業');
@@ -118,7 +119,9 @@ const PAIRS = Object.freeze([
   { name: '年 ねん (令和8年: a counter)', at: STARTUP, index: 2, s: '年', r: 'ねん', seq: '2084840' },
   { name: '年 とし (twin)', at: MESSAGE, index: 39, s: '年', r: 'とし', core: true },
   { name: '月 がつ', at: WIKINEWS, index: 12, s: '月', r: 'がつ', seq: '2871532' },
-  { name: '月 つき (twin)', at: WIKINEWS, index: 107, s: '月', r: 'つき', core: true },
+  // R3 (Grok 0315): wikinews:45227 #107 was 7月 read つき, a tokenizer slip the lexicon now reads がつ; the twin is the
+  // shelf's one real moon, やまなし #1087 (あんまり月が明るく)
+  { name: '月 つき (twin)', at: YAMANASHI, index: 1087, s: '月', r: 'つき', core: true },
   { name: '時 じ', at: KOJIKI, index: 489, s: '時', r: 'じ', seq: '2020680' },
   { name: '時 とき (twin)', at: KOJIKI, index: 8, s: '時', r: 'とき', core: true },
   { name: '一日 ついたち', at: DIARY, index: 167, s: '一日', r: 'ついたち', seq: '2225040' },
@@ -141,6 +144,9 @@ const UNCONFIRMED = ['This entry’s answer cannot be confirmed yet, so it canno
 const NO_ENTRY = 'No dictionary entry for this spelling.';
 const SAVE_REASON = 'So it can’t be saved here.';
 const QUICK_MISS = 'Not in the quick dictionary. Full entry looks it up in the whole dictionary.';
+// R3 · a word the text uses as a name, or a reading it spells or talks about (悉曇（しったん）: しっ, た, ん), has no
+// dictionary meaning: its card says so, in one line of its own
+const NOT_A_WORD = ['a name in this text', 'a reading in this text'];
 // R2 · inflected words: the card reads the dictionary form the way the text reads it (Kimi 0258, Codex 0309/0323)
 const FORGETTING = art('bunki-read-n2-forgetting-curve', 'bunki-read-n2-forgetting-curve.json', '忘却曲線は');
 const SOSEKI = art('aozora:000772-1', 'aozora-000772-1.json', '私の個人主義（抄）');
@@ -202,7 +208,8 @@ const IRU_ALONE = Object.freeze({ name: 'いる (ここにいる)', at: CITY, in
 // R2.V · a sound change in a compound: the card shows the text's reading and the meaning of the entry read the plain way
 const SOUND = Object.freeze([
   { name: '一 いっ (一本)', at: BODHISENA, index: 564, s: '一', r: 'いっ', plain: 'いち' },
-  { name: '本 ぽん (一本)', at: BODHISENA, index: 565, s: '本', r: 'ぽん', plain: 'ほん' },
+  // R3 (Grok 0315): after a number 本 is the counter — the card shows the counter's sense of 本 read ほん, never "book"
+  { name: '本 ぽん (一本)', at: BODHISENA, index: 565, s: '本', r: 'ぽん', plain: 'ほん', counter: true },
   { name: '八 はっ (八本)', at: BENZAITEN, index: 410, s: '八', r: 'はっ', plain: 'はち' },
   { name: '歩 ぽ (一歩)', at: SOAI, index: 527, s: '歩', r: 'ぽ', plain: 'ほ' },
   { name: '金持ち がねもち', at: HONDA, index: 385, s: '金持ち', r: 'がねもち', plain: 'かねもち' },
@@ -1013,7 +1020,13 @@ async function r2Cases(page) {
   for (const fixture of SOUND) {
     await openArticle(page, fixture.at);
     const { settled } = await slip(page, tok(page, fixture.index));
-    const meaning = k2h(core[fixture.s]?.r) === k2h(fixture.plain) ? core[fixture.s].m[0] : readAs(fixture.s, fixture.plain)[0]?.[3];
+    // R3 · a counter after a number shows the entry's first counter sense (its first gloss), from the served shard
+    const counterGloss = () => {
+      const seq = readAs(fixture.s, fixture.plain)[0]?.[0];
+      const sense = (detailOf(String(seq))?.[3] || []).find((candidate) => (candidate[0] || []).includes('ctr'));
+      return sense ? String(sense[10][0][0]) : null;
+    };
+    const meaning = fixture.counter ? counterGloss() : k2h(core[fixture.s]?.r) === k2h(fixture.plain) ? core[fixture.s].m[0] : readAs(fixture.s, fixture.plain)[0]?.[3];
     check(`R2.V.${fixture.name}`, `${fixture.s} read ${fixture.r}: the card shows ${fixture.r} and the meaning of ${fixture.s} read ${fixture.plain} ("${meaning}"), Save live`,
       settled?.word === fixture.s && settled.reading === fixture.r && settled.gloss === meaning && settled.take && !settled.take.disabled, settled);
   }
@@ -1114,6 +1127,24 @@ const classFits = (p, entry) => (p === '動詞' ? classOf(entry).some(verbal) : 
 // written as the text writes it (〜てください: 下さい, an expression whose sense follows the te-form)
 const teExpressionFits = (tokens, index, label, stated) => afterTeForm(tokens, index)
   && readAs(label, stated).some((row) => teSensesOf(String(row[0])).some((sense) => (sense[0] || []).includes('exp')));
+// R3 (Grok 0315) · the card of an expression the text writes around the token, read whole (について, にとって, いけない,
+// 一枚岩, 方がいい, もったいない, ちがいない, 間もなく, なりに, んだ): two to four tokens holding this one, whose spelling is
+// the card's word or whose reading is its reading line. Its meaning must still be an entry's that writes that word and
+// reads it so (meaningEntry); つく's "to be attached" for について was the wrong sense this sweep's class rule pinned.
+// R3 (Grok 2029) · the must family runs to five (なく て は いけ ない), and a card names an expression by its dictionary
+// form, as a verb's card does: the run's last word may be written inflected (床につい: 床につく; ならなく: ならない), or as
+// a negative ending ぬ, ん or ず where the form says ない (しなければならん, ならぬ, ならず: なければならない)
+const NEGATIVE_ENDINGS = new Set(['ぬ', 'ん', 'ず']);
+const expressionFits = (tokens, index, label, stated) => {
+  for (let from = Math.max(0, index - 4); from <= index; from += 1) {
+    for (let to = Math.max(index, from + 1); to <= Math.min(tokens.length - 1, from + 4); to += 1) {
+      const run = tokens.slice(from, to + 1), last = run.at(-1), head = run.slice(0, -1).map((t) => t.s).join('');
+      if (run.map((t) => t.s).join('') === label || k2h(run.map((t) => t.r || t.s).join('')) === k2h(stated)) return true;
+      if ((last.b && last.b !== last.s && head + last.b === label) || (NEGATIVE_ENDINGS.has(last.s) && `${head}ない` === label)) return true;
+    }
+  }
+  return false;
+};
 
 
 // Explicit independently reviewed source proofs, never inferred from a renderer flag.
@@ -1267,6 +1298,7 @@ async function sweepCase(browser, contextOptions) {
           // as written — never the dictionary form beside the surface's reading (かえる read かえり; Codex 1352)
           out.how = card.kind === 'kanji' ? (asWritten ? 'kanji read as written' : '') : asWritten || (card.kind === 'particle' && label === token.s) ? 'as written'
             : derivedHow(token, label, stated);
+          if (!out.how && card.kind !== 'kanji' && expressionFits(tokens, index, label, stated)) out.how = 'an expression read whole';
           if (!out.how) out.issues.push(`the card reads ${label} ${card.reading || '(no reading line)'}: not from ${token.s} read ${token.r}`);
           if (gloss === QUICK_MISS) out.issues.push('says "Not in the quick dictionary" once the full dictionary has answered');
           if (card.kind === 'particle') {
@@ -1279,6 +1311,10 @@ async function sweepCase(browser, contextOptions) {
           } else if (gloss === '…') {
             out.answer = 'unanswered';
             out.issues.push('the card still says "…": it never answered');
+          } else if (NOT_A_WORD.includes(gloss)) {
+            // R3 · a name or a reading: the card is the word as written, and lends no entry's meaning
+            out.answer = 'notAWord';
+            if (label !== token.s) out.issues.push(`the card says "${gloss}" yet is not a card of ${token.s} as written`);
           } else if (SAYS_NONE(gloss) || gloss === QUICK_MISS) {
             out.answer = /^Several entries: /u.test(gloss) ? 'several' : asWritten ? 'asWritten' : 'noEntry';
             // a card naming no entry holds its Save and says why (D23's honest line)
@@ -1289,7 +1325,7 @@ async function sweepCase(browser, contextOptions) {
             out.entry = entry;
             if (!entry) out.issues.push(`"${gloss}" belongs to no entry that writes ${label} and reads it ${stated}`);
             else if (['動詞', '形容詞'].includes(token.p) && !classOf(entry).length) out.classUnknown = true;
-            else if (!classFits(token.p, entry) && !teExpressionFits(tokens, index, label, stated)) out.issues.push(`${entry.seq || `the ${entry.from === 'words' ? 'word layer' : 'quick dictionary'}'s word`} is not a ${token.p} (${classOf(entry).join(' ')})`);
+            else if (!classFits(token.p, entry) && !teExpressionFits(tokens, index, label, stated) && !expressionFits(tokens, index, label, stated)) out.issues.push(`${entry.seq || `the ${entry.from === 'words' ? 'word layer' : 'quick dictionary'}'s word`} is not a ${token.p} (${classOf(entry).join(' ')})`);
           }
           report.totals[out.answer] = (report.totals[out.answer] || 0) + 1;
           if (out.classUnknown) report.totals.classUnknown += 1;

@@ -134,7 +134,10 @@ function defineRows() {
     // G1 (2026-10-16): one line per gloss — the homograph doors are drawn from homographLines
     'homographLines',
     // G5 (2026-10-18): the slip's floor stops above the 層 mark where the two would share a column (placeFloating)
-    'layersMarkTop'];
+    'layersMarkTop',
+    // R3 (2026-10-18): the record a word's sense shapes, the slip's second line, and the marks the slip leaves (for the
+    // page, and for a sense still to come)
+    'senseRecord', 'senseMoreLine', 'SENSE_BY_ANCHOR', 'SENSE_LATER', 'senseLaterDraw', 'sensePatch', 'SLIP_NODE', 'senseMoreElement'];
   /** The authored top-level statements declaring `names`, each exactly once. */
   const liftFrom = (tree, names) => {
     const found = tree.statements.filter((statement) => {
