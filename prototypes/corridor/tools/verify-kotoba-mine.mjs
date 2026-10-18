@@ -57,8 +57,8 @@ import { openShelfTools } from './shelf-tools-support.mjs';
  *      焦点 dims the other sentences (never removes them); a new card opens 全文,
  *      a card seen before 焦点; sentence cards have no zoom;
  *   e) the grade bar is fixed to the bottom of a phone screen (a 195-character
- *      passage never hides it) and carries the rule 「答えを見て理解が深まったなら
- *      もう一度」 once, dismissible, remembered in prefs.
+ *      passage never hides it) and carries the rule 「答えを見て初めて分かったなら「もう一度」」
+ *      ("If the answer was new to you, choose Again", Hfix-1B) once, dismissible, remembered in prefs.
  *
  * Then the visual system (CARD_CONTRACT_V2 §9, brief-2026-10-04/aesthetics.md):
  *   a) no 見て覚えるコツ panel, no topic hue, no level 1–3 edge, no amber tip bar; the method
@@ -742,8 +742,8 @@ async function verifyDelivery(browser, base) {
 /* ------------------------- the back hierarchy (CARD_CONTRACT_V2 §2–§4) */
 const KANJI_RE = /[㐀-鿿々〆ヵヶ]/;
 const FOLD_ORDER = ['English', 'Translation', 'Kanji form and meaning', 'Related words', 'Other sentences for this word', 'Source'];
-const RULE_TEXT = '答えを見て理解が深まったなら もう一度';
-const UI_RULE_TEXT = 'Choose Again if seeing the answer improved your understanding.';
+const RULE_TEXT = '答えを見て初めて分かったなら「もう一度」';
+const UI_RULE_TEXT = 'If the answer was new to you, choose Again';
 /** where each sentence of a passage ends — the rule build.py and the player share */
 function sentenceEnds(ja) {
   const out = [];
@@ -835,7 +835,8 @@ function verifyBackParity() {
     const html = readFileSync(resolve(release, page), 'utf8');
     releaseParity.push({ page, css: html.includes(playerCss), mount: html.includes(mount), roomMotion: html.includes(roomMotion), fonts: (html.match(/@font-face\s*\{/gu) || []).length });
     if (!['function leechLadder', 'function deleteCard', 'function suspendedField', 'function kanjiFamily', 'function seeAlsoLine', 'function swapCard', 'restoreSuspended', 'LEECH_LAPSES = 5', 'kp-kfam', 'kp-rhint'].every((k) => html.includes(k))) bad.push(`${page}: no delete, ladder or kanji family`);
-    if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'ruleSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT, 'function revealInPlace', 'kp-kindchip', 'kp-levelchip', 'prefers-reduced-motion'].every((k) => html.includes(k)) || /kp-tapword|is-four|VISUAL_TIPS|topicColour|kp-lvchip/.test(html)) bad.push(`${page}: not the current player`);
+    // Hfix-1B: the rule and the eyebrow say it unmistakably (Kimi KH1-1, KH1-2); the old wording is gone
+    if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'ruleSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT, UI_RULE_TEXT, '印のついた語を思い出す', 'function revealInPlace', 'kp-kindchip', 'kp-levelchip', 'prefers-reduced-motion'].every((k) => html.includes(k)) || /kp-tapword|is-four|VISUAL_TIPS|topicColour|kp-lvchip|答えを見て理解が深まった|improved your understanding|'印の語を思い出す'/.test(html)) bad.push(`${page}: not the current player`);
     if (!['function settleBack', 'function clampContext', 'function fitClamps', 'function sourceFold', 'kp-f-src', 'HINT_SITTINGS = 3', 'function skipFor', 'この語の他の文'].every((k) => html.includes(k)) || /記録を消す|kp-danger|'kp-hint'/.test(html)) bad.push(`${page}: not the Phase 1 follow-ups player`);
   }
   check('parity: both separately served Kotoba release HTML outputs embed the exact built-site player CSS and mount code, room motion, and all 451 bundled faces',
@@ -1678,7 +1679,7 @@ async function verifyBack(browser, base) {
     await o.page.waitForSelector('#kp-grade-good');
     const dismissed = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').ruleSeen, zoom: document.getElementById('kp-card').dataset.zoom, enOpen: document.querySelector('#kp-card .kp-f-en').open })`);
     check(
-      'e) the grade bar is pinned to the bottom of the phone screen and shows 「答えを見て理解が深まったなら もう一度」 until dismissed; dismissing is remembered in prefs and keeps an open fold open',
+      'e) the grade bar is pinned to the bottom of the phone screen and shows its rule (Hfix-1B: "If the answer was new to you, choose Again" · 「答えを見て初めて分かったなら「もう一度」」) until dismissed; dismissing is remembered in prefs and keeps an open fold open',
       bar.position === 'fixed' && bar.bottom === bar.expectedBottom && bar.viewport === 844 && (bar.tabsBottom === null || bar.tabsBottom === 844) && bar.noOverlap && bar.hit && bar.rule?.includes(UI_RULE_TEXT) && !dismissed.rule && dismissed.seen === true && dismissed.zoom === 'focus' && dismissed.enOpen === true,
       JSON.stringify({ ...bar, dismissed }),
     );

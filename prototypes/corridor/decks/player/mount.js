@@ -408,7 +408,7 @@ const UI_EN = {
   "このカードを削除しました（設定 › 保留中のカード から戻せます）。": "Card removed. Restore it from Settings → Paused cards.",
   "別の文に替えました。前の文は保留にしました。": "Changed to another sentence. The previous sentence is paused.",
   "保留にしました（設定 › 保留中のカード から戻せます）。": "Card paused. Restore it from Settings → Paused cards.",
-  "答えを見て理解が深まったなら もう一度": "Choose Again if seeing the answer improved your understanding.",
+  "答えを見て初めて分かったなら「もう一度」": "If the answer was new to you, choose Again",
   "この文だけの英訳は未対応です（全文の英訳と文の区切りが合いません）": "A translation of this sentence is unavailable because the sentence boundaries do not match.",
   "未": "New",
   "学習中": "Learning",
@@ -1181,7 +1181,7 @@ function studyScreen() {
 /** what the front asks, in one line: the marked word (読んで思い出す) or the gap (穴埋め・4択) */
 function cardEyebrow(card, mode) {
   const ji = card.type === 'kanji';
-  const label = mode === 'read' && !ji ? t('印の語を思い出す', 'Recall the marked word') : ji ? t('空所の字を思い出す', 'Recall the missing kanji') : t('空所の語を思い出す', 'Recall the missing word');
+  const label = mode === 'read' && !ji ? t('印のついた語を思い出す', 'Recall the marked word') : ji ? t('空所の字を思い出す', 'Recall the missing kanji') : t('空所の語を思い出す', 'Recall the missing word');
   // a passage's back puts the 全文／焦点 toggle on this row in place of the instruction: the front keeps
   // the row at the toggle's height, so the reveal neither grows the card's head nor moves the passage
   const n = el('span', `kp-eyebrow${card.type ? ' kp-eyebrow-zoom' : ''}`, el('span', 'kp-eyebrow-t', label));
@@ -2200,8 +2200,9 @@ const GRADES = [
   ['good', '正解', 'Good', '良', '3'],
   ['easy', '簡単', 'Easy', '易', '4'],
 ];
-/** Under the bar, once per deck until dismissed or answered, the rule for choosing. */
-const RULE = '答えを見て理解が深まったなら もう一度';
+/** Under the bar, once per deck until dismissed or answered, the rule for choosing, said so it cannot be read backwards
+ * (Hfix-1B; Kimi KH1-2, HG-2): an answer that was new to him is もう一度. */
+const RULE = '答えを見て初めて分かったなら「もう一度」';
 function gradeBar(id) {
   // each pad shows the interval the pinned scheduler gives that answer, now (engine preview)
   const pv = preview(fsrsApi, scheduler, ctx.state, id, new Date());
