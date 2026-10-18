@@ -10167,9 +10167,10 @@ function placeFloating(card, r) {
  * release: a card reveals its focus after the release, never during the press. A press in a card moves the focus where it
  * lands, and in WebKit that is the nearest focusable box (a list menu, never its checkbox, as Safari does): revealing it
  * scrolled the card mid-press, the release fell on another line, and the list's tick was lost
- * (design-reader-shelf G5-lists-popover, WebKit). The release's own click is dispatched before the next frame. */
-let pressHeld = false;
-const revealsAfterPress = new Set();
+ * (design-reader-shelf G5-lists-popover, WebKit). The release's own click is dispatched before the next frame.
+ * var, and read through typeof: a suite that lifts revealFloatingFocus alone (test-japanese-lookup) has no press. */
+var pressHeld = false;
+var revealsAfterPress = new Set();
 function releasePress(event) {
   if (event?.isPrimary === false) return;
   pressHeld = false;
@@ -10185,7 +10186,7 @@ addEventListener('blur', () => releasePress());
 
 /** Reveal a focused control using the page for a full sentence card, or its own scroll for a small popup. */
 function revealFloatingFocus(card) {
-  if (pressHeld) { revealsAfterPress.add(card); return; }
+  if (typeof pressHeld !== 'undefined' && pressHeld) { revealsAfterPress.add(card); return; }
   const control = document.activeElement;
   if (!control || control === card || !card.contains(control)) return;
   const box = card.getBoundingClientRect(), focus = control.getBoundingClientRect();
