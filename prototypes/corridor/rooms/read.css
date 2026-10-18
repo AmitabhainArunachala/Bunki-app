@@ -695,6 +695,9 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
   animation: read-mini-rise var(--motion-room) var(--ease-enter) backwards;
 }
 @keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, 10px, 0); } }
+/* Hfix-1A · a slip the reading carries (keepFloatingBeside) passes under the room's bars as its word does: under the bar
+   and its thread (z 20, 19) and the tab bar, still over the text it stands on */
+#mini[data-carried] { z-index: 18; }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #mini {
   /* night: the band is the world's lacquer — its depth (ground 48% + black) under the word, its sheen (ground 72% +
      black) at the foot where it meets the raised lacquer paper; the word is the world's shell-white or sutra-cream

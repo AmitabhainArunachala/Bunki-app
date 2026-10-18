@@ -11596,6 +11596,8 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
   // translated by the scroll since it was taken (placeFloating records it), never seated again mid-scroll
   if (!follow && readingCarries(anchor)) {
     const scroller = anchor.closest?.('#sheet') || null;
+    // carried with the reading, it passes under the room's bars as its word does (never over the bar)
+    if (!scroller) card.dataset.carried = '';
     const offset = () => (scroller ? scroller.scrollTop : window.scrollY);
     const carry = () => {
       if (!card.isConnected || !anchor.isConnected) { (scroller || window).removeEventListener('scroll', carry); return; }
