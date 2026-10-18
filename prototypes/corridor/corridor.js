@@ -11478,13 +11478,16 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
     }, 120);
   }
   if (typeof ResizeObserver !== 'function') return;
-  let last = card.getBoundingClientRect().height;
+  // Hfix-1A · a card cut to its room keeps its box when what is inside it grows (the sense arriving after "…"), so its
+  // content's own height is watched too: the cut is chosen again on the rows as they now stand
+  let last = card.getBoundingClientRect().height, lastContent = card.scrollHeight;
   let grow = null, frame = 0;
   const seat = () => {
     if (!card.isConnected || !anchor.isConnected) { watch.disconnect(); grow?.disconnect(); return; }
-    if (Math.abs(card.getBoundingClientRect().height - last) < 1) return;
+    if (Math.abs(card.getBoundingClientRect().height - last) < 1 && Math.abs(card.scrollHeight - lastContent) < 1) return;
     placeFloating(card, anchorBox(anchor), anchor);
     last = card.getBoundingClientRect().height;
+    lastContent = card.scrollHeight;
   };
   // L · seating the card resizes the very element the ResizeObserver watches (maxHeight), and a size changed inside
   // its own callback is left undelivered in that frame (WebKit raises it as a page error: Save ▾'s menu unfolding grew
@@ -11500,6 +11503,7 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
     frame = requestAnimationFrame(() => { frame = 0; seat(); });
   });
   watch.observe(card);
+  for (const band of card.children) watch.observe(band);
 }
 
 /** A card beside its word: short cards fit above or below the fixed chrome; a tall sentence on a
