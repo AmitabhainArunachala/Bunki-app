@@ -978,7 +978,8 @@ try {
             // only what scrolls under the bars goes: the room's content, the page's, a deck's; overlays that stand on a bar
             // (the report door, the 層 mark, the slip) stay in both shots
             const under = ['#app > main', '#sheet > :not([data-sweep-bar])', '.kp-study > :not([data-sweep-bar])'];
-            style.textContent = `${under.map((q) => `${q}, ${q} *, ${q} *::before, ${q} *::after`).join(', ')} { visibility: hidden !important; transition: none !important; }`;
+            style.textContent = `${under.map((q) => `${q}, ${q} *, ${q} *::before, ${q} *::after`).join(', ')} { visibility: hidden !important; transition: none !important; }
+              [data-sweep-bar], [data-sweep-bar] *, [data-sweep-bar]::before, [data-sweep-bar]::after, [data-sweep-bar] *::before, [data-sweep-bar] *::after { visibility: visible !important; }`;
             document.head.append(style);
           });
           await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
