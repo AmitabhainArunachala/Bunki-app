@@ -11304,6 +11304,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   const ceremony = ladderVisit?.anchor === span
     ? ladderVisit.ceremony?.(mini, { word, label, token, kind, nodeFor, reading, actions, arriving }) : null;
   document.body.append(mini);
+  if (senseWaiting) { SLIP_OWN_MEANING.set(mini, String(g.m[0])); reserveSenseRoom(said, g); }
   miniAnchor = span;
   miniEntry = entryAvailable ? onEntry : null;
   miniOnClose = onClose;
@@ -13596,27 +13597,93 @@ async function ensureSense(token, door) {
 function senseRefine(token, door, slip, redraw, anchor = null) {
   if (!slip || !senseChoice(token, door)?.need) return;
   slip.dataset.sense = 'pending';
-  let touched = false;
+  let touched = false, pressing = false;
   const touch = () => { touched = true; };
-  slip.addEventListener('pointerdown', touch, { capture: true });
+  const press = () => { touched = true; pressing = true; };
+  const lift = () => { pressing = false; };
+  slip.addEventListener('pointerdown', press, { capture: true });
   slip.addEventListener('keydown', touch, { capture: true });
+  window.addEventListener('pointerup', lift, true);
+  window.addEventListener('pointercancel', lift, true);
   const after = () => {
-    slip.removeEventListener('pointerdown', touch, { capture: true });
+    // Hfix-1A · a press still down on the slip lands first (its click opens Save's menu or keeps the word); its meaning
+    // arrives after it, in place
+    if (pressing && slip.isConnected) { afterPressLands(after); return; }
+    slip.removeEventListener('pointerdown', press, { capture: true });
     slip.removeEventListener('keydown', touch, { capture: true });
+    window.removeEventListener('pointerup', lift, true);
+    window.removeEventListener('pointercancel', lift, true);
     // a sense that cannot be had (the dictionary cannot answer) is not waited for again: the word's own meaning stands
     if (senseChoice(token, door)?.need) SENSE_GAVE_UP.add(token);
     if (!slip.isConnected) return;
     const waiting = !!slip.querySelector('[data-sense-wait]');
     // a word the sense leaves as it was (no sense chosen; several entries still named) keeps its slip untouched
     if (senseDoor(token, door) === door && !waiting) { delete slip.dataset.sense; return; }
-    // a finger on a slip still waiting for its meaning: drawn once it lifts
-    if (waiting && slip.matches(':active')) { slip.addEventListener('pointerup', after, { once: true }); return; }
     // brought up to its sense in place where its word and entry stay; drawn again only where they move — and a slip still
-    // at its placeholder is never left there, touched or not
-    if ((!touched || waiting) && document.getElementById('mini') === slip && !sensePatch(slip, token, door, anchor)) redraw();
+    // at its placeholder is never left there, touched or not. Hfix-1A (the lead's item 18): a slip a press has touched
+    // (Save pressed, its menu open) is never drawn again; its meaning lands in place, the word's own where the sense
+    // belongs to another door
+    if ((!touched || waiting) && document.getElementById('mini') === slip && !sensePatch(slip, token, door, anchor)) {
+      if (touched) senseFillInPlace(slip);
+      else redraw();
+    }
     else delete slip.dataset.sense;
   };
   ensureSense(token, door).then(after, after);
+}
+/** Hfix-1A · run `then` once the press now down has landed: after its click (its own act first), on its cancel, or at
+ * most 800 ms on (a press that never clicks: a drag off its button). */
+function afterPressLands(then) {
+  let done = false;
+  const land = () => {
+    if (done) return;
+    done = true;
+    window.removeEventListener('click', land, true);
+    window.removeEventListener('pointercancel', land, true);
+    clearTimeout(timer);
+    setTimeout(then, 0);
+  };
+  window.addEventListener('click', land, true);
+  window.addEventListener('pointercancel', land, true);
+  const timer = setTimeout(land, 800);
+}
+/** Hfix-1A · a touched slip still at its placeholder, whose sense cannot be brought in place: its meaning line takes the
+ * word's own meaning where the "…" stood (the meaning that stands when a sense cannot be had), nothing else moves. */
+const SLIP_OWN_MEANING = new WeakMap();
+function senseFillInPlace(slip) {
+  const wait = slip.querySelector('.mini-gloss[data-sense-wait]');
+  const own = SLIP_OWN_MEANING.get(slip);
+  delete slip.dataset.sense;
+  if (!wait || !own) return;
+  wait.className = 'mini-gloss';
+  delete wait.dataset.senseWait;
+  wait.style.removeProperty('font-weight');
+  wait.style.removeProperty('color');
+  if (!wait.getAttribute('style')) wait.removeAttribute('style');
+  wait.textContent = own;
+  slip.removeAttribute('aria-busy');
+}
+/** Hfix-1A · a meaning still to come lands in place (the lead's item 18: Saved ✓ pressed as the sense arrived met the word
+ * band, which dove into the page, 3–4 times in 5 on a cold page): from first paint the band keeps the room the word's own
+ * meaning takes, its line and, where it has more, its quiet second line. The room is measured on hidden copies set and
+ * removed in one task, before any frame or observer reads the slip (the "…" stays the only meaning it shows); the band
+ * keeps it (min-height), so what the sense brings fills it and nothing under a finger moves. */
+function reserveSenseRoom(said, g) {
+  const wait = said?.querySelector('[data-sense-wait]');
+  if (!wait || !g?.m?.[0] || !said.isConnected) return;
+  const line = el('span', 'mini-gloss', String(g.m[0]));
+  line.lang = 'en';
+  const more = senseMoreLine(g.m);
+  const quiet = more ? senseMoreElement(more) : null;
+  const ghosts = [line, quiet].filter(Boolean);
+  for (const ghost of ghosts) { ghost.style.visibility = 'hidden'; ghost.setAttribute('aria-hidden', 'true'); }
+  const bare = said.getBoundingClientRect().height;
+  wait.style.display = 'none';
+  wait.after(...ghosts);
+  const room = said.getBoundingClientRect().height;
+  for (const ghost of ghosts) ghost.remove();
+  wait.style.removeProperty('display');
+  if (room > bare + 0.5) said.style.minHeight = `${Math.ceil(room)}px`;
 }
 
 /** A slip drawn before its word's sense was at hand, brought up to the sense in place while the slip's word and entry
@@ -13698,7 +13765,10 @@ function senseLater(token, doorOf, anchor, redraw) {
       SENSE_GAVE_UP.add(token);
       const open = japaneseLookupMini?.anchor === anchor ? japaneseLookupMini.mini : null;
       if (open) delete open.dataset.sense;
-      if (open?.querySelector('[data-sense-wait]') && document.getElementById('mini') === open) redraw();
+      if (open?.querySelector('[data-sense-wait]') && document.getElementById('mini') === open) {
+        if (open.dataset.senseTouched) senseFillInPlace(open);
+        else redraw();
+      }
       return;
     }
     entry.ready = true;
@@ -13713,9 +13783,13 @@ function senseLaterDraw(anchor) {
   if (!entry?.ready || !open) return;
   SENSE_LATER.delete(anchor);
   delete open.dataset.sense;
-  // a slip still at its placeholder is brought up to its sense, touched or not; a touched one already answered stays
+  // a slip still at its placeholder is brought up to its sense, touched or not; a touched one already answered stays.
+  // Hfix-1A: a touched one is never drawn again; its meaning lands in place
   const waiting = !!open.querySelector('[data-sense-wait]');
-  if ((!open.dataset.senseTouched || waiting) && !sensePatch(open, entry.token, entry.doorOf(), anchor)) entry.redraw();
+  if ((!open.dataset.senseTouched || waiting) && !sensePatch(open, entry.token, entry.doorOf(), anchor)) {
+    if (open.dataset.senseTouched) senseFillInPlace(open);
+    else entry.redraw();
+  }
 }
 
 /** R2 · among several entries that write a dictionary form and read it the derived way, the one that fits the token:
