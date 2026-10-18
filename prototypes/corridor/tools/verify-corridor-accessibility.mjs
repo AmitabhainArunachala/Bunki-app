@@ -635,6 +635,8 @@ async function main() {
       check('keyboard Enter first reveals reading and keeps the selected occurrence', reading.rung === 'reading' && reading.visible > 0 && !reading.stage && reading.focused, JSON.stringify(reading));
       await page.keyboard.press('Enter');
       await page.waitForSelector('#mini');
+      // R3 · the stage is read once answered (aria-busy cleared, up to 5 s), as popupProbe reads the pointer's (M-3)
+      await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 5_000 }).catch(() => {});
       keyboardPopup = await page.evaluate(`({ focus: document.activeElement?.id ?? null, gloss: document.querySelector('#mini .mini-gloss')?.textContent ?? '' })`);
       await page.keyboard.press('Escape');
     }

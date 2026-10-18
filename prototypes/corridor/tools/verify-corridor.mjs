@@ -109,14 +109,16 @@ async function openFooterSignals(page) {
   await page.waitForTimeout(150);
 }
 
-async function touchAt(page, selector, index, holdMs) {
+async function touchAt(page, selector, index, holdMs, scroll = true) {
   const target = page.locator(selector).nth(index);
   // centre, don't nudge: scrollIntoViewIfNeeded moves the minimum, which
   // can park the target at the viewport's top edge UNDER the fixed chrome
   // — the touch then lands on 戻る and navigates away instead of holding
   // the word. (Surfaced when per-article bookmarks began reopening texts
   // mid-scroll; a centred target is always clear of both chrome bands.)
-  await target.evaluate((n) => n.scrollIntoView({ block: 'center' }));
+  // A caller that has just centred the target and measures it on screen passes scroll = false (openWordStage
+  // already hands its flag on).
+  if (scroll) await target.evaluate((n) => n.scrollIntoView({ block: 'center' }));
   await page.waitForTimeout(60);
   // aim at the element's first line fragment, the way a finger aims at the
   // glyphs — a union box can drift into the line gap once a gloss hangs below
@@ -1114,14 +1116,17 @@ async function main() {
   const wordTopBefore = await page.evaluate(
     `(${glyphBox})(document.querySelectorAll('#reader .tok.content')[${tapIdx}])`,
   );
-  await tap(page, '#reader .tok.content', tapIdx);
+  // F · the reading a first press shows is a native <rt> inside the word's own box, so centring the word again before
+  // each press would scroll the page by half the reading's height (5 px at 390): the word is centred once, above, and
+  // both presses land where it stands, so a move measured here is the app's
+  await touchAt(page, '#reader .tok.content', tapIdx, 0, false);
   await page.waitForTimeout(120);
   const readingOnly = await page.locator('#reader .tok.content').nth(tapIdx).evaluate(node => ({
     rung: node.dataset.ladderRung, readings: node.querySelectorAll('rt:not(.hidden-rt)').length,
     stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), english: !!node.querySelector('.tok-en'),
   }));
   check('grammar · first activation reveals only the reading', readingOnly.rung === 'reading' && readingOnly.readings > 0 && !readingOnly.stage && !readingOnly.page && !readingOnly.english, JSON.stringify(readingOnly));
-  await tap(page, '#reader .tok.content', tapIdx);
+  await touchAt(page, '#reader .tok.content', tapIdx, 0, false);
   await page.waitForSelector('#mini .mini-word');
   const afterTap = await page.evaluate(`(() => {
     const tok = document.querySelectorAll('#reader .tok.content')[${tapIdx}];

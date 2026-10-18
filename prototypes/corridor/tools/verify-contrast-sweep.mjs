@@ -384,6 +384,11 @@ const IN_PAGE = () => {
       if (!content || !el || el === probe || el.closest('script, style, noscript, template, title')) continue;
       const cs = getComputedStyle(el);
       if (cs.visibility !== 'visible' || cs.display === 'none') continue;
+      // a closed <details> paints nothing past its summary, yet WebKit still hands its text boxes, and a probe that lands
+      // on the page's own ground counts as the run's family: the closed "More examples" were read against whatever line
+      // lay where they would stand (site-6: the encounters' rule under a 総理 nobody can see)
+      const shut = el.closest('details:not([open])');
+      if (shut && !shut.querySelector(':scope > summary')?.contains(el)) continue;
       range.selectNodeContents(n);
       let rects = [...range.getClientRects()].map((q) => ({ left: q.left, top: q.top, right: q.right, bottom: q.bottom }));
       // clip by every scrolling or clipping ancestor
@@ -533,7 +538,9 @@ const STEPS = {
     await page.evaluate(() => {
       const ex = document.querySelector('#sheet .example'), s = document.getElementById('sheet');
       if (!ex || !s) return;
-      const bar = s.querySelector(':scope > .sheet-bar')?.getBoundingClientRect().bottom || 0;
+      // G6 · the page's frame is its bar and, under it, the scale thread: the examples are brought to the frame's foot,
+      // so none of them waits under the thread
+      const bar = Math.max(...[':scope > .sheet-bar', ':scope > .scale-thread'].map((sel) => s.querySelector(sel)?.getBoundingClientRect().bottom || 0));
       const head = ex.previousElementSibling?.classList.contains('eyebrow') ? ex.previousElementSibling : ex;
       s.scrollTop += head.getBoundingClientRect().top - bar - 8;
     });
@@ -792,6 +799,9 @@ try {
         try {
           localStorage.setItem('kairo-theme', id);
           localStorage.setItem('bunki-cloze:prefs:v3:n1', JSON.stringify({ look: 'world', zoom: 'full', sittings: 3, ruleSeen: true }));
+          // G3's first-use demonstration of a word's stage is a fresh device's alone (its own verifier walks it): a settled
+          // reader is read without it, as every other G3-era walk reads it (at site-6 the reader was read mid-demonstration)
+          localStorage.setItem('kairo-word-ladder-demo-v1', '1');
         } catch { /* storage refused: the theme check below fails the walk */ }
       }, world);
       await context.route('**/*', (route) => (new URL(route.request().url()).origin === origin ? route.continue() : route.abort()));
