@@ -532,16 +532,17 @@ async function ordinary(fixture) {
   await openSource(fixture);
   const sourceBefore = await readAppRecordSnapshot(page), tapStarted = Date.now();
   await page.locator(`#reader .tok[data-index="${source.index}"]`).click();
-  // G2 · the tap that shows the meaning is also his encounter with the word as it reads here: it writes the encounter
-  // ledger (met) beside the observation. Exactly one new identity, the core word read as it reads here; no other root.
+  // G2 · the tap that shows the meaning is also his encounter with the word as it reads here and a help he asked of this
+  // article: it writes the encounter ledger (met) and the help signal (readHelp) beside the observation. Exactly the
+  // word's own identity in each; no other root.
   const met = JSON.stringify([1, 'word', source.token.b, 'core', null, source.token.r]);
-  await waitForAppRecord(page, record => record.obslog.length === sourceBefore.record.obslog.length + 1 && !!record.met?.entries?.[met],
-    { description: 'the tap\'s observation and its encounter' });
+  await waitForAppRecord(page, record => record.obslog.length === sourceBefore.record.obslog.length + 1 && !!record.met?.entries?.[met]
+    && !!record.readHelp?.articles?.[source.id], { description: 'the tap\'s observation, its encounter and its help' });
   const tapped = await readAppRecordSnapshot(page), tap = tapped.record.obslog.at(-1);
   assert(tap[0] >= tapStarted && tap[0] <= Date.now());
   // one tap shows the meaning (reader lane 2026-10-02): the observation's depth is 2, gloss shown
   assert.deepEqual(tap.slice(1), ['tap', `word:${source.token.b}`, 2, source.id]);
-  assert.deepEqual(tapped.record.obslog, [...sourceBefore.record.obslog, tap]); unchangedExcept(sourceBefore, tapped, ['obslog', 'met']);
+  assert.deepEqual(tapped.record.obslog, [...sourceBefore.record.obslog, tap]); unchangedExcept(sourceBefore, tapped, ['obslog', 'met', 'readHelp']);
   assert.deepEqual(Object.keys(tapped.record.met.entries).filter(key => !Object.hasOwn(sourceBefore.record.met?.entries || {}, key)), [met],
     'The tap adds exactly its own encounter: the core word, read as it reads here');
   for (const [key, entry] of Object.entries(sourceBefore.record.met?.entries || {}))
@@ -549,6 +550,18 @@ async function ordinary(fixture) {
   const today = tapped.record.met.entries[met];
   assert(Number.isSafeInteger(today.first) && today.last === today.first && today.days === 1,
     `A first encounter is one day, first = last: ${JSON.stringify(today)}`);
+  const helpBefore = sourceBefore.record.readHelp, help = tapped.record.readHelp;
+  assert.equal(help?.version, 1, 'The help signal is the versioned root');
+  assert.deepEqual(Object.keys(help.articles).filter(id => !Object.hasOwn(helpBefore?.articles || {}, id)), [source.id],
+    'The tap adds exactly its own article to the help signal');
+  for (const [id, row] of Object.entries(helpBefore?.articles || {})) assert.deepEqual(help.articles[id], row, 'Every other article\'s help is unchanged');
+  const asked = help.articles[source.id];
+  assert.deepEqual(asked.helped, [met], 'The help names exactly the word he asked about, by the same identity');
+  assert(asked.level === source.level && Number.isSafeInteger(asked.chars) && asked.chars > 0 && typeof asked.src === 'string' && asked.src.length > 0,
+    `The article's help carries its level, its size and its source: ${JSON.stringify(asked)}`);
+  if (!helpBefore) assert(Number.isSafeInteger(help.since) && help.since >= tapStarted && help.since <= Date.now(),
+    `A new help signal starts at the tap: ${help.since}`);
+  else assert.equal(help.since, helpBefore.since, 'An existing help signal keeps its start');
   // the tap's popup floats over the page: a second tap on the same word puts it away (and records nothing)
   await page.locator(`#reader .tok[data-index="${source.index}"]`).click(); await page.waitForFunction(() => !document.getElementById('mini'));
   await page.locator('#reader-place-save').click();
