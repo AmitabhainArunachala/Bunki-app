@@ -141,6 +141,19 @@ async function openArticle(page, story) {
   await delay(800);
 }
 const tok = (page, index) => page.locator(`#reader .tok[data-index="${index}"]`).first();
+/** G3 · an idle word is no focus stop: the keyboard selects it through its paragraph's controller (the paragraph's one
+ * Tab stop, Home, then the arrows), as verify-reader-doors does. */
+async function selectWord(page, locator) {
+  const position = await locator.evaluate((node) => {
+    const block = node.closest('[data-prose-roving]');
+    return { block: [...document.querySelectorAll('#reader [data-prose-roving]')].indexOf(block),
+      word: block ? [...block.querySelectorAll('.tok[data-para]')].indexOf(node) : -1 };
+  });
+  if (position.block < 0 || position.word < 0) throw new Error('the word has no place in its paragraph\'s keyboard order');
+  await page.locator('#reader [data-prose-roving]').nth(position.block).focus();
+  await page.keyboard.press('Home');
+  for (let step = 0; step < position.word; step += 1) await page.keyboard.press('ArrowRight');
+}
 /** A word's stage (its card): one tap here; two where the ladder raises the reading first (G3's tap 1), the second only
  * once that rung is observed. */
 async function stage(page, locator) {
@@ -410,7 +423,7 @@ try {
       const word = tok(page, KAWAGUCHI.index);
       await word.scrollIntoViewIfNeeded();
       const text = await word.evaluate((node) => node.textContent);
-      await word.focus();
+      await selectWord(page, word);
       await page.keyboard.press('Control+Enter');
       await page.locator('#sheet').waitFor();
       await delay(1800);

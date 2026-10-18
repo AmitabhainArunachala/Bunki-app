@@ -686,7 +686,9 @@ const CASES = {
         `wav ${wav?.seconds?.toFixed(2)} s · take ${(s.wav?.tookMs / 1000).toFixed(2)} s · input ${s.wav?.inputRate} Hz`);
       const lines = s.session.lines;
       check('the page shows what Kore heard and her reply', lines.at(-2)?.who === 'me' && lines.at(-1)?.who === 'kore' && lines.at(-2).text.includes('名付けた'));
-      const doors = await page.evaluate(() => [...document.querySelectorAll('.speak-line')].slice(-2).map((li) => li.querySelectorAll('.speak-text button').length));
+      // G3 · a line's words are spans in a roving paragraph (lookup words and sentence words), no longer buttons: a door is
+      // the word, whatever its tag
+      const doors = await page.evaluate(() => [...document.querySelectorAll('.speak-line')].slice(-2).map((li) => li.querySelectorAll('.speak-text :is(button, .japanese-lookup-word, .sentence-tok)').length));
       check('both lines are doors', doors.length === 2 && doors.every((x) => x > 2), JSON.stringify(doors));
       // sampled while her voice sounds: every sounding moment has the one owner
       const samples = [];
@@ -745,7 +747,7 @@ const CASES = {
           while (walker.nextNode()) {
             const node = walker.currentNode;
             // named exemption (G3's ruling): the reading in parentheses after a word annotates that word
-            if (node.parentElement.closest('button, .visually-hidden, .speak-shu-reading, .speak-row-reading')) continue;
+            if (node.parentElement.closest('button, .japanese-lookup-word, .sentence-tok, .visually-hidden, .speak-shu-reading, .speak-row-reading')) continue;
             if (/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(node.textContent)) out.push(node.textContent);
           }
         }
@@ -754,7 +756,7 @@ const CASES = {
       check('every Japanese word in every line is a door', bare.length === 0, JSON.stringify(bare));
       const before = await T(page).record();
       // a word in Kore's line: the slip opens, the look-up counts under the conversation, the top bar names it
-      const koreWord = page.locator('.speak-line[data-who="kore"] .speak-text button.sentence-tok').first();
+      const koreWord = page.locator('.speak-line[data-who="kore"] .speak-text .sentence-tok').first();
       const b = await koreWord.getAttribute('data-speak-b');
       // G3 · a word climbs its ladder: when readings show on touch and the word's own is hidden, the first tap raises its
       // reading in place and the next opens the slip
@@ -1073,7 +1075,7 @@ const CASES = {
       check('past conversations open', (await page.locator('.speak-past').count()) >= 1);
       await page.locator('.speak-past').first().click();
       await until(page, "s.layer === 'past-session'", 5000);
-      check('a past conversation\'s words are doors', (await page.locator('.speak-page-past-session .speak-text button').count()) >= 3);
+      check('a past conversation\'s words are doors', (await page.locator('.speak-page-past-session .speak-text :is(button, .japanese-lookup-word, .sentence-tok)').count()) >= 3);
       await page.evaluate(() => window.__SPEAK_TEST__.back());
       await page.evaluate(() => window.__SPEAK_TEST__.back());
       await page.locator('[data-foot="shadow"]').click();
@@ -1308,7 +1310,10 @@ const CASES = {
       await page.waitForTimeout(900);
       await page.keyboard.press('Space');
       await until(page, "s.session.lines.length >= 3", 20000);
-      const stops = await page.evaluate(() => [...document.querySelectorAll('.speak-line .speak-text')].map((p) => [...p.querySelectorAll('button')].filter((b) => b.tabIndex === 0).length));
+      // G3 · a roving paragraph is its own one Tab stop (data-prose-roving, tabIndex 0) and its words are none: count every
+      // stop the line's text holds, itself included
+      const stops = await page.evaluate(() => [...document.querySelectorAll('.speak-line .speak-text')].map((p) => [p, ...p.querySelectorAll('*')]
+        .filter((n) => n.matches('[data-prose-roving], button, .japanese-lookup-word, .sentence-tok') && n.tabIndex === 0).length));
       check('lines are prose: one focus stop per paragraph', stops.length >= 3 && stops.every((n) => n === 1), JSON.stringify(stops));
       const last = (await T(page).snap()).session.lines.filter((l) => l.who !== 'me').at(-1).text;
       await page.waitForTimeout(200);
@@ -1699,7 +1704,7 @@ async function shots(browser) {
     await talk(page, '003', 2200);
     await settled(page);
     await page.waitForTimeout(800);
-    const word = page.locator('.speak-line[data-who="kore"] .speak-text button.sentence-tok').nth(2);
+    const word = page.locator('.speak-line[data-who="kore"] .speak-text .sentence-tok').nth(2);
     await word.click().catch(() => {});
     await page.waitForTimeout(1600);
     await page.keyboard.press('Escape').catch(() => {});

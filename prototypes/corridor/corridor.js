@@ -27549,8 +27549,9 @@ function speakSentence(container, tokens, { contextId }) {
     const f = Array.isArray(raw.f) && raw.f.length ? raw.f : [{ t: s, ...(r && r !== s ? { r } : {}) }];
     renderSentenceTokens(container, [{ s, b, r, c: true, f }], { contextId });
     const door = container.lastElementChild;
-    // the whole token rides the door (surface, base, the surface's reading): an inflected form keeps what R needs
-    if (door?.matches('button.sentence-tok')) { door.dataset.speakS = s; door.dataset.speakB = b; door.dataset.speakR = r; }
+    // the whole token rides the door (surface, base, the surface's reading): an inflected form keeps what R needs. G3 · a
+    // sentence's word is a span in a roving paragraph now, not a button: the door is still the word
+    if (door?.matches('.sentence-tok')) { door.dataset.speakS = s; door.dataset.speakB = b; door.dataset.speakR = r; }
   }
 }
 /** The word last touched in any line, as the top bar's Save keeps it: its reading truth from R (readingToken). */

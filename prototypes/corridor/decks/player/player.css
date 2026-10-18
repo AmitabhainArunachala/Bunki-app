@@ -376,7 +376,7 @@
    * proscenium (--color-lacquer), and the card is the lit paper on it; its text is the lacquer's ink.
    * --kp-shu is the 朱 of the marked word's brackets, the rail and the slash on もう一度 (never text):
    * the world's seal red. Measured: contrast-kotoba stage row */
-  --kp-stage: var(--color-lacquer, #141a28); --kp-stage-ink: var(--color-lacquer-ink, #e9e2d2); --kp-stage-mute: color-mix(in srgb, var(--color-lacquer-ink) 76%, var(--world-ground)); --kp-shu: var(--color-seal, #c4401f);
+  --kp-stage: var(--color-lacquer, #141a28); --kp-stage-ink: var(--color-lacquer-ink, #e9e2d2); --kp-stage-mute: color-mix(in srgb, var(--color-lacquer-ink, #e9e2d2) 76%, var(--world-ground, #141a28)); --kp-shu: var(--color-seal, #c4401f);
   /* the dock (the ground under 答えを見る and the grade pads, and the page below the last card) is the
    * stage; the whole study screen is the stage, lit softly from the top. Measured: contrast-kotoba dock row */
   --kp-dock: var(--kp-stage); --kp-dock-ink: var(--kp-stage-ink); --kp-dock-mute: var(--kp-stage-mute);
