@@ -429,11 +429,16 @@ try {
       await delay(1800);
       const shown = await page.evaluate(() => ({ head: document.querySelector('#sheet .headword')?.textContent?.trim() || '',
         reading: document.querySelector('#sheet .reading')?.textContent?.trim() || '', tutor: !!document.querySelector('#sheet .ai-tutor'),
+        glyph: document.querySelector('#sheet .hero-glyph')?.textContent?.trim() || '',
         answer: [...document.querySelectorAll('#sheet .ai-answer, #sheet .ai-examples')].map((node) => node.textContent).join(' | '),
         page: document.getElementById('sheet')?.innerText || '' }));
       const after = await readAppRecordSnapshot(page);
-      check('T.archive', '訳 read やく (opened before the full dictionary answers): neither the spelling-keyed わけ reply nor the examples sentinel fills its page; the rows stay as seeded',
-        /訳/u.test(text) && shown.head.startsWith('訳') && shown.reading === 'やく' && shown.tutor && !/STALE_/u.test(shown.page) &&
+      // G3 · Ctrl+Enter is the ladder's own page, and the page of 訳 read やく is the kanji's: no entry is read やく (R2,
+      // reading-truth A10: "the second tap's page is the kanji page of 訳"). Before G3 the keyboard alone opened a word page
+      // for it. The page must carry neither the spelling-keyed わけ reply nor the examples sentinel, and the rows stay as seeded
+      const ownPage = shown.glyph === '訳' && !shown.tutor;
+      check('T.archive', '訳 read やく (opened before the full dictionary answers) opens 訳\'s kanji page: neither the spelling-keyed わけ reply nor the examples sentinel fills it; the rows stay as seeded',
+        /訳/u.test(text) && ownPage && !/STALE_/u.test(shown.page) &&
         canonical(after.archive.turns.filter((turn) => String(turn.content).includes('STALE_'))) === canonical(sentinels), shown);
     });
     await browser.close();

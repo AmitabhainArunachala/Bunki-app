@@ -27650,8 +27650,10 @@ function speakHost() {
     level: () => null,
     sentence: speakSentence,
     // his own lines: every word a door that opens the slip and counts nothing (it is his own word)
-    words: (container, text) => {
-      const wrap = appendJapaneseLookup(container, text, { block: container, kinsoku: true });
+    // G3 · a line is one roving paragraph: words set into a piece of it (a correction's right or wrong form, built before it
+    // is placed) name that paragraph as their block, so the line keeps one focus stop
+    words: (container, text, block = container) => {
+      const wrap = appendJapaneseLookup(container, text, { block, kinsoku: true });
       for (const word of wrap.querySelectorAll('.japanese-lookup-word')) word.dataset.speakS = word.dataset.speakB = word.dataset.lookupText;
       return wrap;
     },

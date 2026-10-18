@@ -1318,10 +1318,15 @@ const CASES = {
       const last = (await T(page).snap()).session.lines.filter((l) => l.who !== 'me').at(-1).text;
       await page.waitForTimeout(200);
       check('a new Kore line is announced politely', (await page.locator('.speak-announce').getAttribute('aria-live')) === 'polite' && (await page.locator('.speak-announce').textContent()) === last);
+      // G3 · the line's one stop is its roving paragraph: Home selects its first word, and an arrow moves to the next
       const roving = await page.evaluate(() => {
         const p = document.querySelector('.speak-line[data-who="kore"] .speak-text');
-        const first = p.querySelector('button[tabindex="0"]');
-        first.focus();
+        const stop = p?.matches('[data-prose-roving]') ? p : p?.querySelector('[data-prose-roving]');
+        if (!stop) return false;
+        stop.focus();
+        stop.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+        const first = document.activeElement;
+        if (!first || first === stop || !p.contains(first)) return false;
         first.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
         return document.activeElement !== first && p.contains(document.activeElement);
       });

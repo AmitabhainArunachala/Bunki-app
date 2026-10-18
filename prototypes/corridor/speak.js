@@ -1038,10 +1038,11 @@ export function createSpeakRoom(host) {
       const shu = el('span', 'speak-shu');
       const right = el('span', 'speak-shu-right');
       right.lang = 'ja';
-      host.words(right, mark.c.right);
+      // G3 · the correction's words belong to the line's one roving paragraph (container), not a stop of their own
+      host.words(right, mark.c.right, container);
       if (mark.c.rightReading && mark.c.rightReading !== mark.c.right) right.append(el('span', 'speak-shu-reading', `（${mark.c.rightReading}）`));
       const wrong = el('span', 'speak-shu-wrong');
-      host.words(wrong, text.slice(mark.at, mark.at + mark.len));
+      host.words(wrong, text.slice(mark.at, mark.at + mark.len), container);
       shu.append(right, wrong);
       shu.setAttribute('aria-label', t(`直し：${mark.c.right}`, `Correction: ${mark.c.right}`));
       container.append(shu);

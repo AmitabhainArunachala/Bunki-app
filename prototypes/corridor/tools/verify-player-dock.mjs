@@ -112,7 +112,9 @@ for(const lang of ['bi','ja']) for(const bottom of [0,34]){
 }
 finally{await browser.close();await host.close();writeFileSync(OUT+'/proof.json',JSON.stringify(results,null,2)+'\n');}
 
-const opaque=colour=>/^rgb\(/u.test(colour)||/^rgba\([^,]+,[^,]+,[^,]+,\s*1\)$/u.test(colour);
+// a colour mixed from the world's pigments (color-mix) computes to CSS Color 4's color(srgb r g b): opaque unless it carries
+// an alpha under 1, as rgb() is
+const opaque=colour=>/^rgb\(/u.test(colour)||/^rgba\([^,]+,[^,]+,[^,]+,\s*1\)$/u.test(colour)||/^color\(srgb(?: [-\d.e]+){3}(?: \/ 1)?\)$/u.test(colour);
 const failures=[];
 const check=(name,passed,detail)=>{if(!passed)failures.push({name,detail});};
 check('all long front native point cases executed',results.undo.length===80,results.undo.length);

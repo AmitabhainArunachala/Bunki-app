@@ -340,7 +340,7 @@ const tokenState = (page, fixture) => page.evaluate((index) => {
     .map((rt) => rt.textContent).join(''), lines: lines.length, line: lines[0]?.outerHTML ?? null,
     // a summoned reading lights the word (lit) and the chrome's Save stands for it (tok-current): the
     // original text has neither
-    lit: node.classList.contains('lit'), current: node.classList.contains('tok-current'),
+    lit: node.classList.contains('lit'), current: node.classList.contains('tok-current'), rung: node.dataset.ladderRung || null,
     // R4 (2026-09-30): the name is the word, the rest is its description — read together, in order. G3 · a word in a
     // roving paragraph speaks only when the keyboard selects it (role group: its aria-label and aria-describedby); idle
     // (role presentation) it carries neither, and its name and description wait in data-prose-label and
@@ -1036,8 +1036,10 @@ try {
         JSON.stringify({ stageReturned, back }), { id: `G2.${lang}.original` });
       await tap(page, IU);
       const again = await miniState(page), lit = await tokenState(page, IU);
-      check(`G2 ${lang}: one more tap begins the cycle again: the popup with the word lit, and no sheet`,
-        again?.word === IU.token.b && lit?.lit && lit.lines === 0 && await page.locator('#sheet').count() === 0, JSON.stringify({ again, lit }), { id: `G2.${lang}.again` });
+      // G3 · the word the cycle begins on is marked by its ladder rung: いう is read as written, so its stage (no raised
+      // reading lights it)
+      check(`G2 ${lang}: one more tap begins the cycle again: the popup with the word at its stage, and no sheet`,
+        again?.word === IU.token.b && lit?.rung === 'stage' && lit.lines === 0 && await page.locator('#sheet').count() === 0, JSON.stringify({ again, lit }), { id: `G2.${lang}.again` });
       const word = page.locator(`#reader .tok[data-index="${IU.index}"]`);
       await selectWord(page, IU);
       await page.keyboard.press('Escape');
