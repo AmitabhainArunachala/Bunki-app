@@ -152,9 +152,13 @@ test('measured deterministic partition covers every original and supplemental ga
   // excerpt-narration-contract. The two suites already existed; neither was ever run by CI,
   // which is how a silent build stayed green for seventeen days. None was removed. 139 with
   // narration-media, the first gate to play a shipped clip through a real media element.
-  assert.equal(f.plan.batteryNames.length, 139);
-  // 157 since 1.2.0 added the places-layout gate (the layout under test), 161 with V's four
-  assert.equal(f.plan.requiredNames.length, 161);
+  // 145 with the one-hand integration (FINDINGS M-2): F's type-ruby and continuity, R3's
+  // sense-truth and the whole word grammar (G1–G6) with its controls, each of the last two
+  // one gate per engine.
+  assert.equal(f.plan.batteryNames.length, 145);
+  // 157 since 1.2.0 added the places-layout gate (the layout under test), 161 with V's four,
+  // 167 with the one-hand integration's six
+  assert.equal(f.plan.requiredNames.length, 167);
   assert.equal(f.plan.shards.filter((s) => s.id.startsWith('balanced-')).length, 10);
   assert.deepEqual(createPlan({ identity }), f.plan);
   for (const s of f.plan.shards.filter((s) => s.kind === 'fast')) assert(s.predictedSeconds <= 480);
@@ -180,7 +184,7 @@ test('complete successful evidence promotes full proof and unified summary', () 
   const f = fixture();
   const result = aggregate(f);
   assert.equal(result.kind, 'bunki-full-battery');
-  assert.equal(result.gates.length, 161);
+  assert.equal(result.gates.length, 167);
   assert.match(summary(result), /Slowest ten/);
 });
 const mutations = {

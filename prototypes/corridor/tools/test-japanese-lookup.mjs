@@ -34,6 +34,8 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   // no door (phoneticAnnotationRanges); a prose block is one roving stop (installProseWordRoving)
   'activateWordLadder', 'clearWordLadder', 'ladderVisit', 'ladderReturning', 'readingSlipSerial',
   'phoneticAnnotationRanges', 'phoneticAnnotationCandidates', 'installProseWordRoving', 'proseWordRovers',
+  // G5 (2026-10-18): the slip's floor stops above the 層 mark where the two would share a column (placeFloating)
+  'layersMarkTop',
   // R3 (2026-10-18): the sense a word's text uses — the lookup's entry before its sense, the record its sense shapes, the
   // slip's second line, and the marks the slip leaves (for the page, and for a sense still to come)
   'japaneseLookupEntryRecord', 'senseRecord', 'senseIsQuick', 'senseMoreLine', 'SENSE_BY_ANCHOR', 'SENSE_LATER', 'senseLaterDraw', 'sensePatch', 'SLIP_NODE', 'senseMoreElement'];
@@ -127,6 +129,9 @@ function app({ withIndex = true, withKanji = false } = {}) {
     document, NodeFilter: { SHOW_TEXT: 4 }, Intl, window: { innerWidth: 400 }, queueMicrotask,
     // G3's ladder touches device Back's sentinel, the top bar's keep and the room's re-render, and wires the word menu's
     // gestures: those are the browser's and other rooms' (their own verifiers), stubbed at their boundary here
+    // G4 · the stage's ink ceremony (dressStage: depth, the writing, 読 · 意) is the browser's; verify-word-grammar's G4
+    // part proves it. Here a stage is dressed with none, as a stage outside the ladder is
+    dressStage: () => null,
     syncWalkSentinel: () => {}, syncChromeKeep: () => {}, refreshLadderRoom: () => {}, wireReaderWordMenu: () => {},
     // the page's match cut is the browser's motion (Element.animate, reduced motion): none here
     pageCutAllowed: () => false,
@@ -137,6 +142,9 @@ function app({ withIndex = true, withKanji = false } = {}) {
     sampleTransition: () => {}, sampleWhere: () => '', schedulePagePrebuild: () => {},
     ensureDictionaryRowsForForm: async () => [], wordCaptureState: () => 'take',
     readerCaptureReasonText: () => 'No confirmed meaning to save', readerGlossMissText: () => 'No confirmed meaning',
+    // G5 · the slip's Save is the one keep (saveWord, add-only); Save ▾'s Review row still toggles (toggleWordSave): either
+    // is the save boundary, and receives the exact node
+    saveWord: node => chosen.push(copy(node)),
     toggleWordSave: node => chosen.push(copy(node)), go: node => opened.push(copy(node)),
     // Save ▾ opens its menu once the word is saved (1.3.0): the menu is observed at its boundary
     openVocabularyListPopover: (node, label, invoker, options) => menus.push({ node: copy(node), label, invoker: invoker?.id, menu: !!options?.menu }),
