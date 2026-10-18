@@ -26,7 +26,15 @@ export async function setUpDeviceTutor(page) {
   await page.evaluate(writeDeviceTutor, deviceTutorArgs());
 }
 
-/** Sets a tutor up for every page of a context, before any script of the app runs. */
+/** Sets a tutor up for a context's pages, before any script of the app runs, wherever no provider is stored yet: a provider
+ * a check configures later (its own synthetic one, through Settings › Tutor connection) is never written over on reload. */
+export function writeDeviceTutorIfNone([store, record]) {
+  if (localStorage.getItem(store) === null) localStorage.setItem(store, JSON.stringify(record));
+}
 export async function setUpDeviceTutorForContext(context) {
-  await context.addInitScript(writeDeviceTutor, deviceTutorArgs());
+  await context.addInitScript(writeDeviceTutorIfNone, deviceTutorArgs());
+}
+/** The same on this page now, leaving a provider already stored as it is. */
+export async function setUpDeviceTutorIfNone(page) {
+  await page.evaluate(writeDeviceTutorIfNone, deviceTutorArgs());
 }

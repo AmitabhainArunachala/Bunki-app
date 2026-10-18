@@ -13,6 +13,7 @@ import process from 'node:process';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -252,6 +253,8 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(topic.sourceId, excerpt.captureId); assert.equal(topic.quote, '  町の図書館で本を読んだ。');
     await page.locator('#sheet .learning-source summary').click(); await page.locator('#learning-source-return').click();
     await page.locator('#source-context-return').waitFor(); assert.equal(await page.locator('#listening-excerpt-original').getAttribute('href'), 'https://www.youtube.com/watch?v=R23fixture1&t=12s');
+    // precondition now (Hfix-1B, item 11): a tutor set up, so the word's page offers Ask the tutor (drawn on Back)
+    await setUpDeviceTutor(page);
     await page.locator('#source-reader-back').click(); await page.locator('#sheet .teacher-discuss').click();
     await page.locator('#chat-input').fill(QUESTION); await waitForAppRecord(page, (record) => record.teacherDrafts?.entries.some((entry) => entry.text === QUESTION && !entry.consumed));
     assert.equal(await page.locator('#chat-send').isDisabled(), true);

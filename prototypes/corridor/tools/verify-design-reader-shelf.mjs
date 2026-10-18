@@ -71,7 +71,8 @@
  *                         郊外 seals it: exactly one 郊外 card carrying its sentence (the capture path's ctx),
  *                         and the strip opens beside the word (never over it) with a polite status that says
  *                         Saved and the word's acts in plain full verbs: 全項目 · Full entry · Save the
- *                         sentence · Copy · Ask the tutor about the word · Remove. A second right-click is the
+ *                         sentence · Copy · Remove (Ask the tutor about the word only with a tutor set up:
+ *                         Hfix-1B). A second right-click is the
  *                         same strip and still one card. A right-click off the words keeps the browser's own
  *                         menu. Control: 3166ded3, which had no word menu; 92e5492f, whose menu saved nothing
  *                         until its Save was chosen.
@@ -102,7 +103,7 @@
  *   G6 sentence door    — (John #18; round 4 T5) no sentence bar shows when a word is chosen (no sentence
  *                         action shows outside the popup); the popup's last band is one named door,
  *                         "Study this sentence", showing the sentence's start; it opens the sentence in
- *                         the card, the word marked, with "Ask the tutor" and "Practice it" and a quiet
+ *                         the card, the word marked, with "Ask the tutor" (a tutor set up) and "Practice it" and a quiet
  *                         "Save the sentence", which keeps that sentence on the tutor page without making
  *                         it the active one; and Ask the tutor opens the tutor with that sentence as its
  *                         active context. Control: 3166ded3, whose bar floated in on the first tap.
@@ -164,6 +165,7 @@ import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
+import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
@@ -1019,7 +1021,8 @@ try {
           status: status && { text: status.textContent.trim(), role: status.getAttribute('role') }, top: box.top, bottom: box.bottom, left: box.left, right: box.right };
       });
       // the word's one way out stands beside Saved ✓ in the first row (lead's ruling, 2026-10-18); the acts follow under the hairline
-      assert.deepEqual(strip.items, ['Remove', '全項目 · Full entry', 'Save the sentence', 'Copy', 'Ask the tutor about the word'], `the strip: ${JSON.stringify(strip.items)}`);
+      // Hfix-1B (item 11): no tutor is set up here, so the strip has no "Ask the tutor about the word"
+      assert.deepEqual(strip.items, ['Remove', '全項目 · Full entry', 'Save the sentence', 'Copy'], `the strip: ${JSON.stringify(strip.items)}`);
       assert.equal(await page.locator('#seal-strip .seal-strip-lists > #seal-strip-status + [data-strip-action="remove"]').count(), 1, 'Remove does not stand beside Saved ✓');
       const overWord = !(strip.right <= wordBox.left || strip.left >= wordBox.right || strip.bottom <= wordBox.top || strip.top >= wordBox.bottom);
       assert(strip.role === 'dialog' && !overWord, `the strip is not beside its word: ${JSON.stringify({ strip, wordBox })}`);
@@ -1233,6 +1236,7 @@ try {
 
     await run('G6-sentence-row', DESK, async (page) => {
       await openArticle(page, ARTICLE);
+      await setUpDeviceTutor(page); // precondition now (Hfix-1B, item 11): a tutor set up, so the pane offers Ask the tutor
       await tapToken(page, SUBURB);
       const row = await page.evaluate(() => ({
         bar: [...document.querySelectorAll('.teacher-door, #reader-context-save, #reader-teacher, #reader-sentence-practice')]
@@ -1330,6 +1334,7 @@ try {
     for (const [label, viewport] of [['390', PHONE], ['320', NARROW]]) {
       await run(`G6-sentence-pane-seat-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
+        await setUpDeviceTutor(page); // precondition now (Hfix-1B, item 11): a tutor set up, so Tab meets Ask the tutor first
         await tapToken(page, SUBURB);
         const box = () => page.locator('#mini').evaluate((node) => {
           const r = node.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, height: r.height,

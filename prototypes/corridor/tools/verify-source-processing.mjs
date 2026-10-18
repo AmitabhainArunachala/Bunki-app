@@ -13,6 +13,7 @@ import process from 'node:process';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -319,6 +320,9 @@ for (const engine of engines) for (const width of sizes) {
     await page.locator('#source-capture-url').fill(ENCOUNTER_URL); await page.locator('#source-capture-text').fill(TEXT);
     await page.locator('#source-capture-save').click(); await page.locator('#source-reader-body').waitFor();
     await selectWord(page); await page.locator('#source-selection-lookup').click();
+    // precondition now (Hfix-1B, item 11): a tutor set up, so the word's page offers Ask the tutor (the case's own synthetic
+    // provider replaces it below)
+    await setUpDeviceTutor(page);
     await page.locator('.nav-search-row').first().click(); await page.locator('#sheet .teacher-discuss').click();
     await settledQuestion(page, QUESTION); await configure(page);
     const neutral = await readAppRecordSnapshot(page), topic = neutral.record.teacherContexts.entries.find((t) => t.id === neutral.record.teacherContexts.activeRef);

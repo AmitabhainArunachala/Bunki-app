@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { setUpDeviceTutorIfNone } from './tutor-fixture-support.mjs';
 
 assert(process.env.KAIRO_SITE_DIR && isAbsolute(process.env.KAIRO_SITE_DIR), 'Supply one immutable staged runtime explicitly');
 const OUT = resolveCorridorEvidence(), SITE = resolveCorridorSite();
@@ -140,6 +141,9 @@ async function selectTopic(fixture, contextRef) {
 }
 async function createTopic(fixture, { articleId = 'bunki-graded-n3-river', index = 0 } = {}) {
   await shelf(fixture);
+  // precondition now (Hfix-1B, item 11): a tutor set up, since the sentence's "Ask the tutor" needs one (a provider the case
+  // already configured stays as it is)
+  await setUpDeviceTutorIfNone(fixture.page);
   const source = fixture.page.locator(`.shelf-item[data-passage="${articleId}"]:not([data-recommendation]) .shelf-open`);
   assert.equal(await source.count(), 1, 'Source has one canonical bookshelf entry');
   await source.click();
@@ -236,7 +240,8 @@ define('clean-close-before-debounce-general', async (fixture) => {
 });
 define('clean-close-before-debounce-selected-context', async (fixture) => {
   const topic = await createTopic(fixture);
-  assert.equal(await fixture.page.locator('#chat-send').isDisabled(), true);
+  // Hfix-1B: the door needs a tutor set up, so the question waits as a draft with one, and nothing was sent
+  assert.deepEqual({ blocked: fixture.transport.blocked.length, primary: fixture.transport.primary.length }, { blocked: 0, primary: 0 });
   await beforeDebounce(fixture, topic.id, '  A question about this sentence,\nstill unsent 猫 e\u0301  ', 'selected-context');
 });
 define('committed-topic-drafts-and-deliberate-clear-survive-browser-restart', async (fixture) => {

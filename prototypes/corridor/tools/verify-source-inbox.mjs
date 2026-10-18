@@ -13,6 +13,7 @@ import process from 'node:process';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -196,6 +197,9 @@ for (const engine of engines) for (const width of sizes) {
     await screenshot('exact-source-return');
     await selectWord(page); await page.locator('#source-selection-lookup').click();
     assert.equal(await page.locator('#nav-search-input').inputValue(), '町');
+    // precondition now (Hfix-1B, item 11): a tutor set up, so the word's page offers Ask the tutor (the case's own synthetic
+    // provider replaces it below)
+    await setUpDeviceTutor(page);
     await page.locator('.nav-search-row').first().click(); await page.locator('#sheet').waitFor();
     await page.waitForFunction(() => !document.querySelector('#sheet')?.textContent.includes('Opening complete senses and usage'));
     await screenshot('dictionary-from-capture');

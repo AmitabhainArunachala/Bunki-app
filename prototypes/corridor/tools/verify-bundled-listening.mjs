@@ -25,6 +25,7 @@ import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/r
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
 import { buildListeningCues, listeningSentences } from './build-listening-cues.mjs';
 import { runtimeLock, voiceForRole } from './voice-lock.mjs';
+import { DEVICE_TUTOR, setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -197,7 +198,8 @@ for (const engine of engines) for (const width of sizes) {
     const initial = await snapshot('initial'); assert.deepEqual(initial.taken, []); assert.deepEqual(initial.srs, {});
     await openShelfDoor(page, '#airead-link'); await page.locator('#airead-startingLevel').selectOption('N5');
     await waitForAppRecord(page, record => record.readingSettings?.startingLevel === 'N5');
-    assert(await page.locator('#airead-make').isDisabled()); await screenshot('local-reading-preferences');
+    // Hfix-1B (item 11): with no tutor set up the room draws no "ask the tutor to write one", only the door to set one up
+    assert.equal(await page.locator('#airead-make').count(), 0); assert.equal(await page.locator('#airead-connect').count(), 1); await screenshot('local-reading-preferences');
     await page.locator('#back').click();
     const item = page.locator('.shelf-item:not([data-recommendation])').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) });
     await item.waitFor({ state: 'visible', timeout: 20_000 });
@@ -221,6 +223,8 @@ for (const engine of engines) for (const width of sizes) {
     await page.locator('#sentence-practice-confirm').waitFor(); unchanged(initial, await snapshot('recursive-choice-neutral'));
     await page.locator('#back').click(); await page.locator('#sheet[data-node="kanji:窓"]').waitFor();
     await page.waitForFunction(() => document.activeElement?.id === 'entry-sentence-practice');
+    // precondition now (Hfix-1B, item 11): a tutor set up, so the word's page offers Ask the tutor (the page draws it on Back)
+    await setUpDeviceTutor(page);
     await page.locator('#sheet-back').click(); await page.locator('#sheet[data-node="word:窓"]').waitFor();
     await page.waitForTimeout(800); await page.locator('#sheet .teacher-save').click();
     await waitForAppRecord(page, record => record.teacherContexts?.entries.length === 1);
@@ -269,7 +273,9 @@ for (const engine of engines) for (const width of sizes) {
     await openSaved();
     await page.locator('[data-sentence-teacher-response]').first().click(); await page.locator('#chat-input').waitFor();
     const prepared = await page.locator('#chat-input').inputValue(); assert(prepared.startsWith(`${QUESTION}\n\n`)); assert(prepared.includes(PRODUCTION));
-    await savedQuestion(page, ref, prepared); assert(await page.locator('#chat-send').isDisabled());
+    await savedQuestion(page, ref, prepared);
+    // with a tutor set up (Hfix-1B) the question waits as a draft and nothing was sent: no request left for the tutor's service
+    assert.equal(result.externalRequests.filter((request) => request.origin === DEVICE_TUTOR.credential.origin).length, 0, 'nothing was sent to the tutor');
     await page.locator('#teacher-source-return').click(); await returned(page);
     assert.match(await page.locator('#reader-source-back').textContent(), /Back to tutor/u);
     await page.locator('#reader-source-back').click(); await page.locator('#chat-input').waitFor(); assert.equal(await page.locator('#chat-input').inputValue(), prepared);
