@@ -25,7 +25,10 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'saveOne',
   // R2 (2026-10-17): a reader word's sound change, at the lookup door and the reader's (Codex's f2e3015e review: 仏 ぶっ)
   'soundChangeReadings', 'SOUND_VOICED', 'SOUND_PLAIN', 'kanjiReadingsOf', 'readerLookupAnswer', 'dictionaryAnsweredForm',
-  'soundChangeDoor', 'dictionaryRowsReadAs', 'readerReadingFits'];
+  'soundChangeDoor', 'dictionaryRowsReadAs', 'readerReadingFits',
+  // R3 (2026-10-18): the sense a word's text uses — the lookup's entry before its sense, the record its sense shapes, the
+  // slip's second line, and the marks the slip leaves (for the page, and for a sense still to come)
+  'japaneseLookupEntryRecord', 'senseRecord', 'senseIsQuick', 'senseMoreLine', 'SENSE_BY_ANCHOR', 'SENSE_LATER', 'senseLaterDraw'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
