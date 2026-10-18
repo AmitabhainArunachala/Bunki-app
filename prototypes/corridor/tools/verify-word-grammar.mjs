@@ -721,18 +721,20 @@ async function g6Descend(page,home,modality,to='part'){
 function g6CurrentThreadDOM(action={}) {
   const active=()=>[...document.querySelectorAll('.scale-thread')].filter(n=>n.isConnected&&!n.closest('[inert],[hidden],[aria-hidden="true"]')&&n.getClientRects().length);
   const rect=node=>{if(!node)return null;const r=node.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};};
-  const offsets=()=>({window:{x:scrollX,y:scrollY},document:{x:document.documentElement.scrollLeft,y:document.documentElement.scrollTop},body:{x:document.body.scrollLeft,y:document.body.scrollTop},...Object.fromEntries(['app','reader','sheet'].map(id=>{const n=document.getElementById(id);return [id,n?{x:n.scrollLeft,y:n.scrollTop}:null];}))});
+  const visual=()=>{const v=window.visualViewport;return v?{offsetLeft:v.offsetLeft,offsetTop:v.offsetTop,pageLeft:v.pageLeft,pageTop:v.pageTop,scale:v.scale,width:v.width,height:v.height}:null;};
+  const offsets=()=>({visualViewport:visual(),window:{x:scrollX,y:scrollY},document:{x:document.documentElement.scrollLeft,y:document.documentElement.scrollTop},body:{x:document.body.scrollLeft,y:document.body.scrollTop},...Object.fromEntries(['app','reader','sheet'].map(id=>{const n=document.getElementById(id);return [id,n?{x:n.scrollLeft,y:n.scrollTop}:null];}))});
   const facts=(thread=active()[0])=>{
     if(!thread)return null;
     const currents=thread.querySelectorAll(':scope > [aria-current="step"]'),current=currents[0],outside=thread.querySelector(':scope > [data-scale-out]');
-    const rail=rect(thread),bead=rect(current),out=rect(outside),viewport={width:document.documentElement.clientWidth,height:innerHeight};
-    const left=Math.max(0,rail.left+thread.clientLeft),right=Math.min(viewport.width,rail.left+thread.clientLeft+thread.clientWidth);
+    const rail=rect(thread),bead=rect(current),out=rect(outside),viewport={width:document.documentElement.clientWidth,height:innerHeight},visualViewport=visual();
+    const visualViewportValid=!!visualViewport&&Object.values(visualViewport).every(Number.isFinite)&&visualViewport.scale>0&&visualViewport.width>0&&visualViewport.height>0;
+    const left=Math.max(0,rail.left+thread.clientLeft,visualViewport?.offsetLeft??NaN),right=Math.min(viewport.width,rail.left+thread.clientLeft+thread.clientWidth,(visualViewport?.offsetLeft??NaN)+(visualViewport?.width??NaN));
     let currentLeft=left,currentRight=right;
     if(out&&outside!==current&&out.right>left&&out.left<right){if(out.left+out.width/2<=(left+right)/2)currentLeft=Math.max(left,out.right);else currentRight=Math.min(right,out.left);}
-    const contained=(box,l,r)=>!!box&&box.width>0&&box.height>0&&box.left>=l&&box.right<=r&&box.top>=Math.max(0,rail.top)&&box.bottom<=Math.min(viewport.height,rail.bottom);
+    const contained=(box,l,r)=>visualViewportValid&&!!box&&box.width>0&&box.height>0&&box.left>=l&&box.right<=r&&box.top>=Math.max(0,rail.top,visualViewport.offsetTop)&&box.bottom<=Math.min(viewport.height,rail.bottom,visualViewport.offsetTop+visualViewport.height);
     return {at:performance.now(),scale:thread.dataset.scale,activeRails:active().length,connected:thread.isConnected,owner:thread.parentElement?.id||null,
       currentCount:currents.length,currentTag:current?.tagName,currentDisabled:current?.disabled===true,currentNode:current?.dataset.node||null,currentIndex:current?.dataset.stackIndex||null,
-      currentIsOutside:current===outside,rail,bead,out,viewport,available:{left:currentLeft,right:currentRight},scrollLeft:thread.scrollLeft,scrollTop:thread.scrollTop,scrollWidth:thread.scrollWidth,clientWidth:thread.clientWidth,
+      currentIsOutside:current===outside,rail,bead,out,viewport,visualViewport,visualViewportValid,available:{left:currentLeft,right:currentRight},scrollLeft:thread.scrollLeft,scrollTop:thread.scrollTop,scrollWidth:thread.scrollWidth,clientWidth:thread.clientWidth,
       currentContained:contained(bead,currentLeft,currentRight),outsideContained:contained(out,left,right),offsets:offsets(),fontStatus:document.fonts.status,font:current?getComputedStyle(current).font:null,
       theme:document.documentElement.getAttribute('data-theme'),sheetWorld:document.getElementById('sheet')?.dataset.world||null,stamp:window.__g6DocumentStamp};
   };
@@ -791,11 +793,12 @@ async function g6CurrentThreadVisible(page,{emit,width,world}){
   emit('current.part-route','four native inward edges reach the actual source-backed part',route.length===4&&route.every(row=>row.ok)&&part?.scale==='part'&&part.currentNode===`radical:${G6_ORIGIN.part}`,route);
   emit('current.part-contained','the whole part-current span is visible beside the wholly visible sticky outside control',part?.activeRails===1&&part?.currentCount===1&&part?.currentTag==='SPAN'&&part?.currentContained&&part?.outsideContained,{part,capture});
   const mount=observed.mounts[0],unchanged=observed.mounts.length===1&&mount.sameLiveOwner&&mount.initial.currentNode===mount.settled.currentNode&&
+    mount.initial.visualViewportValid&&mount.settled.visualViewportValid&&
     JSON.stringify(mount.initial.offsets)===JSON.stringify(mount.settled.offsets)&&mount.initial.scrollTop===mount.settled.scrollTop&&
     observed.priorCount>0&&observed.priorRails.length===observed.priorCount&&observed.priorRails.every((row,index)=>row.index===index&&
       (row.retired?!row.connected&&row.after===null:row.connected&&row.sameParent&&row.inert&&JSON.stringify(row.before)===JSON.stringify(row.after)))&&
     observed.priorRails.some(row=>row.owner==='app')&&observed.roomRails.length===1&&observed.roomRails.every(row=>row.connected&&row.fresh&&row.inert&&row.left===0&&row.top===0);
-  emit('current.part-scroll-only','first-layout correction preserves exact page/reader/sheet offsets and accounts for every retired or surviving inert rail',unchanged,observed);
+  emit('current.part-scroll-only','first-layout correction preserves exact visual viewport/page/reader/sheet offsets and accounts for every retired or surviving inert rail',unchanged,observed);
   const ancestor=await g6Bead(page,'article',modality);assert(ancestor.ok,JSON.stringify(ancestor.observed));
   const returned=await g6Line(page,home);emit('current.return-line','native article bead returns the exact nonzero source line within4px',returned.ok,returned.observed);
   const outward=[];
