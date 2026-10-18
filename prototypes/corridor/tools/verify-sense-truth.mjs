@@ -106,6 +106,10 @@ const RULES = Object.freeze([
   fx('日 read にち after 12', 'bunki-read-n1-nobel-economics', 60, '日', '2083100', 1, 'Sunday'),
   fx('ただ, the adverb', 'aozora:000772-1', 157, 'ただ', '1538900', 3, 'ordinary'),
   fx('いけ in てはいけない', 'aozora:002359-1', 39, 'いけ', '1000730', 1, 'to be good (at)', { label: 'いけない' }),
+  // the lead's two (Grok's ん row "んだ, んじゃ"; いけない without ては): 2026-10-18
+  fx('ん before じゃ (いうんじゃア)', 'aozora:000628', 2846, 'ん', '2849387', 0, 'yes', { label: 'んだ' }),
+  fx('いけない without ては (注意しないからいけない)', 'aozora:004668-1', 498, 'いけ', '1000730', 2, 'to be good (at)', { label: 'いけない' }),
+  fx('いけない without ては (なかなかいけない)', 'aozora:049966-2', 1275, 'いけ', '1000730', 2, 'to be good (at)', { label: 'いけない' }),
   fx('一定, the noun', 'bunki-essay-n2-rain', 86, '一定', '1164950', 1, 'to fix'),
   // the つく row's について (115 of its taps: "to be attached", "to be lit") and the idioms of the ない row (Grok's 727:
   // もったいない, ちがいない/違いない, 間もなく), read whole; たくない (an auxiliary's く form) is "not"
