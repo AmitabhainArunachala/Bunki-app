@@ -599,6 +599,11 @@ export function batteryGates(out, env = process.env) {
     // playback gate replaces Audio with a double, so none had ever played a real clip. Both engines:
     // the CI default is one, so the gate asks for all, as guided-session does
     { ...node('narration-media', tool('verify-narration-media')), env: { KAIRO_BROWSER: 'all' } },
+    // F (2026-10-18): one type ladder and one ruby — a reading 10 px or more at half its word, never touching, a gloss
+    // 13 px or more, at 200 % text too — and the two continuity moves (the shelf picture becomes the reader's picture;
+    // the deck's next card arrives the way the last one left). Both engines: WebKit is the referee
+    { ...node('type-ruby', tool('verify-type-ruby')), env: { KAIRO_BROWSER: 'all' } },
+    { ...node('continuity', tool('verify-continuity')), env: { KAIRO_BROWSER: 'all' } },
     // the living-thread guided session (operator-approved 2026-09-23): journey, real deck, moments
     { ...node('guided-session', tool('verify-guided-session')), env: { KAIRO_BROWSER: 'all' } },
     // …its engine rules and set-versus-bank checks, and its offline and single-file claims

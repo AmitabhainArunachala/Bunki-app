@@ -5655,9 +5655,8 @@ function rubyNode(pairs, { furigana, revealed }) {
       frag.append(document.createTextNode(pair.t));
       continue;
     }
+    // native ruby: the house's one ruby rule sets the reading (rooms/motion.css)
     const ruby = document.createElement('ruby');
-    // the reader draws a reading from this attribute when it floats the reading over its word
-    ruby.dataset.r = pair.r;
     ruby.append(document.createTextNode(pair.t));
     const rt = document.createElement('rt');
     rt.textContent = pair.r;
@@ -8267,19 +8266,28 @@ function readerPicture(p) {
   const figure = el('figure', 'reader-picture');
   figure.dataset.japaneseLookup = 'off';
   figure.style.setProperty('--topic', storyAccent(owner));
-  const img = el('img', 'reader-picture-img');
+  // F · one picture element per picture across the reader's redraws (its text arriving late draws the room again):
+  // the story's picture is the shared element of the room change, and a redraw mid-move keeps it, never replaces it
+  const kept = readerPictureImg?.getAttribute('src') === `data/${pic.src}` ? readerPictureImg : null;
+  const img = kept || el('img', 'reader-picture-img');
+  readerPictureImg = img;
+  if (kept) { figure.append(img, readerPictureCredit()); return figure; }
   img.src = `data/${pic.src}`;
   img.alt = String(pic.alt || '');
   if (pic.w && pic.h) { img.width = pic.w; img.height = pic.h; }
   img.decoding = 'async';
-  img.addEventListener('error', () => figure.remove(), { once: true });
-  // D3 (John: "回廊 KAIRO"): the credit names the app; 回廊 is a named mark in either language
+  img.addEventListener('error', () => img.closest('figure')?.remove(), { once: true });
+  figure.append(img, readerPictureCredit());
+  return figure;
+}
+let readerPictureImg = null;
+/** D3 (John: "回廊 KAIRO"): the credit names the app; 回廊 is a named mark in either language */
+function readerPictureCredit() {
   const credit = el('figcaption', 'reader-picture-caption', tx('挿絵 · ', 'Illustration · '));
   const mark = el('span', 'kairo-mark', '回廊');
   mark.lang = 'ja';
   credit.append(mark, ' KAIRO');
-  figure.append(img, credit);
-  return figure;
+  return credit;
 }
 
 /** One shelf card, text first (polish pass 2026-10-01: a brushed headline kanji on a navy slab
@@ -8346,7 +8354,13 @@ function shelfCard(p, rank = 'grid') {
     if (titleEn) open.append(titleEn);
     open.append(foot);
   }
-  open.addEventListener('click', () => openPassage(p.id));
+  open.addEventListener('click', () => {
+    // F · this card's picture becomes the reader's picture (roomTransition's story hero)
+    const img = open.querySelector('.story-img');
+    storyHeroIntent = img ? { img, passageId: p.id, rank: `story-${rank}` } : null;
+    storyHeroFrom = { passageId: p.id, rank: `story-${rank}` };
+    openPassage(p.id);
+  });
   item.append(open);
   return item;
 }
@@ -13134,10 +13148,28 @@ function refreshListenRow() {
   if (!row || !p || row.dataset.passage !== p.id) return;
   const focusedId = row.contains(document.activeElement) ? document.activeElement.id : null;
   const next = buildListenRow(p);
-  // in place: the row swaps where it stands (the foot of a phone, its own line on a desk), so the text under
-  // it does not move; the keyboard stays on the mark or the control it was on
-  row.replaceWith(next);
+  // the row swaps in its state's place (placeListenRow); the keyboard stays on the mark or the control it was on
+  placeListenRow(row, next);
   if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
+}
+/** F · the listen door's two places (the lead's ruling on Grok f-86, 2026-10-18): folded, its one glyph stands at the
+ * right end of the reader's instrument line, in the head's flow, so it never sits over the reading column at any scroll;
+ * open (playing, or held open), the bar stands where it always has — the phone's foot, a desk's own line under the head,
+ * just before the text. With no recording the row is an empty, hidden place in the head (buildListenRow). */
+function placeListenRow(row, next) {
+  const head = document.querySelector('#app > main .reader-head');
+  if (next.dataset.open === 'false' && head) {
+    if (row !== next) row?.remove();
+    head.prepend(next);
+    return;
+  }
+  const reader = document.getElementById('reader');
+  if (row?.closest('.reader-head') && reader) {
+    row.remove();
+    reader.before(next);
+    return;
+  }
+  row.replaceWith(next);
 }
 /* One drawn icon set for the reader and the shelf: a 24-unit grid, 1.6 stroke, round joins,
  * currentColor — never a font glyph standing in for an icon. */
@@ -13176,10 +13208,11 @@ function voicePendingNote(id) {
 
 /** The reader's play bar, built on its own so a late narration manifest can refresh just this
  * row in place — the focused token or glossary entry elsewhere in the reader is never replaced.
- * It carries only the locked narration voice. One glyph when idle (John, 2026-10-15 17:20): a speaker
- * mark, 44 px, quiet, bottom-right above the tabs; a tap opens the clean bar (play · progress · voice ·
- * speed), a tap on the mark closes it. With no clips for this article in that voice it is the same mark,
- * dimmed, the absence and the voice provenance in its description: no picker, no stand-in voice. */
+ * It carries only the locked narration voice. One glyph when idle (John, 2026-10-15 17:20: "a simple
+ * character… elegant and nearly hidden but obvious"): a speaker mark, 44 px, quiet, at the right end of the
+ * reader's instrument line (F, the lead's ruling 2026-10-18: never over the reading column); a tap opens the clean
+ * bar (play · progress · voice · speed) where it has always stood, a tap on the mark closes it. With no clips for this
+ * article in that voice there is no mark at all (no dead control): no picker, no stand-in voice. */
 function buildListenRow(p) {
   const listenRow = el('div', 'listen-row play-bar');
   listenRow.dataset.passage = p.id;
@@ -13189,14 +13222,11 @@ function buildListenRow(p) {
   mark.id = 'listen-open';
   mark.append(uiIcon('speaker'));
   if (!clips.length) {
+    // F (the lead's ruling, 2026-10-18): with no recording for this article there is no mark at all — no dead control.
+    // The row stays as an empty, hidden place (its passage named, so a late manifest can arm it in place)
     listenRow.classList.add('is-pending');
     listenRow.dataset.open = 'false';
-    mark.setAttribute('aria-disabled', 'true');
-    // it opens nothing, so it is not a stop on the keyboard's way through the text (as a disabled control is not)
-    mark.tabIndex = -1;
-    mark.setAttribute('aria-label', tx('聞く', 'Listen'));
-    mark.setAttribute('aria-describedby', 'listen-note');
-    listenRow.append(mark, voicePendingNote('listen-note'));
+    listenRow.hidden = true;
     return listenRow;
   }
   if (readAloud.pid !== p.id) { readAloud.pid = p.id; readAloud.clip = 0; readAloud.failed = null; readAloud.barOpen = false; }
@@ -13461,10 +13491,12 @@ function renderReader(main) {
     S.dialsOpen = !S.dialsOpen;
     render();
   });
-  // the listen door: one mark in one place (John, 2026-10-15): the bar stands below the head, folded to its
-  // speaker mark until the learner opens it — dimmed when this article has no recording
+  // the listen door: one mark in one place (John, 2026-10-15): folded, its speaker mark ends the instrument line until
+  // the learner opens it; none at all when this article has no recording
   const listenRow = buildListenRow(p);
   head.append(meta, dialsToggle);
+  // folded (or absent), the door's place is the head: its glyph at the instrument line's right end (placeListenRow)
+  if (listenRow.dataset.open === 'false') head.prepend(listenRow);
   card.append(head);
   const versions = storyVersions(p);
   if (versions) {
@@ -13528,17 +13560,18 @@ function renderReader(main) {
     main.append(dials);
   }
 
-  // a narrated article's listen door — one tap to hear the article, one tap to stop; above it, G5's 層 mark (the only way
-  // into the layers)
-  main.append(listenRow, readerLayersMark());
+  // a narrated article's listen door, open: one tap to hear the article, one tap to stop (folded, it is in the head);
+  // above it, G5's 層 mark (the only way into the layers)
+  if (listenRow.dataset.open !== 'false') main.append(listenRow);
+  main.append(readerLayersMark());
   // the sentence's actions live in the word popup and the word menu: no bar floats over the text (#18)
 
   const reader = el('div', 'reader');
   reader.id = 'reader';
   if (S.dials.spacing === 1) reader.classList.add('sp-word');
   if (S.dials.spacing === 2) reader.classList.add('sp-bunsetsu');
-  // readings always on keep true ruby layout; otherwise a reading floats over its word and never
-  // pries the line apart (the gaps in 「ダマスカス 郊外」 were hidden readings still taking width)
+  // every reading is native ruby (the one rule, rooms/motion.css): always-on readings earn their space;
+  // a concealed one takes none (the gaps in 「ダマスカス 郊外」 were hidden readings still taking width)
   if (S.dials.furigana === 2) reader.classList.add('fg-always');
 
   if (!p.tokens) {
@@ -35800,6 +35833,61 @@ function roomDirection(from, to) {
   if (a < 0 || b < 0 || a === b) return '';
   return b > a ? 'right' : 'left';
 }
+/* F · the story's picture carries across the room change, shelf ↔ reader (contract §3, "things come from where they
+ * were"): the one picture on screen before and after is one element to the view transition (view-transition-name
+ * hero), named on the departing picture before the capture and on the arriving one once the room is drawn and
+ * scrolled. Only when both are the same picture (one file) and both are on screen; never under reduced motion. On this
+ * path the departing room fades out before the arriving one fades in (two rooms' text never show at once), and the
+ * transition layer is clipped to the room, so the picture travels under the top bar and the tabs (rooms/motion.css). */
+let storyHeroIntent = null; // the tapped shelf card's picture, for the room change it starts
+let storyHeroFrom = null; // { passageId, rank }: the shelf card a story was opened from, where Back takes its picture
+let storyHeroSerial = 0;
+function storyHeroOnScreen(img) {
+  if (!img?.isConnected || !img.complete || !img.naturalWidth) return false;
+  const r = img.getBoundingClientRect();
+  return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+}
+function storyHeroDeparting() {
+  const intent = storyHeroIntent;
+  storyHeroIntent = null;
+  if (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+  for (const named of document.querySelectorAll('.story-img, .reader-picture-img')) {
+    if (named.style.viewTransitionName === 'hero') named.style.removeProperty('view-transition-name');
+  }
+  if (S.view === 'shelf' && intent && storyHeroOnScreen(intent.img)) return { ...intent, to: 'reader', id: ++storyHeroSerial };
+  if (S.view === 'reader' && S.passageId) {
+    const img = document.querySelector('#app > main .reader-picture-img');
+    const rank = storyHeroFrom?.passageId === S.passageId ? storyHeroFrom.rank : null;
+    if (storyHeroOnScreen(img)) return { img, passageId: S.passageId, rank, to: 'shelf', id: ++storyHeroSerial };
+  }
+  return null;
+}
+/** The same picture where the room change arrives: the reader's picture, or the shelf card it was opened from. */
+function storyHeroArriving(hero) {
+  if (S.view !== hero.to || S.passageId !== hero.passageId) return null;
+  const src = hero.img.getAttribute('src');
+  const candidates = hero.to === 'reader'
+    ? [document.querySelector('#app > main .reader-picture-img')]
+    : [...document.querySelectorAll('#shelf-body .shelf-item[data-passage] .story-img')]
+      .filter((img) => img.closest('.shelf-item')?.dataset.passage === hero.passageId)
+      .sort((a, b) => Number(!(hero.rank && a.closest(`.${hero.rank}`))) - Number(!(hero.rank && b.closest(`.${hero.rank}`))));
+  const img = candidates.find((node) => node && node.getAttribute('src') === src && node.getBoundingClientRect().height > 0);
+  if (!img) return null;
+  const r = img.getBoundingClientRect();
+  return r.bottom > 0 && r.top < innerHeight ? img : null;
+}
+function nameStoryHero(img, id) {
+  img.style.viewTransitionName = 'hero';
+  img.dataset.storyHero = String(id);
+}
+function clearStoryHero(hero) {
+  for (const img of [hero?.img, hero?.arrived]) {
+    if (img?.dataset.storyHero === String(hero.id)) {
+      img.style.removeProperty('view-transition-name');
+      delete img.dataset.storyHero;
+    }
+  }
+}
 function withoutRoomTransition(change) {
   roomTransitionUpdating = true;
   try { return change(); } finally { roomTransitionUpdating = false; }
@@ -35813,11 +35901,22 @@ function roomTransition(change) {
   activeRoomTransition?.skipTransition();
   const html = document.documentElement;
   const departing = document.querySelector('#app > main');
+  // F · a story's picture carries across shelf ↔ reader (its room's text fades through the paper, rooms/motion.css)
+  const hero = document.startViewTransition ? storyHeroDeparting() : null;
   // Capture only the departing room. Captured incoming DOM cannot receive a
   // pointer until the native transition finishes, so the next room stays live.
   departing?.removeAttribute('data-room-arrival');
   departing?.style.removeProperty('--room-arrival-delay');
   if (departing && document.startViewTransition) departing.style.viewTransitionName = 'kairo-room';
+  if (hero) {
+    nameStoryHero(hero.img, hero.id);
+    // the layer that draws the travelling picture is clipped to the room: the top bar and the tabs stay above it
+    const bar = document.querySelector('#app > .chrome')?.getBoundingClientRect();
+    const tabs = document.querySelector('#primary-tabs')?.getBoundingClientRect();
+    html.style.setProperty('--room-hero-top', `${Math.max(0, Math.round(bar && bar.height ? bar.bottom : 0))}px`);
+    html.style.setProperty('--room-hero-bottom', `${Math.max(0, Math.round(tabs && tabs.height ? innerHeight - tabs.top : 0))}px`);
+    html.dataset.roomHero = String(hero.id);
+  }
   html.dataset.roomTransition = '1';
   const from = S.view;
   let incoming = null;
@@ -35831,6 +35930,12 @@ function roomTransition(change) {
       const direction = roomDirection(from, S.view);
       if (direction) html.dataset.roomDir = direction;
       else delete html.dataset.roomDir;
+      // the departing picture gives up the name before the arriving one takes it: one name, one element
+      if (hero?.img.isConnected) clearStoryHero({ id: hero.id, img: hero.img });
+      if (hero) {
+        hero.arrived = storyHeroArriving(hero);
+        if (hero.arrived) nameStoryHero(hero.arrived, hero.id);
+      }
       if (incoming) {
         // With no departing snapshot (for example the universe), native
         // finished can settle first. Keep the live fade for its actual length.
@@ -35861,6 +35966,15 @@ function roomTransition(change) {
     delete html.dataset.roomTransition;
     delete html.dataset.roomDir;
   };
+  // the picture's names go with its own transition, whatever came after it (a later room change skips this one)
+  const clearHero = () => {
+    clearStoryHero(hero);
+    if (html.dataset.roomHero === String(hero.id)) {
+      delete html.dataset.roomHero;
+      html.style.removeProperty('--room-hero-top');
+      html.style.removeProperty('--room-hero-bottom');
+    }
+  };
   if (!document.startViewTransition) {
     // Unsupported browsers still change routes and restore focus synchronously.
     // Only their arriving, live room fades; no native snapshot is needed.
@@ -35871,7 +35985,21 @@ function roomTransition(change) {
   const transition = document.startViewTransition(update);
   activeRoomTransition = transition;
   transition.ready.catch(() => {});
-  transition.finished.catch(() => {}).then(arrivalDone).finally(() => clear(transition));
+  // F · on the picture's path the arriving room's rise counts from the moment the departing room starts to fade (the
+  // transition's first frame, not the update before it), so the two fades never overlap
+  if (hero) transition.ready.then(() => {
+    if (!arrival || activeRoomArrival !== arrival) return;
+    arrival.startedAt = performance.now();
+    for (const animation of arrival.animations) animation.currentTime = 0;
+    // one clock: the rise counts from the very frame the departing room's fade starts on (that animation takes its start
+    // a frame after ready under load, and a rise a frame early showed both rooms at once in a loaded Chromium)
+    const leave = document.getAnimations().find((a) => String(a.effect?.pseudoElement || '') === '::view-transition-old(kairo-room)');
+    leave?.ready.then(() => {
+      if (activeRoomArrival !== arrival || leave.startTime == null) return;
+      for (const animation of arrival.animations) animation.startTime = leave.startTime;
+    }, () => {});
+  }, () => {});
+  transition.finished.catch(() => {}).then(arrivalDone).finally(() => { if (hero) clearHero(); clear(transition); });
   return transition;
 }
 /* ------------------------------------------------------ corridor paper worlds

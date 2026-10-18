@@ -570,17 +570,13 @@ const FOCUS_CONTRAST = `(sentences) => {
       const ratio = (light + 0.05) / (dark + 0.05); const kind = element.closest('rt') ? 'ruby' : 'text';
       result[kind].count += 1; result[kind].min = Math.min(result[kind].min ?? Infinity, ratio);
     }
-    // in the app a reading is drawn above its kanji as ruby[data-rt]::after, in the line's own leading
-    // (the rt keeps no box, so the line never moves); it is measured as a reading, by the same rule
-    for (const ruby of sentence.querySelectorAll('ruby[data-rt]')) {
-      const after = getComputedStyle(ruby, '::after');
-      if (after.content === 'none' || after.content === 'normal' || getComputedStyle(ruby).visibility !== 'visible') continue;
-      let opacity = 1; for (let n = ruby; n; n = n.parentElement) { const computed = getComputedStyle(n); if (computed.display === 'none') { opacity = 0; break; } opacity *= Number(computed.opacity); if (computed.maskImage !== 'none') result.masks.push(computed.maskImage); }
-      if (!opacity) continue;
-      const colour = rgba(after.color); const ink = mix(colour, background, opacity * colour[3] / 255);
-      const [light, dark] = [lum(ink), lum(background)].sort((a, b) => b - a);
-      const ratio = (light + 0.05) / (dark + 0.05);
-      result.ruby.count += 1; result.ruby.min = Math.min(result.ruby.min ?? Infinity, ratio);
+    // F (one ruby, 2026-10-18): every reading is a native <rt>, measured above as a text node inside rt; no reading is
+    // drawn as a pseudo-element any more (was ruby[data-rt]::after), and none may be: one found is a failure
+    for (const ruby of sentence.querySelectorAll('ruby')) {
+      for (const pseudo of ['::before', '::after']) {
+        const content = getComputedStyle(ruby, pseudo).content;
+        if (content && content !== 'none' && content !== 'normal') { result.ruby.count += 1; result.ruby.min = 0; }
+      }
     }
   }
   return result;
@@ -2719,8 +2715,8 @@ async function verifyVisual(browser, base) {
     for (const world of ['hokusai', 'iwa']) {
       const o = await open('?deck=mcd', 'kotoba-mcd', { prefs: { newPerDay: 0 }, world, state: due('kotoba-mcd', 'km-200-m01') });
       await reveal(o.page);
-      // in the app the reading over a kanji is drawn as its ruby's ::after (the rt keeps no box)
-      const v = await o.page.evaluate(`(() => { const card = document.getElementById('kp-card'); const t = card.querySelector('.kp-target'); const drawn = t ? [...t.querySelectorAll('ruby[data-rt]')].map((r) => getComputedStyle(r, '::after')).filter((a) => a.content !== 'none' && a.content !== 'normal') : [];
+      // F (one ruby): the reading over a kanji is its native <rt>, shown (laid out and visible)
+      const v = await o.page.evaluate(`(() => { const card = document.getElementById('kp-card'); const t = card.querySelector('.kp-target'); const drawn = t ? [...t.querySelectorAll('ruby > rt')].map((r) => getComputedStyle(r)).filter((a) => a.display !== 'none' && a.visibility === 'visible') : [];
         const kp = document.querySelector('.kp'); const probe = document.createElement('i'); kp.append(probe); const tok = (k) => { probe.style.color = 'var(--kp-' + k + ')'; return getComputedStyle(probe).color; };
         const out = { id: card.dataset.card, pos: card.className, target: t ? getComputedStyle(t).color : null, rt: drawn.map((a) => a.color), verb: tok('verb'), ink: tok('ink'), accent: tok('cyan') }; probe.remove(); return out; })()`);
       seen.push({ world, ...v });

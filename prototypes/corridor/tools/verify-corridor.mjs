@@ -342,9 +342,11 @@ async function walkToSemPanel(page, tapFn) {
   return page.locator('#sheet .sem-row').count();
 }
 
+// F (one ladder, 2026-10-18): the reader's body on a phone is the ladder's reading step, 21 px (was the approved 19 px
+// fixture); a reading over it is half its size, 10.5 px, the floor D5 sets. Navigation labels stay at or under 17 px.
 function hasApprovedPhoneHierarchy(probe) {
   const reader = probe.text.find(t => t.label === 'reading body (focused)');
-  return reader?.fontSize === 19 && probe.navigationLabelSize > 0 && probe.navigationLabelSize <= 17;
+  return reader?.fontSize === 21 && probe.navigationLabelSize > 0 && probe.navigationLabelSize <= 17;
 }
 
 function articleSummaries(probe) {
@@ -1608,9 +1610,9 @@ async function main() {
   check('reader navigation · an undersized clipped control fails both geometry and the 44px sweep',
     !narrowProbe.valid && narrowSweep.targets.some(t => t.id === 'chrome-search' && t.hitW < MIN_TAP));
   await narrowControl.evaluate(n => n.remove());
-  const smallReading = await page.addStyleTag({ content: '#reader.reader { font-size: 18px !important; }' });
+  const smallReading = await page.addStyleTag({ content: '#reader.reader { font-size: 19px !important; }' });
   const smallProbe = await page.evaluate(MEASURE_FN);
-  check('reader hierarchy · a smaller reading body fails the approved 19px fixture',
+  check('reader hierarchy · a smaller reading body (the old 19px) fails the ladder\'s 21px reading step',
     !hasApprovedPhoneHierarchy(smallProbe));
   await smallReading.evaluate(n => n.remove());
   const largeNavigation = await page.addStyleTag({ content: '.chrome .l-ja { font-size: 19px !important; }' });
@@ -1776,28 +1778,24 @@ async function main() {
   // path — the sound itself is judged by ears, not by this suite.
   await open('?entry=shelf');
   await tap(page, FIRST_TEXT);
-  // 2026-09-30: the voice is locked (Kore; Charon second). With no Kore clip for this article
-  // the play bar explains the absence; its accessible description names the locked voices.
-  // the bar folds to its one mark (one-hand 5a-ii): with no Kore clip the mark is dimmed and the note — out of
-  // sight — is its description, so the row still says why, and offers nothing to play
-  await page.waitForSelector('#listen-open', { timeout: 15000 });
-  await page.waitForSelector('#listen-note', { state: 'attached', timeout: 15000 });
+  // 2026-09-30: the voice is locked (Kore; Charon second). F (the lead's ruling, 2026-10-18; was: the bar folds to its
+  // one mark, dimmed, its note — out of sight — the description naming the locked voices): with no Kore clip for this
+  // article the reader draws no listen mark at all — no dead control, nothing to press, nothing to focus, no device
+  // voice offered. The row stays only as an empty hidden place (a late manifest can arm it in place)
+  await page.waitForSelector('.listen-row.is-pending', { state: 'attached', timeout: 15000 });
   const listenBefore = await page.evaluate(`({
-    toggles: document.querySelectorAll('#listen-toggle, #listen-voice').length,
-    note: document.querySelector('#listen-note')?.textContent ?? '',
-    description: document.querySelector('#listen-note')?.getAttribute('aria-description') ?? '',
-    mark: document.querySelector('#listen-open')?.getAttribute('aria-disabled') ?? null,
-    describedBy: document.querySelector('#listen-open')?.getAttribute('aria-describedby') ?? null,
+    controls: document.querySelectorAll('#listen-open, #listen-toggle, #listen-voice, #listen-note').length,
+    hidden: !!document.querySelector('.listen-row.is-pending')?.hidden,
+    drawn: [...document.querySelectorAll('.listen-row')].some((row) => row.checkVisibility()),
+    stops: document.querySelectorAll('.listen-row button, .listen-row [tabindex]').length,
+    // the voice's own places: the listen row and the instrument line it would end (the article's text is not a voice)
+    text: [...document.querySelectorAll('.listen-row, .reader-head')].map((node) => node.textContent).join(' '),
   })`);
-  // D13b (2026-09-25): no device voice and no automatic voice. With no voice chosen the door
-  // is shut and the note says why honestly (no recording, or recorded only in the interim
-  // アミ voice, or recordings still being checked); it never offers a device voice.
-  check('reader · with no approved recording the listen row says so and offers nothing to play',
-    listenBefore.toggles === 0 && /^No recording for this article$/u.test(listenBefore.note) &&
-      listenBefore.mark === 'true' && listenBefore.describedBy === 'listen-note' &&
-      listenBefore.description === 'Approved voices: Kore (main), Charon (second).' &&
-      !/device voice|端末の声|F1/u.test(`${listenBefore.note} ${listenBefore.description}`),
-    JSON.stringify(listenBefore));
+  // D13b (2026-09-25): no device voice and no automatic voice — and now nothing to press where there is nothing to hear
+  check('reader · with no approved recording no listen mark is drawn and nothing offers to play',
+    listenBefore.controls === 0 && listenBefore.hidden && !listenBefore.drawn && listenBefore.stops === 0 &&
+      !/device voice|端末の声|F1/u.test(listenBefore.text),
+    JSON.stringify({ ...listenBefore, text: listenBefore.text.slice(0, 80) }));
 
   // the strip is summoned explicitly now — ?entry=shelf is a front door and
   // no longer raises the operator instrument (full-instrument review P1)

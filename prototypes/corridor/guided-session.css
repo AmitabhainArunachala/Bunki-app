@@ -16,7 +16,7 @@
   --gs-edge: var(--paper-edge, 1px solid color-mix(in srgb, var(--ink) 30%, transparent));
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 15.5px;
+  font-size: var(--type-body);
   line-height: 1.6;
 }
 .guided-room h1,
@@ -30,10 +30,10 @@
   color: var(--ink);
 }
 .guided-room h2 {
-  font-size: 20px;
+  font-size: var(--type-lead);
 }
 .guided-room h3 {
-  font-size: 16px;
+  font-size: var(--type-body);
 }
 .guided-room p {
   margin: 0 0 0.8em;
@@ -77,7 +77,7 @@
 /* ---------- bilingual labels: Japanese first, a small English gloss beside it ---------- */
 .gs-gloss {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.06em;
   color: var(--ink-2);
   margin-left: 7px;
@@ -88,13 +88,13 @@
 .gs-title .gs-gloss {
   display: block;
   margin: 6px 0 0;
-  font-size: 12px;
+  font-size: var(--type-caption);
   letter-spacing: 0.12em;
 }
 .gs-eyebrow {
   display: block;
   font-family: var(--serif);
-  font-size: 12.5px;
+  font-size: var(--type-label);
   letter-spacing: 0.12em;
   color: var(--ink-2);
   margin: 0 0 8px;
@@ -152,16 +152,16 @@
   padding-top: 22px;
 }
 .gs-hero {
-  font-size: clamp(32px, 7vw, 48px) !important;
+  font-size: clamp(var(--type-display), 7vw, calc(var(--type-headword) * 1.25)) !important;
   line-height: 1.15;
 }
 .gs-title {
-  font-size: clamp(24px, 4.2vw, 32px);
+  font-size: clamp(var(--type-section), 4.2vw, var(--type-display));
   line-height: 1.25;
   margin-bottom: 4px !important;
 }
 .gs-lede {
-  font-size: 17px;
+  font-size: var(--type-lead);
   line-height: 1.65;
   color: var(--ink-2);
   max-width: 48ch;
@@ -169,7 +169,7 @@
 }
 .gs-meta {
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: var(--type-label);
   letter-spacing: 0.06em;
   color: var(--faint);
   margin-top: 14px !important;
@@ -180,14 +180,14 @@
   background: var(--ground-0);
   border: 1px solid var(--line);
   border-left: 3px solid var(--ink);
-  font-size: 17px;
+  font-size: var(--type-lead);
   overflow-wrap: anywhere;
 }
 .gs-field-caption {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--faint);
   margin-top: 8px;
   font-family: var(--serif);
@@ -210,7 +210,7 @@
 }
 .gs-step {
   font-family: var(--serif);
-  font-size: 12px;
+  font-size: var(--type-caption);
   letter-spacing: 0.14em;
   color: var(--ink-2);
   display: block;
@@ -219,11 +219,11 @@
 .gs-journey-strip strong {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: 17px;
+  font-size: var(--type-lead);
   display: block;
 }
 .gs-journey-strip p {
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
   margin: 4px 0 0 !important;
 }
@@ -248,12 +248,12 @@
   display: block;
   font-family: var(--serif);
   font-weight: 400;
-  font-size: 19px;
+  font-size: var(--type-reading);
 }
 .gs-duecard button small {
   display: block;
   color: var(--card-faint, rgba(33, 30, 23, 0.6));
-  font-size: 12.5px;
+  font-size: var(--type-label);
   margin-top: 3px;
 }
 .gs-duecard .gs-go {
@@ -261,7 +261,7 @@
   margin-top: 10px;
   font-family: var(--serif);
   color: var(--card-ai, #2e4d6e);
-  font-size: 15px;
+  font-size: var(--type-control);
 }
 .gs-duecard button.gs-light {
   background: transparent !important;
@@ -273,7 +273,7 @@
   color: var(--ink-2);
 }
 .gs-duecard button.gs-light b {
-  font-size: 15px;
+  font-size: var(--type-control);
 }
 /* the glosses ride inline beside their Japanese, even inside the card's block-level small */
 .gs-duecard button .gs-gloss {
@@ -309,7 +309,7 @@
   gap: 2px;
   padding: 4px 8px !important;
   font-family: var(--serif) !important;
-  font-size: 16px;
+  font-size: var(--type-body);
   color: var(--ink);
   background: none !important;
   border-radius: var(--radius-seal);
@@ -317,7 +317,7 @@
 }
 .gs-node small {
   font-family: var(--sans);
-  font-size: 10.5px;
+  font-size: var(--type-caption);
   letter-spacing: 0.06em;
   color: var(--ink-2);
 }
@@ -346,7 +346,7 @@
   border-color: var(--red);
 }
 .gs-node.due {
-  font-size: 19px;
+  font-size: var(--type-lead);
 }
 .gs-node.due::before {
   width: 10px;
@@ -367,7 +367,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px 16px;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   margin: 14px 0;
 }
@@ -413,11 +413,11 @@
 .gs-facts strong {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: 18px;
+  font-size: var(--type-lead);
   display: block;
 }
 .gs-facts span {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--faint);
 }
 .gs-details {
@@ -430,7 +430,7 @@
   min-height: 32px;
 }
 .gs-details p {
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
   margin-top: 8px;
 }
@@ -438,7 +438,7 @@
   margin-top: 26px !important;
 }
 .gs-side-note {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint);
   line-height: 1.55;
 }
@@ -446,7 +446,7 @@
   color: var(--faint);
 }
 .gs-notice {
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
   color: var(--ink);
   border-left: 3px solid var(--ai);
   padding: 6px 10px;
@@ -466,7 +466,7 @@
 }
 .gs-session-top .gs-eyebrow {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--type-caption);
 }
 .gs-count {
   position: absolute;
@@ -487,7 +487,7 @@
   display: grid !important;
   place-items: center;
   font-family: var(--serif) !important;
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--faint);
   border-bottom: 3px solid var(--line) !important;
   text-align: center !important;
@@ -517,14 +517,14 @@
   margin-left: -1px;
   border-left: 2px solid transparent;
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint);
   letter-spacing: 0.04em;
 }
 .gs-rail-item small {
   display: block;
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--faint-2, var(--faint));
 }
 .gs-rail-item.current {
@@ -564,11 +564,11 @@
   );
 }
 .gs-sheet .gs-title {
-  font-size: clamp(21px, 3vw, 26px);
+  font-size: clamp(var(--type-reading), 3vw, var(--type-section));
   margin-bottom: 14px !important;
 }
 .gs-passage {
-  font-size: 16.5px;
+  font-size: var(--type-body);
   line-height: 1.95;
   padding: 14px 16px;
   background: var(--ground-2);
@@ -577,12 +577,12 @@
   white-space: pre-line;
 }
 .gs-instruction {
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
   margin-bottom: 6px !important;
 }
 .gs-question {
-  font-size: 19px;
+  font-size: var(--type-lead);
   line-height: 1.85;
   margin: 0 0 18px !important;
 }
@@ -611,7 +611,7 @@ legend.gs-instruction {
   gap: 12px;
   min-height: 48px;
   padding: 12px 14px;
-  font-size: 17px;
+  font-size: var(--type-lead);
   text-wrap: pretty;
   word-break: keep-all;
   line-break: strict;
@@ -627,7 +627,7 @@ legend.gs-instruction {
 }
 .gs-choice-num {
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint);
   width: 12px;
   flex: none;
@@ -659,7 +659,7 @@ legend.gs-instruction {
 .gs-outcome {
   display: block;
   font-family: var(--sans);
-  font-size: 11.5px;
+  font-size: var(--type-caption);
   letter-spacing: 0.06em;
   margin-top: 4px;
   color: var(--ink-2);
@@ -732,7 +732,7 @@ legend.gs-instruction {
   gap: 8px;
   font-family: var(--serif);
   font-weight: 500;
-  font-size: 24px;
+  font-size: var(--type-section);
 }
 .gs-incorrect .gs-verdict {
   color: var(--red);
@@ -744,7 +744,7 @@ legend.gs-instruction {
 .gs-verdict-ja {
   display: block;
   font-family: var(--serif);
-  font-size: 15px;
+  font-size: var(--type-control);
   letter-spacing: 0.1em;
   margin: -2px 0 0 28px;
   color: var(--ink-2);
@@ -753,17 +753,17 @@ legend.gs-instruction {
   color: var(--red);
 }
 .gs-comparison {
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
   margin: 6px 0 0 !important;
 }
 .gs-feedback p {
   margin: 6px 0 0;
-  font-size: 14px;
+  font-size: var(--type-chrome);
 }
 .gs-feedback .gs-text {
   margin-top: 8px;
-  font-size: 13px;
+  font-size: var(--type-label);
 }
 .gs-return-link {
   margin-top: 16px;
@@ -778,16 +778,16 @@ legend.gs-instruction {
 }
 .gs-aside h3,
 .gs-aside .gs-aside-title {
-  font-size: 16px;
+  font-size: var(--type-body);
 }
 .gs-aside p {
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
 }
 .gs-aside .gs-text {
   display: block;
   margin-top: 8px;
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
   border-bottom: 0 !important;
 }
 .gs-aside .gs-text [lang='ja'] {
@@ -798,12 +798,12 @@ legend.gs-instruction {
   padding-top: 14px;
 }
 .gs-aside .gs-rule p {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--faint);
 }
 .gs-source-id {
   font-family: 'Roboto Mono', 'Noto Sans JP', ui-monospace, Menlo, monospace;
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
   word-break: break-all;
 }
@@ -827,7 +827,7 @@ legend.gs-instruction {
   color: var(--sheet-ink);
 }
 .gs-anchor {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   letter-spacing: 0.06em;
   color: var(--sheet-faint);
   margin-bottom: 14px;
@@ -846,16 +846,16 @@ legend.gs-instruction {
 }
 .gs-target > span:first-child {
   font-family: var(--serif);
-  font-size: 26px;
+  font-size: var(--type-section);
   color: var(--sheet-ink);
 }
 .gs-target > span:last-child {
   color: var(--sheet-ink-2);
-  font-size: 14px;
+  font-size: var(--type-chrome);
 }
 .gs-reading {
   font-family: var(--sans);
-  font-size: 0.62em;
+  font-size: var(--type-label);
   font-weight: 400;
   margin-inline-start: 0.16em;
   color: var(--red);
@@ -869,7 +869,7 @@ legend.gs-instruction {
   align-items: center;
   gap: 8px 18px;
   margin: 12px 0 18px;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--sheet-faint);
 }
 .gs-lacquer .gs-text {
@@ -882,7 +882,7 @@ legend.gs-instruction {
   color: var(--card-ink, var(--ink));
   padding: 16px 18px;
   border-radius: var(--radius-card);
-  font-size: 19px;
+  font-size: var(--type-lead);
   line-height: 1.9;
   margin: 6px 0 14px !important;
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
@@ -900,12 +900,12 @@ legend.gs-instruction {
 }
 .gs-meaning {
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--sheet-ink-2);
   margin: 0 0 14px !important;
 }
 .gs-teaching {
-  font-size: 14.5px;
+  font-size: var(--type-control);
   line-height: 1.7;
   color: var(--sheet-ink-2);
   border-top: 1px solid var(--sheet-line);
@@ -921,13 +921,13 @@ legend.gs-instruction {
   border-radius: var(--radius-card);
 }
 .gs-example p {
-  font-size: 17px;
+  font-size: var(--type-lead);
   margin: 0 0 4px !important;
   color: var(--sheet-ink);
 }
 .gs-example small {
   color: var(--sheet-faint);
-  font-size: 12.5px;
+  font-size: var(--type-label);
 }
 .gs-lacquer > .gs-eyebrow:not(:first-of-type) {
   margin-top: 18px;
@@ -945,7 +945,7 @@ legend.gs-instruction {
   border-radius: var(--radius-card);
   color: var(--gold);
   font-family: var(--serif) !important;
-  font-size: 15px;
+  font-size: var(--type-control);
 }
 .gs-branch-links button span {
   opacity: 0.7;
@@ -971,7 +971,7 @@ legend.gs-instruction {
   flex-wrap: wrap;
 }
 .gs-branch-reading {
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--sheet-red);
   letter-spacing: 0.06em;
   font-weight: 400;
@@ -1014,25 +1014,25 @@ legend.gs-instruction {
 }
 .gs-row-number {
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint);
   padding-top: 3px;
 }
 .gs-row h3,
 .gs-row .gs-row-title {
-  font-size: 18px;
+  font-size: var(--type-lead);
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 4px 10px;
 }
 .gs-row p {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   margin: 2px 0 6px !important;
 }
 .gs-row .gs-text {
-  font-size: 13px;
+  font-size: var(--type-label);
   border-bottom-color: transparent !important;
 }
 .gs-row .gs-text [lang='ja'] {
@@ -1048,7 +1048,7 @@ legend.gs-instruction {
   display: inline-flex;
   align-items: baseline;
   gap: 6px;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   white-space: nowrap;
 }
@@ -1073,7 +1073,7 @@ legend.gs-instruction {
   gap: 4px 12px;
 }
 .gs-card {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
 }
 .gs-card b {
@@ -1105,7 +1105,7 @@ legend.gs-instruction {
 }
 .gs-deck-summary p {
   font-family: var(--serif);
-  font-size: 15px;
+  font-size: var(--type-control);
 }
 .gs-results {
   display: grid;
@@ -1114,17 +1114,17 @@ legend.gs-instruction {
   padding-top: 20px;
 }
 .gs-score {
-  font-size: clamp(40px, 9vw, 56px) !important;
+  font-size: clamp(var(--type-headword), 9vw, calc(var(--type-headword) * 1.25)) !important;
   line-height: 1.05;
 }
 .gs-of {
-  font-size: 0.42em;
+  font-size: var(--type-lead);
   color: var(--ink-2);
 }
 .gs-h-sub {
   display: block;
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: var(--type-label);
   letter-spacing: 0.04em;
   color: var(--ink-2);
   margin-top: 14px;
@@ -1146,12 +1146,12 @@ legend.gs-instruction {
 .gs-results-facts strong {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: 24px;
+  font-size: var(--type-section);
   display: block;
   font-variant-numeric: tabular-nums;
 }
 .gs-results-facts span {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   display: block;
 }
@@ -1166,7 +1166,7 @@ legend.gs-instruction {
   gap: 6px 10px;
   margin: 4px 0 12px !important;
   font-family: var(--serif);
-  font-size: 16px;
+  font-size: var(--type-body);
 }
 .gs-gap-line b {
   font-weight: 500;
@@ -1188,11 +1188,11 @@ legend.gs-instruction {
 }
 .gs-focus-target {
   font-family: var(--serif);
-  font-size: 30px;
+  font-size: var(--type-title);
   margin: 6px 0 8px;
 }
 .gs-focus p {
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
 }
 
@@ -1206,7 +1206,7 @@ legend.gs-instruction {
 .gs-draft-label {
   display: block;
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: var(--type-label);
   letter-spacing: 0.06em;
   color: var(--ink-2);
   margin: 16px 0 6px;
@@ -1219,7 +1219,7 @@ legend.gs-instruction {
   border-radius: var(--radius-card);
   background: var(--ground-0);
   color: var(--ink);
-  font-size: 17px;
+  font-size: var(--type-lead);
   line-height: 1.8;
   resize: vertical;
   box-sizing: border-box;
@@ -1239,7 +1239,7 @@ legend.gs-instruction {
   grid-template-columns: auto 1fr;
   gap: 6px 14px;
   margin: 10px 0 0;
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
 }
 .gs-sensei-context dt {
   color: var(--faint);
@@ -1248,7 +1248,7 @@ legend.gs-instruction {
   margin: 0;
 }
 .gs-copy-message {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ai);
   min-height: 1em;
 }
@@ -1260,7 +1260,7 @@ legend.gs-instruction {
   margin-top: 40px;
   padding-top: 18px;
   border-top: 1px solid var(--line-soft);
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
 }
 .gs-moments,
@@ -1275,7 +1275,7 @@ legend.gs-instruction {
   letter-spacing: 0.08em;
 }
 .gs-footer .gs-text {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   min-height: 34px;
 }
@@ -1292,7 +1292,7 @@ legend.gs-instruction {
 }
 .gs-effect select {
   font: inherit;
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ink);
   background: var(--ground-0);
   border: 1px solid var(--line);
@@ -1306,7 +1306,7 @@ legend.gs-instruction {
   height: 16px;
 }
 .gs-footer-note {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--faint);
 }
 .gs-save-status {
@@ -1379,17 +1379,17 @@ legend.gs-instruction {
 }
 @media (max-width: 380px) {
   .gs-hero {
-    font-size: 30px !important;
+    font-size: var(--type-title) !important;
   }
   .gs-choice {
-    font-size: 16px;
+    font-size: var(--type-body);
   }
   .gs-node {
-    font-size: 14px;
+    font-size: var(--type-chrome);
     padding: 4px 6px !important;
   }
   .gs-node small {
-    font-size: 9px;
+    font-size: var(--type-caption);
   }
 }
 @media (max-width: 760px) {
@@ -1402,10 +1402,10 @@ legend.gs-instruction {
     display: none;
   }
   .gs-node {
-    font-size: 14px;
+    font-size: var(--type-chrome);
     padding: 4px 6px !important;
   }
   .gs-node small {
-    font-size: 9.5px;
+    font-size: var(--type-caption);
   }
 }

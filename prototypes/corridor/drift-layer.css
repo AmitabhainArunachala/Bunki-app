@@ -253,6 +253,13 @@ body[data-furigana='1'] #drift-layer.active #sky > .glyph.hosted-constellation-g
 body[data-furigana='2'] #drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g > ruby.drift-reading > rt {
   pointer-events: auto;
 }
+/* G3: hosted glyphs keep native reading markup at rest, including before their first tap, and the hosted sky follows
+   the same reading dial as prose. A sibling gloss/particle caption is never part of the ruby. (At F's merge these moved
+   here from editorial.css: the sky's reading rules stand in the sky's own sheet, so the house's one ruby stays the one
+   rule that sizes a reading everywhere else.) */
+body[data-furigana] #drift-layer .drift-reading rt { font-size: .45em; line-height: 1; opacity: 0; }
+body[data-furigana='1'] #drift-layer .hosted-reading-shown .drift-reading rt,
+body[data-furigana='2'] #drift-layer .drift-reading rt { opacity: 1; }
 
 /* Interface arrivals stay short and still when motion is reduced. The card
  * occupies its final position throughout its fade; direct field gestures

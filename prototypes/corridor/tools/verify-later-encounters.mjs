@@ -59,8 +59,15 @@ async function againReturns(page, cue, session) {
   assert.deepEqual(await page.evaluate(() => window.__KAIRO_SRS__.session()),
     { queue: session.queue + 1, ix: session.ix + 1, deferred: session.deferred }, 'Again reinserts the card as the next item');
 }
-async function gradeAgain(page) {
+// Check, then Again. The cue Again must show again is the card's face-down cue, so it is read before Check, while the
+// gap still stands; Check is done once the answer shows (the grades are drawn and the cue carries the answer where the
+// gap was). Reading the cue after the Check click raced that render: before it, the gap; after it, the answer.
+async function checkThenAgain(page) {
   const cue = await page.locator('.sentence-recall-cue').textContent();
+  assert.equal(await page.locator('.sentence-recall-cue .sentence-gap').count(), 1, 'The face-down card shows its gap');
+  await page.locator('#sentence-recall-check').click();
+  await page.locator('.grade.g-again').waitFor();
+  assert.equal(await page.locator('.sentence-recall-cue .sentence-answer').count(), 1, 'Check shows the answer in the gap');
   const session = await page.evaluate(() => window.__KAIRO_SRS__.session());
   await page.locator('.grade.g-again').click(); await againReturns(page, cue, session);
 }
@@ -262,7 +269,7 @@ for (const engine of engines) for (const width of sizes) {
     assert.deepEqual(enrolled.sentencePractice.entries.find(entry => entry.plan.id === first.plan.id), original);
     assert.deepEqual(second.plan.confirmation, first.plan.confirmation);
     await page.locator('#sentence-review-start').click(); await page.locator('#sentence-recall-answer').fill('戸');
-    await page.locator('#sentence-recall-check').click(); await gradeAgain(page);
+    await checkThenAgain(page);
     const beforeUndo = await snapshot('later-difficulty-before-undo');
     await page.locator('.review-undo').click();
     await waitForAppRecord(page, record => record.revlog.length === beforeUndo.revlog.length + 1 && record.revlog.at(-1)[2] === 0,
@@ -280,8 +287,7 @@ for (const engine of engines) for (const width of sizes) {
     });
     assert.equal(await suggestion('revisit').count(), 0, 'An undone grade must not request remedial reading');
     await openSaved(second.plan.id); await page.locator('#sentence-review-start').click();
-    await page.locator('#sentence-recall-answer').fill('戸'); await page.locator('#sentence-recall-check').click();
-    await gradeAgain(page);
+    await page.locator('#sentence-recall-answer').fill('戸'); await checkThenAgain(page);
     const difficult = await snapshot('later-recall-needed-another-try');
     assert.equal(difficult.sentencePractice.grades.length, firstGrades + 2);
     assert.equal(difficult.sentencePractice.grades.at(-1).observation.grade, 'again');

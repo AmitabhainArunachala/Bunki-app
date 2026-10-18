@@ -91,21 +91,37 @@ await page.waitForSelector('#tray', { timeout: 30000 });
 const card = await page.$('#shelf-body [data-passage]');
 if (card) {
   await card.click(); await page.waitForSelector('#reader', { timeout: 30000 }); await page.waitForTimeout(400);
-  // the play bar stands folded to its one mark (John, 2026-10-15 17:20): quiet by design — no edge, no bed, no shadow;
-  // the mark itself is a 44 px door. (The open bar's scan-line relief is pinned by verify-playback on a narrated fixture.)
+  // F (the lead's ruling, 2026-10-18): an article with no recording draws no listen mark at all (no dead control)
+  const none = await page.evaluate(`(() => { const row = document.querySelector('.listen-row'); return row ? { pending: row.classList.contains('is-pending'), hidden: row.hidden, drawn: row.checkVisibility(), mark: !!document.querySelector('#listen-open') } : null; })()`);
+  receipt.surfaces['listen mark (no recording)'] = none;
+  if (!none) failures.push('listen row: no .listen-row place in the reader');
+  else if (none.pending && !(none.hidden && !none.drawn && !none.mark)) failures.push(`listen mark: drawn for an article with no recording (${JSON.stringify(none)})`);
+  await check('reader body', '#reader');
+}
+// the play bar stands folded to its one mark (John, 2026-10-15 17:20) on the article that ships its recording: quiet by
+// design — no edge, no bed, no shadow — a 44 px door at the right end of the instrument line, in the head's flow (F, the
+// lead's ruling on Grok f-86, 2026-10-18). (The open bar's scan-line relief is pinned by verify-playback on a narrated fixture.)
+await page.goto(`${base}/?entry=shelf`);
+await page.waitForSelector('#tray', { timeout: 30000 });
+const NARRATED = 'jawiki:5294446';
+if (await page.$(`#shelf-body [data-passage="${NARRATED}"] .shelf-open`)) {
+  await page.evaluate((pid) => document.querySelector(`#shelf-body [data-passage="${pid}"] .shelf-open`).click(), NARRATED);
+  await page.waitForSelector('#reader', { timeout: 30000 });
+  await page.waitForFunction(() => !!document.querySelector('#listen-open'), null, { timeout: 15000 }).catch(() => {});
+  await page.waitForTimeout(400);
   const mark = await page.evaluate(`(() => { const row = document.querySelector('.listen-row.play-bar'); const m = document.querySelector('#listen-open'); if (!row || !m) return null;
     const probe = document.createElement('i'); probe.style.background = 'var(--color-surface)'; document.body.append(probe); const surface = getComputedStyle(probe).backgroundColor; probe.remove();
-    const cs = getComputedStyle(row), r = m.getBoundingClientRect(); return { open: row.dataset.open, border: parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth), bg: cs.backgroundColor, surface, shadow: cs.boxShadow, w: r.width, h: r.height }; })()`);
+    const cs = getComputedStyle(row), r = m.getBoundingClientRect(); return { open: row.dataset.open, inHead: !!row.closest('.reader-head'), position: cs.position, border: parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth), bg: cs.backgroundColor, surface, shadow: cs.boxShadow, w: r.width, h: r.height }; })()`);
   receipt.surfaces['listen mark (folded)'] = mark;
-  if (!mark) failures.push('listen mark: .listen-row.play-bar #listen-open not found');
+  if (!mark) failures.push(`listen mark: .listen-row.play-bar #listen-open not found on the narrated article ${NARRATED}`);
   else {
     if (mark.open !== 'false') failures.push(`listen mark: the bar is not folded (data-open ${mark.open})`);
-    // quiet: no edge, no shadow, no bed — its ground exactly the reader's own surface (a disc that keeps the glyph off bare text)
+    if (!(mark.inHead && mark.position === 'static')) failures.push(`listen mark: folded, it is not in the head's flow (in head ${mark.inHead}, position ${mark.position})`);
+    // quiet: no edge, no shadow, no bed — its ground exactly the reader's own surface
     if (!(mark.border === 0 && mark.bg === mark.surface && !/\/ 0\)|rgba\([^)]*, 0\)/.test(mark.bg) && mark.shadow === 'none')) failures.push(`listen mark: the folded bar is not quiet (border ${mark.border}, bg ${mark.bg} vs surface ${mark.surface}, shadow ${mark.shadow})`);
     if (!(mark.w >= 44 && mark.h >= 44)) failures.push(`listen mark: under 44px (${mark.w}×${mark.h})`);
   }
-  await check('reader body', '#reader');
-}
+} else failures.push(`listen mark: the narrated article ${NARRATED} is not on the shelf`);
 await browser.close();
 server.close();
 receipt.failures = failures;

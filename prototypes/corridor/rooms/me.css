@@ -66,26 +66,36 @@ html[data-room='me'] .me-edges {
 html[data-room='me'] .me-head .me-kicker { margin: 0 0 var(--space-2); }
 html[data-room='me'] .me-head .view-title {
   margin: 0 0 var(--space-2);
-  font: 800 clamp(30px, 9vw, 38px)/1.08 var(--font-headword);
+  font: 800 var(--type-hero)/1.08 var(--font-headword);
   letter-spacing: -0.01em;
   text-wrap: balance;
 }
 html[data-room='me'] body:not(.ui-bi) .me-head .view-title { letter-spacing: 0.04em; word-break: keep-all; line-break: strict; }
-html[data-room='me'] :is(.me-dateline, .me-hz-sub, .me-cal-foot, .me-home-when, .me-line-src, .me-part-aside, .me-hz-n, .me-lead-m) {
-  font-family: var(--font-data);
+/* the book's faces (F, L-5: one ladder, no monospace in the book): its labels and figures-in-a-line are the interface's
+   face (--font-ui) with tabular numerals, its prose the reading face, its titles and its big numerals the headword
+   face — three faces, each with one job */
+html[data-room='me'] :is(.me-dateline, .me-hz-sub, .me-cal-foot, .me-home-when, .me-line-src, .me-part-aside, .me-hz-n) {
+  font-family: var(--font-ui);
   font-variant-numeric: tabular-nums;
 }
-html[data-room='me'] .me-dateline { margin: 0; font-size: 12px; line-height: 1.7; letter-spacing: 0.06em; color: var(--color-muted); }
+html[data-room='me'] .me-lead-m { font-family: var(--font-reading); font-variant-numeric: tabular-nums; }
+html[data-room='me'] .me-dateline { margin: 0; font-size: var(--type-caption); line-height: 1.7; letter-spacing: 0.06em; color: var(--color-muted); }
 html[data-room='me'] body.ui-bi .me-dateline { text-transform: uppercase; }
 html[data-room='me'] body:not(.ui-bi) .me-dateline { font-family: var(--font-reading); letter-spacing: 0.04em; }
-html[data-room='me'] body:not(.ui-bi) .me-dateline b { font-family: var(--font-data); }
 html[data-room='me'] .me-clause { white-space: nowrap; }
-html[data-room='me'] body .me-dateline.is-blank { font: 400 15px/1.65 var(--font-reading); letter-spacing: 0.02em; text-transform: none; color: var(--color-ink-2); }
+html[data-room='me'] body .me-dateline.is-blank { font: 400 var(--type-control)/1.65 var(--font-reading); letter-spacing: 0.02em; text-transform: none; color: var(--color-ink-2); }
 html[data-room='me'] :is(.me-dateline, .me-hz-sub, .me-line-src) b { color: var(--color-ink); font-weight: 700; }
 html[data-room='me'] .me-lead { display: grid; gap: 3px; margin: var(--space-4) 0 0; }
-html[data-room='me'] .me-lead-n { font: 700 40px/1 var(--font-data); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; color: var(--color-ink); }
-html[data-room='me'] .me-lead-l { font: 800 17px/1.3 var(--font-headword); }
-html[data-room='me'] .me-lead-m { font-size: 11px; line-height: 1.5; color: var(--color-muted); }
+html[data-room='me'] .me-lead-n { font: 800 var(--type-headword)/1 var(--font-headword); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; color: var(--color-ink); }
+html[data-room='me'] .me-lead-l { font: 800 var(--type-lead)/1.3 var(--font-headword); }
+html[data-room='me'] .me-lead-m { font-size: var(--type-label); line-height: 1.5; color: var(--color-muted); }
+/* G2's help line (on integration 7f1912be; its own rules there, editorial.css:5405–5409, set 24 / 15 / 13 px and the
+   mono face, and give way to these on the merge): set as the lead above it — the figure in the headword face, its
+   label as the lead's, its note as prose */
+html[data-room='me'] .me-help-n { font: 800 var(--type-section)/1 var(--font-headword); font-variant-numeric: tabular-nums; color: var(--color-ink); }
+html[data-room='me'] .me-help-l { font: 800 var(--type-lead)/1.3 var(--font-headword); }
+html[data-room='me'] .me-help-m { font: 400 var(--type-label)/1.5 var(--font-reading); font-variant-numeric: tabular-nums; color: var(--color-muted); }
+html[data-room='me'] .me-help:not(:has(.me-help-n)) { font: 400 var(--type-label)/1.55 var(--font-reading); color: var(--color-muted); }
 
 /* ruled sections */
 html[data-room='me'] .me-part {
@@ -95,14 +105,14 @@ html[data-room='me'] .me-part {
 }
 html[data-room='me'] .me-part-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
 html[data-room='me'] .me-part-head h2.eyebrow { margin: 0 0 var(--space-2); }
-html[data-room='me'] .me-part-aside { font-size: 11px; letter-spacing: 0.06em; color: var(--color-gold); }
-html[data-room='me'] .me-quiet { margin: var(--space-1) 0 0; font: 400 14px/1.65 var(--font-reading); color: var(--color-ink-2); }
+html[data-room='me'] .me-part-aside { font-size: var(--type-caption); letter-spacing: 0.06em; color: var(--color-gold); }
+html[data-room='me'] .me-quiet { margin: var(--space-1) 0 0; font: 400 var(--type-chrome)/1.65 var(--font-reading); color: var(--color-ink-2); }
 
 /* four horizons: thin gold hairlines, mono numbers */
 html[data-room='me'] .me-hz { margin: var(--space-3) 0 var(--space-4); }
 html[data-room='me'] .me-hz-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
-html[data-room='me'] .me-hz-name { font: 800 17px/1.25 var(--font-headword); }
-html[data-room='me'] .me-hz-n { font-size: 13px; white-space: nowrap; color: var(--color-muted); }
+html[data-room='me'] .me-hz-name { font: 800 var(--type-lead)/1.25 var(--font-headword); }
+html[data-room='me'] .me-hz-n { font-size: var(--type-label); white-space: nowrap; color: var(--color-muted); }
 html[data-room='me'] .me-hz-n b { color: var(--color-ink); font-weight: 700; }
 html[data-room='me'] .me-hz-rule {
   position: relative; height: 9px; margin: 6px 0 4px;
@@ -122,7 +132,7 @@ html[data-room='me'] .me-hz-rule .me-hz-fill {
 }
 html[data-room='me'] .me-hz-rule .me-hz-met { top: 3.5px; height: 2px; background: color-mix(in srgb, var(--color-gold) 28%, transparent); }
 @keyframes me-fill { from { transform: scaleX(0); } }
-html[data-room='me'] .me-hz-sub { margin: 0; font-size: 11px; line-height: 1.5; letter-spacing: 0.05em; color: var(--color-muted); }
+html[data-room='me'] .me-hz-sub { margin: 0; font-size: var(--type-caption); line-height: 1.5; letter-spacing: 0.05em; color: var(--color-muted); }
 html[data-room='me'] body.ui-bi .me-hz-sub { text-transform: uppercase; }
 html[data-room='me'] .me-hz.not-begun .me-hz-name { color: var(--color-ink-2); }
 html[data-room='me'] .me-settle .me-hz-rule i { animation-delay: 0ms; }
@@ -146,11 +156,12 @@ html[data-room='me'] .me-n1-seal {
   border-radius: var(--radius-seal);
   background: var(--color-ink);
   color: var(--color-surface);
-  font: 800 15px/1 var(--font-headword);
+  font: 800 var(--type-control)/1 var(--font-headword);
   letter-spacing: 0.04em;
 }
 html[data-room='me'] .me-n1-when {
-  font: 600 12px/1 var(--font-data);
+  font: 600 var(--type-caption)/1 var(--font-ui);
+  font-variant-numeric: tabular-nums;
   letter-spacing: 0.12em;
   color: var(--color-ink);
 }
@@ -161,16 +172,17 @@ html[data-room='me'] .me-n1-count {
   color: var(--color-ink);
 }
 html[data-room='me'] .me-n1-days {
-  font: 800 48px/0.95 var(--font-headword);
+  font: 800 calc(var(--type-headword) * 1.25)/0.95 var(--font-headword);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
-html[data-room='me'] .me-n1-unit { font: 600 15px/1.2 var(--font-ui); color: var(--color-ink-2); }
-html[data-room='me'] body:not(.ui-bi) .me-n1-unit { font: 800 17px/1.2 var(--font-headword); }
-html[data-room='me'] .me-n1-count.is-done .me-n1-unit { font: 800 20px/1.25 var(--font-headword); color: var(--color-ink); }
+html[data-room='me'] .me-n1-unit { font: 600 var(--type-control)/1.2 var(--font-ui); color: var(--color-ink-2); }
+html[data-room='me'] body:not(.ui-bi) .me-n1-unit { font: 800 var(--type-lead)/1.2 var(--font-headword); }
+html[data-room='me'] .me-n1-count.is-done .me-n1-unit { font: 800 var(--type-reading)/1.25 var(--font-headword); color: var(--color-ink); }
 html[data-room='me'] .me-n1-date {
   margin: 8px 0 0;
-  font: 400 11px/1.5 var(--font-data);
+  font: 400 var(--type-caption)/1.5 var(--font-ui);
+  font-variant-numeric: tabular-nums;
   letter-spacing: 0.05em;
   color: var(--color-muted);
 }
@@ -182,15 +194,15 @@ html[data-room='me'] .me-n1 .me-hz {
 }
 html[data-room='me'] .me-hz-group {
   margin: var(--space-4) 0 0;
-  font: 600 11px/1.2 var(--font-ui);
+  font: 600 var(--type-caption)/1.2 var(--font-ui);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-muted);
 }
-html[data-room='me'] body:not(.ui-bi) .me-hz-group { letter-spacing: 0.24em; font-size: 12px; text-transform: none; }
+html[data-room='me'] body:not(.ui-bi) .me-hz-group { letter-spacing: 0.24em; font-size: var(--type-caption); text-transform: none; }
 html[data-room='me'] .me-hz-note {
   margin: 3px 0 0;
-  font: 400 13px/1.45 var(--font-reading);
+  font: 400 var(--type-label)/1.45 var(--font-reading);
   color: var(--color-ink-2);
   text-wrap: pretty;
 }
@@ -222,8 +234,8 @@ html[data-room='me'] .me-home {
 }
 html[data-room='me'] .me-home:last-child { border-bottom: 0; }
 html[data-room='me'] .me-home-w { display: grid; gap: 1px; }
-html[data-room='me'] .me-home-surface { font: 800 26px/1.15 var(--font-headword); letter-spacing: 0.04em; }
-html[data-room='me'] .me-home-r { font: 400 11.5px/1.3 var(--font-reading); letter-spacing: 0.1em; color: var(--color-muted); }
+html[data-room='me'] .me-home-surface { font: 800 var(--type-section)/1.15 var(--font-headword); letter-spacing: 0.04em; }
+html[data-room='me'] .me-home-r { font: 400 var(--type-caption)/1.3 var(--font-reading); letter-spacing: 0.1em; color: var(--color-muted); }
 html[data-room='me'] .me-home-seam { position: relative; display: block; height: 18px; overflow: hidden; }
 html[data-room='me'] .me-seam { display: block; width: 100%; height: 100%; overflow: visible; }
 html[data-room='me'] .me-seam path {
@@ -242,15 +254,15 @@ html[data-room='me'] .me-gleam {
 }
 @keyframes me-gleam { 0% { opacity: 0; transform: translateX(-100%); } 30% { opacity: 0.9; } 100% { opacity: 0; transform: translateX(380%); } }
 html[data-room='me'] .me-home .me-gleam { animation-delay: min(240ms, calc(160ms + var(--i, 0) * 40ms)); }
-html[data-room='me'] .me-home-when { display: grid; justify-items: end; gap: 2px; font-size: 11px; line-height: 1.35; letter-spacing: 0.04em; color: var(--color-muted); white-space: nowrap; }
+html[data-room='me'] .me-home-when { display: grid; justify-items: end; gap: 2px; font-size: var(--type-caption); line-height: 1.35; letter-spacing: 0.04em; color: var(--color-muted); white-space: nowrap; }
 html[data-room='me'] .me-home-when b { color: var(--color-gold); font-weight: 700; }
 @keyframes me-rise { from { opacity: 0.01; transform: translateY(6px); } }
 
 /* the seal calendar: a 朱 seal carrying 習 or 読 on every day practised */
 html[data-room='me'] .me-month { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; }
 html[data-room='me'] .me-month-title { margin: 0; display: flex; justify-content: center; align-items: baseline; gap: 8px; }
-html[data-room='me'] .me-month-name { font: 800 24px/1.1 var(--font-headword); }
-html[data-room='me'] .me-month-year { font: 500 12px/1 var(--font-data); color: var(--color-muted); letter-spacing: 0.08em; }
+html[data-room='me'] .me-month-name { font: 800 var(--type-section)/1.1 var(--font-headword); }
+html[data-room='me'] .me-month-year { font: 500 var(--type-caption)/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--color-muted); letter-spacing: 0.08em; }
 html[data-room='me'] .me-turn {
   width: 44px; height: 44px; display: grid; place-items: center; padding: 0;
   border: 0; background: transparent; color: var(--color-ink-2); border-radius: var(--radius-control); cursor: pointer;
@@ -263,20 +275,20 @@ html[data-room='me'] .me-turn-on::before { transform: translateX(-2px) rotate(-1
 html[data-room='me'] .me-turn:disabled { opacity: 0.25; cursor: default; }
 html[data-room='me'] .me-turn:not(:disabled):hover { background: var(--color-fill); }
 html[data-room='me'] :is(.me-dow, .me-cal) { display: grid; grid-template-columns: repeat(7, 1fr); }
-html[data-room='me'] .me-dow { margin: var(--space-2) 0 4px; text-align: center; font: 500 10px/1 var(--font-data); letter-spacing: 0.08em; color: var(--color-muted); }
+html[data-room='me'] .me-dow { margin: var(--space-2) 0 4px; text-align: center; font: 500 var(--type-caption)/1 var(--font-ui); letter-spacing: 0.08em; color: var(--color-muted); }
 html[data-room='me'] .me-cal { gap: 4px; }
 html[data-room='me'] .me-day {
   position: relative; display: block; aspect-ratio: 1; font-style: normal;
   box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-line);
 }
 html[data-room='me'] .me-day.blank { box-shadow: none; }
-html[data-room='me'] .me-day-n { position: absolute; left: 3px; top: 2px; z-index: 2; font: 400 8.5px/1 var(--font-data); color: var(--color-muted); }
+html[data-room='me'] .me-day-n { position: absolute; left: 3px; top: 2px; z-index: 2; font: 400 var(--type-caption)/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--color-muted); }
 html[data-room='me'] .me-seal {
   position: absolute; inset: 24% 16% 14% 20%; display: grid; place-items: center;
   border-radius: var(--radius-seal);
   background: var(--color-seal);
   color: var(--color-surface);
-  font: 800 clamp(13px, 4.2vw, 17px)/1 var(--font-headword);
+  font: 800 var(--type-body)/1 var(--font-headword);
   box-shadow: inset 0 0 0 1.25px var(--color-surface), inset 0 0 0 2.5px var(--color-seal);
   opacity: 0.92;
   transform: rotate(-4deg);
@@ -289,9 +301,9 @@ html[data-room='me'] .me-day.seal-read .me-seal { background: transparent; color
 @keyframes me-stamp { from { opacity: 0; transform: scale(1.3) rotate(-4deg); } }
 html[data-room='me'] .me-day.is-today { box-shadow: inset 0 0 0 1.5px var(--color-live); }
 html[data-room='me'] .me-day.is-today .me-day-n { color: var(--color-live); font-weight: 700; }
-html[data-room='me'] .me-cal-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: var(--space-3) 0 0; font-size: 11px; letter-spacing: 0.05em; color: var(--color-muted); }
+html[data-room='me'] .me-cal-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: var(--space-3) 0 0; font-size: var(--type-caption); letter-spacing: 0.05em; color: var(--color-muted); }
 html[data-room='me'] .me-key { display: inline-flex; align-items: center; gap: 6px; }
-html[data-room='me'] .me-key-seal { width: 16px; height: 16px; display: grid; place-items: center; border-radius: var(--radius-seal); background: var(--color-seal); color: var(--color-surface); font: 800 10px/1 var(--font-headword); }
+html[data-room='me'] .me-key-seal { width: 16px; height: 16px; display: grid; place-items: center; border-radius: var(--radius-seal); background: var(--color-seal); color: var(--color-surface); font: 800 var(--type-caption)/1 var(--font-headword); }
 html[data-room='me'] .me-key-seal.read { background: transparent; color: var(--color-seal); box-shadow: inset 0 0 0 1px var(--color-seal); }
 html[data-room='me'] .me-cal-count { margin-left: auto; color: var(--color-ink-2); }
 html[data-room='me'] .me-seals.turned-back .me-cal { animation: me-turn-back var(--motion-sheet) var(--ease-enter) backwards; transform-origin: 100% 50%; }
@@ -303,11 +315,11 @@ html[data-room='me'] .me-seals:is(.turned-back, .turned-on) .me-seal { animation
 /* a line you wrote by hand */
 html[data-room='me'] .me-hand {
   margin: var(--space-1) 0 var(--space-2);
-  font: 400 22px/1.8 var(--font-brush);
+  font: 400 var(--type-reading)/1.8 var(--font-brush);
   color: var(--color-ink);
   line-break: strict; overflow-wrap: anywhere;
 }
-html[data-room='me'] .me-line-src { margin: 0; font-size: 11px; letter-spacing: 0.05em; color: var(--color-muted); }
+html[data-room='me'] .me-line-src { margin: 0; font-size: var(--type-caption); letter-spacing: 0.05em; color: var(--color-muted); }
 html[data-room='me'] .me-line-title { font-family: var(--font-reading); letter-spacing: 0.04em; color: var(--color-ink-2); }
 
 /* contents and the back of the book: ruled rows, not cards */
@@ -316,20 +328,20 @@ html[data-room='me'] body.v-depth-layered #app .me-book .foundation-door {
   min-height: 50px; padding: 0 2px; margin: 0;
   background: transparent; border: 0; border-radius: 0; box-shadow: none;
   border-bottom: var(--stroke-hairline) solid var(--color-line);
-  font: 500 15px/1.3 var(--font-ui);
+  font: 500 var(--type-control)/1.3 var(--font-ui);
 }
-html[data-room='me'] body:not(.ui-bi) .me-book .foundation-door { font: 800 15px/1.3 var(--font-headword); letter-spacing: 0.06em; }
+html[data-room='me'] body:not(.ui-bi) .me-book .foundation-door { font: 800 var(--type-control)/1.3 var(--font-headword); letter-spacing: 0.06em; }
 html[data-room='me'] body.v-depth-layered #app .me-book .foundation-door:hover { background: var(--color-fill); }
 html[data-room='me'] .me-set {
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
   min-height: 60px; border-bottom: var(--stroke-hairline) solid var(--color-line);
 }
-html[data-room='me'] .me-set-l { font: 500 15px/1.3 var(--font-ui); }
-html[data-room='me'] body:not(.ui-bi) .me-set-l { font: 800 15px/1.3 var(--font-headword); letter-spacing: 0.06em; }
+html[data-room='me'] .me-set-l { font: 500 var(--type-control)/1.3 var(--font-ui); }
+html[data-room='me'] body:not(.ui-bi) .me-set-l { font: 800 var(--type-control)/1.3 var(--font-headword); letter-spacing: 0.06em; }
 html[data-room='me'] .me-seg { display: inline-flex; flex: none; padding: 2px; border-radius: var(--radius-control); box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-edge-strong); }
 html[data-room='me'] .me-seg button {
   min-width: 60px; min-height: 44px; padding: 0 12px; border: 0; border-radius: var(--radius-control);
-  background: transparent; color: var(--color-ink-2); font: 500 14px/1 var(--font-ui); cursor: pointer;
+  background: transparent; color: var(--color-ink-2); font: 500 var(--type-chrome)/1 var(--font-ui); cursor: pointer;
 }
 html[data-room='me'] .me-seg button[lang='ja'] { font-family: var(--font-headword); font-weight: 800; }
 html[data-room='me'] .me-seg button[aria-pressed='true'] { background: var(--color-ink); color: var(--color-surface); font-weight: 700; }
@@ -378,7 +390,7 @@ html[data-room='me'] .me-seg button[aria-pressed='true'] { background: var(--col
 
 /* settings: the back pages of the same book */
 html[data-room='settings'] main .me-kicker { margin: 0 0 var(--space-2); }
-html[data-room='settings'] main > .view-title { font: 800 clamp(28px, 8vw, 36px)/1.1 var(--font-headword); }
+html[data-room='settings'] main > .view-title { font: 800 var(--type-display)/1.1 var(--font-headword); }
 html[data-room='settings'] main .foundation-section { padding-top: var(--space-3); }
 
 html[data-room='settings'] main :is(.settings-language, .settings-layout-choice) {
@@ -387,21 +399,21 @@ html[data-room='settings'] main :is(.settings-language, .settings-layout-choice)
 }
 html[data-room='settings'] main :is(.settings-language, .settings-layout-choice) button {
   min-width: 72px; min-height: 44px; padding: 0 14px; border: 0; border-radius: var(--radius-control);
-  background: transparent; color: var(--color-ink-2); font: 500 14px/1 var(--font-ui);
+  background: transparent; color: var(--color-ink-2); font: 500 var(--type-chrome)/1 var(--font-ui);
 }
 html[data-room='settings'] main :is(.settings-language, .settings-layout-choice) button[aria-pressed='true'] { background: var(--color-ink); color: var(--color-surface); font-weight: 700; }
 /* G4 · 筆 and 声: two named rows of the same segmented choice as the language and the layout */
 html[data-room='settings'] main .settings-writing-row { display: grid; justify-items: start; gap: var(--space-2); margin: var(--space-3) 0 0; }
-html[data-room='settings'] main .settings-writing-name { margin: 0; font: 600 15px/1.4 var(--font-ui); color: var(--color-ink); }
+html[data-room='settings'] main .settings-writing-name { margin: 0; font: 600 var(--type-control)/1.4 var(--font-ui); color: var(--color-ink); }
 html[data-room='settings'] main .settings-writing-choice { flex-wrap: wrap; }
 html[data-room='settings'] main > .foundation-doors { margin-top: var(--space-4); gap: 0; border-top: var(--stroke-hairline) solid var(--color-edge-strong); }
 html[data-room='settings'] body.v-depth-layered #app main > .foundation-doors .foundation-door {
   min-height: 54px; padding: 0 2px; margin: 0;
   background: transparent; border: 0; border-radius: 0; box-shadow: none;
   border-bottom: var(--stroke-hairline) solid var(--color-line);
-  font: 500 16px/1.3 var(--font-ui);
+  font: 500 var(--type-body)/1.3 var(--font-ui);
 }
-html[data-room='settings'] body:not(.ui-bi) #app main > .foundation-doors .foundation-door { font: 800 16px/1.3 var(--font-headword); letter-spacing: 0.06em; }
+html[data-room='settings'] body:not(.ui-bi) #app main > .foundation-doors .foundation-door { font: 800 var(--type-body)/1.3 var(--font-headword); letter-spacing: 0.06em; }
 html[data-room='settings'] body.v-depth-layered #app main > .foundation-doors .foundation-door:hover { background: var(--color-fill); }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='settings'] main :is(.settings-language, .settings-layout-choice) button[aria-pressed='true'] {
   background: transparent; color: var(--color-ink);
@@ -417,16 +429,16 @@ html[data-room='progress'] main .stats-cell {
   border-bottom: var(--stroke-hairline) solid var(--color-line);
 }
 html[data-room='progress'] main .stats-cell:not(:nth-child(3n + 1)) { border-left: var(--stroke-hairline) solid var(--color-line); }
-html[data-room='progress'] main .stats-n { font: 700 26px/1.1 var(--font-data); color: var(--color-ink); }
+html[data-room='progress'] main .stats-n { font: 700 var(--type-section)/1.1 var(--font-data); color: var(--color-ink); }
 html[data-room='progress'] main .s-learn .stats-n { color: var(--color-seal); }
 html[data-room='progress'] main .s-mature .stats-n { color: var(--color-gold); }
-html[data-room='progress'] main .stats-l { margin-top: 2px; font-size: 11.5px; letter-spacing: 0.04em; color: var(--color-muted); }
+html[data-room='progress'] main .stats-l { margin-top: 2px; font-size: var(--type-caption); letter-spacing: 0.04em; color: var(--color-muted); }
 html[data-room='progress'] main .stats-bars { gap: 3px; border-bottom-color: var(--color-edge-strong); }
 html[data-room='progress'] main .stats-col i { border-radius: var(--radius-seal) var(--radius-seal) 0 0; background: color-mix(in srgb, var(--color-gold) 85%, var(--color-ink)); }
 html[data-room='progress'] main .stats-bars.ahead .stats-col i { background: color-mix(in srgb, var(--color-accent) 12%, transparent); box-shadow: inset 0 0 0 1px var(--color-accent); }
 html[data-room='progress'] main :is(.stats-axis, .stats-today, .stats-retention) { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
-html[data-room='progress'] main .stats-axis { font-size: 11px; letter-spacing: 0.05em; color: var(--color-muted); }
-html[data-room='progress'] main :is(.stats-today, .stats-retention) { font-size: 14px; line-height: 1.6; color: var(--color-ink-2); }
+html[data-room='progress'] main .stats-axis { font-size: var(--type-caption); letter-spacing: 0.05em; color: var(--color-muted); }
+html[data-room='progress'] main :is(.stats-today, .stats-retention) { font-size: var(--type-chrome); line-height: 1.6; color: var(--color-ink-2); }
 html[data-room='progress'] main .kagami-cell { border-radius: var(--radius-seal); border-color: var(--color-edge-strong); }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='progress'] main .stats-col i { background: var(--color-gold); box-shadow: 0 0 6px -2px var(--color-gold); }
 
@@ -434,4 +446,4 @@ html[data-room='progress'] main .kagami-cell { border-radius: var(--radius-seal)
 /* round 4 review (D5): the fields deck's "not begun" is said once, under the group's name */
 html[data-room='me'] .me-hz-group-note { margin: 4px 0 2px; }
 /* Q · a goal not begun says so in a plain sentence, in the house voice: never set in capitals and tracked like a figure */
-html[data-room='me'] body .me-hz-sub.is-sentence { font: 400 13.5px/1.5 var(--font-ui); letter-spacing: 0.01em; text-transform: none; color: var(--color-ink-2); }
+html[data-room='me'] body .me-hz-sub.is-sentence { font: 400 var(--type-chrome)/1.5 var(--font-ui); letter-spacing: 0.01em; text-transform: none; color: var(--color-ink-2); }

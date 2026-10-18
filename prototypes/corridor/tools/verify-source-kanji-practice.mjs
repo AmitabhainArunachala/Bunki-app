@@ -558,11 +558,35 @@ async function ordinary(fixture) {
   const stageStarted = Date.now();
   await token.click();
   await page.locator('#mini').waitFor();
-  await waitForAppRecord(page, record => record.obslog.length === read.record.obslog.length + 1);
+  // G2 · the tap that shows the meaning (the stage) is also his encounter with the word as it reads here and a help he
+  // asked of this article: it writes the encounter ledger (met) and the help signal (readHelp) beside the observation.
+  // Exactly the word's own identity in each; no other root. The reading rung before it wrote neither.
+  const met = JSON.stringify([1, 'word', source.token.b, 'core', null, source.token.r]);
+  await waitForAppRecord(page, record => record.obslog.length === read.record.obslog.length + 1 && !!record.met?.entries?.[met]
+    && !!record.readHelp?.articles?.[source.id], { description: 'the stage\'s observation, its encounter and its help' });
   const tapped = await readAppRecordSnapshot(page), tap = tapped.record.obslog.at(-1);
   assert(tap[0] >= stageStarted && tap[0] <= Date.now());
   assert.deepEqual(tap.slice(1), ['tap', `word:${source.token.b}`, 2, source.id]);
-  assert.deepEqual(tapped.record.obslog, [...read.record.obslog, tap]); unchangedExcept(read, tapped, ['obslog']);
+  assert.deepEqual(tapped.record.obslog, [...read.record.obslog, tap]); unchangedExcept(read, tapped, ['obslog', 'met', 'readHelp']);
+  assert.deepEqual(Object.keys(tapped.record.met.entries).filter(key => !Object.hasOwn(sourceBefore.record.met?.entries || {}, key)), [met],
+    'The tap adds exactly its own encounter: the core word, read as it reads here');
+  for (const [key, entry] of Object.entries(sourceBefore.record.met?.entries || {}))
+    assert.deepEqual(tapped.record.met.entries[key], entry, 'The tap leaves every other encounter as it was');
+  const today = tapped.record.met.entries[met];
+  assert(Number.isSafeInteger(today.first) && today.last === today.first && today.days === 1,
+    `A first encounter is one day, first = last: ${JSON.stringify(today)}`);
+  const helpBefore = sourceBefore.record.readHelp, help = tapped.record.readHelp;
+  assert.equal(help?.version, 1, 'The help signal is the versioned root');
+  assert.deepEqual(Object.keys(help.articles).filter(id => !Object.hasOwn(helpBefore?.articles || {}, id)), [source.id],
+    'The tap adds exactly its own article to the help signal');
+  for (const [id, row] of Object.entries(helpBefore?.articles || {})) assert.deepEqual(help.articles[id], row, 'Every other article\'s help is unchanged');
+  const asked = help.articles[source.id];
+  assert.deepEqual(asked.helped, [met], 'The help names exactly the word he asked about, by the same identity');
+  assert(asked.level === source.level && Number.isSafeInteger(asked.chars) && asked.chars > 0 && typeof asked.src === 'string' && asked.src.length > 0,
+    `The article's help carries its level, its size and its source: ${JSON.stringify(asked)}`);
+  if (!helpBefore) assert(Number.isSafeInteger(help.since) && help.since >= tapStarted && help.since <= Date.now(),
+    `A new help signal starts at the tap: ${help.since}`);
+  else assert.equal(help.since, helpBefore.since, 'An existing help signal keeps its start');
   assert.equal(await token.getAttribute('data-ladder-rung'), 'stage');
   assert.equal(await page.locator('#mini .mini-word').textContent(), source.token.b);
   assert.equal(await page.locator('#mini .mini-reading').textContent(), source.token.r);

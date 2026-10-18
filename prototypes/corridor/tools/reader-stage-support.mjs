@@ -16,8 +16,21 @@ async function facts(target, page) {
       word: n.dataset.word,
       rung: n.dataset.ladderRung || null,
       reading: [...n.querySelectorAll('rt')].map((r) => r.textContent).join(''),
+      // F · a reading is the one ruby: a native rt, painted where it shows. A host that still draws one by ::before is read
+      // the same way, so either paint counts and neither is assumed
       visibleReadings: [...n.querySelectorAll('ruby')]
         .map((r) => {
+          const rt = r.querySelector('rt'),
+            ns = rt && getComputedStyle(rt);
+          if (
+            ns &&
+            rt.textContent &&
+            ns.display !== 'none' &&
+            ns.visibility !== 'hidden' &&
+            Number(ns.opacity) >= 1 &&
+            rt.getClientRects().length > 0
+          )
+            return rt.textContent;
           const s = getComputedStyle(r, '::before'),
             c = s.content;
           return s.display !== 'none' &&
@@ -33,6 +46,11 @@ async function facts(target, page) {
         .join(''),
       painted: [...n.querySelectorAll('ruby')].map((r) => ({
         reading: r.dataset.r,
+        native: (() => {
+          const rt = r.querySelector('rt'),
+            s = rt && getComputedStyle(rt);
+          return s ? { text: rt.textContent, hidden: rt.classList.contains('hidden-rt'), display: s.display, visibility: s.visibility, opacity: s.opacity } : null;
+        })(),
         content: getComputedStyle(r, '::before').content,
         opacity: getComputedStyle(r, '::before').opacity,
         display: getComputedStyle(r, '::before').display,
@@ -129,6 +147,18 @@ export async function exactReaderStage(page, target, { word, index, reading, evi
       return (
         rs.length > 0 &&
         rs.every((r) => {
+          // F · the native rt paints the reading; a ::before reading is still read where a host draws one
+          const rt = r.querySelector('rt'),
+            ns = rt && getComputedStyle(rt);
+          if (
+            ns &&
+            rt.textContent &&
+            ns.display !== 'none' &&
+            ns.visibility !== 'hidden' &&
+            Number(ns.opacity) >= 1 &&
+            rt.getClientRects().length > 0
+          )
+            return true;
           const s = getComputedStyle(r, '::before');
           return (
             s.display !== 'none' &&

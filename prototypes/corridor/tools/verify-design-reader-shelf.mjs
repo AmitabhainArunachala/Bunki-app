@@ -3,8 +3,11 @@
  *   R1 flush tokens     — adjacent reader tokens on one line leave no gap between their glyphs
  *                         (base text only, readings excluded), before and after a reading shows;
  *                         and no whitespace text node stands between token elements.
- *   R2 readability      — Japanese body 21–22 px at 1368 / 18–19 px at 390; a shown reading is
- *                         ≥ 0.55 × the body; the tap's English (in the word popup, reader lane
+ *   R2 readability      — (F, 2026-10-18: one ladder, one ruby; was 21–22 / 18–19 px and a reading
+ *                         ≥ 0.55 × the body, drawn as ruby::before) the Japanese body is the ladder's
+ *                         reading step, exactly 23 px at 1368 and 21 px at 390; a shown reading is a
+ *                         native <rt> at exactly half the body and 10 px or more (MASTER_SPEC D5), at
+ *                         ≥ 4.5:1 on its paper; the tap's English (in the word popup, reader lane
  *                         2026-10-02) is ≥ 15 px at ≥ 4.5:1; the body text itself is ≥ 4.5:1.
  *   R3 first sentence   — every token of the first sentence is inside the first viewport, and
  *                         nothing fixed (tip, bar, bug) covers it, at 390×844 and 1368×900.
@@ -461,25 +464,28 @@ try {
 
       await run(`R2-readability-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
-        if (withControl) await page.addStyleTag({ content: '#reader rt, #reader ruby::before { font-size: 0.46em !important; }' });
+        if (withControl) await page.addStyleTag({ content: '#reader rt { font-size: 0.46em !important; }' });
         const body = await page.evaluate(() => parseFloat(getComputedStyle(document.querySelector('#reader')).fontSize));
-        const [lo, hi] = label === '1368' ? [21, 22] : [18, 19];
-        assert(body >= lo && body <= hi, `Japanese body ${body}px, wanted ${lo}–${hi}px`);
+        const want = label === '1368' ? 23 : 21; // the ladder's reading step (21 on a phone)
+        assert.equal(body, want, `Japanese body ${body}px, wanted the reading step ${want}px`);
         const bodyContrast = await page.evaluate(contrastOf, '#reader .tok.content');
         assert(bodyContrast >= 4.5, `reading text contrast ${bodyContrast}:1`);
         await tapToken(page, 1);
-        // measure what is painted: the <rt> itself, or the ruby's ::before when the reader draws
-        // the reading there (the <rt> then stays in the DOM, undisplayed, as the reading's record)
+        // what is painted is the <rt> itself (one ruby, native): no pseudo-element draws a reading
         const rt = await page.evaluate(() => {
           const node = [...document.querySelectorAll('#reader .tok[data-index="1"] rt')].find((n) => !n.classList.contains('hidden-rt'));
           if (!node) return null;
-          const drawn = getComputedStyle(node).display === 'none' ? getComputedStyle(node.parentElement, '::before') : getComputedStyle(node);
-          const text = drawn === getComputedStyle(node) ? node.textContent : drawn.content.replace(/^"|"$/gu, '');
-          return { size: parseFloat(drawn.fontSize), opacity: Number(drawn.opacity), text, expected: node.textContent,
-            carrier: getComputedStyle(node).display === 'none' ? 'ruby::before' : 'rt' };
+          const cs = getComputedStyle(node), ruby = node.parentElement;
+          const pseudo = ['::before', '::after'].map((p) => getComputedStyle(ruby, p).content).filter((c) => c && c !== 'none' && c !== 'normal');
+          return { size: parseFloat(cs.fontSize), opacity: Number(cs.opacity), shown: cs.display !== 'none' && cs.visibility !== 'hidden',
+            text: node.textContent, carrier: 'rt', pseudo };
         });
-        assert(rt && rt.opacity > 0.9 && rt.text === rt.expected, `the first tap shows no reading: ${JSON.stringify(rt)}`);
-        assert(rt.size / body >= 0.55, `furigana ${rt.size}px is ${(rt.size / body).toFixed(2)}× the body`);
+        assert(rt && rt.shown && rt.opacity > 0.9 && rt.text, `the first tap shows no reading: ${JSON.stringify(rt)}`);
+        assert.deepEqual(rt.pseudo, [], `a pseudo-element draws a reading: ${JSON.stringify(rt.pseudo)}`);
+        assert(Math.abs(rt.size / body - 0.5) <= 0.01, `furigana ${rt.size}px is ${(rt.size / body).toFixed(2)}× the body, not half`);
+        assert(rt.size >= 10, `furigana ${rt.size}px is under 10px`);
+        const readingContrast = await page.evaluate(contrastOf, '#reader .tok[data-index="1"] rt:not(.hidden-rt)');
+        assert(readingContrast >= 4.5, `the reading's contrast ${readingContrast}:1`);
         // one tap is the meaning (reader lane 2026-10-02): the English stands in the word's popup
         const gloss = await page.evaluate(() => {
           const node = document.querySelector('#mini .mini-gloss');
@@ -489,7 +495,7 @@ try {
         const glossContrast = await page.evaluate(contrastOf, '#mini .mini-gloss');
         assert(gloss.size >= 15, `English gloss ${gloss.size}px`);
         assert(glossContrast >= 4.5, `English gloss contrast ${glossContrast}:1`);
-        return { body, bodyContrast, furigana: rt.size, carrier: rt.carrier, ratio: Math.round((rt.size / body) * 100) / 100, gloss: gloss.size, glossContrast };
+        return { body, bodyContrast, furigana: rt.size, carrier: rt.carrier, ratio: Math.round((rt.size / body) * 100) / 100, readingContrast, gloss: gloss.size, glossContrast };
       });
 
       await run(`R3-first-sentence-${label}`, viewport, async (page) => {
@@ -1273,8 +1279,16 @@ try {
       await token.waitFor();
       await page.evaluate(() => document.fonts.ready);
       await page.waitForTimeout(500);
-      await page.evaluate(() => window.scrollTo(0, 4716));
-      await tapToken(page, 816, { scroll: false }); // this fixture deliberately pins article scroll at 4716
+      // the public fixture seats token 816 at the viewport top it had at article scroll 4716 before the ladder
+      // (332 px down a 390×844 screen, its card below it); the page has grown, so the scroll is derived from the token
+      const fixture = await page.evaluate(() => {
+        const t = document.querySelector('#reader .tok[data-index="816"]').getBoundingClientRect();
+        const y = Math.round(t.top + scrollY - 332);
+        window.scrollTo(0, y);
+        return { y, top: document.querySelector('#reader .tok[data-index="816"]').getBoundingClientRect().top };
+      });
+      assert(Math.abs(fixture.top - 332) <= 1.5 && fixture.y > 0, `the fixture seats the word at 332 px: ${JSON.stringify(fixture)}`);
+      await tapToken(page, 816, { scroll: false }); // G3 · a tap on the word the fixture seats, where it stands
       await page.waitForSelector('#mini #mini-sentence-open');
       await page.waitForTimeout(400);
       const seat = () => page.evaluate(() => {
@@ -1292,7 +1306,7 @@ try {
       });
       const word = await seat();
       assert.equal(word.word, '大丈夫', 'token 816 of やまなし opens its own word');
-      assert.equal(word.scrollY, 4716, 'The public below-word fixture uses article scroll 4716');
+      assert.equal(word.scrollY, fixture.y, `The public below-word fixture keeps its article scroll (${fixture.y})`);
       assert.equal(word.card.side, 'below', `the public fixture must start with the word card below its anchor: ${JSON.stringify(word)}`);
       assert.equal(word.sentence, false, 'The public fixture starts on the word view');
       await page.locator('#mini #mini-sentence-open').click();

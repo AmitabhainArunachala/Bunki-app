@@ -84,14 +84,14 @@ html[data-room='learn'] body:not([data-view='drift']) #app > main > .room-sign {
 html[data-room='learn'] body:not([data-view='drift']) #app > main > .room-sign .room-sign-datum { color: var(--learn-stage-quiet); }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage-eyebrow {
   margin: 0 0 4px;
-  font: 600 11.5px/1.3 var(--font-ui);
+  font: 600 var(--type-caption)/1.3 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--learn-stage-quiet);
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage h1.view-title {
   margin: 0;
-  font: 800 34px/1.1 var(--font-headword);
+  font: 800 var(--type-display)/1.1 var(--font-headword);
   color: var(--color-lacquer-ink);
   letter-spacing: 0.01em;
 }
@@ -137,14 +137,14 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-card-meta {
   margin: 0 0 8px;
-  font: 600 10.5px/1.3 var(--font-ui);
+  font: 600 var(--type-caption)/1.3 var(--font-ui);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--learn-card-muted);
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-card-text {
   margin: 0;
-  font: 400 18px/2 var(--font-reading);
+  font: 400 var(--type-lead)/2 var(--font-reading);
   color: var(--learn-card-ink);
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -152,9 +152,9 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   overflow: hidden;
   line-break: strict;
 }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-card-text.is-word { font: 800 40px/1.3 var(--font-headword); letter-spacing: 0.04em; }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-card-text.is-word { font: 800 var(--type-headword)/1.3 var(--font-headword); letter-spacing: 0.04em; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-card:has(.is-quiet) { min-height: 104px; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-card-text.is-quiet { font: 400 16px/1.7 var(--font-reading); color: var(--learn-card-muted); }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-card-text.is-quiet { font: 400 var(--type-body)/1.7 var(--font-reading); color: var(--learn-card-muted); }
 /* the asked place: the one live mark on the screen */
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-gap {
   display: inline-block;
@@ -175,11 +175,11 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-due { display: flex; align-items: baseline; gap: 10px; margin: 0; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-due-n {
-  font: 800 56px/0.9 var(--font-headword);
+  font: 800 calc(var(--type-headword) * 1.25)/0.9 var(--font-headword);
   color: var(--color-lacquer-ink);
   font-variant-numeric: tabular-nums;
 }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-due-u { font: 500 14px/1.25 var(--font-ui); color: var(--learn-stage-quiet); max-width: 5.6em; }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-due-u { font: 500 var(--type-chrome)/1.25 var(--font-ui); color: var(--learn-stage-quiet); max-width: 5.6em; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-split {
   margin: 0;
   display: flex;
@@ -189,14 +189,14 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   text-align: right;
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-split-h {
-  font: 600 10.5px/1.2 var(--font-ui);
+  font: 600 var(--type-caption)/1.2 var(--font-ui);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--learn-stage-quiet);
 }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-split-line { display: flex; gap: 10px; font: 400 12px/1.2 var(--font-data); color: var(--learn-stage-quiet); }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-split-line { display: flex; gap: 10px; font: 400 var(--type-caption)/1.2 var(--font-data); color: var(--learn-stage-quiet); }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-split-cell { display: inline-flex; gap: 5px; align-items: baseline; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-split-n { font: 700 13px/1 var(--font-data); color: var(--learn-stage-ink); font-variant-numeric: tabular-nums; }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-split-n { font: 700 var(--type-label)/1 var(--font-data); color: var(--learn-stage-ink); font-variant-numeric: tabular-nums; }
 
 /* ONE primary: washi on lacquer, a 2px under-edge that presses away */
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage :is(.learn-go, .learn-go-quiet) {
@@ -223,8 +223,8 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   color: var(--learn-card-ink);
   box-shadow: 0 2px 0 color-mix(in srgb, var(--learn-card) 40%, #000), 0 0 22px color-mix(in srgb, var(--color-gold) 24%, transparent);
 }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go :is(.study-door-t, .learn-go-t) { font: 700 17px/1.25 var(--font-ui); color: inherit; letter-spacing: 0.01em; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go .study-door-sub { font: 500 12px/1.2 var(--font-ui); color: inherit; opacity: 0.74; }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go :is(.study-door-t, .learn-go-t) { font: 700 var(--type-lead)/1.25 var(--font-ui); color: inherit; letter-spacing: 0.01em; }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go .study-door-sub { font: 500 var(--type-caption)/1.2 var(--font-ui); color: inherit; opacity: 0.74; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go-quiet {
   min-height: 46px;
   margin-top: 10px;
@@ -235,8 +235,8 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   border: 1px solid color-mix(in srgb, var(--color-lacquer-ink) 34%, transparent);
   box-shadow: 0 1px 0 rgb(0 0 0 / 35%);
 }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go-quiet .study-door-t { font: 600 13px/1.2 var(--font-ui); color: inherit; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go-quiet .study-door-sub { font: 400 12px/1.2 var(--font-ui); color: var(--learn-stage-quiet); }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go-quiet .study-door-t { font: 600 var(--type-label)/1.2 var(--font-ui); color: inherit; }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go-quiet .study-door-sub { font: 400 var(--type-caption)/1.2 var(--font-ui); color: var(--learn-stage-quiet); }
 
 /* round 3 (r3-rooms): one practice, one home. With Today's queue waiting and a deck ready, the
    stage is the deck's sitting and the review is one quiet line that points home to Today */
@@ -249,7 +249,7 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   background: transparent;
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go-home .study-door-t {
-  font: 500 14px/1.3 var(--font-ui);
+  font: 500 var(--type-chrome)/1.3 var(--font-ui);
   color: var(--learn-stage-ink);
   text-decoration: underline;
   text-decoration-thickness: 0.5px;
@@ -257,7 +257,7 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go-home .study-door-t::after { content: ' ›'; text-decoration: none; display: inline-block; margin-left: 4px; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-stage .learn-go-home .study-door-sub:empty { display: none; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-card-text.is-deck { font: 800 24px/1.4 var(--font-headword, var(--font-display)); letter-spacing: 0.01em; }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-card-text.is-deck { font: 800 var(--type-section)/1.4 var(--font-headword, var(--font-display)); letter-spacing: 0.01em; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-card:has(.is-deck) { min-height: 120px; }
 
 /* ---- the numbered blocks ---- */
@@ -283,19 +283,19 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   position: absolute;
   left: calc(-1 * var(--learn-gutter));
   top: 7px;
-  font: 500 11px/1 var(--font-data);
+  font: 500 var(--type-caption)/1 var(--font-data);
   letter-spacing: 0.04em;
   color: var(--color-seal);
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-h {
   margin: 0;
   flex: 1;
-  font: 800 21px/1.25 var(--font-headword);
+  font: 800 var(--type-reading)/1.25 var(--font-headword);
   color: var(--color-ink);
   letter-spacing: 0.01em;
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-count {
-  font: 500 11.5px/1.2 var(--font-data);
+  font: 500 var(--type-caption)/1.2 var(--font-data);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
   color: var(--color-muted);
@@ -304,7 +304,7 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-gloss {
   margin: 0 0 12px;
   max-width: 34em;
-  font: 400 14px/1.55 var(--font-ui);
+  font: 400 var(--type-chrome)/1.55 var(--font-ui);
   color: var(--color-ink-2);
   overflow-wrap: normal;
   /* Q · its words come from the app's one rule (corridor.js jaFlow: .ja-flow); auto-phrase was Chromium's alone */
@@ -313,7 +313,7 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-label {
   margin: 14px 0 6px;
-  font: 600 10.5px/1.2 var(--font-ui);
+  font: 600 var(--type-caption)/1.2 var(--font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted);
@@ -347,8 +347,8 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   border-right: 1.25px solid var(--color-quiet);
   transform: translateY(-50%) rotate(45deg);
 }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .study-door-t { font: 800 18px/1.25 var(--font-headword); color: var(--color-ink); }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .study-door-sub { font: 400 13px/1.45 var(--font-ui); color: var(--color-ink-2); }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .study-door-t { font: 800 var(--type-lead)/1.25 var(--font-headword); color: var(--color-ink); }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .study-door-sub { font: 400 var(--type-label)/1.45 var(--font-ui); color: var(--color-ink-2); }
 
 /* 02 the ledger: name and words left, due/new right, a slim hairline of words begun */
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-decks { display: block; margin: 0; padding: 0; border: 0; background: none; box-shadow: none; }
@@ -383,11 +383,11 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck { row-gap: 4px; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck::after { grid-row: 1 / span 2; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-name { display: contents; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-t { grid-column: 1 / 3; grid-row: 1; font: 600 15px/1.3 var(--font-ui); color: var(--color-ink); }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-sub { grid-column: 1; grid-row: 2; min-width: 0; font: 400 12px/1.35 var(--font-ui); color: var(--color-muted); }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-t { grid-column: 1 / 3; grid-row: 1; font: 600 var(--type-control)/1.3 var(--font-ui); color: var(--color-ink); }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-sub { grid-column: 1; grid-row: 2; min-width: 0; font: 400 var(--type-caption)/1.35 var(--font-ui); color: var(--color-muted); }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck:not(:has(.dojo-deck-n)) .dojo-deck-sub { grid-column: 1 / 3; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-n { grid-column: 2; grid-row: 2; display: flex; gap: 12px; align-items: baseline; font: 500 11.5px/1 var(--font-ui); color: var(--color-muted); white-space: nowrap; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-n b { margin-right: 2px; font: 800 19px/1 var(--font-headword); color: var(--color-ink); font-variant-numeric: tabular-nums; }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-n { grid-column: 2; grid-row: 2; display: flex; gap: 12px; align-items: baseline; font: 500 var(--type-caption)/1 var(--font-ui); color: var(--color-muted); white-space: nowrap; }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-n b { margin-right: 2px; font: 800 var(--type-reading)/1 var(--font-headword); color: var(--color-ink); font-variant-numeric: tabular-nums; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-due:not(.is-due) b { color: var(--color-muted); }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-due.is-due b { color: var(--color-seal); }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .dojo-deck-bar {
@@ -411,7 +411,7 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 /* 03 the sitting: hairline length chips, three mode cards, one secondary begin */
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .focus-choices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 0; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .focus-chip { min-height: 48px; margin: 0; border-radius: var(--radius-control); }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .focus-chip-n { font: 700 17px/1 var(--font-data); font-variant-numeric: tabular-nums; }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .focus-chip-n { font: 700 var(--type-lead)/1 var(--font-data); font-variant-numeric: tabular-nums; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .focus-modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 0 0 14px; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .focus-mode {
   display: flex;
@@ -430,8 +430,8 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   box-shadow: none;
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .focus-mode.on { border-color: var(--color-accent); background: var(--color-tint-wash); box-shadow: inset 3px 0 0 var(--color-accent); }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .focus-mode-t { font: 700 14px/1.25 var(--font-ui); color: var(--color-ink); }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .focus-mode-sub { font: 400 11.5px/1.35 var(--font-ui); color: var(--color-muted); text-wrap: pretty; max-width: 100%; } /* Q · words from the one rule (.ja-flow), not auto-phrase and anywhere: 保存していな｜い */
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .focus-mode-t { font: 700 var(--type-chrome)/1.25 var(--font-ui); color: var(--color-ink); }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .focus-mode-sub { font: 400 var(--type-caption)/1.35 var(--font-ui); color: var(--color-muted); text-wrap: pretty; max-width: 100%; } /* Q · words from the one rule (.ja-flow), not auto-phrase and anywhere: 保存していな｜い */
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .take.focus-start {
   display: inline-flex;
   align-items: center;
@@ -445,7 +445,7 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   color: var(--color-accent);
   border: 1px solid var(--color-accent);
   box-shadow: 0 2px 0 color-mix(in srgb, var(--color-accent) 30%, transparent);
-  font: 600 15px/1 var(--font-ui);
+  font: 600 var(--type-control)/1 var(--font-ui);
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .take.focus-start .l-ja { color: inherit; }
 
@@ -461,10 +461,10 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   min-width: 0;
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-length.is-pending { border-top-color: var(--color-edge-strong); }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-length-t { font: 700 14px/1.2 var(--font-ui); color: var(--color-ink); }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-length-m { font: 400 11.5px/1.2 var(--font-data); color: var(--color-ink-2); font-variant-numeric: tabular-nums; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-length-n { font: 400 11px/1.3 var(--font-ui); color: var(--color-muted); }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .study-hall-note { margin: 0; font: 400 12.5px/1.5 var(--font-ui); color: var(--color-muted); text-wrap: pretty; }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-length-t { font: 700 var(--type-chrome)/1.2 var(--font-ui); color: var(--color-ink); }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-length-m { font: 400 var(--type-caption)/1.2 var(--font-data); color: var(--color-ink-2); font-variant-numeric: tabular-nums; }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-length-n { font: 400 var(--type-caption)/1.3 var(--font-ui); color: var(--color-muted); }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .study-hall-note { margin: 0; font: 400 var(--type-label)/1.5 var(--font-ui); color: var(--color-muted); text-wrap: pretty; }
 
 /* 05 the index: plain rows, no paper */
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app .learn-more-list { display: block; }
@@ -480,8 +480,8 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
 }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .learn-more-list .study-door:first-child { border-top: 0; }
 html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .learn-more-list .study-door::after { right: 4px; }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .learn-more-list .study-door-t { font: 600 15px/1.3 var(--font-ui); }
-html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .learn-more-list .study-door-sub { font-size: 12.5px; color: var(--color-muted); }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .learn-more-list .study-door-t { font: 600 var(--type-control)/1.3 var(--font-ui); }
+html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app #study-hall .learn-more-list .study-door-sub { font-size: var(--type-label); color: var(--color-muted); }
 
 /* ---- the card floats on the lacquer (ambient; the room arrives by the one view transition) ---- */
 @keyframes learn-float { from { transform: rotate(-0.5deg); } to { transform: translateY(-3px) rotate(-0.25deg); } }
@@ -495,7 +495,7 @@ html[data-room='tests'] body:not([data-view='drift']) #app > main > .tests-head 
 html[data-room='tests'] .tests-head .eyebrow { margin: 0 0 6px; }
 html[data-room='tests'] .tests-head .view-title { margin: 0; }
 /* Review's backup reminder: a quiet line with its door, under the saved words */
-html[data-room='learn'] .learn-section .store-nudge { margin: 14px 2px 0; font: 400 13px/1.5 var(--font-ui); color: var(--color-ink-2); }
+html[data-room='learn'] .learn-section .store-nudge { margin: 14px 2px 0; font: 400 var(--type-label)/1.5 var(--font-ui); color: var(--color-ink-2); }
 html[data-room='learn'] body:not(.zen) #app .store-nudge-go {
   display: inline;
   min-height: 44px;
@@ -505,7 +505,7 @@ html[data-room='learn'] body:not(.zen) #app .store-nudge-go {
   background: none;
   box-shadow: none;
   color: var(--color-accent);
-  font: 600 13px/1.5 var(--font-ui);
+  font: 600 var(--type-label)/1.5 var(--font-ui);
   text-decoration: underline;
   text-decoration-thickness: 0.5px;
   text-underline-offset: 3px;

@@ -2815,7 +2815,12 @@ try {
         const node = document.querySelector('#reader > [data-layers="open"]');
         const words = node ? [...node.querySelectorAll('.tok[data-index] ruby')] : [];
         // nothing is painted over the paragraph's words: its layers stand under it
-        const shown = words.filter((ruby) => { const ink = getComputedStyle(ruby, '::before'); return ink.content !== 'none' && Number(ink.opacity) > 0.5; }).length;
+        // F · a reading is the one ruby, a native rt: one that shows counts as painted, as a ::before reading would
+        const shown = words.filter((ruby) => {
+          const rt = ruby.querySelector('rt'), native = rt && getComputedStyle(rt);
+          if (native && rt.textContent && native.display !== 'none' && native.visibility !== 'hidden' && Number(native.opacity) > 0.5 && rt.getClientRects().length > 0) return true;
+          const ink = getComputedStyle(ruby, '::before'); return ink.content !== 'none' && Number(ink.opacity) > 0.5;
+        }).length;
         const block = document.getElementById('reader-layers');
         return { open: document.querySelectorAll('[data-layers]').length, rubies: words.length, shown, block: !!block, after: node?.nextElementSibling === block,
           indices: node ? [...node.querySelectorAll('.tok[data-index]')].map((tok) => Number(tok.dataset.index)) : [],

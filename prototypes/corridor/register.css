@@ -23,9 +23,6 @@
   --paper-edge: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
   --rule: 1px solid var(--line);
   --stage: 0;
-  --t-display: 26px;
-  --t-section: 20px;
-  --t-read: 20px;
 }
 /* the five night worlds (corridor.js setKairoTheme): a ベロ藍 shadow vanishes on a dark
    ground, so night paper casts a black one, never a glow */
@@ -41,7 +38,7 @@ html[data-register="attempt"] .chrome .chrome-search,
 html[data-register="attempt"] .chrome .chrome-dojo,
 html[data-register="attempt"] .chrome .lang-seg,
 html[data-register="attempt"] .chrome > button#tray { display: none; }
-html[data-register="attempt"] .chrome .crumb { position: static; width: auto; height: auto; clip-path: none; color: var(--faint); font-size: 13px; }
+html[data-register="attempt"] .chrome .crumb { position: static; width: auto; height: auto; clip-path: none; color: var(--faint); font-size: var(--type-label); }
 
 /* the stage bar — place in the sitting, 3 px of ink under the mast */
 html[data-register="attempt"] .chrome::after {
@@ -71,7 +68,7 @@ main h1.exam-heading,
 .assessment-room > h1 {
   font-family: var(--display);
   font-weight: 500;
-  font-size: var(--t-display);
+  font-size: var(--type-display);
   line-height: 1.25;
   letter-spacing: 0.01em;
   margin: 6px 0 6px;
@@ -80,7 +77,7 @@ main h1.exam-heading,
 }
 .view-title-en, .eyebrow {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.14em;
   color: var(--faint);
 }
@@ -90,7 +87,7 @@ main h1.exam-heading,
 main h2 {
   font-family: var(--display);
   font-weight: 500;
-  font-size: var(--t-section);
+  font-size: var(--type-section);
   letter-spacing: 0.01em;
   line-height: 1.3;
 }
@@ -105,7 +102,7 @@ html[data-register="shelf"] .search-field {
   border-radius: 0;
   padding: 0 0 6px;
   min-height: 40px;
-  font-size: 16px;
+  font-size: var(--type-body);
   margin: 0 0 22px;
   color: var(--ink-2);
 }
@@ -115,7 +112,7 @@ html[data-register="shelf"] .search-field::placeholder { color: var(--faint); }
    sections, notes) keeps the full measure — in the study every reading card fell into one of
    six columns and shrank to 51 px at 390 (C1, 2026-09-25) */
 #shelf-body > :not(button.grammar-link) { grid-column: 1 / -1; }
-#shelf-body .shelf-snippet.intro { font-size: 15px; color: var(--ink-2); margin: 0 0 14px; }
+#shelf-body .shelf-snippet.intro { font-size: var(--type-control); color: var(--ink-2); margin: 0 0 14px; }
 #shelf-body button.grammar-link {
   font-family: var(--display);
   border-radius: var(--radius-card);
@@ -128,7 +125,7 @@ html[data-register="shelf"] .search-field::placeholder { color: var(--faint); }
   background: var(--ground-0);
   border: var(--paper-edge);
   box-shadow: var(--paper-shadow);
-  font-size: 22px;
+  font-size: var(--type-reading);
   text-align: start;
   align-items: flex-start;
 }
@@ -139,7 +136,7 @@ html[data-register="shelf"] .search-field::placeholder { color: var(--faint); }
   background: var(--ground-2);
   border: var(--paper-edge);
   box-shadow: none;
-  font-size: 17px;
+  font-size: var(--type-lead);
 }
 #shelf-body button.grammar-link[data-grade="line"] {
   grid-column: 1 / -1;
@@ -150,7 +147,7 @@ html[data-register="shelf"] .search-field::placeholder { color: var(--faint); }
   box-shadow: none;
   padding: 14px 0 0;
   margin-top: 6px;
-  font-size: 15px;
+  font-size: var(--type-control);
   text-align: start;
   color: var(--ink-2);
 }
@@ -159,14 +156,14 @@ html[data-register="shelf"] .search-field::placeholder { color: var(--faint); }
 #shelf-body button.grammar-link span:last-child {
   display: block;
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.12em;
   color: var(--faint);
   margin-top: 4px;
 }
 #shelf-body button.grammar-link[data-grade="tool"] small,
 #shelf-body button.grammar-link[data-grade="tool"] span:last-child { display: none; }
-#shelf-body button.grammar-link[data-grade="room"]:nth-of-type(5) { grid-column: 1 / -1; font-size: 24px; }
+#shelf-body button.grammar-link[data-grade="room"]:nth-of-type(5) { grid-column: 1 / -1; font-size: var(--type-section); }
 /* phones: after the base door rules, so they actually win at equal specificity (Codex 06:46Z) */
 @media (max-width: 520px) {
   #shelf-body button.grammar-link[data-grade="room"] { grid-column: 1 / -1; }
@@ -176,11 +173,11 @@ html[data-register="shelf"] .search-field::placeholder { color: var(--faint); }
 /* ------------------------------------------------------------ 4 · JLPT ROOM
    A room, not a form: bilingual name, five level seals, three lengths as
    sheets with the time beneath, the offered practice as one washi plate. */
-html[data-register="jlpt"] .exam-intro { font-size: 16px; color: var(--ink-2); margin: 10px 0 18px; }
+html[data-register="jlpt"] .exam-intro { font-size: var(--type-body); color: var(--ink-2); margin: 10px 0 18px; }
 .exam-levels { gap: 8px; margin: 0 0 14px; }
 .exam-levels .chip {
   font-family: var(--display);
-  font-size: 18px;
+  font-size: var(--type-lead);
   min-width: 56px;
   min-height: 48px;
   padding: 0 12px;
@@ -204,11 +201,11 @@ html[data-register="jlpt"] .exam-intro { font-size: 16px; color: var(--ink-2); m
   box-shadow: var(--paper-shadow);
   padding: 14px 12px 12px;
   font-family: var(--display);
-  font-size: 17px;
+  font-size: var(--type-lead);
   color: var(--ink);
 }
 .exam-length[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink), var(--paper-shadow); }
-.exam-length-time { font-family: var(--sans); font-size: 11px; letter-spacing: 0.1em; color: var(--faint); margin-top: 6px; }
+.exam-length-time { font-family: var(--sans); font-size: var(--type-caption); letter-spacing: 0.1em; color: var(--faint); margin-top: 6px; }
 .assessment-room .exam-form {
   background: var(--ground-0);
   border: var(--paper-edge);
@@ -217,13 +214,13 @@ html[data-register="jlpt"] .exam-intro { font-size: 16px; color: var(--ink-2); m
   padding: 18px 18px 14px;
   margin: 0 0 14px;
 }
-.assessment-room .exam-form h2 { font-size: 22px; margin: 0 0 6px; }
+.assessment-room .exam-form h2 { font-size: var(--type-reading); margin: 0 0 6px; }
 .assessment-room .exam-form .exam-skills,
-.assessment-room .exam-form .exam-status { font-family: var(--sans); font-size: 12px; letter-spacing: 0.06em; color: var(--ink-2); }
+.assessment-room .exam-form .exam-status { font-family: var(--sans); font-size: var(--type-caption); letter-spacing: 0.06em; color: var(--ink-2); }
 .assessment-room .exam-form .exam-status { color: var(--faint); }
 .assessment-room h2.exam-section-heading {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.16em;
   color: var(--faint);
   margin: 26px 0 10px;
@@ -239,7 +236,7 @@ html[data-register="jlpt"] .exam-intro { font-size: 16px; color: var(--ink-2); m
 html[data-register="attempt"] main { padding-top: 10px; }
 html[data-register="attempt"] h1.exam-heading {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.16em;
   color: var(--faint);
   font-weight: 400;
@@ -247,18 +244,18 @@ html[data-register="attempt"] h1.exam-heading {
 }
 html[data-register="attempt"] .exam-progress {
   font-family: var(--sans);
-  font-size: 12px;
+  font-size: var(--type-caption);
   letter-spacing: 0.08em;
   color: var(--ink-2);
   margin: 0 0 4px;
 }
 html[data-register="attempt"] .exam-timer { color: var(--red); font-variant-numeric: tabular-nums; }
-html[data-register="attempt"] .exam-save { margin: 0 0 10px; font-family: var(--sans); font-size: 11px; letter-spacing: 0.1em; color: var(--faint); }
+html[data-register="attempt"] .exam-save { margin: 0 0 10px; font-family: var(--sans); font-size: var(--type-caption); letter-spacing: 0.1em; color: var(--faint); }
 html[data-register="attempt"]:not([data-answered]) .exam-save,
 html[data-register="attempt"]:not([data-answered]) .mock-attempt-policy { visibility: hidden; }
 html[data-register="attempt"] .exam-skill {
   font-family: var(--display);
-  font-size: 13px;
+  font-size: var(--type-label);
   letter-spacing: 0.06em;
   color: var(--ink-2);
   margin: 12px 0 0;
@@ -274,7 +271,7 @@ html[data-register="attempt"] .mock-q {
   box-shadow: var(--paper-shadow);
   padding: 20px 18px 8px;
   margin: 14px 0 0;
-  font-size: var(--t-read);
+  font-size: var(--type-reading);
   line-height: 1.9;
   color: var(--ink);
 }
@@ -284,7 +281,7 @@ html[data-register="attempt"] .exam-instruction {
   margin: 0;
   padding: 0 18px 12px;
   font-family: var(--sans);
-  font-size: 12px;
+  font-size: var(--type-caption);
   letter-spacing: 0.06em;
   color: var(--faint);
 }
@@ -331,7 +328,7 @@ html[data-register="attempt"] .lesson-option {
   box-shadow: none;
   padding: 13px 8px;
   min-height: var(--tap);
-  font-size: 19px;
+  font-size: var(--type-reading);
   line-height: 1.6;
   text-align: start;
   color: var(--ink);
@@ -364,7 +361,7 @@ html[data-register="attempt"] .chip#exam-flag {
   box-shadow: none;
   padding: 8px 0;
   font-family: var(--sans);
-  font-size: 12px;
+  font-size: var(--type-caption);
   letter-spacing: 0.1em;
   color: var(--ink-2);
   text-decoration: underline;
@@ -374,7 +371,7 @@ html[data-register="attempt"] .chip#exam-flag {
 html[data-register="attempt"] .exam-question-map summary,
 html[data-register="attempt"] .exam-leave-controls .chip {
   font-family: var(--sans);
-  font-size: 12px;
+  font-size: var(--type-caption);
   letter-spacing: 0.08em;
   color: var(--ink-2);
 }
@@ -388,28 +385,28 @@ html[data-register="threshold"] .exam-confirm {
   padding: 22px 20px;
   margin-top: 12px;
 }
-html[data-register="threshold"] .exam-confirm h1 { font-size: 24px; }
+html[data-register="threshold"] .exam-confirm h1 { font-size: var(--type-section); }
 
 /* ------------------------------------------------------------- 6 · RESULTS
    The number is the headline; two sheets under two section rules; the
    wrong rows keep their red bar — the one screen that already read. */
 html[data-register="results"] .assessment-room > h1.view-title {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.16em;
   color: var(--faint);
   font-weight: 400;
 }
 html[data-register="results"] .exam-score {
   font-family: var(--display);
-  font-size: 44px;
+  font-size: var(--type-headword);
   line-height: 1.1;
   letter-spacing: -0.01em;
   color: var(--ink);
   margin: 2px 0 4px;
   font-variant-numeric: tabular-nums;
 }
-html[data-register="results"] .exam-score-note { font-size: 14px; color: var(--ink-2); margin: 0 0 18px; }
+html[data-register="results"] .exam-score-note { font-size: var(--type-chrome); color: var(--ink-2); margin: 0 0 18px; }
 html[data-register="results"] .exam-counts,
 html[data-register="results"] .exam-results-skills,
 html[data-register="results"] .exam-official {
@@ -420,10 +417,10 @@ html[data-register="results"] .exam-official {
   padding: 16px 18px;
   margin: 0 0 14px;
 }
-html[data-register="results"] .exam-counts dt { font-family: var(--sans); font-size: 11px; letter-spacing: 0.14em; color: var(--faint); }
-html[data-register="results"] .exam-counts dd { font-family: var(--display); font-size: 22px; margin: 0; font-variant-numeric: tabular-nums; }
+html[data-register="results"] .exam-counts dt { font-family: var(--sans); font-size: var(--type-caption); letter-spacing: 0.14em; color: var(--faint); }
+html[data-register="results"] .exam-counts dd { font-family: var(--display); font-size: var(--type-reading); margin: 0; font-variant-numeric: tabular-nums; }
 html[data-register="results"] .exam-results-skills .wrong { box-shadow: inset 3px 0 0 var(--red); padding-inline-start: 12px; }
-html[data-register="results"] .exam-followup { font-size: 15px; color: var(--ink-2); }
+html[data-register="results"] .exam-followup { font-size: var(--type-control); color: var(--ink-2); }
 html[data-register="results"] details.exam-answer {
   border-top: var(--rule);
   padding: 10px 0 10px 12px;
@@ -431,7 +428,7 @@ html[data-register="results"] details.exam-answer {
 }
 html[data-register="results"] details.exam-answer.incorrect { box-shadow: inset 3px 0 0 var(--red); border-inline-start: 0; }
 html[data-register="results"] details.exam-answer.correct summary { color: var(--faint); }
-html[data-register="results"] details.exam-answer summary { font-size: 16px; line-height: 1.7; cursor: pointer; }
+html[data-register="results"] details.exam-answer summary { font-size: var(--type-body); line-height: 1.7; cursor: pointer; }
 html[data-register="results"] details.exam-answer.incorrect summary { color: var(--ink); }
 html[data-register="results"] #exam-sensei {
   background: var(--ink);
@@ -441,7 +438,7 @@ html[data-register="results"] #exam-sensei {
   min-height: 48px;
   padding: 0 18px;
   font-family: var(--display);
-  font-size: 17px;
+  font-size: var(--type-lead);
 }
 /* the older sets' review (the N1 検収前 path) is paper too; every row keeps a margin so
    the red bar on a wrong one never sits on its × */
@@ -454,7 +451,7 @@ html[data-register="review"] .mock-review {
 }
 html[data-register="review"] .mock-review-row { padding-inline-start: 12px; }
 html[data-register="review"] .mock-review-row.wrong { box-shadow: inset 3px 0 0 var(--red); }
-html[data-register="results"] #exam-undo-additions { background: transparent; border: 0; text-decoration: underline; text-underline-offset: 4px; font-family: var(--sans); font-size: 12px; letter-spacing: 0.08em; color: var(--ink-2); }
+html[data-register="results"] #exam-undo-additions { background: transparent; border: 0; text-decoration: underline; text-underline-offset: 4px; font-family: var(--sans); font-size: var(--type-caption); letter-spacing: 0.08em; color: var(--ink-2); }
 
 /* ----------------------------------------------------------- 7 · THE TUTOR
    Understanding is a room of its own material: the lacquer stage, with
@@ -482,7 +479,7 @@ html[data-register="tutor"] main { min-height: 100vh; }
 /* the why sheet (T6) is understanding, not the attempt: the tutor's material as a sheet,
    and its verdict red only when the answer was wrong */
 .exam-why-sheet { border-radius: var(--radius-card); padding: 18px 18px 14px; margin: 10px 0 16px; }
-.exam-why-verdict { font-family: var(--display); font-size: 22px; }
+.exam-why-verdict { font-family: var(--display); font-size: var(--type-reading); }
 .exam-why-verdict[data-verdict="incorrect"] { color: var(--red); }
 html[data-register="tutor"] .chrome { background: var(--sheet-ground); border-bottom-color: var(--sheet-line-soft); }
 html[data-register="tutor"] .chrome > *, html[data-register="tutor"] .chrome .crumb, html[data-register="tutor"] .chrome .lang-seg > * { color: var(--sheet-ink-2); }
@@ -528,7 +525,7 @@ html[data-register="tutor"] .teacher-context-label, html[data-register="tutor"] 
    The report entry lives in each page's own flow (no floating rail since 2026-09-25): two
    quiet text doors on a hairline; fainter during an attempt, ink-on-lacquer in the tutor. */
 #app > .report-line-page, #sheet .report-line-sheet { border-top: var(--rule); padding-top: 12px; }
-.report-line .report-door { font-family: var(--sans); font-size: 12px; letter-spacing: 0.08em; }
+.report-line .report-door { font-family: var(--sans); font-size: var(--type-caption); letter-spacing: 0.08em; }
 html[data-register="attempt"] #app > .report-line-page { opacity: 0.6; }
 html[data-register="attempt"] #app > .report-line-page:hover, html[data-register="attempt"] #app > .report-line-page:focus-within { opacity: 1; }
 html[data-register="tutor"] #app > .report-line-page .report-door { color: var(--sheet-ink-2); }
@@ -542,7 +539,7 @@ html[data-register="tutor"] #app > .report-line-page .report-door { color: var(-
   main { max-width: 720px; }
   body:not([data-view="entry"], [data-view="drift"]) .chrome { padding-inline: max(16px, calc((100% - 720px) / 2 + 16px)); }
   html[data-register="attempt"] .exam-prompt,
-  html[data-register="attempt"] .mock-q { padding: 26px 26px 10px; font-size: 22px; }
+  html[data-register="attempt"] .mock-q { padding: 26px 26px 10px; font-size: var(--type-reading); }
   html[data-register="attempt"] .mock-opt,
-  html[data-register="attempt"] .lesson-option { font-size: 20px; }
+  html[data-register="attempt"] .lesson-option { font-size: var(--type-reading); }
 }

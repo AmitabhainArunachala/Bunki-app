@@ -2,9 +2,8 @@
  * lifecycle behaviour, not voice or codec quality.
  * The voice is locked (operator's blind audition, 2026-09-29): Google Gemini TTS Kore reads and Charon
  * is the second speaker. F1 is withdrawn. There is no device voice, no voice picker and no interim
- * voice. Until the Kore clips ship, index.html raises no narration flag and the reader's play bar is a
- * quiet absence label with the locked voices in its accessible description: that state is checked as the build serves
- * it. The bar's own lifecycle — play, pause, restart, a failed clip, a passage switch, a late manifest —
+ * voice. An article with no recording in that voice draws no listen mark at all (F, the lead's ruling 2026-10-18: no
+ * dead control): that state is checked as the build serves it. The bar's own lifecycle — play, pause, restart, a failed clip, a passage switch, a late manifest —
  * is checked on the same code with a synthetic Kore narration manifest (the test raises the flag; an
  * Audio double answers every clip): the bar Kore will use, before its clips exist. Answer-card 音 follows
  * the same roster: a word manifest voiced in Kore plays; a stored interim voice, or a word recorded only
@@ -233,19 +232,38 @@ async function openPassage(page) {
   await page.waitForSelector(`.version-choice[data-version="${OTHER}"]`);
 }
 
-/** The bar's one mark (John, 2026-10-15 17:20): folded, it is the whole bar — 44 px, the only thing drawn; a tap opens
- * the instruments, a tap folds them away; with no recording the same mark, dimmed, described by the pending note. */
+/** The bar's one mark (John, 2026-10-15 17:20: "a simple character… elegant and nearly hidden but obvious"). F (the
+ * lead's ruling on Grok f-86, 2026-10-18; was "folded, it is the whole bar — 44 px, the only thing drawn", fixed at the
+ * phone's foot over the reading column): folded, it is one glyph in the reader's head, in the head's flow (static, at the
+ * right end of the instrument line), 44 px, the only thing of the bar drawn, and no text box that shows meets it; open,
+ * the bar is as it was; with no recording there is no mark at all — no dead control, nothing to focus. */
 const markState = (page) => page.evaluate(() => {
   const row = document.querySelector('.listen-row.play-bar'), mark = document.querySelector('#listen-open');
-  const box = (n) => { const r = n?.getBoundingClientRect(); return r ? { w: r.width, h: r.height, x: r.x, right: r.right, bottom: r.bottom } : null; };
+  const box = (n) => { const r = n?.getBoundingClientRect(); return r ? { w: r.width, h: r.height, x: r.x, top: r.top, right: r.right, bottom: r.bottom } : null; };
   const shown = (n) => !!n && n.checkVisibility() && getComputedStyle(n).visibility !== 'hidden';
-  return { open: row?.dataset.open ?? null, pending: !!row?.classList.contains('is-pending'), mark: box(mark), markShown: shown(mark),
+  // every text box of the room that shows, against the mark's own box
+  const textHits = [];
+  if (row && mark && shown(mark)) {
+    const m = mark.getBoundingClientRect();
+    const walk = document.createTreeWalker(document.querySelector('#app > main') || document.body, NodeFilter.SHOW_TEXT);
+    for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+      if (!n.data.trim() || row.contains(n) || !n.parentElement.checkVisibility()) continue;
+      const range = document.createRange(); range.selectNodeContents(n);
+      for (const q of range.getClientRects()) if (q.width && q.height && q.left < m.right && q.right > m.left && q.top < m.bottom && q.bottom > m.top) textHits.push(n.data.trim().slice(0, 12));
+    }
+  }
+  return { open: row?.dataset.open ?? null, pending: !!row?.classList.contains('is-pending'), rowHidden: !!row?.hidden,
+    inHead: !!row?.closest('.reader-head'), position: row ? getComputedStyle(row).position : null,
+    mark: box(mark), markShown: shown(mark),
     markDim: mark ? parseFloat(getComputedStyle(mark).opacity) : null, markDisabled: mark?.getAttribute('aria-disabled') ?? null,
     expanded: mark?.getAttribute('aria-expanded') ?? null, describedBy: mark?.getAttribute('aria-describedby') ?? null, tab: mark ? mark.tabIndex : null,
     toggleShown: shown(document.querySelector('#listen-toggle')), rateShown: shown(document.querySelector('#listen-rate')),
-    noteShown: shown(document.querySelector('#listen-note')), buttons: row ? row.querySelectorAll('button').length : 0 };
+    noteShown: shown(document.querySelector('#listen-note')), buttons: row ? row.querySelectorAll('button').length : 0, textHits };
 });
-const folded = (s) => s.open === 'false' && s.markShown && s.mark.w >= 44 && s.mark.h >= 44 && !s.toggleShown && !s.rateShown && !s.noteShown;
+const folded = (s) => s.open === 'false' && s.markShown && s.inHead && s.position === 'static' && s.mark.w >= 44 && s.mark.h >= 44
+  && !s.toggleShown && !s.rateShown && !s.noteShown && s.textHits.length === 0;
+/** No recording: no mark, no control, no line — the row an empty, hidden place */
+const absent = (s) => !s.markShown && s.buttons === 0 && s.rowHidden && s.pending;
 async function openBar(page) {
   const s = await markState(page);
   if (s.open === 'true') return;
@@ -254,11 +272,10 @@ async function openBar(page) {
   await page.waitForSelector('.listen-row.play-bar[data-open="true"]', { timeout: 5000 });
 }
 async function press(page) { await openBar(page); await page.locator('#listen-toggle').click(); }
-/** The shut bar: the dimmed mark alone — no play control to press, no picker; the pending note is its description. */
-const barShut = (page) => page.evaluate(() => !document.querySelector('#listen-toggle') && !document.querySelector('#listen-voice')
-  && !!document.querySelector('.listen-row.is-pending #listen-note')
-  && document.querySelector('.listen-row.is-pending #listen-open')?.getAttribute('aria-disabled') === 'true'
-  && document.querySelector('.listen-row.is-pending')?.dataset.open === 'false');
+/** The shut bar: no recording, so nothing at all — no mark, no play control, no picker, no line; an empty hidden row. */
+const barShut = (page) => page.evaluate(() => !document.querySelector('#listen-open') && !document.querySelector('#listen-toggle')
+  && !document.querySelector('#listen-voice') && !document.querySelector('#listen-note')
+  && !!document.querySelector('.listen-row.is-pending[hidden]') && document.querySelector('.listen-row.is-pending')?.dataset.open === 'false');
 const PENDING = /^No recording for this article$/u;
 const PENDING_VOICES = 'Approved voices: Kore (main), Charon (second).';
 const FAILED = /could not play|再生できませんでした/u;
@@ -353,21 +370,16 @@ try {
   console.log(`engine ${ENGINE} ${browserVersion} (KAIRO_BROWSER=${REQUESTED})`);
 
   // --- the shipped state: no narration flag, no approved clip ---
-  await check('the-shipped-play-bar-is-a-quiet-pending-line-and-silent', 'quiet', async (f) => {
+  await check('the-shipped-reader-draws-no-mark-without-a-recording-and-is-silent', 'quiet', async (f) => {
     const { page } = f;
-    assert.equal(await barShut(page), true, 'no play control and no picker: the dimmed mark, the pending note as its description');
+    assert.equal(await barShut(page), true, 'no recording: no mark, no play control, no picker, no line');
     const mark = await markState(page);
-    assert.equal(folded(mark) && mark.pending && mark.markDisabled === 'true' && mark.markDim < 1 && mark.describedBy === 'listen-note' && mark.buttons === 1 && mark.tab === -1, true,
-      `the pending state is the one mark, dimmed, 44 px, the only control, out of the tab order: ${JSON.stringify(mark)}`);
-    const before = await counts(page);
-    assert.match(before.note, PENDING, 'the line says that this article has no audio yet');
-    assert.equal(before.description, PENDING_VOICES, 'the accessible description names the locked voices');
-    // the dimmed mark is aria-disabled: Playwright holds an ordinary click off it, so the press is forced through
-    await page.locator('#listen-open').click({ force: true });
+    assert.equal(absent(mark), true, `no recording: the reader draws no listen mark and holds nothing of it to focus: ${JSON.stringify(mark)}`);
+    // the keyboard's way through the head meets no listen stop
+    assert.equal(await page.evaluate(() => document.querySelectorAll('.listen-row button, .listen-row [tabindex]').length), 0, 'no listen stop');
     await page.waitForTimeout(350);
     const after = await counts(page);
     assert.equal(after.clips.length, 0, 'nothing plays');
-    assert.equal((await markState(page)).open, 'false', 'the dimmed mark opens nothing');
     // V (2026-10-17): narration HAS shipped — one article, six real clips in the locked voice —
     // so index.html raises the flag and the build asks once. Before V this asserted zero, which
     // was true only while nothing was recorded: it was a test of the silence, and it passed
@@ -380,21 +392,21 @@ try {
     const { page } = f;
     await manifestSettled(f, '__narrationConsumed');
     assert.equal(f.narrationAsked, 1, 'the raised flag fetched the manifest');
-    assert.equal(await barShut(page), true, 'an F1 manifest is refused: the bar stays the pending line');
-    assert.match((await counts(page)).note, PENDING);
+    assert.equal(await barShut(page), true, 'an F1 manifest is refused: no mark is drawn');
+    assert.equal(absent(await markState(page)), true, 'an F1 manifest arms nothing');
     assert.equal((await counts(page)).clips.length, 0);
   });
-  await check('an-unnarrated-article-in-a-present-manifest-is-the-pending-line', 'narration-partial', async (f) => {
+  await check('an-unnarrated-article-in-a-present-manifest-draws-no-mark', 'narration-partial', async (f) => {
     const { page } = f;
     await manifestSettled(f, '__narrationConsumed');
-    assert.equal(await barShut(page), true, `${FIRST} has no clip: nothing to press`);
-    assert.match((await counts(page)).note, PENDING);
+    assert.equal(await barShut(page), true, `${FIRST} has no clip: no mark, nothing to press`);
+    assert.equal(absent(await markState(page)), true, `${FIRST} has no clip: the row is an empty hidden place`);
     // positive control: the narrated article beside it opens its bar in the locked voice
     await switchPassage(page);
     assert.equal(await barShut(page), false, `${OTHER} is narrated: its bar can open`);
     const live = await markState(page);
     assert.equal(folded(live) && !live.pending && live.markDisabled === null && live.expanded === 'false' && live.markDim === 1 && live.tab === 0, true,
-      `narrated, the bar stands folded to its live mark (a stop on the keyboard's way) until a tap: ${JSON.stringify(live)}`);
+      `narrated, the bar stands folded to its live mark in the head, in flow, on no text (a stop on the keyboard's way) until a tap: ${JSON.stringify(live)}`);
     assert.equal((await counts(page)).note, 'Kore');
     assert.equal((await counts(page)).clips.length, 0);
   });
@@ -446,6 +458,9 @@ try {
       await page.waitForFunction(({ index, reading }) => {
         const n = document.querySelector(`#reader .tok[data-index="${index}"]`);
         const painted = [...n.querySelectorAll('ruby')].map(ruby => {
+          // F · the one ruby paints a reading as its native rt; a ::before reading is read where a host still draws one
+          const rt = ruby.querySelector('rt'), native = rt && getComputedStyle(rt);
+          if (native && native.display !== 'none' && native.visibility !== 'hidden' && Number(native.opacity) === 1 && rt.getClientRects().length > 0) return rt.textContent;
           const style = getComputedStyle(ruby, '::before'), content = style.content;
           if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) !== 1) return '';
           return content.startsWith('attr(') ? ruby.dataset.r : /^["'].*["']$/u.test(content) ? content.slice(1, -1) : '';
@@ -488,6 +503,40 @@ try {
     const reopened = await markState(page);
     assert.equal(reopened.expanded === 'true' && reopened.toggleShown && reopened.rateShown && reopened.mark.w >= 44, true,
       `a tap on the mark opens the bar again: ${JSON.stringify(reopened)}`);
+  });
+  // F, brief item 2 (Grok f-86): folded, the mark meets no text box in any of the eleven worlds, at 320 / 390 / 430. A world
+  // can change a face and so the head's line; each world is set as he sets it (stored, then the app opened again).
+  await check('the-folded-mark-meets-no-text-in-any-world-at-any-phone-width', 'narration', async ({ page }) => {
+    const WORLDS = ['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'keyblock', 'hakuu', 'kaku'];
+    // each world opened once, its three widths stepped in place (the head is laid out by CSS alone); the rows are written
+    // as they come, so a run cut short still shows how far it got
+    const rows = [], file = resolve(out, `folded-mark-worlds-${ENGINE}.json`);
+    for (const world of WORLDS) {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.evaluate((id) => localStorage.setItem('kairo-theme', id), world);
+      await page.goto(`${base}/index.html?entry=shelf&ui=bi`);
+      await page.waitForFunction(() => document.body.dataset.ready === '1');
+      await openPassage(page);
+      await page.waitForSelector('.listen-row.play-bar[data-open="false"] #listen-open', { timeout: 10000 });
+      const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme') || 'hokusai');
+      for (const width of [320, 390, 430]) {
+        await page.setViewportSize({ width, height: 844 });
+        await page.waitForFunction(() => new Promise((done) => {
+          const m = document.querySelector('#listen-open'), a = m?.getBoundingClientRect();
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            const b = m?.getBoundingClientRect();
+            done(!!a && !!b && a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height);
+          }));
+        }), null, { timeout: 5000 });
+        const s = await markState(page);
+        rows.push({ width, world, theme, folded: folded(s), mark: s.mark, inHead: s.inHead, position: s.position, textHits: s.textHits });
+      }
+      writeFileSync(file, JSON.stringify(rows, null, 2));
+    }
+    assert.equal(rows.length, 33, 'eleven worlds at three widths');
+    assert.deepEqual(rows.filter((r) => r.theme !== r.world).map((r) => `${r.width}/${r.world}→${r.theme}`), [], 'each world is the world asked for');
+    assert.deepEqual(rows.filter((r) => !r.folded).map((r) => `${r.width}/${r.world}: ${JSON.stringify({ inHead: r.inHead, position: r.position, mark: r.mark, textHits: r.textHits })}`), [],
+      'folded, the mark is one 44 px glyph in the head that meets no text box, in every world at 320 / 390 / 430');
   });
   await check('stale-clip-events-cannot-change-a-restarted-read', 'narration', async ({ page }) => {
     await press(page);
@@ -538,7 +587,7 @@ try {
   });
   await check('late-manifest-opens-listen-for-the-current-passage', 'narration-delayed', async (f) => {
     const { page, release } = f;
-    assert.equal(await barShut(page), true, 'while narration loads the bar is the dimmed mark');
+    assert.equal(await barShut(page), true, 'while narration loads there is no mark (no dead control)');
     await switchPassage(page);
     release();
     await page.waitForSelector('#listen-toggle', { state: 'attached', timeout: 5000 });
@@ -550,9 +599,10 @@ try {
     assert.match(active.clips[0].src, clipAt(OTHER, 0));
     assert.equal(active.pressed, 'true');
   });
-  await check('a-press-on-the-pending-mark-starts-nothing-later', 'narration-delayed', async (f) => {
+  await check('no-pending-mark-to-press-and-the-armed-mark-waits-for-its-own-press', 'narration-delayed', async (f) => {
     const { page, release } = f;
-    await page.locator('#listen-open').click({ force: true });
+    // while narration loads there is no mark: nothing to press, nothing to queue
+    assert.equal(await page.locator('#listen-open').count(), 0, 'no pending mark to press');
     release();
     await manifestSettled(f, '__narrationConsumed');
     await page.waitForSelector('#listen-toggle', { state: 'attached', timeout: 5000 });
@@ -560,7 +610,7 @@ try {
     const after = await counts(page);
     assert.equal(after.pressed, 'false', 'the armed bar waits for its own press');
     assert.equal(after.clips.length, 0);
-    assert.equal(folded(await markState(page)), true, 'a press on the dimmed mark did not leave the bar open');
+    assert.equal(folded(await markState(page)), true, 'the armed mark stands folded in the head until its own press');
   });
   await check('current-recording-failure-stops-with-a-reason-and-no-device-voice', 'narration', async ({ page }) => {
     await press(page);
@@ -626,11 +676,11 @@ try {
   });
   for (const [name, mode, expect] of [
     ['a-late-manifest-refreshes-the-row-and-keeps-focus-and-place', 'narration-delayed', { shut: false, note: /^Kore$/u }],
-    ['a-late-manifest-failure-settles-the-row-and-keeps-focus-and-place', 'narration-delayed-fail', { shut: true, note: PENDING }],
+    ['a-late-manifest-failure-settles-the-row-and-keeps-focus-and-place', 'narration-delayed-fail', { shut: true, note: /^$/u }],
   ]) {
     await check(name, mode, async (f) => {
       const { page, release } = f;
-      assert.match((await counts(page)).note, PENDING, 'the row starts as the pending line while narration loads');
+      assert.equal(await barShut(page), true, 'the row starts as an empty hidden place while narration loads (no mark, no line)');
       // a word in the text itself, as the glossary door was: the read's second word, selected the way a keyboard
       // reaches it (its paragraph's one stop, Home, then the arrows), never by focusing an idle prose span directly
       const selection = await page.evaluate(() => {

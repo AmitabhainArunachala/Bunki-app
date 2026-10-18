@@ -35,13 +35,6 @@
     'Source Han Serif JP', 'Songti SC', serif;
   --sans: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif;
 
-  /* typographic scale — focused first */
-  --t-read: 21px;
-  --t-hero: 30px;
-  --t-body: 16px;
-  --t-label: 12px;
-  --t-chrome: 13px;
-
   --tap: 44px; /* minimum hit target */
 }
 
@@ -73,7 +66,7 @@ body {
   background: var(--ground);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: var(--t-body);
+  font-size: var(--type-body);
   line-height: 1.6;
   /* r4 (T2: "native ios expeirnce is alreayd way smoother"): pages keep the native bounce but
      never pull-to-refresh (contain); the full-screen door keeps none. The viewport takes its
@@ -130,8 +123,8 @@ body::before {
   text-align: left;
   font: inherit;
 }
-.study-door-t { font-family: var(--serif); font-size: 18px; }
-.study-door-sub { font-size: var(--t-chrome); color: var(--ink-2); }
+.study-door-t { font-family: var(--serif); font-size: var(--type-lead); }
+.study-door-sub { font-size: var(--type-chrome); color: var(--ink-2); }
 .study-hall-note { margin: 4px 0 18px; }
 
 /* 今日の棚 — six readings that change with the date (operator, 2026-09-18) */
@@ -148,7 +141,7 @@ body::before {
 
 /* 新着 — the newest dated news, first on the shelf (operator, 2026-09-28) */
 .eyebrow.shelf-fresh-head { margin: 22px 2px 2px; }
-.shelf-fresh-note { font-size: var(--t-label); color: var(--ink-2); margin: 0 2px 10px; }
+.shelf-fresh-note { font-size: var(--type-label); color: var(--ink-2); margin: 0 2px 10px; }
 .shelf-fresh-strip {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -165,12 +158,12 @@ body::before {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
 }
-.reader-date { font-size: var(--t-label); color: var(--ink-2); margin: 2px 0 10px; }
+.reader-date { font-size: var(--type-label); color: var(--ink-2); margin: 2px 0 10px; }
 
 /* the writing-speed slider beside ゆっくり (operator, 2026-09-18) */
 .stroke-speed-wrap { display: inline-flex; align-items: center; gap: 8px; }
 .stroke-speed-range { width: 96px; accent-color: var(--ink); }
-.stroke-speed-readout { font-size: var(--t-chrome); color: var(--ink-2); min-width: 3ch; font-variant-numeric: tabular-nums; }
+.stroke-speed-readout { font-size: var(--type-chrome); color: var(--ink-2); min-width: 3ch; font-variant-numeric: tabular-nums; }
 
 /* the search room's lens row — the same lenses as 字引, in the room the
  * learner actually opens (operator, 2026-09-17) */
@@ -196,7 +189,7 @@ body::before {
   flex: 1;
   min-width: 0;
   font-family: var(--serif);
-  font-size: var(--t-chrome);
+  font-size: var(--type-chrome);
   color: var(--faint);
   letter-spacing: 0.06em;
   white-space: nowrap;
@@ -271,7 +264,7 @@ body[data-view='drift'] main {
 /* ------------------------------------------------------------- headings */
 .eyebrow {
   font-family: var(--serif);
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   letter-spacing: 0.22em;
   color: var(--faint);
   text-transform: none;
@@ -280,7 +273,7 @@ body[data-view='drift'] main {
 
 h1.view-title {
   font-family: var(--serif);
-  font-size: 22px;
+  font-size: var(--type-reading);
   font-weight: 400;
   letter-spacing: 0.06em;
   margin: 0 0 4px;
@@ -319,13 +312,13 @@ h1.view-title {
 
 .shelf-title {
   font-family: var(--serif);
-  font-size: 19px;
+  font-size: var(--type-reading);
   line-height: 1.45;
   margin: 0 0 5px;
 }
 
 .shelf-meta {
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   color: var(--faint);
   letter-spacing: 0.04em;
   display: flex;
@@ -337,7 +330,7 @@ h1.view-title {
 
 .shelf-snippet {
   font-family: var(--serif);
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--faint);
   line-height: 1.7;
   margin: 0 0 10px;
@@ -358,7 +351,7 @@ h1.view-title {
   grid-template-columns: 88px 1fr auto;
   align-items: center;
   gap: 8px;
-  font-size: var(--t-label);
+  font-size: var(--type-label);
 }
 
 .sig-name {
@@ -464,7 +457,7 @@ body.ginga #drift-layer #hint.first-cue {
   justify-content: center;
   padding: 0;
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--type-lead);
   line-height: 1;
   color: var(--ink);
   background: transparent;
@@ -550,7 +543,7 @@ body.ginga #drift-layer #hint.first-cue {
 .nav-arrow {
   width: 40px;
   height: 44px;
-  font-size: 24px;
+  font-size: var(--type-section);
   line-height: 1;
   color: var(--ai, #2e4d6e);
   background: transparent;
@@ -588,7 +581,7 @@ body.ginga #drift-layer #hint.first-cue {
   min-height: 44px;
   margin: 0;
   padding: 0 12px 0 36px;
-  font: 400 16px/1.2 inherit;
+  font: 400 var(--type-body)/1.2 inherit;
   font-family: inherit;
   color: var(--ink, #23303f);
   background: rgb(120 120 128 / 12%);
@@ -620,7 +613,7 @@ body.ginga #drift-layer #hint.first-cue {
   min-height: 44px;
   padding: 0 14px;
   font-family: inherit;
-  font-size: 15px;
+  font-size: var(--type-control);
   font-weight: 600;
   line-height: 44px;
   letter-spacing: 0;
@@ -644,7 +637,7 @@ body.ginga #drift-layer #hint.first-cue {
 .nav-review .en-sub,
 .nav-dojo .en-sub {
   display: inline;
-  font-size: 12px;
+  font-size: var(--type-caption);
   font-weight: 500;
   letter-spacing: 0.01em;
   opacity: 0.78;
@@ -654,7 +647,7 @@ body.ginga #drift-layer #hint.first-cue {
   min-width: 22px;
   height: 22px;
   padding: 0 7px;
-  font-size: 12px;
+  font-size: var(--type-caption);
   font-weight: 700;
   line-height: 22px;
   text-align: center;
@@ -713,7 +706,7 @@ html[data-layout='places'] .nav-station:hover {
 }
 html[data-layout='places'] .nav-station-t {
   grid-area: t;
-  font-size: 16px;
+  font-size: var(--type-body);
   font-weight: 600;
   line-height: 1.2;
   color: var(--ai, #2e4d6e);
@@ -722,7 +715,7 @@ html[data-layout='places'] .nav-station-sub {
   grid-area: s;
   min-width: 0;
   overflow: hidden;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   font-weight: 400;
   line-height: 1.3;
   color: rgb(60 60 67 / 68%);
@@ -798,7 +791,7 @@ html[data-layout='places'] .nav-station-go {
   display: flex;
   align-items: center;
   padding: 0 11px;
-  font-size: 13px;
+  font-size: var(--type-label);
   letter-spacing: 0;
   color: var(--ink-2, #55606c);
   transition: none;
@@ -831,7 +824,7 @@ html[data-layout='places'] .nav-station-go {
   width: 100%;
   padding: 8px 10px;
   font: inherit;
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ink, #23303f);
   background: var(--ground, #fbf8f0);
   border: 1px solid var(--line, #cfc7b5);
@@ -846,14 +839,14 @@ html[data-layout='places'] .nav-station-go {
   margin: 4px auto 0;
 }
 .search-page .nav-search-input {
-  font-size: 18px;
+  font-size: var(--type-lead);
   padding: 13px 16px;
   border-radius: var(--radius-control);
   background: var(--ground-0, #fff);
 }
 .search-page-hint {
   margin: 10px 2px 0;
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint, #a9a293);
 }
 .search-page-results {
@@ -872,13 +865,13 @@ html[data-layout='places'] .nav-station-go {
   min-height: 56px;
 }
 .search-page-results .nsr-glyph {
-  font-size: 23px;
+  font-size: var(--type-reading);
 }
 .search-page-results .nsr-read {
-  font-size: 13px;
+  font-size: var(--type-label);
 }
 .search-page-results .nsr-gloss {
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
   white-space: normal; /* the room has space — a gloss may finish its thought */
 }
 .nav-search-row {
@@ -898,7 +891,7 @@ html[data-layout='places'] .nav-station-go {
 }
 .nsr-glyph {
   font-family: var(--serif);
-  font-size: 19px;
+  font-size: var(--type-reading);
   color: var(--ink);
   flex: none;
 }
@@ -908,11 +901,11 @@ html[data-layout='places'] .nav-station-go {
   min-width: 0;
 }
 .nsr-read {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--red, #9e2b25);
 }
 .nsr-gloss {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--ink-2, #55606c);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -920,7 +913,7 @@ html[data-layout='places'] .nav-station-go {
 }
 .nav-search-empty {
   padding: 12px;
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint, #a9a293);
 }
 
@@ -937,7 +930,7 @@ html[data-layout='places'] .nav-station-go {
   min-height: 52px;
   padding: 0 20px;
   font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
-  font-size: 17px;
+  font-size: var(--type-lead);
   font-weight: 600;
   line-height: 52px;
   letter-spacing: 0;
@@ -957,7 +950,7 @@ html[data-layout='places'] .nav-station-go {
 }
 .corner-bubble .en-sub {
   display: inline;
-  font-size: 12px;
+  font-size: var(--type-caption);
   font-weight: 500;
   letter-spacing: 0.01em;
   opacity: 0.78;
@@ -1000,11 +993,11 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
 }
 .focus-chip-n {
   font-family: var(--serif);
-  font-size: 24px;
+  font-size: var(--type-section);
   line-height: 1;
 }
 .focus-chip-u {
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--faint, #a9a293);
 }
 .focus-modes {
@@ -1032,10 +1025,10 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
 }
 .focus-mode-t {
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--type-lead);
 }
 .focus-mode-sub {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--ink-2, #55606c);
 }
 .focus-start {
@@ -1068,18 +1061,18 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
 }
 .focus-badge {
   font-family: var(--serif);
-  font-size: 13px;
+  font-size: var(--type-label);
   letter-spacing: 0.08em;
   opacity: 0.9;
 }
 .focus-clock-el {
   font-variant-numeric: tabular-nums;
-  font-size: 19px;
+  font-size: var(--type-lead);
   font-weight: 600;
 }
 .focus-hud-end {
   padding: 6px 14px;
-  font-size: 13px;
+  font-size: var(--type-label);
   /* the door's word stays on one line: a squeezed 終わる collapsed into a
    * vertical strand of characters (operator's real phone, 2026-08-20) */
   white-space: nowrap;
@@ -1091,7 +1084,7 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
 }
 .focus-hud-end .en-sub {
   display: block;
-  font-size: 9px;
+  font-size: var(--type-caption);
   opacity: 0.8;
 }
 
@@ -1133,11 +1126,11 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
 }
 .cat-glyph {
   font-family: var(--serif);
-  font-size: 30px;
+  font-size: var(--type-title);
   line-height: 1;
 }
 .cat-mean {
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--ink-2, #55606c);
   text-align: center;
   line-height: 1.2;
@@ -1203,13 +1196,13 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
 .band-legend {
   display: flex;
   justify-content: space-between;
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   color: var(--faint);
 }
 
 .uncertain {
   color: var(--red);
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   letter-spacing: 0.08em;
   display: inline-flex;
   align-items: center;
@@ -1222,26 +1215,18 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
   border: 1px solid var(--red);
   border-radius: var(--radius-seal);
   padding: 1px 5px;
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.06em;
 }
 
 /* -------------------------------------------------------------- reader */
 .reader {
   font-family: var(--serif);
-  font-size: var(--t-read);
+  font-size: var(--type-reading);
   line-height: 2.15;
   letter-spacing: 0.02em;
   color: var(--ink);
   margin-top: 6px;
-}
-
-.reader ruby {
-  ruby-position: over;
-  /* A reading wider than its word must OVERHANG, not pry the word apart:
-   * the browser default justifies base glyphs to the ruby's width, which
-   * splits 拡張 into 拡 張 mid-word. Center keeps the word whole. */
-  ruby-align: center;
 }
 
 /* paragraph break — the article files carry paragraph starts, the reader
@@ -1249,20 +1234,6 @@ body:has(.bubble-sensei) #bunki-reports-root .br-rail {
 .reader .para-break {
   display: block;
   height: 1.05em;
-}
-
-.reader rt {
-  font-size: 0.46em;
-  color: var(--red);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1.1;
-  opacity: 1;
-  transition: opacity 0.18s ease;
-}
-
-.reader rt.hidden-rt {
-  opacity: 0;
 }
 
 .tok {
@@ -1395,7 +1366,7 @@ button.tok::before {
   background: transparent;
   font: inherit;
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   line-height: 1.2;
   cursor: pointer;
 }
@@ -1451,7 +1422,7 @@ span.tok.named {
 
 .dial-label {
   font-family: var(--serif);
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   color: var(--faint);
   letter-spacing: 0.1em;
 }
@@ -1496,26 +1467,21 @@ span.tok.named {
 
 .headword {
   font-family: var(--serif);
-  font-size: var(--t-hero);
+  font-size: var(--type-hero);
   line-height: 1.5;
   margin: 0 0 2px;
-}
-
-.headword rt {
-  font-size: 0.4em;
-  color: var(--red);
 }
 
 .reading {
   font-family: var(--serif);
   color: var(--red);
-  font-size: 15px;
+  font-size: var(--type-control);
   letter-spacing: 0.08em;
   margin: 0 0 6px;
 }
 
 .gloss {
-  font-size: 15px;
+  font-size: var(--type-control);
   color: var(--ink-2);
   line-height: 1.6;
   margin: 0 0 12px;
@@ -1533,7 +1499,7 @@ span.tok.named {
 
 .sem-head {
   font-family: var(--serif);
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   letter-spacing: 0.16em;
   color: var(--faint);
   margin: 0 0 7px;
@@ -1560,7 +1526,7 @@ span.tok.named {
 
 .sem-word {
   font-family: var(--serif);
-  font-size: 18px;
+  font-size: var(--type-lead);
   white-space: nowrap;
   color: var(--ink);
 }
@@ -1568,17 +1534,17 @@ span.tok.named {
 .sem-head .latin {
   letter-spacing: 0.02em;
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
 }
 
 .sem-note {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   line-height: 1.5;
 }
 
 .sem-empty {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint);
   line-height: 1.6;
   border-left: 2px solid var(--line);
@@ -1605,11 +1571,11 @@ span.tok.named {
 }
 
 .chip .big {
-  font-size: 20px;
+  font-size: var(--type-lead);
 }
 
 .chip .sub {
-  font-size: 10px;
+  font-size: var(--type-caption);
   color: var(--faint);
   letter-spacing: 0.04em;
 }
@@ -1630,7 +1596,7 @@ span.tok.named {
 
 .hero-glyph {
   font-family: var(--serif);
-  font-size: 78px;
+  font-size: calc(var(--type-headword) * 1.75);
   line-height: 1;
   color: var(--red);
 }
@@ -1642,7 +1608,7 @@ span.tok.named {
 
 .hero-mean {
   font-family: var(--serif);
-  font-size: 20px;
+  font-size: var(--type-reading);
   margin: 0 0 5px;
   color: var(--ink);
 }
@@ -1651,13 +1617,13 @@ span.tok.named {
   display: grid;
   grid-template-columns: 58px 1fr;
   gap: 3px 10px;
-  font-size: 13px;
+  font-size: var(--type-label);
   margin: 0 0 12px;
 }
 
 .kv dt {
   color: var(--faint);
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   letter-spacing: 0.08em;
 }
 
@@ -1673,7 +1639,7 @@ span.tok.named {
 
 /* --------------------------------------------------------- provenance */
 .pool-tag {
-  font-size: 10px;
+  font-size: var(--type-caption);
   letter-spacing: 0.08em;
   border: 1px solid var(--line);
   border-radius: var(--radius-seal);
@@ -1697,13 +1663,13 @@ button.pool-tag.cat-chip {
   min-width: var(--tap);
   min-height: var(--tap);
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: var(--type-caption);
   line-height: 1.4;
   white-space: normal;
 }
 
 .note {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--faint);
   line-height: 1.6;
   border-left: 2px solid var(--line);
@@ -1741,7 +1707,7 @@ button.pool-tag.cat-chip {
 
 .card-face {
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--type-lead);
   line-height: 1.95;
   color: var(--ink);
 }
@@ -1753,7 +1719,7 @@ button.pool-tag.cat-chip {
 }
 
 .card-face .target {
-  font-size: 30px;
+  font-size: var(--type-title);
   display: block;
   text-align: center;
   padding: 12px 0;
@@ -1763,14 +1729,14 @@ button.pool-tag.cat-chip {
   border-top: 1px dashed var(--line);
   margin-top: 11px;
   padding-top: 11px;
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
   font-family: var(--serif);
   line-height: 1.8;
 }
 
 .card-kind {
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   letter-spacing: 0.16em;
   color: var(--faint);
   margin: 0 0 9px;
@@ -1781,7 +1747,7 @@ button.pool-tag.cat-chip {
 .sched {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: var(--type-label);
   margin: 4px 0 8px;
 }
 
@@ -1794,7 +1760,7 @@ button.pool-tag.cat-chip {
 }
 
 .sched th {
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   color: var(--faint);
   font-weight: 400;
   letter-spacing: 0.08em;
@@ -1814,7 +1780,7 @@ button.pool-tag.cat-chip {
   background: var(--ink);
   color: var(--ground);
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -1832,7 +1798,7 @@ button.pool-tag.cat-chip {
 
 #variants .vbar button.vtoggle {
   font: inherit;
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.14em;
   background: transparent;
   border: 1px solid rgba(252, 251, 246, 0.4);
@@ -1875,7 +1841,7 @@ button.pool-tag.cat-chip {
 
 #variants .vseg button {
   font: inherit;
-  font-size: 11px;
+  font-size: var(--type-caption);
   min-height: var(--tap);
   background: transparent;
   color: var(--ground);
@@ -1937,7 +1903,7 @@ button.pool-tag.cat-chip {
   transform: translateX(-50%);
   bottom: 16px;
   font-family: var(--serif);
-  font-size: 14px;
+  font-size: var(--type-chrome);
   letter-spacing: 0.2em;
   color: var(--ink);
   background: color-mix(in srgb, var(--ground) 88%, transparent);
@@ -1952,7 +1918,7 @@ button.pool-tag.cat-chip {
   font-family: var(--serif);
   color: var(--faint);
   letter-spacing: 0.2em;
-  font-size: 13px;
+  font-size: var(--type-label);
   padding: 40px 0;
   text-align: center;
 }
@@ -1968,12 +1934,12 @@ button.pool-tag.cat-chip {
 
 .tray-line .w {
   font-family: var(--serif);
-  font-size: 19px;
+  font-size: var(--type-reading);
 }
 
 .tray-line .when {
   margin-left: auto;
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
@@ -2067,7 +2033,6 @@ button.pool-tag.cat-chip {
 
   /* S4 hanko controls — the seal grammar shared by every stamped control */
   --seal-size: 56px;
-  --seal-font: 22px;
 }
 
 /* ------------------------------------------------------ corridor paper worlds
@@ -2323,7 +2288,7 @@ button.pool-tag.cat-chip {
   background: var(--ground-0);
   color: var(--ink);
   font-family: var(--serif);
-  font-size: 15px;
+  font-size: var(--type-control);
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -2368,7 +2333,7 @@ button.pool-tag.cat-chip {
 .world-row-name {
   flex: 0 0 100%;
   margin: 0 0 2px 2px;
-  font: 600 11px/1.2 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
+  font: 600 var(--type-caption)/1.2 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--ink) 72%, transparent);
@@ -2377,7 +2342,7 @@ button.pool-tag.cat-chip {
   margin: 2px 2px 0;
   padding-top: 10px;
   border-top: 0.5px solid var(--line);
-  font: 500 13px/1.3 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
+  font: 500 var(--type-label)/1.3 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', system-ui, sans-serif;
   color: var(--ink);
   min-height: 1.3em;
 }
@@ -2392,7 +2357,7 @@ button.pool-tag.cat-chip {
   /* a fine ring in the panel's own ink, so a dark stone (漆 殻 浪) stays drawn on the night panel */
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 30%, transparent);
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--type-lead);
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -2407,7 +2372,7 @@ button.pool-tag.cat-chip {
 .en-sub {
   display: block;
   font-family: var(--sans);
-  font-size: 9px;
+  font-size: var(--type-caption);
   font-weight: 400;
   letter-spacing: 0.13em;
   text-transform: lowercase;
@@ -2434,7 +2399,7 @@ button .l-ja {
 
 .en-inline {
   font-family: var(--sans);
-  font-size: 10px;
+  font-size: var(--type-caption);
   letter-spacing: 0.1em;
   text-transform: lowercase;
   color: inherit;
@@ -2617,7 +2582,7 @@ body.v-depth-layered .inline-link {
 .sheet-depth {
   flex: 1;
   min-width: 0;
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   color: var(--faint);
   white-space: nowrap;
   overflow: hidden;
@@ -2668,7 +2633,7 @@ body.v-depth-layered .inline-link {
   width: 0;
   min-width: calc(100% + 3.2em);
   font-family: var(--sans);
-  font-size: 9.5px;
+  font-size: var(--type-label);
   line-height: 1.25;
   color: var(--ai, var(--ink-2));
   letter-spacing: 0.02em;
@@ -2682,7 +2647,7 @@ body.v-depth-layered .inline-link {
 
 .gesture-hint {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.06em;
   color: var(--faint);
   margin: 8px 2px 0;
@@ -2707,7 +2672,7 @@ body.v-depth-layered .inline-link {
 
 .shelf-title-en {
   font-family: var(--sans);
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   letter-spacing: 0.01em;
 }
@@ -2722,7 +2687,7 @@ body.v-depth-layered .inline-link {
 
 .level-chip {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   font-weight: 600;
   letter-spacing: 0.06em;
   color: var(--ground);
@@ -2733,13 +2698,13 @@ body.v-depth-layered .inline-link {
 
 .level-note {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--faint);
 }
 
 .details-toggle {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.08em;
   color: var(--faint);
   background: transparent;
@@ -2768,13 +2733,13 @@ body.v-depth-layered .inline-link {
 
 /* dictionary anatomy — senses, rows, examples */
 .headword-alt {
-  font-size: 0.55em;
+  font-size: var(--type-section);
   color: var(--ink-2);
 }
 
 .senses .sense-pos {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.1em;
   color: var(--faint);
   margin: 0 0 3px;
@@ -2784,14 +2749,14 @@ body.v-depth-layered .inline-link {
 .sense-list {
   margin: 0 0 12px;
   padding-left: 22px;
-  font-size: 15px;
+  font-size: var(--type-control);
   color: var(--ink-2);
   line-height: 1.65;
 }
 
 .sense-list li::marker {
   color: var(--red);
-  font-size: 12px;
+  font-size: var(--type-caption);
 }
 
 .entry-rows {
@@ -2818,7 +2783,7 @@ body.v-depth-layered .inline-link {
 
 .row-glyph {
   font-family: var(--serif);
-  font-size: 26px;
+  font-size: var(--type-section);
   min-width: 34px;
   text-align: center;
 }
@@ -2826,13 +2791,13 @@ body.v-depth-layered .inline-link {
 .row-main {
   flex: 1;
   min-width: 0;
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
 }
 
 .row-go {
   color: var(--faint);
-  font-size: 18px;
+  font-size: var(--type-lead);
 }
 
 .row-stack {
@@ -2844,12 +2809,12 @@ body.v-depth-layered .inline-link {
 
 .row-word {
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--type-lead);
   color: var(--ink);
 }
 
 .row-word .row-reading {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--red);
   margin-left: 8px;
 }
@@ -2857,14 +2822,14 @@ body.v-depth-layered .inline-link {
 /* levels are metadata, not readings — they stay out of the red */
 .row-word .row-level {
   font-family: var(--sans);
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.06em;
   color: var(--faint);
   margin-left: 8px;
 }
 
 .row-gloss {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   white-space: nowrap;
   overflow: hidden;
@@ -2879,7 +2844,7 @@ body.v-depth-layered .inline-link {
 
 .example-ja {
   font-family: var(--serif);
-  font-size: 16px;
+  font-size: var(--type-body);
   line-height: 1.9;
   margin: 0;
 }
@@ -2891,21 +2856,21 @@ body.v-depth-layered .inline-link {
 
 .example-en {
   font-family: var(--sans);
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   margin: 2px 0 0;
 }
 
 .example-src {
   font-family: var(--sans);
-  font-size: 10px;
+  font-size: var(--type-caption);
   letter-spacing: 0.06em;
   color: var(--faint);
 }
 
 .formation {
   font-family: var(--serif);
-  font-size: 15px;
+  font-size: var(--type-control);
   background: var(--ground-2);
   border-radius: var(--radius-card);
   padding: 8px 12px;
@@ -2913,7 +2878,7 @@ body.v-depth-layered .inline-link {
 }
 
 .grammar-note {
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
   line-height: 1.7;
   margin: 0 0 12px;
 }
@@ -2937,6 +2902,7 @@ svg.strokes path {
 }
 
 svg.strokes text {
+  /* drawn: a stroke number in the stroke grid's own user units (like its stroke-width), not type on the page */
   font-size: 8px;
   fill: var(--red);
   font-family: var(--sans);
@@ -2960,7 +2926,7 @@ svg.strokes text {
   display: block;
   width: 100%;
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--type-lead);
   color: var(--ink);
   background: var(--ground-0, var(--ground));
   border: 1px solid var(--line);
@@ -2981,7 +2947,7 @@ svg.strokes text {
 .search-field::placeholder {
   color: var(--faint);
   font-family: var(--sans);
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
   letter-spacing: 0.02em;
 }
 
@@ -3017,7 +2983,7 @@ svg.strokes text {
 }
 .rad-glyph {
   font-family: var(--serif);
-  font-size: 34px;
+  font-size: var(--type-display);
   line-height: 1;
   flex: none;
   color: var(--ink);
@@ -3026,7 +2992,7 @@ svg.strokes text {
   gap: 5px;
 }
 .rad-glyph .rad-var {
-  font-size: 18px;
+  font-size: var(--type-lead);
   color: var(--ink-2, var(--faint));
 }
 .rad-text {
@@ -3036,11 +3002,11 @@ svg.strokes text {
   gap: 2px;
 }
 .rad-name {
-  font-size: 16px;
+  font-size: var(--type-body);
   color: var(--ink);
 }
 .rad-sub {
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   color: var(--faint);
 }
 .rad-door .row-go {
@@ -3080,7 +3046,7 @@ svg.strokes text {
 
 .stroke-door-glyph {
   font-family: var(--serif);
-  font-size: 56px;
+  font-size: calc(var(--type-headword) * 1.25);
   line-height: 96px;
   width: 96px;
   flex: none;
@@ -3135,7 +3101,7 @@ body.v-depth-layered .stroke-page {
   min-width: var(--tap);
   padding: 0 12px;
   font-family: var(--serif);
-  font-size: var(--t-chrome);
+  font-size: var(--type-chrome);
   color: var(--ink-2);
   background: var(--ground-0, var(--ground));
   border: 1px solid var(--line);
@@ -3160,7 +3126,7 @@ body.v-depth-layered .stroke-page {
 
 .stroke-title-word {
   font-family: var(--serif);
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   letter-spacing: 0.16em;
   color: var(--faint);
 }
@@ -3197,11 +3163,11 @@ body.v-depth-layered .stroke-page {
   font-family: var(--serif);
 }
 .stroke-k {
-  font-size: 30px;
+  font-size: var(--type-title);
   line-height: 1.2;
 }
 .stroke-k-meta {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
   letter-spacing: 0.2em;
   margin-left: 10px;
@@ -3210,7 +3176,7 @@ body.v-depth-layered .stroke-page {
   display: flex;
   flex-direction: column;
   text-align: right;
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.18em;
   line-height: 1.9;
   color: var(--ink-2);
@@ -3225,7 +3191,7 @@ body.v-depth-layered .stroke-page {
 }
 .stroke-read-label {
   margin-right: 0.6em;
-  font-size: 9.5px;
+  font-size: var(--type-caption);
   opacity: 0.62;
   letter-spacing: 0.3em;
 }
@@ -3359,7 +3325,7 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
 .stroke-hint {
   display: none;
   text-align: center;
-  font-size: 10px;
+  font-size: var(--type-caption);
   letter-spacing: 0.35em;
   color: var(--faint);
   margin: 12px 0 0;
@@ -3408,6 +3374,7 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
 
 .stroke-num {
   font-family: var(--sans);
+  /* drawn: the stroke grid's user units (its 109-unit box), not type on the page */
   font-size: 6px;
   fill: var(--ink-2);
   paint-order: stroke;
@@ -3437,14 +3404,14 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
 
 .stroke-count {
   font-family: var(--serif);
-  font-size: 30px;
+  font-size: var(--type-title);
   line-height: 1.1;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 
 .stroke-count-unit {
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   letter-spacing: 0.14em;
   color: var(--faint);
 }
@@ -3472,7 +3439,7 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
 }
 
 .stroke-meta {
-  font-size: var(--t-label);
+  font-size: var(--type-label);
   color: var(--faint);
   text-align: center;
   margin: 0;
@@ -3492,20 +3459,20 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
 
 .stroke-missing-glyph {
   font-family: var(--serif);
-  font-size: clamp(120px, 46vw, 260px);
+  font-size: clamp(calc(var(--type-headword) * 3), 46vw, calc(var(--type-headword) * 6));
   line-height: 1.1;
   color: var(--ink);
 }
 
 .stroke-missing-line {
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--type-lead);
   color: var(--ink-2);
   margin: 6px 0 0;
 }
 
 .stroke-missing-note {
-  font-size: 13px;
+  font-size: var(--type-label);
   line-height: 1.7;
   color: var(--faint);
   max-width: 34em;
@@ -3617,14 +3584,14 @@ body:has(.stroke-page[data-numbers='on']) .stroke-nums-lift {
 }
 
 .stroke-count {
-  font-size: 19px;
+  font-size: var(--type-lead);
   letter-spacing: 0.08em;
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
 
 .stroke-count-unit {
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--faint);
   letter-spacing: 0.14em;
 }
@@ -3802,7 +3769,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .stroke-page[data-minimal='on'] .stroke-missing-glyph {
-  font-size: min(62vw, 44dvh, 300px);
+  font-size: min(62vw, 44dvh, calc(var(--type-headword) * 7));
 }
 
 [data-stroke-chrome] {
@@ -3876,14 +3843,14 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   align-items: baseline;
   gap: 5px;
   color: var(--ink-2);
-  font-size: 10px;
+  font-size: var(--type-caption);
   letter-spacing: 0.12em;
 }
 
 .stroke-reading-label .en-sub {
   margin: 0;
   color: var(--faint-2);
-  font: 8px/1 var(--sans);
+  font: var(--type-caption)/1 var(--sans);
   letter-spacing: 0.04em;
 }
 
@@ -3891,7 +3858,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   display: block;
   margin-top: 3px;
   overflow-wrap: anywhere;
-  font-size: 13px;
+  font-size: var(--type-label);
   letter-spacing: 0.08em;
 }
 
@@ -3907,7 +3874,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   min-width: 44px;
   min-height: 44px;
   padding: 0;
-  font: 19px/1 var(--serif);
+  font: var(--type-reading)/1 var(--serif);
   letter-spacing: 0.08em;
   color: var(--ink-2);
   background: transparent;
@@ -4093,21 +4060,21 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .review-front {
   font-family: var(--serif);
-  font-size: 44px;
+  font-size: var(--type-headword);
   line-height: 1.2;
 }
 
 .review-reading {
   color: var(--red);
   letter-spacing: 0.18em;
-  font-size: 15px;
+  font-size: var(--type-control);
 }
 
 .review-sense {
   font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
   font-style: italic;
   color: var(--ink-2);
-  font-size: 15px;
+  font-size: var(--type-control);
 }
 
 .review-face .chip {
@@ -4142,12 +4109,12 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .grade .g-label {
   font-family: var(--serif);
-  font-size: 14px;
+  font-size: var(--type-chrome);
   letter-spacing: 0.08em;
 }
 
 .grade .g-when {
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
   white-space: nowrap;
 }
@@ -4187,17 +4154,17 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   align-items: center;
   justify-content: center;
   font-family: var(--serif);
-  font-size: var(--seal-font);
+  font-size: var(--type-seal);
   line-height: 1;
 }
 
 .grade.hanko .g-label {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--ink);
   letter-spacing: 0.06em;
 }
 .grade.hanko .g-when {
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
 }
 
@@ -4248,12 +4215,12 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   align-items: center;
   justify-content: center;
   font-family: var(--serif);
-  font-size: 19px;
+  font-size: var(--type-reading);
   line-height: 1;
 }
 .sum-seal .sum-n {
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--type-lead);
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
@@ -4302,7 +4269,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .ai-tutor .ai-answer {
   font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
   white-space: pre-wrap;
   margin-top: 8px;
@@ -4315,13 +4282,13 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 /* ------------------------------------------------------------- lessons */
 .lesson-row .row-glyph {
-  font-size: 15px;
+  font-size: var(--type-control);
   color: var(--ink-2);
 }
 
 .lesson-row .row-main {
   font-family: var(--serif);
-  font-size: 15px;
+  font-size: var(--type-control);
 }
 
 .lesson-options {
@@ -4379,18 +4346,18 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .kagami-level {
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
   letter-spacing: 0.04em;
 }
 
 .kagami-count {
   font-family: var(--serif);
-  font-size: 15px;
+  font-size: var(--type-control);
 }
 
 .kagami-obs {
-  font-size: 10px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
   opacity: 0.8;
 }
@@ -4403,7 +4370,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .kagami-prov,
 .kagami-thin {
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
   margin: 0;
   line-height: 1.6;
@@ -4461,7 +4428,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .mock-passage-source {
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
   margin: 0;
 }
@@ -4495,7 +4462,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .mock-pending,
 .mock-score {
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
   margin-left: 8px;
   white-space: nowrap;
@@ -4528,7 +4495,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .mock-review-ans,
 .mock-review-why {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
   margin: 2px 0 0;
   line-height: 1.6;
@@ -4554,7 +4521,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   flex: none;
   width: 18px;
   text-align: center;
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ink-2);
 }
 
@@ -4565,7 +4532,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .lesson-enroll-word {
   flex: 1;
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--type-lead);
 }
 
 .lesson-enroll-one {
@@ -4589,7 +4556,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 /* D23: why a word's 覚える is held, said on its own row before any batch */
 .enroll-held {
   margin: 2px 0 6px;
-  font-size: 12px;
+  font-size: var(--type-caption);
   line-height: 1.6;
   color: var(--faint);
 }
@@ -4637,7 +4604,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  font-size: 14px;
+  font-size: var(--type-chrome);
   line-height: 1.55;
 }
 
@@ -4648,7 +4615,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .deck-reading {
   display: block;
   font-family: var(--sans, inherit);
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
 }
 
@@ -4675,19 +4642,19 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .thes-word {
   font-family: var(--serif);
-  font-size: 22px;
+  font-size: var(--type-reading);
   color: var(--ink);
   white-space: nowrap;
 }
 
 .thes-reading {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   white-space: nowrap;
 }
 
 .thes-gloss {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint);
   line-height: 1.5;
   overflow: hidden;
@@ -4696,7 +4663,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .thes-rel {
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--faint);
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-card);
@@ -4711,7 +4678,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
  * underline so a finger knows where the doors are. */
 .airead-body {
   font-family: var(--serif);
-  font-size: 19px;
+  font-size: var(--type-reading);
   line-height: 2.3;
   color: var(--ink);
   margin: 20px 0 8px;
@@ -4743,7 +4710,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .airead-field-label {
   display: block;
-  font-size: 13px;
+  font-size: var(--type-label);
   line-height: 1.5;
   margin-bottom: 6px;
   color: var(--ink-2);
@@ -4755,7 +4722,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   min-height: 44px;
   box-sizing: border-box;
   margin: 0;
-  font-size: 16px;
+  font-size: var(--type-body);
 }
 
 .airead-interests {
@@ -4766,7 +4733,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   margin: 32px 0 8px;
   font-family: var(--serif);
   line-height: 1.65;
-  font-size: clamp(23px, 3vw, 30px);
+  font-size: clamp(var(--type-section), 3vw, var(--type-title));
   overflow-wrap: anywhere;
 }
 
@@ -4793,12 +4760,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   margin: 0 0 14px;
 }
 
-.airead-body rt {
-  font-size: 9px;
-  color: var(--ink-2);
-  letter-spacing: 0;
-}
-
 .airead-hit {
   position: relative;
   touch-action: manipulation;
@@ -4812,7 +4773,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .airead-note {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint);
   margin: 10px 0 0;
 }
@@ -4822,7 +4783,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .airead-meta {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--faint);
   margin: 6px 0 26px;
 }
@@ -4838,7 +4799,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .airead-made-head {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--faint);
 }
 
@@ -4888,7 +4849,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
  * The forecast line under the review button, and the per-line rest toggle
  * — small ink, since resting a card is a quiet act, not a feature. */
 .srs-forecast {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--faint);
   letter-spacing: 0.04em;
   margin: 6px 0 0;
@@ -4899,7 +4860,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-control);
   color: var(--faint);
-  font-size: 11px;
+  font-size: var(--type-caption);
   line-height: 1;
   padding: 4px 7px;
   cursor: pointer;
@@ -4951,7 +4912,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .trail-line {
-  font-size: 12.5px;
+  font-size: var(--type-label);
   line-height: 1.7;
   color: var(--ink-2);
   margin: 2px 0;
@@ -5003,7 +4964,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .srs-preset-name {
   display: block;
   font-family: var(--serif);
-  font-size: 19px;
+  font-size: var(--type-reading);
   font-weight: 600;
   letter-spacing: 0.06em;
 }
@@ -5011,7 +4972,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .srs-preset-name .en-inline {
   margin-left: 0.5em;
   font-family: var(--sans);
-  font-size: 12px;
+  font-size: var(--type-caption);
   font-weight: 400;
   letter-spacing: 0.04em;
   color: var(--ink-2);
@@ -5020,14 +4981,14 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .srs-preset-line {
   display: block;
   margin-top: 6px;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   line-height: 1.6;
   color: var(--ink-2);
 }
 
 .srs-preset-now {
   margin: 6px 0 4px;
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--faint);
   letter-spacing: 0.04em;
 }
@@ -5041,7 +5002,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 
 .srs-pref-row .srs-pref-name {
   flex: 1;
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--faint);
   letter-spacing: 0.04em;
 }
@@ -5049,7 +5010,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .srs-pref-val {
   min-width: 2.5em;
   text-align: center;
-  font-size: 14px;
+  font-size: var(--type-chrome);
   font-variant-numeric: tabular-nums;
 }
 
@@ -5079,7 +5040,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .chat-turn {
-  font-size: 15px;
+  font-size: var(--type-control);
   line-height: 1.75;
   margin: 0 0 12px;
   white-space: pre-wrap;
@@ -5100,7 +5061,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .chat-empty {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint);
 }
 
@@ -5140,7 +5101,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .teacher-source-quote {
   margin: 0 0 12px;
   color: var(--ink);
-  font-size: 18px;
+  font-size: var(--type-lead);
   line-height: 1.9;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
@@ -5163,7 +5124,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .teacher-actions .en-sub,
 .reading-place-actions .en-sub,
 .chat-send .en-sub {
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.05em;
   opacity: 0.82;
 }
@@ -5181,7 +5142,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .teacher-source-credit,
 .teacher-context-label {
   color: var(--ink-2);
-  font-size: 13px;
+  font-size: var(--type-label);
   line-height: 1.65;
   overflow-wrap: anywhere;
 }
@@ -5227,7 +5188,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .listening-form label {
   display: block;
   margin-bottom: 8px;
-  font-size: var(--t-body);
+  font-size: var(--type-body);
 }
 .source-capture-form .chat-field,
 .source-file-intake .chat-field,
@@ -5242,7 +5203,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   background: var(--ground-0, var(--ground));
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 16px;
+  font-size: var(--type-body);
   font-weight: 400;
 }
 .source-capture-text {
@@ -5258,12 +5219,12 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .source-file-intake .chat-field { margin-bottom: 16px; }
 .source-file-intake .teacher-actions { margin: 16px 0; }
 .source-file-name { overflow-wrap: anywhere; }
-.source-file-raw { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--sans); font-size: 16px; line-height: 1.8; }
+.source-file-raw { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--sans); font-size: var(--type-body); line-height: 1.8; }
 .source-inbox-heading {
   scroll-margin-top: 88px;
   margin: 32px 0 16px;
   font-family: var(--serif);
-  font-size: 24px;
+  font-size: var(--type-section);
   font-weight: 500;
 }
 .source-inbox-title {
@@ -5276,7 +5237,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   background: transparent;
   color: var(--ink);
   font-family: var(--serif);
-  font-size: 22px;
+  font-size: var(--type-reading);
   line-height: 1.7;
   overflow-wrap: anywhere;
   cursor: pointer;
@@ -5297,7 +5258,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 .listening-panel h2 {
   margin: 0 0 16px;
-  font-size: 24px;
+  font-size: var(--type-section);
   font-weight: 500;
 }
 .listening-form {
@@ -5369,7 +5330,7 @@ html:has(.teacher-question:focus) {
 
 .teacher-draft-title {
   margin: 0 0 12px;
-  font-size: 18px;
+  font-size: var(--type-lead);
   font-weight: 400;
   font-family: var(--serif);
 }
@@ -5377,7 +5338,7 @@ html:has(.teacher-question:focus) {
 .teacher-draft-quote {
   margin: 12px 0;
   color: var(--ink);
-  font-size: 16px;
+  font-size: var(--type-body);
   line-height: 1.8;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -5387,7 +5348,7 @@ html:has(.teacher-question:focus) {
   min-height: 44px;
   padding: 12px 0;
   color: var(--ink-2);
-  font-size: 13px;
+  font-size: var(--type-label);
   cursor: pointer;
 }
 
@@ -5416,7 +5377,7 @@ html:has(.teacher-question:focus) {
 .reading-places .section-title {
   margin: 0 0 12px;
   font-family: var(--serif);
-  font-size: 18px;
+  font-size: var(--type-lead);
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: 0.05em;
@@ -5429,12 +5390,12 @@ html:has(.teacher-question:focus) {
 .reading-place-title {
   margin-bottom: 8px;
   color: var(--ink-2);
-  font-size: 14px;
+  font-size: var(--type-chrome);
 }
 
 .reading-place-quote {
   margin: 10px 0;
-  font-size: 17px;
+  font-size: var(--type-lead);
   line-height: 1.9;
   overflow-wrap: anywhere;
 }
@@ -5445,12 +5406,12 @@ html:has(.teacher-question:focus) {
 
 /* the tutor's quiz — question card and the one-line why */
 .aiq-q {
-  font-size: 20px;
+  font-size: var(--type-lead);
   line-height: 1.9;
 }
 
 .aiq-why {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   line-height: 1.6;
   margin: 10px 0 4px;
@@ -5475,7 +5436,7 @@ html:has(.teacher-question:focus) {
 /* the cloze face: the shelf's own sentence, with the word's place held */
 .review-cloze {
   font-family: var(--serif);
-  font-size: 18px;
+  font-size: var(--type-lead);
   line-height: 2;
   color: var(--ink);
   margin: 6px 0 4px;
@@ -5502,12 +5463,12 @@ html:has(.teacher-question:focus) {
   cursor: pointer;
 }
 .archive-row-title {
-  font-size: 15px;
+  font-size: var(--type-control);
   line-height: 1.5;
 }
 .archive-row-title-en {
   display: block;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   letter-spacing: 0.01em;
 }
@@ -5516,7 +5477,7 @@ html:has(.teacher-question:focus) {
   align-items: center;
   gap: 8px;
   margin-top: 3px;
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--faint);
 }
 
@@ -5525,31 +5486,31 @@ html:has(.teacher-question:focus) {
  * meta line (漢検 band · reading type) after the reveal */
 .probe-context {
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--type-lead);
   line-height: 2;
   color: var(--ink-2);
   margin: 4px 0 0;
 }
 .probe-meta {
   color: var(--ink-2);
-  font-size: 12px;
+  font-size: var(--type-caption);
   letter-spacing: 0.14em;
 }
 body.zen .probe-context {
-  font-size: 19px;
+  font-size: var(--type-lead);
 }
 
 /* 文 · the minimum reader — one sentence, large, room for its rt */
 .sent-reader {
   font-family: var(--serif);
-  font-size: 24px;
+  font-size: var(--type-section);
   line-height: 2.3;
   color: var(--ink);
   margin: 8px 0 12px;
 }
 .sent-reader-en {
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: var(--type-chrome);
   line-height: 1.7;
   color: var(--ink-2);
   margin: 0 0 6px;
@@ -5563,7 +5524,7 @@ body.zen .probe-context {
   border: 0;
   padding: 0 4px;
   margin-left: 4px;
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ai, var(--ink-2));
   cursor: pointer;
   vertical-align: baseline;
@@ -5591,7 +5552,7 @@ body.zen .probe-context {
 /* the answer face's example lines — quieter than the cloze, still living */
 .review-example {
   font-family: var(--serif);
-  font-size: 15px;
+  font-size: var(--type-control);
   line-height: 2;
   color: var(--ink-2);
   margin: 4px 0 0;
@@ -5599,7 +5560,7 @@ body.zen .probe-context {
 body.zen .review-example {
   /* the wild sentences are the quiet second voice on the sheet: set apart
    * by a hairline, reading left-to-right the way a sentence wants to */
-  font-size: 16px;
+  font-size: var(--type-body);
   line-height: 1.9;
   text-align: left;
   width: 100%;
@@ -5619,14 +5580,14 @@ body.zen .review-example {
 
 .leech-row .w {
   font-family: var(--serif);
-  font-size: 18px;
+  font-size: var(--type-lead);
 }
 
 /* the per-list review door on a list heading */
 .list-head .list-review {
   /* a door, not a label: the filtered deck's one-tap review */
   margin-left: auto;
-  font-size: 12px;
+  font-size: var(--type-caption);
   padding: 6px 12px;
   background: var(--ground-0, #fff);
   border-radius: var(--radius-control);
@@ -5669,13 +5630,13 @@ body.zen .review-example {
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-control);
   color: var(--ink-2);
-  font-size: 13px;
+  font-size: var(--type-label);
   cursor: pointer;
 }
 
 .kdx-chip.kdx-part {
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--type-lead);
 }
 
 .kdx-chip.on-list {
@@ -5684,7 +5645,7 @@ body.zen .review-example {
 }
 
 .kdx-sthead {
-  font-size: 11px;
+  font-size: var(--type-caption);
   letter-spacing: 0.12em;
   color: var(--faint);
   margin: 8px 0 2px;
@@ -5704,7 +5665,7 @@ body.zen .review-example {
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-card);
   font-family: var(--serif);
-  font-size: 24px;
+  font-size: var(--type-section);
   color: var(--ink);
   cursor: pointer;
 }
@@ -5726,7 +5687,7 @@ body.zen .review-example {
 .conj-label {
   flex: none;
   width: 96px;
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--faint);
   display: flex;
   flex-direction: column;
@@ -5734,13 +5695,13 @@ body.zen .review-example {
 }
 
 .conj-en {
-  font-size: 10px;
+  font-size: var(--type-caption);
   letter-spacing: 0.04em;
 }
 
 .conj-form {
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--type-lead);
   color: var(--ink);
 }
 
@@ -5756,7 +5717,7 @@ body.zen .review-example {
   border-top: 1px solid var(--line-soft);
   padding: 13px 2px;
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: var(--type-chrome);
   letter-spacing: 0.02em;
   color: var(--ai, #2e4d6e);
   cursor: pointer;
@@ -5776,7 +5737,7 @@ body.zen .review-example {
 }
 .ai-ex-ja {
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: var(--type-lead);
   color: var(--ink);
   line-height: 1.55;
   margin: 0;
@@ -5784,7 +5745,7 @@ body.zen .review-example {
 .ai-ex-lv {
   display: inline-block;
   font-family: var(--sans);
-  font-size: 10px;
+  font-size: var(--type-caption);
   letter-spacing: 0.08em;
   color: var(--faint);
   border: 1px solid var(--line-soft);
@@ -5794,17 +5755,17 @@ body.zen .review-example {
   vertical-align: 0.12em;
 }
 .ai-ex-read {
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--red);
   margin: 2px 0 0;
 }
 .ai-ex-en {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   margin: 2px 0 0;
 }
 .ai-ex-note {
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--faint);
   margin: 4px 0 0;
 }
@@ -5825,19 +5786,19 @@ body.zen .review-example {
 .kdx-lens .l-ja {
   display: block;
   font-family: var(--serif);
-  font-size: 16px;
+  font-size: var(--type-body);
   color: var(--ink);
 }
 .kdx-lens .en-sub {
   display: block;
   font-family: var(--sans);
-  font-size: 10px;
+  font-size: var(--type-caption);
   letter-spacing: 0.04em;
   color: var(--faint);
 }
 .view-title-en {
   margin: -2px 0 10px;
-  font-size: 13px;
+  font-size: var(--type-label);
   line-height: 1.5;
   color: var(--ink-2);
 }
@@ -5855,7 +5816,7 @@ body.zen .review-example {
   border-radius: var(--radius-control);
   padding: 6px 12px;
   font-family: var(--sans);
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--ai);
   cursor: pointer;
 }
@@ -5865,7 +5826,7 @@ body.zen .review-example {
   margin: 4px 0 12px;
   padding: 11px 14px;
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: var(--type-control);
   color: var(--ink);
   background: var(--ground-0);
   border: 1px solid var(--line);
@@ -5906,7 +5867,7 @@ body.zen .review-example {
 .dictionary-warning,
 .dictionary-credit {
   margin: 7px 0 12px;
-  font-size: 12px;
+  font-size: var(--type-caption);
   line-height: 1.6;
   color: var(--faint);
 }
@@ -5975,11 +5936,11 @@ body.zen .review-example {
 }
 .dictionary-spellings {
   color: var(--ink);
-  font-size: 16px;
+  font-size: var(--type-body);
 }
 .dictionary-readings {
   color: var(--red);
-  font-size: 13px;
+  font-size: var(--type-label);
   letter-spacing: 0.04em;
 }
 .dictionary-sense {
@@ -5995,7 +5956,7 @@ body.zen .review-example {
 .dictionary-sense-number {
   color: var(--faint);
   font-family: var(--serif);
-  font-size: 12px;
+  font-size: var(--type-caption);
   padding-top: 3px;
 }
 .dictionary-sense-body {
@@ -6008,14 +5969,14 @@ body.zen .review-example {
   margin: 0 0 5px;
   padding-left: 18px;
   color: var(--ink-2);
-  font-size: 15px;
+  font-size: var(--type-control);
   line-height: 1.62;
 }
 .dictionary-restriction,
 .dictionary-info {
   margin: 2px 0 6px;
   color: var(--faint);
-  font-size: 12px;
+  font-size: var(--type-caption);
   line-height: 1.55;
 }
 .dictionary-relations {
@@ -6025,7 +5986,7 @@ body.zen .review-example {
   margin: 0;
   color: var(--faint);
   font-family: var(--serif);
-  font-size: 12px;
+  font-size: var(--type-caption);
   letter-spacing: 0.08em;
 }
 .dictionary-rel {
@@ -6053,13 +6014,13 @@ body.zen .review-example {
 }
 .dictionary-rel-word {
   font-family: var(--serif);
-  font-size: 15px;
+  font-size: var(--type-control);
 }
 .dictionary-rel-note {
   min-width: 0;
   overflow-wrap: anywhere;
   color: var(--faint);
-  font-size: 12px;
+  font-size: var(--type-caption);
 }
 .dictionary-entry-rule {
   height: 1px;
@@ -6071,7 +6032,7 @@ body.zen .review-example {
 .store-warning,
 .store-nudge {
   margin: 2px 0 12px;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   line-height: 1.6;
   color: var(--faint);
 }
@@ -6119,7 +6080,7 @@ body.zen .review-example {
   transform: translateX(-50%);
   margin: 0;
   padding: 8px 12px;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   line-height: 1.6;
   overflow-wrap: anywhere;
   color: var(--ink);
@@ -6192,7 +6153,7 @@ body.zen main {
   background: transparent;
   color: var(--faint);
   font: inherit;
-  font-size: 21px;
+  font-size: var(--type-reading);
   line-height: 1;
   cursor: pointer;
   opacity: 0.7;
@@ -6236,21 +6197,21 @@ body.zen .review-face {
 }
 body.zen .review-front {
   /* grand for 大統領, still on the sheet for a six-glyph compound */
-  font-size: clamp(44px, 13vw, 62px);
+  font-size: clamp(var(--type-headword), 13vw, calc(var(--type-headword) * 1.5));
   line-height: 1.15;
   text-wrap: balance;
 }
 body.zen .review-cloze {
   font-family: var(--serif);
-  font-size: 24px;
+  font-size: var(--type-section);
   line-height: 2;
   margin: 0;
 }
 body.zen .review-reading {
-  font-size: 18px;
+  font-size: var(--type-lead);
 }
 body.zen .review-sense {
-  font-size: 17px;
+  font-size: var(--type-lead);
   line-height: 1.55;
   max-width: 36ch;
 }
@@ -6348,7 +6309,7 @@ body.zen .focus-hud .focus-badge {
 }
 body.zen .focus-hud-left {
   color: var(--faint);
-  font-size: 13px;
+  font-size: var(--type-label);
   letter-spacing: 0.14em;
   min-height: var(--tap);
   align-items: center;
@@ -6371,7 +6332,7 @@ body.zen .focus-hud-end {
 }
 .zen-wait-clock {
   font-family: var(--serif);
-  font-size: 40px;
+  font-size: var(--type-headword);
   color: var(--ink-2);
   letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
@@ -6379,7 +6340,7 @@ body.zen .focus-hud-end {
 .zen-wait-note {
   margin: 0;
   color: var(--faint);
-  font-size: 14px;
+  font-size: var(--type-chrome);
   letter-spacing: 0.06em;
 }
 
@@ -6502,29 +6463,29 @@ body.zen .review-front {
 }
 body.zen .review-front[data-len='1'],
 body.zen .review-front[data-len='2'] {
-  font-size: 74px;
+  font-size: calc(var(--type-headword) * 1.75);
   letter-spacing: 0.32em;
   padding-left: 0.32em; /* re-centres the trailing tracking gap */
 }
 body.zen .review-front[data-len='3'] {
-  font-size: 62px;
+  font-size: calc(var(--type-headword) * 1.5);
   letter-spacing: 0.18em;
   padding-left: 0.18em;
 }
 body.zen .review-front[data-len='4'] {
-  font-size: 52px;
+  font-size: calc(var(--type-headword) * 1.25);
   letter-spacing: 0.1em;
   padding-left: 0.1em;
 }
 body.zen .review-front[data-len='5'],
 body.zen .review-front[data-len='6'] {
-  font-size: 42px;
+  font-size: var(--type-headword);
   letter-spacing: 0.05em;
   padding-left: 0.05em;
 }
 body.zen .review-front[data-len='7'],
 body.zen .review-front[data-len='8'] {
-  font-size: 33px;
+  font-size: var(--type-display);
   letter-spacing: 0.02em;
   font-feature-settings: 'palt' 1;
 }
@@ -6540,7 +6501,7 @@ body.zen .review-reading-row {
 body.zen .review-reading-row > .say { flex-shrink: 0; }
 body.zen .review-reading {
   font-family: 'Yuji Syuku', var(--serif);
-  font-size: 27px;
+  font-size: var(--type-title);
   line-height: 1.4;
   color: var(--card-red);
   letter-spacing: 0.05em; /* the brush hand carries its own rhythm */
@@ -6580,20 +6541,20 @@ body.zen .review-reading {
 body.zen .review-sense-primary {
   font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
   font-style: normal;
-  font-size: 18px;
+  font-size: var(--type-lead);
   line-height: 1.5;
   color: var(--card-ink);
   max-width: 34ch;
 }
 body.zen .review-sense-rest {
   font-family: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
   line-height: 1.5;
   color: var(--card-ink-2);
   max-width: 36ch;
 }
 body.zen .review-sense-late {
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--card-ink-2);
   text-align: left;
   width: 100%;
@@ -6613,7 +6574,7 @@ body.zen .review-sense-late {
   min-height: 44px;
   padding: 8px 10px;
   font: inherit;
-  font-size: 12.5px;
+  font-size: var(--type-label);
   letter-spacing: 0.12em;
   color: var(--card-ink-2, #6f514c);
   background: transparent;
@@ -6898,7 +6859,7 @@ body.zen .grade-row .grade:nth-child(4) {
 }
 .fold-head .fold-sub {
   margin-left: auto;
-  font-size: 12px;
+  font-size: var(--type-caption);
   opacity: 0.86;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -6939,7 +6900,7 @@ body.zen .grade-row .grade:nth-child(4) {
 }
 .study-fact {
   margin: 4px 0;
-  font-size: 13.5px;
+  font-size: var(--type-chrome);
   color: var(--ink-2);
 }
 
@@ -7001,7 +6962,7 @@ body.zen .grade-row .grade:nth-child(4) {
 .feed-location,
 .feed-source-status {
   color: var(--ink-2);
-  font-size: 13px;
+  font-size: var(--type-label);
   overflow-wrap: anywhere;
 }
 .feed-notice {
@@ -7019,7 +6980,7 @@ body.zen .grade-row .grade:nth-child(4) {
 .feed-title,
 .feed-source-title {
   font-family: var(--serif);
-  font-size: var(--t-read);
+  font-size: var(--type-reading);
   font-weight: 500;
   line-height: 1.7;
   margin: 8px 0;
@@ -7038,7 +6999,7 @@ body.zen .grade-row .grade:nth-child(4) {
 }
 .feed-publishers-title {
   margin-top: 36px;
-  font-size: var(--t-body);
+  font-size: var(--type-body);
 }
 .feed-publishers {
   display: grid;
@@ -7084,7 +7045,7 @@ body.zen .grade-row .grade:nth-child(4) {
   align-items: center;
   column-gap: 14px;
   margin: 0;
-  font-size: 13px;
+  font-size: var(--type-label);
 }
 .publisher-credit-label {
   color: var(--ink-2);
@@ -7094,7 +7055,7 @@ body.zen .grade-row .grade:nth-child(4) {
   padding-block: 10px;
   box-sizing: border-box;
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ink-2);
 }
 .publisher-title {
@@ -7102,7 +7063,7 @@ body.zen .grade-row .grade:nth-child(4) {
 }
 .publisher-body {
   font-family: var(--serif);
-  font-size: var(--t-read);
+  font-size: var(--type-reading);
   line-height: 2.2;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -7115,7 +7076,7 @@ body.zen .grade-row .grade:nth-child(4) {
 .record-notes h2 {
   margin-bottom: 12px;
   font-family: var(--serif);
-  font-size: 20px;
+  font-size: var(--type-reading);
   font-weight: 500;
 }
 .record-note-compose {
@@ -7124,7 +7085,7 @@ body.zen .grade-row .grade:nth-child(4) {
 .record-note-compose label {
   display: block;
   margin-bottom: 8px;
-  font-size: var(--t-body);
+  font-size: var(--type-body);
 }
 .record-note-input {
   display: block;
@@ -7137,14 +7098,14 @@ body.zen .grade-row .grade:nth-child(4) {
   background: var(--ground);
   color: var(--ink);
   font-family: var(--serif);
-  font-size: var(--t-body);
+  font-size: var(--type-body);
   line-height: 1.8;
   resize: vertical;
 }
 .record-note-compose-status {
   min-height: 1.7em;
   margin-block: 8px 0;
-  font-size: 13px;
+  font-size: var(--type-label);
   line-height: 1.7;
   color: var(--ink-2);
 }
@@ -7182,7 +7143,7 @@ body.zen .grade-row .grade:nth-child(4) {
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: var(--radius-card);
-  font-size: var(--t-body);
+  font-size: var(--type-body);
   line-height: 1.7;
 }
 .record-note-confirm button {
@@ -7202,7 +7163,7 @@ body.zen .grade-row .grade:nth-child(4) {
 .record-note-segment {
   margin-block: 8px;
   font-family: var(--serif);
-  font-size: var(--t-read);
+  font-size: var(--type-reading);
   line-height: 1.9;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -7217,7 +7178,7 @@ body.zen .grade-row .grade:nth-child(4) {
 .record-note-conflict,
 .record-note-copies,
 .record-note-source {
-  font-size: 13px;
+  font-size: var(--type-label);
   line-height: 1.7;
   color: var(--ink-2);
   overflow-wrap: anywhere;
@@ -7238,7 +7199,7 @@ body.zen .grade-row .grade:nth-child(4) {
 /* Deliberate practice from an exact source sentence. */
 .sentence-practice { max-width: 780px; margin-inline: auto; }
 .sentence-original, .sentence-cloze-preview, .sentence-recall-cue {
-  margin: 1.4rem 0; line-height: 1.9; font-size: clamp(1.25rem, 2.6vw, 1.8rem);
+  margin: 1.4rem 0; line-height: 1.9; font-size: clamp(var(--type-reading), 2.6vw, var(--type-title));
   white-space: pre-wrap; overflow-wrap: anywhere;
 }
 .sentence-original { border-inline-start: 2px solid var(--line); padding-inline-start: 1rem; }
@@ -7252,9 +7213,9 @@ body.zen .grade-row .grade:nth-child(4) {
 .sentence-option strong, .sentence-option small { display: block; }
 .sentence-option small { margin-top: .4rem; line-height: 1.6; }
 .sentence-practice-section, .sentence-practice-history { border-top: 1px solid var(--line); margin-top: 2rem; padding-top: 1.2rem; }
-.sentence-practice-section h2, .sentence-practice-history h2 { font-size: 1.2rem; line-height: 1.5; }
+.sentence-practice-section h2, .sentence-practice-history h2 { font-size: var(--type-reading); line-height: 1.5; }
 .sentence-response { display: block; box-sizing: border-box; width: 100%; max-width: 780px; margin: .6rem 0 1rem; padding: .8rem 1rem;
-  font: inherit; font-size: 1.1rem; line-height: 1.7; color: var(--ink); background: var(--ground-0, #f4efe3);
+  font: inherit; font-size: var(--type-lead); line-height: 1.7; color: var(--ink); background: var(--ground-0, #f4efe3);
   border: 1px solid var(--line, #cfc7b5); border-radius: var(--radius-card); resize: vertical; }
 .sentence-response:focus-visible, .sentence-option input:focus-visible, .sentence-library-entry:focus-visible {
   outline: 2px solid var(--ink, #23303f); outline-offset: 3px;
@@ -7268,10 +7229,10 @@ body.zen .grade-row .grade:nth-child(4) {
 .sentence-library-entry span, .sentence-library-entry small { display: block; line-height: 1.7; overflow-wrap: anywhere; }
 .sentence-library-entry small { opacity: .8; margin-top: .2rem; }
 .sentence-reading-suggestions { margin: 1.75rem 0; padding: 1.1rem 0; border-block: 1px solid var(--line); }
-.sentence-reading-suggestions h2 { margin: 0 0 .8rem; font-size: 1.2rem; line-height: 1.5; }
-.sentence-reading-choice h3 { margin: .7rem 0 .45rem; font-size: 1.25rem; line-height: 1.5; }
+.sentence-reading-suggestions h2 { margin: 0 0 .8rem; font-size: var(--type-reading); line-height: 1.5; }
+.sentence-reading-choice h3 { margin: .7rem 0 .45rem; font-size: var(--type-reading); line-height: 1.5; }
 .sentence-reading-reason { margin: .45rem 0; max-width: 65ch; line-height: 1.65; }
-.sentence-reading-quote { margin: .85rem 0; font-size: 1.1rem; line-height: 1.9; overflow-wrap: anywhere; }
+.sentence-reading-quote { margin: .85rem 0; font-size: var(--type-lead); line-height: 1.9; overflow-wrap: anywhere; }
 .sentence-reading-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin: .85rem 0; }
 .sentence-reading-suggestions .chip { max-width: 100%; white-space: normal; }
 .sentence-recall { max-width: 780px; width: 100%; }
@@ -7280,9 +7241,9 @@ body[data-view='sentence-practice'] .teacher-context { margin-top: 1.6rem; }
 body[data-view='review'] #sentence-recall-answer { margin-inline: auto; }
 body[data-view='review'] .teacher-actions { justify-content: center; flex-wrap: wrap; }
 @media (max-width: 540px) {
-  .sentence-practice .view-title { font-size: 1.75rem; }
+  .sentence-practice .view-title { font-size: var(--type-title); }
   .sentence-practice .take { max-width: 100%; white-space: normal; }
-  .sentence-response { font-size: 1rem; }
+  .sentence-response { font-size: var(--type-body); }
 }
 
 /* -------------------------------------------------- relief (operator, 2026-09-18)
@@ -7379,27 +7340,27 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
 }
 .exam-length { flex: 1 1 150px; min-width: 0; padding: 1rem; border: 1px solid var(--line);
   border-radius: var(--radius-control); background: transparent; color: inherit; font: inherit; text-align: start; }
-.exam-length-time { display: block; font-size: .78em; margin-top: .4rem; line-height: 1.5; }
+.exam-length-time { display: block; font-size: var(--type-caption); margin-top: .4rem; line-height: 1.5; }
 .exam-form { padding: 1.25rem 0; border-bottom: 1px solid var(--line); }
-.exam-form h2 { font-size: 1.25rem; margin: 0 0 .5rem; }
+.exam-form h2 { font-size: var(--type-lead); margin: 0 0 .5rem; }
 .exam-form .take { margin: 1rem 0 .5rem; }
-.exam-skills { font-size: .86rem; line-height: 1.6; }
-.exam-status, .exam-save, .exam-version { font-size: .8rem; line-height: 1.6; }
-.exam-sources { margin: 1rem 0; font-size: .85rem; line-height: 1.7; }
+.exam-skills { font-size: var(--type-chrome); line-height: 1.6; }
+.exam-status, .exam-save, .exam-version { font-size: var(--type-label); line-height: 1.6; }
+.exam-sources { margin: 1rem 0; font-size: var(--type-chrome); line-height: 1.7; }
 .exam-sources a { display: block; overflow-wrap: anywhere; }
 .exam-sources summary, .exam-question-map summary, .exam-answer summary { cursor: pointer; padding: .5rem 0; }
-.exam-heading { font-size: 1.4rem; margin: 0 0 1.2rem; }
+.exam-heading { font-size: var(--type-reading); margin: 0 0 1.2rem; }
 .exam-progress { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .exam-timer { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .exam-save { margin: .35rem 0 1.2rem; opacity: .75; }
-.exam-skill { font-size: .85rem; }
+.exam-skill { font-size: var(--type-chrome); }
 .exam-prompt { white-space: pre-wrap; margin: 1.3rem 0 .65rem; }
 .exam-passage { white-space: pre-wrap; border-inline-start: 2px solid var(--line); padding-inline-start: 1rem; margin: 1.5rem 0; }
-.exam-passage h2 { font-size: 1.1rem; }
+.exam-passage h2 { font-size: var(--type-lead); }
 .exam-passage p { margin: 0; }
 .assessment-room .mock-opts { display: grid; gap: .6rem; margin-block: 1rem; }
 .assessment-room .mock-opt { width: 100%; min-height: 52px; text-align: start; overflow-wrap: anywhere;
-  font-size: 1rem; color: inherit; background: transparent; padding: .6rem .85rem;
+  font-size: var(--type-body); color: inherit; background: transparent; padding: .6rem .85rem;
   border: 1px solid var(--line, #76808066); border-radius: var(--radius-control); }
 .assessment-room .mock-opt[aria-pressed="true"] { outline: 2px solid currentColor; background: var(--line-soft); }
 .exam-question-map { margin: 1.2rem 0; }
@@ -7407,24 +7368,24 @@ body.v-depth-layered .skip-grid-viewport { border-block-color: var(--edge); }
 .exam-question-grid .chip { padding: .5rem; min-height: 44px; }
 .exam-confirm { line-height: 1.7; }
 .exam-confirm button { display: block; margin: 1rem 0; }
-.exam-score { font-size: 2rem; margin: 1.2rem 0 .6rem; }
+.exam-score { font-size: var(--type-display); margin: 1.2rem 0 .6rem; }
 .exam-counts { display: flex; gap: 1rem; justify-content: space-between; flex-wrap: wrap; margin: 1.5rem 0; }
 .exam-counts div { min-width: 70px; }
-.exam-counts dt { font-size: .8rem; }
-.exam-counts dd { margin: .35rem 0; font-size: 1.4rem; }
+.exam-counts dt { font-size: var(--type-label); }
+.exam-counts dd { margin: .35rem 0; font-size: var(--type-reading); }
 .exam-results-skills, .exam-followup { padding: 1rem 0; border-block: 1px solid var(--line); }
 .exam-answer { margin: 1rem 0; line-height: 1.7; }
 .exam-answer.incorrect { border-inline-start: 2px solid var(--red); padding-inline-start: .75rem; }
 .exam-rationale { white-space: pre-wrap; }
-.exam-conditions, .exam-audio-status { font-size: .86rem; line-height: 1.7; }
+.exam-conditions, .exam-audio-status { font-size: var(--type-chrome); line-height: 1.7; }
 .exam-conditions summary { cursor: pointer; padding: .5rem 0; }
 .assessment-review-context { max-width: 42rem; margin: 1rem auto; padding: 1rem; text-align: start;
   border-inline-start: 2px solid var(--edge, #76808066); line-height: 1.8; overflow-wrap: anywhere; }
 .assessment-review-context h2 { font: inherit; font-weight: 600; letter-spacing: normal; }
-.assessment-review-context p { white-space: pre-wrap; font-size: 1rem; }
+.assessment-review-context p { white-space: pre-wrap; font-size: var(--type-body); }
 /* G1: a card from an assisted answer says so once, in the register's secondary ink at chrome
  * size, on word, sentence and question backs alike. No badge, colour, icon or rule of its own. */
-.review-face .assessment-review-assisted { margin: .75rem 0 0; font-size: var(--t-chrome, 13px); line-height: 1.6; color: var(--ink-2, #4a5d70); }
+.review-face .assessment-review-assisted { margin: .75rem 0 0; font-size: var(--type-chrome); line-height: 1.6; color: var(--ink-2, #4a5d70); }
 body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a453a); }
 .exam-notice { border-inline-start: 3px solid var(--red); padding: .75rem; line-height: 1.6; }
 .exam-written { margin-bottom: 1.5rem; }
@@ -7433,34 +7394,33 @@ body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a
 .exam-official { margin: 0 0 1.5rem; padding: 1rem 0; border-block: 1px solid var(--line); }
 .assessment-room .exam-official-badge { display: flex; flex-wrap: wrap; gap: .2rem .75rem; align-items: baseline;
   margin: .35rem 0 .75rem; padding: .45rem .7rem; border-inline-start: 3px solid var(--official);
-  background: var(--official-wash); color: var(--ink); font-size: .85rem; line-height: 1.6; }
+  background: var(--official-wash); color: var(--ink); font-size: var(--type-chrome); line-height: 1.6; }
 .exam-official-mark { font-weight: 600; letter-spacing: normal; }
-.exam-official-byline { font-size: .78rem; color: var(--ink-2); }
+.exam-official-byline { font-size: var(--type-caption); color: var(--ink-2); }
 .exam-official-import { position: relative; display: inline-flex; align-items: center; min-height: var(--tap, 44px);
   margin-top: .75rem; cursor: pointer; }
 .exam-official-file { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 .exam-official-import:focus-within { outline: 2px solid currentColor; outline-offset: 2px; }
-.exam-official-instruction { margin: .5rem 0 0; font-size: .92rem; line-height: 1.8; color: var(--ink-2); white-space: pre-wrap; }
+.exam-official-instruction { margin: .5rem 0 0; font-size: var(--type-control); line-height: 1.8; color: var(--ink-2); white-space: pre-wrap; }
 .paper-underline { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .3em; }
 .paper-box { display: inline-block; min-width: 1.6em; margin: 0 .15em; padding: 0 .25em; border: 1px solid currentColor;
-  font-family: var(--sans, system-ui, sans-serif); font-size: .85em; line-height: 1.3; text-align: center; }
-.assessment-room ruby rt { font-size: .5em; }
+  font-family: var(--sans, system-ui, sans-serif); font-size: var(--type-lead); line-height: 1.3; text-align: center; }
 .exam-official-pages { margin: 1rem 0; }
 .exam-official-pages summary { cursor: pointer; padding: .5rem 0; min-height: var(--tap, 44px); }
 .exam-official-page { display: block; max-width: 100%; height: auto; margin: .5rem 0; border: 1px solid var(--line); }
 .exam-official-sections { padding: 1rem 0; border-block: 1px solid var(--line); }
-.exam-official-sections h2 { font-size: 1.05rem; margin: 0 0 .75rem; }
+.exam-official-sections h2 { font-size: var(--type-body); margin: 0 0 .75rem; }
 .exam-official-section-list { display: grid; gap: .75rem; margin: 0; }
 .exam-official-section-list div { padding-inline-start: .75rem; border-inline-start: 3px solid var(--official); }
-.exam-official-section-list dt { font-size: .9rem; }
-.exam-official-section-list .exam-official-raw { margin: .2rem 0; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
-.exam-official-section-list .exam-official-mark { margin: 0; font-size: .8rem; font-weight: normal; color: var(--ink-2); }
-.exam-official-pass, .exam-official-scale { font-size: .85rem; line-height: 1.7; }
+.exam-official-section-list dt { font-size: var(--type-chrome); }
+.exam-official-section-list .exam-official-raw { margin: .2rem 0; font-size: var(--type-reading); font-variant-numeric: tabular-nums; }
+.exam-official-section-list .exam-official-mark { margin: 0; font-size: var(--type-label); font-weight: normal; color: var(--ink-2); }
+.exam-official-pass, .exam-official-scale { font-size: var(--type-chrome); line-height: 1.7; }
 .exam-image { max-width: 100%; height: auto; }
 /* The printed JLPT paper on the question sheet (editorial.css owns the sheet): 問題 in its ink box
    beside the 大問 name, underlined targets, （　） blanks, the ★ row and numbered gaps. */
 .exam-mondai-no { display: inline-block; padding: .04em .45em; border-radius: var(--radius-seal); background: var(--ink, #1c2b3a);
-  color: var(--ground-0, #faf6ec); font-size: .78em; line-height: 1.5; letter-spacing: .06em; vertical-align: .1em; }
+  color: var(--ground-0, #faf6ec); font-size: var(--type-body); line-height: 1.5; letter-spacing: .06em; vertical-align: .1em; }
 .exam-mondai-instruction { overflow-wrap: anywhere; }
 .exam-underline-blank { display: inline-block; min-width: 3.2em; border-bottom: 1.5px solid currentColor;
   margin-inline: .1em; line-height: 1.2; vertical-align: baseline; }
@@ -7468,35 +7428,35 @@ body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a
 .exam-blank { white-space: pre; }
 .exam-slot { display: inline-block; min-width: 3.1em; margin-inline: .18em; border-bottom: 1.5px solid currentColor;
   text-align: center; line-height: 1.3; }
-.exam-star-slot { font-size: .95em; }
+.exam-star-slot { font-size: var(--type-reading); }
 .exam-gap-box { display: inline-block; min-width: 1.9em; margin-inline: .15em; padding: 0 .3em; border: 1.5px solid currentColor;
-  font-family: var(--sans, system-ui, sans-serif); font-size: .82em; line-height: 1.55; text-align: center;
+  font-family: var(--sans, system-ui, sans-serif); font-size: var(--type-body); line-height: 1.55; text-align: center;
   font-variant-numeric: tabular-nums; text-indent: 0; }
 .exam-gap-box[data-current="true"] { background: var(--ink, #1c2b3a); color: var(--ground-0, #faf6ec); border-color: var(--ink, #1c2b3a); }
 .exam-word { font-weight: 700; }
 .exam-passage-label { margin: 0 0 .3rem; font-weight: 700; }
 .assessment-room .mock-opts.exam-opts-row { grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: .4rem; }
 .assessment-room .exam-opts-row .mock-opt { border-top: 0; }
-.exam-form-timing, .exam-paper-note, .exam-practice-note, .exam-next-paper { font-size: .86rem; line-height: 1.7; }
+.exam-form-timing, .exam-paper-note, .exam-practice-note, .exam-next-paper { font-size: var(--type-chrome); line-height: 1.7; }
 .exam-practice-note { border-inline-start: 3px solid var(--line, #76808066); padding-inline-start: .75rem; }
 .exam-paper-list { margin: .4rem 0; padding-inline-start: 1.4rem; line-height: 1.8; }
 .exam-paper-name { font-family: var(--serif, "Noto Serif JP", serif); font-weight: 600; }
 .exam-official-results { margin: 0 0 14px; }
-.exam-official-title { font-size: 1rem; margin: 0 0 .6rem; }
+.exam-official-title { font-size: var(--type-body); margin: 0 0 .6rem; }
 .exam-official-row { padding: .7rem 0; border-top: 1px solid var(--line-soft, #76808033); }
 .exam-official-row:first-of-type { border-top: 0; }
 .exam-official-label { margin: 0; font-family: var(--serif, "Noto Serif JP", serif); font-weight: 600; line-height: 1.6; }
-.exam-official-raw { margin: .15rem 0; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
-.exam-official-fact, .exam-official-pass, .exam-official-note { margin: .15rem 0; font-size: .82rem; line-height: 1.6; color: var(--ink-2, #4a5d70); }
+.exam-official-raw { margin: .15rem 0; font-size: var(--type-lead); font-variant-numeric: tabular-nums; }
+.exam-official-fact, .exam-official-pass, .exam-official-note { margin: .15rem 0; font-size: var(--type-label); line-height: 1.6; color: var(--ink-2, #4a5d70); }
 .exam-official-daimon { display: flex; flex-wrap: wrap; gap: .2rem 1rem; margin: .35rem 0 0; padding: 0; list-style: none;
-  font-size: .85rem; line-height: 1.6; }
+  font-size: var(--type-chrome); line-height: 1.6; }
 .exam-daimon-count { font-variant-numeric: tabular-nums; }
 .exam-official-pass { margin-top: .8rem; }
 @media (max-width: 480px) {
   .assessment-room .mock-opts.exam-opts-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .exam-lengths { gap: .4rem; }
-  .exam-length { flex-basis: calc(33% - .4rem); padding: .75rem .4rem; font-size: .85rem; }
-  .exam-score { font-size: 1.6rem; }
+  .exam-length { flex-basis: calc(33% - .4rem); padding: .75rem .4rem; font-size: var(--type-chrome); }
+  .exam-score { font-size: var(--type-section); }
   .assessment-room .mock-nav { gap: .5rem; }
   .assessment-room .chip, .assessment-room .take { max-width: 100%; white-space: normal; }
 }
@@ -7510,7 +7470,7 @@ body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a
 .assessment-question-option { display: flex; align-items: flex-start; gap: .65rem; min-width: 0; min-height: 44px;
   margin: .5rem 0; padding: .7rem; border: 1px solid var(--line); border-radius: var(--radius-control); overflow-wrap: anywhere; }
 .assessment-question-option input { flex: 0 0 auto; margin-top: .35rem; }
-.assessment-question-key { font-size: .8em; flex: 0 0 auto; }
+.assessment-question-key { font-size: var(--type-label); flex: 0 0 auto; }
 .assessment-question-image { display: block; max-width: 100%; height: auto; }
 .assessment-question-review .teacher-actions { flex-wrap: wrap; }
 .assessment-question-review button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
@@ -7520,7 +7480,7 @@ body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a
 .room-state { max-width: 34rem; margin: 2.5rem auto; padding: 1.5rem 1.25rem; border: 1px solid var(--line, rgba(0, 0, 0, .12)); border-radius: var(--radius-card); }
 .room-state .view-title { margin-top: 0; }
 .room-state p { margin: .5rem 0; line-height: 1.6; }
-.room-state .room-state-why { opacity: .78; font-size: .92em; }
+.room-state .room-state-why { opacity: .78; font-size: var(--type-control); }
 .room-state .chip { margin: .75rem .5rem 0 0; }
 /* One carrier for the reason: while a room says why it cannot write, the fixed
  * store banner (same text, same reload) would only cover the room's title. */
@@ -7529,7 +7489,7 @@ body:has(#app main .room-state[data-room-state='blocked']) #store-alert { displa
 /* The report entry, in the page's own flow (2026-09-25): quiet, last on the page,
  * never a layer over a control. The focused stage carries it in its more-row. */
 .report-line { display: flex; flex-wrap: wrap; gap: .25rem 1rem; justify-content: center; margin: 3rem 0 1.5rem; }
-.report-line .report-door { background: none; border: 0; min-height: var(--tap, 44px); padding: 0 .25rem; color: var(--faint); font-size: .82rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.report-line .report-door { background: none; border: 0; min-height: var(--tap, 44px); padding: 0 .25rem; color: var(--faint); font-size: var(--type-label); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .report-line .report-door:hover, .report-line .report-door:focus-visible { color: var(--ink); }
 body.zen #app > .report-line-page .report-door { color: var(--zen-text); }
 .report-line-sheet { margin: 2rem 0 .5rem; }
@@ -7538,7 +7498,7 @@ body.zen #app > .report-line-page .report-door { color: var(--zen-text); }
 #app > .report-line-page { max-width: 40rem; margin-inline: auto; padding-inline: 1rem; }
 
 /* the 音 door's reason when it cannot play — visible and announced, never a silent tap */
-.say-note { display: block; flex-basis: 100%; margin-top: .25rem; font-size: .82rem; color: var(--faint); }
+.say-note { display: block; flex-basis: 100%; margin-top: .25rem; font-size: var(--type-label); color: var(--faint); }
 body.zen .say-note { color: var(--card-ink-2, var(--ink-2)); }
 .say-note:empty { display: none; }
 
@@ -7550,13 +7510,13 @@ body.zen .say-note { color: var(--card-ink-2, var(--ink-2)); }
  * core hit renders is restyled. */
 .tok-en.tok-en-miss { color: var(--faint); }
 .reader-choice { margin: 8px 0 14px; }
-.reader-choice-title { margin: 0 0 4px; color: var(--faint); font-family: var(--serif); font-size: 12px; letter-spacing: 0.08em; }
+.reader-choice-title { margin: 0 0 4px; color: var(--faint); font-family: var(--serif); font-size: var(--type-caption); letter-spacing: 0.08em; }
 .reader-choice-row { display: flex; align-items: center; gap: 9px; width: 100%; min-height: var(--tap); padding: 7px 1px;
   border: 0; border-bottom: 1px solid var(--line-soft); background: transparent; color: var(--ai); text-align: left; font: inherit; cursor: pointer; }
 .reader-choice-row:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
 .reader-choice-more,
 .reader-choice-note,
-.reader-choice-capture { margin: 6px 0 10px; font-size: 12px; line-height: 1.6; color: var(--faint); }
+.reader-choice-capture { margin: 6px 0 10px; font-size: var(--type-caption); line-height: 1.6; color: var(--faint); }
 .reader-choice-note p { margin: 0 0 4px; }
 .reader-capture-held { opacity: 0.45; cursor: not-allowed; }
 /* the chrome seal stays reachable (aria-disabled): pressing it opens the reason */
@@ -7601,13 +7561,13 @@ body.zen .say-note { color: var(--card-ink-2, var(--ink-2)); }
 }
 .deck-count .deck-count-n {
   display: block;
-  font: 600 30px/1.1 var(--sans);
+  font: 600 var(--type-title)/1.1 var(--sans);
   font-variant-numeric: tabular-nums;
 }
 .deck-count .deck-count-l {
   display: block;
   margin-top: 2px;
-  font-size: 12px;
+  font-size: var(--type-caption);
   letter-spacing: 0.04em;
   color: var(--ink-2);
 }
@@ -7627,7 +7587,7 @@ body.zen .say-note { color: var(--card-ink-2, var(--ink-2)); }
   border-bottom: 1px solid var(--line-soft);
   background: transparent;
   font: inherit;
-  font-size: 16px;
+  font-size: var(--type-body);
   color: var(--ink);
   text-align: left;
   cursor: pointer;
@@ -7652,7 +7612,7 @@ body.zen .say-note { color: var(--card-ink-2, var(--ink-2)); }
 .deck-row.deck-head {
   min-height: 0;
   padding-block: 6px;
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
   cursor: default;
 }
@@ -7684,7 +7644,7 @@ body.zen .say-note { color: var(--card-ink-2, var(--ink-2)); }
   display: flex;
   gap: 14px;
   z-index: 6;
-  font: 600 16px/1 var(--sans);
+  font: 600 var(--type-body)/1 var(--sans);
   font-variant-numeric: tabular-nums;
   pointer-events: none;
 }
@@ -7707,7 +7667,7 @@ body.zen .anki-counts .c-due { color: #9fd59c; }
 .anki-undo-slot .review-undo {
   min-height: 36px;
   padding: 4px 12px;
-  font-size: 13px;
+  font-size: var(--type-label);
 }
 .anki-undo-slot .review-undo .en-sub {
   display: none;
@@ -7726,7 +7686,7 @@ body.zen .review-reveal {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.4),
     0 6px 18px rgba(0, 0, 0, 0.45);
-  font-size: 18px;
+  font-size: var(--type-lead);
 }
 
 /* the answer bar: interval above, the plain word, the other language beneath */
@@ -7741,16 +7701,16 @@ body.zen .review-reveal {
   color: var(--ink);
 }
 .grade.anki .g-when {
-  font: 600 13px/1 var(--sans);
+  font: 600 var(--type-label)/1 var(--sans);
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
 .grade.anki .g-label {
-  font: 600 16px/1.15 var(--sans);
+  font: 600 var(--type-body)/1.15 var(--sans);
   letter-spacing: 0.02em;
 }
 .grade.anki .g-sub {
-  font-size: 11px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
 }
 .grade.anki.g-again { border-top-color: var(--srs-learn); }
@@ -7803,7 +7763,7 @@ body.zen .reveal.r-4 {
   min-height: var(--tap);
   padding: 8px 12px;
   font: inherit;
-  font-size: 16px;
+  font-size: var(--type-body);
   color: var(--ink);
   background: var(--ground-0, #faf6ea);
   border: 1px solid var(--line);
@@ -7814,7 +7774,7 @@ body.zen .reveal.r-4 {
   max-width: 42%;
   padding: 0 8px;
   font: inherit;
-  font-size: 14px;
+  font-size: var(--type-chrome);
   color: var(--ink);
   background: var(--ground-0, #faf6ea);
   border: 1px solid var(--line);
@@ -7836,7 +7796,7 @@ body.zen .reveal.r-4 {
 }
 .browse-meta {
   flex-basis: 100%;
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ink-2);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -7844,7 +7804,7 @@ body.zen .reveal.r-4 {
 }
 .stats-today,
 .stats-retention {
-  font-size: 17px;
+  font-size: var(--type-lead);
   margin: 10px 0 16px;
 }
 .stats-standing {
@@ -7861,12 +7821,12 @@ body.zen .reveal.r-4 {
 }
 .stats-n {
   display: block;
-  font: 600 24px/1.1 var(--sans);
+  font: 600 var(--type-section)/1.1 var(--sans);
   font-variant-numeric: tabular-nums;
 }
 .stats-l {
   display: block;
-  font-size: 12px;
+  font-size: var(--type-caption);
   color: var(--ink-2);
 }
 .s-new .stats-n { color: var(--srs-new); }
@@ -7929,12 +7889,12 @@ main .browse-filters .chip.browse-filter.on {
 
 .dojo-deck-t {
   font-family: var(--serif);
-  font-size: 19px;
+  font-size: var(--type-reading);
 }
 
 .dojo-deck-sub {
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: var(--type-label);
   color: var(--ink-2);
 }
 

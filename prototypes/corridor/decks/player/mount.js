@@ -588,12 +588,10 @@ function displayUnits(card, units) {
     ? { ...unit, word: null, tok: { ...unit.tok, r: 'こむら', personContext: 'komura-jutaro' } } : unit);
 }
 
-/** a reading over its kanji; data-rt lets a host draw the reading as a label above the word
- * instead of as ruby, so showing or hiding it never moves the line */
+/** a reading over its kanji: native ruby, set by the house's one ruby rule (rooms/motion.css); the deck
+ * hides a reading in place (player.css), so showing or hiding it never moves the line */
 function rubyNode(text, reading) {
-  const ruby = el('ruby', null, text, el('rt', null, reading));
-  ruby.dataset.rt = reading;
-  return ruby;
+  return el('ruby', null, text, el('rt', null, reading));
 }
 export function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'none' : 'all', split = false, clamp = false, taps = null }) {
   if (front) {
@@ -752,78 +750,22 @@ export function sentenceNodes(card, { front = false, blank = false, ruby = front
   });
   if (clamp && split) clampContext(out);
   if (taps) ctx?.host?.installProseWords?.(out, '.kp-tok');
-  if (taps || ruby === 'all') {
-    reflowWatch?.observe(out);
-    document.fonts?.ready.then(() => out.isConnected && seatReadings(out));
-  }
+  if (taps || ruby === 'all') reflowWatch?.observe(out);
   return out;
 }
 
 /** Whenever a passage reflows (width, zoom, an opened fold, fonts): a word that wraps onto a second
  * line would centre its 44px reach (.kp-tok::before) on the gap between the two lines and reach over
- * the words of both, so it keeps only its printed boxes (kp-split); and the readings are re-seated. */
+ * the words of both, so it keeps only its printed boxes (kp-split). Readings are native ruby: the
+ * line lays them out itself, so nothing is seated by hand. */
 const reflowWatch = typeof ResizeObserver === 'function'
   ? new ResizeObserver((entries) => {
     for (const { target } of entries) {
       if (!target.isConnected) { reflowWatch.unobserve(target); continue; }
       for (const tok of target.querySelectorAll('.kp-tok')) tok.classList.toggle('kp-split', tok.getClientRects().length > 1);
-      seatReadings(target);
     }
   })
   : null;
-let rtMeasure = null;
-/** A host may draw each reading above its word (ruby[data-rt]::after; the app does, so the line
- * never moves) instead of laying it out as ruby. A reading wider than its word would then run into
- * its neighbour's reading or past the edge of the line. Each line's readings are seated left to
- * right: centred on the word where there is room, nudged apart (and inside the line) where there is
- * not, and narrowed to the word plus one reading character at most (--kp-rt-dx, --kp-rt-fit). */
-function seatReadings(sentence) {
-  const rubies = [...sentence.querySelectorAll('ruby[data-rt]')];
-  if (!rubies.length) return;
-  const style = getComputedStyle(rubies[0], '::after');
-  const size = parseFloat(style.fontSize);
-  if (!size) return;
-  rtMeasure ||= document.createElement('canvas').getContext('2d');
-  if (rtMeasure) rtMeasure.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-  const spacing = parseFloat(style.letterSpacing) || 0;
-  const gap = size * 0.2;
-  const lines = new Map();
-  for (const ruby of rubies) {
-    ruby.style.removeProperty('--kp-rt-dx');
-    ruby.style.removeProperty('--kp-rt-fit');
-    const rects = ruby.getClientRects();
-    if (rects.length !== 1 || !rects[0].width) continue;
-    const r = rects[0];
-    let block = ruby.parentElement;
-    while (block !== sentence && !/^(block|flex|flow-root|list-item)$/.test(getComputedStyle(block).display)) block = block.parentElement;
-    const text = ruby.dataset.rt;
-    const natural = (rtMeasure ? rtMeasure.measureText(text).width : [...text].length * size) + spacing * [...text].length;
-    const width = Math.min(natural, r.width + size);
-    const key = `${Math.round(r.bottom / 4)}`; // one line of the block
-    if (!lines.has(block)) lines.set(block, new Map());
-    const row = lines.get(block);
-    if (!row.has(key)) row.set(key, []);
-    row.get(key).push({ ruby, centre: (r.left + r.right) / 2, natural, width, x: (r.left + r.right) / 2 - width / 2 });
-  }
-  for (const [block, rows] of lines) {
-    const b = block.getBoundingClientRect(), cs = getComputedStyle(block);
-    const lo = b.left + parseFloat(cs.paddingLeft), hi = b.right - parseFloat(cs.paddingRight);
-    for (const items of rows.values()) {
-      items.sort((p, q) => p.centre - q.centre);
-      items.forEach((it, i) => { it.x = Math.max(it.x, i ? items[i - 1].x + items[i - 1].width + gap : lo); });
-      for (let i = items.length - 1; i >= 0; i--) {
-        const it = items[i], limit = i < items.length - 1 ? items[i + 1].x - gap : hi;
-        if (it.x + it.width > limit) it.x = limit - it.width;
-      }
-      for (const it of items) {
-        const dx = it.x + it.width / 2 - it.centre;
-        if (Math.abs(dx) >= 0.5) it.ruby.style.setProperty('--kp-rt-dx', `${dx.toFixed(1)}px`);
-        if (it.width < it.natural - 0.5) it.ruby.style.setProperty('--kp-rt-fit', (it.width / it.natural).toFixed(3));
-      }
-    }
-  }
-}
-
 /** 焦点 on a long passage: the sentences before the target and those after it each become one
  * group. 全文 lays the groups out inline (nothing changes); 焦点 folds each to two dimmed lines
  * (the before group shows its last two, the after group its first two) and fitClamps adds a ⋯
@@ -1030,16 +972,17 @@ function frameFront() {
   window.scrollTo({ top: 0, behavior: 'instant' });
   // in the app the reveal is the screen's right half, not a docked button: the floor is the screen's
   // own foot, and a marked word below it opens in view, its sentence in the middle of the page
+  const undo = ctx.root.querySelector('.kp-study > .kp-undo');
   if (target && dock && getComputedStyle(dock).position === 'fixed') {
     const t = target.getBoundingClientRect();
     const ceil = topInset() + 16;
-    const floor = innerHeight - 56;
+    // a showing Undo stands over the page's foot (sticky above the tabs): the word stops 16 px above it too
+    const floor = Math.min(innerHeight - 56, undo && getComputedStyle(undo).position === 'sticky' ? undo.getBoundingClientRect().top - 16 : Infinity);
     if (t.bottom > floor) window.scrollTo({ top: Math.max(0, Math.round((t.top + t.bottom) / 2 - (ceil + floor) / 2)), behavior: 'instant' });
     return;
   }
   if (!target || !dock || getComputedStyle(dock).position !== 'sticky') return;
   const t = target.getBoundingClientRect();
-  const undo = ctx.root.querySelector('.kp-study > .kp-undo');
   const floor = Math.min(dock.getBoundingClientRect().top, undo && getComputedStyle(undo).position === 'sticky' ? undo.getBoundingClientRect().top : Infinity) - 16;
   const ceil = topInset() + 16;
   if (t.bottom <= floor) return;
@@ -2589,8 +2532,52 @@ function settleBack() {
       break;
     }
   }
-  if (!dy) return;
-  window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
+  if (dy) window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
+  if (windowed) seatUnderHeader(windowed, marked);
+}
+
+/** A long answer can carry the page past the window's seat, so the window's first lines run under the pinned header
+ * (WebKit, whose answer sets taller, lands there). A line at the header's edge is then wholly under it or wholly
+ * below it, its readings included (F, one ruby: a reading is the line's own ink, never half of one left under the
+ * bar): the passage moves by the least whole pixels that does it, the marked word kept in view. */
+function seatUnderHeader(passage, mark) {
+  const view = passage.getBoundingClientRect();
+  const clip = topInset();
+  if (clip <= view.top + 0.5) return;
+  const lines = new Map();
+  for (const n of passage.querySelectorAll('.kp-tok, ruby')) {
+    if (n.matches('ruby') && n.closest('.kp-tok')) continue;
+    for (const r of n.getClientRects()) {
+      if (!r.width || !r.height) continue;
+      const key = Math.round(r.bottom);
+      const line = lines.get(key) || { top: r.top, bottom: r.bottom, base: r.top };
+      line.top = Math.min(line.top, r.top); line.base = Math.min(line.base, r.top); line.bottom = Math.max(line.bottom, r.bottom);
+      lines.set(key, line);
+    }
+  }
+  // a reading belongs to the line its word sits on (WebKit seats an rt's box a little into its word's own box)
+  for (const rt of passage.querySelectorAll('rt')) {
+    const word = [...rt.parentElement.childNodes].find((c) => c.nodeType === 3 && c.textContent.trim());
+    if (!word) continue;
+    const range = document.createRange();
+    range.selectNodeContents(word);
+    const b = [...range.getClientRects()].find((r) => r.width);
+    const line = b && [...lines.values()].find((l) => Math.abs(l.bottom - b.bottom) <= 2);
+    if (!line) continue;
+    for (const r of rt.getClientRects()) if (r.width && r.height) line.top = Math.min(line.top, r.top);
+  }
+  const cut = [...lines.values()].find((l) => l.top < clip - 0.5 && l.bottom > clip + 0.5);
+  if (!cut) return;
+  const target = mark?.getBoundingClientRect();
+  const max = passage.scrollHeight - passage.clientHeight;
+  const prior = passage.scrollTop;
+  const shifts = [Math.floor(cut.top - clip), Math.ceil(cut.bottom - clip)].sort((a, b) => Math.abs(a) - Math.abs(b));
+  for (const shift of shifts) {
+    if (prior + shift < 0 || prior + shift > max) continue;
+    if (target && (target.top - shift < clip || target.bottom - shift > view.bottom)) continue;
+    passage.scrollTo({ top: prior + shift, behavior: 'instant' });
+    break;
+  }
 }
 /** the height of a header the host pins over the top of the page (the corridor's chrome); with
  * none, the study top bar pins itself (player.css, data-host none): where it rests once stuck */
@@ -2753,20 +2740,33 @@ function ghostOf(face, dir) {
   const rect = face.getBoundingClientRect();
   const node = face.cloneNode(true);
   stripCloneIdentity(node);
+  // a still copy: nothing inside it fades in again while it leaves
   node.classList.remove('kp-arrive');
+  for (const moving of node.querySelectorAll('.kp-enter, .kp-arrive')) moving.classList.remove('kp-enter', 'kp-arrive');
   node.classList.add('kp-ghost', `kp-out-${dir}`);
   node.style.transform = '';
   node.setAttribute('aria-hidden', 'true');
   node.inert = true;
   return { node, rect };
 }
+let arrivalSerial = 0;
 function arrive(ghost, dir) {
   const box = ctx.root.querySelector('.kp-study');
   if (!box) return; // the done screen
   if (dir) box.dataset.advance = dir;
   const card = box.querySelector('#kp-card');
-  card?.classList.add('kp-arrive');
-  setTimeout(() => card?.classList.remove('kp-arrive'), 200);
+  if (card) {
+    // the arrival's class leaves with its own animation (or, bounded, its computed length), never a later card's:
+    // each paint builds a new card, and a reveal that keeps this one cancels the wait
+    card.classList.add('kp-arrive');
+    const arrival = ++arrivalSerial;
+    const settle = () => { if (card.dataset.arrival === String(arrival)) { card.classList.remove('kp-arrive'); delete card.dataset.arrival; } };
+    card.dataset.arrival = String(arrival);
+    card.addEventListener('animationend', (e) => { if (e.target === card) settle(); });
+    const cs = getComputedStyle(card);
+    const ms = (v) => (String(v).trim().endsWith('ms') ? parseFloat(v) : parseFloat(v) * 1000) || 0;
+    setTimeout(settle, ms(cs.animationDuration) + ms(cs.animationDelay) + 60);
+  }
   if (!motionOk()) return;
   // もう一度: one brief 朱 slash across the screen as the answered card leaves (inert, removed after)
   if (dir === 'again') {
@@ -2782,7 +2782,8 @@ function arrive(ghost, dir) {
   Object.assign(ghost.node.style, { top: `${ghost.rect.top - at.top}px`, left: `${ghost.rect.left - at.left}px`, width: `${ghost.rect.width}px`, height: `${ghost.rect.height}px` });
   box.append(ghost.node);
   const drop = () => ghost.node.remove();
-  ghost.node.addEventListener('animationend', drop, { once: true });
+  // its own leave ends it (an animation that ends inside the copy does not), or, bounded, 400 ms
+  ghost.node.addEventListener('animationend', (e) => { if (e.target === ghost.node) drop(); });
   setTimeout(drop, 400);
 }
 
