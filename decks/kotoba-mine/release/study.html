@@ -7925,16 +7925,17 @@ function frameFront() {
   window.scrollTo({ top: 0, behavior: 'instant' });
   // in the app the reveal is the screen's right half, not a docked button: the floor is the screen's
   // own foot, and a marked word below it opens in view, its sentence in the middle of the page
+  const undo = ctx.root.querySelector('.kp-study > .kp-undo');
   if (target && dock && getComputedStyle(dock).position === 'fixed') {
     const t = target.getBoundingClientRect();
     const ceil = topInset() + 16;
-    const floor = innerHeight - 56;
+    // a showing Undo stands over the page's foot (sticky above the tabs): the word stops 16 px above it too
+    const floor = Math.min(innerHeight - 56, undo && getComputedStyle(undo).position === 'sticky' ? undo.getBoundingClientRect().top - 16 : Infinity);
     if (t.bottom > floor) window.scrollTo({ top: Math.max(0, Math.round((t.top + t.bottom) / 2 - (ceil + floor) / 2)), behavior: 'instant' });
     return;
   }
   if (!target || !dock || getComputedStyle(dock).position !== 'sticky') return;
   const t = target.getBoundingClientRect();
-  const undo = ctx.root.querySelector('.kp-study > .kp-undo');
   const floor = Math.min(dock.getBoundingClientRect().top, undo && getComputedStyle(undo).position === 'sticky' ? undo.getBoundingClientRect().top : Infinity) - 16;
   const ceil = topInset() + 16;
   if (t.bottom <= floor) return;
