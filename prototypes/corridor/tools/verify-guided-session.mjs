@@ -31,6 +31,7 @@ import { join } from 'node:path';
 import { chromium, webkit } from 'playwright-core';
 import AxeBuilder from '@axe-core/playwright';
 import { loadGuidedIndex, loadGuidedSet } from '../guided-session-content.mjs';
+import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 import {
   resolveCorridorEvidence,
   resolveCorridorSite,
@@ -300,10 +301,21 @@ async function journey(browser, browserName, viewport) {
 
     // J · arrival and setup
     check('J1 arrival names the set and its size', /N2/u.test(await room(page).innerText()));
+    // Hfix-1B · the room's doors are plain words in the interface's language, never its views' internal names (field,
+    // learn, sensei, about: H-hokusai-05 and kin), and with no tutor set up there is no tutor's door (item 11)
+    const roomDoors = () => page.locator('.guided-room .gs-bar .gs-nav').evaluateAll((ns) => ns.map((n) => ({ view: n.dataset.view, label: n.innerText.trim() })));
+    const bare = await roomDoors();
+    check('J1b the room\'s doors read Map · Revisit · Sources (no internal name, no tutor\'s door while no tutor is set up)',
+      JSON.stringify(bare) === JSON.stringify([{ view: 'field', label: 'Map' }, { view: 'learn', label: 'Revisit' }, { view: 'about', label: 'Sources' }]), JSON.stringify(bare));
     await shot(page, dir, '01-arrival', { full: true });
     await axeClean(page, 'arrival');
     await noOverflow('arrival');
+    // precondition now: a tutor set up (J15 walks the prepared question to the tutor room); the next view shows its door
+    await setUpDeviceTutor(page);
     await act(page, 'setup').click();
+    const tutored = await roomDoors();
+    check('J1c with a tutor set up the doors read Map · Revisit · Tutor · Sources',
+      JSON.stringify(tutored.map((d) => d.label)) === JSON.stringify(['Map', 'Revisit', 'Tutor', 'Sources']) && tutored[2].view === 'sensei', JSON.stringify(tutored));
     await shot(page, dir, '02-setup', { full: true });
     await act(page, 'start').click();
     check(
@@ -910,6 +922,12 @@ async function switches(browser, browserName) {
   const errors = [];
   watchErrors(page, errors);
   try {
+    // Hfix-1B · in 日本語 the room's doors are plain Japanese words (地図 · 見直す · 出典), never 場 or 覚, and no tutor's door
+    await page.goto(`${origin}/index.html?entry=shelf&ui=ja`);
+    await ready(page);
+    await openRoomFromHall(page);
+    const jaDoors = await page.locator('.guided-room .gs-bar .gs-nav').evaluateAll((ns) => ns.map((n) => n.innerText.trim()));
+    check('J1d in 日本語 the room\'s doors read 地図 · 見直す · 出典 (no tutor set up)', JSON.stringify(jaDoors) === JSON.stringify(['地図', '見直す', '出典']), JSON.stringify(jaDoors));
     await page.goto(`${origin}/index.html?entry=shelf&ui=bi`);
     await ready(page);
     await openRoomFromHall(page);

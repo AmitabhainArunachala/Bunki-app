@@ -29980,6 +29980,8 @@ function guidedHost() {
       keepNavigationReturn('ai', document.activeElement);
       S.view = 'ai'; render(); window.scrollTo(0, 0);
     },
+    // Hfix-1B · the room shows its tutor doors only while a tutor is set up on this device
+    tutorReady: () => !!aiKey(),
     deck: {
       status: guidedCardStatus,
       info: guidedCardInfo,
