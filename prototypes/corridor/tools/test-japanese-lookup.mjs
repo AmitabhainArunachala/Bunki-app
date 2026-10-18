@@ -28,7 +28,7 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'soundChangeDoor', 'dictionaryRowsReadAs', 'readerReadingFits',
   // R3 (2026-10-18): the sense a word's text uses — the lookup's entry before its sense, the record its sense shapes, the
   // slip's second line, and the marks the slip leaves (for the page, and for a sense still to come)
-  'japaneseLookupEntryRecord', 'senseRecord', 'senseIsQuick', 'senseMoreLine', 'SENSE_BY_ANCHOR', 'SENSE_LATER', 'senseLaterDraw', 'sensePatch'];
+  'japaneseLookupEntryRecord', 'senseRecord', 'senseIsQuick', 'senseMoreLine', 'SENSE_BY_ANCHOR', 'SENSE_LATER', 'senseLaterDraw', 'sensePatch', 'SLIP_NODE'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]

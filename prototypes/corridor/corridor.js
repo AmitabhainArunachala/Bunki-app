@@ -9429,6 +9429,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     SENSE_BY_ANCHOR.set(span, sense);
     if (entryNode?.t === 'word' && !entryNode.sense && (entryNode.seq == null || String(entryNode.seq) === sense.seq)) entryNode.sense = sense;
   }
+  if (entryNode) SLIP_NODE.set(mini, entryNode);
   // a press or a key inside the slip keeps it as it is (senseRefine, senseLater); a lookup word's sense still to come
   // marks it pending until it is drawn again with it
   const senseTouch = () => { mini.dataset.senseTouched = '1'; };
@@ -10740,6 +10741,8 @@ function senseRefine(token, door, slip, redraw, anchor = null) {
     slip.removeEventListener('pointerdown', touch, { capture: true });
     slip.removeEventListener('keydown', touch, { capture: true });
     if (!slip.isConnected) return;
+    // a word the sense leaves as it was (no sense chosen; several entries still named) keeps its slip untouched
+    if (senseDoor(token, door) === door) { delete slip.dataset.sense; return; }
     // brought up to its sense in place where its word and entry stay; drawn again only where they move
     if (!touched && document.getElementById('mini') === slip && !sensePatch(slip, token, door, anchor)) redraw();
     else delete slip.dataset.sense;
@@ -10774,11 +10777,17 @@ function sensePatch(slip, token, door, anchor = null) {
   slip.dataset.senseEntry = `${sense.seq}:${sense.k}`;
   delete slip.dataset.sense;
   if (anchor) SENSE_BY_ANCHOR.set(anchor, sense);
-  // a page built ahead from the slip's first draw carries no mark: it is built again on the way in
-  pagePrebuildCancel?.();
-  pagePrebuilt = null;
+  // the slip's entry node carries the mark to its page; a page already built ahead from it (G1: the tap only mounts
+  // it) is built ahead again, with the mark
+  const node = SLIP_NODE.get(slip);
+  if (node?.t === 'word' && (node.seq == null || String(node.seq) === sense.seq)) {
+    node.sense = sense;
+    if (pagePrebuilt?.node === node && anchor) { pagePrebuilt = null; schedulePagePrebuild(node, anchor); }
+  }
   return true;
 }
+/** Each word slip's entry node (showMini), so a sense that arrives later reaches its page (sensePatch). */
+const SLIP_NODE = new WeakMap();
 
 /** A lookup word's sense, waited for a moment at most (SENSE_WAIT_MS, as a reading's answer is): whether it is at hand. */
 const SENSE_WAIT_MS = 400;
