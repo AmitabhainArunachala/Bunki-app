@@ -10170,8 +10170,11 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // the word band: the word, its reading and its meaning, with the deeper door in its corner
   const head = el('div', 'mini-head');
   const said = el('div', 'mini-head-text');
-  // the word itself is the way into its full entry, as a second tap on it in the text is
-  const word = el(entryAvailable ? 'button' : 'span', 'mini-word', label);
+  // the word itself is the way into its full entry, as a second tap on it in the text is. It is one word, the token's
+  // own: set as plain text, never cut into the word rule's pieces (Q's jaWords read つき出す as つき｜出す and おくれる as
+  // お｜くれる, a break inside the word and a card whose word is its first piece), as the bar's word is
+  const word = el(entryAvailable ? 'button' : 'span', 'mini-word');
+  word.textContent = label;
   word.lang = 'ja';
   word.dataset.uiContent = 'learning';
   if (entryAvailable) {
@@ -10626,8 +10629,30 @@ function placeFloating(card, r) {
   revealFloatingFocus(card);
 }
 
+/* A press held down (a mouse button, a pen, a finger before its tap lands) keeps what it rests on under it until its
+ * release: a card reveals its focus after the release, never during the press. A press in a card moves the focus where it
+ * lands, and in WebKit that is the nearest focusable box (a list menu, never its checkbox, as Safari does): revealing it
+ * scrolled the card mid-press, the release fell on another line, and the list's tick was lost
+ * (design-reader-shelf G5-lists-popover, WebKit). The release's own click is dispatched before the next frame.
+ * var, and read through typeof: a suite that lifts revealFloatingFocus alone (test-japanese-lookup) has no press. */
+var pressHeld = false;
+var revealsAfterPress = new Set();
+function releasePress(event) {
+  if (event?.isPrimary === false) return;
+  pressHeld = false;
+  if (!revealsAfterPress.size) return;
+  const cards = [...revealsAfterPress];
+  revealsAfterPress.clear();
+  requestAnimationFrame(() => { for (const card of cards) if (card.isConnected) revealFloatingFocus(card); });
+}
+document.addEventListener('pointerdown', (event) => { if (event.isPrimary !== false) pressHeld = true; }, true);
+document.addEventListener('pointerup', releasePress, true);
+document.addEventListener('pointercancel', releasePress, true);
+addEventListener('blur', () => releasePress());
+
 /** Reveal a focused control using the page for a full sentence card, or its own scroll for a small popup. */
 function revealFloatingFocus(card) {
+  if (typeof pressHeld !== 'undefined' && pressHeld) { revealsAfterPress.add(card); return; }
   const control = document.activeElement;
   if (!control || control === card || !card.contains(control)) return;
   const box = card.getBoundingClientRect(), focus = control.getBoundingClientRect();

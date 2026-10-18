@@ -5378,16 +5378,17 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
 #mini[data-depth='recalled'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 78%, transparent); }
 #mini[data-depth='owned'] { --depth-fill: var(--depth-band-ink); }
 #mini[data-kept] { --depth-edge: 0 0 0 1.5px var(--mini-reading, var(--depth-ring)); }
-#mini:is([data-depth], [data-kept]) .mini-word { position: relative; }
-/* beside the word, at its middle, like a seal set by a name: under it the dot would sit in the reading's line */
+/* beside the word, at its middle, like a seal set by a name: under it the dot would sit in the reading's line. The dot is the
+   word's last flex item, its margins netting no width, pushed to the box's end and centred on it: 9 px past the word's box,
+   at its middle, where a box positioned on the word drew it. The word itself is never positioned: its ::before is the reach
+   that makes the whole band the door into the entry (read.css), and it must keep the band, not the word, as its box */
+#mini:is([data-depth], [data-kept]) .mini-word { display: flex; justify-content: space-between; align-items: center; }
 #mini:is([data-depth], [data-kept]) .mini-word::after {
   content: '';
-  position: absolute;
-  left: calc(100% + 9px);
-  top: 50%;
+  flex: none;
   width: 6px;
   height: 6px;
-  margin-top: -3px;
+  margin-inline: 9px -15px;
   border-radius: 50%;
   background: var(--depth-fill, transparent);
   box-shadow: var(--depth-edge, none);
