@@ -6,6 +6,8 @@
  *       stage no seat can hold ends between two rows, says so with a fade at its foot, and scrolls by touch and keyboard;
  *   2   the open layers lie under no part of the 層 mark (it stands in their corner), whole on the glass; it folds them and
  *       goes home;
+ *   3   at part depth the thread rests with no bead half under the sticky 宙, the current bead whole, also after a finger
+ *       moves it;
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -53,6 +55,8 @@ const CONTROL = {
   ] },
   'stage-fade': { item: '1.', css: "#mini[data-more='true']::after { content: none !important; }" },
   layers: { item: '2.', source: [['corridor.js', 'dockLayersMark(mark, block, null, () => layersOnGlass(block));', 'void layersOnGlass;']] },
+  thread: { item: '3.', css: '.scale-thread { scroll-snap-type: none !important; }',
+    source: [['corridor.js', '    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);', '    if (delta) thread.scrollLeft += delta;']] },
 };
 
 const rows = [];
@@ -256,9 +260,56 @@ async function itemLayers(browser, engine) {
   }
 }
 
+// G6's visible, live rail (verify-word-grammar's G6 part)
+const RAIL = '.scale-thread:not([inert]):not([aria-hidden="true"]):not([inert] .scale-thread):not([aria-hidden="true"] .scale-thread):visible';
+/** The rail as it rests: 宙's box and every bead's, the current one named. */
+const railFacts = (page, scale) => page.evaluate((scale) => {
+  const rail = [...document.querySelectorAll(`.scale-thread[data-scale="${scale}"]`)].find((n) => !n.closest('[inert],[aria-hidden="true"]') && n.getClientRects().length);
+  if (!rail) return null;
+  const r = rail.getBoundingClientRect(), out = rail.querySelector(':scope > [data-scale-out]').getBoundingClientRect();
+  const beads = [...rail.children].filter((n) => !n.matches('[data-scale-out]')).map((n) => { const b = n.getBoundingClientRect();
+    return { label: n.textContent.trim().slice(0, 12), left: b.left, right: b.right, current: n.getAttribute('aria-current') === 'step' }; });
+  return { scrollLeft: rail.scrollLeft, scrollWidth: rail.scrollWidth, clientWidth: rail.clientWidth, left: r.left + rail.clientLeft,
+    right: r.left + rail.clientLeft + rail.clientWidth, out: { left: out.left, right: out.right }, beads };
+}, scale);
+// a bead rests whole beside 宙, or wholly under it: never across 宙's edge (H1: "shelf" read "elf")
+const straddling = (f) => f.beads.filter((b) => b.left < f.out.right - 0.5 && b.right > f.out.right + 0.5);
+async function itemThread(browser, engine) {
+  // 3 · the thread at part depth (G6: article → sentence → word → kanji → part), in three worlds: no bead half under 宙, the
+  // current bead whole on the rail; and after a finger moves the rail, it rests the same way
+  for (const world of WORLDS) {
+    const { context, page, errors } = await session(browser, { world });
+    try {
+      await openStory(page);
+      // the rail names its origin once a word has been opened (verify-word-grammar g6OpenOrigin)
+      await stage(page);
+      await page.keyboard.press('Escape'); await delay(250); await page.keyboard.press('Escape'); await delay(250);
+      for (const [from, to] of [['article', 'sentence'], ['sentence', 'word'], ['word', 'kanji'], ['kanji', 'part']]) {
+        await page.locator(`${RAIL}[data-scale="${from}"] button[data-scale-in]`).tap();
+        await page.waitForFunction((s) => [...document.querySelectorAll('.scale-thread')].some((n) => !n.closest('[inert],[aria-hidden="true"]') && n.getClientRects().length && n.dataset.scale === s), to, { timeout: 8000 });
+        await settle(page, 450);
+      }
+      const f = await railFacts(page, 'part');
+      const current = f.beads.find((b) => b.current);
+      const whole = !!current && current.left >= f.out.right - 0.5 && current.right <= f.right + 0.5;
+      check(`3.thread-rest · ${engine} ${world} · at part depth no bead stands half under 宙, the current bead whole`,
+        f.scrollWidth > f.clientWidth && !straddling(f).length && whole && !errors.length,
+        { scrollLeft: f.scrollLeft, overflow: f.scrollWidth - f.clientWidth, straddling: straddling(f).map((b) => `${b.label} ${Math.round(b.left)}–${Math.round(b.right)}`),
+          out: Math.round(f.out.right), current: current && [current.label, Math.round(current.left), Math.round(current.right)], errors });
+      // a finger moves the rail part way back; where it comes to rest, no bead is half under 宙 either
+      await page.evaluate(() => { const rail = [...document.querySelectorAll('.scale-thread[data-scale="part"]')].find((n) => n.getClientRects().length); rail.scrollBy({ left: -20, behavior: 'instant' }); });
+      await delay(700);
+      const g = await railFacts(page, 'part');
+      check(`3.thread-moved · ${engine} ${world} · moved 20 px back by hand, the rail rests on a whole bead`, !straddling(g).length,
+        { scrollLeft: g.scrollLeft, straddling: straddling(g).map((b) => `${b.label} ${Math.round(b.left)}–${Math.round(b.right)}`), out: Math.round(g.out.right) });
+    } finally { await context.close(); }
+  }
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
   { id: 'layers', prefix: '2.', run: itemLayers },
+  { id: 'thread', prefix: '3.', run: itemThread },
 ];
 
 const log = { engines: {} };

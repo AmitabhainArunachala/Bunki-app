@@ -5737,6 +5737,35 @@ function scaleThread() {
   }
   return thread;
 }
+/** Hfix-1A · where the rail may rest: with a bead's start at 宙's edge (H1: "shelf" stood half under the sticky 宙 at part
+ * depth and read "elf"). 宙's width and the gap after it are the scroller's reserved start (--thread-reserve, its
+ * scroll-padding), every other bead is a snap point (editorial.css), and the rail's end gives way just enough that its
+ * furthest rest holds its last bead whole with no bead half under 宙. Returns the first rest at or past `target`. */
+function threadRest(thread, target = thread.scrollLeft) {
+  const outside = thread.querySelector(':scope > [data-scale-out]');
+  if (!outside || !thread.isConnected) return target;
+  const port = thread.getBoundingClientRect().left + thread.clientLeft;
+  const gap = parseFloat(getComputedStyle(thread).columnGap) || 0;
+  // 宙 sticks at the scroller's start, so its right edge is the same at rest and while the rail is scrolled
+  const reserve = Math.round(outside.getBoundingClientRect().right - port + gap);
+  if (thread.style.getPropertyValue('--thread-reserve') !== `${reserve}px`) thread.style.setProperty('--thread-reserve', `${reserve}px`);
+  // the rail's own end padding, read once before any room is added to it
+  thread.dataset.threadPad ??= String(parseFloat(getComputedStyle(thread).paddingInlineEnd) || 0);
+  const pad = Number(thread.dataset.threadPad), added = Math.max(0, (parseFloat(getComputedStyle(thread).paddingInlineEnd) || 0) - pad);
+  if (thread.scrollWidth <= thread.clientWidth + 1) return 0;
+  const beads = [...thread.children].filter((node) => node !== outside && node.getClientRects().length);
+  const rests = beads.map((node) => node.getBoundingClientRect().left - port + thread.scrollLeft - reserve).filter((x) => x >= -0.5);
+  const end = thread.scrollWidth - thread.clientWidth - added;
+  const furthest = rests.filter((x) => x >= end - 0.5).sort((a, b) => a - b)[0];
+  // a rest a fraction past the end is no rest in either engine (they snap back to the start): a pixel's slack
+  const room = furthest > end - 0.5 ? Math.ceil(furthest - end + 1) : 0;
+  if (room !== Math.round(added)) {
+    thread.style.paddingInlineEnd = room ? `${pad + room}px` : '';
+    // laid out now, so the snap positions a scroll set in this task is measured against include the new end
+    void thread.scrollWidth;
+  }
+  return Math.max(0, Math.ceil(rests.filter((x) => x >= target - 0.5).sort((a, b) => a - b)[0] ?? furthest ?? target));
+}
 /** Reveal the current bead once, on this newly mounted rail only. Page/reader
  * restoration and focus keep their existing owners; native rail use wins. */
 function revealMountedScaleCurrent(thread) {
@@ -5754,9 +5783,13 @@ function revealMountedScaleCurrent(thread) {
   for (const type of events) thread.addEventListener(type, cancel, { capture: true, passive: true });
   const reveal = () => {
     cleanup();
+    // Hfix-1A · the rail's rests are set whoever moves it next (this reveal, or a finger); a finger's move is judged on
+    // the offset before they are set (setting them may re-snap the rail)
+    const left0 = thread.scrollLeft;
+    if (thread.isConnected) threadRest(thread, thread.scrollLeft);
     if (cancelled || !thread.isConnected || thread.parentElement !== parent ||
         current.parentElement !== thread || current.getAttribute('aria-current') !== 'step' ||
-        thread.scrollLeft !== initialLeft || thread.closest('[inert], [hidden], [aria-hidden="true"]') ||
+        left0 !== initialLeft || thread.closest('[inert], [hidden], [aria-hidden="true"]') ||
         (thread.contains(document.activeElement) && document.activeElement !== outside && document.activeElement !== current)) return;
     const rect = thread.getBoundingClientRect(), bead = current.getBoundingClientRect();
     if (!rect.width || !rect.height || !bead.width || !bead.height || thread.scrollWidth <= thread.clientWidth) return;
@@ -5772,7 +5805,8 @@ function revealMountedScaleCurrent(thread) {
     if (bead.width > right - left) return;
     const delta = bead.right > right ? Math.ceil(bead.right - right)
       : bead.left < left ? Math.floor(bead.left - left) : 0;
-    if (delta) thread.scrollLeft += delta;
+    // Hfix-1A · the least move that shows the current bead, carried on to the next rest: no bead left half under 宙
+    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);
   };
   // The actual sheet is untransformed; only its separate cut-word animates.
   // Read this mount's layout once, after layer law and before any later use.

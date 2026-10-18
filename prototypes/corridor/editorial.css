@@ -5944,6 +5944,15 @@ body[data-furigana='0'] #drift-layer .word .yomi { opacity: 0; }
 .scale-thread > button { cursor: pointer; }
 .scale-thread > button:focus-visible { outline: 1px solid currentColor; outline-offset: -3px; }
 .scale-thread > [data-scale-out] { position: sticky; left: 0; z-index: 1; width: 44px; max-width: 44px; padding-inline: 4px; background: var(--color-bar, var(--ed-paper)); font-size: var(--type-lead); }
+/* Hfix-1A · a bead never rests half under 宙 (H1: "shelf" read "elf" at part depth): the scroller's start keeps 宙's width
+   (and the gap after it, set by corridor.js threadRest as --thread-reserve), and the rail rests only where a bead begins
+   there, whether the app reveals the current bead or a finger moves it */
+.scale-thread { --thread-reserve: 46px; scroll-snap-type: x mandatory; scroll-padding-inline-start: var(--thread-reserve); }
+.scale-thread > :not([data-scale-out]) { scroll-snap-align: start; }
+/* the page's rail: its own start padding, then 宙 and the gap after it; 宙's paper also covers that padding, so a bead
+   resting under 宙 never shows a sliver to its left */
+#sheet > .scale-thread { --thread-reserve: calc(max(12px, calc(var(--page-gutter, 20px) - 8px)) + 46px); }
+#sheet > .scale-thread > [data-scale-out] { box-shadow: calc(-1 * max(12px, calc(var(--page-gutter, 20px) - 8px))) 0 0 var(--color-bar, var(--ed-paper)); }
 .scale-thread > [aria-current='step'] { font-weight: 600; }
 .scale-thread > button:disabled { cursor: default; opacity: 1; }
 #sheet > .scale-thread { position: sticky; top: calc(45px + env(safe-area-inset-top, 0px)); z-index: 3; display: flex; max-width: none; margin: 0 calc(-1 * var(--page-gutter, 32px)) var(--space-3, 12px); padding-inline: max(12px, calc(var(--page-gutter, 20px) - 8px)); background: var(--color-bar, var(--ed-paper)); box-shadow: 0 1px 0 color-mix(in srgb, currentColor 12%, transparent); }
