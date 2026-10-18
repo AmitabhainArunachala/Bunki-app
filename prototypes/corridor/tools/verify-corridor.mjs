@@ -1737,8 +1737,11 @@ async function main() {
   const lockedBar = await page.addStyleTag({ content: '#app > .chrome { overflow-x: hidden !important; }' });
   const lockedReach = await reachChromeNatively(page, 320);
   check('reader navigation · a 320px toolbar that native strokes cannot scroll leaves its last door unreached',
-    !lockedReach.valid && !lockedReach.verdict.everyDoorReached && !lockedReach.seen.includes('tray'),
-    JSON.stringify({ verdict: lockedReach.verdict, seen: lockedReach.seen }));
+    !lockedReach.valid && !lockedReach.verdict.everyDoorReached && !lockedReach.seen.includes('tray')
+      && lockedReach.strokes.length > 0 && lockedReach.strokes.every(s => s.complete)
+      && Object.entries(lockedReach.verdict).every(([premise, held]) => premise === 'everyDoorReached' || held),
+    JSON.stringify({ verdict: lockedReach.verdict, seen: lockedReach.seen,
+      strokes: lockedReach.strokes.map(s => ({ origin: s.origin, forward: s.forward, complete: s.complete, acknowledged: s.acknowledged, inputError: s.inputError })) }));
   await lockedBar.evaluate(n => n.remove());
   await page.setViewportSize(VIEWPORT);
   await page.evaluate(() => { window.scrollTo(0, 0); });
