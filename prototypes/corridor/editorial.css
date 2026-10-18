@@ -1714,6 +1714,7 @@ body.v-depth-layered #reader, #reader.reader {
   transition: opacity 180ms ease-out, transform 180ms ease-out;
 }
 #reader:not(.fg-always) ruby:has(> rt:not(.hidden-rt))::before { opacity: 1; transform: translate(-50%, 0); }
+#reader:not(.fg-always) ruby:has(> rt.hidden-rt)::before { width: 0; overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   #reader:not(.fg-always) ruby::before { transition: none; transform: translate(-50%, 0); }
 }
@@ -5119,6 +5120,7 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
 @media (max-width: 520px) {
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { flex-wrap: nowrap; padding-inline: 2px; min-width: 0; max-width: 100%; overflow-x: auto; }
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg { padding-right: 3px; background-position: right 1px center; }
+  body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome :focus-visible { outline: 2px solid var(--tint); outline-offset: -2px; }
   /* the saved count sits at the bookmark's shoulder, so the bookmark is always one 44px door */
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome > button#tray {
     position: relative; width: 44px; min-width: 44px; padding: 0; justify-content: center; gap: 0;
@@ -5130,7 +5132,7 @@ body:not(.zen) #app > .chrome .lang-seg button[aria-pressed='true']::before { ba
   }
 }
 @media (max-width: 374px) {
-  /* the narrowest phones: seven 44px doors on one row (the bar's own Save is gone, so the Learn door keeps its place) */
+  /* the narrowest phones: the eight 44px doors close their gaps; what still exceeds the row scrolls inside the toolbar */
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome { gap: 0; }
   body.has-primary-tabs[data-view='reader']:not(.zen) #app > .chrome .lang-seg button { min-width: 44px; padding-inline: 0; }
 }
