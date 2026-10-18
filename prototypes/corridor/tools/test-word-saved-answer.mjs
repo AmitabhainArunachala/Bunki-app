@@ -49,6 +49,7 @@
  *     Japanese label rides along (labelJa) for the route-label rows.
  */
 import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
@@ -621,6 +622,8 @@ function defineRows() {
   }
   after(() => {
     const { exact, report } = inventoryReport('word-saved-answer', INVENTORY, observed);
+    Object.assign(report, { schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(),
+      verifierSha256: sha256(readFileSync(fileURLToPath(import.meta.url))), sourceSha256: sha256(source), sourceOnly: true });
     // the release gate's 'checks' report; a control run writes none
     if (process.env.KAIRO_EVIDENCE_DIR && !controlName) {
       writeFileSync(join(resolveCorridorEvidence(), 'verification-report.json'), JSON.stringify(report, null, 2) + '\n');

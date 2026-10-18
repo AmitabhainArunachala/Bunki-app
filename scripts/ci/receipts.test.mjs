@@ -1,3 +1,4 @@
+import { syntheticEvidence } from './test-evidence-fixture.mjs';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync } from 'node:fs';
@@ -41,8 +42,28 @@ function fixture() {
       requiredNames: ['lint', 'corridor'],
       shards,
       gates: [
-        { name: 'lint', status: 'passed' },
-        { name: 'corridor', status: 'flaky' },
+        {
+          name: 'lint',
+          status: 'passed',
+          attempts: [
+            {
+              name: 'lint',
+              status: 'passed',
+              ...syntheticEvidence('lint', commit, artifact.artifactSha256),
+            },
+          ],
+        },
+        {
+          name: 'corridor',
+          status: 'flaky',
+          attempts: [
+            {
+              name: 'corridor',
+              status: 'passed',
+              ...syntheticEvidence('corridor', commit, artifact.artifactSha256),
+            },
+          ],
+        },
       ],
     },
     plan: { scope: 'full', identity, requiredNames: ['corridor', 'lint'], shards },

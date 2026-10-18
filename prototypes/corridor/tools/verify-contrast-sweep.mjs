@@ -37,28 +37,39 @@ import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
 import { inflateSync } from 'node:zlib';
+import { createHash, randomUUID } from 'node:crypto';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
+import { readAppRecord } from './record-test-support.mjs';
+import { contrastExpectedCases } from '../../../scripts/ci/vh-existing-report-contracts.mjs';
 
+const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['webkit', 'chromium'];
+assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
+const WORLDS = Object.freeze(['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'keyblock', 'hakuu', 'kaku']);
+const NIGHT = new Set(['rokusho', 'yoru', 'nami', 'hakuu', 'kaku']);
+const SETTLED_STATES = Object.freeze(['shelf', 'reader', 'slip', 'page', 'page-examples', 'today', 'learn', 'words', 'me', 'settings', 'deck-front', 'deck-back']);
+const STATE_NAMES = Object.freeze([...SETTLED_STATES, 'fresh-demo']);
+assert(process.argv.slice(2).every((arg) => arg === '--demo-only') && process.argv.length <= 3, 'Unknown contrast-sweep argument');
+const demoOnly = process.argv.includes('--demo-only');
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+// a partial run (SWEEP_WORLDS / SWEEP_STATES) is for a builder's iteration only: it can never pass as an acceptance
+const onlyWorlds = Object.hasOwn(process.env, 'SWEEP_WORLDS') ? process.env.SWEEP_WORLDS.split(',') : null;
+const onlyStates = Object.hasOwn(process.env, 'SWEEP_STATES') ? process.env.SWEEP_STATES.split(',') : null;
+assert(!onlyWorlds || onlyWorlds.every((world) => WORLDS.includes(world)), 'Unknown/empty SWEEP_WORLDS selector');
+assert(!onlyStates || onlyStates.every((state) => STATE_NAMES.includes(state)), 'Unknown/empty SWEEP_STATES selector');
+assert(!onlyWorlds || new Set(onlyWorlds).size === onlyWorlds.length, 'Duplicate SWEEP_WORLDS selector');
+assert(!onlyStates || new Set(onlyStates).size === onlyStates.length, 'Duplicate SWEEP_STATES selector');
+const partial = demoOnly || !!(onlyWorlds || onlyStates);
+const worlds = WORLDS.filter((w) => !onlyWorlds || onlyWorlds.includes(w));
+const states = STATE_NAMES.filter((s) => (!demoOnly || s === 'fresh-demo') && (!onlyStates || onlyStates.includes(s)));
+assert(worlds.length && states.length, 'nothing to sweep');
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Pin an immutable built site and its digest');
 const site = resolveCorridorSite(), evidence = resolveCorridorEvidence();
 const identity = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), 'utf8'));
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
-const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['webkit', 'chromium'];
-assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
-const WORLDS = Object.freeze(['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'keyblock', 'hakuu', 'kaku']);
-const NIGHT = new Set(['rokusho', 'yoru', 'nami', 'hakuu', 'kaku']);
-const STATE_NAMES = Object.freeze(['shelf', 'reader', 'slip', 'page', 'page-examples', 'today', 'learn', 'words', 'me', 'settings', 'deck-front', 'deck-back']);
-// a partial run (SWEEP_WORLDS / SWEEP_STATES) is for a builder's iteration only: it can never pass as an acceptance
-const onlyWorlds = process.env.SWEEP_WORLDS ? process.env.SWEEP_WORLDS.split(',') : null;
-const onlyStates = process.env.SWEEP_STATES ? process.env.SWEEP_STATES.split(',') : null;
-const partial = !!(onlyWorlds || onlyStates);
-const worlds = WORLDS.filter((w) => !onlyWorlds || onlyWorlds.includes(w));
-const states = STATE_NAMES.filter((s) => !onlyStates || onlyStates.includes(s));
-assert(worlds.length && states.length, 'nothing to sweep');
 const delay = (ms) => new Promise((done) => setTimeout(done, ms));
 const STORY = Object.freeze({ id: 'kantei:jp-105-actions-202609-25startup', search: 'スタートアップ大賞' });
 const WORD = '総理';
@@ -420,6 +431,8 @@ const IN_PAGE = () => {
       const fill = svg ? cs.fill : (cs.webkitTextFillColor || cs.color);
       texts.push({
         text: content.slice(0, 40), sel: path(el), rects, colour: fill, colourProp: cs.color, opacity, blend, filter,
+        demo: !!el.closest('#mini[data-demo="true"]'),
+        demoBandLabel: !!el.closest('#mini[data-demo="true"] .mini-band-label'),
         clipText: /text/.test(cs.backgroundClip || '') || /text/.test(cs.webkitBackgroundClip || ''),
         stroke: parseFloat(cs.webkitTextStrokeWidth || '0') > 0, fontPx: parseFloat(cs.fontSize), weight: Number(cs.fontWeight) || 400,
         hidden: !!el.closest('[aria-hidden="true"]'),
@@ -603,7 +616,8 @@ function analyse(world, state, data, shot, bands) {
   // C1 text
   for (const t of data.texts) {
     if (t.occluded) { out.occluded++; continue; }
-    const record = { text: t.text, sel: t.sel, fontPx: t.fontPx, weight: t.weight, hidden: t.hidden };
+    const record = { text: t.text, sel: t.sel, fontPx: t.fontPx, weight: t.weight, hidden: t.hidden,
+      opacity: t.opacity, demo: t.demo, demoBandLabel: t.demoBandLabel };
     const fg = parseColour(t.colour);
     const why = t.clipText ? 'clipped-to-text' : t.blend ? `blend ${t.blend}` : t.filter ? `filter ${t.filter}` : (!fg ? `paint ${t.colour}` : (fg.a === 0 && t.stroke ? 'stroke-only' : ''));
     if (why) { out.unresolved.push({ ...record, why }); continue; }
@@ -773,8 +787,154 @@ function sourceAudit() {
   return found;
 }
 
+/* First-use is a separate pristine device, never inferred from the settled-reader fixture.
+ * Lead ruling, 2026-10-19 VH-1: D2/C1 judges rest states, not mid-fade. The arrival must
+ * reach full opacity by its authored duration plus one observed frame. No opacity is
+ * forced, no animation is cancelled/paused, and the 4.5/3:1 C1 thresholds stay intact. */
+const DEMO_ARRIVAL = () => {
+  const seen = new WeakSet();
+  window.__contrastDemoArrivals = [];
+  const observe = () => {
+    const mini = document.querySelector('#mini[data-demo="true"]');
+    if (!mini || seen.has(mini)) return;
+    seen.add(mini);
+    const style = getComputedStyle(mini);
+    // Reduced motion legitimately uses feel-fade; inspect the authored opacity animation,
+    // never assume the full-motion CSS animation's name also names this device's arrival.
+    const animation = mini.getAnimations().find((item) => item.effect?.getKeyframes().some((frame) => Object.hasOwn(frame, 'opacity')));
+    const row = { name: animation?.animationName || animation?.id || style.animationName, completed: false, connected: true };
+    window.__contrastDemoArrivals.push({ mini, row });
+    if (!animation) {
+      const durations = style.animationDuration.split(',').map((value) => parseFloat(value) * (value.trim().endsWith('ms') ? 1 : 1000));
+      row.noAnimation = true;
+      row.authoredDuration = Math.max(...durations);
+      row.opacity = Number(style.opacity);
+      row.elapsed = 0; row.frameMs = 0;
+      row.completed = row.authoredDuration === 0 && row.opacity === 1;
+      return;
+    }
+    const timing = animation.effect.getComputedTiming();
+    row.authoredDuration = Number(timing.duration);
+    row.authoredEnd = Number(timing.endTime);
+    let previous = null;
+    const sample = (now) => {
+      if (!mini.isConnected) { row.connected = false; row.superseded = true; return; }
+      const start = animation.startTime;
+      const elapsed = start === null ? null : now - start;
+      if (elapsed !== null && elapsed >= row.authoredEnd) {
+        row.elapsed = elapsed;
+        row.previousElapsed = previous === null ? null : previous - start;
+        row.frameMs = previous === null ? null : now - previous;
+        row.opacity = Number(getComputedStyle(mini).opacity);
+        row.playState = animation.playState;
+        row.completed = row.frameMs !== null && row.opacity === 1 && animation.playState === 'finished' &&
+          row.previousElapsed < row.authoredEnd && elapsed <= row.authoredEnd + row.frameMs;
+        return;
+      }
+      previous = now;
+      requestAnimationFrame(sample);
+    };
+    requestAnimationFrame(sample);
+  };
+  new MutationObserver(observe).observe(document, { childList: true, subtree: true });
+};
+const demoC1 = (result) => result.pairs.length > 0 && result.unresolved.length === 0 && result.pairs.every((pair) => pair.ok);
+async function measureDemo(page, world, phase) {
+  const data = await page.evaluate(([owned, inks]) => window.__sweep.collect(owned, [], inks), [OWNED, INKS]);
+  data.texts = data.texts.filter((text) => text.demo);
+  await page.evaluate(() => window.__sweep.hide(true));
+  let shot;
+  try {
+    await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+    shot = decodePng(await page.screenshot({ type: 'png' }));
+  } finally { await page.evaluate(() => window.__sweep.hide(false)); }
+  const result = analyse(world, `fresh-demo.${phase}`, data, shot, []);
+  result.engine = engine;
+  return result;
+}
+async function freshDemo(browser, world, report) {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: DPR,
+    serviceWorkers: 'block', reducedMotion: 'no-preference', colorScheme: 'light' });
+  const errors = [];
+  try {
+    await silenceBrowserAudio(context);
+    await context.addInitScript(IN_PAGE);
+    await context.addInitScript(DEMO_ARRIVAL);
+    await context.addInitScript((id) => localStorage.setItem('kairo-theme', id), world);
+    await context.route('**/*', (route) => new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
+    const page = await context.newPage();
+    page.on('pageerror', (error) => errors.push(error.message));
+    page.setDefaultTimeout(20000);
+    await STEPS.shelf(page);
+    await STEPS.reader(page);
+    await page.locator('#mini[data-demo="true"] .mini-word').waitFor();
+    await page.waitForFunction(() => {
+      const mini = document.querySelector('#mini[data-demo="true"]');
+      const observation = window.__contrastDemoArrivals.findLast((item) => item.mini === mini)?.row;
+      return observation && (observation.elapsed !== undefined || observation.noAnimation) && mini.getAttribute('aria-busy') !== 'true' &&
+        Number(getComputedStyle(mini).opacity) === 1 && !mini.getAnimations().some((animation) => animation.playState === 'running' || animation.playState === 'pending');
+    });
+    await page.evaluate(async () => { await document.fonts.ready; });
+    const facts = await page.evaluate(() => ({
+      word: document.querySelector('#mini[data-demo="true"] .mini-word')?.textContent.trim(),
+      seen: localStorage.getItem('kairo-word-ladder-demo-v1'),
+      theme: document.documentElement.dataset.theme || 'hokusai',
+      motionPreference: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduce' : 'no-preference',
+      arrivals: window.__contrastDemoArrivals.map(({ mini, row }) => ({ ...row, current: mini === document.querySelector('#mini[data-demo="true"]') })),
+    }));
+    check(`${world}/fresh-demo.reach`, 'a pristine device opened the real first-use word demonstration', !!facts.word && facts.seen === '1', facts.word);
+    check(`${world}/fresh-demo.world`, 'the fresh demonstration wears its requested world', facts.theme === world, facts.theme);
+    const current = facts.arrivals.filter((row) => row.current);
+    check(`${world}/fresh-demo.arrival`, 'the authored arrival reaches full opacity within its duration plus one observed frame',
+      facts.motionPreference === 'no-preference' && current.length === 1 && current.every((row) => row.completed && row.opacity === 1),
+      facts.arrivals.map((row) => ({ ...row, motionPreference: facts.motionPreference })));
+    const candidate = await measureDemo(page, world, 'settled');
+    report.results.push(candidate);
+    check(`${world}/fresh-demo.coverage`, 'the actual demo headword and Kanji label are included in the pixel contrast measurement',
+      candidate.pairs.some((pair) => pair.text === facts.word) && candidate.pairs.some((pair) => pair.demoBandLabel && pair.text === 'Kanji'),
+      candidate.pairs.map(({ text, sel, opacity }) => ({ text, sel, opacity })));
+    check(`${world}/fresh-demo.C1`, 'every settled first-use demo text run meets the unchanged C1 threshold', demoC1(candidate), candidate);
+    await page.screenshot({ path: join(evidence, 'shots', `${engine}-${world}-fresh-demo.jpg`), type: 'jpeg', quality: 88 });
+    if (world === 'hokusai') {
+      const recordBefore = await readAppRecord(page);
+      const label = page.locator('#mini[data-demo="true"] .mini-band-label').filter({ hasText: /^Kanji$/ }).first();
+      const oldStyle = await label.getAttribute('style');
+      let mutant;
+      try {
+        await label.evaluate((node) => { node.style.setProperty('color', 'rgb(120, 120, 120)', 'important');
+          node.style.setProperty('-webkit-text-fill-color', 'rgb(120, 120, 120)', 'important');
+          node.style.setProperty('background', 'rgb(120, 120, 120)', 'important'); });
+        mutant = await measureDemo(page, world, 'mutant');
+      } finally {
+        await label.evaluate((node, prior) => { if (prior === null) node.removeAttribute('style'); else node.setAttribute('style', prior); }, oldStyle);
+      }
+      const restored = await measureDemo(page, world, 'restored');
+      const recordAfter = await readAppRecord(page);
+      const sameRecord = JSON.stringify(recordBefore) === JSON.stringify(recordAfter);
+      const control = { engine, id: 'same-ink-background', candidate, mutant, restored, recordBefore, recordAfter,
+        styleBefore: oldStyle, styleAfter: await label.getAttribute('style') };
+      report.controls.push(control);
+      check(`${world}/fresh-demo.control-kill`, 'same ink and background on the actual Kanji label makes the same C1 predicate fail',
+        demoC1(candidate) && !demoC1(mutant) && mutant.pairs.some((pair) => pair.demoBandLabel && pair.text === 'Kanji' && !pair.ok), mutant);
+      check(`${world}/fresh-demo.control-restore`, 'restoring the exact style restores the settled C1 result',
+        demoC1(restored) && oldStyle === control.styleAfter && JSON.stringify(candidate.pairs) === JSON.stringify(restored.pairs), restored);
+      check(`${world}/fresh-demo.control-record`, 'the DOM contrast fault and restoration preserve the whole native record', sameRecord);
+    }
+  } catch (error) {
+    check(`${world}/fresh-demo.error`, 'first-use contrast walk completed', false, String(error.stack || error));
+  } finally {
+    check(`${world}/fresh-demo.page-errors`, 'first-use contrast has no page errors', errors.length === 0, errors);
+    await context.close();
+  }
+}
+
 /* ------------------------------------------------------------------ run */
-const report = { identity: { gitSha: identity.gitSha, artifactSha256: identity.artifactSha256 }, partial, worlds, states, engines: {}, results: [], source: null };
+const report = { schemaVersion: 2, runId, artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty,
+  verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
+  identity: { gitSha: identity.gitSha, artifactSha256: identity.artifactSha256 }, partial, worlds, states, engines: {}, results: [], controls: [], source: null,
+  requestedScope: partial ? 'diagnostic' : 'full', selectors: { worlds: onlyWorlds, states: onlyStates, demoOnly },
+  freshDemoMotion: 'no-preference', settledMotion: 'reduce',
+  contrastTimingContract: 'Lead ruling 2026-10-19 VH-1: D2/C1 at rest; arrival full opacity by authored duration plus one observed frame; no mid-fade contrast exemption claimed as measured rest coverage.' };
 mkdirSync(join(evidence, 'shots'), { recursive: true });
 try {
   const source = sourceAudit();
@@ -791,7 +951,10 @@ try {
     const version = browser.version();
     report.engines[engine] = version;
     console.log(`engine ${engine} ${version}`);
+    try {
     for (const world of worlds) {
+      if (states.includes('fresh-demo')) await freshDemo(browser, world, report);
+      if (!states.some((state) => SETTLED_STATES.includes(state))) continue;
       const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: DPR, serviceWorkers: 'block', reducedMotion: 'reduce', colorScheme: 'light' });
       await silenceBrowserAudio(context);
       await context.addInitScript(IN_PAGE);
@@ -799,8 +962,7 @@ try {
         try {
           localStorage.setItem('kairo-theme', id);
           localStorage.setItem('bunki-cloze:prefs:v3:n1', JSON.stringify({ look: 'world', zoom: 'full', sittings: 3, ruleSeen: true }));
-          // G3's first-use demonstration of a word's stage is a fresh device's alone (its own verifier walks it): a settled
-          // reader is read without it, as every other G3-era walk reads it (at site-6 the reader was read mid-demonstration)
+          // This is the settled-device fixture. freshDemo independently measures the pristine-device demonstration.
           localStorage.setItem('kairo-word-ladder-demo-v1', '1');
         } catch { /* storage refused: the theme check below fails the walk */ }
       }, world);
@@ -811,7 +973,7 @@ try {
       await canvas.evaluate(IN_PAGE);
       page.setDefaultTimeout(20000);
       page.on('pageerror', (error) => errors.push(error.message));
-      for (const state of STATE_NAMES) {
+      for (const state of SETTLED_STATES) {
         if (!states.includes(state) && !['shelf', 'reader', 'slip', 'page', 'today', 'me', 'deck-front'].includes(state)) continue;
         try {
           await STEPS[state](page);
@@ -870,7 +1032,7 @@ try {
         const banded = result.banding.filter((b) => !b.ok);
         check(`${world}/${state}.C4`, `${world}/${state}: no banding, gentle slope — ≤ 1 visible tonal step per 24 px (${result.banding.length} gradation layers drawn)`,
           banded.length === 0, banded.slice(0, 8));
-        if (result.kanji.length) check(`${world}/${state}.C5`, `${world}/${state}: the key-kanji sheets wear their wash and the kanji reads ≥ 4.5:1 (${result.kanji.length})`,
+        check(`${world}/${state}.C5`, `${world}/${state}: the key-kanji sheets wear their wash and the kanji reads ≥ 4.5:1 (${result.kanji.length})`,
           result.kanji.every((k) => k.ok), result.kanji);
         if (!NIGHT.has(world)) check(`${world}/${state}.C6`, `${world}/${state}: no muddy surface (between ink and 92 % of the page)`, result.muddy.length === 0, result.muddy.slice(0, 10));
       }
@@ -881,8 +1043,11 @@ try {
       check(`${world}.page-errors`, `${world}: no page errors`, errors.length === 0, errors.slice(0, 6));
       await context.close();
     }
-    await browser.close();
+    } finally { await browser.close(); }
   }
+} catch (error) {
+  report.error = String(error.stack || error);
+  check('fatal', 'contrast sweep completed', false, report.error);
 } finally {
   await host.close?.();
 }
@@ -897,10 +1062,16 @@ for (const eng of Object.keys(report.engines)) for (const world of worlds) {
 }
 report.table = table;
 report.rows = rows;
+report.expectedCases = contrastExpectedCases(engines.length === 2 ? 'all' : engines[0]);
+report.observedCases = rows.map((row) => row.id);
+report.selectedPassed = rows.length > 0 && rows.every((row) => row.ok) && !report.error;
+report.fullAcceptance = !partial && report.selectedPassed && report.expectedCases.length === rows.length &&
+  new Set(report.observedCases).size === rows.length && report.expectedCases.every((id) => report.observedCases.includes(id));
+writeFileSync(join(evidence, 'contrast-sweep.json'), JSON.stringify(report, null, 1));
 writeFileSync(join(evidence, `sweep-${engines.join('-')}.json`), JSON.stringify(report, null, 1));
 console.log('\nworst pair per world');
 for (const t of table) console.log(`  ${t.engine.padEnd(8)} ${t.world.padEnd(9)} runs ${String(t.runs).padStart(5)}  unresolved ${t.unresolved}  ${t.worst}`);
 const failed = rows.filter((r) => !r.ok);
 console.log(`\n${rows.length - failed.length}/${rows.length} rows green${partial ? ' — PARTIAL RUN (SWEEP_WORLDS/SWEEP_STATES): never an acceptance' : ''}`);
 console.log(`artifact ${identity.artifactSha256} @ ${identity.gitSha}`);
-process.exitCode = failed.length ? 1 : partial ? 3 : 0;
+process.exitCode = failed.length || (!partial && !report.fullAcceptance) ? 1 : partial ? 3 : 0;

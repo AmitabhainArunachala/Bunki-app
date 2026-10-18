@@ -30,6 +30,9 @@
  */
 /* global document, window, indexedDB, navigator, location, fetch, IDBObjectStore, Blob, DOMException */
 import assert from 'node:assert/strict';
+import { createHash, randomUUID } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { reportCopyObservation, expectedReportChecks, exactNamedCompletion, REPORT_COPY_CONTROLS } from './vh-learning-contracts.mjs';
 import { Buffer } from 'node:buffer';
 import console from 'node:console';
 import process from 'node:process';
@@ -45,6 +48,11 @@ const ISSUE = 'https://github.com/AmitabhainArunachala/Bunki-app/issues/new';
 const out = resolveCorridorEvidence();
 mkdirSync(out, { recursive: true });
 const host = await startCorridorDev(0);
+const identity = JSON.parse(readFileSync(join(host.site, 'build-identity.json'), 'utf8'));
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+const startedAt = new Date().toISOString();
+const verifierGitSha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+const verifierSha256 = createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex');
 const version = JSON.parse(readFileSync(new URL('../../../release.json', import.meta.url))).version;
 const RELAY_KEY = 'relay-test-key-0123456789';
 const setupLink = () => `${host.origin}/index.html?report-relay=${relay.origin}&report-key=${RELAY_KEY}`;
@@ -58,7 +66,11 @@ const waitFor = async (predicate, timeout = 20_000) => {
   }
   return true;
 };
-const engines = process.env.KAIRO_BROWSER === 'chromium' ? { chromium } : { chromium, webkit };
+assert(!process.env.KAIRO_BROWSER || ['chromium','webkit','all'].includes(process.env.KAIRO_BROWSER), 'unknown browser');
+assert(process.argv.length === 2, 'report-delivery takes no narrowing arguments');
+const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? { [process.env.KAIRO_BROWSER]: ({chromium,webkit})[process.env.KAIRO_BROWSER] } : { chromium, webkit };
+const versions = {}, controls = [], scenarios = [];
+const COPY_CONTROLS = REPORT_COPY_CONTROLS;
 const checks = [];
 // In GitHub Actions a failed check is also an annotation, so the failure is
 // readable from the check run without downloading the job log.
@@ -76,7 +88,9 @@ const check = (name, pass, detail = '') => {
 const scenario = async (name, body) => {
   try {
     await body();
+    scenarios.push({name, completed: true});
   } catch (error) {
+    scenarios.push({name, completed: false});
     check(`${name} ran to completion`, false, String(error?.message || error).split('\n').slice(0, 3).join(' '));
   }
 };
@@ -90,8 +104,8 @@ async function acceptSetupLink(page) {
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
 }
 
-async function openSheet(page, beforeProbe) {
-  await page.goto(`${host.origin}/index.html?entry=shelf`, { waitUntil: 'load' });
+async function openSheet(page, beforeProbe, locale = 'en') {
+  await page.goto(`${host.origin}/index.html?entry=shelf&ui=${locale === 'ja' ? 'ja' : 'bi'}`, { waitUntil: 'load' });
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
   await page.locator('#bunki-report-bug').click();
   await page.locator('#br-actual').waitFor();
@@ -119,15 +133,53 @@ const issueOf = (address) => {
   return { base: `${url.origin}${url.pathname}`, title: url.searchParams.get('title') || '', body: url.searchParams.get('body') || '', labels: url.searchParams.get('labels'), length: address.length };
 };
 
+
+async function observeCopy(page, options = {}) {
+  const button = page.locator('#br-form .br-primary');
+  const label = options.pending || options.relay ? 'Send report' : options.locale === 'ja' ? '送る' : 'Send';
+  const state = await button.evaluate(node => ({visible:node.innerText.trim(),delivery:node.dataset.delivery,disabled:node.disabled}));
+  state.visibleShown = await button.isVisible();
+  state.accessible = await page.getByRole('button',{name:label,exact:true}).evaluateAll((nodes,node)=>nodes.includes(node),await button.elementHandle()) ? label : '[accessible name mismatch]';
+  return { observed:state, assertions:reportCopyObservation(state,options) };
+}
+async function disclosure(page, locale = 'en', relayMode = false) {
+  const details=page.locator('#br-form .br-details');
+  if (await details.getAttribute('open') === null) await details.locator('summary').click();
+  const expected=locale==='ja' ? (relayMode ? '送った報告は、画像と一緒に GitHub の公開ページに載る。個人的なことは書かない。写しはこの端末に残る。' : '報告は、アプリを直す人が読む GitHub の公開ページに、あなたの言葉とこの画面の欄を入れて開く。そこで「Submit new issue」を押すと送られる。公開されるので、個人的なことは書かない。写しはこの端末に残る。')
+    : relayMode ? 'Send report files it as a public GitHub issue, with its screenshots, so leave out anything private. A copy stays on this device.' : 'This opens GitHub with your words and this screen filled in. Tap “Submit new issue” there to send it. Issues in this repository are public, so leave out anything private. A copy stays on this device.';
+  const node=details.getByText(expected,{exact:true});
+  return {expected, pass:await node.count()===1 && await node.isVisible(), text:await details.innerText()};
+}
+async function copyControl(page, {name,engine,locale,options={},mutate,observe=()=>observeCopy(page,options),kills}) {
+  const before=await observe();
+  const button=page.locator('#br-form .br-primary'), details=page.locator('#br-form .br-details');
+  const snapshot=await page.evaluate(()=>({button:document.querySelector('#br-form .br-primary').outerHTML,details:document.querySelector('#br-form .br-details').outerHTML}));
+  let mutant,restored,error=null;
+  try {await mutate(button,details); mutant=await observe();}
+  catch(e) {error=String(e.stack || e);}
+  finally {
+    await page.evaluate(saved=>{document.querySelector('#br-form .br-primary').outerHTML=saved.button;document.querySelector('#br-form .br-details').outerHTML=saved.details;},snapshot);
+    restored=await observe();
+  }
+  const clean=row=>row && Object.values(row.assertions).every(value=>value===true);
+  const reds=mutant ? Object.keys(mutant.assertions).filter(key=>!mutant.assertions[key]) : [];
+  const killed=!error && clean(before) && clean(restored) && reds.length===kills.length && kills.every(key=>reds.includes(key));
+  const proof={name,engine,locale,kind:'isolated DOM observation control',before,mutant,restored,error,kills,verdict:killed?'killed':'incomplete'};
+  controls.push(proof); check(`${engine}/${locale}/C.${name}`,killed,JSON.stringify(proof));
+}
+
 try {
   for (const [engine, browserType] of Object.entries(engines)) {
     console.log(`\n— ${engine}`);
     const browser = await browserType.launch({ ...(engine === 'chromium' && process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}) });
+    versions[engine] = browser.version();
     try {
-      const fresh = async ({ blockWindows = false, probeDelayMs = 0 } = {}) => {
+      const fresh = async ({ blockWindows = false, holdProbe = false } = {}) => {
+        let releaseProbe = () => {};
+        const probe = new Promise(done => { releaseProbe = done; });
         const context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
-        if (probeDelayMs) await context.route(`${host.origin}/api/config`, async (route) => {
-          await new Promise((resolve) => setTimeout(resolve, probeDelayMs));
+        if (holdProbe) await context.route(`${host.origin}/api/config`, async (route) => {
+          await probe;
           await route.fulfill({ status: 404, contentType: 'application/json', body: '{}' });
         });
         await context.route('https://github.com/**', (route) => route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>stub</title><p>GitHub stub</p>' }));
@@ -140,15 +192,39 @@ try {
         page.on('console', (message) => {
           if (message.type() === 'error' && !/(\/api\/config|favicon\.ico)$/.test(message.location()?.url || '')) errors.push(message.text());
         });
-        return { context, page, errors };
+        return { context, page, errors, releaseProbe };
       };
+
+      // Q's approved Send/送る copy, real held probe, and public disclosure under Details.
+      for (const locale of ['en','ja']) await scenario(`${engine} · copy ${locale}`,async()=>{
+        const {context,page,errors,releaseProbe}=await fresh({holdProbe:true});
+        try {
+          await openSheet(page,async()=>{
+            const state=await observeCopy(page,{locale,pending:true});
+            check(`${engine}/${locale}/pending-copy`,Object.values(state.assertions).every(Boolean),JSON.stringify(state));
+            await copyControl(page,{name:'fallback-advertised-before-probe',engine,locale,options:{locale,pending:true},kills:['delivery'],mutate:button=>button.evaluate(node=>{node.dataset.delivery='github';})});
+            releaseProbe();
+          },locale);
+          const state=await observeCopy(page,{locale});
+          check(`${engine}/${locale}/fallback-copy`,Object.values(state.assertions).every(Boolean),JSON.stringify(state));
+          for(const [name,value] of [['fallback-copy-empty',''],['fallback-copy-wrong','Wrong send label']])
+            await copyControl(page,{name,engine,locale,options:{locale},kills:['label'],mutate:button=>button.evaluate((node,text)=>{node.textContent=text;},value)});
+          await copyControl(page,{name:'fallback-accessible-name-wrong',engine,locale,options:{locale},kills:['label'],mutate:button=>button.evaluate(node=>node.setAttribute('aria-label','Wrong accessible label'))});
+          const note=await disclosure(page,locale);
+          check(`${engine}/${locale}/public-disclosure`,note.pass,note.text);
+          await copyControl(page,{name:'public-disclosure-removed',engine,locale,kills:['disclosure'],
+            observe:async()=>{const note=await disclosure(page,locale);return {observed:note,assertions:{disclosure:note.pass}};},
+            mutate:async(_button,details)=>{await details.getByText(note.expected,{exact:true}).evaluate(node=>node.remove());}});
+          check(`${engine}/${locale}/copy-page-errors`,errors.length===0,errors.join(' | '));
+        } finally {releaseProbe();await context.close();}
+      });
 
       // 1–2 · one tap opens the prefilled issue and saves the same report
       await scenario(`${engine} · prefilled issue`, async () => {
         const { context, page, errors } = await fresh();
         await openSheet(page);
-        const note = await page.locator('#br-form > .br-note').last().textContent();
-        check(`${engine} · the sheet says GitHub issues are public before anything is sent`, /public/.test(note), note);
+        const note = await disclosure(page);
+        check(`${engine} · the sheet says GitHub issues are public before anything is sent`, note.pass, note.text);
         const words = 'The reader popup covers the word 天気 after I tap it.\nSecond line with detail.';
         await page.locator('#br-actual').fill(words);
         await page.locator('#br-expected').fill('The popup should sit below the word.');
@@ -209,9 +285,9 @@ try {
       await scenario(`${engine} · blocked window`, async () => {
         // The service probe answers late here: until it confirms there is no service,
         // the sheet must not offer GitHub (a real service may still answer).
-        const { context, page, errors } = await fresh({ blockWindows: true, probeDelayMs: 2500 });
+        const { context, page, errors, releaseProbe } = await fresh({ blockWindows: true, holdProbe: true });
         let pendingLabel = '';
-        await openSheet(page, async () => { pendingLabel = await page.locator('#br-form .br-primary').getAttribute('data-delivery'); });
+        await openSheet(page, async () => { pendingLabel = await page.locator('#br-form .br-primary').getAttribute('data-delivery'); releaseProbe(); });
         check(`${engine} · GitHub is offered only after the probe confirms there is no service`,
           !!pendingLabel && pendingLabel !== 'github', `while pending: ${pendingLabel}`);
         await page.locator('#br-actual').fill('Saved while the window was blocked.');
@@ -264,7 +340,7 @@ try {
         await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
         const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('kairo-report-relay-v1') || 'null')?.url);
         check(`${engine} · pasting the setup link in Settings sets up this device`,
-          /Not set up/.test(before) && stored === `${relay.origin}/k/${RELAY_KEY}`, `${before} → ${stored}`);
+          before === 'On this device, sending a report opens a page where you finish sending it.' && stored === `${relay.origin}/k/${RELAY_KEY}`, `${before} → ${stored}`);
         let failed = null;
         for (const deadline = Date.now() + 20_000; !failed && Date.now() < deadline; await page.waitForTimeout(250))
           failed = (await savedRows(page)).find((row) => row.delivery_error) || null;
@@ -288,9 +364,11 @@ try {
         await page.locator('#br-actual').waitFor();
         const ready = await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.textContent === 'Send report', null, { timeout: 15_000 }).then(() => true, () => false);
         check(`${engine} · with the relay set up, the sheet sends reports itself`, ready, await page.locator('#br-form .br-primary').textContent());
-        const sendNote = await page.locator('#br-form > p.br-note').last().textContent();
+        const sendNote = await disclosure(page, 'en', true);
+        const relayCopy = await observeCopy(page, {relay:true});
+        check(`${engine}/relay-copy`, Object.values(relayCopy.assertions).every(Boolean), JSON.stringify(relayCopy));
         check(`${engine} · before sending, the sheet says the report and its screenshots become a public GitHub issue`,
-          /public GitHub issue, with its screenshots/.test(sendNote), sendNote);
+          sendNote.pass, sendNote.text);
         await page.locator('#br-actual').fill('The tutor reply is cut off.');
         await page.locator('#br-files').setInputFiles({ name: 'screen.png', mimeType: 'image/png', buffer: PIXEL_PNG });
         await page.locator('.br-attachments figure').waitFor();
@@ -403,13 +481,18 @@ try {
       await browser.close();
     }
   }
+} catch (error) {
+  check('terminal error', false, String(error.stack || error));
 } finally {
-  await host.close?.();
-  await relay.close();
-  await github.close();
+  for (const resource of [host,relay,github]) await resource.close?.().catch(error=>check('cleanup error',false,String(error)));
+  const expectedControls=Object.keys(engines).flatMap(engine=>['en','ja'].flatMap(locale=>COPY_CONTROLS.map(name=>`${engine}/${locale}/${name}`)));
+  const observedControls=controls.map(row=>`${row.engine}/${row.locale}/${row.name}`);
+  const expectedChecks=expectedReportChecks(Object.keys(engines));
+  const expectedScenarios=Object.keys(engines).flatMap(engine=>['copy en','copy ja','prefilled issue','long report','blocked window','relay','no Blob storage','setup link'].map(name=>`${engine} · ${name}`));
+  const fullAcceptance=exactNamedCompletion(checks,expectedChecks) && exactNamedCompletion(scenarios,expectedScenarios,'name','completed') && observedControls.length===expectedControls.length && new Set(observedControls).size===expectedControls.length
+    && expectedControls.every(id=>observedControls.includes(id)) && controls.every(row=>row.verdict==='killed');
+  writeFileSync(join(out, 'verification-report.json'), `${JSON.stringify({schema:'vh-report-delivery/1',suite:'report-delivery',version,runId,startedAt,finishedAt:new Date().toISOString(),
+    gitSha:identity.gitSha,artifactSha256:identity.artifactSha256,verifierGitSha,verifierSha256,engines:Object.keys(engines),browsers:versions,scope:'full-engine',checks,expectedChecks,scenarios,expectedScenarios,controls,expectedControls,observedControls,fullAcceptance},null,2)}\n`);
+  console.log(`\n${checks.filter(row=>row.pass).length}/${checks.length} checks passed`);
+  if (!fullAcceptance) process.exitCode=1;
 }
-
-const failed = checks.filter((item) => !item.pass);
-writeFileSync(join(out, 'verification-report.json'), `${JSON.stringify({ suite: 'report-delivery', version, checks }, null, 2)}\n`);
-console.log(`\n${checks.length - failed.length}/${checks.length} checks passed`);
-if (failed.length) process.exitCode = 1;

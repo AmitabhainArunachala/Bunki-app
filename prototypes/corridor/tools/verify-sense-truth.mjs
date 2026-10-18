@@ -27,8 +27,10 @@
  * Negative controls: the sense rules off → G and C1–C3 go red; one sidecar row moved to another sense → F0 goes red
  * (the row and its receipts' agreement), and F0 stops the run; the slip's placeholder off (a slip drawn before its sense
  * paints the word's first meaning) → W's held and never-taken-back rows go red.
- * SENSE_TRUTH_ONLY=<f0,g,p,c,…> runs only those cases (a control's scope; marked partial, never an acceptance). */
+ * SENSE_TRUTH_ONLY=<f0,g,w,c> runs only those cases (a control's scope; marked partial, never an acceptance). */
 import assert from 'node:assert/strict';
+import { createHash, randomUUID } from 'node:crypto';
+import { selection, SENSE_GROUPS, exactRoster, readingInteraction, senseAttempts } from './vh-voice-contracts.mjs';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
@@ -38,6 +40,9 @@ import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/r
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 
+const ONLY = selection(process.env.SENSE_TRUTH_ONLY, SENSE_GROUPS, 'SENSE_TRUTH_ONLY');
+const run = (name) => ONLY === null || ONLY.includes(name);
+
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Pin an immutable built site and its digest');
 const site = resolveCorridorSite(), evidence = resolveCorridorEvidence();
 const identity = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), 'utf8'));
@@ -45,8 +50,29 @@ const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
 assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
-const ONLY = (process.env.SENSE_TRUTH_ONLY || '').split(',').filter(Boolean);
-const run = (name) => !ONLY.length || ONLY.includes(name);
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+const vhControl = process.env.SENSE_VH_CONTROL || '';
+const VH = {
+  'discard-completed-red-on-retry': { at: 'adapt-n3:govonline:article-202609-radio-3741', index: 36 },
+  'pronunciation-ta-promoted-to-door': { at: 'bunki-read-n3-gojuon-sanskrit', index: 233, promote: true },
+  'pronunciation-n-promoted-to-door': { at: 'bunki-read-n3-gojuon-sanskrit', index: 234, promote: true },
+  'quoted-reading-demoted-to-annotation': { at: 'bunki-graded-n3-hashira-counter', index: 242, promote: false },
+};
+assert(!vhControl || VH[vhControl], 'unknown SENSE_VH_CONTROL');
+const vhMutations = [];
+async function installVhControl(context) {
+  if (!vhControl || !Object.hasOwn(VH[vhControl], 'promote')) return;
+  await context.route('**/corridor.js', async (route) => {
+    const original = await (await route.fetch()).text();
+    const anchor = 'const readingAnnotations = phoneticAnnotationIndices(p.tokens);';
+    assert.equal(original.split(anchor).length, 2, 'annotation control anchor occurs exactly once');
+    const fault = VH[vhControl];
+    const replacement = `${anchor} if (p.id === ${JSON.stringify(fault.at)}) readingAnnotations.${fault.promote ? 'delete' : 'add'}(${fault.index});`;
+    const changed = original.replace(anchor, replacement);
+    vhMutations.push({ control: vhControl, matches: 1, before: createHash('sha256').update(original).digest('hex'), after: createHash('sha256').update(changed).digest('hex') });
+    await route.fulfill({ status: 200, body: changed, contentType: 'text/javascript; charset=utf-8' });
+  });
+}
 const versions = {};
 const json = (path) => JSON.parse(readFileSync(resolve(site, path), 'utf8'));
 const delay = (ms) => new Promise((done) => setTimeout(done, ms));
@@ -273,12 +299,12 @@ const NAME = NAMES[0];
 // readings, not words: the kana a text spells a word's reading in (悉曇（しったん）), and the readings it talks about
 // (「いちちゅう」「さんちゅう」とは読まない: the sidecar's reading rows)
 const READINGS = Object.freeze([
-  fx('悉曇（しったん）: しっ', 'bunki-read-n3-gojuon-sanskrit', 232, 'しっ', null, null, 'to know'),
-  fx('悉曇（しったん）: た', 'bunki-read-n3-gojuon-sanskrit', 233, 'た', null, null, 'did'),
-  fx('悉曇（しったん）: ん', 'bunki-read-n3-gojuon-sanskrit', 234, 'ん', null, null, 'yes'),
-  fx('「いちちゅう」: ちゅう', 'bunki-graded-n3-hashira-counter', 242, 'ちゅう', null, null, 'kiss', { row: true }),
-  fx('「さんちゅう」: さん', 'bunki-graded-n3-hashira-counter', 245, 'さん', null, null, 'Mr', { row: true }),
-  fx('「さんちゅう」: ちゅう', 'bunki-graded-n3-hashira-counter', 246, 'ちゅう', null, null, 'kiss', { row: true }),
+  fx('悉曇（しったん）: しっ', 'bunki-read-n3-gojuon-sanskrit', 232, 'しっ', null, null, 'to know', { expectedInteraction: 'inert-annotation' }),
+  fx('悉曇（しったん）: た', 'bunki-read-n3-gojuon-sanskrit', 233, 'た', null, null, 'did', { expectedInteraction: 'inert-annotation' }),
+  fx('悉曇（しったん）: ん', 'bunki-read-n3-gojuon-sanskrit', 234, 'ん', null, null, 'yes', { expectedInteraction: 'inert-annotation' }),
+  fx('「いちちゅう」: ちゅう', 'bunki-graded-n3-hashira-counter', 242, 'ちゅう', null, null, 'kiss', { row: true, expectedInteraction: 'reading-card' }),
+  fx('「さんちゅう」: さん', 'bunki-graded-n3-hashira-counter', 245, 'さん', null, null, 'Mr', { row: true, expectedInteraction: 'reading-card' }),
+  fx('「さんちゅう」: ちゅう', 'bunki-graded-n3-hashira-counter', 246, 'ちゅう', null, null, 'kiss', { row: true, expectedInteraction: 'reading-card' }),
 ]);
 // the glosses the card shows for a sense: a glossed row's lead first, then the rest but the misleading first (as the app)
 const led = (glosses, lead) => (Number.isInteger(lead) && lead > 0 && lead < glosses.length
@@ -447,69 +473,84 @@ async function pageSense(page) {
     text: node.querySelector('.gloss, .dictionary-glosses li')?.textContent ?? '' })).filter((sense) => sense.marked));
 }
 
+const GROK = Object.freeze([...RULES, ...RECHECK, ...CONTROLS, ...MORE, ...SIDECAR, ...IMPRECISE].map((f) => ({ ...f, kind: 'sense' }))
+  .concat(GLOSSED.map((f) => ({ ...f, kind: 'gloss' })), NAMES.map((f) => ({ ...f, kind: 'name' })),
+    READINGS.map((f) => ({ ...f, kind: 'reading' }))));
+const retried = [];
+const attempts = [];
+const vhSelected = selection(process.env.SENSE_VH_CASES, GROK.map((f) => `${f.at}#${f.index}`), 'SENSE_VH_CASES');
+assert(!vhSelected || (ONLY?.length === 1 && ONLY[0] === 'g'), 'SENSE_VH_CASES requires explicit g diagnostic scope');
+assert(!vhControl || (vhSelected?.length === 1 && vhSelected[0] === `${VH[vhControl].at}#${VH[vhControl].index}`), 'control requires its exact fixture');
+const scheduledGrok = GROK.filter((f) => !vhSelected || vhSelected.includes(`${f.at}#${f.index}`));
 async function grokCases(_, fresh) {
-  const fixtures = [...RULES, ...RECHECK, ...CONTROLS, ...MORE, ...SIDECAR, ...IMPRECISE].map((f) => ({ ...f, kind: 'sense' }))
-    .concat(GLOSSED.map((f) => ({ ...f, kind: 'gloss' })), NAMES.map((f) => ({ ...f, kind: 'name' })),
-      READINGS.map((f) => ({ ...f, kind: 'reading' })));
-  for (const fixture of fixtures) {
-    // each row in its own context; a row that cannot be run (a timeout: the page stalled) runs once more in a fresh
-    // one, and fails alone, with its screenshot, if it still cannot; its checks are recorded once, from the run that ran
-    for (let attempt = 1; ; attempt += 1) {
-      const { page, close } = await fresh();
-      try {
-        const rows = await grokCase(page, fixture);
-        for (const row of rows) check(row[0], row[1], row[2], attempt > 1 ? { attempt, detail: row[3] } : row[3]);
-        break;
-      } catch (error) {
-        if (attempt < 2) { retried.push(`${engine}:${fixture.name}: ${String(error.message || error).split('\n')[0].slice(0, 120)}`); continue; }
-        check(`G.${fixture.name}`, `${fixture.at} #${fixture.index} ${fixture.s}: the row ran`, false, String(error.message || error).slice(0, 400));
-        await page.screenshot({ path: resolve(evidence, `${engine}-G-${fixture.at.replace(/[^a-z0-9]+/giu, '_')}-${fixture.index}.png`) }).catch(() => {});
-        break;
-      } finally { await close(); }
-    }
+  for (const fixture of scheduledGrok) {
+    let current = null;
+    const history = [];
+    await senseAttempts({ history,
+      emit: (row) => check(row.id === 'incomplete' ? `G.${fixture.name}.incomplete` : row.id, row.title, row.ok,
+        { attempt: row.attempt, detail: row.observed }),
+      run: async (emit) => {
+        try { current = await fresh(); await grokCase(current.page, fixture, emit); }
+        finally { if (current) { await current.close(); current = null; } }
+      },
+    });
+    attempts.push({ engine, fixture: fixture.name, history });
+    for (const attempt of history.filter((row) => row.retry)) retried.push({ engine, fixture: fixture.name, ...attempt });
   }
 }
-const retried = [];
-/** One row of Grok's tables, tapped: the checks it earns, as [name, description, ok, detail] (recorded by grokCases). */
-async function grokCase(page, fixture) {
-  const rows = [];
-  {
-    if (!(await openArticle(page, fixture.at))) return [[`G.${fixture.name}`, `${fixture.at} opens from the shelf`, false]];
-    // G3 · a phonetic parenthetical (悉曇（しったん）) is no door at all: its kana is the word before it read aloud, so the
-    // reader draws it inert (tok annotation, data-reader-annotation). A tap there opens no card and raises nothing, so no
-    // meaning, and never the wrong one, can show
-    if (fixture.kind === 'reading' && await page.locator(`#reader .tok[data-index="${fixture.index}"]`).first().evaluate((n) => n.dataset.readerAnnotation === 'true').catch(() => false)) {
+/** The sink commits a semantic observation BEFORE the next navigation. The fixture, never the DOM, selects the law. */
+async function grokCase(page, fixture, emit) {
+  const publish = (id, title, ok, observed = null) => emit({ id, title, ok: !!ok, observed });
+  let opened;
+  try { opened = await openArticle(page, fixture.at); }
+  catch (error) { if (error.name === 'TimeoutError') error.senseStage = 'setup'; throw error; }
+  if (!opened) { publish(`G.${fixture.name}`, `${fixture.at} opens from the shelf`, false); return; }
+  if (fixture.kind === 'reading') {
+    const target = page.locator(`#reader .tok[data-index="${fixture.index}"]`).first();
+    const observed = await target.evaluate((n) => ({ annotation: n.dataset.readerAnnotation === 'true',
+      interactive: n.hasAttribute('tabindex') || n.hasAttribute('role') || n.hasAttribute('data-japanese-lookup') }));
+    if (fixture.expectedInteraction === 'inert-annotation') {
       await closeMini(page);
-      const target = page.locator(`#reader .tok[data-index="${fixture.index}"]`).first();
       await target.tap({ timeout: 30000 });
       await delay(600);
-      const after = await page.evaluate((i) => ({ mini: !!document.getElementById('mini'), sheet: !!document.getElementById('sheet'),
-        rung: document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung || null, text: document.body.innerText }), fixture.index);
-      return [[`G.${fixture.name}`, `${fixture.at} #${fixture.index} ${fixture.s}: a phonetic parenthetical is no door (G3): a tap opens no card, raises nothing, never "${fixture.never}"`,
-        !after.mini && !after.sheet && !after.rung, { mini: after.mini, sheet: after.sheet, rung: after.rung }]];
+      Object.assign(observed, await page.evaluate((i) => ({ mini: !!document.getElementById('mini'), sheet: !!document.getElementById('sheet'),
+        rung: document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung || null }), fixture.index));
+      publish(`G.${fixture.name}`, `${fixture.at} #${fixture.index}: independently bracketed reading is inert`,
+        readingInteraction(fixture.expectedInteraction, observed), observed);
+      return;
     }
-    const got = await card(page, fixture.index);
-    if (fixture.kind === 'name') {
-      return [[`G.${fixture.name}`, `${fixture.at} #${fixture.index} ${fixture.s}: the card says it is a name in this text, never "${fixture.never}"`,
-        got?.word === fixture.s && got.lines[0] === 'a name in this text' && !got.lines.includes(fixture.never), got]];
-    }
-    if (fixture.kind === 'reading') {
-      return [[`G.${fixture.name}`, `${fixture.at} #${fixture.index} ${fixture.s}: the card is ${fixture.s} itself and says it is a reading in this text, never "${fixture.never}"`,
-        got?.word === fixture.s && got.lines[0] === 'a reading in this text' && !got.more && !got.lines.includes(fixture.never) && !got.sense, got]];
-    }
-    const lead = fixture.kind === 'gloss' ? sidecarRow(fixture.at, fixture.index)?.[3] : undefined;
-    const glosses = led(glossesOf(fixture.seq, fixture.k), lead);
-    const lines = [...(got?.lines || []), ...(got?.more ? got.more.split('; ') : [])];
-    rows.push([`G.${fixture.name}`, `${fixture.at} #${fixture.index} ${fixture.s}: the card is entry ${fixture.seq} sense ${fixture.k + 1}, "${glosses[0]}"${glosses.length > 1 ? ' then its next glosses' : ''}${fixture.kind === 'gloss' ? ` (led by the sidecar's gloss ${lead})` : ''}; never "${fixture.never}"`,
-      got?.lines?.[0] === glosses[0] && got.sense === `${fixture.seq}:${fixture.k}` && (!fixture.label || got.word === fixture.label)
-        && (glosses.length < 2 || got.more.startsWith(glosses[1])) && (fixture.kind !== 'gloss' || fixture.leads.includes(lead))
-        && !lines.includes(fixture.never), got]);
-    if (PAGE.has(fixture.name)) {
-      const marked = await pageSense(page);
-      rows.push([`P.${fixture.name}`, `its word page marks sense ${fixture.k + 1} as the meaning in this text`, marked.length === 1 && marked[0].k === fixture.k, marked]);
-    }
+    const classified = readingInteraction(fixture.expectedInteraction, observed);
+    publish(`G.${fixture.name}.classification`, 'the independently quoted reading is an interactive reading card, not an annotation', classified, observed);
+    if (!classified) { publish(`G.${fixture.name}`, 'a misclassified reading cannot satisfy its card contract', false, observed); return; }
   }
-  return rows;
+  let got = await card(page, fixture.index);
+  if (vhControl === 'discard-completed-red-on-retry') {
+    await page.locator('#mini .mini-gloss').first().evaluate((node) => { node.textContent = 'VH wrong sense sentinel'; });
+    got = await cardState(page);
+    vhMutations.push({ control: vhControl, fixture: `${fixture.at}#${fixture.index}`, observed: got.lines, phase: 'real card DOM before semantic observation' });
+  }
+  if (fixture.kind === 'name') {
+    publish(`G.${fixture.name}`, `${fixture.at} #${fixture.index}: a name, never "${fixture.never}"`,
+      got?.word === fixture.s && got.lines[0] === 'a name in this text' && !got.lines.includes(fixture.never), got);
+    return;
+  }
+  if (fixture.kind === 'reading') {
+    publish(`G.${fixture.name}`, `${fixture.at} #${fixture.index}: exactly the reading in this text`,
+      got?.word === fixture.s && got.lines[0] === 'a reading in this text' && !got.more && !got.lines.includes(fixture.never) && !got.sense, got);
+    return;
+  }
+  const lead = fixture.kind === 'gloss' ? sidecarRow(fixture.at, fixture.index)?.[3] : undefined;
+  const glosses = led(glossesOf(fixture.seq, fixture.k), lead);
+  const lines = [...(got?.lines || []), ...(got?.more ? got.more.split('; ') : [])];
+  publish(`G.${fixture.name}`, `${fixture.at} #${fixture.index}: entry ${fixture.seq} sense ${fixture.k + 1}, never "${fixture.never}"`,
+    got?.lines?.[0] === glosses[0] && got.sense === `${fixture.seq}:${fixture.k}` && (!fixture.label || got.word === fixture.label)
+      && (glosses.length < 2 || got.more.startsWith(glosses[1])) && (fixture.kind !== 'gloss' || fixture.leads.includes(lead))
+      && !lines.includes(fixture.never), got);
+  if (PAGE.has(fixture.name)) {
+    if (vhControl === 'discard-completed-red-on-retry') { const error = new Error('controlled post-G navigation timeout'); error.name = 'TimeoutError'; error.senseStage = 'navigation'; throw error; }
+    const marked = await pageSense(page);
+    publish(`P.${fixture.name}`, `its word page marks sense ${fixture.k + 1} as the meaning in this text`, marked.length === 1 && marked[0].k === fixture.k, marked);
+  }
 }
 
 /* ------------------------------------------------------------------ W · the wrong-meaning flash (Grok 2029) */
@@ -698,6 +739,7 @@ async function classSweep(fresh, cases) {
         ok = ok && (row[0] === 'name' ? got.lines[0] === 'a name in this text' : row[0] === 'reading' ? got.lines[0] === 'a reading in this text' : got.sense === `${row[0]}:${row[1]}`
           && (row.length < 4 || got.lines[0] === glossesOf(row[0], row[1])[row[3]]));
       }
+      check(`C.case.${item.cls}.${item.at}.${item.index}`, 'the scheduled class occurrence completed and met its sense law', ok, { got, token: item.token });
       if (!ok) { cls.failed += 1; report.failures.push({ cls: item.cls, at: item.at, index: item.index, s: item.token?.s, got }); }
     }
     } finally { await close(); }
@@ -705,10 +747,22 @@ async function classSweep(fresh, cases) {
   return report;
 }
 
+const scheduledClasses = run('c') ? classCases() : [];
+const expectedCases = [
+  ...(run('f0') ? [...[...RULES, ...RECHECK, ...CONTROLS, ...MORE, ...IMPRECISE].map((f) => `data/F0.${f.name}`),
+    ...SIDECAR.map((f) => `data/F0.sidecar.${f.name}`), ...GLOSSED.map((f) => `data/F0.gloss.${f.name}`),
+    ...NAMES.map((f) => `data/F0.name.${f.name}`), ...READINGS.map((f) => `data/F0.reading.${f.name}`), 'data/F0.sidecar'] : []),
+  ...engines.flatMap((e) => [
+    ...(run('g') ? [...scheduledGrok.flatMap((f) => [`G.${f.name}`, ...(f.expectedInteraction === 'reading-card' ? [`G.${f.name}.classification`] : []), ...(PAGE.has(f.name) ? [`P.${f.name}`] : [])]), 'g.page-errors'] : []),
+    ...(run('w') ? FLASH.flatMap((f) => [true, false].flatMap((hold) => [...(hold ? ['held'] : []), 'settled', 'never-taken-back', 'page-errors'].map((suffix) => `W.${hold ? 'held' : 'free'}.${f.name}.${suffix}`))) : []),
+    ...(run('c') ? [...scheduledClasses.map((c) => `C.case.${c.cls}.${c.at}.${c.index}`), 'C1', 'C2', 'C3', 'C4', 'c.page-errors'] : []),
+  ].map((id) => `${e}/${id}`)),
+];
+let fatalError = null;
 try {
   if (!F0_OK) throw new Error('F0: the served data moved; nothing below would mean what it says');
-  const cases = run('c') ? classCases() : [];
-  for (engine of engines) {
+  const cases = scheduledClasses;
+  for (engine of (['g', 'w', 'c'].some(run) ? engines : [])) {
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true });
     versions[engine] = browser.version();
     console.log(`engine ${engine} · ${browser.browserType().name()} ${versions[engine]}`);
@@ -729,6 +783,7 @@ try {
         await silenceBrowserAudio(own);
         await own.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
         await own.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
+        await installVhControl(own);
         const p = await own.newPage();
         p.setDefaultTimeout(15000);
         p.on('pageerror', (error) => errors.push(error.message));
@@ -764,13 +819,20 @@ try {
     }
     await browser.close();
   }
-} finally {
+} catch (error) { fatalError = String(error.stack || error); check('run.incomplete', 'the requested run completed', false, fatalError); } finally {
   await host.close();
   const failed = rows.filter((row) => !row.recorded && !row.ok);
   record('S.retried', 'rows and taps run once more after a timeout (never after a wrong answer)', { count: retried.length, retried: retried.slice(0, 40) });
-  writeFileSync(resolve(evidence, 'verify-sense-truth.json'), `${JSON.stringify({ site, served: identity.gitSha, artifactSha256: identity.artifactSha256,
-    engines, versions, partial: ONLY.length ? ONLY : false, failed: failed.length, rows }, null, 2)}\n`);
-  if (ONLY.length) console.log(`PARTIAL RUN (${ONLY.join(', ')}): a control's scope, not an acceptance result`);
-  console.log(`\n${rows.filter((row) => !row.recorded).length - failed.length} passed, ${failed.length} failed, ${rows.filter((row) => row.recorded).length} recorded · engines ${JSON.stringify(versions)} · evidence ${evidence}`);
-  process.exitCode = failed.length ? 1 : 0;
+  const observedCases = rows.filter((row) => !row.recorded).map((row) => `${row.engine}/${row.id}`);
+  const complete = exactRoster(expectedCases, observedCases);
+  const selectedPassed = complete && failed.length === 0 && !fatalError;
+  const fullAcceptance = selectedPassed && ONLY === null && !vhControl && !vhSelected && engines.every((e) => !!versions[e]);
+  writeFileSync(resolve(evidence, 'verify-sense-truth.json'), `${JSON.stringify({ schemaVersion: 1, runId, site, served: identity.gitSha, artifactSha256: identity.artifactSha256,
+    verifierSha256: createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex'),
+    engines, versions, requestedScope: ONLY || SENSE_GROUPS, partial: ONLY || false, fullAcceptance, selectedPassed, complete,
+    expectedCases, observedCases, attempts, nonce: process.env.SENSE_VH_NONCE || null, vhControl: vhControl || null, vhSelected, vhMutations, error: fatalError, failed: failed.length, rows }, null, 2)}\n`);
+  if (ONLY !== null) console.log(`PARTIAL RUN (${ONLY.join(', ')}): diagnostic, never acceptance`);
+  console.log(`\n${observedCases.length - failed.length} passed, ${failed.length} failed; complete=${complete}; fullAcceptance=${fullAcceptance} · ${evidence}`);
+  process.exitCode = !selectedPassed ? 1 : fullAcceptance ? 0 : 3;
+
 }

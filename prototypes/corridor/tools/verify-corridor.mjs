@@ -24,7 +24,7 @@ import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, extname, join, resolve } from 'node:path';
 import process from 'node:process';
@@ -678,6 +678,7 @@ async function main() {
 
   const hashFile = (file) => createHash('sha256').update(readFileSync(file)).digest('hex');
   const report = {
+    schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(), fullAcceptance: false,
     artifact: { path: CORRIDOR_DIR, sha256: JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'build-identity.json'), 'utf8')).artifactSha256 },
     sources: {
       verifier: hashFile(fileURLToPath(import.meta.url)),
@@ -4839,6 +4840,7 @@ async function main() {
   server.close();
 
   report.summary = { total: results.length, failed: failures };
+  report.fullAcceptance = failures === 0;
   report.results = results;
   mkdirSync(dirname(reportPath), { recursive: true });
   writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);

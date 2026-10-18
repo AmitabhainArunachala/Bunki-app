@@ -10,6 +10,7 @@
  */
 
 import assert from 'node:assert/strict';
+import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -1040,6 +1041,11 @@ async function main() {
   const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO, encoding: 'utf8' }).trim();
   const report = {
     schemaVersion: 1,
+    runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(),
+    verifierSha256: createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex'),
+    artifact: { path: CORRIDOR_DIR, sha256: JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'build-identity.json'), 'utf8')).artifactSha256 },
+    runtime: { engine: 'chromium', version: browser.version() },
+    fullAcceptance: failures === 0,
     verifier: 'verify-corridor-accessibility.mjs',
     head,
     chromium: process.env.CHROMIUM_PATH || 'playwright-default',

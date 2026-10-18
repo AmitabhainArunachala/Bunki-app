@@ -2,11 +2,18 @@
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {createHash,randomUUID} from 'node:crypto';
+import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {chromium,webkit} from 'playwright-core';
 import {fixture,enrichmentFixture} from './personal-fixture.mjs';
-import {resolveCorridorSite} from '../../../scripts/resolve-corridor-site.mjs';
+import {resolveCorridorEvidence,resolveCorridorSite} from '../../../scripts/resolve-corridor-site.mjs';
 const root=resolveCorridorSite();
+const evidence=resolveCorridorEvidence(),runId=process.env.KAIRO_GATE_RUN_ID||randomUUID();
+const identity=JSON.parse(readFileSync(path.join(root,'build-identity.json')));
+let receiptResult=null,receiptError=null,browser;
+const browserName=process.env.PERSONAL_HOST_BROWSER||'chromium';
 let releaseDictionary;
 let dictionaryPending=false;
 const dictionaryWait=new Promise(resolve=>{releaseDictionary=resolve;});
@@ -19,11 +26,11 @@ const server=createServer(async(req,res)=>{try{
  res.setHeader('Content-Type',({'.mjs':'text/javascript','.js':'text/javascript','.json':'application/json','.html':'text/html','.css':'text/css','.woff2':'font/woff2'})[path.extname(f)]||'application/octet-stream');
  res.end(data);
 }catch{res.writeHead(404);res.end('missing');}});
+try {
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const origin=`http://127.0.0.1:${server.address().port}`;
-const browserName=process.env.PERSONAL_HOST_BROWSER || 'chromium';
 assert(['chromium','webkit'].includes(browserName),'Unknown host browser');
-const browser=await (browserName==='webkit'?webkit:chromium).launch({headless:true,...(browserName==='chromium'&&process.env.PERSONAL_CHROMIUM?{executablePath:process.env.PERSONAL_CHROMIUM}:{})});
+browser=await (browserName==='webkit'?webkit:chromium).launch({headless:true,...(browserName==='chromium'&&process.env.PERSONAL_CHROMIUM?{executablePath:process.env.PERSONAL_CHROMIUM}:{})});
 // Read committed rows independently of the host's in-memory publication. The
 // legacy localStorage record is no longer the shared learner write target.
 async function sharedRecord(page) {
@@ -48,7 +55,6 @@ async function sharedRecord(page) {
   } finally {db.close();}
  }));
 }
-try {
  const page=await browser.newPage({viewport:{width:390,height:844}}), errors=[],reqs=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>reqs.push({url:r.url(),method:r.method()}));
  await page.goto(origin+'/?deck=personal');
@@ -130,5 +136,11 @@ try {
  assert.equal(finalProgress,before.progress,'word, grammar and list capture leave personal assessment history unchanged');
  assert.equal(reqs.filter(r=>/\/data\/articles\/index\.json$/u.test(new URL(r.url).pathname)).length,0,'the private deck loads no article index');
  assert(reqs.every(r=>r.method==='GET'));assert(reqs.every(r=>r.url.startsWith(origin)||r.url.startsWith('data:')));assert.deepEqual(errors,[]);
- console.log(JSON.stringify({status:'PASS',realCoreDictionary:true,sharedRememberAndNamedList:true,oneTapSave:true,optionalListPopover:true,addToListPointerToggle:true,dictionaryRefreshPreservesListDraft:true,explicitReviewEnrollment:true,recursiveKanjiBack:true,privateRootAndAssessmentPreserved:true,englishDeliberateReveal:true,frontLoadsNoDictionary:true,requestsAllSameOriginGet:true,deviceBackClosesHost:true,sharedGrammarCapture:true,errors},null,2));
-}finally{releaseDictionary();await browser.close();await new Promise(r=>server.close(r));}
+ receiptResult={status:'PASS',realCoreDictionary:true,sharedRememberAndNamedList:true,oneTapSave:true,optionalListPopover:true,addToListPointerToggle:true,dictionaryRefreshPreservesListDraft:true,explicitReviewEnrollment:true,recursiveKanjiBack:true,privateRootAndAssessmentPreserved:true,englishDeliberateReveal:true,frontLoadsNoDictionary:true,requestsAllSameOriginGet:true,deviceBackClosesHost:true,sharedGrammarCapture:true,errors};
+}catch(error){receiptError=String(error.stack||error);process.exitCode=1;}finally{
+ const receipt={...receiptResult,schemaVersion:2,runId,status:receiptError?'FAIL':receiptResult?.status||'FAIL',error:receiptError,completed:!!receiptResult&&!receiptError,
+  engine:browserName,browserVersion:browser?.version()||null,artifactSha256:identity.artifactSha256,gitSha:identity.gitSha,
+  verifierSha256:createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex')};
+ writeFileSync(path.join(evidence,'personal-host.json'),JSON.stringify(receipt,null,2)+'\n');console.log(JSON.stringify(receipt,null,2));
+ releaseDictionary();await browser?.close();if(server.listening)await new Promise(r=>server.close(r));
+}

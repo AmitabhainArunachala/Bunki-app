@@ -23,7 +23,10 @@
 
 import { openShelfDoor } from './shelf-tools-support.mjs';
 import { createServer } from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { createHash, randomUUID } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { assessmentReportContracts } from '../../../scripts/ci/vh-assessment-report-contracts.mjs';
 import { extname, resolve } from 'node:path';
 import process from 'node:process';
 
@@ -31,9 +34,16 @@ import { chromium } from 'playwright-core';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { verifyKagamiFreshness } from './verify-kagami-freshness.mjs';
 import { readAppRecord, readAppRecordSnapshot } from './record-test-support.mjs';
-import { resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 
 const CORRIDOR_DIR = resolveCorridorSite();
+const evidence = resolveCorridorEvidence();
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+const verifierSha256 = hash(readFileSync(fileURLToPath(import.meta.url)));
+const identity = JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'build-identity.json')));
+const browserVersions = {};
+let freshnessEvidence = null;
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -69,8 +79,8 @@ function startServer() {
 
 const results = [];
 let failures = 0;
-function check(name, pass, detail = '') {
-  results.push({ name, pass: !!pass });
+function check(name, pass, detail = '', engine = 'chromium') {
+  results.push({ engine, name, pass: !!pass, detail });
   if (!pass) failures += 1;
   console.log(`${pass ? '  ok  ' : ' FAIL '} ${name}${detail ? `  — ${detail}` : ''}`);
 }
@@ -302,10 +312,12 @@ async function silentContext(browser, options) {
 }
 
 async function main() {
+  if (process.argv.length !== 2 || (process.env.KAIRO_BROWSER !== undefined && !['chromium','all'].includes(process.env.KAIRO_BROWSER))) throw new Error('Kagami full walk is Chromium plus both-engine freshness; unknown or narrowed scope cannot accept');
   const { server, base } = await startServer();
   suiteServer = server;
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
   suiteBrowser = browser;
+  browserVersions.chromium = browser.version();
   const consoleErrors = [];
 
   console.log('— 鏡: the mirror over a measured ledger');
@@ -694,19 +706,36 @@ async function main() {
   await browser.close();
   try {
     const freshness = await verifyKagamiFreshness(base);
-    for (const engine of freshness.engines) check(`${engine}: same-count rest swap refreshes the warm mirror and preserves native records`, true);
+    freshnessEvidence = JSON.parse(readFileSync(resolve(freshness.out, 'receipt.json')));
+    for (const row of freshnessEvidence.results) browserVersions[row.engine] = row.browserVersion;
+    for (const engine of freshness.engines) check(`${engine}: same-count rest swap refreshes the warm mirror and preserves native records`, true, '', engine);
   } finally { server.close(); }
   console.log(`\n${results.length - failures}/${results.length} checks passed`);
   return failures === 0 ? 0 : 1;
 }
 
+function writeReceipt(error = null) {
+  const expectedCases = assessmentReportContracts.kagami.expectedCases();
+  const observedCases = results.map(row => `${row.engine}/${row.name}`);
+  const complete = expectedCases.length === observedCases.length && new Set(observedCases).size === observedCases.length && expectedCases.every(id => observedCases.includes(id));
+  const fullAcceptance = complete && failures === 0 && !error && freshnessEvidence?.pass === true;
+  writeFileSync(resolve(evidence, 'kagami-report.json'), JSON.stringify({ schemaVersion: 2, runId, requestedScope: process.argv.length === 2 && (process.env.KAIRO_BROWSER === undefined || ['chromium','all'].includes(process.env.KAIRO_BROWSER)) ? 'full' : { browser: process.env.KAIRO_BROWSER ?? null, args: process.argv.slice(2) },
+    artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, verifierSha256,
+    helperSha256: hash(readFileSync(new URL('./verify-kagami-freshness.mjs', import.meta.url))),
+    engines: Object.keys(browserVersions), browserVersions, expectedCases, observedCases, complete,
+    fullAcceptance, selectedPassed: fullAcceptance, results, failures, error, freshness: freshnessEvidence,
+    limits: ['Mirror walk uses Chromium; the actual UI rest-swap control uses Chromium and WebKit. No full WebKit mirror-walk claim.'],
+  }, null, 2) + '\n');
+  return fullAcceptance;
+}
 main().finally(async () => {
   try { await suiteBrowser?.close(); }
   finally { if (suiteServer) await new Promise((done) => suiteServer.close(done)); }
 }).then(
-  (code) => process.exit(code),
+  (code) => { const accepted = writeReceipt(); process.exit(code || (accepted ? 0 : 1)); },
   (err) => {
     console.error(err);
+    writeReceipt(String(err.stack || err));
     process.exit(2);
   },
 );

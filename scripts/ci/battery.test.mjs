@@ -1,3 +1,4 @@
+import { syntheticEvidence } from './test-evidence-fixture.mjs';
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
@@ -89,6 +90,7 @@ function refreshRetryPlans(f) {
 }
 function gate(name) {
   return {
+    ...syntheticEvidence(name, identity.sha, artifact.artifactSha256),
     name,
     status: 'passed',
     exitCode: 0,
@@ -155,10 +157,10 @@ test('measured deterministic partition covers every original and supplemental ga
   // 145 with the one-hand integration (FINDINGS M-2): F's type-ruby and continuity, R3's
   // sense-truth and the whole word grammar (G1–G6) with its controls, each of the last two
   // one gate per engine.
-  assert.equal(f.plan.batteryNames.length, 145);
+  assert.equal(f.plan.batteryNames.length, 166);
   // 157 since 1.2.0 added the places-layout gate (the layout under test), 161 with V's four,
   // 167 with the one-hand integration's six
-  assert.equal(f.plan.requiredNames.length, 167);
+  assert.equal(f.plan.requiredNames.length, 188);
   assert.equal(f.plan.shards.filter((s) => s.id.startsWith('balanced-')).length, 10);
   assert.deepEqual(createPlan({ identity }), f.plan);
   for (const s of f.plan.shards.filter((s) => s.kind === 'fast')) assert(s.predictedSeconds <= 480);
@@ -184,7 +186,7 @@ test('complete successful evidence promotes full proof and unified summary', () 
   const f = fixture();
   const result = aggregate(f);
   assert.equal(result.kind, 'bunki-full-battery');
-  assert.equal(result.gates.length, 167);
+  assert.equal(result.gates.length, 188);
   assert.match(summary(result), /Slowest ten/);
 });
 const mutations = {
@@ -306,25 +308,35 @@ test('missing directory, empty directory and malformed receipts fail closed', ()
 test('real canonical runGates rejects command failure, missing file, timeout, incomplete report and interruption', async () => {
   const out = fresh();
   const report = join(out, 'report.json');
-  writeFileSync(report, JSON.stringify({ total: 0, passed: 0, results: [] }));
   const gates = [
-    { name: 'command-failure', command: process.execPath, args: ['-e', 'process.exit(9)'] },
+    {
+      name: 'command-failure',
+      command: process.execPath,
+      fixtureReceipt: 'process-probe',
+      args: ['-e', 'process.exit(9)'],
+    },
     {
       name: 'missing-path',
       command: process.execPath,
+      fixtureReceipt: 'process-probe',
       args: ['-e', ''],
       requiredPath: 'does-not-exist',
     },
     {
       name: 'timeout',
       command: process.execPath,
+      fixtureReceipt: 'process-probe',
       args: ['-e', 'setInterval(()=>{},1000)'],
       timeoutMs: 40,
     },
     {
       name: 'incomplete-report',
       command: process.execPath,
-      args: ['-e', ''],
+      fixtureReceipt: 'process-probe',
+      args: [
+        '-e',
+        `require('node:fs').writeFileSync(${JSON.stringify(report)},JSON.stringify({total:0,passed:0,results:[]}))`,
+      ],
       report: { path: report, type: 'checks' },
     },
   ];
@@ -582,6 +594,7 @@ test('SIGINT and SIGTERM abort real runGates, retain interrupted terminal eviden
           {
             name: 'signal-cleanup',
             command: process.execPath,
+            fixtureReceipt: 'process-probe',
             args: ['-e', 'setInterval(()=>{},1000)'],
             timeoutMs: 5000,
           },
@@ -642,4 +655,11 @@ test('measured healthy canonical gate durations stay below half their selected t
       `${original.name} healthy duration approaches timeout`,
     );
   }
+});
+
+test('CI contracts provision pytest for actual framework admission regressions', () => {
+  const shard = createPlan({ identity }).shards.find((s) => s.gates.includes('ci-contracts'));
+  assert(shard, 'Required CI contracts shard');
+  assert.equal(shard.python, true);
+  assert.equal(shard.corpus, true);
 });

@@ -156,7 +156,8 @@
 import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import { designSelection, scopeResult } from './vh-visual-contracts.mjs';
 import { createRequire } from 'node:module';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -173,6 +174,8 @@ const manifest = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), '
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
 assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
 const browserVersions = {};
+const selectedDesign = designSelection(process.argv.slice(2));
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
 const g3Only = process.argv.includes('--g3-only');
 const spacingOnly = process.argv.includes('--spacing-only');
 const fixesOnly = process.argv.includes('--design-fixes-only');
@@ -423,9 +426,8 @@ try {
       return { ctx, page };
     };
     const run = async (name, viewport, body, init, options) => {
-      if (g3Only && !/^(P1-fresh-word-demo-|P1-history-only-no-demo$|G1-stage-meaning-|G4-keyboard-menu$|K1-keyboard-roving$)/u.test(name)) return;
-      if (spacingOnly && !/^R1-flush-tokens-(1368|390)$/u.test(name)) return;
-      if (fixesOnly && !/^(R1-flush-tokens-(1368|390)|W2-one-word-one-card-reverse|G6-sentence-below-seat-390|G8-reader-popup-motion-(390|320))$/u.test(name)) return;
+      assert(selectedDesign.cases.includes(name) || selectedDesign.diagnostic, `Undeclared design case ${name}`);
+      if (!selectedDesign.cases.includes(name)) return;
       const { ctx, page } = await context(viewport, init, options);
       const pageErrors = [], pageErrorDetails = [], networkEvents = [];
       const traceRequest = (event, request) => {
@@ -1660,7 +1662,10 @@ try {
   }
 } finally {
   await host.close();
+  const acceptance = scopeResult({ expected: engines.flatMap(engine => selectedDesign.cases.map(id => `${engine}/${id}`)),
+    observed: results.map(row => `${row.engine}/${row.name}`), passed: results.every(row => row.passed), diagnostic: selectedDesign.diagnostic });
   const receipt = {
+    schemaVersion: 2, runId, requestedScope: selectedDesign.scope, engines, ...acceptance,
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
     verifierSha256,
     control: withControl ? (spacingOnly ? '8px padding after the actual 郊外 token' : '8px token padding; rt and ruby::before forced to 0.46em') : null,
@@ -1668,9 +1673,9 @@ try {
     browserVersions,
     selectedScope: fixesOnly ? 'Six exact changed or diagnosed design cases per engine' : spacingOnly ? 'R1 spacing only, both viewport sizes' : g3Only ? 'G3 demonstration, stage, keyboard and prose; older design gates not run' : 'all design gates',
     results,
-    passed: results.length === engines.length * (fixesOnly ? 6 : spacingOnly ? 2 : g3Only ? 7 : 50) && results.every((row) => row.passed),
+    passed: acceptance.fullAcceptance,
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);
-  if (!receipt.passed) process.exitCode = 1;
+  process.exitCode = acceptance.exitCode;
 }

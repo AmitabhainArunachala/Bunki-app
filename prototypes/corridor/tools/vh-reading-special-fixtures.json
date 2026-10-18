@@ -1,0 +1,1439 @@
+{
+  "schemaVersion": 1,
+  "reviewedAtSource": "384d4a70e05a33019f1ad36789d13d22de04094a",
+  "basis": "Existing reviewed sense classifications, exact source/token context frozen independently of renderer flags and displayed card. Agreement records are provenance, not standalone proof.",
+  "articles": [
+    {
+      "article": "aozora:000628",
+      "file": "aozora-000628.json",
+      "sha256": "46ff162b984078b356a67c62e5f6d4015dd74b9fa73ee0bf613a24b9abf7114f",
+      "proofs": [
+        {
+          "index": 76,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 68,
+          "contextEnd": 85,
+          "context": "はなれた山の中に、「ごん狐」という狐がいまし",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is part of the proper name/title ごん狐."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 87,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 79,
+          "contextEnd": 96,
+          "context": "という狐がいました。ごんは、一人ぼっちの小狐で、",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 205,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 197,
+          "contextEnd": 214,
+          "context": "雨がふりつづいたその間、ごんは、外へも出られなく",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 230,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 222,
+          "contextEnd": 239,
+          "context": "ました。雨があがると、ごんは、ほっとして穴からはい出",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 263,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 255,
+          "contextEnd": 272,
+          "context": "きんきん、ひびいていました。ごんは、村の小川の堤まで",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 366,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 358,
+          "contextEnd": 375,
+          "context": "て、もまれています。ごんは川下の方へと、ぬかるみ",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 403,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 395,
+          "contextEnd": 412,
+          "context": "、何かやっています。ごんは、見つからないように、そうっと",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox character"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name here."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 436,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 428,
+          "contextEnd": 445,
+          "context": "。「兵十だな」と、ごんは思いました。兵十はぼろぼろ",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox character"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name here."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 677,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 669,
+          "contextEnd": 686,
+          "context": "。兵十がいなくなると、ごんは、ぴょいと草の中から",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox character"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name here."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 708,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 700,
+          "contextEnd": 717,
+          "context": "がしたくなったのです。ごんはびくの中の魚をつかみ出し",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name in the story"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name"
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 793,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 785,
+          "contextEnd": 802,
+          "context": "、手ではつかめません。ごんはじれったくなって、頭をびく",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name"
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 826,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 818,
+          "contextEnd": 835,
+          "context": "。うなぎは、キュッと言ってごんの首へまきつきました。その",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name"
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 858,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 850,
+          "contextEnd": 867,
+          "context": "め」と、どなりたてました。ごんは、びっくりしてとびあがりました",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name"
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 882,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 874,
+          "contextEnd": 891,
+          "context": "しましたが、うなぎは、ごんの首にまきついたままはなれ",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name"
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 894,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 886,
+          "contextEnd": 903,
+          "context": "まきついたままはなれません。ごんはそのまま横っとびにとび出して一しょ",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name"
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 940,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 932,
+          "contextEnd": 949,
+          "context": "ては来ませんでした。ごんは、ほっとして、うなぎの",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name"
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 980,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 972,
+          "contextEnd": 989,
+          "context": "。二十日ほどたって、ごんが、弥助というお百姓の",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox in the story."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox protagonist's proper name, not the burdock sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 1044,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 1036,
+          "contextEnd": 1053,
+          "context": "髪をすいていました。ごんは、「ふふん、村に何",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox protagonist's proper name, not the burdock sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 1213,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 1205,
+          "contextEnd": 1222,
+          "context": "「ああ、葬式だ」と、ごんは思いました。「兵十の",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox protagonist's proper name, not the burdock sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 1237,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 1229,
+          "contextEnd": 1246,
+          "context": "だろう」お午がすぎると、ごんは、村の墓地へ行って",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox protagonist's proper name, not the burdock sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 1386,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 1378,
+          "contextEnd": 1395,
+          "context": "ふみおられていました。ごんはのびあがって見ました。兵十",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox protagonist's proper name, not the burdock sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 1449,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 1441,
+          "contextEnd": 1458,
+          "context": "のは兵十のおっ母だ」ごんはそう思いながら、頭をひっこめ",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox protagonist's proper name, not the burdock sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 1464,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 1456,
+          "contextEnd": 1473,
+          "context": "をひっこめました。その晩、ごんは、穴の中で考えまし",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox protagonist's proper name, not the burdock sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 1667,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 1659,
+          "contextEnd": 1676,
+          "context": "物置の後から見ていたごんは、そう思いました。ごん",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox in the story."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name in the story."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 1675,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 1667,
+          "contextEnd": 1684,
+          "context": "ごんは、そう思いました。ごんは物置のそばをはなれて、",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox in the story."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name in the story."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 1720,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 1712,
+          "contextEnd": 1729,
+          "context": "いきのいいいわしだアい」ごんは、その、いせいのいい声",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox in the story."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox, a proper name here."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 1802,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 1794,
+          "contextEnd": 1811,
+          "context": "中へもってはいりました。ごんはそのすきまに、かごの中",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox in the story."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is again used as the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 1890,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 1882,
+          "contextEnd": 1899,
+          "context": "いるのが小さく見えました。ごんは、うなぎのつぐないに、まず",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox in the story."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is used as the proper name of the character, not the dictionary sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 1918,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 1910,
+          "contextEnd": 1927,
+          "context": "た。つぎの日には、ごんは山で栗をどっさりひろって",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox in the story."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name here, not the burdock sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 1997,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 1989,
+          "contextEnd": 2006,
+          "context": "。どうしたんだろうと、ごんが思っていますと、兵十",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name here, not the burdock sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2064,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2056,
+          "contextEnd": 2073,
+          "context": "と、ぶつぶつ言っています。ごんは、これはしまったと思い",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the proper name of the fox, not the dictionary sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2096,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2088,
+          "contextEnd": 2105,
+          "context": "傷までつけられたのか。ごんはこうおもいながら、そっと物置の",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the proper name of the fox, not the dictionary sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2131,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2123,
+          "contextEnd": 2140,
+          "context": "日も、そのつぎの日もごんは、栗をひろっては、",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the proper name of the fox, not the dictionary sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2182,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2174,
+          "contextEnd": 2191,
+          "context": "四月のいい晩でした。ごんは、ぶらぶらあそびに出かけました",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the proper name of the fox, not the burdock sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2234,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2226,
+          "contextEnd": 2243,
+          "context": "と松虫が鳴いています。ごんは、道の片がわにかくれ",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the proper name of the fox, not the burdock sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2370,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2362,
+          "contextEnd": 2379,
+          "context": "に、おいていくんだ」ごんは、ふたりのあとをつけて",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the proper name of the fox, not the burdock sense."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2450,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2442,
+          "contextEnd": 2459,
+          "context": "と、後を見ました。ごんはびくっとして、小さくなっ",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox protagonist in the story."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2467,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2459,
+          "contextEnd": 2476,
+          "context": "てたちどまりました。加助は、ごんには気がつかないで、",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox character's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2539,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2531,
+          "contextEnd": 2548,
+          "context": "うつって動いていました。ごんは、「おねんぶつがあるん",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox character's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2600,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2592,
+          "contextEnd": 2609,
+          "context": "がきこえて来ました。五ごんは、おねんぶつがすむまで、",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox character's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2632,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2624,
+          "contextEnd": 2641,
+          "context": "また一しょにかえっていきます。ごんは、二人の話をきこうと",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox character's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2798,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2790,
+          "contextEnd": 2807,
+          "context": "言うがいいよ」「うん」ごんは、へえ、こいつはつまらない",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox character's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2860,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2852,
+          "contextEnd": 2869,
+          "context": "引き合わないなあ。六そのあくる日もごんは、栗をもって、兵十",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox character's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2890,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2882,
+          "contextEnd": 2899,
+          "context": "なっていました。それでごんは家の裏口から、こっそり中",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the fox character's name."
+            },
+            "b": {
+              "choice": "N",
+              "reason": "Gon is the fox's proper name."
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2939,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2931,
+          "contextEnd": 2948,
+          "context": "。こないだうなぎをぬすみやがったあのごん狐めが、またいたずらをし",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name here"
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 2994,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2986,
+          "contextEnd": 3003,
+          "context": "て、今戸口を出ようとするごんを、ドンと、うちました",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name here"
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 3004,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 2996,
+          "contextEnd": 3013,
+          "context": "、ドンと、うちました。ごんは、ばたりとたおれました。",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name here"
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 3056,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 3048,
+          "contextEnd": 3065,
+          "context": "」と兵十は、びっくりしてごんに目を落しました。「",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name here"
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 3065,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 3057,
+          "contextEnd": 3074,
+          "context": "に目を落しました。「ごん、お前だったのか。いつ",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name here"
+            },
+            "c": null
+          }
+        },
+        {
+          "index": 3082,
+          "kind": "name",
+          "surface": "ごん",
+          "reading": "ごん",
+          "sidecar": [
+            "name",
+            "agree"
+          ],
+          "contextStart": 3074,
+          "contextEnd": 3091,
+          "context": "も栗をくれたのは」ごんは、ぐったりと目をつぶった",
+          "review": {
+            "source": "agree",
+            "a": {
+              "choice": "N",
+              "reason": "ごん is the name of the fox"
+            },
+            "b": {
+              "choice": "N",
+              "reason": "ごん is the fox's proper name here"
+            },
+            "c": null
+          }
+        }
+      ]
+    },
+    {
+      "article": "bunki-graded-n3-hashira-counter",
+      "file": "bunki-graded-n3-hashira-counter.json",
+      "sha256": "663003ccaef50156e5ea34e277338eddace6aaf6d6b246eec5c0fc5877afbdcb",
+      "proofs": [
+        {
+          "index": 241,
+          "kind": "reading",
+          "surface": "いち",
+          "reading": "いち",
+          "sidecar": [
+            "reading",
+            "review"
+          ],
+          "contextStart": 233,
+          "contextEnd": 250,
+          "context": "読む。数字を音読みして「いちちゅう」「さんちゅう」とは",
+          "review": {
+            "source": "review",
+            "a": null,
+            "b": null,
+            "c": null,
+            "review": {
+              "choice": "R",
+              "gloss": "",
+              "reason": "Grok 2029 (recheck of 79f623ea): 「いちちゅう」「さんちゅう」とは読まない names readings the text rejects; いち there is part of a reading, not a word (never 'kiss', never 'Mr')"
+            }
+          }
+        },
+        {
+          "index": 242,
+          "kind": "reading",
+          "surface": "ちゅう",
+          "reading": "ちゅう",
+          "sidecar": [
+            "reading",
+            "review"
+          ],
+          "contextStart": 234,
+          "contextEnd": 251,
+          "context": "。数字を音読みして「いちちゅう」「さんちゅう」とは読ま",
+          "review": {
+            "source": "review",
+            "a": null,
+            "b": null,
+            "c": null,
+            "review": {
+              "choice": "R",
+              "gloss": "",
+              "reason": "Grok 2029 (recheck of 79f623ea): 「いちちゅう」「さんちゅう」とは読まない names readings the text rejects; ちゅう there is part of a reading, not a word (never 'kiss', never 'Mr')"
+            }
+          }
+        },
+        {
+          "index": 245,
+          "kind": "reading",
+          "surface": "さん",
+          "reading": "さん",
+          "sidecar": [
+            "reading",
+            "review"
+          ],
+          "contextStart": 237,
+          "contextEnd": 254,
+          "context": "音読みして「いちちゅう」「さんちゅう」とは読まない。数",
+          "review": {
+            "source": "review",
+            "a": null,
+            "b": null,
+            "c": null,
+            "review": {
+              "choice": "R",
+              "gloss": "",
+              "reason": "Grok 2029 (recheck of 79f623ea): 「いちちゅう」「さんちゅう」とは読まない names readings the text rejects; さん there is part of a reading, not a word (never 'kiss', never 'Mr')"
+            }
+          }
+        },
+        {
+          "index": 246,
+          "kind": "reading",
+          "surface": "ちゅう",
+          "reading": "ちゅう",
+          "sidecar": [
+            "reading",
+            "review"
+          ],
+          "contextStart": 238,
+          "contextEnd": 255,
+          "context": "して「いちちゅう」「さんちゅう」とは読まない。数が",
+          "review": {
+            "source": "review",
+            "a": null,
+            "b": null,
+            "c": null,
+            "review": {
+              "choice": "R",
+              "gloss": "",
+              "reason": "Grok 2029 (recheck of 79f623ea): 「いちちゅう」「さんちゅう」とは読まない names readings the text rejects; ちゅう there is part of a reading, not a word (never 'kiss', never 'Mr')"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "article": "bunki-read-n2-bodhisena",
+      "file": "bunki-read-n2-bodhisena.json",
+      "sha256": "f31eb41eeb80075c63aaa834684134c72e2ae70de08fb08283649a63fb3637e8",
+      "proofs": [
+        {
+          "index": 232,
+          "kind": "name",
+          "surface": "台",
+          "reading": "だい",
+          "sidecar": [
+            "name",
+            "third:a"
+          ],
+          "contextStart": 224,
+          "contextEnd": 241,
+          "context": "階級の出身とされる。五台山の文殊菩薩に心を動かさ",
+          "review": {
+            "source": "third:a",
+            "a": {
+              "choice": "N",
+              "reason": "五台山 is a proper place name (Mount Wutai)"
+            },
+            "b": {
+              "choice": "1412560:6",
+              "gloss": "plateau; heights",
+              "reason": "台 in 五台山 is a place-name element meaning plateau/heights."
+            },
+            "c": {
+              "choice": "N",
+              "reason": "五台山 is the proper place name Mount Wutai."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "article": "mext:b_menu-houdou-mext_01683",
+      "file": "mext-b_menu-houdou-mext_01683.json",
+      "sha256": "4d9814182c9bc0fdf5a9f8c4c23201ee277fc9174e4f942dce99b2ec6776f06b",
+      "proofs": [
+        {
+          "index": 257,
+          "kind": "name",
+          "surface": "大会",
+          "reading": "たいかい",
+          "sidecar": [
+            "name",
+            "third:a"
+          ],
+          "contextStart": 249,
+          "contextEnd": 266,
+          "context": "第36回全国産業教育フェア佐賀大会実行委員会、文部科学省、",
+          "review": {
+            "source": "third:a",
+            "a": {
+              "choice": "N",
+              "reason": "Part of the proper name '全国産業教育フェア佐賀大会'"
+            },
+            "b": {
+              "choice": "1413180:0",
+              "gloss": "mass meeting; convention; rally",
+              "reason": "大会 in the event/committee name means convention or conference."
+            },
+            "c": {
+              "choice": "N",
+              "reason": "Used inside the event/committee title 佐賀大会実行委員会."
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

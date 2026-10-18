@@ -17,6 +17,7 @@ import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { batteryGates, runGates, verifyArtifact } from '../verify-release-gates.mjs';
 import { supplementalGates } from './supplemental.mjs';
+import { requireGateAttemptEvidence } from './verification-admission.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const NOW = () => new Date().toISOString();
@@ -168,9 +169,13 @@ export function createPlan({
               ? ['webkit']
               : ['chromium', 'webkit'],
       e2e: items.some((g) => g.name === 'e2e'),
-      corpus: items.some((g) => ['corpus-pytest', 'reading-facets'].includes(g.name)),
+      corpus: items.some((g) =>
+        ['corpus-pytest', 'reading-facets', 'ci-contracts'].includes(g.name),
+      ),
       python: items.some(
-        (g) => DECKS.has(g.name) || ['corpus-pytest', 'reading-facets', 'vitest'].includes(g.name),
+        (g) =>
+          DECKS.has(g.name) ||
+          ['corpus-pytest', 'reading-facets', 'vitest', 'ci-contracts'].includes(g.name),
       ),
     });
   const fast = all.filter((g) => FAST.has(g.name) && !DECKS.has(g.name));
@@ -609,6 +614,11 @@ export function admitReceipt(plan, receipt, shard, attempt, artifact, expected =
     assert.equal(gate.status === 'passed', gate.exitCode === 0);
     assert(gate.completedAt && Date.parse(gate.completedAt) >= Date.parse(gate.startedAt));
     assert(gate.log, 'Gate log missing');
+    if (gate.status === 'passed')
+      requireGateAttemptEvidence(gate, {
+        gitSha: plan.identity.sha,
+        artifactSha256: artifact.artifactSha256,
+      });
   }
   assert.equal(
     receipt.status === 'passed',

@@ -36,6 +36,9 @@
  */
 /* global window, document, getComputedStyle, NodeFilter, innerWidth, innerHeight, localStorage */
 import assert from 'node:assert/strict';
+import { sweepExpectedIds } from '../../../scripts/ci/vh-visual-report-contracts.mjs';
+import { randomUUID, createHash } from 'node:crypto';
+import { exactRoster, shelfContract, shelfEvidence, shelfMutationControls } from './vh-visual-contracts.mjs';
 import console from 'node:console';
 import process from 'node:process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -43,9 +46,15 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
 import { startCorridorDev } from '../../../scripts/serve-corridor-dev.mjs';
-import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 
+assert(process.env.KAIRO_BROWSER === undefined || ['chromium','webkit','all'].includes(process.env.KAIRO_BROWSER), 'Unknown or empty browser scope');
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+const identity = JSON.parse(readFileSync(join(resolveCorridorSite(), 'build-identity.json'), 'utf8'));
+assert(process.argv.length === 2, 'Unknown sweep argument');
+assert(process.env.KAIRO_SWEEP_MODE === undefined || ['inventory','verify'].includes(process.env.KAIRO_SWEEP_MODE), 'Unknown or empty KAIRO_SWEEP_MODE');
+assert(process.env.KAIRO_SWEEP_NEGATIVE === undefined || ['chip','cover','box'].includes(process.env.KAIRO_SWEEP_NEGATIVE), 'Unknown or empty KAIRO_SWEEP_NEGATIVE');
 const MODE = process.env.KAIRO_SWEEP_MODE === 'inventory' ? 'inventory' : 'verify';
 const NEGATIVE = process.env.KAIRO_SWEEP_NEGATIVE || '';
 const SHOTS = MODE === 'inventory' || process.env.KAIRO_SWEEP_SHOTS === '1';
@@ -53,8 +62,10 @@ const out = resolveCorridorEvidence();
 mkdirSync(join(out, 'rooms'), { recursive: true });
 const host = await startCorridorDev(0);
 const checks = [];
-const check = (name, pass, detail = '') => {
-  checks.push({ name, pass: !!pass, detail: String(detail).slice(0, 2000) });
+const browserVersions = {};
+const controls = [];
+const check = (name, pass, detail = '', id) => {
+  checks.push({ id, name, pass: !!pass, detail: String(detail).slice(0, 2000) });
   console.log(`${pass ? '  ok  ' : ' FAIL '} ${name}${detail ? `  — ${String(detail).slice(0, 400)}` : ''}`);
 };
 const engines =
@@ -407,6 +418,8 @@ const HAND_KINDS = new Set(['original', 'aozora', 'gv', 'mext', 'govonline']);
 const QUEUE_ORIGINALS = JSON.parse(readFileSync(resolve(REPO, 'docs/content/feed-review-queue.json'), 'utf8'))
   .filter((row) => HAND_KINDS.has(row.kind) && row.decision !== 'rejected');
 const ORIGINALS = QUEUE_ORIGINALS.map((row) => row.id);
+const SOURCE_SHELF_ROWS = JSON.parse(readFileSync(resolve(resolveCorridorSite(), 'data/articles/index.json'), 'utf8')).articles;
+const VH_SHELF_CONTRACT = shelfContract(SOURCE_SHELF_ROWS, QUEUE_ORIGINALS);
 const ORIGINAL_ROWS = new Map(QUEUE_ORIGINALS.map((row) => [row.id, row]));
 // the drops, newest first, each the hand-chosen rows of one addedAt day
 const DROP_DAYS = [...new Set(QUEUE_ORIGINALS.map((row) => row.addedAt))].sort().reverse();
@@ -446,6 +459,11 @@ async function shelfRowsAndCards(page, engine, lang) {
   for (const d of [0, 1, 2, 3].map((n) => plusDays(day, n))) {
     await page.evaluate((x) => window.__SWEEP__.shelfOn(x), d);
     shelves.push({ day: d, cards: await page.evaluate(() => window.__SWEEP__.shelfCards()) });
+    if (MODE === 'verify' && !NEGATIVE) {
+      const mutations = await shelfMutationControls(page, VH_SHELF_CONTRACT, SOURCE_SHELF_ROWS, { engine, lang, day: d, dayIndex: shelves.length - 1 });
+      controls.push(...mutations);
+      for (const mutation of mutations) check(`${label} ${d}: VH1.control.${mutation.id}`, mutation.passed, JSON.stringify(mutation.premise || mutation.error), `S01/${label}/${shelves.length - 1}/${mutation.id}`);
+    }
   }
   // every level filter, and the cards it keeps
   const levels = [];
@@ -466,7 +484,7 @@ async function shelfRowsAndCards(page, engine, lang) {
     rows: walked.map(({ row, seen }) => ({ id: row.id, review: row.review, level: levelOf(row), chips: seen.chips, contexts: seen.contexts })) });
   if (MODE !== 'verify') return;
   check(`${label} the shelf's hand-chosen articles are the queue's (${ORIGINALS.length}, in ${DROPS.length} drops: ${DROPS.map((ids, i) => `${DROP_DAYS[i]} ${ids.length}`).join(', ')})`,
-    drop.length === ORIGINALS.length && ORIGINALS.length > 0 && DROPS.length >= 2, `${drop.length} of ${ORIGINALS.length}`);
+    drop.length === ORIGINALS.length && ORIGINALS.length > 0 && DROPS.length >= 2, `${drop.length} of ${ORIGINALS.length}`, `S02/${label}`);
   // N2 · the series the shelf holds, from the rows alone; a series with a member in the newest drop gathers there
   const seriesRows = rows.filter((row) => !row.folded && seriesOf(row));
   const series = [...new Set(seriesRows.map((row) => seriesOf(row).key))].map((key) => seriesRows.filter((row) => seriesOf(row).key === key))
@@ -488,14 +506,18 @@ async function shelfRowsAndCards(page, engine, lang) {
     // the drops stand first, the newest whole (with what its series pulled in), then each older one whole; then the rest
     let at = 0;
     const drawnBlocks = blocks.map((block) => { const got = ids.slice(at, at + block.length); at += block.length; return got; });
-    const blocksOk = blocks.every((block, i) => drawnBlocks[i].length === block.length && drawnBlocks[i].every((id) => block.includes(id)));
-    const firstOther = ids.findIndex((id) => !ORIGINALS.includes(id));
-    const lastDrop = Math.max(...drop.map((id) => ids.indexOf(id)));
+    const vhEvidence = shelfEvidence({ ...VH_SHELF_CONTRACT, ids });
+    const blocksOk = blocks.every((block, i) => exactRoster(block, drawnBlocks[i])) && vhEvidence.blocks;
+    check(`${label} ${d}: N.exact-roster every non-folded shelf row appears exactly once`,
+      vhEvidence.roster, JSON.stringify(ids), `S03/${label}/${shelves.findIndex(row => row.day === d)}`);
+    const adjustedDrop = blocks.flat();
+    const firstOther = ids.findIndex((id) => !adjustedDrop.includes(id));
+    const lastDrop = Math.max(...adjustedDrop.map((id) => ids.indexOf(id)));
     check(`${label} ${d}: the drops stand first — the newest whole, then N's whole — and every new reading stands ahead of every inherited card, today's six included`,
       drop.length > 0 && blocksOk && firstOther > lastDrop,
-      JSON.stringify(all.slice(0, drop.length + 2).map((c) => `${c.id}${c.band ? ` [${c.band}]` : ''}`)));
+      JSON.stringify(all.slice(0, drop.length + 2).map((c) => `${c.id}${c.band ? ` [${c.band}]` : ''}`)), `S04/${label}/${shelves.findIndex(row => row.day === d)}`);
     check(`${label} ${d}: the shelf opens on the newest drop's newest dated news piece (${newestNews})`,
-      !!newestNews && lead?.lane === 'news' && lead.date === newestNews && DROPS[0].includes(lead.id), `${ids[0]} · ${lead?.lane} · ${lead?.date}`);
+      !!newestNews && lead?.lane === 'news' && lead.date === newestNews && DROPS[0].includes(lead.id), `${ids[0]} · ${lead?.lane} · ${lead?.date}`, `S05/${label}/${shelves.findIndex(row => row.day === d)}`);
     const broken = drawnBlocks.flatMap((block) => block.slice(1).map((id, i) => [block[i], id])).filter(([a, b]) => {
       if (seriesPair(a, b)) return false;  // a series stands together, in book order
       const qa = ORIGINAL_ROWS.get(a), qb = ORIGINAL_ROWS.get(b);
@@ -503,7 +525,7 @@ async function shelfRowsAndCards(page, engine, lang) {
         || APART.some(([x, y]) => (a === x && b === y) || (a === y && b === x));
     }).map(([a, b]) => `${a}|${b}`);
     check(`${label} ${d}: within each drop no two neighbours share a field or a style (a series' own neighbours aside), and the reviewers' pairs stand apart`,
-      blocksOk && broken.length === 0, broken.join(', '));
+      blocksOk && broken.length === 0, broken.join(', '), `S06/${label}/${shelves.findIndex(row => row.day === d)}`);
     // series in book order: every series the shelf holds stands together, a later cut never before an earlier one
     const seriesTrouble = series.filter((group) => {
       const want = [...group].sort(bookOrder).map((row) => row.id);
@@ -511,18 +533,18 @@ async function shelfRowsAndCards(page, engine, lang) {
       return start < 0 || want.some((id, i) => ids[start + i] !== id);
     }).map((group) => group.map((row) => `${row.id}@${ids.indexOf(row.id)}`).join(' '));
     check(`${label} ${d}: every series stands together in book order (${series.map((group) => `${seriesOf(group[0]).key} ×${group.length}`).join(', ')}) — a later cut never precedes its earlier one`,
-      series.length >= 2 && seriesTrouble.length === 0, seriesTrouble.join(' | '));
+      series.length >= 2 && seriesTrouble.length === 0 && vhEvidence.series, seriesTrouble.join(' | '), `S07/${label}/${shelves.findIndex(row => row.day === d)}`);
     const terada = series.find((group) => group.some((row) => row.id !== NAKAYA_ON_TERADA && /寺田/u.test(row.attribution)));
     const near = terada ? Math.min(...terada.map((row) => Math.abs(ids.indexOf(row.id) - ids.indexOf(NAKAYA_ON_TERADA)))) : Infinity;
-    check(`${label} ${d}: Nakaya's portrait of Terada stands within two places of Terada's pieces (Kimi, FIXES-batch-4)`, near <= 2, `${near} places`);
-    orders.push(ids.slice(0, drop.length).join(','));
+    check(`${label} ${d}: Nakaya's portrait of Terada stands within two places of Terada's pieces (Kimi, FIXES-batch-4)`, near <= 2, `${near} places`, `S08/${label}/${shelves.findIndex(row => row.day === d)}`);
+    orders.push(ids.slice(0, adjustedDrop.length).join(','));
   }
   check(`${label} the drops keep one order on all four days — the daily turn moves only the shelf after them`, new Set(orders).size === 1,
-    orders.map((o) => o.slice(0, 60)).join(' | '));
+    orders.map((o) => o.slice(0, 60)).join(' | '), `S09/${label}`);
   const firstInherited = shelves.map(({ cards: all }) => all.find((c) => !c.band && !ORIGINALS.includes(c.id))?.id);
   check(`${label} after the drop the shelf still turns daily: its first inherited story changes across four days`,
-    new Set(firstInherited).size >= 2, firstInherited.join(', '));
-  check(`${label} Today's story is the shelf's lead`, !!pick && pick === shelves[0].cards[0]?.id, `${pick} (shelf lead ${shelves[0].cards[0]?.id})`);
+    new Set(firstInherited).size >= 2, firstInherited.join(', '), `S10/${label}`);
+  check(`${label} Today's story is the shelf's lead`, !!pick && pick === shelves[0].cards[0]?.id, `${pick} (shelf lead ${shelves[0].cards[0]?.id})`, `S11/${label}`);
   // N (round 2; Codex A–E) · Today's reading offers the newest drop first, whatever the record holds: five in-memory
   // records, each restored. The expectation is the brief's rule, computed here from the rows' forms and the drawn order
   // (the drop as the shelf draws it, then the shelf after it) — never by calling the app's own selector
@@ -537,12 +559,12 @@ async function shelfRowsAndCards(page, engine, lang) {
     const seen = await page.evaluate((r) => window.__SWEEP__.todayUnder(r), record);
     const row = byId.get(seen.pick);
     check(`${label} Today ${name}: ${rule}`, !!seen.pick && seen.pick === want && seen.doors === 1 && !!row && seen.title === row.title,
-      `picked ${seen.pick} (want ${want}) · drawn "${seen.title}" · ${seen.doors} door(s)`);
+      `picked ${seen.pick} (want ${want}) · drawn "${seen.title}" · ${seen.doors} door(s)`, `S12/${label}/${name.split(" ")[0]}`);
   };
   const tb = ['結核'];
   const tbInherited = inherited.filter((id) => overlap(id, tb));
   check(`${label} Today fixture: 結核 stands in an inherited story (${tbInherited.slice(0, 2).join(', ')}) and in no new one`,
-    tbInherited.length > 0 && ORIGINALS.every((id) => !overlap(id, tb)), `${tbInherited.length} inherited`);
+    tbInherited.length > 0 && ORIGINALS.every((id) => !overlap(id, tb)), `${tbInherited.length} inherited`, `S13/${label}`);
   await todayCase('B saved 結核, the drops unread', { taken: tb }, bestIn(dropOrder, tb),
     'a new story — the drop\'s first, since none holds 結核 — never the inherited story that does');
   // C · a word one later new story holds, and some inherited story too: Today names that new story
@@ -550,7 +572,7 @@ async function shelfRowsAndCards(page, engine, lang) {
     && inherited.some((x) => (formsOf[x] || []).includes(f))));
   const cWord = cId && (formsOf[cId] || []).find((f) => dropOrder.filter((x) => (formsOf[x] || []).includes(f)).length === 1
     && inherited.some((x) => (formsOf[x] || []).includes(f)));
-  check(`${label} Today fixture: a word only one later new story holds (${cWord} → ${cId})`, !!cId && !!cWord, String(cId));
+  check(`${label} Today fixture: a word only one later new story holds (${cWord} → ${cId})`, !!cId && !!cWord, String(cId), `S14/${label}`);
   if (cWord) await todayCase(`C saved ${cWord}`, { taken: [cWord] }, cId, `the one new story holding the saved word (${cId}), personalised within the drop`);
   // D · an aged record: the lead read, fifteen inherited stories read, and sixty saved words from inherited stories
   const aRead = [dropOrder[0], ...inherited.slice(0, 15)];
@@ -568,9 +590,9 @@ async function shelfRowsAndCards(page, engine, lang) {
   const eRow = byId.get(eSeen.pick);
   check(`${label} Today E2 every drop read: an unread inherited story, drawn with its title, one door`,
     !!eRow && !ORIGINALS.includes(eSeen.pick) && !eRow.folded && eSeen.doors === 1 && eSeen.title === eRow.title,
-    `picked ${eSeen.pick} · drawn "${eSeen.title}" · ${eSeen.doors} door(s)`);
+    `picked ${eSeen.pick} · drawn "${eSeen.title}" · ${eSeen.doors} door(s)`, `S15/${label}`);
   const after = await page.evaluate(() => window.__SWEEP__.todayPick());
-  check(`${label} Today's record is restored after the fixtures (the pick is the shelf's lead again)`, after === pick, `${after}`);
+  check(`${label} Today's record is restored after the fixtures (the pick is the shelf's lead again)`, after === pick, `${after}`, `S16/${label}`);
   const stories = rows.filter((row) => !row.folded);
   let filtered = 0;
   for (const { level, cards: kept } of levels) {
@@ -579,20 +601,20 @@ async function shelfRowsAndCards(page, engine, lang) {
     const off = kept.filter((c) => c.step !== level || c.chip.replace(/\+$/u, '') !== level).map((c) => `${c.id}:${c.chip}`);
     filtered += got.length;
     check(`${label} the ${level} filter keeps exactly the stories whose card shows ${level} (${want.length}), and every card it shows says ${level}`,
-      JSON.stringify(got) === JSON.stringify(want) && off.length === 0, off.slice(0, 6).join(' | ') || `${got.length} cards`);
+      JSON.stringify(got) === JSON.stringify(want) && off.length === 0, off.slice(0, 6).join(' | ') || `${got.length} cards`, `S17/${label}/${level}`);
   }
   check(`${label} the five level filters together show every story with a level, once`, filtered === stories.filter((row) => stepOf(row)).length,
-    `${filtered} of ${stories.filter((row) => stepOf(row)).length}`);
+    `${filtered} of ${stories.filter((row) => stepOf(row)).length}`, `S18/${label}`);
   const cardTrouble = cards.filter((card) => {
     const row = byId.get(card.id);
     return !row || card.chips.length !== 1 || (levelOf(row) && card.chips[0] !== levelOf(row)) || PROV_N.test(card.text);
   }).map((card) => `${card.id}:${card.chips.join('/')}`);
   check(`${label} every card (${cards.length}) carries one level — the written-for level where the row has one — and no provenance word`,
-    cards.length === rows.filter((row) => !row.folded).length && cardTrouble.length === 0, cardTrouble.slice(0, 6).join(' | '));
+    cards.length === rows.filter((row) => !row.folded).length && cardTrouble.length === 0, cardTrouble.slice(0, 6).join(' | '), `S19/${label}`);
   const originals = drop.map((id) => byId.get(id));
   const labelled = originals.filter((row) => row.review !== null || row.pending || /検収前/u.test(row.sourceLabel) || row.learnerLabel !== row.sourceLabel ||
     PROV_N.test(`${row.sourceLabel} ${row.attribution} ${row.title} ${row.titleEn} ${row.context ?? ''}`)).map((row) => row.id);
-  check(`${label} the originals carry no review value, no 検収前 and no provenance word in what the learner reads`, labelled.length === 0, labelled.join(', '));
+  check(`${label} the originals carry no review value, no 検収前 and no provenance word in what the learner reads`, labelled.length === 0, labelled.join(', '), `S20/${label}`);
   const rowTrouble = [];
   for (const { row, seen } of walked) {
     const problems = [];
@@ -625,17 +647,18 @@ async function shelfRowsAndCards(page, engine, lang) {
     if (problems.length) realTrouble.push(`${row.id} (${kind}): ${problems.join(', ')}`);
   }
   check(`${label} every hand-chosen real text (${realRead}) shows its credit and licence in the reader's footer; Global Voices states its changes`,
-    realRead >= 8 && realTrouble.length === 0, realTrouble.slice(0, 6).join(' | '));
+    realRead >= 8 && realTrouble.length === 0, realTrouble.slice(0, 6).join(' | '), `S21/${label}`);
   const withContext = rows.filter((row) => row.context).length;
   check(`${label} every row read (${walked.length}): one level, no provenance, no authoring drawn; the context line on the ${withContext} rows that carry it, under the title, and on no other`,
-    walked.length === rows.length && withContext > 0 && rowTrouble.length === 0, rowTrouble.slice(0, 6).join(' | '));
+    walked.length === rows.length && withContext > 0 && rowTrouble.length === 0, rowTrouble.slice(0, 6).join(' | '), `S22/${label}`);
   const onShelf = hidden.filter((value) => shelfText.includes(value));
-  check(`${label} no row's authoring record is drawn on the shelf`, hidden.length > 0 && onShelf.length === 0, onShelf.join(' / '));
+  check(`${label} no row's authoring record is drawn on the shelf`, hidden.length > 0 && onShelf.length === 0, onShelf.join(' / '), `S23/${label}`);
 }
 const SOURCE_TEXT = '町の図書館に着くと、窓の近くに席があった。そこで友達と会い、次に読む本を選んだ。';
 try {
   for (const [engine, browserType] of Object.entries(engines)) {
     const browser = await browserType.launch();
+    browserVersions[engine] = browser.version();
     try {
       for (const lang of ['bi', 'ja']) {
         const context = await browser.newContext(phone);
@@ -681,7 +704,7 @@ try {
           try {
             await act();
           } catch (error) {
-            check(`${label} · the room opens`, false, error.message);
+            check(`${label} · the room opens`, false, error.message, `S24/${label}`);
             return null;
           }
           if (NEGATIVE === 'chip' && id === 'reader') {
@@ -712,10 +735,10 @@ try {
           }
           inventory.push({ engine, lang, room: id, view: found.view, ...found, extra: more, shot });
           if (MODE === 'verify') {
-            check(`${label} · P no provenance label`, found.provenance.length === 0, JSON.stringify(found.provenance));
-            check(`${label} · C no review caption`, found.captions.length === 0, JSON.stringify(found.captions));
-            check(`${label} · K every keep control is the one Save`, found.keeps.every((k) => k.one), JSON.stringify(found.keeps.filter((k) => !k.one)));
-            check(`${label} · M no registration or corner mark`, found.marks.length === 0, JSON.stringify(found.marks));
+            check(`${label} · P no provenance label`, found.provenance.length === 0, JSON.stringify(found.provenance), `S25/${label}`);
+            check(`${label} · C no review caption`, found.captions.length === 0, JSON.stringify(found.captions), `S26/${label}`);
+            check(`${label} · K every keep control is the one Save`, found.keeps.every((k) => k.one), JSON.stringify(found.keeps.filter((k) => !k.one)), `S27/${label}`);
+            check(`${label} · M no registration or corner mark`, found.marks.length === 0, JSON.stringify(found.marks), `S28/${label}`);
           }
           return { found, more };
         };
@@ -888,11 +911,11 @@ try {
               }, save);
               const cover = await page.evaluate(coveredBy, { before, scope });
               check(`${label} · one press keeps it and opens its menu`, state?.pressed === 'true' && state.expanded === 'true' && cover.open,
-                JSON.stringify({ state, place: cover.place }));
+                JSON.stringify({ state, place: cover.place }), `S29/${label}`);
               check(`${label} · its menu covers no control that was in reach`, cover.open && cover.checked > 0 && cover.covered.length === 0,
-                JSON.stringify(cover));
+                JSON.stringify(cover), `S30/${label}`);
             } catch (error) {
-              check(`${label} · one press keeps it and opens its menu`, false, error.message);
+              check(`${label} · one press keeps it and opens its menu`, false, error.message, `S29/${label}`);
             }
             await page.keyboard.press('Escape');
             await settle(250);
@@ -956,7 +979,7 @@ try {
         await page.evaluate(() => window.__SWEEP__.layout('places'));
         for (const view of ['dojo', 'shelf', 'search', 'tests', 'me']) await room(`places-${view}`, async () => { await page.evaluate((v) => window.__SWEEP__.visit(v), view); await settle(900); });
         await page.evaluate(() => window.__SWEEP__.layout('current'));
-        if (MODE === 'verify') check(`${engine} ${lang} · no page errors on the walk`, errors.length === 0, errors.join(' | '));
+        if (MODE === 'verify') check(`${engine} ${lang} · no page errors on the walk`, errors.length === 0, errors.join(' | '), `S32/${engine} ${lang}`);
         await context.close();
       }
     } finally {
@@ -970,8 +993,8 @@ try {
       const keep = row.extra?.barKeep;
       const label = `${row.engine} ${row.lang} · ${row.room}`;
       check(`${label} · B the bar carries the keep control, labelled in words, the one Save`,
-        !!keep && keep.one && /\S{2,}/u.test(keep.text) && (row.lang === 'ja' ? /保存/u.test(keep.text) : /\bSave/u.test(keep.text)), JSON.stringify(keep));
-      if (row.room === 'reader-card') check(`${label} · B it names the word last touched (総理)`, !!keep && keep.text.includes('総理'), JSON.stringify(keep));
+        !!keep && keep.one && /\S{2,}/u.test(keep.text) && (row.lang === 'ja' ? /保存/u.test(keep.text) : /\bSave/u.test(keep.text)), JSON.stringify(keep), `S33/${label}`);
+      if (row.room === 'reader-card') check(`${label} · B it names the word last touched (総理)`, !!keep && keep.text.includes('総理'), JSON.stringify(keep), `S34/${label}`);
     }
     // D: the deck's bar is a band in the world's deep pigment; its words at 4.5:1 on it
     for (const row of inventory.filter((r) => /^deck-(front|back)-(hokusai|sumi)$/u.test(r.room))) {
@@ -979,19 +1002,19 @@ try {
       const label = `${row.engine} ${row.lang} · ${row.room}`;
       const solid = !!bar && /^(rgb\(|color\(srgb )/u.test(bar.bg) && !/, 0\)$| \/ 0\)$/u.test(bar.bg);
       const dark = solid && contrast(bar.bg, 'rgb(255, 255, 255)') >= 7;
-      check(`${label} · D the deck's bar is a solid deep band`, solid && dark, JSON.stringify(bar));
+      check(`${label} · D the deck's bar is a solid deep band`, solid && dark, JSON.stringify(bar), `S35/${label}`);
       const low = bar && solid ? Math.min(...bar.parts.map((p) => contrast(p.color, bar.bg))) : 0;
-      check(`${label} · D its back, count and Remove hold 4.5:1 on the band`, solid && bar.parts.length >= 3 && low >= 4.5, `${low.toFixed(2)}:1 ${JSON.stringify(bar?.parts)}`);
+      check(`${label} · D its back, count and Remove hold 4.5:1 on the band`, solid && bar.parts.length >= 3 && low >= 4.5, `${low.toFixed(2)}:1 ${JSON.stringify(bar?.parts)}`, `S36/${label}`);
     }
     // T: Today's line is one surface, no box inside it
     for (const row of inventory.filter((r) => r.room === 'today' || r.room === 'today-cards')) {
       const t = row.extra;
       const label = row.room === 'today' ? "T Today's line is no box and holds none" : "T with cards waiting, Today's cards line is there, no box and none inside";
       check(`${row.engine} ${row.lang} · ${label}`, !!t && t.line && t.lineBoxed === false && t.innerBoxes.length === 0 && (row.room === 'today' || t.cards),
-        JSON.stringify({ line: t?.lineBoxed, inner: t?.innerBoxes, cards: t?.cards }));
+        JSON.stringify({ line: t?.lineBoxed, inner: t?.innerBoxes, cards: t?.cards }), `S37/${row.engine} ${row.lang}/${row.room}`);
     }
     // the walk itself: every room was reached (a room that does not open cannot hide an instance)
-    check('the walk reached every room in both languages and both engines', summary.rooms >= Object.keys(engines).length * 2 * 50, `${summary.rooms} rooms`);
+    check('the walk reached every room in both languages and both engines', summary.rooms >= Object.keys(engines).length * 2 * 50, `${summary.rooms} rooms`, 'S38/all');
   }
   const failed = checks.filter((c) => !c.pass);
   console.log(`inventory: ${summary.rooms} rooms · provenance ${summary.P} · captions ${summary.C} · keep controls ${summary.K} (one Save ${summary.Kone}) · marks ${summary.M}`);
@@ -1000,7 +1023,15 @@ try {
     if (failed.length) process.exitCode = 1;
   } else console.log(`SWEEP INVENTORY — ${inventory.length} room scans written`);
 } finally {
-  writeFileSync(join(out, 'sweep.json'), `${JSON.stringify({ mode: MODE, negative: NEGATIVE, summary, checks, inventory }, null, 1)}\n`);
+  const expectedCases = sweepExpectedIds(Object.keys(engines).length === 2 ? 'all' : Object.keys(engines)[0]);
+  const observedCases = checks.map(row => row.id);
+  const complete = exactRoster(expectedCases, observedCases);
+  if (!NEGATIVE && MODE === 'verify' && !complete) process.exitCode = 1;
+  writeFileSync(join(out, 'sweep.json'), `${JSON.stringify({ schemaVersion: 2, runId, expectedCases, observedCases, complete, artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty, engines: Object.keys(engines), browserVersions, verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
+    requestedScope: MODE, selectedPassed: checks.length > 0 && checks.every(row => row.pass),
+    fullAcceptance: MODE === 'verify' && !NEGATIVE && complete && checks.length > 0 && checks.every(row => row.pass),
+    mode: MODE, negative: NEGATIVE, summary, checks, inventory, controls }, null, 1)}\n`);
   await host.close();
+  if (!process.exitCode && (MODE !== 'verify' || NEGATIVE)) process.exitCode = 3;
 }
 assert(MODE === 'inventory' || checks.length > 0, 'at least one check ran');

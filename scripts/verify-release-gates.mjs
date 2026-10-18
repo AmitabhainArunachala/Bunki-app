@@ -1,8 +1,9 @@
 /** Truthful battery execution and behavioral regression checks for release gates. */
 import assert from 'node:assert/strict';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import {
+  appendFileSync,
   closeSync,
   existsSync,
   lstatSync,
@@ -27,6 +28,14 @@ import { isDeepStrictEqual } from 'node:util';
 import { buildCorridorModules } from './build-reading-module.mjs';
 import { corridorAssetFiles } from './corridor-assets.mjs';
 import { verifyRelease } from './release/version.mjs';
+import { acceptanceEnvironment, digest, sourceSnapshot } from './ci/verification-admission.mjs';
+import {
+  gateEvidenceDeclaration,
+  evidenceInvocation,
+  validateGateEvidence,
+  RELEASE_GROUPS,
+} from './ci/gate-evidence.mjs';
+import { commandCheckEvidence } from './ci/command-check-contracts.mjs';
 
 const SELF = fileURLToPath(import.meta.url);
 const ROOT = resolve(dirname(SELF), '..');
@@ -333,7 +342,7 @@ export function batteryGates(out, env = process.env) {
     // named by-design red, and test-excerpt-narration threw at import, so the quote audio John
     // asked for on 09-29 had no executing test at all. voice-lock is the comparison that was
     // missing between the renderer, the manifests and the runtime.
-    node('voice-lock', tool('verify-voice-lock')),
+    node('voice-lock', tool('verify-voice-lock'), ['--require-complete']),
     {
       name: 'approved-voice-contract',
       command: process.execPath,
@@ -607,14 +616,49 @@ export function batteryGates(out, env = process.env) {
     // R3 (2026-10-18): the sense a word's text uses, for every one of the reviewed taps, the flash while a sense is still to
     // come, and the class sweeps. One gate per engine: each runs 15–25 minutes, past the battery's default, so each
     // carries its own floor, twice its longest healthy run (battery.test: a measured run stays under half its timeout)
-    { ...node('sense-truth', tool('verify-sense-truth')), env: { KAIRO_BROWSER: 'chromium' }, timeoutMs: 60 * 60 * 1000 },
-    { ...node('sense-truth-webkit', tool('verify-sense-truth')), env: { KAIRO_BROWSER: 'webkit' }, timeoutMs: 60 * 60 * 1000 },
+    {
+      ...node('sense-truth', tool('verify-sense-truth')),
+      env: { KAIRO_BROWSER: 'chromium' },
+      timeoutMs: 60 * 60 * 1000,
+    },
+    {
+      ...node('sense-truth-webkit', tool('verify-sense-truth')),
+      env: { KAIRO_BROWSER: 'webkit' },
+      timeoutMs: 60 * 60 * 1000,
+    },
+    ...['chromium', 'webkit'].flatMap((engine) => {
+      const suffix = engine === 'webkit' ? '-webkit' : '';
+      return [
+        ['record-depth', 'verify-record-depth', ['--controls']],
+        ['speak', 'verify-speak', []],
+        ['speak-negatives', 'verify-speak', ['--negatives']],
+        ['vh-sense-controls', 'verify-vh-sense-controls', []],
+        ['reader-doors', 'verify-reader-doors', []],
+        ['reading-truth', 'verify-reading-truth', []],
+        ['comb-0', 'verify-comb-0', []],
+        ['sweep', 'verify-sweep', []],
+        ['contrast-sweep', 'verify-contrast-sweep', []],
+        ['design-reader-shelf', 'verify-design-reader-shelf', []],
+      ].map(([name, file, args]) => ({
+        ...node(name + suffix, tool(file), args),
+        env: { KAIRO_BROWSER: engine },
+      }));
+    }),
+    node('vh-voice-controls', tool('verify-vh-voice-controls')),
     // G1–G6 (one-hand): the word's grammar — the page and its cut (G1), depth and the help ledger (G2), the tap ladder
     // (G3), ink (G4), hold = seal (G5) and the scale thread (G6) — with every slice's negative controls. One gate per
     // engine: each runs 22–25 minutes with controls (site-5: 1,309 s Chromium, 1,521 s WebKit), so each carries its own
     // floor, twice its longest healthy run
-    { ...node('word-grammar', tool('verify-word-grammar'), ['--controls']), env: { KAIRO_BROWSER: 'chromium' }, timeoutMs: 60 * 60 * 1000 },
-    { ...node('word-grammar-webkit', tool('verify-word-grammar'), ['--controls']), env: { KAIRO_BROWSER: 'webkit' }, timeoutMs: 60 * 60 * 1000 },
+    {
+      ...node('word-grammar', tool('verify-word-grammar'), ['--controls']),
+      env: { KAIRO_BROWSER: 'chromium' },
+      timeoutMs: 60 * 60 * 1000,
+    },
+    {
+      ...node('word-grammar-webkit', tool('verify-word-grammar'), ['--controls']),
+      env: { KAIRO_BROWSER: 'webkit' },
+      timeoutMs: 60 * 60 * 1000,
+    },
     // the living-thread guided session (operator-approved 2026-09-23): journey, real deck, moments
     { ...node('guided-session', tool('verify-guided-session')), env: { KAIRO_BROWSER: 'all' } },
     // …its engine rules and set-versus-bank checks, and its offline and single-file claims
@@ -2202,24 +2246,83 @@ function requireCompleteReport({
   }
 }
 
-async function runGate(gate, root, out, signal) {
+async function runGate(gate, root, out, signal, boundary = {}) {
   const log = join(out, `${gate.name}.log`);
   const startedAt = now();
+  const runId = randomUUID();
+  const attemptPath = join(out, `${gate.name}.attempt.json`);
+  const stdoutPath = join(out, `${gate.name}.stdout.json`);
+  let proof = null;
   writeFileSync(log, `${gate.command} ${gate.args.join(' ')}\n`);
-  const finish = (status, exitCode, detail = '', processExitCode = null) => ({
-    name: gate.name,
-    status,
-    exitCode,
-    processExitCode,
-    detail,
-    log,
-    startedAt,
-    completedAt: now(),
-  });
+  const finish = (status, exitCode, detail = '', processExitCode = null) => {
+    const result = {
+      name: gate.name,
+      runId,
+      attemptReceipt: attemptPath,
+      status,
+      exitCode,
+      processExitCode,
+      detail,
+      log,
+      startedAt,
+      completedAt: now(),
+      proof,
+    };
+    if (status === 'passed') {
+      result.evidenceReceipt = {
+        schemaVersion: 1,
+        kind: 'bunki-gate-evidence',
+        name: gate.name,
+        runId,
+        gitSha: boundary.gitSha || null,
+        artifactSha256: boundary.artifactSha256 || null,
+        fullAcceptance: true,
+        proof,
+      };
+      result.evidenceReceiptSha256 = digest(JSON.stringify(result.evidenceReceipt));
+    }
+    writeJson(attemptPath, {
+      schemaVersion: 1,
+      kind: 'bunki-gate-attempt',
+      ...result,
+      invocation: { command: gate.command, args: gate.args, cwd: gate.cwd || '.' },
+      candidate: boundary.source || null,
+    });
+    return result;
+  };
   if (gate.requiredPath && !existsSync(resolve(root, gate.requiredPath))) {
     return finish('missing', 127, `Required path is missing: ${gate.requiredPath}`);
   }
+  let declaration, invocation, commandBefore, sourceBefore;
+  const producer =
+    gate.requiredPath &&
+    existsSync(resolve(root, gate.requiredPath)) &&
+    lstatSync(resolve(root, gate.requiredPath)).isFile()
+      ? resolve(root, gate.requiredPath)
+      : null;
+  const verifierSha256 = producer ? digest(readFileSync(producer)) : null;
+  try {
+    declaration = gateEvidenceDeclaration(gate, root, out);
+    sourceBefore = sourceSnapshot(root);
+    assert.deepEqual(
+      sourceBefore,
+      boundary.sourceSnapshot,
+      'Source/input tree differs from the initial battery snapshot',
+    );
+    if (declaration.path)
+      assert(!existsSync(declaration.path), 'Preexisting receipt rejected before launch');
+    const evidenceDirectory = join(out, gate.name);
+    assert(
+      !existsSync(evidenceDirectory) || readdirSync(evidenceDirectory).length === 0,
+      'Gate evidence directory must be fresh',
+    );
+    invocation = evidenceInvocation(gate, declaration, root);
+    if (declaration.kind === 'command-check') commandBefore = commandCheckEvidence(gate, root);
+  } catch (error) {
+    return finish('incomplete', 78, error.message);
+  }
   const fd = openSync(log, 'a');
+  const stdoutFd = openSync(stdoutPath, 'wx');
   let child;
   let timer;
   let killTimer;
@@ -2250,10 +2353,10 @@ async function runGate(gate, root, out, signal) {
   let result;
   try {
     result = await new Promise((accept) => {
-      child = spawn(gate.command, gate.args, {
+      child = spawn(invocation.command, invocation.args, {
         cwd: resolve(root, gate.cwd || '.'),
-        env: { ...process.env, ...gate.env },
-        stdio: ['ignore', fd, fd],
+        env: { ...acceptanceEnvironment(process.env, invocation.env), KAIRO_GATE_RUN_ID: runId },
+        stdio: ['ignore', stdoutFd, fd],
         detached: process.platform !== 'win32',
       });
       child.once('error', (error) => accept({ error }));
@@ -2269,18 +2372,48 @@ async function runGate(gate, root, out, signal) {
     clearTimeout(killTimer);
     signal?.removeEventListener('abort', abort);
     closeSync(fd);
+    closeSync(stdoutFd);
+    appendFileSync(log, readFileSync(stdoutPath));
   }
   if (killed)
     return finish(killed, killed === 'timed-out' ? 124 : 130, `Gate ${killed}`, result.code);
   if (result.error) return finish('missing', 127, result.error.message);
   if (result.code !== 0)
     return finish('failed', result.code || 1, result.processSignal || '', result.code);
-  if (gate.report) {
-    try {
-      requireCompleteReport(gate.report);
-    } catch (error) {
-      return finish('incomplete', 78, error.message, 0);
-    }
+  try {
+    if (producer)
+      assert.equal(
+        digest(readFileSync(producer)),
+        verifierSha256,
+        'Verifier source changed during execution',
+      );
+    const sourceAfter = sourceSnapshot(root);
+    assert.deepEqual(sourceAfter, sourceBefore, 'Source/input tree changed during gate execution');
+    proof = validateGateEvidence(
+      gate,
+      declaration,
+      {
+        ...boundary,
+        root,
+        out,
+        startedAt,
+        runId,
+        stdoutPath,
+        commandBefore,
+        processExitCode: result.code,
+        engine: gate.env?.PERSONAL_HOST_BROWSER || gate.env?.KAIRO_BROWSER || 'chromium',
+        verifierSha256,
+        gitSha: boundary.gitSha,
+        sourceVerifiedBeforeAndAfter: sourceBefore !== null,
+        sourceBefore,
+        sourceAfter,
+        env: invocation.env,
+        environment: invocation.env,
+      },
+      requireCompleteReport,
+    );
+  } catch (error) {
+    return finish('incomplete', 78, error.message, 0);
   }
   return finish('passed', 0, '', 0);
 }
@@ -2330,16 +2463,93 @@ export async function runGates({ gates, root, out, source = null, signal }) {
       ].join('\n'),
     );
   };
+  const boundary = { source };
+  boundary.sourceSnapshot = sourceSnapshot(root);
+  boundary.gitSha = boundary.sourceSnapshot?.head || null;
+  if (source?.sha && boundary.gitSha)
+    assert.equal(source.sha, boundary.gitSha, 'Declared source SHA differs from actual HEAD');
+  receipt.sourceBefore = boundary.sourceSnapshot;
+  boundary.producerHashes = Object.fromEntries(
+    [
+      'prototypes/corridor/tools/verify-sense-truth.mjs',
+      'prototypes/corridor/tools/verify-speak.mjs',
+    ]
+      .filter((p) => existsSync(resolve(root, p)))
+      .map((p) => [p, digest(readFileSync(resolve(root, p)))]),
+  );
+  if (existsSync(resolve(root, 'prototypes/corridor/corridor.js')))
+    boundary.sourceSha256 = digest(readFileSync(resolve(root, 'prototypes/corridor/corridor.js')));
+  boundary.sourceHashes = Object.fromEntries(
+    [
+      'prototypes/corridor/tools/verify-record-binding.mjs',
+      'prototypes/corridor/record-binding.mjs',
+    ]
+      .filter((p) => existsSync(resolve(root, p)))
+      .map((p) => [resolve(root, p), digest(readFileSync(resolve(root, p)))]),
+  );
+
+  if (source?.site) {
+    const verified = verifyArtifact(source.site);
+    assert.equal(verified.artifactSha256, source.artifactSha256, 'Requested artifact differs');
+    const manifest = json(join(source.site, 'build-identity.json'));
+    assert.equal(manifest.gitSha, boundary.gitSha, 'Artifact and source HEAD differ');
+    Object.assign(boundary, {
+      site: source.site,
+      artifactSha256: verified.artifactSha256,
+      runtimeFiles: manifest.files,
+      artifactVerifiedBeforeAndAfter: true,
+      readArtifactJson: (path) => json(join(source.site, path)),
+    });
+    receipt.artifactBefore = verified;
+  }
   persist();
   for (const [index, gate] of gates.entries()) {
     if (signal?.aborted) break;
     receipt.gates[index] = { name: gate.name, status: 'running' };
     persist();
-    receipt.gates[index] = await runGate(gate, root, out, signal);
+    receipt.gates[index] = await runGate(gate, root, out, signal, boundary);
     persist();
     console.log(
       `[battery] ${gate.name} -> ${receipt.gates[index].status} (${receipt.gates[index].exitCode})`,
     );
+  }
+  const invalidatePassed = (detail) => {
+    for (const gate of receipt.gates)
+      if (gate.status === 'passed') {
+        gate.status = 'incomplete';
+        gate.exitCode = 78;
+        gate.detail = detail;
+        gate.proof = null;
+        delete gate.evidenceReceipt;
+        delete gate.evidenceReceiptSha256;
+        if (gate.attemptReceipt)
+          writeJson(gate.attemptReceipt, {
+            ...json(gate.attemptReceipt),
+            ...gate,
+            evidenceReceipt: null,
+            evidenceReceiptSha256: null,
+          });
+      }
+  };
+  try {
+    receipt.sourceAfter = sourceSnapshot(root);
+    assert.deepEqual(
+      receipt.sourceAfter,
+      receipt.sourceBefore,
+      'Source/input tree changed across the battery',
+    );
+  } catch (error) {
+    receipt.sourceBoundaryError = String(error.message);
+    invalidatePassed('Source boundary failed: ' + error.message);
+  }
+  if (source?.site) {
+    try {
+      receipt.artifactAfter = verifyArtifact(source.site);
+      assert.equal(receipt.artifactAfter.artifactSha256, receipt.artifactBefore.artifactSha256);
+    } catch (error) {
+      receipt.artifactBoundaryError = String(error.message);
+      invalidatePassed('Artifact boundary failed: ' + error.message);
+    }
   }
   receipt.status = signal?.aborted
     ? 'interrupted'
@@ -2363,6 +2573,38 @@ async function verifyRunner(out) {
   const invoke = (name, gates, interruptAfterMs) => {
     const evidence = join(out, name);
     const config = join(fixtures, `${name}.json`);
+    // Synthetic reports must be emitted by this fixture child inside this run,
+    // just as real producer reports must; parent-staged siblings are not fresh evidence.
+    gates = gates.map((item) => {
+      if (!item.report) return item;
+      const old = item.report.path,
+        target = join(evidence, `${item.name}-report.json`);
+      const args = item.args.map((arg) => arg.replaceAll(old, target));
+      if (existsSync(old)) {
+        const at = args.indexOf('-e');
+        assert(at >= 0, 'Report fixture must be an explicit child program');
+        let payload = lstatSync(old).isFile() ? readFileSync(old, 'utf8') : null;
+        let sidecars = '';
+        if (item.report.type === 'record-practice-finalize' && payload !== null) {
+          // Relocate the complete synthetic report bundle, preserving missing,
+          // malformed and symlinked sidecars for the existing rejection controls.
+          payload = payload.replaceAll(fixtures + '/', evidence + '/');
+          for (const engine of ['chromium', 'webkit']) {
+            const source = join(fixtures, engine),
+              destination = join(evidence, engine);
+            if (existsSync(source))
+              sidecars += `require('node:fs').cpSync(${JSON.stringify(source)},${JSON.stringify(destination)},{recursive:true,verbatimSymlinks:true});\n`;
+          }
+        }
+        args[at + 1] =
+          sidecars +
+          (!lstatSync(old).isFile()
+            ? `require('node:fs').cpSync(${JSON.stringify(old)},${JSON.stringify(target)},{recursive:true});\n`
+            : `require('node:fs').writeFileSync(${JSON.stringify(target)},${JSON.stringify(payload)});\n`) +
+          args[at + 1];
+      }
+      return { ...item, args, report: { ...item.report, path: target } };
+    });
     writeJson(config, { root: fixtures, out: evidence, gates, interruptAfterMs });
     const child = spawnSync(process.execPath, [driver, config], {
       encoding: 'utf8',
@@ -2376,6 +2618,7 @@ async function verifyRunner(out) {
     command: process.execPath,
     args: ['-e', source],
     timeoutMs: 3000,
+    fixtureReceipt: 'process-probe',
     ...extra,
   });
   const marker = join(fixtures, 'continued.txt');
@@ -2396,6 +2639,7 @@ async function verifyRunner(out) {
     gate('missing-file', 'process.exit(0)', { requiredPath: 'missing-verifier.mjs' }),
     {
       name: 'missing-executable',
+      fixtureReceipt: 'process-probe',
       command: join(fixtures, 'not-installed'),
       args: [],
       timeoutMs: 3000,
@@ -6131,19 +6375,23 @@ async function main() {
     const base = join(homedir(), '.dharma/bunki/release-gates');
     if (!args.length) mkdirSync(base, { recursive: true });
     const out = freshOutput(args[1] || mkdtempSync(join(base, 'verify-')));
-    const checks = [
-      ...(await verifyRunner(out)),
-      ...verifyTeachingReports(out),
-      ...verifySearchReports(out),
-      ...verifyStandaloneJourneyReports(out),
-      ...verifyArtifactFailures(out),
-      ...(await verifyWorkflows()),
-      ...(await verifyWorkflowFailures(out)),
+    const groupChecks = [
+      await verifyRunner(out),
+      verifyTeachingReports(out),
+      verifySearchReports(out),
+      verifyStandaloneJourneyReports(out),
+      verifyArtifactFailures(out),
+      await verifyWorkflows(),
+      await verifyWorkflowFailures(out),
     ];
+    const groups = RELEASE_GROUPS.map((id, index) => ({ id, checks: groupChecks[index] }));
+    const checks = groupChecks.flat();
     writeJson(join(out, 'verification-report.json'), {
       schemaVersion: 1,
       completedAt: now(),
       checks,
+      groups,
+      runId: process.env.KAIRO_GATE_RUN_ID,
       passed: checks.length,
       scope:
         'executed runner failure paths and parsed workflow contracts; GitHub-hosted deployment is not executed',
