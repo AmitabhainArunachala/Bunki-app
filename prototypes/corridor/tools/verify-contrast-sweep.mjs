@@ -32,7 +32,8 @@
  *             drawing — or is a mask (alpha only, no pigment); and no bokashi or drawing names a literal colour.
  *   C8 chrome (Hfix-1A, F-1) the fixed chrome is opaque enough that text under it never shows through: with the reading
  *             scrolled so text lies under the bars, each bar's pixels are the same with what scrolls under them (the
- *             room's, the page's, a deck's content) hidden as with it shown.
+ *             room's, the page's, a deck's content) hidden as with it shown. Judged wherever a bar paints (found over a
+ *             #ff00ff ground; a clear strip in a bar's box paints nothing and is no chrome).
  *             And C1 reads each line where a reader reads it: inside the open reading area between the bars and clear of
  *             their shade (a run's every line probed, not its first alone); a line outside it is read again with the
  *             document or the page scrolled clear, the run keeping its worst pair (F-1's 9 reds were lines read under the
@@ -976,15 +977,31 @@ try {
             const style = document.createElement('style');
             style.id = 'sweep-isolate';
             // only what scrolls under the bars goes: the room's content, the page's, a deck's; overlays that stand on a bar
-            // (the report door, the 層 mark, the slip) stay in both shots
+            // (the report door, the 層 mark, the slip) stay in both shots. A bar standing inside that content (a deck's top
+            // and grade bars) is never hidden and is itself made visible, so its own parts keep the visibility the app gave
+            // them (a part the bar hides while scrolled stays hidden)
             const under = ['#app > main', '#sheet > :not([data-sweep-bar])', '.kp-study > :not([data-sweep-bar])'];
-            style.textContent = `${under.map((q) => `${q}, ${q} *, ${q} *::before, ${q} *::after`).join(', ')} { visibility: hidden !important; transition: none !important; }
-              [data-sweep-bar], [data-sweep-bar] *, [data-sweep-bar]::before, [data-sweep-bar]::after, [data-sweep-bar] *::before, [data-sweep-bar] *::after { visibility: visible !important; }`;
+            const off = ':not([data-sweep-bar], [data-sweep-bar] *)';
+            style.textContent = `${under.map((q) => [`${q}${off}`, `${q} ${off}`, `${q}${off}::before`, `${q}${off}::after`, `${q} ${off}::before`, `${q} ${off}::after`].join(', ')).join(', ')} { visibility: hidden !important; transition: none !important; }
+              [data-sweep-bar] { visibility: visible !important; }`;
             document.head.append(style);
           });
           await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
           const alone = decodePng(await page.screenshot({ type: 'png' }));
-          await page.evaluate((m) => { document.getElementById('sweep-isolate')?.remove(); scrollBy({ top: -m.doc, behavior: 'instant' });
+          // the bars alone over a loud ground (#ff00ff): where a bar's box shows that ground unchanged, the bar paints
+          // nothing (a clear strip its box holds above its body, as the deck's grade bar does): no chrome there to judge.
+          // A bar that paints, however faintly (a frosted bar of the page's own colour), is judged on all it paints
+          await page.evaluate(() => {
+            const style = document.createElement('style');
+            style.id = 'sweep-bare';
+            const off = ':not([data-sweep-bar], [data-sweep-bar] *)';
+            style.textContent = `body *${off}, body *${off}::before, body *${off}::after, body::before, body::after { visibility: hidden !important; transition: none !important; }
+              [data-sweep-bar] { visibility: visible !important; } html { background: #ff00ff !important; } body { background: transparent !important; }`;
+            document.head.append(style);
+          });
+          await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+          const bare = decodePng(await page.screenshot({ type: 'png' }));
+          await page.evaluate((m) => { document.getElementById('sweep-isolate')?.remove(); document.getElementById('sweep-bare')?.remove(); scrollBy({ top: -m.doc, behavior: 'instant' });
             const sheet = document.getElementById('sheet'); if (sheet) sheet.scrollTop -= m.sheet; }, moved);
           const through = [];
           for (const r of barRects) {
@@ -992,6 +1009,8 @@ try {
             const x0 = Math.max(0, Math.floor(r.left * DPR)), x1 = Math.min(whole.width, Math.ceil(r.right * DPR));
             const y0 = Math.max(0, Math.floor(r.top * DPR)), y1 = Math.min(whole.height, Math.ceil(r.bottom * DPR));
             for (let y = y0; y < y1; y += 1) for (let x = x0; x < x1; x += 1) {
+              const m = pixel(bare, x, y);
+              if (m.r >= 250 && m.g <= 5 && m.b >= 250) continue;
               const a = pixel(whole, x, y), b = pixel(alone, x, y);
               const d = Math.max(Math.abs(a.r - b.r), Math.abs(a.g - b.g), Math.abs(a.b - b.b));
               if (d > worst) worst = d;
