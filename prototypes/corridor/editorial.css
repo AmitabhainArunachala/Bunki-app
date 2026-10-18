@@ -4323,6 +4323,10 @@ body:not([data-view='drift']) #sheet .eyebrow {
   text-transform: uppercase;
   color: var(--color-muted);
 }
+/* akafuji · the Words room's eyebrows stand on the room's graph ground, whose lines run through their letters: they take
+   the world's second ink, not its muted one, so they read at 4.5:1 against a line as well as the paper (the lead's
+   ruling 2026-10-19; contrast-sweep akafuji/words: "search" 4.37:1 at F's 12 px label) */
+:root[data-theme='akafuji'][data-room='search'] body:not([data-view='drift']) main .eyebrow { color: var(--color-ink-2); }
 body:not(.ui-bi):not([data-view='drift']) main .eyebrow,
 body:not(.ui-bi):not([data-view='drift']) #sheet .eyebrow { font-size: var(--type-caption); letter-spacing: 0.2em; text-transform: none; }
 body.v-depth-layered:not([data-view='drift']) .eyebrow.shelf-section::before,

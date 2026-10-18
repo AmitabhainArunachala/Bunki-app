@@ -71,9 +71,11 @@ html:is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) 
   }
 }
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) #app > main > .learn-stage {
-  /* bokashi: urushi — the Learn stage at night — depth: lantern gold held inside the world's lacquer coats */
+  /* bokashi: urushi — the Learn stage at night — depth: lantern gold held inside the world's lacquer coats, let go over
+     the ellipse's whole reach (a midway stop at half its gold), so at the stage's height under F's ladder no 24 px of it
+     steps more than once (contrast-sweep C4, yoru in WebKit; the lead's ruling 2026-10-19) */
   background:
-    radial-gradient(56% 46% at 50% 36%, color-mix(in srgb, var(--tone-gold) 16%, transparent), transparent 72%),
+    radial-gradient(56% 46% at 50% 36%, color-mix(in srgb, var(--tone-gold) 16%, transparent), color-mix(in srgb, var(--tone-gold) 8%, transparent) 50%, transparent 100%),
     linear-gradient(180deg, var(--color-lacquer-2), var(--color-lacquer));
   box-shadow: inset 0 -1px 0 rgb(255 255 255 / 6%), 0 1px 0 color-mix(in srgb, var(--color-seal) 55%, transparent);
 }
