@@ -920,6 +920,125 @@ body[data-view='drift'] #mini .mini-take:not(.taken):not(.reader-capture-held) {
 @keyframes read-mini-path { from { opacity: 0.01; transform: translate3d(-6px, 0, 0); } }
 #mini :is(.mini-sentence-open, .mini-sentence-pane)[hidden] { display: none; }
 
+/* G4 · 墨 — the word writes itself (corridor.js writeWord). The ink is the band's own white-out ink (--mini-head-ink: the
+   paper by day, the world's ink at night) and its お手本 the same ink at a breath (24 %): one pigment at two strengths, no
+   new colour (contract §6). Each character keeps its place and its text; while the ink stands in for a written character
+   its type is held clear, and at the end the ink dries into the type in one short crossfade. Nothing here takes a
+   pointer: the word is still the door to its page, mid-stroke included. */
+#mini .mini-word :is(.ink-word, .ink-char) { pointer-events: none; }
+#mini .mini-word .ink-char { position: relative; }
+#mini .mini-word .ink-glyph {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1em;
+  height: 1em;
+  overflow: visible;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+#mini .mini-word .ink-glyph path { fill: none; stroke-width: 7.5; stroke-linecap: round; stroke-linejoin: round; }
+/* the お手本 is one layer at a breath: its opacity is the group's, so crossing strokes never darken where they meet */
+#mini .mini-word .ink-ghost { opacity: 0.24; }
+#mini .mini-word .ink-ghost path { stroke: var(--mini-head-ink); }
+#mini .mini-word .ink-wet path { stroke: var(--mini-head-ink); stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+/* the word travels to the stage as its own お手本, and the ink writes over it where it lands */
+#mini .mini-word[data-ink='arriving'] { color: color-mix(in srgb, var(--mini-head-ink) 24%, transparent); }
+#mini .mini-word:is([data-ink='arriving'], [data-ink='writing'], [data-ink='finished']) .ink-char[data-strokes] { color: transparent; }
+/* finished by a press: every stroke drawn at once, until the press is released and the plain word stands */
+#mini .mini-word[data-ink='finished'] .ink-wet path { stroke-dashoffset: 0; opacity: 1; }
+#mini .mini-word[data-ink='writing'] .ink-char:not([data-strokes]) { transition: color 160ms ease-out; }
+#mini .mini-word[data-ink='settling'] .ink-char[data-strokes] { color: var(--mini-head-ink); transition: color 180ms ease-out; }
+#mini .mini-word[data-ink='settling'] .ink-glyph { opacity: 0; transition: opacity 180ms ease-in; }
+/* the reading keeps its place from the first frame and flows in over the writing's last 40 % */
+#mini .mini-reading[data-ink-held] { opacity: 0; }
+
+/* a bare word (recalled, owned): 読 and 意 on request — a quiet seal heads the reading's line and the meaning's; a tap
+   shows the line in place. A held line keeps its size unseen, so asking re-seats nothing and moves nothing */
+#mini .mini-asked { display: flex; align-items: flex-start; gap: 4px; margin: 0 0 0 -8px; min-height: 44px; }
+#mini .mini-asked-answer { display: grid; gap: 2px; min-width: 0; padding-top: 11px; }
+#mini .mini-asked-answer[data-ask-held] { visibility: hidden; }
+#mini .mini-asked .mini-gloss { margin: 0; }
+#mini .mini-ask-seal {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--mini-head-ink-2);
+  font: 600 16px/1 var(--font-headword, var(--serif));
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#mini .mini-ask-seal::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mini-head-ink) 52%, transparent);
+  pointer-events: none;
+}
+#mini .mini-ask-seal[aria-expanded='true'] { color: var(--mini-head-ink); }
+#mini .mini-ask-seal[aria-expanded='true']::before { box-shadow: inset 0 0 0 1px var(--mini-reading); }
+#mini .mini-ask-seal:focus-visible { outline: 2px solid var(--mini-gold, currentColor); outline-offset: -2px; border-radius: 50%; }
+#mini .mini-ask-seal { flex: none; }
+
+/* the stage's own marks, quiet at the end of its row: 筆 writes the word again, 音 says it in the recorded voice. A
+   word with no recording: the 音 is struck through, its name says so, and a tap says why in a line beneath */
+#mini .mini-marks {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  margin-inline-start: auto;
+}
+#mini .mini-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink-2);
+  font: 600 17px/1 var(--font-headword, var(--serif));
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#mini .mini-mark::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--mini-edge);
+  pointer-events: none;
+}
+#mini .mini-mark:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -3px; border-radius: 50%; }
+#mini .mini-voice[data-voice-unavailable] { color: var(--color-muted); }
+#mini .mini-voice[data-voice-unavailable]::after {
+  content: '';
+  position: absolute;
+  left: 13px;
+  right: 13px;
+  top: 50%;
+  border-top: 1px solid currentColor;
+  transform: rotate(-32deg);
+  pointer-events: none;
+}
+#mini .mini-say-note {
+  flex: 1 0 100%;
+  max-width: 230px;
+  margin: 0 6px 4px;
+  font: 400 12.5px/1.4 var(--font-ui, var(--sans));
+  color: var(--color-ink-2);
+  text-align: end;
+}
+#mini .mini-say-note:empty { display: none; }
+
 /* Save ▾'s menu unfolds inside the card, under its own button (John, 2026-10-14: "a drop down menu … with
    options inside the menu"): it never lies over another control; the card grows, and keepFloatingBeside
    seats the taller card beside its word again. One menu in every room, with no switch — S: the same rules dress it

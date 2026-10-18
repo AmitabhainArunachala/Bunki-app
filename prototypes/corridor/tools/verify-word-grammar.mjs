@@ -35,8 +35,17 @@
  *   --sky-ownership-only runs only that walk. --controls adds its three strict mutations and clean restores.
  * G3 negative controls: --controls replays stalled tap2, uncleared ruby, a front door, and the sky glyph's z-index, hit region
  *   and caption width removed; harness failures are incomplete.
- * --controls-only runs only the four candidate schedules, mutants and restores, with no frame measurements.
+ * --controls-only runs only the G3 and G4 candidate schedules, mutants and restores, with no frame measurements.
  * --g3-only is an explicit narrow slice, never a claim that the retained G1 gates passed.
+ * G4 (one-hand/G4/BRIEF.md) — ink: at the second rung the stage's ceremony follows depth (new and met write themselves over
+ *   their お手本, the reading flowing in over the last 40 %; seen again arrives written; recalled and owned arrive bare with
+ *   読 · 意 on request); the tempo is min(110, 1400 ÷ strokes) ≥ 45 ms a stroke scaled by the ONE 書く速さ slider, measured
+ *   slow > middle > fast; any tap, key or wheel finishes the writing at once and still acts; Settings 筆 (first meeting ·
+ *   always · never) and the 筆 replay mark; a hold and the demonstration never write; reduced motion arrives written; the
+ *   stroke page's first frame holds the whole character as a faint ghost and the bug rail never overlaps the readings;
+ *   声 is recorded audio only; WebKit frames ≤ 24 ms across the writing and its interrupt. --g4-only runs only G4.
+ *   G4 negative controls (with --controls): the tap that finishes the writing is consumed → G4.interrupt.save-acts red;
+ *   no ghost on the board → G4.ghost.first-frame and .first-pixels red; a second speed control → G4.one-speed red.
  * Negative controls (one-hand/G1/neg-control): the 91dvh cap back → P1 red; the scrim re-appended → P1 red; the word not
  * sent travelling (enterWord) → P2 red; the page fading in over the reader instead of arriving whole → P14 red. */
 import assert from 'node:assert/strict';
@@ -50,6 +59,7 @@ import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/r
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import { readAppRecord, readAppRecordSnapshot } from './record-test-support.mjs';
+import { restoreAppFixture } from './record-fixture-support.mjs';
 import { serveMutation } from './reader-gloss-mutants.mjs';
 
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Pin an immutable built site and its digest');
@@ -86,10 +96,13 @@ const kanaOnly = process.argv.includes('--kana-only');
 const skyReadingsOnly = process.argv.includes('--sky-readings-only');
 const skyOwnershipOnly = process.argv.includes('--sky-ownership-only');
 assert([controlsOnly, roomsOnly, sentencesOnly, kanaOnly, skyReadingsOnly, skyOwnershipOnly].filter(Boolean).length <= 1, 'Choose one explicit narrow schedule');
+const g4Only = process.argv.includes('--g4-only');
+assert(!(g4Only && (controlsOnly || roomsOnly || sentencesOnly || kanaOnly || skyReadingsOnly || skyOwnershipOnly)), 'Choose one explicit narrow schedule');
 const g3Only = controlsOnly || roomsOnly || sentencesOnly || kanaOnly || skyReadingsOnly || skyOwnershipOnly || process.argv.includes('--g3-only');
 const withControls = controlsOnly || process.argv.includes('--controls');
 // G2's walks and G3's narrow schedules each skip the other's walks: one schedule per run
 assert(!(g2Only && g3Only), 'Choose the G2 walks or a G3 schedule, not both');
+assert(!(g2Only && g4Only), 'Choose the G2 walks or G4, not both');
 
 // Lead0235 names glyphs absent from the shipped sky and hosted kanji corpus. Supply only fixture word/caption DATA in
 // the served response: real __lockWord → constellationLock → spawnGlyph → mountHostedNodeReading still runs. Do not
@@ -287,6 +300,37 @@ const GLYPHS = () => {
   };
 };
 const glyphsOf = (page, selector) => page.evaluate((s) => window.__glyphs(document.querySelector(s)), selector);
+/* G4 · every change of a stage headword's ink (data-ink: arriving · writing · settling; data-ink-ended: written · input ·
+ * replaced), with the document clock and what the word held then — read by the walks, never written back. */
+const INK_TRACE = () => {
+  window.__ink = [];
+  new MutationObserver((records) => {
+    for (const record of records) {
+      const word = record.target;
+      if (!(word instanceof Element) || !word.classList.contains('mini-word')) continue;
+      window.__ink.push({ at: performance.now(), name: record.attributeName, ink: word.dataset.ink ?? null, ended: word.dataset.inkEnded ?? null,
+        chars: word.querySelectorAll('.ink-char').length, text: word.textContent });
+    }
+  }).observe(document, { subtree: true, attributes: true, attributeFilter: ['data-ink', 'data-ink-ended'] });
+};
+/* G4 · 声 is recorded audio only: count every Audio made, every media play and every device-speech call. Counting only —
+ * each call still reaches the native (test-silenced) implementation unchanged. */
+const VOICE_SPY = () => {
+  const spy = window.__voice = { audio: 0, plays: 0, speak: 0, utterances: 0, attempts: 0 };
+  const NativeAudio = window.Audio;
+  if (typeof NativeAudio === 'function') {
+    window.Audio = new Proxy(NativeAudio, { construct(target, args, newTarget) { spy.audio += 1; return Reflect.construct(target, args, newTarget); } });
+  }
+  const media = window.HTMLMediaElement?.prototype;
+  const play = media && Object.getOwnPropertyDescriptor(media, 'play');
+  if (typeof play?.value === 'function') Object.defineProperty(media, 'play', { ...play, value: new Proxy(play.value, { apply(target, receiver, args) { spy.plays += 1; return Reflect.apply(target, receiver, args); } }) });
+  const speech = window.SpeechSynthesis?.prototype;
+  const speak = speech && Object.getOwnPropertyDescriptor(speech, 'speak');
+  if (typeof speak?.value === 'function') Object.defineProperty(speech, 'speak', { ...speak, value: new Proxy(speak.value, { apply(target, receiver, args) { spy.speak += 1; return Reflect.apply(target, receiver, args); } }) });
+  if (typeof window.SpeechSynthesisUtterance === 'function') {
+    window.SpeechSynthesisUtterance = new Proxy(window.SpeechSynthesisUtterance, { construct(target, args, newTarget) { spy.utterances += 1; return Reflect.construct(target, args, newTarget); } });
+  }
+};
 /** Two glyph boxes in the same place at the same size: 3 px, and 8 % of the height (2 px at least). */
 const near = (a, b) => !!a && !!b && Math.abs(a.left - b.left) <= 3 && Math.abs(a.top - b.top) <= 3 && Math.abs(a.height - b.height) <= Math.max(2, b.height * 0.08);
 
@@ -666,19 +710,21 @@ try {
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true });
     browserVersions[engine] = browser.version();
     console.log(`${engine} ${browserVersions[engine]}`);
-    const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true, control = null, init = null, demo = false, phase = 'candidate' } = {}) => {
+    const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true, control = null, init = null, demo = false, phase = 'candidate', reducedMotion = 'no-preference' } = {}) => {
       if (g2Only && !name.startsWith('g2')) return;
-      if (g3Only && !name.startsWith('G3')) return;
-      if (controlsOnly && !['G3-stalled', 'G3-clear', 'G3-front', 'G3-sky-ownership'].includes(name)) return;
+      // --controls-only is a G3 schedule that also replays G4's three candidate schedules (G4-named)
+      if (g3Only && !name.startsWith('G3') && !(controlsOnly && name.startsWith('G4'))) return;
+      if (g4Only && !name.startsWith('G4')) return;
+      if (controlsOnly && !['G3-stalled', 'G3-clear', 'G3-front', 'G3-sky-ownership', 'G4-interrupt-save', 'G4-ghost', 'G4-one-speed'].includes(name)) return;
       if (roomsOnly && !['G3-words', 'G3-words-family', 'G3-sky', 'G3-sky-glyph', 'G3-sky-ownership', 'G3-particle'].includes(name)) return;
       if (skyOwnershipOnly && name !== 'G3-sky-ownership') return;
       if (sentencesOnly && name !== 'G3-front' && !name.startsWith('G3-sentence-')) return;
       if (kanaOnly && name !== 'G3-kana' && name !== 'G3-particle') return;
       if (skyReadingsOnly && name !== 'G3-sky-glyph' && name !== 'G3-particle') return;
-      const context = await browser.newContext({ viewport, isMobile: mobile, hasTouch: true, deviceScaleFactor: 2, serviceWorkers: 'block' });
+      const context = await browser.newContext({ viewport, isMobile: mobile, hasTouch: true, deviceScaleFactor: 2, serviceWorkers: 'block', reducedMotion });
       await context.addInitScript(GLYPHS);
       if (!demo) await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
-      if (init) await context.addInitScript(init);
+      for (const script of [].concat(init || [])) await context.addInitScript(script);
       await silenceBrowserAudio(context);
       await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
       const setup = name === 'G3-sky-ownership' ? { engine, name, phase: control ? `mutant:${control.id}` : phase,
@@ -1379,6 +1425,566 @@ try {
       check('G3.demo.no-replay', 'navigation does not replay the demonstration', await page.locator('#mini[data-demo="true"], #reader-tip').count() === 0, await slipFacts(page));
     }, { demo: true });
 
+    /* ======================================================================== G4 · ink (one-hand/G4/BRIEF.md)
+     * Every G4 context records the stage headword's ink states as they change (INK_TRACE: data-ink, data-ink-ended, with
+     * the document clock) and counts every recorded-media play, Audio construction and device-speech call (VOICE_SPY). */
+    const g4Walk = (name, body, options = {}) => walk(name, body, { ...options, init: [INK_TRACE, VOICE_SPY, ...(options.init ? [options.init] : [])] });
+    const inkTrace = (page) => page.evaluate(() => window.__ink || []);
+    const voiceSpy = (page) => page.evaluate(() => ({ ...window.__voice }));
+    // a stage that has begun writing and is mid-way: some strokes drawn, some not yet begun
+    const midWriting = (page, timeout = 6000) => page.waitForFunction(() => {
+      const word = document.querySelector('#mini .mini-word');
+      if (word?.dataset.ink !== 'writing') return false;
+      const offsets = [...word.querySelectorAll('.ink-wet path')].map((path) => parseFloat(getComputedStyle(path).strokeDashoffset));
+      return offsets.some((value) => value <= 0.02) && offsets.some((value) => value >= 0.98);
+    }, null, { timeout, polling: 'raf' });
+    const settledInk = (page, timeout = 9000) => page.waitForFunction(() => {
+      const word = document.querySelector('#mini .mini-word');
+      return !!word && !word.dataset.ink && !!word.dataset.inkEnded && !word.querySelector('.ink-char');
+    }, null, { timeout });
+    const inkFacts = (page) => page.evaluate(() => {
+      const mini = document.getElementById('mini'), word = mini?.querySelector('.mini-word');
+      const reading = mini?.querySelector('.mini-reading'), gloss = mini?.querySelector('.mini-gloss');
+      const shown = (node) => !!node && getComputedStyle(node).display !== 'none' && getComputedStyle(node).visibility !== 'hidden' && node.getClientRects().length > 0;
+      const ghost = [...(word?.querySelectorAll('.ink-ghost') || [])];
+      const flow = reading?.getAnimations().map((animation) => animation.effect.getComputedTiming())[0] || null;
+      return { stage: !!mini, ceremony: mini?.dataset.ceremony ?? null, depth: mini?.dataset.depth ?? null,
+        word: word?.textContent ?? null, ink: word?.dataset.ink ?? null, ended: word?.dataset.inkEnded ?? null,
+        ms: Number(word?.dataset.inkMs || 0), strokes: Number(word?.dataset.inkStrokes || 0), chars: word?.querySelectorAll('.ink-char').length ?? 0,
+        wet: [...(word?.querySelectorAll('.ink-wet path') || [])].map((path) => Math.round(parseFloat(getComputedStyle(path).strokeDashoffset) * 1000) / 1000),
+        ghostPaths: ghost.reduce((n, g) => n + g.querySelectorAll('path').length, 0),
+        ghostShown: ghost.length > 0 && ghost.every((g) => Number(getComputedStyle(g).opacity) > 0 && getComputedStyle(g).visibility !== 'hidden'),
+        inkPointer: [...(word?.querySelectorAll('.ink-word, .ink-char, .ink-glyph') || [])].every((node) => getComputedStyle(node).pointerEvents === 'none'),
+        // the band holds the word as one child while it writes, as G3 drew it (readers take its first node as the word)
+        oneChild: !!word && word.childNodes.length === 1 && word.childNodes[0].textContent === word.textContent,
+        ariaHidden: [...(word?.querySelectorAll('.ink-glyph') || [])].every((svg) => svg.getAttribute('aria-hidden') === 'true'),
+        reading: reading ? { text: reading.textContent, shown: shown(reading), opacity: Number(getComputedStyle(reading).opacity),
+          height: reading.getBoundingClientRect().height } : null,
+        flow: flow && { delay: flow.delay, duration: flow.duration },
+        gloss: gloss ? { shown: shown(gloss) } : null,
+        asks: [...(mini?.querySelectorAll('.mini-ask-seal') || [])].map((button) => button.dataset.ask),
+        brush: !!mini?.querySelector('#mini-brush'), voice: !!mini?.querySelector('#mini-voice'),
+        speed: mini?.querySelectorAll('input[type="range"], .stroke-speed-wrap').length ?? 0 };
+    });
+    /* Words of the walked story at each depth, seeded through the actual import (restoreAppFixture). The cards follow the
+     * pinned FSRS shape; recalled and owned are reviewed cards with present recall ≥ 0.9 at 10 and 60 days' stability. */
+    const DEPTH_WORDS = Object.freeze({ unmet: '総理', met: '大臣', again: '官邸', recalled: '表彰', owned: '出席' });
+    const depthRecord = () => {
+      const T = Date.now(), iso = (ms) => new Date(ms).toISOString(), day = 86400000;
+      const card = (fields) => ({ difficulty: 5, elapsed_days: 0, scheduled_days: 0, reps: 0, lapses: 0, learning_steps: 0, ...fields });
+      return { v: 1,
+        taken: ['met', 'again', 'recalled', 'owned'].map((depth, i) => ({ t: 'word', id: DEPTH_WORDS[depth], label: DEPTH_WORDS[depth], ts: T - 3e7 - i, started: T - 3e7 - i })),
+        srs: {
+          [`word:${DEPTH_WORDS.met}`]: card({ due: iso(T), stability: 0, state: 0 }),
+          [`word:${DEPTH_WORDS.again}`]: card({ due: iso(T + 600000), last_review: iso(T - 600000), stability: 0.4, reps: 1, state: 1, learning_steps: 1 }),
+          [`word:${DEPTH_WORDS.recalled}`]: card({ due: iso(T + 9 * day), last_review: iso(T - day), stability: 10, elapsed_days: 1, scheduled_days: 10, reps: 4, state: 2 }),
+          [`word:${DEPTH_WORDS.owned}`]: card({ due: iso(T + 58 * day), last_review: iso(T - 2 * day), stability: 60, elapsed_days: 2, scheduled_days: 60, reps: 7, state: 2 }),
+        } };
+    };
+    const seedDepths = async (page) => { await boot(page); await restoreAppFixture(page, depthRecord()); };
+    /** Settings, reached as he reaches it: the Me tab (or Progress, in the layout under test), then its Settings door. */
+    const openSettings = async (page) => {
+      await boot(page);
+      await page.locator('#tab-me, #tab-progress').first().click();
+      await page.locator('#me-settings').click();
+      await page.locator('#settings-writing').waitFor();
+    };
+    /** A tap on a staged-and-writing word's own control, read the moment the tap has landed: the writing has finished at once
+     * — ended by that input, and every stroke drawn (or already the plain word) — and the plain word follows the release. */
+    const tapMidWriting = async (page, locator) => {
+      await midWriting(page);
+      const before = await inkFacts(page);
+      await locator.tap();
+      const after = await page.evaluate(() => {
+        const word = document.querySelector('#mini .mini-word');
+        const offsets = [...(word?.querySelectorAll('.ink-wet path') || [])].map((path) => parseFloat(getComputedStyle(path).strokeDashoffset));
+        return { ended: [...(window.__ink || [])].filter((row) => row.ended === 'input').length,
+          chars: word?.querySelectorAll('.ink-char').length ?? 0, drawn: offsets.every((value) => value <= 0.001) };
+      });
+      return { before, after };
+    };
+    /* The interrupt schedule the negative control replays: a tap on Save during the writing finishes it at once and still
+     * saves the word. */
+    const interruptSaveProbe = async (page) => {
+      await openStory(page);
+      await stage(page, readerWord(page));
+      const { before, after } = await tapMidWriting(page, page.locator('#mini #mini-take'));
+      check('G4.interrupt.save-writing', 'Save was pressed while the word was writing itself, strokes still to come', before.ink === 'writing' && before.wet.some((v) => v >= 0.98), before);
+      const plain = await page.waitForFunction(() => { const word = document.querySelector('#mini .mini-word'); return !!word && !word.querySelector('.ink-char') && !word.dataset.ink; }, null, { timeout: 1000 }).then(() => true, () => false);
+      check('G4.interrupt.save-at-once', 'the tap finished the writing at once — ended by that input, every stroke drawn — and the plain word stood once the tap was released',
+        after.ended >= 1 && (after.chars === 0 || after.drawn) && plain, { ...after, plain });
+      const saved = await page.waitForFunction(() => {
+        const seal = document.querySelector('#mini #mini-take');
+        return seal?.getAttribute('aria-pressed') === 'true' || seal?.classList.contains('taken') ? true : null;
+      }, null, { timeout: 5000 }).then(() => true, () => false);
+      const record = await readAppRecord(page);
+      check('G4.interrupt.save-acts', 'the same tap still saved the word: the record keeps it and the Save says so',
+        saved && record.taken.some((item) => item.t === 'word' && item.id === WORD), { saved, taken: record.taken.map((item) => `${item.t}:${item.id}`) });
+    };
+    /* The ghost schedule the negative control replays: the stroke page's first frame already holds the whole character as
+     * a faint お手本 — read in the DOM at its first animation frame and in pixels at the first screenshot. */
+    const GHOST_KANJI = '海';
+    const ghostProbe = async (page) => {
+      await boot(page);
+      await page.evaluate(() => {
+        window.__firstBoard = null;
+        new MutationObserver((records, observer) => {
+          if (!document.getElementById('stroke-page')) return;
+          observer.disconnect();
+          requestAnimationFrame(() => {
+            const page = document.getElementById('stroke-page');
+            const roots = [document.querySelector('.stroke-nums-lift'), page].filter(Boolean);
+            const guides = roots.flatMap((root) => [...root.querySelectorAll('.stroke-guide')]);
+            const visible = (node) => { for (let at = node; at && at !== document.documentElement; at = at.parentElement || at.parentNode?.host) {
+              const style = getComputedStyle(at); if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) return false; } return true; };
+            const stage = page.querySelector('.stroke-stage').getBoundingClientRect();
+            const painted = guides.filter(visible).filter((guide) => { const box = guide.getBoundingClientRect();
+              return box.width > 0 && box.right > stage.left && box.left < stage.right && box.bottom > stage.top && box.top < stage.bottom; });
+            window.__firstBoard = { ready: page.dataset.inkReady, living: page.dataset.living, guides: guides.length, painted: painted.length,
+              paths: painted.reduce((n, guide) => n + guide.querySelectorAll('path').length, 0) };
+          });
+        }).observe(document.body, { childList: true, subtree: true });
+      });
+      await openShelfTools(page);
+      await page.locator('#search').fill(GHOST_KANJI);
+      await page.locator(`[data-result="kanji:${GHOST_KANJI}"]`).first().click();
+      await page.locator('#strokes-door').waitFor();
+      const strokes = Number(await page.locator('#strokes-door').getAttribute('data-strokes'));
+      await page.locator('#strokes-door').click();
+      await page.locator('#stroke-page').waitFor();
+      const shot = decodePng(await page.screenshot());
+      const first = await page.evaluate(() => new Promise((done) => { const wait = () => (window.__firstBoard ? done(window.__firstBoard) : requestAnimationFrame(wait)); wait(); }));
+      const box = await boxOf(page, '#stroke-page .stroke-stage');
+      const scale = await page.evaluate(() => devicePixelRatio);
+      // ink on the board: pixels at least 14 levels darker (day) or lighter (night) than the board's own median paper
+      const sample = [], { width, px } = shot;
+      for (let y = Math.round(box.y * scale) + 4; y < Math.round((box.y + box.height) * scale) - 4; y += 2)
+        for (let x = Math.round(box.x * scale) + 4; x < Math.round((box.x + box.width) * scale) - 4; x += 2) {
+          const i = (y * width + x) * 3; sample.push(0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2]);
+        }
+      const median = [...sample].sort((a, b) => a - b)[sample.length >> 1];
+      const night = median < 110;
+      const ink = sample.filter((value) => (night ? value - median : median - value) >= 14).length / sample.length;
+      check('G4.ghost.first-frame', `the stroke page's first frame holds the whole ${GHOST_KANJI} as a faint お手本 (its ${strokes} strokes, painted over the board)`,
+        first.painted >= 1 && first.paths === strokes, { ...first, strokes });
+      check('G4.ghost.first-pixels', 'the first screenshot of the board is not empty: the ghost is ink on the paper, in pixels', ink >= 0.012, { ink: Math.round(ink * 10000) / 100, median, night });
+    };
+    /* The one speed control: the writing room's three-step slider, and no other anywhere a word writes itself. */
+    const SPEED = '#stroke-speed-range, input[type="range"].stroke-speed-range, .stroke-speed-wrap input[type="range"]';
+    const oneSpeedProbe = async (page) => {
+      await openStory(page);
+      await stage(page, readerWord(page));
+      const onStage = await page.locator(`#mini :is(${SPEED})`).count();
+      await page.keyboard.press('Escape');
+      await openSettings(page);
+      const inSettings = await page.locator(`#app main :is(${SPEED})`).count();
+      const brushRow = await page.locator('#settings-brush button').count();
+      await boot(page);
+      await openShelfTools(page);
+      await page.locator('#search').fill('総');
+      await page.locator('[data-result="kanji:総"]').first().click();
+      await page.locator('#strokes-door').click();
+      await page.locator('#stroke-page').waitFor();
+      const inRoom = await page.locator(`#stroke-page :is(${SPEED})`).count();
+      const label = await page.locator('#stroke-page .stroke-speed-label').first().textContent().catch(() => '');
+      check('G4.one-speed', 'exactly one writing-speed control: the writing room’s three-step slider — none on the stage, none in Settings (筆 sets only when)',
+        onStage === 0 && inSettings === 0 && inRoom === 1 && /Writing speed|書く速さ/u.test(label || '') && brushRow === 3, { onStage, inSettings, inRoom, label, brushRow });
+    };
+    for (const [name, probe] of [['G4-interrupt-save', interruptSaveProbe], ['G4-ghost', ghostProbe], ['G4-one-speed', oneSpeedProbe]]) {
+      const begin = rows.length;
+      await g4Walk(name, probe);
+      schedules[name] = rows.slice(begin);
+    }
+
+    await g4Walk('G4-depth', async (page) => {
+      await seedDepths(page);
+      for (const [depth, label] of Object.entries(DEPTH_WORDS)) {
+        await openStory(page);
+        const word = readerWord(page, label);
+        await word.scrollIntoViewIfNeeded();
+        await page.evaluate(() => { window.__ink = []; });
+        await stage(page, word);
+        const first = await inkFacts(page);
+        if (depth === 'unmet' || depth === 'met') {
+          check(`G4.depth.${depth}.write`, `${depth} (${label}): the word comes closer to write itself — its whole お手本 there from the first frame, the type held for the ink, the reading's place kept but unwritten, the word still one child of its band`,
+            first.ceremony === 'write' && first.depth === depth && ['arriving', 'writing'].includes(first.ink) && first.chars === [...label].length &&
+            first.ghostShown && first.ghostPaths === first.strokes && first.strokes > 0 && first.reading?.shown && first.reading.opacity === 0 && first.inkPointer && first.ariaHidden &&
+            first.oneChild && first.word === label, first);
+          await midWriting(page);
+          const mid = await inkFacts(page);
+          const ordered = mid.wet.every((value, i) => i === 0 || value >= mid.wet[i - 1] - 0.001);
+          check(`G4.depth.${depth}.strokes`, 'mid-way the strokes are drawn one after another, in order: the first done, the last not begun',
+            mid.ink === 'writing' && ordered && mid.wet[0] <= 0.02 && mid.wet.at(-1) >= 0.98, mid.wet);
+          check(`G4.depth.${depth}.reading-flow`, 'the reading flows in over the writing’s last 40 % (its fade begins at 60 % of the writing and lasts 40 %)',
+            !!mid.flow && Math.abs(mid.flow.delay - (0.6 * mid.ms - 0)) <= 2 && Math.abs(mid.flow.duration - 0.4 * mid.ms) <= 2 && mid.reading?.opacity < 1, { ms: mid.ms, flow: mid.flow, reading: mid.reading });
+          await settledInk(page);
+          const done = await inkFacts(page);
+          const trace = (await inkTrace(page)).map((row) => row.ink || (row.ended ? `ended:${row.ended}` : 'plain'));
+          check(`G4.depth.${depth}.settled`, 'written, the ink dries into the word’s own type: the plain word, its reading shown',
+            done.ended === 'written' && done.chars === 0 && done.word === label && done.reading?.opacity === 1 && done.gloss?.shown, { done, trace });
+        } else if (depth === 'again') {
+          await delay(900);
+          const later = await inkFacts(page);
+          const trace = await inkTrace(page);
+          check('G4.depth.again.written', `seen again (${label}): it arrives written, with its reading — no ink at any moment`,
+            first.ceremony === 'written' && first.depth === 'again' && !first.ink && first.chars === 0 && first.reading?.shown && first.reading.opacity === 1 &&
+            later.chars === 0 && trace.every((row) => !row.ink), { first, trace });
+        } else {
+          const ask = (what) => page.locator(`#mini .mini-ask-seal[data-ask="${what}"]`);
+          const place = async () => ({ card: await boxOf(page, '#mini'), reading: await boxOf(page, '#mini .mini-ask-seal[data-ask="reading"]'),
+            meaning: await boxOf(page, '#mini .mini-ask-seal[data-ask="meaning"]') });
+          // the stage has settled: its entry has answered (a first draw may be drawn again) and it has risen
+          await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 5000 }).catch(() => {});
+          await delay(450);
+          const row0 = await place();
+          check(`G4.depth.${depth}.bare`, `${depth} (${label}): it arrives bare — no ink, its reading and meaning held behind 読 · 意`,
+            first.ceremony === 'bare' && first.depth === depth && first.chars === 0 && !first.reading?.shown && !first.gloss?.shown &&
+            JSON.stringify(first.asks) === JSON.stringify(['reading', 'meaning']), first);
+          await ask('reading').tap(); await delay(250);
+          const read = await inkFacts(page);
+          const row1 = await place();
+          await ask('meaning').tap(); await delay(250);
+          const meant = await inkFacts(page);
+          const row2 = await place();
+          const same = (a, b) => !!a && !!b && ['x', 'y', 'width', 'height'].every((k) => Math.abs(a[k] - b[k]) <= 0.5);
+          const still = (a, b) => same(a.card, b.card) && same(a.reading, b.reading) && same(a.meaning, b.meaning);
+          check(`G4.depth.${depth}.on-request`, '読 shows the reading, then 意 the meaning, one tap each, in place: the card, the 読 and the 意 never move',
+            read.reading?.shown && !read.gloss?.shown && meant.reading?.shown && meant.gloss?.shown && still(row0, row1) && still(row1, row2) &&
+            await ask('reading').getAttribute('aria-expanded') === 'true', { read: read.reading, meant: meant.gloss, row0, row1, row2 });
+        }
+        await page.keyboard.press('Escape'); await delay(250);
+      }
+      // the ceremony is the visit's: a return from the page keeps what was asked, and never writes again
+      await openStory(page);
+      await stage(page, readerWord(page, DEPTH_WORDS.recalled));
+      await page.locator('#mini .mini-ask-seal[data-ask="reading"]').tap(); await delay(200);
+      await page.locator('#mini .mini-word').tap(); await pageSettled(page);
+      await page.locator('#sheet-back').tap(); await bare(page);
+      const back = await inkFacts(page);
+      check('G4.depth.return', 'Back from the page restores the bare stage as he left it (its reading asked, its meaning not) — no ink',
+        back.ceremony === 'bare' && back.reading?.shown && !back.gloss?.shown && back.chars === 0, back);
+    });
+
+    await g4Walk('G4-tempo', async (page) => {
+      const measured = {};
+      for (const [step, name] of [[0, 'slow'], [2, 'fast'], [1, 'middle']]) {
+        // his one slider, in the writing room, moved by the keyboard as he would
+        await boot(page);
+        await openShelfTools(page);
+        await page.locator('#search').fill('総');
+        await page.locator('[data-result="kanji:総"]').first().click();
+        await page.locator('#strokes-door').click();
+        const range = page.locator('#stroke-page #stroke-speed-range');
+        await range.waitFor();
+        await range.focus();
+        const at = Number(await range.inputValue());
+        for (let i = at; i !== step; i += step > at ? 1 : -1) await page.keyboard.press(step > at ? 'ArrowRight' : 'ArrowLeft');
+        await range.dispatchEvent('change');
+        const set = { value: await range.inputValue(), text: await range.getAttribute('aria-valuetext'), stored: await page.evaluate(() => localStorage.getItem('kairo-stroke-speed-v1')) };
+        await page.locator('#strokes-back').click();
+        await openStory(page);
+        await page.evaluate(() => { window.__ink = []; });
+        await stage(page, readerWord(page));
+        await settledInk(page);
+        const facts = await inkFacts(page);
+        const trace = await inkTrace(page);
+        const began = trace.find((row) => row.ink === 'writing'), ended = trace.find((row) => row.ended === 'written');
+        measured[name] = { set, planned: facts.ms, strokes: facts.strokes, wall: began && ended ? Math.round(ended.at - began.at) : null };
+        await page.keyboard.press('Escape'); await delay(200);
+      }
+      const { slow, middle, fast } = measured;
+      const expect = (speed) => Math.round(Math.max(45, Math.min(110, 1400 / middle.strokes)) * middle.strokes * (1.1 / speed));
+      check('G4.tempo.slider', 'the one slider set slow, fast and middle (0.7 · 1.6 · 1.1), as the device keeps it',
+        slow.set.value === '0' && slow.set.stored === '0.7' && fast.set.value === '2' && fast.set.stored === '1.6' && middle.set.value === '1' && middle.set.stored === '1.1', measured);
+      check('G4.tempo.planned', `総理 (${middle.strokes} strokes): each stroke min(110, 1400 ÷ strokes) ≥ 45 ms at the middle step — 1.4 s — scaled by the slider`,
+        middle.strokes === 25 && middle.planned === 1400 && slow.planned === expect(0.7) && fast.planned === expect(1.6), measured);
+      check('G4.tempo.measured', 'measured on the page clock, slow > middle > fast, each within a frame or two of its plan, and the middle ≤ 1.4 s (+ one frame)',
+        [slow, middle, fast].every((m) => Number.isFinite(m.wall) && m.wall >= m.planned - 20 && m.wall <= m.planned + 120) &&
+        slow.wall > middle.wall && middle.wall > fast.wall && middle.wall <= 1400 + 34, measured);
+    });
+
+    await g4Walk('G4-interrupt', async (page) => {
+      // the word itself: the tap finishes the writing and still opens the page
+      await openStory(page);
+      await stage(page, readerWord(page));
+      let { before, after } = await tapMidWriting(page, page.locator('#mini .mini-word'));
+      await pageSettled(page);
+      check('G4.interrupt.word', 'a tap on the writing word finishes it at once and still opens its page', before.ink === 'writing' && after.ended >= 1 &&
+        coversViewport(await pageFacts(page)) && (await pageFacts(page)).headword.startsWith(WORD), { before: before.ink, after, page: await pageFacts(page) });
+      await page.locator('#sheet-back').tap(); await bare(page);
+      const back = await inkFacts(page);
+      check('G4.interrupt.word-return', 'Back returns the stage written, and it never writes again on a return', back.ceremony === 'write' && back.chars === 0 && !back.ink, back);
+      await leaveStage(page);
+      // a key: Escape finishes the writing and still folds the stage
+      await page.evaluate(() => { window.__ink = []; });
+      await stage(page, readerWord(page));
+      await midWriting(page);
+      await page.keyboard.press('Escape');
+      await page.waitForFunction(() => !document.getElementById('mini'), null, { timeout: 3000 }).catch(() => {});
+      let trace = await inkTrace(page);
+      check('G4.interrupt.key', 'a key (Escape) finishes the writing at once and still folds the stage', trace.some((row) => row.ended === 'input') && !await page.locator('#mini').count(), trace.slice(-3));
+      // the paper: a tap beside the stage finishes the writing and still folds it
+      await page.evaluate(() => { window.__ink = []; });
+      await stage(page, readerWord(page));
+      await midWriting(page);
+      const gutter = await page.evaluate(() => { const r = document.getElementById('reader').getBoundingClientRect(); return { x: Math.max(2, r.left / 2), y: Math.min(innerHeight - 140, 760) }; });
+      const onPaper = await page.evaluate(({ x, y }) => { const hit = document.elementFromPoint(x, y); return !!hit && !hit.closest('#mini, .tok, button, a, [role="button"]'); }, gutter);
+      await page.touchscreen.tap(gutter.x, gutter.y);
+      await page.waitForFunction(() => !document.getElementById('mini'), null, { timeout: 3000 }).catch(() => {});
+      trace = await inkTrace(page);
+      check('G4.interrupt.paper', 'a tap on the paper finishes the writing at once and still folds the stage', onPaper && trace.some((row) => row.ended === 'input') && !await page.locator('#mini').count(), { onPaper, gutter, trace: trace.slice(-3) });
+      // a finger's scroll (Chromium: the devtools touch input drags the page; mobile WebKit has no drivable touch drag)
+      if (engine === 'chromium') {
+        await page.evaluate(() => { window.__ink = []; window.scrollTo(0, 0); });
+        await delay(200);
+        await stage(page, readerWord(page));
+        await midWriting(page);
+        const y0 = await page.evaluate(() => scrollY);
+        const cdp = await page.context().newCDPSession(page);
+        const x = 30, y = 760;
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
+        for (let i = 1; i <= 8; i++) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: y - i * 30 }] });
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+        await delay(500);
+        trace = await inkTrace(page);
+        const y1 = await page.evaluate(() => scrollY);
+        check('G4.interrupt.touch-scroll', 'a finger scrolling the page during the writing finishes it at once and the page still scrolls', trace.some((row) => row.ended === 'input') && y1 > y0, { y0, y1, trace: trace.slice(-3) });
+      }
+    });
+
+    // a wheel (a Mac's trackpad or mouse): the writing finishes and the page still scrolls
+    await g4Walk('G4-interrupt-desktop', async (page) => {
+      await openStory(page);
+      await page.evaluate(() => { window.__ink = []; window.scrollTo(0, 0); });
+      await stage(page, readerWord(page));
+      await midWriting(page);
+      const y0 = await page.evaluate(() => scrollY);
+      const at = await boxOf(page, '#reader');
+      await page.mouse.move(at.x + at.width / 2, Math.min(at.y + at.height - 20, 600));
+      await page.mouse.wheel(0, 300);
+      await delay(500);
+      const trace = await inkTrace(page);
+      const y1 = await page.evaluate(() => scrollY);
+      check('G4.interrupt.wheel', 'a wheel during the writing finishes it at once and the page still scrolls (a Mac window)', trace.some((row) => row.ended === 'input') && y1 > y0, { y0, y1, trace: trace.slice(-3) });
+      // a mouse: the press that finishes the writing still clicks — the word opens its page, Save saves
+      await page.keyboard.press('Escape'); await delay(300);
+      await page.evaluate(() => { window.__ink = []; window.scrollTo(0, 0); });
+      await delay(200);
+      await stage(page, readerWord(page));
+      await midWriting(page);
+      await page.locator('#mini .mini-word').click();
+      const opened = await page.locator('#sheet').waitFor({ timeout: 5000 }).then(() => true, () => false);
+      const facts = opened ? await pageFacts(page) : null;
+      check('G4.interrupt.mouse-word', 'a mouse click on the writing word finishes it at once and still opens its page', opened && facts?.headword.startsWith(WORD) &&
+        (await inkTrace(page)).some((row) => row.ended === 'input'), { opened, headword: facts?.headword });
+      if (opened) { await page.locator('#sheet-back').click(); await bare(page); }
+      await page.keyboard.press('Escape'); await delay(300);
+      await stage(page, readerWord(page, DEPTH_WORDS.met));
+      await midWriting(page);
+      await page.locator('#mini #mini-take').click();
+      const saved = await page.waitForFunction(() => { const seal = document.querySelector('#mini #mini-take'); return seal?.getAttribute('aria-pressed') === 'true' || seal?.classList.contains('taken') ? true : null; },
+        null, { timeout: 5000 }).then(() => true, () => false);
+      const record = await readAppRecord(page);
+      check('G4.interrupt.mouse-save', 'a mouse click on Save during the writing finishes it and still saves the word', saved && record.taken.some((item) => item.t === 'word' && item.id === DEPTH_WORDS.met),
+        { saved, taken: record.taken.map((item) => `${item.t}:${item.id}`) });
+    }, { viewport: { width: 1280, height: 800 }, mobile: false });
+
+    await g4Walk('G4-brush', async (page) => {
+      // Settings 筆 → never: the word arrives written; the device keeps the choice
+      await openSettings(page);
+      await page.locator('#settings-brush [data-value="never"]').click();
+      const chosen = { pressed: await page.locator('#settings-brush [aria-pressed="true"]').getAttribute('data-value'),
+        stored: await page.evaluate(() => localStorage.getItem('kairo-word-brush-v1')) };
+      await openStory(page);
+      await page.evaluate(() => { window.__ink = []; });
+      await stage(page, readerWord(page));
+      await delay(900);
+      const never = await inkFacts(page);
+      check('G4.brush.never', 'Settings 筆 never: a new word arrives written, its reading at once', chosen.pressed === 'never' && chosen.stored === 'never' &&
+        never.ceremony === 'written' && never.chars === 0 && (await inkTrace(page)).every((row) => !row.ink) && never.reading?.opacity === 1, { chosen, never });
+      // the 筆 mark writes it again under never, and changes nothing he keeps
+      const record = async () => { const r = await readAppRecord(page); return JSON.stringify({ taken: r.taken, srs: r.srs, revlog: r.revlog }); };
+      const kept = await record();
+      await page.locator('#mini #mini-brush').tap();
+      await midWriting(page);
+      const again = await inkFacts(page);
+      await settledInk(page);
+      check('G4.brush.mark', 'the 筆 mark writes the word again — any depth, any 筆 — and never changes depth, record or scheduling',
+        again.ink === 'writing' && again.depth === 'unmet' && (await inkFacts(page)).ended === 'written' && await record() === kept, { again, same: await record() === kept });
+      await page.keyboard.press('Escape');
+      // always: a word he has seen again writes too
+      await seedDepths(page);
+      await page.evaluate(() => localStorage.setItem('kairo-word-brush-v1', 'always'));
+      await openStory(page);
+      await stage(page, readerWord(page, DEPTH_WORDS.again));
+      const always = await inkFacts(page);
+      check('G4.brush.always', 'Settings 筆 always: a word seen again writes itself as it comes closer', always.ceremony === 'write' && always.depth === 'again' && ['arriving', 'writing'].includes(always.ink), always);
+      await page.keyboard.press('Escape');
+      // a hold never writes: the Words web's hold opens its stage written
+      await page.evaluate(() => localStorage.setItem('kairo-word-brush-v1', 'first'));
+      await openStory(page);
+      await openWeb(page, '海');
+      await page.evaluate(() => { window.__ink = []; });
+      const node = page.locator('.ww-node[data-ww-type="word"][data-ww-key="海洋"]');
+      await node.click({ button: 'right' }); await delay(900);
+      const held = await inkFacts(page);
+      check('G4.brush.hold', 'a hold (right-click) opens the word written — a hold never writes', held.stage && held.word === '海洋' && held.ceremony === 'written' &&
+        held.chars === 0 && (await inkTrace(page)).every((row) => !row.ink), held);
+      await page.keyboard.press('Escape');
+    });
+
+    await g4Walk('G4-demo', async (page) => {
+      await openStory(page);
+      await page.locator('#mini[data-demo="true"] .mini-word').waitFor();
+      await delay(900);
+      const demo = await inkFacts(page);
+      check('G4.demo.no-ink', 'the one-time demonstration never writes: a cold record writes only the words he brings closer', demo.ceremony === 'written' && demo.chars === 0 &&
+        (await inkTrace(page)).every((row) => !row.ink), demo);
+    }, { demo: true });
+
+    await g4Walk('G4-reduced', async (page) => {
+      await openStory(page);
+      await stage(page, readerWord(page));
+      const first = await inkFacts(page);
+      await delay(700);
+      check('G4.reduced', 'reduced motion: the word arrives written, its reading at once, and no 筆 mark (nothing is written over time)',
+        first.ceremony === 'written' && first.chars === 0 && !first.brush && first.reading?.opacity === 1 && (await inkTrace(page)).every((row) => !row.ink), first);
+    }, { reducedMotion: 'reduce' });
+
+    await g4Walk('G4-room', async (page) => {
+      // the living ink's written strokes leave the ghost on the numbers' own clock; a 2-stroke 人 writes quickly
+      await boot(page);
+      await openShelfTools(page);
+      await page.locator('#search').fill('人');
+      await page.locator('[data-result="kanji:人"]').first().click();
+      await page.locator('#strokes-door').click();
+      await page.waitForFunction(() => { const p = document.getElementById('stroke-page'); return p && p.dataset.inkReady !== 'pending'; }, null, { timeout: 20000 });
+      const living = await page.locator('#stroke-page').getAttribute('data-living');
+      if (living === 'on') {
+        await page.waitForFunction(() => Number(document.getElementById('stroke-page')?.dataset.strokeShown || 0) >= 2, null, { timeout: 30000 });
+        await page.waitForFunction(() => [...document.querySelectorAll('.stroke-nums-lift .stroke-guide path')].every((path) => path.classList.contains('is-written')), null, { timeout: 30000 }).catch(() => {});
+        const ghost = await page.evaluate(() => [...document.querySelectorAll('.stroke-nums-lift .stroke-guide path')].map((path) => path.classList.contains('is-written')));
+        check('G4.ghost.leaves', 'over the living ink, each written stroke leaves the お手本: written, none of its ghost stays above the ink', ghost.length === 2 && ghost.every(Boolean), { living, ghost });
+      } else check('G4.ghost.leaves', 'the classic diagram draws its ink over its own ghost (no living ink in this engine)', ['off', 'still'].includes(living), { living });
+      // the bug rail never stands over the readings: the classic room at rest and scrolled, the quiet room awake
+      const overlap = () => page.evaluate(() => {
+        const rail = document.querySelector('#bunki-reports-root .br-rail');
+        const box = rail && getComputedStyle(rail).display !== 'none' ? rail.getBoundingClientRect() : null;
+        const rows = [...document.querySelectorAll('#stroke-page :is(.stroke-read-row, .stroke-reading-row)')].map((row) => row.getBoundingClientRect()).filter((r) => r.width && r.height);
+        const hit = box ? rows.filter((r) => r.left < box.right && r.right > box.left && r.top < box.bottom && r.bottom > box.top).length : 0;
+        return { rail: box && [box.x, box.y, box.width, box.height].map(Math.round), rows: rows.length, hit };
+      });
+      await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi&minimal=0`);
+      await page.waitForFunction(() => document.body.dataset.ready === '1');
+      await openShelfTools(page);
+      await page.locator('#search').fill(GHOST_KANJI);
+      await page.locator(`[data-result="kanji:${GHOST_KANJI}"]`).first().click();
+      await page.locator('#strokes-door').click();
+      await page.locator('#stroke-page .stroke-readings').waitFor();
+      const rest = await overlap();
+      await page.locator('#stroke-page').evaluate((room) => { room.scrollTop = 40; });
+      await delay(200);
+      const scrolled = await overlap();
+      await page.screenshot({ path: resolve(evidence, `${engine}-G4-classic-room.png`) });
+      check('G4.rail.classic', 'the classic writing room: the bug rail stands clear of the readings, at rest and scrolled', !!rest.rail && rest.rows >= 2 && rest.hit === 0 && scrolled.hit === 0, { rest, scrolled });
+      await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi`);
+      await page.waitForFunction(() => document.body.dataset.ready === '1');
+      await openShelfTools(page);
+      await page.locator('#search').fill(GHOST_KANJI);
+      await page.locator(`[data-result="kanji:${GHOST_KANJI}"]`).first().click();
+      await page.locator('#strokes-door').click();
+      await page.locator('.stroke-chrome-trigger').click();
+      await page.waitForFunction(() => document.getElementById('stroke-page')?.dataset.chrome === 'awake');
+      await delay(500);
+      const awake = await overlap();
+      check('G4.rail.quiet', 'the quiet room awake: the bug rail stands clear of the readings', !!awake.rail && awake.rows >= 2 && awake.hit === 0, awake);
+    });
+
+    await g4Walk('G4-voice', async (page) => {
+      await openStory(page);
+      await page.evaluate(() => { window.__voice.attempts = 0; });
+      await stage(page, readerWord(page));
+      await settledInk(page);
+      const passive = await page.evaluate(() => { const voice = document.querySelector('#mini #mini-voice');
+        return { voice: !!voice, flag: voice?.dataset.voiceUnavailable || null, name: voice?.title || '', note: document.querySelector('#mini .mini-say-note')?.textContent || null }; });
+      check('G4.voice.passive', '声 on, a new word comes closer: no recording yet, so the 音 says so quietly (struck, its name) and nothing plays',
+        passive.voice && !!passive.flag && /recording|収録音声/u.test(passive.name) && passive.note === null, passive);
+      await page.locator('#mini #mini-voice').tap();
+      await page.waitForFunction(() => !!document.querySelector('#mini .mini-say-note')?.textContent, null, { timeout: 4000 }).catch(() => {});
+      const asked = await page.evaluate(() => ({ note: document.querySelector('#mini .mini-say-note')?.textContent || '', live: document.querySelector('#mini .mini-say-note')?.getAttribute('aria-live') }));
+      check('G4.voice.asked', 'a tap on 音 says why, in a line he can read (and a screen reader hears): no recording, nothing played',
+        /recording|収録音声/u.test(asked.note) && asked.live === 'polite', asked);
+      await page.locator('#mini .mini-word').tap(); await pageSettled(page);
+      await page.locator('#sheet-back').tap(); await bare(page);
+      await delay(400);
+      const kept = await page.evaluate(() => { const voice = document.querySelector('#mini #mini-voice');
+        return { voice: !!voice, flag: voice?.dataset.voiceUnavailable || null, name: voice?.title || '' }; });
+      check('G4.voice.return-keeps', 'back from the page, the stage drawn again keeps what the voice door said: 音 still struck, its reason its name',
+        kept.voice && !!kept.flag && kept.flag === passive.flag && kept.name === passive.name, { passive, kept });
+      const spy = await voiceSpy(page);
+      check('G4.voice.never-device', 'recorded audio only: no device speech, no Audio made and nothing played without an admitted recording — on arrival, on 音, on a return from the page',
+        spy.speak === 0 && spy.utterances === 0 && spy.audio === 0 && spy.plays === 0, spy);
+    });
+
+    await g4Walk('G4-frames', async (page) => {
+      await openStory(page);
+      const samples = [];
+      for (let rep = 0; rep < 3; rep++) {
+        const word = readerWord(page);
+        await word.scrollIntoViewIfNeeded();
+        await word.tap(); await delay(400);
+        assert.equal(await word.evaluate((node) => node.dataset.ladderRung), 'reading', 'the measured tap two starts from the reading rung');
+        await delay(250);
+        const box = await word.boundingBox();
+        // every frame from just before tap two until the word has settled, each with the ink's state in that frame
+        await page.evaluate(() => new Promise((done) => {
+          window.__g4f = [];
+          requestAnimationFrame((t0) => {
+            const tick = (t) => { const w = document.querySelector('#mini .mini-word'); window.__g4f.push([t, w?.dataset.ink || '']);
+              if (t - t0 < 3200) requestAnimationFrame(tick); };
+            requestAnimationFrame(tick); done();
+          });
+        }));
+        await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+        await delay(3500);
+        const f = await page.evaluate(() => window.__g4f);
+        const deltas = (rowsOf) => rowsOf.slice(1).map((row, i) => Math.round((row[0] - rowsOf[i][0]) * 10) / 10);
+        const begin = f.findIndex((row) => row[1] === 'writing'), end = f.findLastIndex((row) => row[1] === 'writing' || row[1] === 'settling');
+        const writing = begin > 0 && end > begin ? deltas(f.slice(begin - 1, end + 2)) : [];
+        const whole = deltas(f);
+        const stat = (d) => d.length ? { worst: Math.max(...d), p95: [...d].sort((a, b) => a - b)[Math.ceil(d.length * 0.95) - 1], over24: d.filter((x) => x > 24).length, frames: d.length } : null;
+        samples.push({ rep, phase: rep === 0 ? 'cold' : 'warm', writing: stat(writing), tap2: stat(whole), writingDeltas: writing, tap2Deltas: whole });
+        await page.keyboard.press('Escape'); await delay(300);
+      }
+      // the interrupt's own frames, 600 ms from the input: a key that acts on nothing else (Shift) isolates the ink's own
+      // finish — the gate; a tap on Save mid-writing (its menu, the record's write) is recorded beside it
+      const interruptWindow = async (act) => {
+        await stage(page, readerWord(page));
+        await midWriting(page);
+        await page.evaluate(() => new Promise((done) => { window.__g4i = []; requestAnimationFrame((t0) => { const tick = (t) => { window.__g4i.push(t); if (t - t0 < 600) requestAnimationFrame(tick); }; requestAnimationFrame(tick); done(); }); }));
+        await act();
+        await delay(800);
+        const ti = await page.evaluate(() => window.__g4i);
+        const id = ti.slice(1).map((v, i) => Math.round((v - ti[i]) * 10) / 10);
+        const ended = (await inkFacts(page)).ended;
+        await page.keyboard.press('Escape'); await delay(300);
+        return { ended, worst: Math.max(...id), p95: [...id].sort((a, b) => a - b)[Math.ceil(id.length * 0.95) - 1], over24: id.filter((x) => x > 24).length, frames: id.length, deltas: id };
+      };
+      const interrupt = await interruptWindow(() => page.keyboard.press('Shift'));
+      const saveBox = async () => page.locator('#mini #mini-take').boundingBox();
+      const saveInterrupt = await interruptWindow(async () => { const box = await saveBox(); await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2); });
+      frames.push({ engine, grammar: 'G4', samples: samples.map(({ rep, phase, writing, tap2 }) => ({ rep, phase, writing, tap2 })), interrupt, saveInterrupt,
+        deltas: samples.map(({ rep, writingDeltas, tap2Deltas }) => ({ rep, writingDeltas, tap2Deltas })) });
+      const worstWriting = Math.max(...samples.map((s) => s.writing?.worst ?? Infinity));
+      const summary = { writing: samples.map((s) => s.writing && { phase: s.phase, worst: s.writing.worst, p95: s.writing.p95 }),
+        interrupt: { ended: interrupt.ended, worst: interrupt.worst, p95: interrupt.p95 }, saveTap: { ended: saveInterrupt.ended, worst: saveInterrupt.worst, p95: saveInterrupt.p95 },
+        tap2: samples.map((s) => ({ phase: s.phase, worst: s.tap2.worst, p95: s.tap2.p95 })) };
+      if (engine === 'webkit') {
+        check('G4.frames.writing', 'the writing itself: worst frame ≤ 24 ms in WebKit, cold and warm (worst and p95 recorded)', samples.every((s) => s.writing?.frames > 20) && worstWriting <= 24, summary);
+        check('G4.frames.interrupt', 'the interrupt — the ink finishing at once under an input (Shift) that does nothing else: worst frame ≤ 24 ms in WebKit', interrupt.ended === 'input' && interrupt.worst <= 24, summary);
+      } else check('G4.frames.recorded', 'Chromium frames recorded beside WebKit (never averaged in)', samples.every((s) => s.writing?.frames > 20) && Number.isFinite(worstWriting), summary);
+    });
+
     if (withControls) {
       const specs = [
         { id: 'stalled-second', run: 'G3-stalled', probe: stalledProbe, kill: 'G3.control.stage',
@@ -1417,7 +2023,8 @@ try {
           witness: (row) => row.observed.brush.side === 'cover' && ['bare', '嘩', '眩', '貰'].every((key) => row.observed[key]?.side === 'glyph'),
           edits: [{ file: 'drift-layer.css', key: 'bare-glyph-full-width', from: '  width: fit-content;\n  margin-inline: auto;\n', to: '' }] },
       ];
-      for (const spec of specs.filter((spec) => !skyOwnershipOnly || spec.run === 'G3-sky-ownership')) {
+      // --g4-only replays G4's three controls alone; G3's controls need G3's candidate schedules
+      for (const spec of g4Only ? [] : specs.filter((spec) => !skyOwnershipOnly || spec.run === 'G3-sky-ownership')) {
         const control = { engine, id: spec.id, edits: spec.edits, served: [], pageErrors: [] };
         const begin = rows.length;
         await walk(spec.run, spec.probe, { control });
@@ -1443,6 +2050,51 @@ try {
         controls.push(control);
         check(`G3.negative.${spec.id}`, 'candidate passes, named product mutation fails its intended assertion, and unmodified restore passes',
           killed && restored, { verdict: control.verdict, cleanCandidate, complete, restored, target, setupError: control.setupError, error: control.error });
+      }
+      /* G4's three named controls (one-hand/G4/BRIEF.md). Each replays its exact candidate schedule against one served
+       * product mutation (source bytes on disk are never edited); it is killed only when every named kill row fails for
+       * its witnessed reason while every other row of the schedule still passes, and the unmodified restore passes. */
+      const g4Specs = [
+        { id: 'writing-blocks-tap', run: 'G4-interrupt-save', probe: interruptSaveProbe, kills: ['G4.interrupt.save-acts'],
+          witness: (row) => row.observed.saved === false && !row.observed.taken.includes(`word:${WORD}`),
+          edits: [{ file: 'corridor.js', key: 'ink-eats-its-tap', from: "  const interrupt = (event) => ink.end('input', event);",
+            to: "  const interrupt = (event) => { if (event.type === 'pointerdown') window.addEventListener('click', (click) => click.stopImmediatePropagation(), { capture: true, once: true }); ink.end('input', event); }; // G4 negative: the tap that finishes the writing is consumed" }] },
+        { id: 'empty-first-board', run: 'G4-ghost', probe: ghostProbe, kills: ['G4.ghost.first-frame', 'G4.ghost.first-pixels'],
+          witness: (row) => row.id.endsWith('first-frame') ? row.observed.painted === 0 : row.observed.ink < 0.012,
+          edits: [
+            { file: 'editorial.css', key: 'no-quiet-ghost', from: "#stroke-page[data-minimal='on'] .stroke-guide { display: inline; }", to: '/* G4 negative: no ghost in the quiet room */' },
+            { file: 'editorial.css', key: 'no-pending-overlay', from: "#stroke-page[data-ink-ready='pending'] .stroke-stage svg.stroke-canvas { position: absolute; inset: 0; }", to: '/* G4 negative: the diagram stays below the sheet */' },
+            { file: 'editorial.css', key: 'no-living-lift', from: "body:has(#stroke-page[data-living='on']) .stroke-nums-lift { display: block; }", to: '/* G4 negative: the lifted layer stays hidden */' },
+            { file: 'editorial.css', key: 'no-living-ghost', from: '.stroke-nums-lift .stroke-guide { display: inline; }', to: '/* G4 negative: no ghost over the living ink */' }] },
+        { id: 'second-speed-control', run: 'G4-one-speed', probe: oneSpeedProbe, kills: ['G4.one-speed'],
+          witness: (row) => row.observed.inSettings >= 1 && row.observed.inRoom === 1,
+          edits: [{ file: 'corridor.js', key: 'speed-in-settings', from: "    el('p', 'settings-layout-note', tx('書く速さは、書の間のスライダー一つで決まります。',",
+            to: "    strokeSpeedControl({ dataset: {} }), el('p', 'settings-layout-note', tx('書く速さは、書の間のスライダー一つで決まります。'," }] },
+      ];
+      // G4's controls replay G4's candidate schedules, which a G3 narrow schedule (other than --controls-only) does not run
+      for (const spec of g3Only && !controlsOnly ? [] : g4Specs) {
+        const control = { engine, id: spec.id, edits: spec.edits, served: [], pageErrors: [] };
+        const begin = rows.length;
+        await g4Walk(spec.run, spec.probe, { control });
+        control.rows = rows.splice(begin);
+        const baseline = schedules[spec.run] || [];
+        const expected = baseline.map((row) => row.id);
+        const actual = control.rows.map((row) => row.id);
+        const killIds = spec.kills.map((id) => `${engine}/${id}`);
+        const targets = killIds.map((id) => control.rows.find((row) => row.id === id));
+        const cleanCandidate = baseline.length > 1 && baseline.every((row) => row.ok) && new Set(expected).size === expected.length;
+        const complete = !control.error && !control.setupError && control.pageErrors.length === 0 &&
+          JSON.stringify(actual) === JSON.stringify(expected) && spec.edits.every((edit) => control.served.some((served) => served.file === edit.file && served.applied.some((applied) => applied.key === edit.key)));
+        const killed = cleanCandidate && complete && targets.every((row) => row && !row.ok && spec.witness(row)) &&
+          control.rows.every((row) => killIds.includes(row.id) || row.ok);
+        control.verdict = !cleanCandidate || !complete ? 'incomplete' : killed ? 'killed' : targets.every((row) => row?.ok) ? 'survived' : 'contaminated';
+        const restoreBegin = rows.length;
+        await g4Walk(spec.run, spec.probe);
+        control.restore = rows.splice(restoreBegin);
+        const restored = JSON.stringify(control.restore.map((row) => row.id)) === JSON.stringify(expected) && control.restore.every((row) => row.ok);
+        controls.push(control);
+        check(`G4.negative.${spec.id}`, 'candidate passes, the named product mutation fails its intended assertions, and the unmodified restore passes',
+          killed && restored, { verdict: control.verdict, cleanCandidate, complete, restored, targets, setupError: control.setupError, error: control.error });
       }
     }
 
@@ -1819,7 +2471,7 @@ try {
 
 function innerHeightOf(facts) { return facts?.inner?.height || 844; }
 
-writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: g2Only ? 'G2 walks only' : skyOwnershipOnly ? `G3 controlled sky glyph hit ownership${withControls ? ' and its negative controls' : ''}; named 嘩/眩/貰 use fixture-only corpus/captions, actual product mount/hit code; no natural-input, G1 or frame claim` : skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : 'G1, G2 and G3', ...(Object.keys(g2Versions).length ? { browsers: g2Versions } : {}), ...(controlsRun.length ? { control: controlsRun } : {}), rows, frames, controls, fixtures }, null, 1));
+writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: g2Only ? 'G2 walks only' : g4Only ? `G4 only${withControls ? ' with its three negative controls' : ''}; G1, G2 and G3 gates not run` : skyOwnershipOnly ? `G3 controlled sky glyph hit ownership${withControls ? ' and its negative controls' : ''}; named 嘩/眩/貰 use fixture-only corpus/captions, actual product mount/hit code; no natural-input, G1 or frame claim` : skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 and G4 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : 'G1, G2, G3 and G4', ...(Object.keys(g2Versions).length ? { browsers: g2Versions } : {}), ...(controlsRun.length ? { control: controlsRun } : {}), rows, frames, controls, fixtures }, null, 1));
 const failed = rows.filter((row) => !row.ok);
 console.log(`\n${rows.length - failed.length}/${rows.length} — evidence ${evidence}`);
 process.exit(failed.length ? 1 : 0);

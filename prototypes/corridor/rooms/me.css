@@ -390,6 +390,10 @@ html[data-room='settings'] main :is(.settings-language, .settings-layout-choice)
   background: transparent; color: var(--color-ink-2); font: 500 14px/1 var(--font-ui);
 }
 html[data-room='settings'] main :is(.settings-language, .settings-layout-choice) button[aria-pressed='true'] { background: var(--color-ink); color: var(--color-surface); font-weight: 700; }
+/* G4 · 筆 and 声: two named rows of the same segmented choice as the language and the layout */
+html[data-room='settings'] main .settings-writing-row { display: grid; justify-items: start; gap: var(--space-2); margin: var(--space-3) 0 0; }
+html[data-room='settings'] main .settings-writing-name { margin: 0; font: 600 15px/1.4 var(--font-ui); color: var(--color-ink); }
+html[data-room='settings'] main .settings-writing-choice { flex-wrap: wrap; }
 html[data-room='settings'] main > .foundation-doors { margin-top: var(--space-4); gap: 0; border-top: var(--stroke-hairline) solid var(--color-edge-strong); }
 html[data-room='settings'] body.v-depth-layered #app main > .foundation-doors .foundation-door {
   min-height: 54px; padding: 0 2px; margin: 0;
