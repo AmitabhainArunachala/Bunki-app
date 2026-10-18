@@ -470,21 +470,31 @@ try {
   // can change a face and so the head's line; each world is set as he sets it (stored, then the app opened again).
   await check('the-folded-mark-meets-no-text-in-any-world-at-any-phone-width', 'narration', async ({ page }) => {
     const WORLDS = ['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'keyblock', 'hakuu', 'kaku'];
-    const rows = [];
-    for (const width of [320, 390, 430]) {
-      await page.setViewportSize({ width, height: 844 });
-      for (const world of WORLDS) {
-        await page.evaluate((id) => localStorage.setItem('kairo-theme', id), world);
-        await page.goto(`${base}/index.html?entry=shelf&ui=bi`);
-        await page.waitForFunction(() => document.body.dataset.ready === '1');
-        await openPassage(page);
-        await page.waitForSelector('.listen-row.play-bar[data-open="false"] #listen-open', { timeout: 10000 });
+    // each world opened once, its three widths stepped in place (the head is laid out by CSS alone); the rows are written
+    // as they come, so a run cut short still shows how far it got
+    const rows = [], file = resolve(out, `folded-mark-worlds-${ENGINE}.json`);
+    for (const world of WORLDS) {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.evaluate((id) => localStorage.setItem('kairo-theme', id), world);
+      await page.goto(`${base}/index.html?entry=shelf&ui=bi`);
+      await page.waitForFunction(() => document.body.dataset.ready === '1');
+      await openPassage(page);
+      await page.waitForSelector('.listen-row.play-bar[data-open="false"] #listen-open', { timeout: 10000 });
+      const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme') || 'hokusai');
+      for (const width of [320, 390, 430]) {
+        await page.setViewportSize({ width, height: 844 });
+        await page.waitForFunction(() => new Promise((done) => {
+          const m = document.querySelector('#listen-open'), a = m?.getBoundingClientRect();
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            const b = m?.getBoundingClientRect();
+            done(!!a && !!b && a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height);
+          }));
+        }), null, { timeout: 5000 });
         const s = await markState(page);
-        const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme') || 'hokusai');
         rows.push({ width, world, theme, folded: folded(s), mark: s.mark, inHead: s.inHead, position: s.position, textHits: s.textHits });
       }
+      writeFileSync(file, JSON.stringify(rows, null, 2));
     }
-    writeFileSync(resolve(out, `folded-mark-worlds-${ENGINE}.json`), JSON.stringify(rows, null, 2));
     assert.equal(rows.length, 33, 'eleven worlds at three widths');
     assert.deepEqual(rows.filter((r) => r.theme !== r.world).map((r) => `${r.width}/${r.world}→${r.theme}`), [], 'each world is the world asked for');
     assert.deepEqual(rows.filter((r) => !r.folded).map((r) => `${r.width}/${r.world}: ${JSON.stringify({ inHead: r.inHead, position: r.position, mark: r.mark, textHits: r.textHits })}`), [],
