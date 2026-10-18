@@ -4,9 +4,9 @@
  * step folded into Review and the focus room in the decks. Real Chromium at 390 × 844 on the
  * built site, the record imported through the app's own importer.
  *
- * 1. Default: a fresh device opens the current layout, unmarked, and Settings offers the switch
- *    with Current pressed.
- * 2. Switched on through Settings (a seeded 140-word record, 57 cards today): the bar's five names
+ * 1. Default: a fresh device opens the current layout, unmarked, and its Settings does not offer the
+ *    second skin (Hfix-1B, H-hokusai-07: no Layout section).
+ * 2. Switched on by the layout link (?layout=places, a seeded 140-word record, 57 cards today): the bar's five names
  *    and no two labels touching; each room's top bar holding only Back and search and lighting its
  *    own station; Review's one number (Begin, the deck row, the badge); every deck and list in
  *    Review and no tests there; Begin and the way back; Saved, its lists, Browse, the backup door
@@ -16,7 +16,8 @@
  *    is up, and the quiet report door in the study bar's end slot (Hfix-1B, §7 line 28); the left half of the card stays still and the right half
  *    turns it; every reading on the back, with the passage's lines unmoved; the Readings switch
  *    returns the clean text and moves nothing.
- * 4. Switched back through Settings: the current layout returns, unmarked.
+ * 4. Switched back through Settings (a device in the places layout keeps Layout as its way back): the current layout
+ *    returns, unmarked, and Settings offers no Layout again.
  * 5. Since 1.2.1 the focus room is the app's deck screen in the current layout too: a fresh device
  *    opens a deck from Learn into the same clean room, the four grades colour coded.
  *
@@ -125,7 +126,7 @@ async function openSettings(page) {
   await page.locator('#tab-me, #tab-progress').first().click();
   await page.waitForTimeout(600);
   await page.locator('#me-settings').click();
-  await page.locator('#settings-layout').waitFor();
+  await page.locator('.settings-language').waitFor();
 }
 
 try {
@@ -137,24 +138,23 @@ try {
     check('default · the current layout, unmarked', (await layout(page)) === 'current', await layout(page));
     check('default · the current tab bar', (await tabNames(page)).join() === 'Today,Read,Learn,Words,Me', (await tabNames(page)).join());
     await openSettings(page);
-    const pressed = await page.locator('#settings-layout [aria-pressed="true"]').getAttribute('data-layout');
-    check('default · Settings offers Layout with Current pressed', pressed === 'current', pressed);
+    const offered = await page.locator('#settings-layout, .settings-layout').count();
+    check('default · Settings does not offer the second skin (no Layout section: Hfix-1B, H-hokusai-07)', offered === 0, offered);
     check('default · no page errors', !errors.length, errors.slice(0, 2).join(' | '));
     await context.close();
   }
 
-  // ---- 2. the five places, switched on through Settings with a seeded record
+  // ---- 2. the five places, switched on by the layout link with a seeded record (Hfix-1B: not offered in Settings)
   {
     const { context, page, errors } = await newPage();
     await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi`);
     await ready(page);
     await restoreAppFixture(page, seed());
-    await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi`);
+    // Hfix-1B · the learner's Settings no longer offers the layout under test: it is switched on by its link
+    await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi&layout=places`);
     await ready(page);
-    await openSettings(page);
-    await page.locator('#settings-layout [data-layout="places"]').click();
     await page.waitForTimeout(900);
-    check('switch · Settings turns the new layout on', (await layout(page)) === 'places');
+    check('switch · the layout link turns the new layout on', (await layout(page)) === 'places');
     await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi`);
     await ready(page);
     check('switch · the choice holds after a reload', (await layout(page)) === 'places');
@@ -318,6 +318,7 @@ try {
     await page.locator('#settings-layout [data-layout="current"]').click();
     await wait(900);
     check('switch back · the current layout returns, unmarked', (await layout(page)) === 'current');
+    check('switch back · Settings offers no Layout again (Hfix-1B)', (await page.locator('#settings-layout, .settings-layout').count()) === 0);
     await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi`);
     await ready(page);
     check('switch back · the current tab bar after a reload', (await tabNames(page)).join() === 'Today,Read,Learn,Words,Me', (await tabNames(page)).join());

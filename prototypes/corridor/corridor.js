@@ -37218,7 +37218,7 @@ function takePrebuiltPage(node, depth) {
  * A sampler runs only inside a named move — a word's card arriving, a page arriving, Back, a room change — for at
  * most a second from the frame the move began in, and keeps that move's worst frame (and how many passed 24 ms).
  * One row per move in its own capped key on this device, never in the learning record, never in a backup: the bug
- * report carries the week's worst five, and Me → Settings says the roughest one in a line. */
+ * report carries the week's worst five (its Details, and the report it files); the learner's Settings shows none (H0-2). */
 const FRAMES_STORE = 'kairo-frames';
 const FRAMES_CAP = 200;
 const FRAMES_WINDOW_MS = 1000;
@@ -37272,37 +37272,6 @@ function roughestThisWeek(n = 5) {
   return readFrameRows().filter((row) => row[0] >= since).sort((a, b) => b[3] - a[3]).slice(0, n)
     .map(([t, name, where, worst]) => ({ name, where, worst_ms: worst, at: new Date(t).toISOString().slice(0, 10) }));
 }
-const FRAME_KIND_WORDS = {
-  card: ['語のカードを開いたとき', 'opening a word card'], page: ['語のページを開いたとき', "opening a word's page"],
-  back: ['戻ったとき', 'going back'], room: ['部屋を移ったとき', 'changing rooms'],
-};
-/** A place the sampler wrote, in the reader's words: a room by its own name, an article as an article. */
-function frameWhereWords(where) {
-  const place = (view) => {
-    const name = roomName(view);
-    return name ? tx(...name) : view === 'reader' ? tx('記事', 'an article') : view;
-  };
-  return String(where || '').split('→').map((part) => {
-    const [view, page] = part.split('/');
-    return page ? tx(`${place(view)}のページ`, `a page over ${place(view)}`) : place(view);
-  }).join(' → ');
-}
-/** Me → Settings, under bug reports: the roughest move this week, and where — one quiet line. */
-function framesLine() {
-  const line = el('p', 'teacher-note settings-frames');
-  line.id = 'settings-frames';
-  const [worst] = roughestThisWeek(1);
-  if (!worst) {
-    line.textContent = tx('今週はまだ動きを測っていません。', 'No moves measured on this device this week.');
-    return line;
-  }
-  const [ja, en] = FRAME_KIND_WORDS[worst.name];
-  line.dataset.worstMs = String(worst.worst_ms);
-  line.textContent = tx(`今週いちばん重かった瞬間：${worst.worst_ms} ms（${ja}、${frameWhereWords(worst.where)}）`,
-    `Roughest moment this week: ${worst.worst_ms} ms, ${en} (${frameWhereWords(worst.where)}).`);
-  return line;
-}
-
 function licencePanel() {
   const box = el('div', 'note');
   box.append(
@@ -40026,7 +39995,9 @@ function renderSettings(main) {
     foundationDoor('settings-backup', 'バックアップ', 'Backup', 'tray', showRecordBackup),
   );
   // K · one plain line under the Backup door: is this device keeping the record, and how full is it
-  main.append(language, renderLayoutChoice(), renderWritingChoice(), doors, recordKeepLine(), renderReportRelaySettings(), about);
+  // Hfix-1B (H-hokusai-07): the layout under test is a second skin, so the learner's Settings does not offer it; a device
+  // already in it (the places branch above) keeps Layout as its way back
+  main.append(language, renderWritingChoice(), doors, recordKeepLine(), renderReportRelaySettings(), about);
 }
 function renderWordsDoors(main) {
   // the layout under test: the day's word, large, with its reading and the part its kanji share —
@@ -40760,7 +40731,9 @@ function renderReportRelaySettings() {
     save.disabled = true;
     location.reload();
   });
-  section.append(status, form, framesLine());
+  // Hfix-1B (H0-2): no frame time on the learner's Settings; the report sheet carries the week's roughest moments (its
+  // Details, and the report it files: maintenanceContext's frames)
+  section.append(status, form);
   return section;
 }
 function mountMaintenanceReports() {
