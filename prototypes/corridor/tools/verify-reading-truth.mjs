@@ -105,6 +105,7 @@ const STARTUP = art('kantei:jp-105-actions-202609-25startup', 'kantei-jp-105-act
 const MESSAGE = art('kantei:jp-105-discourse-20260923message', 'kantei-jp-105-discourse-20260923message.json', '観光・食文化交流');
 const WIKINEWS = art('wikinews:45227', 'wikinews-45227.json', '21年の歴史');
 const KOJIKI = art('bunki-essay-n2-kojiki-myth-history', 'bunki-essay-n2-kojiki-myth-history.json', '古事記');
+const YAMANASHI = art('aozora:046605', 'aozora-046605.json', 'やまなし');
 const DIARY = art('bunki-graded-n3-nakaima-diary', 'bunki-graded-n3-nakaima-diary.json', '中今');
 const CABINET = art('jawiki:5294446', 'jawiki-5294446.json', '高市内閣');
 const KAWAGUCHI = art('aozora:049966-1', 'aozora-049966-1.json', 'チベット旅行記');
@@ -113,7 +114,9 @@ const PAIRS = Object.freeze([
   { name: '年 ねん (令和8年: a counter)', at: STARTUP, index: 2, s: '年', r: 'ねん', seq: '2084840' },
   { name: '年 とし (twin)', at: MESSAGE, index: 39, s: '年', r: 'とし', core: true },
   { name: '月 がつ', at: WIKINEWS, index: 12, s: '月', r: 'がつ', seq: '2871532' },
-  { name: '月 つき (twin)', at: WIKINEWS, index: 107, s: '月', r: 'つき', core: true },
+  // R3 (Grok 0315): wikinews:45227 #107 was 7月 read つき, a tokenizer slip the lexicon now reads がつ; the twin is the
+  // shelf's one real moon, やまなし #1087 (あんまり月が明るく)
+  { name: '月 つき (twin)', at: YAMANASHI, index: 1087, s: '月', r: 'つき', core: true },
   { name: '時 じ', at: KOJIKI, index: 489, s: '時', r: 'じ', seq: '2020680' },
   { name: '時 とき (twin)', at: KOJIKI, index: 8, s: '時', r: 'とき', core: true },
   { name: '一日 ついたち', at: DIARY, index: 167, s: '一日', r: 'ついたち', seq: '2225040' },
