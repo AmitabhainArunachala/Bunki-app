@@ -2864,7 +2864,8 @@ body .token-actions button:hover { background: var(--ai-wash); }
   display: block;
   height: 22px;
   margin: -22px -10px -4px;
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--color-paper, #f5efe0) 0%, transparent), var(--color-paper, #f5efe0));
+  /* bokashi: atenashi — the seal strip's foot — focus: the strip's own paper rising over its last rows, where there is more */
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--color-paper) 0%, transparent), var(--color-paper));
   pointer-events: none;
 }
 .seal-strip[data-side='above'] { animation-name: seal-strip-fall; }
@@ -4697,11 +4698,12 @@ body.has-primary-tabs:not(.zen) #app > .chrome :is(.chrome-search svg, .chrome-g
 body.has-primary-tabs:not(.zen) #app > .chrome > button#tray .l-ja { font: 500 var(--type-caption)/1 var(--font-data); font-variant-numeric: tabular-nums; }
 @media (max-width: 360px) {
   /* the narrowest phones keep ONE row: the Learn door yields to the Learn tab one thumb away,
-     and Lists becomes its bookmark with the count set small at its shoulder. Q · the reader too: it was the exception,
-     and at 320 its eight (seven doors and the Save) overflowed the phone (the bookmark off screen; Chromium widened the
-     page to 376 px). With Learn in the tab bar its seven (verify-corridor's >= 7 reachable 44 px) fit one row. */
+     and Lists becomes its bookmark with the count set small at its shoulder. The reader is the exception again (G6, the
+     lead's 2135 decision, kept at the merge): its eight doors keep their 44 px targets on one row and what exceeds the
+     phone scrolls inside the toolbar (the 520 px rule), so the page stays the phone's width. Q's G-12 hid the reader's
+     Learn door here instead, so its seven fit without a scroll; the two cannot both hold at 320 px (see INTG3's hand-back). */
   body.has-primary-tabs:not(.zen) #app > .chrome { padding-inline: 2px; }
-  body.has-primary-tabs:not(.zen) #app > .chrome > button.chrome-dojo { display: none; }
+  body.has-primary-tabs:not(.zen):not([data-view='reader']) #app > .chrome > button.chrome-dojo { display: none; }
   body.has-primary-tabs:not(.zen) #app > .chrome .lang-seg { padding-right: 3px; background-position: right 1px center; }
   body.has-primary-tabs:not(.zen) #app > .chrome > button#tray {
     position: relative;
@@ -5831,6 +5833,15 @@ html[data-save-drawer='room'] #app > .chrome[data-bar='room'],
 html[data-save-drawer='sheet'] #sheet > .sheet-bar[data-bar='sheet'] {
   margin-bottom: var(--save-drawer-push, 0px);
 }
+/* G6 · the scale thread is the bar's second row: it stands under the drawer with the rest of the page, so the drawer
+   covers none of its doors (its sticky top would otherwise hold it under the drawer) */
+html[data-save-drawer='room'] #app > .scale-thread,
+html[data-save-drawer='sheet'] #sheet > .scale-thread {
+  top: calc(45px + env(safe-area-inset-top, 0px) + var(--save-drawer-push, 0px));
+}
+html[data-save-drawer='room'] body.ginga #app > .scale-thread {
+  top: calc(56px + env(safe-area-inset-top, 0px) + var(--save-drawer-push, 0px));
+}
 
 /* ==========================================================================
    S · THE DECK'S BAND (John, 2026-10-16, on a flashcard's front: "yes but the blue banner was actually nicer. be a
@@ -5911,7 +5922,8 @@ body[data-furigana='0'] #drift-layer .word .yomi { opacity: 0; }
 /* Hosted glyphs keep native reading markup at rest, including before their first tap: their reading rules stand in
    the drift sky's own sheet (drift-layer.css, from tools/build-drift-layer.mjs), beside its hit regions. */
 
-/* G6 · scale thread */
+/* G6 · scale thread. On a word's page it stands one --space-3 above the page's head (was 20 px): the thread's row is
+   the page's second bar, and the word's kanji still start within 40 % of a phone's screen (P9, 総理 at 390 × 844) */
 .scale-thread { display: inline-flex; align-items: center; gap: 2px; max-width: 100%; min-width: 0; min-height: 44px; overflow-x: auto; overscroll-behavior-x: contain; touch-action: pan-x pan-y pinch-zoom; color: var(--color-bar-ink, currentColor); vertical-align: middle; scrollbar-width: thin; }
 .scale-thread > :is(button, .scale-current) { box-sizing: border-box; flex: 0 0 auto; display: inline-block; max-width: 100px; min-width: 44px; min-height: 44px; padding: 12px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; background: transparent; color: inherit; font: inherit; font-size: var(--type-label); line-height: 20px; text-align: center; }
 .scale-thread > button { cursor: pointer; }
@@ -5919,7 +5931,7 @@ body[data-furigana='0'] #drift-layer .word .yomi { opacity: 0; }
 .scale-thread > [data-scale-out] { position: sticky; left: 0; z-index: 1; width: 44px; max-width: 44px; padding-inline: 4px; background: var(--color-bar, var(--ed-paper)); font-size: var(--type-lead); }
 .scale-thread > [aria-current='step'] { font-weight: 600; }
 .scale-thread > button:disabled { cursor: default; opacity: 1; }
-#sheet > .scale-thread { position: sticky; top: calc(45px + env(safe-area-inset-top, 0px)); z-index: 3; display: flex; max-width: none; margin: 0 calc(-1 * var(--page-gutter, 32px)) 20px; padding-inline: max(12px, calc(var(--page-gutter, 20px) - 8px)); background: var(--color-bar, var(--ed-paper)); box-shadow: 0 1px 0 color-mix(in srgb, currentColor 12%, transparent); }
+#sheet > .scale-thread { position: sticky; top: calc(45px + env(safe-area-inset-top, 0px)); z-index: 3; display: flex; max-width: none; margin: 0 calc(-1 * var(--page-gutter, 32px)) var(--space-3, 12px); padding-inline: max(12px, calc(var(--page-gutter, 20px) - 8px)); background: var(--color-bar, var(--ed-paper)); box-shadow: 0 1px 0 color-mix(in srgb, currentColor 12%, transparent); }
 #app > .scale-thread { position: sticky; top: calc(45px + env(safe-area-inset-top, 0px)); z-index: 19; flex: 0 0 auto; width: 100%; background: var(--color-bar, var(--ed-paper)); box-shadow: 0 1px 0 color-mix(in srgb, currentColor 12%, transparent); }
 body.ginga #app > .scale-thread { position: fixed; left: 0; top: calc(56px + env(safe-area-inset-top, 0px)); }
 /* The deck's one-finger vertical scroll must still allow the phone's text zoom. */

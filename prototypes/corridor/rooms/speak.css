@@ -68,6 +68,11 @@ body.has-primary-tabs[data-view='speak'] #app { padding-bottom: calc(var(--nav-c
   overflow-wrap: anywhere;
 }
 .speak-line[data-who='me'] .speak-text { font-size: var(--type-lead); color: var(--color-ink-2); }
+/* A line mixes the dictionary's word doors with plain lookup segments: the line is the one layer their 44px hit regions
+   share, under every glyph of it (as the guided room's prose and a page's examples are). Isolated segment by segment,
+   the region of れ (入|れた) lay over 入's centre at the reading step: a tap on 入 opened れ. */
+.speak-text { isolation: isolate; }
+.speak-text .japanese-lookup-text { isolation: auto; }
 .speak-waiting { min-height: calc(var(--type-reading) * 2); }
 .speak-note { margin: var(--space-1) 0 0; font: var(--weight-regular) var(--type-caption) / var(--leading-ui) var(--font-ui); color: var(--color-quiet); }
 

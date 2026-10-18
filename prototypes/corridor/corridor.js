@@ -10580,6 +10580,16 @@ function openPlainSaveMenu(invoker, { more = [], place = null } = {}) {
   invoker?.setAttribute('aria-expanded', 'true');
   placeSaveMenu(pop, invoker, place);
 }
+/** A card that has grown to all the room it has scrolls itself, never the page, until its unfolded menu stands whole in
+ * it: the menu's foot comes into view without its head leaving the card's top. */
+function keepMenuInCard(pop) {
+  const card = pop.closest?.('#mini');
+  if (!card || !(card.scrollHeight > card.clientHeight + 1) || typeof pop.getBoundingClientRect !== 'function') return;
+  const box = pop.getBoundingClientRect(), view = card.getBoundingClientRect();
+  const top = view.top + card.clientTop, foot = top + card.clientHeight;
+  const lift = Math.min(box.bottom - foot, box.top - top);
+  if (lift > 0) card.scrollTop += Math.ceil(lift);
+}
 /** Where the one Save's menu stands: inside its card or row (the card grows; nothing is covered), as a drawer under its bar,
  * or (the lists popover of a surface with neither) beside its invoker. */
 function placeSaveMenu(pop, invoker, place = null) {
@@ -10588,6 +10598,7 @@ function placeSaveMenu(pop, invoker, place = null) {
   if (where === 'inline') {
     pop.classList.add('is-inline');
     (invoker.closest('.mini-actions') || invoker.closest('[data-save-row]') || invoker).after(pop);
+    keepMenuInCard(pop);
   } else if (where === 'drawer') {
     pop.classList.add('is-inline', 'is-drawer');
     const bar = invoker?.closest?.('[data-bar]');
@@ -11332,6 +11343,14 @@ function anchorBox(anchor) {
   }
   return { top, bottom, left, right, width: right - left, height: bottom - top, x: left, y: top };
 }
+/** The foot of the frame a card or a strip is seated under: the top bar (on a page, the page's own bar) and, under it,
+ * G6's scale thread, the bar's second row. A card that meets the bar alone stood over the thread's doors, a sliver of 宙
+ * showing beside it. */
+function frameFoot(onPage, fixedEdge) {
+  const bar = (onPage ? fixedEdge('#sheet > .sheet-bar', 'bottom') : null) ?? fixedEdge('#app > .chrome', 'bottom');
+  const thread = fixedEdge(onPage ? '#sheet > .scale-thread' : '#app > .scale-thread', 'bottom');
+  return bar == null && thread == null ? null : Math.max(bar ?? 0, thread ?? 0);
+}
 /** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
 function keepFloatingBeside(card, anchor, { follow = false } = {}) {
   placeFloating(card, anchorBox(anchor));
@@ -11406,7 +11425,7 @@ function placeFloating(card, r) {
   // A clipped card meets the chrome edge: a gutter here can expose half a title glyph. On a page the edge is the page's
   // own bar (G1: Back is never covered)
   const onPage = !!card.dataset.page;
-  const ceiling = Math.max(8, (onPage ? fixedEdge('#sheet > .sheet-bar', 'bottom') : null) ?? fixedEdge('#app > .chrome', 'bottom') ?? 0);
+  const ceiling = Math.max(8, frameFoot(onPage, fixedEdge) ?? 0);
   // the deck's grade dock is a floor too: the slip never covers the four grades (it sits above a word in the lower third)
   // G5 · nor the 層 mark at the foot, where the card would stand over it (it sits beside 音, so on a phone it takes no
   // more room than 音 does)
@@ -12113,7 +12132,7 @@ function placeSealStrip(open) {
   const glassLeft = vv ? vv.offsetLeft : 0, glassRight = vv ? vv.offsetLeft + vv.width : window.innerWidth;
   const onPage = !!anchor.closest('#sheet');
   const scroller = onPage ? anchor.closest('#sheet') : null;
-  const ceiling = Math.max(glassTop + 8, (onPage ? fixedEdge('#sheet > .sheet-bar', 'bottom') : null) ?? fixedEdge('#app > .chrome', 'bottom') ?? 0);
+  const ceiling = Math.max(glassTop + 8, frameFoot(onPage, fixedEdge) ?? 0);
   const view = vv?.height || window.innerHeight;
   strip.style.maxHeight = `${Math.max(96, Math.floor(view * 0.4))}px`;
   strip.style.left = '0px';

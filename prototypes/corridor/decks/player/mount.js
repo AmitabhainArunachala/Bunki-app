@@ -1954,7 +1954,8 @@ function tapped(unit, node, { card, where, depth }) {
   }
   // The host owns the ladder. Existing ruby needs only presentation callbacks; plain
   // definition text uses the host's inline reading. Nothing is revealed before activation.
-  const hasRuby = !!node.querySelector('ruby[data-rt]');
+  // F · the passage's readings are native <rt>s the deck hides in place (player.css), never ruby[data-rt]
+  const hasRuby = !!node.querySelector('ruby > rt');
   const opened = safely(() => ctx.host.openSlip?.(frame, node, {
     english: ctx.prefs.gloss === 'show',
     ...(hasRuby ? {

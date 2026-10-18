@@ -36,6 +36,8 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'phoneticAnnotationRanges', 'phoneticAnnotationCandidates', 'installProseWordRoving', 'proseWordRovers',
   // G5 (2026-10-18): the slip's floor stops above the 層 mark where the two would share a column (placeFloating)
   'layersMarkTop',
+  // G6 (2026-10-19, merge): the slip's ceiling is the frame's foot, the scale thread under the bar (placeFloating)
+  'frameFoot',
   // R3 (2026-10-18): the sense a word's text uses — the lookup's entry before its sense, the record its sense shapes, the
   // slip's second line, and the marks the slip leaves (for the page, and for a sense still to come)
   'japaneseLookupEntryRecord', 'senseRecord', 'senseIsQuick', 'senseMoreLine', 'SENSE_BY_ANCHOR', 'SENSE_LATER', 'senseLaterDraw', 'sensePatch', 'SLIP_NODE', 'senseMoreElement'];
