@@ -1079,10 +1079,12 @@ async function main() {
     const m = document.querySelector('#seal-strip');
     return m ? { role: m.getAttribute('role'), status: document.getElementById('seal-strip-status')?.textContent.trim() ?? '',
       items: [...m.querySelectorAll('[data-strip-action]')].filter((n) => !n.hidden).map((n) => n.dataset.stripAction),
+      // Remove stands beside Saved ✓ in the first row (lead's ruling, 2026-10-18)
+      removeBesideSaved: !!m.querySelector('.seal-strip-lists > #seal-strip-status + [data-strip-action="remove"]'),
       kept: Number(document.getElementById('tray')?.dataset.count ?? NaN) } : null;
   })()`);
   check('grammar · a press and hold seals the word and opens its strip', !!menu && menu.role === 'dialog' && /^Saved/u.test(menu.status) &&
-    menu.kept === keptBefore + 1 && menu.items.join(',') === 'entry,sentence,copy,ask-tutor,remove', JSON.stringify({ keptBefore, ...menu }));
+    menu.kept === keptBefore + 1 && menu.items.join(',') === 'remove,entry,sentence,copy,ask-tutor' && menu.removeBesideSaved, JSON.stringify({ keptBefore, ...menu }));
   // "anywhere else": a point on the page's own margin, beside the text, that carries no control
   const elsewhere = await page.evaluate(`(() => {
     for (const x of [innerWidth - 3, 3]) for (const y of [0.35, 0.5, 0.65].map((f) => Math.round(innerHeight * f))) {

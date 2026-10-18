@@ -1008,7 +1008,9 @@ try {
         return { role: node.getAttribute('role'), items: [...node.querySelectorAll('[data-strip-action]')].filter((item) => !item.hidden).map((item) => item.textContent.trim()),
           status: status && { text: status.textContent.trim(), role: status.getAttribute('role') }, top: box.top, bottom: box.bottom, left: box.left, right: box.right };
       });
-      assert.deepEqual(strip.items, ['全項目 · Full entry', 'Save the sentence', 'Copy', 'Ask the tutor about the word', 'Remove'], `the strip: ${JSON.stringify(strip.items)}`);
+      // the word's one way out stands beside Saved ✓ in the first row (lead's ruling, 2026-10-18); the acts follow under the hairline
+      assert.deepEqual(strip.items, ['Remove', '全項目 · Full entry', 'Save the sentence', 'Copy', 'Ask the tutor about the word'], `the strip: ${JSON.stringify(strip.items)}`);
+      assert.equal(await page.locator('#seal-strip .seal-strip-lists > #seal-strip-status + [data-strip-action="remove"]').count(), 1, 'Remove does not stand beside Saved ✓');
       const overWord = !(strip.right <= wordBox.left || strip.left >= wordBox.right || strip.bottom <= wordBox.top || strip.top >= wordBox.bottom);
       assert(strip.role === 'dialog' && !overWord, `the strip is not beside its word: ${JSON.stringify({ strip, wordBox })}`);
       const after = await readAppRecord(page);

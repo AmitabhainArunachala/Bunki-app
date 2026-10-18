@@ -37,6 +37,7 @@
  *   a word held inside the word's page keeps its strip in the page, over no button; the bookmark lands on the kept
  *   words, and browsing them never starts a review; layers open only from 層, never move the paragraph's lines, and fold
  *   on any tap, Escape or the mark; the strip stands wholly on the glass at 320×568, 390×844 and 430×932 over no button,
+ *   every control inside its painted box with no scroll of its own (Remove beside Saved ✓),
  *   and the bookmark's landed row is on the glass there; Remove un-saves everywhere and Undo brings every place back;
  *   with reduced motion nothing travels; on a deck card the front stays sealed and a back
  *   word's hold keeps it once and opens the strip; a Save in a bar stands inside it, 8 px clear of
@@ -1144,8 +1145,9 @@ try {
       check('G5.seal.flight', 'a 印 presses onto the word and flies to the bookmark, landing on it', pressed === 1 && shown.length >= 6 && !!from && !!to && !!centre &&
         Math.hypot(from[0] - (wordBox.left + wordBox.width), from[1] - wordBox.top) <= 40 && Math.hypot(to[0] - centre[0], to[1] - centre[1]) <= 24 && done.seals === 0,
         { pressed, frames: shown.length, from, to, centre, wordBox });
-      check('G5.seal.strip', 'the strip opens with the word kept: Saved, his lists, New list…, then 全項目 · Full entry, Save the sentence, Copy, the tutor and Remove',
-        opened.strip && /Saved/u.test(opened.status) && JSON.stringify(opened.acts.map((act) => act.action)) === JSON.stringify(['entry', 'sentence', 'copy', 'ask-tutor', 'remove']) &&
+      check('G5.seal.strip', 'the strip opens with the word kept: Saved ✓ and Remove beside it, his lists, New list…, then 全項目 · Full entry, Save the sentence, Copy and the tutor',
+        opened.strip && /Saved/u.test(opened.status) && JSON.stringify(opened.acts.map((act) => act.action)) === JSON.stringify(['remove', 'entry', 'sentence', 'copy', 'ask-tutor']) &&
+        await page.locator('#seal-strip .seal-strip-lists > #seal-strip-status + [data-strip-action="remove"]').count() === 1 &&
         await page.locator('#seal-strip-new').isVisible(), opened);
       check('G5.labels', 'plain full verbs: never the rejected row "this sentence · save · ask the tutor · practice", nor "Open the web"', labelsClean(opened), opened.acts);
       await page.screenshot({ path: resolve(evidence, `${engine}-G5-strip.png`) });
@@ -1440,6 +1442,20 @@ try {
         stripOnGlass: !!s && s.top >= band.top - 0.5 && s.bottom <= band.bottom + 0.5 && s.left >= glass.left - 0.5 && s.right <= glass.right + 0.5,
         wordOnGlass: !!wordBox && wordBox.top >= band.top - 0.5 && wordBox.bottom <= band.bottom + 0.5 };
     });
+    // every control of the open strip stands wholly inside its painted box, and nothing scrolls inside it (lead's ruling,
+    // 2026-10-18: Remove beside Saved ✓, so no row needs the strip's own scroll)
+    const stripFit = (page) => page.evaluate(() => {
+      const strip = document.getElementById('seal-strip');
+      if (!strip) return null;
+      const box = strip.getBoundingClientRect();
+      const inner = { top: box.top + strip.clientTop, left: box.left + strip.clientLeft, bottom: box.top + strip.clientTop + strip.clientHeight, right: box.left + strip.clientLeft + strip.clientWidth };
+      const controls = [...strip.querySelectorAll('button, input')].filter((n) => !n.hidden && !n.closest('[hidden]') && n.getClientRects().length)
+        .map((n) => { const r = n.getBoundingClientRect(); return { id: n.id || n.dataset.stripAction || n.dataset.list || n.textContent.trim().slice(0, 16), top: Math.round(r.top), bottom: Math.round(r.bottom), inside: r.top >= inner.top - 0.5 && r.bottom <= inner.bottom + 0.5 && r.left >= inner.left - 0.5 && r.right <= inner.right + 0.5 }; });
+      const remove = strip.querySelector('[data-strip-action="remove"]');
+      return { scrollHeight: strip.scrollHeight, clientHeight: strip.clientHeight, more: strip.dataset.more ?? null, scrollTop: strip.scrollTop,
+        removeInFirstRow: !!remove?.closest('.seal-strip-lists') && remove.previousElementSibling?.id === 'seal-strip-status',
+        controls, outside: controls.filter((c) => !c.inside).map((c) => c.id) };
+    });
     /** Put a content word of the reader (kanji, on the left half, so no fixed door at the foot is over it) at `y` on the
      * glass, mark it as the one to hold, and return it. */
     const wordAt = async (page, where) => {
@@ -1478,11 +1494,22 @@ try {
           await holdOn(page, word, { id: id++ });
           await page.locator('#seal-strip').waitFor();
           await landed(page);
-          const glass = await glassFacts(page), place = await stripCover(page, '[data-g5-held]');
+          const glass = await glassFacts(page), place = await stripCover(page, '[data-g5-held]'), fits = await stripFit(page);
           glass.wordTopBeforeHold = word.before ?? null;
+          check(`G5.strip.fits.${form}.${name}`, `${form}, ${name}${name === 'first' ? '' : ' (with his three lists)'}: every control of the strip stands wholly inside its painted box, Remove beside Saved ✓, and nothing scrolls inside it`,
+            !!fits && fits.outside.length === 0 && fits.scrollHeight <= fits.clientHeight && fits.more !== 'true' && fits.removeInFirstRow, fits);
           check(`G5.glass.${form}.${name}`, `${form}, a word ${name === 'first' ? 'where the story opens' : `near the ${name}`}: the strip stands wholly on the glass, over no button, under 40 % of the screen, the word still on the glass`,
             glass.stripOnGlass && glass.wordOnGlass && !!place && place.covered.length === 0 && place.share <= 0.4 && !place.overWord, { ...glass, covered: place?.covered, share: place?.share, overWord: place?.overWord });
           if (name === 'foot') await page.screenshot({ path: resolve(evidence, `${engine}-G5-glass-${form}-foot.png`) });
+          if (name === 'first') {
+            // his lists for the holds that follow: three, as a learner keeps them
+            for (const list of ['仕事', '旅', 'ニュースの語']) {
+              await page.locator('#seal-strip-new').tap();
+              await page.locator('#seal-strip-name').fill(list);
+              await page.locator('#seal-strip-create').tap();
+              await page.locator(`#seal-strip .seal-list[data-list="${list}"]`).waitFor();
+            }
+          }
           await page.keyboard.press('Escape'); await delay(250);
         }
         // the bookmark lands on the row it focuses (the newest kept word's), on the glass at this size. At 320 the room's bar
