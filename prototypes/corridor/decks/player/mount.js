@@ -355,6 +355,7 @@ const UI_EN = {
   "閉じる": "Close",
   "ここでは保存できません": "Can't save from here.",
   "削除": "Remove",
+  "このカードを削除": "Remove this card",
   "このカードを削除（保留にする・あとで戻せる）": "Remove this card from study (pause it; restore it later)",
   "別の文に替える": "Use another sentence",
   "替えられる文がありません": "No alternative sentence available",
@@ -1073,7 +1074,8 @@ function studyScreen() {
   // a short sitting draws one segment per card (the rail itself still ticks by transform)
   if (total > 1 && total <= 30) prog.style.setProperty('--kp-n', String(total));
   prog.append(rail(ui.pos / total));
-  top.append(prog, el('span', 'kp-count', `${ui.pos + 1}/${total}`), deleteButton());
+  // 削除 is not here (Hfix-1B, the lead's round-1 ruling): a card is taken out on its back, never from a front
+  top.append(prog, el('span', 'kp-count', `${ui.pos + 1}/${total}`));
   box.append(top);
 
   const stored = ctx.state.cards[id];
@@ -2042,19 +2044,24 @@ const SWAPPED = '別の文に替えました。前の文は保留にしました
 const SUSPENDED = '保留にしました（設定 › 保留中のカード から戻せます）。';
 const UNDOABLE = [DELETED, SWAPPED, SUSPENDED];
 
-/** the back's nodes in order: the answer (tier one, a leech's ladder, then the folds) */
+/** the back's nodes in order: the answer (tier one, a leech's ladder, then the folds), then its quiet row (削除) */
 function backParts(card, word) {
   const answer = answerBlock(card, word);
-  return { answer, nodes: [answer] };
+  return { answer, nodes: [answer, cardTools()] };
 }
 
-/** 削除 in the study top bar, front and back, never more than a glance away: one tap, undone
- * from the toast or Undo for the rest of the sitting */
+/** 削除 (Hfix-1B, the lead's round-1 ruling on HG-5): taking a card out of study is a deliberate act after its answer is
+ * seen, so it lives on the back alone, as the card's last quiet row under the folds: never in the top bar, never on a
+ * front, never beside the grades. One tap there, undone from the toast or Undo for the rest of the sitting. */
 function deleteButton() {
-  return btn('kp-delete', t("削除"), (e) => {
+  return btn('kp-delete', t("このカードを削除"), (e) => {
     e.stopPropagation();
     deleteCard();
   }, { id: 'kp-delete', 'aria-label': t("このカードを削除（保留にする・あとで戻せる）") });
+}
+/** the back's quiet row: the last thing on the card, after its answer and folds */
+function cardTools() {
+  return el('div', 'kp-card-tools', deleteButton());
 }
 
 /** a ladder hint: the first kana of the reading and one ○ per kana left; on a 字 card, the

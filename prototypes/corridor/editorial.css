@@ -3311,12 +3311,14 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
     radial-gradient(120% 55% at 50% 22%, color-mix(in srgb, var(--world-paper) 10%, transparent) 0%, transparent 72%),
     var(--kp-study-ground);
 }
-/* ─ the bar: ×, one hairline of progress, the count in plain figures, Remove as a quiet word */
+/* ─ the bar: ×, one hairline of progress, the count in plain figures (Remove lives on the back: Hfix-1B) */
 #app .kp-top-study .kp-icon { width: 44px; color: var(--color-bar-ink); }
 #app .kp-top-study .kp-progress { height: 2px; border-radius: var(--radius-seal); background: color-mix(in srgb, var(--kp-stage-ink) 14%, transparent); -webkit-mask-image: none; mask-image: none; }
 #app .kp-top-study .kp-progress i { background: color-mix(in srgb, var(--kp-stage-ink) 80%, transparent); border-radius: var(--radius-seal); }
 #app .kp-top-study .kp-count { min-width: 0; font: 500 var(--type-label)/1 var(--sans, system-ui); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; color: var(--kp-stage-mute); }
-#app .kp-top-study .kp-delete { height: 44px; padding: 0 4px; border: 0; background: transparent; font: 500 var(--type-label)/1 var(--sans, system-ui); letter-spacing: 0.01em; color: var(--kp-stage-mute); }
+/* ─ the back's quiet row (Hfix-1B): Remove in the card's own quiet sans, at the end of the answer */
+#app .kp-study .kp-card-tools .kp-delete { padding: 0 2px; font: 500 var(--type-label)/1 var(--sans, system-ui); letter-spacing: 0.01em; color: var(--kp-ink-2);
+  text-decoration: underline; text-decoration-color: var(--kp-line); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 /* ─ the sheet: one paper, one hairline edge (no kind stripe), a little fibre, lifted by two shadows:
    a close one that says it rests, a long one that says it is lit from above */
 #app .kp-study .kp-card {
@@ -3963,7 +3965,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   :where(#bunki-reports-root .br-actions) button, :where(#bunki-reports-root .br-context-summary) button,
   .skip-more, .skip-retry, .skip-search-opener, .skip-code-door, .reference-button,
   :where(.pc) button:where(:not(.pc nav *, .pc-top *, .pc-card-foot *, .pc-grades *, .pc-token)),
-  .kp-delete, .vocabulary-list-create, :where(.vocabulary-list-form) .chip, :where(.vocabulary-list-dialog) > .chip,
+  .vocabulary-list-create, :where(.vocabulary-list-form) .chip, :where(.vocabulary-list-dialog) > .chip,
   .kdx-lens, .focus-chip
 ) {
   min-height: 44px;
@@ -3984,7 +3986,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   :where(#bunki-reports-root .br-actions) button, :where(#bunki-reports-root .br-context-summary) button,
   .skip-more, .skip-retry, .skip-search-opener, .skip-code-door, .reference-button,
   :where(.pc) button:where(:not(.pc nav *, .pc-top *, .pc-card-foot *, .pc-grades *, .pc-token)),
-  .kp-delete, .vocabulary-list-create, :where(.vocabulary-list-form) .chip, :where(.vocabulary-list-dialog) > .chip,
+  .vocabulary-list-create, :where(.vocabulary-list-form) .chip, :where(.vocabulary-list-dialog) > .chip,
   .kdx-lens, .focus-chip
 ):hover:where(:not(:disabled, [aria-disabled='true'])) { background: var(--color-fill); }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.chip, .gs-button, .cd-btn, .stroke-btn, .skip-more, .skip-retry, .reference-button):where(:disabled, [aria-disabled='true']) {
@@ -4034,7 +4036,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
 
 /* ---- C · Quiet: a word, no box ---- */
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  .btn-tertiary, .chip:where(.btn-tertiary), .kp-link, .gs-text, .nav-arrow, .sheet-back,
+  .btn-tertiary, .chip:where(.btn-tertiary), .kp-link, .kp-delete, .gs-text, .nav-arrow, .sheet-back,
   :where(#bunki-reports-root) .br-close, .reference-text-button
 ) {
   min-height: 44px;
@@ -4050,7 +4052,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
   cursor: pointer;
 }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  .btn-tertiary, .chip:where(.btn-tertiary), .kp-link, .gs-text, .nav-arrow, .sheet-back,
+  .btn-tertiary, .chip:where(.btn-tertiary), .kp-link, .kp-delete, .gs-text, .nav-arrow, .sheet-back,
   :where(#bunki-reports-root) .br-close, .reference-text-button
 ):hover:where(:not(:disabled)) { background: var(--color-fill); }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.btn-tertiary, .gs-text, .kp-link):where(:disabled) { color: var(--color-muted); cursor: default; }

@@ -16,7 +16,8 @@
  *                    hairline crosses drawn as background layers, perpendicular hairline pseudo-elements, corner
  *                    brackets, glyph crosses;
  *   D  the deck    — the deck's study bar is a solid band in the world's deep pigment (藍 and 墨 walked), its
- *                    back, count and Remove at 4.5:1 or more on it;
+ *                    back and count at 4.5:1 or more on it, and nothing else on it: Remove lives on the card's back
+ *                    (Hfix-1B);
  *   T  Today       — no box inside a box: the day's line carries no bordered box within it, and no + marks.
  *   N  the shelf's rows and cards (slice N, 2026-10-17: "made by AI!! do not write that", the twenty new articles) —
  *                    every card carries one level, the level its text was written for where the row has one; every
@@ -981,7 +982,10 @@ try {
       const dark = solid && contrast(bar.bg, 'rgb(255, 255, 255)') >= 7;
       check(`${label} · D the deck's bar is a solid deep band`, solid && dark, JSON.stringify(bar));
       const low = bar && solid ? Math.min(...bar.parts.map((p) => contrast(p.color, bar.bg))) : 0;
-      check(`${label} · D its back, count and Remove hold 4.5:1 on the band`, solid && bar.parts.length >= 3 && low >= 4.5, `${low.toFixed(2)}:1 ${JSON.stringify(bar?.parts)}`);
+      // Hfix-1B · Remove left the bar for the card's back (the lead's ruling on HG-5): the bar holds exactly its back and count
+      const sigs = (bar?.parts || []).map((p) => p.sig);
+      check(`${label} · D its back and count hold 4.5:1 on the band, and nothing else is on it (no Remove)`,
+        solid && JSON.stringify(sigs) === JSON.stringify(['kp-quit', 'kp-count']) && low >= 4.5, `${low.toFixed(2)}:1 ${JSON.stringify(bar?.parts)}`);
     }
     // T: Today's line is one surface, no box inside it
     for (const row of inventory.filter((r) => r.room === 'today' || r.room === 'today-cards')) {

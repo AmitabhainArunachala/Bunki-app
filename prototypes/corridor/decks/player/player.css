@@ -208,7 +208,10 @@
 .kp-rhint { margin: 0; display: flex; align-items: baseline; gap: 8px; font-size: var(--type-body); color: var(--kp-ink-2); }
 .kp-rhint-label { font-size: var(--type-caption); color: var(--kp-mute); border: 1px dashed currentColor; border-radius: var(--radius-card, 4px); padding: 0 4px; }
 /* 削除: quiet, one tap, at the right end of the study top bar (44px, like ✕); undone from the toast */
-.kp-delete { flex: none; height: 44px; padding: 0 12px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-ink-2); font-size: var(--type-label); }
+/* 削除 (Hfix-1B): the back's last quiet row, after the folds, its one word at the row's end; 44px to touch; never on a front,
+   never in the top bar */
+.kp-card-tools { display: flex; justify-content: flex-end; margin: 2px 0 -10px; }
+.kp-delete { flex: none; min-height: 44px; padding: 0 2px; border: 0; border-radius: 0; background: none; color: var(--kp-ink-2); font-size: var(--type-label); letter-spacing: 0.02em; text-decoration: underline; text-decoration-color: var(--kp-line); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .kp-toast.is-info { border-color: var(--kp-line); grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
 .kp-seg button:disabled { opacity: 0.5; cursor: default; }
 
@@ -463,7 +466,6 @@
 }
 .kp-top-study .kp-progress i { background: var(--kp-stage-ink); }
 .kp-top-study .kp-count { color: var(--kp-stage-ink); font-size: var(--type-label); letter-spacing: 0.12em; min-width: 3.4em; text-align: right; }
-.kp-top-study .kp-delete { border-color: color-mix(in srgb, var(--kp-stage-ink) 18%, transparent); color: var(--kp-stage-ink); border-radius: var(--radius-seal, 3px); font-size: var(--type-caption); letter-spacing: 0.06em; padding: 0 10px; }
 
 /* the sheet: nearly square paper, a hairline edge, relief, トンボ registration marks in its
  * corners (a pseudo-element, so the card's own surface stays plain under the ruby) */
