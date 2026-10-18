@@ -738,7 +738,7 @@ function g6CurrentThreadDOM(action={}) {
   };
   if(action.op==='observe'){
     if(window.__g6CurrentMount)throw new Error('current-thread observer already active');
-    const old=[...document.querySelectorAll('.scale-thread')].map(node=>({node,scale:node.dataset.scale,left:node.scrollLeft,top:node.scrollTop})),seen=new Set(),mounts=[];
+    const old=[...document.querySelectorAll('.scale-thread')].map((node,index)=>({node,index,owner:node.parentElement,ownerId:node.parentElement?.id||null,scale:node.dataset.scale,left:node.scrollLeft,top:node.scrollTop})),seen=new Set(),mounts=[];
     const observer=new MutationObserver(()=>{
       for(const thread of active())if(thread.dataset.scale===action.scale&&!seen.has(thread)&&!old.some(row=>row.node===thread)){
         seen.add(thread);mounts.push({thread,initial:facts(thread)});
@@ -747,7 +747,7 @@ function g6CurrentThreadDOM(action={}) {
     observer.observe(document.getElementById('app'),{childList:true,subtree:true});
     window.__g6CurrentMount={finish:()=>{
       observer.disconnect();
-      return {mounts:mounts.map(({thread,initial})=>({initial,settled:facts(thread),sameLiveOwner:thread.isConnected&&thread===active()[0]})),retained:old.filter(row=>row.node.isConnected).map(row=>({scale:row.scale,before:{left:row.left,top:row.top},after:{left:row.node.scrollLeft,top:row.node.scrollTop},inert:!!row.node.closest('[inert],[aria-hidden="true"]')}))};
+      return {mounts:mounts.map(({thread,initial})=>({initial,settled:facts(thread),sameLiveOwner:thread.isConnected&&thread===active()[0]})),priorCount:old.length,priorRails:old.map(row=>({index:row.index,scale:row.scale,owner:row.ownerId,before:{left:row.left,top:row.top},connected:row.node.isConnected,retired:!row.node.isConnected,sameParent:row.node.parentElement===row.owner,after:row.node.isConnected?{left:row.node.scrollLeft,top:row.node.scrollTop}:null,inert:!!row.node.closest('[inert],[aria-hidden="true"]')})),roomRails:[...document.querySelectorAll('#app > .scale-thread')].map(node=>({connected:node.isConnected,fresh:!old.some(row=>row.node===node),inert:!!node.closest('[inert],[aria-hidden="true"]'),left:node.scrollLeft,top:node.scrollTop}))};
     }};
     return {observing:action.scale,oldRails:old.length};
   }
@@ -764,7 +764,16 @@ async function g6CurrentThreadGeometry(page){
 async function g6CurrentThreadVisible(page,{emit,width,world}){
   const modality='touch',home=await g6OpenOrigin(page,modality),route=[];
   for(const [from,to]of [['article','sentence'],['sentence','word'],['word','kanji']]){
-    const step=await g6Move(page,{from,to,home,modality});route.push(step);assert(step.ok,JSON.stringify(step.observed));
+    try{const step=await g6Move(page,{from,to,home,modality});route.push(step);assert(step.ok,JSON.stringify(step.observed));}
+    catch(error){
+      const actual=await page.evaluate(()=>{
+        const rail=[...document.querySelectorAll('.scale-thread')].find(n=>!n.closest('[inert],[aria-hidden="true"]')&&n.getClientRects().length);
+        const rows=[...(rail?.children||[])].map(node=>{const r=node.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;return {tag:node.tagName,text:node.textContent,scaleIn:node.hasAttribute('data-scale-in'),current:node.getAttribute('aria-current'),rect:{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height},centre:{x,y},hits:document.elementsFromPoint(x,y).slice(0,6).map(n=>({tag:n.tagName,id:n.id,class:n.className,text:n.textContent?.slice(0,80)}))};});
+        return {scale:rail?.dataset.scale,scrollLeft:rail?.scrollLeft,rows,scrollY,theme:document.documentElement.getAttribute('data-theme')};
+      });
+      writeFileSync(resolve(evidence,`${engine}-G6-current-${width}-${world}-${from}-${to}-native-failure.json`),JSON.stringify({from,to,width,world,error:String(error.stack||error),actual},null,2));
+      throw error;
+    }
   }
   await pageSettled(page);
   await page.evaluate(g6CurrentThreadDOM,{op:'observe',scale:'part'});
@@ -777,13 +786,16 @@ async function g6CurrentThreadVisible(page,{emit,width,world}){
   }finally{observed=await page.evaluate(g6CurrentThreadDOM,{op:'finish'});}
   const part=await g6CurrentThreadGeometry(page),capture=resolve(evidence,`${engine}-G6-current-${width}-${world}-part.png`);
   await page.screenshot({path:capture});
-  emit('current.context','actual requested width and palette with the retained nonzero source occurrence',part?.viewport.width===width&&part?.sheetWorld===world&&part?.stamp===home.stamp&&home.origin.scrollY>0,{width,world,part,origin:home.origin,capture});
+  const paper=await pageFacts(page),appliedWorld=part?.theme===''?'hokusai':part?.theme;
+  emit('current.context','actual requested width and applied palette/paper with the retained nonzero source occurrence',part?.viewport.width===width&&appliedWorld===world&&paper?.background===paper?.paper&&paper?.alpha===1&&part?.stamp===home.stamp&&home.origin.scrollY>0,{width,world,appliedWorld,paper,part,origin:home.origin,capture});
   emit('current.part-route','four native inward edges reach the actual source-backed part',route.length===4&&route.every(row=>row.ok)&&part?.scale==='part'&&part.currentNode===`radical:${G6_ORIGIN.part}`,route);
   emit('current.part-contained','the whole part-current span is visible beside the wholly visible sticky outside control',part?.activeRails===1&&part?.currentCount===1&&part?.currentTag==='SPAN'&&part?.currentContained&&part?.outsideContained,{part,capture});
   const mount=observed.mounts[0],unchanged=observed.mounts.length===1&&mount.sameLiveOwner&&mount.initial.currentNode===mount.settled.currentNode&&
     JSON.stringify(mount.initial.offsets)===JSON.stringify(mount.settled.offsets)&&mount.initial.scrollTop===mount.settled.scrollTop&&
-    observed.retained.length>0&&observed.retained.every(row=>row.inert&&JSON.stringify(row.before)===JSON.stringify(row.after));
-  emit('current.part-scroll-only','first-layout correction leaves exact page/reader/sheet offsets and every retained inert rail unchanged',unchanged,observed);
+    observed.priorCount>0&&observed.priorRails.length===observed.priorCount&&observed.priorRails.every((row,index)=>row.index===index&&
+      (row.retired?!row.connected&&row.after===null:row.connected&&row.sameParent&&row.inert&&JSON.stringify(row.before)===JSON.stringify(row.after)))&&
+    observed.priorRails.some(row=>row.owner==='app')&&observed.roomRails.length===1&&observed.roomRails.every(row=>row.connected&&row.fresh&&row.inert&&row.left===0&&row.top===0);
+  emit('current.part-scroll-only','first-layout correction preserves exact page/reader/sheet offsets and accounts for every retired or surviving inert rail',unchanged,observed);
   const ancestor=await g6Bead(page,'article',modality);assert(ancestor.ok,JSON.stringify(ancestor.observed));
   const returned=await g6Line(page,home);emit('current.return-line','native article bead returns the exact nonzero source line within4px',returned.ok,returned.observed);
   const outward=[];
