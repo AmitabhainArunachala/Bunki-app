@@ -878,10 +878,21 @@ function g6ControlFor(page,from,to){
   const direction=G6_ORDER.indexOf(to)>G6_ORDER.indexOf(from)?'in':'out';
   return page.locator(`${G6_RAIL}[data-scale="${from}"] button[data-scale-${direction}]`);
 }
+// Hfix-1A (the lead's item 8; it pinned the word rail's "kanji ›" on every word page): a word's rail offers its way in only
+// back to the kanji entered from it in the visit, so the first word → kanji edge goes through the page's own kanji row (the
+// door a learner sees) and every later one through the rail (verify-hfix-1a 8.* holds the rule itself)
+async function g6Door(page,from,to){
+  if(from==='word'&&to==='kanji'){
+    const rail=page.locator(`${G6_RAIL}[data-scale="word"] button[data-scale-in]`);
+    if(await rail.count())return rail;
+    return page.locator(`#sheet .entry-row[data-kanjirow="${G6_ORIGIN.kanji}"]`);
+  }
+  return g6ControlFor(page,from,to);
+}
 async function g6Move(page,{from,to,modality,home,timing=false}){
   const before=await g6ScaleFacts(page);
   assert.equal(before.scale,from,`edge begins at actual ${from}`);
-  const control=g6ControlFor(page,from,to);
+  const control=await g6Door(page,from,to);
   if(modality==='keyboard')assert((await g6TabReach(page,control)).found,`real Tab order reaches ${from}→${to}`);
   let measurement=null;
   if(timing)measurement=await measure(page,()=>g6Activate(page,control,modality));

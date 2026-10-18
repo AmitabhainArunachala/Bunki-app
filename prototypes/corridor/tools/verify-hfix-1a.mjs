@@ -14,6 +14,7 @@
  *       plain words, English or Japanese, with no JMdict romaji;
  *   7   a part page says what the part is in plain words (name, meaning, where it sits, in how many kanji); its number and
  *       strokes stay in its chips;
+ *   8   a word page's thread offers no "kanji ›" before a kanji is entered from it; its way back in goes to the kanji entered;
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -68,6 +69,8 @@ const CONTROL = {
   'plain-pos': { item: '6.plain', source: [['corridor.js', 'function dictionaryTag(tag) {', 'function dictionaryTag(tag) { return D.dictionaryIndex?.tags?.[tag] || tag;']] },
   'part-plain': { item: '7.', source: [['corridor.js', "        `${official.name}, ${meaning ? `the ${meaning} radical` : 'a radical'}, ${where[1]}.`,",
     '        `Official Kangxi radical no. ${official.n} — ${official.name} (${posText}). Below: the characters that contain this part.`,']] },
+  'kanji-bead': { item: '8.', source: [['corridor.js', "  if (scale === 'word') return node?.enteredKanji && scaleWordKanji(node).includes(node.enteredKanji) ? 'kanji' : null;",
+    "  if (scale === 'word') return scaleWordKanji(node).length ? 'kanji' : null;"]] },
   thread: { item: '3.', css: '.scale-thread { scroll-snap-type: none !important; }',
     source: [['corridor.js', '    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);', '    if (delta) thread.scrollLeft += delta;']] },
 };
@@ -466,6 +469,38 @@ async function itemPart(browser, engine) {
   }
 }
 
+async function itemKanjiBead(browser, engine) {
+  // 8 · 総理's whole page (stage → band): its rail ends at the word, no "kanji ›" (a level he has not entered); in through
+  // 理's own row and out again, the rail's way in returns to 理, the kanji entered
+  const { context, page, errors } = await session(browser);
+  try {
+    await openStory(page);
+    await stage(page);
+    await page.locator('#mini .mini-word').tap();
+    await page.locator('#sheet').waitFor();
+    await settle(page, 600);
+    const wordRail = () => page.evaluate(() => { const rail = [...document.querySelectorAll('.scale-thread[data-scale="word"]')].find((n) => !n.closest('[inert],[aria-hidden="true"]') && n.getClientRects().length);
+      return rail ? { beads: [...rail.children].map((n) => n.textContent.trim()), inward: [...rail.querySelectorAll('[data-scale-in]')].map((n) => n.textContent.trim()) } : null; });
+    const first = await wordRail();
+    await page.locator('#sheet .entry-row[data-kanjirow="理"]').tap();
+    await page.waitForFunction(() => document.getElementById('sheet')?.dataset.node === 'kanji:理', null, { timeout: 8000 });
+    await settle(page, 500);
+    await page.locator(`${RAIL}[data-scale="kanji"] button[data-scale-out]`).tap();
+    await page.waitForFunction(() => document.getElementById('sheet')?.dataset.node?.startsWith('word:'), null, { timeout: 8000 });
+    await settle(page, 500);
+    const back = await wordRail();
+    let into = null;
+    if (back?.inward.length === 1) {
+      await page.locator(`${RAIL}[data-scale="word"] button[data-scale-in]`).tap();
+      await page.waitForFunction(() => document.getElementById('sheet')?.dataset.node?.startsWith('kanji:'), null, { timeout: 8000 }).catch(() => {});
+      into = await page.evaluate(() => document.getElementById('sheet')?.dataset.node ?? null);
+    }
+    check(`8.kanji-bead · ${engine} · 総理's page shows no "kanji ›" before a kanji is entered; back out of 理, its way in returns to 理`,
+      !!first && first.inward.length === 0 && !first.beads.some((t) => /kanji|漢字/u.test(t)) && back?.inward.length === 1 && into === 'kanji:理' && !errors.length,
+      { first, back, into, errors });
+  } finally { await context.close(); }
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
   { id: 'layers', prefix: '2.', run: itemLayers },
@@ -474,6 +509,7 @@ const ITEMS = [
   { id: 'speak-bar', prefix: '5.', run: itemSpeakBar },
   { id: 'entry', prefix: '6.', run: itemEntry },
   { id: 'part', prefix: '7.', run: itemPart },
+  { id: 'kanji-bead', prefix: '8.', run: itemKanjiBead },
 ];
 
 const log = { engines: {} };

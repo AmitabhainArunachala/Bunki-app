@@ -5469,7 +5469,10 @@ function scaleInTarget() {
     const source = scaleSource(visit), word = visit.word || readerEntryNode(source.token, visit.index, source.p);
     return word?.t === 'word' ? 'word' : null;
   }
-  if (scale === 'word') return scaleWordKanji(node).length ? 'kanji' : null;
+  // Hfix-1A (round 1, H-hakuu-09, H-nami-08: a trailing "kanji ›" on 総理's page, a level he had not entered): a word's
+  // rail offers its way in only back to the kanji entered from it in this visit; the first way in is the page's own kanji
+  // rows, which name each kanji
+  if (scale === 'word') return node?.enteredKanji && scaleWordKanji(node).includes(node.enteredKanji) ? 'kanji' : null;
   if (scale === 'kanji') return scaleKanjiParts(node).length ? 'part' : null;
   return null;
 }
@@ -5623,7 +5626,7 @@ function scaleIn(target = {}) {
     if (next?.t !== 'word') return false;
     visit.word = next;
   } else if (scale === 'word') {
-    const id = scaleWordKanji(node)[0];
+    const id = node.enteredKanji && scaleWordKanji(node).includes(node.enteredKanji) ? node.enteredKanji : null;
     if (id) next = { t: 'kanji', id, from: node.from, sourceContext: node.sourceContext };
   } else if (scale === 'kanji') {
     const id = scaleKanjiParts(node)[0];
@@ -5714,6 +5717,9 @@ function returnToScaleBead(bead) {
 function scaleThread() {
   const scale = scaleName() || (S.stack.length ? 'entry' : null);
   if (!scale) return null;
+  // Hfix-1A · a word remembers the kanji entered from it in this visit (its rail's way back in goes there, and only there)
+  const shown = S.stack.at(-1), under = S.stack.at(-2);
+  if (shown?.t === 'kanji' && under?.t === 'word' && scaleWordKanji(under).includes(shown.id)) under.enteredKanji = shown.id;
   const thread = el('nav', 'scale-thread');
   thread.dataset.scale = scale;
   thread.setAttribute('aria-label', tx('ことばの道すじ', 'The way through the text'));
