@@ -30,8 +30,15 @@
  *   C7 source every gradient in every sheet the screens load (the lazy deck and guided sheets too) carries its comment —
  *             `bokashi: ichimonji|atenashi|urushi|emitted — surface — depth|light|brush|focus`, or `drawn:` for a hard-stop
  *             drawing — or is a mask (alpha only, no pigment); and no bokashi or drawing names a literal colour.
+ *   C8 chrome (Hfix-1A, F-1) the fixed chrome is opaque enough that text under it never shows through: with the reading
+ *             scrolled so text lies under the bars, each bar's pixels are the same with everything but the bars hidden.
+ *             And C1 reads each line where a reader reads it: inside the open reading area between the bars and clear of
+ *             their shade (a run's every line probed, not its first alone); a line outside it is read again with the
+ *             document or the page scrolled clear, the run keeping its worst pair (F-1's 9 reds were lines read under the
+ *             tab bar's edge and shade).
  * Negative controls (one-hand/M/neg): a literal #1f3a5f → transparent top bar → C3 red; the key-kanji sheet flat again
- * → C5 red; the bar's ink lowered onto its paper → C1 red; the word's page at 85 % of its page's luminance → C6 red. */
+ * → C5 red; the bar's ink lowered onto its paper → C1 red; the word's page at 85 % of its page's luminance → C6 red;
+ * SWEEP_NEGATIVE=translucent-bar (Hfix-1A) → C8 red. */
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -53,6 +60,10 @@ const WORLDS = Object.freeze(['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokus
 const NIGHT = new Set(['rokusho', 'yoru', 'nami', 'hakuu', 'kaku']);
 const STATE_NAMES = Object.freeze(['shelf', 'reader', 'slip', 'page', 'page-examples', 'today', 'learn', 'words', 'me', 'settings', 'deck-front', 'deck-back']);
 // a partial run (SWEEP_WORLDS / SWEEP_STATES) is for a builder's iteration only: it can never pass as an acceptance
+// Hfix-1A · a negative control (SWEEP_NEGATIVE=translucent-bar): the tab bar painted see-through, so text under it shows
+// through; C8 must go red
+const SWEEP_NEGATIVE = process.env.SWEEP_NEGATIVE || '';
+assert(['', 'translucent-bar'].includes(SWEEP_NEGATIVE), `unknown SWEEP_NEGATIVE ${SWEEP_NEGATIVE}`);
 const onlyWorlds = process.env.SWEEP_WORLDS ? process.env.SWEEP_WORLDS.split(',') : null;
 const onlyStates = process.env.SWEEP_STATES ? process.env.SWEEP_STATES.split(',') : null;
 const partial = !!(onlyWorlds || onlyStates);
@@ -374,6 +385,34 @@ const IN_PAGE = () => {
         });
       }
     }
+    // Hfix-1A (F-1, the lead's ruling) · the open reading area: the glass between the fixed or sticky bars at its top and
+    // its foot, and clear of their shade. A line of a run is read where a reader reads it, inside that area; a line under a
+    // bar or in its shade waits for a pass that scrolls it clear (deferred), never sampled against the bar's own paint. A
+    // bar's own words are read in it. The bars are tagged (data-sweep-bar) for C8.
+    const bars = [];
+    for (const el of document.querySelectorAll('body > *, #app > *, #sheet > *, .kp > *, .kp-study > *')) {
+      const s = getComputedStyle(el);
+      if (!['fixed', 'sticky'].includes(s.position) || s.visibility !== 'visible' || s.display === 'none') continue;
+      const r = el.getBoundingClientRect();
+      if (r.width < vw * 0.6 || r.height < 8 || r.bottom <= 0 || r.top >= vh) continue;
+      // a bar meets the glass's edge (the bar and the thread under it at the top; the tab bar, a player, a grade bar at the
+      // foot): a fixed overlay standing mid-glass (the slip) is no bar
+      const top = r.top <= 52, foot = r.bottom >= vh - 2;
+      if (!top && !foot) continue;
+      // the shade a bar casts past its edge (its box-shadows: offset, blur and spread toward the open area)
+      let shade = 0;
+      for (const m of String(s.boxShadow || '').matchAll(/(-?[\d.]+)px\s+(-?[\d.]+)px\s+([\d.]+)px(?:\s+(-?[\d.]+)px)?/g)) {
+        if (/inset/.test(s.boxShadow)) continue;
+        const dy = Number(m[2]), blur = Number(m[3]), spread = Number(m[4] || 0);
+        shade = Math.max(shade, top ? dy + blur + spread : -dy + blur + spread);
+      }
+      el.dataset.sweepBar = top ? 'top' : 'foot';
+      bars.push({ el, sel: path(el), top, rect: { left: r.left, top: r.top, right: r.right, bottom: r.bottom }, shade: Math.max(0, shade) });
+    }
+    const openTop = Math.max(0, ...bars.filter((b) => b.top).map((b) => b.rect.bottom + b.shade));
+    const openBottom = Math.min(vh, ...bars.filter((b) => !b.top).map((b) => b.rect.top - b.shade));
+    const inBar = (el) => bars.some((b) => b.el.contains(el));
+    const scrollerOf = (el) => (el.closest('#sheet') ? 'sheet' : el.closest('#app, main, body') ? 'doc' : 'other');
     // text runs
     const texts = [];
     const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
@@ -411,14 +450,29 @@ const IN_PAGE = () => {
         if (s.filter && s.filter !== 'none' && !/^(drop-shadow\([^)]*\)\s*)+$/.test(s.filter)) filter = s.filter;
       }
       if (opacity < 0.02) continue;
-      // occluded: none of three probes along the first rect lands on the run's element or its family
-      const q = rects[0], ys = (q.top + q.bottom) / 2;
+      // each line on its own (F-1: only the first line was probed, so a run's later lines were read under the tab bar): a
+      // line is read where it stands in the open area and its own element is the topmost thing along it; a line outside
+      // the open area waits for a pass that scrolls it clear; a line covered inside it by something else is occluded
       const family = (hit) => !!hit && (hit === el || el.contains(hit) || hit.contains(el));
-      const hits = [q.left + 2, (q.left + q.right) / 2, q.right - 2].map((x) => document.elementFromPoint(x, ys));
-      if (!hits.some(family)) { texts.push({ occluded: true, text: content.slice(0, 30), sel: path(el) }); continue; }
+      const own = inBar(el), measured = [], deferred = [];
+      for (const q of rects) {
+        const ys = (q.top + q.bottom) / 2;
+        const open = own || (q.top >= openTop - 0.5 && q.bottom <= openBottom + 0.5);
+        if (!open) { deferred.push(q.top < openTop ? q.top - openTop - 12 : q.bottom - openBottom + 12); continue; }
+        const hits = [q.left + 2, (q.left + q.right) / 2, q.right - 2].map((x) => document.elementFromPoint(x, ys));
+        if (hits.some(family)) measured.push(q);
+      }
+      const key = `${path(el)}|${content.slice(0, 40)}`;
+      if (!measured.length) {
+        if (deferred.length) texts.push({ deferred: true, key, need: deferred, scroller: scrollerOf(el), text: content.slice(0, 30), sel: path(el) });
+        else texts.push({ occluded: true, text: content.slice(0, 30), sel: path(el) });
+        continue;
+      }
+      rects = measured;
       const svg = el instanceof SVGElement;
       const fill = svg ? cs.fill : (cs.webkitTextFillColor || cs.color);
       texts.push({
+        key, partial: deferred.length > 0, need: deferred, scroller: scrollerOf(el),
         text: content.slice(0, 40), sel: path(el), rects, colour: fill, colourProp: cs.color, opacity, blend, filter,
         clipText: /text/.test(cs.backgroundClip || '') || /text/.test(cs.webkitBackgroundClip || ''),
         stroke: parseFloat(cs.webkitTextStrokeWidth || '0') > 0, fontPx: parseFloat(cs.fontSize), weight: Number(cs.fontWeight) || 400,
@@ -444,7 +498,8 @@ const IN_PAGE = () => {
     }).filter(Boolean);
     probe.remove();
     return {
-      pigments, page, bodyBg, paints, texts, figures: figureRects, kanji,
+      pigments, page, bodyBg, paints, texts, figures: figureRects, kanji, open: { top: openTop, bottom: openBottom },
+      bars: bars.map((b) => ({ sel: b.sel, top: b.top, rect: b.rect, shade: b.shade })),
       meta: { theme: root.dataset.theme || 'hokusai', room: root.dataset.room || '', view: body.dataset.view || '', scrollY, sheetTop: document.getElementById('sheet')?.scrollTop ?? null },
     };
   };
@@ -603,7 +658,8 @@ function analyse(world, state, data, shot, bands) {
   // C1 text
   for (const t of data.texts) {
     if (t.occluded) { out.occluded++; continue; }
-    const record = { text: t.text, sel: t.sel, fontPx: t.fontPx, weight: t.weight, hidden: t.hidden };
+    if (t.deferred) { out.deferred = (out.deferred || 0) + 1; continue; }
+    const record = { key: t.key, text: t.text, sel: t.sel, fontPx: t.fontPx, weight: t.weight, hidden: t.hidden };
     const fg = parseColour(t.colour);
     const why = t.clipText ? 'clipped-to-text' : t.blend ? `blend ${t.blend}` : t.filter ? `filter ${t.filter}` : (!fg ? `paint ${t.colour}` : (fg.a === 0 && t.stroke ? 'stroke-only' : ''));
     if (why) { out.unresolved.push({ ...record, why }); continue; }
@@ -795,6 +851,11 @@ try {
       const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: DPR, serviceWorkers: 'block', reducedMotion: 'reduce', colorScheme: 'light' });
       await silenceBrowserAudio(context);
       await context.addInitScript(IN_PAGE);
+      if (SWEEP_NEGATIVE === 'translucent-bar') await context.addInitScript(() => document.addEventListener('DOMContentLoaded', () => {
+        const style = document.createElement('style');
+        style.textContent = '#primary-tabs { background: color-mix(in srgb, var(--color-bar, #f5efe0) 55%, transparent) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }';
+        document.head.append(style);
+      }));
       await context.addInitScript((id) => {
         try {
           localStorage.setItem('kairo-theme', id);
@@ -857,12 +918,92 @@ try {
         await canvas.evaluate(() => window.__sweep.replica(null));
         const result = analyse(world, state, data, shot, bands);
         result.engine = engine;
+        // Hfix-1A (F-1, the lead's ruling) · every run with a line outside the open area is read again scrolled clear of the
+        // bars: one pass that moves the document (or the page) down for the lines under the top bars, one that moves it up
+        // for the lines over the tab bar; each run keeps its worst pair from every pass. A run in a layer no scroll moves is
+        // under a bar C8 proves opaque, and is counted (barred), never read against the bar's paint
+        const waiting = data.texts.filter((t) => t.deferred || t.partial);
+        const reread = { passes: 0, read: 0, barred: [] };
+        const readKeys = new Set(result.pairs.map((p) => p.key));
+        for (const dir of [-1, 1]) {
+          const mine = waiting.filter((t) => ['doc', 'sheet'].includes(t.scroller) && t.need.some((n) => Math.sign(n) === dir));
+          if (!mine.length) continue;
+          const needs = mine.flatMap((t) => t.need.filter((n) => Math.sign(n) === dir));
+          const delta = dir < 0 ? Math.min(...needs) : Math.max(...needs);
+          const moved = await page.evaluate((d) => {
+            const sheet = document.getElementById('sheet'), y0 = scrollY, s0 = sheet?.scrollTop ?? 0;
+            scrollBy({ top: d, behavior: 'instant' });
+            if (sheet) sheet.scrollTop = s0 + d;
+            return { doc: scrollY - y0, sheet: (sheet?.scrollTop ?? 0) - s0 };
+          }, delta);
+          await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+          const again = await page.evaluate(([owned, inks]) => window.__sweep.collect(owned, [], inks), [OWNED, INKS]);
+          await page.evaluate(() => window.__sweep.hide(true));
+          await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+          const clear = decodePng(await page.screenshot({ type: 'png' }));
+          await page.evaluate(() => window.__sweep.hide(false));
+          await page.evaluate((m) => { scrollBy({ top: -m.doc, behavior: 'instant' }); const sheet = document.getElementById('sheet'); if (sheet) sheet.scrollTop -= m.sheet; }, moved);
+          const keys = new Set(mine.map((t) => t.key));
+          const pass = analyse(world, state, { ...again, texts: again.texts.filter((t) => keys.has(t.key)), figures: [], paints: [], kanji: [] }, clear, []);
+          reread.passes += 1;
+          for (const pair of pass.pairs) {
+            reread.read += 1;
+            readKeys.add(pair.key);
+            const had = result.pairs.find((p) => p.key === pair.key);
+            if (!had) result.pairs.push({ ...pair, pass: dir < 0 ? 'scrolled down' : 'scrolled up' });
+            else if (pair.ratio / pair.required < had.ratio / had.required) Object.assign(had, pair, { pass: dir < 0 ? 'scrolled down' : 'scrolled up' });
+          }
+          result.unresolved.push(...pass.unresolved);
+        }
+        reread.barred = waiting.filter((t) => !readKeys.has(t.key)).map((t) => `${t.text} ${t.sel}`.slice(0, 80));
+        result.reread = reread;
+        // C8 (F-1) · the fixed chrome is opaque enough that text under it never shows through: with the reading scrolled
+        // so text lies under the bars, each bar's pixels are the same with everything but the bars hidden as with the page
+        // whole (any channel within 8/255)
+        if (data.bars?.length) {
+          const moved = await page.evaluate(() => {
+            const sheet = document.getElementById('sheet'), y0 = scrollY, s0 = sheet?.scrollTop ?? 0;
+            scrollBy({ top: 240, behavior: 'instant' });
+            if (sheet) sheet.scrollTop = s0 + 240;
+            return { doc: scrollY - y0, sheet: (sheet?.scrollTop ?? 0) - s0 };
+          });
+          await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+          const whole = decodePng(await page.screenshot({ type: 'png' }));
+          const barRects = await page.evaluate(() => [...document.querySelectorAll('[data-sweep-bar]')].map((b) => { const r = b.getBoundingClientRect();
+            return { sel: b.id ? `#${b.id}` : b.className.split(' ')[0], left: r.left, top: r.top, right: r.right, bottom: r.bottom }; }).filter((r) => r.right - r.left > 0 && r.bottom - r.top > 0));
+          await page.evaluate(() => {
+            const style = document.createElement('style');
+            style.id = 'sweep-isolate';
+            style.textContent = 'body *, body *::before, body *::after { visibility: hidden !important; transition: none !important; } [data-sweep-bar], [data-sweep-bar] *, [data-sweep-bar]::before, [data-sweep-bar]::after, [data-sweep-bar] *::before, [data-sweep-bar] *::after { visibility: visible !important; }';
+            document.head.append(style);
+          });
+          await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+          const alone = decodePng(await page.screenshot({ type: 'png' }));
+          await page.evaluate((m) => { document.getElementById('sweep-isolate')?.remove(); scrollBy({ top: -m.doc, behavior: 'instant' });
+            const sheet = document.getElementById('sheet'); if (sheet) sheet.scrollTop -= m.sheet; }, moved);
+          const through = [];
+          for (const r of barRects) {
+            let worst = 0, count = 0;
+            const x0 = Math.max(0, Math.floor(r.left * DPR)), x1 = Math.min(whole.width, Math.ceil(r.right * DPR));
+            const y0 = Math.max(0, Math.floor(r.top * DPR)), y1 = Math.min(whole.height, Math.ceil(r.bottom * DPR));
+            for (let y = y0; y < y1; y += 1) for (let x = x0; x < x1; x += 1) {
+              const a = pixel(whole, x, y), b = pixel(alone, x, y);
+              const d = Math.max(Math.abs(a.r - b.r), Math.abs(a.g - b.g), Math.abs(a.b - b.b));
+              if (d > worst) worst = d;
+              if (d > 8) count += 1;
+            }
+            if (worst > 8) through.push({ bar: r.sel, worst, pixels: count });
+          }
+          result.chrome = { bars: barRects.length, scrolled: moved, through };
+          check(`${world}/${state}.C8`, `${world}/${state}: the fixed chrome (${barRects.length} bars) is opaque: no text under it shows through (scrolled ${moved.doc || moved.sheet} px)`,
+            through.length === 0, through);
+        }
         report.results.push(result);
         const fails = result.pairs.filter((p) => !p.ok).sort((a, b) => a.ratio / a.required - b.ratio / b.required);
         const worstPair = result.pairs.slice().sort((a, b) => a.ratio / a.required - b.ratio / b.required)[0];
-        check(`${world}/${state}.C1`, `${world}/${state}: every visible text run reads (${result.pairs.length} runs; worst ${worstPair ? `${worstPair.ratio}:1 "${worstPair.text}"` : '—'})`,
+        check(`${world}/${state}.C1`, `${world}/${state}: every visible text run reads, each line in the open reading area (${result.pairs.length} runs, ${result.reread.read} read again scrolled clear of the bars; worst ${worstPair ? `${worstPair.ratio}:1 "${worstPair.text}"` : '—'})`,
           fails.length === 0 && result.unresolved.length === 0,
-          { fails: fails.slice(0, 12).map((p) => `${p.ratio}<${p.required} ${p.fg} on ${p.bg} "${p.text}" ${p.sel}`), unresolved: result.unresolved.slice(0, 8) });
+          { fails: fails.slice(0, 12).map((p) => `${p.ratio}<${p.required} ${p.fg} on ${p.bg} "${p.text}" ${p.sel}${p.pass ? ` (${p.pass})` : ''}`), unresolved: result.unresolved.slice(0, 8), barred: result.reread.barred.slice(0, 6) });
         if (result.figures.length) check(`${world}/${state}.C2`, `${world}/${state}: the overlay stands as a figure on its page (≥ 3:1 fill or lit edge on one whole side)`,
           result.figures.every((f) => f.ok), result.figures);
         check(`${world}/${state}.C3`, `${world}/${state}: every gradient and every owned surface roots in the world's ${result.pigmentCount} pigments`,
