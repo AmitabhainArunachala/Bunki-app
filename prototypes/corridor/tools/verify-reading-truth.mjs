@@ -26,7 +26,7 @@
  *       いい); #1414 解せ → 解す · げす · to understand (never かいする); Shosoin #483 来 read き and Sōseki #66 来 read こ →
  *       来る · くる (never きる, こる). Save on 云う keeps entry 1587040 and cueReading いう, in the same row shape as 年's
  *   R2.V  a sound change names the entry read the plain way, the card still showing the text's reading: 一 いっ, 本 ぽん,
- *       八 はっ, 歩 ぽ, 金持ち がねもち
+ *       八 はっ, 歩 ぽ, 金持ち がねもち (R3, Grok 0315: 本 after a number shows that entry's counter sense, never "book")
  *   R2.K  a lone kanji read by its on'yomi, no word entry read so, is the kanji's card: 寺 じ, 国 こく, 仏 ぶつ (never
  *       仏 ふつ "France", the quick dictionary's)
  *   R2.C3 a reading the shipped dictionary now carries from the pinned JMdict: 私 read わたくし is entry 2842390
@@ -197,7 +197,8 @@ const IRU_ALONE = Object.freeze({ name: 'いる (ここにいる)', at: CITY, in
 // R2.V · a sound change in a compound: the card shows the text's reading and the meaning of the entry read the plain way
 const SOUND = Object.freeze([
   { name: '一 いっ (一本)', at: BODHISENA, index: 564, s: '一', r: 'いっ', plain: 'いち' },
-  { name: '本 ぽん (一本)', at: BODHISENA, index: 565, s: '本', r: 'ぽん', plain: 'ほん' },
+  // R3 (Grok 0315): after a number 本 is the counter — the card shows the counter's sense of 本 read ほん, never "book"
+  { name: '本 ぽん (一本)', at: BODHISENA, index: 565, s: '本', r: 'ぽん', plain: 'ほん', counter: true },
   { name: '八 はっ (八本)', at: BENZAITEN, index: 410, s: '八', r: 'はっ', plain: 'はち' },
   { name: '歩 ぽ (一歩)', at: SOAI, index: 527, s: '歩', r: 'ぽ', plain: 'ほ' },
   { name: '金持ち がねもち', at: HONDA, index: 385, s: '金持ち', r: 'がねもち', plain: 'かねもち' },
@@ -894,7 +895,13 @@ async function r2Cases(page) {
   for (const fixture of SOUND) {
     await openArticle(page, fixture.at);
     const { settled } = await slip(page, tok(page, fixture.index));
-    const meaning = k2h(core[fixture.s]?.r) === k2h(fixture.plain) ? core[fixture.s].m[0] : readAs(fixture.s, fixture.plain)[0]?.[3];
+    // R3 · a counter after a number shows the entry's first counter sense (its first gloss), from the served shard
+    const counterGloss = () => {
+      const seq = readAs(fixture.s, fixture.plain)[0]?.[0];
+      const sense = (detailOf(String(seq))?.[3] || []).find((candidate) => (candidate[0] || []).includes('ctr'));
+      return sense ? String(sense[10][0][0]) : null;
+    };
+    const meaning = fixture.counter ? counterGloss() : k2h(core[fixture.s]?.r) === k2h(fixture.plain) ? core[fixture.s].m[0] : readAs(fixture.s, fixture.plain)[0]?.[3];
     check(`R2.V.${fixture.name}`, `${fixture.s} read ${fixture.r}: the card shows ${fixture.r} and the meaning of ${fixture.s} read ${fixture.plain} ("${meaning}"), Save live`,
       settled?.word === fixture.s && settled.reading === fixture.r && settled.gloss === meaning && settled.take && !settled.take.disabled, settled);
   }
