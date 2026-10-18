@@ -11701,7 +11701,16 @@ function placeFloating(card, r, anchor = null) {
       return null;
     };
     top = seatWhole();
-    if (top == null && anchor && !sentence) {
+    // the reading moves once, by the card's real size: while a face the card uses still loads (the first stage of a page
+    // asks for its kanji parts' glyphs), it measures in fallback metrics (463 px for 420 in Chromium), so it is seated for
+    // now and again once the faces are in
+    const fontsLoading = document.fonts?.status === 'loading';
+    if (top == null && anchor && !sentence && fontsLoading) {
+      document.fonts.ready.then(() => {
+        if (card.isConnected && anchor.isConnected && standingSlip() === card && card.dataset.flow !== 'document') placeFloating(card, anchorBox(anchor), anchor);
+      });
+    }
+    if (top == null && anchor && !sentence && !fontsLoading) {
       const move = readingMoveFor(anchor, r, m.height, ceiling, floor, { most: true });
       if (move) {
         const scroller = anchor.closest('#sheet');
