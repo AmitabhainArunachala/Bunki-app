@@ -9368,14 +9368,33 @@ function readingLine(rt) {
   return { left: box.left + parseFloat(cs.borderLeftWidth) + parseFloat(cs.paddingLeft),
     right: box.right - parseFloat(cs.borderRightWidth) - parseFloat(cs.paddingRight), block };
 }
+/** A block row that is the inside of an inline box (the reader's word: an inline-flex door around a block row): WebKit
+ * sizes it to its reading's full width, overhang or not, so while a touch reading overhangs, each such row between the
+ * ruby and its line keeps the width it has without the reading (data-touch-pin), and lets it go again after. */
+function touchRows(rt, block) {
+  const rows = [];
+  for (let n = rt.parentElement?.parentElement; n && n !== block && n !== document.body; n = n.parentElement) {
+    if (!/^inline|^ruby|^contents$/.test(getComputedStyle(n).display) && /^inline/.test(getComputedStyle(n.parentElement).display)) rows.push(n);
+  }
+  return rows;
+}
+function unpinTouchRows(rt) {
+  for (let n = rt.parentElement; n && n !== document.body; n = n.parentElement) {
+    if (n.hasAttribute('data-touch-pin')) { n.style.removeProperty('width'); n.removeAttribute('data-touch-pin'); }
+  }
+}
 function seatTouchReading(rt) {
   if (!rt?.style) return;
   rt.style.removeProperty('margin-inline');
+  if (rt.isConnected) unpinTouchRows(rt);
   if (!touchReading(rt)) return;
   const style = getComputedStyle(rt);
   if (style.display === 'none' || style.visibility === 'hidden') return;
+  const line = readingLine(rt);
+  if (!line) return;
+  const rows = touchRows(rt, line.block);
   // the word under this reading: the ruby's own text before it, back to the reading before, measured with the reading
-  // set aside (Chromium reports a base already widened to its reading)
+  // set aside (Chromium reports a base already widened to its reading), and the rows it stands in, as wide
   const range = document.createRange();
   let left = Infinity, right = -Infinity;
   const shown = rt.style.display;
@@ -9385,12 +9404,11 @@ function seatTouchReading(rt) {
     range.selectNodeContents(node);
     for (const box of range.getClientRects()) if (box.width > 0) { left = Math.min(left, box.left); right = Math.max(right, box.right); }
   }
+  const rowWidths = rows.map((n) => getComputedStyle(n).width);
   rt.style.display = shown;
   const own = rt.getBoundingClientRect();
   const excess = own.width - (right - left);
   if (!Number.isFinite(excess) || excess <= 0.5) return;
-  const line = readingLine(rt);
-  if (!line) return;
   let roomLeft = Math.max(0, left - line.left), roomRight = Math.max(0, line.right - right);
   // another reading shown on this line keeps its paper: the nearest on each side bounds the overhang
   for (const other of line.block.querySelectorAll('rt')) {
@@ -9404,7 +9422,9 @@ function seatTouchReading(rt) {
   // at a line's edge the reading slides inward: what one side cannot take, the other may
   const short = excess - start - end;
   if (short > 0) { const more = Math.min(roomLeft - start, short); start += more; end += Math.min(roomRight - end, short - more); }
-  if (start + end > 0.5) rt.style.marginInline = `${-start}px ${-end}px`;
+  if (start + end <= 0.5) return;
+  rt.style.marginInline = `${-start}px ${-end}px`;
+  rows.forEach((n, i) => { n.style.width = rowWidths[i]; n.setAttribute('data-touch-pin', ''); });
 }
 if (typeof MutationObserver === 'function' && typeof document !== 'undefined' && document.documentElement) {
   new MutationObserver((records) => {
