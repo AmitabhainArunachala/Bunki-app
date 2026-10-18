@@ -21,7 +21,7 @@ function app() {
     window: { scrollY: 180, scrollTo(_x, y) { this.scrollY = y; } },
     document: { activeElement: null, getElementById: () => null }, referenceLibrary: null,
     learningSourceVisit: null, pendingReferenceCollection: null, retainedRetryView: null,
-    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, readerWordMenu: null, personalHost: null,
+    activeTokenAlternatives: null, readerPosTimer: null, sheetActionVisit: null, readerWordMenu: null, readerWordMenuSerial: 0, personalHost: null,
     roomTransitionUpdating: false, activeRoomTransition: null, pageEpoch: 0, recordEpoch: 4,
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
     restoreDialogInvoker() {}, stopReadAloud() {}, clearTimeout() {},
