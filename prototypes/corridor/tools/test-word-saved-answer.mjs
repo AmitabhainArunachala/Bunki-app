@@ -140,7 +140,7 @@ function defineRows() {
     'frameFoot', 'keepMenuInCard',
     // R3 (2026-10-18): the record a word's sense shapes, the slip's second line, and the marks the slip leaves (for the
     // page, and for a sense still to come)
-    'senseRecord', 'senseMoreLine', 'SENSE_BY_ANCHOR', 'SENSE_LATER', 'senseLaterDraw', 'sensePatch', 'SLIP_NODE', 'senseMoreElement'];
+    'senseRecord', 'senseNameHeldText', 'senseMoreLine', 'SENSE_BY_ANCHOR', 'SENSE_LATER', 'senseLaterDraw', 'sensePatch', 'SLIP_NODE', 'senseMoreElement'];
   /** The authored top-level statements declaring `names`, each exactly once. */
   const liftFrom = (tree, names) => {
     const found = tree.statements.filter((statement) => {

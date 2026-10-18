@@ -10737,7 +10737,9 @@ function wordSaveFacts(token, { reader = false, from = null, record } = {}) {
   // N2 · a te-form auxiliary's card leads with its senses for the te-form, however its entry is looked up (teFormRecord)
   const g = record !== undefined ? record : reader ? readerQuickRecord(token)
     : senseRecord(teFormRecord(lookup(token.b, token.seq, token.r), token.te), token.sense);
-  const held = (reader && !D.dict[token.b]) || !g?.m?.some(meaning => typeof meaning === 'string' && meaning.trim());
+  // R3 · a name in this text, or a reading the text quotes, is held: it is not a word to review (V-07)
+  const special = g?.senseName ? (g.senseKind || (token?.sense?.reading ? 'reading' : 'name')) : null;
+  const held = !!special || (reader && !D.dict[token.b]) || !g?.m?.some(meaning => typeof meaning === 'string' && meaning.trim());
   const node = { t: 'word', id: token.b, ...(token.seq ? { seq: token.seq, reading: token.r || g?.r } : {}),
     ...(from ? { from, ctxScope: 'sent' } : {}) };
   // R · a reading of its own the core does not carry, with no entry named yet, rides the node, so its Save waits
@@ -10745,7 +10747,7 @@ function wordSaveFacts(token, { reader = false, from = null, record } = {}) {
   const own = !token.b || token.b === token.s ? String(token.r || '') : '';
   if (!token.seq && D.dict[token.b] && own && kataToHira(own) !== kataToHira(String(D.dict[token.b].r || ''))) node.reading = own;
   const state = held ? null : wordCaptureState(node);
-  return { g, held, node, state, identityHeld: state === 'conflict' || state === 'unavailable' };
+  return { g, held, node, state, identityHeld: state === 'conflict' || state === 'unavailable', heldReason: special ? senseNameHeldText(special) : null };
 }
 
 /** After a save or an undo: the open popup's Save, the reader's learning marks and the chrome seal repaint
@@ -11086,13 +11088,13 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   ladderRefreshing = ladderVisit?.anchor === span;
   try { removeMini(); } finally { ladderRefreshing = false; }
   const other = nodeFor || { t: kind, id: token.b };
-  const { g, held, node: captureNode, state: miniState, identityHeld } = kind === 'word'
+  const { g, held, node: captureNode, state: miniState, identityHeld, heldReason = null } = kind === 'word'
     ? wordSaveFacts(token, { reader, from, record })
     : { g: null, held: false, node: other, state: save === 'default' ? wordCaptureState(other) : null, identityHeld: false };
   const label = look?.label || token.b;
   if (ladderVisit?.anchor === span) {
     ladderVisit.saveFacts = save === 'none' ? () => null
-      : () => ({ label, g, held, node: captureNode, state: wordCaptureState(captureNode), identityHeld });
+      : () => ({ label, g, held, heldReason, node: captureNode, state: wordCaptureState(captureNode), identityHeld });
   }
   const mini = el('div', null);
   mini.id = 'mini';
@@ -11252,7 +11254,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
       // finishes that line, as it finishes the spelling's miss; a word whose own entry reads otherwise keeps D23's sentence
       const readMiss = readsOtherwise && !look?.gloss && !waiting && (token.seq == null || token.seq === '');
       const missShown = !g?.m?.[0] || readMiss;
-      const reason = el('span', 'mini-take-reason', hostHeld || (held || readMiss ? (missShown ? tx('そのため、ここでは保存できません。', 'So it can’t be saved here.')
+      const reason = el('span', 'mini-take-reason', hostHeld || heldReason || (held || readMiss ? (missShown ? tx('そのため、ここでは保存できません。', 'So it can’t be saved here.')
         : readerCaptureReasonText(token.b)) : wordCaptureHeldText(captureNode)));
       reason.id = 'mini-take-reason';
       mini.append(reason);
@@ -12465,7 +12467,7 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
   const kept = () => !!node && keptState(node) === 'taken';
   const statusFor = () => {
     if (!facts) return '';
-    if (facts.held) return readerCaptureReasonText(label);
+    if (facts.held) return facts.heldReason || readerCaptureReasonText(label);
     if (facts.identityHeld) return wordCaptureHeldText(facts.node, { route: false });
     if (outcome?.status === 'held') return wordCaptureHeldText(facts.node, { route: false });
     if (outcome?.status === 'failed') return outcome.reason === 'not-ready' || !recordWritable()
@@ -13464,9 +13466,18 @@ function senseIsQuick(door, seq) {
  * its glosses ride as senseGlosses for the slip's second line. A name has no dictionary meaning. */
 function senseRecord(rec, sense) {
   if (!sense) return rec;
-  if (sense.name) return { r: rec?.r || '', m: [sense.reading ? tx('この文では読み方', 'a reading in this text') : tx('この文では名前', 'a name in this text')], senseName: true };
+  if (sense.name) return { r: rec?.r || '', m: [sense.reading ? tx('この文では読み方', 'a reading in this text') : tx('この文では名前', 'a name in this text')], senseName: true,
+    senseKind: sense.reading ? 'reading' : 'name' };
   if (!rec || !Array.isArray(sense.glosses) || !sense.glosses.length) return rec;
   return { ...rec, m: [...new Set([...sense.glosses, ...(rec.m || [])])], senseGlosses: sense.glosses, sense: { seq: sense.seq, k: sense.k } };
+}
+
+/** R3's special cards (the lead's ruling, 2026-10-19; V-07): a token the card says is a name in this text, or a reading
+ * the text quotes, is not a word to review. Its Save is held, and says why in one quiet line, wherever a held Save explains
+ * itself (the slip, the hold's strip, the bar). */
+function senseNameHeldText(kind) {
+  return kind === 'reading' ? tx('文中に引かれた読み方で、復習する語ではありません。', 'A reading quoted in the text, not a word to review.')
+    : tx('この文の名前で、復習する語ではありません。', 'A name in this text, not a word to review.');
 }
 
 /** The quiet second line itself: one line, never more (a long gloss ends in "…"; the page lists it whole), so the slip
@@ -27749,7 +27760,7 @@ function chromeKeep() {
       const now = chromeKeepTarget();
       if (!now) { showReaderToast(tx('文中の語をタップしてから、保存する。', 'Tap a word in the story, then Save.')); return false; }
       if (now.held || now.identityHeld) {
-        showReaderToast(now.held ? readerCaptureReasonText(now.label) : wordCaptureHeldText(now.node, { route: false }));
+        showReaderToast(now.held ? now.heldReason || readerCaptureReasonText(now.label) : wordCaptureHeldText(now.node, { route: false }));
         return false;
       }
       // G5 · the one keep: a Save never un-keeps
@@ -30136,7 +30147,7 @@ function speakKeep() {
       const now = speakKeepTarget();
       if (!now) { showReaderToast(tx('会話の語をタップしてから、保存する。', 'Tap a word in the conversation, then Save.')); return false; }
       if (now.held || now.identityHeld) {
-        showReaderToast(now.held ? readerCaptureReasonText(now.label) : wordCaptureHeldText(now.node, { route: false }));
+        showReaderToast(now.held ? now.heldReason || readerCaptureReasonText(now.label) : wordCaptureHeldText(now.node, { route: false }));
         return false;
       }
       return toggleWordSave(now.node, now.label);
