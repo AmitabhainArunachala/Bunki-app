@@ -29,7 +29,11 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   // Q (2026-10-17): the slip stands clear of its word with the word's reading (anchorBox); lookup prose keeps each word's
   // doors in one no-break unit, by the app's one word rule (jaGroupSegments); the bar's Save fits its bar (fitChromeKeep)
   'anchorBox', 'fitChromeKeep', 'chromeKeepFitting', 'jaGroupSegments', 'jaMendSegments', 'JA_KANA_WORDS', 'JA_KANJI', 'JA_KANA_RUN',
-  'JA_COUNTER', 'JA_OPENS_WORD', 'JA_CLOSES'];
+  'JA_COUNTER', 'JA_OPENS_WORD', 'JA_CLOSES',
+  // G3 (2026-10-18): a tap climbs the word's ladder (activateWordLadder: reading, stage, page); a phonetic parenthetical is
+  // no door (phoneticAnnotationRanges); a prose block is one roving stop (installProseWordRoving)
+  'activateWordLadder', 'clearWordLadder', 'ladderVisit', 'ladderReturning', 'readingSlipSerial',
+  'phoneticAnnotationRanges', 'phoneticAnnotationCandidates', 'installProseWordRoving', 'proseWordRovers'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
@@ -61,6 +65,7 @@ class Element {
   append(...nodes) { for (const node of nodes) { this.children.push(node); node.parentElement = this; } }
   setAttribute(name, value) { this.attributes[name] = String(value); }
   getAttribute(name) { return this.attributes[name] ?? null; }
+  removeAttribute(name) { delete this.attributes[name]; }
   addEventListener(kind, handler) { (this.listeners[kind] ||= []).push(handler); }
   async click() { if (!this.disabled) for (const handler of this.listeners.click || []) await handler({ stopPropagation() {}, detail: 0 }); }
   matches(selector) {
@@ -69,6 +74,9 @@ class Element {
     if (selector === '[data-japanese-lookup]') return this.dataset.japaneseLookup !== undefined;
     if (selector === '[data-lookup-item]') return this.dataset.lookupItem !== undefined;
     if (selector === '[data-lookup-block]') return this.dataset.lookupBlock !== undefined;
+    // G3's roving reads its paragraph by [data-prose-roving] and asks whether a block is div or span
+    if (selector.includes(',')) return selector.split(',').some(one => this.matches(one.trim()));
+    if (/^\[data-[a-z-]+\]$/.test(selector)) return selector.slice(6, -1).replace(/-([a-z])/g, (_m, c) => c.toUpperCase()) in this.dataset;
     return this.tag === selector;
   }
   closest(selectors) {
@@ -110,8 +118,15 @@ function app({ withIndex = true, withKanji = false } = {}) {
       visit(parent); let at = -1;
       return { nextNode() { return ++at < nodes.length; }, get currentNode() { return nodes[at]; } };
     } };
-  const context = vm.createContext({ D, S: { view: 'shelf', taken: [], deepWords: {}, dials: { kanji: 0, furigana: 1 } },
-    document, NodeFilter: { SHOW_TEXT: 4 }, Intl, window: { innerWidth: 400 },
+  // G3 · the reading dial shows readings, so a tap goes straight to the word's stage (activateWordLadder skips the reading
+  // rung when readings are off or always shown); verify-word-grammar pins every rung in both engines
+  const context = vm.createContext({ D, S: { view: 'shelf', taken: [], deepWords: {}, dials: { kanji: 0, furigana: 2 } },
+    document, NodeFilter: { SHOW_TEXT: 4 }, Intl, window: { innerWidth: 400 }, queueMicrotask,
+    // G3's ladder touches device Back's sentinel, the top bar's keep and the room's re-render, and wires the word menu's
+    // gestures: those are the browser's and other rooms' (their own verifiers), stubbed at their boundary here
+    syncWalkSentinel: () => {}, syncChromeKeep: () => {}, refreshLadderRoom: () => {}, wireReaderWordMenu: () => {},
+    // the page's match cut is the browser's motion (Element.animate, reduced motion): none here
+    pageCutAllowed: () => false,
     tx: (_ja, en) => en, el: (tag, cls, value) => new Element(tag, cls, value),
     biLabel: (tag, cls, _ja, en) => new Element(tag, cls, en),
     removeMini: () => body.querySelector('#mini')?.remove(), activeTokenAlternatives: null, articleNarration: null,
@@ -235,13 +250,22 @@ test('Each prose block is one Tab stop of plain-word names sharing one keyboard 
   const second = new Element('p'); second.append(text('分かりました。'));
   root.append(first, second); f.body.append(root);
   f.context.enhanceJapaneseProse(root);
+  // G3 · the block itself is the one Tab stop (installProseWordRoving): its words are plain spans, retired until the arrows
+  // select one, each named by its own visible text, and the block carries the shared help (the word keeps it for when
+  // it is selected)
   for (const block of [first, second]) {
     const words = block.querySelectorAll('.japanese-lookup-word');
     assert(words.length > 1, 'The fixture block has several words');
-    assert.deepEqual(words.map(word => word.tabIndex), [0, ...words.slice(1).map(() => -1)]);
+    assert.equal(block.dataset.proseRoving, 'true');
+    assert.equal(block.tabIndex, 0, 'The block is the one Tab stop');
+    assert(String(block.getAttribute('aria-describedby')).split(' ').includes('japanese-lookup-help'));
     for (const word of words) {
+      assert.equal(word.tag, 'span', 'A word is a plain span, not a button');
+      assert(word.tabIndex !== 0 && !('tabindex' in word.attributes), 'A word is never its own Tab stop');
+      assert.equal(word.getAttribute('role'), 'presentation', 'An unselected word is not its own group');
       assert.equal(word.getAttribute('aria-label'), null, 'The visible word is its own name');
-      assert.equal(word.getAttribute('aria-describedby'), 'japanese-lookup-help');
+      assert.equal(word.dataset.lookupText, word.textContent);
+      assert.equal(word.dataset.proseDescription, 'japanese-lookup-help');
     }
   }
   const help = f.body.querySelectorAll('#japanese-lookup-help');

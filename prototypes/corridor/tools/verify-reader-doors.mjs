@@ -1,146 +1,20 @@
-/**
- * Reader doors that answer: every door on the shelf and in an article does something.
- *
- *   D0 identity: the served build is the commit under test.
- *   D1 today's picks: at 1728×996 and 390×844, each #shelf-today door's own centre is the
- *      door (no sibling painted over it), and a real click there opens that article.
- *      Control: the 09-24 study overlay's 6-column grid (register.css before the C1
- *      spanning rule) put the strip in one ~106 px column; its centre hit the next
- *      heading and the tap did nothing ("The Man in the Next Room", Codex 04:07Z).
- *   D2 one committed reading door, bound to literals copied from the article (2026-09-25):
- *      aozora:046605 (やまなし) token 1, surface 谷川, reading たにがわ, c:false; its neighbour,
- *      token 2, is の. The served article must still hold exactly that token (D2.fixture). At
- *      kanji 0, spacing 0 and furigana 1 then 0 (a fresh document each), the reader lane's grammar
- *      (2026-10-02, John #8): tap, Enter and Space each open the word's popup showing exactly 谷川 and
- *      たにがわ. On the text the reading is the ふりがな setting's: at furigana 1 (触れて, on touch) the
- *      touched word shows exactly たにがわ in the visible ruby and in its whole accessible label
- *      ("谷川 · たにがわ · Enter: reading and meaning · Shift+F10: more actions"); at furigana 0 nothing
- *      is shown on the text and the label stays "谷川 · Enter: …". No painted English; keyboard
- *      activation puts focus in the popup and Escape gives it back to the same button; the neighbour
- *      and the passage unchanged. Control r1 (below).
- *   D3 readings always on (0,2,0) or already kana (2,1,0): every name is a door, and the door does
- *      something. Since c97f1757 every Japanese token opens the shared lookup ("names already shown
- *      in kana" included), so the old oracle here (names as plain text) was retired with that design
- *      (glance pass 2026-10-01). In a fresh document per setting, やまなし's names are all buttons
- *      that show the pointer, and a click on its 谷川 (token 1, D2's fixture) opens the lookup popup
- *      for 谷川 without leaving the article: never a button that reveals nothing. Control m8.
- *   D4 the touched-word mark stays with its passage (the Codex D11-NAME-DOOR-REVIEW schedule), walked
- *      in ONE document: shelf → aozora:000628 (ごん狐), whose token 1 これ (content) one tap leaves
- *      touched (lit, its popup open), with no English written under it (D4.A-no-english) → 戻る (#back)
- *      → shelf → aozora:046605. A marker set on the document before A must still be there in B. In both
- *      articles the dial controls (文字設定, opened once in A and left open) must read kanji 0, furigana 1,
- *      spacing 0 by aria-pressed, and the text must agree (no spacing class; readings hidden until
- *      touched). B token 1 must be the reading door 谷川 (its own row: a plain token fails it, never
- *      skips it) and open with no reading, mark or English, its label exactly the hidden one. It is
- *      then tapped twice whatever those rows found: たにがわ shown with its popup, then the popup put
- *      away by the second tap, the reading staying on the touched word, and never English. Controls
- *      mG, m1, m1g and m2 (below). Claim boundary: this shelf walk only; the example-sentence detour is D5.
- *   D5 the detour return (D22), in ONE document, dials 0,1,0: home aozora:046605 (やまなし) takes
- *      its own mark (token 3 底, touched by one tap: そこ shown; token 1 谷川 stays the hidden reading
- *      door). わかる's word sheet opens from its token 293 by the keyboard's full-entry door
- *      (Ctrl+Enter: no popup, no touch). Its first example is its own sentence in やまなし (G1: the tapped
- *      word's own example leads); ごん狐's only わかる sentence follows, under More examples: ごん狐
- *      precedes やまなし in the index, no other shelf article has わかる, and ごん狐's body is loaded first
- *      by opening it (the sheet lists loaded articles only). ▹, then この記事を読む, opens
- *      aozora:000628 (ごん狐), where token 1 これ, an index home has not touched, takes one tap. Then
- *      戻る (#back), and again only while a sheet the detour left from is still open. The marks separate
- *      a restore from both failures. Home's index 3 is home-only (ごん狐 never touches it) and must
- *      come back exactly, at the return and with the sheets closed: a clear-all return fails there.
- *      ごん狐's index 1 collides with an index home left unmarked and must stay absent (谷川 not lit, no
- *      reading, exact hidden label): the leak fails there. A tap on 谷川 then shows exactly たにがわ, and
- *      it never shows English. Controls m3, m3g, m4, m5 (below).
- *      Scope: the この記事を読む → 戻る route only. No read-aloud claim: D5 never starts 聞く, so
- *      the stopReadAloud() the D22 fix adds on this return is unobserved. Not covered: the learning
- *      source route (元の文を読む → reader-source-back, D22b, fixed and tested separately), the
- *      same-passage detour (its marks stay as they are, by design), and nested detours.
- *   D6 the learning-source return (D22b), dials 0,1,0. First the record gets one saved word, わかる,
- *      whose encounter is ごん狐's sentence 2347–2356 (わかる at 2351). It enters through the real
- *      importer (record-fixture-support's restoreAppFixture). The encounter is built by the served
- *      candidate's own teacher-context.mjs, so its content-derived id is the one this candidate
- *      verifies. Then, in ONE document: home やまなし takes the same mark as in D5 (token 3 底,
- *      home-only). わかる's sheet, opened from token 293 by Ctrl+Enter, shows the saved encounter.
- *      元の文を読む visits ごん狐 at token 2351, where token 1 これ (colliding with home's unmarked 谷川)
- *      takes one tap. reader-source-back returns home under the sheet the visit left from, and ends the
- *      visit; 戻る closes that sheet. The same oracle as D5 applies: home's mark exact under the sheet
- *      and with it closed (a clear-all fails), 谷川 not lit and its label exact (the leak fails), a tap
- *      on 谷川 shows exactly たにがわ, and no reading door in home shows English. Controls m6, m7 (below).
- *      Scope: this route only. No read-aloud claim: the D22b stopReadAloud() is unobserved. Not
- *      covered: the review and sentence-practice callers of 元の文を読む, source-reader (capture) and
- *      publisher visits, nested visits.
- *
- * Token taps and D1's doors go to coordinates (page.mouse), not locator.click: Playwright
- * retries a locator click when another element would receive it, which hides exactly the D1
- * defect. Navigation (a shelf door into a fixture article, 戻る) uses locator.click; the passage
- * it opens is asserted by id right after.
- *
- * Mutation controls run after the cases, against the SAME served candidate, each in its own
- * context with service workers blocked. The pattern is verify-corridor-doors T3's route
- * interception: the file is fetched from the host, its bytes must equal the digest in
- * build-identity.json, each literal edit must match exactly once, and the edited bytes are
- * served in its place. Each control declares the rows that establish its schedule (requires), the
- * witness rows it must fail (kills) and the only other rows allowed to fail with it (allowed).
- * Its run must record exactly the schedule's rows (RUN_ROWS), once each, with every other row
- * passing, against a candidate that passes those same rows once each and whose fixture row for
- * that schedule (RUN_FIXTURE: D2/D4/D5/D6.fixture, the candidate's alone) passed exactly once.
- * Otherwise the control is `incomplete` (setup or identity failure, a failed candidate fixture, page
- * error, edit never served, schedule not established, rows never reached, an unclean candidate or
- * baseline) or `contaminated`
- * (duplicate or extra rows, an unallowed failure, witnesses failing other than as declared),
- * never a kill. Each control adds one `C` row (pass = killed). Its own rows are evidence about
- * the mutant, kept in the receipt's `controls`, and do not enter the verdict.
- *   The reader lane (2026-10-02) retired the tap ladder: no tap writes the gloss mark any more, so the
- *   English defects below need a producer, glossOnTap (a tap writes the gloss mark again, the old second
- *   rung), and the reading-only painter is controlled under it.
- *   mG  glossOnTap alone: a tap writes English under ごん狐's これ → D4.A-no-english fails. Allowed:
- *       nothing else (B's 谷川 keeps its reading-only painter).
- *   m1  openPassage's per-passage reset removed. B token 1 opens showing たにがわ, lit by A's touched
- *       mark → D4.no-inherited-state fails. Allowed: nothing else (the taps still show and close).
- *   m1g m1 with glossOnTap: A's touched mark carries its gloss mark into B → D4.no-inherited-state fails,
- *       and D4.never-english must still pass (the reading-only painter strips it). Allowed:
- *       D4.A-no-english (glossOnTap's own). It is m2's baseline.
- *   m2  the reading-only paint removed: the named painter calls the shared paintTok, evaluated ON m1g.
- *       The one difference from m1g is the paint → D4.never-english fails (English on 谷川). Allowed:
- *       m1g's rows (D4.no-inherited-state, D4.A-no-english).
- *   m3  returnFromNavigation's restore block removed: the return before D22 (e21160fe's corridor.js;
- *       the frame's saved copies are left in place, and nothing else reads them). Home comes back
- *       showing exactly ごん狐's mark → D5.home-marks-restored and D5.away-index-not-lit fail.
- *       Allowed: D5.named-tap. D5.named-no-english must pass.
- *       The block's stopReadAloud() goes with it, unobserved (no audio claim).
- *   m3g m3 with glossOnTap: the same kills; D5.named-no-english must still pass. It is m4's baseline.
- *   m4  the reading-only paint removed, evaluated ON m3g → D5.named-no-english fails, a gloss line on
- *       谷川. Allowed: m3g's inherited rows.
- *   m5  the restore's two assignments replaced by clearing every mark: nothing leaks, but home's
- *       own mark is lost → D5.home-marks-restored fails, having come back with no marks at all.
- *       Allowed: nothing else (谷川 stays unlit, and its tap and English rows must pass).
- *   m6  restoreLearningSourceCaller's D22b block removed: the source return of 1561ff95. Home comes
- *       back showing exactly ごん狐's mark → D6.home-marks-restored and D6.away-index-not-lit fail.
- *       Allowed: D6.named-tap. D6.named-no-english must pass.
- *   m7  D22b's two assignments replaced by clearing every mark → only D6.home-marks-restored fails,
- *       having come back with no marks at all. Allowed: nothing else.
- *       D6's English row has no control of its own here: the painter's English defect is controlled
- *       on D4 (m2) and D5 (m4).
- *   m8  the reader's lookup click on non-content tokens stripped: names stay buttons that do
- *       nothing — the 10125f16 defect the old D3 guarded against → D3.k0f2.opens-lookup and
- *       D3.k2f1.opens-lookup fail. Allowed: nothing else (the names are still buttons with a pointer).
- *   r1  aozora:046605 token 1 served read たにかわ (r and ruby): a consistent wrong reading → D2.f1
- *       visible-reading and accessible-reading fail, having shown たにかわ as ruby and in the label, and
- *       D2.f1/f0 popup-reading fail, the popup reading たにかわ. Allowed: nothing else.
- *
- * Scope: desktop Chromium only (chromium.launch; no WebKit), the bilingual UI (ui=bi, pinned for
- * D2, D4, D5 and D6; the product default), mouse clicks at coordinates and keyboard Enter/Space. Not
- * the 日本語のみ UI (ui=ja), whose door label is Japanese. D1's 390×844 is a narrow window driven by the mouse,
- * not touch: real mobile touch input on a reading door (and WebKit) stays pending. Dials: D2
- * 0,1,0 and 0,0,0; D3 0,2,0 and 2,1,0; D4, D5 and D6 0,1,0. Not covered: kanji 1 with an
- * all-converted token, spacing 1 and 2, reading doors other than the fixture token.
- *
- * Receipt: reader-doors.json is written from `finally`, with every row, each control's record
- * (literal edits, served digests, rows, page errors, verdict) and the candidate's page errors,
- * which are aggregated last. SITE and EVIDENCE are resolved at module top level, before the
- * terminal try. A resolver or evidence-directory failure therefore ends the process with at most
- * the resolver's own selection.json (status failed) and no reader-doors.json: classify that as
- * setup/incomplete, never as a behavioural verdict.
- *
- * Usage: node verify-reader-doors.mjs   (KAIRO_SITE_DIR may pin a staged artifact)
+/** Reader doors, G3. Literal article/reading fixtures are retained from the prior verifier.
+ * D0 pins clean source/artifact identity; D1 real coordinate hits test shelf doors.
+ * D2 tests tap/Enter/Space: on-touch reading only → repeated activation stage → Escape bare;
+ * off goes directly to stage without inline ruby. Spoken reading is checked on the selected word.
+ * D3 always-on and kana-converted words go directly to stage, through native inline span doors.
+ * D4 same-document shelf walk isolates occurrences and tests reading → stage → bare.
+ * D5 example-sentence detour and D6 saved-learning-source return retain exact source, sheet,
+ * focus and no-English assertions. G3 clears summoned readings when their visit ends; those
+ * returns now require bare home prose. Saved navigation/encounter records are still exercised.
+ * Historical m1–m7 mark-retention mutants contradicted G3 and are replaced by exact stalled-rung,
+ * retained-reading and forbidden-off-ruby mutations. r1 still corrupts only the fixture reading;
+ * m8 still removes only its named click handler. Each kill requires the clean candidate's exact
+ * row schedule and declared observed failure, with all unrelated rows passing. Setup crashes,
+ * unmatched edits, page errors, missing/duplicate rows and arbitrary reds never count as kills.
+ * KAIRO_BROWSER=chromium|webkit selects one actual engine (default Chromium); each receipt
+ * records browser.version(). Run both invocations for two-engine acceptance. Coordinate mouse
+ * clicks are not physical-phone touch/VoiceOver evidence. No audio or provider claim.
  */
 
 import { execFileSync } from 'node:child_process';
@@ -150,7 +24,7 @@ import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import { chromium } from 'playwright-core';
+import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { restoreAppFixture } from './record-fixture-support.mjs';
 
@@ -159,6 +33,9 @@ const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 
 const SITE = resolveCorridorSite();
 const EVIDENCE = resolveCorridorEvidence();
+const engine = process.env.KAIRO_BROWSER || 'chromium';
+if (!['chromium', 'webkit'].includes(engine)) throw new Error('KAIRO_BROWSER must be chromium or webkit; run each engine separately');
+let browserVersion = null;
 const results = [];
 const pageErrors = [];
 const controls = [];
@@ -198,7 +75,7 @@ const SURFACE = DOOR.token.s, READING = DOOR.token.r;
 const WRONG_READING = 'たにかわ';
 // The door's whole accessible label, as nameReaderToken builds it in the bilingual UI (ui=bi, pinned in the D2/D4
 // URLs; it is also the default): the surface, the reading only while shown, the keyboard help. Nothing else may appear.
-const DOOR_HINT = 'Enter: reading and meaning · Shift+F10: more actions';
+const DOOR_HINT = 'Enter: next word layer · Shift+F10: more actions';
 const doorLabel = (reading = null) => [SURFACE, ...(reading ? [reading] : []), DOOR_HINT].join(' · ');
 const D4_QUERY = '?entry=shelf&dials=0,1,0&ui=bi';
 // D5, copied from the committed articles by the same read-only script (2026-09-25). Home is やまなし: its own marks go on
@@ -216,154 +93,56 @@ const D6 = Object.freeze({ home: D5.home, away: D5.away, word: D5.word, savedAt:
     quote: '」「それがわからんのだよ。', title: 'ごん狐', attribution: '青空文庫 新美南吉「ごん狐」',
     url: 'https://www.aozora.gr.jp/cards/000121/card628.html', target: Object.freeze({ type: 'word', id: 'わかる' }) }) });
 
-// The controls' literal edits. Each `from` was counted exactly once in 9ceb139e's corridor.js and
-// aozora-046605.json; the served bytes are edited, never the checkout.
+// Mutations target the served bytes, never the source checkout. Each edit must match once.
 const EDITS = Object.freeze({
-  reset: Object.freeze({ file: 'corridor.js', from: '    S.revealed = new Set();\n    S.glossed = new Set();\n', to: '' }),
-  // the reading-only painter of a name door replaced by the shared paintTok, with today's label
-  paint: Object.freeze({ file: 'corridor.js', from: '  if (named) readerTokenPainters.set(index, () => paintNamedTok(span, token, index));\n',
-    to: "  if (named) readerTokenPainters.set(index, () => { paintTok(span, token, index); nameReaderToken(span, token, index, 'named'); });\n" }),
-  // the retired ladder's English rung written by a tap again: the touched word gets the gloss mark too
-  glossOnTap: Object.freeze({ file: 'corridor.js', from: '  S.revealed = new Set([index]);\n',
-    to: '  S.revealed = new Set([index]);\n  (S.glossed ||= new Set()).add(index);\n' }),
-  // the reader's lookup door on every non-content token (wireLookupToken's click), counted exactly once
-  lookupClick: Object.freeze({ file: 'corridor.js',
-    from: '    quickLook(event.detail === 0 ? \'keyboard\' : \'pointer\');\n', to: '' }),
-  reading: Object.freeze({ file: DOOR.file, from: JSON.stringify(DOOR.token),
-    to: JSON.stringify({ ...DOOR.token, r: WRONG_READING, f: [{ t: SURFACE, r: WRONG_READING }] }) }),
-  // counted exactly once in 1561ff95's corridor.js (0bf1afdb); absent from e21160fe's, the return before D22
-  restore: Object.freeze({ file: 'corridor.js', from: '  if (home.passageId !== S.passageId) {\n    stopReadAloud();\n'
-    + '    S.revealed = home.revealed ? new Set(home.revealed) : null;\n    S.glossed = home.glossed ? new Set(home.glossed) : null;\n  }\n', to: '' }),
-  // the same block's two assignments, counted exactly once there: a return that clears every mark instead of restoring
-  clearall: Object.freeze({ file: 'corridor.js',
-    from: '    S.revealed = home.revealed ? new Set(home.revealed) : null;\n    S.glossed = home.glossed ? new Set(home.glossed) : null;\n',
-    to: '    S.revealed = new Set(); S.glossed = new Set();\n' }),
-  // D22b's block in restoreLearningSourceCaller, counted exactly once in 5d9d4cdd's corridor.js (7fdaa61c) and absent from
-  // 1561ff95's; then its two assignments, for a return that clears instead of restoring
-  visitRestore: Object.freeze({ file: 'corridor.js', from: '  if (visit.sourceState.passageId !== S.passageId) {\n    stopReadAloud();\n'
-    + '    S.revealed = visit.revealed ? new Set(visit.revealed) : null;\n    S.glossed = visit.glossed ? new Set(visit.glossed) : null;\n  }\n', to: '' }),
-  visitClearall: Object.freeze({ file: 'corridor.js',
-    from: '    S.revealed = visit.revealed ? new Set(visit.revealed) : null;\n    S.glossed = visit.glossed ? new Set(visit.glossed) : null;\n',
-    to: '    S.revealed = new Set(); S.glossed = new Set();\n' }),
-  // 1.3.0's guard: a tap off the popup clears the summoned reading (and, in the text, the mark) before any navigation,
-  // and Escape on the word does the same — so a reset or restore defect alone can no longer leak a mark. Each reset or
-  // restore control is evaluated with the guard removed too (the compound mutant): the control still proves its check
-  // catches the leak it was written for. Counted exactly once each in the candidate's corridor.js.
-  tapKeeps: Object.freeze({ file: 'corridor.js',
-    from: "      removeMini();\n      clearReaderReadings({ marked: inText });\n    } else if (!mini && inText && !target.closest?.('.tok, .token-door, button, a, input, select, textarea, summary, [role=\"button\"]')) {\n      clearReaderReadings({ marked: true });\n    }\n",
-    to: '      removeMini();\n    }\n' }),
-  escapeKeeps: Object.freeze({ file: 'corridor.js', from: '    else if (slip) { removeMini(); clearReaderReadings(); }\n', to: '    else if (slip) removeMini();\n' }),
+  lookupClick: { file: 'corridor.js', from: "    quickLook(event.detail === 0 ? 'keyboard' : 'pointer');\n", to: '' },
+  reading: { file: DOOR.file, from: JSON.stringify(DOOR.token),
+    to: JSON.stringify({ ...DOOR.token, r: WRONG_READING, f: [{ t: SURFACE, r: WRONG_READING }] }) },
+  stalled: { file: 'corridor.js', from: "      return ladderVisit.openStage({ restore: false, demo: false });", to: "      return 'reading';" },
+  keepReading: { file: 'corridor.js', from: '  visit.clearReveal?.();', to: '  // control: leave the summoned reading painted' },
+  offRuby: { file: 'corridor.js', from: "  anchor.dataset.ladderRung = 'stage';\n  return visit.openStage({ restore: !!options.restore, demo: !!options.demo });",
+    to: "  anchor.dataset.ladderRung = 'stage';\n  if (S.dials.furigana === 0) { inlineWordReading(anchor, reading); anchor.querySelectorAll('ruby').forEach(ruby => ruby.dataset.r = reading); }\n  return visit.openStage({ restore: !!options.restore, demo: !!options.demo });" },
 });
-// Every row one D4 walk or one D2 pair records, by id. A control's run must produce exactly these, once each, and the
-// candidate must pass all of them, once each, before any mutant can be said to differ from it.
 const RUN_ROWS = Object.freeze({
-  d4: Object.freeze(['D4.A-prior-state', 'D4.A-no-english', 'D4.same-document', 'D4.same-dials', 'D4.B-door', 'D4.no-inherited-state',
-    'D4.tap-shows', 'D4.second-tap-closes', 'D4.never-english']),
-  d2: Object.freeze([1, 0].flatMap((f) => ['door', 'popup-reading', 'visible-reading', 'accessible-reading', 'no-english', 'focus-returns',
-    'neighbour-unchanged', 'no-navigation', 'label-names-reading'].map((row) => `D2.f${f}.${row}`))),
-  d5: Object.freeze(['D5.home-marks', 'D5.detour', 'D5.away-marks', 'D5.returned', 'D5.home-marks-restored',
-    'D5.away-index-not-lit', 'D5.named-tap', 'D5.named-no-english']),
-  d6: Object.freeze(['D6.home-marks', 'D6.source-visit', 'D6.away-marks', 'D6.returned', 'D6.home-marks-restored',
-    'D6.away-index-not-lit', 'D6.named-tap', 'D6.named-no-english']),
-  d3: Object.freeze(['k0f2', 'k2f1'].flatMap((key) => ['names', 'pointer', 'opens-lookup'].map((row) => `D3.${key}.${row}`))),
+  d2: [1, 0].flatMap(f => ['door','first-rung','popup-reading','visible-reading','accessible-reading','no-english','focus-returns','neighbour-unchanged','no-navigation','bare-after-fold'].map(row => `D2.f${f}.${row}`)),
+  d3: ['k0f2','k2f1'].flatMap(key => ['names','pointer','opens-lookup'].map(row => `D3.${key}.${row}`)),
+  d4: ['D4.A-prior-state','D4.A-no-english','D4.same-document','D4.same-dials','D4.B-door','D4.no-inherited-state','D4.tap-shows','D4.second-tap-stage','D4.fold-bare','D4.never-english'],
 });
-// The candidate-only fixture row each schedule's controls stand on: it must have passed exactly once before any kill counts.
-const RUN_FIXTURE = Object.freeze({ d2: 'D2.fixture', d3: 'D3.fixture', d4: 'D4.fixture', d5: 'D5.fixture', d6: 'D6.fixture' });
-// requires: rows that establish the schedule. kills: witness rows that must fail, as `witness` describes.
-// allowed: the only other rows that may fail. Every remaining row of the run must pass.
-const D4_REQUIRES = Object.freeze(['D4.A-prior-state', 'D4.same-document', 'D4.same-dials', 'D4.B-door']);
-const D5_REQUIRES = Object.freeze(['D5.home-marks', 'D5.detour', 'D5.away-marks', 'D5.returned']);
-const glossed = (rows, id) => ((rows.get(id)?.observed?.glosses || []).some((gloss) => typeof gloss === 'string' && gloss.trim()));
+const RUN_FIXTURE = Object.freeze({ d2: 'D2.fixture', d3: 'D3.fixture', d4: 'D4.fixture' });
 const CONTROLS = Object.freeze([
-  Object.freeze({ name: 'mG', title: 'a tap writes the gloss mark again (the retired English rung)', edits: ['glossOnTap'], run: 'd4',
-    requires: D4_REQUIRES, kills: ['D4.A-no-english'],
-    // B's 谷川 keeps its reading-only painter: nothing else may fail
-    allowed: [],
-    witness: (rows) => (glossed(rows, 'D4.A-no-english') ? '' : 'no English appeared under これ') }),
-  Object.freeze({ name: 'm1', title: "openPassage's per-passage reset removed (with the outside-tap guard removed)", edits: ['reset', 'tapKeeps'], run: 'd4',
-    requires: D4_REQUIRES, kills: ['D4.no-inherited-state'],
-    // B token 1 opens touched; its first tap still shows the reading and its second still puts the popup away
-    allowed: [],
-    witness: (rows) => (rows.get('D4.no-inherited-state')?.observed?.visibleRuby === READING ? '' : `B token 1 did not open showing ${READING}`) }),
-  Object.freeze({ name: 'm1g', title: "openPassage's reset removed, with taps writing the gloss mark (with the outside-tap guard removed)", edits: ['reset', 'glossOnTap', 'tapKeeps'], run: 'd4',
-    requires: D4_REQUIRES, kills: ['D4.no-inherited-state'],
-    // glossOnTap's own row; D4.never-english must pass: the reading-only painter strips the inherited gloss mark
-    allowed: ['D4.A-no-english'],
-    witness: (rows) => (rows.get('D4.no-inherited-state')?.observed?.visibleRuby === READING ? '' : `B token 1 did not open showing ${READING}`) }),
-  Object.freeze({ name: 'm2', title: 'the reading-only paint removed, on m1g for the prior state', edits: ['reset', 'glossOnTap', 'paint', 'tapKeeps'], run: 'd4',
-    // m1g itself must be an admitted kill: that includes its own passing D4.never-english, the baseline this one differs from
-    baseline: 'm1g',
-    requires: D4_REQUIRES, kills: ['D4.never-english'],
-    allowed: ['D4.no-inherited-state', 'D4.A-no-english'],
-    witness: (rows) => (glossed(rows, 'D4.never-english') ? '' : 'no English text appeared') }),
-  Object.freeze({ name: 'm8', title: "the reader's lookup click on names stripped: buttons that do nothing", edits: ['lookupClick'], run: 'd3',
-    requires: ['D3.k0f2.names', 'D3.k2f1.names'],
-    kills: ['D3.k0f2.opens-lookup', 'D3.k2f1.opens-lookup'],
-    // the names stay buttons with a pointer: only the lookup is gone
-    allowed: [],
-    witness: (rows) => (['k0f2', 'k2f1'].every((key) => rows.get(`D3.${key}.opens-lookup`)?.observed?.mini === null)
-      ? '' : 'a lookup popup still opened') }),
-  Object.freeze({ name: 'r1', title: `${PASSAGE_B} token ${DOOR.index} served read ${WRONG_READING}`, edits: ['reading'], run: 'd2',
-    requires: ['D2.f1.door', 'D2.f0.door', 'D2.f1.no-navigation', 'D2.f0.no-navigation'],
-    // 1.3.0: a tap summons the reading at ふりがな なし too, so the wrong reading shows on the text and in the label at f=0 as well
-    kills: ['D2.f1.visible-reading', 'D2.f1.accessible-reading', 'D2.f1.popup-reading', 'D2.f0.visible-reading', 'D2.f0.accessible-reading', 'D2.f0.popup-reading'],
-    // nothing else may fail: focus, neighbour, painted English and the label's wording stay the candidate's
-    allowed: [],
-    witness: (rows) => ([1, 0].every((f) => rows.get(`D2.f${f}.visible-reading`)?.observed?.[1] === WRONG_READING
-      && rows.get(`D2.f${f}.accessible-reading`)?.observed?.[1] === doorLabel(WRONG_READING)
-      && rows.get(`D2.f${f}.popup-reading`)?.observed?.[0]?.reading === WRONG_READING)
-      ? '' : `the door did not show ${WRONG_READING}, as ruby, in its label and in its popup`) }),
-  Object.freeze({ name: 'm3', title: 'the D22 restore removed from returnFromNavigation (the return before 1561ff95; with the outside-tap guard removed)', edits: ['restore', 'tapKeeps'], run: 'd5',
-    requires: D5_REQUIRES,
-    kills: ['D5.home-marks-restored', 'D5.away-index-not-lit'],
-    // 谷川 comes back touched by ごん狐's mark; its tap still shows the reading; D5.named-no-english must still pass
-    allowed: ['D5.named-tap'],
-    witness: (rows) => (canonical(rows.get('D5.home-marks-restored')?.observed?.atReturn) === canonical({ lit: [A_TOKEN.index], glossed: [] })
-      ? '' : `home did not come back showing exactly ${D5.away}'s mark at index ${A_TOKEN.index}`) }),
-  Object.freeze({ name: 'm3g', title: 'the D22 restore removed, with taps writing the gloss mark (with the outside-tap guard removed)', edits: ['restore', 'glossOnTap', 'tapKeeps'], run: 'd5',
-    requires: D5_REQUIRES,
-    kills: ['D5.home-marks-restored', 'D5.away-index-not-lit'],
-    allowed: ['D5.named-tap'],
-    witness: (rows) => ((rows.get('D5.home-marks-restored')?.observed?.atReturn?.lit || []).join() === String(A_TOKEN.index)
-      ? '' : `home did not come back showing ${D5.away}'s mark at index ${A_TOKEN.index}`) }),
-  Object.freeze({ name: 'm4', title: 'the reading-only paint removed, on m3g for the prior state', edits: ['restore', 'glossOnTap', 'paint', 'tapKeeps'], run: 'd5',
-    baseline: 'm3g',
-    requires: D5_REQUIRES,
-    kills: ['D5.named-no-english'],
-    // inherited from m3g: home shows ごん狐's mark and carries its gloss mark
-    allowed: ['D5.home-marks-restored', 'D5.away-index-not-lit', 'D5.named-tap'],
-    witness: (rows) => (glossed(rows, 'D5.named-no-english') ? '' : 'no gloss line appeared on 谷川') }),
-  Object.freeze({ name: 'm5', title: 'the D22 restore replaced by clearing every mark on the return', edits: ['clearall'], run: 'd5',
-    requires: D5_REQUIRES,
-    kills: ['D5.home-marks-restored'],
-    // clearing leaks nothing: 谷川 stays unlit, and its tap and English rows must all still pass
-    allowed: [],
-    witness: (rows) => (canonical(rows.get('D5.home-marks-restored')?.observed?.atReturn) === canonical({ lit: [], glossed: [] })
-      ? '' : 'home did not come back with no marks at all') }),
-  Object.freeze({ name: 'm6', title: 'the D22b restore removed from restoreLearningSourceCaller (the source return of 1561ff95; with the Escape guard removed)', edits: ['visitRestore', 'escapeKeeps'], run: 'd6',
-    requires: ['D6.home-marks', 'D6.source-visit', 'D6.away-marks', 'D6.returned'],
-    kills: ['D6.home-marks-restored', 'D6.away-index-not-lit'],
-    // 谷川 comes back touched by ごん狐's mark; D6.named-no-english must still pass
-    allowed: ['D6.named-tap'],
-    witness: (rows) => (canonical(rows.get('D6.home-marks-restored')?.observed?.atReturn) === canonical({ lit: [A_TOKEN.index], glossed: [] })
-      ? '' : `home did not come back showing exactly ${D6.away}'s mark at index ${A_TOKEN.index}`) }),
-  Object.freeze({ name: 'm7', title: 'the D22b restore replaced by clearing every mark on the source return', edits: ['visitClearall'], run: 'd6',
-    requires: ['D6.home-marks', 'D6.source-visit', 'D6.away-marks', 'D6.returned'],
-    kills: ['D6.home-marks-restored'],
-    // clearing leaks nothing: only the restore row may die
-    allowed: [],
-    witness: (rows) => (canonical(rows.get('D6.home-marks-restored')?.observed?.atReturn) === canonical({ lit: [], glossed: [] })
-      ? '' : 'home did not come back with no marks at all') }),
+  { name:'g3-stalled', title:'second activation stalls before stage', edits:['stalled'], run:'d4',
+    requires:['D4.A-prior-state','D4.B-door','D4.tap-shows'], kills:['D4.second-tap-stage'], allowed:[],
+    witness:rows => rows.get('D4.second-tap-stage')?.observed?.popup === null ? '' : 'the stage still opened' },
+  { name:'g3-kept-reading', title:'fold leaves summoned ruby behind', edits:['keepReading'], run:'d2',
+    requires:['D2.f1.door','D2.f1.popup-reading'], kills:['D2.f1.bare-after-fold'], allowed:[],
+    witness:rows => rows.get('D2.f1.bare-after-fold')?.observed?.every(row => row.visibleRuby === READING) ? '' : 'the folded word did not retain its exact reading' },
+  { name:'g3-off-ruby', title:'off setting wrongly exposes inline reading', edits:['offRuby'], run:'d2',
+    requires:['D2.f0.door','D2.f0.popup-reading'], kills:['D2.f0.visible-reading','D2.f0.bare-after-fold'], allowed:[],
+    witness:rows => rows.get('D2.f0.visible-reading')?.observed?.every(value => value === READING) ? '' : 'off did not show the fixture reading' },
+  { name:'m8', title:'named lookup click removed', edits:['lookupClick'], run:'d3',
+    requires:['D3.k0f2.names','D3.k2f1.names'], kills:['D3.k0f2.opens-lookup','D3.k2f1.opens-lookup'], allowed:[],
+    witness:rows => ['k0f2','k2f1'].every(key => rows.get(`D3.${key}.opens-lookup`)?.observed?.mini === null) ? '' : 'a stage still opened' },
+  { name:'r1', title:`literal reading changed to ${WRONG_READING}`, edits:['reading'], run:'d2',
+    requires:['D2.f1.door','D2.f0.door','D2.f1.no-navigation','D2.f0.no-navigation'],
+    kills:['D2.f1.visible-reading','D2.f1.accessible-reading','D2.f1.popup-reading','D2.f0.popup-reading'], allowed:[],
+    witness:rows => rows.get('D2.f1.visible-reading')?.observed?.every(value => value === WRONG_READING)
+      && [1,0].every(f => rows.get(`D2.f${f}.popup-reading`)?.observed?.every(row => row?.reading === WRONG_READING))
+      && rows.get('D2.f1.accessible-reading')?.observed?.every(row => row.description === `${WRONG_READING} · ${DOOR_HINT}`)
+      ? '' : 'the exact wrong reading was not shown and spoken' },
 ]);
 
 async function openPage(viewport, query, mutation = null) {
-  const context = await browser.newContext({ viewport, deviceScaleFactor: viewport.width > 1000 ? 2 : 3,
+  const context = await browser.newContext({ viewport, reducedMotion: 'reduce', deviceScaleFactor: viewport.width > 1000 ? 2 : 3,
     ...(mutation ? { serviceWorkers: 'block' } : {}) });
   const sink = mutation ? mutation.control.pageErrors : pageErrors;
   context.on('page', (page) => page.on('pageerror', (error) => {
     if (sink.length < 20) sink.push({ case: currentCase, message: error.message });
   }));
   try {
+    // This suite models an already-seen demo on this device; the fresh-device demo has its own G3 verifier.
+    await context.addInitScript(ownOrigin => {
+      if (location.origin === ownOrigin) localStorage.setItem('kairo-word-ladder-demo-v1', '1');
+    }, origin);
     if (mutation) await serveMutation(context, mutation);
     const page = await context.newPage();
     await page.goto(`${origin}/index.html${query}`);
@@ -418,15 +197,49 @@ const tokenState = (page, index) => page.evaluate((i) => {
   for (const extra of bare.querySelectorAll('rt, .tok-en')) extra.remove();
   const rts = [...node.querySelectorAll('rt')];
   const en = node.querySelector('.tok-en');
+  // On-touch reader ruby is painted by ::before (rt is the semantic record), while always-on uses native rt.
+  const painted = [...node.querySelectorAll('ruby')].map(ruby => {
+    const style = getComputedStyle(ruby, '::before');
+    let text = style.content;
+    if (text?.startsWith('attr(')) text = ruby.getAttribute('data-r') || '';
+    else if (/^["'].*["']$/u.test(text)) text = text.slice(1, -1);
+    else text = '';
+    return { text, opacity: Number(style.opacity), display: style.display, visibility: style.visibility };
+  }).filter(row => row.text && row.opacity > 0 && row.display !== 'none' && row.visibility !== 'hidden');
+  const native = rts.filter(rt => { const style = getComputedStyle(rt);
+    return !rt.classList.contains('hidden-rt') && style.visibility !== 'hidden' && style.display !== 'none' && Number(style.opacity) > 0;
+  }).map(rt => rt.textContent).join('');
   return { tag: node.tagName.toLowerCase(), cls: node.className, surface: bare.textContent,
     ruby: rts.map((rt) => rt.textContent).join(''),
-    visibleRuby: rts.filter((rt) => !rt.classList.contains('hidden-rt')).map((rt) => rt.textContent).join(''),
+    visibleRuby: native || painted.map(row => row.text).join(''), paintedRuby: painted,
+    rung: node.dataset.ladderRung || null, name: node.getAttribute('aria-label'), role: node.getAttribute('role'),
+    preparedDescription: (node.dataset.proseDescription || '').split(/\s+/u).filter(Boolean).map(id => document.getElementById(id)?.textContent || '').filter(Boolean).join(' · '),
+    description: (node.getAttribute('aria-describedby') || '').split(/\s+/u).filter(Boolean).map(id => document.getElementById(id)?.textContent || '').filter(Boolean).join(' · '),
     gloss: en ? en.textContent : null, lit: node.classList.contains('lit'), hasEn: node.classList.contains('has-en'),
     // R4 (2026-09-30): a word is named by itself and described by the rest — read together, in order
     focused: document.activeElement === node, label: [node.getAttribute('aria-label') || '',
       ...(node.getAttribute('aria-describedby') || '').split(/\s+/u).filter(Boolean).map((id) => document.getElementById(id)?.textContent || '')]
       .filter(Boolean).join(' · '), cursor: getComputedStyle(node).cursor };
 }, String(index));
+const spoken = (state, reading = null) => {
+  const expected = [reading, DOOR_HINT].filter(Boolean).join(' · ');
+  return !!state && (state.role === 'group'
+    ? state.name === SURFACE && state.description === expected
+    : state.role === 'presentation' && state.name === null && state.description === '' && state.preparedDescription === expected);
+};
+// Idle spans deliberately cannot receive focus: exercise the paragraph's actual keyboard controller.
+async function focusToken(page, index) {
+  const position = await page.locator(`#reader .tok[data-index="${index}"]`).evaluate(node => {
+    const block = node.closest('[data-prose-roving]');
+    return { block: [...document.querySelectorAll('#reader [data-prose-roving]')].indexOf(block),
+      word: block ? [...block.querySelectorAll('.tok[data-para]')].indexOf(node) : -1 };
+  });
+  if (position.block < 0 || position.word < 0) throw new Error(`Token ${index} has no prose keyboard position`);
+  await page.locator('#reader [data-prose-roving]').nth(position.block).focus();
+  await page.keyboard.press('Home');
+  for (let step = 0; step < position.word; step++) await page.keyboard.press('ArrowRight');
+  if (!await page.locator(`#reader .tok[data-index="${index}"]`).evaluate(node => document.activeElement === node)) throw new Error(`Keyboard did not reach token ${index}`);
+}
 const classes = (state) => String(state?.cls || '').split(/\s+/);
 // a real click at the token's centre; `own` records whether that point is the token itself (the click is made either way)
 async function tapCentre(page, index) {
@@ -504,11 +317,11 @@ async function d3Names(page, rec) {
     await openArticle(page, `dials=${dials}`, PASSAGE_B);
     const state = await page.evaluate((index) => {
       const door = document.querySelector(`#reader .tok[data-index="${index}"]`);
-      return { named: document.querySelectorAll('#reader .tok.named').length, buttons: document.querySelectorAll('#reader button.tok.named').length,
+      return { named: document.querySelectorAll('#reader .tok.named').length, spans: document.querySelectorAll('#reader span.tok.named').length, buttons: document.querySelectorAll('#reader button.tok.named').length,
         door: door ? `${door.tagName.toLowerCase()}.${[...door.classList].join('.')}` : null, cursor: door ? getComputedStyle(door).cursor : null };
     }, DOOR.index);
     rec(`D3.${key}.names`, `D3 dials ${dials}: every name in ${PASSAGE_B} is a door, ${SURFACE} among them`,
-      state.named > 0 && state.buttons === state.named && state.door === 'button.tok.named', JSON.stringify(state));
+      state.named > 0 && state.spans === state.named && state.buttons === 0 && state.door === 'span.tok.named', JSON.stringify(state));
     rec(`D3.${key}.pointer`, `D3 dials ${dials}: a name's door shows the pointer it answers to`, state.cursor === 'pointer', String(state.cursor));
     const tap = await tapCentre(page, DOOR.index);
     const mini = await page.waitForFunction(() => document.querySelector('#mini .mini-word')?.textContent.trim() || null, null, { timeout: 5_000 })
@@ -529,61 +342,47 @@ const popupState = (page) => page.evaluate(() => {
 /** D2 at one furigana setting: the fixture door, tap/Enter/Space, against the literal reading. */
 async function d2Door(page, rec, furigana) {
   const key = `D2.f${furigana}`, label = `D2 f=${furigana}`;
-  await openArticle(page, `dials=0,${furigana},0&ui=bi`, PASSAGE_B);
-  const before = await tokenState(page, DOOR.index), neighbourBefore = await tokenState(page, DOOR.neighbour.index);
-  rec(`${key}.door`, `${label}: token ${DOOR.index} of ${PASSAGE_B} is the reading door ${SURFACE}, its reading hidden, beside ${DOOR.neighbour.s}`,
-    before?.tag === 'button' && classes(before).includes('named') && before.surface === SURFACE && before.visibleRuby === ''
-      && neighbourBefore?.surface === DOOR.neighbour.s, JSON.stringify({ before, neighbour: neighbourBefore?.surface ?? null }));
-  const views = [before], acts = [], popups = [], focus = [];
-  for (const how of ['tap', 'Enter', 'Space']) {
+  const views = [], firsts = [], popups = [], folds = [], focus = [], neighbours = [], navigation = [], acts = [];
+  let before = null;
+  for (const how of ['tap','Enter','Space']) {
+    await openArticle(page, `dials=0,${furigana},0&ui=bi`, PASSAGE_B);
     const node = page.locator(`#reader .tok[data-index="${DOOR.index}"]`);
-    if (how === 'tap') acts.push({ how, ...(await tapCentre(page, DOOR.index)) });
-    else {
-      const present = (await node.count()) === 1;
-      // 1.3.0: with its popup open, activating the same word again opens its full entry, so each keyboard activation
-      // begins from the original word — Escape on the word puts the popup and the reading it summoned away first
-      if (present && await page.locator('#mini').count()) {
-        await node.focus(); await page.keyboard.press('Escape');
-        await page.waitForFunction(() => !document.getElementById('mini'), null, { timeout: 3_000 }).catch(() => {});
-      }
-      if (present) { await node.focus(); await page.keyboard.press(how); }
-      acts.push({ how, done: present });
-    }
-    // the lookup answers after its dictionary rows: wait for this activation's popup (the keyboard's takes focus)
-    if (how === 'tap') await page.waitForFunction((word) => document.querySelector('#mini .mini-word')?.textContent === word, SURFACE, { timeout: 5_000 }).catch(() => {});
-    else await page.waitForFunction(() => !!document.activeElement?.closest('#mini'), null, { timeout: 5_000 }).catch(() => {});
+    before ||= await tokenState(page, DOOR.index);
+    const neighbour = await tokenState(page, DOOR.neighbour.index);
+    const activate = async () => how === 'tap' ? tapCentre(page, DOOR.index)
+      : (await focusToken(page, DOOR.index), await page.keyboard.press(how), {done:true,own:true});
+    const act = await activate(); acts.push(act);
+    await page.waitForFunction(({i,f}) => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung === (f===1 ? 'reading':'stage'),
+      {i:DOOR.index,f:furigana},{timeout:5000}).catch(()=>{});
+    firsts.push({rung:(await tokenState(page,DOOR.index))?.rung, popup:await popupState(page)});
+    if (furigana===1) await activate();
+    await page.waitForFunction(() => !!document.getElementById('mini'), null, {timeout:5000}).catch(()=>{});
     popups.push(await popupState(page));
-    views.push(await tokenState(page, DOOR.index));
-    if (how !== 'tap') {
-      const inPopup = await page.evaluate(() => !!document.activeElement?.closest('#mini'));
-      await page.keyboard.press('Escape');
-      const back = await page.evaluate((i) => document.activeElement?.dataset?.index === i && !document.getElementById('mini'), String(DOOR.index));
-      focus.push({ how, inPopup, back });
-    }
+    const inPopup = await page.evaluate(() => !!document.activeElement?.closest('#mini'));
+    await focusToken(page, DOOR.index);
+    views.push(await tokenState(page,DOOR.index));
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.getElementById('mini'), null, {timeout:3000}).catch(()=>{});
+    folds.push(await tokenState(page,DOOR.index));
+    focus.push({how,inPopup,back:await node.evaluate(n=>document.activeElement===n)});
+    neighbours.push(canonical(await tokenState(page,DOOR.neighbour.index))===canonical(neighbour));
+    navigation.push(await page.evaluate(pid=>document.body.dataset.view==='reader'&&document.querySelector('.listen-row')?.dataset.passage===pid,PASSAGE_B));
   }
-  const done = acts.every((act) => act.done);
-  rec(`${key}.popup-reading`, `${label}: tap, Enter and Space each open the popup for ${SURFACE} reading exactly ${READING}`,
-    done && popups.every((popup) => popup?.word === SURFACE && popup.reading === READING), JSON.stringify({ popups, acts }), popups);
-  // 1.3.0: a tap summons the reading above the word whatever the dial (ふりがな なし included): the text shows it
-  const shown = READING;
-  const visible = views.map((view) => view?.visibleRuby ?? null);
-  rec(`${key}.visible-reading`, `${label}: on the text, the touched word shows exactly ${READING} after each activation (visible ruby${furigana === 1 ? '' : ', summoned at ふりがな なし'})`,
-  done && canonical(visible) === canonical(['', shown, shown, shown]), JSON.stringify({ visible, acts }), visible);
-  const labels = views.map((view) => view?.label ?? null);
-  const shownLabel = doorLabel(READING);
-  // the whole label, not a segment of it: no second reading, gloss or other word may ride along
-  rec(`${key}.accessible-reading`, `${label}: the accessible label is exactly "${doorLabel()}", then "${shownLabel}" once touched`,
-    done && canonical(labels) === canonical([doorLabel(), shownLabel, shownLabel, shownLabel]), JSON.stringify(labels), labels);
-  rec(`${key}.no-english`, `${label}: no English gloss is painted on the door (.tok-en, has-en)`, done && views.every((view) => view && view.gloss === null && !view.hasEn),
-    JSON.stringify(views.map((view) => view?.gloss ?? null)));
-  rec(`${key}.focus-returns`, `${label}: keyboard activation puts focus in the popup, and Escape gives it back to the same button`,
-    focus.length === 2 && focus.every((row) => row.inPopup && row.back), JSON.stringify(focus));
-  rec(`${key}.neighbour-unchanged`, `${label}: the neighbour token is unchanged`,
-    !!neighbourBefore && JSON.stringify(await tokenState(page, DOOR.neighbour.index)) === JSON.stringify({ ...neighbourBefore, focused: false }));
-  rec(`${key}.no-navigation`, `${label}: no navigation, still ${PASSAGE_B}`, await page.evaluate((pid) => document.body.dataset.view === 'reader'
-    && document.querySelector('.listen-row')?.dataset.passage === pid, PASSAGE_B));
-  rec(`${key}.label-names-reading`, `${label}: the label names a reading, not a word class`,
-    /reading|読み/u.test(labels[1] || '') && !/\bname\b|名前/u.test(labels[1] || ''), labels[1] || '');
+  const done=acts.every(row=>row.done&&row.own);
+  rec(`${key}.door`,`${label}: literal name is an inline span door, initially bare`, before?.tag==='span'&&classes(before).includes('named')&&before.surface===SURFACE&&before.visibleRuby==='',JSON.stringify(before));
+  rec(`${key}.first-rung`,`${label}: initial activation ${furigana===1?'reveals reading only':'opens stage directly'}`,
+    done&&firsts.every(row=>row.rung===(furigana===1?'reading':'stage')&&(furigana===1?row.popup===null:row.popup?.word===SURFACE)),JSON.stringify(firsts),firsts);
+  rec(`${key}.popup-reading`,`${label}: each modality reaches the exact word and reading at stage`,done&&popups.every(row=>row?.word===SURFACE&&row.reading===READING),JSON.stringify(popups),popups);
+  const visible=views.map(row=>row?.visibleRuby??null);
+  rec(`${key}.visible-reading`,`${label}: inline ruby obeys the dial exactly`,done&&visible.every(value=>value===(furigana===1?READING:'')),JSON.stringify(visible),visible);
+  const labels=views.map(row=>({name:row?.name,description:row?.description,role:row?.role}));
+  rec(`${key}.accessible-reading`,`${label}: selected prose word names only itself and describes only the permitted reading`,
+    done&&views.every(row=>row?.name===SURFACE&&row.role==='group'&&spoken(row,furigana===1?READING:null)),JSON.stringify(labels),labels);
+  rec(`${key}.no-english`,`${label}: no inline English appears`,done&&views.every(row=>row&&row.gloss===null&&!row.hasEn),JSON.stringify(views.map(row=>row?.gloss)));
+  rec(`${key}.focus-returns`,`${label}: keyboard stage takes focus; Escape returns to the same occurrence`,focus.every(row=>row.back&&(row.how==='tap'||row.inPopup)),JSON.stringify(focus));
+  rec(`${key}.neighbour-unchanged`,`${label}: neighbouring particle is unchanged`,neighbours.every(Boolean),JSON.stringify(neighbours));
+  rec(`${key}.no-navigation`,`${label}: every activation stays in the literal article`,navigation.every(Boolean),JSON.stringify(navigation));
+  rec(`${key}.bare-after-fold`,`${label}: Escape removes stage, rung and summoned reading`,folds.every(row=>row?.rung===null&&row.visibleRuby===''&&!row.lit),JSON.stringify(folds),folds);
 }
 
 /** D4 in one document: A token 1 touched, 戻る, B from the shelf, B token 1 checked and tapped twice. */
@@ -596,11 +395,13 @@ async function d4Walk(page, rec) {
   await page.waitForFunction(() => !!document.getElementById('mini'), null, { timeout: 3_000 }).catch(() => {});
   const aAfter = await tokenState(page, A_TOKEN.index), aPopup = await popupState(page);
   rec('D4.A-prior-state', `D4 ${PASSAGE_A} token ${A_TOKEN.index} ${A_TOKEN.token.s} starts plain, and one tap leaves it the touched word, its popup open`,
-    aBefore?.tag === 'button' && classes(aBefore).includes('content') && aBefore.surface === A_TOKEN.token.s && !aBefore.lit && aBefore.gloss === null
-      && aTap.done && !!aAfter?.lit && aPopup?.word === A_TOKEN.token.b,
+    aBefore?.tag === 'span' && classes(aBefore).includes('content') && aBefore.surface === A_TOKEN.token.s && !aBefore.lit && aBefore.gloss === null
+      && aTap.done && aAfter?.rung === 'stage' && aPopup?.word === A_TOKEN.token.b,
     JSON.stringify({ aBefore, aAfter, aTap, aPopup }));
   rec('D4.A-no-english', `D4 that tap writes no English under ${A_TOKEN.token.s}: the meaning is in its popup`,
     aTap.done && !!aAfter && aAfter.gloss === null && !aAfter.hasEn, JSON.stringify(aAfter?.gloss ?? null), { glosses: [aAfter?.gloss ?? null] });
+  await focusToken(page, A_TOKEN.index);
+  await page.keyboard.press('Escape');
   await page.locator('#back').click();
   await openFromShelf(page, PASSAGE_B);
   const sameDocument = await page.evaluate((value) => window.__readerDoorsDocument === value, marker);
@@ -613,26 +414,31 @@ async function d4Walk(page, rec) {
       && canonical(shownA) === canonical({ spacing: 0, readingsHidden: true }) && canonical(shownB) === canonical(shownA),
     JSON.stringify({ dialsA, dialsB, shownA, shownB }));
   rec('D4.B-door', `D4 ${PASSAGE_B} token ${DOOR.index} is the reading door ${SURFACE} carrying ${READING}`,
-    b0?.tag === 'button' && classes(b0).includes('named') && b0.surface === SURFACE && b0.ruby === READING, JSON.stringify(b0));
+    b0?.tag === 'span' && classes(b0).includes('named') && b0.surface === SURFACE && b0.ruby === READING, JSON.stringify(b0));
   rec('D4.no-inherited-state', `D4 it opens with no reveal, mark or English from ${PASSAGE_A} token ${A_TOKEN.index}, labelled exactly "${doorLabel()}"`,
-    !!b0 && b0.visibleRuby === '' && !b0.lit && b0.gloss === null && !b0.hasEn && b0.label === doorLabel(), JSON.stringify(b0),
+    !!b0 && b0.visibleRuby === '' && !b0.lit && b0.gloss === null && !b0.hasEn && spoken(b0), JSON.stringify(b0),
     { visibleRuby: b0?.visibleRuby ?? null, lit: b0?.lit ?? null, gloss: b0?.gloss ?? null });
   // exercised whatever the rows above found: a missing or plain token fails the rows below, it never skips them
   const taps = [], views = [], popups = [];
   for (let i = 0; i < 2; i++) {
     taps.push(await tapCentre(page, DOOR.index));
-    if (i === 0) await page.waitForFunction((word) => document.querySelector('#mini .mini-word')?.textContent === word, SURFACE, { timeout: 5_000 }).catch(() => {});
-    else await page.waitForTimeout(150);
+    if (i === 0) await page.waitForFunction(i => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung === 'reading', DOOR.index, {timeout:5000}).catch(()=>{});
+    else await page.waitForFunction(() => !!document.getElementById('mini'), null, {timeout:5000}).catch(()=>{});
     views.push(await tokenState(page, DOOR.index));
     popups.push(await popupState(page));
   }
   const done = taps.every((tap) => tap.done);
-  rec('D4.tap-shows', `D4 the first tap opens ${SURFACE}'s popup and shows exactly ${READING}, labelled exactly "${doorLabel(READING)}"`,
-    done && views[0]?.visibleRuby === READING && views[0].label === doorLabel(READING) && popups[0]?.reading === READING,
-    JSON.stringify({ view: views[0], popup: popups[0], tap: taps[0] }));
-  rec('D4.second-tap-closes', `D4 the second tap puts the popup away; the touched word keeps ${READING}, "${doorLabel(READING)}"`,
-    done && popups[1] === null && views[1]?.visibleRuby === READING && views[1].label === doorLabel(READING),
-    JSON.stringify({ view: views[1], popup: popups[1], tap: taps[1] }));
+  rec('D4.tap-shows', `D4 first tap reveals exactly ${READING} without a stage`,
+    done && views[0]?.visibleRuby===READING && views[0].rung==='reading' && spoken(views[0],READING) && popups[0]===null,
+    JSON.stringify({view:views[0],popup:popups[0]}));
+  rec('D4.second-tap-stage', `D4 second tap opens the exact word stage`,
+    done && popups[1]?.word===SURFACE && popups[1].reading===READING && views[1]?.rung==='stage',
+    JSON.stringify({view:views[1],popup:popups[1]}),{popup:popups[1]});
+  await focusToken(page, DOOR.index);
+  await page.keyboard.press('Escape');
+  const folded=await tokenState(page,DOOR.index);
+  rec('D4.fold-bare','D4 Escape clears the reading and stage without leaving the article',
+    folded?.visibleRuby==='' && !folded.lit && folded.rung===null && await popupState(page)===null && (await readerMarks(page)).passage===PASSAGE_B,JSON.stringify(folded));
   const glosses = views.map((view) => view?.gloss ?? null);
   rec('D4.never-english', `D4 tapping it never adds English, whatever ${PASSAGE_A} token ${A_TOKEN.index} carried`,
     done && views.every((view) => view && view.gloss === null && !view.hasEn), JSON.stringify(glosses), { glosses });
@@ -649,22 +455,22 @@ async function d5Detour(page, rec) {
   await page.locator('#back').click();
   await openFromShelf(page, D5.home);
   const clean = await readerMarks(page);
-  // one tap: the word's popup, and on the text its reading (ふりがな 触れて); the reader lane wrote no English mark
+  // G3: first tap summons only this occurrence's reading; no English or stage.
   const knownTaps = [await tapCentre(page, D5.known.index)];
-  await page.waitForFunction(() => !!document.getElementById('mini'), null, { timeout: 3_000 }).catch(() => {});
+  await page.waitForFunction(i => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung==='reading', D5.known.index,{timeout:3000}).catch(()=>{});
   const homeBefore = await readerMarks(page);
   const known = await tokenState(page, D5.known.index), named = await tokenState(page, DOOR.index);
   rec('D5.home-marks', `D5 ${D5.home} opens unmarked; one tap leaves token ${D5.known.index} ${D5.known.token.s} the touched word (${D5.known.token.r} shown), its only mark; token ${DOOR.index} ${SURFACE} is the hidden reading door`,
     canonical(markSets(clean)) === canonical({ lit: [], glossed: [] }) && knownTaps.every((tap) => tap.done)
       && canonical(homeBefore.lit) === canonical([D5.known.index]) && known?.visibleRuby === D5.known.token.r
-      && named?.tag === 'button' && classes(named).includes('named') && named.visibleRuby === '' && named.label === doorLabel(),
+      && named?.tag === 'span' && classes(named).includes('named') && named.visibleRuby === '' && spoken(named),
     JSON.stringify({ clean: markSets(clean), homeBefore: markSets(homeBefore), known, named, knownTaps }));
 
   const detour = { word: (await tokenState(page, D5.word.index))?.surface ?? null, examples: null, anchor: null };
   let step = `focus token ${D5.word.index}`;
   try {
     // the sheet opens through the word's own keyboard door (Ctrl+Enter): no popup, no touch on the text
-    await page.locator(`#reader .tok[data-index="${D5.word.index}"]`).focus();
+    await focusToken(page, D5.word.index);
     step = 'Ctrl+Enter';
     await page.keyboard.press('Control+Enter');
     step = `the ${D5.word.token.b} sheet`;
@@ -705,9 +511,11 @@ async function d5Detour(page, rec) {
   const awayMarked = await readerMarks(page);
   rec('D5.away-marks', `D5 ${D5.away} opens unmarked, and one tap leaves its token ${A_TOKEN.index} ${A_TOKEN.token.s} (an index ${D5.home} has not touched) the touched word, its only mark`,
     awayClean.passage === D5.away && canonical(markSets(awayClean)) === canonical({ lit: [], glossed: [] }) && awayTaps.every((tap) => tap.done)
-      && canonical(awayMarked.lit) === canonical([A_TOKEN.index]) && !homeBefore.lit.includes(A_TOKEN.index),
+      && (await tokenState(page,A_TOKEN.index))?.rung === 'stage' && (await popupState(page))?.word === A_TOKEN.token.b && !homeBefore.lit.includes(A_TOKEN.index),
     JSON.stringify({ awayClean: markSets(awayClean), awayMarked: markSets(awayMarked), awayTaps }));
 
+  await focusToken(page, A_TOKEN.index);
+  await page.keyboard.press('Escape');
   // 戻る: the frame returns home under the sheets the detour left from; then the sheet's own 戻る (#sheet-back), only while one
   // of them is still open — under a dialog the chrome's #back is inert behind the scrim (the layer law)
   await page.locator('#back').click();
@@ -726,21 +534,22 @@ async function d5Detour(page, rec) {
   rec('D5.returned', `D5 戻る returns to ${D5.home} in the same document, and closing the sheets it left from keeps ${D5.home}`,
     atReturn.passage === D5.home && uncovered.passage === D5.home && uncovered.sheet === null && await sameDocument(),
     JSON.stringify({ atReturn: { passage: atReturn.passage, sheet: atReturn.sheet }, uncovered: { passage: uncovered.passage, sheet: uncovered.sheet }, presses }));
-  rec('D5.home-marks-restored', `D5 ${D5.home}'s own mark comes back exactly (token ${D5.known.index} touched, nothing else), under the sheets and with them closed`,
-    canonical(markSets(atReturn)) === canonical(markSets(homeBefore)) && canonical(markSets(uncovered)) === canonical(markSets(homeBefore)),
+  rec('D5.home-bare-return', `D5 ${D5.home} returns without a summoned reading, under its sheets and after they close`,
+    canonical(markSets(atReturn)) === canonical({lit:[],glossed:[]}) && canonical(markSets(uncovered)) === canonical({lit:[],glossed:[]}),
     JSON.stringify({ before: markSets(homeBefore), atReturn: markSets(atReturn), uncovered: markSets(uncovered) }),
     { before: markSets(homeBefore), atReturn: markSets(atReturn), uncovered: markSets(uncovered) });
   rec('D5.away-index-not-lit', `D5 ${D5.away}'s mark at index ${A_TOKEN.index} does not land on ${D5.home}'s ${SURFACE}: not lit, reading hidden, label exactly "${doorLabel()}"`,
-    [namedAtReturn, namedUncovered].every((view) => view && classes(view).includes('named') && !view.lit && view.visibleRuby === '' && view.label === doorLabel()),
+    [namedAtReturn, namedUncovered].every((view) => view && classes(view).includes('named') && !view.lit && view.visibleRuby === '' && spoken(view)),
     JSON.stringify({ namedAtReturn, namedUncovered }));
   // the closed sheet hands focus back to token 293 in an animation frame (showing its actions): let that land, then move
   // focus to the door itself, so the tap below meets the door and no pill
   await frames();
-  await page.locator(`#reader .tok[data-index="${DOOR.index}"]`).focus().catch(() => {});
+  await focusToken(page, DOOR.index);
   const toggle = await tapCentre(page, DOOR.index);
+  await page.waitForFunction(i=>document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung==='reading',DOOR.index,{timeout:5000}).catch(()=>{});
   const namedAfter = await tokenState(page, DOOR.index);
   rec('D5.named-tap', `D5 a tap on ${D5.home}'s ${SURFACE} then shows exactly ${READING}, labelled exactly "${doorLabel(READING)}"`,
-    toggle.done && namedAfter?.visibleRuby === READING && namedAfter.label === doorLabel(READING), JSON.stringify({ namedAfter, toggle }));
+    toggle.done && namedAfter?.visibleRuby === READING && spoken(namedAfter,READING), JSON.stringify({ namedAfter, toggle }));
   const glosses = [namedAtReturn, namedUncovered, namedAfter].map((view) => view?.gloss ?? null);
   rec('D5.named-no-english', `D5 ${D5.home}'s ${SURFACE} shows no English: under the sheets, with them closed, or after its tap`,
     toggle.done && [namedAtReturn, namedUncovered, namedAfter].every((view) => view && view.gloss === null && !view.hasEn), JSON.stringify(glosses), { glosses });
@@ -770,22 +579,22 @@ async function d6Visit(page, rec) {
   const frames = () => page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
   await openFromShelf(page, D6.home);
   const clean = await readerMarks(page);
-  // one tap: the word's popup, and on the text its reading (ふりがな 触れて); the reader lane wrote no English mark
+  // G3: first tap summons only this occurrence's reading; no English or stage.
   const knownTaps = [await tapCentre(page, D5.known.index)];
-  await page.waitForFunction(() => !!document.getElementById('mini'), null, { timeout: 3_000 }).catch(() => {});
+  await page.waitForFunction(i => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung==='reading', D5.known.index,{timeout:3000}).catch(()=>{});
   const homeBefore = await readerMarks(page);
   const known = await tokenState(page, D5.known.index), named = await tokenState(page, DOOR.index);
   rec('D6.home-marks', `D6 ${D6.home} opens unmarked; one tap leaves token ${D5.known.index} ${D5.known.token.s} the touched word (${D5.known.token.r} shown), its only mark; token ${DOOR.index} ${SURFACE} is the hidden reading door`,
     canonical(markSets(clean)) === canonical({ lit: [], glossed: [] }) && knownTaps.every((tap) => tap.done)
       && canonical(homeBefore.lit) === canonical([D5.known.index]) && known?.visibleRuby === D5.known.token.r
-      && named?.tag === 'button' && classes(named).includes('named') && named.visibleRuby === '' && named.label === doorLabel(),
+      && named?.tag === 'span' && classes(named).includes('named') && named.visibleRuby === '' && spoken(named),
     JSON.stringify({ clean: markSets(clean), homeBefore: markSets(homeBefore), known, named, knownTaps }));
 
   const visit = { word: (await tokenState(page, D6.word.index))?.surface ?? null, quote: null, anchor: null, sourceBack: false };
   let step = `focus token ${D6.word.index}`;
   try {
     // the sheet opens through the word's own keyboard door (Ctrl+Enter): no popup, no touch on the text
-    await page.locator(`#reader .tok[data-index="${D6.word.index}"]`).focus();
+    await focusToken(page, D6.word.index);
     step = 'Ctrl+Enter';
     await page.keyboard.press('Control+Enter');
     step = `the ${D6.word.token.b} sheet's saved encounter`;
@@ -815,11 +624,11 @@ async function d6Visit(page, rec) {
   const awayMarked = await readerMarks(page);
   rec('D6.away-marks', `D6 ${D6.away} opens unmarked, and one tap leaves its token ${A_TOKEN.index} ${A_TOKEN.token.s} (an index ${D6.home} has not touched) the touched word, its only mark`,
     awayClean.passage === D6.away && canonical(markSets(awayClean)) === canonical({ lit: [], glossed: [] }) && awayTaps.every((tap) => tap.done)
-      && canonical(awayMarked.lit) === canonical([A_TOKEN.index]) && !homeBefore.lit.includes(A_TOKEN.index),
+      && (await tokenState(page,A_TOKEN.index))?.rung === 'stage' && (await popupState(page))?.word === A_TOKEN.token.b && !homeBefore.lit.includes(A_TOKEN.index),
     JSON.stringify({ awayClean: markSets(awayClean), awayMarked: markSets(awayMarked), awayTaps }));
 
   // the touched word's popup floats over the page: Escape on the word puts it away before the return control is pressed
-  await page.locator(`#reader .tok[data-index="${A_TOKEN.index}"]`).focus();
+  await focusToken(page, A_TOKEN.index);
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.getElementById('mini'), null, { timeout: 3_000 }).catch(() => {});
   // reader-source-back: the visit returns home under exactly the sheet it left from, that sheet's own door focused
@@ -850,20 +659,21 @@ async function d6Visit(page, rec) {
       && uncovered.passage === D6.home && uncovered.sheet === null && visitGone && await sameDocument(),
     JSON.stringify({ atReturn: { passage: atReturn.passage, sheets: sheetsAtReturn, focus: focusAtReturn }, closed, sheetsAfterClose,
       focusAfterClose, uncovered: { passage: uncovered.passage, sheet: uncovered.sheet }, visitGone }));
-  rec('D6.home-marks-restored', `D6 ${D6.home}'s own mark comes back exactly (token ${D5.known.index} touched, nothing else), under the sheet and with it closed`,
-    canonical(markSets(atReturn)) === canonical(markSets(homeBefore)) && canonical(markSets(uncovered)) === canonical(markSets(homeBefore)),
+  rec('D6.home-bare-return', `D6 ${D6.home} returns without a summoned reading, under its sheets and after they close`,
+    canonical(markSets(atReturn)) === canonical({lit:[],glossed:[]}) && canonical(markSets(uncovered)) === canonical({lit:[],glossed:[]}),
     JSON.stringify({ before: markSets(homeBefore), atReturn: markSets(atReturn), uncovered: markSets(uncovered) }),
     { before: markSets(homeBefore), atReturn: markSets(atReturn), uncovered: markSets(uncovered) });
   rec('D6.away-index-not-lit', `D6 ${D6.away}'s mark at index ${A_TOKEN.index} does not land on ${D6.home}'s ${SURFACE}: not lit, reading hidden, label exactly "${doorLabel()}"`,
-    [namedAtReturn, namedUncovered].every((view) => view && classes(view).includes('named') && !view.lit && view.visibleRuby === '' && view.label === doorLabel()),
+    [namedAtReturn, namedUncovered].every((view) => view && classes(view).includes('named') && !view.lit && view.visibleRuby === '' && spoken(view)),
     JSON.stringify({ namedAtReturn, namedUncovered }));
   // the closed sheet hands focus back in an animation frame: let that land, then move focus to the door itself
   await frames();
-  await page.locator(`#reader .tok[data-index="${DOOR.index}"]`).focus().catch(() => {});
+  await focusToken(page, DOOR.index);
   const toggle = await tapCentre(page, DOOR.index);
+  await page.waitForFunction(i=>document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung==='reading',DOOR.index,{timeout:5000}).catch(()=>{});
   const namedAfter = await tokenState(page, DOOR.index), englishAfter = await namedEnglish();
   rec('D6.named-tap', `D6 a tap on ${D6.home}'s ${SURFACE} then shows exactly ${READING}, labelled exactly "${doorLabel(READING)}"`,
-    toggle.done && namedAfter?.visibleRuby === READING && namedAfter.label === doorLabel(READING), JSON.stringify({ namedAfter, toggle }));
+    toggle.done && namedAfter?.visibleRuby === READING && spoken(namedAfter,READING), JSON.stringify({ namedAfter, toggle }));
   const glosses = [namedAtReturn, namedUncovered, namedAfter].map((view) => view?.gloss ?? null);
   rec('D6.named-no-english', `D6 no reading door in ${D6.home} shows English (${SURFACE} included): under the sheet, with it closed, or after ${SURFACE}'s tap`,
     toggle.done && [namedAtReturn, namedUncovered, namedAfter].every((view) => view && view.gloss === null && !view.hasEn)
@@ -945,7 +755,9 @@ async function runControl(spec) {
 try {
   host = await startStaticHost({ site: SITE, port: 0 });
   origin = host.origin;
-  browser = await chromium.launch();
+  browser = await ({chromium,webkit})[engine].launch();
+  browserVersion=browser.version();
+  console.log(`BROWSER ${engine} ${browserVersion}`);
 
   currentCase = 'D0';
   {
@@ -1064,7 +876,7 @@ try {
   await browser?.close().catch((error) => results.push({ name: 'browser · cleanup', pass: false, detail: error.message }));
   await host?.close().catch((error) => results.push({ name: 'host · cleanup', pass: false, detail: error.message }));
   if (pageErrors.length) results.push({ name: 'no uncaught page errors', pass: false, detail: JSON.stringify(pageErrors) });
-  writeFileSync(resolve(EVIDENCE, 'reader-doors.json'), JSON.stringify({ origin, results, controls, pageErrors, lastCase: currentCase }, null, 2) + '\n');
+  writeFileSync(resolve(EVIDENCE, 'reader-doors.json'), JSON.stringify({ engine, browserVersion, origin, results, controls, pageErrors, lastCase: currentCase }, null, 2) + '\n');
 }
 const failed = results.filter((r) => !r.pass);
 console.log(`\n${results.length - failed.length}/${results.length} passed · evidence ${EVIDENCE}`);

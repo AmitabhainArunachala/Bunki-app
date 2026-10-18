@@ -255,8 +255,7 @@ async function holdEntry(page, index, word) {
   await token.scrollIntoViewIfNeeded();
   const box = await token.boundingBox();
   assert(box && box.width > 0 && box.height > 0, 'Word has a real pointer target');
-  // one tap opens the word's popup; its band (the word) opens the entry (1.3.0)
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await openReaderWordStage(page, token);
   await page.locator('#mini button.mini-word').click();
   await page
     .locator(`#sheet[data-node="word:${word}"]`)
@@ -637,6 +636,7 @@ async function runCase(name, synthetic, body) {
     serviceWorkers: 'block',
     recordVideo: { dir: join(out, 'recordings'), size: { width: 1120, height: 940 } },
   });
+  await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device; demonstration has its own gate.
   const transport = captureTransport(context, synthetic);
   await transport.install();
   await context.tracing.start({ screenshots: true, snapshots: true, sources: false });
@@ -1272,3 +1272,26 @@ writeFileSync(join(OUT, 'receipt.json'), `${JSON.stringify(receipt, null, 2)}\n`
 writeFileSync(join(EVIDENCE, 'latest.json'), `${JSON.stringify(receipt, null, 2)}\n`);
 console.log(JSON.stringify(receipt, null, 2));
 process.exitCode = receipt.failures ? 1 : 0;
+
+// These source-context checks enter through the G3 ladder; the grammar itself is
+// checked separately. A second activation is allowed only after a real reading rung.
+async function openReaderWordStage(page, word) {
+  await word.click();
+  await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
+    // On-touch reader ruby paints through ::before; the native rt stays hidden
+    // to preserve the word's width. Require actual paint from either renderer.
+    await page.waitForFunction(node => [...node.querySelectorAll('ruby')].some(ruby => {
+      const rt = ruby.querySelector('rt');
+      if (!rt?.textContent.trim() || rt.classList.contains('hidden-rt')) return false;
+      const native = getComputedStyle(rt), floating = getComputedStyle(ruby, '::before');
+      return (rt.getClientRects().length > 0 && native.visibility !== 'hidden' && native.display !== 'none' && Number(native.opacity) > 0) ||
+        (ruby.getClientRects().length > 0 && ruby.dataset.r === rt.textContent && floating.content === JSON.stringify(rt.textContent) &&
+          floating.visibility !== 'hidden' && floating.display !== 'none' && Number(floating.opacity) > 0);
+    }), await word.elementHandle(), { timeout: 5000 });
+    await word.click();
+  }
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'stage', 'The exact source word reaches its stage');
+}

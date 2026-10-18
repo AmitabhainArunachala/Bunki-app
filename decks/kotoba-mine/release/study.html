@@ -4001,11 +4001,11 @@
    * proscenium (--color-lacquer), and the card is the lit paper on it; its text is the lacquer's ink.
    * --kp-shu is the 朱 of the marked word's brackets, the rail and the slash on もう一度 (never text):
    * the world's seal red. Measured: contrast-kotoba stage row */
-  --kp-stage: var(--color-lacquer, #141a28); --kp-stage-ink: var(--color-lacquer-ink, #e9e2d2); --kp-stage-mute: #b5ad9c; --kp-shu: var(--color-seal, #c4401f);
+  --kp-stage: var(--color-lacquer, #141a28); --kp-stage-ink: var(--color-lacquer-ink, #e9e2d2); --kp-stage-mute: color-mix(in srgb, var(--color-lacquer-ink) 76%, var(--world-ground)); --kp-shu: var(--color-seal, #c4401f);
   /* the dock (the ground under 答えを見る and the grade pads, and the page below the last card) is the
    * stage; the whole study screen is the stage, lit softly from the top. Measured: contrast-kotoba dock row */
   --kp-dock: var(--kp-stage); --kp-dock-ink: var(--kp-stage-ink); --kp-dock-mute: var(--kp-stage-mute);
-  --kp-study-ground: radial-gradient(130% 60% at 50% 0%, rgba(233, 226, 210, 0.07), transparent 72%), var(--kp-stage); }
+  /* bokashi: urushi — the deck's study ground — light: the world's raised paper held as a faint lamp at the top of its lacquer stage */ --kp-study-ground: radial-gradient(130% 60% at 50% 0%, color-mix(in srgb, var(--world-paper) 7%, transparent), transparent 72%), var(--kp-stage); }
 /* depth: the card is a physical object; its surface stays plain so the ruby reads cleanly
  * (the texture is on the page, see .kp above) */
 .kp .kp-card { background-color: var(--kp-panel); background-image: none; box-shadow: var(--kp-depth); }
@@ -4075,6 +4075,7 @@
 .kp .kp-card::before {
   content: ''; position: absolute; inset: 8px; pointer-events: none; opacity: 0.55;
   --reg: color-mix(in srgb, var(--kp-ink) 55%, transparent);
+  /* drawn: the card's registration marks (見当), eight hairlines of the deck's ink */
   background:
     linear-gradient(var(--reg), var(--reg)) 0 5px / 11px 1px no-repeat, linear-gradient(var(--reg), var(--reg)) 5px 0 / 1px 11px no-repeat,
     linear-gradient(var(--reg), var(--reg)) 100% 5px / 11px 1px no-repeat, linear-gradient(var(--reg), var(--reg)) calc(100% - 5px) 0 / 1px 11px no-repeat,
@@ -4103,6 +4104,7 @@
  * reach it has as a tap target on the back); its own colour stays its part of speech */
 .kp .kp-target {
   padding: 0 0.16em; margin: 0 0.04em; text-decoration-thickness: 1.5px; -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  /* drawn: the cloze target's 朱 corner marks, four hairlines, over its 朱 mark */
   background:
     linear-gradient(var(--kp-shu), var(--kp-shu)) 0 0 / 0.36em 2px no-repeat, linear-gradient(var(--kp-shu), var(--kp-shu)) 0 0 / 2px 0.36em no-repeat,
     linear-gradient(var(--kp-shu), var(--kp-shu)) 100% 100% / 0.36em 2px no-repeat, linear-gradient(var(--kp-shu), var(--kp-shu)) 100% 100% / 2px 0.36em no-repeat,
@@ -4115,6 +4117,7 @@
 .kp-polish { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit; z-index: 1; }
 .kp-polish::before {
   content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; width: 55%; opacity: 0;
+  /* bokashi: atenashi — the reveal's polish band (研ぎ出し) — brush: 朱 and the deck's ink wiped once across the card */
   background: linear-gradient(100deg, transparent 0 26%, color-mix(in srgb, var(--kp-shu) 12%, transparent) 38%, color-mix(in srgb, var(--kp-ink) 14%, transparent) 47%, color-mix(in srgb, var(--kp-ink) 6%, transparent) 56%, transparent 70%);
   animation: kp-polish var(--motion-fast, 180ms) var(--ease-ink, ease-in-out) both;
 }
@@ -4143,7 +4146,7 @@
 .kp .kp-kanji > * { flex: 1 1 100%; min-width: 0; }
 .kp .kp-kj { border-radius: var(--radius-seal, 3px); grid-template-columns: 58px 1fr; padding: 8px 10px 8px 8px; gap: 2px 10px; background: color-mix(in srgb, var(--kp-panel-2) 70%, transparent); }
 .kp .kp-kj b { width: 58px; height: 58px; display: grid; place-items: center; font-family: var(--kp-head); font-weight: 800; font-size: 40px; border: 1px solid var(--kp-line);
-  background: linear-gradient(var(--kp-line), var(--kp-line)) 50% 0 / 1px 100% no-repeat, linear-gradient(var(--kp-line), var(--kp-line)) 0 50% / 100% 1px no-repeat, var(--kp-panel); }
+  /* drawn: the kanji box's cross guide (十字), two hairlines */ background: linear-gradient(var(--kp-line), var(--kp-line)) 50% 0 / 1px 100% no-repeat, linear-gradient(var(--kp-line), var(--kp-line)) 0 50% / 100% 1px no-repeat, var(--kp-panel); }
 .kp .kp-kj > span { font-size: 14px; font-weight: 600; color: var(--kp-ink); }
 .kp-kj-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-size: 12px; color: var(--kp-mute); }
 .kp-kj-parts i { font-style: normal; font-family: var(--kp-head); font-weight: 800; font-size: 17px; color: var(--kp-ink); padding: 0 3px; border-radius: var(--radius-seal, 3px); }
@@ -4188,6 +4191,7 @@
 /* もう一度: a brief 朱 slash crosses the screen as the answered card leaves (transform and opacity only) */
 .kp-slash {
   position: fixed; left: 4%; right: 4%; top: 44%; height: 3px; z-index: 3; pointer-events: none; border-radius: var(--radius-seal, 3px);
+  /* bokashi: atenashi — the もう一度 slash — brush: one 朱 stroke across the screen, its ends lifting */
   background: linear-gradient(90deg, transparent, var(--kp-shu) 10%, var(--kp-shu) 85%, transparent);
   transform-origin: left center; transform: rotate(-12deg) scaleX(0); opacity: 0;
   animation: kp-slash var(--motion-fast, 180ms) var(--ease-ink, ease-in-out) both;
@@ -4359,11 +4363,11 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 
 /* 答えを見る: one clear key under the card, framed in the deck's accent (the old home's 答えを見る) */
 .kp .kp-reveal { border: 1.5px solid var(--kp-cyan); border-radius: var(--radius-control, 6px); min-height: 56px; color: var(--kp-cyan); font-weight: 700; letter-spacing: 0.08em;
-  background: linear-gradient(var(--kp-cyan-wash), var(--kp-cyan-wash)), var(--kp-dock); }
+  /* drawn: the reveal key's wash, one flat layer of the deck's accent over the dock */ background: linear-gradient(var(--kp-cyan-wash), var(--kp-cyan-wash)), var(--kp-dock); }
 .kp .kp-next { border-radius: var(--radius-control, 6px); }
 /* on the lacquer stage the key is lit in the stage's own ink */
 .kp .kp-study > .kp-reveal { border-color: var(--kp-stage-ink); color: var(--kp-stage-ink);
-  background: linear-gradient(color-mix(in srgb, var(--kp-stage-ink) 9%, transparent), color-mix(in srgb, var(--kp-stage-ink) 9%, transparent)), var(--kp-dock); }
+  /* drawn: the lit key's wash, one flat layer of the stage's ink over the dock */ background: linear-gradient(color-mix(in srgb, var(--kp-stage-ink) 9%, transparent), color-mix(in srgb, var(--kp-stage-ink) 9%, transparent)), var(--kp-dock); }
 /* docked at the foot of a long passage, the key stands on a straight band of the dock that runs to both
  * screen edges (the ring alone drew a rounded frame over the card) */
 .kp .kp-study > .kp-reveal { box-shadow: var(--kp-depth), 0 0 0 10px var(--kp-dock), -48px 0 0 10px var(--kp-dock), 48px 0 0 10px var(--kp-dock); }
@@ -7676,6 +7680,7 @@ function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'non
     }
   });
   if (clamp && split) clampContext(out);
+  if (taps) ctx?.host?.installProseWords?.(out, '.kp-tok');
   if (taps || ruby === 'all') {
     reflowWatch?.observe(out);
     document.fonts?.ready.then(() => out.isConnected && seatReadings(out));
@@ -8494,8 +8499,8 @@ function seeAlsoLine(card, word) {
 
 /* ------------------------------------------------ tap → define → 覚える (CARD_CONTRACT_V2 §3, STANDARD A44)
  * After the reveal only, every word of the passage and of the Japanese definition is a tap
- * target (a word, a kanji, a grammar cue as one, and any word of this deck; particles, endings
- * and punctuation are not words and stay plain). With a host lexicon (the corridor) a tap opens
+ * target (a word, a kanji, a grammar cue as one, particles and endings; punctuation and
+ * phonetic annotations stay plain). With a host lexicon (the corridor) taps use its shared ladder into
  * the entry sheet: the reading, the Japanese sense, English behind 英語, and the corridor's one-tap
  * 覚える (A51); a word of this deck says 「このデッキにあります」 and offers no 覚える (A17). A word in
  * the sheet's definition opens one more sheet, and that second one says 「ここで止めよう」 and offers
@@ -8563,13 +8568,41 @@ function deckWordOf(t) {
   return null;
 }
 
-/** tokens → tap units { at, len, tok, word }: a 語, a 字, a 文法 cue (its tokens joined), or any
- * token that is a word of this deck */
+/** Parenthetical kana matching the preceding written word are a reading annotation,
+ * not another occurrence. Keep the original token offsets and displayed text. */
+function phoneticAnnotationRanges(tokens) {
+  const text = tokens.map((token) => token.s).join('');
+  const kana = (value) => String(value || '').replace(/[ァ-ヶ]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60)).replace(/[\s・]/gu, '');
+  const ranges = [];
+  for (const match of text.matchAll(/[（(]([\p{Script=Hiragana}\p{Script=Katakana}ー・\s]+)[）)]/gu)) {
+    let reading = '', written = '', edge = match.index;
+    for (let i = tokens.length - 1; i >= 0; i -= 1) {
+      const token = tokens[i];
+      if (token.at + token.s.length > edge) continue;
+      if (token.at + token.s.length !== edge || !/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー々]+$/u.test(token.s)) break;
+      const r = token.r || (/^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u.test(token.s) ? token.s : '');
+      if (!r) break;
+      reading = kana(r) + reading;
+      written = token.s + written;
+      edge = token.at;
+      if (reading === kana(match[1]) && /\p{Script=Han}/u.test(written)) {
+        ranges.push([match.index, match.index + match[0].length]);
+        break;
+      }
+      if (reading.length >= kana(match[1]).length) break;
+    }
+  }
+  return ranges;
+}
+
+/** Tokens → tap units, preserving grammar cues and every other Japanese occurrence. */
 function unitsOfTokens(tokens) {
   const out = [];
+  const annotations = phoneticAnnotationRanges(tokens);
   for (const t of tokens) {
+    if (annotations.some(([start, end]) => t.at < end && t.at + t.s.length > start)) continue;
     const word = deckWordOf(t);
-    if (t.k === 'other' && !word) continue;
+    if (t.k === 'other' && !word && !/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(t.s)) continue;
     const last = out.at(-1);
     if (!word && t.k === '文法' && last && !last.word && last.tok.k === '文法' && last.tok.ref === t.ref && last.at + last.len === t.at) {
       last.len += t.s.length;
@@ -8619,13 +8652,18 @@ function onDown(e) {
   if (ui.pop && !e.target.closest?.('.kp-pop')) closePop();
 }
 
-/** make node one tap target: role button, in the tab order, no look of its own until hover or focus */
+/** Hosted prose uses the shared paragraph controller; standalone keeps its native keyboard fallback. */
 function tapNode(node, unit, onTap) {
   node.classList.add('kp-tok');
   node.kpUnit = unit;
-  node.setAttribute('role', 'button');
-  node.tabIndex = 0;
-  node.setAttribute('aria-haspopup', 'dialog');
+  node.dataset.japaneseLookup = 'deck-word';
+  if (unit.word?.term || unit.tok?.s) node.dataset.proseLabel = unit.tok?.s || unit.word.term;
+  const hostedProse = typeof ctx?.host?.installProseWords === 'function';
+  if (!hostedProse) {
+    node.setAttribute('role', 'button');
+    node.tabIndex = 0;
+    node.setAttribute('aria-haspopup', 'dialog');
+  }
   if (unit.word) node.dataset.deckWord = unit.word.id;
   node.kpTap = () => onTap(unit, node);
   node.addEventListener('click', (e) => {
@@ -8650,7 +8688,7 @@ function tapNode(node, unit, onTap) {
     chosen.kpTap();
   });
   node.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (hostedProse || e.defaultPrevented || (e.key !== 'Enter' && e.key !== ' ')) return;
     e.preventDefault();
     e.stopPropagation();
     onTap(unit, node);
@@ -8701,7 +8739,10 @@ function answerWords(node, text, units = null, onTap = null) {
 /** tier one's Japanese definition, its words tappable on the back */
 function defLine(card, word) {
   const p = el('p', 'kp-def');
+  // Q · the definition's words by the word rule (answerWords: tapText's pieces, a <wbr> between words); G3 · its taps
+  // join the host's one roving prose stop
   answerWords(p, word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 }));
+  if (p.querySelector('.kp-tok')) ctx?.host?.installProseWords?.(p, '.kp-tok');
   reflowWatch?.observe(p);
   return p;
 }
@@ -8807,19 +8848,32 @@ function lightWord(node) {
   node?.classList.add('kp-lit');
 }
 function tapped(unit, node, { card, where, depth }) {
+  // A late or synthetic activation must not turn a sealed front into a lookup door.
+  if (ui.screen === 'study' && !ui.revealed) return;
   const frame = frameOf(unit);
-  lightWord(node);
   if (!ctx.host) {
+    lightWord(node);
     logTap(card, where, frame, depth);
     openPop(frame, node);
     return;
   }
-  // the app's one slip beside the word (the one-hand pass, contract §1): the host draws it, and the next tap on
-  // the same word dives into the full entry; the word's reading stays lit until the slip, or that entry, goes
-  const opened = safely(() => ctx.host.openSlip?.(frame, node, { english: ctx.prefs.gloss === 'show', onClose: (reason) => { if (reason !== 'dive') lightWord(null); } }), false);
-  // the ledger keeps how deep each tap went: the slip at the tap's own depth, the full entry one deeper
-  logTap(card, where, frame, opened === 'dived' ? depth + 1 : depth);
-  if (!opened) lightWord(null);
+  // The host owns the ladder. Existing ruby needs only presentation callbacks; plain
+  // definition text uses the host's inline reading. Nothing is revealed before activation.
+  const hasRuby = !!node.querySelector('ruby[data-rt]');
+  const opened = safely(() => ctx.host.openSlip?.(frame, node, {
+    english: ctx.prefs.gloss === 'show',
+    ...(hasRuby ? {
+      reveal: () => node.classList.add('kp-lit'),
+      clearReveal: () => node.classList.remove('kp-lit'),
+      readingVisible: () => ctx.prefs.readings !== 'off' || node.classList.contains('kp-lit') || node.classList.contains('kp-target'),
+    } : {}),
+    onClose: (reason) => { if (reason !== 'dive') node.classList.remove('kp-lit'); },
+  }), false);
+  // Keep the existing tuple: hosted reveal, stage and page are distinct observation depths.
+  // Putting a stage away opens nothing, so it is no observation.
+  if (opened === 'dismissed') return;
+  logTap(card, where, frame, opened === 'dived' ? depth + 2 : opened === 'opened' ? depth + 1 : depth);
+  if (!opened) node.classList.remove('kp-lit');
 }
 
 /** what the host answers, or fallback when it throws: a host fault never breaks the card */
@@ -9927,7 +9981,11 @@ function restoreButton(ta, msg) {
 }
 
 function onKey(e) {
-  if (!ctx?.root?.isConnected || ui.screen !== 'study' || e.target.closest?.('input, textarea')) return;
+  // A retained card still has this document listener while a full entry owns the keys.
+  if (e.defaultPrevented || !ctx?.root?.isConnected || ui.screen !== 'study'
+    || ctx.root.closest('[inert], [aria-hidden="true"], [hidden]')
+    || (ctx.host && document.querySelector('#sheet, #stroke-page'))
+    || e.target.closest?.('input, textarea')) return;
   // an open slip (the host's) or popover takes the keys: Escape closes it, and nothing grades behind it
   const slip = !!ctx.host && safely(() => !!ctx.host.slipOpen?.(), false);
   if (slip || ui.pop) {

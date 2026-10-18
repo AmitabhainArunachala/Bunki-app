@@ -44,14 +44,10 @@
  *                         itself does not, and the look-up field's hint fits inside the field.
  *                         Control: 7ef0e985, whose phone chip bar and today's six scrolled sideways
  *                         with a chip and a card cut mid-word at the edge.
- *   P1 tip in the page  — (glance pass; reader lane 2026-10-02) at 1368 and 390, on a first visit, the
- *                         one-time hint says, in one plain line, "Tap any word for its meaning." (round 4,
- *                         John T4: the explanation was "too verbose"). It is a note in the page's flow
- *                         (never fixed, sticky or absolute) that ends above the article's first word,
- *                         and at four scroll depths no on-screen word is covered by it. The first word
- *                         that opens its popup makes it disappear without moving the text, and it is
- *                         remembered, so the next visit opens without it; its × removes it at once and
- *                         for good. Control: 3166ded3, whose tip taught the three-tap ladder and stayed.
+ *   P1 word demonstration — G3 replaces the permanent tip with one silent, text-free word stage on
+ *                         a genuinely fresh record. It creates no lookup/review work, does not replay
+ *                         after navigation/reload, and a saved-history record suppresses it even without
+ *                         the device-only seen key. Both 390 and 1368 are exercised.
  *   W1 ダマスカス saves  — (glance pass; reader lane 2026-10-02) at 1368 and 390, the word popup for
  *                         ダマスカス (Damascus, the fixture article's first word, read だますかす by the
  *                         article and ダマスカス by the dictionary: one reading in two scripts) offers a live
@@ -65,14 +61,9 @@
  *                         offer; saved in 全項目 first, the popup's Save is live and pressed ("Saved ✓")
  *                         with no held reason and no "open that card". Control: 8dea3c2e, where the quick
  *                         look kept だますかす as the card's reading and 全項目 called it "another reading".
- *   G1 one tap, the meaning — (reader lane 2026-10-02, John #8/#11) at 1368 and 390, ONE tap on 郊外 opens
- *                         the popup with the word, its reading こうがい, its meaning "suburb", a filled
- *                         Save ▾ and the band as the door into the full entry, inside the screen; nothing is
- *                         written under the word.
- *                         A tap on another word moves the popup (N2: waited for, up to 5 s, not a fixed
- *                         250 ms: that word's popup comes when the full dictionary first answers); Escape
- *                         puts it away and gives focus back to the word. Control: 3166ded3, whose first tap
- *                         showed only the reading.
+ *   G1 stage meaning   — G3's known on-touch word reveals its reading, then opens the stage with
+ *                         its meaning, Save and full-entry band. Switching words yields exactly one stage;
+ *                         Escape closes it and restores focus. verify-word-grammar pins every rung.
  *   G2 menu → one card  — (John #11 "right click and choose save") a right-click on 郊外 opens the word menu
  *                         at the pointer: Save · Save the sentence · Full entry · Ask the tutor about
  *                         this sentence · Copy. Save makes exactly one 郊外 card carrying its sentence
@@ -175,6 +166,13 @@ const site = resolveCorridorSite(), evidence = resolveCorridorEvidence();
 const manifest = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), 'utf8'));
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
 assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
+const browserVersions = {};
+const g3Only = process.argv.includes('--g3-only');
+const spacingOnly = process.argv.includes('--spacing-only');
+const fixesOnly = process.argv.includes('--design-fixes-only');
+assert([g3Only, spacingOnly, fixesOnly].filter(Boolean).length <= 1, 'Choose one explicit narrow design schedule');
+const verifierSha256 = createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex');
+const DEMO_KEY = 'kairo-word-ladder-demo-v1';
 const withControl = process.argv.includes('--control');
 
 const ARTICLE = 'global-voices:2026-09-28-65726'; // 「ダマスカス 郊外 ジャラマナ」, 「正 反対」, 「「 連帯 の 畑 」」
@@ -232,7 +230,9 @@ const measureGaps = (count) => {
     }
     if (!rects.length) continue;
     probe.textContent = base;
-    const excess = word.getBoundingClientRect().width - probe.getBoundingClientRect().width;
+    // Native prose may wrap within one token. Its union spans the empty
+    // distance between line ends; only the actual fragment widths carry ink.
+    const excess = [...word.getClientRects()].reduce((sum, rect) => sum + rect.width, 0) - probe.getBoundingClientRect().width;
     boxes.push({ text: base, index: Number(tok.dataset.index), first: rects[0], last: rects.at(-1), excess });
   }
   probe.remove();
@@ -300,7 +300,7 @@ const measureReaderMotion = () => {
   let transitions = 0, animations = 0;
   const nodes = [...document.querySelectorAll('#app, #app *, #mini, #mini *, #reader-word-menu, #reader-word-menu *, #reader-toast, #reader-toast *, #vocabulary-list-popover, #vocabulary-list-popover *')];
   const groups = { topBar: '#app > .chrome button', tabBar: '#primary-tabs .primary-tab', titleCard: '.reader-card button, .reader-card summary',
-    bookmark: '#reader-place-save', playBar: '.listen-row', words: '#reader button', finished: '#read-fin', settings: '.dials .seg button',
+    bookmark: '#reader-place-save', playBar: '.listen-row', words: '#reader .tok[data-prose-label]', finished: '#read-fin', settings: '.dials .seg button',
     menu: '#reader-word-menu', popup: '#mini button', toast: '#reader-toast', listAdd: '#vocabulary-list-create' };
   const covered = Object.fromEntries(Object.entries(groups).map(([group, selector]) => [group, nodes.filter((node) => node.matches(selector)).length]));
   for (const node of nodes) for (const pseudo of [null, '::before', '::after']) {
@@ -353,12 +353,36 @@ const contrastOf = (selector) => {
   return Math.round(((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)) * 100) / 100;
 };
 
-async function tapToken(page, index) {
+async function focusToken(page, index) {
   const tok = page.locator(`#reader .tok[data-index="${index}"]`);
-  await tok.evaluate((node) => node.scrollIntoView({ block: 'center' }));
+  const at = await tok.evaluate((node) => [...node.closest('[data-prose-roving]').querySelectorAll('.tok[data-para]')].indexOf(node));
+  assert(at >= 0, `token ${index} has no paragraph rover`);
+  await tok.locator('xpath=ancestor::*[@data-prose-roving][1]').focus();
+  await page.keyboard.press('Home');
+  for (let i = 0; i < at; i++) await page.keyboard.press('ArrowRight');
+  assert.equal(await page.evaluate(() => document.activeElement?.dataset.index), String(index), 'paragraph rover selected the wrong word');
+}
+
+async function tapToken(page, index, { scroll = true } = {}) {
+  const tok = page.locator(`#reader .tok[data-index="${index}"]`);
+  if (scroll) await tok.evaluate((node) => node.scrollIntoView({ block: 'center' }));
   const box = await tok.evaluate((node) => { const r = node.getClientRects()[0]; return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
   await page.mouse.click(box.x, box.y);
-  await page.waitForTimeout(250);
+  // Lookup-only words may still be resolving their dictionary index after
+  // 250 ms. Observe this activation on the exact node; never add a retry tap.
+  const activated = await tok.elementHandle();
+  try {
+    await page.waitForFunction((node) => node?.isConnected &&
+      (node.dataset.ladderRung === 'reading' ||
+        (node.dataset.ladderRung === 'stage' && !!document.querySelector('#mini'))), activated, { timeout: 5000 });
+  } finally { await activated?.dispose(); }
+  if (!await page.locator('#mini').count()) {
+    const revealed = await tok.evaluate((node) => node.dataset.ladderRung === 'reading');
+    assert(revealed, `token ${index}: first activation produced neither the reading rung nor a stage`);
+    await tok.click();
+    await page.waitForSelector('#mini');
+    await page.waitForTimeout(250);
+  }
 }
 
 /** The popup's painted box and which of its views is open. */
@@ -380,25 +404,40 @@ const popupFocus = (page) => page.evaluate(() => {
 try {
   for (const engine of engines) {
     const browser = await { chromium, webkit }[engine].launch({ headless: true });
-    const context = async (viewport, init) => {
+    browserVersions[engine] = browser.version();
+    console.log(`${engine} ${browserVersions[engine]}`);
+    const context = async (viewport, init, { demo = false } = {}) => {
       const ctx = await browser.newContext({ viewport, reducedMotion: 'reduce', serviceWorkers: 'block' });
       await silenceBrowserAudio(ctx);
+      if (!demo) await ctx.addInitScript((key) => localStorage.setItem(key, '1'), DEMO_KEY);
       if (init) await ctx.addInitScript(init);
       await ctx.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
       const page = await ctx.newPage();
       page.setDefaultTimeout(15000);
       return { ctx, page };
     };
-    const run = async (name, viewport, body, init) => {
-      const { ctx, page } = await context(viewport, init);
+    const run = async (name, viewport, body, init, options) => {
+      if (g3Only && !/^(P1-fresh-word-demo-|P1-history-only-no-demo$|G1-stage-meaning-|G4-keyboard-menu$|K1-keyboard-roving$)/u.test(name)) return;
+      if (spacingOnly && !/^R1-flush-tokens-(1368|390)$/u.test(name)) return;
+      if (fixesOnly && !/^(R1-flush-tokens-(1368|390)|W2-one-word-one-card-reverse|G6-sentence-below-seat-390|G8-reader-popup-motion-(390|320))$/u.test(name)) return;
+      const { ctx, page } = await context(viewport, init, options);
+      const pageErrors = [], pageErrorDetails = [], networkEvents = [];
+      const traceRequest = (event, request) => {
+        if (/\/dict-v2\//u.test(request.url())) networkEvents.push({ event, phase: page.__verifierPhase || 'walk', url: request.url(), failure: request.failure()?.errorText || null });
+      };
+      page.on('request', (request) => traceRequest('request', request));
+      page.on('requestfinished', (request) => traceRequest('finished', request));
+      page.on('requestfailed', (request) => traceRequest('failed', request));
+      page.on('pageerror', (error) => { pageErrors.push(error.message); pageErrorDetails.push({ phase: page.__verifierPhase || 'walk', message: error.message }); });
       try {
         const observations = await body(page);
+        assert.deepEqual(pageErrors, [], 'unfiltered browser page errors');
         results.push({ engine, name, passed: true, observations });
         console.log(`PASS ${engine}/${name} ${JSON.stringify(observations)}`);
       } catch (error) {
         const screenshot = resolve(evidence, `${engine}-${name}.png`);
         await page.screenshot({ path: screenshot, animations: 'disabled' }).catch(() => {});
-        results.push({ engine, name, passed: false, error: String(error.message || error), screenshot });
+        results.push({ engine, name, passed: false, error: String(error.message || error), pageErrorDetails, networkEvents, screenshot });
         console.log(`FAIL ${engine}/${name}: ${String(error.message || error).split('\n')[0]}`);
       } finally { await ctx.close(); }
     };
@@ -406,6 +445,7 @@ try {
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
       await run(`R1-flush-tokens-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
+        if (withControl) await page.addStyleTag({ content: '#reader .tok[data-index="1"] .tok-word { padding-inline-end: 8px !important; }' });
         const resting = await page.evaluate(measureGaps, 220);
         assert(resting.tokens > 100, `measured only ${resting.tokens} tokens`);
         assert.equal(resting.strayWhitespace, 0, 'whitespace text nodes stand between reader tokens');
@@ -745,58 +785,101 @@ try {
     }
 
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
-      await run(`P1-tip-in-the-page-${label}`, viewport, async (page) => {
+      await run(`P1-fresh-word-demo-${label}`, viewport, async (page) => {
+        page.__verifierPhase = 'fresh shelf';
+        await open(page);
+        const learning = (record) => Object.fromEntries(['taken', 'srs', 'obslog', 'revlog', 'lists', 'teacherContexts']
+          .map((key) => [key, record[key] ?? null]));
+        const before = learning(await readAppRecord(page));
+        page.__verifierPhase = 'open article';
         await openArticle(page, ARTICLE);
-        const tip = await page.evaluate(() => {
-          const node = document.getElementById('reader-tip');
-          if (!node) return null;
-          const first = document.querySelector('#reader .tok').getBoundingClientRect();
-          return { position: getComputedStyle(node).position, bottom: Math.round(node.getBoundingClientRect().bottom), firstTop: Math.round(first.top),
-            text: node.innerText.trim() };
-        });
-        assert(tip, 'no first-visit tip on a first visit');
-        assert.equal(tip.text, 'Tap any word for its meaning.', 'the hint is not the plain wording');
-        assert(['static', 'relative'].includes(tip.position), `the tip is ${tip.position}, not part of the page`);
-        assert(tip.bottom <= tip.firstTop, `the tip ends at ${tip.bottom}px, below the first word's top ${tip.firstTop}px`);
-        const covered = [];
-        for (const depth of [0, 300, 700, 1200]) {
-          await page.evaluate((y) => window.scrollTo(0, y), depth);
-          await page.waitForTimeout(120);
-          covered.push(...await page.evaluate((y) => [...document.querySelectorAll('#reader .tok')].flatMap((t) => {
-            const r = t.getClientRects()[0];
-            if (!r || r.bottom <= 0 || r.top >= innerHeight) return [];
-            const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-            return hit?.closest('#reader-tip') ? [`${t.textContent}@${y}`] : [];
-          }), depth));
-        }
-        assert.equal(covered.length, 0, `words covered by the tip: ${covered.slice(0, 5).join(', ')}`);
-        await page.evaluate(() => window.scrollTo(0, 0));
-        // the word's distance below the tip: the header may change height when a word is chosen
-        // (that is the header's business); the tip must neither leave nor move the text
-        const gap = () => {
-          const t = document.getElementById('reader-tip');
-          const w = document.querySelector('#reader .tok[data-index="1"]').getBoundingClientRect();
-          return t ? Math.round(w.top - t.getBoundingClientRect().bottom) : null;
-        };
-        const before = await page.evaluate(gap);
+        await page.locator('#mini[data-demo="true"] .mini-word').waitFor();
+        const demonstration = await page.evaluate(() => ({
+          word: document.querySelector('#mini[data-demo="true"] .mini-word')?.textContent.trim(),
+          stages: document.querySelectorAll('#mini').length,
+          tip: document.querySelectorAll('#reader-tip').length,
+          instructions: /Tap any word for its meaning\./u.test(document.body.innerText),
+          seen: localStorage.getItem('kairo-word-ladder-demo-v1'),
+          audio: window.__g3DemoAudio,
+        }));
+        assert(demonstration.word && demonstration.stages === 1, `fresh demo did not choose one real word: ${JSON.stringify(demonstration)}`);
+        assert(!demonstration.tip && !demonstration.instructions, 'the permanent reader tip remains');
+        assert.equal(demonstration.seen, '1', 'demonstration did not remember its device-only seen mark');
+        assert.equal(demonstration.audio, 0, 'the demonstration played audio');
+        await page.waitForTimeout(800);
+        assert.deepEqual(learning(await readAppRecord(page)), before, 'the demonstration created learner history or review work');
+        await page.keyboard.press('Escape');
+        page.__verifierPhase = 'navigation after demo';
+        await openArticle(page, ARTICLE);
+        await page.waitForTimeout(1000);
+        assert.equal(await page.locator('#mini[data-demo="true"], #reader-tip').count(), 0, 'demonstration/tip replayed after navigation');
+        page.__verifierPhase = 'reload after demo';
+        await page.reload();
+        await page.waitForFunction(() => document.body.dataset.ready === '1');
+        await page.waitForTimeout(1000);
+        assert.equal(await page.locator('#mini[data-demo="true"], #reader-tip').count(), 0, 'demonstration/tip replayed after reload');
+        page.__verifierPhase = 'lookup-only setup';
+        // A lookup alone is history too: no saved card is needed to suppress the demo.
+        await openArticle(page, ARTICLE);
+        const beforeLookup = await readAppRecord(page);
+        page.__verifierPhase = 'deliberate lookup';
         await tapToken(page, 1);
-        const after = { gap: await page.evaluate(gap), remembered: await page.evaluate(() => localStorage.getItem('kairo-tip-reader-v1')),
-          popup: await page.locator('#mini').count(),
-          visible: await page.evaluate(() => { const t = document.getElementById('reader-tip'); return !!t && getComputedStyle(t).visibility !== 'hidden' && Number(getComputedStyle(t).opacity) > 0.01; }) };
-        assert.equal(after.popup, 1, 'the first tap opened no popup');
-        assert(after.gap !== null && Math.abs(after.gap - before) <= 1, `the first tap moved the text under the tip: ${JSON.stringify({ before, ...after })}`);
-        assert(!after.visible, 'the hint still shows after the first successful tap');
-        assert.equal(after.remembered, '1', 'choosing a word did not remember the tip as seen');
+        const looked = await waitForAppRecord(page, (r) => r.obslog.length > beforeLookup.obslog.length, { description: 'lookup-only history' });
+        assert.equal(looked.taken.length, 0, 'lookup-only fixture accidentally saved a card');
+        page.__verifierPhase = 'navigate after lookup';
+        await page.evaluate((key) => localStorage.removeItem(key), DEMO_KEY);
         await openArticle(page, ARTICLE);
-        assert.equal(await page.locator('#reader-tip').count(), 0, 'the tip came back on the next visit');
-        await page.evaluate(() => localStorage.removeItem('kairo-tip-reader-v1'));
-        await openArticle(page, THREE_PARAS);
-        await page.locator('#reader-tip .reader-tip-close').click();
-        const dismissed = await page.evaluate((key) => ({ tip: !!document.getElementById('reader-tip'), remembered: localStorage.getItem(key) }), 'kairo-tip-reader-v1');
-        assert(!dismissed.tip && dismissed.remembered === '1', `the × did not dismiss and remember the tip: ${JSON.stringify(dismissed)}`);
-        return { position: tip.position, gapAboveText: tip.firstTop - tip.bottom, text: tip.text };
-      });
+        await page.waitForTimeout(1000);
+        assert.equal(await page.locator('#mini[data-demo="true"]').count(), 0, 'lookup-only history received a demonstration');
+        assert.deepEqual(learning(await readAppRecord(page)), learning(looked), 'suppressed lookup-history demo changed learning roots');
+        page.__verifierPhase = 'saved-history setup';
+        // Establish real saved history through its UI, then remove only the device mark. The
+        // durable record, not this mark, must prevent teaching an existing learner again.
+        await openArticle(page, ARTICLE);
+        await tapToken(page, 1);
+        await page.locator('#mini #mini-take:not([disabled])').click();
+        page.__verifierPhase = 'save history';
+        const saved = await waitForAppRecord(page, (r) => r.taken.some((item) => item.t === 'word' && item.id === '郊外'),
+          { description: 'history fixture saved through the real stage' });
+        page.__verifierPhase = 'navigate after Save';
+        await page.evaluate((key) => localStorage.removeItem(key), DEMO_KEY);
+        await openArticle(page, ARTICLE);
+        await page.waitForTimeout(1000);
+        assert.equal(await page.locator('#mini[data-demo="true"], #reader-tip').count(), 0, 'a learner with saved history received the demonstration');
+        assert.deepEqual(learning(await readAppRecord(page)), learning(saved), 'suppressed demonstration changed learner history');
+        return { demonstration, navigationReplay: false, reloadReplay: false, historyReplay: false, lookupHistoryReplay: false };
+      }, () => {
+        window.__g3DemoAudio = 0;
+        const play = window.HTMLMediaElement.prototype.play;
+        window.HTMLMediaElement.prototype.play = function (...args) { window.__g3DemoAudio++; return play.apply(this, args); };
+        if (window.speechSynthesis) {
+          const speak = window.speechSynthesis.speak.bind(window.speechSynthesis);
+          window.speechSynthesis.speak = (...args) => { window.__g3DemoAudio++; return speak(...args); };
+        }
+      }, { demo: true });
     }
+
+    await run('P1-history-only-no-demo', PHONE, async (page) => {
+      await open(page);
+      const before = await readAppRecord(page);
+      assert.equal(before.readerPos?.['aozora:049966-1'], 120, 'real migration must retain the history-only position fixture');
+      assert.equal(before.taken.length, 0, 'history-only fixture has no saved card');
+      assert.equal((before.obslog || []).length, 0, 'history-only fixture has no lookup');
+      assert.equal(await page.evaluate(key => localStorage.getItem(key), DEMO_KEY), null, 'no device seen key may suppress this fixture');
+      await openArticle(page, ARTICLE); await page.waitForTimeout(1200);
+      assert.equal(await page.locator('#mini[data-demo="true"], #reader-tip').count(), 0, 'existing reader-position history must suppress the demonstration');
+      const after = await readAppRecord(page);
+      for (const key of ['taken', 'srs', 'obslog', 'revlog', 'lists', 'teacherContexts']) assert.deepEqual(after[key], before[key], `suppressed demonstration changed ${key}`);
+      assert.equal(after.readerPos?.['aozora:049966-1'], 120, 'opening another article lost existing reading position');
+      return { savedCards: 0, lookups: 0, priorArticlePosition: 120, demonstration: false };
+    }, () => {
+      // Migration input only. The app installs and reads its normal native record;
+      // the verifier never writes the active database or replaces a state reducer.
+      if (!localStorage.getItem('g3-history-fixture-installed')) {
+        localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1, taken: [], srs: {}, readerPos: { 'aozora:049966-1': 120 } }));
+        localStorage.setItem('g3-history-fixture-installed', '1');
+      }
+    }, { demo: true });
 
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
       await run(`W1-damascus-can-be-saved-${label}`, viewport, async (page) => {
@@ -860,8 +943,7 @@ try {
       await page.waitForFunction(() => document.querySelector('#sheet #sheet-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
       await page.locator(await entryCloseSelector(page)).click();
       await page.waitForFunction(() => !document.querySelector('#sheet'), null, { timeout: 5_000 });
-      await page.locator('#reader .tok[data-index="0"]').click();
-      await page.waitForSelector('#mini #mini-take');
+      await page.locator('#mini .mini-word').waitFor(); // G3: Back from a stage-origin page restores that stage.
       const quick = await page.evaluate(() => {
         const seal = document.querySelector('#mini #mini-take');
         return { pressed: seal.getAttribute('aria-pressed'), disabled: seal.disabled, held: seal.classList.contains('reader-capture-held'),
@@ -887,27 +969,20 @@ try {
     });
     const cardsFor = (record, id) => record.taken.filter((t) => t.t === 'word' && t.id === id);
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
-      await run(`G1-one-tap-meaning-${label}`, viewport, async (page) => {
+      await run(`G1-stage-meaning-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
         await tapToken(page, SUBURB);
         const one = await popupState(page);
-        assert(one, 'one tap opened no popup');
-        assert.deepEqual([one.word, one.reading, one.gloss], ['郊外', 'こうがい', 'suburb'], `one tap does not show the word, reading and meaning: ${JSON.stringify(one)}`);
+        assert(one, 'reading → stage opened no popup');
+        assert.deepEqual([one.word, one.reading, one.gloss], ['郊外', 'こうがい', 'suburb'], `the stage does not show the word, reading and meaning: ${JSON.stringify(one)}`);
         assert(one.save?.label === 'Save' && !one.save.disabled && one.save.filled, `no filled Save: ${JSON.stringify(one.save)}`);
         assert(one.door?.name === 'Open the full entry' && one.door.chevron && !one.door.entryButton, `the band is not the door into the full entry: ${JSON.stringify(one.door)}`);
         assert(one.inside && one.underWord === 0, `the popup is off screen, or English was written under the word: ${JSON.stringify(one)}`);
         await tapToken(page, 2);
-        // N2 (the lead, on Grok 0036 and N2/verify-1/TABLE.md) · ジャラマナ is the first word the core lacks: its popup comes
-        // when the full dictionary first answers, about 300 ms after the tap on both builds (every WebKit sample over the
-        // old fixed 250 ms). The check waits for the popup to move, up to 5 s, then asserts exactly as before.
-        await page.waitForFunction(() => {
-          const word = document.querySelector('#mini .mini-word')?.textContent;
-          return document.querySelectorAll('#mini').length === 1 && !!word && word !== '郊外';
-        }, null, { timeout: 5_000 }).catch(() => {});
         const moved = await page.evaluate(() => ({ count: document.querySelectorAll('#mini').length, word: document.querySelector('#mini .mini-word')?.textContent }));
         const third = await page.evaluate(() => document.querySelector('#reader .tok[data-index="2"] .tok-word')?.textContent.replace(/\s/gu, ''));
         assert(moved.count === 1 && moved.word && moved.word !== '郊外' && third.includes(moved.word.slice(0, 1)), `another word did not move the popup: ${JSON.stringify({ moved, third })}`);
-        await page.locator('#reader .tok[data-index="2"]').focus();
+        await focusToken(page, 2);
         await page.keyboard.press('Escape');
         const closed = await page.evaluate(() => ({ mini: !!document.getElementById('mini'), focus: document.activeElement?.dataset.index }));
         assert(!closed.mini && closed.focus === '2', `Escape did not put the popup away and keep the word: ${JSON.stringify(closed)}`);
@@ -986,7 +1061,7 @@ try {
     await run('G4-keyboard-menu', DESK, async (page) => {
       await openArticle(page, ARTICLE);
       const word = page.locator(`#reader .tok[data-index="${SUBURB}"]`);
-      await word.focus();
+      await focusToken(page, SUBURB);
       await page.keyboard.press('Shift+F10');
       await page.waitForSelector('#reader-word-menu');
       const first = await page.evaluate(() => document.activeElement?.dataset.menuAction);
@@ -999,6 +1074,9 @@ try {
       const byKey = await page.evaluate(() => document.activeElement?.closest('#reader-word-menu') ? document.activeElement.dataset.menuAction : null);
       assert.equal(byKey, 'save-word', 'the ContextMenu key did not open the menu');
       await page.keyboard.press('Escape');
+      await page.keyboard.press('Enter');
+      const reveal = await word.evaluate((node) => node.dataset.ladderRung === 'reading');
+      assert(reveal && await page.locator('#mini').count() === 0, 'first Enter did not stop at the reading rung');
       await page.keyboard.press('Enter');
       await page.waitForSelector('#mini');
       const popup = await page.evaluate(() => document.activeElement?.id);
@@ -1170,8 +1248,14 @@ try {
     });
 
     await run('G6-sentence-below-seat-390', PHONE, async (page) => {
-      const pageErrors = [];
-      page.on('pageerror', (error) => pageErrors.push(error.message));
+      const pageErrors = [], pageErrorDetails = [], networkEvents = [];
+      const traceRequest = (event, request) => {
+        if (/\/dict-v2\//u.test(request.url())) networkEvents.push({ event, phase: page.__verifierPhase || 'walk', url: request.url(), failure: request.failure()?.errorText || null });
+      };
+      page.on('request', (request) => traceRequest('request', request));
+      page.on('requestfinished', (request) => traceRequest('finished', request));
+      page.on('requestfailed', (request) => traceRequest('failed', request));
+      page.on('pageerror', (error) => { pageErrors.push(error.message); pageErrorDetails.push({ phase: page.__verifierPhase || 'walk', message: error.message }); });
       await open(page);
       await page.locator('#shelf-body [data-passage="aozora:046605"] .shelf-open').first().click();
       const token = page.locator('#reader .tok[data-index="816"]');
@@ -1179,7 +1263,7 @@ try {
       await page.evaluate(() => document.fonts.ready);
       await page.waitForTimeout(500);
       await page.evaluate(() => window.scrollTo(0, 4716));
-      await token.click();
+      await tapToken(page, 816, { scroll: false }); // this fixture deliberately pins article scroll at 4716
       await page.waitForSelector('#mini #mini-sentence-open');
       await page.waitForTimeout(400);
       const seat = () => page.evaluate(() => {
@@ -1427,7 +1511,7 @@ try {
         assert(settings.covered.settings > 0, `motion check did not observe the text settings: ${JSON.stringify(settings.covered)}`);
         assert.deepEqual(settings.violations, [], 'The text settings may animate only transform and opacity');
         await page.locator('#dials-toggle').click();
-        await page.locator(`#reader .tok[data-index="${SUBURB}"]`).focus();
+        await focusToken(page, SUBURB);
         await page.keyboard.press('Shift+F10');
         await page.waitForSelector('#reader-word-menu');
         const menu = await page.evaluate(measureReaderMotion);
@@ -1492,8 +1576,12 @@ try {
         await page.keyboard.press('Tab');
       }
       assert(presses <= paragraphs + 3, `${presses} Tab presses from the title to 読み終えた for ${paragraphs} paragraphs`);
-      const first = page.locator('#reader button.tok[tabindex="0"]').first();
+      const first = page.locator('#reader [data-reader-prose][tabindex="0"]').first();
+      const idle = await page.evaluate(() => ({ paragraphs: document.querySelectorAll('#reader [data-reader-prose][tabindex="0"]').length,
+        buttons: document.querySelectorAll('#reader button.tok, #reader .tok[role="button"]').length }));
+      assert.deepEqual(idle, { paragraphs, buttons: 0 }, 'idle prose must have one paragraph stop and no word buttons');
       await first.focus();
+      await page.keyboard.press('Home');
       const walk = await page.evaluate(() => {
         const a = document.activeElement;
         return { index: a.dataset.index, name: a.getAttribute('aria-label'), word: a.querySelector('.tok-word')?.textContent.replace(/\s/gu, '') ?? '' };
@@ -1541,11 +1629,13 @@ try {
   await host.close();
   const receipt = {
     artifactSha256: manifest.artifactSha256, gitSha: manifest.gitSha, sourceDirty: manifest.sourceDirty,
-    verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
-    control: withControl ? 'rt and ruby::before forced to 0.46em' : null,
-    scope: 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the first-visit tip in the page, ダマスカス savable, one word one card; reader lane: one tap shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row and phone seating, sentence Save without activation, the version switch with 44px hit boxes, transform/opacity-only motion across the reader room and the popup Save and list path, the same one path in the galaxy, return from Practice on lookup and content words with motion enabled, a public below-word sentence seat with unchanged anchor and article scroll, and Japanese punctuation line breaks with source text preserved',
+    verifierSha256,
+    control: withControl ? (spacingOnly ? '8px padding after the actual 郊外 token' : '8px token padding; rt and ruby::before forced to 0.46em') : null,
+    scope: fixesOnly ? 'R1 fragment spacing, W2 saved page return, G6 pinned below seat, and G8 motion coverage only; other design gates not run' : spacingOnly ? 'R1 actual inline-fragment widths and same-line printed-token gaps at 1368/390 only; no other design gates' : 'Design pass steps 1–2: reader token flushness, readability, first screen; shelf wording, first story and text-first cards; no F1 audio; glance pass: the study tools behind one button, a one-line title block, no clipped row at 320/390/1368, the silent fresh-record word demonstration with no permanent tip, ダマスカス savable, one word one card; reader lane: reading then stage shows the meaning, the word menu saves one card, Save is one tap with Undo, the menu by keyboard, the lists popover, the sentence row and phone seating, sentence Save without activation, the version switch with 44px hit boxes, transform/opacity-only motion across the reader room and the popup Save and list path, the same one path in the galaxy, return from Practice on lookup and content words with motion enabled, a public below-word sentence seat with unchanged anchor and article scroll, and Japanese punctuation line breaks with source text preserved',
+    browserVersions,
+    selectedScope: fixesOnly ? 'Six exact changed or diagnosed design cases per engine' : spacingOnly ? 'R1 spacing only, both viewport sizes' : g3Only ? 'G3 demonstration, stage, keyboard and prose; older design gates not run' : 'all design gates',
     results,
-    passed: results.length === engines.length * 49 && results.every((row) => row.passed),
+    passed: results.length === engines.length * (fixesOnly ? 6 : spacingOnly ? 2 : g3Only ? 7 : 50) && results.every((row) => row.passed),
   };
   writeFileSync(resolve(evidence, 'design-reader-shelf.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(`${results.filter((r) => r.passed).length}/${results.length} passed · evidence ${evidence}`);

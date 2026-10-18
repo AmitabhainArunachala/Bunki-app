@@ -95,6 +95,9 @@ function defineRows() {
     'capturePending', 'toggleTaken', 'replaceWordCard', 'wordCaptureState', 'wordCaptureReadingMismatch', 'wordCaptureHeldText', 'showMini',
     // G1 (2026-10-16): a slip stands only beside a word on the top layer, and a slip leaving into its page is not standing
     'slipAllowed', 'standingSlip',
+    // G3 (2026-10-17): the slip is one rung of an occurrence's ladder; the actual mini reads the visit it stands for,
+    // and the bar's Save follows the slip that now stands
+    'ladderVisit', 'ladderRefreshing', 'syncChromeKeep',
     // glance pass 2026-10-01: the reading names an entry's kana form across scripts
     'KANA_VOWEL_ROWS', 'kanaReadingKey', 'entryKanaIndex', 'entryCueReading',
     // Save is one tap (reader lane, 2026-10-02): the seal itself saves, and a press on "Saved ✓" is the mini's

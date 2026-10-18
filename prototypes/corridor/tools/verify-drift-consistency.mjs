@@ -15,13 +15,14 @@
  *
  * Battery per word (charter §2, v1 slice — the operator-reported cases):
  *   tap            → unfolds + blooms (C1, C2)   [kana words included]
- *   tap again      → glosses (C1)
+ *   tap again      → shared stage; then page, Back → stage, Escape → bare (C1)
  *   slow drag →    → word MOVES and SURVIVES (C3) — never graded
  *   pinch over it  → constellation survives, camera zooms (C4, C5)
  *   water tap      → deliberate release works (C5)
  *   fast flick →   → grade fires (the flick IS the judgment gesture)
  *   pointercancel  → next gesture still clean (C6)
  */
+import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -187,7 +188,7 @@ const file = async (word, gesture, expected, outcome, detail, extra = {}) => {
 
 const boot = async (theme = '北斎', fuzzSeed = null) => {
   const seedQuery = Number.isSafeInteger(fuzzSeed) ? `&__fuzzSeed=${fuzzSeed}` : '';
-  await page.goto(`${base}/index.html?entry=drift${seedQuery}`);
+  await page.goto(`${base}/index.html?entry=drift&dials=0,1,0${seedQuery}`);
   await page.waitForFunction('document.body.dataset.ready === "1"', null, { timeout: 30000 });
   await page.waitForSelector('#drift-layer[data-record-state="active"]');
   await page.waitForTimeout(2100);
@@ -263,6 +264,9 @@ const wordProbe = (label, requiredClass = null) => `(() => {
       pe: el.style.pointerEvents || '',
       unfolded: el.classList.contains('unfolded') || el.classList.contains('glossed'),
       glossed: el.classList.contains('glossed'),
+      rung: el.dataset.ladderRung || null,
+      reading: el.querySelector('.yomi')?.textContent || '',
+      readingVisible: !!el.querySelector('.yomi')?.getClientRects().length && Number(getComputedStyle(el.querySelector('.yomi')).opacity) > 0,
       isCentre: el.classList.contains('bctr'),
     };
   }
@@ -318,9 +322,50 @@ const worldProbe = `(() => ({
   tray: document.getElementById('drift-tray')?.textContent ?? '',
   depthOpen: (document.getElementById('depth')?.textContent ?? '') !== '',
   cardOpen: document.getElementById('card')?.classList.contains('open') ?? false,
-  // the app's slip (the one-hand pass): the word it names, or null — it belongs to a dive's centre, never to the bloom
+  // Hosted stages belong to the exact occurrence in the field or a dive.
   slip: document.getElementById('mini')?.querySelector('.mini-word')?.textContent ?? null,
+  meaning: document.getElementById('mini')?.querySelector('.mini-gloss')?.textContent ?? null,
+  sheet: document.getElementById('sheet')?.dataset.node ?? null,
 }))()`;
+
+// The observed first rung is intentional: kana/absent readings skip reading,
+// while a supplied hidden reading must be shown before meaning. No retry taps.
+const hostedAnswer = (label, node, state) => node.exists &&
+  (node.rung === 'reading' ? node.readingVisible && !state.slip && !state.sheet :
+    node.rung === 'stage' && state.slip === label && !!state.meaning?.trim() && !state.sheet);
+const assertFirstHostedAnswer = (label, before, node, state) => {
+  const kana = value => String(value).replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+  const needsReading = !!before.reading && kana(before.reading) !== kana(label) && !before.readingVisible;
+  assert.equal(node.rung, needsReading ? 'reading' : 'stage', `First hosted answer for ${label}`);
+  assert(hostedAnswer(label, node, state), `Exact hosted reading/meaning for ${label}`);
+};
+const finishHostedVisit = async (label) => {
+  const before = await readAppRecordSnapshot(page);
+  let node = await page.evaluate(wordProbe(label));
+  if (node.rung === 'reading') {
+    const aim = await aimWord(label); assert(aim.aimable, `Reading occurrence ${label} remains reachable`);
+    await tapAt(aim.x, aim.y); await page.locator('#mini').waitFor();
+  }
+  node = await page.evaluate(wordProbe(label));
+  const stage = await page.evaluate(worldProbe);
+  assert.equal(node.rung, 'stage'); assert.equal(stage.slip, label); assert(stage.meaning?.trim());
+  const aim = await aimWord(label); assert(aim.aimable, `Stage occurrence ${label} remains reachable`);
+  await tapAt(aim.x, aim.y); await page.locator('#sheet').waitFor();
+  assert.equal(await page.locator('#mini').count(), 0);
+  assert.equal(await page.locator('#sheet').getAttribute('data-node'), `word:${label}`);
+  await page.locator('#sheet-back').click(); await page.locator('#mini').waitFor();
+  const restored = await page.evaluate(worldProbe);
+  assert.equal(restored.slip, label); assert.equal(restored.meaning, stage.meaning);
+  assert.equal(restored.bloomCentre, stage.bloomCentre); assert.equal(restored.depthOpen, stage.depthOpen);
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#mini,#sheet').count(), 0);
+  assert.equal((await page.evaluate(wordProbe(label))).rung, null);
+  const after = await readAppRecordSnapshot(page);
+  assert(isDeepStrictEqual(after.record.srs, before.record.srs), 'Lookup cannot grade or reschedule a card');
+  assert(isDeepStrictEqual(after.record.taken, before.record.taken), 'Lookup cannot save a word');
+  assert.equal((await page.evaluate(worldProbe)).tray, stage.tray, 'Lookup cannot judge a sky word');
+  return { stage, restored };
+};
 
 const pickOne = (exclude) => page.evaluate(`(() => {
   const done = new Set(${JSON.stringify([...exclude])});
@@ -451,58 +496,22 @@ for (let round = 0; round < N_WORDS; round++) {
   }
   if (!aimed) continue;   // never reached the word: no case, no verdict
 
-  // C1/C2 — tap: unfold + bloom (every word, kana included)
-  await tapAt(at.x, at.y);
-  await page.waitForTimeout(750);
+  // C1/C2 — first hosted answer, then the exact shared page and reversible ladder.
+  const firstBefore = await page.evaluate(wordProbe(word.w));
+  await tapAt(at.x, at.y); await page.waitForTimeout(750);
   let s = await page.evaluate(wordProbe(word.w));
   let w0 = await page.evaluate(worldProbe);
-  if (!s.exists) await file(word, 'tap', 'unfold+bloom', 'vanished', 'word gone after a tap');
-  else if (w0.depthOpen) await file(word, 'tap', 'unfold+bloom', 'misfired', 'single tap dived');
-  else if (!s.unfolded) {
-    const forensic = await page.evaluate(`(() => {
-      const copies = [...document.querySelectorAll('#drift-layer .word')]
-        .filter((n) => (n.querySelector('.base')?.textContent ?? '') === ${JSON.stringify(word.w)})
-        .map((n) => ({ cls: n.className, op: n.style.opacity, pe: n.style.pointerEvents }));
-      const el = document.elementFromPoint(${at.x}, ${at.y});
-      return { copies, under: el ? (el.closest('.word') ? 'word:' + (el.closest('.word').querySelector('.base')?.textContent ?? '') : el.tagName + '#' + el.id) : null,
-               unfoldedNow: [...document.querySelectorAll('#drift-layer .word.unfolded')].map((n) => n.querySelector('.base')?.textContent) };
-    })()`);
-    await file(word, 'tap', 'unfold+bloom', 'dead', `no furigana (op=${at.opacity.toFixed(2)}->${s.opacity.toFixed(2)}) ${JSON.stringify(forensic)}`);
+  try {
+    assertFirstHostedAnswer(word.w, firstBefore, s, w0);
+    assert.equal(w0.bloomCentre, word.w); assert.equal(w0.depthOpen, false);
+    await file(word, 'tap', 'exact reading or skipped-reading stage with the same family centre', 'ok', `rung=${s.rung}; satellites=${w0.sats}`);
+    const visit = await finishHostedVisit(word.w);
+    await file(word, 'tap-again', 'stage → same entry → same stage → bare; no save or grade', 'ok', JSON.stringify(visit));
+  } catch (error) {
+    await file(word, 'tap-again', 'exact hosted ladder with reversible identity and no grade', 'misfired', error.message);
+    throw error;
   }
-  else if (w0.bloomCentre !== word.w) await file(word, 'tap', 'unfold+bloom', 'dead', `no constellation (sats=${w0.sats})`);
-  else if (w0.slip !== null) await file(word, 'tap', 'unfold+bloom', 'misfired', `the app's slip opened over the bloom (slip=${w0.slip})`);
-  else await file(word, 'tap', 'unfold+bloom', 'ok', `${w0.sats} satellites`);
-
-  const bloomAlive = w0.bloomCentre === word.w;
-
-  // C1 — second tap: gloss, still here (the app's slip belongs to the dive's centre, never to the bloom)
-  if (s.exists) {
-    s = await page.evaluate(wordProbe(word.w));
-    // the bloom's assembly easing keeps moving the centre for a beat after the
-    // first tap: confirm the finger is still over the word before the second
-    let aimed2 = false;
-    for (let a = 0; a < 3 && !aimed2; a++) {
-      s = await page.evaluate(wordProbe(word.w));
-      if (!s.exists || !s.onScreen) break;
-      aimed2 = await page.evaluate(`(() => {
-        const el = document.elementFromPoint(${s.x}, ${s.y});
-        const w = el && el.closest ? el.closest('.word') : null;
-        return !!w && (w.querySelector('.base')?.textContent ?? '') === ${JSON.stringify(word.w)};
-      })()`);
-      if (!aimed2) await page.waitForTimeout(180);
-    }
-    if (s.exists && s.onScreen && aimed2) {
-      await tapAt(s.x, s.y);
-      await page.waitForTimeout(500);
-      const s2 = await page.evaluate(wordProbe(word.w));
-      const w2 = await page.evaluate(worldProbe);
-      if (!s2.exists && !w2.depthOpen) await file(word, 'tap-again', 'gloss', 'vanished', '');
-      else if (w2.depthOpen) await file(word, 'tap-again', 'gloss', 'misfired', 'second tap dived (third act came early)');
-      else if (!s2.glossed) await file(word, 'tap-again', 'gloss', 'dead', `no English (op=${s.opacity.toFixed(2)} pe="${s.pe}" unfolded=${s2.unfolded})`);
-      else if (w2.slip !== null) await file(word, 'tap-again', 'gloss', 'misfired', `the app's slip opened over the bloom (slip=${w2.slip})`);
-      else await file(word, 'tap-again', 'gloss', 'ok', '');
-    }
-  }
+  const bloomAlive = (await page.evaluate(worldProbe)).bloomCentre === word.w;
 
   // C4/C5 — pinch over the constellation: camera zooms, bloom survives
   if (bloomAlive) {
@@ -573,31 +582,20 @@ for (let round = 0; round < N_WORDS; round++) {
       else if (!satAfterFlick.exists)
         await file(satWord, 'sat-flick', 'no judgment on satellites', 'vanished', 'satellite gone after a flick');
       else await file(satWord, 'sat-flick', 'no judgment on satellites', 'ok', '');
-      // tap the satellite: it must REVEAL in place, never vanish
-      const sat2 = await aimWord(satPick.w, 'bsat', false);
-      if (sat2.aimable) {
-        await tapAt(sat2.x, sat2.y);
-        await page.waitForTimeout(700);
-        const sat3 = await page.evaluate(wordProbe(satPick.w, 'bsat'));
-        if (!sat3.exists || sat3.opacity < 0.05)
-          await file(satWord, 'sat-tap', 'reveals in place', 'vanished', 'satellite dissolved on first tap');
-        else if (!sat3.unfolded)
-          await file(satWord, 'sat-tap', 'reveals in place', 'dead', 'no reveal');
-        else await file(satWord, 'sat-tap', 'reveals in place', 'ok', '');
-        // tap again: the constellation re-centres on it — the chain walk
-        const sat4 = await aimWord(satPick.w, 'bsat', true);
-        if (sat4.aimable) {
-          await tapAt(sat4.x, sat4.y);
-          await page.waitForTimeout(1100);
-          const w5 = await page.evaluate(worldProbe);
-          const sat5 = await page.evaluate(wordProbe(satPick.w, 'bctr'));
-          if (!sat5.exists)
-            await file(satWord, 'sat-recentre', 'becomes the planet', 'vanished', 'satellite gone on second tap');
-          else if (w5.bloomCentre !== satPick.w && !w5.depthOpen)
-            await file(satWord, 'sat-recentre', 'becomes the planet', 'dead', `centre is ${w5.bloomCentre ?? 'nothing'}`);
-          else await file(satWord, 'sat-recentre', 'becomes the planet', 'ok', `${w5.sats} new satellites`);
-        }
-      }
+      // The first hosted occurrence becomes its family's centre; its next
+      // actions climb reading/stage/page, never a private second-tap dive.
+      const sat2 = await aimWord(satPick.w, 'bsat');
+      if (!sat2.aimable) throw new Error(`Satellite ${satPick.w} is not hit-owned: ${sat2.reason}`);
+      const satBefore = await page.evaluate(wordProbe(satPick.w));
+      await tapAt(sat2.x, sat2.y); await page.waitForTimeout(700);
+      const sat3 = await page.evaluate(wordProbe(satPick.w));
+      const satWorld = await page.evaluate(worldProbe);
+      assertFirstHostedAnswer(satPick.w, satBefore, sat3, satWorld);
+      assert.equal(satWorld.bloomCentre, satPick.w);
+      assert((await page.evaluate(wordProbe(word.w))).exists, 'The prior planet survives the family walk');
+      await file(satWord, 'sat-tap', 'exact first hosted answer; prior planet survives', 'ok', `rung=${sat3.rung}`);
+      await finishHostedVisit(satPick.w);
+      await file(satWord, 'sat-recentre', 'same family centre through page and return', 'ok', `${satWorld.sats} satellites`);
     }
     await settle();
   }
@@ -691,61 +689,22 @@ if (!chainStartWord) {
     }
 
     const previousCentre = centre;
-    const first = await aimWord(satellite.w, 'bsat', false);
-    if (!first.aimable) {
-      await file(
-        { w: satellite.w, kanji: (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
-        'chain-hop',
-        `hop ${hop}/${CHAIN_HOPS} is owned by the intended live satellite`,
-        'detached',
-        first.reason,
-        { state: 'bloom', hop },
-      );
-      break;
-    }
-    await tapAt(first.x, first.y);
-    await page.waitForTimeout(650);
-    const revealed = await page.evaluate(wordProbe(satellite.w, 'bsat'));
+    const first = await aimWord(satellite.w, 'bsat');
+    if (!first.aimable) throw new Error(`Chain satellite ${satellite.w} is not hit-owned: ${first.reason}`);
+    const prior = await page.evaluate(wordProbe(satellite.w));
+    await tapAt(first.x, first.y); await page.waitForTimeout(700);
+    const revealed = await page.evaluate(wordProbe(satellite.w));
     const afterReveal = await page.evaluate(worldProbe);
-    if (!revealed.exists || !revealed.glossed || afterReveal.bloomCentre !== previousCentre) {
-      await file(
-        { w: satellite.w, kanji: (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
-        'chain-hop',
-        `hop ${hop}/${CHAIN_HOPS} reveals in place before re-centring`,
-        !revealed.exists ? 'vanished' : 'misfired',
-        `exists=${revealed.exists}; glossed=${revealed.glossed}; centre=${afterReveal.bloomCentre ?? 'none'}`,
-        { state: 'bloom', hop, coordinates: { x: first.x, y: first.y } },
-      );
-      break;
-    }
-
-    const second = await aimWord(satellite.w, 'bsat', true);
-    if (!second.aimable) {
-      await file(
-        { w: satellite.w, kanji: (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
-        'chain-hop',
-        `hop ${hop}/${CHAIN_HOPS} remains aimable for the second tap`,
-        'detached',
-        second.reason,
-        { state: 'bloom', hop },
-      );
-      break;
-    }
-    await tapAt(second.x, second.y);
-    await page.waitForTimeout(1700);
+    assertFirstHostedAnswer(satellite.w, prior, revealed, afterReveal);
+    await finishHostedVisit(satellite.w);
     const afterRecentre = await page.evaluate(worldProbe);
     const newCentre = await page.evaluate(wordProbe(satellite.w, 'bctr'));
     const oldCentre = await page.evaluate(wordProbe(previousCentre));
-    const hopOk =
-      newCentre.exists &&
-      newCentre.isCentre &&
-      oldCentre.exists &&
-      afterRecentre.bloomCentre === satellite.w &&
-      afterRecentre.sats >= 6;
+    const hopOk = newCentre.exists && newCentre.isCentre && oldCentre.exists &&
+      afterRecentre.bloomCentre === satellite.w && afterRecentre.sats >= 6;
     await file(
       { w: satellite.w, kanji: (satellite.w.match(/[\u4e00-\u9fff]/g) ?? []).length },
-      'chain-hop',
-      `hop ${hop}/${CHAIN_HOPS} makes the satellite the held planet without deleting the prior planet`,
+      'chain-hop', `hop ${hop}/${CHAIN_HOPS} preserves exact family and prior planet through shared page and return`,
       hopOk ? 'ok' : !newCentre.exists || !oldCentre.exists ? 'vanished' : 'detached',
       `centre=${afterRecentre.bloomCentre ?? 'none'}; sats=${afterRecentre.sats}; priorExists=${oldCentre.exists}`,
       { state: 'bloom', hop },
@@ -1171,10 +1130,12 @@ for (const seed of FUZZ_SEEDS) {
         coordinates = { x: revealAim.x, y: revealAim.y, satellite: satellite.w };
         await tapAt(revealAim.x, revealAim.y);
         await page.waitForTimeout(500);
-        const revealed = await page.evaluate(wordProbe(satellite.w, 'bsat'));
+        const revealed = await page.evaluate(wordProbe(satellite.w));
         const afterReveal = await page.evaluate(worldProbe);
-        actionSpecificOk = revealed.exists && revealed.glossed && afterReveal.bloomCentre === centre;
-        actionDetail = `satellite=${satellite.w}; exists=${revealed.exists}; glossed=${revealed.glossed}`;
+        const priorExists = (await page.evaluate(wordProbe(centre))).exists;
+        actionSpecificOk = hostedAnswer(satellite.w, revealed, afterReveal) && afterReveal.bloomCentre === satellite.w && priorExists;
+        actionDetail = `satellite=${satellite.w}; rung=${revealed.rung}; priorExists=${priorExists}`;
+        if (actionSpecificOk) { await finishHostedVisit(satellite.w); centre = satellite.w; }
       }
     } else {
       const water = await waterPoint();

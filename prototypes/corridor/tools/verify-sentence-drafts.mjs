@@ -93,6 +93,7 @@ async function launch(fixture, { offline = false, protectedState = false } = {})
     serviceWorkers: 'allow', acceptDownloads: true, ignoreHTTPSErrors: true,
     ...(fixture.engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
   });
+  await fixture.context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device fixture.
   fixture.browserVersion = fixture.context.browser()?.version();
   await silenceBrowserAudio(fixture.context);
   await fixture.context.tracing.start({ screenshots: true, snapshots: true, sources: true });
@@ -227,16 +228,16 @@ async function practiceFromSource(fixture, source = SOURCE, { savePlace = false 
   assert.equal(await sourceDoor.count(), 1, 'Source has one canonical bookshelf entry');
   await sourceDoor.click();
   const word = page.locator(`#reader .tok[data-index="${source.index}"][data-word="${source.word}"]`);
-  await word.click();
+  await openReaderWordStage(page, word);
   if (savePlace) {
-    // the word's popup floats over the page (reader lane 2026-10-02): a second tap on the word puts it away first
-    await word.click(); await page.waitForFunction(() => !document.getElementById('mini'));
+    // Fold the stage before the separate reading-place action; no new lookup.
+    await page.keyboard.press('Escape'); await page.waitForFunction(() => !document.getElementById('mini'));
+    assert.equal(await word.getAttribute('data-ladder-rung'), null);
     await page.locator('#reader-place-save').click();
     await page.waitForFunction(() => document.getElementById('reader-place-note')?.textContent.includes('is saved'));
     const saved = await readAppRecordSnapshot(page);
     assert.equal(saved.rows.filter(row => row.kind === 'operation').length, 1, 'One ordinary reading-place save supplies the existing actor sequence for local restore');
-    // one tap opens the word's popup again
-    await word.click();
+    await openReaderWordStage(page, word);
   }
   await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
   await page.locator('#sentence-choose-cloze').uncheck(); await page.locator('#sentence-choose-production').check();
@@ -878,4 +879,27 @@ try {
   writeFileSync(join(OUT, 'receipt.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(JSON.stringify({ passed: receipt.passed, failed: receipt.failed, pass: receipt.pass, receipt: join(OUT, 'receipt.json') }));
   if (!receipt.pass) process.exitCode = 1;
+}
+
+// These source-context checks enter through the G3 ladder; the grammar itself is
+// checked separately. A second activation is allowed only after a real reading rung.
+async function openReaderWordStage(page, word) {
+  await word.click();
+  await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
+    // On-touch reader ruby paints through ::before; the native rt stays hidden
+    // to preserve the word's width. Require actual paint from either renderer.
+    await page.waitForFunction(node => [...node.querySelectorAll('ruby')].some(ruby => {
+      const rt = ruby.querySelector('rt');
+      if (!rt?.textContent.trim() || rt.classList.contains('hidden-rt')) return false;
+      const native = getComputedStyle(rt), floating = getComputedStyle(ruby, '::before');
+      return (rt.getClientRects().length > 0 && native.visibility !== 'hidden' && native.display !== 'none' && Number(native.opacity) > 0) ||
+        (ruby.getClientRects().length > 0 && ruby.dataset.r === rt.textContent && floating.content === JSON.stringify(rt.textContent) &&
+          floating.visibility !== 'hidden' && floating.display !== 'none' && Number(floating.opacity) > 0);
+    }), await word.elementHandle(), { timeout: 5000 });
+    await word.click();
+  }
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'stage', 'The exact source word reaches its stage');
 }

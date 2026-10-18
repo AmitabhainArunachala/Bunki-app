@@ -30,14 +30,20 @@ const fixture = Buffer.concat([original, Buffer.from(shim)]);
 const reenable = ['create.disabled = busy || !recordWritable();', 'create.disabled = busy;'];
 assert.equal(original.toString().split(reenable[0]).length, 2, 'The control mutation must target one exact line');
 const reenabled = Buffer.concat([Buffer.from(original.toString().replace(...reenable)), Buffer.from(shim)]);
+// Negative control: a build that declares every kana parenthetical after a kanji an annotation by its shape alone must
+// fail the plain-prose case at its first door.
+const byShape = ['.filter(([open, , inner]) => annotationReadsAs(source, open, annotationKana(inner), tokenReadings, wordStarts))', '.filter(() => true)'];
+assert.equal(original.toString().split(byShape[0]).length, 2, 'The control mutation must target one exact line');
+const shapeOnly = Buffer.concat([Buffer.from(original.toString().replace(...byShape)), Buffer.from(shim)]);
 const controls = [['failed-list-write-is-honest-and-recoverable', 'list-form-reenabled-before-reload', reenabled, /must stay disabled until reload/],
-  ['failed-capture-inside-a-list-is-honest-and-recoverable', 'list-form-reenabled-before-reload-after-capture', reenabled, /A failed native write protects the host until reload/]];
+  ['failed-capture-inside-a-list-is-honest-and-recoverable', 'list-form-reenabled-before-reload-after-capture', reenabled, /A failed native write protects the host until reload/],
+  ['plain-prose-parentheticals-are-annotations-only-when-they-read', 'annotation-by-kana-shape', shapeOnly, /keeps its door/]];
 const sourceFiles = new Map(identity.files.map(file => [file.path, file.sha256]));
 assert.equal(sha(original), sourceFiles.get('corridor.js'));
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
 assert(engines.every(engine => ['chromium', 'webkit'].includes(engine)));
 const host = await startStaticHost({ site, port: 0 });
-const results = [], failures = [];
+const results = [], failures = [], browserVersions = {};
 const state = page => readAppRecordSnapshot(page);
 const targetRows = record => ({ taken: record.taken, srs: record.srs, revlog: record.revlog, deepWords: record.deepWords });
 
@@ -50,7 +56,14 @@ async function openLookup(page, text = '電車') {
     document.body.append(anchor);
     await window.annotationFixture.openJapaneseLookup(anchor, text);
   }, text);
+  await page.locator('#annotation-anchor[data-ladder-rung="reading"] rt').waitFor();
+  assert.equal(await page.locator('#mini').count(), 0, 'The first activation exposes reading only');
+  const shown = await page.locator('#annotation-anchor rt').evaluate(node => ({ text: node.textContent,
+    opacity: Number(getComputedStyle(node).opacity), visibility: getComputedStyle(node).visibility }));
+  assert(shown.text && shown.opacity > 0 && shown.visibility !== 'hidden', 'The first reading must actually paint');
+  await page.evaluate(text => window.annotationFixture.openJapaneseLookup(document.getElementById('annotation-anchor'), text), text);
   await page.locator('#mini').waitFor();
+  assert.equal(await page.locator('#annotation-anchor').getAttribute('data-ladder-rung'), 'stage');
 }
 // Save ▾ (1.3.0; one-hand pass 2026-10-15): the popup has one Save and no list button. On a word not yet saved the
 // press saves it and unfolds its menu (Review · lists · + New list · Copy) inside the card, under the button; on a
@@ -233,18 +246,22 @@ const cases = [
     });
     const word = page.locator('#assistance-fixture [data-lookup-text="電車"]');
     await word.click(); await page.waitForFunction(() => window.annotationGate.calls === 1);
-    assert.equal(await page.locator('#mini').count(), 0, 'No hint may appear while assistance persistence is pending');
+    assert.equal(await page.locator('#mini, #assistance-fixture rt').count(), 0, 'Neither reading nor stage may appear while assistance persistence is pending');
     await page.evaluate(() => window.annotationGate.resolve(false));
     await page.waitForTimeout(50);
-    assert.equal(await page.locator('#mini').count(), 0, 'Rejected assistance cannot reveal a hint');
+    assert.equal(await page.locator('#mini, #assistance-fixture rt').count(), 0, 'Rejected assistance cannot reveal a reading or stage');
     await word.click(); await page.waitForFunction(() => window.annotationGate.calls === 2);
     await page.evaluate(() => {
       const old = document.querySelector('#assistance-fixture [data-lookup-text="電車"]');
       const replacement = old.cloneNode(true); old.replaceWith(replacement);
       window.annotationGate.resolve(true);
     });
-    await page.locator('#mini').waitFor();
-    assert.equal(await page.locator('#mini .mini-reading').textContent(), 'でんしゃ');
+    await page.locator('#assistance-fixture [data-ladder-rung="reading"] rt').waitFor();
+    assert.equal(await page.locator('#mini').count(), 0, 'Approved first help reveals only the reading on the replacement occurrence');
+    assert.equal(await page.locator('#assistance-fixture rt').textContent(), 'でんしゃ');
+    assert.equal(await page.locator('#assistance-fixture rt').evaluate(node => {
+      const style = getComputedStyle(node); return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0;
+    }), true, 'The approved reading actually paints');
   }],
   ['skip-search-stroke-door', async page => {
     await page.locator('#chrome-search').click();
@@ -325,6 +342,52 @@ const cases = [
     assert.equal(observed.normal.nestedControls, 0);
     assert.equal(observed.protectedCount, 0, 'Global enhancement cannot silently add hints to a timed/mock assessment');
   }],
+  // G3 · plain prose has no tokens: a kana parenthetical is its word's reading only when the served dictionary or the kanji
+  // data reads that word so (子供（こども）, 拓 ひら of ひら.く); a katakana word or a grammar mark in parentheses is prose
+  ['plain-prose-parentheticals-are-annotations-only-when-they-read', async page => {
+    const fixture = await page.evaluateHandle(() => {
+      const f = window.annotationFixture;
+      const room = f.S.view; f.S.view = 'shelf';
+      const box = document.createElement('section');
+      box.innerHTML = '<p class="fixture-annotation">子供（こども）が下品(な)要因（ボトルネック）を切り拓（ひら）く。</p>';
+      document.body.append(box);
+      const before = box.textContent;
+      try {
+        f.enhanceJapaneseProse(box);
+        return { box, room, before, pending: [...box.querySelectorAll('[data-lookup-readings-pending]')] };
+      } catch (error) { f.S.view = room; box.remove(); throw error; }
+    });
+    try {
+      // Keep the exact mounted occurrence and room alive while queued lexical proof arrives.
+      await page.waitForFunction(({ box, pending }) => {
+        if (!box.isConnected || window.annotationFixture.S.view !== 'shelf' ||
+          pending.some(node => !node.isConnected || !box.contains(node))) {
+          throw new Error('The same annotation fixture must remain mounted in its room');
+        }
+        return !box.querySelector('[data-lookup-readings-pending]');
+      }, fixture, { timeout: 10000 });
+      const observed = await fixture.evaluate(({ box, before, pending }) => {
+        if (!box.isConnected || window.annotationFixture.S.view !== 'shelf' ||
+          pending.some(node => !node.isConnected || !box.contains(node))) {
+          throw new Error('The same annotation fixture must remain mounted through observation');
+        }
+        const words = [...box.querySelectorAll('.japanese-lookup-word')].map(node => node.dataset.lookupText);
+        const sameText = box.textContent === before;
+        return { sameText, words, pendingReadings: { initial: pending.length, remaining: box.querySelectorAll('[data-lookup-readings-pending]').length,
+          sameBoxConnected: box.isConnected, sameWrappersConnected: pending.every(node => node.isConnected && box.contains(node)) } };
+      });
+      assert(observed.sameText, 'Lookup wrapping preserves exact source text');
+      assert(['ボトル', 'ネック'].every(part => observed.words.some(word => word.includes(part))),
+        `A katakana word in parentheses that reads no word before it keeps its door: ${JSON.stringify(observed.words)}`);
+      assert(observed.words.includes('な'), `A grammar mark in parentheses keeps its door: ${JSON.stringify(observed.words)}`);
+      assert(['子供', '下品', '要因', '拓'].every(word => observed.words.includes(word)), `Each written word stays a door: ${JSON.stringify(observed.words)}`);
+      assert(!observed.words.some(word => /^(こども|ひ|ら|ひら)$/u.test(word)), `A reading that reads its word is text, not a door: ${JSON.stringify(observed.words)}`);
+      return observed;
+    } finally {
+      try { await fixture.evaluate(({ box, room }) => { window.annotationFixture.S.view = room; box.remove(); }); }
+      finally { await fixture.dispose(); }
+    }
+  }],
 ];
 const filter = new Set(process.argv.slice(2).map(arg => { assert(arg.startsWith('--case=')); return arg.slice(7); }));
 for (const name of filter) assert(cases.some(([candidate]) => candidate === name), `Unknown case: ${name}`);
@@ -336,6 +399,8 @@ let browser;
 try {
   for (const engine of engines) {
     browser = await ({ chromium, webkit })[engine].launch();
+    browserVersions[engine] = browser.version();
+    console.log(`BROWSER ${engine} ${browserVersions[engine]}`);
     for (const { name, run, body, expect } of jobs) {
       const context = await browser.newContext({ viewport: { width: 1200, height: 900 }, locale: 'en-US', serviceWorkers: 'block' });
       await silenceBrowserAudio(context);
@@ -372,7 +437,7 @@ try {
   }
 } finally {
   await browser?.close(); await host.close();
-  writeFileSync(resolve(evidence, 'annotation-lookup.json'), JSON.stringify({ passed: failures.length === 0, identity,
+  writeFileSync(resolve(evidence, 'annotation-lookup.json'), JSON.stringify({ passed: failures.length === 0, identity, browserVersions,
     sourceSha256: sha(original), fixtureSha256: sha(fixture), shimSha256: sha(shim), verifierSha256: sha(readFileSync(new URL(import.meta.url))),
     controls: controls.map(([target, name, body]) => ({ case: target, name, fixtureSha256: sha(body) })),
     results, failures, limits: ['Test-only export shim and synthetic anchors; no operator profile or external service.', 'Native database writes and reload durability are exercised; visual acceptance belongs to the uninstrumented app.'] }, null, 2) + '\n');

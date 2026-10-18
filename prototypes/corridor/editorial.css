@@ -401,6 +401,11 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
  * passages and practice papers. These are words, never button-shaped chips. */
 .japanese-lookup-text { position: relative; isolation: isolate; font: inherit; line-height: inherit; letter-spacing: inherit; }
 .airead-para .japanese-lookup-text { isolation: auto; }
+/* G3 · guided prose mixes the session's teaching words (.gs-word) with lookup text: the block is the one layer their hit
+ * regions share, under all of its ink (the example line's rule below). Isolated segment by segment, に's region lay over
+ * 支 of 支障 and は's over 橋: a tap on the teaching word opened its neighbour. */
+.guided-room [data-prose-roving] { position: relative; isolation: isolate; }
+.guided-room [data-prose-roving] .japanese-lookup-text { isolation: auto; }
 .japanese-lookup-word {
   position: relative;
   display: inline;
@@ -436,6 +441,7 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
   z-index: -1;
 }
 .japanese-lookup-word:hover { text-decoration: underline; text-decoration-color: var(--ai); text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+.reader-card h1.view-title .japanese-lookup-word { white-space: nowrap; }
 /* Keyboard focus on a prose word wears the app's one focus token, the same ink underline and
  * vermilion wash as a reader word; never the browser's ring. The transparent outline still
  * draws in forced-colors mode. */
@@ -1665,6 +1671,24 @@ body.v-depth-layered #reader, #reader.reader {
   color: var(--text);
 }
 #reader .tok { padding: 0; }
+/* One shared paragraph layer keeps transparent hit areas above the page,
+ * while every neighbouring glyph remains above those areas. */
+#reader [data-reader-prose] { position: relative; isolation: isolate; }
+#reader .tok[data-para], .sentence-tok { cursor: pointer; position: relative; }
+/* Inline prose owns the same transparent reach as the former word button.
+ * Keep the hit box behind neighbouring glyphs so their centres remain theirs. */
+#reader .tok[data-para]::before, .sentence-tok::before {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: max(100%, var(--tap));
+  height: max(100%, var(--tap));
+  transform: translate(-50%, -50%);
+  z-index: -1;
+}
+/* Entry examples and the sentence page use the same hidden-reading marker
+ * outside .reader. Keep native ruby layout; revealing removes this marker. */
+.sentence-tok rt.hidden-rt { opacity: 0; }
 /* Off or on-touch readings float over their word and never widen it. A hidden <rt> still takes
  * layout width (that was every gap in 「ダマスカス 郊外」), and WebKit will not position an <rt>,
  * so the <rt> stays in the DOM as the reading's record while ::before draws it. Always-on keeps
@@ -1676,7 +1700,7 @@ body.v-depth-layered #reader, #reader.reader {
   position: absolute;
   left: 50%;
   bottom: calc(100% - 0.1em);
-  transform: translateX(-50%);
+  transform: translate(-50%, 0.18em);
   font-size: 0.6em;
   line-height: 1.2;
   letter-spacing: 0.02em;
@@ -1684,9 +1708,12 @@ body.v-depth-layered #reader, #reader.reader {
   color: var(--accent);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 180ms ease-out;
+  transition: opacity 180ms ease-out, transform 180ms ease-out;
 }
-#reader:not(.fg-always) ruby:has(> rt:not(.hidden-rt))::before { opacity: 1; }
+#reader:not(.fg-always) ruby:has(> rt:not(.hidden-rt))::before { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) {
+  #reader:not(.fg-always) ruby::before { transition: none; transform: translate(-50%, 0); }
+}
 .reader rt, #reader rt { font-size: 0.6em; letter-spacing: 0.02em; color: var(--accent); pointer-events: none; }
 .reader .para-break { height: 1.5em; }
 .reader .tok-en {
@@ -3203,6 +3230,7 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 /* ─ the sheet: one paper, one hairline edge (no kind stripe), a little fibre, lifted by two shadows:
    a close one that says it rests, a long one that says it is lit from above */
 #app .kp-study .kp-card {
+  grid-template-columns: minmax(0, 1fr); /* inline prose cannot widen the phone card */
   gap: 14px; padding: 20px 22px 24px; border-radius: var(--radius-card);
   border: 1px solid color-mix(in srgb, var(--kp-ink) 9%, transparent);
   /* plain paper: a texture never sits under the readings (the deck's own rule, 和紙・黒板・桜) */
@@ -4063,7 +4091,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
   :where(#reader .tok.tok-current) > .tok-word, :where(#reader .tok:hover) > .tok-word,
   .kp-tok:where(.kp-lit), .kp-tok:hover, .kp-tok:focus-visible,
-  .gs-word:hover, .gs-word:focus-visible, .japanese-lookup-word:hover,
+  .gs-word:hover, .gs-word:focus-visible, .japanese-lookup-word:hover, .japanese-lookup-word:focus-visible,
   :where(.ww-node:hover) .ww-g, :where(.ww-node:focus-visible) .ww-g
 ) {
   background: transparent;
@@ -5794,3 +5822,12 @@ body.has-primary-tabs:has(#app :is(.kp-study, .kp-done)) .kp-grades { bottom: 0;
 #app .ai-connection { margin: var(--space-4, 16px) 0 var(--space-2, 8px); }
 #app .ai-connection > summary { display: flex; align-items: center; min-height: 44px; font: 500 14px/1.3 var(--font-ui); color: var(--color-muted); cursor: pointer; }
 #app .ai-connection[open] > summary { color: var(--color-ink-2); }
+/* G3: the hosted sky uses the same reading dial as prose. On-tap keeps its
+   existing in-place reveal; always/off are visible before any activation. */
+body[data-furigana='2'] #drift-layer .word .yomi { opacity: 1; }
+body[data-furigana='0'] #drift-layer .word .yomi { opacity: 0; }
+/* Hosted glyphs keep native reading markup at rest, including before their
+   first tap. A sibling gloss/particle caption is never part of the ruby. */
+body[data-furigana] #drift-layer .drift-reading rt { font-size: .45em; line-height: 1; opacity: 0; }
+body[data-furigana='1'] #drift-layer .hosted-reading-shown .drift-reading rt,
+body[data-furigana='2'] #drift-layer .drift-reading rt { opacity: 1; }

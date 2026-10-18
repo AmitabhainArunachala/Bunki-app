@@ -403,6 +403,22 @@ try {
   // reader lane 2026-10-02: the floating sentence bar is gone; what floats over the text now is the tapped word's popup
   await check('approved-player-is-touch-sized-and-clear-of-the-word-popup-on-phones', 'narration', async ({ page }) => {
     await openBar(page);
+    assert.equal(await page.locator('body').getAttribute('data-furigana'), '1', 'This fixture exercises on-touch reading then stage');
+    const selected = await page.locator('#reader .tok[data-word]').evaluateAll(nodes => {
+      const n = nodes.find(n => /\p{Script=Han}/u.test(n.dataset.word) && n.dataset.word.length > 1 && n.querySelector('rt.hidden-rt'));
+      if (!n) return null;
+      const paragraphs = [...document.querySelectorAll('#reader [data-prose-roving]')], paragraph = n.closest('[data-prose-roving]');
+      return { index: n.dataset.index, word: n.dataset.word, reading: [...n.querySelectorAll('rt')].map(rt => rt.textContent).join(''),
+        paragraph: paragraphs.indexOf(paragraph), wordIndex: [...paragraph.querySelectorAll('.tok[data-para]')].indexOf(n) };
+    });
+    assert(selected?.reading && selected.paragraph >= 0 && selected.wordIndex >= 0, 'A hidden-reading occurrence belongs to a real paragraph controller');
+    const word = page.locator(`#reader .tok[data-index="${selected.index}"]`);
+    const selectWord = async () => {
+      await page.locator('#reader [data-prose-roving]').nth(selected.paragraph).focus();
+      await page.keyboard.press('Home');
+      for (let index = 0; index < selected.wordIndex; index++) await page.keyboard.press('ArrowRight');
+      assert.equal(await word.evaluate(n => document.activeElement === n), true, 'Paragraph arrows select the exact occurrence');
+    };
     const measure = () => page.evaluate(() => {
       const bar = document.querySelector('.listen-row.play-bar').getBoundingClientRect();
       const popup = document.querySelector('#mini').getBoundingClientRect();
@@ -420,12 +436,31 @@ try {
     const measurements = [];
     for (const width of [320, 390]) {
       await page.setViewportSize({ width, height: 844 });
-      // a popup left from the wider screen goes first: Escape on its word
-      await page.locator('#reader .tok').first().focus();
+      // Fold the prior stage, then select through the actual paragraph keyboard path.
       await page.keyboard.press('Escape');
       await page.waitForFunction(() => !document.getElementById('mini'));
-      await page.locator('#reader .tok').first().click();
+      await selectWord();
+      assert.equal(await word.getAttribute('data-ladder-rung'), null);
+      const before = (await readAppRecord(page)).obslog || [];
+      await page.keyboard.press('Enter');
+      await page.waitForFunction(({ index, reading }) => {
+        const n = document.querySelector(`#reader .tok[data-index="${index}"]`);
+        const painted = [...n.querySelectorAll('ruby')].map(ruby => {
+          const style = getComputedStyle(ruby, '::before'), content = style.content;
+          if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) !== 1) return '';
+          return content.startsWith('attr(') ? ruby.dataset.r : /^["'].*["']$/u.test(content) ? content.slice(1, -1) : '';
+        }).join('');
+        return n.dataset.ladderRung === 'reading' && painted === reading && !document.getElementById('mini');
+      }, selected);
+      const revealed = await waitForAppRecord(page, record => record.obslog.length === before.length + 1);
+      assert.deepEqual(revealed.obslog.slice(0, -1), before);
+      assert.deepEqual(revealed.obslog.at(-1).slice(1), ['tap', `word:${selected.word}`, 1, FIRST]);
+      await page.keyboard.press('Enter');
       await page.locator('#mini').waitFor({ state: 'visible' });
+      assert.equal(await word.getAttribute('data-ladder-rung'), 'stage');
+      const staged = await waitForAppRecord(page, record => record.obslog.length === before.length + 2);
+      assert.deepEqual(staged.obslog.slice(0, -1), revealed.obslog);
+      assert.deepEqual(staged.obslog.at(-1).slice(1), ['tap', `word:${selected.word}`, 2, FIRST]);
       const observed = await measure();
       measurements.push(observed);
       writeFileSync(resolve(out, 'phone-player-geometry.json'), JSON.stringify(measurements, null, 2));
@@ -440,9 +475,9 @@ try {
     await overlap.evaluate(node => node.remove());
     assert.equal((await measure()).valid, true, 'removing the controls restores the usable layout');
     // the mark folds the bar (the slip goes first: a tap outside it puts it away by the mini's law)
-    await page.locator('#reader .tok').first().focus();
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => !document.getElementById('mini'));
+    assert.equal(await word.getAttribute('data-ladder-rung'), null, 'Folding the stage returns the occurrence bare');
     await page.locator('#listen-open').click();
     await page.waitForSelector('.listen-row.play-bar[data-open="false"]', { timeout: 5000 });
     const foldedState = await markState(page);
@@ -596,15 +631,26 @@ try {
     await check(name, mode, async (f) => {
       const { page, release } = f;
       assert.match((await counts(page)).note, PENDING, 'the row starts as the pending line while narration loads');
-      const before = await page.evaluate(() => {
-        // a control in the text itself, as the glossary door was: the second word button of the read
+      // a word in the text itself, as the glossary door was: the read's second word, selected the way a keyboard
+      // reaches it (its paragraph's one stop, Home, then the arrows), never by focusing an idle prose span directly
+      const selection = await page.evaluate(() => {
         const refs = [...document.querySelectorAll('#reader .tok')];
         const target = refs[Math.min(1, refs.length - 1)];
+        const paragraph = target.closest('[data-prose-roving]');
+        return { index: target.dataset.index,
+          paragraph: [...document.querySelectorAll('#reader [data-prose-roving]')].indexOf(paragraph),
+          wordIndex: paragraph ? [...paragraph.querySelectorAll('.tok[data-para]')].indexOf(target) : -1 };
+      });
+      assert(selection.paragraph >= 0 && selection.wordIndex >= 0, 'the second word belongs to a paragraph controller');
+      await page.locator('#reader [data-prose-roving]').nth(selection.paragraph).focus();
+      await page.keyboard.press('Home');
+      for (let i = 0; i < selection.wordIndex; i++) await page.keyboard.press('ArrowRight');
+      const before = await page.evaluate((index) => {
+        const target = document.querySelector(`#reader .tok[data-index="${index}"]`);
         target.dataset.focusProbe = '1';
-        target.focus();
         return { focused: document.activeElement === target, top: target.getBoundingClientRect().top,
           row: document.querySelector('.listen-row')?.getBoundingClientRect().height ?? 0, passage: document.querySelector('h1.view-title')?.textContent };
-      });
+      }, selection.index);
       assert.equal(before.focused, true, 'the probe holds focus before the manifest settles');
       release();
       await manifestSettled(f, '__narrationConsumed');

@@ -101,8 +101,10 @@ function nodeOf(entry, deps) {
 
 export function createHost(deps) {
   const taken = (entry) => (deps.taken() || []).some((row) => row.t === entry?.t && row.id === entry?.id);
+  let closedAs = null; // why the corridor last closed a slip this host opened: 'dive' | 'dismiss' | 'entry'
   return {
     name: 'corridor',
+    installProseWords(block, selector) { deps.installProseWords?.(block, selector); },
     lookup(token) {
       if (!token?.s) return null;
       if (token.k === '部品') {
@@ -112,7 +114,13 @@ export function createHost(deps) {
       if (token.k === '文法') return grammarEntry(deps, token) || wordEntry(deps, token);
       if (token.k === '字') return kanjiEntry(deps, token);
       if (token.k === '語') return wordEntry(deps, token) || (token.s.length === 1 ? kanjiEntry(deps, { ...token, ref: token.s }) : null);
-      return null; // particles, endings, punctuation: nothing to open
+      // G3: particles and endings are Japanese doors too. A dictionary miss keeps the
+      // player's contextual frame; punctuation and non-Japanese text remain plain.
+      if (token.k === 'other' && /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(token.s)) {
+        return wordEntry(deps, { ...token, k: '語' }) ||
+          (/^\p{Script=Han}$/u.test(token.s) ? kanjiEntry(deps, { ...token, ref: token.s }) : null);
+      }
+      return null;
     },
     open(entry) {
       if (entry?.t && entry.id) deps.open(nodeOf(entry, deps));
@@ -133,8 +141,10 @@ export function createHost(deps) {
      * The deck's own word says it is already in the deck where Save would stand, and its band opens the
      * dictionary's entry when the dictionary has it. Save goes through the corridor's one path on the node,
      * the path take() wraps. english: show the English sense under the Japanese one.
-     * 'opened' | 'dived' (this tap was the second on the word: the slip went into the entry) | false. */
-    openSlip(frame, anchor, { english = false, onClose = null } = {}) {
+     * 'reading' | 'opened' | 'dived' | 'dismissed' | false: a second tap on a stage with no entry only puts the
+     * stage away, as the corridor's close says. Rung ownership stays with the corridor;
+     * the player's callbacks only show or clear its existing in-place ruby. */
+    openSlip(frame, anchor, { english = false, onClose = null, reveal, clearReveal, readingVisible } = {}) {
       if (typeof deps.openSlip !== 'function' || !frame || !anchor) return false;
       const entry = frame.entry || (frame.word
         ? wordEntry(deps, { s: frame.word.term, ref: frame.word.term, r: frame.word.reading || '', k: '語' })
@@ -146,12 +156,19 @@ export function createHost(deps) {
           : frame.en ? { gloss: frame.en, glossLang: 'en' } : {}),
       };
       const before = !!deps.slipOpen?.();
+      closedAs = null;
       const slip = deps.openSlip(node, {
-        anchor, from: 'deck', look, key: frame.key || '', onClose,
+        anchor, from: 'deck', look, key: frame.key || '', reveal, clearReveal, readingVisible,
+        onClose: (reason) => {
+          closedAs = reason;
+          onClose?.(reason);
+        },
         ...(frame.word ? { note: deps.inDeckNote?.() || 'このデッキにあります' } : {}),
       });
+      if (slip === 'reading') return 'reading';
       if (slip) return 'opened';
-      return before && !deps.slipOpen?.() ? 'dived' : false;
+      if (!before || deps.slipOpen?.()) return false;
+      return closedAs === 'dive' ? 'dived' : closedAs === 'dismiss' ? 'dismissed' : false;
     },
     slipOpen() {
       return !!deps.slipOpen?.();

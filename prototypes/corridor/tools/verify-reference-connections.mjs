@@ -36,6 +36,7 @@ await new Promise((done) => server.listen(0, '127.0.0.1', done));
 const base = `http://127.0.0.1:${server.address().port}`;
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device fixture.
 await silenceBrowserAudio(context);
 const externalRequests = [];
 await context.route('**/*', route => {
@@ -262,7 +263,7 @@ try {
     assert.ok(index >= 0);
     await page.locator(`[data-passage="${article.id}"]`).first().click();
     const token = page.locator(`#reader .tok[data-index="${index}"][data-word="${word}"]`);
-    await token.click();
+    await openReaderWordStage(page, token);
     await page.click('#mini-sentence-open'); await page.click('#reader-sentence-practice');
     await page.locator('#sentence-choose-cloze').check();
     await page.click('#sentence-practice-confirm');
@@ -342,3 +343,26 @@ try {
 const failures = results.filter((r) => !r.pass);
 console.log(`\n${results.length - failures.length}/${results.length} recursive connection checks passed.`);
 process.exitCode = failures.length ? 1 : 0;
+
+// These source-context checks enter through the G3 ladder; the grammar itself is
+// checked separately. A second activation is allowed only after a real reading rung.
+async function openReaderWordStage(page, word) {
+  await word.click();
+  await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
+    // On-touch reader ruby paints through ::before; the native rt stays hidden
+    // to preserve the word's width. Require actual paint from either renderer.
+    await page.waitForFunction(node => [...node.querySelectorAll('ruby')].some(ruby => {
+      const rt = ruby.querySelector('rt');
+      if (!rt?.textContent.trim() || rt.classList.contains('hidden-rt')) return false;
+      const native = getComputedStyle(rt), floating = getComputedStyle(ruby, '::before');
+      return (rt.getClientRects().length > 0 && native.visibility !== 'hidden' && native.display !== 'none' && Number(native.opacity) > 0) ||
+        (ruby.getClientRects().length > 0 && ruby.dataset.r === rt.textContent && floating.content === JSON.stringify(rt.textContent) &&
+          floating.visibility !== 'hidden' && floating.display !== 'none' && Number(floating.opacity) > 0);
+    }), await word.elementHandle(), { timeout: 5000 });
+    await word.click();
+  }
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'stage', 'The exact source word reaches its stage');
+}

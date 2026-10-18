@@ -158,13 +158,42 @@ async function chooseDial(page, key, value) {
   { key, value });
 }
 
-/** The reader's tap grammar (1.3.0): one tap opens the word's popup; a second tap on the same word opens
- * its full entry (the popup has no Full entry button; the hold that used to open it opens the word menu). */
+/** Reach the exact prose occurrence through its paragraph's real keyboard controller. */
+async function focusProseOccurrence(page, target) {
+  const offset = await target.evaluate(word => {
+    const block = word.closest('[data-prose-roving]');
+    if (!block) return -1;
+    return [...block.querySelectorAll('.tok[data-para],.sentence-tok,.japanese-lookup-word,.gs-word,.kp-tok')]
+      .filter(node => node.closest('[data-prose-roving]') === block).indexOf(word);
+  });
+  assert(offset >= 0, 'The intended occurrence belongs to a prose keyboard controller');
+  await target.locator('xpath=ancestor::*[@data-prose-roving][1]').focus();
+  await page.keyboard.press('Home');
+  for (let step = 0; step < offset; step++) await page.keyboard.press('ArrowRight');
+  assert(await target.evaluate(word => document.activeElement === word), 'Home/Arrows select the exact intended occurrence');
+}
+
+/** Setup for checks whose subject is the stage: only an observed reading rung permits the second activation. */
+async function openWordStage(page, selector, index = 0, scroll = true) {
+  const target = page.locator(selector).nth(index);
+  assert.notEqual(await target.getAttribute('data-ladder-rung'), 'stage', 'Stage setup begins on a word without its stage');
+  await touchAt(page, selector, index, 0, scroll);
+  await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await target.elementHandle());
+  if (await target.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'Reading rung has no meaning stage');
+    assert(await target.evaluate(node => [...node.querySelectorAll('rt')].some(rt => !rt.classList.contains('hidden-rt') && getComputedStyle(rt).visibility !== 'hidden')), 'Reading rung reveals the pronunciation');
+    await touchAt(page, selector, index, 0, scroll);
+  }
+  await page.locator('#mini .mini-word').waitFor();
+  assert.equal(await target.getAttribute('data-ladder-rung'), 'stage', 'The exact occurrence reached its stage');
+}
+
+/** Open the page through its stage, after observing any required reading rung. */
 async function holdWord(page, selector, index = 0) {
-  await touchAt(page, selector, index, 0);
-  await page.waitForSelector('#mini .mini-word', { timeout: 8000 });
+  await openWordStage(page, selector, index);
   await page.waitForTimeout(120);
   await touchAt(page, selector, index, 0);
+  await page.waitForSelector('#sheet');
   await page.waitForTimeout(200);
 }
 
@@ -420,7 +449,7 @@ export const MEASURE_FN = `(() => {
       !(n.matches('.article-about a.inline-link[href]') && getComputedStyle(n).display === 'inline'))
     .map((n) => {
       const r = n.getBoundingClientRect();
-      const expanded = n.matches('button.tok, button.sent-door, button.rest-toggle') ? getComputedStyle(n, '::before') : null;
+      const expanded = n.matches('.tok, button.sent-door, button.rest-toggle') ? getComputedStyle(n, '::before') : null;
       const expandedW = expanded ? parseFloat(expanded.width) : 0;
       const expandedH = expanded ? parseFloat(expanded.height) : 0;
       return {
@@ -495,6 +524,8 @@ async function main() {
       'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
   };
   const context = await browser.newContext(contextOptions);
+  // This is an existing-device journey; G3's fresh-device demonstration has its own verifier.
+  await context.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
   await silenceBrowserAudio(context);
   const page = await context.newPage();
   const consoleErrors = [];
@@ -931,13 +962,12 @@ async function main() {
   const tapIdx = await page.evaluate(`(() => {
     const toks = [...document.querySelectorAll('#reader .tok.content')];
     for (let i = 1; i < toks.length; i++) {
-      if (toks[i].getClientRects().length === 1 && toks[i].textContent.length >= 2) return i;
+      if (toks[i].getClientRects().length === 1 && toks[i].querySelector('rt.hidden-rt') && toks[i].textContent.length >= 2) return i;
     }
     return 2;
   })()`);
 
-  // reader lane 2026-10-02 (John #8): ONE tap is the meaning. The popup shows the word, its reading and
-  // its meaning at once; the word does not move, nothing is written under it, and no sheet opens.
+  // G3: the first activation reveals the reading; the second exposes the stage without moving the print.
   const glyphBox = `(el) => (el.querySelector('ruby') ?? el).getBoundingClientRect().bottom`;
   await page.locator('#reader .tok.content').nth(tapIdx).evaluate((n) => n.scrollIntoView({ block: 'center' }));
   await page.waitForTimeout(80);
@@ -946,6 +976,13 @@ async function main() {
   );
   await tap(page, '#reader .tok.content', tapIdx);
   await page.waitForTimeout(120);
+  const readingOnly = await page.locator('#reader .tok.content').nth(tapIdx).evaluate(node => ({
+    rung: node.dataset.ladderRung, readings: node.querySelectorAll('rt:not(.hidden-rt)').length,
+    stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), english: !!node.querySelector('.tok-en'),
+  }));
+  check('grammar · first activation reveals only the reading', readingOnly.rung === 'reading' && readingOnly.readings > 0 && !readingOnly.stage && !readingOnly.page && !readingOnly.english, JSON.stringify(readingOnly));
+  await tap(page, '#reader .tok.content', tapIdx);
+  await page.waitForSelector('#mini .mini-word');
   const afterTap = await page.evaluate(`(() => {
     const tok = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
     const mini = document.querySelector('#mini');
@@ -962,7 +999,7 @@ async function main() {
       dataWord: tok.dataset.word,
     };
   })()`);
-  check('grammar · one tap opens the popup — the word, its reading and its meaning at once, the band its door, no Full entry button, no sheet',
+  check('grammar · second activation opens the stage — exact word, reading, meaning and Save, the band its door, no separate Full entry button',
     !!afterTap.popup && afterTap.popup.word === afterTap.dataWord && afterTap.popup.gloss.length > 0 &&
       ['Save', '保存', 'Saved ✓', '保存済み ✓'].includes(afterTap.popup.save) && afterTap.popup.door && !afterTap.popup.entryButton && !afterTap.sheet,
     JSON.stringify(afterTap.popup));
@@ -978,7 +1015,7 @@ async function main() {
     `[...document.querySelectorAll('#reader .tok.content')].findIndex((t) => t.dataset.word === '沿線')`,
   );
   if (enIdx >= 0) {
-    await tap(page, '#reader .tok.content', enIdx);
+    await openWordStage(page, '#reader .tok.content', enIdx);
     await page.waitForTimeout(150);
     const glossFit = await page.evaluate(`(() => {
       const en = document.querySelector('#mini .mini-gloss');
@@ -999,11 +1036,10 @@ async function main() {
   await page.waitForTimeout(150);
   await page.locator('[data-dial="furigana:1"]').dispatchEvent('click');
   await page.waitForTimeout(150);
-  await tap(page, '#reader .tok.content', tapIdx);
-  await page.waitForTimeout(120);
+  await openWordStage(page, '#reader .tok.content', tapIdx);
   const popupUp = (await page.locator('#mini').count()) === 1;
 
-  // a second tap on the same word opens its full entry (1.3.0): the popup goes, nothing under the word
+  // The next activation from the observed stage opens its full entry.
   await tap(page, '#reader .tok.content', tapIdx);
   await page.waitForSelector('#sheet', { timeout: 8000 });
   await page.waitForTimeout(120);
@@ -1012,19 +1048,24 @@ async function main() {
     return { sheet: document.querySelector('#sheet')?.dataset.node ?? '', popup: !!document.querySelector('#mini'),
       gloss: !!t.querySelector('.tok-en'), current: t.classList.contains('tok-current') };
   })()`);
-  check('grammar · a second tap on the same word opens its full entry — the popup gone, nothing under the word, the word still the chosen one',
+  check('grammar · activation from the stage opens its full entry — the popup gone, nothing under the word, the word still the chosen one',
     popupUp && afterSecond.sheet.startsWith('word:') && !afterSecond.popup && !afterSecond.gloss && afterSecond.current,
     JSON.stringify({ popupUp, ...afterSecond }));
-  // closing the entry returns the original word: the reading its tap summoned goes with the sheet
+  // Back unwinds page to the same stage; folding that stage returns to bare prose.
   await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
   await page.waitForFunction(() => !document.getElementById('sheet'));
-  await page.waitForTimeout(120);
+  await page.waitForSelector('#mini');
   const afterClose = await page.evaluate(`(() => {
     const t = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
     return { sheet: !!document.querySelector('#sheet'), popup: !!document.querySelector('#mini'), lit: t.classList.contains('lit'), current: t.classList.contains('tok-current') };
   })()`);
-  check('grammar · closing the entry returns the original word — no sheet, no popup, no summoned reading, the word still the chosen one',
-    !afterClose.sheet && !afterClose.popup && !afterClose.lit && afterClose.current, JSON.stringify(afterClose));
+  check('grammar · closing the page restores its stage and summoned reading on the chosen word',
+    !afterClose.sheet && afterClose.popup && afterClose.lit && afterClose.current, JSON.stringify(afterClose));
+  await page.keyboard.press('Escape');
+  const folded = await page.locator('#reader .tok.content').nth(tapIdx).evaluate(node => ({
+    stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), lit: node.classList.contains('lit'), rung: node.dataset.ladderRung,
+  }));
+  check('grammar · folding the restored stage leaves the original word bare', !folded.stage && !folded.page && !folded.lit && !folded.rung, JSON.stringify(folded));
 
   // press and hold → the word menu (John #11: "right click and choose save"); a tap anywhere else puts it away
   await touchAt(page, '#reader .tok.content', 6, 700);
@@ -1048,8 +1089,7 @@ async function main() {
   check('grammar · one tap anywhere else puts the menu away',
     !!elsewhere && (await page.locator('#reader-word-menu').count()) === 0, elsewhere ? 'menu dismissed' : 'no empty margin found');
 
-  // the second tap on the word → the full entry (from a clean slate: whatever the menu
-  // interlude did, close it and re-aim)
+  // Always-on ruby skips the reading rung: stage then full entry from the clean word.
   if (await page.locator('#sheet').count()) {
     await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
     await page.waitForTimeout(150);
@@ -1078,7 +1118,7 @@ async function main() {
       hasClose: !!s.querySelector('#sheet-close'),
     };
   })()`);
-  check('grammar · the second tap on the word opens the full entry',
+  check('grammar · with always-on readings, stage then page takes two activations',
     panel.headword.length > 0 && (panel.reading.length > 0 || panel.gloss.length > 0),
     `${panel.headword}（${panel.reading}）`);
   check('the sheet carries its own back and close', panel.hasBack && panel.hasClose,
@@ -1174,6 +1214,8 @@ async function main() {
   // is its content's — a centred column no wider than the old 900 px sheet. This is another page in the same
   // already-headless browser.
   const desktopSheetContext = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  // This is an existing-device journey; G3's fresh-device demonstration has its own verifier.
+  await desktopSheetContext.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
   try {
     const desktopPage = await desktopSheetContext.newPage();
     await desktopPage.goto(`${base}/index.html?entry=shelf&ui=bi`, { waitUntil: 'load' });
@@ -1334,7 +1376,7 @@ async function main() {
   // choose the word first (its popup): a phone's sticky header grows by the chrome's 覚える door when a word is
   // chosen, and the browser's scroll anchoring moves scrollY to keep the text still. The place the reader leaves
   // from is the place once the word is chosen; then the same word again opens the entry (1.3.0).
-  await tap(page, '#reader .tok.content', 23);
+  await openWordStage(page, '#reader .tok.content', 23);
   await page.waitForSelector('#mini .mini-word', { timeout: 8000 });
   await page.waitForTimeout(150);
   const scrollBefore = await page.evaluate('window.scrollY');
@@ -1536,7 +1578,7 @@ async function main() {
   const chromeGeometry = [];
   for (const selected of [false, true]) {
     if (selected) {
-      await tap(page, '#reader .tok.content', 1);
+      await openWordStage(page, '#reader .tok.content', 1);
       await page.waitForSelector('#mini #mini-take');
     }
     for (const width of [320, 390]) {
@@ -1600,7 +1642,7 @@ async function main() {
   await tap(page, FIRST_TEXT);
   await settleReader(page);
   await barCheck('reader', '#app > .chrome');
-  await tap(page, '#reader .tok.content', 1);
+  await openWordStage(page, '#reader .tok.content', 1);
   await page.waitForSelector('#mini button.mini-word');
   await tap(page, '#mini button.mini-word');
   await page.waitForSelector('#sheet .sheet-bar');
@@ -2026,8 +2068,8 @@ async function main() {
     await open('?entry=shelf');
     await page.locator(d23Letter).first().click();
     await settleReader(page);
-    // one tap is the popup (reader lane 2026-10-02); a hold opens the word menu instead
-    await touchAt(page, d23Token, 0, 0);
+    // Stage setup observes any reading rung; a hold remains the separate word menu.
+    await openWordStage(page, d23Token);
     await page.waitForSelector('#mini #mini-take');
   };
   const d23Start = d23Cards(await readAppRecord(page));
@@ -2223,21 +2265,23 @@ async function main() {
 
   // ------------------------------ Phase A · the observation log (taps)
   console.log('\n— Phase A · reader taps land in the observation log');
-  await open('?entry=shelf&dials=0,0,0'); // furigana hidden → the full ladder
+  await open('?entry=shelf&dials=0,1,0'); // on-demand furigana → reading, stage, page
   await tap(page, FIRST_TEXT);
   await settleReader(page);
   const obsBefore = await evaluateAppRecord(page,
     `(record.obslog || []).length`,
   );
-  await tap(page, '#reader .tok.content', 3); // the popup: the meaning shown (2)
+  await openWordStage(page, '#reader .tok.content', 3); // reading (1), then meaning (2)
   await page.waitForTimeout(250);
-  await tap(page, '#reader .tok.content', 3); // the same word again: its full entry (3)
+  await tap(page, '#reader .tok.content', 3); // stage → full entry (3)
   await page.waitForSelector('#sheet');
   await page.waitForTimeout(250);
   await page.locator(await entryCloseSelector(page)).dispatchEvent('click'); // closing it returns the original word: no row
   await page.waitForFunction(() => !document.getElementById('sheet'));
   await page.waitForTimeout(250);
-  await holdWord(page, '#reader .tok.content', 3); // the popup again (2), then its entry (3)
+  await page.waitForSelector('#mini'); // Back restores the stage without another observation
+  await page.keyboard.press('Escape'); // folding returns to bare without another observation
+  await holdWord(page, '#reader .tok.content', 3); // reading (1), stage (2), entry (3) again
   await page.waitForSelector('#sheet');
   await page.waitForTimeout(1600); // the trailing debounce persists the rows
   const obs = await evaluateAppRecord(page, `(() => {
@@ -2246,11 +2290,9 @@ async function main() {
     return { rows, srsHasKey: rows.length ? Object.prototype.hasOwnProperty.call(env.srs || {}, rows[0][2]) : null };
   })()`);
   const ladder = obs.rows.filter((r) => r[1] === 'tap');
-  const sameWord = ladder.length === 4 && ladder.every((r) => r[2] === ladder[0][2] && r[4] === ladder[0][4]);
-  // 1.3.0: one tap shows the meaning (an honest 2), the same word again is its entry (the 3), closing the
-  // entry logs nothing, and the cycle logs the same again
-  check('a tap, the same word again, its close, then the popup and its entry again — meaning, entry, meaning, entry — every look logged, the close none',
-    sameWord && ladder.map((r) => r[3]).join(',') === '2,3,2,3',
+  const sameWord = ladder.length === 6 && ladder.every((r) => r[2] === ladder[0][2] && r[4] === ladder[0][4]);
+  check('reading, stage and page each log their depth; Back and fold log nothing; the next visit repeats the same exact word/source',
+    sameWord && ladder.map((r) => r[3]).join(',') === '1,2,3,1,2,3',
     ladder.map((r) => `depth ${r[3]}`).join(' → ') + ` (${ladder[0]?.[2]}@${ladder[0]?.[4]})` || 'no rows');
   check('rows persist inside the exported envelope with ms timestamps',
     ladder.every((r) => Number.isInteger(r[0]) && r[0] > 1.7e12 && typeof r[2] === 'string' && typeof r[4] === 'string'),
@@ -2470,18 +2512,18 @@ async function main() {
   check('a common word carries at least 4 example sentences',
     bankSheet.n >= 4 && bankSheet.en >= 1,
     `${bankSheet.n} examples · ${bankSheet.en} with English`);
-  // the eyebrow teaches the gesture: one tap gives the meaning (reader lane 2026-10-02)
+  // G3 teaches the ladder once, through motion; examples retain their heading without a permanent gesture hint.
   const exampleEyebrow = await page.evaluate(
-    `[...document.querySelectorAll('#sheet .eyebrow')].map((n) => n.textContent).find((t) => t === 'examples — tap a word for its meaning') ?? ''`,
+    `[...document.querySelectorAll('#sheet .eyebrow')].map((n) => n.textContent).find((t) => /examples|用例/.test(t)) ?? ''`,
   );
-  check('the 用例 eyebrow says that a tap on a word gives its meaning',
-    /触れると意味/.test(exampleEyebrow) || /tap a word for its meaning/.test(exampleEyebrow),
+  const obsoleteExampleHint = await page.locator('#sheet').innerText();
+  check('the example heading remains, without the obsolete permanent one-tap hint',
+    /examples|用例/.test(exampleEyebrow) && !/触れると意味|tap (?:a|any) word for its meaning/i.test(obsoleteExampleHint),
     `eyebrow: "${exampleEyebrow}"`);
   // R (2026-10-16): a word read otherwise than the quick dictionary (明日 あした) waits up to READING_WAIT_MS for its
   // entry, so its popup is read once it has come — the same popup, the reading and the meaning at once (seen red on the
   // base build too, L/site-3, before G1)
-  await page.evaluate(`document.querySelector('#sheet .example .sentence-tok')?.dispatchEvent(new MouseEvent('click', { bubbles: true }))`);
-  await page.waitForSelector('#mini .mini-word', { timeout: 3000 }).catch(() => {});
+  await openWordStage(page, '#sheet .example .sentence-tok');
   const ladderProof = await page.evaluate(`(() => {
     const tok = document.querySelector('#sheet .example .sentence-tok');
     if (!tok) return null;
@@ -2489,7 +2531,7 @@ async function main() {
     return { word: tok.textContent, popup: mini?.querySelector('.mini-word')?.textContent ?? null,
       gloss: mini?.querySelector('.mini-gloss')?.textContent ?? null, under: !!tok.querySelector('.tok-en') };
   })()`);
-  check('example tokens open the word popup — the reading and the meaning at once, nothing under the word',
+  check('example tokens reach their stage through the observed reading rung, with nothing under the word',
     !!ladderProof && !!ladderProof.popup && ladderProof.word.includes(ladderProof.popup.slice(0, 1)) && !!ladderProof.gloss && !ladderProof.under,
     JSON.stringify(ladderProof));
   // the keyboard-shaped click put focus in the popup; Escape there puts away the popup only
@@ -2524,7 +2566,7 @@ async function main() {
   await page.waitForTimeout(400);
   await page.evaluate(`document.querySelector('#sheet .example .sent-door')?.click()`);
   await page.waitForSelector('#sheet .sent-reader .sentence-tok.example-hit', { timeout: 8000 });
-  await tap(page, '#sheet .sent-reader .sentence-tok.example-hit');
+  await openWordStage(page, '#sheet .sent-reader .sentence-tok.example-hit');
   await page.waitForTimeout(300);
   const hantoGloss = await page.evaluate(
     `document.querySelector('#mini .mini-gloss')?.textContent ?? null`,
@@ -2585,46 +2627,43 @@ async function main() {
   check('the reader boots bare — ふりがな waits for the tap',
     bareBoot.visible === 0 && bareBoot.hidden > 10,
     `${bareBoot.visible} shown · ${bareBoot.hidden} waiting`);
-  const cycleTap = () => page.evaluate(`(() => {
-    const t = [...document.querySelectorAll('#reader .tok.content')].find((x) => x.querySelector('rt'));
-    t.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: 10, clientY: 10 }));
-    t.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: 10, clientY: 10 }));
-    // activation rides the click a real browser sends after the tap
-    t.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
-  })()`);
-  const cycleState = () => page.evaluate(`(() => {
-    const t = [...document.querySelectorAll('#reader .tok.content')].find((x) => x.querySelector('rt')) ||
-      [...document.querySelectorAll('#reader .tok.content')][0];
-    return { rt: [...t.querySelectorAll('rt')].filter((r) => !r.classList.contains('hidden-rt')).length, gloss: !!t.querySelector('.tok-en'),
-      popup: document.querySelector('#mini .mini-gloss')?.textContent ?? null };
-  })()`);
-  // 1.3.0: one tap is the meaning — the popup, with the touched word's reading on the text (ふりがな 触れて);
-  // the same word again is its full entry; closing it returns the original word; one more tap is the
-  // popup again; nothing is ever written under the word
+  const cycleIndex = await page.locator('#reader .tok.content').evaluateAll(words => words.findIndex(word => word.querySelector('rt.hidden-rt')));
+  assert(cycleIndex >= 0, 'The bare-cycle fixture has an actual hidden reading');
+  const cycleTap = () => tap(page, '#reader .tok.content', cycleIndex);
+  const cycleState = () => page.locator('#reader .tok.content').nth(cycleIndex).evaluate(t => ({
+    rt: t.querySelectorAll('rt:not(.hidden-rt)').length, gloss: !!t.querySelector('.tok-en'),
+    popup: document.querySelector('#mini .mini-gloss')?.textContent ?? null,
+    page: document.querySelector('#sheet')?.dataset.node ?? '', rung: t.dataset.ladderRung ?? null,
+  }));
   await cycleTap();
-  await page.waitForTimeout(150);
   const cyc1 = await cycleState();
-  await cycleTap();
-  await page.waitForSelector('#sheet', { timeout: 8000 });
-  await page.waitForTimeout(150);
-  const cyc2 = { ...(await cycleState()), sheet: await page.evaluate(`document.querySelector('#sheet')?.dataset.node ?? ''`) };
-  await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
-  await page.waitForFunction(() => !document.getElementById('sheet'));
-  await page.waitForTimeout(150);
-  const closed = await cycleState();
-  await cycleTap();
-  await page.waitForTimeout(200);
+  check('bare cycle · first activation is reading only', cyc1.rung === 'reading' && cyc1.rt > 0 && !cyc1.popup && !cyc1.page && !cyc1.gloss, JSON.stringify(cyc1));
+  await cycleTap(); await page.waitForSelector('#mini .mini-word');
+  await page.waitForFunction(() => {
+    const gloss = document.querySelector('#mini .mini-gloss')?.textContent?.trim();
+    return !!gloss && gloss !== '…';
+  });
+  const cyc2 = await cycleState();
+  check('bare cycle · second activation is the meaning stage', cyc2.rung === 'stage' && cyc2.rt > 0 && !!cyc2.popup && !cyc2.page && !cyc2.gloss, JSON.stringify(cyc2));
+  await cycleTap(); await page.waitForSelector('#sheet', { timeout: 8000 });
   const cyc3 = await cycleState();
-  check('one tap shows the meaning and the reading at once; the same word again opens its entry; its close returns the original word; one more tap is the popup again',
-    cyc1.rt >= 1 && !!cyc1.popup && !cyc1.gloss && cyc2.popup === null && cyc2.sheet.startsWith('word:') && !cyc2.gloss
-      && closed.popup === null && closed.rt === 0 && !closed.gloss && !!cyc3.popup && cyc3.rt >= 1 && !cyc3.gloss,
-    `tap 1: rt=${cyc1.rt} popup="${cyc1.popup}" → tap 2: sheet=${cyc2.sheet} popup=${cyc2.popup} → close: rt=${closed.rt} popup=${closed.popup} → tap 3: rt=${cyc3.rt} popup="${cyc3.popup}"`);
-  // the full entry is one choice in the word menu a press and hold opens — and 戻る works IMMEDIATELY.
-  // The third tap above left the popup open, and a finger can't hold a word the popup covers, so
-  // put it away first, the way a reader would: Escape on the word (the same word once more would dive).
-  await page.evaluate(`(() => { const t = [...document.querySelectorAll('#reader .tok.content')].find((x) => x.querySelector('rt')); t?.focus(); })()`);
+  check('bare cycle · third activation opens the full entry', cyc3.page.startsWith('word:') && !cyc3.popup && !cyc3.gloss, JSON.stringify(cyc3));
+  await page.locator(await entryCloseSelector(page)).click();
+  await page.waitForFunction(() => !document.getElementById('sheet'));
+  await page.waitForSelector('#mini');
+  const returned = await cycleState();
+  check('bare cycle · Back restores the same meaning stage', returned.rung === 'stage' && returned.popup === cyc2.popup && returned.rt > 0 && !returned.page && !returned.gloss, JSON.stringify(returned));
   await page.keyboard.press('Escape');
-  await page.waitForSelector('#mini', { state: 'hidden', timeout: 4000 });
+  const cycleFolded = await cycleState();
+  check('bare cycle · folding the stage returns to bare text', !cycleFolded.rung && cycleFolded.rt === 0 && !cycleFolded.popup && !cycleFolded.page && !cycleFolded.gloss, JSON.stringify(cycleFolded));
+  await cycleTap();
+  const reopened = await cycleState();
+  check('bare cycle · a new visit starts with reading again', reopened.rung === 'reading' && reopened.rt > 0 && !reopened.popup && !reopened.page, JSON.stringify(reopened));
+  await focusProseOccurrence(page, page.locator('#reader .tok.content').nth(cycleIndex));
+  await page.keyboard.press('Escape');
+  const bareAgain = await cycleState();
+  check('bare cycle · Escape also folds reading directly to bare', !bareAgain.rung && bareAgain.rt === 0 && !bareAgain.popup && !bareAgain.page, JSON.stringify(bareAgain));
+  // The full entry is also one choice in the word menu; Back answers immediately.
   await touchAt(page, '#reader .tok.content', 4, 700); // past GESTURE.MENU_MS
   await page.waitForSelector('#reader-word-menu', { timeout: 6000 });
   const menuUp = await page.evaluate(`[...document.querySelectorAll('#reader-word-menu [role="menuitem"]')].map((n) => n.dataset.menuAction)`);
@@ -2857,7 +2896,7 @@ async function main() {
   const idleBar = await barSaves();
   check('R2-B · before a word is touched the bar carries one keep, the one Save, at rest (it says what it does; it names no word)',
     idleBar.length === 1 && idleBar[0].id === 'chrome-keep' && idleBar[0].one && idleBar[0].rest, JSON.stringify(idleBar));
-  await tap(page, '#reader .tok.content', 9);
+  await openWordStage(page, '#reader .tok.content', 9);
   await page.waitForSelector('#mini #mini-take');
   const touched = await page.evaluate(`(() => {
     const t = document.querySelectorAll('#reader .tok.content')[9];
@@ -2909,6 +2948,8 @@ async function main() {
     await page.waitForSelector('#mini', { state: 'detached' });
   }
   // the deeper choices stay one door away: the word's Full entry carries the context scopes and the named lists
+  const captureOrigin = await page.locator('#reader .tok.content').nth(9).elementHandle();
+  const captureOriginIndex = await captureOrigin.getAttribute('data-index');
   await holdWord(page, '#reader .tok.content', 9);
   await page.waitForSelector('#sheet [data-ctx-scope]');
   await waitForWordSheetBody(page, captureSheetLoads);
@@ -2944,13 +2985,17 @@ async function main() {
     }, scope);
     check(`R2-B · the full entry durably saves ${scope} context without another enrollment or review`,
       record.taken.length === captured.taken && record.revlog.length === envBefore.revlog);
+    check(`G3 · saving ${scope} context preserves the exact originating occurrence`,
+      await captureOrigin.evaluate((word, index) => word.isConnected && word === document.querySelector(`#reader .tok[data-index="${index}"]`), captureOriginIndex));
   }
   captureSheetLoads.dispose();
   await shoot(page, shotsDir, '19-capture-sovereignty');
   await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
   await page.waitForSelector('#sheet', { state: 'detached' });
-  // the popup's Saved ✓ ▾ opens its menu; the menu's Review row takes the card back out (1.3.0)
-  await tap(page, '#reader .tok.content', 9);
+  // Back has restored this word's stage; Save opens its menu without another word activation.
+  await page.waitForSelector('#mini');
+  assert.equal(await page.locator('#reader .tok.content').nth(9).getAttribute('data-ladder-rung'), 'stage');
+  assert(await captureOrigin.evaluate(word => word.isConnected && word.dataset.ladderRung === 'stage'), 'Context saves return to the original occurrence stage');
   await page.waitForSelector('#mini #mini-take[aria-pressed="true"]');
   await tap(page, '#mini-take');
   await page.waitForSelector('#mini #vocabulary-list-popover.is-inline #mini-review');
@@ -2965,10 +3010,10 @@ async function main() {
     undone.taken === envBefore.taken && undone.revlog === envBefore.revlog,
     JSON.stringify(undone));
   // put the word's menu and popup away one layer at a time, as a finger's Escape would (the same word again would dive)
-  await page.locator('#reader .tok.content').nth(9).focus();
+  await focusProseOccurrence(page, page.locator('#reader .tok.content').nth(9));
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.getElementById('vocabulary-list-popover'));
-  await page.locator('#reader .tok.content').nth(9).focus();
+  await focusProseOccurrence(page, page.locator('#reader .tok.content').nth(9));
   await page.keyboard.press('Escape');
   await page.waitForSelector('#mini', { state: 'detached' });
 
@@ -2983,7 +3028,7 @@ async function main() {
   let miniIx = -1;
   const miniSkipped = [];
   for (const ix of miniCandidates.slice(0, 16)) {
-    await tap(page, '#reader .tok.content', ix);
+    await openWordStage(page, '#reader .tok.content', ix);
     await page.waitForSelector('#mini #mini-take');
     const seal = await page.evaluate(`(() => {
       const s = document.querySelector('#mini-take');
@@ -2992,7 +3037,7 @@ async function main() {
     })()`);
     if (!seal.disabled && !seal.taken) { miniIx = ix; break; }
     miniSkipped.push(`${seal.word}:${seal.disabled ? 'held' : 'taken'}`);
-    await page.locator('#reader .tok.content').nth(ix).focus();
+    await focusProseOccurrence(page, page.locator('#reader .tok.content').nth(ix));
     await page.keyboard.press('Escape');
     await page.waitForSelector('#mini', { state: 'detached' });
     await page.waitForTimeout(120);
@@ -3680,55 +3725,178 @@ async function main() {
       readerYKept > 200 && Math.abs(backFromSheet.y - readerYKept) <= 20,
     `${JSON.stringify(backFromSheet)} (kept ${readerYKept})`);
 
-  // (b) from a drift dive: one press surfaces ONE level of the water
-  await open('');
-  await page.waitForTimeout(2200);
-  const divePickText = await page.evaluate(`(() => {
-    const K = /[\\u4e00-\\u9fff]/;
-    for (const w of document.querySelectorAll('#drift-layer .word')) {
-      const r = w.getBoundingClientRect();
-      if (!r.width || r.left < 60 || r.right > 320 || r.top < 260 || r.bottom > 640) continue;
-      if (!K.test(w.textContent)) continue;
-      w.dataset.r3b = '1';
-      return w.textContent;
+  // (b) Hosted taps use the shared reading/stage/page visit. Device Back
+  // must fold every rung on the SAME occurrence without leaving this document.
+  const r3bState = () => page.evaluate(() => ({
+    stamp: window.__r3bDocument, view: document.body.dataset.view, history: history.state,
+    active: document.getElementById('drift-layer')?.classList.contains('active'),
+    mini: document.querySelector('#mini .mini-word')?.textContent ?? null,
+    sheet: document.querySelector('#sheet')?.dataset.node ?? null,
+    dived: document.body.classList.contains('drift-dived'), depth: document.getElementById('depth')?.textContent,
+  }));
+  const r3bTouch = async (point) => {
+    const offset = await page.evaluate(() => ({ x: visualViewport?.offsetLeft || 0, y: visualViewport?.offsetTop || 0 }));
+    const cdp = await context.newCDPSession(page);
+    try {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [
+        { x: point.x - offset.x, y: point.y - offset.y, radiusX: 6, radiusY: 6, force: 1 },
+      ] });
+      await page.waitForTimeout(60);
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    } finally { await cdp.detach(); }
+  };
+  const r3bWordTap = async (target) => {
+    let point = null;
+    // Wait before input for this exact printed occurrence, never replay a delivered tap.
+    for (let i = 0; i < 50 && !point; i++) {
+      point = await target.evaluate(owner => {
+        const r = owner.querySelector('.base')?.getBoundingClientRect();
+        if (!owner.isConnected || !r?.width) return null;
+        const x = r.x + r.width / 2, y = r.y + r.height / 2;
+        if (document.elementFromPoint(x, y)?.closest('.word') !== owner) return null;
+        window.__r3bPointer = null;
+        addEventListener('pointerdown', event => { window.__r3bPointer = {
+          same: event.target.closest('.word') === owner, trusted: event.isTrusted, type: event.pointerType,
+        }; }, { capture: true, once: true });
+        return { x, y };
+      });
+      if (!point) await page.waitForTimeout(100);
     }
-    return null;
-  })()`);
-  check('R3-B · a kanji word stands in the field to dive into', !!divePickText, divePickText ?? 'none');
-  const diveCdp = await page.context().newCDPSession(page);
-  let dived = false;
-  for (let i = 0; i < 5 && !dived && divePickText; i++) {
-    const at = await page.evaluate(`(() => {
-      const w = document.querySelector('#drift-layer .word[data-r3b]');
-      if (!w) return null;
-      const r = w.getBoundingClientRect();
-      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    })()`);
-    if (!at) break;
-    await diveCdp.send('Input.dispatchTouchEvent', {
-      type: 'touchStart',
-      touchPoints: [{ x: at.x, y: at.y }],
-    });
-    await page.waitForTimeout(70);
-    await diveCdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    await page.waitForTimeout(650);
-    dived = await page.evaluate(`document.body.classList.contains('drift-dived')`);
+    assert(point, 'R3-B: original word has an eligible printed hit target');
+    await r3bTouch(point);
+    const actual = await page.evaluate(() => window.__r3bPointer);
+    assert(actual?.same && actual.trusted && actual.type === 'touch', `R3-B native target: ${JSON.stringify(actual)}`);
+    await page.waitForTimeout(500);
+  };
+  for (const rung of ['reading', 'stage', 'page']) {
+    try {
+      await open('?entry=drift');
+      await page.waitForSelector('#drift-layer[data-record-state="active"]');
+      await page.waitForTimeout(2200);
+      assert.equal(await page.getAttribute('body', 'data-furigana'), '1', 'R3-B uses the restored on-touch dial');
+      const target = await page.evaluateHandle(() => [...document.querySelectorAll('#drift-layer .word')].find(n => {
+        const base = n.querySelector('.base'), reading = n.querySelector('.yomi'), r = base?.getBoundingClientRect();
+        return /[\u4e00-\u9fff]/.test(base?.textContent || '') && reading?.textContent &&
+          Number(getComputedStyle(reading).opacity) === 0 && r?.left > 60 && r.right < 330 && r.top > 230 && r.bottom < 620 &&
+          document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)?.closest('.word') === n;
+      }));
+      assert(await target.evaluate(n => !!n), 'R3-B: a visible known word supplies the reading rung');
+      const label = await target.evaluate(n => n.querySelector('.base').textContent);
+      await page.evaluate(rung => { window.__r3bDocument = `hosted-${rung}`; }, rung);
+      await r3bWordTap(target);
+      await page.waitForFunction(n => n.isConnected && n.dataset.ladderRung === 'reading', target);
+      if (rung !== 'reading') {
+        await r3bWordTap(target);
+        await page.waitForSelector('#mini');
+        assert.equal(await target.evaluate(n => n.dataset.ladderRung), 'stage');
+        assert.equal(await page.locator('#mini .mini-word').textContent(), label);
+      }
+      if (rung === 'page') {
+        await r3bWordTap(target);
+        await page.waitForSelector('#sheet');
+        assert.equal(await page.getAttribute('#sheet', 'data-node'), `word:${label}`);
+        assert(await target.evaluate(n => n.isConnected), 'Original occurrence survives page entry');
+      }
+      const before = await r3bState();
+      await page.goBack(); await page.waitForTimeout(800);
+      const after = await r3bState();
+      const origin = after.stamp === before.stamp ? await target.evaluate(n => ({
+        connected: n.isConnected, label: n.querySelector('.base')?.textContent, rung: n.dataset.ladderRung ?? null,
+        readingOpacity: getComputedStyle(n.querySelector('.yomi')).opacity,
+      })) : null;
+      const returned = after.stamp === before.stamp && after.view === 'drift' && after.active && !after.sheet &&
+        origin?.connected && origin.label === label && (rung === 'page'
+          ? origin.rung === 'stage' && after.mini === label
+          : !origin.rung && !after.mini && Number(origin.readingOpacity) === 0);
+      check(`R3-B · device Back from hosted ${rung} returns the exact occurrence`, returned,
+        JSON.stringify({ label, before, after, origin }));
+      if (rung === 'page') {
+        // Do not count a return after failed staging as evidence of a deeper Back.
+        let folded = null;
+        if (returned) { await page.goBack(); await page.waitForTimeout(800); folded = await r3bState(); }
+        const bareOrigin = folded?.stamp === before.stamp ? await target.evaluate(n => ({
+          connected: n.isConnected, rung: n.dataset.ladderRung ?? null, opacity: getComputedStyle(n.querySelector('.yomi')).opacity,
+        })) : null;
+        check('R3-B · another device Back folds the restored hosted stage in place',
+          !!returned && folded?.stamp === before.stamp && folded.view === 'drift' && folded.active &&
+          !folded.mini && !folded.sheet && bareOrigin?.connected && !bareOrigin.rung && Number(bareOrigin.opacity) === 0,
+          JSON.stringify({ folded, bareOrigin }));
+      }
+    } catch (error) {
+      check(`R3-B · hosted ${rung} native setup and return complete`, false, error.stack || String(error));
+    }
   }
-  await diveCdp.detach();
-  check('R3-B · the tap ladder carries into the dive', dived, `drift-dived after ladder taps`);
-  await page.evaluate('window.__r3bDive = 1');
-  await page.goBack();
-  await page.waitForTimeout(800);
-  const backFromDive = await page.evaluate(`({
-    sameDocument: window.__r3bDive === 1,
-    view: document.body.dataset.view,
-    dived: document.body.classList.contains('drift-dived'),
-    layerActive: document.getElementById('drift-layer')?.classList.contains('active'),
-  })`);
-  check('R3-B · device Back from a dive surfaces one level, never leaves the water',
-    backFromDive.sameDocument && backFromDive.view === 'drift' && !backFromDive.dived &&
-      backFromDive.layerActive,
-    JSON.stringify(backFromDive));
+
+  // (b2) The retained PRIVATE sky dive is still a separate Back obligation.
+  // Observe real hub-sprite paint calls (as verify-drift-hunt does), then one
+  // native touch enters the rendered hub. No app-state/API dive or tap loop.
+  await context.addInitScript(() => {
+    window.__r3bHubs = [];
+    const symbols = new WeakMap(), proto = window.CanvasRenderingContext2D.prototype;
+    const fillText = proto.fillText, drawImage = proto.drawImage;
+    proto.fillText = function (text, ...args) {
+      if (this.canvas.width === 96 && this.canvas.height === 96) symbols.set(this.canvas, String(text));
+      return fillText.call(this, text, ...args);
+    };
+    proto.drawImage = function (...args) {
+      if (this.canvas.id === 'fx' && args.length === 5 && args[0] instanceof window.HTMLCanvasElement &&
+          args[0].width === 96 && args[0].height === 96) {
+        window.__r3bHubs.push({ label: symbols.get(args[0]), x: args[1] + args[3] / 2, y: args[2] + args[4] / 2, at: performance.now() });
+        if (window.__r3bHubs.length > 1200) window.__r3bHubs.splice(0, 600);
+      }
+      return drawImage.apply(this, args);
+    };
+  });
+  try {
+    await open('?entry=drift');
+    await page.waitForSelector('#drift-layer[data-record-state="active"]');
+    await page.waitForTimeout(2200);
+    await page.evaluate(() => { window.__r3bDocument = 'private-dive'; });
+    const before = await r3bState();
+    assert(!before.dived && before.depth === '' && !before.mini && !before.sheet, 'Private dive starts at bare depth zero');
+    const hub = await page.waitForFunction(() => {
+      const now = performance.now(), seen = new Set(), options = [];
+      const rects = [...document.querySelectorAll('#drift-layer .word,#drift-layer .glyph,#drift-layer .part')]
+        .map(n => n.getBoundingClientRect());
+      for (const h of window.__r3bHubs.slice().reverse()) {
+        if (now - h.at >= 220 || !h.label || seen.has(h.label)) continue;
+        seen.add(h.label);
+        // Same visible hub-body samples as verify-drift-hunt, all within its
+        // existing 34px door. Clearance prevents native touch target adjustment
+        // from choosing a nearby word; the delivered target is asserted below.
+        for (const [dx, dy] of [[0,0],[24,0],[-24,0],[0,-24],[0,24],[17,-17],[-17,-17],[17,17],[-17,17]]) {
+          const x = h.x + dx, y = h.y + dy, hit = document.elementFromPoint(x, y);
+          if (x < 52 || x > 338 || y < 170 || y > 690 ||
+              hit?.closest('.word,.glyph,.part,#lvl,#theme,.drift-door,#ginga-symbol,#ginga-theme-seal,#chrome,.nav-bar')) continue;
+          const clearance = Math.min(...rects.map(r => Math.hypot(Math.max(r.left-x, 0, x-r.right), Math.max(r.top-y, 0, y-r.bottom))));
+          options.push({ ...h, canvas: { x: h.x, y: h.y }, x, y, dx, dy, clearance });
+        }
+      }
+      return options.sort((a, b) => b.clearance - a.clearance).find(h => h.clearance >= 12) || null;
+    }, null, { timeout: 6000 });
+    const point = await hub.jsonValue();
+    await page.evaluate(() => {
+      window.__r3bPointer = null;
+      addEventListener('pointerdown', event => { window.__r3bPointer = {
+        trusted: event.isTrusted, type: event.pointerType, node: event.target.closest('.word,.glyph,.part')?.className ?? null,
+      }; }, { capture: true, once: true });
+    });
+    await r3bTouch(point);
+    const actual = await page.evaluate(() => window.__r3bPointer);
+    assert(actual?.trusted && actual.type === 'touch' && !actual.node, `Native canvas hub target: ${JSON.stringify(actual)}`);
+    await page.waitForFunction(label => document.body.classList.contains('drift-dived') &&
+      document.getElementById('depth')?.textContent === label, point.label, { timeout: 5000 });
+    const dived = await r3bState();
+    const entered = dived.stamp === before.stamp && dived.dived && dived.depth === point.label && dived.history?.bunkiWalk?.v === 1;
+    check('R3-B · native canvas hub enters exactly one private sky level', entered, JSON.stringify({ point, actual, dived }));
+    await page.goBack(); await page.waitForTimeout(800);
+    const returned = await r3bState();
+    check('R3-B · device Back from a private dive surfaces one level, never leaves the water',
+      entered && returned.stamp === before.stamp && returned.view === 'drift' && returned.active &&
+      !returned.dived && returned.depth === '' && !returned.mini && !returned.sheet, JSON.stringify(returned));
+  } catch (error) {
+    check('R3-B · private dive native setup and return complete', false, error.stack || String(error));
+  }
 
   // (c) the archive keeps BOTH scroll contexts across Back — the year list
   // where a row was opened, and the shelf where its door stands ~20,000px deep
@@ -3970,6 +4138,8 @@ async function main() {
     w: invalidParamsRecord.srsPrefs.fsrs.w.map((x, i) => (i === 20 ? 5 : x)),
   };
   const invalidParamsContext = await browser.newContext(contextOptions);
+  // This is an existing-device journey; G3's fresh-device demonstration has its own verifier.
+  await invalidParamsContext.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });
   await invalidParamsContext.addInitScript((recordText) => {
     if (!location.href.startsWith('http://127.0.0.1:') || sessionStorage.getItem('params-fixture-seeded')) return;
     localStorage.setItem('kairo-corridor-v1', recordText);
@@ -4121,8 +4291,7 @@ async function main() {
     const tok = document.querySelector('#reader .tok.content');
     return tok ? tok.textContent.trim() : '';
   })()`);
-  await tap(page, '#reader .tok.content');
-  await page.waitForTimeout(400);
+  await openWordStage(page, '#reader .tok.content');
   const sentDoorSeen = await page.evaluate(`(() => {
     const d = document.querySelector('.sent-door');
     if (d) { d.click(); return true; }

@@ -63,8 +63,11 @@
  *       never "Not in the quick dictionary" once settled;
  *       never a card left at "…"; a card naming no entry holds its Save and says why.
  *       Counts and every exception are written to the report
- *   R   recorded, never asserted: 式 in 表彰式 and 改造 in 内閣改造 (sense: the tokens carry no sense data), ちかい in
- *       the phonetic parenthetical (G3), し of する (an inflected verb reads its dictionary form), the first paint
+ *   R   recorded, never asserted: 式 in 表彰式 and 改造 in 内閣改造 (sense: the tokens carry no sense data),
+ *       し of する (an inflected verb reads its dictionary form), the first paint. G3 explicitly asserts
+ *       that ちかい in the phonetic parenthetical is an annotation with no door, extra ruby or menu, that 拓's partial
+ *       reading ひら (切り拓（ひら）く) is one too, and that a parenthetical reading no word before it (要因（ボトルネック）)
+ *       keeps its doors.
  * Every engine run logs browser.version(). READING_TRUTH_ONLY=<case,…> runs only the named cases (a negative control's
  * scope); such a run is marked partial in the report and is never an acceptance result. READING_TRUTH_PAST_F0=1 lets a
  * negative control that moves a fixture (the 私/わたくし entry dropped) watch the browser too: the run still fails on F0
@@ -72,6 +75,7 @@
  * Negative control: the same run against a build with R's reading edits reverted fails A1 on 年 (とし). N2: with the te-form
  * rule reverted (no token marked) N2.te, R2.stem and AUX fail; with the kana いる rule reverted N2.alone fails. */
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
@@ -107,6 +111,7 @@ const WIKINEWS = art('wikinews:45227', 'wikinews-45227.json', '21年の歴史');
 const KOJIKI = art('bunki-essay-n2-kojiki-myth-history', 'bunki-essay-n2-kojiki-myth-history.json', '古事記');
 const DIARY = art('bunki-graded-n3-nakaima-diary', 'bunki-graded-n3-nakaima-diary.json', '中今');
 const CABINET = art('jawiki:5294446', 'jawiki-5294446.json', '高市内閣');
+const BOTTLENECK = art('env:press-press_05575', 'env-press-press_05575.json', 'ナッジ実証事業');
 const KAWAGUCHI = art('aozora:049966-1', 'aozora-049966-1.json', 'チベット旅行記');
 // a homograph read otherwise than the quick dictionary names its entry; its twin read like the quick dictionary is the core
 const PAIRS = Object.freeze([
@@ -412,6 +417,8 @@ const F0_OK = rows.every((row) => row.recorded || row.ok);
 /* ------------------------------------------------------------------ the browser */
 const host = await startStaticHost({ site, port: 0 });
 async function boot(page, query = '?entry=shelf&ui=bi') {
+  // The demo has its own fresh-record gate; reading-truth measures deliberate lookup.
+  await page.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
   await page.goto(`${host.origin}/index.html${query}`);
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
 }
@@ -432,6 +439,49 @@ const tok = (page, index) => page.locator(`#reader .tok[data-index="${index}"]`)
 async function tapAt(page, locator) {
   await locator.tap({ timeout: 15000 });
 }
+async function tapExactPrintedReaderGlyph(page, locator, { index, surface, annotation = null }) {
+  // Scroll setup only. Mobile WebKit does not implement mouse.wheel.
+  await locator.evaluate(node => node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' }));
+  await page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
+  const evidence = await locator.evaluate(node => {
+    const glyphs = [], text = [];
+    const walker = document.createTreeWalker(node.querySelector('.tok-word') || node, NodeFilter.SHOW_TEXT, {
+      acceptNode: t => t.parentElement.closest('rt,.tok-en,.tok-state') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
+    });
+    while (walker.nextNode()) {
+      const t = walker.currentNode; let offset = 0;
+      for (const char of t.textContent) {
+        const range = document.createRange(); range.setStart(t, offset); offset += char.length; range.setEnd(t, offset);
+        text.push(char); if (/\s/u.test(char)) continue;
+        for (const rect of range.getClientRects()) {
+          if (!rect.width || !rect.height) continue;
+          const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2;
+          const owner = document.elementFromPoint(x, y);
+          glyphs.push({ char, x, y, visible: x >= 0 && x < innerWidth && y >= 0 && y < innerHeight,
+            owns: !!owner && node.contains(owner), ownerIndex: owner?.closest('#reader .tok')?.dataset.index ?? null });
+        }
+      }
+    }
+    return { index: node.dataset.index, surface: text.join(''), annotation: node.dataset.readerAnnotation ?? null, glyphs };
+  });
+  assert.equal(evidence.index, String(index)); assert.equal(evidence.surface, surface);
+  assert.equal(evidence.annotation, annotation, 'DOM annotation classification disagrees with independently proved source eligibility');
+  assert(evidence.glyphs.length && evidence.glyphs.every(g => g.visible && g.owns && g.ownerIndex === String(index)),
+    'Every printed glyph must be in view and owned by this exact occurrence; never rescue another point');
+  await page.evaluate(() => {
+    window.__readingTruthGlyphWitness = null;
+    document.addEventListener('click', event => {
+      window.__readingTruthGlyphWitness = { index: event.target.closest?.('#reader .tok')?.dataset.index ?? null,
+        trusted: event.isTrusted, pointerType: event.pointerType ?? null };
+    }, { capture: true, once: true });
+  });
+  const point = evidence.glyphs[0]; await page.touchscreen.tap(point.x, point.y);
+  await page.waitForFunction(() => window.__readingTruthGlyphWitness !== null, null, { timeout: 1000 });
+  const witness = await page.evaluate(() => window.__readingTruthGlyphWitness);
+  assert(witness.trusted && witness.index === String(index), 'Native touch must activate the exact requested occurrence');
+  return { ...evidence, witness };
+}
+
 async function closeMini(page) {
   for (let attempt = 0; attempt < 3 && await page.locator('#mini').count(); attempt++) {
     await page.locator('#mini').press('Escape').catch(() => {});
@@ -446,12 +496,49 @@ const miniState = (page) => page.evaluate(() => {
     gloss: mini.querySelector('.mini-gloss')?.textContent ?? '', take: take ? { disabled: take.disabled, text: take.textContent.trim() } : null,
     reason: mini.querySelector('#mini-take-reason')?.textContent ?? null };
 });
+/** Reach the stage without waiting for dictionary settlement (cold-index gates hold that promise). */
+async function activateStage(page, locator, activate = () => tapAt(page, locator)) {
+  await activate();
+  // Advance only an observed reading rung; no blind second tap can rescue a dead door.
+  await page.waitForFunction((node) => !!document.getElementById('mini') || node.dataset.ladderRung === 'reading',
+    await locator.elementHandle(), { timeout: 20000 });
+  if (!await page.locator('#mini').count()) await activate();
+  await page.locator('#mini').waitFor({ timeout: 20000 });
+}
 /** The slip as it first paints, and as it settles: a slip drawn before the full dictionary answered is aria-busy
  * until the answer redraws it (or the answer changes nothing). */
-async function slip(page, locator, { keyboard = false } = {}) {
+async function slip(page, locator, { keyboard = false, sweepTarget = null } = {}) {
   await closeMini(page);
-  if (keyboard) { await locator.focus(); await page.keyboard.press('Enter'); } else await tapAt(page, locator);
-  await page.locator('#mini').waitFor({ timeout: 20000 });
+  const activate = async () => {
+    if (keyboard) {
+      const rover = await locator.evaluate((node) => {
+        const block = node.closest('[data-prose-roving]');
+        const native = node.matches('button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary');
+        if (!block) return { index: -1, native };
+        const selector = block.hasAttribute('data-reader-prose') ? '.tok[data-para]'
+          : node.matches('.sentence-tok') ? '.sentence-tok'
+            : node.matches('.kp-tok') ? '.kp-tok'
+              : block.querySelector('.gs-word') ? '.japanese-lookup-word,.gs-word' : '.japanese-lookup-word';
+        return { index: [...block.querySelectorAll(selector)].filter((word) => word.closest('[data-prose-roving]') === block).indexOf(node), native };
+      });
+      if (rover.index >= 0) {
+        await locator.locator('xpath=ancestor::*[@data-prose-roving][1]').focus();
+        await page.keyboard.press('Home');
+        for (let n = 0; n < rover.index; n++) await page.keyboard.press('ArrowRight');
+      } else {
+        assert(rover.native, 'a keyboard target outside its selector-specific rover must be a native focusable control');
+        await locator.focus();
+      }
+      assert(await locator.evaluate((node) => document.activeElement === node), 'keyboard activation must target the requested occurrence');
+      await page.keyboard.press('Enter');
+    } else if (sweepTarget) sweepTarget.taps.push(await tapExactPrintedReaderGlyph(page, locator, sweepTarget));
+    else await tapAt(page, locator);
+  };
+  await activateStage(page, locator, activate);
+  if (sweepTarget) {
+    assert.equal(await locator.getAttribute('data-index'), String(sweepTarget.index));
+    assert.equal(await locator.getAttribute('data-ladder-rung'), 'stage', 'The exact sweep occurrence must own the stage');
+  }
   const first = await miniState(page);
   await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 30000 });
   await delay(100);
@@ -609,8 +696,41 @@ async function stableCases(page) {
     name.settled?.gloss === NO_ENTRY && name.settled.take?.disabled && name.settled.reason === SAVE_REASON, name.settled);
   for (const fixture of RECORDED.filter((f) => f.at === STARTUP)) record(`R.${fixture.name}`, fixture.name, (await slip(page, tok(page, fixture.index))).settled);
   await openArticle(page, CABINET);
-  for (const fixture of RECORDED.filter((f) => f.at === CABINET)) record(`R.${fixture.name}`, fixture.name, (await slip(page, tok(page, fixture.index))).settled);
+  for (const fixture of RECORDED.filter((f) => f.at === CABINET)) {
+    if (fixture.index !== 11) { record(`R.${fixture.name}`, fixture.name, (await slip(page, tok(page, fixture.index))).settled); continue; }
+    await closeMini(page);
+    const annotation = page.locator('#reader span[data-index="11"][data-reader-annotation="true"]');
+    await annotation.waitFor();
+    const before = await annotation.evaluate((node) => ({ text: node.textContent, action: node.dataset.action ?? null,
+      role: node.getAttribute('role'), popup: node.getAttribute('aria-haspopup'), paragraphDoor: node.hasAttribute('data-para'),
+      ruby: node.querySelectorAll('ruby,rt').length }));
+    await annotation.tap(); await delay(200);
+    const afterTap = await page.evaluate(() => ({ mini: !!document.getElementById('mini'), page: !!document.getElementById('sheet'),
+      raised: document.querySelector('[data-index="11"][data-reader-annotation]')?.dataset.ladderRung ?? null }));
+    await annotation.click({ button: 'right' }); await delay(200);
+    const menu = await page.locator('#reader-word-menu').count();
+    check('G3.phonetic-annotation', 'Cabinet token11 ちかい remains source text, with no lookup door, extra ruby, stage or word menu',
+      before.text === fixture.s && !before.action && !before.role && !before.popup && !before.paragraphDoor && before.ruby === 0
+        && !afterTap.mini && !afterTap.page && !afterTap.raised && menu === 0, { before, afterTap, menu });
+  }
   await closeMini(page);
+  // G3 · a parenthetical is an annotation only when it reads the word before it: 拓's partial reading in 切り拓（ひら）く is
+  // the text's furigana; 要因（ボトルネック） names a second word, whose tokens stay doors like every other
+  const facts = (index) => tok(page, index).evaluate((node) => {
+    const copy = node.cloneNode(true);
+    copy.querySelectorAll('rt').forEach((rt) => rt.remove());
+    return { text: copy.textContent, annotation: node.dataset.readerAnnotation === 'true', door: node.hasAttribute('data-para'),
+      popup: node.getAttribute('aria-haspopup') };
+  });
+  await openArticle(page, STARTUP);
+  const partial = { written: await facts(407), reading: await facts(409) };
+  check('G3.partial-annotation', 'Startup 切り拓（ひら）: 拓 stays a door and its partial reading ひら is an annotation with no door',
+    partial.written.text === '拓' && partial.written.door && !partial.written.annotation
+      && partial.reading.text === 'ひら' && partial.reading.annotation && !partial.reading.door && !partial.reading.popup, partial);
+  await openArticle(page, BOTTLENECK);
+  const semantic = [await facts(601), await facts(603), await facts(604)];
+  check('G3.semantic-parenthetical', 'env-press 要因（ボトルネック）: a katakana word that does not read 要因 keeps its doors, ボトル and ネック',
+    semantic.map((row) => row.text).join(',') === '要因,ボトル,ネック' && semantic.every((row) => row.door && !row.annotation), semantic);
 }
 
 async function sentenceCase(page) {
@@ -620,7 +740,7 @@ async function sentenceCase(page) {
   await slip(page, tok(page, 4));
   await tapAt(page, tok(page, 4));
   await page.locator('#sheet').waitFor({ timeout: 15000 });
-  const year = page.locator('#sheet .example-ja .sentence-tok').filter({ hasText: /^年$/u });
+  const year = page.locator('#sheet .example-ja .sentence-tok[data-prose-label="年"]');
   await year.first().waitFor({ timeout: 20000 });
   await stillFor(page, '#sheet');
   const counting = await year.evaluateAll((nodes) => nodes.findIndex((node) => /[0-9０-９〇一二三四五六七八九十]$/u.test(node.previousSibling?.textContent || '')));
@@ -667,8 +787,7 @@ async function coldCase(browser, contextOptions, answer) {
       };
       new MutationObserver(seen).observe(document.body, { childList: true, subtree: true, characterData: true });
     });
-    await tapAt(page, tok(page, COLD.index));
-    await page.locator('#mini').waitFor({ timeout: 20000 });
+    await activateStage(page, tok(page, COLD.index));
     for (let attempt = 0; attempt < 80 && !asked; attempt++) await delay(250);
     const held = await miniState(page);
     const line = await page.evaluate(() => {
@@ -743,8 +862,7 @@ async function unreadCase(browser, contextOptions) {
       };
       new MutationObserver(seen).observe(document.body, { childList: true, subtree: true, characterData: true });
     });
-    await tapAt(page, tok(page, UNREAD.index));
-    await page.locator('#mini').waitFor({ timeout: 20000 });
+    await activateStage(page, tok(page, UNREAD.index));
     for (let attempt = 0; attempt < 80 && !asked; attempt++) await delay(250);
     const held = await miniState(page);
     check(`${tag}.held`, 'with the full dictionary held, the card for 訳 reads やく, its meaning line is a quiet "…", Save is held and says nothing',
@@ -996,9 +1114,75 @@ const classFits = (p, entry) => (p === '動詞' ? classOf(entry).some(verbal) : 
 const teExpressionFits = (tokens, index, label, stated) => afterTeForm(tokens, index)
   && readAs(label, stated).some((row) => teSensesOf(String(row[0])).some((sense) => (sense[0] || []).includes('exp')));
 
+
+// Explicit independently reviewed source proofs, never inferred from a renderer flag.
+// New/changed fixtures fail closed and require re-review. Semantic parentheticals
+// stay eligible; stable-case controls for ボトル/ネック remain mandatory separately.
+const SWEEP_PRONUNCIATION_PROOFS = [
+  { id: 'gojuon-pronunciation', article: 'bunki-read-n3-gojuon-sanskrit',
+    sha256: '830d99e8e1c86e273f6ed334de1cc6dbcbf030972c9424465735af42557fff0d',
+    bracket: [348, 354], written: '悉曇', reading: 'しったん', tokenReadingIndex: 230,
+    basis: 'Authored source phrase and token230.r independently agree exactly with bracket content.' },
+  { id: 'cabinet-pronunciation', article: 'jawiki:5294446',
+    sha256: 'fdc707e444625169cc39d1a06a4dc1f64489fd131ab0aa898c001e26df29b51d',
+    bracket: [9, 27], written: '第2次高市改造内閣', reading: 'だいにじたかいちかいぞうないかく',
+    basis: 'Reviewed literal source title pronunciation; same complete bracket as accepted Cabinet token11 fixture. Tokenizer readings are imperfect; do not infer equality from token.r concatenation.' },
+  { id: 'shina-name-pronunciation', article: 'wikinews:45089',
+    sha256: '70e8acfb88c662b028569d231525cfe3b8834184d0cb9c59eebcaa57f14395c5',
+    bracket: [40, 48], written: '階猛', reading: 'しな・たけし',
+    basis: 'Reviewed literal source name pronunciation 階猛（しな・たけし）氏. Tokenizer 階.r=かい is not the name reading; fixture is explicit, not guessed from that token.' },
+];
+
+function sweepEligibility(article, file, tokens) {
+  const text = tokens.map(t => t.s).join('');
+  const proofs = SWEEP_PRONUNCIATION_PROOFS.filter(p => p.article === article);
+  const fileSha256 = createHash('sha256').update(readFileSync(resolve(site, 'data/articles', file))).digest('hex');
+  for (const proof of proofs) {
+    assert.equal(fileSha256, proof.sha256, `${article}: pronunciation source changed; re-review`);
+    assert.equal(text.slice(...proof.bracket), `（${proof.reading}）`);
+    assert.equal(text.slice(proof.bracket[0] - proof.written.length, proof.bracket[0]), proof.written);
+    if (proof.tokenReadingIndex !== undefined) {
+      assert.equal(tokens[proof.tokenReadingIndex].s, proof.written);
+      assert.equal(tokens[proof.tokenReadingIndex].r, proof.reading);
+    }
+  }
+  let offset = 0; const occurrences = [], distinct = new Map(), original = new Set();
+  for (const [index, token] of tokens.entries()) {
+    const start = offset; offset += token.s.length;
+    if (!token.b || token.b === token.s) continue;
+    const key = `${token.s}|${token.b}|${token.r}|${!!token.c}`;
+    original.add(key);
+    const proof = proofs.find(p => start >= p.bracket[0] && offset <= p.bracket[1]);
+    occurrences.push({ index, start, end: offset, token, eligible: !proof, proof: proof?.id ?? null });
+    if (proof) continue; // BEFORE dedup: wikinews #27 excluded, semantic #61 retained.
+    if (distinct.has(key)) { distinct.get(key).occurrences++; distinct.get(key).indices.push(index); }
+    else distinct.set(key, { index, token, occurrences: 1, indices: [index] });
+  }
+  return { fileSha256, proofs, occurrences, originalDistinct: original.size, distinct };
+}
+async function checkSweepAnnotation(page, occurrence) {
+  await closeMini(page);
+  const locator = tok(page, occurrence.index);
+  const beforeRecord = await readAppRecord(page);
+  const geometry = await tapExactPrintedReaderGlyph(page, locator, { index: occurrence.index, surface: occurrence.token.s, annotation: 'true' });
+  await delay(200);
+  const point = geometry.glyphs[0];
+  await page.mouse.click(point.x, point.y, { button: 'right' }); await delay(100);
+  const observed = await locator.evaluate(node => ({ text: node.textContent, para: node.hasAttribute('data-para'),
+    action: node.dataset.action ?? null, role: node.getAttribute('role'), popup: node.getAttribute('aria-haspopup'),
+    ruby: node.querySelectorAll('ruby,rt').length, rung: node.dataset.ladderRung ?? null,
+    stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), menu: !!document.getElementById('reader-word-menu') }));
+  const afterRecord = await readAppRecord(page);
+  assert.equal(observed.text, occurrence.token.s);
+  assert(!observed.para && !observed.action && !observed.role && !observed.popup && !observed.ruby && !observed.rung && !observed.stage && !observed.page && !observed.menu,
+    'Independently proved pronunciation must remain inert source text');
+  for (const key of ['taken', 'srs', 'revlog', 'stats', 'lists', 'obslog']) assert.deepEqual(afterRecord[key], beforeRecord[key], `${key} unchanged for inert annotation`);
+  return { geometry, observed, noSaveOrGrade: true };
+}
+
 async function sweepCase(browser, contextOptions) {
   const report = { engine, articles: [], notOnShelf: [], totals: { tokens: 0, occurrences: 0, tapped: 0, entry: 0, quick: 0, kanji: 0, several: 0, noEntry: 0,
-    asWritten: 0, particle: 0, wordLayer: 0, unanswered: 0, classUnknown: 0, exceptions: 0, tapFailures: 0 }, exceptions: [] };
+    asWritten: 0, particle: 0, wordLayer: 0, unanswered: 0, classUnknown: 0, exceptions: 0, tapFailures: 0 }, exceptions: [], annotationChecks: [] };
   const context = await browser.newContext(contextOptions);
   await silenceBrowserAudio(context);
   await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
@@ -1042,22 +1226,35 @@ async function sweepCase(browser, contextOptions) {
       swept.add(row.id);
       const id = row.id;
       const tokens = json(`data/articles/${row.file}`).tokens || [];
-      const distinct = new Map();
-      tokens.forEach((t, index) => {
-        if (!t.b || t.b === t.s) return;
-        const key = `${t.s}|${t.b}|${t.r}|${!!t.c}`;
-        if (distinct.has(key)) distinct.get(key).occurrences += 1;
-        else distinct.set(key, { index, token: t, occurrences: 1 });
-      });
-      const article = { id, group: item.group, tokens: distinct.size, occurrences: 0, rows: [] };
+      const eligibility = sweepEligibility(id, row.file, tokens), distinct = eligibility.distinct;
+      const article = { id, group: item.group, tokens: distinct.size, occurrences: 0, rows: [],
+        eligibility: { fileSha256: eligibility.fileSha256, proofs: eligibility.proofs, originalDistinct: eligibility.originalDistinct,
+          originalOccurrences: eligibility.occurrences.length, roster: eligibility.occurrences,
+          representatives: [...distinct.values()].map(({ index, indices }) => ({ index, indices })) } };
       report.articles.push(article);
+      for (const occurrence of eligibility.occurrences.filter(r => !r.eligible)) {
+        const result = { article: id, index: occurrence.index, proof: occurrence.proof, passed: false };
+        try { result.evidence = await checkSweepAnnotation(page, occurrence); result.passed = true; }
+        catch (error) { result.error = String(error.stack || error); }
+        report.annotationChecks.push(result);
+      }
       for (const { index, token, occurrences } of distinct.values()) {
         report.totals.tokens += 1;
         report.totals.occurrences += occurrences;
         article.occurrences += occurrences;
         let card = null, failure = null;
-        try { card = (await slip(page, tok(page, index))).settled; } catch (error) { failure = String(error.message || error).split('\n')[0].slice(0, 160); }
-        const out = { index, s: token.s, b: token.b, r: token.r, p: token.p, c: !!token.c, occurrences, card, how: '', answer: '', issues: [] };
+        const sweepTarget = { index, surface: token.s, taps: [] };
+        let noSaveOrGrade = false;
+        try {
+          const beforeRecord = await readAppRecord(page);
+          card = (await slip(page, tok(page, index), { sweepTarget })).settled;
+          const afterRecord = await readAppRecord(page);
+          for (const key of ['taken', 'srs', 'revlog', 'stats', 'lists']) assert.deepEqual(afterRecord[key], beforeRecord[key], `${key} unchanged for lookup`);
+          noSaveOrGrade = true;
+        } catch (error) { failure = String(error.message || error).split('\n')[0].slice(0, 160); }
+        const out = { index, s: token.s, b: token.b, r: token.r, p: token.p, c: !!token.c, occurrences, card, how: '', answer: '', issues: [],
+          taps: sweepTarget.taps, noSaveOrGrade };
+        if (failure && card) out.issues.push(`activation/record assertion: ${failure}`);
         if (!card) {
           report.totals.tapFailures += 1;
           out.issues.push(`no card: ${failure}`);
@@ -1104,6 +1301,11 @@ async function sweepCase(browser, contextOptions) {
     await context.close();
     writeFileSync(resolve(evidence, `sweep-${engine}.json`), `${JSON.stringify(report, null, 1)}\n`);
   }
+  check('SWEEP.annotations', 'only independently proved source pronunciation occurrences are excluded, and each remains inert in the actual DOM',
+    report.annotationChecks.every(row => row.passed), report.annotationChecks);
+  check('SWEEP.no-save-or-grade', 'ordinary sweep lookups never save or grade',
+    report.articles.every(article => article.rows.every(row => row.noSaveOrGrade)),
+    report.articles.flatMap(article => article.rows.filter(row => !row.noSaveOrGrade).map(row => ({ article: article.id, index: row.index, issues: row.issues }))));
   const all = report.exceptions;
   const list = (pick) => all.filter(pick).map((x) => `${x.article} #${x.index} ${x.s}/${x.b}/${x.r}: ${x.issues.join('; ')}`).slice(0, 12);
   const twentySwept = report.articles.filter((article) => article.group === 'twenty').length;

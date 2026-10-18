@@ -776,7 +776,8 @@ const CASES = {
       await page.evaluate(() => document.getElementById('mini')?.remove());
       // a word in his own line: the slip opens, nothing is counted
       const beforeMine = await T(page).record();
-      const myWord = page.locator('.speak-line[data-who="me"] .speak-text button.japanese-lookup-word').first();
+      // G3 · a lookup word is a span in a roving paragraph now, not a button; the door is the same word
+      const myWord = page.locator('.speak-line[data-who="me"] .speak-text .japanese-lookup-word').first();
       const mine = await myWord.getAttribute('data-speak-b');
       await myWord.click();
       await page.waitForSelector('#mini', { timeout: 8000 });

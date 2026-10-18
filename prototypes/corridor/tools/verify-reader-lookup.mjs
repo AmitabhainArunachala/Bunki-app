@@ -36,14 +36,58 @@ for (const fixture of missing) {
     'Missing fixture must not have a full-dictionary row');
 }
 assert.equal(article.tokens[2].s,'の');
-const host=await startStaticHost({site,port:0}), results=[];
+const host=await startStaticHost({site,port:0}), results=[], browserVersions={}, pointerSamples=[];
 const token=(page,index)=>page.locator(`#reader .tok[data-index="${index}"]`);
 async function center(locator){
   await locator.scrollIntoViewIfNeeded();
-  return locator.evaluate(node=>{const box=node.getBoundingClientRect(),x=box.left+box.width/2,y=box.top+box.height/2;
-    if(!node.contains(document.elementFromPoint(x,y)))throw new Error('Token centre obscured');return{x,y};});
+  // Inline words may wrap. Their union box contains other words; use an actual
+  // printed glyph fragment while retaining exact occurrence hit ownership.
+  const point=await locator.evaluate(node=>{
+    const box=node.getBoundingClientRect(),cx=box.left+box.width/2,cy=box.top+box.height/2;
+    const union={x:cx,y:cy,width:box.width,height:box.height,hit:node.contains(document.elementFromPoint(cx,cy)),fragments:node.getClientRects().length};
+    const walker=document.createTreeWalker(node,NodeFilter.SHOW_TEXT);
+    while(walker.nextNode()){
+      const text=walker.currentNode;if(text.parentElement.closest('rt,.tok-en'))continue;
+      for(let i=0;i<text.length;i++){
+        if(!/[^\s]/u.test(text.data[i]))continue;
+        const range=document.createRange();range.setStart(text,i);range.setEnd(text,i+1);
+        const r=range.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+        if(r.width>0&&r.height>0&&node.contains(document.elementFromPoint(x,y)))return{x,y,index:node.dataset.index,glyph:text.data[i],union};
+      }
+    }
+    throw new Error(`No printed glyph of this occurrence is hit-testable: ${JSON.stringify(union)}`);
+  });
+  pointerSamples.push(point);return point;
 }
 async function click(page,locator){const at=await center(locator);await page.mouse.click(at.x,at.y);}
+async function focusOccurrence(page,word){
+  const at=await word.evaluate(node=>{const block=node.closest('[data-reader-prose]');return [...block.querySelectorAll('.tok[data-para]')].indexOf(node);});
+  assert(at>=0);await word.locator('xpath=ancestor::*[@data-reader-prose][1]').focus();
+  await page.keyboard.press('Home');for(let i=0;i<at;i++)await page.keyboard.press('ArrowRight');
+  assert(await word.evaluate(node=>document.activeElement===node),'The exact occurrence is selected through its paragraph');
+}
+async function openStage(page,word,source,dials,modality='pointer'){
+  if(modality!=='pointer')await focusOccurrence(page,word);
+  const activate=()=>modality==='pointer'?click(page,word):page.keyboard.press(modality);
+  const surface=await word.evaluate(node=>{const clone=node.cloneNode(true);clone.querySelectorAll('rt,.tok-en').forEach(n=>n.remove());return clone.textContent;});
+  const kana=s=>String(s||'').replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
+  const reveal=Number(dials.split(',')[1])===1&&!!source.r&&kana(source.r)!==kana(surface);
+  await activate();
+  await page.waitForFunction(node=>!!node?.dataset.ladderRung,await word.elementHandle());
+  assert.equal(await word.getAttribute('data-ladder-rung'),reveal?'reading':'stage','The first activation follows this dial and exact displayed word');
+  if(reveal){
+    assert.equal(await page.locator('#mini').count(),0,'The first rung has no meaning stage');
+    await page.waitForFunction(node=>[...node.querySelectorAll('ruby')].some(ruby=>{
+      const rt=ruby.querySelector('rt');if(!rt?.textContent||rt.classList.contains('hidden-rt'))return false;
+      const n=getComputedStyle(rt),p=getComputedStyle(ruby,'::before');
+      return rt.getClientRects().length>0&&n.display!=='none'&&n.visibility!=='hidden'&&Number(n.opacity)>0||
+        ruby.dataset.r===rt.textContent&&p.content===JSON.stringify(rt.textContent)&&p.visibility!=='hidden'&&Number(p.opacity)>0;
+    }),await word.elementHandle(),{timeout:5000});
+    await activate();
+  }
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'),'stage','The same occurrence reaches the meaning stage');
+}
 async function open(page,dials){
   await page.goto(`${host.origin}/?entry=shelf&dials=${dials}&ui=bi`);
   await page.waitForFunction(()=>document.body.dataset.ready==='1');
@@ -67,8 +111,10 @@ try{
  for(const engine of engines){
   const browserType={chromium,webkit}[engine];
   const browser=await browserType.launch({headless:true});
+  browserVersions[engine]=browser.version(); console.log(`${engine} ${browserVersions[engine]}`);
   const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce',serviceWorkers:'block'});
   await silenceBrowserAudio(context);
+  await context.addInitScript(()=>localStorage.setItem('kairo-word-ladder-demo-v1','1')); // This is lookup coverage, not the fresh-record demonstration.
   const page=await context.newPage(),errors=[];
   page.setDefaultTimeout(12000);page.on('pageerror',e=>errors.push(e.message));
   await context.route('**/*',route=>new URL(route.request().url()).origin===host.origin?route.continue():route.abort());
@@ -81,29 +127,29 @@ try{
    for(const dials of ['0,1,0','0,0,0','0,2,0','2,1,0']){
     await run('named-known-'+dials.replaceAll(',','-'),async()=>{
      await open(page,dials);const named=token(page,1),neighbour=await token(page,2).textContent();
-     assert.equal(await named.evaluate(n=>n.tagName),'BUTTON');assert(await named.getAttribute('aria-label'));
-     await click(page,named);await page.locator('#mini .mini-reading').waitFor();
+     assert.equal(await named.evaluate(n=>n.tagName),'SPAN');assert.equal(await named.getAttribute('role'),'presentation');assert.equal(await named.getAttribute('tabindex'),null);
+     await openStage(page,named,article.tokens[1],dials);await page.locator('#mini .mini-reading').waitFor();
      const shown=await mini(page);assert.deepEqual(shown,{word:'谷川',reading:'たにがわ',gloss:'mountain stream',role:'dialog'});
      assert.equal(await token(page,2).textContent(),neighbour);assert.equal(await page.locator('#sheet').count(),0);
      assert.equal(await named.locator('.tok-en').count(),0,'Lookup must not inject another word’s inline gloss');
      for(const key of ['Enter','Space']){
-      await tapOutside(page);await named.focus();await page.keyboard.press(key);
+      await tapOutside(page);await openStage(page,named,article.tokens[1],dials,key);
       await page.locator('#mini .mini-reading').waitFor();assert.deepEqual(await mini(page),shown);
      }
      return{dials,shown,labelAfter:await named.getAttribute('aria-label')};
     });
     for(const fixture of missing) await run(fixture.kind+'-absent-'+dials.replaceAll(',','-'),async()=>{
      await open(page,dials);const control=token(page,fixture.index);
-     assert.equal(await control.evaluate(node=>node.tagName),'BUTTON');
+     assert.equal(await control.evaluate(node=>node.tagName),'SPAN');assert.equal(await control.getAttribute('role'),'presentation');assert.equal(await control.getAttribute('tabindex'),null);
      assert(await control.evaluate((node,kind)=>node.classList.contains(kind),fixture.kind));
-     await click(page,control);await page.locator('#mini').waitFor();
+     await openStage(page,control,article.tokens[fixture.index],dials);await page.locator('#mini').waitFor();
      const shown=await mini(page);assert.equal(shown.word,fixture.surface);
      assert.equal(shown.reading,fixture.reading,'A retained token reading must survive lookup even when the dictionary has no entry');
      assert.equal(await page.locator('#mini-take').isDisabled(),true,'Absent meanings cannot create an empty review card');return shown;
     });
     await run('auxiliary-identity-'+dials.replaceAll(',','-'),async()=>{
      await open(page,dials);const ending=token(page,89);
-     await click(page,ending);await page.locator('#mini').waitFor();
+     await openStage(page,ending,article.tokens[89],dials);await page.locator('#mini').waitFor();
      const shown=await mini(page);
      // L · a word written exactly as it is read does not say itself twice: ます has no reading line
      assert.equal(shown.word,'ます');assert.equal(shown.reading,'');
@@ -115,7 +161,7 @@ try{
      assert.equal(await page.locator('#sheet').count(),0);
      // the same run, a kanji word: its reading line is still there (谷川 read たにがわ), so hiding every reading cannot pass
      await tapOutside(page);const kanji=token(page,1);
-     await click(page,kanji);await page.locator('#mini .mini-reading').waitFor();
+     await openStage(page,kanji,article.tokens[1],dials);await page.locator('#mini .mini-reading').waitFor();
      const kanjiShown=await mini(page);
      assert.equal(kanjiShown.word,'谷川');assert.equal(kanjiShown.reading,'たにがわ','A kanji word keeps its reading line');
      return{dials,shown,kanjiShown,saveHeld:true,unresolvedEntryHeld:true};
@@ -124,7 +170,7 @@ try{
    await run('particle-tap-keyboard-and-menu',async()=>{
     await open(page,'0,1,0');const particle=token(page,2);const before=await particle.textContent();
     for(const modality of ['pointer','Enter','Space']){
-     if(modality==='pointer')await click(page,particle);else{await particle.focus();await page.keyboard.press(modality);}
+     await openStage(page,particle,article.tokens[2],'0,1,0',modality);
      await page.locator('#mini .mini-gloss').waitFor();const shown=await mini(page);
      assert.equal(shown.word,'の');assert.equal(shown.gloss,'of · belonging');assert.equal(shown.role,'dialog');
      assert.equal(await page.locator('#sheet').count(),0);assert.equal(await particle.textContent(),before);
@@ -148,7 +194,7 @@ try{
  }
 }finally{
  await host.close();
- const receipt={artifactSha256:manifest.artifactSha256,gitSha:manifest.gitSha,sourceDirty:manifest.sourceDirty,
+ const receipt={browserVersions,pointerSamples,artifactSha256:manifest.artifactSha256,gitSha:manifest.gitSha,sourceDirty:manifest.sourceDirty,
   verifierSha256:createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
   scope:'Known named, dictionary-absent named/plain, and auxiliary identity lookup in four dial modes; particle short tap, keyboard and the word menu full entry. No broad lexical/capture regression claim',
   instrumentation:'Unmodified staged runtime, normal DOM controls, no export shim or model calls; native audio paths run silently',results,

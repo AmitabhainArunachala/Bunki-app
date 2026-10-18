@@ -108,6 +108,7 @@ async function launch(fixture) {
   fixture.context = await ({ chromium, webkit }[fixture.engine]).launchPersistentContext(fixture.profile, {
     headless: true, viewport: { width: 1120, height: 1100 }, locale: 'en-US', serviceWorkers: 'block', acceptDownloads: true,
   });
+  await fixture.context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device fixture.
   browserVersions[fixture.engine] = fixture.context.browser()?.version();
   await fixture.transport.install(fixture.context);
   fixture.page = fixture.context.pages()[0] || await fixture.context.newPage(); fixture.page.setDefaultTimeout(15000);
@@ -144,7 +145,7 @@ async function createTopic(fixture, { articleId = 'bunki-graded-n3-river', index
   await source.click();
   const token = fixture.page.locator(`#reader .tok[data-index="${index}"]`); await token.waitFor();
   const word = await token.getAttribute('data-word'); assert(word, 'Fixture chooses a real content word');
-  await token.click(); await fixture.page.locator('#mini-sentence-open').click(); await fixture.page.locator('#reader-teacher').click();
+  await openReaderWordStage(fixture.page, token); await fixture.page.locator('#mini-sentence-open').click(); await fixture.page.locator('#reader-teacher').click();
   await fixture.page.locator('#teacher-context-select').waitFor();
   await waitForAppRecord(fixture.page, (record) => record.teacherContexts?.entries.some((entry) => entry.sourceId === articleId && entry.index === index), { description: 'normal source-context save' });
   const native = await readAppRecordSnapshot(fixture.page);
@@ -714,3 +715,26 @@ try {
 }
 assert.equal(results.length, ENGINES.length * (FILTERS.size || definitions.length));
 assert(results.every((row) => row.pass), 'Teacher-draft persistent-browser journeys failed');
+
+// These source-context checks enter through the G3 ladder; the grammar itself is
+// checked separately. A second activation is allowed only after a real reading rung.
+async function openReaderWordStage(page, word) {
+  await word.click();
+  await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
+    // On-touch reader ruby paints through ::before; the native rt stays hidden
+    // to preserve the word's width. Require actual paint from either renderer.
+    await page.waitForFunction(node => [...node.querySelectorAll('ruby')].some(ruby => {
+      const rt = ruby.querySelector('rt');
+      if (!rt?.textContent.trim() || rt.classList.contains('hidden-rt')) return false;
+      const native = getComputedStyle(rt), floating = getComputedStyle(ruby, '::before');
+      return (rt.getClientRects().length > 0 && native.visibility !== 'hidden' && native.display !== 'none' && Number(native.opacity) > 0) ||
+        (ruby.getClientRects().length > 0 && ruby.dataset.r === rt.textContent && floating.content === JSON.stringify(rt.textContent) &&
+          floating.visibility !== 'hidden' && floating.display !== 'none' && Number(floating.opacity) > 0);
+    }), await word.elementHandle(), { timeout: 5000 });
+    await word.click();
+  }
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'stage', 'The exact source word reaches its stage');
+}

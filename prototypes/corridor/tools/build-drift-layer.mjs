@@ -182,6 +182,36 @@ ${scopedRules.join('\n')}
 body:not(.ui-bi) #drift-layer [data-l='en'],
 body.ui-bi #drift-layer [data-l='ja'] { display: none; }
 
+
+/* Active constellation glyphs sit above the free field, below existing
+ * word satellites (5), centres (6) and component plaques (7). */
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) {
+  z-index: 1;
+}
+
+/* Native hit regions: preserve field doors through transparent caption/rt
+   space. The actual ruby base (or unannotated .g) retains native handlers. */
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center),
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g {
+  pointer-events: none;
+}
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g > ruby.drift-reading,
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g:not(:has(> ruby.drift-reading)),
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph.unfolded:not(.comp):not(.center) > small {
+  pointer-events: auto;
+}
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g:not(:has(> ruby.drift-reading)) {
+  width: fit-content;
+  margin-inline: auto;
+}
+#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g > ruby.drift-reading > rt {
+  pointer-events: none;
+}
+body[data-furigana='1'] #drift-layer.active #sky > .glyph.hosted-constellation-glyph.hosted-reading-shown:not(.comp):not(.center) > .g > ruby.drift-reading > rt,
+body[data-furigana='2'] #drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) > .g > ruby.drift-reading > rt {
+  pointer-events: auto;
+}
+
 /* Interface arrivals stay short and still when motion is reduced. The card
  * occupies its final position throughout its fade; direct field gestures
  * and the separate teaching renderer retain their own geometry. */
@@ -704,16 +734,70 @@ patch(
   'boot rAF deferred',
 );
 
+// G3: preserve the accepted hosted reading/stage/page adapter in generated output.
+// Exact-once anchors leave the frozen standalone donor and its own grammar intact.
+patch(
+  '  nodes.push(n); nodeOf.set(el,n);\n  return n;\n}\nfunction spawnPart(ch,x,y){',
+  '  nodes.push(n); nodeOf.set(el,n);\n  mountHostedNodeReading(n);\n  return n;\n}\nfunction spawnPart(ch,x,y){',
+  'G3 resting hosted glyph reading',
+);
+patch(
+  '  nodes.push(n); nodeOf.set(el,n);\n  return n;\n}\n// ---- the vault-field: a world plane of galaxies, seen through a camera ----',
+  '  nodes.push(n); nodeOf.set(el,n);\n  mountHostedNodeReading(n);\n  return n;\n}\n// ---- the vault-field: a world plane of galaxies, seen through a camera ----',
+  'G3 resting hosted particle reading',
+);
+patch(
+  '  cueRetire(n,"tap");   // retain the identity of the answered gesture\n  const lvl=stack[stack.length-1];',
+  '  cueRetire(n,"tap");   // retain the identity of the answered gesture\n' +
+  '  // Hosted occurrences use the app\'s ladder before the standalone field\'s\n' +
+  '  // private rung counter. Cue retirement keeps its existing durable path;\n' +
+  '  // the lookup does not await it, duplicate it, or turn it into a grade.\n' +
+  '  if(hostedSlip(n,{bloom:true})!==false)return;\n' +
+  '  const lvl=stack[stack.length-1];',
+  'G3 ordinary hosted taps use the shared ladder',
+);
+
+// A satellite promoted by the hosted first tap stays where it was touched.
+// Its old constellation offset belongs to that old parent, not a return trip
+// for the new centre. Fold the rendered location into its world anchor first.
+patch(
+  'function bloomFocus(n){\n  if(recordPending.size)return;\n  clearBloom(n.el?n:undefined);',
+  'function bloomFocus(n){\n  if(recordPending.size)return;\n' +
+    '  const promoted=n.wref&&n.el?.classList.contains("bsat")?s2wl(n.x,n.y):null;\n' +
+    '  clearBloom(n.el?n:undefined);\n' +
+    '  if(promoted){\n' +
+    '    const wr=n.wref;\n' +
+    '    n.wx=wr.wx=promoted.x;n.wy=wr.wy=promoted.y;\n' +
+    '    wr.ox=wr.oy=wr.hx=wr.hy=wr.px=wr.py=0;wr.ret=false;\n' +
+    '  }',
+  'hosted satellite promotion keeps its displayed world anchor',
+);
+
+// Active constellation glyphs retain native hit ownership above free words.
+// Remove the marker on every release, including a kept/relocked glyph.
+patch('focusN.el.classList.remove("bctr"); focusN.top=focusN.baseOp;',
+  'focusN.el.classList.remove("bctr","hosted-constellation-glyph"); focusN.top=focusN.baseOp;',
+  'clear constellation glyph centre marker');
+patch('  for(const g of LOCKG){\n    if(g===keep)',
+  '  for(const g of LOCKG){\n    g.el.classList.remove("hosted-constellation-glyph");\n    if(g===keep)',
+  'clear constellation glyph satellite marker');
+patch('  if(n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97);}',
+  '  if(n.el){n.el.classList.add("bctr"); n.top=Math.max(n.top,0.97); if(n.kind==="glyph")n.el.classList.add("hosted-constellation-glyph");}',
+  'mark active constellation glyph centre');
+patch('    LOCKG.push(g); pinOf[c]=g; g.hlDom=true;',
+  '    LOCKG.push(g); pinOf[c]=g; g.hlDom=true;\n    g.el.classList.add("hosted-constellation-glyph");',
+  'mark active constellation glyph satellite');
+
 // A receipt is evidence only for its exact command and current local scope.
 // Lazy reuse of the controller codec prevents a second Drift schema here.
 js += `
 // Round 4 review (T1): the universe speaks the interface language the corridor set on <body>.
 function uiT(ja,en){return document.body&&document.body.classList.contains("ui-bi")?en:ja;}
 // The one-hand pass (contract §1): the host's one slip, asked for the way the entry door is asked for —
-//   window.__BUNKI_OPEN_SLIP = { has(kind,key), open(kind,key,{anchor,redo,onClose}), isOpen(anchor), close() }
-// and drawn only when has() says the far side exists. slipFor(n) opens it beside a dive's centre at the
-// ladder's end; true when this tap opened it, false when it already stands there (then the centre's tap goes
-// on to the entry, as the band does). redo: the sky owns its taps, so no press is the slip's own dive.
+//   window.__BUNKI_OPEN_SLIP = { has(kind,key), open(kind,key,options), isOpen(anchor), close() }
+// Ordinary hosted taps share its reading → stage → page visit. Held/dive-centre
+// callers retain slipFor's idempotent stage request. Standalone keeps its own
+// field grammar; camera, pinch, lock and flick handlers do not pass through here.
 function slipHost(kind,key){
   const h=typeof window!=="undefined"&&window.__BUNKI_OPEN_SLIP;
   if(!h||typeof h.open!=="function") return null;
@@ -722,15 +806,69 @@ function slipHost(kind,key){
 }
 function slipAway(){
   const h=typeof window!=="undefined"&&window.__BUNKI_OPEN_SLIP;
-  if(h&&typeof h.isOpen==="function"&&h.isOpen()&&typeof h.close==="function") h.close();
+  // A reading-only visit has no popup yet, but must fold when its scene leaves.
+  if(h&&typeof h.close==="function") h.close();
 }
-function slipFor(n){
-  const kind=n.kind==="word"?"word":n.kind==="glyph"?"kanji":null;
+function mountHostedNodeReading(n,reading){
+  if(n.kind!=="glyph"&&n.kind!=="part")return null;
+  const kind=n.kind==="glyph"?"kanji":"particle";
+  const h=slipHost(kind,n.ch);
+  if(!h)return null; // standalone retains its own unannotated field
+  reading=reading||h.reading?.(kind,n.ch)||"";
+  const kana=s=>String(s).replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
+  if(!reading||kana(reading)===kana(n.ch))return null;
+  const base=n.el.querySelector(n.kind==="glyph"?".g":".pch");
+  if(!base)return null;
+  let ruby=base.querySelector(":scope > ruby.drift-reading");
+  if(!ruby){
+    ruby=document.createElement("ruby");ruby.className="drift-reading";ruby.lang="ja";
+    ruby.append(...base.childNodes);
+    const rt=document.createElement("rt");rt.textContent=reading;ruby.append(rt);base.append(ruby);
+  }
+  n.r=reading;
+  return ruby;
+}
+function hostedSlip(n,{redo=false,bloom=false}={}){
+  const kind=n.kind==="word"?"word":n.kind==="glyph"?"kanji":n.kind==="part"?"particle":null;
   const key=kind==="word"?n.w:n.ch;
   const h=kind&&key?slipHost(kind,key):null;
   if(!h||!n.el||!n.el.isConnected) return false;
+  if(bloom&&n.kind==="word"&&!n.el.dataset.ladderRung&&stack.length===0&&!lockOn){
+    bloomFocus(n); // keep the existing family response, without an extra tap rung
+    bloomLast=performance.now();
+  }
+  const clearReveal=()=>{
+    n.el.classList.remove("unfolded","glossed","hosted-reading-shown");
+    if(unfolded===n)unfolded=null;
+  };
+  const reveal=reading=>{
+    if(n.kind==="word"){
+      collapseUnfold();
+      n.el.classList.add("unfolded");n.el.classList.remove("glossed");unfolded=n;
+    }else if(reading){
+      // Reuse the resting annotation; its caption remains a sibling.
+      if(mountHostedNodeReading(n,reading))n.el.classList.add("hosted-reading-shown");
+    }
+    return clearReveal;
+  };
+  const readingVisible=()=>{
+    const reading=n.el.querySelector(n.kind==="word"?".yomi":"ruby rt");
+    if(!reading?.textContent.trim())return false;
+    const s=getComputedStyle(reading);
+    return reading.getClientRects().length>0&&s.display!=="none"&&s.visibility!=="hidden"&&Number(s.opacity)>0;
+  };
+  const look={surface:key,label:key,reading:n.r||"",gloss:n.g||""};
+  return h.open(kind,key,{anchor:n.el,redo,look,reveal,clearReveal,readingVisible,
+    onClose:reason=>{if(reason!=="dive")clearReveal();}});
+}
+function slipFor(n){
+  const kind=n.kind==="word"?"word":n.kind==="glyph"?"kanji":n.kind==="part"?"particle":null;
+  const key=kind==="word"?n.w:n.ch;
+  const h=kind&&key?slipHost(kind,key):null;
+  if(!h||!n.el||!n.el.isConnected)return false;
   if(typeof h.isOpen==="function"&&h.isOpen(n.el)) return false;
-  return h.open(kind,key,{anchor:n.el,redo:true})==="opened";
+  const result=hostedSlip(n,{redo:true});
+  return result==="opened"||result==="reading";
 }
 // Round 4 review (T1, fix 2): by day the universe keeps a sky of its own (the donor's own cool
 // ground), and by night it stands on the host world's ground only when every word ink keeps its

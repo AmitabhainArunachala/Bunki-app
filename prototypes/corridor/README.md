@@ -51,9 +51,10 @@ first act of the #36 harvest: the sites-v11 kotobako dictionary rides in as
 first) and `strokes.json` (2,136 KanjiVG stroke-path sets, drawn on the
 kanji page). Word entries carry senses / kanji-in-word rows / real examples
 from the shelf; kanji pages carry 音訓, stroke order, components, and glossed
-compounds. The reader's staged activation grammar (reading, then gloss, then
-full entry) was replaced on 2026-10-02 by one tap for the meaning and a
-right-click / press-and-hold / ContextMenu word menu; "the reader's click
+compounds. The reader climbs one word's ladder by taps (G3, 2026-10-18): the
+reading in place, then the word's stage, then its page; another word starts
+its own ladder, and outside or Escape folds one rung. A right-click,
+press-and-hold or ContextMenu opens the word menu; "the reader's click
 grammar" comment in `corridor.js` owns the current grammar. 取る became
 覚える; items land in an automatic monthly list (the operator's Renzo habit)
 plus named lists, persisted in localStorage. A 12-entry original-content

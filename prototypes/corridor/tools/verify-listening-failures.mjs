@@ -1,3 +1,4 @@
+import { exactReaderStage } from './reader-stage-support.mjs';
 /** The sentence listening lock under an armed corrupt-transport fixture. The voice is Kore
  * (Charon second): the bundled Ami cues are never offered or requested, so the corrupt-byte
  * fault never fires, and the listening mode explains the absence with Kore/Charon in its accessible description.
@@ -96,7 +97,7 @@ for (const engine of engines) {
     await silenceBrowserAudio(context);const servedFrom=served.length;
     await page.goto(`${ORIGIN}/index.html?ui=bi`);await ready(page);await shelf(page);
     await page.locator('.shelf-item:not([data-recommendation])').filter({has:page.locator('.shelf-title',{hasText:/^静かな朝$/u})}).locator('.shelf-open').click();
-    await sourceToken(page).click();await page.locator('#mini-sentence-open').click();await page.locator('#reader-sentence-practice').click();
+    await exactReaderStage(page, sourceToken(page), { word: WORD, index: INDEX, reading: 'まど', evidenceDir: OUT });await page.locator('#mini-sentence-open').click();await page.locator('#reader-sentence-practice').click();
     await page.locator('#sentence-practice-confirm').waitFor();
     assert(served.slice(servedFrom).includes('/audio/sentence-cues.json'),'The bundled cue catalog was consulted');
     assert.equal(await page.locator('#sentence-choose-listening').count(),0,'The Ami cue is not offered as a practice');
