@@ -139,6 +139,9 @@ const UNCONFIRMED = ['This entry’s answer cannot be confirmed yet, so it canno
 const NO_ENTRY = 'No dictionary entry for this spelling.';
 const SAVE_REASON = 'So it can’t be saved here.';
 const QUICK_MISS = 'Not in the quick dictionary. Full entry looks it up in the whole dictionary.';
+// R3 · a word the text uses as a name, or a reading it spells or talks about (悉曇（しったん）: しっ, た, ん), has no
+// dictionary meaning: its card says so, in one line of its own
+const NOT_A_WORD = ['a name in this text', 'a reading in this text'];
 // R2 · inflected words: the card reads the dictionary form the way the text reads it (Kimi 0258, Codex 0309/0323)
 const FORGETTING = art('bunki-read-n2-forgetting-curve', 'bunki-read-n2-forgetting-curve.json', '忘却曲線は');
 const SOSEKI = art('aozora:000772-1', 'aozora-000772-1.json', '私の個人主義（抄）');
@@ -1110,6 +1113,10 @@ async function sweepCase(browser, contextOptions) {
           } else if (gloss === '…') {
             out.answer = 'unanswered';
             out.issues.push('the card still says "…": it never answered');
+          } else if (NOT_A_WORD.includes(gloss)) {
+            // R3 · a name or a reading: the card is the word as written, and lends no entry's meaning
+            out.answer = 'notAWord';
+            if (label !== token.s) out.issues.push(`the card says "${gloss}" yet is not a card of ${token.s} as written`);
           } else if (SAYS_NONE(gloss) || gloss === QUICK_MISS) {
             out.answer = /^Several entries: /u.test(gloss) ? 'several' : asWritten ? 'asWritten' : 'noEntry';
             // a card naming no entry holds its Save and says why (D23's honest line)

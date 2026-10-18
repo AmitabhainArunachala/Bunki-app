@@ -521,6 +521,9 @@ async function coreRun(open, rec) {
       bar.saves.length === 1 && bar.saves[0] === 'chrome-keep' && bar.keep?.one && bar.keep.word === CORE.token.b && !bar.keep.held && !bar.panel,
       JSON.stringify(bar), { bar });
     await openPopup(page, CORE);
+    // R3 (Grok 2029) · a slip drawn before its word's sense is at hand shows a quiet "…" until it is (aria-busy, R2's
+    // contract): the meaning line is read once the slip is answered, as M.itt's card and the named rows read theirs
+    await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 30_000 });
     const mini = await miniState(page), take = (await captureState(page)).mini;
     once('G1.mini', `G1 its mini: word ${CORE.token.s}, reading ${CORE_ENTRY.reading}, gloss exactly "${CORE_ENTRY.gloss}"; its 覚 enabled and not held`,
       mini?.word === CORE.token.s && mini.reading === CORE_ENTRY.reading && mini.gloss === `<span class="mini-gloss">${CORE_ENTRY.gloss}</span>`

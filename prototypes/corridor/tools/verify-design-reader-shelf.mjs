@@ -890,6 +890,10 @@ try {
       await run(`G1-one-tap-meaning-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
         await tapToken(page, SUBURB);
+        // R3 (Grok 2029) · a slip drawn before its word's sense is at hand shows a quiet "…" (aria-busy, R2's contract) until
+        // it is: the card is read once answered, up to 5 s, then asserted exactly as before
+        await page.waitForFunction(() => !!document.getElementById('mini') && document.getElementById('mini').getAttribute('aria-busy') !== 'true',
+          null, { timeout: 5_000 }).catch(() => {});
         const one = await popupState(page);
         assert(one, 'one tap opened no popup');
         assert.deepEqual([one.word, one.reading, one.gloss], ['郊外', 'こうがい', 'suburb'], `one tap does not show the word, reading and meaning: ${JSON.stringify(one)}`);
