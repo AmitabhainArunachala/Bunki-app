@@ -11498,6 +11498,19 @@ function frameFoot(onPage, fixedEdge) {
 function keepFloatingBeside(card, anchor, { follow = false } = {}) {
   placeFloating(card, anchorBox(anchor), anchor);
   card.addEventListener('scroll', () => markCardMore(card), { passive: true });
+  // Hfix-1A · a card beside a word the reading carries moves with it when the reading scrolls (it stood fixed, and a word
+  // scrolled while its stage stood slid under it: reader-gloss's tap on that word met the stage's band): the same seat,
+  // translated by the scroll since it was taken (placeFloating records it), never seated again mid-scroll
+  if (!follow && readingCarries(anchor)) {
+    const scroller = anchor.closest?.('#sheet') || null;
+    const offset = () => (scroller ? scroller.scrollTop : window.scrollY);
+    const carry = () => {
+      if (!card.isConnected || !anchor.isConnected) { (scroller || window).removeEventListener('scroll', carry); return; }
+      if (card.dataset.flow === 'document' || !Number.isFinite(card._seatOffset) || !card.dataset.floatingTop) return;
+      card.style.top = `${Number(card.dataset.floatingTop) - (offset() - card._seatOffset)}px`;
+    };
+    (scroller || window).addEventListener('scroll', carry, { passive: true });
+  }
   card.addEventListener('focusin', () => {
     requestAnimationFrame(() => { if (card.isConnected) revealFloatingFocus(card); });
   });
@@ -11557,14 +11570,21 @@ function layersMarkTop(left, width) {
  * the page when the word is on one, else the document; a word in a layer that does not scroll with the reading (the sky,
  * a deck, a list of its own) never moves. Returns the move in px (positive: the reading rises), or 0. With `most`, a card
  * no seat can hold whole gets the move that gives it the most room the glass allows (its word at the glass's edge). */
-function readingMoveFor(anchor, r, tall, ceiling, floor, { most = false } = {}) {
-  if (!anchor?.isConnected) return 0;
+/** Hfix-1A · whether a word moves with the reading's own scroller (the page when it is on one, else the document): no fixed
+ * or sticky layer and no scroller of its own between them. */
+function readingCarries(anchor) {
+  if (!anchor?.isConnected) return false;
   const scroller = anchor.closest('#sheet');
   for (let node = anchor.parentElement; node && node !== (scroller || document.body); node = node.parentElement) {
     const style = getComputedStyle(node);
-    if (style.position === 'fixed' || style.position === 'sticky') return 0;
-    if (/(auto|scroll)/u.test(style.overflowY) && node.scrollHeight > node.clientHeight + 1) return 0;
+    if (style.position === 'fixed' || style.position === 'sticky') return false;
+    if (/(auto|scroll)/u.test(style.overflowY) && node.scrollHeight > node.clientHeight + 1) return false;
   }
+  return true;
+}
+function readingMoveFor(anchor, r, tall, ceiling, floor, { most = false } = {}) {
+  if (!readingCarries(anchor)) return 0;
+  const scroller = anchor.closest('#sheet');
   const room = scroller
     ? { up: scroller.scrollTop, down: scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop }
     : { up: window.scrollY, down: document.documentElement.scrollHeight - window.innerHeight - window.scrollY };
@@ -11740,6 +11760,9 @@ function placeFloating(card, r, anchor = null) {
   // CSS rounds fractional positions; retain the exact calculated seat for the sentence pin.
   if (Number.isFinite(top)) card.dataset.floatingTop = String(top);
   else delete card.dataset.floatingTop;
+  // the reading's offset this seat was taken at (keepFloatingBeside carries the card with its word from here)
+  const seatScroller = (anchor || miniAnchor)?.closest?.('#sheet') || null;
+  card._seatOffset = seatScroller ? seatScroller.scrollTop : window.scrollY;
   // which side of its word the card stands on: its shade falls away from the word, never across it
   card.dataset.side = top < r.top ? 'above' : 'below';
   markCardMore(card);
