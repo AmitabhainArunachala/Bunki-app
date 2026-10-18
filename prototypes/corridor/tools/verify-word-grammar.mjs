@@ -36,7 +36,9 @@
  *   sentence · save · ask the tutor · practice"), stays under 40 % of the screen and covers no button and not the word;
  *   a word held inside the word's page keeps its strip in the page, over no button; the bookmark lands on the kept
  *   words, and browsing them never starts a review; layers open only from 層, never move the paragraph's lines, and fold
- *   on any tap, Escape or the mark; with reduced motion nothing travels; on a deck card the front stays sealed and a back
+ *   on any tap, Escape or the mark; the strip stands wholly on the glass at 320×568, 390×844 and 430×932 over no button,
+ *   and the bookmark's landed row is on the glass there; Remove un-saves everywhere and Undo brings every place back;
+ *   with reduced motion nothing travels; on a deck card the front stays sealed and a back
  *   word's hold keeps it once and opens the strip; a Save in a bar stands inside it, 8 px clear of
  *   every screen edge, its target its doors' height (L-2); frames of the seal and the landing (WebKit ≤ 24 ms).
  *   --g5-only runs only these; --g5-controls adds: a second hold that un-keeps, a strip over a button, a layer that stays.
@@ -1420,6 +1422,154 @@ try {
         { mid: { rings: mid.rings }, pressed, anims, done: { strip: done.strip, count: done.count, seals: done.seals } });
     });
 
+    // The strip stands wholly on the glass (the visual viewport, under the bar and above the foot's bar and doors) at every
+    // phone size, over no button, under 40 % of the screen, the word still on the glass: for a word near the top, the first
+    // word and a word near the foot (lead, 2026-10-18: at 320×568 it once fell past the fold; at a 357-wide Chromium layout
+    // it covered 層). Then the bookmark lands on the row it focuses, on the glass, at that size.
+    const glassFacts = (page) => page.evaluate(() => {
+      const strip = document.getElementById('seal-strip'), held = document.querySelector('[data-g5-held]');
+      const vv = window.visualViewport;
+      const glass = { top: vv ? vv.offsetTop : 0, left: vv ? vv.offsetLeft : 0, bottom: vv ? vv.offsetTop + vv.height : innerHeight, right: vv ? vv.offsetLeft + vv.width : innerWidth };
+      const fixedEdge = (sel, edge) => { const n = document.querySelector(sel); if (!n || !['fixed', 'sticky'].includes(getComputedStyle(n).position)) return null; const b = n.getBoundingClientRect(); return b.height ? b[edge] : null; };
+      const band = { top: Math.max(glass.top, fixedEdge('#app > .chrome', 'bottom') ?? glass.top),
+        bottom: Math.min(glass.bottom, fixedEdge('#primary-tabs', 'top') ?? glass.bottom) };
+      const box = (n) => { if (!n) return null; const r = n.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, left: r.left, right: r.right, height: r.height }; };
+      const s = box(strip), word = held ? window.__glyphs(held) : null;
+      const wordBox = word && { top: word.top, bottom: word.top + word.height, left: word.left, right: word.left + word.width };
+      return { inner: [innerWidth, innerHeight], vv: vv ? { w: vv.width, h: vv.height, scale: vv.scale } : null, glass, band, side: strip?.dataset.side ?? null, strip: s, word: wordBox,
+        stripOnGlass: !!s && s.top >= band.top - 0.5 && s.bottom <= band.bottom + 0.5 && s.left >= glass.left - 0.5 && s.right <= glass.right + 0.5,
+        wordOnGlass: !!wordBox && wordBox.top >= band.top - 0.5 && wordBox.bottom <= band.bottom + 0.5 };
+    });
+    /** Put a content word of the reader (kanji, on the left half, so no fixed door at the foot is over it) at `y` on the
+     * glass, mark it as the one to hold, and return it. */
+    const wordAt = async (page, where) => {
+      const index = await page.evaluate((where) => {
+        document.querySelector('[data-g5-held]')?.removeAttribute('data-g5-held');
+        // the band between the fixed bar and the fixed foot (only what stays put on the glass counts)
+        const fixedEdge = (sel, edge) => { const n = document.querySelector(sel); if (!n || !['fixed', 'sticky'].includes(getComputedStyle(n).position)) return null; const b = n.getBoundingClientRect(); return b.height ? b[edge] : null; };
+        const vv = window.visualViewport, glassBottom = vv ? vv.offsetTop + vv.height : innerHeight;
+        const chrome = fixedEdge('#app > .chrome', 'bottom') ?? 0;
+        const foot = Math.min(glassBottom, fixedEdge('#primary-tabs', 'top') ?? glassBottom, fixedEdge('.listen-row', 'top') ?? glassBottom);
+        const words = [...document.querySelectorAll('#reader .tok[data-index]')].filter((n) => /[一-鿿]/u.test(n.textContent) && !n.classList.contains('particle')
+          && n.getBoundingClientRect().left < innerWidth * 0.45);
+        // a word far enough down the story that the reading can scroll it to that place (the story's first lines cannot
+        // be brought down to the foot)
+        const targetFor = (n) => (where === 'foot' ? foot - 30 - n.getBoundingClientRect().height : chrome + 12);
+        const pick = words.find((n, i) => i >= 6 && n.getBoundingClientRect().top + scrollY >= targetFor(n) + 40) || words.at(-1);
+        const r = pick.getBoundingClientRect();
+        const target = targetFor(pick);
+        window.scrollBy(0, r.top - target);
+        pick.setAttribute('data-g5-held', '');
+        return pick.dataset.index;
+      }, where);
+      await delay(400);
+      const word = page.locator(`#reader .tok[data-index="${index}"]`);
+      word.before = await word.evaluate((n) => Math.round(n.getBoundingClientRect().top));
+      return word;
+    };
+    for (const [form, viewport] of [['320x568', { width: 320, height: 568 }], ['390x844', { width: 390, height: 844 }], ['430x932', { width: 430, height: 932 }]]) {
+      await walk(`G5-glass-${form}`, async (page) => {
+        await openStory(page);
+        const cases = [['first', async () => { const w = readerWord(page); await w.evaluate((n) => { document.querySelector('[data-g5-held]')?.removeAttribute('data-g5-held'); n.setAttribute('data-g5-held', ''); }); return w; }],
+          ['foot', () => wordAt(page, 'foot')], ['top', () => wordAt(page, 'top')]];
+        let id = 80;
+        for (const [name, choose] of cases) {
+          const word = await choose();
+          await holdOn(page, word, { id: id++ });
+          await page.locator('#seal-strip').waitFor();
+          await landed(page);
+          const glass = await glassFacts(page), place = await stripCover(page, '[data-g5-held]');
+          glass.wordTopBeforeHold = word.before ?? null;
+          check(`G5.glass.${form}.${name}`, `${form}, a word ${name === 'first' ? 'where the story opens' : `near the ${name}`}: the strip stands wholly on the glass, over no button, under 40 % of the screen, the word still on the glass`,
+            glass.stripOnGlass && glass.wordOnGlass && !!place && place.covered.length === 0 && place.share <= 0.4 && !place.overWord, { ...glass, covered: place?.covered, share: place?.share, overWord: place?.overWord });
+          if (name === 'foot') await page.screenshot({ path: resolve(evidence, `${engine}-G5-glass-${form}-foot.png`) });
+          await page.keyboard.press('Escape'); await delay(250);
+        }
+        // the bookmark lands on the row it focuses (the newest kept word's), on the glass at this size. At 320 the room's bar
+        // (eight doors, 376 px of them, base 92e5492f too) stands the bookmark off the glass, so a finger cannot reach it
+        // there: the bookmark is then pressed by its own click, and that it was off the glass is kept with the facts
+        const tray = await page.locator('#tray').evaluate((node) => {
+          const r = node.getBoundingClientRect(), vv = window.visualViewport;
+          return { left: Math.round(r.left), right: Math.round(r.right), onGlass: r.left >= (vv ? vv.offsetLeft : 0) && r.right <= (vv ? vv.offsetLeft + vv.width : innerWidth) };
+        });
+        if (tray.onGlass) await page.locator('#tray').tap();
+        else await page.locator('#tray').evaluate((node) => node.click());
+        await delay(800);
+        const land = await page.evaluate(() => {
+          const row = document.activeElement?.closest?.('.tray-line[data-kept-key]') || null;
+          const box = row?.getBoundingClientRect();
+          const vv = window.visualViewport;
+          const ceiling = Math.max(vv ? vv.offsetTop : 0, document.querySelector('#app > .chrome')?.getBoundingClientRect().bottom || 0);
+          const floor = Math.min(vv ? vv.offsetTop + vv.height : innerHeight, document.getElementById('primary-tabs')?.getBoundingClientRect().top || innerHeight);
+          const rows = [...document.querySelectorAll('#app main .tray-line[data-kept-key]')];
+          return { view: document.body.dataset.view, key: row?.dataset.keptKey || null, landedMark: !!row && row.hasAttribute('data-landed'),
+            isLastOfItsKey: !!row && rows.filter((n) => n.dataset.keptKey === row.dataset.keptKey).at(-1) === row,
+            row: box ? { top: Math.round(box.top), bottom: Math.round(box.bottom) } : null, ceiling: Math.round(ceiling), floor: Math.round(floor) };
+        });
+        check(`G5.bookmark.${form}`, `${form}: the bookmark lands on the row it focuses — the newest kept word's last row — and that row is on the glass`,
+          land.view === 'tray' && !!land.row && land.landedMark && land.isLastOfItsKey && land.row.top >= land.ceiling && land.row.bottom <= land.floor, { ...land, tray });
+        await page.screenshot({ path: resolve(evidence, `${engine}-G5-bookmark-${form}.png`) });
+      }, { viewport, mobile: true });
+    }
+
+    // Remove un-saves the word everywhere (lead's ruling, 2026-10-18): out of taken and off every list, so Today shows it
+    // nowhere, in one durable write; Undo brings back every place it held, in their places
+    await walk('G5-remove-everywhere', async (page) => {
+      await openStory(page);
+      const first = readerWord(page), other = page.locator('#reader .tok[data-prose-label="大賞"]').first();
+      const backToReader = async () => {
+        await page.locator('#app > .chrome [data-bar-back]').first().tap();
+        await page.locator('#reader .tok[data-index]').first().waitFor();
+        await delay(400);
+      };
+      const rowsOf = (page, key) => page.evaluate((key) => [...document.querySelectorAll('#app main .tray-line[data-kept-key]')].filter((n) => n.dataset.keptKey === key).length, key);
+      const placesOf = (record, id) => ({ taken: (record.taken || []).map((row, index) => ({ row, index })).filter(({ row }) => row.t === 'word' && row.id === id),
+        lists: Object.entries(record.lists || {}).flatMap(([name, rows]) => (rows || []).map((row, index) => ({ name, index, row })).filter(({ row }) => row.t === 'word' && row.id === id)) });
+      await holdOn(page, first, { id: 90 });
+      await page.locator('#seal-strip').waitFor(); await landed(page);
+      await page.locator('#seal-strip-new').tap();
+      await page.locator('#seal-strip-name').fill('朝');
+      await page.locator('#seal-strip-create').tap();
+      await waitForAppRecord(page, (r) => r.lists?.['朝']?.some((row) => row.id === WORD), { description: 'the list 朝' });
+      await page.keyboard.press('Escape'); await delay(250);
+      await holdOn(page, other, { id: 91 });
+      await page.locator('#seal-strip').waitFor(); await landed(page);
+      await page.locator('#seal-strip .seal-list[data-list="朝"]').tap();
+      const kept = await waitForAppRecord(page, (r) => r.lists?.['朝']?.some((row) => row.id === '大賞'), { description: '大賞 on 朝' });
+      const before = placesOf(kept, '大賞'), count0 = (await g5Facts(page)).count;
+      // Remove, from the word's own strip
+      await page.locator('#seal-strip [data-strip-action="remove"]').tap();
+      const gone = await waitForAppRecord(page, (r) => placesOf(r, '大賞').taken.length === 0 && placesOf(r, '大賞').lists.length === 0, { description: 'Remove un-saves everywhere' }).catch(() => null);
+      await delay(200);
+      const afterRemove = await g5Facts(page);
+      const undo = page.locator('#reader-toast-action');
+      const undoShown = await undo.isVisible().catch(() => false);
+      // Undo: every place back, in its place
+      if (undoShown) await undo.tap();
+      const back = await waitForAppRecord(page, (r) => placesOf(r, '大賞').taken.length === before.taken.length && placesOf(r, '大賞').lists.length === before.lists.length,
+        { description: 'Undo restores every place' }).catch(() => null);
+      await delay(300);
+      const afterUndo = await g5Facts(page);
+      await page.locator('#tray').tap(); await delay(800);
+      const todayAfterUndo = { 大賞: await rowsOf(page, 'word:大賞'), 総理: await rowsOf(page, `word:${WORD}`) };
+      check('G5.remove.undo', 'Undo brings back every place Remove took: the card’s row and each list row, the same and in the same places; the bookmark and Today again',
+        !!back && JSON.stringify(placesOf(back, '大賞')) === JSON.stringify(before) && afterUndo.count === count0 && todayAfterUndo['大賞'] >= 2 && todayAfterUndo['大賞'] === todayAfterUndo['総理'],
+        { undoShown, before, back: back && placesOf(back, '大賞'), counts: [count0, afterRemove.count, afterUndo.count], todayAfterUndo });
+      // Remove again, then Today: the word appears nowhere saved
+      await backToReader();
+      await holdOn(page, other, { id: 92 });
+      await page.locator('#seal-strip').waitFor(); await landed(page);
+      await page.locator('#seal-strip [data-strip-action="remove"]').tap();
+      const goneAgain = await waitForAppRecord(page, (r) => placesOf(r, '大賞').taken.length === 0 && placesOf(r, '大賞').lists.length === 0, { description: 'Remove again' }).catch(() => null);
+      await delay(300);
+      await page.locator('#tray').tap(); await delay(800);
+      const todayAfterRemove = await rowsOf(page, 'word:大賞'), stillThere = await rowsOf(page, `word:${WORD}`);
+      check('G5.remove.everywhere', 'Remove un-saves the word everywhere in one write: out of taken, off every list, the bookmark −1, the strip gone, and Today shows it nowhere (the other word stays)',
+        !!gone && !!goneAgain && afterRemove.count === count0 - 1 && !afterRemove.strip && undoShown && todayAfterRemove === 0 && stillThere >= 2,
+        { gone: gone && placesOf(gone, '大賞'), count: [count0, afterRemove.count], strip: afterRemove.strip, undoShown, todayAfterRemove, stillThere });
+      await page.screenshot({ path: resolve(evidence, `${engine}-G5-remove-today.png`) });
+    });
+
     await walk('G5-tray', async (page) => {
       await openStory(page);
       const word = readerWord(page);
@@ -1586,7 +1736,7 @@ try {
         { id: 'strip-covers-a-button', run: 'G5-place', probe: g5PlaceProbe, kill: 'G5.strip.place',
           witness: (row) => row.observed?.covered?.length > 0,
           edits: [{ file: 'corridor.js', key: 'strip-over-the-foot',
-            from: '  let seat = seats.find((s) => !controlsUnder(rect(s.top, s.tall), strip, anchor).length) || null;',
+            from: '  let seat = seatsNow();',
             to: "  let seat = { top: (document.getElementById('dials-toggle')?.getBoundingClientRect().top ?? ceiling) - 8, tall: h, side: 'below' }; // G5 negative: laid over a button" }] },
         { id: 'layer-stays-open', run: 'G5-layer-fold', probe: g5LayerProbe, kill: 'G5.layers.fold-paper',
           witness: (row) => row.observed.layers > 0 || row.observed.layerBlock > 0,
