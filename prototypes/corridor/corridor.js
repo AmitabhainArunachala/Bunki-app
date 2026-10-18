@@ -6533,11 +6533,25 @@ function beyondJoyo(ch) {
   return !k || BEYOND_JOYO.has(k.kk);
 }
 
+/** Hfix-1A (L-4: Ｍｕｊｉｎ and ２０２６ set letter-spaced in government prose): a run of full-width Latin letters or
+ * digits is one span (.fw-run) that takes the face's proportional widths (palt) and never breaks inside; its text is
+ * the text as written. */
+const FULL_WIDTH_RUN = /[０-９Ａ-Ｚａ-ｚ]+/gu;
+function appendTextRuns(target, text) {
+  let at = 0;
+  for (const run of String(text).matchAll(FULL_WIDTH_RUN)) {
+    if (run.index > at) target.append(document.createTextNode(text.slice(at, run.index)));
+    target.append(el('span', 'fw-run', run[0]));
+    at = run.index + run[0].length;
+  }
+  if (at < text.length) target.append(document.createTextNode(text.slice(at)));
+}
 function rubyNode(pairs, { furigana, revealed }) {
   const frag = document.createDocumentFragment();
   for (const pair of pairs) {
+    // a ruby's base is left as it is (its reading's place never moves); plain text gets its full-width runs
     if (!pair.r || furigana === 0) {
-      frag.append(document.createTextNode(pair.t));
+      appendTextRuns(frag, pair.t);
       continue;
     }
     // native ruby: the house's one ruby rule sets the reading (rooms/motion.css)

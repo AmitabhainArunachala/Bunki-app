@@ -730,6 +730,10 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
     0 -16px 48px -14px rgb(0 0 0 / 62%);
 }
 
+/* Hfix-1A (L-4) · a run of full-width Latin letters or digits in a word (Ｍｕｊｉｎ, ２０２６) takes the face's
+   proportional widths, never letter-spaced, and never breaks inside (corridor.js appendTextRuns) */
+.tok-word .fw-run { font-feature-settings: 'palt' 1; white-space: nowrap; }
+
 /* Hfix-1A · a stage cut short of its rows (no seat on the glass holds it whole) ends between two rows and says it scrolls:
    its foot fades into the band the cut falls in (corridor.js markCardMore), the hold strip's own sign
    (editorial.css .seal-strip[data-more]), and the fade leaves once the last row is in view */

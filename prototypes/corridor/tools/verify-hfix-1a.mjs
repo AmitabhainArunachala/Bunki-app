@@ -17,6 +17,7 @@
  *   8   a word page's thread offers no "kanji ›" before a kanji is entered from it; its way back in goes to the kanji entered;
  *   9   the open screen's article title breaks only between its words (jaWords), at 390 and 320;
  *   10  the shelf's vertical room sign stands whole: 8 px from the glass's edges, under the bar and thread, clear of Tools;
+ *   11  full-width Latin and digits in the reader (Ｍｕｊｉｎ, ２０２６) set proportionally (palt), unbroken, text unchanged;
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -75,6 +76,7 @@ const CONTROL = {
     "  if (scale === 'word') return scaleWordKanji(node).length ? 'kanji' : null;"]] },
   'open-title': { item: '9.', css: '#drift-layer .scale-star-caption.is-words { word-break: normal !important; overflow-wrap: anywhere !important; line-break: auto !important; }' },
   'shelf-sign': { item: '10.', css: "body:not([data-view='drift']) #app:has(> .scale-thread) > main > .room-sign { top: calc(52px + env(safe-area-inset-top, 0px)) !important; right: 6px !important; }" },
+  fullwidth: { item: '11.', css: '.tok-word .fw-run { font-feature-settings: normal !important; }' },
   thread: { item: '3.', css: '.scale-thread { scroll-snap-type: none !important; }',
     source: [['corridor.js', '    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);', '    if (delta) thread.scrollLeft += delta;']] },
 };
@@ -559,6 +561,35 @@ async function itemShelfSign(browser, engine) {
   }
 }
 
+async function itemFullWidth(browser, engine) {
+  // 11 · L-4: in the startup story every run of full-width Latin letters or digits outside a ruby base is one span that
+  // takes the face's proportional widths (narrower than its full-width setting) and never breaks; the text is as written
+  const { context, page, errors } = await session(browser);
+  try {
+    await openStory(page);
+    const f = await page.evaluate(() => {
+      const reader = document.getElementById('reader');
+      const loose = [];
+      const walk = document.createTreeWalker(reader, NodeFilter.SHOW_TEXT);
+      while (walk.nextNode()) {
+        const n = walk.currentNode;
+        if (n.parentElement.closest('rt, rp, ruby, .fw-run, .tok-en, [aria-hidden="true"]')) continue;
+        if (/[０-９Ａ-Ｚａ-ｚ]/u.test(n.data)) loose.push(n.data.slice(0, 20));
+      }
+      const runs = [...reader.querySelectorAll('.fw-run')].map((n) => {
+        const cs = getComputedStyle(n), w = n.getBoundingClientRect().width;
+        n.style.fontFeatureSettings = 'normal'; const full = n.getBoundingClientRect().width; n.style.fontFeatureSettings = '';
+        return { text: n.textContent, palt: /palt/u.test(cs.fontFeatureSettings), nowrap: cs.whiteSpace === 'nowrap', lines: n.getClientRects().length, w, full, inRuby: !!n.closest('ruby') };
+      });
+      return { loose, runs, text: ['Ｍｕｊｉｎ', '２０２６'].every((t) => reader.textContent.includes(t)) };
+    });
+    const bad = f.runs.filter((r) => !r.palt || !r.nowrap || r.lines !== 1 || r.inRuby || !(r.w < r.full * 0.85));
+    check(`11.fullwidth · ${engine} · Ｍｕｊｉｎ and ２０２６: each full-width run one span, proportional (palt), unbroken, its text as written`,
+      f.runs.length >= 2 && f.runs.some((r) => r.text === 'Ｍｕｊｉｎ') && f.runs.some((r) => r.text === '２０２６') && !f.loose.length && !bad.length && f.text && !errors.length,
+      { runs: f.runs.length, bad: bad.slice(0, 4).map((r) => ({ ...r, w: Math.round(r.w), full: Math.round(r.full) })), loose: f.loose.slice(0, 4), errors });
+  } finally { await context.close(); }
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
   { id: 'layers', prefix: '2.', run: itemLayers },
@@ -570,6 +601,7 @@ const ITEMS = [
   { id: 'kanji-bead', prefix: '8.', run: itemKanjiBead },
   { id: 'open-title', prefix: '9.', run: itemOpenTitle },
   { id: 'shelf-sign', prefix: '10.', run: itemShelfSign },
+  { id: 'fullwidth', prefix: '11.', run: itemFullWidth },
 ];
 
 const log = { engines: {} };
