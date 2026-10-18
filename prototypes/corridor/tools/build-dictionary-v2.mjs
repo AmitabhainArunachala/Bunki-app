@@ -55,13 +55,15 @@ const EXPECTED = Object.freeze({
   sourceEntries: 218_290,
   // 69,996 from the base rule + 6 article entries (R2, 2026-10-17: 私 わたくし, 銭 ぜに, 異 こと, 作物 さくぶつ, 解す げす,
   // 帰す きす) + 168 for the twenty of batches 3r and 4r (N2, 2026-10-17) + 2 the shelf's grammar words are read as (R3,
-  // 2026-10-18: なり 1536290, the classical copula; つ 2220330, the general counter of 一つ). A content slice that adds
-  // article entries moves these two counts together, named in its commit
-  selectedEntries: 70_172,
+  // 2026-10-18: なり 1536290, the classical copula; つ 2220330, the general counter of 一つ) + 7 expressions the shelf
+  // writes across words (R3, Grok 2029: につき 1009850, 床に就く 1854590, 相違ない 2027060, なくちゃ 2098160, ともなく
+  // 2137120, 性暴力 2456730, 何度となく 2840609). A content slice that adds article entries moves these two counts
+  // together, named in its commit
+  selectedEntries: 70_179,
   selectedCommon: 22_626,
   selectedKanaOnly: 36_683,
   selectedTop151: 10_687,
-  selectedArticleEntries: 176,
+  selectedArticleEntries: 183,
 });
 
 const SHARD_COUNT = 16;
@@ -767,6 +769,27 @@ function readArticleEntries() {
     }
     if (!Array.isArray(receipts) || !receipts.length) die(`article entry ${seq}: at least one receipt is required`);
     for (const receipt of receipts) {
+      // R3 (2026-10-18) · an expression the tokenizer writes as several words (相違ない: 相違 + ない) has a receipt that spans
+      // them, token through `through`: s and r are the words' surfaces and readings joined, b the same with the last word's
+      // base (床についていて: 床につく). It fits where s and r are the spelling and the reading, or — its last word
+      // inflected — b is the spelling
+      if (receipt?.through !== undefined) {
+        const from = receipt.token, to = receipt.through;
+        if (!Number.isInteger(from) || !Number.isInteger(to) || to <= from || to - from > 5) {
+          die(`article entry ${seq}: receipt ${receipt?.article} #${from}-${to} is not a span of two to six words`);
+        }
+        const words = tokensOf(receipt.article).slice(from, to + 1);
+        if (words.length !== to - from + 1) die(`article entry ${seq}: receipt ${receipt.article} #${from}-${to} runs past the article`);
+        const last = words.at(-1);
+        const s = words.map((word) => word.s).join(''), r = words.map((word) => word.r || '').join('');
+        const b = words.slice(0, -1).map((word) => word.s).join('') + last.b;
+        if (s !== receipt.s || b !== receipt.b || r !== receipt.r) {
+          die(`article entry ${seq}: receipt ${receipt.article} #${from}-${to} is not that article's words as recorded`);
+        }
+        const fits = (s === spelling && r === reading) || (!!last.b && last.b !== last.s && b === spelling);
+        if (!fits) die(`article entry ${seq}: receipt ${receipt.article} #${from}-${to} does not read ${spelling} ${reading}`);
+        continue;
+      }
       const token = Number.isInteger(receipt?.token) ? tokensOf(receipt.article)[receipt.token] : null;
       if (!token || token.s !== receipt.s || token.b !== receipt.b || (token.r || '') !== receipt.r) {
         die(`article entry ${seq}: receipt ${receipt?.article} #${receipt?.token} is not that article's token as recorded`);

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "about": "Entries a reviewed article reads that the base selection (common, kana-only, top-151 kanji) leaves out. build-dictionary-v2.mjs adds each listed seq to the shipped dictionary only after proving, against the pinned JMdict, that the entry writes the spelling and reads it the reading, and that every receipt is a token of a shipped article exactly as recorded: an uninflected token is that spelling read that reading; an inflected token has that spelling (or its する form) as its base. A content slice adds its articles’ entries here, receipts included, and rebuilds; nothing else in the entry is typed by hand.",
+  "about": "Entries a reviewed article reads that the base selection (common, kana-only, top-151 kanji) leaves out. build-dictionary-v2.mjs adds each listed seq to the shipped dictionary only after proving, against the pinned JMdict, that the entry writes the spelling and reads it the reading, and that every receipt is a token of a shipped article exactly as recorded: an uninflected token is that spelling read that reading; an inflected token has that spelling (or its する form) as its base. An expression the tokenizer writes as several words has a receipt spanning them (token through `through`): their surfaces and readings joined are the spelling and the reading, or — the last word inflected — their surfaces with the last word's base are the spelling. A content slice adds its articles’ entries here, receipts included, and rebuilds; nothing else in the entry is typed by hand.",
   "pin": "3.6.2+20260803141815",
   "entries": [
     {
@@ -14,6 +14,29 @@
           "s": "御神酒",
           "b": "御神酒",
           "r": "おみき"
+        }
+      ]
+    },
+    {
+      "seq": "1009850",
+      "spelling": "につき",
+      "reading": "につき",
+      "receipts": [
+        {
+          "article": "bunki-essay-n2-notebook",
+          "token": 117,
+          "through": 118,
+          "s": "につき",
+          "b": "につく",
+          "r": "につき"
+        },
+        {
+          "article": "env:press-press_05569",
+          "token": 739,
+          "through": 740,
+          "s": "につき",
+          "b": "につく",
+          "r": "につき"
         }
       ]
     },
@@ -2370,6 +2393,21 @@
       ]
     },
     {
+      "seq": "1854590",
+      "spelling": "床につく",
+      "reading": "とこにつく",
+      "receipts": [
+        {
+          "article": "aozora:000628",
+          "token": 1482,
+          "through": 1484,
+          "s": "床につい",
+          "b": "床につく",
+          "r": "とこについ"
+        }
+      ]
+    },
+    {
       "seq": "1854700",
       "spelling": "通弁",
       "reading": "つうべん",
@@ -2566,6 +2604,37 @@
       ]
     },
     {
+      "seq": "2027060",
+      "spelling": "相違ない",
+      "reading": "そういない",
+      "receipts": [
+        {
+          "article": "aozora:000772-1",
+          "token": 1153,
+          "through": 1154,
+          "s": "相違ない",
+          "b": "相違ない",
+          "r": "そういない"
+        },
+        {
+          "article": "aozora:004668-1",
+          "token": 1068,
+          "through": 1069,
+          "s": "相違ない",
+          "b": "相違ない",
+          "r": "そういない"
+        },
+        {
+          "article": "aozora:058059-1",
+          "token": 1312,
+          "through": 1313,
+          "s": "相違ない",
+          "b": "相違ない",
+          "r": "そういない"
+        }
+      ]
+    },
+    {
       "seq": "2036140",
       "spelling": "奪い去る",
       "reading": "うばいさる",
@@ -2618,6 +2687,36 @@
           "s": "天平",
           "b": "天平",
           "r": "てんぴょう"
+        }
+      ]
+    },
+    {
+      "seq": "2098160",
+      "spelling": "なくちゃ",
+      "reading": "なくちゃ",
+      "receipts": [
+        {
+          "article": "aozora:053224-1",
+          "token": 818,
+          "through": 819,
+          "s": "なくちゃ",
+          "b": "なくちゃ",
+          "r": "なくちゃ"
+        }
+      ]
+    },
+    {
+      "seq": "2137120",
+      "spelling": "ともなく",
+      "reading": "ともなく",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 829,
+          "through": 831,
+          "s": "ともなく",
+          "b": "ともない",
+          "r": "ともなく"
         }
       ]
     },
@@ -2832,6 +2931,21 @@
       ]
     },
     {
+      "seq": "2456730",
+      "spelling": "性暴力",
+      "reading": "せいぼうりょく",
+      "receipts": [
+        {
+          "article": "bunki-read-n2-pillay-peace-nobel",
+          "token": 362,
+          "through": 363,
+          "s": "性暴力",
+          "b": "性暴力",
+          "r": "せいぼうりょく"
+        }
+      ]
+    },
+    {
       "seq": "2525100",
       "spelling": "霧消",
       "reading": "むしょう",
@@ -2940,6 +3054,21 @@
           "s": "供え物",
           "b": "供え物",
           "r": "そなえもの"
+        }
+      ]
+    },
+    {
+      "seq": "2840609",
+      "spelling": "何度となく",
+      "reading": "なんどとなく",
+      "receipts": [
+        {
+          "article": "aozora:004668-1",
+          "token": 163,
+          "through": 166,
+          "s": "何度となく",
+          "b": "何度とない",
+          "r": "なんどとなく"
         }
       ]
     },
