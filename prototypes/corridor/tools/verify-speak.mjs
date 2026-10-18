@@ -1457,6 +1457,12 @@ const CASES = {
       // settings: a key and a limit the device refused are not "Saved", and what he typed stays
       await page.locator('.speak-cost').click();
       await until(page, "s.layer === 'connect'", 5000);
+      // Hfix-1B · the key page fits the screen: WebKit sized its column by the fields' intrinsic width (395 in a 322 page)
+      const fit = await page.evaluate(() => ({ vw: innerWidth, docW: document.documentElement.scrollWidth,
+        right: Math.max(...[...document.querySelectorAll('.speak-connect, .speak-connect *')].map((n) => n.getBoundingClientRect().right)),
+        page: Math.round(document.querySelector('.speak-page')?.getBoundingClientRect().right ?? 0) }));
+      check('the key page fits the screen: its fields and Save end inside the page, and nothing scrolls sideways', fit.docW <= fit.vw && fit.right <= fit.page + 0.5,
+        JSON.stringify(fit));
       const before = await page.evaluate(() => ({ device: localStorage.getItem('kairo-speak-device-v1'), spend: localStorage.getItem('kairo-speak-spend-v1') }));
       await page.evaluate(() => { window.__SPEAK_SPY__.failDevice = true; });
       await page.fill('.speak-connect input[name="speak-key"]', 'test-new-key-not-real');
