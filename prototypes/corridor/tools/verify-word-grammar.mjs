@@ -29,8 +29,13 @@
  *   P15 the kanji tiles grow with their text (G1b; the critic's finding 3): each KANJI IN THIS WORD glyph at twice its size
  *       (both engines) — and, in Chromium, the whole page at 200 % text (-webkit-text-size-adjust, the critic's probe; WebKit
  *       on a desktop does not apply it) — stays inside its tile, and the tile keeps its 48 px floor
- * G3 negative controls: --controls replays stalled tap2, uncleared ruby and a front door; harness failures are incomplete.
- * --controls-only runs only the three candidate schedules, mutants and restores, with no frame measurements.
+ * G3 sky ownership: an active constellation glyph owns its printed ink above a later free word (言 / 誇り), and the transparent
+ *   caption width beside it stays the free word's, annotated or not (筆 of 鉛筆, plus fixture-only 嘩/眩/貰 mounted by the
+ *   actual missing-host-data branch). Geometry is explicitly controlled; this is not a natural scene/touch journey.
+ *   --sky-ownership-only runs only that walk. --controls adds its three strict mutations and clean restores.
+ * G3 negative controls: --controls replays stalled tap2, uncleared ruby, a front door, and the sky glyph's z-index, hit region
+ *   and caption width removed; harness failures are incomplete.
+ * --controls-only runs only the four candidate schedules, mutants and restores, with no frame measurements.
  * --g3-only is an explicit narrow slice, never a claim that the retained G1 gates passed.
  * Negative controls (one-hand/G1/neg-control): the 91dvh cap back → P1 red; the scrim re-appended → P1 red; the word not
  * sent travelling (enterWord) → P2 red; the page fading in over the reader instead of arriving whole → P14 red. */
@@ -73,20 +78,40 @@ const check = (id, title, ok, observed = '') => {
   console.log(`${ok ? 'ok  ' : 'FAIL'} ${engine}/${id} ${title}${ok ? '' : ` — ${JSON.stringify(observed).slice(0, 500)}`}`);
   return !!ok;
 };
-const frames = [], browserVersions = {}, controls = [];
+const frames = [], browserVersions = {}, controls = [], fixtures = [];
 const controlsOnly = process.argv.includes('--controls-only');
 const roomsOnly = process.argv.includes('--rooms-only');
 const sentencesOnly = process.argv.includes('--sentences-only');
 const kanaOnly = process.argv.includes('--kana-only');
 const skyReadingsOnly = process.argv.includes('--sky-readings-only');
-assert([controlsOnly, roomsOnly, sentencesOnly, kanaOnly, skyReadingsOnly].filter(Boolean).length <= 1, 'Choose one explicit narrow schedule');
-const g3Only = controlsOnly || roomsOnly || sentencesOnly || kanaOnly || skyReadingsOnly || process.argv.includes('--g3-only');
+const skyOwnershipOnly = process.argv.includes('--sky-ownership-only');
+assert([controlsOnly, roomsOnly, sentencesOnly, kanaOnly, skyReadingsOnly, skyOwnershipOnly].filter(Boolean).length <= 1, 'Choose one explicit narrow schedule');
+const g3Only = controlsOnly || roomsOnly || sentencesOnly || kanaOnly || skyReadingsOnly || skyOwnershipOnly || process.argv.includes('--g3-only');
 const withControls = controlsOnly || process.argv.includes('--controls');
 const g6FramesOnly=process.argv.includes('--g6-frames-only');
 const g6ControlsOnly=process.argv.includes('--g6-controls-only');
 const g6Only=g6FramesOnly||g6ControlsOnly||process.argv.includes('--g6-only');
 assert(!(g6FramesOnly&&g6ControlsOnly),'Choose one G6 narrow schedule');
 assert(!(g6Only&&g3Only),'G6 and G3 narrow schedules are distinct');
+
+// Lead0235 names glyphs absent from the shipped sky and hosted kanji corpus. Supply only fixture word/caption DATA in
+// the served response: real __lockWord → constellationLock → spawnGlyph → mountHostedNodeReading still runs. Do not
+// invent production dictionary entries, alter the host's has/reading gate, or remove ruby to simulate these three cases.
+const SKY_OWNERSHIP_NAMED = Object.freeze([
+  { word: '喧嘩', glyph: '嘩' }, { word: '眩しい', glyph: '眩' }, { word: '貰う', glyph: '貰' },
+]);
+const SKY_FIXTURE_CAPTION = 'FIXTURE ONLY caption';
+const skyFixtureAnchor = '// the semantic tier: LLM-authored typed relations (pilot slice)';
+const skyFixtureRows = SKY_OWNERSHIP_NAMED.map(({ word }) => [word, '', 'fixture-only source', 'k', '', 3]);
+const skyFixtureCaptions = Object.fromEntries(SKY_OWNERSHIP_NAMED.map(({ glyph }) => [glyph, SKY_FIXTURE_CAPTION]));
+const skyFixtureEdit = Object.freeze({ file: 'drift-layer.js', key: 'fixture-only-named-glyph-data', from: skyFixtureAnchor,
+  to: `/* Verification-only corpus/caption data, never shipped dictionary authority. */
+if (${JSON.stringify(skyFixtureRows)}.some(row => WALL.some(entry => entry[0] === row[0])) ||
+    ${JSON.stringify(SKY_OWNERSHIP_NAMED.map(({ glyph }) => glyph))}.some(glyph => glossOf(glyph)))
+  throw new Error("named glyph fixture no longer matches the absent production corpus");
+WALL.push(...${JSON.stringify(skyFixtureRows)});
+Object.assign(K, ${JSON.stringify(skyFixtureCaptions)});
+${skyFixtureAnchor}` });
 
 const host = await startStaticHost({ site, port: 0 });
 async function boot(page, { world = null } = {}) {
@@ -1157,10 +1182,91 @@ async function g6ControlSchedule(page,{modality,schedule,emit}){
     const row=await g6Line(page,home);emit('return.line','same source occurrence returns within4px',row.ok,row.observed);
   }
 }
+// G6 regression: a real dictionary preparation must not outlive its source layer.
+// Only the request is delayed; all navigation uses existing public controls.
+async function g6PendingWordMenu(page,{context,emit}){
+  const requests=[],finished=[];
+  let phase='boot',releaseRequest,released=false;
+  const gate=new Promise(resolve=>{releaseRequest=resolve;});
+  const release=()=>{if(!released){released=true;releaseRequest();}};
+  const isIndex=url=>new URL(url).pathname.endsWith('/data/share_alike/dict-v2/index.json');
+  const onFinished=request=>{if(isIndex(request.url()))finished.push({url:request.url(),phase,time:Date.now()});};
+  const hold=async route=>{
+    const row={url:route.request().url(),phase,startedAt:Date.now(),releasedAt:null};requests.push(row);
+    await gate;row.releasedAt=Date.now();await route.continue();
+  };
+  context.on('requestfinished',onFinished);
+  await context.route('**/data/share_alike/dict-v2/index.json',hold);
+  try{
+    await openStory(page);
+    const word=page.locator('.reader-card h1 .japanese-lookup-word').filter({hasText:/\p{Script=Han}/u}).first();
+    await word.waitFor();await word.scrollIntoViewIfNeeded();
+    const anchor=await word.elementHandle();
+    const sourceFacts=()=>anchor.evaluate(n=>({
+      text:n.dataset.lookupText,connected:n.isConnected,inert:!!n.closest('[inert]'),hidden:!!n.closest('[aria-hidden="true"]'),
+      view:document.body.dataset.view,sheet:document.querySelector('#sheet')?.dataset.node||null,
+      title:document.querySelector('.reader-card h1')?.textContent||null,
+      sentence:document.querySelector('#sheet .sent-reader')?.textContent||null,
+    }));
+    const before=await sourceFacts();
+    // openStory's 900ms wait can meet the reader's 900ms bookmark debounce.
+    // Observe its durable completion before claiming this menu wrote no record.
+    const bookmarkPosition=await page.evaluate(()=>Math.round(scrollY));
+    const recordBefore=await waitForAppRecord(page,record=>record.readerPos?.[STORY.id]===bookmarkPosition,{description:'native title-scroll bookmark committed before menu'});
+    assert.equal(await page.evaluate(()=>Math.round(scrollY)),bookmarkPosition,'reader stays at its observed bookmark before menu');
+    assert.equal(requests.length,0,'the controlled dictionary request must originate in the native menu action');
+    phase='menu-prepare';await word.click({button:'right'});
+    const deadline=Date.now()+7000;while(!requests.length&&Date.now()<deadline)await delay(25);
+    const pending=requests.length===1&&requests[0].phase==='menu-prepare'&&!released&&await page.locator('#reader-word-menu').count()===0;
+    emit('menu.pending-real-request','native word menu awaits its own real dictionary request',pending,{before,requests:structuredClone(requests),released});
+    assert(pending,'the real menu preparation must be pending before navigation');
+    phase='scale-move';
+    const inward=page.locator('#app > .scale-thread[data-scale="article"] [data-scale-in]');
+    assert.equal(await inward.count(),1,'one existing article-to-sentence control');
+    await inward.click();await page.locator('#sheet[data-node^="sent:"]').waitFor();
+    const afterMove=await sourceFacts(),moveScale=await g6ScaleFacts(page);
+    const retained=afterMove.connected&&afterMove.inert&&afterMove.hidden&&afterMove.text===before.text&&moveScale.scale==='sentence'&&moveScale.active.id==='sheet-back'&&!moveScale.active.inert&&moveScale.active.visible;
+    emit('menu.source-retained','scale move retains the actual inactive source and focuses its sentence',retained,{before,afterMove,moveScale});
+    assert(retained,'fixture must retain the actual source under the active sentence layer');
+    assert.equal(await page.locator('#reader-word-menu').count(),0);
+    // Passive observation also catches a briefly mounted menu; it never alters focus or application state.
+    await page.evaluate(()=>{
+      const witness={mounted:[],focused:[]};
+      const observer=new MutationObserver(records=>{
+        for(const record of records)for(const node of record.addedNodes)if(node.nodeType===1){
+          const menus=[...(node.matches('#reader-word-menu')?[node]:[]),...node.querySelectorAll('#reader-word-menu')];
+          for(const menu of menus)witness.mounted.push({time:performance.now(),text:menu.textContent});
+        }
+      });
+      observer.observe(document.body,{childList:true,subtree:true});
+      const focus=event=>{if(event.target.closest?.('#reader-word-menu'))witness.focused.push({time:performance.now(),id:event.target.id});};
+      document.addEventListener('focusin',focus,true);
+      window.__g6PendingMenuWitness={witness,stop:()=>{observer.disconnect();document.removeEventListener('focusin',focus,true);}};
+    });
+    phase='release';release();
+    const finishDeadline=Date.now()+10000;while(!finished.length&&Date.now()<finishDeadline)await delay(25);
+    assert.equal(finished.length,1,'the held real dictionary response must finish');
+    await page.waitForFunction(()=>window.__KAIRO_DICTIONARY_PERF__?.entries>0,null,{timeout:10000});
+    const observationStartedAt=Date.now();await delay(8000);
+    const afterRelease=await sourceFacts(),releaseScale=await g6ScaleFacts(page),recordAfter=await readAppRecord(page);
+    const witness=await page.evaluate(()=>{const state=window.__g6PendingMenuWitness;state.stop();return state.witness;});
+    const menus=await page.locator('body > #reader-word-menu').count();
+    emit('menu.no-late-menu','completed dictionary preparation never mounts a menu over the new layer',menus===0&&witness.mounted.length===0,{menus,witness,requests,finished,observationStartedAt,observationEndedAt:Date.now()});
+    const focus=releaseScale.active;
+    emit('menu.no-late-focus','late preparation cannot steal focus from the current sentence control',witness.focused.length===0&&focus.id===moveScale.active.id&&focus.tag===moveScale.active.tag&&focus.connected&&!focus.inert&&focus.visible&&!focus.body,{before:moveScale.active,after:focus,lateMenuFocus:witness.focused});
+    emit('menu.source-unchanged','the exact connected source and sentence remain unchanged',JSON.stringify(afterMove)===JSON.stringify(afterRelease)&&releaseScale.scale===moveScale.scale&&releaseScale.node===moveScale.node&&releaseScale.passage===moveScale.passage&&releaseScale.stamp===moveScale.stamp,{afterMove,afterRelease,moveScale,releaseScale});
+    emit('menu.no-record-work','opening, navigating away and cancelling pending preparation write no record',JSON.stringify(recordBefore)===JSON.stringify(recordAfter),{before:recordBefore,after:recordAfter});
+  }finally{
+    release();context.off('requestfinished',onFinished);
+    await page.evaluate(()=>window.__g6PendingMenuWitness?.stop()).catch(()=>{});
+    await context.unroute('**/data/share_alike/dict-v2/index.json',hold);
+  }
+}
+
 async function runG6Suite(browser){
   const results=[];
-  const run=async(name,ids,body,{control=null,publish=true,init=null}={})=>{
-    const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:2,serviceWorkers:'block'});
+  const run=async(name,ids,body,{control=null,publish=true,init=null,viewport={width:390,height:844},mobile=true}={})=>{
+    const context=await browser.newContext({viewport,isMobile:mobile,hasTouch:true,deviceScaleFactor:2,serviceWorkers:'block'});
     await context.addInitScript(()=>{localStorage.setItem('kairo-word-ladder-demo-v1','1');window.__g6DocumentStamp=crypto.randomUUID();});
     if(init)await context.addInitScript(init);
     await silenceBrowserAudio(context);
@@ -1199,6 +1305,7 @@ async function runG6Suite(browser){
       await run(`${modality}.forty`,g6WalkIds(G6_FORTY,false),(page,{emit})=>g6Walk(page,{modality,itinerary:G6_FORTY,emit}));
     }
     if(!g6FramesOnly){
+      await run('pending-word-menu',['menu.pending-real-request','menu.source-retained','menu.no-late-menu','menu.no-late-focus','menu.source-unchanged','menu.no-record-work'],g6PendingWordMenu,{viewport:{width:1024,height:900},mobile:false});
       for(const modality of ['touch','keyboard']){
         await run(`${modality}.thread`,['bead.word','bead.kanji','bead.sentence','bead.article','bead.article.line','bead.shelf','bead.shelf.line','no-record-work'],(page,{emit})=>g6ThreadAncestors(page,{modality,emit}));
         await run(`${modality}.recursion`,['recursive.order','recursive.ancestor','recursive.no-record-work'],(page,{emit})=>g6RecursiveThread(page,{modality,emit}));
@@ -1281,11 +1388,12 @@ try {
     browserVersions[engine] = browser.version();
     console.log(`${engine} ${browserVersions[engine]}`);
     if (!g3Only) await runG6Suite(browser);
-    const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true, control = null, init = null, demo = false } = {}) => {
+    const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true, control = null, init = null, demo = false, phase = 'candidate' } = {}) => {
       if (g6Only && !name.startsWith('G6')) return;
       if (g3Only && !name.startsWith('G3')) return;
-      if (controlsOnly && !['G3-stalled', 'G3-clear', 'G3-front'].includes(name)) return;
-      if (roomsOnly && !['G3-words', 'G3-words-family', 'G3-sky', 'G3-sky-glyph', 'G3-particle'].includes(name)) return;
+      if (controlsOnly && !['G3-stalled', 'G3-clear', 'G3-front', 'G3-sky-ownership'].includes(name)) return;
+      if (roomsOnly && !['G3-words', 'G3-words-family', 'G3-sky', 'G3-sky-glyph', 'G3-sky-ownership', 'G3-particle'].includes(name)) return;
+      if (skyOwnershipOnly && name !== 'G3-sky-ownership') return;
       if (sentencesOnly && name !== 'G3-front' && !name.startsWith('G3-sentence-')) return;
       if (kanaOnly && name !== 'G3-kana' && name !== 'G3-particle') return;
       if (skyReadingsOnly && name !== 'G3-sky-glyph' && name !== 'G3-particle') return;
@@ -1295,6 +1403,10 @@ try {
       if (init) await context.addInitScript(init);
       await silenceBrowserAudio(context);
       await context.route('**/*', (route) => (new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort()));
+      const setup = name === 'G3-sky-ownership' ? { engine, name, phase: control ? `mutant:${control.id}` : phase,
+        scope: 'Fixture-only named word/caption data; actual product mount/hit code; controlled geometry',
+        edits: [skyFixtureEdit], served: [], pageErrors: [] } : null;
+      if (setup) await serveMutation(context, { origin: host.origin, manifest: new Map(identity.files.map((file) => [file.path, file.sha256])), control: setup, edits: setup.edits });
       if (control) await serveMutation(context, { origin: host.origin, manifest: new Map(identity.files.map((file) => [file.path, file.sha256])), control, edits: control.edits });
       const page = await context.newPage(), errors = [];
       page.setDefaultTimeout(15000);
@@ -1305,6 +1417,14 @@ try {
         check(`${name}.error`, `${name} ran to the end`, false, String(error.stack || error).slice(0, 700));
         await page.screenshot({ path: resolve(evidence, `${engine}-${name}-error.png`) }).catch(() => {});
       } finally {
+        if (setup) {
+          setup.pageErrors = errors;
+          setup.complete = !setup.setupError && setup.served.length > 0 && setup.served.every((served) =>
+            served.file === skyFixtureEdit.file && served.applied.length === 1 && served.applied[0].key === skyFixtureEdit.key) &&
+            new Set(setup.served.map((served) => served.mutantSha256)).size === 1;
+          fixtures.push(setup);
+          check('G3.sky-ownership.setup', 'each served ownership fixture starts from pinned bytes and applies the same data-only setup exactly once', setup.complete, setup);
+        }
         if (control) control.pageErrors = errors;
         check(`${name}.page-errors`, `${name}: no page errors`, errors.length === 0, errors);
         await context.close();
@@ -1364,8 +1484,165 @@ try {
       const after = await page.evaluate(() => ({ stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), answered: !document.getElementById('kp-reveal') }));
       check('G3.front.press', 'a front sentence press cannot expose lookup help or answer the card', !after.stage && !after.page && !after.answered, after);
     };
+    // A controlled CSS ownership fixture, not a natural scene/touch claim. Actual mounted nodes keep their product
+    // classes, z-index, hit rules and host admission; only their transforms/order are temporarily arranged in one task.
+    // 熾烈 supplies a real unhosted glyph, but no wide donor caption. Lead0235's exact absent glyphs use the separately
+    // receipted corpus/caption fixture above; 筆's unmounted-ruby case remains an additional structural regression.
+    const skyOwnershipProbe = async (page) => {
+      const lock = async (word, kanji) => {
+        await page.goto(`${host.origin}/?entry=drift&ui=bi`);
+        await page.waitForFunction(() => document.body.dataset.ready === '1' && !!window.__lockWord);
+        await delay(1200);
+        // Materialize the exact existing cover through the installed seam. Never substitute an arbitrary word.
+        const opened = await page.evaluate((w) => ({ cover: window.__lockWord('誇り'), target: window.__lockWord(w) }), word);
+        assert(opened.cover && opened.target, `the exact 誇り cover and ${word} constellation must exist`);
+        await page.waitForFunction((ch) => [...document.querySelectorAll('#drift-layer.active #sky > .glyph.hosted-constellation-glyph')]
+          .some((node) => {
+            const g = node.querySelector(':scope > .g'), copy = g?.cloneNode(true);
+            copy?.querySelectorAll('rt').forEach((rt) => rt.remove());
+            return copy?.textContent === ch;
+          }), kanji);
+        await delay(1800);
+        await page.evaluate(() => document.fonts.ready.then(() => true));
+      };
+      const own = (kanji, { sourceWord, bare = false, captionRequired = false } = {}) => page.evaluate(async ({ kanji, sourceWord, bare, captionRequired }) => {
+        // First let the app bring the exact cover into view. Locking it and a distant target in the same task leaves
+        // its old world position edge-faded to zero, even if a later DOM transform puts its rectangle on the glass.
+        // This bounded lifecycle wait changes no camera, opacity, display or product hit rule. Every case uses it.
+        const opened = { cover: window.__lockWord('誇り'), target: false };
+        const sky = document.querySelector('#drift-layer.active #sky');
+        const liveCover = () => [...sky.querySelectorAll(':scope > .word.bctr')]
+          .find((node) => node.querySelector('.base')?.textContent === '誇り');
+        const lifecycle = { samples: [], admitted: false }, start = performance.now();
+        let word = null, previous = null, stable = 0;
+        while (performance.now() - start < 5000) {
+          await new Promise(requestAnimationFrame);
+          word = liveCover();
+          const box = word?.querySelector('.base').getBoundingClientRect(), css = word && getComputedStyle(word);
+          const sample = { elapsed: performance.now() - start, connected: !!word?.isConnected,
+            mounted: !!word?.style.transform, opacity: css ? Number(css.opacity) : 0,
+            visible: css?.display !== 'none' && css?.visibility === 'visible' && !word?.closest('[inert]'),
+            box: box && { x: box.x, y: box.y, width: box.width, height: box.height },
+            inView: !!box && box.width > 0 && box.height > 0 && box.left >= 64 && box.right <= innerWidth - 64 &&
+              box.top >= 96 && box.bottom <= innerHeight - 96 };
+          lifecycle.samples.push(sample);
+          stable = sample.inView && previous && Math.abs(box.x - previous.x) < 1 && Math.abs(box.y - previous.y) < 1 ? stable + 1 : 0;
+          previous = sample.box;
+          if (sample.connected && sample.mounted && sample.visible && sample.opacity > 0 && stable >= 6) {
+            lifecycle.admitted = true; lifecycle.elapsed = sample.elapsed; lifecycle.stableFrames = stable; break;
+          }
+        }
+        if (!lifecycle.admitted) return { kanji, sourceWord, opened, lifecycle, controlledGeometry: true,
+          admitted: false, setupError: 'exact 誇り did not become visibly mounted and settled before target admission' };
+        opened.target = window.__lockWord(sourceWord);
+        await new Promise(requestAnimationFrame);
+        const textOf = (node) => {
+          const holder = node.querySelector(':scope > .g > ruby.drift-reading') || node.querySelector(':scope > .g');
+          return holder && [...holder.childNodes].find((child) => child.nodeType === Node.TEXT_NODE);
+        };
+        const glyph = [...sky.querySelectorAll(':scope > .glyph.hosted-constellation-glyph')].find((node) => textOf(node)?.nodeValue === kanji);
+        const facts = { kanji, sourceWord, opened, lifecycle, frameBoundaryObserved: true, appTransformMounted: !!glyph?.style.transform,
+          glyph: !!glyph, controlledGeometry: true, admitted: false, attempts: [],
+          canonical: { has: window.__BUNKI_OPEN_SLIP.has('kanji', kanji), reading: window.__BUNKI_OPEN_SLIP.reading('kanji', kanji) } };
+        if (!glyph) return facts;
+        const style = (node) => getComputedStyle(node);
+        if (!word?.isConnected || word.querySelector('.base')?.textContent !== '誇り')
+          return { ...facts, cover: null, setupError: 'the admitted exact 誇り cover is absent; no substitute permitted' };
+        const g = glyph.querySelector(':scope > .g'), caption = glyph.querySelector(':scope > small');
+        const original = { glyphTransform: glyph.style.transform, wordTransform: word.style.transform,
+          wordParent: word.parentNode, wordNext: word.nextSibling, children: [...g.childNodes] };
+        const ruby = bare ? g.querySelector(':scope > ruby.drift-reading') : null;
+        const rubyChildren = ruby ? [...ruby.childNodes] : [];
+        const rect = (r) => ({ x: r.x, y: r.y, left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height });
+        const identity = (node) => node ? { tag: node.tagName.toLowerCase(), id: node.id, classes: [...node.classList],
+          ancestor: node.closest('.word,.glyph,[data-drift-chrome],#lvl,.crumb')?.outerHTML.slice(0, 300) || null } : null;
+        const range = document.createRange(), coverRange = document.createRange();
+        const inkRect = () => { range.selectNodeContents(textOf(glyph)); return range.getBoundingClientRect(); };
+        const coverInk = () => { coverRange.selectNodeContents(word.querySelector('.base')); return coverRange.getBoundingClientRect(); };
+        try {
+          if (ruby) g.replaceChildren(...rubyChildren.filter((child) => child.nodeName !== 'RT'));
+          sky.append(word);
+          Object.assign(facts, { cover: word.querySelector('.base').textContent,
+            later: !!(glyph.compareDocumentPosition(word) & Node.DOCUMENT_POSITION_FOLLOWING),
+            annotated: !!g.querySelector(':scope > ruby.drift-reading'), unmountedForStructuralCase: !!ruby,
+            stacked: glyph.classList.contains('center') || glyph.classList.contains('comp'),
+            caption: caption?.textContent || '', captionOpacity: caption ? style(caption).opacity : null,
+            glyphOpacity: Number(style(glyph).opacity), coverOpacity: Number(style(word).opacity),
+            visiblyMounted: [glyph, word].every((node) => node.isConnected && node.getClientRects().length > 0 &&
+              style(node).display !== 'none' && style(node).visibility === 'visible' && Number(style(node).opacity) > 0 && !node.closest('[inert]')),
+            coverFree: style(word).zIndex === '1' && style(word).pointerEvents !== 'none' && style(word).visibility !== 'hidden',
+            original: { glyph: rect(glyph.getBoundingClientRect()), cover: rect(word.getBoundingClientRect()) } });
+          const skyBox = sky.getBoundingClientRect();
+          const clip = { left: Math.max(0, skyBox.left) + 8, top: Math.max(0, skyBox.top) + 8,
+            right: Math.min(innerWidth, skyBox.right) - 8, bottom: Math.min(innerHeight, skyBox.bottom) - 8 };
+          facts.viewport = { width: innerWidth, height: innerHeight }; facts.clip = clip;
+          const inside = (r) => r.width > 0 && r.height > 0 && r.left >= clip.left && r.right <= clip.right && r.top >= clip.top && r.bottom <= clip.bottom;
+          const placeCover = (point) => {
+            word.style.transform = original.wordTransform;
+            const start = coverInk();
+            word.style.transform = `translate(${point.x - start.left - start.width / 2}px, ${point.y - start.top - start.height / 2}px) ${original.wordTransform}`;
+            const ink = coverInk(), stack = document.elementsFromPoint(point.x, point.y), hit = document.elementFromPoint(point.x, point.y);
+            // Ignore only the tested glyph when checking the underlying target. A mutant that loses the glyph's hit
+            // region still has the same valid setup; unrelated chrome/words and offscreen points never qualify.
+            const underlying = stack.find((node) => !glyph.contains(node));
+            return { ...point, owner: glyph.contains(hit) ? 'glyph' : word.contains(hit) ? 'cover' : hit ? 'foreign' : null,
+              coverInk: rect(ink), coverRect: rect(word.getBoundingClientRect()), hit: identity(hit), stack: stack.slice(0, 8).map(identity),
+              admitted: point.x >= clip.left && point.x <= clip.right && point.y >= clip.top && point.y <= clip.bottom &&
+                ink.left <= point.x && point.x <= ink.right && ink.top <= point.y && point.y <= ink.bottom && word.contains(underlying) };
+          };
+          // A hard-bounded grid admits geometry without inspecting the desired glyph-vs-cover product outcome.
+          for (const fy of [.45, .3, .65]) for (const fx of [.5, .35, .65]) {
+            glyph.style.transform = original.glyphTransform;
+            const from = inkRect(), x = clip.left + (clip.right - clip.left) * fx, y = clip.top + (clip.bottom - clip.top) * fy;
+            glyph.style.transform = `translate(${x - from.left - from.width / 2}px, ${y - from.top - from.height / 2}px) ${original.glyphTransform}`;
+            const ink = inkRect(), box = glyph.getBoundingClientRect(), captionBox = caption?.getBoundingClientRect();
+            const gap = Math.min(ink.left - box.left, box.right - ink.right);
+            const trial = { grid: { fx, fy }, ink: rect(ink), box: rect(box), captionBox: captionBox && rect(captionBox), gap };
+            facts.attempts.push(trial);
+            if (!inside(box) || (captionRequired && (!captionBox || !inside(captionBox) || gap < 4))) continue;
+            trial.centre = placeCover({ x: ink.left + ink.width / 2, y: ink.top + ink.height / 2 });
+            if (captionRequired) trial.side = placeCover({ x: box.left + (ink.left - box.left) / 2, y: ink.top + ink.height / 2 });
+            if (!trial.centre.admitted || (captionRequired && !trial.side.admitted)) continue;
+            Object.assign(facts, { admitted: true, selected: trial, centre: trial.centre.owner, side: trial.side?.owner || null });
+            return facts;
+          }
+          facts.setupError = 'no clear in-viewport geometry among the nine fixed candidates';
+          return facts;
+        } finally {
+          glyph.style.transform = original.glyphTransform;
+          word.style.transform = original.wordTransform;
+          original.wordParent.insertBefore(word, original.wordNext?.parentNode === original.wordParent ? original.wordNext : null);
+          if (ruby) { ruby.replaceChildren(...rubyChildren); g.replaceChildren(...original.children); }
+          facts.restored = glyph.style.transform === original.glyphTransform && word.style.transform === original.wordTransform &&
+            word.parentNode === original.wordParent && word.nextSibling === original.wordNext &&
+            original.children.every((child, index) => g.childNodes[index] === child);
+        }
+      }, { kanji, sourceWord, bare, captionRequired });
+      await lock('言葉', '言');
+      const said = await own('言', { sourceWord: '言葉' });
+      await lock('鉛筆', '筆');
+      const brush = await own('筆', { sourceWord: '鉛筆', captionRequired: true });
+      const bare = await own('筆', { sourceWord: '鉛筆', bare: true, captionRequired: true });
+      const named = {};
+      for (const { word, glyph } of SKY_OWNERSHIP_NAMED) {
+        await lock(word, glyph);
+        named[glyph] = await own(glyph, { sourceWord: word, captionRequired: true });
+      }
+      const cases = { said, brush, bare, ...named }, captions = { brush, bare, ...named };
+      check('G3.sky-ownership.corpus', 'fixture-only 嘩/眩/貰 are actual mounted unannotated glyphs; hosted readings/pages remain absent',
+        Object.keys(named).length === 3 && Object.values(named).every((c) => c.glyph && !c.annotated && !c.unmountedForStructuralCase &&
+          c.canonical.has === false && c.canonical.reading === '' && c.caption === SKY_FIXTURE_CAPTION), named);
+      check('G3.sky-ownership.fixture', 'actual glyphs and exact 誇り use clear controlled geometry; only the tested pair owns each admitted point',
+        Object.values(cases).every((c) => c.lifecycle?.admitted && c.opened.cover && c.opened.target && c.appTransformMounted && c.glyph && c.cover === '誇り' && c.later && !c.stacked && c.visiblyMounted && c.coverFree && c.coverOpacity > 0 &&
+          c.glyphOpacity > 0 && c.admitted && c.restored) && said.annotated && brush.annotated && !bare.annotated &&
+          Object.values(captions).every((c) => c.selected?.gap >= 4 && c.selected.side.admitted && c.captionOpacity === '0'), cases);
+      check('G3.sky-ownership.centre', 'each exact glyph owns its printed centre above the later 誇り, annotated or not',
+        Object.values(cases).every((c) => c.centre === 'glyph'), cases);
+      check('G3.sky-ownership.caption', 'each transparent caption side belongs to 誇り, including all three naturally unannotated fixture glyphs',
+        Object.values(captions).every((c) => c.side === 'cover'), captions);
+    };
     const schedules = {};
-    for (const [name, probe] of [['G3-stalled', stalledProbe], ['G3-clear', clearProbe], ['G3-front', frontProbe]]) {
+    for (const [name, probe] of [['G3-stalled', stalledProbe], ['G3-clear', clearProbe], ['G3-front', frontProbe], ['G3-sky-ownership', skyOwnershipProbe]]) {
       const begin = rows.length;
       await walk(name, probe);
       schedules[name] = rows.slice(begin);
@@ -1841,8 +2118,21 @@ try {
           { file: 'decks/player/mount.js', key: 'front-door-gate',
             from: '    taps = null; // the front has nothing to tap, whatever is asked',
             to: '    /* G3 negative: retain the front tap cover */' }] },
+        { id: 'glyph-z-dropped', run: 'G3-sky-ownership', probe: skyOwnershipProbe, kill: 'G3.sky-ownership.centre',
+          witness: (row) => Object.values(row.observed).every((c) => c.centre === 'cover'),
+          edits: [{ file: 'drift-layer.css', key: 'drop-glyph-z',
+            from: '#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) {\n  z-index: 2;\n}',
+            to: '#drift-layer.active #sky > .glyph.hosted-constellation-glyph:not(.comp):not(.center) {\n}' }] },
+        { id: 'glyph-hit-region-removed', run: 'G3-sky-ownership', probe: skyOwnershipProbe, kill: 'G3.sky-ownership.centre',
+          witness: (row) => Object.values(row.observed).every((c) => c.centre === 'cover'),
+          edits: [{ file: 'drift-layer.css', key: 'remove-glyph-hit-region',
+            from: ':not(.comp):not(.center) > small {\n  pointer-events: auto;\n}',
+            to: ':not(.comp):not(.center) > small {\n  pointer-events: none;\n}' }] },
+        { id: 'bare-glyph-caption-width', run: 'G3-sky-ownership', probe: skyOwnershipProbe, kill: 'G3.sky-ownership.caption',
+          witness: (row) => row.observed.brush.side === 'cover' && ['bare', '嘩', '眩', '貰'].every((key) => row.observed[key]?.side === 'glyph'),
+          edits: [{ file: 'drift-layer.css', key: 'bare-glyph-full-width', from: '  width: fit-content;\n  margin-inline: auto;\n', to: '' }] },
       ];
-      for (const spec of specs) {
+      for (const spec of specs.filter((spec) => !skyOwnershipOnly || spec.run === 'G3-sky-ownership')) {
         const control = { engine, id: spec.id, edits: spec.edits, served: [], pageErrors: [] };
         const begin = rows.length;
         await walk(spec.run, spec.probe, { control });
@@ -1852,14 +2142,17 @@ try {
         const actual = control.rows.map((row) => row.id);
         const target = control.rows.find((row) => row.id === `${engine}/${spec.kill}`);
         const cleanCandidate = baseline.length > 1 && baseline.every((row) => row.ok) && new Set(expected).size === expected.length;
+        const fixtureReady = spec.run !== 'G3-sky-ownership' || ['corpus', 'fixture', 'setup'].every((part) =>
+          control.rows.some((row) => row.id === `${engine}/G3.sky-ownership.${part}` && row.ok));
         const complete = !control.error && !control.setupError && control.pageErrors.length === 0 &&
-          JSON.stringify(actual) === JSON.stringify(expected) && spec.edits.every((edit) => control.served.some((served) => served.file === edit.file && served.applied.some((applied) => applied.key === edit.key)));
+          fixtureReady && JSON.stringify(actual) === JSON.stringify(expected) && spec.edits.every((edit) => control.served.some((served) => served.file === edit.file && served.applied.some((applied) => applied.key === edit.key)));
         const killed = cleanCandidate && complete && target && !target.ok && spec.witness(target) &&
           control.rows.every((row) => row.id === target.id || row.ok);
         control.verdict = !cleanCandidate || !complete ? 'incomplete' : killed ? 'killed' : target?.ok ? 'survived' : 'contaminated';
-        // Re-run the exact unmodified schedule in a new context. Source bytes are never edited on disk.
+        // Re-run without the product mutant, retaining identical explicitly synthetic fixture data where declared.
+        // Source bytes are never edited on disk.
         const restoreBegin = rows.length;
-        await walk(spec.run, spec.probe);
+        await walk(spec.run, spec.probe, { phase: `restore:${spec.id}` });
         control.restore = rows.splice(restoreBegin);
         const restored = JSON.stringify(control.restore.map((row) => row.id)) === JSON.stringify(expected) && control.restore.every((row) => row.ok);
         controls.push(control);
@@ -2247,7 +2540,7 @@ try {
 
 function innerHeightOf(facts) { return facts?.inner?.height || 844; }
 
-writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: g6FramesOnly ? 'G6 twelve directed edges and frames only; draft scope limits in g6-<engine>.json' : g6ControlsOnly ? 'G6 controls with positives and restores only' : g6Only ? 'G6 core schedule only; no G1/G3 claim; draft scope limits in g6-<engine>.json' : skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : 'G1, G3 and G6 core (G6 scope limits in per-engine receipt)', rows, frames, controls }, null, 1));
+writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: g6FramesOnly ? 'G6 twelve directed edges and frames only; draft scope limits in g6-<engine>.json' : g6ControlsOnly ? 'G6 controls with positives and restores only' : g6Only ? 'G6 core schedule only; no G1/G3 claim; draft scope limits in g6-<engine>.json' : skyOwnershipOnly ? `G3 controlled sky glyph hit ownership${withControls ? ' and its negative controls' : ''}; named 嘩/眩/貰 use fixture-only corpus/captions, actual product mount/hit code; no natural-input, G1 or frame claim` : skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : 'G1, G3 and G6 core (G6 scope limits in per-engine receipt)', rows, frames, controls, fixtures }, null, 1));
 const failed = rows.filter((row) => !row.ok);
 console.log(`\n${rows.length - failed.length}/${rows.length} — evidence ${evidence}`);
 process.exit(failed.length ? 1 : 0);

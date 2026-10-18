@@ -766,7 +766,7 @@ export function createGuidedSession(host) {
             `問${state.index + 1} · 答える前の解説`,
             `Question ${state.index + 1} · Explanation before answering`,
           )
-        : `${t(`問${state.index + 1} · 最初の答え`, `Question ${state.index + 1} · Your first answer`)}: <strong lang="ja">${esc(q.options[a.choice])}</strong>${assisted(a) ? t(' · 助けあり', ' · with help') : ''}`;
+        : `${t(`問${state.index + 1} · 最初の答え`, `Question ${state.index + 1} · Your first answer`)}: <strong lang="ja">${esc(q.options[a.choice])}</strong>${assisted(a) ? t(' · 助けあり', ' · With help') : ''}`;
     const primary =
       a.choice === null
         ? btn(bi('問題に戻る', 'return to your answer'), 'question', 'primary')
@@ -786,11 +786,11 @@ export function createGuidedSession(host) {
         const a = answer(q);
         const outcome =
           a.choice === null
-            ? bi('未回答', 'not answered')
+            ? bi('未回答', 'Not answered')
             : a.correct
-              ? bi('正解', 'correct')
-              : bi('不正解', 'incorrect');
-        return `<div class="gs-row ${a.correct === false ? 'missed' : ''}"><span class="gs-row-number">${String(i + 1).padStart(2, '0')}</span><div><h2 class="gs-row-title">${bi(kindLabel(q)[0], kindLabel(q)[1])}</h2><p>${outcome}${assisted(a) ? ` · ${bi('助けあり', 'with help')}` : ''}${a.flagged ? ` · ${bi('旗', 'flagged')}` : ''}</p></div><div class="gs-row-actions">${textBtn(bi('見直す', 'revisit'), 'source', `data-index="${i}"`)}</div></div>`;
+              ? bi('正解', 'Correct')
+              : bi('不正解', 'Incorrect');
+        return `<div class="gs-row ${a.correct === false ? 'missed' : ''}"><span class="gs-row-number">${String(i + 1).padStart(2, '0')}</span><div><h2 class="gs-row-title">${bi(kindLabel(q)[0], kindLabel(q)[1])}</h2><p>${outcome}${assisted(a) ? ` · ${bi('助けあり', 'With help')}` : ''}${a.flagged ? ` · ${bi('旗', 'Flagged')}` : ''}</p></div><div class="gs-row-actions">${textBtn(bi('見直す', 'revisit'), 'source', `data-index="${i}"`)}</div></div>`;
       },
     ).join(
       '',
@@ -879,7 +879,7 @@ export function createGuidedSession(host) {
     const wrong = Q.filter(
       (entry) => answer(entry).correct === false && !assisted(answer(entry)),
     ).length;
-    return `<section class="gs-results"><div><span class="gs-eyebrow">${bi('今日の結果', 'what you met today')}</span><h1 class="gs-title gs-score" tabindex="-1">${countRight()} <span class="gs-of">${t(`/ ${answered()}`, `of ${answered()}`)}</span><small class="gs-h-sub">${bi('最初の答えが正解', 'correct first answers')}</small></h1><p class="gs-lede">${activeLearn().length ? t('見直したいところを下に集めた。文脈がまだ近いうちに、一つから始めよう。', 'The places that need another look are gathered below. Begin with one, while the context is still close.') : t('小さな問題のまとまり。もっと深く行ける。文法を、違う場面でもう一度試してみよう。', 'A small set of questions, with room to go deeper. Try the grammar once more in a different situation.')}</p><div class="gs-results-facts"><div><strong>${wrong}</strong><span>${bi('不正解', 'incorrect')}</span></div><div><strong>${help}</strong><span>${bi('助けあり', 'with help')}</span></div><div><strong>${Q.length - answered()}</strong><span>${bi('未回答', 'unanswered')}</span></div></div>${gapLine()}<p class="gs-side-note">${t('案内つきの筆記練習で、JLPT の得点やレベルの判定ではない。', 'This is guided written practice, not a JLPT score or level estimate.')}</p><div class="gs-spaced"><h2>${bi('覚に入ったもの', 'kept in Learn')}</h2>${notice ? `<p class="gs-notice" role="status">${esc(notice)}</p>` : ''}${followups()}</div><div class="gs-actions">${textBtn(bi('場へ', 'your return field'), 'field')}</div></div><aside class="gs-focus"><span class="gs-eyebrow">${bi('次の一歩', 'one useful next step')}</span><div class="gs-focus-target" lang="ja">${esc(q.target.label)}</div><p>${esc(q.target.meaning)}. ${t('解説なしで、違う文で試してみよう。', 'Try it in a different context, without the explanation beside you.')}</p>${btn(bi('新しい文で試す', 'try a fresh context'), 'practice', 'primary', `data-id="${esc(q.id)}"`)}<div class="gs-spaced gs-rule"><p>${t('先生と話してみる？', 'Want to talk it through?')}</p>${textBtn(bi('先生への質問を用意する', 'prepare a question for Sensei'), 'sensei-target', `data-id="${esc(q.id)}"`)}</div></aside></section>`;
+    return `<section class="gs-results"><div><span class="gs-eyebrow">${bi('今日の結果', 'what you met today')}</span><h1 class="gs-title gs-score" tabindex="-1">${countRight()} <span class="gs-of">${t(`/ ${answered()}`, `of ${answered()}`)}</span><small class="gs-h-sub">${bi('最初の答えが正解', 'correct first answers')}</small></h1><p class="gs-lede">${activeLearn().length ? t('見直したいところを下に集めた。文脈がまだ近いうちに、一つから始めよう。', 'The places that need another look are gathered below. Begin with one, while the context is still close.') : t('小さな問題のまとまり。もっと深く行ける。文法を、違う場面でもう一度試してみよう。', 'A small set of questions, with room to go deeper. Try the grammar once more in a different situation.')}</p><div class="gs-results-facts"><div><strong>${wrong}</strong><span>${bi('不正解', 'Incorrect')}</span></div><div><strong>${help}</strong><span>${bi('助けあり', 'With help')}</span></div><div><strong>${Q.length - answered()}</strong><span>${bi('未回答', 'Unanswered')}</span></div></div>${gapLine()}<p class="gs-side-note">${t('案内つきの筆記練習で、JLPT の得点やレベルの判定ではない。', 'This is guided written practice, not a JLPT score or level estimate.')}</p><div class="gs-spaced"><h2>${bi('覚に入ったもの', 'kept in Learn')}</h2>${notice ? `<p class="gs-notice" role="status">${esc(notice)}</p>` : ''}${followups()}</div><div class="gs-actions">${textBtn(bi('場へ', 'your return field'), 'field')}</div></div><aside class="gs-focus"><span class="gs-eyebrow">${bi('次の一歩', 'one useful next step')}</span><div class="gs-focus-target" lang="ja">${esc(q.target.label)}</div><p>${esc(q.target.meaning)}. ${t('解説なしで、違う文で試してみよう。', 'Try it in a different context, without the explanation beside you.')}</p>${btn(bi('新しい文で試す', 'try a fresh context'), 'practice', 'primary', `data-id="${esc(q.id)}"`)}<div class="gs-spaced gs-rule"><p>${t('先生と話してみる？', 'Want to talk it through?')}</p>${textBtn(bi('先生への質問を用意する', 'prepare a question for Sensei'), 'sensei-target', `data-id="${esc(q.id)}"`)}</div></aside></section>`;
   }
 
   function savedWordsView() {
@@ -1362,17 +1362,25 @@ export function createGuidedSession(host) {
     }
   }
 
+  function lookupAdmitted(questionId) {
+    return !!state && Q.some((entry) => entry.id === questionId) && !!root?.isConnected &&
+      current().id === questionId && ['question', 'insight'].includes(root.dataset.stage);
+  }
+
   return {
     /** Arriving through a door: the room opens at its top with the heading focused. */
     enter() {
       after = { top: true };
     },
+    /** Whether a word in this question may open its lookup doors now; nothing is recorded. */
+    canLookup(questionId) {
+      return lookupAdmitted(questionId);
+    },
     /** A word looked up inside an unanswered question is help before its first answer. The
      * app shows the reading only once this returns true: the help is saved on that question. */
     recordLookup(questionId) {
+      if (!lookupAdmitted(questionId)) return false;
       const q = Q.find((entry) => entry.id === questionId);
-      if (!state || !q || !root?.isConnected || current().id !== questionId ||
-          !['question', 'insight'].includes(root.dataset.stage)) return false;
       const next = answer(q).choice === null
         ? reduceGuidedState(state, { type: 'LOOKUP', id: q.id })
         : state;

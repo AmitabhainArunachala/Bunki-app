@@ -9735,7 +9735,7 @@ function appendJapaneseLookup(container, text, context = {}) {
       target: { kind: 'word', id: segment }, label: segment, copyText: segment,
       prepare: async () => {
         menuOccurrence = occurrence();
-        if (context.beforeOpen && !(await context.beforeOpen())) return false;
+        if (context.beforeOpen && !(await context.admit?.())) return false;
         await ensureDictionaryRowsForForm(segment).catch(() => {});
         menuRecord = japaneseLookupRecord(segment, context);
       },
@@ -9744,7 +9744,11 @@ function appendJapaneseLookup(container, text, context = {}) {
       save: () => wordSaveFacts({ s: segment, b: menuRecord?.head || segment, r: menuRecord?.r || '', c: !!menuRecord,
         ...(menuRecord?.seq ? { seq: menuRecord.seq } : {}) }, { record: menuRecord }),
       quickLook: () => { const anchor = current(); if (anchor) void openJapaneseLookup(anchor, segment, context); },
-      openEntry: mode => { const node = entry(), anchor = current(); if (node && anchor) go(node, { invoker: anchor, instant: mode === 'keyboard' }); },
+      openEntry: async mode => {
+        if (!entry() || (context.beforeOpen && !(await context.beforeOpen()))) return;
+        const node = entry(), anchor = current();
+        if (node && anchor) go(node, { invoker: anchor, instant: mode === 'keyboard' });
+      },
     });
     if (context.kinsoku) placeKinsoku(wrapper, word, segment);
     else wrapper.append(word);
@@ -9773,7 +9777,8 @@ function enhanceJapaneseProse(root) {
     // A word looked up in a guided question is saved as help on that question before it shows.
     const question = S.view === 'guided' ? parent.closest('.guided-room [data-question]')?.dataset.question : null;
     // the reader's title card keeps Japanese line breaks (禁則処理): its marks cling to their words
-    const context = { ...(question ? { itemId: `guided:${question}`, beforeOpen: () => guidedRoom?.recordLookup(question) === true } : {}), block: parent,
+    const context = { ...(question ? { itemId: `guided:${question}`, admit: () => guidedRoom?.canLookup(question) === true,
+      beforeOpen: () => guidedRoom?.recordLookup(question) === true } : {}), block: parent,
       ...(parent.closest?.('.reader-card') ? { kinsoku: true } : {}) };
     const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
     const textNodes = [];
@@ -11036,6 +11041,7 @@ async function sendSentenceToTutor(node, discuss, currentSurface, say) {
  * Enter picks, Escape closes and gives focus back to the word. Only words lose the browser's own menu. */
 let readerWordMenu = null;
 function closeReaderWordMenu({ restoreFocus = false } = {}) {
+  readerWordMenuSerial += 1; // Retire pending preparation even before a menu mounts.
   const open = readerWordMenu;
   readerWordMenu = null;
   if (!open) return;
@@ -11708,8 +11714,6 @@ function readerGlossLine(token) {
   return line;
 }
 
-/** The first-visit tip: one plain line (round 4, John T4: the explanation was "too verbose and..
- * confusing"). The text settings keep the longer form, with the word menu's press and hold. */
 /** How the reader's words work, in plain words: the text settings say it whole (John, 2026-10-02 #8). */
 function tapLadderHint() {
   return tx('タップするたびに、読み、意味、詳しい項目へと進みます。長押し（または右クリック）で、ほかの操作も。',
@@ -17008,11 +17012,11 @@ function assessmentCardAssistance(card) {
  * device or time. */
 function assessmentAssistedMark({ assistedOrigin: origin, assistedKind: kind }) {
   const text = origin === 'received'
-    ? tx('助けあり · 同期された結果に、この問題の助けの記録がある', 'with help · the synced result records help on this question')
+    ? tx('助けあり · 同期された結果に、この問題の助けの記録がある', 'With help · the synced result records help on this question')
     : origin === 'local' && kind === 'explanation'
-      ? tx('助けあり · 答えたあとに解説を見た問題', 'with help · you opened the explanation after answering')
+      ? tx('助けあり · 答えたあとに解説を見た問題', 'With help · you opened the explanation after answering')
       : origin === 'local' && kind === 'dictionary'
-        ? tx('助けあり · この問題で語を調べた', 'with help · you looked up a word on this question') : null;
+        ? tx('助けあり · この問題で語を調べた', 'With help · you looked up a word on this question') : null;
   if (!text) throw new TypeError(`assessment-assisted-origin:${origin}:${kind}`);
   return el('p', 'assessment-review-assisted', text);
 }
@@ -28235,12 +28239,12 @@ async function ensureBankExamples(word) {
 
 /* ---------------------------------- the reader's grammar, outside the reader
  * Any sentence the app shows — a sheet's 用例, a review cloze, a probe's
- * context line — carries the reader's click grammar, and starts BARE:
- * no furigana until it is asked for (operator's law, 2026-08-12 — the
- * sentence is the exercise; readings on request only, whatever the
- * reader's own dial says). One tap opens the word's popup, as in the
- * reader (reader lane 2026-10-02): the reading and the meaning at once,
- * Save, and Full entry ›. Taps land in the obslog. */
+ * context line — carries the reader's click grammar: the reading in place,
+ * then the stage, then the page. G3 gives every word one ladder, so its
+ * readings follow the reader's ふりがな dial: on tap (the default) and off
+ * start BARE (operator's law, 2026-08-12 — the sentence is the exercise;
+ * readings on request only), and only always shows them. Taps land in the
+ * obslog. */
 function renderSentenceTokens(container, tokens, opts = {}) {
   const target = opts.targetId || null;
   const contextId = opts.contextId || 'sentence';

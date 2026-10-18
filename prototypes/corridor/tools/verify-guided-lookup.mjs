@@ -9,7 +9,7 @@ import { resolve } from 'node:path';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { loadGuidedIndex, loadGuidedSet } from '../guided-session-content.mjs';
-import { readAppRecord } from './record-test-support.mjs';
+import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Pin an immutable built site and its digest');
@@ -20,6 +20,10 @@ const set = await loadGuidedSet((await loadGuidedIndex(readJson))[0], readJson);
 const key = `kairo-guided-session-v1:${set.id}`, Q = set.questions;
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
+const cases = ['lookup-before-and-after-answer', 'refused-write-retry-and-retired-question', 'menu-records-help-only-on-reveal'];
+const caseFilter = process.argv.find(arg => arg.startsWith('--case='))?.slice('--case='.length) || null;
+assert(!caseFilter || cases.includes(caseFilter), `Unknown Guided lookup case: ${caseFilter}`);
+const planned = [];
 const host = await startStaticHost({ site, port: 0 }), results = [];
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all'
   ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
@@ -96,7 +100,9 @@ try {
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true });
     const browserVersion = browser.version();
     console.log(`BROWSER ${engine} ${browserVersion}`);
-    const check = async (name, body) => {
+    const check = async (name, body, { savedWord = null } = {}) => {
+      planned.push({ engine, name, selected: !caseFilter || name === caseFilter });
+      if (caseFilter && name !== caseFilter) return;
       const context = await browser.newContext({ viewport: { width: 1024, height: 900 }, serviceWorkers: 'block', reducedMotion: 'reduce' });
       await silenceBrowserAudio(context);
       await context.route('**/*', route => new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort());
@@ -110,27 +116,34 @@ try {
         addEventListener('DOMContentLoaded', () => {
           new MutationObserver(() => {
             const rung = document.querySelector('.guided-room [data-ladder-rung="reading"]') ? 'reading'
-              : document.getElementById('mini') ? 'stage' : null;
+              : document.getElementById('mini') ? 'stage' : document.getElementById('sheet') ? 'entry' : null;
             if (!rung || window.__guidedHintSnapshots.some(row => row.rung === rung)) return;
             window.__guidedHintSnapshots.push({ rung, state: JSON.parse(localStorage.getItem(key)) });
           }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-ladder-rung'] });
         });
       }, key);
-      const page = await context.newPage(), errors = [];
+      const page = await context.newPage(), errors = [], stages = [];
       page.setDefaultTimeout(15000);
       page.on('pageerror', error => errors.push(error.message));
       try {
         await start(page);
         const before = await learning(page);
-        const observed = await body(page);
-        assert.deepEqual(await learning(page), before, 'Lookup and answers never invent deck cards or review grades');
+        const observed = await body(page, stages);
+        const after = await learning(page);
+        if (savedWord) {
+          assert.equal(before.taken.some(row => row.t === 'word' && row.id === savedWord), false, 'The deliberately saved word starts unsaved');
+          assert.equal(after.taken.filter(row => row.t === 'word' && row.id === savedWord).length, 1, 'Only one deliberate word Save is retained');
+          assert.deepEqual(after.taken.filter(row => !(row.t === 'word' && row.id === savedWord)), before.taken, 'Menu actions preserve all other saved cards');
+          assert.deepEqual(after.srs, before.srs, 'Menu actions and answers invent no review grade');
+          assert.deepEqual(after.revlog, before.revlog);
+        } else assert.deepEqual(after, before, 'Lookup and answers never invent deck cards or review grades');
         assert.deepEqual(errors, []);
-        results.push({ engine, browserVersion, name, passed: true, observed });
+        results.push({ engine, browserVersion, name, passed: true, observed, stages });
         console.log(`PASS ${engine}/${name}`);
       } catch (error) {
         const screenshot = resolve(evidence, `${engine}-${name}.png`);
         await page.screenshot({ path: screenshot, fullPage: true }).catch(() => {});
-        results.push({ engine, browserVersion, name, passed: false, error: error.stack || String(error), errors, screenshot });
+        results.push({ engine, browserVersion, name, passed: false, error: error.stack || String(error), errors, screenshot, stages });
         console.log(`FAIL ${engine}/${name}: ${error.message}`);
       } finally {
         await context.close();
@@ -199,18 +212,119 @@ try {
         assert.equal(state.events.filter(event => event.type === 'LOOKUP').length, 1, 'The successful retry records help exactly once');
         return { first: state.answers[first], second: state.answers[second], lookupEvents: 1 };
       });
+      await check('menu-records-help-only-on-reveal', async (page, stages) => {
+        // This is generic Japanese prose in the real bank question, not a gs-word teaching door.
+        const word = '橋', first = Q[0].id;
+        const occurrence = page.locator(`.guided-room .gs-question .japanese-lookup-word[data-lookup-text="${word}"]`);
+        assert.equal(await occurrence.count(), 1, 'The real first question has the selected generic lookup occurrence');
+        const menu = page.locator('#reader-word-menu');
+        const before = await stored(page), recordBefore = await readAppRecord(page);
+        assert.notEqual(before.answers[first].lookupBefore, true);
+        const bare = async label => {
+          assert.equal(await page.locator('#mini, #sheet, .guided-room [data-ladder-rung]').count(), 0, `${label} reveals no hint or page`);
+          assert.equal(await occurrence.locator('rt').count(), 0, `${label} leaves the occurrence bare`);
+        };
+        const menuActions = {};
+        for (const [how, dismiss] of [['escape', () => page.keyboard.press('Escape')],
+          ['outside', () => page.locator('.guided-room .gs-title').first().click()]]) {
+          await occurrence.click({ button: 'right' });
+          await menu.waitFor();
+          const openState = await stored(page);
+          menuActions[how] = await menu.locator('[role="menuitem"]').evaluateAll(nodes => nodes.map(node => node.dataset.menuAction));
+          await dismiss();
+          await menu.waitFor({ state: 'detached' });
+          const actualState = await stored(page);
+          stages.push({ name: `word-menu-dismiss-${how}`, modality: 'right-click', dismissal: how,
+            openState, expectedState: before, actualState });
+          assert.deepEqual(actualState, before, `Opening and dismissing the Guided word menu (${how}) records nothing`);
+          assert.deepEqual(openState, before, `The open Guided menu (${how}) records nothing`);
+          assert.deepEqual(await readAppRecord(page), recordBefore, `The dismissed Guided menu (${how}) leaves the learner record unchanged`);
+          await bare(`The dismissed Guided menu (${how})`);
+        }
+        assert(['entry', 'copy', 'save-word'].every(action => menuActions.escape.includes(action)), 'The generic word menu offers Full entry, Copy and Save');
+        await occurrence.click({ button: 'right' });
+        await menu.locator('[data-menu-action="copy"]').click();
+        await menu.waitFor({ state: 'detached' });
+        const copyToast = page.locator('#reader-toast .reader-toast-text');
+        await copyToast.waitFor();
+        const copyOutcome = await copyToast.innerText();
+        assert([`Copied ${word}`, 'Could not copy'].includes(copyOutcome), 'Native Copy reports its terminal outcome; OS clipboard contents are not asserted');
+        assert.deepEqual(await stored(page), before, 'Copy records no Guided assistance or session change');
+        assert.deepEqual(await readAppRecord(page), recordBefore, 'Copy leaves the learner record unchanged');
+        await bare('Copy');
+        stages.push({ name: 'word-menu-copy', copyOutcome, actualState: await stored(page), expectedState: before });
+
+        assert.equal(recordBefore.taken.some(row => row.t === 'word' && row.id === word), false);
+        await occurrence.click({ button: 'right' });
+        const save = menu.locator('[data-menu-action="save-word"]');
+        assert.notEqual(await save.getAttribute('aria-disabled'), 'true', 'The selected word can be deliberately saved');
+        await save.click();
+        await menu.waitFor({ state: 'detached' });
+        const savedRecord = await waitForAppRecord(page, row => row.taken.some(saved => saved.t === 'word' && saved.id === word),
+          { description: 'the deliberate menu Save' });
+        assert.deepEqual(await stored(page), before, 'Save records no Guided assistance or session change');
+        await bare('Save');
+        const savedRows = savedRecord.taken.filter(row => row.t === 'word' && row.id === word);
+        assert.equal(savedRows.length, 1);
+        stages.push({ name: 'word-menu-save', savedRows, actualState: await stored(page), expectedState: before });
+
+        await occurrence.click({ button: 'right' });
+        const entry = menu.locator('[data-menu-action="entry"]');
+        assert.notEqual(await entry.getAttribute('aria-disabled'), 'true', 'The selected occurrence has a full entry');
+        await entry.click();
+        await page.locator('#sheet').waitFor();
+        const after = await stored(page), event = after.events.at(-1);
+        assert.equal(after.events.length, before.events.length + 1, 'Full entry records exactly one Guided help event');
+        assert.deepEqual(after.events.slice(0, -1), before.events);
+        assert.equal(event.type, 'LOOKUP');
+        assert.equal(event.source, 'guided-session');
+        assert.equal(event.id, first, 'The new help event names the current question');
+        assert(Number.isFinite(event.at));
+        const expected = structuredClone(before);
+        expected.answers[first].lookupBefore = true;
+        expected.events.push(event);
+        assert.deepEqual(after, expected, 'Full entry changes only this question’s lookup mark and its one event');
+        const atEntry = await page.evaluate(() => window.__guidedHintSnapshots.find(row => row.rung === 'entry')?.state);
+        assert.deepEqual(atEntry, after, 'The help is durable before the full entry first appears');
+        assert.deepEqual(await readAppRecord(page), savedRecord, 'Full entry leaves the saved learner record unchanged');
+        stages.push({ name: 'word-menu-entry', actualState: after, event, atEntry });
+        await page.locator('#sheet-back').click();
+        await page.locator('#sheet').waitFor({ state: 'detached' });
+        assert.deepEqual(await stored(page), after, 'Returning from Full entry does not record help twice');
+
+        // Exercise the three affected, visible Guided labels from this real assisted answer.
+        await answer(page, 0);
+        await act(page, 'explain').click();
+        const anchorLabel = await page.locator('.gs-anchor').innerText();
+        assert.match(anchorLabel, / · With help$/u);
+        await page.locator(`.guided-room [data-action="source"][data-index="${Q.length - 1}"]`).click();
+        await answer(page, Q.length - 1);
+        await act(page, 'next').click();
+        const summaryLabel = await page.locator('.gs-row').first().locator('p').innerText();
+        assert.match(summaryLabel, / · With help$/u);
+        await act(page, 'finish').click();
+        const helpFact = page.locator('.gs-results-facts > div').nth(1);
+        assert.equal(await helpFact.locator(':scope > span').innerText(), 'With help');
+        assert.equal(await helpFact.locator('strong').innerText(), '1');
+        const finalState = await stored(page);
+        assert.equal(finalState.events.filter(row => row.type === 'LOOKUP').length, 1);
+        assert.equal(finalState.answers[first].lookupBefore, true);
+        return { word, menu: menuActions, copyOutcome, savedRows, event, atEntry,
+          labels: { anchor: anchorLabel, summary: summaryLabel, results: await helpFact.innerText() } };
+      }, { savedWord: '橋' });
     } finally {
       await browser.close();
     }
   }
 } finally {
   await host.close();
-  const passed = results.length === engines.length * 2 && results.every(row => row.passed);
+  const expectedCases = engines.length * (caseFilter ? 1 : cases.length);
+  const passed = planned.filter(row => row.selected).length === expectedCases && results.length === expectedCases && results.every(row => row.passed);
   writeFileSync(resolve(evidence, 'guided-lookup.json'), JSON.stringify({
     artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty,
     verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
-    scope: 'Real guided question lookup lifecycle, before-hint durability, retained full-page return, after-answer honesty, refused write retry and retired-question guard; no design or voice claim',
-    results, passed,
+    scope: 'Real guided question lookup lifecycle, before-hint durability, retained full-page return, after-answer honesty, refused write retry, retired-question guard, generic prose menu non-assistance, deliberate Save and With help labels; no design or voice claim',
+    caseFilter, caseInventory: { planned, expectedCases, observedCases: results.length }, results, passed,
   }, null, 2) + '\n');
   if (!passed) process.exitCode = 1;
 }
