@@ -9710,8 +9710,11 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // the word band: the word, its reading and its meaning, with the deeper door in its corner
   const head = el('div', 'mini-head');
   const said = el('div', 'mini-head-text');
-  // the word itself is the way into its full entry, as a second tap on it in the text is
-  const word = el(entryAvailable ? 'button' : 'span', 'mini-word', label);
+  // the word itself is the way into its full entry, as a second tap on it in the text is. It is one word, the token's
+  // own: set as plain text, never cut into the word rule's pieces (Q's jaWords read つき出す as つき｜出す and おくれる as
+  // お｜くれる, a break inside the word and a card whose word is its first piece), as the bar's word is
+  const word = el(entryAvailable ? 'button' : 'span', 'mini-word');
+  word.textContent = label;
   word.lang = 'ja';
   word.dataset.uiContent = 'learning';
   if (entryAvailable) {
