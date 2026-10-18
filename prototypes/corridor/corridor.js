@@ -8600,8 +8600,7 @@ async function openJapaneseLookup(anchor, text, context = {}) {
   const readMiss = listed.length > 0 && !listed.some((row) => dictionaryReadingSupportsForm(row, context.reading, text));
   const token = { s: text, b: record?.head || text, r: context.reading || record?.r || '', c: !!record,
     ...(record?.seq ? { seq: record.seq } : {}), ...(context.shown ? { shown: context.shown } : {}),
-    ...(context.kanjiOnly ? { kanjiOnly: true } : {}), ...(readMiss ? { readMiss: true } : {}),
-    ...(context.sensePending ? { sensePending: true } : {}) };
+    ...(context.kanjiOnly ? { kanjiOnly: true } : {}), ...(readMiss ? { readMiss: true } : {}) };
   const entryNode = hasKanjiEntry ? { t: 'kanji', id: text }
     : record ? { t: 'word', id: token.b, ...(record?.seq ? { seq: record.seq, reading: record.r } : {}) } : null;
   const mini = showMini(anchor, token, (modality) => {
@@ -9391,8 +9390,9 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // L · while the right entry is still on its way (the full dictionary asked, not failed), the held Save says nothing:
   // D23's sentence is for a dead end (answered with nothing confirmable, or the dictionary cannot answer)
   const pending = waiting && D.dictionaryState !== 'error';
-  // R3 · a word whose sense is still to come (openReadingSlip, wireLookupToken) shows no meaning until it is at hand
-  const senseWaiting = kind === 'word' && !look?.gloss && !!token.sensePending && !readsOtherwise && !!g?.m?.[0];
+  // R3 · a word whose sense is still to come shows no meaning until it is at hand: a reader word's door says so
+  // (openReadingSlip), a lookup word's anchor waits in SENSE_LATER (wireLookupToken)
+  const senseWaiting = kind === 'word' && !look?.gloss && (!!token.sensePending || SENSE_LATER.has(span)) && !readsOtherwise && !!g?.m?.[0];
   if (look?.gloss) {
     const gloss = el('span', 'mini-gloss', look.gloss);
     if (look.glossLang) gloss.lang = look.glossLang;
@@ -11581,12 +11581,10 @@ function wireLookupToken(span, token, index, p, lookupContext, named) {
     if (!answer.kanjiOnly || counting) await senseWithin(token, lookupDoor());
     const choice = answer.kanjiOnly && !counting ? null : senseChoice(token, lookupDoor());
     if (choice && !choice.need && (!answer.kanjiOnly || choice.seq)) answer = { ...answer, kanjiOnly: undefined, sense: choice };
-    // still to come: the slip opens with a quiet placeholder for its meaning and is brought up to the sense once it is
-    // at hand (senseLater); one that could not be had before opens with the word's own meaning
-    if (choice?.need && !SENSE_GAVE_UP.has(token)) {
-      answer = { ...answer, sensePending: true };
-      senseLater(token, lookupDoor, span, () => quickLook('programmatic', { restore: true }));
-    } else SENSE_LATER.delete(span);
+    // still to come: the slip opens with a quiet placeholder for its meaning (showMini reads SENSE_LATER) and is brought
+    // up to the sense once it is at hand (senseLater); one that could not be had before opens with the word's own meaning
+    if (choice?.need && !SENSE_GAVE_UP.has(token)) senseLater(token, lookupDoor, span, () => quickLook('programmatic', { restore: true }));
+    else SENSE_LATER.delete(span);
     if (choice && !choice.need && !choice.door?.senseName && choice.seq) SENSE_BY_ANCHOR.set(span, { seq: String(choice.seq), k: Number(choice.k) });
     record = answer.kanjiOnly ? null : japaneseLookupRecord(text, { ...lookupContext, ...answer });
   };
