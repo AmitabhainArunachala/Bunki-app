@@ -6,12 +6,12 @@
   "c": "kimi_code:k3"
  },
  "tally": {
-  "agree": 942,
+  "agree": 931,
   "third:a": 24,
-  "third:b": 38,
-  "split": 18,
-  "pair:ac": 11,
-  "unanswered": 6,
+  "third:b": 37,
+  "split": 13,
+  "pair:ac": 9,
+  "unanswered": 5,
   "review": 1
  },
  "rounds": {
@@ -851,6 +851,126 @@
    "index": 260,
    "surface": "つい",
    "why": "read whole as について (about); round 1 offered only つく's senses ('to be attached', 'to be lit')"
+  },
+  {
+   "passage": "bunki-essay-n2-mountain",
+   "index": 252,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "real-tsurezure",
+   "index": 110,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "bunki-essay-n1-memory",
+   "index": 165,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "bunki-essay-n1-city",
+   "index": 50,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "bunki-essay-n1-city",
+   "index": 187,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "bunki-graded-n3-thanks-before-help",
+   "index": 547,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "bunki-essay-n2-nakaima-time",
+   "index": 592,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "bunki-essay-n2-thanks-first",
+   "index": 333,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "bunki-essay-n2-testimony-literacy",
+   "index": 668,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "bunki-essay-n1-first-versus-supreme",
+   "index": 697,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "bunki-essay-n1-first-versus-supreme",
+   "index": 826,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "bunki-essay-n1-miracle-testimony",
+   "index": 190,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "env:press-press_05575",
+   "index": 692,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "govonline:article-202609-radio-3741",
+   "index": 103,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "jawiki:5294446",
+   "index": 216,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "global-voices:2026-09-28-65726",
+   "index": 751,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "adapt-n3:govonline:article-202609-radio-3741",
+   "index": 44,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "aozora:049966-1",
+   "index": 438,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "bunki-read-n2-forgetting-curve",
+   "index": 487,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
+  },
+  {
+   "passage": "bunki-read-n1-kukai-sanskrit",
+   "index": 656,
+   "surface": "とっ",
+   "why": "read whole as にとって (to; for); the round offered only とる's senses"
   }
  ],
  "splits": [
@@ -870,42 +990,6 @@
    "round": "1",
    "a": "1157080:1",
    "b": "1157080:0",
-   "c": null
-  },
-  {
-   "passage": "bunki-essay-n1-city",
-   "index": 50,
-   "surface": "とっ",
-   "round": "1",
-   "a": "N",
-   "b": "1326980:10",
-   "c": null
-  },
-  {
-   "passage": "bunki-essay-n1-city",
-   "index": 187,
-   "surface": "とっ",
-   "round": "1",
-   "a": "N",
-   "b": "1326980:10",
-   "c": null
-  },
-  {
-   "passage": "bunki-essay-n1-first-versus-supreme",
-   "index": 697,
-   "surface": "とっ",
-   "round": "1",
-   "a": "1326980:3",
-   "b": "1326980:10",
-   "c": null
-  },
-  {
-   "passage": "bunki-essay-n1-first-versus-supreme",
-   "index": 826,
-   "surface": "とっ",
-   "round": "1",
-   "a": "1326980:3",
-   "b": "1326980:10",
    "c": null
   },
   {
@@ -999,15 +1083,6 @@
    "c": null
   },
   {
-   "passage": "global-voices:2026-09-28-65726",
-   "index": 751,
-   "surface": "とっ",
-   "round": "1",
-   "a": "1326980:0",
-   "b": "1326980:10",
-   "c": null
-  },
-  {
    "passage": "wikinews:45227",
    "index": 171,
    "surface": "中",
@@ -1021,7 +1096,6 @@
  {"passage": "adapt-n3:env:press-press_05643", "index": 49, "surface": "部", "round": "1", "sentence": "ヒアリの仲間で、もともとはアメリカの南西【部】からメキシコの北部にすんでいるアリです。", "rules": "1499290:0", "a": {"choice": "1499290:2", "gloss": "part; portion; region", "reason": "南西部 means the southwestern part/region of America."}, "b": {"choice": "1499290:2", "gloss": "part; portion; region", "reason": "部 means part/region, as in southwestern part of the US."}, "c": null, "source": "agree"},
  {"passage": "adapt-n3:env:press-press_05643", "index": 158, "surface": "ため", "round": "1", "sentence": "このアリが日本に住みつかないようにする【ため】です。", "rules": "1157080:0", "a": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "ため here means 'in order to' / for the purpose of preventing the ant from settling."}, "b": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "ため means purpose/sake, as in 'in order to'."}, "c": null, "source": "agree"},
  {"passage": "adapt-n3:env:press-press_05643", "index": 186, "surface": "中", "round": "1", "sentence": "環境省は、兵庫県や神戸市などに、ヒアリの仲間かもしれないアリをコンテナや荷物の【中】で見つけたら、すぐに連絡するよう頼んでいます。", "rules": "1423310:0", "a": {"choice": "1423310:0", "gloss": "inside; interior", "reason": "コンテナや荷物の中 means inside containers or cargo."}, "b": {"choice": "1423310:0", "gloss": "inside; interior", "reason": "中 means inside/interior, as in inside containers or luggage."}, "c": null, "source": "agree"},
- {"passage": "adapt-n3:govonline:article-202609-radio-3741", "index": 44, "surface": "とっ", "round": "1", "sentence": "耳が聞こえない人や、聞こえにくい人に【とっ】て、大切な「言語」です。", "rules": "2021030:0", "a": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "にとって means 'to/for (someone)' from とる 'to take, interpret, understand'"}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "とって in にとって derives from 取る meaning to interpret/take from a standpoint."}, "c": null, "source": "agree"},
  {"passage": "adapt-n3:govonline:article-202609-radio-3741", "index": 81, "surface": "つく", "round": "1", "sentence": "最近は、コンサートや舞台でも、手話通訳が【つく】公演が行われています。", "rules": "1441400:0", "a": {"choice": "1495740:0", "gloss": "to be attached; to be connected with; to adhere", "reason": "通訳がつく means an interpreter is attached/provided"}, "b": {"choice": "1495740:0", "gloss": "to be attached; to be connected with; to adhere", "reason": "手話通訳がつく公演 means performances with sign language interpretation attached/provided, so 付く 'be attached'."}, "c": null, "source": "agree"},
  {"passage": "adapt-n3:govonline:article-202609-radio-3741", "index": 100, "surface": "推進", "round": "1", "sentence": "日本では、2025年に「手話施策【推進】法」という法律ができました。", "rules": "1371140:0", "a": {"choice": "1371140:1", "gloss": "promotion (of a policy, project, movement, etc.); furtherance; advancement", "reason": "推進 in the law name means promotion of a policy"}, "b": {"choice": "1371140:1", "gloss": "promotion (of a policy, project, movement, etc.); furtherance; advancement", "reason": "推進法 means a promotion act, so 'promotion/furtherance'."}, "c": null, "source": "agree"},
  {"passage": "adapt-n3:govonline:article-202609-tv-6628", "index": 36, "surface": "ため", "round": "1", "sentence": "新しい産業を発展させる【ため】に、なくてはならない資源です。", "rules": "1157080:0", "a": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "発展させるために means 'in order to / for the purpose of'"}, "b": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "発展させるために means 'in order to develop', so ため = sake/purpose."}, "c": null, "source": "agree"},
@@ -1193,7 +1267,6 @@
  {"passage": "aozora:049966-1", "index": 212, "surface": "分", "round": "1", "sentence": "甚だしきは全くその意味を異にして居るのもあり、また一つの訳本に出て居る【分】が外の本には出て居らないのもあり順序の顛倒したのもあるというような訳で種々雑多になって居ります。", "rules": "1502860:0", "a": {"choice": "1502860:0", "gloss": "part; portion; share", "reason": "出て居る分 means the portion that appears"}, "b": {"choice": "1502860:0", "gloss": "part; portion; share", "reason": "出て居る分 means the portion/part that appears."}, "c": null, "source": "agree"},
  {"passage": "aozora:049966-1", "index": 264, "surface": "方", "round": "1", "sentence": "しかしその梵語の経文を訳した方々は決して嘘をつかれるような【方】でないからして、これには何か研究すべき事があるであろう。", "rules": "1516925:0", "a": {"choice": "1516925:1", "gloss": "person; lady; gentleman", "reason": "方(かた) is an honorific for person"}, "b": {"choice": "1516925:1", "gloss": "person; lady; gentleman", "reason": "方々/方 here is honorific for people/person."}, "c": null, "source": "agree"},
  {"passage": "aozora:049966-1", "index": 348, "surface": "点", "round": "1", "sentence": "もし然らばそんなに原書の違ったものがあるのか知らん、あるいはまた訳された方々がその土地の人情等に応じて幾分か取捨を加えたような【点】もありその意味を違えたのもあるか知らん。", "rules": "1441390:0", "a": {"choice": "1441390:4", "gloss": "point; aspect; matter", "reason": "点 here means 'aspect' or 'matter' — translators made adjustments in certain respects."}, "b": {"choice": "1441390:4", "gloss": "point; aspect; matter", "reason": "点 here means an aspect/point in the discussion."}, "c": null, "source": "agree"},
- {"passage": "aozora:049966-1", "index": 438, "surface": "とっ", "round": "1", "sentence": "もっともセイロンには小乗の仏典はあるけれどもそれはもちろん我々に【とっ】て余り必要のものでない。", "rules": "2021030:0", "a": {"choice": "1326980:0", "gloss": "to take; to pick up; to grab", "reason": "とって in にとって is a set phrase meaning 'for (someone)'; closest to basic 取る sense."}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "In 我々にとって, 取る is the 'take/interpret' sense underlying the idiom 'for us'."}, "c": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "我々にとって = as regarded/interpreted by us."}, "source": "third:b"},
  {"passage": "aozora:049966-1", "index": 467, "surface": "なる", "round": "1", "sentence": "しかるにその大乗教の仏典【なる】ものは仏法の本家なるインドには跡を絶って、今はネパールあるいはチベットに存在して居るという。", "rules": "1536290:0", "a": {"choice": "1536290:0", "gloss": "to be", "reason": "なる is attributive form of copula なり, meaning 'which is' (仏典なるもの = the scriptures that are)."}, "b": {"choice": "1536290:0", "gloss": "to be", "reason": "なる is the attributive copula 'that is'."}, "c": null, "source": "agree"},
  {"passage": "aozora:049966-1", "index": 499, "surface": "為", "round": "1", "sentence": "その原書を得る【為】にはぜひネパールあるいはチベットに行かなくてはならぬ。", "rules": "1157080:0", "a": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "為には = 'in order to' — sake/purpose/objective."}, "b": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "為には means 'in order to', i.e. sake/purpose."}, "c": null, "source": "agree"},
  {"passage": "aozora:049966-1", "index": 750, "surface": "なる", "round": "1", "sentence": "この考えがつまり入蔵を思い立った原因でありまして、ちょうどその時が明治二十六年の四月で今より満十年余以前のことでござりますけれども、チベットは厳重に鎖国主義を実行して居る国で、有力【なる】西洋人が沢山の金を費やし多くの光陰を費やし種々の準備を調えて行ってすらも今日失敗に帰して居る者が多い中に、我々ごとき一介の貧僧が出掛けたところがはたして目的を達することが出来るかどうか。", "rules": "1536290:0", "a": {"choice": "1536290:0", "gloss": "to be", "reason": "なる is attributive copula なり meaning 'which is' (有力なる = who are powerful)."}, "b": {"choice": "1536290:0", "gloss": "to be", "reason": "なる is the copula 'to be' modifying 西洋人, equivalent to である."}, "c": null, "source": "agree"},
@@ -1270,8 +1343,6 @@
  {"passage": "bunki-essay-n1-beyond-fact-fiction", "index": 539, "surface": "生", "round": "1", "sentence": "信じる人は、物語を現在の【生】に関わる真実として受け取るかもしれない。", "rules": "1378450:0", "a": {"choice": "1378450:1", "gloss": "natural; as it is; unedited", "reason": "生(なま) means 'natural; as it is' — life in its natural, unprocessed state"}, "b": {"choice": "1378450:1", "gloss": "natural; as it is; unedited", "reason": "生 (なま) here means the present as it is, unprocessed/natural."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n1-beyond-fact-fiction", "index": 579, "surface": "中", "round": "1", "sentence": "その二つは同じ主張ではないが、一人の【中】に共存することさえある。", "rules": "1423310:0", "a": {"choice": "1423310:0", "gloss": "inside; interior", "reason": "中(なか) means 'inside; interior' — inside one person"}, "b": {"choice": "1423310:0", "gloss": "inside; interior", "reason": "一人の中に means inside one person."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n1-beyond-fact-fiction", "index": 653, "surface": "方", "round": "1", "sentence": "どの文献では語り【方】が異なるか。", "rules": "1516925:2", "a": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "方(かた) as suffix meaning 'way of; manner of' narrating"}, "b": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "語り方 means way/method of narrating."}, "c": null, "source": "agree"},
- {"passage": "bunki-essay-n1-city", "index": 50, "surface": "とっ", "round": "1", "sentence": "この匿名性は、外国語話者に【とっ】て特別な意味を持つ。", "rules": "2021030:0", "a": {"choice": "N", "reason": "にとって is a grammaticalized particle not matching any listed verb sense of とる"}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "とっ forms 〜にとって, meaning 'for/from the standpoint of', matching 取る 'interpret/take as'."}, "c": null, "source": null},
- {"passage": "bunki-essay-n1-city", "index": 187, "surface": "とっ", "round": "1", "sentence": "この静けさは、学習に【とっ】て二重の効果を持つ。", "rules": "2021030:0", "a": {"choice": "N", "reason": "にとって is a grammaticalized particle not matching any listed verb sense of とる"}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "In にとって, 取る means 'to take/interpret from a standpoint' (for/regarding)."}, "c": null, "source": null},
  {"passage": "bunki-essay-n1-city", "index": 205, "surface": "ため", "round": "1", "sentence": "一方では、失敗の代償が小さい【ため】に試行の回数を増やせる。", "rules": "1157080:0", "a": {"choice": "1157080:2", "gloss": "consequence; result; effect", "reason": "ため means 'because of' — the consequence/result of small cost"}, "b": {"choice": "1157080:2", "gloss": "consequence; result; effect", "reason": "In ために indicating cause, ため means consequence/result/effect (because of)."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n1-cosmic-analogy", "index": 153, "surface": "中", "round": "1", "sentence": "その語りの【中】では、ビッグバン、宇宙エネルギー、量子物理学、さらに神々と身体の対応といった比喩が用いられる。", "rules": "1423310:0", "a": {"choice": "1423310:1", "gloss": "among; within", "reason": "中 means 'within/among' the narrative"}, "b": {"choice": "1423310:1", "gloss": "among; within", "reason": "中 means 'within' the narrative/domain."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n1-cosmic-analogy", "index": 312, "surface": "中", "round": "1", "sentence": "現代宇宙論のビッグバン・モデルは、膨張する宇宙、初期の高温・高密度状態、背景放射など、観測と数理モデルの関係の【中】で検討される。", "rules": "1423310:0", "a": {"choice": "1423310:1", "gloss": "among; within", "reason": "中 means 'within/among' the relationship between observation and models"}, "b": {"choice": "1423310:1", "gloss": "among; within", "reason": "中 means 'within' the relationship/context."}, "c": null, "source": "agree"},
@@ -1282,8 +1353,6 @@
  {"passage": "bunki-essay-n1-cosmic-analogy", "index": 834, "surface": "方", "round": "1", "sentence": "瞑想のための象徴地図と、生理機能を説明する身体地図は、目的も確かめ【方】も異なる。", "rules": "1516925:2", "a": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "方 means 'way of' confirming"}, "b": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "確かめ方 means way/method of confirming."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n1-first-versus-supreme", "index": 74, "surface": "中", "round": "1", "sentence": "名前には「天」「【中】」「主」が並び、しかも『古事記』で最初に成る神である。", "rules": "1620400:0", "a": {"choice": "1620400:0", "gloss": "medium (size); average (grade, level, etc.); middle", "reason": "中 is discussed as meaning 'middle' among the characters in the god's name."}, "b": {"choice": "N", "reason": "中 is part of the proper name 天之御中主神, not a dictionary sense."}, "c": {"choice": "1620400:0", "gloss": "medium (size); average (grade, level, etc.); middle", "reason": "中 in the god's name means middle/center (of heaven); glossed as a meaningful component."}, "source": "third:a"},
  {"passage": "bunki-essay-n1-first-versus-supreme", "index": 487, "surface": "枚", "round": "2-sense", "sentence": "神名の解釈も一【枚】岩ではない。", "rules": "1166750:0", "a": {"choice": "1166750:1", "gloss": "unity (of a group, organization, etc.); unanimity; solidarity", "reason": "一枚岩 here metaphorically means unity/unanimity of interpretation, not a literal rock slab."}, "b": {"choice": "1166750:1", "gloss": "unity (of a group, organization, etc.); unanimity; solidarity", "reason": "一枚岩ではない means not monolithic or unanimous."}, "c": null, "source": "agree"},
- {"passage": "bunki-essay-n1-first-versus-supreme", "index": 697, "surface": "とっ", "round": "1", "sentence": "「私に【とっ】て中心である」と「古代日本人全体が最高神と認めた」の距離を守ることは、信仰への無礼ではなく、他者の伝統を勝手に単純化しない礼儀でもある。", "rules": "2021030:0", "a": {"choice": "1326980:3", "gloss": "to adopt (a method, proposal, etc.); to take (a measure, attitude, etc.); to choose", "reason": "にとって: 'to take (a standpoint/perspective)'; fits 'to adopt/take an attitude'"}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "〜にとって is the te-form of 取る meaning 'to take/interpret from the standpoint of'."}, "c": null, "source": null},
- {"passage": "bunki-essay-n1-first-versus-supreme", "index": 826, "surface": "とっ", "round": "1", "sentence": "古典の登場順、後世の祭祀、近現代の教説、個人の敬意を別々の時間軸に置けば、「いつから、誰に【とっ】て中心なのか」という、より具体的な問いが生まれる。", "rules": "2021030:0", "a": {"choice": "1326980:3", "gloss": "to adopt (a method, proposal, etc.); to take (a measure, attitude, etc.); to choose", "reason": "にとって: 'to take (a standpoint/perspective)'; fits 'to adopt/take an attitude'"}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "Same idiomatic 〜にとって, from 取る 'to take/interpret as'."}, "c": null, "source": null},
  {"passage": "bunki-essay-n1-ise-time", "index": 78, "surface": "中", "round": "1", "sentence": "森、空、水、祈り、手仕事の断片を重ね、始まりが一度きりではなく、反復の【中】から現れるように見せる。", "rules": "1423310:0", "a": {"choice": "1423310:1", "gloss": "among; within", "reason": "反復の中から = 'from within repetition'; 中 means 'among; within'"}, "b": {"choice": "1423310:0", "gloss": "inside; interior", "reason": "中 means within/inside repetition."}, "c": {"choice": "1423310:1", "gloss": "among; within", "reason": "反復の中から = from within/among repetition."}, "source": "third:a"},
  {"passage": "bunki-essay-n1-ise-time", "index": 466, "surface": "中", "round": "1", "sentence": "伝統は保存庫の【中】で止まるのではなく、失敗し得る手の中で更新される。", "rules": "1423310:0", "a": {"choice": "1423310:0", "gloss": "inside; interior", "reason": "保存庫の中で = 'inside the storage'; 中 means 'inside; interior'"}, "b": {"choice": "1423310:0", "gloss": "inside; interior", "reason": "中 means inside the storage room."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n1-ise-time", "index": 479, "surface": "中", "round": "1", "sentence": "伝統は保存庫の中で止まるのではなく、失敗し得る手の【中】で更新される。", "rules": "1423310:0", "a": {"choice": "1423310:0", "gloss": "inside; interior", "reason": "手の中で = 'in the hands'; 中 means 'inside; interior'"}, "b": {"choice": "1423310:0", "gloss": "inside; interior", "reason": "手の中 means inside/within the hands, i.e. interior."}, "c": null, "source": "agree"},
@@ -1299,9 +1368,7 @@
  {"passage": "bunki-essay-n1-kojiki-power", "index": 769, "surface": "中", "round": "1", "sentence": "両書の差は、「国内向け」と「国外向け」という一対の標語だけでは尽くせないが、同時代の国家形成の【中】で、異なる性格の書物が編まれた事実は重要である。", "rules": "1423310:0", "a": {"choice": "1423310:3", "gloss": "during; while; middle", "reason": "中(なか) means 'during; in the midst of' state formation"}, "b": {"choice": "1423310:3", "gloss": "during; while; middle", "reason": "中 in 国家形成の中で means 'during/amid' the process."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n1-kojiki-power", "index": 789, "surface": "枚", "round": "2-sense", "sentence": "権力は一【枚】岩の声ではなく、目的の異なる複数の記録装置を作るからだ。", "rules": "1166750:0", "a": {"choice": "1166750:1", "gloss": "unity (of a group, organization, etc.); unanimity; solidarity", "reason": "一枚岩 is used metaphorically for a unified/solidarity voice, not a literal slab of rock."}, "b": {"choice": "1166750:1", "gloss": "unity (of a group, organization, etc.); unanimity; solidarity", "reason": "Part of 一枚岩, used metaphorically for unanimity/monolithic unity."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n1-memory", "index": 103, "surface": "点", "round": "1", "sentence": "問題は忘れること自体ではなく、何が失われ何が残るかを偶然に委ねている【点】にある。", "rules": "1441390:0", "a": {"choice": "1441390:4", "gloss": "point; aspect; matter", "reason": "点にある means 'the point/aspect lies in' — a matter or detail."}, "b": {"choice": "1441390:4", "gloss": "point; aspect; matter", "reason": "点 here means the point/aspect that ..."}, "c": null, "source": "agree"},
- {"passage": "bunki-essay-n1-memory", "index": 165, "surface": "とっ", "round": "1", "sentence": "つまり、いったん忘れかけた状態こそが、学習に【とっ】て最も価値のある瞬間になりうる。", "rules": "2021030:0", "a": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "にとって means 'for (someone)' — taking/interpreting from a perspective."}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "In にとって, 取る means 'take/regard as' (interpret/consider)."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n1-memory", "index": 376, "surface": "ため", "round": "1", "sentence": "忘却を前提とした設計とは、この分離を起こす【ため】の条件づくりにほかならない。", "rules": "1157080:0", "a": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "ため means 'for the purpose of' causing the separation"}, "b": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "ため here means 'for the purpose of', i.e. sake/purpose."}, "c": null, "source": "agree"},
- {"passage": "bunki-essay-n1-miracle-testimony", "index": 190, "surface": "とっ", "round": "1", "sentence": "ある人が祈りの後で落ち着き、出来事を好転と受け止めたなら、その安堵や意味は本人に【とっ】て現実である。", "rules": "2021030:0", "a": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "本人にとって = 'for the person themselves'; 取る means 'to interpret; to understand' from a perspective"}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "にとって means 'for/to (someone)', from 取る as 'take/interpret'."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n1-nakaima-time-theory", "index": 67, "surface": "中", "round": "1", "sentence": "けれども、神社チャンネルの動画（V1）が提示する「【中】今」を、過去と未来の間に置かれた生きた現在という解釈として受け取るなら、そこには検討に値する問いがある。", "rules": "1423310:0", "a": {"choice": "1423310:2", "gloss": "middle; center; centre", "reason": "中 in 中今 means 'middle' between past and future"}, "b": {"choice": "1423310:2", "gloss": "middle; center; centre", "reason": "中 in 中今 means middle between past and future."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n1-nakaima-time-theory", "index": 125, "surface": "中", "round": "1", "sentence": "なお、これは動画制作者の思想的なレンズであり、『古事記』が「【中】今」を定義して造化三神に結び付けたわけではない。", "rules": "1423310:0", "a": {"choice": "1423310:2", "gloss": "middle; center; centre", "reason": "中 in 中今 means 'middle' between past and future"}, "b": {"choice": "1423310:2", "gloss": "middle; center; centre", "reason": "Same term 中今, 中 means middle."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n1-nakaima-time-theory", "index": 179, "surface": "方", "round": "1", "sentence": "その見【方】では、今はつかんだ瞬間に消えてしまう。", "rules": "1516925:2", "a": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "方 means 'way of' viewing/seeing"}, "b": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "見方 means way of seeing; 方 is suffix for method/way."}, "c": null, "source": "agree"},
@@ -1344,7 +1411,6 @@
  {"passage": "bunki-essay-n2-kojiki-myth-history", "index": 674, "surface": "先", "round": "1", "sentence": "その境界を守れば、入口の物語性と、その【先】の複雑な研究を対立させずに済む。", "rules": "1387210:0", "a": {"choice": "1387210:3", "gloss": "(the way) ahead; beyond", "reason": "その先 = beyond that; 先 meaning '(the way) ahead; beyond'"}, "b": {"choice": "1387210:3", "gloss": "(the way) ahead; beyond", "reason": "その先 means beyond that point."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-kojiki-myth-history", "index": 730, "surface": "中", "round": "1", "sentence": "神話を含み、歴史を構成しようとし、後世には文学、信仰、政治、研究の【中】で読み直されてきた書物である。", "rules": "1423310:0", "a": {"choice": "1423310:1", "gloss": "among; within", "reason": "研究の中で = within research; 中 meaning among/within"}, "b": {"choice": "1423310:1", "gloss": "among; within", "reason": "の中で means among/within those fields."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-mountain", "index": 52, "surface": "中", "round": "1", "sentence": "その静けさの【中】で、普段は一つに見えていた問題が、実はいくつもの小さな選択からできていたことに気づく。", "rules": "1423310:0", "a": {"choice": "1423310:3", "gloss": "during; while; middle", "reason": "静けさの中で = in the midst of the silence."}, "b": {"choice": "1423310:0", "gloss": "inside; interior", "reason": "In the silence; 中 means inside/interior."}, "c": {"choice": "1423310:1", "gloss": "among; within", "reason": "静けさの中で 'within/amid the silence'; 中 'among; within'"}, "source": null},
- {"passage": "bunki-essay-n2-mountain", "index": 252, "surface": "とっ", "round": "1", "sentence": "今日の自分に【とっ】て意味のある数語を選び、元の文と一緒に残す。", "rules": "2021030:0", "a": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "にとって: とる as in how one takes/interprets something from one's perspective"}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "にとって means 'from the standpoint of'; 取る sense 12 (interpret/take)."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-myth-to-book", "index": 369, "surface": "方", "round": "1", "sentence": "國學院大學の解説によれば、太安万侶は読みづらい漢字に読み【方】を示し、一字一音の表記を多く使った。", "rules": "1516925:2", "a": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "読み方 = way of reading; 方 as suffix meaning method/manner of"}, "b": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "読み方 means 'way of reading'."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-myth-to-book", "index": 431, "surface": "ため", "round": "1", "sentence": "文字は声を消す墓ではなく、別の時代へ声を渡す【ため】の装置にもなる。", "rules": "1157080:0", "a": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "ための = for the purpose of; ため meaning sake/purpose/objective"}, "b": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "ための装置 means 'device for the sake of'."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-myth-to-book", "index": 499, "surface": "ため", "round": "1", "sentence": "失われた材料が多い【ため】、すべての工程を復元することはできない。", "rules": "1157080:0", "a": {"choice": "1157080:2", "gloss": "consequence; result; effect", "reason": "多いため = because there are many; ため meaning consequence/result/effect"}, "b": {"choice": "1157080:2", "gloss": "consequence; result; effect", "reason": "ため indicates cause/reason, 'because of'."}, "c": null, "source": "agree"},
@@ -1357,7 +1423,6 @@
  {"passage": "bunki-essay-n2-nakaima-time", "index": 363, "surface": "点", "round": "1", "sentence": "中今を時間論として読むなら、過去と未来を切り落とす一【点】ではなく、両方を引き受けて行為を選ぶ場所、と考えるほうが豊かではないか。", "rules": "1441390:0", "a": {"choice": "1441390:3", "gloss": "point", "reason": "一点 means 'a single point' (abstract/geometric point)."}, "b": {"choice": "1441390:0", "gloss": "dot; spot; point", "reason": "点 in 一点 means a point/dot, not a score or aspect."}, "c": {"choice": "1441390:3", "gloss": "point", "reason": "An abstract point/instant in time, not a visible dot."}, "source": "third:a"},
  {"passage": "bunki-essay-n2-nakaima-time", "index": 489, "surface": "中", "round": "1", "sentence": "動画の「【中】今」を手掛かりにしながら、私は自分の生活へ問いを戻しているだけだ。", "rules": "1423310:0", "a": {"choice": "1423310:2", "gloss": "middle; center; centre", "reason": "中今: 中 means 'middle' (between past and future)."}, "b": {"choice": "N", "reason": "中 is part of the video title 「中今」, a proper name."}, "c": {"choice": "1423310:2", "gloss": "middle; center; centre", "reason": "In the compound 中今, 中 means middle between before and after."}, "source": "third:a"},
  {"passage": "bunki-essay-n2-nakaima-time", "index": 573, "surface": "かけ", "round": "1", "sentence": "朝から続く仕事、数年【かけ】て学ぶ言葉、世代を越えて受け取る物語も、行為している人にとっては現在進行の出来事だろう。", "rules": "1207610:0", "a": {"choice": "1207610:4", "gloss": "to spend (time, money); to expend; to use", "reason": "数年かけて means 'spending/taking several years' to learn."}, "b": {"choice": "1207610:4", "gloss": "to spend (time, money); to expend; to use", "reason": "かけて in 数年かけて means to spend time."}, "c": null, "source": "agree"},
- {"passage": "bunki-essay-n2-nakaima-time", "index": 592, "surface": "とっ", "round": "1", "sentence": "朝から続く仕事、数年かけて学ぶ言葉、世代を越えて受け取る物語も、行為している人に【とっ】ては現在進行の出来事だろう。", "rules": "2021030:0", "a": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "〜にとって (from とる) means 'from the perspective of,' closest to 'to take; to interpret; to understand'"}, "b": null, "c": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "Fixed にとって means ‘for/from X’s standpoint,’ closest to taking/interpreting as."}, "source": "pair:ac"},
  {"passage": "bunki-essay-n2-nakaima-time", "index": 601, "surface": "中", "round": "1", "sentence": "【中】今を一秒の点だけにせず、応答できる時間の幅として考えると、焦りを減らす言い訳ではなく、何に応答するかを選ぶ問いになる。", "rules": "1423310:0", "a": {"choice": "1423310:2", "gloss": "middle; center; centre", "reason": "中今 is a coined concept; 中 means 'middle; center' of the present moment"}, "b": null, "c": {"choice": "1423310:3", "gloss": "during; while; middle", "reason": "Refers to the temporal midst/duration of ‘now,’ not a point."}, "source": null},
  {"passage": "bunki-essay-n2-nakaima-time", "index": 607, "surface": "点", "round": "1", "sentence": "中今を一秒の【点】だけにせず、応答できる時間の幅として考えると、焦りを減らす言い訳ではなく、何に応答するかを選ぶ問いになる。", "rules": "1441390:0", "a": {"choice": "1441390:0", "gloss": "dot; spot; point", "reason": "一秒の点 means a 'point/dot' of one second, a spatial metaphor for an instant"}, "b": {"choice": "1441390:3", "gloss": "point", "reason": "点 here means a point in time, not a physical dot."}, "c": null, "source": null},
  {"passage": "bunki-essay-n2-nakaima-time", "index": 790, "surface": "中", "round": "1", "sentence": "そう理解するなら、【中】今というレンズは、現実から逃げるためでなく、現実へ戻るために働くだろう。", "rules": "1423310:0", "a": {"choice": "1423310:2", "gloss": "middle; center; centre", "reason": "中今 is a coined concept; 中 means 'middle; center' of the present moment"}, "b": {"choice": "1423310:2", "gloss": "middle; center; centre", "reason": "中 in 中今 means 'middle' (the middle of now)."}, "c": null, "source": "agree"},
@@ -1389,7 +1454,6 @@
  {"passage": "bunki-essay-n2-testimony-literacy", "index": 536, "surface": "ため", "round": "1", "sentence": "質問は語り手を裁く武器ではなく、自分の判断を急がせない【ため】の手すりである。", "rules": "1157080:0", "a": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "急がせないための means 'for the purpose of not rushing', ため = purpose"}, "b": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "ための means for the purpose of; ため is purpose/sake."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-testimony-literacy", "index": 566, "surface": "金", "round": "1", "sentence": "「唱えれば必ず治る」「お【金】が入る」「危険から守られる」といった主張には、特に慎重さが必要だ。", "rules": "1242590:0", "a": {"choice": "1242590:0", "gloss": "money", "reason": "お金 means 'money', 金 = money"}, "b": {"choice": "1242590:0", "gloss": "money", "reason": "お金が入る means money comes in, so 金 = money."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-testimony-literacy", "index": 650, "surface": "方", "round": "1", "sentence": "よい受け取り【方】は、冷たい疑いと無条件の信頼の中間にある。", "rules": "1516925:2", "a": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "受け取り方 means 'way of receiving', 方 as suffix for method/way of"}, "b": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "受け取り方 means way/manner of receiving."}, "c": null, "source": "agree"},
- {"passage": "bunki-essay-n2-testimony-literacy", "index": 668, "surface": "とっ", "round": "1", "sentence": "「あなたに【とっ】て大切な経験だったのですね」と聞きながら、「同じ結果が他の人にも起こるかは別に確かめよう」と考える。", "rules": "2021030:0", "a": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "あなたにとって 'for you' from とる meaning to take/interpret/understand"}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "〜にとって uses 取る in the sense of taking/interpreting from a standpoint."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-testimony-literacy", "index": 805, "surface": "ため", "round": "1", "sentence": "その慎重さは信仰への敵意ではなく、自分と他者を守る【ため】の認識の礼儀なのである。", "rules": "1157080:0", "a": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "ため means 'for the purpose of' protecting oneself and others"}, "b": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "ため means 'for the sake/purpose of' protecting oneself and others."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-thanks-first", "index": 44, "surface": "先", "round": "1", "sentence": "それに対して、まだ助けを受けていない段階で「ありがとうございます」を【先】に置く言い方もある。", "rules": "1387210:0", "a": {"choice": "1387210:2", "gloss": "first; before; ahead (of)", "reason": "先に置く means 'place first/before,' i.e., ahead of receiving help."}, "b": {"choice": "1387210:2", "gloss": "first; before; ahead (of)", "reason": "先に置く means 'put first/ahead'."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-thanks-first", "index": 48, "surface": "方", "round": "1", "sentence": "それに対して、まだ助けを受けていない段階で「ありがとうございます」を先に置く言い【方】もある。", "rules": "1516925:2", "a": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "言い方 means 'way of saying,' the manner/method suffix sense."}, "b": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "言い方 means 'way of saying'."}, "c": null, "source": "agree"},
@@ -1397,7 +1461,6 @@
  {"passage": "bunki-essay-n2-thanks-first", "index": 130, "surface": "先", "round": "1", "sentence": "感謝を【先】に言うと、相手への信頼を表せる場合がある。", "rules": "1387210:0", "a": {"choice": "1387210:2", "gloss": "first; before; ahead (of)", "reason": "先に言う means 'say first/before,' the ahead-of sense."}, "b": {"choice": "1387210:2", "gloss": "first; before; ahead (of)", "reason": "先に means 'first/before' here."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-thanks-first", "index": 283, "surface": "方", "round": "1", "sentence": "誰が誰に、どの場面で、どんな声で言うかによって、受け取られ【方】は変わる。", "rules": "1516925:2", "a": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "受け取られ方 means 'the way it is received,' the manner/method suffix."}, "b": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "方 as a suffix means 'way/manner of' (how it is received)."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-thanks-first", "index": 321, "surface": "先", "round": "1", "sentence": "「お助けいただきありがとうございます」と、助けを願う場面で【先】に感謝を述べる人もいる。", "rules": "1387210:0", "a": {"choice": "1387210:2", "gloss": "first; before; ahead (of)", "reason": "先に感謝を述べる means 'express thanks first/before,' the ahead-of sense."}, "b": {"choice": "1387210:2", "gloss": "first; before; ahead (of)", "reason": "先に means 'first' here."}, "c": null, "source": "agree"},
- {"passage": "bunki-essay-n2-thanks-first", "index": 333, "surface": "とっ", "round": "1", "sentence": "その人に【とっ】ては、不安の中でも感謝できるものを探す行為かもしれないし、信仰を確認する習慣かもしれない。", "rules": "2021030:0", "a": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "にとって is a set phrase from とる meaning 'to take/interpret from one's perspective.'"}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "In にとっては, とる is closest to the 'interpret/take as' sense."}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-thanks-first", "index": 339, "surface": "中", "round": "1", "sentence": "その人にとっては、不安の【中】でも感謝できるものを探す行為かもしれないし、信仰を確認する習慣かもしれない。", "rules": "1423310:0", "a": {"choice": "1423310:3", "gloss": "during; while; middle", "reason": "不安の中 means 'in the midst of anxiety,' the during/midst sense."}, "b": {"choice": "1423310:3", "gloss": "during; while; middle", "reason": "in the midst of anxiety; midst/during sense"}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-thanks-first", "index": 465, "surface": "中", "round": "1", "sentence": "困り事ばかり数えていた人物が、すでに助けてくれた友人を思い出し、「昨日はありがとう」と伝えることで、問題の【中】にも関係が残っていると気付いたとする。", "rules": "1423310:0", "a": {"choice": "1423310:1", "gloss": "among; within", "reason": "問題の中にも means 'even within/among the problems,' the among/within sense."}, "b": {"choice": "1423310:1", "gloss": "among; within", "reason": "within/among the problems"}, "c": null, "source": "agree"},
  {"passage": "bunki-essay-n2-thanks-first", "index": 494, "surface": "ため", "round": "1", "sentence": "これは効果を示す実話ではなく、言葉の働きを考える【ため】の場面であり、誰にでも同じ結果を保証する証拠ではない。", "rules": "1157080:0", "a": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "考えるため means 'for the purpose of considering,' the sake/purpose sense."}, "b": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "for the sake/purpose of considering"}, "c": null, "source": "agree"},
@@ -1470,7 +1533,6 @@
  {"passage": "bunki-graded-n3-thanks-before-help", "index": 354, "surface": "方", "round": "1", "sentence": "信じる人が大切な祈りとして使っていても、全員に同じ使い【方】を求めるものではないよ。", "rules": "1516925:2", "a": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "使い方 means 'way of using'"}, "b": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "使い方 means way/method of using."}, "c": null, "source": "agree"},
  {"passage": "bunki-graded-n3-thanks-before-help", "index": 434, "surface": "機関", "round": "1", "sentence": "」「休んで、必要なら医療【機関】へ行く。", "rules": "1220870:0", "a": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "医療機関 means 'medical institution'"}, "b": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "医療機関 means medical institution/organization."}, "c": null, "source": "agree"},
  {"passage": "bunki-graded-n3-thanks-before-help", "index": 451, "surface": "金", "round": "1", "sentence": "」「お【金】の問題なら？", "rules": "1242590:0", "a": {"choice": "1242590:0", "gloss": "money", "reason": "お金 means 'money'"}, "b": {"choice": "1242590:0", "gloss": "money", "reason": "お金 means money."}, "c": null, "source": "agree"},
- {"passage": "bunki-graded-n3-thanks-before-help", "index": 547, "surface": "とっ", "round": "1", "sentence": "危険な約束をしないで、その人に【とっ】てどんな意味があるかを尋ねられるから。", "rules": "2021030:0", "a": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "にとって relates to how one takes/interprets something, closest to 'to interpret; to understand'"}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "〜にとって means 'from the standpoint of', matching 取る as interpret/take."}, "c": null, "source": "agree"},
  {"passage": "bunki-graded-n3-thanks-before-help", "index": 721, "surface": "先", "round": "1", "sentence": "まだ見えない助けに【先】に感謝する祈りは、それとは別の個人的な実践である。", "rules": "1387210:0", "a": {"choice": "1387210:2", "gloss": "first; before; ahead (of)", "reason": "先に感謝する means 'thank beforehand/before'"}, "b": {"choice": "1387210:2", "gloss": "first; before; ahead (of)", "reason": "先に means beforehand or first."}, "c": null, "source": "agree"},
  {"passage": "bunki-graded-n3-world-beginning", "index": 374, "surface": "ため", "round": "1", "sentence": "その【ため】、冒頭の三柱が現れたことと、二柱が国土を生む物語を、同じ出来事のようにつなげてはいけない。", "rules": "1157080:0", "a": {"choice": "1157080:2", "gloss": "consequence; result; effect", "reason": "そのため = 'for that reason; because of that'; ため = 'consequence; result; effect'"}, "b": {"choice": "1157080:2", "gloss": "consequence; result; effect", "reason": "そのため means 'therefore; for that reason', i.e. as a result/consequence."}, "c": null, "source": "agree"},
  {"passage": "bunki-graded-n3-world-beginning", "index": 517, "surface": "ため", "round": "1", "sentence": "動画が示す説や疑問は、本文の外から考える【ため】の入口として受け取るとよい。", "rules": "1157080:0", "a": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "ための入口 = 'entrance for (the purpose of) thinking'; ため = 'sake; purpose'"}, "b": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "考えるための入口 = an entrance for thinking; ため marks purpose/sake."}, "c": null, "source": "agree"},
@@ -1491,7 +1553,6 @@
  {"passage": "bunki-read-n1-kukai-sanskrit", "index": 243, "surface": "部", "round": "1", "sentence": "806年10月22日付で朝廷に差し出された目録によると、空海が持ち帰った経典や注釈書は計216部461巻に上り、うち42【部】44巻は梵字による真言や讃歌であった。", "rules": "1499290:0", "a": {"choice": "1499290:4", "gloss": "counter for copies of a newspaper, magazine, book, etc.", "reason": "部 as counter for books/scriptures counted"}, "b": {"choice": "1499290:4", "gloss": "counter for copies of a newspaper, magazine, book, etc.", "reason": "部 again counts the 42 works/books in 42部44巻."}, "c": null, "source": "agree"},
  {"passage": "bunki-read-n1-kukai-sanskrit", "index": 262, "surface": "中", "round": "1", "sentence": "空海は同じ目録の【中】で、梵字を持ち帰った理由にも触れている。", "rules": "1423310:0", "a": {"choice": "1423310:1", "gloss": "among; within", "reason": "目録の中で = within/among the catalog"}, "b": {"choice": "1423310:0", "gloss": "inside; interior", "reason": "中 means inside/within the same catalog."}, "c": {"choice": "1423310:0", "gloss": "inside; interior", "reason": "'Inside/within the catalog' — physical interior of the catalogue."}, "source": "third:b"},
  {"passage": "bunki-read-n1-kukai-sanskrit", "index": 533, "surface": "点", "round": "1", "sentence": "空海の位置は、むしろ真言宗における悉曇の学の祖という【点】にある。", "rules": "1441390:0", "a": {"choice": "1441390:4", "gloss": "point; aspect; matter", "reason": "点 = point; aspect; matter, as in 'という点にある'"}, "b": {"choice": "1441390:4", "gloss": "point; aspect; matter", "reason": "点 means point/aspect in という点にある."}, "c": null, "source": "agree"},
- {"passage": "bunki-read-n1-kukai-sanskrit", "index": 656, "surface": "とっ", "round": "1", "sentence": "真言の翻訳を避けてまで守ろうとした音と文字は、空海に【とっ】て、世界そのものの姿でもあったのである。", "rules": "2021030:0", "a": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "にとって = from the perspective of, related to 取る 'to interpret/understand'"}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "In 空海にとって, 取る means 'to take/interpret' as 'for Kukai'."}, "c": null, "source": "agree"},
  {"passage": "bunki-read-n1-neocognitron", "index": 265, "surface": "方", "round": "1", "sentence": "単純型、複雑型、超複雑型の細胞が階層的につながり、視覚の情報を段階的に処理するという考え【方】だ。", "rules": "1516925:2", "a": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "'考え方' uses '方' as a suffix meaning 'way of'."}, "b": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "考え方 means way/manner of thinking."}, "c": null, "source": "agree"},
  {"passage": "bunki-read-n1-neocognitron", "index": 436, "surface": "なら", "round": "1", "sentence": "本人も後に、当時のAIは「もし〜【なら】ば〜する」という形の規則を連ねて処理するもので、ネオコグニトロンとは全くの別分野だったと振り返っている。", "rules": "1536290:0", "a": {"choice": "1536290:0", "gloss": "to be", "reason": "なら is the conditional form of the copula なり, meaning 'to be'"}, "b": {"choice": "1536290:0", "gloss": "to be", "reason": "Conditional copula 'if it is' in もし〜ならば, sense of 也 as copula."}, "c": null, "source": "agree"},
  {"passage": "bunki-read-n1-neocognitron", "index": 527, "surface": "方", "round": "1", "sentence": "2024年のノーベル物理学賞の解説資料も、同じ見【方】を示している。", "rules": "1516925:2", "a": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "見方 means 'way of seeing/viewing', i.e. method/manner of"}, "b": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "見方 means way of viewing/perspective."}, "c": null, "source": "agree"},
@@ -1532,7 +1593,6 @@
  {"passage": "bunki-read-n2-forgetting-curve", "index": 254, "surface": "分", "round": "1", "sentence": "知識や連想に頼れない【分】、記憶そのものの働きが観察しやすくなるという工夫です。", "rules": "1502860:0", "a": {"choice": "1502860:5", "gloss": "in proportion to; just as much as; to the same degree", "reason": "頼れない分 means 'to the extent that one cannot rely on...'"}, "b": {"choice": "1502860:5", "gloss": "in proportion to; just as much as; to the same degree", "reason": "〜ない分 means to the extent that / in proportion as one cannot rely on knowledge or associations."}, "c": null, "source": "agree"},
  {"passage": "bunki-read-n2-forgetting-curve", "index": 409, "surface": "方", "round": "1", "sentence": "A　逆の読み【方】もできます。", "rules": "1516925:2", "a": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "読み方 means 'way of reading'"}, "b": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "読み方 means way/method of reading."}, "c": null, "source": "agree"},
  {"passage": "bunki-read-n2-forgetting-curve", "index": 476, "surface": "点", "round": "1", "sentence": "もう一つ見落とされがちなのは、材料がわざと意味を取り除いた音の列だったという【点】です。", "rules": "1441390:0", "a": {"choice": "1441390:4", "gloss": "point; aspect; matter", "reason": "点 here means 'point; aspect; matter; detail'"}, "b": {"choice": "1441390:4", "gloss": "point; aspect; matter", "reason": "Here 点 means the point/aspect/matter that the material was a sound sequence."}, "c": null, "source": "agree"},
- {"passage": "bunki-read-n2-forgetting-curve", "index": 487, "surface": "とっ", "round": "1", "sentence": "意味のある文章や、自分に【とっ】て大切な言葉であれば、条件はかなり異なります。", "rules": "2021030:0", "a": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "In 'にとって', '取る' means to take/interpret from a standpoint."}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "In 自分にとって, 取る is used in the idiomatic sense 'to take/regard from one's standpoint' (interpret/understand)."}, "c": null, "source": "agree"},
  {"passage": "bunki-read-n2-forgetting-curve", "index": 552, "surface": "生", "round": "1", "sentence": "2006年、アメリカの心理学者ローディガーとカーピキは、大学【生】に短い説明文を二つ学習させ、一方は2回読ませ、もう一方は1回読んだあとに思い出せる内容を書き出させました。", "rules": "2088240:1", "a": {"choice": "2088240:2", "gloss": "student", "reason": "'大学生' uses '生' as a suffix meaning 'student'."}, "b": {"choice": "2088240:2", "gloss": "student", "reason": "大学生 means university student; 生 is the suffix for student."}, "c": null, "source": "agree"},
  {"passage": "bunki-read-n2-forgetting-curve", "index": 589, "surface": "分", "round": "1", "sentence": "5【分】後のテストでは読み返した文章のほうが成績が上だったものの、1週間後には逆転しました。", "rules": "1502840:0", "a": {"choice": "1502840:0", "gloss": "minute (unit of time)", "reason": "'5分' uses '分' to mean 'minute'."}, "b": {"choice": "1502840:0", "gloss": "minute (unit of time)", "reason": "分 here means minutes in '5 minutes later'."}, "c": null, "source": "agree"},
  {"passage": "bunki-read-n2-grit-checked", "index": 161, "surface": "点", "round": "1", "sentence": "出発【点】は2007年の論文である。", "rules": "1441390:0", "a": {"choice": "1441390:3", "gloss": "point", "reason": "出発点 = starting point; 点 as 'point'"}, "b": {"choice": "1441390:3", "gloss": "point", "reason": "出発点 means starting point, so 点 = point."}, "c": null, "source": "agree"},
@@ -1662,7 +1722,6 @@
  {"passage": "env:press-press_05575", "index": 546, "surface": "機関", "round": "1", "sentence": "■本取りまとめの活用方法本取りまとめは、地方公共団体、民間事業者、研究【機関】等の施策や事業へのナッジの活用を支援するため、次の３段階の手順を示しています。", "rules": "1220870:0", "a": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "研究機関 means 'research institution/organization'"}, "b": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "研究機関 means research institution/organization."}, "c": null, "source": "agree"},
  {"passage": "env:press-press_05575", "index": 560, "surface": "ため", "round": "1", "sentence": "■本取りまとめの活用方法本取りまとめは、地方公共団体、民間事業者、研究機関等の施策や事業へのナッジの活用を支援する【ため】、次の３段階の手順を示しています。", "rules": "1157080:0", "a": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "支援するため means 'for the purpose of supporting'"}, "b": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "支援するため means 'in order to support', expressing purpose/sake."}, "c": null, "source": "agree"},
  {"passage": "env:press-press_05575", "index": 676, "surface": "ため", "round": "1", "sentence": "を選ぶ：特定したボトルネックに応じて、適切なナッジを選定する3．ナッジを仕上げる：実証で得られた示唆を基に、実際の場面で機能する介入策に仕上げる■実証知見を踏まえた行動変容政策への示唆行動変容を促す【ため】には、望ましい行動を知らせるだけでなく、生活者にとって「やりたい」「選びたい」と思える行動に転換することが重要です。", "rules": "1157080:0", "a": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "促すため means 'for the purpose of promoting'"}, "b": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "「ためには」 means 'in order to', so ため = sake/purpose."}, "c": null, "source": "agree"},
- {"passage": "env:press-press_05575", "index": 692, "surface": "とっ", "round": "1", "sentence": "選定する3．ナッジを仕上げる：実証で得られた示唆を基に、実際の場面で機能する介入策に仕上げる■実証知見を踏まえた行動変容政策への示唆行動変容を促すためには、望ましい行動を知らせるだけでなく、生活者に【とっ】て「やりたい」「選びたい」と思える行動に転換することが重要です。", "rules": "2021030:0", "a": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "にとって (に+とる) relates to how something is perceived/interpreted from someone's standpoint"}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "In 「にとって」, 取る means 'take/regard as', matching sense 12."}, "c": null, "source": "agree"},
  {"passage": "env:press-press_05575", "index": 714, "surface": "ため", "round": "1", "sentence": "その【ため】のアプローチとして、行動の社会的な価値を訴求するだけでなく、快適、安心、お得といった生活者が重視する価値と結び付ける「本音への接続」や、本音に合っていても選びにくい行動を「選んでいい」", "rules": "1157080:0", "a": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "そのための means 'for that purpose'"}, "b": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "「そのための」 means 'for that', so ため = sake/purpose."}, "c": null, "source": "agree"},
  {"passage": "env:press-press_05575", "index": 834, "surface": "実施", "round": "2-gloss", "sentence": "■今後について環境省では、本取りまとめで得られた知見を、デコ活を始めとする脱炭素施策の企画や【実施】に活用するとともに、地方公共団体、民間事業者、研究機関等が脱炭素に資する施策や事業に取り組む際に行動科学が活用されるよう支援してまいります。", "rules": "1321140:0", "a": {"choice": "1321140:0:1", "gloss": "implementation", "reason": "企画や実施 refers to the planning and implementation of measures."}, "b": {"choice": "1321140:0:1", "gloss": "implementation", "reason": "Planning and implementation of decarbonization measures."}, "c": null, "source": "agree"},
  {"passage": "env:press-press_05575", "index": 851, "surface": "機関", "round": "1", "sentence": "■今後について環境省では、本取りまとめで得られた知見を、デコ活を始めとする脱炭素施策の企画や実施に活用するとともに、地方公共団体、民間事業者、研究【機関】等が脱炭素に資する施策や事業に取り組む際に行動科学が活用されるよう支援してまいります。", "rules": "1220870:0", "a": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "研究機関 means 'research institution/organization'"}, "b": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "研究機関 means research institution/organization."}, "c": null, "source": "agree"},
@@ -1742,7 +1801,6 @@
  {"passage": "global-voices:2026-09-28-65726", "index": 149, "surface": "中", "round": "1", "sentence": "土地を耕し、種をまき、土壌を覆い、水を引き、シリアの経済力低下と農業衰退の【中】、ほぼ消滅していたさまざまな穀物の収穫の回復を目指している。", "rules": "1423310:0", "a": {"choice": "1423310:3", "gloss": "during; while; middle", "reason": "中 in 衰退の中 means 'amidst/during' the decline."}, "b": {"choice": "1423310:3", "gloss": "during; while; middle", "reason": "In the midst of economic and agricultural decline; 中 means midst/during."}, "c": null, "source": "agree"},
  {"passage": "global-voices:2026-09-28-65726", "index": 283, "surface": "中", "round": "1", "sentence": "とりわけ環境的な課題や気候変動がますます土地や農業に影響を与える【中】で、その重要性は増している。", "rules": "1423310:0", "a": {"choice": "1423310:3", "gloss": "during; while; middle", "reason": "中 in 影響を与える中で means 'amidst/during' the ongoing influence."}, "b": {"choice": "1423310:3", "gloss": "during; while; middle", "reason": "As/while environmental issues affect land and agriculture; 中で means while/during."}, "c": null, "source": "agree"},
  {"passage": "global-voices:2026-09-28-65726", "index": 571, "surface": "機関", "round": "1", "sentence": "シリア社会で、生活空間を守りよりよい環境を創造する芸術の影響力が認められるように、政府【機関】と連携し地元コミュニティで芸術家の役割を明確にすることを目指している。", "rules": "1220870:0", "a": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "機関 in 政府機関 means agency/organization/institution."}, "b": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "政府機関 means government agency/institution."}, "c": null, "source": "agree"},
- {"passage": "global-voices:2026-09-28-65726", "index": 751, "surface": "とっ", "round": "1", "sentence": "在来種子と食料安全保障在来種子が重要なのは、それが農家に【とっ】て最も基本的な植え付け材料であるからだ。", "rules": "2021030:0", "a": {"choice": "1326980:0", "gloss": "to take; to pick up; to grab", "reason": "とっ in にとって is 取る in its general sense of 'to take' (a standpoint)."}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "In 農家にとって, とる is the idiom meaning 'from the standpoint of/for', closest to the 'interpret/understand' sense."}, "c": null, "source": null},
  {"passage": "global-voices:2026-09-28-65726", "index": 767, "surface": "機関", "round": "1", "sentence": "国連食糧農業【機関】（FAO）によると、地域を基盤にした種子流通システムは、特に自家受粉の作物において種子全体の消費量の80～90％を占めることがある。", "rules": "1220870:0", "a": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "機関 in 国連食糧農業機関 means organization/institution."}, "b": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "国連食糧農業機関 means UN Food and Agriculture Organization; 機関 here means agency/organization."}, "c": null, "source": "agree"},
  {"passage": "global-voices:2026-09-28-65726", "index": 862, "surface": "ため", "round": "1", "sentence": "その【ため】病害への抵抗力を持ち、気候変動にも対応できる。", "rules": "1157080:0", "a": {"choice": "1157080:2", "gloss": "consequence; result; effect", "reason": "そのため means 'for that reason; as a result,' matching consequence/result/effect."}, "b": {"choice": "1157080:2", "gloss": "consequence; result; effect", "reason": "そのため means 'therefore/as a result', matching consequence/result."}, "c": null, "source": "agree"},
  {"passage": "govonline:202403-entry-5920-column", "index": 197, "surface": "方", "round": "1", "sentence": "たり、誤情報の影響を受け続ける現象（誤情報持続効果）、繰り返し同じ情報に接触することで、その情報が正しく感じられる現象（真実錯覚効果）等の心理現象も偽・誤情報の流通・拡散に影響を与えているとの見【方】もあります。", "rules": "1516925:2", "a": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "見方 means 'way of seeing/interpreting', 方 as suffix for method/way"}, "b": {"choice": "1516925:2", "gloss": "method of; manner of; way of", "reason": "見方 means way of viewing, so 方 is the suffix meaning method/way."}, "c": null, "source": "agree"},
@@ -1755,7 +1813,6 @@
  {"passage": "govonline:article-202609-radio-3739", "index": 140, "surface": "金", "round": "1", "sentence": "加盟以来、日本は分担【金】の拠出や世界のルール作りへの参画など、国連を通じて世界の平和や国際社会の課題に向き合ってきました。", "rules": "1242600:0", "a": {"choice": "1242600:4", "gloss": "money; gold coin", "reason": "分担金 uses 金 as suffix meaning money"}, "b": {"choice": "1242600:4", "gloss": "money; gold coin", "reason": "分担金 uses 金 as a suffix meaning money/contribution."}, "c": null, "source": "agree"},
  {"passage": "govonline:article-202609-radio-3739", "index": 177, "surface": "機関", "round": "1", "sentence": "番組では、国連【機関】の役割や取組、世界で活躍する日本人職員など、国連の様々な面をご紹介します。", "rules": "1220870:0", "a": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "国連機関 means UN agency/organization"}, "b": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "国連機関 means UN agency/organization."}, "c": null, "source": "agree"},
  {"passage": "govonline:article-202609-radio-3741", "index": 92, "surface": "とる", "round": "1", "sentence": "手話は、手や指、体の動き、表情などを使ってコミュニケーションを【とる】、きこえないかたや、きこえにくいかたにとって大切な「言語」です。", "rules": "2021030:0", "a": {"choice": "1326980:0", "gloss": "to take; to pick up; to grab", "reason": "コミュニケーションをとる = to take/have communication, general 'to take'"}, "b": null, "c": {"choice": "1326980:3", "gloss": "to adopt (a method, proposal, etc.); to take (a measure, attitude, etc.); to choose", "reason": "コミュニケーションをとる means to engage in/take communication as an activity."}, "source": null},
- {"passage": "govonline:article-202609-radio-3741", "index": 103, "surface": "とっ", "round": "1", "sentence": "手話は、手や指、体の動き、表情などを使ってコミュニケーションをとる、きこえないかたや、きこえにくいかたに【とっ】て大切な「言語」です。", "rules": "2021030:0", "a": {"choice": "1326980:0", "gloss": "to take; to pick up; to grab", "reason": "にとって is a grammaticalized form of とる 'to take', closest general sense"}, "b": null, "c": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "にとって expresses a standpoint or interpretive frame: for/to those people."}, "source": null},
  {"passage": "govonline:article-202609-radio-3741", "index": 122, "surface": "推進", "round": "1", "sentence": "日本では、2025年に「手話施策【推進】法」が成立し、手話への国民の理解を広げるとともに、手話を使いやすい環境を整え、手話による文化を守り育てていく取組が進められています。", "rules": "1371140:0", "a": {"choice": "1371140:1", "gloss": "promotion (of a policy, project, movement, etc.); furtherance; advancement", "reason": "推進 means promotion of a policy within the law's title."}, "b": {"choice": "1371140:1", "gloss": "promotion (of a policy, project, movement, etc.); furtherance; advancement", "reason": "In 手話施策推進法, 推進 means promotion/advancement of a policy."}, "c": null, "source": "agree"},
  {"passage": "govonline:article-202609-radio-3741", "index": 171, "surface": "推進", "round": "1", "sentence": "番組では、手話施策【推進】法の概要や国による手話の違いなどについて、コンサート手話通訳を行っているかたのお話も交えながらご紹介します。", "rules": "1371140:0", "a": {"choice": "1371140:1", "gloss": "promotion (of a policy, project, movement, etc.); furtherance; advancement", "reason": "推進 means promotion of a policy within the law's title."}, "b": {"choice": "1371140:1", "gloss": "promotion (of a policy, project, movement, etc.); furtherance; advancement", "reason": "In 手話施策推進法, 推進 means promotion/advancement of a policy."}, "c": null, "source": "agree"},
  {"passage": "govonline:article-202609-radio-3743", "index": 16, "surface": "遺産", "round": "2-gloss", "sentence": "地域の【遺産】・登録有形文化財」私たちの身近にある、歴史ある建造物。", "rules": "1159260:0", "a": {"choice": "1159260:0:3", "gloss": "heritage", "reason": "地域の遺産 refers to regional heritage, including cultural properties."}, "b": {"choice": "1159260:0:3", "gloss": "heritage", "reason": "Historical buildings are described as local heritage."}, "c": null, "source": "agree"},
@@ -1782,7 +1839,6 @@
  {"passage": "jawiki:5238864-s63", "index": 448, "surface": "機関", "round": "1", "sentence": "千葉県では各地で堤防決壊や越水が発生し、各地で大規模な浸水を引き起こしたほか、交通【機関】やインフラ等へも多大な被害をもたらした。", "rules": "1220870:0", "a": {"choice": "1220870:2", "gloss": "system; facility; facilities", "reason": "交通機関 means transport system/facility"}, "b": {"choice": "1220870:2", "gloss": "system; facility; facilities", "reason": "交通機関 means transportation facilities/means, not an organization or engine."}, "c": null, "source": "agree"},
  {"passage": "jawiki:5294446", "index": 159, "surface": "中", "round": "1", "sentence": "なお、認証官任命式は、皇居宮殿の松の間は8〜9月はLED工事【中】で使えなかったため、竹の間で行われた。", "rules": "1620400:1", "a": {"choice": "1620400:3", "gloss": "currently (doing); in the process of; in the middle of", "reason": "工事中 means 'under construction'"}, "b": {"choice": "1620400:3", "gloss": "currently (doing); in the process of; in the middle of", "reason": "工事中 means under construction/in the process of construction."}, "c": null, "source": "agree"},
  {"passage": "jawiki:5294446", "index": 164, "surface": "ため", "round": "1", "sentence": "なお、認証官任命式は、皇居宮殿の松の間は8〜9月はLED工事中で使えなかった【ため】、竹の間で行われた。", "rules": "1157080:0", "a": {"choice": "1157080:2", "gloss": "consequence; result; effect", "reason": "ため means 'because of' (consequence/result)"}, "b": {"choice": "1157080:2", "gloss": "consequence; result; effect", "reason": "ため here marks cause/reason: because it could not be used."}, "c": null, "source": "agree"},
- {"passage": "jawiki:5294446", "index": 216, "surface": "とっ", "round": "1", "sentence": "9月頃は自民党役員人事と合わせて内閣改造が行われることが多く、国務大臣の任命の認証は重要な国事行為の一つであり、多くの政治家に【とっ】て国務大臣に任命されて、天皇から認証されることは、一生に一度の晴れ舞台であり、宮内庁の配慮不足が指摘された。", "rules": "2021030:0", "a": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "にとって (for someone) relates to taking a perspective/interpreting"}, "b": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "〜にとって uses 取る in the sense of taking/interpreting from someone's standpoint."}, "c": null, "source": "agree"},
  {"passage": "kantei:jp-105-actions-202609-15hyousyou", "index": 124, "surface": "実施", "round": "2-gloss", "sentence": "皆様は、様々な災害に際し、危険や困難に直面しながらもひるむことなく、人命救助、住民の安全確保などに取り組まれたほか、防災に関する講習会の開催や地域の防災訓練の【実施】などに尽力され、災害による被害の防止・軽減に大きく寄与されました。", "rules": "1321140:0", "a": {"choice": "1321140:0:1", "gloss": "implementation", "reason": "Implementation is appropriate for the formal execution of disaster prevention training."}, "b": {"choice": "1321140:0:3", "gloss": "carrying out", "reason": "Carrying out fits conducting local disaster drills."}, "c": {"choice": "1321140:0:3", "gloss": "carrying out", "reason": "Refers to conducting/holding disaster drills, best rendered as 'carrying out'."}, "source": "third:b"},
  {"passage": "kantei:jp-105-actions-202609-15hyousyou", "index": 239, "surface": "ため", "round": "1", "sentence": "政府では、激甚化・頻発化する自然災害に対し、国民の皆様の生命と財産を守り抜く【ため】、全力で災害対応に取り組んでおります。", "rules": "1157080:0", "a": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "ため = 'for the purpose of' protecting lives and property"}, "b": {"choice": "1157080:1", "gloss": "sake; purpose; objective", "reason": "守り抜くため means 'in order to protect', so ため means sake/purpose."}, "c": null, "source": "agree"},
  {"passage": "kantei:jp-105-actions-202609-15hyousyou", "index": 255, "surface": "先", "round": "1", "sentence": "年内には、【先】の国会で成立した「防災庁設置関連法」に基づきまして、平時からの徹底した「事前防災」、発災時から復旧・復興までの一貫した災害対応の「司令塔」となる「防災庁」を設置し、防災体制の", "rules": "1387210:0", "a": {"choice": "1387210:5", "gloss": "previous; prior; former", "reason": "先の国会 = 'the previous Diet session'"}, "b": {"choice": "1387210:5", "gloss": "previous; prior; former", "reason": "「先の国会」 means the previous/former Diet session."}, "c": null, "source": "agree"},
@@ -1964,7 +2020,6 @@
  {"passage": "real-hojoki", "index": 156, "surface": "なり", "round": "1", "sentence": "所も変らず、人も多かれど、いにしへ見し人は、二三十人が中に、わづかに一人二人【なり】。", "rules": "1536290:0", "a": {"choice": "1536290:0", "gloss": "to be", "reason": "なり is copula 'to be'"}, "b": {"choice": "1536290:0", "gloss": "to be", "reason": "なり after 一人二人 is the copula, meaning 'are one or two'."}, "c": null, "source": "agree"},
  {"passage": "real-tsurezure", "index": 1, "surface": "なる", "round": "1", "sentence": "つれづれ【なる】ままに、日暮らし、硯にむかひて、心にうつりゆくよしなし事を、そこはかとなく書きつくれば、あやしうこそものぐるほしけれ。", "rules": "1536290:0", "a": {"choice": "1536290:0", "gloss": "to be", "reason": "なる is attributive form of copula なり 'to be'"}, "b": {"choice": "1536290:0", "gloss": "to be", "reason": "なる is the copula 'to be' in つれづれなる, not location."}, "c": null, "source": "agree"},
  {"passage": "real-tsurezure", "index": 88, "surface": "なり", "round": "1", "sentence": "一の人の御有様はさら【なり】、ただ人も、舎人など賜はるきはは、ゆゆしと見ゆ。", "rules": "1536290:0", "a": {"choice": "1536290:0", "gloss": "to be", "reason": "なり is copula 'to be'"}, "b": {"choice": "1536290:0", "gloss": "to be", "reason": "なり is the copula 'to be' in さらなり, meaning 'needless to say'."}, "c": null, "source": "agree"},
- {"passage": "real-tsurezure", "index": 110, "surface": "とっ", "round": "1", "sentence": "現代の読者に【とっ】て、語彙や文法は古い。", "rules": "2021030:0", "a": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "にとって: とる as in how one takes/interprets from one's perspective"}, "b": null, "c": {"choice": "1326980:10", "gloss": "to take (e.g. a joke); to interpret; to understand", "reason": "にとって means as taken or interpreted by modern readers."}, "source": "pair:ac"},
  {"passage": "sports:sports-b_menu-houdou-31-09-1420919_00007", "index": 39, "surface": "あげ", "round": "1", "sentence": "文部科学大臣表彰1．趣旨地域又は職域におけるスポーツの健全な普及及び発展に貢献し、もって地域におけるスポーツの振興に顕著な成果を【あげ】たスポーツ関係者及びスポーツ団体を文部科学大臣が表彰する。", "rules": "1352320:0", "a": {"choice": "2864818:10", "gloss": "to earn (something desirable); to achieve (e.g. a good result); to obtain", "reason": "成果をあげた: 挙げる 'to achieve (a good result)'"}, "b": {"choice": "1352320:7", "gloss": "to earn (something desirable); to achieve (e.g. a good result); to obtain", "reason": "成果をあげた means achieved/produced results."}, "c": {"choice": "1352320:7", "gloss": "to earn (something desirable); to achieve (e.g. a good result); to obtain", "reason": "成果をあげた = 'achieved results', the 'to achieve/obtain' sense of 上げる."}, "source": "third:b"},
  {"passage": "sports:sports-b_menu-houdou-31-09-1420919_00007", "index": 68, "surface": "機関", "round": "1", "sentence": "表彰される者及び団体については、下記の【機関】より推薦されたものを、文部科学大臣が審査の上決定する。", "rules": "1220870:0", "a": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "下記の機関: 'organizations/institutions' that recommend candidates"}, "b": {"choice": "1220870:1", "gloss": "agency; organisation; organization", "reason": "機関 here means an organization/institution that recommends candidates."}, "c": null, "source": "agree"},
  {"passage": "sports:sports-b_menu-houdou-31-09-1420919_00007", "index": 191, "surface": "分", "round": "1", "sentence": "116名女性　38名合計　154名生涯スポーツ優良団体本年度スポーツクラブ　49団体スポーツクラブ以外の団体　47団体合計　96団体４．表彰式（1）日時：令和8年10月16日（金曜日）表彰式　　14時15【分】～15時00分記念撮影　15時15分～（2）場所：中央合同庁舎第7号館3階講堂（千代田区霞が関3－2－2）５．過去の表彰令和7年度生涯スポーツ功労者及び生涯スポーツ優良団体表彰被表彰者を", "rules": "1502840:0", "a": {"choice": "1502840:0", "gloss": "minute (unit of time)", "reason": "14時15分: 分 means 'minute' (unit of time)"}, "b": {"choice": "1502840:0", "gloss": "minute (unit of time)", "reason": "分 after 15時 indicates minutes as a unit of time."}, "c": null, "source": "agree"},
