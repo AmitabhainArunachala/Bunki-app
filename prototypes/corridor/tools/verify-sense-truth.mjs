@@ -475,6 +475,19 @@ async function grokCase(page, fixture) {
   const rows = [];
   {
     if (!(await openArticle(page, fixture.at))) return [[`G.${fixture.name}`, `${fixture.at} opens from the shelf`, false]];
+    // G3 · a phonetic parenthetical (悉曇（しったん）) is no door at all: its kana is the word before it read aloud, so the
+    // reader draws it inert (tok annotation, data-reader-annotation). A tap there opens no card and raises nothing, so no
+    // meaning, and never the wrong one, can show
+    if (fixture.kind === 'reading' && await page.locator(`#reader .tok[data-index="${fixture.index}"]`).first().evaluate((n) => n.dataset.readerAnnotation === 'true').catch(() => false)) {
+      await closeMini(page);
+      const target = page.locator(`#reader .tok[data-index="${fixture.index}"]`).first();
+      await target.tap({ timeout: 30000 });
+      await delay(600);
+      const after = await page.evaluate((i) => ({ mini: !!document.getElementById('mini'), sheet: !!document.getElementById('sheet'),
+        rung: document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung || null, text: document.body.innerText }), fixture.index);
+      return [[`G.${fixture.name}`, `${fixture.at} #${fixture.index} ${fixture.s}: a phonetic parenthetical is no door (G3): a tap opens no card, raises nothing, never "${fixture.never}"`,
+        !after.mini && !after.sheet && !after.rung, { mini: after.mini, sheet: after.sheet, rung: after.rung }]];
+    }
     const got = await card(page, fixture.index);
     if (fixture.kind === 'name') {
       return [[`G.${fixture.name}`, `${fixture.at} #${fixture.index} ${fixture.s}: the card says it is a name in this text, never "${fixture.never}"`,
