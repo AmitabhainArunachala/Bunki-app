@@ -10915,6 +10915,7 @@ function sensePatch(slip, token, door, anchor = null) {
     delete line.dataset.senseWait;
     line.style.removeProperty('font-weight');
     line.style.removeProperty('color');
+    if (!line.getAttribute('style')) line.removeAttribute('style');
     slip.removeAttribute('aria-busy');
   }
   line.textContent = choice.glosses[0];
