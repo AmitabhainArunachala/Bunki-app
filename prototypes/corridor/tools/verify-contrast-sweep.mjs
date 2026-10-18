@@ -477,6 +477,9 @@ const origin = host.origin;
 async function ready(page) { await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 }); }
 async function settle(page, ms = 450) {
   await page.waitForFunction(() => !document.documentElement.dataset.roomTransition, null, { timeout: 8000 }).catch(() => {});
+  // R3 (Grok 2029) · an open slip drawn before its word's sense is at hand says a quiet "…" (aria-busy, R2's contract) until
+  // it is answered: its colours are read on the answered card (M-3), after the same settle as before
+  await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 5000 }).catch(() => {});
   await delay(ms);
   await page.evaluate(async () => { await document.fonts.ready; await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))); });
 }

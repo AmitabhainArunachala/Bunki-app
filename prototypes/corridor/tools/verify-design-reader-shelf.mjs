@@ -1334,7 +1334,11 @@ try {
         const box = () => page.locator('#mini').evaluate((node) => {
           const r = node.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, height: r.height,
             clipped: !!node.style.maxHeight, side: node.dataset.side,
-            chromeBottom: document.querySelector('#app > .chrome')?.getBoundingClientRect().bottom };
+            // G6 · the chrome's edge is the frame's foot: the scale thread stands under the bar as its second row
+            chromeBottom: Math.max(...['#app > .chrome', '#app > .scale-thread'].map((sel) => {
+              const edge = document.querySelector(sel);
+              return edge && ['fixed', 'sticky'].includes(getComputedStyle(edge).position) ? edge.getBoundingClientRect().bottom : 0;
+            })) };
         });
         const focused = () => page.evaluate(() => {
           const mini = document.querySelector('#mini'), active = document.activeElement;

@@ -278,6 +278,9 @@ async function openQuickLook(page, preferredIndex = 0) {
     if (await page.locator('#sheet').count()) {
       throw new Error(`a quick-lookup tap must not open a full entry: ${JSON.stringify(touchAttempts.at(-1))}`);
     }
+    // R3 (Grok 2029) · a slip drawn before its word's sense is at hand shows a quiet "…" (aria-busy, R2's contract) until it
+    // is: the card is read once answered, up to 5 s, then asserted exactly as before (M-3)
+    await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 5_000 }).catch(() => {});
     const quick = await page.evaluate(() => {
       const mini = document.getElementById('mini');
       if (!mini) return null;

@@ -515,7 +515,11 @@ async function main() {
     console.log('\n— reading, stage and page: parity and geometry');
     // Every layer is observed separately; setup never retries a missing stage.
     const tokenIndex = 2;
-    const popupProbe = () => page.evaluate(`(() => {
+    // R3 (Grok 2029) · a slip drawn before its word's sense is at hand shows a quiet "…" (aria-busy, R2's contract) until it
+    // is: the card is read once answered, up to 5 s, then asserted exactly as before (M-3)
+    const popupProbe = async () => {
+      await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 5_000 }).catch(() => {});
+      return page.evaluate(`(() => {
       const mini = document.getElementById('mini');
       const box = mini?.getBoundingClientRect();
       return { open: !!mini, reading: mini?.querySelector('.mini-reading')?.textContent ?? '', gloss: mini?.querySelector('.mini-gloss')?.textContent ?? '',
@@ -525,6 +529,7 @@ async function main() {
         bar: [...document.querySelectorAll('.teacher-door, #reader-context-save, #reader-teacher, #reader-sentence-practice')]
           .filter((node) => !node.closest('#mini') && node.getClientRects().length).length };
     })()`);
+    };
     await openReader(page, base);
     await setRevealOnTouch(page);
     await centreWord(page, tokenIndex);

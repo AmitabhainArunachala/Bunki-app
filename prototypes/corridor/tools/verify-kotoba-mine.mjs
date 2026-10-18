@@ -1296,7 +1296,10 @@ async function verifyTap(browser, base) {
     const before = { sched: await page.evaluate(SCHEDULE_OF(KEY)), env: await env(page) };
     // a word of the passage that is not this deck's: 人口
     const candidates = page.locator('#kp-card .kp-sentence .kp-tok:not(.kp-target):not([data-deck-word])');
-    const candidateIndex = await candidates.evaluateAll(nodes => nodes.findIndex(node => node.querySelector('ruby[data-rt]') && node.kpUnit?.tok?.k === '語'));
+    // F · every reading is a native <rt>, and the deck hides one in place (player.css: visibility), so a hidden-reading word is
+    // one whose own <rt> is there and unseen (the drawn ruby[data-rt] reading is gone)
+    const candidateIndex = await candidates.evaluateAll(nodes => nodes.findIndex(node => node.kpUnit?.tok?.k === '語'
+      && [...node.querySelectorAll('ruby > rt')].some(rt => rt.textContent.trim() && getComputedStyle(rt).visibility === 'hidden')));
     if (candidateIndex < 0) throw new Error('Fixture has no hidden-reading lexical word');
     const tok = candidates.nth(candidateIndex);
     const tokText = await tok.evaluate((n) => { const c = n.cloneNode(true); c.querySelectorAll('rt').forEach((r) => r.remove()); return c.textContent; });
@@ -1309,11 +1312,10 @@ async function verifyTap(browser, base) {
         && await page.locator('#mini').count() === 0 && (await page.evaluate(LOOKUPS_OF(KEY))).length === 0);
     await page.keyboard.press('Enter');
     await page.waitForFunction(() => document.querySelector('#kp-card [data-ladder-rung="reading"]'));
-    await page.waitForFunction(() => [...document.querySelectorAll('#kp-card [data-ladder-rung="reading"] ruby')].every(n => Number(getComputedStyle(n, '::after').opacity) === 1));
-    const reading = await tok.evaluate(n => ({ expected: [...n.querySelectorAll('ruby[data-rt]')].map(r=>r.dataset.rt).join(''),
-      shown: [...n.querySelectorAll('ruby[data-rt]')].map(r => { const style=getComputedStyle(r,'::after'); const content=style.content;
-        return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity)>0
-          ? content.startsWith('attr(') ? r.dataset.rt : /^["'].*["']$/u.test(content) ? content.slice(1,-1) : '' : ''; }).join(''),
+    await page.waitForFunction(() => [...document.querySelectorAll('#kp-card [data-ladder-rung="reading"] ruby > rt')].every(rt => getComputedStyle(rt).visibility !== 'hidden' && Number(getComputedStyle(rt).opacity) === 1));
+    const reading = await tok.evaluate(n => ({ expected: [...n.querySelectorAll('ruby > rt')].map(rt => rt.textContent).join(''),
+      shown: [...n.querySelectorAll('ruby > rt')].map(rt => { const style = getComputedStyle(rt);
+        return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 ? rt.textContent : ''; }).join(''),
       rung:n.dataset.ladderRung, lit:n.classList.contains('kp-lit') }));
     check('tap: first Enter exposes the exact reading only, logs depth1 once and leaves the schedule unchanged',
       reading.expected && reading.shown === reading.expected && reading.rung === 'reading' && reading.lit && await page.locator('#mini').count() === 0
