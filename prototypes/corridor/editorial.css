@@ -4478,7 +4478,8 @@ body:not([data-view='drift']) #app > main > .room-sign {
   position: absolute;
   z-index: 1;
   top: calc(52px + env(safe-area-inset-top, 0px));
-  right: 6px;
+  /* Hfix-1A · 8 px clear of the glass's edge (D5; round 1 measured it 6 px off, H-akafuji-07, H-shu-05) */
+  right: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -4493,14 +4494,18 @@ body:not([data-view='drift']) #app > main > .room-sign {
 }
 @media (max-width: 520px) {
   html:is([data-room='tray'], [data-room='learn'], [data-room='tests'], [data-room='search'], [data-room='me']) body:not(.zen):not([data-view='drift']) #app > main:has(> .room-sign) { padding-right: 36px; }
-  /* the shelf keeps its full measure (its title block is pinned to one-line notes); only the
-     look-up field steps aside, and the sign is cut short above the Tools door */
+  /* the shelf keeps its full measure (its title block is pinned to one-line notes); the look-up field and, Hfix-1A, the
+     masthead step aside, so the sign hangs beside the masthead (its Tools door 8 px from it) and ends above the cards */
   body[data-view='shelf']:not(.zen) #app > main > .room-sign ~ #search { width: calc(100% - 30px); }
   body[data-view='shelf']:not(.zen) #app > main > .room-sign { padding-block: 10px 8px; gap: 8px; }
+  body[data-view='shelf']:not(.zen) #app > main:has(> .room-sign) .shelf-masthead { padding-right: 24px; }
 }
 @media (min-width: 521px) {
-  body:not([data-view='drift']) #app > main > .room-sign { right: max(6px, calc((100vw - 920px) / 2 - 36px)); }
+  body:not([data-view='drift']) #app > main > .room-sign { right: max(8px, calc((100vw - 920px) / 2 - 36px)); }
 }
+/* Hfix-1A · in a room with G6's thread (the bar's second row), the sign hangs 8 px under the thread, not under it (round
+   1: "READ" stood under the thread, only "AD" showing) */
+body:not([data-view='drift']) #app:has(> .scale-thread) > main > .room-sign { top: calc(97px + env(safe-area-inset-top, 0px)); }
 body:not([data-view='drift']) #app > main > .room-sign .room-sign-name {
   writing-mode: vertical-rl;
   text-orientation: mixed; /* Latin turns a quarter, never stacks upright (gate 5) */

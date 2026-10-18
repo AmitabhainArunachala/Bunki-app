@@ -16,6 +16,7 @@
  *       strokes stay in its chips;
  *   8   a word page's thread offers no "kanji ›" before a kanji is entered from it; its way back in goes to the kanji entered;
  *   9   the open screen's article title breaks only between its words (jaWords), at 390 and 320;
+ *   10  the shelf's vertical room sign stands whole: 8 px from the glass's edges, under the bar and thread, clear of Tools;
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
  * writes one row per control (killed = at least one of its item's rows red, with no page error). Claim boundary: headless
@@ -73,6 +74,7 @@ const CONTROL = {
   'kanji-bead': { item: '8.', source: [['corridor.js', "  if (scale === 'word') return node?.enteredKanji && scaleWordKanji(node).includes(node.enteredKanji) ? 'kanji' : null;",
     "  if (scale === 'word') return scaleWordKanji(node).length ? 'kanji' : null;"]] },
   'open-title': { item: '9.', css: '#drift-layer .scale-star-caption.is-words { word-break: normal !important; overflow-wrap: anywhere !important; line-break: auto !important; }' },
+  'shelf-sign': { item: '10.', css: "body:not([data-view='drift']) #app:has(> .scale-thread) > main > .room-sign { top: calc(52px + env(safe-area-inset-top, 0px)) !important; right: 6px !important; }" },
   thread: { item: '3.', css: '.scale-thread { scroll-snap-type: none !important; }',
     source: [['corridor.js', '    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);', '    if (delta) thread.scrollLeft += delta;']] },
 };
@@ -527,6 +529,36 @@ async function itemOpenTitle(browser, engine) {
   }
 }
 
+async function itemShelfSign(browser, engine) {
+  // 10 · the shelf's vertical room sign stands whole on the glass: 8 px or more from its edges, under the bar and the thread
+  // (not behind them), clear of the Tools door and the first card; Today's sign keeps the same edge
+  for (const [world, width, room] of [['akafuji', 390, 'shelf'], ['shu', 390, 'shelf'], ['hokusai', 320, 'shelf'], ['hokusai', 390, 'tray']]) {
+    const { context, page, errors } = await session(browser, { world, width, query: room === 'shelf' ? 'entry=shelf' : 'entry=shelf&room=tray' });
+    try {
+      await page.waitForSelector('#app > main > .room-sign', { timeout: 15_000 });
+      await settle(page, 500);
+      const f = await page.evaluate(() => {
+        const box = (n) => { if (!n) return null; const r = n.getBoundingClientRect(); return r.width ? { left: r.left, right: r.right, top: r.top, bottom: r.bottom } : null; };
+        const sign = document.querySelector('#app > main > .room-sign'), s = box(sign);
+        const glyphs = []; const walk = document.createTreeWalker(sign, NodeFilter.SHOW_TEXT);
+        while (walk.nextNode()) { const r = document.createRange(); r.selectNodeContents(walk.currentNode); glyphs.push(...[...r.getClientRects()].filter((q) => q.width > 0.5)); }
+        // what stands over the sign's glyphs (the sign itself takes no pointer: the topmost other thing at each glyph)
+        const over = glyphs.map((g) => document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2)).filter((n) => n?.closest('#app > .chrome, #app > .scale-thread')).length;
+        const frame = Math.max(box(document.querySelector('#app > .chrome'))?.bottom ?? 0, box(document.querySelector('#app > .scale-thread'))?.bottom ?? 0);
+        const hits = (a, b) => !!a && !!b && a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+        const tools = box(document.getElementById('shelf-tools-toggle')), card = box(document.querySelector('#shelf-reading-results > *'));
+        return { sign: s, vw: document.documentElement.clientWidth, frame, over, glyphs: glyphs.length,
+          inside: glyphs.every((g) => g.left >= 8 - 0.5 && g.right <= document.documentElement.clientWidth - 8 + 0.5 && g.top >= frame - 0.5),
+          tools: hits(s, tools), card: hits(s, card), text: sign.textContent };
+      });
+      const edge = f.sign && f.sign.right <= f.vw - 8 + 0.5 && f.sign.left >= 8 - 0.5 && f.sign.top >= f.frame - 0.5;
+      check(`10.room-sign · ${engine} ${world} ${width} ${room} · the room sign (${f.text}) stands whole, 8 px from the edge, under the bar and thread, clear of Tools and the cards`,
+        edge && f.inside && f.glyphs > 0 && f.over === 0 && !f.tools && !f.card && !errors.length,
+        { sign: f.sign && Object.fromEntries(Object.entries(f.sign).map(([k, v]) => [k, Math.round(v)])), vw: f.vw, frame: f.frame, over: f.over, tools: f.tools, card: f.card, errors });
+    } finally { await context.close(); }
+  }
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
   { id: 'layers', prefix: '2.', run: itemLayers },
@@ -537,6 +569,7 @@ const ITEMS = [
   { id: 'part', prefix: '7.', run: itemPart },
   { id: 'kanji-bead', prefix: '8.', run: itemKanjiBead },
   { id: 'open-title', prefix: '9.', run: itemOpenTitle },
+  { id: 'shelf-sign', prefix: '10.', run: itemShelfSign },
 ];
 
 const log = { engines: {} };
