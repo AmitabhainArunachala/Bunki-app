@@ -5557,6 +5557,48 @@ function scaleThread() {
   }
   return thread;
 }
+/** Reveal the current bead once, on this newly mounted rail only. Page/reader
+ * restoration and focus keep their existing owners; native rail use wins. */
+function revealMountedScaleCurrent(thread) {
+  const parent = thread?.parentElement;
+  const current = thread?.querySelector(':scope > [aria-current="step"]');
+  const outside = thread?.querySelector(':scope > [data-scale-out]');
+  if (!parent || !current || current === outside) return;
+  const initialLeft = thread.scrollLeft;
+  let cancelled = false;
+  const events = ['pointerdown', 'wheel', 'keydown'];
+  const cleanup = () => {
+    for (const type of events) thread.removeEventListener(type, cancel, true);
+  };
+  const cancel = () => { cancelled = true; cleanup(); };
+  for (const type of events) thread.addEventListener(type, cancel, { capture: true, passive: true });
+  const reveal = () => {
+    cleanup();
+    if (cancelled || !thread.isConnected || thread.parentElement !== parent ||
+        current.parentElement !== thread || current.getAttribute('aria-current') !== 'step' ||
+        thread.scrollLeft !== initialLeft || thread.closest('[inert], [hidden], [aria-hidden="true"]') ||
+        (thread.contains(document.activeElement) && document.activeElement !== outside && document.activeElement !== current)) return;
+    const rect = thread.getBoundingClientRect(), bead = current.getBoundingClientRect();
+    if (!rect.width || !rect.height || !bead.width || !bead.height || thread.scrollWidth <= thread.clientWidth) return;
+    let left = Math.max(0, rect.left + thread.clientLeft);
+    let right = Math.min(document.documentElement.clientWidth, rect.left + thread.clientLeft + thread.clientWidth);
+    // Reserve the sticky control's actual occupied edge, without assuming a
+    // positive scrollLeft or a particular inline direction.
+    const out = outside?.getBoundingClientRect();
+    if (out?.width && out.right > left && out.left < right) {
+      if (out.left + out.width / 2 <= (left + right) / 2) left = Math.max(left, out.right);
+      else right = Math.min(right, out.left);
+    }
+    if (bead.width > right - left) return;
+    const delta = bead.right > right ? Math.ceil(bead.right - right)
+      : bead.left < left ? Math.floor(bead.left - left) : 0;
+    if (delta) thread.scrollLeft += delta;
+  };
+  // The actual sheet is untransformed; only its separate cut-word animates.
+  // Read this mount's layout once, after layer law and before any later use.
+  requestAnimationFrame(reveal);
+}
+
 function paintRoomScaleThread(root) {
   const old = root.querySelector(':scope > .scale-thread');
   const thread = scaleThread();
@@ -5568,6 +5610,7 @@ function paintRoomScaleThread(root) {
     if (chrome) chrome.after(thread);
     else root.prepend(thread);
   }
+  revealMountedScaleCurrent(thread);
 }
 function renderScaleArticleReturn(main) {
   const visit = S.scaleVisit, article = scalePassage(visit);
@@ -32882,6 +32925,7 @@ function mountPageEffects(sheet, node) {
   if (oldThread && thread) oldThread.replaceWith(thread);
   else if (thread) sheet.querySelector(':scope > .sheet-bar')?.after(thread);
   else oldThread?.remove();
+  if (thread) revealMountedScaleCurrent(thread);
   activatePendingLookupReadings(sheet);
   adoptSaveMenuOwner();
   // reading position survives the doors: Back hands a ~2,700px entry its place, never its top (P1, review)

@@ -88,9 +88,11 @@ const skyOwnershipOnly = process.argv.includes('--sky-ownership-only');
 assert([controlsOnly, roomsOnly, sentencesOnly, kanaOnly, skyReadingsOnly, skyOwnershipOnly].filter(Boolean).length <= 1, 'Choose one explicit narrow schedule');
 const g3Only = controlsOnly || roomsOnly || sentencesOnly || kanaOnly || skyReadingsOnly || skyOwnershipOnly || process.argv.includes('--g3-only');
 const withControls = controlsOnly || process.argv.includes('--controls');
+const g6ThreadCurrentOnly=process.argv.includes('--g6-thread-current-only');
 const g6FramesOnly=process.argv.includes('--g6-frames-only');
 const g6ControlsOnly=process.argv.includes('--g6-controls-only');
-const g6Only=g6FramesOnly||g6ControlsOnly||process.argv.includes('--g6-only');
+const g6Only=g6ThreadCurrentOnly||g6FramesOnly||g6ControlsOnly||process.argv.includes('--g6-only');
+assert(!(g6ThreadCurrentOnly&&(g6FramesOnly||g6ControlsOnly||withControls)),'Current-thread narrow schedule is distinct');
 assert(!(g6FramesOnly&&g6ControlsOnly),'Choose one G6 narrow schedule');
 assert(!(g6Only&&g3Only),'G6 and G3 narrow schedules are distinct');
 
@@ -715,6 +717,84 @@ async function g6Descend(page,home,modality,to='part'){
   let from=(await g6ScaleFacts(page)).scale;
   while(from!==to){const next=G6_ORDER[G6_ORDER.indexOf(from)+1];assert(next,`real inner edge from ${from}`);const row=await g6Move(page,{from,to:next,home,modality});assert(row.ok,JSON.stringify(row.observed));from=next;}
 }
+// Passive geometry only. This code never scrolls, focuses, or calls an app helper.
+function g6CurrentThreadDOM(action={}) {
+  const active=()=>[...document.querySelectorAll('.scale-thread')].filter(n=>n.isConnected&&!n.closest('[inert],[hidden],[aria-hidden="true"]')&&n.getClientRects().length);
+  const rect=node=>{if(!node)return null;const r=node.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};};
+  const offsets=()=>({window:{x:scrollX,y:scrollY},document:{x:document.documentElement.scrollLeft,y:document.documentElement.scrollTop},body:{x:document.body.scrollLeft,y:document.body.scrollTop},...Object.fromEntries(['app','reader','sheet'].map(id=>{const n=document.getElementById(id);return [id,n?{x:n.scrollLeft,y:n.scrollTop}:null];}))});
+  const facts=(thread=active()[0])=>{
+    if(!thread)return null;
+    const currents=thread.querySelectorAll(':scope > [aria-current="step"]'),current=currents[0],outside=thread.querySelector(':scope > [data-scale-out]');
+    const rail=rect(thread),bead=rect(current),out=rect(outside),viewport={width:document.documentElement.clientWidth,height:innerHeight};
+    const left=Math.max(0,rail.left+thread.clientLeft),right=Math.min(viewport.width,rail.left+thread.clientLeft+thread.clientWidth);
+    let currentLeft=left,currentRight=right;
+    if(out&&outside!==current&&out.right>left&&out.left<right){if(out.left+out.width/2<=(left+right)/2)currentLeft=Math.max(left,out.right);else currentRight=Math.min(right,out.left);}
+    const contained=(box,l,r)=>!!box&&box.width>0&&box.height>0&&box.left>=l&&box.right<=r&&box.top>=Math.max(0,rail.top)&&box.bottom<=Math.min(viewport.height,rail.bottom);
+    return {at:performance.now(),scale:thread.dataset.scale,activeRails:active().length,connected:thread.isConnected,owner:thread.parentElement?.id||null,
+      currentCount:currents.length,currentTag:current?.tagName,currentDisabled:current?.disabled===true,currentNode:current?.dataset.node||null,currentIndex:current?.dataset.stackIndex||null,
+      currentIsOutside:current===outside,rail,bead,out,viewport,available:{left:currentLeft,right:currentRight},scrollLeft:thread.scrollLeft,scrollTop:thread.scrollTop,scrollWidth:thread.scrollWidth,clientWidth:thread.clientWidth,
+      currentContained:contained(bead,currentLeft,currentRight),outsideContained:contained(out,left,right),offsets:offsets(),fontStatus:document.fonts.status,font:current?getComputedStyle(current).font:null,
+      theme:document.documentElement.getAttribute('data-theme'),sheetWorld:document.getElementById('sheet')?.dataset.world||null,stamp:window.__g6DocumentStamp};
+  };
+  if(action.op==='observe'){
+    if(window.__g6CurrentMount)throw new Error('current-thread observer already active');
+    const old=[...document.querySelectorAll('.scale-thread')].map(node=>({node,scale:node.dataset.scale,left:node.scrollLeft,top:node.scrollTop})),seen=new Set(),mounts=[];
+    const observer=new MutationObserver(()=>{
+      for(const thread of active())if(thread.dataset.scale===action.scale&&!seen.has(thread)&&!old.some(row=>row.node===thread)){
+        seen.add(thread);mounts.push({thread,initial:facts(thread)});
+      }
+    });
+    observer.observe(document.getElementById('app'),{childList:true,subtree:true});
+    window.__g6CurrentMount={finish:()=>{
+      observer.disconnect();
+      return {mounts:mounts.map(({thread,initial})=>({initial,settled:facts(thread),sameLiveOwner:thread.isConnected&&thread===active()[0]})),retained:old.filter(row=>row.node.isConnected).map(row=>({scale:row.scale,before:{left:row.left,top:row.top},after:{left:row.node.scrollLeft,top:row.node.scrollTop},inert:!!row.node.closest('[inert],[aria-hidden="true"]')}))};
+    }};
+    return {observing:action.scale,oldRails:old.length};
+  }
+  if(action.op==='finish'){
+    if(!window.__g6CurrentMount)throw new Error('current-thread observer missing');
+    try{return window.__g6CurrentMount.finish();}finally{delete window.__g6CurrentMount;}
+  }
+  return facts();
+}
+async function g6CurrentThreadGeometry(page){
+  await page.evaluate(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))));
+  return page.evaluate(g6CurrentThreadDOM);
+}
+async function g6CurrentThreadVisible(page,{emit,width,world}){
+  const modality='touch',home=await g6OpenOrigin(page,modality),route=[];
+  for(const [from,to]of [['article','sentence'],['sentence','word'],['word','kanji']]){
+    const step=await g6Move(page,{from,to,home,modality});route.push(step);assert(step.ok,JSON.stringify(step.observed));
+  }
+  await pageSettled(page);
+  await page.evaluate(g6CurrentThreadDOM,{op:'observe',scale:'part'});
+  let observed;
+  try{
+    const step=await g6Move(page,{from:'kanji',to:'part',home,modality});route.push(step);
+    await pageSettled(page);
+    await page.waitForFunction(()=>document.fonts.status==='loaded',null,{timeout:10000});
+    await page.evaluate(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))));
+  }finally{observed=await page.evaluate(g6CurrentThreadDOM,{op:'finish'});}
+  const part=await g6CurrentThreadGeometry(page),capture=resolve(evidence,`${engine}-G6-current-${width}-${world}-part.png`);
+  await page.screenshot({path:capture});
+  emit('current.context','actual requested width and palette with the retained nonzero source occurrence',part?.viewport.width===width&&part?.sheetWorld===world&&part?.stamp===home.stamp&&home.origin.scrollY>0,{width,world,part,origin:home.origin,capture});
+  emit('current.part-route','four native inward edges reach the actual source-backed part',route.length===4&&route.every(row=>row.ok)&&part?.scale==='part'&&part.currentNode===`radical:${G6_ORIGIN.part}`,route);
+  emit('current.part-contained','the whole part-current span is visible beside the wholly visible sticky outside control',part?.activeRails===1&&part?.currentCount===1&&part?.currentTag==='SPAN'&&part?.currentContained&&part?.outsideContained,{part,capture});
+  const mount=observed.mounts[0],unchanged=observed.mounts.length===1&&mount.sameLiveOwner&&mount.initial.currentNode===mount.settled.currentNode&&
+    JSON.stringify(mount.initial.offsets)===JSON.stringify(mount.settled.offsets)&&mount.initial.scrollTop===mount.settled.scrollTop&&
+    observed.retained.length>0&&observed.retained.every(row=>row.inert&&JSON.stringify(row.before)===JSON.stringify(row.after));
+  emit('current.part-scroll-only','first-layout correction leaves exact page/reader/sheet offsets and every retained inert rail unchanged',unchanged,observed);
+  const ancestor=await g6Bead(page,'article',modality);assert(ancestor.ok,JSON.stringify(ancestor.observed));
+  const returned=await g6Line(page,home);emit('current.return-line','native article bead returns the exact nonzero source line within4px',returned.ok,returned.observed);
+  const outward=[];
+  for(const [from,to]of [['article','shelf'],['shelf','sky']]){const row=await g6Move(page,{from,to,home,modality});outward.push(row);assert(row.ok,JSON.stringify(row.observed));}
+  const sky=await g6CurrentThreadGeometry(page);
+  emit('current.sky-contained','the genuine root-sky current is the fully visible disabled outside button',outward.every(row=>row.ok)&&sky?.scale==='sky'&&sky?.currentCount===1&&sky.currentIsOutside&&sky.currentTag==='BUTTON'&&sky.currentDisabled&&sky.currentContained&&sky.outsideContained,{sky,outward});
+  for(const [from,to]of [['sky','shelf'],['shelf','article']]){const row=await g6Move(page,{from,to,home,modality});assert(row.ok,JSON.stringify(row.observed));}
+  const skyReturn=await g6Line(page,home);emit('current.sky-return-line','root-sky detour preserves the same source and line within4px',skyReturn.ok,skyReturn.observed);
+  const after=g6Learning(await readAppRecord(page));emit('current.no-record-work','current-bead visibility and native journeys create no saved-card or grade work',JSON.stringify(home.learning)===JSON.stringify(after),{before:home.learning,after});
+}
+
 async function g6ThreadAncestors(page,{modality,emit}){
   const home=await g6OpenOrigin(page,modality);
   for(const scale of ['word','kanji','sentence','article','shelf']){
@@ -737,6 +817,8 @@ async function g6RecursiveThread(page,{modality,emit}){
   assert.equal(await page.locator('#sheet').getAttribute('data-node'),'word:過酷');
   const initial=await g6ScaleFacts(page),learning=g6Learning(await readAppRecord(page));
   for(const word of ['厳しい','過酷']){await g6Activate(page,page.locator(`#sheet button.sem-row[data-sem="${word}"]`),modality);await pageSettled(page);assert.equal(await page.locator('#sheet').getAttribute('data-node'),`word:${word}`);}
+  const recursiveCurrent=await g6CurrentThreadGeometry(page);
+  emit('recursive.current-visible','new recursive rail exposes its entire current span beside the sticky outside control',recursiveCurrent?.activeRails===1&&recursiveCurrent?.currentTag==='SPAN'&&recursiveCurrent?.currentContained&&recursiveCurrent?.outsideContained,recursiveCurrent);
   const nested=await g6ScaleFacts(page),nodes=g6CanonicalBeads(nested),initialNodes=g6CanonicalBeads(initial);
   const expected=[...initialNodes.map(g6BeadIdentity),{node:'word:厳しい',index:String(initialNodes.length)},{node:'word:過酷',index:String(initialNodes.length+1)}];
   emit('recursive.order','native reciprocal semantic doors retain all three ordered word occurrences',nodes.length===expected.length&&nodes.every((b,i)=>b.node===expected[i].node&&b.stackIndex===expected[i].index)&&nodes.at(-1).current&&nodes[0].node===nodes.at(-1).node,{initial,nested,expected});
@@ -1882,7 +1964,10 @@ async function runG6Suite(browser){
     }
     return result;
   };
-  if(!g6ControlsOnly){
+  if(!g6FramesOnly&&!g6ControlsOnly)for(const width of [320,390,430])for(const world of ['hokusai','sumi']){
+    await run(`current-thread.${width}.${world}`,['current.context','current.part-route','current.part-contained','current.part-scroll-only','current.return-line','current.sky-contained','current.sky-return-line','current.no-record-work'],(page,{emit})=>g6CurrentThreadVisible(page,{emit,width,world}),{viewport:{width,height:844},init:`localStorage.setItem('kairo-theme',${JSON.stringify(world)})`});
+  }
+  if(!g6ControlsOnly&&!g6ThreadCurrentOnly){
     for(const modality of ['touch','keyboard']){
       await run(`${modality}.edges`,g6WalkIds(G6_EDGES,true),(page,{emit})=>g6Walk(page,{modality,itinerary:G6_EDGES,emit,timing:true}));
       if(g6FramesOnly)continue;
@@ -1899,7 +1984,7 @@ async function runG6Suite(browser){
       }
       for(const modality of ['touch','keyboard']){
         await run(`${modality}.thread`,['bead.word','bead.kanji','bead.sentence','bead.article','bead.article.line','bead.shelf','bead.shelf.line','no-record-work'],(page,{emit})=>g6ThreadAncestors(page,{modality,emit}));
-        await run(`${modality}.recursion`,['recursive.order','recursive.ancestor','recursive.no-record-work'],(page,{emit})=>g6RecursiveThread(page,{modality,emit}));
+        await run(`${modality}.recursion`,['recursive.current-visible','recursive.order','recursive.ancestor','recursive.no-record-work'],(page,{emit})=>g6RecursiveThread(page,{modality,emit}));
         await run(`${modality}.replacement-source`,['source.replaced'],(page,{emit})=>g6ReplacementSource(page,{modality,emit}));
         for(const kind of ['navigate',engine==='webkit'?'key':'wheel']){
           const control={engine,id:`G6.${modality}.abandoned-${kind}`,edits:G6_RETURN_FRAME_FIXTURE.edits,served:[]};
@@ -1977,7 +2062,7 @@ async function runG6Suite(browser){
     }
   }
   writeFileSync(resolve(evidence,`g6-${engine}.json`),JSON.stringify({site,gitSha:identity.gitSha,artifactSha256:identity.artifactSha256,verifierSha256,browserVersion:browserVersions[engine],node:process.version,
-    scope:g6FramesOnly?'G6 twelve directed edges × touch/keyboard plus per-edge frames only':g6ControlsOnly?`G6 named controls ${G6_MUTANTS.filter(spec=>!spec.engines||spec.engines.includes(engine)).map(spec=>`${spec.id} × ${(spec.modalities||['touch','keyboard']).join('/')}`).join(', ')} with positives/restores only`:'G6 directed edges, forty-step walks, exact thread ancestry, return lifecycle, sky actual-handler/native Chromium gestures, native pending records and kept membership projection; controls only when requested',
+    scope:g6ThreadCurrentOnly?'G6 current-thread visibility: six width/palette native contexts only':g6FramesOnly?'G6 twelve directed edges × touch/keyboard plus per-edge frames only':g6ControlsOnly?`G6 named controls ${G6_MUTANTS.filter(spec=>!spec.engines||spec.engines.includes(engine)).map(spec=>`${spec.id} × ${(spec.modalities||['touch','keyboard']).join('/')}`).join(', ')} with positives/restores only`:'G6 directed edges, forty-step walks, exact thread ancestry, return lifecycle, sky actual-handler/native Chromium gestures, native pending records and kept membership projection; controls only when requested',
     limitations:['WebKit two-pointer witness uses synthetic PointerEvents and TouchEvents through actual handlers, not native iPhone zoom','Chromium native text pinch is trusted protocol input sampled after dispatch, not physical-phone evidence','Abandoned-return cases use one explicitly hashed served-byte scheduling seam; not untouched-candidate proof','Kept projection browser cases cover native membership revisions and retained saved identity; separate lifted-function tests cover conflicting seq/reading identities','Private sky dive routes remain covered by canonical Drift verifiers; these G6 gestures exercise surface scale admission','Lost-terminal cases create the lost owned pointer with one synthetic sky pointerdown whose terminal is deliberately omitted; recovery is proven only with trusted Chromium protocol TouchEvents, while WebKit cases prove only that untrusted lists, foreign terminals and a fresh mouse cannot release the drain','Interrupted-hold cases dispatch a synthetic window blur and a synthetic hidden visibility override, not an operating-system app switch','A lost mouse terminal is retired only by a later trusted event from that same mouse with no button down; a lost pen terminal stays draining until that pen pointer terminates','Star/level-rail cases reach near-rail geometry by native mouse pans; rail exclusion in the compact and saturated fallbacks is proven by lifted-function tests only'],results},null,2));
 }
 
@@ -3140,7 +3225,7 @@ try {
 
 function innerHeightOf(facts) { return facts?.inner?.height || 844; }
 
-writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: g6FramesOnly ? 'G6 twelve directed edges and frames only; draft scope limits in g6-<engine>.json' : g6ControlsOnly ? 'G6 controls with positives and restores only' : g6Only ? 'G6 core schedule only; no G1/G3 claim; draft scope limits in g6-<engine>.json' : skyOwnershipOnly ? `G3 controlled sky glyph hit ownership${withControls ? ' and its negative controls' : ''}; named 嘩/眩/貰 use fixture-only corpus/captions, actual product mount/hit code; no natural-input, G1 or frame claim` : skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : 'G1, G3 and G6 core (G6 scope limits in per-engine receipt)', rows, frames, controls, fixtures }, null, 1));
+writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: g6ThreadCurrentOnly ? 'G6 current-thread visibility: six width/palette native contexts only' : g6FramesOnly ? 'G6 twelve directed edges and frames only; draft scope limits in g6-<engine>.json' : g6ControlsOnly ? 'G6 controls with positives and restores only' : g6Only ? 'G6 core schedule only; no G1/G3 claim; draft scope limits in g6-<engine>.json' : skyOwnershipOnly ? `G3 controlled sky glyph hit ownership${withControls ? ' and its negative controls' : ''}; named 嘩/眩/貰 use fixture-only corpus/captions, actual product mount/hit code; no natural-input, G1 or frame claim` : skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : 'G1, G3 and G6 core (G6 scope limits in per-engine receipt)', rows, frames, controls, fixtures }, null, 1));
 const failed = rows.filter((row) => !row.ok);
 console.log(`\n${rows.length - failed.length}/${rows.length} — evidence ${evidence}`);
 process.exit(failed.length ? 1 : 0);
