@@ -26361,6 +26361,18 @@ function renderDepthBasis(sheet, node, reading = '') {
   return line;
 }
 
+/** Hfix-1B (L-1) · ONE count of a finished article's characters, read by Me's "characters read unaided" and its help line
+ * alike, so the card never says more were read unaided than were read: the first reading the help signal sealed (the
+ * article's own text, whitespace aside, as he first finished it); else the same count from its text, when the text is at
+ * hand; else, for an article finished before the help signal began and not yet loaded, the index's figure. null: no count. */
+function articleReadChars(articleId, record = S, p = null) {
+  const root = readHelpReadable(record.readHelp) ? record.readHelp : null;
+  const row = root && owns(root.articles, articleId) ? root.articles[articleId] : null;
+  if (row && owns(row, 'done') && finiteNumber(row.chars)) return row.chars;
+  const passage = p || D.passages?.find((entry) => entry.id === articleId) || null;
+  if (passage?.tokens?.length) return articleFingerprint(passage).chars;
+  return finiteNumber(passage?.chars) ? passage.chars : null;
+}
 /* ----- the help signal in Me (Fugu R4.1; Codex: a declared denominator): help per 1,000 characters of the first readings of
  * articles he finished that month — repeats and the same word asked twice count once — shown beside the month's exposure
  * and its average level. A signal, never proof; nothing before `since` is counted or estimated. */
@@ -26368,11 +26380,11 @@ function helpByMonth(record = S) {
   const root = readHelpReadable(record.readHelp) ? record.readHelp : null;
   if (!root) return null;
   const months = new Map();
-  for (const row of Object.values(root.articles)) {
+  for (const [articleId, row] of Object.entries(root.articles)) {
     if (!owns(row, 'done')) continue;
     const month = months.get(row.month) || { month: row.month, articles: 0, chars: 0, help: 0, levels: [], unlevelled: 0 };
     month.articles += 1;
-    month.chars += row.chars;
+    month.chars += articleReadChars(articleId, record);
     month.help += row.helped.length;
     if (row.level) month.levels.push(Number(row.level.slice(1)));
     else month.unlevelled += 1;
@@ -39324,10 +39336,17 @@ function meDays(decks) {
   for (const d of decks) for (const row of d.ledger?.log || []) if (Array.isArray(row)) mark(Date.parse(row[2]), 'cards');
   return { days, first: Number.isFinite(first) ? new Date(first) : null };
 }
-/** graft D's lead figure: characters of the articles you finished, less the words you tapped for help */
+/** graft D's lead figure: characters of the articles you finished, less the words you tapped for help. The characters
+ * are counted as the help line counts them (articleReadChars, Hfix-1B L-1), so unaided never exceeds read */
 function meReadUnaided() {
   const passages = D.passages || [];
-  const finished = passages.filter((p) => owns(S.readDone || {}, p.id) && finiteNumber(p.chars));
+  const counted = new Map();
+  for (const p of passages) {
+    if (!owns(S.readDone || {}, p.id)) continue;
+    const chars = articleReadChars(p.id, S, p);
+    if (finiteNumber(chars)) counted.set(p.id, chars);
+  }
+  const finished = passages.filter((p) => counted.has(p.id));
   if (!finished.length) return null;
   const ids = new Set(finished.map((p) => p.id));
   const looked = new Set();
@@ -39339,8 +39358,8 @@ function meReadUnaided() {
     looked.add(once);
     helped += [...row[2].replace(/^word:/, '')].length;
   }
-  const read = finished.reduce((sum, p) => sum + p.chars, 0);
-  return { n: Math.max(0, read - helped), articles: finished.length, looked: looked.size };
+  const read = finished.reduce((sum, p) => sum + counted.get(p.id), 0);
+  return { n: Math.max(0, read - helped), read, articles: finished.length, looked: looked.size };
 }
 function meHorizons(decks) {
   const rows = [];
