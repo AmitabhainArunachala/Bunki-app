@@ -509,7 +509,13 @@ const STEPS = {
     await page.evaluate(() => scrollTo(0, 0)); await eagerImages(page); await settle(page, 800);
   },
   async slip(page) {
-    await page.locator(`#reader .tok[aria-label="${WORD}"]`).first().tap();
+    // G3 · the word is found by its prose label (a word in a roving paragraph carries no aria-label until the keyboard
+    // selects it), and climbs its ladder: its reading in place, then the slip
+    const word = page.locator(`#reader .tok[data-prose-label="${WORD}"]`).first();
+    await word.tap();
+    const rung = await page.waitForFunction((el) => (document.getElementById('mini') ? 'stage' : el.dataset.ladderRung === 'reading' ? 'reading' : null),
+      await word.elementHandle(), { timeout: 8000 }).then((h) => h.jsonValue()).catch(() => null);
+    if (rung === 'reading') await word.tap();
     await page.locator('#mini .mini-word').waitFor({ timeout: 15000 });
     await settle(page, 1300);
   },

@@ -736,6 +736,9 @@ try {
       await page.waitForFunction(() => document.body.dataset.ready === '1');
       await page.locator('#kp-start').click();
       await page.locator('#kp-card .kp-sentence').waitFor();
+      // Q · the front is drawn twice: at once, then again with the back's word units once the deck's tokens arrive
+      // (upgradeFront replaces the sentence). Measure the front it settles on, never one being replaced
+      await page.waitForFunction(() => document.querySelector('#kp-card > .kp-sentence')?.dataset.words === 'tokens', null, { timeout: 15000 }).catch(() => {});
       const facts = await page.evaluate(() => {
         const card = document.getElementById('kp-card');
         return { card: card.dataset.card, text: card.querySelector('.kp-sentence')?.textContent,
@@ -1395,7 +1398,11 @@ try {
             to: "sentenceNodes(card, { front: true, blank: mode !== 'read', split: passage, taps: backTaps(card, word) || { units: [], onTap: (unit, node) => tapped({ word }, node, { card, where: 'p', depth: 1 }) } })" },
           { file: 'decks/player/mount.js', key: 'front-door-gate',
             from: '    taps = null; // the front has nothing to tap, whatever is asked',
-            to: '    /* G3 negative: retain the front tap cover */' }] },
+            to: '    /* G3 negative: retain the front tap cover */' },
+          // Q · the front is drawn again when the deck's tokens arrive (upgradeFront): the mutant keeps its cover there too
+          { file: 'decks/player/mount.js', key: 'front-tap-cover-upgrade',
+            from: "  const sentence = sentenceNodes(card, { front: true, blank: cardMode() !== 'read', split: !!card.type });",
+            to: "  const sentence = sentenceNodes(card, { front: true, blank: cardMode() !== 'read', split: !!card.type, taps: backTaps(card, ctx.index.cards.get(id).word) || { units: [], onTap: () => {} } });" }] },
         { id: 'glyph-z-dropped', run: 'G3-sky-ownership', probe: skyOwnershipProbe, kill: 'G3.sky-ownership.centre',
           witness: (row) => Object.values(row.observed).every((c) => c.centre === 'cover'),
           edits: [{ file: 'drift-layer.css', key: 'drop-glyph-z',

@@ -294,10 +294,17 @@ async function tap(page, fixture) {
   await page.mouse.click(x, y);
   await delay(150);
 }
-/** One real tap opens the popup; a second tap on the same word opens its full entry (1.3.0). */
+/** Real taps climb the word's ladder to its popup (G3: when readings show on touch and the word's own is hidden, the
+ * first tap raises the reading in place and the next opens the popup; a word read as written opens it at once); one tap
+ * more on the same word opens its full entry. */
 async function openPopup(page, fixture) {
   if (await page.locator('#mini .mini-word').count() && await page.locator('#mini .mini-word').textContent() === fixture.token.b) return;
   await tap(page, fixture);
+  const rung = await page.waitForFunction(({ index, word }) => {
+    if ([...document.querySelectorAll('#mini .mini-word')].some((n) => n.textContent.includes(word))) return 'stage';
+    return document.querySelector(`#reader .tok[data-index="${index}"]`)?.dataset.ladderRung === 'reading' ? 'reading' : null;
+  }, { index: fixture.index, word: fixture.token.b }, { timeout: 15_000 }).then((h) => h.jsonValue()).catch(() => null);
+  if (rung === 'reading') await tap(page, fixture);
   await page.locator('#mini .mini-word').filter({ hasText: fixture.token.b }).waitFor();
 }
 async function fullEntry(page, fixture) {
@@ -515,7 +522,7 @@ async function coreRun(open, rec) {
     await openArticle(page, CORE.passage);
     await openPopup(page, CORE);
     const token = await tokenState(page, CORE);
-    once('G1.popup', `G1 ${at(CORE)}: one tap preserves the word, reveals its ruby, and leaves meaning in the popup`,
+    once('G1.popup', `G1 ${at(CORE)}: its taps (the ladder's reading, then its popup) preserve the word, reveal its ruby, and leave meaning in the popup`,
       token?.surface === CORE.token.s && token.visibleRuby === CORE_ENTRY.ruby && token.lines === 0 && !token.hasEn
         && token.label === `${CORE.token.s} · ${WORD.bi} · ${CORE_ENTRY.reading} · ${HINT.bi}`,
       JSON.stringify(token), { token });
@@ -714,7 +721,8 @@ async function captureRun(open, rec) {
   await block(rec, ['G7.bar.none'], async (once) => {
     const page = await (await open()).newPage();
     await openArticle(page, CORE.passage);
-    await tap(page, CORE);
+    // G3 · touched: the ladder's taps up to its popup
+    await openPopup(page, CORE);
     await page.waitForSelector('#mini #mini-take');
     const bar = (await captureState(page)).bar;
     once('G7.bar.none', `G7 with ${CORE.token.s} touched, the bar carries the one Save naming it and no panel: three doors (the mini's, the page bar's, the reader bar's)`,
@@ -1022,7 +1030,8 @@ try {
         JSON.stringify(after), { id: `G2.${lang}.escape` });
       // L · the same run, a kanji word: its popup keeps the reading line (厳しい read きびしい), so hiding every reading
       // cannot pass G2
-      await tap(page, CORE);
+      // G3 · the kanji word's ladder: its reading in place, then its popup
+      await openPopup(page, CORE);
       const kanji = await miniState(page);
       check(`G2 ${lang}: in the same article a kanji word's popup keeps its reading line (${CORE.token.s} ${CORE.token.r})`,
         kanji?.word === CORE.token.b && kanji.reading === CORE.token.r, JSON.stringify(kanji), { id: `G2.${lang}.kanji-reading` });

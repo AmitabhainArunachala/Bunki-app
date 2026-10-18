@@ -665,6 +665,16 @@ try {
           await page.touchscreen.tap(box.x + box.width / 2, box.y + Math.min(box.height / 2, 30));
           await settle(450);
         };
+        // G3 · a tap climbs the word's ladder: when readings show on touch and the word's own is hidden, the first tap
+        // raises its reading in place and the next opens its card. A place that needs the card taps until it stands, never
+        // past it. A reader word is found by its prose label (a word in a roving paragraph carries no aria-label of its own
+        // until the keyboard selects it)
+        const climbAt = async (doTap) => {
+          await doTap();
+          const rung = await page.waitForFunction(() => (document.getElementById('mini') ? 'stage'
+            : document.querySelector('[data-ladder-rung="reading"]') ? 'reading' : null), null, { timeout: 6000 }).then((h) => h.jsonValue()).catch(() => null);
+          if (rung === 'reading') await doTap();
+        };
         let shotN = 0;
         const room = async (id, act, extra = null) => {
           const label = `${engine} ${lang} · ${id}`;
@@ -743,7 +753,7 @@ try {
           return { barKeep: keep ? { text: keep.textContent.replace(/\s+/gu, ' ').trim(), one: keep.matches('button.save-one[data-save-one]'), shown: !!keep.getClientRects().length } : null };
         }));
         const word = '総理';
-        await room('reader-card', async () => { await tap(`#reader .tok[aria-label="${word}"]`); await page.locator('#mini').waitFor(); await settle(500); }, () => page.evaluate(() => {
+        await room('reader-card', async () => { await climbAt(() => tap(`#reader .tok[data-prose-label="${word}"]`)); await page.locator('#mini').waitFor(); await settle(500); }, () => page.evaluate(() => {
           const keep = document.getElementById('chrome-keep');
           return { barKeep: keep ? { text: keep.textContent.replace(/\s+/gu, ' ').trim(), aria: keep.getAttribute('aria-label') || '', one: keep.matches('button.save-one[data-save-one]') } : null };
         }));
@@ -759,7 +769,7 @@ try {
         await room('reader-card-menu', async () => {
           await page.evaluate(() => window.__SWEEP__.closeLayers());
           await page.evaluate(() => window.__SWEEP__.reader('スタートアップ')); await settle(900);
-          await tap(`#reader .tok[aria-label="${word}"]`); await page.locator('#mini-take').waitFor(); await settle(400);
+          await climbAt(() => tap(`#reader .tok[data-prose-label="${word}"]`)); await page.locator('#mini-take').waitFor(); await settle(400);
           await tap('#mini-take'); await settle(700);
         });
         await page.evaluate(() => window.__SWEEP__.closeLayers());
@@ -782,8 +792,7 @@ try {
           todayLine);
         await room('today-star-card', async () => {
           const star = page.locator('.today-star:not([hidden])').first();
-          const b = await star.boundingBox();
-          await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2);
+          await climbAt(async () => { const b = await star.boundingBox(); await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2); await settle(450); });
           await page.locator('#mini[data-from="sky"]').waitFor(); await settle(500);
         });
         await room('universe', async () => { await page.evaluate(() => { window.__SWEEP__.closeLayers(); window.__SWEEP__.visit('drift'); }); await settle(1400); });
@@ -899,20 +908,20 @@ try {
           };
           await menu('the reader card', '#mini', async () => {
             await story(0);
-            await tap('#reader .tok[aria-label="出席"]');
+            await climbAt(() => tap('#reader .tok[data-prose-label="出席"]'));
             await page.locator('#mini-take').waitFor();
             await settle(400);
           }, '#mini-take');
           await menu("the reader's bar", null, async () => {
             await story(260);
-            await tap('#reader .tok[aria-label="官邸"]');
+            await climbAt(() => tap('#reader .tok[data-prose-label="官邸"]'));
             await page.locator('#mini').waitFor();
             await page.keyboard.press('Escape');
             await settle(400);
           }, '#chrome-keep');
           const wordPage = async () => {
             await story(0);
-            await tap('#reader .tok[aria-label="大臣"]');
+            await climbAt(() => tap('#reader .tok[data-prose-label="大臣"]'));
             await page.locator('#mini button.mini-word').waitFor();
             await tap('#mini button.mini-word');
             await page.locator('#sheet .sheet-bar').waitFor();
@@ -933,8 +942,7 @@ try {
             await page.evaluate(() => { window.__SWEEP__.closeLayers(); window.__SWEEP__.visit('tray'); });
             await settle(1100);
             const star = page.locator('.today-star:not([hidden])').first();
-            const b = await star.boundingBox();
-            await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2);
+            await climbAt(async () => { const b = await star.boundingBox(); await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2); await settle(450); });
             await page.locator('#mini[data-from="sky"] #mini-take').waitFor();
             await settle(500);
           }, '#mini[data-from="sky"] #mini-take');

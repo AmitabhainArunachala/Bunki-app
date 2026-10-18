@@ -756,7 +756,15 @@ const CASES = {
       // a word in Kore's line: the slip opens, the look-up counts under the conversation, the top bar names it
       const koreWord = page.locator('.speak-line[data-who="kore"] .speak-text button.sentence-tok').first();
       const b = await koreWord.getAttribute('data-speak-b');
-      await koreWord.click();
+      // G3 · a word climbs its ladder: when readings show on touch and the word's own is hidden, the first tap raises its
+      // reading in place and the next opens the slip
+      const climb = async (word) => {
+        await word.click();
+        const rung = await page.waitForFunction((el) => (document.getElementById('mini') ? 'stage' : el.dataset.ladderRung === 'reading' ? 'reading' : null),
+          await word.elementHandle(), { timeout: 8000 }).then((h) => h.jsonValue()).catch(() => null);
+        if (rung === 'reading') await word.click();
+      };
+      await climb(koreWord);
       await page.waitForSelector('#mini', { timeout: 8000 });
       await page.waitForTimeout(400);
       const keep = await page.evaluate(() => window.__SPEAK_TEST__.keepWord());
@@ -779,7 +787,7 @@ const CASES = {
       // G3 · a lookup word is a span in a roving paragraph now, not a button; the door is the same word
       const myWord = page.locator('.speak-line[data-who="me"] .speak-text .japanese-lookup-word').first();
       const mine = await myWord.getAttribute('data-speak-b');
-      await myWord.click();
+      await climb(myWord);
       await page.waitForSelector('#mini', { timeout: 8000 });
       await page.waitForTimeout(300);
       const afterMine = await T(page).record();

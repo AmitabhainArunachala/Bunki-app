@@ -191,6 +191,9 @@ async function session(browser, width, lang, { reduced = true, query = 'entry=sh
     await route.fulfill({ response: r, body: (await r.text()) + BRIDGE });
   });
   await context.addInitScript(INSTRUMENTS);
+  // G3 · the ladder's first-use demonstration is its own behaviour (verify-word-grammar's G3.demo rows): seen here, as
+  // G3's verifiers set it, so a tap is a tap
+  await context.addInitScript(() => { try { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); } catch { /* private */ } });
   if (NEG_CSS[NEGATIVE]) await context.addInitScript((css) => { document.addEventListener('DOMContentLoaded', () => { const s = document.createElement('style'); s.textContent = css; document.head.append(s); }); }, NEG_CSS[NEGATIVE]);
   const page = await context.newPage();
   page.setDefaultTimeout(30_000);
@@ -205,6 +208,14 @@ const settle = async (page, ms = 500) => {
   await page.waitForFunction(() => document.getAnimations().filter((a) => a.playState === 'running' && a.effect?.getTiming?.().iterations !== Infinity).length === 0, null, { timeout: 4000 }).catch(() => {});
 };
 const run = (page, src) => page.evaluate((s) => window.__COMB__.run(s), src);
+// G3 · a tap climbs the word's ladder: the reading in place (readings shown on touch, the word's own hidden), then the
+// stage (the slip). A check that needs the slip taps until it stands: the reading rung, then once more, never past it
+async function climbToSlip(page, tok) {
+  await tok.click();
+  const rung = await page.waitForFunction((el) => (document.getElementById('mini') ? 'stage' : el.dataset.ladderRung === 'reading' ? 'reading' : null),
+    await tok.elementHandle(), { timeout: 8000 }).then((h) => h.jsonValue()).catch(() => null);
+  if (rung === 'reading') await tok.click();
+}
 
 // a negative control must find the lines it puts back, or it proves nothing: checked on the staged site before any page
 for (const [file, from] of NEG_SOURCE_CHECK()) {
@@ -258,7 +269,7 @@ try {
             if (index !== null) {
               const tok = page.locator(`#reader .tok[data-index="${index}"]`).first();
               await tok.scrollIntoViewIfNeeded();
-              await tok.click();
+              await climbToSlip(page, tok);
               await page.locator('#mini').waitFor().catch(() => {});
               word = await page.evaluate((i) => window.__COMB__.run(`readingToken(passage().tokens[${i}]).b`), index);
               await page.keyboard.press('Escape');
@@ -543,7 +554,7 @@ try {
               await page.evaluate(() => window.__COMB__.run('removeMini()'));
               const tok = page.locator(`#reader .tok[data-index="${index}"]`).first();
               await tok.scrollIntoViewIfNeeded();
-              await tok.click();
+              await climbToSlip(page, tok);
               await page.locator('#mini').waitFor();
               await settle(page, 500);
               gaps.push(await page.evaluate((i) => {
@@ -583,7 +594,7 @@ try {
               return { bad, noisy, so: mainParts('総').join('+') };
             })()`);
             await page.evaluate((x) => window.__COMB__.open(x), STARTUP);
-            await page.locator('#reader .tok[data-index="9"]').click();
+            await climbToSlip(page, page.locator('#reader .tok[data-index="9"]').first());
             await page.locator('#mini .mini-kanji-row').first().waitFor();
             const row = await page.evaluate(() => [...document.querySelectorAll('#mini .mini-kanji-row[data-kanji="総"] .mini-kanji-part')].map((n) => n.textContent).join('+'));
             check(`G4 · ${tag} · each kanji's parts shown once, at their own level, named plainly (総 = 糸 + 忩 on the card)`,
