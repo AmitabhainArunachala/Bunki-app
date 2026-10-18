@@ -4911,6 +4911,12 @@ body:not(.zen) #app > .chrome {
 @media (max-width: 520px) {
   html[data-room='deckplay'] [data-bar='deck'], [data-bar='guided'] { margin-inline: -18px; padding-inline: 10px; }
 }
+/* while a question is open the room's main keeps another gutter (the attempt block below): none above a phone, where its
+   paper is the column, and --s2 on a phone. The bar takes back exactly that much, never more (it ran 2 px off a 390 screen) */
+html[data-register='attempt'] [data-bar='guided'] { margin-inline: 0; padding-inline: 0; }
+@media (max-width: 520px) {
+  html[data-register='attempt'] [data-bar='guided'] { margin-inline: calc(-1 * var(--s2)); padding-inline: calc(var(--s2) - 8px); }
+}
 /* G1 · the page's bar is the top of the screen: it carries the safe area as the room's chrome does, and on a wide window
    its doors stand over the page's measure */
 #sheet > .sheet-bar[data-bar] {
