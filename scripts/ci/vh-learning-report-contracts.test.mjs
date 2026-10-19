@@ -83,27 +83,25 @@ function reader() {
           }),
         );
     if (name.startsWith('inline-english-')) set(spec.kills[0], { glosses: ['VH_INLINE_ENGLISH'] });
+    if (name === 'inline-english-named-d4') {
+      set('D4.tap-shows', {view:{gloss:'VH_INLINE_ENGLISH'}});
+      set('D4.own-english', {glosses:['VH_INLINE_ENGLISH','valley','valley']});
+    }
     if (name === 'g3-stalled') set(spec.kills[0], { popup: null });
-    if (name === 'g3-kept-reading')
+    if (name === 'g3-kept-reading') for (const kill of spec.kills)
       set(
-        spec.kills[0],
+        kill,
         Array.from({ length: 3 }, () => ({ visibleRuby: 'たにがわ' })),
       );
-    if (name === 'g3-off-ruby') set(spec.kills[0], Array(3).fill('たにがわ'));
+    if (name === 'g3-off-hidden') {
+      set('D2.f0.visible-reading', Array(3).fill(''));
+      set('D2.f0.english-rung', {englishes: Array.from({length:3},()=>({visibleRuby:''}))});
+    }
     if (name === 'm8') for (const id of spec.kills) set(id, { mini: null });
-    if (name === 'r1') {
-      set('D2.f1.visible-reading', Array(3).fill('たにかわ'));
-      for (const f of [1, 0])
-        set(
-          `D2.f${f}.popup-reading`,
-          Array.from({ length: 3 }, () => ({ reading: 'たにかわ' })),
-        );
-      set(
-        'D2.f1.accessible-reading',
-        Array.from({ length: 3 }, () => ({
-          description: 'たにかわ · Enter: next word layer · Shift+F10: save and more',
-        })),
-      );
+    if (name === 'r1') for (const f of [1,0]) {
+      set(`D2.f${f}.visible-reading`, Array(3).fill('たにかわ'));
+      set(`D2.f${f}.popup-reading`, Array.from({length:3},()=>({reading:'たにかわ'})));
+      set(`D2.f${f}.accessible-reading`, Array.from({length:3},()=>({description:'たにかわ · Enter: next word layer · Shift+F10: save and more'})));
     }
     const mutation = served(
       spec.key,
@@ -1014,5 +1012,37 @@ test('record served base and candidate/restore page loads are bound to the teste
     const r = record();
     mutate(r);
     assert.equal(judgeRecord(r).passed, false, label);
+  }
+});
+
+test('Ladder reader schedule retains all three rungs, off reading and independent VH Escape rows', () => {
+  assert.equal(READER_CASES.length,102);
+  assert.equal(Object.keys(READER_CONTROLS).length,11);
+  assert.equal(READER_RUN_ROWS.d2.length,26);
+  assert.equal(READER_RUN_ROWS.d4.length,11);
+  for (const f of [1,0]) for (const suffix of ['english-rung','reading-no-english','popup-focus-premise','focus-returns','popup-absent'])
+    assert.ok(READER_RUN_ROWS.d2.includes(`D2.f${f}.${suffix}`));
+  for (const id of ['D4.A-english','D4.second-tap-english','D4.third-tap-stage','D4.own-english']) assert.ok(READER_RUN_ROWS.d4.includes(id));
+});
+test('Ladder controls reject vacuous/wrong witnesses, missing off kills, or unrelated mutant reds', () => {
+  const adapter=learningReportContracts['reader-doors'];
+  const control=(x,n)=>x.controls.find(c=>c.name===n);
+  const row=(x,n,id)=>control(x,n).rows.find(r=>r.id===id);
+  for(const mutate of [
+    x=>{row(x,'inline-english-content','D4.A-english').observed.glosses=['this'];},
+    x=>{row(x,'inline-english-named-d4','D4.tap-shows').observed.view.gloss=null;},
+    x=>{row(x,'inline-english-named-d4','D4.own-english').observed.glosses=[null,'valley','valley'];},
+    x=>{row(x,'g3-stalled','D4.third-tap-stage').observed.popup={word:'谷川'};},
+    x=>{row(x,'g3-kept-reading','D2.f0.bare-after-fold').observed=[];},
+    x=>{row(x,'g3-off-hidden','D2.f0.english-rung').observed.englishes=[];},
+    x=>{row(x,'g3-off-hidden','D2.f0.accessible-reading').pass=true;},
+    x=>{row(x,'r1','D2.f0.visible-reading').observed=['たにがわ','たにがわ','たにがわ'];},
+    x=>{row(x,'r1','D2.f0.accessible-reading').observed=[];},
+    x=>{row(x,'r1','D2.f0.popup-reading').pass=true;},
+    x=>{row(x,'r1','D2.f1.no-navigation').pass=false;},
+  ]) {const bad=reader();mutate(bad);assert.equal(adapter.validate(bad,context).passed,false);}
+  for(const optional of [[],['D2.f1.english-rung'],['D2.f0.english-rung'],['D2.f1.english-rung','D2.f0.english-rung']]) {
+    const valid=reader();for(const id of optional)row(valid,'r1',id).pass=false;
+    assert.deepEqual(adapter.validate(valid,context).errors,[]);
   }
 });

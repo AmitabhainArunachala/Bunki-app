@@ -374,6 +374,22 @@ async function focusToken(page, index) {
   assert.equal(await page.evaluate(() => document.activeElement?.dataset.index), String(index), 'paragraph rover selected the wrong word');
 }
 
+/** Ladder (John, 10-19, a spec change): a word's box by its own ladder — its reading where that is not up, then its English
+ * under it, then the box — each press only once the rung before it is seen, never a blind extra. Whether the box came. */
+async function climbToBox(page, locator, press = () => locator.click()) {
+  const node = await locator.elementHandle();
+  try {
+    let last = await locator.getAttribute('data-ladder-rung');
+    for (let step = 0; step < 3 && !(await page.locator('#mini').count()); step += 1) {
+      await press();
+      last = await page.waitForFunction(([n, was]) => (document.getElementById('mini') ? 'stage'
+        : ['reading', 'gloss'].includes(n?.dataset.ladderRung) && n.dataset.ladderRung !== was ? n.dataset.ladderRung : null),
+      [node, last], { timeout: 10000 }).then((handle) => handle.jsonValue(), () => null);
+      if (!last) break;
+    }
+  } finally { await node?.dispose(); }
+  return (await page.locator('#mini').count()) > 0;
+}
 async function tapToken(page, index, { scroll = true } = {}) {
   const tok = page.locator(`#reader .tok[data-index="${index}"]`);
   if (scroll) await tok.evaluate((node) => node.scrollIntoView({ block: 'center' }));
@@ -384,16 +400,39 @@ async function tapToken(page, index, { scroll = true } = {}) {
   const activated = await tok.elementHandle();
   try {
     await page.waitForFunction((node) => node?.isConnected &&
-      (node.dataset.ladderRung === 'reading' ||
+      (node.dataset.ladderRung === 'reading' || node.dataset.ladderRung === 'gloss' ||
         (node.dataset.ladderRung === 'stage' && !!document.querySelector('#mini'))), activated, { timeout: 5000 });
   } finally { await activated?.dispose(); }
   if (!await page.locator('#mini').count()) {
-    const revealed = await tok.evaluate((node) => node.dataset.ladderRung === 'reading');
-    assert(revealed, `token ${index}: first activation produced neither the reading rung nor a stage`);
-    await tok.click();
+    const revealed = await tok.evaluate((node) => node.dataset.ladderRung === 'reading' || node.dataset.ladderRung === 'gloss');
+    assert(revealed, `token ${index}: first activation produced neither the reading rung, the English rung nor a stage`);
+    // Ladder (John, 10-19): after the reading comes the English under the word, then the stage — each click only once the
+    // rung before it is seen, never a blind retry
+    if (await tok.evaluate((node) => node.dataset.ladderRung === 'reading')) {
+      await tok.click();
+      await page.waitForFunction((node) => node?.isConnected && (node.dataset.ladderRung === 'gloss' || !!document.querySelector('#mini')),
+        await tok.elementHandle(), { timeout: 5000 });
+    }
+    if (!await page.locator('#mini').count()) {
+      assert(await tok.evaluate((node) => node.dataset.ladderRung === 'gloss'), `token ${index}: the English rung did not follow the reading`);
+      await tok.click();
+    }
     await page.waitForSelector('#mini');
     await page.waitForTimeout(250);
   }
+}
+
+/** Ladder · a tap where the control stands on the glass, once it holds still (two frames alike): a finger's tap, which never
+ * scrolls the page to its target first. */
+async function tapWhereItStands(page, selector) {
+  await page.locator(selector).waitFor();
+  const at = await page.locator(selector).evaluate((node) => new Promise((done) => {
+    let last = null;
+    const tick = () => { const r = node.getBoundingClientRect(), now = `${r.x}|${r.y}|${r.width}|${r.height}`;
+      if (now === last) done({ x: r.x + r.width / 2, y: r.y + r.height / 2 }); else { last = now; requestAnimationFrame(tick); } };
+    requestAnimationFrame(tick);
+  }));
+  await page.mouse.click(at.x, at.y);
 }
 
 /** The popup's painted box and which of its views is open. */
@@ -897,7 +936,8 @@ try {
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
       await run(`W1-damascus-can-be-saved-${label}`, viewport, async (page) => {
         await openArticle(page, ARTICLE);
-        await page.locator('#reader .tok[data-index="0"]').click();
+        // Ladder (John, 10-19, a spec change): a kana word's first tap sets its English under it, the next opens its box
+        await climbToBox(page, page.locator('#reader .tok[data-index="0"]'));
         await page.waitForSelector('#mini #mini-take');
         const probe = await page.evaluate(() => {
           const seal = document.querySelector('#mini #mini-take');
@@ -923,7 +963,8 @@ try {
 
     // the popup's one-tap Save; then 全項目 from the same popup
     const saveFromQuickLook = async (page) => {
-      await page.locator('#reader .tok[data-index="0"]').click();
+      // Ladder (John, 10-19, a spec change): the kana word's English first, then its box
+      await climbToBox(page, page.locator('#reader .tok[data-index="0"]'));
       await page.waitForSelector('#mini #mini-take:not([disabled])');
       await page.locator('#mini #mini-take').click();
       await page.waitForFunction(() => document.querySelector('#mini #mini-take')?.getAttribute('aria-pressed') === 'true', null, { timeout: 5_000 });
@@ -948,7 +989,8 @@ try {
     // 全項目 first, then the quick look (a fresh context: a fresh record)
     await run('W2-one-word-one-card-reverse', DESK, async (page) => {
       await openArticle(page, ARTICLE);
-      await page.locator('#reader .tok[data-index="0"]').click();
+      // Ladder (John, 10-19, a spec change): the kana word's English first, then its box
+      await climbToBox(page, page.locator('#reader .tok[data-index="0"]'));
       await page.waitForSelector('#mini button.mini-word');
       await page.locator('#mini button.mini-word').click();
       await page.waitForSelector('#sheet #sheet-take:not([disabled])');
@@ -978,7 +1020,8 @@ try {
           filled: getComputedStyle(take).backgroundColor !== 'rgba(0, 0, 0, 0)' && getComputedStyle(take).backgroundColor !== 'transparent' },
         door: door && { name: door.getAttribute('aria-label'), chevron: getComputedStyle(head, '::after').content !== 'none', entryButton: !!mini.querySelector('.mini-entry') },
         inside: box.left >= 0 && box.top >= 0 && box.right <= innerWidth && box.bottom <= innerHeight,
-        underWord: document.querySelectorAll('#reader .tok-en').length };
+        underWord: document.querySelectorAll('#reader .tok-en').length,
+        underAt: [...document.querySelectorAll('#reader .tok-en')].map((row) => row.closest('.tok')?.dataset.index ?? null) };
     });
     const cardsFor = (record, id) => record.taken.filter((t) => t.t === 'word' && t.id === id);
     for (const [label, viewport] of [['1368', DESK], ['390', PHONE]]) {
@@ -994,7 +1037,10 @@ try {
         assert.deepEqual([one.word, one.reading, one.gloss], ['郊外', 'こうがい', 'suburb'], `the stage does not show the word, reading and meaning: ${JSON.stringify(one)}`);
         assert(one.save?.label === 'Save' && !one.save.disabled && one.save.filled, `no filled Save: ${JSON.stringify(one.save)}`);
         assert(one.door?.name === 'Open the full entry' && one.door.chevron && !one.door.entryButton, `the band is not the door into the full entry: ${JSON.stringify(one.door)}`);
-        assert(one.inside && one.underWord === 0, `the popup is off screen, or English was written under the word: ${JSON.stringify(one)}`);
+        // Ladder (John, 10-19, a spec change): "nothing written under the word" becomes: the word's own English, which its
+        // second tap set, stays under it while its box stands, and no other word has one
+        assert(one.inside && one.underWord === 1 && one.underAt[0] === String(SUBURB),
+          `the popup is off screen, or English other than the word's own was written under a word: ${JSON.stringify(one)}`);
         await tapToken(page, 2);
         const moved = await page.evaluate(() => ({ count: document.querySelectorAll('#mini').length, word: document.querySelector('#mini .mini-word')?.textContent }));
         const third = await page.evaluate(() => document.querySelector('#reader .tok[data-index="2"] .tok-word')?.textContent.replace(/\s/gu, ''));
@@ -1103,6 +1149,10 @@ try {
       await page.keyboard.press('Enter');
       const reveal = await word.evaluate((node) => node.dataset.ladderRung === 'reading');
       assert(reveal && await page.locator('#mini').count() === 0, 'first Enter did not stop at the reading rung');
+      // Ladder (John, 10-19): the second Enter sets the English under the word; the third opens the popup
+      await page.keyboard.press('Enter');
+      const english = await word.evaluate((node) => node.dataset.ladderRung === 'gloss' && !!node.querySelector(':scope > .tok-en'));
+      assert(english && await page.locator('#mini').count() === 0, 'second Enter did not stop at the English rung');
       await page.keyboard.press('Enter');
       await page.waitForSelector('#mini');
       const popup = await page.evaluate(() => document.activeElement?.id);
@@ -1189,7 +1239,8 @@ try {
       const tokens = page.locator('#sheet .example .sentence-tok');
       for (let i = 0, n = Math.min(await tokens.count(), 30); i < n && !before; i += 1) {
         await tokens.nth(i).scrollIntoViewIfNeeded();
-        await tokens.nth(i).click();
+        // Ladder (John, 10-19, a spec change): a sentence word's box is its third rung (its reading, its English, the box)
+        await climbToBox(page, tokens.nth(i));
         await page.waitForTimeout(250);
         const seen = await path();
         if (seen.hasMenu && seen.held === false && seen.pressed === 'false') before = seen;
@@ -1366,6 +1417,13 @@ try {
         const word = await box();
         if (word.clipped && word.side === 'above') assert(Math.abs(word.top - word.chromeBottom) <= 1,
           'A clipped word card must meet the chrome edge, leaving no strip of cut title glyphs');
+        // Ladder · D7 (the lead's ruling, 10-19): on a short glass the word's box may glide the text to make room for its kanji
+        // rows as it opens (smoothly, unless motion is reduced); that is the box's own seat, so the article's place is read
+        // once the text stands still, and opening the sentence must not move it from there
+        await page.evaluate(() => new Promise((done) => { let last = scrollY, still = 0, frames = 0;
+          const tick = () => { frames += 1; if (scrollY === last) still += 1; else { still = 0; last = scrollY; }
+            if (still >= 6 || frames > 300) done(); else requestAnimationFrame(tick); };
+          requestAnimationFrame(tick); }));
         const beforeScroll = await page.evaluate(() => scrollY);
         await page.locator('#mini #mini-sentence-open').click();
         await page.waitForTimeout(200); // ResizeObserver has placed the settled sentence view.
@@ -1441,8 +1499,11 @@ try {
           await page.waitForTimeout(400); // the card has finished rising
           const left = await popupSeat(page);
           assert.equal(left.word, text, `token ${index} of the fixture article`);
-          await page.locator('#mini #mini-sentence-open').click();
-          await page.locator('#mini #reader-sentence-practice').click();
+          // Ladder (the lead's ruling (c), 10-19: the box rides in the text's layer): the doors are tapped where they stand,
+          // as a finger does. Playwright's click first scrolls its target into view; with the box in the text layer that
+          // scroll moves the article (to 413 px here, then the practice view starts at 0), which no finger's tap does
+          await tapWhereItStands(page, '#mini #mini-sentence-open');
+          await tapWhereItStands(page, '#mini #reader-sentence-practice');
           await page.waitForFunction(() => document.body.dataset.view === 'sentence-practice');
           await page.locator('#sentence-practice-back').click();
           await page.waitForFunction(() => document.body.dataset.view === 'reader');
@@ -1473,6 +1534,13 @@ try {
         const point = (selector) => page.locator(selector).evaluate((node) => { const r = node.getClientRects()[0]; return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
         const tok = await point('#reader .tok[data-index="12"]');
         await page.mouse.click(tok.x, tok.y);
+        // Ladder (John, 10-19, a spec change): その (kana) shows its English under it first; the next tap, taken only once that
+        // rung is seen, opens its box, and its sentence is opened while the card still rises
+        await page.waitForFunction(() => document.querySelector('#reader .tok[data-index="12"]')?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'));
+        if (!(await page.locator('#mini').count())) {
+          const again = await point('#reader .tok[data-index="12"] .tok-word');
+          await page.mouse.click(again.x, again.y);
+        }
         const door = await point('#mini #mini-sentence-open');
         await page.mouse.click(door.x, door.y);
         await page.waitForFunction(() => document.querySelector('#mini .mini-sentence-pane')?.hidden === false);

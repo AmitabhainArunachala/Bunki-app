@@ -72,11 +72,14 @@ window.__H1A__ = {
 const CONTROL = {
   // the base's cut: the room's height, wherever it falls across a row
   stage: { item: '1.', source: [
-    ['corridor.js', 'const fit = rowCut(card, Math.max(roomAbove, roomBelow, 96));', 'const fit = Math.max(roomAbove, roomBelow, 96);'],
+    // Ladder: the cut takes its room from the word's rooms after any glide (above/below), and floors at 1 px, not 96.
+    // Ladder R2: a compact card's cut leaves its fade on paper (fadeCut), any other card's is rowCut's; the base's is the room
+    ['corridor.js', "const fit = (card.classList.contains('is-compact') ? fadeCut(card, room) : null) ?? rowCut(card, room);", 'const fit = room;'],
   ] },
   'stage-fade': { item: '1.', css: "#mini[data-more='true']::after { content: none !important; }" },
   // a seat that scrolls the reading (the defect the round-1 capture found: every writing ended before its first stroke)
-  'ink-seat': { item: '1.ink', source: [['corridor.js', '  card.style.top = `${top}px`;\n', "  card.style.top = `${top}px`;\n  if (card.id === 'mini' && !card.dataset.inkSeat) { card.dataset.inkSeat = '1'; window.scrollBy({ top: 40, behavior: 'instant' }); }\n"]] },
+  // Ladder: placeFloating seats a word's card in the text's layer (top + oy); travelSlip's own `${top}px` line is a page's
+  'ink-seat': { item: '1.ink', source: [['corridor.js', '  card.style.top = `${top + oy}px`;\n', "  card.style.top = `${top + oy}px`;\n  if (card.id === 'mini' && !card.dataset.inkSeat) { card.dataset.inkSeat = '1'; window.scrollBy({ top: 40, behavior: 'instant' }); }\n"]] },
   layers: { item: '2.', source: [['corridor.js', 'dockLayersMark(mark, block, null, () => layersOnGlass(block));', 'void layersOnGlass;']] },
   'one-save': { item: '4.', source: [['corridor.js', 'function paintKeepAside(button) {', 'function paintKeepAside(button) { return;']] },
   'speak-bar': { item: '5.', source: [['corridor.js', "  if (S.view === 'reader' && passage()) chrome.append(chromeKeep());",
@@ -156,15 +159,22 @@ async function openStory(page) {
   await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 20_000 });
   await settle(page, 700);
 }
-// G3 · tap 1 raises the reading, tap 2 brings the stage; the stage's ink and its sense settle before it is measured
+/** The rung a tap has left the word on: 'stage' once a card stands, else the first of `rungs` the word is on; null when it
+ * moved to neither within 8 s (the climb then stops there: never a blind tap). */
+const climbed = async (page, tok, rungs) => page.waitForFunction(([el, rungs]) => (document.getElementById('mini') ? 'stage'
+  : rungs.includes(el.dataset.ladderRung) ? el.dataset.ladderRung : null), [await tok.elementHandle(), rungs], { timeout: 8000 })
+  .then((h) => h.jsonValue()).catch(() => null);
+// G3 · tap 1 raises the reading; Ladder (John, 10-19): tap 2 sets the English under the word and tap 3 brings the stage,
+// each tap taken only once the rung before it is seen (a word whose reading is already up starts at the English). The
+// stage's ink and its sense settle before it is measured
 async function stage(page, sel = WORD_SEL) {
   const tok = page.locator(sel).first();
   await tok.scrollIntoViewIfNeeded();
   await delay(200);
   await tok.tap();
-  const rung = await page.waitForFunction((el) => (document.getElementById('mini') ? 'stage' : el.dataset.ladderRung === 'reading' ? 'reading' : null),
-    await tok.elementHandle(), { timeout: 8000 }).then((h) => h.jsonValue()).catch(() => null);
-  if (rung === 'reading') await tok.tap();
+  let rung = await climbed(page, tok, ['reading', 'gloss']);
+  if (rung === 'reading') { await tok.tap(); rung = await climbed(page, tok, ['gloss']); }
+  if (rung === 'gloss') await tok.tap();
   await page.locator('#mini .mini-word').waitFor({ timeout: 10_000 });
   await page.waitForFunction(() => { const m = document.getElementById('mini'); const w = m?.querySelector('.mini-word');
     return m && m.getAttribute('aria-busy') !== 'true' && (!w?.dataset.ink || !!w.dataset.inkEnded); }, null, { timeout: 12_000 }).catch(() => {});
@@ -225,17 +235,19 @@ async function itemStage(browser, engine) {
           word: [Math.round(f.word.top), Math.round(f.word.bottom)], ceiling: f.ceiling, floor: f.floor, errors });
     } finally { await context.close(); }
   }
-  // 1 · a short glass (390×560): no seat holds the stage, so it ends between two rows, fades at its foot and scrolls
+  // 1 · a short glass (390×520): no seat holds the stage, so it ends between two rows, fades at its foot and scrolls.
+  // Ladder (the lead's D7 ruling, 10-19): at 390×560 the compact box now stands whole beside 総理, so no cut was left to
+  // judge; at 390×520 even the compact box has no seat whole (the text glides it the most room it can, then it is cut)
   {
-    const { context, page, errors } = await session(browser, { height: 560 });
+    const { context, page, errors } = await session(browser, { height: 520 });
     try {
       await openStory(page);
       await stage(page);
       const f = await stageFacts(page);
       const cut = sliced(f);
-      check(`1.stage-cut · ${engine} 390×560 · the cut falls between two rows`, f.scrollHeight > f.clientHeight + 1 && !cut.length,
+      check(`1.stage-cut · ${engine} 390×520 · the cut falls between two rows`, f.scrollHeight > f.clientHeight + 1 && !cut.length,
         { cut: cut.map((r) => `${r.row} ${Math.round(r.top)}–${Math.round(r.bottom)} across ${Math.round(f.seen.bottom)}`), scrollHeight: f.scrollHeight, clientHeight: f.clientHeight });
-      check(`1.stage-fade · ${engine} 390×560 · a fade at its foot says there is more`,
+      check(`1.stage-fade · ${engine} 390×520 · a fade at its foot says there is more`,
         f.more === 'true' && f.fade?.position === 'sticky' && f.fade.height >= 16 && /gradient/u.test(f.fade.image), { more: f.more, fade: f.fade });
       // keyboard: Tab through the stage to its last door; the stage follows, shows it whole, and the fade leaves at the end
       await page.locator('#mini .mini-take, #mini button').first().focus();
@@ -247,7 +259,7 @@ async function itemStage(browser, engine) {
       await delay(300);
       const k = await stageFacts(page);
       const door = await page.evaluate(() => { const d = document.activeElement; if (!d?.matches?.('#mini .mini-sentence-open')) return null; const r = d.getBoundingClientRect(); return { top: r.top, bottom: r.bottom }; });
-      check(`1.stage-keys · ${engine} 390×560 · Tab reaches the last row, the stage scrolls it whole, the fade leaves`,
+      check(`1.stage-keys · ${engine} 390×520 · Tab reaches the last row, the stage scrolls it whole, the fade leaves`,
         !!door && door.top >= k.seen.top - 0.5 && door.bottom <= k.seen.bottom + 0.5 && k.scrollTop > 0 && k.more === 'false', { door, scrollTop: k.scrollTop, more: k.more });
       // keyboard again from the top: PageDown inside the stage scrolls it
       await page.evaluate(() => { document.getElementById('mini').scrollTop = 0; });
@@ -267,7 +279,7 @@ async function itemStage(browser, engine) {
         touched = (await stageFacts(page)).scrollTop;
         await cdp.detach();
       }
-      check(`1.stage-scrolls · ${engine} 390×560 · PageDown${engine === 'chromium' ? ' and a finger' : ''} scroll the stage`,
+      check(`1.stage-scrolls · ${engine} 390×520 · PageDown${engine === 'chromium' ? ' and a finger' : ''} scroll the stage`,
         p.scrollTop > 0 && p.overflowY === 'auto' && !/none|pan-x(?!.*pan-y)/u.test(p.touchAction) && (engine !== 'chromium' || touched > 0) && !errors.length,
         { pageDown: p.scrollTop, finger: touched, overflowY: p.overflowY, touchAction: p.touchAction, errors });
     } finally { await context.close(); }
@@ -780,10 +792,12 @@ async function itemStageInk(browser, engine) {
           .observe(document.body, { subtree: true, attributes: true, attributeFilter: ['data-ink', 'data-ink-ended'] });
       });
       await tok.tap();
-      const rung = await page.waitForFunction((el) => (document.getElementById('mini') ? 'stage' : el.dataset.ladderRung === 'reading' ? 'reading' : null),
-        await tok.elementHandle(), { timeout: 8000 }).then((h) => h.jsonValue()).catch(() => null);
+      let rung = await climbed(page, tok, ['reading', 'gloss']);
       const y0 = await page.evaluate(() => window.scrollY);
-      if (rung === 'reading') await tok.tap();
+      // Ladder (John, 10-19): the English under the word comes between the reading and the stage, one observed rung a tap;
+      // the print is held still from the first rung on, through the English and the stage's seat
+      if (rung === 'reading') { await tok.tap(); rung = await climbed(page, tok, ['gloss']); }
+      if (rung === 'gloss') await tok.tap();
       await page.locator('#mini .mini-word').waitFor({ timeout: 10_000 });
       if (scrollMidway) {
         const writing = await page.waitForFunction(() => window.__ink.includes('ink:writing'), null, { timeout: 4000 }).then(() => true, () => false);

@@ -580,7 +580,7 @@ async function ordinary(fixture) {
   // G2 × G3 in the merged app (ba36905a: "the ledger counts the reading the first tap raises"): the tap that raises the
   // reading is his encounter with the word as it reads here and a help he asked of this article, so its tap row carries
   // the encounter ledger (met) and the help signal (readHelp) in the same write. Exactly the word's own identity in each;
-  // no other root. The stage after it adds its observation alone: the day is counted and the help already names the word.
+  // no other root. The English rung after it adds its observation alone: the day is counted and the help already names the word.
   const met = JSON.stringify([1, 'word', source.token.b, 'core', null, source.token.r]);
   assert.deepEqual(read.record.obslog, [...sourceBefore.record.obslog, readingObservation]); unchangedExcept(sourceBefore, read, ['obslog', 'met', 'readHelp']);
   assert.deepEqual(Object.keys(read.record.met?.entries || {}).filter(key => !Object.hasOwn(sourceBefore.record.met?.entries || {}, key)), [met],
@@ -605,21 +605,41 @@ async function ordinary(fixture) {
   assert.equal(await token.getAttribute('data-ladder-rung'), 'reading');
   assert.equal(await token.locator('rt:not(.hidden-rt)').allTextContents().then(parts => parts.join('')), source.token.r);
   assert.equal(await page.locator('#mini,#sheet').count(), 0, 'The first activation exposes only the source reading');
-  const stageStarted = Date.now();
+  assert.equal(await token.locator('.tok-en').count(), 0, 'The reading rung shows no English yet');
+  // The merged G2 ledger already counted the reading. Ladder's second activation shows the meaning and adds its
+  // depth-2 observation alone; the third activation opens the stage without another observation or encounter.
+  const englishStarted = Date.now();
   await token.click();
-  await page.locator('#mini').waitFor();
-  await waitForAppRecord(page, record => record.obslog.length === read.record.obslog.length + 1, { description: 'the stage\'s observation' });
+  await page.waitForFunction(node => node.dataset.ladderRung !== 'reading', await token.elementHandle());
+  assert.equal(await token.getAttribute('data-ladder-rung'), 'gloss', 'The second activation sets the English under the word');
+  assert.equal(await page.locator('#mini,#sheet').count(), 0, 'The English rung opens no stage and no page');
+  await waitForAppRecord(page, record => record.obslog.length === read.record.obslog.length + 1, { description: 'the English rung\'s observation' });
   const tapped = await readAppRecordSnapshot(page), tap = tapped.record.obslog.at(-1);
-  assert(tap[0] >= stageStarted && tap[0] <= Date.now());
+  assert(tap[0] >= englishStarted && tap[0] <= Date.now());
   assert.deepEqual(tap.slice(1), ['tap', `word:${source.token.b}`, 2, source.id]);
   assert.deepEqual(tapped.record.obslog, [...read.record.obslog, tap]); unchangedExcept(read, tapped, ['obslog']);
+  assert.equal(await token.locator(':scope > .tok-en .tok-en-text').count(), 1, 'The English rung draws the English under the word');
+  assert.equal(await token.locator('rt:not(.hidden-rt)').allTextContents().then(parts => parts.join('')), source.token.r,
+    'The reading stays over the word at the English rung');
+  await token.click();
+  await page.locator('#mini').waitFor();
   assert.equal(await token.getAttribute('data-ladder-rung'), 'stage');
   assert.equal(await page.locator('#mini .mini-word').textContent(), source.token.b);
   assert.equal(await page.locator('#mini .mini-reading').textContent(), source.token.r);
+  assert.equal(await token.locator(':scope > .tok-en').count(), 1, 'The English stays under the word at the stage');
+  const quietUntil = Date.now() + 300;
+  do {
+    const now = (await readAppRecordSnapshot(page)).record;
+    assert.deepEqual(now.obslog, tapped.record.obslog, 'The stage logs no observation of its own');
+    assert.deepEqual(now.met, tapped.record.met, 'The stage writes no encounter of its own');
+    assert.deepEqual(now.readHelp, tapped.record.readHelp, 'The stage writes no help of its own');
+    await delay(25);
+  } while (Date.now() < quietUntil);
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => !document.getElementById('mini'));
   assert.equal(await token.getAttribute('data-ladder-rung'), null);
   assert.equal(await token.locator('rt:not(.hidden-rt)').count(), 0, 'Escape restores bare prose');
+  assert.equal(await token.locator('.tok-en').count(), 0, 'Escape takes the English away with the stage');
   retained(tapped, await snapshot(fixture, 'reading-stage-escape-neutral'));
   await page.locator('#reader-place-save').click();
   await page.waitForFunction(() => document.getElementById('reader-place-note')?.textContent.includes('is saved'));

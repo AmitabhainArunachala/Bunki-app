@@ -225,12 +225,23 @@ async function selectWord(page, locator) {
   await page.keyboard.press('Home');
   for (let step = 0; step < position.word; step += 1) await page.keyboard.press('ArrowRight');
 }
-/** A word's stage (its card): one tap here; two where the ladder raises the reading first (G3's tap 1), the second only
- * once that rung is observed. */
+/** A word's stage (its card), one observed rung per tap: the ladder raises the reading first (G3's tap 1) and, Ladder (John,
+ * 10-19), a word set in text then shows its English under it; each next tap comes only once the rung before it is seen,
+ * past the last one. A word already standing on a rung climbs on from there; a rung that does not move fails the walk,
+ * never tapped again. */
 async function stage(page, locator) {
-  await locator.tap();
-  await page.waitForFunction((node) => !!document.getElementById('mini') || node?.dataset.ladderRung === 'reading', await locator.elementHandle(), { timeout: 10000 });
-  if (!await page.locator('#mini').count()) await locator.tap();
+  const node = await locator.elementHandle();
+  let rung = await locator.getAttribute('data-ladder-rung');
+  do {
+    await locator.tap();
+    rung = await page.waitForFunction(({ node, after }) => {
+      if (document.getElementById('mini')) return 'stage';
+      const order = ['reading', 'gloss'], now = node?.dataset.ladderRung;
+      // the English rung is seen once its row stands under the word
+      if (now === 'gloss' && !node.querySelector(':scope > .tok-en .tok-en-text')) return null;
+      return order.indexOf(now) > order.indexOf(after) ? now : null;
+    }, { node, after: rung }, { timeout: 10000 }).then((handle) => handle.jsonValue());
+  } while (rung !== 'stage');
   await page.locator('#mini .mini-word').waitFor();
 }
 async function waitRecord(page, predicate, what, timeout = 15000) {
@@ -326,7 +337,13 @@ try {
         canonical(portable(booted)) === canonical(portable(old)) && !('met' in booted) && !('readHelp' in booted),
         { changed: changedRoots(portable(old), portable(booted)), roots: Object.keys(booted).length, revlog: booted.revlog.length });
       await openArticle(page, STORY);
-      await stage(page, tok(page, 9));
+      // Ladder (John, 10-19): the climb to 総理's card is three taps now (its reading, its English, its card). The look-up's
+      // met and readHelp ride in the reading rung's own tap row, so they are read on that rung, before the English rung's
+      // row can land beside them ("beside its tap row" observed as the one row, not raced against the next); the climb then
+      // goes on from the reading, one observed rung at a time
+      const souri = tok(page, 9);
+      await souri.tap();
+      await page.waitForFunction((node) => node?.dataset.ladderRung === 'reading', await souri.elementHandle(), { timeout: 10000 });
       const looked = await waitRecord(page, (record) => !!record.met, 'the look-up\'s met');
       const metKeys = Object.keys(looked.met.entries);
       const changed = changedRoots(booted, looked);
@@ -335,6 +352,7 @@ try {
         looked.met.entries[metKeys[0]].days === 1 && canonical(looked.readHelp.articles[STORY.id]?.helped) === canonical(metKeys) &&
         changed.every((key) => ['met', 'readHelp', 'obslog', 'readerPos'].includes(key)) && SCHEDULING.every((key) => !changed.includes(key)) &&
         looked.obslog.length === booted.obslog.length + 1, { changed, met: looked.met, readHelp: looked.readHelp });
+      await stage(page, souri);
       await page.locator('#mini .mini-word').tap();
       await page.locator('#depth-known').waitFor({ timeout: 15000 });
       await page.locator('#depth-known').click();

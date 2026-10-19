@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { WG_CANDIDATE_ROSTER, WG_CONTROL_EVIDENCE, WG_WALKS, grammarCandidateRows, grammarControlRows } from './vh-word-grammar-contracts.mjs';
+import { WG_CANDIDATE_ROSTER, grammarWalkNames, grammarControlSpec, grammarCandidateRows, grammarControlRows } from './vh-word-grammar-contracts.mjs';
 const observedG6 = JSON.parse(readFileSync(new URL('./vh-g6-observed-controls.json', import.meta.url), 'utf8'));
 
 export const sha = (text) => createHash('sha256').update(text).digest('hex');
@@ -49,6 +49,18 @@ function controlFor(engine, rowId, spec, rows) {
     if (rowId.startsWith('G1.') || rowId.startsWith('G2.')) control.baseline = baseline;
     control.rows = baseline.map((row) => ({ ...row, phase: `mutant:${spec.control}`, ok: !spec.kills.includes(row.id.slice(engine.length + 1)) }));
     control.restore = baseline.map((row) => ({ ...row, phase: `restore:${spec.control}` }));
+    // Explicit synthetic mutant observations for the independent Ladder witness checks.
+    const ladderObserved = {
+      'ladder:mouse-ignored': { ring: 0, strip: 0 },
+      'ladder:card-fixed-to-glass': { rode: 0, moved: 80 },
+      'ladder:back-leaves-at-once': [{ first: { view: 'today' } }],
+      'ladder:no-room-made': [{ rows: [{ whole: false }] }],
+      'ladder:no-aside-mark': { aside: null },
+      'ladder:fade-on-a-row': [{ underFade: ['synthetic row'] }],
+      'ladder:dash-for-none': { dashes: ['—'] },
+      'ladder:english-ignores-sense': { words: [{ wrong: ['synthetic wrong meaning'] }] },
+    };
+    if (Object.hasOwn(ladderObserved, spec.control)) control.rows.find(row => row.id === `${engine}/${spec.kills[0]}`).observed = structuredClone(ladderObserved[spec.control]);
     return control;
   }
 }
@@ -61,10 +73,10 @@ export function grammarFixture(engines = ['chromium', 'webkit']) {
   ];
   const controls = engines.flatMap((engine) => grammarControlRows(engine).map((id) => {
     const local = id.slice(engine.length + 1);
-    return controlFor(engine, local, WG_CONTROL_EVIDENCE[local], rows);
+    return controlFor(engine, local, grammarControlSpec(engine, local), rows);
   }));
   return {
     argv: ['--controls'], engines, g6Completed: [...engines], rows, controls, runtimeFiles: FIXTURE_RUNTIME_FILES.map((row) => ({ ...row })),
-    walks: engines.flatMap((engine) => WG_WALKS.map((name) => ({ engine, name, phase: 'candidate', complete: true }))),
+    walks: engines.flatMap((engine) => grammarWalkNames(engine).map((name) => ({ engine, name, phase: 'candidate', complete: true }))),
   };
 }

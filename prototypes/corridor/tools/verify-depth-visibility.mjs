@@ -758,6 +758,9 @@ async function liveFirstState(page, out, { name, id, query, word, prior, archive
   row(out, `${name}.reading-without-encounter`, reading.rung === 'reading' && reading.reading.length > 0 && !reading.mini && !encounterAt(pre) && settle.settled && !encounterAt(settle.snapshot) && !encounterAt(beforeInput2),
     { reading, revisions: { beforeInput1: pre.revision, settle: settle.reads, settled: settle.settled, waitedMs: settle.waitedMs, quietMs: settle.quietMs, beforeInput2: beforeInput2.revision }, encounter: { settled: encounterAt(settle.snapshot), beforeInput2: encounterAt(beforeInput2) } });
   await input();
+  await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.ladderRung === 'gloss', selector);
+  const gloss = await sample('gloss');
+  await input();
   await page.locator('#mini').waitFor({ state: 'visible' });
   const opened = await sample('stage-open');
   const slipAnchor = await page.evaluate(() => { const baseText = (el) => { const copy = el.cloneNode(true); copy.querySelectorAll('rt, rp').forEach((r) => r.remove()); return copy.textContent.replace(/\s/gu, ''); }; const mini = document.getElementById('mini'), anchor = mini?._kept?.anchor || null;
@@ -778,14 +781,14 @@ async function liveFirstState(page, out, { name, id, query, word, prior, archive
   }
   const sameMini = Boolean(miniHandle) && await miniHandle.evaluate((el) => el.isConnected && el === document.getElementById('mini'));
   const expected = await page.evaluate((word) => window.__KAIRO_DEPTH__.depth({ t: 'word', id: word }), word);
-  const frames = [before, input1, reading, opened, met];
+  const frames = [before, input1, reading, gloss, opened, met];
   row(out, `${name}.stage-commits-met`, opened.rung === 'stage' && met.rung === 'stage' && !encounterAt(beforeInput2) && committed.met.entries[native.key]?.days >= 1 && encounterAt(after) && expected?.depth === 'met' && met.depth === 'met',
     { encounter: committed.met.entries[native.key], revisions: { beforeInput2: beforeInput2.revision, after: after.revision }, expected, opened: { rung: opened.rung, depth: opened.depth }, met: { rung: met.rung, depth: met.depth } });
-  const firstMove = Math.max(baseShift(before, input1), baseShift(before, reading)), secondMove = Math.max(baseShift(reading, opened), baseShift(reading, met));
+  const firstMove = Math.max(baseShift(before, input1), baseShift(before, reading)), secondMove = Math.max(baseShift(reading, gloss), baseShift(reading, opened), baseShift(reading, met));
   const cumulativeMove = Math.max(...frames.map((f) => baseShift(before, f)));
   const telemetry = frames.map((f) => ({ label: f.label, element: f.source, elementShift: shift(before.source, f.source), baseBox: f.baseBox, union: f.union }));
   row(out, `${name}.first-tap-base-glyphs`, firstMove <= 1, { maxShift: firstMove, before: before.base, input1: input1.base, reading: reading.base, telemetry });
-  row(out, `${name}.second-tap-base-glyphs`, secondMove <= 1, { maxShift: secondMove, reading: reading.base, opened: opened.base, met: met.base, telemetry });
+  row(out, `${name}.second-tap-base-glyphs`, secondMove <= 1, { maxShift: secondMove, reading: reading.base, gloss: gloss.base, opened: opened.base, met: met.base, telemetry });
   row(out, `${name}.fresh-to-state-base-glyphs`, cumulativeMove <= 1, { maxShift: cumulativeMove, perFrame: frames.map((f) => ({ label: f.label, shift: baseShift(before, f) })) });
   row(out, `${name}.title-rhythm-through-inputs`, frames.every((f) => JSON.stringify(f.title) === JSON.stringify(before.title)), frames.map((f) => ({ label: f.label, ...f.title })));
   row(out, `${name}.source-visible-and-owned`, frames.every((f) => f.visible && f.hitOwned), frames.map((f) => ({ label: f.label, visible: f.visible, hitOwned: f.hitOwned })));
@@ -847,6 +850,10 @@ async function rooms(page, out) {
     const word = page.locator(`#reader .tok[data-index="${PARA[name]}"]`);
     await word.scrollIntoViewIfNeeded(); await word.click();
     await page.waitForFunction((e) => document.getElementById('mini') || e?.dataset.ladderRung === 'reading', await word.elementHandle());
+    if (!await page.locator('#mini').count()) {
+      await word.click();
+      await page.waitForFunction((e) => document.getElementById('mini') || e?.dataset.ladderRung === 'gloss', await word.elementHandle());
+    }
     if (!await page.locator('#mini').count()) await word.click();
     await page.locator('#mini .mini-word').waitFor(); await delay(200);
     const slip = await surfaceCapture(page, out, `slip-${name}`, '#mini .mini-word');

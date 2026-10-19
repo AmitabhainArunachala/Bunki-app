@@ -444,12 +444,18 @@ const cardState = (page) => page.evaluate(() => {
     sense: mini.dataset.senseEntry || '', take: take ? { disabled: take.disabled } : null };
 });
 /** G3 · a tap climbs the word's ladder: a word whose reading the dial hides (the reader's on-touch default) raises it in
- * place first, and the next tap draws its card. The second tap is made only once that reading rung is observed. */
+ * place first. Ladder (John, 10-19): the next tap sets its English under it, and the next draws its card. Each tap is made
+ * only once the rung before it is observed, each rung past the last. */
 async function climbToCard(page, target, index) {
-  await target.tap({ timeout: 30000 });
-  await page.waitForFunction((i) => !!document.getElementById('mini')
-    || document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung === 'reading', index, { timeout: OPEN_MS });
-  if (!(await page.locator('#mini').count())) await target.tap({ timeout: 30000 });
+  let last = null;
+  for (let step = 0; step < 3 && !(await page.locator('#mini').count()); step++) {
+    await target.tap({ timeout: 30000 });
+    last = await page.waitForFunction(({ i, last }) => {
+      if (document.getElementById('mini')) return 'stage';
+      const rung = document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung;
+      return ['reading', 'gloss'].includes(rung) && rung !== last ? rung : null;
+    }, { i: index, last }, { timeout: OPEN_MS }).then((h) => h.jsonValue());
+  }
   await page.locator('#mini').waitFor({ timeout: OPEN_MS });
 }
 /** A real tap; the card as it settles: no longer busy (aria-busy), its sense no longer pending (data-sense). */

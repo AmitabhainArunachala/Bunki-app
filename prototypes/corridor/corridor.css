@@ -2632,41 +2632,45 @@ body.v-depth-layered .inline-link {
 }
 
 
-/* second tap: English beneath the word — IN THE LINE FLOW, so no font's
- * metrics on any device can ever collide it with the next line. The token
- * becomes a baseline-aligned column: the word keeps its exact baseline
- * (inline-flex baseline = first item's baseline) and the line breathes
- * down a few pixels to make room. */
-.tok.has-en {
+/* Ladder · the English rung (John, 10-19: "two taps should be the furigana plus the english word underneath"): the word's
+ * English in a row of its own under the word — IN THE LINE FLOW, so no font's metrics on any device can ever collide it
+ * with the next line. The word becomes a baseline-aligned column (inline-flex baseline = its first row's baseline) and the
+ * line breathes down to make room. The row is zero-wide (min-width: the word's own width), so the word never widens and
+ * the line never re-wraps; its words are centred under the word by flex centring and slid inward at the line's edges
+ * (corridor.js seatInlineGloss). A gloss is never cut: the compact sense is chosen in JS, and a long one wraps. */
+.tok.has-en,
+.japanese-lookup-word.has-en {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   vertical-align: baseline;
-  line-height: 1.3; /* hug the glyphs; the reader's own leading houses the rt */
 }
+.tok.has-en { line-height: 1.3; /* hug the glyphs; the reader's own leading houses the rt */ }
 
-/* a truncated gloss is a broken gloss — the global rule (operator, morning
- * round): the compact sense is chosen in JS, the box may overhang ~1.6em a
- * side, and the text WRAPS to a second line rather than ellipsizing. The
- * gloss is in the line flow, so extra depth just breathes the line down —
- * nothing can collide, and the two-line clamp is an unreachable last resort. */
 .tok-en {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  display: flex;
+  justify-content: center;
   width: 0;
-  min-width: calc(100% + 3.2em);
+  min-width: 100%;
+  margin-top: 0.15em;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.tok-en-text {
+  flex: none;
+  width: max-content;
+  max-width: min(16em, calc(100vw - 48px));
   font-family: var(--sans);
-  font-size: var(--type-label);
-  line-height: 1.25;
-  color: var(--ai, var(--ink-2));
-  letter-spacing: 0.02em;
+  font-size: var(--type-control);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0;
+  /* the world's own ink, never a borrowed accent */
+  color: var(--color-ink, var(--text, currentColor));
   white-space: normal;
   overflow-wrap: break-word;
-  overflow: hidden;
   text-align: center;
-  pointer-events: none;
-  margin-top: -0.3em; /* snug under its own word — the next line's ruby owns the rest of the gap */
 }
 
 .gesture-hint {
@@ -7604,12 +7608,15 @@ body.zen .say-note { color: var(--card-ink-2, var(--ink-2)); }
 .say-note:empty { display: none; }
 
 /* D11 · the reader's honest gloss (2026-09-25). A content word the quick
- * dictionary cannot gloss says so: a faint dash on the English rung, one
- * plain line in the mini. Its full-entry door offers only dictionary rows
- * read as the token is read, as native candidate buttons, and holds 覚 off
- * along that path with the reason on the sheet. New classes only; nothing a
- * core hit renders is restyled. */
-.tok-en.tok-en-miss { color: var(--faint); }
+ * dictionary cannot gloss says so in one plain line in the mini. Its
+ * full-entry door offers only dictionary rows read as the token is read, as
+ * native candidate buttons, and holds 覚 off along that path with the reason
+ * on the sheet. New classes only; nothing a core hit renders is restyled.
+ * Ladder R2 (the lead, 10-20: "it never shows —"): its English rung shows
+ * nothing, and the rung stands. A row whose answer may still come keeps its
+ * line, so the English lands without moving the next line. */
+.tok-en.tok-en-miss { display: none; }
+.tok-en.tok-en-wait .tok-en-text { min-height: 1.3em; }
 .reader-choice { margin: 8px 0 14px; }
 .reader-choice-title { margin: 0 0 4px; color: var(--faint); font-family: var(--serif); font-size: var(--type-caption); letter-spacing: 0.08em; }
 .reader-choice-row { display: flex; align-items: center; gap: 9px; width: 100%; min-height: var(--tap); padding: 7px 1px;

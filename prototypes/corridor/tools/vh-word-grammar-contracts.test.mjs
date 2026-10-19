@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { grammarSelection, foldGeometryEqual, foldShiftBites, grammarAcceptance, grammarControlRows, grammarControlVerdicts, sharedHoverDiverges, WG_CANDIDATE_ROSTER, WG_CONTROL_EVIDENCE } from './vh-word-grammar-contracts.mjs';
+import { grammarSelection, grammarWalkNames, grammarControlSpec, foldGeometryEqual, foldShiftBites, grammarAcceptance, grammarControlRows, grammarControlVerdicts, sharedHoverDiverges, WG_CANDIDATE_ROSTER, WG_CONTROL_EVIDENCE } from './vh-word-grammar-contracts.mjs';
 import { grammarFixture, sha } from './vh-word-grammar-fixture.mjs';
 const geometry = x => [{ id: 'p1', top: x, height: 24, tokens: [{ id: '76', left: 4, top: 9 }] }];
 test('WG-1 raw boundary rejects old rounded false green and malformed observations', () => {
@@ -73,7 +73,7 @@ test('every declared control row has exactly one independent evidence obligation
     const local = grammarControlRows(engine).map(id => id.slice(engine.length + 1));
     assert.deepEqual(local.filter(id => !WG_CONTROL_EVIDENCE[id]), []);
     for (const id of local) {
-      const spec = WG_CONTROL_EVIDENCE[id];
+      const spec = grammarControlSpec(engine, id);
       if (spec.kind !== 'served-edit' || spec.local) continue;
       for (const kill of spec.kills) assert.ok(Object.values(WG_CANDIDATE_ROSTER[engine]).some(ids => ids.includes(kill)), `${engine}/${id}: ${kill}`);
     }
@@ -392,4 +392,49 @@ test('G6 baseline and restore samples must each show their own fault absent, not
     }
   }
   assert.equal(rejected, 144);
+});
+
+test('Ladder remains diagnostic, preserves the old stalled control, and admits exact engine-specific walks', () => {
+  assert.equal(grammarSelection(['--ladder-only', '--controls']).fullRequested, false);
+  assert.throws(() => grammarSelection(['--ladder-only', '--g1-only']));
+  for (const engine of ['chromium', 'webkit']) {
+    const value = grammarFixture([engine]);
+    assert.equal(grammarAcceptance(value).fullAcceptance, true);
+    assert.equal(grammarWalkNames(engine).filter(w => w.startsWith('L-')).length, engine === 'chromium' ? 9 : 16);
+    assert.equal(grammarControlRows(engine).filter(id => id.includes('/L.negative.')).length, engine === 'chromium' ? 7 : 8);
+    assert.ok(grammarControlRows(engine).includes(`${engine}/G3.negative.stalled-second`));
+    value.argv = ['--ladder-only', '--controls'];
+    value.rows = value.rows.filter(row => row.walk?.startsWith('L-') || row.id.includes('/L.negative.'));
+    value.walks = value.walks.filter(w => w.name.startsWith('L-'));
+    assert.equal(grammarAcceptance(value).selectedPassed, true);
+    assert.equal(grammarAcceptance(value).fullAcceptance, false);
+  }
+});
+test('each added Ladder/G3 obligation rejects missing rows, fabricated witnesses and failed restores', () => {
+  for (const engine of ['chromium', 'webkit']) {
+    for (const suffix of ['stalled-second', 'tap1-opens-box', 'no-gloss-on-tap2', 'stalled-third', 'box-over-ruby']) {
+      const value = grammarFixture([engine]);
+      value.controls = value.controls.filter(c => c.id !== suffix);
+      rejects(value, `${engine}/G3.negative.${suffix}`);
+    }
+    const fresh = grammarFixture([engine]);
+    for (const id of grammarControlRows(engine).filter(id => id.includes('/L.negative.'))) {
+      const spec = grammarControlSpec(engine, id.slice(engine.length + 1));
+      for (const mutate of [
+        c => { c.rows.find(row => row.id === `${engine}/${spec.kills[0]}`).observed = {}; },
+        c => { c.restore[0].ok = false; },
+        c => { c.rows.pop(); },
+        c => { c.served[0].baseSha256 = 'a'.repeat(64); },
+        c => { c.rows[0].phase = 'candidate'; },
+      ]) {
+        const value = structuredClone(fresh); mutate(control(value, engine, spec.control)); rejects(value, id);
+      }
+      const missing = structuredClone(fresh); missing.rows = missing.rows.filter(row => row.id !== id);
+      assert.equal(grammarAcceptance(missing).fullAcceptance, false);
+    }
+    for (const suffix of ['G3.control.gloss', 'G3.control.stage-clear', 'L.tap2', 'L.gloss.sense']) {
+      const missing = structuredClone(fresh); missing.rows = missing.rows.filter(row => row.id !== `${engine}/${suffix}`);
+      assert.equal(grammarAcceptance(missing).fullAcceptance, false);
+    }
+  }
 });

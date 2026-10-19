@@ -203,7 +203,10 @@ async function shelf(fixture) {
     if (view === 'drift') {
       await page.locator('#ginga-symbol').focus(); await page.keyboard.press('Enter'); await page.locator('.bubble-shelf').click();
     } else await page.locator('#back').click();
-    await page.waitForFunction(previous => document.body.dataset.view !== previous, view);
+    // Ladder (the lead's W2 ruling, 10-19, a spec change): with a word's reading, English or box up, the bar's Back folds the
+    // word bare and stays; the next Back leaves. Each Back is observed: the room changes, or the word stands bare
+    await page.waitForFunction(previous => document.body.dataset.view !== previous ||
+      (previous === 'reader' && !document.getElementById('mini') && !document.querySelector('#reader [data-ladder-rung]')), view);
   }
   assert.fail('Ordinary Back controls did not reach the bookshelf');
 }
@@ -912,7 +915,7 @@ try {
 // checked separately. A second activation is allowed only after a real reading rung.
 async function openReaderWordStage(page, word) {
   await word.click();
-  await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  await page.waitForFunction(node => ['reading', 'gloss', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
   if (await word.getAttribute('data-ladder-rung') === 'reading') {
     assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
     // On-touch reader ruby paints through ::before; the native rt stays hidden
@@ -925,6 +928,13 @@ async function openReaderWordStage(page, word) {
         (ruby.getClientRects().length > 0 && ruby.dataset.r === rt.textContent && floating.content === JSON.stringify(rt.textContent) &&
           floating.visibility !== 'hidden' && floating.display !== 'none' && Number(floating.opacity) > 0);
     }), await word.elementHandle(), { timeout: 5000 });
+    await word.click();
+  }
+  // Ladder (John, 10-19): the English under the word comes before the stage; one more activation, only once it is seen
+  await page.waitForFunction(node => node?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'gloss') {
+    assert.equal(await page.locator('#mini').count(), 0, 'The English rung shows the meaning under the word, before the stage');
+    assert(await word.evaluate(node => !!node.querySelector(':scope > .tok-en .tok-en-text')), 'The English rung draws the English under the word');
     await word.click();
   }
   await page.locator('#mini').waitFor();

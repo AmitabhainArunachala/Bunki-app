@@ -466,7 +466,7 @@ async function openReaderWordStage(page, word, keyboard = false) {
   if (keyboard) assert(await word.evaluate(node => document.activeElement === node), 'Return selected the exact source occurrence');
   const activate = () => keyboard ? page.keyboard.press('Enter') : word.click();
   await activate();
-  await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  await page.waitForFunction(node => ['reading', 'gloss', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
   if (await word.getAttribute('data-ladder-rung') === 'reading') {
     assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
     // On-touch reader ruby paints through ::before; the native rt stays hidden
@@ -480,6 +480,13 @@ async function openReaderWordStage(page, word, keyboard = false) {
           floating.visibility !== 'hidden' && floating.display !== 'none' && Number(floating.opacity) > 0);
     }), await word.elementHandle(), { timeout: 5000 });
     await activate();
+  }
+  // Ladder (John, 10-19): the English under the word comes before the stage; one more activation, only once it is seen
+  await page.waitForFunction(node => node?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'gloss') {
+    assert.equal(await page.locator('#mini').count(), 0, 'The English rung shows the meaning under the word, before the stage');
+    assert(await word.evaluate(node => !!node.querySelector(':scope > .tok-en .tok-en-text')), 'The English rung draws the English under the word');
+    await word.click();
   }
   await page.locator('#mini').waitFor();
   assert.equal(await word.getAttribute('data-ladder-rung'), 'stage', 'The exact source word reaches its stage');

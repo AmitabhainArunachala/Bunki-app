@@ -133,10 +133,11 @@ export const READER_RUN_ROWS = Object.freeze({
     [
       'door',
       'first-rung',
+      'english-rung',
       'popup-reading',
       'visible-reading',
       'accessible-reading',
-      'no-english',
+      'reading-no-english',
       'popup-focus-premise',
       'focus-returns',
       'popup-absent',
@@ -150,15 +151,16 @@ export const READER_RUN_ROWS = Object.freeze({
   ),
   d4: [
     'A-prior-state',
-    'A-no-english',
+    'A-english',
     'same-document',
     'same-dials',
     'B-door',
     'no-inherited-state',
     'tap-shows',
-    'second-tap-stage',
+    'second-tap-english',
+    'third-tap-stage',
     'fold-bare',
-    'never-english',
+    'own-english',
   ].map((row) => `D4.${row}`),
   d5: [
     'home-marks',
@@ -197,15 +199,15 @@ export const READER_CONTROLS = Object.freeze({
     key: 'keepPopup',
     kills: [1, 0].map((f) => `D2.f${f}.popup-absent`),
   },
-  'inline-english-content': { run: 'd4', key: 'contentEnglish', kills: ['D4.A-no-english'] },
-  'inline-english-named-d4': { run: 'd4', key: 'namedEnglish', kills: ['D4.never-english'] },
+  'inline-english-content': { run: 'd4', key: 'contentEnglish', kills: ['D4.A-english'] },
+  'inline-english-named-d4': { run: 'd4', key: 'namedEnglish', kills: ['D4.tap-shows', 'D4.own-english'] },
   'inline-english-named-d5': { run: 'd5', key: 'namedEnglish', kills: ['D5.named-no-english'] },
-  'g3-stalled': { run: 'd4', key: 'stalled', kills: ['D4.second-tap-stage'] },
-  'g3-kept-reading': { run: 'd2', key: 'keepReading', kills: ['D2.f1.bare-after-fold'] },
-  'g3-off-ruby': {
+  'g3-stalled': { run: 'd4', key: 'stalled', kills: ['D4.third-tap-stage'] },
+  'g3-kept-reading': { run: 'd2', key: 'keepReading', kills: ['D2.f1.bare-after-fold', 'D2.f0.bare-after-fold'] },
+  'g3-off-hidden': {
     run: 'd2',
-    key: 'offRuby',
-    kills: ['D2.f0.visible-reading', 'D2.f0.bare-after-fold'],
+    key: 'offHidden',
+    kills: ['D2.f0.visible-reading', 'D2.f0.accessible-reading', 'D2.f0.english-rung'],
   },
   m8: { run: 'd3', key: 'lookupClick', kills: ['D3.k0f2.opens-lookup', 'D3.k2f1.opens-lookup'] },
   r1: {
@@ -215,8 +217,11 @@ export const READER_CONTROLS = Object.freeze({
       'D2.f1.visible-reading',
       'D2.f1.accessible-reading',
       'D2.f1.popup-reading',
+      'D2.f0.visible-reading',
+      'D2.f0.accessible-reading',
       'D2.f0.popup-reading',
     ],
+    allowed: ['D2.f1.english-rung', 'D2.f0.english-rung'],
   },
 });
 export const READER_D1_DAY = '2026-10-15';
@@ -288,34 +293,27 @@ function readerWitness(name, control) {
         )
       );
     });
-  if (name.startsWith('inline-english-'))
-    return seen(READER_CONTROLS[name].kills[0])?.glosses?.includes('VH_INLINE_ENGLISH');
-  if (name === 'g3-stalled') return seen('D4.second-tap-stage')?.popup === null;
+  if (name === 'inline-english-content')
+    return seen('D4.A-english')?.glosses?.length === 1 && seen('D4.A-english').glosses[0] === 'VH_INLINE_ENGLISH';
+  if (name === 'inline-english-named-d4')
+    return seen('D4.tap-shows')?.view?.gloss === 'VH_INLINE_ENGLISH' && seen('D4.own-english')?.glosses?.[0] === 'VH_INLINE_ENGLISH';
+  if (name === 'inline-english-named-d5')
+    return seen('D5.named-no-english')?.glosses?.includes('VH_INLINE_ENGLISH');
+  if (name === 'g3-stalled') return seen('D4.third-tap-stage')?.popup === null;
   if (name === 'g3-kept-reading')
-    return (
-      seen('D2.f1.bare-after-fold')?.length === 3 &&
-      seen('D2.f1.bare-after-fold').every((row) => row.visibleRuby === 'たにがわ')
-    );
-  if (name === 'g3-off-ruby')
-    return (
-      seen('D2.f0.visible-reading')?.length === 3 &&
-      seen('D2.f0.visible-reading').every((row) => row === 'たにがわ')
-    );
+    return [1, 0].every(f => seen(`D2.f${f}.bare-after-fold`)?.length === 3 &&
+      seen(`D2.f${f}.bare-after-fold`).every(row => row.visibleRuby === 'たにがわ'));
+  if (name === 'g3-off-hidden')
+    return seen('D2.f0.visible-reading')?.length === 3 && seen('D2.f0.visible-reading').every(value => value === '') &&
+      seen('D2.f0.english-rung')?.englishes?.length === 3 && seen('D2.f0.english-rung').englishes.every(row => row.visibleRuby === '');
   if (name === 'm8')
     return ['k0f2', 'k2f1'].every((key) => seen(`D3.${key}.opens-lookup`)?.mini === null);
   if (name === 'r1')
-    return (
-      seen('D2.f1.visible-reading')?.length === 3 &&
-      seen('D2.f1.visible-reading').every((value) => value === 'たにかわ') &&
-      [1, 0].every(
-        (f) =>
-          seen(`D2.f${f}.popup-reading`)?.length === 3 &&
-          seen(`D2.f${f}.popup-reading`).every((row) => row?.reading === 'たにかわ'),
-      ) &&
-      seen('D2.f1.accessible-reading')?.every(
-        (row) => row.description === 'たにかわ · Enter: next word layer · Shift+F10: save and more',
-      )
-    );
+    return [1, 0].every(f => seen(`D2.f${f}.visible-reading`)?.length === 3 &&
+      seen(`D2.f${f}.visible-reading`).every(value => value === 'たにかわ') &&
+      seen(`D2.f${f}.popup-reading`)?.length === 3 && seen(`D2.f${f}.popup-reading`).every(row => row?.reading === 'たにかわ') &&
+      seen(`D2.f${f}.accessible-reading`)?.length === 3 && seen(`D2.f${f}.accessible-reading`).every(row =>
+        row.description === 'たにかわ · Enter: next word layer · Shift+F10: save and more'));
   return false;
 }
 function validateReader(report, context, require, engines) {
@@ -358,10 +356,8 @@ function validateReader(report, context, require, engines) {
         (control.rows || []).map((row) => row.id),
       ), `${control.name}: incomplete mutant schedule`);
     require((control.rows || []).every((row) => executed(row) && typeof row.pass === 'boolean') &&
-      exact(
-        spec.kills,
-        (control.rows || []).filter((row) => row.pass === false).map((row) => row.id),
-      ), `${control.name}: wrong named red set`);
+      spec.kills.every(id => control.rows.find(row => row.id === id)?.pass === false) &&
+      control.rows.filter(row => row.pass === false).every(row => [...spec.kills, ...(spec.allowed || [])].includes(row.id)), `${control.name}: wrong named red set`);
     require(readerWitness(control.name, control), `${control.name}: intended fault not witnessed`);
     const file = control.name === 'r1' ? 'data/articles/aozora-046605.json' : 'corridor.js',
       digest = runtime(context, file);

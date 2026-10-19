@@ -517,11 +517,16 @@ const miniState = (page) => page.evaluate(() => {
 });
 /** Reach the stage without waiting for dictionary settlement (cold-index gates hold that promise). */
 async function activateStage(page, locator, activate = () => tapAt(page, locator)) {
-  await activate();
-  // Advance only an observed reading rung; no blind second tap can rescue a dead door.
-  await page.waitForFunction((node) => !!document.getElementById('mini') || node.dataset.ladderRung === 'reading',
-    await locator.elementHandle(), { timeout: 20000 });
-  if (!await page.locator('#mini').count()) await activate();
+  // Advance only an observed rung; no blind extra tap can rescue a dead door. Ladder (John, 10-19): the reading, then the
+  // English under the word, then the stage — each activation only once the rung before it is seen, each rung past the last.
+  const node = await locator.elementHandle();
+  let last = null;
+  for (let step = 0; step < 3 && !await page.locator('#mini').count(); step++) {
+    await activate();
+    last = await page.waitForFunction(({ node, last }) => document.getElementById('mini') ? 'stage'
+      : ['reading', 'gloss'].includes(node.dataset.ladderRung) && node.dataset.ladderRung !== last ? node.dataset.ladderRung : null,
+      { node, last }, { timeout: 20000 }).then((handle) => handle.jsonValue());
+  }
   await page.locator('#mini').waitFor({ timeout: 20000 });
 }
 /** The slip as it first paints, and as it settles: a slip drawn before the full dictionary answered is aria-busy

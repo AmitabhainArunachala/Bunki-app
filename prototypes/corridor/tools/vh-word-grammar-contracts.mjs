@@ -9,7 +9,7 @@ const candidateKey = row => `${row.id.split('/')[0]}/${row.walk}/${row.id.slice(
 
 export const G2_CONTROL_IDS = Object.freeze(['reading-check-dropped', 'tap-schedules']);
 export const WG_FLAGS = Object.freeze([
-  '--controls', '--vh-contracts-only', '--vh-ink-only', '--g1-only', '--g2-only', '--g2-control', '--g3-only', '--g4-only', '--g5-only', '--g5-controls',
+  '--controls', '--ladder-only', '--vh-contracts-only', '--vh-ink-only', '--g1-only', '--g2-only', '--g2-control', '--g3-only', '--g4-only', '--g5-only', '--g5-controls',
   '--g6-only', '--g6-thread-current-only', '--g6-frames-only', '--g6-controls-only', '--controls-only',
   '--rooms-only', '--sentences-only', '--kana-only', '--sky-readings-only', '--sky-ownership-only',
 ]);
@@ -60,7 +60,7 @@ export const sharedHoverDiverges = (mutant, baseline) => observedObject(mutant) 
   mutant.peer.background === baseline.peer.background;
 
 export const WG_WALKS = Object.freeze([
-  'G3-stalled', 'G3-clear', 'G3-front', 'G3-sky-ownership', 'G3-ladder', 'G3-direct-and-anchor', 'G3-current-save', 'G3-kana',
+  'G3-stalled', 'G3-stalled-stage', 'G3-clear', 'G3-front', 'G3-sky-ownership', 'G3-ladder', 'G3-direct-and-anchor', 'G3-current-save', 'G3-kana',
   ...['example', 'page'].flatMap(surface => ['off', 'on-touch', 'always'].map(mode => `G3-sentence-${surface}-${mode}`)),
   'G3-words', 'G3-words-family', 'G3-sky', 'G3-sky-glyph', 'G3-particle', 'G3-demo',
   'G4-interrupt-save', 'G4-ghost', 'G4-one-speed', 'G4-depth', 'G4-tempo', 'G4-interrupt', 'G4-interrupt-desktop',
@@ -71,14 +71,22 @@ export const WG_WALKS = Object.freeze([
   'page', 'depth', 'stale', 'frames', 'worlds', 'gloss', 'desktop', 'text-200', 'exposure',
   'g2-depth', 'g2-reading', 'g2-taps',
 ]);
+export function grammarWalkNames(engine) {
+  return [...WG_WALKS, ...Object.keys(WG_CANDIDATE_ROSTER[engine] || {}).filter(walk => walk.startsWith('L-'))];
+}
+export function grammarControlSpec(engine, id) {
+  const spec = WG_CONTROL_EVIDENCE[id];
+  return spec?.killsByEngine ? { ...spec, kills: spec.killsByEngine[engine] || [] } : spec;
+}
 export function grammarControlRows(engine) {
   const ids = [
     ...['page-capped', 'scrim-appended', 'word-not-travelling', 'page-fades-over-reader'].map(id => `G1.negative.${id}`),
     ...G2_CONTROL_IDS.map(id => `G2.negative.${id}`),
-    ...['stalled-second', 'ruby-survives-back', 'front-door', 'glyph-z-dropped', 'glyph-hit-region-removed', 'bare-glyph-caption-width'].map(id => `G3.negative.${id}`),
+    ...['stalled-second', 'tap1-opens-box', 'no-gloss-on-tap2', 'stalled-third', 'box-over-ruby', 'ruby-survives-back', 'front-door', 'glyph-z-dropped', 'glyph-hit-region-removed', 'bare-glyph-caption-width'].map(id => `G3.negative.${id}`),
     ...['missing-final-stroke','never-plain-after-input','writing-blocks-tap', 'empty-first-board', 'second-speed-control'].map(id => `G4.negative.${id}`),
     ...['room-keep-hover','second-hold-unkeeps', 'strip-covers-a-button', 'layer-stays-open', 'fold-shift-one-pixel', 'fold-shift-one-quarter-over'].map(id => `G5.negative.${id}`),
   ];
+  ids.push(...['mouse-ignored', 'card-fixed-to-glass', 'back-leaves-at-once', 'no-room-made', 'no-aside-mark', ...(engine === 'webkit' ? ['fade-on-a-row'] : []), 'dash-for-none', 'english-ignores-sense'].map(id => `L.negative.${id}`));
   for (const mode of ['touch', 'keyboard']) {
     const g6 = ['missing-reverse', 'captured-text-pinch', 'lost-return-line', 'touchmove-cancel'];
     if (engine === 'chromium') g6.push('late-bubble-pointer', 'touchmove-cancel-native');
@@ -113,7 +121,19 @@ export const WG_CONTROL_EVIDENCE = Object.freeze({
   'G1.negative.page-fades-over-reader': servedEdit('G1.page-fades-over-reader', ['P14.arrive-sumi', 'P14.arrive-yoru']),
   'G2.negative.reading-check-dropped': servedEdit('G2.reading-check-dropped', ['G2.4', 'G2.4.rooms']),
   'G2.negative.tap-schedules': servedEdit('G2.tap-schedules', ['G2.7']),
-  'G3.negative.stalled-second': servedEdit('stalled-second', ['G3.control.stage']),
+  'G3.negative.stalled-second': servedEdit('stalled-second', ['G3.control.stage', 'G3.control.stage-clear']),
+  'G3.negative.tap1-opens-box': servedEdit('tap1-opens-box', ['G3.clear.reading']),
+  'G3.negative.no-gloss-on-tap2': servedEdit('no-gloss-on-tap2', ['G3.control.gloss']),
+  'G3.negative.stalled-third': servedEdit('stalled-third', ['G3.control.stage', 'G3.control.stage-clear']),
+  'G3.negative.box-over-ruby': servedEdit('box-over-ruby', ['G3.control.stage-clear']),
+  'L.negative.mouse-ignored': servedEdit('ladder:mouse-ignored', ['M.hold', 'M.second-hold', 'M.drag']),
+  'L.negative.card-fixed-to-glass': servedEdit('ladder:card-fixed-to-glass', ['L.scroll.down', 'L.scroll.up']),
+  'L.negative.back-leaves-at-once': servedEdit('ladder:back-leaves-at-once', ['L.bar-back']),
+  'L.negative.no-room-made': Object.freeze({ ...servedEdit('ladder:no-room-made', []), killsByEngine: Object.freeze({ chromium: Object.freeze(['L.d7.1440x900']), webkit: Object.freeze(['L.d7.390x844']) }) }),
+  'L.negative.no-aside-mark': servedEdit('ladder:no-aside-mark', ['L.dots']),
+  'L.negative.fade-on-a-row': servedEdit('ladder:fade-on-a-row', ['L.d7.fade.390x560']),
+  'L.negative.dash-for-none': servedEdit('ladder:dash-for-none', ['L.gloss.never-dash']),
+  'L.negative.english-ignores-sense': servedEdit('ladder:english-ignores-sense', ['L.gloss.sense']),
   'G3.negative.ruby-survives-back': servedEdit('ruby-survives-back', ['G3.clear.bare']),
   'G3.negative.front-door': servedEdit('front-door', ['G3.front.sealed']),
   'G3.negative.glyph-z-dropped': servedEdit('glyph-z-dropped', ['G3.sky-ownership.centre']),
@@ -236,6 +256,20 @@ function g6ObservedWitness(spec, baseline, mutant, restore) {
     default: return false;
   }
 }
+function ladderFaultWitness(spec, targets) {
+  const o = targets[0]?.observed;
+  switch (spec.control) {
+    case 'ladder:mouse-ignored': return o?.ring === 0 && o?.strip === 0;
+    case 'ladder:card-fixed-to-glass': return Number.isFinite(o?.rode) && Number.isFinite(o?.moved) && Math.abs(o.rode) < 1 && Math.abs(o.moved) >= 60;
+    case 'ladder:back-leaves-at-once': return Array.isArray(o) && o.some(step => typeof step?.first?.view === 'string' && step.first.view !== 'reader');
+    case 'ladder:no-room-made': return Array.isArray(o) && o.some(place => Array.isArray(place?.rows) && place.rows.some(row => row?.whole === false));
+    case 'ladder:no-aside-mark': return observedObject(o) && o.aside === null;
+    case 'ladder:fade-on-a-row': return Array.isArray(o) && o.some(place => Array.isArray(place?.underFade) && place.underFade.length > 0);
+    case 'ladder:dash-for-none': return Array.isArray(o?.dashes) && o.dashes.length > 0;
+    case 'ladder:english-ignores-sense': return Array.isArray(o?.words) && o.words.some(word => Array.isArray(word?.wrong) && word.wrong.length > 0);
+    default: return false;
+  }
+}
 function servedEditVerdict(spec, control, { engine, rows, digests }) {
   if (control.verdict !== 'killed' || control.error || control.setupError ||
       !noDeclaredErrors(control.pageErrors, spec.local) || !noDeclaredErrors(control.consoleErrors, spec.local)) return false;
@@ -247,7 +281,7 @@ function servedEditVerdict(spec, control, { engine, rows, digests }) {
     if (!Array.isArray(mutant) || !mutant.length || !Array.isArray(restore)) return false;
     if (!mutant.every(row => /^mutant:/u.test(row?.phase || '')) || !restore.every(row => /^restore:/u.test(row?.phase || ''))) return false;
     const walks = new Set(mutant.map(row => row.walk));
-    if (!walks.size || [...walks].some(walk => !WG_WALKS.includes(walk)) || !sameValue([...walks].sort(), [...new Set(restore.map(row => row.walk))].sort())) return false;
+    if (!walks.size || [...walks].some(walk => !grammarWalkNames(engine).includes(walk)) || !sameValue([...walks].sort(), [...new Set(restore.map(row => row.walk))].sort())) return false;
     const candidate = rows.filter(row => row?.phase === 'candidate' && walks.has(row.walk) && row.id?.startsWith(prefix));
     if (baseline !== undefined && !(sameIds(baseline, candidate) && baseline.every((row, i) => row.ok === true && row.walk === candidate[i].walk))) return false;
     baseline = candidate;
@@ -259,6 +293,7 @@ function servedEditVerdict(spec, control, { engine, rows, digests }) {
   if (![...baseline, ...mutant, ...restore].every(executedRow)) return false;
   if (spec.local && !g6ObservedWitness(spec, baseline, mutant, restore)) return false;
   const targets = kills.map(id => mutant.find(row => row.id === id));
+  if (spec.control.startsWith('ladder:') && !ladderFaultWitness(spec, targets)) return false;
   return targets.every(row => row && row.ok === false) && mutant.every(row => kills.includes(row.id) || row.ok === true) && restore.every(row => row.ok === true);
 }
 const sharedHover = sample => !!sample?.held && !!sample?.peer && sample.held.hover === true && sample.peer.hover === true && sample.held.disabled === false &&
@@ -282,7 +317,7 @@ export function grammarControlVerdicts({ engines, rows, controls, runtimeFiles }
   const digests = new Map((Array.isArray(runtimeFiles) ? runtimeFiles : []).map(file => [file?.path, file?.sha256]));
   const records = Array.isArray(controls) ? controls : [];
   return engines.flatMap(engine => grammarControlRows(engine).map(id => {
-    const spec = WG_CONTROL_EVIDENCE[id.slice(engine.length + 1)];
+    const spec = grammarControlSpec(engine, id.slice(engine.length + 1));
     const matching = records.filter(control => control?.engine === engine && control.id === spec?.control);
     const ok = !!spec && matching.length === 1 && CONTROL_VERDICTS[spec.kind](spec, matching[0], { engine, rows, digests }) === true;
     return { id, ok };
@@ -290,10 +325,10 @@ export function grammarControlVerdicts({ engines, rows, controls, runtimeFiles }
 }
 export function grammarAcceptance({ argv, engines, rows, walks, g6Completed, controls, runtimeFiles }) {
   const selection = grammarSelection(argv);
-  const expectedWalks = engines.flatMap(engine => WG_WALKS.map(name => `${engine}/${name}`));
+  const expectedWalks = engines.flatMap(engine => grammarWalkNames(engine).map(name => `${engine}/${name}`));
   const observedWalks = walks.filter(w => w.phase === 'candidate').map(w => `${w.engine}/${w.name}`);
   const expectedControls = engines.flatMap(grammarControlRows);
-  const observedControls = rows.filter(row => /\/(G[1-5]\.negative\.|G6\.(touch|keyboard)\.negative\.)/u.test(row.id)).map(row => row.id);
+  const observedControls = rows.filter(row => /\/(G[1-5]\.negative\.|L\.negative\.|G6\.(touch|keyboard)\.negative\.)/u.test(row.id)).map(row => row.id);
   const expectedCandidates=engines.flatMap(engine=>grammarCandidateRows(engine).map(candidateKey));
   const observedCandidates=rows.filter(row=>row.phase==='candidate').map(candidateKey);
   const controlSet=new Set(expectedControls);

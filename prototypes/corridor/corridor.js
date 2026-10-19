@@ -9592,14 +9592,17 @@ function dialRow(labelJa, labelEn, key, options) {
 }
 
 /* ------------------------------------------- the reader's click grammar
- * G3 follows John's October 14 request to cycle through the layers to the full entry:
- *   tap              → reading in place, then the word's stage, then its page
- *   tap another word → begin that occurrence's ladder; outside or Escape folds one rung
- *   right-click, or press and hold on a touch screen, or ContextMenu / Shift+F10
- *                    → the word menu: Save · Save the sentence · Full entry ·
- *                      Ask the tutor about this sentence · Copy
- * The ふりがな dial skips the reading rung when off or always. A moved pointer is a scroll,
- * never a tap. Rung changes keep the occurrence's DOM and its paragraph focus. */
+ * G3 follows John's October 14 request to cycle through the layers to the full entry, and the Ladder his October 19 one
+ * ("one tap should just be the furigana, two taps should be the furigana plus the english word underneath, three taps
+ * should reveal the box"):
+ *   tap              → the reading over the word, then its English under it, then the word's stage, then its page
+ *   tap another word → begin that occurrence's ladder; outside or Escape returns the word bare in one step
+ *   right-click, a press held still (finger, pen, mouse or trackpad), or ContextMenu / Shift+F10
+ *                    → hold = seal, and the word menu (G5)
+ * A word whose reading is already shown (ふりがな つねに) or that is its own kana skips the reading rung; with ふりがな
+ * なし a tap still shows that one word's reading. The English rung belongs to words set in text (the reader, sentences,
+ * lookup prose: the callers that pass `gloss`); the sky, the Words room and the deck keep reading → stage. A moved
+ * pointer is a scroll, never a tap. Rung changes keep the occurrence's DOM and its paragraph focus. */
 const GESTURE = { MENU_MS: 500, MOVE_PX: 9, RING_MS: 150 };
 
 /* After a hold opens the full entry, the browser still synthesises a click
@@ -9692,6 +9695,78 @@ function inlineWordReading(anchor, reading) {
   anchor.append(row);
   return () => { if (row.parentNode === anchor) row.replaceWith(...children); };
 }
+/** Ladder · the English rung: the word's English in a row of its own under the word (John, 10-19: "two taps should be
+ * the furigana plus the english word underneath"). The row stands in the word's own column (.has-en), so the line breathes
+ * down to make room and nothing on the next line is covered; it is zero-wide, so the word never widens and the line never
+ * re-wraps; its words are centred under the word and slid inward at the line's edges (seatInlineGloss). While it shows, the
+ * occurrence's depth dot steps aside (data-depth-aside, the DOTS slice's hook). Ladder R2 (the lead's round 2, 10-20: "it
+ * never shows —"): an empty text shows nothing. A row whose answer may still come keeps its line (tok-en-wait), so its
+ * English lands without moving the next line; a row with no English at all is not drawn (tok-en-miss), and the rung stands. */
+function inlineGlossLine(text, waiting = false) {
+  const line = el('span', 'tok-en');
+  line.append(el('span', 'tok-en-text'));
+  setGlossLine(line, text, waiting);
+  return line;
+}
+function setGlossLine(line, text, waiting = false) {
+  line.querySelector('.tok-en-text').textContent = text || '';
+  line.classList.toggle('tok-en-wait', !text && waiting);
+  line.classList.toggle('tok-en-miss', !text && !waiting);
+}
+function inlineWordGloss(anchor, text) {
+  return seatGlossRow(anchor, inlineGlossLine(text));
+}
+function seatGlossRow(anchor, line) {
+  anchor.querySelector(':scope > .tok-en')?.remove();
+  anchor.append(line);
+  anchor.classList.add('has-en');
+  anchor.dataset.depthAside = 'meaning';
+  return () => {
+    line.remove();
+    if (!anchor.querySelector(':scope > .tok-en')) { anchor.classList.remove('has-en'); delete anchor.dataset.depthAside; }
+  };
+}
+/** A text token's English rung outside the reader (a sentence's words): the reader's own (tokenGlossLine). */
+function inlineTokenGloss(anchor, token) {
+  return seatGlossRow(anchor, tokenGlossLine(token));
+}
+/** Ladder R2 · a text token's English row (the critic's round-1 FAIL, 10-20: tap 2 repeated the quick dictionary's first gloss,
+ * so 先 in 出荷先 could read "point", and a word with no meaning at hand showed "—"). It says the gloss of the sense its
+ * sentence uses where the article's sense data names one (the sidecar, R3 part 2), else the box's first gloss: its door's
+ * meaning, led by the sense the box settles on once that is in (readerTokenGloss). A sense the sidecar names that is not
+ * yet at hand is waited for, never painted over with a meaning it takes back (R3's rule for the box); elsewhere the row
+ * speaks at once. Its reading's rows and its sense are asked for (the reader asked at the word's first rung: senseAhead):
+ * once the rows are in the row says what they give, as it always has, and once the sense is in, what that settles; with
+ * nothing to say it says nothing. `painted` hears a change. */
+function tokenGlossLine(token, painted = null) {
+  const reading = readyTokenReading(token);
+  const sensing = () => !SENSE_GAVE_UP.has(token) && !!senseChoice(token, readingTokenEntry(token))?.need;
+  const named = () => sensing() && !!sidecarSense(senseNeighbours(token))?.seq;
+  const line = inlineGlossLine(named() ? '' : readerTokenGloss(token), !!reading || sensing());
+  if (!reading && !sensing()) return line;
+  const paint = (last) => {
+    if (!line.isConnected) return;
+    const was = line.textContent, found = !last && named() ? '' : readerTokenGloss(token);
+    setGlossLine(line, found, !last && sensing());
+    if (found) seatInlineGloss(line);
+    if (found !== was) painted?.(line);
+  };
+  Promise.resolve(reading).then(() => { paint(false); return ensureSense(token, readingTokenEntry(token)); })
+    .catch(() => {}).then(() => paint(true));
+  return line;
+}
+/** The English row's words: centred under their word, never past the edge of the line they stand in. */
+function seatInlineGloss(line) {
+  const ink = line?.firstElementChild;
+  if (!ink?.isConnected || !line.isConnected) return;
+  ink.style.removeProperty('translate');
+  const box = ink.getBoundingClientRect();
+  if (!box.width) return;
+  const edges = readingLine(line);
+  if (!edges) return;
+  const shift = box.left < edges.left ? edges.left - box.left : box.right > edges.right ? edges.right - box.right : 0;
+  if (Math.abs(shift) > 0.5) ink.style.translate = `${shift}px 0`;
+}
 /* A reading revealed on touch stands over its word without widening it (the lead's ruling, 2026-10-19; type-ruby R1 at
  * 320 px: ひょうしょう over 表彰 widened the word 21 px and re-wrapped its line). When it is wider than its word it overhangs
  * the neighbouring kana by half its excess on each side, as Japanese typesetting lets ruby overhang, so a tap never reflows
@@ -9779,29 +9854,38 @@ function seatTouchReading(rt) {
 }
 if (typeof MutationObserver === 'function' && typeof document !== 'undefined' && document.documentElement) {
   new MutationObserver((records) => {
-    const seen = new Set();
+    const seen = new Set(), glosses = new Set();
     for (const record of records) {
       if (record.type === 'attributes') { if (record.target.nodeName === 'RT') seen.add(record.target); continue; }
       for (const node of record.addedNodes) {
         if (node.nodeType !== 1) continue;
         if (node.nodeName === 'RT') seen.add(node);
         else for (const rt of node.querySelectorAll?.('rt:not(.hidden-rt)') || []) seen.add(rt);
+        // Ladder · an English row, its words seated after the readings (an overhang may move the word)
+        if (node.classList?.contains('tok-en')) glosses.add(node);
+        else for (const line of node.querySelectorAll?.('.tok-en') || []) glosses.add(line);
       }
     }
     for (const rt of seen) if (rt.style.marginInline || touchReading(rt)) seatTouchReading(rt);
+    for (const line of glosses) seatInlineGloss(line);
   }).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
   // a width or a late font changes what a reading needs: the shown ones are seated again
   let touchReadingFrame = 0;
+  const seatShown = () => {
+    for (const rt of document.querySelectorAll('rt:not(.hidden-rt)')) if (touchReading(rt)) seatTouchReading(rt);
+    for (const line of document.querySelectorAll('.tok-en')) seatInlineGloss(line);
+  };
   window.addEventListener('resize', () => {
     cancelAnimationFrame(touchReadingFrame);
-    touchReadingFrame = requestAnimationFrame(() => { for (const rt of document.querySelectorAll('rt:not(.hidden-rt)')) if (touchReading(rt)) seatTouchReading(rt); });
+    touchReadingFrame = requestAnimationFrame(seatShown);
   }, { passive: true });
-  document.fonts?.ready?.then(() => { for (const rt of document.querySelectorAll('rt:not(.hidden-rt)')) if (touchReading(rt)) seatTouchReading(rt); });
+  document.fonts?.ready?.then(seatShown);
 }
 function clearWordLadder(visit = ladderVisit) {
   if (!visit) return;
   if (ladderVisit === visit) ladderVisit = null;
   delete visit.anchor.dataset.ladderRung;
+  visit.clearGloss?.();
   visit.clearReveal?.();
   readingSlipSerial++;
   syncChromeKeep();
@@ -9854,9 +9938,14 @@ function activateWordLadder(anchor, options) {
       else removeMini();
       return null;
     }
-    if (ladderVisit.rung === 'reading') {
+    // Ladder · the reading's next rung is the English under the word where the word has one; the English's is the stage.
+    // The English is the one this activation knows (a dictionary that answered since the first tap names it now)
+    if (ladderVisit.rung === 'reading' && options.gloss) ladderVisit.gloss = options.gloss;
+    if (ladderVisit.rung === 'reading' && ladderVisit.gloss) return ladderGlossRung(ladderVisit);
+    if (ladderVisit.rung === 'reading' || ladderVisit.rung === 'gloss') {
+      const meaningShown = ladderVisit.rung === 'gloss';
       ladderVisit.rung = anchor.dataset.ladderRung = 'stage';
-      return ladderVisit.openStage({ restore: false, demo: false });
+      return ladderVisit.openStage({ restore: false, demo: false, meaningShown });
     }
   }
   if (standingSlip()) removeMini();
@@ -9870,15 +9959,29 @@ function activateWordLadder(anchor, options) {
     const style = getComputedStyle(rt);
     return !rt.classList.contains('hidden-rt') && style.visibility !== 'hidden' && style.display !== 'none' && style.opacity !== '0';
   });
-  if (!options.demo && !options.restore && !options.redo && S.dials.furigana === 1 && reading && kataToHira(reading) !== kataToHira(String(options.surface || '')) && !visible) {
+  const climbing = !options.demo && !options.restore && !options.redo;
+  // Ladder · a word set in text (a caller with an English rung) shows its reading first on any dial where the reading is
+  // not already up: ふりがな なし too ("that is what tapping is for"); つねに has it up already. The sky, the Words room
+  // and the deck keep the on-touch dial's reading rung.
+  const dialReveals = options.gloss ? true : S.dials.furigana === 1;
+  if (climbing && dialReveals && reading && kataToHira(reading) !== kataToHira(String(options.surface || '')) && !visible) {
     visit.rung = anchor.dataset.ladderRung = 'reading';
     const undo = options.reveal ? options.reveal(reading) : inlineWordReading(anchor, reading);
     visit.clearReveal = options.clearReveal || (typeof undo === 'function' ? undo : null);
     options.onReveal?.();
     return 'reading';
   }
+  if (climbing && options.gloss) return ladderGlossRung(visit);
   anchor.dataset.ladderRung = 'stage';
   return visit.openStage({ restore: !!options.restore, demo: !!options.demo });
+}
+/** Ladder · the English rung: the word's English under it, the reading (if one was raised) staying over it. */
+function ladderGlossRung(visit) {
+  visit.rung = visit.anchor.dataset.ladderRung = 'gloss';
+  const undo = visit.gloss();
+  visit.clearGloss = typeof undo === 'function' ? undo : null;
+  visit.onGloss?.();
+  return 'gloss';
 }
 function removeMini({ keep = null } = {}) {
   // the card's own menu goes with the card; a bar's drawer belongs to its bar, and the render that follows decides it
@@ -9981,9 +10084,15 @@ document.addEventListener(
     }
     const mini = standingSlip();
     // Back owns its own one-level fold on click; do not consume a second
-    // level by dismissing the stage at pointerdown first.
-    if (ladderVisit && target.closest?.('#sheet-back, #chrome-back, [data-action="navigation.back"]')) return;
-    if (!mini && ladderVisit?.rung === 'reading' && !ladderVisit.anchor.contains(target) &&
+    // level by dismissing the stage at pointerdown first. Ladder (the lead's sweep, 10-19): the top bar's ‹ Back (#back) is
+    // one of them — with a reading, an English or a box up it folds the word bare (back → foldWordLadder), and only the next
+    // Back leaves the article; cleared here at its press, the word was already bare and the first Back left for the shelf.
+    // The first-use demonstration's box is the app's own, not a word he climbed: Back clears it at its press and leaves, as
+    // before (folded first, Back stayed in the article and continuity's H2 waited for a room change that never came)
+    if (ladderVisit && (target.closest?.('#sheet-back, #chrome-back, [data-action="navigation.back"]') ||
+        (!ladderVisit.demo && target.closest?.('#back, [data-bar-back]')))) return;
+    // an outside press returns the word bare from its reading or its English (Ladder: as now, in one step)
+    if (!mini && (ladderVisit?.rung === 'reading' || ladderVisit?.rung === 'gloss') && !ladderVisit.anchor.contains(target) &&
         !target.closest?.('#seal-strip, #vocabulary-list-popover')) clearWordLadder();
     const inText = ev.button === 0 && !!target.closest?.('#reader');
     if (mini && !mini.contains(target) && !target.closest?.('#vocabulary-list-popover, #reader-toast')) {
@@ -10268,8 +10377,14 @@ async function openJapaneseLookup(anchor, text, context = {}) {
     ...(context.kanjiOnly ? { kanjiOnly: true } : {}), ...(readMiss ? { readMiss: true } : {}) };
   const entryNode = record ? { t: 'word', id: token.b, ...(record.seq ? { seq: record.seq, reading: record.r } : {}) }
     : hasKanjiEntry ? { t: 'kanji', id: text } : null;
-  return activateWordLadder(anchor, { surface: context.surface || text, reading: context.surfaceReading || token.r,
+  // Ladder · the English under the word: the sense its text uses (the record above), a lone kanji's meaning, or the dash
+  const english = record?.m?.length ? inlineGloss(record) : (context.kanjiOnly || hasKanjiEntry) ? String(D.kanji[text]?.m || '').toLowerCase() : '';
+  // Ladder · the surface the reading is weighed against is the word as printed: a caller's label (the exam paper passes
+  // surface: 'assessment') is not, so a kana word there starts at its English, as everywhere
+  const printed = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(String(context.surface || '')) ? context.surface : text;
+  return activateWordLadder(anchor, { surface: printed, reading: context.surfaceReading || token.r,
     reveal: context.reveal, clearReveal: context.clearReveal, readingVisible: context.readingVisible,
+    gloss: () => inlineWordGloss(anchor, english),
     restore: context.restore, openStage: () => {
   const mini = showMini(anchor, token, (modality) => {
     // An unresolved spelling must not reopen lookup(text)'s rejected first row.
@@ -11653,7 +11768,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     mini.append(actions);
   }
   // the word's kanji, their parts and its web follow the actions, so Save is always the first thing in reach
-  if (kanji) { const web = miniKanjiWeb(token.b, span); if (web) mini.append(web); }
+  if (kanji) { const web = miniKanjiWeb(token.b, span, reading); if (web) mini.append(web); }
   if (sentence) mini.append(sentence);
   // (a slip drawn again in place has its Escape already: the same word's)
   if (!standing) mini.addEventListener('keydown', (event) => {
@@ -11703,7 +11818,7 @@ function slipAllowed(anchor) {
  * words that share one of them, and one door into the web of the word. Every part comes from the
  * kanji data (D.kanji[c].parts through mainParts, named from D.radicals), never chosen by hand; the
  * cards line comes from the learner's own saved words. Nothing is drawn when the word has no kanji. */
-function miniKanjiWeb(word, anchor) {
+function miniKanjiWeb(word, anchor, wordReading = '') {
   const chars = [...new Set([...String(word || '')].filter((c) => D.kanji?.[c]))].slice(0, 3);
   if (!chars.length) return null;
   const box = el('div', 'mini-web');
@@ -11730,6 +11845,17 @@ function miniKanjiWeb(word, anchor) {
     row.append(glyph);
     const what = el('span', 'mini-kanji-what');
     if (bi() && k.m) what.append(el('span', 'mini-kanji-meaning', k.m));
+    // Ladder · D7 · its readings (on, then kun), for the compact card's one line per kanji (glyph, keyword, readings); the
+    // full card shows its parts there instead. A kanji that is the whole word reads only as the word reads here: its card's
+    // answer is that reading, never another of the kanji's (年 read ねん shows ネン, never とし: record-depth R.reader)
+    const own = [...String(word || '')].length === 1 && String(wordReading || '').trim();
+    const readings = own ? [own]
+      : [...(k.on || []).slice(0, 2), ...(k.kun || []).slice(0, 1).map((kun) => String(kun).replace('.', ''))].filter(Boolean);
+    if (readings.length) {
+      const line = el('span', 'mini-kanji-readings', readings.join(' · '));
+      line.lang = 'ja'; line.dataset.uiContent = 'learning';
+      what.append(line);
+    }
     const parts = mainParts(c).filter((part) => part !== c);
     if (parts.length) {
       const set = el('span', 'mini-kanji-parts');
@@ -11910,6 +12036,40 @@ function rowCut(card, room) {
   }
   return foot >= 96 ? Math.ceil(foot + 1) : room;
 }
+/** Ladder R2 · D7 · the depth of a cut card's fade (rooms/read.css: #mini[data-more='true']::after), and the rows it may
+ * never lie on: the card's bands and their own lines (the word band, Save and its reason, the kanji band's heading and its
+ * rows, the sentence's door, Save's menu items). */
+const MINI_FADE = 32;
+const MINI_FADE_ROWS = '.mini-head, .mini-word-note, .mini-actions, .mini-take-reason, .mini-band-head, .mini-kanji-row, ' +
+  '.mini-sentence-open, #vocabulary-list-popover, #vocabulary-list-popover > *, .vocabulary-list-more > *';
+/** Ladder R2 · D7 (the critic's FAIL, 10-20: at 390×520 and 390×560, and at 320×568 with the second 総理 mid-glass, the
+ * compact box was cut at a kanji row's foot and its fade lay on that row; DESIGN: "the fade never lies on a row"). A compact
+ * card cut to its room ends a fade's depth below the deepest row that leaves that much room under it, so its fade lies on
+ * paper: under its last kanji row the kanji band's own depth is there already (is-cut); under any other row, what follows is
+ * folded down by what the fade still needs (data-fold, closed when the card is seated again). A band's heading is never the
+ * last row shown, nor a line inside Save's menu (the menu shows whole or waits under the fold). The cut's height, or null
+ * where not even the word band leaves room for a fade under it (then rowCut decides). */
+function fadeCut(card, room) {
+  const box = card.getBoundingClientRect();
+  const rows = [...card.querySelectorAll(MINI_FADE_ROWS)].filter((node) => node.getClientRects().length).map((node) => {
+    const b = node.getBoundingClientRect();
+    return { node, top: b.top - box.top + card.scrollTop, bottom: b.bottom - box.top + card.scrollTop };
+  });
+  const feet = rows.filter((row) => !row.node.matches('.mini-band-head, #vocabulary-list-popover > *, .vocabulary-list-more > *') &&
+    !rows.some((other) => other.top < row.bottom - 0.5 && other.bottom > row.bottom + 0.5)).sort((a, b) => b.bottom - a.bottom);
+  for (const foot of feet) {
+    // the fade's depth and the card's own foot border; and, where the room has it, a px of paper between the fade and the
+    // row (as the cut rowCut made below the kanji band had)
+    const tight = Math.ceil(foot.bottom + MINI_FADE + 1);
+    if (tight > room) continue;
+    const cut = tight + 1 <= room ? tight + 1 : tight;
+    const next = Math.min(Infinity, ...rows.filter((row) => row !== foot && row.top >= foot.bottom - 0.5).map((row) => row.top));
+    const fold = Math.ceil(foot.bottom + MINI_FADE + (cut - tight) - next);
+    if (fold > 0) { foot.node.style.marginBottom = `${fold}px`; foot.node.dataset.fold = String(fold); }
+    return cut;
+  }
+  return null;
+}
 /** Hfix-1A · a card with more below its cut says so: its foot fades into the band the cut falls in (data-more, the
  * strip's own sign), and it scrolls by touch and by keyboard (its rows are buttons; revealFloatingFocus follows them). */
 function markCardMore(card) {
@@ -11937,7 +12097,10 @@ function placeFloating(card, r) {
   const scrolled = card.scrollTop;
   card.style.maxHeight = '';
   card.style.overflowY = '';
-  const m = card.getBoundingClientRect();
+  card.classList.remove('is-cut');
+  // Ladder R2 · D7 · a fold a cut opened under a row (fadeCut) closes: the card is measured as it stands whole
+  for (const row of card.querySelectorAll('[data-fold]')) { row.style.removeProperty('margin-bottom'); delete row.dataset.fold; }
+  let m = card.getBoundingClientRect();
   const fixedEdge = (selector, edge) => {
     const node = document.querySelector?.(selector);
     if (!node || typeof getComputedStyle !== 'function' || !['fixed', 'sticky'].includes(getComputedStyle(node).position)) return null;
@@ -12000,7 +12163,20 @@ function placeFloating(card, r) {
     return;
   }
   delete card.dataset.flow;
-  let top;
+  // Ladder · the card travels with its word (lead's ruling, 10-19: a trackpad scroll slid the text under a card fixed to the
+  // glass, and it stood on the word's reading): a word in the page's own text puts its card in the text's scroll layer
+  // (data-flow="text", under the bars like the text); a word in a scrolling page moves it with that page's scroll
+  const anchor = card._kept?.anchor;
+  const scroller = anchor ? slipScroller(anchor) : null;
+  // Ladder · D7 · a glide still under way (the card seated again while the text glides, its meaning arriving): the text is
+  // going to stand that much further on, and the seat is chosen for where it stops, never for where it passes
+  const startScroll = scroller === 'window' ? window.scrollY : 0;
+  let inflight = 0;
+  if (scroller === 'window' && card._glideTo != null) {
+    inflight = card._glideTo - startScroll;
+    if (Math.abs(inflight) < 0.5) { card._glideTo = null; inflight = 0; }
+  }
+  let top, shift = inflight;
   if (pinHolds) {
     top = pinned;
     if (m.height > pinnedRoom) {
@@ -12010,43 +12186,179 @@ function placeFloating(card, r) {
   }
   else {
     // Hfix-1A · the word card stands whole beside its word where it can (the sentence's reserve only chooses between the
-    // seats that hold it whole); else it is cut, between two rows. The print never moves for it (G3: the second activation
-    // exposes the stage without moving the print)
-    const seatWhole = () => {
-      if (seatHeight <= roomAbove) return r.top - 10 - seatHeight;
-      if (seatHeight <= roomBelow) return r.bottom + 10;
+    // seats that hold it whole); else it is cut, between two rows. `shift` is how far the text has risen for it (D7, below)
+    const seatWhole = (shift = 0) => {
+      const above = roomAbove - shift, below = roomBelow + shift, wordTop = r.top - shift, wordBottom = r.bottom - shift;
+      if (seatHeight <= above) return wordTop - 10 - seatHeight;
+      if (seatHeight <= below) return wordBottom + 10;
       // The word view still ends before its anchor; only the expanded sentence uses
       // the reserved room below it. The next printed word stays available to tap.
-      if (seatHeight > m.height && seatHeight <= floor - ceiling && m.height <= roomAbove) return ceiling;
-      if (m.height <= roomBelow) return r.bottom + 10;
-      if (m.height <= roomAbove) return r.top - 10 - m.height;
+      if (seatHeight > m.height && seatHeight <= floor - ceiling && m.height <= above) return ceiling;
+      if (m.height <= below) return wordBottom + 10;
+      if (m.height <= above) return wordTop - 10 - m.height;
       return null;
     };
-    top = seatWhole();
+    top = seatWhole(shift);
+    // Ladder · D7 (the lead's sweep and ruling, 10-19: "all of its kanji rows must be visible without scrolling inside it, and
+    // it still must not cover the word or its reading"; John, 10-15: the card is "too bulky"). A card no seat beside its word
+    // holds whole sets compact: tighter bands, every kanji on one line of its own (glyph, keyword, readings), what is
+    // secondary under a cut that says it scrolls; the print stays still. Once compact, a card stays compact while it stands.
+    if (top == null && !sentence && anchor?.matches?.('#reader .tok, .japanese-lookup-word, .sentence-tok') &&
+        card.querySelector(':scope > .mini-web') && !card.classList.contains('is-compact')) {
+      card.classList.add('is-compact');
+      m = card.getBoundingClientRect();
+      seatHeight = m.height;
+      top = seatWhole(shift);
+    }
+    // a compact card to be cut keeps a fade's depth of its kanji band under its last kanji row (is-cut): the cut then falls
+    // between two bands, and the fade it wears covers that and never a kanji row
+    if (top == null && card.classList.contains('is-compact')) card.classList.add('is-cut');
+    // What a card must show runs to the foot of its last band before the sentence's (the meaning, Save, every kanji row).
+    // Only where no seat beside its word holds even that of the compact card (a short glass: 320×568) does the text it rides
+    // with glide, the least that lets a seat hold the whole card, else that much of it; the card says so (data-glide)
+    let glided = 0;
+    // the text glides for a box his tap opened, never for one the app puts back (a page or Practice returning to its stage:
+    // the article stands where he left it; a hold's refresh) nor for the first-use demonstration: decided at the box's
+    // arrival, while its visit still says how it came, and kept while it stands
+    if (card._mayGlide === undefined) {
+      const visit = ladderVisit?.anchor === anchor ? ladderVisit : null;
+      card._mayGlide = !(visit && (visit.restore || visit.restoreNext || visit.redo || visit.demo));
+    }
+    if (top == null && !sentence && scroller && card._mayGlide && Math.max(roomAbove - shift, roomBelow + shift) < mustShowHeight(card)) {
+      const word = { top: r.top - shift, bottom: r.bottom - shift };
+      glided = roomForCard(word, ceiling, floor, scroller, [m.height, Math.min(m.height, mustShowHeight(card))],
+        (scroller === 'window' ? startScroll : scroller.scrollTop) + shift);
+      if (glided) {
+        // the page's text glides (at once under reduced motion); the card already stands where the text is going
+        if (scroller === 'window') {
+          card._glideTo = startScroll + shift + glided;
+          window.scrollTo({ top: card._glideTo, behavior: pageCutAllowed() ? 'smooth' : 'instant' });
+        } else {
+          // a page's own scroller moves at once (its card is on the glass and follows that page's scroll): the seat follows
+          // what actually moved
+          const before = scroller.scrollTop;
+          scroller.scrollTo({ top: before + glided, behavior: 'instant' });
+          glided = scroller.scrollTop - before;
+        }
+        shift += glided;
+        top = seatWhole(shift);
+      }
+    }
+    if (top != null) card.classList.remove('is-cut');
+    // the glide stays on the card for as long as it stands (a later re-seat does not hide that the print moved)
+    if (glided) card.dataset.glide = String((Number(card.dataset.glide) || 0) + glided);
     if (top == null) {
-      const fit = rowCut(card, Math.max(roomAbove, roomBelow, 96));
+      // Ladder · a cut card takes the room it has and no more (a 96 px floor past a smaller room stood it on its word). Above
+      // its word it still meets the chrome's edge (Hfix-1A: no strip of cut title glyphs over it; a sentence opened from it
+      // keeps that top edge), its foot, shortened to a row, ending further from the word; below it, 10 px under the word
+      const above = roomAbove - shift, below = roomBelow + shift;
+      // Ladder R2 · D7 · a compact card's fade lies on no row (fadeCut); any other card is cut as Hfix-1A cuts it
+      const room = Math.max(above, below, 1);
+      const fit = (card.classList.contains('is-compact') ? fadeCut(card, room) : null) ?? rowCut(card, room);
       card.style.maxHeight = `${fit}px`;
       card.style.overflowY = 'auto';
       if (scrolled) card.scrollTop = scrolled;
-      // above its word a cut card still meets the chrome's edge (no strip of cut title glyphs over it); its foot, shortened
-      // to a row, ends further from the word
-      top = roomAbove >= roomBelow ? ceiling : r.bottom + 10;
+      top = above >= below ? ceiling : r.bottom - shift + 10;
     }
   }
   // a card nearly as wide as the screen is centred, its two gutters equal (review round 2 #13);
   // a narrower card stays beside its word
-  card.style.left = m.width >= window.innerWidth - 48
-    ? `${Math.max(0, (window.innerWidth - m.width) / 2)}px`
-    : `${Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2))}px`;
-  card.style.top = `${top}px`;
+  const left = m.width >= window.innerWidth - 48
+    ? Math.max(0, (window.innerWidth - m.width) / 2)
+    : Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2));
+  // the text's layer: the seat is the glass position once the text has finished moving (window.scrollY + shift)
+  const ox = scroller === 'window' ? window.scrollX : 0, oy = scroller === 'window' ? startScroll + shift : 0;
+  if (scroller === 'window') { card.dataset.flow = 'text'; card.dataset.seatScroll = String(oy); }
+  else delete card.dataset.seatScroll;
+  card.style.left = `${left + ox}px`;
+  card.style.top = `${top + oy}px`;
+  card.style.clipPath = '';
   // CSS rounds fractional positions; retain the exact calculated seat for the sentence pin.
   if (Number.isFinite(top)) card.dataset.floatingTop = String(top);
   else delete card.dataset.floatingTop;
-  // which side of its word the card stands on: its shade falls away from the word, never across it
-  card.dataset.side = top < r.top ? 'above' : 'below';
+  // which side of its word the card stands on: its shade falls away from the word, never across it, and above its word it
+  // arrives from above (rooms/read.css --mini-rise), so its rise never brushes the reading
+  card.dataset.side = top < r.top - shift ? 'above' : 'below';
+  card._seat = scroller && scroller !== 'window' && anchor ? { scroller, top, left, anchor: anchor.getBoundingClientRect(),
+    frame: { top: ceiling, bottom: Math.min(floor + 8, scroller.getBoundingClientRect().bottom) } } : null;
   markCardMore(card);
   revealFloatingFocus(card);
 }
+/** Ladder · D7 · how much of a card must show: down to the foot of its last band before the sentence's (its meaning, Save and
+ * its menu, every kanji row), measured with the card whole; a card with nothing but that shows whole. */
+function mustShowHeight(card) {
+  const box = card.getBoundingClientRect();
+  let foot = 0;
+  for (const band of card.children) {
+    if (band.classList.contains('mini-sentence-wrap') || !band.getClientRects().length) continue;
+    foot = Math.max(foot, band.getBoundingClientRect().bottom - box.top + card.scrollTop);
+  }
+  return foot ? Math.ceil(foot) + 1 : box.height;
+}
+/** Ladder · D7 · how far the text must rise (+) or fall (−) so a seat beside the word holds a card of each height in turn
+ * (the whole card, then what it must show): the least move over the two sides, within what its scroller can scroll, with the
+ * word and its reading staying on the glass between the frame and the floor. When no height can be had, the move that gives
+ * the most room, if it gives more; else 0. */
+function roomForCard(r, ceiling, floor, scroller, heights, at = scroller === 'window' ? window.scrollY : scroller.scrollTop) {
+  const win = scroller === 'window';
+  const max = win ? document.documentElement.scrollHeight - window.innerHeight : scroller.scrollHeight - scroller.clientHeight;
+  for (const h of heights) {
+    let best = null;
+    // above the word: its card stays under the frame and the word over the floor; below it: the card ends over the floor and
+    // the word stays under the frame
+    for (const [low, high] of [[r.bottom - floor, r.top - 10 - h - ceiling], [r.bottom + 10 + h - floor, r.top - ceiling]]) {
+      const lo = Math.max(low, -at), hi = Math.min(high, max - at);
+      if (lo > hi) continue;
+      const s = Math.min(Math.max(0, lo), hi);
+      // Ladder R2 · D7 · in whole px and never short of the room it is for: away from 0 while that stays inside [lo, hi]
+      // (rounding to the nearest px gave back up to half a px: at 320×568 the second 総理's box missed the fade's depth
+      // under its kanji rows by 0.2 px, and its fade lay on 理's row)
+      const whole = s < 0 ? Math.floor(s) : Math.ceil(s);
+      const move = whole >= lo && whole <= hi ? whole : Math.round(s);
+      if (best == null || Math.abs(move) < Math.abs(best)) best = move;
+    }
+    if (best != null && Math.abs(best) >= 1) return best;
+  }
+  // no height can be had beside the word wherever the text stands (a glass shorter than the card's must-show and its word:
+  // 390×520): the move that gives the card the most room, its word still on the glass, when that is more than it has.
+  // Standing still there cut it to what the word's middle left (131 px of 339: not one kanji row)
+  const sinks = Math.max(r.bottom - floor, -at), rises = Math.min(r.top - ceiling, max - at);
+  const roomAbove = (s) => r.top - s - 10 - ceiling, roomBelow = (s) => floor - (r.bottom - s) - 10;
+  const now = Math.max(roomAbove(0), roomBelow(0));
+  const [move, room] = roomAbove(sinks) >= roomBelow(rises) ? [sinks, roomAbove(sinks)] : [rises, roomBelow(rises)];
+  return room > now + 1 && Math.abs(move) >= 1 ? Math.round(move) : 0;
+}
+/** Ladder · where a word's card travels: 'window' for a word that scrolls with the page, the element that scrolls it inside
+ * a scrolling surface (a page), or null: a word that does not scroll (a fixed surface), a word inside a card, or no word set
+ * in text (the sky, the Words room and the deck keep their cards where they are). */
+function slipScroller(anchor) {
+  if (!anchor?.isConnected || !anchor.matches?.('#reader .tok, .japanese-lookup-word, .sentence-tok')) return null;
+  for (let n = anchor.parentElement; n && n !== document.body && n !== document.documentElement; n = n.parentElement) {
+    if (n.id === 'mini') return null;
+    const style = getComputedStyle(n);
+    if (/(auto|scroll|overlay)/.test(style.overflowY) && n.scrollHeight > n.clientHeight + 1) return n;
+    if (style.position === 'fixed') return null;
+  }
+  return 'window';
+}
+/** A card in a scrolling page moves as its word does, and is hidden where the text is (under the page's bar, past its foot). */
+function travelSlip(card) {
+  const seat = card._seat, anchor = card._kept?.anchor;
+  if (!seat || !card.isConnected || !anchor?.isConnected) return;
+  const now = anchor.getBoundingClientRect();
+  const top = seat.top + (now.top - seat.anchor.top), left = seat.left + (now.left - seat.anchor.left);
+  card.style.top = `${top}px`;
+  card.style.left = `${left}px`;
+  card.dataset.floatingTop = String(top);
+  const box = card.getBoundingClientRect();
+  const cutTop = Math.max(0, seat.frame.top - box.top), cutBottom = Math.max(0, box.bottom - seat.frame.bottom);
+  card.style.clipPath = cutTop || cutBottom ? `inset(${cutTop}px 0 ${cutBottom}px 0)` : '';
+}
+// a scroll inside a page (any scroller but the window, whose cards ride in its own layer) carries its word's card along
+if (typeof document !== 'undefined') document.addEventListener('scroll', (event) => {
+  const card = standingSlip();
+  if (card?._seat && event.target === card._seat.scroller) travelSlip(card);
+}, { capture: true, passive: true });
 
 /* A press held down (a mouse button, a pen, a finger before its tap lands) keeps what it rests on under it until its
  * release: a card reveals its focus after the release, never during the press. A press in a card moves the focus where it
@@ -12204,8 +12516,10 @@ function readerSentenceRow(node, index, sourceEnd = index) {
     const card = wrap.closest('#mini');
     if (card && open) {
       const exactTop = card.dataset.floatingTop;
+      // Ladder · a card riding in the text's layer has moved with its word since its seat: it pins where it stands now
+      const moved = card.dataset.flow === 'text' ? window.scrollY - Number(card.dataset.seatScroll || window.scrollY) : 0;
       card.dataset.pinTop = exactTop !== undefined && Number.isFinite(Number(exactTop))
-        ? exactTop : String(parseFloat(card.style.top));
+        ? String(Number(exactTop) - moved) : String(parseFloat(card.style.top) - (card.dataset.flow === 'text' ? window.scrollY : 0));
     } else if (card) delete card.dataset.pinTop;
     pane.hidden = !open;
     door.hidden = open;
@@ -13185,10 +13499,10 @@ async function openPreparedWordEntry(span, door) {
   return door.openEntry('keyboard');
 }
 
-/** Press-and-hold (touch and pen), right-click and the menu key seal the word (sealWord, G5); a hold that moves is a
- * scroll. A hold belongs to the pointer that began it: another finger, a cancel, a lift or a move past MOVE_PX before
- * the commit ends it, its ring with it. A touch hold some engines also report as a contextmenu is the same hold: one
- * seal, never two. */
+/** Press-and-hold (touch, pen, and a mouse or trackpad held still), right-click and the menu key seal the word (sealWord,
+ * G5); a hold that moves is a scroll, or with a mouse a drag that selects text. A hold belongs to the pointer that began
+ * it: another finger, a cancel, a lift or a move past MOVE_PX before the commit ends it, its ring with it. A touch hold
+ * some engines also report as a contextmenu is the same hold: one seal, never two. */
 function wireReaderWordMenu(span, door) {
   span.setAttribute('aria-keyshortcuts', 'Shift+F10 Control+Enter');
   warmSealStripFaces();
@@ -13200,7 +13514,13 @@ function wireReaderWordMenu(span, door) {
     clearTimeout(h.timer);
     clearTimeout(h.ringTimer);
     window.removeEventListener('pointerdown', h.other, true);
+    h.unwatch?.();
     if (!h.committed) h.ring?.cancel();
+  };
+  // a committed mouse hold keeps no text selected: the press was a hold, not the start of a drag
+  const unselect = () => {
+    const selection = typeof getSelection === 'function' ? getSelection() : null;
+    if (selection && !selection.isCollapsed && selection.containsNode?.(span, true)) selection.removeAllRanges();
   };
   const commit = (h) => {
     if (hold !== h || h.committed) return;
@@ -13209,7 +13529,18 @@ function wireReaderWordMenu(span, door) {
     clearTimeout(h.ringTimer);
     // the finger's release may synthesise a click: it belongs to the hold, never to the strip under it
     swallowClickUntil = Date.now() + 700;
+    if (h.mouse) unselect();
     void sealWord(span, door, { ring: h.ring });
+  };
+  const moved = (event) => {
+    if (!hold || event.pointerId !== hold.start.id) return;
+    if (hold.committed) { if (hold.mouse) unselect(); return; }
+    if (Math.hypot(event.clientX - hold.start.x, event.clientY - hold.start.y) > GESTURE.MOVE_PX) clear();
+  };
+  const released = (event) => {
+    if (!hold || event.pointerId !== hold.start.id) return;
+    if (hold.committed) swallowClickUntil = Date.now() + 700;
+    clear();
   };
   span.addEventListener('contextmenu', (event) => {
     event.preventDefault();
@@ -13222,24 +13553,36 @@ function wireReaderWordMenu(span, door) {
   });
   span.addEventListener('pointerdown', (event) => {
     clear();
-    if (event.pointerType === 'mouse' || event.isPrimary === false) return;
+    if (event.isPrimary === false) return;
+    // Ladder · a mouse or trackpad press held still is a hold too (John, 10-19 17:19, on the Mac: "HOLDING A WORD does
+    // nothing at all"): its primary button only, never with Control (the Mac's secondary click, the contextmenu below)
+    const mouse = event.pointerType === 'mouse';
+    if (mouse && (event.button !== 0 || event.ctrlKey)) return;
     const start = { x: event.clientX, y: event.clientY, id: event.pointerId };
-    const h = { start, ring: null, committed: 0 };
+    const h = { start, ring: null, committed: 0, mouse };
     h.other = (other) => { if (other.pointerId !== start.id && hold === h && !h.committed) clear(); };
     window.addEventListener('pointerdown', h.other, true);
+    if (mouse) {
+      // a mouse has no implicit capture: a drag or a release past the word's edge is heard on the window, and leaving the
+      // window ends the hold
+      const lost = () => clear();
+      window.addEventListener('pointermove', moved, true);
+      window.addEventListener('pointerup', released, true);
+      window.addEventListener('pointercancel', lost, true);
+      window.addEventListener('blur', lost);
+      h.unwatch = () => {
+        window.removeEventListener('pointermove', moved, true);
+        window.removeEventListener('pointerup', released, true);
+        window.removeEventListener('pointercancel', lost, true);
+        window.removeEventListener('blur', lost);
+      };
+    }
     h.ringTimer = setTimeout(() => { if (hold === h && !h.committed) h.ring = holdRing(start.x, start.y); }, GESTURE.RING_MS);
     h.timer = setTimeout(() => commit(h), GESTURE.MENU_MS);
     hold = h;
   });
-  span.addEventListener('pointermove', (event) => {
-    if (!hold || hold.committed || event.pointerId !== hold.start.id) return;
-    if (Math.hypot(event.clientX - hold.start.x, event.clientY - hold.start.y) > GESTURE.MOVE_PX) clear();
-  });
-  span.addEventListener('pointerup', (event) => {
-    if (!hold || event.pointerId !== hold.start.id) return;
-    if (hold.committed) swallowClickUntil = Date.now() + 700;
-    clear();
-  });
+  span.addEventListener('pointermove', moved);
+  span.addEventListener('pointerup', released);
   span.addEventListener('pointercancel', (event) => {
     if (hold && event.pointerId === hold.start.id) clear();
   });
@@ -14485,9 +14828,9 @@ function dictionaryAnsweredForm(form = '') {
   return !!form && !!D.dictionaryIndex && (D.dictionaryMode === 'main' || !!D.dictionaryCompleteForms?.has(String(form)));
 }
 
-/** The line under a content word on the ladder's English rung: its gloss
- * exactly as before, or an honest dash when the quick dictionary has none. N · a word whose entry at hand is read
- * otherwise shows the dash until the full dictionary answers, then that answer's gloss if it has one read so. */
+/** The line under a content word on the ladder's English rung: its gloss, or nothing where it has none (Ladder R2: never the
+ * dash). N · a word whose entry at hand is read otherwise shows nothing until the full dictionary answers, then that
+ * answer's gloss if it has one read so. */
 /** R2 · a reader word's gloss speaks for its door (readingToken): an inflected word's dictionary form read the text's
  * way, a sound change's entry, a lone kanji's meaning; '' when the entry at hand has none read so. */
 function readerDoorGloss(door) {
@@ -14498,18 +14841,11 @@ function readerDoorGloss(door) {
 }
 const readerTokenGloss = (token) => readerDoorGloss(readingToken(token));
 function readerGlossLine(token) {
-  const gloss = readerDoorGloss;
-  const now = gloss(readingToken(token));
-  const line = now ? el('span', 'tok-en', now) : el('span', 'tok-en tok-en-miss', '—');
-  if (!now) readyTokenReading(token)?.then(() => {
-    const found = line.isConnected ? gloss(readingToken(token)) : '';
-    if (found) {
-      line.className = 'tok-en'; line.textContent = found;
-      const word = line.closest('.tok[data-index]');
-      if (word) nameReaderToken(word, token, Number(word.dataset.index), 'word');
-    }
+  // Ladder R2 · the sense its sentence uses, followed to its answer (tokenGlossLine); its spoken state follows the row
+  return tokenGlossLine(token, (line) => {
+    const word = line.closest('.tok[data-index]');
+    if (word) nameReaderToken(word, token, Number(word.dataset.index), 'word');
   });
-  return line;
 }
 
 /** How the reader's words work, in plain words: the text settings say it whole (John, 2026-10-02 #8). */
@@ -14595,9 +14931,10 @@ function installReaderRoving(reader) {
     if (paragraph.querySelector('.tok[data-para]')) installProseWordRoving(paragraph, '.tok[data-para]');
   }
 }
-/** Reading only: never a gloss, whatever the shared per-index state holds. */
+/** A name's reading, from the shared per-index state. Ladder · its English row is the ladder's own (inlineWordGloss), kept
+ * while its occurrence's visit holds it and gone otherwise. With ふりがな なし a touched name still shows its reading. */
 function paintNamedTok(span, token, index) {
-  const shown = S.dials.furigana !== 0 && !!S.revealed?.has(index);
+  const shown = !!S.revealed?.has(index);
   if (S.dials.furigana === 1) {
     for (const rt of span.querySelectorAll('rt')) rt.classList.toggle('hidden-rt', !shown);
   } else if (S.dials.furigana === 0) {
@@ -14606,14 +14943,18 @@ function paintNamedTok(span, token, index) {
     if (row) row.replaceWith(next);
     else { span.textContent = ''; span.append(next); }
   }
-  span.querySelector('.tok-en')?.remove();
-  span.classList.remove('has-en');
+  if (!(ladderVisit?.anchor === span && ladderVisit.clearGloss)) {
+    span.querySelector('.tok-en')?.remove();
+    span.classList.remove('has-en');
+    delete span.dataset.depthAside;
+  }
   span.classList.toggle('lit', shown);
   nameReaderToken(span, token, index, 'named');
 }
 /** Apply one token's reveal state straight to its DOM — no re-render. */
 function paintTok(span, token, index) {
-  const hasReading = S.dials.furigana === 2 || (S.dials.furigana === 1 && S.revealed?.has(index));
+  // Ladder · ふりがな なし: a touched word shows its own reading too (the tap's first rung)
+  const hasReading = S.dials.furigana === 2 || !!S.revealed?.has(index);
   const hasEn = S.glossed?.has(index);
   if (S.dials.furigana === 1) {
     for (const rt of span.querySelectorAll('rt')) rt.classList.toggle('hidden-rt', !hasReading);
@@ -14645,6 +14986,9 @@ function paintTok(span, token, index) {
     span.classList.remove('has-en');
     existingEn.remove();
   }
+  // Ladder · while its English shows, this occurrence's depth dot steps aside (the DOTS slice's hook)
+  if (hasEn) span.dataset.depthAside = 'meaning';
+  else delete span.dataset.depthAside;
   nameReaderToken(span, token, index, 'word');
 }
 
@@ -14654,10 +14998,23 @@ function paintTok(span, token, index) {
 const readerTokenPainters = new Map();
 const readerTokenDoors = new WeakMap();
 function markReaderReading(index) {
-  if (S.dials.furigana !== 1) return;
+  // Ladder · on touch and なし alike, the touched word shows its reading; つねに shows them all already
+  if (S.dials.furigana === 2) return;
   const before = S.revealed ? [...S.revealed] : [];
   S.revealed = new Set([index]);
   for (const at of new Set([...before, index])) readerTokenPainters.get(at)?.();
+}
+/** Ladder · the English rung of a reader word: its index joins the shared glossed state (one word at a time) and the word
+ * repaints with its English row; the undo takes it away again. */
+function glossReaderToken(index) {
+  const before = S.glossed ? [...S.glossed] : [];
+  S.glossed = new Set([index]);
+  for (const at of new Set([...before, index])) readerTokenPainters.get(at)?.();
+  return () => {
+    if (!S.glossed?.has(index)) return;
+    S.glossed.delete(index);
+    readerTokenPainters.get(index)?.();
+  };
 }
 /** Back to the original text: every reading a tap summoned goes (つねに keeps its own), and with
  * `marked` the marked word too (the chrome's Save then stands for the place again). */
@@ -14705,17 +15062,30 @@ function wireTokenGestures(span, token, index, p) {
     go(readerEntryNode(token, index, p), { invoker: span, from: (fromSlip && slipHeadword()) || span, instant: modality === 'keyboard' });
   };
   const sentence = () => readerTakeNode({ id: token.b, index, p: p.id });
+  // Ladder · Hfix-1A's item 18 on the ladder: the sense the box will show is asked for at the word's first rung (its
+  // reading, or its English where the reading is up), the way the box asks for it once it stands (its reading answered,
+  // then ensureSense). The box comes two taps on and finds it at hand. It had been asked for only after the box stood
+  // with its "…": the dictionary's shard went out about 160 ms after the box on a quiet machine, later under load, so a
+  // Save aimed during that "…" raced a request not yet made (the pending-save rows: asked 0)
+  const senseAhead = () => {
+    if (SENSE_GAVE_UP.has(token)) return;
+    Promise.resolve(readyTokenReading(token)).then(() => ensureSense(token, readingTokenEntry(token))).catch(() => {});
+  };
   const quickLook = (modality = 'pointer', { restore = false, demo = false } = {}) => activateWordLadder(span, {
     surface: displayPairs(token).map(pair => pair.t).join(''), reading: token.r, modality, restore, demo,
-    reveal: () => { setReaderTake(token.b, index, p.id); markReaderReading(index); },
+    reveal: () => { setReaderTake(token.b, index, p.id); markReaderReading(index); senseAhead(); },
     clearReveal: () => clearReaderReadings(),
     readingVisible: () => S.dials.furigana === 2 || !!S.revealed?.has(index),
     onReveal: () => obsLog('tap', obsKey, 1, p.id),
-    openStage: ({ restore, demo }) => {
+    // Ladder · the English under the word (the shared per-index state, so a repaint or a redraw keeps it)
+    gloss: () => { setReaderTake(token.b, index, p.id); senseAhead(); return glossReaderToken(index); },
+    // the meaning is shown: the observation log's depth 2, once a visit, at the first rung that shows it
+    onGloss: () => obsLog('tap', obsKey, 2, p.id),
+    openStage: ({ restore, demo, meaningShown }) => {
     if (!demo) {
     setReaderTake(token.b, index, p.id);
-    // the meaning is shown: the observation log's depth 2, as the mini always wrote it
-    if (!restore) obsLog('tap', obsKey, 2, p.id);
+    // the meaning is shown: the observation log's depth 2, as the mini always wrote it (unless its English rung did)
+    if (!restore && !meaningShown) obsLog('tap', obsKey, 2, p.id);
     }
     // R · the slip stands for the entry the token's own reading names (readingToken). A word the core lacks whose
     // reading names the full dictionary's one entry is that entry's own door (D23 answers it), not D11's held look
@@ -15862,13 +16232,14 @@ function renderReader(main) {
       // Keep its source token and spelling intact; the dial owns only the ruby.
       wordRow(particle?.r && kataToHira(particle.r) !== kataToHira(token.s)
         ? [{ t: token.s, r: particle.r }] : displayPairs(token), {
-        // Off stays bare; on-touch owns only the current occurrence's reveal.
-        furigana: S.dials.furigana,
+        // Off stays bare but for the occurrence a tap revealed (Ladder); on-touch owns only the current occurrence's reveal.
+        furigana: S.dials.furigana === 0 && S.revealed?.has(index) ? 1 : S.dials.furigana,
         revealed: S.dials.furigana === 2 || (S.revealed && S.revealed.has(index)),
       }),
     );
     if (token.c && S.glossed?.has(index)) {
       span.classList.add('has-en');
+      span.dataset.depthAside = 'meaning';
       span.append(readerGlossLine(token));
     }
     let rendered = span;
@@ -16086,7 +16457,8 @@ window.__BUNKI_OPEN_ENTRY = {
  *   redo    the caller already read the press (the reader's doors): never treat this call as the second tap
  * Returns 'reading', the stage element, or null after entering the page or dismissing a held stage. */
 function openSlip(node, { anchor, from = 'lookup', host = null, look = null, note = null, sentence = null, focus = false,
-  onClose = null, entry, key = null, redo = false, why = '', reveal = null, clearReveal = null, readingVisible = null, onStage = null } = {}) {
+  onClose = null, entry, key = null, redo = false, why = '', reveal = null, clearReveal = null, readingVisible = null, onStage = null,
+  gloss = null } = {}) {
   if (!anchor?.isConnected) return null;
   if (!redo && diveFromSlip(anchor)) return null;
   const kind = node?.t === 'kanji' ? 'kanji' : node?.t === 'particle' ? 'particle' : node?.t === 'grammar' ? 'grammar' : 'word';
@@ -16130,7 +16502,10 @@ function openSlip(node, { anchor, from = 'lookup', host = null, look = null, not
       entry(modality);
     } else if (node) go(node, { invoker: anchor, from: slipHeadword() || anchor, instant: modality === 'keyboard' }); // the slip leaves inside the cut (enterWord)
   };
+  // Ladder · a caller whose word stands in a line of text passes its English rung (`gloss`); the sky, the Words room and
+  // the deck pass none and keep reading → stage
   return activateWordLadder(anchor, { surface: token.s, reading: look?.reading || token.r, reveal, clearReveal, readingVisible, redo, from,
+    ...(gloss ? { gloss } : {}),
     openStage: () => {
       const stage = showMini(anchor, token, onEntry, { focusEntry: focus, record, entryAvailable, sentence, look, kind, save, host, note,
         source: from, key, kanji, onClose, follow: from === 'drift' || from === 'sky', nodeFor: node && kind !== 'word' ? { t: node.t, id: node.id } : null,
@@ -25669,6 +26044,8 @@ function wireParticleGestures(span, particle, index, p) {
     if (S.readerTake) { S.readerTake = null; syncReaderTakeSeal(); }
     openSlip({ t: 'particle', id: particle.id }, {
       anchor: span, from: 'reader', key: `particle:${particle.id}`, redo: restore,
+      // Ladder · a particle's English rung is its role, under it
+      gloss: () => inlineWordGloss(span, particle.role || ''),
       look: { label: particle.p, reading: particle.r, gloss: bi() ? particle.role : particle.roleJa },
       sentence: readerSentenceRow(sentence(), index), focus: modality === 'keyboard',
       entry: (entryModality) => openFull(entryModality),
@@ -33337,8 +33714,11 @@ function renderSentenceTokens(container, tokens, opts = {}) {
         focusPopup: modality === 'keyboard' });
       return activateWordLadder(span, { surface: displayPairs(token).map(pair => pair.t).join(''), reading: token.r, modality,
         onReveal: () => obsLog('tap', srsKey('word', token.b), 1, contextId),
-        openStage: ({ restore }) => {
-          if (!restore) obsLog('tap', srsKey('word', token.b), 2, contextId);
+        // Ladder · the English under the word, then the stage; the meaning's depth 2 is logged once, where it first shows
+        gloss: () => inlineTokenGloss(span, token),
+        onGloss: () => obsLog('tap', srsKey('word', token.b), 2, contextId),
+        openStage: ({ restore, meaningShown }) => {
+          if (!restore && !meaningShown) obsLog('tap', srsKey('word', token.b), 2, contextId);
           return openReadingSlip(span, token, (door) => showMini(span, door, (mode) => openEntry(door, mode), {
             focusEntry: modality === 'keyboard', from, entryNode: entryNodeFor(door) }));
         } });

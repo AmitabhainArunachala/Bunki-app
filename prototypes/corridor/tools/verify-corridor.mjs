@@ -189,15 +189,23 @@ async function focusProseOccurrence(page, target) {
   assert(await target.evaluate(word => document.activeElement === word), 'Home/Arrows select the exact intended occurrence');
 }
 
-/** Setup for checks whose subject is the stage: only an observed reading rung permits the second activation. */
+/** Setup for checks whose subject is the stage: only an observed reading rung permits the second activation, and (Ladder)
+ * only an observed English rung the third. */
 async function openWordStage(page, selector, index = 0, scroll = true) {
   const target = page.locator(selector).nth(index);
   assert.notEqual(await target.getAttribute('data-ladder-rung'), 'stage', 'Stage setup begins on a word without its stage');
   await touchAt(page, selector, index, 0, scroll);
-  await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await target.elementHandle());
+  await page.waitForFunction(node => ['reading', 'gloss', 'stage'].includes(node?.dataset.ladderRung), await target.elementHandle());
   if (await target.getAttribute('data-ladder-rung') === 'reading') {
     assert.equal(await page.locator('#mini').count(), 0, 'Reading rung has no meaning stage');
     assert(await target.evaluate(node => [...node.querySelectorAll('rt')].some(rt => !rt.classList.contains('hidden-rt') && getComputedStyle(rt).visibility !== 'hidden')), 'Reading rung reveals the pronunciation');
+    await touchAt(page, selector, index, 0, scroll);
+  }
+  // Ladder (John, 10-19): the English under the word comes before the stage; one more touch, only once it is seen
+  await page.waitForFunction(node => node?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'), await target.elementHandle());
+  if (await target.getAttribute('data-ladder-rung') === 'gloss') {
+    assert.equal(await page.locator('#mini').count(), 0, 'English rung has no meaning stage yet');
+    assert(await target.evaluate(node => !!node.querySelector(':scope > .tok-en .tok-en-text')), 'English rung draws the English under the word');
     await touchAt(page, selector, index, 0, scroll);
   }
   await page.locator('#mini .mini-word').waitFor();
@@ -770,10 +778,15 @@ async function pendingSaveEngine(browser, engine, base) {
     await word.evaluate((n) => n.scrollIntoView({ block: 'center' }));
     if (seat === 'top') await word.evaluate((n) => window.scrollBy(0, n.getBoundingClientRect().top - 150));
     await page.waitForTimeout(120);
-    for (let tap = 0; tap < 2 && !await page.locator('#mini #mini-take').count(); tap += 1) {
+    // Ladder (John, 10-19): one observed rung a tap: the reading (where it is not up), then the English under the word, then
+    // the stage; each tap waits for the rung it climbs to, and the next is taken only once that rung is seen
+    for (let after = ['reading', 'gloss']; after && !await page.locator('#mini').count();) {
       const box = await word.boundingBox();
       await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
-      await page.waitForFunction((n) => !!document.getElementById('mini') || n.dataset.ladderRung === 'reading', await word.elementHandle(), { timeout: 10000 });
+      const rung = await page.waitForFunction(([n, after]) => (document.getElementById('mini') ? 'stage'
+        : after.includes(n.dataset.ladderRung) ? n.dataset.ladderRung : null), [await word.elementHandle(), after], { timeout: 10000 })
+        .then((h) => h.jsonValue());
+      after = { reading: ['gloss'], gloss: [] }[rung] ?? null;
     }
     await page.locator('#mini #mini-take').waitFor({ timeout: 10000 });
     await page.waitForTimeout(250);
@@ -1334,7 +1347,8 @@ async function main() {
     return 2;
   })()`);
 
-  // G3: the first activation reveals the reading; the second exposes the stage without moving the print.
+  // G3: the first activation reveals the reading; Ladder (John, 10-19, a spec change): the second writes the word's English
+  // under it, the third exposes the stage, and none of them moves the print.
   const glyphBox = `(el) => (el.querySelector('ruby') ?? el).getBoundingClientRect().bottom`;
   await page.locator('#reader .tok.content').nth(tapIdx).evaluate((n) => n.scrollIntoView({ block: 'center' }));
   await page.waitForTimeout(80);
@@ -1343,14 +1357,31 @@ async function main() {
   );
   // F · the reading a first press shows is a native <rt> inside the word's own box, so centring the word again before
   // each press would scroll the page by half the reading's height (5 px at 390): the word is centred once, above, and
-  // both presses land where it stands, so a move measured here is the app's
+  // every press (three, Ladder) lands where it stands, so a move measured here is the app's
+  const tapWord = () => page.locator('#reader .tok.content').nth(tapIdx).elementHandle(); // found afresh at each wait
   await touchAt(page, '#reader .tok.content', tapIdx, 0, false);
   await page.waitForTimeout(120);
+  await page.waitForFunction((n) => !!n.dataset.ladderRung || !!document.getElementById('mini'), await tapWord(), { timeout: 8000 });
   const readingOnly = await page.locator('#reader .tok.content').nth(tapIdx).evaluate(node => ({
     rung: node.dataset.ladderRung, readings: node.querySelectorAll('rt:not(.hidden-rt)').length,
     stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), english: !!node.querySelector('.tok-en'),
   }));
   check('grammar · first activation reveals only the reading', readingOnly.rung === 'reading' && readingOnly.readings > 0 && !readingOnly.stage && !readingOnly.page && !readingOnly.english, JSON.stringify(readingOnly));
+  // Ladder (John, 10-19, a spec change): the second activation, taken only once the reading rung is seen, writes the word's
+  // English under it and opens nothing; the third, taken only once that English is seen, opens the stage
+  await page.waitForFunction((n) => n.dataset.ladderRung === 'reading', await tapWord(), { timeout: 8000 });
+  await touchAt(page, '#reader .tok.content', tapIdx, 0, false);
+  await page.waitForFunction((n) => n.dataset.ladderRung !== 'reading' || !!document.getElementById('mini'), await tapWord(), { timeout: 8000 });
+  const englishOnly = await page.locator('#reader .tok.content').nth(tapIdx).evaluate((node) => ({
+    rung: node.dataset.ladderRung, readings: node.querySelectorAll('rt:not(.hidden-rt)').length,
+    english: node.querySelector(':scope > .tok-en .tok-en-text')?.textContent.trim() ?? '', rows: document.querySelectorAll('#reader .tok-en').length,
+    marked: node.classList.contains('has-en') && node.dataset.depthAside === 'meaning',
+    stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'),
+  }));
+  check('grammar · second activation writes the word\'s English under it, keeps its reading, and opens nothing',
+    englishOnly.rung === 'gloss' && englishOnly.readings > 0 && !!englishOnly.english && englishOnly.rows === 1 && englishOnly.marked &&
+      !englishOnly.stage && !englishOnly.page, JSON.stringify(englishOnly));
+  await page.waitForFunction((n) => n.dataset.ladderRung === 'gloss', await tapWord(), { timeout: 8000 });
   await touchAt(page, '#reader .tok.content', tapIdx, 0, false);
   await page.waitForSelector('#mini .mini-word');
   const afterTap = await page.evaluate(`(() => {
@@ -1360,6 +1391,8 @@ async function main() {
     return {
       lit: tok.classList.contains('lit'),
       en: document.querySelectorAll('#reader .tok-en').length,
+      ownEn: tok.querySelectorAll(':scope > .tok-en').length,
+      rung: tok.dataset.ladderRung ?? null,
       sheet: !!document.querySelector('#sheet'),
       popup: mini ? { word: mini.querySelector('.mini-word')?.textContent, reading: mini.querySelector('.mini-reading')?.textContent ?? '',
         gloss: mini.querySelector('.mini-gloss')?.textContent ?? '', save: mini.querySelector('#mini-take')?.textContent ?? null,
@@ -1369,13 +1402,16 @@ async function main() {
       dataWord: tok.dataset.word,
     };
   })()`);
-  check('grammar · second activation opens the stage — exact word, reading, meaning and Save, the band its door, no separate Full entry button',
-    !!afterTap.popup && afterTap.popup.word === afterTap.dataWord && afterTap.popup.gloss.length > 0 &&
+  // Ladder (John, 10-19, a spec change): the stage is the third activation (it was the second)
+  check('grammar · third activation opens the stage — exact word, reading, meaning and Save, the band its door, no separate Full entry button',
+    !!afterTap.popup && afterTap.rung === 'stage' && afterTap.popup.word === afterTap.dataWord && afterTap.popup.gloss.length > 0 &&
       ['Save', '保存', 'Saved ✓', '保存済み ✓'].includes(afterTap.popup.save) && afterTap.popup.door && !afterTap.popup.entryButton && !afterTap.sheet,
-    JSON.stringify(afterTap.popup));
-  check('grammar · the tapped word does not move, nothing is written under it, and its popup leaves it uncovered',
-    afterTap.en === 0 && !afterTap.covers && Math.abs(afterTap.top - wordTopBefore) < 2,
-    `glyph bottom ${wordTopBefore.toFixed(1)} → ${afterTap.top.toFixed(1)}px · covered=${afterTap.covers} · reading shown=${afterTap.lit}`);
+    JSON.stringify({ rung: afterTap.rung, ...afterTap.popup }));
+  // Ladder (John, 10-19, a spec change): "nothing is written under it" becomes: its own English, and nothing else, is
+  // written under it (one English row in the whole text, the tapped word's)
+  check('grammar · the tapped word does not move, only its own English is written under it, and its popup leaves it uncovered',
+    afterTap.en === 1 && afterTap.ownEn === 1 && !afterTap.covers && Math.abs(afterTap.top - wordTopBefore) < 2,
+    `glyph bottom ${wordTopBefore.toFixed(1)} → ${afterTap.top.toFixed(1)}px · covered=${afterTap.covers} · reading shown=${afterTap.lit} · English rows ${afterTap.en} (own ${afterTap.ownEn})`);
 
   // the worst long-gloss word on the shelf must render its meaning WHOLE in the popup
   await open('?entry=shelf');
@@ -1416,10 +1452,14 @@ async function main() {
   const afterSecond = await page.evaluate(`(() => {
     const t = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
     return { sheet: document.querySelector('#sheet')?.dataset.node ?? '', popup: !!document.querySelector('#mini'),
-      gloss: !!t.querySelector('.tok-en'), current: t.classList.contains('tok-current') };
+      gloss: t.querySelectorAll(':scope > .tok-en').length, glossAll: document.querySelectorAll('#reader .tok-en').length,
+      rung: t.dataset.ladderRung ?? null, current: t.classList.contains('tok-current') };
   })()`);
-  check('grammar · activation from the stage opens its full entry — the popup gone, nothing under the word, the word still the chosen one',
-    popupUp && afterSecond.sheet.startsWith('word:') && !afterSecond.popup && !afterSecond.gloss && afterSecond.current,
+  // Ladder (John, 10-19, a spec change): "nothing under the word" becomes: the word keeps its own English under it while its
+  // page stands (the visit holds it for the way back to its stage), and no other word has one
+  check('grammar · activation from the stage opens its full entry — the popup gone, the word\'s own English held under it, the word still the chosen one',
+    popupUp && afterSecond.sheet.startsWith('word:') && afterSecond.rung === 'page' && !afterSecond.popup && afterSecond.gloss === 1 &&
+      afterSecond.glossAll === 1 && afterSecond.current,
     JSON.stringify({ popupUp, ...afterSecond }));
   // Back unwinds page to the same stage; folding that stage returns to bare prose.
   await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
@@ -1427,15 +1467,19 @@ async function main() {
   await page.waitForSelector('#mini');
   const afterClose = await page.evaluate(`(() => {
     const t = document.querySelectorAll('#reader .tok.content')[${tapIdx}];
-    return { sheet: !!document.querySelector('#sheet'), popup: !!document.querySelector('#mini'), lit: t.classList.contains('lit'), current: t.classList.contains('tok-current') };
+    return { sheet: !!document.querySelector('#sheet'), popup: !!document.querySelector('#mini'), lit: t.classList.contains('lit'), current: t.classList.contains('tok-current'),
+      english: t.querySelectorAll(':scope > .tok-en').length };
   })()`);
-  check('grammar · closing the page restores its stage and summoned reading on the chosen word',
-    !afterClose.sheet && afterClose.popup && afterClose.lit && afterClose.current, JSON.stringify(afterClose));
+  // Ladder (John, 10-19): the restored stage has its English under the word again, as the stage had it
+  check('grammar · closing the page restores its stage, summoned reading and English on the chosen word',
+    !afterClose.sheet && afterClose.popup && afterClose.lit && afterClose.current && afterClose.english === 1, JSON.stringify(afterClose));
   await page.keyboard.press('Escape');
   const folded = await page.locator('#reader .tok.content').nth(tapIdx).evaluate(node => ({
     stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), lit: node.classList.contains('lit'), rung: node.dataset.ladderRung,
+    english: node.querySelectorAll('.tok-en').length,
   }));
-  check('grammar · folding the restored stage leaves the original word bare', !folded.stage && !folded.page && !folded.lit && !folded.rung, JSON.stringify(folded));
+  // Ladder (John, 10-19): bare is without the English too
+  check('grammar · folding the restored stage leaves the original word bare', !folded.stage && !folded.page && !folded.lit && !folded.rung && !folded.english, JSON.stringify(folded));
 
   // press and hold → the seal and its strip (John #11: "right click and choose save"; G5 hold = seal): the word is kept,
   // the strip opens beside it with the word's acts; a tap anywhere else puts it away
@@ -1468,7 +1512,9 @@ async function main() {
   check('grammar · one tap anywhere else puts the strip away',
     !!elsewhere && (await page.locator('#seal-strip').count()) === 0, elsewhere ? 'strip dismissed' : 'no empty margin found');
 
-  // Always-on ruby skips the reading rung: stage then full entry from the clean word.
+  // Always-on ruby skips the reading rung. Ladder (John, 10-19, a spec change): the English under the word, then the stage,
+  // then the full entry from the clean word: three activations (it was two: the stage, then the page), each taken only once
+  // the rung before it is seen
   if (await page.locator('#sheet').count()) {
     await page.locator(await entryCloseSelector(page)).dispatchEvent('click');
     await page.waitForTimeout(150);
@@ -1476,7 +1522,21 @@ async function main() {
   await page.evaluate('window.scrollTo(0, 0)');
   await page.locator('[data-dial="furigana:2"]').dispatchEvent('click');
   await page.waitForTimeout(150);
-  await holdWord(page, '#reader .tok.content');
+  const alwaysWord = page.locator('#reader .tok.content').first();
+  const alwaysRung = () => alwaysWord.evaluate((n) => ({ rung: n.dataset.ladderRung ?? null, stage: !!document.getElementById('mini'),
+    english: !!n.querySelector(':scope > .tok-en .tok-en-text'), readings: n.querySelectorAll('rt:not(.hidden-rt)').length }));
+  await tap(page, '#reader .tok.content', 0);
+  await page.waitForFunction((n) => !!n.dataset.ladderRung || !!document.getElementById('mini'), await alwaysWord.elementHandle(), { timeout: 8000 });
+  const alwaysFirst = await alwaysRung();
+  if (alwaysFirst.rung === 'gloss') {
+    await tap(page, '#reader .tok.content', 0);
+    await page.waitForSelector('#mini .mini-word');
+  }
+  const alwaysSecond = await alwaysRung();
+  if (alwaysSecond.rung === 'stage') {
+    await page.waitForTimeout(120);
+    await tap(page, '#reader .tok.content', 0);
+  }
   await page.waitForSelector('#sheet[data-node^="word:"]');
   // G1 (2026-10-16): the page arrives by a 320 ms match cut and takes data that lands meanwhile once the cut ends, so
   // its complete senses are read when its "Opening complete senses…" line has gone, not at a fixed 200 ms
@@ -1497,9 +1557,13 @@ async function main() {
       hasClose: !!s.querySelector('#sheet-close'),
     };
   })()`);
-  check('grammar · with always-on readings, stage then page takes two activations',
-    panel.headword.length > 0 && (panel.reading.length > 0 || panel.gloss.length > 0),
-    `${panel.headword}（${panel.reading}）`);
+  // Ladder (John, 10-19, a spec change): it named two activations (the stage, then the page); now the English, the stage,
+  // then the page, each rung observed
+  check('grammar · with always-on readings, the English, the stage, then the page take three activations',
+    alwaysFirst.rung === 'gloss' && alwaysFirst.english && !alwaysFirst.stage &&
+      alwaysSecond.rung === 'stage' && alwaysSecond.stage && alwaysSecond.english &&
+      panel.headword.length > 0 && (panel.reading.length > 0 || panel.gloss.length > 0),
+    `${panel.headword}（${panel.reading}） · first ${JSON.stringify(alwaysFirst)} · second ${JSON.stringify(alwaysSecond)}`);
   check('the sheet carries its own back and close', panel.hasBack && panel.hasClose,
     `back=${panel.hasBack} close=${panel.hasClose}`);
   check('the entry offers a hop into each kanji', panel.kanjiRows.length > 0,
@@ -2674,14 +2738,33 @@ async function main() {
 
   // ------------------------------ Phase A · the observation log (taps)
   console.log('\n— Phase A · reader taps land in the observation log');
-  await open('?entry=shelf&dials=0,1,0'); // on-demand furigana → reading, stage, page
+  await open('?entry=shelf&dials=0,1,0'); // on-demand furigana → reading, English, stage, page
   await tap(page, FIRST_TEXT);
   await settleReader(page);
   const obsBefore = await evaluateAppRecord(page,
     `(record.obslog || []).length`,
   );
-  await openWordStage(page, '#reader .tok.content', 3); // reading (1), then meaning (2)
-  await page.waitForTimeout(250);
+  // Ladder (John, 10-19, a spec change): the meaning's depth 2 is logged where the meaning first shows, the English under
+  // the word (once a visit), and the stage after it logs nothing; the reading logs 1 and the page 3 as before. The first
+  // visit climbs one observed rung at a time and reads the durable log at each rung (each row lands with its own write)
+  const tapDepths = async () => ((await readAppRecord(page)).obslog || []).slice(obsBefore).filter((r) => r[1] === 'tap').map((r) => r[3]).join(',');
+  const depthsBecome = async (want, ms = 4000) => {
+    let seen = await tapDepths();
+    for (const until = Date.now() + ms; seen !== want && Date.now() < until; seen = await tapDepths()) await page.waitForTimeout(50);
+    return seen;
+  };
+  const obsWord = () => page.locator('#reader .tok.content').nth(3).elementHandle(); // found afresh at each wait
+  await tap(page, '#reader .tok.content', 3); // reading (1)
+  await page.waitForFunction((n) => n.dataset.ladderRung === 'reading', await obsWord(), { timeout: 8000 });
+  const obsAtReading = await depthsBecome('1');
+  await tap(page, '#reader .tok.content', 3); // English (2)
+  await page.waitForFunction((n) => n.dataset.ladderRung === 'gloss', await obsWord(), { timeout: 8000 });
+  const obsAtEnglish = await depthsBecome('1,2');
+  const obsEnglishStageless = (await page.locator('#mini').count()) === 0;
+  await tap(page, '#reader .tok.content', 3); // the stage: no row
+  await page.waitForSelector('#mini .mini-word');
+  await page.waitForTimeout(600); // a row the stage wrote would have landed by now
+  const obsAtStage = await tapDepths();
   await tap(page, '#reader .tok.content', 3); // stage → full entry (3)
   await page.waitForSelector('#sheet');
   await page.waitForTimeout(250);
@@ -2690,7 +2773,7 @@ async function main() {
   await page.waitForTimeout(250);
   await page.waitForSelector('#mini'); // Back restores the stage without another observation
   await page.keyboard.press('Escape'); // folding returns to bare without another observation
-  await holdWord(page, '#reader .tok.content', 3); // reading (1), stage (2), entry (3) again
+  await holdWord(page, '#reader .tok.content', 3); // reading (1), English (2), stage (no row), entry (3) again
   await page.waitForSelector('#sheet');
   await page.waitForTimeout(1600); // the trailing debounce persists the rows
   const obs = await evaluateAppRecord(page, `(() => {
@@ -2700,9 +2783,13 @@ async function main() {
   })()`);
   const ladder = obs.rows.filter((r) => r[1] === 'tap');
   const sameWord = ladder.length === 6 && ladder.every((r) => r[2] === ladder[0][2] && r[4] === ladder[0][4]);
-  check('reading, stage and page each log their depth; Back and fold log nothing; the next visit repeats the same exact word/source',
-    sameWord && ladder.map((r) => r[3]).join(',') === '1,2,3,1,2,3',
-    ladder.map((r) => `depth ${r[3]}`).join(' → ') + ` (${ladder[0]?.[2]}@${ladder[0]?.[4]})` || 'no rows');
+  // Ladder (John, 10-19, a spec change): it pinned the stage's depth 2; the English rung logs it now (seen before any stage
+  // stands), and the stage logs nothing
+  check('reading, English and page each log their depth (the meaning\'s 2 at the English, before any stage); the stage, Back and fold log nothing; the next visit repeats the same exact word/source',
+    sameWord && ladder.map((r) => r[3]).join(',') === '1,2,3,1,2,3' &&
+      obsAtReading === '1' && obsAtEnglish === '1,2' && obsEnglishStageless && obsAtStage === '1,2',
+    (ladder.map((r) => `depth ${r[3]}`).join(' → ') + ` (${ladder[0]?.[2]}@${ladder[0]?.[4]})` || 'no rows') +
+      ` · logged at the reading ${obsAtReading || '—'}, at the English ${obsAtEnglish || '—'} (no stage ${obsEnglishStageless}), at the stage ${obsAtStage || '—'}`);
   check('rows persist inside the exported envelope with ms timestamps',
     ladder.every((r) => Number.isInteger(r[0]) && r[0] > 1.7e12 && typeof r[2] === 'string' && typeof r[4] === 'string'),
     `${obs.rows.length} rows appended after ${obsBefore} existing`);
@@ -2937,11 +3024,17 @@ async function main() {
     const tok = document.querySelector('#sheet .example .sentence-tok');
     if (!tok) return null;
     const mini = document.querySelector('#mini');
-    return { word: tok.textContent, popup: mini?.querySelector('.mini-word')?.textContent ?? null,
-      gloss: mini?.querySelector('.mini-gloss')?.textContent ?? null, under: !!tok.querySelector('.tok-en') };
+    const own = tok.cloneNode(true);
+    own.querySelectorAll('.tok-en').forEach((row) => row.remove());
+    return { word: own.textContent, popup: mini?.querySelector('.mini-word')?.textContent ?? null,
+      gloss: mini?.querySelector('.mini-gloss')?.textContent ?? null, under: tok.querySelectorAll(':scope > .tok-en .tok-en-text').length,
+      underAll: document.querySelectorAll('#sheet .tok-en').length };
   })()`);
-  check('example tokens reach their stage through the observed reading rung, with nothing under the word',
-    !!ladderProof && !!ladderProof.popup && ladderProof.word.includes(ladderProof.popup.slice(0, 1)) && !!ladderProof.gloss && !ladderProof.under,
+  // Ladder (John, 10-19, a spec change): "with nothing under the word" becomes: with its own English under the word, the
+  // one English row on the page (the stage keeps the English rung's row; the word's own text is read without it)
+  check('example tokens reach their stage through the observed reading and English rungs, their own English kept under the word',
+    !!ladderProof && !!ladderProof.popup && ladderProof.word.includes(ladderProof.popup.slice(0, 1)) && !!ladderProof.gloss &&
+      ladderProof.under === 1 && ladderProof.underAll === 1,
     JSON.stringify(ladderProof));
   // the keyboard-shaped click put focus in the popup; Escape there puts away the popup only
   await page.keyboard.press('Escape');
@@ -3044,30 +3137,46 @@ async function main() {
     popup: document.querySelector('#mini .mini-gloss')?.textContent ?? null,
     page: document.querySelector('#sheet')?.dataset.node ?? '', rung: t.dataset.ladderRung ?? null,
   }));
+  const cycleWord = () => page.locator('#reader .tok.content').nth(cycleIndex).elementHandle(); // found afresh at each wait
   await cycleTap();
+  await page.waitForFunction((n) => !!n.dataset.ladderRung || !!document.getElementById('mini'), await cycleWord(), { timeout: 8000 });
   const cyc1 = await cycleState();
   check('bare cycle · first activation is reading only', cyc1.rung === 'reading' && cyc1.rt > 0 && !cyc1.popup && !cyc1.page && !cyc1.gloss, JSON.stringify(cyc1));
+  // Ladder (John, 10-19, a spec change): the second activation, taken only once the reading is seen, writes the English under
+  // the word and opens nothing; the third, taken only once the English is seen, is the meaning stage (it was the second),
+  // and the English stays under the word through the stage, its page and the way back; the fourth opens the full entry
+  await page.waitForFunction((n) => n.dataset.ladderRung === 'reading', await cycleWord(), { timeout: 8000 });
+  await cycleTap();
+  await page.waitForFunction((n) => n.dataset.ladderRung !== 'reading' || !!document.getElementById('mini'), await cycleWord(), { timeout: 8000 });
+  const cycEnglish = await cycleState();
+  check('bare cycle · second activation writes the English under the word, its reading kept, and opens no stage',
+    cycEnglish.rung === 'gloss' && cycEnglish.rt > 0 && cycEnglish.gloss && !cycEnglish.popup && !cycEnglish.page, JSON.stringify(cycEnglish));
+  await page.waitForFunction((n) => n.dataset.ladderRung === 'gloss', await cycleWord(), { timeout: 8000 });
   await cycleTap(); await page.waitForSelector('#mini .mini-word');
   await page.waitForFunction(() => {
     const gloss = document.querySelector('#mini .mini-gloss')?.textContent?.trim();
     return !!gloss && gloss !== '…';
   });
   const cyc2 = await cycleState();
-  check('bare cycle · second activation is the meaning stage', cyc2.rung === 'stage' && cyc2.rt > 0 && !!cyc2.popup && !cyc2.page && !cyc2.gloss, JSON.stringify(cyc2));
+  check('bare cycle · third activation is the meaning stage, the English kept under the word',
+    cyc2.rung === 'stage' && cyc2.rt > 0 && !!cyc2.popup && !cyc2.page && cyc2.gloss, JSON.stringify(cyc2));
   await cycleTap(); await page.waitForSelector('#sheet', { timeout: 8000 });
   const cyc3 = await cycleState();
-  check('bare cycle · third activation opens the full entry', cyc3.page.startsWith('word:') && !cyc3.popup && !cyc3.gloss, JSON.stringify(cyc3));
+  check('bare cycle · fourth activation opens the full entry, the English held under the word for the way back',
+    cyc3.page.startsWith('word:') && cyc3.rung === 'page' && !cyc3.popup && cyc3.gloss, JSON.stringify(cyc3));
   await page.locator(await entryCloseSelector(page)).click();
   await page.waitForFunction(() => !document.getElementById('sheet'));
   await page.waitForSelector('#mini');
   const returned = await cycleState();
-  check('bare cycle · Back restores the same meaning stage', returned.rung === 'stage' && returned.popup === cyc2.popup && returned.rt > 0 && !returned.page && !returned.gloss, JSON.stringify(returned));
+  check('bare cycle · Back restores the same meaning stage, its English under the word',
+    returned.rung === 'stage' && returned.popup === cyc2.popup && returned.rt > 0 && !returned.page && returned.gloss, JSON.stringify(returned));
   await page.keyboard.press('Escape');
   const cycleFolded = await cycleState();
   check('bare cycle · folding the stage returns to bare text', !cycleFolded.rung && cycleFolded.rt === 0 && !cycleFolded.popup && !cycleFolded.page && !cycleFolded.gloss, JSON.stringify(cycleFolded));
   await cycleTap();
+  await page.waitForFunction((n) => !!n.dataset.ladderRung || !!document.getElementById('mini'), await cycleWord(), { timeout: 8000 });
   const reopened = await cycleState();
-  check('bare cycle · a new visit starts with reading again', reopened.rung === 'reading' && reopened.rt > 0 && !reopened.popup && !reopened.page, JSON.stringify(reopened));
+  check('bare cycle · a new visit starts with reading again', reopened.rung === 'reading' && reopened.rt > 0 && !reopened.popup && !reopened.page && !reopened.gloss, JSON.stringify(reopened));
   await focusProseOccurrence(page, page.locator('#reader .tok.content').nth(cycleIndex));
   await page.keyboard.press('Escape');
   const bareAgain = await cycleState();

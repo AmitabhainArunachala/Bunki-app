@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "reviewedHead": "384d4a70e05a33019f1ad36789d13d22de04094a",
-  "note": "Independent candidate assertion identities, reconciled against historical complete schedules and current verifier source. Green/red observations do not change this roster. Engine-specific timing obligations are retained.",
+  "reviewedHead": "9a26f84da6916bfeeb35624adae5eb4edcfcf563",
+  "note": "Independent candidate assertion identities, reconciled against historical complete schedules and current verifier source. Green/red observations do not change this roster. Engine-specific timing obligations are retained. Batch3 Ladder: preserve every old identity; add accepted G3 English/stage-clear rows and engine-specific L walks. Historical G3 schedules supply identities only, reconciled against accepted9a source; r3 native receipts pin new Ladder identities, not merged green proof.",
   "sources": [
     {
       "path": "G6/codex-build/site-17-wordgrammar/verify-word-grammar.json",
@@ -38,14 +38,36 @@
     {
       "path": "G6/codex-build/final-handback-prep/final-e38-g6-only-controls/g6-webkit.json",
       "sha256": "d7ff4ea5fdb889d6a8878341ba7280be03a4a5ce3bbc30717f3a5a9a9172c91a"
+    },
+    {
+      "path": "LADDER/verify-final3/word-grammar---g3-only--controls-chromium/verify-word-grammar.json",
+      "sha256": "a04acd008f5f1d34f78769a254a89565436b9d182e03038f834d979a97b194db"
+    },
+    {
+      "path": "LADDER/r3/verify/word-grammar---ladder-only--controls-chromium/verify-word-grammar.json",
+      "sha256": "ccf00232e132819bace4a14a0fbb2c846d26104e03e6f0a29e6fa6d9c006d405"
+    },
+    {
+      "path": "LADDER/verify-final3/word-grammar---g3-only--controls-webkit/verify-word-grammar.json",
+      "sha256": "40728f59eea15896c2ee78e4d622684732c7a68e3a233b15dfb7042cda9bf5ae"
+    },
+    {
+      "path": "LADDER/r3/verify/word-grammar---ladder-only--controls-webkit/verify-word-grammar.json",
+      "sha256": "5b614d002967af7b5c9f24524a61f123d1cf34d63529ebe4e580e0a2bb5ffb37"
     }
   ],
   "engines": {
     "chromium": {
       "G3-stalled": [
         "G3.control.reading",
-        "G3.control.stage",
+        "G3.control.gloss",
         "G3-stalled.page-errors"
+      ],
+      "G3-stalled-stage": [
+        "G3.control.climb",
+        "G3.control.stage",
+        "G3.control.stage-clear",
+        "G3-stalled-stage.page-errors"
       ],
       "G3-clear": [
         "G3.clear.reading",
@@ -68,12 +90,14 @@
       ],
       "G3-ladder": [
         "G3.on-touch.first",
+        "G3.on-touch.english",
         "G3.on-touch.stage",
         "G3.on-touch.page",
         "G3.on-touch.return-stage",
         "G3.on-touch.bare",
         "G3.on-touch.frames",
         "G3.off.first",
+        "G3.off.english",
         "G3.off.stage",
         "G3.off.page",
         "G3.off.return-stage",
@@ -93,6 +117,7 @@
         "G3.direct-page",
         "G3.direct-bare",
         "G3.outside-reading",
+        "G3.outside-english",
         "G3.native-pinch",
         "G3-direct-and-anchor.page-errors"
       ],
@@ -107,6 +132,7 @@
       "G3-kana": [
         "G3.kana.fixture",
         "G3.kana.identical",
+        "G3.kana.stage",
         "G3.kana.particle",
         "G3.kana.particle-save-rest",
         "G3.kana.particle-folded-rest",
@@ -116,6 +142,7 @@
       "G3-sentence-example-off": [
         "G3.sentence.example.off.bare",
         "G3.sentence.example.off.first",
+        "G3.sentence.example.off.english",
         "G3.sentence.example.off.stage",
         "G3.sentence.example.off.page",
         "G3.sentence.example.off.return-stage",
@@ -125,6 +152,7 @@
       "G3-sentence-example-on-touch": [
         "G3.sentence.example.on-touch.bare",
         "G3.sentence.example.on-touch.first",
+        "G3.sentence.example.on-touch.english",
         "G3.sentence.example.on-touch.stage",
         "G3.sentence.example.on-touch.page",
         "G3.sentence.example.on-touch.return-stage",
@@ -143,6 +171,7 @@
       "G3-sentence-page-off": [
         "G3.sentence.page.off.bare",
         "G3.sentence.page.off.first",
+        "G3.sentence.page.off.english",
         "G3.sentence.page.off.stage",
         "G3.sentence.page.off.page",
         "G3.sentence.page.off.return-stage",
@@ -152,6 +181,7 @@
       "G3-sentence-page-on-touch": [
         "G3.sentence.page.on-touch.bare",
         "G3.sentence.page.on-touch.first",
+        "G3.sentence.page.on-touch.english",
         "G3.sentence.page.on-touch.stage",
         "G3.sentence.page.on-touch.page",
         "G3.sentence.page.on-touch.return-stage",
@@ -250,10 +280,12 @@
       "G3-particle": [
         "G3.particle.off.bare",
         "G3.particle.off.first",
+        "G3.particle.off.english",
         "G3.particle.off.stage",
         "G3.particle.off.clear",
         "G3.particle.on-touch.bare",
         "G3.particle.on-touch.first",
+        "G3.particle.on-touch.english",
         "G3.particle.on-touch.stage",
         "G3.particle.on-touch.clear",
         "G3.particle.always.bare",
@@ -267,6 +299,62 @@
         "G3.demo.no-work",
         "G3.demo.no-replay",
         "G3-demo.page-errors"
+      ],
+      "L-climb": [
+        "L.tap1",
+        "L.tap2",
+        "L.dots",
+        "L.tap3",
+        "L.page",
+        "L.back",
+        "L.fold",
+        "L-climb.page-errors"
+      ],
+      "L-dials": [
+        "L.always.tap1",
+        "L.always.tap2",
+        "L.off.tap1",
+        "L.off.tap2",
+        "L.off.tap3",
+        "L.off.fold",
+        "L-dials.page-errors"
+      ],
+      "L-kana": [
+        "L.kana.tap1",
+        "L.kana.tap2",
+        "L-kana.page-errors"
+      ],
+      "L-place-1440": [
+        "L.place.1440x900.hokusai.on-touch",
+        "L.place.1440x900.hokusai.always",
+        "L.place.1440x900.yoru.on-touch",
+        "L.place.1440x900.yoru.always",
+        "L-place-1440.page-errors"
+      ],
+      "L-scroll": [
+        "L.scroll.down",
+        "L.scroll.up",
+        "L-scroll.page-errors"
+      ],
+      "L-mouse": [
+        "M.hold",
+        "M.second-hold",
+        "M.drag",
+        "M.click",
+        "L-mouse.page-errors"
+      ],
+      "L-back": [
+        "L.bar-back",
+        "L-back.page-errors"
+      ],
+      "L-d7-1440": [
+        "L.d7.1440x900",
+        "L-d7-1440.page-errors"
+      ],
+      "L-gloss": [
+        "L.gloss.never-dash",
+        "L.gloss.sense",
+        "L-gloss.page-errors"
       ],
       "page": [
         "P3.card",
@@ -1166,8 +1254,14 @@
     "webkit": {
       "G3-stalled": [
         "G3.control.reading",
-        "G3.control.stage",
+        "G3.control.gloss",
         "G3-stalled.page-errors"
+      ],
+      "G3-stalled-stage": [
+        "G3.control.climb",
+        "G3.control.stage",
+        "G3.control.stage-clear",
+        "G3-stalled-stage.page-errors"
       ],
       "G3-clear": [
         "G3.clear.reading",
@@ -1190,12 +1284,14 @@
       ],
       "G3-ladder": [
         "G3.on-touch.first",
+        "G3.on-touch.english",
         "G3.on-touch.stage",
         "G3.on-touch.page",
         "G3.on-touch.return-stage",
         "G3.on-touch.bare",
         "G3.on-touch.frames",
         "G3.off.first",
+        "G3.off.english",
         "G3.off.stage",
         "G3.off.page",
         "G3.off.return-stage",
@@ -1215,6 +1311,7 @@
         "G3.direct-page",
         "G3.direct-bare",
         "G3.outside-reading",
+        "G3.outside-english",
         "G3.native-pinch",
         "G3-direct-and-anchor.page-errors"
       ],
@@ -1229,6 +1326,7 @@
       "G3-kana": [
         "G3.kana.fixture",
         "G3.kana.identical",
+        "G3.kana.stage",
         "G3.kana.particle",
         "G3.kana.particle-save-rest",
         "G3.kana.particle-folded-rest",
@@ -1238,6 +1336,7 @@
       "G3-sentence-example-off": [
         "G3.sentence.example.off.bare",
         "G3.sentence.example.off.first",
+        "G3.sentence.example.off.english",
         "G3.sentence.example.off.stage",
         "G3.sentence.example.off.page",
         "G3.sentence.example.off.return-stage",
@@ -1247,6 +1346,7 @@
       "G3-sentence-example-on-touch": [
         "G3.sentence.example.on-touch.bare",
         "G3.sentence.example.on-touch.first",
+        "G3.sentence.example.on-touch.english",
         "G3.sentence.example.on-touch.stage",
         "G3.sentence.example.on-touch.page",
         "G3.sentence.example.on-touch.return-stage",
@@ -1265,6 +1365,7 @@
       "G3-sentence-page-off": [
         "G3.sentence.page.off.bare",
         "G3.sentence.page.off.first",
+        "G3.sentence.page.off.english",
         "G3.sentence.page.off.stage",
         "G3.sentence.page.off.page",
         "G3.sentence.page.off.return-stage",
@@ -1274,6 +1375,7 @@
       "G3-sentence-page-on-touch": [
         "G3.sentence.page.on-touch.bare",
         "G3.sentence.page.on-touch.first",
+        "G3.sentence.page.on-touch.english",
         "G3.sentence.page.on-touch.stage",
         "G3.sentence.page.on-touch.page",
         "G3.sentence.page.on-touch.return-stage",
@@ -1372,10 +1474,12 @@
       "G3-particle": [
         "G3.particle.off.bare",
         "G3.particle.off.first",
+        "G3.particle.off.english",
         "G3.particle.off.stage",
         "G3.particle.off.clear",
         "G3.particle.on-touch.bare",
         "G3.particle.on-touch.first",
+        "G3.particle.on-touch.english",
         "G3.particle.on-touch.stage",
         "G3.particle.on-touch.clear",
         "G3.particle.always.bare",
@@ -1389,6 +1493,96 @@
         "G3.demo.no-work",
         "G3.demo.no-replay",
         "G3-demo.page-errors"
+      ],
+      "L-climb": [
+        "L.tap1",
+        "L.tap2",
+        "L.dots",
+        "L.tap3",
+        "L.page",
+        "L.back",
+        "L.fold",
+        "L-climb.page-errors"
+      ],
+      "L-dials": [
+        "L.always.tap1",
+        "L.always.tap2",
+        "L.off.tap1",
+        "L.off.tap2",
+        "L.off.tap3",
+        "L.off.fold",
+        "L-dials.page-errors"
+      ],
+      "L-kana": [
+        "L.kana.tap1",
+        "L.kana.tap2",
+        "L-kana.page-errors"
+      ],
+      "L-place-320": [
+        "L.place.320x568.hokusai.on-touch",
+        "L.place.320x568.hokusai.always",
+        "L.place.320x568.yoru.on-touch",
+        "L.place.320x568.yoru.always",
+        "L-place-320.page-errors"
+      ],
+      "L-place-390": [
+        "L.place.390x844.hokusai.on-touch",
+        "L.place.390x844.hokusai.always",
+        "L.place.390x844.yoru.on-touch",
+        "L.place.390x844.yoru.always",
+        "L-place-390.page-errors"
+      ],
+      "L-place-430": [
+        "L.place.430x932.hokusai.on-touch",
+        "L.place.430x932.hokusai.always",
+        "L.place.430x932.yoru.on-touch",
+        "L.place.430x932.yoru.always",
+        "L-place-430.page-errors"
+      ],
+      "L-scroll": [
+        "L.scroll.down",
+        "L.scroll.up",
+        "L-scroll.page-errors"
+      ],
+      "L-mouse": [
+        "M.hold",
+        "M.second-hold",
+        "M.drag",
+        "M.click",
+        "L-mouse.page-errors"
+      ],
+      "L-back": [
+        "L.bar-back",
+        "L-back.page-errors"
+      ],
+      "L-d7-320": [
+        "L.d7.320x568",
+        "L-d7-320.page-errors"
+      ],
+      "L-d7-390": [
+        "L.d7.390x844",
+        "L-d7-390.page-errors"
+      ],
+      "L-d7-430": [
+        "L.d7.430x932",
+        "L-d7-430.page-errors"
+      ],
+      "L-d7s-390x520": [
+        "L.d7.fade.390x520",
+        "L-d7s-390x520.page-errors"
+      ],
+      "L-d7s-390x560": [
+        "L.d7.fade.390x560",
+        "L-d7s-390x560.page-errors"
+      ],
+      "L-d7s-320x568": [
+        "L.d7.fade.320x568",
+        "L-d7s-320x568.page-errors"
+      ],
+      "L-gloss": [
+        "L.gloss.never-dash",
+        "L.gloss.sense",
+        "L-gloss.page-errors"
       ],
       "page": [
         "P3.card",

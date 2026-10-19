@@ -307,12 +307,18 @@ async function tap(page, fixture) {
  * more on the same word opens its full entry. */
 async function openPopup(page, fixture) {
   if (await page.locator('#mini .mini-word').count() && await page.locator('#mini .mini-word').textContent() === fixture.token.b) return;
-  await tap(page, fixture);
-  const rung = await page.waitForFunction(({ index, word }) => {
-    if ([...document.querySelectorAll('#mini .mini-word')].some((n) => n.textContent.includes(word))) return 'stage';
-    return document.querySelector(`#reader .tok[data-index="${index}"]`)?.dataset.ladderRung === 'reading' ? 'reading' : null;
-  }, { index: fixture.index, word: fixture.token.b }, { timeout: 15_000 }).then((h) => h.jsonValue()).catch(() => null);
-  if (rung === 'reading') await tap(page, fixture);
+  // Ladder (John, 10-19): the reading, then the English under the word, then the popup — each tap only once the rung before
+  // it is seen, each rung past the last
+  let rung = null;
+  for (let step = 0; step < 3 && rung !== 'stage'; step++) {
+    if (step && !['reading', 'gloss'].includes(rung)) break;
+    await tap(page, fixture);
+    rung = await page.waitForFunction(({ index, word, last }) => {
+      if ([...document.querySelectorAll('#mini .mini-word')].some((n) => n.textContent.includes(word))) return 'stage';
+      const now = document.querySelector(`#reader .tok[data-index="${index}"]`)?.dataset.ladderRung;
+      return ['reading', 'gloss'].includes(now) && now !== last ? now : null;
+    }, { index: fixture.index, word: fixture.token.b, last: rung }, { timeout: 15_000 }).then((h) => h.jsonValue()).catch(() => null);
+  }
   await page.locator('#mini .mini-word').filter({ hasText: fixture.token.b }).waitFor();
 }
 async function fullEntry(page, fixture) {
@@ -342,6 +348,8 @@ const tokenState = (page, fixture) => page.evaluate((index) => {
   const lines = node.querySelectorAll('.tok-en');
   return { surface: bare.textContent, visibleRuby: [...node.querySelectorAll('rt')].filter((rt) => !rt.classList.contains('hidden-rt'))
     .map((rt) => rt.textContent).join(''), lines: lines.length, line: lines[0]?.outerHTML ?? null,
+    // Ladder · the English row's own words, and the state line a selected word speaks (its reading, its English)
+    lineText: lines[0]?.textContent.trim() ?? null, state: document.getElementById(`tok-state-${index}`)?.textContent ?? null,
     // a summoned reading lights the word (lit) and the chrome's Save stands for it (tok-current): the
     // original text has neither
     lit: node.classList.contains('lit'), current: node.classList.contains('tok-current'), rung: node.dataset.ladderRung || null,
@@ -553,9 +561,11 @@ async function coreRun(open, rec) {
     await openArticle(page, CORE.passage);
     await openPopup(page, CORE);
     const token = await tokenState(page, CORE);
-    once('G1.popup', `G1 ${at(CORE)}: its taps (the ladder's reading, then its popup) preserve the word, reveal its ruby, and leave meaning in the popup`,
-      token?.surface === CORE.token.s && token.visibleRuby === CORE_ENTRY.ruby && token.lines === 0 && !token.hasEn
-        && token.label === `${CORE.token.s} · ${WORD.bi} · ${CORE_ENTRY.reading} · ${HINT.bi}`,
+    // Ladder (John, 10-19, a spec change): the taps are the reading, then the English under the word, then the popup; the
+    // English stays under the word while the popup stands, and the word speaks it after its reading
+    once('G1.popup', `G1 ${at(CORE)}: its taps (the ladder's reading, then its English under it, then its popup) preserve the word, reveal its ruby and its English, and the popup holds the meaning`,
+      token?.surface === CORE.token.s && token.visibleRuby === CORE_ENTRY.ruby && token.lines === 1 && token.hasEn && token.lineText === CORE_ENTRY.gloss
+        && token.label === `${CORE.token.s} · ${WORD.bi} · ${CORE_ENTRY.reading} · ${CORE_ENTRY.gloss} · ${HINT.bi}`,
       JSON.stringify(token), { token });
     const bar = (await captureState(page)).bar;
     // S · it pinned "the bar carries no Save of its own"; the new truth: one keep in the bar, the one Save, naming the word.
@@ -1015,13 +1025,24 @@ try {
     await runCase(`G2 ${lang}`, async (open) => {
       const page = await (await open()).newPage();
       await openArticle(page, IU.passage, `dials=0,1,0&ui=${lang}`);
+      // Ladder (John, 10-19, a spec change): いう is written as it is read, so its first tap sets its English under it, and
+      // the next opens its popup
+      await tap(page, IU);
+      const englishShown = await page.waitForFunction((i) => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung === 'gloss',
+        IU.index, { timeout: 10_000 }).then(() => true, () => false);
+      const english = await tokenState(page, IU);
+      // Ladder R2 (the lead's spec change, 10-20: "it never shows —; with no gloss at all, show nothing under the word and keep
+      // the rung"): いう has no English of its own (several entries read いう), so its rung's row says nothing, never the dash
+      check(`G2 ${lang}: one tap sets いう's English rung: the word kept, its row under it saying nothing (no English of its own) and never "—", no popup yet`,
+        englishShown && english?.surface === IU.token.s && english.rung === 'gloss' && english.lines === 1 && english.hasEn && english.lineText === ''
+          && await page.locator('#mini').count() === 0, JSON.stringify(english), { id: `G2.${lang}.english` });
       await tap(page, IU);
       // R2 · the popup settles once the full dictionary has answered: before, the quick dictionary's miss; after, the entries
       // read いう named (never "Not in the quick dictionary" once it has answered). Waited for, never assumed
       await page.waitForFunction((several) => document.querySelector('#mini .mini-gloss')?.textContent === several, SEVERAL[lang], { timeout: 30_000 }).catch(() => {});
       const one = await tokenState(page, IU), mini = await miniState(page);
       // L · いう is written exactly as it is read, so its popup says it once: no reading line (G2 kanji, below, keeps one)
-      check(`G2 ${lang}: one tap shows the honest dictionary answer in the popup — the entries read いう named once the full dictionary has answered — the word written as it is read saying itself once`,
+      check(`G2 ${lang}: the next tap shows the honest dictionary answer in the popup — the entries read いう named once the full dictionary has answered — the word written as it is read saying itself once`,
         mini?.word === IU.token.b && IU.token.r === IU.token.b && mini.reading === null
           // R2: the full dictionary's answer (SEVERAL, never the MISS line). Q (the comb): its Japanese is set by the app's one
           // word rule (a <wbr> between words, a word holding a mark in a no-break .ja-unit, the line marked .ja-flow), and
@@ -1030,13 +1051,17 @@ try {
           && wordRuleOff(mini.gloss) === `<span class="mini-gloss mini-miss ja-flow">${SEVERAL[lang]}</span>`
           && !mini.text.includes(MISS[lang])
           && !/no gloss yet|語釈なし|No dictionary entry for this spelling\.|この表記の辞書項目はありません。/u.test(mini.text), JSON.stringify(mini), { id: `G2.${lang}.popup` });
-      check(`G2 ${lang}: prose keeps its surface and plain word name with keyboard instructions`,
-        one?.surface === IU.token.s && one.lines === 0 && !one.hasEn
-          && one.label === `${IU.token.s} · ${WORD[lang]} · ${HINT[lang]}`, JSON.stringify(one), { id: `G2.${lang}.prose` });
+      // Ladder: its English row stays under it while the popup stands, and it speaks that rung's English (or the honest miss
+      // where the row shows the dash) between its name and its keyboard help
+      check(`G2 ${lang}: prose keeps its surface, its English row under it, and its plain word name with its English and keyboard instructions`,
+        one?.surface === IU.token.s && one.lines === 1 && one.hasEn && !!one.state && (one.lineText === '—' || one.state.includes(one.lineText))
+          && one.label === `${IU.token.s} · ${WORD[lang]} · ${one.state} · ${HINT[lang]}`, JSON.stringify(one), { id: `G2.${lang}.prose` });
       await tap(page, IU);
       await page.locator('#sheet').waitFor();
-      check(`G2 ${lang}: tapping the same word again opens its full entry, without a gloss rung`,
-        await page.locator('#mini').count() === 0 && await page.locator('#sheet').count() === 1 && (await tokenState(page, IU))?.lines === 0, '', { id: `G2.${lang}.dismiss` });
+      // Ladder: the popup's next tap is the page; the word keeps the English its rung set, under the page, and gains no other
+      const under = await tokenState(page, IU);
+      check(`G2 ${lang}: tapping the same word again opens its full entry, the word under it keeping only its own English row`,
+        await page.locator('#mini').count() === 0 && await page.locator('#sheet').count() === 1 && under?.rung === 'page' && under.lines === 1, JSON.stringify(under), { id: `G2.${lang}.dismiss` });
       await closeIfOpen(page);
       // G3 · the page's way back is the stage it came from (verify-word-grammar pins it); folding that stage is the way
       // back to the original text by itself
@@ -1049,10 +1074,10 @@ try {
       await tap(page, IU);
       const again = await miniState(page), lit = await tokenState(page, IU);
       // G3 · the cycle begins again exactly where the first tap began it: いう is read as written, so the ladder skips its
-      // reading rung and the word stands at its stage, lit only if the first tap lit it (no raised reading lights it)
-      check(`G2 ${lang}: one more tap begins the cycle again: the popup with the word at its stage, as the first tap left it, and no sheet`,
-        again?.word === IU.token.b && one?.rung === 'stage' && lit?.rung === 'stage' && lit.lit === one.lit && lit.lines === 0
-          && await page.locator('#sheet').count() === 0, JSON.stringify({ again, lit, first: one }), { id: `G2.${lang}.again` });
+      // reading rung. Ladder: the first tap set its English under it, and so does this one: no popup, no sheet
+      check(`G2 ${lang}: one more tap begins the cycle again: the word's English under it, as the first tap left it, and no popup or sheet`,
+        again === null && english?.rung === 'gloss' && lit?.rung === 'gloss' && lit.lit === english.lit && lit.lines === 1 && lit.lineText === english.lineText
+          && await page.locator('#sheet').count() === 0, JSON.stringify({ again, lit, first: english }), { id: `G2.${lang}.again` });
       const word = page.locator(`#reader .tok[data-index="${IU.index}"]`);
       await selectWord(page, IU);
       await page.keyboard.press('Escape');
@@ -1061,10 +1086,16 @@ try {
       check(`G2 ${lang}: Escape on the word puts the popup and its summoned reading away: nothing lit`,
         bare?.surface === IU.token.s && bare.visibleRuby === '' && !bare.lit && bare.lines === 0, JSON.stringify(bare), { id: `G2.${lang}.escape-word` });
       await selectWord(page, IU);
+      // Ladder: the keyboard climbs the same rungs: Enter sets its English, Enter again opens the popup
+      await page.keyboard.press('Enter');
+      const keyEnglish = await page.waitForFunction((i) => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung === 'gloss',
+        IU.index, { timeout: 10_000 }).then(() => true, () => false);
+      const keyEarly = await page.locator('#mini').count();
       await page.keyboard.press('Enter');
       await page.locator('#mini').waitFor();
-      check(`G2 ${lang}: Enter reopens the popup and focuses the word, its door into the full entry, for an unsavable word`,
-        await page.locator('#mini .mini-word[data-action="entry.open"]').evaluate(node => node === document.activeElement), '', { id: `G2.${lang}.keyboard` });
+      check(`G2 ${lang}: Enter sets the word's English, then Enter opens the popup and focuses the word, its door into the full entry, for an unsavable word`,
+        keyEnglish && keyEarly === 0 && await page.locator('#mini .mini-word[data-action="entry.open"]').evaluate(node => node === document.activeElement),
+        JSON.stringify({ keyEnglish, keyEarly }), { id: `G2.${lang}.keyboard` });
       await page.keyboard.press('Escape');
       await page.locator('#mini').waitFor({ state: 'detached' });
       const after = await tokenState(page, IU);
