@@ -1689,7 +1689,7 @@ function scheduleRecordMeasure(snapshot) {
   recordSizePending = snapshot;
   if (recordSizeTimer) return;
   recordSizeTimer = setTimeout(() => {
-    if (typeof requestIdleCallback === 'function') requestIdleCallback(measureRecordSize, { timeout: 4000 });
+    if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(measureRecordSize, { timeout: 4000 });
     else measureRecordSize();
   }, Math.max(0, recordSizeAt + 20000 - Date.now()));
 }
@@ -4725,7 +4725,7 @@ function appendJaFlow(node, text) {
 function appendJaPieces(node, words) {
   const unit = (text) => { const span = document.createElement('span'); span.className = 'ja-unit'; span.textContent = text; return span; };
   words.forEach((word, i) => {
-    // a plain space already lets the line end; an ideographic space (旅行記　入蔵) does not under keep-all in WebKit, so
+    // a plain space already lets the line end; an ideographic space (旅行記\u3000入蔵) does not under keep-all in WebKit, so
     // the break stands after it (never before it: no line opens on a space)
     if (i && !/^\s/u.test(word) && !/[ \u00a0]$/u.test(words[i - 1])) node.append(document.createElement('wbr'));
     if (!/^[「『（〈《〔［｛(“"]|.[、。，．！？」』）〉》〕］｝〜…‥・：；!?]/u.test(word)) { node.append(word); return; }
@@ -8928,7 +8928,7 @@ function renderFeedEntry(entry, reference = null) {
   if (!entry) row.append(el('p', 'feed-meta', tx('リンクを保存している。記事本文と見出しは端末に保存していない。',
     'The link is saved. The article text and headline are not stored on this device.')));
   const library = feedModule.parseFeedLibrary(S.feedLibrary);
-  const saved = reference || library.savedReferences.find((item) => item.entryId === entry.id && item.publisherId === entry.publisherId && item.canonicalUrl === url);
+  void (reference || library.savedReferences.find((item) => item.entryId === entry.id && item.publisherId === entry.publisherId && item.canonicalUrl === url));
   // S · keeping a story's link is the one Save (saveOne): Save, then Saved ✓ with Remove in its menu
   row.dataset.saveRow = '';
   const linkKept = () => !!feedModule.parseFeedLibrary(S.feedLibrary).savedReferences.find((item) => item.entryId === (reference?.entryId || entry.id)
@@ -10342,7 +10342,7 @@ function jaGroupSegments(segments) {
     const last = groups.length ? groups[groups.length - 1].join('') : '';
     const a = last.slice(-1), b = seg.charAt(0);
     const digitA = /[0-9０-９]/u.test(a), digitB = /[0-9０-９]/u.test(b);
-    let join = false;
+    let join;
     if (!last) join = false;
     // a closing mark, a small kana or ー never opens a line; an opening mark never ends one
     else if (JA_CLOSES.test(seg) || /[「『（〈《〔［｛(“"]$/u.test(last)) join = true;
@@ -10402,7 +10402,7 @@ function setJaWords(node, text) {
 /** a text's width in ems, as a Japanese face sets it: a full-width character one em, anything narrower about 0.6 */
 function jaEms(text) {
   let ems = 0;
-  for (const ch of String(text)) ems += ch === '\u3000' ? 1 : /\s/u.test(ch) ? 0.3 : /[ᄀ-ᅟ⺀-꓏가-힣豈-﫿︰-﹏＀-｠￠-￦　-〿]|[\u{20000}-\u{3fffd}]/u.test(ch) ? 1 : 0.6;
+  for (const ch of String(text)) ems += ch === '\u3000' ? 1 : /\s/u.test(ch) ? 0.3 : /[ᄀ-ᅟ⺀-꓏가-힣豈-﫿︰-﹏＀-｠￠-￦\u3000-〿]|[\u{20000}-\u{3fffd}]/u.test(ch) ? 1 : 0.6;
   return ems;
 }
 const JA_FIT_FLOOR = 0.72;
@@ -13663,7 +13663,7 @@ function senseMustRun(near, h) {
   // the stem it follows: a verb's, an adjective's, an auxiliary's, or the copula's (でなければ, じゃなくちゃ)
   const before = near.at(h - 1);
   const stem = head.p === '助動詞' || ['動詞', '形容詞', '助動詞'].includes(before?.p) || ['で', 'じゃ'].includes(String(before?.s || ''));
-  let verb = null, expression = null;
+  let verb, expression;
   if (nai && s === 'なく' && word(1) === 'て' && word(2) === 'は' && ['いけ', 'なら'].includes(word(3))) {
     verb = 3;
     expression = word(3) === 'いけ'
@@ -18897,10 +18897,10 @@ async function personalCollectionsEmptyForAdoption() {
   const { DB_NAME } = await import('./decks/personal/store.mjs');
   return new Promise((resolve, reject) => {
     let absent = false, settled = false;
-    const finish = (empty, error) => { if (settled) return; settled = true; error ? reject(error) : resolve(empty); };
+    const finish = (empty, error) => { if (settled) return; settled = true; void (error ? reject(error) : resolve(empty)); };
     const request = indexedDB.open(DB_NAME);
     request.onupgradeneeded = () => { absent = true; request.transaction.abort(); };
-    request.onerror = (event) => { event.preventDefault(); absent ? finish(true) : finish(false, request.error); };
+    request.onerror = (event) => { event.preventDefault(); void (absent ? finish(true) : finish(false, request.error)); };
     request.onblocked = () => finish(false, new Error('personal-store-blocked'));
     request.onsuccess = () => {
       const db = request.result;
@@ -31219,7 +31219,6 @@ let speakRoom = null;
 let speakEntered = false;
 let speakFrom = 'dojo';
 let speakPending = null;
-let speakKeepWord = null;
 const speakOwnedAudio = new WeakSet();
 const speakAvailable = () => window.__CORRIDOR_STANDALONE__ !== true;
 const SPEAK_JA = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
@@ -31306,7 +31305,7 @@ function speakHost() {
     // the reading he met it in, and the words he looked up in the scene's article
     learning: (articleId) => {
       const today = S.taken.length && scheduler ? todayQueue() : null;
-      let picks = [];
+      let picks;
       try { picks = todaySkyPicks(todayWordOfDay(today)?.word || '', today, todayReadPick()); } catch { picks = []; }
       const out = { picks: picks.map((p) => ({ word: p.word, kind: p.kind, why: p.why, reading: p.item?.cueReading || lookup(p.word)?.r || '' })), articleTaps: [] };
       if (articleId) {
@@ -31351,7 +31350,7 @@ function speakHost() {
     // the word last touched in any line, kept whole (surface, base, reading); Hfix-1A: the bar no longer shows it (its
     // slip's Save is the one)
     setKeep: ({ word, surface = '', reading = '' }) => {
-      speakKeepWord = word ? { word, surface: surface || word, reading } : null;
+      void (word ? { word, surface: surface || word, reading } : null);
     },
     // one sound at a time: Kore's element becomes the app's one playback owner while she speaks
     ownAudio: (audioEl) => {
@@ -31377,7 +31376,6 @@ function speakHost() {
     // V's lock as the app carries it: the VOICE_LOCK mirror that tools/sync-voice-lock.mjs generates from
     // audio/voice-lock.json (no fetch, no race). Where this build has no mirror yet, the room keeps speak-core's
     // checked fallback (VOICE_LOCK_FILE, equal to V's file whenever the file is in the tree).
-    // eslint-disable-next-line no-undef
     voiceLock: () => (typeof VOICE_LOCK !== 'undefined' ? VOICE_LOCK : null),
   });
 }
@@ -38113,7 +38111,7 @@ function composePage(node, path) {
   else if (node.t === 'sent') renderSentenceNode(sheet, node);
   else if (node.t === 'reference') renderReferenceNode(sheet, node);
   if (personalHost && ['grammar', 'particle'].includes(node.t)) {
-
+    // No additional host action is needed for these two sheet kinds.
   }
   if (node.t !== 'reference' && node.referenceEntry?.levelSources?.length) {
     const notes = el('details', 'reference-entry-provenance');
@@ -41483,7 +41481,7 @@ function crumbLine(parts) {
   const trayOrigin = !viaTray ? null : S.trayFrom === 'reader' ? 'reader' : plainRecord(S.trayFrom) ? S.trayFrom.view : null;
   const galaxyWard = (view) => view === 'drift' || view === 'dojo' || view === 'probe' || view === 'deckplay' ||
     (view === 'guided' && guidedFrom === 'dojo') || (view === 'search' && S.searchFrom !== 'shelf');
-  let root = null;
+  let root;
   if (S.view === 'entry' || trayOrigin === 'entry') root = 'entry';
   else if (trayOrigin) root = galaxyWard(trayOrigin) ? 'drift' : 'shelf';
   else if (S.view === 'settings') { parts.push(tx(...ROOM_NAMES.line.me)); root = null; }
