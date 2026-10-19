@@ -4444,15 +4444,60 @@ function dictionaryTag(tag) {
   const description = D.dictionaryIndex?.tags?.[tag] || tag;
   return tx(SENSE_TAG_JA[tag] || description, SENSE_TAG_EN[tag] || description);
 }
-/* the core record's part of speech is plain words already, bar a few JMdict codes it kept */
-const CORE_POS_PLAIN = {
-  'adj-pn': 'pre-noun adjective', 'adj-f': 'used before a noun', 'n-suf': 'noun suffix', 'n-pref': 'noun prefix',
-  'vs-s': 'suru verb', 'vs-c': 'su verb', vz: 'zuru verb', aux: 'auxiliary', 'aux-adj': 'auxiliary adjective',
-  'adj-ix': 'i-adjective (いい/よい)', 'adj-ku': 'ku-adjective', v5aru: 'godan verb', 'v1-s': 'ichidan verb',
-  'v2a-s': 'nidan verb', cop: 'copula',
+/* Hfix-2d · one part-of-speech line, in the plain school terms 日本語 readers know and in plain one-line
+ * English (X-17, X-18). Verb class and transitivity compose: 動詞（五段・自動詞） / 動詞（一段・他動詞） /
+ * する動詞（他動詞） in 日本語; "godan verb, intransitive" / "ichidan verb, transitive" / "suru verb,
+ * transitive" in EN. Tags arrive as JMdict codes (v5r, adj-i, …) or as the core record's plain-English
+ * segments ("godan verb", "transitive verb", …); both normalize to the same codes. Usage/field/dialect
+ * tags keep dictionaryTag. */
+const POS_SEGMENT_CODE = {
+  noun: 'n', 'na-adjective': 'adj-na', 'no-adjective': 'adj-no', 'i-adjective': 'adj-i', 'taru-adjective': 'adj-t',
+  adverb: 'adv', 'adverb (to)': 'adv-to', particle: 'prt', conjunction: 'conj', interjection: 'int', expression: 'exp',
+  pronoun: 'pn', counter: 'ctr', suffix: 'suf', prefix: 'pref', numeric: 'num', number: 'num', copula: 'cop',
+  'godan verb': 'v5', 'ichidan verb': 'v1', 'nidan verb': 'v2', 'yodan verb': 'v4', 'suru verb': 'vs', 'kuru verb': 'vk',
+  'zuru verb': 'vz', 'su verb': 'vs-c', verb: 'v-unspec', 'auxiliary verb': 'aux-v', auxiliary: 'aux',
+  'intransitive verb': 'vi', 'transitive verb': 'vt', 'auxiliary adjective': 'aux-adj',
+  'pre-noun adjective': 'adj-pn', 'used before a noun': 'adj-f', 'noun suffix': 'n-suf', 'noun prefix': 'n-pref',
+  'i-adjective (いい/よい)': 'adj-ix', 'ku-adjective': 'adj-ku',
 };
-function plainPos(p) {
-  return String(p).split(' · ').map((part) => CORE_POS_PLAIN[part] || part).join(' · ');
+function posCode(tag) {
+  return POS_PLAIN[tag] || POS_FAMILY.some(([family]) => family.test(tag)) ? tag : POS_SEGMENT_CODE[tag] || tag;
+}
+function posLine(tags) {
+  const codes = tags.map(posCode);
+  const verbClass = codes.some((code) => /^v5/u.test(code)) ? 'v5' : codes.some((code) => /^v1($|-)/u.test(code)) ? 'v1'
+    : codes.some((code) => /^v2/u.test(code)) ? 'v2' : codes.some((code) => /^v4/u.test(code)) ? 'v4' : null;
+  const transitivity = ['vi', 'vt'].filter((code) => codes.includes(code));
+  const jaTrans = transitivity.map((code) => (code === 'vi' ? '自動詞' : '他動詞')).join('・');
+  const enTrans = transitivity.map((code) => (code === 'vi' ? 'intransitive' : 'transitive')).join(' and ');
+  const suru = codes.some((code) => /^vs($|-)/u.test(code));
+  const classText = verbClass
+    ? S.lang === 'ja'
+      ? transitivity.length
+        ? `動詞（${{ v5: '五段', v1: '一段', v2: '二段（古語）', v4: '四段（古語）' }[verbClass]}・${jaTrans}）`
+        : `${{ v5: '五段', v1: '一段', v2: '二段（古語）', v4: '四段（古語）' }[verbClass]}動詞`
+      : `${{ v5: 'godan', v1: 'ichidan', v2: 'nidan', v4: 'yodan' }[verbClass]} verb${transitivity.length ? `, ${enTrans}` : ''}`
+    : null;
+  const suruOwn = !verbClass && transitivity.length;
+  const suruText = suru
+    ? S.lang === 'ja'
+      ? suruOwn ? `する動詞（${jaTrans}）` : 'する動詞'
+      : `suru verb${suruOwn ? `, ${enTrans}` : ''}`
+    : null;
+  const pieces = [];
+  let verbsEmitted = false;
+  for (const code of codes) {
+    if (/^v[1254]/u.test(code) || /^vs($|-)/u.test(code)) {
+      if (!verbsEmitted) { if (classText) pieces.push(classText); if (suruText) pieces.push(suruText); verbsEmitted = true; }
+      continue;
+    }
+    if (code === 'vi' || code === 'vt') {
+      if (!verbsEmitted && !classText && !suruText) pieces.push(dictionaryTag(code)); // transitivity standing alone
+      continue;
+    }
+    pieces.push(dictionaryTag(code));
+  }
+  return [...new Set(pieces)].join(' · ');
 }
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -33662,8 +33707,9 @@ function renderDictionaryDetails(container, details, node) {
       const section = el('div', 'dictionary-sense');
       section.append(el('span', 'dictionary-sense-number', String(senseIndex + 1)));
       const body = el('div', 'dictionary-sense-body');
-      const tags = [...partOfSpeech, ...field, ...dialect, ...misc].map(dictionaryTag);
-      if (tags.length) body.append(el('p', 'sense-pos', [...new Set(tags)].join(' · ')));
+      const pos = posLine(partOfSpeech);
+      const usage = [...new Set([...field, ...dialect, ...misc].map(dictionaryTag))];
+      if (pos || usage.length) body.append(el('p', 'sense-pos', [pos, ...usage].filter(Boolean).join(' · ')));
       const restrictions = [];
       if (appliesToKanji?.length && appliesToKanji[0] !== '*') {
         restrictions.push(tx(`${appliesToKanji.join('・')} の語義`, `for ${appliesToKanji.join('・')}`));
@@ -34323,7 +34369,13 @@ function renderWordNode(sheet, node) {
       row.dataset.kanjirow = c;
       const glyph = el('span', 'row-glyph', c);
       row.append(glyph);
-      row.append(el('span', 'row-main', D.kanji[c].m));
+      // Hfix-2d (X-17): in 日本語 mode a keyword that exists only in English is not machine-translated —
+      // the kanji's own reading stands in its place (real data, nothing invented); left out when there is none
+      const keyword =
+        S.lang === 'ja'
+          ? (D.kanji[c].kun?.[0] || D.kanji[c].on?.[0] || '').replace(/[.\-・]/gu, '')
+          : D.kanji[c].m;
+      if (keyword) row.append(el('span', 'row-main', keyword));
       row.append(el('span', 'row-go', '›'));
       row.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }, { invoker: row, from: glyph }));
       rows.append(row);
@@ -34353,7 +34405,7 @@ function renderWordNode(sheet, node) {
   } else if (rec?.m?.length && !unresolved) {
     const box = el('div', 'senses');
     if (lone) renderDictionaryHomographs(box, node, { head: true });
-    if (rec.p) box.append(el('p', 'sense-pos', plainPos(rec.p)));
+    if (rec.p) box.append(el('p', 'sense-pos', posLine(String(rec.p).split(' · '))));
     const immediate = rec.seq ? rec.m.slice(0, 1) : rec.m;
     if (immediate.length === 1) {
       box.append(el('p', 'gloss', immediate[0]));
@@ -34721,7 +34773,10 @@ function renderKanjiNode(sheet, node) {
   hero.append(el('div', 'hero-glyph', k.c));
   const meta = el('div', 'hero-meta');
   const display = retained || kanjiDisplayRecord(node.id, node.referenceEntry) || k;
-  meta.append(el('div', 'hero-mean', display.m || tx('語義は未収録です。', 'Meaning not supplied.')));
+  // Hfix-2d (X-17): a keyword that exists only in English is not machine-translated. In 日本語 mode it is
+  // left out here — this entry's own reading lines stand directly below; in EN it stays.
+  if (bi()) meta.append(el('div', 'hero-mean', display.m || 'Meaning not supplied.'));
+  else if (!display.m) meta.append(el('div', 'hero-mean', tx('語義は未収録です。', 'Meaning not supplied.')));
   const chips = el('div', 'shelf-meta');
   if (Number.isInteger(k.st)) chips.append(catalogChip(`${k.st} 画`, `${k.st} strokes`, 'strokes', k.st, node.from));
   if (D.kanken[k.c]?.kk)
