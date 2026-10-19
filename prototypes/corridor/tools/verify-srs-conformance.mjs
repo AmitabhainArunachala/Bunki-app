@@ -383,6 +383,11 @@ async function playerJohnRoute(browser, engine, { mutate = null } = {}) {
     out.pause = (await page.locator('#kp-pause').textContent().catch(() => '')) || '';
     out.aheadButton = await page.locator('#kp-ahead').count();
     out.closeBefore = (await page.locator('.kp-done-line').allTextContents()).join(' ');
+    // a control is judged on the first pass (its repeats, its labels): the early pass and the day after are not needed
+    if (mutate) {
+      out.errors = errors;
+      return out;
+    }
     out.beforeShot = join(OUT, `${engine}-player-close-pause.png`);
     await page.screenshot({ path: out.beforeShot, fullPage: true });
     if (out.aheadButton) {
