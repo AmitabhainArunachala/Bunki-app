@@ -32695,6 +32695,14 @@ function exampleIdentity(id, node = null) {
     const written = Array.isArray(row?.[4]) ? row[4] : [];
     for (const form of written.length ? written : Array.isArray(row?.[5]) ? row[5] : []) forms.add(form);
   }
+  // KT-6 round 2 (critic 0426, the lead's ruling): the word's own entries are every entry that writes its key (押える is a
+  // spelling of 押さえる's entry, 問 of 問い's). Their spellings with the key's kanji (another okurigana: 押さえる, 代わる,
+  // 問い, 願い, 勢い, 或る) are the word's own; a spelling with other kanji only when the entry has one sense or JMdict
+  // restricts none of its senses to some of its spellings (依る, 拠る and 由る share every sense of 因る's entry; 張る keeps
+  // a sense of its own, so it never stands under 貼る). Never another entry's spelling.
+  for (const row of exampleOwnRows(key)) {
+    for (const form of row[4]) if (!forms.has(form) && (exampleKanji(form) === exampleKanji(key) || exampleSensesShared(row))) forms.add(form);
+  }
   let readings = null;
   if (own === node && (node.seq || node.reading) && rows.length) {
     readings = new Set(rows.flatMap((row) => (Array.isArray(row?.[5]) ? row[5] : []).map((kana) => kataToHira(String(kana)))));
@@ -32703,6 +32711,36 @@ function exampleIdentity(id, node = null) {
   // a kana spelling is the same spelling in either kana: ドキドキ is どきどき, ガン is がん (癌)
   const kana = new Set([...forms].filter((form) => READER_KANA.test(form)).map((form) => kataToHira(form)));
   return { forms, kana, readings };
+}
+/** The kanji a spelling is written with, in order (押さえる and 押える: 押). */
+function exampleKanji(form) {
+  return (String(form || '').match(/\p{Script=Han}/gu) || []).join('');
+}
+/** The entries at hand that write `key` as one of their spellings (a kanji key only: a kana key names no entry by itself). */
+function exampleOwnRows(key) {
+  if (!key || !D.dictionaryIndex || !exampleKanji(key)) return [];
+  return dictionaryRowsForForm(key).filter((row) => Array.isArray(row?.[4]) && row[4].includes(key));
+}
+/** Whether every spelling of an entry carries every sense of it: one sense, or no sense JMdict restricts to some of its
+ * spellings (the entry's detail, once its shard is here: ensureExampleIdentity). Unknown is no. */
+function exampleSensesShared(row) {
+  const senses = D.dictionaryDetails?.get(String(row?.[0]))?.[3] || null;
+  const count = senses ? senses.length : Array.isArray(row?.[12]) ? row[12].length : 0;
+  if (count === 1) return true;
+  if (!senses) return false;
+  return senses.every((sense) => !Array.isArray(sense?.[1]) || !sense[1].length || sense[1].includes('*'));
+}
+/** KT-6 · the details the sense check reads for a word's own entries written with other kanji, fetched once. True when
+ * something arrived, so the page draws its examples again. */
+async function ensureExampleIdentity(id) {
+  if (!exampleKanji(id)) return false;
+  await ensureDictionaryRowsForForm(id);
+  const shards = [...new Set(exampleOwnRows(id)
+    .filter((row) => row[4].some((form) => exampleKanji(form) !== exampleKanji(id)) && !D.dictionaryDetails?.get(String(row[0])))
+    .map((row) => dictionaryShardId(row[0])))];
+  if (!shards.length) return false;
+  await Promise.all(shards.map(ensureDictionaryShard));
+  return true;
 }
 function exampleTokenIsWord(token, identity) {
   if (!token?.c) return false;
@@ -35135,6 +35173,12 @@ function renderWordNode(sheet, node) {
       if (!entries.length) return;
       refreshWordSheet(node);
     });
+  }
+  // KT-6 · the word's own entries and the details the identity's sense check reads, asked once; the examples are drawn
+  // again when they land
+  if (!personalHost && !node.exampleIdentityAsked && window.__CORRIDOR_STANDALONE__ !== true) {
+    node.exampleIdentityAsked = true;
+    ensureExampleIdentity(node.id).then((arrived) => { if (arrived) refreshWordSheet(node); }).catch(() => {});
   }
   const { first: leadExamples, more: moreExamples } = exampleOrder(node, findExamples(node.id, 6, node));
   if (leadExamples.length || moreExamples.length) {

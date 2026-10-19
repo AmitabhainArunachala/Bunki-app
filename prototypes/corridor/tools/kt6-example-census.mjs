@@ -25,8 +25,11 @@ function constant(name) {
   if (!match) throw new Error(`corridor.js has no const ${name}`);
   return match[0].slice(1);
 }
+// KT-6 round 2's helpers (the word's own entries and their sense check) are read when the served build has them, so the
+// same census runs on the build before them and the counts compare
+const optional = ['exampleKanji', 'exampleOwnRows', 'exampleSensesShared'].filter((name) => new RegExp(`\\nfunction ${name}\\(`).test(source));
 const names = ['kataToHira', 'normalizeGloss', 'dictionaryReadingSummaries', 'dictionaryReadingSupportsForm', 'dictionaryCoreMatch',
-  'dictionaryRowBySeq', 'dictionaryRowsForForm', 'dictionaryRowsFor', 'dictionaryDetailRowsFor', 'exampleIdentity',
+  'dictionaryRowBySeq', 'dictionaryRowsForForm', 'dictionaryRowsFor', 'dictionaryDetailRowsFor', ...optional, 'exampleIdentity',
   'exampleTokenIsWord', 'exampleHoldsWord', 'inflateExampleToken'];
 const code = [constant('KATA_TO_HIRA_OFFSET'), constant('GLOSS_MESSY'), constant('GLOSS_LEAD'), constant('READER_KANA'), ...names.map(topLevel),
   `return { ${names.join(', ')} };`].join('\n');
@@ -39,6 +42,11 @@ Object.assign(D, {
   dictionaryIndex: index, dictionaryMode: 'main',
   dictionaryBySeq: new Map(), dictionaryByForm: new Map(), dictionaryCompleteForms: new Set(),
 });
+// every entry's detail, as the word page has it once its shards are fetched (the sense check reads it)
+D.dictionaryDetails = new Map();
+for (let i = 0; i < index.shardCount; i += 1) {
+  for (const entry of json(`data/share_alike/dict-v2/${i.toString(16).padStart(2, '0')}.json`).entries) D.dictionaryDetails.set(String(entry[0]), entry);
+}
 const dir = 'data/proprietary_safe/examples';
 const manifest = json(`${dir}/manifest.json`);
 const keys = {};
@@ -95,7 +103,9 @@ const spotRows = spots.map(([key, why]) => {
 });
 
 const report = { site, artifact: JSON.parse(readFileSync(join(site, 'build-identity.json'), 'utf8')).artifactSha256,
-  rule: 'a bank sentence is a word\'s example only when a content token\'s dictionary form is one of the word\'s own written forms (key, core alt, its own entry\'s spellings; kana forms only for an entry with no kanji)',
+  rule: optional.length ? 'a bank sentence is a word\'s example only when a content token\'s dictionary form is one of the word\'s own written forms: key, core alt, the shown entry\'s spellings (kana forms only for an entry with no kanji), and the spellings of every entry that writes the key: with the key\'s kanji, or with other kanji when the entry has one sense or restricts none of its senses to some spellings'
+    : 'a bank sentence is a word\'s example only when a content token\'s dictionary form is one of the word\'s own written forms (key, core alt, its own entry\'s spellings; kana forms only for an entry with no kanji)',
+  helpers: optional,
   all: tally, core, firstExampleChanged: firstChanged, spots: spotRows, changed };
 const fmt = (t) => `${t.keys} keys: ${t.unchanged} unchanged, ${t.loseSome} lose some, ${t.loseAll} lose all; ${t.dropped} of ${t.links} sentence links dropped`;
 console.log(`whole bank   ${fmt(tally)}`);

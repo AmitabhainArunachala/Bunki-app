@@ -7,6 +7,13 @@
  *          Control: no token ever counts as the word.
  *   KT6-C  an inflected verb keeps its inflected examples (歩く: ≥ 4, one written 歩け/歩き/歩い). Green on base and
  *          branch (a guard). Control: as B.
+ * KT-6 round 2 (critic 0426 on 1f790977; the lead's ruling), each against 1f790977 as its base:
+ *   KT6-D  the seven words a variant okurigana or a same-entry spelling writes show their own sentences again (押える
+ *          ← 押さえる, 代る ← 代わる, 問 ← 問い, 願 ← 願い, 勢 ← 勢い, 或 ← 或る, 因る ← 依る/拠る/由る: entry 1168660 shares
+ *          every sense). Red on 1f790977 (0 or 1 left). Control: no own-entry spelling admitted.
+ *   KT6-E  張る never stands under 貼る (one entry, 1427900, but a sense of its own): every example 貼る's page shows
+ *          holds 貼. A guard, green on 1f790977 too. Control: every same-entry spelling admitted whatever its senses.
+ *   KT6-F  藍 still shows no example at all. A guard, green on 1f790977 too. Control: the bank read by the bare kana.
  * KAIRO_SITE_DIR + KAIRO_ARTIFACT_SHA256 pin the build; KAIRO_BROWSER picks the engine (WebKit 390×844 touch, Chromium
  * 1440×900); HFIX2E_MODE = base | branch | control; HFIX2E_CASE runs one row. */
 import assert from 'node:assert/strict';
@@ -41,6 +48,11 @@ const CONTROL = {
   // no token ever counts as the word: a guard that cannot go red guards nothing
   'KT6-B': ['function exampleTokenIsWord(token, identity) {', 'function exampleTokenIsWord(token, identity) {\n  return false;'],
   'KT6-C': ['function exampleTokenIsWord(token, identity) {', 'function exampleTokenIsWord(token, identity) {\n  return false;'],
+  // no spelling of the word's own entries is admitted, as on 1f790977
+  'KT6-D': ['  for (const row of exampleOwnRows(key)) {', '  for (const row of []) {'],
+  // every same-entry spelling admitted whatever its senses: 張る would stand under 貼る
+  'KT6-E': ['function exampleSensesShared(row) {', 'function exampleSensesShared(row) {\n  return true;'],
+  'KT6-F': ['const banked = bankExamplesFor(id, node);', 'const banked = D.exampleBank?.get(id) || [];'],
 };
 async function ready(page) {
   await page.waitForFunction(() => document.body.dataset.ready === '1' && !document.documentElement.dataset.roomTransition);
@@ -107,8 +119,29 @@ async function searchWord(page, word) {
   await page.waitForSelector('#sheet .headword');
 }
 
-try {
-  await row('KT6-A', async ({ page }) => {
+/** A core word's own page, reached the way the Words room reaches it: its word web, then "Open the full entry". */
+async function openWordPage(page, word) {
+  // each word from a fresh start: no page from the word before stands over the web
+  await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi`); await ready(page);
+  assert.equal(await page.evaluate((word) => window.openWordWeb(word, { type: 'word' }), word), true, `the word web opens on ${word}`);
+  await page.waitForFunction((word) => document.querySelector('.ww-plate')?.dataset.wwCentre === `word:${word}`, word, { timeout: 15000 });
+  await ready(page);
+  await page.locator('.ww-open').first().click();
+  await page.waitForFunction((word) => document.querySelector('#sheet')?.dataset.node === `word:${word}`, word, { timeout: 15000 });
+}
+/** A word page's examples once its detail, its bank and its own entries have answered: what it shows when it settles. */
+async function settledExamples(page) {
+  await page.waitForFunction(() => document.querySelectorAll('#sheet .example').length >= 1, null, { timeout: 12000 }).catch(() => {});
+  await settled(page, ['ex-']);
+  let last = '';
+  for (const until = Date.now() + 6000; Date.now() < until; await page.waitForTimeout(400)) {
+    const now = JSON.stringify(await exampleTexts(page));
+    if (now === last) break;
+    last = now;
+  }
+  return exampleTexts(page);
+}
+async function openIndigo(page) {
     await openShelfTools(page);
     await page.locator('#kanjidex-link').click();
     await page.locator('.kdx-lens').first().waitFor();
@@ -127,6 +160,10 @@ try {
     await page.waitForFunction(() => /indigo/u.test(document.querySelector('#sheet')?.textContent || ''), null, { timeout: 20000 });
     // あい's index shard (fnv1a32 & 15 = 3) and the two sentence shards its six bank lines live in
     await settled(page, ['ex-03.json', 's-00.json', 's-01.json']);
+}
+try {
+  await row('KT6-A', async ({ page }) => {
+    await openIndigo(page);
     const examples = await exampleTexts(page);
     const sheet = await page.evaluate(() => ({ node: document.querySelector('#sheet')?.dataset.node || '',
       headword: document.querySelector('#sheet .headword')?.textContent.trim() || '',
@@ -165,6 +202,35 @@ try {
     const inflected = examples.filter((text) => text.includes('歩') && !text.includes('歩く'));
     assert(inflected.length >= 1, `KT6-C: an inflected 歩く (歩け, 歩き, 歩い) is still its example (${examples.join(' | ')})`);
     return { examples, inflected };
+  });
+  await row('KT6-D', async ({ page }) => {
+    const words = [['押える', /押さえ/u], ['代る', /代わ/u], ['問', /問い/u], ['願', /願い/u], ['勢', /勢い/u], ['或', /或る/u], ['因る', /[依拠由]/u]];
+    const seen = {};
+    for (const [word, own] of words) {
+      await openWordPage(page, word);
+      const examples = await settledExamples(page);
+      seen[word] = { count: examples.length, own: examples.filter((text) => own.test(text)).length, first: examples[0] || null };
+    }
+    await shot(page, 'KT6-D-last');
+    const short = Object.entries(seen).filter(([, row]) => !row.count || !row.own);
+    assert.deepEqual(short.map(([word]) => word), [], `KT6-D: each word shows its own sentences again (${JSON.stringify(seen)})`);
+    return seen;
+  });
+
+  await row('KT6-E', async ({ page }) => {
+    await openWordPage(page, '貼る');
+    const examples = await settledExamples(page);
+    await shot(page, 'KT6-E-examples');
+    const stretched = examples.filter((text) => text.includes('張') && !text.includes('貼'));
+    assert.deepEqual(stretched, [], `KT6-E: 張る never stands under 貼る (${stretched.join(' | ')})`);
+    return { examples };
+  });
+
+  await row('KT6-F', async ({ page }) => {
+    await openIndigo(page);
+    const examples = await exampleTexts(page);
+    assert.deepEqual(examples, [], `KT6-F: 藍 shows no example (${examples.join(' | ')})`);
+    return { examples };
   });
 } finally {
   await browser.close(); await host.close();
