@@ -5958,6 +5958,122 @@
       ]
     },
     {
+      "name": "srs-conformance",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "dfad0cc69cbd88c411dc9ff140e1dd91332b2260",
+        "producerBytesBasis": "SRS FULLPROOF's integration branch (int-srs on 4159d180), optional reads presence-checked, ten controls, the early pass's counter and one early wording on four surfaces; producer bytes pinned by SHA-256, not falsely attributed to a parent commit.",
+        "producer": "prototypes/corridor/tools/verify-srs-conformance.mjs",
+        "producerSha256": "8b317203a8405f0e9dc706aad58fbfaf713ce55b7a6ed9030648f866082fe04a",
+        "command": [
+          "node",
+          "prototypes/corridor/tools/verify-srs-conformance.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/srs-conformance"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-srs-conformance.mjs",
+            "sha256": "8b317203a8405f0e9dc706aad58fbfaf713ce55b7a6ed9030648f866082fe04a"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [
+        {
+          "sampleCount": 1,
+          "medianSeconds": 2188,
+          "meanSeconds": 2188.0,
+          "maxSeconds": 2188,
+          "minSeconds": 2188,
+          "successfulMedianSeconds": 2188,
+          "provenance": "LOCAL measurement, SRS merge lane, 2026-10-19, Apple silicon M5, node v22.23.3. No CI run has executed this gate yet, so this is not a GitHub receipt and must be replaced by the first battery's own number. Chromium on int-site-2 (the SRS merge onto 1c2a499f, artifact c0ffc9f5), 38/38 rows and 8/8 controls, fleet load 25-29 at the start.",
+          "samples": [
+            {
+              "runId": null,
+              "seconds": 2188,
+              "status": "passed",
+              "source": "local"
+            }
+          ],
+          "currentContractMeasured": false,
+          "historicalReason": "SRS merge (2026-10-19): local measurements of this producer, all rows and all eight controls on one engine, before the first battery runs it; kept exactly as observed, never a current-command timing."
+        }
+      ],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "srs-conformance-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "dfad0cc69cbd88c411dc9ff140e1dd91332b2260",
+        "producerBytesBasis": "SRS FULLPROOF's integration branch (int-srs on 4159d180), optional reads presence-checked, ten controls, the early pass's counter and one early wording on four surfaces; producer bytes pinned by SHA-256, not falsely attributed to a parent commit.",
+        "producer": "prototypes/corridor/tools/verify-srs-conformance.mjs",
+        "producerSha256": "8b317203a8405f0e9dc706aad58fbfaf713ce55b7a6ed9030648f866082fe04a",
+        "command": [
+          "node",
+          "prototypes/corridor/tools/verify-srs-conformance.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/srs-conformance-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-srs-conformance.mjs",
+            "sha256": "8b317203a8405f0e9dc706aad58fbfaf713ce55b7a6ed9030648f866082fe04a"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [
+        {
+          "sampleCount": 2,
+          "medianSeconds": 2203.5,
+          "meanSeconds": 2203.5,
+          "maxSeconds": 2214,
+          "minSeconds": 2193,
+          "successfulMedianSeconds": 2203.5,
+          "provenance": "LOCAL measurement, SRS lane, 2026-10-19, Apple silicon M5, node v22.23.3. No CI run has executed this gate yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. WebKit, 38/38 rows and 8/8 controls each: site-7 (bb2549ba's artifact 661462f7) 2193 s at load 8-16; int-site-2 (artifact c0ffc9f5) 2214 s at load 14-28.",
+          "samples": [
+            {
+              "runId": null,
+              "seconds": 2193,
+              "status": "passed",
+              "source": "local"
+            },
+            {
+              "runId": null,
+              "seconds": 2214,
+              "status": "passed",
+              "source": "local"
+            }
+          ],
+          "currentContractMeasured": false,
+          "historicalReason": "SRS merge (2026-10-19): local measurements of this producer, all rows and all eight controls on one engine, before the first battery runs it; kept exactly as observed, never a current-command timing."
+        }
+      ],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
       "name": "standalone-journey",
       "sampleCount": 5,
       "medianSeconds": 62.892,

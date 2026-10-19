@@ -127,6 +127,8 @@
 .kp-levelchip { color: var(--kp-ink-2); background: var(--kp-panel-2); font-family: var(--kp-num); letter-spacing: 0.04em; }
 .kp-st-new { color: var(--kp-ink-2); }
 .kp-st-learn { color: var(--kp-amber); border-color: currentColor; }
+/* shown before its learning step was due, by the learner's choice at the close */
+.kp-st-early { color: var(--kp-ink-2); border-color: currentColor; }
 .kp-st-grow { color: var(--kp-green); border-color: currentColor; border-style: dashed; }
 .kp-st-known { color: var(--kp-green); border-color: currentColor; }
 .kp-st-hard { color: var(--kp-red); border-color: currentColor; }
@@ -256,6 +258,8 @@
 .kp-swipehint { grid-column: 1 / -1; margin: 2px 0 0; text-align: center; font-size: var(--type-caption); color: var(--kp-mute); letter-spacing: 0.1em; }
 .kp-rule { grid-column: 1 / -1; margin: 0; display: flex; align-items: center; justify-content: flex-start; gap: 6px; font-size: var(--type-label); color: var(--kp-ink-2); text-align: left; }
 .kp-rule > span { flex: 1; min-width: 0; }
+/* a card whose Good keeps it in its learning steps says when it comes back */
+.kp-stepnote { grid-column: 1 / -1; margin: 2px 0 0; font-size: var(--type-label); line-height: 1.45; color: var(--kp-ink-2); text-align: left; }
 /* The report control occupies the lower-right corner; keep the rule dismissal on the left. */
 .kp-rule-x { position: relative; order: -1; width: 32px; height: 32px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: var(--type-chrome); flex: none; }
 /* the one press (editorial.css owns it in the corridor): the frozen study pages stand alone, so the deck
@@ -576,6 +580,7 @@
  * line of small print with a bare ×. No boxes, nothing in the pads' way. */
 .kp .kp-swipehint { color: var(--kp-dock-mute); font-family: var(--kp-num); font-size: var(--type-caption); letter-spacing: 0.16em; margin: 0; }
 .kp .kp-rule { color: var(--kp-dock-ink); font-size: var(--type-label); line-height: 1.45; gap: 2px; }
+.kp .kp-grades .kp-stepnote { color: var(--kp-dock-ink); }
 .kp .kp-rule-x { color: var(--kp-dock-mute); border-color: transparent; background: none; font-size: var(--type-control); }
 @media (max-width: 640px) {
   .kp .kp-grades { border-top-color: color-mix(in srgb, var(--kp-dock-ink) 16%, transparent); }

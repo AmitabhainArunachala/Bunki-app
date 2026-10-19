@@ -658,11 +658,17 @@ async function verifyDelivery(browser, base) {
     await page.click('#kp-start');
     await page.click('#kp-reveal');
     await page.waitForSelector('.kp-grade');
-    // a new card answered 正解 (Good) comes back once in the sitting (its 10-minute step); the second answer ends it
+    // a new card answered 正解 (Good) is in its 10-minute step: with nothing else left the close says so and offers it
+    // now, early (Anki's learn-ahead, by the learner's choice: lead's ruling 10-19); taken, the second answer ends it
     await page.click('#kp-grade-good');
+    await page.waitForSelector('#kp-ahead');
+    const pause = await page.evaluate(`document.getElementById('kp-pause')?.innerText || ''`);
+    await page.click('#kp-ahead');
+    await page.waitForSelector('#kp-card .kp-st-early');
     await page.click('#kp-reveal');
     await page.click('#kp-grade-good');
     await page.waitForSelector('.kp-done');
+    check('the one card in its step is not shown again until the learner chooses it at the close, then it says it is early', /1 word is in a learning step \(the next is due in 10 min\): review it now, early, or it will wait for you\./.test(pause), pause);
     const done = await page.evaluate(`({ undo: document.querySelectorAll('#kp-undo').length, text: document.querySelector('.kp-done').innerText.replace(/\\s+/g, ' ') })`);
     let back = null;
     if (done.undo) {
@@ -670,7 +676,8 @@ async function verifyDelivery(browser, base) {
       await page.waitForSelector('.kp-grade');
       back = { count: await count(), log: await logLength('kotoba-mine') };
     }
-    check("K020", 'the done screen keeps ひとつ戻す and it brings the last card back', done.undo === 1 && done.text.includes('Recall rate') && back?.count === '2/2' && back.log === 1, JSON.stringify({ ...done, back }));
+    // the card comes back as the early pass's own one card: that pass counts within itself (lead's 0122, Grok §1)
+    check("K020", 'the done screen keeps ひとつ戻す and it brings the last card back', done.undo === 1 && done.text.includes('Recall rate') && back?.count === '1/1' && back.log === 1, JSON.stringify({ ...done, back }));
 
     // 4択 never asks a 字 card: it is answered as 穴埋め (F38)
     await page.evaluate(DUE_KANJI);

@@ -72,6 +72,7 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'reference-ui.css',
   'drift-layer.css',
   'drift-layer.js',
+  'srs-core.mjs',
   'decks/context-dense/mount.js',
   'decks/context-dense/engine.js',
   'decks/context-dense/deck.json',

@@ -25,9 +25,9 @@ for (const file of readdirSync(join(root, 'scripts/ci')).filter((f) =>
       for (const key of value) known.add(key);
     }
 }
-test('all 195 canonical and supplemental gates have unique names and mandatory declarations', () => {
-  assert.equal(gates.length, 195);
-  assert.equal(new Set(gates.map((g) => g.name)).size, 195);
+test('all 197 canonical and supplemental gates have unique names and mandatory declarations', () => {
+  assert.equal(gates.length, 197);
+  assert.equal(new Set(gates.map((g) => g.name)).size, 197);
   const expected = JSON.parse(
     readFileSync(new URL('./vh-required-gate-roster.json', import.meta.url), 'utf8'),
   );

@@ -78,9 +78,14 @@ async function selectTown(page) {
 function unchanged(before, after, keys = ['taken', 'srs', 'revlog', 'stats', 'lists']) {
   for (const key of keys) assert.deepEqual(after[key], before[key], `${key} remains unchanged`);
 }
-// Again turns the same card face-down at once (Anki's learn-ahead, 35f8b940): no countdown beat and
-// no いま見る. The graded card is reinserted as the session's very next item, answer box empty.
+// Again on the sitting's only card: with nothing else left the close offers it now, early (Anki's learn-ahead, by the
+// learner's choice: lead's ruling 10-19, SRS) — no countdown beat and no いま見る. Taken, the graded card is the
+// session's very next item, face-down, answer box empty.
 async function againReturns(page, cue, session) {
+  await page.waitForSelector('#review-ahead', { timeout: 15000 });
+  assert.match(await page.locator('#review-pause').textContent(), /^1 word is in a learning step \(the next is due in 1 min\): review it now, early, or it will wait for you\.$/u,
+    'the close says the card is in its 1-minute step and offers it early');
+  await page.locator('#review-ahead').click();
   await page.waitForFunction(() => !document.querySelector('.grade')
     && document.getElementById('sentence-recall-answer')?.value === '');
   assert.equal(await page.locator('[data-review-wait]').count(), 0, 'Again holds no countdown');

@@ -3844,6 +3844,8 @@ async function personalDictionaryBridge(container) {
 }
 let fsrsApi = null;
 let scheduler = null;
+// the app's one schedule owner (srs-core.mjs): the sitting rule, the due gate before any grade, the close's counts
+let srsCore = null;
 /** The exact generator parameters the scheduler was built with — kept so the
  * verification suites can read the policy actually in force (fuzz OFF, the
  * pin's numbers) instead of trusting a comment. */
@@ -4902,6 +4904,7 @@ async function boot() {
 
   try {
     fsrsApi = window.__TSFSRS__ || (await import('./vendor/ts-fsrs.mjs'));
+    srsCore = window.__SRS_CORE__ || (await import('./srs-core.mjs'));
     buildSrsScheduler(pin, true);
   } catch (err) {
     console.warn('FSRS unavailable', err);
@@ -6883,6 +6886,8 @@ function renderContextDeck(main) {
   contextDeckMod.render(main, {
     bilingual: S.lang !== 'ja',
     storage: localStorage,
+    // one schedule policy on every surface (lead's ruling 10-19)
+    learner: srsLearnerPolicy(),
     onLeave() {
       S.view = 'dojo';
       render();
@@ -19976,8 +19981,11 @@ async function loadAssessmentQuestionSource(plan) {
 }
 function openAssessmentQuestionReview(item) {
   if (!recordWritable() || !S.taken.some(row => row.t === 'question' && row.id === item.id)) return;
+  // a question not due yet is not reviewed early from its list row: the review says when it comes back
+  const rec = S.srs[srsKey(item.t, item.id)];
+  const notDue = rec && srsCore && !srsCore.servable(rec, new Date()) ? rec.due : null;
   S.review = { queue: [item], ix: 0, revealed: false, declared: null, done: { again: 0, hard: 0, good: 0, easy: 0 },
-    history: [], deferred: 0, showEarly: true };
+    history: [], deferred: 0, notDue };
   S.view = 'review'; render();
 }
 function renderAssessmentQuestionRecall(face, rv, item) {
@@ -19994,6 +20002,13 @@ function renderAssessmentQuestionRecall(face, rv, item) {
       .finally(() => { if (current()) { rv.questionSourceChecking = false; render(); } });
   }
   rv.questionSourceAvailable = !!plan && !rv.questionSourceChecking && !!currentAssessmentQuestionSource(S, plan);
+  if (rv.notDue) {
+    face.append(el('p', 'eyebrow', tx('模試の問題を復習', 'Review a test question')));
+    const status = el('p', 'teacher-note', tx(`この問題の次の復習は ${srsWhen(item)}。その時に出ます。`, `This question is next due ${srsWhen(item)}; it comes back then.`));
+    status.id = 'assessment-question-status'; status.setAttribute('role', 'status'); face.append(status);
+    const close = el('button', 'chip', tx('閉じる', 'Close')); close.type = 'button'; close.id = 'assessment-question-skip';
+    close.addEventListener('click', skip); face.append(close); return;
+  }
   if (!rv.questionSourceAvailable) {
     face.append(el('p', 'eyebrow', tx('模試の問題を復習', 'Review a test question')));
     const status = el('p', 'teacher-note', rv.questionSourceChecking ? tx('問題を読み込み中…', 'Loading your question…') : assessmentQuestionError());
@@ -28924,6 +28939,15 @@ function syncSrsScheduler() {
   buildSrsScheduler(D.pin);
   return true;
 }
+/** The learner's schedule policy as srs-core takes it ({ w, retention, learningSteps }): exactly what buildSrsScheduler
+ * gives the corridor's own scheduler, handed to every deck the corridor opens, so one preset, one retention and one
+ * set of fitted weights schedule every surface (lead's ruling 10-19). Null before the pin is loaded. */
+function srsLearnerPolicy() {
+  if (!D.pin) return null;
+  const fitted = S.srsPrefs?.fsrs;
+  const policy = srsSchedulePolicy(D.pin);
+  return { w: fitted !== undefined && !srsParamsProblem(fitted) ? fitted.w.slice() : null, retention: policy.retention, learningSteps: policy.learningSteps };
+}
 function srsStoredRecord(card) {
   return {
     ...card,
@@ -29013,8 +29037,8 @@ function advanceReviewSession(rv, item, next, entry) {
   rv.declared = null;
   // …and binds its own shown answer (D23, presentReviewAnswer)
   rv.presented = null;
-  // …and neither does いま見る: the next ripening card gets its own wait
-  rv.showEarly = false;
+  // …and the next card is chosen again by srs-core's rule (renderReview), early only by the learner's choice
+  rv.early = false;
   // the fold closes with the card it opened on
   rv.moreOpen = false;
   rv.sentenceAttemptId = null;
@@ -29104,6 +29128,9 @@ async function commitStandardGrade({ rv, item, key, skey, rating, now, day }) {
     if (!taken || (prevRec === undefined && !finiteNumber(taken.started)) || latest.suspended[skey]) {
       throw new Error('Review card is no longer enrolled');
     }
+    // srs-core's gate: a card that is not due now (a learning step within the learn-ahead limit at most) is never
+    // graded as a real review, whatever led here — a duplicate row, a second window, a practice lap, a list row
+    if (prevRec !== undefined && !srsCore.servable(prevRec, now, { learnAhead: true })) throw new Error('Review card is not due');
     const card = prevRec
       ? { ...prevRec, due: new Date(prevRec.due), ...(prevRec.last_review ? { last_review: new Date(prevRec.last_review) } : {}) }
       : fsrsApi.createEmptyCard(now);
@@ -29112,7 +29139,7 @@ async function commitStandardGrade({ rv, item, key, skey, rating, now, day }) {
     const revlog = [...(latest.revlog || []), srsReviewLogRow(skey, card, committedNext, rating, now, schedNow)];
     const srs = { ...latest.srs, [skey]: srsStoredRecord(committedNext) };
     const dayStats = { ...(latest.stats?.[day] || { n: 0, again: 0 }) };
-    entry = { key, prev: prevRec, day, logIx: revlog.length - 1, after: srs[skey] };
+    entry = { key, prev: prevRec, day, logIx: revlog.length - 1, after: srs[skey], early: rv.early === true };
     if (prevRec === undefined) {
       dayStats.nnew = (dayStats.nnew || 0) + 1;
       entry.introduced = true;
@@ -29154,13 +29181,30 @@ function isLeech(item) {
   const rec = S.srs[key];
   return !!rec && (rec.lapses || 0) >= LEECH_LAPSES && !S.suspended[key];
 }
+/** Burying across surfaces (lead's ruling 10-19, srs-core): a saved word: card whose word (lemma and reading) was
+ * answered in a deck or the context deck today rests until tomorrow; kanji:, sentence and question cards are other
+ * skills and never rest, and a card in its learning steps keeps them. answered: srsCore.answeredToday(...). */
+function srsWordRests(item, answered) {
+  if (item.t !== 'word' || !srsCore) return false;
+  return srsCore.buriedHere(answered, item.id, D.dict?.[item.id]?.r ?? null, 'corridor');
+}
+/** after a real grade of a saved word (never practice): the word was answered here today */
+function srsNoteAnswered(item, now) {
+  if (item.t !== 'word' || !srsCore) return false;
+  return srsCore.noteAnswered(globalThis.localStorage, srsCore.wordIdentity(item.id, D.dict?.[item.id]?.r), 'corridor', now);
+}
 function srsDueItems(now = new Date()) {
   const reviews = [];
   const fresh = [];
+  const answered = srsCore ? srsCore.answeredToday(globalThis.localStorage, now) : {};
+  // one row per card: a duplicated type:id row (an old import) is one card with one schedule, asked once
+  const keys = new Set();
   for (const item of S.taken) {
     const key = srsKey(item.t, item.id);
-    if (S.suspended[key]) continue;
+    if (S.suspended[key] || keys.has(key)) continue;
+    keys.add(key);
     const rec = S.srs[key];
+    if ((!rec || rec.state === 2) && srsWordRests(item, answered)) continue;
     if (!rec) {
       // no-debt migration (PR70-P1-1): a cardless row joins the queue only
       // when the learner explicitly started it. Legacy and imported rows
@@ -29218,10 +29262,18 @@ function todayQueue(now = new Date(), scope = null) {
   const fresh = [];
   const ahead = [];
   const nowMs = now.getTime();
+  const keys = new Set();
+  const answered = srsCore ? srsCore.answeredToday(globalThis.localStorage, now) : {};
+  let buried = 0;
   for (const item of S.taken) {
     const key = srsKey(item.t, item.id);
-    if (S.suspended[key] || (inScope && !inScope.has(key))) continue;
+    if (S.suspended[key] || (inScope && !inScope.has(key)) || keys.has(key)) continue;
+    keys.add(key);
     const rec = S.srs[key];
+    if ((!rec || rec.state === 2) && (!rec ? finiteNumber(item.started) : Date.parse(rec.due) <= nowMs) && srsWordRests(item, answered)) {
+      buried += 1;
+      continue;
+    }
     if (!rec) {
       if (finiteNumber(item.started)) fresh.push(item);
       continue;
@@ -29263,7 +29315,7 @@ function todayQueue(now = new Date(), scope = null) {
     learn.push(...ahead);
     order.push(...ahead);
   }
-  return { learn, review, new: fresher, order, held, reviewRoom };
+  return { learn, review, new: fresher, order, held, reviewRoom, buried };
 }
 /** Midnight at the start of a date, in the learner's own calendar. */
 function startOfDay(d) {
@@ -29540,12 +29592,16 @@ function renderReview(main) {
   if (rv && S.focus && !S.focus.ended && rv.ix >= rv.queue.length && Date.now() < S.focus.deadline) {
     refillFocusQueue(rv);
   }
-  if (!rv || !scheduler || !fsrsApi) {
+  if (!rv || !scheduler || !fsrsApi || !srsCore) {
     main.append(withEn(el('p', 'eyebrow', S.focus ? '集中' : '復習'), S.focus ? 'focus' : 'review', 'en-inline'));
     main.append(el('div', 'sem-empty', tx('復習を始められない。', 'No session to run.')));
     return;
   }
-  if (rv.ix >= rv.queue.length) {
+  // the next card by srs-core's rule (the dojo drills and skips it): a learning step only when it is due; with nothing
+  // else left the close offers the steps still to come, early by the learner's choice, or they wait
+  const step = !S.focus && !rv.pending && !rv.revealed && rv.ix < rv.queue.length ? reviewNextStep(rv) : null;
+  const paused = step?.pause ? step : null;
+  if (rv.ix >= rv.queue.length || paused) {
     main.append(withEn(el('p', 'eyebrow', S.focus ? '集中' : '復習'), S.focus ? 'focus' : 'review', 'en-inline'));
     // count grades pressed, not queue rows — re-inserted learning passes
     // would otherwise inflate the goodbye number
@@ -29576,6 +29632,38 @@ function renderReview(main) {
         main.append(rise);
       }
     }
+    // what the sitting did, every number counted from its own answers (srs-core closeLines)
+    const graded = (rv.history || []).filter((h) => h.key in rv.done && !h.drill);
+    if (!S.focus && graded.length) {
+      const lines = srsCore.closeLines(srsCore.sittingTally(graded.map((h) => ({ word: srsKey(h.item.t, h.item.id), before: h.prev?.state ?? null,
+        rating: { again: 1, hard: 2, good: 3, easy: 4 }[h.key], early: h.early === true })), { startedAt: rv.t0 || null, now: new Date() }), (bi() ? 'en' : 'ja'));
+      for (const line of lines) main.append(el('p', 'review-said', line));
+    }
+    if (paused) {
+      // cards still in a learning step: they come back when due; the learner may review them now, early, within the limit
+      const words = new Set(rv.queue.slice(rv.ix).map((i) => srsKey(i.t, i.id))).size;
+      const said = srsCore.pauseWords({ ...paused, count: words }, (bi() ? 'en' : 'ja'));
+      const line = el('p', 'srs-forecast review-pause', said.line);
+      line.id = 'review-pause';
+      main.append(line);
+      if (said.now) {
+        const ahead = el('button', 'take', said.now);
+        ahead.type = 'button';
+        ahead.id = 'review-ahead';
+        ahead.addEventListener('click', () => {
+          if (S.review !== rv) return;
+          rv.ahead = true;
+          render();
+        });
+        main.append(ahead);
+      }
+      clearTimeout(reviewPauseTimer);
+      const turn = paused.canEarly ? paused.at : paused.at - srsCore.LEARN_AHEAD_MS;
+      if (turn > Date.now()) reviewPauseTimer = setTimeout(() => { if (S.review === rv && S.view === 'review') render(); }, Math.min(2 ** 31 - 1, turn - Date.now() + 50));
+    }
+    // saved words answered in a deck today rest until tomorrow (burying across surfaces), said quietly
+    const buried = S.focus || rv.scope === undefined ? 0 : todayQueue(new Date(), rv.scope).buried;
+    if (buried) main.append(el('p', 'srs-forecast review-buried', srsCore.buriedWords(buried, bi() ? 'en' : 'ja')));
     // the close's tally (concept C): kept, again and the sitting's time, each named in the
     // learner's language, never a bare 再/良 seal (EN purity). A zero-grade close has no cells.
     const sum = el('dl', 'review-summary');
@@ -29705,40 +29793,6 @@ function renderReview(main) {
     renderReviewBreak(main, rv, graded);
     return;
   }
-  // A re-inserted learning card may not have ripened yet. The nearest-ripening
-  // card comes forward (a ready card is always nearest). A short beat — the
-  // 1-minute step — is honoured with a quiet countdown: that pause IS the
-  // step. A longer gap is pulled early instead of parking the learner
-  // (Anki's learn-ahead), and the engine's same-day math prices early passes
-  // correctly. The dojo skips all of this — drilling early is its point.
-  if (!S.focus && !rv.pending && !rv.revealed) {
-    const nowMs = Date.now();
-    const dueAt = (q) => {
-      const rec = S.srs[srsKey(q.t, q.id)];
-      return rec ? new Date(rec.due).getTime() : 0; // never-seen cards are always ready
-    };
-    if (dueAt(rv.queue[rv.ix]) > nowMs) {
-      let best = rv.ix;
-      for (let k = rv.ix + 1; k < rv.queue.length; k++) {
-        if (dueAt(rv.queue[k]) < dueAt(rv.queue[best])) best = k;
-      }
-      if (best !== rv.ix) {
-        const held = rv.queue[rv.ix];
-        rv.queue[rv.ix] = rv.queue[best];
-        rv.queue[best] = held;
-      }
-      const left = dueAt(rv.queue[rv.ix]) - nowMs;
-      if (left > 0 && left <= REVIEW_WAIT_HOLD_MS && !rv.showEarly) {
-        renderReviewWait(main, rv, dueAt(rv.queue[rv.ix]));
-        return;
-      }
-      // いま見る holds for the WHOLE card, not for one render. Clearing it as
-      // the front face painted meant the next render — the one the learner's
-      // own 答えを見る triggers — fell back into the countdown and hid
-      // the answer they had just asked for. advanceReviewSession retires the
-      // flag when the card is done.
-    }
-  }
   const item = rv.queue[rv.ix];
   // D23: a face-down card has shown no answer yet; its next reveal binds its own
   if (!rv.revealed) rv.presented = null;
@@ -29776,6 +29830,11 @@ function renderReview(main) {
   // Anki's three numbers (operator, 2026-09-28: a hairline told him nothing) and an undo
   // that no longer hides behind …
   if (!S.focus) main.append(reviewCounts(rv));
+  // a card in its learning steps says so quietly, and one shown early says that it is early and why (lead's ruling 10-19)
+  const stepRec = S.srs[srsKey(item.t, item.id)];
+  if (!S.focus && (rv.early || (stepRec && srsCore.isLearning(stepRec)))) {
+    main.append(el('p', 'review-step', rv.early ? tx('学習中 · 少し早め（ほかに札がないため）', 'Learning · a few minutes early (nothing else left)') : tx('学習中', 'Learning')));
+  }
   const undoSlot = el('div', 'anki-undo-slot');
   renderReviewUndo(undoSlot, rv);
   if (undoSlot.childNodes.length) main.append(undoSlot);
@@ -30060,11 +30119,15 @@ function renderReview(main) {
   // orphan this predicate exists to prevent, one step further out. Practice
   // it, record the evidence, leave the enrolment to the learner.
   const takenRow = S.taken.find((t) => t.t === item.t && t.id === item.id);
+  // …and a card that is not due now (a future review in Kanji-only, a learning step brought back seconds later) is
+  // practice too: the dojo drills, but it never records an early review (srs-core's gate, lead's ruling 10-19)
+  const drillRec = S.srs[srsKey(item.t, item.id)];
   const drillOnly =
     S.focus &&
     (item.drillPass === true ||
-      (S.srs[srsKey(item.t, item.id)] === undefined &&
-        (!takenRow || !finiteNumber(takenRow.started))));
+      (drillRec === undefined &&
+        (!takenRow || !finiteNumber(takenRow.started))) ||
+      (drillRec !== undefined && !srsCore.servable(drillRec, new Date())));
   const row = el('div', 'grade-row');
   if (drillOnly) row.setAttribute('data-practice', '');
   // S4 hanko: each grade is stamped as a seal — 再難良易 — with its EN key and
@@ -30130,7 +30193,7 @@ function renderReview(main) {
           });
         return;
       }
-      await commitStandardGrade({
+      const graded = await commitStandardGrade({
           rv,
           item,
           key: effKey,
@@ -30139,6 +30202,8 @@ function renderReview(main) {
           now: pressedNow,
           day,
         });
+      // a saved word answered here today: its cards in the decks rest until tomorrow (burying across surfaces)
+      if (graded) srsNoteAnswered(item, pressedNow);
     });
     row.append(b);
   }
@@ -30541,65 +30606,45 @@ function renderReviewBreak(main, rv, graded) {
   doors.append(go, out);
   main.append(doors);
 }
-/* The quiet beat between learning steps: every remaining card is a short
- * step that hasn't ripened. The glass keeps its zen — a soft count, one way
- * out — and turns the next card over by itself the moment the step matures.
- * Beats longer than this are pulled early instead of held. */
-// Anki shows a ripening learning card at once (its learn-ahead) — the countdown beat made the
-// operator wait a minute mid-session (2026-09-28), so no step is held any more
-const REVIEW_WAIT_HOLD_MS = 0;
-let reviewWaitTimer = null;
-function renderReviewWait(main, rv, nearestDueMs) {
-  const progress = el('div', 'zen-progress');
-  const fill = el('i');
-  fill.style.width = `${Math.min(100, Math.round((rv.ix / rv.queue.length) * 100))}%`;
-  progress.append(fill);
-  main.append(progress);
-  const exit = el('button', 'zen-exit', '×');
-  exit.type = 'button';
-  exit.id = 'zen-exit';
-  exit.setAttribute('aria-label', tx('復習を閉じる', 'leave the session'));
-  exit.addEventListener('click', () => {
-    clearTimeout(reviewWaitTimer);
-    S.review = null;
-    S.view = 'tray';
-    render();
+/** the close's timer: its choice changes when the next learning step falls due or comes within the learn-ahead limit */
+let reviewPauseTimer = null;
+/**
+ * The review's next card by srs-core's rule (Anki's order). Of the cards still in the sitting (rv.queue from rv.ix):
+ * a learning step that is due now; else the next waiting card that may be answered now; else, by the learner's choice
+ * at the close (rv.ahead), a step due within the learn-ahead limit, marked early. The chosen card moves to rv.ix (the
+ * answered part of the queue never moves, so undo's indexes hold); a waiting card that is no longer due (a duplicate
+ * row, a grade from another window) leaves the sitting. Returns srs-core's step: { show } | { pause } | { done }.
+ */
+function reviewNextStep(rv, now = new Date()) {
+  const rest = rv.queue.slice(rv.ix);
+  const keys = new Set();
+  const waiting = [];
+  const learning = [];
+  rest.forEach((item, k) => {
+    const key = srsKey(item.t, item.id);
+    if (keys.has(key)) return;
+    const rec = S.srs[key];
+    if (rec && srsCore.isLearning(rec)) {
+      keys.add(key);
+      learning.push({ id: k, due: Date.parse(rec.due) });
+    } else if (srsCore.servable(rec, now)) {
+      keys.add(key);
+      waiting.push(k);
+    }
   });
-  main.append(exit);
-  const face = el('div', 'review-face zen-wait');
-  const left = Math.max(0, nearestDueMs - Date.now());
-  const mm = Math.floor(left / 60000);
-  const ss = Math.floor((left % 60000) / 1000);
-  face.append(el('div', 'zen-wait-clock', `${mm}:${String(ss).padStart(2, '0')}`));
-  face.append(
-    el('p', 'zen-wait-note', tx('つぎの札が熟すまで、ひと息。', 'The next card is ripening — one breath.')),
-  );
-  const early = biLabel('button', 'chip zen-wait-skip', 'いま見る', 'show it now');
-  early.type = 'button';
-  early.id = 'zen-wait-skip';
-  early.addEventListener('click', () => {
-    clearTimeout(reviewWaitTimer);
-    rv.showEarly = true;
-    render();
-  });
-  const actions = el('div', 'teacher-actions');
-  actions.append(early);
-  renderReviewUndo(actions, rv);
-  face.append(actions);
-  face.setAttribute('data-review-wait', '');
-  main.append(face);
-  clearTimeout(reviewWaitTimer);
-  reviewWaitTimer = setTimeout(
-    () => {
-      if (S.view === 'review' && S.review === rv) render();
-    },
-    Math.min(1000, Math.max(120, left)),
-  );
+  let step = srsCore.nextStep({ now, queue: waiting, learning, ahead: !!rv.ahead });
+  // once the close has paused on the steps, it stays until the learner chooses ("they will wait for you"): a step
+  // that falls due meanwhile reads "due now" there instead of turning the close into a card by itself
+  if (step.pause) rv.closed = true;
+  else if (rv.closed && !rv.ahead && !waiting.length && step.show !== undefined) {
+    step = { pause: true, count: learning.length, at: now.getTime(), canEarly: true };
+  }
+  const kept = [...waiting, ...learning.map((l) => l.id)].sort((a, b) => a - b);
+  const order = step.show !== undefined ? [step.show, ...kept.filter((k) => k !== step.show)] : kept;
+  rv.queue = [...rv.queue.slice(0, rv.ix), ...order.map((k) => rest[k])];
+  rv.early = step.show !== undefined && step.early;
+  return step;
 }
-
-/* Anki's most-used safety: the last grade can always be taken back — the
- * previous card state is restored exactly, never recomputed. Reachable from
- * every state of the session, the summary included. */
 function renderReviewUndo(main, rv) {
   if (!rv.history.length) return;
   const undo = biLabel('button', 'chip review-undo', 'ひとつ戻す', 'undo last grade');
@@ -31840,6 +31885,8 @@ function renderDeckPlay(main) {
       english: bi(),
       presentation: deckPresentation,
       storage: localStorage, host: deckHost(),
+      // one schedule policy on every surface: the learner's preset, retention and fitted weights (lead's ruling 10-19)
+      learner: srsLearnerPolicy(),
       // Q · the app's one rule for Japanese line breaks (jaWords): the card's sentence breaks only between its words,
       // the same on its front and its back
       words: (text, segments = null) => (segments ? jaGroupSegments(segments) : jaWordGroups(text)),

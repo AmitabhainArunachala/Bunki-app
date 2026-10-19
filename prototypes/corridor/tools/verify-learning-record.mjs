@@ -14,6 +14,7 @@ import { chromium, webkit } from 'playwright-core';
 import { verifyBundledArtifact } from '../../bunki-desktop/lib/artifact.cjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import * as fsrsApi from '../vendor/ts-fsrs.mjs';
+import * as srsCore from '../srs-core.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const browserMode = process.argv.includes('--browser');
@@ -73,6 +74,8 @@ const names = new Set([
   'focusKanjiReadingReview', 'kanjiAnswerAvailable', 'retainedKanjiRecord', 'validKanjiRecord', 'nonEmptyString', 'safeJsonValue',
   'advanceReviewSession', 'resetAssessmentQuestionReview', 'commitReviewAction', 'commitDrillGrade', 'commitStandardGrade',
   'renderReview', 'renderReviewUndo', 'renderProbe', 'renderLessons', 'renderSrsPrefs',
+  // the review's next card by the app's one schedule owner (srs-core.mjs, given to the sandbox below)
+  'reviewNextStep', 'reviewPauseTimer', 'srsNoteAnswered',
   'reviewCounts', 'srsCardKind', 'SRS_KINDS',
   'aiQuizPending', 'aiQuizStarting', 'aiQuizParse', 'aiQuizCommit', 'aiQuizStart', 'renderAiQuiz',
   'learningEnrollmentPending', 'commitLearningEnrollment', 'captureStorePatch', 'commitCapture',
@@ -140,7 +143,7 @@ function fixture(overrides = {}, options = {}) {
   let paints = 0;
   let scrolls = 0;
   const sandbox = {
-    S, Date: options.Date || Date, Math, JSON, Set, Map, console, fsrsApi, scheduler: fsrsApi.fsrs({ enable_fuzz: false }), recordEpoch: 1,
+    S, Date: options.Date || Date, Math, JSON, Set, Map, console, fsrsApi, srsCore, scheduler: fsrsApi.fsrs({ enable_fuzz: false }), recordEpoch: 1,
     assessmentQuestionReviewOwner: null,
     recordReady: (epoch = 1) => epoch === sandbox.recordEpoch,
     recordWritable: (epoch = 1) => epoch === sandbox.recordEpoch,
@@ -474,7 +477,9 @@ async function propertyChecks() {
   const items = [clone(item), { t: 'kanji', id: '学', label: '学', ts: 100, started: 100 }];
   const keyOf = (value) => value.t + ':' + value.id;
   const fixedStart = Date.parse('2026-09-10T10:00:00Z');
-  const mature = () => ({ due: '2026-09-13T10:00:00.000Z', last_review: '2026-09-01T10:00:00.000Z',
+  // a mature review card that is DUE at the fixed start (due the day before, after a 12-day interval): since 10-19 the
+  // producer refuses an early review (srs-core's gate), and the model below says so independently
+  const mature = () => ({ due: '2026-09-09T10:00:00.000Z', last_review: '2026-08-28T10:00:00.000Z',
     state: 2, stability: 12, difficulty: 5, elapsed_days: 2, scheduled_days: 12, learning_steps: 0, reps: 4, lapses: 1 });
   const scope = 'Generated word and dictionary-backed kanji grade/dojo/undo handler contracts with frozen synthetic roots, default unfitted FSRS weights, fixed clock and controlled save acknowledgments. Resume serializes these modeled roots into a fresh fixture. No browser/native durability, native lost-ack recovery, fitted-weight initialization, retained dictionary provenance, sentence/question source contract, or undo initiated after reload claim.';
   const counters = {};
@@ -527,7 +532,7 @@ async function propertyChecks() {
   };
   const scenarioNames = ['grade', 'reject-retry', 'undo-reject-retry', 'undo-conflict', 'replace-before-stage',
     'replace-after-stage', 'epoch-loss', 'stale-enrollment', 'disclosure-guard', 'concurrent-merge',
-    'dojo-existing', 'kanji-unavailable', 'committed-lost-ack', 'ownership-after-publication', 'two-grade-two-undo'];
+    'dojo-existing', 'kanji-unavailable', 'committed-lost-ack', 'ownership-after-publication', 'two-grade-two-undo', 'backward-step'];
   const commandsFor = (historyIndex, historySeed) => {
     const random = rngFor(historySeed);
     const commands = [];
@@ -535,8 +540,13 @@ async function propertyChecks() {
     for (let episode = 0; episode < episodes; episode += 1) {
       const kind = episode === 0 ? historyIndex % scenarioNames.length : episode === 1 ? 0 : random(scenarioNames.length);
       const rating = 1 + random(4);
+      // srs-core refuses a grade before its due: the episode every history grades in (the second) and the cases built on a
+      // saved grade (an undo, a lost acknowledgment, ownership after publication, two grades, the backward step) walk the
+      // clock on, forward only, to their card's due; the others keep the refusals earlier backward moves bring
+      const toDue = episode === 1 || ['undo-reject-retry', 'undo-conflict', 'committed-lost-ack', 'ownership-after-publication',
+        'two-grade-two-undo', 'backward-step'].includes(scenarioNames[kind]);
       const start = { op: 'start', type: kind === 11 ? 1 : random(2), dojo: kind === 10,
-        declared: random(4) === 0 ? 0 : 1, shift: [-172800000, 0, 60000, 86400000][random(4)] };
+        declared: random(4) === 0 ? 0 : 1, shift: [-172800000, 0, 60000, 86400000][random(4)], toDue };
       const gradeCommand = { op: 'grade', rating };
       const ok = { op: 'ack', save: true };
       const stage = { op: 'stage' };
@@ -562,8 +572,11 @@ async function propertyChecks() {
         case 'committed-lost-ack': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, lostAck: true }]; break;
         case 'ownership-after-publication': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, loseOwnershipAfterPublish: true }]; break;
         case 'two-grade-two-undo': part = [start, { op: 'grade', rating: 1 }, stage, ok,
-          { op: 'clock', shift: 86400000 }, { op: 'disclosure', revealed: true, declared: 1 }, gradeCommand, stage, ok,
+          { op: 'clock', shift: 86400000, toDue: true }, { op: 'disclosure', revealed: true, declared: 1 }, gradeCommand, stage, ok,
           { op: 'undo' }, stage, ok, { op: 'undo' }, stage, ok]; break;
+        // the device clock set back a few minutes: Again puts the card in a short step, which the due gate serves within the
+        // 20-minute learn-ahead limit, and the grade is anchored at the last review (the clamp), never before it
+        case 'backward-step': part = [start, { op: 'grade', rating: 1 }, stage, ok, { ...start, shift: -300000, toDue: false }, gradeCommand, stage, ok]; break;
         default: part = [start, gradeCommand, { op: 'duplicate' }, stage, ok];
       }
       part.push({ op: 'resume' });
@@ -574,6 +587,15 @@ async function propertyChecks() {
     }
     assert(commands.length >= 12 && commands.length <= 64);
     return commands;
+  };
+  // the due rule, modeled on its own (not by calling srs-core): a card never answered may be graded; a learning or
+  // relearning step when due within the 20-minute learn-ahead limit; a review card when it falls due by the end of today
+  const gradeableNow = (rec, nowMs) => {
+    if (!rec || rec.state === 0) return true;
+    const due = Date.parse(rec.due);
+    if (rec.state === 1 || rec.state === 3) return due <= nowMs + 20 * 60000;
+    const end = new Date(nowMs); end.setHours(23, 59, 59, 999);
+    return due <= end.getTime();
   };
   const runHistory = async (historyIndex, historySeed, commands) => {
     let now = fixedStart;
@@ -594,6 +616,12 @@ async function propertyChecks() {
       f.c.presentReviewAnswer(rv);
       return rv;
     };
+    // srs-core refuses a grade before its due (the model says so at stage): a case that needs its grade saved walks the clock
+    // on, forward only, to its card's due
+    const walkToDue = (item) => {
+      const rec = f.durable().srs[keyOf(item)];
+      if (!gradeableNow(rec, now)) { now = Date.parse(rec.due); count('clockMovesToDue'); }
+    };
     const attemptGrade = (rating) => {
       const rv = f.S.review, current = rv.queue[rv.ix];
       const key = ['again', 'hard', 'good', 'easy'][rating - 1];
@@ -610,7 +638,8 @@ async function propertyChecks() {
         let valid = ownsSession;
         if (pending.kind === 'grade') valid = valid && (pending.item.t !== 'kanji' || !!f.c.D.kanji[pending.item.id]?.m?.trim()) &&
           (pending.item.t !== 'word' || !!f.c.D.dict[pending.item.id]?.m?.length) &&
-          (pending.dojo || (!!entry && (before.srs[pending.key] !== undefined || Number.isFinite(entry.started)) && !before.suspended[pending.key]));
+          (pending.dojo || (!!entry && (before.srs[pending.key] !== undefined || Number.isFinite(entry.started)) && !before.suspended[pending.key] &&
+            gradeableNow(before.srs[pending.key], now)));
         if (pending.kind === 'undo' && !pending.entry.dojo) valid = valid &&
           JSON.stringify(ordered(before.srs[pending.entry.key] ?? null)) === JSON.stringify(ordered(pending.entry.after ?? null));
         pending.valid = !!valid; pending.staged = true;
@@ -679,9 +708,12 @@ async function propertyChecks() {
           case 'start': {
             assert.equal(pending, null); rejectedGrade = false; target = items[command.type]; now += command.shift;
             if (command.shift < 0) count('backwardClockMoves'); else if (command.shift === 0) count('equalClockMoves');
+            if (command.toDue) walkToDue(target);
             const rv = newSession(command.dojo); rv.declared = command.declared; break;
           }
-          case 'clock': assert.equal(pending, null); now += command.shift; count('explicitClockMoves'); break;
+          case 'clock': assert.equal(pending, null); now += command.shift; count('explicitClockMoves');
+            if (command.toDue) walkToDue(f.S.review.queue[f.S.review.ix]);
+            break;
           case 'disclosure': assert.equal(pending, null); Object.assign(f.S.review, { revealed: command.revealed, declared: command.declared });
             // the rendered face: a revealed card presents (binds) its answer, a face-down one has none
             if (command.revealed) f.c.presentReviewAnswer(f.S.review); else f.S.review.presented = null;
@@ -909,11 +941,15 @@ async function referenceChecks() {
     const vectors = [
       ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V1-new-${rating}`, history: [], now: '2026-09-25T00:00:00Z', rating, state: S.New })),
       ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V2-learning-${rating}`, history: [[R.Good, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating, state: S.Learning })),
-      ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V3-review-${rating}`, history: V3, now: '2026-09-25T00:00:00Z', rating, state: S.Review })),
+      // V3/V7b grade the review card on its due date (2026-10-31 on the pin, V5 pins it). Before 10-19 they graded
+      // it on 09-25, 36 days early; the app now refuses that (srs-core's gate), and V3-early below proves the refusal.
+      ...[R.Again, R.Hard, R.Good, R.Easy].map((rating) => ({ id: `V3-review-${rating}`, history: V3, now: '2026-10-31T00:00:00Z', rating, state: S.Review })),
       ...[R.Again, R.Good].map((rating) => ({ id: `V4-relearning-${rating}`, history: [...V3, [R.Again, '2026-09-25T00:00:00Z']], now: '2026-09-25T00:10:00Z', rating, state: S.Relearning })),
       { id: 'V5-overdue-good', history: V3, now: '2026-11-30T00:00:00Z', rating: R.Good, state: S.Review },
       { id: 'V7a-fitted-new-good', history: [], now: '2026-09-25T00:00:00Z', rating: R.Good, state: S.New, fitted: true },
-      { id: 'V7b-fitted-mature-good', history: V3, now: '2026-09-25T00:00:00Z', rating: R.Good, state: S.Review, fitted: true },
+      // the fitted weights date V3's card 2026-11-17 (the history replayed on them), so V7b grades it then
+      { id: 'V7b-fitted-mature-good', history: V3, now: '2026-11-17T00:00:00Z', rating: R.Good, state: S.Review, fitted: true },
+      { id: 'V3-early-good', history: V3, now: '2026-09-25T00:00:00Z', rating: R.Good, state: S.Review, refused: true },
     ];
     const stored = (card) => ({ ...card, due: card.due.toISOString(), ...(card.last_review ? { last_review: card.last_review.toISOString() } : {}) });
     for (const vector of vectors) {
@@ -947,6 +983,13 @@ async function referenceChecks() {
       const key = { [R.Again]: 'again', [R.Hard]: 'hard', [R.Good]: 'good', [R.Easy]: 'easy' }[vector.rating];
       const pending = grade(f, { rating: vector.rating, key, now: at(vector.now), day: vector.now.slice(0, 10) });
       f.ack(true);
+      if (vector.refused) {
+        // a review card 36 days before its due: the app writes no grade and the card keeps its schedule
+        assert.equal(await pending, false, `${vector.id}: the app refused an early review`);
+        assert.deepEqual(f.durable().srs['word:学校'], row.before, `${vector.id}: the card keeps its schedule`);
+        row.refused = true; row.pass = true;
+        continue;
+      }
       assert.equal(await pending, true, `${vector.id}: the app committed its grade`);
       const actual = f.durable().srs['word:学校'];
       row.expected = stored(expected); row.actual = actual;
