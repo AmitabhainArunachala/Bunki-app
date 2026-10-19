@@ -305,6 +305,9 @@ const MUTANTS = {
   'lookup-stale-save': () => mutant('decks/player/mount.js', `  writeLedger((fresh) => logLookup(fresh, { cardId, where, surface: frame.surface, key: frame.key, depth }, new Date()));\n`,
     `  { const next = logLookup(ctx.state, { cardId, where, surface: frame.surface, key: frame.key, depth }, new Date()); if (save(next)) ctx.state = next; }\n`),
   'bury-off': () => mutant('srs-core.mjs', `export function buriedHere(answered, term, reading, where) {\n`, `export function buriedHere(answered, term, reading, where) {\n  return false;\n`),
+  // a required mark taken away: the presence-checked reads must still report it missing
+  'no-step-note': () => mutant('decks/player/mount.js', `if ((!st || st.state !== 2) && pv.good < DAY) bar.append(el('p', 'kp-stepnote',`, `if (false) bar.append(el('p', 'kp-stepnote',`),
+  'no-pause-line': () => mutant('decks/player/mount.js', `    line.id = 'kp-pause';\n    box.append(line);\n`, `    line.id = 'kp-pause';\n`),
 };
 function control(name, checkName, caught, detail = '') {
   receipt.controls.push({ name, check: checkName, caught: !!caught, detail });
@@ -332,13 +335,17 @@ async function newPage(browser, { seedLocal = null } = {}) {
 const ledgerOf = (page, deck = 'n2') => page.evaluate((key) => JSON.parse(localStorage.getItem(key) || 'null'), `bunki-cloze:${deck}`);
 const nowIn = (page) => page.evaluate(() => Date.now());
 const isEarly = (chips) => chips.some((c) => /early|少し早め/iu.test(c));
+// an optional element, read after the barrier that settles its screen: absent answers at once, where a locator
+// read would first wait out its 30 s timeout
+const shownText = async (locator) => ((await locator.count()) ? locator.textContent().catch(() => null) : null);
 async function openDeck(page, deck = 'n2') {
   await page.goto(`${BASE}/index.html?entry=shelf&ui=bi&deck=${deck}`, { waitUntil: 'load' });
   await page.waitForSelector('#kp-start', { timeout: 30000 });
 }
 async function onCard(page) {
   await page.waitForSelector('#kp-card, .kp-done', { timeout: 20000 });
-  return page.locator('#kp-card').getAttribute('data-card').catch(() => null);
+  const card = page.locator('#kp-card');
+  return (await card.count()) ? card.getAttribute('data-card').catch(() => null) : null;
 }
 /** answer the card on screen with a grade; returns what the pad promised and what was stored */
 async function answer(page, grade = 'good', deck = 'n2') {
@@ -348,7 +355,7 @@ async function answer(page, grade = 'good', deck = 'n2') {
   await page.waitForSelector(`#kp-grade-${grade}`);
   const label = (await page.locator(`#kp-grade-${grade} small`).textContent()).trim();
   const chips = await page.locator('#kp-card .kp-st-step').allTextContents();
-  const stepNote = await page.locator('.kp-stepnote').textContent().catch(() => null);
+  const stepNote = await shownText(page.locator('.kp-stepnote'));
   const shownAt = await nowIn(page);
   await page.locator(`#kp-grade-${grade}`).click();
   await page.waitForFunction(([key, card, n]) => (JSON.parse(localStorage.getItem(key) || '{}').log || []).filter((r) => r[0] === card).length > n, [`bunki-cloze:${deck}`, card, (before?.reps ?? 0)], { timeout: 10000 }).catch(() => {});
@@ -360,6 +367,9 @@ async function answer(page, grade = 'good', deck = 'n2') {
 }
 
 /* ------------------------------------------------------------------ the deck player, John's route */
+// what (c)(j) and (d) ask of the close and of the back, shared with the controls that take those marks away
+const pauseOffered = (out) => out.aheadButton === 1 && new RegExp(`^${out.newCards} words are in a learning step \\(the next is due in ([1-9]|10) min\\): review them now, early, or they will wait for you\\.$`, 'u').test(out.pause.trim());
+const stepNoteSays = (showing) => /Learning: Good brings it back in 10 min\./u.test(showing?.stepNote || '');
 async function playerJohnRoute(browser, engine, { mutate = null } = {}) {
   const { context, page, errors } = await newPage(browser);
   const out = { showings: [], labelsHonest: true, earlyBeforeChoice: 0, repeatsBeforePause: 0 };
@@ -380,7 +390,7 @@ async function playerJohnRoute(browser, engine, { mutate = null } = {}) {
       if (a.label !== a.promised) out.labelsHonest = false;
     }
     out.newCards = seen.size;
-    out.pause = (await page.locator('#kp-pause').textContent().catch(() => '')) || '';
+    out.pause = (await shownText(page.locator('#kp-pause'))) || '';
     out.aheadButton = await page.locator('#kp-ahead').count();
     out.closeBefore = (await page.locator('.kp-done-line').allTextContents()).join(' ');
     // a control is judged on the first pass (its repeats, its labels): the early pass and the day after are not needed
@@ -425,7 +435,7 @@ async function playerJohnRoute(browser, engine, { mutate = null } = {}) {
   const n = out.newCards;
   check(`[${engine}] (a) John's route (Learn → Begin): ${n} new cards answered Good, none shown again before its 10-minute step while other cards remained`, n >= 10 && out.repeatsBeforePause === 0 && out.earlyBeforeChoice === 0, { newCards: n, repeats: out.repeatsBeforePause, early: out.earlyBeforeChoice });
   check(`[${engine}] (c)(j) with nothing else left the close counts the sitting and offers the early choice, within 20 min`,
-    out.aheadButton === 1 && new RegExp(`^${n} words are in a learning step \\(the next is due in ([1-9]|10) min\\): review them now, early, or they will wait for you\\.$`, 'u').test(out.pause.trim()) &&
+    pauseOffered(out) &&
       new RegExp(`^${n} new words · ${n} answers in \\d+ minutes?\\.$`, 'u').test(out.closeBefore.trim()), `${out.closeBefore} | ${out.pause}`);
   const ahead = out.ahead || [];
   check(`[${engine}] (c) chosen early: each card says it is early and in its learning step, and Good graduates it`,
@@ -433,7 +443,7 @@ async function playerJohnRoute(browser, engine, { mutate = null } = {}) {
     ahead.slice(0, 2).map((a) => `${a.chips.join('+')} → ${a.label}`).join(' · '));
   check(`[${engine}] (d) every pressed pad named exactly what it scheduled (${out.showings.length + ahead.length} answers)`, out.labelsHonest,
     [...out.showings, ...ahead].filter((a) => a.label !== a.promised).slice(0, 3).map((a) => `${a.label}≠${a.promised}`).join(' ') || `e.g. ${out.showings[0]?.label} · ${ahead[0]?.label}`);
-  check(`[${engine}] (d) a card whose Good keeps it in its steps says when it comes back`, /Learning: Good brings it back in 10 min\./u.test(out.showings[0]?.stepNote || ''), out.showings[0]?.stepNote || '');
+  check(`[${engine}] (d) a card whose Good keeps it in its steps says when it comes back`, stepNoteSays(out.showings[0]), out.showings[0]?.stepNote || '');
   check(`[${engine}] (j) the final close: ${n} new words, ${2 * n} answers, ${n} learning-step returns, all early by choice`,
     new RegExp(`^${n} new words · ${2 * n} answers in \\d+ minutes?\\. Cards came back ${n} times for a learning step \\(all a few minutes early, with nothing else left\\)\\.$`, 'u').test((out.closeAfter || '').trim()) && out.pauseAfter === 0, out.closeAfter);
   check(`[${engine}] (g) half an hour later no card answered into review is due again (shortest interval ${Number(out.minReviewDays).toFixed(1)} days)`, out.reviewDueAgain === 0 && out.minReviewDays >= 1, { due: out.reviewDueAgain });
@@ -716,7 +726,7 @@ async function corridorReview(browser, engine, { mutate = null } = {}) {
     const grade = async () => {
       await page.waitForSelector('#reveal, .grade.g-good', { timeout: 15000 });
       const key = await page.evaluate(() => window.__KAIRO_SRS__.current());
-      const step = (await page.locator('.review-step').textContent().catch(() => '')) || '';
+      const step = (await shownText(page.locator('.review-step'))) || '';
       if (await page.locator('#reveal').count()) await page.locator('#reveal').click();
       await page.waitForSelector('.grade.g-good:not([disabled])');
       const label = (await page.locator('.grade.g-good .g-when').textContent()).trim();
@@ -735,7 +745,7 @@ async function corridorReview(browser, engine, { mutate = null } = {}) {
       if (out.shown.includes(g.key)) out.earlyBeforeChoice += 1;
       out.shown.push(g.key);
     }
-    out.pause = (await page.locator('#review-pause').textContent().catch(() => '')) || '';
+    out.pause = (await shownText(page.locator('#review-pause'))) || '';
     out.said = (await page.locator('.review-said').allTextContents()).join(' ');
     await page.screenshot({ path: join(OUT, `${engine}-corridor-close-pause.png`), fullPage: true });
     if (await page.locator('#review-ahead').count()) {
@@ -890,6 +900,12 @@ for (const engine of ENGINES) {
       overrides = MUTANTS['lying-label']();
       const lie = (await scenario(`[${engine}] control lying label`, () => playerJohnRoute(browser, engine, { mutate: true }))) || { labelsHonest: true };
       control(`[${engine}] a label that lies (Good says 5 min, schedules 10)`, '(d) every pressed pad', !lie.labelsHonest);
+      overrides = MUTANTS['no-step-note']();
+      const quiet = await scenario(`[${engine}] control no step note`, () => playerJohnRoute(browser, engine, { mutate: true }));
+      control(`[${engine}] the back without its step note`, '(d) a card whose Good keeps it in its steps says when it comes back', !!quiet && quiet.showings.length > 0 && !stepNoteSays(quiet.showings[0]), quiet?.showings[0]?.stepNote ?? 'no note read');
+      overrides = MUTANTS['no-pause-line']();
+      const mute = await scenario(`[${engine}] control no pause line`, () => playerJohnRoute(browser, engine, { mutate: true }));
+      control(`[${engine}] the close without its pause line`, '(c)(j) the close offers the early choice', !!mute && mute.newCards >= 10 && !pauseOffered(mute), `pause "${mute?.pause ?? ''}" · choice ${mute?.aheadButton ?? 0}`);
       }
       // a control is caught only when its named check returns red; a crash under a control is not proof
       for (const [key, name, label, checkName, run] of [

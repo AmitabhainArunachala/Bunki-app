@@ -1800,7 +1800,7 @@ function requireCompleteReport({
     assert(Array.isArray(value.results) && value.results.length >= 30, 'The SRS receipt has too few checks');
     assert.equal(new Set(value.results.map((row) => row.name)).size, value.results.length, 'Duplicate SRS checks');
     assert(value.results.every((row) => row.pass === true), 'The SRS receipt contains a failed check');
-    assert(Array.isArray(value.controls) && value.controls.length >= 8, 'The SRS receipt has too few controls');
+    assert(Array.isArray(value.controls) && value.controls.length >= 10, 'The SRS receipt has too few controls');
     assert(value.controls.every((control) => control.caught === true), 'An SRS negative control was not caught');
     assert.equal(value.pass, true, 'The SRS receipt does not pass');
     assert(artifactSha256 && value.artifactSha256 === artifactSha256, 'The SRS receipt is for another artifact');

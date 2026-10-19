@@ -5749,10 +5749,10 @@
       "name": "srs-conformance",
       "measurementStatus": "unmeasured",
       "currentContract": {
-        "producerBytesParent": "3cfd9245934b6b8ec469e2e8df3ac234b16d9b24",
-        "producerBytesBasis": "SRS FULLPROOF's integration branch (int-srs on 4159d180); producer bytes pinned by SHA-256, not falsely attributed to a parent commit.",
+        "producerBytesParent": "7dd97fc2d96f14063b9f4a1ae4efb5e48593e5dc",
+        "producerBytesBasis": "SRS FULLPROOF's integration branch (int-srs on 4159d180), optional reads presence-checked and ten controls; producer bytes pinned by SHA-256, not falsely attributed to a parent commit.",
         "producer": "prototypes/corridor/tools/verify-srs-conformance.mjs",
-        "producerSha256": "c6cdd4e9f695c25196d17304aff0c477d08e318a2e6f0a65099e6831f7e0b63e",
+        "producerSha256": "b3a9cddde58a492cbffb53f76540eb2ac067a9a083e05d2120e264ce50ddd157",
         "command": [
           "node",
           "prototypes/corridor/tools/verify-srs-conformance.mjs"
@@ -5765,7 +5765,7 @@
         "declaredFileInputs": [
           {
             "path": "prototypes/corridor/tools/verify-srs-conformance.mjs",
-            "sha256": "c6cdd4e9f695c25196d17304aff0c477d08e318a2e6f0a65099e6831f7e0b63e"
+            "sha256": "b3a9cddde58a492cbffb53f76540eb2ac067a9a083e05d2120e264ce50ddd157"
           }
         ]
       },
@@ -5804,10 +5804,10 @@
       "name": "srs-conformance-webkit",
       "measurementStatus": "unmeasured",
       "currentContract": {
-        "producerBytesParent": "3cfd9245934b6b8ec469e2e8df3ac234b16d9b24",
-        "producerBytesBasis": "SRS FULLPROOF's integration branch (int-srs on 4159d180); producer bytes pinned by SHA-256, not falsely attributed to a parent commit.",
+        "producerBytesParent": "7dd97fc2d96f14063b9f4a1ae4efb5e48593e5dc",
+        "producerBytesBasis": "SRS FULLPROOF's integration branch (int-srs on 4159d180), optional reads presence-checked and ten controls; producer bytes pinned by SHA-256, not falsely attributed to a parent commit.",
         "producer": "prototypes/corridor/tools/verify-srs-conformance.mjs",
-        "producerSha256": "c6cdd4e9f695c25196d17304aff0c477d08e318a2e6f0a65099e6831f7e0b63e",
+        "producerSha256": "b3a9cddde58a492cbffb53f76540eb2ac067a9a083e05d2120e264ce50ddd157",
         "command": [
           "node",
           "prototypes/corridor/tools/verify-srs-conformance.mjs"
@@ -5820,7 +5820,7 @@
         "declaredFileInputs": [
           {
             "path": "prototypes/corridor/tools/verify-srs-conformance.mjs",
-            "sha256": "c6cdd4e9f695c25196d17304aff0c477d08e318a2e6f0a65099e6831f7e0b63e"
+            "sha256": "b3a9cddde58a492cbffb53f76540eb2ac067a9a083e05d2120e264ce50ddd157"
           }
         ]
       },
