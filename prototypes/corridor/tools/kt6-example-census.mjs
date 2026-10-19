@@ -75,16 +75,16 @@ const changed = Object.entries(perKey).filter(([, row]) => row.after !== row.bef
 
 // ten spot checks, each named for the class it stands for
 const spots = [
-  ['あい', '藍 (indigo), core key in kana with alt 藍: the finding'],
-  ['まだ', 'a word written in kana (core key まだ, alt 未だ)'],
+  ['あい', 'the finding: 藍 (indigo), filed under the kana あい, held 愛 (love) sentences'],
   ['えっと', 'a kana-only word (no kanji form)'],
   ['歩く', 'an inflected verb (歩け, 歩き: dictionary form 歩く)'],
-  ['こと', 'kana key whose sentences write it 事 (core alt)'],
-  ['学校', 'verify-corridor\'s example-bank canary (≥ 4 examples)'],
-  ['半島', 'verify-corridor\'s sentence-door canary'],
-  ['引きかえす', 'a variant spelling of its entry (sentences write 引き返す)'],
-  ['あれえ', 'a kana key sharing sound with another word (あれ)'],
-  ['いる', 'kana key (core: 要る "to need") whose sentences are いる "to be": spelling cannot part them'],
+  ['こと', 'a kanji word whose bank key is kana (事, the core alt)'],
+  ['くも', '蜘蛛 (spider) filed under くも held 雲 (cloud)'],
+  ['ほうき', '箒 (broom) held 放棄 (abandonment)'],
+  ['は', 'the topic particle held 歯 (tooth) and 葉 (leaf)'],
+  ['ならう', '倣う (imitate) held 習う (learn)'],
+  ['引きかえす', 'a variant spelling of its own entry (sentences write 引き返す): kept'],
+  ['いる', 'kana key (core: 要る "to need") whose kana sentences are いる "to be": spelling cannot part them (left)'],
 ];
 const spotRows = spots.map(([key, why]) => {
   const row = perKey[key];
