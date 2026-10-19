@@ -160,13 +160,46 @@ test('SVG fallback retimes the current stroke without clearing it or moving back
   };
   vm.createContext(context); vm.runInContext(run + '\nthis.start = startStrokeAnimation;', context);
   context.start(page);
-  const tick = time => { now = time; const frame = pending; pending = null; frame(time); };
+  const tick = (time, rafTime = time) => { now = time; const frame = pending; pending = null; frame(rafTime); };
   tick(225); assert.equal(latest.fraction, 0.25);
   context.strokeRetiming.setSpeed(2.2);
-  tick(450); assert.equal(latest.fraction, 0.75, 'double rate advances half a stroke in the next225ms');
+  tick(450, 200); assert.equal(latest.fraction, 0.75, 'a stale rAF timestamp must not rewind the stroke after input');
   context.strokeRetiming.setSpeed(0.55);
   tick(630); assert.equal(latest.fraction, 0.85, 'slow change keeps progress and advances at half rate');
   assert.equal(latest.stroke, 1);
   tick(3100); assert.equal(latest.stroke, 2); assert.equal(latest.fraction, 1);
   assert.equal(page.dataset.state, 'done'); assert.equal(context.strokeRetiming, null);
 });
+
+// Run each real backend frame and setter, with rendering stubbed. A delayed rAF
+// timestamp can predate the input event even though its callback executes later.
+const inkSource = readFileSync(new URL('../corridor-ink.js', import.meta.url), 'utf8');
+for (const [index, backend] of ['gpu', 'gl2'].entries()) {
+  test(`${backend} advances monotonically when a queued frame predates the speed input`, () => {
+    const frames = [...inkSource.matchAll(/  function frame\(now\) \{[\s\S]*?\n  \}\n  const handle = \{/gu)];
+    assert.equal(frames.length, 2);
+    const match = frames[index], frame = match[0].slice(0, match[0].indexOf('\n  const handle'));
+    const setterAt = inkSource.indexOf('    setSpeed(speed) {', match.index);
+    const setter = inkSource.slice(setterAt, inkSource.indexOf('    rewrite(opts)', setterAt));
+    let now = 0; const positions = [], noop = () => {};
+    const context = {
+      performance: { now: () => now }, alive: true, dead: false, writing: true, looping: true,
+      writeSpeed: 0.55, wallAnchor: 0, virtualAnchor: 0, seed: 1, spec: {},
+      requestAnimationFrame: noop, uploadSprite: noop, render: noop, blit: noop, splat: noop, step: noop,
+      engine: { frameStep: noop, reset: () => assert.fail('Retiming must not clear the sheet') },
+      writer: { advance: value => { positions.push(value); return { splats: [], beginStroke: null, finished: false }; },
+        start: () => assert.fail('Retiming must not restart the writer') },
+    };
+    vm.createContext(context);
+    vm.runInContext(`${frame}\nthis.frame = frame; this.handle = {${setter}};`, context);
+    now = 100; context.frame(100);
+    now = 120; context.handle.setSpeed(2.2);
+    now = 125; context.frame(110);
+    now = 140; context.handle.setSpeed(0.55);
+    now = 150; context.frame(130);
+    const expected = [55, 77, 115.5];
+    assert.equal(positions.length, expected.length);
+    positions.forEach((value, i) => assert(Math.abs(value - expected[i]) < 1e-8, `${backend} sample${i}: ${value} must equal ${expected[i]}`));
+    assert(positions.every((value, i) => !i || value >= positions[i - 1]));
+  });
+}

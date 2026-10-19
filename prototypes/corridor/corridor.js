@@ -34766,6 +34766,8 @@ function startStrokeAnimation(page) {
     },
   };
   const frame = (ts) => {
+    // Input can run after this frame's rAF timestamp but before its callback.
+    ts = performance.now();
     const t = virtualAnchor + (ts - wallAnchor) * rate;
     if (t >= span) {
       paintStrokes(page, total, 1);

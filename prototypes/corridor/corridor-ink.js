@@ -810,6 +810,9 @@ function startGPU(canvas, spec, device) {
     device.queue.submit([e.finish()]);
   }
   function frame(now) {
+    // rAF's timestamp can predate a speed input handled before this callback.
+    // Sample the same monotonic clock as begin/setSpeed: never extrapolate back.
+    now = performance.now();
     if (!alive) return;
     if (dead) { if (handle.ondead) handle.ondead(); return; }
     if (!writing) {
@@ -1086,6 +1089,8 @@ function startGL2(canvas, spec) {
     draw();
   }
   function frame(now) {
+    // Use callback time, as begin/setSpeed do; a queued rAF timestamp may be stale.
+    now = performance.now();
     if (!alive) return;
     if (!writing) {
       // FREEZE at finish (gallery law): the simulation already stops, but the
