@@ -7,7 +7,7 @@
  * The page follows the backs of Core / Yomitan cards (the whole reading in
  * furigana), an MCD front (one gap in the sentence), and the corridor seals.
  */
-import { basicTsv, counts, createScheduler, emptyState, grade, normalizeState, paragraphOf, studyQueue, validateDeck, RATINGS, codePoints } from './engine.js';
+import { basicTsv, closeLines, counts, createScheduler, emptyState, grade, LEARN_AHEAD_MS, nextStep, normalizeState, paragraphOf, pauseWords, preview, servable, sittingTally, studyQueue, validateDeck, waitWords, RATINGS, codePoints } from './engine.js';
 
 const deck = await fetch(new URL('./deck.json', import.meta.url)).then((response) => {
   if (!response.ok) throw new Error('context deck could not be read');
@@ -39,6 +39,10 @@ const THEMES = [
 
 const lexicon = [...deck.cards].sort((a, b) => b.target.length - a.target.length || a.id.localeCompare(b.id));
 
+// the sitting follows srs-core's rule (Anki's order): log — this sitting's answers, for the close; ahead — the learner
+// chose to review learning steps early; early — the card on screen came by that choice; pause — nothing else is left but
+// cards in a learning step; shown — the card's stored record when it was put on screen (a grade refuses if another window
+// changed it since)
 const ui = {
   screen: 'home',
   queue: [],
@@ -46,7 +50,14 @@ const ui = {
   phase: 'declare',
   previewId: null,
   missed: false,
+  log: [],
+  started: 0,
+  ahead: false,
+  early: false,
+  pause: null,
+  shown: 'null',
 };
+let pauseTimer = null;
 let paintedTurn = null;
 let english = false;
 const t = (ja, en) => english ? en : ja;
@@ -59,8 +70,45 @@ function loadState(storage) {
   }
 }
 
+/** true when stored; a full storage leaves the ledger as it was */
 function saveState(storage, state) {
-  storage.setItem(storageKey, JSON.stringify(state));
+  try {
+    storage.setItem(storageKey, JSON.stringify(state));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const isStep = (stored) => !!stored && (stored.state === 1 || stored.state === 3);
+/**
+ * Put the sitting's next card at ui.index by srs-core's rule: a learning step that is due now; else the next waiting
+ * card that may be answered now; else, with nothing else left, the steps still to come — early only by the learner's
+ * choice (ui.ahead), otherwise the close pauses on them and offers that choice. A waiting card another window has
+ * answered meanwhile leaves the sitting.
+ */
+function settle(state, now = new Date()) {
+  const waiting = [];
+  for (const card of ui.queue.slice(ui.index)) {
+    if (waiting.includes(card) || isStep(state.cards[card.id]) || !servable(state.cards[card.id], now)) continue;
+    waiting.push(card);
+  }
+  const queued = new Set(waiting.map((card) => card.id));
+  const learning = deck.cards.filter((card) => isStep(state.cards[card.id]) && !queued.has(card.id)).map((card) => ({ id: card.id, due: Date.parse(state.cards[card.id].due) }));
+  const step = nextStep({ now, queue: waiting.map((card) => card.id), learning, ahead: ui.ahead });
+  ui.queue = [...ui.queue.slice(0, ui.index), ...waiting];
+  ui.early = false;
+  ui.pause = null;
+  if (step.show) {
+    const card = cardById(step.show);
+    ui.queue = [...ui.queue.slice(0, ui.index), card, ...waiting.filter((c) => c !== card)];
+    ui.early = step.early;
+    ui.shown = JSON.stringify(state.cards[step.show] ?? null);
+    ui.screen = 'card';
+  } else {
+    if (step.pause) ui.pause = { ...step };
+    ui.screen = 'done';
+  }
 }
 
 function loadLook(storage) {
@@ -216,14 +264,33 @@ function showAnswer(host, opts, state, missed) {
   paint(host, opts, state);
 }
 
+/**
+ * One answer, fresh-read-then-write: graded on the ledger as it is stored now (another window's grades are kept), and
+ * only if the card is still the one put on screen and may be answered now (srs-core's gate); otherwise nothing is
+ * graded and the sitting moves on. A full storage keeps the card on screen.
+ */
 function commit(host, opts, state, rating) {
   const card = ui.queue[ui.index];
-  const next = grade(fsrsApi, scheduler, state, card.id, rating, new Date());
-  saveState(opts.storage, next);
-  ui.index += 1;
+  const now = new Date();
+  const fresh = loadState(opts.storage);
+  const stored = fresh.cards[card.id] ?? null;
   ui.phase = 'declare';
   ui.missed = false;
-  if (ui.index >= ui.queue.length) ui.screen = 'done';
+  if (JSON.stringify(stored) !== ui.shown || !servable(stored, now, { learnAhead: true })) {
+    ui.queue.splice(ui.index, 1);
+    settle(fresh, now);
+    paint(host, opts, fresh);
+    return;
+  }
+  const next = grade(fsrsApi, opts.scheduler || scheduler, fresh, card.id, rating, now);
+  if (!saveState(opts.storage, next)) {
+    ui.phase = 'answer';
+    paint(host, opts, fresh);
+    return;
+  }
+  ui.log.push({ word: card.id, before: stored?.state ?? null, rating, early: ui.early });
+  ui.index += 1;
+  settle(next, now);
   paint(host, opts, next);
 }
 
@@ -315,12 +382,15 @@ function paintHome(room, opts, state, look) {
 
   const actions = h('div', 'cd-actions');
   const start = button(t('今日の札', 'Today’s cards'), 'cd-btn cd-primary', () => {
-    const queue = studyQueue(deck, loadState(opts.storage), new Date());
-    ui.queue = queue.queue;
+    const fresh = loadState(opts.storage);
+    ui.queue = studyQueue(deck, fresh, new Date()).queue;
     ui.index = 0;
     ui.phase = 'declare';
-    ui.screen = queue.queue.length ? 'card' : 'done';
-    paint(opts.host, opts, loadState(opts.storage));
+    ui.log = [];
+    ui.started = Date.now();
+    ui.ahead = false;
+    settle(fresh);
+    paint(opts.host, opts, fresh);
   });
   start.id = 'cd-start';
   actions.append(start);
@@ -396,11 +466,18 @@ function paintCard(room, opts, state, look) {
     page.column.append(plate);
   }
 
+  // a card in its learning steps says so, and one shown early says that it is early and why (lead's ruling 10-19)
+  const stored = state.cards[card.id];
+  if (ui.early || isStep(stored)) page.column.append(h('p', 'cd-step', ui.early ? t('学習中 · 少し早め（ほかに札がないため）', 'Learning · a few minutes early (nothing else left)') : t('学習中', 'Learning')));
   const grades = h('div', 'cd-dock cd-grades');
+  // each seal names the wait its answer schedules, now (the scheduler's own preview)
+  const pv = preview(fsrsApi, opts.scheduler || scheduler, state, card.id, new Date());
   const seal = (glyph, className, id, rating, label) => {
     const node = button(english ? label : glyph, `cd-seal ${className}`, () => commit(opts.host, opts, state, rating));
     node.id = id;
-    node.setAttribute('aria-label', label);
+    const wait = waitWords(pv[rating], english ? 'en' : 'ja');
+    node.append(h('small', 'cd-seal-t', wait));
+    node.setAttribute('aria-label', `${label} · ${wait}`);
     return node;
   };
   if (ui.missed) {
@@ -417,8 +494,39 @@ function paintCard(room, opts, state, look) {
 }
 
 function paintDone(room, opts) {
+  clearTimeout(pauseTimer);
   room.append(h('h1', 'cd-title', t('今日の分はここまで', 'That’s all for today')));
+  const now = new Date();
+  const lang = english ? 'en' : 'ja';
+  // what the sitting did, every number counted from its own answers (srs-core closeLines)
+  if (ui.log.length) for (const line of closeLines(sittingTally(ui.log, { startedAt: ui.started || null, now }), lang)) room.append(h('p', 'cd-lead cd-said', line));
   const actions = h('div', 'cd-actions');
+  if (ui.pause) {
+    // cards still in a learning step: they come back when due; the learner may review them now, early, within the limit
+    const said = pauseWords({ ...ui.pause }, lang, now);
+    const line = h('p', 'cd-lead cd-pause', said.line);
+    line.id = 'cd-pause';
+    room.append(line);
+    if (said.now) {
+      const ahead = button(said.now, 'cd-btn cd-primary', () => {
+        ui.ahead = true;
+        const fresh = loadState(opts.storage);
+        settle(fresh);
+        paint(opts.host, opts, fresh);
+      });
+      ahead.id = 'cd-ahead';
+      actions.append(ahead);
+    }
+    const turn = ui.pause.canEarly ? ui.pause.at : ui.pause.at - LEARN_AHEAD_MS;
+    if (turn > now.getTime()) {
+      pauseTimer = setTimeout(() => {
+        if (ui.screen !== 'done' || !opts.host.isConnected) return;
+        const fresh = loadState(opts.storage);
+        settle(fresh);
+        paint(opts.host, opts, fresh);
+      }, Math.min(2 ** 31 - 1, turn - now.getTime() + 50));
+    }
+  }
   actions.append(button(t('戻る', 'Back'), 'cd-btn cd-primary', () => {
     ui.screen = 'home';
     paint(opts.host, opts, loadState(opts.storage));
@@ -490,5 +598,6 @@ export function render(host, opts = {}) {
   ensureCss();
   const storage = opts.storage || localStorage;
   const state = loadState(storage);
-  paint(host, { ...opts, host, storage }, state);
+  // one schedule policy on every surface: the learner's own when the host passes it, the pin otherwise
+  paint(host, { ...opts, host, storage, scheduler: opts.learner ? createScheduler(fsrsApi, pin, opts.learner) : scheduler }, state);
 }
