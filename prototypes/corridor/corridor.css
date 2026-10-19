@@ -1637,7 +1637,10 @@ span.tok.named {
   color: var(--red);
 }
 
+/* each reading is one unit on its line: an atomic inline breaks only between readings (a nowrap span alone left
+   WebKit no break after the ・ before it, and a long list ran off the page) */
 .kv dd .reading-item {
+  display: inline-block;
   white-space: nowrap;
 }
 
@@ -3890,6 +3893,7 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 }
 
 .stroke-reading-item {
+  display: inline-block;
   white-space: nowrap;
 }
 
