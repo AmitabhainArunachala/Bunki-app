@@ -13573,12 +13573,14 @@ function markSenseContext(tokens, passage = null) {
   });
 }
 
-/** The shelf's sense sidecar (data/articles/senses.json, R3 part 2), asked for once. */
+/** The shelf's sense sidecar (data/articles/senses.json, R3 part 2), asked for once. The single file carries it with
+ * the articles (articles/senses), as it carries their bodies; it has no sibling file to fetch. */
 let senseSidecarPromise = null;
 function ensureSenseSidecar() {
   if (D.senseSidecar || senseSidecarPromise) return senseSidecarPromise || Promise.resolve(D.senseSidecar);
-  senseSidecarPromise = fetchData('data/articles/senses.json')
-    .then((res) => (res.ok ? res.json() : null))
+  const bundled = window.__CORRIDOR_BUNDLE__?.['articles/senses'];
+  senseSidecarPromise = (bundled ? Promise.resolve(bundled)
+    : fetchData('data/articles/senses.json').then((res) => (res.ok ? res.json() : null)))
     .then((data) => { D.senseSidecar = data?.schemaVersion === 1 && data.articles ? data.articles : {}; return D.senseSidecar; },
       () => { D.senseSidecar = {}; return D.senseSidecar; });
   return senseSidecarPromise;
