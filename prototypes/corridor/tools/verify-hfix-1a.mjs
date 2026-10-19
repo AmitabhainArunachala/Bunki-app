@@ -72,8 +72,9 @@ window.__H1A__ = {
 const CONTROL = {
   // the base's cut: the room's height, wherever it falls across a row
   stage: { item: '1.', source: [
-    // Ladder: the cut takes its room from the word's rooms after any glide (above/below), and floors at 1 px, not 96
-    ['corridor.js', 'const fit = rowCut(card, Math.max(above, below, 1));', 'const fit = Math.max(above, below, 1);'],
+    // Ladder: the cut takes its room from the word's rooms after any glide (above/below), and floors at 1 px, not 96.
+    // Ladder R2: a compact card's cut leaves its fade on paper (fadeCut), any other card's is rowCut's; the base's is the room
+    ['corridor.js', "const fit = (card.classList.contains('is-compact') ? fadeCut(card, room) : null) ?? rowCut(card, room);", 'const fit = room;'],
   ] },
   'stage-fade': { item: '1.', css: "#mini[data-more='true']::after { content: none !important; }" },
   // a seat that scrolls the reading (the defect the round-1 capture found: every writing ended before its first stroke)

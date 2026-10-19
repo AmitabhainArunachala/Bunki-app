@@ -3857,19 +3857,19 @@ try {
         // Ladder R2 · a word with no English says the dash again
         { id: 'dash-for-none', run: 'L-gloss', body: ladderGloss, options: glossView, kills: ['L.gloss.never-dash'],
           witness: (row) => row.observed.dashes?.length > 0,
-          edits: [{ file: 'corridor.js', key: 'english-dash', from: "  line.firstElementChild.textContent = text || '';",
-            to: "  line.firstElementChild.textContent = text || '—'; // Ladder negative: the dash" },
+          edits: [{ file: 'corridor.js', key: 'english-dash', from: "  line.querySelector('.tok-en-text').textContent = text || '';",
+            to: "  line.querySelector('.tok-en-text').textContent = text || '—'; // Ladder negative: the dash" },
           { file: 'corridor.js', key: 'english-dash-drawn', from: "  line.classList.toggle('tok-en-miss', !text && !waiting);",
             to: "  line.classList.toggle('tok-en-miss', false); // Ladder negative: the dash is drawn" }] },
         // Ladder R2 · the English rung takes the word's own first gloss, never the sense its sentence uses
         { id: 'english-ignores-sense', run: 'L-gloss', body: ladderGloss, options: glossView, kills: ['L.gloss.sense'],
           witness: (row) => row.observed.words?.some((w) => w.wrong?.length > 0),
-          edits: [{ file: 'corridor.js', key: 'english-never-waits', from: '  const named = sensing && !!sidecarSense(senseNeighbours(token))?.seq;',
-            to: '  const named = false; // Ladder negative: the English never waits for its sense' },
-          { file: 'corridor.js', key: 'english-without-sense', from: "  const line = inlineGlossLine(named ? '' : readerTokenGloss(token), !!reading || sensing);",
-            to: "  const line = inlineGlossLine(named ? '' : readerDoorGloss(readingTokenEntry(token)), !!reading || sensing); // Ladder negative" },
-          { file: 'corridor.js', key: 'english-follows-no-sense', from: '    const was = line.firstElementChild.textContent, found = readerTokenGloss(token);',
-            to: '    const was = line.firstElementChild.textContent, found = readerDoorGloss(readingTokenEntry(token)); // Ladder negative' }] },
+          edits: [{ file: 'corridor.js', key: 'english-never-waits', from: '  const named = () => sensing() && !!sidecarSense(senseNeighbours(token))?.seq;',
+            to: '  const named = () => false; // Ladder negative: the English never waits for its sense' },
+          { file: 'corridor.js', key: 'english-without-sense', from: "  const line = inlineGlossLine(named() ? '' : readerTokenGloss(token), !!reading || sensing());",
+            to: "  const line = inlineGlossLine(named() ? '' : readerDoorGloss(readingTokenEntry(token)), !!reading || sensing()); // Ladder negative" },
+          { file: 'corridor.js', key: 'english-follows-no-sense', from: "    const was = line.textContent, found = !last && named() ? '' : readerTokenGloss(token);",
+            to: "    const was = line.textContent, found = !last && named() ? '' : readerDoorGloss(readingTokenEntry(token)); // Ladder negative" }] },
       ];
       for (const spec of ladderSpecs) {
         const baseline = ladderSchedules[spec.run] || [];

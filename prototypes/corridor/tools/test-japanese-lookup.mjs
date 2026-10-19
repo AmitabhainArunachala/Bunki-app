@@ -48,7 +48,9 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   // Ladder (2026-10-19, John: "one tap should just be the furigana, two taps should be the furigana plus the english word
   // underneath, three taps should reveal the box"): a word set in text climbs reading → English → stage (inlineWordReading,
   // ladderGlossRung, inlineWordGloss, inlineGlossLine), and its card rides with it where its text scrolls (slipScroller)
-  'inlineWordReading', 'ladderGlossRung', 'inlineWordGloss', 'inlineGlossLine', 'inlineGloss', 'slipScroller'];
+  'inlineWordReading', 'ladderGlossRung', 'inlineWordGloss', 'inlineGlossLine', 'inlineGloss', 'slipScroller',
+  // Ladder R2 (2026-10-20): the English row is seated and set by one hand each (seatGlossRow, setGlossLine)
+  'seatGlossRow', 'setGlossLine'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
