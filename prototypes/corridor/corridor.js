@@ -34715,11 +34715,12 @@ function renderKanjiNode(sheet, node) {
   const readingLine = (list) => {
     const span = el('span', 'on');
     if (!list?.length) span.textContent = '—';
-    // each reading stays whole on its line (a long list breaks only between readings, never inside い.ける)
+    // each reading stays whole on its line, its ・ kept with it, so a long list breaks only after a ・ (never
+    // inside い.ける, never before a ・)
     (list || []).forEach((reading, i) => {
-      if (i) span.append(document.createTextNode('・'));
       const item = el('span', 'reading-item', reading);
       if (officialOnly.has(reading)) item.append(el('sup', 'reading-official-mark', '*'));
+      if (i < list.length - 1) item.append(document.createTextNode('・'));
       span.append(item);
     });
     return span;
@@ -35169,8 +35170,8 @@ function strokeReadingRow(ja, en, values, kind = 'on', official = []) {
   const value = el('span', 'stroke-reading-value');
   if (!raw.length) value.textContent = '—';
   raw.forEach((item, i) => {
-    if (i) value.append(document.createTextNode('・'));
-    value.append(el('span', 'stroke-reading-item', (kind === 'kun' ? displayKunReading(item) : item) + (official.includes(item) ? '*' : '')));
+    value.append(el('span', 'stroke-reading-item',
+      (kind === 'kun' ? displayKunReading(item) : item) + (official.includes(item) ? '*' : '') + (i < raw.length - 1 ? '・' : '')));
   });
   value.lang = 'ja';
   if (kind === 'kun' && raw.length) {
