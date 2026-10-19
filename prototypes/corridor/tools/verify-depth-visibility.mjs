@@ -8,8 +8,11 @@
  * title of wikinews:27998, tapping 大臣 on the line below a saved 巡る. Each ring is held to
  * every OTHER visible card character's box, ruby included, and to all of the card's actual
  * text ink, its own word's included. Its own word's font box is measured, not required clear.
+ * The saved occurrence itself is bound in every raster frame, its ring pixels included. Where the
+ * open slip covers it, that frame is geometry only; the native Escape then uncovers the same ring.
  * --title-rings runs only those ring cases: 2 engines x 11 worlds x phone (21px) and desktop
  * (34px), 44 exact cases. It never sets fullAcceptance; only the exact roster sets its own field.
+ * --self-test-admission runs the roster and saved-ring verdicts against altered receipts, no browser.
  */
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
@@ -33,15 +36,17 @@ const CONTEXT_STORY = 'aozora:000772-1';
 // nextLineOn: the engine/size layouts where the natural title sets the tapped word's reading on the line below the ring.
 const LIVE = [{ name: 'live-daisho', id: STORY, query: 'スタートアップ大賞', word: '大賞' }, { name: 'live-watashi', id: CONTEXT_STORY, query: '私の個人主義', word: '私' },
   { name: 'live-daisho-saved-nihon', id: STORY, query: 'スタートアップ大賞', word: '大賞', prior: '日本', nextLineOn: ['webkit/phone'] },
-  { name: 'live-daijin-saved-meguru', id: 'wikinews:27998', archiveYear: '2015', query: '巡る', word: '大臣', prior: '巡る', nextLineOn: ['webkit/desktop', 'chromium/desktop'] }];
+  { name: 'live-daijin-saved-meguru', id: 'wikinews:27998', archiveYear: '2015', query: '巡る', word: '大臣', prior: '巡る', nextLineOn: ['webkit/desktop', 'chromium/desktop'], uncover: true }];
+const titleLeading = (fontPx) => fontPx * 1.45 + Math.max(20, fontPx * 0.94);
 const DEVICES = { phone: { viewport: { width: 390, height: 844 }, touch: true, titleFont: '21px' }, desktop: { viewport: { width: 1440, height: 900 }, touch: false, titleFont: '34px' } };
 const defaultSize = (engine) => (engine === 'webkit' ? 'phone' : 'desktop');
 const RING_LIVE = LIVE.filter((l) => l.prior);
 const RING_ENGINES = ['webkit', 'chromium'];
 const RING_SIZES = ['phone', 'desktop'];
+const ringFrames = (spec) => [['before', true], ['reading', true], ['stage-open', false], ['stage-met', !spec.uncover], ...(spec.uncover ? [['stage-met-uncovered', true]] : [])];
 const ringRows = (spec) => [`world.${spec.name}`, `${spec.name}.device`, ...['fresh', 'reading-beside-ring', 'reading-without-encounter', 'prior-state-intact', 'stage-commits-met', 'first-tap-base-glyphs', 'second-tap-base-glyphs',
-  'fresh-to-state-base-glyphs', 'title-rhythm-through-inputs', 'source-visible-and-owned', 'scroll-unchanged', 'slip-seated'].map((id) => `${spec.name}.${id}`),
-  ...['before', 'reading', 'stage-open', 'stage-met'].flatMap((frame) => ['fragment-alignment', 'no-other-glyph-overlap', ...(frame === 'stage-open' ? [] : ['ring-clear-of-ink'])].map((id) => `${spec.name}-${frame}.${id}`))];
+  'fresh-to-state-base-glyphs', 'title-rhythm-through-inputs', 'source-visible-and-owned', 'scroll-unchanged', 'slip-seated', ...(spec.uncover ? ['uncovered-record-identical', 'uncovered-title-stable'] : [])].map((id) => `${spec.name}.${id}`),
+  ...ringFrames(spec).flatMap(([frame, raster]) => ['fragment-alignment', 'no-other-glyph-overlap', ...(raster ? ['ring-clear-of-ink', 'saved-occurrence'] : [])].map((id) => `${spec.name}-${frame}.${id}`))];
 const ringCaseId = (engine, world, size) => `${engine}/${world}/${size}`;
 const RING_REQUIRED = RING_ENGINES.flatMap((engine) => WORLDS.flatMap((world) => RING_SIZES.map((size) => ({ caseId: ringCaseId(engine, world, size), engine, world, size, titleFont: DEVICES[size].titleFont,
   rows: RING_LIVE.flatMap(ringRows), nextLineWitnesses: RING_LIVE.filter((l) => l.nextLineOn.includes(`${engine}/${size}`)).map((l) => l.name) }))));
@@ -66,12 +71,14 @@ const savedWord = (id, now) => ({ t: 'word', id, label: id, ts: now - 40 * DAY, 
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const option = (name) => { const i = process.argv.indexOf(name); return i < 0 ? null : process.argv[i + 1]; };
 const allowedArgs = new Set(['--worlds', '--control-current-paint']);
-for (let i = 2; i < process.argv.length; i++) { if (['--diagnostic-inline-end', '--late-lookup', '--title-rings'].includes(process.argv[i])) continue; assert(allowedArgs.has(process.argv[i]) && process.argv[i + 1], `Invalid option ${process.argv[i]}`); i++; }
+for (let i = 2; i < process.argv.length; i++) { if (['--diagnostic-inline-end', '--late-lookup', '--title-rings', '--self-test-admission'].includes(process.argv[i])) continue; assert(allowedArgs.has(process.argv[i]) && process.argv[i + 1], `Invalid option ${process.argv[i]}`); i++; }
 const diagnosticInlineEnd = process.argv.includes('--diagnostic-inline-end');
 const lateLookup = process.argv.includes('--late-lookup');
 const titleRings = process.argv.includes('--title-rings');
+const selfTestAdmission = process.argv.includes('--self-test-admission');
 assert(!lateLookup || (!option('--worlds') && !diagnosticInlineEnd), 'The late-lookup roster names its own worlds and paint');
 assert(!titleRings || (!lateLookup && !diagnosticInlineEnd), 'The title-ring roster is its own mode');
+assert(!selfTestAdmission || process.argv.length === 3, 'The admission self-test takes no other option');
 const worlds = lateLookup ? LATE_WORLDS : option('--worlds')?.split(',') || WORLDS;
 assert(worlds.length && new Set(worlds).size === worlds.length && worlds.every((w) => WORLDS.includes(w)), 'Named, unique public worlds required');
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['webkit', 'chromium'];
@@ -129,15 +136,19 @@ async function boot(page) {
 async function openPassage(page, { id, query, archiveYear }) {
   if (archiveYear) {
     await page.locator('#archive-link').click(); await page.locator(`.archive-year[data-year="${archiveYear}"]`).click();
-    await page.locator(`.archive-row[data-passage="${id}"]`).click(); return;
+    const row = page.locator(`.archive-row[data-passage="${id}"]`); const door = await row.getAttribute('data-passage'); await row.click(); return door;
   }
   const direct = page.locator(`[data-passage="${id}"]:not([data-recommendation]) .shelf-open`).first();
-  if (await direct.count()) await direct.click(); else { await openShelfTools(page); await page.locator('#shelf-reading-search').fill(query); await page.locator('#shelf-reading-search').press('Enter'); await page.locator(`#shelf-reading-results [data-passage="${id}"] .shelf-open`).first().click(); }
+  const open = (await direct.count()) ? direct : null;
+  if (!open) { await openShelfTools(page); await page.locator('#shelf-reading-search').fill(query); await page.locator('#shelf-reading-search').press('Enter'); }
+  const button = open || page.locator(`#shelf-reading-results [data-passage="${id}"] .shelf-open`).first();
+  const door = await button.evaluate((el) => el.closest('[data-passage]')?.dataset.passage ?? null); await button.click(); return door;
 }
 async function story(page, id = STORY, query = 'スタートアップ大賞', archiveYear) {
   await boot(page);
-  await openPassage(page, { id, query, archiveYear });
+  const door = await openPassage(page, { id, query, archiveYear });
   await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 30000 }); await delay(1000);
+  return door;
 }
 /** The title as laid out now, with the native depth of every card word read
  * through the app's own resolver, independent of painted attributes. */
@@ -491,15 +502,21 @@ async function seedPrior(page, { id, query, prior, archiveYear }) {
   value.met = { version: 1, entries: { ...(value.met?.entries || {}), [node.key]: { first: today, last: today, days: 1 } } };
   value.taken = [...(value.taken || []), savedWord(prior, now)];
   await commitRecord(page, value, 'prior');
-  await story(page, id, query, archiveYear);
+  const door = await story(page, id, query, archiveYear);
   await page.waitForFunction((word) => document.querySelector(`.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"][data-depth="met"][data-kept]`), prior);
-  return node;
+  return { ...node, door };
 }
 const TITLE_DOTS = '.reader-card > h1.view-title .japanese-lookup-word:is([data-depth],[data-kept])';
 /** One live frame of the title's stateful dots against the whole card: every visible character box (title, its shown
  * readings, caption, context and instrument lines) by the common title law, and, when asked, the actual raster: ring
  * pixels (shown vs dots hidden) never on text ink (dots hidden vs card text transparent), its own word's glyphs included. */
-async function titleRingFrame(page, out, name, label, raster) {
+/** The saved occurrence named by the fixture, independent of what TITLE_DOTS happens to match: exactly one title
+ * occurrence of the word, painted met and kept, with visible pixels in its ring band (beyond the fill and its gap). */
+const savedOccurrenceVerdict = (occurrences, ink) => {
+  const entry = occurrences.length === 1 ? ink.find((d) => d.probeId === occurrences[0]) : null;
+  return { occurrences, entry: entry || null, passed: Boolean(entry && entry.depth === 'met' && entry.kept && entry.painted >= 4 && entry.ringPainted >= 4) };
+};
+async function titleRingFrame(page, out, name, label, raster, prior) {
   const frame = `${name}-${label}`;
   await page.locator('.reader-card .japanese-lookup-word').evaluateAll((els, name) => els.forEach((el, i) => { el.dataset.dotsNode ||= `${name}-${i}`; }), name);
   const dots = await facts(page, TITLE_DOTS);
@@ -507,11 +524,13 @@ async function titleRingFrame(page, out, name, label, raster) {
   for (const d of dots) d.captureFrame = frame;
   out.measurements[frame] = dots;
   lineGeometry(out, frame, dots);
-  if (!raster) return dots;
-  const view = await page.evaluate(() => ({ x: scrollX, y: scrollY, dpr: devicePixelRatio }));
   const slip = await page.evaluate((centres) => { const m = document.getElementById('mini'), s = m && getComputedStyle(m), r = m?.getBoundingClientRect();
     return m && s.display !== 'none' && s.visibility !== 'hidden' && r.width > 0 && r.height > 0 ? { left: r.left + scrollX, top: r.top + scrollY, right: r.right + scrollX, bottom: r.bottom + scrollY, onTop: centres.map(([x, y]) => Boolean(document.elementFromPoint(x - scrollX, y - scrollY)?.closest('#mini'))) } : null; },
   dots.map((d) => [(d.left + d.right) / 2, (d.top + d.bottom) / 2]));
+  const covered = (d, i) => Boolean(slip && slip.onTop[i] && d.left - d.spread >= slip.left && d.top - d.spread >= slip.top && d.right + d.spread <= slip.right && d.bottom + d.spread <= slip.bottom);
+  out.ringOcclusion ||= {}; out.ringOcclusion[frame] = { slip, raster, covered: dots.map((d, i) => ({ text: d.text, probeId: d.probeId, coveredBySlip: covered(d, i) })) };
+  if (!raster) return dots;
+  const view = await page.evaluate(() => ({ x: scrollX, y: scrollY, dpr: devicePixelRatio }));
   const shot = async (suffix) => png(await page.screenshot({ path: resolve(evidence, `${shotTag(out)}-${frame}${suffix}.png`), animations: 'allow' }));
   const shown = await shot('');
   const noDots = await page.addStyleTag({ content: hideCss }); const paper = await shot('-paper');
@@ -522,26 +541,31 @@ async function titleRingFrame(page, out, name, label, raster) {
   const differs = (a, b) => a.some((v, k) => Math.abs(v - b[k]) > 3);
   const ink = dots.map((d, i) => {
     const box = { left: d.left - d.spread - 1, top: d.top - d.spread - 1, right: d.right + d.spread + 1, bottom: d.bottom + d.spread + 1 }, hits = { own: 0, other: 0, reading: 0, unattributed: 0 };
-    const underSlip = Boolean(slip && slip.onTop[i] && box.left >= slip.left && box.top >= slip.top && box.right <= slip.right && box.bottom <= slip.bottom);
-    let painted = 0;
+    const centre = [(d.left + d.right) / 2, (d.top + d.bottom) / 2];
+    let painted = 0, ringPainted = 0;
     for (let y = Math.max(0, Math.floor((box.top - view.y) * view.dpr)); y < Math.min(shown.height, Math.ceil((box.bottom - view.y) * view.dpr)); y++)
       for (let x = Math.max(0, Math.floor((box.left - view.x) * view.dpr)); x < Math.min(shown.width, Math.ceil((box.right - view.x) * view.dpr)); x++) {
         const behind = pix(paper, x, y);
         if (!differs(pix(shown, x, y), behind)) continue;
         painted++;
-        if (!differs(behind, pix(bare, x, y))) continue;
         const cx = (x + 0.5) / view.dpr + view.x, cy = (y + 0.5) / view.dpr + view.y;
+        if (Math.hypot(cx - centre[0], cy - centre[1]) > d.width / 2 + 0.5) ringPainted++;
+        if (!differs(behind, pix(bare, x, y))) continue;
         const glyph = dots.captureFrame.glyphs.find((g) => cx >= g.left && cx <= g.right && cy >= g.top && cy <= g.bottom);
         hits[!glyph ? 'unattributed' : glyph.rt ? 'reading' : glyph.owner === d.probeId ? 'own' : 'other']++;
       }
-    return { probeId: d.probeId, text: d.text, depth: d.depth, kept: d.kept, box, painted, underSlip, hits };
+    return { probeId: d.probeId, text: d.text, depth: d.depth, kept: d.kept, box, painted, ringPainted, coveredBySlip: covered(d, i), hits };
   });
-  row(out, `${frame}.ring-clear-of-ink`, stable && ink.length > 0 && ink.every((d) => (d.painted >= 4 || d.underSlip) && Object.values(d.hits).every((n) => n === 0)), { stable, view, slip, ink });
+  row(out, `${frame}.ring-clear-of-ink`, stable && ink.length > 0 && ink.every((d) => d.painted >= 4 && Object.values(d.hits).every((n) => n === 0)), { stable, view, slip, ink });
+  if (prior) {
+    const occurrences = await page.locator(`.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${prior}"]`).evaluateAll((els) => els.map((el) => el.dataset.dotsNode));
+    row(out, `${frame}.saved-occurrence`, savedOccurrenceVerdict(occurrences, ink).passed, { saved: prior, ...savedOccurrenceVerdict(occurrences, ink) });
+  }
   return dots;
 }
-async function liveFirstState(page, out, { name, id, query, word, prior, archiveYear, nextLineOn = [] }) {
+async function liveFirstState(page, out, { name, id, query, word, prior, archiveYear, nextLineOn = [], uncover = false }) {
   const priorNode = prior ? await seedPrior(page, { id, query, prior, archiveYear }) : null;
-  if (!prior) await story(page, id, query, archiveYear);
+  const door = prior ? priorNode.door : await story(page, id, query, archiveYear);
   const nextLineRequired = nextLineOn.includes(`${out.engine}/${out.size}`);
   await page.locator('.reader-card').evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' })); await delay(250);
   const selector = `.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"]`, target = page.locator(selector).first();
@@ -595,13 +619,14 @@ async function liveFirstState(page, out, { name, id, query, word, prior, archive
   const twoLine = Boolean(first && daisho && first.top != null && daisho.top != null && daisho.top - first.top > (first.bottom - first.top) / 2);
   const priorPainted = !prior || Boolean(fresh?.words.some((w) => w.title && w.text === prior && w.painted && w.nativeActive));
   row(out, `${name}.fresh`, native.kind === 'core' && fresh?.titleWords > 0 && stateless(fresh, (w) => w.text !== prior) && priorPainted && !before.rung && !before.mini && !pre.record.met?.entries?.[native.key] && (out.engine !== 'webkit' || out.size !== 'phone' || id !== STORY || twoLine) && (!nextLineRequired || adjacent), { native, prior: prior ? { word: prior, node: priorNode, painted: priorPainted } : null, lines, twoLine, layout, fresh, before, revision: pre.revision });
-  if (prior) await titleRingFrame(page, out, name, 'before', true);
+  if (prior) await titleRingFrame(page, out, name, 'before', true, prior);
+  await page.evaluate(() => { window.__dotsInputs = []; for (const type of ['touchstart', 'pointerdown', 'click']) document.addEventListener(type, (e) => window.__dotsInputs.push({ type, trusted: e.isTrusted, pointerType: e.pointerType ?? null, word: e.target?.closest?.('.japanese-lookup-word')?.dataset.lookupText ?? null }), true); });
   await input();
   const input1 = await sample('input-1');
   await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.ladderRung != null, selector); await delay(350);
   const reading = await sample('reading');
   if (prior) {
-    const ringDots = await titleRingFrame(page, out, name, 'reading', true), ring = ringDots.find((d) => d.text === prior);
+    const ringDots = await titleRingFrame(page, out, name, 'reading', true, prior), ring = ringDots.find((d) => d.text === prior);
     const targetNode = await target.evaluate((el) => el.dataset.dotsNode);
     const readingGlyphs = out.captureFrames[`${name}-reading`].glyphs.filter((g) => g.rt && g.owner === targetNode);
     const underRing = ring ? readingGlyphs.filter((g) => g.top > ring.fragments.at(-1).bottom && g.left < ring.right + ring.spread && g.right > ring.left - ring.spread) : [];
@@ -616,12 +641,12 @@ async function liveFirstState(page, out, { name, id, query, word, prior, archive
   await input();
   await page.locator('#mini').waitFor({ state: 'visible' });
   const opened = await sample('stage-open');
-  if (prior) await titleRingFrame(page, out, name, 'stage-open', false);
+  if (prior) await titleRingFrame(page, out, name, 'stage-open', false, prior);
   const miniHandle = await page.$('#mini');
   const committed = await waitForAppRecord(page, (value) => Boolean(value.met?.entries?.[native.key]), { description: `native first encounter for ${word}` });
   await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.depth === 'met', selector); await delay(350);
   const met = await sample('stage-met');
-  if (prior) await titleRingFrame(page, out, name, 'stage-met', true);
+  if (prior) await titleRingFrame(page, out, name, 'stage-met', !uncover, prior);
   const after = await readAppRecordSnapshot(page);
   if (prior) {
     const priorDepth = await page.evaluate((word) => window.__KAIRO_DEPTH__.depth({ t: 'word', id: word }), prior);
@@ -646,6 +671,20 @@ async function liveFirstState(page, out, { name, id, query, word, prior, archive
   row(out, `${name}.scroll-unchanged`, frames.every((f) => f.scrollY === before.scrollY && f.scrollX === before.scrollX), frames.map((f) => ({ label: f.label, scrollX: f.scrollX, scrollY: f.scrollY })));
   row(out, `${name}.slip-seated`, sameMini && shift(opened.mini, met.mini) <= 1 && seated(opened) && seated(met),
     { authoredGap: SLIP_GAP, sameMini, miniShift: shift(opened.mini, met.mini), opened: { mini: opened.mini, union: opened.union, ...seat(opened) }, met: { mini: met.mini, union: met.union, ...seat(met) }, openedBeforeState: !opened.depth });
+  if (uncover) {
+    // The open slip covers this saved ring; the app's own Escape folds the slip and uncovers the same occurrence.
+    const held = await settledRecord(page);
+    await page.keyboard.press('Escape');
+    await page.locator('#mini').waitFor({ state: 'detached' }); await delay(350);
+    const uncovered = await sample('stage-met-uncovered');
+    await titleRingFrame(page, out, name, 'stage-met-uncovered', true, prior);
+    const released = await settledRecord(page);
+    row(out, `${name}.uncovered-record-identical`, held.settled && released.settled && released.snapshot.revision === held.snapshot.revision && JSON.stringify(released.snapshot.record) === JSON.stringify(held.snapshot.record),
+      { control: 'Escape', held: { revision: held.snapshot.revision, settled: held.settled }, released: { revision: released.snapshot.revision, settled: released.settled, reads: released.reads } });
+    row(out, `${name}.uncovered-title-stable`, !uncovered.mini && uncovered.visible && uncovered.hitOwned && JSON.stringify(uncovered.title) === JSON.stringify(before.title) && baseShift(before, uncovered) <= 1 && uncovered.scrollX === before.scrollX && uncovered.scrollY === before.scrollY && uncovered.depth === 'met',
+      { title: uncovered.title, before: before.title, baseShift: baseShift(before, uncovered), scroll: [uncovered.scrollX, uncovered.scrollY], mini: uncovered.mini, depth: uncovered.depth, reading: uncovered.reading });
+  }
+  return { door, saved: prior ? await page.evaluate((word) => [...document.querySelectorAll(`.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"][data-kept]`)].map((el) => el.dataset.lookupText), prior) : [], tapped: await target.evaluate((el) => el.dataset.lookupText) };
 }
 async function rooms(page, out) {
   out.roomStateCoverage = {};
@@ -842,7 +881,7 @@ async function lateTitle(page, out, spec, result) {
     }
     const frames = result.frames, deltas = frames.map((f) => ({ label: f.label, delta: titleDelta(cold, f) }));
     add('native-title-not-deferred', frames.every((f) => !f.missing && f.titleText === cold.titleText && f.words === spec.words && !f.pending && !f.buttons.length), frames.map((f) => ({ label: f.label, words: f.words, pending: f.pending, buttons: f.buttons })));
-    add('unconditional-title-rhythm', frames.every((f) => Number.parseFloat(f.paddingBottom) === 8 && Math.abs(Number.parseFloat(f.lineHeight) - (Number.parseFloat(f.fontSize) * 1.45 + 20)) < 0.01), frames.map((f) => ({ label: f.label, fontSize: f.fontSize, lineHeight: f.lineHeight, paddingBottom: f.paddingBottom })));
+    add('unconditional-title-rhythm', frames.every((f) => Number.parseFloat(f.paddingBottom) === 8 && Math.abs(Number.parseFloat(f.lineHeight) - titleLeading(Number.parseFloat(f.fontSize))) < 0.01), frames.map((f) => ({ label: f.label, fontSize: f.fontSize, lineHeight: f.lineHeight, paddingBottom: f.paddingBottom })));
     add('title-identical', deltas.every(({ delta: d }) => d && d.rhythm && Object.values(d.title).every((v) => v === 0)), deltas);
     add('card-identical', deltas.every(({ delta: d }) => d && Object.values(d.card).every((v) => v === 0)), deltas);
     add('glyphs-identical', deltas.every(({ delta: d }) => d && d.glyphShift === 0), deltas);
@@ -877,25 +916,33 @@ async function lateWalk(browser, out) {
   out.passed = out.lateAdmission.accepted;
   save();
 }
-/** Lead 2240: each saved-ring fixture on a fresh native profile at this size, with the device and font it actually rendered. */
+/** Lead 2240: each saved-ring fixture on a fresh native profile at this size, with the viewport and font it actually
+ * rendered and the trusted input events the native taps or clicks actually delivered to the tapped word. */
 async function ringDevice(page, out, spec) {
   const device = DEVICES[out.size];
-  const actual = await page.evaluate(() => ({ width: innerWidth, height: innerHeight, touchEvents: 'ontouchstart' in window, touchPoints: navigator.maxTouchPoints, fontSize: getComputedStyle(document.querySelector('.reader-card > h1.view-title')).fontSize }));
-  row(out, `${spec.name}.device`, actual.width === device.viewport.width && actual.height === device.viewport.height && actual.touchEvents === device.touch && actual.fontSize === device.titleFont,
-    { size: out.size, input: out.touch ? 'tap' : 'click', expected: device, actual });
+  const actual = await page.evaluate(() => ({ width: innerWidth, height: innerHeight, touchEvents: 'ontouchstart' in window, touchPoints: navigator.maxTouchPoints, fontSize: getComputedStyle(document.querySelector('.reader-card > h1.view-title')).fontSize, inputs: window.__dotsInputs || [] }));
+  const onWord = actual.inputs.filter((e) => e.trusted && e.word === spec.word);
+  const touches = onWord.filter((e) => e.type === 'touchstart' || (e.type === 'pointerdown' && e.pointerType === 'touch')).length, mice = onWord.filter((e) => e.type === 'pointerdown' && e.pointerType === 'mouse').length;
+  const inputProof = device.touch ? touches >= 2 && mice === 0 : mice >= 2 && touches === 0;
+  row(out, `${spec.name}.device`, actual.width === device.viewport.width && actual.height === device.viewport.height && actual.fontSize === device.titleFont && inputProof,
+    { size: out.size, input: out.touch ? 'tap' : 'click', expected: device, actual, trustedOnWord: { touches, mice } });
 }
 function ringContextAdmission(out) {
   const requiredRows = RING_LIVE.flatMap(ringRows), executedRows = out.rows.map((r) => r.id);
+  const known = RING_REQUIRED.some((c) => c.caseId === ringCaseId(out.engine, out.world, out.size));
+  const identity = (c) => { const spec = RING_LIVE.find((l) => l.name === c.name);
+    return Boolean(spec) && c.story === spec.id && c.saved === spec.prior && c.tapped === spec.word && c.observed?.door === spec.id && JSON.stringify(c.observed?.saved) === JSON.stringify([spec.prior]) && c.observed?.tapped === spec.word; };
   return { caseId: ringCaseId(out.engine, out.world, out.size), requiredRows, executedRows, missingRows: requiredRows.filter((id) => !executedRows.includes(id)), unexpectedRows: executedRows.filter((id) => !requiredRows.includes(id)),
-    accepted: !out.errors.length && exactRoster(executedRows, requiredRows) && out.rows.every((r) => r.passed === true) && exactRoster(out.ringCases.map((c) => c.name), RING_LIVE.map((l) => l.name)) &&
-      out.ringCases.every((c) => c.completed && !c.error && exactRoster(c.rowIds, ringRows(RING_LIVE.find((l) => l.name === c.name)))) };
+    identities: (out.ringCases || []).map((c) => ({ name: c.name, story: c.story, saved: c.saved, tapped: c.tapped, observed: c.observed ?? null, bound: identity(c) })),
+    accepted: known && !out.errors.length && exactRoster(executedRows, requiredRows) && out.rows.every((r) => r.passed === true) && exactRoster((out.ringCases || []).map((c) => c.name), RING_LIVE.map((l) => l.name)) &&
+      out.ringCases.every((c) => c.completed && !c.error && identity(c) && exactRoster(c.rowIds, ringRows(RING_LIVE.find((l) => l.name === c.name)))) };
 }
 async function ringWalk(browser, out) {
   out.ringCases = [];
   for (const spec of RING_LIVE) {
     const result = { name: spec.name, story: spec.id, saved: spec.prior, tapped: spec.word, startedAt: new Date().toISOString(), rowIds: [], completed: false };
     out.ringCases.push(result); const start = out.rows.length;
-    try { await freshWalk(browser, out, async (page) => { await liveFirstState(page, out, spec); await ringDevice(page, out, spec); await worldBinding(page, out, spec.name); }); result.completed = true; }
+    try { await freshWalk(browser, out, async (page) => { result.observed = await liveFirstState(page, out, spec); await ringDevice(page, out, spec); await worldBinding(page, out, spec.name); }); result.completed = true; }
     catch (error) { result.error = String(error.stack || error); out.errors.push(`${spec.name}: ${result.error}`); console.error(`${ringCaseId(out.engine, out.world, out.size)} ${spec.name}: ${error.message}`); }
     finally { result.rowIds = out.rows.slice(start).map((r) => r.id); result.completedAt = new Date().toISOString(); save(); }
   }
@@ -904,6 +951,48 @@ async function ringWalk(browser, out) {
   out.ringAdmission = ringContextAdmission(out);
   out.passed = out.ringAdmission.accepted;
   save();
+}
+/** Executable negatives for the roster and saved-ring verdicts: one complete, passing synthetic context per fixture
+ * set, then each single alteration a receipt could carry must be refused. No browser is launched. */
+function runAdmissionSelfTest() {
+  const good = () => {
+    const out = { engine: 'webkit', world: 'hokusai', size: 'desktop', errors: [], rows: [], ringCases: [] };
+    for (const spec of RING_LIVE) { const ids = ringRows(spec); out.rows.push(...ids.map((id) => ({ id, passed: true })));
+      out.ringCases.push({ name: spec.name, story: spec.id, saved: spec.prior, tapped: spec.word, observed: { door: spec.id, saved: [spec.prior], tapped: spec.word }, completed: true, rowIds: ids }); }
+    return out;
+  };
+  const altered = {
+    'wrong story': (o) => { o.ringCases[1].story = 'jawiki:5238864-s63'; },
+    'wrong saved word': (o) => { o.ringCases[0].saved = '大賞'; },
+    'wrong tapped word': (o) => { o.ringCases[1].tapped = '巡る'; },
+    'opened door is another story': (o) => { o.ringCases[0].observed.door = 'wikinews:27998'; },
+    'saved ring absent on the page': (o) => { o.ringCases[1].observed.saved = []; },
+    'saved ring duplicated': (o) => { o.ringCases[0].observed.saved = ['日本', '日本']; },
+    'missing row': (o) => { o.rows.pop(); },
+    'duplicate row': (o) => { o.rows.push({ ...o.rows[0] }); },
+    'failed row': (o) => { o.rows[3].passed = false; },
+    'missing uncovered continuation': (o) => { const id = 'live-daijin-saved-meguru-stage-met-uncovered.ring-clear-of-ink'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[1].rowIds = o.ringCases[1].rowIds.filter((r) => r !== id); },
+    'occluded stage-met raster substituted': (o) => { const from = 'live-daijin-saved-meguru-stage-met-uncovered.ring-clear-of-ink', to = 'live-daijin-saved-meguru-stage-met.ring-clear-of-ink'; o.rows.find((r) => r.id === from).id = to; o.ringCases[1].rowIds = o.ringCases[1].rowIds.map((r) => (r === from ? to : r)); },
+    'page error': (o) => { o.errors.push('pageerror'); },
+    'incomplete case': (o) => { o.ringCases[0].completed = false; },
+    'missing fixture': (o) => { o.ringCases.pop(); },
+    'unknown context': (o) => { o.size = 'tablet'; },
+  };
+  const ringInk = { probeId: 'n-1', text: '巡る', depth: 'met', kept: true, painted: 120, ringPainted: 60, hits: {} };
+  const saved = {
+    'lost kept attribute': [['n-1'], [{ ...ringInk, kept: false }]],
+    'ring band unpainted': [['n-1'], [{ ...ringInk, ringPainted: 0 }]],
+    'saved word lost its depth': [['n-1'], [{ ...ringInk, depth: null }]],
+    'saved occurrence not painted at all': [['n-1'], [{ ...ringInk, painted: 0, ringPainted: 0 }]],
+    'saved occurrence missing from paint': [['n-1'], [{ ...ringInk, probeId: 'n-2' }]],
+    'two saved occurrences': [['n-1', 'n-3'], [ringInk]],
+  };
+  const results = { positive: { admission: ringContextAdmission(good()).accepted, savedOccurrence: savedOccurrenceVerdict(['n-1'], [ringInk]).passed },
+    refused: Object.fromEntries([...Object.entries(altered).map(([k, f]) => { const o = good(); f(o); return [k, !ringContextAdmission(o).accepted]; }),
+      ...Object.entries(saved).map(([k, [occ, ink]]) => [k, !savedOccurrenceVerdict(occ, ink).passed])]) };
+  const passed = results.positive.admission && results.positive.savedOccurrence && Object.values(results.refused).every(Boolean);
+  console.log(JSON.stringify({ selfTestAdmission: passed, ...results }, null, 1));
+  return passed;
 }
 async function one(browser, engine, world, size = defaultSize(engine)) {
   const out = { engine, version: browser.version(), world, size, viewport: DEVICES[size].viewport, deviceScaleFactor: 2, touch: DEVICES[size].touch, startedAt: new Date().toISOString(), rows: [], measurements: {}, errors: [] };
@@ -954,7 +1043,8 @@ async function one(browser, engine, world, size = defaultSize(engine)) {
   } catch (error) { out.errors.push(String(error.stack || error)); console.error(`${engine}/${world}: ${error.message}`); }
   finally { await context.close(); out.completedAt = new Date().toISOString(); out.passed = !out.errors.length && out.completedWalk && out.rows.length >= 24 && out.rows.every((r) => r.passed); save(); }
 }
-try {
+if (selfTestAdmission) process.exitCode = runAdmissionSelfTest() ? 0 : 1;
+else try {
   report.load = execFileSync('uptime', { encoding: 'utf8' }).trim();
   if (process.env.DOTS_BASE_URL) {
     assert(!process.env.KAIRO_SITE_DIR && !controlBytes && !diagnosticInlineEnd, 'Remote evidence cannot impersonate a local artifact or use mutation controls');

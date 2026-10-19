@@ -5473,14 +5473,14 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
   bottom: calc(-0.3em + 1px);
   transform: translateX(calc(-0.5em - var(--depth-size) / 2));
 }
-/* every reader title, unconditionally: each title line holds its own font cell plus room for a reading above and a ring below,
-   laid out once for whatever arrives later (its words, a state, a reading, late name readings); a stateful word's dot sits in
-   that room, its offset scaled with the title's size, off the ink of its own word, of the next title line and of a reading
-   shown there, and clear of the English caption. Repeating the same class
+/* every reader title, unconditionally: each title line holds its own font cell plus room for a reading above and a ring below
+   (a room that grows with a large title's reading), laid out once for whatever arrives later (its words, a state, a reading,
+   late name readings); a stateful word's dot sits in that room, its offset scaled with the title's size, off the ink of its
+   own word, of the next title line and of a reading shown there, and clear of the English caption. Repeating the same class
    preserves the matched titles and outranks the later rooms/read.css font shorthand and phone leading without an important
    declaration. */
-html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 20px); padding-bottom: 8px; }
-html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom:calc(0.32em - 12.4px); }
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + max(20px, 0.94em)); padding-bottom: 8px; }
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom:calc(0.2em - 9.88px); }
 /* Ladder contract: only this occurrence steps aside while its inline English is open. Removing the attribute
    restores the same fill and ring; the painter and learner record are untouched, and no line box moves. */
 #reader .tok[data-depth-aside='meaning'] > .tok-word::after,
