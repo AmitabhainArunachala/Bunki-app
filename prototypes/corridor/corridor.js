@@ -18746,6 +18746,8 @@ function renderLessons(main) {
     const face = el('div', 'review-face');
     face.append(el('div', 'review-front', word));
     if (backc.reading) face.append(el('div', 'review-reading', backc.reading));
+    // K01 · a kanji lesson teaches a selection of readings; the full entry has every one
+    if (backc.reading && run.kind === 'kanji') face.append(el('p', 'lesson-reading-note', tx('このレッスンで扱う読み。ほかの読みは「全項目」に。', 'The readings this lesson teaches — the full entry has every reading.')));
     for (const m of backc.senses.slice(0, 3)) face.append(el('div', 'review-sense', m));
     const door = biLabel('button', 'chip', '全項目', 'Full entry');
     door.type = 'button';
@@ -18773,6 +18775,7 @@ function renderLessons(main) {
     const face = el('div', 'review-face');
     face.append(el('div', 'review-front', word));
     if (run.picked != null && backc.reading) face.append(el('div', 'review-reading', backc.reading));
+    if (run.picked != null && backc.reading && run.kind === 'kanji') face.append(el('p', 'lesson-reading-note', tx('このレッスンで扱う読み。ほかの読みは「全項目」に。', 'The readings this lesson teaches — the full entry has every reading.')));
     main.append(face);
     const list = el('div', 'lesson-options');
     run.choices.opts.forEach((opt) => {
@@ -22237,6 +22240,11 @@ function loadReferenceExtra() {
     }
     if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Reference data unavailable');
     D.referenceExtra = data;
+    // the official table that supplies the readings KANJIDIC2 lacks is named beside the other sources
+    const table = (data.sources || []).find((source) => String(source.name).startsWith('常用漢字表'));
+    if (table && D.sources?.share_alike && !D.sources.share_alike.some((source) => source.url === table.url)) {
+      D.sources.share_alike.push({ name: 'Jōyō kanji table (Cabinet Notice No. 2, 2010)', licence: table.licence, url: table.url, fetchedAt: table.fetchedAt });
+    }
     return data;
   }).catch(error => {
     referenceExtraError = error;
@@ -22246,6 +22254,14 @@ function loadReferenceExtra() {
     referenceExtraPending = false;
     referenceExtraTask = null;
     if (S.ready && S.view === 'levels' && !S.stack.length) render();
+    // a kanji page or reading search drawn while every reading was still on its way is drawn again (K01, K06);
+    // the search swaps only its results, so the field being typed in keeps its focus
+    else if (S.ready) {
+      if (document.querySelector('#kdx-results > [data-kdx-readings="pending"]')) {
+        document.getElementById('kdx-results')?.replaceWith(kdxTextResults('reading'));
+      }
+      if (document.querySelector('[data-kanji-readings="pending"]')) render();
+    }
   });
   return referenceExtraTask;
 }
@@ -22345,17 +22361,87 @@ function openReferenceEntry(entry, invoker) {
     ...(target?.reading ? { reading: target.reading } : {}), referenceEntry: entry }, { invoker });
 }
 
+/* Kanji-trust K01 · one reference record for every kanji door. kanji.json's short reading lists stay what the
+ * lessons teach; the reference sidecar carries every KANJIDIC2 reading of each kanji.json or Jōyō glyph, the
+ * 常用漢字表 readings KANJIDIC2 lacks, and the two Jōyō forms kanji.json lacks (剝, 𠮟). Display and lookup only:
+ * D.kanji, the learner's record and the scheduler are never written. */
+let kanjiReferenceIndexFor = null;
+let kanjiReferenceIndex = null;
+function kanjiReferenceRows() {
+  const extra = D.referenceExtra;
+  if (!extra) return null;
+  if (kanjiReferenceIndexFor !== extra) {
+    const official = new Map();
+    for (const [glyph, reading] of extra.officialReadings || []) {
+      if (!official.has(glyph)) official.set(glyph, []);
+      official.get(glyph).push(reading);
+    }
+    kanjiReferenceIndex = {
+      readings: new Map((extra.kanjiReadings || []).map((row) => [row[0], row])),
+      official,
+      records: new Map((extra.kanjiRecords || []).map((row) => [row[0], row])),
+      words: new Map(extra.jmdictWords || []),
+      wordless: new Set(extra.kanjiWithoutWords || []),
+    };
+    kanjiReferenceIndexFor = extra;
+  }
+  return kanjiReferenceIndex;
+}
+/** Whether every reading is here yet: 'complete' once the sidecar arrived, else 'pending' or 'failed' (retryable). */
+function kanjiReadingsState() {
+  return D.referenceExtra ? 'complete' : referenceExtraError && !referenceExtraPending ? 'failed' : 'pending';
+}
+/** The whole record of one kanji: the listed readings first, then each further KANJIDIC2 reading, then the
+ * 常用漢字表 ones KANJIDIC2 lacks (named in officialReadings). lessonOn/lessonKun keep the lessons' selection.
+ * readingsState: complete · listed (no KANJIDIC2 record) · pending · failed. */
+function kanjiReference(id) {
+  const rows = kanjiReferenceRows();
+  const row = rows?.readings.get(id);
+  const added = rows?.official.get(id) || [];
+  const helpers = window.BunkiReferenceCore;
+  const core = D.kanji?.[id];
+  if (!helpers?.mergeReadings) {
+    return core ? { ...core, lessonOn: [...(core.on || [])], lessonKun: [...(core.kun || [])], officialReadings: [], readingsState: 'failed' } : null;
+  }
+  const isOn = (reading) => helpers.readingKey(reading).startsWith('on:');
+  if (core) {
+    return {
+      ...core,
+      on: helpers.mergeReadings(core.on, row?.[1], added.filter(isOn)),
+      kun: helpers.mergeReadings(core.kun, row?.[2], added.filter((reading) => !isOn(reading))),
+      lessonOn: [...(core.on || [])],
+      lessonKun: [...(core.kun || [])],
+      officialReadings: added,
+      readingsState: row ? 'complete' : rows ? 'listed' : kanjiReadingsState(),
+    };
+  }
+  const record = rows?.records.get(id);
+  if (!record) return null;
+  return {
+    c: id, on: [...(row?.[1] || [])], kun: [...(row?.[2] || [])], m: record[1].join('; '), meanings: [...record[1]],
+    st: record[2], rad: record[3], parts: [], officialReadings: added, readingsState: 'complete', joyoOutsideCore: true,
+  };
+}
+/** Every kanji the finder lists: kanji.json's, and the Jōyō forms it lacks once the reference record holds them. */
+function kanjiFinderUniverse() {
+  const rows = kanjiReferenceRows();
+  const keys = Object.keys(D.kanji || {});
+  return rows ? [...keys, ...[...rows.records.keys()].filter((glyph) => !D.kanji[glyph])] : keys;
+}
+
 /** Display-only enrichment. Canonical facts and scheduling records are never
- * overwritten; only an empty display field can borrow attested source data. */
+ * overwritten: the complete readings ride beside them (kanjiReference), and an
+ * empty display field can still borrow attested source data. */
 function kanjiDisplayRecord(id, reference = null) {
   const canonical = D.kanji[id];
-  if (!canonical) return canonical;
+  if (!canonical) return kanjiReference(id) || canonical;
+  const full = kanjiReference(id);
   const entry = reference || referenceLibrary?.entry('kanji', id);
-  if (!entry) return canonical;
+  if (!entry) return full;
   return {
-    ...canonical,
-    on: canonical.on?.length ? canonical.on : entry.on || [],
-    kun: canonical.kun?.length ? canonical.kun : entry.kun || [],
+    ...full,
+    on: full.on?.length ? full.on : entry.on || [],
+    kun: full.kun?.length ? full.kun : entry.kun || [],
     m: canonical.m || entry.meanings?.join('; ') || '',
     st: canonical.st ?? entry.strokeCount,
   };
@@ -22369,7 +22455,8 @@ function renderReferenceMetadata(container, entry) {
     }
   }
   const grouped = new Map();
-  const labels = { on: '音読み', kun: '訓読み', meanings: tx('意味', 'meanings'), strokeCount: tx('画数', 'stroke count') };
+  const labels = { on: '音読み', kun: '訓読み', meanings: tx('意味', 'meanings'), strokeCount: tx('画数', 'stroke count'),
+    readings: tx('すべての読み', 'every reading'), officialReadings: tx('常用漢字表の読み', 'Jōyō table readings') };
   for (const [field, credit] of Object.entries(entry.metadataSources || {})) {
     if (credit.source === 'kanji' || credit.source === 'kmeta') continue;
     const source = `${credit.source} · ${credit.sourceId}`;
@@ -22787,8 +22874,8 @@ function renderKdxStrokes(main) {
   }
   main.append(stRow);
   if (S.kdx.st) {
-    const chars = Object.keys(D.kanji)
-      .filter((c) => D.kanji[c].st === S.kdx.st)
+    const chars = kanjiFinderUniverse()
+      .filter((c) => (D.kanji[c] || kanjiReference(c))?.st === S.kdx.st)
       .sort((a, b) => (a < b ? -1 : 1));
     renderKdxGrid(main, chars, 300);
   }
@@ -34386,19 +34473,65 @@ function renderKanjiNode(sheet, node) {
   meta.append(chips);
   hero.append(meta);
   sheet.append(hero);
-  if (k.skipFallback) sheet.append(el('p', 'skip-fallback-note', tx(
-    'SKIP 索引の KANJIDIC2 項目。このアプリの部品・用例・筆順が未収録のことがあります。',
-    'KANJIDIC2 entry from the SKIP index. This app may not yet have its components, example words or stroke diagram.',
-  )));
+  // K01 · an official Jōyō form kanji.json lacks (剝, 𠮟) says what it is; any other wider entry keeps its SKIP note
+  const joyoForm = !D.kanji[k.c] && !!kanjiReferenceRows()?.records.has(k.c);
+  if (k.skipFallback) sheet.append(el('p', 'skip-fallback-note', joyoForm
+    ? tx('常用漢字表（2010年）の字形。読みと意味は KANJIDIC2 から。このアプリにはこの字の部品のデータがまだない。',
+      'An official Jōyō form (2010). Its readings and meanings come from KANJIDIC2; this app has no component data for it yet.')
+    : tx(
+      'SKIP 索引の KANJIDIC2 項目。このアプリの部品・用例・筆順が未収録のことがあります。',
+      'KANJIDIC2 entry from the SKIP index. This app may not yet have its components, example words or stroke diagram.',
+    )));
 
+  // K01 · every reading of the kanji (kanjiReference): the lessons' selection first, then the rest. A reading
+  // only the official 2010 table gives is starred and named under the list. Until every reading has arrived the
+  // list is the lessons' selection and says so; a failed load offers its retry.
   const kv = el('dl', 'kv');
+  const readingsState = display.readingsState || 'complete';
+  kv.dataset.kanjiReadings = readingsState;
+  const officialOnly = new Set(display.officialReadings || []);
+  const readingLine = (list) => {
+    const span = el('span', 'on');
+    if (!list?.length) span.textContent = '—';
+    // each reading stays whole on its line (a long list breaks only between readings, never inside い.ける)
+    (list || []).forEach((reading, i) => {
+      if (i) span.append(document.createTextNode('・'));
+      const item = el('span', 'reading-item', reading);
+      if (officialOnly.has(reading)) item.append(el('sup', 'reading-official-mark', '*'));
+      span.append(item);
+    });
+    return span;
+  };
   const on = el('dd');
-  on.append(el('span', 'on', (display.on || []).join('・') || '—'));
+  on.append(readingLine(display.on));
   kv.append(withEn(el('dt', null, '音'), 'on'), on);
   const kun = el('dd');
-  kun.append(el('span', 'on', (display.kun || []).join('・') || '—'));
+  kun.append(readingLine(display.kun));
   kv.append(withEn(el('dt', null, '訓'), 'kun'), kun);
   sheet.append(kv);
+  if (officialOnly.size) {
+    const official = el('p', 'fine reading-source-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)'));
+    official.id = 'kanji-reading-official';
+    sheet.append(official);
+  }
+  if (readingsState === 'pending' || readingsState === 'failed') {
+    const line = el('p', 'fine reading-source-note', readingsState === 'failed'
+      ? tx('すべての読みを読み込めなかった。いま見えているのはレッスン用に選んだ読みだけ。', 'Every reading could not be loaded — these are only the readings chosen for lessons.')
+      : tx('いま見えているのはレッスン用に選んだ読み。すべての読みを読み込み中…', 'These are the readings chosen for lessons — loading every reading…'));
+    line.id = 'kanji-readings-status';
+    line.setAttribute('role', 'status');
+    sheet.append(line);
+    if (readingsState === 'failed') {
+      const retry = biLabel('button', 'chip', '再試行', 'Try again');
+      retry.type = 'button';
+      retry.id = 'kanji-readings-retry';
+      retry.addEventListener('click', () => {
+        void loadReferenceExtra();
+        render();
+      });
+      sheet.append(retry);
+    }
+  }
   renderSourceKanjiDoor(sheet, node);
 
   // 部首 — the ONE official radical (the Kangxi classification), with its
@@ -34772,17 +34905,18 @@ function displayKunReading(reading) {
   return dot < 0 ? value : `${value.slice(0, dot)}（${value.slice(dot + 1)}）`;
 }
 
-function strokeReadingRow(ja, en, values, kind = 'on') {
+function strokeReadingRow(ja, en, values, kind = 'on', official = []) {
   const row = el('div', 'stroke-reading-row');
   const label = el('span', 'stroke-reading-label', tx(ja, en));
   const raw = values?.length ? values : [];
-  const value = el(
-    'span',
-    'stroke-reading-value',
-    raw.length
-      ? raw.map((item) => (kind === 'kun' ? displayKunReading(item) : item)).join('・')
-      : '—',
-  );
+  // K01 · a reading only the official 2010 table gives carries the same star as on the kanji page; each reading
+  // stays whole on its line, so a complete list breaks only between readings
+  const value = el('span', 'stroke-reading-value');
+  if (!raw.length) value.textContent = '—';
+  raw.forEach((item, i) => {
+    if (i) value.append(document.createTextNode('・'));
+    value.append(el('span', 'stroke-reading-item', (kind === 'kun' ? displayKunReading(item) : item) + (official.includes(item) ? '*' : '')));
+  });
   value.lang = 'ja';
   if (kind === 'kun' && raw.length) {
     value.setAttribute('aria-label', raw.map((item) => item.replaceAll('.', '')).join('、'));
@@ -34835,9 +34969,15 @@ function strokeAwakeField(page, k) {
   readings.setAttribute('role', 'group');
   readings.setAttribute('aria-label', tx('読み', 'readings'));
   readings.append(
-    strokeReadingRow('音読み', 'on', k?.on, 'on'),
-    strokeReadingRow('訓読み', 'kun', k?.kun, 'kun'),
+    strokeReadingRow('音読み', 'on', k?.on, 'on', k?.officialReadings),
+    strokeReadingRow('訓読み', 'kun', k?.kun, 'kun', k?.officialReadings),
   );
+  // a long complete list (生 has eighteen kun; 54 kanji have more than six of a kind) reads across the whole width
+  // rather than down a half-width column; every other kanji keeps the two boxes side by side
+  if ((k?.on?.length || 0) > 6 || (k?.kun?.length || 0) > 6) readings.classList.add('stroke-reading-field--long');
+  if (k?.officialReadings?.length) {
+    readings.append(el('p', 'stroke-reading-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
+  }
 
   field.append(readings);
   return field;
@@ -35681,9 +35821,11 @@ function renderStrokePage(root) {
       el('span', 'stroke-k-meta', `${k?.st ?? paths.length}画${radC ? ` · ${radC}部` : ''}`),
     );
     const readings = el('span', 'stroke-readings');
+    const officialOnly = new Set(k?.officialReadings || []);
+    const star = (reading) => (officialOnly.has(reading) ? '*' : '');
     if (k?.on?.length) {
       const row = el('span', 'stroke-read-row');
-      row.append(el('span', 'stroke-read-label', '音'), el('span', 'stroke-on', k.on.join('・')));
+      row.append(el('span', 'stroke-read-label', '音'), el('span', 'stroke-on', k.on.map((reading) => reading + star(reading)).join('・')));
       readings.append(row);
     }
     if (k?.kun?.length) {
@@ -35695,9 +35837,13 @@ function renderStrokePage(root) {
         const reading = el('span', 'stroke-kun');
         reading.append(el('span', 'stroke-kun-stem', stem));
         if (oku) reading.append(document.createTextNode(oku));
+        if (star(kn)) reading.append(document.createTextNode(star(kn)));
         row.append(reading);
       });
       readings.append(row);
+    }
+    if (officialOnly.size) {
+      readings.append(el('span', 'stroke-read-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
     }
     khead.append(kleft, readings);
     if (!S.strokeMinimal) body.append(khead);

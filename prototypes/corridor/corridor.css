@@ -1637,6 +1637,27 @@ span.tok.named {
   color: var(--red);
 }
 
+.kv dd .reading-item {
+  white-space: nowrap;
+}
+
+/* Kanji-trust K01 · a reading only the official 2010 table gives carries a star, and one quiet line names it */
+.reading-official-mark,
+.reference-reading-official {
+  margin-left: 0.08em;
+  font-size: 0.62em;
+  line-height: 0;
+  vertical-align: super;
+  color: var(--ink-2);
+}
+
+.reading-source-note {
+  margin: -4px 0 12px;
+  color: var(--ink-2);
+  font-size: var(--type-caption);
+  line-height: 1.5;
+}
+
 /* --------------------------------------------------------- provenance */
 .pool-tag {
   font-size: var(--type-caption);
@@ -3189,6 +3210,12 @@ body.v-depth-layered .stroke-page {
   max-width: 46vw;
   overflow-wrap: anywhere;
 }
+.stroke-read-note {
+  display: block;
+  max-width: 46vw;
+  font-size: var(--type-caption);
+  opacity: 0.8;
+}
 .stroke-read-label {
   margin-right: 0.6em;
   font-size: var(--type-caption);
@@ -3860,6 +3887,21 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   overflow-wrap: anywhere;
   font-size: var(--type-label);
   letter-spacing: 0.08em;
+}
+
+.stroke-reading-item {
+  white-space: nowrap;
+}
+
+.stroke-reading-field--long {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.stroke-reading-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--ink-2);
+  font: var(--type-caption)/1.4 var(--sans);
 }
 
 .stroke-chrome-trigger {
