@@ -89,6 +89,8 @@ const SHELL = [
   'corridor-ink.js',
   'fonts.css',
   'vendor/ts-fsrs.mjs',
+  // the one schedule owner every deck, review and practice asks
+  'srs-core.mjs',
   'dictionary-worker.js',
   'skip-core.js',
   'skip-ui.js',

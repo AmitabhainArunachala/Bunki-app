@@ -3384,7 +3384,9 @@ body:has(#app :is(.kp-study, .kp-done)) #app > .report-line-page { display: none
 }
 /* ─ the head: after a deck's first sittings the task goes unsaid (the marked word says it); the
    level stays as one small figure in the corner, not a chip */
-#app .kp-study .kp-chips > .kp-chip:not(.kp-levelchip) { display: none; }
+#app .kp-study .kp-chips > .kp-chip:not(.kp-levelchip):not(.kp-st-step) { display: none; }
+/* a card in its learning steps, or shown early by the learner's choice, says so quietly (lead's ruling 10-19) */
+#app .kp-study .kp-chips > .kp-st-step { color: var(--kp-ink-2); border-color: transparent; }
 #app .kp-study .kp-chips { flex-wrap: nowrap; min-height: 16px; }
 #app .kp-study .kp-eyebrow { flex: 1 1 auto; min-width: 0; font: 600 var(--type-caption)/1.2 var(--sans, system-ui); letter-spacing: 0.02em; text-transform: none; color: var(--kp-mute); }
 #app .kp[data-hints='0'] .kp-study .kp-eyebrow-t,
@@ -3493,6 +3495,8 @@ body:has(#app .kp-study > .kp-reveal) #app { padding-bottom: 0; }
 #app .kp-done .kp-door-l { font: 500 var(--type-caption)/1 var(--sans, system-ui); letter-spacing: 0.02em; color: var(--kp-mute); }
 #app .kp-done .kp-door-t { font-family: var(--kp-serif); font-weight: 600; font-size: var(--type-reading); line-height: 1.5; letter-spacing: 0.03em; }
 #app .kp-done .kp-home-quiet, #app .kp-done > .kp-start:not(.kp-door) { justify-self: start; min-height: 44px; padding: 0; border: 0; background: none; box-shadow: none; font: 500 var(--type-control)/1 var(--sans, system-ui); color: var(--kp-stage-ink); text-decoration: none; }
+/* the close's honest choice (review them now, early) sits with the other quiet doors, flush left */
+#app .kp-done > .kp-ahead { width: auto; text-align: start; }
 #app .kp-done .kp-undo { justify-self: start; padding: 0; font: 500 var(--type-label)/1 var(--sans, system-ui); color: var(--kp-stage-mute); }
 /* ─ grading: four pads on the stage, colour coded as chosen on 10-08 (D1: "Four (Again · Hard · Good ·
    Easy) — and color coded"), red · amber · green · blue as in the decks. Each word takes its hue at a

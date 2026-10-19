@@ -17,23 +17,35 @@
 import {
   RATINGS,
   buildQueue,
+  buriedToday,
+  buriedWords,
   cardTokens,
+  changeOf,
+  closeLines,
   createScheduler,
   defTokens,
   grade,
   indexDeck,
   inspectState,
   isLeech,
+  isSuspended,
+  LEARN_AHEAD_MS,
   learningSoon,
   logLookup,
+  nextStep,
   normalizeState,
+  noteAnsweredWord,
+  pauseWords,
   preview,
   repairCard,
   restoreSuspended,
+  servable,
+  sittingTally,
   skipFor,
   suspendCard,
   swapCard,
   swapTarget,
+  undoChange,
   validateDeck,
   wordStatus,
 } from './engine.js';
@@ -112,8 +124,11 @@ export function hostAdapter() {
 const PREFS_DEFAULT = { newPerDay: 15, mode: 'read', gloss: 'tap', zoom: 'auto', ruleSeen: false, sittings: 0 };
 /** 「タップして答えを見る」 and the swipe hint show for this many sittings per deck, then retire */
 const HINT_SITTINGS = 3;
-const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, log: [], started: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null };
-let ctx = null; // { root, deck, deckKey, index, storage, onLeave, openEntry, host, tokenFile, gloss, state, prefs, notice }
+// the sitting (srs-core's rule): ahead — the learner chose to review learning steps early; early — the card on screen
+// came by that choice; pause — nothing else is left but cards in a learning step ({ count, words, at, canEarly });
+// shown — the card's stored record when it was put on screen (a grade refuses if another window changed it since)
+const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, log: [], started: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null, ahead: false, early: false, pause: null, shown: 'null', buried: 0 };
+let ctx = null; // { root, deck, deckKey, index, storage, onLeave, openEntry, host, tokenFile, gloss, state, ledgerText, scheduler, prefs, notice }
 let mountRequest = 0;
 let pendingStart = null;
 
@@ -290,13 +305,71 @@ function loadState(storage, deck) {
   const storedCards = raw && typeof raw === 'object' && raw.cards && typeof raw.cards === 'object' ? Object.keys(raw.cards).length : 0;
   if (text != null && !Object.keys(state.cards).length && (unreadable || storedCards)) {
     const kept = writeRaw(storage, quarantineKey(deck.id), text);
-    return { state, notice: kept ? QUARANTINED : '' };
+    return { state, notice: kept ? QUARANTINED : '', text };
   }
-  return { state, notice: '' };
+  return { state, notice: '', text };
 }
-/** write a candidate ledger; the caller adopts it only when this returns true */
+/** write a candidate ledger; the caller adopts it only when this returns true. The text written becomes this
+ * window's revision of the ledger (writeLedger). */
 function save(state) {
-  return writeJson(ctx.storage, stateKey(ctx.deck.id), state);
+  const text = JSON.stringify(state);
+  if (!writeRaw(ctx.storage, stateKey(ctx.deck.id), text)) return false;
+  ctx.ledgerText = text;
+  return true;
+}
+/**
+ * The one way a grade, an undo or a repair reaches the ledger: fresh-read-then-write with a revision check.
+ * The revision is the exact stored text this window last read or wrote. When another window (a second tab, an
+ * open standalone page) has written since, its ledger is read again and the change is made on it (merge);
+ * `change(fresh)` may refuse by returning null, as a grade does when its card was answered there. A whole
+ * ledger this window holds is never written over newer grades (sol, 10-19: four six-day dates were rolled back).
+ * A stored ledger that cannot be read is not adopted. Returns { state, before } | { refused: true } | { failed: true }.
+ */
+function writeLedger(change) {
+  let text;
+  try {
+    text = ctx.storage.getItem(stateKey(ctx.deck.id));
+  } catch {
+    text = ctx.ledgerText;
+  }
+  if (text !== ctx.ledgerText && text != null) {
+    let raw = null;
+    try {
+      raw = JSON.parse(text);
+    } catch {
+      raw = null;
+    }
+    const read = raw ? normalizeState(raw, ctx.deck) : null;
+    if (read && (Object.keys(read.cards).length || !Object.keys(ctx.state.cards).length)) {
+      ctx.state = read;
+      ctx.ledgerText = text;
+    }
+  }
+  const before = ctx.state;
+  const next = change(before);
+  if (!next) return { refused: true };
+  if (!save(next)) return { failed: true };
+  ctx.state = next;
+  return { state: next, before };
+}
+/** another window wrote this deck's ledger: read it now, so what this one shows and answers is current */
+function onStorage(e) {
+  if (!ctx?.root?.isConnected || e.storageArea !== ctx.storage || e.key !== stateKey(ctx.deck.id) || e.newValue == null || e.newValue === ctx.ledgerText) return;
+  let raw = null;
+  try {
+    raw = JSON.parse(e.newValue);
+  } catch {
+    return;
+  }
+  const read = normalizeState(raw, ctx.deck);
+  if (!Object.keys(read.cards).length && Object.keys(ctx.state.cards).length) return;
+  ctx.state = read;
+  ctx.ledgerText = e.newValue;
+  // a close that is waiting on cards in a learning step counts them again; the card on screen is checked when answered
+  if (ui.screen === 'home' || (ui.screen === 'study' && !ui.queue[ui.pos])) {
+    if (ui.screen === 'study') refreshPause();
+    paint();
+  }
 }
 /** adopt new settings only once they are stored */
 function savePrefs(prefs) {
@@ -370,6 +443,8 @@ const UI_EN = {
   "思い出せた": "Recalled",
   "← もう一度　　スワイプ　　正解 →": "← Again　　Swipe　　Good →",
   "このヒントを閉じる": "Dismiss this hint",
+  "この札は別のウィンドウで答えました。次の札へ進みます。": "This card was answered in another window. On to the next one.",
+  "別のウィンドウで答えが変わったので、戻せませんでした。": "The answer changed in another window, so it could not be undone.",
   "おつかれさま": "Session complete",
   "回答": "Answers",
   "思い出せた割合": "Recall rate",
@@ -876,7 +951,7 @@ function titleParts(deck) {
 function homeScreen() {
   const { deck, state, prefs } = ctx;
   const now = new Date();
-  const q = buildQueue(deck, state, now, prefs.newPerDay, { skip: skipFor(prefs.mode) });
+  const q = buildQueue(deck, state, now, prefs.newPerDay, { skip: skipFor(prefs.mode), buried: buriedToday(ctx.storage, deck.id, now) });
   const statuses = deck.words.map((w) => wordStatus(w, state));
   const known = statuses.filter((s) => s.key === 'known').length;
   const hard = statuses.filter((s) => s.key === 'hard').length;
@@ -903,9 +978,19 @@ function homeScreen() {
   box.append(tiles);
 
   const total = q.queue.length;
-  const start = btn('kp-start', total ? t(`始める — ${fmtN(total)}枚`, `Begin — ${nounEn(total, 'card')}`) : t("今日はここまで"), () => startSession(), { id: 'kp-start' });
-  start.disabled = !total;
+  // nothing due, but cards still in a learning step: they wait for their time, and the sitting's close offers them early
+  const stepping = total ? [] : learningCards(now);
+  const nextStepAt = stepping.length ? Math.min(...stepping.map((l) => l.due)) : 0;
+  const label = total
+    ? t(`始める — ${fmtN(total)}枚`, `Begin — ${nounEn(total, 'card')}`)
+    : stepping.length
+      ? t(`学習中 ${fmtN(stepping.length)}枚 — 次は ${fmtWait(Math.max(0, nextStepAt - now.getTime()))}後`, `${nounEn(stepping.length, 'card')} in a learning step — next in ${fmtWait(Math.max(0, nextStepAt - now.getTime()))}`)
+      : t("今日はここまで");
+  const start = btn('kp-start', label, () => startSession(), { id: 'kp-start' });
+  start.disabled = !total && !stepping.length;
   box.append(start);
+  // cards whose word was answered on another surface today rest until tomorrow (burying across decks), said quietly
+  if (q.buried) box.append(el('p', 'kp-sub kp-buried', buriedWords(q.buried, ctx.english === false ? 'ja' : 'en')));
 
   const foot = el('div', 'kp-foot');
   foot.append(btn('kp-link', t("語の一覧"), () => go('list'), { id: 'kp-to-list' }), btn('kp-link', t("設定"), () => go('settings'), { id: 'kp-to-settings' }));
@@ -931,12 +1016,13 @@ function topicSettings() {
     box2.checked = !off.has(g.id);
     box2.dataset.group = g.id;
     box2.addEventListener('change', () => {
-      const set = new Set(ctx.state.groupsOff);
-      if (box2.checked) set.delete(g.id);
-      else set.add(g.id);
-      const nextState = { ...ctx.state, groupsOff: [...set] };
-      if (!save(nextState)) return saveFailed();
-      ctx.state = nextState;
+      const r = writeLedger((fresh) => {
+        const set = new Set(fresh.groupsOff);
+        if (box2.checked) set.delete(g.id);
+        else set.add(g.id);
+        return { ...fresh, groupsOff: [...set] };
+      });
+      if (r.failed) return saveFailed();
       ui.toast = '';
       paintResponse({ hold: false });
     });
@@ -991,7 +1077,7 @@ function frameFront() {
 }
 
 function startSession() {
-  const q = buildQueue(ctx.deck, ctx.state, new Date(), ctx.prefs.newPerDay, { skip: skipFor(ctx.prefs.mode) });
+  const q = buildQueue(ctx.deck, ctx.state, new Date(), ctx.prefs.newPerDay, { skip: skipFor(ctx.prefs.mode), buried: buriedToday(ctx.storage, ctx.deck.id, new Date()) });
   // one more sitting of this deck: the tap and swipe hints count these (HINT_SITTINGS). Not stored
   // (storage full) only means they show a little longer.
   const prefs = { ...ctx.prefs, sittings: (Number(ctx.prefs.sittings) || 0) + 1 };
@@ -1005,7 +1091,9 @@ function startSession() {
   ui.started = Date.now();
   ui.undo = null;
   ui.rail = 0;
-  refill();
+  ui.ahead = false;
+  ui.buried = q.buried;
+  settle();
   resetCard();
   wantTokens();
   go('study');
@@ -1018,14 +1106,67 @@ function resetCard() {
   ui.pop = null;
 }
 
-/** pull learning steps that came due back into the sitting, right after the
- * card under the cursor (never in its place: the card on screen never changes) */
-function refill() {
+/** this sitting's learning and relearning cards (the deck's, in its topics and mode), each with its due */
+function learningCards(now) {
+  return learningSoon(ctx.deck, ctx.state, now, Infinity, { skip: skipFor(ctx.prefs.mode) }).map(({ id, t }) => ({ id, due: t }));
+}
+/**
+ * Put the sitting's next card at the cursor, by srs-core's rule (Anki's order): a learning step that is due now;
+ * else the next card still waiting (a due review or a new card) that may still be answered now; else, with nothing
+ * else left, the steps still to come: shown early only once the learner chose to (ui.ahead), otherwise the close
+ * pauses on them (ui.pause) and offers that choice. The card on screen is never replaced: this runs only between
+ * cards. A waiting card another window has since answered is dropped here.
+ */
+function settle() {
   const now = new Date();
-  const ahead = new Set(ui.queue.slice(ui.pos));
-  for (const { id, t } of learningSoon(ctx.deck, ctx.state, now, 0, { skip: skipFor(ctx.prefs.mode) })) {
-    if (!ahead.has(id) && t <= now.getTime()) ui.queue.splice(ui.pos + 1, 0, id);
+  const waiting = [];
+  // a word answered on another surface since the sitting began rests too (its 字 cards and learning steps stay)
+  const rests = buriedToday(ctx.storage, ctx.deck.id, now);
+  for (const id of ui.queue.slice(ui.pos)) {
+    if (waiting.includes(id) || isSuspended(ctx.state, id) || !ctx.index.cards.has(id)) continue;
+    const s = ctx.state.cards[id];
+    if (!servable(s, now) || (s && s.state !== 2 && s.state !== 0)) continue;
+    const { card, word } = ctx.index.cards.get(id);
+    if (card.type !== 'kanji' && rests(word)) {
+      ui.buried++;
+      continue;
+    }
+    waiting.push(id);
   }
+  const queued = new Set(waiting);
+  const learning = learningCards(now).filter((l) => !queued.has(l.id));
+  const step = nextStep({ now, queue: waiting, learning, ahead: ui.ahead });
+  ui.queue = [...ui.queue.slice(0, ui.pos), ...waiting];
+  ui.early = false;
+  ui.pause = null;
+  if (step.show) {
+    ui.queue = [...ui.queue.slice(0, ui.pos), step.show, ...waiting.filter((id) => id !== step.show)];
+    ui.early = step.early;
+    ui.shown = JSON.stringify(ctx.state.cards[step.show] ?? null);
+  } else if (step.pause) {
+    const words = new Set(learning.map((l) => ctx.index.cards.get(l.id)?.word.id));
+    ui.pause = { count: step.count, words: words.size, at: step.at, canEarly: step.canEarly };
+  }
+}
+/** the close's pause, read again when a step falls due or comes within the learn-ahead limit, or another window wrote:
+ * the close stays until the learner chooses ("they will wait for you"); a step that is due now reads "due now" */
+function refreshPause() {
+  const now = new Date();
+  const learning = learningCards(now);
+  if (!learning.length) {
+    ui.pause = null;
+    return;
+  }
+  const next = Math.min(...learning.map((l) => l.due));
+  const words = new Set(learning.map((l) => ctx.index.cards.get(l.id)?.word.id));
+  ui.pause = { count: learning.length, words: words.size, at: Math.max(next, now.getTime()), canEarly: next - now.getTime() <= LEARN_AHEAD_MS };
+}
+/** the close's choice: review the cards in a learning step now (early, when they are not due yet) */
+function reviewAhead() {
+  ui.ahead = true;
+  settle();
+  resetCard();
+  paintResponse({ resetScroll: true, front: true });
 }
 
 /** the answer mode for the card on screen. 4択 offers whole words, and the rest
@@ -1096,7 +1237,11 @@ function studyScreen() {
     ...passageChips(card),
     TOPIC[card.topic] ? null : el('span', 'kp-chip', t(ctx.deck.groups.find((g) => g.id === word.group)?.titleJa || '', ctx.deck.groups.find((g) => g.id === word.group)?.titleEn || '')),
     word.level ? levelChip(word.level) : null,
-    el('span', `kp-chip ${stored ? 'kp-st-learn' : 'kp-st-new'}`, stored ? t("復習") : t("初めて")),
+    // where the card is in its schedule: never seen, still in a learning step, or a review
+    // (the focus room draws only the step one: kp-st-step)
+    el('span', `kp-chip ${!stored ? 'kp-st-new' : stored.state === 1 || stored.state === 3 ? 'kp-st-learn kp-st-step' : 'kp-st-learn'}`, !stored ? t("初めて") : stored.state === 1 || stored.state === 3 ? t('学習中', 'Learning') : t("復習")),
+    // shown before its step is due, by the learner's choice at the close: it says so, and why
+    ui.early ? el('span', 'kp-chip kp-st-early kp-st-step', t('少し早め · ほかに札がないため', 'Early · nothing else left')) : null,
   );
   // the card's one instruction, as its eyebrow (chrome: it names the task, never the answer)
   chips.prepend(cardEyebrow(card, mode));
@@ -1156,6 +1301,11 @@ function studyScreen() {
     if (mode === 'choice') {
       const ok = ui.picked === word.id;
       box.append(el('p', `kp-verdict ${ok ? 'kp-c-known' : 'kp-c-hard'}`, ok ? t("正解") : t(`不正解 — 正しくは ${word.term}`, `Incorrect — the answer is ${word.term}`)));
+      const after = ctx.state.cards[id];
+      if (after && (after.state === 1 || after.state === 3)) {
+        const back = fmtWait(Math.max(0, new Date(after.due).getTime() - Date.now()));
+        box.append(el('p', 'kp-stepnote', t(`学習中：${back}後にもう一度出ます。`, `Learning: it comes back in ${back}.`)));
+      }
       box.append(btn('kp-next', t("次へ →"), () => next(), { id: 'kp-next' }));
     } else {
       box.append(gradeBar(id));
@@ -1948,8 +2098,8 @@ function deckIds() {
  * (storage full) only means the row is missing: the tap still opens. */
 function logTap(card, where, frame, depth) {
   const cardId = card?.id || ui.queue[ui.pos] || '';
-  const next = logLookup(ctx.state, { cardId, where, surface: frame.surface, key: frame.key, depth }, new Date());
-  if (save(next)) ctx.state = next;
+  // a lookup is written like a grade: on the ledger as it is stored now, never a stale copy over another window's grades
+  writeLedger((fresh) => logLookup(fresh, { cardId, where, surface: frame.surface, key: frame.key, depth }, new Date()));
 }
 
 /** the word whose meaning is open shows its reading; closing the meaning returns the clean text */
@@ -2057,6 +2207,8 @@ const DELETED = 'このカードを削除しました（設定 › 保留中の�
 const SWAPPED = '別の文に替えました。前の文は保留にしました。';
 const SUSPENDED = '保留にしました（設定 › 保留中のカード から戻せます）。';
 const UNDOABLE = [DELETED, SWAPPED, SUSPENDED];
+const ELSEWHERE = 'この札は別のウィンドウで答えました。次の札へ進みます。';
+const UNDO_STALE = '別のウィンドウで答えが変わったので、戻せませんでした。';
 
 /** the back's nodes in order: the answer (tier one, a leech's ladder, then the folds), then its quiet row (削除) */
 function backParts(card, word) {
@@ -2121,11 +2273,17 @@ function leechLadder(card, word) {
   return box;
 }
 
-/** adopt a ledger change made on the card on screen: stored first, then one undo step */
-function adoptRepair(nextState) {
-  if (!save(nextState)) return saveFailed();
-  ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log] };
-  ctx.state = nextState;
+/** this sitting's place, for one undo step */
+function sittingNow() {
+  return { queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log], ahead: ui.ahead, early: ui.early, shown: ui.shown };
+}
+/** adopt a ledger change made on the card on screen (change: fresh ledger → changed ledger, via writeLedger): stored
+ * first, then one undo step that takes back only what it touched */
+function adoptRepair(change) {
+  const sitting = sittingNow();
+  const r = writeLedger(change);
+  if (r.failed || r.refused) return saveFailed();
+  ui.undo = { change: changeOf(r.before, r.state), sitting };
   return true;
 }
 /** the card leaves the sitting: this and every later place it held in the queue */
@@ -2134,35 +2292,44 @@ function dropFromQueue(id) {
 }
 function deleteCard() {
   const id = ui.queue[ui.pos];
-  if (!id || !adoptRepair(suspendCard(ctx.state, id, 'delete', new Date()))) return;
+  if (!id || !adoptRepair((fresh) => suspendCard(fresh, id, 'delete', new Date()))) return;
   dropFromQueue(id);
+  settle();
   ui.toast = DELETED;
   resetCard();
   paintResponse({ front: true });
 }
 function ladderSwap(card, word) {
-  const done = swapCard(word, card, ctx.state, new Date());
-  if (!done || !adoptRepair(done.state)) return;
+  let to = null;
+  if (!swapCard(word, card, ctx.state, new Date())) return;
+  const swapped = adoptRepair((fresh) => {
+    const done = swapCard(word, card, fresh, new Date());
+    to = done?.to ?? null;
+    return done?.state ?? null;
+  });
+  if (!swapped) return;
   dropFromQueue(card.id);
-  ui.queue.splice(ui.pos, 0, done.to); // the new passage takes the card's place, front first
+  ui.queue.splice(ui.pos, 0, to); // the new passage takes the card's place, front first
+  ui.shown = 'null';
   ui.toast = SWAPPED;
   resetCard();
   paint();
 }
 function ladderHint(card, hint) {
-  if (!adoptRepair(repairCard(ctx.state, card.id, 'hint', new Date(), hint))) return;
+  if (!adoptRepair((fresh) => repairCard(fresh, card.id, 'hint', new Date(), hint))) return;
   ui.toast = '';
   paint();
 }
 function ladderSuspend(card) {
-  if (!adoptRepair(suspendCard(ctx.state, card.id, 'leech', new Date()))) return;
+  if (!adoptRepair((fresh) => suspendCard(fresh, card.id, 'leech', new Date()))) return;
   dropFromQueue(card.id);
+  settle();
   ui.toast = SUSPENDED;
   resetCard();
   paint();
 }
 function ladderKeep(card) {
-  if (!adoptRepair(repairCard(ctx.state, card.id, 'keep', new Date()))) return;
+  if (!adoptRepair((fresh) => repairCard(fresh, card.id, 'keep', new Date()))) return;
   ui.toast = '';
   paint();
 }
@@ -2219,7 +2386,7 @@ const GRADES = [
 const RULE = '答えを見て初めて分かったなら「もう一度」';
 function gradeBar(id) {
   // each pad shows the interval the pinned scheduler gives that answer, now (engine preview)
-  const pv = preview(fsrsApi, scheduler, ctx.state, id, new Date());
+  const pv = preview(fsrsApi, ctx.scheduler, ctx.state, id, new Date());
   const bar = el('div', 'kp-grades');
   // in 日本語 each pad carries its seal glyph (Kaisei Tokumin: 再 難 良 易); English shows the word only
   const seal = (glyph) => {
@@ -2236,6 +2403,9 @@ function gradeBar(id) {
       }),
     );
   }
+  // a card whose Good keeps it in its learning steps says so, quietly: it will be back (Kimi's note, lead's ruling 10-19)
+  const st = ctx.state.cards[id];
+  if ((!st || st.state !== 2) && pv.good < DAY) bar.append(el('p', 'kp-stepnote', t(`学習中：正解でも ${fmtWait(pv.good)}後にもう一度出ます。`, `Learning: Good brings it back in ${fmtWait(pv.good)}.`)));
   // the gesture is explained once: on the first back of the deck's first sitting (help never sits in the
   // pads' way after that)
   if (swipeHintOn()) bar.append(el('p', 'kp-swipehint', t("← もう一度　　スワイプ　　正解 →")));
@@ -2696,8 +2866,24 @@ function retireRule() {
 function commit(rating, { stay = false } = {}) {
   const id = ui.queue[ui.pos];
   if (!id) return;
-  const nextState = grade(fsrsApi, scheduler, ctx.state, id, rating, new Date());
-  if (!save(nextState)) {
+  const now = new Date();
+  const sitting = sittingNow();
+  // graded on the ledger as it is now, and only if the card is still the one put on screen and may be answered now
+  // (srs-core's gate): a card another window has answered, or one a stale queue still held, is never graded early
+  const r = writeLedger((fresh) => {
+    const stored = fresh.cards[id] ?? null;
+    if (isSuspended(fresh, id) || JSON.stringify(stored) !== ui.shown || !servable(stored, now, { learnAhead: true })) return null;
+    return grade(fsrsApi, ctx.scheduler, fresh, id, rating, now);
+  });
+  if (r.refused) {
+    dropFromQueue(id);
+    settle();
+    resetCard();
+    ui.toast = ELSEWHERE;
+    paintResponse({ front: true });
+    return;
+  }
+  if (r.failed) {
     // not stored: the same card stays, ready to answer again
     if (cardMode() === 'choice') {
       ui.revealed = false;
@@ -2707,14 +2893,17 @@ function commit(rating, { stay = false } = {}) {
     return;
   }
   askToKeepStorage();
+  // the word was answered here today: its cards on the other surfaces rest until tomorrow
+  const indexed = ctx.index.cards.get(id);
+  noteAnsweredWord(ctx.storage, ctx.deck.id, indexed?.word, indexed?.card, now);
   if (cardMode() !== 'choice') retireRule();
   ui.toast = '';
-  ui.undo = { state: ctx.state, queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log] };
-  ctx.state = nextState;
+  ui.undo = { change: changeOf(r.before, r.state), sitting };
   ui.done++;
   if (rating >= RATINGS.hard) ui.right++;
   const answered = ctx.index.cards.get(id)?.word;
-  if (answered) ui.log.push({ term: answered.term, ok: rating >= RATINGS.hard });
+  // the close counts these: the word, where the card was in its schedule before this answer, and whether it came early
+  if (answered) ui.log.push({ term: answered.term, ok: rating >= RATINGS.hard, word: answered.id, before: r.before.cards[id]?.state ?? null, rating, early: ui.early });
   if (stay) {
     paint();
     return;
@@ -2743,13 +2932,9 @@ function askToKeepStorage() {
 function next(dir) {
   const id = ui.queue[ui.pos];
   const held = !motionOk() ? holdStudy(ctx.root.querySelector('.kp-study')) : null;
-  refill();
   ui.pos++;
-  // a learning step due within the sitting comes back after a few cards
-  const s = ctx.state.cards[id];
-  if (s && s.state !== 2 && new Date(s.due).getTime() - Date.now() < 15 * MIN) {
-    ui.queue.splice(Math.min(ui.queue.length, ui.pos + 4), 0, id);
-  }
+  // the next card by srs-core's rule: a learning step comes back when it is due, never a few cards later
+  settle();
   resetCard();
   const ghost = dir && motionOk() ? ghostOf(ctx.root.querySelector('#kp-card'), dir) : null;
   paint();
@@ -2816,17 +3001,26 @@ function arrive(ghost, dir) {
 
 function undo() {
   if (!ui.undo) return;
-  // the words looked up since stay looked up: undo takes back answers and repairs, not lookups
-  const restored = { ...ui.undo.state, lookups: ctx.state.lookups || [] };
-  if (!save(restored)) return saveFailed();
-  ui.toast = '';
-  ctx.state = restored;
-  ui.queue = ui.undo.queue;
-  ui.pos = ui.undo.pos;
-  ui.done = ui.undo.done;
-  ui.right = ui.undo.right;
-  ui.log = ui.undo.log || [];
+  // only what the answer or repair touched goes back: another window's grades and the words looked up since stay
+  const { change, sitting } = ui.undo;
+  const r = writeLedger((fresh) => undoChange(fresh, change));
+  if (r.failed) return saveFailed();
   ui.undo = null;
+  if (r.refused) {
+    ui.toast = UNDO_STALE;
+    paint();
+    return;
+  }
+  ui.toast = '';
+  ui.queue = sitting.queue;
+  ui.pos = sitting.pos;
+  ui.done = sitting.done;
+  ui.right = sitting.right;
+  ui.log = sitting.log || [];
+  ui.ahead = sitting.ahead;
+  ui.early = sitting.early;
+  ui.pause = null;
+  ui.shown = JSON.stringify(ctx.state.cards[ui.queue[ui.pos]] ?? null);
   resetCard();
   ui.revealed = cardMode() !== 'choice';
   ui.seen = !!ctx.state.cards[ui.queue[ui.pos]];
@@ -2894,12 +3088,16 @@ function attachSwipe(face) {
 }
 
 /**
- * The session close: the surface is clear. The words of this sitting rise off the card table
- * (the ones answered もう一度 in 朱), then the tally from this sitting only: kept (難しい, 正解, 簡単),
- * again (もう一度) and the time since 始める, the recall rate, when the next review falls due,
- * and one door: back to the deck.
+ * The session close: the surface is clear. The words of this sitting rise off the card table (the ones answered
+ * もう一度 in 朱), then what the sitting did in one or two sentences counted from its own answers (srs-core
+ * closeLines: new words, reviews, answers, the learning-step returns and how many came early, the words that
+ * needed Again), the tally (recalled, again, time) and the recall rate. While cards are still in a learning step
+ * it offers the one honest choice (lead's ruling 10-19): review them now, early (within the learn-ahead limit), or
+ * they wait. Then one door forward and back to the deck.
  */
+let pauseTimer = null;
 function doneScreen() {
+  clearTimeout(pauseTimer);
   const box = el('section', 'kp-done');
   box.append(topBar(t("おつかれさま")));
   box.append(el('h2', 'kp-done-title', t("机の上は、空になった。", "The surface is clear.")));
@@ -2917,29 +3115,43 @@ function doneScreen() {
     });
     box.append(rise);
   }
+  const now = new Date();
+  const lang = ctx.english === false ? 'ja' : 'en';
+  const tally = sittingTally(ui.log.map((x) => ({ word: x.word ?? x.term, before: x.before ?? null, rating: x.rating ?? (x.ok ? RATINGS.good : RATINGS.again), early: !!x.early })), { startedAt: ui.started || null, now });
   const pct = ui.done ? Math.round((ui.right / ui.done) * 100) : 0;
-  const secs = ui.started ? Math.max(0, Math.round((Date.now() - ui.started) / 1000)) : 0;
+  const secs = tally.seconds;
   const clock = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
   const cell = (label, value, cls) => el('div', `kp-tally-c ${cls}`, el('span', null, label), el('b', null, value));
-  box.append(el('div', 'kp-tally', cell(t("覚えた", "Kept"), String(ui.right), 'kp-tally-kept'), cell(t("もう一度"), String(ui.done - ui.right), 'kp-tally-again'), cell(t("時間", "Time"), clock, 'kp-tally-time')));
-  const rate = el('p', 'kp-done-rate', el('span', null, t("思い出せた割合")), el('b', null, `${pct}%`), el('span', null, `${t("回答")} ${ui.done}`));
-  if (!ctx.focusRoom) box.append(rate);
-  const soon = learningSoon(ctx.deck, ctx.state, new Date(), DAY, { skip: skipFor(ctx.prefs.mode) })[0];
-  // in the app's focus room the close says it in one sentence, and the recall rate stays under it as
-  // one quiet line (the tally boxes above stay the standalone page's)
-  if (ctx.focusRoom) {
-    // what happened, in one sentence and only what is true: the words met, the minutes, and how many
-    // needed a second look (they were seen again in the sitting; when they return is the next line)
-    const met = new Set(ui.log.map((x) => x.term)).size;
-    const second = missed.size;
-    const mins = Math.max(1, Math.round(secs / 60));
-    const minEn = `${mins} ${mins === 1 ? 'minute' : 'minutes'}`;
-    box.append(el('p', 'kp-done-line', second
-      ? t(`${met} 語に出会った（${mins} 分）。${second} 語はもう一度見た。`, `You met ${met} ${met === 1 ? 'word' : 'words'} in ${minEn}. ${second} needed a second look.`)
-      : t(`${met} 語に出会った（${mins} 分）。`, `You met ${met} ${met === 1 ? 'word' : 'words'} in ${minEn}.`)));
-    box.append(rate);
+  // what happened, only what is true: every number is a count of this sitting's answers
+  if (ui.log.length) {
+    const said = el('div', 'kp-done-said');
+    for (const line of closeLines(tally, lang)) said.append(el('p', 'kp-done-line', line));
+    box.append(said);
   }
-  box.append(el('p', 'kp-sub', soon ? t(`次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。`, `Next review in ${fmtWait(Math.max(0, soon.t - Date.now()))}.`) : t("今日の分は終わり。また明日。")));
+  if (!ctx.focusRoom) box.append(el('div', 'kp-tally', cell(t("思い出せた", "Recalled"), String(ui.right), 'kp-tally-kept'), cell(t("もう一度"), String(ui.done - ui.right), 'kp-tally-again'), cell(t("時間", "Time"), clock, 'kp-tally-time')));
+  box.append(el('p', 'kp-done-rate', el('span', null, t("思い出せた割合")), el('b', null, `${pct}%`), el('span', null, `${t("回答")} ${ui.done}`)));
+  if (ui.pause) {
+    // cards still in a learning step: they come back when due; the learner may review them now, early, within the limit
+    const said = pauseWords({ ...ui.pause, count: ui.pause.words }, lang, now);
+    const line = el('p', 'kp-sub kp-pause', said.line);
+    line.id = 'kp-pause';
+    box.append(line);
+    if (said.now) box.append(btn('kp-start kp-ahead', said.now, reviewAhead, { id: 'kp-ahead' }));
+    // the line and its choice change when the next step falls due, or comes within the learn-ahead limit
+    const turn = ui.pause.canEarly ? ui.pause.at : ui.pause.at - LEARN_AHEAD_MS;
+    if (turn > now.getTime()) {
+      pauseTimer = setTimeout(() => {
+        if (ui.screen === 'study' && !ui.queue[ui.pos] && ctx?.root?.isConnected) {
+          refreshPause();
+          paint();
+        }
+      }, Math.min(2 ** 31 - 1, turn - now.getTime() + 50));
+    }
+  } else {
+    const soon = learningSoon(ctx.deck, ctx.state, now, DAY, { skip: skipFor(ctx.prefs.mode) })[0];
+    box.append(el('p', 'kp-sub', soon ? t(`次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。`, `Next review in ${fmtWait(Math.max(0, soon.t - Date.now()))}.`) : t("今日の分は終わり。また明日。")));
+  }
+  if (ui.buried) box.append(el('p', 'kp-sub kp-buried', buriedWords(ui.buried, lang)));
   // one door forward: the host's reading for today, the words just met waiting in it
   const door = ctx.focusRoom ? safely(() => ctx.next?.() || null, null) : null;
   if (door) {
@@ -2947,7 +3159,7 @@ function doneScreen() {
     doorButton.querySelector('.kp-door-t').lang = 'ja';
     box.append(doorButton);
   }
-  box.append(btn(door ? 'kp-link kp-home-quiet' : 'kp-start', t("デッキに戻る"), () => go('home'), { id: 'kp-home' }));
+  box.append(btn(door || ui.pause?.canEarly ? 'kp-link kp-home-quiet' : 'kp-start', t("デッキに戻る"), () => go('home'), { id: 'kp-home' }));
   if (ui.undo) box.append(btn('kp-undo', t("ひとつ戻す"), undo, { id: 'kp-undo' }));
   return box;
 }
@@ -3075,9 +3287,8 @@ function suspendedField() {
   const count = el('p', 'kp-sub', ids.length ? t(`${fmtN(ids.length)}枚（${Object.entries(why).map(([k, n]) => `${SUSPEND_WHY[k] || k} ${n}`).join('・')}）`, `${nounEn(ids.length, 'card')} (${Object.entries(why).map(([k, n]) => `${t(SUSPEND_WHY[k] || k)} ${n}`).join(' · ')})`) : t("ありません"));
   count.id = 'kp-suspended';
   const back = btn('', t("復元"), () => {
-    const nextState = restoreSuspended(ctx.state, new Date(), ids);
-    if (!save(nextState)) return saveFailed();
-    ctx.state = nextState;
+    const r = writeLedger((fresh) => restoreSuspended(fresh, new Date(), ids));
+    if (r.failed) return saveFailed();
     ui.undo = null;
     ui.toast = '';
     paint();
@@ -3200,7 +3411,7 @@ function ensureCss() {
   document.head.append(link);
 }
 
-export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false, words = null } = {}) {
+export async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false, words = null, learner = null } = {}) {
   const request = ++mountRequest;
   if (autoStart !== undefined) pendingStart = { deckId, autoStart };
   ensureCss();
@@ -3242,10 +3453,13 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     // Q · the host's one rule for Japanese line breaks: text → its words, as groups of segments (the app's jaWordGroups);
     // the standalone pages have none and keep the browser's breaks
     words: typeof words === 'function' ? words : null,
+    // the learner's own schedule policy (retention, steps, fitted weights) when the host passes it: one policy on every
+    // surface (lead's ruling 10-19); the standalone pages have none and use the pin
+    scheduler: learner ? createScheduler(fsrsApi, pin, learner) : scheduler,
   };
   root.addEventListener('pointerdown', onDown, true);
   wireDeckHold(root);
-  ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));
+  ({ state: ctx.state, notice: ctx.notice, text: ctx.ledgerText } = loadState(storage, deck));
   if (!sameDeck || start === false) {
     ui.screen = 'home';
     ui.queue = [];
@@ -3253,6 +3467,7 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
   }
   if (!keyBound) {
     document.addEventListener('keydown', onKey);
+    window.addEventListener('storage', onStorage);
     window.addEventListener('scroll', () => ui.pop && placePop(), { passive: true });
     keyBound = true;
   }
@@ -3297,6 +3512,6 @@ export async function summary(deckId, storage = window.localStorage) {
   const { deck } = await loadDeck(deckId);
   const { state } = loadState(storage, deck);
   const prefs = prefsFor(storage, deck);
-  const q = buildQueue(deck, state, new Date(), prefs.newPerDay, { skip: skipFor(prefs.mode) });
+  const q = buildQueue(deck, state, new Date(), prefs.newPerDay, { skip: skipFor(prefs.mode), buried: buriedToday(storage, deck.id, new Date()) });
   return { due: q.due.length, fresh: q.fresh.length, total: q.queue.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
 }

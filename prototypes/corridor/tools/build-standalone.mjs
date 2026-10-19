@@ -51,6 +51,8 @@ const recordImports = new Map([
   ['./record-app.mjs', 'app'],
   ['./record-sync.mjs', 'sync'],
   ['./modules/record-core.mjs', 'core'],
+  // the one schedule owner, loaded beside ts-fsrs at boot
+  ['./srs-core.mjs', 'srsCore'],
 ]);
 const assessmentImports = new Map([
   ['./assessment-v2-controller.mjs', 'assessmentV2'],

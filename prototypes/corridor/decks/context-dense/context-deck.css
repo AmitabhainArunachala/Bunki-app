@@ -456,6 +456,22 @@ ruby.cd-ruby rt {
   line-height: 1;
 }
 
+/* the wait each answer schedules, under its seal (the scheduler's own preview) */
+.cd-seal-t {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--sans, system-ui);
+  font-size: var(--type-caption);
+  color: var(--cd-ink);
+}
+
+/* a card in its learning steps, or shown early by the learner's choice, says so */
+.cd-step {
+  margin: 0.4rem 0 0;
+  font-size: var(--type-caption);
+  color: var(--cd-ink);
+}
+
 .cd-seal-again {
   color: var(--cd-vermilion);
   border-color: var(--cd-vermilion);

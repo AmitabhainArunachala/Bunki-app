@@ -6,6 +6,8 @@
  * room, the standalone page, a test) supplies time, storage, and FSRS.
  */
 
+import * as srsCore from '../../srs-core.mjs';
+
 export const DECK_FORMAT = 'bunki-srs-deck';
 export const STATE_FORMAT = 'bunki-srs-deck-state';
 export const DECK_VERSION = 1;
@@ -289,17 +291,21 @@ export function dayKey(date) {
   return `${y}-${m}-${d}`;
 }
 
-export function createScheduler(fsrsApi, pin) {
-  const parameters = fsrsApi.generatorParameters({
-    w: pin.w.slice(),
-    request_retention: pin.requestRetention,
-    maximum_interval: pin.maximumInterval,
-    enable_fuzz: pin.enableFuzz,
-    enable_short_term: pin.enableShortTerm,
-    learning_steps: pin.learningSteps,
-    relearning_steps: pin.relearningSteps,
-  });
-  return fsrsApi.fsrs(parameters);
+/** the scheduler, built by the app's one schedule owner (srs-core.mjs): the pin, with the learner's own policy when
+ * the host passes it */
+export function createScheduler(fsrsApi, pin, learner = null) {
+  return srsCore.createScheduler(fsrsApi, pin, learner);
+}
+/** the sitting rule, the due gate and the close, from the same owner */
+export const { nextStep, servable, sittingTally, closeLines, pauseWords, waitWords, LEARN_AHEAD_MS, buriedWords } = srsCore;
+/** burying across surfaces for today: (card) => true when its word (target and reading) was answered elsewhere today */
+export function buriedToday(storage, now) {
+  const answered = srsCore.answeredToday(storage, now);
+  return (card) => srsCore.buriedHere(answered, card.target, card.reading, 'context');
+}
+/** after a real answer: the word was answered in the context deck today */
+export function noteAnsweredCard(storage, card, now) {
+  return srsCore.noteAnswered(storage, srsCore.wordIdentity(card.target, card.reading), 'context', now);
 }
 
 function reviveCard(stored, TypeConvert) {
@@ -406,11 +412,13 @@ export function counts(deck, state, now) {
  */
 export function grade(fsrsApi, scheduler, state, cardId, rating, now) {
   const stored = state.cards[cardId] ?? null;
+  // the review-time clamp the pin names: a clock behind the card's last review grades at that review
+  const at = srsCore.reviewInstant(stored?.last_review, now);
   const before = stored
     ? reviveCard(stored, fsrsApi.TypeConvert)
-    : fsrsApi.createEmptyCard(now);
-  const scheduled = scheduler.next(before, now, rating);
-  const introducedAt = stored?.introducedAt || now.toISOString();
+    : fsrsApi.createEmptyCard(at);
+  const scheduled = scheduler.next(before, at, rating);
+  const introducedAt = stored?.introducedAt || at.toISOString();
   return {
     ...state,
     cards: {
@@ -418,6 +426,17 @@ export function grade(fsrsApi, scheduler, state, cardId, rating, now) {
       [cardId]: freezeCard(scheduled.card, introducedAt),
     },
   };
+}
+
+/** what each answer would schedule, from now, for the seals' times (ms by rating 1–4) */
+export function preview(fsrsApi, scheduler, state, cardId, now) {
+  const stored = state.cards[cardId] ?? null;
+  const at = srsCore.reviewInstant(stored?.last_review, now);
+  const before = stored ? reviveCard(stored, fsrsApi.TypeConvert) : fsrsApi.createEmptyCard(at);
+  const all = scheduler.repeat(before, at);
+  const out = {};
+  for (const rating of [1, 2, 3, 4]) out[rating] = new Date(all[rating].card.due).getTime() - now.getTime();
+  return out;
 }
 
 export function basicTsv(deck) {

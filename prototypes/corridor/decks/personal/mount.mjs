@@ -1,5 +1,12 @@
 import * as FSRS from '../../vendor/ts-fsrs.mjs';
 import {createEngine} from './engine.mjs';
+import {pauseWords} from '../../srs-core.mjs';
+
+// the pin every surface's scheduler is built from (srs-core.mjs)
+const PIN = window.__CORRIDOR_BUNDLE__?.['fsrs-pin'] || await fetch(new URL('../../data/fsrs-pin.json', import.meta.url)).then(r => {
+  if (!r.ok) throw new Error('The scheduler pin could not be read.');
+  return r.json();
+});
 import {openStore} from './store.mjs';
 import {validateCollection, validateEnrichment, parseImport, backup, safeURL, MAX_IMPORT_BYTES} from './schema.mjs';
 import {mergeEnrichment} from './enrichment.mjs';
@@ -147,6 +154,8 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
   const body = root.querySelector('.pc-body'), status = root.querySelector('.pc-status'), input = root.querySelector('.pc-file');
   let store, record, engine, list = [], screen = 'home', current = null, revealed = false, started = 0;
   let busy = false, pending = null, query = '', world = 'all', reader = null, fatal = '', disposed = false;
+  // the learner chose, with nothing else left, to review learning steps early (srs-core's learn-ahead, by choice)
+  let ahead = false;
   let noticeTimer, exploring = false, englishOpen = false, briefEnglishOpen = false;
   const prepared = new Map(), preparing = new Set();
   let lookupNodes = [], paintedViewKey = null;
@@ -195,7 +204,8 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
     await validateCollection(next.collection);
     const enrichment = next.enrichment || next.collection.enrichment;
     if (enrichment) await validateEnrichment(enrichment,next.collection);
-    const nextEngine = createEngine(next.collection,FSRS);
+    const nextEngine = createEngine(next.collection,FSRS,PIN);
+    ahead = false;
     nextEngine.validate(next.progress);
     record = {...next,...(enrichment?{enrichment}:{})}; engine = nextEngine; resetCard(); reader = null; query = ''; world = 'all'; nav('study');
   }
@@ -309,18 +319,20 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
     return `<section class="pc-answer" tabindex="-1" aria-label="${text("Revealed answer")}"><div class="pc-answer-head"><div><p class="pc-eyebrow">${text("Check your recall", "確認")}</p><h3 lang="ja" data-ui-content="learning">${phraseRuby(l,target)}${!['grammar','apply'].includes(kind)?`<span class="pc-reading">${l.acceptedReadings.map(esc).join(' / ')}</span>`:''}</h3></div><span class="pc-answer-kind">${labels[kind] || tx("Reference")}</span></div><p class="pc-definition${explanation?'':' pc-fallback'}" lang="ja">${explanation?rubyText(explanation,e?.rubySegments?.[explanationKey]):esc(fallback)}</p>${briefEnglish(l,kind)}${e?.usageJa?`<div class="pc-usage"><p lang="ja">${rubyText(e.usageJa,e.rubySegments?.usageJa)}</p></div>`:''}${tools}${grammar}${contrast}${relation}${englishSupport(l,kind)}${provenance(l)}</section>`;
   }
   function study() {
-    const q = engine.queue(record.progress);
-    if (!current || ![...q.due,...q.newCards].some(c => c.id === current.id)) {
+    const q = engine.queue(record.progress, Date.now(), {ahead});
+    if (!current || (current.id !== q.next?.id && ![...q.due,...q.newCards].some(c => c.id === current.id))) {
       current = q.next; revealed = false; englishOpen = false; briefEnglishOpen = false; started = performance.now();
     }
     let html = `<div class="pc-study-meta"><div class="pc-counter"><span><b>${q.due.length}</b>${text("due")}</span><span><b>${Math.max(0,record.progress.settings.newLimit-q.startedToday)}</b>${text("new slots")}</span></div><p class="pc-small">${text("Japan study day")}</p></div>`;
     if (!current) {
-      return html + `<section class="pc-panel"><p class="pc-eyebrow">${text("At your pace", "ひと息")}</p><h2>${text("Room to return")}</h2><p>${text("Nothing is due right now.")}${q.nextAt?text(` Next selected review: ${date(q.nextAt)}.`, ` 次の復習：${date(q.nextAt)}。`):''}</p><p>${text(`${q.buried} related cards resting until another study day. ${q.pausedCount} selected cards paused.`, `関連する札 ${q.buried} 枚は翌学習日まで待機、選んだ札 ${q.pausedCount} 枚は休み中です。`)}</p><div class="pc-actions">${button(tx("Read a paragraph"),'data-screen="read"','pc-primary')}${button(tx("Refresh due cards"),'data-action="refresh"')}${button(tx("Undo last grade"),'data-action="undo"')}</div></section>`;
+      // cards still in a learning step: they come back when due; the learner may review them now, early, within the limit
+      const step = q.pause ? pauseWords({...q.pause,count:q.pause.words}, english ? 'en' : 'ja') : null;
+      return html + `<section class="pc-panel"><p class="pc-eyebrow">${text("At your pace", "ひと息")}</p><h2>${text("Room to return")}</h2><p>${text("Nothing is due right now.")}${q.nextAt?text(` Next selected review: ${date(q.nextAt)}.`, ` 次の復習：${date(q.nextAt)}。`):''}</p>${step?`<p id="pc-pause">${esc(step.line)}</p>${step.now?`<div class="pc-actions"><button type="button" class="pc-primary" data-action="ahead" id="pc-ahead">${esc(step.now)}</button></div>`:''}`:''}<p>${text(`${q.buried} related cards resting until another study day. ${q.pausedCount} selected cards paused.`, `関連する札 ${q.buried} 枚は翌学習日まで待機、選んだ札 ${q.pausedCount} 枚は休み中です。`)}</p><div class="pc-actions">${button(tx("Read a paragraph"),'data-screen="read"','pc-primary')}${button(tx("Refresh due cards"),'data-action="refresh"')}${button(tx("Undo last grade"),'data-action="undo"')}</div></section>`;
     }
     const l = current.lesson, kind = current.kind;
     const prompt = kind==='meaning'?tx(`What does “${l.term}” mean here?`, `「${l.term}」は、ここではどんな意味？`):kind==='reading'?tx(`How do you read “${l.term}”?`, `「${l.term}」の読み方は？`):kind==='grammar'?tx(`How does “${l.grammar}” work in this sentence?`, `「${l.grammar}」は、この文でどう働く？`):l.conceptQuestion;
     const guide = kind==='meaning'?tx("Recall the meaning in this context."):kind==='reading'?tx("Recall the reading."):kind==='grammar'?tx("Recall the grammar’s function in this paragraph."):tx("Use the paragraph to reason. English or Japanese is fine.");
-    html += `<article class="pc-panel pc-card${revealed?' pc-revealed':''}" data-card="${esc(current.id)}"><header class="pc-card-head"><p class="pc-kicker">${esc(worldName(worldFor(l.world)))} / <span lang="ja" data-ui-content="learning">${esc(l.title)}</span></p><span class="pc-state">${q.states.has(current.id)?tx("Review"):tx("New")}</span></header><section class="pc-focus"><p class="pc-eyebrow">${esc(labels[kind])}</p><h2 data-ui-content-value="${esc(kind==='grammar'?l.grammar:kind==='apply'?prompt:l.term)}">${esc(prompt)}</h2><p class="pc-small">${esc(guide)}</p>${revealed?quickAnswer(l,kind):''}</section><section class="pc-context"><div class="pc-context-label pc-eyebrow">${text("Context", "文脈")}</div><p class="pc-japanese" lang="ja">${revealed?annotated(l,kind==='grammar'?l.grammar:kind==='apply'?'':l.term):mark(l.ja,kind==='grammar'?l.grammar:kind==='apply'?'':l.term)}</p>${revealed?`<p class="pc-explore-note">${bridge?.lookup?tx("Tap a word, kanji, or grammar expression to explore."):tx("Read the paragraph again, then compare your recall.")}${prepared.get(preparedKey(l))?.notice?` ${esc(prepared.get(preparedKey(l)).notice)}`:''}</p>`:''}</section>`;
+    html += `<article class="pc-panel pc-card${revealed?' pc-revealed':''}" data-card="${esc(current.id)}"><header class="pc-card-head"><p class="pc-kicker">${esc(worldName(worldFor(l.world)))} / <span lang="ja" data-ui-content="learning">${esc(l.title)}</span></p><span class="pc-state">${!q.states.has(current.id)?tx("New"):[1,3].includes(q.states.get(current.id).state)?text("Learning","学習中"):tx("Review")}${q.early&&q.next?.id===current.id?` · ${text("a few minutes early (nothing else left)","少し早め（ほかに札がないため）")}`:''}</span></header><section class="pc-focus"><p class="pc-eyebrow">${esc(labels[kind])}</p><h2 data-ui-content-value="${esc(kind==='grammar'?l.grammar:kind==='apply'?prompt:l.term)}">${esc(prompt)}</h2><p class="pc-small">${esc(guide)}</p>${revealed?quickAnswer(l,kind):''}</section><section class="pc-context"><div class="pc-context-label pc-eyebrow">${text("Context", "文脈")}</div><p class="pc-japanese" lang="ja">${revealed?annotated(l,kind==='grammar'?l.grammar:kind==='apply'?'':l.term):mark(l.ja,kind==='grammar'?l.grammar:kind==='apply'?'':l.term)}</p>${revealed?`<p class="pc-explore-note">${bridge?.lookup?tx("Tap a word, kanji, or grammar expression to explore."):tx("Read the paragraph again, then compare your recall.")}${prepared.get(preparedKey(l))?.notice?` ${esc(prepared.get(preparedKey(l)).notice)}`:''}</p>`:''}</section>`;
     if (revealed) {
       prepare(l);
       const waits = engine.intervals(record.progress,current.id);
@@ -392,7 +404,7 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
     if (existing && existing.collection.contentDigest !== data.contentDigest) throw new Error(tx("This is a different content edition. Keep both files; the existing collection was not changed."));
     if (incoming.enrichment) await validateEnrichment(incoming.enrichment,data);
     const enrichment = mergeEnrichment(existing?.enrichment || existing?.collection.enrichment,incoming.enrichment);
-    const e = createEngine(data,FSRS), base = existing ? e.validate(existing.progress) : e.fresh(uid());
+    const e = createEngine(data,FSRS,PIN), base = existing ? e.validate(existing.progress) : e.fresh(uid());
     if (!existing && incoming.progress) base.settings = e.validate(incoming.progress).settings;
     const imported = incoming.progress ? e.previewImport(base,incoming.progress) : {added:0,result:base};
     pending = {collection:data,progress:incoming.progress,enrichment,existing,added:imported.added};
@@ -404,7 +416,7 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
     if (!pending || busy) return;
     busy = true;
     try {
-      const p = pending, e = createEngine(p.collection,FSRS);
+      const p = pending, e = createEngine(p.collection,FSRS,PIN);
       await store.update(p.collection.id,p.existing?.revision ?? null,old => {
         const base = old ? e.validate(old.progress) : e.fresh(uid());
         if (!old && p.progress) base.settings = e.validate(p.progress).settings;
@@ -419,7 +431,7 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
   async function grade(rating) {
     if (!current || !revealed || screen!=='study' || busy || exploring) return;
     const id = current.id;
-    if (await transact(old => engine.grade(old,id,rating,uid(),performance.now()-started))) {
+    if (await transact(old => engine.grade(old,id,rating,uid(),performance.now()-started,Date.now(),ahead))) {
       resetCard(); paint(); notice(tx("Review saved.")); window.scrollTo(0,0);
       body.querySelector('[data-action="reveal"]')?.focus({preventScroll:true});
     }
@@ -464,6 +476,7 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
         case 'english-brief': briefEnglishOpen=!briefEnglishOpen; paint(); focusAction('english-brief'); break;
         case 'english': englishOpen=!englishOpen; paint(); body.querySelector('[data-action="english"]')?.focus({preventScroll:true}); break;
         case 'refresh': resetCard(); paint(); break;
+        case 'ahead': ahead=true; resetCard(); paint(); break;
         case 'undo': if (await transact(old => engine.undo(old,uid()))) { resetCard(); paint(); notice(tx("Last grade undone. Original event preserved.")); } break;
         case 'read-all': reader=null; paint(); break;
         case 'export': await exportRecord(); break;
