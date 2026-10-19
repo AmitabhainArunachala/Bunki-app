@@ -28769,11 +28769,41 @@ function chromeKeep() {
   paintKeepAside(button);
   return button;
 }
+/* Hfix-2e (X-10) · a click lands only on the element its press went down on. The press on the bar's keep that puts a
+ * word's raised reading away (the outside press, clearWordLadder) used to draw the keep afresh under that press: on the
+ * Mac its first click only took the reading away and nothing was saved (a finger's tap was spared). While a press is down
+ * on the keep it is repainted in place, and drawn afresh once the press has landed (after its click, the same task). */
+let chromeKeepPressed = null;
+let chromeKeepResync = false;
+if (typeof window !== 'undefined') {
+  window.addEventListener('pointerdown', (event) => {
+    const keep = event.target?.closest?.('#chrome-keep');
+    if (!keep) return;
+    chromeKeepPressed = keep;
+    const landed = () => {
+      window.removeEventListener('pointerup', landed, true);
+      window.removeEventListener('pointercancel', landed, true);
+      setTimeout(() => {
+        if (chromeKeepPressed !== keep) return;
+        chromeKeepPressed = null;
+        if (chromeKeepResync) { chromeKeepResync = false; syncChromeKeep(); }
+      }, 0);
+    };
+    window.addEventListener('pointerup', landed, true);
+    window.addEventListener('pointercancel', landed, true);
+  }, true);
+}
 /** After a touch, a save or an undo: the bar's keep names the word now under the finger, in place (no render). */
 function syncChromeKeep() {
   const old = document.getElementById('chrome-keep');
   if (!old) return;
   const fresh = chromeKeep();
+  if (old === chromeKeepPressed) {
+    paintWordSave(old, fresh.getAttribute('aria-pressed') === 'true');
+    paintKeepAside(old);
+    chromeKeepResync = true;
+    return;
+  }
   if (fresh.dataset.saveKey === old.dataset.saveKey && old.getAttribute('aria-expanded') === 'true') {
     paintWordSave(old, fresh.getAttribute('aria-pressed') === 'true');
     paintKeepAside(old);

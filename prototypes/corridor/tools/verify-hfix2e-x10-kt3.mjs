@@ -5,7 +5,8 @@
  *        saved, and two Saves stood on screen): .card · with the card open exactly one Save is live (shown, and the
  *        topmost thing at its own centre), the card's, and any Save the bar shows then keeps the word in ONE press;
  *        .fold · the card folded by Escape, .reading · one tap raising the word's reading: the bar's Save is the one live
- *        Save, names the word, and ONE press keeps it (S.taken grows by one).
+ *        Save, names the word, and ONE press keeps it (S.taken grows by one). On the base .reading is red in Chromium: the
+ *        press that puts the reading away drew the bar's Save afresh under the mouse, and its click was lost.
  *   KT3  a kanji-grid glyph's accessible name is the kanji itself plus its meaning (「稿 — draft」), with the reading the
  *        grid found it by where the grid has one (the reading lens: 「食 たべる — eat」), a kanji the lessons lack keeps its
  *        reference meaning (剝), in the English and the 日本語 interface (the meaning is English data in both).
@@ -55,9 +56,10 @@ window.__H2E__ = {
   taken: () => S.taken.length,
 };`;
 // the defect put back: [the shipped text, what the control serves in its place]
+// (X10: the bar's keep never steps aside for the card, as before Hfix-1A, and a sync draws it afresh under its own press)
 const CONTROL = {
-  X10: ['const aside = !!standingSlip() || S.stack.length > 0;', 'const aside = false;'],
-  KT3: ["b.setAttribute('aria-label', kdxGlyphName(c, readingOf?.(c) || ''));", "if (D.kanji[c]) b.setAttribute('aria-label', D.kanji[c].m);"],
+  X10: [['const aside = !!standingSlip() || S.stack.length > 0;', 'const aside = false;'], ['  if (old === chromeKeepPressed) {', '  if (false) {']],
+  KT3: [["b.setAttribute('aria-label', kdxGlyphName(c, readingOf?.(c) || ''));", "if (D.kanji[c]) b.setAttribute('aria-label', D.kanji[c].m);"]],
 };
 
 async function session(row, { ui = 'bi' } = {}) {
@@ -73,9 +75,10 @@ async function session(row, { ui = 'bi' } = {}) {
     const original = await response.text();
     let body = original;
     if (mode === 'control') {
-      const [from, to] = CONTROL[row];
-      assert.equal(body.split(from).length, 2, `control ${row}: its line must be in corridor.js exactly once`);
-      body = body.replace(from, to);
+      for (const [from, to] of CONTROL[row]) {
+        assert.equal(body.split(from).length, 2, `control ${row}: "${from.slice(0, 50)}" must be in corridor.js exactly once`);
+        body = body.replace(from, to);
+      }
       mutations.push({ row, original: sha(original), served: sha(body) });
     }
     await route.fulfill({ response, body: body + BRIDGE });
@@ -172,7 +175,7 @@ await row(`X10.card · ${engine} ${viewport.width} · a word's card open: one li
   assert(barKept, `X10: one press on the bar's Save keeps the word: ${JSON.stringify(facts)}`);
   return facts;
 });
-await row(`X10.fold · ${engine} ${viewport.width} · the card folded (Escape), the word's reading still up: the bar's Save is live, names 総理, and one press keeps it`, 'X10', async ({ page }) => {
+await row(`X10.fold · ${engine} ${viewport.width} · the card folded (Escape): the bar's Save is the one live Save, names 総理, and one press keeps it`, 'X10', async ({ page }) => {
   await openStory(page);
   await openCard(page);
   await page.keyboard.press('Escape');
