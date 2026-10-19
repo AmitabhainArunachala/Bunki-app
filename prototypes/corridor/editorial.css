@@ -5458,6 +5458,15 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
   box-shadow: var(--depth-edge, none);
   pointer-events: none;
 }
+/* A prose word can wrap between glyphs; its positioned inline box can then have zero width. With both horizontal
+   insets auto, the dot starts at the text's own inline end, then moves under the final glyph. No line breaks change.
+   Half a pixel of lift keeps the saved ring clear of the next line's glyph box. Reader tokens stay centred. */
+.japanese-lookup-word:is([data-depth], [data-kept])::after {
+  left: auto;
+  right: auto;
+  bottom: calc(-0.3em + 0.5px);
+  transform: translateX(calc(-0.5em - var(--depth-size) / 2));
+}
 /* Ladder contract: only this occurrence steps aside while its inline English is open. Removing the attribute
    restores the same fill and ring; the painter and learner record are untouched, and no line box moves. */
 #reader .tok[data-depth-aside='meaning'] > .tok-word::after,
@@ -5502,6 +5511,11 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
   pointer-events: none;
 }
 /* a star in Today's sky: the dot under the word as in the text */
+html[data-room='tray'] .today-star {
+  /* The star's authored breath reaches 66% opacity. Lower only its seal into the world's ink so the
+     composited ring still clears 3:1 at that trough; the star's text and motion keep their own opacity. */
+  --depth-ring: color-mix(in srgb, var(--color-seal, var(--world-signal)) 75%, var(--depth-pigment));
+}
 html[data-room='tray'] .today-star:is([data-depth], [data-kept])::after {
   content: '';
   position: absolute;
