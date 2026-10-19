@@ -48,8 +48,9 @@ async function seed(page,kind){
    if(!e.saveGuidedState(localStorage,'kairo-guided-session-v1:'+id,state).ok)throw Error('guided save');
   }else if(kind==='personal'||kind==='empty-personal'){
    const {openStore}=await import('./decks/personal/store.mjs');const store=await openStore();
-   try{if(collection){const {createEngine}=await import('./decks/personal/engine.mjs'),api=await import('./vendor/ts-fsrs.mjs');
-    const progress=createEngine(collection,api).fresh('item-a-device');await store.update(collection.id,null,()=>({id:collection.id,collection,progress}));}}
+   // the personal engine builds its scheduler from the app's one pin, exactly as decks/personal/mount.mjs passes it (SRS)
+   try{if(collection){const {createEngine}=await import('./decks/personal/engine.mjs'),api=await import('./vendor/ts-fsrs.mjs'),pin=await(await fetch('data/fsrs-pin.json')).json();
+    const progress=createEngine(collection,api,pin).fresh('item-a-device');await store.update(collection.id,null,()=>({id:collection.id,collection,progress}));}}
    finally{store.close();}
   }
  },{kind,collection});
