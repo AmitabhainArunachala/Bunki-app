@@ -55,25 +55,35 @@ try {
     'The assessment asset pack stays unparsed until an assessment is requested');
   const shelfLook = await page.evaluate(() => {
     const art = document.querySelector('.shelf-art');
-    const word = document.querySelector('#shelf-body .japanese-lookup-word');
-    const style = word && getComputedStyle(word);
-    return { art: art?.naturalWidth || 0, artSource: art?.src.slice(0, 5) || '', grid: getComputedStyle(document.getElementById('shelf-reading-results')).display,
-      word: style && { display: style.display, border: style.borderTopStyle, background: style.backgroundColor,
-        padding: style.padding, minWidth: style.minWidth, minHeight: style.minHeight } };
+    return { art: art?.naturalWidth || 0, artSource: art?.src.slice(0, 5) || '', grid: getComputedStyle(document.getElementById('shelf-reading-results')).display };
   });
   assert(shelfLook.art > 0 && shelfLook.artSource === 'blob:', `The shelf art must be embedded: ${JSON.stringify(shelfLook)}`);
   checks.push('embedded-shelf-art');
   assert.equal(shelfLook.grid, 'grid', 'The editorial shelf layout must be inlined');
   checks.push('inlined-editorial-shelf-layout');
+  // The shelf's cards are each one door (a button), so the shelf holds no prose lookup word to measure; it has had
+  // none since before 10-17, when this row began reading an absent word. The study hall, one door away in the same
+  // Japanese chrome, sets its Japanese prose with lookup words: measure the first of those, then reopen the shelf.
+  await openShelfTools(page);
+  await page.locator('#decks-link').click();
+  const proseWord = page.locator('#study-hall .japanese-lookup-word').first();
+  await proseWord.waitFor({ state: 'visible' });
+  const lookupLook = await proseWord.evaluate((node) => {
+    const style = getComputedStyle(node);
+    return { surface: 'study-hall', text: node.textContent,
+      word: { display: style.display, border: style.borderTopStyle, background: style.backgroundColor,
+        padding: style.padding, minWidth: style.minWidth, minHeight: style.minHeight } };
+  });
   // A native button can compute declared display:inline to inline-block. Both
   // stay in the prose line; zero padding/border/background is the contract.
-  assert(['inline', 'inline-block'].includes(shelfLook.word?.display), 'Lookup words stay in the prose line');
-  assert.deepEqual({ ...shelfLook.word, display: undefined },
+  assert(['inline', 'inline-block'].includes(lookupLook.word?.display), 'Lookup words stay in the prose line');
+  assert.deepEqual({ ...lookupLook.word, display: undefined },
     { display: undefined, border: 'none', background: 'rgba(0, 0, 0, 0)', padding: '0px', minWidth: '0px', minHeight: '0px' },
     'Lookup words must read as prose, not default buttons');
   checks.push('lookup-words-read-as-prose');
-  // Japanese shelf prose still exercises the lookup styling contract. The
-  // English chrome no longer supplies incidental Japanese lookup words.
+  await page.goto(documentURL.href,{waitUntil:'domcontentloaded'});
+  await page.locator('#shelf-reading-results .shelf-item').first().waitFor();
+  // The English chrome no longer supplies incidental Japanese lookup words.
   await page.locator('#lang [data-lang="bi"]').click();
   assert.equal(await page.locator('#lang [data-lang="bi"]').getAttribute('aria-pressed'), 'true',
     'The remaining standalone journey uses English chrome');
@@ -113,10 +123,11 @@ try {
   assert.equal(errors.length,0,JSON.stringify(errors));
   checks.push('no-page-errors');
   await page.screenshot({path:resolve(temporary,'skip-standalone.png')});
-  writeFileSync(resolve(temporary,'result.json'),JSON.stringify({pass:true,mode:fragment?'fragment':'document',runId:process.env.KAIRO_GATE_RUN_ID??null,site,artifactSha256:identity.artifactSha256,browser:browser.version(),checks,requests,errors,shelfLook,scope:'Silent Chromium standalone lookup mechanics and embedded editorial layer; no physical-device or full learner journey acceptance'},null,2)+'\n');
+  writeFileSync(resolve(temporary,'result.json'),JSON.stringify({pass:true,mode:fragment?'fragment':'document',runId:process.env.KAIRO_GATE_RUN_ID??null,site,artifactSha256:identity.artifactSha256,browser:browser.version(),checks,requests,errors,shelfLook,lookupLook,scope:'Silent Chromium standalone lookup mechanics and embedded editorial layer; no physical-device or full learner journey acceptance'},null,2)+'\n');
   console.log('PASS standalone: real SKIP grid, three code wheels and two independent filters with all subresource network blocked.');
   console.log('PASS no runtime exceptions or external SKIP data requests.');
   console.log(`PASS embedded editorial layer and shelf art: ${JSON.stringify(shelfLook)}`);
+  console.log(`PASS lookup words read as prose: ${JSON.stringify(lookupLook)}`);
   console.log('PASS no personal-collections deck row or route in the single file.');
 } finally {
   await browser.close();
