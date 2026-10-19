@@ -534,8 +534,11 @@ function paintDone(room, opts) {
     if (turn > now.getTime()) {
       pauseTimer = setTimeout(() => {
         if (ui.screen !== 'done' || !opts.host.isConnected) return;
+        // the close stays until the learner chooses: the steps are read again, a due one reads "due now"
         const fresh = loadState(opts.storage);
-        settle(fresh);
+        const at = Date.now();
+        const steps = deck.cards.filter((card) => isStep(fresh.cards[card.id])).map((card) => Date.parse(fresh.cards[card.id].due));
+        ui.pause = steps.length ? { count: steps.length, at: Math.max(Math.min(...steps), at), canEarly: Math.min(...steps) - at <= LEARN_AHEAD_MS } : null;
         paint(opts.host, opts, fresh);
       }, Math.min(2 ** 31 - 1, turn - now.getTime() + 50));
     }

@@ -29753,7 +29753,13 @@ function reviewNextStep(rv, now = new Date()) {
       waiting.push(k);
     }
   });
-  const step = srsCore.nextStep({ now, queue: waiting, learning, ahead: !!rv.ahead });
+  let step = srsCore.nextStep({ now, queue: waiting, learning, ahead: !!rv.ahead });
+  // once the close has paused on the steps, it stays until the learner chooses ("they will wait for you"): a step
+  // that falls due meanwhile reads "due now" there instead of turning the close into a card by itself
+  if (step.pause) rv.closed = true;
+  else if (rv.closed && !rv.ahead && !waiting.length && step.show !== undefined) {
+    step = { pause: true, count: learning.length, at: now.getTime(), canEarly: true };
+  }
   const kept = [...waiting, ...learning.map((l) => l.id)].sort((a, b) => a - b);
   const order = step.show !== undefined ? [step.show, ...kept.filter((k) => k !== step.show)] : kept;
   rv.queue = [...rv.queue.slice(0, rv.ix), ...order.map((k) => rest[k])];
