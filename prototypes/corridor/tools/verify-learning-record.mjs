@@ -540,9 +540,11 @@ async function propertyChecks() {
     for (let episode = 0; episode < episodes; episode += 1) {
       const kind = episode === 0 ? historyIndex % scenarioNames.length : episode === 1 ? 0 : random(scenarioNames.length);
       const rating = 1 + random(4);
-      // srs-core refuses a grade before its due: the episode every history grades in (the second) and the cases that need
-      // their first grade saved walk the clock on, forward only, to their card's due
-      const toDue = episode === 1 || ['ownership-after-publication', 'backward-step'].includes(scenarioNames[kind]);
+      // srs-core refuses a grade before its due: the episode every history grades in (the second) and the cases built on a
+      // saved grade (an undo, a lost acknowledgment, ownership after publication, two grades, the backward step) walk the
+      // clock on, forward only, to their card's due; the others keep the refusals earlier backward moves bring
+      const toDue = episode === 1 || ['undo-reject-retry', 'undo-conflict', 'committed-lost-ack', 'ownership-after-publication',
+        'two-grade-two-undo', 'backward-step'].includes(scenarioNames[kind]);
       const start = { op: 'start', type: kind === 11 ? 1 : random(2), dojo: kind === 10,
         declared: random(4) === 0 ? 0 : 1, shift: [-172800000, 0, 60000, 86400000][random(4)], toDue };
       const gradeCommand = { op: 'grade', rating };
@@ -570,7 +572,7 @@ async function propertyChecks() {
         case 'committed-lost-ack': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, lostAck: true }]; break;
         case 'ownership-after-publication': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, loseOwnershipAfterPublish: true }]; break;
         case 'two-grade-two-undo': part = [start, { op: 'grade', rating: 1 }, stage, ok,
-          { op: 'clock', shift: 86400000 }, { op: 'disclosure', revealed: true, declared: 1 }, gradeCommand, stage, ok,
+          { op: 'clock', shift: 86400000, toDue: true }, { op: 'disclosure', revealed: true, declared: 1 }, gradeCommand, stage, ok,
           { op: 'undo' }, stage, ok, { op: 'undo' }, stage, ok]; break;
         // the device clock set back a few minutes: Again puts the card in a short step, which the due gate serves within the
         // 20-minute learn-ahead limit, and the grade is anchored at the last review (the clamp), never before it
@@ -613,6 +615,12 @@ async function propertyChecks() {
       sessionUndos.set(rv, { count: 0, reinserted: false, days: new Set() });
       f.c.presentReviewAnswer(rv);
       return rv;
+    };
+    // srs-core refuses a grade before its due (the model says so at stage): a case that needs its grade saved walks the clock
+    // on, forward only, to its card's due
+    const walkToDue = (item) => {
+      const rec = f.durable().srs[keyOf(item)];
+      if (!gradeableNow(rec, now)) { now = Date.parse(rec.due); count('clockMovesToDue'); }
     };
     const attemptGrade = (rating) => {
       const rv = f.S.review, current = rv.queue[rv.ix];
@@ -700,15 +708,12 @@ async function propertyChecks() {
           case 'start': {
             assert.equal(pending, null); rejectedGrade = false; target = items[command.type]; now += command.shift;
             if (command.shift < 0) count('backwardClockMoves'); else if (command.shift === 0) count('equalClockMoves');
-            // srs-core refuses a grade before its due (the model says so at stage); a case that needs its grade saved walks the
-            // clock on, forward only, to that due
-            if (command.toDue) {
-              const rec = f.durable().srs[keyOf(target)];
-              if (!gradeableNow(rec, now)) { now = Date.parse(rec.due); count('clockMovesToDue'); }
-            }
+            if (command.toDue) walkToDue(target);
             const rv = newSession(command.dojo); rv.declared = command.declared; break;
           }
-          case 'clock': assert.equal(pending, null); now += command.shift; count('explicitClockMoves'); break;
+          case 'clock': assert.equal(pending, null); now += command.shift; count('explicitClockMoves');
+            if (command.toDue) walkToDue(f.S.review.queue[f.S.review.ix]);
+            break;
           case 'disclosure': assert.equal(pending, null); Object.assign(f.S.review, { revealed: command.revealed, declared: command.declared });
             // the rendered face: a revealed card presents (binds) its answer, a face-down one has none
             if (command.revealed) f.c.presentReviewAnswer(f.S.review); else f.S.review.presented = null;
