@@ -48,7 +48,7 @@ async function newPage(group, width = 390, height = 844) {
     if (group === 'X20') await routeFile(page, 'editorial.css', s => s + '\n#app .kp .kp-study > #kp-undo { pointer-events: none !important; }\n', 'Undo label loses its own pointer target');
     if (group === 'X8') await routeFile(page, 'decks/player/mount.js', s => replaceOne(s, 'if (!ctx.prefs.againCoachSeen)', 'if (!ctx.prefs.ruleSeen)'), 'old coach flag');
     if (group === 'X4') await routeFile(page, 'decks/player/mount.js', s => replaceOne(replaceOne(replaceOne(s, 'if (!fitsEdges(dy)) {', 'if (false) {'), 'rBottom - d <= bottomLimit + 0.5 || rTop - d >= dockTop - 0.5', '!(rTop - d < barTop - 0.5 && rBottom - d > barTop + 0.5)'), 'return row.bottom - lift <= bottom + 0.5 || row.top - lift >= dockTop - 0.5;', 'return !(row.top - lift < barTop - 0.5 && row.bottom - lift > barTop + 0.5);'), 'restore old edge conditions; scheduling and coach untouched');
-    if (group === 'X4') await routeFile(page, 'decks/player/player.css', s => replaceOne(s, '.kp .kp-folds { margin-top: 40px;', '.kp .kp-folds { margin-top: 12px;'), 'restore old answer-to-fold clearance');
+    if (group === 'X4') await routeFile(page, 'decks/player/player.css', s => replaceOne(s, '.kp .kp-folds { margin-top: 60px;', '.kp .kp-folds { margin-top: 12px;'), 'restore old answer-to-fold clearance');
     if (group === 'readings') for (const d of ['kotoba-mine', 'kotoba-mcd']) for (const f of ['deck.json', 'tokens.json']) await routeFile(page, `decks/${d}/${f}`, s => {
       const data = JSON.parse(s);
       if (f === 'deck.json') { for (const card of data.words.flatMap(w => w.cards)) for (const row of card.ruby) if (/[0-9０-９].*[日月]/u.test(row[0])) row[1] = 'まちがい'; }
@@ -209,7 +209,7 @@ async function readingRows() {
       const before = await page.evaluate(() => JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mcd')));
       const token = page.locator('#kp-card .kp-sentence .kp-tok').filter({hasText:'ラピダス'}).first();
       const count = await token.count();
-      if (count) { await token.focus(); await page.keyboard.press('Enter'); await resting(page); }
+      if (count) { await token.click(); await resting(page); if (await token.getAttribute('data-ladder-rung') === 'reading') { await token.click(); await resting(page); } }
       const shown = await page.locator('#mini[data-from="deck"] .mini-gloss').allTextContents();
       const after = await page.evaluate(() => JSON.parse(localStorage.getItem('bunki-cloze:kotoba-mcd')));
       check('readings', `native ラピダス ${id}: custom definition opens without grading`, count === 1 && shown.includes('最先端の半導体の量産を目指す日本の企業。') && JSON.stringify(before.cards) === JSON.stringify(after.cards) && JSON.stringify(before.log) === JSON.stringify(after.log), {count,shown,before,after});

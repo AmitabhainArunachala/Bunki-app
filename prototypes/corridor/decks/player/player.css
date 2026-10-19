@@ -803,7 +803,7 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 .kp .kp-def { font-size: var(--type-lead); line-height: 1.65; font-weight: 600; color: var(--kp-ink); }
 .kp .kp-note { font-size: var(--type-control); line-height: 1.6; }
 /* Leave room to seat a whole passage line while the folds stay below the dock’s clear band. */
-.kp .kp-folds { margin-top: 40px; border: 1px solid var(--kp-line); border-radius: var(--radius-card, 4px); background: var(--kp-panel-2); }
+.kp .kp-folds { margin-top: 60px; border: 1px solid var(--kp-line); border-radius: var(--radius-card, 4px); background: var(--kp-panel-2); }
 .kp .kp-fold { border-bottom: 1px solid var(--kp-line); padding: 0 14px; }
 .kp .kp-fold:last-child { border-bottom: 0; }
 .kp .kp-fold > summary { min-height: 44px; position: relative; padding-right: 22px; font-size: var(--type-chrome); color: var(--kp-ink); letter-spacing: 0.01em; }
