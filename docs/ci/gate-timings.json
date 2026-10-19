@@ -2364,6 +2364,76 @@
       ]
     },
     {
+      "name": "hfix2d",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "9aa2c6cf65f06d9c6150c0217434c8d8e926465c",
+        "producerBytesBasis": "Accepted Hfix-2d r5 behavioral body with WEAVE receipt-only hardening; exact bytes are pinned below. No wrapper timing is claimed.",
+        "producer": "prototypes/corridor/tools/verify-hfix2d.mjs",
+        "producerSha256": "6ed37b2d8d64b9096b67f9773c9477b3a1d8fe55af68c8b8583eedc084243f79",
+        "command": [
+          "node",
+          "prototypes/corridor/tools/verify-hfix2d.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EXPECT_GITSHA": "",
+          "KAIRO_EVIDENCE_DIR": "/unused/hfix2d"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-hfix2d.mjs",
+            "sha256": "6ed37b2d8d64b9096b67f9773c9477b3a1d8fe55af68c8b8583eedc084243f79"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures this exact 368-occurrence native-engine gate on the final combined artifact. Expected git SHA is bound from the selected site; the runner supplies the fresh attempt nonce.",
+      "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
+      "limitations": [
+        "No numeric timing is claimed for this unmeasured contract."
+      ]
+    },
+    {
+      "name": "hfix2d-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "9aa2c6cf65f06d9c6150c0217434c8d8e926465c",
+        "producerBytesBasis": "Accepted Hfix-2d r5 behavioral body with WEAVE receipt-only hardening; exact bytes are pinned below. No wrapper timing is claimed.",
+        "producer": "prototypes/corridor/tools/verify-hfix2d.mjs",
+        "producerSha256": "6ed37b2d8d64b9096b67f9773c9477b3a1d8fe55af68c8b8583eedc084243f79",
+        "command": [
+          "node",
+          "prototypes/corridor/tools/verify-hfix2d.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EXPECT_GITSHA": "",
+          "KAIRO_EVIDENCE_DIR": "/unused/hfix2d-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-hfix2d.mjs",
+            "sha256": "6ed37b2d8d64b9096b67f9773c9477b3a1d8fe55af68c8b8583eedc084243f79"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures this exact 368-occurrence native-engine gate on the final combined artifact. Expected git SHA is bound from the selected site; the runner supplies the fresh attempt nonce.",
+      "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
+      "limitations": [
+        "No numeric timing is claimed for this unmeasured contract."
+      ]
+    },
+    {
       "name": "hfix2c",
       "measurementStatus": "unmeasured",
       "currentContract": {

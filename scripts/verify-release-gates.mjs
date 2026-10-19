@@ -38,6 +38,7 @@ import {
 } from './ci/gate-evidence.mjs';
 import { commandCheckEvidence } from './ci/command-check-contracts.mjs';
 import { loadHfix2cPins, validateHfix2cFocused, validateHfix2cLaneAdmission } from './ci/vh-hfix2c-report-contracts.mjs';
+import { loadHfix2dPins, validateHfix2dReport } from './ci/vh-hfix2d-report-contracts.mjs';
 
 const SELF = fileURLToPath(import.meta.url);
 const ROOT = resolve(dirname(SELF), '..');
@@ -298,6 +299,14 @@ export function batteryGates(out, env = process.env) {
         };
       }),
     ),
+    ...['chromium', 'webkit'].map((engine) => {
+      const name = engine === 'chromium' ? 'hfix2d' : 'hfix2d-webkit';
+      return {
+        ...node(name, tool('verify-hfix2d'), [], { ...report(name, 'hfix2d'), engine }),
+        env: { KAIRO_BROWSER: engine,
+          KAIRO_EXPECT_GITSHA: env.KAIRO_SITE_DIR ? json(join(env.KAIRO_SITE_DIR, 'build-identity.json')).gitSha : '' },
+      };
+    }),
     node(
       'word-saved-answer',
       tool('test-word-saved-answer'),
@@ -907,19 +916,20 @@ export function batteryGates(out, env = process.env) {
       'srs-conformance',
       'hfix2c',
       'hfix2c-three-state-contrast',
+      'hfix2d',
     ].includes(gate.report?.type)
       ? {
           report: {
             ...gate.report,
             artifactSha256: env.KAIRO_VERIFIED_ARTIFACT_SHA256,
-            ...(['hfix2a', 'hfix2a-item-a', 'hfix2c', 'hfix2c-three-state-contrast'].includes(gate.report.type)
+            ...(['hfix2a', 'hfix2a-item-a', 'hfix2c', 'hfix2c-three-state-contrast', 'hfix2d'].includes(gate.report.type)
               ? {
                   siteIdentity: env.KAIRO_SITE_DIR
                     ? json(join(env.KAIRO_SITE_DIR, 'build-identity.json'))
                     : null,
                 }
               : {}),
-            ...(['hfix2c', 'hfix2c-three-state-contrast'].includes(gate.report.type)
+            ...(['hfix2c', 'hfix2c-three-state-contrast', 'hfix2d'].includes(gate.report.type)
               ? { siteDir: env.KAIRO_SITE_DIR ? resolve(env.KAIRO_SITE_DIR) : null }
               : {}),
             ...(gate.report.type === 'kanji-trust'
@@ -968,6 +978,7 @@ export function batteryGates(out, env = process.env) {
               'srs-conformance',
               'hfix2c',
               'hfix2c-three-state-contrast',
+              'hfix2d',
             ].includes(gate.report.type)
               ? {
                   sourceSha256: existsSync(resolve(ROOT, gate.requiredPath))
@@ -1989,6 +2000,12 @@ function requireCompleteReport({
     assert.equal(sourceSha256, type === 'hfix2c' ? pins.sources.focused : pins.sources.wrapper, 'Hfix-2c descriptor source differs');
     if (type === 'hfix2c') validateHfix2cFocused(value, pins);
     else validateHfix2cLaneAdmission(value, dirname(path), pins);
+  } else if (type === 'hfix2d') {
+    const pins = loadHfix2dPins({ root: ROOT, siteDir, engine, runId });
+    assert.equal(pins.artifactSha256, artifactSha256, 'Hfix-2d descriptor artifact differs');
+    assert.equal(digest(JSON.stringify(pins.identity)), digest(JSON.stringify(siteIdentity)), 'Hfix-2d descriptor identity differs');
+    assert.equal(sourceSha256, pins.verifierSha256, 'Hfix-2d descriptor source differs');
+    validateHfix2dReport(value, pins);
   } else if (type === 'teaching-context' || type === 'ai-adaptation') {
     assert.equal(
       value.suite,
@@ -2955,6 +2972,8 @@ async function verifyRunner(out) {
     'hfix2c-webkit',
     'hfix2c-contrast',
     'hfix2c-contrast-webkit',
+    'hfix2d',
+    'hfix2d-webkit',
     'word-saved-answer',
     'word-saved-answer-controls',
     'word-saved-answer-mutation-controls',

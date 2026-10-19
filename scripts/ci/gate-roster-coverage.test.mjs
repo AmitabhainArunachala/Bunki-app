@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from
 import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
 import { fileURLToPath, URL } from 'node:url';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { batteryGates, runGates, validateKanjiTrustReport, validateHfix2aReport } from '../verify-release-gates.mjs';
 import { supplementalGates } from './supplemental.mjs';
 import { gateEvidenceDeclaration } from './gate-evidence.mjs';
@@ -25,9 +25,9 @@ for (const file of readdirSync(join(root, 'scripts/ci')).filter((f) =>
       for (const key of value) known.add(key);
     }
 }
-test('all 201 canonical and supplemental gates have unique names and mandatory declarations', () => {
-  assert.equal(gates.length, 201);
-  assert.equal(new Set(gates.map((g) => g.name)).size, 201);
+test('all 203 canonical and supplemental gates have unique names and mandatory declarations', () => {
+  assert.equal(gates.length, 203);
+  assert.equal(new Set(gates.map((g) => g.name)).size, 203);
   const expected = JSON.parse(
     readFileSync(new URL('./vh-required-gate-roster.json', import.meta.url), 'utf8'),
   );
@@ -421,4 +421,42 @@ test('four Hfix-2c descriptors pin their order, engines, receipts and full focus
     if (focused) { assert.equal(env.HFIX2C_MODE, 'branch'); assert.equal(env.HFIX2C_CASE, ''); assert.equal(env.HFIX2C_BASE, ''); }
     else for (const key of ['HFIX2C_MODE', 'HFIX2C_CASE', 'HFIX2C_BASE']) assert(!Object.hasOwn(env, key));
   }
+});
+
+test('two Hfix-2d descriptors bind one engine, no controls and the candidate commit', () => {
+  const rows = gates.filter(gate => gate.name.startsWith('hfix2d'));
+  assert.deepEqual(rows.map(gate => gate.name), ['hfix2d', 'hfix2d-webkit']);
+  for (const gate of rows) {
+    const engine = gate.name.endsWith('-webkit') ? 'webkit' : 'chromium';
+    assert.equal(gate.env.KAIRO_BROWSER, engine); assert.equal(gate.report.engine, engine);
+    assert.equal(gate.report.type, 'hfix2d');
+    assert.equal(gate.report.path, join(out, gate.name, 'verification-report.json'));
+    assert.deepEqual(gate.args, ['prototypes/corridor/tools/verify-hfix2d.mjs']);
+    const env = acceptanceEnvironment({ KAIRO_BROWSER: 'all', KAIRO_EXPECT_GITSHA: 'stale', HFIX2C_MODE: 'control', SWEEP_STATES: 'page' }, gate.env);
+    assert.equal(env.KAIRO_BROWSER, engine); assert.equal(env.KAIRO_EXPECT_GITSHA, '');
+    assert(!Object.hasOwn(env, 'HFIX2C_MODE')); assert(!Object.hasOwn(env, 'SWEEP_STATES'));
+  }
+  const parent = join(homedir(), '.dharma/bunki/hfix2d-descriptor-tests'); mkdirSync(parent, { recursive: true });
+  const site = mkdtempSync(join(parent, 'site-')), gitSha = 'c'.repeat(40);
+  // batteryGates hydrates every site-bound descriptor before this test selects
+  // Hfix-2d; mirror the release runner's synthetic practice-source fixture.
+  const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+  const files = [
+    'corridor.js', 'record-host.mjs', 'record-app.mjs', 'assessment-controller.mjs',
+    'record-controller.mjs', 'modules/record-core.mjs', 'modules/assessment-core.mjs',
+    'data/mock/sets/n5-01.json',
+  ].map(path => {
+    const bytes = path === 'record-host.mjs' || path === 'data/mock/sets/n5-01.json'
+      ? readFileSync(join(root, 'prototypes/corridor', path))
+      : Buffer.from(`// Synthetic source identity fixture: ${path}\n`);
+    const file = join(site, path);
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, bytes);
+    return { path, bytes: bytes.length, sha256: hash(bytes) };
+  });
+  const artifactSha256 = hash(JSON.stringify(files));
+  writeFileSync(join(site, 'build-identity.json'), JSON.stringify({ gitSha, artifactSha256, files }));
+  const bound = batteryGates(out, { KAIRO_SITE_DIR: site,
+    KAIRO_VERIFIED_ARTIFACT_SHA256: artifactSha256, KAIRO_EXPECT_GITSHA: 'stale' }).filter(gate => gate.name.startsWith('hfix2d'));
+  assert(bound.every(gate => gate.env.KAIRO_EXPECT_GITSHA === gitSha));
 });

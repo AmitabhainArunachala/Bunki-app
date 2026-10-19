@@ -22,12 +22,14 @@
  *       preview fills the box (no tall empty stretch); on the Mac the arrival keeps the phone's measure.
  *
  * Usage: KAIRO_SITE_DIR=<built site> KAIRO_ARTIFACT_SHA256=<sha> KAIRO_EXPECT_GITSHA=<sha> \
- *          KAIRO_BROWSER=all|webkit|chromium node prototypes/corridor/tools/verify-hfix2d.mjs
+ *          KAIRO_GATE_RUN_ID=<fresh nonce> KAIRO_BROWSER=webkit|chromium node prototypes/corridor/tools/verify-hfix2d.mjs
  * Controls (page.route, no disk copies): --control pos-revert (base's tag join → P red), --control
  * keyword-revert (English keyword in 日本語 → K red), --control preview-removed (G red), --control
  * baseline-label (G centring red), --control usage-dim (the r2 opacity back → C red).
  */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import process from 'node:process';
 import { chromium, webkit } from 'playwright-core';
@@ -35,11 +37,32 @@ import { startCorridorDev } from '../../../scripts/serve-corridor-dev.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 
-const CONTROL = process.argv.includes('--control') ? process.argv[process.argv.indexOf('--control') + 1] : null;
+const args = process.argv.slice(2);
 const CONTROLS = new Set(['pos-revert', 'keyword-revert', 'preview-removed', 'baseline-label', 'usage-dim']);
-if (CONTROL && !CONTROLS.has(CONTROL)) throw new Error(`unknown control ${CONTROL}`);
-const ENGINES = process.env.KAIRO_BROWSER === 'webkit' ? { webkit } : process.env.KAIRO_BROWSER === 'chromium' ? { chromium } : { webkit, chromium };
+assert(args.length === 0 || (args.length === 2 && args[0] === '--control' && CONTROLS.has(args[1])), 'Usage: verify-hfix2d.mjs [--control <known control>]');
+const CONTROL = args.length ? args[1] : null;
+const engine = process.env.KAIRO_BROWSER;
+assert(['chromium', 'webkit'].includes(engine), 'Select exactly one native KAIRO_BROWSER');
+const expectSha = process.env.KAIRO_EXPECT_GITSHA;
+assert.match(expectSha || '', /^[a-f0-9]{40}$/u, 'KAIRO_EXPECT_GITSHA is required');
+const runId = process.env.KAIRO_GATE_RUN_ID;
+assert(typeof runId === 'string' && runId.trim().length > 0, 'KAIRO_GATE_RUN_ID is required');
+assert(process.env.KAIRO_SITE_DIR, 'KAIRO_SITE_DIR must select the already built artifact');
+assert.match(process.env.KAIRO_ARTIFACT_SHA256 || '', /^[a-f0-9]{64}$/u, 'KAIRO_ARTIFACT_SHA256 is required');
+const ENGINES = { [engine]: engine === 'webkit' ? webkit : chromium };
+const browserVersions = {};
+const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
+const verifierSha256 = sha256(readFileSync(new URL(import.meta.url)));
+const helperPaths = [
+  "scripts/serve-corridor-dev.mjs",
+  "scripts/resolve-corridor-site.mjs",
+  "prototypes/corridor/tools/browser-audio-silence.mjs",
+  "prototypes/bunki-desktop/lib/static-host.cjs",
+  "prototypes/bunki-desktop/lib/artifact.cjs"
+];
+const helperSha256 = Object.fromEntries(helperPaths.map(file => [file, sha256(readFileSync(new URL('../../../' + file, import.meta.url)))]));
 const out = resolveCorridorEvidence();
+assert.equal(readdirSync(out).length, 0, 'Use a fresh Hfix-2d evidence directory');
 const shots = join(out, 'shots');
 mkdirSync(shots, { recursive: true });
 const host = await startCorridorDev(0);
@@ -293,7 +316,8 @@ async function guidedRows(engine, browserType) {
 
 for (const [engine, browserType] of Object.entries(ENGINES)) {
   const probe = await browserType.launch();
-  console.log(`\n— ${engine} ${probe.version()}${CONTROL ? ` · CONTROL ${CONTROL}` : ''}`);
+  browserVersions[engine] = probe.version();
+  console.log(`\n— ${engine} ${browserVersions[engine]}${CONTROL ? ` · CONTROL ${CONTROL}` : ''}`);
   await probe.close();
   for (const word of WORDS) await wordRows(engine, browserType, word);
   await contrastRows(engine, browserType);
@@ -301,14 +325,16 @@ for (const [engine, browserType] of Object.entries(ENGINES)) {
 }
 
 const identity = JSON.parse(readFileSync(join(host.site, 'build-identity.json'), 'utf8'));
-const expectSha = process.env.KAIRO_EXPECT_GITSHA;
 if (expectSha) {
   const ok = identity.gitSha === expectSha;
   checks.push({ name: 'identity · the served site is the expected commit', pass: ok, detail: `${identity.gitSha} ${ok ? '===' : '!=='} ${expectSha}` });
   console.log(`  ${ok ? 'ok  ' : 'FAIL'} identity · the served site is the expected commit  — ${identity.gitSha}`);
 }
-writeFileSync(join(out, 'verification-report.json'), `${JSON.stringify({ suite: 'hfix2d', site: host.site, control: CONTROL, engines: Object.keys(ENGINES), identity, checks }, null, 2)}\n`);
 const failedAll = checks.filter((item) => !item.pass);
+writeFileSync(join(out, 'verification-report.json'), `${JSON.stringify({ schemaVersion: 2, suite: 'hfix2d',
+  scope: CONTROL ? 'control' : 'full', runId, site: host.site, control: CONTROL, engines: Object.keys(ENGINES), browserVersions,
+  expectedGitSha: expectSha, artifactSha256: identity.artifactSha256, identity, verifierSha256, helperSha256,
+  pass: failedAll.length === 0, summary: { total: checks.length, passed: checks.length - failedAll.length, failed: failedAll.length }, checks }, null, 2)}\n`);
 console.log(`\n${checks.length - failedAll.length}/${checks.length} checks passed${CONTROL ? ` (control ${CONTROL}: the rows above must be red where it bites)` : ''}`);
 await host.close?.();
 process.exitCode = failedAll.length ? 1 : 0;
