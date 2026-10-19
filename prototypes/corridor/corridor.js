@@ -11834,11 +11834,13 @@ function fadeCut(card, room) {
   const feet = rows.filter((row) => !row.node.matches('.mini-band-head, #vocabulary-list-popover > *, .vocabulary-list-more > *') &&
     !rows.some((other) => other.top < row.bottom - 0.5 && other.bottom > row.bottom + 0.5)).sort((a, b) => b.bottom - a.bottom);
   for (const foot of feet) {
-    // the card's foot border (1 px) under its fade, as rowCut counts it
-    const cut = Math.ceil(foot.bottom + MINI_FADE + 1);
-    if (cut > room) continue;
+    // the fade's depth and the card's own foot border; and, where the room has it, a px of paper between the fade and the
+    // row (as the cut rowCut made below the kanji band had)
+    const tight = Math.ceil(foot.bottom + MINI_FADE + 1);
+    if (tight > room) continue;
+    const cut = tight + 1 <= room ? tight + 1 : tight;
     const next = Math.min(Infinity, ...rows.filter((row) => row !== foot && row.top >= foot.bottom - 0.5).map((row) => row.top));
-    const fold = Math.ceil(foot.bottom + MINI_FADE - next);
+    const fold = Math.ceil(foot.bottom + MINI_FADE + (cut - tight) - next);
     if (fold > 0) { foot.node.style.marginBottom = `${fold}px`; foot.node.dataset.fold = String(fold); }
     return cut;
   }
