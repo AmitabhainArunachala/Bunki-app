@@ -782,6 +782,25 @@ export function batteryGates(out, env = process.env) {
     node('kagami', tool('verify-kagami')),
     // card-system slice 1: the button, the counts and the session are one queue; three presets
     node('srs-today', tool('verify-srs-today')),
+    // SRS FULLPROOF: does a card come back when it promised, on every surface (the deck player, the saved-word review,
+    // the context deck, your own texts), with its negative controls; one gate per engine, each with its own floor,
+    // over twice its longest healthy run (36 min Chromium, 37 min WebKit, both with controls, 10-19)
+    {
+      ...node('srs-conformance', tool('verify-srs-conformance'), [], {
+        ...report('srs-conformance', 'srs-conformance', 'srs-conformance.json'),
+        engine: 'chromium',
+      }),
+      env: { KAIRO_BROWSER: 'chromium' },
+      timeoutMs: 80 * 60 * 1000,
+    },
+    {
+      ...node('srs-conformance-webkit', tool('verify-srs-conformance'), [], {
+        ...report('srs-conformance-webkit', 'srs-conformance', 'srs-conformance.json'),
+        engine: 'webkit',
+      }),
+      env: { KAIRO_BROWSER: 'webkit' },
+      timeoutMs: 80 * 60 * 1000,
+    },
     node(
       'native-readings',
       tool('verify-native-readings'),
@@ -844,6 +863,7 @@ export function batteryGates(out, env = process.env) {
       'search-fallback-core',
       'search-fallback-ui',
       'standalone-journey',
+      'srs-conformance',
     ].includes(gate.report?.type)
       ? {
           report: {
@@ -887,6 +907,7 @@ export function batteryGates(out, env = process.env) {
               'search-fallback-core',
               'search-fallback-ui',
               'standalone-journey',
+              'srs-conformance',
             ].includes(gate.report.type)
               ? {
                   sourceSha256: existsSync(resolve(ROOT, gate.requiredPath))
@@ -1769,6 +1790,21 @@ function requireCompleteReport({
       'Check count disagrees with the receipt',
     );
     assert.equal(value.summary?.failed, 0, 'Receipt reports failures');
+  } else if (type === 'srs-conformance') {
+    // SRS FULLPROOF: every row green and every negative control caught, for this gate's engine, on the pinned artifact
+    // by the pinned verifier; a targeted (--only) run is never an acceptance
+    assert.equal(value.format, 'bunki-srs-conformance', 'Not an SRS conformance receipt');
+    assert.equal(value.version, 1, 'Unknown SRS conformance receipt version');
+    assert.equal(value.only, null, 'A targeted SRS run is never an acceptance');
+    assert.deepEqual(value.engines, [engine], 'The SRS receipt is for another engine');
+    assert(Array.isArray(value.results) && value.results.length >= 30, 'The SRS receipt has too few checks');
+    assert.equal(new Set(value.results.map((row) => row.name)).size, value.results.length, 'Duplicate SRS checks');
+    assert(value.results.every((row) => row.pass === true), 'The SRS receipt contains a failed check');
+    assert(Array.isArray(value.controls) && value.controls.length >= 8, 'The SRS receipt has too few controls');
+    assert(value.controls.every((control) => control.caught === true), 'An SRS negative control was not caught');
+    assert.equal(value.pass, true, 'The SRS receipt does not pass');
+    assert(artifactSha256 && value.artifactSha256 === artifactSha256, 'The SRS receipt is for another artifact');
+    assert(sourceSha256 && value.verifierSha256 === sourceSha256, 'The SRS receipt is from another verifier');
   } else if (type === 'teaching-context' || type === 'ai-adaptation') {
     assert.equal(
       value.suite,
@@ -2814,6 +2850,8 @@ async function verifyRunner(out) {
     'practice-history-webkit',
     'kagami',
     'srs-today',
+    'srs-conformance',
+    'srs-conformance-webkit',
     'import-provider',
     'playback',
     'narration-media',
