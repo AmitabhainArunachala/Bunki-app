@@ -1637,6 +1637,30 @@ span.tok.named {
   color: var(--red);
 }
 
+/* each reading is one unit on its line: an atomic inline breaks only between readings (a nowrap span alone left
+   WebKit no break after the ・ before it, and a long list ran off the page) */
+.kv dd .reading-item {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* Kanji-trust K01 · a reading only the official 2010 table gives carries a star, and one quiet line names it */
+.reading-official-mark,
+.reference-reading-official {
+  margin-left: 0.08em;
+  font-size: 0.62em;
+  line-height: 0;
+  vertical-align: super;
+  color: var(--ink-2);
+}
+
+.reading-source-note {
+  margin: -4px 0 12px;
+  color: var(--ink-2);
+  font-size: var(--type-caption);
+  line-height: 1.5;
+}
+
 /* --------------------------------------------------------- provenance */
 .pool-tag {
   font-size: var(--type-caption);
@@ -3189,6 +3213,12 @@ body.v-depth-layered .stroke-page {
   max-width: 46vw;
   overflow-wrap: anywhere;
 }
+.stroke-read-note {
+  display: block;
+  max-width: 46vw;
+  font-size: var(--type-caption);
+  opacity: 0.8;
+}
 .stroke-read-label {
   margin-right: 0.6em;
   font-size: var(--type-caption);
@@ -3862,6 +3892,24 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   letter-spacing: 0.08em;
 }
 
+.stroke-reading-item {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.stroke-reading-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--ink-2);
+  font: var(--type-caption)/1.4 var(--sans);
+}
+
+/* K01 · the retry under the readings when every reading could not be loaded */
+.stroke-readings-retry {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
 .stroke-chrome-trigger {
   position: absolute;
   right: calc(8px + env(safe-area-inset-right));
@@ -4289,6 +4337,27 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
 .lesson-row .row-main {
   font-family: var(--serif);
   font-size: var(--type-control);
+}
+
+/* K08 · a finished lesson keeps its score in its row (and the run before, when there was one) */
+.lesson-row .lesson-score {
+  flex: none;
+  color: var(--ink-2);
+  font-size: var(--type-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.lesson-missed-mark {
+  margin: 0 0 6px;
+  color: var(--red);
+  font-size: var(--type-caption);
+}
+
+.lesson-reading-note {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+  font-size: var(--type-caption);
 }
 
 .lesson-options {

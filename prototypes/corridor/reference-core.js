@@ -22,6 +22,11 @@
  * Supplemental glyphs may lack D.kanji: read their normalized core metadata,
  * not lesson lookup. Fields metadataMissing/missingReading/missingMeanings
  * expose gaps; sourceRecords retain every Kentei source identity and URL.
+ * Kanji readings (Kanji-trust): extra.kanjiReadings (every KANJIDIC2 reading of each kanji.json or Jōyō
+ * glyph) and extra.officialReadings (常用漢字表 readings KANJIDIC2 lacks) complete an entry's `readings`,
+ * completeOn/completeKun and officialReadings; `on`/`kun` keep their first-source contract. The pure
+ * reading helpers (readingMatch, normalizeReadingQuery, mergeReadings, kanjiWordBuckets, kanjiAltWords) are
+ * the rules the generator, the app's kanji finder and the node invariant share.
  * The separate, licensed data projection is rebuilt and audited by:
  *   node tools/build-reference-data.mjs --check [--archive /path/to/archive.zip]
  * No network or generated classifications are used.
@@ -51,6 +56,7 @@
     'dictionary-index': 'prototypes/corridor/data/share_alike/dict-v2/index.json',
     'kanjidic-sample': 'corpus/samples/jmdict/kanjidic_sample.jsonl',
     'kanjidic-pinned': 'https://github.com/scriptin/jmdict-simplified/releases/tag/3.6.2%2B20260803141815',
+    'joyo-2010': 'https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/kanji/joyokanjisakuin/index.html',
   });
   const POLICY = Object.freeze({
     membership: 'All attested levels; distinct entries within each collection. Conflicts repeat across levels.',
@@ -60,6 +66,7 @@
     jlptKanji: 'Bundled editorial JLPT tags retained verbatim; N3 has no tagged kanji. Historical pre-2010 KANJIDIC levels are not mapped to modern JLPT levels.',
     unknown: 'No attested label, or an unrecognized label kept verbatim; never infer a level from school grade or rank.',
     relationships: 'Kentei related forms share an attested species ID, not necessarily a glyph or grade. Dictionary candidates require exact form/reading and reading restrictions; they do not classify every sense or authorize a canonical redirect.',
+    kanjiReadings: 'A kanji shows every reading: the listed readings first, then each further KANJIDIC2 reading, then each 常用漢字表 (2010) reading KANJIDIC2 lacks, marked as such. Nothing is dropped, merged or generated.',
   });
 
   function text(value) {
@@ -158,6 +165,91 @@
 
   function search(collection, query, options) {
     return paginateEntries(searchEntries(collection.entries, query), options);
+  }
+
+  /* ---- kanji readings and lookup (Kanji-trust). Pure, so the generator, this catalog, the app and the
+   * node invariant share one rule. A reading is matched whole, one reading at a time: never two concatenated. */
+  const toHiragana = (value) => text(value).replace(/[ァ-ヶ]/g,
+    (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+  /** KANJIDIC2 writes okurigana after a dot (た.べる) and affix positions with a hyphen (なま-, -う). */
+  function readingForms(reading) {
+    const plain = toHiragana(reading).replace(/-/g, '');
+    return { full: plain.replace(/\./g, ''), stem: plain.split('.')[0] };
+  }
+  /** Same reading, same kind: 音 in katakana is compared with 音, 訓 in hiragana with 訓 (dots and hyphens dropped). */
+  function readingKey(reading) {
+    const value = text(reading).replace(/[.-]/g, '');
+    return /[ァ-ヺ]/.test(value) ? `on:${value}` : `kun:${value}`;
+  }
+  /** Every reading of `base`, in its order, then each reading of the further lists that is not yet there (exact text). */
+  function mergeReadings(base, ...more) {
+    return unique([...strings(base), ...more.flatMap(strings)]);
+  }
+  /** A query as the reading lens reads it: NFKC (ｔａｂｅｒｕ, ﾀﾍﾞﾙ), katakana as hiragana, romaji through `toKana`
+   * (the app's own converter). Latin typed after kana is still being composed (たべr): a run `toKana` cannot read is
+   * dropped at the end, and refuses the query anywhere else. Returns '' when nothing readable is left. */
+  function normalizeReadingQuery(raw, toKana = () => null) {
+    const value = text(raw).normalize('NFKC').toLowerCase().replace(/[\s.\-・･'’]/g, '');
+    if (!value) return '';
+    const runs = value.match(/[a-z]+|[^a-z]+/g) || [];
+    let out = '';
+    for (let i = 0; i < runs.length; i += 1) {
+      const run = runs[i];
+      if (!/^[a-z]+$/.test(run)) {
+        if (!/^[ぁ-ゖァ-ヺー]+$/.test(run)) return '';
+        out += toHiragana(run);
+        continue;
+      }
+      let kana = toKana(run);
+      // a romaji run still being typed (taber, kanj): read the longest leading part that converts
+      for (let cut = run.length - 1; !kana && cut > 0 && i === runs.length - 1; cut -= 1) kana = toKana(run.slice(0, cut));
+      if (!kana) {
+        if (i === runs.length - 1 && out) return out;
+        return '';
+      }
+      out += kana;
+    }
+    return out;
+  }
+  /** 2: a reading is the query itself (whole, or the stem before its okurigana); 1: a reading begins with it; 0: none. */
+  function readingMatch(readings, query) {
+    if (!query) return 0;
+    let best = 0;
+    for (const reading of strings(readings)) {
+      const { full, stem } = readingForms(reading);
+      if (full === query || stem === query) return 2;
+      if (full.startsWith(query)) best = 1;
+    }
+    return best;
+  }
+  /** The app's kanji → words rule (corridor.js D.kanjiWords): a row's `k` list, else the kanji of its headword. */
+  const isIndexedKanji = (ch) => ch >= '一' && ch <= '鿿';
+  function kanjiWordBuckets(dict = {}, words = {}) {
+    const buckets = new Map();
+    const add = (glyph, word) => {
+      if (!buckets.has(glyph)) buckets.set(glyph, new Set());
+      buckets.get(glyph).add(word);
+    };
+    for (const row of Object.values(words)) {
+      for (const glyph of row?.k?.length ? row.k : [...text(row?.w)].filter(isIndexedKanji)) add(glyph, row.w);
+    }
+    for (const [id, row] of Object.entries(dict)) {
+      for (const glyph of row?.k?.length ? row.k : [...id].filter(isIndexedKanji)) add(glyph, id);
+    }
+    return buckets;
+  }
+  /** Words reached through a written alternative (しいたけ／椎茸): glyph → [[entry id, the spelling that holds it]]. */
+  function kanjiAltWords(dict = {}) {
+    const out = new Map();
+    for (const [id, row] of Object.entries(dict)) {
+      const alt = text(row?.alt);
+      if (!alt) continue;
+      for (const glyph of unique([...alt].filter(isIndexedKanji))) {
+        if (!out.has(glyph)) out.set(glyph, []);
+        out.get(glyph).push([id, alt]);
+      }
+    }
+    return out;
   }
 
   function createCatalog(input = {}, options = {}) {
@@ -320,6 +412,28 @@
         entry.reading = entry.readings[0] || '';
         addSource(entry, source);
       }
+      // Every reading a kanji has (Kanji-trust K01): the listed ones first, then each further KANJIDIC2
+      // reading, then each 常用漢字表 reading KANJIDIC2 lacks, named in officialReadings. `on`/`kun` keep
+      // their first-source contract above; `readings`, completeOn and completeKun are the whole record.
+      const official = new Map();
+      for (const [id, reading] of extra.officialReadings || []) {
+        if (!official.has(id)) official.set(id, []);
+        official.get(id).push(reading);
+      }
+      const isOn = (reading) => readingKey(reading).startsWith('on:');
+      for (const [id, on, kun] of extra.kanjiReadings || []) {
+        const entry = kanjiEntries.get(id);
+        if (!entry) continue;
+        const added = official.get(id) || [];
+        entry.completeOn = mergeReadings(entry.on, on, added.filter(isOn));
+        entry.completeKun = mergeReadings(entry.kun, kun, added.filter((reading) => !isOn(reading)));
+        entry.officialReadings = [...added];
+        const before = entry.readings.length;
+        entry.readings = unique([...entry.readings, ...entry.completeOn, ...entry.completeKun]);
+        // provenance only where this source added a reading the listed ones lacked
+        if (entry.readings.length - added.length > before) entry.metadataSources.readings = { source: 'kanjidic-pinned', sourceId: id };
+        if (added.length) entry.metadataSources.officialReadings = { source: 'joyo-2010', sourceId: id };
+      }
     }
 
     function collectionFor(family, level) {
@@ -423,6 +537,7 @@
 
   return Object.freeze({
     createCatalog, search, searchEntries, sortEntries, paginateEntries,
+    readingForms, readingKey, mergeReadings, normalizeReadingQuery, readingMatch, kanjiWordBuckets, kanjiAltWords,
     normalizeQuery, normalizeLevel, compareEntries, wordKey, JLPT_LEVELS, KANKEN_LEVELS,
   });
 });

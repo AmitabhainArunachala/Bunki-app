@@ -25,6 +25,25 @@
   function create({ catalog, tx, onChange, onOpen, onExit, onStudy, onMock, onSearch, getReturnLabel, getTaken, note, roomName }) {
     // the one honest note (contract §5), from the host; without one the element is drawn without its words
     const honest = (kind) => { if (note) return note(kind); const line = node('p', 'note'); line.dataset.kind = kind; return line; };
+    /** A row's readings: every reading (Kanji-trust K01); one only the official 2010 table gives is starred. */
+    const readingCell = (entry) => {
+      const cell = node('span', 'reference-entry-reading');
+      if (!entry.readings?.length) {
+        cell.textContent = entry.reading || tx('読みなし', 'No reading');
+        return cell;
+      }
+      const official = new Set(entry.officialReadings || []);
+      entry.readings.forEach((reading, index) => {
+        if (index) cell.append('・');
+        cell.append(reading);
+        if (official.has(reading)) {
+          const mark = node('sup', 'reference-reading-official', '*');
+          mark.title = tx('常用漢字表（2010年）にある読み', 'a reading from the official Jōyō kanji table (2010)');
+          cell.append(mark);
+        }
+      });
+      return cell;
+    };
     const state = {
       collectionId: null,
       jlptKind: 'word',
@@ -458,7 +477,7 @@
         const content = node('span', 'reference-entry-content');
         content.append(
           node('span', 'reference-entry-headword', entry.missingGlyph ? tx(`字形未収録 (${entry.id})`, `Glyph not supplied (${entry.id})`) : entry.text || entry.id),
-          node('span', 'reference-entry-reading', entry.readings?.length ? entry.readings.join('・') : entry.reading || tx('読みなし', 'No reading')),
+          readingCell(entry),
           node('span', 'reference-entry-meaning', entry.meanings?.length
             ? entry.meanings.join('; ')
             : tx('意味未収録', 'Meaning not supplied')),

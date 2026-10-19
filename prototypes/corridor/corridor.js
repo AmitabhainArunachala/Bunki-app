@@ -4896,6 +4896,8 @@ async function boot() {
     }
   }
   D.wordCap = manifest.caps.kanjiWordCap;
+  // K07 · words whose written alternative holds a kanji (しいたけ／椎茸): one rule with the generator's
+  D.kanjiAltWords = window.BunkiReferenceCore?.kanjiAltWords?.(D.dict) || new Map();
 
   try {
     fsrsApi = window.__TSFSRS__ || (await import('./vendor/ts-fsrs.mjs'));
@@ -5987,6 +5989,9 @@ function keepNavigationReturn(destination, invoker = document.activeElement) {
     searchFrom: S.searchFrom, navQ: S.navQ, navSourceContext: S.navSourceContext,
     referenceState: referenceLibrary ? { ...referenceLibrary.state } : null,
     pendingReferenceCollection: S.view === 'levels' ? pendingReferenceCollection : null,
+    // K05 · the 字引 finder and the search room's lenses share one query (S.kdx): a search opened from an entry
+    // changes it, so the frame keeps the finder as it was (query, lens, show-all) for the return to put back
+    kdx: S.kdx ? JSON.parse(JSON.stringify(S.kdx)) : null, searchLens: S.searchLens,
   });
   S.stack = [];
   S.dialogInvoker = null;
@@ -6016,6 +6021,7 @@ function returnFromNavigation() {
     scaleVisit: home.scaleVisit && home.scaleVisit.recordEpoch === recordEpoch ? home.scaleVisit : null,
     passageId: home.passageId, readerScroll: home.readerScroll, readerTake: home.readerTake,
     searchFrom: home.searchFrom, navQ: home.navQ, navSourceContext: home.navSourceContext,
+    kdx: home.kdx || undefined, searchLens: home.searchLens,
     sheetReturnFocus: home.stack.at(-1)?.returnFocus || null,
   });
   render();
@@ -18956,16 +18962,53 @@ function lessonLaneIds(kind, lvl) {
 function lessonPlan(kind, lvl) {
   const ids = lessonLaneIds(kind, lvl);
   const out = [];
+  // K08 · a lane's last few items are a short lesson of their own (鹿 alone in 7級): never dropped, and the
+  // lessons before keep their ids and items, so a kept score still names the same ten
   for (let i = 0; i < ids.length; i += LESSON_SIZE) {
     const words = ids.slice(i, i + LESSON_SIZE);
-    if (words.length < 4) break;
     out.push({ id: `${lvl}-${out.length + 1}`, lvl, kind, words });
   }
   return out;
 }
-function startLesson(lesson) {
+/** K08 · the items the lesson's latest full run missed, from its own evidence rows (the record's shape is
+ * unchanged: one score per lesson, and one obslog row per item per run, stamped with the score's time). */
+function lessonMissedLast(lesson) {
+  const done = S.lessonsDone?.[lesson.id];
+  if (!done) return [];
+  const kind = lesson.kind || 'word';
+  const missed = new Set((S.obslog || [])
+    .filter((row) => row[1] === 'lesson' && row[4] === lesson.id && row[0] === done.ts && row[3] === 1)
+    .map((row) => row[2]));
+  return lesson.words.filter((w) => missed.has(srsKey(kind, w)));
+}
+/** The run before a lesson's latest one, read back from the evidence rows: id → { score, total }. */
+function lessonPreviousRuns() {
+  const runs = new Map();
+  for (const row of S.obslog || []) {
+    if (row[1] !== 'lesson' || !S.lessonsDone?.[row[4]]) continue;
+    const byTime = runs.get(row[4]) || new Map();
+    const run = byTime.get(row[0]) || { score: 0, total: 0 };
+    run.total += 1;
+    if (row[3] === 3) run.score += 1;
+    byTime.set(row[0], run);
+    runs.set(row[4], byTime);
+  }
+  const previous = new Map();
+  for (const [id, byTime] of runs) {
+    const before = [...byTime.keys()].filter((ts) => ts < S.lessonsDone[id].ts).sort((a, b) => b - a)[0];
+    if (before != null) previous.set(id, byTime.get(before));
+  }
+  return previous;
+}
+/** Start a lesson: all of it, or only `only` (its missed items, which never touch its score). */
+function startLesson(lesson, { only = null } = {}) {
   S.lessonsScroll = window.scrollY; // the list keeps the learner's place
-  S.lessonRun = { ...lesson, ix: 0, phase: 'learn', correct: 0, picked: null, choices: null };
+  const plan = { id: lesson.id, lvl: lesson.lvl, kind: lesson.kind, words: [...lesson.words] };
+  S.lessonRun = {
+    ...plan, plan, words: only ? [...only] : [...lesson.words], missedOnly: !!only,
+    previous: S.lessonsDone?.[lesson.id] || null, lastMissed: lessonMissedLast(plan),
+    ix: 0, phase: 'learn', correct: 0, picked: null, choices: null,
+  };
   render();
   window.scrollTo(0, 0);
 }
@@ -19055,6 +19098,7 @@ function renderLessons(main) {
   main.append(withEn(el('p', 'eyebrow', 'レッスン'), 'lessons', 'en-inline'));
   if (!run) {
     main.append(el('h1', 'view-title', tx('入り口から、順に', 'From the entrance, in order')));
+    const previous = lessonPreviousRuns();
     const section = (kind, lvl, label) => {
       const plan = lessonPlan(kind, lvl);
       if (!plan.length) return;
@@ -19063,17 +19107,43 @@ function renderLessons(main) {
       head.append(document.createTextNode(`${label} — ${done} / ${plan.length}`));
       if (bi()) head.append(el('span', 'en-inline', `${plan.length} lessons`));
       main.append(head);
+      // K08 · a finished lesson with misses stays in the list with its score, beside the next unfinished
+      // ones; "see all" opens every lesson of the lane, a perfect one included, to take again
+      const laneKey = `${kind}:${lvl}`;
+      const all = S.lessonsAll === laneKey;
+      const again = new Set(plan.filter((l) => S.lessonsDone[l.id] && S.lessonsDone[l.id].score < S.lessonsDone[l.id].total).slice(0, 5));
       const next = plan.filter((l) => !S.lessonsDone[l.id]).slice(0, 5);
-      for (const lesson of next) {
+      const shown = all ? plan : plan.filter((l) => again.has(l) || next.includes(l));
+      for (const lesson of shown) {
         const row = el('button', 'entry-row lesson-row');
         row.type = 'button';
+        row.dataset.lesson = lesson.id;
         row.append(el('span', 'row-glyph', lesson.id.split('-')[1]));
         row.append(el('span', 'row-main', lesson.words.slice(0, 4).join('・') + (lesson.words.length > 4 ? '…' : '')));
+        const result = S.lessonsDone[lesson.id];
+        if (result) {
+          const before = previous.get(lesson.id);
+          const score = el('span', 'lesson-score', `${result.score}/${result.total}`);
+          if (before) score.append(el('span', 'lesson-score-before', tx(` · 前回 ${before.score}/${before.total}`, ` · last time ${before.score}/${before.total}`)));
+          row.append(score);
+        }
         row.append(el('span', 'row-go', '›'));
         row.addEventListener('click', () => startLesson(lesson));
         main.append(row);
       }
-      if (!next.length) main.append(el('p', 'card-kind', tx('この級はぜんぶ終わった。', 'Every lesson at this level is done.')));
+      if (!all && !next.length && !again.size) main.append(el('p', 'card-kind', tx('この級はぜんぶ終わった。', 'Every lesson at this level is done.')));
+      if (all || shown.length < plan.length) {
+        const toggle = el('button', 'more-row lesson-all');
+        toggle.type = 'button';
+        toggle.dataset.lessonLane = laneKey;
+        toggle.setAttribute('aria-expanded', String(all));
+        toggle.textContent = all ? tx('たたむ', 'show fewer') : tx(`この級のレッスンをすべて見る（${plan.length}）`, `see all ${plan.length} lessons`);
+        toggle.addEventListener('click', () => {
+          S.lessonsAll = all ? null : laneKey;
+          render();
+        });
+        main.append(toggle);
+      }
     };
     for (const lvl of JLPT_LANES) section('word', lvl, lvl);
     main.append(withEn(el('p', 'eyebrow', '漢検 — 字のレッスン'), 'kanji lessons, by Kanji Kentei grade', 'en-inline'));
@@ -19085,9 +19155,16 @@ function renderLessons(main) {
     const word = run.words[run.ix];
     const backc = reviewBack({ t: run.kind || 'word', id: word });
     main.append(el('p', 'card-kind', `${run.id} — ${run.ix + 1} / ${run.words.length}`));
+    if ((run.lastMissed || []).includes(word)) {
+      const missed = el('p', 'lesson-missed-mark', tx('× 前回まちがえた', '× missed last time'));
+      missed.dataset.lessonMissed = word;
+      main.append(missed);
+    }
     const face = el('div', 'review-face');
     face.append(el('div', 'review-front', word));
     if (backc.reading) face.append(el('div', 'review-reading', backc.reading));
+    // K01 · a kanji lesson teaches a selection of readings; the full entry has every one
+    if (backc.reading && run.kind === 'kanji') face.append(el('p', 'lesson-reading-note', tx('このレッスンで扱う読み。ほかの読みは「全項目」に。', 'The readings this lesson teaches — the full entry has every reading.')));
     for (const m of backc.senses.slice(0, 3)) face.append(el('div', 'review-sense', m));
     const door = biLabel('button', 'chip', '全項目', 'Full entry');
     door.type = 'button';
@@ -19115,6 +19192,7 @@ function renderLessons(main) {
     const face = el('div', 'review-face');
     face.append(el('div', 'review-front', word));
     if (run.picked != null && backc.reading) face.append(el('div', 'review-reading', backc.reading));
+    if (run.picked != null && backc.reading && run.kind === 'kanji') face.append(el('p', 'lesson-reading-note', tx('このレッスンで扱う読み。ほかの読みは「全項目」に。', 'The readings this lesson teaches — the full entry has every reading.')));
     main.append(face);
     const list = el('div', 'lesson-options');
     run.choices.opts.forEach((opt) => {
@@ -19158,13 +19236,15 @@ function renderLessons(main) {
           const kt = run.kind || 'word';
           const now = Date.now();
           const result = { score: run.correct, total: run.words.length, ts: now };
-          const rows = run.words.map((w, i) => [now, 'lesson', srsKey(kt, w), run.results[i] === 3 ? 3 : 1, run.id]);
+          // K08 · going over the missed ones is practice on the record, named apart, and never the lesson's score
+          const runName = run.missedOnly ? `${run.id}:missed` : run.id;
+          const rows = run.words.map((w, i) => [now, 'lesson', srsKey(kt, w), run.results[i] === 3 ? 3 : 1, runName]);
           run.pending = true;
           btn.disabled = true;
           let saved;
           try {
             saved = await commitStorePatch((latest) => ({
-              lessonsDone: { ...latest.lessonsDone, [run.id]: result },
+              ...(run.missedOnly ? {} : { lessonsDone: { ...latest.lessonsDone, [run.id]: result } }),
               obslog: [...(latest.obslog || []), ...rows],
             }));
           } finally { run.pending = false; }
@@ -19183,6 +19263,16 @@ function renderLessons(main) {
   // stands in the observation ledger; 覚える is a quiet choice, per word
   // or all at once, and choosing nothing adds nothing.
   main.append(el('h1', 'view-title', tx(`${run.correct} / ${run.words.length}`, `${run.correct} of ${run.words.length}`)));
+  // K08 · the lesson's earlier score stays named; a run of the missed ones leaves the score as it was
+  if (run.missedOnly) {
+    const kept = S.lessonsDone?.[run.id];
+    const line = el('p', 'gloss lesson-score-kept', kept
+      ? tx(`まちがえた分だけの稽古。レッスンの点数は ${kept.score} / ${kept.total} のまま。`, `Practice on the missed ones only — the lesson's score stays ${kept.score} of ${kept.total}.`)
+      : tx('まちがえた分だけの稽古。レッスンの点数は変わらない。', 'Practice on the missed ones only — the lesson\'s score does not change.'));
+    main.append(line);
+  } else if (run.previous) {
+    main.append(el('p', 'gloss lesson-score-before', tx(`前回は ${run.previous.score} / ${run.previous.total}`, `Last time ${run.previous.score} of ${run.previous.total}`)));
+  }
   main.append(
     el(
       'p',
@@ -19244,6 +19334,22 @@ function renderLessons(main) {
     all.disabled = learningEnrollmentPending.has(run);
     main.append(all);
   }
+  // K08 · a failed or partial lesson is taught again from here: only the missed ones, or all of it
+  const plan = run.plan || { id: run.id, lvl: run.lvl, kind: run.kind, words: run.words };
+  const missed = run.words.filter((w, i) => (run.results || [])[i] !== 3);
+  if (missed.length) {
+    const counter = kt === 'kanji' ? '字' : '語';
+    const redo = biLabel('button', 'take', `まちがえた ${missed.length} ${counter}をもう一度`, `Go over the ${missed.length} missed`);
+    redo.type = 'button';
+    redo.id = 'lesson-missed';
+    redo.addEventListener('click', () => startLesson(plan, { only: missed }));
+    main.append(redo);
+  }
+  const retake = biLabel('button', missed.length ? 'chip' : 'take', 'レッスンをはじめから', 'Retake this lesson');
+  retake.type = 'button';
+  retake.id = 'lesson-retake';
+  retake.addEventListener('click', () => startLesson(plan));
+  main.append(retake);
   const again = biLabel('button', 'take', 'レッスン一覧へ', 'back to lessons');
   again.type = 'button';
   again.addEventListener('click', endLessonRun);
@@ -22579,6 +22685,11 @@ function loadReferenceExtra() {
     }
     if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Reference data unavailable');
     D.referenceExtra = data;
+    // the official table that supplies the readings KANJIDIC2 lacks is named beside the other sources
+    const table = (data.sources || []).find((source) => String(source.name).startsWith('常用漢字表'));
+    if (table && D.sources?.share_alike && !D.sources.share_alike.some((source) => source.url === table.url)) {
+      D.sources.share_alike.push({ name: 'Jōyō kanji table (Cabinet Notice No. 2, 2010)', licence: table.licence, url: table.url, fetchedAt: table.fetchedAt });
+    }
     return data;
   }).catch(error => {
     referenceExtraError = error;
@@ -22588,6 +22699,17 @@ function loadReferenceExtra() {
     referenceExtraPending = false;
     referenceExtraTask = null;
     if (S.ready && S.view === 'levels' && !S.stack.length) render();
+    // a kanji page or reading search drawn while every reading was still on its way is drawn again (K01, K06);
+    // the search swaps only its results, so the field being typed in keeps its focus
+    else if (S.ready) {
+      if (document.querySelector('#kdx-results > [data-kdx-readings="pending"]')) {
+        document.getElementById('kdx-results')?.replaceWith(kdxTextResults('reading'));
+      }
+      // an open writing room keeps its ink: only its readings are drawn again, the entry beneath when the room closes
+      if (S.strokes) {
+        if (document.querySelector('#stroke-page [data-stroke-readings]')) refreshStrokeReadings();
+      } else if (document.querySelector('[data-kanji-readings="pending"]')) render();
+    }
   });
   return referenceExtraTask;
 }
@@ -22687,20 +22809,99 @@ function openReferenceEntry(entry, invoker) {
     ...(target?.reading ? { reading: target.reading } : {}), referenceEntry: entry }, { invoker });
 }
 
+/* Kanji-trust K01 · one reference record for every kanji door. kanji.json's short reading lists stay what the
+ * lessons teach; the reference sidecar carries every KANJIDIC2 reading of each kanji.json or Jōyō glyph, the
+ * 常用漢字表 readings KANJIDIC2 lacks, and the two Jōyō forms kanji.json lacks (剝, 𠮟). Display and lookup only:
+ * D.kanji, the learner's record and the scheduler are never written. */
+let kanjiReferenceIndexFor = null;
+let kanjiReferenceIndex = null;
+function kanjiReferenceRows() {
+  const extra = D.referenceExtra;
+  if (!extra) return null;
+  if (kanjiReferenceIndexFor !== extra) {
+    const official = new Map();
+    for (const [glyph, reading] of extra.officialReadings || []) {
+      if (!official.has(glyph)) official.set(glyph, []);
+      official.get(glyph).push(reading);
+    }
+    kanjiReferenceIndex = {
+      readings: new Map((extra.kanjiReadings || []).map((row) => [row[0], row])),
+      official,
+      records: new Map((extra.kanjiRecords || []).map((row) => [row[0], row])),
+      words: new Map(extra.jmdictWords || []),
+      wordless: new Set(extra.kanjiWithoutWords || []),
+    };
+    kanjiReferenceIndexFor = extra;
+  }
+  return kanjiReferenceIndex;
+}
+/** Whether every reading is here yet: 'complete' once the sidecar arrived, else 'pending' or 'failed' (retryable). */
+function kanjiReadingsState() {
+  return D.referenceExtra ? 'complete' : referenceExtraError && !referenceExtraPending ? 'failed' : 'pending';
+}
+/** The whole record of one kanji: the listed readings first, then each further KANJIDIC2 reading, then the
+ * 常用漢字表 ones KANJIDIC2 lacks (named in officialReadings). lessonOn/lessonKun keep the lessons' selection.
+ * readingsState: complete · listed (no KANJIDIC2 record) · pending · failed. */
+function kanjiReference(id) {
+  const rows = kanjiReferenceRows();
+  const row = rows?.readings.get(id);
+  const added = rows?.official.get(id) || [];
+  const helpers = window.BunkiReferenceCore;
+  const core = D.kanji?.[id];
+  if (!helpers?.mergeReadings) {
+    return core ? { ...core, lessonOn: [...(core.on || [])], lessonKun: [...(core.kun || [])], officialReadings: [], readingsState: 'failed' } : null;
+  }
+  const isOn = (reading) => helpers.readingKey(reading).startsWith('on:');
+  if (core) {
+    return {
+      ...core,
+      on: helpers.mergeReadings(core.on, row?.[1], added.filter(isOn)),
+      kun: helpers.mergeReadings(core.kun, row?.[2], added.filter((reading) => !isOn(reading))),
+      lessonOn: [...(core.on || [])],
+      lessonKun: [...(core.kun || [])],
+      officialReadings: added,
+      readingsState: row ? 'complete' : rows ? 'listed' : kanjiReadingsState(),
+    };
+  }
+  const record = rows?.records.get(id);
+  if (!record) return null;
+  return {
+    c: id, on: [...(row?.[1] || [])], kun: [...(row?.[2] || [])], m: record[1].join('; '), meanings: [...record[1]],
+    st: record[2], rad: record[3], parts: [], officialReadings: added, readingsState: 'complete', joyoOutsideCore: true,
+  };
+}
+/** Every kanji the finder lists: kanji.json's, and the Jōyō forms it lacks once the reference record holds them. */
+function kanjiFinderUniverse() {
+  const rows = kanjiReferenceRows();
+  const keys = Object.keys(D.kanji || {});
+  return rows ? [...keys, ...[...rows.records.keys()].filter((glyph) => !D.kanji[glyph])] : keys;
+}
+
 /** Display-only enrichment. Canonical facts and scheduling records are never
- * overwritten; only an empty display field can borrow attested source data. */
+ * overwritten: the complete readings ride beside them (kanjiReference), and an
+ * empty display field can still borrow attested source data. */
 function kanjiDisplayRecord(id, reference = null) {
   const canonical = D.kanji[id];
-  if (!canonical) return canonical;
+  if (!canonical) return kanjiReference(id) || canonical;
+  const full = kanjiReference(id);
   const entry = reference || referenceLibrary?.entry('kanji', id);
-  if (!entry) return canonical;
+  if (!entry) return full;
   return {
-    ...canonical,
-    on: canonical.on?.length ? canonical.on : entry.on || [],
-    kun: canonical.kun?.length ? canonical.kun : entry.kun || [],
+    ...full,
+    on: full.on?.length ? full.on : entry.on || [],
+    kun: full.kun?.length ? full.kun : entry.kun || [],
     m: canonical.m || entry.meanings?.join('; ') || '',
     st: canonical.st ?? entry.strokeCount,
   };
+}
+/** K01 · the one record a kanji's entry and its writing room both show: the learner's saved copy, else the whole
+ * reference record, else the wider SKIP index's KANJIDIC2 entry (胤); null only while none of them holds it. */
+function kanjiEntryRecord(id, reference = null) {
+  return retainedKanjiRecord(id) || kanjiDisplayRecord(id, reference) || D.kanji[id] || window.BunkiSkipUI?.getKanji(S.skipUi, id) || null;
+}
+/** The writing room's record: its entry's, with the reference entry that entry was opened from. */
+function strokeRoomRecord(id) {
+  return kanjiEntryRecord(id, S.stack.findLast((node) => node.t === 'kanji' && node.id === id)?.referenceEntry);
 }
 function renderReferenceMetadata(container, entry) {
   if (entry.type === 'word' && entry.variants?.length) {
@@ -22711,7 +22912,8 @@ function renderReferenceMetadata(container, entry) {
     }
   }
   const grouped = new Map();
-  const labels = { on: '音読み', kun: '訓読み', meanings: tx('意味', 'meanings'), strokeCount: tx('画数', 'stroke count') };
+  const labels = { on: '音読み', kun: '訓読み', meanings: tx('意味', 'meanings'), strokeCount: tx('画数', 'stroke count'),
+    readings: tx('すべての読み', 'every reading'), officialReadings: tx('常用漢字表の読み', 'Jōyō table readings') };
   for (const [field, credit] of Object.entries(entry.metadataSources || {})) {
     if (credit.source === 'kanji' || credit.source === 'kmeta') continue;
     const source = `${credit.source} · ${credit.sourceId}`;
@@ -22974,29 +23176,53 @@ function renderSkipLookup(host, options = {}) {
   });
 }
 
-/** The shared results grid — every hit opens the same kanji entry. */
-function renderKdxGrid(host, chars, CAP = 200) {
-  host.append(
-    withEn(
-      el('p', 'eyebrow', `見つかった字 — ${chars.length}`),
-      chars.length > CAP ? `found — first ${CAP} shown` : 'found',
-      'en-inline',
-    ),
-  );
+/** What a capped grid shows: its first `cap` hits, or every hit once its "show all" is open (K05). */
+function kdxGridShown(chars, cap, open) {
+  return open ? chars : chars.slice(0, cap);
+}
+/** The shared results grid — every hit opens the same kanji entry. The count is the true one, and a grid longer
+ * than its first page carries one "show all" door (K05). `key` names the query: an opened grid stays open for that
+ * query in this session (S.kdx, never the record), so Back from an entry lands on the same place. `empty: false`
+ * leaves out the no-match line when the lookup itself is not complete (a failure is not a no-match, K06). */
+function renderKdxGrid(host, chars, CAP = 200, key = '', { empty = true, mark = null } = {}) {
+  const open = !!key && S.kdx?.open === key;
+  const heading = (shown) => tx(`見つかった字 — ${chars.length}`, shown < chars.length
+    ? `${chars.length.toLocaleString('en')} found — first ${shown} shown` : `${chars.length.toLocaleString('en')} found`);
+  const eyebrow = el('p', 'eyebrow', heading(kdxGridShown(chars, CAP, open).length));
+  eyebrow.dataset.kdxCount = String(chars.length);
+  host.append(eyebrow);
   if (!chars.length) {
-    host.append(el('div', 'sem-empty', tx('この条件の字はない。', 'No character matches that yet.')));
+    if (empty) host.append(el('div', 'sem-empty', tx('この条件の字はない。', 'No character matches that yet.')));
     return;
   }
   const grid = el('div', 'kdx-grid');
-  for (const c of chars.slice(0, CAP)) {
-    const b = el('button', 'kdx-glyph', c);
-    b.type = 'button';
-    b.dataset.kdxHit = c;
-    if (D.kanji[c]) b.setAttribute('aria-label', D.kanji[c].m);
-    b.addEventListener('click', () => go({ t: 'kanji', id: c }));
-    grid.append(b);
-  }
+  const add = (list) => {
+    for (const c of list) {
+      const b = el('button', 'kdx-glyph', c);
+      b.type = 'button';
+      b.dataset.kdxHit = c;
+      if (D.kanji[c]) b.setAttribute('aria-label', D.kanji[c].m);
+      mark?.(b, c);
+      b.addEventListener('click', () => go({ t: 'kanji', id: c }));
+      grid.append(b);
+    }
+  };
+  add(kdxGridShown(chars, CAP, open));
   host.append(grid);
+  if (kdxGridShown(chars, CAP, open).length < chars.length) {
+    const more = el('button', 'more-row kdx-more');
+    more.type = 'button';
+    more.dataset.kdxMore = key || 'grid';
+    const remain = chars.length - CAP;
+    more.textContent = tx(`のこり ${remain} 字をすべて見る`, `show all ${chars.length.toLocaleString('en')} — ${remain.toLocaleString('en')} more`);
+    more.addEventListener('click', () => {
+      if (key) (S.kdx ||= {}).open = key;
+      add(chars.slice(CAP));
+      eyebrow.textContent = heading(chars.length);
+      more.remove();
+    });
+    host.append(more);
+  }
 }
 
 /* 部品 — multi-radical. Tap several parts you can see; the set narrows to
@@ -23045,7 +23271,7 @@ function renderKdxParts(main) {
   }
 
   const hits = kdxPartHits();
-  if (S.kdx.parts.length || S.kdx.st) renderKdxGrid(main, hits, 160);
+  if (S.kdx.parts.length || S.kdx.st) renderKdxGrid(main, hits, 160, `parts:${S.kdx.parts.join('')}:${S.kdx.st || ''}`);
 
   // which components still co-occur with the current hits? (the union of the
   // hits' own parts). Nothing selected → everything is available.
@@ -23073,7 +23299,10 @@ function kdxPartGrid(coPresent) {
   const wrap = el('div');
   wrap.id = 'kdx-partgrid';
   const q = (S.kdx.partq || '').trim().toLowerCase();
-  let parts = Object.values(D.radicals).filter((r) => (r.kanjiCount || 0) >= 8);
+  // a part used in fewer than 8 kanji stays out of the browsing wall, but the exact part or its exact name
+  // typed in the filter always finds it (K05: 父, ちち)
+  let parts = Object.values(D.radicals).filter((r) =>
+    (r.kanjiCount || 0) >= 8 || (q && (r.c === q || (r.name && r.name.toLowerCase() === q))));
   if (q) parts = parts.filter((r) => r.c === q || (r.name && r.name.toLowerCase().includes(q)));
   parts.sort((a, b) => (a.st || 99) - (b.st || 99) || b.kanjiCount - a.kanjiCount);
   const bySt = new Map();
@@ -23129,10 +23358,10 @@ function renderKdxStrokes(main) {
   }
   main.append(stRow);
   if (S.kdx.st) {
-    const chars = Object.keys(D.kanji)
-      .filter((c) => D.kanji[c].st === S.kdx.st)
+    const chars = kanjiFinderUniverse()
+      .filter((c) => (D.kanji[c] || kanjiReference(c))?.st === S.kdx.st)
       .sort((a, b) => (a < b ? -1 : 1));
-    renderKdxGrid(main, chars, 300);
+    renderKdxGrid(main, chars, 300, `st:${S.kdx.st}`);
   }
 }
 
@@ -23162,34 +23391,69 @@ function renderKdxRadical(main) {
   }
   main.append(row);
   if (S.kdx.rad) {
-    const chars = Object.keys(D.kanji)
-      .filter((c) => D.kanji[c].rad === S.kdx.rad)
-      .sort((a, b) => D.kanji[a].st - D.kanji[b].st || (a < b ? -1 : 1));
-    renderKdxGrid(main, chars, 300);
-    for (const g of main.querySelectorAll('.kdx-glyph')) g.dataset.rad = String(S.kdx.rad);
+    const rec = (c) => D.kanji[c] || kanjiReference(c);
+    const chars = kanjiFinderUniverse()
+      .filter((c) => rec(c)?.rad === S.kdx.rad)
+      .sort((a, b) => rec(a).st - rec(b).st || (a < b ? -1 : 1));
+    renderKdxGrid(main, chars, 300, `rad:${S.kdx.rad}`, { mark: (b) => { b.dataset.rad = String(S.kdx.rad); } });
   }
 }
 
 /* 頻度 — newspaper frequency rank (KANJIDIC2's 2,501 most used, carried by
  * the SKIP sidecar). Loaded once, on first use. */
 let kanjiFreqPromise = null;
+let kanjiFreqError = null;
 function ensureKanjiFrequency() {
   if (D.kanjiFreq) return Promise.resolve(D.kanjiFreq);
   if (!kanjiFreqPromise) {
-    kanjiFreqPromise = fetch('data/share_alike/skip.json')
-      .then((r) => (r.ok ? r.json() : null))
+    // K06 · a failed load is kept as an error, never as an empty table, and lets go of its promise so the
+    // learner's retry fetches again (it once cached {} for good and answered "no match" forever)
+    kanjiFreqError = null;
+    const bundled = window.__CORRIDOR_BUNDLE__?.['share_alike/skip'];
+    kanjiFreqPromise = (bundled ? Promise.resolve(bundled) : fetch('data/share_alike/skip.json').then((r) => {
+      if (!r.ok) throw new Error(`frequency table: ${r.status}`);
+      return r.json();
+    }))
       .then((data) => {
+        if (!Array.isArray(data?.entries)) throw new Error('frequency table unreadable');
         const map = {};
-        for (const e of (data && data.entries) || []) if (e.frequency != null) map[e.literal] = e.frequency;
+        for (const e of data.entries) if (e.frequency != null) map[e.literal] = e.frequency;
         D.kanjiFreq = map;
         return map;
       })
-      .catch(() => {
-        D.kanjiFreq = {};
-        return D.kanjiFreq;
+      .catch((error) => {
+        kanjiFreqError = error;
+        return null;
+      })
+      .finally(() => {
+        kanjiFreqPromise = null;
       });
   }
   return kanjiFreqPromise;
+}
+/** The kanji one newspaper-frequency band lists, commonest first, over the finder's universe (K05). */
+function kdxFrequencyHits(lo, hi) {
+  return kanjiFinderUniverse()
+    .filter((c) => D.kanjiFreq?.[c] >= lo && D.kanjiFreq[c] <= hi)
+    .sort((a, b) => D.kanjiFreq[a] - D.kanjiFreq[b]);
+}
+/** The honest line for a lookup table that could not load, with the one retry: the retry answers the query the
+ * learner already has (S.kdx keeps it), without a reload (K06). */
+function kdxLoadFailed(host, id, ja, en, retry) {
+  const line = el('p', 'sem-empty', tx(ja, en));
+  line.dataset.kdxLoad = 'failed';
+  line.setAttribute('role', 'status');
+  const button = biLabel('button', 'chip', '再試行', 'Try again');
+  button.type = 'button';
+  button.id = id;
+  button.addEventListener('click', () => {
+    const pending = retry();
+    render();
+    pending.then(() => {
+      if (S.view === 'search' || S.view === 'kanjidex') render();
+    });
+  });
+  host.append(line, button);
 }
 const FREQ_BANDS = [
   [1, 100],
@@ -23199,8 +23463,13 @@ const FREQ_BANDS = [
 ];
 function renderKdxFrequency(main) {
   main.append(withEn(el('p', 'eyebrow', '頻度'), 'by how often it appears in newspapers — rank 1 is the commonest', 'en-inline'));
-  if (!D.kanjiFreq) {
-    main.append(el('p', 'sem-empty', tx('頻度表を読み込み中…', 'loading the frequency table…')));
+  // K06 · a table that could not load says so under the bands it would answer, with its retry; a band chosen
+  // meanwhile is the one the retry answers
+  const failed = !D.kanjiFreq && kanjiFreqError && !kanjiFreqPromise;
+  if (!D.kanjiFreq && !failed) {
+    const loading = el('p', 'sem-empty', tx('頻度表を読み込み中…', 'loading the frequency table…'));
+    loading.dataset.kdxLoad = 'pending';
+    main.append(loading);
     ensureKanjiFrequency().then(() => {
       if (S.view === 'search' || S.view === 'kanjidex') render();
     });
@@ -23222,12 +23491,13 @@ function renderKdxFrequency(main) {
     row.append(b);
   }
   main.append(row);
+  if (failed) {
+    kdxLoadFailed(main, 'kdx-freq-retry', '頻度表を読み込めなかった。', 'The frequency table could not be loaded.', ensureKanjiFrequency);
+    return;
+  }
   if (S.kdx.freqLo) {
-    const chars = Object.keys(D.kanjiFreq)
-      .filter((c) => D.kanji[c] && D.kanjiFreq[c] >= S.kdx.freqLo && D.kanjiFreq[c] <= S.kdx.freqHi)
-      .sort((a, b) => D.kanjiFreq[a] - D.kanjiFreq[b]);
-    renderKdxGrid(main, chars, 500);
-    for (const g of main.querySelectorAll('.kdx-glyph')) g.dataset.freq = String(D.kanjiFreq[g.dataset.kdxHit]);
+    const chars = kdxFrequencyHits(S.kdx.freqLo, S.kdx.freqHi);
+    renderKdxGrid(main, chars, 500, `freq:${S.kdx.freqLo}`, { mark: (b, c) => { b.dataset.freq = String(D.kanjiFreq[c]); } });
   }
 }
 
@@ -23265,8 +23535,7 @@ function renderKdxLevel(main) {
     const chars = Object.keys(D.kanji)
       .filter((c) => D.kanji[c].kk === S.kdx.kk)
       .sort((a, b) => D.kanji[a].st - D.kanji[b].st || (a < b ? -1 : 1));
-    renderKdxGrid(main, chars, 400);
-    for (const g of main.querySelectorAll('.kdx-glyph')) g.dataset.kk = S.kdx.kk;
+    renderKdxGrid(main, chars, 400, `kk:${S.kdx.kk}`, { mark: (b) => { b.dataset.kk = S.kdx.kk; } });
   }
 }
 
@@ -23277,23 +23546,40 @@ function renderKdxLevel(main) {
  * edition for 2,904 kanji, the 1999 first edition for 2,230. Every number
  * says its edition; the 2022 printing has no public mapping yet. */
 let kkldPromise = null;
+let kkldError = null;
 function ensureKkld() {
   if (D.kkld) return Promise.resolve(D.kkld);
   if (!kkldPromise) {
     // the standalone file carries the table; a served site fetches it, and
-    // the service worker keeps it for offline visits
+    // the service worker keeps it for offline visits. K06 · a failed load is an
+    // error with a retry, never an empty table answering "no kanji carries that
+    // number"; the promise lets go so the retry fetches again.
+    kkldError = null;
     const bundled = window.__CORRIDOR_BUNDLE__?.['share_alike/kkld'];
-    kkldPromise = (bundled ? Promise.resolve(bundled) : fetch('data/share_alike/kkld.json').then((r) => (r.ok ? r.json() : null)))
+    kkldPromise = (bundled ? Promise.resolve(bundled) : fetch('data/share_alike/kkld.json').then((r) => {
+      if (!r.ok) throw new Error(`Kodansha table: ${r.status}`);
+      return r.json();
+    }))
       .then((data) => {
-        D.kkld = data && data.entries ? data : { entries: {}, byNumber2013: {}, byNumber1999: {}, counts: {} };
+        if (!data?.entries || !data.byNumber2013 || !data.byNumber1999) throw new Error('Kodansha table unreadable');
+        D.kkld = data;
         return D.kkld;
       })
-      .catch(() => {
-        D.kkld = { entries: {}, byNumber2013: {}, byNumber1999: {}, counts: {} };
-        return D.kkld;
+      .catch((error) => {
+        kkldError = error;
+        return null;
+      })
+      .finally(() => {
+        kkldPromise = null;
       });
   }
   return kkldPromise;
+}
+/** The kanji one Kodansha number names in one edition: every glyph the table maps, none filtered by the core
+ * layer (K04 · #8 is 胤 in both editions; a glyph outside kanji.json opens its KANJIDIC2 entry). */
+function kkldNumberGlyphs(ed, number) {
+  const table = ed === 'ed1999' ? D.kkld?.byNumber1999 : D.kkld?.byNumber2013;
+  return [...(table?.[String(Number(number))] || [])];
 }
 function kkldOf(c) {
   return D.kkld?.entries?.[c] || null;
@@ -23308,13 +23594,6 @@ function kkldLine(c) {
 }
 function renderKdxKkld(main) {
   main.append(withEn(el('p', 'eyebrow', 'Kodansha 番号'), "Kodansha Kanji Learner's Dictionary entry number", 'en-inline'));
-  if (!D.kkld) {
-    main.append(el('p', 'sem-empty', tx('番号表を読み込み中…', 'loading the number table…')));
-    ensureKkld().then(() => {
-      if (S.view === 'search' || S.view === 'kanjidex') render();
-    });
-    return;
-  }
   const edRow = el('div', 'kdx-row');
   for (const [id, ja, en] of [
     ['ed2013', '2013年版（改訂増補）', '2013 Revised & Expanded'],
@@ -23344,6 +23623,21 @@ function renderKdxKkld(main) {
   const paintKkld = () => {
     out.textContent = '';
     const q = (S.kdx.kkldQ || '').trim();
+    // K06 · the number table still on its way, or failed: said in the results, the typed query kept, and the
+    // retry (or the arrival) answers that same query in place
+    if (!D.kkld) {
+      if (kkldError && !kkldPromise) {
+        kdxLoadFailed(out, 'kdx-kkld-retry', '番号表を読み込めなかった。', 'The Kodansha number table could not be loaded.', ensureKkld);
+        return;
+      }
+      const loading = el('p', 'sem-empty', tx('番号表を読み込み中…', 'loading the number table…'));
+      loading.dataset.kdxLoad = 'pending';
+      out.append(loading);
+      ensureKkld().then(() => {
+        if (out.isConnected) paintKkld();
+      });
+      return;
+    }
     if (!q) {
       out.append(el('p', 'fine', tx(
         `${(D.kkld.counts?.ed2013 || 0).toLocaleString()} 字に 2013年版の番号、${(D.kkld.counts?.ed1999 || 0).toLocaleString()} 字に 1999年版の番号。2022年版の番号は載せていない。`,
@@ -23352,16 +23646,15 @@ function renderKdxKkld(main) {
       return;
     }
     const ed = S.kdx.kkldEd || 'ed2013';
-    const table = ed === 'ed1999' ? D.kkld.byNumber1999 : D.kkld.byNumber2013;
     if (/^\d+$/.test(q)) {
-      const chars = (table[String(Number(q))] || []).filter((c) => D.kanji[c]);
-      renderKdxGrid(out, chars, 20);
-      for (const g of out.querySelectorAll('.kdx-glyph')) g.dataset.kkld = q;
+      const chars = kkldNumberGlyphs(ed, q);
+      renderKdxGrid(out, chars, 20, `kkld:${ed}:${q}`, { mark: (b) => { b.dataset.kkld = q; b.dataset.kkldEd = ed; } });
       if (!chars.length) out.append(el('p', 'fine', tx('この番号の字はこの版にない。', 'No kanji carries that number in this edition.')));
       return;
     }
-    const chars = [...q].filter((c) => D.kanji[c]);
-    renderKdxGrid(out, chars, 20);
+    // a typed kanji is looked up whether or not the core layer holds it (胤 has its numbers too)
+    const chars = [...new Set([...q])].filter((c) => kkldOf(c) || D.kanji[c] || kanjiReference(c));
+    renderKdxGrid(out, chars, 20, `kkld:${ed}:${q}`);
     for (const c of chars) {
       const line = kkldLine(c);
       out.append(el('p', 'fine', `${c} · ${line || tx('Kodansha 番号なし', 'no Kodansha number')}`));
@@ -23400,29 +23693,52 @@ function kdxTextResults(kind) {
   wrap.id = 'kdx-results';
   const q = ((kind === 'reading' ? S.kdx.reading : S.kdx.meaning) || '').trim();
   if (!q) return wrap;
-  let chars;
+  const strokesOf = (c) => (D.kanji[c] || kanjiReference(c))?.st ?? 99;
   if (kind === 'reading') {
-    const hasKana = /[ぁ-んァ-ンー]/.test(q);
-    const qh = (hasKana ? kataToHira(q) : ROMAJI(q) || q.toLowerCase()).replace(/[.\-・\s]/g, '');
-    // match PER reading (never concatenated — else 介 + い.う spuriously reads
-    // かいう ⊇ かい): a reading whose okurigana-stripped stem starts with the
-    // query counts, so typing か…かい narrows the same way a paper index does.
-    chars = Object.keys(D.kanji).filter((c) => {
-      const k = D.kanji[c];
-      return (
-        qh &&
-        [...k.on, ...k.kun].some((r) => {
-          const rh = kataToHira(r).replace(/[.\-・\s].*$/, '').replace(/[.\-・\s]/g, '');
-          return rh === qh || rh.startsWith(qh);
-        })
-      );
-    });
-  } else {
-    const ql = q.toLowerCase();
-    chars = Object.keys(D.kanji).filter((c) => String(D.kanji[c].m).toLowerCase().includes(ql));
+    // K03 · the whole reading or its stem, one reading at a time (never concatenated — else 介 + い.う would read
+    // かいう ⊇ かい), over every reading the kanji has (K01): たべる, taberu, タベル, ﾀﾍﾞﾙ and an IME's たべr all find
+    // 食, and た still does; a reading that IS the query (whole or stem) comes before one that only begins with it.
+    const helpers = window.BunkiReferenceCore;
+    const qh = helpers.normalizeReadingQuery(q, ROMAJI);
+    const rank = new Map();
+    if (qh) {
+      for (const c of kanjiFinderUniverse()) {
+        const k = kanjiReference(c) || D.kanji[c];
+        const level = helpers.readingMatch([...(k?.on || []), ...(k?.kun || [])], qh);
+        if (level) rank.set(c, level);
+      }
+    }
+    const chars = [...rank.keys()].sort((a, b) => rank.get(b) - rank.get(a) || strokesOf(a) - strokesOf(b) || (a < b ? -1 : 1));
+    // until every reading has arrived the search runs over the lessons' readings only, and says so: a miss
+    // then is not a "no match" (K06)
+    const state = kanjiReadingsState();
+    if (state !== 'complete') {
+      const line = el('p', 'sem-empty', state === 'failed'
+        ? tx('すべての読みを読み込めなかった。いまはレッスン用に選んだ読みだけで探している。', 'Every reading could not be loaded — searching only the readings chosen for lessons.')
+        : tx('すべての読みを読み込み中。いまはレッスン用に選んだ読みだけで探している。', 'Loading every reading — searching only the readings chosen for lessons for now.'));
+      line.dataset.kdxReadings = state;
+      line.setAttribute('role', 'status');
+      wrap.append(line);
+      if (state === 'failed') {
+        const retry = biLabel('button', 'chip', '再試行', 'Try again');
+        retry.type = 'button';
+        retry.id = 'kdx-readings-retry';
+        retry.addEventListener('click', () => {
+          const pending = loadReferenceExtra();
+          document.getElementById('kdx-results')?.replaceWith(kdxTextResults(kind));
+          pending.then(() => document.getElementById('kdx-results')?.replaceWith(kdxTextResults(kind)));
+        });
+        wrap.append(retry);
+      }
+    }
+    renderKdxGrid(wrap, chars, 200, `reading:${qh}`, { empty: state === 'complete' });
+    return wrap;
   }
-  chars.sort((a, b) => D.kanji[a].st - D.kanji[b].st || (a < b ? -1 : 1));
-  renderKdxGrid(wrap, chars, 200);
+  const ql = q.toLowerCase();
+  const chars = kanjiFinderUniverse()
+    .filter((c) => String((D.kanji[c] || kanjiReference(c))?.m || '').toLowerCase().includes(ql))
+    .sort((a, b) => strokesOf(a) - strokesOf(b) || (a < b ? -1 : 1));
+  renderKdxGrid(wrap, chars, 200, `meaning:${ql}`);
   return wrap;
 }
 
@@ -34687,6 +35003,15 @@ function confusablesFor(c) {
   return [...(CONFUSABLE_MAP[c] || [])];
 }
 
+/** K07 · a JMdict spelling tag said plainly beside a word's gloss (rK, iK, oK, ateji); '' for the rest. */
+function writtenFormNote(tags = []) {
+  if (tags.includes('rK')) return tx('まれな表記', 'rare spelling');
+  if (tags.includes('iK')) return tx('変則的な表記', 'irregular spelling');
+  if (tags.includes('oK')) return tx('古い表記', 'old spelling');
+  if (tags.includes('ateji')) return tx('当て字', 'ateji spelling');
+  return '';
+}
+
 function renderKanjiNode(sheet, node) {
   const retained = retainedKanjiRecord(node.id);
   const k = retained || D.kanji[node.id] || window.BunkiSkipUI?.getKanji(S.skipUi, node.id);
@@ -34720,7 +35045,7 @@ function renderKanjiNode(sheet, node) {
   const hero = el('div', 'hero');
   hero.append(el('div', 'hero-glyph', k.c));
   const meta = el('div', 'hero-meta');
-  const display = retained || kanjiDisplayRecord(node.id, node.referenceEntry) || k;
+  const display = kanjiEntryRecord(node.id, node.referenceEntry) || k;
   meta.append(el('div', 'hero-mean', display.m || tx('語義は未収録です。', 'Meaning not supplied.')));
   const chips = el('div', 'shelf-meta');
   if (Number.isInteger(k.st)) chips.append(catalogChip(`${k.st} 画`, `${k.st} strokes`, 'strokes', k.st, node.from));
@@ -34745,19 +35070,66 @@ function renderKanjiNode(sheet, node) {
   meta.append(chips);
   hero.append(meta);
   sheet.append(hero);
-  if (k.skipFallback) sheet.append(el('p', 'skip-fallback-note', tx(
-    'SKIP 索引の KANJIDIC2 項目。このアプリの部品・用例・筆順が未収録のことがあります。',
-    'KANJIDIC2 entry from the SKIP index. This app may not yet have its components, example words or stroke diagram.',
-  )));
+  // K01 · an official Jōyō form kanji.json lacks (剝, 𠮟) says what it is; any other wider entry keeps its SKIP note
+  const joyoForm = !D.kanji[k.c] && !!kanjiReferenceRows()?.records.has(k.c);
+  if (k.skipFallback) sheet.append(el('p', 'skip-fallback-note', joyoForm
+    ? tx('常用漢字表（2010年）の字形。読みと意味は KANJIDIC2 から。このアプリにはこの字の部品のデータがまだない。',
+      'An official Jōyō form (2010). Its readings and meanings come from KANJIDIC2; this app has no component data for it yet.')
+    : tx(
+      'SKIP 索引の KANJIDIC2 項目。このアプリの部品・用例・筆順が未収録のことがあります。',
+      'KANJIDIC2 entry from the SKIP index. This app may not yet have its components, example words or stroke diagram.',
+    )));
 
+  // K01 · every reading of the kanji (kanjiReference): the lessons' selection first, then the rest. A reading
+  // only the official 2010 table gives is starred and named under the list. Until every reading has arrived the
+  // list is the lessons' selection and says so; a failed load offers its retry.
   const kv = el('dl', 'kv');
+  const readingsState = display.readingsState || 'complete';
+  kv.dataset.kanjiReadings = readingsState;
+  const officialOnly = new Set(display.officialReadings || []);
+  const readingLine = (list) => {
+    const span = el('span', 'on');
+    if (!list?.length) span.textContent = '—';
+    // each reading stays whole on its line, its ・ kept with it, so a long list breaks only after a ・ (never
+    // inside い.ける, never before a ・)
+    (list || []).forEach((reading, i) => {
+      const item = el('span', 'reading-item', reading);
+      if (officialOnly.has(reading)) item.append(el('sup', 'reading-official-mark', '*'));
+      if (i < list.length - 1) item.append(document.createTextNode('・'));
+      span.append(item);
+    });
+    return span;
+  };
   const on = el('dd');
-  on.append(el('span', 'on', (display.on || []).join('・') || '—'));
+  on.append(readingLine(display.on));
   kv.append(withEn(el('dt', null, '音'), 'on'), on);
   const kun = el('dd');
-  kun.append(el('span', 'on', (display.kun || []).join('・') || '—'));
+  kun.append(readingLine(display.kun));
   kv.append(withEn(el('dt', null, '訓'), 'kun'), kun);
   sheet.append(kv);
+  if (officialOnly.size) {
+    const official = el('p', 'fine reading-source-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)'));
+    official.id = 'kanji-reading-official';
+    sheet.append(official);
+  }
+  if (readingsState === 'pending' || readingsState === 'failed') {
+    const line = el('p', 'fine reading-source-note', readingsState === 'failed'
+      ? tx('すべての読みを読み込めなかった。いま見えているのはレッスン用に選んだ読みだけ。', 'Every reading could not be loaded — these are only the readings chosen for lessons.')
+      : tx('いま見えているのはレッスン用に選んだ読み。すべての読みを読み込み中…', 'These are the readings chosen for lessons — loading every reading…'));
+    line.id = 'kanji-readings-status';
+    line.setAttribute('role', 'status');
+    sheet.append(line);
+    if (readingsState === 'failed') {
+      const retry = biLabel('button', 'chip', '再試行', 'Try again');
+      retry.type = 'button';
+      retry.id = 'kanji-readings-retry';
+      retry.addEventListener('click', () => {
+        void loadReferenceExtra();
+        render();
+      });
+      sheet.append(retry);
+    }
+  }
   renderSourceKanjiDoor(sheet, node);
 
   // 部首 — the ONE official radical (the Kangxi classification), with its
@@ -34826,60 +35198,93 @@ function renderKanjiNode(sheet, node) {
   // No silent cap: an initial page, then "show all" reveals the whole list
   // (Renzo shows "6 of 96" the same way). The count in the heading is the true
   // total, so the depth of the dictionary is visible at a glance.
+  // K07 · then the words reached through a written alternative (しいたけ／椎茸, あい／藍), shown by the spelling
+  // that holds this kanji and opening that very entry; a Jōyō kanji no shipped word list names carries up to ten
+  // JMdict words chosen at build time (the reference sidecar), each opening its own entry by sequence and reading.
   const words = D.kanjiWords[k.c] || [];
-  if (words.length) {
-    sheet.append(withEn(el('p', 'eyebrow', `よく使う語 — ${words.length} 語`), 'common compounds', 'en-inline'));
+  const listed = new Set(words);
+  const alternates = (D.kanjiAltWords?.get(k.c) || []).filter(([id]) => !listed.has(id));
+  const filled = !words.length && !alternates.length ? kanjiReferenceRows()?.words.get(k.c) || [] : [];
+  const items = [
+    ...words.map((id) => ({ id })),
+    ...alternates.map(([id, form]) => ({ id, form })),
+    ...filled.map(([seq, form, reading, gloss, tags]) => ({ id: form, form, seq: String(seq), reading, gloss, tags })),
+  ];
+  if (items.length) {
+    sheet.append(filled.length
+      ? withEn(el('p', 'eyebrow', `この字を含む語 — ${items.length} 語`), 'words that contain it', 'en-inline')
+      : withEn(el('p', 'eyebrow', `よく使う語 — ${items.length} 語`), 'common compounds', 'en-inline'));
     const rows = el('div', 'entry-rows');
-    const makeRow = (w) => {
-      const g = lookup(w);
+    const makeRow = (item) => {
+      const g = item.seq ? { r: item.reading, m: [item.gloss] } : lookup(item.id);
       const row = el('button', 'entry-row compound');
       row.type = 'button';
+      if (item.form) row.dataset.wordSpelling = item.form;
+      if (item.seq) row.dataset.jmdictSeq = item.seq;
       const main = el('span', 'row-stack');
       const top = el('span', 'row-word');
-      top.append(document.createTextNode(w));
+      top.append(document.createTextNode(item.form || item.id));
       if (g?.r) top.append(el('span', 'row-reading', g.r));
       main.append(top);
-      if (g?.m?.[0]) main.append(el('span', 'row-gloss', g.m[0]));
+      const gloss = [g?.m?.[0], writtenFormNote(item.tags)].filter(Boolean).join(' — ');
+      if (gloss) main.append(el('span', 'row-gloss', gloss));
       row.append(main);
       row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go({ t: 'word', id: w, from: node.from }));
+      row.addEventListener('click', () => go(item.seq
+        ? { t: 'word', id: item.form, seq: item.seq, reading: item.reading, from: node.from }
+        : { t: 'word', id: item.id, from: node.from }));
       return row;
     };
     const FIRST = 24;
-    for (const w of (node.compoundsExpanded ? words : words.slice(0, FIRST))) rows.append(makeRow(w));
+    for (const item of (node.compoundsExpanded ? items : items.slice(0, FIRST))) rows.append(makeRow(item));
     sheet.append(rows);
-    if (words.length > FIRST && !node.compoundsExpanded) {
+    if (items.length > FIRST && !node.compoundsExpanded) {
       const more = el('button', 'more-row');
       more.type = 'button';
-      const remain = words.length - FIRST;
-      more.textContent = tx(`のこり ${remain} 語をすべて見る`, `show all ${words.length} — ${remain} more`);
+      const remain = items.length - FIRST;
+      more.textContent = tx(`のこり ${remain} 語をすべて見る`, `show all ${items.length} — ${remain} more`);
       more.addEventListener('click', () => {
         node.compoundsExpanded = true;
-        for (const w of words.slice(FIRST)) rows.append(makeRow(w));
+        for (const item of items.slice(FIRST)) rows.append(makeRow(item));
         more.remove();
       });
       sheet.append(more);
     }
   } else {
     sheet.append(withEn(el('p', 'eyebrow', 'この字を含む語'), 'words that contain it', 'en-inline'));
-    sheet.append(
-      el('div', 'sem-empty', tx('この字を含む語は辞書側にまだない。部品からは続けられる。', 'No listed word contains this kanji yet — the walk continues through its parts.')),
-    );
+    // K07 · a Jōyō kanji the build found in no shipped dictionary says so plainly
+    const none = kanjiReferenceRows()?.wordless.has(k.c);
+    const empty = el('div', 'sem-empty', none
+      ? tx('この字を含む語は、このアプリの辞書にはない。', 'No word in this app’s dictionaries contains this kanji.')
+      : tx('この字を含む語は辞書側にまだない。部品からは続けられる。', 'No listed word contains this kanji yet — the walk continues through its parts.'));
+    if (none) empty.dataset.wordless = 'checked';
+    sheet.append(empty);
   }
 
+  // K05 · as many idioms as the heading counts are one tap away
   const idioms = D.idiomsByKanji[k.c] || [];
   if (idioms.length) {
     const heading = el('p', 'eyebrow');
     heading.textContent = tx(`熟語・慣用句 — ${idioms.length}`, `${idioms.length} idioms and set phrases`);
     sheet.append(heading);
-    sheet.append(
-      chipsFor(
-        idioms.slice(0, 24).map((w) => ({ label: w, sub: D.idioms[w]?.r || '' })),
-        (item) => go({ t: 'idiom', id: item.label, from: node.from }),
-        null,
-        'idiom',
-      ),
-    );
+    const FIRST_IDIOMS = 24;
+    const chipOf = (w) => ({ label: w, sub: D.idioms[w]?.r || '' });
+    const openIdiom = (item) => go({ t: 'idiom', id: item.label, from: node.from });
+    const chips = chipsFor((node.idiomsExpanded ? idioms : idioms.slice(0, FIRST_IDIOMS)).map(chipOf), openIdiom, null, 'idiom');
+    sheet.append(chips);
+    if (idioms.length > FIRST_IDIOMS && !node.idiomsExpanded) {
+      const more = el('button', 'more-row');
+      more.type = 'button';
+      more.id = 'kanji-idioms-more';
+      const remain = idioms.length - FIRST_IDIOMS;
+      more.textContent = tx(`のこり ${remain} 語をすべて見る`, `show all ${idioms.length} — ${remain} more`);
+      more.addEventListener('click', () => {
+        node.idiomsExpanded = true;
+        chips.append(...chipsFor(idioms.slice(FIRST_IDIOMS).map(chipOf), openIdiom, null, 'idiom').children);
+        more.remove();
+      });
+      sheet.append(more);
+    }
   }
 
 
@@ -35142,17 +35547,18 @@ function displayKunReading(reading) {
   return dot < 0 ? value : `${value.slice(0, dot)}（${value.slice(dot + 1)}）`;
 }
 
-function strokeReadingRow(ja, en, values, kind = 'on') {
+function strokeReadingRow(ja, en, values, kind = 'on', official = []) {
   const row = el('div', 'stroke-reading-row');
   const label = el('span', 'stroke-reading-label', tx(ja, en));
   const raw = values?.length ? values : [];
-  const value = el(
-    'span',
-    'stroke-reading-value',
-    raw.length
-      ? raw.map((item) => (kind === 'kun' ? displayKunReading(item) : item)).join('・')
-      : '—',
-  );
+  // K01 · a reading only the official 2010 table gives carries the same star as on the kanji page; each reading
+  // stays whole on its line, so a complete list breaks only between readings
+  const value = el('span', 'stroke-reading-value');
+  if (!raw.length) value.textContent = '—';
+  raw.forEach((item, i) => {
+    value.append(el('span', 'stroke-reading-item',
+      (kind === 'kun' ? displayKunReading(item) : item) + (official.includes(item) ? '*' : '') + (i < raw.length - 1 ? '・' : '')));
+  });
   value.lang = 'ja';
   if (kind === 'kun' && raw.length) {
     value.setAttribute('aria-label', raw.map((item) => item.replaceAll('.', '')).join('、'));
@@ -35204,17 +35610,65 @@ function strokeAwakeField(page, k) {
   field.id = 'stroke-awake-field';
   field.dataset.strokeChrome = '';
   field.setAttribute('aria-label', tx('読み', 'readings'));
+  field.append(strokeReadingField(k));
+  return field;
+}
 
+function strokeReadingField(k) {
   const readings = el('div', 'stroke-reading-field');
   readings.setAttribute('role', 'group');
   readings.setAttribute('aria-label', tx('読み', 'readings'));
+  // what the lists are (unfinished, or carrying a starred reading) is said above them: below, the writing-speed
+  // corner covers the field's left edge
+  readings.append(...strokeReadingsStatus(k));
+  if (k?.officialReadings?.length) {
+    readings.append(el('p', 'stroke-reading-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
+  }
   readings.append(
-    strokeReadingRow('音読み', 'on', k?.on, 'on'),
-    strokeReadingRow('訓読み', 'kun', k?.kun, 'kun'),
+    strokeReadingRow('音読み', 'on', k?.on, 'on', k?.officialReadings),
+    strokeReadingRow('訓読み', 'kun', k?.kun, 'kun', k?.officialReadings),
   );
+  return readings;
+}
 
-  field.append(readings);
-  return field;
+/** K01 · the writing room says what its readings are, as the entry does: until every reading has arrived they are the
+ * lessons' selection, and a failed load offers its retry. Nothing when the lists are whole. */
+function strokeReadingsStatus(k, tag = 'p', className = 'stroke-reading-note') {
+  const state = k?.readingsState;
+  if (state !== 'pending' && state !== 'failed') return [];
+  const line = el(tag, className, state === 'failed'
+    ? tx('すべての読みを読み込めなかった。いま見えているのはレッスン用に選んだ読みだけ。', 'Every reading could not be loaded — these are only the readings chosen for lessons.')
+    : tx('いま見えているのはレッスン用に選んだ読み。すべての読みを読み込み中…', 'These are the readings chosen for lessons — loading every reading…'));
+  line.id = 'stroke-readings-status';
+  line.dataset.strokeReadings = state;
+  line.setAttribute('role', 'status');
+  if (state !== 'failed') return [line];
+  const retry = biLabel('button', 'chip stroke-readings-retry', '再試行', 'Try again');
+  retry.type = 'button';
+  retry.id = 'stroke-readings-retry';
+  retry.addEventListener('click', () => {
+    void loadReferenceExtra();
+    refreshStrokeReadings();
+  });
+  return [line, retry];
+}
+
+/** K01 · the readings arrived, failed, or are being asked for again while the writing room is open: only its readings
+ * are drawn again, so the ink keeps writing. The classic room carries them in its header and is drawn whole. */
+function refreshStrokeReadings() {
+  if (!S.strokes) return;
+  const field = document.querySelector('#stroke-awake-field .stroke-reading-field');
+  if (!field) {
+    render();
+    return;
+  }
+  const hadFocus = field.contains(document.activeElement);
+  const next = strokeReadingField(strokeRoomRecord(S.strokes.id));
+  field.replaceWith(next);
+  if (hadFocus) {
+    next.tabIndex = -1;
+    (next.querySelector('#stroke-readings-retry') || next).focus({ preventScroll: true });
+  }
 }
 
 /** One three-position speed control; the same setting drives both ink engines. */
@@ -35957,7 +36411,7 @@ function renderStrokePage(root) {
     stopInkRoom(); // the page is gone however it left — never orphan an engine
     return;
   }
-  const k = kanjiDisplayRecord(st.id, S.stack.findLast((node) => node.t === 'kanji' && node.id === st.id)?.referenceEntry);
+  const k = strokeRoomRecord(st.id);
   const paths = strokePathsFor(st.id);
   const reduced = strokeReduced();
 
@@ -36065,9 +36519,11 @@ function renderStrokePage(root) {
       el('span', 'stroke-k-meta', `${k?.st ?? paths.length}画${radC ? ` · ${radC}部` : ''}`),
     );
     const readings = el('span', 'stroke-readings');
+    const officialOnly = new Set(k?.officialReadings || []);
+    const star = (reading) => (officialOnly.has(reading) ? '*' : '');
     if (k?.on?.length) {
       const row = el('span', 'stroke-read-row');
-      row.append(el('span', 'stroke-read-label', '音'), el('span', 'stroke-on', k.on.join('・')));
+      row.append(el('span', 'stroke-read-label', '音'), el('span', 'stroke-on', k.on.map((reading) => reading + star(reading)).join('・')));
       readings.append(row);
     }
     if (k?.kun?.length) {
@@ -36079,10 +36535,15 @@ function renderStrokePage(root) {
         const reading = el('span', 'stroke-kun');
         reading.append(el('span', 'stroke-kun-stem', stem));
         if (oku) reading.append(document.createTextNode(oku));
+        if (star(kn)) reading.append(document.createTextNode(star(kn)));
         row.append(reading);
       });
       readings.append(row);
     }
+    if (officialOnly.size) {
+      readings.append(el('span', 'stroke-read-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
+    }
+    readings.append(...strokeReadingsStatus(k, 'span', 'stroke-read-note'));
     khead.append(kleft, readings);
     if (!S.strokeMinimal) body.append(khead);
     const stage = el('div', 'stroke-stage');
