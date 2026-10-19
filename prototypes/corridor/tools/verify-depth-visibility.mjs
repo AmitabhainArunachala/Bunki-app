@@ -87,14 +87,14 @@ async function seed(page) {
   const value = (await readAppRecordSnapshot(page)).record;
   const item = (id) => ({ t: 'word', id, label: id, ts: now - 40 * DAY, started: now - 40 * DAY });
   const card = (stability, daysAgo) => ({ due: new Date(now + Math.round(stability * 0.6) * DAY).toISOString(), last_review: new Date(now - daysAgo * DAY).toISOString(), stability, difficulty: 5.1, elapsed_days: daysAgo, scheduled_days: Math.round(stability * 0.6) + daysAgo, reps: 7, lapses: 0, learning_steps: 0, state: 2 });
-  value.taken = [...value.taken, ...['大臣', '挨拶', '日', '年'].map(item)];
+  value.taken = [...value.taken, ...['大臣', '挨拶', '日', '年', '官邸', '大賞', '表彰'].map(item)];
   value.lists = { ...value.lists, 式典: [{ t: 'word', id: '式', label: '式', ts: now - 3 * DAY }] };
   value.srs = { ...value.srs, 'word:大臣': card(64, 3), 'word:表彰': card(12, 1), 'word:挨拶': card(48, 2), 'word:日': card(80, 4), 'word:年': card(90, 5) };
   const rev = (t, g) => [t, 'word:大臣', g, 2, 3, 0.95, 40, 5, 42, 5, 30, t + 30 * DAY];
   value.revlog = [...value.revlog, rev(now - 3 * DAY, 1), rev(now - 2 * DAY, 3)];
   // Native history reaches real Today looked/due variants, including the due
   // star's authored breathing opacity; no DOM state or paint is manufactured.
-  value.obslog = [...(value.obslog || []), ...['官邸', '大賞', '表彰'].flatMap((word) => [[now - 30 * 60000, 'tap', `word:${word}`, 2, STORY], [now - 15 * 60000, 'tap', `word:${word}`, 2, STORY]])];
+  value.obslog = [...(value.obslog || []), ...['官邸', '大賞', '表彰'].flatMap((word) => [[now - 30 * 60000, 'tap', `word:${word}`, 2, STORY], [now - 15 * 60000, 'tap', `word:${word}`, 2, STORY], [now - 6 * DAY, 'dojo', `word:${word}`, 1], [now - 5 * DAY, 'dojo', `word:${word}`, 3]])];
   value.srs['word:挨拶'].due = new Date(now - 60000).toISOString();
   value.met = { version: 1, entries: Object.fromEntries([['met', 0, 0, 1], ['again', 9, 1, 3], ['recalled', 30, 4, 6], ['owned', 60, 2, 11], ['notYet', 20, 1, 4]].map(([k, first, last, days]) => [nodes[k].key, { first: today - first, last: today - last, days, ...(k === 'notYet' ? { said: { value: 'not-yet', at: now - DAY, cursor: value.revlog.length } } : {}) }])) };
   const blank = new URL('__dots-blank', base).href;
@@ -139,12 +139,24 @@ async function facts(page, selector, pseudo = true) {
   });
     const glyphs = [];
     if (elements.some((el) => el.matches('.japanese-lookup-word') && el.closest('#sheet'))) {
-      for (const owner of document.querySelectorAll('#sheet .japanese-lookup-word')) {
-        const walker = document.createTreeWalker(owner, NodeFilter.SHOW_TEXT); let text;
+      // Each containing prose block includes ordinary Japanese, English,
+      // punctuation and ruby. Lookup spans are owners, never the glyph census.
+      const blocks = new Set([...document.querySelectorAll('#sheet .japanese-lookup-word')].map((el) => {
+        let block = el.parentElement;
+        while (block && block.id !== 'sheet' && getComputedStyle(block).display === 'inline') block = block.parentElement;
+        return block;
+      }).filter(Boolean));
+      const seen = new Set();
+      for (const block of blocks) {
+        const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT); let text;
         while ((text = walker.nextNode())) {
-          const style = getComputedStyle(text.parentElement);
+          if (seen.has(text)) continue; seen.add(text);
+          const parent = text.parentElement, owner = parent.closest('.japanese-lookup-word');
+          const folded = parent.closest('details:not([open])');
+          if (parent.closest('[hidden]') || (folded && !folded.querySelector(':scope > summary')?.contains(parent))) continue;
+          const style = getComputedStyle(parent);
           if (style.visibility === 'hidden' || style.display === 'none' || Number(style.opacity) === 0) continue;
-          for (let i = 0; i < text.length; i++) { const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1); for (const r of range.getClientRects()) if (r.width && r.height) glyphs.push({ owner: owner.dataset.dotsNode || null, text: text.textContent, left: r.left + scrollX, top: r.top + scrollY, right: r.right + scrollX, bottom: r.bottom + scrollY }); }
+          for (let i = 0; i < text.length; i++) { if (!text.textContent[i].trim()) continue; const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1); for (const r of range.getClientRects()) if (r.width && r.height) glyphs.push({ owner: owner?.dataset.dotsNode || null, text: text.textContent[i], rt: !!parent.closest('rt'), block: block.className || block.tagName, left: r.left + scrollX, top: r.top + scrollY, right: r.right + scrollX, bottom: r.bottom + scrollY }); }
         }
       }
     }
@@ -216,6 +228,57 @@ function checkPaint(out, name, dots) {
   row(out, `${name}.size`, active.every((d) => (d.depth === 'unmet' || !d.depth || (Math.min(d.width, d.height) >= 6 && d.raster.fillPaintedWidth >= 5 && d.raster.fillPaintedHeight >= 5 && d.raster.fillPaintedAreaCssPx2 >= 18)) && (!d.kept || (d.outer >= 10 && Math.min(d.raster.paintedWidth, d.raster.paintedHeight) >= 9))), active.map((d) => ({ index: d.index, width: d.width, outer: d.outer, raster: [d.raster.paintedWidth, d.raster.paintedHeight] })));
   row(out, `${name}.contrast`, active.every((d) => (!['owned', 'recalled'].includes(d.depth) || d.raster.fillContrast >= 3) && (!['met', 'again'].includes(d.depth) || d.raster.fillContrast >= 1.5) && (!d.kept || d.raster.ringContrast >= 3)), active.map((d) => ({ index: d.index, depth: d.depth, fill: d.raster.fillContrast, ring: d.raster.ringContrast })));
 }
+/** Enumerate the native surface before looking at painter output. A deleted
+ * data-depth/data-kept attribute cannot delete its obligation from this census. */
+async function surfaceCapture(page, out, name, selector, pseudo = true) {
+  const censusId = randomUUID();
+  const census = await page.locator(selector).evaluateAll((els, censusId) => els.map((el, i) => {
+    const owner = el.matches('.mini-word') ? el.closest('#mini') : el;
+    el.dataset.dotsNode ||= `${censusId}-${i}`;
+    let node = null, exclusion = null;
+    if (owner.dataset.depthNode) {
+      try { node = { t: 'word', ...JSON.parse(owner.dataset.depthNode) }; } catch { exclusion = 'invalid native identity'; }
+    } else if (el.matches('.japanese-lookup-word')) {
+      if (el.closest('.headword')) exclusion = 'headword: basis line owns the dot';
+      else {
+        const candidate = { t: 'word', id: el.dataset.lookupText };
+        const identity = window.__KAIRO_DEPTH__.identity(candidate);
+        if (/[\p{Script=Han}\p{Script=Katakana}]/u.test(candidate.id) || identity?.kind === 'core') node = candidate;
+        else exclusion = 'outside Japanese word painter eligibility';
+      }
+    }
+    if (!node && !exclusion && el.matches('.today-star.glyph') && [...el.textContent.trim()].length === 1) exclusion = 'native Today kanji glyph: not a word';
+    if (!node && !exclusion) exclusion = 'invalid native identity';
+    const expected = node ? window.__KAIRO_DEPTH__.depth(node) : null;
+    const folded = el.closest('details:not([open])');
+    const notRendered = el.closest('[hidden]') ? 'native hidden ancestor' : folded && !folded.querySelector(':scope > summary')?.contains(el) ? 'closed native details body' : null;
+    const active = Boolean(!notRendered && expected && (expected.depth !== 'unmet' || expected.kept));
+    if (active) el.dataset.dotsExpected = censusId;
+    return { probeId: el.dataset.dotsNode, text: el.textContent, className: el.className, node, exclusion, notRendered, expectedDepth: expected?.depth || null, expectedKept: expected?.kept || false, active, actualDepth: owner.dataset.depth || null, actualKept: owner.dataset.kept != null };
+  }), censusId);
+  out.nativeCensus ||= {}; out.nativeCensus[name] = census;
+  const active = census.filter((r) => r.active);
+  row(out, `${name}.native-painter-census`, active.length > 0 && census.every((r) => r.exclusion !== 'invalid native identity') && active.every((r) => r.expectedDepth === r.actualDepth && r.expectedKept === r.actualKept), census);
+  // Empty eligible scope is a recorded failure, not a silent or setup pass.
+  const dots = active.length ? await capture(page, out, name, `[data-dots-expected="${censusId}"]`, pseudo) : [];
+  row(out, `${name}.all-expected-painted`, active.length > 0 && active.every((r) => dots.some((d) => d.probeId === r.probeId && d.raster.changedPixels >= 4)), { expected: active.map((r) => r.probeId), observed: dots.map((d) => ({ probeId: d.probeId, changedPixels: d.raster.changedPixels })) });
+  return dots;
+}
+function semanticFamily(out, family, samples) {
+  const met = samples.filter((d) => d.depth === 'met' && d.raster.fill);
+  const known = samples.filter((d) => ['owned', 'recalled'].includes(d.depth) && d.raster.fill);
+  const saved = samples.filter((d) => d.kept && d.raster.ring);
+  const pairs = { metKnown: met.flatMap((a) => known.map((b) => delta(a.raster.fill, b.raster.fill))), metSaved: met.flatMap((a) => saved.map((b) => delta(a.raster.fill, b.raster.ring))), knownSaved: known.flatMap((a) => saved.map((b) => delta(a.raster.fill, b.raster.ring))) };
+  const coverage = { met: met.length, known: known.length, saved: saved.length, knownStates: [...new Set(known.map((d) => d.depth))], unavailable: ['met', 'known', 'saved'].filter((k) => !({ met, known, saved })[k].length) };
+  out.semanticCoverage ||= {}; out.semanticCoverage[family] = coverage;
+  row(out, `${family}.semantic-separation`, !coverage.unavailable.length && Object.values(pairs).every((values) => values.length && values.every((v) => v >= 10)) && met.every((a) => known.every((b) => a.raster.fillContrast < b.raster.fillContrast)), { coverage, minimumDeltaE76: Object.fromEntries(Object.entries(pairs).map(([key, values]) => [key, values.length ? Math.min(...values) : null])), metContrast: met.map((d) => d.raster.fillContrast), knownContrast: known.map((d) => d.raster.fillContrast) });
+}
+async function worldBinding(page, out, phase) {
+  const actual = await page.evaluate(() => ({ stored: localStorage.getItem('kairo-theme'), rendered: document.documentElement.dataset.theme ?? null, inlineScheme: document.documentElement.style.colorScheme, computedScheme: getComputedStyle(document.documentElement).colorScheme, metaScheme: document.querySelector('meta[name="color-scheme"]')?.content || null }));
+  const expectedTheme = out.world === 'hokusai' ? '' : out.world;
+  const expectedScheme = ['rokusho', 'yoru', 'nami', 'hakuu', 'kaku'].includes(out.world) ? 'dark' : 'light';
+  row(out, `world.${phase}`, actual.stored === out.world && actual.rendered === expectedTheme && actual.inlineScheme === expectedScheme && actual.computedScheme === expectedScheme && actual.metaScheme === expectedScheme, { requested: out.world, expectedTheme, expectedScheme, ...actual });
+}
 async function ladderContract(page, out) {
   const target = page.locator(`#reader .tok[data-index="${PARA.owned}"]`);
   await target.scrollIntoViewIfNeeded();
@@ -251,6 +314,7 @@ async function ladderContract(page, out) {
 }
 async function rooms(page, out) {
   out.roomStateCoverage = {};
+  const familySamples = { slip: [], basis: [], prose: [] };
   // Traverse actual doors for all four fills. These are independently seeded
   // native identities; opening a slip can add today's encounter naturally.
   for (const name of ['owned', 'met', 'again', 'recalled']) {
@@ -259,16 +323,17 @@ async function rooms(page, out) {
     await page.waitForFunction((e) => document.getElementById('mini') || e?.dataset.ladderRung === 'reading', await word.elementHandle());
     if (!await page.locator('#mini').count()) await word.click();
     await page.locator('#mini .mini-word').waitFor(); await delay(200);
-    const slip = await capture(page, out, `slip-${name}`, '#mini .mini-word');
+    const slip = await surfaceCapture(page, out, `slip-${name}`, '#mini .mini-word');
     checkPaint(out, `slip-${name}`, slip);
     await page.locator('#mini .mini-word').click(); await page.locator('#depth-basis .depth-dot').waitFor(); await delay(300);
-    const basis = await capture(page, out, `basis-${name}`, '#sheet .depth-dot:is([data-depth],[data-kept]):visible', false);
+    const basis = await surfaceCapture(page, out, `basis-${name}`, '#sheet .depth-dot', false);
     checkPaint(out, `basis-${name}`, basis);
+    familySamples.slip.push(...slip); familySamples.basis.push(...basis);
     out.roomStateCoverage[name] = { slip: slip.map((d) => d.depth), basis: basis.map((d) => d.depth) };
-    const proseSelector = '#sheet .japanese-lookup-word:is([data-depth],[data-kept]):visible';
+    const proseSelector = '#sheet .japanese-lookup-word[data-lookup-text]:not(.headword .japanese-lookup-word)';
     if (await page.locator(proseSelector).count()) {
-      const prose = await capture(page, out, `prose-${name}`, proseSelector);
-      checkPaint(out, `prose-${name}`, prose);
+      const prose = await surfaceCapture(page, out, `prose-${name}`, proseSelector);
+      checkPaint(out, `prose-${name}`, prose); familySamples.prose.push(...prose);
       row(out, `prose-${name}.fragment-alignment`, prose.every((d) => d.fragments.some((f) => (d.left + d.right) / 2 >= f.left - 0.5 && (d.left + d.right) / 2 <= f.right + 0.5 && (d.top + d.bottom) / 2 >= f.bottom - 2 && (d.top + d.bottom) / 2 <= f.bottom + 12)), prose.map((d) => ({ text: d.text, dot: [d.left, d.top, d.right, d.bottom], fragments: d.fragments, cssGeometry: d.cssGeometry })));
       const clashes = prose.flatMap((d) => out.captureFrames[d.captureFrame].glyphs.filter((g) => g.owner !== d.probeId && d.left - d.spread < g.right && d.right + d.spread > g.left && d.top - d.spread < g.bottom && d.bottom + d.spread > g.top).map((g) => ({ captureFrame: d.captureFrame, dot: d.text, dotBox: [d.left - d.spread, d.top - d.spread, d.right + d.spread, d.bottom + d.spread], host: d.host, fragments: d.fragments, cssGeometry: d.cssGeometry, glyph: g })));
       row(out, `prose-${name}.no-other-glyph-overlap`, clashes.length === 0, clashes);
@@ -279,10 +344,13 @@ async function rooms(page, out) {
   }
   row(out, 'room.native-fill-coverage', ['owned', 'met', 'again', 'recalled'].every((name) => out.roomStateCoverage[name].slip.includes(name) && out.roomStateCoverage[name].basis.includes(name)), out.roomStateCoverage);
   row(out, 'room.generic-prose-covered', (out.proseCoverage || []).length > 0, out.proseCoverage || []);
+  for (const [family, samples] of Object.entries(familySamples)) semanticFamily(out, family, samples);
   await page.locator('#tray').click(); await page.locator('.tray-line').first().waitFor(); await delay(300);
-  checkPaint(out, 'tray', await capture(page, out, 'tray', '.tray-line .depth-dot:is([data-depth],[data-kept]):visible', false));
+  const tray = await surfaceCapture(page, out, 'tray', '.tray-line .depth-dot', false);
+  checkPaint(out, 'tray', tray); semanticFamily(out, 'tray', tray);
   await page.locator('#tab-today').click(); await page.locator('.today-star').first().waitFor(); await delay(350);
-  checkPaint(out, 'today', await capture(page, out, 'today', '.today-star:is([data-depth],[data-kept]):not([hidden])'));
+  const today = await surfaceCapture(page, out, 'today', '.today-star:not([hidden])');
+  checkPaint(out, 'today', today); semanticFamily(out, 'today', today);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   out.todayAnimation = await page.evaluate(() => {
     const found = [];
@@ -296,11 +364,12 @@ async function rooms(page, out) {
     return found;
   });
   row(out, 'today.native-breath-reached', out.todayAnimation.length > 0, out.todayAnimation);
-  checkPaint(out, 'today-minimum-breath', await capture(page, out, 'today-minimum-breath', '.today-star.due:is([data-depth],[data-kept]):not([hidden])'));
+  checkPaint(out, 'today-minimum-breath', await surfaceCapture(page, out, 'today-minimum-breath', '.today-star.due:not([hidden])'));
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.locator('#tab-me, #tab-progress').first().click(); await page.locator('#me-progress').waitFor(); await page.locator('#me-progress').click();
   await page.waitForFunction(() => document.body.dataset.view === 'kagami'); await delay(300);
-  checkPaint(out, 'mirror', await capture(page, out, 'mirror', '.kagami-row .depth-dot:is([data-depth],[data-kept]):visible', false));
+  const mirror = await surfaceCapture(page, out, 'mirror', '.kagami-row .depth-dot', false);
+  checkPaint(out, 'mirror', mirror); semanticFamily(out, 'mirror', mirror);
 }
 
 async function one(browser, engine, world) {
@@ -309,9 +378,10 @@ async function one(browser, engine, world) {
   const context = await browser.newContext({ viewport: engine === 'webkit' ? { width: 390, height: 844 } : { width: 1440, height: 900 }, deviceScaleFactor: 2, isMobile: engine === 'webkit', hasTouch: engine === 'webkit', reducedMotion: 'reduce', colorScheme: 'light', serviceWorkers: 'block' });
   try {
     await context.addInitScript((world) => { localStorage.setItem('kairo-theme', world); localStorage.setItem('kairo-word-ladder-demo-v1', '1'); }, world);
-    if (controlBytes || diagnosticInlineEnd) await context.route(new URL('editorial.css', base).href + '*', async (route) => { try { const response = await route.fetch(); const original = await response.body(); const expected = report.identity.files?.find((f) => f.path === 'editorial.css')?.sha256; assert(expected && hash(original) === expected, 'Control fetched CSS does not match artifact'); const servedBytes = controlBytes || Buffer.concat([original, Buffer.from('\n.japanese-lookup-word:is([data-depth],[data-kept])::after { left:auto; right:auto; transform:translateX(calc(-0.5em - var(--depth-size)/2)); }\n')]); assert(hash(original) !== hash(servedBytes), 'Control must change CSS'); report.control.served.push({ url: route.request().url(), candidateSha256: hash(original), servedSha256: hash(servedBytes) }); await route.fulfill({ response, body: servedBytes, headers: { ...response.headers(), 'content-length': String(servedBytes.length), 'content-type': 'text/css' } }); } catch (e) { report.control.setupError = String(e.stack); await route.abort(); } });
+    if (controlBytes || diagnosticInlineEnd || process.env.DOTS_BASE_URL) await context.route(new URL('editorial.css', base).href + '*', async (route) => { try { const response = await route.fetch(); const original = await response.body(); const expected = report.identity.files?.find((f) => f.path === 'editorial.css')?.sha256; assert(expected && hash(original) === expected, 'Control fetched CSS does not match artifact'); const servedBytes = controlBytes || (process.env.DOTS_BASE_URL ? original : Buffer.concat([original, Buffer.from('\n.japanese-lookup-word:is([data-depth],[data-kept])::after { left:auto; right:auto; transform:translateX(calc(-0.5em - var(--depth-size)/2)); }\n')])); if (!process.env.DOTS_BASE_URL) assert(hash(original) !== hash(servedBytes), 'Control must change CSS'); (process.env.DOTS_BASE_URL ? (report.remoteCssServed ||= []) : report.control.served).push({ url: route.request().url(), candidateSha256: hash(original), servedSha256: hash(servedBytes) }); await route.fulfill({ response, body: servedBytes, headers: { ...response.headers(), 'content-length': String(servedBytes.length), 'content-type': 'text/css' } }); } catch (e) { report.control.setupError = String(e.stack); await route.abort(); } });
     const page = await context.newPage(); page.setDefaultTimeout(15000); page.on('pageerror', (e) => out.errors.push(String(e)));
     await seed(page);
+    await worldBinding(page, out, 'reader');
     await page.evaluate(() => { const el = document.querySelector('#reader .tok[data-index]'); window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + scrollY - 160)); });
     await delay(400);
     await page.screenshot({ path: resolve(evidence, `${engine}-${world}-reader-viewport.png`), fullPage: false });
@@ -343,6 +413,7 @@ async function one(browser, engine, world) {
     await ladderContract(page, out);
     console.log(JSON.stringify({ engine, world, metrics: { met: met?.raster, owned: owned?.raster, recalled: recalled?.raster }, states })); save();
     await rooms(page, out);
+    await worldBinding(page, out, 'after-rooms');
     out.completedWalk = true;
   } catch (error) { out.errors.push(String(error.stack || error)); console.error(`${engine}/${world}: ${error.message}`); }
   finally { await context.close(); out.completedAt = new Date().toISOString(); out.passed = !out.errors.length && out.completedWalk && out.rows.length >= 24 && out.rows.every((r) => r.passed); save(); }
@@ -354,6 +425,8 @@ try {
     base = new URL(process.env.DOTS_BASE_URL); assert(base.protocol === 'https:' && base.pathname.endsWith('/'), 'DOTS_BASE_URL must be an HTTPS directory');
     const response = await fetch(new URL('build-identity.json', base)); assert(response.ok, 'Remote build identity missing'); const bytes = Buffer.from(await response.arrayBuffer()); report.identity = JSON.parse(bytes); report.identityBytesSha256 = hash(bytes);
     assert.equal(report.identity.gitSha, '09c9239dccea32242873c312a4866ca9f5080c11', 'Live build is not expected 09c9239d'); report.mode = 'remote evidence only';
+    const css = await fetch(new URL('editorial.css', base)); assert(css.ok, 'Remote CSS missing'); const cssBytes = Buffer.from(await css.arrayBuffer()); report.remoteCssBytesSha256 = hash(cssBytes);
+    assert.equal(report.remoteCssBytesSha256, report.identity.files?.find((f) => f.path === 'editorial.css')?.sha256, 'Remote CSS bytes must match build identity');
   } else { const site = resolveCorridorSite(); report.site = site; report.identity = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), 'utf8')); host = await startStaticHost({ site, port: 0 }); base = new URL(`${host.origin}/`); report.mode = 'local artifact'; }
   report.baseUrl = base.href; save();
   const runEngine = async (engine) => { const browser = await ({ webkit, chromium }[engine]).launch({ headless: true }); try { for (const world of worlds) await one(browser, engine, world); } finally { await browser.close(); } };
@@ -361,10 +434,13 @@ try {
   if (report.parallelEngines) await Promise.all(engines.map(runEngine)); else for (const engine of engines) await runEngine(engine);
 } catch (error) { report.errors.push(String(error.stack || error)); console.error(error.message); }
 finally {
+  if (report.mode === 'remote evidence only') {
+    try { const response = await fetch(new URL('build-identity.json', base)); assert(response.ok, 'Remote identity recheck missing'); const bytes = Buffer.from(await response.arrayBuffer()); report.identityAfterBytesSha256 = hash(bytes); report.identityAfter = JSON.parse(bytes); assert.equal(report.identityAfterBytesSha256, report.identityBytesSha256, 'Remote identity changed during evidence run'); assert(report.remoteCssServed?.length, 'No bound remote CSS was served'); } catch (error) { report.errors.push(String(error.stack || error)); }
+  }
   if (host) await host.close();
   report.completedAt = new Date().toISOString();
   report.passed = !report.errors.length && !report.control.setupError && report.contexts.length === engines.length * worlds.length && report.contexts.every((c) => c.passed) && (!controlBytes || report.control.served.length > 0);
   report.fullAcceptance = report.passed && report.scope.full && report.mode === 'local artifact' && !controlBytes && !diagnosticInlineEnd;
-  report.control.killed = Boolean(controlBytes && !report.control.setupError && !report.errors.length && report.contexts.every((c) => !c.errors.length) && report.control.served.length && report.contexts.some((c) => c.rows.some((r) => /^reader\.(size|contrast|nonempty|semantic-separation)$/.test(r.id) && !r.passed)));
+  report.control.killed = Boolean(controlBytes && !report.control.setupError && !report.errors.length && report.contexts.every((c) => !c.errors.length) && report.control.served.length && report.contexts.some((c) => c.rows.some((r) => /^(reader|slip|basis|prose|tray|today|mirror)(?:-[a-z]+)?\.(size|contrast|nonempty|semantic-separation)$/.test(r.id) && !r.passed)));
   save(); console.log(`DOTS ${report.passed ? 'PASS' : 'FAIL'}: ${evidence}`); if (!report.passed) process.exitCode = 1;
 }
