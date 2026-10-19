@@ -22363,7 +22363,10 @@ function loadReferenceExtra() {
       if (document.querySelector('#kdx-results > [data-kdx-readings="pending"]')) {
         document.getElementById('kdx-results')?.replaceWith(kdxTextResults('reading'));
       }
-      if (document.querySelector('[data-kanji-readings="pending"]')) render();
+      // an open writing room keeps its ink: only its readings are drawn again, the entry beneath when the room closes
+      if (S.strokes) {
+        if (document.querySelector('#stroke-page [data-stroke-readings]')) refreshStrokeReadings();
+      } else if (document.querySelector('[data-kanji-readings="pending"]')) render();
     }
   });
   return referenceExtraTask;
@@ -35233,20 +35236,64 @@ function strokeAwakeField(page, k) {
   field.id = 'stroke-awake-field';
   field.dataset.strokeChrome = '';
   field.setAttribute('aria-label', tx('読み', 'readings'));
+  field.append(strokeReadingField(k));
+  return field;
+}
 
+function strokeReadingField(k) {
   const readings = el('div', 'stroke-reading-field');
   readings.setAttribute('role', 'group');
   readings.setAttribute('aria-label', tx('読み', 'readings'));
+  // an unfinished list says so above the readings, where the room's corner controls never cover its retry
   readings.append(
+    ...strokeReadingsStatus(k),
     strokeReadingRow('音読み', 'on', k?.on, 'on', k?.officialReadings),
     strokeReadingRow('訓読み', 'kun', k?.kun, 'kun', k?.officialReadings),
   );
   if (k?.officialReadings?.length) {
     readings.append(el('p', 'stroke-reading-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
   }
+  return readings;
+}
 
-  field.append(readings);
-  return field;
+/** K01 · the writing room says what its readings are, as the entry does: until every reading has arrived they are the
+ * lessons' selection, and a failed load offers its retry. Nothing when the lists are whole. */
+function strokeReadingsStatus(k, tag = 'p', className = 'stroke-reading-note') {
+  const state = k?.readingsState;
+  if (state !== 'pending' && state !== 'failed') return [];
+  const line = el(tag, className, state === 'failed'
+    ? tx('すべての読みを読み込めなかった。いま見えているのはレッスン用に選んだ読みだけ。', 'Every reading could not be loaded — these are only the readings chosen for lessons.')
+    : tx('いま見えているのはレッスン用に選んだ読み。すべての読みを読み込み中…', 'These are the readings chosen for lessons — loading every reading…'));
+  line.id = 'stroke-readings-status';
+  line.dataset.strokeReadings = state;
+  line.setAttribute('role', 'status');
+  if (state !== 'failed') return [line];
+  const retry = biLabel('button', 'chip stroke-readings-retry', '再試行', 'Try again');
+  retry.type = 'button';
+  retry.id = 'stroke-readings-retry';
+  retry.addEventListener('click', () => {
+    void loadReferenceExtra();
+    refreshStrokeReadings();
+  });
+  return [line, retry];
+}
+
+/** K01 · the readings arrived, failed, or are being asked for again while the writing room is open: only its readings
+ * are drawn again, so the ink keeps writing. The classic room carries them in its header and is drawn whole. */
+function refreshStrokeReadings() {
+  if (!S.strokes) return;
+  const field = document.querySelector('#stroke-awake-field .stroke-reading-field');
+  if (!field) {
+    render();
+    return;
+  }
+  const hadFocus = field.contains(document.activeElement);
+  const next = strokeReadingField(strokeRoomRecord(S.strokes.id));
+  field.replaceWith(next);
+  if (hadFocus) {
+    next.tabIndex = -1;
+    (next.querySelector('#stroke-readings-retry') || next).focus({ preventScroll: true });
+  }
 }
 
 /** One three-position speed control; the same setting drives both ink engines. */
@@ -36111,6 +36158,7 @@ function renderStrokePage(root) {
     if (officialOnly.size) {
       readings.append(el('span', 'stroke-read-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
     }
+    readings.append(...strokeReadingsStatus(k, 'span', 'stroke-read-note'));
     khead.append(kleft, readings);
     if (!S.strokeMinimal) body.append(khead);
     const stage = el('div', 'stroke-stage');

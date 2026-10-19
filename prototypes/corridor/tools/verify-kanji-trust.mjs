@@ -6,6 +6,10 @@
  *   K01-joyo-forms             剝 and 𠮟 (official forms kanji.json lacks) are found by reading and open whole.
  *   K01-stroke-extended        胤 (the SKIP index's KANJIDIC2 record) shows the same readings in its writing room as
  *                              on its entry: イン / たね, never — / —.
+ *   K01-stroke-failed          every reading's download fails: 生's writing room says its lists are the lessons'
+ *                              selection and offers Try again; the retry says it is loading, then draws every official
+ *                              reading, both in the same room (the ink is not restarted); the entry beneath is whole
+ *                              when the room closes.
  *   K03-lookup                 食 by たべる, taberu, タベル, ﾀﾍﾞﾙ, ｔａｂｅｒｕ, たべr (an IME mid-word) and た;
  *                              生 by いきる, うまれる, なま; かいう never finds 介 (two readings are never joined).
  *   K04-kodansha               #8 is 胤 in both editions, 2013 #22 is 仔; 胤 opens with both numbers; a fixed
@@ -30,7 +34,8 @@
  *                              retake both stay reachable ("last time" shown); 鹿 (7級's tail) has a lesson;
  *                              nothing is enrolled.
  * Controls (`--control <name>`, in-memory page.route edits, no disk copies) must turn their rows red:
- *   recap-browse · refilter-kkld · drop-official-reading · stroke-own-record · forget-finder · failed-lesson-disappears.
+ *   recap-browse · refilter-kkld · drop-official-reading · stroke-own-record · silent-stroke-readings · redraw-room ·
+ *   forget-finder · failed-lesson-disappears.
  * Usage: KAIRO_SITE_DIR=<site> KAIRO_ARTIFACT_SHA256=<digest> KAIRO_EVIDENCE_DIR=<dir>
  *        [KAIRO_BROWSER=webkit|chromium|all] [--shots] [--control <name>] [--only <row,row>] node verify-kanji-trust.mjs
  */
@@ -84,6 +89,10 @@ const CONTROLS = {
     } },
   'stroke-own-record': { rows: ['K01-stroke-extended'], file: 'corridor.js',
     edit: (text) => replaceOnce(text, 'return kanjiEntryRecord(id, S.stack', 'return kanjiDisplayRecord(id, S.stack') },
+  'silent-stroke-readings': { rows: ['K01-stroke-failed'], file: 'corridor.js',
+    edit: (text) => replaceOnce(text, '    ...strokeReadingsStatus(k),\n', '') },
+  'redraw-room': { rows: ['K01-stroke-failed'], file: 'corridor.js',
+    edit: (text) => replaceOnce(text, "if (document.querySelector('#stroke-page [data-stroke-readings]')) refreshStrokeReadings();", 'render();') },
   'forget-finder': { rows: ['K05-nested-return', 'K05-nested-search-page'], file: 'corridor.js',
     edit: (text) => replaceOnce(text, 'kdx: home.kdx || undefined, searchLens: home.searchLens,', '') },
   'failed-lesson-disappears': { rows: ['K08-lessons'], file: 'corridor.js',
@@ -247,6 +256,57 @@ const ROWS = {
     assert.deepEqual({ on: room.on.map(plain), kun: room.kun.map(plain) }, { on: entry.on.map(plain), kun: entry.kun.map(plain) },
       `胤: entry ${shown(entry)}, writing room ${shown(room)}`);
     return `胤 by skip:1-1-8: entry ${shown(entry)} = writing room ${shown(room)}`;
+  },
+  async 'K01-stroke-failed'(_, browser) {
+    // every reading's download fails until the learner asks again; that request is then held, then let through
+    let network = 'fail';
+    let release;
+    const held = new Promise((resolve) => { release = resolve; });
+    const { ctx, page, errors } = await session(browser, { routes: [['**/data/share_alike/reference-extra.json', async (route) => {
+      if (network === 'fail') return route.abort('failed');
+      await held;
+      return route.fallback();
+    }]] });
+    try {
+      await finder(page);
+      await openEntry(page, '生');
+      const entryState = await page.locator('#sheet [data-kanji-readings]').getAttribute('data-kanji-readings', { timeout: 3000 }).catch(() => null);
+      const lesson = await strokeRoomReadings(page);
+      const status = await page.locator('#stroke-readings-status').innerText({ timeout: 3000 }).catch(() => '');
+      const retry = page.locator('#stroke-readings-retry');
+      if (shots) await page.screenshot({ path: shotPath('sei-stroke-failed') });
+      assert(/only the readings chosen for lessons/.test(status) && await retry.isVisible(),
+        `the writing room lists ${lesson.on.join('・')} / ${lesson.kun.join('・')} and says "${status}"${await retry.count() ? '' : ', with no retry'}`);
+      assert(entryState === 'failed', `生's entry is "${entryState}", not failed`);
+      // the network is back: the retry says it is loading, then draws every reading, both in the same room, still
+      // writing (never drawn again from the start)
+      network = 'hold';
+      await page.evaluate(() => { window.__ktrustRoom = document.getElementById('stroke-page'); });
+      await retry.click();
+      const loading = await page.locator('#stroke-readings-status[data-stroke-readings="pending"]').innerText({ timeout: 5000 }).catch(() => '');
+      const sameWhileLoading = await page.evaluate(() => window.__ktrustRoom === document.getElementById('stroke-page'));
+      release();
+      assert(/loading every reading/.test(loading) && sameWhileLoading, `after Try again the room says "${loading}", same room ${sameWhileLoading}`);
+      await page.locator('#stroke-readings-status').waitFor({ state: 'detached', timeout: 15000 });
+      const values = await page.locator('#stroke-awake-field .stroke-reading-value').allTextContents();
+      const list = (text) => (text || '').split('・').map((s) => s.replace(/[（）]/g, '').trim()).filter(Boolean);
+      const whole = { on: list(values[0]), kun: list(values[1]) };
+      const sameRoom = await page.evaluate(() => window.__ktrustRoom === document.getElementById('stroke-page'));
+      if (shots) await page.screenshot({ path: shotPath('sei-stroke-retried') });
+      assert(sameRoom, 'the retry drew the writing room again');
+      assert.deepEqual(officialMissing('生', whole), [], `after the retry the room lacks ${officialMissing('生', whole)}`);
+      // the entry beneath is whole too once the room closes
+      await page.locator('#strokes-back').click();
+      await page.locator('#stroke-page').waitFor({ state: 'detached' });
+      await settle(page, 400);
+      const after = await entryReadings(page);
+      assert.deepEqual(officialMissing('生', after), [], `the entry after the room lacks ${officialMissing('生', after)}`);
+      assert(!errors.length, `page errors: ${errors.join(' | ')}`);
+      return `failed: room ${lesson.on.join('・')} / ${lesson.kun.join('・')} with "${status.replace(/\s+/g, ' ')}" + Try again; retry: "${loading.replace(/\s+/g, ' ')}", then ${whole.on.length + whole.kun.length} readings, every official one, in the same room; entry whole after`;
+    } finally {
+      release();
+      await ctx.close();
+    }
   },
   async 'K03-lookup'({ page }) {
     await lens(page, 'by reading');
@@ -616,7 +676,7 @@ for (const engine of engines) {
     let detail = '';
     let errors = [];
     try {
-      if (row === 'K06-load') {
+      if (row === 'K06-load' || row === 'K01-stroke-failed') {
         detail = await ROWS[row](null, browser);
       } else {
         const opened = await session(browser);
