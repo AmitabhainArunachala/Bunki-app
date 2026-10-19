@@ -4402,14 +4402,14 @@ function dictionaryDetailsFor(node) {
  * without its romaji. */
 const POS_PLAIN = {
   n: ['名詞', 'noun'], 'n-adv': ['副詞的名詞', 'adverbial noun'], 'n-t': ['時の名詞', 'noun (time)'], 'n-pr': ['固有名詞', 'proper noun'],
-  'n-pref': ['名詞（接頭）', 'noun (prefix)'], 'n-suf': ['名詞（接尾）', 'noun (suffix)'], pn: ['代名詞', 'pronoun'], num: ['数詞', 'number'],
-  ctr: ['助数詞', 'counter'], 'adj-i': ['い形容詞', 'i-adjective'], 'adj-ix': ['い形容詞（いい・よい）', 'i-adjective (いい/よい)'],
+  'n-pref': ['名詞（接頭）', 'noun prefix'], 'n-suf': ['名詞（接尾）', 'noun suffix'], pn: ['代名詞', 'pronoun'], num: ['数詞', 'number'],
+  ctr: ['助数詞', 'counter'], 'adj-i': ['い形容詞', 'i-adjective'], 'adj-ix': ['い形容詞（いい・よい）', 'i-adjective'],
   'adj-na': ['な形容詞', 'na-adjective'], 'adj-no': ['の形容詞', 'no-adjective'], 'adj-pn': ['連体詞', 'pre-noun adjective'],
-  'adj-t': ['タルト形容動詞', 'taru-adjective'], 'adj-f': ['連体修飾', 'used before a noun'], 'adj-ku': ['ク活用（古語）', 'ku-adjective (archaic)'],
-  'adj-shiku': ['シク活用（古語）', 'shiku-adjective (archaic)'], 'adj-nari': ['ナリ活用（古語）', 'nari-adjective (archaic)'],
-  'adj-kari': ['カリ活用（古語）', 'kari-adjective (archaic)'], adv: ['副詞', 'adverb'], 'adv-to': ['副詞（と）', 'adverb (with と)'],
+  'adj-t': ['タルト形容動詞', 'taru-adjective'], 'adj-f': ['連体修飾', 'used before a noun'], 'adj-ku': ['ク活用（古語）', 'archaic ku-adjective'],
+  'adj-shiku': ['シク活用（古語）', 'archaic shiku-adjective'], 'adj-nari': ['ナリ活用（古語）', 'archaic nari-adjective'],
+  'adj-kari': ['カリ活用（古語）', 'archaic kari-adjective'], adv: ['副詞', 'adverb'], 'adv-to': ['副詞（と）', 'to-adverb'],
   aux: ['補助語', 'auxiliary'], 'aux-v': ['助動詞', 'auxiliary verb'], 'aux-adj': ['補助形容詞', 'auxiliary adjective'], conj: ['接続詞', 'conjunction'],
-  cop: ['断定（だ）', 'copula (だ)'], exp: ['表現', 'expression'], int: ['感動詞', 'interjection'], pref: ['接頭辞', 'prefix'], suf: ['接尾辞', 'suffix'],
+  cop: ['助動詞（断定）', 'copula'], exp: ['表現', 'expression'], int: ['感動詞', 'interjection'], pref: ['接頭辞', 'prefix'], suf: ['接尾辞', 'suffix'],
   prt: ['助詞', 'particle'], unc: ['分類なし', 'unclassified'], 'v-unspec': ['動詞', 'verb'], v1: ['一段動詞', 'verb (ichidan)'],
   'v1-s': ['一段動詞（くれる）', 'verb (ichidan, くれる)'], v5aru: ['五段動詞（-ある）', 'verb (godan, -ある)'], 'v5k-s': ['五段動詞（行く）', 'verb (godan, 行く)'],
   'v5r-i': ['五段動詞（不規則）', 'verb (godan, irregular)'], 'v5u-s': ['五段動詞（特殊）', 'verb (godan, special)'], v5uru: ['五段動詞（うる）', 'verb (godan, うる)'],
@@ -4424,7 +4424,7 @@ const SENSE_TAG_JA = {
   given: '名', group: '集団名', hist: '歴史用語', hon: '尊敬語', hum: '謙譲語', id: '慣用表現', joc: '冗談・ユーモア', leg: '伝説',
   'm-sl': '漫画俗語', male: '男性語', myth: '神話', 'net-sl': 'ネットスラング', obj: '物の名称', obs: '廃語', 'on-mim': '擬音語・擬態語',
   organization: '組織名', person: '人物のフルネーム', place: '地名', poet: '詩語', pol: '丁寧語', product: '商品名', proverb: 'ことわざ',
-  quote: '引用句', rare: '稀な語', sens: '配慮を要する語', serv: 'サービス名', ship: '船名', sl: '俗語', surname: '姓', uk: '通常かな書き',
+  quote: '引用句', rare: '稀な語', sens: '配慮を要する語', serv: 'サービス名', ship: '船名', sl: '俗語', surname: '姓', uk: 'ふつうかなで書く',
   unclass: '未分類の固有名', vulg: '卑語', work: '作品名', yoji: '四字熟語', Buddh: '仏教', Christn: 'キリスト教', MA: '武道', Shinto: '神道',
   agric: '農業', anat: '解剖学', archeol: '考古学', archit: '建築', art: '美術・美学', astron: '天文学', aviat: '航空', baseb: '野球',
   biochem: '生化学', biol: '生物学', bot: '植物学', boxing: 'ボクシング', bus: 'ビジネス', cards: 'カードゲーム', chem: '化学', civeng: '土木工学',
@@ -4440,22 +4440,219 @@ const SENSE_TAG_JA = {
   ksb: '関西方言', ktb: '関東方言', kyb: '京都方言', kyu: '九州方言', nab: '長野方言', osb: '大阪方言', rkb: '琉球方言', thb: '東北方言',
   tsb: '土佐方言', tsug: '津軽方言'
 };
-const SENSE_TAG_EN = { hon: 'honorific language', hum: 'humble language', pol: 'polite language' };
+const SENSE_TAG_EN = { hon: 'honorific language', hum: 'humble language', pol: 'polite language', uk: 'usually written in kana' };
 function dictionaryTag(tag) {
   const pos = POS_PLAIN[tag] || POS_FAMILY.find(([family]) => family.test(tag))?.[1];
   if (pos) return tx(pos[0], pos[1]);
   const description = D.dictionaryIndex?.tags?.[tag] || tag;
   return tx(SENSE_TAG_JA[tag] || description, SENSE_TAG_EN[tag] || description);
 }
-/* the core record's part of speech is plain words already, bar a few JMdict codes it kept */
-const CORE_POS_PLAIN = {
-  'adj-pn': 'pre-noun adjective', 'adj-f': 'used before a noun', 'n-suf': 'noun suffix', 'n-pref': 'noun prefix',
-  'vs-s': 'suru verb', 'vs-c': 'su verb', vz: 'zuru verb', aux: 'auxiliary', 'aux-adj': 'auxiliary adjective',
-  'adj-ix': 'i-adjective (いい/よい)', 'adj-ku': 'ku-adjective', v5aru: 'godan verb', 'v1-s': 'ichidan verb',
-  'v2a-s': 'nidan verb', cop: 'copula',
+/* Hfix-2d r2 · a field, dialect or usage tag beside its own sense: quiet brackets in 日本語 (〔スポーツ〕),
+ * plain small words in EN (sports · martial arts) — never `·`-joined into the part-of-speech line. */
+function quietUsageTags(codes) {
+  return codes
+    .map((tag) => {
+      const description = D.dictionaryIndex?.tags?.[tag] || tag;
+      const name = tx(SENSE_TAG_JA[tag] || description, SENSE_TAG_EN[tag] || description);
+      return S.lang === 'ja' ? `〔${name}〕` : name;
+    })
+    .join(S.lang === 'ja' ? '' : ' · ');
+}
+/* Hfix-2d · one part-of-speech line, in the plain school terms 日本語 readers know and in plain one-line
+ * English (X-17, X-18). Verb class and transitivity compose: 動詞（五段・自動詞） / 動詞（一段・他動詞） /
+ * する動詞（他動詞） in 日本語; "godan verb, intransitive" / "ichidan verb, transitive" / "suru verb,
+ * transitive" in EN. Tags arrive as JMdict codes (v5r, adj-i, …) or as the core record's plain-English
+ * segments ("godan verb", "transitive verb", …); both normalize to the same codes. Usage/field/dialect
+ * tags keep dictionaryTag. */
+const POS_SEGMENT_CODE = {
+  noun: 'n', 'na-adjective': 'adj-na', 'no-adjective': 'adj-no', 'i-adjective': 'adj-i', 'taru-adjective': 'adj-t',
+  adverb: 'adv', 'adverb (to)': 'adv-to', particle: 'prt', conjunction: 'conj', interjection: 'int', expression: 'exp',
+  pronoun: 'pn', counter: 'ctr', suffix: 'suf', prefix: 'pref', numeric: 'num', number: 'num', copula: 'cop',
+  'godan verb': 'v5', 'ichidan verb': 'v1', 'nidan verb': 'v2', 'yodan verb': 'v4', 'suru verb': 'vs', 'kuru verb': 'vk',
+  'zuru verb': 'vz', 'su verb': 'vs-c', verb: 'v-unspec', 'auxiliary verb': 'aux-v', auxiliary: 'aux',
+  'intransitive verb': 'vi', 'transitive verb': 'vt', 'auxiliary adjective': 'aux-adj',
+  'pre-noun adjective': 'adj-pn', 'used before a noun': 'adj-f', 'noun suffix': 'n-suf', 'noun prefix': 'n-pref',
+  'i-adjective (いい/よい)': 'adj-ix', 'ku-adjective': 'adj-ku',
 };
-function plainPos(p) {
-  return String(p).split(' · ').map((part) => CORE_POS_PLAIN[part] || part).join(' · ');
+function posCode(tag) {
+  return POS_PLAIN[tag] || POS_FAMILY.some(([family]) => family.test(tag)) ? tag : POS_SEGMENT_CODE[tag] || tag;
+}
+function posLine(tags) {
+  const codes = tags.map(posCode);
+  const verbClass = codes.some((code) => /^v5/u.test(code)) ? 'v5' : codes.some((code) => /^v1($|-)/u.test(code)) ? 'v1'
+    : codes.some((code) => /^v2/u.test(code)) ? 'v2' : codes.some((code) => /^v4/u.test(code)) ? 'v4' : null;
+  const transitivity = ['vi', 'vt'].filter((code) => codes.includes(code));
+  const jaTrans = transitivity.map((code) => (code === 'vi' ? '自動詞' : '他動詞')).join('・');
+  const enTrans = transitivity.map((code) => (code === 'vi' ? 'intransitive' : 'transitive')).join(' and ');
+  const suru = codes.some((code) => /^vs($|-)/u.test(code));
+  const kuru = codes.includes('vk');
+  const zuru = codes.includes('vz');
+  const auxVerb = codes.includes('aux-v');
+  const JA_CLASS = { v5: '五段', v1: '一段', v2: '二段', v4: '四段' };
+  const EN_CLASS = { v5: 'godan', v1: 'ichidan', v2: 'nidan', v4: 'yodan' };
+  const classText = verbClass
+    ? S.lang === 'ja'
+      ? transitivity.length
+        ? `動詞（${JA_CLASS[verbClass]}・${jaTrans}${verbClass === 'v2' || verbClass === 'v4' ? '・古語' : ''}）`
+        : `${JA_CLASS[verbClass]}動詞${verbClass === 'v2' || verbClass === 'v4' ? '（古語）' : ''}`
+      : `${verbClass === 'v2' || verbClass === 'v4' ? 'archaic ' : ''}${EN_CLASS[verbClass]} verb${transitivity.length ? `, ${enTrans}` : ''}`
+    : null;
+  const suruOwn = !verbClass && transitivity.length;
+  const suruText = suru
+    ? S.lang === 'ja'
+      ? suruOwn ? `する動詞（${jaTrans}）` : 'する動詞'
+      : `suru verb${suruOwn ? `, ${enTrans}` : ''}`
+    : null;
+  const kuruText = kuru
+    ? S.lang === 'ja'
+      ? transitivity.length ? `動詞（カ変・${jaTrans}）` : 'カ変動詞'
+      : `kuru verb${transitivity.length ? `, ${enTrans}` : ''}`
+    : null;
+  const zuruText = zuru
+    ? S.lang === 'ja'
+      // Hfix-2d r3 · school grammar files 信ずる・感ずる under サ変; the label names the ずる form inside the
+      // one pair of parens (no nesting, no wave dash: the JA label set is kana, kanji, parens, ・)
+      ? transitivity.length ? `動詞（サ変・ずる・${jaTrans}）` : '動詞（サ変・ずる）'
+      : `zuru verb${transitivity.length ? `, ${enTrans}` : ''}`
+    : null;
+  // 〜ていく・〜てみる: an aux-v with a class is the subsidiary verb, in that class, not a 助動詞
+  const auxClass = auxVerb && (verbClass || suru || kuru || zuru)
+    ? S.lang === 'ja'
+      ? `補助動詞（${verbClass ? JA_CLASS[verbClass] : suru ? 'サ変' : kuru ? 'カ変' : 'サ変・ずる'}）`
+      : `${verbClass ? EN_CLASS[verbClass] : suru ? 'suru' : kuru ? 'kuru' : 'zuru'} subsidiary verb`
+    : null;
+  const pieces = [];
+  let verbsEmitted = false;
+  for (const code of codes) {
+    if (/^v[1254]/u.test(code) || /^vs($|-)/u.test(code) || code === 'vk' || code === 'vz') {
+      if (!verbsEmitted) {
+        // 〜ていく・〜てみる: the subsidiary verb stands instead of the class composite
+        for (const text of auxClass ? [auxClass] : [classText, suruText, kuruText, zuruText]) if (text) pieces.push(text);
+        verbsEmitted = true;
+      }
+      continue;
+    }
+    if (code === 'vi' || code === 'vt') {
+      if (!verbsEmitted && !classText && !suruText && !kuruText && !zuruText && !auxClass) pieces.push(dictionaryTag(code));
+      continue;
+    }
+    if (code === 'aux-v') {
+      // alone it stays 助動詞; with a class it is the auxClass composite above; beside the copula the
+      // copula's own line already says it (です・だ read 助動詞（断定） once, Hfix-2d r3)
+      if (!auxClass && !codes.includes('cop')) pieces.push(dictionaryTag(code));
+      continue;
+    }
+    if (code === 'adv' && codes.includes('adv-to')) continue; // one family once: 副詞（と） / to-adverb covers it
+    pieces.push(dictionaryTag(code));
+  }
+  return [...new Set(pieces)].join(' · ');
+}
+/* Hfix-2d r4 · the reading each of a word's kanji uses in that word, one left-to-right pass over the word's
+ * own reading with backtracking: longest first, but a candidate stands only when every later kanji can still
+ * match (r3's span could eat the next kanji's kana — 一月 showed ひとつ・∅, now ひと・つき; 口調 ク・チョウ,
+ * not くち・∅; 黒色 くろ・いろ; 死人 し・にん; 古巣 ふる・す; 逆様 さか・さま). An on reading must match in
+ * katakana (勉強 → ベン・キョウ), a kun reading in hiragana. Okurigana comes only from the kana the word
+ * itself writes right after the kanji (書く → か（く）, 三つ → みっ（つ）, 暖かい → あたた（かい）) — never
+ * from the reading's tail (羽 shows はね, not は（ね）; 時々 shows とき, the 々 stops the kana run). A dotted
+ * kun whose okurigana the word doesn't write is rejected unless the word writes its first part (食べ物's 食
+ * takes た（べ） from た.べる); inside a compound a kun may name its whole unwritten span without parens
+ * (組合 → くみ・あい, never あ（い）), and a dotted kun's bare stem stands when the rest of the word needs
+ * the kana back. A kanji nothing matches shows '' (今日, 大人: their words are jukujikun). Only data the
+ * app ships: the written word, the word's reading and each kanji's own on/kun lists. */
+function kanjiReadingsInWord(chars, reading, word = '') {
+  const hira = String(reading || '').replace(/[\u30a1-\u30f6]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+  const kata = String(reading || '').replace(/[\u3041-\u3096]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) + 0x60));
+  // one candidate list per kanji, built once; w is the kana the word itself writes right after the kanji
+  // (hiragana only; 々, another kanji, katakana or the word's end stop the run)
+  const candLists = [];
+  let wordPos = 0;
+  for (const c of chars) {
+    const k = D.kanji[c];
+    const at = word ? word.indexOf(c, wordPos) : -1;
+    const w = at < 0 ? '' : /^[ぁ-ゖ]+/u.exec(word.slice(at + 1))?.[0] || '';
+    if (at >= 0) wordPos = at + 1;
+    const list = [];
+    if (k) {
+      for (const on of k.on || []) list.push({ on: true, base: on, suffix: '', w });
+      for (const kun of k.kun || []) {
+        const dot = kun.indexOf('.');
+        list.push({ on: false, base: dot < 0 ? kun : kun.slice(0, dot), suffix: dot < 0 ? '' : kun.slice(dot + 1), w });
+      }
+    }
+    candLists.push(list);
+  }
+  // the fits at a position, longest first: a parenthesised written okurigana (書く か（く）, 三つ みっ（つ）,
+  // 食べ物 た（べ） from た.べる), a plain reading, then a compound's unwritten span (試合 あい)
+  const fitsFor = (i, pos) => {
+    const fits = [];
+    for (const cand of candLists[i]) {
+      const space = (cand.on ? kata : hira).slice(pos);
+      if (!cand.base || !space.startsWith(cand.base)) continue;
+      if (cand.suffix) {
+        if (cand.w) {
+          // a dotted kun asks the word to write its okurigana — exactly it or its written first part when a
+          // compound cuts it; the rest of the suffix is the stem's own grammar, not something this word writes
+          if (!(cand.suffix === cand.w || cand.suffix.startsWith(cand.w))) continue;
+          if (!space.startsWith(cand.w, cand.base.length)) continue;
+          fits.push({ display: `${cand.base}（${cand.w}）`, consume: cand.base.length + cand.w.length, rank: 0, consumedW: true });
+        } else {
+          // nothing written after the kanji (a compound's inside, or 々): the kun may name the whole
+          // span this kanji reads here, without claiming okurigana (試合 あい, never あ（い）)
+          if (!space.startsWith(cand.suffix, cand.base.length)) continue;
+          fits.push({ display: cand.base + cand.suffix, consume: cand.base.length + cand.suffix.length, rank: 2 });
+        }
+      } else {
+        fits.push({ display: cand.base, consume: cand.base.length, rank: 1 });
+      }
+    }
+    fits.sort((a, b) => b.consume - a.consume || a.rank - b.rank);
+    const seen = new Set();
+    return fits.filter((fit) => !seen.has(fit.display) && (seen.add(fit.display), true));
+  };
+  // a dotted kun's bare stem (死人 シ・ニン, 古巣 ふる・す, 一月 ひと・つき, 見本 み・ホン): never a greedy
+  // choice — it stands only when every later kanji still matches (r4: a span may not eat the next kanji's kana)
+  const stemsFor = (i, pos) => {
+    const stems = [];
+    for (const cand of candLists[i]) {
+      if (cand.on || !cand.suffix || cand.w || !cand.base) continue;
+      if (hira.slice(pos).startsWith(cand.base) && !stems.some((s) => s.display === cand.base)) stems.push({ display: cand.base, consume: cand.base.length });
+    }
+    return stems.sort((a, b) => b.consume - a.consume);
+  };
+  // the move after a fit: the reading position plus, when the fit didn't itself spend it, the kana the word
+  // writes between this kanji and the next (男の人: おとこ steps の before ひと). No kana, no step.
+  const advance = (i, pos, f) => {
+    let mid = pos + f.consume;
+    const w = candLists[i][0]?.w || '';
+    if (!f.consumedW && w) {
+      if (!hira.startsWith(w, mid)) return -1;
+      mid += w.length;
+    }
+    return mid;
+  };
+  // a path is complete only at the end of the reading, and no kanji may match after a blank one
+  // (r4 review: 男の人 is not お・と, 一生 is not い, 脱出 is not だ)
+  const fullFrom = (i, pos, memo) => {
+    if (i >= chars.length) return pos === hira.length;
+    const key = `${i}:${pos}`;
+    if (!memo.has(key)) memo.set(key, [...fitsFor(i, pos), ...stemsFor(i, pos)].some((f) => {
+      const mid = advance(i, pos, f);
+      return mid >= 0 && fullFrom(i + 1, mid, memo);
+    }));
+    return memo.get(key);
+  };
+  const out = [];
+  let pos = 0;
+  for (let i = 0; i < chars.length; i++) {
+    const memo = new Map();
+    const fits = hira ? fitsFor(i, pos) : [];
+    let chosen = fits.find((f) => { const mid = advance(i, pos, f); return mid >= 0 && fullFrom(i + 1, mid, memo); });
+    if (!chosen) chosen = stemsFor(i, pos).find((f) => { const mid = advance(i, pos, f); return mid >= 0 && fullFrom(i + 1, mid, memo); });
+    if (chosen) pos = advance(i, pos, chosen);
+    else if (fits[0]) pos += fits[0].consume; // no full path: the r3 greedy seat, unchanged
+    out.push((chosen || fits[0]) ? (chosen || fits[0]).display : '');
+  }
+  return out;
 }
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -34232,6 +34429,13 @@ function renderDictionaryDetails(container, details, node) {
       forms.append(el('span', 'dictionary-readings', kanaForms.map((form) => form[0]).join('・')));
       block.append(forms);
     }
+    // a usage tag every sense of this entry carries (うかな書き on ため, 丁寧語 on よろしくお願いします): once, at the entry
+    const usageOf = (sense) => [...(sense[5] || []), ...(sense[6] || []), ...(sense[7] || [])];
+    const entryWideTags = senses.length
+      ? [...new Set(usageOf(senses[0]).filter((tag) => senses.every((sense) => usageOf(sense).includes(tag))))]
+      : [];
+    if (entryWideTags.length) block.append(el('p', 'sense-usage dictionary-usage', quietUsageTags(entryWideTags)));
+    let previousPos = '';
     senses.forEach((sense, senseIndex) => {
       const [
         partOfSpeech,
@@ -34249,8 +34453,16 @@ function renderDictionaryDetails(container, details, node) {
       const section = el('div', 'dictionary-sense');
       section.append(el('span', 'dictionary-sense-number', String(senseIndex + 1)));
       const body = el('div', 'dictionary-sense-body');
-      const tags = [...partOfSpeech, ...field, ...dialect, ...misc].map(dictionaryTag);
-      if (tags.length) body.append(el('p', 'sense-pos', [...new Set(tags)].join(' · ')));
+      const pos = posLine(partOfSpeech);
+      // Hfix-2d r2 · the part-of-speech line holds parts of speech only, printed when it changes (and always
+      // on the sense this text uses); field, dialect and usage tags sit beside their own sense as quiet
+      // bracketed tags, and a tag every sense carries shows once, at the entry
+      const usageTags = [...new Set([...field, ...dialect, ...misc])].filter((tag) => !entryWideTags.includes(tag));
+      const inText = node?.sense || SENSE_BY_ANCHOR.get(heroSource.get(node));
+      const isTextSense = inText && String(inText.seq) === String(entry[0]) && Number(inText.k) === senseIndex;
+      if (pos && (pos !== previousPos || isTextSense)) body.append(el('p', 'sense-pos', pos));
+      if (pos) previousPos = pos;
+      if (usageTags.length) body.append(el('p', 'sense-usage', quietUsageTags(usageTags)));
       const restrictions = [];
       if (appliesToKanji?.length && appliesToKanji[0] !== '*') {
         restrictions.push(tx(`${appliesToKanji.join('・')} の語義`, `for ${appliesToKanji.join('・')}`));
@@ -34283,8 +34495,7 @@ function renderDictionaryDetails(container, details, node) {
       renderDictionaryRelations(body, '対義語', 'opposites', antonym, node);
       // R3 · the sense the word's text uses, marked among them all (senseDoor): the node's, else the one the slip of the
       // word it was opened from showed
-      const inText = node?.sense || SENSE_BY_ANCHOR.get(heroSource.get(node));
-      if (inText && String(inText.seq) === String(entry[0]) && Number(inText.k) === senseIndex) {
+      if (isTextSense) {
         section.classList.add('dictionary-sense-in-text');
         section.setAttribute('aria-current', 'true');
         body.prepend(el('p', 'dictionary-info', tx('この文での意味', 'the meaning in this text')));
@@ -34904,13 +35115,19 @@ function renderWordNode(sheet, node) {
   if (rowChars.length) {
     sheet.append(withEn(el('p', 'eyebrow', 'この語の漢字'), 'kanji in this word', 'en-inline'));
     const rows = el('div', 'entry-rows');
-    for (const c of rowChars) {
+    // Hfix-2d r3 · in 日本語 a row names the kanji by the reading it has IN THIS WORD (on in katakana, kun in
+    // hiragana), matched left to right over the word's own reading — never an English keyword, never a reading
+    // the word doesn't use (本 ホン on the ほん page, 気 キ on 天気, 番 バン on 一番); empty when none matches
+    const wordReading = String(rec?.r || node.reading || '').trim();
+    const inWord = S.lang === 'ja' ? kanjiReadingsInWord(rowChars, wordReading, label) : null;
+    for (const [charIndex, c] of rowChars.entries()) {
       const row = el('button', 'entry-row');
       row.type = 'button';
       row.dataset.kanjirow = c;
       const glyph = el('span', 'row-glyph', c);
       row.append(glyph);
-      row.append(el('span', 'row-main', D.kanji[c].m));
+      const keyword = S.lang === 'ja' ? inWord[charIndex] : D.kanji[c].m;
+      if (keyword) row.append(el('span', 'row-main', keyword));
       row.append(el('span', 'row-go', '›'));
       row.addEventListener('click', () => go({ t: 'kanji', id: c, from: node.from }, { invoker: row, from: glyph }));
       rows.append(row);
@@ -34940,7 +35157,7 @@ function renderWordNode(sheet, node) {
   } else if (rec?.m?.length && !unresolved) {
     const box = el('div', 'senses');
     if (lone) renderDictionaryHomographs(box, node, { head: true });
-    if (rec.p) box.append(el('p', 'sense-pos', plainPos(rec.p)));
+    if (rec.p) box.append(el('p', 'sense-pos', posLine(String(rec.p).split(' · '))));
     const immediate = rec.seq ? rec.m.slice(0, 1) : rec.m;
     if (immediate.length === 1) {
       box.append(el('p', 'gloss', immediate[0]));

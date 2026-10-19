@@ -134,7 +134,8 @@
 }
 .gs-button {
   display: inline-flex;
-  align-items: baseline;
+  /* Hfix-2d (X-3b): one label on a 48 px button is centred, not packed to the top by baseline */
+  align-items: center;
   gap: 8px;
 }
 .gs-button.primary .gs-gloss {
