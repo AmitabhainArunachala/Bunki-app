@@ -524,6 +524,9 @@ html[data-register="tutor"] .teacher-context-label, html[data-register="tutor"] 
    the sheet's inks; their house colours were day inks, 2.0:1 on the lacquer in 藍 */
 html[data-register="tutor"] #app main :is(.key-head, .ai-connection > summary, .airead-note) { color: var(--sheet-ink-2); }
 html[data-register="tutor"] #app main .ai-connection[open] > summary { color: var(--sheet-ink); }
+/* a Send that cannot send yet (nothing written, or no tutor set up) is a quiet outline in the sheet's ink, its word legible;
+   it was the lacquer slab at half opacity, its word at 1.9:1 in every world (Hfix-1B, found by the sweep's tutor state) */
+html[data-register="tutor"] main button.chat-send:disabled { opacity: 1; background: transparent; color: var(--sheet-ink-2); box-shadow: inset 0 0 0 1px currentColor; }
 
 /* ------------------------------------------------------ 8 · THE REPORT LINE
    The report entry lives in each page's own flow (no floating rail since 2026-09-25): two
