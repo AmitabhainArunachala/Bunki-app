@@ -15,6 +15,7 @@ import { chromium } from 'playwright-core';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecord,
   readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { selectBackupFile } from './record-fixture-support.mjs';
 
 const option = (name, fallback) => {
   const index = process.argv.indexOf(name);
@@ -126,7 +127,13 @@ async function importFixture(name, record, { navigate = true } = {}) {
   if (navigate) await openShelf();
   await page.locator('#tray').click();
   await page.evaluate(() => { window.__PI_ADAPT_BEFORE_IMPORT = true; });
-  await page.locator('#import-file').setInputFiles({ name: `${name}.json`, mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(record)) });
+  // INTFIX · the import-confirm family, the same cause as corridor-ai. Hfix-2a (71907eb2) made
+  // every backup restore ask first; an unanswered confirmation is dismissed by Playwright, the
+  // import never happens, and the sentinel below never clears — which is why all eight cases
+  // timed out here at 30 s and the report read 0/9. selectBackupFile answers EXACTLY the restore
+  // confirmation and refuses any other dialog, so this stays as strict as it was. The sentinel
+  // wait, the deepEqual on obslog and every other assertion are untouched.
+  await selectBackupFile(page, { name: `${name}.json`, mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(record)) });
   await page.waitForFunction(() => !window.__PI_ADAPT_BEFORE_IMPORT && document.body.dataset.ready === '1', null, { timeout: 30000 });
   const snapshot = await readAppRecordSnapshot(page);
   write(`${name}-imported.json`, snapshot);

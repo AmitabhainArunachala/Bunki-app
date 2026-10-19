@@ -25,6 +25,7 @@
 
 import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
+import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { isDeepStrictEqual } from 'node:util';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
@@ -36,6 +37,7 @@ import process from 'node:process';
 import { chromium } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecord, readAppRecordSnapshot, waitForAppRecord, armRecordWriteFailure, clearRecordWriteFailure } from './record-test-support.mjs';
+import { selectBackupFile } from './record-fixture-support.mjs';
 
 const CORRIDOR_DIR = resolveCorridorSite();
 const OUT = resolveCorridorEvidence();
@@ -213,9 +215,38 @@ async function importThroughUi(page, text, name) {
   if (!await page.locator('#import-file').count()) await page.locator('#tray').click();
   await page.locator('#import-file').waitFor({ state: 'attached' });
   await page.evaluate(() => { window.__PRE_IMPORT_PAGE = 1; });
-  await page.locator('#import-file').setInputFiles({ name, mimeType: 'application/json', buffer: Buffer.from(text, 'utf8') });
+  // INTFIX · the import-confirm family. Hfix-2a (71907eb2) made every backup restore ask first,
+  // and a confirmation nobody answers is dismissed by Playwright, so the import never ran and
+  // this helper's reload wait below timed out at 30 s. The shared selectBackupFile answers
+  // EXACTLY that restore confirmation — it asserts the dialog's type and both halves of its
+  // message, and dismisses anything else — so the verifier stays as strict as it was: a stray
+  // dialog still fails the row. Nothing else here changes; the reload wait is untouched.
+  await selectBackupFile(page, { name, mimeType: 'application/json', buffer: Buffer.from(text, 'utf8') });
   await page.waitForFunction(() => !window.__PRE_IMPORT_PAGE && document.body.dataset.ready === '1', null, { timeout: 30000 });
   return readAppRecordSnapshot(page);
+}
+
+/** INTFIX · the import-confirm family, for the import paths that must reach the NATIVE WRITE and
+ * so cannot use selectBackupFile's own "input cleared" wait — a fault-injected import never
+ * finishes normally. It answers exactly the restore confirmation and nothing else: any other
+ * dialog, or a confirmation whose wording has moved, is dismissed and rethrown, so the row stays
+ * as strict as it was. It adds no wait of its own; the caller's waits are untouched.
+ *
+ * Not every import needs this. The product throws `record-unavailable` / `invalid-import` BEFORE
+ * window.confirm, so a malformed file and a secondary tab abort earlier and raise no dialog at
+ * all; those two rows are deliberately left exactly as they were. */
+function answerRestoreConfirm(page) {
+  let problem;
+  const confirm = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', confirm);
+  return () => { page.off('dialog', confirm); if (problem) throw problem; };
 }
 
 async function exportThroughUi(page, name) {
@@ -970,10 +1001,15 @@ async function main() {
   const storeBeforeQuota = await readAppRecordSnapshot(page);
   await armRecordWriteFailure(page, 'quota');
   await page.evaluate(() => { window.__PRE_IMPORT_PAGE = 1; });
-  await page.setInputFiles('#import-file', {
-    name: 'synthetic-quota.json', mimeType: 'application/json', buffer: Buffer.from(exportedRecord, 'utf8'),
-  });
-  await page.waitForFunction(() => window.__recordTestFault?.fired > 0, null, { timeout: 8000 });
+  // a VALID backup: it passes validation and reaches window.confirm, so the restore must be
+  // answered or the armed quota fault below can never fire
+  const settleQuotaConfirm = answerRestoreConfirm(page);
+  try {
+    await page.setInputFiles('#import-file', {
+      name: 'synthetic-quota.json', mimeType: 'application/json', buffer: Buffer.from(exportedRecord, 'utf8'),
+    });
+    await page.waitForFunction(() => window.__recordTestFault?.fired > 0, null, { timeout: 8000 });
+  } finally { settleQuotaConfirm(); }
   await page.waitForFunction(() => !!document.querySelector('.port-row:has(#import-file) + .airead-note')?.textContent, null, { timeout: 8000 });
   const quotaAfter = await readAppRecordSnapshot(page);
   const quotaOutcome = {
