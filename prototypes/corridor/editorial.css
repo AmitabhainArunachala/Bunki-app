@@ -1180,7 +1180,7 @@ html[data-register='shelf'] .search-field::placeholder { color: color-mix(in srg
   border-radius: var(--radius-card);
   background: var(--surface-sunk);
   box-shadow: none;
-  color: var(--tint);
+  color: var(--color-accent-label, var(--tint));
   font: 600 var(--type-control)/1.3 var(--sans);
   text-align: start;
   white-space: normal;
@@ -1706,6 +1706,17 @@ body.v-depth-layered #reader, #reader.reader {
 /* a reading is the one ruby (rooms/motion.css): native, half its word, over it. On touch a reading stands
    alone over the word you tapped, so it keeps no gap at its sides and pries no air into the line (R1) */
 #reader:not(.fg-always) { --reading-gap: 0; }
+/* Hfix-2e2 · G6-1 · a reading folded away on touch fades (the house's fast beat) and only then gives up its box: the lead's
+   2158 delayed collapse, so at rest a folded reading takes no room and no width, and the fold is still seen to go. Its word
+   keeps the reading's seat until it has gone (corridor.js seatTouchReading). Revealed, it stands at once, as before: the
+   transition belongs to the folded state only. Reduced motion keeps the instant conceal. */
+#reader:not(.fg-always) rt.hidden-rt {
+  opacity: 0;
+  transition: opacity var(--motion-fast) var(--ease-exit), display var(--motion-fast) allow-discrete;
+}
+@media (prefers-reduced-motion: reduce) {
+  #reader:not(.fg-always) rt.hidden-rt { transition: none; }
+}
 /* at 200 % text on a phone (a column under 240 CSS px) a bracketed word can be wider than the line: there the
    closing mark may start a line rather than run off the screen (the kinsoku rule yields to the page's edge) */
 @media (max-width: 240px) {
@@ -2178,7 +2189,7 @@ body .sheet .hero #kanji-shape-lookup, body .sheet .teacher-door .chip {
 body .sheet .teacher-door .chip { flex-direction: column; }
 body .sheet .teacher-door .chip .en-sub { font-size: var(--type-caption); letter-spacing: 0.01em; text-transform: none; color: inherit; opacity: 0.9; }
 /* S · beside the sentence's one Save, asking the tutor and practising are quiet words in the accent, no box (the C family) */
-body .sheet .teacher-door .chip.btn-tertiary { flex-direction: row; padding: 0 10px; border: 0; background: transparent; color: var(--color-accent, var(--ai)); font: 600 var(--type-control)/1.3 var(--font-ui, var(--sans)); }
+body .sheet .teacher-door .chip.btn-tertiary { flex-direction: row; padding: 0 10px; border: 0; background: transparent; color: var(--color-accent-label, var(--color-accent, var(--ai))); font: 600 var(--type-control)/1.3 var(--font-ui, var(--sans)); }
 body .sheet .teacher-door .chip.btn-tertiary:hover:where(:not(:disabled)) { background: var(--color-fill, var(--ai-wash)); }
 body .sheet .kv { margin: var(--s2) 0; padding: var(--s2) 0; border-block: 1px solid var(--hairline); }
 body .sheet .kv dt { font: 700 var(--type-chrome)/1.8 var(--sans); color: var(--text); }
@@ -2954,8 +2965,14 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .layers-mark:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 @media (max-width: 520px) {
   body[data-view='reader'] .layers-mark { right: calc(var(--s2) + 44px + 8px); bottom: calc(8px + env(safe-area-inset-bottom)); }
-  body.has-primary-tabs[data-view='reader'] .layers-mark { bottom: calc(var(--nav-clearance) + 8px); }
+  body.has-primary-tabs[data-view='reader'] .layers-mark { bottom: calc(var(--nav-clearance) + 4px); }
   body[data-view='reader']:has(.listen-row.play-bar[data-open='true']) .layers-mark { display: none; }
+  /* Hfix-2e2 · X-13 · on a phone the column runs the glass's whole width, so a mark resting at the foot stood over the
+     reading mid-article. While 層 rests there it stands on the reader's dock (the slim paper strip the player lives on,
+     #app::after): the lines pass under the dock as they pass under the tab bar, and never under the mark. Its box stays
+     where the cards and strips already take it as their floor; docked in its open block, the strip goes with it. */
+  body[data-view='reader']:not(.zen):has(#layers-mark:not([data-docked])):not(:has(.listen-row.play-bar[data-open='true'])) #app::after { display: block; }
+  body.has-primary-tabs[data-view='reader']:not(.zen):has(#layers-mark:not([data-docked])):not(:has(.listen-row.play-bar[data-open='true'])) #app::after { height: 52px; }
 }
 /* Hfix-1A · open, the mark stands in its block's own corner (corridor.js dockLayersMark): the block's lines flow round it,
    so it is never over a glyph or a gloss; the block holds it (flow-root) however short it is */
@@ -4380,6 +4397,11 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
    set a step deeper so the accent clears 4.5:1 on that page and on the accent wash (measured by
    contrast-kotoba in every world; #35496b read 4.13 on the wash) */
 :where(:root[data-theme='iwa'] body:not([data-view='drift'])) { --color-accent: #2c3d5c; --color-accent-wash: rgb(44 61 92 / 10%); }
+/* 浪 (Hfix-2e2): its 藍 as the ink of a quiet label (the shelf tools' doors; "Practice it" and "Ask the tutor" beside a
+   sentence's Save) read 4.24:1 on a door's hover wash and 3.97:1 on the chip's. That ink alone is lifted a fifth toward the
+   paper, its own hue kept; the accent itself (its washes, its marks, every other ink) is as it was. Other worlds have no
+   label ink of their own and keep their accent there. */
+:where(:root[data-theme='nami'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) { --color-accent-label: #a8c4db; }
 /* 殻 is already phosphor: its own accent is the live light */
 :where(:root[data-theme='kaku'] body:not([data-view='drift'])) { --color-live: var(--world-accent); --color-live-glow: color-mix(in srgb, var(--world-accent) 45%, transparent); }
 
