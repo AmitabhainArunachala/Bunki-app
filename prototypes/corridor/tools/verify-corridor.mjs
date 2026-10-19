@@ -534,7 +534,7 @@ async function reachChromeNatively(page, width) {
  * screen and inside the bar (nothing clipped by the toolbar's own scroller, which G6 keeps only as a safety net), is at
  * least 44 px and its own hit target; nothing overlaps; Learn stays one tap away in the tab bar; the page stays the
  * phone's width. */
-async function standChrome(page, width) {
+async function standChrome(page, width, { selected = false } = {}) {
   const at = await measureChromeTargets(page);
   const learn = await page.evaluate(() => {
     const door = document.querySelector('#app > .chrome > #chrome-dojo');
@@ -542,9 +542,22 @@ async function standChrome(page, width) {
     const shown = (n) => !!n && n.checkVisibility() && n.getBoundingClientRect().width > 1;
     return { door: shown(door), tab: shown(tab) };
   });
+  // Hfix-1A (item 4, the lead's ruling: one Save on screen) · while a word's stage stands, the bar's Save steps aside: it
+  // keeps its slot (no door moves) but is neither seen nor reached, and the stage's Save is the one. So a selected bar
+  // stands six doors around that kept slot; an unselected bar, seven
+  const keep = await page.evaluate(() => {
+    const k = document.querySelector('#app > .chrome #chrome-keep');
+    if (!k) return null;
+    const r = k.getBoundingClientRect();
+    return { aside: k.hasAttribute('data-aside'), inert: !!k.inert, hidden: getComputedStyle(k).visibility === 'hidden', x: r.x, right: r.right };
+  });
   const doors = at.rows.filter(r => r.bar).map(r => r.id);
+  const count = selected ? 6 : 7;
+  const search = at.rows.find(r => r.id === 'chrome-search'), tray = at.rows.find(r => r.id === 'tray');
+  const keepAside = !selected || (!!keep && keep.aside && keep.inert && keep.hidden && !doors.includes('chrome-keep')
+    && keep.right - keep.x >= 44 && !!search && !!tray && keep.x >= search.right - 1 && keep.right <= tray.x + 1);
   const verdict = {
-    sevenDistinctDoors: doors.length === 7 && new Set(doors).size === 7,
+    sevenDistinctDoors: doors.length === count && new Set(doors).size === count && keepAside,
     learnInTabBar: !learn.door && learn.tab,
     everyDoorWhole: at.rows.every(r => r.whole),
     toolbarFits: !!at.port && at.port.scrollMax <= 0,
@@ -556,7 +569,7 @@ async function standChrome(page, width) {
       && at.page.bodyWidth <= width && (at.page.readerWidth ?? 0) <= width
       && at.page.visual?.width === width && at.page.visual?.scale === 1,
   };
-  return { valid: Object.values(verdict).every(Boolean), verdict, doors, learn, port: at.port, page: at.page,
+  return { valid: Object.values(verdict).every(Boolean), verdict, doors, keep, learn, port: at.port, page: at.page,
     rows: at.rows.map(r => ({ id: r.id, x: Math.round(r.x), right: Math.round(r.right), width: Math.round(r.width), whole: r.whole, reachable: r.reachable })) };
 }
 
@@ -1940,9 +1953,9 @@ async function main() {
       await waitForFiniteMotion(page, '.chrome');
       await shoot(page, shotsDir, `07-reader-chrome-${width}-${selected ? 'selected' : 'unselected'}`);
       if (width === 320) {
-        const stand = await standChrome(page, width);
+        const stand = await standChrome(page, width, { selected });
         chromeGeometry.push({ selected, width, ...stand });
-        check(`reader navigation · ${width}px ${selected ? 'selected' : 'unselected'}: seven doors stand whole, each 44 px and its own target, Learn in the tab bar, the page ${width} wide`,
+        check(`reader navigation · ${width}px ${selected ? 'selected' : 'unselected'}: ${selected ? 'six doors stand whole around the bar\'s Save, which steps aside in its own slot while the stage\'s Save is the one' : 'seven doors stand whole'}, each 44 px and its own target, Learn in the tab bar, the page ${width} wide`,
           stand.valid, JSON.stringify(stand));
         continue;
       }
@@ -1960,7 +1973,8 @@ async function main() {
   // the negative control: the Learn door given back at 320 px crowds the bar past the phone. Its last door no longer
   // stands whole, while the toolbar's own scroller (G6's safety net) still keeps the page 320 wide.
   const learnBack = await page.addStyleTag({ content: 'body.has-primary-tabs:not(.zen) #app > .chrome > #chrome-dojo { display: inline-flex !important; }' });
-  const crowded = await standChrome(page, 320);
+  // (the walk left the word's stage standing: the bar is measured as a selected one)
+  const crowded = await standChrome(page, 320, { selected: true });
   check('reader navigation · a 320px bar given its Learn door back no longer stands whole, and the page stays 320 wide',
     !crowded.valid && !crowded.verdict.learnInTabBar && !crowded.verdict.toolbarFits && !crowded.verdict.everyDoorWhole
       && crowded.verdict.viewportWidth, JSON.stringify(crowded));
