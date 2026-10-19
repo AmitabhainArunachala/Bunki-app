@@ -6,6 +6,8 @@
  *   K01-joyo-forms             剝 and 𠮟 (official forms kanji.json lacks) are found by reading and open whole.
  *   K01-stroke-extended        胤 (the SKIP index's KANJIDIC2 record) shows the same readings in its writing room as
  *                              on its entry: イン / たね, never — / —.
+ *   K01-stroke-official        中's writing room stars ジュウ and names the official table in a note nothing covers
+ *                              (the writing-speed corner lies over the field's lower left).
  *   K01-stroke-failed          every reading's download fails: 生's writing room says its lists are the lessons'
  *                              selection and offers Try again; the retry says it is loading, then draws every official
  *                              reading, both in the same room (the ink is not restarted); the entry beneath is whole
@@ -34,8 +36,8 @@
  *                              retake both stay reachable ("last time" shown); 鹿 (7級's tail) has a lesson;
  *                              nothing is enrolled.
  * Controls (`--control <name>`, in-memory page.route edits, no disk copies) must turn their rows red:
- *   recap-browse · refilter-kkld · drop-official-reading · stroke-own-record · silent-stroke-readings · redraw-room ·
- *   forget-finder · failed-lesson-disappears.
+ *   recap-browse · refilter-kkld · drop-official-reading · stroke-own-record · silent-stroke-readings · notes-below ·
+ *   redraw-room · forget-finder · failed-lesson-disappears.
  * Usage: KAIRO_SITE_DIR=<site> KAIRO_ARTIFACT_SHA256=<digest> KAIRO_EVIDENCE_DIR=<dir>
  *        [KAIRO_BROWSER=webkit|chromium|all] [--shots] [--control <name>] [--only <row,row>] node verify-kanji-trust.mjs
  */
@@ -90,7 +92,9 @@ const CONTROLS = {
   'stroke-own-record': { rows: ['K01-stroke-extended'], file: 'corridor.js',
     edit: (text) => replaceOnce(text, 'return kanjiEntryRecord(id, S.stack', 'return kanjiDisplayRecord(id, S.stack') },
   'silent-stroke-readings': { rows: ['K01-stroke-failed'], file: 'corridor.js',
-    edit: (text) => replaceOnce(text, '    ...strokeReadingsStatus(k),\n', '') },
+    edit: (text) => replaceOnce(text, '  readings.append(...strokeReadingsStatus(k));\n', '') },
+  'notes-below': { rows: ['K01-stroke-official', 'K01-stroke-failed'], file: 'corridor.js',
+    edit: (text) => replaceOnce(text, "  readings.append(\n    strokeReadingRow('音読み'", "  readings.prepend(\n    strokeReadingRow('音読み'") },
   'redraw-room': { rows: ['K01-stroke-failed'], file: 'corridor.js',
     edit: (text) => replaceOnce(text, "if (document.querySelector('#stroke-page [data-stroke-readings]')) refreshStrokeReadings();", 'render();') },
   'forget-finder': { rows: ['K05-nested-return', 'K05-nested-search-page'], file: 'corridor.js',
@@ -256,6 +260,22 @@ const ROWS = {
     assert.deepEqual({ on: room.on.map(plain), kun: room.kun.map(plain) }, { on: entry.on.map(plain), kun: entry.kun.map(plain) },
       `胤: entry ${shown(entry)}, writing room ${shown(room)}`);
     return `胤 by skip:1-1-8: entry ${shown(entry)} = writing room ${shown(room)}`;
+  },
+  async 'K01-stroke-official'({ page }) {
+    await openEntry(page, '中');
+    const room = await strokeRoomReadings(page);
+    const note = page.locator('#stroke-awake-field .stroke-reading-note', { hasText: 'Jōyō' });
+    const text = await note.innerText({ timeout: 3000 }).catch(() => '');
+    // the note's words are on top where they stand: nothing (the writing-speed corner) lies over them
+    const covered = await note.evaluate((node) => {
+      const box = node.getBoundingClientRect();
+      return [0.04, 0.5, 0.96].map((f) => document.elementFromPoint(box.left + box.width * f, box.top + box.height / 2))
+        .filter((hit) => !node.contains(hit)).map((hit) => String(hit?.className || hit?.tagName || 'nothing'));
+    }).catch(() => ['no note']);
+    if (shots) await page.screenshot({ path: shotPath('naka-stroke') });
+    assert(room.on.includes('ジュウ*'), `中's writing room: ${room.on.join('・')} / ${room.kun.join('・')}`);
+    assert(/official Jōyō kanji table \(2010\)/.test(text) && !covered.length, `the star's note "${text}" lies under ${covered.join(', ')}`);
+    return `中's writing room: ${room.on.join('・')}; "${text.trim()}", nothing over it`;
   },
   async 'K01-stroke-failed'(_, browser) {
     // every reading's download fails until the learner asks again; that request is then held, then let through

@@ -35244,15 +35244,16 @@ function strokeReadingField(k) {
   const readings = el('div', 'stroke-reading-field');
   readings.setAttribute('role', 'group');
   readings.setAttribute('aria-label', tx('読み', 'readings'));
-  // an unfinished list says so above the readings, where the room's corner controls never cover its retry
-  readings.append(
-    ...strokeReadingsStatus(k),
-    strokeReadingRow('音読み', 'on', k?.on, 'on', k?.officialReadings),
-    strokeReadingRow('訓読み', 'kun', k?.kun, 'kun', k?.officialReadings),
-  );
+  // what the lists are (unfinished, or carrying a starred reading) is said above them: below, the writing-speed
+  // corner covers the field's left edge
+  readings.append(...strokeReadingsStatus(k));
   if (k?.officialReadings?.length) {
     readings.append(el('p', 'stroke-reading-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
   }
+  readings.append(
+    strokeReadingRow('音読み', 'on', k?.on, 'on', k?.officialReadings),
+    strokeReadingRow('訓読み', 'kun', k?.kun, 'kun', k?.officialReadings),
+  );
   return readings;
 }
 
