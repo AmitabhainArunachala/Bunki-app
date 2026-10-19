@@ -1908,7 +1908,12 @@ export const SPEAK_MUTANT_SPEC = Object.freeze({
     witness: {
       S18: 'hidden while the microphone was pending',
     },
-    downstream: {},
+    // INTFIX · the guard's removal also strands the unwanted take and its live track, so the
+    // room never returns to rest and the next tap cannot listen. One named consequence row of
+    // the same defect; the witness above must still die for the control to count as caught.
+    downstream: {
+      S18: ['in view again, the next tap listens as before'],
+    },
   },
   'spend-unchecked': {
     file: 'speak.js',
