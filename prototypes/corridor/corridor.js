@@ -4544,69 +4544,94 @@ function posLine(tags) {
   }
   return [...new Set(pieces)].join(' · ');
 }
-/* Hfix-2d r3 · the reading each of a word's kanji uses in that word, one left-to-right pass over the word's
- * own reading. An on reading must match in katakana (勉強 → ベン・キョウ), a kun reading in hiragana. Okurigana
- * comes only from the kana the word itself writes right after the kanji (書く → か（く）, 三つ → みっ（つ）,
- * 暖かい → あたた（かい）) — never from the reading's tail (羽 shows はね, not は（ね）; 時々 shows とき, the
- * 々 stops the kana run). A dotted kun whose okurigana the word doesn't write is rejected unless the word
- * writes its first part (食べ物's 食 takes た（べ） from た.べる); inside a compound a kun may name its whole
- * unwritten span without parens (組合 → くみ・あい, never あ（い）). The longest match wins. A kanji nothing
- * matches shows '' (今日, 大人: their words are jukujikun, no single reading to stand in the slot). Only data
- * the app ships: the written word, the word's reading and each kanji's own on/kun lists. */
+/* Hfix-2d r4 · the reading each of a word's kanji uses in that word, one left-to-right pass over the word's
+ * own reading with backtracking: longest first, but a candidate stands only when every later kanji can still
+ * match (r3's span could eat the next kanji's kana — 一月 showed ひとつ・∅, now ひと・つき; 口調 ク・チョウ,
+ * not くち・∅; 黒色 くろ・いろ; 死人 し・にん; 古巣 ふる・す; 逆様 さか・さま). An on reading must match in
+ * katakana (勉強 → ベン・キョウ), a kun reading in hiragana. Okurigana comes only from the kana the word
+ * itself writes right after the kanji (書く → か（く）, 三つ → みっ（つ）, 暖かい → あたた（かい）) — never
+ * from the reading's tail (羽 shows はね, not は（ね）; 時々 shows とき, the 々 stops the kana run). A dotted
+ * kun whose okurigana the word doesn't write is rejected unless the word writes its first part (食べ物's 食
+ * takes た（べ） from た.べる); inside a compound a kun may name its whole unwritten span without parens
+ * (組合 → くみ・あい, never あ（い）), and a dotted kun's bare stem stands when the rest of the word needs
+ * the kana back. A kanji nothing matches shows '' (今日, 大人: their words are jukujikun). Only data the
+ * app ships: the written word, the word's reading and each kanji's own on/kun lists. */
 function kanjiReadingsInWord(chars, reading, word = '') {
   const hira = String(reading || '').replace(/[\u30a1-\u30f6]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60));
   const kata = String(reading || '').replace(/[\u3041-\u3096]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) + 0x60));
-  const out = [];
-  let pos = 0;
+  // one candidate list per kanji, built once; w is the kana the word itself writes right after the kanji
+  // (hiragana only; 々, another kanji, katakana or the word's end stop the run)
+  const candLists = [];
   let wordPos = 0;
   for (const c of chars) {
-    let found = '';
     const k = D.kanji[c];
-    if (k && hira) {
-      // the kana the written word itself puts right after this kanji — the only source of a parenthesised
-      // okurigana (hiragana only; 々, another kanji, katakana or the word's end stop the run)
-      const at = word ? word.indexOf(c, wordPos) : -1;
-      const w = at < 0 ? '' : /^[ぁ-ゖ]+/u.exec(word.slice(at + 1))?.[0] || '';
-      if (at >= 0) wordPos = at + 1;
-      const candidates = [];
-      for (const on of k.on || []) candidates.push({ on: true, base: on, suffix: '' });
+    const at = word ? word.indexOf(c, wordPos) : -1;
+    const w = at < 0 ? '' : /^[ぁ-ゖ]+/u.exec(word.slice(at + 1))?.[0] || '';
+    if (at >= 0) wordPos = at + 1;
+    const list = [];
+    if (k) {
+      for (const on of k.on || []) list.push({ on: true, base: on, suffix: '', w });
       for (const kun of k.kun || []) {
         const dot = kun.indexOf('.');
-        candidates.push({ on: false, base: dot < 0 ? kun : kun.slice(0, dot), suffix: dot < 0 ? '' : kun.slice(dot + 1) });
-      }
-      const fits = [];
-      for (const cand of candidates) {
-        const space = (cand.on ? kata : hira).slice(pos);
-        if (!cand.base || !space.startsWith(cand.base)) continue;
-        if (cand.suffix) {
-          if (w) {
-            // a dotted kun asks the word to write its okurigana — exactly it (書く か（く）, 三つ みっ（つ）) or
-            // its written first part when a compound cuts it (食べ物 た（べ） from た.べる); the rest of the
-            // suffix is the stem's own grammar, not something this word writes
-            if (!(cand.suffix === w || cand.suffix.startsWith(w))) continue;
-            if (!space.startsWith(w, cand.base.length)) continue;
-            fits.push({ display: `${cand.base}（${w}）`, consume: cand.base.length + w.length, rank: 0 });
-          } else {
-            // nothing written after the kanji (a compound's inside, or 々): the kun may name the whole
-            // span this kanji reads here, without claiming okurigana (試合 あい, never あ（い）)
-            if (!space.startsWith(cand.suffix, cand.base.length)) continue;
-            fits.push({ display: cand.base + cand.suffix, consume: cand.base.length + cand.suffix.length, rank: 2 });
-          }
-        } else {
-          fits.push({ display: cand.base, consume: cand.base.length, rank: 1 });
-        }
-      }
-      fits.sort((a, b) => b.consume - a.consume || a.rank - b.rank);
-      const seen = new Set();
-      for (const fit of fits) {
-        if (seen.has(fit.display)) continue;
-        seen.add(fit.display);
-        found = fit.display;
-        pos += fit.consume;
-        break;
+        list.push({ on: false, base: dot < 0 ? kun : kun.slice(0, dot), suffix: dot < 0 ? '' : kun.slice(dot + 1), w });
       }
     }
-    out.push(found);
+    candLists.push(list);
+  }
+  // the fits at a position, longest first: a parenthesised written okurigana (書く か（く）, 三つ みっ（つ）,
+  // 食べ物 た（べ） from た.べる), a plain reading, then a compound's unwritten span (試合 あい)
+  const fitsFor = (i, pos) => {
+    const fits = [];
+    for (const cand of candLists[i]) {
+      const space = (cand.on ? kata : hira).slice(pos);
+      if (!cand.base || !space.startsWith(cand.base)) continue;
+      if (cand.suffix) {
+        if (cand.w) {
+          // a dotted kun asks the word to write its okurigana — exactly it or its written first part when a
+          // compound cuts it; the rest of the suffix is the stem's own grammar, not something this word writes
+          if (!(cand.suffix === cand.w || cand.suffix.startsWith(cand.w))) continue;
+          if (!space.startsWith(cand.w, cand.base.length)) continue;
+          fits.push({ display: `${cand.base}（${cand.w}）`, consume: cand.base.length + cand.w.length, rank: 0 });
+        } else {
+          // nothing written after the kanji (a compound's inside, or 々): the kun may name the whole
+          // span this kanji reads here, without claiming okurigana (試合 あい, never あ（い）)
+          if (!space.startsWith(cand.suffix, cand.base.length)) continue;
+          fits.push({ display: cand.base + cand.suffix, consume: cand.base.length + cand.suffix.length, rank: 2 });
+        }
+      } else {
+        fits.push({ display: cand.base, consume: cand.base.length, rank: 1 });
+      }
+    }
+    fits.sort((a, b) => b.consume - a.consume || a.rank - b.rank);
+    const seen = new Set();
+    return fits.filter((fit) => !seen.has(fit.display) && (seen.add(fit.display), true));
+  };
+  // a dotted kun's bare stem (死人 し・にん, 古巣 ふる・す, 一月 ひと・つき): never a greedy choice — it stands
+  // only when every later kanji still matches (r4: a span may not eat the next kanji's kana)
+  const stemsFor = (i, pos) => {
+    const stems = [];
+    for (const cand of candLists[i]) {
+      if (cand.on || !cand.suffix || cand.w || !cand.base) continue;
+      if (hira.slice(pos).startsWith(cand.base) && !stems.some((s) => s.display === cand.base)) stems.push({ display: cand.base, consume: cand.base.length });
+    }
+    return stems.sort((a, b) => b.consume - a.consume);
+  };
+  const fullFrom = (i, pos, memo) => {
+    if (i >= chars.length) return true;
+    const key = `${i}:${pos}`;
+    if (!memo.has(key)) memo.set(key, [...fitsFor(i, pos), ...stemsFor(i, pos)].some((f) => fullFrom(i + 1, pos + f.consume, memo)));
+    return memo.get(key);
+  };
+  const out = [];
+  let pos = 0;
+  for (let i = 0; i < chars.length; i++) {
+    const memo = new Map();
+    const fits = hira ? fitsFor(i, pos) : [];
+    const chosen = fits.find((f) => fullFrom(i + 1, pos + f.consume, memo))
+      || stemsFor(i, pos).find((f) => fullFrom(i + 1, pos + f.consume, memo))
+      || fits[0];
+    if (chosen) pos += chosen.consume;
+    out.push(chosen ? chosen.display : '');
   }
   return out;
 }

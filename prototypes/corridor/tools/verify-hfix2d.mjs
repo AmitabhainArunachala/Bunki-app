@@ -2,7 +2,9 @@
 /** Hfix-2d · the word page's parts of speech and kanji keywords in 日本語 and plain English, plus Guided's
  * start box (X-17, X-18, X-3b). Real WebKit 390×844 touch + Chromium 1440×900, browser.version() logged.
  * Round 3 (the r2 critic's two must-fix items): the usage tags' ink keeps C1 contrast in every world, and
- * a kanji row's okurigana comes only from the kana the word itself writes.
+ * a kanji row's okurigana comes only from the kana the word itself writes. Round 4 (the r3 critic's open
+ * item): the matcher backtracks, so one kanji's reading can no longer swallow the next kanji's kana
+ * (一月 ひと・つき, 口調 ク・チョウ, 黒色 くろ・いろ — the r3 spans ひとつ/くち/くろい left a blank row).
  *
  *   P   the packet words in both modes: each .sense-pos line is the plain form for the sense's own
  *       tags — JA: the school terms (名詞, 動詞（五段・他動詞）, 動詞（一段・他動詞）, する動詞（他動詞）,
@@ -83,6 +85,10 @@ const WORDS = [
   { q: '暖かい', row: { ja: ['あたた（かい）'], en: ['Warmth'] } },
   { q: '食べ物', row: { ja: ['た（べ）', 'もの'], en: ['Eat', 'Thing'] } },
   { q: '組合', row: { ja: ['くみ', 'あい'], en: ['Association', 'Fit'] } },
+  // r4 · a reading may not swallow the next kanji's kana: the backtracking split leaves every kanji its own
+  { q: '一月', row: { ja: ['ひと', 'つき'], en: ['One', 'Month'] } },
+  { q: '口調', row: { ja: ['ク', 'チョウ'], en: ['Mouth', 'Tune'] } },
+  { q: '黒色', row: { ja: ['くろ', 'いろ'], en: ['Black', 'Color'] } },
 ];
 const JA_PLAIN = /^[ぁ-ゖァ-ヶー一-鿯々〇〻（）・·０-９ ]+$/u; // no Latin on a JA label: kana, kanji, parens, ・/·, spaces, full-width digits
 const EN_PLAIN = /^[a-z][a-z ·,'-]*$/u; // one plain English line, no parentheses, no romaji tags
