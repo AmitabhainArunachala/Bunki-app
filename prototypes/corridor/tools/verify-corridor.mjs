@@ -635,9 +635,12 @@ export const MEASURE_FN = `(() => {
       const r = n.getBoundingClientRect();
       // a control whose press region is its ::before is measured by that region (the reader's words, the sentence and rest
       // doors; G5 · L-2: a Save in a bar, its 28 px face inside the bar and its ::before the bar's full 44, as Close)
-      const expanded = n.matches('.tok, button.sent-door, button.rest-toggle, [data-bar] button.save-one:not(.chrome-keep)') ? getComputedStyle(n, '::before') : null;
-      const expandedW = expanded ? parseFloat(expanded.width) : 0;
-      const expandedH = expanded ? parseFloat(expanded.height) : 0;
+      const expanded = n.matches('.tok, button.sent-door, button.rest-toggle, [data-bar] button.save-one:not(.chrome-keep), button.ww-reading-door') ? getComputedStyle(n, '::before') : null;
+      // A reading door's transparent reach must actually exist and receive input.
+      const usableExpanded = !n.matches('button.ww-reading-door') || (expanded &&
+        !['none', 'normal'].includes(expanded.content) && expanded.display !== 'none' && expanded.pointerEvents !== 'none');
+      const expandedW = expanded && usableExpanded ? parseFloat(expanded.width) : 0;
+      const expandedH = expanded && usableExpanded ? parseFloat(expanded.height) : 0;
       return {
         text: (n.textContent||'').trim().slice(0, 14),
         w: Math.round(r.width), h: Math.round(r.height),

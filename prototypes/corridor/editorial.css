@@ -6103,6 +6103,30 @@ body.ginga #app > .scale-thread { position: fixed; left: 0; top: calc(56px + env
   text-decoration: underline;
   text-underline-offset: .2em;
 }
+/* Keep the printed reading fixed while giving it its own invisible press region.
+   The centre's headword starts immediately below, so that region grows upward. */
+.ww-reading-door::before {
+  content: '';
+  position: absolute;
+  pointer-events: auto;
+}
+.ww-reading-door.ww-c-r::before {
+  left: 50%;
+  bottom: 0;
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  transform: translateX(-50%);
+}
+/* The detail reading clips long text in its dd. Anchor the press region to its
+   existing cell instead, with the same inset and no reach into adjacent cells. */
+.ww-marks > div:has(> dd > .ww-reading-door) { position: relative; }
+.ww-marks > div > dd > .ww-reading-door { position: static; }
+.ww-marks > div > dd > .ww-reading-door::before {
+  left: 8px;
+  right: 8px;
+  bottom: 0;
+  height: 44px;
+}
 .ww-reading-choices { margin-block: 1rem; }
 .ww-reading-choices .ww-reading-choice { display: block; max-width: 100%; margin-block: .5rem; white-space: normal; text-align: start; }
 /* The choices sit on the room's paper, without the generic note/chip tint. */
