@@ -110,6 +110,8 @@ async function openLists(page) {
   }
   await page.locator('#tray').click();
 }
+// A click or tap on a reader word walks the tap ladder and opens the word (the accepted product); a desktop learner
+// selects text with a mouse drag (lead's ruling 10-20). Press just before 町, drag across it, release just after it.
 async function selectWord(page) {
   const body = page.locator('#source-reader-body'); await page.evaluate(() => document.fonts.ready); await body.scrollIntoViewIfNeeded();
   const point = await body.evaluate((node) => {
@@ -118,14 +120,16 @@ async function selectWord(page) {
     while ((text = walker.nextNode())) {
       if (position < offset + text.length) {
         const range = document.createRange(); range.setStart(text, position - offset); range.setEnd(text, position - offset + 1);
-        const rect = range.getBoundingClientRect(), box = node.getBoundingClientRect();
-        return { x: rect.x - box.x + rect.width / 4, y: rect.y - box.y + rect.height / 2, start: position };
+        let rect = range.getBoundingClientRect();
+        if (rect.top < 0 || rect.bottom > innerHeight) { text.parentElement.scrollIntoView({ block: 'center' }); rect = range.getBoundingClientRect(); }
+        return { left: rect.left, right: rect.right, width: rect.width, y: rect.top + rect.height / 2, start: position };
       }
       offset += text.length;
     }
     throw new Error('Word not present');
   });
-  await body.dblclick({ position: { x: point.x, y: point.y } });
+  await page.mouse.move(point.left - point.width / 4, point.y); await page.mouse.down();
+  await page.mouse.move(point.right + point.width / 4, point.y, { steps: 8 }); await page.mouse.up();
   await page.waitForFunction(() => window.getSelection()?.toString() === '町');
   await page.waitForFunction(() => document.querySelector('#source-context-save')?.disabled === false);
   return point.start;
