@@ -48,11 +48,24 @@
  *             their shade (a run's every line probed, not its first alone); a line outside it is read again with the
  *             document or the page scrolled clear, the run keeping its worst pair (F-1's 9 reds were lines read under the
  *             tab bar's edge and shade).
+ *             VC-1 (CONTRAST-INTEGRATION-SPEC, lead 2125, sol): each run is its own native occurrence — its text node,
+ *             numbered by the census and kept across positions, with the reader token's data-index where it has one; its
+ *             path and words are only a label — and each of its lines (its index among the node's line boxes) its own
+ *             verdict, completed exactly once. A fixed overlay standing on the glass (the slip, #mini: no bar, yet it owns
+ *             its painted pixels) obscures a line whose sampled band its box meets or a probe across the band finds on it;
+ *             such a line, like one outside the open area, is read again at a bounded native scroll position where that
+ *             very line stands wholly clear (open area; the overlay's box, shadow and outline), checked at that capture.
+ *             What no bounded position reads is a named unresolved failure (unexposed, missing native occurrence,
+ *             positioning timeout, duplicate completion), never a pass; only a fixed layer's line hidden inside an opaque
+ *             bar is barred. The thresholds, the composition and the extremes rule are unchanged.
  * Negative controls (one-hand/M/neg): a literal #1f3a5f → transparent top bar → C3 red; the key-kanji sheet flat again
  * → C5 red; the bar's ink lowered onto its paper → C1 red; the word's page at 85 % of its page's luminance → C6 red;
  * SWEEP_NEGATIVE=translucent-bar (Hfix-1A) → C8 red. In every full run (INT-VH, the lead's ruling): on hokusai's deck front,
  * each engine, the actual foot band's fade undeclared, declared at 30 px, and see-through below its declared strip → C8 red,
- * each restored to the exact style and the exact candidate measurement (rows …/deck-front.C8-control.*). */
+ * each restored to the exact style and the exact candidate measurement (rows …/deck-front.C8-control.*).
+ * VC-1's C1 controls (diagnostic, SWEEP_NEGATIVE=c1-…, a list): the gold-edge counterexample on the slip (sol's site-10
+ * geometry), and on the reader a same-word sibling, a visible low-contrast mutant, a spent positioning budget, an unexposable
+ * line, a missing native occurrence and a duplicate completion → C1 red by name, each restored exactly (…/C1-control.*). */
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -89,11 +102,21 @@ assert(!onlyStates || new Set(onlyStates).size === onlyStates.length, 'Duplicate
 // through; C8 must go red. INT-VH: a declared control is a selector like the others (VH-1): exact when set, and its run is
 // diagnostic, never an acceptance (partial, and named in the receipt's selectors)
 const SWEEP_NEGATIVE = Object.hasOwn(process.env, 'SWEEP_NEGATIVE') ? process.env.SWEEP_NEGATIVE : null;
-assert(SWEEP_NEGATIVE === null || SWEEP_NEGATIVE === 'translucent-bar', `unknown SWEEP_NEGATIVE ${SWEEP_NEGATIVE}`);
+// VC-1 (CONTRAST-INTEGRATION-SPEC item 4) · the C1 controls are declared controls of the same kind: an exact list of known
+// ids (no repeat), each run on its own scene of each selected world after that scene's own measurement (c1Controls);
+// diagnostic, never acceptance
+const C1_CONTROLS = Object.freeze(['c1-gold-edge', 'c1-same-word', 'c1-low-contrast', 'c1-timeout', 'c1-unexposed', 'c1-missing-occurrence', 'c1-duplicate-completion']);
+// the scene each runs on: the gold edge where the slip stands over the reader; the rest on the reader at rest
+const C1_CONTROL_SCENE = Object.freeze({ 'c1-gold-edge': 'slip' });
+const c1SceneOf = (id) => C1_CONTROL_SCENE[id] || 'reader';
+const c1ControlIds = SWEEP_NEGATIVE === null || SWEEP_NEGATIVE === 'translucent-bar' ? [] : SWEEP_NEGATIVE.split(',');
+assert(SWEEP_NEGATIVE === null || SWEEP_NEGATIVE === 'translucent-bar' ||
+  (c1ControlIds.every((id) => C1_CONTROLS.includes(id)) && new Set(c1ControlIds).size === c1ControlIds.length), `unknown SWEEP_NEGATIVE ${SWEEP_NEGATIVE}`);
 const partial = demoOnly || !!(onlyWorlds || onlyStates) || SWEEP_NEGATIVE !== null;
 const worlds = WORLDS.filter((w) => !onlyWorlds || onlyWorlds.includes(w));
 const states = STATE_NAMES.filter((s) => (!demoOnly || s === 'fresh-demo') && (!onlyStates || onlyStates.includes(s)));
 assert(worlds.length && states.length, 'nothing to sweep');
+assert(c1ControlIds.every((id) => states.includes(c1SceneOf(id))), 'Each C1 control runs on its own scene (the gold edge on the slip, the rest on the reader): select it (SWEEP_STATES)');
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Pin an immutable built site and its digest');
 const site = resolveCorridorSite(), evidence = resolveCorridorEvidence();
 const identity = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), 'utf8'));
@@ -343,6 +366,65 @@ const IN_PAGE = () => {
     return bits.join(' > ');
   };
   const alphaOf = (c) => { const m = String(c).match(/[\d.]+%?/g) || []; const a = m[3]; return a === undefined ? 1 : a.endsWith('%') ? parseFloat(a) / 100 : Number(a); };
+  // VC-1 (CONTRAST-INTEGRATION-SPEC item 1) · one identity per native occurrence: every text node the census walks is
+  // numbered the first time it is seen (document order on the first census) and keeps that number for the document's
+  // life, so a later census (scrolled, re-collected) names the same node by the same number. The path and the words are
+  // only its label: a sibling with the same word or the same CSS path never shares its identity. Each fixed layer the
+  // census meets is numbered the same way, so a line knows which overlay is its own.
+  const textIds = new WeakMap(), layerIds = new WeakMap();
+  let textNext = 0, layerNext = 0;
+  const textId = (n) => { let id = textIds.get(n); if (id === undefined) { id = ++textNext; textIds.set(n, id); } return id; };
+  const layerId = (el) => { let id = layerIds.get(el); if (id === undefined) { id = ++layerNext; layerIds.set(el, id); } return id; };
+  // the top-level layers of a computed box-shadow / filter list (commas inside a colour's parentheses stay)
+  const layersOf = (text) => {
+    const out = [];
+    let depth = 0, at = 0;
+    for (let i = 0; i < text.length; i++) {
+      if (text[i] === '(') depth++;
+      else if (text[i] === ')') depth--;
+      else if (text[i] === ',' && depth === 0) { out.push(text.slice(at, i).trim()); at = i + 1; }
+    }
+    out.push(text.slice(at).trim());
+    return out.filter((s) => s && s !== 'none');
+  };
+  const COLOUR_IN = /(rgba?\([^()]*\)|color\([^()]*\)|(?:ok)?(?:lab|lch)\([^()]*\)|hsla?\([^()]*\)|hwb\([^()]*\)|#[0-9a-f]{3,8}\b|\btransparent\b|\bcurrentcolor\b)/i;
+  /** What a fixed layer paints past its border box: its outer shadows (offset, spread and blur: a blur of B reaches B
+   * past the shadow's edge), its outline and a drop-shadow filter. Inset and fully transparent shadows paint nothing out. */
+  const extentOf = (s, r, colourOf) => {
+    const e = { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+    const grow = (l, t, rr, b) => { e.left = Math.min(e.left, l); e.top = Math.min(e.top, t); e.right = Math.max(e.right, rr); e.bottom = Math.max(e.bottom, b); };
+    for (const layer of layersOf(String(s.boxShadow || ''))) {
+      if (/\binset\b/i.test(layer)) continue;
+      const colour = (layer.match(COLOUR_IN) || [])[0];
+      if (colour && alphaOf(colourOf(colour)) === 0) continue;
+      const [ox = 0, oy = 0, blur = 0, spread = 0] = (layer.replace(colour || '', ' ').match(/-?[\d.]+px/g) || []).map(parseFloat);
+      grow(r.left + ox - spread - blur, r.top + oy - spread - blur, r.right + ox + spread + blur, r.bottom + oy + spread + blur);
+    }
+    const ow = parseFloat(s.outlineWidth) || 0;
+    if (s.outlineStyle && s.outlineStyle !== 'none' && ow > 0) {
+      const o = ow + Math.max(0, parseFloat(s.outlineOffset) || 0);
+      grow(r.left - o, r.top - o, r.right + o, r.bottom + o);
+    }
+    for (const m of String(s.filter || '').matchAll(/drop-shadow\(((?:[^()]|\([^()]*\))*)\)/g)) {
+      const colour = (m[1].match(COLOUR_IN) || [])[0];
+      const [ox = 0, oy = 0, blur = 0] = (m[1].replace(colour || '', ' ').match(/-?[\d.]+px/g) || []).map(parseFloat);
+      grow(r.left + ox - blur, r.top + oy - blur, r.right + ox + blur, r.bottom + oy + blur);
+    }
+    return e;
+  };
+  const box = (r) => ({ left: r.left, top: r.top, right: r.right, bottom: r.bottom });
+  window.__sweep.scrollState = () => {
+    const se = document.scrollingElement || document.documentElement, sheet = document.getElementById('sheet');
+    return { doc: { y: scrollY, max: Math.max(0, se.scrollHeight - innerHeight) },
+      sheet: sheet ? { y: sheet.scrollTop, max: Math.max(0, sheet.scrollHeight - sheet.clientHeight) } : null };
+  };
+  // a native scroll to absolute positions (the document, the word's page), as a reader's own scroll would leave them
+  window.__sweep.scrollAt = (target) => {
+    if (Number.isFinite(target?.doc)) scrollTo({ top: target.doc, behavior: 'instant' });
+    const sheet = document.getElementById('sheet');
+    if (sheet && Number.isFinite(target?.sheet)) sheet.scrollTo({ top: target.sheet, behavior: 'instant' });
+    return window.__sweep.scrollState();
+  };
   window.__sweep.collect = (owned, figures, inks) => {
     const vw = innerWidth, vh = innerHeight, root = document.documentElement, body = document.body;
     const probe = document.createElement('i');
@@ -441,12 +523,48 @@ const IN_PAGE = () => {
     const openTop = Math.max(0, ...bars.filter((b) => b.top).map((b) => b.rect.bottom + b.shade));
     const openBottom = Math.min(vh, ...bars.filter((b) => !b.top).map((b) => b.rect.top - b.shade));
     const inBar = (el) => bars.some((b) => b.el.contains(el));
-    const scrollerOf = (el) => (el.closest('#sheet') ? 'sheet' : el.closest('#app, main, body') ? 'doc' : 'other');
+    // VC-1 (spec item 2) · the fixed layers. A control standing on a bar (C8's definition in measureChrome: a fixed or sticky
+    // element outside every bar, inside a bar's box and on top there, as the deck's key on its foot band) is the bar's own:
+    // its words are read in it, as a bar's are. Every other fixed element the glass hits inside its own box stands in
+    // front of what scrolls: an overlay (the slip, #mini, deliberately no bar). An overlay owns its painted pixels: its
+    // border box (fill and border) and past it its outer shadows and outline (extentOf). A fixed element the glass never
+    // hits in its own box (behind the content, or pointer-events: none) is listed, not treated as an overlay.
+    const parts = [], overlays = [], fixedOther = [];
+    for (const el of body.querySelectorAll('*')) {
+      if (el === probe || inBar(el) || parts.some((p) => p.el.contains(el)) || overlays.some((o) => o.el.contains(el))) continue;
+      const s = getComputedStyle(el);
+      if (!['fixed', 'sticky'].includes(s.position) || s.visibility !== 'visible' || s.display === 'none') continue;
+      const r = el.getBoundingClientRect();
+      if (!(r.width > 0 && r.height > 0)) continue;
+      const bar = bars.find((b) => r.left >= b.rect.left - 1 && r.right <= b.rect.right + 1 && r.top >= b.rect.top - 1 && r.bottom <= b.rect.bottom + 1);
+      const centre = bar && document.elementFromPoint((r.left + r.right) / 2, (r.top + r.bottom) / 2);
+      if (centre && el.contains(centre)) { parts.push({ el, id: layerId(el), sel: path(el), rect: box(r), extent: extentOf(s, r, colourOf) }); continue; }
+      if (s.position !== 'fixed') continue;
+      if (Number(s.opacity) === 0 || !(r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw)) continue;
+      const xs = [1 / 6, 1 / 2, 5 / 6].map((f) => Math.min(vw - 0.5, Math.max(0.5, r.left + r.width * f)));
+      const ys = [1 / 6, 1 / 2, 5 / 6].map((f) => Math.min(vh - 0.5, Math.max(0.5, r.top + r.height * f)));
+      const front = xs.some((x) => ys.some((y) => { const hit = document.elementFromPoint(x, y); return !!hit && (hit === el || el.contains(hit)); }));
+      if (!front) { fixedOther.push({ sel: path(el), rect: box(r), pointerEvents: s.pointerEvents }); continue; }
+      overlays.push({ el, id: layerId(el), sel: path(el), rect: box(r), extent: extentOf(s, r, colourOf) });
+    }
+    const onBar = (el) => inBar(el) || parts.some((p) => p.el.contains(el));
+    const layers = [...parts, ...overlays];
+    const layerOf = (hit) => layers.find((o) => o.el.contains(hit)) || null;
+    // the scroll that moves a text: the word's page (#sheet), none (a fixed layer), or the document
+    const scrollerOf = (el) => {
+      for (let a = el; a && a !== body; a = a.parentElement) {
+        if (a.id === 'sheet') return 'sheet';
+        if (getComputedStyle(a).position === 'fixed') return 'fixed';
+      }
+      return 'doc';
+    };
+    const meets = (e, b) => e.left < b.right && e.right > b.left && e.top < b.bottom && e.bottom > b.top;
     // text runs
     const texts = [];
     const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
     const range = document.createRange();
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      const id = textId(n);
       const content = n.nodeValue.replace(/\s+/g, ' ').trim();
       const el = n.parentElement;
       if (!content || !el || el === probe || el.closest('script, style, noscript, template, title')) continue;
@@ -458,17 +576,19 @@ const IN_PAGE = () => {
       const shut = el.closest('details:not([open])');
       if (shut && !shut.querySelector(':scope > summary')?.contains(el)) continue;
       range.selectNodeContents(n);
-      let rects = [...range.getClientRects()].map((q) => ({ left: q.left, top: q.top, right: q.right, bottom: q.bottom }));
+      // VC-1 · each line keeps its index among the node's own line boxes, so the same line is named at every position
+      const native = [...range.getClientRects()].map((q, line) => ({ line, left: q.left, top: q.top, right: q.right, bottom: q.bottom }));
+      let rects = native.map((q) => ({ ...q }));
       // clip by every scrolling or clipping ancestor
       for (let a = el; a && a !== root; a = a.parentElement) {
         const s = getComputedStyle(a);
         if (/inset\(50%\)/.test(s.clipPath || '') || /rect\(0px,? 0px,? 0px,? 0px\)/.test(s.clip || '')) { rects = []; break; }
         if (s.overflowX !== 'visible' || s.overflowY !== 'visible') {
           const q = a.getBoundingClientRect();
-          rects = rects.map((x) => ({ left: Math.max(x.left, q.left), top: Math.max(x.top, q.top), right: Math.min(x.right, q.right), bottom: Math.min(x.bottom, q.bottom) }));
+          rects = rects.map((x) => ({ line: x.line, left: Math.max(x.left, q.left), top: Math.max(x.top, q.top), right: Math.min(x.right, q.right), bottom: Math.min(x.bottom, q.bottom) }));
         }
       }
-      rects = rects.map((x) => ({ left: Math.max(x.left, 0), top: Math.max(x.top, 0), right: Math.min(x.right, vw), bottom: Math.min(x.bottom, vh) }))
+      rects = rects.map((x) => ({ line: x.line, left: Math.max(x.left, 0), top: Math.max(x.top, 0), right: Math.min(x.right, vw), bottom: Math.min(x.bottom, vh) }))
         .filter((x) => x.right - x.left >= 2 && x.bottom - x.top >= 4);
       if (!rects.length) continue;
       let opacity = 1, blend = '', filter = '';
@@ -483,26 +603,48 @@ const IN_PAGE = () => {
       // line is read where it stands in the open area and its own element is the topmost thing along it; a line outside
       // the open area waits for a pass that scrolls it clear; a line covered inside it by something else is occluded
       const family = (hit) => !!hit && (hit === el || el.contains(hit) || hit.contains(el));
-      const own = inBar(el), measured = [], deferred = [];
+      // VC-1 (spec item 2) · a line is seen (required) where Hfix-1A saw it: in the open area with its own element topmost
+      // somewhere along its midline; a line outside the open area waits for a position that brings it in; a line in it but
+      // covered along its whole midline is occluded, as before. A seen line is read where it stands only when no overlay's
+      // box meets its whole sampled band (the sampler's own band below) and every probe across that band (three rows, a
+      // probe at most 6 px apart) finds no overlay and no bar on it: one family hit among three never admits the rectangle.
+      // Otherwise it is partly obscured and waits for a native scroll position that clears that very line (rereadWaiting).
+      const own = onBar(el), mine = layerOf(el), lines = [];
       for (const q of rects) {
-        const ys = (q.top + q.bottom) / 2;
+        const entry = { line: q.line, rect: { left: q.left, top: q.top, right: q.right, bottom: q.bottom }, native: native[q.line] };
         const open = own || (q.top >= openTop - 0.5 && q.bottom <= openBottom + 0.5);
-        if (!open) { deferred.push(q.top < openTop ? q.top - openTop - 12 : q.bottom - openBottom + 12); continue; }
-        const hits = [q.left + 2, (q.left + q.right) / 2, q.right - 2].map((x) => document.elementFromPoint(x, ys));
-        if (hits.some(family)) measured.push(q);
+        if (!open) { lines.push({ ...entry, state: 'wait', why: 'outside the open area', need: q.top < openTop ? q.top - openTop - 12 : q.bottom - openBottom + 12 }); continue; }
+        const ys = (q.top + q.bottom) / 2;
+        const mids = [q.left + 2, (q.left + q.right) / 2, q.right - 2].map((x) => document.elementFromPoint(x, ys));
+        if (!mids.some(family)) { lines.push({ ...entry, state: 'occluded' }); continue; }
+        const h = q.bottom - q.top, band = { left: q.left + 0.5, right: q.right - 0.5, top: q.top + h * 0.2, bottom: q.bottom - h * 0.2 };
+        // obscured: an overlay's box (its fill and border, what the glass hits) meets the band. A band only under an
+        // overlay's shadow (past its box) is not obscured and is read here as before; it is listed (shaded). Where a line
+        // is moved, its new place must clear the whole painted extent, shadow included (clearSpans)
+        const foreignLayers = layers.filter((o) => o !== mine && !o.el.contains(el));
+        const blockers = foreignLayers.filter((o) => meets(o.rect, band)).map((o) => ({ layer: o.id, sel: o.sel, rect: o.rect, extent: o.extent }));
+        const shaded = foreignLayers.filter((o) => !meets(o.rect, band) && meets(o.extent, band)).map((o) => o.sel);
+        const cols = Math.max(3, Math.min(24, Math.ceil((band.right - band.left) / 6))), foreign = [];
+        for (const y of [band.top + 0.25, (band.top + band.bottom) / 2, band.bottom - 0.25]) for (let i = 0; i < cols; i++) {
+          const x = band.left + ((i + 0.5) * (band.right - band.left)) / cols, hit = document.elementFromPoint(x, y);
+          if (family(hit)) continue;
+          const layer = hit && layerOf(hit);
+          foreign.push({ x, y, by: layer && layer !== mine ? 'overlay' : hit && !own && inBar(hit) ? 'bar' : 'other', layer: layer?.id ?? null, sel: hit ? path(hit) : null });
+        }
+        const covered = foreign.filter((f) => f.by !== 'other');
+        if (blockers.length || covered.length) {
+          lines.push({ ...entry, state: 'wait', why: blockers.length ? 'under an overlay' : 'covered at a probe', band, blockers, covered: covered.slice(0, 3) });
+          continue;
+        }
+        lines.push({ ...entry, state: 'read', ...(shaded.length ? { shaded } : {}),
+          ...(foreign.length ? { foreign: foreign.length, foreignBy: [...new Set(foreign.map((f) => f.sel))].slice(0, 3) } : {}) });
       }
-      const key = `${path(el)}|${content.slice(0, 40)}`;
-      if (!measured.length) {
-        if (deferred.length) texts.push({ deferred: true, key, need: deferred, scroller: scrollerOf(el), text: content.slice(0, 30), sel: path(el) });
-        else texts.push({ occluded: true, text: content.slice(0, 30), sel: path(el) });
-        continue;
-      }
-      rects = measured;
       const svg = el instanceof SVGElement;
       const fill = svg ? cs.fill : (cs.webkitTextFillColor || cs.color);
       texts.push({
-        key, partial: deferred.length > 0, need: deferred, scroller: scrollerOf(el),
-        text: content.slice(0, 40), sel: path(el), rects, colour: fill, colourProp: cs.color, opacity, blend, filter,
+        id, key: `t${id}`, index: el.closest('.tok[data-index]')?.dataset.index ?? null, label: `${path(el)}|${content.slice(0, 40)}`,
+        own, layer: mine?.id ?? null, scroller: scrollerOf(el), lines,
+        text: content.slice(0, 40), sel: path(el), colour: fill, colourProp: cs.color, opacity, blend, filter,
         demo: !!el.closest('#mini[data-demo="true"]'),
         demoBandLabel: !!el.closest('#mini[data-demo="true"] .mini-band-label'),
         clipText: /text/.test(cs.backgroundClip || '') || /text/.test(cs.webkitBackgroundClip || ''),
@@ -531,8 +673,21 @@ const IN_PAGE = () => {
     return {
       pigments, page, bodyBg, paints, texts, figures: figureRects, kanji, open: { top: openTop, bottom: openBottom },
       bars: bars.map((b) => ({ sel: b.sel, top: b.top, rect: b.rect, shade: b.shade })),
+      overlays: layers.map((o) => ({ layer: o.id, sel: o.sel, part: parts.includes(o), rect: o.rect, extent: o.extent })), fixedOther,
+      scroll: window.__sweep.scrollState(),
       meta: { theme: root.dataset.theme || 'hokusai', room: root.dataset.room || '', view: body.dataset.view || '', scrollY, sheetTop: document.getElementById('sheet')?.scrollTop ?? null },
     };
+  };
+  // VC-1 · who owns the pixel at a CSS point: the topmost element there, the outermost fixed layer it belongs to, and the
+  // reader token (its data-index) under it, with the stack beneath (the gold-edge control's ownership receipt)
+  window.__sweep.ownerAt = (x, y) => {
+    const hit = document.elementFromPoint(x, y);
+    let layer = null;
+    for (let a = hit; a && a !== document.body; a = a.parentElement) if (getComputedStyle(a).position === 'fixed') layer = a;
+    const token = (e) => e?.closest?.('.tok[data-index]')?.dataset.index ?? null;
+    return { x, y, hit: hit ? path(hit) : null, id: hit?.id || null, token: token(hit),
+      layer: layer ? { layer: layerId(layer), sel: path(layer), id: layer.id || null } : null,
+      stack: document.elementsFromPoint(x, y).slice(0, 5).map((e) => ({ sel: path(e), id: e.id || null, token: token(e) })) };
   };
   window.__sweep.hide = (on) => {
     let style = document.getElementById('sweep-hide');
@@ -721,6 +876,205 @@ async function resting(page) {
   });
 }
 
+/* ------------------------------------------------------------------ C1, one native occurrence at a time (VC-1) */
+// CONTRAST-INTEGRATION-SPEC (lead 2125, sol): the C1 obligation is unchanged (item 3): ordinary text 4.5:1, large text (the
+// existing ≥ 24 px, or ≥ 18.67 px at ≥ 700) 3:1, the run's colour at its alpha × its ancestors' opacity composited over the
+// darkest and the lightest pixel under each line's inner band (sample and extremes, untouched). What changed is whose
+// pixels those are and which occurrence they judge: each run is its own native occurrence (its text node, item 1) and each
+// of its lines its own verdict, read only where the whole band is clear (item 2).
+/** One run's verdict from the lines read in one shot: each line its own pair, the run keeping its worst line. */
+function readRun(t, lines, shot, at) {
+  const record = { key: t.key, occurrence: t.id, index: t.index, label: t.label, text: t.text, sel: t.sel, fontPx: t.fontPx, weight: t.weight,
+    hidden: t.hidden, opacity: t.opacity, demo: t.demo, demoBandLabel: t.demoBandLabel };
+  const fg = parseColour(t.colour);
+  const why = t.clipText ? 'clipped-to-text' : t.blend ? `blend ${t.blend}` : t.filter ? `filter ${t.filter}` : (!fg ? `paint ${t.colour}` : (fg.a === 0 && t.stroke ? 'stroke-only' : ''));
+  if (why) return { unresolved: { ...record, why } };
+  if (fg.a * t.opacity < 0.02) return {};
+  const large = t.fontPx >= 24 || (t.fontPx >= 18.67 && t.weight >= 700);
+  const required = large ? 3 : 4.5;
+  const verdicts = [];
+  for (const l of lines) {
+    const q = l.rect;
+    const h = q.bottom - q.top, band = { left: q.left + 0.5, right: q.right - 0.5, top: q.top + h * 0.2, bottom: q.bottom - h * 0.2 };
+    const under = sample(shot, band, Math.max(1, Math.min(2, (band.right - band.left) / 40)));
+    if (!under.length) continue;
+    const { dark, light } = extremes(under);
+    let worst = Infinity, pair = null;
+    for (const bg of [dark, light]) {
+      const ink = over({ ...fg, a: fg.a * t.opacity }, bg), r = ratio(ink, bg);
+      if (r < worst) { worst = r; pair = { fg: hex(fg), bg: hex(bg) }; }
+    }
+    verdicts.push({ line: l.line, ratio: Math.round(worst * 100) / 100, ...pair, ok: worst >= required, at, band });
+  }
+  if (!verdicts.length) return {};
+  return { pair: { ...record, ratio: null, required, fg: null, bg: null, ok: null, lines: verdicts } };
+}
+const atLabel = (at) => (at === 'stood' ? null : `read at ${at.doc} px${at.sheet === null || at.sheet === undefined ? '' : `, the page at ${at.sheet} px`}`);
+/** The run's verdict is its worst line's; it passes only if every line does. */
+function settleRun(pair) {
+  pair.lines.sort((a, b) => a.line - b.line);
+  const worst = pair.lines.reduce((w, l) => (!w || l.ratio < w.ratio ? l : w), null);
+  Object.assign(pair, { ratio: worst.ratio, fg: worst.fg, bg: worst.bg, ok: pair.lines.every((l) => l.ok) });
+  if (atLabel(worst.at)) pair.pass = atLabel(worst.at);
+  else delete pair.pass;
+  return pair;
+}
+
+/* VC-1 (spec item 2) · the waiting lines. Every required line not read where it stood (outside the open area, or with its
+ * band under an overlay's paint or covered at a probe) is read again at a native scroll position where that very line —
+ * its node, its line index — stands wholly in the open area with its whole band clear of every overlay, as the census at
+ * that capture verifies (geometry and ownership together). The positions are planned from the last census (the overlays
+ * are fixed; the line moves with its own scroller), at most REREAD_POSITIONS of them within REREAD_BUDGET_MS. Each line
+ * completes exactly once. A line no bounded position reads is a named unresolved failure — its occurrence, the positions
+ * tried and its geometry — unless no scroll moves it (a fixed layer's) and it lies wholly inside an opaque bar's box (C8),
+ * hidden: counted as barred, as Hfix-1A meant. */
+const REREAD_POSITIONS = 6;
+const REREAD_BUDGET_MS = 30000;
+const REREAD_MARGIN = 12;
+const lineKey = (id, line) => `${id}:${line}`;
+const bandOf = (q) => { const h = q.bottom - q.top; return { left: q.left + 0.5, right: q.right - 0.5, top: q.top + h * 0.2, bottom: q.bottom - h * 0.2 }; };
+/** The positions of its own scroller (absolute, within [0, limit]) at which a line last seen with rect `rect` while that
+ * scroller stood at `from` would stand wholly in the open area with its band clear of every fixed overlay's extent that
+ * is not its own: disjoint closed spans. */
+function clearSpans(rect, from, geometry, layer, limit) {
+  const band = bandOf(rect);
+  let spans = [[Math.max(0, from + rect.bottom - geometry.open.bottom - 0.5), Math.min(limit, from + rect.top - geometry.open.top + 0.5)]];
+  for (const o of geometry.overlays) {
+    if (o.layer === layer || !(o.extent.left < band.right && o.extent.right > band.left)) continue;
+    const lo = from + band.top - o.extent.bottom, hi = from + band.bottom - o.extent.top;
+    spans = spans.flatMap(([a, b]) => [[a, Math.min(b, lo)], [Math.max(a, hi), b]]);
+  }
+  return spans.filter(([a, b]) => a <= b);
+}
+function planPosition(pending, geometry, tried, base) {
+  const plan = {}, expect = {};
+  for (const scroller of ['doc', 'sheet']) {
+    const now = geometry.scroll[scroller];
+    const items = [...pending.values()].filter((p) => p.scroller === scroller);
+    if (!now || !items.length) continue;
+    const anchor = base[scroller]?.y ?? now.y;
+    const spans = items.map((p) => clearSpans(p.seen.native, p.seen.from[scroller], geometry, p.layer, now.max));
+    const fits = (y, s) => s.some(([a, b]) => y >= a - 0.01 && y <= b + 0.01);
+    let best = null;
+    for (const s of spans) for (const [a, b] of s) {
+      const m = Math.min(REREAD_MARGIN, (b - a) / 2);
+      for (const y of [a + m, b - m].map((v) => Math.round(v * 2) / 2)) {
+        if (tried[scroller].some((t) => Math.abs(t - y) < 1)) continue;
+        const count = spans.filter((x) => fits(y, x)).length;
+        if (count && (!best || count > best.count || (count === best.count && Math.abs(y - anchor) < Math.abs(best.y - anchor)))) best = { y, count };
+      }
+    }
+    if (best) { plan[scroller] = best.y; expect[scroller] = best.count; }
+  }
+  return Object.keys(plan).length ? { plan, expect } : null;
+}
+function mergeRead(result, pair) {
+  const had = result.pairs.find((p) => p.occurrence === pair.occurrence);
+  if (!had) { result.pairs.push(settleRun(pair)); return; }
+  had.lines.push(...pair.lines);
+  settleRun(had);
+}
+async function capture(page) {
+  const data = await page.evaluate(([owned, inks]) => window.__sweep.collect(owned, [], inks), [OWNED, INKS]);
+  await page.evaluate(() => window.__sweep.hide(true));
+  let shot;
+  try {
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    shot = decodePng(await page.screenshot({ type: 'png' }));
+  } finally { await page.evaluate(() => window.__sweep.hide(false)); }
+  return { data, shot };
+}
+/** `fault` (diagnostic controls only, SWEEP_NEGATIVE c1-*): a hook that may restrict the positions, exhaust the budget
+ * or alter a capture's census, so a control can show that each such failure is named and never passes. */
+async function rereadWaiting(page, data, result, fault = null) {
+  const reread = { waiting: 0, passes: 0, read: 0, barred: [], positions: [] };
+  const pending = new Map(), done = new Map();
+  for (const pair of result.pairs) for (const l of pair.lines) done.set(lineKey(pair.occurrence, l.line), 'stood');
+  const failed = new Set(result.unresolved.map((u) => u.occurrence));
+  for (const t of data.texts) for (const l of t.lines) {
+    if (l.state !== 'wait' || failed.has(t.id)) continue;
+    pending.set(lineKey(t.id, l.line), { id: t.id, line: l.line, t, first: l, scroller: t.scroller, layer: t.layer, attempts: [],
+      seen: { native: l.native, from: { doc: data.scroll.doc.y, sheet: data.scroll.sheet?.y ?? 0 } } });
+  }
+  reread.waiting = pending.size;
+  const record = (t) => ({ key: t.key, occurrence: t.id, index: t.index, label: t.label, text: t.text, sel: t.sel, fontPx: t.fontPx, weight: t.weight, hidden: t.hidden });
+  if (!pending.size) return reread;
+  const base = data.scroll, tried = { doc: [base.doc.y], sheet: base.sheet ? [base.sheet.y] : [] };
+  const budget = fault?.budgetMs ?? REREAD_BUDGET_MS, most = fault?.positions ?? REREAD_POSITIONS;
+  let geometry = { open: data.open, overlays: data.overlays, scroll: base }, timedOut = false;
+  const started = Date.now();
+  try {
+    while (pending.size) {
+      if (reread.passes >= most) break;
+      if (Date.now() - started >= budget) { timedOut = true; break; }
+      const next = fault?.plan ? fault.plan(reread.passes, pending, geometry) : planPosition(pending, geometry, tried, base);
+      if (!next) break;
+      for (const s of Object.keys(next.plan)) tried[s]?.push(next.plan[s]);
+      await page.evaluate((t) => window.__sweep.scrollAt(t), next.plan);
+      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+      if (fault?.before) await fault.before(page, pending);
+      const { data: again, shot: clear } = await capture(page);
+      if (fault?.census) fault.census(again, pending);
+      reread.passes += 1;
+      const at = { doc: again.scroll.doc.y, sheet: again.scroll.sheet?.y ?? null };
+      reread.positions.push({ asked: next.plan, at, expected: next.expect });
+      geometry = { open: again.open, overlays: again.overlays, scroll: again.scroll };
+      const census = new Map();
+      for (const t of again.texts) census.set(t.id, census.has(t.id) ? 'duplicate' : t);
+      for (const [k, p] of [...pending]) {
+        if (!pending.has(k)) continue;
+        const t = census.get(p.id), whole = t && t !== 'duplicate' ? t : null;
+        const l = whole?.lines.find((x) => x.line === p.line) || null;
+        p.attempts.push({ at, found: !!t, ...(t === 'duplicate' ? { duplicate: true } : {}),
+          line: l ? { rect: l.rect, state: l.state, ...(l.why ? { why: l.why } : {}), ...(l.blockers?.length ? { blockers: l.blockers.map((b) => ({ sel: b.sel, extent: b.extent })) } : {}),
+            ...(l.shaded ? { shaded: l.shaded } : {}) } : null });
+        if (l) p.seen = { native: l.native, from: { doc: again.scroll.doc.y, sheet: again.scroll.sheet?.y ?? 0 } };
+        if (t === 'duplicate') {
+          pending.delete(k);
+          result.unresolved.push({ ...record(p.t), why: 'duplicate completion', line: p.line, detail: 'the census named this native occurrence twice at one capture', attempts: p.attempts });
+          continue;
+        }
+        // a moved line completes only wholly clear: in the open area, no overlay's box on its band and no probe covered
+        // (the census's 'read'), and no overlay's shadow or outline on it either
+        if (l?.state !== 'read' || l.shaded) continue;
+        const read = readRun(whole, [l], clear, at);
+        pending.delete(k);
+        if (read.unresolved) {
+          result.unresolved.push(read.unresolved);
+          for (const [other, q] of [...pending]) if (q.id === p.id) pending.delete(other);
+          continue;
+        }
+        if (!read.pair) continue;
+        if (done.has(k)) {
+          result.unresolved.push({ ...record(p.t), why: 'duplicate completion', line: p.line, detail: `already completed ${JSON.stringify(done.get(k))}`, attempts: p.attempts });
+          continue;
+        }
+        done.set(k, at);
+        reread.read += 1;
+        mergeRead(result, read.pair);
+      }
+      if (fault?.after) await fault.after(page, again, pending, result, done);
+    }
+  } finally {
+    await page.evaluate((b) => window.__sweep.scrollAt({ doc: b.doc.y, sheet: b.sheet?.y }), base);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  }
+  for (const p of pending.values()) {
+    const q = p.first.rect;
+    // barred (Hfix-1A's word, now exact): only a line no scroll moves (a fixed layer's) and hidden wholly inside an opaque
+    // bar's box; a line its own scroll could move that no bounded position read is a named failure
+    const hidden = p.scroller === 'fixed' && p.first.why === 'outside the open area' && data.bars.some((b) =>
+      q.left >= b.rect.left - 0.5 && q.right <= b.rect.right + 0.5 && q.top >= b.rect.top - 0.5 && q.bottom <= b.rect.bottom + 0.5);
+    if (hidden) { reread.barred.push(`${p.t.text} ${p.t.sel}`.slice(0, 80)); continue; }
+    const why = p.attempts.length && p.attempts.every((a) => !a.found) ? 'missing native occurrence' : timedOut ? 'positioning timeout' : 'unexposed';
+    result.unresolved.push({ ...record(p.t), why, line: p.line, scroller: p.scroller,
+      geometry: { rect: p.first.rect, native: p.first.native, band: bandOf(p.first.rect), waited: p.first.why, open: data.open,
+        blockers: p.first.blockers?.map((b) => ({ sel: b.sel, extent: b.extent })) || [], scroll: base },
+      attempts: p.attempts });
+  }
+  return reread;
+}
+
 /* ------------------------------------------------------------------ analysis */
 function analyse(world, state, data, shot, bands) {
   const out = { world, state, pairs: [], unresolved: [], occluded: 0, figures: [], roots: [], banding: [], kanji: [], muddy: [] };
@@ -729,30 +1083,16 @@ function analyse(world, state, data, shot, bands) {
   const page = parseColour(data.page);
   // C1 text
   for (const t of data.texts) {
-    if (t.occluded) { out.occluded++; continue; }
-    // Hfix-1A (F-1): a run whose every line lies outside the open reading area waits for the pass that scrolls it clear
-    if (t.deferred) { out.deferred = (out.deferred || 0) + 1; continue; }
-    const record = { key: t.key, text: t.text, sel: t.sel, fontPx: t.fontPx, weight: t.weight, hidden: t.hidden,
-      opacity: t.opacity, demo: t.demo, demoBandLabel: t.demoBandLabel };
-    const fg = parseColour(t.colour);
-    const why = t.clipText ? 'clipped-to-text' : t.blend ? `blend ${t.blend}` : t.filter ? `filter ${t.filter}` : (!fg ? `paint ${t.colour}` : (fg.a === 0 && t.stroke ? 'stroke-only' : ''));
-    if (why) { out.unresolved.push({ ...record, why }); continue; }
-    if (fg.a * t.opacity < 0.02) continue;
-    const large = t.fontPx >= 24 || (t.fontPx >= 18.67 && t.weight >= 700);
-    const required = large ? 3 : 4.5;
-    let worst = Infinity, pair = null;
-    for (const q of t.rects) {
-      const h = q.bottom - q.top, band = { left: q.left + 0.5, right: q.right - 0.5, top: q.top + h * 0.2, bottom: q.bottom - h * 0.2 };
-      const under = sample(shot, band, Math.max(1, Math.min(2, (band.right - band.left) / 40)));
-      if (!under.length) continue;
-      const { dark, light } = extremes(under);
-      for (const bg of [dark, light]) {
-        const ink = over({ ...fg, a: fg.a * t.opacity }, bg), r = ratio(ink, bg);
-        if (r < worst) { worst = r; pair = { fg: hex(fg), bg: hex(bg) }; }
-      }
+    const reads = t.lines.filter((l) => l.state === 'read');
+    if (!reads.length) {
+      // Hfix-1A (F-1), VC-1: a run with no line read where it stands waits for a position that clears it (rereadWaiting)
+      if (t.lines.some((l) => l.state === 'wait')) out.deferred = (out.deferred || 0) + 1;
+      else out.occluded++;
+      continue;
     }
-    if (!pair) continue;
-    out.pairs.push({ ...record, ratio: Math.round(worst * 100) / 100, required, ...pair, ok: worst >= required });
+    const read = readRun(t, reads, shot, 'stood');
+    if (read.unresolved) out.unresolved.push(read.unresolved);
+    else if (read.pair) out.pairs.push(settleRun(read.pair));
   }
   // C2 figures
   for (const f of data.figures) {
@@ -1257,6 +1597,250 @@ async function chromeControls(page, world, state, candidate, report) {
   }
 }
 
+/* ------------------------------------------------------------------ VC-1 · the C1 controls (diagnostic) */
+// CONTRAST-INTEGRATION-SPEC item 4, in VH-1's form (the same-ink control's): on a world's slip, after its own measurement,
+// each control measures C1 three times in the same page: the candidate (the scene's C1 again, bound to the scene's own
+// result), the negative (the same measurement with the control's fault) and the restored measurement (the fault undone:
+// exactly the candidate), with the native record before and after. Its row is green only when the negative shows the
+// control's own named failure, so the fault can never pass.
+const c1Core = (m) => ({ pairs: m.pairs, unresolved: m.unresolved, read: m.reread.read, barred: m.reread.barred, positions: m.reread.positions });
+const c1Green = (m) => m.pairs.every((p) => p.ok) && m.unresolved.length === 0;
+async function measureC1(page, world, state, fault = null) {
+  try {
+    if (fault?.setup) await fault.setup(page);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    const { data, shot } = await capture(page);
+    if (fault?.initial) fault.initial(data);
+    const result = analyse(world, state, { ...data, paints: [], figures: [], kanji: [] }, shot, []);
+    result.reread = await rereadWaiting(page, data, result, fault);
+    const waiting = data.texts.flatMap((t) => t.lines.filter((l) => l.state === 'wait').map((l) => ({ occurrence: t.id, index: t.index, label: t.label, text: t.text,
+      line: l.line, why: l.why, need: l.need ?? null, scroller: t.scroller })));
+    return { pairs: result.pairs, unresolved: result.unresolved, reread: result.reread, waiting, open: data.open, scroll: data.scroll };
+  } finally { if (fault?.teardown) await fault.teardown(page); }
+}
+const unresolvedFor = (m, occurrence, why) => m.unresolved.filter((u) => u.occurrence === occurrence && (!why || u.why === why));
+// the token whose text node is the occurrence: the reader's own data-index names it on the page
+const tokenText = (index, text) => ({ index, text });
+const swapOut = ({ index, text }) => {
+  const tok = document.querySelector(`.tok[data-index="${index}"]`);
+  const walker = tok && document.createTreeWalker(tok, NodeFilter.SHOW_TEXT);
+  for (let n = walker?.nextNode(); n; n = walker.nextNode()) if (n.nodeValue.trim() === text) {
+    const twin = document.createTextNode(n.nodeValue);
+    window.__vc1Swap = { original: n, twin };
+    n.replaceWith(twin);
+    return true;
+  }
+  return false;
+};
+const swapBack = () => { const s = window.__vc1Swap; if (s?.twin.isConnected) s.twin.replaceWith(s.original); delete window.__vc1Swap; return !!s; };
+const paintToken = ({ index, text, colour }) => {
+  const tok = document.querySelector(`.tok[data-index="${index}"]`);
+  const walker = tok && document.createTreeWalker(tok, NodeFilter.SHOW_TEXT);
+  for (let n = walker?.nextNode(); n; n = walker.nextNode()) if (n.nodeValue.trim() === text) {
+    const el = n.parentElement;
+    window.__vc1Paint = { el, style: el.getAttribute('style') };
+    // an ordinary inline colour (no !important), so the glyph-hiding shot still hides it as it hides every glyph
+    el.style.setProperty('color', colour);
+    el.style.setProperty('-webkit-text-fill-color', colour);
+    return true;
+  }
+  return false;
+};
+const unpaint = () => { const p = window.__vc1Paint; if (p) { if (p.style === null) p.el.removeAttribute('style'); else p.el.setAttribute('style', p.style); } delete window.__vc1Paint; return !!p; };
+/** A waiting reader occurrence whose label (path and words) a sibling read where it stood shares: the identity case.
+ * The slip's word (総理) when one waits, else the first reader token that has such a sibling. */
+function sameWordTarget(candidate) {
+  const read = candidate.pairs.filter((p) => p.ok && p.lines.every((l) => l.at === 'stood') && p.index !== null);
+  const fits = (w) => w.index !== null && w.scroller === 'doc' && w.why === 'outside the open area' && read.some((p) => p.label === w.label && p.occurrence !== w.occurrence);
+  const x = candidate.waiting.find((w) => fits(w) && w.text === WORD) || candidate.waiting.find(fits);
+  return x ? { x, y: read.find((p) => p.label === x.label && p.occurrence !== x.occurrence) } : null;
+}
+// the gold-edge counterexample as sol's spec states it (site-10, a dark world's slip): the source token 12's Range at
+// +61 px, the fixed #mini's bottom at 454, the waiting token 43 requesting +61 px, the gold pixel at CSS (344.75, 453.25)
+const GOLD_EDGE = Object.freeze({ rect: { left: 324.0625, top: 437.015625, right: 366.484375, bottom: 467.015625 }, miniBottom: 454, delta: 61, point: { x: 344.75, y: 453.25 }, source: '12', waiting: '43' });
+const near = (a, b) => Math.abs(a - b) < 0.01;
+const C1_FAULTS = {
+  // (a) the gold-edge counterexample. Candidate: the source token 12 is read where it stands, wholly clear; the waiting
+  // token 43 at +61 px; at that capture the pixel is #mini's and token 12's line there waits under #mini (never sampled).
+  // Negative: token 12's line made to wait too, with the one position +61 px allowed: it is never sampled against the gold
+  // edge, and with no clear position left it is a named failure, not a ratio.
+  async 'gold-edge'(page, candidate) {
+    const source = candidate.pairs.find((p) => p.index === GOLD_EDGE.source && p.text === WORD);
+    const waiting = candidate.waiting.find((w) => w.index === GOLD_EDGE.waiting && w.text === WORD);
+    if (!source || !waiting) return { inapplicable: `no ${WORD} token ${GOLD_EDGE.source} read and token ${GOLD_EDGE.waiting} waiting on this slip` };
+    const observe = (facts) => async (pg, again) => {
+      if (again.scroll.doc.y !== candidate.scroll.doc.y + GOLD_EDGE.delta) return;
+      const t = again.texts.find((x) => x.id === source.occurrence), l = t?.lines.find((x) => x.line === 0);
+      const mini = again.overlays.find((o) => /#mini$/.test(o.sel));
+      facts.push({ at: again.scroll.doc.y, source: l ? { rect: l.rect, state: l.state, why: l.why || null, blockers: l.blockers?.map((b) => b.sel) || [], band: bandOf(l.rect) } : null,
+        mini: mini ? { rect: mini.rect, extent: mini.extent } : null, owner: await pg.evaluate((p) => window.__sweep.ownerAt(p.x, p.y), GOLD_EDGE.point) });
+    };
+    const seen = [], refused = [];
+    return {
+      target: { source: source.occurrence, waiting: waiting.occurrence },
+      observer: { after: observe(seen) },
+      fault: {
+        initial: (data) => { const t = data.texts.find((x) => x.id === source.occurrence); for (const l of t?.lines || []) if (l.state === 'read') Object.assign(l, { state: 'wait', why: 'held by the gold-edge control' }); },
+        plan: (n) => (n === 0 ? { plan: { doc: candidate.scroll.doc.y + GOLD_EDGE.delta }, expect: { doc: 'the counterexample position' } } : null),
+        after: observe(refused),
+      },
+      expectation: `never takes #mini's gold edge at CSS (${GOLD_EDGE.point.x}, ${GOLD_EDGE.point.y}) as token ${GOLD_EDGE.source}'s ground: token ${GOLD_EDGE.source} reads on its own wholly clear sample; held to the +${GOLD_EDGE.delta} px position it is a named failure`,
+      judge(negative, cand) {
+        const fact = seen[0], held = refused[0];
+        const geometry = !!fact?.source && ['left', 'top', 'right', 'bottom'].every((k) => near(fact.source.rect[k], GOLD_EDGE.rect[k])) && fact.mini?.rect.bottom === GOLD_EDGE.miniBottom;
+        const owned = fact?.owner?.layer?.id === 'mini' && fact.owner.token === null && fact.source.state === 'wait' && fact.source.blockers.some((b) => /#mini$/.test(b)) &&
+          fact.source.band.top <= GOLD_EDGE.point.y && fact.source.band.bottom >= GOLD_EDGE.point.y && fact.source.band.left <= GOLD_EDGE.point.x && fact.source.band.right >= GOLD_EDGE.point.x;
+        const own = cand.pairs.find((p) => p.occurrence === source.occurrence);
+        const clear = !!own && own.ok && own.lines.every((l) => l.at === 'stood' && l.ratio >= own.required);
+        const intended = cand.pairs.find((p) => p.occurrence === waiting.occurrence);
+        const intendedOwn = !!intended && intended.ok && intended.lines.every((l) => l.at !== 'stood' && l.at.doc === candidate.scroll.doc.y + GOLD_EDGE.delta);
+        const neverSampled = !negative.pairs.some((p) => p.occurrence === source.occurrence) && unresolvedFor(negative, source.occurrence, 'unexposed').length > 0 &&
+          held?.owner?.layer?.id === 'mini' && held.source?.state === 'wait' && !c1Green(negative);
+        return { ok: geometry && owned && clear && intendedOwn && neverSampled, geometry, owned, clear, intendedOwn, neverSampled, fact, held,
+          source: own ? { occurrence: own.occurrence, index: own.index, ratio: own.ratio, lines: own.lines } : null,
+          intended: intended ? { occurrence: intended.occurrence, index: intended.index, ratio: intended.ratio, lines: intended.lines } : null,
+          negative: unresolvedFor(negative, source.occurrence) };
+      },
+    };
+  },
+  // (b) same word, another native index: the waiting occurrence held where it is still not exposed (a third of its need),
+  // while a sibling with its label passed where it stood. The sibling's pass cannot complete it: a named failure.
+  async 'same-word'(page, candidate) {
+    const target = sameWordTarget(candidate);
+    if (!target) return { inapplicable: 'no waiting reader token with a same-label sibling read where it stood' };
+    const third = Math.round(target.x.need / 3);
+    return {
+      target: { waiting: target.x, sibling: { occurrence: target.y.occurrence, index: target.y.index, ratio: target.y.ratio } },
+      fault: { plan: (n) => (n === 0 ? { plan: { doc: candidate.scroll.doc.y + third }, expect: { doc: 'a third of its need' } } : null) },
+      expectation: `stays red for the waiting token ${target.x.index} (node ${target.x.occurrence}) when only its same-word sibling token ${target.y.index} has passed`,
+      judge(negative) {
+        const named = unresolvedFor(negative, target.x.occurrence, 'unexposed');
+        const sibling = negative.pairs.find((p) => p.occurrence === target.y.occurrence);
+        return { ok: named.length > 0 && !negative.pairs.some((p) => p.occurrence === target.x.occurrence) && !!sibling?.ok && !c1Green(negative),
+          named, sibling: sibling && { occurrence: sibling.occurrence, ratio: sibling.ratio, ok: sibling.ok } };
+      },
+    };
+  },
+  // (c) a real visible low-contrast mutant: the actual CSS colour of one exposed occurrence lowered to ≈ 2.5:1 on its own
+  // ground, its same-word siblings untouched and passing: C1 stays red below 4.5 for that occurrence
+  async 'low-contrast'(page, candidate) {
+    const exposed = (p) => p.index !== null && p.ok && p.lines.every((l) => l.at === 'stood') && candidate.pairs.some((q) => q.label === p.label && q.occurrence !== p.occurrence && q.ok);
+    const mutant = candidate.pairs.find((p) => exposed(p) && p.text === WORD) || candidate.pairs.find(exposed);
+    if (!mutant) return { inapplicable: 'no exposed reader token with a passing same-word sibling' };
+    const fg = parseColour(mutant.fg), bg = parseColour(mutant.bg);
+    let colour = null;
+    for (let t = 0.05; t <= 1; t += 0.05) {
+      const c = { r: bg.r + (fg.r - bg.r) * t, g: bg.g + (fg.g - bg.g) * t, b: bg.b + (fg.b - bg.b) * t, a: 1 };
+      if (ratio(c, bg) >= 2.5) { colour = hex(c); break; }
+    }
+    return {
+      target: { occurrence: mutant.occurrence, index: mutant.index, text: mutant.text, colour, candidateRatio: mutant.ratio },
+      fault: { setup: async (pg) => assert(await pg.evaluate(paintToken, { ...tokenText(mutant.index, mutant.text), colour }), 'mutant paint did not apply'),
+        teardown: async (pg) => { await pg.evaluate(unpaint); } },
+      expectation: `stays red below 4.5 for token ${mutant.index} painted ${colour}, while its same-word siblings pass`,
+      judge(negative) {
+        const red = negative.pairs.find((p) => p.occurrence === mutant.occurrence);
+        const siblings = negative.pairs.filter((p) => p.label === mutant.label && p.occurrence !== mutant.occurrence);
+        return { ok: !!red && !red.ok && red.ratio < 4.5 && red.required === 4.5 && red.fg === colour && siblings.length > 0 && siblings.every((p) => p.ok) && !c1Green(negative),
+          red: red && { occurrence: red.occurrence, ratio: red.ratio, fg: red.fg, bg: red.bg, ok: red.ok }, siblings: siblings.map((p) => ({ occurrence: p.occurrence, index: p.index, ratio: p.ratio, ok: p.ok })) };
+      },
+    };
+  },
+  // (d) bounded positioning and coverage: each failure is named, never a pass
+  async timeout(page, candidate) {
+    const target = sameWordTarget(candidate);
+    if (!target) return { inapplicable: 'no waiting reader occurrence' };
+    return { target: { waiting: target.x }, fault: { budgetMs: 0 }, expectation: 'with its positioning budget spent, every waiting line is a named "positioning timeout"',
+      judge: (negative) => { const named = unresolvedFor(negative, target.x.occurrence, 'positioning timeout');
+        return { ok: named.length > 0 && negative.reread.passes === 0 && !negative.pairs.some((p) => p.occurrence === target.x.occurrence) && !c1Green(negative), named }; } };
+  },
+  async unexposed(page, candidate) {
+    // a real fixed overlay of the page's own ground standing over the reading column's start, through the whole open area:
+    // a line it half covers can be brought nowhere clear of it
+    const veil = { top: candidate.open.top, height: candidate.open.bottom - candidate.open.top };
+    return {
+      target: { veil },
+      fault: {
+        setup: async (pg) => pg.evaluate((v) => {
+          const d = document.createElement('div');
+          d.id = 'vc1-veil';
+          d.style.cssText = `position:fixed;left:0;top:${v.top}px;width:60px;height:${v.height}px;z-index:65;background:var(--color-page, var(--ground));`;
+          document.body.append(d);
+        }, veil),
+        teardown: async (pg) => { await pg.evaluate(() => document.getElementById('vc1-veil')?.remove()); },
+      },
+      expectation: 'a line a fixed overlay half covers at every bounded position is a named "unexposed" failure',
+      judge: (negative) => { const named = negative.unresolved.filter((u) => u.why === 'unexposed' && u.geometry?.blockers?.some((b) => /vc1-veil/.test(b.sel)));
+        return { ok: named.length > 0 && !c1Green(negative), named: named.slice(0, 4), count: named.length }; },
+    };
+  },
+  async 'missing-occurrence'(page, candidate) {
+    const target = sameWordTarget(candidate);
+    if (!target) return { inapplicable: 'no waiting reader occurrence with a same-label sibling' };
+    let swapped = false;
+    return {
+      target: { waiting: target.x },
+      fault: {
+        before: async (pg) => { if (!swapped) { swapped = await pg.evaluate(swapOut, tokenText(target.x.index, target.x.text)); assert(swapped, 'the occurrence was not replaced'); } },
+        teardown: async (pg) => { await pg.evaluate(swapBack); },
+      },
+      expectation: `the waiting token ${target.x.index}'s text node replaced by an identical twin before its capture is a named "missing native occurrence"`,
+      judge: (negative) => { const named = unresolvedFor(negative, target.x.occurrence, 'missing native occurrence');
+        return { ok: named.length > 0 && !negative.pairs.some((p) => p.occurrence === target.x.occurrence) && !c1Green(negative), named }; },
+    };
+  },
+  async 'duplicate-completion'(page, candidate) {
+    const target = sameWordTarget(candidate);
+    if (!target) return { inapplicable: 'no waiting reader occurrence' };
+    return {
+      target: { waiting: target.x },
+      fault: { census: (again) => { const t = again.texts.find((x) => x.id === target.x.occurrence); if (t) again.texts.push(structuredClone(t)); } },
+      expectation: `a capture naming the waiting token ${target.x.index} twice is a named "duplicate completion", never two passes`,
+      judge: (negative) => { const named = unresolvedFor(negative, target.x.occurrence, 'duplicate completion');
+        return { ok: named.length > 0 && !negative.pairs.some((p) => p.occurrence === target.x.occurrence) && !c1Green(negative), named }; },
+    };
+  },
+};
+// the reader keeps its place: it saves its scroll position 900 ms after the last scroll (corridor.js saveReaderPosition), so
+// a control that scrolled reads the native record only once that save has landed (the same record twice, 300 ms apart)
+async function settledRecord(page) {
+  let last = null;
+  for (let i = 0; i < 8; i++) {
+    await delay(i ? 300 : 1100);
+    const now = JSON.stringify(await readAppRecord(page));
+    if (now === last) return JSON.parse(now);
+    last = now;
+  }
+  return JSON.parse(last);
+}
+async function c1Controls(page, world, state, scene, report) {
+  for (const id of c1ControlIds.filter((c) => c1SceneOf(c) === state)) {
+    const name = id.slice(3), row = `${world}/${state}.C1-control.${name}`;
+    try {
+      const recordBefore = await settledRecord(page);
+      const probe = await measureC1(page, world, state);
+      const control = await C1_FAULTS[name](page, probe);
+      if (control.inapplicable) { check(row, `the C1 control ${name} applies here`, false, control.inapplicable); continue; }
+      const candidate = control.observer ? await measureC1(page, world, state, control.observer) : probe;
+      const negative = await measureC1(page, world, state, control.fault);
+      const restored = await measureC1(page, world, state);
+      const recordAfter = await settledRecord(page);
+      const verdict = control.judge(negative, candidate);
+      const bound = JSON.stringify(c1Core(candidate)) === JSON.stringify(c1Core({ ...scene, reread: scene.reread }));
+      const same = JSON.stringify(c1Core(restored)) === JSON.stringify(c1Core(candidate));
+      report.controls.push({ engine, id, scene: `${world}/${state}`, target: control.target, expectation: control.expectation, verdict, bound,
+        candidate, negative, restored, recordBefore, recordAfter });
+      check(row, `C1 ${control.expectation}`, verdict.ok, verdict);
+      check(`${row}.restore`, 'the candidate is the scene\'s own C1 measurement, and undoing the fault restores it exactly', bound && same,
+        { bound, same, restored: c1Core(restored) });
+      check(`${row}.record`, 'the fault and its undoing preserve the whole native record', JSON.stringify(recordBefore) === JSON.stringify(recordAfter));
+    } catch (error) {
+      for (const suffix of ['', '.restore', '.record']) if (!rows.some((r) => r.id === `${engine}/${row}${suffix}`))
+        check(`${row}${suffix}`, 'the C1 control completed', false, String(error.stack || error).slice(0, 600));
+    }
+  }
+}
+
 /* ------------------------------------------------------------------ run */
 const report = { schemaVersion: 2, runId, artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty,
   verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
@@ -1354,45 +1938,20 @@ try {
         await canvas.evaluate(() => window.__sweep.replica(null));
         const result = analyse(world, state, data, shot, bands);
         result.engine = engine;
-        // Hfix-1A (F-1, the lead's ruling) · every run with a line outside the open area is read again scrolled clear of the
-        // bars: one pass that moves the document (or the page) down for the lines under the top bars, one that moves it up
-        // for the lines over the tab bar; each run keeps its worst pair from every pass. A run in a layer no scroll moves is
-        // under a bar C8 proves opaque, and is counted (barred), never read against the bar's paint
-        const waiting = data.texts.filter((t) => t.deferred || t.partial);
-        const reread = { passes: 0, read: 0, barred: [] };
-        const readKeys = new Set(result.pairs.map((p) => p.key));
-        for (const dir of [-1, 1]) {
-          const mine = waiting.filter((t) => ['doc', 'sheet'].includes(t.scroller) && t.need.some((n) => Math.sign(n) === dir));
-          if (!mine.length) continue;
-          const needs = mine.flatMap((t) => t.need.filter((n) => Math.sign(n) === dir));
-          const delta = dir < 0 ? Math.min(...needs) : Math.max(...needs);
-          const moved = await page.evaluate((d) => {
-            const sheet = document.getElementById('sheet'), y0 = scrollY, s0 = sheet?.scrollTop ?? 0;
-            scrollBy({ top: d, behavior: 'instant' });
-            if (sheet) sheet.scrollTop = s0 + d;
-            return { doc: scrollY - y0, sheet: (sheet?.scrollTop ?? 0) - s0 };
-          }, delta);
-          await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
-          const again = await page.evaluate(([owned, inks]) => window.__sweep.collect(owned, [], inks), [OWNED, INKS]);
-          await page.evaluate(() => window.__sweep.hide(true));
-          await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
-          const clear = decodePng(await page.screenshot({ type: 'png' }));
-          await page.evaluate(() => window.__sweep.hide(false));
-          await page.evaluate((m) => { scrollBy({ top: -m.doc, behavior: 'instant' }); const sheet = document.getElementById('sheet'); if (sheet) sheet.scrollTop -= m.sheet; }, moved);
-          const keys = new Set(mine.map((t) => t.key));
-          const pass = analyse(world, state, { ...again, texts: again.texts.filter((t) => keys.has(t.key)), figures: [], paints: [], kanji: [] }, clear, []);
-          reread.passes += 1;
-          for (const pair of pass.pairs) {
-            reread.read += 1;
-            readKeys.add(pair.key);
-            const had = result.pairs.find((p) => p.key === pair.key);
-            if (!had) result.pairs.push({ ...pair, pass: dir < 0 ? 'scrolled down' : 'scrolled up' });
-            else if (pair.ratio / pair.required < had.ratio / had.required) Object.assign(had, pair, { pass: dir < 0 ? 'scrolled down' : 'scrolled up' });
-          }
-          result.unresolved.push(...pass.unresolved);
-        }
-        reread.barred = waiting.filter((t) => !readKeys.has(t.key)).map((t) => `${t.text} ${t.sel}`.slice(0, 80));
-        result.reread = reread;
+        // VC-1 · the scene's census: the fixed layers met (overlays, the bars' parts, those standing behind), the lines by
+        // state, the lines read with a probe on something outside their own element, and every waiting line
+        const lineStates = data.texts.flatMap((t) => t.lines.map((l) => l.state));
+        result.census = { open: data.open, scroll: data.scroll, overlays: data.overlays, fixedOther: data.fixedOther,
+          lines: Object.fromEntries(['read', 'wait', 'occluded'].map((k) => [k, lineStates.filter((x) => x === k).length])),
+          foreign: data.texts.flatMap((t) => t.lines.filter((l) => l.foreign).map((l) => ({ occurrence: t.id, text: t.text.slice(0, 20), line: l.line, probes: l.foreign, by: l.foreignBy }))),
+          shaded: data.texts.flatMap((t) => t.lines.filter((l) => l.shaded).map((l) => ({ occurrence: t.id, text: t.text.slice(0, 20), line: l.line, by: l.shaded }))),
+          waiting: data.texts.flatMap((t) => t.lines.filter((l) => l.state === 'wait').map((l) => ({ occurrence: t.id, index: t.index, text: t.text.slice(0, 20), line: l.line,
+            why: l.why, scroller: t.scroller, rect: l.rect, ...(l.blockers?.length ? { blockers: l.blockers.map((b) => b.sel) } : {}) }))) };
+        // Hfix-1A (F-1, the lead's ruling), VC-1 (CONTRAST-INTEGRATION-SPEC item 2) · every required line not read where it
+        // stood (outside the open area, or under an overlay's paint) is read again at a native position that clears that very
+        // line, verified at its capture; one completion per line; a line no bounded position reads is a named failure, unless
+        // no scroll moves it and it lies wholly inside an opaque bar's box (barred: hidden, C8 proves the bar opaque)
+        result.reread = await rereadWaiting(page, data, result);
         // C8 (F-1) · the fixed chrome is opaque enough that text under it never shows through: with the reading scrolled
         // so text lies under the bars, each bar's pixels are the same with what scrolls under them hidden as with it shown
         // (any channel within 8/255); a bar at the foot that declares a top-edge fade is judged below its strip, where it
@@ -1408,9 +1967,13 @@ try {
         report.results.push(result);
         const fails = result.pairs.filter((p) => !p.ok).sort((a, b) => a.ratio / a.required - b.ratio / b.required);
         const worstPair = result.pairs.slice().sort((a, b) => a.ratio / a.required - b.ratio / b.required)[0];
-        check(`${world}/${state}.C1`, `${world}/${state}: every visible text run reads, each line in the open reading area (${result.pairs.length} runs, ${result.reread.read} read again scrolled clear of the bars; worst ${worstPair ? `${worstPair.ratio}:1 "${worstPair.text}"` : '—'})`,
+        // VC-1 · each failing pair names its native occurrence (text node, reader token, line); a named unresolved failure
+        // (unexposed, missing native occurrence, positioning timeout, duplicate completion, unresolved paint) fails C1 too
+        const named = (p) => `node ${p.occurrence}${p.index !== null && p.index !== undefined ? ` token ${p.index}` : ''}`;
+        check(`${world}/${state}.C1`, `${world}/${state}: every visible text run reads, each line in the open reading area and clear of every overlay (${result.pairs.length} runs, ${result.reread.read} lines read again at a clear position; worst ${worstPair ? `${worstPair.ratio}:1 "${worstPair.text}"` : '—'})`,
           fails.length === 0 && result.unresolved.length === 0,
-          { fails: fails.slice(0, 12).map((p) => `${p.ratio}<${p.required} ${p.fg} on ${p.bg} "${p.text}" ${p.sel}${p.pass ? ` (${p.pass})` : ''}`), unresolved: result.unresolved.slice(0, 8), barred: result.reread.barred.slice(0, 6) });
+          { fails: fails.slice(0, 12).map((p) => `${p.ratio}<${p.required} ${p.fg} on ${p.bg} "${p.text}" ${named(p)} line ${p.lines.find((l) => !l.ok)?.line} ${p.sel}${p.pass ? ` (${p.pass})` : ''}`),
+            unresolved: result.unresolved.slice(0, 8).map((u) => ({ ...u, attempts: u.attempts?.slice(0, 6) })), barred: result.reread.barred.slice(0, 6) });
         if (result.figures.length) check(`${world}/${state}.C2`, `${world}/${state}: the overlay stands as a figure on its page (≥ 3:1 fill or lit edge on one whole side)`,
           result.figures.every((f) => f.ok), result.figures);
         check(`${world}/${state}.C3`, `${world}/${state}: every gradient and every owned surface roots in the world's ${result.pigmentCount} pigments`,
@@ -1421,6 +1984,7 @@ try {
         check(`${world}/${state}.C5`, `${world}/${state}: the key-kanji sheets wear their wash and the kanji reads ≥ 4.5:1 (${result.kanji.length})`,
           result.kanji.every((k) => k.ok), { applicability: result.kanji.length ? 'measured' : 'vacuous-no-key-kanji-sheet', measured: result.kanji.length, sheets: result.kanji });
         if (!NIGHT.has(world)) check(`${world}/${state}.C6`, `${world}/${state}: no muddy surface (between ink and 92 % of the page)`, result.muddy.length === 0, result.muddy.slice(0, 10));
+        if (c1ControlIds.some((id) => c1SceneOf(id) === state)) await c1Controls(page, world, state, result, report);
       }
       if (onlyStates?.includes('shelf') || !onlyStates) {
         const ks = report.results.filter((r) => r.engine === engine && r.world === world && r.state === 'shelf');
