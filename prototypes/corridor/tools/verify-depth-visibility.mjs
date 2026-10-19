@@ -25,13 +25,20 @@ const DAY = 86400000;
 const STORY = 'kantei:jp-105-actions-202609-25startup';
 const CONTEXT_STORY = 'aozora:000772-1';
 const LIVE = [{ name: 'live-daisho', id: STORY, query: 'スタートアップ大賞', word: '大賞' }, { name: 'live-watashi', id: CONTEXT_STORY, query: '私の個人主義', word: '私' }];
+// Lead 2000's bounded late-lookup roster: two shipped titles whose words wait on the
+// name-readings sidecar, success and failure-then-retry, both engines, 藍 and 墨.
+const LATE = [{ name: 'late-typhoon', id: 'jawiki:5238864-s63', query: '台風' }, { name: 'late-nohe', id: 'wikinews:27998', archiveYear: '2015' }];
+const LATE_MODES = ['success', 'fail-retry'];
+const LATE_WORLDS = ['hokusai', 'sumi'];
 const savedWord = (id, now) => ({ t: 'word', id, label: id, ts: now - 40 * DAY, started: now - 40 * DAY });
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const option = (name) => { const i = process.argv.indexOf(name); return i < 0 ? null : process.argv[i + 1]; };
 const allowedArgs = new Set(['--worlds', '--control-current-paint']);
-for (let i = 2; i < process.argv.length; i++) { if (process.argv[i] === '--diagnostic-inline-end') continue; assert(allowedArgs.has(process.argv[i]) && process.argv[i + 1], `Invalid option ${process.argv[i]}`); i++; }
+for (let i = 2; i < process.argv.length; i++) { if (['--diagnostic-inline-end', '--late-lookup'].includes(process.argv[i])) continue; assert(allowedArgs.has(process.argv[i]) && process.argv[i + 1], `Invalid option ${process.argv[i]}`); i++; }
 const diagnosticInlineEnd = process.argv.includes('--diagnostic-inline-end');
-const worlds = option('--worlds')?.split(',') || WORLDS;
+const lateLookup = process.argv.includes('--late-lookup');
+assert(!lateLookup || (!option('--worlds') && !diagnosticInlineEnd), 'The late-lookup roster names its own worlds and paint');
+const worlds = lateLookup ? LATE_WORLDS : option('--worlds')?.split(',') || WORLDS;
 assert(worlds.length && new Set(worlds).size === worlds.length && worlds.every((w) => WORLDS.includes(w)), 'Named, unique public worlds required');
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['webkit', 'chromium'];
 assert(engines.every((e) => ['webkit', 'chromium'].includes(e)), 'Unknown engine');
@@ -40,14 +47,15 @@ const controlFile = option('--control-current-paint');
 const controlBytes = controlFile ? readFileSync(resolve(controlFile)) : null;
 const report = { schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(), startedAt: new Date().toISOString(),
   verifierSha256: hash(readFileSync(fileURLToPath(import.meta.url))), command: [process.execPath, ...process.argv.slice(1)],
-  scope: { engines, worlds, full: engines.length === 2 && worlds.length === 11, rooms: ['slip', 'basis', 'tray', 'today', 'mirror'],
+  scope: { engines, worlds, full: !lateLookup && engines.length === 2 && worlds.length === 11, rooms: lateLookup ? [] : ['slip', 'basis', 'tray', 'today', 'mirror'],
+    ...(lateLookup ? { lateRoster: { titles: LATE.map((l) => l.id), modes: LATE_MODES, engines: ['webkit', 'chromium'], worlds: LATE_WORLDS, cases: LATE.length * LATE_MODES.length * 2 * LATE_WORLDS.length, claim: 'bounded named roster for late name-reading titles; not every world' } } : {}),
     card: { title: STORY, context: `${CONTEXT_STORY} 講演 met+saved`, live: LIVE.map((l) => `${l.id} ${l.word}: fresh profile, real first and second input`) },
     fixture: 'G2 first paragraph; native installation record; exact dictionary identities', ladder: 'attribute contract only' },
   thresholds: { fillCssPx: 6, actualFillExtentCssPx: 5, actualFillAreaCssPx2: 18, actualFillNote: 'Interior mask excludes 0.25px radius edge; extent allows circle antialiasing, area rejects clipped stripes', keptOuterCssPx: 10, knownContrast: 3, savedContrast: 3, metContrast: 1.5, semanticDeltaE76: 10,
     deltaEStatus: 'conservative engineering bound, not WCAG', measurement: 'actual device pixels: painted screenshot vs identical geometry with only dots hidden; paper is the hidden pixel' },
   diagnosticInlineEnd,
   control: { file: controlFile, sha256: controlBytes ? hash(controlBytes) : null, served: [], setupError: null }, contexts: [], errors: [], passed: false, fullAcceptance: false };
-const save = () => writeFileSync(resolve(evidence, 'verify-depth-visibility.json'), JSON.stringify(report, null, 2));
+const save = () => writeFileSync(resolve(evidence, lateLookup ? 'verify-depth-visibility-late.json' : 'verify-depth-visibility.json'), JSON.stringify(report, null, 2));
 const row = (out, id, passed, detail) => { out.rows.push({ id, passed: Boolean(passed), detail }); if (!passed) console.log(`FAIL ${out.engine}/${out.world} ${id}`); };
 let host;
 let base;
@@ -78,10 +86,18 @@ async function boot(page) {
   await page.goto(new URL('index.html?entry=shelf&ui=bi', base).href);
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 45000 });
 }
-async function story(page, id = STORY, query = 'スタートアップ大賞') {
-  await boot(page);
+/** Open a passage through its native door: the shelf (or its search), or the archive's year fold. */
+async function openPassage(page, { id, query, archiveYear }) {
+  if (archiveYear) {
+    await page.locator('#archive-link').click(); await page.locator(`.archive-year[data-year="${archiveYear}"]`).click();
+    await page.locator(`.archive-row[data-passage="${id}"]`).click(); return;
+  }
   const direct = page.locator(`[data-passage="${id}"]:not([data-recommendation]) .shelf-open`).first();
   if (await direct.count()) await direct.click(); else { await openShelfTools(page); await page.locator('#shelf-reading-search').fill(query); await page.locator('#shelf-reading-search').press('Enter'); await page.locator(`#shelf-reading-results [data-passage="${id}"] .shelf-open`).first().click(); }
+}
+async function story(page, id = STORY, query = 'スタートアップ大賞') {
+  await boot(page);
+  await openPassage(page, { id, query });
   await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 30000 }); await delay(1000);
 }
 /** The title as laid out now, with the native depth of every card word read
@@ -406,10 +422,26 @@ async function contextCard(page, out) {
   const kouen = (out.nativeCensus?.context || []).find((r) => r.text === '講演');
   row(out, 'context.native-kouen', kouen?.active === true && kouen.expectedDepth === 'met' && kouen.expectedKept && kouen.actualDepth === 'met' && kouen.actualKept && card.some((d) => d.probeId === kouen.probeId && d.raster.changedPixels >= 4), { kind: word.kind, census: kouen || null });
 }
-/** Lead 1940: on a fresh native profile, the first input on a title word
+/** Lead 1940/1950: on a fresh native profile, the first input on a title word
  * shows its reading without an encounter, the second opens its stage and
- * records the first state. Through both, the word stays put, the open slip
- * stays seated beside the word and its reading, and the title keeps its height. */
+ * records the first state. The same Japanese base characters (rt excluded)
+ * stay within 1 CSS px through both inputs, the title keeps its BEFORE height
+ * and rhythm exactly, the word stays visible and owns its hit, the page does
+ * not scroll, and the open slip sits at its authored gap from the word and its
+ * reading (rt included). The whole lookup element box is telemetry only. */
+const SLIP_GAP = 10;
+async function settledRecord(page, { quietMs = 750, timeout = 8000 } = {}) {
+  const started = Date.now(), reads = [];
+  let snapshot = await readAppRecordSnapshot(page), since = Date.now();
+  reads.push({ atMs: 0, revision: snapshot.revision });
+  while (Date.now() - started < timeout) {
+    await delay(50);
+    const next = await readAppRecordSnapshot(page);
+    if (next.revision !== snapshot.revision) { snapshot = next; since = Date.now(); reads.push({ atMs: Date.now() - started, revision: next.revision }); }
+    else if (Date.now() - since >= quietMs) return { snapshot, settled: true, quietMs, waitedMs: Date.now() - started, reads };
+  }
+  return { snapshot, settled: false, quietMs, waitedMs: Date.now() - started, reads };
+}
 async function liveFirstState(page, out, { name, id, query, word }) {
   await story(page, id, query);
   await page.locator('.reader-card').evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' })); await delay(250);
@@ -420,32 +452,53 @@ async function liveFirstState(page, out, { name, id, query, word }) {
     await document.fonts.ready;
     const el = document.querySelector(selector);
     const plain = (b) => ({ x: b.x, y: b.y, width: b.width, height: b.height });
-    const h1 = el.closest('h1.view-title'), heading = getComputedStyle(h1), r = el.getBoundingClientRect(), glyphs = [];
+    const h1 = el.closest('h1.view-title'), heading = getComputedStyle(h1), r = el.getBoundingClientRect(), base = [], all = [];
     const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let text;
-    while ((text = walker.nextNode())) for (let i = 0; i < text.length; i++) { if (!text.textContent[i].trim()) continue; const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1); for (const b of range.getClientRects()) if (b.width && b.height) glyphs.push(b); }
-    const union = glyphs.length ? { left: Math.min(...glyphs.map((b) => b.left)), top: Math.min(...glyphs.map((b) => b.top)), right: Math.max(...glyphs.map((b) => b.right)), bottom: Math.max(...glyphs.map((b) => b.bottom)) } : null;
-    const mini = document.getElementById('mini'), m = mini?.getBoundingClientRect(), ms = mini && getComputedStyle(mini);
-    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-    return { label, scrollX, scrollY, source: plain(r), union, rung: el.dataset.ladderRung || null, depth: el.dataset.depth || null, kept: el.dataset.kept != null,
+    while ((text = walker.nextNode())) {
+      const reading = Boolean(text.parentElement.closest('rt, rp'));
+      for (let i = 0; i < text.length; i++) {
+        if (!text.textContent[i].trim()) continue;
+        const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1);
+        for (const b of range.getClientRects()) if (b.width && b.height) { const g = { char: text.textContent[i], left: b.left, top: b.top, right: b.right, bottom: b.bottom }; all.push(g); if (!reading) base.push(g); }
+      }
+    }
+    const union = (gs) => (gs.length ? { left: Math.min(...gs.map((g) => g.left)), top: Math.min(...gs.map((g) => g.top)), right: Math.max(...gs.map((g) => g.right)), bottom: Math.max(...gs.map((g) => g.bottom)) } : null);
+    const baseBox = union(base), mini = document.getElementById('mini'), m = mini?.getBoundingClientRect(), ms = mini && getComputedStyle(mini);
+    const hit = baseBox ? document.elementFromPoint((baseBox.left + baseBox.right) / 2, (baseBox.top + baseBox.bottom) / 2) : null;
+    return { label, scrollX, scrollY, source: plain(r), base, baseBox, union: union(all), rung: el.dataset.ladderRung || null, depth: el.dataset.depth || null, kept: el.dataset.kept != null,
       reading: [...el.querySelectorAll('rt')].filter((rt) => { const s = getComputedStyle(rt); return !rt.classList.contains('hidden-rt') && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0'; }).map((rt) => rt.textContent).join(''),
       title: { height: h1.getBoundingClientRect().height, lineHeight: heading.lineHeight, paddingBottom: heading.paddingBottom, fontSize: heading.fontSize },
-      mini: m && m.width > 0 && m.height > 0 && ms.display !== 'none' && ms.visibility !== 'hidden' ? plain(m) : null, hitOwned: Boolean(hit && (hit === el || el.contains(hit))) };
+      visible: r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight, hitOwned: Boolean(hit && (hit === el || el.contains(hit))),
+      mini: m && m.width > 0 && m.height > 0 && ms.display !== 'none' && ms.visibility !== 'hidden' ? plain(m) : null };
   }, { selector, label });
   const input = () => (out.engine === 'webkit' ? target.tap() : target.click());
   const shift = (a, b) => (a && b ? Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y)) : Infinity);
-  const unionShift = (a, b) => (a && b ? Math.max(...['left', 'top', 'right', 'bottom'].map((k) => Math.abs(a[k] - b[k]))) : Infinity);
-  const gap = (s) => (s.mini && s.union ? Math.max(s.union.top - (s.mini.y + s.mini.height), s.mini.y - s.union.bottom) : null);
+  const baseShift = (a, b) => (a.base.length && a.base.length === b.base.length && a.base.every((g, i) => g.char === b.base[i].char)
+    ? Math.max(...a.base.flatMap((g, i) => ['left', 'top', 'right', 'bottom'].map((k) => Math.abs(g[k] - b.base[i][k])))) : Infinity);
+  const seat = (s) => {
+    if (!s.mini || !s.union) return { side: null, gap: null, overlapsAcross: false };
+    const m = { left: s.mini.x, top: s.mini.y, right: s.mini.x + s.mini.width, bottom: s.mini.y + s.mini.height }, u = s.union;
+    const side = m.bottom <= u.top ? 'above' : m.top >= u.bottom ? 'below' : m.right <= u.left ? 'left' : m.left >= u.right ? 'right' : 'overlapping';
+    const gap = { above: u.top - m.bottom, below: m.top - u.bottom, left: u.left - m.right, right: m.left - u.right }[side] ?? null;
+    const overlapsAcross = ['above', 'below'].includes(side) ? m.left < u.right && m.right > u.left : ['left', 'right'].includes(side) ? m.top < u.bottom && m.bottom > u.top : false;
+    return { side, gap, overlapsAcross };
+  };
+  const seated = (s) => { const x = seat(s); return Number.isFinite(x.gap) && Math.abs(x.gap - SLIP_GAP) <= 1 && x.overlapsAcross; };
   const fresh = await titleLayout(page);
+  const pre = await readAppRecordSnapshot(page);
   const before = await sample('before');
   const first = lines.find((l) => l.text === '日本'), daisho = lines.find((l) => l.text === '大賞');
   const twoLine = Boolean(first && daisho && first.top != null && daisho.top != null && daisho.top - first.top > (first.bottom - first.top) / 2);
-  row(out, `${name}.fresh`, native.kind === 'core' && fresh?.titleWords > 0 && stateless(fresh) && !before.rung && !before.mini && (out.engine !== 'webkit' || id !== STORY || twoLine), { native, lines, twoLine, fresh, before });
+  row(out, `${name}.fresh`, native.kind === 'core' && fresh?.titleWords > 0 && stateless(fresh) && !before.rung && !before.mini && !pre.record.met?.entries?.[native.key] && (out.engine !== 'webkit' || id !== STORY || twoLine), { native, lines, twoLine, fresh, before, revision: pre.revision });
   await input();
+  const input1 = await sample('input-1');
   await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.ladderRung != null, selector); await delay(350);
   const reading = await sample('reading');
-  const firstEncounter = (await readAppRecordSnapshot(page)).record.met?.entries?.[native.key] ?? null;
-  row(out, `${name}.reading-without-encounter`, reading.rung === 'reading' && reading.reading.length > 0 && !firstEncounter && !reading.mini, { reading, firstEncounter });
-  row(out, `${name}.source-input-1`, shift(before.source, reading.source) <= 1, { shift: shift(before.source, reading.source), before: before.source, reading: reading.source, scrollY: [before.scrollY, reading.scrollY], hitOwned: [before.hitOwned, reading.hitOwned] });
+  const settle = await settledRecord(page);
+  const beforeInput2 = await readAppRecordSnapshot(page);
+  const encounterAt = (snapshot) => snapshot.record.met?.entries?.[native.key] ?? null;
+  row(out, `${name}.reading-without-encounter`, reading.rung === 'reading' && reading.reading.length > 0 && !reading.mini && !encounterAt(pre) && settle.settled && !encounterAt(settle.snapshot) && !encounterAt(beforeInput2),
+    { reading, revisions: { beforeInput1: pre.revision, settle: settle.reads, settled: settle.settled, waitedMs: settle.waitedMs, quietMs: settle.quietMs, beforeInput2: beforeInput2.revision }, encounter: { settled: encounterAt(settle.snapshot), beforeInput2: encounterAt(beforeInput2) } });
   await input();
   await page.locator('#mini').waitFor({ state: 'visible' });
   const opened = await sample('stage-open');
@@ -453,12 +506,23 @@ async function liveFirstState(page, out, { name, id, query, word }) {
   const committed = await waitForAppRecord(page, (value) => Boolean(value.met?.entries?.[native.key]), { description: `native first encounter for ${word}` });
   await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.depth === 'met', selector); await delay(350);
   const met = await sample('stage-met');
+  const after = await readAppRecordSnapshot(page);
   const sameMini = Boolean(miniHandle) && await miniHandle.evaluate((el) => el.isConnected && el === document.getElementById('mini'));
   const expected = await page.evaluate((word) => window.__KAIRO_DEPTH__.depth({ t: 'word', id: word }), word);
-  row(out, `${name}.stage-commits-met`, opened.rung === 'stage' && met.rung === 'stage' && committed.met.entries[native.key]?.days >= 1 && expected?.depth === 'met' && met.depth === 'met', { encounter: committed.met.entries[native.key], expected, opened: { rung: opened.rung, depth: opened.depth }, met: { rung: met.rung, depth: met.depth } });
-  row(out, `${name}.source-input-2`, shift(reading.source, met.source) <= 1 && unionShift(reading.union, met.union) <= 1, { shift: shift(reading.source, met.source), unionShift: unionShift(reading.union, met.union), reading: { source: reading.source, union: reading.union }, met: { source: met.source, union: met.union }, scrollY: [reading.scrollY, met.scrollY], hitOwned: [reading.hitOwned, met.hitOwned] });
-  row(out, `${name}.title-height-first-state`, JSON.stringify(reading.title) === JSON.stringify(met.title) && JSON.stringify(opened.title) === JSON.stringify(met.title), { reading: reading.title, opened: opened.title, met: met.title, openedBeforeState: !opened.depth });
-  row(out, `${name}.slip-seated`, sameMini && shift(opened.mini, met.mini) <= 1 && Number.isFinite(gap(opened)) && Number.isFinite(gap(met)) && gap(opened) >= 0 && gap(met) >= 0 && Math.abs(gap(met) - gap(opened)) <= 1, { sameMini, opened: { mini: opened.mini, union: opened.union, gap: gap(opened) }, met: { mini: met.mini, union: met.union, gap: gap(met) }, openedBeforeState: !opened.depth });
+  const frames = [before, input1, reading, opened, met];
+  row(out, `${name}.stage-commits-met`, opened.rung === 'stage' && met.rung === 'stage' && !encounterAt(beforeInput2) && committed.met.entries[native.key]?.days >= 1 && encounterAt(after) && expected?.depth === 'met' && met.depth === 'met',
+    { encounter: committed.met.entries[native.key], revisions: { beforeInput2: beforeInput2.revision, after: after.revision }, expected, opened: { rung: opened.rung, depth: opened.depth }, met: { rung: met.rung, depth: met.depth } });
+  const firstMove = Math.max(baseShift(before, input1), baseShift(before, reading)), secondMove = Math.max(baseShift(reading, opened), baseShift(reading, met));
+  const cumulativeMove = Math.max(...frames.map((f) => baseShift(before, f)));
+  const telemetry = frames.map((f) => ({ label: f.label, element: f.source, elementShift: shift(before.source, f.source), baseBox: f.baseBox, union: f.union }));
+  row(out, `${name}.first-tap-base-glyphs`, firstMove <= 1, { maxShift: firstMove, before: before.base, input1: input1.base, reading: reading.base, telemetry });
+  row(out, `${name}.second-tap-base-glyphs`, secondMove <= 1, { maxShift: secondMove, reading: reading.base, opened: opened.base, met: met.base, telemetry });
+  row(out, `${name}.fresh-to-state-base-glyphs`, cumulativeMove <= 1, { maxShift: cumulativeMove, perFrame: frames.map((f) => ({ label: f.label, shift: baseShift(before, f) })) });
+  row(out, `${name}.title-rhythm-through-inputs`, frames.every((f) => JSON.stringify(f.title) === JSON.stringify(before.title)), frames.map((f) => ({ label: f.label, ...f.title })));
+  row(out, `${name}.source-visible-and-owned`, frames.every((f) => f.visible && f.hitOwned), frames.map((f) => ({ label: f.label, visible: f.visible, hitOwned: f.hitOwned })));
+  row(out, `${name}.scroll-unchanged`, frames.every((f) => f.scrollY === before.scrollY && f.scrollX === before.scrollX), frames.map((f) => ({ label: f.label, scrollX: f.scrollX, scrollY: f.scrollY })));
+  row(out, `${name}.slip-seated`, sameMini && shift(opened.mini, met.mini) <= 1 && seated(opened) && seated(met),
+    { authoredGap: SLIP_GAP, sameMini, miniShift: shift(opened.mini, met.mini), opened: { mini: opened.mini, union: opened.union, ...seat(opened) }, met: { mini: met.mini, union: met.union, ...seat(met) }, openedBeforeState: !opened.depth });
 }
 async function rooms(page, out) {
   out.roomStateCoverage = {};
@@ -530,9 +594,88 @@ async function freshWalk(browser, out, walk) {
   try { const page = await context.newPage(); page.setDefaultTimeout(15000); page.on('pageerror', (e) => out.errors.push(String(e))); await walk(page); }
   finally { await context.close(); }
 }
+/** The reader title as laid out now: its box, rhythm, card and every authored
+ * character (never a retry button's label or a reading), in viewport pixels. */
+const titleGeometry = (page, label) => page.evaluate(async (label) => {
+  await document.fonts.ready;
+  const h = document.querySelector('.reader-card > h1.view-title');
+  if (!h) return { label, missing: true };
+  const card = h.closest('.reader-card'), style = getComputedStyle(h), box = (r) => ({ left: r.left, top: r.top, width: r.width, height: r.height }), glyphs = [];
+  const walker = document.createTreeWalker(h, NodeFilter.SHOW_TEXT); let text;
+  while ((text = walker.nextNode())) {
+    if (text.parentElement.closest('button, rt, rp')) continue;
+    for (let i = 0; i < text.length; i++) { if (!text.textContent[i].trim()) continue; const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1); const b = range.getBoundingClientRect(); if (b.width && b.height) glyphs.push({ char: text.textContent[i], left: b.left, top: b.top, right: b.right, bottom: b.bottom }); }
+  }
+  const wrapper = h.querySelector('[data-lookup-readings-pending]');
+  return { label, scrollX, scrollY, title: box(h.getBoundingClientRect()), card: box(card.getBoundingClientRect()), lineHeight: style.lineHeight, paddingBottom: style.paddingBottom, fontSize: style.fontSize,
+    pending: Boolean(wrapper), busy: wrapper?.getAttribute('aria-busy') ?? null, words: h.querySelectorAll('.japanese-lookup-word').length, buttons: [...h.querySelectorAll('button')].map((b) => b.textContent), glyphs };
+}, label);
+const glyphShift = (a, b) => (a.length && a.length === b.length && a.every((g, i) => g.char === b[i].char) ? Math.max(...a.flatMap((g, i) => ['left', 'top', 'right', 'bottom'].map((k) => Math.abs(g[k] - b[i][k])))) : Infinity);
+const titleDelta = (a, b) => (a.missing || b.missing ? null : { height: b.title.height - a.title.height, width: b.title.width - a.title.width, top: b.title.top - a.title.top, left: b.title.left - a.title.left,
+  cardHeight: b.card.height - a.card.height, cardTop: b.card.top - a.card.top, scrollY: b.scrollY - a.scrollY, rhythm: [a.lineHeight, a.paddingBottom, a.fontSize].join() === [b.lineHeight, b.paddingBottom, b.fontSize].join(), glyphShift: glyphShift(a.glyphs, b.glyphs) });
+const sameTitle = (d) => Boolean(d) && d.height === 0 && d.width === 0 && Math.abs(d.top) <= 1 && Math.abs(d.left) <= 1 && d.cardHeight === 0 && Math.abs(d.cardTop) <= 1 && d.scrollY === 0 && d.rhythm && d.glyphShift <= 1;
+const frameSummary = ({ glyphs, ...frame }) => ({ ...frame, glyphCount: glyphs?.length ?? 0 });
+/** Lead 2000: a title whose words wait on the name-readings sidecar renders
+ * once. The real sidecar request is held; it is released whole (success) or
+ * failed, then retried through the title's own Reload readings button. */
+async function lateTitle(page, out, spec, mode) {
+  const label = `${spec.name}-${mode}`, requests = [], held = [];
+  await page.route('**/data/share_alike/skip.json', async (route) => {
+    const request = { url: route.request().url(), status: null }; requests.push(request);
+    request.status = await new Promise((release) => held.push(release));
+    if (request.status === 200) await route.fulfill({ response: await route.fetch() });
+    else await route.fulfill({ status: request.status, contentType: 'text/plain', body: 'Deliberate name-readings failure' });
+  });
+  const heldCount = async (count) => { const deadline = Date.now() + 15000; while (held.length < count && Date.now() < deadline) await delay(25); return held.length === count; };
+  const press = (locator) => (out.engine === 'webkit' ? locator.tap() : locator.click());
+  const pending = '.reader-card > h1.view-title [data-lookup-readings-pending]';
+  try {
+    await boot(page);
+    await openPassage(page, spec);
+    await page.locator(pending).first().waitFor({ timeout: 30000 });
+    await page.locator('.reader-card').evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' })); await delay(250);
+    const firstHeld = await heldCount(1);
+    const cold = await titleGeometry(page, 'cold-pending');
+    row(out, `${label}.cold-pending`, firstHeld && requests.length === 1 && cold.pending && cold.words === 0 && !cold.buttons.length, { requests: requests.length, cold: frameSummary(cold) });
+    held.shift()?.(mode === 'success' ? 200 : 503);
+    const frames = [cold];
+    if (mode === 'fail-retry') {
+      const retry = page.locator(`${pending} > button`).first();
+      await retry.waitFor({ timeout: 15000 });
+      const failed = await titleGeometry(page, 'failed'); frames.push(failed);
+      await press(retry);
+      const secondHeld = await heldCount(1);
+      const retrying = await titleGeometry(page, 'retry-pending'); frames.push(retrying);
+      row(out, `${label}.native-retry`, failed.buttons.length === 1 && secondHeld && requests.length === 2 && retrying.pending && retrying.busy === 'true' && !retrying.buttons.length, { failedButtons: failed.buttons, requests: requests.map((r) => r.status), retrying: frameSummary(retrying) });
+      held.shift()?.(200);
+    }
+    await page.waitForFunction(() => { const h = document.querySelector('.reader-card > h1.view-title'); return Boolean(h) && h.querySelectorAll('.japanese-lookup-word').length > 0 && !h.querySelector('[data-lookup-readings-pending]'); }, null, { timeout: 30000 });
+    if (mode === 'success') await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 30000 });
+    await delay(350);
+    const loaded = await titleGeometry(page, 'loaded'); frames.push(loaded);
+    const delta = titleDelta(cold, loaded);
+    row(out, `${label}.loaded-words`, loaded.words > 0 && !loaded.pending && !loaded.buttons.length && requests.at(-1)?.status === 200, { words: loaded.words, statuses: requests.map((r) => r.status) });
+    row(out, `${label}.title-identical`, sameTitle(delta), { delta, cold: frameSummary(cold), loaded: frameSummary(loaded) });
+    if (mode === 'fail-retry') row(out, `${label}.through-failure-identical`, frames.every((f) => sameTitle(titleDelta(cold, f))), frames.map((f) => ({ label: f.label, delta: titleDelta(cold, f), buttons: f.buttons })));
+    await page.screenshot({ path: resolve(evidence, `${out.engine}-${out.world}-${label}-loaded.png`), fullPage: false });
+    out.lateCases.push({ label, completed: true, statuses: requests.map((r) => r.status), frames: frames.map(frameSummary) });
+  } finally { while (held.length) held.shift()(503); }
+}
+async function lateWalk(browser, out) {
+  out.lateCases = [];
+  for (const spec of LATE) for (const mode of LATE_MODES) {
+    try { await freshWalk(browser, out, (page) => lateTitle(page, out, spec, mode)); }
+    catch (error) { out.errors.push(`${spec.name}-${mode}: ${String(error.stack || error)}`); console.error(`${out.engine}/${out.world} ${spec.name}-${mode}: ${error.message}`); }
+  }
+  out.completedWalk = true;
+  out.completedAt = new Date().toISOString();
+  out.passed = !out.errors.length && out.lateCases.length === LATE.length * LATE_MODES.length && out.lateCases.every((c) => c.completed) && out.rows.length > 0 && out.rows.every((r) => r.passed);
+  save();
+}
 async function one(browser, engine, world) {
   const out = { engine, version: browser.version(), world, viewport: engine === 'webkit' ? { width: 390, height: 844 } : { width: 1440, height: 900 }, deviceScaleFactor: 2, touch: engine === 'webkit', startedAt: new Date().toISOString(), rows: [], measurements: {}, errors: [] };
   report.contexts.push(out); save();
+  if (lateLookup) return lateWalk(browser, out);
   const context = await openContext(browser, engine, world);
   try {
     const page = await context.newPage(); page.setDefaultTimeout(15000); page.on('pageerror', (e) => out.errors.push(String(e)));
@@ -600,6 +743,7 @@ finally {
   report.completedAt = new Date().toISOString();
   report.passed = !report.errors.length && !report.control.setupError && report.contexts.length === engines.length * worlds.length && report.contexts.every((c) => c.passed) && (!controlBytes || report.control.served.length > 0);
   report.fullAcceptance = report.passed && report.scope.full && report.mode === 'local artifact' && !controlBytes && !diagnosticInlineEnd;
+  if (lateLookup) report.lateRosterAccepted = report.passed && engines.length === 2 && report.mode === 'local artifact' && !controlBytes;
   report.control.killed = Boolean(controlBytes && !report.control.setupError && !report.errors.length && report.contexts.every((c) => !c.errors.length) && report.control.served.length && report.contexts.some((c) => c.rows.some((r) => /^(reader|title|context|slip|basis|prose|tray|today|mirror)(?:-[a-z]+)*\.(size|contrast|nonempty|semantic-separation)$/.test(r.id) && !r.passed)));
   save(); console.log(`DOTS ${report.passed ? 'PASS' : 'FAIL'}: ${evidence}`); if (!report.passed) process.exitCode = 1;
 }
