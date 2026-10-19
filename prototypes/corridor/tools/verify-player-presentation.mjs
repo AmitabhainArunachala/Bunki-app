@@ -61,6 +61,11 @@ try {
       const page = await context.newPage(), cdp = engine === 'chromium' ? await context.newCDPSession(page) : null;
       if (cdp) { await cdp.send('DOM.enable'); await cdp.send('Accessibility.enable'); }
       await page.goto(host.origin + '/index.html?deck=n1&ui=bi');
+      // The language controls appear before catalog/record hydration finishes.
+      // Establish the loaded deck home before testing either accessible name.
+      await page.waitForFunction(() => document.body.dataset.ready === '1');
+      await page.locator('#kp-start').waitFor();
+      await page.locator('#bunki-report-bug').waitFor();
       // the report entry's accessible names, in both languages, on the deck home (the card screen has none)
       for (const lang of ['ja', 'bi']) { await page.locator(`#lang [data-lang=${lang}]`).click(); await labels(page, cdp, lang); }
       await page.locator('#kp-start').click();
