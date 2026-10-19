@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 import { batteryGates, gateTimeoutMs, runGates, verifyArtifact } from '../verify-release-gates.mjs';
 import { supplementalGates } from './supplemental.mjs';
 import { requireGateAttemptEvidence } from './verification-admission.mjs';
+import { plannedProofContract } from './gate-evidence.mjs';
 import { parse as parseYaml } from 'yaml';
 import {
   budgetFits,
@@ -646,6 +647,22 @@ export async function executeShard({
     throw error;
   }
 }
+let plannedDescriptors;
+const plannedContracts = new Map();
+export function requirePlannedGateProof(name, proof) {
+  if (!plannedContracts.has(name)) {
+    plannedDescriptors ??= new Map(
+      [...batteryGates('/planned-proof', {}), ...supplementalGates('/planned-proof')].map((g) => [
+        g.name,
+        g,
+      ]),
+    );
+    const gate = plannedDescriptors.get(name);
+    assert(gate, `Unplanned gate cannot carry admitted proof: ${name}`);
+    plannedContracts.set(name, plannedProofContract(gate, ROOT));
+  }
+  return plannedContracts.get(name).require(proof);
+}
 const terminal = new Set(['passed', 'failed', 'missing', 'timed-out', 'incomplete']);
 export function admitReceipt(plan, receipt, shard, attempt, artifact, expected = shard.gates) {
   assert.equal(receipt.schemaVersion, 1);
@@ -676,11 +693,13 @@ export function admitReceipt(plan, receipt, shard, attempt, artifact, expected =
     assert.equal(gate.status === 'passed', gate.exitCode === 0);
     assert(gate.completedAt && Date.parse(gate.completedAt) >= Date.parse(gate.startedAt));
     assert(gate.log, 'Gate log missing');
-    if (gate.status === 'passed')
+    if (gate.status === 'passed') {
       requireGateAttemptEvidence(gate, {
         gitSha: plan.identity.sha,
         artifactSha256: artifact.artifactSha256,
       });
+      requirePlannedGateProof(gate.name, gate.evidenceReceipt.proof);
+    }
   }
   assert.equal(
     receipt.status === 'passed',

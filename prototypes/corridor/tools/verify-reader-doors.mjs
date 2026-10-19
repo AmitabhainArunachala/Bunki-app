@@ -26,7 +26,7 @@ import { pathToFileURL } from 'node:url';
 
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
-import { escapeObligations, READER_D1_DAY, READER_D1_PICKS, readerDoorsReceipt, restoreServedDigests } from './vh-learning-contracts.mjs';
+import { escapeObligations, READER_D1_DAY, READER_D1_PICKS, readerDoorsReceipt, deliveredAsBuilt, serveRecorded } from './vh-learning-contracts.mjs';
 import { restoreAppFixture } from './record-fixture-support.mjs';
 
 const require = createRequire(import.meta.url);
@@ -161,9 +161,9 @@ const CONTROLS = Object.freeze([
       ? '' : 'the exact wrong reading was not shown and spoken' },
 ]);
 
-async function openPage(viewport, query, mutation = null, { shelfDay = null } = {}) {
+async function openPage(viewport, query, mutation = null, { shelfDay = null, restore = null } = {}) {
   const context = await browser.newContext({ viewport, reducedMotion: 'reduce', deviceScaleFactor: viewport.width > 1000 ? 2 : 3,
-    ...(mutation ? { serviceWorkers: 'block' } : {}) });
+    ...(mutation || restore ? { serviceWorkers: 'block' } : {}) });
   const sink = mutation ? mutation.control.pageErrors : pageErrors;
   context.on('page', (page) => page.on('pageerror', (error) => {
     if (sink.length < 20) sink.push({ case: currentCase, message: error.message });
@@ -176,6 +176,7 @@ async function openPage(viewport, query, mutation = null, { shelfDay = null } = 
       if (day) localStorage.setItem('kairo-shelf-day', day);
     }, { ownOrigin: origin, day: shelfDay });
     if (mutation) await serveMutation(context, mutation);
+    if (restore) await serveRecorded(context, { origin, files: restore.files, delivered: restore.delivered });
     const page = await context.newPage();
     await page.goto(`${origin}/index.html${query}`);
     if (mutation?.control.setupError) throw new Error(`mutation setup: ${mutation.control.setupError}`);
@@ -796,18 +797,19 @@ async function runControl(spec) {
     await context?.close().catch(() => {});
   }
   [control.verdict, control.reason] = adjudicate(spec, control);
-  control.restore = { rows: [], served: [], error: null, pageErrors: [] };
+  control.restore = { rows: [], delivered: [], error: null, pageErrors: [] };
   let restored = null;
   const errorsBefore = pageErrors.length;
+  const files = edits.map((edit) => edit.file);
   try {
-    restored = await openPage(DESK, ['d2', 'd3'].includes(spec.run) ? '?entry=shelf' : D4_QUERY);
-    await restoreServedDigests({ files: edits.map(edit => edit.file), manifest, served: control.restore.served,
-      fetchBytes: async (file) => (await restored.page.request.get(`${origin}/${file}`)).body() });
+    restored = await openPage(DESK, ['d2', 'd3'].includes(spec.run) ? '?entry=shelf' : D4_QUERY, null,
+      { restore: { files, delivered: control.restore.delivered } });
     const rec = (id, name, pass, detail, observed) => control.restore.rows.push({id, name, pass: !!pass, detail, observed});
     if (spec.run === 'd3') await d3Names(restored.page, rec);
     else if (spec.run === 'd4') await d4Walk(restored.page, rec);
     else if (spec.run === 'd5') await d5Detour(restored.page, rec);
     else for (const f of [1, 0]) await d2Door(restored.page, rec, f);
+    deliveredAsBuilt({ files, rows: control.restore.delivered, manifest });
   } catch (error) { control.restore.error = String(error.stack || error); }
   finally { await restored?.context.close(); }
   control.restore.pageErrors = pageErrors.slice(errorsBefore);

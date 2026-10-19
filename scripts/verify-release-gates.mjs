@@ -32,6 +32,7 @@ import { acceptanceEnvironment, digest, sourceSnapshot } from './ci/verification
 import {
   gateEvidenceDeclaration,
   evidenceInvocation,
+  requireApprovedInvocation,
   validateGateEvidence,
   RELEASE_GROUPS,
 } from './ci/gate-evidence.mjs';
@@ -271,6 +272,12 @@ export function batteryGates(out, env = process.env) {
       [],
       report('word-saved-answer-controls', 'checks'),
     ),
+    {
+      ...node('word-saved-answer-mutation-controls', tool('test-word-saved-answer'), [
+        '--controls',
+      ]),
+      timeoutMs: 40 * 60 * 1000,
+    },
     node('navigation-returns', tool('test-navigation-returns')),
     node('reference-packaging', tool('test-reference-packaging')),
     node('skip-packaging', tool('test-skip-packaging')),
@@ -2260,7 +2267,8 @@ async function runGate(gate, root, out, signal, boundary = {}) {
   const attemptPath = join(out, `${gate.name}.attempt.json`);
   const stdoutPath = join(out, `${gate.name}.stdout.json`);
   let proof = null;
-  writeFileSync(log, `${gate.command} ${gate.args.join(' ')}\n`);
+  let declaration, invocation, instrumentation, commandBefore, sourceBefore, fd, stdoutFd;
+  writeFileSync(log, '');
   const finish = (status, exitCode, detail = '', processExitCode = null) => {
     const result = {
       name: gate.name,
@@ -2292,7 +2300,21 @@ async function runGate(gate, root, out, signal, boundary = {}) {
       schemaVersion: 1,
       kind: 'bunki-gate-attempt',
       ...result,
-      invocation: { command: gate.command, args: gate.args, cwd: gate.cwd || '.' },
+      declaredInvocation: {
+        command: gate.command,
+        args: gate.args,
+        cwd: gate.cwd || '.',
+        env: { ...gate.env },
+      },
+      invocation: instrumentation
+        ? {
+            command: invocation.command,
+            args: invocation.args,
+            cwd: resolve(root, gate.cwd || '.'),
+            env: { KAIRO_BROWSER: 'chromium', ...invocation.env, KAIRO_GATE_RUN_ID: runId },
+            instrumentation,
+          }
+        : null,
       candidate: boundary.source || null,
     });
     return result;
@@ -2300,7 +2322,6 @@ async function runGate(gate, root, out, signal, boundary = {}) {
   if (gate.requiredPath && !existsSync(resolve(root, gate.requiredPath))) {
     return finish('missing', 127, `Required path is missing: ${gate.requiredPath}`);
   }
-  let declaration, invocation, commandBefore, sourceBefore, fd, stdoutFd;
   const producer =
     gate.requiredPath &&
     existsSync(resolve(root, gate.requiredPath)) &&
@@ -2324,6 +2345,8 @@ async function runGate(gate, root, out, signal, boundary = {}) {
       'Gate evidence directory must be fresh',
     );
     invocation = evidenceInvocation(gate, declaration, root);
+    instrumentation = requireApprovedInvocation(gate, declaration, invocation, root);
+    writeFileSync(log, `${invocation.command} ${invocation.args.join(' ')}\n`);
     if (declaration.kind === 'command-check') commandBefore = commandCheckEvidence(gate, root);
     fd = openSync(log, 'a');
     stdoutFd = openSync(stdoutPath, 'wx');
@@ -2485,8 +2508,10 @@ export async function runGates({ gates, root, out, source = null, signal }) {
   const boundary = { source };
   boundary.sourceSnapshot = sourceSnapshot(root);
   boundary.gitSha = boundary.sourceSnapshot?.head || null;
-  if (source?.sha && boundary.gitSha)
+  if (source?.sha) {
+    assert(boundary.gitSha, 'Declared source requires an actual checkout rooted at the gate root');
     assert.equal(source.sha, boundary.gitSha, 'Declared source SHA differs from actual HEAD');
+  }
   receipt.sourceBefore = boundary.sourceSnapshot;
   boundary.producerHashes = Object.fromEntries(
     [
@@ -2628,6 +2653,12 @@ async function verifyRunner(out) {
     const child = spawnSync(process.execPath, [driver, config], {
       encoding: 'utf8',
       timeout: 15_000,
+      env: {
+        ...process.env,
+        GIT_CEILING_DIRECTORIES: [out, process.env.GIT_CEILING_DIRECTORIES]
+          .filter(Boolean)
+          .join(':'),
+      },
     });
     assert.ifError(child.error);
     return { child, receipt: json(join(evidence, 'battery.json')) };
@@ -2680,6 +2711,7 @@ async function verifyRunner(out) {
     'kanji-capture',
     'word-saved-answer',
     'word-saved-answer-controls',
+    'word-saved-answer-mutation-controls',
     'navigation-returns',
     'reference-packaging',
     'skip-packaging',

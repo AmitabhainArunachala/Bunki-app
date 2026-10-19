@@ -6,13 +6,12 @@ import { URL } from 'node:url';
 import {
   DESIGN_CASES,
   READING_CASES,
+  SWEEP_DROP_IDS,
   exactRoster,
   plainBadBreak,
-} from '../../prototypes/corridor/tools/vh-visual-contracts.mjs';
+} from './vh-visual-rosters.mjs';
 const readingRoster = JSON.parse(
-  readFileSync(
-    new URL('../../prototypes/corridor/tools/vh-reading-row-roster.json', import.meta.url),
-  ),
+  readFileSync(new URL('./vh-visual-reading-row-roster.json', import.meta.url)),
 );
 const engines = (value) => (value === 'all' ? ['chromium', 'webkit'] : [value || 'chromium']);
 const langs = ['bi', 'ja'];
@@ -160,6 +159,73 @@ function shelfControlHolds(r) {
     !r.unrelated.length
   );
 }
+const DRIFT = 'day-two-drop-order-drift';
+const prefixMatrix = (matrix, days, length) =>
+  !!matrix &&
+  typeof matrix === 'object' &&
+  matrix.prefixLength === length &&
+  equal(matrix.days, days) &&
+  Array.isArray(matrix.prefixes) &&
+  matrix.prefixes.length === 4 &&
+  matrix.prefixes.every((prefix) => idList(prefix) && prefix.length === length);
+const oneOrder = (prefixes) => prefixes.every((prefix) => equal(prefix, prefixes[0]));
+function dropOrderHolds(report, rows, days, engine, lang) {
+  const evidence = (Array.isArray(report.checks) ? report.checks : []).find(
+    (row) => row?.id === `S09/${engine} ${lang} · N`,
+  )?.evidence;
+  const length = evidence?.prefixLength;
+  if (length !== SWEEP_DROP_IDS.length || !prefixMatrix(evidence, days, length)) return false;
+  const own = rows.filter((r) => r.engine === engine && r.lang === lang);
+  const natural = days.map((day) => {
+    const seen = own.filter((r) => r.day === day).map((r) => r.baseline);
+    return seen.length > 0 && seen.every((ids) => idList(ids) && equal(ids, seen[0]))
+      ? seen[0].slice(0, length)
+      : null;
+  });
+  if (
+    !natural.every((prefix) => exactRoster(SWEEP_DROP_IDS, prefix)) ||
+    !equal(evidence.prefixes, natural) ||
+    evidence.passed !== true ||
+    !oneOrder(natural)
+  )
+    return false;
+  const moved = (r) =>
+    r.baseline.map((id, i) => (id === r.changed[i] ? -1 : i)).filter((i) => i >= 0);
+  if (
+    !own.every(
+      (r) => r.judged?.order !== false || (idList(r.changed) && moved(r).every((i) => i < length)),
+    )
+  )
+    return false;
+  const drift = own.filter((r) => r.id === DRIFT);
+  if (drift.length !== 1) return false;
+  const [r] = drift,
+    s09 = r.s09;
+  if (
+    r.day !== days[1] ||
+    !s09 ||
+    s09.prefixLength !== length ||
+    s09.dayIndex !== 1 ||
+    r.premise?.naturalBaseline !== true ||
+    !idList(r.changed) ||
+    !idList(r.restored)
+  )
+    return false;
+  const replaced = (ids) => natural.map((prefix, i) => (i === 1 ? ids.slice(0, length) : prefix));
+  const expected = { natural, mutant: replaced(r.changed), restored: replaced(r.restored) };
+  return (
+    Object.entries(expected).every(
+      ([key, prefixes]) =>
+        prefixMatrix(s09[key], days, length) &&
+        equal(s09[key].prefixes, prefixes) &&
+        s09[key].passed === (key !== 'mutant') &&
+        oneOrder(prefixes) === (key !== 'mutant'),
+    ) &&
+    equal(expected.restored, natural) &&
+    r.judged?.order === false &&
+    s09.mutant.passed === r.judged.order
+  );
+}
 const LEXICAL_WITNESS = 'inside an independently evidenced mixed-script word';
 const lineObservation = (o) =>
   !!o &&
@@ -284,6 +350,15 @@ function controls(report, kind, requiredEngines, require) {
       require(shelfControlHolds(
         r,
       ), 'Shelf mutation prerequisite, intended kill or byte restore missing');
+    for (const e of requiredEngines)
+      for (const lang of langs)
+        require(dropOrderHolds(
+          report,
+          rows,
+          days,
+          e,
+          lang,
+        ), 'S09 four-day order or its day-two drift control not reconstructed from the actual collection');
   } else if (kind === 'reading-truth') {
     const expected = requiredEngines.flatMap((e) =>
       ['aozora:000628#76', 'bunki-graded-n3-hashira-counter#242']

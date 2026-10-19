@@ -7,8 +7,15 @@ import {
   SWEEP_ROOMS,
   readingDataIds,
 } from './vh-visual-report-contracts.mjs';
-import { readFileSync } from 'node:fs';
-import { READING_CASES } from '../../prototypes/corridor/tools/vh-visual-contracts.mjs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
+import { URL, pathToFileURL } from 'node:url';
+import { READING_CASES, DESIGN_CASES, SWEEP_DROP_IDS } from './vh-visual-rosters.mjs';
+import {
+  shelfDropOrder,
+  shelfDriftControl,
+} from '../../prototypes/corridor/tools/vh-visual-contracts.mjs';
 const sha = 'a'.repeat(64),
   context = { artifactSha256: sha, verifierSha256: sha, runId: 'attempt-1' };
 const observedControls = JSON.parse(
@@ -20,12 +27,24 @@ const observedControls = JSON.parse(
   ),
 );
 const observedComb = (engine) => structuredClone(observedControls.engines[engine].comb);
-const observedShelf = (engine) =>
+const OBSERVED_DROP_LENGTH = 40;
+const observedDays = Object.keys(observedControls.shelves).sort();
+const observedNatural = () =>
+  observedDays.map((day) => ({ day, ids: [...observedControls.shelves[day]] }));
+const observedShelf = (engine, evaluate) =>
   observedControls.engines[engine].shelf.map(({ edits, ...row }) => {
     const baseline = [...observedControls.shelves[row.day]],
       changed = [...baseline];
     for (const [at, id] of edits) changed[at] = id;
-    return structuredClone({ ...row, baseline, changed, restored: [...baseline] });
+    const observed = structuredClone({ ...row, baseline, changed, restored: [...baseline] });
+    return row.id === 'day-two-drop-order-drift'
+      ? shelfDriftControl(
+          { ...observed, awaiting: 'S09' },
+          observedNatural(),
+          OBSERVED_DROP_LENGTH,
+          evaluate,
+        )
+      : observed;
   });
 function candidate(name) {
   const contract = visualReportContracts[name],
@@ -93,7 +112,15 @@ function candidate(name) {
         recordAfter: { v: 1, unknown: 'kept' },
       });
   } else {
-    report.checks = ids.map((id) => ({ id, pass: true }));
+    report.checks = ids.map((id) =>
+      /^S09\//u.test(id)
+        ? {
+            id,
+            pass: true,
+            evidence: shelfDropOrder(observedNatural(), OBSERVED_DROP_LENGTH),
+          }
+        : { id, pass: true },
+    );
     if (kind === 'comb-0') {
       report.engines = report.browserVersions;
       report.controls = observedComb(engine);
@@ -312,5 +339,302 @@ test('an explicit or declared sweep selector stays diagnostic, even KAIRO_SWEEP_
         false,
         `${name} ${JSON.stringify(env)}`,
       );
+  }
+});
+test('the observed four-day shelves share exactly the 40-card adjusted drop and rotate after it', () => {
+  const shelves = observedNatural().map(({ ids }) => ids);
+  assert.equal(shelves.length, 4);
+  const common = shelves[0].findIndex((id, i) => shelves.some((ids) => ids[i] !== id));
+  assert.equal(common, OBSERVED_DROP_LENGTH);
+  assert(shelves.every((ids) => ids.length > OBSERVED_DROP_LENGTH));
+});
+test('the reviewed full drop is exactly the canonical accepted hand-chosen content roster', () => {
+  const queue = JSON.parse(
+    readFileSync(new URL('../../docs/content/feed-review-queue.json', import.meta.url), 'utf8'),
+  );
+  const eligible = new Set(['original', 'aozora', 'gv', 'mext', 'govonline']);
+  const expected = queue
+    .filter((row) => eligible.has(row.kind) && row.decision !== 'rejected')
+    .map((row) => row.id)
+    .sort();
+  assert.equal(new Set(expected).size, expected.length);
+  assert.deepEqual([...SWEEP_DROP_IDS].sort(), expected);
+});
+const S09_REJECTION =
+  'S09 four-day order or its day-two drift control not reconstructed from the actual collection';
+const alwaysGreen = (shelves, length) => ({ ...shelfDropOrder(shelves, length), passed: true });
+const s09Row = (r, lang = 'bi') =>
+  r.checks.find((row) => row.id === `S09/${r.engines[0]} ${lang} · N`);
+const driftRows = (r) => r.controls.filter((row) => row.id === 'day-two-drop-order-drift');
+test('S09 cannot certify a consistently shortened prefix that still includes every control mutation', () => {
+  for (const name of ['sweep', 'sweep-webkit']) {
+    for (const length of [17, 39]) {
+      const report = candidate(name);
+      for (const lang of ['bi', 'ja']) {
+        s09Row(report, lang).evidence = shelfDropOrder(observedNatural(), length);
+        for (const drift of driftRows(report).filter((row) => row.lang === lang)) {
+          Object.assign(
+            drift,
+            shelfDriftControl({ ...drift, awaiting: 'S09' }, observedNatural(), length),
+          );
+        }
+      }
+      const verdict = validateVisualReport(name, report, context);
+      assert.equal(verdict.passed, false, `${name}: omitted ${40 - length} drop articles`);
+      assert(verdict.errors.includes(S09_REJECTION));
+    }
+  }
+});
+test('S09 rejects a full-length consistently substituted drop member', () => {
+  for (const name of ['sweep', 'sweep-webkit']) {
+    const report = candidate(name);
+    // Substitute an untouched tail member everywhere, so all prior order and control
+    // consistency checks still agree. Independent membership must catch it.
+    const expectedId = observedNatural()[0].ids[39];
+    const substitute = (value) => {
+      if (value === expectedId) return 'foreign-unreviewed-drop-member';
+      if (Array.isArray(value)) return value.map(substitute);
+      if (value && typeof value === 'object')
+        return Object.fromEntries(
+          Object.entries(value).map(([key, item]) => [key, substitute(item)]),
+        );
+      return value;
+    };
+    const verdict = validateVisualReport(name, substitute(report), context);
+    assert.equal(verdict.passed, false);
+    assert(verdict.errors.includes(S09_REJECTION));
+  }
+});
+const swapPrefix = (ids) => {
+  const next = [...ids];
+  [next[0], next[2]] = [next[2], next[0]];
+  return next;
+};
+for (const name of ['sweep', 'sweep-webkit'])
+  test(`${name}: S09 and its day-two drift control are re-judged from the actual four-day collection`, () => {
+    const original = candidate(name);
+    assert.deepEqual(validateVisualReport(name, original, context).errors, []);
+    const forgeries = {
+      'S09 raw prefixes missing': (r) => {
+        delete s09Row(r).evidence;
+      },
+      'S09 matrix missing a day': (r) => {
+        const evidence = s09Row(r).evidence;
+        evidence.days.pop();
+        evidence.prefixes.pop();
+      },
+      'S09 matrix duplicates a day': (r) => {
+        const evidence = s09Row(r).evidence;
+        evidence.days[2] = evidence.days[1];
+      },
+      'S09 matrix holds day one only': (r) => {
+        const evidence = s09Row(r).evidence;
+        evidence.days = evidence.days.slice(0, 1);
+        evidence.prefixes = evidence.prefixes.slice(0, 1);
+      },
+      'S09 prefix length shrunk to one card': (r) => {
+        const evidence = s09Row(r).evidence;
+        evidence.prefixLength = 1;
+        evidence.prefixes = evidence.prefixes.map((prefix) => prefix.slice(0, 1));
+      },
+      'S09 and its drift control consistently judged on a prefix shorter than the observed order kills':
+        (r) => {
+          s09Row(r).evidence = shelfDropOrder(observedNatural(), 4);
+          for (const drift of driftRows(r).filter((row) => row.lang === 'bi'))
+            Object.assign(
+              drift,
+              shelfDriftControl({ ...drift, awaiting: 'S09' }, observedNatural(), 4),
+            );
+        },
+      'S09 prefixes disagree with the observed day-three shelf': (r) => {
+        const evidence = s09Row(r).evidence;
+        evidence.prefixes[2] = swapPrefix(evidence.prefixes[2]);
+      },
+      'an always-green S09 passes a real day-three drift': (r) => {
+        const natural = observedNatural().map((shelf, i) =>
+          i === 2 ? { ...shelf, ids: swapPrefix(shelf.ids) } : shelf,
+        );
+        for (const row of r.controls)
+          if (row.lang === 'bi' && row.day === observedDays[2])
+            for (const key of ['baseline', 'changed', 'restored']) row[key] = swapPrefix(row[key]);
+        s09Row(r).evidence = alwaysGreen(natural, OBSERVED_DROP_LENGTH);
+        const drift = driftRows(r).find((row) => row.lang === 'bi');
+        const forged = shelfDriftControl(
+          { ...drift, awaiting: 'S09' },
+          natural,
+          OBSERVED_DROP_LENGTH,
+          alwaysGreen,
+        );
+        Object.assign(drift, forged, {
+          passed: true,
+          failures: ['order'],
+          judged: { ...forged.judged, order: false },
+          s09: { ...forged.s09, mutant: { ...forged.s09.mutant, passed: false } },
+        });
+      },
+      'drift control judged by an always-green S09 evaluator': (r) => {
+        for (const drift of driftRows(r))
+          Object.assign(
+            drift,
+            shelfDriftControl(
+              { ...drift, awaiting: 'S09' },
+              observedNatural(),
+              OBSERVED_DROP_LENGTH,
+              alwaysGreen,
+            ),
+          );
+      },
+      'always-green drift relabelled as a kill': (r) => {
+        const drift = driftRows(r)[0];
+        const forged = shelfDriftControl(
+          { ...drift, awaiting: 'S09' },
+          observedNatural(),
+          OBSERVED_DROP_LENGTH,
+          alwaysGreen,
+        );
+        Object.assign(drift, forged, {
+          passed: true,
+          failures: ['order'],
+          judged: { ...forged.judged, order: false },
+        });
+      },
+      'mutant four-day set never replaced day two': (r) => {
+        const drift = driftRows(r)[0];
+        drift.s09.mutant.prefixes = structuredClone(drift.s09.natural.prefixes);
+      },
+      'mutant replaced day three instead of day two': (r) => {
+        const drift = driftRows(r)[0],
+          prefixes = drift.s09.mutant.prefixes;
+        [prefixes[1], prefixes[2]] = [prefixes[2], prefixes[1]];
+      },
+      'restored four-day set is not the actual collection': (r) => {
+        const drift = driftRows(r)[0];
+        drift.s09.restored.prefixes[3] = swapPrefix(drift.s09.restored.prefixes[3]);
+      },
+      'natural four-day set is not the actual collection': (r) => {
+        const drift = driftRows(r)[0];
+        drift.s09.natural.prefixes[0] = swapPrefix(drift.s09.natural.prefixes[0]);
+      },
+      'drift S09 triplet missing': (r) => {
+        delete driftRows(r)[0].s09;
+      },
+      'drift natural matrix holds day one only': (r) => {
+        const natural = driftRows(r)[0].s09.natural;
+        natural.days = natural.days.slice(0, 1);
+        natural.prefixes = natural.prefixes.slice(0, 1);
+      },
+      'drift evaluated on another day index': (r) => {
+        driftRows(r)[0].s09.dayIndex = 0;
+      },
+      'drift baseline not the natural day-two shelf': (r) => {
+        driftRows(r)[0].premise.naturalBaseline = false;
+      },
+      'drift order kill not taken from the mutant S09 result': (r) => {
+        driftRows(r)[0].s09.mutant.passed = 'false';
+      },
+      'control baselines of one day disagree': (r) => {
+        const row = r.controls.find(
+          (control) =>
+            control.lang === 'ja' &&
+            control.day === observedDays[3] &&
+            control.id === 'drop-duplicate-hides-omission',
+        );
+        const at = row.baseline.length - 1;
+        [row.baseline[at], row.baseline[at - 1]] = [row.baseline[at - 1], row.baseline[at]];
+        row.changed = [...row.baseline];
+        row.changed[3] = row.baseline[1];
+        row.restored = [...row.baseline];
+      },
+      'second drift row on the same engine and language': (r) => {
+        r.controls.push(structuredClone(driftRows(r)[0]));
+      },
+    };
+    for (const [label, mutate] of Object.entries(forgeries)) {
+      const r = structuredClone(original);
+      mutate(r);
+      const judged = validateVisualReport(name, r, context);
+      assert.equal(judged.passed, false, label);
+      assert(judged.errors.includes(S09_REJECTION), label);
+    }
+  });
+test('a mutated producer roster, comparator or line-break oracle cannot shrink visual admission', async () => {
+  const output = process.env.RUNNER_TEMP || join(homedir(), '.dharma', 'bunki', 'test-fixtures');
+  mkdirSync(output, { recursive: true });
+  const root = mkdtempSync(join(output, 'visual-admission-'));
+  try {
+    const ci = join(root, 'scripts', 'ci'),
+      tools = join(root, 'prototypes', 'corridor', 'tools');
+    mkdirSync(ci, { recursive: true });
+    mkdirSync(tools, { recursive: true });
+    for (const name of [
+      'vh-visual-report-contracts.mjs',
+      'vh-visual-rosters.mjs',
+      'vh-visual-reading-row-roster.json',
+    ])
+      writeFileSync(join(ci, name), readFileSync(new URL(name, import.meta.url)));
+    const producer = new URL(
+      '../../prototypes/corridor/tools/vh-visual-contracts.mjs',
+      import.meta.url,
+    ).href;
+    writeFileSync(
+      join(tools, 'vh-visual-contracts.mjs'),
+      `import * as real from ${JSON.stringify(producer)};\n` +
+        `export * from ${JSON.stringify(producer)};\n` +
+        `export const DESIGN_CASES = Object.freeze(real.DESIGN_CASES.filter((id) => id !== 'G9-japanese-line-breaks-320'));\n` +
+        `export const READING_CASES = Object.freeze(real.READING_CASES.filter((id) => id !== 'special'));\n` +
+        `export const exactRoster = () => true;\n` +
+        `export const plainBadBreak = () => '';\n`,
+    );
+    const roster = JSON.parse(
+      readFileSync(
+        new URL('../../prototypes/corridor/tools/vh-reading-row-roster.json', import.meta.url),
+      ),
+    );
+    delete roster.cases.special;
+    roster.cases.reader = roster.cases.reader.filter((id) => id !== 'reader.page-errors');
+    roster.captureWithR2 = [];
+    writeFileSync(join(tools, 'vh-reading-row-roster.json'), JSON.stringify(roster));
+    const mutated = await import(pathToFileURL(join(tools, 'vh-visual-contracts.mjs')).href);
+    assert.equal(mutated.DESIGN_CASES.length, 49);
+    assert.equal(mutated.exactRoster(['a'], []), true);
+    assert.equal(mutated.plainBadBreak('サボる', 2), '');
+    const altered = await import(pathToFileURL(join(ci, 'vh-visual-report-contracts.mjs')).href);
+    assert.equal(altered.visualReportContracts['design-reader-shelf'].expectedCases().length, 50);
+    assert(
+      altered.visualReportContracts['design-reader-shelf']
+        .expectedCases()
+        .includes('chromium/G9-japanese-line-breaks-320'),
+    );
+    assert.equal(altered.visualReportContracts['reading-truth'].expectedCases().length, 120);
+    assert.deepEqual(
+      altered.visualReportContracts['reading-truth'].expectedCases(),
+      visualReportContracts['reading-truth'].expectedCases(),
+    );
+    for (const name of Object.keys(visualReportContracts)) {
+      const report = candidate(name);
+      assert.equal(altered.validateVisualReport(name, report, context).passed, true, name);
+    }
+    const design = candidate('design-reader-shelf');
+    design.results = design.results.filter((row) => row.name !== 'G9-japanese-line-breaks-320');
+    assert.equal(
+      altered.validateVisualReport('design-reader-shelf', design, context).passed,
+      false,
+    );
+    const duplicate = candidate('design-reader-shelf');
+    duplicate.results[1] = structuredClone(duplicate.results[0]);
+    assert.equal(
+      altered.validateVisualReport('design-reader-shelf', duplicate, context).passed,
+      false,
+    );
+    const reading = candidate('reading-truth');
+    reading.rows = reading.rows.filter((row) => row.id !== 'reader.page-errors');
+    reading.observedCases = reading.observedCases.filter((id) => !id.endsWith('/special'));
+    assert.equal(altered.validateVisualReport('reading-truth', reading, context).passed, false);
+    const comb = candidate('comb-0');
+    comb.controls[0].candidate.breaks = [2];
+    assert.equal(altered.validateVisualReport('comb-0', comb, context).passed, false);
+    assert.equal(DESIGN_CASES.length, 50);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
   }
 });

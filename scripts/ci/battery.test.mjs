@@ -1,4 +1,4 @@
-import { syntheticEvidence } from './test-evidence-fixture.mjs';
+import { syntheticEvidence, syntheticProof } from './test-evidence-fixture.mjs';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
@@ -164,10 +164,10 @@ test('budgeted deterministic partition covers every original and supplemental ga
   // 145 with the one-hand integration (FINDINGS M-2): F's type-ruby and continuity, R3's
   // sense-truth and the whole word grammar (G1–G6) with its controls, each of the last two
   // one gate per engine.
-  assert.equal(f.plan.batteryNames.length, 166);
+  assert.equal(f.plan.batteryNames.length, 167);
   // 157 since 1.2.0 added the places-layout gate (the layout under test), 161 with V's four,
   // 167 with the one-hand integration's six
-  assert.equal(f.plan.requiredNames.length, 188);
+  assert.equal(f.plan.requiredNames.length, 189);
   assert(
     f.plan.shards.filter((s) => s.id.startsWith('balanced-')).length > 10,
     'Actual execution ceilings require deterministic overflow lanes beyond the original ten',
@@ -200,7 +200,7 @@ test('complete successful evidence promotes full proof and unified summary', () 
   const f = fixture();
   const result = aggregate(f);
   assert.equal(result.kind, 'bunki-full-battery');
-  assert.equal(result.gates.length, 188);
+  assert.equal(result.gates.length, 189);
   assert.match(summary(result), /Slowest ten/);
 });
 const mutations = {
@@ -259,6 +259,72 @@ test('failed gate is eligible once, fresh passing retry is loud FLAKY with both 
   assert.equal(row.attempts.length, 2);
   assert.equal(result.flakes.length, 1);
   assert.match(summary(result), /FLAKY/);
+});
+const transported = {
+  'undefined proof kind': ['typecheck', (p) => delete p.kind],
+  'generic retained-report proof for a compiler check': [
+    'typecheck',
+    () => ({ kind: 'retained-report', obligation: { synthetic: true } }),
+  ],
+  'generic retained-report proof for a framework gate': [
+    'vitest',
+    () => ({ kind: 'retained-report', obligation: { synthetic: true } }),
+  ],
+  'foreign framework roster': ['export', () => syntheticProof('replay')],
+  'self-consistent reduced framework roster': [
+    'vitest',
+    (p) => {
+      p.obligation.files.pop();
+      p.obligation.filesSha256 = digest(JSON.stringify(p.obligation.files));
+    },
+  ],
+  'foreign retained-report type': ['shelf-search', (p) => (p.obligation.type = 'drift')],
+  'adapter obligation of another gate': ['corridor-build', (p) => (p.obligation.adapter = 'skip')],
+  'command-check obligation without its declared inputs': [
+    'lint',
+    (p) => (p.obligation.inputs = p.obligation.inputs.slice(1)),
+  ],
+  'command-check obligation for another command': [
+    'typecheck',
+    (p) => (p.obligation.command = 'true'),
+  ],
+  'command-check obligation for another npm script': [
+    'typecheck',
+    (p) => (p.obligation.args = ['run', 'lint']),
+  ],
+  'standalone command-check obligation with a relative output': [
+    'standalone-build',
+    (p) => (p.obligation.args[1] = 'relative-output'),
+  ],
+  'extra obligation field': ['lint', (p) => (p.obligation.synthetic = true)],
+  'node-test files of another gate': [
+    'skip-core',
+    (p) => (p.obligation.files = syntheticProof('kanji-capture').obligation.files),
+  ],
+  'process-probe proof': ['skip-core', () => ({ kind: 'process-probe', obligation: {} })],
+};
+test('shard admission derives the transported proof kind and obligation shape from the planned gate', () => {
+  aggregate(fixture());
+  for (const [label, [name, mutate]] of Object.entries(transported)) {
+    const f = fixture();
+    const receipt = f.receipts.find((r) => r.gates.some((g) => g.name === name));
+    const index = receipt.gates.findIndex((g) => g.name === name);
+    const proof = syntheticProof(name);
+    const mutation = mutate(proof);
+    const replaced =
+      mutation && typeof mutation === 'object' && !Array.isArray(mutation) ? mutation : proof;
+    if (replaced.kind === undefined) delete replaced.kind;
+    receipt.gates[index] = {
+      ...receipt.gates[index],
+      ...syntheticEvidence(name, identity.sha, artifact.artifactSha256, replaced),
+    };
+    assert.throws(() => aggregate(f), /Transported|transported|Foreign|Test-only/u, label);
+    assert.throws(
+      () => createRetryPlan(f.plan, f.receipts, f.artifact, undefined, 'all'),
+      /Transported|transported|Foreign|Test-only/u,
+      label,
+    );
+  }
 });
 test('no retry after failure rejects', () =>
   assert.throws(() => aggregate(failedFixture()), /Missing\/extra retries/));
@@ -923,11 +989,11 @@ function rehash(value, key) {
   value[key] = digest(body);
   return value;
 }
-test('scheduling budgets bind all 188 actual descriptor ceilings and normalized workflow caps', () => {
+test('scheduling budgets bind all 189 actual descriptor ceilings and normalized workflow caps', () => {
   const plan = createPlan({ identity });
   const descriptors = [...batteryGates('/unused', {}), ...supplementalGates('/unused')];
-  assert.equal(plan.requiredNames.length, 188);
-  assert.equal(new Set(plan.shards.flatMap((s) => s.gates)).size, 188);
+  assert.equal(plan.requiredNames.length, 189);
+  assert.equal(new Set(plan.shards.flatMap((s) => s.gates)).size, 189);
   assert.equal(validateWorkflowSchedule(workflow(), budgetLanes(plan.shards)), true);
   for (const shard of plan.shards) {
     const expected = shard.gates.map((name) => ({

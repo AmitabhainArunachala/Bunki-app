@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync, existsSync, statSync, lstatSync } from 'node:fs';
+import { readFileSync, existsSync, statSync, lstatSync, realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
@@ -30,6 +30,7 @@ export const NARROWING_ENV = Object.freeze([
   'SPEAK_RUN_PHASE',
   'GUIDED_FAULT',
   'GUIDED_STANDALONE',
+  'D23_ASSESSMENT_STAGE',
   'KAIRO_QUESTION_VIEW_CASES',
   'KAIRO_QUESTION_STAGED_SOURCE',
   'KAIRO_EXPECT_SOURCE_LOSS',
@@ -109,6 +110,10 @@ export function sourceSnapshot(root) {
     });
   let head;
   try {
+    // A disposable fixture directory can sit inside an unrelated ancestor checkout.
+    // Only the checkout rooted at the supplied path can supply its source identity.
+    if (realpathSync(git('rev-parse', '--show-toplevel').trim()) !== realpathSync(root))
+      return null;
     head = git('rev-parse', 'HEAD').trim();
   } catch {
     return null;

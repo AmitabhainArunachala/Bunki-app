@@ -14,12 +14,14 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   ASSESSMENT_CASES,
+  ASSESSMENT_CORE_MODULE_INPUTS,
   ASSESSMENT_SOURCE_INPUTS,
   assessmentReportContracts,
   validateAssessmentReport,
 } from './vh-assessment-report-contracts.mjs';
 import { validateGateEvidence } from './gate-evidence.mjs';
 import { digest } from './verification-admission.mjs';
+import { buildCorridorModules } from '../build-reading-module.mjs';
 const workspace = mkdtempSync(join(tmpdir(), 'vh-assessment-workspace-'));
 const driverFile = join(workspace, 'node_modules/playwright-core/index.mjs');
 mkdirSync(dirname(driverFile), { recursive: true });
@@ -51,9 +53,13 @@ const sha = 'a'.repeat(64),
         'assessment-question-practice.mjs',
         'assessment-question-view.mjs',
         'corridor.css',
+        'assessment-controller.mjs',
+        ...Object.keys(ASSESSMENT_CORE_MODULE_INPUTS),
       ].map((path) => [path, sha]),
     ),
   };
+const coreInputs = (module) =>
+  ASSESSMENT_CORE_MODULE_INPUTS[module].map((path) => ({ path, sha256: sha }));
 function fixture(name) {
   const c = assessmentReportContracts[name],
     producer = c.producer.match(/verify-(.*)\.mjs$/u)[1],
@@ -84,7 +90,8 @@ function fixture(name) {
       format: 'kairo-assessment-v2-controller-verification',
       controllerSha256: sha,
       coreSha256: sha,
-      inputs: [{ path: 'assessment.ts', sha256: sha }],
+      compiler: { name: 'esbuild', version: '0.28.2' },
+      inputs: coreInputs('modules/assessment-core.mjs'),
     });
   if (producer === 'assessment-learning')
     Object.assign(r, { checks: ASSESSMENT_CASES[producer], status: 'passed', count: rows.length });
@@ -211,9 +218,19 @@ function fixture(name) {
     Object.assign(r, {
       format: 'kairo-assessment-controller-verification',
       currentInputDifferences: [],
-      source: { sha256: sha },
-      core: { sha256: sha },
-      modules: [{ sha256: sha }],
+      sourceArtifact: { path: '/site', artifactSha256: sha },
+      source: { path: '../site/assessment-controller.mjs', sha256: sha },
+      fixture: { path: 'prototypes/corridor/data/mock/sets/n5-01.json', sha256: sha },
+      core: {
+        path: 'modules/assessment-core.mjs',
+        sha256: sha,
+        inputs: coreInputs('modules/assessment-core.mjs'),
+      },
+      modules: Object.keys(ASSESSMENT_CORE_MODULE_INPUTS).map((path) => ({
+        path,
+        sha256: sha,
+        inputs: coreInputs(path),
+      })),
       stress: {
         attempts: 500,
         itemsPerAttempt: 18,
@@ -598,4 +615,245 @@ test('personal reading admits only the workspace playwright-core driver', () => 
     ).passed,
     false,
   );
+});
+
+const repo = fileURLToPath(new globalThis.URL('../..', import.meta.url));
+const CONTROLLER_SOURCES = {
+  'assessment-v2-controller': ['prototypes/corridor/assessment-v2-controller.mjs'],
+  'assessment-controller': [
+    'prototypes/corridor/assessment-controller.mjs',
+    'prototypes/corridor/data/mock/sets/n5-01.json',
+  ],
+};
+test('reviewed compiled-core input obligations equal the actual production build inputs', () => {
+  const built = buildCorridorModules(repo);
+  assert.deepEqual(
+    Object.keys(ASSESSMENT_CORE_MODULE_INPUTS).sort(),
+    built.map((module) => module.path).sort(),
+  );
+  for (const module of built)
+    assert.deepEqual(
+      [...ASSESSMENT_CORE_MODULE_INPUTS[module.path]].sort(),
+      module.inputs.map((row) => row.path).sort(),
+      module.path,
+    );
+  assert.deepEqual(
+    [...ASSESSMENT_SOURCE_INPUTS['assessment-v2-controller']].sort(),
+    [
+      ...CONTROLLER_SOURCES['assessment-v2-controller'],
+      ...ASSESSMENT_CORE_MODULE_INPUTS['modules/assessment-core.mjs'],
+    ].sort(),
+  );
+  assert.deepEqual(
+    [...ASSESSMENT_SOURCE_INPUTS['assessment-controller']].sort(),
+    [
+      ...new Set([
+        ...CONTROLLER_SOURCES['assessment-controller'],
+        ...Object.values(ASSESSMENT_CORE_MODULE_INPUTS).flat(),
+      ]),
+    ].sort(),
+  );
+});
+const builtModules = buildCorridorModules(repo);
+const controllerRoot = mkdtempSync(join(tmpdir(), 'vh-controller-root-'));
+for (const file of new Set([
+  ...Object.values(CONTROLLER_SOURCES).flat(),
+  ...['assessment-v2-controller', 'assessment-controller'].map(
+    (name) => assessmentReportContracts[name].producer,
+  ),
+  ...builtModules.flatMap((module) => module.inputs.map((row) => row.path)),
+])) {
+  mkdirSync(dirname(join(controllerRoot, file)), { recursive: true });
+  copyFileSync(join(repo, file), join(controllerRoot, file));
+}
+function admitObservedController(name, { pinned = true, receipt: edit = () => {}, change } = {}) {
+  const root = controllerRoot;
+  const producer = assessmentReportContracts[name].producer;
+  const hash = (file) => digest(readFileSync(join(root, file)));
+  const inputs = (module) =>
+    module.inputs.map((row) => ({ path: row.path, sha256: hash(row.path) }));
+  const core = builtModules.find((module) => module.path === 'modules/assessment-core.mjs');
+  const { layout, report, artifactSha256 } = observed[name];
+  const receipt = structuredClone(report);
+  if (name === 'assessment-v2-controller')
+    Object.assign(receipt, {
+      controllerSha256: hash(CONTROLLER_SOURCES[name][0]),
+      coreSha256: digest(core.bytes),
+      inputs: inputs(core),
+    });
+  else {
+    const modules = builtModules.map((module) => ({
+      path: module.path,
+      sha256: digest(module.bytes),
+      bytes: module.bytes.length,
+      compiler: module.compiler,
+      inputs: inputs(module),
+    }));
+    Object.assign(receipt, {
+      sourceArtifact: pinned ? { path: '/pinned-site', artifactSha256 } : null,
+      source: {
+        path: pinned
+          ? '../pinned-site/assessment-controller.mjs'
+          : 'prototypes/corridor/assessment-controller.mjs',
+        sha256: hash('prototypes/corridor/assessment-controller.mjs'),
+      },
+      fixture: { ...report.fixture, sha256: hash(report.fixture.path) },
+      core: { ...report.core, sha256: digest(core.bytes), inputs: inputs(core) },
+      modules,
+    });
+  }
+  edit(receipt);
+  const out = mkdtempSync(join(tmpdir(), 'vh-controller-out-'));
+  const dir = layout.run ? join(out, name, layout.run) : join(out, name);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, layout.receipt), JSON.stringify(receipt));
+  const original = change && readFileSync(join(root, change));
+  if (change) appendFileSync(join(root, change), '\n');
+  try {
+    return validateGateEvidence(
+      { name, args: [producer], requiredPath: producer },
+      { kind: 'adapter', name },
+      {
+        root,
+        out,
+        startedAt: new Date(Date.now() - 60_000).toISOString(),
+        runId: 'observed-attempt',
+        engine: 'chromium',
+        ...(name === 'assessment-controller' && pinned
+          ? {
+              artifactSha256,
+              runtimeFiles: [
+                {
+                  path: 'assessment-controller.mjs',
+                  sha256: hash('prototypes/corridor/assessment-controller.mjs'),
+                },
+                ...builtModules.map((module) => ({
+                  path: module.path,
+                  sha256: digest(module.bytes),
+                })),
+              ],
+            }
+          : {}),
+      },
+    );
+  } finally {
+    if (change) writeFileSync(join(root, change), original);
+  }
+}
+const OTHER = 'f'.repeat(64);
+const firstInput = (receipt) =>
+  receipt.inputs || receipt.modules.find((m) => m.path === 'modules/assessment-core.mjs').inputs;
+test('observed controller receipts pass the real consumer only while every declared source is the runner-hashed one', () => {
+  for (const [name, options] of [
+    ['assessment-v2-controller', {}],
+    ['assessment-controller', { pinned: true }],
+    ['assessment-controller', { pinned: false }],
+  ]) {
+    const admitted = admitObservedController(name, options);
+    assert.deepEqual(
+      [...admitted.obligation.observedCases].sort(),
+      ASSESSMENT_CASES[name].map((row) => `node/${row}`).sort(),
+    );
+    const label = `${name}${options.pinned === false ? ' (source mode)' : ''}`;
+    for (const [what, edit] of [
+      ['wrong input digest', (r) => (firstInput(r)[0].sha256 = OTHER)],
+      ['digest-shaped garbage input', (r) => (firstInput(r)[3].sha256 = 'a'.repeat(64))],
+      ['missing input', (r) => firstInput(r).splice(1, 1)],
+      ['duplicate input', (r) => firstInput(r).push({ ...firstInput(r)[0] })],
+      [
+        'extra unknown input',
+        (r) => firstInput(r).push({ path: 'packages/assessment/src/unknown.ts', sha256: OTHER }),
+      ],
+      [
+        'wrong controller digest',
+        (r) =>
+          name === 'assessment-v2-controller'
+            ? (r.controllerSha256 = OTHER)
+            : (r.source.sha256 = OTHER),
+      ],
+    ])
+      assert.throws(
+        () => admitObservedController(name, { ...options, receipt: edit }),
+        /source|input|Compiled|core/u,
+        `${label}: ${what}`,
+      );
+    for (const file of [
+      ...CONTROLLER_SOURCES[name],
+      'packages/assessment/src/attempt-v2.ts',
+      'packages/assessment/node_modules/zod/v4/core/core.js',
+      'package-lock.json',
+    ])
+      assert.throws(
+        () =>
+          admitObservedController(name, {
+            ...options,
+            change: file,
+          }),
+        /source|input|fixture/u,
+        `${label}: changed ${file}`,
+      );
+  }
+  for (const [what, edit] of [
+    ['wrong fixture digest', (r) => (r.fixture.sha256 = OTHER)],
+    [
+      'wrong fixture path',
+      (r) => (r.fixture.path = 'prototypes/corridor/data/mock/sets/n5-02.json'),
+    ],
+    ['missing module', (r) => r.modules.pop()],
+    ['wrong module digest', (r) => (r.modules[0].sha256 = OTHER)],
+    [
+      'shared input dropped from one module while another still declares it',
+      (r) => {
+        const learning = r.modules.find((m) => m.path === 'modules/learning-core.mjs');
+        learning.inputs = learning.inputs.filter((row) => row.path !== 'package.json');
+      },
+    ],
+    ['core differs from staged module', (r) => (r.core.sha256 = r.modules[0].sha256)],
+    ['source-mode receipt under a pinned artifact', (r) => (r.sourceArtifact = null)],
+    ['foreign artifact', (r) => (r.sourceArtifact.artifactSha256 = OTHER)],
+  ])
+    assert.throws(
+      () => admitObservedController('assessment-controller', { receipt: edit }),
+      /fixture|module|artifact|core|Compiled|source/u,
+      what,
+    );
+  assert.throws(
+    () =>
+      admitObservedController('assessment-controller', {
+        pinned: false,
+        receipt: (r) => (r.sourceArtifact = { path: '/site', artifactSha256: OTHER }),
+      }),
+    /artifact|mode/u,
+  );
+});
+test('controller source binding needs the runner digests: missing or changed sourceFiles never accept', () => {
+  for (const name of ['assessment-v2-controller', 'assessment-controller']) {
+    const good = fixture(name);
+    assert.deepEqual(validateAssessmentReport(name, good, context).errors, []);
+    assert.equal(
+      validateAssessmentReport(name, good, { ...context, sourceFiles: undefined }).passed,
+      false,
+    );
+    for (const path of [
+      ASSESSMENT_SOURCE_INPUTS[name][0],
+      ASSESSMENT_SOURCE_INPUTS[name].at(-1),
+      'packages/assessment/src/index.ts',
+    ]) {
+      const unpinned = { ...context.sourceFiles };
+      delete unpinned[path];
+      assert.equal(
+        validateAssessmentReport(name, good, { ...context, sourceFiles: unpinned }).passed,
+        false,
+        `${name}: unpinned ${path}`,
+      );
+      assert.equal(
+        validateAssessmentReport(name, good, {
+          ...context,
+          sourceFiles: { ...context.sourceFiles, [path]: OTHER },
+        }).passed,
+        false,
+        `${name}: changed ${path}`,
+      );
+    }
+  }
 });

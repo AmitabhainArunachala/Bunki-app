@@ -3,6 +3,7 @@
 import { URL } from 'node:url';
 import assert from 'node:assert/strict';
 import console from 'node:console';
+import { randomUUID } from 'node:crypto';
 import process from 'node:process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -15,6 +16,8 @@ import { openShelfTools } from '../prototypes/corridor/tools/shelf-tools-support
 const out = resolveCorridorEvidence();
 mkdirSync(out, { recursive: true });
 const host = await startCorridorDev(0);
+const identity = JSON.parse(readFileSync(join(host.site, 'build-identity.json'), 'utf8'));
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
 const checks = [];
 const diagnostics = [];
 const releaseVersion = JSON.parse(
@@ -447,7 +450,20 @@ try {
 } finally {
   writeFileSync(
     join(out, 'foundation.json'),
-    `${JSON.stringify({ checks, horizontalSamples, diagnostics, browserVersions }, null, 2)}\n`,
+    `${JSON.stringify(
+      {
+        site: host.site,
+        runId,
+        artifactSha256: identity.artifactSha256,
+        gitSha: identity.gitSha,
+        checks,
+        horizontalSamples,
+        diagnostics,
+        browserVersions,
+      },
+      null,
+      2,
+    )}\n`,
   );
   await host.close();
 }

@@ -72,6 +72,12 @@ export async function senseAttempts({ run, emit, history = [], onError = () => {
   }
 }
 
+const noExecutionFailure = row => !!row && typeof row === 'object' &&
+  !row.skip && !row.skipped && !row.unexecuted && !row.timedOut && !row.error && !row.harnessError &&
+  !['skip', 'skipped', 'not-run', 'error', 'timeout'].includes(row.status);
+const executedRow = row => noExecutionFailure(row) &&
+  (row.observed == null || typeof row.observed !== 'object' || noExecutionFailure(row.observed));
+
 export function speakCompletion({ engines, selected, cases, checks, error, pageErrors = [], fault = '', overlay = false }) {
   const requested = selected || SPEAK_CASE_IDS;
   const expectedCases = engines.flatMap((engine) => [...requested, ...(!selected ? ['egress'] : [])].map((id) => `${engine}/${id}`));
@@ -79,7 +85,8 @@ export function speakCompletion({ engines, selected, cases, checks, error, pageE
   const complete = exactRoster(expectedCases, observedCases) && cases.every((row) => row.completed === true && row.checks > 0)
     && checks.length > 0 && checks.every((row) => expectedCases.includes(`${row.engine}/${row.case}`))
     && cases.every((row) => checks.filter((check) => check.engine === row.engine && check.case === row.case).length === row.checks);
-  const selectedPassed = complete && !error && pageErrors.length === 0 && cases.every((row) => row.pass) && checks.every((row) => row.pass);
+  const selectedPassed = complete && !error && pageErrors.length === 0 && cases.every((row) => row.pass === true && executedRow(row))
+    && checks.every((row) => row.pass === true && executedRow(row));
   return { expectedCases, observedCases, complete, selectedPassed, fullAcceptance: selectedPassed && selected === null && !fault && !overlay };
 }
 
@@ -89,15 +96,16 @@ export function adjudicateSpeakPhase({ receipt, exit, signal, timedOut, nonce, e
   if (!receipt || !Array.isArray(receipt.checks) || !Array.isArray(receipt.cases) || !Array.isArray(receipt.pageErrors)
     || !receipt.checks.every(row => row && typeof row === 'object') || !receipt.cases.every(row => row && typeof row === 'object'))
     return { ok: false, clean: false, witnesses: [], unrelated: [], downstreamReds: [], status: 'not-run' };
-  const failures = receipt.checks.filter((row) => !row.pass);
+  const failures = receipt.checks.filter((row) => row.pass === false);
   const expected = cases.map((id) => `${engine}/${id}`);
   const clean = !!receipt && receipt.nonce === nonce && receipt.phase === (fault ? 'mutant' : receipt.phase)
     && receipt.fault === (fault || null) && receipt.artifactSha256 && receipt.verifierSha256
     && !receipt.error && !(receipt.pageErrors || []).length && !signal && !timedOut
     && exactRoster(expected, (receipt.cases || []).map((row) => `${row.engine}/${row.case}`))
-    && receipt.cases.every((row) => row.completed && row.checks > 0
+    && receipt.cases.every((row) => executedRow(row) && row.completed === true && typeof row.pass === 'boolean' && row.checks > 0
       && receipt.checks.filter((r) => r.engine === engine && r.case === row.case).length === row.checks)
-    && receipt.checks.every((row) => row.engine === engine && cases.includes(row.case));
+    && receipt.checks.every((row) => executedRow(row) && row.engine === engine && cases.includes(row.case)
+      && typeof row.name === 'string' && row.name.length > 0 && typeof row.pass === 'boolean');
   const intended = (row) => row.engine === engine && witness[row.case]?.test(row.name);
   const witnesses = cases.map((id) => ({ case: id, rows: failures.filter((row) => row.case === id && intended(row)).map((row) => row.name) }));
   const allowedDownstream = (row) => row.engine === engine && (downstream[row.case] || []).includes(row.name);
@@ -106,4 +114,46 @@ export function adjudicateSpeakPhase({ receipt, exit, signal, timedOut, nonce, e
   const ok = clean && (fault ? exit === 1 && witnesses.every((row) => row.rows.length > 0) && unrelated.length === 0
     : exit === 3 && receipt.selectedPassed === true && failures.length === 0);
   return { ok: !!ok, clean: !!clean, witnesses, unrelated, downstreamReds, status: !clean || unrelated.length ? 'not-run' : ok ? (fault ? 'caught' : 'passed') : 'missed' };
+}
+
+const SENSE_SENTINEL = 'VH wrong sense sentinel';
+function senseWitness(control, row) {
+  const detail = row?.observed?.detail;
+  if (!executedRow(row) || row.observed?.attempt !== 1 || !detail || typeof detail !== 'object' || Array.isArray(detail)
+    || detail.skip || detail.skipped || detail.unexecuted || detail.harnessError) return false;
+  if (control.id === 'discard-completed-red-on-retry') return row.id === control.row
+    ? detail.lines?.[0] === SENSE_SENTINEL
+    : row.id === `${control.row}.incomplete` && typeof detail.error === 'string' && detail.error.length > 0 && detail.stage === 'navigation';
+  if (['pronunciation-ta-promoted-to-door', 'pronunciation-n-promoted-to-door'].includes(control.id))
+    return row.id === control.row && detail.annotation === false && detail.interactive === true;
+  if (control.id === 'quoted-reading-demoted-to-annotation')
+    return [control.row, ...control.downstream].includes(row.id) && detail.annotation === true && detail.interactive === false;
+  return false;
+}
+/** One served Sense control phase: only exact false intended rows with their named witness kill, and every other
+ * semantic row must be exactly true. Malformed, surviving or stale evidence is a failed phase. */
+export function adjudicateSensePhase({ phase, control, engine, receipt, exit, signal, timedOut, error, runId, nonce, artifactSha256, verifierSha256 }) {
+  const rows = Array.isArray(receipt?.rows) && receipt.rows.every((row) => row && typeof row === 'object') ? receipt.rows : null;
+  const semantic = (rows || []).filter((row) => row.recorded !== true);
+  const typed = !!rows && rows.every((row) => row.recorded === true || !Object.hasOwn(row, 'recorded'))
+    && semantic.every((row) => executedRow(row) && typeof row.ok === 'boolean');
+  const reds = semantic.filter((row) => row.ok === false);
+  const attempts = Array.isArray(receipt?.attempts) ? receipt.attempts : [];
+  const fresh = !error && !timedOut && !signal && typed && receipt?.runId === runId && receipt?.nonce === nonce
+    && receipt?.artifactSha256 === artifactSha256 && receipt?.verifierSha256 === verifierSha256
+    && exactRoster([engine], receipt?.engines) && !receipt?.error && attempts.length === 1;
+  let ok = false;
+  if (phase === 'mutant') {
+    const witness = reds.find((row) => row.id === control.row && row.engine === engine);
+    const history = Array.isArray(attempts[0]?.history) ? attempts[0].history : [];
+    const intended = exactRoster([control.row, ...control.downstream], reds.map((row) => row.id)) && reds.every((row) => row.engine === engine && senseWitness(control, row))
+      && semantic.some((row) => row.id === 'g.page-errors' && row.ok === true) && !!witness
+      && Array.isArray(receipt?.vhMutations) && receipt.vhMutations.length > 0 && receipt.vhControl === control.id;
+    const completed = control.id === 'discard-completed-red-on-retry'
+      ? history.length === 1 && history[0]?.observations === 1 && history[0].retry === false && history[0].stage === 'navigation'
+        && witness?.observed?.detail?.lines?.[0] === SENSE_SENTINEL
+      : history.length === 1 && history[0]?.complete === true && receipt?.complete === true;
+    ok = fresh && exit === 1 && intended && completed;
+  } else ok = fresh && exit === 3 && receipt.selectedPassed === true && receipt.fullAcceptance === false && reds.length === 0;
+  return { ok: !!ok, fresh: !!fresh, reds: reds.map((row) => ({ id: row.id, observed: row.observed })), attempts };
 }

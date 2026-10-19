@@ -41,6 +41,23 @@ export function foldGeometryEqual(before, after) {
       t.id === b.tokens[j]?.id && near(t.left, b.tokens[j]?.left) && near(t.top, b.tokens[j]?.top));
   });
 }
+const observedObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+const completeFoldGeometry = geometry => Array.isArray(geometry) && geometry.length > 0 && geometry.every(p => observedObject(p) &&
+  typeof p.id === 'string' && Number.isFinite(p.top) && Number.isFinite(p.height) && Array.isArray(p.tokens) && p.tokens.length > 0 &&
+  p.tokens.every(t => observedObject(t) && typeof t.id === 'string' && Number.isFinite(t.left) && Number.isFinite(t.top)));
+const paragraphMovedBy = (moved, from, dy) => moved.id === from.id && moved.height === from.height && moved.top - from.top === dy &&
+  moved.tokens.length === from.tokens.length && moved.tokens.every((t, j) => t.id === from.tokens[j].id && t.left === from.tokens[j].left && t.top - from.tokens[j].top === dy);
+export function foldShiftBites({ plain, baseline, shifted, amount, direction }) {
+  if (!Number.isFinite(amount) || amount <= 0 || ![1, -1].includes(direction)) return false;
+  if (![plain, baseline, shifted].every(completeFoldGeometry) || !foldGeometryEqual(baseline, plain) || shifted.length !== baseline.length) return false;
+  if (direction !== (baseline[0].top >= plain[0].top ? 1 : -1)) return false;
+  return paragraphMovedBy(shifted[0], baseline[0], amount * direction) && shifted.every((p, i) => i === 0 || paragraphMovedBy(p, baseline[i], 0)) &&
+    !foldGeometryEqual(shifted, plain);
+}
+const hoverSide = side => observedObject(side) && side.hover === true && side.disabled === false && typeof side.background === 'string' && side.background.length > 0;
+export const sharedHoverDiverges = (mutant, baseline) => observedObject(mutant) && hoverSide(mutant.held) && hoverSide(mutant.peer) &&
+  mutant.held.background === 'rgb(255, 0, 255)' && mutant.peer.background !== mutant.held.background && hoverSide(baseline?.peer) &&
+  mutant.peer.background === baseline.peer.background;
 
 export const WG_WALKS = Object.freeze([
   'G3-stalled', 'G3-clear', 'G3-front', 'G3-sky-ownership', 'G3-ladder', 'G3-direct-and-anchor', 'G3-current-save', 'G3-kana',
@@ -75,11 +92,19 @@ export function exactRoster(expected, observed) {
     new Set(expected).size === expected.length && new Set(observed).size === observed.length &&
     expected.length === observed.length && [...expected].sort().every((v, i) => v === [...observed].sort()[i]);
 }
-const servedEdit = (control, kills, local = false) => Object.freeze({ kind: 'served-edit', control, kills: Object.freeze(kills), local });
+const servedEdit = (control, kills, local = false, schedule = null) => Object.freeze({ kind: 'served-edit', control, kills: Object.freeze(kills), local,
+  ...(schedule ? { schedule: Object.freeze([...schedule]), rows: Object.freeze([...schedule, 'errors', 'schedule']) } : {}) });
+const G6_REVERSE_SCHEDULE = ['setup.article-sentence', 'setup.sentence-word', 'setup.word-kanji', 'setup.kanji-part', 'reverse.part-kanji'];
+const G6_LINE_SCHEDULE = ['setup.article-shelf', 'setup.shelf-sky', 'setup.sky-shelf', 'setup.shelf-article', 'return.line'];
+const G6_PROVENANCE_SCHEDULE = ['kept.identity', 'kept.native-door', 'kept.source-provenance', 'kept.no-record-write', 'kept.list-only', 'kept.removed'];
 const G6_CONTROL_TARGETS = Object.freeze({
-  'missing-reverse': 'reverse.part-kanji', 'captured-text-pinch': 'text.two-pointer', 'lost-return-line': 'return.line',
-  'touchmove-cancel': 'text.two-pointer', 'late-bubble-pointer': 'text.native-two-pointer',
-  'touchmove-cancel-native': 'text.native-two-pointer', 'invented-fresh-source': 'kept.source-provenance',
+  'missing-reverse': { target: 'reverse.part-kanji', schedule: G6_REVERSE_SCHEDULE },
+  'captured-text-pinch': { target: 'text.two-pointer', schedule: ['text.two-pointer'] },
+  'lost-return-line': { target: 'return.line', schedule: G6_LINE_SCHEDULE },
+  'touchmove-cancel': { target: 'text.two-pointer', schedule: ['text.two-pointer'] },
+  'late-bubble-pointer': { target: 'text.native-two-pointer', schedule: ['text.native-two-pointer'] },
+  'touchmove-cancel-native': { target: 'text.native-two-pointer', schedule: ['text.native-two-pointer'] },
+  'invented-fresh-source': { target: 'kept.source-provenance', schedule: G6_PROVENANCE_SCHEDULE },
 });
 export const WG_CONTROL_EVIDENCE = Object.freeze({
   'G1.negative.page-capped': servedEdit('G1.page-capped', ['P1.viewport', 'P1.cap']),
@@ -105,8 +130,8 @@ export const WG_CONTROL_EVIDENCE = Object.freeze({
   'G5.negative.layer-stays-open': servedEdit('layer-stays-open', ['G5.layers.fold-paper']),
   'G5.negative.fold-shift-one-pixel': Object.freeze({ kind: 'fold-shift', control: 'fold-shift-one-pixel', amount: 1, candidate: 'G5.layers.bare-again' }),
   'G5.negative.fold-shift-one-quarter-over': Object.freeze({ kind: 'fold-shift', control: 'fold-shift-one-quarter-over', amount: 1.25, candidate: 'G5.layers.bare-again' }),
-  ...Object.fromEntries(['touch', 'keyboard'].flatMap(mode => Object.entries(G6_CONTROL_TARGETS).map(([id, target]) =>
-    [`G6.${mode}.negative.${id}`, servedEdit(`G6.${mode}.${id}`, [target], true)]))),
+  ...Object.fromEntries(['touch', 'keyboard'].flatMap(mode => Object.entries(G6_CONTROL_TARGETS).map(([id, { target, schedule }]) =>
+    [`G6.${mode}.negative.${id}`, servedEdit(`G6.${mode}.${id}`, [target], true, schedule)]))),
 });
 const HEX64 = /^[a-f0-9]{64}$/u;
 const sameIds = (a, b) => Array.isArray(a) && Array.isArray(b) && a.length > 0 && JSON.stringify(a.map(row => row?.id)) === JSON.stringify(b.map(row => row?.id));
@@ -129,7 +154,6 @@ function servedEditsExact(control, digests) {
   });
   return entriesExact && edits.every(edit => mutants.has(edit.file));
 }
-const observedObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const noDeclaredErrors = (value, required = false) => value === undefined ? !required : Array.isArray(value) && value.length === 0;
 const executedRow = row => row && !row.error && !row.setupError && row.harnessError == null &&
   !row.observed?.unexecuted && row.observed?.harnessError == null;
@@ -168,12 +192,34 @@ function nativeInputExecuted(observed) {
     Number.isFinite(inventory.pointerMoves) && inventory.pointerMoves > 0 && Number.isFinite(inventory.touchMoves) && inventory.touchMoves > 0 &&
     events.some(e => e.family === 'pointer' && e.type === 'pointermove') && events.some(e => e.family === 'touch' && e.type === 'touchmove');
 }
+function g6ScheduleWitnessed(spec, rows) {
+  const errors = rows.find(row => row.id === 'errors')?.observed, schedule = rows.find(row => row.id === 'schedule')?.observed;
+  return observedObject(errors) && sameValue(errors.pageErrors, []) && sameValue(errors.consoleErrors, []) && errors.diagnosticError === null &&
+    observedObject(schedule) && sameValue(schedule.expected, spec.schedule) && sameValue(schedule.actual, [...spec.schedule, 'errors']) && schedule.error === null;
+}
+function g6FaultAbsent(name, observed) {
+  switch (name) {
+    case 'missing-reverse': return observed.before?.scale === 'part' && observed.after?.scale === 'kanji' && observed.arrived === true;
+    case 'captured-text-pinch': return observed.faults?.textPinch === 0 && observed.events.every(e => e.type !== 'pointermove' || e.defaultPrevented === false);
+    case 'lost-return-line': return Number.isFinite(observed.delta) && observed.delta >= 0 && observed.delta <= 4 &&
+      samePresentFields(observed.origin, observed.current, ['index', 'para', 'label', 'word', 'printed', 'title']) && observed.current.connected === true;
+    case 'late-bubble-pointer': return observed.faults?.latePointer === 0 &&
+      observed.events.every(e => e.family !== 'pointer' || e.type !== 'pointermove' || e.defaultPrevented === false);
+    case 'touchmove-cancel': return observed.faults?.touchmove === 0 && observed.touch.events.every(e => e.type !== 'touchmove' || e.defaultPrevented === false);
+    case 'touchmove-cancel-native': return observed.faults?.touchmove === 0 &&
+      observed.events.every(e => e.family !== 'touch' || e.type !== 'touchmove' || e.defaultPrevented === false);
+    case 'invented-fresh-source': return observed.branch === 'no-ref' && observed.counts?.door === 0 && observed.markers?.inventedSource === 0;
+    default: return false;
+  }
+}
 function g6ObservedWitness(spec, baseline, mutant, restore) {
   const target = spec.kills[0], samples = [baseline, mutant, restore].map(rows => rows.find(row => row.id === target)?.observed);
   if (!samples.every(observedObject)) return false;
-  const [before, observed] = samples, name = spec.control.split('.').at(-1);
+  if (![baseline, mutant, restore].every(rows => g6ScheduleWitnessed(spec, rows))) return false;
+  const [before, observed, after] = samples, name = spec.control.split('.').at(-1);
   if (['captured-text-pinch', 'touchmove-cancel'].includes(name) && !samples.every(syntheticInputExecuted)) return false;
   if (['late-bubble-pointer', 'touchmove-cancel-native'].includes(name) && !samples.every(nativeInputExecuted)) return false;
+  if (!g6FaultAbsent(name, before) || !g6FaultAbsent(name, after)) return false;
   switch (name) {
     case 'missing-reverse': return observed.before?.scale === 'part' && observed.after?.scale === 'part' && observed.arrived === false;
     case 'captured-text-pinch': return observed.events.some(e => e.type === 'pointermove' && e.defaultPrevented === true);
@@ -207,6 +253,7 @@ function servedEditVerdict(spec, control, { engine, rows, digests }) {
     baseline = candidate;
   }
   if (!Array.isArray(baseline) || baseline.length < 2 || new Set(baseline.map(row => row?.id)).size !== baseline.length) return false;
+  if (spec.local && !sameValue(baseline.map(row => row?.id), spec.rows)) return false;
   if (!baseline.every(row => row.ok === true) || !kills.every(id => baseline.some(row => row.id === id))) return false;
   if (!sameIds(mutant, baseline) || !sameIds(restore, baseline)) return false;
   if (![...baseline, ...mutant, ...restore].every(executedRow)) return false;
@@ -219,14 +266,15 @@ const sharedHover = sample => !!sample?.held && !!sample?.peer && sample.held.ho
 function sharedHoverVerdict(spec, control, { engine, rows }) {
   const candidate = rows.find(row => row?.id === `${engine}/${spec.candidate}` && row.phase === 'candidate');
   return control.verdict === 'killed' && control.kind === 'DOM style mutation' && candidate?.ok === true && sameValue(control.baseline, candidate.observed) && sharedHover(control.baseline) &&
-    !sharedHover(control.mutant) && control.mutant?.held?.background === 'rgb(255, 0, 255)' && sharedHover(control.restore);
+    !sharedHover(control.mutant) && sharedHoverDiverges(control.mutant, control.baseline) && sharedHover(control.restore);
 }
 function foldShiftVerdict(spec, control, { engine, rows }) {
   const candidate = rows.find(row => row?.id === `${engine}/${spec.candidate}` && row.phase === 'candidate');
   const plain = candidate?.observed?.plain;
   return control.verdict === 'killed' && control.kind === 'post-fold DOM geometry mutation' && control.amount === spec.amount &&
     [1, -1].includes(control.direction) && candidate?.ok === true && sameValue(control.baseline, candidate.observed.bareAgain) &&
-    foldGeometryEqual(control.baseline, plain) && !foldGeometryEqual(control.shifted, plain) && foldGeometryEqual(control.restore, plain) &&
+    foldGeometryEqual(control.baseline, plain) && foldShiftBites({ plain, baseline: control.baseline, shifted: control.shifted, amount: control.amount, direction: control.direction }) &&
+    foldGeometryEqual(control.restore, plain) &&
     Array.isArray(control.beforeScroll) && control.beforeScroll.length === 2 && sameValue(control.beforeScroll, control.afterScroll);
 }
 const CONTROL_VERDICTS = { 'served-edit': servedEditVerdict, 'shared-hover': sharedHoverVerdict, 'fold-shift': foldShiftVerdict };

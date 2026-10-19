@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { grammarSelection, foldGeometryEqual, grammarAcceptance, grammarControlRows, grammarControlVerdicts, WG_CANDIDATE_ROSTER, WG_CONTROL_EVIDENCE } from './vh-word-grammar-contracts.mjs';
+import { grammarSelection, foldGeometryEqual, foldShiftBites, grammarAcceptance, grammarControlRows, grammarControlVerdicts, sharedHoverDiverges, WG_CANDIDATE_ROSTER, WG_CONTROL_EVIDENCE } from './vh-word-grammar-contracts.mjs';
 import { grammarFixture, sha } from './vh-word-grammar-fixture.mjs';
 const geometry = x => [{ id: 'p1', top: x, height: 24, tokens: [{ id: '76', left: 4, top: 9 }] }];
 test('WG-1 raw boundary rejects old rounded false green and malformed observations', () => {
@@ -252,4 +252,144 @@ test('G6 each fault must demonstrate its own named witness, including same-token
       assert.equal(observedG6Verdict(broken), false);
     }
   }
+});
+
+test('a fold-shift or shared-hover control whose mutant sample is absent or incomplete is rejected at admission', () => {
+  for (const mutate of [c => { delete c.shifted; }, c => { c.shifted = []; }]) {
+    const value = clean(); mutate(control(value, 'chromium', 'fold-shift-one-pixel'));
+    rejects(value, 'chromium/G5.negative.fold-shift-one-pixel');
+  }
+  const noPeer = clean(); delete control(noPeer, 'webkit', 'G5.room-keep-hover').mutant.peer;
+  rejects(noPeer, 'webkit/G5.negative.room-keep-hover');
+});
+
+const observedG5 = JSON.parse(readFileSync(new URL('./vh-g5-observed-controls.json', import.meta.url), 'utf8'));
+const g5Control = (engine, id) => structuredClone(observedG5.engines[engine].controls.find(row => row.id === id));
+const g5Plain = engine => observedG5.engines[engine].candidates.find(row => row.id === `${engine}/G5.layers.bare-again`).observed.plain;
+function observedG5Verdict(engine, value) {
+  const [suffix] = Object.entries(WG_CONTROL_EVIDENCE).find(([, spec]) => spec.kind !== 'served-edit' && spec.control === value.id);
+  const rows = observedG5.engines[engine].candidates.map(row => ({ ...structuredClone(row), phase: 'candidate' }));
+  return grammarControlVerdicts({ engines: [engine], rows, controls: [value], runtimeFiles: [] }).find(row => row.id === `${engine}/${suffix}`).ok;
+}
+const shiftFirst = (geometry, dy) => geometry.map((p, i) => i ? structuredClone(p) : { ...p, top: p.top + dy, tokens: p.tokens.map(t => ({ ...t, top: t.top + dy })) });
+const FOLD_SHIFTS = ['fold-shift-one-pixel', 'fold-shift-one-quarter-over'];
+test('retained real 1 px and 1.25 px fold shifts are admitted, and the unchanged raw <1 px law is what they bite', () => {
+  assert.deepEqual(observedG5.sources.map(row => row.engine), ['chromium', 'webkit']);
+  for (const source of observedG5.sources) assert.match(source.receiptSha256, /^[a-f0-9]{64}$/u);
+  for (const engine of ['chromium', 'webkit']) {
+    const plain = g5Plain(engine);
+    assert.equal(plain.length > 1, true);
+    for (const id of [...FOLD_SHIFTS, 'G5.room-keep-hover']) assert.equal(observedG5Verdict(engine, g5Control(engine, id)), true, `${engine}/${id}`);
+    for (const id of FOLD_SHIFTS) {
+      const { baseline, shifted, amount, direction } = g5Control(engine, id);
+      assert.equal(foldGeometryEqual(baseline, plain), true);
+      assert.equal(foldGeometryEqual(shifted, plain), false);
+      assert.equal(foldShiftBites({ plain, baseline, shifted, amount, direction }), true);
+      assert.deepEqual(shifted, shiftFirst(baseline, amount * direction));
+    }
+    const { baseline } = g5Control(engine, 'fold-shift-one-pixel');
+    assert.equal(foldShiftBites({ plain, baseline, shifted: shiftFirst(baseline, 63 / 64), amount: 63 / 64, direction: 1 }), false);
+    assert.equal(foldShiftBites({ plain, baseline, shifted: shiftFirst(baseline, 1), amount: 1, direction: 1 }), true);
+  }
+});
+test('fold-shift kills require the authored shift of exactly the first paragraph, with complete identical geometry elsewhere', () => {
+  let rejected = 0;
+  for (const engine of ['chromium', 'webkit']) for (const id of FOLD_SHIFTS) for (const mutate of [
+    c => { delete c.shifted; }, c => { c.shifted = null; }, c => { c.shifted = []; }, c => { c.shifted = 'shifted'; },
+    c => { c.shifted = c.shifted.slice(0, 1); }, c => { c.shifted.push(structuredClone(c.shifted.at(-1))); },
+    c => { c.shifted[0].id = 'renamed'; }, c => { c.shifted[4].id = 'renamed'; }, c => { c.shifted[0].tokens[0].id = 'renamed'; },
+    c => { c.shifted[0].tokens.pop(); }, c => { c.shifted[0].tokens = []; }, c => { delete c.shifted[0].height; },
+    c => { c.shifted[0].top = NaN; }, c => { c.shifted[0].tokens[3].left = Infinity; },
+    c => { c.shifted = shiftFirst(c.baseline, c.amount * c.direction + 1); },
+    c => { c.shifted = shiftFirst(c.baseline, -c.amount * c.direction); },
+    c => { c.direction = -c.direction; },
+    c => { c.shifted[0].top += 0.25; }, c => { c.shifted[0].tokens[2].top -= 0.25; }, c => { c.shifted[0].tokens[1].left += 0.5; }, c => { c.shifted[0].height += 1; },
+    c => { c.shifted[3] = shiftFirst([c.shifted[3]], 2)[0]; }, c => { c.shifted[6].tokens[2].top += 0.25; },
+  ]) {
+    const value = g5Control(engine, id); mutate(value);
+    assert.equal(observedG5Verdict(engine, value), false, `${engine}/${id}: ${mutate}`); rejected++;
+  }
+  assert.equal(rejected, 92);
+  for (const id of FOLD_SHIFTS) {
+    const value = g5Control('webkit', id), dy = value.amount * value.direction;
+    value.shifted = [shiftFirst(value.baseline, dy)[0], ...structuredClone(g5Plain('webkit').slice(1))];
+    assert.equal(observedG5Verdict('webkit', value), false, `webkit/${id}: unshifted paragraphs read from another sample`);
+  }
+});
+test('the shared-hover mutant must observe the untouched peer still hovered, enabled and unchanged', () => {
+  let rejected = 0;
+  for (const engine of ['chromium', 'webkit']) for (const mutate of [
+    c => { delete c.mutant.peer; }, c => { c.mutant.peer = null; }, c => { c.mutant.peer = {}; }, c => { c.mutant.peer.hover = false; },
+    c => { delete c.mutant.peer.disabled; }, c => { c.mutant.peer.disabled = true; }, c => { delete c.mutant.peer.background; },
+    c => { c.mutant.peer.background = 'rgb(9, 9, 9)'; }, c => { c.mutant.peer.background = 'rgb(255, 0, 255)'; },
+    c => { c.mutant.held.hover = false; }, c => { delete c.mutant.held.disabled; }, c => { c.mutant.held.background = 'rgb(9, 9, 9)'; },
+  ]) {
+    const value = g5Control(engine, 'G5.room-keep-hover'); mutate(value);
+    assert.equal(observedG5Verdict(engine, value), false, `${engine}: ${mutate}`); rejected++;
+  }
+  assert.equal(rejected, 24);
+  const value = g5Control('webkit', 'G5.room-keep-hover');
+  assert.equal(sharedHoverDiverges(value.mutant, value.baseline), true);
+  assert.equal(sharedHoverDiverges({ held: value.mutant.held }, value.baseline), false);
+});
+
+const G6_REVIEWED_ROWS = {
+  'missing-reverse': ['setup.article-sentence', 'setup.sentence-word', 'setup.word-kanji', 'setup.kanji-part', 'reverse.part-kanji', 'errors', 'schedule'],
+  'captured-text-pinch': ['text.two-pointer', 'errors', 'schedule'], 'touchmove-cancel': ['text.two-pointer', 'errors', 'schedule'],
+  'late-bubble-pointer': ['text.native-two-pointer', 'errors', 'schedule'], 'touchmove-cancel-native': ['text.native-two-pointer', 'errors', 'schedule'],
+  'lost-return-line': ['setup.article-shelf', 'setup.shelf-sky', 'setup.sky-shelf', 'setup.shelf-article', 'return.line', 'errors', 'schedule'],
+  'invented-fresh-source': ['kept.identity', 'kept.native-door', 'kept.source-provenance', 'kept.no-record-write', 'kept.list-only', 'kept.removed', 'errors', 'schedule'],
+};
+const PHASES = ['baseline', 'rows', 'restore'];
+test('G6 local controls require their reviewed complete schedule, errors and schedule rows in every phase', () => {
+  for (const original of observedG6.controls) {
+    const name = original.id.split('.').at(-1), target = g6Spec(original)[1].kills[0];
+    assert.deepEqual(g6Spec(original)[1].rows, G6_REVIEWED_ROWS[name]);
+    for (const phase of PHASES) assert.deepEqual(original[phase].map(row => row.id), G6_REVIEWED_ROWS[name]);
+    const mutations = [
+      c => { for (const phase of PHASES) c[phase] = [c[phase].find(row => row.id === target), { id: 'x', title: 'x', ok: true, observed: {} }]; },
+      c => { for (const phase of PHASES) c[phase] = c[phase].filter(row => row.id !== 'errors'); },
+      c => { for (const phase of PHASES) c[phase] = c[phase].filter(row => row.id !== 'schedule'); },
+      c => { for (const phase of PHASES) c[phase].push({ id: 'extra', title: 'extra', ok: true, observed: {} }); },
+      c => { for (const phase of PHASES) c[phase].reverse(); },
+      c => { c.baseline.find(row => row.id === 'errors').observed.pageErrors = ['TypeError: baseline']; },
+      c => { c.restore.find(row => row.id === 'errors').observed.consoleErrors = ['restore console error']; },
+      c => { c.baseline.find(row => row.id === 'errors').observed.diagnosticError = 'screenshot failed'; },
+      c => { const observed = c.restore.find(row => row.id === 'schedule').observed; observed.expected = [...observed.expected, 'invented']; },
+      c => { c.rows.find(row => row.id === 'schedule').observed.actual.pop(); },
+      c => { c.baseline.find(row => row.id === 'schedule').observed.error = 'harness error'; },
+      c => { delete c.restore.find(row => row.id === 'errors').observed; },
+    ];
+    if (G6_REVIEWED_ROWS[name].length > 3) mutations.push(c => { for (const phase of PHASES) c[phase] = c[phase].filter(row => row.id === target || ['errors', 'schedule'].includes(row.id)); });
+    for (const mutate of mutations) {
+      const value = structuredClone(original); mutate(value);
+      assert.equal(observedG6Verdict(value), false, `${value.engine}/${value.id}: ${mutate}`);
+    }
+  }
+});
+test('G6 baseline and restore samples must each show their own fault absent, not only a passing row', () => {
+  const faults = {
+    'missing-reverse': [o => { o.arrived = false; o.after.scale = 'part'; }, o => { o.after.scale = 'part'; }, o => { o.arrived = false; }],
+    'captured-text-pinch': [o => { o.faults.textPinch = 1; }, o => { delete o.faults; },
+      o => { const e = o.events.find(e => e.type === 'pointermove'); e.defaultPrevented = true; e.accepted = false; }],
+    'touchmove-cancel': [o => { o.faults.touchmove = 1; }, o => { delete o.faults.touchmove; },
+      o => { const e = o.touch.events.find(e => e.type === 'touchmove'); e.defaultPrevented = true; e.accepted = false; }],
+    'late-bubble-pointer': [o => { o.faults.latePointer = 1; }, o => { delete o.faults; },
+      o => { o.events.find(e => e.family === 'pointer' && e.type === 'pointermove').defaultPrevented = true; }],
+    'touchmove-cancel-native': [o => { o.faults.touchmove = 1; }, o => { o.faults.touchmove = '0'; },
+      o => { o.events.find(e => e.family === 'touch' && e.type === 'touchmove').defaultPrevented = true; }],
+    'lost-return-line': [o => { o.delta = 80; }, o => { o.delta = 4.5; }, o => { delete o.delta; }, o => { o.current.index = 'different token'; }],
+    'invented-fresh-source': [o => { o.counts.door = 1; }, o => { o.markers.inventedSource = 1; }, o => { delete o.markers; }, o => { o.branch = 'has-ref'; }],
+  };
+  let rejected = 0;
+  for (const original of observedG6.controls) {
+    const name = original.id.split('.').at(-1);
+    assert.equal(observedG6Verdict(structuredClone(original)), true);
+    for (const phase of ['baseline', 'restore']) for (const mutate of faults[name]) {
+      const value = structuredClone(original); mutate(g6Primary(value, phase).observed);
+      assert.equal(g6Primary(value, phase).ok, true);
+      assert.equal(observedG6Verdict(value), false, `${value.engine}/${value.id}/${phase}: ${mutate}`); rejected++;
+    }
+  }
+  assert.equal(rejected, 144);
 });

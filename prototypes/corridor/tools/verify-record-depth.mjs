@@ -23,7 +23,7 @@
 import assert from 'node:assert/strict';
 import { spawn, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { parseRecordArgs, recordCompletion, recordControlVerdict, RECORD_ROWS, RECORD_CONTROLS } from './vh-learning-contracts.mjs';
+import { parseRecordArgs, recordCompletion, recordControlVerdict, RECORD_ROWS, RECORD_CONTROLS, deliveredAsBuilt, serveRecorded } from './vh-learning-contracts.mjs';
 import { createHash, randomUUID } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -69,6 +69,7 @@ const KAWAGUCHI = Object.freeze({ id: 'aozora:049966-1', search: 'チベット�
 const rows = [];
 const versions = {};
 const served = { served: [], setupError: null };
+const delivered = [];
 let engine = '';
 const check = (id, title, ok, observed = '') => {
   rows.push({ id: `${engine}/${id}`, title, ok: !!ok, observed });
@@ -276,6 +277,7 @@ try {
           async (route) => { await gate; await route.continue().catch(() => {}); });
       }
       if (control) await serveMutation(context, { origin: host.origin, manifest, control: served, edits: control.edits });
+      else await serveRecorded(context, { origin: host.origin, files: ['corridor.js'], delivered });
       const page = await context.newPage(), errors = [];
       page.setDefaultTimeout(30000);
       page.on('pageerror', (error) => errors.push(error.message));
@@ -507,9 +509,11 @@ try {
 } finally {
   await host?.close().catch(error=>{terminalError ||= String(error.stack || error);});
   const completion=recordCompletion(rows,engines,only || Object.keys(RECORD_ROWS));
+  let deliveryError=null;
+  if (!control) try { deliveredAsBuilt({ files: ['corridor.js'], rows: delivered, manifest }); } catch (error) { deliveryError=error.message; }
   const report={...reportBase(),phase:control ? 'mutant' : 'candidate',...completion,rows,
-    fullAcceptance:false, ...(control ? {control:{name:controlName,kills:control.kills,served:served.served,setupError:served.setupError}} : {})};
-  report.diagnosticPass &&= !terminalError && !served.setupError;
+    fullAcceptance:false, ...(control ? {control:{name:controlName,kills:control.kills,served:served.served,setupError:served.setupError}} : {delivered,deliveryError})};
+  report.diagnosticPass &&= !terminalError && !served.setupError && !deliveryError;
   writeFileSync(resolve(evidence,'verify-record-depth.json'),JSON.stringify(report,null,2)+'\n');
   console.log(`\n${rows.filter(row=>row.ok).length}/${rows.length} — evidence ${evidence}`);
   process.exitCode=report.diagnosticPass ? 3 : 1;

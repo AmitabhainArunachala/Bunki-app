@@ -361,7 +361,9 @@ export const RETAINED_CASES = Object.freeze({
   ],
 });
 
-import { realpathSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { lstatSync, readFileSync, realpathSync, statSync } from 'node:fs';
+import { isAbsolute, join, relative, resolve } from 'node:path';
 const WORD_IDS = [
   'T1',
   'T2',
@@ -409,10 +411,7 @@ const WORD_IDS = [
 ];
 const wordCases = ['F0', ...WORD_IDS.flatMap((id) => [`${id}.setup`, id]), 'inventory-exact'];
 const wordControls = [...Array.from({ length: 18 }, (_, i) => `A${i + 1}`), 'inventory-exact'];
-const C1_NAMES = [
-  'C1 · the sentence page walks on to the whole article it came from',
-  'C1 · a sentence with no shelf article shows no door onto nothing',
-];
+const C1_ARTICLE_NAME = 'C1 · the sentence page walks on to the whole article it came from';
 const exact = (a, b) =>
   Array.isArray(a) &&
   Array.isArray(b) &&
@@ -498,7 +497,7 @@ function checkReport(name, producer, expected, { sourceOnly = false, browser = t
         producerHash: name === 'corridor' ? r.sources?.verifier : r.verifierSha256,
       });
       const observed = r.results.map((row) =>
-        name === 'corridor' && C1_NAMES.includes(row.name) ? 'C1/sentence-home' : row.name,
+        name === 'corridor' && row.name === C1_ARTICLE_NAME ? 'C1/sentence-home' : row.name,
       );
       s.require(
         r.results.every((row) => row.pass === true),
@@ -554,8 +553,23 @@ function checkReport(name, producer, expected, { sourceOnly = false, browser = t
           'Incomplete/wrong viewport walk',
         );
         if (name === 'corridor-a11y') s.require(r.head === c.gitSha, 'Wrong app source head');
-        if (name === 'corridor')
+        if (name === 'corridor') {
           s.require(sha(runtimeHash(c, 'corridor.js')), 'Missing served runtime identity');
+          const home = r.results.filter((row) => row.name === C1_ARTICLE_NAME);
+          let landed;
+          try {
+            landed = JSON.parse(home[0]?.detail);
+          } catch {
+            landed = null;
+          }
+          s.require(
+            home.length === 1 &&
+              landed?.present === true &&
+              landed.reader === true &&
+              landed.sheet === false,
+            'C1 sentence page did not walk on to its shelf article',
+          );
+        }
       }
       return finish(s, observed);
     },
@@ -663,6 +677,438 @@ export function driftFastSchedule() {
   }
   return rows;
 }
+const WORD_CONTROL_WITNESSES = Object.freeze({
+  C1: ['T1'],
+  C2: ['T2'],
+  C3: ['T3'],
+  C4: ['T5'],
+  C5: ['T12', 'T2'],
+  C6a: ['T8', 'T9', 'T14'],
+  C7: ['T11'],
+  C8: ['T2'],
+  C9r: ['T7r'],
+  C9s: ['T7s'],
+  C10: ['T8'],
+  C11: ['T4'],
+  C12: ['T4'],
+  C13: ['T6', 'T3'],
+  C14: ['T10'],
+  C15: ['T8'],
+  C16: ['T14'],
+  C18: ['K1'],
+  C19: ['K2'],
+  C17: ['T15'],
+  KS1: ['S1', 'S2', 'S3', 'S8', 'S9'],
+  KS2: ['S4', 'S6', 'S8'],
+  KS3: ['S1', 'S2', 'S3', 'S4', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11'],
+  KS4: ['S1', 'S9', 'N1'],
+  KS4b: ['N1'],
+  KS5: ['S1', 'S8', 'S11'],
+  KC1: ['X1', 'X2', 'X3', 'X5', 'V2', 'V4', 'V5', 'P3', 'P3b'],
+  KR1: ['V2'],
+  KP3: ['P3', 'P3b'],
+  KP3b: ['P3', 'P3b'],
+  KB1: ['X3', 'X5', 'P3', 'P3r'],
+  KR3: ['P3r'],
+  KR3t: ['P3r'],
+  KX5: ['X5'],
+});
+const LEARNING_CONTROL_WITNESSES = Object.freeze({
+  RB: {
+    setups: ['word-review-render-fixture-starts-unbound'],
+    witnesses: [
+      'word-review-shows-and-binds-its-saved-answer',
+      'word-review-changed-answer-refuses-both-producers-and-asks-for-a-fresh-look',
+    ],
+  },
+  C6b: {
+    setups: [],
+    witnesses: ['word-review-unavailable-face-refuses-grades-and-writes-nothing'],
+  },
+});
+// Reviewed collateral is a closed set, independent of the producer's own verdict.
+// All other completed observations must remain exactly true.
+const WORD_CONTROL_COLLATERAL = Object.freeze({
+  C2: [
+    'T7r.setup',
+    'T7r',
+    'T7s.setup',
+    'T7s',
+    'T11.setup',
+    'T11',
+    'T13.setup',
+    'T13',
+    'T15',
+    'X1',
+    'X2',
+    'X3.setup',
+    'X3',
+    'X4.setup',
+    'X4',
+    'X5.setup',
+    'X5',
+    'V1',
+    'V2',
+    'V3',
+    'V4',
+    'V5',
+    'P3',
+    'P3b',
+    'P3r',
+    'K1',
+  ],
+  C3: ['T4', 'K1'],
+  C4: ['T8.setup', 'T8', 'X1', 'X2', 'X3', 'V5'],
+  C9r: ['V3', 'V4', 'V5'],
+  C9s: ['V3'],
+  C13: ['T5'],
+  C17: ['T7r', 'T7s'],
+  C18: ['K2'],
+  C19: ['K1'],
+  KS1: ['S11'],
+  KS4: ['S2', 'S3', 'S8', 'S11'],
+  KS4b: ['S8'],
+  KR1: ['V3', 'V5', 'X3'],
+  KP3: ['P3r'],
+  KP3b: ['P3r'],
+});
+const LEARNING_RECORD_INVENTORY = Object.freeze([
+  'grade-rejection-keeps-schedule-log-stats-and-session-with-double-tap-guard',
+  'queued-grade-recomputes-latest-card-and-preserves-concurrent-log-and-stats',
+  'not-recalled-forces-again-even-if-another-grade-is-requested',
+  'review-does-not-advance-a-replacement-session-after-ack',
+  'stale-grade-refuses-removed-or-suspended-card-without-lost-latest-data',
+  'undo-is-atomic-append-only-and-rejection-keeps-the-grade',
+  'undo-does-not-overwrite-a-later-card-change',
+  'acknowledged-grade-disposes-question-view-and-clears-transient-response-state',
+  'undo-after-ungraded-skip-restores-the-actual-graded-item-and-removes-only-its-reinsertion',
+  'dojo-evidence-waits-for-ack-and-never-creates-schedule-state',
+  'show-answer-turns-the-card-without-a-write-and-ignores-a-second-press',
+  'word-review-render-fixture-starts-unbound',
+  'word-review-shows-and-binds-its-saved-answer',
+  'word-review-unavailable-face-refuses-grades-and-writes-nothing',
+  'word-review-changed-answer-refuses-both-producers-and-asks-for-a-fresh-look',
+  'quiz-answer-next-and-close-use-only-acknowledged-run-and-ignore-stale-buttons',
+  'lesson-completion-atomically-files-score-and-evidence-after-ack',
+  'explicit-enrollment-batch-is-one-save-deduplicated-and-keeps-deep-word-provenance',
+  'probe-mint-and-evidence-wait-together-and-double-input-cannot-mint-twice',
+  'preference-step-merges-latest-pacing-without-publishing-unacknowledged-value',
+  'pace-panel-offers-three-presets-and-names-a-hand-set-schedule-custom',
+  'g2-definitions-lifted-from-the-authored-source',
+  'g2-identity-is-the-word-as-it-reads-never-the-spelling-alone',
+  'g2-depth-boundaries-need-stability-and-present-recall',
+  'g2-a-different-reading-or-entry-is-at-most-met-and-never-rings',
+  'g2-golden-訳-read-やく-never-inherits-わけ',
+  'g2-not-yet-outranks-until-an-unrevoked-good-review-after-it',
+  'g2-kept-is-review-or-a-list-for-the-same-word-only',
+  'g2-a-look-up-writes-the-encounter-ledger-only-once-a-day',
+  'g2-his-correction-writes-met-only-and-toggles',
+  'g2-the-roots-validate-strictly-and-keep-later-versions',
+  'g2-help-per-1000-characters-counts-first-readings-once',
+  'g2-a-kept-word-answers-cold-from-its-own-card',
+]);
+const WORD_SAVED_ANSWER_INVENTORY = Object.freeze(
+  wordCases.filter((id) => id !== 'inventory-exact'),
+);
+const MUTATION_CONTROL_PINS = Object.freeze({
+  'corridor.js': 'prototypes/corridor/corridor.js',
+  'test-word-saved-answer.mjs': 'prototypes/corridor/tools/test-word-saved-answer.mjs',
+  'word-saved-answer-controls.mjs': 'prototypes/corridor/tools/word-saved-answer-controls.mjs',
+  'verify-learning-record.mjs': 'prototypes/corridor/tools/verify-learning-record.mjs',
+  'dict-v2/index.json': 'prototypes/corridor/data/share_alike/dict-v2/index.json',
+  'dict.json': 'prototypes/corridor/data/share_alike/dict.json',
+  'words.json': 'prototypes/corridor/data/share_alike/words.json',
+});
+const MUTATION_CONTROL_CHILDREN = Object.freeze([
+  'tap-baseline',
+  ...Object.keys(WORD_CONTROL_WITNESSES).map((name) => `tap-${name}`),
+  'learning-baseline',
+  ...Object.keys(LEARNING_CONTROL_WITNESSES).map((name) => `learning-${name}`),
+]);
+const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
+const canonicalSha = (value) => sha256(JSON.stringify(value, null, 2) + '\n');
+const sameKeys = (object, ids) =>
+  object !== null &&
+  typeof object === 'object' &&
+  !Array.isArray(object) &&
+  exact(ids, Object.keys(object)) &&
+  Object.values(object).every((ok) => typeof ok === 'boolean');
+function gateBytes(c, rel) {
+  const gate = realPath(join(c.out, c.gateId)),
+    file = join(c.out, c.gateId, rel);
+  if (!gate || lstatSync(file).isSymbolicLink()) return null;
+  const real = realpathSync(file),
+    inside = relative(gate, real);
+  if (!inside || inside.startsWith('..') || isAbsolute(inside)) return null;
+  if (!(statSync(real).mtimeMs >= Date.parse(c.startedAt))) return null;
+  return readFileSync(real);
+}
+function tapRows(stdout, inventory) {
+  const rows = {},
+    summary = {};
+  let plan = null,
+    directive = false,
+    duplicate = false;
+  for (const line of stdout.split('\n')) {
+    const row = /^(not ok|ok) \d+ - (.*)$/u.exec(line);
+    if (row) {
+      const id = row[2].trim().split(/\s+/u)[0];
+      if (/\s#\s*(?:SKIP|TODO)\b/iu.test(row[2])) directive = true;
+      if (Object.hasOwn(rows, id)) duplicate = true;
+      rows[id] = row[1] === 'ok';
+      continue;
+    }
+    const total = /^1\.\.(\d+)$/u.exec(line);
+    if (total) plan = Number(total[1]);
+    const count = /^# (tests|pass|fail|cancelled|skipped|todo) (\d+)$/u.exec(line);
+    if (count) summary[count[1]] = Number(count[2]);
+  }
+  const failed = Object.values(rows).filter((ok) => !ok).length;
+  return !directive &&
+    !duplicate &&
+    plan === inventory.length &&
+    summary.tests === inventory.length &&
+    summary.pass === inventory.length - failed &&
+    summary.fail === failed &&
+    summary.cancelled === 0 &&
+    summary.skipped === 0 &&
+    summary.todo === 0
+    ? rows
+    : null;
+}
+function mutationChild(c, row, id, pinned, s) {
+  const tap = id.startsWith('tap-'),
+    baseline = id.endsWith('-baseline'),
+    name = baseline ? null : id.slice(tap ? 4 : 9),
+    inventory = tap ? WORD_SAVED_ANSWER_INVENTORY : LEARNING_RECORD_INVENTORY,
+    why = (message) => `${id}: ${message}`;
+  s.require(row?.evidence === `children/${id}.json`, why('wrong evidence path'));
+  const record = c.readReport(`children/${id}.json`),
+    recordBytes = gateBytes(c, `children/${id}.json`);
+  s.require(
+    sha(row.evidenceSha256) &&
+      recordBytes !== null &&
+      sha256(recordBytes) === row.evidenceSha256 &&
+      canonicalSha(record) === row.evidenceSha256,
+    why('evidence bytes differ from the report'),
+  );
+  s.require(
+    record?.format === 'd23-child-evidence' &&
+      record.version === 1 &&
+      record.child === id &&
+      record.kind === (tap ? 'tap' : 'receipt') &&
+      record.role === (baseline ? 'baseline' : 'control') &&
+      row.role === record.role &&
+      record.control === name &&
+      row.control === name,
+    why('wrong child identity'),
+  );
+  s.require(
+    record.status === (baseline ? 0 : 1) && record.signal === null && record.error === null,
+    why('did not complete: exit, signal, timeout or spawn error'),
+  );
+  s.require(
+    record.observation?.complete === true &&
+      Array.isArray(record.observation.problems) &&
+      record.observation.problems.length === 0 &&
+      row.complete === true &&
+      Array.isArray(row.problems) &&
+      row.problems.length === 0,
+    why('incomplete observation'),
+  );
+  const rows = record.observation?.rows;
+  s.require(sameKeys(rows, inventory), why('not the exact pinned inventory'));
+  const source = record.mutation?.sourceSha256;
+  s.require(
+    record.mutation?.authoredSha256 === pinned && sha(source),
+    why('wrong authored source'),
+  );
+  if (baseline)
+    s.require(
+      source === pinned && record.verdict === null,
+      why('baseline is not the authored source'),
+    );
+  else
+    s.require(
+      source !== pinned && Array.isArray(record.mutation.edits) && record.mutation.edits.length > 0,
+      why('control did not lift a mutated source'),
+    );
+  const stdout = gateBytes(c, `children/${id}.stdout`),
+    stderr = gateBytes(c, `children/${id}.stderr`);
+  s.require(
+    stdout !== null &&
+      stderr !== null &&
+      record.stdout?.path === `${id}.stdout` &&
+      record.stderr?.path === `${id}.stderr` &&
+      record.stdout.bytes === stdout.length &&
+      record.stdout.sha256 === sha256(stdout) &&
+      record.stderr.bytes === stderr.length &&
+      record.stderr.sha256 === sha256(stderr),
+    why('raw child output differs from its record'),
+  );
+  const lines = String(stdout ?? '').split('\n');
+  if (tap) {
+    s.require(
+      record.marker ===
+        `# d23-source ${name || 'baseline'} ${baseline ? 0 : record.mutation?.edits?.length} ${source}` &&
+        lines.includes(record.marker),
+      why('source marker missing'),
+    );
+    s.require(stderr?.length === 0, why('TAP child wrote stderr'));
+    const parsed = tapRows(String(stdout ?? ''), inventory);
+    s.require(
+      parsed !== null &&
+        sameKeys(parsed, inventory) &&
+        inventory.every((k) => parsed[k] === rows?.[k]),
+      why('TAP output disagrees with the recorded rows or carries skip/todo/cancel'),
+    );
+  } else {
+    if (!baseline)
+      s.require(
+        record.marker === `CONTROL-APPLIED ${name} ${source}` && lines.includes(record.marker),
+        why('control marker missing'),
+      );
+    const receipt = c.readReport(record.receipt?.path),
+      receiptBytes = gateBytes(c, record.receipt.path);
+    s.require(
+      receiptBytes !== null &&
+        receiptBytes.length === record.receipt.bytes &&
+        sha256(receiptBytes) === record.receipt.sha256 &&
+        canonicalSha(receipt) === record.receipt.sha256,
+      why('learning receipt differs from its record'),
+    );
+    const results = Array.isArray(receipt?.results) ? receipt.results : [];
+    s.require(
+      receipt?.format === 'kairo-learning-acknowledgment-tests' &&
+        receipt.sourceSha256 === source &&
+        (receipt.control ?? null) === name &&
+        exact(
+          inventory,
+          results.map((result) => result.name),
+        ) &&
+        results.every(
+          (result) => typeof result.pass === 'boolean' && rows?.[result.name] === result.pass,
+        ) &&
+        receipt.pass === results.every((result) => result.pass === true) &&
+        String(stderr ?? '') ===
+          results
+            .filter((result) => result.pass !== true)
+            .map((result) => `${result.diagnostic}\n`)
+            .join(''),
+      why('learning receipt disagrees with the recorded rows'),
+    );
+  }
+  if (baseline)
+    s.require(rows && Object.values(rows).every((ok) => ok === true), why('baseline red'));
+  else {
+    const pinnedControl = tap
+      ? {
+          witnesses: WORD_CONTROL_WITNESSES[name],
+          setups: [
+            'F0',
+            ...WORD_CONTROL_WITNESSES[name]
+              .map((w) => `${w}.setup`)
+              .filter((w) => inventory.includes(w)),
+          ],
+        }
+      : LEARNING_CONTROL_WITNESSES[name];
+    const failed = rows ? Object.keys(rows).filter((k) => rows[k] === false) : [];
+    s.require(
+      record.verdict?.verdict === 'killed' &&
+        row.verdict === 'killed' &&
+        record.verdict.control === name &&
+        exact(failed, record.verdict.failed || []),
+      why('producer verdict is not a complete kill'),
+    );
+    s.require(
+      pinnedControl.witnesses.every((w) => rows?.[w] === false) &&
+        pinnedControl.setups.every((w) => rows?.[w] === true),
+      why('pinned witnesses did not fail behind green setups'),
+    );
+    const allowed = new Set([
+      ...pinnedControl.witnesses,
+      ...(tap ? WORD_CONTROL_COLLATERAL[name] || [] : []),
+    ]);
+    s.require(
+      failed.every((id) => allowed.has(id)),
+      why('unrelated failure contaminates the control'),
+    );
+  }
+}
+function mutationControls(producer) {
+  return {
+    producer,
+    paths: ['controls-report.json'],
+    sourceOnly: true,
+    expectedCases: () => [...MUTATION_CONTROL_CHILDREN],
+    validate(r, c) {
+      const errors = [],
+        require = (condition, message) => {
+          if (!condition) errors.push(message);
+        },
+        s = { errors, require, expectedCases: [...MUTATION_CONTROL_CHILDREN] };
+      require(c.sourceVerifiedBeforeAndAfter ===
+        true, 'Controls lack an unchanged source boundary');
+      require(Array.isArray(c.args) &&
+        c.args.length === 2 &&
+        c.args[0] === producer &&
+        c.args[1] === '--controls', 'Not the full mutation-control schedule invocation');
+      require(typeof c.readReport === 'function' &&
+        text(c.root) &&
+        text(c.out) &&
+        text(c.gateId), 'No gate attempt to read');
+      require(r?.format === 'd23-control-admission' &&
+        r.version === 2, 'Wrong control report format');
+      require(sameSite(r.root, c.root), 'Controls ran against another checkout');
+      const pinned = Object.fromEntries(
+        Object.entries(MUTATION_CONTROL_PINS).map(([key, path]) => [
+          key,
+          sha256(readFileSync(resolve(c.root, path))),
+        ]),
+      );
+      const pins = r.pins;
+      require(pins?.stable === true &&
+        exact(Object.keys(MUTATION_CONTROL_PINS), Object.keys(pins.before || {})) &&
+        JSON.stringify(pins.before) === JSON.stringify(pins.after) &&
+        Object.entries(MUTATION_CONTROL_PINS).every(
+          ([key, path]) =>
+            pins.before[key]?.path === path && pins.before[key].sha256 === pinned[key],
+        ), 'Pinned sources unstable or differ from the current checkout');
+      require(sha(c.verifierSha256) &&
+        pinned['test-word-saved-answer.mjs'] === c.verifierSha256, 'Wrong producer identity');
+      require(JSON.stringify(r.inventory) === JSON.stringify(WORD_SAVED_ANSWER_INVENTORY) &&
+        exact(
+          LEARNING_RECORD_INVENTORY,
+          r.learningInventory || [],
+        ), 'Baseline inventories differ from the pinned rosters');
+      require(r.phase?.children === MUTATION_CONTROL_CHILDREN.length &&
+        r.phase.expectedChildren === MUTATION_CONTROL_CHILDREN.length &&
+        r.phase.controls === MUTATION_CONTROL_CHILDREN.length - 2 &&
+        r.pass === true, 'Control phase incomplete or red');
+      const children = Array.isArray(r.children) ? r.children : [];
+      const observed = children.map((row) => row?.child);
+      require(exact(
+        MUTATION_CONTROL_CHILDREN,
+        observed,
+      ), 'Missing, duplicate or extra control child');
+      for (const row of children)
+        if (MUTATION_CONTROL_CHILDREN.includes(row?.child))
+          mutationChild(c, row, row.child, pinned['corridor.js'], s);
+      const verdicts = Array.isArray(r.verdicts) ? r.verdicts : [];
+      require(exact(
+        MUTATION_CONTROL_CHILDREN.filter((id) => !id.endsWith('-baseline')),
+        verdicts.map((row) => row?.child),
+      ) &&
+        verdicts.every(
+          (row) =>
+            row.verdict === 'killed' &&
+            row.child ===
+              `${row.suite === 'test-word-saved-answer' ? 'tap' : 'learning'}-${row.control}`,
+        ), 'A control survived, was contaminated or did not complete');
+      return finish(s, observed);
+    },
+  };
+}
 const driftSchedule = driftFastSchedule();
 const contracts = {
   'corridor-build': checkReport(
@@ -682,6 +1128,9 @@ const contracts = {
     'prototypes/corridor/tools/test-word-saved-answer-controls.mjs',
     wordControls,
     { sourceOnly: true, browser: false },
+  ),
+  'word-saved-answer-mutation-controls': mutationControls(
+    'prototypes/corridor/tools/test-word-saved-answer.mjs',
   ),
   corridor: checkReport(
     'corridor',

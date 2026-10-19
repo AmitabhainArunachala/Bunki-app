@@ -1,4 +1,4 @@
-import { syntheticEvidence } from './test-evidence-fixture.mjs';
+import { syntheticEvidence, syntheticProof } from './test-evidence-fixture.mjs';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync } from 'node:fs';
@@ -184,6 +184,34 @@ const rejections = {
   },
   'changed shard topology': (v) => {
     v.receipt.shards = [{ id: 'other', gates: ['corridor', 'lint'] }];
+  },
+  'undefined transported proof kind': (v) => {
+    const proof = syntheticProof('lint');
+    delete proof.kind;
+    Object.assign(
+      v.receipt.gates[0].attempts[0],
+      syntheticEvidence('lint', commit, v.receipt.artifact.artifactSha256, proof),
+    );
+  },
+  'generic retained-report proof for a lint check': (v) => {
+    Object.assign(
+      v.receipt.gates[0].attempts[0],
+      syntheticEvidence('lint', commit, v.receipt.artifact.artifactSha256, {
+        kind: 'retained-report',
+        obligation: { synthetic: true },
+      }),
+    );
+  },
+  'foreign adapter obligation shape': (v) => {
+    const proof = syntheticProof('corridor');
+    proof.obligation = { type: 'checks' };
+    Object.assign(
+      v.receipt.gates[1].attempts[0],
+      syntheticEvidence('corridor', commit, v.receipt.artifact.artifactSha256, proof),
+    );
+  },
+  'attempt of another gate': (v) => {
+    v.receipt.gates[1].attempts = [globalThis.structuredClone(v.receipt.gates[0].attempts[0])];
   },
 };
 for (const [name, mutate] of Object.entries(rejections))

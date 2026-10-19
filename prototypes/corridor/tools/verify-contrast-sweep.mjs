@@ -44,7 +44,7 @@ import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import { readAppRecord } from './record-test-support.mjs';
 import { contrastExpectedCases } from '../../../scripts/ci/vh-existing-report-contracts.mjs';
-import { judgeContrastArrival } from './vh-contrast-arrival.mjs';
+import { judgeContrastArrival, judgeContrastArrivals } from './vh-contrast-arrival.mjs';
 
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['webkit', 'chromium'];
 assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
@@ -804,15 +804,16 @@ const DEMO_ARRIVAL = () => {
     const style = getComputedStyle(mini);
     const animations = mini.getAnimations();
     const animation = animations.find((item) => item instanceof CSSAnimation && item.animationName === 'read-mini-rise');
-    const row = { name: animation?.animationName || style.animationName, animationType: animation?.constructor.name || null,
+    const row = { mountSequence: window.__contrastDemoArrivals.length, name: animation?.animationName || style.animationName,
+      animationType: animation?.constructor.name || null,
       actualAnimationNames: animations.map((item) => item.animationName || item.id || item.constructor.name),
-      sampled: false, connected: true, timeOrigin: performance.timeOrigin,
+      sampled: false, terminal: null, connected: true, timeOrigin: performance.timeOrigin,
       documentId, sameDocument: document === installedDocument && window === installedWindow &&
         window.__contrastCalibrationDocument === document && window.__contrastCalibrationWindow === window,
       frameCalibration: window.__contrastFrameCalibration || null, samples: [] };
     window.__contrastDemoArrivals.push({ mini, row });
     if (!animation) {
-      row.missingAnimation = true; row.sampled = true; row.opacity = Number(style.opacity);
+      row.missingAnimation = true; row.sampled = true; row.terminal = 'missing-animation'; row.opacity = Number(style.opacity);
       return;
     }
     const timing = animation.effect.getComputedTiming();
@@ -823,7 +824,12 @@ const DEMO_ARRIVAL = () => {
     row.authoredEnd = Number(timing.endTime);
     const observedMount = performance.now();
     const sample = (now) => {
-      if (!mini.isConnected) { row.connected = false; row.superseded = true; row.sampled = true; return; }
+      if (!mini.isConnected) {
+        row.connected = false; row.superseded = true; row.sampled = true; row.terminal = 'detached';
+        row.supersededBeforeFinish = !(row.opacity === 1 && row.playState === 'finished');
+        row.detached = { rafTime: now, observedAt: performance.now(), playState: animation.playState, currentTime: animation.currentTime };
+        return;
+      }
       row.startTime = animation.startTime;
       row.currentTime = animation.currentTime;
       row.playbackRate = animation.playbackRate;
@@ -839,9 +845,11 @@ const DEMO_ARRIVAL = () => {
       row.samples.push({ rafTime: row.rafTime, observedAt: row.observedAt, elapsed: row.elapsed,
         callbackDeliveryMs: row.callbackDeliveryMs, currentTime: row.currentTime, opacity: row.opacity, playState: row.playState });
       const allowance = row.frameCalibration?.frameMs;
-      if ((row.elapsed !== null && (row.elapsed > row.authoredEnd + allowance ||
-          (row.opacity === 1 && row.playState === 'finished'))) || row.observedAt - observedMount >= 2000) {
+      const finished = row.elapsed !== null && row.opacity === 1 && row.playState === 'finished';
+      const late = row.elapsed !== null && row.elapsed > row.authoredEnd + allowance;
+      if (finished || late || row.observedAt - observedMount >= 2000) {
         row.sampled = true;
+        row.terminal = finished ? 'finished' : late ? 'deadline-exceeded' : 'observer-budget-exhausted';
         return;
       }
       requestAnimationFrame(sample);
@@ -906,18 +914,19 @@ async function freshDemo(browser, world, report) {
       seen: localStorage.getItem('kairo-word-ladder-demo-v1'),
       theme: document.documentElement.dataset.theme || 'hokusai',
       motionPreference: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduce' : 'no-preference',
-      arrivals: window.__contrastDemoArrivals.map(({ mini, row }) => ({ ...row, current: mini === document.querySelector('#mini[data-demo="true"]') })),
+      arrivals: window.__contrastDemoArrivals.map(({ mini, row }) => ({ ...row, connected: mini.isConnected,
+        current: mini.isConnected && mini.matches('#mini[data-demo="true"]') })),
     }));
     check(`${world}/fresh-demo.reach`, 'a pristine device opened the real first-use word demonstration', !!facts.word && facts.seen === '1', facts.word);
     check(`${world}/fresh-demo.world`, 'the fresh demonstration wears its requested world', facts.theme === world, facts.theme);
-    const arrivals = facts.arrivals.map((row) => {
-      const observed = { ...row, motionPreference: facts.motionPreference };
+    const observedArrivals = facts.arrivals.map((row) => ({ ...row, motionPreference: facts.motionPreference }));
+    const arrivalVerdict = judgeContrastArrivals(observedArrivals);
+    const arrivals = observedArrivals.map((observed, index) => {
       const judged = judgeContrastArrival(observed);
-      return { ...observed, completed: judged.passed, frameMs: judged.frameMs, deadlineMs: judged.deadlineMs, arrivalErrors: judged.errors };
+      return { ...observed, completed: judged.passed, frameMs: judged.frameMs, deadlineMs: judged.deadlineMs, arrivalErrors: arrivalVerdict.mounts[index].errors };
     });
-    const current = arrivals.filter((row) => row.current);
-    check(`${world}/fresh-demo.arrival`, 'the named read-mini-rise reaches full opacity by its authored end plus an independently calibrated frame',
-      facts.motionPreference === 'no-preference' && current.length === 1 && current.every((row) => judgeContrastArrival(row).passed), arrivals);
+    check(`${world}/fresh-demo.arrival`, 'every displayed named read-mini-rise reaches full opacity by its own authored end plus an independently calibrated frame',
+      facts.motionPreference === 'no-preference' && arrivalVerdict.passed, arrivals);
     const candidate = await measureDemo(page, world, 'settled');
     report.results.push(candidate);
     check(`${world}/fresh-demo.coverage`, 'the actual demo headword and Kanji label are included in the pixel contrast measurement',
@@ -1064,7 +1073,7 @@ try {
         check(`${world}/${state}.C4`, `${world}/${state}: no banding, gentle slope — ≤ 1 visible tonal step per 24 px (${result.banding.length} gradation layers drawn)`,
           banded.length === 0, banded.slice(0, 8));
         check(`${world}/${state}.C5`, `${world}/${state}: the key-kanji sheets wear their wash and the kanji reads ≥ 4.5:1 (${result.kanji.length})`,
-          result.kanji.every((k) => k.ok), result.kanji);
+          result.kanji.every((k) => k.ok), { applicability: result.kanji.length ? 'measured' : 'vacuous-no-key-kanji-sheet', measured: result.kanji.length, sheets: result.kanji });
         if (!NIGHT.has(world)) check(`${world}/${state}.C6`, `${world}/${state}: no muddy surface (between ink and 92 % of the page)`, result.muddy.length === 0, result.muddy.slice(0, 10));
       }
       if (onlyStates?.includes('shelf') || !onlyStates) {

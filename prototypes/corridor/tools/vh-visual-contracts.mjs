@@ -9,6 +9,8 @@ export function exactRoster(expected, observed) {
     && expected.length === observed.length && new Set(expected).size === expected.length
     && new Set(observed).size === observed.length && expected.every(id => observed.includes(id));
 }
+export const blockRosterHolds = (block, drawn) => Array.isArray(block) && Array.isArray(drawn)
+  && (block.length === 0 ? drawn.length === 0 : exactRoster(block, drawn));
 export function selection(value, allowed, name) {
   if (value === undefined) return null;
   const selected = value.split(',').map(x => x.trim());
@@ -174,6 +176,15 @@ export function shelfEvidence({ expectedIds, blocks, series, ids, prefix }) {
   return { roster: exactRoster(expectedIds, ids), blocks: blocksExact, series: seriesOrdered, adjustedPrefix,
     order: !prefix || (prefix.length === adjustedPrefix.length && prefix.every((id, i) => adjustedPrefix[i] === id)) };
 }
+export function shelfDropOrder(shelves, prefixLength) {
+  const days = Array.isArray(shelves) ? shelves.map(shelf => shelf?.day) : [];
+  const scheduled = days.length === 4 && days.every((day, i) => typeof day === 'string' && /^\d{4}-\d{2}-\d{2}$/u.test(day)
+    && Date.parse(day) - Date.parse(days[0]) === i * 86400000);
+  const sized = Number.isInteger(prefixLength) && prefixLength > 0;
+  const prefixes = scheduled && sized ? shelves.map(shelf => (Array.isArray(shelf.ids) ? shelf.ids.slice(0, prefixLength) : [])) : [];
+  const filled = prefixes.length === 4 && prefixes.every(prefix => prefix.length === prefixLength && prefix.every(id => typeof id === 'string' && id.length > 0));
+  return { passed: filled && prefixes.every(prefix => prefix.every((id, i) => id === prefixes[0][i])), days: scheduled ? days : [], prefixLength, prefixes };
+}
 export function shelfContract(rows, queue) {
   const originals = queue.filter(row => ['original','aozora','gv','mext','govonline'].includes(row.kind) && row.decision !== 'rejected');
   const days = [...new Set(originals.map(row => row.addedAt))].sort().reverse();
@@ -213,8 +224,42 @@ export function shelfNeighborViolations(ids, contract, rows) {
   }
   return broken;
 }
-/** Strict native DOM mutation controls. The same shelfEvidence predicate serves the
- * main sweep and these controls. A failed candidate or unsafe mutation is not a kill. */
+const DRIFT='day-two-drop-order-drift',SHELF_KEYS=['roster','blocks','series','order'];
+function settleShelfControl(row) {
+  const {mutation,judged,premise,s09}=row;
+  const failures=SHELF_KEYS.filter(key=>judged[key]===false);
+  // A duplicate also changes order; it is a declared consequence, not a new kill.
+  const allowed=mutation.mode==='duplicate'?['roster','blocks','order']:mutation.intended;
+  const unrelated=failures.filter(key=>!allowed.includes(key));
+  const ordered=mutation.id!==DRIFT||(!row.awaiting&&premise.naturalBaseline===true&&s09?.natural?.passed===true
+    &&s09.mutant?.passed===false&&s09.restored?.passed===true);
+  const passed=premise.baseGood&&premise.legacyMembership&&premise.neighborClean&&mutation.intended.every(key=>failures.includes(key))&&!unrelated.length
+    &&row.restoredBytes&&JSON.stringify(row.restored)===JSON.stringify(row.baseline)&&ordered;
+  return {...row,failures,unrelated,passed};
+}
+export function shelfDriftControl(row, natural, prefixLength, evaluate = shelfDropOrder) {
+  const {awaiting,...held}=row,at=natural.findIndex(shelf=>shelf.day===row.day);
+  const replaced=ids=>natural.map((shelf,i)=>i===at?{day:shelf.day,ids}:shelf);
+  const s09={prefixLength,dayIndex:at,natural:evaluate(natural,prefixLength),mutant:evaluate(replaced(row.changed),prefixLength),
+    restored:evaluate(replaced(row.restored),prefixLength)};
+  const naturalBaseline=awaiting==='S09'&&at===1&&natural.length===4&&JSON.stringify(natural[at].ids)===JSON.stringify(row.baseline);
+  return settleShelfControl({...held,judged:{...row.judged,order:s09.mutant.passed},premise:{...row.premise,naturalBaseline},s09});
+}
+export async function shelfOrderCollection(page, contract, rows, { days, visit, engine, lang, controls = true }) {
+  const shelves=[],settled=[],held=[];
+  for(const [dayIndex,day] of days.entries()) {
+    shelves.push({day,cards:await visit(day)});
+    if(controls) for(const row of await shelfMutationControls(page,contract,rows,{day,dayIndex,engine,lang})) (row.awaiting?held:settled).push(row);
+  }
+  return {shelves,settled,held};
+}
+export function shelfOrderVerdict({ shelves, settled, held }, prefixLength, evaluate = shelfDropOrder) {
+  const natural=shelves.map(({day,cards})=>({day,ids:cards.map(card=>card.id)}));
+  return {order:evaluate(natural,prefixLength),controls:[...settled,...held.map(row=>shelfDriftControl(row,natural,prefixLength,evaluate))]};
+}
+/** Strict native DOM mutation controls. The same shelfEvidence predicate serves the main sweep and these
+ * controls; the day-two drift control waits for the four-day shelfDropOrder collection that S09 judges.
+ * A failed candidate or unsafe mutation is not a kill. */
 export async function shelfMutationControls(page, contract, rows, { day, dayIndex, engine, lang }) {
   const read=()=>page.locator('#shelf-reading-results .shelf-item').evaluateAll(nodes=>nodes.map(node=>node.dataset.passage));
   const baseline=await read(), first=shelfEvidence({...contract,ids:baseline});
@@ -232,11 +277,12 @@ export async function shelfMutationControls(page, contract, rows, { day, dayInde
   };
   const candidates=[{id:'drop-duplicate-hides-omission',mode:'duplicate',pair:choose(true),intended:['roster','blocks']},
     {id:'series-book-order-swapped',mode:'swap',pair:{a:'aozora:049966-1',b:'aozora:049966-2'},intended:['series','order']}];
-  if(dayIndex===1) candidates.push({id:'day-two-drop-order-drift',mode:'swap',pair:choose(false),intended:['order']});
+  if(dayIndex===1) candidates.push({id:DRIFT,mode:'swap',pair:choose(false),intended:['order']});
   const results=[];
   for(const mutation of candidates) {
     if(!mutation.pair) {results.push({id:mutation.id,engine,lang,day,passed:false,error:'No independently legal mutation premise'});continue;}
     let changed,judged,restored,restoreHTML;
+    const awaiting=mutation.id===DRIFT;
     try {
       await root.evaluate((root,{pair,mode})=>{
         const nodes=[...root.querySelectorAll('.shelf-item')],a=nodes.find(node=>node.dataset.passage===pair.a),b=nodes.find(node=>node.dataset.passage===pair.b);
@@ -244,20 +290,15 @@ export async function shelfMutationControls(page, contract, rows, { day, dayInde
         if(mode==='duplicate') b.replaceWith(a.cloneNode(true));
         else {const marker=document.createComment('VH-1');a.replaceWith(marker);b.replaceWith(a);marker.replaceWith(b);}
       },mutation);
-      changed=await read(); judged=shelfEvidence({...contract,ids:changed,prefix});
+      changed=await read(); judged=shelfEvidence({...contract,ids:changed,...(awaiting?{}:{prefix})});
+      if(awaiting) judged.order=null;
     } finally { await root.evaluate((root,html)=>{root.innerHTML=html;},original); restored=await read();restoreHTML=await root.innerHTML(); }
     const legacyMembership=changed.length===baseline.length&&contract.blocks.every((block,index)=>{
       const start=contract.blocks.slice(0,index).flat().length;return changed.slice(start,start+block.length).every(id=>block.includes(id));
     });
-    const failures=['roster','blocks','series','order'].filter(key=>!judged[key]);
-    // A duplicate also changes order; it is a declared consequence, not a new kill.
-    const allowed=mutation.mode==='duplicate'?['roster','blocks','order']:mutation.intended;
-    const unrelated=failures.filter(key=>!allowed.includes(key));
     const neighborClean=mutation.id==='series-book-order-swapped'||shelfNeighborViolations(changed,contract,rows).length===0;
-    const passed=baseGood&&legacyMembership&&neighborClean&&mutation.intended.every(key=>failures.includes(key))&&!unrelated.length
-      &&restoreHTML===original&&JSON.stringify(restored)===JSON.stringify(baseline);
-    results.push({id:mutation.id,engine,lang,day,mutation,baseline,changed,restored,judged,failures,unrelated,
-      premise:{baseGood,legacyMembership,neighborClean},restoredBytes:restoreHTML===original,passed});
+    results.push(settleShelfControl({id:mutation.id,engine,lang,day,mutation,baseline,changed,restored,judged,
+      premise:{baseGood,legacyMembership,neighborClean},restoredBytes:restoreHTML===original,...(awaiting?{awaiting:'S09'}:{})}));
   }
   return results;
 }

@@ -20,6 +20,8 @@ import {
   PERSONAL_SOURCES,
   PLACES_CASES,
   LANGUAGE_ROOMS,
+  LANGUAGE_ROOM_VIEWS,
+  LANGUAGE_STAMPS,
   EXPERIENCE_CASES,
   EXPERIENCE_ASSETS,
   HOST_CASES,
@@ -81,7 +83,13 @@ function context(name) {
 function fixture(name, c = context(name)) {
   const ids = deckReportContracts[name].expectedCases(c.engine, c),
     rows = ids.map((name) => ({ name, pass: true }));
-  const r = { results: rows, artifactSha256: hash, verifierSha256: hash, site: c.site };
+  const r = {
+    results: rows,
+    artifactSha256: hash,
+    verifierSha256: hash,
+    site: c.site,
+    runId: c.runId,
+  };
   if (name === 'personal-collections-contract')
     Object.assign(r, {
       schemaVersion: 2,
@@ -168,14 +176,15 @@ function fixture(name, c = context(name)) {
       artifact: c.site,
       results: ids.map((id) => {
         const [language, room] = id.split('/');
+        const view = LANGUAGE_ROOM_VIEWS[room];
         return {
           room,
           language,
-          view: 'shelf',
-          shell: { view: 'shelf', stamp: 'shelf', quiet: false, activeTabs: 1, tabs: 1 },
+          view,
+          shell: { view, stamp: LANGUAGE_STAMPS[view], quiet: false, activeTabs: 1, tabs: 1 },
           issues: [],
           contractIssues: [],
-          inspected: 12,
+          inspected: language === 'EN' ? 12 : 0,
         };
       }),
       errors: [],
@@ -563,16 +572,25 @@ test('independent observed producer receipts meet the pinned rosters', () => {
       observedReceipts['redesign-foundation'].report,
       foundation,
     ).errors,
-    ['Foundation always runs both engines; engine/version evidence missing'],
+    [
+      'Served report needs its own site, artifact and attempt identity',
+      'Foundation always runs both engines; engine/version evidence missing',
+    ],
   );
+  const syntheticIdentity = {
+    site: foundation.site,
+    runId: foundation.runId,
+    artifactSha256: foundation.artifactSha256,
+    browserVersions: { chromium: '153.0.7258.5', webkit: '26.0' },
+  };
   const versioned = {
     ...structuredClone(observedReceipts['redesign-foundation'].report),
-    browserVersions: { chromium: '153.0.7258.5', webkit: '26.0' },
+    ...syntheticIdentity,
   };
   assert.deepEqual(validateDeckReport('redesign-foundation', versioned, foundation).errors, []);
   const partial = {
     ...structuredClone(observedReceipts['redesign-foundation-partial'].report),
-    browserVersions: versioned.browserVersions,
+    ...syntheticIdentity,
   };
   assert(
     validateDeckReport('redesign-foundation', partial, foundation).errors.includes(
@@ -600,5 +618,84 @@ test('independent observed producer receipts meet the pinned rosters', () => {
     const bad = structuredClone(personal);
     mutate(bad);
     assert.equal(validateDeckReport('personal-collections-contract', bad, pc).passed, false);
+  }
+});
+test('redesign-language rows need a known pinned view, its stamp and actual English inspections', () => {
+  const c = context('redesign-language'),
+    good = fixture('redesign-language');
+  assert.deepEqual(validateDeckReport('redesign-language', good, c).errors, []);
+  const en = good.results.findIndex((row) => row.language === 'EN' && row.room === 'reader'),
+    ja = good.results.findIndex((row) => row.language === '日本語');
+  for (const mutate of [
+    (r) => {
+      r.results[en] = {
+        room: 'reader',
+        language: 'EN',
+        issues: [],
+        contractIssues: [],
+        inspected: 0,
+        shell: { quiet: true, activeTabs: 0 },
+      };
+    },
+    (r) => {
+      delete r.results[en].view;
+      delete r.results[en].shell.view;
+      delete r.results[en].shell.stamp;
+    },
+    (r) => (r.results[en].inspected = 0),
+    (r) => delete r.results[en].inspected,
+    (r) => (r.results[en].inspected = 1.5),
+    (r) => (r.results[ja].inspected = -1),
+    (r) => {
+      r.results[en].view = 'shelf';
+      r.results[en].shell.view = 'shelf';
+      r.results[en].shell.stamp = 'shelf';
+    },
+    (r) => {
+      r.results[en].view = 'constructor';
+      r.results[en].shell.view = 'constructor';
+      r.results[en].shell.stamp = undefined;
+    },
+    (r) => (r.results[en].shell.view = 'shelf'),
+    (r) => delete r.results[en].shell.quiet,
+  ]) {
+    const bad = structuredClone(good);
+    mutate(bad);
+    assert.equal(validateDeckReport('redesign-language', bad, c).passed, false, String(mutate));
+  }
+  assert.equal(Object.keys(LANGUAGE_ROOM_VIEWS).length, LANGUAGE_ROOMS.length);
+  assert(Object.values(LANGUAGE_ROOM_VIEWS).every((view) => Object.hasOwn(LANGUAGE_STAMPS, view)));
+  const observed = observedReceipts['redesign-language'].report;
+  assert.deepEqual(
+    Object.fromEntries(observed.results.map((row) => [row.room, row.view])),
+    LANGUAGE_ROOM_VIEWS,
+  );
+});
+test('served personal-collections and foundation reports bind their own site, attempt and artifact', () => {
+  for (const name of ['personal-collections-browser', 'redesign-foundation']) {
+    const c = context(name),
+      good = fixture(name, c);
+    assert.deepEqual(validateDeckReport(name, good, c).errors, [], name);
+    for (const mutate of [
+      (r) => delete r.site,
+      (r) => (r.site = OTHER_SITE),
+      (r) => (r.site = join(SITE, 'missing')),
+      (r) => delete r.runId,
+      (r) => (r.runId = 'stale-attempt'),
+      (r) => delete r.artifactSha256,
+      (r) => (r.artifactSha256 = 'b'.repeat(64)),
+    ]) {
+      const bad = structuredClone(good);
+      mutate(bad);
+      assert.equal(validateDeckReport(name, bad, c).passed, false, `${name} ${mutate}`);
+    }
+    for (const patch of [{ runId: '' }, { site: '' }, { artifactVerifiedBeforeAndAfter: false }])
+      assert.equal(validateDeckReport(name, good, { ...c, ...patch }).passed, false, name);
+    for (const site of [SITE_LINK, `${SITE}/`])
+      assert.deepEqual(
+        validateDeckReport(name, { ...good, site }, c).errors,
+        [],
+        `${name} ${site}`,
+      );
   }
 });

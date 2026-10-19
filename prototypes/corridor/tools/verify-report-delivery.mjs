@@ -32,7 +32,7 @@
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { reportCopyObservation, expectedReportChecks, exactNamedCompletion, REPORT_COPY_CONTROLS } from './vh-learning-contracts.mjs';
+import { reportCopyObservation, reportDeliveryAcceptance } from './vh-learning-contracts.mjs';
 import { Buffer } from 'node:buffer';
 import console from 'node:console';
 import process from 'node:process';
@@ -70,7 +70,6 @@ assert(!process.env.KAIRO_BROWSER || ['chromium','webkit','all'].includes(proces
 assert(process.argv.length === 2, 'report-delivery takes no narrowing arguments');
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? { [process.env.KAIRO_BROWSER]: ({chromium,webkit})[process.env.KAIRO_BROWSER] } : { chromium, webkit };
 const versions = {}, controls = [], scenarios = [];
-const COPY_CONTROLS = REPORT_COPY_CONTROLS;
 const checks = [];
 // In GitHub Actions a failed check is also an annotation, so the failure is
 // readable from the check run without downloading the job log.
@@ -485,14 +484,10 @@ try {
   check('terminal error', false, String(error.stack || error));
 } finally {
   for (const resource of [host,relay,github]) await resource.close?.().catch(error=>check('cleanup error',false,String(error)));
-  const expectedControls=Object.keys(engines).flatMap(engine=>['en','ja'].flatMap(locale=>COPY_CONTROLS.map(name=>`${engine}/${locale}/${name}`)));
-  const observedControls=controls.map(row=>`${row.engine}/${row.locale}/${row.name}`);
-  const expectedChecks=expectedReportChecks(Object.keys(engines));
-  const expectedScenarios=Object.keys(engines).flatMap(engine=>['copy en','copy ja','prefilled issue','long report','blocked window','relay','no Blob storage','setup link'].map(name=>`${engine} · ${name}`));
-  const fullAcceptance=exactNamedCompletion(checks,expectedChecks) && exactNamedCompletion(scenarios,expectedScenarios,'name','completed') && observedControls.length===expectedControls.length && new Set(observedControls).size===expectedControls.length
-    && expectedControls.every(id=>observedControls.includes(id)) && controls.every(row=>row.verdict==='killed');
+  const { scope, expectedChecks, expectedScenarios, expectedControls, observedControls, diagnosticPass, fullAcceptance } =
+    reportDeliveryAcceptance({ engines: Object.keys(engines), checks, scenarios, controls });
   writeFileSync(join(out, 'verification-report.json'), `${JSON.stringify({schema:'vh-report-delivery/1',suite:'report-delivery',version,runId,startedAt,finishedAt:new Date().toISOString(),
-    gitSha:identity.gitSha,artifactSha256:identity.artifactSha256,verifierGitSha,verifierSha256,engines:Object.keys(engines),browsers:versions,scope:Object.keys(engines).length===2?'full-engine':'diagnostic',checks,expectedChecks,scenarios,expectedScenarios,controls,expectedControls,observedControls,fullAcceptance},null,2)}\n`);
+    gitSha:identity.gitSha,artifactSha256:identity.artifactSha256,verifierGitSha,verifierSha256,engines:Object.keys(engines),browsers:versions,scope,checks,expectedChecks,scenarios,expectedScenarios,controls,expectedControls,observedControls,diagnosticPass,fullAcceptance},null,2)}\n`);
   console.log(`\n${checks.filter(row=>row.pass).length}/${checks.length} checks passed`);
   if (!fullAcceptance) process.exitCode=1;
 }

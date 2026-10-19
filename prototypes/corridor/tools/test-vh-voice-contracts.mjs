@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { selection, exactRoster, SENSE_GROUPS, SPEAK_CASE_IDS, SPEAK_CONTROL_IDS_BY_ENGINE, speakControlPlan, senseAttempts, readingInteraction, speakCompletion, adjudicateSpeakPhase } from './vh-voice-contracts.mjs';
+import { selection, exactRoster, SENSE_GROUPS, SPEAK_CASE_IDS, SPEAK_CONTROL_IDS_BY_ENGINE, speakControlPlan, senseAttempts, readingInteraction, speakCompletion, adjudicateSpeakPhase, adjudicateSensePhase } from './vh-voice-contracts.mjs';
 import { grokCase } from './sense-grok-case.mjs';
 const grokDeps = (deps) => ({ openArticle: async () => true, card: async () => null, cardState: async () => null, closeMini: async () => {}, delay: async () => {},
   pageSense: async () => [], glossesOf: () => [], sidecarRow: () => null, led: (rows) => rows, pageNames: new Set(), vhControl: '', vhMutations: [], ...deps });
@@ -172,4 +172,113 @@ test('Speak downstream names are exact and cannot replace the primary witness', 
 test('malformed or missing child row arrays cannot kill a Speak mutant', () => {
   for (const receipt of [null, {}, { checks: {}, cases: [] }, { checks: [null], cases: [], pageErrors: [] }, { checks: [], cases: [null], pageErrors: [] }])
     assert.equal(adjudicateSpeakPhase({ receipt, exit: 1, cases: ['S1'], nonce: 'n', engine: 'chromium', fault: 'fault' }).status, 'not-run');
+});
+
+test('Speak negatives count only exact false witness rows; null, undefined and skip markers never kill', () => {
+  for (const pass of [null, undefined, 'skip', 0, 'false']) {
+    const r = negativeReceipt(); r.checks[0].pass = pass;
+    assert.equal(adjudicate(r).ok, false, `witness ${pass}`);
+    const unrelated = negativeReceipt();
+    unrelated.checks.push({ engine: 'webkit', case: 'S1', name: 'other row', pass }); unrelated.cases[0].checks++;
+    assert.equal(adjudicate(unrelated).ok, false, `unrelated ${pass}`);
+    const candidate = { ...negativeReceipt(), phase: 'baseline', fault: null, selectedPassed: true };
+    candidate.checks = [{ engine: 'webkit', case: 'S1', name: 'intended witness', pass }];
+    assert.equal(adjudicateSpeakPhase({ receipt: candidate, exit: 3, nonce: 'fresh', engine: 'webkit', cases: ['S1'] }).ok, false, `baseline ${pass}`);
+  }
+  const candidate = { ...negativeReceipt(), phase: 'baseline', fault: null, selectedPassed: true };
+  candidate.checks = [{ engine: 'webkit', case: 'S1', name: 'intended witness', pass: true }];
+  assert.equal(adjudicateSpeakPhase({ receipt: candidate, exit: 3, nonce: 'fresh', engine: 'webkit', cases: ['S1'] }).ok, true);
+});
+
+const SENSE_CONTROL = { id: 'discard-completed-red-on-retry', fixture: 'adapt-n3:govonline:article-202609-radio-3741#36', row: 'G.ない, auxiliary (聞こえない)', downstream: ['G.ない, auxiliary (聞こえない).incomplete'] };
+const READING_CONTROL = { id: 'pronunciation-ta-promoted-to-door', fixture: 'bunki-read-n3-gojuon-sanskrit#233', row: 'G.悉曇（しったん）: た', downstream: [] };
+const senseIdentity = { engine: 'chromium', runId: 'run', nonce: 'fresh', artifactSha256: 'artifact', verifierSha256: 'tool' };
+const navigationTimeout = { attempt: 1, observations: 1, complete: false, retry: false, stage: 'navigation', error: 'TimeoutError: controlled post-G navigation timeout' };
+const senseReceipt = (control, phase, { primaryOk = phase !== 'mutant', history } = {}) => {
+  const discard = control.id === SENSE_CONTROL.id, mutant = phase === 'mutant';
+  const rows = [{ engine: 'chromium', id: control.row, ok: primaryOk,
+    observed: { attempt: 1, detail: discard ? { lines: [mutant ? 'VH wrong sense sentinel' : 'the real sense'] } : { annotation: false, interactive: true } } }];
+  if (discard && mutant) rows.push({ engine: 'chromium', id: `${control.row}.incomplete`, ok: false, observed: { attempt: 1, detail: { error: navigationTimeout.error, stage: 'navigation' } } });
+  if (discard && !mutant) rows.push({ engine: 'chromium', id: control.row.replace(/^G\./u, 'P.'), ok: true, observed: { attempt: 1, detail: {} } });
+  rows.push({ engine: 'chromium', id: 'g.page-errors', ok: true, observed: [] }, { engine: 'chromium', id: 'S.retried', recorded: true, observed: { count: 0 } });
+  return { runId: 'run', nonce: 'fresh', artifactSha256: 'artifact', verifierSha256: 'tool', engines: ['chromium'], error: null,
+    selectedPassed: !mutant, fullAcceptance: false, complete: !(discard && mutant), vhControl: mutant ? control.id : null,
+    vhMutations: mutant ? [{ control: control.id, matches: 1 }] : [],
+    attempts: [{ engine: 'chromium', fixture: control.row.slice(2), history: history || (discard && mutant ? [navigationTimeout] : [{ attempt: 1, observations: 1, complete: true }]) }], rows };
+};
+const senseVerdict = (control, phase, receipt, extra = {}) => adjudicateSensePhase({ ...senseIdentity, control, phase, receipt, exit: phase === 'mutant' ? 1 : 3, ...extra });
+test('Sense served-control phases: caught mutants and green candidates are admitted by the producer adjudicator', () => {
+  for (const control of [SENSE_CONTROL, READING_CONTROL])
+    for (const phase of ['baseline', 'mutant', 'restore']) {
+      const verdict = senseVerdict(control, phase, senseReceipt(control, phase));
+      assert.equal(verdict.ok, true, `${control.id}/${phase}`); assert.equal(verdict.fresh, true);
+    }
+});
+test('a surviving discard-retry mutant is a structured failed control, never a crash that loses other evidence', () => {
+  const survived = senseReceipt(SENSE_CONTROL, 'mutant', { primaryOk: true });
+  let verdict;
+  assert.doesNotThrow(() => { verdict = senseVerdict(SENSE_CONTROL, 'mutant', survived); });
+  assert.equal(verdict.ok, false); assert.deepEqual(verdict.reds.map((row) => row.id), [`${SENSE_CONTROL.row}.incomplete`]);
+  const unmutated = senseReceipt(SENSE_CONTROL, 'mutant'); delete unmutated.vhMutations;
+  assert.doesNotThrow(() => { verdict = senseVerdict(SENSE_CONTROL, 'mutant', unmutated); });
+  assert.equal(verdict.ok, false);
+  for (const receipt of [null, undefined, {}, { rows: {} }, { rows: [null] }, { ...senseReceipt(SENSE_CONTROL, 'mutant'), attempts: [{ history: null }] }, { ...senseReceipt(SENSE_CONTROL, 'mutant'), attempts: [null] }])
+    for (const phase of ['baseline', 'mutant', 'restore'])
+      assert.doesNotThrow(() => { assert.equal(senseVerdict(SENSE_CONTROL, phase, receipt).ok, false); }, `${phase}: ${JSON.stringify(receipt)?.slice(0, 40)}`);
+});
+test('Sense served-control kills need exact false named witnesses; null, skip, timeout and stale evidence never kill', () => {
+  for (const ok of [null, undefined, 'skip', 0]) {
+    const receipt = senseReceipt(READING_CONTROL, 'mutant');
+    receipt.rows[0].ok = ok;
+    assert.equal(senseVerdict(READING_CONTROL, 'mutant', receipt).ok, false, `witness ${ok}`);
+    const candidate = senseReceipt(READING_CONTROL, 'baseline');
+    candidate.rows[1].ok = ok;
+    assert.equal(senseVerdict(READING_CONTROL, 'baseline', candidate).ok, false, `candidate ${ok}`);
+  }
+  const hidden = senseReceipt(READING_CONTROL, 'mutant');
+  hidden.rows.push({ engine: 'chromium', id: 'G.hidden', recorded: 'skip', ok: false });
+  assert.equal(senseVerdict(READING_CONTROL, 'mutant', hidden).ok, false);
+  const wrongSentinel = senseReceipt(SENSE_CONTROL, 'mutant');
+  wrongSentinel.rows[0].observed.detail.lines = ['the real sense'];
+  assert.equal(senseVerdict(SENSE_CONTROL, 'mutant', wrongSentinel).ok, false);
+  for (const extra of [{ timedOut: true }, { signal: 'SIGKILL' }, { error: 'spawn ENOENT' }, { exit: 3 }, { nonce: 'other' }, { runId: 'other' }, { artifactSha256: 'other' }, { verifierSha256: 'other' }, { engine: 'webkit' }])
+    assert.equal(senseVerdict(READING_CONTROL, 'mutant', senseReceipt(READING_CONTROL, 'mutant'), extra).ok, false, JSON.stringify(extra));
+  const retried = senseReceipt(READING_CONTROL, 'mutant', { history: [{ attempt: 1, observations: 0, complete: false, retry: true, stage: 'setup' }, { attempt: 2, observations: 1, complete: true }] });
+  assert.equal(senseVerdict(READING_CONTROL, 'mutant', retried).ok, false);
+});
+test('Sense reading kills require actual wrong classification observations, not a false label on absent or opposite evidence', () => {
+  for (const mutate of [
+    row => { delete row.observed; }, row => { row.observed = null; },
+    row => { row.observed.detail = {}; },
+    row => { row.observed.detail = { annotation: true, interactive: false }; },
+    row => { row.observed.detail.skipped = true; },
+  ]) {
+    const receipt = senseReceipt(READING_CONTROL, 'mutant'); mutate(receipt.rows[0]);
+    assert.doesNotThrow(() => assert.equal(senseVerdict(READING_CONTROL, 'mutant', receipt).ok, false));
+  }
+  const incomplete = senseReceipt(SENSE_CONTROL, 'mutant');
+  incomplete.rows[1].observed.detail = {};
+  assert.equal(senseVerdict(SENSE_CONTROL, 'mutant', incomplete).ok, false);
+});
+test('Sense and Speak execution-failure markers cannot be laundered into exact boolean rows', () => {
+  for (const marker of [{ skipped: true }, { skip: true }, { unexecuted: true }, { timedOut: true }, { harnessError: 'setup failed' }, { status: 'not-run' }]) {
+    for (const phase of ['baseline', 'mutant', 'restore']) {
+      for (const location of ['row', 'observed']) {
+        const receipt = senseReceipt(READING_CONTROL, phase);
+        Object.assign(location === 'row' ? receipt.rows[0] : receipt.rows[0].observed, marker);
+        assert.equal(senseVerdict(READING_CONTROL, phase, receipt).ok, false, `${phase}/${location}/${JSON.stringify(marker)}`);
+      }
+    }
+    const receipt = negativeReceipt(); Object.assign(receipt.checks[0], marker);
+    assert.equal(adjudicate(receipt).ok, false);
+    const candidate = negativeReceipt(); Object.assign(candidate, { fault: null, phase: 'baseline', selectedPassed: true }); candidate.checks[0].pass = true;
+    Object.assign(candidate.checks[0], marker);
+    assert.equal(adjudicateSpeakPhase({ receipt: candidate, exit: 3, nonce: 'fresh', engine: 'webkit', cases: ['S1'] }).ok, false);
+  }
+});
+test('Speak completion requires strict true, including every case and assertion', () => {
+  for (const collection of ['cases', 'checks']) for (const value of [1, 'true', null, undefined, 'skip']) {
+    const full = fixture([...SPEAK_CASE_IDS, 'egress']); full[collection][0].pass = value;
+    assert.equal(speakCompletion({ engines: ['webkit'], selected: null, ...full }).fullAcceptance, false);
+  }
 });

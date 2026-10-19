@@ -7,7 +7,7 @@ import { chromium, webkit } from 'playwright-core';
 import { startCorridorDev } from '../../../scripts/serve-corridor-dev.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
-import { shelfContract, shelfEvidence, shelfMutationControls, mixedScriptMutationControl, loadMixedLexemes, scopeResult } from './vh-visual-contracts.mjs';
+import { shelfContract, shelfEvidence, shelfOrderCollection, shelfOrderVerdict, mixedScriptMutationControl, loadMixedLexemes, scopeResult } from './vh-visual-contracts.mjs';
 assert(!process.argv.slice(2).length,'VH visual target has no selectors');
 const site=resolveCorridorSite(),out=resolveCorridorEvidence();
 const identity=JSON.parse(readFileSync(resolve(site,'build-identity.json')));
@@ -42,16 +42,18 @@ try {
             results.push({...result,caseId:`${engine}/${lang}/${width}/${result.id}`});
           }
           await page.setViewportSize({width:390,height:844});
-          let prefix;
-          for(const [dayIndex,day] of days.entries()) {
+          const collection=await shelfOrderCollection(page,contract,rows,{days,engine,lang,visit:async day=>{
             await page.evaluate(day=>localStorage.setItem('kairo-shelf-day',day),day);
             await page.reload();await page.waitForFunction(()=>document.body.dataset.ready==='1',null,{timeout:60000});
             await page.locator('#shelf-reading-results .shelf-item').first().waitFor();
-            const ids=await page.locator('#shelf-reading-results .shelf-item').evaluateAll(nodes=>nodes.map(node=>node.dataset.passage));
-            const baseline=shelfEvidence({...contract,ids,prefix});prefix??=baseline.adjustedPrefix;
-            const controls=await shelfMutationControls(page,contract,rows,{day,dayIndex,engine,lang});
-            for(const result of controls)results.push({...result,baseline,passed:result.passed&&baseline.roster&&baseline.blocks&&baseline.series&&baseline.order,
-              caseId:`${engine}/${lang}/${day}/${result.id}`});
+            return (await page.locator('#shelf-reading-results .shelf-item').evaluateAll(nodes=>nodes.map(node=>node.dataset.passage))).map(id=>({id}));
+          }});
+          const {order,controls}=shelfOrderVerdict(collection,contract.blocks.flat().length);
+          const shelf=new Map(collection.shelves.map(({day,cards})=>[day,shelfEvidence({...contract,ids:cards.map(card=>card.id)})]));
+          for(const result of controls) {
+            const evidence=shelf.get(result.day);
+            results.push({...result,shelf:evidence,dropOrder:order,passed:result.passed&&evidence.roster&&evidence.blocks&&evidence.series&&order.passed,
+              caseId:`${engine}/${lang}/${result.day}/${result.id}`});
           }
           if(errors.length)results.push({caseId:`${engine}/${lang}/page-errors`,passed:false,errors});
         }finally{await context.close();}

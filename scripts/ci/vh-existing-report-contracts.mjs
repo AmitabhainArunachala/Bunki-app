@@ -337,6 +337,113 @@ function contract({
   });
 }
 const named = (producer, names, options = {}) => contract({ producer, names, ...options });
+const TEACHER_DRAFT_KEYS = ['consumed', 'contextRef', 'revision', 'text'];
+const TEACHER_DELAYED_COMMON = [
+  'name',
+  'label',
+  'providerStatus',
+  'submitted',
+  'current',
+  'outboundXid',
+  'outboundReplies',
+  'editorAfterOutcome',
+  'draftAfterOutcome',
+  'editorAfterRestart',
+  'draftAfterRestart',
+];
+export const TEACHER_DELAYED_OBSERVATIONS = Object.freeze({
+  'synthetic-delayed-success-preserves-newer-text-and-deliberate-empty': Object.freeze({
+    name: 'delayed-success-keeps-current-draft',
+    providerStatus: 200,
+    keys: Object.freeze([...TEACHER_DELAYED_COMMON, 'reply']),
+  }),
+  'synthetic-delayed-error-preserves-newer-text-and-deliberate-empty': Object.freeze({
+    name: 'delayed-error-keeps-current-draft',
+    providerStatus: 503,
+    keys: Object.freeze([...TEACHER_DELAYED_COMMON, 'failureLines']),
+  }),
+});
+const generalDraft = (draft) =>
+  !!draft &&
+  typeof draft === 'object' &&
+  !Array.isArray(draft) &&
+  exact(TEACHER_DRAFT_KEYS, Object.keys(draft)) &&
+  draft.consumed === false &&
+  draft.contextRef === null &&
+  typeof draft.revision === 'string' &&
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(draft.revision) &&
+  typeof draft.text === 'string';
+const sameDraft = (a, b) => TEACHER_DRAFT_KEYS.every((key) => a?.[key] === b?.[key]);
+export function teacherDelayedObservationErrors(name, observations) {
+  const spec = Object.hasOwn(TEACHER_DELAYED_OBSERVATIONS, name)
+    ? TEACHER_DELAYED_OBSERVATIONS[name]
+    : null;
+  if (!spec) return [`${name}: no reviewed delayed-outcome observation contract`];
+  if (!Array.isArray(observations) || observations.length !== 2)
+    return [`${name}: exactly the newer and deliberate-empty completed observations are required`];
+  const errors = [];
+  ['newer', 'empty'].forEach((label, index) => {
+    const observed = observations[index],
+      at = `${name}/${label}`;
+    if (
+      !observed ||
+      typeof observed !== 'object' ||
+      Array.isArray(observed) ||
+      !exact(spec.keys, Object.keys(observed))
+    ) {
+      errors.push(`${at}: observation absent or not the pinned shape`);
+      return;
+    }
+    if (
+      observed.name !== spec.name ||
+      observed.label !== label ||
+      observed.providerStatus !== spec.providerStatus
+    )
+      errors.push(`${at}: wrong observation identity or provider outcome`);
+    if (!generalDraft(observed.submitted) || observed.submitted.text.trim() === '')
+      errors.push(`${at}: durable submitted draft absent`);
+    if (
+      !generalDraft(observed.current) ||
+      observed.current.revision === observed.submitted?.revision
+    )
+      errors.push(`${at}: newer authored draft revision absent`);
+    if (
+      label === 'empty'
+        ? observed.current?.text !== ''
+        : !(
+            typeof observed.current?.text === 'string' &&
+            observed.current.text.trim() !== '' &&
+            observed.current.text !== observed.submitted?.text
+          )
+    )
+      errors.push(`${at}: current draft is not the ${label} text`);
+    if (!nonempty(observed.outboundXid)) errors.push(`${at}: durable outbound turn absent`);
+    if (
+      observed.editorAfterOutcome !== observed.current?.text ||
+      !generalDraft(observed.draftAfterOutcome) ||
+      !sameDraft(observed.draftAfterOutcome, observed.current)
+    )
+      errors.push(`${at}: delayed outcome changed the visible or durable current draft`);
+    if (
+      observed.editorAfterRestart !== observed.current?.text ||
+      !generalDraft(observed.draftAfterRestart) ||
+      !sameDraft(observed.draftAfterRestart, observed.current)
+    )
+      errors.push(`${at}: current draft did not survive the browser restart`);
+    const replies = Array.isArray(observed.outboundReplies) ? observed.outboundReplies : null;
+    if (
+      spec.providerStatus === 200
+        ? !(nonempty(observed.reply) && replies?.length === 1 && replies[0] === observed.reply)
+        : !(
+            replies?.length === 0 &&
+            Number.isInteger(observed.failureLines) &&
+            observed.failureLines > 0
+          )
+    )
+      errors.push(`${at}: delayed provider outcome was not durably observed`);
+  });
+  return errors;
+}
 const viewport = (producer, options = {}) =>
   contract({
     producer,
@@ -390,8 +497,12 @@ const definitions = {
     versions: 'report',
     requireRowErrors: true,
     requireObservations: true,
-    extra(report, context, require) {
+    extra(report, context, require, rows) {
       require(report.suite === 'teacher-drafts', 'Wrong teacher-drafts suite');
+      for (const row of rows)
+        if (Object.hasOwn(TEACHER_DELAYED_OBSERVATIONS, row?.name))
+          for (const error of teacherDelayedObservationErrors(row.name, row.observations))
+            require(false, `${row.engine}/${error}`);
     },
   }),
   'sentence-drafts-integration': named('sentence-drafts', EXISTING_CASES['sentence-drafts'], {
@@ -691,6 +802,30 @@ function normalDemoArrival(arrival) {
     arrival.elapsed <= end + allowance
   );
 }
+export function demoArrivalVerdict(arrivals) {
+  if (!Array.isArray(arrivals) || arrivals.length === 0)
+    return { passed: false, errors: ['No displayed demo arrival observed'] };
+  const errors = [];
+  const current = arrivals.filter((arrival) => arrival?.current === true);
+  if (current.length !== 1)
+    errors.push(`Exactly one displayed current demo mount required; observed ${current.length}`);
+  arrivals.forEach((arrival, index) => {
+    if (arrival?.mountSequence !== index)
+      errors.push(`Mount ${index}: missing, dropped or reordered sequence id`);
+    if (arrival?.current !== true && arrival?.current !== false)
+      errors.push(`Mount ${index}: displayed/retired state absent`);
+    if (arrival?.superseded === true || arrival?.supersededBeforeFinish === true)
+      errors.push(`Mount ${index}: superseded before its arrival finished`);
+    if (
+      arrival?.documentId !== arrivals[0]?.documentId ||
+      !same(arrival?.frameCalibration, arrivals[0]?.frameCalibration)
+    )
+      errors.push(`Mount ${index}: not bound to the same document and pre-arrival calibration`);
+    if (!normalDemoArrival(arrival))
+      errors.push(`Mount ${index}: named arrival / calibrated deadline evidence absent or red`);
+  });
+  return { passed: errors.length === 0, errors };
+}
 for (const engine of ['chromium', 'webkit']) {
   definitions[`contrast-sweep${engine === 'webkit' ? '-webkit' : ''}`] = {
     producer: 'prototypes/corridor/tools/verify-contrast-sweep.mjs',
@@ -773,16 +908,10 @@ for (const engine of ['chromium', 'webkit']) {
                 rows.find((row) => row.id === `${engine}/${world}/fresh-demo.reach`)?.observed &&
               pair.sel.includes('mini-word'),
           ), `${world}: no passing actual demo headword/label contrast`);
-        const arrivals = rows.find(
-          (row) => row.id === `${engine}/${world}/fresh-demo.arrival`,
-        )?.observed;
-        const current = Array.isArray(arrivals)
-          ? arrivals.filter((arrival) => arrival.current)
-          : [];
-        require(current.length === 1 &&
-          current.every(
-            normalDemoArrival,
-          ), `${world}: named normal arrival / independently calibrated deadline evidence absent or red`);
+        const arrivals = demoArrivalVerdict(
+          rows.find((row) => row.id === `${engine}/${world}/fresh-demo.arrival`)?.observed,
+        );
+        require(arrivals.passed, `${world}: every displayed named arrival must meet its own calibrated deadline: ${arrivals.errors.join('; ')}`);
       }
       const controls = Array.isArray(report.controls) ? report.controls : [];
       require(controls.length === 1 &&

@@ -170,39 +170,111 @@ test('Speak independently requires S23 and egress even when the producer declare
     assert.equal(validateVoiceReport('speak', report, context).passed, false);
   }
 });
-test('a mutated producer case helper cannot shrink the executable Speak admission oracle', async () => {
-  const output = process.env.RUNNER_TEMP || join(homedir(), '.dharma', 'bunki', 'test-fixtures');
-  mkdirSync(output, { recursive: true });
-  const root = mkdtempSync(join(output, 'speak-oracle-'));
-  try {
-    const ci = join(root, 'scripts', 'ci'),
-      tools = join(root, 'prototypes', 'corridor', 'tools');
-    mkdirSync(ci, { recursive: true });
-    mkdirSync(tools, { recursive: true });
-    for (const name of ['vh-voice-report-contracts.mjs', 'vh-voice-rosters.mjs'])
-      writeFileSync(join(ci, name), readFileSync(new URL(name, import.meta.url)));
-    const originalHelper = new URL(
-      '../../prototypes/corridor/tools/vh-voice-contracts.mjs',
-      import.meta.url,
-    ).href;
-    writeFileSync(
-      join(tools, 'vh-voice-contracts.mjs'),
-      `export { exactRoster } from ${JSON.stringify(originalHelper)};\n` +
-        `export const SPEAK_CASE_IDS = ['S1'];\n` +
-        `export function speakCompletion() { return {fullAcceptance:true, observedCases:['chromium/S1','chromium/egress']}; }\n`,
-    );
-    const altered = await import(pathToFileURL(join(ci, 'vh-voice-report-contracts.mjs')).href);
-    assert.equal(altered.voiceReportContracts.speak.expectedCases('chromium').length, 24);
-    const full = speak();
-    assert.equal(altered.validateVoiceReport('speak', full.report, full.context).passed, true);
-    full.report.cases = full.report.cases.filter((row) => ['S1', 'egress'].includes(row.case));
-    full.report.checks = full.report.checks.filter((row) => ['S1', 'egress'].includes(row.case));
-    full.report.expectedCases = full.report.observedCases = ['chromium/S1', 'chromium/egress'];
-    assert.equal(altered.validateVoiceReport('speak', full.report, full.context).passed, false);
-  } finally {
-    rmSync(root, { recursive: true, force: true });
-  }
-});
+const MUTATED_PRODUCER_COMPARATORS = {
+  'original comparator': (helper) => `export { exactRoster } from ${JSON.stringify(helper)};\n`,
+  'always-true comparator': () => 'export function exactRoster() { return true; }\n',
+  'subset-accepting comparator': () =>
+    'export function exactRoster(expected, observed) {\n' +
+    '  return Array.isArray(observed) && observed.every((id) => expected.includes(id));\n' +
+    '}\n',
+  'duplicate-tolerant comparator': () =>
+    'export function exactRoster(expected, observed) {\n' +
+    '  return Array.isArray(observed) && expected.every((id) => observed.includes(id));\n' +
+    '}\n',
+};
+function shrink(report, id) {
+  const reduced = structuredClone(report);
+  const gone = id(reduced.rows.pop());
+  reduced.expectedCases = reduced.expectedCases.filter((x) => x !== gone);
+  reduced.observedCases = reduced.observedCases.filter((x) => x !== gone);
+  return reduced;
+}
+for (const [label, comparator] of Object.entries(MUTATED_PRODUCER_COMPARATORS))
+  test(`a mutated producer helper (${label}, shrunk cases) cannot weaken any voice admission oracle`, async () => {
+    const output = process.env.RUNNER_TEMP || join(homedir(), '.dharma', 'bunki', 'test-fixtures');
+    mkdirSync(output, { recursive: true });
+    const root = mkdtempSync(join(output, 'voice-oracle-'));
+    try {
+      const ci = join(root, 'scripts', 'ci'),
+        tools = join(root, 'prototypes', 'corridor', 'tools');
+      mkdirSync(ci, { recursive: true });
+      mkdirSync(tools, { recursive: true });
+      for (const name of ['vh-voice-report-contracts.mjs', 'vh-voice-rosters.mjs'])
+        writeFileSync(join(ci, name), readFileSync(new URL(name, import.meta.url)));
+      const originalHelper = new URL(
+        '../../prototypes/corridor/tools/vh-voice-contracts.mjs',
+        import.meta.url,
+      ).href;
+      writeFileSync(
+        join(tools, 'vh-voice-contracts.mjs'),
+        comparator(originalHelper) +
+          `export const SPEAK_CASE_IDS = ['S1'];\n` +
+          `export const SPEAK_CONTROL_IDS = ['revlog'];\n` +
+          `export const SPEAK_CONTROL_IDS_BY_ENGINE = { webkit: ['revlog'], chromium: ['revlog'] };\n` +
+          `export function speakCompletion() { return {fullAcceptance:true, observedCases:['chromium/S1','chromium/egress']}; }\n` +
+          `export function adjudicateSpeakPhase() { return { ok: true, status: 'caught' }; }\n`,
+      );
+      const altered = await import(pathToFileURL(join(ci, 'vh-voice-report-contracts.mjs')).href);
+      assert.equal(altered.voiceReportContracts.speak.expectedCases('chromium').length, 24);
+      const full = speak();
+      assert.equal(altered.validateVoiceReport('speak', full.report, full.context).passed, true);
+      full.report.cases = full.report.cases.filter((row) => ['S1', 'egress'].includes(row.case));
+      full.report.checks = full.report.checks.filter((row) => ['S1', 'egress'].includes(row.case));
+      full.report.expectedCases = full.report.observedCases = ['chromium/S1', 'chromium/egress'];
+      assert.equal(altered.validateVoiceReport('speak', full.report, full.context).passed, false);
+      const judge = (name, report, context) =>
+        altered.validateVoiceReport(name, report, context).passed;
+      const sensed = sense();
+      assert.equal(judge('sense-truth', sensed.report, sensed.context), true);
+      assert.equal(
+        judge(
+          'sense-truth',
+          shrink(sensed.report, (r) => `${r.engine}/${r.id}`),
+          sensed.context,
+        ),
+        false,
+        'Sense row roster shrunk',
+      );
+      const repeated = structuredClone(sensed.report);
+      repeated.rows.push(structuredClone(repeated.rows[0]));
+      repeated.observedCases.push(repeated.observedCases[0]);
+      assert.equal(judge('sense-truth', repeated, sensed.context), false, 'duplicate Sense row');
+      const copies = copyControls();
+      assert.equal(judge('vh-voice-controls', copies.report, copies.context), true);
+      assert.equal(
+        judge(
+          'vh-voice-controls',
+          shrink(copies.report, (r) => r.control),
+          copies.context,
+        ),
+        false,
+        'copy-control roster shrunk',
+      );
+      const negatives = speakNegatives('webkit');
+      assert.equal(judge('speak-negatives', negatives.report, negatives.context), true);
+      const reduced = shrink(negatives.report, (r) => `${r.engine}/${r.fault}`);
+      reduced.requestedScope.pop();
+      reduced.applicability.webkit.pop();
+      assert.equal(
+        judge('speak-negatives', reduced, negatives.context),
+        false,
+        'Speak control roster shrunk',
+      );
+      const controls = senseControls('chromium');
+      assert.equal(judge('vh-sense-controls', controls.report, controls.context), true);
+      assert.equal(
+        judge(
+          'vh-sense-controls',
+          shrink(controls.report, (r) => `${r.engine}/${r.control}`),
+          controls.context,
+        ),
+        false,
+        'Sense control roster shrunk',
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
 test('both Speak engines require their own timing row, never the other engine’s alternative', () => {
   for (const engine of ['chromium', 'webkit']) {
     const { report, context } = speak(engine);
@@ -231,7 +303,7 @@ test('Sense source changes require independent roster review, and semantic retry
   ];
   assert.equal(validateVoiceReport('sense-truth', clean.report, clean.context).passed, false);
 });
-test('copy controls require all six exact controls and unique nonce-bound completed mutant/restored sources', () => {
+function copyControls() {
   const { report, context } = base('vh-voice-controls');
   report.rows = VOICE_CONTROL_IDS.map((control) => ({
     control,
@@ -258,6 +330,10 @@ test('copy controls require all six exact controls and unique nonce-bound comple
       };
     }),
   }));
+  return { report, context };
+}
+test('copy controls require all six exact controls and unique nonce-bound completed mutant/restored sources', () => {
+  const { report, context } = copyControls();
   const judged = validateVoiceReport('vh-voice-controls', report, context);
   assert(judged.passed, judged.errors.join(';'));
   for (const change of [
@@ -277,24 +353,177 @@ test('copy controls require all six exact controls and unique nonce-bound comple
   shortened.observedCases.pop();
   assert.equal(validateVoiceReport('vh-voice-controls', shortened, context).passed, false);
 });
-test('Sense controls reread fresh child receipts; caught labels with missing nonce/semantic rows do not suffice', () => {
-  const { report, context } = base('vh-sense-controls');
+const D = 'd'.repeat(64);
+const SENSE_TIMEOUT =
+  'TimeoutError: controlled post-G navigation timeout\n    at grokCase (verify-sense-truth.mjs:550:73)';
+// Rows, titles and observations as recorded by the retained Chromium/WebKit served-control receipts.
+const RETAINED_SENSE_CONTROLS = {
+  'discard-completed-red-on-retry': {
+    fixture: 'ない, auxiliary (聞こえない)',
+    candidate: ['G.ない, auxiliary (聞こえない)', 'P.ない, auxiliary (聞こえない)'],
+    reds: [
+      [
+        'G.ない, auxiliary (聞こえない)',
+        'adapt-n3:govonline:article-202609-radio-3741 #36: entry 1529520 sense 5, never "nonexistent"',
+        {
+          word: 'ない',
+          reading: '',
+          lines: ['VH wrong sense sentinel'],
+          more: '',
+          sense: '1529520:4',
+          take: { disabled: false },
+        },
+      ],
+      [
+        'G.ない, auxiliary (聞こえない).incomplete',
+        'the case completed without infrastructure failure',
+        { error: SENSE_TIMEOUT, stage: 'navigation' },
+      ],
+    ],
+  },
+  'pronunciation-ta-promoted-to-door': {
+    fixture: '悉曇（しったん）: た',
+    candidate: ['G.悉曇（しったん）: た'],
+    reds: [
+      [
+        'G.悉曇（しったん）: た',
+        'bunki-read-n3-gojuon-sanskrit #233: independently bracketed reading is inert',
+        { annotation: false, interactive: true, mini: true, sheet: false, rung: 'stage' },
+      ],
+    ],
+  },
+  'pronunciation-n-promoted-to-door': {
+    fixture: '悉曇（しったん）: ん',
+    candidate: ['G.悉曇（しったん）: ん'],
+    reds: [
+      [
+        'G.悉曇（しったん）: ん',
+        'bunki-read-n3-gojuon-sanskrit #234: independently bracketed reading is inert',
+        { annotation: false, interactive: true, mini: true, sheet: false, rung: 'stage' },
+      ],
+    ],
+  },
+  'quoted-reading-demoted-to-annotation': {
+    fixture: '「いちちゅう」: ちゅう',
+    candidate: ['G.「いちちゅう」: ちゅう.classification', 'G.「いちちゅう」: ちゅう'],
+    reds: [
+      [
+        'G.「いちちゅう」: ちゅう.classification',
+        'the independently quoted reading is an interactive reading card, not an annotation',
+        { annotation: true, interactive: false },
+      ],
+      [
+        'G.「いちちゅう」: ちゅう',
+        'a misclassified reading cannot satisfy its card contract',
+        { annotation: true, interactive: false },
+      ],
+    ],
+  },
+};
+function senseChild(engine, control, phase, nonce, runId) {
+  const spec = RETAINED_SENSE_CONTROLS[control],
+    mutant = phase === 'mutant',
+    discard = mutant && control === 'discard-completed-red-on-retry';
+  const rows = [
+    ...(mutant
+      ? spec.reds.map(([id, title, detail]) => ({
+          engine,
+          id,
+          title,
+          ok: false,
+          observed: { attempt: 1, detail },
+        }))
+      : spec.candidate.map((id) => ({
+          engine,
+          id,
+          title: id,
+          ok: true,
+          observed: { attempt: 1, detail: {} },
+        }))),
+    { engine, id: 'g.page-errors', title: 'g: no page errors', ok: true, observed: [] },
+    {
+      engine,
+      id: 'S.retried',
+      title: 'rows and taps run once more after a timeout (never after a wrong answer)',
+      recorded: true,
+      observed: { count: 0, retried: [] },
+    },
+  ];
+  return {
+    schemaVersion: 1,
+    runId,
+    nonce,
+    artifactSha256: A,
+    verifierSha256: D,
+    engines: [engine],
+    versions: { [engine]: '26.6' },
+    fullAcceptance: false,
+    selectedPassed: !mutant,
+    complete: !discard,
+    vhControl: mutant ? control : null,
+    vhMutations: mutant ? [{ control, matches: 1, before: C, after: A }] : [],
+    error: null,
+    attempts: [
+      {
+        engine,
+        fixture: spec.fixture,
+        history: discard
+          ? [
+              {
+                attempt: 1,
+                observations: 1,
+                complete: false,
+                retry: false,
+                stage: 'navigation',
+                error: SENSE_TIMEOUT,
+              },
+            ]
+          : [{ attempt: 1, observations: spec.reds.length, complete: true }],
+      },
+    ],
+    rows,
+  };
+}
+function senseControls(engine) {
+  const { report, context } = base('vh-sense-controls', engine),
+    children = new Map();
+  context.producerHashes = { 'prototypes/corridor/tools/verify-sense-truth.mjs': D };
   report.selected = null;
-  report.engines = ['chromium'];
+  report.engines = [engine];
   report.sourceDigest = C;
   report.rows = SENSE_CONTROL_IDS.map((control) => ({
-    engine: 'chromium',
+    engine,
     control,
     status: 'caught',
     restored: true,
-    phases: ['baseline', 'mutant', 'restore'].map((phase) => ({
-      phase,
-      dir: `/${phase}-nonce-${control}`,
-      exit: phase === 'mutant' ? 1 : 3,
-      ok: true,
-      fresh: true,
-    })),
+    phases: ['baseline', 'mutant', 'restore'].map((phase) => {
+      const nonce = `${engine}-${control}-${phase}`,
+        dir = `/${phase}-${nonce}`;
+      children.set(
+        `${dir}/verify-sense-truth.json`,
+        senseChild(engine, control, phase, nonce, context.runId),
+      );
+      return { phase, dir, nonce, exit: phase === 'mutant' ? 1 : 3, ok: true, fresh: true };
+    }),
   }));
+  context.readReport = (path) => structuredClone(children.get(path));
+  return { report, context, children };
+}
+const senseRow = (children, report, control, phase, id) =>
+  children
+    .get(
+      `${report.rows.find((r) => r.control === control).phases.find((p) => p.phase === phase).dir}/verify-sense-truth.json`,
+    )
+    .rows.find((row) => row.id === id);
+test('Sense controls admit the retained complete served-control evidence on both engines', () => {
+  for (const engine of ['chromium', 'webkit']) {
+    const { report, context } = senseControls(engine);
+    const judged = validateVoiceReport('vh-sense-controls', report, context);
+    assert(judged.passed, `${engine}: ${judged.errors.join(';')}`);
+  }
+});
+test('Sense controls reread fresh child receipts; caught labels with missing nonce/semantic rows do not suffice', () => {
+  const { report, context } = senseControls('chromium');
   context.readReport = () => ({
     schemaVersion: 1,
     runId: context.runId,
@@ -310,6 +539,133 @@ test('Sense controls reread fresh child receipts; caught labels with missing non
     vhMutations: [],
   });
   assert.equal(validateVoiceReport('vh-sense-controls', report, context).passed, false);
+});
+test('Sense controls count only exact false intended reds with complete named witnesses; skip/null/missing never kill', () => {
+  for (const [control, id] of [
+    ['discard-completed-red-on-retry', 'G.ない, auxiliary (聞こえない)'],
+    ['discard-completed-red-on-retry', 'G.ない, auxiliary (聞こえない).incomplete'],
+    ['pronunciation-ta-promoted-to-door', 'G.悉曇（しったん）: た'],
+    ['quoted-reading-demoted-to-annotation', 'G.「いちちゅう」: ちゅう.classification'],
+    ['quoted-reading-demoted-to-annotation', 'G.「いちちゅう」: ちゅう'],
+  ]) {
+    for (const [label, mutate] of [
+      ['ok null', (row) => (row.ok = null)],
+      ['ok undefined', (row) => delete row.ok],
+      ['ok skip', (row) => (row.ok = 'skip')],
+      ['ok 0', (row) => (row.ok = 0)],
+      ['observation missing', (row) => delete row.observed],
+      ['observation detail missing', (row) => (row.observed = { attempt: 1 })],
+      ['observation detail empty', (row) => (row.observed.detail = {})],
+      ['recorded skip marker', (row) => (row.recorded = 'skip')],
+    ]) {
+      const { report, context, children } = senseControls('chromium');
+      mutate(senseRow(children, report, control, 'mutant', id));
+      assert.equal(
+        validateVoiceReport('vh-sense-controls', report, context).passed,
+        false,
+        `${control}/${id}: ${label}`,
+      );
+    }
+  }
+  const { report, context, children } = senseControls('chromium');
+  senseRow(
+    children,
+    report,
+    'discard-completed-red-on-retry',
+    'mutant',
+    'G.ない, auxiliary (聞こえない)',
+  ).observed.detail.lines.splice(0, 1, 'the real sense');
+  assert.equal(validateVoiceReport('vh-sense-controls', report, context).passed, false);
+});
+test('Sense control unrelated and candidate rows must be exactly true; a hidden skipped row cannot pass', () => {
+  for (const phase of ['baseline', 'mutant', 'restore'])
+    for (const value of [null, undefined, 'skip', 1, 'true']) {
+      const { report, context, children } = senseControls('webkit');
+      const row = senseRow(
+        children,
+        report,
+        'pronunciation-n-promoted-to-door',
+        phase,
+        'g.page-errors',
+      );
+      if (value === undefined) delete row.ok;
+      else row.ok = value;
+      assert.equal(
+        validateVoiceReport('vh-sense-controls', report, context).passed,
+        false,
+        `${phase}: page-errors ${value}`,
+      );
+    }
+  for (const value of [null, undefined, 'skip']) {
+    const { report, context, children } = senseControls('webkit');
+    const row = senseRow(
+      children,
+      report,
+      'quoted-reading-demoted-to-annotation',
+      'restore',
+      'G.「いちちゅう」: ちゅう',
+    );
+    if (value === undefined) delete row.ok;
+    else row.ok = value;
+    assert.equal(validateVoiceReport('vh-sense-controls', report, context).passed, false);
+  }
+  const { report, context, children } = senseControls('webkit');
+  const mutant = children.get(`${report.rows[1].phases[1].dir}/verify-sense-truth.json`);
+  mutant.rows.push({
+    engine: 'webkit',
+    id: 'G.hidden',
+    title: 'hidden',
+    recorded: 'skip',
+    ok: false,
+  });
+  assert.equal(validateVoiceReport('vh-sense-controls', report, context).passed, false);
+});
+test('Sense classification kills need the actual promoted or demoted interaction, with no skipped execution', () => {
+  for (const engine of ['chromium', 'webkit'])
+    for (const control of SENSE_CONTROL_IDS.slice(1)) {
+      const { report, context, children } = senseControls(engine);
+      const child = children.get(
+        `${report.rows.find((row) => row.control === control).phases[1].dir}/verify-sense-truth.json`,
+      );
+      for (const row of child.rows.filter((row) => row.ok === false)) {
+        Object.assign(
+          row.observed.detail,
+          control === 'quoted-reading-demoted-to-annotation'
+            ? { annotation: false, interactive: true }
+            : { annotation: true, interactive: false },
+        );
+      }
+      assert.equal(
+        validateVoiceReport('vh-sense-controls', report, context).passed,
+        false,
+        `${engine}/${control}`,
+      );
+    }
+  for (const phase of ['baseline', 'mutant', 'restore'])
+    for (const marker of [
+      { skipped: true },
+      { skip: true },
+      { unexecuted: true },
+      { timedOut: true },
+      { harnessError: 'setup failed' },
+      { status: 'not-run' },
+    ])
+      for (const location of ['row', 'observed']) {
+        const { report, context, children } = senseControls('chromium');
+        const row = senseRow(
+          children,
+          report,
+          'pronunciation-ta-promoted-to-door',
+          phase,
+          'G.悉曇（しったん）: た',
+        );
+        Object.assign(location === 'row' ? row : row.observed, marker);
+        assert.equal(
+          validateVoiceReport('vh-sense-controls', report, context).passed,
+          false,
+          `${phase}/${location}/${JSON.stringify(marker)}`,
+        );
+      }
 });
 test('all adapters reject malformed or missing receipts without throwing', () => {
   for (const name of Object.keys(voiceReportContracts))
@@ -363,6 +719,7 @@ function speakNegatives(engine) {
           engine,
           case: id,
           completed: true,
+          pass: checks.filter((r) => r.case === id).every((r) => r.pass),
           checks: checks.filter((r) => r.case === id).length,
         })),
         checks,
@@ -443,6 +800,100 @@ test('Speak mutant setup errors, spawn failures, child errors and timeouts are n
   mutant.pageErrors = ['setup'];
   assert.equal(validateVoiceReport('speak-negatives', report, context).passed, false);
 });
+const speakChild = (children, report, fault, phase) =>
+  children.get(`${report.rows.find((r) => r.fault === fault)[phase].evidence}/verify-speak.json`);
+test('Speak intended kills are exact false named witnesses; null, undefined, skip or nameless rows never kill', () => {
+  const witness = SPEAK_MUTANT_SPEC['device-voice'].witness;
+  for (const [label, mutate] of [
+    ['pass null', (row) => (row.pass = null)],
+    ['pass undefined', (row) => delete row.pass],
+    ['pass skip', (row) => (row.pass = 'skip')],
+    ['pass 0', (row) => (row.pass = 0)],
+    ['pass "false"', (row) => (row.pass = 'false')],
+    ['nameless witness', (row) => (row.name = '')],
+    ['witness removed', (row, child) => child.checks.splice(child.checks.indexOf(row), 1)],
+  ])
+    for (const id of Object.keys(witness)) {
+      const { report, context, children } = speakNegatives('chromium');
+      const child = speakChild(children, report, 'device-voice', 'mutant');
+      const row = child.checks.find(
+        (c) => c.case === id && new RegExp(witness[id], 'u').test(c.name),
+      );
+      mutate(row, child);
+      assert.equal(
+        validateVoiceReport('speak-negatives', report, context).passed,
+        false,
+        `${id}: ${label}`,
+      );
+    }
+});
+test('Speak unrelated, downstream and candidate rows must be exact booleans; unrelated rows exactly true', () => {
+  for (const phase of ['baseline', 'mutant', 'restore'])
+    for (const value of [null, undefined, 'skip', 1]) {
+      const { report, context, children } = speakNegatives('webkit');
+      const child = speakChild(children, report, 'charon-main', phase);
+      const row = child.checks.find((c) => c.pass === true);
+      if (value === undefined) delete row.pass;
+      else row.pass = value;
+      assert.equal(
+        validateVoiceReport('speak-negatives', report, context).passed,
+        false,
+        `${phase}: unrelated ${value}`,
+      );
+    }
+  for (const value of [null, undefined, 'skip']) {
+    const { report, context, children } = speakNegatives('webkit');
+    const child = speakChild(children, report, 'charon-main', 'mutant');
+    const name = SPEAK_MUTANT_SPEC['charon-main'].downstream.S9[0];
+    const row = child.checks.find((c) => c.case === 'S9' && c.name === name);
+    if (value === undefined) delete row.pass;
+    else row.pass = value;
+    assert.equal(
+      validateVoiceReport('speak-negatives', report, context).passed,
+      false,
+      `downstream ${value}`,
+    );
+  }
+  for (const phase of ['baseline', 'restore'])
+    for (const value of [null, undefined, false]) {
+      const { report, context, children } = speakNegatives('webkit');
+      const child = speakChild(children, report, 'revlog', phase);
+      if (value === undefined) delete child.cases[0].pass;
+      else child.cases[0].pass = value;
+      assert.equal(
+        validateVoiceReport('speak-negatives', report, context).passed,
+        false,
+        `${phase}: case pass ${value}`,
+      );
+    }
+  const { report, context, children } = speakNegatives('webkit');
+  const child = speakChild(children, report, 'charon-main', 'mutant');
+  const name = SPEAK_MUTANT_SPEC['charon-main'].downstream.S9[0];
+  child.checks.find((c) => c.case === 'S9' && c.name === name).pass = false;
+  const judged = validateVoiceReport('speak-negatives', report, context);
+  assert(judged.passed, judged.errors.join(';'));
+});
+test('Speak control execution markers reject even a correctly named boolean witness or green prerequisite', () => {
+  for (const phase of ['baseline', 'mutant', 'restore'])
+    for (const marker of [
+      { skipped: true },
+      { skip: true },
+      { unexecuted: true },
+      { timedOut: true },
+      { harnessError: 'setup failed' },
+      { status: 'not-run' },
+    ])
+      for (const collection of ['checks', 'cases']) {
+        const { report, context, children } = speakNegatives('webkit');
+        const child = speakChild(children, report, 'device-voice', phase);
+        Object.assign(child[collection][0], marker);
+        assert.equal(
+          validateVoiceReport('speak-negatives', report, context).passed,
+          false,
+          `${phase}/${collection}/${JSON.stringify(marker)}`,
+        );
+      }
+});
 test('a mutant witness must be an explicit non-empty expression for a selected case', () => {
   const name = SPEAK_MUTANT_SPEC['device-voice'].witness.S2;
   const checks = [{ engine: 'chromium', case: 'S2', name, pass: false }];
@@ -453,6 +904,21 @@ test('a mutant witness must be an explicit non-empty expression for a selected c
     assert.equal(judged.scoped && judged.witnessed && judged.unrelatedClean, false);
   }
   assert.equal(speakMutantKill(undefined, checks, 'chromium').witnessed, false);
+  for (const pass of [null, undefined, 'skip', 0, 'false']) {
+    const judged = speakMutantKill(
+      { witness: { S2: name }, downstream: {} },
+      [{ engine: 'chromium', case: 'S2', name, pass }],
+      'chromium',
+    );
+    assert.equal(judged.scoped && judged.witnessed && judged.unrelatedClean, false, `${pass}`);
+    assert.equal(judged.green, false, `${pass} is not green`);
+  }
+  const green = speakMutantKill(
+    { witness: { S2: name }, downstream: {} },
+    [{ engine: 'chromium', case: 'S2', name, pass: true }],
+    'chromium',
+  );
+  assert.deepEqual([green.scoped, green.green, green.witnessed], [true, true, false]);
   assert.equal(
     speakMutantKill({ witness: { S2: name }, downstream: {} }, checks, 'webkit').scoped,
     false,

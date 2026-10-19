@@ -509,7 +509,26 @@ const definitions = {
       require(report.onlySyntheticData === true &&
         report.externalNetworkRequestsSent === 0 &&
         report.failures === 0, 'Import provider safety/completion incomplete');
-      require(Array.isArray(report.transport), 'Transport observations missing');
+      // These are the observed intercepted requests, not the producer's constant
+      // onlySyntheticData/externalNetworkRequestsSent declarations. Each configured
+      // origin must have its own credential, and all four exercised bindings occur.
+      const bindings = [
+        ['https://api.anthropic.com', '/v1/messages', 'default-synthetic'],
+        ['https://pre-upgrade-custom.invalid', '/v1/messages', 'custom-synthetic'],
+        ['https://custom-provider.invalid', '/proxy/v1/messages', 'custom-synthetic'],
+        ['https://second-provider.invalid', '/v1/messages', 'second-synthetic'],
+      ];
+      const calls = Array.isArray(report.transport) ? report.transport : [];
+      const matches = (call, binding) =>
+        call &&
+        call.origin === binding[0] &&
+        call.pathname === binding[1] &&
+        call.credential === binding[2];
+      require(calls.length > 0 &&
+        calls.every((call) => bindings.some((binding) => matches(call, binding))) &&
+        bindings.every((binding) =>
+          calls.some((call) => matches(call, binding)),
+        ), 'Transport observations lack the exercised origin/path/credential bindings or include foreign transport');
     },
   }),
   'corridor-ai': named({
@@ -603,6 +622,30 @@ const definitions = {
         sha(report.standaloneSha256) &&
         createHash('sha256').update(readFileSync(report.standalone)).digest('hex') ===
           report.standaloneSha256, 'Single-file handoff bytes differ from the observed handoff');
+      // build-standalone emits this sibling receipt for the exact HTML file. Bind
+      // those bytes back to the independently verified site, not just to themselves.
+      const sidecarPath = text(report.standalone) ? report.standalone + '.build.json' : null;
+      let build = null;
+      try {
+        if (
+          placed.length === 2 &&
+          sidecarPath &&
+          lstatSync(sidecarPath).isFile() &&
+          !lstatSync(sidecarPath).isSymbolicLink()
+        )
+          build = JSON.parse(readFileSync(sidecarPath, 'utf8'));
+      } catch {
+        /* missing/malformed sidecar is an explicit rejection below */
+      }
+      require(build?.status === 'passed' &&
+        realPath(build.site) &&
+        realPath(build.site) === realPath(context.site) &&
+        sha(context.artifactSha256) &&
+        build.artifactSha256 === context.artifactSha256 &&
+        realPath(build.output) === realPath(report.standalone) &&
+        sha(report.standaloneSha256) &&
+        build.standaloneSha256 ===
+          report.standaloneSha256, 'Standalone build sidecar is missing or not bound to this artifact and handoff');
     },
   }),
 };

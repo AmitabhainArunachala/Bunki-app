@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath, URL } from 'node:url';
 import {
   existingReportContracts,
@@ -10,9 +11,21 @@ import {
   CONTRAST_WORLDS,
   CONTRAST_STATES,
   contrastExpectedCases,
+  demoArrivalVerdict,
+  TEACHER_DELAYED_OBSERVATIONS,
+  teacherDelayedObservationErrors,
 } from './vh-existing-report-contracts.mjs';
 const A = 'a'.repeat(64),
   B = 'b'.repeat(64);
+const teacherObserved = JSON.parse(
+  readFileSync(new URL('./vh-teacher-drafts-observed-rows.json', import.meta.url), 'utf8'),
+);
+const retainedArrivals = JSON.parse(
+  readFileSync(
+    new URL('../../prototypes/corridor/tools/vh-contrast-arrival-retained.json', import.meta.url),
+    'utf8',
+  ),
+).retained;
 function fixture(gate) {
   const contract = existingReportContracts[gate],
     engine = gate.endsWith('webkit') ? 'webkit' : 'chromium';
@@ -33,7 +46,10 @@ function fixture(gate) {
       pageErrors: [],
       externalRequests: [],
       audioRequests: [],
-      observations: [{ name: 'completed journey' }],
+      observations:
+        gate === 'teacher-drafts-integration' && Object.hasOwn(TEACHER_DELAYED_OBSERVATIONS, name)
+          ? structuredClone(teacherObserved.results.find((row) => row.name === name).observations)
+          : [{ name: 'completed journey' }],
       browserVersion: '1.0',
       browser: '1.0',
       ordinaryUi: true,
@@ -184,6 +200,7 @@ function contrastFixture(engine) {
         ? {
             observed: [
               {
+                mountSequence: 0,
                 current: true,
                 name: 'read-mini-rise',
                 animationType: 'CSSAnimation',
@@ -510,4 +527,225 @@ test('actual engine and browser-version evidence is mandatory, never checked onl
       assert.equal(validateExistingReport(gate, report, context).passed, false, `${gate}: ${key}`);
     }
   }
+});
+const arrivalRow = (report, world = 'hokusai') =>
+  report.rows.find((row) => row.id.endsWith(`/${world}/fresh-demo.arrival`));
+function arrivalPair() {
+  const { report } = contrastFixture('chromium');
+  const current = arrivalRow(report).observed[0],
+    first = { ...structuredClone(current), current: false };
+  const second = { ...structuredClone(current), mountSequence: 1 };
+  second.startTime += 600;
+  second.observedAt += 600;
+  second.rafTime += 600;
+  second.elapsed = second.rafTime - second.startTime;
+  return [first, second];
+}
+test('arrival admission judges every displayed mount: finished predecessor passes, any bad predecessor fails', () => {
+  assert.deepEqual(demoArrivalVerdict(arrivalPair()), { passed: true, errors: [] });
+  for (const mutate of [
+    (first) => (first.missingAnimation = true),
+    (first) => (first.name = 'feel-fade'),
+    (first) => delete first.startTime,
+    (first) => {
+      first.rafTime = 867;
+      first.observedAt = 867;
+      first.elapsed = 367;
+    },
+    (first) => {
+      first.opacity = 0.997243;
+      first.playState = 'running';
+      first.currentTime = 166.747;
+    },
+    (first) => (first.playState = 'running'),
+    (first) => (first.superseded = true),
+    (first) => (first.supersededBeforeFinish = true),
+    (first) => (first.completed = false),
+  ]) {
+    const rows = arrivalPair();
+    mutate(rows[0]);
+    const verdict = demoArrivalVerdict(rows);
+    assert.equal(verdict.passed, false);
+    assert(
+      verdict.errors.every((error) => error.startsWith('Mount 0:')),
+      verdict.errors.join(';'),
+    );
+  }
+  for (const rows of [
+    [],
+    null,
+    [arrivalPair()[0]],
+    arrivalPair().map((row) => ({ ...row, current: true })),
+    [arrivalPair()[1]],
+    arrivalPair().reverse(),
+    arrivalPair().map((row, index) => (index ? row : { ...row, current: undefined })),
+  ])
+    assert.equal(demoArrivalVerdict(rows).passed, false);
+  const foreign = '4b60dc24-b05a-4546-8341-9b76d7368f07';
+  for (const rebind of [
+    (row) => ({
+      ...row,
+      documentId: foreign,
+      frameCalibration: { ...row.frameCalibration, documentId: foreign },
+    }),
+    (row) => ({
+      ...row,
+      frameCalibration: {
+        ...row.frameCalibration,
+        timestamps: row.frameCalibration.timestamps.map((stamp) => stamp - 1),
+      },
+    }),
+  ])
+    assert.deepEqual(
+      demoArrivalVerdict(arrivalPair().map((row, index) => (index ? rebind(row) : row))).errors,
+      ['Mount 1: not bound to the same document and pre-arrival calibration'],
+    );
+  for (const engine of ['chromium', 'webkit']) {
+    const gate = `contrast-sweep${engine === 'webkit' ? '-webkit' : ''}`;
+    const { report, context } = contrastFixture(engine);
+    arrivalRow(report).observed = arrivalPair();
+    assert(validateExistingReport(gate, report, context).passed);
+    arrivalRow(report).observed[0].playState = 'running';
+    const judged = validateExistingReport(gate, report, context);
+    assert.equal(judged.passed, false);
+    assert(
+      judged.errors.some((error) => error.startsWith('hokusai: every displayed named arrival')),
+    );
+  }
+});
+test('retained real arrival receipts are re-adjudicated red: the unfinished superseded first mount is judged', () => {
+  assert.deepEqual(
+    retainedArrivals.map(({ rowId, sha256 }) => [rowId, sha256]),
+    [
+      [
+        'chromium/hokusai/fresh-demo.arrival',
+        '827adfca1df834fe4e4b088500f3da6f35fb188f146b30c06e934b508f172083',
+      ],
+      [
+        'webkit/keyblock/fresh-demo.arrival',
+        '2719128a828330d15aba71902bdb3ebc0ca4d0fdc4ddc8080bb66523db3e9fe0',
+      ],
+    ],
+  );
+  for (const { rowId, observed, producerRowOk } of retainedArrivals) {
+    const [engine, world] = rowId.split('/'),
+      gate = `contrast-sweep${engine === 'webkit' ? '-webkit' : ''}`;
+    assert.equal(producerRowOk, true);
+    assert.equal(demoArrivalVerdict(observed).passed, false);
+    const sequenced = observed.map((row, mountSequence) => ({ ...row, mountSequence }));
+    const verdict = demoArrivalVerdict(sequenced);
+    assert.equal(verdict.passed, false);
+    assert.deepEqual(verdict.errors, [
+      'Mount 0: superseded before its arrival finished',
+      'Mount 0: named arrival / calibrated deadline evidence absent or red',
+    ]);
+    const currentOnly = [{ ...observed[1], mountSequence: 0 }];
+    assert.equal(demoArrivalVerdict(currentOnly).passed, true);
+    const { report, context } = contrastFixture(engine);
+    arrivalRow(report, world).observed = sequenced;
+    assert.equal(validateExistingReport(gate, report, context).passed, false);
+    arrivalRow(report, world).observed = currentOnly;
+    assert(validateExistingReport(gate, report, context).passed);
+  }
+});
+function teacherReport() {
+  const report = {
+    ...structuredClone(teacherObserved.report),
+    results: structuredClone(teacherObserved.results),
+  };
+  return {
+    report,
+    context: {
+      engine: 'chromium',
+      artifactSha256: report.artifactSha256,
+      verifierSha256: report.verifierSha256,
+    },
+  };
+}
+test('teacher-drafts admission requires the real delayed-outcome draft observations for both preservation cases', () => {
+  const delayed = Object.keys(TEACHER_DELAYED_OBSERVATIONS);
+  assert.deepEqual(
+    teacherObserved.provenance.realEmptyObservationRows,
+    delayed.map((name) => `chromium/${name}`),
+  );
+  assert.deepEqual(
+    [...teacherObserved.results.map((row) => row.name)].sort(),
+    [...EXISTING_CASES['teacher-drafts']].sort(),
+  );
+  const { report, context } = teacherReport();
+  const judged = validateExistingReport('teacher-drafts-integration', report, context);
+  assert(judged.passed, judged.errors.join(';'));
+  for (const name of delayed)
+    assert.deepEqual(
+      teacherDelayedObservationErrors(
+        name,
+        report.results.find((row) => row.name === name).observations,
+      ),
+      [],
+    );
+  const observation = (r, name, index = 0) =>
+    r.results.find((row) => row.name === name).observations[index];
+  const [success, failure] = delayed;
+  const mutations = [
+    (r) => (r.results.find((row) => row.name === success).observations = []),
+    (r) => (r.results.find((row) => row.name === failure).observations = []),
+    (r) =>
+      (r.results.find((row) => row.name === success).observations = [
+        { name: 'completed journey' },
+      ]),
+    (r) =>
+      (r.results.find((row) => row.name === failure).observations = [
+        { name: 'completed journey' },
+        { name: 'completed journey' },
+      ]),
+    (r) => r.results.find((row) => row.name === success).observations.pop(),
+    (r) => r.results.find((row) => row.name === failure).observations.reverse(),
+    (r) => r.results.find((row) => row.name === success).observations.push({ name: 'extra' }),
+    (r) => delete observation(r, success).draftAfterRestart,
+    (r) => delete observation(r, failure, 1).editorAfterRestart,
+    (r) => (observation(r, success).extra = true),
+    (r) => (observation(r, success).name = 'delayed-error-keeps-current-draft'),
+    (r) => (observation(r, failure).providerStatus = 200),
+    (r) => (observation(r, success, 1).label = 'newer'),
+    (r) => (observation(r, success).current.revision = observation(r, success).submitted.revision),
+    (r) => (observation(r, success).current.text = observation(r, success).submitted.text),
+    (r) => (observation(r, success, 1).current.text = 'not deliberately empty'),
+    (r) =>
+      (observation(r, failure, 1).editorAfterOutcome = observation(r, failure, 1).submitted.text),
+    (r) =>
+      (observation(r, failure).draftAfterOutcome.revision = observation(
+        r,
+        failure,
+      ).submitted.revision),
+    (r) => (observation(r, success).draftAfterRestart.consumed = true),
+    (r) =>
+      (observation(r, success, 1).editorAfterRestart = observation(r, success, 1).submitted.text),
+    (r) => (observation(r, failure).submitted.contextRef = 'teacher-context:other'),
+    (r) => (observation(r, failure).submitted.revision = 'not-a-revision'),
+    (r) => (observation(r, success).current.extra = 'key'),
+    (r) => (observation(r, success).outboundXid = ''),
+    (r) => (observation(r, success).outboundReplies = []),
+    (r) =>
+      (observation(r, success).outboundReplies = [
+        observation(r, success).reply,
+        observation(r, success).reply,
+      ]),
+    (r) => (observation(r, success).reply = ''),
+    (r) => (observation(r, failure).outboundReplies = ['late reply']),
+    (r) => (observation(r, failure).failureLines = 0),
+    (r) => (observation(r, failure, 1).failureLines = null),
+  ];
+  mutations.forEach((mutate, index) => {
+    const altered = teacherReport();
+    mutate(altered.report);
+    assert.equal(
+      validateExistingReport('teacher-drafts-integration', altered.report, altered.context).passed,
+      false,
+      `negative ${index} accepted`,
+    );
+  });
+  assert.equal(
+    teacherDelayedObservationErrors('clean-close-before-debounce-general', []).length,
+    1,
+  );
 });

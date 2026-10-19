@@ -1,7 +1,6 @@
 /** VH-1: release admission independently checks complete producer/phase evidence. */
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
-import { exactRoster } from '../../prototypes/corridor/tools/vh-voice-contracts.mjs';
 import {
   SENSE_CASE_IDS,
   SENSE_DATA_INVENTORY_SHA256,
@@ -42,6 +41,45 @@ export const voiceReportNarrowingEnvironment = Object.freeze([
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const sha = (s) => typeof s === 'string' && /^[a-f0-9]{64}$/u.test(s);
 const nonempty = (s) => typeof s === 'string' && s.length > 0;
+const exactRoster = (expected, observed) =>
+  Array.isArray(expected) &&
+  expected.length > 0 &&
+  Array.isArray(observed) &&
+  new Set(expected).size === expected.length &&
+  new Set(observed).size === observed.length &&
+  expected.length === observed.length &&
+  expected.every((id) => observed.includes(id));
+const verdictRows = (rows) =>
+  rows.every((row) => row.recorded === true || !Object.hasOwn(row, 'recorded'));
+// Independently reject execution-failure markers even when a row claims a boolean verdict.
+const noExecutionFailure = (row) =>
+  !!row &&
+  typeof row === 'object' &&
+  !row.skip &&
+  !row.skipped &&
+  !row.unexecuted &&
+  !row.timedOut &&
+  !row.error &&
+  !row.harnessError &&
+  !['skip', 'skipped', 'not-run', 'error', 'timeout'].includes(row.status);
+const executedRow = (row) =>
+  noExecutionFailure(row) &&
+  (row.observed == null || typeof row.observed !== 'object' || noExecutionFailure(row.observed));
+const promotedReading = (detail) => detail?.annotation === false && detail.interactive === true;
+const demotedReading = (detail) => detail?.annotation === true && detail.interactive === false;
+const SENSE_CONTROL_WITNESSES = Object.freeze({
+  'discard-completed-red-on-retry': {
+    'G.ない, auxiliary (聞こえない)': (detail) => detail?.lines?.[0] === 'VH wrong sense sentinel',
+    'G.ない, auxiliary (聞こえない).incomplete': (detail) =>
+      nonempty(detail?.error) && detail.stage === 'navigation',
+  },
+  'pronunciation-ta-promoted-to-door': { 'G.悉曇（しったん）: た': promotedReading },
+  'pronunciation-n-promoted-to-door': { 'G.悉曇（しったん）: ん': promotedReading },
+  'quoted-reading-demoted-to-annotation': {
+    'G.「いちちゅう」: ちゅう.classification': demotedReading,
+    'G.「いちちゅう」: ちゅう': demotedReading,
+  },
+});
 const engines = (e) => (e === 'all' ? ['chromium', 'webkit'] : [e || 'chromium']);
 const ids = (names, engine) => engines(engine).flatMap((e) => names.map((name) => `${e}/${name}`));
 const runtime = (context, path) =>
@@ -116,22 +154,33 @@ export function speakMutantKill(spec, checks, engine) {
   const pattern = (id) =>
     cases.includes(id) && nonempty(spec.witness[id]) ? new RegExp(spec.witness[id], 'u') : null;
   const rows = Array.isArray(checks) ? checks : [];
-  const red = rows.filter((c) => c?.pass !== true);
+  const red = rows.filter((c) => c?.pass === false);
   const witnessed = (c) => pattern(c.case)?.test(c.name) === true;
+  const downstream = (c) => (spec.downstream?.[c.case] || []).includes(c.name);
   return {
     red,
     scoped:
       cases.length > 0 &&
       cases.every((id) => pattern(id)) &&
       rows.length > 0 &&
-      rows.every((c) => c?.engine === engine && cases.includes(c.case) && nonempty(c.name)),
+      rows.every(
+        (c) =>
+          executedRow(c) &&
+          c.engine === engine &&
+          cases.includes(c.case) &&
+          nonempty(c.name) &&
+          typeof c.pass === 'boolean',
+      ),
+    green: rows.length > 0 && rows.every((c) => executedRow(c) && c.pass === true),
     witnessed:
       cases.length > 0 && cases.every((id) => red.some((c) => c.case === id && witnessed(c))),
-    unrelatedClean: red.every(
+    unrelatedClean: rows.every(
       (c) =>
-        c.engine === engine &&
-        cases.includes(c.case) &&
-        (witnessed(c) || (spec.downstream?.[c.case] || []).includes(c.name)),
+        c?.pass === true ||
+        (c?.pass === false &&
+          c.engine === engine &&
+          cases.includes(c.case) &&
+          (witnessed(c) || downstream(c))),
     ),
   };
 }
@@ -203,10 +252,10 @@ const contracts = {
         digest(JSON.stringify(inventory)) === SENSE_DATA_INVENTORY_SHA256,
         'Sense content/class registry changed; independent roster review required',
       );
-      const rows = report.rows.filter((r) => !r.recorded),
+      const rows = report.rows.filter((r) => r.recorded !== true),
         observed = rows.map((r) => `${r.engine}/${r.id}`);
       state.require(
-        rows.every((r) => r.ok === true),
+        verdictRows(report.rows) && rows.every((r) => executedRow(r) && r.ok === true),
         'Semantic Sense red',
       );
       const expectedAttempts = state.expectedCases
@@ -261,13 +310,17 @@ const contracts = {
           !report.overlay &&
           report.cases.every(
             (row) =>
+              executedRow(row) &&
               row.completed === true &&
               row.pass === true &&
               Number.isInteger(row.checks) &&
               row.checks > 0,
           ) &&
           report.checks.every(
-            (row) => row.pass === true && state.expectedCases.includes(`${row.engine}/${row.case}`),
+            (row) =>
+              executedRow(row) &&
+              row.pass === true &&
+              state.expectedCases.includes(`${row.engine}/${row.case}`),
           ),
         'Speak independent completeness/strict per-row pass failed',
       );
@@ -301,18 +354,9 @@ const contracts = {
       );
       const observed = report.rows.map((r) => `${r.engine}/${r.control}`),
         nonces = [];
-      const reds = {
-        'discard-completed-red-on-retry': [
-          'G.ない, auxiliary (聞こえない)',
-          'G.ない, auxiliary (聞こえない).incomplete',
-        ],
-        'pronunciation-ta-promoted-to-door': ['G.悉曇（しったん）: た'],
-        'pronunciation-n-promoted-to-door': ['G.悉曇（しったん）: ん'],
-        'quoted-reading-demoted-to-annotation': [
-          'G.「いちちゅう」: ちゅう.classification',
-          'G.「いちちゅう」: ちゅう',
-        ],
-      };
+      const reds = Object.fromEntries(
+        Object.entries(SENSE_CONTROL_WITNESSES).map(([id, rows]) => [id, Object.keys(rows)]),
+      );
       for (const row of report.rows) {
         state.require(
           row.status === 'caught' &&
@@ -338,8 +382,13 @@ const contracts = {
               nonempty(r.versions?.[row.engine]),
             'Wrong Sense child verifier/version',
           );
-          const semantic = r.rows.filter((x) => !x.recorded),
-            bad = semantic.filter((x) => !x.ok);
+          const semantic = r.rows.filter((x) => x.recorded !== true),
+            bad = semantic.filter((x) => x.ok === false);
+          state.require(
+            verdictRows(r.rows) &&
+              semantic.every((x) => executedRow(x) && typeof x.ok === 'boolean'),
+            'Sense phase row is not an exact boolean verdict',
+          );
           const primary = reds[row.control][0];
           const candidateRows =
             row.control === SENSE_CONTROL_IDS[0]
@@ -364,17 +413,31 @@ const contracts = {
                   reds[row.control],
                   bad.map((x) => x.id),
                 ) &&
+                Array.isArray(r.vhMutations) &&
                 r.vhMutations.length > 0,
               'Missing exact intended mutant red',
+            );
+            state.require(
+              Object.entries(SENSE_CONTROL_WITNESSES[row.control]).every(([id, witness]) => {
+                const red = bad.find((x) => x.id === id);
+                return (
+                  red?.engine === row.engine &&
+                  nonempty(red.title) &&
+                  red.observed?.attempt === 1 &&
+                  !red.observed.detail?.skip &&
+                  !red.observed.detail?.skipped &&
+                  !red.observed.detail?.unexecuted &&
+                  !red.observed.detail?.harnessError &&
+                  witness(red.observed.detail)
+                );
+              }),
+              'Intended Sense red lacks its complete named witness',
             );
             const h = r.attempts[0].history;
             state.require(
               h.length === 1 &&
                 (row.control === SENSE_CONTROL_IDS[0]
-                  ? h[0].observations === 1 &&
-                    h[0].retry === false &&
-                    h[0].stage === 'navigation' &&
-                    bad[0].observed?.detail?.lines?.[0] === 'VH wrong sense sentinel'
+                  ? h[0].observations === 1 && h[0].retry === false && h[0].stage === 'navigation'
                   : h[0].complete === true && r.complete === true),
               'Semantic retry hid a red or mutant never completed',
             );
@@ -506,7 +569,13 @@ contracts['speak-negatives'] = {
               ids(cases, row.engine),
               r.cases.map((c) => `${c.engine}/${c.case}`),
             ) &&
-            r.cases.every((c) => c.completed === true && c.checks > 0),
+            r.cases.every(
+              (c) =>
+                executedRow(c) &&
+                c.completed === true &&
+                c.checks > 0 &&
+                typeof c.pass === 'boolean',
+            ),
           'Mutant child case roster incomplete',
         );
         for (const id of cases)
@@ -535,7 +604,11 @@ contracts['speak-negatives'] = {
           );
         } else
           state.require(
-            p.exit === 3 && r.selectedPassed === true && !r.fault && kill.red.length === 0,
+            p.exit === 3 &&
+              r.selectedPassed === true &&
+              !r.fault &&
+              kill.green &&
+              r.cases.every((c) => c.pass === true),
             'Candidate/restore not green',
           );
       }

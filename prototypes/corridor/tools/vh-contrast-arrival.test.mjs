@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { judgeContrastArrival } from './vh-contrast-arrival.mjs';
+import { readFileSync } from 'node:fs';
+import { judgeContrastArrival, judgeContrastArrivals } from './vh-contrast-arrival.mjs';
 
 const fixture = () => ({
   name: 'read-mini-rise', animationType: 'CSSAnimation', motionPreference: 'no-preference',
@@ -66,4 +67,69 @@ test('numeric origin telemetry can vary while actual window/document identity st
   assert.equal(judgeContrastArrival(row).passed, true);
   row.documentId = 'different-document';
   assert.equal(judgeContrastArrival(row).passed, false);
+});
+
+const mount = (mountSequence, current, shift = 0) => {
+  const row = fixture();
+  Object.assign(row, { mountSequence, current, startTime: row.startTime + shift, observedAt: row.observedAt + shift, rafTime: row.rafTime + shift });
+  row.elapsed = row.rafTime - row.startTime;
+  return row;
+};
+const healthyPair = () => [mount(0, false), mount(1, true, 300)];
+test('every displayed mount is judged: a healthy finished predecessor and a healthy current mount pass', () => {
+  assert.equal(judgeContrastArrivals([mount(0, true)]).passed, true);
+  const judged = judgeContrastArrivals(healthyPair());
+  assert.deepEqual(judged.errors, []);
+  assert.deepEqual(judged.mounts.map((item) => [item.mountSequence, item.current, item.passed]), [[0, false, true], [1, true, true]]);
+});
+test('a missing, wrong, late, stalled or unfinished superseded first mount stays red behind a healthy current mount', () => {
+  for (const mutate of [
+    (first) => { first.missingAnimation = true; },
+    (first) => { delete first.startTime; delete first.elapsed; },
+    (first) => { first.name = 'feel-fade'; },
+    (first) => { first.rafTime = 736.001; first.elapsed = first.rafTime - first.startTime; },
+    (first) => { first.opacity = 0.997243; first.playState = 'running'; first.currentTime = 166.747; first.rafTime = 666.747; first.elapsed = 166.747; },
+    (first) => { first.playState = 'running'; },
+    (first) => { first.superseded = true; first.supersededBeforeFinish = true; },
+    (first) => { first.supersededBeforeFinish = true; },
+  ]) {
+    const rows = healthyPair(); mutate(rows[0]);
+    const judged = judgeContrastArrivals(rows);
+    assert.equal(judged.passed, false);
+    assert.equal(judged.mounts[0].passed, false); assert.equal(judged.mounts[1].passed, true);
+  }
+});
+test('empty, no-current, two-current, dropped, reordered and foreign-document collections fail', () => {
+  for (const rows of [
+    [], null, undefined,
+    [mount(0, false)],
+    [mount(0, true), mount(1, true, 300)],
+    [mount(1, true, 300)],
+    [mount(1, false), mount(0, true, 300)],
+    [mount(0, false), mount(2, true, 300)],
+    [{ ...mount(0, false), current: undefined }, mount(1, true, 300)],
+  ]) assert.equal(judgeContrastArrivals(rows).passed, false);
+  const foreign = healthyPair(); foreign[0].documentId = foreign[0].frameCalibration.documentId = '4b60dc24-b05a-4546-8341-9b76d7368f07';
+  assert.equal(judgeContrastArrivals(foreign).passed, false);
+  const recalibrated = healthyPair(); recalibrated[1].frameCalibration = { ...recalibrated[1].frameCalibration, timestamps: recalibrated[1].frameCalibration.timestamps.map((stamp) => stamp * 2) };
+  assert.equal(judgeContrastArrival(recalibrated[1]).passed, true);
+  assert.equal(judgeContrastArrivals(recalibrated).passed, false);
+});
+test('retained real Hokusai/keyblock receipts are re-adjudicated red because their first displayed mount never finished', () => {
+  const { retained } = JSON.parse(readFileSync(new URL('./vh-contrast-arrival-retained.json', import.meta.url), 'utf8'));
+  assert.deepEqual(retained.map(({ rowId, file, sha256 }) => [rowId, file.split('/VH1/')[1], sha256]), [
+    ['chromium/hokusai/fresh-demo.arrival', 'visual/final-arrival-document-chromium/contrast-sweep.json', '827adfca1df834fe4e4b088500f3da6f35fb188f146b30c06e934b508f172083'],
+    ['webkit/keyblock/fresh-demo.arrival', 'visual/final-arrival-document-webkit/contrast-sweep.json', '2719128a828330d15aba71902bdb3ebc0ca4d0fdc4ddc8080bb66523db3e9fe0'],
+  ]);
+  for (const { observed, producerRowOk } of retained) {
+    assert.equal(producerRowOk, true);
+    assert.deepEqual(observed.map((row) => [row.current, row.superseded === true, row.playState]), [[false, true, 'running'], [true, false, 'finished']]);
+    assert.equal(judgeContrastArrivals(observed).passed, false);
+    const sequenced = observed.map((row, mountSequence) => ({ ...row, mountSequence }));
+    const judged = judgeContrastArrivals(sequenced);
+    assert.equal(judged.passed, false);
+    assert.deepEqual(judged.mounts.map((item) => item.passed), [false, true]);
+    assert(judged.mounts[0].errors.includes('Arrival did not finish at full opacity'));
+    assert.equal(judgeContrastArrivals([{ ...observed[1], mountSequence: 0 }]).passed, true, 'only the current mount was what the old producer judged');
+  }
 });

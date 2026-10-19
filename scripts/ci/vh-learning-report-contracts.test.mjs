@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, utimesSync, writeFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   learningReportContracts,
   READER_CASES,
@@ -13,6 +13,7 @@ import {
   READER_D1_PICKS,
   PUBLIC_DISCLOSURE,
 } from './vh-learning-report-contracts.mjs';
+import { REPORT_COPY_CONTROL_SPECS } from './vh-learning-rosters.mjs';
 import { validateGateEvidence } from './gate-evidence.mjs';
 import { digest } from './verification-admission.mjs';
 import {
@@ -28,19 +29,27 @@ const base = {
   verifierSha256: 'c'.repeat(64),
   fullAcceptance: true,
 };
-const context = { engine: 'chromium', ...base };
+const DIGEST = Object.freeze({
+  'corridor.js': 'd'.repeat(64),
+  'data/articles/aozora-046605.json': '1'.repeat(64),
+});
+const FOREIGN = 'f'.repeat(64);
+const runtimeFiles = Object.entries(DIGEST).map(([path, sha256]) => ({ path, sha256 }));
+const context = { engine: 'chromium', ...base, runtimeFiles };
 const deliveryContext = { ...context, engine: 'all' };
 const shelf = (width) => `D1 ${width}: today's picks are on the shelf`;
 const clone = (x) => globalThis.structuredClone(x),
   triplet = (x) => ['tap', 'Enter', 'Space'].map((how) => ({ how, ...x }));
-const served = (key) => [
+const served = (key, file = 'corridor.js') => [
   {
-    file: 'corridor.js',
-    baseSha256: 'd'.repeat(64),
+    file,
+    baseSha256: DIGEST[file],
     mutantSha256: 'e'.repeat(64),
     applied: [{ key, offset: 1 }],
   },
 ];
+const delivered = (file = 'corridor.js') =>
+  [0, 1].map(() => ({ file, status: 200, sha256: DIGEST[file] }));
 function reader() {
   const report = {
     ...base,
@@ -96,8 +105,10 @@ function reader() {
         })),
       );
     }
-    const mutation = served(spec.key);
-    if (name === 'r1') mutation[0].file = 'data/articles/aozora-046605.json';
+    const mutation = served(
+      spec.key,
+      name === 'r1' ? 'data/articles/aozora-046605.json' : 'corridor.js',
+    );
     report.controls.push({
       name,
       run: spec.run,
@@ -110,7 +121,7 @@ function reader() {
         error: null,
         pageErrors: [],
         rows: READER_RUN_ROWS[spec.run].map((id) => ({ id, pass: true })),
-        served: [{ file: mutation[0].file, sha256: mutation[0].baseSha256 }],
+        delivered: delivered(mutation[0].file),
       },
     });
   }
@@ -146,6 +157,7 @@ function record(engines = ['chromium']) {
       control: phase === 'mutant' ? name : null,
     },
     rows: rowsFor(engine, phase === 'candidate' ? undefined : [spec.case]),
+    ...(phase === 'mutant' ? {} : { delivered: delivered(), deliveryError: null }),
   });
   const child = (dir, receipt, code) => {
     files.set(`${dir}/verify-record-depth.json`, clone(receipt));
@@ -221,8 +233,9 @@ function delivery(engines = ['chromium', 'webkit']) {
           },
           mutant = clone(before);
         if (name === 'fallback-copy-empty') mutant.observed.visible = '';
-        if (name === 'fallback-copy-wrong') mutant.observed.visible = 'Send report';
-        if (name === 'fallback-accessible-name-wrong') mutant.observed.accessible = 'wrong';
+        if (name === 'fallback-copy-wrong') mutant.observed.visible = 'Wrong send label';
+        if (!pending && name !== 'public-disclosure-removed')
+          mutant.observed.accessible = '[accessible name mismatch]';
         if (pending) mutant.observed.delivery = 'github';
         if (name === 'public-disclosure-removed') {
           before = {
@@ -241,6 +254,7 @@ function delivery(engines = ['chromium', 'webkit']) {
           locale,
           name,
           verdict: 'killed',
+          error: null,
           before,
           mutant,
           restored: clone(before),
@@ -290,8 +304,8 @@ test('reader exact Escape witness, unrelated red, clean restore bytes, and engin
     (x) => (x.controls[2].rows.find((r) => !r.pass).observed[0].popupPresent = false),
     (x) => (x.controls[0].rows[0].pass = false),
     (x) => x.controls[0].restore.rows.pop(),
-    (x) => delete x.controls[0].restore.served,
-    (x) => (x.controls[0].restore.served[0].sha256 = 'f'.repeat(64)),
+    (x) => delete x.controls[0].restore.delivered,
+    (x) => (x.controls[0].restore.delivered[0].sha256 = 'f'.repeat(64)),
     (x) => (x.controls[0].error = 'timeout'),
     (x) => (x.controls[0].served[0].mutantSha256 = x.controls[0].served[0].baseSha256),
   ]) {
@@ -303,6 +317,67 @@ test('reader exact Escape witness, unrelated red, clean restore bytes, and engin
     learningReportContracts['reader-doors-webkit'].validate(reader(), context).passed,
     false,
   );
+});
+test('reader intended failures must be exact false, never missing, null, skip or truthy stand-ins', () => {
+  for (const name of Object.keys(READER_CONTROLS))
+    for (const value of [undefined, null, 'skip', 0, 1, 'false']) {
+      const bad = reader(),
+        row = bad.controls
+          .find((control) => control.name === name)
+          .rows.find((row) => row.pass === false);
+      if (value === undefined) delete row.pass;
+      else row.pass = value;
+      assert.equal(
+        learningReportContracts['reader-doors'].validate(bad, context).passed,
+        false,
+        `${name}/${String(value)}`,
+      );
+    }
+});
+const executionMarkers = [
+  { skipped: true },
+  { skip: true },
+  { unexecuted: true },
+  { timedOut: true },
+  { harnessError: 'setup did not complete' },
+  { error: 'observation failed' },
+  { status: 'not-run' },
+];
+test('reader execution markers reject in control, mutant row, array observation and restored evidence', () => {
+  for (const marker of executionMarkers)
+    for (const location of [
+      'control',
+      'row',
+      'observation',
+      'restore',
+      'restore-row',
+      'restore-observation',
+      'candidate',
+    ]) {
+      const bad = reader(),
+        control = bad.controls[0],
+        row = control.rows.find((row) => row.pass === false);
+      const target =
+        location === 'control'
+          ? control
+          : location === 'row'
+            ? row
+            : location === 'observation'
+              ? row.observed[0]
+              : location === 'restore'
+                ? control.restore
+                : location === 'restore-row'
+                  ? control.restore.rows[0]
+                  : location === 'restore-observation'
+                    ? (control.restore.rows[0].observed = {})
+                    : bad.results[0];
+      Object.assign(target, marker);
+      assert.equal(
+        learningReportContracts['reader-doors'].validate(bad, context).passed,
+        false,
+        `${location}/${JSON.stringify(marker)}`,
+      );
+    }
 });
 const childFile = (r, index, phase) =>
   `${r.report.controls[index][phase].dir}/verify-record-depth.json`;
@@ -344,6 +419,34 @@ test('record admission requires strict boolean observations in candidate, mutant
       'a missing/truthy marker is not a named false witness',
     );
   }
+});
+test('record intended witnesses and all phases reject execution markers even with exact boolean verdicts', () => {
+  for (const index of [0, 1])
+    for (const phase of ['candidate', 'mutant', 'restore'])
+      for (const marker of executionMarkers) {
+        for (const location of ['receipt', 'row', 'observation', 'child']) {
+          const bad = record();
+          if (location === 'child') Object.assign(bad.report.controls[index][phase], marker);
+          else {
+            onBoth(bad, phase, index, (receipt) => {
+              const row =
+                phase === 'mutant' ? receipt.rows.find((row) => row.ok === false) : receipt.rows[0];
+              Object.assign(
+                location === 'receipt' ? receipt : location === 'row' ? row : (row.observed ||= {}),
+                marker,
+              );
+            });
+            // Preserve parent/candidate equality so a content-binding mismatch cannot hide this regression.
+            if (phase === 'candidate')
+              bad.report.rows = clone(bad.report.controls[index].candidate.receipt.rows);
+          }
+          assert.equal(
+            judgeRecord(bad).passed,
+            false,
+            `${index}/${phase}/${location}/${JSON.stringify(marker)}`,
+          );
+        }
+      }
 });
 test('record raw full run, filtered candidate, setup failures and false claimed kills cannot be accepted', () => {
   for (const mutate of [
@@ -460,6 +563,7 @@ test('record-depth admission reads fresh child receipts from disk through the re
       gitSha: base.gitSha,
       artifactSha256: base.artifactSha256,
       verifierSha256: producerSha,
+      runtimeFiles,
       stdoutPath: join(out, 'record-depth.stdout.json'),
     };
     const admit = () =>
@@ -577,5 +681,336 @@ test('report claims are re-adjudicated from exact copy/disclosure observations a
       learningReportContracts['report-delivery'].validate(bad, deliveryContext).passed,
       false,
     );
+  }
+});
+const controlAt = (x, name, locale = 'en', engine = 'chromium') =>
+  x.controls.find((c) => c.engine === engine && c.locale === locale && c.name === name);
+const judgeDelivery = (x, ctx = deliveryContext) =>
+  learningReportContracts['report-delivery'].validate(x, ctx);
+test('public disclosure removal is a kill only with complete before, mutant and restored observations', () => {
+  assert.deepEqual(judgeDelivery(delivery()).errors, []);
+  const pub = (x, locale) => controlAt(x, 'public-disclosure-removed', locale);
+  for (const [label, mutate] of [
+    ['absent mutant', (x) => delete pub(x).mutant],
+    ['mutant without an observation', (x) => (pub(x).mutant = {})],
+    ['null observation', (x) => (pub(x).mutant.observed = null)],
+    ['null pass marker', (x) => (pub(x).mutant.observed.pass = null)],
+    ['undefined pass marker', (x) => delete pub(x).mutant.observed.pass],
+    ['string pass marker', (x) => (pub(x).mutant.observed.pass = 'false')],
+    ['skip marker', (x) => (pub(x).mutant.observed = { skipped: true })],
+    [
+      'wrong expected text while the disclosure is still shown',
+      (x) =>
+        Object.assign(pub(x).mutant.observed, {
+          expected: 'Something else',
+          text: `Details\n${PUBLIC_DISCLOSURE.en}`,
+        }),
+    ],
+    [
+      'expected text of the other locale',
+      (x) => (pub(x, 'ja').mutant.observed.expected = PUBLIC_DISCLOSURE.en),
+    ],
+    [
+      'pass false but the disclosure is still in the text',
+      (x) => (pub(x).mutant.observed.text = `Details\n\n${PUBLIC_DISCLOSURE.en}`),
+    ],
+    ['empty mutant text', (x) => (pub(x).mutant.observed.text = '')],
+    ['missing mutant text', (x) => delete pub(x).mutant.observed.text],
+    ['error marker', (x) => (pub(x).error = 'Error: timeout')],
+    ['undefined error field', (x) => delete pub(x).error],
+    ['incomplete verdict', (x) => (pub(x).verdict = 'incomplete')],
+    ['restored observation absent', (x) => delete pub(x).restored],
+    ['before pass null', (x) => (pub(x).before.observed.pass = null)],
+    ['before text lacks the disclosure', (x) => (pub(x).before.observed.text = 'Details')],
+    ['restored expected text wrong', (x) => (pub(x).restored.observed.expected = 'Details')],
+  ]) {
+    const bad = delivery();
+    mutate(bad);
+    assert.equal(judgeDelivery(bad).passed, false, label);
+  }
+});
+test('copy-label kills require complete observations and each control’s own fault witness', () => {
+  for (const [label, mutate] of [
+    [
+      'missing visibleShown',
+      (x) => delete controlAt(x, 'fallback-copy-empty').mutant.observed.visibleShown,
+    ],
+    [
+      'missing visible copy',
+      (x) => delete controlAt(x, 'fallback-copy-wrong').mutant.observed.visible,
+    ],
+    [
+      'missing accessible name',
+      (x) => delete controlAt(x, 'fallback-accessible-name-wrong').mutant.observed.accessible,
+    ],
+    [
+      'missing delivery on the delivery kill',
+      (x) => delete controlAt(x, 'fallback-advertised-before-probe').mutant.observed.delivery,
+    ],
+    [
+      'null disabled',
+      (x) => (controlAt(x, 'fallback-copy-empty', 'ja').mutant.observed.disabled = null),
+    ],
+    [
+      'skip marker',
+      (x) => (controlAt(x, 'fallback-copy-wrong').mutant.observed = { skipped: true }),
+    ],
+    ['absent mutant', (x) => delete controlAt(x, 'fallback-accessible-name-wrong').mutant],
+    [
+      'empty-copy kill without empty copy',
+      (x) => (controlAt(x, 'fallback-copy-empty').mutant.observed.visible = 'Something'),
+    ],
+    [
+      'wrong-copy kill from a hidden button',
+      (x) =>
+        Object.assign(controlAt(x, 'fallback-copy-wrong').mutant.observed, {
+          visible: 'Send',
+          accessible: 'Send',
+          visibleShown: false,
+        }),
+    ],
+    [
+      'accessible-name kill caused by the visible copy',
+      (x) => (controlAt(x, 'fallback-accessible-name-wrong').mutant.observed.visible = ''),
+    ],
+    [
+      'pending kill with the service still advertised',
+      (x) =>
+        Object.assign(controlAt(x, 'fallback-advertised-before-probe').mutant.observed, {
+          delivery: 'relay',
+        }),
+    ],
+    [
+      'before observation incomplete',
+      (x) => delete controlAt(x, 'fallback-copy-empty').before.observed.disabled,
+    ],
+    ['restored observation absent', (x) => delete controlAt(x, 'fallback-copy-wrong').restored],
+    ['unknown locale', (x) => (controlAt(x, 'fallback-copy-empty').locale = 'fr')],
+  ]) {
+    const bad = delivery();
+    mutate(bad);
+    assert.equal(judgeDelivery(bad).passed, false, label);
+  }
+});
+test('public disclosure and every copy kill reject execution-failure markers in every phase and observation', () => {
+  for (const name of REPORT_COPY_CONTROLS)
+    for (const phase of ['before', 'mutant', 'restored'])
+      for (const location of ['control', 'phase', 'observation'])
+        for (const marker of executionMarkers) {
+          const bad = delivery(),
+            control = controlAt(bad, name);
+          Object.assign(
+            location === 'control'
+              ? control
+              : location === 'phase'
+                ? control[phase]
+                : control[phase].observed,
+            marker,
+          );
+          assert.equal(
+            judgeDelivery(bad).passed,
+            false,
+            `${name}/${phase}/${location}/${JSON.stringify(marker)}`,
+          );
+        }
+});
+test('the reviewed report-delivery roster is the current producer schedule, held independently of it', () => {
+  const adapter = learningReportContracts['report-delivery'];
+  assert.deepEqual(adapter.expectedCases('all'), expectedReportChecks(['chromium', 'webkit']));
+  assert.equal(adapter.expectedCases('all').length, 107);
+  assert.deepEqual(Object.keys(REPORT_COPY_CONTROL_SPECS), [...REPORT_COPY_CONTROLS]);
+});
+test('a mutated producer schedule or comparator cannot shrink or loosen learning admission', async () => {
+  const output = process.env.RUNNER_TEMP || join(homedir(), '.dharma', 'bunki', 'test-fixtures');
+  mkdirSync(output, { recursive: true });
+  const root = mkdtempSync(join(output, 'learning-oracle-'));
+  try {
+    const ci = join(root, 'scripts', 'ci'),
+      tools = join(root, 'prototypes', 'corridor', 'tools');
+    mkdirSync(ci, { recursive: true });
+    mkdirSync(tools, { recursive: true });
+    for (const name of ['vh-learning-report-contracts.mjs', 'vh-learning-rosters.mjs'])
+      writeFileSync(join(ci, name), readFileSync(new globalThis.URL(name, import.meta.url)));
+    const original = JSON.stringify(
+      new globalThis.URL(
+        '../../prototypes/corridor/tools/vh-learning-contracts.mjs',
+        import.meta.url,
+      ).href,
+    );
+    writeFileSync(
+      join(tools, 'vh-learning-contracts.mjs'),
+      [
+        `import * as original from ${original};`,
+        `export * from ${original};`,
+        `export const REPORT_COPY_CONTROLS = Object.freeze(original.REPORT_COPY_CONTROLS.filter((name) => name !== 'public-disclosure-removed'));`,
+        `export function expectedReportChecks(engines) { return original.expectedReportChecks(engines).filter((name) => !name.endsWith(' · no console errors (relay)') && !name.endsWith('/C.public-disclosure-removed')); }`,
+        `export function reportCopyObservation() { return { label: true, delivery: true, enabled: true }; }`,
+        `export function exactNamedCompletion() { return true; }`,
+        `export const RECORD_ROWS = Object.freeze({ ...original.RECORD_ROWS, A: original.RECORD_ROWS.A.slice(1) });`,
+        '',
+      ].join('\n'),
+    );
+    const producer = await import(pathToFileURL(join(tools, 'vh-learning-contracts.mjs')).href);
+    const shrunkChecks = producer.expectedReportChecks(['chromium', 'webkit']);
+    assert.equal(shrunkChecks.length, 101);
+    assert.equal(producer.REPORT_COPY_CONTROLS.length, 4);
+    assert.deepEqual(producer.reportCopyObservation({}), {
+      label: true,
+      delivery: true,
+      enabled: true,
+    });
+    assert.equal(producer.exactNamedCompletion([], ['x']), true);
+    assert.equal(Object.values(producer.RECORD_ROWS).flat().length, 16);
+    const altered = await import(pathToFileURL(join(ci, 'vh-learning-report-contracts.mjs')).href);
+    const adapter = altered.learningReportContracts['report-delivery'];
+    assert.equal(adapter.expectedCases('all').length, 107);
+    assert.equal(
+      altered.learningReportContracts['record-depth'].expectedCases('chromium').length,
+      17,
+    );
+    assert.deepEqual(adapter.validate(delivery(), deliveryContext).errors, []);
+    const fromProducer = () => {
+      const x = delivery();
+      x.checks = shrunkChecks.map((name) => ({ name, pass: true }));
+      x.controls = x.controls.filter((c) => producer.REPORT_COPY_CONTROLS.includes(c.name));
+      return x;
+    };
+    assert.equal(adapter.validate(fromProducer(), deliveryContext).passed, false);
+    const fewerChecks = delivery();
+    fewerChecks.checks = fromProducer().checks;
+    assert.equal(adapter.validate(fewerChecks, deliveryContext).passed, false);
+    const fewerControls = delivery();
+    fewerControls.controls = fromProducer().controls;
+    assert.equal(adapter.validate(fewerControls, deliveryContext).passed, false);
+    for (const mutate of [
+      (x) => (controlAt(x, 'fallback-copy-empty').restored.observed.accessible = 'wrong'),
+      (x) => (controlAt(x, 'fallback-copy-wrong').before.observed = {}),
+      (x) =>
+        (controlAt(x, 'fallback-advertised-before-probe').restored.observed.delivery = 'github'),
+    ]) {
+      const bad = delivery();
+      mutate(bad);
+      assert.equal(adapter.validate(bad, deliveryContext).passed, false);
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+test('reader served bases and restored loads are bound to the tested artifact manifest, never to each other', () => {
+  const adapter = learningReportContracts['reader-doors'];
+  assert.deepEqual(adapter.validate(reader(), context).errors, []);
+  assert.deepEqual(adapter.validate(reader(), { ...context, runtimeFiles: DIGEST }).errors, []);
+  const without = (path) => ({
+    ...context,
+    runtimeFiles: runtimeFiles.filter((row) => row.path !== path),
+  });
+  for (const [label, mutate, ctx = context] of [
+    [
+      'foreign base and restore digests that agree with each other',
+      (x) => {
+        for (const c of x.controls) {
+          for (const row of c.served) row.baseSha256 = FOREIGN;
+          for (const row of c.restore.delivered) row.sha256 = FOREIGN;
+        }
+      },
+    ],
+    ['one foreign served base', (x) => (x.controls[0].served[0].baseSha256 = FOREIGN)],
+    [
+      'restored page loaded a foreign build',
+      (x) => (x.controls[0].restore.delivered[0].sha256 = FOREIGN),
+    ],
+    [
+      'restored page loaded the mutant bytes',
+      (x) => (x.controls[0].restore.delivered[1].sha256 = x.controls[0].served[0].mutantSha256),
+    ],
+    ['restored page loaded nothing', (x) => (x.controls[0].restore.delivered = [])],
+    [
+      'server-only restore probe in place of page loads',
+      (x) => {
+        const c = x.controls[0];
+        delete c.restore.delivered;
+        c.restore.served = [{ file: 'corridor.js', sha256: DIGEST['corridor.js'] }];
+      },
+    ],
+    ['failed restore delivery', (x) => (x.controls[0].restore.delivered[0].error = 'aborted')],
+    ['non-200 restore delivery', (x) => (x.controls[0].restore.delivered[0].status = 304)],
+    ['missing restore status', (x) => delete x.controls[0].restore.delivered[0].status],
+    [
+      'restore delivery of another file',
+      (x) =>
+        x.controls[0].restore.delivered.push({
+          file: 'speak.js',
+          status: 200,
+          sha256: DIGEST['corridor.js'],
+        }),
+    ],
+    [
+      'r1 base is the corridor digest',
+      (x) => (x.controls.find((c) => c.name === 'r1').served[0].baseSha256 = DIGEST['corridor.js']),
+    ],
+    ['manifest lacks corridor.js', () => {}, without('corridor.js')],
+    ['manifest lacks the r1 article', () => {}, without('data/articles/aozora-046605.json')],
+    ['no tested artifact manifest', () => {}, { ...context, runtimeFiles: undefined }],
+    [
+      'manifest digest malformed on both sides',
+      (x) => {
+        for (const c of x.controls) {
+          for (const row of c.served) row.baseSha256 = 'nope';
+          for (const row of c.restore.delivered) row.sha256 = 'nope';
+        }
+      },
+      { ...context, runtimeFiles: { ...DIGEST, 'corridor.js': 'nope' } },
+    ],
+  ]) {
+    const bad = reader();
+    mutate(bad);
+    assert.equal(adapter.validate(bad, ctx).passed, false, label);
+  }
+});
+test('record served base and candidate/restore page loads are bound to the tested artifact manifest', () => {
+  assert.deepEqual(judgeRecord(record()).errors, []);
+  const both = record(['chromium', 'webkit']);
+  assert.deepEqual(judgeRecord(both).errors, []);
+  for (const [label, mutate] of [
+    [
+      'foreign digests that agree with each other',
+      (r) => {
+        onBoth(r, 'candidate', 0, (x) => x.delivered.forEach((row) => (row.sha256 = FOREIGN)));
+        for (const index of [0, 1]) {
+          onBoth(r, 'mutant', index, (x) =>
+            x.control.served.forEach((row) => (row.baseSha256 = FOREIGN)),
+          );
+          onBoth(r, 'restore', index, (x) => x.delivered.forEach((row) => (row.sha256 = FOREIGN)));
+        }
+      },
+    ],
+    [
+      'foreign mutant base',
+      (r) => onBoth(r, 'mutant', 0, (x) => (x.control.served[0].baseSha256 = FOREIGN)),
+    ],
+    [
+      'restore loaded a foreign build',
+      (r) => onBoth(r, 'restore', 1, (x) => (x.delivered[0].sha256 = FOREIGN)),
+    ],
+    ['restore loaded nothing', (r) => onBoth(r, 'restore', 0, (x) => (x.delivered = []))],
+    ['restore delivery absent', (r) => onBoth(r, 'restore', 0, (x) => delete x.delivered)],
+    [
+      'restore delivery failed',
+      (r) => onBoth(r, 'restore', 0, (x) => (x.delivered[1].error = 'aborted')),
+    ],
+    [
+      'candidate loaded the mutant bytes',
+      (r) => onBoth(r, 'candidate', 0, (x) => (x.delivered[0].sha256 = 'e'.repeat(64))),
+    ],
+    ['candidate delivery absent', (r) => onBoth(r, 'candidate', 0, (x) => delete x.delivered)],
+    [
+      'manifest lacks corridor.js',
+      (r) => (r.context.runtimeFiles = runtimeFiles.filter((row) => row.path !== 'corridor.js')),
+    ],
+    ['no tested artifact manifest', (r) => delete r.context.runtimeFiles],
+  ]) {
+    const r = record();
+    mutate(r);
+    assert.equal(judgeRecord(r).passed, false, label);
   }
 });

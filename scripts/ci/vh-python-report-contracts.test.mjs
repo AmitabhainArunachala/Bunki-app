@@ -1,5 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+  globSync,
+  statSync,
+} from 'node:fs';
+import { homedir } from 'node:os';
+import { dirname, join } from 'node:path';
 import { pythonReportRosters, validatePythonReport } from './vh-python-report-contracts.mjs';
 const digest = 'a'.repeat(64),
   gitSha = 'b'.repeat(40);
@@ -99,4 +111,84 @@ test('reviewed census keeps all explicit dynamic fixture cases', () => {
       row.name.includes('(32 files, 954 passages, 323 words)'),
     ),
   );
+});
+
+test('root-bound Python admission hashes actual files and the complete on-disk input census', () => {
+  const parent = join(homedir(), '.dharma/bunki/verifier-receipts/python-tests');
+  mkdirSync(parent, { recursive: true });
+  const root = mkdtempSync(join(parent, 'root-binding-'));
+  const hash = (path) =>
+    createHash('sha256')
+      .update(readFileSync(join(root, path)))
+      .digest('hex');
+  const put = (path, bytes) => {
+    mkdirSync(dirname(join(root, path)), { recursive: true });
+    writeFileSync(join(root, path), bytes);
+  };
+  try {
+    for (const [gate, spec] of Object.entries(pythonReportRosters)) {
+      // This is an admission fixture, not a claim that these Python checks ran.
+      // Unlike the digest-injection unit fixtures, every identity here is read
+      // independently from a real root by the production validator.
+      put(spec.producer, '# Python producer fixture\n');
+      put(
+        'scripts/ci/vh-python-report-rosters.json',
+        readFileSync(new globalThis.URL('./vh-python-report-rosters.json', import.meta.url)),
+      );
+      put(
+        'scripts/ci/vh_python_receipts.py',
+        readFileSync(new globalThis.URL('./vh_python_receipts.py', import.meta.url)),
+      );
+      for (const pattern of spec.inputs) {
+        if (pattern.includes('*'))
+          put(pattern.slice(0, pattern.indexOf('*')) + 'fixture.json', '{}\n');
+        else put(pattern, '# fixture input\n');
+      }
+      const r = receipt(gate);
+      r.invocation = ['/usr/bin/python3', join(root, spec.producer)];
+      r.verifierSha256 = hash(spec.producer);
+      r.contractSha256 = hash('scripts/ci/vh-python-report-rosters.json');
+      r.helperSha256 = hash('scripts/ci/vh_python_receipts.py');
+      const inputs = [
+        ...new Set(
+          spec.inputs.flatMap((pattern) =>
+            globSync(pattern, { cwd: root }).filter((p) => statSync(join(root, p)).isFile()),
+          ),
+        ),
+      ];
+      r.inputs = Object.fromEntries(inputs.map((path) => [path, hash(path)]));
+      const context = { gateId: gate, runId: r.runId, gitSha, root };
+      assert.equal(validatePythonReport(r, context), true);
+      for (const path of [
+        spec.producer,
+        'scripts/ci/vh-python-report-rosters.json',
+        'scripts/ci/vh_python_receipts.py',
+        ...inputs,
+      ]) {
+        const bytes = readFileSync(join(root, path));
+        put(path, Buffer.concat([bytes, Buffer.from('\nchanged\n')]));
+        assert.throws(
+          () => validatePythonReport(r, context),
+          undefined,
+          `${gate}: changed ${path}`,
+        );
+        put(path, bytes);
+      }
+      const glob = spec.inputs.find((pattern) => pattern.includes('*'));
+      if (glob) {
+        const extra = glob.slice(0, glob.indexOf('*')) + 'unreported.json';
+        put(extra, '{}\n');
+        assert.throws(() => validatePythonReport(r, context), /census/u);
+        rmSync(join(root, extra));
+      }
+      const removed = inputs[0],
+        bytes = readFileSync(join(root, removed));
+      rmSync(join(root, removed));
+      assert.throws(() => validatePythonReport(r, context));
+      put(removed, bytes);
+      assert.equal(validatePythonReport(r, context), true);
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

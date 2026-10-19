@@ -8,23 +8,28 @@ import {
   chmodSync,
   appendFileSync,
   existsSync,
+  copyFileSync,
 } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { runGates } from '../verify-release-gates.mjs';
 import { supplementalGates } from './supplemental.mjs';
+import { frameworkGateRoster } from './framework-rosters.mjs';
 import {
   registerGateAdapters,
   gateEvidenceDeclaration,
   validateGateEvidence,
+  evidenceInvocation,
+  requireApprovedInvocation,
 } from './gate-evidence.mjs';
 import {
   acceptanceEnvironment,
   exactIds,
   digest,
   requireGateAttemptEvidence,
+  sourceSnapshot,
 } from './verification-admission.mjs';
 import { grammarFixture } from '../../prototypes/corridor/tools/vh-word-grammar-fixture.mjs';
 const root = fileURLToPath(new globalThis.URL('../..', import.meta.url));
@@ -133,7 +138,7 @@ function fakeSource() {
   const shim = join(bin, 'git');
   writeFileSync(
     shim,
-    `#!${process.execPath}\nimport fs from 'node:fs';const args=process.argv.slice(2);if(args[0]==='rev-parse')process.stdout.write(${JSON.stringify(gitSha)});else if(args[0]==='diff')process.stdout.write(fs.readFileSync(${JSON.stringify(file)}));else if(!['status','ls-files'].includes(args[0]))process.exit(2);\n`,
+    `#!${process.execPath}\nimport fs from 'node:fs';const args=process.argv.slice(2);if(args[0]==='rev-parse')process.stdout.write(args[1]==='--show-toplevel'?process.cwd():${JSON.stringify(gitSha)});else if(args[0]==='diff')process.stdout.write(fs.readFileSync(${JSON.stringify(file)}));else if(!['status','ls-files'].includes(args[0]))process.exit(2);\n`,
   );
   chmodSync(shim, 0o755);
   return { isolated, file, bin, sourceSha: digest(readFileSync(file)) };
@@ -394,7 +399,7 @@ test('independent registry rejects an adapter that falsely promotes an empty or 
 test('framework evidence binds its attempt nonce and actual framework/version', () => {
   const out = mkdtempSync(join(fixture, 'framework-')),
     path = join(out, 'framework.json'),
-    gate = { name: 'vitest', args: [] },
+    gate = { name: 'export', command: 'npm', args: ['run', 'verify:export'] },
     declaration = { kind: 'framework', path };
   const context = {
     root,
@@ -413,9 +418,16 @@ test('framework evidence binds its attempt nonce and actual framework/version', 
     fullAcceptance: true,
     errors: [],
     filtered: false,
-    scheduledFiles: [producer],
-    files: [{ path: producer, sha256: digest(readFileSync(producer)) }],
-    collected: [{ id: 'one', file: producer, name: 'one' }],
+    scheduledFiles: [resolve(root, 'packages/export/test/verify-export.test.ts')],
+    files: [
+      {
+        path: resolve(root, 'packages/export/test/verify-export.test.ts'),
+        sha256: digest(readFileSync(resolve(root, 'packages/export/test/verify-export.test.ts'))),
+      },
+    ],
+    collected: [
+      { id: 'one', file: resolve(root, 'packages/export/test/verify-export.test.ts'), name: 'one' },
+    ],
     completed: [{ id: 'one', status: 'passed', retry: 0, expectedFailure: false }],
   });
   writeFileSync(path, JSON.stringify(clean()));
@@ -572,4 +584,249 @@ test('word-grammar admission binds its invocation argv, declared engine, nonce a
     () => attempt((r) => (r.controls = r.controls.filter((row) => row.id !== 'G1.page-capped'))),
     /G1–G6 candidate and control/u,
   );
+});
+
+test('an ancestor checkout is never the source identity of a disposable fixture, and declared source cannot use that seam', async () => {
+  const parent = mkdtempSync(join(fixture, 'ancestor-'));
+  const child = join(parent, 'nested-fixture');
+  mkdirSync(child);
+  // An explicit Git observation fixture gives the parent a HEAD, while the child
+  // belongs to that ancestor rather than being its own checkout. No repo is created.
+  const bin = join(parent, 'bin');
+  mkdirSync(bin);
+  const shim = join(bin, 'git');
+  writeFileSync(
+    shim,
+    `#!${process.execPath}\nconst a=process.argv.slice(2);if(a[0]==='rev-parse')process.stdout.write(a[1]==='--show-toplevel'?${JSON.stringify(parent)}:${JSON.stringify(gitSha)});else if(!['status','diff','ls-files'].includes(a[0]))process.exit(2);\n`,
+  );
+  chmodSync(shim, 0o755);
+  const prior = process.env.PATH;
+  process.env.PATH = bin + ':' + prior;
+  try {
+    assert.equal(sourceSnapshot(parent).head, gitSha);
+    assert.equal(sourceSnapshot(child), null, 'ancestor HEAD cannot identify child fixture');
+    const gate = {
+      name: 'ancestor-probe',
+      command: process.execPath,
+      args: ['-e', 'process.exit(0)'],
+      fixtureReceipt: 'process-probe',
+    };
+    const good = await runGates({ gates: [gate], root: child, out: join(child, 'probe') });
+    assert.equal(good.gates[0].status, 'passed');
+    assert.equal(good.sourceBefore, null);
+    assert.throws(
+      () => requireGateAttemptEvidence(good.gates[0], { gitSha: null, artifactSha256: null }),
+      /Test-only process fixture/u,
+    );
+    await assert.rejects(
+      () =>
+        runGates({
+          gates: [gate],
+          root: child,
+          out: join(child, 'declared'),
+          source: { sha: gitSha },
+        }),
+      /actual checkout rooted/u,
+    );
+    await assert.rejects(
+      () =>
+        runGates({
+          gates: [gate],
+          root: parent,
+          out: join(parent, 'wrong'),
+          source: { sha: '0'.repeat(40) },
+        }),
+      /differs from actual HEAD/u,
+    );
+  } finally {
+    process.env.PATH = prior;
+  }
+});
+
+test('raw Node-suite options are rejected before path resolution or any fixture test execution', () => {
+  const dir = mkdtempSync(join(fixture, 'raw-node-'));
+  const testFile = join(dir, 'positive.test.mjs'),
+    marker = join(dir, 'executed');
+  writeFileSync(
+    testFile,
+    `import{test}from'node:test';import{writeFileSync}from'node:fs';test('fixture only',()=>writeFileSync(${JSON.stringify(marker)},'ran'));`,
+  );
+  const runner = resolve(root, 'scripts/ci/run-node-suite.mjs');
+  for (const [i, files] of [
+    [testFile, '--test-name-pattern=absent'],
+    [''],
+    [testFile, testFile],
+    [testFile, `${dir}/./positive.test.mjs`],
+  ].entries()) {
+    const result = spawnSync(
+      process.execPath,
+      [runner, '--out', join(dir, `bad-${i}.json`), '--', ...files],
+      { encoding: 'utf8', env: acceptanceEnvironment(process.env) },
+    );
+    assert.notEqual(result.status, 0);
+    assert.equal(existsSync(marker), false);
+  }
+  const report = join(dir, 'good.json');
+  const good = spawnSync(process.execPath, [runner, '--out', report, '--', testFile], {
+    encoding: 'utf8',
+    env: acceptanceEnvironment(process.env),
+  });
+  assert.equal(good.status, 0, good.stderr);
+  assert.equal(existsSync(marker), true);
+  assert.equal(JSON.parse(readFileSync(report)).fullAcceptance, true);
+});
+
+test('real Node wrapper and pytest instrumentation receipts record the actual safe invocation and reject altered args or environment', async () => {
+  const dir = mkdtempSync(join(fixture, 'actual-invocation-'));
+  mkdirSync(join(dir, 'scripts/ci'), { recursive: true });
+  for (const file of ['run-node-suite.mjs', 'verification-admission.mjs', 'vh_pytest_receipt.py'])
+    copyFileSync(resolve(root, 'scripts/ci', file), join(dir, 'scripts/ci', file));
+  writeFileSync(
+    join(dir, 'actual.test.mjs'),
+    `import{test}from'node:test';import assert from'node:assert/strict';test('actual node child',()=>{assert.equal(process.env.KAIRO_BROWSER,'chromium');assert(process.env.KAIRO_GATE_RUN_ID)});`,
+  );
+  mkdirSync(join(dir, 'prototypes/corridor/tools'), { recursive: true });
+  writeFileSync(
+    join(dir, 'prototypes/corridor/tools/test_reading_facets.py'),
+    "import os\ndef test_actual_fixture():\n assert os.environ['KAIRO_BROWSER']=='chromium'\n assert os.environ['KAIRO_GATE_RUN_ID']\n",
+  );
+  const cases = [
+    { name: 'actual-node-fixture', command: process.execPath, args: ['--test', 'actual.test.mjs'] },
+    {
+      name: 'reading-facets',
+      command: process.env.VH_TEST_PYTHON || 'python3',
+      args: [
+        '-m',
+        'pytest',
+        '-p',
+        'no:cacheprovider',
+        'prototypes/corridor/tools/test_reading_facets.py',
+        '-q',
+      ],
+    },
+  ];
+  const secret = process.env.VH_PRIVATE_AMBIENT;
+  process.env.VH_PRIVATE_AMBIENT = 'fixture-private-must-not-be-recorded';
+  try {
+    for (const gate of cases) {
+      const out = join(dir, gate.name),
+        declaration = gateEvidenceDeclaration(gate, dir, out);
+      const actual = evidenceInvocation(gate, declaration, dir);
+      requireApprovedInvocation(gate, declaration, actual, dir);
+      assert.throws(
+        () =>
+          requireApprovedInvocation(
+            gate,
+            declaration,
+            { ...actual, args: [...actual.args, '--test-name-pattern=none'] },
+            dir,
+          ),
+        /Actual arguments/u,
+      );
+      assert.throws(
+        () =>
+          requireApprovedInvocation(
+            gate,
+            declaration,
+            { ...actual, env: { ...actual.env, KAIRO_BROWSER: 'webkit' } },
+            dir,
+          ),
+        /Injected environment/u,
+      );
+      const run = await runGates({ gates: [gate], root: dir, out });
+      assert.equal(run.gates[0].status, 'passed', run.gates[0].detail);
+      const attempt = JSON.parse(readFileSync(run.gates[0].attemptReceipt));
+      assert.deepEqual(attempt.declaredInvocation.args, gate.args);
+      assert.deepEqual(attempt.invocation.args, actual.args);
+      assert.equal(attempt.invocation.command, actual.command);
+      assert.equal(attempt.invocation.cwd, resolve(dir));
+      assert.deepEqual(attempt.invocation.env, {
+        KAIRO_BROWSER: 'chromium',
+        ...actual.env,
+        KAIRO_GATE_RUN_ID: attempt.runId,
+      });
+      assert.equal(
+        readFileSync(run.gates[0].log, 'utf8').split('\n')[0],
+        `${actual.command} ${actual.args.join(' ')}`,
+      );
+      assert(!JSON.stringify(attempt).includes('fixture-private-must-not-be-recorded'));
+      assert.equal(
+        attempt.invocation.instrumentation,
+        gate.name === 'reading-facets' ? 'vh_pytest_receipt' : 'run-node-suite',
+      );
+    }
+    for (const gate of [
+      { name: 'vitest', command: 'npm', args: ['run', 'test'] },
+      { name: 'e2e', command: 'npm', args: ['run', 'test:e2e', '--', '--output', '/fixture/e2e'] },
+    ]) {
+      const declaration = gateEvidenceDeclaration(gate, dir, '/fixture');
+      const actual = evidenceInvocation(gate, declaration, dir);
+      assert.match(requireApprovedInvocation(gate, declaration, actual, dir), /receipt-reporter/u);
+      assert(actual.args.includes('--reporter'));
+      assert.throws(
+        () => requireApprovedInvocation(gate, declaration, { ...actual, args: gate.args }, dir),
+        /Actual arguments/u,
+      );
+    }
+  } finally {
+    if (secret === undefined) delete process.env.VH_PRIVATE_AMBIENT;
+    else process.env.VH_PRIVATE_AMBIENT = secret;
+  }
+});
+
+test('real no-browser Playwright reporter runs through the actual augmented gate command and receipt boundary', async () => {
+  const dir = mkdtempSync(join(fixture, 'actual-playwright-'));
+  mkdirSync(join(dir, 'scripts/ci'), { recursive: true });
+  for (const file of [
+    'playwright-receipt-reporter.mjs',
+    'framework-receipt.mjs',
+    'verification-admission.mjs',
+  ])
+    copyFileSync(resolve(root, 'scripts/ci', file), join(dir, 'scripts/ci', file));
+  const roster = frameworkGateRoster('e2e');
+  for (const file of roster.files) {
+    const path = join(dir, file);
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(
+      path,
+      `const {test,expect}=require(${JSON.stringify(resolve(root, 'node_modules/@playwright/test'))});test('fixture without browser',()=>{expect(process.env.KAIRO_GATE_RUN_ID).toBeTruthy();expect(process.env.KAIRO_BROWSER).toBe('chromium')});`,
+    );
+  }
+  writeFileSync(
+    join(dir, 'fixture.config.cjs'),
+    "module.exports={testDir:'./apps/app/e2e',workers:1,retries:0};\n",
+  );
+  const quote = (value) => `'${value.replaceAll("'", "'\\''")}'`;
+  writeFileSync(
+    join(dir, 'package.json'),
+    JSON.stringify({
+      scripts: {
+        'test:e2e': `${quote(process.execPath)} ${quote(resolve(root, 'node_modules/@playwright/test/cli.js'))} test --config ./fixture.config.cjs`,
+      },
+    }),
+  );
+  const out = join(dir, 'evidence');
+  const gate = {
+    name: 'e2e',
+    command: 'npm',
+    args: roster.args.map((arg) => arg.replace('{out}', out)),
+  };
+  const declaration = gateEvidenceDeclaration(gate, dir, out);
+  const actual = evidenceInvocation(gate, declaration, dir);
+  assert.equal(
+    requireApprovedInvocation(gate, declaration, actual, dir),
+    'playwright-receipt-reporter',
+  );
+  const run = await runGates({ gates: [gate], root: dir, out });
+  assert.equal(run.gates[0].status, 'passed', run.gates[0].detail);
+  const attempt = JSON.parse(readFileSync(run.gates[0].attemptReceipt));
+  assert.deepEqual(attempt.declaredInvocation.args, gate.args);
+  assert.deepEqual(attempt.invocation.args, actual.args);
+  assert.equal(attempt.invocation.instrumentation, 'playwright-receipt-reporter');
+  assert.equal(
+    readFileSync(run.gates[0].log, 'utf8').split('\n')[0],
+    `${actual.command} ${actual.args.join(' ')}`,
+  );
+  assert.equal(run.gates[0].evidenceReceipt.proof.obligation.tests, 13);
+  assert.deepEqual(run.gates[0].evidenceReceipt.proof.obligation.files, roster.files);
 });

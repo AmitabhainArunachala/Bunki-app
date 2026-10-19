@@ -116,12 +116,11 @@ function named({
       else
         require(context.artifactVerifiedBeforeAndAfter === true &&
           sha(context.artifactSha256) &&
-          nonempty(context.site) &&
-          (!report.site ||
-            sameSite(
-              report.site,
-              context.site,
-            )), 'Legacy report needs pinned site before/after execution');
+          report.artifactSha256 === context.artifactSha256 &&
+          sameSite(report.site, context.site) &&
+          nonempty(context.runId) &&
+          report.runId ===
+            context.runId, 'Served report needs its own site, artifact and attempt identity');
       for (const row of rows || [])
         if (typeof row === 'object') {
           require(row?.[passKey] === true &&
@@ -1579,6 +1578,27 @@ export const LANGUAGE_STAMPS = Object.freeze({
   me: 'me',
   settings: 'settings',
 });
+function languageRoomView(room) {
+  if (room === 'aiquiz') return 'tray';
+  if (['front-navigation', 'world-picker'].includes(room)) return 'drift';
+  if (room === 'mirror-with-evidence') return 'kagami';
+  if (room.startsWith('lesson-')) return 'lessons';
+  for (const view of ['review', 'probe', 'guided', 'mock', 'search'])
+    if (room.startsWith(`${view}-`)) return view;
+  if (
+    room === 'shelf-tools' ||
+    room.startsWith('sheet-') ||
+    ['word-save-destinations', 'word-new-list', 'variants'].includes(room)
+  )
+    return 'shelf';
+  if (room.startsWith('deck-context')) return 'contextdeck';
+  if (room.startsWith('deck-')) return 'deckplay';
+  if (room.startsWith('personal-')) return 'personaldeck';
+  return room;
+}
+export const LANGUAGE_ROOM_VIEWS = Object.freeze(
+  Object.fromEntries(LANGUAGE_ROOMS.map((room) => [room, languageRoomView(room)])),
+);
 defs['redesign-language'] = {
   producer: 'tools/lint-ui-language.mjs',
   paths: ['ui-language/report.json'],
@@ -1607,14 +1627,18 @@ defs['redesign-language'] = {
         !row.error &&
           row.issues?.length === 0 &&
           row.contractIssues?.length === 0 &&
-          Number.isFinite(row.inspected) &&
-          row.inspected >= 0,
+          Number.isInteger(row.inspected) &&
+          (row.language === 'EN' ? row.inspected > 0 : row.inspected >= 0),
         `Language inspection failed ${row.room}`,
       );
       q(
         sh &&
-          row.view === sh.view &&
-          LANGUAGE_STAMPS[sh.view] === sh.stamp &&
+          Object.hasOwn(LANGUAGE_ROOM_VIEWS, row.room) &&
+          Object.hasOwn(LANGUAGE_STAMPS, LANGUAGE_ROOM_VIEWS[row.room]) &&
+          row.view === LANGUAGE_ROOM_VIEWS[row.room] &&
+          sh.view === row.view &&
+          sh.stamp === LANGUAGE_STAMPS[row.view] &&
+          typeof sh.quiet === 'boolean' &&
           sh.activeTabs === (sh.quiet ? 0 : 1) &&
           (sh.quiet || sh.tabs === 1),
         `Language shell mismatch ${row.room}`,

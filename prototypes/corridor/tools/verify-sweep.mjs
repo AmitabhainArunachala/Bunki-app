@@ -38,7 +38,7 @@
 import assert from 'node:assert/strict';
 import { sweepExpectedIds } from '../../../scripts/ci/vh-visual-report-contracts.mjs';
 import { randomUUID, createHash } from 'node:crypto';
-import { exactRoster, scopeResult, shelfContract, shelfEvidence, shelfMutationControls, sweepSelection } from './vh-visual-contracts.mjs';
+import { blockRosterHolds, scopeResult, shelfContract, shelfEvidence, shelfOrderCollection, shelfOrderVerdict, sweepSelection } from './vh-visual-contracts.mjs';
 import console from 'node:console';
 import process from 'node:process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -63,8 +63,8 @@ const host = await startCorridorDev(0);
 const checks = [];
 const browserVersions = {};
 const controls = [];
-const check = (name, pass, detail = '', id) => {
-  checks.push({ id, name, pass: !!pass, detail: String(detail).slice(0, 2000) });
+const check = (name, pass, detail = '', id, evidence) => {
+  checks.push({ id, name, pass: !!pass, detail: String(detail).slice(0, 2000), ...(evidence === undefined ? {} : { evidence }) });
   console.log(`${pass ? '  ok  ' : ' FAIL '} ${name}${detail ? `  — ${String(detail).slice(0, 400)}` : ''}`);
 };
 const engines =
@@ -454,16 +454,12 @@ async function shelfRowsAndCards(page, engine, lang) {
   const hidden = [...new Set(rows.flatMap((row) => row.hidden))];
   const drop = rows.filter((row) => ORIGINALS.includes(row.id)).map((row) => row.id);
   // the shelf as drawn on four days running — the daily turn's four offsets — every card in DOM order, today's six included
-  const shelves = [];
-  for (const d of [0, 1, 2, 3].map((n) => plusDays(day, n))) {
-    await page.evaluate((x) => window.__SWEEP__.shelfOn(x), d);
-    shelves.push({ day: d, cards: await page.evaluate(() => window.__SWEEP__.shelfCards()) });
-    if (MODE === 'verify' && !NEGATIVE) {
-      const mutations = await shelfMutationControls(page, VH_SHELF_CONTRACT, SOURCE_SHELF_ROWS, { engine, lang, day: d, dayIndex: shelves.length - 1 });
-      controls.push(...mutations);
-      for (const mutation of mutations) check(`${label} ${d}: VH1.control.${mutation.id}`, mutation.passed, JSON.stringify(mutation.premise || mutation.error), `S01/${label}/${shelves.length - 1}/${mutation.id}`);
-    }
-  }
+  const collection = await shelfOrderCollection(page, VH_SHELF_CONTRACT, SOURCE_SHELF_ROWS, { engine, lang, days: [0, 1, 2, 3].map((n) => plusDays(day, n)),
+    controls: MODE === 'verify' && !NEGATIVE, visit: async (d) => {
+      await page.evaluate((x) => window.__SWEEP__.shelfOn(x), d);
+      return page.evaluate(() => window.__SWEEP__.shelfCards());
+    } });
+  const shelves = collection.shelves;
   // every level filter, and the cards it keeps
   const levels = [];
   for (const level of ['N5', 'N4', 'N3', 'N2', 'N1']) {
@@ -498,7 +494,6 @@ async function shelfRowsAndCards(page, engine, lang) {
     return ids.indexOf(b) === ids.indexOf(a) + 1 && ids.includes(a);
   });
   const newestNews = DROPS[0].map((id) => byId.get(id)).filter((row) => row.lane === 'news' && /^\d{4}-\d{2}-\d{2}$/u.test(row.date)).map((row) => row.date).sort().at(-1);
-  const orders = [];
   for (const { day: d, cards: all } of shelves) {
     const ids = all.map((c) => c.id);
     const lead = byId.get(ids[0]);
@@ -506,7 +501,7 @@ async function shelfRowsAndCards(page, engine, lang) {
     let at = 0;
     const drawnBlocks = blocks.map((block) => { const got = ids.slice(at, at + block.length); at += block.length; return got; });
     const vhEvidence = shelfEvidence({ ...VH_SHELF_CONTRACT, ids });
-    const blocksOk = blocks.every((block, i) => exactRoster(block, drawnBlocks[i])) && vhEvidence.blocks;
+    const blocksOk = blocks.every((block, i) => blockRosterHolds(block, drawnBlocks[i])) && vhEvidence.blocks;
     check(`${label} ${d}: N.exact-roster every non-folded shelf row appears exactly once`,
       vhEvidence.roster, JSON.stringify(ids), `S03/${label}/${shelves.findIndex(row => row.day === d)}`);
     const adjustedDrop = blocks.flat();
@@ -536,10 +531,15 @@ async function shelfRowsAndCards(page, engine, lang) {
     const terada = series.find((group) => group.some((row) => row.id !== NAKAYA_ON_TERADA && /寺田/u.test(row.attribution)));
     const near = terada ? Math.min(...terada.map((row) => Math.abs(ids.indexOf(row.id) - ids.indexOf(NAKAYA_ON_TERADA)))) : Infinity;
     check(`${label} ${d}: Nakaya's portrait of Terada stands within two places of Terada's pieces (Kimi, FIXES-batch-4)`, near <= 2, `${near} places`, `S08/${label}/${shelves.findIndex(row => row.day === d)}`);
-    orders.push(ids.slice(0, adjustedDrop.length).join(','));
   }
-  check(`${label} the drops keep one order on all four days — the daily turn moves only the shelf after them`, new Set(orders).size === 1,
-    orders.map((o) => o.slice(0, 60)).join(' | '), `S09/${label}`);
+  const fourDayOrder = shelfOrderVerdict(collection, blocks.flat().length);
+  check(`${label} the drops keep one order on all four days — the daily turn moves only the shelf after them`, fourDayOrder.order.passed,
+    fourDayOrder.order.prefixes.map((o) => o.join(',').slice(0, 60)).join(' | '), `S09/${label}`, fourDayOrder.order);
+  for (const mutation of fourDayOrder.controls) {
+    controls.push(mutation);
+    check(`${label} ${mutation.day}: VH1.control.${mutation.id}`, mutation.passed, JSON.stringify(mutation.premise || mutation.error),
+      `S01/${label}/${shelves.findIndex((row) => row.day === mutation.day)}/${mutation.id}`);
+  }
   const firstInherited = shelves.map(({ cards: all }) => all.find((c) => !c.band && !ORIGINALS.includes(c.id))?.id);
   check(`${label} after the drop the shelf still turns daily: its first inherited story changes across four days`,
     new Set(firstInherited).size >= 2, firstInherited.join(', '), `S10/${label}`);

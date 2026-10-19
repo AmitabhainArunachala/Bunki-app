@@ -64,7 +64,7 @@
  * sent travelling (enterWord) → P2 red; the page fading in over the reader instead of arriving whole → P14 red. */
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
-import { foldGeometryEqual, grammarSelection, grammarAcceptance } from './vh-word-grammar-contracts.mjs';
+import { foldGeometryEqual, foldShiftBites, grammarSelection, grammarAcceptance, sharedHoverDiverges } from './vh-word-grammar-contracts.mjs';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
@@ -4185,7 +4185,7 @@ try {
       if(withControls){
         const style=await keep.getAttribute('style');await keep.evaluate(n=>n.style.setProperty('background','rgb(255, 0, 255)','important'));
         const mutant=await sample();await keep.evaluate((n,value)=>value===null?n.removeAttribute('style'):n.setAttribute('style',value),style);
-        const restore=await sample();const killed=baseline.equal&&!mutant.equal&&mutant.held.background==='rgb(255, 0, 255)'&&restore.equal;
+        const restore=await sample();const killed=baseline.equal&&!mutant.equal&&sharedHoverDiverges(mutant,baseline)&&restore.equal;
         controls.push({engine,id:'G5.room-keep-hover',kind:'DOM style mutation',baseline,mutant,restore,verdict:killed?'killed':'incomplete'});
         check('G5.negative.room-keep-hover','only room Keep diverges from shared hover; clean style restores equality',killed,{baseline,mutant,restore});
       }
@@ -4682,7 +4682,7 @@ try {
           const afterScroll = await page.evaluate(() => [scrollX, scrollY]);
           await page.locator(paragraph).first().evaluate((node, value) => { node.style.transform = value; }, previous);
           const restoredGeometry = await geometry();
-          const killed = foldGeometryEqual(bareAgain, plain) && !foldGeometryEqual(shifted, plain);
+          const killed = foldGeometryEqual(bareAgain, plain) && foldShiftBites({ plain, baseline: bareAgain, shifted, amount, direction });
           const restored = foldGeometryEqual(restoredGeometry, plain) && JSON.stringify(beforeScroll) === JSON.stringify(afterScroll);
           controls.push({ engine, id, kind: 'post-fold DOM geometry mutation', amount, direction, baseline: bareAgain, shifted, restore: restoredGeometry, beforeScroll, afterScroll, verdict: killed && restored ? 'killed' : 'incomplete' });
           check(`G5.negative.${id}`, 'the real folded paragraph shifted by the declared amount fails raw geometry; restoring its style passes without page scroll', killed && restored, { amount, direction, beforeScroll, afterScroll, shifted, restoredGeometry });

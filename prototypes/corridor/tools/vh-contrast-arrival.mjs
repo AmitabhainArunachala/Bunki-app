@@ -36,3 +36,24 @@ export function judgeContrastArrival(row) {
     'Arrival did not finish at full opacity');
   return { passed: errors.length === 0, errors, frameMs, deadlineMs };
 }
+
+/** Judges every observed demo mount, in order, against its own start; exactly one is still displayed. */
+export function judgeContrastArrivals(rows) {
+  if (!Array.isArray(rows) || rows.length === 0) return { passed: false, errors: ['No displayed arrival was observed'], mounts: [] };
+  const errors = [];
+  const sameCalibration = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  const mounts = rows.map((row, index) => {
+    const judged = judgeContrastArrival(row);
+    const mountErrors = [...judged.errors];
+    if (row?.mountSequence !== index) mountErrors.push(`Mount sequence ${row?.mountSequence} is not its observed position ${index}`);
+    if (row?.current !== true && row?.current !== false) mountErrors.push('Displayed/retired state was not recorded');
+    if (row?.superseded === true || row?.supersededBeforeFinish === true) mountErrors.push('Superseded before its arrival finished');
+    if (row?.documentId !== rows[0]?.documentId || !sameCalibration(row?.frameCalibration, rows[0]?.frameCalibration))
+      mountErrors.push('Not bound to the same document and pre-arrival calibration as the other mounts');
+    return { mountSequence: row?.mountSequence ?? null, current: row?.current === true, passed: mountErrors.length === 0, errors: mountErrors };
+  });
+  const current = mounts.filter((mount) => mount.current);
+  if (current.length !== 1) errors.push(`Exactly one displayed current mount is required; observed ${current.length}`);
+  for (const [index, mount] of mounts.entries()) for (const error of mount.errors) errors.push(`mount ${index}: ${error}`);
+  return { passed: errors.length === 0, errors, mounts };
+}

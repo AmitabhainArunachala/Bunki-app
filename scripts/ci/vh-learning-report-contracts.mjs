@@ -2,10 +2,16 @@
 import { basename, join } from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
 import {
-  expectedReportChecks,
-  reportCopyObservation,
-  REPORT_COPY_CONTROLS,
-} from '../../prototypes/corridor/tools/vh-learning-contracts.mjs';
+  PUBLIC_DISCLOSURE,
+  publicDisclosureState,
+  REPORT_COPY_CONTROL_SPECS,
+  REPORT_DELIVERY_SCENARIOS,
+  REPORT_LOCALES,
+  reportCopyState,
+  reportDeliveryChecks,
+  sendLabel,
+} from './vh-learning-rosters.mjs';
+export { PUBLIC_DISCLOSURE };
 const enginesFor = (engine) => (engine === 'all' ? ['chromium', 'webkit'] : [engine || 'chromium']);
 const exact = (want, got) =>
   Array.isArray(got) &&
@@ -15,6 +21,37 @@ const exact = (want, got) =>
   want.every((id) => got.includes(id));
 const sha = (value) => typeof value === 'string' && /^[a-f0-9]{64}$/u.test(value);
 const nonempty = (value) => typeof value === 'string' && value.length > 0;
+// Execution markers cannot be laundered into a boolean semantic verdict. Arrays
+// are real multi-input observations, so their individual witnesses are checked too.
+function executed(value) {
+  if (value === null || typeof value !== 'object') return true;
+  if (
+    value.skip ||
+    value.skipped ||
+    value.unexecuted ||
+    value.timedOut ||
+    value.error ||
+    value.harnessError ||
+    value.setupError ||
+    ['skip', 'skipped', 'not-run', 'error', 'timeout'].includes(value.status)
+  )
+    return false;
+  return (
+    (!Array.isArray(value) || value.every(executed)) &&
+    (!Object.hasOwn(value, 'observed') || executed(value.observed))
+  );
+}
+const runtime = (context, path) =>
+  Array.isArray(context.runtimeFiles)
+    ? context.runtimeFiles.find((row) => row?.path === path)?.sha256
+    : context.runtimeFiles?.[path];
+const deliveredExactly = (rows, file, digest) =>
+  sha(digest) &&
+  Array.isArray(rows) &&
+  rows.length > 0 &&
+  rows.every(
+    (row) => row?.file === file && row.status === 200 && !row.error && row.sha256 === digest,
+  );
 // Independently reviewed admission schedule: producer helpers cannot shrink this law.
 const RECORD_ROWS = Object.freeze({
   A: Object.freeze([
@@ -46,7 +83,7 @@ function recordCompletion(rows, engines, cases = Object.keys(RECORD_ROWS)) {
     );
   return {
     scheduleComplete,
-    diagnosticPass: scheduleComplete && rows.every((row) => row.ok === true),
+    diagnosticPass: scheduleComplete && rows.every((row) => executed(row) && row.ok === true),
   };
 }
 function recordControlVerdict({ name, engine, candidate, mutant, restore }) {
@@ -54,6 +91,7 @@ function recordControlVerdict({ name, engine, candidate, mutant, restore }) {
   if (!spec) return { verdict: 'incomplete', reason: 'unknown control' };
   const clean = (receipt, cases) =>
     receipt &&
+    executed(receipt) &&
     !receipt.terminalError &&
     recordCompletion(receipt.rows, [engine], cases).diagnosticPass;
   if (!clean(candidate, Object.keys(RECORD_ROWS)) || !clean(restore, [spec.case]))
@@ -61,7 +99,10 @@ function recordControlVerdict({ name, engine, candidate, mutant, restore }) {
   if (
     !recordCompletion(mutant?.rows, [engine], [spec.case]).scheduleComplete ||
     mutant.terminalError ||
-    mutant.control?.setupError
+    mutant.control?.setupError ||
+    !executed(mutant) ||
+    !executed(mutant.control) ||
+    !mutant.rows.every(executed)
   )
     return { verdict: 'incomplete', reason: 'mutant schedule/setup failed' };
   const served = mutant.control?.served;
@@ -87,10 +128,6 @@ function recordControlVerdict({ name, engine, candidate, mutant, restore }) {
     ? { verdict: 'killed', reason: kill, witness }
     : { verdict: 'contaminated', reason: 'fault-specific witness absent' };
 }
-export const PUBLIC_DISCLOSURE = Object.freeze({
-  en: 'This opens GitHub with your words and this screen filled in. Tap “Submit new issue” there to send it. Issues in this repository are public, so leave out anything private. A copy stays on this device.',
-  ja: '報告は、アプリを直す人が読む GitHub の公開ページに、あなたの言葉とこの画面の欄を入れて開く。そこで「Submit new issue」を押すと送られる。公開されるので、個人的なことは書かない。写しはこの端末に残る。',
-});
 export const READER_RUN_ROWS = Object.freeze({
   d2: [1, 0].flatMap((f) =>
     [
@@ -207,10 +244,11 @@ function cleanRows(rows, expected, field = 'pass') {
       expected,
       rows.map((row) => row.id),
     ) &&
-    rows.every((row) => row[field] === true)
+    rows.every((row) => executed(row) && row[field] === true)
   );
 }
 function identity(report, context, require) {
+  require(executed(report), 'Receipt has an execution-failure marker');
   require(nonempty(report.runId), 'Missing runId');
   if (context.runId) require(report.runId === context.runId, 'Wrong runId');
   require(/^[a-f0-9]{40}$/u.test(report.gitSha || ''), 'Missing app source SHA');
@@ -288,7 +326,7 @@ function validateReader(report, context, require, engines) {
   require(Array.isArray(report.pageErrors) && !report.pageErrors.length, 'Reader page errors');
   const rows = report.results || [],
     observed = rows.map((row) => `${report.engine}/${row.id || row.name}`);
-  require(rows.every((row) => row.pass === true), 'Reader failed assertion');
+  require(rows.every((row) => executed(row) && row.pass === true), 'Reader failed assertion');
   require(report.d1Day === READER_D1_DAY, 'Reader D1 shelf day is not the declared day');
   for (const width of READER_D1_WIDTHS) {
     const shelf = rows.find(
@@ -308,7 +346,8 @@ function validateReader(report, context, require, engines) {
       require(false, 'Unknown reader control');
       continue;
     }
-    require(control.verdict === 'killed' &&
+    require(executed(control) &&
+      control.verdict === 'killed' &&
       !control.setupError &&
       !control.error &&
       Array.isArray(control.pageErrors) &&
@@ -318,24 +357,28 @@ function validateReader(report, context, require, engines) {
         READER_RUN_ROWS[spec.run],
         (control.rows || []).map((row) => row.id),
       ), `${control.name}: incomplete mutant schedule`);
-    require(exact(
-      spec.kills,
-      (control.rows || []).filter((row) => row.pass !== true).map((row) => row.id),
-    ), `${control.name}: wrong named red set`);
+    require((control.rows || []).every((row) => executed(row) && typeof row.pass === 'boolean') &&
+      exact(
+        spec.kills,
+        (control.rows || []).filter((row) => row.pass === false).map((row) => row.id),
+      ), `${control.name}: wrong named red set`);
     require(readerWitness(control.name, control), `${control.name}: intended fault not witnessed`);
-    const file = control.name === 'r1' ? 'data/articles/aozora-046605.json' : 'corridor.js';
+    const file = control.name === 'r1' ? 'data/articles/aozora-046605.json' : 'corridor.js',
+      digest = runtime(context, file);
+    require(sha(digest), `${control.name}: tested artifact manifest has no ${file} digest`);
     require(Array.isArray(control.served) &&
       control.served.length > 0 &&
       control.served.every(
         (row) =>
           row.file === file &&
-          sha(row.baseSha256) &&
+          row.baseSha256 === digest &&
           sha(row.mutantSha256) &&
           row.baseSha256 !== row.mutantSha256 &&
           row.applied?.length === 1 &&
           row.applied[0].key === spec.key,
       ), `${control.name}: served mutation proof invalid`);
-    require(control.restore?.passed === true &&
+    require(executed(control.restore) &&
+      control.restore?.passed === true &&
       !control.restore.error &&
       Array.isArray(control.restore.pageErrors) &&
       !control.restore.pageErrors.length &&
@@ -343,12 +386,11 @@ function validateReader(report, context, require, engines) {
         control.restore.rows,
         READER_RUN_ROWS[spec.run],
       ), `${control.name}: clean complete restore absent`);
-    require(control.restore?.served?.length === 1 &&
-      control.restore.served[0].file === file &&
-      sha(control.restore.served[0].sha256) &&
-      control.served.every(
-        (row) => row.baseSha256 === control.restore.served[0].sha256,
-      ), `${control.name}: byte restoration proof absent`);
+    require(deliveredExactly(
+      control.restore?.delivered,
+      file,
+      digest,
+    ), `${control.name}: restored page did not load the tested artifact's ${file}`);
   }
   return observed;
 }
@@ -413,7 +455,10 @@ function validateRecord(report, context, require, engines) {
           ), `${control.engine}: controls compare against different candidates`);
         candidates.set(control.engine, receipt);
       } else attemptNonces.push(receipt?.nonce);
-      require(child?.valid === true &&
+      require(executed(control) &&
+        executed(child) &&
+        executed(receipt) &&
+        child?.valid === true &&
         child.status?.code === exit &&
         !child.status.signal &&
         !child.status.error &&
@@ -446,13 +491,21 @@ function validateRecord(report, context, require, engines) {
       mutant: fresh.mutant,
       restore: fresh.restore,
     });
-    const served = fresh.mutant?.control?.served;
+    const served = fresh.mutant?.control?.served,
+      digest = runtime(context, 'corridor.js');
+    require(sha(digest), `${control.name}: tested artifact manifest has no corridor.js digest`);
+    for (const phase of ['candidate', 'restore'])
+      require(deliveredExactly(
+        fresh[phase]?.delivered,
+        'corridor.js',
+        digest,
+      ), `${control.name}/${phase}: page did not load the tested artifact's corridor.js`);
     require(Array.isArray(served) &&
       served.length > 0 &&
       served.every(
         (row) =>
           row.file === 'corridor.js' &&
-          sha(row.baseSha256) &&
+          row.baseSha256 === digest &&
           sha(row.mutantSha256) &&
           row.baseSha256 !== row.mutantSha256 &&
           row.applied?.length === 1 &&
@@ -493,27 +546,22 @@ function validateDelivery(report, context, require, engines) {
     exact(engines, report.engines), 'Report-delivery scope/engine mismatch');
   for (const engine of engines)
     require(nonempty(report.browsers?.[engine]), `Report actual ${engine} version absent`);
-  require((report.checks || []).every((row) => row.pass === true), 'Report failed assertion');
+  require((report.checks || []).every(
+    (row) => executed(row) && row.pass === true,
+  ), 'Report failed assertion');
   const scenarios = engines.flatMap((engine) =>
-    [
-      'copy en',
-      'copy ja',
-      'prefilled issue',
-      'long report',
-      'blocked window',
-      'relay',
-      'no Blob storage',
-      'setup link',
-    ].map((name) => `${engine} · ${name}`),
+    REPORT_DELIVERY_SCENARIOS.map((name) => `${engine} · ${name}`),
   );
   require(exact(
     scenarios,
     (report.scenarios || []).map((row) => row.name),
   ) &&
-    (report.scenarios || []).every((row) => row.completed === true), 'Report scenarios incomplete');
+    (report.scenarios || []).every(
+      (row) => executed(row) && row.completed === true,
+    ), 'Report scenarios incomplete');
   const ids = engines.flatMap((engine) =>
-    ['en', 'ja'].flatMap((locale) =>
-      REPORT_COPY_CONTROLS.map((name) => `${engine}/${locale}/${name}`),
+    REPORT_LOCALES.flatMap((locale) =>
+      Object.keys(REPORT_COPY_CONTROL_SPECS).map((name) => `${engine}/${locale}/${name}`),
     ),
   );
   require(exact(
@@ -521,38 +569,43 @@ function validateDelivery(report, context, require, engines) {
     (report.controls || []).map((row) => `${row.engine}/${row.locale}/${row.name}`),
   ), 'Report copy controls incomplete');
   for (const control of report.controls || []) {
-    require(control.verdict === 'killed' &&
-      !control.error, `${control.name}: not a completed kill`);
-    const publicControl = control.name === 'public-disclosure-removed';
-    const observe = (phase) => {
-      const observed = control[phase]?.observed;
-      return publicControl
-        ? {
-            disclosure:
-              observed?.pass === true &&
-              observed.expected === PUBLIC_DISCLOSURE[control.locale] &&
-              observed.text?.includes(PUBLIC_DISCLOSURE[control.locale]),
-          }
-        : reportCopyObservation(observed || {}, {
-            locale: control.locale,
-            pending: control.name === 'fallback-advertised-before-probe',
-          });
-    };
-    require(Object.values(observe('before')).every(Boolean) &&
-      Object.values(observe('restored')).every(
-        Boolean,
-      ), `${control.name}: candidate/restore not clean`);
-    const expected = publicControl
-      ? 'disclosure'
-      : control.name === 'fallback-advertised-before-probe'
-        ? 'delivery'
-        : 'label';
-    require(exact(
-      [expected],
-      Object.entries(observe('mutant'))
-        .filter(([, pass]) => !pass)
-        .map(([id]) => id),
-    ), `${control.name}: wrong completed red`);
+    const spec = Object.hasOwn(REPORT_COPY_CONTROL_SPECS, control.name)
+      ? REPORT_COPY_CONTROL_SPECS[control.name]
+      : null;
+    if (!spec) {
+      require(false, 'Unknown report copy control');
+      continue;
+    }
+    require(executed(control) &&
+      ['before', 'mutant', 'restored'].every((phase) => executed(control[phase])) &&
+      control.verdict === 'killed' &&
+      control.error === null, `${control.name}: not a completed kill`);
+    const observed = (phase) => control[phase]?.observed;
+    if (spec.disclosure) {
+      const state = (phase) => publicDisclosureState(observed(phase), control.locale);
+      require(['before', 'restored'].every((phase) => {
+        const s = state(phase);
+        return s.complete && s.pass === true && s.present === true;
+      }), `${control.name}: candidate/restore not clean`);
+      const mutant = state('mutant');
+      require(mutant.complete &&
+        mutant.pass === false &&
+        mutant.present === false, `${control.name}: disclosure not observed removed`);
+      continue;
+    }
+    const options = { locale: control.locale, pending: spec.pending === true };
+    const state = (phase) => reportCopyState(observed(phase), options);
+    require(['before', 'restored'].every((phase) => {
+      const s = state(phase);
+      return s.complete && s.label === true && s.delivery === true && s.enabled === true;
+    }), `${control.name}: candidate/restore not clean`);
+    const mutant = state('mutant');
+    require(mutant.complete &&
+      exact(
+        [spec.kill],
+        ['label', 'delivery', 'enabled'].filter((id) => mutant[id] !== true),
+      ) &&
+      spec.witness(observed('mutant'), sendLabel(options)), `${control.name}: wrong completed red`);
   }
   return (report.checks || []).map((row) => row.name);
 }
@@ -576,7 +629,7 @@ const make = (kind, fixedEngine) =>
                 .flat()
                 .map((id) => `${e}/${id}`),
             )
-          : expectedReportChecks(engines);
+          : reportDeliveryChecks(engines);
     },
     validate(report, context = {}) {
       const errors = [],

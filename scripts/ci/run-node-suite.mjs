@@ -7,18 +7,19 @@ import { resolve, dirname } from 'node:path';
 import { digest, requireNodeSuite } from './verification-admission.mjs';
 
 const args = process.argv.slice(2);
+const operand = (value) => typeof value === 'string' && value.length > 0 && !value.startsWith('-');
 assert(
-  args[0] === '--out' && args[1] && args[2] === '--',
+  args[0] === '--out' && operand(args[1]) && args[2] === '--',
   'Usage: run-node-suite --out report.json -- full-file-list',
 );
-const out = resolve(args[1]),
-  files = args.slice(3).map((file) => resolve(file));
+const requested = args.slice(3);
 assert(
-  files.length &&
-    new Set(files).size === files.length &&
-    files.every((file) => !file.startsWith('--')),
+  requested.length && requested.every(operand) && new Set(requested).size === requested.length,
   'Nonempty unique test file roster required',
 );
+const out = resolve(args[1]),
+  files = requested.map((file) => resolve(file));
+assert(new Set(files).size === files.length, 'Nonempty unique test file roster required');
 const receipt = {
   schemaVersion: 1,
   kind: 'bunki-node-test-suite',

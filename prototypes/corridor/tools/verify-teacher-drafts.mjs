@@ -319,13 +319,17 @@ define('synthetic-delayed-success-preserves-newer-text-and-deliberate-empty', as
     assert.notEqual(newer.revision, pending.submitted.revision);
     const edited = await snapshot(fixture, `${label}-edited-while-reply-pending`); await screenshot(fixture, `${label}-visible-while-pending`);
     pending.planned.release(); await successfulReply(fixture, reply);
-    assert.equal(await fixture.page.locator('#chat-input').inputValue(), nextText);
+    const editorAfterOutcome = await fixture.page.locator('#chat-input').inputValue(); assert.equal(editorAfterOutcome, nextText);
     const after = await snapshot(fixture, `${label}-after-delayed-success`); checkDraft(after, null, nextText, false, newer.revision);
     assert.deepEqual(after.record.teacherDrafts, edited.record.teacherDrafts, 'A late response cannot consume a different edit identity');
     assert(after.archive.turns.some((row) => row.role === 'assistant' && row.content === reply && row.xid === pending.outbound.xid));
     unchangedExcept(edited, after, ['aiChat']);
-    await restart(fixture); assert.equal(await fixture.page.locator('#chat-input').inputValue(), nextText);
-    checkDraft(await snapshot(fixture, `${label}-after-clean-restart`), null, nextText, false, newer.revision);
+    await restart(fixture); const editorAfterRestart = await fixture.page.locator('#chat-input').inputValue(); assert.equal(editorAfterRestart, nextText);
+    const reopened = await snapshot(fixture, `${label}-after-clean-restart`); checkDraft(reopened, null, nextText, false, newer.revision);
+    fixture.observations.push({ name: 'delayed-success-keeps-current-draft', label, providerStatus: pending.call.status,
+      submitted: pending.submitted, current: newer, outboundXid: pending.outbound.xid, reply,
+      outboundReplies: after.archive.turns.filter((row) => row.role === 'assistant' && row.xid === pending.outbound.xid).map((row) => row.content),
+      editorAfterOutcome, draftAfterOutcome: entry(after, null), editorAfterRestart, draftAfterRestart: entry(reopened, null) });
   }
 }, { synthetic: true });
 
@@ -337,12 +341,19 @@ define('synthetic-delayed-error-preserves-newer-text-and-deliberate-empty', asyn
     pending.planned.release();
     await waitForAppRecord(fixture.page, (record) => record.aiChat.some((row) => row.systemMessage === true), { description: 'durable synthetic provider failure line' });
     await finished(fixture);
-    assert.equal(await fixture.page.locator('#chat-input').inputValue(), nextText, 'Failure cannot restore old submitted text into a deliberate empty/new draft');
+    const editorAfterOutcome = await fixture.page.locator('#chat-input').inputValue();
+    assert.equal(editorAfterOutcome, nextText, 'Failure cannot restore old submitted text into a deliberate empty/new draft');
     const after = await snapshot(fixture, `${label}-after-delayed-provider-error`); checkDraft(after, null, nextText, false, newer.revision);
     assert.equal(after.archive.turns.filter((row) => row.xid === pending.outbound.xid && row.role === 'assistant').length, 0);
     unchangedExcept(pending.beforeReply, after, ['aiChat', 'teacherDrafts']);
     await screenshot(fixture, `${label}-failed-request-keeps-current-draft`);
-    await restart(fixture); assert.equal(await fixture.page.locator('#chat-input').inputValue(), nextText);
+    await restart(fixture); const editorAfterRestart = await fixture.page.locator('#chat-input').inputValue(); assert.equal(editorAfterRestart, nextText);
+    const reopened = await snapshot(fixture, `${label}-after-clean-restart`); checkDraft(reopened, null, nextText, false, newer.revision);
+    fixture.observations.push({ name: 'delayed-error-keeps-current-draft', label, providerStatus: pending.call.status,
+      submitted: pending.submitted, current: newer, outboundXid: pending.outbound.xid,
+      outboundReplies: after.archive.turns.filter((row) => row.role === 'assistant' && row.xid === pending.outbound.xid).map((row) => row.content),
+      failureLines: after.record.aiChat.filter((row) => row.systemMessage === true).length,
+      editorAfterOutcome, draftAfterOutcome: entry(after, null), editorAfterRestart, draftAfterRestart: entry(reopened, null) });
   }
 }, { synthetic: true });
 

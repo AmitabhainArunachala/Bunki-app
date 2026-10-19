@@ -1,5 +1,11 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+function executed(value) {
+  if(value===null || typeof value!=='object') return true;
+  if(value.skip || value.skipped || value.unexecuted || value.timedOut || value.error || value.harnessError || value.setupError ||
+    ['skip','skipped','not-run','error','timeout'].includes(value.status)) return false;
+  return (!Array.isArray(value) || value.every(executed)) && (!Object.hasOwn(value,'observed') || executed(value.observed));
+}
 export const RECORD_ROWS = Object.freeze({
   A: ['A.upgrade','A.look-up','A.known','A.finish','A.round-trip','A.page-errors'],
   A2: ['A2.later-met','A2.page-errors'],
@@ -30,25 +36,28 @@ export function recordCompletion(rows, engines, cases=Object.keys(RECORD_ROWS)) 
   const expected=engines.flatMap(engine=>cases.flatMap(name=>RECORD_ROWS[name].map(id=>`${engine}/${id}`)));
   const ids=rows.map(row=>row.id);
   const complete=expected.length>0 && ids.length===expected.length && new Set(ids).size===ids.length && expected.every(id=>ids.includes(id));
-  return { expectedRows: expected, observedRows: ids, scheduleComplete: complete, diagnosticPass: complete && rows.every(row=>row.ok===true) };
+  return { expectedRows: expected, observedRows: ids, scheduleComplete: complete, diagnosticPass: complete && rows.every(row=>executed(row) && row.ok===true) };
 }
 export function recordControlVerdict({ name, engine, candidate, mutant, restore }) {
   const spec=RECORD_CONTROLS[name];
   if(!spec) return { verdict:'incomplete', reason:'unknown control' };
-  const clean=(receipt,cases)=>receipt && !receipt.terminalError && recordCompletion(receipt.rows,[engine],cases).diagnosticPass;
+  const clean=(receipt,cases)=>receipt && executed(receipt) && !receipt.terminalError && !receipt.deliveryError && receipt.delivered?.length>0 && recordCompletion(receipt.rows,[engine],cases).diagnosticPass;
   if(!clean(candidate,Object.keys(RECORD_ROWS)) || !clean(restore,[spec.case])) return { verdict:'incomplete', reason:'candidate or restore not clean' };
   const completed=recordCompletion(mutant?.rows || [],[engine],[spec.case]);
-  if(!completed.scheduleComplete || mutant.terminalError || mutant.control?.setupError) return {verdict:'incomplete',reason:'mutant schedule/setup failed'};
+  if(!completed.scheduleComplete || mutant.terminalError || mutant.control?.setupError || !executed(mutant) || !executed(mutant.control) || !mutant.rows.every(executed)) return {verdict:'incomplete',reason:'mutant schedule/setup failed'};
   const served=mutant.control?.served || [];
   if(!served.length || served.some(row=>row.baseSha256===row.mutantSha256 || row.applied?.length!==1)) return {verdict:'incomplete',reason:'served edit not proved'};
-  const kill=`${engine}/${spec.kill}`, reds=mutant.rows.filter(row=>!row.ok);
-  if(reds.length!==1 || reds[0].id!==kill) return {verdict:'contaminated',reason:'expected exact named red only'};
+  const kill=`${engine}/${spec.kill}`, reds=mutant.rows.filter(row=>row.ok!==true);
+  if(reds.length!==1 || reds[0].id!==kill || reds[0].ok!==false) return {verdict:'contaminated',reason:'expected exact named false row only'};
   const witness=reds[0].observed;
   const witnessed=name==='kagami-spelling-only' ? witness?.rowReading==='ねん' && witness?.mirror?.toshi===true
     : witness?.head?.startsWith('訳') && witness.reading==='やく' && witness.tutor===true && /STALE_WAKE_REASON/u.test(witness.page || '');
   return witnessed ? {verdict:'killed',reason:kill,witness} : {verdict:'contaminated',reason:'fault-specific witness absent'};
 }
 export function reportCopyObservation(observed, { locale='en', pending=false, relay=false }={}) {
+  if(!observed || !executed(observed) || typeof observed.visible!=='string' || typeof observed.accessible!=='string' ||
+    typeof observed.visibleShown!=='boolean' || typeof observed.delivery!=='string' || typeof observed.disabled!=='boolean')
+    return {label:false,delivery:false,enabled:false};
   const label=pending || relay ? 'Send report' : locale==='ja' ? '送る' : 'Send';
   const delivery=pending || relay ? 'service' : 'github';
   return { label: observed.visible===label && observed.accessible===label && observed.visibleShown===true,
@@ -57,29 +66,56 @@ export function reportCopyObservation(observed, { locale='en', pending=false, re
 
 export const READER_D1_DAY = '2026-10-15';
 export const READER_D1_PICKS = 6;
-export async function restoreServedDigests({ files, fetchBytes, manifest, served }) {
+export async function serveRecorded(context, { origin, files, delivered }) {
   for (const file of new Set(files)) {
-    const sha256 = createHash('sha256').update(await fetchBytes(file)).digest('hex');
-    served.push({ file, sha256 });
-    if (sha256 !== manifest.get(file)) throw new Error(`restore digest mismatch: ${file}`);
+    await context.route((url) => url.origin === origin && url.pathname === `/${file}`, async (route) => {
+      const row = { file, status: null, sha256: null };
+      delivered.push(row);
+      try {
+        const response = await route.fetch();
+        const body = await response.body();
+        const headers = { ...response.headers() };
+        delete headers['content-length'];
+        delete headers['content-encoding'];
+        row.status = response.status();
+        row.sha256 = createHash('sha256').update(body).digest('hex');
+        await route.fulfill({ status: response.status(), headers, body });
+      } catch (error) {
+        row.error = String(error?.message || error);
+        await route.abort().catch(() => {});
+      }
+    });
   }
-  return served;
+  return delivered;
+}
+export function deliveredAsBuilt({ files, rows, manifest }) {
+  for (const file of new Set(files)) {
+    const mine = rows.filter(row => row.file === file);
+    if (!mine.length) throw new Error(`${file} was never delivered to the page`);
+    if (mine.some(row => row.error || row.status !== 200 || typeof row.sha256 !== 'string' || row.sha256 !== manifest.get(file)))
+      throw new Error(`${file}: delivered bytes are not the manifest's`);
+  }
+  if (rows.some(row => !files.includes(row.file))) throw new Error('a delivery outside the declared files');
+  return rows;
 }
 export function readerDoorsReceipt({ runId, servedIdentity, verifierGitSha, verifierSha256, engine, browserVersion, origin, d1Day, results, controls, pageErrors,
   expectedControls, lastCase }) {
   const hex = (value, length) => typeof value === 'string' && value.length === length && /^[a-f0-9]+$/u.test(value);
   const fullAcceptance = typeof runId === 'string' && runId.length > 0 && hex(servedIdentity?.gitSha, 40) && hex(servedIdentity?.artifactSha256, 64)
-    && hex(verifierSha256, 64) && results.length > 0 && results.every(row => row.pass === true) && !pageErrors.length
-    && expectedControls > 0 && controls.length === expectedControls && controls.every(row => row.verdict === 'killed');
+    && hex(verifierSha256, 64) && results.length > 0 && results.every(row => executed(row) && row.pass === true) && !pageErrors.length
+    && expectedControls > 0 && controls.length === expectedControls && controls.every(row => executed(row) && executed(row.restore) && row.verdict === 'killed'
+      && (!row.rows || row.rows.every(sample=>executed(sample) && typeof sample.pass==='boolean'))
+      && (!row.restore?.rows || row.restore.rows.every(sample=>executed(sample) && sample.pass===true)));
   return { schema: 'vh-reader-doors/1', runId, gitSha: servedIdentity?.gitSha, artifactSha256: servedIdentity?.artifactSha256, verifierGitSha, verifierSha256,
     engine, browserVersion, origin, d1Day, results, controls, pageErrors, fullAcceptance, lastCase };
 }
 
 export function escapeObligations(rows) {
+  const completed=rows.every(executed);
   return {
-    premise: rows.length===3 && rows.every(row=>row.premise?.inside===true && row.premise.source===false && row.premise.connected===true),
-    exactSource: rows.length===3 && rows.every(row=>row.back===true),
-    popupAbsent: rows.length===3 && rows.every(row=>row.popupGone===true),
+    premise: completed && rows.length===3 && rows.every(row=>row.premise?.inside===true && row.premise.source===false && row.premise.connected===true),
+    exactSource: completed && rows.length===3 && rows.every(row=>row.back===true),
+    popupAbsent: completed && rows.length===3 && rows.every(row=>row.popupGone===true),
   };
 }
 
@@ -127,5 +163,16 @@ export function expectedReportChecks(engines) {
 }
 export function exactNamedCompletion(rows, expected, id='name', passed='pass') {
  const names=rows.map(row=>row[id]);
- return expected.length>0 && names.length===expected.length && new Set(names).size===names.length && expected.every(name=>names.includes(name)) && rows.every(row=>row[passed]===true);
+ return expected.length>0 && names.length===expected.length && new Set(names).size===names.length && expected.every(name=>names.includes(name)) && rows.every(row=>executed(row) && row[passed]===true);
+}
+export const REPORT_SCENARIOS = Object.freeze(['copy en','copy ja','prefilled issue','long report','blocked window','relay','no Blob storage','setup link']);
+export function reportDeliveryAcceptance({ engines, checks, scenarios, controls }) {
+ const expectedControls=engines.flatMap(engine=>['en','ja'].flatMap(locale=>REPORT_COPY_CONTROLS.map(name=>`${engine}/${locale}/${name}`)));
+ const observedControls=controls.map(row=>`${row.engine}/${row.locale}/${row.name}`);
+ const expectedChecks=expectedReportChecks(engines);
+ const expectedScenarios=engines.flatMap(engine=>REPORT_SCENARIOS.map(name=>`${engine} · ${name}`));
+ const bothEngines=engines.length===2 && ['chromium','webkit'].every(engine=>engines.includes(engine));
+ const diagnosticPass=exactNamedCompletion(checks,expectedChecks) && exactNamedCompletion(scenarios,expectedScenarios,'name','completed')
+  && exactNamedCompletion(controls.map((row,i)=>({name:observedControls[i],killed:executed(row) && ['before','mutant','restored'].every(phase=>executed(row[phase])) && row.verdict==='killed'})),expectedControls,'name','killed');
+ return { scope:bothEngines?'full-engine':'diagnostic', expectedChecks, expectedScenarios, expectedControls, observedControls, diagnosticPass, fullAcceptance:bothEngines && diagnosticPass };
 }

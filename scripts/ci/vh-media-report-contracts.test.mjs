@@ -30,6 +30,14 @@ const handoffRun = join(evidence, 'guided-offline', 'guided-offline-fixture');
 mkdirSync(handoffRun, { recursive: true });
 const handoff = join(handoffRun, 'corridor-standalone.html');
 writeFileSync(handoff, '<!doctype html><title>handoff</title>\n');
+const buildSidecar = (output) => ({
+  status: 'passed',
+  site,
+  artifactSha256: A,
+  output: realpathSync(output),
+  standaloneSha256: sha256(output),
+});
+writeFileSync(handoff + '.build.json', JSON.stringify(buildSidecar(handoff)));
 function fixture(name, engine = 'chromium') {
   const context = {
     engine,
@@ -76,7 +84,28 @@ function fixture(name, engine = 'chromium') {
     simulatedBrowser: 'Chromium',
     onlySyntheticData: true,
     externalNetworkRequestsSent: 0,
-    transport: [],
+    transport: [
+      {
+        origin: 'https://api.anthropic.com',
+        pathname: '/v1/messages',
+        credential: 'default-synthetic',
+      },
+      {
+        origin: 'https://pre-upgrade-custom.invalid',
+        pathname: '/v1/messages',
+        credential: 'custom-synthetic',
+      },
+      {
+        origin: 'https://custom-provider.invalid',
+        pathname: '/proxy/v1/messages',
+        credential: 'custom-synthetic',
+      },
+      {
+        origin: 'https://second-provider.invalid',
+        pathname: '/v1/messages',
+        credential: 'second-synthetic',
+      },
+    ],
     browser: engine,
     format: 'kairo-ai-runtime-verification',
     version: 2,
@@ -435,6 +464,7 @@ test('an observed guided-offline receipt is admitted at the producer layout by t
     mkdirSync(run, { recursive: true });
     const standalone = join(run, observed.layout.standalone);
     writeFileSync(standalone, '<!doctype html><title>observed handoff</title>\n');
+    writeFileSync(standalone + '.build.json', JSON.stringify(buildSidecar(standalone)));
     const receipt = {
       ...observed.report,
       artifactSha256: A,
@@ -457,6 +487,7 @@ test('an observed guided-offline receipt is admitted at the producer layout by t
         startedAt: new Date(Date.now() - 60_000).toISOString(),
         runId: 'observed-attempt',
         engine: 'chromium',
+        site,
         artifactSha256: A,
       },
     );
@@ -470,4 +501,82 @@ test('an observed guided-offline receipt is admitted at the producer layout by t
     () => admit((out) => join(out, 'guided-offline', observed.layout.receipt)),
     /exactly one fresh receipt/u,
   );
+});
+
+test('guided-offline consumes the real sibling build receipt and refuses a foreign artifact', () => {
+  const { report, context } = fixture('guided-offline');
+  const path = handoff + '.build.json',
+    good = readFileSync(path);
+  const admit = () => validateMediaReport('guided-offline', report, context).passed;
+  try {
+    assert.equal(admit(), true);
+    for (const patch of [
+      { artifactSha256: C },
+      { artifactSha256: null },
+      { site: evidence },
+      { output: site },
+      { standaloneSha256: C },
+      { status: 'failed' },
+    ]) {
+      writeFileSync(path, JSON.stringify({ ...buildSidecar(handoff), ...patch }));
+      assert.equal(admit(), false, JSON.stringify(patch));
+    }
+    writeFileSync(path, '{not-json');
+    assert.equal(admit(), false);
+    rmSync(path);
+    assert.equal(admit(), false);
+    const foreign = join(evidence, 'foreign-build.json');
+    writeFileSync(foreign, good);
+    symlinkSync(foreign, path);
+    assert.equal(admit(), false, 'a linked sidecar is not the producer sibling');
+    rmSync(path);
+    rmSync(foreign);
+  } finally {
+    writeFileSync(path, good);
+  }
+  assert.equal(admit(), true);
+});
+
+test('import-provider requires actual allowed transport bindings, not constant safety booleans', () => {
+  const { report, context } = fixture('import-provider');
+  const admit = (transport) =>
+    validateMediaReport('import-provider', { ...report, transport }, context).passed;
+  assert.equal(admit(report.transport), true);
+  // Actual intercepted sequence from 2026-10-01/glance/lean-92362bed/import-provider/
+  // verify-import-provider.json, SHA256 a89e730dc2368cf765baf93eda06f4957c04f5f81ecbefc51fba8f656fd66f4e.
+  // Replays transport observations only; the rest of this admission fixture is synthetic.
+  const observedTransport = [
+    ['https://api.anthropic.com', '/v1/messages', 'default-synthetic'],
+    ['https://pre-upgrade-custom.invalid', '/v1/messages', 'custom-synthetic'],
+    ['https://pre-upgrade-custom.invalid', '/v1/messages', 'custom-synthetic'],
+    ['https://api.anthropic.com', '/v1/messages', 'default-synthetic'],
+    ['https://custom-provider.invalid', '/proxy/v1/messages', 'custom-synthetic'],
+    ['https://custom-provider.invalid', '/proxy/v1/messages', 'custom-synthetic'],
+    ['https://custom-provider.invalid', '/proxy/v1/messages', 'custom-synthetic'],
+    ['https://custom-provider.invalid', '/proxy/v1/messages', 'custom-synthetic'],
+    ['https://second-provider.invalid', '/v1/messages', 'second-synthetic'],
+    ['https://second-provider.invalid', '/v1/messages', 'second-synthetic'],
+    ['https://api.anthropic.com', '/v1/messages', 'default-synthetic'],
+  ].map(([origin, pathname, credential]) => ({ origin, pathname, credential }));
+  assert.equal(admit(observedTransport), true, 'retained genuine request observations');
+  for (const transport of [
+    undefined,
+    null,
+    [],
+    [{}],
+    report.transport.slice(1),
+    report.transport.map((row, index) =>
+      index ? row : { ...row, credential: 'custom-synthetic' },
+    ),
+    [
+      ...report.transport,
+      {
+        origin: 'https://redirect-recipient.invalid',
+        pathname: '/v1/messages',
+        credential: 'default-synthetic',
+      },
+    ],
+    report.transport.map((row, index) => (index ? row : { ...row, pathname: '/foreign' })),
+  ])
+    assert.equal(admit(transport), false, JSON.stringify(transport));
 });

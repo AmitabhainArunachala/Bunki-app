@@ -458,6 +458,223 @@ const questionSources = [
   'teacher-drafts.mjs',
   'sentence-drafts.mjs',
 ];
+// Reviewed esbuild inputs of the five compiled corridor cores at 5f6c2055 (esbuild 0.28.2, package-lock layout).
+const ZOD_FILES = Object.freeze([
+  'index.js',
+  'v4/classic/checks.js',
+  'v4/classic/coerce.js',
+  'v4/classic/compat.js',
+  'v4/classic/errors.js',
+  'v4/classic/external.js',
+  'v4/classic/from-json-schema.js',
+  'v4/classic/iso.js',
+  'v4/classic/parse.js',
+  'v4/classic/schemas.js',
+  'v4/core/api.js',
+  'v4/core/checks.js',
+  'v4/core/core.js',
+  'v4/core/doc.js',
+  'v4/core/errors.js',
+  'v4/core/index.js',
+  'v4/core/json-schema-generator.js',
+  'v4/core/json-schema-processors.js',
+  'v4/core/json-schema.js',
+  'v4/core/parse.js',
+  'v4/core/regexes.js',
+  'v4/core/registries.js',
+  'v4/core/schemas.js',
+  'v4/core/to-json-schema.js',
+  'v4/core/util.js',
+  'v4/core/versions.js',
+  ...[
+    'ar',
+    'az',
+    'be',
+    'bg',
+    'ca',
+    'cs',
+    'da',
+    'de',
+    'el',
+    'en',
+    'eo',
+    'es',
+    'fa',
+    'fi',
+    'fr-CA',
+    'fr',
+    'he',
+    'hr',
+    'hu',
+    'hy',
+    'id',
+    'index',
+    'is',
+    'it',
+    'ja',
+    'ka',
+    'kh',
+    'km',
+    'ko',
+    'lt',
+    'mk',
+    'ms',
+    'nl',
+    'no',
+    'ota',
+    'pl',
+    'ps',
+    'pt',
+    'ro',
+    'ru',
+    'sl',
+    'sv',
+    'ta',
+    'th',
+    'tr',
+    'ua',
+    'uk',
+    'ur',
+    'uz',
+    'vi',
+    'yo',
+    'zh-CN',
+    'zh-TW',
+  ].map((locale) => `v4/locales/${locale}.js`),
+]);
+const zod = (workspace) =>
+  ZOD_FILES.map((file) => `packages/${workspace}/node_modules/zod/${file}`);
+const CORE_BUILD = [
+  'package-lock.json',
+  'package.json',
+  'packages/ai/package.json',
+  'packages/domain/package.json',
+  'scripts/build-reading-module.mjs',
+];
+const DOMAIN_SHARED = [
+  'packages/domain/src/events/shared.ts',
+  'packages/domain/src/primitives.ts',
+  'packages/domain/src/replay/canonical-json.ts',
+];
+const READING_SOURCES = [
+  'packages/reading/src/article.ts',
+  'packages/reading/src/common.ts',
+  'packages/reading/src/file-source.ts',
+  'packages/reading/src/generation.ts',
+  'packages/reading/src/index.ts',
+  'packages/reading/src/intake.ts',
+  'packages/reading/src/transcript.ts',
+];
+export const ASSESSMENT_CORE_MODULE_INPUTS = Object.freeze({
+  'modules/reading-core.mjs': Object.freeze([
+    ...CORE_BUILD,
+    'packages/ai/src/hash.ts',
+    ...DOMAIN_SHARED,
+    'packages/reading/package.json',
+    ...READING_SOURCES,
+    ...zod('domain'),
+    ...zod('reading'),
+  ]),
+  'modules/feed-core.mjs': Object.freeze([
+    ...CORE_BUILD,
+    'packages/ai/src/hash.ts',
+    ...DOMAIN_SHARED,
+    'packages/feed/package.json',
+    'packages/feed/src/contracts.ts',
+    'packages/feed/src/full-reader/alma-html.ts',
+    'packages/feed/src/full-reader/alma-policy.ts',
+    'packages/feed/src/full-reader/alma.ts',
+    'packages/feed/src/full-reader/html.ts',
+    'packages/feed/src/full-reader/index.ts',
+    'packages/feed/src/full-reader/selection.ts',
+    'packages/feed/src/identity.ts',
+    'packages/feed/src/index.ts',
+    'packages/feed/src/model.ts',
+    'packages/feed/src/parser.ts',
+    'packages/feed/src/policy.ts',
+    'packages/feed/src/registry.ts',
+    ...READING_SOURCES,
+    'node_modules/@xmldom/xmldom/lib/conventions.js',
+    'node_modules/@xmldom/xmldom/lib/dom-parser.js',
+    'node_modules/@xmldom/xmldom/lib/dom.js',
+    'node_modules/@xmldom/xmldom/lib/entities.js',
+    'node_modules/@xmldom/xmldom/lib/index.js',
+    'node_modules/@xmldom/xmldom/lib/sax.js',
+    ...zod('domain'),
+    ...zod('feed'),
+    ...zod('reading'),
+  ]),
+  'modules/assessment-core.mjs': Object.freeze([
+    ...CORE_BUILD,
+    'packages/ai/src/hash.ts',
+    ...DOMAIN_SHARED,
+    'packages/assessment/package.json',
+    'packages/assessment/src/attempt-v2.ts',
+    'packages/assessment/src/attempt.ts',
+    'packages/assessment/src/blueprints.ts',
+    'packages/assessment/src/common.ts',
+    'packages/assessment/src/content.ts',
+    'packages/assessment/src/editorial-v2.ts',
+    'packages/assessment/src/editorial.ts',
+    'packages/assessment/src/index.ts',
+    'packages/assessment/src/legacy.ts',
+    ...zod('assessment'),
+    ...zod('domain'),
+  ]),
+  'modules/record-core.mjs': Object.freeze([
+    ...CORE_BUILD,
+    'packages/ai/src/hash.ts',
+    ...DOMAIN_SHARED,
+    'packages/persistence/package.json',
+    'packages/persistence/src/hash.ts',
+    'packages/persistence/src/replication/backup.ts',
+    'packages/persistence/src/replication/browser.ts',
+    'packages/persistence/src/replication/coordinator.ts',
+    'packages/persistence/src/replication/errors.ts',
+    'packages/persistence/src/replication/indexeddb.ts',
+    'packages/persistence/src/replication/json.ts',
+    'packages/sync/src/assessment-operations-v2.ts',
+    'packages/sync/src/assessment-views-v2.ts',
+    'packages/sync/src/common.ts',
+    'packages/sync/src/exam-attempt-views.ts',
+    'packages/sync/src/index.ts',
+    'packages/sync/src/note-views.ts',
+    'packages/sync/src/operations.ts',
+    'packages/sync/src/reading-views.ts',
+    'packages/sync/src/replica.ts',
+    'packages/sync/src/source-reference-views.ts',
+    'scripts/corridor-record-entry.ts',
+    ...zod('domain'),
+    ...zod('sync'),
+  ]),
+  'modules/learning-core.mjs': Object.freeze([
+    ...CORE_BUILD,
+    'packages/domain/src/contracts/bound-retrieval-contract.ts',
+    'packages/domain/src/contracts/component-identity.ts',
+    'packages/domain/src/contracts/index.ts',
+    'packages/domain/src/contracts/learn-contracts.ts',
+    'packages/domain/src/contracts/promotion-activation.ts',
+    'packages/domain/src/contracts/retrieval-contract.ts',
+    'packages/domain/src/contracts/source-practice.ts',
+    'packages/domain/src/contracts/thread-link.ts',
+    'packages/domain/src/errors.ts',
+    'packages/domain/src/events/catalog.ts',
+    'packages/domain/src/events/envelope.ts',
+    'packages/domain/src/events/factories.ts',
+    'packages/domain/src/events/mint-registry.ts',
+    'packages/domain/src/events/parse.ts',
+    ...DOMAIN_SHARED,
+    'packages/domain/src/evidence/gate.ts',
+    'packages/domain/src/evidence/mint.ts',
+    'packages/persistence/src/hash.ts',
+    'scripts/corridor-learning-entry.ts',
+    ...zod('domain'),
+  ]),
+});
+const V2_CONTROLLER = 'prototypes/corridor/assessment-v2-controller.mjs';
+const CONTROLLER = 'prototypes/corridor/assessment-controller.mjs';
+const CONTROLLER_FIXTURE = 'prototypes/corridor/data/mock/sets/n5-01.json';
+const ASSESSMENT_CORE = 'modules/assessment-core.mjs';
 export const ASSESSMENT_SOURCE_INPUTS = Object.freeze({
   'assessment-question-practice': Object.freeze([
     'prototypes/corridor/assessment-question-practice.mjs',
@@ -465,7 +682,27 @@ export const ASSESSMENT_SOURCE_INPUTS = Object.freeze({
   'assessment-question-source': Object.freeze(
     questionSources.map((name) => `prototypes/corridor/${name}`),
   ),
+  'assessment-v2-controller': Object.freeze([
+    V2_CONTROLLER,
+    ...ASSESSMENT_CORE_MODULE_INPUTS[ASSESSMENT_CORE],
+  ]),
+  'assessment-controller': Object.freeze([
+    CONTROLLER,
+    CONTROLLER_FIXTURE,
+    ...new Set(Object.values(ASSESSMENT_CORE_MODULE_INPUTS).flat()),
+  ]),
 });
+const sourceBound = (context, path, actual) => digest(actual) && actual === inputAt(context, path);
+const coreInputs = (path) =>
+  Object.hasOwn(ASSESSMENT_CORE_MODULE_INPUTS, path) ? ASSESSMENT_CORE_MODULE_INPUTS[path] : [];
+const inputsBound = (context, module, inputs) =>
+  Array.isArray(inputs) &&
+  inputs.every((row) => row && typeof row === 'object') &&
+  exact(
+    coreInputs(module),
+    inputs.map((row) => row.path),
+  ) &&
+  inputs.every((row) => sourceBound(context, row.path, row.sha256));
 function runtime(require, context, actual, path) {
   require(digest(actual), `${path}: missing digest`);
   const expected = hashAt(context, path);
@@ -597,11 +834,13 @@ defs['assessment-v2-controller'] = make('assessment-v2-controller', {
       'Wrong controller format/failure count',
     );
     q(
-      digest(r.controllerSha256) &&
-        digest(r.coreSha256) &&
-        Array.isArray(r.inputs) &&
-        r.inputs.length > 0,
-      'Compiled controller/core/input identities missing',
+      digest(r.coreSha256) && r.compiler?.name === 'esbuild' && nonempty(r.compiler.version),
+      'Compiled core identity missing',
+    );
+    q(sourceBound(c, V2_CONTROLLER, r.controllerSha256), 'Controller source changed or unpinned');
+    q(
+      inputsBound(c, ASSESSMENT_CORE, r.inputs),
+      'Compiled core inputs changed, missing, extra or unpinned',
     );
   },
 });
@@ -870,13 +1109,45 @@ defs['assessment-controller'] = make('assessment-controller', {
       Array.isArray(r.currentInputDifferences) && !r.currentInputDifferences.length,
       'Compiled source changed',
     );
+    const pinned = digest(c.artifactSha256);
     q(
-      digest(r.source?.sha256) &&
-        digest(r.core?.sha256) &&
-        Array.isArray(r.modules) &&
-        r.modules.length > 0 &&
-        r.modules.every((row) => digest(row.sha256)),
-      'Controller compiler/source/module identities missing',
+      pinned ? r.sourceArtifact?.artifactSha256 === c.artifactSha256 : r.sourceArtifact === null,
+      'Controller run mode or artifact differs from the pinned artifact',
+    );
+    q(
+      sourceBound(c, CONTROLLER, r.source?.sha256) &&
+        (pinned
+          ? r.source.sha256 === hashAt(c, 'assessment-controller.mjs')
+          : r.source.path === CONTROLLER),
+      'Controller source changed, unpinned or not the tested artifact',
+    );
+    q(
+      r.fixture?.path === CONTROLLER_FIXTURE &&
+        sourceBound(c, CONTROLLER_FIXTURE, r.fixture.sha256),
+      'Controller fixture changed or unpinned',
+    );
+    const modules = Array.isArray(r.modules) ? r.modules : [];
+    q(
+      exact(
+        Object.keys(ASSESSMENT_CORE_MODULE_INPUTS),
+        modules.map((row) => row?.path),
+      ),
+      'Compiled module roster incomplete',
+    );
+    for (const row of modules)
+      q(
+        digest(row?.sha256) &&
+          inputsBound(c, row.path, row.inputs) &&
+          (!pinned || row.sha256 === hashAt(c, row.path)),
+        `${row?.path}: compiled module inputs changed, missing, extra, unpinned or not the pinned artifact`,
+      );
+    const core = modules.find((row) => row?.path === ASSESSMENT_CORE);
+    q(
+      r.core?.path === ASSESSMENT_CORE &&
+        digest(r.core.sha256) &&
+        r.core.sha256 === core?.sha256 &&
+        inputsBound(c, ASSESSMENT_CORE, r.core.inputs),
+      'Controller core differs from its staged module or its inputs',
     );
     q(
       r.stress?.attempts === 500 &&
@@ -886,7 +1157,6 @@ defs['assessment-controller'] = make('assessment-controller', {
         r.stress.serializedBytes > 0,
       'Controller retained-history stress missing',
     );
-    if (r.sourceArtifact) artifact(q, r, c, r.sourceArtifact.artifactSha256);
   },
 });
 defs['annotation-lookup'] = make('annotation-lookup', {
