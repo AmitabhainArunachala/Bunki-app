@@ -206,17 +206,21 @@ async function itemStage(browser, engine) {
       await openStory(page);
       await page.locator(WORD_SEL).first().scrollIntoViewIfNeeded();
       await delay(200);
-      const before = await page.evaluate((sel) => ({ y: window.scrollY, word: document.querySelector(sel).getBoundingClientRect().top }), WORD_SEL);
+      // the word's own glyphs (its ruby's foot, as the corridor's grammar row measures it: the reading tap 1 raises sits
+      // above them, inside the word's box)
+      const glyph = () => page.evaluate((sel) => { const w = document.querySelector(sel); return (w.querySelector('ruby') ?? w).getBoundingClientRect().bottom; }, WORD_SEL);
+      const before = { y: await page.evaluate(() => window.scrollY), word: await glyph() };
       await stage(page);
       const f = await stageFacts(page);
       const whole = f.scrollHeight <= f.clientHeight + 1 && f.rows.every((r) => r.top >= f.seen.top - 0.5 && r.bottom <= f.seen.bottom + 0.5);
       const cutClean = f.scrollHeight > f.clientHeight + 1 && !sliced(f).length && f.more === 'true' && !!f.fade;
       const clear = f.word.top >= f.ceiling - 0.5 && f.word.bottom <= f.floor + 0.5 && (f.bottom <= f.word.top - 8 || f.top >= f.word.bottom + 8);
       const framed = f.top >= f.ceiling - 0.5 && f.bottom <= f.floor + 0.5;
-      const still = Math.abs(f.scrollY - before.y) < 1 && Math.abs(f.word.top - before.word) < 2;
+      const after = await glyph();
+      const still = Math.abs(f.scrollY - before.y) < 1 && Math.abs(after - before.word) < 2;
       check(`1.stage-whole · ${engine} ${world} 390×844 · every row shown, or a clean cut that says it scrolls; the word clear and the print still`,
         (whole || cutClean) && clear && framed && still && !errors.length,
-        { whole, cutClean, clear, framed, still, moved: Math.round(f.scrollY - before.y), sliced: sliced(f).map((r) => r.row), more: f.more,
+        { whole, cutClean, clear, framed, still, moved: Math.round(f.scrollY - before.y), glyph: [Math.round(before.word), Math.round(after)], sliced: sliced(f).map((r) => r.row), more: f.more,
           top: Math.round(f.top), bottom: Math.round(f.bottom), scrollHeight: f.scrollHeight, clientHeight: f.clientHeight,
           word: [Math.round(f.word.top), Math.round(f.word.bottom)], ceiling: f.ceiling, floor: f.floor, errors });
     } finally { await context.close(); }
