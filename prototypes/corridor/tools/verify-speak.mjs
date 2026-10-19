@@ -41,7 +41,7 @@
  *   untyped-word  an untyped correction admitted as a word          → S21
  *   overlap       a second turn sent while one is in flight         → S22
  *   pin-only      the room keeps to its pin over V's lock in the app → S9
- *   token-dropped the top bar's Save given the base alone           → S5
+ *   token-dropped a word's Save (its slip's) given the base alone    → S5
  *   blob-kept     a kept line played from a blob: URL               → S12 (WebKit offline refuses it)
  *   no-his-pitch  his pitch line not drawn                          → S23
  *   residue-target  a corrected line checked against its kana alone → S23
@@ -115,9 +115,10 @@ const FAULTS = {
     from: '    if (hisLine) pic.append(hisLine);', to: '    void hisLine;' },
   'residue-target': { file: 'speak.js', witness: { S23: /after End/u },
     from: "    const targetKana = tokened ? readingOf(line) : tr.targetKana || '';", to: '    const targetKana = readingOf(line);' },
-  // the top bar's Save takes the whole token (Codex: the surface was dropped before R could derive identity)
+  // the Save takes the whole token (Codex: the surface was dropped before R could derive identity). Since Hfix-1A the Save
+  // is the word's own slip's, drawn from the token Kore's line renders for it: here it gets the base alone
   'token-dropped': { file: 'corridor.js', witness: { S5: /whole token he touched/u },
-    from: '      speakKeepWord = word ? { word, surface: surface || word, reading } : null;', to: "      speakKeepWord = word ? { word, surface: word, reading: '' } : null;" },
+    from: '    renderSentenceTokens(container, [{ s, b, r, c: true, f }], { contextId });', to: "    renderSentenceTokens(container, [{ s: b, b, r: '', c: true, f }], { contextId });" },
   'blob-kept': { file: 'speak.js', witness: { S12: /plays on, not only starts/u },
     from: "  const keptUrl = (wav) => `data:audio/wav;base64,${core.bytesToBase64(wav)}`;", to: "  const keptUrl = (wav) => URL.createObjectURL(new Blob([wav], { type: 'audio/wav' }));" },
   'ended-no-shadow': { file: 'speak.js', witness: { S23: /after End/u },
@@ -278,6 +279,14 @@ const BRIDGE = `
     if (holdGate && appendArchive.length) await holdGate;
     return realCommit(patch, appendArchive);
   };
+  // Hfix-1A: a word in Speak is kept through its own slip, whose Save derives the word's identity from the token the
+  // slip is drawn from (readingToken, wordSaveFacts); this is that token, as openReadingSlip was handed it
+  let slipToken = null;
+  const realOpenReadingSlip = openReadingSlip;
+  openReadingSlip = (anchor, token, draw) => {
+    slipToken = token ? { word: token.b, surface: token.s, reading: token.r } : null;
+    return realOpenReadingSlip(anchor, token, draw);
+  };
   window.__SPEAK_TEST__ = {
     ready: () => !!S.ready && recordWritable(),
     view: () => S.view,
@@ -297,7 +306,7 @@ const BRIDGE = `
     ownedNow: () => { const s = speakRoom?.snapshot(); return s && s.phase === 'speaking' && !s.audioPaused ? !!recAudioEl : null; },
     otherSound: (uri) => { void playRecClip(uri, null); },
     keepWord: () => document.getElementById('speak-keep')?.dataset.saveWord || '',
-    keepToken: () => (speakKeepWord ? { ...speakKeepWord } : null),
+    keepToken: () => (slipToken ? { ...slipToken } : null),
     soundState: () => (recAudioEl ? { src: String(recAudioEl.currentSrc || '').slice(0, 24), t: recAudioEl.currentTime, d: recAudioEl.duration, paused: recAudioEl.paused,
       ended: recAudioEl.ended, error: recAudioEl.error?.code || null, ready: recAudioEl.readyState } : null),
     hold: (on) => { if (on && !holdGate) holdGate = new Promise((done) => { releaseHold = done; }); if (!on && holdGate) { holdGate = null; releaseHold(); } },
@@ -869,16 +878,19 @@ const CASES = {
       const mineSlip = await page.evaluate(() => ({ bar: window.__SPEAK_TEST__.keepWord(), barSaves: document.querySelectorAll('#app > .chrome [data-save-bar], #app > .chrome button.save-one').length,
         word: document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? null }));
       check('the last word touched, in any line, opens its own slip; the top bar still carries no Save', mineSlip.word === mine && !mineSlip.bar && mineSlip.barSaves === 0, `${mine} · ${JSON.stringify(mineSlip)}`);
-      // an inflected word (入 of 入れた, base 入れる): the top bar's Save is handed the whole token he touched — surface, base
-      // and reading — so the reading's owner can derive its identity (Codex at acb125d2: the surface was dropped)
+      // an inflected word (入 of 入れた, base 入れる): its Save is handed the whole token he touched — surface, base and
+      // reading — so the reading's owner can derive its identity (Codex at acb125d2: the surface was dropped)
       await page.keyboard.press('Escape');
       await page.evaluate(() => document.getElementById('mini')?.remove());
       const inflected = page.locator('.speak-line[data-who="kore"] .speak-text [data-speak-s="入"][data-speak-b="入れる"]').last();
       const door = await inflected.evaluate((node) => ({ s: node.dataset.speakS, b: node.dataset.speakB, r: node.dataset.speakR }));
-      await inflected.click();
+      // Hfix-1A: the bar carries no Save, so the word is kept through its own slip; the room keeps the whole token by
+      // handing it to that slip, whose Save derives its identity from it (the room's private copy, read by no Save since
+      // Hfix-1A, left with FULL-prep's lint, 3aa5ce7a). The slip is reached as every word in this case reaches it
+      await climb(inflected);
+      await page.waitForSelector('#mini', { timeout: 8000 });
       await page.waitForTimeout(400);
       const handed = await page.evaluate(() => window.__SPEAK_TEST__.keepToken());
-      // Hfix-1A: the room still keeps the whole token he touched (it named it "the top bar's Save"; the bar carries no Save now)
       check('the room keeps the whole token he touched: surface, base and reading', !!handed && handed.word === door.b && handed.surface === door.s && handed.reading === door.r && door.s !== door.b,
         JSON.stringify({ door, handed }));
     } finally { await f.context.close(); }
