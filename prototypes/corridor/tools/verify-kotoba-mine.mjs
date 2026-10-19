@@ -2179,6 +2179,9 @@ async function verifyReview(browser, base) {
       check(`a) ${deck}: the front's passage hangs no punctuation (${actualEngine}: ${front.hang ?? 'no such property'})`,
         actualEngine === 'webkit' ? front.hang === 'none' : front.hang === null || front.hang === 'none', JSON.stringify({ hang: front.hang }));
       await revealCard(o.page);
+      // the reveal's crossfade holds an inert copy of the front (its quit button without its id) over the screen, and a
+      // polish band crosses the card, for under 0.4 s: the back is read once both have gone
+      await o.page.waitForFunction(() => !document.querySelector('.kp-reveal-hold') && !document.querySelector('#kp-card > .kp-polish'), null, { timeout: 3000 });
       const first = await onScreen(o.page);
       const before = await read(o.page, deck);
       const tools = await o.page.evaluate(`(() => { const d = document.getElementById('kp-delete'); d.scrollIntoView({ block: 'center' }); const r = d.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2; const at = (dy) => document.elementFromPoint(cx, cy + dy) === d;
