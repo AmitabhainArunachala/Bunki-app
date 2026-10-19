@@ -172,7 +172,10 @@ const phone = (width, reduced = true) => ({ viewport: { width, height: 844 }, de
 async function session(browser, width, lang, { reduced = true, query = 'entry=shelf', service = false } = {}) {
   const context = await browser.newContext(phone(width, reduced));
   await silenceBrowserAudio(context);
-  // a report service on this host (synthetic: config and a guest session, no AI), as the relay answers on his phone
+  // a report service on this host (synthetic: config and a guest session, no AI), as the relay answers on his phone.
+  // Precondition now (Hfix-1B, H0-4): the page is told of it, as a device set up for the relay is; the sheet no longer asks
+  // its own host unprompted
+  if (service) await context.addInitScript(() => { window.__BUNKI_MAINTENANCE_URL__ = location.origin; });
   if (service) await context.route(/\/api\/(config|session)$/, (route) => route.fulfill({ contentType: 'application/json',
     body: JSON.stringify(route.request().url().endsWith('/config')
       ? { schema_version: 'bunki.maintenance/v1', build: { git_sha: null, artifact_sha256: null }, content_ids: [], ai: { status: 'unavailable' } }

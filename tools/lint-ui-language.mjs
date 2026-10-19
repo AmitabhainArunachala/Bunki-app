@@ -1,6 +1,6 @@
 /** Exercise real room renderers in a built artifact. The test route bridge
  * exposes existing navigation functions; it does not replace any UI markup. */
-/* global window, document, NodeFilter, getComputedStyle */
+/* global window, document, NodeFilter, getComputedStyle, localStorage */
 import process from 'node:process';
 import { Buffer } from 'node:buffer';
 import { URL } from 'node:url';
@@ -13,6 +13,7 @@ import { chromium } from 'playwright-core';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../scripts/resolve-corridor-site.mjs';
 import { fixture, enrichmentFixture } from '../prototypes/corridor/tools/personal-fixture.mjs';
 import { entryCloseSelector } from '../prototypes/corridor/tools/sheet-navigation-support.mjs';
+import { DEVICE_TUTOR_STORE, setUpDeviceTutor } from '../prototypes/corridor/tools/tutor-fixture-support.mjs';
 
 export const ROOMS = [
   'drift',
@@ -497,10 +498,14 @@ try {
     await page.locator('.guided-room [data-action=finish]').click();
     await page.locator('.gs-results').waitFor();
     await record(page, 'guided-results', language);
+    // precondition now: a tutor set up (Hfix-1B, item 11: the guided room's tutor door shows only with one); it is taken
+    // away again right after the walk, so no other recorded screen changes
+    await setUpDeviceTutor(page);
     for (const view of ['learn', 'field', 'sensei', 'about']) {
       await page.locator(`.gs-bar [data-view=${view}]`).click();
       await record(page, `guided-${view}`, language);
     }
+    await page.evaluate((store) => localStorage.removeItem(store), DEVICE_TUTOR_STORE);
     await page.evaluate(() => window.__BUNKI_LANGUAGE_TOUR__.visit('mock'));
     await page.locator('[data-exam-start]').first().click();
     await record(page, 'mock-confirm', language);

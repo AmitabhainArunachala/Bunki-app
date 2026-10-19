@@ -333,9 +333,11 @@
   background: var(--ground-0);
   margin-bottom: 2px;
 }
+/* a point still ahead recedes by its ink alone (Hfix-1B; H-akafuji-08, H-hokusai-06, H-nami-05, H-rokusho-10): the world's
+   second ink at full strength, never faded further, so its name and kind read at 4.5:1 or more on the field and on the
+   map's own threads that run under them (an opacity of .75 left them 3.3–4.5:1) */
 .gs-node:disabled {
   color: var(--ink-2);
-  opacity: 0.75;
 }
 .gs-node.encountered::before {
   background: var(--ink);

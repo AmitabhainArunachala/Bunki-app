@@ -355,6 +355,7 @@ const UI_EN = {
   "閉じる": "Close",
   "ここでは保存できません": "Can't save from here.",
   "削除": "Remove",
+  "このカードを削除": "Remove this card",
   "このカードを削除（保留にする・あとで戻せる）": "Remove this card from study (pause it; restore it later)",
   "別の文に替える": "Use another sentence",
   "替えられる文がありません": "No alternative sentence available",
@@ -407,7 +408,7 @@ const UI_EN = {
   "このカードを削除しました（設定 › 保留中のカード から戻せます）。": "Card removed. Restore it from Settings → Paused cards.",
   "別の文に替えました。前の文は保留にしました。": "Changed to another sentence. The previous sentence is paused.",
   "保留にしました（設定 › 保留中のカード から戻せます）。": "Card paused. Restore it from Settings → Paused cards.",
-  "答えを見て理解が深まったなら もう一度": "Choose Again if seeing the answer improved your understanding.",
+  "答えを見て初めて分かったなら「もう一度」": "If the answer was new to you, choose Again",
   "この文だけの英訳は未対応です（全文の英訳と文の区切りが合いません）": "A translation of this sentence is unavailable because the sentence boundaries do not match.",
   "未": "New",
   "学習中": "Learning",
@@ -1073,7 +1074,8 @@ function studyScreen() {
   // a short sitting draws one segment per card (the rail itself still ticks by transform)
   if (total > 1 && total <= 30) prog.style.setProperty('--kp-n', String(total));
   prog.append(rail(ui.pos / total));
-  top.append(prog, el('span', 'kp-count', `${ui.pos + 1}/${total}`), deleteButton());
+  // 削除 is not here (Hfix-1B, the lead's round-1 ruling): a card is taken out on its back, never from a front
+  top.append(prog, el('span', 'kp-count', `${ui.pos + 1}/${total}`));
   box.append(top);
 
   const stored = ctx.state.cards[id];
@@ -1168,18 +1170,32 @@ function studyScreen() {
         ui.revealed = true;
         commit(RATINGS.again, { stay: true });
       }, { id: 'kp-dunno' }),
+      footBand(),
     );
   } else {
-    box.append(btn('kp-reveal', t("答えを見る"), reveal, { id: 'kp-reveal' }));
+    // the foot's band turns the card where the stage beside it does: its right half in the focus room
+    box.append(btn('kp-reveal', t("答えを見る"), reveal, { id: 'kp-reveal' }), footBand((e) => {
+      if (!ctx.focusRoom || !Number.isFinite(e.clientX) || e.clientX >= innerWidth / 2) reveal();
+    }));
   }
   if (ui.undo) box.append(btn('kp-undo', t("ひとつ戻す"), undo, { id: 'kp-undo' }));
   return box;
 }
 
+/** Hfix-1B · the band under the front's foot (editorial.css draws it in the app; player.css keeps it out of the standalone
+ * pages). A real element, not the study's ::after: it covers the passage that scrolls under it, so a tap there lands on the
+ * band (onTap, if any) and a reading of the page, a contrast sweep's included, finds that text covered, not shown */
+function footBand(onTap) {
+  const band = el('i', 'kp-foot-band');
+  band.setAttribute('aria-hidden', 'true');
+  if (onTap) band.addEventListener('click', onTap);
+  return band;
+}
+
 /** what the front asks, in one line: the marked word (読んで思い出す) or the gap (穴埋め・4択) */
 function cardEyebrow(card, mode) {
   const ji = card.type === 'kanji';
-  const label = mode === 'read' && !ji ? t('印の語を思い出す', 'Recall the marked word') : ji ? t('空所の字を思い出す', 'Recall the missing kanji') : t('空所の語を思い出す', 'Recall the missing word');
+  const label = mode === 'read' && !ji ? t('印のついた語を思い出す', 'Recall the marked word') : ji ? t('空所の字を思い出す', 'Recall the missing kanji') : t('空所の語を思い出す', 'Recall the missing word');
   // a passage's back puts the 全文／焦点 toggle on this row in place of the instruction: the front keeps
   // the row at the toggle's height, so the reveal neither grows the card's head nor moves the passage
   const n = el('span', `kp-eyebrow${card.type ? ' kp-eyebrow-zoom' : ''}`, el('span', 'kp-eyebrow-t', label));
@@ -2042,19 +2058,24 @@ const SWAPPED = '別の文に替えました。前の文は保留にしました
 const SUSPENDED = '保留にしました（設定 › 保留中のカード から戻せます）。';
 const UNDOABLE = [DELETED, SWAPPED, SUSPENDED];
 
-/** the back's nodes in order: the answer (tier one, a leech's ladder, then the folds) */
+/** the back's nodes in order: the answer (tier one, a leech's ladder, then the folds), then its quiet row (削除) */
 function backParts(card, word) {
   const answer = answerBlock(card, word);
-  return { answer, nodes: [answer] };
+  return { answer, nodes: [answer, cardTools()] };
 }
 
-/** 削除 in the study top bar, front and back, never more than a glance away: one tap, undone
- * from the toast or Undo for the rest of the sitting */
+/** 削除 (Hfix-1B, the lead's round-1 ruling on HG-5): taking a card out of study is a deliberate act after its answer is
+ * seen, so it lives on the back alone, as the card's last quiet row under the folds: never in the top bar, never on a
+ * front, never beside the grades. One tap there, undone from the toast or Undo for the rest of the sitting. */
 function deleteButton() {
-  return btn('kp-delete', t("削除"), (e) => {
+  return btn('kp-delete', t("このカードを削除"), (e) => {
     e.stopPropagation();
     deleteCard();
   }, { id: 'kp-delete', 'aria-label': t("このカードを削除（保留にする・あとで戻せる）") });
+}
+/** the back's quiet row: the last thing on the card, after its answer and folds */
+function cardTools() {
+  return el('div', 'kp-card-tools', deleteButton());
 }
 
 /** a ladder hint: the first kana of the reading and one ○ per kana left; on a 字 card, the
@@ -2193,8 +2214,9 @@ const GRADES = [
   ['good', '正解', 'Good', '良', '3'],
   ['easy', '簡単', 'Easy', '易', '4'],
 ];
-/** Under the bar, once per deck until dismissed or answered, the rule for choosing. */
-const RULE = '答えを見て理解が深まったなら もう一度';
+/** Under the bar, once per deck until dismissed or answered, the rule for choosing, said so it cannot be read backwards
+ * (Hfix-1B; Kimi KH1-2, HG-2): an answer that was new to him is もう一度. */
+const RULE = '答えを見て初めて分かったなら「もう一度」';
 function gradeBar(id) {
   // each pad shows the interval the pinned scheduler gives that answer, now (engine preview)
   const pv = preview(fsrsApi, scheduler, ctx.state, id, new Date());
@@ -2499,14 +2521,18 @@ function settleBack() {
   if (windowed && target.getBoundingClientRect().height > windowed.clientHeight) target = marked || windowed;
   const toggle = windowed && face.querySelector('.kp-zoom');
   const top = Math.min(target.getBoundingClientRect().top, toggle ? toggle.getBoundingClientRect().top : Infinity);
-  // Q · the whole of what the answer says stays above the pads when it fits beside the target; else its definition
+  // Q · the whole of what the answer says (its word, definition and note) stays above the pads. Hfix-1B (G-10, Grok's
+  // 320×568 walk: the note ran under the pads): when it does not fit beside the target, the answer comes first and the
+  // passage gives way above it (it scrolls up under the header, where it is read again by scrolling); only an answer taller
+  // than the whole room keeps its word in view and lets its end go
   const said = answerSaid(def).getBoundingClientRect().bottom - lift;
-  const bottom = said - top <= bottomLimit - topLimit ? said : def.getBoundingClientRect().bottom - lift;
+  const word = answer.getBoundingClientRect().top - lift;
+  const bottom = said;
   let dy = 0;
   if (bottom - top <= bottomLimit - topLimit) {
     if (top < topLimit) dy = top - topLimit;
     else if (bottom > bottomLimit) dy = bottom - bottomLimit;
-  } else dy = bottom - bottomLimit;
+  } else dy = Math.min(bottom - bottomLimit, word - topLimit);
   const room = { up: -window.scrollY, down: document.documentElement.scrollHeight - innerHeight - window.scrollY };
   dy = Math.max(room.up, Math.min(room.down, dy));
   // then no fold row cut by the bar (backFits: none crosses its top edge by more than half a pixel on

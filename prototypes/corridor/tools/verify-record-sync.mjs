@@ -263,10 +263,17 @@ try {
     await page.evaluate(() => window.showUnavailable());
     assert.match(await page.locator('.record-sync-status').innerText(), /unavailable in this host|isn’t available here/u);
     assert.equal(await page.locator('#record-sync button:enabled').count(), 0);
+    // Hfix-1B (L-7): nor any dead button drawn, nor the line of what it would carry; the status line stays
+    assert.equal(await page.locator('#record-sync button:visible').count(), 0, 'no sync button is drawn where sync cannot run');
+    assert.equal(await page.locator('#record-sync .record-sync-scope').isVisible(), false);
+    assert.equal(await page.locator('#record-sync .record-sync-status').isVisible(), true);
   });
   await check('connect and sync require separate user actions; disconnect wins a late cycle', async () => {
     await page.evaluate(() => window.setupSync());
     assert.deepEqual(await page.evaluate(() => fixture.calls), []);
+    // Hfix-1B (L-7) · where sync can run, its three buttons and its line are drawn again
+    assert.equal(await page.locator('#record-sync button:visible').count(), 3);
+    assert.equal(await page.locator('#record-sync .record-sync-scope').isVisible(), true);
     await page.locator('#record-sync-connect').click();
     await page.waitForFunction(() => !document.getElementById('record-sync-now').disabled);
     assert.deepEqual(await page.evaluate(() => fixture.calls), ['connect']);

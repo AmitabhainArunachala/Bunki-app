@@ -11744,7 +11744,7 @@ function readerSentenceRow(node, index, sourceEnd = index) {
     try { await sendSentenceToTutor(node, true, () => ask.isConnected, say); }
     finally { for (const control of buttons) control.disabled = !recordWritable(); }
   });
-  choices.append(ask);
+  if (aiKey()) choices.append(ask); // Hfix-1B (item 11): the tutor's choice only while a tutor is set up
   if (sentencePracticeModule) {
     const practice = choice('reader-sentence-practice', tx('練習する', 'Practice it'), tx('思い出す・使う', 'Recall it or use it'),
       tx('この文を練習する', 'Practice this sentence'));
@@ -12628,7 +12628,8 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
     keep.disabled = !recordWritable();
   }
   act('copy', tx('コピー', 'Copy'), () => copyReaderText(door.copyText));
-  if (sentence) {
+  // Hfix-1B (item 11): the tutor's door only while a tutor is set up on this device
+  if (sentence && aiKey()) {
     // the tutor receives the word in its sentence (contextFromTeacherNode's target), so the verb names the word
     const ask = act('ask-tutor', tx('この語を先生に聞く', 'Ask the tutor about the word'), () => sendSentenceToTutor(sentence, true, stillHere, showReaderToast));
     ask.disabled = !recordWritable();
@@ -16340,6 +16341,10 @@ function updateRecordSyncSurface(container) {
   const connect = container.querySelector('#record-sync-connect');
   const sync = container.querySelector('#record-sync-now');
   const disconnect = container.querySelector('#record-sync-disconnect');
+  // Hfix-1B (L-7): where syncing cannot run here, its three buttons and the line of what it carries are not drawn at all
+  // (three greyed buttons under "isn't available here" were dead controls); the status line says why and points to export
+  const idle = state === 'unavailable' && slot?.pending !== 'register';
+  for (const part of container.querySelectorAll('.record-sync-actions, .record-sync-scope')) part.hidden = idle;
   connect.disabled = !writable || !slot || !!slot.pending || ['unavailable', 'ready', 'syncing', 'connecting'].includes(state);
   sync.disabled = !writable || !slot?.registrationId || !!slot.pending || state !== 'ready';
   // Disconnect remains usable during an in-flight cycle. Its newer generation
@@ -16355,10 +16360,10 @@ function renderRecordSync() {
   const label = el('p', 'eyebrow', tx('端末の同期', 'Sync between devices'));
   const status = el('p', 'airead-note record-sync-status');
   status.setAttribute('aria-live', 'polite');
-  const scope = el('p', 'airead-note', tx(
+  const scope = el('p', 'airead-note record-sync-scope', tx(
     'メモ、読書の栞、そのまま保存したリンク、提出・中断した練習の回答を同期する。単語カード、設定、貼り付けた文章、読了履歴はこの端末に残る。',
     'Sync carries your notes, reading places, plain saved links, and finished or stopped practice answers. Cards, settings, pasted text and reading history stay on this device.'));
-  const row = el('div', 'port-row');
+  const row = el('div', 'port-row record-sync-actions');
   for (const [method, id, ja, en] of [['connect', 'record-sync-connect', '接続する', 'Connect'],
     ['sync', 'record-sync-now', '今すぐ同期', 'Sync now'], ['disconnect', 'record-sync-disconnect', '接続を切る', 'Disconnect']]) {
     const button = biLabel('button', 'chip', ja, en);
@@ -21649,7 +21654,7 @@ function renderTeacherDoor(container, getNode) {
   });
   keepSentence.disabled = !node || !recordWritable();
   actions.append(keepSentence);
-  {
+  if (aiKey()) { // Hfix-1B (item 11): the tutor's door only while a tutor is set up
     const button = biLabel('button', 'chip btn-tertiary teacher-discuss', '先生に聞く', 'Ask the tutor');
     button.type = 'button';
     button.disabled = !node || !recordWritable();
@@ -26361,6 +26366,18 @@ function renderDepthBasis(sheet, node, reading = '') {
   return line;
 }
 
+/** Hfix-1B (L-1) · ONE count of a finished article's characters, read by Me's "characters read unaided" and its help line
+ * alike, so the card never says more were read unaided than were read: the first reading the help signal sealed (the
+ * article's own text, whitespace aside, as he first finished it); else the same count from its text, when the text is at
+ * hand; else, for an article finished before the help signal began and not yet loaded, the index's figure. null: no count. */
+function articleReadChars(articleId, record = S, p = null) {
+  const root = readHelpReadable(record.readHelp) ? record.readHelp : null;
+  const row = root && owns(root.articles, articleId) ? root.articles[articleId] : null;
+  if (row && owns(row, 'done') && finiteNumber(row.chars)) return row.chars;
+  const passage = p || D.passages?.find((entry) => entry.id === articleId) || null;
+  if (passage?.tokens?.length) return articleFingerprint(passage).chars;
+  return finiteNumber(passage?.chars) ? passage.chars : null;
+}
 /* ----- the help signal in Me (Fugu R4.1; Codex: a declared denominator): help per 1,000 characters of the first readings of
  * articles he finished that month — repeats and the same word asked twice count once — shown beside the month's exposure
  * and its average level. A signal, never proof; nothing before `since` is counted or estimated. */
@@ -26368,11 +26385,11 @@ function helpByMonth(record = S) {
   const root = readHelpReadable(record.readHelp) ? record.readHelp : null;
   if (!root) return null;
   const months = new Map();
-  for (const row of Object.values(root.articles)) {
+  for (const [articleId, row] of Object.entries(root.articles)) {
     if (!owns(row, 'done')) continue;
     const month = months.get(row.month) || { month: row.month, articles: 0, chars: 0, help: 0, levels: [], unlevelled: 0 };
     month.articles += 1;
-    month.chars += row.chars;
+    month.chars += articleReadChars(articleId, record);
     month.help += row.helped.length;
     if (row.level) month.levels.push(Number(row.level.slice(1)));
     else month.unlevelled += 1;
@@ -29980,6 +29997,8 @@ function guidedHost() {
       keepNavigationReturn('ai', document.activeElement);
       S.view = 'ai'; render(); window.scrollTo(0, 0);
     },
+    // Hfix-1B · the room shows its tutor doors only while a tutor is set up on this device
+    tutorReady: () => !!aiKey(),
     deck: {
       status: guidedCardStatus,
       info: guidedCardInfo,
@@ -32979,7 +32998,9 @@ function renderAiReading(main) {
       interests.focus();
     } finally { if (btn.isConnected) btn.disabled = !!aiReadingJob || !recordWritable() || !aiKey(); }
   });
-  main.append(btn, note);
+  // Hfix-1B (item 11): with no tutor set up its "ask the tutor" is not drawn (it was a dead control); the door to set one up is
+  if (aiKey()) main.append(btn);
+  main.append(note);
   if (!aiKey()) {
     const connect = biLabel('button', 'chip', '先生につなぐ', 'connect the tutor to write more');
     connect.type = 'button'; connect.id = 'airead-connect';
@@ -37216,7 +37237,7 @@ function takePrebuiltPage(node, depth) {
  * A sampler runs only inside a named move — a word's card arriving, a page arriving, Back, a room change — for at
  * most a second from the frame the move began in, and keeps that move's worst frame (and how many passed 24 ms).
  * One row per move in its own capped key on this device, never in the learning record, never in a backup: the bug
- * report carries the week's worst five, and Me → Settings says the roughest one in a line. */
+ * report carries the week's worst five (its Details, and the report it files); the learner's Settings shows none (H0-2). */
 const FRAMES_STORE = 'kairo-frames';
 const FRAMES_CAP = 200;
 const FRAMES_WINDOW_MS = 1000;
@@ -37270,37 +37291,6 @@ function roughestThisWeek(n = 5) {
   return readFrameRows().filter((row) => row[0] >= since).sort((a, b) => b[3] - a[3]).slice(0, n)
     .map(([t, name, where, worst]) => ({ name, where, worst_ms: worst, at: new Date(t).toISOString().slice(0, 10) }));
 }
-const FRAME_KIND_WORDS = {
-  card: ['語のカードを開いたとき', 'opening a word card'], page: ['語のページを開いたとき', "opening a word's page"],
-  back: ['戻ったとき', 'going back'], room: ['部屋を移ったとき', 'changing rooms'],
-};
-/** A place the sampler wrote, in the reader's words: a room by its own name, an article as an article. */
-function frameWhereWords(where) {
-  const place = (view) => {
-    const name = roomName(view);
-    return name ? tx(...name) : view === 'reader' ? tx('記事', 'an article') : view;
-  };
-  return String(where || '').split('→').map((part) => {
-    const [view, page] = part.split('/');
-    return page ? tx(`${place(view)}のページ`, `a page over ${place(view)}`) : place(view);
-  }).join(' → ');
-}
-/** Me → Settings, under bug reports: the roughest move this week, and where — one quiet line. */
-function framesLine() {
-  const line = el('p', 'teacher-note settings-frames');
-  line.id = 'settings-frames';
-  const [worst] = roughestThisWeek(1);
-  if (!worst) {
-    line.textContent = tx('今週はまだ動きを測っていません。', 'No moves measured on this device this week.');
-    return line;
-  }
-  const [ja, en] = FRAME_KIND_WORDS[worst.name];
-  line.dataset.worstMs = String(worst.worst_ms);
-  line.textContent = tx(`今週いちばん重かった瞬間：${worst.worst_ms} ms（${ja}、${frameWhereWords(worst.where)}）`,
-    `Roughest moment this week: ${worst.worst_ms} ms, ${en} (${frameWhereWords(worst.where)}).`);
-  return line;
-}
-
 function licencePanel() {
   const box = el('div', 'note');
   box.append(
@@ -39353,10 +39343,17 @@ function meDays(decks) {
   for (const d of decks) for (const row of d.ledger?.log || []) if (Array.isArray(row)) mark(Date.parse(row[2]), 'cards');
   return { days, first: Number.isFinite(first) ? new Date(first) : null };
 }
-/** graft D's lead figure: characters of the articles you finished, less the words you tapped for help */
+/** graft D's lead figure: characters of the articles you finished, less the words you tapped for help. The characters
+ * are counted as the help line counts them (articleReadChars, Hfix-1B L-1), so unaided never exceeds read */
 function meReadUnaided() {
   const passages = D.passages || [];
-  const finished = passages.filter((p) => owns(S.readDone || {}, p.id) && finiteNumber(p.chars));
+  const counted = new Map();
+  for (const p of passages) {
+    if (!owns(S.readDone || {}, p.id)) continue;
+    const chars = articleReadChars(p.id, S, p);
+    if (finiteNumber(chars)) counted.set(p.id, chars);
+  }
+  const finished = passages.filter((p) => counted.has(p.id));
   if (!finished.length) return null;
   const ids = new Set(finished.map((p) => p.id));
   const looked = new Set();
@@ -39368,8 +39365,8 @@ function meReadUnaided() {
     looked.add(once);
     helped += [...row[2].replace(/^word:/, '')].length;
   }
-  const read = finished.reduce((sum, p) => sum + p.chars, 0);
-  return { n: Math.max(0, read - helped), articles: finished.length, looked: looked.size };
+  const read = finished.reduce((sum, p) => sum + counted.get(p.id), 0);
+  return { n: Math.max(0, read - helped), read, articles: finished.length, looked: looked.size };
 }
 function meHorizons(decks) {
   const rows = [];
@@ -40024,7 +40021,9 @@ function renderSettings(main) {
     foundationDoor('settings-backup', 'バックアップ', 'Backup', 'tray', showRecordBackup),
   );
   // K · one plain line under the Backup door: is this device keeping the record, and how full is it
-  main.append(language, renderLayoutChoice(), renderWritingChoice(), doors, recordKeepLine(), renderReportRelaySettings(), about);
+  // Hfix-1B (H-hokusai-07): the layout under test is a second skin, so the learner's Settings does not offer it; a device
+  // already in it (the places branch above) keeps Layout as its way back
+  main.append(language, renderWritingChoice(), doors, recordKeepLine(), renderReportRelaySettings(), about);
 }
 function renderWordsDoors(main) {
   // the layout under test: the day's word, large, with its reading and the part its kanji share —
@@ -40758,7 +40757,9 @@ function renderReportRelaySettings() {
     save.disabled = true;
     location.reload();
   });
-  section.append(status, form, framesLine());
+  // Hfix-1B (H0-2): no frame time on the learner's Settings; the report sheet carries the week's roughest moments (its
+  // Details, and the report it files: maintenanceContext's frames)
+  section.append(status, form);
   return section;
 }
 function mountMaintenanceReports() {
@@ -40766,7 +40767,12 @@ function mountMaintenanceReports() {
   maintenanceReports = window.BunkiReports.mount({
     rail: true,
     locale: S.lang === 'ja' ? 'ja' : 'en',
-    serviceUrl: window.__BUNKI_MAINTENANCE_URL__ || REPORT_RELAY_URL || (location.protocol === 'http:' || location.protocol === 'https:' ? location.origin : ''),
+    // Hfix-1B (H0-4): the sheet asks a report service only when it has one: the maintenance service the page declares, or
+    // the relay this device was set up with (Settings › Bug reports). It no longer guesses its own address: a host with no
+    // service (GitHub Pages, any static host) answered that guess's /api/config with a 404 on every opening of the sheet,
+    // an error in the console, and the sheet held its Send until the 404 came back. With none, a report goes by the
+    // prefilled GitHub page at once, as it did after the 404
+    serviceUrl: window.__BUNKI_MAINTENANCE_URL__ || REPORT_RELAY_URL || '',
     appVersion: APP_RELEASE.version,
     // Without a report service (a device not yet set up for the relay), a report is
     // filed as a prefilled GitHub issue that the learner submits; the fixer agent

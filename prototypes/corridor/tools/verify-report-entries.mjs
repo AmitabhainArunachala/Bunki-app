@@ -23,6 +23,10 @@
  *   R8 the field entry (?entry=field) carries the page entry.
  *   R9 an unavailable kanji card (legacy row 㐆, no saved answer): entry present, reporting
  *      changes nothing, and continuing advances without a grade.
+ *  R10 a deck sitting (Hfix-1B; HG-1, H-sumi-06): on the card's front, its back and the session's close the same
+ *      bug stands in the study bar's own end slot (inside the bar's box, clear of ×, the count, the card, the
+ *      reveal and the grades), uncovered; it opens reporting, closing returns focus to it, and the card on screen,
+ *      its face and the deck's ledger are exactly as they were.
  * Every case runs in Chromium and WebKit, at 1728×996 and 390×844.
  *
  * Claim boundary: the review more-row entry needs seeded due cards; the probe
@@ -284,6 +288,64 @@ try {
         nextHit.uncovered && moved && JSON.stringify(finalRecord) === JSON.stringify(before.record),
         JSON.stringify({ hit: nextHit, zeroGradeSummary: moved, durableRecordUnchanged: JSON.stringify(finalRecord) === JSON.stringify(before.record) }));
       await kanjiContext.close();
+    }
+
+    // R10 a deck sitting: the bug in the study bar's end slot on the front, the back and the close (Hfix-1B)
+    {
+      const deckContext = await browser.newContext({ viewport });
+      // a sitting of two new cards, so its close is two grades away; the rule's line is read elsewhere (kotoba-mine)
+      await deckContext.addInitScript(() => {
+        try { localStorage.setItem('bunki-cloze:prefs:v3:n2', JSON.stringify({ look: 'world', newPerDay: 2, sittings: 3, ruleSeen: true })); } catch { /* no storage */ }
+      });
+      const dp = await deckContext.newPage();
+      await dp.goto(`${origin}/index.html?deck=n2&ui=bi`); await ready(dp);
+      await dp.locator('#kp-start').click();
+      await dp.locator('#kp-card').waitFor({ timeout: 20_000 });
+      await dp.waitForTimeout(600);
+      const slot = () => dp.evaluate(() => {
+        const box = (n) => { const r = n?.getBoundingClientRect(); return r && r.width && r.height ? { l: r.left, t: r.top, r: r.right, b: r.bottom } : null; };
+        const meet = (a, b) => !!a && !!b && a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
+        const bug = box(document.querySelector('#bunki-report-bug'));
+        const bar = box(document.querySelector('.kp-top-study'));
+        const glyph = box(document.querySelector('#bunki-report-bug svg'));
+        const others = ['#kp-quit', '.kp-top-study .kp-count', '#kp-card', '.kp-grades', '#kp-delete', '.kp-done .kp-door', '.kp-done .kp-home-quiet']
+          .map((s) => [s, box(document.querySelector(s))]).filter(([, b]) => b);
+        const card = document.getElementById('kp-card');
+        return { bug, bar, glyph, inBar: !!bar && !!glyph && glyph.l >= bar.l && glyph.r <= bar.r && glyph.t >= bar.t && glyph.b <= bar.b,
+          clear: others.filter(([, b]) => meet(bug, b)).map(([s]) => s), card: card?.dataset.card || null,
+          revealed: !!document.querySelector('.kp-grades'), done: !!document.querySelector('.kp-done'),
+          ledger: localStorage.getItem('bunki-cloze:n2') };
+      });
+      for (const face of ['front', 'back', 'close']) {
+        if (face === 'back') { await dp.locator('#kp-reveal').click(); await dp.locator('#kp-grade-good').waitFor({ timeout: 15_000 }); await dp.waitForTimeout(500); }
+        if (face === 'close') {
+          for (let i = 0; i < 4 && !(await dp.locator('.kp-done').count()); i++) {
+            if (await dp.locator('#kp-reveal').count()) await dp.locator('#kp-reveal').click();
+            await dp.locator('#kp-grade-easy').click();
+            await dp.waitForTimeout(700);
+          }
+          await dp.locator('.kp-done').waitFor({ timeout: 15_000 });
+          await dp.waitForTimeout(500);
+        }
+        const before = await slot();
+        check(`R10 ${w}px deck ${face}: the permanent bug entry is visible`, await railVisible(dp));
+        if (face !== 'close') check(`R10 ${w}px deck ${face}: the bug stands in the study bar's end slot, clear of its controls, the card and the grades`,
+          before.inBar && before.clear.length === 0, JSON.stringify(before));
+        else check(`R10 ${w}px deck close: the bug keeps its place at the top, clear of the close's doors`,
+          !!before.bug && before.bug.t <= 1 && before.clear.length === 0, JSON.stringify(before));
+        const hit = await fingerClick(dp, '#bunki-report-bug');
+        check(`R10 ${w}px deck ${face}: the bug is uncovered and opens reporting`, hit.uncovered && await reportOpen(dp), JSON.stringify(hit));
+        if (await reportOpen(dp)) {
+          await closeReport(dp);
+          const back = await dp.waitForFunction(() => !!document.activeElement?.matches('#bunki-report-bug'), null, { timeout: 5_000 }).then(() => true, () => false);
+          check(`R10 ${w}px deck ${face}: closing returns focus to the bug`, back);
+        }
+        const after = await slot();
+        check(`R10 ${w}px deck ${face}: reporting changed nothing (the card, its face, the ledger)`,
+          after.card === before.card && after.revealed === before.revealed && after.done === before.done && after.ledger === before.ledger,
+          JSON.stringify({ before: { card: before.card, revealed: before.revealed, done: before.done }, after: { card: after.card, revealed: after.revealed, done: after.done } }));
+      }
+      await deckContext.close();
     }
 
     // R6 a room that failed to draw keeps its entry (fault injected by this harness only)

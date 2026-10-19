@@ -5,7 +5,9 @@
  * Served build only (KAIRO_SITE_DIR + KAIRO_ARTIFACT_SHA256), 390×844, touch, service workers blocked, reduced motion,
  * real WebKit AND Chromium (each engine's browser.version() is logged). All eleven worlds × the key screens: the shelf's
  * first screen, the reader, the slip, the word's page (top, then scrolled to its examples), Today, Learn, Words, Me,
- * Settings, the deck's front and back. Nothing is filtered: every failing pair is listed.
+ * Settings, the tutor's room (Hfix-1B), Guided (its front, then its field map in the open area: Hfix-1B), Speak at rest and its
+ * key page (Hfix-1B),
+ * the deck's front and back. Nothing is filtered: every failing pair is listed.
  *   C1 text   every visible text run reads at ≥ 4.5:1, large text (≥ 24 px, or ≥ 18.67 px at ≥ 700) at ≥ 3:1, against the
  *             pixels actually under it: the screen is shot a second time with every glyph made transparent, and the run's
  *             colour (its alpha times its ancestors' opacity) is composited over the darkest and the lightest pixel under
@@ -51,7 +53,7 @@ const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all'
 assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
 const WORLDS = Object.freeze(['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'keyblock', 'hakuu', 'kaku']);
 const NIGHT = new Set(['rokusho', 'yoru', 'nami', 'hakuu', 'kaku']);
-const STATE_NAMES = Object.freeze(['shelf', 'reader', 'slip', 'page', 'page-examples', 'today', 'learn', 'words', 'me', 'settings', 'deck-front', 'deck-back']);
+const STATE_NAMES = Object.freeze(['shelf', 'reader', 'slip', 'page', 'page-examples', 'today', 'learn', 'words', 'me', 'settings', 'tutor', 'guided', 'guided-field', 'speak', 'speak-key', 'deck-front', 'deck-back']);
 // a partial run (SWEEP_WORLDS / SWEEP_STATES) is for a builder's iteration only: it can never pass as an acceptance
 const onlyWorlds = process.env.SWEEP_WORLDS ? process.env.SWEEP_WORLDS.split(',') : null;
 const onlyStates = process.env.SWEEP_STATES ? process.env.SWEEP_STATES.split(',') : null;
@@ -570,6 +572,47 @@ const STEPS = {
   async settings(page) {
     await page.locator('#me-settings').click();
     await page.waitForFunction(() => document.documentElement.dataset.room === 'settings', null, { timeout: 10000 });
+    await page.evaluate(() => scrollTo(0, 0)); await settle(page, 600);
+  },
+  // Hfix-1B (item 11): the tutor's room as Settings › Tutor connection opens it with no tutor set up, its one Details closed
+  async tutor(page) {
+    await page.locator('#settings-tutor').click();
+    await page.waitForFunction(() => document.body.dataset.view === 'ai', null, { timeout: 10000 });
+    await page.locator('#ai-connection').first().waitFor({ state: 'attached', timeout: 10000 });
+    await page.evaluate(() => scrollTo(0, 0)); await settle(page, 700);
+  },
+  // Hfix-1B (items 6 and 7; H-akafuji-08, H-hokusai-06, H-nami-05, H-rokusho-10, H-yoru-05): Guided's front, its field map
+  // (the diagram of the six questions, brought into the open reading area between the bars) and Speak at rest
+  async guided(page) {
+    await page.locator('#tab-learn').click();
+    await page.waitForFunction(() => document.documentElement.dataset.room === 'learn', null, { timeout: 10000 });
+    await page.locator('button[data-study-door="guided"]').first().click();
+    await page.waitForFunction(() => document.body.dataset.view === 'guided', null, { timeout: 10000 });
+    await page.locator('.guided-room .gs-arrival').first().waitFor({ timeout: 20000 });
+    await lazySheets(page);
+    await page.evaluate(() => scrollTo(0, 0)); await settle(page, 700);
+  },
+  async 'guided-field'(page) {
+    await page.evaluate(() => {
+      const map = document.querySelector('.guided-room .gs-field-preview');
+      const top = document.querySelector('#app > .chrome')?.getBoundingClientRect().bottom || 0;
+      if (map) scrollTo(0, scrollY + map.getBoundingClientRect().top - top - 12);
+    });
+    await settle(page, 500);
+  },
+  async speak(page) {
+    await page.locator('#tab-learn').click();
+    await page.waitForFunction(() => document.documentElement.dataset.room === 'learn', null, { timeout: 10000 });
+    await page.locator('button[data-study-door="speak"]').first().click();
+    await page.waitForFunction(() => document.body.dataset.view === 'speak', null, { timeout: 10000 });
+    await page.locator('.speak-room').first().waitFor({ timeout: 20000 });
+    await lazySheets(page);
+    await page.evaluate(() => scrollTo(0, 0)); await settle(page, 1200);
+  },
+  // its quiet "Key and limit" leads one level deeper, to the key page (H-yoru-05's line)
+  async 'speak-key'(page) {
+    await page.locator('.speak-room .speak-cost').first().click();
+    await page.locator('.speak-room .speak-connect').first().waitFor({ timeout: 10000 });
     await page.evaluate(() => scrollTo(0, 0)); await settle(page, 600);
   },
   async 'deck-front'(page) {

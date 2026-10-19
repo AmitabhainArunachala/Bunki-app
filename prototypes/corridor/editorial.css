@@ -3289,8 +3289,31 @@ body:has(#app :is(.kp-study, .kp-done)) #app > .chrome,
 body:has(#app :is(.kp-study, .kp-done)) .primary-tabs { display: none; }
 body.has-primary-tabs:has(#app :is(.kp-study, .kp-done)) { --nav-clearance: env(safe-area-inset-bottom, 0px); }
 body:has(#app .kp-study) #app .kp-top-study { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; }
-/* no report button while a card is up (John, 2026-10-13) */
-body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: none; }
+/* the quiet report door while a card is up (Hfix-1B; §7 line 28, HG-1, H-sumi-06): the same bug every room has, quiet,
+   in the study bar's own end slot (the slot Remove left), so it never lies over the card, the reveal or the grades; the
+   session close keeps it in the same place. The bar starts at the top of the screen (no strip of stage above it), so the
+   fixed door and the sticky bar stand together at every scroll; and the study ends at the page's end (no padding of the
+   room under it), so the front's foot key and the back's last fold keep their own clearances, nothing more. */
+html[data-room='deckplay'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main:has(> .kp > .kp-study) { margin-block: 0; padding-block: 0; }
+#app .kp:has(> .kp-study) { padding-block: 0; }
+body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail {
+  top: env(safe-area-inset-top, 0px); right: calc(4px + env(safe-area-inset-right, 0px)); bottom: auto;
+}
+/* wider than a phone the bar stands centred (672 wide, the card's 40rem and its gutters): the door keeps to its end slot */
+@media (min-width: 521px) {
+  body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { right: max(14px, calc((100vw - 672px) / 2 + 4px)); }
+}
+body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail::before { content: none; }
+body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail .br-bug { color: var(--deck-band-quiet); }
+body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail .br-bug svg { width: 17px; height: 17px; }
+body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail .br-bug:is(:hover, :focus-visible) { color: var(--deck-band-ink); }
+body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail .br-bug:is(:hover, :focus-visible)::before {
+  background: color-mix(in srgb, var(--deck-band-ink) 14%, transparent); box-shadow: none;
+}
+body:has(#bunki-reports-root .br-rail) #app .kp-top-study[data-bar='deck'] { padding-right: calc(52px + env(safe-area-inset-right, 0px)); }
+/* with the door in the bar, the page's own report line under the stage is the same door twice (the FEEL pass, 10-02: "redundant
+   with the bug button"); it goes while a card is up or the sitting closes, so the page ends where the card's foot does */
+body:has(#app :is(.kp-study, .kp-done)) #app > .report-line-page { display: none; }
 /* The back reads clean, like the reader: a reading shows on the answer, and on a word you tap
    while its meaning is open (the one ruby, rooms/motion.css; which readings show is the deck's own,
    player.css). A word with a reading never breaks across a line, on the front too (kp-nb), so the
@@ -3311,12 +3334,14 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
     radial-gradient(120% 55% at 50% 22%, color-mix(in srgb, var(--world-paper) 10%, transparent) 0%, transparent 72%),
     var(--kp-study-ground);
 }
-/* ─ the bar: ×, one hairline of progress, the count in plain figures, Remove as a quiet word */
+/* ─ the bar: ×, one hairline of progress, the count in plain figures (Remove lives on the back: Hfix-1B) */
 #app .kp-top-study .kp-icon { width: 44px; color: var(--color-bar-ink); }
 #app .kp-top-study .kp-progress { height: 2px; border-radius: var(--radius-seal); background: color-mix(in srgb, var(--kp-stage-ink) 14%, transparent); -webkit-mask-image: none; mask-image: none; }
 #app .kp-top-study .kp-progress i { background: color-mix(in srgb, var(--kp-stage-ink) 80%, transparent); border-radius: var(--radius-seal); }
 #app .kp-top-study .kp-count { min-width: 0; font: 500 var(--type-label)/1 var(--sans, system-ui); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; color: var(--kp-stage-mute); }
-#app .kp-top-study .kp-delete { height: 44px; padding: 0 4px; border: 0; background: transparent; font: 500 var(--type-label)/1 var(--sans, system-ui); letter-spacing: 0.01em; color: var(--kp-stage-mute); }
+/* ─ the back's quiet row (Hfix-1B): Remove in the card's own quiet sans, at the end of the answer */
+#app .kp-study .kp-card-tools .kp-delete { padding: 0 2px; font: 500 var(--type-label)/1 var(--sans, system-ui); letter-spacing: 0.01em; color: var(--kp-ink-2);
+  text-decoration: underline; text-decoration-color: var(--kp-line); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 /* ─ the sheet: one paper, one hairline edge (no kind stripe), a little fibre, lifted by two shadows:
    a close one that says it rests, a long one that says it is lit from above */
 #app .kp-study .kp-card {
@@ -3341,7 +3366,9 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 #app .kp-study .kp-sentence,
 #app .kp-study .kp-sentence:has(.kp-tok) {
   font-size: var(--type-reading); line-height: 2.3; letter-spacing: 0.05em; font-weight: 500;
-  text-align: start; line-break: strict; hanging-punctuation: allow-end;
+  /* no hanging punctuation (Hfix-1B): WebKit, the iPhone's engine, painted a line's hung 「ど、」 a second time at the
+     next line's start (会話のきっかけにできるけど、/ど、実際に…); a line now ends inside its measure, as Chromium's did */
+  text-align: start; line-break: strict;
   overflow-wrap: break-word;
   /* a Japanese page sits on a character grid: the block is a whole number of characters wide, so a
      full line ends flush; a line that ends before a word kept whole for its reading stays a little
@@ -3350,25 +3377,49 @@ body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail { display: 
 }
 /* 焦点 folds the sentences around the target to exactly two of these lines (2 × 2.3), never a sliver of a third */
 #app .kp .kp-study .kp-card[data-zoom='focus'] .kp-sentence .kp-ctx:not([data-open='1']) .kp-ctx-in { max-height: 4.6em; }
-/* ─ the marked word: ink, not a colour code; held by two 朱 corner ticks over a breath of wash.
-   One mark, not three (the underline goes) */
+/* ─ the marked word: ink, not a colour code, over a wash of 朱. One mark, not three (the underline went; the corner ticks
+   went in Hfix-1B, H-yoru-01) */
 #app .kp-study .kp-target { color: var(--kp-ink); font-weight: 700; text-decoration: none; padding: 0 0.1em; margin: 0 -0.1em; }
 #app .kp-study .kp-target.kp-tok:hover, #app .kp-study .kp-target.kp-tok:focus-visible { text-decoration: none; }
-/* ─ reveal: the right half of the screen turns the card (John, 2026-10-13: "Simply tapping the right
-   of the screen should show back of card. No need for 'reveal answer' button"). The button stays a
-   real, labelled control for keyboard and VoiceOver; it just has no look. Its keyboard focus shows as
-   a hairline at the zone's edge. */
-#app .kp-study > #kp-reveal {
-  position: fixed; z-index: 2; top: calc(env(safe-area-inset-top, 0px) + 60px); right: 0; bottom: 0; width: 50%;
-  min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none;
-  color: transparent; font-size: 0; -webkit-tap-highlight-color: transparent; cursor: pointer;
+/* ─ reveal: the right half of the card still turns it (John, 2026-10-13: "Simply tapping the right of the screen should
+   show back of card. No need for 'reveal answer' button"), and the key that names that turn stands at the foot of the
+   screen (Hfix-1B, the lead's round-1 ruling on H-hakuu-01): one quiet word at the thumb's right, on a band of the stage,
+   10 px clear of the home indicator. On the longest passage it is reachable without scrolling; the passage scrolls under
+   the band and, at its end, rests above it. The key never moves: a short front is the screen's height, so its place in
+   the flow is its pinned place. Undo, when there is one, stands on the same row at the left. */
+#app .kp-study:has(> .kp-reveal) { min-height: 100dvh; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+/* the inset is counted once, by the study (its padding, its key and its band reach the glass): the app's own inset padding
+   left the page's end that much below the study, so at a long front's end the key rose by the inset (78 px off the
+   bottom at a 34 px inset, where it stands at 44) and a short front scrolled by it */
+body:has(#app .kp-study > .kp-reveal) #app { padding-bottom: 0; }
+#app .kp .kp-study > .kp-reveal {
+  position: sticky; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 3; order: 2; flex: none;
+  align-self: flex-end; width: auto; min-width: 44px; min-height: 44px; margin: auto 0 0; padding: 0 6px 0 16px;
+  border: 0; border-radius: var(--radius-control); background: transparent; box-shadow: none;
+  font: 600 var(--type-control)/1 var(--sans, system-ui); letter-spacing: 0.02em; color: var(--kp-stage-ink);
+  -webkit-tap-highlight-color: transparent; cursor: pointer;
 }
-#app .kp-study > #kp-reveal:focus-visible { outline: none; box-shadow: inset 2px 0 0 color-mix(in srgb, var(--kp-stage-ink) 55%, transparent); }
-/* with no slab at the foot, the page runs to the bottom of the screen and can scroll clear of it */
-#app .kp-study:has(> #kp-reveal) { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
-/* Undo on the next front stands 10px off the foot (the safe area counted once), on its opaque
-   full-width dock band, so no passage ink shows through it */
-#app .kp .kp-study:has(> #kp-reveal) > .kp-undo { bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 3; }
+#app .kp .kp-study > .kp-reveal::after { content: '›'; margin-left: 8px; font-weight: 400; font-size: var(--type-lead); line-height: 0; }
+#app .kp .kp-study > .kp-reveal:focus-visible { outline: 2px solid var(--kp-stage-ink); outline-offset: -2px; box-shadow: none; }
+/* the foot's band: one strip of the stage under the foot's words, edge to edge and down to the glass, so no passage ink
+   shows around them; a real element (mount.js footBand: what it covers is covered, for a tap and for a reader of the
+   page), under Undo's own band and Reveal, over the passage. Its top 18 px is an alpha mask (no pigment), so a line
+   scrolling under the band recedes into the stage instead of being cut; a tap on it turns the card as the stage does. It
+   is drawn only while the front's key is there: a back revealed in place keeps the card's node, and with it this element,
+   which player.css then keeps undrawn (it would lie over the back's last row and take its taps) */
+#app .kp .kp-study:has(> .kp-reveal) > .kp-foot-band {
+  display: block; order: 3; flex: none; position: sticky; bottom: 0; z-index: 1;
+  height: calc(82px + env(safe-area-inset-bottom, 0px));
+  margin: -88px calc((100% - 100vw) / 2) calc(-10px - env(safe-area-inset-bottom, 0px));
+  background: var(--kp-dock);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18px);
+  mask-image: linear-gradient(to bottom, transparent, #000 18px);
+}
+/* Undo on the next front stands on the key's row at the left, 10px off the foot (the safe area counted once), on its
+   opaque full-width dock band, so no passage ink shows through it; the key paints over that band at the right */
+#app .kp .kp-study:has(> .kp-reveal) > .kp-undo {
+  order: 2; align-self: flex-start; margin: -60px 0 0; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 2;
+}
 #app .kp-study .kp-taphint { border-top: 0; padding-top: 4px; font: 500 var(--type-caption)/1.4 var(--sans, system-ui); letter-spacing: 0.02em; text-transform: none; color: var(--kp-mute); }
 #app .kp-study .kp-undo { font: 500 var(--type-label)/1 var(--sans, system-ui); letter-spacing: 0.01em; }
 /* ─ the answer: headword in ink, its reading and part of speech as quiet text, no badges */
@@ -3963,7 +4014,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   :where(#bunki-reports-root .br-actions) button, :where(#bunki-reports-root .br-context-summary) button,
   .skip-more, .skip-retry, .skip-search-opener, .skip-code-door, .reference-button,
   :where(.pc) button:where(:not(.pc nav *, .pc-top *, .pc-card-foot *, .pc-grades *, .pc-token)),
-  .kp-delete, .vocabulary-list-create, :where(.vocabulary-list-form) .chip, :where(.vocabulary-list-dialog) > .chip,
+  .vocabulary-list-create, :where(.vocabulary-list-form) .chip, :where(.vocabulary-list-dialog) > .chip,
   .kdx-lens, .focus-chip
 ) {
   min-height: 44px;
@@ -3984,7 +4035,7 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
   :where(#bunki-reports-root .br-actions) button, :where(#bunki-reports-root .br-context-summary) button,
   .skip-more, .skip-retry, .skip-search-opener, .skip-code-door, .reference-button,
   :where(.pc) button:where(:not(.pc nav *, .pc-top *, .pc-card-foot *, .pc-grades *, .pc-token)),
-  .kp-delete, .vocabulary-list-create, :where(.vocabulary-list-form) .chip, :where(.vocabulary-list-dialog) > .chip,
+  .vocabulary-list-create, :where(.vocabulary-list-form) .chip, :where(.vocabulary-list-dialog) > .chip,
   .kdx-lens, .focus-chip
 ):hover:where(:not(:disabled, [aria-disabled='true'])) { background: var(--color-fill); }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.chip, .gs-button, .cd-btn, .stroke-btn, .skip-more, .skip-retry, .reference-button):where(:disabled, [aria-disabled='true']) {
@@ -4034,7 +4085,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
 
 /* ---- C · Quiet: a word, no box ---- */
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  .btn-tertiary, .chip:where(.btn-tertiary), .kp-link, .gs-text, .nav-arrow, .sheet-back,
+  .btn-tertiary, .chip:where(.btn-tertiary), .kp-link, .kp-delete, .gs-text, .nav-arrow, .sheet-back,
   :where(#bunki-reports-root) .br-close, .reference-text-button
 ) {
   min-height: 44px;
@@ -4050,7 +4101,7 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
   cursor: pointer;
 }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(
-  .btn-tertiary, .chip:where(.btn-tertiary), .kp-link, .gs-text, .nav-arrow, .sheet-back,
+  .btn-tertiary, .chip:where(.btn-tertiary), .kp-link, .kp-delete, .gs-text, .nav-arrow, .sheet-back,
   :where(#bunki-reports-root) .br-close, .reference-text-button
 ):hover:where(:not(:disabled)) { background: var(--color-fill); }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.btn-tertiary, .gs-text, .kp-link):where(:disabled) { color: var(--color-muted); cursor: default; }
@@ -5857,18 +5908,21 @@ html[data-save-drawer='room'] body.ginga #app > .scale-thread {
    rail a paper hairline on a paper track; a lit hairline at its foot keeps it a band on the deck's lacquer stage (D1).
    Flat: no gradient, the band is one pigment.
    ========================================================================== */
-#app .kp-top-study[data-bar='deck'] {
+/* the band's three tokens reach the report door that stands in its end slot (Hfix-1B): one definition, day and night */
+:is(#app .kp-top-study[data-bar='deck'], body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail) {
   /* the world's own named pigment (corridor.css's world block --ink, THEME_UI's ink): ベロ藍 #1c2f42 Prussian blue, 墨
      #211e17, 朱's #2b2620 … — the house's --color-ink is a near-black in ベロ藍, so the band reads the world's pigment */
   --deck-band: var(--world-ink, var(--color-ink));
   --deck-band-ink: var(--color-paper, #f5efe0);
   --deck-band-quiet: color-mix(in srgb, var(--deck-band-ink) 82%, var(--deck-band));
+}
+#app .kp-top-study[data-bar='deck'] {
   background: var(--deck-band);
   border-bottom: 1px solid color-mix(in srgb, var(--deck-band-ink) 16%, var(--deck-band));
   box-shadow: 0 1px 0 rgb(0 0 0 / 22%);
   color: var(--deck-band-ink);
 }
-:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #app .kp-top-study[data-bar='deck'] {
+:root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) :is(#app .kp-top-study[data-bar='deck'], body:has(#app :is(.kp-study, .kp-done)) #bunki-reports-root .br-rail) {
   /* Material II: the card band's night value, amended — the world's ground 30 % in its own deepest coat, not in black */
   --deck-band: color-mix(in srgb, var(--color-ground) 30%, var(--zen-stage-deep));
   --deck-band-ink: var(--color-ink);

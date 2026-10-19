@@ -457,10 +457,10 @@
     {
       "card": "km-078-m08",
       "after": "試験前に",
-      "surface": "一",
-      "before": "晩で",
-      "right": "ひと",
-      "wrong": "いち"
+      "surface": "一晩",
+      "before": "で",
+      "right": "ひとばん",
+      "wrong": "いちばん"
     },
     {
       "card": "km-025-m07",
@@ -627,11 +627,11 @@
     },
     {
       "card": "km-011-m07",
-      "after": "警察官2",
-      "surface": "人",
+      "after": "警察官",
+      "surface": "2人",
       "before": "が殉",
-      "right": "り",
-      "wrong": "にん"
+      "right": "ふたり",
+      "wrong": "ににん"
     },
     {
       "card": "km-011-m07",

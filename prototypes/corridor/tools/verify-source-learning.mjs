@@ -13,6 +13,7 @@ import process from 'node:process';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -299,6 +300,8 @@ for (const engine of engines) for (const width of sizes) {
       for (const key of ['taken', 'srs', 'revlog', 'sourceInbox', 'teacherContexts', 'lists'])
         assert.deepEqual(reused.record[key], reviewed.record[key]);
       await screenshot('later-offline-reuse');
+      // precondition now (Hfix-1B, item 11): a tutor set up, so the word's page offers Ask the tutor (drawn on Back)
+      await setUpDeviceTutor(page);
       await page.locator('#source-reader-back').click();
       await page.locator('#sheet .teacher-discuss').click();
       await page.locator('#chat-input').fill(QUESTION);

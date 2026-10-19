@@ -20,6 +20,7 @@ import {
 } from '../../../scripts/resolve-corridor-site.mjs';
 import { verifyBundledArtifact } from '../../bunki-desktop/lib/artifact.cjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { setUpDeviceTutorForContext } from './tutor-fixture-support.mjs';
 
 assert(
   process.env.KAIRO_SITE_DIR && isAbsolute(process.env.KAIRO_SITE_DIR),
@@ -637,6 +638,9 @@ async function runCase(name, synthetic, body) {
     recordVideo: { dir: join(out, 'recordings'), size: { width: 1120, height: 940 } },
   });
   await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device; demonstration has its own gate.
+  // precondition now (Hfix-1B, item 11): a tutor set up, since every "Ask the tutor" door needs one; a case's own synthetic
+  // provider (configureProvider) replaces it and is never written over
+  await setUpDeviceTutorForContext(context);
   const transport = captureTransport(context, synthetic);
   await transport.install();
   await context.tracing.start({ screenshots: true, snapshots: true, sources: false });
@@ -722,10 +726,11 @@ try {
       'Discuss deduplicates the prior neutral save',
     );
     assert.deepEqual(frozenLearning(saved.record), frozenLearning(initial.record));
-    assert.equal(
-      await page.locator('#chat-send').isDisabled(),
-      true,
-      'Saved context is available before provider setup',
+    // Hfix-1B: the door needs a tutor set up, so the saved context now waits with one; nothing was sent
+    assert.deepEqual(
+      { blocked: fixture.transport.blocked.length, primary: fixture.transport.primary.length },
+      { blocked: 0, primary: 0 },
+      'Saved context waits on the tutor page and nothing was sent',
     );
     await screenshot(fixture, 'saved-context');
     await reopenTutor(page);

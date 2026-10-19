@@ -55,6 +55,9 @@ const G2_CONTROLS = {
   'not-yet-ignored': { from: "  if (said?.value === 'not-yet' && !(match === 'same' && notYetReleased(record, skey, said.cursor))) {",
     to: "  if (said?.value === 'not-yet' && !stored && !(match === 'same' && notYetReleased(record, skey, said.cursor))) {",
     kills: ['g2-not-yet-outranks-until-an-unrevoked-good-review-after-it'] },
+  // Hfix-1B · L-1 back: Me's lead figure counts the index's figure again while the help line counts the sealed reading
+  'two-counts': { from: '    const chars = articleReadChars(p.id, S, p);', to: '    const chars = finiteNumber(p.chars) ? p.chars : null;',
+    kills: ['hfix1b-me-reads-one-count-so-unaided-never-exceeds-read'] },
 };
 const g2ControlAt = process.argv.indexOf('--g2-control');
 const g2Control = g2ControlAt >= 0 ? G2_CONTROLS[process.argv[g2ControlAt + 1]] : null;
@@ -1209,7 +1212,7 @@ const G2_NAMES = new Set([
   'DEPTH_ORDER', 'DEPTH_RECALL_R', 'DEPTH_RECALLED_S', 'DEPTH_OWNED_S', 'depthRank', 'deeperDepth', 'shallowerDepth',
   'localDayOrdinal', 'localMonthKey', 'encounterIdentity', 'encounterKey', 'depthIdentityMatch', 'depthIndexMemo', 'depthIndex',
   'depthRetrievability', 'notYetReleased', 'wordDepth', 'copyRecordWith', 'articleFingerprint', 'readHelpPatch', 'readHelpFinishPatch',
-  'encounterPatch', 'correctionPatch', 'helpByMonth', 'savedNodeRecord', 'wordArchiveRef',
+  'encounterPatch', 'correctionPatch', 'helpByMonth', 'articleReadChars', 'meReadUnaided', 'savedNodeRecord', 'wordArchiveRef',
   'MET_KEY_MAX', 'MET_KINDS', 'validMetKey', 'validMetEntry', 'validMetRoot', 'validReadHelpArticle', 'validReadHelp', 'metReadable',
   'readHelpReadable', 'metCursorsFit', 'KANA_VOWEL_ROWS', 'kanaReadingKey', 'KATA_TO_HIRA_OFFSET', 'kataToHira', 'entryKanaIndex',
   'wordCardIdentity', 'wordAnswerIdentity', 'savedAnswerFor', 'wordSelection', 'nonBlankMeanings', 'srsKey', 'srsSchedulerInstant',
@@ -1496,6 +1499,37 @@ await check('g2-help-per-1000-characters-counts-first-readings-once', async () =
   assert.equal(c.helpByMonth(quiet).months[0].per1000, 0);
   assert.equal(c.helpByMonth(g2Record()), null);
   assert.deepEqual(clone(c.helpByMonth(g2Record({ readHelp: { version: 1, since: T0, articles: {} } })).months), []);
+});
+/* Hfix-1B (L-1, the lead's Dogen look at G2): Me said "730 characters read unaided … less the 3 words you looked up" above
+ * "725 characters, 3 words asked" — unaided over read on one card. The lead figure counted the index's figure (whitespace
+ * in) and the help line the sealed first reading (whitespace aside): two rules. Both now read ONE count (articleReadChars). */
+await check('hfix1b-me-reads-one-count-so-unaided-never-exceeds-read', async () => {
+  const tokens = (text) => [...text].map((s) => ({ s, b: s, r: '', c: true }));
+  // 725 characters of text, two paragraph breaks besides; the index says 735 (its figure counts more than the text's own)
+  const A = { id: 'a', chars: 735, tokens: tokens(`${'あ'.repeat(700)}\n\n${'い'.repeat(25)}`) };
+  const c = g2Context({ passages: [A] });
+  let record = g2Record();
+  const apply = (patch) => { record = g2Record({ ...record, ...clone(patch) }); };
+  for (const [i, node] of [{ id: '総理', reading: 'そうり' }, { id: '日本', reading: 'にほん' }, { id: '年', reading: 'とし' }].entries())
+    apply({ readHelp: c.readHelpPatch(record, 'a', keyOf(c, node), T0 + i) });
+  apply(c.readHelpFinishPatch(record, 'a', T0 + 9));
+  apply({ readDone: { a: T0 + 9 }, obslog: [[T0, 'tap', 'word:総理', 1, 'a'], [T0 + 1, 'tap', 'word:日本', 2, 'a'], [T0 + 2, 'tap', 'word:年', 1, 'a']] });
+  c.S = record;
+  const help = c.helpByMonth(record).months[0];
+  const lead = clone(c.meReadUnaided());
+  assert.equal(help.chars, 725, 'the help line counts the sealed first reading');
+  assert.equal(help.help, 3);
+  assert.deepEqual(lead, { n: 720, read: 725, articles: 1, looked: 3 }, 'the lead counts the same 725, less the 5 characters of the 3 words');
+  assert(lead.n <= help.chars, 'unaided never exceeds what was read');
+  // Me opened cold (the article's text not loaded): the sealed first reading still counts it, never the index's figure
+  const cold = g2Context({ passages: [{ id: 'a', chars: 735 }] });
+  cold.S = record;
+  assert.equal(cold.meReadUnaided().read, 725);
+  assert.equal(cold.helpByMonth(record).months[0].chars, 725);
+  // an article finished before the help signal began and not loaded: its index figure, and still unaided ≤ read
+  const old = g2Context({ passages: [{ id: 'b', chars: 300 }] });
+  old.S = g2Record({ readDone: { b: 1 }, obslog: [[1, 'tap', 'word:総理', 1, 'b']] });
+  assert.deepEqual(clone(old.meReadUnaided()), { n: 298, read: 300, articles: 1, looked: 1 });
 });
 await check('g2-a-kept-word-answers-cold-from-its-own-card', async () => {
   const c = g2Context();

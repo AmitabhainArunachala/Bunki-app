@@ -208,7 +208,12 @@
 .kp-rhint { margin: 0; display: flex; align-items: baseline; gap: 8px; font-size: var(--type-body); color: var(--kp-ink-2); }
 .kp-rhint-label { font-size: var(--type-caption); color: var(--kp-mute); border: 1px dashed currentColor; border-radius: var(--radius-card, 4px); padding: 0 4px; }
 /* 削除: quiet, one tap, at the right end of the study top bar (44px, like ✕); undone from the toast */
-.kp-delete { flex: none; height: 44px; padding: 0 12px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-ink-2); font-size: var(--type-label); }
+/* 削除 (Hfix-1B): the back's last quiet row, after the folds, its one word at the row's end; 44px to touch; never on a front,
+   never in the top bar */
+.kp-card-tools { display: flex; justify-content: flex-end; margin: 2px 0 -10px; }
+/* the foot's band (mount.js footBand) is the app's focus room's (editorial.css); a standalone page draws none */
+.kp-foot-band { display: none; }
+.kp-delete { flex: none; min-height: 44px; padding: 0 2px; border: 0; border-radius: 0; background: none; color: var(--kp-ink-2); font-size: var(--type-label); letter-spacing: 0.02em; text-decoration: underline; text-decoration-color: var(--kp-line); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .kp-toast.is-info { border-color: var(--kp-line); grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
 .kp-seg button:disabled { opacity: 0.5; cursor: default; }
 
@@ -395,7 +400,7 @@
   --kp-noun: var(--kp-cyan); --kp-verb: #93301a; --kp-adj: #805300; --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
   /* the study stage (the ground around the card while studying) is the room's lacquer, Learn's own
    * proscenium (--color-lacquer), and the card is the lit paper on it; its text is the lacquer's ink.
-   * --kp-shu is the 朱 of the marked word's brackets, the rail and the slash on もう一度 (never text):
+   * --kp-shu is the 朱 of the marked word's wash, the rail and the slash on もう一度 (never text):
    * the world's seal red. Measured: contrast-kotoba stage row */
   --kp-stage: var(--color-lacquer, #141a28); --kp-stage-ink: var(--color-lacquer-ink, #e9e2d2); --kp-stage-mute: color-mix(in srgb, var(--color-lacquer-ink, #e9e2d2) 76%, var(--world-ground, var(--color-lacquer, #141a28))); --kp-shu: var(--color-seal, #c4401f);
   /* the dock (the ground under 答えを見る and the grade pads, and the page below the last card) is the
@@ -463,7 +468,6 @@
 }
 .kp-top-study .kp-progress i { background: var(--kp-stage-ink); }
 .kp-top-study .kp-count { color: var(--kp-stage-ink); font-size: var(--type-label); letter-spacing: 0.12em; min-width: 3.4em; text-align: right; }
-.kp-top-study .kp-delete { border-color: color-mix(in srgb, var(--kp-stage-ink) 18%, transparent); color: var(--kp-stage-ink); border-radius: var(--radius-seal, 3px); font-size: var(--type-caption); letter-spacing: 0.06em; padding: 0 10px; }
 
 /* the sheet: nearly square paper, a hairline edge, relief, トンボ registration marks in its
  * corners (a pseudo-element, so the card's own surface stays plain under the ruby) */
@@ -494,15 +498,13 @@
  * Fronts have no tap nodes and keep their original compact line spacing. */
 .kp .kp-sentence:has(.kp-tok) { line-height: 2.5; }
 .kp .kp-card[data-zoom='focus'] .kp-sentence:has(.kp-tok) .kp-ctx:not([data-open='1']) .kp-ctx-in { max-height: 5em; }
-/* the marked word: 朱 corner brackets and a faint wash (backgrounds, so its ::before keeps the 44px
- * reach it has as a tap target on the back); its own colour stays its part of speech */
+/* the marked word: a wash of 朱 under its ink (a background, so its ::before keeps the 44px reach it has as a tap target
+ * on the back); its own colour stays its part of speech. No corner marks (Hfix-1B, H-yoru-01; §7 line 38 "no corner marks",
+ * S's class M): the two 朱 corner brackets that framed it were the crop-mark ornament John asked to go */
 .kp .kp-target {
   padding: 0 0.16em; margin: 0 0.04em; text-decoration-thickness: 1.5px; -webkit-box-decoration-break: clone; box-decoration-break: clone;
-  /* drawn: the cloze target's 朱 corner marks, four hairlines, over its 朱 mark */
-  background:
-    linear-gradient(var(--kp-shu), var(--kp-shu)) 0 0 / 0.36em 2px no-repeat, linear-gradient(var(--kp-shu), var(--kp-shu)) 0 0 / 2px 0.36em no-repeat,
-    linear-gradient(var(--kp-shu), var(--kp-shu)) 100% 100% / 0.36em 2px no-repeat, linear-gradient(var(--kp-shu), var(--kp-shu)) 100% 100% / 2px 0.36em no-repeat,
-    color-mix(in srgb, var(--kp-shu) 10%, transparent);
+  background: color-mix(in srgb, var(--kp-shu) 14%, transparent);
+  border-radius: var(--radius-seal, 3px);
 }
 .kp .kp-blank { border-bottom-color: var(--kp-shu); background: color-mix(in srgb, var(--kp-shu) 9%, transparent); border-radius: var(--radius-seal, 3px) var(--radius-seal, 3px) 0 0; }
 .kp .kp-taphint { font-size: var(--type-caption); letter-spacing: 0.14em; padding-top: 12px; border-top: 1px solid var(--kp-line); }

@@ -57,8 +57,8 @@ import { openShelfTools } from './shelf-tools-support.mjs';
  *      焦点 dims the other sentences (never removes them); a new card opens 全文,
  *      a card seen before 焦点; sentence cards have no zoom;
  *   e) the grade bar is fixed to the bottom of a phone screen (a 195-character
- *      passage never hides it) and carries the rule 「答えを見て理解が深まったなら
- *      もう一度」 once, dismissible, remembered in prefs.
+ *      passage never hides it) and carries the rule 「答えを見て初めて分かったなら「もう一度」」
+ *      ("If the answer was new to you, choose Again", Hfix-1B) once, dismissible, remembered in prefs.
  *
  * Then the visual system (CARD_CONTRACT_V2 §9, brief-2026-10-04/aesthetics.md):
  *   a) no 見て覚えるコツ panel, no topic hue, no level 1–3 edge, no amber tip bar; the method
@@ -75,9 +75,9 @@ import { openShelfTools } from './shelf-tools-support.mjs';
  *      smooth autoscroll, transformed card or swipe drag.
  *
  * Then the review loop (CARD_CONTRACT_V2 §3.7, §4), both decks where it applies:
- *   a) 削除 in the study top bar is one tap: the card leaves the sitting and every later queue, its FSRS
- *      record and id untouched (ledger: suspended, repairLog); the toast's 元に戻す brings it
- *      back; 設定 › 保留中のカード counts it and 復元 returns it to the queue;
+ *   a) 削除 is never on a front (Hfix-1B); on the back it is the card's last quiet row, and one tap there: the card
+ *      leaves the sitting and every later queue, its FSRS record and id untouched (ledger: suspended, repairLog); the
+ *      toast's 元に戻す brings it back; 設定 › 保留中のカード counts it and 復元 returns it to the queue;
  *   b) a card that has lapsed LEECH_LAPSES (5) times shows the repair ladder on its back after tier one, in
  *      order 別の文に替える → ヒントを付ける → 保留, each one tap and logged: the swap suspends the
  *      card and puts the word's next unseen passage on screen (due at once, after a reload too);
@@ -742,8 +742,8 @@ async function verifyDelivery(browser, base) {
 /* ------------------------- the back hierarchy (CARD_CONTRACT_V2 §2–§4) */
 const KANJI_RE = /[㐀-鿿々〆ヵヶ]/;
 const FOLD_ORDER = ['English', 'Translation', 'Kanji form and meaning', 'Related words', 'Other sentences for this word', 'Source'];
-const RULE_TEXT = '答えを見て理解が深まったなら もう一度';
-const UI_RULE_TEXT = 'Choose Again if seeing the answer improved your understanding.';
+const RULE_TEXT = '答えを見て初めて分かったなら「もう一度」';
+const UI_RULE_TEXT = 'If the answer was new to you, choose Again';
 /** where each sentence of a passage ends — the rule build.py and the player share */
 function sentenceEnds(ja) {
   const out = [];
@@ -835,7 +835,8 @@ function verifyBackParity() {
     const html = readFileSync(resolve(release, page), 'utf8');
     releaseParity.push({ page, css: html.includes(playerCss), mount: html.includes(mount), roomMotion: html.includes(roomMotion), fonts: (html.match(/@font-face\s*\{/gu) || []).length });
     if (!['function leechLadder', 'function deleteCard', 'function suspendedField', 'function kanjiFamily', 'function seeAlsoLine', 'function swapCard', 'restoreSuspended', 'LEECH_LAPSES = 5', 'kp-kfam', 'kp-rhint'].every((k) => html.includes(k))) bad.push(`${page}: no delete, ladder or kanji family`);
-    if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'ruleSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT, 'function revealInPlace', 'kp-kindchip', 'kp-levelchip', 'prefers-reduced-motion'].every((k) => html.includes(k)) || /kp-tapword|is-four|VISUAL_TIPS|topicColour|kp-lvchip/.test(html)) bad.push(`${page}: not the current player`);
+    // Hfix-1B: the rule and the eyebrow say it unmistakably (Kimi KH1-1, KH1-2); the old wording is gone
+    if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'ruleSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT, UI_RULE_TEXT, '印のついた語を思い出す', 'function revealInPlace', 'kp-kindchip', 'kp-levelchip', 'prefers-reduced-motion'].every((k) => html.includes(k)) || /kp-tapword|is-four|VISUAL_TIPS|topicColour|kp-lvchip|答えを見て理解が深まった|improved your understanding|'印の語を思い出す'/.test(html)) bad.push(`${page}: not the current player`);
     if (!['function settleBack', 'function clampContext', 'function fitClamps', 'function sourceFold', 'kp-f-src', 'HINT_SITTINGS = 3', 'function skipFor', 'この語の他の文'].every((k) => html.includes(k)) || /記録を消す|kp-danger|'kp-hint'/.test(html)) bad.push(`${page}: not the Phase 1 follow-ups player`);
   }
   check('parity: both separately served Kotoba release HTML outputs embed the exact built-site player CSS and mount code, room motion, and all 451 bundled faces',
@@ -1678,7 +1679,7 @@ async function verifyBack(browser, base) {
     await o.page.waitForSelector('#kp-grade-good');
     const dismissed = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').ruleSeen, zoom: document.getElementById('kp-card').dataset.zoom, enOpen: document.querySelector('#kp-card .kp-f-en').open })`);
     check(
-      'e) the grade bar is pinned to the bottom of the phone screen and shows 「答えを見て理解が深まったなら もう一度」 until dismissed; dismissing is remembered in prefs and keeps an open fold open',
+      'e) the grade bar is pinned to the bottom of the phone screen and shows its rule (Hfix-1B: "If the answer was new to you, choose Again" · 「答えを見て初めて分かったなら「もう一度」」) until dismissed; dismissing is remembered in prefs and keeps an open fold open',
       bar.position === 'fixed' && bar.bottom === bar.expectedBottom && bar.viewport === 844 && (bar.tabsBottom === null || bar.tabsBottom === 844) && bar.noOverlap && bar.hit && bar.rule?.includes(UI_RULE_TEXT) && !dismissed.rule && dismissed.seen === true && dismissed.zoom === 'focus' && dismissed.enOpen === true,
       JSON.stringify({ ...bar, dismissed }),
     );
@@ -1833,7 +1834,7 @@ async function verifyBack(browser, base) {
     );
   }
 
-  // 5, A39) the standalone study pages have no host header, so the study top bar (× n/N 削除)
+  // 5, A39) the standalone study pages have no host header, so the study top bar (× n/N)
   // pins itself: after the reveal it stays on screen on a short passage (km-064-m01, due) and on a
   // word's long contract-v2 first passage (A49) alike, and tier one rests between it and the bar.
   {
@@ -2155,7 +2156,9 @@ async function verifyReview(browser, base) {
     await page.waitForSelector('.kp-grade');
   };
 
-  // a) 削除: one tap, out of the sitting and the queue, record untouched; 元に戻す; 設定 › 保留中のカード › 復元
+  // a) 削除: never on a front (Hfix-1B, the lead's round-1 ruling on HG-5: removing a card is an explicit act after the
+  //    answer is seen); on the back it is the card's last quiet row, after the answer and its folds, outside the top bar and
+  //    the grade bar. One tap there takes the card out of the sitting and the queue, record untouched; 元に戻す; 設定 › 保留中のカード › 復元
   for (const [q, deck, a, b] of [
     ['?deck=mcd', 'kotoba-mcd', 'km-064-m01', 'km-065-m01'],
     ['?deck=kotoba', 'kotoba-mine', 'km-064-1', 'km-065-1'],
@@ -2163,11 +2166,30 @@ async function verifyReview(browser, base) {
     const o = await open(q, deck, ledger(deck, [card(a, { due: '2020-01-01T00:00:00.000Z' }), card(b, { due: '2020-01-02T00:00:00.000Z' })]));
     try {
       await start(o.page);
+      const front = await o.page.evaluate(`(() => { const top = document.querySelector('.kp-top-study'); const words = (n) => (n?.innerText || '').replace(/\\s+/g, ' ');
+        return { del: document.querySelectorAll('#kp-delete, .kp-delete').length, topButtons: [...(top?.querySelectorAll('button') || [])].map((n) => n.id || n.className),
+          removeWords: /Remove|削除/.test(words(document.querySelector('.kp-study'))),
+          hang: getComputedStyle(document.querySelector('#kp-card .kp-sentence')).hangingPunctuation ?? null,
+          mark: (() => { const t = document.querySelector('#kp-card .kp-target'); const cs = t && getComputedStyle(t); return cs ? { image: cs.backgroundImage, wash: cs.backgroundColor } : null; })() }; })()`);
+      // Hfix-1B (H-yoru-01; §7 line 38): the marked word is marked by its wash alone, with no corner marks drawn on it
+      check(`a) ${deck}: the front's marked word carries no corner marks (no drawn layer on it), only its wash`,
+        !!front.mark && front.mark.image === 'none' && !/rgba\(0, 0, 0, 0\)|transparent/u.test(front.mark.wash), JSON.stringify(front.mark));
+      // Hfix-1B: WebKit (the iPhone's engine) painted a line's hung 「ど、」 a second time at the next line's start; the deck's
+      // passage hangs no punctuation (Chromium has no such property: null there, and nothing to paint twice)
+      check(`a) ${deck}: the front's passage hangs no punctuation (${actualEngine}: ${front.hang ?? 'no such property'})`,
+        actualEngine === 'webkit' ? front.hang === 'none' : front.hang === null || front.hang === 'none', JSON.stringify({ hang: front.hang }));
       await revealCard(o.page);
+      // the reveal's crossfade holds an inert copy of the front (its quit button without its id) over the screen, and a
+      // polish band crosses the card, for under 0.4 s: the back is read once both have gone
+      await o.page.waitForFunction(() => !document.querySelector('.kp-reveal-hold') && !document.querySelector('#kp-card > .kp-polish'), null, { timeout: 3000 });
       const first = await onScreen(o.page);
       const before = await read(o.page, deck);
       const tools = await o.page.evaluate(`(() => { const d = document.getElementById('kp-delete'); d.scrollIntoView({ block: 'center' }); const r = d.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2; const at = (dy) => document.elementFromPoint(cx, cy + dy) === d;
-        return { inTop: !!d.closest('.kp-top-study') && !d.closest('#kp-card'), lastInTop: d.parentElement.lastElementChild === d, h: Math.round(r.height), reach: at(-21) && at(21), label: d.textContent }; })()`);
+        const row = d.parentElement, face = document.getElementById('kp-card');
+        return { inCard: !!face && face.contains(d), quietRow: row.classList.contains('kp-card-tools') && row.parentElement === face && face.lastElementChild === row && row.children.length === 1,
+          afterAnswer: !!face?.querySelector('.kp-answer') && !!(face.querySelector('.kp-answer').compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING),
+          outsideBars: !d.closest('.kp-top-study, .kp-grades'), topButtons: [...document.querySelectorAll('.kp-top-study button')].map((n) => n.id || n.className),
+          h: Math.round(r.height), reach: at(-21) && at(21), label: d.textContent }; })()`);
       await o.page.click('#kp-delete');
       await o.page.waitForSelector('#kp-toast-undo');
       const gone = await onScreen(o.page);
@@ -2191,11 +2213,13 @@ async function verifyReview(browser, base) {
       const homeAfter = await o.page.evaluate(`document.getElementById('kp-start').textContent`);
       const lastRow = l1.repairLog?.at(-1) ?? [];
       check(
-        `a) ${deck}: 削除 at the right end of the study top bar (one tap, 44px reach) takes the card out of the sitting at once, keeps its FSRS record and id, and says how to undo; 元に戻す brings it back on screen`,
-        tools.inTop && tools.lastInTop && tools.h >= 44 && tools.reach && tools.label === 'Remove' && first.id === a && first.count === '1/2' && gone.id === b && gone.count === '1/1' && gone.undo && /Card removed/.test(gone.toast) &&
+        `a) ${deck}: no 削除 on the front (nothing in its top bar but ×, no Remove word anywhere on it); on the back 削除 is the card's last quiet row, after the answer, outside the top bar and the grades (one tap, 44px reach), and takes the card out of the sitting at once, keeps its FSRS record and id, and says how to undo; 元に戻す brings it back on screen`,
+        front.del === 0 && JSON.stringify(front.topButtons) === '["kp-quit"]' && !front.removeWords &&
+          tools.inCard && tools.quietRow && tools.afterAnswer && tools.outsideBars && JSON.stringify(tools.topButtons) === '["kp-quit"]' &&
+          tools.h >= 44 && tools.reach && tools.label === 'Remove this card' && first.id === a && first.count === '1/2' && gone.id === b && gone.count === '1/1' && gone.undo && /Card removed/.test(gone.toast) &&
           l1.suspended?.[a]?.by === 'delete' && JSON.stringify(l1.cards[a]) === JSON.stringify(before.cards[a]) && lastRow[0] === a && lastRow[1] === 'delete' && !l1.suspended?.[b] &&
           back.id === a && back.revealed && back.count === '1/2' && !l2.suspended?.[a],
-        JSON.stringify({ tools, first: first.id, gone, back: back.id, suspended: l1.suspended, row: lastRow.slice(0, 2) }),
+        JSON.stringify({ front, tools, first: first.id, gone, back: back.id, suspended: l1.suspended, row: lastRow.slice(0, 2) }),
       );
       check(
         `a) ${deck}: after a reload the deleted card is not in the queue; 設定 › 保留中のカード counts it and 復元 puts it back (logged), with the record as it was`,

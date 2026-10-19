@@ -240,10 +240,15 @@ body.has-primary-tabs[data-view='speak'] #app { padding-bottom: calc(var(--nav-c
 .speak-pair-natural { margin: 0; font: var(--weight-regular) var(--type-lead) / var(--leading-body) var(--font-reading); color: var(--color-ink); }
 .speak-acts { display: flex; gap: var(--space-2); margin-top: var(--space-1); }
 .speak-para { margin: 0 0 var(--space-4); font: var(--weight-regular) var(--type-body) / var(--leading-body) var(--font-ui); color: var(--color-ink-2); }
-.speak-connect { display: grid; gap: var(--space-3); margin: var(--space-4) 0; }
-.speak-field { display: grid; gap: var(--space-1); }
+/* the key page's one column is the page's width (Hfix-1B): WebKit sized the column by the fields' own intrinsic width
+   (395 in a 322 page), so the fields and Save ran past the screen and the page scrolled sideways */
+.speak-connect { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); margin: var(--space-4) 0; }
+.speak-field { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-1); min-width: 0; }
 .speak-field-t { font: var(--weight-medium) var(--type-label) / var(--leading-ui) var(--font-ui); color: var(--color-ink-2); }
 .speak-field input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
   min-height: var(--hit);
   padding: 0 var(--space-3);
   border: var(--stroke-relief) solid var(--color-edge-strong);

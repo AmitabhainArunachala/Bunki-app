@@ -3691,24 +3691,24 @@
 .kp button:focus-visible, .kp input:focus-visible, .kp textarea:focus-visible { outline: 2px solid var(--kp-cyan); outline-offset: 2px; }
 
 .kp-top { display: flex; align-items: center; gap: 12px; min-height: 44px; }
-.kp-icon { width: 44px; height: 44px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel); font-size: 18px; flex: none; position: relative; }
+.kp-icon { width: 44px; height: 44px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel); font-size: var(--type-lead); flex: none; position: relative; }
 /* Keep the rounded mark while its transparent square owns the whole tap floor. */
 .kp-icon::before { content: ''; position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; transform: translate(-50%, -50%); }
-.kp-title { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.02em; }
-.kp-sub { margin: 0; color: var(--kp-ink-2); font-size: 14px; line-height: 1.6; }
-.kp-h2 { margin: 8px 0 0; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; color: var(--kp-mute); }
+.kp-title { margin: 0; font-size: var(--type-reading); font-weight: 700; letter-spacing: 0.02em; }
+.kp-sub { margin: 0; color: var(--kp-ink-2); font-size: var(--type-chrome); line-height: 1.6; }
+.kp-h2 { margin: 8px 0 0; font-size: var(--type-label); font-weight: 700; letter-spacing: 0.12em; color: var(--kp-mute); }
 
 .kp-tiles { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; row-gap: 4px; padding: 10px 0; border-block: 1px solid var(--kp-line); font-family: var(--kp-num); font-variant-numeric: tabular-nums; }
 /* the deck's state: one quiet mono line, "0 due · 15 new · 0 known · 0 difficult", no coloured tiles */
 .kp-tile { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; }
 .kp-tile + .kp-tile::before { content: '·'; margin: 0 10px; color: var(--kp-mute); }
-.kp-tile b { font-size: 15px; font-weight: 600; color: var(--kp-ink); }
-.kp-tile span { font-size: 12.5px; letter-spacing: 0.04em; color: var(--kp-mute); }
+.kp-tile b { font-size: var(--type-control); font-weight: 600; color: var(--kp-ink); }
+.kp-tile span { font-size: var(--type-label); letter-spacing: 0.04em; color: var(--kp-mute); }
 .kp-c-known b, .kp-verdict.kp-c-known { color: var(--kp-green); }
 .kp-c-hard b, .kp-verdict.kp-c-hard { color: var(--kp-red); }
 .kp-tiles .kp-tile b { color: var(--kp-ink); }
 
-.kp-start { width: 100%; min-height: 56px; border: 0; border-radius: var(--radius-control, 6px); background: var(--kp-cyan); color: #00131d; font-size: 18px; font-weight: 700; letter-spacing: 0.04em; }
+.kp-start { width: 100%; min-height: 56px; border: 0; border-radius: var(--radius-control, 6px); background: var(--kp-cyan); color: #00131d; font-size: var(--type-lead); font-weight: 700; letter-spacing: 0.04em; }
 .kp-start:disabled { background: var(--kp-panel-2); color: var(--kp-mute); cursor: default; }
 
 .kp-groups { display: grid; gap: 6px; }
@@ -3716,9 +3716,9 @@
 .kp-group input { width: 20px; height: 20px; accent-color: var(--kp-cyan); margin: 0; }
 .kp-group.is-off { opacity: 0.45; }
 .kp-gname { min-width: 0; display: grid; }
-.kp-gname b { font-size: 16px; }
-.kp-gname small { color: var(--kp-mute); font-size: 12px; }
-.kp-gcount { font-family: var(--kp-num); font-size: 13px; color: var(--kp-ink-2); }
+.kp-gname b { font-size: var(--type-body); }
+.kp-gname small { color: var(--kp-mute); font-size: var(--type-caption); }
+.kp-gcount { font-family: var(--kp-num); font-size: var(--type-label); color: var(--kp-ink-2); }
 .kp-bar { grid-column: 1 / -1; display: flex; height: 6px; border-radius: var(--radius-seal, 3px); overflow: hidden; background: var(--kp-panel-2); }
 .kp-bar i { display: block; height: 100%; }
 .kp-bar .kp-c-known { background: var(--kp-green); }
@@ -3726,7 +3726,7 @@
 .kp-bar .kp-c-learn { background: var(--kp-amber); }
 
 .kp-foot { display: flex; gap: 20px; justify-content: center; }
-.kp-link { min-height: 44px; background: none; border: 0; color: var(--kp-ink-2); font-size: 14px; text-decoration: underline; text-underline-offset: 4px; padding: 8px; }
+.kp-link { min-height: 44px; background: none; border: 0; color: var(--kp-ink-2); font-size: var(--type-chrome); text-decoration: underline; text-underline-offset: 4px; padding: 8px; }
 
 /* study */
 .kp-top-study { gap: 10px; }
@@ -3737,7 +3737,7 @@
 .kp-progress { flex: 1; height: 6px; border-radius: var(--radius-seal, 3px); background: var(--kp-panel-2); overflow: hidden; }
 /* the rail ticks per card on the compositor: scaleX, never width */
 .kp-progress i { display: block; height: 100%; width: 100%; background: var(--kp-cyan); transform-origin: left center; transform: scaleX(var(--kp-frac, 0)); transition: transform var(--motion-ma, 120ms) var(--ease-enter, ease-out); }
-.kp-count { font-family: var(--kp-num); font-size: 13px; color: var(--kp-ink-2); font-variant-numeric: tabular-nums; }
+.kp-count { font-family: var(--kp-num); font-size: var(--type-label); color: var(--kp-ink-2); font-variant-numeric: tabular-nums; }
 
 .kp-card { --kp-kind: var(--kp-kind-go); background: var(--kp-panel); border: 1px solid var(--kp-line); border-left: 4px solid var(--kp-kind); border-radius: var(--radius-card, 4px); padding: 18px 18px 20px; display: grid; gap: 14px; touch-action: pan-y; user-select: none; transition: transform 0.12s; min-height: 220px; }
 /* item kind: the left edge and the kind chip, nothing else */
@@ -3746,7 +3746,7 @@
 .kp-card[data-swipe='good'] { box-shadow: 0 0 0 2px var(--kp-green); }
 .kp-card[data-swipe='again'] { box-shadow: 0 0 0 2px var(--kp-red); }
 .kp-chips { display: flex; gap: 6px; flex-wrap: wrap; }
-.kp-chip { font-size: 12px; padding: 2px 8px; border-radius: var(--radius-seal, 3px); border: 1px solid var(--kp-line); color: var(--kp-ink-2); white-space: nowrap; }
+.kp-chip { font-size: var(--type-caption); padding: 2px 8px; border-radius: var(--radius-seal, 3px); border: 1px solid var(--kp-line); color: var(--kp-ink-2); white-space: nowrap; }
 .kp-kindchip { color: var(--kp-kind); border-color: currentColor; font-weight: 700; }
 /* level: a monochrome text chip, only when the word has one (aesthetics.md §3) */
 .kp-levelchip { color: var(--kp-ink-2); background: var(--kp-panel-2); font-family: var(--kp-num); letter-spacing: 0.04em; }
@@ -3756,81 +3756,95 @@
 .kp-st-known { color: var(--kp-green); border-color: currentColor; }
 .kp-st-hard { color: var(--kp-red); border-color: currentColor; }
 
-.kp-sentence { margin: 0; font-size: clamp(22px, 6.2vw, 30px); line-height: 2.05; font-weight: 500; letter-spacing: 0.02em; color: var(--kp-ink); overflow-wrap: anywhere; }
-.kp-sentence rt { font-size: 0.45em; color: var(--kp-ink-2); font-weight: 400; letter-spacing: 0; }
+/* the card's passage reads a step above the reader's body (base: clamp(22px, 6.2vw, 30px), 24.2 px at 390): the
+   nearest step, title, and section on a phone up to 420 px (below 427 px the base sat nearer 24 than 29) */
+.kp-sentence { margin: 0; font-size: var(--type-title); line-height: 2.3; font-weight: 500; letter-spacing: 0.02em; color: var(--kp-ink); overflow-wrap: anywhere; }
 .kp-blank { display: inline-block; min-width: 2.4em; border-bottom: 3px solid var(--kp-cyan); background: var(--kp-cyan-wash); border-radius: var(--radius-control, 6px) var(--radius-control, 6px) 0 0; margin: 0 2px; line-height: 1.3; }
 .kp-target { color: var(--kp-cyan); font-weight: 700; text-decoration: underline 2px; text-underline-offset: 0.28em; }
-.kp-target rt { color: inherit; }
-.kp-taphint { margin: 0; font-size: 12px; color: var(--kp-mute); letter-spacing: 0.08em; }
+/* the deck's readings are its quiet ink, --kp-ink-2 at full strength (base: 88 % of it in the corridor, full on the
+   study pages; the world's red reads under 4.5:1 on a night card: nami 4.40, hakuu 4.39); one hue on the asked word: its
+   reading takes the word's own colour. The one ruby reads --color-reading, handed to the ruby only: the word's own mark
+   under the pointer (.kp-tok, the house's one word mark) keeps the house's reading colour */
+.kp-sentence ruby { --color-reading: var(--kp-ink-2); }
+.kp-sentence .kp-target ruby { --color-reading: currentColor; }
+/* 読み off: the clean original, keeping the asked word's reading and the one on a word you tap. A concealed
+   reading keeps its place, so the line never moves between on and off or while a word is open. */
+.kp[data-readings='off'] .kp-sentence ruby:not(:is(.kp-target, .kp-tok.kp-lit) ruby) > rt { visibility: hidden; }
+.kp-taphint { margin: 0; font-size: var(--type-caption); color: var(--kp-mute); letter-spacing: 0.08em; }
 
 .kp-answer { display: grid; gap: 6px; border-top: 1px solid var(--kp-line); padding-top: 14px; }
 .kp-word { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-.kp-term { font-size: 30px; font-weight: 700; color: var(--kp-cyan); line-height: 1.2; }
-.kp-reading { font-size: 18px; color: var(--kp-ink-2); }
-.kp-def { margin: 0; font-size: 17px; line-height: 1.6; }
-.kp-note { margin: 0; font-size: 15px; line-height: 1.6; color: var(--kp-ink-2); }
-.kp-pitch { font-family: var(--kp-num); font-size: 13px; color: var(--kp-ink-2); border: 1px solid var(--kp-line); border-radius: var(--radius-seal, 3px); padding: 0 5px; }
-.kp-en { margin: 0; font-size: 14px; color: var(--kp-ink-2); line-height: 1.5; }
-.kp-tip { margin: 4px 0 0; font-size: 13px; color: var(--kp-ink-2); line-height: 1.5; }
+.kp-term { font-size: var(--type-title); font-weight: 700; color: var(--kp-cyan); line-height: 1.2; }
+.kp-reading { font-size: var(--type-lead); color: var(--kp-ink-2); }
+.kp-def { margin: 0; font-size: var(--type-lead); line-height: 1.6; }
+.kp-note { margin: 0; font-size: var(--type-control); line-height: 1.6; color: var(--kp-ink-2); }
+.kp-pitch { font-family: var(--kp-num); font-size: var(--type-label); color: var(--kp-ink-2); border: 1px solid var(--kp-line); border-radius: var(--radius-seal, 3px); padding: 0 5px; }
+.kp-en { margin: 0; font-size: var(--type-chrome); color: var(--kp-ink-2); line-height: 1.5; }
+.kp-tip { margin: 4px 0 0; font-size: var(--type-label); color: var(--kp-ink-2); line-height: 1.5; }
 .kp-tip-label { color: var(--kp-mute); }
-.kp-en-none { font-size: 13px; color: var(--kp-mute); }
-.kp-src { margin: 0; display: grid; gap: 2px; font-size: 12px; color: var(--kp-ink-2); letter-spacing: .02em; line-height: 1.6; }
+.kp-en-none { font-size: var(--type-label); color: var(--kp-mute); }
+.kp-src { margin: 0; display: grid; gap: 2px; font-size: var(--type-caption); color: var(--kp-ink-2); letter-spacing: .02em; line-height: 1.6; }
 .kp-src-label { color: var(--kp-mute); }
 
 /* the back's second tier: one tap each, the same order on every card */
 .kp-folds { display: grid; margin-top: 6px; border-top: 1px solid var(--kp-line); }
 .kp-fold { border-bottom: 1px solid var(--kp-line); }
-.kp-fold > summary { list-style: none; cursor: pointer; min-height: 40px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--kp-ink-2); letter-spacing: .04em; }
+.kp-fold > summary { list-style: none; cursor: pointer; min-height: 40px; display: flex; align-items: center; gap: 8px; font-size: var(--type-label); color: var(--kp-ink-2); letter-spacing: .04em; }
 .kp-fold > summary::-webkit-details-marker { display: none; }
-.kp-fold > summary::before { content: '▶'; color: var(--kp-mute); font-size: 11px; width: 1em; }
+.kp-fold > summary::before { content: '▶'; color: var(--kp-mute); font-size: var(--type-caption); width: 1em; }
 .kp-fold[open] > summary::before { content: '▼'; }
 .kp-fold > :not(summary) { margin-bottom: 10px; }
-.kp-gloss { margin: 0; font-size: 15px; line-height: 1.5; color: var(--kp-ink-2); font-weight: 400; }
-.kp-sem, .kp-others { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; color: var(--kp-ink-2); }
+.kp-gloss { margin: 0; font-size: var(--type-control); line-height: 1.5; color: var(--kp-ink-2); font-weight: 400; }
+.kp-sem, .kp-others { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: var(--type-chrome); color: var(--kp-ink-2); }
 .kp-sem b { color: var(--kp-ink); font-weight: 600; margin-right: 8px; }
-.kp-sem-rel { font-size: 12px; color: var(--kp-mute); margin-right: 8px; }
-.kp-sem small { display: block; font-size: 12px; color: var(--kp-mute); }
+.kp-sem-rel { font-size: var(--type-caption); color: var(--kp-mute); margin-right: 8px; }
+.kp-sem small { display: block; font-size: var(--type-caption); color: var(--kp-mute); }
 
 /* the kanji family inside 漢字の形と意味: the learner's own words sharing a kanji (同) or a
  * reading (読), each a link to 語の一覧; text marks, no hue */
 /* rows 44px apart, so each link's 44px reach never overlaps the next row's */
 .kp-kfam { margin: 6px 0 12px; padding: 0; list-style: none; display: grid; gap: 14px; }
 .kp-kfam li { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 6px; }
-.kp-kfam-c { font-size: 20px; font-weight: 600; min-width: 3.2em; display: inline-flex; align-items: baseline; gap: 4px; }
-.kp-kfam-c small { font-size: 12px; font-weight: 400; color: var(--kp-mute); }
-.kp-fam, .kp-see-link { position: relative; display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 0 10px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); font-size: 15px; color: var(--kp-ink); }
+.kp-kfam-c { font-size: var(--type-lead); font-weight: 600; min-width: 3.2em; display: inline-flex; align-items: baseline; gap: 4px; }
+.kp-kfam-c small { font-size: var(--type-caption); font-weight: 400; color: var(--kp-mute); }
+.kp-fam, .kp-see-link { position: relative; display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 0 10px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); font-size: var(--type-control); color: var(--kp-ink); }
 /* 44px reach: from inside the 1px border, 28 + 16 */
 .kp-fam::after, .kp-see-link::after { content: ''; position: absolute; inset: -8px 0; }
-.kp-fam-mark { font-size: 11px; color: var(--kp-ink-2); border: 1px solid currentColor; border-radius: var(--radius-card, 4px); padding: 0 3px; line-height: 1.3; }
+.kp-fam-mark { font-size: var(--type-caption); color: var(--kp-ink-2); border: 1px solid currentColor; border-radius: var(--radius-card, 4px); padding: 0 3px; line-height: 1.3; }
 .kp-fam[data-mark='読'] .kp-fam-mark { border-style: dashed; }
-.kp-fam-more { font-size: 12px; color: var(--kp-mute); }
-.kp-see { margin: 0; padding: 8px 0; border-bottom: 1px solid var(--kp-line); display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; color: var(--kp-ink-2); }
+.kp-fam-more { font-size: var(--type-caption); color: var(--kp-mute); }
+.kp-see { margin: 0; padding: 8px 0; border-bottom: 1px solid var(--kp-line); display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: var(--type-label); color: var(--kp-ink-2); }
 .kp-see-label { color: var(--kp-mute); letter-spacing: .04em; margin-left: 2px; }
 .kp-see-label + .kp-see-label, .kp-see-link + .kp-see-label, .kp-see-item + .kp-see-label { margin-left: 10px; }
-.kp-see-item { font-size: 15px; color: var(--kp-ink); }
+.kp-see-item { font-size: var(--type-control); color: var(--kp-ink); }
 
 /* a leech (CARD_CONTRACT_V2 §4): the repair ladder after tier one, before the folds, in order; quiet
    (line and ink-2), the lapse count a state chip */
 .kp-ladder { border: 1px solid var(--kp-line); border-radius: var(--radius-card, 4px); padding: 10px 12px; margin-top: 4px; display: grid; gap: 8px; }
-.kp-ladder-head { margin: 0; font-size: 14px; color: var(--kp-ink-2); display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
+.kp-ladder-head { margin: 0; font-size: var(--type-chrome); color: var(--kp-ink-2); display: flex; align-items: center; flex-wrap: wrap; gap: 2px; }
 .kp-ladder-n { margin: 0 4px; font-family: var(--kp-num); font-variant-numeric: tabular-nums; }
 .kp-ladder-steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
 .kp-ladder-step { width: 100%; min-height: 48px; display: grid; justify-items: start; gap: 1px; padding: 6px 12px; text-align: left; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); }
-.kp-ladder-step b { font-size: 15px; }
-.kp-ladder-step small { font-size: 12px; color: var(--kp-ink-2); }
+.kp-ladder-step b { font-size: var(--type-control); }
+.kp-ladder-step small { font-size: var(--type-caption); color: var(--kp-ink-2); }
 .kp-ladder-step:disabled { cursor: default; opacity: 0.55; }
 .kp-ladder-keep { justify-self: start; padding: 6px 2px; min-height: 36px; }
 /* a repaired card's front hint: marked as a repair, this card only */
-.kp-rhint { margin: 0; display: flex; align-items: baseline; gap: 8px; font-size: 16px; color: var(--kp-ink-2); }
-.kp-rhint-label { font-size: 11px; color: var(--kp-mute); border: 1px dashed currentColor; border-radius: var(--radius-card, 4px); padding: 0 4px; }
+.kp-rhint { margin: 0; display: flex; align-items: baseline; gap: 8px; font-size: var(--type-body); color: var(--kp-ink-2); }
+.kp-rhint-label { font-size: var(--type-caption); color: var(--kp-mute); border: 1px dashed currentColor; border-radius: var(--radius-card, 4px); padding: 0 4px; }
 /* 削除: quiet, one tap, at the right end of the study top bar (44px, like ✕); undone from the toast */
-.kp-delete { flex: none; height: 44px; padding: 0 12px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-ink-2); font-size: 13px; }
+/* 削除 (Hfix-1B): the back's last quiet row, after the folds, its one word at the row's end; 44px to touch; never on a front,
+   never in the top bar */
+.kp-card-tools { display: flex; justify-content: flex-end; margin: 2px 0 -10px; }
+/* the foot's band (mount.js footBand) is the app's focus room's (editorial.css); a standalone page draws none */
+.kp-foot-band { display: none; }
+.kp-delete { flex: none; min-height: 44px; padding: 0 2px; border: 0; border-radius: 0; background: none; color: var(--kp-ink-2); font-size: var(--type-label); letter-spacing: 0.02em; text-decoration: underline; text-decoration-color: var(--kp-line); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .kp-toast.is-info { border-color: var(--kp-line); grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
 .kp-seg button:disabled { opacity: 0.5; cursor: default; }
 
 /* zoom: 全文 or 焦点 (the sentences around the target dimmed, never removed) */
 .kp-zoom { margin-left: auto; display: inline-flex; border: 1px solid var(--kp-line); border-radius: var(--radius-control, 6px); position: relative; z-index: 1; } /* its hit area stays above the passage, even while the readings fade in */
-.kp-zoom-btn { position: relative; border: 0; background: none; border-radius: var(--radius-control, 6px); font-size: 12px; padding: 2px 10px; min-height: 28px; color: var(--kp-ink-2); }
+.kp-zoom-btn { position: relative; border: 0; background: none; border-radius: var(--radius-control, 6px); font-size: var(--type-caption); padding: 2px 10px; min-height: 28px; color: var(--kp-ink-2); }
 /* 44px touch targets without a bigger look: the hit area reaches past the drawn button */
 .kp-zoom-btn::after, .kp-rule-x::after { content: ''; position: absolute; inset: -8px 0; }
 .kp-rule-x::after { inset: -7px; } /* from inside the 1px border: 30 + 14 */
@@ -3850,25 +3864,25 @@
 .kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'] .kp-more { display: inline-flex; }
 /* the ⋯ keeps its own gutter (44px pill + gap), open or folded, so it never sits on a glyph */
 .kp-card[data-zoom='focus'] .kp-ctx[data-clip='1'] .kp-ctx-in { padding-right: 56px; }
-.kp-more { position: absolute; right: 0; z-index: 1; align-items: center; justify-content: center; min-width: 44px; height: 28px; padding: 0 10px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); color: var(--kp-ink-2); font-size: 16px; line-height: 1; }
+.kp-more { position: absolute; right: 0; z-index: 1; align-items: center; justify-content: center; min-width: 44px; height: 28px; padding: 0 10px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); color: var(--kp-ink-2); font-size: var(--type-body); line-height: 1; }
 .kp-ctx[data-side='before'] .kp-more { top: 0; }
 .kp-ctx[data-side='after'] .kp-more { bottom: 0; }
 .kp-more::after { content: ''; position: absolute; inset: -8px 0; } /* 44px reach */
 .kp-more[aria-expanded='true'] { color: var(--kp-cyan); border-color: currentColor; }
 .kp-src a { color: inherit; text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
 
-.kp-reveal, .kp-next { width: 100%; min-height: 56px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 17px; font-weight: 700; }
+.kp-reveal, .kp-next { width: 100%; min-height: 56px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: var(--type-lead); font-weight: 700; }
 .kp-grades { display: grid; grid-template-columns: 1fr 1.2fr; gap: 8px; position: sticky; bottom: 0; z-index: 2; padding-top: 8px; padding-bottom: env(safe-area-inset-bottom); background: var(--kp-bg); }
 .kp-grade { min-height: 64px; border-radius: var(--radius-seal, 3px); border: 1px solid var(--kp-line); background: var(--kp-panel); display: grid; place-content: center; gap: 2px; }
-.kp-grade b { font-size: 15px; }
-.kp-grade small { font-family: var(--kp-num); font-size: 12px; color: var(--kp-ink-2); }
+.kp-grade b { font-size: var(--type-control); }
+.kp-grade small { font-family: var(--kp-num); font-size: var(--type-caption); color: var(--kp-ink-2); }
 .kp-again { border-color: var(--kp-red); } .kp-again b { color: var(--kp-red); }
 .kp-good { border-color: var(--kp-green); background: color-mix(in srgb, var(--kp-green) 12%, var(--kp-panel)); } .kp-good b { color: var(--kp-green); }
-.kp-swipehint { grid-column: 1 / -1; margin: 2px 0 0; text-align: center; font-size: 11px; color: var(--kp-mute); letter-spacing: 0.1em; }
-.kp-rule { grid-column: 1 / -1; margin: 0; display: flex; align-items: center; justify-content: flex-start; gap: 6px; font-size: 13px; color: var(--kp-ink-2); text-align: left; }
+.kp-swipehint { grid-column: 1 / -1; margin: 2px 0 0; text-align: center; font-size: var(--type-caption); color: var(--kp-mute); letter-spacing: 0.1em; }
+.kp-rule { grid-column: 1 / -1; margin: 0; display: flex; align-items: center; justify-content: flex-start; gap: 6px; font-size: var(--type-label); color: var(--kp-ink-2); text-align: left; }
 .kp-rule > span { flex: 1; min-width: 0; }
 /* The report control occupies the lower-right corner; keep the rule dismissal on the left. */
-.kp-rule-x { position: relative; order: -1; width: 32px; height: 32px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: 14px; flex: none; }
+.kp-rule-x { position: relative; order: -1; width: 32px; height: 32px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: var(--type-chrome); flex: none; }
 /* the one press (editorial.css owns it in the corridor): the frozen study pages stand alone, so the deck
    carries the same rule for them — every control dims to .55 at once and lets go over the press beat;
    the deck's word tokens keep their own mark */
@@ -3886,38 +3900,39 @@
   .kp-grades { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-width: 40rem; margin: 0 auto; padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); border-top: 1px solid var(--kp-line); }
   .kp-study.has-bar { padding-bottom: var(--kp-bar-h, 140px); }
 }
-.kp-undo { justify-self: center; min-width: 44px; min-height: 44px; background: none; border: 0; color: var(--kp-mute); font-size: 13px; padding: 8px; }
-.kp-verdict { margin: 0; text-align: center; font-size: 18px; font-weight: 700; }
+.kp-undo { justify-self: center; min-width: 44px; min-height: 44px; background: none; border: 0; color: var(--kp-mute); font-size: var(--type-label); padding: 8px; }
+.kp-verdict { margin: 0; text-align: center; font-size: var(--type-lead); font-weight: 700; }
 
 .kp-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.kp-choice { min-height: 56px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); font-size: 20px; font-weight: 600; overflow-wrap: anywhere; padding: 6px; }
+.kp-choice { min-height: 56px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel-2); font-size: var(--type-lead); font-weight: 600; overflow-wrap: anywhere; padding: 6px; }
 
 /* word list */
-.kp-search { width: 100%; min-height: 48px; padding: 0 14px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font: inherit; font-size: 16px; }
+.kp-search { width: 100%; min-height: 48px; padding: 0 14px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font: inherit; font-size: var(--type-body); }
 .kp-rows { display: grid; gap: 4px; }
 .kp-row { display: grid; grid-template-columns: minmax(0, 8rem) minmax(0, 1fr) auto auto; gap: 10px; align-items: center; text-align: left; padding: 10px 12px; border-radius: var(--radius-card, 4px); border: 1px solid var(--kp-line); background: var(--kp-panel); }
 .kp-rw { display: grid; min-width: 0; }
-.kp-rw b { font-size: 17px; overflow-wrap: anywhere; }
-.kp-rw small { font-size: 12px; color: var(--kp-mute); }
-.kp-rm { font-size: 13px; color: var(--kp-ink-2); min-width: 0; }
+.kp-rw b { font-size: var(--type-lead); overflow-wrap: anywhere; }
+.kp-rw small { font-size: var(--type-caption); color: var(--kp-mute); }
+.kp-rm { font-size: var(--type-label); color: var(--kp-ink-2); min-width: 0; }
 .kp-dots { display: flex; gap: 3px; }
 .kp-dots i { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--kp-mute); }
 .kp-dots i.half { background: var(--kp-amber); border-color: var(--kp-amber); }
 .kp-dots i.on { background: var(--kp-green); border-color: var(--kp-green); }
 .kp-detail { padding: 6px 12px 14px; display: grid; gap: 10px; }
-.kp-detail .kp-sentence { font-size: 20px; line-height: 1.9; }
+.kp-detail .kp-sentence { font-size: var(--type-reading); line-height: 1.9; }
 .kp-ex { display: grid; gap: 2px; border-left: 2px solid var(--kp-line); padding-left: 10px; }
 
 /* settings */
 .kp-field { display: grid; gap: 8px; }
 .kp-seg { display: flex; flex-wrap: wrap; gap: 6px; }
-.kp-seg button { min-width: 44px; min-height: 44px; padding: 0 14px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel); font-size: 14px; }
+.kp-seg button { min-width: 44px; min-height: 44px; padding: 0 14px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: var(--kp-panel); font-size: var(--type-chrome); }
 .kp-seg button.is-on { border-color: var(--kp-cyan); color: var(--kp-cyan); background: var(--kp-cyan-wash); font-weight: 700; }
-.kp-backup { width: 100%; min-height: 5rem; font-family: var(--kp-num); font-size: 11px; background: var(--kp-panel); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: var(--radius-control, 6px); padding: 8px; }
-.kp-toast { position: sticky; top: calc(8px + env(safe-area-inset-top, 0px)); z-index: 5; display: grid; gap: 8px; margin-bottom: 12px; background: var(--kp-panel-2); border: 1px solid var(--kp-red); border-radius: var(--radius-overlay, 18px); padding: 10px 16px; font-size: 14px; line-height: 1.5; }
-.kp-toast-btn { justify-self: start; min-height: 40px; padding: 0 14px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: 14px; font-weight: 700; }
+.kp-backup { width: 100%; min-height: 5rem; font-family: var(--kp-num); font-size: var(--type-caption); background: var(--kp-panel); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: var(--radius-control, 6px); padding: 8px; }
+.kp-toast { position: sticky; top: calc(8px + env(safe-area-inset-top, 0px)); z-index: 5; display: grid; gap: 8px; margin-bottom: 12px; background: var(--kp-panel-2); border: 1px solid var(--kp-red); border-radius: var(--radius-overlay, 18px); padding: 10px 16px; font-size: var(--type-chrome); line-height: 1.5; }
+.kp-toast-btn { justify-self: start; min-height: 40px; padding: 0 14px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-cyan); background: var(--kp-cyan-wash); color: var(--kp-cyan); font-size: var(--type-chrome); font-weight: 700; }
 
 @media (max-width: 420px) {
+  .kp-sentence { font-size: var(--type-section); }
   .kp-row { grid-template-columns: minmax(0, 6rem) minmax(0, 1fr) auto; }
   .kp-row .kp-dots { display: none; }
 }
@@ -3928,7 +3943,6 @@
 /* 研ぎ出し: each reading surfaces as the polish band passes it (mount.js polish() sets --kp-rt-delay, 0–60 ms, by place) */
 .kp-sentence.kp-enter rt { animation: kp-fade var(--motion-ma, 120ms) var(--ease-enter, ease-out) var(--kp-rt-delay, 40ms) both; }
 .kp-answer.kp-enter { animation: kp-rise var(--motion-fast, 180ms) var(--ease-enter, ease-out) both; }
-.kp-card.kp-arrive { animation: kp-arrive var(--motion-fast, 180ms) var(--ease-enter, ease-out) both; }
 .kp-study { position: relative; overflow-anchor: none; }
 .kp .kp-study.kp-reveal-hold { position: fixed; z-index: 5; margin: 0; pointer-events: none; background: var(--kp-stage); animation: kp-fade-out var(--motion-ma, 120ms) linear both; }
 .kp-reveal-hold *, .kp-reveal-hold *::before, .kp-reveal-hold *::after { pointer-events: none !important; animation: none !important; transition: none !important; }
@@ -3936,15 +3950,27 @@
 .kp-screen-hold *, .kp-screen-hold *::before, .kp-screen-hold *::after { pointer-events: none !important; animation: none !important; transition: none !important; }
 .kp .kp-screen-enter { animation: kp-fade var(--motion-fast, 180ms) var(--ease-enter, ease-out) both; }
 .kp .kp-answer .kp-fold[open] > :not(summary) { animation: kp-rise var(--motion-quick, 160ms) var(--ease-enter, ease-out) both; }
-.kp-ghost { position: absolute; margin: 0; pointer-events: none; z-index: 1; }
-.kp-ghost.kp-out-good { animation: kp-out-good var(--motion-ma, 120ms) var(--ease-exit, ease-in) both; }
-.kp-ghost.kp-out-again { animation: kp-out-again var(--motion-ma, 120ms) var(--ease-exit, ease-in) both; }
+/* F · the next card arrives the way the last one left (contract §3): one pair of keyframes. A grade sends the
+   answered card 24 px the way it was thrown — Good to the right, as the swipe throws it; Again to the left — while
+   it fades (card-leave), and the next card comes in on the same line of travel, from the other side, once the copy
+   has gone (card-arrive, after the half-beat), so the deck moves one way, one card at a time. No grade (the first card) is a plain fade. Reduced motion: no
+   ghost and no travel, the next card fades in 100 ms (below). */
+/* the leaving copy stands where the answered card stood, over the stage (its top and left are set from the card's own
+   box); it is still a .kp-card, whose position: relative (.kp .kp-card) outranked a lone .kp-ghost and left the copy in
+   the flow, under the next card and below the screen, so the leave was never seen (base 6eb89b85 too) */
+.kp .kp-card.kp-ghost, .kp-ghost { position: absolute; margin: 0; pointer-events: none; z-index: 1; animation: card-leave var(--motion-quick, 160ms) var(--ease-exit, ease-in) both; }
+.kp-ghost.kp-out-good { --card-dx: 24px; }
+.kp-ghost.kp-out-again { --card-dx: -24px; }
+/* one card at a time (the house's "never two layers of text"): the copy has drifted its 24 px and gone by the half-beat,
+   and only then does the next card come in, on the same line of travel, over its own --motion-quick */
+.kp-card.kp-arrive { animation: card-arrive var(--motion-quick, 160ms) var(--ease-enter, ease-out) calc(var(--motion-quick, 160ms) / 2) both; }
+.kp-study[data-advance='good'] .kp-card.kp-arrive { --card-dx: -24px; }
+.kp-study[data-advance='again'] .kp-card.kp-arrive { --card-dx: 24px; }
 @keyframes kp-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes kp-fade-out { from { opacity: 1; } to { opacity: 0; } }
 @keyframes kp-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-@keyframes kp-arrive { from { opacity: 0.4; transform: scale(0.98); } to { opacity: 1; transform: none; } }
-@keyframes kp-out-good { to { opacity: 0; transform: translateX(24px); } }
-@keyframes kp-out-again { to { opacity: 0; transform: translateX(-24px); } }
+@keyframes card-leave { 50%, to { opacity: 0; transform: translateX(var(--card-dx, 0px)); } }
+@keyframes card-arrive { from { opacity: 0; transform: translateX(var(--card-dx, 0px)); } }
 /* Reduced motion keeps the held frame, with a short opacity crossfade and no movement. */
 /* the deck's own reduced-motion contract (it stands alone on the frozen study pages, outside the corridor's one rule) */
 @media (prefers-reduced-motion: reduce) {
@@ -3967,7 +3993,7 @@
 }
 .kp-method { margin: 4px 0; border: 1px solid var(--kp-line, #26303b); border-radius: var(--radius-card, 4px); padding: 10px 14px; }
 .kp-method summary { cursor: pointer; font-weight: 700; color: var(--kp-ink); }
-.kp-method p { margin: 8px 0 0; font-size: 14px; line-height: 1.65; color: var(--kp-ink-2); }
+.kp-method p { margin: 8px 0 0; font-size: var(--type-chrome); line-height: 1.65; color: var(--kp-ink-2); }
 .kp-blank { color: var(--kp-cyan); }
 
 /* tap → define → 覚える, after the reveal only (CARD_CONTRACT_V2 §3, STANDARD A44). A word of the
@@ -3985,13 +4011,13 @@
    the standalone study pages' only word card */
 .kp-pop { position: fixed; z-index: 40; width: min(320px, calc(100vw - 32px)); background: var(--kp-panel-2); color: var(--kp-ink); border: 1px solid var(--kp-line); border-radius: var(--radius-overlay, 18px); padding: 10px 12px 12px; display: grid; gap: 6px; box-shadow: var(--kp-depth); animation: kp-fade var(--motion-ma, 120ms) var(--ease-enter, ease-out) both; }
 .kp-pop-head { display: flex; align-items: baseline; gap: 8px; }
-.kp-pop-term { font-size: 20px; }
-.kp-pop-reading { font-size: 14px; color: var(--kp-ink-2); flex: 1; }
-.kp-pop-x { margin-left: auto; position: relative; width: 32px; height: 32px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: 14px; flex: none; align-self: center; }
+.kp-pop-term { font-size: var(--type-lead); }
+.kp-pop-reading { font-size: var(--type-chrome); color: var(--kp-ink-2); flex: 1; }
+.kp-pop-x { margin-left: auto; position: relative; width: 32px; height: 32px; border-radius: var(--radius-control, 6px); border: 1px solid var(--kp-line); background: none; color: var(--kp-mute); font-size: var(--type-chrome); flex: none; align-self: center; }
 .kp-pop-x::after { content: ''; position: absolute; inset: -7px; }
-.kp-pop-def { margin: 0; font-size: 15px; line-height: 1.6; }
+.kp-pop-def { margin: 0; font-size: var(--type-control); line-height: 1.6; }
 .kp-pop .kp-fold > summary { min-height: 36px; }
-.kp-pop-note { margin: 0; font-size: 11px; line-height: 1.5; color: var(--kp-mute); }
+.kp-pop-note { margin: 0; font-size: var(--type-caption); line-height: 1.5; color: var(--kp-mute); }
 
 /* ---------------------------------------------------------------- the material's second set
  * The same meaning per colour in every world (accent = the asked word, red/green = again/good). */
@@ -3999,13 +4025,13 @@
   --kp-noun: var(--kp-cyan); --kp-verb: #93301a; --kp-adj: #805300; --kp-adv: #6b4aa8; --kp-expr: #296944; --kp-sound: #a42f6b;
   /* the study stage (the ground around the card while studying) is the room's lacquer, Learn's own
    * proscenium (--color-lacquer), and the card is the lit paper on it; its text is the lacquer's ink.
-   * --kp-shu is the 朱 of the marked word's brackets, the rail and the slash on もう一度 (never text):
+   * --kp-shu is the 朱 of the marked word's wash, the rail and the slash on もう一度 (never text):
    * the world's seal red. Measured: contrast-kotoba stage row */
-  --kp-stage: var(--color-lacquer, #141a28); --kp-stage-ink: var(--color-lacquer-ink, #e9e2d2); --kp-stage-mute: #b5ad9c; --kp-shu: var(--color-seal, #c4401f);
+  --kp-stage: var(--color-lacquer, #141a28); --kp-stage-ink: var(--color-lacquer-ink, #e9e2d2); --kp-stage-mute: color-mix(in srgb, var(--color-lacquer-ink, #e9e2d2) 76%, var(--world-ground, var(--color-lacquer, #141a28))); --kp-shu: var(--color-seal, #c4401f);
   /* the dock (the ground under 答えを見る and the grade pads, and the page below the last card) is the
    * stage; the whole study screen is the stage, lit softly from the top. Measured: contrast-kotoba dock row */
   --kp-dock: var(--kp-stage); --kp-dock-ink: var(--kp-stage-ink); --kp-dock-mute: var(--kp-stage-mute);
-  --kp-study-ground: radial-gradient(130% 60% at 50% 0%, rgba(233, 226, 210, 0.07), transparent 72%), var(--kp-stage); }
+  /* bokashi: urushi — the deck's study ground — light: the world's raised paper held as a faint lamp at the top of its lacquer stage */ --kp-study-ground: radial-gradient(130% 60% at 50% 0%, color-mix(in srgb, var(--world-paper) 7%, transparent), transparent 72%), var(--kp-stage); }
 /* depth: the card is a physical object; its surface stays plain so the ruby reads cleanly
  * (the texture is on the page, see .kp above) */
 .kp .kp-card { background-color: var(--kp-panel); background-image: none; box-shadow: var(--kp-depth); }
@@ -4018,14 +4044,14 @@
 .kp-pos-adv .kp-target, .kp-pos-adv .kp-term { color: var(--kp-adv); }
 .kp-pos-expr .kp-target, .kp-pos-expr .kp-term { color: var(--kp-expr); }
 .kp-pos-sound .kp-target, .kp-pos-sound .kp-term { color: var(--kp-sound); }
-.kp-posbadge { font-size: 12px; padding: 1px 8px; border-radius: var(--radius-seal, 3px); border: 1px solid currentColor; margin-left: 8px; vertical-align: middle; }
+.kp-posbadge { font-size: var(--type-caption); padding: 1px 8px; border-radius: var(--radius-seal, 3px); border: 1px solid currentColor; margin-left: 8px; vertical-align: middle; }
 
 /* kanji anatomy on the back: each character large, with its meaning and parts */
 .kp-kanji { display: flex; gap: 10px; flex-wrap: wrap; margin: 4px 0 2px; }
 .kp-kj { display: grid; grid-template-columns: auto 1fr; gap: 0 10px; align-items: center; padding: 8px 12px; border-radius: var(--radius-card, 4px); background: var(--kp-panel-2); border: 1px solid var(--kp-line); min-width: 9.5rem; }
-.kp-kj b { grid-row: span 2; font-size: 40px; line-height: 1; font-weight: 600; }
-.kp-kj span { font-size: 13px; color: var(--kp-ink-2); }
-.kp-kj small { font-size: 12px; color: var(--kp-mute); }
+.kp-kj b { grid-row: span 2; font-size: var(--type-headword); line-height: 1; font-weight: 600; }
+.kp-kj span { font-size: var(--type-label); color: var(--kp-ink-2); }
+.kp-kj small { font-size: var(--type-caption); color: var(--kp-mute); }
 
 .kp-pos-noun .kp-posbadge { color: var(--kp-noun); }
 .kp-pos-verb .kp-posbadge { color: var(--kp-verb); }
@@ -4034,12 +4060,12 @@
 .kp-pos-expr .kp-posbadge { color: var(--kp-expr); }
 .kp-pos-sound .kp-posbadge { color: var(--kp-sound); }
 /* a written passage's register and topic (CARD_CONTRACT_V2 §6): text chips, a size down, no hue */
-.kp-chip-sm { font-size: 11px; padding: 2px 6px; }
+.kp-chip-sm { font-size: var(--type-caption); padding: 2px 6px; }
 
 /* Full English metadata stays on one phone row without abbreviating the labels. */
 @media (max-width: 640px) {
   .kp-chips { gap: 3px; }
-  .kp-chip { font-size: 11px; padding-inline: 2px; }
+  .kp-chip { font-size: var(--type-caption); padding-inline: 2px; }
   .kp-chip-sm { padding-inline: 0; }
 }
 
@@ -4058,7 +4084,7 @@
 .kp[data-host='none'] .kp-top-study { background: var(--kp-stage); }
 
 /* the top bar: ‹ (the house's one back glyph), the rail (one segment per card on a short sitting), the count, 削除 */
-.kp-top-study .kp-icon { background: transparent; border-color: transparent; color: var(--kp-stage-ink); font-size: 20px; font-weight: 300; }
+.kp-top-study .kp-icon { background: transparent; border-color: transparent; color: var(--kp-stage-ink); font-size: var(--type-lead); font-weight: 300; }
 .kp-top-study .kp-icon:focus-visible { border-color: var(--kp-stage-ink); }
 .kp-top-study .kp-progress { height: 3px; border-radius: 0; background: color-mix(in srgb, var(--kp-stage-ink) 24%, transparent); }
 .kp-top-study .kp-progress[style*='--kp-n'] {
@@ -4066,8 +4092,7 @@
   mask-image: repeating-linear-gradient(90deg, #000 0 calc(100% / var(--kp-n) - 4px), transparent 0 calc(100% / var(--kp-n)));
 }
 .kp-top-study .kp-progress i { background: var(--kp-stage-ink); }
-.kp-top-study .kp-count { color: var(--kp-stage-ink); font-size: 13px; letter-spacing: 0.12em; min-width: 3.4em; text-align: right; }
-.kp-top-study .kp-delete { border-color: color-mix(in srgb, var(--kp-stage-ink) 18%, transparent); color: var(--kp-stage-ink); border-radius: var(--radius-seal, 3px); font-size: 12px; letter-spacing: 0.06em; padding: 0 10px; }
+.kp-top-study .kp-count { color: var(--kp-stage-ink); font-size: var(--type-label); letter-spacing: 0.12em; min-width: 3.4em; text-align: right; }
 
 /* the sheet: nearly square paper, a hairline edge, relief, トンボ registration marks in its
  * corners (a pseudo-element, so the card's own surface stays plain under the ruby) */
@@ -4075,6 +4100,7 @@
 .kp .kp-card::before {
   content: ''; position: absolute; inset: 8px; pointer-events: none; opacity: 0.55;
   --reg: color-mix(in srgb, var(--kp-ink) 55%, transparent);
+  /* drawn: the card's registration marks (見当), eight hairlines of the deck's ink */
   background:
     linear-gradient(var(--reg), var(--reg)) 0 5px / 11px 1px no-repeat, linear-gradient(var(--reg), var(--reg)) 5px 0 / 1px 11px no-repeat,
     linear-gradient(var(--reg), var(--reg)) 100% 5px / 11px 1px no-repeat, linear-gradient(var(--reg), var(--reg)) calc(100% - 5px) 0 / 1px 11px no-repeat,
@@ -4084,8 +4110,8 @@
 
 /* the card's head: its one instruction as an eyebrow, then the facts as a quiet slip line */
 .kp-chips { align-items: center; row-gap: 8px; }
-.kp-eyebrow { flex: 0 0 100%; order: -1; display: flex; align-items: center; gap: 10px; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--kp-mute); }
-.kp-eyebrow:lang(ja) { font-size: 12px; letter-spacing: 0.22em; text-transform: none; }
+.kp-eyebrow { flex: 0 0 100%; order: -1; display: flex; align-items: center; gap: 10px; font-size: var(--type-caption); letter-spacing: 0.16em; text-transform: uppercase; color: var(--kp-mute); }
+.kp-eyebrow:lang(ja) { font-size: var(--type-caption); letter-spacing: 0.22em; text-transform: none; }
 .kp-eyebrow::before { content: ''; width: 18px; height: 2px; background: var(--kp-shu); flex: none; }
 .kp .kp-chip { border-radius: var(--radius-seal, 3px); border-color: color-mix(in srgb, var(--kp-ink) 16%, transparent); }
 .kp .kp-kindchip, .kp .kp-st-learn, .kp .kp-st-grow, .kp .kp-st-known, .kp .kp-st-hard { border-color: currentColor; }
@@ -4097,24 +4123,22 @@
  * Fronts have no tap nodes and keep their original compact line spacing. */
 .kp .kp-sentence:has(.kp-tok) { line-height: 2.5; }
 .kp .kp-card[data-zoom='focus'] .kp-sentence:has(.kp-tok) .kp-ctx:not([data-open='1']) .kp-ctx-in { max-height: 5em; }
-/* readings never under 11px; no tracking of their own, so a long reading stretches its base as little as it can */
-.kp .kp-sentence rt { font-family: var(--kp-jp); font-size: max(11px, 0.5em); letter-spacing: -0.02em; }
-/* the marked word: 朱 corner brackets and a faint wash (backgrounds, so its ::before keeps the 44px
- * reach it has as a tap target on the back); its own colour stays its part of speech */
+/* the marked word: a wash of 朱 under its ink (a background, so its ::before keeps the 44px reach it has as a tap target
+ * on the back); its own colour stays its part of speech. No corner marks (Hfix-1B, H-yoru-01; §7 line 38 "no corner marks",
+ * S's class M): the two 朱 corner brackets that framed it were the crop-mark ornament John asked to go */
 .kp .kp-target {
   padding: 0 0.16em; margin: 0 0.04em; text-decoration-thickness: 1.5px; -webkit-box-decoration-break: clone; box-decoration-break: clone;
-  background:
-    linear-gradient(var(--kp-shu), var(--kp-shu)) 0 0 / 0.36em 2px no-repeat, linear-gradient(var(--kp-shu), var(--kp-shu)) 0 0 / 2px 0.36em no-repeat,
-    linear-gradient(var(--kp-shu), var(--kp-shu)) 100% 100% / 0.36em 2px no-repeat, linear-gradient(var(--kp-shu), var(--kp-shu)) 100% 100% / 2px 0.36em no-repeat,
-    color-mix(in srgb, var(--kp-shu) 10%, transparent);
+  background: color-mix(in srgb, var(--kp-shu) 14%, transparent);
+  border-radius: var(--radius-seal, 3px);
 }
 .kp .kp-blank { border-bottom-color: var(--kp-shu); background: color-mix(in srgb, var(--kp-shu) 9%, transparent); border-radius: var(--radius-seal, 3px) var(--radius-seal, 3px) 0 0; }
-.kp .kp-taphint { font-size: 11.5px; letter-spacing: 0.14em; padding-top: 12px; border-top: 1px solid var(--kp-line); }
+.kp .kp-taphint { font-size: var(--type-caption); letter-spacing: 0.14em; padding-top: 12px; border-top: 1px solid var(--kp-line); }
 
 /* 研ぎ出し: one polish band crosses the card on the reveal (transform and opacity only; removed after) */
 .kp-polish { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit; z-index: 1; }
 .kp-polish::before {
   content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; width: 55%; opacity: 0;
+  /* bokashi: atenashi — the reveal's polish band (研ぎ出し) — brush: 朱 and the deck's ink wiped once across the card */
   background: linear-gradient(100deg, transparent 0 26%, color-mix(in srgb, var(--kp-shu) 12%, transparent) 38%, color-mix(in srgb, var(--kp-ink) 14%, transparent) 47%, color-mix(in srgb, var(--kp-ink) 6%, transparent) 56%, transparent 70%);
   animation: kp-polish var(--motion-fast, 180ms) var(--ease-ink, ease-in-out) both;
 }
@@ -4123,61 +4147,61 @@
 /* the back: the headword in Shippori 800 with its reading beside it, the Japanese definition in Mincho */
 .kp .kp-answer { gap: 6px; padding-top: 10px; }
 .kp .kp-word { column-gap: 12px; row-gap: 2px; }
-.kp .kp-word .kp-term { font-family: var(--kp-head); font-weight: 800; font-size: 34px; line-height: 1.15; letter-spacing: 0.04em; }
-.kp .kp-word .kp-reading { font-size: 16px; letter-spacing: 0.14em; color: var(--kp-ink-2); }
-.kp .kp-word .kp-posbadge { margin-left: auto; border-radius: var(--radius-seal, 3px); font-size: 11.5px; letter-spacing: 0.08em; }
-.kp .kp-def { font-family: var(--kp-serif); font-size: 18px; line-height: 1.7; letter-spacing: 0.02em; }
+.kp .kp-word .kp-term { font-family: var(--kp-head); font-weight: 800; font-size: var(--type-display); line-height: 1.15; letter-spacing: 0.04em; }
+.kp .kp-word .kp-reading { font-size: var(--type-body); letter-spacing: 0.14em; color: var(--kp-ink-2); }
+.kp .kp-word .kp-posbadge { margin-left: auto; border-radius: var(--radius-seal, 3px); font-size: var(--type-caption); letter-spacing: 0.08em; }
+.kp .kp-def { font-family: var(--kp-serif); font-size: var(--type-lead); line-height: 1.7; letter-spacing: 0.02em; }
 .kp .kp-note { font-family: var(--kp-serif); }
 /* 英語: the first fold reads as a dashed slip you can lift ("Show English") */
 .kp .kp-folds { margin-top: 10px; border-top: 0; gap: 0; }
 .kp .kp-f-gloss { border: 1px dashed color-mix(in srgb, var(--kp-ink) 30%, transparent); border-radius: var(--radius-seal, 3px); padding: 0 14px; margin-bottom: 8px; }
-.kp .kp-f-gloss > summary { min-height: 44px; font-size: 14px; color: var(--kp-ink); font-weight: 600; letter-spacing: 0.02em; }
+.kp .kp-f-gloss > summary { min-height: 44px; font-size: var(--type-chrome); color: var(--kp-ink); font-weight: 600; letter-spacing: 0.02em; }
 .kp .kp-f-gloss > summary::before { content: '＋'; color: var(--kp-mute); }
 .kp .kp-f-gloss[open] > summary::before { content: '－'; }
 .kp .kp-fold > summary { min-height: 44px; }
-.kp .kp-gloss { font-family: var(--kp-serif); font-style: italic; font-size: 16px; }
+.kp .kp-gloss { font-family: var(--kp-serif); font-style: italic; font-size: var(--type-body); }
 
 /* 漢字の形と意味: each kanji on a 田字格 plate (glyph, meaning, strokes, parts); a part two of the
  * word's kanji share is lit, and the bracket under the plates joins them (deck kanji data only) */
 .kp .kp-kanji { gap: 8px; }
 .kp .kp-kanji > * { flex: 1 1 100%; min-width: 0; }
 .kp .kp-kj { border-radius: var(--radius-seal, 3px); grid-template-columns: 58px 1fr; padding: 8px 10px 8px 8px; gap: 2px 10px; background: color-mix(in srgb, var(--kp-panel-2) 70%, transparent); }
-.kp .kp-kj b { width: 58px; height: 58px; display: grid; place-items: center; font-family: var(--kp-head); font-weight: 800; font-size: 40px; border: 1px solid var(--kp-line);
-  background: linear-gradient(var(--kp-line), var(--kp-line)) 50% 0 / 1px 100% no-repeat, linear-gradient(var(--kp-line), var(--kp-line)) 0 50% / 100% 1px no-repeat, var(--kp-panel); }
-.kp .kp-kj > span { font-size: 14px; font-weight: 600; color: var(--kp-ink); }
-.kp-kj-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-size: 12px; color: var(--kp-mute); }
-.kp-kj-parts i { font-style: normal; font-family: var(--kp-head); font-weight: 800; font-size: 17px; color: var(--kp-ink); padding: 0 3px; border-radius: var(--radius-seal, 3px); }
+.kp .kp-kj b { width: 58px; height: 58px; display: grid; place-items: center; font-family: var(--kp-head); font-weight: 800; font-size: var(--type-headword); border: 1px solid var(--kp-line);
+  /* drawn: the kanji box's cross guide (十字), two hairlines */ background: linear-gradient(var(--kp-line), var(--kp-line)) 50% 0 / 1px 100% no-repeat, linear-gradient(var(--kp-line), var(--kp-line)) 0 50% / 100% 1px no-repeat, var(--kp-panel); }
+.kp .kp-kj > span { font-size: var(--type-chrome); font-weight: 600; color: var(--kp-ink); }
+.kp-kj-parts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font-size: var(--type-caption); color: var(--kp-mute); }
+.kp-kj-parts i { font-style: normal; font-family: var(--kp-head); font-weight: 800; font-size: var(--type-lead); color: var(--kp-ink); padding: 0 3px; border-radius: var(--radius-seal, 3px); }
 .kp-kj-parts i[data-shared] { color: var(--kp-cyan); box-shadow: 0 0 0 1px currentColor; }
 .kp .kp-anatomy-door { display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; }
 .kp .kp-anatomy-kanji { grid-row: span 2; width: 58px; height: 58px; }
 .kp .kp-anatomy-component { vertical-align: middle; }
 .kp .kp-anatomy-door:focus-visible { outline: 2px solid var(--kp-cyan); outline-offset: 2px; }
-.kp-kshare { position: relative; margin: 6px 0 2px; padding: 12px 10px 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-size: 13px; color: var(--kp-ink-2); }
+.kp-kshare { position: relative; margin: 6px 0 2px; padding: 12px 10px 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-size: var(--type-label); color: var(--kp-ink-2); }
 .kp-kshare::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 8px; border: 1.5px solid var(--kp-cyan); border-top: 0; border-radius: 0 0 var(--radius-seal, 3px) var(--radius-seal, 3px); opacity: 0.8; }
-.kp-kshare b { font-family: var(--kp-head); font-weight: 800; font-size: 20px; color: var(--kp-cyan); }
-.kp-kshare span[lang='ja'] { font-family: var(--kp-head); font-weight: 800; font-size: 16px; color: var(--kp-ink); }
+.kp-kshare b { font-family: var(--kp-head); font-weight: 800; font-size: var(--type-reading); color: var(--kp-cyan); }
+.kp-kshare span[lang='ja'] { font-family: var(--kp-head); font-weight: 800; font-size: var(--type-body); color: var(--kp-ink); }
 .kp .kp-kfam-c { font-family: var(--kp-head); font-weight: 800; }
 .kp .kp-fam, .kp .kp-see-link { border-radius: var(--radius-seal, 3px); font-family: var(--kp-serif); }
 
 /* under the card: 答えを見る as a washi slab; the grade pads */
-.kp .kp-reveal, .kp .kp-next { min-height: 60px; border-radius: var(--radius-card, 4px); border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font-size: 18px; letter-spacing: 0.06em; box-shadow: var(--kp-depth); }
+.kp .kp-reveal, .kp .kp-next { min-height: 60px; border-radius: var(--radius-card, 4px); border: 1px solid var(--kp-line); background: var(--kp-panel); color: var(--kp-ink); font-size: var(--type-lead); letter-spacing: 0.06em; box-shadow: var(--kp-depth); }
 .kp .kp-verdict { justify-self: center; padding: 6px 16px; border-radius: var(--radius-seal, 3px); background: var(--kp-panel); }
 .kp .kp-undo { color: var(--kp-dock-mute); }
 .kp .kp-grades { background: var(--kp-dock); column-gap: 10px; }
 .kp .kp-grade { position: relative; min-height: 64px; border-radius: var(--radius-card, 4px); grid-auto-flow: row; box-shadow: var(--kp-depth); }
-.kp .kp-grade b { font-size: 17px; letter-spacing: 0.04em; }
-.kp .kp-grade small { font-size: 12.5px; letter-spacing: 0.06em; }
+.kp .kp-grade b { font-size: var(--type-lead); letter-spacing: 0.04em; }
+.kp .kp-grade small { font-size: var(--type-label); letter-spacing: 0.06em; }
 .kp .kp-again { border-color: var(--kp-line); border-top: 2px solid var(--kp-red); }
-.kp-grade-seal { font-family: var(--font-seal, 'Kaisei Tokumin', serif); font-size: 24px; line-height: 1; justify-self: center; }
+.kp-grade-seal { font-family: var(--font-seal, 'Kaisei Tokumin', serif); font-size: var(--type-seal); line-height: 1; justify-self: center; }
 .kp-again .kp-grade-seal { color: var(--kp-red); }
 .kp-good .kp-grade-seal { color: var(--kp-green); }
 /* in 日本語 the seal is the pad's face and the word a quiet caption under it */
-.kp-grade:has(.kp-grade-seal) b { font-size: 12px; letter-spacing: 0.1em; }
+.kp-grade:has(.kp-grade-seal) b { font-size: var(--type-caption); letter-spacing: 0.1em; }
 /* the first back of a deck's first sitting only: the gesture as one quiet mono caption, the rule as one
  * line of small print with a bare ×. No boxes, nothing in the pads' way. */
-.kp .kp-swipehint { color: var(--kp-dock-mute); font-family: var(--kp-num); font-size: 10.5px; letter-spacing: 0.16em; margin: 0; }
-.kp .kp-rule { color: var(--kp-dock-ink); font-size: 12.5px; line-height: 1.45; gap: 2px; }
-.kp .kp-rule-x { color: var(--kp-dock-mute); border-color: transparent; background: none; font-size: 15px; }
+.kp .kp-swipehint { color: var(--kp-dock-mute); font-family: var(--kp-num); font-size: var(--type-caption); letter-spacing: 0.16em; margin: 0; }
+.kp .kp-rule { color: var(--kp-dock-ink); font-size: var(--type-label); line-height: 1.45; gap: 2px; }
+.kp .kp-rule-x { color: var(--kp-dock-mute); border-color: transparent; background: none; font-size: var(--type-control); }
 @media (max-width: 640px) {
   .kp .kp-grades { border-top-color: color-mix(in srgb, var(--kp-dock-ink) 16%, transparent); }
   /* the last lines of the passage and the folds stay above the pinned pads: the reserved room is
@@ -4188,6 +4212,7 @@
 /* もう一度: a brief 朱 slash crosses the screen as the answered card leaves (transform and opacity only) */
 .kp-slash {
   position: fixed; left: 4%; right: 4%; top: 44%; height: 3px; z-index: 3; pointer-events: none; border-radius: var(--radius-seal, 3px);
+  /* bokashi: atenashi — the もう一度 slash — brush: one 朱 stroke across the screen, its ends lifting */
   background: linear-gradient(90deg, transparent, var(--kp-shu) 10%, var(--kp-shu) 85%, transparent);
   transform-origin: left center; transform: rotate(-12deg) scaleX(0); opacity: 0;
   animation: kp-slash var(--motion-fast, 180ms) var(--ease-ink, ease-in-out) both;
@@ -4196,22 +4221,22 @@
 
 /* the session close: the surface is clear */
 .kp-done { gap: 18px; }
-.kp .kp-done .kp-title { font-family: var(--kp-jp); font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--kp-mute); }
+.kp .kp-done .kp-title { font-family: var(--kp-jp); font-size: var(--type-caption); font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--kp-mute); }
 .kp .kp-done .kp-title:lang(ja) { text-transform: none; letter-spacing: 0.24em; }
-.kp-done-title { margin: 0; font-family: var(--kp-head); font-weight: 800; font-size: clamp(30px, 9vw, 44px); line-height: 1.2; letter-spacing: 0.01em; color: var(--kp-ink); text-wrap: balance; word-break: keep-all; overflow-wrap: anywhere; }
+.kp-done-title { margin: 0; font-family: var(--kp-head); font-weight: 800; font-size: clamp(var(--type-hero), 9vw, var(--type-headword)); line-height: 1.2; letter-spacing: 0.01em; color: var(--kp-ink); text-wrap: balance; word-break: keep-all; overflow-wrap: anywhere; }
 .kp-rise { position: relative; display: flex; flex-wrap: wrap; gap: 10px 22px; padding: 4px 2px 8px; }
-.kp-rise-w { font-family: var(--kp-head); font-weight: 800; font-size: 17px; color: var(--kp-ink-2); animation: kp-rise-up var(--motion-fast, 180ms) var(--ease-enter, ease-out) calc(40ms + var(--i, 0) * 10ms) backwards; }
+.kp-rise-w { font-family: var(--kp-head); font-weight: 800; font-size: var(--type-lead); color: var(--kp-ink-2); animation: kp-rise-up var(--motion-fast, 180ms) var(--ease-enter, ease-out) calc(40ms + var(--i, 0) * 10ms) backwards; }
 .kp-rise-w.is-again { color: var(--kp-red); }
 @keyframes kp-rise-up { from { opacity: 0.01; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 .kp-tally { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-block: 1px solid var(--kp-line); }
 .kp-tally-c { display: grid; gap: 6px; padding: 14px 12px 12px; }
 .kp-tally-c + .kp-tally-c { border-left: 1px solid var(--kp-line); }
-.kp-tally-c span { font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--kp-mute); }
-.kp-tally-c b { font-family: var(--kp-head); font-weight: 800; font-size: 38px; line-height: 1; font-variant-numeric: tabular-nums; color: var(--kp-ink); }
+.kp-tally-c span { font-size: var(--type-caption); letter-spacing: 0.14em; text-transform: uppercase; color: var(--kp-mute); }
+.kp-tally-c b { font-family: var(--kp-head); font-weight: 800; font-size: var(--type-hero); line-height: 1; font-variant-numeric: tabular-nums; color: var(--kp-ink); }
 .kp-tally-again b { color: var(--kp-red); }
-.kp-done-rate { margin: 0; display: flex; align-items: baseline; gap: 10px; font-size: 14px; color: var(--kp-ink-2); }
+.kp-done-rate { margin: 0; display: flex; align-items: baseline; gap: 10px; font-size: var(--type-chrome); color: var(--kp-ink-2); }
 .kp-done-rate b { font-family: var(--kp-num); font-variant-numeric: tabular-nums; color: var(--kp-ink); }
-.kp-done-rate span + b + span { margin-left: auto; font-family: var(--kp-num); font-size: 12.5px; color: var(--kp-mute); }
+.kp-done-rate span + b + span { margin-left: auto; font-family: var(--kp-num); font-size: var(--type-label); color: var(--kp-mute); }
 .kp-done .kp-start { border-radius: var(--radius-card, 4px); }
 
 /* the deck home: paper slips, not pills */
@@ -4219,7 +4244,7 @@
 .kp .kp-start { border-radius: var(--radius-card, 4px); letter-spacing: 0.06em; box-shadow: 0 2px 0 color-mix(in srgb, var(--kp-cyan) 55%, #000); }
 .kp .kp-start:disabled { box-shadow: none; }
 .kp .kp-title { font-family: var(--kp-head); font-weight: 800; letter-spacing: 0.03em; }
-.kp .kp-h2 { font-family: var(--kp-jp); font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase; }
+.kp .kp-h2 { font-family: var(--kp-jp); font-size: var(--type-caption); letter-spacing: 0.18em; text-transform: uppercase; }
 .kp .kp-h2:lang(ja) { text-transform: none; }
 
 /* the themes: a quiet list, not a page of settings. Hairline rows, the name in Mincho, the count in
@@ -4230,8 +4255,8 @@
 .kp .kp-group > .kp-gname { grid-column: 1; grid-row: 1; }
 .kp .kp-group > .kp-gcount { grid-column: 2; grid-row: 1; }
 .kp .kp-group > input { grid-column: 3; grid-row: 1; justify-self: end; }
-.kp .kp-gname b { font-family: var(--kp-serif); font-size: 17px; font-weight: 500; letter-spacing: 0.01em; line-height: 1.4; }
-.kp .kp-gcount { font-size: 12px; letter-spacing: 0.06em; color: var(--kp-mute); font-variant-numeric: tabular-nums; }
+.kp .kp-gname b { font-family: var(--kp-serif); font-size: var(--type-lead); font-weight: 500; letter-spacing: 0.01em; line-height: 1.4; }
+.kp .kp-gcount { font-size: var(--type-caption); letter-spacing: 0.06em; color: var(--kp-mute); font-variant-numeric: tabular-nums; }
 .kp .kp-group .kp-bar { height: 2px; border-radius: 0; background: transparent; } /* progress only: an untouched theme draws no second line */
 .kp .kp-group input { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; margin: 0; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--kp-ink) 26%, transparent); background: none; cursor: pointer; }
 .kp .kp-group input:checked {
@@ -4248,7 +4273,7 @@
 
 /* ---- the room family, every look (Bunki fix round 2): one quiet exit, a docked 答えを見る ---- */
 /* the deck home's ← is bare, like the study ✕: the page's one way out */
-.kp-home > .kp-top .kp-icon { background: transparent; border-color: transparent; font-size: 20px; font-weight: 300; }
+.kp-home > .kp-top .kp-icon { background: transparent; border-color: transparent; font-size: var(--type-lead); font-weight: 300; }
 .kp-home > .kp-top .kp-icon:focus-visible { border-color: var(--kp-line); }
 /* 答えを見る (and わからない) is docked at the foot of the screen like the grade pads, so the reveal is
  * always one tap away on a long passage; its own place in the flow, under the card, is the room the
@@ -4261,7 +4286,7 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 /* a passage's eyebrow row is the 全文／焦点 toggle's height on the front too: on the back the toggle takes
  * the instruction's place on that row, so the reveal does not grow the card's head or move the passage */
 .kp .kp-eyebrow-zoom { min-height: 30px; }
-.kp .kp-eyebrow > .kp-zoom { margin-left: auto; text-transform: none; letter-spacing: normal; font-size: 12px; }
+.kp .kp-eyebrow > .kp-zoom { margin-left: auto; text-transform: none; letter-spacing: normal; font-size: var(--type-caption); }
 .kp .kp-eyebrow:has(> .kp-zoom) > .kp-eyebrow-t { display: none; }
 
 /* ---- the reveal does not move the page (fix round 3). At phone width a passage taller than the room
@@ -4292,25 +4317,25 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
  * that answer now. A press answers at once (scale, 90 ms). */
 .kp .kp-grades { grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 6px; }
 .kp .kp-grade { --kp-hue: var(--kp-ink-2); min-height: 58px; padding: 7px 2px 8px; border-radius: var(--radius-seal, 3px); border: 1px solid var(--kp-line); border-top: 2px solid var(--kp-hue); background: var(--kp-panel); gap: 3px; box-shadow: var(--kp-depth); }
-.kp .kp-grade b { color: var(--kp-hue); font-size: 15px; font-weight: 700; letter-spacing: 0.02em; line-height: 1.2; }
-.kp .kp-grade small { font-family: var(--kp-num); font-size: 12px; letter-spacing: 0.02em; color: var(--kp-ink-2); line-height: 1.2; }
+.kp .kp-grade b { color: var(--kp-hue); font-size: var(--type-control); font-weight: 700; letter-spacing: 0.02em; line-height: 1.2; }
+.kp .kp-grade small { font-family: var(--kp-num); font-size: var(--type-caption); letter-spacing: 0.02em; color: var(--kp-ink-2); line-height: 1.2; }
 .kp .kp-again { --kp-hue: var(--kp-red); }
 .kp .kp-hard { --kp-hue: var(--kp-amber); }
 .kp .kp-good { --kp-hue: var(--kp-green); background: color-mix(in srgb, var(--kp-green) 12%, var(--kp-panel)); }
 .kp .kp-easy { --kp-hue: var(--kp-blue); }
 /* in 日本語 the seal (再 難 良 易) is the pad's face, in its hue, and the word a caption under it */
-.kp .kp-grade-seal, .kp .kp-again .kp-grade-seal, .kp .kp-good .kp-grade-seal { font-size: 20px; color: var(--kp-hue); }
-.kp .kp-grade:has(.kp-grade-seal) b { font-size: 11px; letter-spacing: 0.04em; }
+.kp .kp-grade-seal, .kp .kp-again .kp-grade-seal, .kp .kp-good .kp-grade-seal { font-size: var(--type-seal); color: var(--kp-hue); }
+.kp .kp-grade:has(.kp-grade-seal) b { font-size: var(--type-caption); letter-spacing: 0.04em; }
 
 /* ---- T2: the deck home. A plain name, then "the four windows but maybe not so big" in the old home's
  * colours: due amber, new in ink, known green, difficult red, four small tiles in one row ---- */
-.kp-home .kp-title { font-size: 24px; line-height: 1.25; letter-spacing: 0.01em; }
-.kp-home .kp-sub { font-size: 13px; color: var(--kp-ink-2); font-variant-numeric: tabular-nums; }
+.kp-home .kp-title { font-size: var(--type-section); line-height: 1.25; letter-spacing: 0.01em; }
+.kp-home .kp-sub { font-size: var(--type-label); color: var(--kp-ink-2); font-variant-numeric: tabular-nums; }
 .kp .kp-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; border: 0; font-family: inherit; }
 .kp .kp-tile { display: grid; align-content: center; gap: 2px; min-height: 60px; padding: 8px 10px; border-radius: var(--radius-card, 4px); border: 1px solid var(--kp-line); background: var(--kp-panel); box-shadow: var(--kp-depth); }
 .kp .kp-tile + .kp-tile::before { content: none; }
-.kp .kp-tiles .kp-tile b { font-family: var(--kp-num); font-variant-numeric: tabular-nums; font-size: 22px; font-weight: 700; line-height: 1.1; color: var(--kp-ink); }
-.kp .kp-tiles .kp-tile span { font-size: 11.5px; letter-spacing: 0.02em; color: var(--kp-ink-2); white-space: nowrap; }
+.kp .kp-tiles .kp-tile b { font-family: var(--kp-num); font-variant-numeric: tabular-nums; font-size: var(--type-reading); font-weight: 700; line-height: 1.1; color: var(--kp-ink); }
+.kp .kp-tiles .kp-tile span { font-size: var(--type-caption); letter-spacing: 0.02em; color: var(--kp-ink-2); white-space: nowrap; }
 .kp .kp-tiles .kp-c-due b { color: var(--kp-amber); }
 .kp .kp-tiles .kp-c-known b { color: var(--kp-green); }
 .kp .kp-tiles .kp-c-hard b { color: var(--kp-red); }
@@ -4334,36 +4359,36 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
 
 /* the head: the one instruction, then the facts as one quiet line. Only the kind is boxed and the level
  * keeps its tint; every chip is the same 20px box, so the line stays one line */
-.kp .kp-eyebrow { color: var(--kp-ink-2); font-weight: 600; font-size: 11px; letter-spacing: 0.14em; }
+.kp .kp-eyebrow { color: var(--kp-ink-2); font-weight: 600; font-size: var(--type-caption); letter-spacing: 0.14em; }
 .kp .kp-eyebrow::before { width: 14px; }
 /* on a passage's back the 全文／焦点 toggle takes the instruction's row: its 朱 dash goes with the words */
 .kp .kp-eyebrow:has(> .kp-zoom)::before { content: none; }
 /* every screen's ← (word list, settings, the session close) is the bare mark of the deck home and ✕ */
-.kp section > .kp-top .kp-icon { background: transparent; border-color: transparent; font-size: 20px; font-weight: 300; }
+.kp section > .kp-top .kp-icon { background: transparent; border-color: transparent; font-size: var(--type-lead); font-weight: 300; }
 .kp section > .kp-top .kp-icon:focus-visible { border-color: var(--kp-line); }
 .kp .kp-chips { gap: 6px 8px; }
-.kp .kp-chip { border: 1px solid transparent; border-radius: var(--radius-seal, 3px); padding: 0; font-size: 11.5px; line-height: 18px; letter-spacing: 0.01em; }
-.kp .kp-kindchip { border-color: currentColor; padding: 0 5px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.kp .kp-chip { border: 1px solid transparent; border-radius: var(--radius-seal, 3px); padding: 0; font-size: var(--type-caption); line-height: 18px; letter-spacing: 0.01em; }
+.kp .kp-kindchip { border-color: currentColor; padding: 0 5px; font-size: var(--type-caption); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
 .kp .kp-levelchip { padding: 0 5px; font-weight: 700; }
-.kp .kp-chip-sm { font-size: 11.5px; padding: 0; }
+.kp .kp-chip-sm { font-size: var(--type-caption); padding: 0; }
 @media (max-width: 640px) {
   .kp .kp-chips { gap: 6px; }
-  .kp .kp-chip, .kp .kp-chip-sm { font-size: 11px; padding-inline: 0; }
-  .kp .kp-kindchip { font-size: 10px; padding-inline: 4px; }
+  .kp .kp-chip, .kp .kp-chip-sm { font-size: var(--type-caption); padding-inline: 0; }
+  .kp .kp-kindchip { font-size: var(--type-caption); padding-inline: 4px; }
   .kp .kp-levelchip { padding-inline: 4px; }
 }
 /* the passage: a single sentence is the card's one line and stands heavier; a passage of four or five
  * sentences stays at reading weight */
 .kp .kp-sentence:not(:has(.kp-s)) { font-weight: 600; }
-.kp .kp-taphint { font-size: 11px; letter-spacing: 0.12em; color: var(--kp-mute); padding-top: 12px; }
+.kp .kp-taphint { font-size: var(--type-caption); letter-spacing: 0.12em; color: var(--kp-mute); padding-top: 12px; }
 
 /* 答えを見る: one clear key under the card, framed in the deck's accent (the old home's 答えを見る) */
 .kp .kp-reveal { border: 1.5px solid var(--kp-cyan); border-radius: var(--radius-control, 6px); min-height: 56px; color: var(--kp-cyan); font-weight: 700; letter-spacing: 0.08em;
-  background: linear-gradient(var(--kp-cyan-wash), var(--kp-cyan-wash)), var(--kp-dock); }
+  /* drawn: the reveal key's wash, one flat layer of the deck's accent over the dock */ background: linear-gradient(var(--kp-cyan-wash), var(--kp-cyan-wash)), var(--kp-dock); }
 .kp .kp-next { border-radius: var(--radius-control, 6px); }
 /* on the lacquer stage the key is lit in the stage's own ink */
 .kp .kp-study > .kp-reveal { border-color: var(--kp-stage-ink); color: var(--kp-stage-ink);
-  background: linear-gradient(color-mix(in srgb, var(--kp-stage-ink) 9%, transparent), color-mix(in srgb, var(--kp-stage-ink) 9%, transparent)), var(--kp-dock); }
+  /* drawn: the lit key's wash, one flat layer of the stage's ink over the dock */ background: linear-gradient(color-mix(in srgb, var(--kp-stage-ink) 9%, transparent), color-mix(in srgb, var(--kp-stage-ink) 9%, transparent)), var(--kp-dock); }
 /* docked at the foot of a long passage, the key stands on a straight band of the dock that runs to both
  * screen edges (the ring alone drew a rounded frame over the card) */
 .kp .kp-study > .kp-reveal { box-shadow: var(--kp-depth), 0 0 0 10px var(--kp-dock), -48px 0 0 10px var(--kp-dock), 48px 0 0 10px var(--kp-dock); }
@@ -4392,22 +4417,22 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
  * Japanese definition in full ink; the folds one grouped list, every row the same 44px with a chevron */
 .kp .kp-answer { border-top: 1px solid color-mix(in srgb, var(--kp-ink) 22%, transparent); padding-top: 14px; gap: 8px; }
 .kp .kp-word { align-items: baseline; }
-.kp .kp-word .kp-term { font-size: 36px; line-height: 1.1; }
-.kp .kp-word .kp-reading { font-size: 16px; letter-spacing: 0.1em; color: var(--kp-ink-2); }
-.kp .kp-word .kp-posbadge { align-self: center; border-radius: var(--radius-seal, 3px); border-width: 1.5px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; padding: 0 7px; line-height: 19px; }
-.kp .kp-def { font-size: 18px; line-height: 1.65; font-weight: 600; color: var(--kp-ink); }
-.kp .kp-note { font-size: 15px; line-height: 1.6; }
+.kp .kp-word .kp-term { font-size: var(--type-hero); line-height: 1.1; }
+.kp .kp-word .kp-reading { font-size: var(--type-body); letter-spacing: 0.1em; color: var(--kp-ink-2); }
+.kp .kp-word .kp-posbadge { align-self: center; border-radius: var(--radius-seal, 3px); border-width: 1.5px; font-size: var(--type-caption); font-weight: 700; letter-spacing: 0.06em; padding: 0 7px; line-height: 19px; }
+.kp .kp-def { font-size: var(--type-lead); line-height: 1.65; font-weight: 600; color: var(--kp-ink); }
+.kp .kp-note { font-size: var(--type-control); line-height: 1.6; }
 .kp .kp-folds { margin-top: 12px; border: 1px solid var(--kp-line); border-radius: var(--radius-card, 4px); background: var(--kp-panel-2); }
 .kp .kp-fold { border-bottom: 1px solid var(--kp-line); padding: 0 14px; }
 .kp .kp-fold:last-child { border-bottom: 0; }
-.kp .kp-fold > summary { min-height: 44px; position: relative; padding-right: 22px; font-size: 14px; color: var(--kp-ink); letter-spacing: 0.01em; }
+.kp .kp-fold > summary { min-height: 44px; position: relative; padding-right: 22px; font-size: var(--type-chrome); color: var(--kp-ink); letter-spacing: 0.01em; }
 .kp .kp-fold > summary::before { content: none; }
 .kp .kp-fold > summary::after { content: ''; position: absolute; right: 2px; top: 50%; width: 7px; height: 7px; margin-top: -5px; border-right: 1.5px solid var(--kp-mute); border-bottom: 1.5px solid var(--kp-mute); transform: rotate(-45deg); transition: transform var(--motion-ma, 120ms) var(--ease-enter, ease-out); }
 .kp .kp-fold[open] > summary::after { transform: rotate(45deg); margin-top: -7px; }
 .kp .kp-fold > :not(summary) { margin-bottom: 12px; }
 /* 英語 is the first row of the list, not a dashed slip of its own */
 .kp .kp-f-gloss { border: 0; border-bottom: 1px solid var(--kp-line); border-radius: 0; padding: 0 14px; margin-bottom: 0; }
-.kp .kp-f-gloss > summary { font-size: 14px; font-weight: 600; color: var(--kp-ink); }
+.kp .kp-f-gloss > summary { font-size: var(--type-chrome); font-weight: 600; color: var(--kp-ink); }
 .kp .kp-f-gloss > summary::before { content: none; }
 .kp .kp-see { padding: 10px 14px; border-bottom: 1px solid var(--kp-line); }
 
@@ -4420,6 +4445,61 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
   .kp .kp-card[data-window-controls] .kp-zoom { margin-left: 0; }
   .kp .kp-card[data-window-controls] .kp-zoom-btn { padding-inline: 4px; min-width: 44px; }
   .kp .kp-card[data-window-controls] .kp-answer { padding-top: 0; }
+}
+
+/* Q · the answer's definition and note break only between their words (mount.js answerWords gives the <wbr>); a word
+   wider than its whole line may still break */
+.kp .kp-words { word-break: keep-all; overflow-wrap: break-word; line-break: strict; }
+
+/* ── The house's type (slice F, 2026-10-18): ONE ladder, in the one sheet both hosts read — the app
+   (index.html) and the deck's own study pages (decks/kotoba-mine/tools/build.py inlines fonts.css,
+   decks/player/player.css and this sheet). Every size a stylesheet sets on type is one of these steps;
+   a figure (a kanji or a numeral drawn as a stage's picture) is a multiple of the headword step; a
+   reading is half its word (the ruby rule below). The floors (MASTER_SPEC D5): a reading 10 CSS px or
+   more, a gloss 13 or more. The old ladders (corridor.css --t-*, register.css, editorial.css's own and
+   its bridge, reference-ui.css --reference-*) are gone. ── */
+:root {
+  --type-caption: 12px;
+  --type-label: 13px;
+  --type-chrome: 14px;
+  --type-control: 15px;
+  --type-body: 16px;
+  --type-lead: 18px;
+  --type-seal: 22px;
+  --type-reading: 23px;
+  --type-section: 24px;
+  --type-title: 29px;
+  --type-display: 34px;
+  --type-hero: 38px;
+  --type-headword: 42px;
+  --leading-tight: 1.25;
+  --leading-ui: 1.35;
+  --leading-body: 1.55;
+  --leading-reading: 1.9;
+}
+/* a phone sets reading and display a step smaller: 21 is the smallest Japanese that carries a 10 px
+   reading. (Until F this compact pair applied only with the contrast variant off; type is not contrast.) */
+@media (max-width: 520px) {
+  :root { --type-reading: 21px; --type-display: 29px; }
+}
+/* ── One ruby: every reading in the house is a native <rt>, set by this one rule. Half its word (so 10 CSS
+   px or more over Japanese set at the reading step or larger, D5), over it, one line high, in the
+   reading's colour (--color-reading, the one red; a host may hand a word's own colour down, as the deck's
+   asked word does). A word with a reading never breaks across a line, so its reading never crosses one;
+   a reading wider than its word centres over it instead of prying the word apart (拡張, never 拡 張).
+   Two readings side by side keep a breath of paper between them (--reading-gap), so each reads as its
+   own word's (だいじん かんてい, never だいじんかんてい); where a reading stands alone — the reader's
+   on-touch readings — a host may set the gap to 0 so the reading pries nothing apart.
+   A concealed reading (.hidden-rt) takes no room; a deck that keeps its lines still hides its readings
+   in place (player.css). The pseudo readings (::before / ::after labels) are gone. ── */
+ruby { ruby-position: over; ruby-align: center; white-space: nowrap; }
+rt { padding-inline: var(--reading-gap, 0.125em); font-size: 0.5em; line-height: 1; font-weight: 400; letter-spacing: 0; color: var(--color-reading, currentColor); }
+rt.hidden-rt { display: none; }
+/* WebKit sets a reading on its word's content box, Chromium on the word's em box (the placement CSS Ruby
+   describes), a few px lower; this lays WebKit's reading on the em box too, so both engines draw one line
+   (measured: the reading's foot 5.7 / 6.0 px into the word's content box at 21 px). */
+@supports (font: -apple-system-body) {
+  rt { margin-block-end: -0.54em; }
 }
 
 /* The departing frame fades over the live incoming room. Capturing the new
@@ -4451,6 +4531,33 @@ html[data-room-transition][data-room-dir='left'] #app > main[data-room-arrival] 
 }
 :root[data-room-dir='right']::view-transition-old(kairo-room) { animation-name: kairo-room-leave-to-left; }
 :root[data-room-dir='left']::view-transition-old(kairo-room) { animation-name: kairo-room-leave-to-right; }
+/* F · the story's picture carries across shelf ↔ reader (corridor.js names it hero on the departing picture
+   before the capture and on the arriving one once the room is drawn): the one group that moves. It travels and
+   resizes in the room's beat and curve; the two crops meet as one picture (cover, clipped to the moving box).
+   The layer that draws it is clipped to the room, so the picture passes under the top bar and the tabs, never
+   over them. Around it the rooms fade through the paper: the departing room is gone within the first two fifths
+   of the beat and only then does the arriving one rise, so two rooms' text never show at once. */
+html[data-room-hero]::view-transition { clip-path: inset(var(--room-hero-top, 0px) 0 var(--room-hero-bottom, 0px) 0); }
+html[data-room-hero]::view-transition-old(kairo-room) { animation: kairo-room-fade-out calc(var(--motion-room) * 0.4) var(--ease-exit) both; }
+html[data-room-hero][data-room-transition] #app > main[data-room-arrival] {
+  animation-name: kairo-room-arrive;
+  /* a frame of bare paper (16 ms) between the departing room's last ink and the arriving room's first */
+  animation-duration: calc(var(--motion-room) * 0.6 - 16ms);
+  animation-delay: calc(var(--motion-room) * 0.4 + 16ms + var(--room-arrival-delay, 0ms));
+}
+::view-transition-group(hero) {
+  animation: revert;
+  animation-duration: var(--motion-room);
+  animation-timing-function: var(--ease-enter);
+  overflow: clip;
+}
+::view-transition-old(hero),
+::view-transition-new(hero) {
+  block-size: 100%;
+  object-fit: cover;
+  animation-duration: var(--motion-room);
+  animation-timing-function: var(--ease-enter);
+}
 @keyframes kairo-room-fade-out { to { opacity: 0; } }
 @keyframes kairo-room-leave { to { opacity: 0; transform: translateY(-6px); } }
 @keyframes kairo-room-leave-to-left { to { opacity: 0; transform: translateX(-24px); } }
@@ -7041,7 +7148,9 @@ let pendingStart = null;
 /** Transient reading state belongs to one face, never to the learner ledger. */
 function capturePresentation({ includeInert = false } = {}) {
   if (!includeInert && ctx?.root?.closest('[inert]')) return null;
-  const face = ctx?.root?.isConnected && ctx.root.querySelector('#kp-card');
+  // L · null, never false: a deck left behind keeps its ctx with a detached root, and `false?.querySelector()` throws
+  // (?. guards only null/undefined), which aborted every later render() — the room change to Guided never came
+  const face = ctx?.root?.isConnected ? ctx.root.querySelector('#kp-card') : null;
   const passage = face?.querySelector('.kp-sentence');
   if (!passage || ui.screen !== 'study') return null;
   return {
@@ -7108,7 +7217,7 @@ function backFits() {
   const windowed = passage.classList.contains('kp-window');
   const clearTarget = mark.top >= Math.max(top, windowed ? view.top : top) - 1 && mark.bottom <= Math.min(bottom, windowed ? view.bottom : bottom) + 1;
   const clearToggle = !toggle || (toggle.getBoundingClientRect().top >= top - 1 && toggle.getBoundingClientRect().bottom <= bottom + 1);
-  const clearFolds = [...face.querySelectorAll('.kp-folds > details > summary')].every(node => {
+  const clearFolds = [...face.querySelectorAll(FOLD_ROWS)].every(node => {
     const row = node.getBoundingClientRect();
     return !(row.top - lift < barTop - 0.5 && row.bottom - lift > barTop + 0.5);
   });
@@ -7274,6 +7383,7 @@ const UI_EN = {
   "閉じる": "Close",
   "ここでは保存できません": "Can't save from here.",
   "削除": "Remove",
+  "このカードを削除": "Remove this card",
   "このカードを削除（保留にする・あとで戻せる）": "Remove this card from study (pause it; restore it later)",
   "別の文に替える": "Use another sentence",
   "替えられる文がありません": "No alternative sentence available",
@@ -7326,7 +7436,7 @@ const UI_EN = {
   "このカードを削除しました（設定 › 保留中のカード から戻せます）。": "Card removed. Restore it from Settings → Paused cards.",
   "別の文に替えました。前の文は保留にしました。": "Changed to another sentence. The previous sentence is paused.",
   "保留にしました（設定 › 保留中のカード から戻せます）。": "Card paused. Restore it from Settings → Paused cards.",
-  "答えを見て理解が深まったなら もう一度": "Choose Again if seeing the answer improved your understanding.",
+  "答えを見て初めて分かったなら「もう一度」": "If the answer was new to you, choose Again",
   "この文だけの英訳は未対応です（全文の英訳と文の区切りが合いません）": "A translation of this sentence is unavailable because the sentence boundaries do not match.",
   "未": "New",
   "学習中": "Learning",
@@ -7507,12 +7617,10 @@ function displayUnits(card, units) {
     ? { ...unit, word: null, tok: { ...unit.tok, r: 'こむら', personContext: 'komura-jutaro' } } : unit);
 }
 
-/** a reading over its kanji; data-rt lets a host draw the reading as a label above the word
- * instead of as ruby, so showing or hiding it never moves the line */
+/** a reading over its kanji: native ruby, set by the house's one ruby rule (rooms/motion.css); the deck
+ * hides a reading in place (player.css), so showing or hiding it never moves the line */
 function rubyNode(text, reading) {
-  const ruby = el('ruby', null, text, el('rt', null, reading));
-  ruby.dataset.rt = reading;
-  return ruby;
+  return el('ruby', null, text, el('rt', null, reading));
 }
 function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'none' : 'all', split = false, clamp = false, taps = null }) {
   if (front) {
@@ -7521,18 +7629,81 @@ function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'non
     taps = null; // the front has nothing to tap, whatever is asked
   }
   const cover = taps ? coverOf(card.ja.length, displayUnits(card, taps.units)) : null;
+  // Q · the passage breaks only between its words, the same on both faces (the lead, inbox 1447; MASTER_SPEC §7: the
+  // front stays sealed). Its words are the back's own tap units where it has them (on the front, plain: never a door,
+  // nothing to tap) and, between them, the host's one rule (jaWords); each word of 12 characters or fewer is one
+  // no-break span (.kp-w). A word that is not whole on one face would break the lines apart at the reveal.
+  const frontUnits = front && ctx?.host && !blank ? passageUnits(card) : null;
+  const wordCover = frontUnits ? coverOf(card.ja.length, displayUnits(card, frontUnits)) : cover;
+  const wordEnd = new Array(card.ja.length).fill(0);
+  let wordStart = 0;
+  // the passage's own tokens are the truest words when they have arrived (the same tokens on both faces); the host's
+  // rule glues them as it glues any words, and cuts the text itself (Intl.Segmenter) until they arrive
+  const toks = ctx?.host && ctx.tokenFile ? cardTokens(card, ctx.tokenFile) : null;
+  let segments = null;
+  if (toks?.length) {
+    segments = [];
+    let cursor = 0;
+    for (const t of [...toks].sort((a, b) => a.at - b.at)) {
+      if (!(t.at >= cursor) || card.ja.slice(t.at, t.at + t.s.length) !== t.s) continue;
+      if (t.at > cursor) segments.push(card.ja.slice(cursor, t.at));
+      segments.push(t.s);
+      cursor = t.at + t.s.length;
+    }
+    if (cursor < card.ja.length) segments.push(card.ja.slice(cursor));
+  }
+  for (const group of (ctx?.words ? ctx.words(card.ja, segments) : [])) {
+    const len = group.join('').length;
+    for (let i = wordStart; i < wordStart + len && i < wordEnd.length; i++) wordEnd[i] = wordStart + len;
+    wordStart += len;
+  }
+  // a tap unit is one word too: the rule's word around it grows to hold it whole
+  for (const u of wordCover ? new Set(wordCover.filter(Boolean)) : []) {
+    const end = Math.max(...Array.from({ length: u.len }, (_, j) => wordEnd[u.at + j] || 0), u.at + u.len);
+    for (let i = u.at; i < end && i < wordEnd.length; i++) wordEnd[i] = Math.max(wordEnd[i], end);
+  }
   const out = el('p', 'kp-sentence');
   out.lang = 'ja';
+  if (segments) out.dataset.words = 'tokens';
   const ends = split ? sentenceEnds(card.ja) : [card.ja.length];
   let host = out;
   let at = 0; // offset in card.ja of the next character
   let k = 0; // the sentence being filled
+  let word = null, wordUntil = -1; // the no-break span of the word being filled, and where that word ends
+  // a line may end between two words: an explicit <wbr> stands between them, outside their no-break spans (WebKit
+  // offers no break between two no-break spans side by side: the back ran on one line, 4,000 px wide, at 320)
+  const breakBefore = (parent) => {
+    const last = parent.lastChild;
+    if (last && !(last.nodeType === 1 && last.tagName === 'WBR')) parent.append(document.createElement('wbr'));
+  };
   const open = () => {
+    word = null;
     if (!split) return;
     host = el('span', 'kp-s');
+    breakBefore(out);
     out.append(host);
   };
   open();
+  /** the box a piece at [at, at + len) goes into: the current word's span while the piece is inside that word */
+  const plain = () => {
+    if (host.lastChild?.nodeType === 1 && host.lastChild.classList.contains('kp-w')) breakBefore(host);
+    word = null;
+    return host;
+  };
+  const boxFor = (len) => {
+    if (!wordEnd[at]) return plain();
+    if (word && word.parentNode === host && at < wordUntil) {
+      wordUntil = Math.max(wordUntil, wordEnd[Math.min(at + len, wordEnd.length) - 1] || 0);
+      return word;
+    }
+    const end = Math.max(wordEnd[at], wordEnd[Math.min(at + len, wordEnd.length) - 1] || 0);
+    if (end - at > 12) return plain();
+    word = el('span', 'kp-w');
+    breakBefore(host);
+    host.append(word);
+    wordUntil = end;
+    return word;
+  };
   // A word kept on one line (ruby, kp-nb: a host may set white-space: nowrap on it) must still leave
   // a line break open before a kept word right after it (小村|寿太郎), or the pair would move to the
   // next line as one and leave a short line behind: a <wbr> goes between them, where the next one goes.
@@ -7543,19 +7714,23 @@ function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'non
   // (one word, several ruby segments) until a sentence starts a new host
   const put = (node, isTarget, len, unit = null) => {
     if (split && isTarget === 1) host.dataset.focus = '1';
-    const gap = keptBefore && kept(edge(node, false)) ? document.createElement('wbr') : null;
+    let gap = keptBefore && kept(edge(node, false)) ? document.createElement('wbr') : null;
     keptBefore = kept(edge(node, true));
+    const box = boxFor(len);
+    // Q · the break between two kept words is a break between words: never inside one word's span or one tap unit
+    // (Chromium honours a <wbr> inside a no-break span: 先入｜観); a word's span already has its own break before it
+    if (box !== host) gap = null;
     if (unit) {
-      let tok = host.lastChild;
+      let tok = box.lastChild;
       if (!(tok && tok.kpUnit === unit)) {
         tok = tapNode(el('span', 'kp-tok'), unit, taps.onTap);
-        host.append(tok);
+        if (gap) box.append(gap);
+        box.append(tok);
       }
-      if (gap) tok.append(gap);
       tok.append(node);
     } else {
-      if (gap) host.append(gap);
-      host.append(node);
+      if (gap) box.append(gap);
+      box.append(node);
     }
     at += len;
     while (split && k < ends.length - 1 && at >= ends[k]) {
@@ -7586,7 +7761,7 @@ function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'non
     if (hasRuby) return put(rubyNode(text, reading), 0, len, unitOver(at, len));
     if (keep && !cover) return put(el('span', 'kp-nb', text), 0, len);
     // plain text may hold a sentence end or a word edge: cut it there so each sentence keeps its
-    // own words and each word its own tap target
+    // own words and each word its own tap target (and, Q, its own no-break span)
     let rest = text;
     while (rest) {
       let cut = rest.length;
@@ -7597,83 +7772,29 @@ function sentenceNodes(card, { front = false, blank = false, ruby = front ? 'non
         while (j < cut && cover[at + j] === u) j++;
         cut = j;
       }
+      if (wordEnd[at] && wordEnd[at] - at < cut) cut = wordEnd[at] - at;
       put(document.createTextNode(rest.slice(0, cut)), 0, cut, cover ? cover[at] : null);
       rest = rest.slice(cut);
     }
   });
   if (clamp && split) clampContext(out);
-  if (taps || ruby === 'all') {
-    reflowWatch?.observe(out);
-    document.fonts?.ready.then(() => out.isConnected && seatReadings(out));
-  }
+  if (taps) ctx?.host?.installProseWords?.(out, '.kp-tok');
+  if (taps || ruby === 'all') reflowWatch?.observe(out);
   return out;
 }
 
 /** Whenever a passage reflows (width, zoom, an opened fold, fonts): a word that wraps onto a second
  * line would centre its 44px reach (.kp-tok::before) on the gap between the two lines and reach over
- * the words of both, so it keeps only its printed boxes (kp-split); and the readings are re-seated. */
+ * the words of both, so it keeps only its printed boxes (kp-split). Readings are native ruby: the
+ * line lays them out itself, so nothing is seated by hand. */
 const reflowWatch = typeof ResizeObserver === 'function'
   ? new ResizeObserver((entries) => {
     for (const { target } of entries) {
       if (!target.isConnected) { reflowWatch.unobserve(target); continue; }
       for (const tok of target.querySelectorAll('.kp-tok')) tok.classList.toggle('kp-split', tok.getClientRects().length > 1);
-      seatReadings(target);
     }
   })
   : null;
-let rtMeasure = null;
-/** A host may draw each reading above its word (ruby[data-rt]::after; the app does, so the line
- * never moves) instead of laying it out as ruby. A reading wider than its word would then run into
- * its neighbour's reading or past the edge of the line. Each line's readings are seated left to
- * right: centred on the word where there is room, nudged apart (and inside the line) where there is
- * not, and narrowed to the word plus one reading character at most (--kp-rt-dx, --kp-rt-fit). */
-function seatReadings(sentence) {
-  const rubies = [...sentence.querySelectorAll('ruby[data-rt]')];
-  if (!rubies.length) return;
-  const style = getComputedStyle(rubies[0], '::after');
-  const size = parseFloat(style.fontSize);
-  if (!size) return;
-  rtMeasure ||= document.createElement('canvas').getContext('2d');
-  if (rtMeasure) rtMeasure.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-  const spacing = parseFloat(style.letterSpacing) || 0;
-  const gap = size * 0.2;
-  const lines = new Map();
-  for (const ruby of rubies) {
-    ruby.style.removeProperty('--kp-rt-dx');
-    ruby.style.removeProperty('--kp-rt-fit');
-    const rects = ruby.getClientRects();
-    if (rects.length !== 1 || !rects[0].width) continue;
-    const r = rects[0];
-    let block = ruby.parentElement;
-    while (block !== sentence && !/^(block|flex|flow-root|list-item)$/.test(getComputedStyle(block).display)) block = block.parentElement;
-    const text = ruby.dataset.rt;
-    const natural = (rtMeasure ? rtMeasure.measureText(text).width : [...text].length * size) + spacing * [...text].length;
-    const width = Math.min(natural, r.width + size);
-    const key = `${Math.round(r.bottom / 4)}`; // one line of the block
-    if (!lines.has(block)) lines.set(block, new Map());
-    const row = lines.get(block);
-    if (!row.has(key)) row.set(key, []);
-    row.get(key).push({ ruby, centre: (r.left + r.right) / 2, natural, width, x: (r.left + r.right) / 2 - width / 2 });
-  }
-  for (const [block, rows] of lines) {
-    const b = block.getBoundingClientRect(), cs = getComputedStyle(block);
-    const lo = b.left + parseFloat(cs.paddingLeft), hi = b.right - parseFloat(cs.paddingRight);
-    for (const items of rows.values()) {
-      items.sort((p, q) => p.centre - q.centre);
-      items.forEach((it, i) => { it.x = Math.max(it.x, i ? items[i - 1].x + items[i - 1].width + gap : lo); });
-      for (let i = items.length - 1; i >= 0; i--) {
-        const it = items[i], limit = i < items.length - 1 ? items[i + 1].x - gap : hi;
-        if (it.x + it.width > limit) it.x = limit - it.width;
-      }
-      for (const it of items) {
-        const dx = it.x + it.width / 2 - it.centre;
-        if (Math.abs(dx) >= 0.5) it.ruby.style.setProperty('--kp-rt-dx', `${dx.toFixed(1)}px`);
-        if (it.width < it.natural - 0.5) it.ruby.style.setProperty('--kp-rt-fit', (it.width / it.natural).toFixed(3));
-      }
-    }
-  }
-}
-
 /** 焦点 on a long passage: the sentences before the target and those after it each become one
  * group. 全文 lays the groups out inline (nothing changes); 焦点 folds each to two dimmed lines
  * (the before group shows its last two, the after group its first two) and fitClamps adds a ⋯
@@ -7880,16 +8001,17 @@ function frameFront() {
   window.scrollTo({ top: 0, behavior: 'instant' });
   // in the app the reveal is the screen's right half, not a docked button: the floor is the screen's
   // own foot, and a marked word below it opens in view, its sentence in the middle of the page
+  const undo = ctx.root.querySelector('.kp-study > .kp-undo');
   if (target && dock && getComputedStyle(dock).position === 'fixed') {
     const t = target.getBoundingClientRect();
     const ceil = topInset() + 16;
-    const floor = innerHeight - 56;
+    // a showing Undo stands over the page's foot (sticky above the tabs): the word stops 16 px above it too
+    const floor = Math.min(innerHeight - 56, undo && getComputedStyle(undo).position === 'sticky' ? undo.getBoundingClientRect().top - 16 : Infinity);
     if (t.bottom > floor) window.scrollTo({ top: Math.max(0, Math.round((t.top + t.bottom) / 2 - (ceil + floor) / 2)), behavior: 'instant' });
     return;
   }
   if (!target || !dock || getComputedStyle(dock).position !== 'sticky') return;
   const t = target.getBoundingClientRect();
-  const undo = ctx.root.querySelector('.kp-study > .kp-undo');
   const floor = Math.min(dock.getBoundingClientRect().top, undo && getComputedStyle(undo).position === 'sticky' ? undo.getBoundingClientRect().top : Infinity) - 16;
   const ceil = topInset() + 16;
   if (t.bottom <= floor) return;
@@ -7980,7 +8102,8 @@ function studyScreen() {
   // a short sitting draws one segment per card (the rail itself still ticks by transform)
   if (total > 1 && total <= 30) prog.style.setProperty('--kp-n', String(total));
   prog.append(rail(ui.pos / total));
-  top.append(prog, el('span', 'kp-count', `${ui.pos + 1}/${total}`), deleteButton());
+  // 削除 is not here (Hfix-1B, the lead's round-1 ruling): a card is taken out on its back, never from a front
+  top.append(prog, el('span', 'kp-count', `${ui.pos + 1}/${total}`));
   box.append(top);
 
   const stored = ctx.state.cards[id];
@@ -8075,18 +8198,32 @@ function studyScreen() {
         ui.revealed = true;
         commit(RATINGS.again, { stay: true });
       }, { id: 'kp-dunno' }),
+      footBand(),
     );
   } else {
-    box.append(btn('kp-reveal', t("答えを見る"), reveal, { id: 'kp-reveal' }));
+    // the foot's band turns the card where the stage beside it does: its right half in the focus room
+    box.append(btn('kp-reveal', t("答えを見る"), reveal, { id: 'kp-reveal' }), footBand((e) => {
+      if (!ctx.focusRoom || !Number.isFinite(e.clientX) || e.clientX >= innerWidth / 2) reveal();
+    }));
   }
   if (ui.undo) box.append(btn('kp-undo', t("ひとつ戻す"), undo, { id: 'kp-undo' }));
   return box;
 }
 
+/** Hfix-1B · the band under the front's foot (editorial.css draws it in the app; player.css keeps it out of the standalone
+ * pages). A real element, not the study's ::after: it covers the passage that scrolls under it, so a tap there lands on the
+ * band (onTap, if any) and a reading of the page, a contrast sweep's included, finds that text covered, not shown */
+function footBand(onTap) {
+  const band = el('i', 'kp-foot-band');
+  band.setAttribute('aria-hidden', 'true');
+  if (onTap) band.addEventListener('click', onTap);
+  return band;
+}
+
 /** what the front asks, in one line: the marked word (読んで思い出す) or the gap (穴埋め・4択) */
 function cardEyebrow(card, mode) {
   const ji = card.type === 'kanji';
-  const label = mode === 'read' && !ji ? t('印の語を思い出す', 'Recall the marked word') : ji ? t('空所の字を思い出す', 'Recall the missing kanji') : t('空所の語を思い出す', 'Recall the missing word');
+  const label = mode === 'read' && !ji ? t('印のついた語を思い出す', 'Recall the marked word') : ji ? t('空所の字を思い出す', 'Recall the missing kanji') : t('空所の語を思い出す', 'Recall the missing word');
   // a passage's back puts the 全文／焦点 toggle on this row in place of the instruction: the front keeps
   // the row at the toggle's height, so the reveal neither grows the card's head nor moves the passage
   const n = el('span', `kp-eyebrow${card.type ? ' kp-eyebrow-zoom' : ''}`, el('span', 'kp-eyebrow-t', label));
@@ -8263,7 +8400,7 @@ function answerBlock(card, word) {
   // has one, else the word's; the deck's English notes go behind 英語
   const jaNote = word.tip && !/[A-Za-z]/.test(word.tip);
   const note = (typeof card.tipJa === 'string' && card.tipJa) || (jaNote ? word.tip : '');
-  if (note) a.append(el('p', `kp-note${note === card.tipJa ? ' kp-note-passage' : ''}`, note));
+  if (note) a.append(answerWords(el('p', `kp-note${note === card.tipJa ? ' kp-note-passage' : ''}`), note));
   // a leech's repair ladder (§4) sits after tier one and before the folds, so the word, its
   // reading and the definition stay pinned under the passage on every card (learning-design L1)
   if (isLeech(ctx.state, card.id)) a.append(leechLadder(card, word));
@@ -8420,8 +8557,8 @@ function seeAlsoLine(card, word) {
 
 /* ------------------------------------------------ tap → define → 覚える (CARD_CONTRACT_V2 §3, STANDARD A44)
  * After the reveal only, every word of the passage and of the Japanese definition is a tap
- * target (a word, a kanji, a grammar cue as one, and any word of this deck; particles, endings
- * and punctuation are not words and stay plain). With a host lexicon (the corridor) a tap opens
+ * target (a word, a kanji, a grammar cue as one, particles and endings; punctuation and
+ * phonetic annotations stay plain). With a host lexicon (the corridor) taps use its shared ladder into
  * the entry sheet: the reading, the Japanese sense, English behind 英語, and the corridor's one-tap
  * 覚える (A51); a word of this deck says 「このデッキにあります」 and offers no 覚える (A17). A word in
  * the sheet's definition opens one more sheet, and that second one says 「ここで止めよう」 and offers
@@ -8451,7 +8588,22 @@ function wantTokens() {
     if (ctx?.deck !== deck || ctx.tokenFile) return;
     ctx.tokenFile = file;
     if (ui.screen === 'study' && ui.revealed) upgradeTaps();
+    else if (ui.screen === 'study') upgradeFront();
   });
+}
+
+/** Q · the front's words from the passage's own tokens once they arrive (Intl.Segmenter cut 簡単なんだ｜ろうと where
+ * the tokens hold だろう): the same text, its words as the back's, still sealed: plain, no doors */
+function upgradeFront() {
+  const id = ui.queue[ui.pos];
+  const face = ctx.root.querySelector('#kp-card');
+  const old = face?.querySelector(':scope > .kp-sentence');
+  if (!id || !face || face.dataset.card !== id || !old || old.dataset.words === 'tokens') return;
+  const { card } = ctx.index.cards.get(id);
+  const sentence = sentenceNodes(card, { front: true, blank: cardMode() !== 'read', split: !!card.type });
+  if (sentence.dataset.words !== 'tokens') return;
+  if (old.classList.contains('kp-enter')) sentence.classList.add('kp-enter');
+  old.replaceWith(sentence);
 }
 
 /** character offset → the unit covering it, or null */
@@ -8474,13 +8626,41 @@ function deckWordOf(t) {
   return null;
 }
 
-/** tokens → tap units { at, len, tok, word }: a 語, a 字, a 文法 cue (its tokens joined), or any
- * token that is a word of this deck */
+/** Parenthetical kana matching the preceding written word are a reading annotation,
+ * not another occurrence. Keep the original token offsets and displayed text. */
+function phoneticAnnotationRanges(tokens) {
+  const text = tokens.map((token) => token.s).join('');
+  const kana = (value) => String(value || '').replace(/[ァ-ヶ]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60)).replace(/[\s・]/gu, '');
+  const ranges = [];
+  for (const match of text.matchAll(/[（(]([\p{Script=Hiragana}\p{Script=Katakana}ー・\s]+)[）)]/gu)) {
+    let reading = '', written = '', edge = match.index;
+    for (let i = tokens.length - 1; i >= 0; i -= 1) {
+      const token = tokens[i];
+      if (token.at + token.s.length > edge) continue;
+      if (token.at + token.s.length !== edge || !/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー々]+$/u.test(token.s)) break;
+      const r = token.r || (/^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u.test(token.s) ? token.s : '');
+      if (!r) break;
+      reading = kana(r) + reading;
+      written = token.s + written;
+      edge = token.at;
+      if (reading === kana(match[1]) && /\p{Script=Han}/u.test(written)) {
+        ranges.push([match.index, match.index + match[0].length]);
+        break;
+      }
+      if (reading.length >= kana(match[1]).length) break;
+    }
+  }
+  return ranges;
+}
+
+/** Tokens → tap units, preserving grammar cues and every other Japanese occurrence. */
 function unitsOfTokens(tokens) {
   const out = [];
+  const annotations = phoneticAnnotationRanges(tokens);
   for (const t of tokens) {
+    if (annotations.some(([start, end]) => t.at < end && t.at + t.s.length > start)) continue;
     const word = deckWordOf(t);
-    if (t.k === 'other' && !word) continue;
+    if (t.k === 'other' && !word && !/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(t.s)) continue;
     const last = out.at(-1);
     if (!word && t.k === '文法' && last && !last.word && last.tok.k === '文法' && last.tok.ref === t.ref && last.at + last.len === t.at) {
       last.len += t.s.length;
@@ -8530,18 +8710,28 @@ function onDown(e) {
   if (ui.pop && !e.target.closest?.('.kp-pop')) closePop();
 }
 
-/** make node one tap target: role button, in the tab order, no look of its own until hover or focus */
+/** Hosted prose uses the shared paragraph controller; standalone keeps its native keyboard fallback. */
 function tapNode(node, unit, onTap) {
   node.classList.add('kp-tok');
   node.kpUnit = unit;
-  node.setAttribute('role', 'button');
-  node.tabIndex = 0;
-  node.setAttribute('aria-haspopup', 'dialog');
+  node.dataset.japaneseLookup = 'deck-word';
+  if (unit.word?.term || unit.tok?.s) node.dataset.proseLabel = unit.tok?.s || unit.word.term;
+  const hostedProse = typeof ctx?.host?.installProseWords === 'function';
+  if (!hostedProse) {
+    node.setAttribute('role', 'button');
+    node.tabIndex = 0;
+    node.setAttribute('aria-haspopup', 'dialog');
+  }
   if (unit.word) node.dataset.deckWord = unit.word.id;
   node.kpTap = () => onTap(unit, node);
+  // G5 · the player root's one hold finds the word it is held on by this (wireDeckHold); the word keeps only its tap's
+  // own listeners
+  node.kpHoldUnit = unit;
   node.addEventListener('click', (e) => {
     e.stopPropagation();
     if (dragged(e)) return;
+    // the release of a hold is never a tap (G5)
+    if (e.detail !== 0 && node.kpHeldAt && Date.now() - node.kpHeldAt < 700) return;
     // Transparent 44px reaches can overlap in prose. A pointer still chooses the printed
     // word nearest its point, rather than whichever neighbouring reach paints last.
     let chosen = node;
@@ -8561,12 +8751,88 @@ function tapNode(node, unit, onTap) {
     chosen.kpTap();
   });
   node.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (hostedProse || e.defaultPrevented || (e.key !== 'Enter' && e.key !== ' ')) return;
     e.preventDefault();
     e.stopPropagation();
     onTap(unit, node);
   });
   return node;
+}
+
+/* G5 · hold = seal on the card's back (MASTER_SPEC §4 G; the front stays sealed until the answer): a finger held still on a
+ * back word, a right-click or Shift+F10 keeps it through the corridor's one keep (host.take, add-only) and opens the strip
+ * beside it (host.addToList, seal). The ring under the finger is the corridor's own (its seam, when the page is hosted). A
+ * hold that moves is a scroll; a hold belongs to its pointer; its release is never a tap. One set of listeners on the
+ * player's root serves every back word (each carries its unit as kpHoldUnit), so a tap target keeps only its tap's own.
+ * Standalone pages have no host and no hold. */
+const HOLD_MS = 500, HOLD_RING_MS = 150, HOLD_MOVE = 9;
+function holdWord(root, target) {
+  for (let node = target; node && node !== root; node = node.parentNode) if (node.kpHoldUnit) return node;
+  return null;
+}
+function wireDeckHold(root) {
+  let hold = null;
+  const clear = () => {
+    const h = hold;
+    if (!h) return;
+    hold = null;
+    clearTimeout(h.timer);
+    clearTimeout(h.ringTimer);
+    if (!h.done) h.ring?.cancel();
+  };
+  const commit = (h) => {
+    if (hold !== h || h.done) return;
+    h.done = true;
+    clearTimeout(h.timer);
+    clearTimeout(h.ringTimer);
+    h.node.kpHeldAt = Date.now();
+    void held(h.node.kpHoldUnit, h.node, { ring: h.ring });
+  };
+  root.addEventListener('pointerdown', (e) => {
+    clear();
+    if (e.pointerType === 'mouse' || e.isPrimary === false || !ctx?.host?.take) return;
+    const node = holdWord(root, e.target);
+    if (!node) return;
+    const h = { node, x: e.clientX, y: e.clientY, id: e.pointerId, ring: null, done: false };
+    h.ringTimer = setTimeout(() => {
+      if (hold === h && !h.done) h.ring = safely(() => globalThis.__KAIRO_HOLD_RING__?.(h.x, h.y) || null, null);
+    }, HOLD_RING_MS);
+    h.timer = setTimeout(() => commit(h), HOLD_MS);
+    hold = h;
+  });
+  root.addEventListener('pointermove', (e) => {
+    if (hold && !hold.done && e.pointerId === hold.id && Math.hypot(e.clientX - hold.x, e.clientY - hold.y) > HOLD_MOVE) clear();
+  });
+  root.addEventListener('pointerup', (e) => {
+    if (!hold || e.pointerId !== hold.id) return;
+    if (hold.done) hold.node.kpHeldAt = Date.now();
+    clear();
+  });
+  root.addEventListener('pointercancel', (e) => { if (hold && e.pointerId === hold.id) clear(); });
+  root.addEventListener('contextmenu', (e) => {
+    const node = holdWord(root, e.target);
+    if (!node || !ctx?.host?.take) return;
+    e.preventDefault();
+    // a touch hold some engines also report as a contextmenu is the same hold: one seal, never two
+    if (hold && !hold.done && hold.node === node) { commit(hold); return; }
+    if (node.kpHeldAt && Date.now() - node.kpHeldAt < 1200) return;
+    void held(node.kpHoldUnit, node, { keyboard: !e.clientX && !e.clientY });
+  });
+}
+async function held(unit, node, { keyboard = false, ring = null } = {}) {
+  // a late or synthetic hold never turns a sealed front into a door
+  if (ui.screen === 'study' && !ui.revealed) { ring?.cancel(); return; }
+  const host = ctx?.host;
+  const frame = frameOf(unit);
+  const entry = frame.entry || (frame.word
+    ? safely(() => host?.lookup?.({ s: frame.word.term, ref: frame.word.term, r: frame.word.reading || '', k: '語' }) || null, null) : null);
+  if (!host?.take || !host?.addToList || !entry) { ring?.cancel(); return; }
+  const was = !!safely(() => host.isTaken?.(entry), false);
+  let kept = was;
+  if (!was) { try { kept = !!(await host.take(entry)); } catch { kept = false; } }
+  ring?.settle(kept);
+  if (!kept || !node.isConnected) return;
+  safely(() => host.addToList(entry, node, { seal: true, created: !was, keyboard }));
 }
 
 /** text with its units as tap targets (a definition) */
@@ -8584,10 +8850,38 @@ function tapText(text, units, onTap) {
   return out;
 }
 
+/** Q · the answer's Japanese breaks only between its words, as the passage does (the host's one rule, ctx.words; the
+ * lead, inbox 1447): a <wbr> at each word's edge, never inside a word or a tap unit, and keep-all inside the words
+ * (player.css .kp-words). 話し合いによって条件をまとめるこ｜と and 定｜番 broke at the line's end. Without a host
+ * the text stands as it did. */
+function answerWords(node, text, units = null, onTap = null) {
+  const pieces = units?.length ? tapText(text, units, onTap) : [text];
+  const groups = ctx?.words && text ? ctx.words(text) : null;
+  if (!groups || groups.length < 2) { node.append(...pieces); return node; }
+  const cuts = new Set();
+  let end = 0;
+  for (const g of groups) { end += g.join('').length; cuts.add(end); }
+  let at = 0;
+  for (const piece of pieces) {
+    const len = typeof piece === 'string' ? piece.length : piece.textContent.length;
+    if (at && cuts.has(at)) node.append(document.createElement('wbr'));
+    if (typeof piece === 'string') {
+      let from = 0;
+      for (let i = 1; i < piece.length; i += 1) if (cuts.has(at + i)) { node.append(piece.slice(from, i), document.createElement('wbr')); from = i; }
+      node.append(piece.slice(from));
+    } else node.append(piece);
+    at += len;
+  }
+  node.classList.add('kp-words');
+  return node;
+}
 /** tier one's Japanese definition, its words tappable on the back */
 function defLine(card, word) {
   const p = el('p', 'kp-def');
-  p.append(...tapText(word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 })));
+  // Q · the definition's words by the word rule (answerWords: tapText's pieces, a <wbr> between words); G3 · its taps
+  // join the host's one roving prose stop
+  answerWords(p, word.defJa || '', defUnits(word), (u, node) => tapped(u, node, { card, where: 'd', depth: 1 }));
+  if (p.querySelector('.kp-tok')) ctx?.host?.installProseWords?.(p, '.kp-tok');
   reflowWatch?.observe(p);
   return p;
 }
@@ -8693,19 +8987,33 @@ function lightWord(node) {
   node?.classList.add('kp-lit');
 }
 function tapped(unit, node, { card, where, depth }) {
+  // A late or synthetic activation must not turn a sealed front into a lookup door.
+  if (ui.screen === 'study' && !ui.revealed) return;
   const frame = frameOf(unit);
-  lightWord(node);
   if (!ctx.host) {
+    lightWord(node);
     logTap(card, where, frame, depth);
     openPop(frame, node);
     return;
   }
-  // the app's one slip beside the word (the one-hand pass, contract §1): the host draws it, and the next tap on
-  // the same word dives into the full entry; the word's reading stays lit until the slip, or that entry, goes
-  const opened = safely(() => ctx.host.openSlip?.(frame, node, { english: ctx.prefs.gloss === 'show', onClose: (reason) => { if (reason !== 'dive') lightWord(null); } }), false);
-  // the ledger keeps how deep each tap went: the slip at the tap's own depth, the full entry one deeper
-  logTap(card, where, frame, opened === 'dived' ? depth + 1 : depth);
-  if (!opened) lightWord(null);
+  // The host owns the ladder. Existing ruby needs only presentation callbacks; plain
+  // definition text uses the host's inline reading. Nothing is revealed before activation.
+  // F · the passage's readings are native <rt>s the deck hides in place (player.css), never ruby[data-rt]
+  const hasRuby = !!node.querySelector('ruby > rt');
+  const opened = safely(() => ctx.host.openSlip?.(frame, node, {
+    english: ctx.prefs.gloss === 'show',
+    ...(hasRuby ? {
+      reveal: () => node.classList.add('kp-lit'),
+      clearReveal: () => node.classList.remove('kp-lit'),
+      readingVisible: () => ctx.prefs.readings !== 'off' || node.classList.contains('kp-lit') || node.classList.contains('kp-target'),
+    } : {}),
+    onClose: (reason) => { if (reason !== 'dive') node.classList.remove('kp-lit'); },
+  }), false);
+  // Keep the existing tuple: hosted reveal, stage and page are distinct observation depths.
+  // Putting a stage away opens nothing, so it is no observation.
+  if (opened === 'dismissed') return;
+  logTap(card, where, frame, opened === 'dived' ? depth + 2 : opened === 'opened' ? depth + 1 : depth);
+  if (!opened) node.classList.remove('kp-lit');
 }
 
 /** what the host answers, or fallback when it throws: a host fault never breaks the card */
@@ -8778,19 +9086,24 @@ const SWAPPED = '別の文に替えました。前の文は保留にしました
 const SUSPENDED = '保留にしました（設定 › 保留中のカード から戻せます）。';
 const UNDOABLE = [DELETED, SWAPPED, SUSPENDED];
 
-/** the back's nodes in order: the answer (tier one, a leech's ladder, then the folds) */
+/** the back's nodes in order: the answer (tier one, a leech's ladder, then the folds), then its quiet row (削除) */
 function backParts(card, word) {
   const answer = answerBlock(card, word);
-  return { answer, nodes: [answer] };
+  return { answer, nodes: [answer, cardTools()] };
 }
 
-/** 削除 in the study top bar, front and back, never more than a glance away: one tap, undone
- * from the toast or Undo for the rest of the sitting */
+/** 削除 (Hfix-1B, the lead's round-1 ruling on HG-5): taking a card out of study is a deliberate act after its answer is
+ * seen, so it lives on the back alone, as the card's last quiet row under the folds: never in the top bar, never on a
+ * front, never beside the grades. One tap there, undone from the toast or Undo for the rest of the sitting. */
 function deleteButton() {
-  return btn('kp-delete', t("削除"), (e) => {
+  return btn('kp-delete', t("このカードを削除"), (e) => {
     e.stopPropagation();
     deleteCard();
   }, { id: 'kp-delete', 'aria-label': t("このカードを削除（保留にする・あとで戻せる）") });
+}
+/** the back's quiet row: the last thing on the card, after its answer and folds */
+function cardTools() {
+  return el('div', 'kp-card-tools', deleteButton());
 }
 
 /** a ladder hint: the first kana of the reading and one ○ per kana left; on a 字 card, the
@@ -8929,8 +9242,9 @@ const GRADES = [
   ['good', '正解', 'Good', '良', '3'],
   ['easy', '簡単', 'Easy', '易', '4'],
 ];
-/** Under the bar, once per deck until dismissed or answered, the rule for choosing. */
-const RULE = '答えを見て理解が深まったなら もう一度';
+/** Under the bar, once per deck until dismissed or answered, the rule for choosing, said so it cannot be read backwards
+ * (Hfix-1B; Kimi KH1-2, HG-2): an answer that was new to him is もう一度. */
+const RULE = '答えを見て初めて分かったなら「もう一度」';
 function gradeBar(id) {
   // each pad shows the interval the pinned scheduler gives that answer, now (engine preview)
   const pv = preview(fsrsApi, scheduler, ctx.state, id, new Date());
@@ -9074,6 +9388,13 @@ function paintResponse({ resetScroll = false, front = false, hold = true } = {})
  */
 /** A fitted reading window sits directly under the fixed chrome, so the card's chip row
  * (level, kind and Full/Focus) moves below it; an unwindowed passage keeps the row above. */
+/** Q · the last part of the answer that says something (its word, definition, note): the parts before its folds, whose
+ * rows are doors. A leech's ladder is controls, not the answer: it may wait below the pads (the first screen keeps the
+ * word and its definition without a scroll, CARD_CONTRACT_V2 §4) */
+function answerSaid(def) {
+  const parts = [...(def.parentElement?.children || [])].filter((n) => !n.classList.contains('kp-folds') && !n.classList.contains('kp-ladder') && n.getClientRects().length);
+  return parts[parts.length - 1] || def;
+}
 function placeWindowControls(face, passage, windowed) {
   face.toggleAttribute('data-window-controls', !!windowed);
   const chips = face.querySelector('.kp-chips');
@@ -9084,6 +9405,9 @@ function placeWindowControls(face, passage, windowed) {
   held?.focus({ preventScroll: true });
 }
 const WINDOW_LINES = 3;
+/** Q · the rows of the answer's folds the pads may never cut: each fold's summary, and a row of the folds that is not a
+ * fold (the see-also line of grammar links, which the pads cut in the MCD deck) */
+const FOLD_ROWS = '.kp-folds > details > summary, .kp-folds > :not(details)';
 const WINDOW_REACH = 12;
 function windowPassage(from, page = from) {
   const face = ctx.root.querySelector('#kp-card');
@@ -9102,8 +9426,14 @@ function windowPassage(from, page = from) {
   const line = parseFloat(getComputedStyle(passage).lineHeight) || 48;
   // The window seats directly under the chrome; the chip row, word and definition are budgeted below it.
   const seat = box.top - WINDOW_REACH - topInset() - SETTLE_GAP;
-  let over = def.getBoundingClientRect().bottom - lift - seat - (barTop - SETTLE_GAP);
-  for (const s of face.querySelectorAll('.kp-folds > details > summary')) {
+  // Q · nothing he must read sits under the pads (Grok's walk: the answer's note went grey under them): the window makes
+  // room for the whole of what the answer says (its word, definition, note: every part before its folds), and only when
+  // that would leave the passage fewer than WINDOW_LINES lines, for the definition, as before
+  const overFor = (n) => n.getBoundingClientRect().bottom - lift - seat - (barTop - SETTLE_GAP);
+  let over = overFor(def);
+  const said = answerSaid(def);
+  if (said !== def && box.height - overFor(said) >= WINDOW_LINES * line) over = Math.max(over, overFor(said));
+  for (const s of face.querySelectorAll(FOLD_ROWS)) {
     const r = s.getBoundingClientRect();
     const [top, bottom] = [r.top - lift - over, r.bottom - lift - over];
     if (!(top < barTop && bottom > barTop)) continue;
@@ -9219,12 +9549,18 @@ function settleBack() {
   if (windowed && target.getBoundingClientRect().height > windowed.clientHeight) target = marked || windowed;
   const toggle = windowed && face.querySelector('.kp-zoom');
   const top = Math.min(target.getBoundingClientRect().top, toggle ? toggle.getBoundingClientRect().top : Infinity);
-  const bottom = def.getBoundingClientRect().bottom - lift;
+  // Q · the whole of what the answer says (its word, definition and note) stays above the pads. Hfix-1B (G-10, Grok's
+  // 320×568 walk: the note ran under the pads): when it does not fit beside the target, the answer comes first and the
+  // passage gives way above it (it scrolls up under the header, where it is read again by scrolling); only an answer taller
+  // than the whole room keeps its word in view and lets its end go
+  const said = answerSaid(def).getBoundingClientRect().bottom - lift;
+  const word = answer.getBoundingClientRect().top - lift;
+  const bottom = said;
   let dy = 0;
   if (bottom - top <= bottomLimit - topLimit) {
     if (top < topLimit) dy = top - topLimit;
     else if (bottom > bottomLimit) dy = bottom - bottomLimit;
-  } else dy = bottom - bottomLimit;
+  } else dy = Math.min(bottom - bottomLimit, word - topLimit);
   const room = { up: -window.scrollY, down: document.documentElement.scrollHeight - innerHeight - window.scrollY };
   dy = Math.max(room.up, Math.min(room.down, dy));
   // then no fold row cut by the bar (backFits: none crosses its top edge by more than half a pixel on
@@ -9232,7 +9568,7 @@ function settleBack() {
   // so the plan is made in whole-pixel moves: a row seated against the bar here is seated there
   const whole = (d) => Math.round(window.scrollY + d) - window.scrollY;
   dy = Math.abs(dy) < 1 ? 0 : whole(dy); // under a pixel off is at rest
-  const rows = [...face.querySelectorAll('.kp-folds > details > summary')].map((s) => {
+  const rows = [...face.querySelectorAll(FOLD_ROWS)].map((s) => {
     const r = s.getBoundingClientRect();
     return [r.top - lift, r.bottom - lift];
   });
@@ -9251,8 +9587,52 @@ function settleBack() {
       break;
     }
   }
-  if (!dy) return;
-  window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
+  if (dy) window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
+  if (windowed) seatUnderHeader(windowed, marked);
+}
+
+/** A long answer can carry the page past the window's seat, so the window's first lines run under the pinned header
+ * (WebKit, whose answer sets taller, lands there). A line at the header's edge is then wholly under it or wholly
+ * below it, its readings included (F, one ruby: a reading is the line's own ink, never half of one left under the
+ * bar): the passage moves by the least whole pixels that does it, the marked word kept in view. */
+function seatUnderHeader(passage, mark) {
+  const view = passage.getBoundingClientRect();
+  const clip = topInset();
+  if (clip <= view.top + 0.5) return;
+  const lines = new Map();
+  for (const n of passage.querySelectorAll('.kp-tok, ruby')) {
+    if (n.matches('ruby') && n.closest('.kp-tok')) continue;
+    for (const r of n.getClientRects()) {
+      if (!r.width || !r.height) continue;
+      const key = Math.round(r.bottom);
+      const line = lines.get(key) || { top: r.top, bottom: r.bottom, base: r.top };
+      line.top = Math.min(line.top, r.top); line.base = Math.min(line.base, r.top); line.bottom = Math.max(line.bottom, r.bottom);
+      lines.set(key, line);
+    }
+  }
+  // a reading belongs to the line its word sits on (WebKit seats an rt's box a little into its word's own box)
+  for (const rt of passage.querySelectorAll('rt')) {
+    const word = [...rt.parentElement.childNodes].find((c) => c.nodeType === 3 && c.textContent.trim());
+    if (!word) continue;
+    const range = document.createRange();
+    range.selectNodeContents(word);
+    const b = [...range.getClientRects()].find((r) => r.width);
+    const line = b && [...lines.values()].find((l) => Math.abs(l.bottom - b.bottom) <= 2);
+    if (!line) continue;
+    for (const r of rt.getClientRects()) if (r.width && r.height) line.top = Math.min(line.top, r.top);
+  }
+  const cut = [...lines.values()].find((l) => l.top < clip - 0.5 && l.bottom > clip + 0.5);
+  if (!cut) return;
+  const target = mark?.getBoundingClientRect();
+  const max = passage.scrollHeight - passage.clientHeight;
+  const prior = passage.scrollTop;
+  const shifts = [Math.floor(cut.top - clip), Math.ceil(cut.bottom - clip)].sort((a, b) => Math.abs(a) - Math.abs(b));
+  for (const shift of shifts) {
+    if (prior + shift < 0 || prior + shift > max) continue;
+    if (target && (target.top - shift < clip || target.bottom - shift > view.bottom)) continue;
+    passage.scrollTo({ top: prior + shift, behavior: 'instant' });
+    break;
+  }
 }
 /** the height of a header the host pins over the top of the page (the corridor's chrome); with
  * none, the study top bar pins itself (player.css, data-host none): where it rests once stuck */
@@ -9415,20 +9795,33 @@ function ghostOf(face, dir) {
   const rect = face.getBoundingClientRect();
   const node = face.cloneNode(true);
   stripCloneIdentity(node);
+  // a still copy: nothing inside it fades in again while it leaves
   node.classList.remove('kp-arrive');
+  for (const moving of node.querySelectorAll('.kp-enter, .kp-arrive')) moving.classList.remove('kp-enter', 'kp-arrive');
   node.classList.add('kp-ghost', `kp-out-${dir}`);
   node.style.transform = '';
   node.setAttribute('aria-hidden', 'true');
   node.inert = true;
   return { node, rect };
 }
+let arrivalSerial = 0;
 function arrive(ghost, dir) {
   const box = ctx.root.querySelector('.kp-study');
   if (!box) return; // the done screen
   if (dir) box.dataset.advance = dir;
   const card = box.querySelector('#kp-card');
-  card?.classList.add('kp-arrive');
-  setTimeout(() => card?.classList.remove('kp-arrive'), 200);
+  if (card) {
+    // the arrival's class leaves with its own animation (or, bounded, its computed length), never a later card's:
+    // each paint builds a new card, and a reveal that keeps this one cancels the wait
+    card.classList.add('kp-arrive');
+    const arrival = ++arrivalSerial;
+    const settle = () => { if (card.dataset.arrival === String(arrival)) { card.classList.remove('kp-arrive'); delete card.dataset.arrival; } };
+    card.dataset.arrival = String(arrival);
+    card.addEventListener('animationend', (e) => { if (e.target === card) settle(); });
+    const cs = getComputedStyle(card);
+    const ms = (v) => (String(v).trim().endsWith('ms') ? parseFloat(v) : parseFloat(v) * 1000) || 0;
+    setTimeout(settle, ms(cs.animationDuration) + ms(cs.animationDelay) + 60);
+  }
   if (!motionOk()) return;
   // もう一度: one brief 朱 slash across the screen as the answered card leaves (inert, removed after)
   if (dir === 'again') {
@@ -9444,7 +9837,8 @@ function arrive(ghost, dir) {
   Object.assign(ghost.node.style, { top: `${ghost.rect.top - at.top}px`, left: `${ghost.rect.left - at.left}px`, width: `${ghost.rect.width}px`, height: `${ghost.rect.height}px` });
   box.append(ghost.node);
   const drop = () => ghost.node.remove();
-  ghost.node.addEventListener('animationend', drop, { once: true });
+  // its own leave ends it (an animation that ends inside the copy does not), or, bounded, 400 ms
+  ghost.node.addEventListener('animationend', (e) => { if (e.target === ghost.node) drop(); });
   setTimeout(drop, 400);
 }
 
@@ -9795,7 +10189,11 @@ function restoreButton(ta, msg) {
 }
 
 function onKey(e) {
-  if (!ctx?.root?.isConnected || ui.screen !== 'study' || e.target.closest?.('input, textarea')) return;
+  // A retained card still has this document listener while a full entry owns the keys.
+  if (e.defaultPrevented || !ctx?.root?.isConnected || ui.screen !== 'study'
+    || ctx.root.closest('[inert], [aria-hidden="true"], [hidden]')
+    || (ctx.host && document.querySelector('#sheet, #stroke-page'))
+    || e.target.closest?.('input, textarea')) return;
   // an open slip (the host's) or popover takes the keys: Escape closes it, and nothing grades behind it
   const slip = !!ctx.host && safely(() => !!ctx.host.slipOpen?.(), false);
   if (slip || ui.pop) {
@@ -9830,7 +10228,7 @@ function ensureCss() {
   document.head.append(link);
 }
 
-async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false } = {}) {
+async function render(main, { deckId, storage = window.localStorage, onLeave, openEntry, host = null, english = true, autoStart, presentation = null, next = null, focusRoom = false, words = null } = {}) {
   const request = ++mountRequest;
   if (autoStart !== undefined) pendingStart = { deckId, autoStart };
   ensureCss();
@@ -9869,8 +10267,12 @@ async function render(main, { deckId, storage = window.localStorage, onLeave, op
     tokenFile: lexicon ? tokensReady.get(deckId) || null : null,
     gloss: lexicon ? null : glossFor(deckId, deck),
     prefs: prefsFor(storage, deck),
+    // Q · the host's one rule for Japanese line breaks: text → its words, as groups of segments (the app's jaWordGroups);
+    // the standalone pages have none and keep the browser's breaks
+    words: typeof words === 'function' ? words : null,
   };
   root.addEventListener('pointerdown', onDown, true);
+  wireDeckHold(root);
   ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));
   if (!sameDeck || start === false) {
     ui.screen = 'home';
@@ -9900,6 +10302,25 @@ async function render(main, { deckId, storage = window.localStorage, onLeave, op
 }
 
 /** due count for a deck chooser, without rendering anything */
+/**
+ * Read-only, for the corridor's Today (S): the words this deck's ledger answered Again since `since` (epoch ms) — a
+ * miss in reading or in the four choices (わからない) — each with its latest miss, most recent first. It loads the deck to
+ * name its cards and writes nothing.
+ */
+async function missedTerms(deckId, storage = window.localStorage, since = 0) {
+  const { deck, index } = await loadDeck(deckId);
+  const { state } = loadState(storage, deck);
+  const latest = new Map();
+  for (const row of Array.isArray(state.log) ? state.log : []) {
+    if (!Array.isArray(row) || row[1] !== RATINGS.again) continue;
+    const at = Date.parse(row[2]);
+    const word = index.cards.get(row[0])?.word;
+    if (!(at >= since) || !word?.term) continue;
+    if (!latest.has(word.term) || latest.get(word.term).at < at) latest.set(word.term, { term: word.term, reading: word.reading || '', at, deck: deckId });
+  }
+  return [...latest.values()].sort((a, b) => b.at - a.at);
+}
+
 async function summary(deckId, storage = window.localStorage) {
   const { deck } = await loadDeck(deckId);
   const { state } = loadState(storage, deck);
