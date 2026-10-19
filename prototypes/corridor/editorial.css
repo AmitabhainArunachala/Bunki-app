@@ -6120,8 +6120,8 @@ body.ginga #app > .scale-thread { position: fixed; left: 0; top: calc(56px + env
 .ww-reading-door.ww-c-r::before {
   left: 50%;
   bottom: 0;
-  width: max(100%, 44px);
-  height: max(100%, 44px);
+  width: max(100%, 46px);
+  height: max(100%, 46px);
   transform: translateX(-50%);
 }
 /* The detail reading clips long text in its dd. Anchor the press region to its
@@ -6132,7 +6132,7 @@ body.ginga #app > .scale-thread { position: fixed; left: 0; top: calc(56px + env
   left: 8px;
   right: 8px;
   bottom: 2px;
-  height: 44px;
+  height: 46px;
 }
 .ww-reading-choices { margin-block: 1rem; }
 .ww-reading-choices .ww-reading-choice { display: block; max-width: 100%; margin-block: .5rem; white-space: normal; text-align: start; }
