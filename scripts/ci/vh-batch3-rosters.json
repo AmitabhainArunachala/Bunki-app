@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 1,
+  "sourceBasis": {
+    "hfix2e-hold": {
+      "head": "f39a014d",
+      "path": "prototypes/corridor/tools/verify-hfix2e-hold.mjs",
+      "sha256": "4f8b3774e87766483914d5ecf80bbc21df34cb6a5fdce7522cf51bd11021c23f"
+    },
+    "hfix2e-contrast": {
+      "head": "f39a014d",
+      "path": "prototypes/corridor/tools/verify-hfix2e-contrast.mjs",
+      "sha256": "5f46b9bd0379d0b095f37b93f52647ce12a4608bcf81f690a98cb04192e60532"
+    },
+    "hfix2e-examples": {
+      "head": "f39a014d",
+      "path": "prototypes/corridor/tools/verify-hfix2e-examples.mjs",
+      "sha256": "fc8668eb88f2fc9f00b6894d85c6280af5cc0e99ede9ab4bd419b597a3bce2d9"
+    },
+    "hfix2e-x10-kt3": {
+      "head": "f39a014d",
+      "path": "prototypes/corridor/tools/verify-hfix2e-x10-kt3.mjs",
+      "sha256": "071ea8f22750d01e5ae9396621eedcf176507e50ee0a7fbcc55fb8f253601c9d"
+    },
+    "hfix2b": {
+      "head": "35a10f8c",
+      "path": "prototypes/corridor/tools/verify-hfix2b.mjs",
+      "sha256": "132fc90dad3da2f28a63d71a17400dbf8cce29c48a494c49e0e66c6f12f8ddbb"
+    },
+    "hfix2e2": {
+      "head": "ab04bb9f",
+      "path": "prototypes/corridor/tools/verify-hfix2e2.mjs",
+      "sha256": "01eb551dd7874c867e3e76d3e35d990cd6e5575b435310e4102d8ae3bbed6f88"
+    }
+  },
+  "rows": {
+    "hfix2b": {
+      "chromium": [
+        "KH1-3 no gloss the sky is served ends mid-word",
+        "KH1-3 取り上げる carries its whole gloss, not \"…to confi\"",
+        "KH1-3 r2 every gloss the sky is served ends on a whole word, none left at the 32-character cut",
+        "KH1-3 r2 the sixteen glosses Grok found cut are whole or honestly cut",
+        "X-12 every saved word is on glass at the first frame, with no drag",
+        "X-12 it is lit in the world's own ink, never the vermilion error dot",
+        "X-1 each 宙 star says why it is there, in Today's sky's own words",
+        "X-1 a star with no recorded reason says nothing, and invents none",
+        "X-1 the reason is in the star's accessible name too",
+        "X-12 a saved word is still lit after a drag",
+        "X-14 the thread shows a shelf bead at all (DEPTH beads deep)",
+        "X-14 the shelf bead is inside the viewport and nothing covers it, with no sliding",
+        "X-14 every bead is reachable and visible, none tucked behind 宙",
+        "X-9 the word page's own writer records the \"Not yet\"",
+        "X-9 a word marked \"Not yet\" on its page reaches Today's sky, with its reason",
+        "no page errors",
+        "H2-1 ipad 1024×768: nothing legible is cut by the glass edge",
+        "H2-1 ipad 1024×768: no sky word draws above opacity 0 while its box crosses the rim",
+        "H2-1 r2 ipad 1024×768: a tapped word held and dragged past the rim draws nothing above 0 across it, finger down or after release, nor any reading with readings always on",
+        "H2-1 ipad no page errors",
+        "H2-1 laptop 1440×900: nothing legible is cut by the glass edge",
+        "H2-1 laptop 1440×900: no sky word draws above opacity 0 while its box crosses the rim",
+        "H2-1 r2 laptop 1440×900: a tapped word held and dragged past the rim draws nothing above 0 across it, finger down or after release, nor any reading with readings always on",
+        "H2-1 laptop no page errors"
+      ],
+      "webkit": [
+        "KH1-3 no gloss the sky is served ends mid-word",
+        "KH1-3 取り上げる carries its whole gloss, not \"…to confi\"",
+        "KH1-3 r2 every gloss the sky is served ends on a whole word, none left at the 32-character cut",
+        "KH1-3 r2 the sixteen glosses Grok found cut are whole or honestly cut",
+        "X-12 every saved word is on glass at the first frame, with no drag",
+        "X-12 it is lit in the world's own ink, never the vermilion error dot",
+        "X-1 each 宙 star says why it is there, in Today's sky's own words",
+        "X-1 a star with no recorded reason says nothing, and invents none",
+        "X-1 the reason is in the star's accessible name too",
+        "X-12 a saved word is still lit after a drag",
+        "X-14 the thread shows a shelf bead at all (DEPTH beads deep)",
+        "X-14 the shelf bead is inside the viewport and nothing covers it, with no sliding",
+        "X-14 every bead is reachable and visible, none tucked behind 宙",
+        "X-9 the word page's own writer records the \"Not yet\"",
+        "X-9 a word marked \"Not yet\" on its page reaches Today's sky, with its reason",
+        "no page errors",
+        "H2-1 phone 390×844: nothing legible is cut by the glass edge",
+        "H2-1 phone 390×844: no sky word draws above opacity 0 while its box crosses the rim",
+        "H2-1 r2 phone 390×844: a tapped word held and dragged past the rim draws nothing above 0 across it, finger down or after release, nor any reading with readings always on",
+        "H2-1 phone no page errors"
+      ]
+    },
+    "hfix2e2": {
+      "chromium": [
+        "X13.cover · chromium 390×844 · through the whole of 知床, 層 at rest never stands over a reading token or its press region, and stays reachable",
+        "X13.reach · chromium 390×844 · mid-article one press on 層 opens the layers and one folds them home",
+        "X13.cover · chromium 320×568 · through the whole of 知床, 層 at rest never stands over a reading token or its press region, and stays reachable",
+        "X13.reach · chromium 320×568 · mid-article one press on 層 opens the layers and one folds them home",
+        "X13.look · chromium hokusai 390×844 · the dock is the tab bar's own surface, one bar with no line between them; 層 at its right end, its disc at 3:1 or more against it",
+        "X13.look · chromium hokusai 320×568 · the dock is the tab bar's own surface, one bar with no line between them; 層 at its right end, its disc at 3:1 or more against it",
+        "X13.look · chromium yoru 390×844 · the dock is the tab bar's own surface, one bar with no line between them; 層 at its right end, its disc at 3:1 or more against it",
+        "X13.look · chromium yoru 320×568 · the dock is the tab bar's own surface, one bar with no line between them; 層 at its right end, its disc at 3:1 or more against it",
+        "X13.look · chromium sumi 390×844 · the dock is the tab bar's own surface, one bar with no line between them; 層 at its right end, its disc at 3:1 or more against it",
+        "X13.look · chromium sumi 320×568 · the dock is the tab bar's own surface, one bar with no line between them; 層 at its right end, its disc at 3:1 or more against it",
+        "X13.fade · chromium 390×844 · the dock fades away as the layers open and back as they fold, in the chrome's beat",
+        "X13.fade · chromium 390×844 (reduced motion) · the dock goes and comes back at once",
+        "X13.mac · chromium 1440×900 · on the Mac 層, its box and its styles, and the reading around it, are exactly the base's",
+        "G61.trace · chromium",
+        "G61.fade · chromium 1440×900 · the fold's frames show the reading fading, never rising, gone by 400 ms",
+        "G61.still · chromium 1440×900 · while it fades no other word of the line moves and its overhang is kept; folded, every word is where it was",
+        "G61.reveal · chromium 1440×900 · the reveal stands at once: its first frame shows the whole reading",
+        "G61.record · chromium 1440×900 · the fold writes nothing: the whole native record and the scroll are the same either side of it",
+        "G61 · chromium 1440×900 · a reading folded away fades, moves no line, writes nothing; its reveal stands at once (load LOAD ≤ 20)",
+        "G61.reduced · chromium 1440×900 · under reduced motion the conceal stays instant",
+        "G61.rest320 · chromium · at rest after a fold the document, body and reader are 320 wide at 320, in all three orders",
+        "G61.press · chromium 320×568 · the 599 press regions of 知床 are the base's, and the same again after a fold",
+        "NAMI.sweep · chromium",
+        "NAMI.tools.rest · chromium 390×844 · in nami the idioms label on the shelf tools' door reads 4.6:1 or more at rest",
+        "NAMI.tools.pointer · chromium 390×844 · in nami the idioms label on the shelf tools' door reads 4.6:1 or more under a pointer",
+        "NAMI.practice.rest · chromium 390×844 · in nami \"Practice it\" reads 4.6:1 or more at rest",
+        "NAMI.practice.pointer · chromium 390×844 · in nami \"Practice it\" reads 4.6:1 or more under a pointer"
+      ],
+      "webkit": [
+        "X13.cover · webkit 390×844 · through the whole of 知床, 層 at rest never stands over a reading token or its press region, and stays reachable",
+        "X13.reach · webkit 390×844 · mid-article one press on 層 opens the layers and one folds them home",
+        "X13.cover · webkit 320×568 · through the whole of 知床, 層 at rest never stands over a reading token or its press region, and stays reachable",
+        "X13.reach · webkit 320×568 · mid-article one press on 層 opens the layers and one folds them home",
+        "X13.look · webkit hokusai 390×844 · the dock is the tab bar's own surface, one bar with no line between them; 層 at its right end, its disc at 3:1 or more against it",
+        "X13.look · webkit hokusai 320×568 · the dock is the tab bar's own surface, one bar with no line between them; 層 at its right end, its disc at 3:1 or more against it",
+        "X13.look · webkit yoru 390×844 · the dock is the tab bar's own surface, one bar with no line between them; 層 at its right end, its disc at 3:1 or more against it",
+        "X13.look · webkit yoru 320×568 · the dock is the tab bar's own surface, one bar with no line between them; 層 at its right end, its disc at 3:1 or more against it",
+        "X13.look · webkit sumi 390×844 · the dock is the tab bar's own surface, one bar with no line between them; 層 at its right end, its disc at 3:1 or more against it",
+        "X13.look · webkit sumi 320×568 · the dock is the tab bar's own surface, one bar with no line between them; 層 at its right end, its disc at 3:1 or more against it",
+        "X13.fade · webkit 390×844 · the dock fades away as the layers open and back as they fold, in the chrome's beat",
+        "X13.fade · webkit 390×844 (reduced motion) · the dock goes and comes back at once",
+        "G61.trace · webkit",
+        "G61.fade · webkit 390×844 · the fold's frames show the reading fading, never rising, gone by 400 ms",
+        "G61.still · webkit 390×844 · while it fades no other word of the line moves and its overhang is kept; folded, every word is where it was",
+        "G61.reveal · webkit 390×844 · the reveal stands at once: its first frame shows the whole reading",
+        "G61.record · webkit 390×844 · the fold writes nothing: the whole native record and the scroll are the same either side of it",
+        "G61 · webkit 390×844 · a reading folded away fades, moves no line, writes nothing; its reveal stands at once (load LOAD ≤ 20)",
+        "G61.reduced · webkit 390×844 · under reduced motion the conceal stays instant",
+        "G61.rest320 · webkit · at rest after a fold the document, body and reader are 320 wide at 320, in all three orders",
+        "G61.press · webkit 320×568 · the 599 press regions of 知床 are the base's, and the same again after a fold",
+        "NAMI.sweep · webkit",
+        "NAMI.tools.rest · webkit 390×844 · in nami the idioms label on the shelf tools' door reads 4.6:1 or more at rest",
+        "NAMI.tools.pointer · webkit 390×844 · in nami the idioms label on the shelf tools' door reads 4.6:1 or more under a pointer",
+        "NAMI.practice.rest · webkit 390×844 · in nami \"Practice it\" reads 4.6:1 or more at rest",
+        "NAMI.practice.pointer · webkit 390×844 · in nami \"Practice it\" reads 4.6:1 or more under a pointer"
+      ]
+    },
+    "hfix2e-hold": {
+      "chromium": [
+        "W7-hold",
+        "W7-centre",
+        "W7-drag",
+        "W7-right",
+        "W7-key",
+        "W7-tap"
+      ],
+      "webkit": [
+        "W7-hold",
+        "W7-centre",
+        "W7-tap"
+      ]
+    },
+    "hfix2e-examples": {
+      "chromium": [
+        "KT6-A",
+        "KT6-B",
+        "KT6-C",
+        "KT6-D",
+        "KT6-G",
+        "KT6-H",
+        "KT6-E",
+        "KT6-F"
+      ],
+      "webkit": [
+        "KT6-A",
+        "KT6-B",
+        "KT6-C",
+        "KT6-D",
+        "KT6-G",
+        "KT6-H",
+        "KT6-E",
+        "KT6-F"
+      ]
+    },
+    "hfix2e-x10-kt3": {
+      "chromium": [
+        "X10.card · chromium 1440 · a word's card open: one live Save, the card's; a Save the bar shows then keeps the word in one press",
+        "X10.fold · chromium 1440 · the card folded (Escape): the bar's Save is the one live Save, names 総理, and one press keeps it",
+        "X10.reading · chromium 1440 · one tap raises 総理's reading: the bar's Save is live, names 総理, and one press keeps it",
+        "KT3 · chromium 1440 bi · a grid glyph is named by the kanji and its meaning, with the reading the reading lens found it by",
+        "KT3 · chromium 1440 ja · a grid glyph is named by the kanji and its meaning, with the reading the reading lens found it by"
+      ],
+      "webkit": [
+        "X10.card · webkit 390 · a word's card open: one live Save, the card's; a Save the bar shows then keeps the word in one press",
+        "X10.fold · webkit 390 · the card folded (Escape): the bar's Save is the one live Save, names 総理, and one press keeps it",
+        "X10.reading · webkit 390 · one tap raises 総理's reading: the bar's Save is live, names 総理, and one press keeps it",
+        "KT3 · webkit 390 bi · a grid glyph is named by the kanji and its meaning, with the reading the reading lens found it by",
+        "KT3 · webkit 390 ja · a grid glyph is named by the kanji and its meaning, with the reading the reading lens found it by"
+      ]
+    },
+    "hfix2e-contrast": {
+      "chromium": [
+        "chromium/hokusai/learn",
+        "chromium/hokusai/words",
+        "chromium/sumi/learn",
+        "chromium/sumi/words",
+        "chromium/shu/learn",
+        "chromium/shu/words",
+        "chromium/akafuji/learn",
+        "chromium/akafuji/words",
+        "chromium/iwa/learn",
+        "chromium/iwa/words",
+        "chromium/rokusho/learn",
+        "chromium/rokusho/words",
+        "chromium/yoru/learn",
+        "chromium/yoru/words",
+        "chromium/nami/learn",
+        "chromium/nami/words",
+        "chromium/keyblock/learn",
+        "chromium/keyblock/words",
+        "chromium/hakuu/learn",
+        "chromium/hakuu/words",
+        "chromium/kaku/learn",
+        "chromium/kaku/words"
+      ],
+      "webkit": [
+        "webkit/hokusai/learn",
+        "webkit/hokusai/words",
+        "webkit/sumi/learn",
+        "webkit/sumi/words",
+        "webkit/shu/learn",
+        "webkit/shu/words",
+        "webkit/akafuji/learn",
+        "webkit/akafuji/words",
+        "webkit/iwa/learn",
+        "webkit/iwa/words",
+        "webkit/rokusho/learn",
+        "webkit/rokusho/words",
+        "webkit/yoru/learn",
+        "webkit/yoru/words",
+        "webkit/nami/learn",
+        "webkit/nami/words",
+        "webkit/keyblock/learn",
+        "webkit/keyblock/words",
+        "webkit/hakuu/learn",
+        "webkit/hakuu/words",
+        "webkit/kaku/learn",
+        "webkit/kaku/words"
+      ]
+    }
+  }
+}

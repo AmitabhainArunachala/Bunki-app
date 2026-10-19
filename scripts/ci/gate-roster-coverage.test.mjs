@@ -6,9 +6,10 @@ import { homedir } from 'node:os';
 import { fileURLToPath, URL } from 'node:url';
 import { dirname, join } from 'node:path';
 import { batteryGates, runGates, validateKanjiTrustReport, validateHfix2aReport } from '../verify-release-gates.mjs';
+import { BATCH3_SUITES, batch3NarrowingEnvironment } from './vh-batch3-report-contracts.mjs';
 import { supplementalGates } from './supplemental.mjs';
 import { gateEvidenceDeclaration } from './gate-evidence.mjs';
-import { acceptanceEnvironment } from './verification-admission.mjs';
+import { acceptanceEnvironment, NARROWING_ENV } from './verification-admission.mjs';
 const root = fileURLToPath(new URL('../..', import.meta.url)),
   out = '/independent-coverage-only/no-execution';
 const gates = [...batteryGates(out, {}), ...supplementalGates(out)];
@@ -25,9 +26,9 @@ for (const file of readdirSync(join(root, 'scripts/ci')).filter((f) =>
       for (const key of value) known.add(key);
     }
 }
-test('all 203 canonical and supplemental gates have unique names and mandatory declarations', () => {
-  assert.equal(gates.length, 203);
-  assert.equal(new Set(gates.map((g) => g.name)).size, 203);
+test('all 215 canonical and supplemental gates have unique names and mandatory declarations', () => {
+  assert.equal(gates.length, 215);
+  assert.equal(new Set(gates.map((g) => g.name)).size, 215);
   const expected = JSON.parse(
     readFileSync(new URL('./vh-required-gate-roster.json', import.meta.url), 'utf8'),
   );
@@ -459,4 +460,127 @@ test('two Hfix-2d descriptors bind one engine, no controls and the candidate com
   const bound = batteryGates(out, { KAIRO_SITE_DIR: site,
     KAIRO_VERIFIED_ARTIFACT_SHA256: artifactSha256, KAIRO_EXPECT_GITSHA: 'stale' }).filter(gate => gate.name.startsWith('hfix2d'));
   assert(bound.every(gate => gate.env.KAIRO_EXPECT_GITSHA === gitSha));
+});
+
+function batch3DescriptorSite(parent) {
+  const site = mkdtempSync(join(parent, 'site-'));
+  const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+  const sourceAssetSha256 = 'a'.repeat(64);
+  const files = [
+    'index.html', 'sw.js', 'manifest.webmanifest', 'corridor.js', 'record-host.mjs',
+    'record-app.mjs', 'assessment-controller.mjs', 'record-controller.mjs',
+    'modules/record-core.mjs', 'modules/assessment-core.mjs', 'data/mock/sets/n5-01.json',
+  ].map(path => {
+    const bytes = path === 'record-host.mjs' || path === 'data/mock/sets/n5-01.json'
+      ? readFileSync(join(root, 'prototypes/corridor', path))
+      : Buffer.from(path === 'sw.js'
+        ? `self.KAIRO_ASSET_VERSION = ${JSON.stringify(sourceAssetSha256)};\n`
+        : `// Explicit nonexecuted synthetic artifact: ${path}\n`);
+    mkdirSync(dirname(join(site, path)), { recursive: true });
+    writeFileSync(join(site, path), bytes);
+    return { path, bytes: bytes.length, sha256: hash(bytes) };
+  });
+  const identity = { schemaVersion: 1, product: 'KAIRO', sourceDirty: false,
+    gitSha: 'c'.repeat(40), sourceAssetSha256, artifactSha256: hash(JSON.stringify(files)), files };
+  writeFileSync(join(site, 'build-identity.json'), JSON.stringify(identity));
+  return { site, identity };
+}
+
+test('twelve Batch 3 descriptors preserve exact order, one engine, wrapper and mandatory pins', () => {
+  const expected = [
+    'hfix2e-contrast', 'hfix2e-contrast-webkit',
+    'hfix2e-examples', 'hfix2e-examples-webkit',
+    'hfix2e-hold', 'hfix2e-hold-webkit',
+    'hfix2e-x10-kt3', 'hfix2e-x10-kt3-webkit',
+    'hfix2b', 'hfix2b-webkit', 'hfix2e2', 'hfix2e2-webkit',
+  ];
+  const parent = join(homedir(), '.dharma/bunki/batch3-descriptor-tests');
+  mkdirSync(parent, { recursive: true });
+  const { site, identity } = batch3DescriptorSite(parent);
+  const all = batteryGates(out, { KAIRO_SITE_DIR: site,
+    KAIRO_VERIFIED_ARTIFACT_SHA256: identity.artifactSha256 });
+  const start = all.findIndex(gate => gate.name === 'hfix2d-webkit') + 1;
+  const rows = all.slice(start, start + 12);
+  assert.deepEqual(rows.map(gate => gate.name), expected);
+  assert.deepEqual(BATCH3_SUITES.flatMap(suite => [suite, `${suite}-webkit`]), expected);
+  for (const key of batch3NarrowingEnvironment) assert(NARROWING_ENV.includes(key), key);
+  for (const gate of rows) {
+    const engine = gate.name.endsWith('-webkit') ? 'webkit' : 'chromium';
+    const suite = gate.name.replace(/-webkit$/u, '');
+    const wrapper = `scripts/ci/run-${suite}-gate.mjs`;
+    assert.deepEqual(gate.args, [wrapper]); assert.equal(gate.requiredPath, wrapper);
+    assert.equal(gate.env.KAIRO_BROWSER, engine); assert.equal(gate.report.engine, engine);
+    assert.equal(gate.report.type, `batch3-${suite}`);
+    assert.equal(gate.report.path, join(out, gate.name, 'lane-admission.json'));
+    assert.equal(gate.report.artifactSha256, identity.artifactSha256);
+    assert.deepEqual(gate.report.siteIdentity, identity); assert.equal(gate.report.siteDir, site);
+    assert.equal(gate.report.sourceSha256, createHash('sha256').update(readFileSync(join(root, wrapper))).digest('hex'));
+    assert.equal(gateEvidenceDeclaration(gate, root, out).kind, 'retained-report');
+    const ambient = Object.fromEntries(batch3NarrowingEnvironment.map(key => [key, 'foreign-selector']));
+    const env = acceptanceEnvironment({ ...ambient, KAIRO_BROWSER: 'all' }, gate.env);
+    assert.equal(env.KAIRO_BROWSER, engine);
+    for (const key of batch3NarrowingEnvironment) assert(!Object.hasOwn(env, key), key);
+  }
+  assert(supplementalGates(out).find(gate => gate.name === 'ci-contracts').args.includes('scripts/ci/vh-batch3-report-contracts.test.mjs'));
+});
+
+test('Batch 3 runGates dispatch requires fresh native evidence after a zero-exit synthetic process', async () => {
+  const parent = join(homedir(), '.dharma/bunki/batch3-dispatch-tests');
+  mkdirSync(parent, { recursive: true });
+  const fixture = mkdtempSync(join(parent, 'unit-'));
+  const { site, identity } = batch3DescriptorSite(fixture);
+  const producer = join(fixture, 'explicit-synthetic-producer.mjs');
+  // This process writes only synthetic unit data. It imports consumers and fixtures,
+  // never the native browser producer, and exercises the real runGates dispatch.
+  writeFileSync(producer, `
+import assert from 'node:assert/strict';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+const root = ${JSON.stringify(root)};
+const {loadBatch3Pins, readBatch3Evidence, makeBatch3Admission, batch3Digest} = await import(pathToFileURL(join(root,'scripts/ci/vh-batch3-report-contracts.mjs')));
+const {unitFixture} = await import(pathToFileURL(join(root,'scripts/ci/fixtures/vh-batch3/fixture.mjs')));
+const engine=process.env.KAIRO_BROWSER, mode=process.env.BATCH3_UNIT_MUTATION;
+const out=process.env.KAIRO_EVIDENCE_DIR;
+if(existsSync(out)) assert.equal(readdirSync(out).length,0,'Native lane starts with an empty evidence directory');
+mkdirSync(out,{recursive:true});
+if(mode==='missing') process.exit(0);
+if(mode==='empty') {writeFileSync(join(out,'lane-admission.json'),'{}');process.exit(0);}
+const suite='hfix2e-examples';
+const p=loadBatch3Pins({root,siteDir:process.env.KAIRO_SITE_DIR,suite,engine,runId:process.env.KAIRO_GATE_RUN_ID});
+const value=unitFixture(suite,engine).value;
+value.build=p.identity.gitSha;value.artifact=p.identity.artifactSha256;
+value.identity={gitSha:p.identity.gitSha,artifactSha256:p.identity.artifactSha256,sourceDirty:false};
+value.verifierSha256=p.sources['prototypes/corridor/tools/verify-hfix2e-examples.mjs'];
+const put=(name,value)=>writeFileSync(join(out,name),JSON.stringify(value));
+put('result.json',value);
+const child={argv:['prototypes/corridor/tools/verify-hfix2e-examples.mjs'],status:0,signal:null,error:null};
+put('native-process.json',child);
+const admission=makeBatch3Admission(readBatch3Evidence(out,p),p,child);
+if(mode==='stale') admission.pins.runId='another-attempt';
+if(mode==='suite') admission.suite='hfix2e-hold';
+if(mode==='narrowed'||mode==='engine') {
+ if(mode==='narrowed') value.results.pop(); else value.engine=engine==='webkit'?'chromium':'webkit';
+ put('result.json',value);admission.files['result.json']=batch3Digest(JSON.stringify(value));
+}
+put('lane-admission.json',admission);
+`);
+  for (const engine of ['chromium', 'webkit']) {
+    for (const mutation of ['good', 'missing', 'empty', 'suite', 'artifact', 'stale', 'wrapper', 'narrowed', 'engine']) {
+      const runOut = join(fixture, `${engine}-${mutation}`);
+      const name = engine === 'chromium' ? 'hfix2e-examples' : 'hfix2e-examples-webkit';
+      const gate = batteryGates(runOut, { KAIRO_SITE_DIR: site,
+        KAIRO_VERIFIED_ARTIFACT_SHA256: identity.artifactSha256 }).find(gate => gate.name === name);
+      const report = { ...gate.report };
+      if (mutation === 'artifact') report.artifactSha256 = 'f'.repeat(64);
+      if (mutation === 'wrapper') report.sourceSha256 = 'f'.repeat(64);
+      const result = await runGates({ root: fixture, out: runOut, gates: [{ ...gate,
+        args: [producer], requiredPath: producer, report,
+        env: { ...gate.env, BATCH3_UNIT_MUTATION: mutation },
+      }] });
+      assert.equal(result.gates[0].processExitCode, 0, `${engine}/${mutation}: synthetic child must exit zero`);
+      assert.equal(result.gates[0].status, mutation === 'good' ? 'passed' : 'incomplete', `${engine}/${mutation}: ${result.gates[0].detail}`);
+      assert.equal(result.exitCode, mutation === 'good' ? 0 : 1, `${engine}/${mutation}`);
+    }
+  }
 });

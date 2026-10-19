@@ -39,6 +39,7 @@ import {
 import { commandCheckEvidence } from './ci/command-check-contracts.mjs';
 import { loadHfix2cPins, validateHfix2cFocused, validateHfix2cLaneAdmission } from './ci/vh-hfix2c-report-contracts.mjs';
 import { loadHfix2dPins, validateHfix2dReport } from './ci/vh-hfix2d-report-contracts.mjs';
+import { BATCH3_SUITES, BATCH3_REPORT_TYPES, loadBatch3Pins, validateBatch3Admission } from './ci/vh-batch3-report-contracts.mjs';
 
 const SELF = fileURLToPath(import.meta.url);
 const ROOT = resolve(dirname(SELF), '..');
@@ -307,6 +308,15 @@ export function batteryGates(out, env = process.env) {
           KAIRO_EXPECT_GITSHA: env.KAIRO_SITE_DIR ? json(join(env.KAIRO_SITE_DIR, 'build-identity.json')).gitSha : '' },
       };
     }),
+    ...BATCH3_SUITES.flatMap((suite) => ['chromium', 'webkit'].map((engine) => {
+      const name = engine === 'chromium' ? suite : `${suite}-webkit`;
+      return {
+        ...node(name, `scripts/ci/run-${suite}-gate.mjs`, [], {
+          ...report(name, `batch3-${suite}`, 'lane-admission.json'), engine,
+        }),
+        env: { KAIRO_BROWSER: engine },
+      };
+    })),
     node(
       'word-saved-answer',
       tool('test-word-saved-answer'),
@@ -917,19 +927,20 @@ export function batteryGates(out, env = process.env) {
       'hfix2c',
       'hfix2c-three-state-contrast',
       'hfix2d',
+      ...BATCH3_REPORT_TYPES,
     ].includes(gate.report?.type)
       ? {
           report: {
             ...gate.report,
             artifactSha256: env.KAIRO_VERIFIED_ARTIFACT_SHA256,
-            ...(['hfix2a', 'hfix2a-item-a', 'hfix2c', 'hfix2c-three-state-contrast', 'hfix2d'].includes(gate.report.type)
+            ...(['hfix2a', 'hfix2a-item-a', 'hfix2c', 'hfix2c-three-state-contrast', 'hfix2d', ...BATCH3_REPORT_TYPES].includes(gate.report.type)
               ? {
                   siteIdentity: env.KAIRO_SITE_DIR
                     ? json(join(env.KAIRO_SITE_DIR, 'build-identity.json'))
                     : null,
                 }
               : {}),
-            ...(['hfix2c', 'hfix2c-three-state-contrast', 'hfix2d'].includes(gate.report.type)
+            ...(['hfix2c', 'hfix2c-three-state-contrast', 'hfix2d', ...BATCH3_REPORT_TYPES].includes(gate.report.type)
               ? { siteDir: env.KAIRO_SITE_DIR ? resolve(env.KAIRO_SITE_DIR) : null }
               : {}),
             ...(gate.report.type === 'kanji-trust'
@@ -979,6 +990,7 @@ export function batteryGates(out, env = process.env) {
               'hfix2c',
               'hfix2c-three-state-contrast',
               'hfix2d',
+              ...BATCH3_REPORT_TYPES,
             ].includes(gate.report.type)
               ? {
                   sourceSha256: existsSync(resolve(ROOT, gate.requiredPath))
@@ -2001,6 +2013,13 @@ function requireCompleteReport({
     assert.equal(sourceSha256, type === 'hfix2c' ? pins.sources.focused : pins.sources.wrapper, 'Hfix-2c descriptor source differs');
     if (type === 'hfix2c') validateHfix2cFocused(value, pins);
     else validateHfix2cLaneAdmission(value, dirname(path), pins);
+  } else if (BATCH3_REPORT_TYPES.includes(type)) {
+    const suite = type.slice('batch3-'.length);
+    const pins = loadBatch3Pins({ root: ROOT, siteDir, suite, engine, runId });
+    assert.equal(pins.identity.artifactSha256, artifactSha256, 'Batch 3 descriptor artifact differs');
+    assert.deepEqual(pins.identity, siteIdentity, 'Batch 3 descriptor identity differs');
+    assert.equal(sourceSha256, pins.sources[`scripts/ci/run-${suite}-gate.mjs`], 'Batch 3 descriptor source differs');
+    validateBatch3Admission(value, dirname(path), pins);
   } else if (type === 'hfix2d') {
     const pins = loadHfix2dPins({ root: ROOT, siteDir, engine, runId });
     assert.equal(pins.artifactSha256, artifactSha256, 'Hfix-2d descriptor artifact differs');
@@ -2975,6 +2994,18 @@ async function verifyRunner(out) {
     'hfix2c-contrast-webkit',
     'hfix2d',
     'hfix2d-webkit',
+    'hfix2e-contrast',
+    'hfix2e-contrast-webkit',
+    'hfix2e-examples',
+    'hfix2e-examples-webkit',
+    'hfix2e-hold',
+    'hfix2e-hold-webkit',
+    'hfix2e-x10-kt3',
+    'hfix2e-x10-kt3-webkit',
+    'hfix2b',
+    'hfix2b-webkit',
+    'hfix2e2',
+    'hfix2e2-webkit',
     'word-saved-answer',
     'word-saved-answer-controls',
     'word-saved-answer-mutation-controls',

@@ -35,6 +35,7 @@ export function supplementalGates(out) {
         'scripts/ci/vh-retained-report-contracts.test.mjs',
         'scripts/ci/vh-visual-report-contracts.test.mjs',
         'scripts/ci/vh-voice-report-contracts.test.mjs',
+        'scripts/ci/vh-batch3-report-contracts.test.mjs',
         'prototypes/corridor/tools/test-vh-type-ruby-controls.mjs',
         'prototypes/corridor/tools/vh-word-grammar-contracts.test.mjs',
         'prototypes/corridor/tools/vh-learning-contracts.test.mjs',
