@@ -676,7 +676,8 @@ async function verifyDelivery(browser, base) {
       await page.waitForSelector('.kp-grade');
       back = { count: await count(), log: await logLength('kotoba-mine') };
     }
-    check("K020", 'the done screen keeps ひとつ戻す and it brings the last card back', done.undo === 1 && done.text.includes('Recall rate') && back?.count === '2/2' && back.log === 1, JSON.stringify({ ...done, back }));
+    // the card comes back as the early pass's own one card: that pass counts within itself (lead's 0122, Grok §1)
+    check("K020", 'the done screen keeps ひとつ戻す and it brings the last card back', done.undo === 1 && done.text.includes('Recall rate') && back?.count === '1/1' && back.log === 1, JSON.stringify({ ...done, back }));
 
     // 4択 never asks a 字 card: it is answered as 穴埋め (F38)
     await page.evaluate(DUE_KANJI);
