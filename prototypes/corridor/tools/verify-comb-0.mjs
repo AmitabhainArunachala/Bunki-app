@@ -528,9 +528,11 @@ try {
             });
             faults.push(...f.out.map((x) => `${centre ? centre.key : 'day'}: ${x}`));
             if (centre) stress += f.stress;
-            // a caption cut short keeps its whole text a hold away: the slip the node opens says it
+            // a caption cut short keeps its whole text in the node's slip: the slip says it. Hfix-2e (the lead's ruling, 10-20):
+            // a right-click on a node now seals it, as a hold does (S3), so the slip is reached the way a tap reaches it
+            // (climbToSlip: the reading rung, then once more, never past the slip); the check is unchanged
             for (const c of f.cut) {
-              await page.locator('.ww-plate .ww-node').nth(c.i).click({ button: 'right' });
+              await climbToSlip(page, page.locator('.ww-plate .ww-node').nth(c.i));
               const said = await page.waitForFunction(() => document.getElementById('mini')?.innerText || '', null, { timeout: 4000 }).then((h) => h.jsonValue()).catch(() => '');
               const plain = (t) => t.toLowerCase().replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
               if (!plain(said).includes(plain(c.text))) faults.push(`${centre ? centre.key : 'day'}: "${c.text.slice(0, 16)}" cut short, and the slip its hold opens does not say it whole`);

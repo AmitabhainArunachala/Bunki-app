@@ -7,7 +7,9 @@
  *             and keeps nothing twice; neither strip lies over another control (S2: "the menu never covers another button"). Red on the base (the mouse is ignored; a finger opens the slip), green on the branch.
  *   W7-centre the same hold on the web's headword (its big glyph), which had no hold at all: red on the base.
  *   W7-drag   guard: a mouse that moves past 9 px before the seal is a drag, never a seal (Chromium).
- *   W7-right  guard: right-click still opens the node's slip, never the strip (comb-0's G7 reads cut captions there).
+ *   W7-right  a right-click on a web word seals it and opens the strip, as a hold does (S3; the lead's ruling, 10-20),
+ *             never its slip (Chromium). Red on the base (its right-click opened the slip).
+ *   W7-key    Shift+F10 on a focused web word does the same, its strip taking the keyboard (Chromium). Red on the base.
  *   W7-tap    guard: a quick press still walks the node's ladder, never seals.
  * Controls (HFIX2E_MODE=control) serve corridor.js mutated: the web's hold ignores the mouse again (Chromium), or its
  * commit opens the slip instead of sealing (WebKit); W7-hold must go red. */
@@ -43,6 +45,10 @@ const MUTANTS = {
     '    if (mouse) return;\n    const start = { x: event.clientX, y: event.clientY, id: event.pointerId };\n    const h = { start, ring: null, committed: 0, mouse };\n    h.other = (other) => { if (other.pointerId !== start.id && hold === h && !h.committed) clear(); };\n    window.addEventListener(\'pointerdown\', h.other, true);\n    if (mouse) {\n      const lost'],
   // the web's hold opens the slip, as on the base
   finger: ['    if (!nodeOf()) { open(); return; }\n    void sealWord(button, door, { ring: h.ring });', '    open(); return;'],
+  // the web's right-click opens the slip again, as on the base
+  right: ['    void sealWord(button, door, { keyboard: !event.clientX && !event.clientY });', '    open();'],
+  // the web's Shift+F10 opens the slip again, as on the base
+  key: ['      if (nodeOf()) void sealWord(button, door, { keyboard: true });\n      else open();', '      open();'],
 };
 
 async function ready(page) {
@@ -54,12 +60,13 @@ async function context(name) {
   await ctx.route('**/*', (route) => new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort());
   const page = await ctx.newPage(); page.setDefaultTimeout(15000);
   const errors = []; page.on('pageerror', (error) => errors.push(String(error)));
-  if (mode === 'control' && (name === 'W7-hold' || name === 'W7-centre')) await page.route('**/corridor.js', async (route) => {
+  const mutant = { 'W7-hold': phone ? 'finger' : 'mouse', 'W7-centre': phone ? 'finger' : 'mouse', 'W7-right': 'right', 'W7-key': 'key' }[name];
+  if (mode === 'control' && mutant) await page.route('**/corridor.js', async (route) => {
     const response = await route.fetch(); const original = await response.text();
-    const [from, to] = MUTANTS[phone ? 'finger' : 'mouse'];
+    const [from, to] = MUTANTS[mutant];
     assert.equal(original.split(from).length, 2, `control ${name}: its mutation names one place`);
     const changed = original.replace(from, to);
-    mutations.push({ row: name, mutant: phone ? 'finger' : 'mouse', original: sha(original), served: sha(changed) });
+    mutations.push({ row: name, mutant, original: sha(original), served: sha(changed) });
     await route.fulfill({ response, body: changed });
   });
   return { ctx, page, errors };
@@ -222,14 +229,36 @@ if (!phone) await row('W7-drag', async ({ page }) => {
   if (dragged.after.strip || dragged.after.count !== c0 || dragged.after.seen.stamp) throw fail('a drag sealed', detail);
   return detail;
 });
+/** One seal by another door than the hold (right-click or Shift+F10): the strip, +1 kept, the 印, no slip, nothing covered. */
+async function sealedBy(page, key, c0, how) {
+  await delay(900);
+  await page.evaluate(async () => {
+    const strip = document.getElementById('seal-strip');
+    if (strip) await Promise.all(strip.getAnimations({ subtree: true }).map((run) => run.finished.catch(() => {})));
+    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+  });
+  const after = await facts(page, key);
+  const detail = { key, c0, how, after, focusInStrip: await page.evaluate(() => !!document.getElementById('seal-strip')?.contains(document.activeElement)) };
+  if (!after.strip) throw fail(`${how} opened no strip`, detail);
+  if (after.mini) throw fail(`${how} opened the slip`, detail);
+  if (after.count !== c0 + 1) throw fail(`${how}: the kept count went ${c0} → ${after.count}, not +1`, detail);
+  if (!(after.seen.stamp >= 1)) throw fail(`${how}: no 印 pressed on`, detail);
+  if (after.covered.length) throw fail(`${how}: the strip covers other controls: ${JSON.stringify(after.covered)}`, detail);
+  return detail;
+}
 if (!phone) await row('W7-right', async ({ page }) => {
   const { node, key } = await pickNode(page);
   const c0 = (await facts(page, key)).count;
   await node.click({ button: 'right' });
-  await delay(900);
-  const after = await facts(page, key);
-  const detail = { key, c0, after };
-  if (!after.mini || after.strip || after.count !== c0) throw fail('right-click did not open the slip alone', detail);
+  return sealedBy(page, key, c0, 'right-click');
+});
+if (!phone) await row('W7-key', async ({ page }) => {
+  const { node, key } = await pickNode(page);
+  const c0 = (await facts(page, key)).count;
+  await node.focus();
+  await page.keyboard.press('Shift+F10');
+  const detail = await sealedBy(page, key, c0, 'Shift+F10');
+  if (!detail.focusInStrip) throw fail('Shift+F10: the strip did not take the keyboard', detail);
   return detail;
 });
 await row('W7-tap', async ({ page }) => {

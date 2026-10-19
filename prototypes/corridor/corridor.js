@@ -25010,7 +25010,7 @@ function openWordWebLadder(item, section, anchor, keyboard = false, redo = false
  * Mac's secondary click); it has no implicit capture, so its move, release and cancel are heard on the window, and past
  * MOVE_PX it is a drag, never a seal. A finger that moves is a scroll. The hold's release never counts as the walking tap
  * (swallowClickUntil). A radical that is not a kanji has nothing to keep: its hold opens it in place, as before.
- * Right-click and Shift+F10 open the node's slip, as before (comb-0's G7 reads a cut caption whole there). */
+ * Right-click, the menu key and Shift+F10 do what a hold does (S3; the lead's ruling, 10-20): the seal and its strip. */
 function wireWordWebHold(button, nodeOf, activate = null) {
   warmSealStripFaces();
   let hold = null;
@@ -25085,7 +25085,9 @@ function wireWordWebHold(button, nodeOf, activate = null) {
     if (hold && !hold.committed && event.pointerType !== 'mouse') { commit(hold); return; }
     if (hold?.committed && Date.now() - hold.committed < 1200) return;
     clear();
-    open();
+    if (!nodeOf()) { open(); return; }
+    // a contextmenu the keyboard raised has no pointer position: the strip takes the keyboard
+    void sealWord(button, door, { keyboard: !event.clientX && !event.clientY });
   });
   button.addEventListener('pointerdown', (event) => {
     clear();
@@ -25120,7 +25122,11 @@ function wireWordWebHold(button, nodeOf, activate = null) {
   });
   button.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && document.getElementById('mini')) { event.preventDefault(); event.stopPropagation(); removeMini(); return; }
-    if (event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey)) { event.preventDefault(); open(); }
+    if (event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey)) {
+      event.preventDefault();
+      if (nodeOf()) void sealWord(button, door, { keyboard: true });
+      else open();
+    }
   });
 }
 
