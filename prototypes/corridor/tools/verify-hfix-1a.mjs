@@ -70,8 +70,8 @@ window.__H1A__ = {
  * ([file, the fix's text, the base's text]); `css` lays the base's look over the page. `item` is the row prefix that
  * must go red. */
 const CONTROL = {
+  // the base's cut: the room's height, wherever it falls across a row
   stage: { item: '1.', source: [
-    ['corridor.js', 'const move = readingMoveFor(anchor, r, m.height, ceiling, floor, { most: true });', 'const move = 0;'],
     ['corridor.js', 'const fit = rowCut(card, Math.max(roomAbove, roomBelow, 96));', 'const fit = Math.max(roomAbove, roomBelow, 96);'],
   ] },
   'stage-fade': { item: '1.', css: "#mini[data-more='true']::after { content: none !important; }" },
