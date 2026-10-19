@@ -694,7 +694,14 @@ for (let attempt = 1; attempt <= 3; attempt++) {
   // Reset observations, take p0 and aim in one synchronous evaluation. No
   // page read, screenshot or wait belongs between this snapshot and native
   // touchStart: the selected body continues orbiting after we return.
-  const snapshot = await page.evaluate(`(() => {
+  //
+  // INTFIX · the aim is taken repeatedly until one lands. Whether an orbiter owns its own centre
+  // is a property of THIS FRAME of a field that never stops drifting, and after the dive has
+  // receded the field only a handful of orbiters are touchable at all, so a single look decided
+  // the whole row on a coin-flip. Each look is a complete, self-contained snapshot; the one that
+  // finds an owner is the one that arms the listener and whose coordinates are touched, with no
+  // read or wait between it and touchStart. A wait only ever happens BEFORE a fresh look.
+  const takeAim = () => page.evaluate(`(() => {
     window.__driftHuntPointerDowns.length = 0;
     window.__driftHuntOwnerHit = null;
     const p0 = ${fieldPos};
@@ -770,6 +777,12 @@ for (let attempt = 1; attempt <= 3; attempt++) {
     }
     return { stage, p0, aimedAt: performance.now() };
   })()`);
+  let snapshot = null;
+  for (let look = 1; look <= 10; look += 1) {
+    snapshot = await takeAim();
+    if (snapshot.stage.card?.hit && snapshot.stage.orb) break;
+    if (look < 10) await page.waitForTimeout(320);
+  }
   stage = snapshot.stage;
   p0 = snapshot.p0;
   staging.snapshot = snapshot;
