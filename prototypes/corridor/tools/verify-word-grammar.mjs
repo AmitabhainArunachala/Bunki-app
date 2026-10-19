@@ -3665,7 +3665,8 @@ try {
     // first and last points the reader's text answers at the column's centre), so a dock or a bar at the foot moves it
     const clearGlass = (page) => page.evaluate(() => {
       const reader = document.getElementById('reader').getBoundingClientRect(), x = reader.left + reader.width / 2;
-      const text = (y) => { const e = document.elementFromPoint(x, y); return !!e?.closest('#reader') && !e.closest('#mini'); };
+      // the reader's own area (its text, the article's head above it), never a bar, a dock or the box (the critic's clearZone)
+      const text = (y) => { const e = document.elementFromPoint(x, y); return !!e?.closest('#reader, main') && !e.closest('[data-bar], .chrome, #tabs, nav, header, #mini'); };
       let top = 0; while (top < innerHeight && !text(top)) top += 1;
       let bottom = innerHeight - 1; while (bottom > top && !text(bottom)) bottom -= 1;
       return { top, bottom: bottom + 1 };
