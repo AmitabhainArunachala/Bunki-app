@@ -188,11 +188,19 @@ const GUIDED_ROOM = [
   'guided-moments.css',
   'guided/sets/index.json',
 ];
+// 話す · Speak is imported only when its door is pressed too, "loaded like the guided session" (corridor.js, track C):
+// its module, its core and its styles travel with the install, so the room opens offline, where it plays and shadows
+// kept lines (676a4754), without having been opened online first.
+const SPEAK_ROOM = [
+  'speak.js',
+  'speak-core.mjs',
+  'rooms/speak.css',
+];
 const guidedAsset = (path) => path.startsWith('guided/') && !path.endsWith('.md');
 const fontAsset = (path) => /^fonts\/[^/]+\.woff2$/.test(path);
 const fontUrl = (url) => url.startsWith(SCOPE) && fontAsset(url.slice(SCOPE.length));
 const PRECACHE_URLS = new Set(
-  [...SHELL, ...BOOT_DATA, ...GUIDED_ROOM].map((path) => new URL(path, SCOPE).href),
+  [...SHELL, ...BOOT_DATA, ...GUIDED_ROOM, ...SPEAK_ROOM].map((path) => new URL(path, SCOPE).href),
 );
 
 const assetUrl = (path) => new URL(path.split('/').map(encodeURIComponent).join('/'), SCOPE).href;
@@ -329,7 +337,7 @@ async function validateRelease(identityResponse, workerResponse) {
   if ((await digest(new TextEncoder().encode(JSON.stringify(inputs)))) !== assetVersion) {
     throw new Error('release source digest mismatch');
   }
-  for (const path of [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM]) {
+  for (const path of [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM, ...SPEAK_ROOM]) {
     if (!entries.has(assetUrl(path))) throw new Error(`release boot entry missing: ${path}`);
   }
   return {
@@ -369,7 +377,7 @@ self.addEventListener('install', (event) => {
       const guided = [...release.entries.values()].map((entry) => entry.path).filter(guidedAsset);
       const urls = [
         ...new Set(
-          [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM, ...guided].map(
+          [...SHELL.filter((path) => path !== '.'), ...BOOT_DATA, ...GUIDED_ROOM, ...SPEAK_ROOM, ...guided].map(
             assetUrl,
           ),
         ),
