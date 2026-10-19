@@ -16,6 +16,24 @@ import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/r
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
 import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
+
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
 assert(!existsSync(join(OUT, 'receipt.json')), 'Use a fresh evidence directory');
@@ -391,8 +409,8 @@ for (const engine of engines) for (const width of sizes) {
       // Import through the normal controls into another fresh installation.
       await close(); profileName = 'restored-profile'; await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
       await openLists(page); const oldTime = await page.evaluate(() => performance.timeOrigin);
-      await page.locator('#import-file').setInputFiles(backupFile);
-      await page.waitForFunction((old) => performance.timeOrigin !== old && document.body.dataset.ready === '1', oldTime, { timeout: 30000 });
+      await answeringRestore(page, async () => { await page.locator('#import-file').setInputFiles(backupFile);
+        await page.waitForFunction((old) => performance.timeOrigin !== old && document.body.dataset.ready === '1', oldTime, { timeout: 30000 }); });
       await tutor(page); await configure(page, `${FAKE_MODEL}-changed`);
       assert.deepEqual(await deviceApprovals(page), {}); assert.equal(await page.locator('#chat-send').isDisabled(), true);
       assert.equal(await page.locator('#chat-input').inputValue(), laterQuestion);
