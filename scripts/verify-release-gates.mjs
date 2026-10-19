@@ -270,6 +270,20 @@ export function batteryGates(out, env = process.env) {
         env: { KAIRO_BROWSER: engine },
       };
     }),
+    ...['hfix2a', 'hfix2a-item-a'].flatMap((type) =>
+      ['chromium', 'webkit'].map((engine) => {
+        const name = engine === 'chromium' ? type : `${type}-webkit`;
+        return {
+          ...node(name, tool(`verify-${type}`), [], {
+            ...report(name, type, 'result.json'),
+            engine,
+          }),
+          // Both producers can succeed in diagnostic mode; only the complete
+          // branch schedule is acceptance, regardless of the caller's shell.
+          env: { KAIRO_BROWSER: engine, HFIX2A_MODE: 'branch', HFIX2A_CASE: '' },
+        };
+      }),
+    ),
     node(
       'word-saved-answer',
       tool('test-word-saved-answer'),
@@ -855,11 +869,20 @@ export function batteryGates(out, env = process.env) {
       'search-fallback-ui',
       'standalone-journey',
       'kanji-trust',
+      'hfix2a',
+      'hfix2a-item-a',
     ].includes(gate.report?.type)
       ? {
           report: {
             ...gate.report,
             artifactSha256: env.KAIRO_VERIFIED_ARTIFACT_SHA256,
+            ...(['hfix2a', 'hfix2a-item-a'].includes(gate.report.type)
+              ? {
+                  siteIdentity: env.KAIRO_SITE_DIR
+                    ? json(join(env.KAIRO_SITE_DIR, 'build-identity.json'))
+                    : null,
+                }
+              : {}),
             ...(gate.report.type === 'kanji-trust'
               ? { siteDir: env.KAIRO_SITE_DIR ? resolve(env.KAIRO_SITE_DIR) : null }
               : {}),
@@ -901,6 +924,8 @@ export function batteryGates(out, env = process.env) {
               'search-fallback-core',
               'search-fallback-ui',
               'standalone-journey',
+              'hfix2a',
+              'hfix2a-item-a',
             ].includes(gate.report.type)
               ? {
                   sourceSha256: existsSync(resolve(ROOT, gate.requiredPath))
@@ -1764,6 +1789,91 @@ export function validateKanjiTrustReport(value, { engine, artifactSha256, siteDi
   return true;
 }
 
+export function validateHfix2aReport(
+  value,
+  { type, engine, artifactSha256, sourceSha256, siteIdentity },
+) {
+  assert(['hfix2a', 'hfix2a-item-a'].includes(type), 'Unknown Hfix-2a report type');
+  assert(['chromium', 'webkit'].includes(engine), 'Hfix-2a engine must be pinned');
+  assert.equal(value.engine, engine, 'Foreign Hfix-2a engine');
+  assert.equal(value.mode, 'branch', 'A diagnostic Hfix-2a run is not acceptance');
+  assert.match(artifactSha256 || '', /^[a-f0-9]{64}$/u, 'Hfix-2a artifact must be pinned');
+  assert.match(sourceSha256 || '', /^[a-f0-9]{64}$/u, 'Hfix-2a verifier must be pinned');
+  assert.equal(siteIdentity?.schemaVersion, 1, 'Hfix-2a build identity must be pinned');
+  assert.equal(siteIdentity.product, 'KAIRO');
+  assert.equal(siteIdentity.artifactSha256, artifactSha256, 'Hfix-2a build pin disagrees');
+  assert.deepEqual(value.identity, siteIdentity, 'Foreign Hfix-2a build identity');
+  assert.equal(value.verifierSha256, sourceSha256, 'Foreign Hfix-2a verifier');
+  const rows = type === 'hfix2a' ? value.results : value.rows;
+  const names =
+    type === 'hfix2a'
+      ? ['X11', 'X16', 'KT2', 'M1']
+      : ['context', 'guided', 'personal', 'fresh', 'empty-personal', 'cancel'];
+  assert(Array.isArray(rows), 'Hfix-2a has no completed rows');
+  assert.deepEqual(
+    rows.map((row) => row.name),
+    names,
+    'Incomplete or reordered Hfix-2a run',
+  );
+  assert(
+    rows.every((row) => row.pass === true),
+    'Hfix-2a contains a failed row',
+  );
+  if (type === 'hfix2a-item-a') {
+    assert.equal(value.pass, true, 'Hfix-2a item A did not pass');
+    assert.deepEqual(value.errors, [], 'Hfix-2a item A reported errors');
+    assert.deepEqual(value.mutations, [], 'Hfix-2a item A ran a mutant');
+  } else {
+    assert(
+      rows.every((row) => row.error === null),
+      'Hfix-2a reported a row error',
+    );
+    assert(
+      typeof value.version === 'string' && value.version.length > 0,
+      'Hfix-2a browser version missing',
+    );
+    assert.deepEqual(
+      value.viewport,
+      engine === 'webkit' ? { width: 390, height: 844 } : { width: 1440, height: 900 },
+      'Foreign Hfix-2a viewport',
+    );
+    assert.deepEqual(
+      rows[3].detail?.safety,
+      [
+        'cancel-preserves-record-and-binding',
+        'source-draft',
+        'deck-ledger',
+        'malformed-backup',
+        'interruption-prefix-0',
+        'interruption-prefix-1',
+        'interruption-prefix-2',
+        'interruption-prefix-3',
+      ],
+      'Incomplete Hfix-2a adoption safety coverage',
+    );
+    assert(Array.isArray(value.mutations), 'Hfix-2a recovery controls missing');
+    assert.deepEqual(
+      value.mutations.map((row) => row.row),
+      ['M1-interrupt--1', 'M1-interrupt-0', 'M1-interrupt-1', 'M1-interrupt-2'],
+      'Incomplete Hfix-2a recovery controls',
+    );
+    const bindingSha = siteIdentity.files?.find(
+      (file) => file.path === 'record-binding.mjs',
+    )?.sha256;
+    assert.match(bindingSha || '', /^[a-f0-9]{64}$/u, 'Hfix-2a recovery source must be pinned');
+    for (const mutation of value.mutations) {
+      assert.equal(mutation.original, bindingSha, 'Hfix-2a recovery control used another source');
+      assert.match(mutation.served || '', /^[a-f0-9]{64}$/u, 'Hfix-2a recovery mutation missing');
+      assert.notEqual(
+        mutation.served,
+        mutation.original,
+        'Hfix-2a recovery control did not mutate',
+      );
+    }
+  }
+  return true;
+}
+
 function requireCompleteReport({
   path,
   type,
@@ -1775,6 +1885,7 @@ function requireCompleteReport({
   sourceAssetSha256,
   builderSha256,
   siteDir,
+  siteIdentity,
   practiceSource,
   mode,
 }) {
@@ -1811,6 +1922,8 @@ function requireCompleteReport({
     assert.equal(value.summary?.failed, 0, 'Receipt reports failures');
   } else if (type === 'kanji-trust') {
     validateKanjiTrustReport(value, { engine, artifactSha256, siteDir });
+  } else if (type === 'hfix2a' || type === 'hfix2a-item-a') {
+    validateHfix2aReport(value, { type, engine, artifactSha256, sourceSha256, siteIdentity });
   } else if (type === 'teaching-context' || type === 'ai-adaptation') {
     assert.equal(
       value.suite,
@@ -2769,6 +2882,10 @@ async function verifyRunner(out) {
     'kanji-capture',
     'kanji-trust',
     'kanji-trust-webkit',
+    'hfix2a',
+    'hfix2a-webkit',
+    'hfix2a-item-a',
+    'hfix2a-item-a-webkit',
     'word-saved-answer',
     'word-saved-answer-controls',
     'word-saved-answer-mutation-controls',

@@ -2364,6 +2364,150 @@
       ]
     },
     {
+      "name": "hfix2a",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "445fc4f37413b4f5960d65f1264af87816806362",
+        "producerBytesBasis": "Hfix-2a merged into WEAVE; unchanged producer bytes pinned by SHA-256.",
+        "producer": "prototypes/corridor/tools/verify-hfix2a.mjs",
+        "producerSha256": "0b97e37ecf91dd95bffed8651f6e342a269dafe77fc4004d1ef9d4734e26f1f4",
+        "command": [
+          "node",
+          "prototypes/corridor/tools/verify-hfix2a.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "HFIX2A_MODE": "branch",
+          "HFIX2A_CASE": "",
+          "KAIRO_EVIDENCE_DIR": "/unused/hfix2a"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-hfix2a.mjs",
+            "sha256": "0b97e37ecf91dd95bffed8651f6e342a269dafe77fc4004d1ef9d4734e26f1f4"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures this complete canonical branch-mode gate on the pinned combined artifact.",
+      "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
+      "limitations": [
+        "No numeric timing is claimed for this unmeasured contract."
+      ]
+    },
+    {
+      "name": "hfix2a-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "445fc4f37413b4f5960d65f1264af87816806362",
+        "producerBytesBasis": "Hfix-2a merged into WEAVE; unchanged producer bytes pinned by SHA-256.",
+        "producer": "prototypes/corridor/tools/verify-hfix2a.mjs",
+        "producerSha256": "0b97e37ecf91dd95bffed8651f6e342a269dafe77fc4004d1ef9d4734e26f1f4",
+        "command": [
+          "node",
+          "prototypes/corridor/tools/verify-hfix2a.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "HFIX2A_MODE": "branch",
+          "HFIX2A_CASE": "",
+          "KAIRO_EVIDENCE_DIR": "/unused/hfix2a-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-hfix2a.mjs",
+            "sha256": "0b97e37ecf91dd95bffed8651f6e342a269dafe77fc4004d1ef9d4734e26f1f4"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures this complete canonical branch-mode gate on the pinned combined artifact.",
+      "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
+      "limitations": [
+        "No numeric timing is claimed for this unmeasured contract."
+      ]
+    },
+    {
+      "name": "hfix2a-item-a",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "445fc4f37413b4f5960d65f1264af87816806362",
+        "producerBytesBasis": "Hfix-2a merged into WEAVE; unchanged producer bytes pinned by SHA-256.",
+        "producer": "prototypes/corridor/tools/verify-hfix2a-item-a.mjs",
+        "producerSha256": "ab41711b357c67d46757d564982d49067a5575e239effb3a65f8055208a9bd97",
+        "command": [
+          "node",
+          "prototypes/corridor/tools/verify-hfix2a-item-a.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "HFIX2A_MODE": "branch",
+          "HFIX2A_CASE": "",
+          "KAIRO_EVIDENCE_DIR": "/unused/hfix2a-item-a"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-hfix2a-item-a.mjs",
+            "sha256": "ab41711b357c67d46757d564982d49067a5575e239effb3a65f8055208a9bd97"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures this complete canonical branch-mode gate on the pinned combined artifact.",
+      "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
+      "limitations": [
+        "No numeric timing is claimed for this unmeasured contract."
+      ]
+    },
+    {
+      "name": "hfix2a-item-a-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "445fc4f37413b4f5960d65f1264af87816806362",
+        "producerBytesBasis": "Hfix-2a merged into WEAVE; unchanged producer bytes pinned by SHA-256.",
+        "producer": "prototypes/corridor/tools/verify-hfix2a-item-a.mjs",
+        "producerSha256": "ab41711b357c67d46757d564982d49067a5575e239effb3a65f8055208a9bd97",
+        "command": [
+          "node",
+          "prototypes/corridor/tools/verify-hfix2a-item-a.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "HFIX2A_MODE": "branch",
+          "HFIX2A_CASE": "",
+          "KAIRO_EVIDENCE_DIR": "/unused/hfix2a-item-a-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-hfix2a-item-a.mjs",
+            "sha256": "ab41711b357c67d46757d564982d49067a5575e239effb3a65f8055208a9bd97"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures this complete canonical branch-mode gate on the pinned combined artifact.",
+      "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
+      "limitations": [
+        "No numeric timing is claimed for this unmeasured contract."
+      ]
+    },
+    {
       "name": "later-encounters-contracts",
       "sampleCount": 5,
       "medianSeconds": 0.863,
