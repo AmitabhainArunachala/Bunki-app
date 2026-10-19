@@ -98,7 +98,9 @@
       ],
       "G3-current-save": [
         "G3.save.fixture",
+        "G3.save.folded",
         "G3.save.current",
+        "G3.save.current-folded",
         "G3.save.no-phantom",
         "G3-current-save.page-errors"
       ],
@@ -107,6 +109,7 @@
         "G3.kana.identical",
         "G3.kana.particle",
         "G3.kana.particle-save-rest",
+        "G3.kana.particle-folded-rest",
         "G3.kana.particle-no-card",
         "G3-kana.page-errors"
       ],
@@ -1217,7 +1220,9 @@
       ],
       "G3-current-save": [
         "G3.save.fixture",
+        "G3.save.folded",
         "G3.save.current",
+        "G3.save.current-folded",
         "G3.save.no-phantom",
         "G3-current-save.page-errors"
       ],
@@ -1226,6 +1231,7 @@
         "G3.kana.identical",
         "G3.kana.particle",
         "G3.kana.particle-save-rest",
+        "G3.kana.particle-folded-rest",
         "G3.kana.particle-no-card",
         "G3-kana.page-errors"
       ],
@@ -2229,6 +2235,7 @@
     }
   },
   "reconciliation": [
+    "INT-VH merge 2 (2026-10-19): Hfix-1A (item 4, one Save on screen) adds G3.save.folded and G3.save.current-folded to G3-current-save and G3.kana.particle-folded-rest to G3-kana in both engines; G3.save.fixture, G3.save.current and G3.kana.particle-save-rest keep their identities with Hfix-1A's titles and predicates.",
     "G1/G3 check identity expressions unchanged since 66b95be7; preserved all three reading dials, six sentence cases, eleven worlds and engine-specific timing rows.",
     "G4 identity expressions unchanged since 8282c0f6; Chromium-only native touch scroll and engine-specific frame rows retained.",
     "G5 identity expressions unchanged since 2b59c8d7 except new room-hover candidate and its independently required control; added two room-hover candidate identities.",

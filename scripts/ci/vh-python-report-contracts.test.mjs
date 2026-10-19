@@ -92,7 +92,8 @@ for (const gate of Object.keys(pythonReportRosters))
 test('reviewed census keeps all explicit dynamic fixture cases', () => {
   assert.deepEqual(
     Object.values(pythonReportRosters).map((spec) => spec.checks.length),
-    [19, 32, 13],
+    // INT-VH (merge 2): Hfix-1A's さもなければかの fixture (two rows) and its ばかの guard: 13 → 16
+    [19, 32, 16],
   );
   assert.equal(
     pythonReportRosters['deck-gloss-ja'].checks.filter((row) =>
@@ -104,7 +105,7 @@ test('reviewed census keeps all explicit dynamic fixture cases', () => {
     pythonReportRosters['deck-segment-overrides'].checks.filter((row) =>
       row.name.includes('without the lexicon'),
     ).length,
-    4,
+    5,
   );
   assert(
     pythonReportRosters['deck-export-mcd'].checks.some((row) =>

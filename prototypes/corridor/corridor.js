@@ -3887,11 +3887,35 @@ function embeddedDictionaryJson(name) {
   return parsed;
 }
 
+/** Hfix-1A (W-2, W-1) · the app's own data loads. The page abandons them itself when it goes (pagehide): a load the
+ * navigation would cut became a page error in WebKit ("… examples/manifest.json due to access control checks", R3's
+ * reading-truth); abandoned, it is an AbortError its caller already answers. A network failure is asked again once,
+ * a moment later (a phone's network drops one request; W-1 saw a dict shard fail so under load), and only then counts;
+ * an HTTP answer is an answer, never asked again. */
+let pageLoads = new AbortController();
+// WebKit cancels in-flight loads before pagehide while the next document is pending (departArticlePrefetch's note): the
+// page lets go at beforeunload too
+addEventListener('beforeunload', () => pageLoads.abort(), { capture: true });
+addEventListener('pagehide', () => pageLoads.abort());
+addEventListener('pageshow', () => { if (pageLoads.signal.aborted) pageLoads = new AbortController(); });
+const DATA_RETRY_MS = 400;
+async function fetchData(path) {
+  for (let attempt = 0; ; attempt += 1) {
+    const signal = pageLoads.signal;
+    try {
+      return await fetch(path, { signal });
+    } catch (error) {
+      if (error?.name === 'AbortError' || signal.aborted || attempt >= 1) throw error;
+      await new Promise((done) => setTimeout(done, DATA_RETRY_MS));
+      if (signal.aborted) throw error;
+    }
+  }
+}
 async function loadDictionaryJson(name) {
   const embedded = embeddedDictionaryJson(name);
   if (embedded) return embedded;
   const path = name === 'index' ? DICTIONARY_INDEX_PATH : DICTIONARY_SHARD_PATH(name);
-  const res = await fetch(path);
+  const res = await fetchData(path);
   if (!res.ok) throw new Error(`${path} → ${res.status}`);
   return res.json();
 }
@@ -4369,8 +4393,56 @@ function dictionaryDetailsFor(node) {
     .filter(Boolean);
 }
 
+/* Hfix-1A · a sense's tags in plain words (round 1: "noun (common) (futsuumeishi)", "adjective (keiyoushi)" on the word page,
+ * L-3, H-kaku-05, H-sumi-03): parts of speech as a learner names them, in the interface's language; usage, field and
+ * dialect tags by the tag contract's Japanese names (docs/briefs/DICT_TAGS_CONTRACT_2026-08-12.md) or JMdict's English
+ * without its romaji. */
+const POS_PLAIN = {
+  n: ['名詞', 'noun'], 'n-adv': ['副詞的名詞', 'adverbial noun'], 'n-t': ['時の名詞', 'noun (time)'], 'n-pr': ['固有名詞', 'proper noun'],
+  'n-pref': ['名詞（接頭）', 'noun (prefix)'], 'n-suf': ['名詞（接尾）', 'noun (suffix)'], pn: ['代名詞', 'pronoun'], num: ['数詞', 'number'],
+  ctr: ['助数詞', 'counter'], 'adj-i': ['い形容詞', 'i-adjective'], 'adj-ix': ['い形容詞（いい・よい）', 'i-adjective (いい/よい)'],
+  'adj-na': ['な形容詞', 'na-adjective'], 'adj-no': ['の形容詞', 'no-adjective'], 'adj-pn': ['連体詞', 'pre-noun adjective'],
+  'adj-t': ['タルト形容動詞', 'taru-adjective'], 'adj-f': ['連体修飾', 'used before a noun'], 'adj-ku': ['ク活用（古語）', 'ku-adjective (archaic)'],
+  'adj-shiku': ['シク活用（古語）', 'shiku-adjective (archaic)'], 'adj-nari': ['ナリ活用（古語）', 'nari-adjective (archaic)'],
+  'adj-kari': ['カリ活用（古語）', 'kari-adjective (archaic)'], adv: ['副詞', 'adverb'], 'adv-to': ['副詞（と）', 'adverb (with と)'],
+  aux: ['補助語', 'auxiliary'], 'aux-v': ['助動詞', 'auxiliary verb'], 'aux-adj': ['補助形容詞', 'auxiliary adjective'], conj: ['接続詞', 'conjunction'],
+  cop: ['断定（だ）', 'copula (だ)'], exp: ['表現', 'expression'], int: ['感動詞', 'interjection'], pref: ['接頭辞', 'prefix'], suf: ['接尾辞', 'suffix'],
+  prt: ['助詞', 'particle'], unc: ['分類なし', 'unclassified'], 'v-unspec': ['動詞', 'verb'], v1: ['一段動詞', 'verb (ichidan)'],
+  'v1-s': ['一段動詞（くれる）', 'verb (ichidan, くれる)'], v5aru: ['五段動詞（-ある）', 'verb (godan, -ある)'], 'v5k-s': ['五段動詞（行く）', 'verb (godan, 行く)'],
+  'v5r-i': ['五段動詞（不規則）', 'verb (godan, irregular)'], 'v5u-s': ['五段動詞（特殊）', 'verb (godan, special)'], v5uru: ['五段動詞（うる）', 'verb (godan, うる)'],
+  vk: ['カ変動詞', 'verb (くる)'], vn: ['ナ変動詞', 'verb (ぬ, irregular)'], vr: ['ラ変動詞', 'verb (り, irregular)'], vs: ['する動詞', 'suru verb'],
+  'vs-c': ['す動詞（古語）', 'su verb (archaic)'], 'vs-i': ['サ変動詞', 'suru verb (irregular)'], 'vs-s': ['サ変動詞（特殊）', 'suru verb (special)'],
+  vz: ['ずる動詞', 'zuru verb'], vi: ['自動詞', 'intransitive verb'], vt: ['他動詞', 'transitive verb'],
+};
+const POS_FAMILY = [[/^v5/u, ['五段動詞', 'verb (godan)']], [/^v2/u, ['二段動詞（古語）', 'verb (nidan, archaic)']], [/^v4/u, ['四段動詞（古語）', 'verb (yodan, archaic)']]];
+const SENSE_TAG_JA = {
+  abbr: '略語', arch: '古語', char: 'キャラクター名', chn: '幼児語', col: '口語', company: '会社名', creat: '生物名', dated: '古めかしい語',
+  dei: '神名', derog: '蔑称', euph: '婉曲表現', ev: 'イベント名', fam: '親しみのある語', fem: '女性語', fict: '架空名', form: '改まった語・文語',
+  given: '名', group: '集団名', hist: '歴史用語', hon: '尊敬語', hum: '謙譲語', id: '慣用表現', joc: '冗談・ユーモア', leg: '伝説',
+  'm-sl': '漫画俗語', male: '男性語', myth: '神話', 'net-sl': 'ネットスラング', obj: '物の名称', obs: '廃語', 'on-mim': '擬音語・擬態語',
+  organization: '組織名', person: '人物のフルネーム', place: '地名', poet: '詩語', pol: '丁寧語', product: '商品名', proverb: 'ことわざ',
+  quote: '引用句', rare: '稀な語', sens: '配慮を要する語', serv: 'サービス名', ship: '船名', sl: '俗語', surname: '姓', uk: '通常かな書き',
+  unclass: '未分類の固有名', vulg: '卑語', work: '作品名', yoji: '四字熟語', Buddh: '仏教', Christn: 'キリスト教', MA: '武道', Shinto: '神道',
+  agric: '農業', anat: '解剖学', archeol: '考古学', archit: '建築', art: '美術・美学', astron: '天文学', aviat: '航空', baseb: '野球',
+  biochem: '生化学', biol: '生物学', bot: '植物学', boxing: 'ボクシング', bus: 'ビジネス', cards: 'カードゲーム', chem: '化学', civeng: '土木工学',
+  cloth: '服飾', comp: 'コンピューター', cryst: '結晶学', dent: '歯学', ecol: '生態学', econ: '経済学', elec: '電気・電気工学', electr: '電子工学',
+  engr: '工学', ent: '昆虫学', figskt: 'フィギュアスケート', film: '映画', finc: '金融', fish: '漁業・釣り', food: '食・料理', gardn: '園芸',
+  genet: '遺伝学', geogr: '地理学', geol: '地質学', geom: '幾何学', go: '囲碁', golf: 'ゴルフ', gramm: '文法', grmyth: 'ギリシャ神話',
+  hanaf: '花札', horse: '競馬', internet: 'インターネット', jpmyth: '日本神話', kabuki: '歌舞伎', law: '法律', ling: '言語学', logic: '論理学',
+  mahj: '麻雀', manga: '漫画', math: '数学', mech: '機械工学', med: '医学', met: '気象学', mil: '軍事', min: '鉱物学', mining: '鉱業',
+  motor: 'モータースポーツ', music: '音楽', noh: '能', pathol: '病理学', pharm: '薬理学', phil: '哲学', photo: '写真', physics: '物理学',
+  physiol: '生理学', politics: '政治', print: '印刷', prowres: 'プロレス', psy: '精神医学', psyanal: '精神分析', psych: '心理学',
+  rail: '鉄道', rommyth: 'ローマ神話', shogi: '将棋', ski: 'スキー', sports: 'スポーツ', stat: '統計学', stockm: '株式市場', sumo: '相撲',
+  surg: '外科学', telec: '電気通信', tradem: '商標', tv: 'テレビ', vidg: 'ビデオゲーム', zool: '動物学', bra: 'ブラジル方言', hob: '北海道方言',
+  ksb: '関西方言', ktb: '関東方言', kyb: '京都方言', kyu: '九州方言', nab: '長野方言', osb: '大阪方言', rkb: '琉球方言', thb: '東北方言',
+  tsb: '土佐方言', tsug: '津軽方言'
+};
+const SENSE_TAG_EN = { hon: 'honorific language', hum: 'humble language', pol: 'polite language' };
 function dictionaryTag(tag) {
-  return D.dictionaryIndex?.tags?.[tag] || tag;
+  const pos = POS_PLAIN[tag] || POS_FAMILY.find(([family]) => family.test(tag))?.[1];
+  if (pos) return tx(pos[0], pos[1]);
+  const description = D.dictionaryIndex?.tags?.[tag] || tag;
+  return tx(SENSE_TAG_JA[tag] || description, SENSE_TAG_EN[tag] || description);
 }
 /* the core record's part of speech is plain words already, bar a few JMdict codes it kept */
 const CORE_POS_PLAIN = {
@@ -5421,7 +5493,10 @@ function scaleInTarget() {
     const source = scaleSource(visit), word = visit.word || readerEntryNode(source.token, visit.index, source.p);
     return word?.t === 'word' ? 'word' : null;
   }
-  if (scale === 'word') return scaleWordKanji(node).length ? 'kanji' : null;
+  // Hfix-1A (round 1, H-hakuu-09, H-nami-08: a trailing "kanji ›" on 総理's page, a level he had not entered): a word's
+  // rail offers its way in only back to the kanji entered from it in this visit; the first way in is the page's own kanji
+  // rows, which name each kanji
+  if (scale === 'word') return node?.enteredKanji && scaleWordKanji(node).includes(node.enteredKanji) ? 'kanji' : null;
   if (scale === 'kanji') return scaleKanjiParts(node).length ? 'part' : null;
   return null;
 }
@@ -5520,7 +5595,7 @@ function scaleOut() {
     const home = S.scaleVisit;
     if (home?.skyPlace) window.__DRIFT__?.restorePlace?.(home.skyPlace);
     const article = scalePassage(home);
-    if (article) window.__DRIFT__?.focusArticle?.({ articleId: article.id, title: article.title, reveal: !home?.skyPlace });
+    if (article) window.__DRIFT__?.focusArticle?.({ articleId: article.id, title: article.title, words: jaWords(article.title), reveal: !home?.skyPlace });
     retireScaleDestination();
     S.view = 'drift'; S.tabRoot = null;
     withoutRoomTransition(render);
@@ -5575,7 +5650,7 @@ function scaleIn(target = {}) {
     if (next?.t !== 'word') return false;
     visit.word = next;
   } else if (scale === 'word') {
-    const id = scaleWordKanji(node)[0];
+    const id = node.enteredKanji && scaleWordKanji(node).includes(node.enteredKanji) ? node.enteredKanji : null;
     if (id) next = { t: 'kanji', id, from: node.from, sourceContext: node.sourceContext };
   } else if (scale === 'kanji') {
     const id = scaleKanjiParts(node)[0];
@@ -5666,6 +5741,9 @@ function returnToScaleBead(bead) {
 function scaleThread() {
   const scale = scaleName() || (S.stack.length ? 'entry' : null);
   if (!scale) return null;
+  // Hfix-1A · a word remembers the kanji entered from it in this visit (its rail's way back in goes there, and only there)
+  const shown = S.stack.at(-1), under = S.stack.at(-2);
+  if (shown?.t === 'kanji' && under?.t === 'word' && scaleWordKanji(under).includes(shown.id)) under.enteredKanji = shown.id;
   const thread = el('nav', 'scale-thread');
   thread.dataset.scale = scale;
   thread.setAttribute('aria-label', tx('ことばの道すじ', 'The way through the text'));
@@ -5737,6 +5815,35 @@ function scaleThread() {
   }
   return thread;
 }
+/** Hfix-1A · where the rail may rest: with a bead's start at 宙's edge (H1: "shelf" stood half under the sticky 宙 at part
+ * depth and read "elf"). 宙's width and the gap after it are the scroller's reserved start (--thread-reserve, its
+ * scroll-padding), every other bead is a snap point (editorial.css), and the rail's end gives way just enough that its
+ * furthest rest holds its last bead whole with no bead half under 宙. Returns the first rest at or past `target`. */
+function threadRest(thread, target = thread.scrollLeft) {
+  const outside = thread.querySelector(':scope > [data-scale-out]');
+  if (!outside || !thread.isConnected) return target;
+  const port = thread.getBoundingClientRect().left + thread.clientLeft;
+  const gap = parseFloat(getComputedStyle(thread).columnGap) || 0;
+  // 宙 sticks at the scroller's start, so its right edge is the same at rest and while the rail is scrolled
+  const reserve = Math.round(outside.getBoundingClientRect().right - port + gap);
+  if (thread.style.getPropertyValue('--thread-reserve') !== `${reserve}px`) thread.style.setProperty('--thread-reserve', `${reserve}px`);
+  // the rail's own end padding, read once before any room is added to it
+  thread.dataset.threadPad ??= String(parseFloat(getComputedStyle(thread).paddingInlineEnd) || 0);
+  const pad = Number(thread.dataset.threadPad), added = Math.max(0, (parseFloat(getComputedStyle(thread).paddingInlineEnd) || 0) - pad);
+  if (thread.scrollWidth <= thread.clientWidth + 1) return 0;
+  const beads = [...thread.children].filter((node) => node !== outside && node.getClientRects().length);
+  const rests = beads.map((node) => node.getBoundingClientRect().left - port + thread.scrollLeft - reserve).filter((x) => x >= -0.5);
+  const end = thread.scrollWidth - thread.clientWidth - added;
+  const furthest = rests.filter((x) => x >= end - 0.5).sort((a, b) => a - b)[0];
+  // a rest a fraction past the end is no rest in either engine (they snap back to the start): a pixel's slack
+  const room = furthest > end - 0.5 ? Math.ceil(furthest - end + 1) : 0;
+  if (room !== Math.round(added)) {
+    thread.style.paddingInlineEnd = room ? `${pad + room}px` : '';
+    // laid out now, so the snap positions a scroll set in this task is measured against include the new end
+    void thread.scrollWidth;
+  }
+  return Math.max(0, Math.ceil(rests.filter((x) => x >= target - 0.5).sort((a, b) => a - b)[0] ?? furthest ?? target));
+}
 /** Reveal the current bead once, on this newly mounted rail only. Page/reader
  * restoration and focus keep their existing owners; native rail use wins. */
 function revealMountedScaleCurrent(thread) {
@@ -5754,9 +5861,13 @@ function revealMountedScaleCurrent(thread) {
   for (const type of events) thread.addEventListener(type, cancel, { capture: true, passive: true });
   const reveal = () => {
     cleanup();
+    // Hfix-1A · the rail's rests are set whoever moves it next (this reveal, or a finger); a finger's move is judged on
+    // the offset before they are set (setting them may re-snap the rail)
+    const left0 = thread.scrollLeft;
+    if (thread.isConnected) threadRest(thread, thread.scrollLeft);
     if (cancelled || !thread.isConnected || thread.parentElement !== parent ||
         current.parentElement !== thread || current.getAttribute('aria-current') !== 'step' ||
-        thread.scrollLeft !== initialLeft || thread.closest('[inert], [hidden], [aria-hidden="true"]') ||
+        left0 !== initialLeft || thread.closest('[inert], [hidden], [aria-hidden="true"]') ||
         (thread.contains(document.activeElement) && document.activeElement !== outside && document.activeElement !== current)) return;
     const rect = thread.getBoundingClientRect(), bead = current.getBoundingClientRect();
     if (!rect.width || !rect.height || !bead.width || !bead.height || thread.scrollWidth <= thread.clientWidth) return;
@@ -5772,7 +5883,8 @@ function revealMountedScaleCurrent(thread) {
     if (bead.width > right - left) return;
     const delta = bead.right > right ? Math.ceil(bead.right - right)
       : bead.left < left ? Math.floor(bead.left - left) : 0;
-    if (delta) thread.scrollLeft += delta;
+    // Hfix-1A · the least move that shows the current bead, carried on to the next rest: no bead left half under 宙
+    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);
   };
   // The actual sheet is untransformed; only its separate cut-word animates.
   // Read this mount's layout once, after layer law and before any later use.
@@ -5811,7 +5923,8 @@ function freshScaleKeptWord(key) {
 }
 function installScaleBridge() {
   const article = scalePassage() || passage() || D.passages.find(p => !String(p.file || '').startsWith('archive/'));
-  if (article) window.__DRIFT__?.focusArticle?.({ articleId: article.id, title: article.title });
+  // Hfix-1A · the star's caption breaks only between the title's words (Q's one word rule)
+  if (article) window.__DRIFT__?.focusArticle?.({ articleId: article.id, title: article.title, words: jaWords(article.title) });
   // Reading alone stays on the sky: its next tap must still reach the stage.
   // The shared pointer gate must exclude overlays, not strand this first rung.
   const skyReady = () => S.view === 'drift' && !S.stack.length && !standingSlip() && (!ladderVisit || ladderVisit.rung === 'reading') && scaleNavigationAllowed();
@@ -6444,11 +6557,25 @@ function beyondJoyo(ch) {
   return !k || BEYOND_JOYO.has(k.kk);
 }
 
+/** Hfix-1A (L-4: Ｍｕｊｉｎ and ２０２６ set letter-spaced in government prose): a run of full-width Latin letters or
+ * digits is one span (.fw-run) that takes the face's proportional widths (palt) and never breaks inside; its text is
+ * the text as written. */
+const FULL_WIDTH_RUN = /[０-９Ａ-Ｚａ-ｚ]+/gu;
+function appendTextRuns(target, text) {
+  let at = 0;
+  for (const run of String(text).matchAll(FULL_WIDTH_RUN)) {
+    if (run.index > at) target.append(document.createTextNode(text.slice(at, run.index)));
+    target.append(el('span', 'fw-run', run[0]));
+    at = run.index + run[0].length;
+  }
+  if (at < text.length) target.append(document.createTextNode(text.slice(at)));
+}
 function rubyNode(pairs, { furigana, revealed }) {
   const frag = document.createDocumentFragment();
   for (const pair of pairs) {
+    // a ruby's base is left as it is (its reading's place never moves); plain text gets its full-width runs
     if (!pair.r || furigana === 0) {
-      frag.append(document.createTextNode(pair.t));
+      appendTextRuns(frag, pair.t);
       continue;
     }
     // native ruby: the house's one ruby rule sets the reading (rooms/motion.css)
@@ -9529,7 +9656,7 @@ function activateWordLadder(anchor, options) {
   anchor.dataset.ladderRung = 'stage';
   return visit.openStage({ restore: !!options.restore, demo: !!options.demo });
 }
-function removeMini() {
+function removeMini({ keep = null } = {}) {
   // the card's own menu goes with the card; a bar's drawer belongs to its bar, and the render that follows decides it
   // (adoptSaveMenuOwner): arriving data that redraws the page keeps it open, a page or room that goes takes it along
   if (!document.getElementById('vocabulary-list-popover')?.classList.contains('is-drawer')) closeVocabularyListPopover();
@@ -9537,7 +9664,8 @@ function removeMini() {
   // G4 · its writing ends where it stands (a stage drawn again resumes it), and its voice stops unless only redrawn
   if (slip) retireStage({ refreshing: ladderRefreshing });
   if (slip && !miniDiving && !ladderRefreshing) finishPageTransition();
-  slip?.remove();
+  // Hfix-1A (19) · a slip about to be drawn again in place (showMini's `keep`) stays where it stands
+  if (slip !== keep) slip?.remove();
   miniAnchor = null;
   miniEntry = null;
   const closing = miniOnClose;
@@ -9550,6 +9678,16 @@ function removeMini() {
 /** The slip that stands for a word now. */
 function standingSlip() {
   return document.getElementById('mini');
+}
+/** Hfix-1A (19) · a standing slip made ready to be drawn again in place: what it says goes (its content, its attributes but
+ * its id, what the slip maps hold for it), and it is drawn from nothing as a new slip is; its element, its arrival still
+ * running, its listeners and observers stay. */
+function blankSlip(card) {
+  card.replaceChildren();
+  for (const { name } of [...card.attributes]) if (name !== 'id') card.removeAttribute(name);
+  SLIP_NODE.delete(card);
+  SLIP_OWN_MEANING.delete(card);
+  return card;
 }
 /** The standing slip's headword: where the word leaves from when the slip is the door into the page. */
 function slipHeadword() {
@@ -11085,8 +11223,13 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   }
   // a fresh arrival is a move the frame sampler names; a slip drawn again on the same word (its entry arrived) is not
   const arriving = !(standingSlip() && miniAnchor === span);
+  // Hfix-1A (the lead's item 19: the first-use demo's slip began its arrival, then began it again, as its answer came) ·
+  // a slip drawn again on its own word is the same slip: one mount per arrival. What it says changes in place (its answer,
+  // its sense, a refresh); its element, its arrival (read-mini-rise) and its wiring stay, and it is seated again from what
+  // it now says
+  const standing = arriving ? null : standingSlip();
   ladderRefreshing = ladderVisit?.anchor === span;
-  try { removeMini(); } finally { ladderRefreshing = false; }
+  try { removeMini({ keep: standing }); } finally { ladderRefreshing = false; }
   const other = nodeFor || { t: kind, id: token.b };
   const { g, held, node: captureNode, state: miniState, identityHeld, heldReason = null } = kind === 'word'
     ? wordSaveFacts(token, { reader, from, record })
@@ -11096,7 +11239,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     ladderVisit.saveFacts = save === 'none' ? () => null
       : () => ({ label, g, held, heldReason, node: captureNode, state: wordCaptureState(captureNode), identityHeld });
   }
-  const mini = el('div', null);
+  const mini = standing ? blankSlip(standing) : el('div', null);
   mini.id = 'mini';
   if (ladderVisit?.demo) mini.dataset.demo = 'true';
   mini.tabIndex = -1;
@@ -11288,7 +11431,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // the word's kanji, their parts and its web follow the actions, so Save is always the first thing in reach
   if (kanji) { const web = miniKanjiWeb(token.b, span); if (web) mini.append(web); }
   if (sentence) mini.append(sentence);
-  mini.addEventListener('keydown', (event) => {
+  // (a slip drawn again in place has its Escape already: the same word's)
+  if (!standing) mini.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
     event.preventDefault();
     event.stopPropagation();
@@ -11303,7 +11447,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // and 音 marks in its row
   const ceremony = ladderVisit?.anchor === span
     ? ladderVisit.ceremony?.(mini, { word, label, token, kind, nodeFor, reading, actions, arriving }) : null;
-  document.body.append(mini);
+  if (!standing) document.body.append(mini);
+  if (senseWaiting) { SLIP_OWN_MEANING.set(mini, String(g.m[0])); reserveSenseRoom(said, g); }
   miniAnchor = span;
   miniEntry = entryAvailable ? onEntry : null;
   miniOnClose = onClose;
@@ -11461,7 +11606,17 @@ function frameFoot(onPage, fixedEdge) {
 }
 /** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
 function keepFloatingBeside(card, anchor, { follow = false } = {}) {
+  // Hfix-1A (19) · a slip drawn again in place keeps its wiring (below): it is only seated again from what it now says
+  if (card._kept?.anchor === anchor) { card._kept.again(); return; }
+  let watch = null, watched = [], last = 0, lastContent = 0;
+  card._kept = { anchor, again: () => {
+    placeFloating(card, anchorBox(anchor));
+    if (watch) { for (const band of watched) watch.unobserve(band); watched = [...card.children]; for (const band of watched) watch.observe(band); }
+    last = card.getBoundingClientRect().height;
+    lastContent = card.scrollHeight;
+  } };
   placeFloating(card, anchorBox(anchor));
+  card.addEventListener('scroll', () => markCardMore(card), { passive: true });
   card.addEventListener('focusin', () => {
     requestAnimationFrame(() => { if (card.isConnected) revealFloatingFocus(card); });
   });
@@ -11477,13 +11632,17 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
     }, 120);
   }
   if (typeof ResizeObserver !== 'function') return;
-  let last = card.getBoundingClientRect().height;
+  // Hfix-1A · a card cut to its room keeps its box when what is inside it grows (the sense arriving after "…"), so its
+  // content's own height is watched too: the cut is chosen again on the rows as they now stand
+  last = card.getBoundingClientRect().height;
+  lastContent = card.scrollHeight;
   let grow = null, frame = 0;
   const seat = () => {
-    if (!card.isConnected || !anchor.isConnected) { watch.disconnect(); grow?.disconnect(); return; }
-    if (Math.abs(card.getBoundingClientRect().height - last) < 1) return;
+    if (!card.isConnected || !anchor.isConnected) { watch?.disconnect(); grow?.disconnect(); return; }
+    if (Math.abs(card.getBoundingClientRect().height - last) < 1 && Math.abs(card.scrollHeight - lastContent) < 1) return;
     placeFloating(card, anchorBox(anchor));
     last = card.getBoundingClientRect().height;
+    lastContent = card.scrollHeight;
   };
   // L · seating the card resizes the very element the ResizeObserver watches (maxHeight), and a size changed inside
   // its own callback is left undelivered in that frame (WebKit raises it as a page error: Save ▾'s menu unfolding grew
@@ -11494,11 +11653,13 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
     grow = new MutationObserver(seat);
     grow.observe(card, { childList: true, subtree: true, characterData: true });
   }
-  const watch = new ResizeObserver(() => {
+  watch = new ResizeObserver(() => {
     if (frame) return;
     frame = requestAnimationFrame(() => { frame = 0; seat(); });
   });
   watch.observe(card);
+  watched = [...card.children];
+  for (const band of watched) watch.observe(band);
 }
 
 /** A card beside its word: short cards fit above or below the fixed chrome; a tall sentence on a
@@ -11506,9 +11667,36 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
 /** The 層 mark's top, when a box spanning [left, left + width] would stand over it; null otherwise (or when it is hidden). */
 function layersMarkTop(left, width) {
   const mark = document.getElementById('layers-mark');
+  // docked in its open block (Hfix-1A) it stands in the text's flow, not at the foot: no card's floor
+  if (mark?.dataset.docked) return null;
   const box = mark?.getBoundingClientRect();
   if (!box?.height || box.right <= left || box.left >= left + width) return null;
   return box.top;
+}
+/** Hfix-1A · a card shortened to its room ends between two of its rows, never across one (H1: 理's row sliced through
+ * its glyph): the deepest row foot inside the room, else the room. */
+function rowCut(card, room) {
+  const box = card.getBoundingClientRect();
+  let foot = 0;
+  // (Save ▾'s menu unfolds as a band of its own: its items are rows too, so the cut never climbs above Save and its menu)
+  for (const row of card.querySelectorAll(':scope > *, .mini-web > *, .mini-kanji > *, .mini-sentence-wrap > *, #vocabulary-list-popover > *, .vocabulary-list-more > *')) {
+    if (!row.getClientRects().length) continue;
+    const bottom = row.getBoundingClientRect().bottom - box.top + card.scrollTop;
+    if (bottom + 1 <= room && bottom > foot) foot = bottom;
+  }
+  return foot >= 96 ? Math.ceil(foot + 1) : room;
+}
+/** Hfix-1A · a card with more below its cut says so: its foot fades into the band the cut falls in (data-more, the
+ * strip's own sign), and it scrolls by touch and by keyboard (its rows are buttons; revealFloatingFocus follows them). */
+function markCardMore(card) {
+  const more = card.style.overflowY === 'auto' && card.scrollHeight - card.scrollTop - card.clientHeight > 1;
+  if (card.dataset.more !== String(more)) card.dataset.more = String(more);
+  if (!more) return;
+  const box = card.getBoundingClientRect(), cut = box.top + card.clientHeight + card.scrollTop - 1;
+  const band = [...card.children].find((node) => { const b = node.getBoundingClientRect(); return b.top + card.scrollTop <= cut && b.bottom + card.scrollTop > cut; });
+  const ground = band ? getComputedStyle(band).backgroundColor : '';
+  if (ground && ground !== 'transparent' && !/[,/]\s*0\)$/u.test(ground)) card.style.setProperty('--mini-more-ground', ground);
+  else card.style.removeProperty('--mini-more-ground');
 }
 function placeFloating(card, r) {
   const wasDocument = card.dataset.flow === 'document';
@@ -11520,6 +11708,9 @@ function placeFloating(card, r) {
     r = { ...r, top: r.top - moved, bottom: r.bottom - moved, left: r.left, width: r.width };
     delete card.dataset.flowScroll;
   }
+  // Hfix-1A · a cut card seated again (its content grew: the sense, Save's menu) keeps where it was scrolled to; measuring
+  // it uncapped would put it back at its top, and the focus it had revealed (the menu's first item) under its foot
+  const scrolled = card.scrollTop;
   card.style.maxHeight = '';
   card.style.overflowY = '';
   const m = card.getBoundingClientRect();
@@ -11580,6 +11771,7 @@ function placeFloating(card, r) {
     card.style.top = `${r.bottom + 10 + window.scrollY}px`;
     delete card.dataset.floatingTop;
     card.dataset.side = 'below';
+    markCardMore(card);
     revealFloatingFocus(card);
     return;
   }
@@ -11592,22 +11784,30 @@ function placeFloating(card, r) {
       card.style.overflowY = 'auto';
     }
   }
-  else if (seatHeight <= roomAbove) top = r.top - 10 - seatHeight;
-  else if (seatHeight <= roomBelow) top = r.bottom + 10;
-  else if (seatHeight > m.height && seatHeight <= floor - ceiling) {
-    top = ceiling;
-    // The word view still ends before its anchor; only the expanded sentence uses
-    // the reserved room below it. The next printed word stays available to tap.
-    if (m.height > roomAbove) {
-      card.style.maxHeight = `${Math.max(96, roomAbove)}px`;
-      card.style.overflowY = 'auto';
-    }
-  }
   else {
-    const room = Math.max(roomAbove, roomBelow, 96);
-    card.style.maxHeight = `${room}px`;
-    card.style.overflowY = 'auto';
-    top = roomAbove >= roomBelow ? Math.max(ceiling, r.top - 10 - room) : r.bottom + 10;
+    // Hfix-1A · the word card stands whole beside its word where it can (the sentence's reserve only chooses between the
+    // seats that hold it whole); else it is cut, between two rows. The print never moves for it (G3: the second activation
+    // exposes the stage without moving the print)
+    const seatWhole = () => {
+      if (seatHeight <= roomAbove) return r.top - 10 - seatHeight;
+      if (seatHeight <= roomBelow) return r.bottom + 10;
+      // The word view still ends before its anchor; only the expanded sentence uses
+      // the reserved room below it. The next printed word stays available to tap.
+      if (seatHeight > m.height && seatHeight <= floor - ceiling && m.height <= roomAbove) return ceiling;
+      if (m.height <= roomBelow) return r.bottom + 10;
+      if (m.height <= roomAbove) return r.top - 10 - m.height;
+      return null;
+    };
+    top = seatWhole();
+    if (top == null) {
+      const fit = rowCut(card, Math.max(roomAbove, roomBelow, 96));
+      card.style.maxHeight = `${fit}px`;
+      card.style.overflowY = 'auto';
+      if (scrolled) card.scrollTop = scrolled;
+      // above its word a cut card still meets the chrome's edge (no strip of cut title glyphs over it); its foot, shortened
+      // to a row, ends further from the word
+      top = roomAbove >= roomBelow ? ceiling : r.bottom + 10;
+    }
   }
   // a card nearly as wide as the screen is centred, its two gutters equal (review round 2 #13);
   // a narrower card stays beside its word
@@ -11620,6 +11820,7 @@ function placeFloating(card, r) {
   else delete card.dataset.floatingTop;
   // which side of its word the card stands on: its shade falls away from the word, never across it
   card.dataset.side = top < r.top ? 'above' : 'below';
+  markCardMore(card);
   revealFloatingFocus(card);
 }
 
@@ -12243,6 +12444,10 @@ function placeSealStrip(open) {
   const ceiling = Math.max(glassTop + 8, frameFoot(onPage, fixedEdge) ?? 0);
   const view = vv?.height || window.innerHeight;
   strip.style.maxHeight = `${Math.max(96, Math.floor(view * 0.4))}px`;
+  // Hfix-1A · measured without its own "more" fade: in Chromium the fade's sticky foot adds 4 px of overflow, so a strip
+  // seated again while it showed measured as not fitting, was cut a row short, and kept its fade (markStripMore sets it
+  // again once seated)
+  delete strip.dataset.more;
   strip.style.left = '0px';
   strip.style.top = '0px';
   // as wide as the glass allows (a page wider than the phone's screen still shows the strip whole)
@@ -12505,10 +12710,13 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
       });
       return button;
     };
-    for (const name of order.slice(0, SEAL_LISTS_SHOWN)) lists.append(chip(name));
+    // Hfix-1A (G5-1, the lead's ruling: at 320 px a word on six lists wrapped row 1 to three lines and the strip scrolled
+    // inside itself): under 360 px three lists stand in row 1, then "All lists · N"
+    const shownLists = window.innerWidth < 360 ? 3 : SEAL_LISTS_SHOWN;
+    for (const name of order.slice(0, shownLists)) lists.append(chip(name));
     let all = null;
-    if (order.length > SEAL_LISTS_SHOWN) {
-      for (const name of order.slice(SEAL_LISTS_SHOWN)) more.append(chip(name));
+    const addAll = (before = null) => {
+      if (all) return;
       all = el('button', 'chip seal-list-all', tx(`すべてのリスト · ${order.length}`, `All lists · ${order.length}`));
       all.type = 'button';
       all.id = 'seal-strip-all';
@@ -12519,8 +12727,24 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
         all.setAttribute('aria-expanded', String(!more.hidden));
         if (!more.hidden) more.querySelector('button')?.focus({ preventScroll: true });
       });
-      lists.append(all, more);
+      if (before) before.before(all, more);
+      else lists.append(all, more);
+    };
+    if (order.length > shownLists) {
+      for (const name of order.slice(shownLists)) more.append(chip(name));
+      addAll();
     }
+    // and while a narrow strip would still scroll inside itself, his lists give way one at a time (down to one) to
+    // "All lists · N", which keeps every one a tap away
+    open.fitLists = () => {
+      if (window.innerWidth >= 360 || !more.hidden) return;
+      for (let shown = [...lists.querySelectorAll(':scope > .seal-list')]; shown.length > 1 && strip.scrollHeight > strip.clientHeight + 1;
+        shown = [...lists.querySelectorAll(':scope > .seal-list')]) {
+        more.prepend(shown.at(-1));
+        addAll(fresh);
+        placeSealStrip(open);
+      }
+    };
     const fresh = el('button', 'chip seal-list-new', tx('新しいリスト…', 'New list…'));
     fresh.type = 'button';
     fresh.id = 'seal-strip-new';
@@ -12667,6 +12891,7 @@ function openSealStrip(anchor, door, facts, outcome, { keyboard = false } = {}) 
   strip.addEventListener('scroll', () => markStripMore(strip), { passive: true });
   sealStrip = open;
   placeSealStrip(open);
+  open.fitLists?.();
   focusSealStrip(keyboard);
   return strip;
 }
@@ -13136,7 +13361,7 @@ function markSenseContext(tokens, passage = null) {
 let senseSidecarPromise = null;
 function ensureSenseSidecar() {
   if (D.senseSidecar || senseSidecarPromise) return senseSidecarPromise || Promise.resolve(D.senseSidecar);
-  senseSidecarPromise = fetch('data/articles/senses.json')
+  senseSidecarPromise = fetchData('data/articles/senses.json')
     .then((res) => (res.ok ? res.json() : null))
     .then((data) => { D.senseSidecar = data?.schemaVersion === 1 && data.articles ? data.articles : {}; return D.senseSidecar; },
       () => { D.senseSidecar = {}; return D.senseSidecar; });
@@ -13518,27 +13743,93 @@ async function ensureSense(token, door) {
 function senseRefine(token, door, slip, redraw, anchor = null) {
   if (!slip || !senseChoice(token, door)?.need) return;
   slip.dataset.sense = 'pending';
-  let touched = false;
+  let touched = false, pressing = false;
   const touch = () => { touched = true; };
-  slip.addEventListener('pointerdown', touch, { capture: true });
+  const press = () => { touched = true; pressing = true; };
+  const lift = () => { pressing = false; };
+  slip.addEventListener('pointerdown', press, { capture: true });
   slip.addEventListener('keydown', touch, { capture: true });
+  window.addEventListener('pointerup', lift, true);
+  window.addEventListener('pointercancel', lift, true);
   const after = () => {
-    slip.removeEventListener('pointerdown', touch, { capture: true });
+    // Hfix-1A · a press still down on the slip lands first (its click opens Save's menu or keeps the word); its meaning
+    // arrives after it, in place
+    if (pressing && slip.isConnected) { afterPressLands(after); return; }
+    slip.removeEventListener('pointerdown', press, { capture: true });
     slip.removeEventListener('keydown', touch, { capture: true });
+    window.removeEventListener('pointerup', lift, true);
+    window.removeEventListener('pointercancel', lift, true);
     // a sense that cannot be had (the dictionary cannot answer) is not waited for again: the word's own meaning stands
     if (senseChoice(token, door)?.need) SENSE_GAVE_UP.add(token);
     if (!slip.isConnected) return;
     const waiting = !!slip.querySelector('[data-sense-wait]');
     // a word the sense leaves as it was (no sense chosen; several entries still named) keeps its slip untouched
     if (senseDoor(token, door) === door && !waiting) { delete slip.dataset.sense; return; }
-    // a finger on a slip still waiting for its meaning: drawn once it lifts
-    if (waiting && slip.matches(':active')) { slip.addEventListener('pointerup', after, { once: true }); return; }
     // brought up to its sense in place where its word and entry stay; drawn again only where they move — and a slip still
-    // at its placeholder is never left there, touched or not
-    if ((!touched || waiting) && document.getElementById('mini') === slip && !sensePatch(slip, token, door, anchor)) redraw();
+    // at its placeholder is never left there, touched or not. Hfix-1A (the lead's item 18): a slip a press has touched
+    // (Save pressed, its menu open) is never drawn again; its meaning lands in place, the word's own where the sense
+    // belongs to another door
+    if ((!touched || waiting) && document.getElementById('mini') === slip && !sensePatch(slip, token, door, anchor)) {
+      if (touched) senseFillInPlace(slip);
+      else redraw();
+    }
     else delete slip.dataset.sense;
   };
   ensureSense(token, door).then(after, after);
+}
+/** Hfix-1A · run `then` once the press now down has landed: after its click (its own act first), on its cancel, or at
+ * most 800 ms on (a press that never clicks: a drag off its button). */
+function afterPressLands(then) {
+  let done = false;
+  const land = () => {
+    if (done) return;
+    done = true;
+    window.removeEventListener('click', land, true);
+    window.removeEventListener('pointercancel', land, true);
+    clearTimeout(timer);
+    setTimeout(then, 0);
+  };
+  window.addEventListener('click', land, true);
+  window.addEventListener('pointercancel', land, true);
+  const timer = setTimeout(land, 800);
+}
+/** Hfix-1A · a touched slip still at its placeholder, whose sense cannot be brought in place: its meaning line takes the
+ * word's own meaning where the "…" stood (the meaning that stands when a sense cannot be had), nothing else moves. */
+const SLIP_OWN_MEANING = new WeakMap();
+function senseFillInPlace(slip) {
+  const wait = slip.querySelector('.mini-gloss[data-sense-wait]');
+  const own = SLIP_OWN_MEANING.get(slip);
+  delete slip.dataset.sense;
+  if (!wait || !own) return;
+  wait.className = 'mini-gloss';
+  delete wait.dataset.senseWait;
+  wait.style.removeProperty('font-weight');
+  wait.style.removeProperty('color');
+  if (!wait.getAttribute('style')) wait.removeAttribute('style');
+  wait.textContent = own;
+  slip.removeAttribute('aria-busy');
+}
+/** Hfix-1A · a meaning still to come lands in place (the lead's item 18: Saved ✓ pressed as the sense arrived met the word
+ * band, which dove into the page, 3–4 times in 5 on a cold page): from first paint the band keeps the room the word's own
+ * meaning takes, its line and, where it has more, its quiet second line. The room is measured on hidden copies set and
+ * removed in one task, before any frame or observer reads the slip (the "…" stays the only meaning it shows); the band
+ * keeps it (min-height), so what the sense brings fills it and nothing under a finger moves. */
+function reserveSenseRoom(said, g) {
+  const wait = said?.querySelector('[data-sense-wait]');
+  if (!wait || !g?.m?.[0] || !said.isConnected) return;
+  const line = el('span', 'mini-gloss', String(g.m[0]));
+  line.lang = 'en';
+  const more = senseMoreLine(g.m);
+  const quiet = more ? senseMoreElement(more) : null;
+  const ghosts = [line, quiet].filter(Boolean);
+  for (const ghost of ghosts) { ghost.style.visibility = 'hidden'; ghost.setAttribute('aria-hidden', 'true'); }
+  const bare = said.getBoundingClientRect().height;
+  wait.style.display = 'none';
+  wait.after(...ghosts);
+  const room = said.getBoundingClientRect().height;
+  for (const ghost of ghosts) ghost.remove();
+  wait.style.removeProperty('display');
+  if (room > bare + 0.5) said.style.minHeight = `${Math.ceil(room)}px`;
 }
 
 /** A slip drawn before its word's sense was at hand, brought up to the sense in place while the slip's word and entry
@@ -13620,7 +13911,10 @@ function senseLater(token, doorOf, anchor, redraw) {
       SENSE_GAVE_UP.add(token);
       const open = japaneseLookupMini?.anchor === anchor ? japaneseLookupMini.mini : null;
       if (open) delete open.dataset.sense;
-      if (open?.querySelector('[data-sense-wait]') && document.getElementById('mini') === open) redraw();
+      if (open?.querySelector('[data-sense-wait]') && document.getElementById('mini') === open) {
+        if (open.dataset.senseTouched) senseFillInPlace(open);
+        else redraw();
+      }
       return;
     }
     entry.ready = true;
@@ -13635,9 +13929,13 @@ function senseLaterDraw(anchor) {
   if (!entry?.ready || !open) return;
   SENSE_LATER.delete(anchor);
   delete open.dataset.sense;
-  // a slip still at its placeholder is brought up to its sense, touched or not; a touched one already answered stays
+  // a slip still at its placeholder is brought up to its sense, touched or not; a touched one already answered stays.
+  // Hfix-1A: a touched one is never drawn again; its meaning lands in place
   const waiting = !!open.querySelector('[data-sense-wait]');
-  if ((!open.dataset.senseTouched || waiting) && !sensePatch(open, entry.token, entry.doorOf(), anchor)) entry.redraw();
+  if ((!open.dataset.senseTouched || waiting) && !sensePatch(open, entry.token, entry.doorOf(), anchor)) {
+    if (open.dataset.senseTouched) senseFillInPlace(open);
+    else entry.redraw();
+  }
 }
 
 /** R2 · among several entries that write a dictionary form and read it the derived way, the one that fits the token:
@@ -14919,6 +15217,7 @@ function foldReaderLayers() {
   const open = readerLayers;
   if (!open) return false;
   readerLayers = null;
+  dockLayersMark(open.mark, null, open.home);
   open.block.remove();
   if (open.paragraph.isConnected) delete open.paragraph.dataset.layers;
   if (open.mark.isConnected) {
@@ -14926,6 +15225,42 @@ function foldReaderLayers() {
     open.mark.removeAttribute('aria-controls');
   }
   return true;
+}
+/** Hfix-1A · the 層 mark goes with the layers it opened (H1: 層 stood over 大臣 cabinet minister in every world): it leaves
+ * its seat at the foot for the open block's own corner, where the block's lines flow round it, so it is never over a glyph
+ * or a gloss; it is still the one way to fold them, and folding sends it home. The same element travels (FLIP), at once
+ * under reduced motion. `home` is where it was: { parent, next }. */
+function dockLayersMark(mark, block, home = null, after = null) {
+  if (!mark?.isConnected) return;
+  const from = mark.getBoundingClientRect();
+  const focused = document.activeElement === mark;
+  if (block) {
+    mark.dataset.docked = 'true';
+    block.prepend(mark);
+    after?.();
+  } else {
+    if (!mark.dataset.docked) return;
+    delete mark.dataset.docked;
+    if (home?.parent?.isConnected) home.parent.insertBefore(mark, home.next?.parentNode === home.parent ? home.next : null);
+    else mark.remove();
+  }
+  if (focused && mark.isConnected) mark.focus({ preventScroll: true });
+  const to = mark.isConnected ? mark.getBoundingClientRect() : null;
+  if (!from.height || !to?.height || !pageCutAllowed()) return;
+  mark.animate([{ transform: `translate(${from.left - to.left}px, ${from.top - to.top}px)` }, { transform: 'none' }],
+    { duration: motionMs('--motion-room', 240), easing: motionEase('--ease-enter') });
+}
+/** Hfix-1A · open layers stand wholly on the glass: a press anywhere folds them, so a phone can never scroll to their foot
+ * (H1: the 意 line ran under the tab bar); the reading moves the least that brings the block up, never its top past the
+ * frame. */
+function layersOnGlass(block) {
+  const box = block.getBoundingClientRect();
+  const edge = (selector, side) => { const node = document.querySelector(selector); if (!node || !['fixed', 'sticky'].includes(getComputedStyle(node).position)) return null; const r = node.getBoundingClientRect(); return r.height ? r[side] : null; };
+  const ceiling = Math.max(edge('#app > .chrome', 'bottom') ?? 0, edge('#app > .scale-thread', 'bottom') ?? 0) + 8;
+  const floor = Math.min(innerHeight, edge('#primary-tabs', 'top') ?? innerHeight, edge('.listen-row', 'top') ?? innerHeight) - 8;
+  const down = document.documentElement.scrollHeight - innerHeight - window.scrollY;
+  const rise = Math.ceil(Math.min(box.bottom - floor, box.top - ceiling, down));
+  if (rise > 0) window.scrollTo({ top: window.scrollY + rise, behavior: 'instant' });
 }
 function openReaderLayers(mark) {
   const paragraph = readerLayerParagraph();
@@ -14984,9 +15319,11 @@ function openReaderLayers(mark) {
   if (roles.length) block.append(pairs('reader-layers-roles', '文', tx('助詞の役割', 'Particles'), roles));
   paragraph.dataset.layers = 'open';
   paragraph.after(block);
-  readerLayers = { paragraph, block, mark };
+  const home = { parent: mark.parentNode, next: mark.nextSibling };
+  readerLayers = { paragraph, block, mark, home };
   mark.setAttribute('aria-pressed', 'true');
   mark.setAttribute('aria-controls', block.id);
+  dockLayersMark(mark, block, null, () => layersOnGlass(block));
   return true;
 }
 /** A token as read: each written piece by its reading where it has one (the text's own furigana), kana and marks as written. */
@@ -24369,6 +24706,9 @@ function wireParticleGestures(span, particle, index, p) {
   // the same slip as every word's (contract §1): the particle, its role, its sentence row; no Save (a particle is
   // not a card), and its band opens the particle's page
   const quickLook = (modality = 'pointer', { restore = false } = {}) => {
+    // Hfix-1A · the word last touched has no Save: the bar's keep, back once the slip folds, rests — it never names the
+    // word touched before the particle (G3: "no stale previous-word card")
+    if (S.readerTake) { S.readerTake = null; syncReaderTakeSeal(); }
     openSlip({ t: 'particle', id: particle.id }, {
       anchor: span, from: 'reader', key: `particle:${particle.id}`, redo: restore,
       look: { label: particle.p, reading: particle.r, gloss: bi() ? particle.role : particle.roleJa },
@@ -27794,6 +28134,7 @@ function chromeKeep() {
   button.setAttribute('aria-label', target
     ? (savedNow() ? tx(`「${target.label}」保存済み`, `Saved ${target.label}`) : tx(`「${target.label}」を保存`, `Save ${target.label}`))
     : tx('語を保存 — 文中の語をタップしてから', 'Save a word — tap a word in the story first'));
+  paintKeepAside(button);
   return button;
 }
 /** After a touch, a save or an undo: the bar's keep names the word now under the finger, in place (no render). */
@@ -27803,10 +28144,20 @@ function syncChromeKeep() {
   const fresh = chromeKeep();
   if (fresh.dataset.saveKey === old.dataset.saveKey && old.getAttribute('aria-expanded') === 'true') {
     paintWordSave(old, fresh.getAttribute('aria-pressed') === 'true');
+    paintKeepAside(old);
     return;
   }
   old.replaceWith(fresh);
   fitChromeKeep(fresh);
+}
+/** Hfix-1A · one Save on screen (H1: "Save 総理" in the bar beside the stage's own Save, H-rokusho-05, H-shu-07): while a
+ * stage or a word page stands, the stage's or the page's Save is the one, and the bar's keep steps aside — it keeps its
+ * room, so no other door moves, and it is out of reach (inert); it returns when they close. */
+function paintKeepAside(button) {
+  const aside = !!standingSlip() || S.stack.length > 0;
+  if (aside === button.hasAttribute('data-aside')) return;
+  button.toggleAttribute('data-aside', aside);
+  button.inert = aside;
 }
 /** Q · the bar's Save says as much as fits whole in the room its bar leaves it (it takes that room, flex 1, so touching
  * a word never moves another door): the verb and the word (Save 総理 · Saved ✓ 総理); else the verb (Save · Saved ✓);
@@ -30144,55 +30495,6 @@ function speakSentence(container, tokens, { contextId }) {
     if (door?.matches('.sentence-tok')) { door.dataset.speakS = s; door.dataset.speakB = b; door.dataset.speakR = r; }
   }
 }
-/** The word last touched in any line, as the top bar's Save keeps it: its reading truth from R (readingToken). */
-function speakKeepTarget() {
-  if (!speakKeepWord?.word || !lookup(speakKeepWord.word)) return null;
-  // the token as the line carried it: readingToken and wordSaveFacts give an inflected surface's reading no say over
-  // its dictionary form, exactly as for a sentence's word anywhere
-  const door = readingToken({ s: speakKeepWord.surface || speakKeepWord.word, b: speakKeepWord.word, r: speakKeepWord.reading || '' });
-  return { label: door.b, ...wordSaveFacts(door) };
-}
-/** The top bar's one Save in the room, naming the word last touched in any line (the reader's keep, for talk). */
-function speakKeep() {
-  const target = speakKeepTarget();
-  const savedNow = () => {
-    const now = speakKeepTarget();
-    return !!now && !now.held && wordCaptureState(now.node) === 'taken';
-  };
-  const button = saveOne({
-    id: 'speak-keep', cls: 'chrome-keep', label: target?.label || '', word: target?.label || '', data: { saveBar: '' },
-    node: target && !target.held && !target.identityHeld ? target.node : null, place: 'drawer', saved: savedNow,
-    keep: () => {
-      const now = speakKeepTarget();
-      if (!now) { showReaderToast(tx('会話の語をタップしてから、保存する。', 'Tap a word in the conversation, then Save.')); return false; }
-      if (now.held || now.identityHeld) {
-        showReaderToast(now.held ? now.heldReason || readerCaptureReasonText(now.label) : wordCaptureHeldText(now.node, { route: false }));
-        return false;
-      }
-      return toggleWordSave(now.node, now.label);
-    },
-    review: { saved: savedNow, toggle: () => { const now = speakKeepTarget(); return now ? toggleWordSave(now.node, now.label) : false; } },
-    more: () => [{ id: 'speak-keep-copy', label: tx('コピー', 'Copy'), run: () => copyReaderText(speakKeepTarget()?.label || '') }],
-  });
-  button.dataset.saveKey = target ? `${target.node.t}:${target.node.id}:${target.node.reading || ''}` : '';
-  if (!target) button.dataset.saveRest = '';
-  if (target && (target.held || target.identityHeld)) button.classList.add('reader-capture-held');
-  paintWordSave(button, savedNow());
-  button.setAttribute('aria-label', target
-    ? (savedNow() ? tx(`「${target.label}」保存済み`, `Saved ${target.label}`) : tx(`「${target.label}」を保存`, `Save ${target.label}`))
-    : tx('語を保存 — 会話の語をタップしてから', 'Save a word — tap a word in the conversation first'));
-  return button;
-}
-function syncSpeakKeep() {
-  const old = document.getElementById('speak-keep');
-  if (!old) return;
-  const fresh = speakKeep();
-  if (fresh.dataset.saveKey === old.dataset.saveKey && old.getAttribute('aria-expanded') === 'true') {
-    paintWordSave(old, fresh.getAttribute('aria-pressed') === 'true');
-    return;
-  }
-  old.replaceWith(fresh);
-}
 /** The room's one door into the app: closures over the app's own lexicon, doors, Save, record and sound. */
 function speakHost() {
   return Object.freeze({
@@ -30261,10 +30563,10 @@ function speakHost() {
     // a line kept for 影 (her voice, on this device) is kept by the one Save ▾ too: one press keeps it, its menu removes it
     saveLine: ({ text, saved, keep, remove }) => saveOne({ cls: 'speak-save speak-save-line', label: text, saved, keep,
       more: () => (saved() ? [{ id: 'speak-line-remove', label: tx('外す', 'Remove'), run: remove }] : []) }),
+    // the word last touched in any line, kept whole (surface, base, reading); Hfix-1A: the bar no longer shows it (its
+    // slip's Save is the one)
     setKeep: ({ word, surface = '', reading = '' }) => {
       speakKeepWord = word ? { word, surface: surface || word, reading } : null;
-      syncSpeakKeep();
-      setTimeout(syncSpeakKeep, 600);
     },
     // one sound at a time: Kore's element becomes the app's one playback owner while she speaks
     ownAudio: (audioEl) => {
@@ -31783,7 +32085,7 @@ function inflateExampleToken(row) {
   return { s, b, r, c: !!c, p, f: (f || []).map((pair) => (pair[1] ? { t: pair[0], r: pair[1] } : { t: pair[0] })) };
 }
 async function fetchExampleJson(path) {
-  const res = await fetch(`${EXAMPLE_DIR}/${path}`);
+  const res = await fetchData(`${EXAMPLE_DIR}/${path}`);
   if (!res.ok) throw new Error(`${path} → ${res.status}`);
   return res.json();
 }
@@ -33454,15 +33756,44 @@ function homographLines(choices, isActive) {
   });
 }
 
-function renderDictionaryHomographs(container, node) {
+/** Hfix-1A · the entry's spellings line goes into its head: the head's word becomes every spelling (総理・綜理), and the
+ * readings the door does not open follow it quietly (ほかに じょうて); the line itself is not drawn twice. */
+function foldEntryForms(box) {
+  const head = box.querySelector(':scope > .is-entry-head .dictionary-homograph');
+  const forms = box.querySelector(':scope > .dictionary-entry > .dictionary-forms');
+  if (!head || !forms) return;
+  const word = head.querySelector('.row-word');
+  const spellings = forms.querySelector('.dictionary-spellings')?.textContent || '';
+  if (word?.firstChild?.nodeType === 3 && spellings) word.firstChild.textContent = spellings;
+  const reading = head.querySelector('.row-reading')?.textContent || '';
+  const others = (forms.querySelector('.dictionary-readings')?.textContent || '').split('・').filter((r) => r && kataToHira(r) !== kataToHira(reading));
+  if (others.length && word && !word.querySelector('.row-also')) {
+    const more = el('span', 'row-also', tx('ほかに ', 'also '));
+    const kana = el('span', null, others.join(tx('、', ', ')));
+    kana.lang = 'ja';
+    more.append(kana);
+    word.append(more);
+  }
+  forms.remove();
+}
+/** Hfix-1A · whether a seq-less core page's entries are one lone door (D23 B2): the door is then the head of that entry's
+ * own block (renderWordNode), never a second copy of it. */
+function dictionaryLoneDoor(node) {
+  if (node.seq != null && node.seq !== '') return false;
+  const choices = dictionaryHomographChoices(node.id);
+  return choices.length === 1 && choices[0].enabledOnCore;
+}
+function renderDictionaryHomographs(container, node, { head = false } = {}) {
   const choices = dictionaryHomographChoices(node.id);
   const seqless = node.seq == null || node.seq === '';
   // a seq-less core sheet shows even a lone entry, as a door (D23 B2)
   const coreDoors = seqless && choices.some((choice) => choice.enabledOnCore);
   if (choices.length <= 1 && !coreDoors) return;
+  // Hfix-1A · the lone door as the head of its entry's block: its spellings and reading, the senses under it say the rest
+  head = head && choices.length === 1;
   const currentSeq = String(node.seq || node.dictionaryResolvedSeq || '');
   const currentReading = kataToHira(node.reading || lookup(node.id, node.seq)?.r || '');
-  const block = el('div', 'dictionary-homographs');
+  const block = el('div', head ? 'dictionary-homographs is-entry-head' : 'dictionary-homographs');
   block.append(
     choices.length === 1
       ? withEn(el('p', 'dictionary-rel-title', '辞書の項目'), 'Dictionary entry', 'en-inline')
@@ -33497,7 +33828,8 @@ function renderDictionaryHomographs(container, node) {
       top.append(more);
     }
     stack.append(top);
-    if (primaryGloss) stack.append(el('span', 'row-gloss', primaryGloss));
+    if (primaryGloss && !head) stack.append(el('span', 'row-gloss', primaryGloss));
+    if (head) choice.setAttribute('aria-label', tx(`辞書の項目「${headForm}」${reading}をひらく`, `Open the dictionary entry ${headForm} ${reading}`));
     choice.append(stack, el('span', 'row-go', active ? '·' : '›'));
     choice.addEventListener('click', () => {
       // guard by CONTENT, not object identity — async dictionary resolution
@@ -34001,8 +34333,11 @@ function renderWordNode(sheet, node) {
 
   // an entry matched from a reader token offers no other rows of the form:
   // its reading already chose among them (D11)
+  // Hfix-1A · one entry block (round 1, H-hokusai-08: a card with the entry, then the entry's senses again): a lone door is
+  // the head of the senses' own block below, where it carries the entry's spellings and reading
+  const lone = !node.readerChoice && dictionaryLoneDoor(node) && (details.length > 0 || (!!rec?.m?.length && !unresolved));
   if (node.readerChoice) renderReaderChoiceNote(sheet, node);
-  else renderDictionaryHomographs(sheet, node);
+  else if (!lone) renderDictionaryHomographs(sheet, node);
 
   // TRANSLATION — every sense, most common first (JMdict order). Once the
   // word's shard arrives, the full source senses take this spot: homographs,
@@ -34011,10 +34346,13 @@ function renderWordNode(sheet, node) {
   if (details.length) {
     // each full sense names its own part of speech, so the core record's summary line would repeat it
     const box = el('div', 'senses dictionary-senses');
+    if (lone) renderDictionaryHomographs(box, node, { head: true });
     renderDictionaryDetails(box, details, node);
+    if (lone) foldEntryForms(box);
     sheet.append(box);
   } else if (rec?.m?.length && !unresolved) {
     const box = el('div', 'senses');
+    if (lone) renderDictionaryHomographs(box, node, { head: true });
     if (rec.p) box.append(el('p', 'sense-pos', plainPos(rec.p)));
     const immediate = rec.seq ? rec.m.slice(0, 1) : rec.m;
     if (immediate.length === 1) {
@@ -36463,13 +36801,26 @@ function renderRadicalNode(sheet, node) {
   hero.append(meta);
   sheet.append(hero);
 
+  // Hfix-1A · the part in plain words (round 1, H-kaku-06: "Official Kangxi radical no. 120 — いとへん (へん · left). Below:
+  // the characters that contain this part."): its name, what it means, where it sits and in how many kanji; its number and
+  // strokes stand in the chips above
   const note = el('div', 'note');
+  const meaning = partGloss(null, r.c);
+  const count = r.kanjiCount || 0;
+  const WHERE = {
+    へん: [`${count}字の左側にある`, `on the left of ${count} kanji`], つくり: [`${count}字の右側にある`, `on the right of ${count} kanji`],
+    かんむり: [`${count}字の上にのる`, `across the top of ${count} kanji`], あし: [`${count}字の下に置かれる`, `along the foot of ${count} kanji`],
+    たれ: [`${count}字の上から左へ垂れる`, `hanging over the top and left of ${count} kanji`],
+    にょう: [`${count}字の左から下を囲む`, `wrapping the left and foot of ${count} kanji`],
+    かまえ: [`${count}字のまわりを囲む`, `enclosing ${count} kanji`], 独立: [`${count}字に含まれる`, `in ${count} kanji`],
+  };
+  const where = official ? WHERE[official.pos] || WHERE.独立 : null;
   note.textContent = official
     ? tx(
-        `康熙部首の第 ${official.n} 番「${official.name}」。位置は${posText}。下は、この部品を含む字。`,
-        `Official Kangxi radical no. ${official.n} — ${official.name} (${posText}). Below: the characters that contain this part.`,
+        `${official.name}は${official.base && official.base !== official.name ? `「${official.base}」の部首` : '部首のひとつ'}。${where[0]}。`,
+        `${official.name}, ${meaning ? `the ${meaning} radical` : 'a radical'}, ${where[1]}.`,
       )
-    : tx('「この部品を含む」族。康熙部首ではない部品。', 'The family of characters containing this part — a shape component, not one of the Kangxi radicals.');
+    : tx(`${count}字に見られる形。214の部首には入らない。`, `A shape found in ${count} kanji; it is not one of the 214 radicals.`);
   sheet.append(note);
 
   if (r.isKanji && D.kanji[r.c]) {
@@ -40416,8 +40767,9 @@ function render() {
   // S · the reader's keep (John, 2026-10-16: "why is the plus bar gone???? what replaced it?? how do we know where to add
   // something"): where the + stood, the one Save in the bar's own type, naming the word last touched (Save 総理); before a
   // word is touched it says what it does (Save a word). Its path is the slip's Save on the same word (chromeKeep).
+  // Hfix-1A · Speak stages no word in the bar: its words open their own slips, whose Save is the one (H1: "Save a…" cut
+  // in Speak's bar, H-hakuu-06, H-rokusho-02, H-nami-10)
   if (S.view === 'reader' && passage()) chrome.append(chromeKeep());
-  if (S.view === 'speak') chrome.append(speakKeep());
   // Today: a quiet bookmark and its saved-word count. The on-screen bookmark stays quiet; its
   // name states the room it opens and that the number is saved words, not today's cards.
   const trayBtn = biLabel('button', null, `今日 ${S.taken.length}`, `Today ${S.taken.length}`);

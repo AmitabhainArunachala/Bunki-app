@@ -597,6 +597,16 @@
         { "s": "次", "b": "次", "p": "名詞", "r": "つぎ", "c": true }
       ],
       "note": "又次の折 is 又 (again) + 次の折 (next time); UniDic reads the personal name 又次 またじ (Bunki batch-4r, aozora:058059-1)"
+    },
+    {
+      "word": "さもなければかの",
+      "after": { "s": "なけれ" },
+      "match": [{ "s": "ばか", "p": "名詞" }, { "s": "の" }],
+      "tokens": [
+        { "s": "ば", "b": "ば", "p": "助詞", "r": "ば", "c": false },
+        { "s": "かの", "b": "かの", "p": "連体詞", "r": "かの", "c": true }
+      ],
+      "note": "さもなければかの国に is さもなければ (otherwise) + かの (that); after なけれ UniDic reads ばか (idiot) + の. Guarded on the なけれ before it, so ばかの elsewhere keeps UniDic's split (R3-3, Hfix-1A, aozora:049966-2)"
     }
   ]
 }

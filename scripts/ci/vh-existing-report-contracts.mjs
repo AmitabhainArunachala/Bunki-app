@@ -710,6 +710,9 @@ export function contrastExpectedCases(engine = 'chromium') {
             'C3',
             'C4',
             'C5',
+            // INT-VH (2026-10-19): Hfix-1A's C8 (F-1), the fixed chrome opaque, written for every settled state with its
+            // applicability explicit (measured where a bar meets the glass, vacuous where none does)
+            'C8',
             ...(['slip', 'deck-front', 'deck-back'].includes(state) ? ['C2'] : []),
             ...(!CONTRAST_NIGHT.has(world) ? ['C6'] : []),
           ].map((id) => `${browser}/${world}/${state}.${id}`),
@@ -978,6 +981,8 @@ export function validateExistingReport(gateName, report, context = {}) {
 export const existingReportNarrowingEnvironment = Object.freeze([
   'SWEEP_WORLDS',
   'SWEEP_STATES',
+  // INT-VH (2026-10-19): Hfix-1A's contrast negative control (translucent-bar) is a diagnostic selector
+  'SWEEP_NEGATIVE',
   'KAIRO_SOURCE_VIEWPORT',
   'KAIRO_LISTENING_VIEWPORT',
   'KAIRO_TRANSCRIPT_VIEWPORT',

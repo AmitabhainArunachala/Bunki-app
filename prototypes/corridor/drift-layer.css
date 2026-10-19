@@ -293,6 +293,7 @@ body[data-furigana='2'] #drift-layer .drift-reading rt { opacity: 1; }
 #drift-layer .scale-star[hidden] { display: none; }
 #drift-layer .scale-star-number { white-space: nowrap; }
 #drift-layer .scale-star-caption { display: block; overflow-wrap: anywhere; }
+#drift-layer .scale-star-caption.is-words { word-break: keep-all; overflow-wrap: break-word; line-break: strict; }
 #drift-layer .scale-star.is-compact { width: 44px; height: 44px; min-height: 44px; max-width: 44px; padding: 0; display: grid; place-items: center; }
 #drift-layer .scale-star.is-compact .scale-star-caption { position: absolute; box-sizing: border-box; left: var(--scale-caption-left); top: var(--scale-caption-top); width: var(--scale-caption-width); max-height: var(--scale-caption-height); overflow: auto; padding: 8px; border: 1px solid var(--line); background: var(--ground); visibility: hidden; pointer-events: none; }
 #drift-layer .scale-star.is-compact:is(:hover,:focus-visible) .scale-star-caption { visibility: visible; }

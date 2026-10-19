@@ -778,7 +778,8 @@ try {
         const word = '総理';
         await room('reader-card', async () => { await climbAt(() => tap(`#reader .tok[data-prose-label="${word}"]`)); await page.locator('#mini').waitFor(); await settle(500); }, () => page.evaluate(() => {
           const keep = document.getElementById('chrome-keep');
-          return { barKeep: keep ? { text: keep.textContent.replace(/\s+/gu, ' ').trim(), aria: keep.getAttribute('aria-label') || '', one: keep.matches('button.save-one[data-save-one]') } : null };
+          return { barKeep: keep ? { text: keep.textContent.replace(/\s+/gu, ' ').trim(), aria: keep.getAttribute('aria-label') || '', one: keep.matches('button.save-one[data-save-one]'),
+            aside: keep.hasAttribute('data-aside') && keep.inert && getComputedStyle(keep).visibility === 'hidden' } : null };
         }));
         await room('page', async () => { await tap('#mini button.mini-word'); await page.locator('#sheet').waitFor(); await settle(1000); });
         await room('page-foot', async () => { await page.evaluate(() => { const s = document.getElementById('sheet'); s.scrollTop = s.scrollHeight; }); await settle(500); });
@@ -997,7 +998,8 @@ try {
       const label = `${row.engine} ${row.lang} · ${row.room}`;
       check(`${label} · B the bar carries the keep control, labelled in words, the one Save`,
         !!keep && keep.one && /\S{2,}/u.test(keep.text) && (row.lang === 'ja' ? /保存/u.test(keep.text) : /\bSave/u.test(keep.text)), JSON.stringify(keep), `S33/${label}`);
-      if (row.room === 'reader-card') check(`${label} · B it names the word last touched (総理)`, !!keep && keep.text.includes('総理'), JSON.stringify(keep), `S34/${label}`);
+      // Hfix-1A · one Save on screen: with the card open the keep stands aside (hidden, its room kept, inert), still naming it
+      if (row.room === 'reader-card') check(`${label} · B it names the word last touched (総理), standing aside while the card stands`, !!keep && keep.text.includes('総理') && keep.aside, JSON.stringify(keep), `S34/${label}`);
     }
     // D: the deck's bar is a band in the world's deep pigment; its words at 4.5:1 on it
     for (const row of inventory.filter((r) => /^deck-(front|back)-(hokusai|sumi)$/u.test(r.room))) {

@@ -2003,6 +2003,11 @@ body .sheet .dictionary-homographs {
   border-radius: var(--radius-card);
   background: color-mix(in srgb, var(--ink) 4%, var(--raised));
 }
+/* Hfix-1A · one entry block (round 1, H-hokusai-08: the entry as a card, then its senses again): a page's lone door is the
+   head of its entry's own block, no card of its own and no meaning repeated — the eyebrow, then the entry's spellings
+   and reading as the door, then its senses (corridor.js renderWordNode, foldEntryForms) */
+body .sheet .senses > .dictionary-homographs.is-entry-head { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; }
+body .sheet .senses > .dictionary-homographs.is-entry-head .dictionary-homograph { border-bottom: 1px solid var(--hairline); }
 body .sheet .entry-rows { border-top: 0; }
 body .sheet .entry-row {
   gap: var(--s2);
@@ -2926,6 +2931,16 @@ body .token-actions button:hover { background: var(--ai-wash); }
   body.has-primary-tabs[data-view='reader'] .layers-mark { bottom: calc(var(--nav-clearance) + 8px); }
   body[data-view='reader']:has(.listen-row.play-bar[data-open='true']) .layers-mark { display: none; }
 }
+/* Hfix-1A · open, the mark stands in its block's own corner (corridor.js dockLayersMark): the block's lines flow round it,
+   so it is never over a glyph or a gloss; the block holds it (flow-root) however short it is */
+#reader-layers > #layers-mark[data-docked] {
+  position: relative;
+  z-index: auto;
+  inset: auto;
+  float: right;
+  margin: 0 0 4px 10px;
+}
+#reader-layers { display: flow-root; }
 /* the layers: the paragraph stays as it is; one quiet block under it — the paragraph read in kana (読), its words' meanings
    (意) and its particles' roles (文), each line led by its glyph — folds on any tap */
 .reader-layers {
@@ -4514,7 +4529,8 @@ body:not([data-view='drift']) #app > main > .room-sign {
   position: absolute;
   z-index: 1;
   top: calc(52px + env(safe-area-inset-top, 0px));
-  right: 6px;
+  /* Hfix-1A · 8 px clear of the glass's edge (D5; round 1 measured it 6 px off, H-akafuji-07, H-shu-05) */
+  right: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -4529,14 +4545,18 @@ body:not([data-view='drift']) #app > main > .room-sign {
 }
 @media (max-width: 520px) {
   html:is([data-room='tray'], [data-room='learn'], [data-room='tests'], [data-room='search'], [data-room='me']) body:not(.zen):not([data-view='drift']) #app > main:has(> .room-sign) { padding-right: 36px; }
-  /* the shelf keeps its full measure (its title block is pinned to one-line notes); only the
-     look-up field steps aside, and the sign is cut short above the Tools door */
+  /* the shelf keeps its full measure (its title block is pinned to one-line notes); the look-up field and, Hfix-1A, the
+     masthead step aside, so the sign hangs beside the masthead (its Tools door 8 px from it) and ends above the cards */
   body[data-view='shelf']:not(.zen) #app > main > .room-sign ~ #search { width: calc(100% - 30px); }
   body[data-view='shelf']:not(.zen) #app > main > .room-sign { padding-block: 10px 8px; gap: 8px; }
+  body[data-view='shelf']:not(.zen) #app > main:has(> .room-sign) .shelf-masthead { padding-right: 24px; }
 }
 @media (min-width: 521px) {
-  body:not([data-view='drift']) #app > main > .room-sign { right: max(6px, calc((100vw - 920px) / 2 - 36px)); }
+  body:not([data-view='drift']) #app > main > .room-sign { right: max(8px, calc((100vw - 920px) / 2 - 36px)); }
 }
+/* Hfix-1A · in a room with G6's thread (the bar's second row), the sign hangs 8 px under the thread, not under it (round
+   1: "READ" stood under the thread, only "AD" showing) */
+body:not([data-view='drift']) #app:has(> .scale-thread) > main > .room-sign { top: calc(97px + env(safe-area-inset-top, 0px)); }
 body:not([data-view='drift']) #app > main > .room-sign .room-sign-name {
   writing-mode: vertical-rl;
   text-orientation: mixed; /* Latin turns a quarter, never stacks upright (gate 5) */
@@ -5839,6 +5859,17 @@ body.record-not-saving #app > .chrome { margin-bottom: var(--record-band-h, 48px
 }
 /* one press keeps the word and opens its drawer: the words say Save, no caret */
 #app > .chrome button.save-one.chrome-keep::after { content: none; }
+/* Hfix-1A (H0-1: Today's note field cut its hint to "anything that felt wrong or mi" at 390, "anything that felt w" at
+   320) · on a phone the note's field takes the whole row and its "keep it" stands under it, so the hint fits whole */
+@media (max-width: 520px) {
+  .chat-row:has(> #note-input) { flex-wrap: wrap; justify-content: flex-end; row-gap: 8px; }
+  .chat-row > #note-input { flex: 1 1 100%; padding-inline: 16px; }
+}
+/* a 320 phone's Today keeps its sign's margin: the hint takes the ladder's label step (13 px) there */
+@media (max-width: 360px) { .chat-row > #note-input::placeholder { font-size: var(--type-label); } }
+/* Hfix-1A · one Save on screen: while a stage or a word page stands the bar's keep steps aside, keeping its room so no
+   other door moves (corridor.js paintKeepAside, which also makes it inert); it returns when they close */
+#app > .chrome button.save-one.chrome-keep[data-aside] { visibility: hidden; }
 #app > .chrome .chrome-keep .save-bar-verb {
   font: 600 var(--type-caption)/1 var(--font-ui);
   letter-spacing: 0.02em;
@@ -5988,6 +6019,15 @@ body[data-furigana='0'] #drift-layer .word .yomi { opacity: 0; }
 .scale-thread > button { cursor: pointer; }
 .scale-thread > button:focus-visible { outline: 1px solid currentColor; outline-offset: -3px; }
 .scale-thread > [data-scale-out] { position: sticky; left: 0; z-index: 1; width: 44px; max-width: 44px; padding-inline: 4px; background: var(--color-bar, var(--ed-paper)); font-size: var(--type-lead); }
+/* Hfix-1A · a bead never rests half under 宙 (H1: "shelf" read "elf" at part depth): the scroller's start keeps 宙's width
+   (and the gap after it, set by corridor.js threadRest as --thread-reserve), and the rail rests only where a bead begins
+   there, whether the app reveals the current bead or a finger moves it */
+.scale-thread { --thread-reserve: 46px; scroll-snap-type: x mandatory; scroll-padding-inline-start: var(--thread-reserve); }
+.scale-thread > :not([data-scale-out]) { scroll-snap-align: start; }
+/* the page's rail: its own start padding, then 宙 and the gap after it; 宙's paper also covers that padding, so a bead
+   resting under 宙 never shows a sliver to its left */
+#sheet > .scale-thread { --thread-reserve: calc(max(12px, calc(var(--page-gutter, 20px) - 8px)) + 46px); }
+#sheet > .scale-thread > [data-scale-out] { box-shadow: calc(-1 * max(12px, calc(var(--page-gutter, 20px) - 8px))) 0 0 var(--color-bar, var(--ed-paper)); }
 .scale-thread > [aria-current='step'] { font-weight: 600; }
 .scale-thread > button:disabled { cursor: default; opacity: 1; }
 #sheet > .scale-thread { position: sticky; top: calc(45px + env(safe-area-inset-top, 0px)); z-index: 3; display: flex; max-width: none; margin: 0 calc(-1 * var(--page-gutter, 32px)) var(--space-3, 12px); padding-inline: max(12px, calc(var(--page-gutter, 20px) - 8px)); background: var(--color-bar, var(--ed-paper)); box-shadow: 0 1px 0 color-mix(in srgb, currentColor 12%, transparent); }

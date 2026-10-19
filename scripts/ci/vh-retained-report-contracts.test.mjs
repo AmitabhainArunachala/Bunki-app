@@ -163,8 +163,9 @@ test('reviewed inventories are independently fixed, including full fast schedule
       'corridor-build': 9,
       'word-saved-answer': 88,
       'word-saved-answer-controls': 19,
-      // INT-VH (2026-10-19): e9b020ee's reader-navigation rows (the 390 px Learn door added): 282 → 283
-      corridor: 283,
+      // INT-VH (2026-10-19): e9b020ee's reader-navigation rows (the 390 px Learn door added): 282 → 283;
+      // merge 2: Hfix-1A item 18's three pending-save rows: 283 → 286
+      corridor: 286,
       'corridor-a11y': 62,
       'drift-fast': 66,
       'word-saved-answer-mutation-controls': 38,

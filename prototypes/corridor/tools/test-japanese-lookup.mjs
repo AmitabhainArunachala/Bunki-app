@@ -40,7 +40,11 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'frameFoot',
   // R3 (2026-10-18): the sense a word's text uses — the lookup's entry before its sense, the record its sense shapes, the
   // slip's second line, and the marks the slip leaves (for the page, and for a sense still to come)
-  'japaneseLookupEntryRecord', 'senseRecord', 'senseNameHeldText', 'senseIsQuick', 'senseMoreLine', 'SENSE_BY_ANCHOR', 'SENSE_LATER', 'senseLaterDraw', 'sensePatch', 'SLIP_NODE', 'senseMoreElement'];
+  'japaneseLookupEntryRecord', 'senseRecord', 'senseNameHeldText', 'senseIsQuick', 'senseMoreLine', 'SENSE_BY_ANCHOR', 'SENSE_LATER', 'senseLaterDraw', 'sensePatch', 'SLIP_NODE', 'senseMoreElement',
+  // Hfix-1A (2026-10-19): a cut slip ends between two rows and fades at its foot (rowCut, markCardMore); a meaning still to
+  // come keeps its room and lands in place (reserveSenseRoom, SLIP_OWN_MEANING); a slip drawn again on its word is the
+  // same element, cleared (blankSlip)
+  'rowCut', 'markCardMore', 'reserveSenseRoom', 'SLIP_OWN_MEANING', 'blankSlip'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]

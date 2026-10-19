@@ -17,6 +17,10 @@ export const NARROWING_ENV = Object.freeze([
   'READING_TRUTH_SWEEP_IDS',
   'SWEEP_WORLDS',
   'SWEEP_STATES',
+  // INT-VH (merge 2): Hfix-1A's two control switches (contrast's translucent bar, corridor's item 18 mutations) never
+  // reach an acceptance run from the operator's shell
+  'SWEEP_NEGATIVE',
+  'KAIRO_CORRIDOR_NEGATIVE',
   'KAIRO_SWEEP_MODE',
   'KAIRO_SWEEP_NEGATIVE',
   'COMB_NEGATIVE',

@@ -1628,8 +1628,9 @@ export const SENSE_CASE_IDS = Object.freeze([
   'chromium/C4',
   'chromium/c.page-errors',
 ]);
+// INT-VH (merge 2): recomputed after the reviewed aozora-049966-2 change below (Hfix-1A R3-3); every other entry unchanged
 export const SENSE_DATA_INVENTORY_SHA256 =
-  'c66e442828ab3d22312074860fc915fc1c652c66a79bad3e9e88de016663405c';
+  '5477af625758b6e84d76e14b39e7d9fd92ae3cdc8043a9f4fd9bb315ef05eff1';
 export const SPEAK_CHECK_NAMES = Object.freeze({
   S1: [
     'the Learn room has one Speak door, a study-door row',
@@ -1648,7 +1649,8 @@ export const SPEAK_CHECK_NAMES = Object.freeze({
     'no audio leaves the phone on entry',
     'nothing plays before his first tap',
     'the device voice is never asked',
-    "one top bar, one Save in it (the room's keep), the ensō, the scene head",
+    // INT-VH (merge 2): Hfix-1A item 5 — Speak's bar carries no Save (no word is staged there)
+    'one top bar and no Save in it (no word is staged there), the ensō, the scene head',
     'nothing animates at rest',
     'the ring is at rest, unpressed',
     'his first tap unlocks the voice and plays her opening',
@@ -1678,12 +1680,13 @@ export const SPEAK_CHECK_NAMES = Object.freeze({
   ],
   S5: [
     'every Japanese word in every line is a door',
-    "a word in Kore's line opens the slip, and the top bar's Save names it",
+    // INT-VH (merge 2): Hfix-1A item 5 — a word in a line opens its own slip, whose Save is the one
+    "a word in Kore's line opens the slip, its Save the one on screen (the top bar carries none)",
     "a look-up in Kore's line counts, under the conversation's id",
     'Save from the slip writes exactly one taken row',
     'a word in his own line opens the slip and counts nothing',
-    "the top bar's Save names the last word touched, in any line",
-    "the top bar's Save is handed the whole token he touched: surface, base and reading",
+    'the last word touched, in any line, opens its own slip; the top bar still carries no Save',
+    'the room keeps the whole token he touched: surface, base and reading',
   ],
   S6: ['another sound stops Kore: one sound at a time', 'leaving the room stops her voice'],
   S7: [
@@ -2058,9 +2061,11 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
     'data/articles/aozora-049966-1.json',
     'f584b8d9758f128642c5b9a1301fb8e3482a81c4e8c3ae517df0aea42e656775',
   ],
+  // INT-VH (merge 2): Hfix-1A's R3-3 segmentation (さもなければかの: tokens 581-582, ばか → ば, の → かの; 1330 tokens
+  // as before). Reviewed: the Sense fixtures on this article read tokens 210, 580, 977 and 1275, unchanged; no row names ばか
   [
     'data/articles/aozora-049966-2.json',
-    'f72090fbfdab6b5274a5bd3cb95e961482a3218b5f676004d95b3fcf997d541d',
+    'e562f013161a7a243fd8c48e9f0c4bc9abeaeb96116c95b1aa2bba60cb9a52a8',
   ],
   [
     'data/articles/aozora-051034.json',

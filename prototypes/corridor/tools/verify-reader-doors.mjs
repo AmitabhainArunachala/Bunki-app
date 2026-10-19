@@ -110,7 +110,9 @@ const EDITS = Object.freeze({
     to: '  // VH control: popup closes without restoring focus\n}, true);' },
   wrongFocus: { file: 'corridor.js', from: '  if (anchor.isConnected) focusProseWord(anchor, { preventScroll: true });\n}, true);',
     to: '  document.querySelector("[data-vh-duplicate]")?.focus({ preventScroll: true });\n}, true);' },
-  keepPopup: { file: 'corridor.js', from: '  slip?.remove();\n  miniAnchor = null;', to: '  // VH control: leave the mounted popup\n  miniAnchor = null;' },
+  // INT-VH (merge 2): Hfix-1A (item 19) keeps a slip that is about to be drawn again in place, so the removal reads
+  // `if (slip !== keep) slip?.remove();`; the control still deletes the removal itself, the same fault
+  keepPopup: { file: 'corridor.js', from: '  if (slip !== keep) slip?.remove();\n  miniAnchor = null;', to: '  // VH control: leave the mounted popup\n  miniAnchor = null;' },
   contentEnglish: { file: 'corridor.js', from: `    // R · the slip stands for the entry the token's own reading names (readingToken). A word the core lacks whose`,
     to: `    if (index === 1 && token.s === "これ") { span.querySelector(".tok-en")?.remove(); span.append(el("span", "tok-en", "VH_INLINE_ENGLISH")); span.classList.add("has-en"); }\n    // R · the slip stands for the entry the token's own reading names (readingToken). A word the core lacks whose` },
   namedEnglish: { file: 'corridor.js', from: "  span.querySelector('.tok-en')?.remove();\n  span.classList.remove('has-en');\n  span.classList.toggle('lit', shown);",

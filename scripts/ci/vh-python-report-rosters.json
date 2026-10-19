@@ -302,67 +302,82 @@
       {
         "id": "deck-segment-overrides/01",
         "name": "えきのこうばんで聞いた: こうばん opens 交番, the text is unchanged",
-        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:64"]
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:66"]
       },
       {
         "id": "deck-segment-overrides/02",
         "name": "まどのそとを見た: まど opens 窓, the text is unchanged",
-        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:64"]
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:66"]
       },
       {
         "id": "deck-segment-overrides/03",
         "name": "ぶちょうに話した: ぶちょう opens 部長, the text is unchanged",
-        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:64"]
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:66"]
       },
       {
         "id": "deck-segment-overrides/04",
         "name": "戻ってくるのは相変わらずなんで、最後は: な opens だ, the text is unchanged",
-        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:64"]
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:66"]
       },
       {
         "id": "deck-segment-overrides/05",
         "name": "えきのこうばんで聞いた: without the lexicon UniDic still splits it [('こう', 'こう'), ('ばん', 'ばん')]",
-        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:69"]
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:71"]
       },
       {
         "id": "deck-segment-overrides/06",
         "name": "まどのそとを見た: without the lexicon UniDic still splits it [('ま', 'ま'), ('どの', 'どの')]",
-        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:69"]
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:71"]
       },
       {
         "id": "deck-segment-overrides/07",
         "name": "ぶちょうに話した: without the lexicon UniDic still splits it [('ぶちょう', 'ふちょう')]",
-        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:69"]
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:71"]
       },
       {
         "id": "deck-segment-overrides/08",
         "name": "戻ってくるのは相変わらずなんで、最後は: without the lexicon UniDic still splits it [('なん', 'なん'), ('で', 'で')]",
-        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:69"]
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:71"]
       },
       {
         "id": "deck-segment-overrides/09",
         "name": "相変わらずなんで: な + ん + で, no 何 left",
-        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:75"]
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:77"]
       },
       {
         "id": "deck-segment-overrides/10",
         "name": "いまどの駅？: UniDic's split is kept",
-        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:79"]
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:81"]
       },
       {
         "id": "deck-segment-overrides/11",
         "name": "なんでそう思うの: UniDic's split is kept",
-        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:79"]
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:81"]
       },
       {
         "id": "deck-segment-overrides/12",
         "name": "暇なんで、行きます: UniDic's split is kept",
-        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:79"]
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:81"]
       },
       {
         "id": "deck-segment-overrides/13",
         "name": "an entry whose tokens do not spell its match is refused",
-        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:92"]
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:94"]
+      },
+      {
+        "id": "deck-segment-overrides/14",
+        "name": "さもなければかの国に入るに困難: かの opens かの, the text is unchanged",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:66"]
+      },
+      {
+        "id": "deck-segment-overrides/15",
+        "name": "さもなければかの国に入るに困難: without the lexicon UniDic still splits it [('ばか', 'ばか'), ('の', 'の')]",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:71"]
+      },
+      {
+        "id": "deck-segment-overrides/16",
+        "name": "あいつはばかの一つ覚えだ: UniDic's split is kept",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:81"]
       }
     ]
   }

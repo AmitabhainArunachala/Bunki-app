@@ -273,8 +273,9 @@ for (const engine of ['chromium', 'webkit'])
     const gate = `contrast-sweep${engine === 'webkit' ? '-webkit' : ''}`;
     const { report, context } = contrastFixture(engine);
     const validate = (value) => validateExistingReport(gate, value, context);
-    // INT-VH (2026-10-19): + Hfix-1B's five settled states × eleven worlds (world, C1, C3-C5; C6 by day): 857 → 1162
-    assert.equal(contrastExpectedCases(engine).length, 1162);
+    // INT-VH (2026-10-19): + Hfix-1B's five settled states × eleven worlds (world, C1, C3-C5; C6 by day): 857 → 1162;
+    // + Hfix-1A's C8 for each of the seventeen settled states × eleven worlds: 1162 → 1349
+    assert.equal(contrastExpectedCases(engine).length, 1349);
     assert(validate(report).passed, validate(report).errors.join(';'));
     const mutations = [
       (r) => {

@@ -103,12 +103,17 @@ export const RETAINED_CASES = Object.freeze({
     // 320 px scroll rows and their control: under 360 px the bar yields its Learn door to the tab bar and its seven doors
     // stand whole; at 390 the Learn door stands in the bar; the control gives it back at 320 and the bar no longer fits
     'reader navigation · 320px unselected: seven doors stand whole, each 44 px and its own target, Learn in the tab bar, the page 320 wide',
-    'reader navigation · 320px selected: seven doors stand whole, each 44 px and its own target, Learn in the tab bar, the page 320 wide',
+    // INT-VH (merge 2): Hfix-1A's one Save on screen (item 4): with the stage up, the bar's Save steps aside in its own slot
+    "reader navigation · 320px selected: six doors stand whole around the bar's Save, which steps aside in its own slot while the stage's Save is the one, each 44 px and its own target, Learn in the tab bar, the page 320 wide",
     'reader navigation · 390px unselected controls remain reachable',
     'reader navigation · 390px the Learn door stands in the bar: it yields to the tab bar only under 360 px',
     'reader navigation · 390px selected controls remain reachable',
     'reader navigation · a 320px bar given its Learn door back no longer stands whole, and the page stays 320 wide',
     'reader navigation · an undersized clipped control fails both geometry and the 44px sweep',
+    // INT-VH (merge 2): Hfix-1A item 18, Save pressed while the meaning is "…" (the corridor gate is Chromium's)
+    'Hfix-1A · 18 · chromium · pending-save.during · Saved ✓ pressed while the meaning is "…" opens its menu; the meaning then arrives in place, the card and menu kept (5 of 5 on cold pages)',
+    'Hfix-1A · 18 · chromium · pending-save.inflight · Saved ✓ aimed during "…", touched after the meaning arrived: its menu opens, the card stays (5 of 5 on cold pages)',
+    'Hfix-1A · 18 · chromium · pending-save.inflight-below · Saved ✓ aimed during "…", touched after the meaning arrived: its menu opens, the card stays (the card below its word) (5 of 5 on cold pages)',
     "reader hierarchy · a smaller reading body (the old 19px) fails the ladder's 21px reading step",
     'reader hierarchy · enlarged navigation fails the approved 17px fixture',
     'one top bar · reader: #app > .chrome is 44 high on one hairline, nowrap, 1 back glyph (‹, 44×44)',

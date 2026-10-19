@@ -680,7 +680,9 @@ const CASES = {
         head: !!document.querySelector('.speak-head .speak-title') && !!document.querySelector('.speak-head .speak-role'),
         saveOnes: document.querySelectorAll('#app main button.save-one').length,
       }));
-      check('one top bar, one Save in it (the room\'s keep), the ensō, the scene head', shape.bars === 1 && shape.saves === 1 && shape.keep && shape.enso === 1 && shape.head && shape.saveOnes === 0, JSON.stringify(shape));
+      // Hfix-1A (the lead's item 5; it pinned the room's keep in the bar): no word is staged in Speak's bar, so it carries
+      // no Save (round 1 found it cut to "Save a…"); a word in a line opens its own slip, whose Save is the one
+      check('one top bar and no Save in it (no word is staged there), the ensō, the scene head', shape.bars === 1 && shape.saves === 0 && !shape.keep && shape.enso === 1 && shape.head && shape.saveOnes === 0, JSON.stringify(shape));
       const moving = await page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running' && document.querySelector('.speak-room')?.contains(a.effect?.target)).map((a) => a.animationName || a.constructor.name));
       check('nothing animates at rest', moving.length === 0, moving.join(','));
       check('the ring is at rest, unpressed', (await ring(page).getAttribute('data-phase')) === 'rest' && (await ring(page).getAttribute('aria-pressed')) === 'false');
@@ -838,8 +840,9 @@ const CASES = {
       await climb(koreWord);
       await page.waitForSelector('#mini', { timeout: 8000 });
       await page.waitForTimeout(400);
-      const keep = await page.evaluate(() => window.__SPEAK_TEST__.keepWord());
-      check('a word in Kore\'s line opens the slip, and the top bar\'s Save names it', !!b && keep === b, `word ${b} · keep ${keep}`);
+      const keep = await page.evaluate(() => ({ bar: window.__SPEAK_TEST__.keepWord(), barSaves: document.querySelectorAll('#app > .chrome [data-save-bar], #app > .chrome button.save-one').length,
+        slip: document.getElementById('mini')?.dataset.key ?? null, save: !!document.querySelector('#mini #mini-take') }));
+      check('a word in Kore\'s line opens the slip, its Save the one on screen (the top bar carries none)', !!b && keep.slip === `word:${b}` && keep.save && !keep.bar && keep.barSaves === 0, `word ${b} · ${JSON.stringify(keep)}`);
       const mid = await T(page).record();
       const taps = mid.obslog.slice(before.obslog.length).filter((row) => row[1] === 'tap');
       check('a look-up in Kore\'s line counts, under the conversation\'s id', taps.length >= 1 && taps.every((row) => String(row[4]).startsWith('speak:')), JSON.stringify(taps));
@@ -863,7 +866,9 @@ const CASES = {
       await page.waitForTimeout(300);
       const afterMine = await T(page).record();
       check('a word in his own line opens the slip and counts nothing', afterMine.obslog.length === beforeMine.obslog.length);
-      check('the top bar\'s Save names the last word touched, in any line', (await page.evaluate(() => window.__SPEAK_TEST__.keepWord())) === mine, mine);
+      const mineSlip = await page.evaluate(() => ({ bar: window.__SPEAK_TEST__.keepWord(), barSaves: document.querySelectorAll('#app > .chrome [data-save-bar], #app > .chrome button.save-one').length,
+        word: document.querySelector('#mini .mini-word')?.childNodes[0]?.textContent ?? null }));
+      check('the last word touched, in any line, opens its own slip; the top bar still carries no Save', mineSlip.word === mine && !mineSlip.bar && mineSlip.barSaves === 0, `${mine} · ${JSON.stringify(mineSlip)}`);
       // an inflected word (入 of 入れた, base 入れる): the top bar's Save is handed the whole token he touched — surface, base
       // and reading — so the reading's owner can derive its identity (Codex at acb125d2: the surface was dropped)
       await page.keyboard.press('Escape');
@@ -873,7 +878,8 @@ const CASES = {
       await inflected.click();
       await page.waitForTimeout(400);
       const handed = await page.evaluate(() => window.__SPEAK_TEST__.keepToken());
-      check('the top bar\'s Save is handed the whole token he touched: surface, base and reading', !!handed && handed.word === door.b && handed.surface === door.s && handed.reading === door.r && door.s !== door.b,
+      // Hfix-1A: the room still keeps the whole token he touched (it named it "the top bar's Save"; the bar carries no Save now)
+      check('the room keeps the whole token he touched: surface, base and reading', !!handed && handed.word === door.b && handed.surface === door.s && handed.reading === door.r && door.s !== door.b,
         JSON.stringify({ door, handed }));
     } finally { await f.context.close(); }
   },
