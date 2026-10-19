@@ -305,9 +305,11 @@ async function heldDrag(page, host, width, height) {
     let o = 1;
     const yomi = n.querySelector(':scope > .yomi');
     for (let e = yomi; e && e !== document.documentElement; e = e.parentElement) o *= Number(getComputedStyle(e).opacity);
-    return { left: r.left, right: r.right, y: r.top + r.height / 2, cls: n.className, reading: o };
+    return { left: r.left, right: r.right, y: r.top + r.height / 2, cls: n.className, reading: o,
+      wordW: Math.round(r.width), readingW: Math.round(yomi.getBoundingClientRect().width) };
   });
   result.heldCls = at.cls;
+  result.widths = `word ${at.wordW}px, reading ${at.readingW}px`;
   // the state Grok measured: the tapped word at rest, its reading drawn
   result.readingShown = at.reading > 0.5;
   const take = async (phase) => {
@@ -319,20 +321,43 @@ async function heldDrag(page, host, width, height) {
     }
   };
   // hold it near its left edge and carry it to the right rim: the word moves 0.9 of the finger,
-  // so it ends well past the rim while the finger stays on the glass
+  // so it ends well past the rim while the finger stays on the glass. The last stretch is walked
+  // 5 px of finger at a time, so the few pixels where a reading wider than its word would cross
+  // before the word does are actually sampled.
   const from = { x: at.left + 6, y: at.y };
   const to = width - 4;
+  const near = Math.min(to, Math.max(from.x, from.x + (width - 70 - at.right) / 0.9));
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
-  for (let s = 1; s <= 10; s += 1) {
-    await page.mouse.move(from.x + ((to - from.x) * s) / 10, from.y);
-    if (s >= 3) await take('held');
+  for (let s = 1; s <= 4; s += 1) await page.mouse.move(from.x + ((near - from.x) * s) / 4, from.y);
+  await take('held');
+  for (let x = near + 5; x <= to; x += 5) {
+    await page.mouse.move(x, from.y);
+    await take('held');
   }
+  await page.mouse.move(to, from.y);
   for (let i = 0; i < 3; i += 1) { await page.waitForTimeout(150); await take('held'); }
   await page.mouse.up();
   // after release: through the glide, and past the bloom's 10 s clear that Grok's drop reached
   for (let i = 0; i < 10; i += 1) { await page.waitForTimeout(150); await take('released'); }
   for (let i = 0; i < 10; i += 1) { await page.waitForTimeout(1000); await take('released'); }
+  // and with the reading dial at "always" (the value corridor.js writes to body[data-furigana]),
+  // every word shows its reading, and a long reading is far wider than its word: the field is
+  // watched at rest and while carried, readings included
+  await page.goto(`${host.origin}/index.html?entry=drift&ui=bi`);
+  await page.waitForFunction(() => document.body.dataset.ready === '1');
+  await page.evaluate(() => { document.body.dataset.furigana = '2'; });
+  await page.waitForTimeout(1200);
+  result.readingsAlways = await page.evaluate(() => document.querySelectorAll('#drift-layer .word').length);
+  for (let i = 0; i < 6; i += 1) { await page.waitForTimeout(600); await take('always'); }
+  for (const [dx, dy] of [[-160, 40], [160, -40], [120, 60]]) {
+    await page.mouse.move(width / 2 + 3, height * 0.72);
+    await page.mouse.down();
+    for (let s = 1; s <= 6; s += 1) { await page.mouse.move(width / 2 + 3 + (dx * s) / 6, height * 0.72 + (dy * s) / 6); await take('always'); }
+    await page.mouse.up();
+    await page.waitForTimeout(400);
+    await take('always');
+  }
   result.cut.sort((a, b) => b.eff - a.eff);
   return result;
 }
@@ -620,9 +645,9 @@ try {
         // r2 · the held drag, on a fresh sky
         const held = await heldDrag(edgePage, host, width, height);
         const heldWhere = [...new Set(held.cut.map((c) => `${c.phase}:${c.part}`))].join('+') || 'none';
-        check(`${tag} · H2-1 r2 ${sizeName} ${width}×${height}: a tapped word held and dragged past the rim draws nothing above 0 across it, finger down or after release`,
+        check(`${tag} · H2-1 r2 ${sizeName} ${width}×${height}: a tapped word held and dragged past the rim draws nothing above 0 across it, finger down or after release, nor any reading with readings always on`,
           !!held.pick && held.readingShown && held.reached > 5 && held.samples > 0 && held.cut.length === 0,
-          `${held.pick ? held.pick.word : 'no word with a reading on the glass'} (${held.heldCls}), reading shown ${held.readingShown}, `
+          `${held.pick ? held.pick.word : 'no word with a reading on the glass'} (${held.heldCls}; ${held.widths || '?'}), reading shown ${held.readingShown}, `
           + `carried ${held.reached}px past the rim, ${held.samples} samples, ${held.cut.length} crossings above 0 (${heldWhere})`
           + `${held.cut.length ? `, brightest ${held.cut[0].eff}: ${JSON.stringify(held.cut.slice(0, 4))}` : ''}`);
         await edgePage.screenshot({ path: join(out, `held-${sizeName}-${AS_BASE ? 'base' : 'branch'}${CONTROL ? `-${CONTROL}` : ''}.png`) });
