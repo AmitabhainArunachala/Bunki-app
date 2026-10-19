@@ -11520,7 +11520,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     mini.append(actions);
   }
   // the word's kanji, their parts and its web follow the actions, so Save is always the first thing in reach
-  if (kanji) { const web = miniKanjiWeb(token.b, span); if (web) mini.append(web); }
+  if (kanji) { const web = miniKanjiWeb(token.b, span, reading); if (web) mini.append(web); }
   if (sentence) mini.append(sentence);
   // (a slip drawn again in place has its Escape already: the same word's)
   if (!standing) mini.addEventListener('keydown', (event) => {
@@ -11570,7 +11570,7 @@ function slipAllowed(anchor) {
  * words that share one of them, and one door into the web of the word. Every part comes from the
  * kanji data (D.kanji[c].parts through mainParts, named from D.radicals), never chosen by hand; the
  * cards line comes from the learner's own saved words. Nothing is drawn when the word has no kanji. */
-function miniKanjiWeb(word, anchor) {
+function miniKanjiWeb(word, anchor, wordReading = '') {
   const chars = [...new Set([...String(word || '')].filter((c) => D.kanji?.[c]))].slice(0, 3);
   if (!chars.length) return null;
   const box = el('div', 'mini-web');
@@ -11598,8 +11598,11 @@ function miniKanjiWeb(word, anchor) {
     const what = el('span', 'mini-kanji-what');
     if (bi() && k.m) what.append(el('span', 'mini-kanji-meaning', k.m));
     // Ladder · D7 · its readings (on, then kun), for the compact card's one line per kanji (glyph, keyword, readings); the
-    // full card shows its parts there instead
-    const readings = [...(k.on || []).slice(0, 2), ...(k.kun || []).slice(0, 1).map((kun) => String(kun).replace('.', ''))].filter(Boolean);
+    // full card shows its parts there instead. A kanji that is the whole word reads only as the word reads here: its card's
+    // answer is that reading, never another of the kanji's (年 read ねん shows ネン, never とし: record-depth R.reader)
+    const own = [...String(word || '')].length === 1 && String(wordReading || '').trim();
+    const readings = own ? [own]
+      : [...(k.on || []).slice(0, 2), ...(k.kun || []).slice(0, 1).map((kun) => String(kun).replace('.', ''))].filter(Boolean);
     if (readings.length) {
       const line = el('span', 'mini-kanji-readings', readings.join(' · '));
       line.lang = 'ja'; line.dataset.uiContent = 'learning';
