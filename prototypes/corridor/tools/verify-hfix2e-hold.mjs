@@ -4,7 +4,7 @@
  * mouse (real button presses).
  *   W7-hold   a hold on a word in the Words room's word web: the ring fills (read 300 ms in), the 印 presses on, the
  *             strip opens, the kept count rises by one, and the walk does not climb; a second hold opens the same strip
- *             and keeps nothing twice. Red on the base (the mouse is ignored; a finger opens the slip), green on the branch.
+ *             and keeps nothing twice; neither strip lies over another control (S2: "the menu never covers another button"). Red on the base (the mouse is ignored; a finger opens the slip), green on the branch.
  *   W7-centre the same hold on the web's headword (its big glyph), which had no hold at all: red on the base.
  *   W7-drag   guard: a mouse that moves past 9 px before the seal is a drag, never a seal (Chromium).
  *   W7-right  guard: right-click still opens the node's slip, never the strip (comb-0's G7 reads cut captions there).
@@ -105,7 +105,21 @@ const watch = (page) => page.evaluate(() => {
 const facts = (page, key) => page.evaluate((key) => {
   const node = key === '#centre' ? document.querySelector('.ww-plate .ww-c-glyph') : document.querySelector(`.ww-plate .ww-node[data-ww-key="${CSS.escape(key)}"]`);
   const strip = document.getElementById('seal-strip');
-  return {
+  // the controls the strip lies over (its own and the held word's excepted), by the app's own list of controls
+  const CONTROLS = 'button, a[href], input:not([type="hidden"]), select, textarea, summary, [role="button"], [role="link"], [role="tab"], [role="menuitem"], [role="checkbox"], [role="radio"], [role="switch"], [role="slider"]';
+  const covered = [];
+  if (strip) {
+    const r = strip.getBoundingClientRect();
+    for (const c of document.querySelectorAll(CONTROLS)) {
+      if (strip.contains(c) || (node && (c === node || c.contains(node) || node.contains(c)))) continue;
+      if (c.closest('[inert], [hidden], [aria-hidden="true"]')) continue;
+      const b = c.getBoundingClientRect(); const st = getComputedStyle(c);
+      if (!b.width || !b.height || st.visibility === 'hidden' || st.display === 'none' || Number(st.opacity) === 0) continue;
+      if (b.right <= r.left + 0.5 || b.left >= r.right - 0.5 || b.bottom <= r.top + 0.5 || b.top >= r.bottom - 0.5) continue;
+      covered.push((c.dataset.wwKey || c.id || c.className || c.tagName).toString().slice(0, 40));
+    }
+  }
+  return { covered,
     count: Number(document.getElementById('tray')?.dataset.count ?? NaN),
     strip: !!strip, stripSays: strip?.querySelector('#seal-strip-status')?.textContent.trim() || '',
     stripLabel: strip?.getAttribute('aria-label') || '',
@@ -164,6 +178,7 @@ async function sealRow(page, { node, type, key }) {
   if (!(first.after.seen.stamp >= 1)) throw fail('no 印 pressed on', detail);
   if (first.after.mini || first.after.rung) throw fail('the release climbed the walk', detail);
   if (!/Saved ✓|保存済み/u.test(first.after.stripSays)) throw fail('the strip does not say the word is saved', detail);
+  if (first.after.covered.length) throw fail(`the strip covers other controls: ${first.after.covered.join(', ')}`, detail);
   // a second hold opens the same strip and keeps nothing twice
   await page.keyboard.press('Escape');
   await page.locator('#seal-strip').waitFor({ state: 'detached', timeout: 3000 }).catch(() => {});
@@ -177,6 +192,7 @@ async function sealRow(page, { node, type, key }) {
   if (!second.after.strip) throw fail('the second hold opened no strip', detail);
   if (second.after.count !== c0 + 1) throw fail(`the second hold changed the count to ${second.after.count}`, detail);
   if (second.after.mini || second.after.rung) throw fail('the second release climbed the walk', detail);
+  if (second.after.covered.length) throw fail(`the second strip covers other controls: ${second.after.covered.join(', ')}`, detail);
   return detail;
 }
 await row('W7-hold', async ({ page }) => sealRow(page, await pickNode(page)));

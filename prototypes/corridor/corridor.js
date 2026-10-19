@@ -12546,7 +12546,9 @@ function placeSealStrip(open) {
   }
   // a room of its own under the word's paragraph: nothing is laid over a control; then the reading moves the least that
   // brings the whole strip onto the glass
-  const block = anchor.closest('p, li, dd, blockquote, [data-reader-prose], [data-lookup-block], .example-ja, .sent-reader') || anchor.parentElement;
+  // Hfix-2e · a word in the word web's plate (its nodes stand at absolute places) takes its room under the whole plate,
+  // never at the top of its layer over the plate's other nodes
+  const block = anchor.closest('p, li, dd, blockquote, [data-reader-prose], [data-lookup-block], .example-ja, .sent-reader, .ww-plate') || anchor.parentElement;
   if (!open.room) {
     open.room = el('div', 'seal-strip-room');
     open.room.setAttribute('aria-hidden', 'true');
