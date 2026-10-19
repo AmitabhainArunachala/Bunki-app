@@ -142,7 +142,7 @@ async function facts(page, selector, pseudo = true) {
     if (roots.length) {
       // Each containing prose block includes ordinary Japanese, English,
       // punctuation and ruby. Lookup spans are owners, never the glyph census.
-      const blocks = new Set(roots.flatMap((root) => [...root.querySelectorAll('.japanese-lookup-word')].map((el) => {
+      const blocks = new Set(roots.flatMap((root) => root.matches('.reader-card') ? [root] : [...root.querySelectorAll('.japanese-lookup-word')].map((el) => {
         let block = el.parentElement;
         while (block && block !== root && getComputedStyle(block).display === 'inline') block = block.parentElement;
         return block;
@@ -153,11 +153,12 @@ async function facts(page, selector, pseudo = true) {
         while ((text = walker.nextNode())) {
           if (seen.has(text)) continue; seen.add(text);
           const parent = text.parentElement, owner = parent.closest('.japanese-lookup-word');
+          const lane = block.matches('.reader-card') ? [...block.children].find((child) => child.contains(parent)) || block : block;
           const folded = parent.closest('details:not([open])');
           if (parent.closest('[hidden]') || (folded && !folded.querySelector(':scope > summary')?.contains(parent))) continue;
           const style = getComputedStyle(parent);
           if (style.visibility === 'hidden' || style.display === 'none' || Number(style.opacity) === 0) continue;
-          for (let i = 0; i < text.length; i++) { if (!text.textContent[i].trim()) continue; const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1); for (const r of range.getClientRects()) if (r.width && r.height) glyphs.push({ owner: owner?.dataset.dotsNode || null, text: text.textContent[i], rt: !!parent.closest('rt'), block: block.className || block.tagName, left: r.left + scrollX, top: r.top + scrollY, right: r.right + scrollX, bottom: r.bottom + scrollY }); }
+          for (let i = 0; i < text.length; i++) { if (!text.textContent[i].trim()) continue; const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1); for (const r of range.getClientRects()) if (r.width && r.height) glyphs.push({ owner: owner?.dataset.dotsNode || null, text: text.textContent[i], rt: !!parent.closest('rt'), block: lane.className || lane.tagName, left: r.left + scrollX, top: r.top + scrollY, right: r.right + scrollX, bottom: r.bottom + scrollY }); }
         }
       }
     }
@@ -319,14 +320,21 @@ function lineGeometry(out, name, dots) {
   row(out, `${name}.no-other-glyph-overlap`, clashes.length === 0, clashes);
 }
 /** The reader's title words sit on the raised title card, not the reader's
- * paper. The native fixture's saved and reviewed words hold state there too. */
+ * paper. The native fixture's saved and reviewed words hold state there too.
+ * Every visible glyph on the card, the English caption included, is text a
+ * title dot must not overlap. */
 async function titleCard(page, out) {
   const heading = page.locator('.reader-card h1.view-title');
   if (await heading.count()) { await heading.first().evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' })); await delay(250); }
   const title = await surfaceCapture(page, out, 'title', '.reader-card .japanese-lookup-word[data-lookup-text]');
   checkPaint(out, 'title', title);
   lineGeometry(out, 'title', title);
-  out.titleCoverage = title.map((d) => ({ text: d.text, depth: d.depth, kept: d.kept, fragments: d.fragments.length, wrapped: d.fragments.length > 1 }));
+  const census = out.captureFrames?.title?.glyphs || [];
+  const captionCharacters = (await page.locator('.reader-card > .view-title-en').allTextContents()).join('').replace(/\s/gu, '').length;
+  const captionGlyphs = census.filter((g) => String(g.block).split(/\s+/).includes('view-title-en')).length;
+  out.titleCoverage = { words: title.map((d) => ({ text: d.text, depth: d.depth, kept: d.kept, fragments: d.fragments.length, wrapped: d.fragments.length > 1 })),
+    glyphCensus: census.reduce((lanes, g) => ({ ...lanes, [g.block]: (lanes[g.block] || 0) + 1 }), {}), captionCharacters, captionGlyphs };
+  row(out, 'title.card-glyph-census', census.length > 0 && captionGlyphs === captionCharacters, out.titleCoverage);
   row(out, 'title.fixture-states', title.some((d) => ['met', 'again', 'recalled', 'owned'].includes(d.depth)) && title.some((d) => d.kept), out.titleCoverage);
 }
 async function rooms(page, out) {
