@@ -208,7 +208,8 @@ const BRIDGE = `window.__F__ = {
 const readerTok = (page, label) => page.locator(`#reader .tok[data-prose-label="${label}"]`).first();
 async function climbToCard(page, tok) {
   const node = await tok.elementHandle();
-  let last = null;
+  // a climb taken up from a rung already shown (the reading judged first) waits for the next rung, never the one it is on
+  let last = await tok.getAttribute('data-ladder-rung');
   for (let step = 0; step < 3 && !(await page.locator('#mini').count()); step++) {
     await tok.click();
     last = await page.waitForFunction(({ node, last }) => document.getElementById('mini') ? 'stage'
@@ -545,9 +546,11 @@ try {
       assert.equal(shown.length, 1, 'a tap shows its reading at 200 %');
       const j1 = judgeReadings({ rows: shown, glyphs: touch.glyphs }, { touch: true });
       assert.deepEqual(j1.issues, [], j1.issues.join('; '));
-      // G3 · the next tap draws the card: its meaning is what is judged (one line at least, never an empty pass)
-      if (!(await page.locator('#mini').count())) await tok.click();
-      await page.locator('#mini').waitFor(); await page.waitForTimeout(400);
+      // G3 · Ladder (John, 10-19, a spec change): the next tap sets the English under the word and the one after draws the
+      // card, each taken only once the rung before it is seen; the card's meaning is what is judged (one line at least, never
+      // an empty pass)
+      await climbToCard(page, tok);
+      await page.waitForTimeout(400);
       const slip = await page.evaluate(GLOSS, ['#mini .mini-gloss']);
       assert(slip.length > 0 && slip.every((g) => g.size >= 13), `the slip's meaning at 200 %: ${JSON.stringify(slip)}`);
       await page.keyboard.press('Escape');
