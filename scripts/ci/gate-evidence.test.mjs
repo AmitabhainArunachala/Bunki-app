@@ -734,7 +734,14 @@ test('real Node wrapper and pytest instrumentation receipts record the actual sa
         /Injected environment/u,
       );
       const run = await runGates({ gates: [gate], root: dir, out });
-      assert.equal(run.gates[0].status, 'passed', run.gates[0].detail);
+      // a gate that failed says why in its log's last lines (pytest missing from the interpreter:
+      // VH_TEST_PYTHON names the one to use)
+      assert.equal(
+        run.gates[0].status,
+        'passed',
+        run.gates[0].detail ||
+          readFileSync(run.gates[0].log, 'utf8').trim().split('\n').slice(-2).join(' | '),
+      );
       const attempt = JSON.parse(readFileSync(run.gates[0].attemptReceipt));
       assert.deepEqual(attempt.declaredInvocation.args, gate.args);
       assert.deepEqual(attempt.invocation.args, actual.args);

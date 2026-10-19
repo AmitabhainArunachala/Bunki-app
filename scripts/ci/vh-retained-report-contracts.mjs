@@ -815,6 +815,9 @@ const LEARNING_RECORD_INVENTORY = Object.freeze([
   'g2-the-roots-validate-strictly-and-keep-later-versions',
   'g2-help-per-1000-characters-counts-first-readings-once',
   'g2-a-kept-word-answers-cold-from-its-own-card',
+  // FULL-prep (2026-10-20): Hfix-1B (L-1), which every learning-record run carries since INT-VH merge 1; INT-VH added it
+  // to RECORD_GATE_CASES.learningControlled but not to this copy, so no mutation-control report could be admitted
+  'hfix1b-me-reads-one-count-so-unaided-never-exceeds-read',
 ]);
 const WORD_SAVED_ANSWER_INVENTORY = Object.freeze(
   wordCases.filter((id) => id !== 'inventory-exact'),

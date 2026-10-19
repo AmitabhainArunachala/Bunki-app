@@ -295,9 +295,10 @@ test('every valid actual canonical and alternate code is reachable, deduped, and
 });
 
 const archiveIndex = process.argv.indexOf('--archive');
-test('optional raw pinned archive reproduces byte-for-byte sidecar and preserves stripped corpus output', {
-  skip: archiveIndex === -1 ? 'Pass --archive /path/to/pinned.zip for full raw-source parity.' : false,
-}, () => {
+// Pass --archive /path/to/pinned.zip for full raw-source parity. The test is registered only then (FULL-prep, the lead's
+// ruling 2026-10-20), so the gate's own run, which never passes an archive, carries no skipped row for the Node
+// admission to refuse; nothing the gate ran before stops running.
+if (archiveIndex !== -1) test('optional raw pinned archive reproduces byte-for-byte sidecar and preserves stripped corpus output', () => {
   const archive = process.argv[archiveIndex + 1];
   assert.ok(archive, '--archive requires a file');
   const corpusPython = process.env.KAIRO_CORPUS_PYTHON || 'python3';

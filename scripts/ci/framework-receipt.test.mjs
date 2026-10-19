@@ -106,7 +106,17 @@ function result(command, args, dir, framework, mode) {
   writeFileSync(join(dir, 'stderr.txt'), run.stderr || '');
   assert(!run.error, `${framework}/${mode}: ${run.error?.message}`);
   assert.equal(run.signal, null);
-  const receipt = JSON.parse(readFileSync(path));
+  let raw;
+  try {
+    raw = readFileSync(path);
+  } catch (error) {
+    // a framework that never started (an interpreter without pytest; VH_TEST_PYTHON names the one
+    // to use) writes no receipt: say so in its own words, not as a missing file
+    assert.fail(
+      `${framework}/${mode}: no receipt (${error.code}); ${command} exited ${run.status}: ${(run.stderr || '').trim().split('\n').at(-1)}`,
+    );
+  }
+  const receipt = JSON.parse(raw);
   assert.equal(receipt.runId, runId);
   assert.equal(receipt.framework, framework);
   record({
