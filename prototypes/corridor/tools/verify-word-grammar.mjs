@@ -4015,7 +4015,9 @@ try {
         // Ladder R4 · the scroll-gap row's control: round 2's fold where the ink leaves the fade room (390×560)
         ...(desk ? [] : [{ id: 'fold-at-560', run: 'L-d7-gap', body: ladderD7Gap, options: { viewport: { width: 390, height: 560 }, mobile: true },
           kills: ['L.d7.scroll-gap'], witness: (row) => row.observed.some((o) => o.steps.some((st) => st.folds > 0)),
-          edits: [{ file: 'corridor.js', key: 'fold-where-the-ink-has-room', from: '  if (best) return best;\n', to: '  if (false) return best; // Ladder negative: a fold instead\n' }] }]),
+          edits: [{ file: 'corridor.js', key: 'fold-where-the-ink-has-room', from: '  if (best) return best;\n', to: '  if (false) return best; // Ladder negative: a fold instead\n' },
+            { file: 'corridor.js', key: 'fold-from-the-row-box', from: '    const inkFoot = Math.max(0, ...ink.filter(([top]) => top < foot.bottom - 0.5).map(([, bottom]) => bottom));',
+              to: "    const inkFoot = foot.bottom; // Ladder negative: round 3's fold, measured from the row's box" }] }]),
         // Ladder R2 · a word with no English says the dash again
         { id: 'dash-for-none', run: 'L-gloss', body: ladderGloss, options: glossView, kills: ['L.gloss.never-dash'],
           witness: (row) => row.observed.dashes?.length > 0,
