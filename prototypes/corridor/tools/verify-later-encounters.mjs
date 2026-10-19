@@ -305,7 +305,8 @@ for (const engine of engines) for (const width of sizes) {
     await suggestion('revisit').click(); await atToken(120, '駅で待つ時間');
     await page.locator('#reader-place-save').click();
     await page.waitForFunction(() => document.getElementById('reader-place-note')?.textContent.includes('is saved'));
-    await page.locator('.read-done button').click(); await waitForAppRecord(page, r => Object.hasOwn(r.readDone, second.context.sourceId));
+    // Speak (7b6abad9) put its door beside the finish button in .read-done; this row finishes the reading
+    await page.locator('.read-done #read-fin').click(); await waitForAppRecord(page, r => Object.hasOwn(r.readDone, second.context.sourceId));
     await page.locator('#reader-source-back').click(); await suggestion('revisit').waitFor();
     unchanged(difficult, await snapshot('source-consumption-without-recall-change'));
     // A copy of this closed, ordinarily evolved installation is a rollback
