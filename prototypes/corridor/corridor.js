@@ -9836,8 +9836,10 @@ document.addEventListener(
     }
     const mini = standingSlip();
     // Back owns its own one-level fold on click; do not consume a second
-    // level by dismissing the stage at pointerdown first.
-    if (ladderVisit && target.closest?.('#sheet-back, #chrome-back, [data-action="navigation.back"]')) return;
+    // level by dismissing the stage at pointerdown first. Ladder (the lead's sweep, 10-19): the top bar's ‹ Back (#back) is
+    // one of them — with a reading, an English or a box up it folds the word bare (back → foldWordLadder), and only the next
+    // Back leaves the article; cleared here at its press, the word was already bare and the first Back left for the shelf
+    if (ladderVisit && target.closest?.('#sheet-back, #chrome-back, #back, [data-bar-back], [data-action="navigation.back"]')) return;
     // an outside press returns the word bare from its reading or its English (Ladder: as now, in one step)
     if (!mini && (ladderVisit?.rung === 'reading' || ladderVisit?.rung === 'gloss') && !ladderVisit.anchor.contains(target) &&
         !target.closest?.('#seal-strip, #vocabulary-list-popover')) clearWordLadder();
@@ -10126,7 +10128,10 @@ async function openJapaneseLookup(anchor, text, context = {}) {
     : hasKanjiEntry ? { t: 'kanji', id: text } : null;
   // Ladder · the English under the word: the sense its text uses (the record above), a lone kanji's meaning, or the dash
   const english = record?.m?.length ? inlineGloss(record) : (context.kanjiOnly || hasKanjiEntry) ? String(D.kanji[text]?.m || '').toLowerCase() : '';
-  return activateWordLadder(anchor, { surface: context.surface || text, reading: context.surfaceReading || token.r,
+  // Ladder · the surface the reading is weighed against is the word as printed: a caller's label (the exam paper passes
+  // surface: 'assessment') is not, so a kana word there starts at its English, as everywhere
+  const printed = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(String(context.surface || '')) ? context.surface : text;
+  return activateWordLadder(anchor, { surface: printed, reading: context.surfaceReading || token.r,
     reveal: context.reveal, clearReveal: context.clearReveal, readingVisible: context.readingVisible,
     gloss: () => inlineWordGloss(anchor, english),
     restore: context.restore, openStage: () => {
@@ -11589,6 +11594,14 @@ function miniKanjiWeb(word, anchor) {
     row.append(glyph);
     const what = el('span', 'mini-kanji-what');
     if (bi() && k.m) what.append(el('span', 'mini-kanji-meaning', k.m));
+    // Ladder · D7 · its readings (on, then kun), for the compact card's one line per kanji (glyph, keyword, readings); the
+    // full card shows its parts there instead
+    const readings = [...(k.on || []).slice(0, 2), ...(k.kun || []).slice(0, 1).map((kun) => String(kun).replace('.', ''))].filter(Boolean);
+    if (readings.length) {
+      const line = el('span', 'mini-kanji-readings', readings.join(' · '));
+      line.lang = 'ja'; line.dataset.uiContent = 'learning';
+      what.append(line);
+    }
     const parts = mainParts(c).filter((part) => part !== c);
     if (parts.length) {
       const set = el('span', 'mini-kanji-parts');
@@ -11796,7 +11809,8 @@ function placeFloating(card, r) {
   const scrolled = card.scrollTop;
   card.style.maxHeight = '';
   card.style.overflowY = '';
-  const m = card.getBoundingClientRect();
+  card.classList.remove('is-cut');
+  let m = card.getBoundingClientRect();
   const fixedEdge = (selector, edge) => {
     const node = document.querySelector?.(selector);
     if (!node || typeof getComputedStyle !== 'function' || !['fixed', 'sticky'].includes(getComputedStyle(node).position)) return null;
@@ -11859,7 +11873,20 @@ function placeFloating(card, r) {
     return;
   }
   delete card.dataset.flow;
-  let top;
+  // Ladder · the card travels with its word (lead's ruling, 10-19: a trackpad scroll slid the text under a card fixed to the
+  // glass, and it stood on the word's reading): a word in the page's own text puts its card in the text's scroll layer
+  // (data-flow="text", under the bars like the text); a word in a scrolling page moves it with that page's scroll
+  const anchor = card._kept?.anchor;
+  const scroller = anchor ? slipScroller(anchor) : null;
+  // Ladder · D7 · a glide still under way (the card seated again while the text glides, its meaning arriving): the text is
+  // going to stand that much further on, and the seat is chosen for where it stops, never for where it passes
+  const startScroll = scroller === 'window' ? window.scrollY : 0;
+  let inflight = 0;
+  if (scroller === 'window' && card._glideTo != null) {
+    inflight = card._glideTo - startScroll;
+    if (Math.abs(inflight) < 0.5) { card._glideTo = null; inflight = 0; }
+  }
+  let top, shift = inflight;
   if (pinHolds) {
     top = pinned;
     if (m.height > pinnedRoom) {
@@ -11869,28 +11896,69 @@ function placeFloating(card, r) {
   }
   else {
     // Hfix-1A · the word card stands whole beside its word where it can (the sentence's reserve only chooses between the
-    // seats that hold it whole); else it is cut, between two rows. The print never moves for it (G3: the second activation
-    // exposes the stage without moving the print)
-    const seatWhole = () => {
-      if (seatHeight <= roomAbove) return r.top - 10 - seatHeight;
-      if (seatHeight <= roomBelow) return r.bottom + 10;
+    // seats that hold it whole); else it is cut, between two rows. `shift` is how far the text has risen for it (D7, below)
+    const seatWhole = (shift = 0) => {
+      const above = roomAbove - shift, below = roomBelow + shift, wordTop = r.top - shift, wordBottom = r.bottom - shift;
+      if (seatHeight <= above) return wordTop - 10 - seatHeight;
+      if (seatHeight <= below) return wordBottom + 10;
       // The word view still ends before its anchor; only the expanded sentence uses
       // the reserved room below it. The next printed word stays available to tap.
-      if (seatHeight > m.height && seatHeight <= floor - ceiling && m.height <= roomAbove) return ceiling;
-      if (m.height <= roomBelow) return r.bottom + 10;
-      if (m.height <= roomAbove) return r.top - 10 - m.height;
+      if (seatHeight > m.height && seatHeight <= floor - ceiling && m.height <= above) return ceiling;
+      if (m.height <= below) return wordBottom + 10;
+      if (m.height <= above) return wordTop - 10 - m.height;
       return null;
     };
-    top = seatWhole();
+    top = seatWhole(shift);
+    // Ladder · D7 (the lead's sweep and ruling, 10-19: "all of its kanji rows must be visible without scrolling inside it, and
+    // it still must not cover the word or its reading"; John, 10-15: the card is "too bulky"). A card no seat beside its word
+    // holds whole sets compact: tighter bands, every kanji on one line of its own (glyph, keyword, readings), what is
+    // secondary under a cut that says it scrolls; the print stays still. Once compact, a card stays compact while it stands.
+    if (top == null && !sentence && anchor?.matches?.('#reader .tok, .japanese-lookup-word, .sentence-tok') &&
+        card.querySelector(':scope > .mini-web') && !card.classList.contains('is-compact')) {
+      card.classList.add('is-compact');
+      m = card.getBoundingClientRect();
+      seatHeight = m.height;
+      top = seatWhole(shift);
+    }
+    // a compact card to be cut keeps a fade's depth of its kanji band under its last kanji row (is-cut): the cut then falls
+    // between two bands, and the fade it wears covers that and never a kanji row
+    if (top == null && card.classList.contains('is-compact')) card.classList.add('is-cut');
+    // What a card must show runs to the foot of its last band before the sentence's (the meaning, Save, every kanji row).
+    // Only where no seat beside its word holds even that of the compact card (a short glass: 320×568) does the text it rides
+    // with glide, the least that lets a seat hold the whole card, else that much of it; the card says so (data-glide)
+    let glided = 0;
+    if (top == null && !sentence && scroller && Math.max(roomAbove - shift, roomBelow + shift) < mustShowHeight(card)) {
+      const word = { top: r.top - shift, bottom: r.bottom - shift };
+      glided = roomForCard(word, ceiling, floor, scroller, [m.height, Math.min(m.height, mustShowHeight(card))],
+        (scroller === 'window' ? startScroll : scroller.scrollTop) + shift);
+      if (glided) {
+        // the page's text glides (at once under reduced motion); the card already stands where the text is going
+        if (scroller === 'window') {
+          card._glideTo = startScroll + shift + glided;
+          window.scrollTo({ top: card._glideTo, behavior: pageCutAllowed() ? 'smooth' : 'instant' });
+        } else {
+          // a page's own scroller moves at once (its card is on the glass and follows that page's scroll): the seat follows
+          // what actually moved
+          const before = scroller.scrollTop;
+          scroller.scrollTo({ top: before + glided, behavior: 'instant' });
+          glided = scroller.scrollTop - before;
+        }
+        shift += glided;
+        top = seatWhole(shift);
+      }
+    }
+    if (top != null) card.classList.remove('is-cut');
+    // the glide stays on the card for as long as it stands (a later re-seat does not hide that the print moved)
+    if (glided) card.dataset.glide = String((Number(card.dataset.glide) || 0) + glided);
     if (top == null) {
-      // Ladder · a cut card takes the room it has and no more: a 96 px floor past a smaller room stood it on its word
-      const fit = rowCut(card, Math.max(roomAbove, roomBelow, 1));
+      // Ladder · a cut card takes the room it has and no more (a 96 px floor past a smaller room stood it on its word), and
+      // ends 10 px from its word on the side it stands
+      const above = roomAbove - shift, below = roomBelow + shift;
+      const fit = rowCut(card, Math.max(above, below, 1));
       card.style.maxHeight = `${fit}px`;
       card.style.overflowY = 'auto';
       if (scrolled) card.scrollTop = scrolled;
-      // above its word a cut card still meets the chrome's edge (no strip of cut title glyphs over it); its foot, shortened
-      // to a row, ends further from the word
-      top = roomAbove >= roomBelow ? ceiling : r.bottom + 10;
+      top = above >= below ? r.top - shift - 10 - fit : r.bottom - shift + 10;
     }
   }
   // a card nearly as wide as the screen is centred, its two gutters equal (review round 2 #13);
@@ -11898,13 +11966,9 @@ function placeFloating(card, r) {
   const left = m.width >= window.innerWidth - 48
     ? Math.max(0, (window.innerWidth - m.width) / 2)
     : Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2));
-  // Ladder · the card travels with its word (lead's ruling, 10-19: a trackpad scroll slid the text under a card fixed to the
-  // glass, and it stood on the word's reading): a word in the page's own text puts its card in the text's scroll layer
-  // (data-flow="text", under the bars like the text); a word in a scrolling page moves it with that page's scroll
-  const anchor = card._kept?.anchor;
-  const scroller = anchor ? slipScroller(anchor) : null;
-  const ox = scroller === 'window' ? window.scrollX : 0, oy = scroller === 'window' ? window.scrollY : 0;
-  if (scroller === 'window') { card.dataset.flow = 'text'; card.dataset.seatScroll = String(window.scrollY); }
+  // the text's layer: the seat is the glass position once the text has finished moving (window.scrollY + shift)
+  const ox = scroller === 'window' ? window.scrollX : 0, oy = scroller === 'window' ? startScroll + shift : 0;
+  if (scroller === 'window') { card.dataset.flow = 'text'; card.dataset.seatScroll = String(oy); }
   else delete card.dataset.seatScroll;
   card.style.left = `${left + ox}px`;
   card.style.top = `${top + oy}px`;
@@ -11914,11 +11978,42 @@ function placeFloating(card, r) {
   else delete card.dataset.floatingTop;
   // which side of its word the card stands on: its shade falls away from the word, never across it, and above its word it
   // arrives from above (rooms/read.css --mini-rise), so its rise never brushes the reading
-  card.dataset.side = top < r.top ? 'above' : 'below';
+  card.dataset.side = top < r.top - shift ? 'above' : 'below';
   card._seat = scroller && scroller !== 'window' && anchor ? { scroller, top, left, anchor: anchor.getBoundingClientRect(),
     frame: { top: ceiling, bottom: Math.min(floor + 8, scroller.getBoundingClientRect().bottom) } } : null;
   markCardMore(card);
   revealFloatingFocus(card);
+}
+/** Ladder · D7 · how much of a card must show: down to the foot of its last band before the sentence's (its meaning, Save and
+ * its menu, every kanji row), measured with the card whole; a card with nothing but that shows whole. */
+function mustShowHeight(card) {
+  const box = card.getBoundingClientRect();
+  let foot = 0;
+  for (const band of card.children) {
+    if (band.classList.contains('mini-sentence-wrap') || !band.getClientRects().length) continue;
+    foot = Math.max(foot, band.getBoundingClientRect().bottom - box.top + card.scrollTop);
+  }
+  return foot ? Math.ceil(foot) + 1 : box.height;
+}
+/** Ladder · D7 · how far the text must rise (+) or fall (−) so a seat beside the word holds a card of each height in turn
+ * (the whole card, then what it must show): the least move over the two sides, within what its scroller can scroll, with the
+ * word and its reading staying on the glass between the frame and the floor. 0 when no height can be had. */
+function roomForCard(r, ceiling, floor, scroller, heights, at = scroller === 'window' ? window.scrollY : scroller.scrollTop) {
+  const win = scroller === 'window';
+  const max = win ? document.documentElement.scrollHeight - window.innerHeight : scroller.scrollHeight - scroller.clientHeight;
+  for (const h of heights) {
+    let best = null;
+    // above the word: its card stays under the frame and the word over the floor; below it: the card ends over the floor and
+    // the word stays under the frame
+    for (const [low, high] of [[r.bottom - floor, r.top - 10 - h - ceiling], [r.bottom + 10 + h - floor, r.top - ceiling]]) {
+      const lo = Math.max(low, -at), hi = Math.min(high, max - at);
+      if (lo > hi) continue;
+      const s = Math.min(Math.max(0, lo), hi);
+      if (best == null || Math.abs(s) < Math.abs(best)) best = s;
+    }
+    if (best != null && Math.abs(best) >= 1) return Math.round(best);
+  }
+  return 0;
 }
 /** Ladder · where a word's card travels: 'window' for a word that scrolls with the page, the element that scrolls it inside
  * a scrolling surface (a page), or null: a word that does not scroll (a fixed surface), a word inside a card, or no word set

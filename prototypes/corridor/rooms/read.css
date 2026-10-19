@@ -1405,6 +1405,50 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
   #mini .mini-sentence-quote { font-size: var(--type-label); }
 }
 
+/* Ladder · D7 · the compact card (the lead's ruling, 10-19; John, 10-15: the word card "too bulky"). When the whole card has
+   no seat beside its word it sets tighter instead of moving the print: the word and its reading on one line with the meaning
+   under them, Save, and every kanji on one line of its own: its glyph, its keyword, its readings. Its parts wait on the
+   kanji's own page; the sentence's band folds under the cut, which says it scrolls. The same bands and inks, set closer;
+   every target keeps its 44 px. */
+#mini .mini-kanji-readings { display: none; }
+#mini.is-compact .mini-head { padding: 6px 8px 7px 16px; }
+#mini.is-compact .mini-head-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+/* the room a meaning still to come keeps (reserveSenseRoom) is measured in the full card's lines: the compact card keeps none,
+   as the sentence view keeps none; a meaning that lands later seats the card again */
+#mini.is-compact .mini-head-text { min-height: 0 !important; }
+#mini.is-compact .mini-word { font-size: var(--type-section); }
+#mini.is-compact .mini-reading { font-size: var(--type-control); }
+/* the word's depth dot hangs 9–15 px past it (editorial.css): on the compact line its reading starts clear of the dot */
+#mini.is-compact:is([data-depth], [data-kept]) .mini-reading { margin-inline-start: 10px; }
+#mini.is-compact .mini-gloss { flex: 1 0 100%; margin: 0; font-size: var(--type-control); line-height: 1.28; }
+/* the quiet second line of a sense waits on the word's page, as a kanji's parts wait on the kanji's (the compact card shows the
+   meaning, Save and every kanji row; at 320×568 that line alone stood the last kanji row under the fade). Its element stays,
+   so a sense arriving later still finds it; its own style says display: block, hence !important */
+#mini.is-compact .mini-gloss-more { display: none !important; }
+#mini.is-compact .mini-actions { padding-block: 4px; }
+#mini.is-compact .mini-band-head { height: 28px; }
+#mini.is-compact .mini-kanji-row { grid-template-columns: 30px minmax(0, 1fr); column-gap: 10px; min-height: 44px; padding: 0; }
+#mini.is-compact .mini-kanji-glyph {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-control);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 1px 3px -1px rgb(20 24 34 / 22%);
+  font-size: var(--type-lead);
+}
+#mini.is-compact .mini-kanji-what { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+#mini.is-compact .mini-kanji-meaning { flex: 0 1 auto; white-space: nowrap; }
+#mini.is-compact .mini-kanji-parts { display: none; }
+/* cut below its kanji rows, the compact card keeps a fade's depth (32 px) of its kanji band under them: the fade covers that */
+#mini.is-compact.is-cut .mini-web { padding-bottom: 32px; }
+#mini.is-compact .mini-kanji-readings {
+  display: inline;
+  margin-inline-start: auto;
+  font: 500 var(--type-label)/1.3 var(--font-reading);
+  letter-spacing: 0.04em;
+  color: var(--color-ink-2);
+  white-space: nowrap;
+}
+
 /* press: the house's one press rule (editorial.css) answers the finger; focus is a clear ring */
 #mini :is(button, [tabindex]):focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 #mini .mini-head :is(button):focus-visible { outline-color: var(--mini-gold); }
