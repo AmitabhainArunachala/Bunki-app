@@ -2110,6 +2110,8 @@ let recordApp = null;
 let recordController = null;
 let recordInstallation = null;
 let recordControllerModule = null;
+// Loaded once at boot and reused by backup adoption: the standalone build rewrites each record module's single import.
+let recordBindingModule = null;
 let recordSyncSlot = null;
 
 function closeRecordSync() {
@@ -2265,6 +2267,7 @@ async function openAppRecord() {
       import('./record-controller.mjs'), import('./record-binding.mjs'), import('./record-app.mjs'),
     ]);
     recordControllerModule = controllerModule;
+    recordBindingModule = bindingModule;
     const assertOwner = () => recordOwner && !recordDeparted && !staleTab && epoch === recordEpoch;
     if (!assertOwner()) throw new Error('record-owner-changed');
     let initialScope;
@@ -19058,7 +19061,7 @@ function renderPortRow(main) {
         return;
       }
       let plan; let adoption = false;
-      const bindingModule = await import('./record-binding.mjs');
+      const bindingModule = recordBindingModule;
       try { plan = await buildImportPlan(s, recordInstallation.policy); }
       catch (error) {
         if (error.code !== 'ownership-mismatch') throw error;
