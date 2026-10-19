@@ -41,6 +41,24 @@ import * as controller from '/record-controller.mjs';
 import * as core from '/modules/record-core.mjs';
 import * as host from '/record-host.mjs';
 import * as app from '/record-app.mjs';
+
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
 window.fixture = { controller, core, host, app };
 </script>`;
 const server = createServer((request, response) => {
@@ -499,8 +517,8 @@ try {
         assert.equal(await page.locator('#personal-note-input').inputValue(), '');
         assert.equal(await page.locator('#note-input').inputValue(), 'Independent builder feedback draft');
         await page.evaluate(() => { window.__ownNoteImportDocument = true; });
-        await page.locator('#import-file').setInputFiles(exported.file);
-        await page.waitForFunction(() => !window.__ownNoteImportDocument && document.body.dataset.ready === '1');
+        await answeringRestore(page, async () => { await page.locator('#import-file').setInputFiles(exported.file);
+          await page.waitForFunction(() => !window.__ownNoteImportDocument && document.body.dataset.ready === '1'); });
         await tray(page);
         const restored = await admit(page, evidence, 'own-journal-ui-backup-restored');
         assert.deepEqual(restored.record, exported.backup.record, 'Explicit restore uses the actual file, whose stats precede the export timestamp');
