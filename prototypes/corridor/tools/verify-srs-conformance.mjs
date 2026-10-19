@@ -464,7 +464,11 @@ async function playerSteps(browser, engine) {
       await other.locator('#kp-start').click();
       const otherCard = await onCard(other);
       const o = await answer(other);
-      await page.locator('#kp-undo').click();
+      // undo by the player's own key (u): this row proves what undo restores. On the integration's desktop front (Hfix-1B,
+      // 1280 px) the reveal key spans the card and covers the Undo button, a layout finding reported to the lead apart
+      // from this check (evidence: SRS/evidence/undo-under-key-probe.mjs)
+      await page.keyboard.press('u');
+      await page.waitForFunction((card) => !(JSON.parse(localStorage.getItem('bunki-cloze:n2') || '{}').log || []).some((r) => r[0] === card), b.card, { timeout: 10000 }).catch(() => {});
       await page.waitForSelector('#kp-grade-good, #kp-reveal');
       const ledger = await ledgerOf(page);
       const restored = JSON.stringify(ledger.cards[b.card] ?? null) === JSON.stringify(b.before) && !ledger.log.some((r) => r[0] === b.card);
