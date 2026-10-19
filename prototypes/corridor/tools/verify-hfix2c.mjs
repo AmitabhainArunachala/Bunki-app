@@ -1,10 +1,10 @@
 /** Hfix-2c: native Undo/coach/layout/review rows and every numeric date card.
  * Each process pins one built artifact. Controls change served bytes with page.route;
- * a timeout is a harness failure, never a caught control. KT complete data is explicitly
- * a contract fixture until Kanji-trust merges. No schedule is altered by the implementation.
+ * a timeout is a harness failure, never a caught control. KT fixtures stay explicit; real
+ * Kanji-trust data must complete and repaint without a learner-record write.
  */
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
@@ -27,8 +27,12 @@ const uptime = () => execFileSync('uptime', { encoding: 'utf8' }).trim();
 const read = (file, base = SITE) => readFileSync(join(base, file), 'utf8');
 const identity = JSON.parse(read('build-identity.json'));
 mkdirSync(join(OUT, 'shots'), { recursive: true });
-const receipt = { identity, engine, mode, uptimeStart: uptime(), rows: [], mutations: [], errors: [],
-  boundary: 'Automated isolated browsers, not a physical phone. Date rows use the shipped public sentence renderer on unchanged built cards. Complete kanji rows inject the unmerged canonical display contract; actual-build rows disclose its absence.' };
+const receipt = { schemaVersion: 2, suite: 'hfix2c', runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(),
+  scope: only ? 'partial:' + only : 'full', selectedCase: only || null,
+  helperSha256: Object.fromEntries(['record-test-support.mjs', 'hfix2c-diversity.json'].map(file => [file, hash(readFileSync(new URL(file, import.meta.url)))])),
+  sources: { nativeRecordHelper: hash(readFileSync(new URL('./record-test-support.mjs', import.meta.url))) },
+  identity, engine, mode, uptimeStart: uptime(), rows: [], mutations: [], errors: [],
+  boundary: 'Automated isolated browsers, not a physical phone. Date rows use the shipped public sentence renderer on unchanged built cards. Five kanji rows use explicit display-contract fixtures; the real-data rows verify complete readings and a held-response pending-to-complete repaint.' };
 const check = (group, name, pass, observed) => { receipt.rows.push({ group, name, pass: !!pass, observed, uptime: uptime() }); console.log(`${pass ? 'PASS' : 'RED'} ${group} ${name}`); };
 const host = await startStaticHost({ site: SITE, port: 0 });
 const browser = await ({ chromium, webkit })[engine].launch(); receipt.browserVersion = browser.version();
@@ -250,8 +254,103 @@ const KANJI = {
   '生': { on: ['セイ', 'ショウ'], kun: ['い.きる', 'い.かす', 'い.ける', 'う.まれる', 'うま.れる', 'う.まれ', 'うまれ', 'う.む', 'お.う', 'は.える', 'は.やす', 'き', 'なま', 'なま-', 'な.る', 'な.す', 'む.す', '-う'], lessonOn: ['セイ', 'ショウ'], lessonKun: ['い.きる', 'い.かす', 'い.ける'], officialReadings: [], readingsState: 'complete' },
   '中': { on: ['チュウ', 'ジュウ'], kun: ['なか', 'うち', 'あた.る'], lessonOn: ['チュウ'], lessonKun: ['なか', 'うち', 'あた.る'], officialReadings: ['ジュウ'], readingsState: 'complete' }
 };
+// Independent expected display, built from the pinned lesson/sidecar bytes rather than the UI helper.
+function actualKanjiContract(id) {
+  const lesson = JSON.parse(read('data/share_alike/kanji.json')).kanji[id];
+  const extra = JSON.parse(read('data/share_alike/reference-extra.json'));
+  const row = extra.kanjiReadings?.find(([glyph]) => glyph === id);
+  if (!lesson || !row) return null;
+  const officialReadings = (extra.officialReadings || []).filter(([glyph]) => glyph === id).map(([,reading]) => reading);
+  const isOn = reading => /[ァ-ヺ]/u.test(reading.replace(/[.-]/gu, ''));
+  return { on: [...new Set([...(lesson.on || []), ...row[1], ...officialReadings.filter(isOn)])],
+    kun: [...new Set([...(lesson.kun || []), ...row[2], ...officialReadings.filter(reading => !isOn(reading))])],
+    lessonOn: [...(lesson.on || [])], lessonKun: [...(lesson.kun || [])], officialReadings, readingsState: 'complete' };
+}
+function readKanjiReview() {
+  return { lines: [...document.querySelectorAll('.review-kanji-readings')].map(n => ({
+    label: n.querySelector('.sense-pos')?.textContent,
+    readings: [...n.querySelectorAll('.review-kanji-reading')].map(r => r.dataset.reading) })),
+    text: document.querySelector('.review-reading-row')?.textContent || '',
+    state: document.querySelector('[data-kanji-readings]')?.dataset.kanjiReadings || null,
+    readings: [...document.querySelectorAll('.review-kanji-reading')].map(n => ({
+      reading: n.dataset.reading, text: n.textContent, lesson: n.dataset.lessonSelection === 'true' })),
+    overflow: document.documentElement.scrollWidth - innerWidth,
+    document: { url: location.href, timeOrigin: performance.timeOrigin }, view: document.body.dataset.view };
+}
+function kanjiReviewMatches(observed, record, state) {
+  const expected = record.on.concat(record.kun).map(reading => {
+    const lesson = record.lessonOn.concat(record.lessonKun).includes(reading);
+    return { reading, text: reading + (lesson ? ' (lesson)' : '') + (record.officialReadings.includes(reading) ? '*' : ''), lesson };
+  });
+  return observed.state === state && observed.lines.length === 2 && observed.lines.every((line,i) =>
+    line.label === (i ? 'Kun readings · ' : 'On readings · ') && JSON.stringify(line.readings) === JSON.stringify(record[i ? 'kun' : 'on'])) &&
+    JSON.stringify(observed.readings) === JSON.stringify(expected) && observed.text.includes('On readings') && observed.text.includes('Kun readings') &&
+    (state === 'complete' ? !/unavailable|Loading/u.test(observed.text)
+      : state === 'pending' ? observed.text.includes('Loading the complete reading set') : observed.text.includes('complete reading set is unavailable')) &&
+    (!record.officialReadings.length || observed.text.includes('* Reading supplied by the Jōyō Kanji Table.')) && observed.overflow === 0;
+}
+async function kanjiRepaintRow() {
+  const name = '生/390/pending-to-complete: real reference bytes repaint the same review without writes';
+  const canonical = actualKanjiContract('生');
+  // A retained pre-Kanji-trust base lacks this capability; name that red without accepting a harness failure.
+  if (mode === 'base' && !canonical) { check('KT1', name, false, { canonicalReadingsAbsent: true }); return; }
+  assert(canonical, 'Merged build contains the complete canonical 生 reading set');
+  assert(canonical.on.length + canonical.kun.length > canonical.lessonOn.length + canonical.lessonKun.length,
+    'Real complete set contains readings beyond the lesson selection');
+  const file = 'data/share_alike/reference-extra.json', body = readFileSync(join(SITE, file));
+  const expectedSha256 = identity.files.find(entry => entry.path === file)?.sha256;
+  assert.equal(hash(body), expectedSha256, 'Held response is the exact pinned artifact file');
+  const protectedKeys = ['srs', 'taken', 'revlog', 'obslog', 'stats', 'suspended'];
+  const roots = record => Object.fromEntries(protectedKeys.map(key => [key, record[key]]));
+  const { context, page } = await newPage('KT1', 390, 844);
+  let release, watchdog, requests = 0, forcedRelease = false, released = false, heldAt = null, servedSha256 = null;
+  const held = new Promise(resolve => { release = () => { released = true; clearTimeout(watchdog); resolve(); }; });
+  try {
+    if (mode === 'control') await routeFile(page, 'corridor.js', source => replaceOne(source,
+      "if (item.t === 'kanji') {\n      // Kanji-trust owns", "if (false) {\n      // Kanji-trust owns"), 'restore flat short reading output for real repaint control');
+    await page.route('**/data/share_alike/reference-extra.json', async route => {
+      requests += 1; heldAt = Date.now();
+      // The product aborts this optional request after 8 s. Release genuine bytes before that bound;
+      // any watchdog release fails the row, so a slow setup cannot masquerade as the intended transition.
+      watchdog = setTimeout(() => { forcedRelease = true; release(); }, 6500);
+      await held;
+      servedSha256 = hash(body);
+      await route.fulfill({ status: 200, contentType: 'application/json', body });
+    });
+    const seed = { v: 1, taken: [{ t: 'kanji', id: '生', label: '生', ts: 1, started: 1 }],
+      srs: {}, revlog: [], obslog: [], stats: {}, suspended: {}, srsPrefs: { newPerDay: 20 } };
+    await page.evaluate(seed => localStorage.setItem('kairo-corridor-v1', JSON.stringify(seed)), seed);
+    await page.goto(host.origin + '/index.html?entry=shelf&ui=bi', { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction(() => document.body.dataset.ready === '1');
+    const before = roots(await readAppRecord(page));
+    assert(before.taken.some(item => item.t === 'kanji' && item.id === '生'), 'Real repaint fixture imported');
+    await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#reveal').click();
+    const pending = await page.evaluate(readKanjiReview), during = roots(await readAppRecord(page));
+    const wasHeld = requests === 1 && !released && !forcedRelease;
+    const pendingRecord = { ...canonical, on: canonical.lessonOn, kun: canonical.lessonKun, officialReadings: [] };
+    const pendingPass = kanjiReviewMatches(pending, pendingRecord, 'pending');
+    const responsePromise = page.waitForResponse(response => new URL(response.url()).pathname === '/' + file);
+    const releasedAfterMs = Date.now() - heldAt;
+    release();
+    const response = await responsePromise, receivedSha256 = hash(await response.body());
+    if (mode === 'branch') await page.locator('[data-kanji-readings="complete"]').waitFor();
+    // No click, reload, navigation or UI helper call after release. The control need not have a completion marker:
+    // it is judged on its returned DOM, never on a timeout being mistaken for a killed mutation.
+    await resting(page);
+    const complete = await page.evaluate(readKanjiReview), after = roots(await readAppRecord(page));
+    const unchanged = JSON.stringify(before) === JSON.stringify(during) && JSON.stringify(before) === JSON.stringify(after);
+    const sameDocument = JSON.stringify(pending.document) === JSON.stringify(complete.document);
+    const pass = wasHeld && !forcedRelease && pendingPass && response.status() === 200 && requests === 1 &&
+      expectedSha256 === servedSha256 && expectedSha256 === receivedSha256 &&
+      kanjiReviewMatches(complete, canonical, 'complete') && sameDocument && pending.view === 'review' && complete.view === 'review' && unchanged;
+    check('KT1', name, pass, { pending, complete, expected: canonical, protectedKeys, roots: { before, during, after },
+      unchanged, sameDocument, wasHeld, forcedRelease, requests, releasedAfterMs,
+      response: { file, bytes: body.length, expectedSha256, servedSha256, receivedSha256, status: response.status() },
+      afterReleaseActions: 'wait for public completion, observe; no click, reload, navigation or app helper' });
+  } finally { release(); clearTimeout(watchdog); await context.close(); }
+}
 async function kanjiRows() {
-  for (const spec of [{id:'生',fixture:false,state:'listed'}, {id:'生',fixture:true,state:'complete'}, {id:'中',fixture:true,state:'complete'}, {id:'生',fixture:true,state:'complete',width:320}, {id:'生',fixture:true,state:'pending'}, {id:'生',fixture:true,state:'failed'}]) {
+  for (const spec of [{id:'生',fixture:false,state:mode === 'base' ? 'listed' : 'complete'}, {id:'生',fixture:true,state:'complete'}, {id:'中',fixture:true,state:'complete'}, {id:'生',fixture:true,state:'complete',width:320}, {id:'生',fixture:true,state:'pending'}, {id:'生',fixture:true,state:'failed'}]) {
     const {id,fixture,state,width=390} = spec;
     const contract = structuredClone(KANJI);
     if (state !== 'complete') for (const k of Object.values(contract)) Object.assign(k, {on:k.lessonOn,kun:k.lessonKun,officialReadings:[],readingsState:state});
@@ -267,25 +366,30 @@ async function kanjiRows() {
       await page.evaluate(seed => localStorage.setItem('kairo-corridor-v1', JSON.stringify(seed)), seed);
       await page.goto(host.origin + '/index.html?entry=shelf&ui=bi'); await page.waitForFunction(() => document.body.dataset.ready === '1');
       const before = await readAppRecord(page); assert(before.taken.some(t => t.id === id && t.t === 'kanji'), 'fixture imported');
-      await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#reveal').click(); await resting(page);
+      await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#reveal').click();
+      if (!fixture && mode === 'branch') await page.locator('[data-kanji-readings="complete"]').waitFor();
+      await resting(page);
       const observed = await page.evaluate(() => ({ lines: [...document.querySelectorAll('.review-kanji-readings')].map(n => ({label:n.querySelector('.sense-pos')?.textContent, readings:[...n.querySelectorAll('.review-kanji-reading')].map(r=>r.dataset.reading)})), text: document.querySelector('.review-reading-row')?.textContent, state: document.querySelector('[data-kanji-readings]')?.dataset.kanjiReadings, readings: [...document.querySelectorAll('.review-kanji-reading')].map(n => ({ reading: n.dataset.reading, text: n.textContent, lesson: n.dataset.lessonSelection === 'true' })), overflow: document.documentElement.scrollWidth - innerWidth }));
       const after = await readAppRecord(page);
       const unchanged = ['srs','taken','revlog','obslog','stats'].every(key => JSON.stringify(before[key]) === JSON.stringify(after[key]));
-      const expected = contract[id].on.concat(contract[id].kun).map(reading => {
-        const lesson = contract[id].lessonOn.concat(contract[id].lessonKun).includes(reading);
-        return { reading, lesson, text: reading + (lesson ? ' (lesson)' : '') + (contract[id].officialReadings.includes(reading) ? '*' : '') };
+      const actualLesson = JSON.parse(read('data/share_alike/kanji.json')).kanji[id];
+      const expectedRecord = fixture ? contract[id] : mode === 'base'
+        ? { ...actualLesson, lessonOn: actualLesson.on, lessonKun: actualLesson.kun, officialReadings: [] } : actualKanjiContract(id);
+      assert(expectedRecord, 'Actual merged kanji has complete canonical data');
+      const expected = expectedRecord.on.concat(expectedRecord.kun).map(reading => {
+        const lesson = expectedRecord.lessonOn.concat(expectedRecord.lessonKun).includes(reading);
+        return { reading, lesson, text: reading + (lesson ? ' (lesson)' : '') + (expectedRecord.officialReadings.includes(reading) ? '*' : '') };
       });
       const statusHonest = observed.state === state && (state === 'complete' ? !/unavailable|Loading/.test(observed.text) : state === 'pending' ? observed.text.includes('Loading the complete reading set') : observed.text.includes('complete reading set is unavailable'));
-      const actualLesson = JSON.parse(read('data/share_alike/kanji.json')).kanji[id];
-      const expectedRecord = fixture ? contract[id] : actualLesson;
       const linesCorrect = observed.lines.length === 2 && observed.lines.every((line,i) => line.label === (i ? 'Kun readings · ' : 'On readings · ') && JSON.stringify(line.readings) === JSON.stringify(expectedRecord[i ? 'kun' : 'on']));
-      const pass = linesCorrect && statusHonest && observed.text.includes('On readings') && observed.text.includes('Kun readings') && (fixture
-        ? JSON.stringify(observed.readings) === JSON.stringify(expected.map(({reading,text,lesson})=>({reading,text,lesson}))) && (!contract[id].officialReadings.length || observed.text.includes('* Reading supplied by the Jōyō Kanji Table.'))
-        : JSON.stringify(observed.readings) === JSON.stringify(actualLesson.on.concat(actualLesson.kun).map(reading=>({reading,text:reading+' (lesson)',lesson:true}))));
-      check('KT1', `${id}/${width}/${state}: ${fixture ? 'unmerged canonical-contract fixture' : 'actual build discloses missing complete set'}`, pass && unchanged && observed.overflow === 0, { observed, unchanged });
+      const pass = linesCorrect && statusHonest && observed.text.includes('On readings') && observed.text.includes('Kun readings') &&
+        JSON.stringify(observed.readings) === JSON.stringify(expected.map(({reading,text,lesson})=>({reading,text,lesson}))) &&
+        (!expectedRecord.officialReadings.length || observed.text.includes('* Reading supplied by the Jōyō Kanji Table.'));
+      check('KT1', `${id}/${width}/${state}: ${fixture ? 'canonical-contract fixture' : mode === 'base' ? 'actual base lacks complete set' : 'actual merged canonical readings'}`, pass && unchanged && observed.overflow === 0, { observed, unchanged });
       await page.screenshot({ path: join(OUT, 'shots', `kanji-${id}-${width}-${state}-${fixture ? 'contract-fixture' : 'actual'}.png`) });
     } finally { await context.close(); }
   }
+  await kanjiRepaintRow();
 }
 async function diversityRows() {
   const { context, page } = await newPage('X21');
@@ -306,8 +410,8 @@ try {
 } finally { await browser.close(); await host.close(); }
 const groups = [...new Set(receipt.rows.map(r => r.group))];
 receipt.groups = Object.fromEntries(groups.map(g => [g, { rows: receipt.rows.filter(r => r.group === g).length, red: receipt.rows.filter(r => r.group === g && !r.pass).length }]));
-const expectedCounts = {X20:4,'X20-key':4,X8:10,X4:4,'X4-return':1,KT1:6,X21:1,inventory:1};
-const selectedGroups = only ? (only === 'X20' ? ['X20','X20-key'] : only === 'readings' ? ['readings','inventory'] : [only]) : Object.keys(expectedCounts).concat('readings');
+const expectedCounts = {X20:4,'X20-key':4,X8:10,X4:4,'X4-return':1,KT1:7,X21:1,inventory:1,readings:104};
+const selectedGroups = only ? (only === 'X20' ? ['X20','X20-key'] : only === 'readings' ? ['readings','inventory'] : [only]) : Object.keys(expectedCounts);
 function expectedBase(row) {
   if (['inventory','X20-key','X21'].includes(row.group)) return true;
   if (row.group === 'X20') return row.name.startsWith('390:');
@@ -319,7 +423,9 @@ function expectedBase(row) {
   return expectedDates(card).every(e => card.ruby.some(([surface,reading]) => surface === e.surface && reading === e.expected));
 }
 if (mode === 'base') for (const row of receipt.rows) row.expectedBase = expectedBase(row);
-const complete = selectedGroups.every(g => receipt.groups[g] && (g === 'readings' ? receipt.groups[g].rows >= 60 : receipt.groups[g].rows === expectedCounts[g]));
+const complete = selectedGroups.every(g => receipt.groups[g]?.rows === expectedCounts[g]) &&
+  new Set(receipt.rows.map(row => row.group + '/' + row.name)).size === receipt.rows.length &&
+  (only || receipt.rows.length === 136);
 receipt.pass = complete && !receipt.errors.length && (mode === 'branch' ? receipt.rows.every(r => r.pass) : mode === 'control'
   ? receipt.rows.every(r => ['inventory','X20-key'].includes(r.group) ? r.pass : !r.pass)
   : receipt.rows.every(row => row.pass === row.expectedBase));

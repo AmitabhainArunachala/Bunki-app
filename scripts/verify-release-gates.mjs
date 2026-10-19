@@ -37,6 +37,7 @@ import {
   RELEASE_GROUPS,
 } from './ci/gate-evidence.mjs';
 import { commandCheckEvidence } from './ci/command-check-contracts.mjs';
+import { loadHfix2cPins, validateHfix2cFocused, validateHfix2cLaneAdmission } from './ci/vh-hfix2c-report-contracts.mjs';
 
 const SELF = fileURLToPath(import.meta.url);
 const ROOT = resolve(dirname(SELF), '..');
@@ -281,6 +282,19 @@ export function batteryGates(out, env = process.env) {
           // Both producers can succeed in diagnostic mode; only the complete
           // branch schedule is acceptance, regardless of the caller's shell.
           env: { KAIRO_BROWSER: engine, HFIX2A_MODE: 'branch', HFIX2A_CASE: '' },
+        };
+      }),
+    ),
+    ...['hfix2c', 'hfix2c-contrast'].flatMap((suite) =>
+      ['chromium', 'webkit'].map((engine) => {
+        const name = engine === 'chromium' ? suite : `${suite}-webkit`;
+        const focused = suite === 'hfix2c';
+        return {
+          ...node(name, focused ? tool('verify-hfix2c') : 'scripts/ci/run-hfix2c-contrast-gate.mjs', [], {
+            ...report(name, focused ? 'hfix2c' : 'hfix2c-three-state-contrast', focused ? 'result.json' : 'lane-admission.json'),
+            engine,
+          }),
+          env: { KAIRO_BROWSER: engine, ...(focused ? { HFIX2C_MODE: 'branch', HFIX2C_CASE: '', HFIX2C_BASE: '' } : {}) },
         };
       }),
     ),
@@ -891,17 +905,22 @@ export function batteryGates(out, env = process.env) {
       'hfix2a',
       'hfix2a-item-a',
       'srs-conformance',
+      'hfix2c',
+      'hfix2c-three-state-contrast',
     ].includes(gate.report?.type)
       ? {
           report: {
             ...gate.report,
             artifactSha256: env.KAIRO_VERIFIED_ARTIFACT_SHA256,
-            ...(['hfix2a', 'hfix2a-item-a'].includes(gate.report.type)
+            ...(['hfix2a', 'hfix2a-item-a', 'hfix2c', 'hfix2c-three-state-contrast'].includes(gate.report.type)
               ? {
                   siteIdentity: env.KAIRO_SITE_DIR
                     ? json(join(env.KAIRO_SITE_DIR, 'build-identity.json'))
                     : null,
                 }
+              : {}),
+            ...(['hfix2c', 'hfix2c-three-state-contrast'].includes(gate.report.type)
+              ? { siteDir: env.KAIRO_SITE_DIR ? resolve(env.KAIRO_SITE_DIR) : null }
               : {}),
             ...(gate.report.type === 'kanji-trust'
               ? { siteDir: env.KAIRO_SITE_DIR ? resolve(env.KAIRO_SITE_DIR) : null }
@@ -947,6 +966,8 @@ export function batteryGates(out, env = process.env) {
               'hfix2a',
               'hfix2a-item-a',
               'srs-conformance',
+              'hfix2c',
+              'hfix2c-three-state-contrast',
             ].includes(gate.report.type)
               ? {
                   sourceSha256: existsSync(resolve(ROOT, gate.requiredPath))
@@ -1896,6 +1917,7 @@ export function validateHfix2aReport(
 }
 
 function requireCompleteReport({
+  runId,
   path,
   type,
   engine,
@@ -1960,6 +1982,13 @@ function requireCompleteReport({
     assert.equal(value.pass, true, 'The SRS receipt does not pass');
     assert(artifactSha256 && value.artifactSha256 === artifactSha256, 'The SRS receipt is for another artifact');
     assert(sourceSha256 && value.verifierSha256 === sourceSha256, 'The SRS receipt is from another verifier');
+  } else if (type === 'hfix2c' || type === 'hfix2c-three-state-contrast') {
+    const pins = loadHfix2cPins({ root: ROOT, siteDir, engine, runId });
+    assert.equal(pins.artifactSha256, artifactSha256, 'Hfix-2c descriptor artifact differs');
+    assert.deepEqual(pins.identity, siteIdentity, 'Hfix-2c descriptor identity differs');
+    assert.equal(sourceSha256, type === 'hfix2c' ? pins.sources.focused : pins.sources.wrapper, 'Hfix-2c descriptor source differs');
+    if (type === 'hfix2c') validateHfix2cFocused(value, pins);
+    else validateHfix2cLaneAdmission(value, dirname(path), pins);
   } else if (type === 'teaching-context' || type === 'ai-adaptation') {
     assert.equal(
       value.suite,
@@ -2659,7 +2688,7 @@ async function runGate(gate, root, out, signal, boundary = {}) {
         env: invocation.env,
         environment: invocation.env,
       },
-      requireCompleteReport,
+      (report) => requireCompleteReport({ ...report, runId }),
     );
   } catch (error) {
     return finish('incomplete', 78, error.message, 0);
@@ -2922,6 +2951,10 @@ async function verifyRunner(out) {
     'hfix2a-webkit',
     'hfix2a-item-a',
     'hfix2a-item-a-webkit',
+    'hfix2c',
+    'hfix2c-webkit',
+    'hfix2c-contrast',
+    'hfix2c-contrast-webkit',
     'word-saved-answer',
     'word-saved-answer-controls',
     'word-saved-answer-mutation-controls',

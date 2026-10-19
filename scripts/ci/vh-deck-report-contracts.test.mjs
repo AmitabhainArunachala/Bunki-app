@@ -484,7 +484,7 @@ test('independent published obligation counts cover all variants', () => {
   assert.equal(PLACES_CASES.length, 93);
   assert.equal(EXPERIENCE_CASES.length, 42);
   // INT-VH (2026-10-19): +2 Hfix-1B deck rows (K161, K162)
-  assert.equal(KOTOBA_SITES.length, 153);
+  assert.equal(KOTOBA_SITES.length, 154);
 });
 test('served-site identity compares real paths on both sides', () => {
   const field = {
@@ -699,5 +699,28 @@ test('served personal-collections and foundation reports bind their own site, at
         [],
         `${name} ${site}`,
       );
+  }
+});
+
+// Hfix-2c adds one completion without renumbering the existing VH check sites.
+test('Kotoba requires the early-choice K163 and the exact againCoachSeen K092 name', () => {
+  const c = { ...context('deck-player-browser'), engine: 'chromium' };
+  const good = fixture('deck-player-browser', c);
+  good.engines = ['chromium'];
+  good.browserVersions = { chromium: '153' };
+  assert.equal(good.results.length, 179);
+  assert.deepEqual(validateDeckReport('deck-player-browser', good, c).errors, []);
+  const early = good.results.findIndex((row) => row.caseId === 'K163');
+  const coach = good.results.findIndex((row) => row.caseId === 'K092');
+  assert(early >= 0 && coach >= 0);
+  assert(good.results[coach].name.endsWith('(prefs againCoachSeen)'));
+  for (const mutate of [
+    (r) => r.results.splice(early, 1),
+    (r) => r.results.push(structuredClone(r.results[early])),
+    (r) => { r.results[coach].name = r.results[coach].name.replace('againCoachSeen', 'ruleSeen'); },
+  ]) {
+    const bad = structuredClone(good);
+    mutate(bad);
+    assert.equal(validateDeckReport('deck-player-browser', bad, c).passed, false);
   }
 });

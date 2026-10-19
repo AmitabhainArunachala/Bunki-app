@@ -2364,6 +2364,148 @@
       ]
     },
     {
+      "name": "hfix2c",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "acc86828db2559ed9f2234a9b9bdde5620ec65b2",
+        "producerBytesBasis": "WEAVE integration consumer/producer bytes pinned by SHA-256; no timing is attributed to the parent.",
+        "producer": "prototypes/corridor/tools/verify-hfix2c.mjs",
+        "producerSha256": "7e73e56c0c0ddfdc4b548452ec195a60952f0cdad0a199305e017eb3ba48897a",
+        "command": [
+          "node",
+          "prototypes/corridor/tools/verify-hfix2c.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "HFIX2C_MODE": "branch",
+          "HFIX2C_CASE": "",
+          "HFIX2C_BASE": "",
+          "KAIRO_EVIDENCE_DIR": "/unused/hfix2c"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-hfix2c.mjs",
+            "sha256": "7e73e56c0c0ddfdc4b548452ec195a60952f0cdad0a199305e017eb3ba48897a"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures this exact complete lane command on the final combined artifact; targeted contrast retains its explicit three-state scope.",
+      "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
+      "limitations": [
+        "No numeric timing is claimed for this unmeasured contract."
+      ]
+    },
+    {
+      "name": "hfix2c-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "acc86828db2559ed9f2234a9b9bdde5620ec65b2",
+        "producerBytesBasis": "WEAVE integration consumer/producer bytes pinned by SHA-256; no timing is attributed to the parent.",
+        "producer": "prototypes/corridor/tools/verify-hfix2c.mjs",
+        "producerSha256": "7e73e56c0c0ddfdc4b548452ec195a60952f0cdad0a199305e017eb3ba48897a",
+        "command": [
+          "node",
+          "prototypes/corridor/tools/verify-hfix2c.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "HFIX2C_MODE": "branch",
+          "HFIX2C_CASE": "",
+          "HFIX2C_BASE": "",
+          "KAIRO_EVIDENCE_DIR": "/unused/hfix2c-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-hfix2c.mjs",
+            "sha256": "7e73e56c0c0ddfdc4b548452ec195a60952f0cdad0a199305e017eb3ba48897a"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures this exact complete lane command on the final combined artifact; targeted contrast retains its explicit three-state scope.",
+      "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
+      "limitations": [
+        "No numeric timing is claimed for this unmeasured contract."
+      ]
+    },
+    {
+      "name": "hfix2c-contrast",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "acc86828db2559ed9f2234a9b9bdde5620ec65b2",
+        "producerBytesBasis": "WEAVE integration consumer/producer bytes pinned by SHA-256; no timing is attributed to the parent.",
+        "producer": "scripts/ci/run-hfix2c-contrast-gate.mjs",
+        "producerSha256": "db692ca56e01ff3b058d10e8936736bb35e114370cb940246ee75f6d63685d11",
+        "command": [
+          "node",
+          "scripts/ci/run-hfix2c-contrast-gate.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/hfix2c-contrast"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "scripts/ci/run-hfix2c-contrast-gate.mjs",
+            "sha256": "db692ca56e01ff3b058d10e8936736bb35e114370cb940246ee75f6d63685d11"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures this exact complete lane command on the final combined artifact; targeted contrast retains its explicit three-state scope.",
+      "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
+      "limitations": [
+        "No numeric timing is claimed for this unmeasured contract."
+      ]
+    },
+    {
+      "name": "hfix2c-contrast-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "acc86828db2559ed9f2234a9b9bdde5620ec65b2",
+        "producerBytesBasis": "WEAVE integration consumer/producer bytes pinned by SHA-256; no timing is attributed to the parent.",
+        "producer": "scripts/ci/run-hfix2c-contrast-gate.mjs",
+        "producerSha256": "db692ca56e01ff3b058d10e8936736bb35e114370cb940246ee75f6d63685d11",
+        "command": [
+          "node",
+          "scripts/ci/run-hfix2c-contrast-gate.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/hfix2c-contrast-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "scripts/ci/run-hfix2c-contrast-gate.mjs",
+            "sha256": "db692ca56e01ff3b058d10e8936736bb35e114370cb940246ee75f6d63685d11"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures this exact complete lane command on the final combined artifact; targeted contrast retains its explicit three-state scope.",
+      "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
+      "limitations": [
+        "No numeric timing is claimed for this unmeasured contract."
+      ]
+    },
+    {
       "name": "hfix2a",
       "measurementStatus": "unmeasured",
       "currentContract": {

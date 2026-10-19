@@ -15,6 +15,10 @@ export const NARROWING_ENV = Object.freeze([
   'READING_TRUTH_ONLY',
   'READING_TRUTH_PAST_F0',
   'READING_TRUTH_SWEEP_IDS',
+  'HFIX2C_MODE',
+  'HFIX2C_CASE',
+  'HFIX2C_BASE',
+  'SWEEP_DEBUG',
   'SWEEP_WORLDS',
   'SWEEP_STATES',
   // INT-VH (merge 2): Hfix-1A's two control switches (contrast's translucent bar, corridor's item 18 mutations) never

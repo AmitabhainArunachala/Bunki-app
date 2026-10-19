@@ -863,7 +863,7 @@ export const KOTOBA_SITES = Object.freeze([
   {
     id: 'K092',
     phase: 'browser',
-    name: 'e) the rule is shown once: after the card it sat under is answered, the next back has none (prefs ruleSeen)',
+    name: 'e) the rule is shown once: after the card it sat under is answered, the next back has none (prefs againCoachSeen)',
     dynamic: false,
   },
   {
@@ -1269,6 +1269,13 @@ export const KOTOBA_SITES = Object.freeze([
     phase: 'browser',
     name: "`a) ${deck}: the front's passage hangs no punctuation (${actualEngine}: ${front.hang ?? 'no such property'})`",
     dynamic: true,
+  },
+  // Hfix-2c: learning ahead is the learner's explicit choice, not an automatic repeat.
+  {
+    id: 'K163',
+    phase: 'browser',
+    name: 'the one card in its step is not shown again until the learner chooses it at the close, then it says it is early',
+    dynamic: false,
   },
 ]);
 export const PLACES_CASES = Object.freeze([

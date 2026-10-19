@@ -25,9 +25,9 @@ for (const file of readdirSync(join(root, 'scripts/ci')).filter((f) =>
       for (const key of value) known.add(key);
     }
 }
-test('all 197 canonical and supplemental gates have unique names and mandatory declarations', () => {
-  assert.equal(gates.length, 197);
-  assert.equal(new Set(gates.map((g) => g.name)).size, 197);
+test('all 201 canonical and supplemental gates have unique names and mandatory declarations', () => {
+  assert.equal(gates.length, 201);
+  assert.equal(new Set(gates.map((g) => g.name)).size, 201);
   const expected = JSON.parse(
     readFileSync(new URL('./vh-required-gate-roster.json', import.meta.url), 'utf8'),
   );
@@ -402,4 +402,23 @@ test('every exported adapter fails closed for absent and malformed producer rece
             );
           }
       }
+});
+
+test('four Hfix-2c descriptors pin their order, engines, receipts and full focused invocation', () => {
+  const rows = gates.filter(gate => gate.name.startsWith('hfix2c'));
+  assert.deepEqual(rows.map(gate => gate.name), ['hfix2c', 'hfix2c-webkit', 'hfix2c-contrast', 'hfix2c-contrast-webkit']);
+  for (const gate of rows) {
+    const engine = gate.name.endsWith('-webkit') ? 'webkit' : 'chromium';
+    const focused = !gate.name.includes('contrast');
+    assert.equal(gate.env.KAIRO_BROWSER, engine);
+    assert.equal(gate.report.engine, engine);
+    assert.equal(gate.report.type, focused ? 'hfix2c' : 'hfix2c-three-state-contrast');
+    assert.equal(gate.report.path, join(out, gate.name, focused ? 'result.json' : 'lane-admission.json'));
+    assert.deepEqual(gate.args, [focused ? 'prototypes/corridor/tools/verify-hfix2c.mjs' : 'scripts/ci/run-hfix2c-contrast-gate.mjs']);
+    const env = acceptanceEnvironment({ KAIRO_BROWSER: 'all', HFIX2C_MODE: 'control', HFIX2C_CASE: 'KT1', HFIX2C_BASE: '/foreign', SWEEP_STATES: 'page', SWEEP_WORLDS: '', SWEEP_NEGATIVE: '', SWEEP_DEBUG: '1' }, gate.env);
+    assert.equal(env.KAIRO_BROWSER, engine);
+    for (const key of ['SWEEP_STATES', 'SWEEP_WORLDS', 'SWEEP_NEGATIVE', 'SWEEP_DEBUG']) assert(!Object.hasOwn(env, key));
+    if (focused) { assert.equal(env.HFIX2C_MODE, 'branch'); assert.equal(env.HFIX2C_CASE, ''); assert.equal(env.HFIX2C_BASE, ''); }
+    else for (const key of ['HFIX2C_MODE', 'HFIX2C_CASE', 'HFIX2C_BASE']) assert(!Object.hasOwn(env, key));
+  }
 });
