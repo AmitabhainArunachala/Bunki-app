@@ -3435,7 +3435,7 @@ body:has(#app :is(.kp-study, .kp-done)) #app > .report-line-page { display: none
    10 px clear of the home indicator. On the longest passage it is reachable without scrolling; the passage scrolls under
    the band and, at its end, rests above it. The key never moves: a short front is the screen's height, so its place in
    the flow is its pinned place. Undo, when there is one, stands on the same row at the left. */
-#app .kp-study:has(> .kp-reveal) { min-height: 100dvh; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+#app .kp-study:has(> .kp-reveal) { display: flex; flex-direction: column; gap: 16px; min-height: 100dvh; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
 /* the inset is counted once, by the study (its padding, its key and its band reach the glass): the app's own inset padding
    left the page's end that much below the study, so at a long front's end the key rose by the inset (78 px off the
    bottom at a 34 px inset, where it stands at 44) and a short front scrolled by it */
@@ -3470,7 +3470,7 @@ body:has(#app .kp-study > .kp-reveal) #app { padding-bottom: 0; }
 /* Undo on the next front stands on the key's row at the left, 10px off the foot (the safe area counted once), on its
    opaque full-width dock band, so no passage ink shows through it; the key paints over that band at the right */
 #app .kp .kp-study:has(> .kp-reveal) > .kp-undo {
-  order: 2; align-self: flex-start; margin: -60px 0 0; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 2;
+  position: sticky; order: 2; align-self: flex-start; background: var(--kp-dock); margin: -60px 0 0; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 2;
 }
 #app .kp-study .kp-taphint { border-top: 0; padding-top: 4px; font: 500 var(--type-caption)/1.4 var(--sans, system-ui); letter-spacing: 0.02em; text-transform: none; color: var(--kp-mute); }
 #app .kp-study .kp-undo { font: 500 var(--type-label)/1 var(--sans, system-ui); letter-spacing: 0.01em; }

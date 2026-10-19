@@ -698,6 +698,62 @@ def encode_tokens(ja: str, form: str) -> list[list[str]]:
 _DEF_TAGGER = None
 
 
+def calendar_tokens(ja: str, tokens: list[dict], bc) -> list[dict]:
+    """Numeric dates keep one reading over the whole written count, including full-width digits.
+    This deck rule runs before passage overrides; it never changes prose or card identities.
+    一日 stays contextual in readings.json. Numeric 1日 also distinguishes the existing
+    duration phrases (1日早く, 1日に渡って) from a calendar's first day.
+    """
+    digits = {1: "いち", 2: "に", 3: "さん", 4: "よん", 5: "ご", 6: "ろく", 7: "しち", 8: "はち", 9: "く"}
+    days = {1: "ついたち", 2: "ふつか", 3: "みっか", 4: "よっか", 5: "いつか",
+            6: "むいか", 7: "なのか", 8: "ようか", 9: "ここのか", 10: "とおか",
+            14: "じゅうよっか", 20: "はつか", 24: "にじゅうよっか"}
+    def number(n):
+        if n < 10:
+            return digits[n]
+        return ("" if n < 20 else digits[n // 10]) + "じゅう" + (digits[n % 10] if n % 10 else "")
+    boundaries, at = {0: 0}, 0
+    for i, token in enumerate(tokens):
+        at += len(token["s"])
+        boundaries[at] = i + 1
+    replacements = {}
+    for match in re.finditer(r"(?<![0-9０-９.．])([0-9０-９]+)(月|日)(間?)", ja):
+        n, unit, duration = int(match[1]), match[2], match[3]
+        if match.start() not in boundaries or match.end() not in boundaries:
+            continue
+        if unit == "月" and 1 <= n <= 12 and not duration:
+            reading = {4: "し", 7: "しち", 9: "く"}.get(n, number(n)) + "がつ"
+        elif unit == "日" and (1 <= n <= 31 or n == 100):
+            reading = "ひゃくにち" if n == 100 else days.get(n, number(n) + "にち")
+            # Keep explicit shared-lexicon duration guards, e.g. 1日で / 1日後.
+            span = tokens[boundaries[match.start()]:boundaries[match.end()]]
+            known_duration = any(t["s"] == "日" and t.get("rs") == "lexicon" and t["r"] == "にち" for t in span)
+            if n == 1 and (duration or known_duration or re.match(r"(?:早|遅|に(?:渡|わた))", ja[match.end():])):
+                reading = "いちにち"
+        else:
+            continue
+        reading += "かん" if duration else ""
+        surface = match[0]
+        replacements[boundaries[match.start()]] = (boundaries[match.end()],
+            {"s": surface, "b": surface, "p": "名詞", "c": False, "r": reading,
+             "f": bc.furigana_pairs(surface, reading), "rs": "deck-calendar"})
+    result, i = [], 0
+    while i < len(tokens):
+        if i in replacements:
+            end, token = replacements[i]
+            result.append(token)
+            i = end
+        else:
+            result.append(tokens[i])
+            i += 1
+    return result
+
+
+def deck_tokens(text: str, tagger, bc) -> list[dict]:
+    tokens = calendar_tokens(text, _cover(text, bc.tokenise(text, tagger)), bc)
+    return apply_reading_rules(text, tokens, bc)
+
+
 def encode_text(text: str) -> list[list[str]]:
     """a text with no target (a word's Japanese definition) as tokens, the same rows a passage gets"""
     global _DEF_TAGGER
@@ -707,7 +763,7 @@ def encode_text(text: str) -> list[list[str]]:
         from corpus.grading._mecab import get_tagger
 
         _DEF_TAGGER = get_tagger()
-    return _encode(text, _cover(text, apply_reading_rules(text, bc.tokenise(text, _DEF_TAGGER), bc)), [])
+    return _encode(text, deck_tokens(text, _DEF_TAGGER, bc), [])
 
 
 def _encode(ja: str, tokens: list[dict], targets: list[tuple[int, int]]) -> list[list[str]]:
@@ -1102,7 +1158,7 @@ def _ordered_for(s: dict, c: dict, tagger, bc) -> list[list]:
     """the sentence as ruby segments. The first occurrence of the form is the target
     (marker 1); every further one is marker 3, so no card shows its own answer."""
     ja, form = s["ja"], s["form"]
-    tokens = _cover(ja, apply_reading_rules(ja, bc.tokenise(ja, tagger), bc))
+    tokens = deck_tokens(ja, tagger, bc)
     marks = []
     for n, a in enumerate(_occurrences(ja, form)):
         b = a + len(form)

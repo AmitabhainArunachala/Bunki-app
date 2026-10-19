@@ -118,10 +118,10 @@ export function hostAdapter() {
 /* mode: 'read' (読んで思い出す, the contract's default), 'self' (穴埋め, the MCD blank preset) or
  * 'choice' (4択); gloss: the English fold on the back starts closed ('tap') or open ('show', the
  * per-deck "always show" switch); zoom: 'auto' (焦点 once a card has been seen, 全文 on a new one)
- * or the learner's 'full' | 'focus'; ruleSeen: the 「もう一度」 rule under the grade bar was shown
+ * or the learner's 'full' | 'focus'; againCoachSeen: the current 「もう一度」 rule under the grade bar was shown
  * once; sittings: how many sittings this deck has started (the tap and swipe hints retire after
  * HINT_SITTINGS). A stored `hint` (the front hint, retired by STANDARD A37) is ignored. */
-const PREFS_DEFAULT = { newPerDay: 15, mode: 'read', gloss: 'tap', zoom: 'auto', ruleSeen: false, sittings: 0 };
+const PREFS_DEFAULT = { newPerDay: 15, mode: 'read', gloss: 'tap', zoom: 'auto', againCoachSeen: false, sittings: 0 };
 /** 「タップして答えを見る」 and the swipe hint show for this many sittings per deck, then retire */
 const HINT_SITTINGS = 3;
 // the sitting (srs-core's rule): ahead — the learner chose to review learning steps early; early — the card on screen
@@ -145,6 +145,7 @@ export function capturePresentation({ includeInert = false } = {}) {
     folds: [...face.querySelectorAll('.kp-fold')].map(n => ({ key: [...n.classList].find(c => c.startsWith('kp-f-')), open: n.open })),
     context: [...passage.querySelectorAll('.kp-ctx')].map(n => ({ side: n.dataset.side, open: n.dataset.open || '' })),
     windowed: passage.classList.contains('kp-window'), height: passage.style.getPropertyValue('--kp-window-h'),
+    foldSeatGap: face.querySelector('.kp-folds')?.style.marginTop || '',
     inner: passage.scrollTop, anchor: passage.getBoundingClientRect().top, page: window.scrollY,
     fitted: backFits(),
   };
@@ -161,6 +162,10 @@ function restorePresentation(saved, { seat = true } = {}) {
   const face = ctx.root.querySelector('#kp-card');
   const passage = face?.querySelector('.kp-sentence');
   if (!passage) return;
+  // This spacing belongs to the current reading pose, including a deliberately
+  // scrolled pose that must not be automatically fitted again on return.
+  const folds = face.querySelector('.kp-folds');
+  if (folds) folds.style.marginTop = saved.foldSeatGap || '';
   for (const fold of saved.folds) {
     const node = fold.key && face.querySelector(`.${fold.key}`);
     if (node) node.open = fold.open;
@@ -204,9 +209,10 @@ function backFits() {
   const windowed = passage.classList.contains('kp-window');
   const clearTarget = mark.top >= Math.max(top, windowed ? view.top : top) - 1 && mark.bottom <= Math.min(bottom, windowed ? view.bottom : bottom) + 1;
   const clearToggle = !toggle || (toggle.getBoundingClientRect().top >= top - 1 && toggle.getBoundingClientRect().bottom <= bottom + 1);
+  const dockTop = barTop + Math.max(0, (parseFloat(getComputedStyle(bar).paddingTop) || 0) - 1);
   const clearFolds = [...face.querySelectorAll(FOLD_ROWS)].every(node => {
     const row = node.getBoundingClientRect();
-    return !(row.top - lift < barTop - 0.5 && row.bottom - lift > barTop + 0.5);
+    return row.bottom - lift <= bottom + 0.5 || row.top - lift >= dockTop - 0.5;
   });
   return clearToggle && clearTarget && def.getBoundingClientRect().bottom - lift <= bottom + 1 && clearFolds;
 }
@@ -2413,11 +2419,12 @@ function gradeBar(id) {
   // the gesture is explained once: on the first back of the deck's first sitting (help never sits in the
   // pads' way after that)
   if (swipeHintOn()) bar.append(el('p', 'kp-swipehint', t("← もう一度　　スワイプ　　正解 →")));
-  if (!ctx.prefs.ruleSeen) {
+  // The old ruleSeen preference belonged to the previous hint; returning decks get this coach once too.
+  if (!ctx.prefs.againCoachSeen) {
     const rule = el('p', 'kp-rule', el('span', null, t(RULE)));
     rule.id = 'kp-rule';
     const dismiss = () => {
-      if (!savePrefQuiet({ ruleSeen: true })) return;
+      if (!savePrefQuiet({ againCoachSeen: true })) return;
       rule.remove();
       fitBar();
     };
@@ -2678,6 +2685,9 @@ function settleBack() {
   const answer = face?.querySelector('.kp-answer');
   const def = answer?.querySelector(':scope > .kp-def');
   if (!def || ui.screen !== 'study') return;
+  const folds = face.querySelector('.kp-folds');
+  // Recalculate the extra seating gap after a viewport, font or fold change.
+  folds?.style.removeProperty('margin-top');
   const bar = ctx.root.querySelector('.kp-grades');
   const barTop = bar ? Math.min(innerHeight, bar.getBoundingClientRect().top) : innerHeight;
   const bottomLimit = barTop - SETTLE_GAP;
@@ -2718,7 +2728,10 @@ function settleBack() {
     const r = s.getBoundingClientRect();
     return [r.top - lift, r.bottom - lift];
   });
-  const clear = (d) => rows.every(([rTop, rBottom]) => !(rTop - d < barTop - 0.5 && rBottom - d > barTop + 0.5));
+  // The grade bar's leading padding is clear glass: a hidden row starts at the opaque dock,
+  // not at the element's top. A visible row keeps the same reading clearance as the answer.
+  const dockTop = barTop + Math.max(0, (parseFloat(getComputedStyle(bar).paddingTop) || 0) - 1);
+  const clear = (d) => rows.every(([rTop, rBottom]) => rBottom - d <= bottomLimit + 0.5 || rTop - d >= dockTop - 0.5);
   if (!clear(dy)) {
     // the least further move (down first) that clears every row, keeping the target sentence below the
     // top when it scrolls down and the definition above the bar when it scrolls up; none in a row's
@@ -2732,6 +2745,56 @@ function settleBack() {
       dy = d;
       break;
     }
+  }
+  // Fit the header and fold edges together. On a short screen the passage may be too
+  // short to become an inner window, so moving only an inner scroll cannot seat its line.
+  // Include text-node ink and ruby, rather than only token element boxes.
+  const passage = face.querySelector('.kp-sentence');
+  const ink = [];
+  const walker = document.createTreeWalker(passage, NodeFilter.SHOW_TEXT);
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    if (!node.textContent.trim() || node.parentElement.closest('rp')) continue;
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    for (const rect of range.getClientRects()) if (rect.width && rect.height) ink.push([rect.top, rect.bottom]);
+  }
+  // A reading and its base are one piece of ink: the header cannot sit in the
+  // whitespace between them and make a visible word lose only its reading.
+  for (const ruby of passage.querySelectorAll('ruby')) {
+    const boxes = [...ruby.getClientRects(), ...[...ruby.querySelectorAll('rt')].flatMap(rt => [...rt.getClientRects()])].filter(r => r.width && r.height);
+    if (boxes.length) ink.push([Math.min(...boxes.map(r => r.top)), Math.max(...boxes.map(r => r.bottom))]);
+  }
+  const view = passage.getBoundingClientRect();
+  const clearHeader = (d) => ink.every(([a, b]) => b <= view.top || a >= view.bottom || !(a - d < inset - 0.5 && b - d > inset + 0.5));
+  const keepTarget = bottom - top <= bottomLimit - topLimit;
+  const fitsEdges = (d) => (!keepTarget || top - d >= topLimit - 0.5) && d >= room.up && d <= room.down && word - d >= topLimit - 0.5 && bottom - d <= bottomLimit + 0.5 && clear(d) && clearHeader(d);
+  if (!fitsEdges(dy)) {
+    // A whole line plus a whole fold can move past an edge; bound the search by the
+    // available reading area, and choose the least page movement that clears both.
+    const reach = Math.ceil(bottomLimit - topLimit);
+    const findSeat = () => {
+      for (let k = 0; k <= reach; k++) {
+        const d = [whole(dy + k), whole(dy - k)].find(fitsEdges);
+        if (d !== undefined) return d;
+      }
+    };
+    let seat = findSeat();
+    if (seat === undefined && folds && rows.length && bottom - word <= bottomLimit - topLimit + 1) {
+      // If every normal-gap seat would cut ink or a fold, make room below the
+      // answer for one whole line plus the dock's clear band. Short cards whose
+      // folds already fit keep their normal spacing (including unmatched MCD).
+      const line = Math.max(1, ...ink.map(([a, b]) => b - a));
+      const extra = Math.ceil(Math.max(0, dockTop - (rows[0][0] - dy)) + line + 1);
+      folds.style.marginTop = `${(parseFloat(getComputedStyle(folds).marginTop) || 0) + extra}px`;
+      rows.splice(0, rows.length, ...[...face.querySelectorAll(FOLD_ROWS)].map(node => {
+        const r = node.getBoundingClientRect(); return [r.top - lift, r.bottom - lift];
+      }));
+      room.down = document.documentElement.scrollHeight - innerHeight - window.scrollY;
+      seat = findSeat();
+      if (seat === undefined) folds.style.removeProperty('margin-top');
+    }
+    if (seat !== undefined) dy = seat;
   }
   if (dy) window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
   if (windowed) seatUnderHeader(windowed, marked);
@@ -2862,8 +2925,8 @@ function polish(face, sentence) {
 /** the rule under the grade bar is shown once: answering the card it sat under retires it.
  * Not stored (storage full) only means it shows again. */
 function retireRule() {
-  if (ctx.prefs.ruleSeen) return;
-  const prefs = { ...ctx.prefs, ruleSeen: true };
+  if (ctx.prefs.againCoachSeen) return;
+  const prefs = { ...ctx.prefs, againCoachSeen: true };
   if (storePrefs(prefs)) ctx.prefs = prefs;
 }
 

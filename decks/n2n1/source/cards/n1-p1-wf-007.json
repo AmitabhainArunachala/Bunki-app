@@ -23,15 +23,16 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
+   "cardId": "nn-fff745308a-7953e7a7",
    "term": "採択",
    "reading": "さいたく",
    "pos": "noun",
    "meaning": "adoption (of a resolution)",
    "defJa": "提案や決議を正式に選んで決めること",
    "passage": {
-    "ja": "国連総会は二〇一九年、二〇二二年から二〇三二年までを「国際先住民言語の十年」とする決議を採択した。世界で話される七千ほどの言語の多くが、消滅の危機にあると指摘されている。言語が失われれば、その言語でしか語れない自然の見方や歴史の記憶も同時に失われる。各国は教育や放送を通じて、話者を支える具体的な措置を求められている。言葉を守ることは、その言葉を話す人々の尊厳を守ることにほかならない。",
+    "ja": "国連総会は二〇一九年、二〇二二年から二〇三二年までを「国際先住民言語の十年」とする決議を採択した。世界で話される七千ほどの言語の多くが、消滅の危機にあると指摘されている。言語が失われれば、その言語でしか語れない自然の見方や歴史の記憶も同時に失われる。各国は教育や放送を通じて、話者を支える具体的な措置を求められている。言葉を守ることは、その言葉を話す人々の尊厳を守ることでもある。",
     "form": "採択",
-    "en": "In 2019 the UN General Assembly adopted a resolution designating 2022 to 2032 the International Decade of Indigenous Languages. Many of the roughly seven thousand languages spoken in the world are said to be in danger of disappearing. When a language is lost, the views of nature and memories of history that can be spoken only in that language are lost with it. Countries are being asked to take concrete measures supporting speakers, through education and broadcasting. Protecting a language is nothing other than protecting the dignity of the people who speak it.",
+    "en": "In 2019 the UN General Assembly adopted a resolution designating 2022 to 2032 the International Decade of Indigenous Languages. Many of the roughly seven thousand languages spoken in the world are said to be in danger of disappearing. When a language is lost, the views of nature and memories of history that can be spoken only in that language are lost with it. Countries are being asked to take concrete measures supporting speakers, through education and broadcasting. Protecting a language also means protecting the dignity of the people who speak it.",
     "register": "報",
     "topic": "language",
     "tipJa": "「決議を採択する」のように、会議などで正式に決める意味。",

@@ -408,14 +408,14 @@
     {
       "word": "スマートフォン",
       "match": [{ "s": "スマート" }, { "s": "フォン" }],
-      "tokens": [{ "s": "スマートフォン", "b": "スマートフォン", "p": "名詞", "r": "すまーとふぉん", "c": false }],
-      "note": "katakana name or term as one token; UniDic splits it into スマート + フォン (Bunki batch-4r, bunki-read-n2-japan-us-chip-fab)"
+      "tokens": [{ "s": "スマートフォン", "b": "スマートフォン", "p": "名詞", "r": "すまーとふぉん", "c": true }],
+      "note": "katakana name or term as one token; UniDic splits it into スマート + フォン (Bunki batch-4r, bunki-read-n2-japan-us-chip-fab); a content word (c: true), so the decks type it 語 and ship its gloss_ja sense (Hfix-2c)"
     },
     {
       "word": "データセンター",
       "match": [{ "s": "データ" }, { "s": "センター" }],
-      "tokens": [{ "s": "データセンター", "b": "データセンター", "p": "名詞", "r": "でーたせんたー", "c": false }],
-      "note": "katakana name or term as one token; UniDic splits it into データ + センター (Bunki batch-4r, bunki-read-n2-japan-us-chip-fab)"
+      "tokens": [{ "s": "データセンター", "b": "データセンター", "p": "名詞", "r": "でーたせんたー", "c": true }],
+      "note": "katakana name or term as one token; UniDic splits it into データ + センター (Bunki batch-4r, bunki-read-n2-japan-us-chip-fab); a content word (c: true), so the decks type it 語 and ship its gloss_ja sense (Hfix-2c)"
     },
     {
       "word": "グローバルファウンドリーズ",
@@ -432,7 +432,7 @@
     {
       "word": "ラピダス",
       "match": [{ "s": "ラピダス" }],
-      "tokens": [{ "s": "ラピダス", "b": "ラピダス", "p": "名詞", "r": "らぴだす", "c": false }],
+      "tokens": [{ "s": "ラピダス", "b": "ラピダス", "p": "名詞", "r": "らぴだす", "c": true }],
       "note": "katakana company name (Rapidus) given its reading; UniDic keeps it whole but leaves it without one (Bunki batch-4r, bunki-read-n2-japan-us-chip-fab)"
     },
     {
@@ -492,8 +492,8 @@
     {
       "word": "シリコンバレー",
       "match": [{ "s": "シリコン" }, { "s": "バレー" }],
-      "tokens": [{ "s": "シリコンバレー", "b": "シリコンバレー", "p": "名詞", "r": "しりこんばれー", "c": false }],
-      "note": "katakana name or term as one token; UniDic splits it into シリコン + バレー (Bunki batch-4r, global-voices:2026-07-28-65374)"
+      "tokens": [{ "s": "シリコンバレー", "b": "シリコンバレー", "p": "名詞", "r": "しりこんばれー", "c": true }],
+      "note": "katakana name or term as one token; UniDic splits it into シリコン + バレー (Bunki batch-4r, global-voices:2026-07-28-65374); a content word (c: true), so the decks type it 語 and ship its gloss_ja sense (Hfix-2c)"
     },
     {
       "word": "タミール",
