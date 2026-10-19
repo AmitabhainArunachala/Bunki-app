@@ -9475,15 +9475,25 @@ function inlineWordReading(anchor, reading) {
  * the furigana plus the english word underneath"). The row stands in the word's own column (.has-en), so the line breathes
  * down to make room and nothing on the next line is covered; it is zero-wide, so the word never widens and the line never
  * re-wraps; its words are centred under the word and slid inward at the line's edges (seatInlineGloss). While it shows, the
- * occurrence's depth dot steps aside (data-depth-aside, the DOTS slice's hook). An empty text is the honest dash. */
-function inlineGlossLine(text) {
-  const line = el('span', text ? 'tok-en' : 'tok-en tok-en-miss');
-  line.append(el('span', 'tok-en-text', text || '—'));
+ * occurrence's depth dot steps aside (data-depth-aside, the DOTS slice's hook). Ladder R2 (the lead's round 2, 10-20: "it
+ * never shows —"): an empty text shows nothing. A row whose answer may still come keeps its line (tok-en-wait), so its
+ * English lands without moving the next line; a row with no English at all is not drawn (tok-en-miss), and the rung stands. */
+function inlineGlossLine(text, waiting = false) {
+  const line = el('span', 'tok-en');
+  line.append(el('span', 'tok-en-text'));
+  setGlossLine(line, text, waiting);
   return line;
 }
+function setGlossLine(line, text, waiting = false) {
+  line.firstElementChild.textContent = text || '';
+  line.classList.toggle('tok-en-wait', !text && waiting);
+  line.classList.toggle('tok-en-miss', !text && !waiting);
+}
 function inlineWordGloss(anchor, text) {
+  return seatGlossRow(anchor, inlineGlossLine(text));
+}
+function seatGlossRow(anchor, line) {
   anchor.querySelector(':scope > .tok-en')?.remove();
-  const line = inlineGlossLine(text);
   anchor.append(line);
   anchor.classList.add('has-en');
   anchor.dataset.depthAside = 'meaning';
@@ -9492,20 +9502,31 @@ function inlineWordGloss(anchor, text) {
     if (!anchor.querySelector(':scope > .tok-en')) { anchor.classList.remove('has-en'); delete anchor.dataset.depthAside; }
   };
 }
-/** A text token's English rung outside the reader (a sentence's words): the reader's own gloss for its door, and the dash
- * until the full dictionary answers, then that answer. */
+/** A text token's English rung outside the reader (a sentence's words): the reader's own (tokenGlossLine). */
 function inlineTokenGloss(anchor, token) {
-  const now = readerTokenGloss(token);
-  const undo = inlineWordGloss(anchor, now);
-  if (!now) readyTokenReading(token)?.then(() => {
-    const line = anchor.querySelector(':scope > .tok-en.tok-en-miss');
-    const found = line?.isConnected ? readerTokenGloss(token) : '';
-    if (!found) return;
-    line.className = 'tok-en';
-    line.firstElementChild.textContent = found;
-    seatInlineGloss(line);
+  return seatGlossRow(anchor, tokenGlossLine(token));
+}
+/** Ladder R2 · a text token's English row (the critic's round-1 FAIL, 10-20: tap 2 repeated the quick dictionary's first gloss,
+ * so 先 in 出荷先 could read "point", and a word with no meaning at hand showed "—"). It says the gloss of the sense its
+ * sentence uses where the article's sense data names one (the sidecar, R3 part 2), else the box's first gloss: its door's
+ * meaning, led by the sense the box settles on once that is in (readerTokenGloss). A sense the sidecar names that is not
+ * yet at hand is waited for, never painted over with a meaning it takes back (R3's rule for the box); elsewhere the row
+ * speaks at once. Either way its reading's rows and its sense are asked for (the reader asked at the word's first rung:
+ * senseAhead), and once they are in the row says what they settle, or nothing. `painted` hears a change. */
+function tokenGlossLine(token, painted = null) {
+  const reading = readyTokenReading(token);
+  const sensing = !SENSE_GAVE_UP.has(token) && !!senseChoice(token, readingTokenEntry(token))?.need;
+  const named = sensing && !!sidecarSense(senseNeighbours(token))?.seq;
+  const line = inlineGlossLine(named ? '' : readerTokenGloss(token), !!reading || sensing);
+  if (!reading && !sensing) return line;
+  Promise.resolve(reading).then(() => ensureSense(token, readingTokenEntry(token))).catch(() => {}).then(() => {
+    if (!line.isConnected) return;
+    const was = line.firstElementChild.textContent, found = readerTokenGloss(token);
+    setGlossLine(line, found);
+    if (found) seatInlineGloss(line);
+    if (found !== was) painted?.(line);
   });
-  return undo;
+  return line;
 }
 /** The English row's words: centred under their word, never past the edge of the line they stand in. */
 function seatInlineGloss(line) {
@@ -11788,6 +11809,38 @@ function rowCut(card, room) {
   }
   return foot >= 96 ? Math.ceil(foot + 1) : room;
 }
+/** Ladder R2 · D7 · the depth of a cut card's fade (rooms/read.css: #mini[data-more='true']::after), and the rows it may
+ * never lie on: the card's bands and their own lines (the word band, Save and its reason, the kanji band's heading and its
+ * rows, the sentence's door, Save's menu items). */
+const MINI_FADE = 32;
+const MINI_FADE_ROWS = '.mini-head, .mini-word-note, .mini-actions, .mini-take-reason, .mini-band-head, .mini-kanji-row, ' +
+  '.mini-sentence-open, #vocabulary-list-popover, #vocabulary-list-popover > *, .vocabulary-list-more > *';
+/** Ladder R2 · D7 (the critic's FAIL, 10-20: at 390×520 and 390×560, and at 320×568 with the second 総理 mid-glass, the
+ * compact box was cut at a kanji row's foot and its fade lay on that row; DESIGN: "the fade never lies on a row"). A compact
+ * card cut to its room ends a fade's depth below the deepest row that leaves that much room under it, so its fade lies on
+ * paper: under its last kanji row the kanji band's own depth is there already (is-cut); under any other row, what follows is
+ * folded down by what the fade still needs (data-fold, closed when the card is seated again). A band's heading is never the
+ * last row shown, nor a line inside Save's menu (the menu shows whole or waits under the fold). The cut's height, or null
+ * where not even the word band leaves room for a fade under it (then rowCut decides). */
+function fadeCut(card, room) {
+  const box = card.getBoundingClientRect();
+  const rows = [...card.querySelectorAll(MINI_FADE_ROWS)].filter((node) => node.getClientRects().length).map((node) => {
+    const b = node.getBoundingClientRect();
+    return { node, top: b.top - box.top + card.scrollTop, bottom: b.bottom - box.top + card.scrollTop };
+  });
+  const feet = rows.filter((row) => !row.node.matches('.mini-band-head, #vocabulary-list-popover > *, .vocabulary-list-more > *') &&
+    !rows.some((other) => other.top < row.bottom - 0.5 && other.bottom > row.bottom + 0.5)).sort((a, b) => b.bottom - a.bottom);
+  for (const foot of feet) {
+    // the card's foot border (1 px) under its fade, as rowCut counts it
+    const cut = Math.ceil(foot.bottom + MINI_FADE + 1);
+    if (cut > room) continue;
+    const next = Math.min(Infinity, ...rows.filter((row) => row !== foot && row.top >= foot.bottom - 0.5).map((row) => row.top));
+    const fold = Math.ceil(foot.bottom + MINI_FADE - next);
+    if (fold > 0) { foot.node.style.marginBottom = `${fold}px`; foot.node.dataset.fold = String(fold); }
+    return cut;
+  }
+  return null;
+}
 /** Hfix-1A · a card with more below its cut says so: its foot fades into the band the cut falls in (data-more, the
  * strip's own sign), and it scrolls by touch and by keyboard (its rows are buttons; revealFloatingFocus follows them). */
 function markCardMore(card) {
@@ -11816,6 +11869,8 @@ function placeFloating(card, r) {
   card.style.maxHeight = '';
   card.style.overflowY = '';
   card.classList.remove('is-cut');
+  // Ladder R2 · D7 · a fold a cut opened under a row (fadeCut) closes: the card is measured as it stands whole
+  for (const row of card.querySelectorAll('[data-fold]')) { row.style.removeProperty('margin-bottom'); delete row.dataset.fold; }
   let m = card.getBoundingClientRect();
   const fixedEdge = (selector, edge) => {
     const node = document.querySelector?.(selector);
@@ -11968,7 +12023,9 @@ function placeFloating(card, r) {
       // its word it still meets the chrome's edge (Hfix-1A: no strip of cut title glyphs over it; a sentence opened from it
       // keeps that top edge), its foot, shortened to a row, ending further from the word; below it, 10 px under the word
       const above = roomAbove - shift, below = roomBelow + shift;
-      const fit = rowCut(card, Math.max(above, below, 1));
+      // Ladder R2 · D7 · a compact card's fade lies on no row (fadeCut); any other card is cut as Hfix-1A cuts it
+      const room = Math.max(above, below, 1);
+      const fit = (card.classList.contains('is-compact') ? fadeCut(card, room) : null) ?? rowCut(card, room);
       card.style.maxHeight = `${fit}px`;
       card.style.overflowY = 'auto';
       if (scrolled) card.scrollTop = scrolled;
@@ -12024,9 +12081,14 @@ function roomForCard(r, ceiling, floor, scroller, heights, at = scroller === 'wi
       const lo = Math.max(low, -at), hi = Math.min(high, max - at);
       if (lo > hi) continue;
       const s = Math.min(Math.max(0, lo), hi);
-      if (best == null || Math.abs(s) < Math.abs(best)) best = s;
+      // Ladder R2 · D7 · in whole px and never short of the room it is for: away from 0 while that stays inside [lo, hi]
+      // (rounding to the nearest px gave back up to half a px: at 320×568 the second 総理's box missed the fade's depth
+      // under its kanji rows by 0.2 px, and its fade lay on 理's row)
+      const whole = s < 0 ? Math.floor(s) : Math.ceil(s);
+      const move = whole >= lo && whole <= hi ? whole : Math.round(s);
+      if (best == null || Math.abs(move) < Math.abs(best)) best = move;
     }
-    if (best != null && Math.abs(best) >= 1) return Math.round(best);
+    if (best != null && Math.abs(best) >= 1) return best;
   }
   // no height can be had beside the word wherever the text stands (a glass shorter than the card's must-show and its word:
   // 390×520): the move that gives the card the most room, its word still on the glass, when that is more than it has.
@@ -14522,9 +14584,9 @@ function dictionaryAnsweredForm(form = '') {
   return !!form && !!D.dictionaryIndex && (D.dictionaryMode === 'main' || !!D.dictionaryCompleteForms?.has(String(form)));
 }
 
-/** The line under a content word on the ladder's English rung: its gloss
- * exactly as before, or an honest dash when the quick dictionary has none. N · a word whose entry at hand is read
- * otherwise shows the dash until the full dictionary answers, then that answer's gloss if it has one read so. */
+/** The line under a content word on the ladder's English rung: its gloss, or nothing where it has none (Ladder R2: never the
+ * dash). N · a word whose entry at hand is read otherwise shows nothing until the full dictionary answers, then that
+ * answer's gloss if it has one read so. */
 /** R2 · a reader word's gloss speaks for its door (readingToken): an inflected word's dictionary form read the text's
  * way, a sound change's entry, a lone kanji's meaning; '' when the entry at hand has none read so. */
 function readerDoorGloss(door) {
@@ -14535,19 +14597,11 @@ function readerDoorGloss(door) {
 }
 const readerTokenGloss = (token) => readerDoorGloss(readingToken(token));
 function readerGlossLine(token) {
-  const gloss = readerDoorGloss;
-  const now = gloss(readingToken(token));
-  const line = inlineGlossLine(now);
-  if (!now) readyTokenReading(token)?.then(() => {
-    const found = line.isConnected ? gloss(readingToken(token)) : '';
-    if (found) {
-      line.className = 'tok-en'; line.firstElementChild.textContent = found;
-      seatInlineGloss(line);
-      const word = line.closest('.tok[data-index]');
-      if (word) nameReaderToken(word, token, Number(word.dataset.index), 'word');
-    }
+  // Ladder R2 · the sense its sentence uses, followed to its answer (tokenGlossLine); its spoken state follows the row
+  return tokenGlossLine(token, (line) => {
+    const word = line.closest('.tok[data-index]');
+    if (word) nameReaderToken(word, token, Number(word.dataset.index), 'word');
   });
-  return line;
 }
 
 /** How the reader's words work, in plain words: the text settings say it whole (John, 2026-10-02 #8). */

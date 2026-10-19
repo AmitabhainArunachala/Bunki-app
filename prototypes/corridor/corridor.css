@@ -7507,12 +7507,15 @@ body.zen .say-note { color: var(--card-ink-2, var(--ink-2)); }
 .say-note:empty { display: none; }
 
 /* D11 · the reader's honest gloss (2026-09-25). A content word the quick
- * dictionary cannot gloss says so: a faint dash on the English rung, one
- * plain line in the mini. Its full-entry door offers only dictionary rows
- * read as the token is read, as native candidate buttons, and holds 覚 off
- * along that path with the reason on the sheet. New classes only; nothing a
- * core hit renders is restyled. */
-.tok-en.tok-en-miss, .tok-en.tok-en-miss .tok-en-text { color: var(--faint); }
+ * dictionary cannot gloss says so in one plain line in the mini. Its
+ * full-entry door offers only dictionary rows read as the token is read, as
+ * native candidate buttons, and holds 覚 off along that path with the reason
+ * on the sheet. New classes only; nothing a core hit renders is restyled.
+ * Ladder R2 (the lead, 10-20: "it never shows —"): its English rung shows
+ * nothing, and the rung stands. A row whose answer may still come keeps its
+ * line, so the English lands without moving the next line. */
+.tok-en.tok-en-miss { display: none; }
+.tok-en.tok-en-wait .tok-en-text { min-height: 1.3em; }
 .reader-choice { margin: 8px 0 14px; }
 .reader-choice-title { margin: 0 0 4px; color: var(--faint); font-family: var(--serif); font-size: var(--type-caption); letter-spacing: 0.08em; }
 .reader-choice-row { display: flex; align-items: center; gap: 9px; width: 100%; min-height: var(--tap); padding: 7px 1px;
