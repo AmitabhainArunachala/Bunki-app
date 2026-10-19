@@ -744,6 +744,9 @@ verified('due-queue-overdueness-order-no-debt-daily-caps-and-today-queue', () =>
   );
   const dueContext = vm.createContext({
     S: {},
+    // the queue's burying across surfaces (srs-core): the real module, with nothing answered today in this storage
+    srsCore,
+    D: { dict: {} },
     crypto: webcrypto,
     document: fakeDocument(),
     localStorage: storage(),
