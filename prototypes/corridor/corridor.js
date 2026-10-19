@@ -24363,7 +24363,8 @@ function wwPassages(w, cap = 2) {
     wwSentences(p, (t) => t.b === w, cap, out);
     if (out.length >= cap) return out;
   }
-  for (const ex of D.exampleBank?.get(w) || []) {
+  // KT-6 · only the word's own bank lines: a kana key's homophones are not its passages
+  for (const ex of bankExamplesFor(w)) {
     if (out.length >= cap) break;
     out.push({ ...ex, target: w });
   }
@@ -32618,9 +32619,57 @@ function renderCardVariant(container, target) {
   container.append(box);
 }
 
-/** Real usages from the committed shelf: sentences containing the word. */
-function findExamples(id, cap = 4) {
+/* KT-6 (Hfix-2e) · a word's examples are the word's own. The bank is keyed by spelling, and its generator credits every
+ * form of an entry, so a kana key gathers every word read that way: 愛's sentences sit under あい, the key the core
+ * dictionary files 藍 by, and 藍's page opened on 「愛は盲目。」. A sentence is this word's example only when it holds
+ * the word: a content token whose dictionary form (b, the spelling as the sentence writes it, inflection undone, so
+ * 歩け holds 歩く) is one of the word's own written forms — its key, the core's other spelling (事 for こと), and, once
+ * the index has its entry, that entry's spellings (引き返す for 引きかえす; a word with no kanji, its kana forms). Never
+ * a kana another entry shares. A page that names its sense (an entry number or a reading) also asks an uninflected
+ * token to be read one of that entry's ways, so 一日 read ついたち is not an example of いちにち. */
+function exampleIdentity(id, node = null) {
+  const key = String(id || '');
+  const forms = new Set(key ? [key] : []);
+  const alt = D.dict?.[key]?.alt;
+  if (alt) forms.add(alt);
+  const own = node && node.id === key ? node : { t: 'word', id: key };
+  const rows = key && D.dictionaryIndex ? dictionaryDetailRowsFor(own) : [];
+  for (const row of rows) {
+    const written = Array.isArray(row?.[4]) ? row[4] : [];
+    for (const form of written.length ? written : Array.isArray(row?.[5]) ? row[5] : []) forms.add(form);
+  }
+  let readings = null;
+  if (own === node && (node.seq || node.reading) && rows.length) {
+    readings = new Set(rows.flatMap((row) => (Array.isArray(row?.[5]) ? row[5] : []).map((kana) => kataToHira(String(kana)))));
+    if (node.reading) readings.add(kataToHira(String(node.reading)));
+  }
+  // a kana spelling is the same spelling in either kana: ドキドキ is どきどき, ガン is がん (癌)
+  const kana = new Set([...forms].filter((form) => READER_KANA.test(form)).map((form) => kataToHira(form)));
+  return { forms, kana, readings };
+}
+function exampleTokenIsWord(token, identity) {
+  if (!token?.c) return false;
+  const spelled = identity.forms.has(token.b) || (READER_KANA.test(String(token.b || '')) && identity.kana.has(kataToHira(String(token.b))));
+  if (!spelled) return false;
+  // an inflected token's reading is its ending's too: its dictionary spelling speaks for it
+  return !identity.readings || token.s !== token.b || !token.r || identity.readings.has(kataToHira(String(token.r)));
+}
+function exampleHoldsWord(tokens, identity) {
+  return Array.isArray(tokens) && tokens.some((token) => exampleTokenIsWord(token, identity));
+}
+/** The bank's fetched sentences that are this word's own (ensureBankExamples keeps the key's whole list). */
+function bankExamplesFor(id, node = null) {
+  const banked = D.exampleBank?.get(id);
+  if (!banked?.length) return [];
+  const identity = exampleIdentity(id, node);
+  return banked.filter((ex) => exampleHoldsWord(ex.tokens, identity));
+}
+
+/** Real usages from the committed shelf: sentences containing the word. A page passes its node, so a sense it names
+ * keeps its examples to that sense (KT-6). */
+function findExamples(id, cap = 4, node = null) {
   const out = [];
+  const identity = node ? exampleIdentity(id, node) : null;
   for (const p of D.passages) {
     if (!p.tokens) continue; // not yet fetched — prefetch fills these in
     let sentence = [];
@@ -32628,7 +32677,7 @@ function findExamples(id, cap = 4) {
     let hit = false;
     for (const [index, t] of p.tokens.entries()) {
       sentence.push(t);
-      if (t.c && t.b === id) hit = true;
+      if (t.c && t.b === id && (!identity || exampleTokenIsWord(t, identity))) hit = true;
       if ('。！？'.includes(t.s)) {
         if (hit) out.push({ tokens: sentence, source: learnerSourceLabel(p), passage: p.id, start });
         sentence = [];
@@ -32641,9 +32690,9 @@ function findExamples(id, cap = 4) {
     if (out.length >= cap) return out;
   }
   // the bank fills what the shelf cannot — already-fetched sentences only
-  // (ensureBankExamples warms this cache; callers refresh once it lands)
-  const banked = D.exampleBank?.get(id);
-  if (banked) {
+  // (ensureBankExamples warms this cache; callers refresh once it lands), and only the word's own (KT-6)
+  const banked = bankExamplesFor(id, node);
+  if (banked.length) {
     const seen = new Set(out.map((ex) => ex.tokens.map((t) => t.s).join('')));
     for (const ex of banked) {
       if (out.length >= cap) break;
@@ -35030,7 +35079,7 @@ function renderWordNode(sheet, node) {
       refreshWordSheet(node);
     });
   }
-  const { first: leadExamples, more: moreExamples } = exampleOrder(node, findExamples(node.id, 6));
+  const { first: leadExamples, more: moreExamples } = exampleOrder(node, findExamples(node.id, 6, node));
   if (leadExamples.length || moreExamples.length) {
     // The words teach the shared ladder themselves; this heading names the examples.
     sheet.append(
