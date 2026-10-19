@@ -211,6 +211,8 @@
 /* 削除 (Hfix-1B): the back's last quiet row, after the folds, its one word at the row's end; 44px to touch; never on a front,
    never in the top bar */
 .kp-card-tools { display: flex; justify-content: flex-end; margin: 2px 0 -10px; }
+/* the foot's band (mount.js footBand) is the app's focus room's (editorial.css); a standalone page draws none */
+.kp-foot-band { display: none; }
 .kp-delete { flex: none; min-height: 44px; padding: 0 2px; border: 0; border-radius: 0; background: none; color: var(--kp-ink-2); font-size: var(--type-label); letter-spacing: 0.02em; text-decoration: underline; text-decoration-color: var(--kp-line); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .kp-toast.is-info { border-color: var(--kp-line); grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
 .kp-seg button:disabled { opacity: 0.5; cursor: default; }

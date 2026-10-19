@@ -12,6 +12,8 @@
  *      response of 400 or more.
  *   S  item 8 (H0-2, H-hokusai-07, H-sumi-09) · Settings shows no frame time and offers no Layout; the week's roughest
  *      moment is in the report sheet's Details; at the end of its scroll the last of Settings sits clear above the tab bar.
+ *   F  item 3 · the deck front's foot band is a real element: a point on passage text under it lands on the band (what it
+ *      covers is covered, for a tap and for the contrast sweep), and a tap on it turns the card in its right half only.
  *
  * Usage:
  *   KAIRO_SITE_DIR=<built site> KAIRO_EVIDENCE_DIR=~/.dharma/… KAIRO_BROWSER=all|webkit|chromium \
@@ -22,7 +24,8 @@
  * - T: the four doors drawn with no tutor;
  * - B: the note under the bar at 320×568;
  * - R: the report sheet's /api/config 404;
- * - S: Settings' frame time and Layout.
+ * - S: Settings' frame time and Layout;
+ * - F: no band element (the base drew the band as the study's ::after, which a point and a tap passed through).
  *
  * Claim boundary: headless engines at phone viewports with touch; not the iPhone itself.
  */
@@ -36,7 +39,7 @@ import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfDoor } from './shelf-tools-support.mjs';
 import { DEVICE_TUTOR, setUpDeviceTutorForContext } from './tutor-fixture-support.mjs';
 
-const ALL = ['T', 'B', 'R', 'S'];
+const ALL = ['T', 'B', 'R', 'S', 'F'];
 const CASES = (process.env.HFIX_CASES || ALL.join(',')).split(',').map((name) => name.trim()).filter(Boolean);
 for (const name of CASES) if (!ALL.includes(name)) throw new Error(`HFIX_CASES: unknown case ${name}`);
 const ENGINES = process.env.KAIRO_BROWSER === 'webkit' ? { webkit } : process.env.KAIRO_BROWSER === 'chromium' ? { chromium } : { webkit, chromium };
@@ -346,6 +349,46 @@ async function settingsFoot(engine, browserType, [width, height]) {
   await s.close();
 }
 
+/* ------------------------------------------------------------------------------------------------------------------ F */
+async function footBand(engine, browserType) {
+  const label = `${engine} · 390×844`;
+  const facts = {};
+  for (const side of ['left', 'right']) {
+    const s = await session(browserType);
+    const { page } = s;
+    try {
+      await boot(page);
+      await tab(page, 'learn', ['dojo', 'tests']);
+      const begin = page.getByRole('button', { name: /Begin .*cards?/u }).first();
+      await begin.waitFor({ timeout: 10_000 });
+      await begin.click();
+      await page.locator('#kp-reveal').waitFor({ timeout: 15_000 });
+      await settle(page, 900);
+      if (side === 'left') facts.covered = await page.evaluate(() => {
+        const band = document.querySelector('#kp-card ~ .kp-foot-band, .kp-study > .kp-foot-band');
+        if (!band) return null;
+        const b = band.getBoundingClientRect();
+        const runs = [...document.querySelectorAll('#kp-card .kp-sentence .kp-w')].map((n) => n.getBoundingClientRect())
+          .filter((q) => q.width && q.bottom > b.top + 1 && q.top < b.bottom - 1);
+        const landed = runs.map((q) => document.elementFromPoint(q.left + Math.min(q.width / 2, 10), (Math.max(q.top, b.top) + Math.min(q.bottom, b.bottom)) / 2));
+        return { top: Math.round(b.top), runs: runs.length, onBand: landed.filter((h) => h === band).length };
+      });
+      const box = await page.locator('.kp-study > .kp-foot-band').boundingBox();
+      if (!box) throw new Error('no foot band element');
+      await page.touchscreen.tap(box.x + box.width * (side === 'right' ? 0.75 : 0.2), box.y + 12);
+      await settle(page, 900);
+      facts[side] = (await page.locator('.kp-grades').count()) > 0 ? 'revealed' : 'front';
+    } catch (error) {
+      facts[side] = `not reached: ${String(error?.message || error).split('\n')[0].slice(0, 120)}`;
+    }
+    await s.close();
+  }
+  check(`F · ${label} · passage text under the foot band is covered by it: every point on it lands on the band`,
+    !!facts.covered && facts.covered.runs > 0 && facts.covered.onBand === facts.covered.runs, facts.covered || 'no band element');
+  check(`F · ${label} · a tap on the band turns the card in its right half and not in its left, as the stage beside it does`,
+    facts.right === 'revealed' && facts.left === 'front', { left: facts.left, right: facts.right });
+}
+
 try {
   for (const [engine, browserType] of Object.entries(ENGINES)) {
     console.log(`\n— ${engine}`);
@@ -353,6 +396,7 @@ try {
     if (CASES.includes('B')) for (const size of [[320, 568], [390, 844], [430, 932]]) await settledBack(engine, browserType, size);
     if (CASES.includes('R')) for (const at of [[390, 844, 'hokusai'], [320, 568, 'sumi']]) await restPass(engine, browserType, at);
     if (CASES.includes('S')) for (const size of [[320, 568], [390, 844]]) await settingsFoot(engine, browserType, size);
+    if (CASES.includes('F')) await footBand(engine, browserType);
   }
 } finally {
   await host.close?.();

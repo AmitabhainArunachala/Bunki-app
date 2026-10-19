@@ -1170,12 +1170,26 @@ function studyScreen() {
         ui.revealed = true;
         commit(RATINGS.again, { stay: true });
       }, { id: 'kp-dunno' }),
+      footBand(),
     );
   } else {
-    box.append(btn('kp-reveal', t("答えを見る"), reveal, { id: 'kp-reveal' }));
+    // the foot's band turns the card where the stage beside it does: its right half in the focus room
+    box.append(btn('kp-reveal', t("答えを見る"), reveal, { id: 'kp-reveal' }), footBand((e) => {
+      if (!ctx.focusRoom || !Number.isFinite(e.clientX) || e.clientX >= innerWidth / 2) reveal();
+    }));
   }
   if (ui.undo) box.append(btn('kp-undo', t("ひとつ戻す"), undo, { id: 'kp-undo' }));
   return box;
+}
+
+/** Hfix-1B · the band under the front's foot (editorial.css draws it in the app; player.css keeps it out of the standalone
+ * pages). A real element, not the study's ::after: it covers the passage that scrolls under it, so a tap there lands on the
+ * band (onTap, if any) and a reading of the page, a contrast sweep's included, finds that text covered, not shown */
+function footBand(onTap) {
+  const band = el('i', 'kp-foot-band');
+  band.setAttribute('aria-hidden', 'true');
+  if (onTap) band.addEventListener('click', onTap);
+  return band;
 }
 
 /** what the front asks, in one line: the marked word (読んで思い出す) or the gap (穴埋め・4択) */

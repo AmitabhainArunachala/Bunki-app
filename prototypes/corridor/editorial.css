@@ -3402,10 +3402,11 @@ body:has(#app .kp-study > .kp-reveal) #app { padding-bottom: 0; }
 #app .kp .kp-study > .kp-reveal::after { content: '›'; margin-left: 8px; font-weight: 400; font-size: var(--type-lead); line-height: 0; }
 #app .kp .kp-study > .kp-reveal:focus-visible { outline: 2px solid var(--kp-stage-ink); outline-offset: -2px; box-shadow: none; }
 /* the foot's band: one strip of the stage under the foot's words, edge to edge and down to the glass, so no passage ink
-   shows around them; drawn by the study itself (under Undo's own band and Reveal), over the passage. Its top 18 px is an
-   alpha mask (no pigment), so a line scrolling under the band recedes into the stage instead of being cut */
-#app .kp-study:has(> .kp-reveal)::after {
-  content: ''; order: 3; flex: none; position: sticky; bottom: 0; z-index: 1; pointer-events: none;
+   shows around them; a real element (mount.js footBand: what it covers is covered, for a tap and for a reader of the
+   page), under Undo's own band and Reveal, over the passage. Its top 18 px is an alpha mask (no pigment), so a line
+   scrolling under the band recedes into the stage instead of being cut; a tap on it turns the card as the stage does */
+#app .kp .kp-study > .kp-foot-band {
+  display: block; order: 3; flex: none; position: sticky; bottom: 0; z-index: 1;
   height: calc(82px + env(safe-area-inset-bottom, 0px));
   margin: -88px calc((100% - 100vw) / 2) calc(-10px - env(safe-area-inset-bottom, 0px));
   background: var(--kp-dock);
