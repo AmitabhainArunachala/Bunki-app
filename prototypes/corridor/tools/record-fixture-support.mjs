@@ -18,6 +18,26 @@ const normalized = (value) => Array.isArray(value) ? value.map(normalized)
     ? Object.fromEntries(Object.keys(value).sort().map((key) => [key, normalized(value[key])])) : value;
 const digest = (value) => createHash('sha256').update(JSON.stringify(normalized(value))).digest('hex');
 
+/** Accept only the actual backup confirmation, for this one file selection.
+ * Rejected files need no dialog; dismissal and cancellation have separate rows. */
+export async function selectBackupFile(page, file) {
+  let problem;
+  const confirm = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', confirm);
+  try {
+    await page.locator('#import-file').setInputFiles(file);
+    await page.waitForFunction(() => !document.querySelector('#import-file')?.value, null, { timeout: 20000 });
+    if (problem) throw problem;
+  } finally { page.off('dialog', confirm); }
+}
+
 /** Synthetic portable file bytes; production code is not used to calculate
  * the fixture's expected digests or counts. */
 export function createAppBackupFixture(record, turns, journal) {
@@ -62,7 +82,7 @@ export async function restoreAppFixture(page, value, { archive, journal } = {}) 
   await page.locator('#tray').click();
   const marker = randomUUID();
   await page.evaluate((marker) => { window.__fixtureImportDocument = marker; }, marker);
-  await page.locator('#import-file').setInputFiles({ name: 'synthetic-fixture-backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(backup)) });
+  await selectBackupFile(page, { name: 'synthetic-fixture-backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(backup)) });
   await page.waitForFunction((marker) => window.__fixtureImportDocument !== marker && document.body.dataset.ready === '1', marker, { timeout: 20000 });
   const after = await readAppRecordSnapshot(page);
   assert.deepEqual(after.record, record, 'The actual importer must commit the supplied synthetic record');

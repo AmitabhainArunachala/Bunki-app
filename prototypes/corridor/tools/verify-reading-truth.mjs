@@ -1,3 +1,4 @@
+import { selectBackupFile } from './record-fixture-support.mjs';
 /** verify-reading-truth · slice R (2026-10-16). The reading a word door shows is the reading its text gives the token,
  * and the entry it stands for is the one read that way: in 令和8年 the ruby says ねん, and the card said とし. A door with
  * no reading of its own (Words, the sky, prose), or with the quick dictionary's own reading, answers from the quick
@@ -662,7 +663,7 @@ async function captureCase(browser, contextOptions) {
     await boot(page);
     if (!(await page.locator('#note-input').count())) await page.locator('#tray').click();
     await page.evaluate(() => { window.__readingTruthDocument = 1; });
-    await page.locator('#import-file').setInputFiles({ name: 'reading-truth.json', mimeType: 'application/json', buffer: exported });
+    await selectBackupFile(page, { name: 'reading-truth.json', mimeType: 'application/json', buffer: exported });
     await page.waitForFunction(() => window.__readingTruthDocument !== 1, null, { timeout: 20000 });
     await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30000 });
     const back = await waitForAppRecord(page, (rec) => (rec.taken || []).some((row) => row.t === 'word' && row.id === '年'),

@@ -1,3 +1,4 @@
+import { selectBackupFile } from './record-fixture-support.mjs';
 /**
  * Repeatable SKIP browser regression. No learner-store fixtures or runtime
  * state injection: controls are driven through clicks, keys and mouse wheel.
@@ -264,7 +265,7 @@ try {
   await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
   await waitForAppRecord(page, record => !record.taken.some(item => item.id === '㐆'));
   await page.locator(await entryCloseSelector(page)).click();
-  await Promise.all([page.waitForEvent('load'), page.setInputFiles('#import-file', backupPath)]);
+  await Promise.all([page.waitForEvent('load'), selectBackupFile(page, backupPath)]);
   await page.waitForFunction(() => document.body.dataset.ready === '1');
   const restored = await readAppRecord(page);
   check('ordinary backup import restores the exact captured answer and schedule',

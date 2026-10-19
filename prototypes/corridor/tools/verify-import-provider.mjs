@@ -1,3 +1,4 @@
+import { selectBackupFile } from './record-fixture-support.mjs';
 /** Actual-browser import and provider regressions. All records and credentials
  * are synthetic, and every external request is intercepted before transport.
  * KAIRO_SITE_DIR may name the staged release; evidence stays outside the repo.
@@ -100,7 +101,7 @@ async function importRecord(page, record) {
   if (!(await page.locator('#import-file').count())) await page.click('#tray');
   const marker = `document-${++caseNumber}`;
   await page.evaluate((value) => { window.__importDocument = value; }, marker);
-  await page.locator('#import-file').setInputFiles({
+  await selectBackupFile(page, {
     name: `synthetic-record-${caseNumber}.json`, mimeType: 'application/json',
     buffer: Buffer.isBuffer(record) ? record : Buffer.from(JSON.stringify(record)),
   });

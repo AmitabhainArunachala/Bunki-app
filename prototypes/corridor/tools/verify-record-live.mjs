@@ -1,3 +1,4 @@
+import { selectBackupFile } from './record-fixture-support.mjs';
 /** Actual staged app journeys over its installation's native IndexedDB store.
  * Setup seeds an isolated origin before the app starts. Every action thereafter
  * uses rendered UI; no app/controller instance or replacement runtime is used.
@@ -768,7 +769,7 @@ try {
         const rejected = await disk(destination);
         assert.deepEqual(rejected.record, fresh.record, 'A hash-inconsistent backup cannot replace the destination');
         assert.deepEqual(rejected.archive, fresh.archive);
-        await destination.locator('#import-file').setInputFiles(path);
+        await selectBackupFile(destination, path);
         await destination.waitForFunction(() => document.body.dataset.ready === '1' && !document.querySelector('#import-file'));
         await ready(destination);
         const restored = await disk(destination);
