@@ -325,6 +325,9 @@ async function kanjiRepaintRow() {
     const before = roots(await readAppRecord(page));
     assert(before.taken.some(item => item.t === 'kanji' && item.id === '生'), 'Real repaint fixture imported');
     await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#reveal').click();
+    // Show answer commits through roomTransition. Observe the public answer row
+    // before sampling pending; the real reference response is still held here.
+    await page.locator('.review-reading-row').waitFor({ state: 'visible', timeout: 4000 });
     const pending = await page.evaluate(readKanjiReview), during = roots(await readAppRecord(page));
     const wasHeld = requests === 1 && !released && !forcedRelease;
     const pendingRecord = { ...canonical, on: canonical.lessonOn, kun: canonical.lessonKun, officialReadings: [] };
