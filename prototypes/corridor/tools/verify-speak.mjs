@@ -760,13 +760,22 @@ const CASES = {
       // a word in Kore's line: the slip opens, the look-up counts under the conversation, the top bar names it
       const koreWord = page.locator('.speak-line[data-who="kore"] .speak-text .sentence-tok').first();
       const b = await koreWord.getAttribute('data-speak-b');
-      // G3 · a word climbs its ladder: when readings show on touch and the word's own is hidden, the first tap raises its
-      // reading in place and the next opens the slip
+      // G3 · a word climbs its ladder: when its own reading is hidden, the first tap raises it in place; Ladder (John, 10-19):
+      // the next sets its English under it, and only the one after opens the slip. Each next tap comes only once the rung
+      // before it is seen, past the last one; a rung that does not move is never tapped again
       const climb = async (word) => {
-        await word.click();
-        const rung = await page.waitForFunction((el) => (document.getElementById('mini') ? 'stage' : el.dataset.ladderRung === 'reading' ? 'reading' : null),
-          await word.elementHandle(), { timeout: 8000 }).then((h) => h.jsonValue()).catch(() => null);
-        if (rung === 'reading') await word.click();
+        const el = await word.elementHandle();
+        let rung = null;
+        do {
+          await word.click();
+          rung = await page.waitForFunction(({ el, after }) => {
+            if (document.getElementById('mini')) return 'stage';
+            const order = ['reading', 'gloss'], now = el.dataset.ladderRung;
+            // the English rung is seen once its row stands under the word
+            if (now === 'gloss' && !el.querySelector(':scope > .tok-en .tok-en-text')) return null;
+            return order.indexOf(now) > order.indexOf(after) ? now : null;
+          }, { el, after: rung }, { timeout: 8000 }).then((h) => h.jsonValue()).catch(() => null);
+        } while (rung === 'reading' || rung === 'gloss');
       };
       await climb(koreWord);
       await page.waitForSelector('#mini', { timeout: 8000 });

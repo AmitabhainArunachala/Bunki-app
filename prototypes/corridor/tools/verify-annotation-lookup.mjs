@@ -58,12 +58,36 @@ async function openLookup(page, text = '電車') {
   }, text);
   await page.locator('#annotation-anchor[data-ladder-rung="reading"] rt').waitFor();
   assert.equal(await page.locator('#mini').count(), 0, 'The first activation exposes reading only');
+  // Ladder (John, 10-19: "one tap should just be the furigana"): no English under the word yet
+  assert.equal(await page.locator('#annotation-anchor .tok-en').count(), 0, 'The first activation exposes reading only, no English');
   const shown = await page.locator('#annotation-anchor rt').evaluate(node => ({ text: node.textContent,
     opacity: Number(getComputedStyle(node).opacity), visibility: getComputedStyle(node).visibility }));
   assert(shown.text && shown.opacity > 0 && shown.visibility !== 'hidden', 'The first reading must actually paint');
+  // Ladder (John, 10-19, a spec change): the second activation no longer opens the stage. It sets the English of the entry
+  // the lookup names under the word, the reading kept and no stage; only once that rung is seen does the third activation
+  // open the stage, the reading and the English kept under the word.
+  const expected = await page.evaluate(text => window.annotationFixture.D.dict[text]?.m?.[0] ?? null, text);
+  assert(expected, `The fixture word ${text} has a core entry with English`);
+  await page.evaluate(text => window.annotationFixture.openJapaneseLookup(document.getElementById('annotation-anchor'), text), text);
+  await page.locator('#annotation-anchor[data-ladder-rung="gloss"] > .tok-en > .tok-en-text').waitFor();
+  assert.equal(await page.locator('#mini').count(), 0, 'The second activation sets the English under the word, not the stage');
+  const english = await page.locator('#annotation-anchor').evaluate(node => {
+    const rows = node.querySelectorAll(':scope > .tok-en');
+    const ink = rows[0]?.querySelector(':scope > .tok-en-text');
+    const style = ink ? getComputedStyle(ink) : null;
+    const rt = node.querySelector('rt'), reading = rt ? getComputedStyle(rt) : null;
+    return { rows: rows.length, text: ink?.textContent.trim() || null,
+      painted: !!style && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && ink.getClientRects().length > 0,
+      reading: !!reading && !!rt.textContent.trim() && reading.display !== 'none' && reading.visibility !== 'hidden' && Number(reading.opacity) > 0,
+      hasEn: node.classList.contains('has-en'), aside: node.dataset.depthAside ?? null };
+  });
+  assert.deepEqual(english, { rows: 1, text: expected, painted: true, reading: true, hasEn: true, aside: 'meaning' },
+    'The second activation paints the entry\'s English in one row under the word, its reading kept, the DOTS hook on it');
   await page.evaluate(text => window.annotationFixture.openJapaneseLookup(document.getElementById('annotation-anchor'), text), text);
   await page.locator('#mini').waitFor();
   assert.equal(await page.locator('#annotation-anchor').getAttribute('data-ladder-rung'), 'stage');
+  assert.equal(await page.locator('#annotation-anchor').evaluate(node => node.querySelector(':scope > .tok-en > .tok-en-text')?.textContent.trim() ?? null),
+    expected, 'The stage keeps the English under the word');
 }
 // Save ▾ (1.3.0; one-hand pass 2026-10-15): the popup has one Save and no list button. On a word not yet saved the
 // press saves it and unfolds its menu (Review · lists · + New list · Copy) inside the card, under the button; on a
@@ -247,9 +271,12 @@ const cases = [
     const word = page.locator('#assistance-fixture [data-lookup-text="電車"]');
     await word.click(); await page.waitForFunction(() => window.annotationGate.calls === 1);
     assert.equal(await page.locator('#mini, #assistance-fixture rt').count(), 0, 'Neither reading nor stage may appear while assistance persistence is pending');
+    // Ladder (John, 10-19): the English under the word is a hint too; admission still precedes every reveal
+    assert.equal(await page.locator('#assistance-fixture .tok-en').count(), 0, 'No English may appear while assistance persistence is pending');
     await page.evaluate(() => window.annotationGate.resolve(false));
     await page.waitForTimeout(50);
     assert.equal(await page.locator('#mini, #assistance-fixture rt').count(), 0, 'Rejected assistance cannot reveal a reading or stage');
+    assert.equal(await page.locator('#assistance-fixture .tok-en').count(), 0, 'Rejected assistance cannot reveal the English');
     await word.click(); await page.waitForFunction(() => window.annotationGate.calls === 2);
     await page.evaluate(() => {
       const old = document.querySelector('#assistance-fixture [data-lookup-text="電車"]');
@@ -258,6 +285,8 @@ const cases = [
     });
     await page.locator('#assistance-fixture [data-ladder-rung="reading"] rt').waitFor();
     assert.equal(await page.locator('#mini').count(), 0, 'Approved first help reveals only the reading on the replacement occurrence');
+    // Ladder (John, 10-19: "one tap should just be the furigana"): the English under the word is the next rung, not this one
+    assert.equal(await page.locator('#assistance-fixture .tok-en').count(), 0, 'Approved first help reveals only the reading, no English');
     assert.equal(await page.locator('#assistance-fixture rt').textContent(), 'でんしゃ');
     assert.equal(await page.locator('#assistance-fixture rt').evaluate(node => {
       const style = getComputedStyle(node); return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0;

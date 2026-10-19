@@ -35,8 +35,22 @@ assert(!requireFull || (!caseFilter && engines.length === requiredEngines.length
 const host = await startStaticHost({ site, port: 0 });
 const act = (page, action) => page.locator(`.guided-room [data-action="${action}"]`).first();
 const stored = page => page.evaluate(key => JSON.parse(localStorage.getItem(key)), key);
-// A written kanji with a hidden reading exercises both rungs; kana may correctly skip to stage.
+// A written kanji with a hidden reading exercises every rung (reading, English, stage); kana correctly starts at its English.
 const lookup = page => page.locator('.guided-room .gs-question .japanese-lookup-word').filter({ hasText: /\p{Script=Han}/u }).first();
+/** Ladder · the English rung as drawn on one occurrence: its rows of English under the word (.tok-en > .tok-en-text), that
+ * text and whether it paints, whether the reading still paints over the word, and the has-en / DOTS-hook marks. */
+const englishFacts = node => {
+  const rows = node.querySelectorAll(':scope > .tok-en');
+  const ink = rows[0]?.querySelector(':scope > .tok-en-text');
+  const style = ink ? getComputedStyle(ink) : null;
+  return { rows: rows.length, text: ink?.textContent.trim() || null,
+    painted: !!style && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && ink.getClientRects().length > 0,
+    reading: [...node.querySelectorAll('rt')].some(rt => {
+      const shown = getComputedStyle(rt);
+      return rt.textContent.trim() && shown.display !== 'none' && shown.visibility !== 'hidden' && Number(shown.opacity) > 0;
+    }),
+    hasEn: node.classList.contains('has-en'), aside: node.dataset.depthAside ?? null };
+};
 const learning = async page => {
   const record = await readAppRecord(page);
   return { taken: record.taken || [], srs: record.srs || {}, revlog: record.revlog || [] };
@@ -62,12 +76,17 @@ async function closeMini(page) {
   await page.locator('#mini').waitFor({ state: 'detached' });
   assert.equal(await page.locator('.guided-room [data-ladder-rung]').count(), 0, 'Closing the stage clears its reading rung');
   assert.equal(await lookup(page).locator('rt').count(), 0, 'The occurrence is bare again');
+  // Ladder (John, 10-19): bare is also without the English the climb set under the word, and without its DOTS-hook marks
+  assert.equal(await page.locator('.guided-room .tok-en, .guided-room .has-en, .guided-room [data-depth-aside]').count(), 0,
+    'Closing the stage clears the English under the word');
 }
 async function revealReading(page) {
   assert.equal(await lookup(page).locator('rt').count(), 0, 'No reading before activation');
   await lookup(page).click();
   await page.locator('.guided-room .gs-question [data-ladder-rung="reading"]').waitFor();
   assert.equal(await page.locator('#mini').count(), 0, 'First tap reveals only the reading');
+  // Ladder (John, 10-19: "one tap should just be the furigana"): no English under the word yet
+  assert.equal(await lookup(page).locator('.tok-en').count(), 0, 'First tap reveals only the reading, not the English');
   const visible = await lookup(page).locator('rt').evaluateAll(nodes => nodes.some(node => {
     const style = getComputedStyle(node);
     return node.textContent.trim() && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0;
@@ -75,9 +94,23 @@ async function revealReading(page) {
   assert.equal(visible, true, 'The reading is actually visible, not only marked in state');
 }
 async function openStage(page) {
+  // Ladder (John, 10-19, a spec change): the repeated tap no longer opens the stage. It sets the word's English under the
+  // same occurrence, its reading kept and no stage; only once that rung is seen does the next tap advance the same
+  // occurrence to its stage, the reading and the English kept under it.
+  await lookup(page).click();
+  await page.locator('.guided-room .gs-question [data-ladder-rung="gloss"]').waitFor();
+  assert.equal(await lookup(page).getAttribute('data-ladder-rung'), 'gloss', 'The repeated tap advances the same occurrence to its English');
+  assert.equal(await page.locator('#mini').count(), 0, 'The second tap shows the English under the word, not the stage');
+  const { text: english, ...drawn } = await lookup(page).evaluate(englishFacts);
+  assert.deepEqual(drawn, { rows: 1, painted: true, reading: true, hasEn: true, aside: 'meaning' },
+    'The English rung paints one row of English under the word, its reading kept, the DOTS hook on this occurrence');
+  assert(english, 'The English row says the entry\'s English, or the dash where the entry has none');
   await lookup(page).click();
   await page.locator('#mini').waitFor();
   assert.equal(await lookup(page).getAttribute('data-ladder-rung'), 'stage', 'The repeated tap advances the same occurrence');
+  assert.equal(await lookup(page).evaluate(node => node.querySelector(':scope > .tok-en > .tok-en-text')?.textContent.trim() ?? null), english,
+    'The stage keeps the same English under the word');
+  return english;
 }
 async function visitEntryAndReturn(page) {
   const occurrence = await lookup(page).elementHandle();
@@ -120,7 +153,9 @@ try {
         window.__guidedHintSnapshots = [];
         addEventListener('DOMContentLoaded', () => {
           new MutationObserver(() => {
+            // Ladder (John, 10-19): the English under the word is a rung of its own, between the reading and the stage
             const rung = document.querySelector('.guided-room [data-ladder-rung="reading"]') ? 'reading'
+              : document.querySelector('.guided-room [data-ladder-rung="gloss"]') ? 'gloss'
               : document.getElementById('mini') ? 'stage' : document.getElementById('sheet') ? 'entry' : null;
             if (!rung || window.__guidedHintSnapshots.some(row => row.rung === rung)) return;
             window.__guidedHintSnapshots.push({ rung, state: JSON.parse(localStorage.getItem(key)) });
@@ -166,7 +201,10 @@ try {
         assert.equal(atHint.answers[first].correct, null);
         assert.equal(atHint.answers[first].helpBefore, false);
         assert.equal(atHint.answers[first].explained, false, 'Dictionary help does not reveal the explanation');
-        await openStage(page);
+        const english = await openStage(page);
+        const atGloss = await page.evaluate(() => window.__guidedHintSnapshots.find(row => row.rung === 'gloss')?.state);
+        assert(atGloss, 'The English rung was observed');
+        assert.deepEqual(atGloss.answers[first], atHint.answers[first], 'Advancing to the English does not change assistance or the answer');
         const atStage = await page.evaluate(() => window.__guidedHintSnapshots.find(row => row.rung === 'stage')?.state);
         assert.deepEqual(atStage?.answers[first], atHint.answers[first], 'Advancing to the stage does not change assistance or the answer');
         const returned = await visitEntryAndReturn(page);
@@ -188,7 +226,7 @@ try {
         await page.reload();
         await page.waitForFunction(() => document.body.dataset.ready === '1');
         assert.deepEqual((await stored(page)).answers, state.answers, 'Help and first responses survive reload');
-        return { beforeHint: atHint.answers[first], first: state.answers[first], second: state.answers[second], returned };
+        return { beforeHint: atHint.answers[first], english, first: state.answers[first], second: state.answers[second], returned };
       });
       await check('refused-write-retry-and-retired-question', async page => {
         const first = Q[0].id, second = Q[1].id, before = await stored(page);

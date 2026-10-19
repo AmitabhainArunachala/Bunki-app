@@ -265,6 +265,17 @@ const englishRow = (node) => {
     englishUnder: !!box && !!glyphs && box.top >= glyphs.top + glyphs.height - 1,
     aside: node.dataset.depthAside ?? null, asideElsewhere: [...document.querySelectorAll('[data-depth-aside]')].filter((other) => other !== node).length };
 };
+/** A tap, then the occurrence's own answer to it: its rung moves (or a stage stands or goes) before it is read. A lookup word
+ * prepares its dictionary first, so a fixed pause can read it before it answers; this waits for the answer (≤ 10 s), and
+ * a door that never answers is read as it stands, so its row still fails. */
+async function tapSettled(page, locator, { pause = 250 } = {}) {
+  const node = await locator.elementHandle();
+  const before = await node.evaluate((n) => ({ rung: n.dataset.ladderRung || null, stages: document.querySelectorAll('#mini').length }));
+  await locator.tap();
+  await page.waitForFunction(({ n, before }) => (n.dataset.ladderRung || null) !== before.rung || document.querySelectorAll('#mini').length !== before.stages,
+    { n: node, before }, { timeout: 10000 }).catch(() => {});
+  await delay(pause);
+}
 async function ladderFacts(page, locator) {
   const reading = await locator.evaluate(visibleReading);
   const row = await locator.evaluate(englishRow);
@@ -2934,18 +2945,18 @@ try {
       const word = page.locator('#reader .tok[data-index="0"]');
       check('G3.kana.fixture', 'the first word is the authored ダマスカス fixture', await word.getAttribute('data-prose-label') === 'ダマスカス', await word.textContent());
       // Ladder · a word that is its own kana has no reading to show: its first activation is its English, its second the stage
-      await word.tap(); await delay(600);
+      await tapSettled(page, word, { pause: 350 });
       const same = await ladderFacts(page, word);
       check('G3.kana.identical', 'identical kana, including hiragana/katakana equivalents, skips an empty reading rung: its first activation is its English under it',
         !same.reading && !!same.english && same.englishUnder && !same.stages && !same.page, same);
-      await word.tap(); await delay(600);
+      await tapSettled(page, word, { pause: 600 });
       const kanaStage = await ladderFacts(page, word);
       check('G3.kana.stage', 'its second activation opens its stage, with no reading rung invented', kanaStage.stages === 1 && kanaStage.word === 'ダマスカス' && !kanaStage.page && !kanaStage.reading, kanaStage);
       await page.keyboard.press('Escape'); await delay(200);
       const particle = readerWord(page, 'の');
-      await particle.tap(); await delay(600);
+      await tapSettled(page, particle, { pause: 350 });
       const partEnglish = await ladderFacts(page, particle);
-      await particle.tap(); await delay(600);
+      await tapSettled(page, particle, { pause: 600 });
       const part = await ladderFacts(page, particle);
       check('G3.kana.particle', 'a one-character particle is a word door: its English (its role) under it first, then a nonempty stage',
         !!partEnglish.english && !partEnglish.stages && !partEnglish.page && part.stages === 1 && !!part.word && !part.page, { partEnglish, part });
@@ -2994,19 +3005,19 @@ try {
           (mode === 0 ? resting.annotations.length === 0 : resting.annotations.some(rt => rt.text === 'ねん')), resting);
         // Ladder (John, 10-19): a sentence's word climbs as the reader's does — its reading where it is not already up (off
         // too), then its English under it, then its stage
-        await target.tap(); await delay(350);
+        await tapSettled(page, target, { pause: 300 });
         const first = await state();
         check(`${id}.first`, `${surface}/${name}: first activation ${mode === 2 ? 'sets the English under the word, its reading already up' : 'visibly reveals only its reading'}`,
           first.parentPage === parentPage && !first.stages && (mode === 2
             ? first.reading && first.rung === 'gloss' && !!first.english && first.englishUnder
             : first.reading && first.rung === 'reading' && !first.english), first);
         if (mode !== 2) {
-          await target.tap(); await delay(350);
+          await tapSettled(page, target, { pause: 300 });
           const english = await state();
           check(`${id}.english`, `${surface}/${name}: second activation keeps the reading and sets the English under the word`,
             english.parentPage === parentPage && !english.stages && english.reading && english.rung === 'gloss' && !!english.english && english.englishUnder, english);
         }
-        await target.tap(); await delay(350);
+        await tapSettled(page, target, { pause: 450 });
         const staged = await state();
         check(`${id}.stage`, `${surface}/${name}: one stage retains the occurrence, its reading and its English`,
           staged.stages === 1 && staged.word === '年' && staged.parentPage === parentPage && staged.reading && !!staged.english, staged);
@@ -3291,16 +3302,16 @@ try {
           (mode !== 2 || resting.annotations.includes('わ')), resting);
         // Ladder (John, 10-19): meaningful は → わ shows its reading first wherever it is not up (on touch and off), then its
         // English (its role) under it, then its stage; with readings always up, its English comes first
-        await target.tap(); await delay(350); const first = await state();
+        await tapSettled(page, target, { pause: 300 }); const first = await state();
         check(`${id}.first`, `${name}: meaningful は → わ ${mode === 2 ? 'keeps わ and sets its English under it first' : 'uses the reading rung first'}`, mode === 2
           ? first.reading && first.annotations.includes('わ') && first.rung === 'gloss' && !!first.english && !first.stages
           : first.reading && first.annotations.includes('わ') && first.rung === 'reading' && !first.english && !first.stages, first);
         if (mode !== 2) {
-          await target.tap(); await delay(350); const english = await state();
+          await tapSettled(page, target, { pause: 300 }); const english = await state();
           check(`${id}.english`, `${name}: its second activation keeps わ and sets its English (its role) under it`,
             english.reading && english.rung === 'gloss' && !!english.english && !english.stages, english);
         }
-        await target.tap(); await delay(350);
+        await tapSettled(page, target, { pause: 450 });
         const staged = await state();
         check(`${id}.stage`, 'the particle stage keeps its meaningful reading and its English, and has no Save',
           staged.stages === 1 && staged.word === 'は' && staged.reading && !!staged.english && staged.save === null, staged);
@@ -3340,6 +3351,15 @@ try {
       if (desk) await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
       else await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
     };
+    // a press, then the occurrence's own answer to it (its rung moves, or a stage stands or goes), never a fixed guess
+    const pressSettled = async (page, locator, pause = 350) => {
+      const node = await locator.elementHandle();
+      const before = await node.evaluate((n) => ({ rung: n.dataset.ladderRung || null, stages: document.querySelectorAll('#mini').length }));
+      await press(page, locator);
+      await page.waitForFunction(({ n, before }) => (n.dataset.ladderRung || null) !== before.rung || document.querySelectorAll('#mini').length !== before.stages,
+        { n: node, before }, { timeout: 10000 }).catch(() => {});
+      await delay(pause);
+    };
     // the English row as read: the world's own ink, and no word or reading of another line under it
     const englishLook = (node) => {
       const ink = node.querySelector(':scope > .tok-en .tok-en-text');
@@ -3369,17 +3389,17 @@ try {
     const ladderClimb = async (page) => {
       await openStory(page);
       const word = readerWord(page);
-      await press(page, word); await delay(500);
+      await pressSettled(page, word, 300);
       const t1 = await ladderFacts(page, word);
       check('L.tap1', 'tap 1: only the reading over the word: no English, no box', t1.reading && !t1.english && !t1.stages && !t1.page, t1);
-      await press(page, word); await delay(650);
+      await pressSettled(page, word, 450);
       const t2 = { ...await ladderFacts(page, word), ...await word.evaluate(englishLook) };
       check('L.tap2', 'tap 2: the reading stays and the English stands under the word, ≥ 13 px, in the world\'s ink, over no word or reading of the next line; no box',
         t2.reading && !!t2.english && t2.english !== '—' && t2.englishUnder && t2.englishPx >= 13 && t2.ink && t2.coversNothing && !t2.stages && !t2.page, t2);
       check('L.dots', 'tap 2: data-depth-aside="meaning" on this occurrence and on no other (the DOTS hook)', t2.aside === 'meaning' && t2.asideElsewhere === 0,
         { aside: t2.aside, elsewhere: t2.asideElsewhere });
       await page.screenshot({ path: resolve(evidence, `${engine}-L-tap2.png`) });
-      await press(page, word); await delay(900);
+      await pressSettled(page, word, 700);
       const t3 = await ladderFacts(page, word), c3 = await boxClear(page, word);
       check('L.tap3', 'tap 3: the box stands, over neither the word\'s reading, nor the word, nor its English', t3.stages === 1 && t3.word === WORD && !t3.page && c3.clear, { t3, c3 });
       await page.screenshot({ path: resolve(evidence, `${engine}-L-tap3.png`) });
@@ -3401,7 +3421,9 @@ try {
       for (const [dir, where, dy] of [['down', 'bottom', 90], ['up', 'top', -90]]) {
         const index = await pickPlace(page, where);
         const word = page.locator(`#reader .tok[data-index="${index}"]`);
-        for (let step = 0; step < 3 && !(await page.locator('#mini').count()); step++) { await press(page, word); await delay(800); }
+        for (let step = 0; step < 3 && !(await page.locator('#mini').count()); step++) { await pressSettled(page, word, 600); }
+        // D7 may glide the text to make the box room: the scroll under test starts once the page stands still
+        await page.evaluate(() => new Promise((done) => { let last = scrollY, still = 0; const tick = () => { still = scrollY === last ? still + 1 : 0; last = scrollY; if (still >= 6) done(); else requestAnimationFrame(tick); }; requestAnimationFrame(tick); }));
         const before = { ...await boxClear(page, word), scrollY: await page.evaluate(() => scrollY) };
         const wb = await word.boundingBox();
         // the pointer rests on the text, away from the box: a scroll there is the page's, as a trackpad's is
@@ -3492,7 +3514,7 @@ try {
             const index = await pickPlace(page, where);
             if (index == null) { places.push({ where, index: null }); continue; }
             const word = page.locator(`#reader .tok[data-index="${index}"]`);
-            for (let step = 0; step < 3 && !(await page.locator('#mini').count()); step++) { await press(page, word); await delay(800); }
+            for (let step = 0; step < 3 && !(await page.locator('#mini').count()); step++) { await pressSettled(page, word, 600); }
             await delay(500);
             places.push({ where, index, label: await word.getAttribute('data-prose-label'), ...await boxClear(page, word) });
             if (where === 'top') await page.screenshot({ path: resolve(evidence, `${engine}-L-place-${viewport.width}-${world}-${dial}-top.png`) });
@@ -3502,6 +3524,101 @@ try {
             places.length === 3 && places.every((place) => place.index != null && place.clear), places);
         }
       }
+    };
+    // the lead's sweep (10-19, W2): the top bar's ‹ Back with a reading, an English or a box up folds the word first, as
+    // Escape does (bare in one step), and only the next Back leaves the article
+    const ladderBack = async (page) => {
+      const results = [];
+      for (const [rungs, label] of [[1, 'reading'], [2, 'english'], [3, 'box']]) {
+        await openStory(page);
+        const word = readerWord(page);
+        for (let step = 0; step < rungs; step++) await pressSettled(page, word, step === 2 ? 700 : 350);
+        const up = await ladderFacts(page, word);
+        await press(page, page.locator('#back')); await delay(600);
+        // a Back that left the article leaves no word to read: that is recorded, never waited for
+        const view = await page.evaluate(() => document.body.dataset.view);
+        const first = { view, ...(view === 'reader' && await word.count() ? await ladderFacts(page, word) : { left: true }) };
+        let second = { view };
+        if (view === 'reader') { await press(page, page.locator('#back')); await delay(1000); second = await page.evaluate(() => ({ view: document.body.dataset.view })); }
+        results.push({ label, up: { reading: up.reading, english: up.english, stages: up.stages },
+          first: { view: first.view, reading: first.reading, english: first.english, stages: first.stages, page: first.page }, second });
+      }
+      check('L.bar-back', 'the top bar\'s ‹ Back with a reading, an English or a box up folds the word bare in one step and stays in the article; the next Back leaves it',
+        results.length === 3 && results.every((row) => (row.label === 'reading' ? row.up.reading && !row.up.english && !row.up.stages
+          : row.label === 'english' ? !!row.up.english && !row.up.stages : row.up.stages === 1) &&
+          row.first.view === 'reader' && !row.first.reading && !row.first.english && !row.first.stages && !row.first.page && row.second.view !== 'reader'), results);
+    };
+    // the lead's sweep (10-19, D7): 総理 high, in the middle and low on the glass; its box shows both kanji rows (総, 理) whole —
+    // inside its painted box, clear of its fading foot, between the bars and the floor — with no scroll of its own, and stands
+    // on neither the word nor its reading
+    const d7Facts = (word) => word.evaluate((node) => {
+      const mini = document.getElementById('mini');
+      if (!mini) return { mini: false };
+      const edge = (sel, side, fallback) => { const n = document.querySelector(sel); if (!n) return fallback; const style = getComputedStyle(n);
+        if (!['fixed', 'sticky'].includes(style.position) || style.display === 'none') return fallback; const b = n.getBoundingClientRect(); return b.height ? b[side] : fallback; };
+      const ceiling = Math.max(edge('#app > .chrome', 'bottom', 0), edge('#app > .scale-thread', 'bottom', 0));
+      const floor = Math.min(edge('#primary-tabs', 'top', innerHeight), edge('.listen-row', 'top', innerHeight), innerHeight);
+      const box = mini.getBoundingClientRect(), more = mini.dataset.more === 'true';
+      const shownFoot = box.top + mini.clientHeight - (more ? 32 : 0);
+      const rows = [...mini.querySelectorAll('.mini-kanji > .mini-kanji-row')].map((row) => {
+        const b = row.getBoundingClientRect();
+        return { text: row.textContent.trim().slice(0, 1), top: Math.round(b.top), bottom: Math.round(b.bottom),
+          whole: b.top >= box.top - 0.5 && b.bottom <= shownFoot + 0.5 && b.top >= ceiling - 0.5 && b.bottom <= floor + 0.5 };
+      });
+      const web = mini.querySelector(':scope > .mini-web')?.getBoundingClientRect();
+      return { mini: true, scrollTop: mini.scrollTop, more, compact: mini.classList.contains('is-compact'), glide: mini.dataset.glide ?? null,
+        mustFoot: web ? Math.round(web.bottom - box.top + mini.scrollTop) : null, scrollY: Math.round(scrollY),
+        box: { top: Math.round(box.top), bottom: Math.round(box.bottom) }, ceiling, floor, rows };
+    });
+    // the word as the card's seat counts it before the stage (its reading over it, its English under it), and the two rooms
+    const d7Before = (word) => word.evaluate((node) => {
+      const edge = (sel, side, fallback) => { const n = document.querySelector(sel); if (!n) return fallback; const style = getComputedStyle(n);
+        if (!['fixed', 'sticky'].includes(style.position) || style.display === 'none') return fallback; const b = n.getBoundingClientRect(); return b.height ? b[side] : fallback; };
+      const ceiling = Math.max(8, edge('#app > .chrome', 'bottom', 0), edge('#app > .scale-thread', 'bottom', 0));
+      const floor = Math.min(edge('#primary-tabs', 'top', innerHeight), edge('.listen-row', 'top', innerHeight), innerHeight) - 8;
+      const range = document.createRange();
+      const rects = [node.getBoundingClientRect(), ...[...node.querySelectorAll('rt')].filter((rt) => !rt.classList.contains('hidden-rt'))
+        .flatMap((rt) => { range.selectNodeContents(rt); return [rt.getBoundingClientRect(), ...range.getClientRects()]; })].filter((r) => r.height > 0.5);
+      const top = Math.min(...rects.map((r) => r.top)), bottom = Math.max(...rects.map((r) => r.bottom));
+      return { scrollY: Math.round(scrollY), roomAbove: Math.round(top - 10 - ceiling), roomBelow: Math.round(floor - (bottom + 10)) };
+    });
+    const ladderD7 = (viewport) => async (page) => {
+      await openStory(page);
+      const word = readerWord(page);
+      const places = [];
+      for (const where of ['high', 'middle', 'low']) {
+        await word.evaluate((node, where) => {
+          const edge = (sel, side, fallback) => { const n = document.querySelector(sel); if (!n) return fallback; const style = getComputedStyle(n);
+            if (!['fixed', 'sticky'].includes(style.position) || style.display === 'none') return fallback; const b = n.getBoundingClientRect(); return b.height ? b[side] : fallback; };
+          const ceiling = Math.max(edge('#app > .chrome', 'bottom', 0), edge('#app > .scale-thread', 'bottom', 0));
+          const floor = Math.min(edge('#primary-tabs', 'top', innerHeight), edge('.listen-row', 'top', innerHeight), innerHeight);
+          const target = where === 'high' ? ceiling + 36 : where === 'middle' ? (ceiling + floor) / 2 - 20 : floor - 90;
+          scrollBy(0, node.getBoundingClientRect().top - target);
+        }, where);
+        await delay(450);
+        const placed = await word.evaluate((node) => Math.round(node.getBoundingClientRect().top));
+        let before = null;
+        for (let step = 0; step < 3 && !(await page.locator('#mini').count()); step++) {
+          // the word as it stands just before the tap that opens its card: its rooms decide whether the print may move
+          if (['gloss', 'reading'].includes(await word.getAttribute('data-ladder-rung')) || step === 2) before = await d7Before(word);
+          await pressSettled(page, word, 500);
+        }
+        await delay(1100);
+        const seen = await d7Facts(word), clear = await boxClear(page, word);
+        const moved = seen.mini && before ? seen.scrollY - before.scrollY : null;
+        // the print stays still, unless even the compact card's kanji rows had no room beside the word where it stood (D7's
+        // case 3), and then it moved exactly the glide the card records
+        const still = moved !== null && Math.abs(moved) < 1 && seen.glide === null;
+        const glideJustified = moved !== null && seen.glide !== null && seen.compact && seen.mustFoot !== null &&
+          Math.max(before.roomAbove, before.roomBelow) < seen.mustFoot - 1 && Math.abs(moved - Number(seen.glide)) <= 2;
+        places.push({ where, placed, before, moved, still, glideJustified, ...seen, clear: clear.clear, overReading: clear.overReading, overWord: clear.overWord });
+        if (where !== 'high') await page.screenshot({ path: resolve(evidence, `${engine}-L-d7-${viewport.width}-${where}.png`) });
+        await page.keyboard.press('Escape'); await delay(400);
+      }
+      check(`L.d7.${viewport.width}x${viewport.height}`, `${viewport.width}×${viewport.height}: 総理 high, in the middle and low, its box shows 総's and 理's kanji rows whole with no scroll of its own, over neither the word nor its reading; the print still, unless even the compact box had no room there (then it glides exactly that)`,
+        places.length === 3 && places.every((place) => place.mini && place.scrollTop === 0 && place.rows?.length === 2 &&
+          place.rows[0].text === '総' && place.rows[1].text === '理' && place.rows.every((row) => row.whole) && place.clear &&
+          (place.still || place.glideJustified)), places);
     };
     const ladderRun = async (name, body, options = {}) => {
       const begin = rows.length;
@@ -3513,23 +3630,23 @@ try {
       // always: the reading is up at rest, so tap 1 is the English and tap 2 the box
       await openStory(page); await furigana(page, 2);
       let word = readerWord(page);
-      await press(page, word); await delay(650);
+      await pressSettled(page, word, 450);
       const a1 = await ladderFacts(page, word);
       check('L.always.tap1', 'ふりがな always: tap 1 is the English under the word (its reading already up), no box', a1.reading && !!a1.english && a1.englishUnder && !a1.stages && !a1.page, a1);
-      await press(page, word); await delay(900);
+      await pressSettled(page, word, 700);
       const a2 = await ladderFacts(page, word);
       check('L.always.tap2', 'ふりがな always: tap 2 is the box', a2.stages === 1 && a2.word === WORD && !a2.page, a2);
       await page.keyboard.press('Escape'); await delay(300);
       // off: a tap still shows that one word's reading first (that is what tapping is for), then its English, then the box
       await openStory(page); await furigana(page, 0);
       word = readerWord(page);
-      await press(page, word); await delay(500);
+      await pressSettled(page, word, 300);
       const o1 = { ...await ladderFacts(page, word), others: await othersReading(word) };
       check('L.off.tap1', 'ふりがな off: tap 1 shows that one word\'s reading and no other: no English, no box', o1.reading && o1.others === 0 && !o1.english && !o1.stages && !o1.page, o1);
-      await press(page, word); await delay(650);
+      await pressSettled(page, word, 450);
       const o2 = await ladderFacts(page, word);
       check('L.off.tap2', 'ふりがな off: tap 2 keeps the reading and sets the English under the word, no box', o2.reading && !!o2.english && o2.englishUnder && !o2.stages, o2);
-      await press(page, word); await delay(900);
+      await pressSettled(page, word, 700);
       const o3 = await ladderFacts(page, word);
       check('L.off.tap3', 'ふりがな off: tap 3 is the box', o3.stages === 1 && o3.word === WORD && !o3.page, o3);
       await page.keyboard.press('Escape'); await delay(400);
@@ -3540,10 +3657,10 @@ try {
       await openStory(page, { story: { id: 'global-voices:2026-09-28-65726', search: 'ダマスカス' } });
       const word = page.locator('#reader .tok[data-index="0"]');
       const label = await word.getAttribute('data-prose-label');
-      await press(page, word); await delay(650);
+      await pressSettled(page, word, 450);
       const k1 = await ladderFacts(page, word);
       check('L.kana.tap1', 'a kana-only word (ダマスカス): tap 1 is its English, with no reading invented, no box', label === 'ダマスカス' && !k1.reading && !!k1.english && k1.englishUnder && !k1.stages, { label, ...k1 });
-      await press(page, word); await delay(900);
+      await pressSettled(page, word, 700);
       const k2 = await ladderFacts(page, word);
       check('L.kana.tap2', 'a kana-only word: tap 2 is the box', k2.stages === 1 && k2.word === 'ダマスカス' && !k2.page, k2);
     }, ladderView);
@@ -3554,6 +3671,11 @@ try {
     const macView = { viewport: { width: 1440, height: 900 }, mobile: false };
     await ladderRun('L-scroll', ladderScroll, macView);
     await ladderRun('L-mouse', ladderMouse, { viewport: { width: 1440, height: 900 }, mobile: false });
+    await ladderRun('L-back', ladderBack, ladderView);
+    const d7Views = desk ? [{ width: 1440, height: 900 }] : [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 430, height: 932 }];
+    // the D7 control runs where John reads: the Mac in Chromium, the 390×844 phone in WebKit
+    const d7Control = desk ? d7Views[0] : d7Views[1];
+    for (const viewport of d7Views) await ladderRun(`L-d7-${viewport.width}`, ladderD7(viewport), { viewport, mobile: !desk });
     if (withControls && ladderOn) {
       // the Ladder's own named controls: each served in memory (page.route), never edited on disk; killed only when its named
       // rows fail for the witnessed reason while every other row of its schedule passes, and the unmodified restore passes
@@ -3565,8 +3687,22 @@ try {
         { id: 'card-fixed-to-glass', run: 'L-scroll', body: ladderScroll, options: macView, kills: ['L.scroll.down', 'L.scroll.up'],
           witness: (row) => Math.abs(row.observed.rode) < 1 && Math.abs(row.observed.moved) >= 60,
           edits: [{ file: 'corridor.js', key: 'card-stays-on-the-glass',
-            from: "  const ox = scroller === 'window' ? window.scrollX : 0, oy = scroller === 'window' ? window.scrollY : 0;\n  if (scroller === 'window') {",
+            from: "  const ox = scroller === 'window' ? window.scrollX : 0, oy = scroller === 'window' ? startScroll + shift : 0;\n  if (scroller === 'window') {",
             to: "  const ox = 0, oy = 0; // Ladder negative: the card is fixed to the glass\n  if (false) {" }] },
+        { id: 'back-leaves-at-once', run: 'L-back', body: ladderBack, options: ladderView, kills: ['L.bar-back'],
+          witness: (row) => row.observed.some((step) => step.first.view !== 'reader'),
+          edits: [{ file: 'corridor.js', key: 'bar-back-cleared-at-press',
+            from: "target.closest?.('#sheet-back, #chrome-back, #back, [data-bar-back], [data-action=\"navigation.back\"]')",
+            to: "target.closest?.('#sheet-back, #chrome-back, [data-action=\"navigation.back\"]') /* Ladder negative: the bar's Back clears the word at its press */" }] },
+        { id: 'no-room-made', run: `L-d7-${d7Control.width}`, body: ladderD7(d7Control),
+          options: { viewport: d7Control, mobile: !desk }, kills: [`L.d7.${d7Control.width}x${d7Control.height}`],
+          witness: (row) => row.observed.some((place) => place.rows?.some((r) => !r.whole)),
+          edits: [{ file: 'corridor.js', key: 'no-compact-card',
+            from: "    if (top == null && !sentence && anchor?.matches?.('#reader .tok, .japanese-lookup-word, .sentence-tok') &&\n        card.querySelector(':scope > .mini-web') && !card.classList.contains('is-compact')) {",
+            to: '    if (false) { // Ladder negative: no compact card' },
+          { file: 'corridor.js', key: 'no-glide',
+            from: '    if (top == null && !sentence && scroller && Math.max(roomAbove, roomBelow) < mustShowHeight(card)) {',
+            to: '    if (false) { // Ladder negative: no room made; the card is cut where it stands' }] },
         { id: 'no-aside-mark', run: 'L-climb', body: ladderClimb, options: ladderView, kills: ['L.dots'], witness: (row) => row.observed.aside === null,
           edits: [{ file: 'corridor.js', key: 'english-without-aside', from: "  if (hasEn) span.dataset.depthAside = 'meaning';",
             to: "  if (false) span.dataset.depthAside = 'meaning'; // Ladder negative: the English row leaves the dot in place" }] },
@@ -4200,7 +4336,7 @@ try {
           witness: (row) => row.observed.overReading || row.observed.overWord,
           edits: [{ file: 'rooms/read.css', key: 'box-laid-on-the-word',
             from: "#mini[data-side='above'] { --mini-rise: -10px; }",
-            to: "#mini[data-side='above'] { --mini-rise: -10px; translate: 0 22px; }\n#mini[data-side='below'] { translate: 0 -22px; } /* Ladder negative: the box laid over the word and its reading */" }] },
+            to: "#mini[data-side='above'] { --mini-rise: -10px; translate: 0 60px; }\n#mini[data-side='below'] { translate: 0 -60px; } /* Ladder negative: the box laid over the word and its reading */" }] },
         { id: 'ruby-survives-back', run: 'G3-clear', probe: clearProbe, kill: 'G3.clear.bare',
           witness: (row) => row.observed.reading && row.observed.stages === 0 && !row.observed.page,
           edits: [{ file: 'corridor.js', key: 'omit-clear-reveal', from: '  visit.clearReveal?.();', to: '  /* G3 negative: retain the raised reading */' }] },

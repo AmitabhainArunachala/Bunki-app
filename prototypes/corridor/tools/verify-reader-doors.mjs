@@ -121,8 +121,9 @@ const CONTROLS = Object.freeze([
     requires:['D2.f1.door','D2.f1.popup-reading','D2.f0.door','D2.f0.popup-reading'], kills:['D2.f1.bare-after-fold','D2.f0.bare-after-fold'], allowed:[],
     witness:rows => [1,0].every(f => rows.get(`D2.f${f}.bare-after-fold`)?.observed?.every(row => row.visibleRuby === READING)) ? '' : 'the folded word did not retain its exact reading' },
   { name:'g3-off-hidden', title:'off setting shows the touched word no reading', edits:['offHidden'], run:'d2',
-    requires:['D2.f0.door','D2.f0.first-rung','D2.f0.popup-reading'], kills:['D2.f0.visible-reading','D2.f0.accessible-reading'], allowed:[],
-    witness:rows => rows.get('D2.f0.visible-reading')?.observed?.every(value => value === '') ? '' : 'off still showed an inline reading' },
+    // the English rung keeps the touched word's reading over it, so it loses it too under this fault
+    requires:['D2.f0.door','D2.f0.first-rung','D2.f0.popup-reading'], kills:['D2.f0.visible-reading','D2.f0.accessible-reading','D2.f0.english-rung'], allowed:[],
+    witness:rows => rows.get('D2.f0.visible-reading')?.observed?.every(value => value === '') && rows.get('D2.f0.english-rung')?.observed?.englishes?.every(row => row.visibleRuby === '') ? '' : 'off still showed an inline reading' },
   { name:'m8', title:'named lookup click removed', edits:['lookupClick'], run:'d3',
     requires:['D3.k0f2.names','D3.k2f1.names'], kills:['D3.k0f2.opens-lookup','D3.k2f1.opens-lookup'], allowed:[],
     witness:rows => ['k0f2','k2f1'].every(key => rows.get(`D3.${key}.opens-lookup`)?.observed?.mini === null) ? '' : 'a stage still opened' },

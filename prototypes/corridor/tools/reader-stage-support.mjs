@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { setTimeout as delay } from 'node:timers/promises';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
 const calls = [];
 const save = (out) => {
@@ -8,6 +9,17 @@ const save = (out) => {
   writeFileSync(resolve(out, 'g3-reader-stage.json'), JSON.stringify(calls, null, 2) + '\n');
 };
 const record = async (page) => (await readAppRecordSnapshot(page)).record;
+/** Ladder · a durable negative: the record is read again and again for `ms`; the first read that breaks `still` is returned
+ * (a row the step must not write lands inside the window), else the last read. */
+async function quietRecord(page, still, ms = 1500) {
+  const deadline = Date.now() + ms;
+  let latest = await record(page);
+  while (still(latest) && Date.now() < deadline) {
+    await delay(25);
+    latest = await record(page);
+  }
+  return latest;
+}
 async function facts(target, page) {
   return {
     target: await target.evaluate((n) => ({
@@ -16,6 +28,11 @@ async function facts(target, page) {
       word: n.dataset.word,
       rung: n.dataset.ladderRung || null,
       reading: [...n.querySelectorAll('rt')].map((r) => r.textContent).join(''),
+      // Ladder · the English rung's row under the word (its own text, null while no row stands), the column it stands in,
+      // and the DOTS hook it raises on the occurrence
+      english: n.querySelector(':scope > .tok-en .tok-en-text')?.textContent.trim() ?? null,
+      hasEn: n.classList.contains('has-en'),
+      aside: n.dataset.depthAside ?? null,
       // F · a reading is the one ruby: a native rt, painted where it shows. A host that still draws one by ::before is read
       // the same way, so either paint counts and neither is assumed
       visibleReadings: [...n.querySelectorAll('ruby')]
@@ -98,6 +115,8 @@ async function pressGlyph(page, target) {
   await page.mouse.click(point.x, point.y);
   return point;
 }
+/** The exact occurrence's climb to its stage, one observed rung per press (Ladder, John 10-19): the reading (depth 1), the
+ * English under the word (depth 2, the meaning's first showing), then the stage (no row of its own). */
 export async function exactReaderStage(page, target, { word, index, reading, evidenceDir }) {
   const call = {
     word,
@@ -133,6 +152,7 @@ export async function exactReaderStage(page, target, { word, index, reading, evi
     assert.equal(initial.target.rung, null);
     assert.equal(initial.target.reading, reading);
     assert.equal(initial.target.visibleReadings, '');
+    assert.equal(initial.target.english, null, 'The bare word carries no English row');
     assert.equal(initial.mini.length, 0);
     assert.equal(initial.sheets, 0);
     call.firstPoint = await pressGlyph(page, target);
@@ -187,6 +207,7 @@ export async function exactReaderStage(page, target, { word, index, reading, evi
     );
     assert.equal(revealed.target.rung, 'reading');
     assert.equal(revealed.target.visibleReadings, reading);
+    assert.equal(revealed.target.english, null, 'The first activation is just the reading: no English yet');
     assert.equal(revealed.mini.length, 0);
     assert.equal(revealed.sheets, 0);
     const baseline = before.obslog || [],
@@ -194,12 +215,36 @@ export async function exactReaderStage(page, target, { word, index, reading, evi
     assert.deepEqual(rows1.slice(0, -1), baseline);
     assert.deepEqual(rows1.at(-1).slice(1, 4), ['tap', `word:${word}`, 1]);
     assert.equal(typeof rows1.at(-1)[4], 'string');
+    // Ladder (John, 10-19, a spec change): the second activation no longer opens the stage. It sets the word's English
+    // under it, its reading kept over it, and no stage yet; that English is the meaning's first showing, so it (not the
+    // stage) writes the depth-2 row for the same article. Only the observed rung permits the next press.
     call.secondPoint = await pressGlyph(page, target);
-    await page.locator('#mini-sentence-open').waitFor();
+    await page.waitForFunction(
+      ({ index }) =>
+        ['gloss', 'stage'].includes(
+          document.querySelector(`#reader .tok[data-index="${index}"]`)?.dataset.ladderRung,
+        ) || !!document.getElementById('mini'),
+      { index },
+    );
+    assert.equal(
+      await target.getAttribute('data-ladder-rung'),
+      'gloss',
+      'The second activation stops at the English rung, before the stage',
+    );
+    // the row's text is the dictionary's English for the word, waited for on this rung (never a press)
+    await page.waitForFunction(
+      ({ index }) => {
+        const text = document
+          .querySelector(`#reader .tok[data-index="${index}"] > .tok-en .tok-en-text`)
+          ?.textContent.trim();
+        return !!text && text !== '—';
+      },
+      { index },
+    );
     await waitForAppRecord(page, (r) => (r.obslog || []).length === baseline.length + 2);
-    const stage = await facts(target, page),
+    const english = await facts(target, page),
       r2 = await record(page);
-    call.steps.push({ phase: 'stage', facts: stage, record: r2 });
+    call.steps.push({ phase: 'english', facts: english, record: r2 });
     assert.equal(
       await anchor.evaluate(
         (n, index) => n === document.querySelector(`#reader .tok[data-index="${index}"]`),
@@ -208,15 +253,44 @@ export async function exactReaderStage(page, target, { word, index, reading, evi
       true,
       'The second activation keeps the same original occurrence',
     );
-    assert.equal(stage.target.rung, 'stage');
-    assert.deepEqual(stage.mini, [{ key: `word:${word}`, word }]);
-    assert.equal(stage.sheets, 0);
+    assert.equal(english.target.rung, 'gloss');
+    assert.equal(english.target.visibleReadings, reading, 'The English rung keeps the reading over the word');
+    assert(
+      !!english.target.english && english.target.english !== '—',
+      `The English rung draws the word's English under it: ${JSON.stringify(english.target.english)}`,
+    );
+    assert.equal(english.target.hasEn, true, 'The English row stands in the word’s own column');
+    assert.equal(english.target.aside, 'meaning', 'The occurrence’s depth dot steps aside for its English');
+    assert.equal(english.mini.length, 0);
+    assert.equal(english.sheets, 0);
     const rows2 = r2.obslog || [];
     assert.deepEqual(rows2.slice(0, -1), rows1);
     assert.deepEqual(rows2.at(-1).slice(1), ['tap', `word:${word}`, 2, rows1.at(-1)[4]]);
+    // Ladder (John, 10-19, a spec change): the third activation opens the stage; the reading and the English stay under it,
+    // and the stage writes no row of its own (its meaning was shown on the English rung): the record keeps the two rows
+    call.thirdPoint = await pressGlyph(page, target);
+    await page.locator('#mini-sentence-open').waitFor();
+    const r3 = await quietRecord(page, (r) => (r.obslog || []).length === baseline.length + 2);
+    const stage = await facts(target, page);
+    call.steps.push({ phase: 'stage', facts: stage, record: r3 });
+    assert.equal(
+      await anchor.evaluate(
+        (n, index) => n === document.querySelector(`#reader .tok[data-index="${index}"]`),
+        index,
+      ),
+      true,
+      'The third activation keeps the same original occurrence',
+    );
+    assert.equal(stage.target.rung, 'stage');
+    assert.deepEqual(stage.mini, [{ key: `word:${word}`, word }]);
+    assert.equal(stage.sheets, 0);
+    assert.equal(stage.target.visibleReadings, reading, 'The reading stays over the word under its stage');
+    assert.equal(stage.target.english, english.target.english, 'The English stays under the word under its stage');
+    assert.deepEqual(r3.obslog || [], rows2, 'The stage writes no observation row: the English rung showed the meaning');
     for (const k of ['taken', 'srs', 'revlog', 'stats', 'lists']) {
       assert.deepEqual(r1[k], before[k], `${k} unchanged on reading`);
-      assert.deepEqual(r2[k], before[k], `${k} unchanged on stage`);
+      assert.deepEqual(r2[k], before[k], `${k} unchanged on English`);
+      assert.deepEqual(r3[k], before[k], `${k} unchanged on stage`);
     }
     call.passed = true;
   } catch (error) {

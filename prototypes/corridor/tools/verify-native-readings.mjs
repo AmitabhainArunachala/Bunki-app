@@ -273,11 +273,35 @@ async function openQuickLook(page, preferredIndex = 0) {
     (value, index, values) => value < count && values.indexOf(value) === index,
   );
   for (const index of candidates) {
-    // one tap is the quick look (reader lane 2026-10-02); a press and hold opens the word menu instead
-    await touchAt(page, tokens.nth(index));
+    // Ladder (John, 10-19, a spec change): taps climb one observed rung at a time — the reading where it is not already up
+    // (this walk keeps readings always up, so none), then the English under the word, then the quick look (the stage); a tap
+    // is taken only once the rung before it is seen, and none opens a full entry. A press and hold opens the word menu instead
+    const token = tokens.nth(index);
+    await touchAt(page, token);
     if (await page.locator('#sheet').count()) {
       throw new Error(`a quick-lookup tap must not open a full entry: ${JSON.stringify(touchAttempts.at(-1))}`);
     }
+    let rung = await page.waitForFunction((node) => (document.getElementById('mini') ? 'stage'
+      : ['reading', 'gloss'].includes(node.dataset.ladderRung) ? node.dataset.ladderRung : null),
+    await token.elementHandle(), { timeout: 5_000 }).then((handle) => handle.jsonValue());
+    if (rung === 'reading') {
+      await touchAt(page, token);
+      rung = await page.waitForFunction((node) => (document.getElementById('mini') ? 'stage' : node.dataset.ladderRung === 'gloss' ? 'gloss' : null),
+        await token.elementHandle(), { timeout: 5_000 }).then((handle) => handle.jsonValue());
+    }
+    if (rung !== 'gloss') {
+      throw new Error(`a quick-lookup climb must set the English under the word before its stage: ${JSON.stringify({ index, rung })}`);
+    }
+    const english = await token.evaluate((node) => ({ text: node.querySelector(':scope > .tok-en .tok-en-text')?.textContent.trim() ?? '',
+      marked: node.classList.contains('has-en') && node.dataset.depthAside === 'meaning', stage: !!document.getElementById('mini') }));
+    if (!english.text || !english.marked || english.stage) {
+      throw new Error(`the English rung must draw the word's English under it, with no stage yet: ${JSON.stringify({ index, english })}`);
+    }
+    await touchAt(page, token);
+    if (await page.locator('#sheet').count()) {
+      throw new Error(`a quick-lookup tap must not open a full entry: ${JSON.stringify(touchAttempts.at(-1))}`);
+    }
+    await page.locator('#mini').waitFor({ timeout: 5_000 });
     // R3 (Grok 2029) · a slip drawn before its word's sense is at hand shows a quiet "…" (aria-busy, R2's contract) until it
     // is: the card is read once answered, up to 5 s, then asserted exactly as before (M-3)
     await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 5_000 }).catch(() => {});
@@ -1063,6 +1087,8 @@ try {
           !before.mini?.key || before.mini.word !== quick.word || before.mini.reading !== quick.reading || before.mini.gloss !== quick.gloss) {
         throw new Error(`G3 pre-page stage identity/readings differ: ${JSON.stringify({ id, before, quick, expectedRuby })}`);
       }
+      // Ladder (John, 10-19): the English the climb set under the word stays under it at the stage
+      if (!before.inlineGloss) throw new Error(`G3 stage lost the English under its word: ${JSON.stringify({ id, before })}`);
       await touchAt(page, page.locator('#mini button.mini-word'));
       await page.waitForSelector('#sheet .headword', { timeout: 6_000 });
       fullEntry = await page.evaluate(() => ({
@@ -1084,6 +1110,8 @@ try {
           !returned.focused || !returned.always || !sameRuby(returned) || JSON.stringify(returned.mini) !== JSON.stringify(before.mini)) {
         throw new Error(`G3 Back did not restore the same occurrence/stage/meaning: ${JSON.stringify({ id, before, returned })}`);
       }
+      // Ladder (John, 10-19): Back restores the stage with the English still under its word
+      if (!returned.inlineGloss) throw new Error(`G3 Back restored the stage without the English under its word: ${JSON.stringify({ id, before, returned })}`);
       // Back returns to the stage. One native Escape folds that final rung;
       // always-visible ruby must survive, while temporary reading/meaning does not.
       await page.keyboard.press('Escape');

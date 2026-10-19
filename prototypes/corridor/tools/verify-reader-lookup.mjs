@@ -72,10 +72,13 @@ async function openStage(page,word,source,dials,modality='pointer'){
   const activate=()=>modality==='pointer'?click(page,word):page.keyboard.press(modality);
   const surface=await word.evaluate(node=>{const clone=node.cloneNode(true);clone.querySelectorAll('rt,.tok-en').forEach(n=>n.remove());return clone.textContent;});
   const kana=s=>String(s||'').replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
-  const reveal=Number(dials.split(',')[1])===1&&!!source.r&&kana(source.r)!==kana(surface);
+  // Ladder (John, 10-19, a spec change): a word set in text raises its reading on every dial where the reading is not
+  // already up (なし too; つねに has it up, and a word that is its own kana has none to raise), then sets its English under
+  // it, and only then opens the stage. Each activation is taken once the rung before it is seen.
+  const reveal=Number(dials.split(',')[1])!==2&&!!source.r&&kana(source.r)!==kana(surface);
   await activate();
   await page.waitForFunction(node=>!!node?.dataset.ladderRung,await word.elementHandle());
-  assert.equal(await word.getAttribute('data-ladder-rung'),reveal?'reading':'stage','The first activation follows this dial and exact displayed word');
+  assert.equal(await word.getAttribute('data-ladder-rung'),reveal?'reading':'gloss','The first activation follows this dial and exact displayed word: its reading where one shows on tap, else its English');
   if(reveal){
     assert.equal(await page.locator('#mini').count(),0,'The first rung has no meaning stage');
     await page.waitForFunction(node=>[...node.querySelectorAll('ruby')].some(ruby=>{
@@ -84,10 +87,18 @@ async function openStage(page,word,source,dials,modality='pointer'){
       return rt.getClientRects().length>0&&n.display!=='none'&&n.visibility!=='hidden'&&Number(n.opacity)>0||
         ruby.dataset.r===rt.textContent&&p.content===JSON.stringify(rt.textContent)&&p.visibility!=='hidden'&&Number(p.opacity)>0;
     }),await word.elementHandle(),{timeout:5000});
+    assert.equal(await word.evaluate(node=>node.querySelectorAll('.tok-en').length),0,'The reading rung shows no English yet');
     await activate();
+    await page.waitForFunction(node=>node?.dataset.ladderRung!=='reading',await word.elementHandle());
+    assert.equal(await word.getAttribute('data-ladder-rung'),'gloss','The second activation sets the English under the same occurrence');
   }
+  assert.equal(await page.locator('#mini').count(),0,'The English rung has no meaning stage');
+  await page.waitForFunction(node=>!!node.querySelector(':scope > .tok-en .tok-en-text')?.textContent.trim(),await word.elementHandle(),{timeout:5000});
+  assert(await word.evaluate(node=>node.classList.contains('has-en')&&node.dataset.depthAside==='meaning'),'The English rung marks its own word');
+  await activate();
   await page.locator('#mini').waitFor();
   assert.equal(await word.getAttribute('data-ladder-rung'),'stage','The same occurrence reaches the meaning stage');
+  assert.equal(await word.evaluate(node=>node.querySelectorAll(':scope > .tok-en').length),1,'The English stays under its word at the stage');
 }
 async function open(page,dials){
   await page.goto(`${host.origin}/?entry=shelf&dials=${dials}&ui=bi`);
@@ -132,7 +143,10 @@ try{
      await openStage(page,named,article.tokens[1],dials);await page.locator('#mini .mini-reading').waitFor();
      const shown=await mini(page);assert.deepEqual(shown,{word:'谷川',reading:'たにがわ',gloss:'mountain stream',role:'dialog'});
      assert.equal(await token(page,2).textContent(),neighbour);assert.equal(await page.locator('#sheet').count(),0);
-     assert.equal(await named.locator('.tok-en').count(),0,'Lookup must not inject another word’s inline gloss');
+     // Ladder (John, 10-19, a spec change): the stage keeps the word's own English under it (one row, its own meaning, the
+     // one its stage shows); no other word in the text carries one, so lookup still never injects another word's gloss
+     const inline=await page.evaluate(word=>[...document.querySelectorAll('#reader .tok-en')].map(row=>({own:row.parentElement===word,text:row.textContent})),await named.elementHandle());
+     assert.deepEqual(inline,[{own:true,text:shown.gloss}],'Lookup sets only this word’s own English under it, never another word’s inline gloss');
      for(const key of ['Enter','Space']){
       await tapOutside(page);await openStage(page,named,article.tokens[1],dials,key);
       await page.locator('#mini .mini-reading').waitFor();assert.deepEqual(await mini(page),shown);
@@ -174,7 +188,12 @@ try{
      await openStage(page,particle,article.tokens[2],'0,1,0',modality);
      await page.locator('#mini .mini-gloss').waitFor();const shown=await mini(page);
      assert.equal(shown.word,'の');assert.equal(shown.gloss,'of · belonging');assert.equal(shown.role,'dialog');
-     assert.equal(await page.locator('#sheet').count(),0);assert.equal(await particle.textContent(),before);
+     // Ladder (John, 10-19, a spec change): the particle's own text is as it was; the one thing under it is its English row,
+     // which reads its role
+     assert.equal(await page.locator('#sheet').count(),0);
+     assert.equal(await particle.evaluate(node=>{const clone=node.cloneNode(true);clone.querySelectorAll(':scope > .tok-en').forEach(n=>n.remove());return clone.textContent;}),before);
+     assert.deepEqual(await particle.evaluate(node=>[...node.querySelectorAll('.tok-en')].map(row=>row.parentElement===node?row.textContent:null)),['of · belonging'],
+      'The particle carries exactly its own English row, its role');
      await tapOutside(page);
     }
     // the grammar entry is one choice in the strip (reader lane 2026-10-02; G5 hold = seal): a right-click, then Full entry;

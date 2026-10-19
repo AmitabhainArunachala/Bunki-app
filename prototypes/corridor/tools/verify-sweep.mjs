@@ -665,15 +665,22 @@ try {
           await page.touchscreen.tap(box.x + box.width / 2, box.y + Math.min(box.height / 2, 30));
           await settle(450);
         };
-        // G3 · a tap climbs the word's ladder: when readings show on touch and the word's own is hidden, the first tap
-        // raises its reading in place and the next opens its card. A place that needs the card taps until it stands, never
-        // past it. A reader word is found by its prose label (a word in a roving paragraph carries no aria-label of its own
-        // until the keyboard selects it)
+        // G3 · a tap climbs the word's ladder: when the word's own reading is hidden, the first tap raises it in place.
+        // Ladder (John, 10-19): a word set in text then sets its English under it, and only the next tap opens its card (the
+        // sky's word goes from its reading to its card). A place that needs the card taps only once the rung before is seen,
+        // never past the card. A reader word is found by its prose label (a word in a roving paragraph carries no aria-label
+        // of its own until the keyboard selects it)
         const climbAt = async (doTap) => {
+          const rungNow = (after) => page.waitForFunction((after) => (document.getElementById('mini') ? 'stage'
+            : after.map((rung) => document.querySelector(`[data-ladder-rung="${rung}"]`) ? rung : null).find(Boolean) ?? null),
+          after, { timeout: 6000 }).then((h) => h.jsonValue()).catch(() => null);
           await doTap();
-          const rung = await page.waitForFunction(() => (document.getElementById('mini') ? 'stage'
-            : document.querySelector('[data-ladder-rung="reading"]') ? 'reading' : null), null, { timeout: 6000 }).then((h) => h.jsonValue()).catch(() => null);
-          if (rung === 'reading') await doTap();
+          let rung = await rungNow(['reading', 'gloss']);
+          if (rung === 'reading') {
+            await doTap();
+            rung = await rungNow(['gloss']);
+          }
+          if (rung === 'gloss') await doTap();
         };
         let shotN = 0;
         const room = async (id, act, extra = null) => {

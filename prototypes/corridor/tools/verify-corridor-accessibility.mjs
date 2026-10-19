@@ -167,15 +167,23 @@ async function focusProseOccurrence(page, target) {
   assert(await target.evaluate(word => document.activeElement === word), 'Home/Arrows select the exact intended occurrence');
 }
 
-/** Setup for checks whose subject is the stage: only an observed reading rung permits the second activation. */
+/** Setup for checks whose subject is the stage: only an observed reading rung permits the second activation, and (Ladder)
+ * only an observed English rung the third. */
 async function openWordStage(page, selector, index = 0, scroll = true) {
   const target = page.locator(selector).nth(index);
   assert.notEqual(await target.getAttribute('data-ladder-rung'), 'stage', 'Stage setup begins on a word without its stage');
   await touchAt(page, selector, index, 0, scroll);
-  await page.waitForFunction(node => ['reading', 'stage'].includes(node?.dataset.ladderRung), await target.elementHandle());
+  await page.waitForFunction(node => ['reading', 'gloss', 'stage'].includes(node?.dataset.ladderRung), await target.elementHandle());
   if (await target.getAttribute('data-ladder-rung') === 'reading') {
     assert.equal(await page.locator('#mini').count(), 0, 'Reading rung has no meaning stage');
     assert(await target.evaluate(node => [...node.querySelectorAll('rt')].some(rt => !rt.classList.contains('hidden-rt') && getComputedStyle(rt).visibility !== 'hidden')), 'Reading rung reveals the pronunciation');
+    await touchAt(page, selector, index, 0, scroll);
+  }
+  // Ladder (John, 10-19): the English under the word comes before the stage; one more touch, only once it is seen
+  await page.waitForFunction(node => node?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'), await target.elementHandle());
+  if (await target.getAttribute('data-ladder-rung') === 'gloss') {
+    assert.equal(await page.locator('#mini').count(), 0, 'English rung has no meaning stage yet');
+    assert(await target.evaluate(node => !!node.querySelector(':scope > .tok-en .tok-en-text')), 'English rung draws the English under the word');
     await touchAt(page, selector, index, 0, scroll);
   }
   await page.locator('#mini .mini-word').waitFor();

@@ -356,7 +356,8 @@ for (const engine of engines) for (const [name, catalog] of [['locked-cue-offere
     page.on('pageerror', error => result.errors.push(error.message));
     await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page); await shelf(page);
     await page.locator('.shelf-item').filter({ has: page.locator('.shelf-title', { hasText: /^静かな朝$/u }) }).locator('.shelf-open').click();
-    // G3 · one tap now shows the reading, a second the slip: the exact ladder opens it (V's controls stand)
+    // G3 · one tap shows the reading, a second (Ladder, John 10-19) the English under the word, a third the slip: the exact
+    // ladder opens it, one observed rung per tap (V's controls stand)
     await exactReaderStage(page, sourceToken(page), { word: WORD, index: INDEX, reading: 'まど', evidenceDir: OUT }); await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click();
     await page.locator('#sentence-practice-confirm').waitFor();
     if (name === 'locked-cue-offered-control') {

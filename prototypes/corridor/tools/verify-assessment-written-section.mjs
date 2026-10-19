@@ -519,10 +519,43 @@ async function assertReadingRung(page, word) {
   await page.waitForFunction(() => !!document.querySelector('.exam-paper [data-ladder-rung="reading"]'));
   assert.equal(await word.getAttribute('data-ladder-rung'), 'reading', 'The same occurrence owns the reading rung');
   assert.equal(await page.locator('#mini').count(), 0, 'The first activation does not expose the stage');
+  // Ladder (John, 10-19: "one tap should just be the furigana"): no English under the word yet
+  assert.equal(await word.locator('.tok-en').count(), 0, 'The first activation does not expose the English');
   assert(await word.locator('rt').evaluateAll(nodes => nodes.some(node => {
     const style = getComputedStyle(node);
     return node.textContent.trim() && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0;
   })), 'The first reading is visible');
+}
+/** Ladder · the English rung as drawn on one occurrence: its rows of English under the word (.tok-en > .tok-en-text), that
+ * text and whether it paints, whether the reading still paints over the word, and the has-en / DOTS-hook marks. */
+const englishFacts = (node) => {
+  const rows = node.querySelectorAll(':scope > .tok-en');
+  const ink = rows[0]?.querySelector(':scope > .tok-en-text');
+  const style = ink ? getComputedStyle(ink) : null;
+  return { rows: rows.length, text: ink?.textContent.trim() || null,
+    painted: !!style && style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && ink.getClientRects().length > 0,
+    reading: [...node.querySelectorAll('rt')].some((rt) => {
+      const shown = getComputedStyle(rt);
+      return rt.textContent.trim() && shown.display !== 'none' && shown.visibility !== 'hidden' && Number(shown.opacity) > 0;
+    }),
+    hasEn: node.classList.contains('has-en'), aside: node.dataset.depthAside ?? null };
+};
+/** Ladder (John, 10-19: "two taps should be the furigana plus the english word underneath"): the activation after the
+ * reading keeps the reading and sets the word's English under it, and opens no stage. Returns the English it shows. */
+async function assertEnglishRung(page, word) {
+  await page.waitForFunction(() => !!document.querySelector('.exam-paper [data-ladder-rung="gloss"]'));
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'gloss', 'The same occurrence owns the English rung');
+  assert.equal(await page.locator('#mini').count(), 0, 'The English rung does not expose the stage');
+  const { text, ...drawn } = await word.evaluate(englishFacts);
+  assert.deepEqual(drawn, { rows: 1, painted: true, reading: true, hasEn: true, aside: 'meaning' },
+    'The English rung paints one row of English under the word, its reading kept, the DOTS hook on this occurrence');
+  assert(text, 'The English row says the entry\'s English, or the dash where the entry has none');
+  return text;
+}
+/** The stage keeps the English its climb set under the word (Ladder: the reading and the English stay under the box). */
+async function assertStageKeepsEnglish(word, english) {
+  assert.equal(await word.evaluate((node) => node.querySelector(':scope > .tok-en > .tok-en-text')?.textContent.trim() ?? null), english,
+    'The stage keeps the same English under the word');
 }
 // A machine-checked N3 test sits the real paper on the one question sheet: two 試験科目 with their official minutes, 問題
 // headers in the official wording, numbers that restart with the second booklet, underlined
@@ -1532,14 +1565,25 @@ try {
       assert.equal(assisted.attempt.answers[0].response.kind, 'unanswered');
       assert.equal(await page.locator('#exam-why-sheet').count(), 0);
       assert.equal(await page.locator('[data-exam-option]').first().isEnabled(), true);
+      // Ladder (John, 10-19, a spec change): the second activation no longer opens the stage. It sets the word's English
+      // under it (the second rung), and only once that rung is seen does the third open the stage; neither rewrites the
+      // recorded help.
+      await lookupWord.click();
+      const english = await assertEnglishRung(page, lookupWord);
+      assert.deepEqual(assessmentItemAssistanceV2(selectAssessmentV2((await disk(page)).assessmentLibraryV2).attempt, item.id), mark,
+        'The second rung does not rewrite the recorded help');
       await lookupWord.click();
       await page.locator('#mini').waitFor();
       assert.equal(await lookupWord.getAttribute('data-ladder-rung'), 'stage');
+      await assertStageKeepsEnglish(lookupWord, english);
       assert.deepEqual(assessmentItemAssistanceV2(selectAssessmentV2((await disk(page)).assessmentLibraryV2).attempt, item.id), mark,
-        'The second rung does not rewrite the recorded help');
+        'The third rung (the stage) does not rewrite the recorded help');
       await page.locator('.exam-heading').click();
       assert.equal(await lookupWord.getAttribute('data-ladder-rung'), null);
       assert.equal(await lookupWord.locator('rt').count(), 0, 'Dismissal restores bare prose');
+      // Ladder (John, 10-19): bare is also without the English the climb set under the word, and without its DOTS-hook marks
+      assert.deepEqual(await lookupWord.evaluate(englishFacts), { rows: 0, text: null, painted: false, reading: false, hasEn: false, aside: null },
+        'Dismissal clears the English under the word');
       await wrongAnswer(page, item);
       const chosen = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
       assert.equal(chosen.attempt.answers[0].flagged, false, 'No bookmark was needed');
@@ -1571,7 +1615,7 @@ try {
       assert.deepEqual(completed.revlog, baseline.revlog);
       assert.match(await page.locator('.exam-bookmark-note').innerText(), /1 wrong answers saved, with or without bookmarks/u);
       await page.screenshot({ path: resolve(evidence, `${engine}${suffix}-study-missed-without-bookmark.png`), fullPage: true });
-      return { lookupText, mark, mistake: mistake.id, prioritySubjects: priorities.targets.map(row => row.subject),
+      return { lookupText, english, mark, mistake: mistake.id, prioritySubjects: priorities.targets.map(row => row.subject),
         unanswered: followup.evidence.filter(row => row.outcome === 'unanswered' || row.outcome === 'not-reached').length };
     });
     // G3 · the word's menu reveals nothing, so opening and dismissing it records no help; Full entry reveals the entry and
@@ -1811,19 +1855,32 @@ try {
       assert.equal(assessmentItemAssistanceV2(assisted.attempt, longReading.id)?.kind, 'dictionary',
         'Enter passes through the same save-before-reveal guard as a tap');
       assert.deepEqual(await atOccurrence(), { focused: true, stop: true, replaced: true });
+      // Ladder (John, 10-19, a spec change): the second Enter no longer opens the stage. It sets the word's English under
+      // the same occurrence, the keyboard staying on it; only once that rung is seen does the third Enter open the stage.
+      await page.keyboard.press('Enter');
+      const english = await assertEnglishRung(page, repeatWord);
+      assert.deepEqual(await atOccurrence(), { focused: true, stop: true, replaced: true }, 'The English rung keeps the keyboard on the same occurrence');
       await page.keyboard.press('Enter');
       await page.locator('#mini').waitFor();
       assert.equal(await repeatWord.getAttribute('data-ladder-rung'), 'stage');
+      await assertStageKeepsEnglish(repeatWord, english);
       assert.equal(await page.locator('#mini .mini-word').textContent(), repeat.text);
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('#mini').count(), 0, 'Esc on the word closes its popup');
       assert.equal(await repeatWord.getAttribute('data-ladder-rung'), null);
       assert.equal(await repeatWord.locator('rt').count(), 0, 'Escape clears the revealed reading');
+      // Ladder (John, 10-19): bare is also without the English the climb set under the word, and without its DOTS-hook marks
+      assert.deepEqual(await repeatWord.evaluate(englishFacts), { rows: 0, text: null, painted: false, reading: false, hasEn: false, aside: null },
+        'Escape clears the English under the word');
       assert.equal((await atOccurrence()).focused, true);
       assert.equal(await page.locator('.exam-paper').count(), 1, 'Esc closed only the popup');
 
+      // Ladder (John, 10-19, a spec change): reading, then English, then the stage — each Enter only once the rung before
+      // it is seen
       await page.keyboard.press('Enter');
       await assertReadingRung(page, repeatWord);
+      await page.keyboard.press('Enter');
+      await assertEnglishRung(page, repeatWord);
       await page.keyboard.press('Enter');
       await page.locator('#mini').waitFor();
       await page.locator('#mini').focus();
@@ -1831,8 +1888,11 @@ try {
       assert.equal(await page.locator('#mini').count(), 0);
       assert.equal((await atOccurrence()).focused, true, 'Esc inside the popup returns to the same occurrence');
 
+      // Ladder (John, 10-19, a spec change): Space climbs the same three rungs, each press only once the rung before it is seen
       await page.keyboard.press('Space');
       await assertReadingRung(page, repeatWord);
+      await page.keyboard.press('Space');
+      await assertEnglishRung(page, repeatWord);
       await page.keyboard.press('Space');
       await page.locator('#mini').waitFor();
       // Save ▾ (1.3.0): the press saves the word and unfolds its menu inside the card, never a window
@@ -1857,7 +1917,7 @@ try {
       await page.screenshot({ path: resolve(evidence, `${engine}${suffix}-prose-roving-focus.png`) });
       const final = selectAssessmentV2((await disk(page)).assessmentLibraryV2);
       assert.equal(final.attempt.answers.find((row) => row.item.id === longReading.id).response.kind, 'unanswered');
-      return { question: longReading.id, presses, proseBlocks: budget.prose, words: budget.words, repeat, focusStyle };
+      return { question: longReading.id, presses, proseBlocks: budget.prose, words: budget.words, repeat, english, focusStyle };
     });
     if (longReading) await run(engine, `prose-timed-plain-text${suffix}`, async (page) => {
       await start(page, section, 'timed');

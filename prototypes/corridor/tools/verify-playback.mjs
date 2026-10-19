@@ -231,6 +231,17 @@ async function openPassage(page) {
   await page.waitForSelector(`#reader .tok`);
   await page.waitForSelector(`.version-choice[data-version="${OTHER}"]`);
 }
+/** Ladder · a durable negative: the record is read again and again for `ms`; the first read that breaks `still` is returned
+ * (a row the step must not write lands inside the window), else the last read. */
+async function quietRecord(page, still, ms = 1500) {
+  const deadline = Date.now() + ms;
+  let latest = await readAppRecord(page);
+  while (still(latest) && Date.now() < deadline) {
+    await page.waitForTimeout(25);
+    latest = await readAppRecord(page);
+  }
+  return latest;
+}
 
 /** The bar's one mark (John, 2026-10-15 17:20: "a simple character… elegant and nearly hidden but obvious"). F (the
  * lead's ruling on Grok f-86, 2026-10-18; was "folded, it is the whole bar — 44 px, the only thing drawn", fixed at the
@@ -415,7 +426,7 @@ try {
   // reader lane 2026-10-02: the floating sentence bar is gone; what floats over the text now is the tapped word's popup
   await check('approved-player-is-touch-sized-and-clear-of-the-word-popup-on-phones', 'narration', async ({ page }) => {
     await openBar(page);
-    assert.equal(await page.locator('body').getAttribute('data-furigana'), '1', 'This fixture exercises on-touch reading then stage');
+    assert.equal(await page.locator('body').getAttribute('data-furigana'), '1', 'This fixture exercises on-touch reading, then the English, then the stage');
     const selected = await page.locator('#reader .tok[data-word]').evaluateAll(nodes => {
       const n = nodes.find(n => /\p{Script=Han}/u.test(n.dataset.word) && n.dataset.word.length > 1 && n.querySelector('rt.hidden-rt'));
       if (!n) return null;
@@ -467,15 +478,30 @@ try {
         }).join('');
         return n.dataset.ladderRung === 'reading' && painted === reading && !document.getElementById('mini');
       }, selected);
+      assert.equal(await word.evaluate(n => !!n.querySelector('.tok-en')), false, 'The first Enter is just the reading: no English yet');
       const revealed = await waitForAppRecord(page, record => record.obslog.length === before.length + 1);
       assert.deepEqual(revealed.obslog.slice(0, -1), before);
       assert.deepEqual(revealed.obslog.at(-1).slice(1), ['tap', `word:${selected.word}`, 1, FIRST]);
+      // Ladder (John, 10-19, a spec change): the second Enter no longer opens the stage. It sets the word's English under
+      // it and no stage yet; that English is the meaning's first showing, so it (not the stage) writes the depth-2 row.
+      // Only the observed English rung permits the third Enter.
+      await page.keyboard.press('Enter');
+      await page.waitForFunction(({ index }) => ['gloss', 'stage'].includes(document.querySelector(`#reader .tok[data-index="${index}"]`)?.dataset.ladderRung)
+        || !!document.getElementById('mini'), selected);
+      const english = await word.evaluate(n => ({ rung: n.dataset.ladderRung || null, text: n.querySelector(':scope > .tok-en .tok-en-text')?.textContent.trim() ?? null,
+        hasEn: n.classList.contains('has-en'), stage: !!document.getElementById('mini') }));
+      assert.equal(english.rung === 'gloss' && !!english.text && english.hasEn && !english.stage, true,
+        `The second Enter sets the word's English under it, no stage yet: ${JSON.stringify(english)}`);
+      const glossed = await waitForAppRecord(page, record => record.obslog.length === before.length + 2);
+      assert.deepEqual(glossed.obslog.slice(0, -1), revealed.obslog);
+      assert.deepEqual(glossed.obslog.at(-1).slice(1), ['tap', `word:${selected.word}`, 2, FIRST]);
+      // Ladder (John, 10-19, a spec change): the third Enter opens the stage, which writes no row of its own (the English
+      // rung showed the meaning): the record keeps the two rows
       await page.keyboard.press('Enter');
       await page.locator('#mini').waitFor({ state: 'visible' });
       assert.equal(await word.getAttribute('data-ladder-rung'), 'stage');
-      const staged = await waitForAppRecord(page, record => record.obslog.length === before.length + 2);
-      assert.deepEqual(staged.obslog.slice(0, -1), revealed.obslog);
-      assert.deepEqual(staged.obslog.at(-1).slice(1), ['tap', `word:${selected.word}`, 2, FIRST]);
+      const staged = await quietRecord(page, record => record.obslog.length === before.length + 2);
+      assert.deepEqual(staged.obslog, glossed.obslog, 'The stage writes no observation row: the English rung showed the meaning');
       const observed = await measure();
       measurements.push(observed);
       writeFileSync(resolve(out, 'phone-player-geometry.json'), JSON.stringify(measurements, null, 2));
@@ -493,6 +519,8 @@ try {
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => !document.getElementById('mini'));
     assert.equal(await word.getAttribute('data-ladder-rung'), null, 'Folding the stage returns the occurrence bare');
+    // Ladder: the fold takes the English under the word with the stage (one step from any rung)
+    assert.equal(await word.evaluate(n => !!n.querySelector('.tok-en') || n.classList.contains('has-en')), false, 'Folding the stage takes the English away too');
     await page.locator('#listen-open').click();
     await page.waitForSelector('.listen-row.play-bar[data-open="false"]', { timeout: 5000 });
     const foldedState = await markState(page);

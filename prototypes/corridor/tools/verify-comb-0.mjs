@@ -208,13 +208,22 @@ const settle = async (page, ms = 500) => {
   await page.waitForFunction(() => document.getAnimations().filter((a) => a.playState === 'running' && a.effect?.getTiming?.().iterations !== Infinity).length === 0, null, { timeout: 4000 }).catch(() => {});
 };
 const run = (page, src) => page.evaluate((s) => window.__COMB__.run(s), src);
-// G3 · a tap climbs the word's ladder: the reading in place (readings shown on touch, the word's own hidden), then the
-// stage (the slip). A check that needs the slip taps until it stands: the reading rung, then once more, never past it
+// G3 · a tap climbs the word's ladder: the reading in place (the word's own hidden), then (Ladder, John 10-19) the English
+// under the word, then the stage (the slip). A check that needs the slip taps until it stands: each next tap only once the
+// rung before it is seen, past the last one, never past the slip and never again on a rung that did not move
 async function climbToSlip(page, tok) {
-  await tok.click();
-  const rung = await page.waitForFunction((el) => (document.getElementById('mini') ? 'stage' : el.dataset.ladderRung === 'reading' ? 'reading' : null),
-    await tok.elementHandle(), { timeout: 8000 }).then((h) => h.jsonValue()).catch(() => null);
-  if (rung === 'reading') await tok.click();
+  const el = await tok.elementHandle();
+  let rung = null;
+  do {
+    await tok.click();
+    rung = await page.waitForFunction(({ el, after }) => {
+      if (document.getElementById('mini')) return 'stage';
+      const order = ['reading', 'gloss'], now = el.dataset.ladderRung;
+      // the English rung is seen once its row stands under the word
+      if (now === 'gloss' && !el.querySelector(':scope > .tok-en .tok-en-text')) return null;
+      return order.indexOf(now) > order.indexOf(after) ? now : null;
+    }, { el, after: rung }, { timeout: 8000 }).then((h) => h.jsonValue()).catch(() => null);
+  } while (rung === 'reading' || rung === 'gloss');
 }
 
 // a negative control must find the lines it puts back, or it proves nothing: checked on the staged site before any page

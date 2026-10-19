@@ -74,12 +74,20 @@ async function reader(page) {
 async function openPopup(page) {
   if (!await page.locator('#mini').count()) {
     await token(page).click();
-    // G3's ladder: on touch the first activation raises only the reading, the second brings the stage. Only an observed
-    // reading rung permits the second activation; a dead door is never rescued with an unconditional extra tap.
+    // G3's ladder: on touch the first activation raises only the reading; Ladder (John, 10-19): the second sets the English
+    // under the word, and only the third brings the stage. Only an observed reading rung permits the second activation, and
+    // only an observed English rung the third; a dead door is never rescued with an unconditional extra tap.
     await page.waitForFunction((index) => !!document.getElementById('mini') ||
-      document.querySelector(`#reader .tok.content[data-index="${index}"]`)?.dataset.ladderRung === 'reading', tokenIndex);
-    if (!await page.locator('#mini').count()) {
+      ['reading', 'gloss'].includes(document.querySelector(`#reader .tok.content[data-index="${index}"]`)?.dataset.ladderRung), tokenIndex);
+    if (!await page.locator('#mini').count() && await token(page).getAttribute('data-ladder-rung') !== 'gloss') {
       assert.equal(await token(page).getAttribute('data-ladder-rung'), 'reading', 'the first activation stopped at the reading rung');
+      await token(page).click();
+      await page.waitForFunction((index) => !!document.getElementById('mini') ||
+        document.querySelector(`#reader .tok.content[data-index="${index}"]`)?.dataset.ladderRung === 'gloss', tokenIndex);
+    }
+    if (!await page.locator('#mini').count()) {
+      assert.equal(await token(page).getAttribute('data-ladder-rung'), 'gloss', 'the activation before the stage stopped at the English rung');
+      assert(await token(page).evaluate(node => !!node.querySelector(':scope > .tok-en .tok-en-text')?.textContent.trim()), 'the English rung draws the English under the word');
       await token(page).click();
     }
   }
