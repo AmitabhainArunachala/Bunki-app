@@ -171,83 +171,9 @@
     "result": "observed",
     "startedAt": "2026-10-05T18:29:08Z"
   },
-  "37168450930/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T01:34:57Z"
-  },
-  "37169615624/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T01:58:30Z"
-  },
-  "37169852855/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T02:02:56Z"
-  },
   "38211189408/1": {
     "result": "observed",
     "startedAt": "2026-10-12T06:09:39Z"
-  },
-  "37170222857/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T02:10:16Z"
-  },
-  "37170340583/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T02:12:31Z"
-  },
-  "37170356978/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T02:12:51Z"
-  },
-  "37170493971/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T02:15:25Z"
-  },
-  "37172203280/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T02:49:04Z"
-  },
-  "37172446472/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T02:53:55Z"
-  },
-  "37173114769/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T03:06:49Z"
-  },
-  "37173114829/1": {
-    "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-10-04T03:06:49Z",
-    "reason": "Unexpected producer event"
-  },
-  "37173826025/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T03:21:07Z"
-  },
-  "37173935250/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T03:23:20Z"
-  },
-  "37174237140/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T03:29:54Z"
-  },
-  "37174252035/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T03:30:11Z"
-  },
-  "37174268111/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T03:30:27Z"
-  },
-  "37174436558/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T03:34:02Z"
-  },
-  "37175516391/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T03:56:31Z"
   },
   "37176715636/1": {
     "result": "rejected",
@@ -1620,5 +1546,9 @@
   "38919512644/7": {
     "result": "observed",
     "startedAt": "2026-10-19T01:22:49Z"
+  },
+  "37925123360/17": {
+    "result": "observed",
+    "startedAt": "2026-10-19T01:23:08Z"
   }
 }
