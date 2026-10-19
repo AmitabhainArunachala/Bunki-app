@@ -64,6 +64,7 @@ class Element {
   }
   get classList() {
     return {
+      contains: (c) => this.className.split(/\s+/).includes(c),
       add: (c) => {
         this.className = this.className ? `${this.className} ${c}` : c;
       },
