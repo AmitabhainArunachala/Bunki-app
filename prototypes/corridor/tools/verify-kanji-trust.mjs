@@ -412,16 +412,17 @@ const ROWS = {
         await page.locator('#lesson-next').click();
         await settle(page, 80);
       }
-      let index = 0;
-      while (await page.locator('.lesson-option').count()) {
+      // one answer per question the quiz counts ("quiz — 1 / 10"); each waits for that question's live options, so
+      // a slow save of the last answer is waited for, never answered twice
+      const total = Number((await page.locator('main .card-kind').first().innerText()).match(/\/\s*(\d+)/)?.[1] || 0);
+      for (let index = 0; index < total; index++) {
+        await page.locator('.lesson-option:not([disabled])').first().waitFor();
         const glyph = (await page.locator('.review-front').innerText()).trim();
         const options = await page.locator('.lesson-option').allTextContents();
         const right = kanji[glyph]?.m;
-        const pick = answer(index++) ? options.indexOf(right) : options.findIndex((text) => text !== right);
+        const pick = answer(index) ? options.indexOf(right) : options.findIndex((text) => text !== right);
         await page.locator('.lesson-option').nth(pick).click();
-        await page.locator('#lesson-next').click();
-        await settle(page, 150);
-        if (await page.locator('.lesson-enroll').count()) break;
+        await page.locator('#lesson-next:not([disabled])').click();
       }
       await page.locator('.lesson-enroll').waitFor();
       return (await page.locator('h1.view-title').innerText()).trim();
@@ -556,7 +557,8 @@ for (const engine of engines) {
       if (errors.length) throw new Error(`page errors: ${errors.join(' | ')}`);
       pass = true;
     } catch (error) {
-      detail = String(error.message || error).split('\n')[0].slice(0, 600);
+      // the first lines name the locator a timeout waited on
+      detail = String(error.message || error).split('\n').filter(Boolean).slice(0, 3).join(' ⏎ ').slice(0, 600);
     }
     const seconds = ((Date.now() - started) / 1000).toFixed(1);
     engineResults.push({ row, pass, detail, seconds });
