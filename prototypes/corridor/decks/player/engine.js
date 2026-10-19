@@ -8,6 +8,8 @@
  * three times in one day. No DOM here; the host supplies time and storage.
  */
 
+import * as srsCore from '../../srs-core.mjs';
+
 export const DECK_FORMAT = 'bunki-cloze-deck';
 export const STATE_FORMAT = 'bunki-cloze-state';
 export const VERSION = 1;
@@ -23,6 +25,13 @@ const UNLOCK_AFTER_LAPSES = 3;
  * (CARD_CONTRACT_V2 §4: swap the passage, add a hint, suspend) */
 export const LEECH_LAPSES = 5;
 export const RATINGS = { again: 1, hard: 2, good: 3, easy: 4 };
+/** the sitting rule and the close, from the app's one schedule owner (srs-core.mjs) */
+export const nextStep = srsCore.nextStep;
+export const servable = srsCore.servable;
+export const sittingTally = srsCore.sittingTally;
+export const closeLines = srsCore.closeLines;
+export const pauseWords = srsCore.pauseWords;
+export const LEARN_AHEAD_MS = srsCore.LEARN_AHEAD_MS;
 
 export function dayKey(date) {
   const y = date.getFullYear();
@@ -107,18 +116,10 @@ function decodeTokens(rows, text, file) {
   return out.map((t) => t.s).join('') === text ? out : null;
 }
 
-export function createScheduler(fsrsApi, pin) {
-  return fsrsApi.fsrs(
-    fsrsApi.generatorParameters({
-      w: pin.w.slice(),
-      request_retention: pin.requestRetention,
-      maximum_interval: pin.maximumInterval,
-      enable_fuzz: pin.enableFuzz,
-      enable_short_term: pin.enableShortTerm,
-      learning_steps: pin.learningSteps,
-      relearning_steps: pin.relearningSteps,
-    }),
-  );
+/** the scheduler, built by the app's one schedule owner (srs-core.mjs): the pin, with the learner's
+ * own policy when the host passes it ({ w, retention, learningSteps }, the corridor's) */
+export function createScheduler(fsrsApi, pin, learner = null) {
+  return srsCore.createScheduler(fsrsApi, pin, learner);
 }
 
 /**
@@ -477,11 +478,7 @@ export function learningSoon(deck, state, now, withinMs, { skip = null } = {}) {
  * reorders a card's history.
  */
 export function effectiveReviewTime(stored, now) {
-  if (stored?.last_review) {
-    const last = new Date(stored.last_review);
-    if (last.getTime() > now.getTime()) return last;
-  }
-  return now;
+  return srsCore.reviewInstant(stored?.last_review, now);
 }
 
 /**
@@ -500,6 +497,63 @@ export function grade(fsrsApi, scheduler, state, cardId, rating, now) {
     cards: { ...state.cards, [cardId]: freeze(next.card, stored?.introducedAt || atIso) },
     log: [...state.log.slice(-4999), row],
   };
+}
+
+/**
+ * What a change touched, so it can be taken back later without touching anything else: per-id
+ * entries of cards, suspended and repairs ({ from, to }, null for absent), and the rows it appended
+ * to log and repairLog. Lookups are never part of a change (undo keeps them).
+ */
+export function changeOf(before, after) {
+  const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+  const entries = {};
+  for (const key of ['cards', 'suspended', 'repairs']) {
+    const b = before[key] || {};
+    const a = after[key] || {};
+    for (const id of new Set([...Object.keys(b), ...Object.keys(a)])) {
+      if (!same(b[id], a[id])) (entries[key] ||= {})[id] = { from: b[id] ?? null, to: a[id] ?? null };
+    }
+  }
+  const rows = {};
+  for (const key of ['log', 'repairLog']) {
+    const b = before[key] || [];
+    const a = after[key] || [];
+    const last = b.length ? JSON.stringify(b[b.length - 1]) : null;
+    let from = 0;
+    if (last !== null) for (let i = a.length - 1; i >= 0; i--) if (JSON.stringify(a[i]) === last) { from = i + 1; break; }
+    if (a.length > from) rows[key] = a.slice(from);
+  }
+  return { entries, rows };
+}
+
+/**
+ * The ledger with a change taken back: each entry it touched returns to what it was, its appended
+ * rows leave, and everything else (another window's grades, lookups) stays. Null when any entry it
+ * touched has changed since, or a row it appended is gone: then nothing can be taken back safely.
+ */
+export function undoChange(state, change) {
+  const out = { ...state };
+  for (const [key, ids] of Object.entries(change.entries)) {
+    const map = { ...(state[key] || {}) };
+    for (const [id, { from, to }] of Object.entries(ids)) {
+      if (JSON.stringify(map[id] ?? null) !== JSON.stringify(to)) return null;
+      if (from === null) delete map[id];
+      else map[id] = from;
+    }
+    out[key] = map;
+  }
+  for (const [key, added] of Object.entries(change.rows)) {
+    const rows = [...(state[key] || [])];
+    for (const row of [...added].reverse()) {
+      const text = JSON.stringify(row);
+      let at = -1;
+      for (let i = rows.length - 1; i >= 0; i--) if (JSON.stringify(rows[i]) === text) { at = i; break; }
+      if (at < 0) return null;
+      rows.splice(at, 1);
+    }
+    out[key] = rows;
+  }
+  return out;
 }
 
 /** what each answer would schedule, for the button labels */

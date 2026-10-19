@@ -205,6 +205,7 @@ describe('sw.js shell', () => {
       'decks/player/mount.js',
       'decks/player/engine.js',
       'vendor/ts-fsrs.mjs',
+      'srs-core.mjs',
       'data/fsrs-pin.json',
     ]) {
       expect(shell, path).toContain(path);

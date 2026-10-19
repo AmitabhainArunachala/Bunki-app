@@ -1325,13 +1325,19 @@ def build_study(deck: dict, out: Path | None = None, gloss: dict | None = None) 
             src, _, alias = part.partition(" as ")
             names.append(f"{(alias or src).strip()}: {src.strip()}")
     fsrs_js = "window.__TSFSRS__ = (() => {\n" + tsfsrs[: m.start()] + "\nreturn {" + ", ".join(names) + "};\n})();"
+    # the app's one schedule owner, which the engine imports as srsCore
+    core = (CORRIDOR / "srs-core.mjs").read_text("utf-8")
+    core_names = re.findall(r"^export (?:async )?(?:function|const|let) (\w+)", core, flags=re.M)
+    core_js = "const __SRS_CORE__ = (() => {\n" + re.sub(r"^export ", "", core, flags=re.M) + "\nreturn { " + ", ".join(core_names) + " };\n})();"
     engine = (player / "engine.js").read_text("utf-8")
+    engine, n = re.subn(r"^import \* as srsCore from '\.\./\.\./srs-core\.mjs';\n", "const srsCore = __SRS_CORE__;\n", engine, flags=re.M)
+    assert n == 1, "the player engine imports srs-core once"
     engine_names = re.findall(r"^export (?:async )?(?:function|const|let) (\w+)", engine, flags=re.M)
     engine_js = "const __KP_ENGINE__ = (() => {\n" + re.sub(r"^export ", "", engine, flags=re.M) + "\nreturn { " + ", ".join(engine_names) + " };\n})();"
     mount = (player / "mount.js").read_text("utf-8")
     mount = re.sub(r"import\s*\{([^}]*)\}\s*from\s*'\./engine\.js';", r"const {\1} = __KP_ENGINE__;", mount)
     mount = re.sub(r"^export ", "", mount, flags=re.M).replace("import.meta.url", "location.href")
-    code = "\n".join([fsrs_js, engine_js, mount])
+    code = "\n".join([fsrs_js, core_js, engine_js, mount])
     page = (HERE / "study-shell.html").read_text("utf-8")
     deck_json = json.dumps(deck, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     pin = (CORRIDOR / "data" / "fsrs-pin.json").read_text("utf-8").strip()
