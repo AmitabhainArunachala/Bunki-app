@@ -9485,7 +9485,7 @@ function inlineGlossLine(text, waiting = false) {
   return line;
 }
 function setGlossLine(line, text, waiting = false) {
-  line.firstElementChild.textContent = text || '';
+  line.querySelector('.tok-en-text').textContent = text || '';
   line.classList.toggle('tok-en-wait', !text && waiting);
   line.classList.toggle('tok-en-miss', !text && !waiting);
 }
@@ -9511,21 +9511,24 @@ function inlineTokenGloss(anchor, token) {
  * sentence uses where the article's sense data names one (the sidecar, R3 part 2), else the box's first gloss: its door's
  * meaning, led by the sense the box settles on once that is in (readerTokenGloss). A sense the sidecar names that is not
  * yet at hand is waited for, never painted over with a meaning it takes back (R3's rule for the box); elsewhere the row
- * speaks at once. Either way its reading's rows and its sense are asked for (the reader asked at the word's first rung:
- * senseAhead), and once they are in the row says what they settle, or nothing. `painted` hears a change. */
+ * speaks at once. Its reading's rows and its sense are asked for (the reader asked at the word's first rung: senseAhead):
+ * once the rows are in the row says what they give, as it always has, and once the sense is in, what that settles; with
+ * nothing to say it says nothing. `painted` hears a change. */
 function tokenGlossLine(token, painted = null) {
   const reading = readyTokenReading(token);
-  const sensing = !SENSE_GAVE_UP.has(token) && !!senseChoice(token, readingTokenEntry(token))?.need;
-  const named = sensing && !!sidecarSense(senseNeighbours(token))?.seq;
-  const line = inlineGlossLine(named ? '' : readerTokenGloss(token), !!reading || sensing);
-  if (!reading && !sensing) return line;
-  Promise.resolve(reading).then(() => ensureSense(token, readingTokenEntry(token))).catch(() => {}).then(() => {
+  const sensing = () => !SENSE_GAVE_UP.has(token) && !!senseChoice(token, readingTokenEntry(token))?.need;
+  const named = () => sensing() && !!sidecarSense(senseNeighbours(token))?.seq;
+  const line = inlineGlossLine(named() ? '' : readerTokenGloss(token), !!reading || sensing());
+  if (!reading && !sensing()) return line;
+  const paint = (last) => {
     if (!line.isConnected) return;
-    const was = line.firstElementChild.textContent, found = readerTokenGloss(token);
-    setGlossLine(line, found);
+    const was = line.textContent, found = !last && named() ? '' : readerTokenGloss(token);
+    setGlossLine(line, found, !last && sensing());
     if (found) seatInlineGloss(line);
     if (found !== was) painted?.(line);
-  });
+  };
+  Promise.resolve(reading).then(() => { paint(false); return ensureSense(token, readingTokenEntry(token)); })
+    .catch(() => {}).then(() => paint(true));
   return line;
 }
 /** The English row's words: centred under their word, never past the edge of the line they stand in. */
