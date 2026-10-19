@@ -201,10 +201,26 @@ const stageFacts = (page) => page.evaluate((sel) => {
   return { top: box.top, bottom: box.bottom, seen, scrollHeight: card.scrollHeight, clientHeight: card.clientHeight, scrollTop: card.scrollTop,
     overflowY: getComputedStyle(card).overflowY, touchAction: getComputedStyle(card).touchAction, more: card.dataset.more || null,
     fade: after.content !== 'none' && after.content !== 'normal' ? { position: after.position, height: parseFloat(after.height), image: after.backgroundImage.slice(0, 80) } : null,
-    rows, word: { top: word.top, bottom: word.bottom }, ceiling, floor, cardFloor, scrollY: window.scrollY, side: card.dataset.side };
+    rows, word: { top: word.top, bottom: word.bottom }, ceiling, floor, cardFloor, scrollY: window.scrollY, side: card.dataset.side,
+    // Ladder R4 · the ink the stage draws (its texts, kanji tiles, Save and its keys): the lead's D7 ruling (10-20) lets a cut
+    // run over a row's blank padding, never across its ink
+    ink: (() => { const range = document.createRange(), out = [];
+      const walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT);
+      for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+        const host = t.parentElement;
+        if (!t.nodeValue.trim() || !host?.getClientRects().length || host.closest('.visually-hidden, [hidden]')) continue;
+        const style = getComputedStyle(host);
+        if (style.visibility === 'hidden' || Number(style.opacity) === 0) continue;
+        range.selectNodeContents(t);
+        for (const r of range.getClientRects()) if (r.width > 0.5 && r.height > 0.5) out.push({ what: t.nodeValue.trim().slice(0, 10), top: r.top, bottom: r.bottom });
+      }
+      for (const n of card.querySelectorAll('.mini-kanji-glyph, .mini-take, .mini-actions button')) if (n.getClientRects().length) { const r = n.getBoundingClientRect(); out.push({ what: n.className.split(' ')[0], top: r.top, bottom: r.bottom }); }
+      return out; })() };
 }, WORD_SEL);
 // a row is whole on the glass, or wholly past the cut: never across it (half a glyph)
 const sliced = (f) => f.rows.filter((r) => r.top < f.seen.bottom - 0.5 && r.bottom > f.seen.bottom + 0.5);
+// Ladder R4 · ink the cut runs across (the lead's D7 ruling, 10-20: a row's blank padding may run under the cut and its fade)
+const inkCut = (f) => (f.ink || []).filter((r) => r.top < f.seen.bottom - 0.5 && r.bottom > f.seen.bottom + 0.5);
 
 async function itemStage(browser, engine) {
   // 1 · in three worlds at 390×844 the stage shows all its rows, or ends between two rows and says it scrolls (a fade at
@@ -244,9 +260,12 @@ async function itemStage(browser, engine) {
       await openStory(page);
       await stage(page);
       const f = await stageFacts(page);
-      const cut = sliced(f);
-      check(`1.stage-cut · ${engine} 390×520 · the cut falls between two rows`, f.scrollHeight > f.clientHeight + 1 && !cut.length,
-        { cut: cut.map((r) => `${r.row} ${Math.round(r.top)}–${Math.round(r.bottom)} across ${Math.round(f.seen.bottom)}`), scrollHeight: f.scrollHeight, clientHeight: f.clientHeight });
+      // Ladder R4 (the lead's D7 ruling, 10-20): the cut and its fade may run over a row's blank padding, never across its ink
+      // (its texts, kanji tiles, Save and its keys); the next row's top may begin under the fade
+      const cut = inkCut(f), rowsAcross = sliced(f);
+      check(`1.stage-cut · ${engine} 390×520 · the cut falls between two rows' ink`, f.scrollHeight > f.clientHeight + 1 && !cut.length,
+        { cut: cut.map((r) => `${r.what} ${Math.round(r.top)}–${Math.round(r.bottom)} across ${Math.round(f.seen.bottom)}`),
+          rowPaddingAcross: rowsAcross.map((r) => `${r.row} ${Math.round(r.top)}–${Math.round(r.bottom)}`), scrollHeight: f.scrollHeight, clientHeight: f.clientHeight });
       check(`1.stage-fade · ${engine} 390×520 · a fade at its foot says there is more`,
         f.more === 'true' && f.fade?.position === 'sticky' && f.fade.height >= 16 && /gradient/u.test(f.fade.image), { more: f.more, fade: f.fade });
       // keyboard: Tab through the stage to its last door; the stage follows, shows it whole, and the fade leaves at the end
