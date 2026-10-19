@@ -3651,11 +3651,37 @@ function checkedKeptWords(rows){
     if(!row||typeof row.key!=='string'||seen.has(row.key)||typeof row.id!=='string'||!row.id||
       typeof row.label!=='string'||typeof row.reading!=='string'||!['available','mismatch','unavailable'].includes(row.status))
       throw new Error('kept-projection-invalid');
+    // Hfix-2b · X-1 — `why` is the star's own reason. A host that does not send one is not
+    // broken, it is older: the field is optional and absent means "nothing recorded", never a
+    // refused projection. A `why` of the wrong type IS a broken projection and is refused.
+    if(row.why!==undefined&&typeof row.why!=='string')throw new Error('kept-projection-invalid');
     seen.add(row.key);
-    return Object.freeze({key:row.key,id:row.id,label:row.label,reading:row.reading,status:row.status});
+    return Object.freeze({key:row.key,id:row.id,label:row.label,reading:row.reading,status:row.status,
+      why:typeof row.why==='string'?row.why:''});
   });
 }
 function scaleHash(key){let h=2166136261;for(const ch of key)h=Math.imul(h^ch.codePointAt(0),16777619)>>>0;return h;}
+/** Hfix-2b · X-12 — where a kept word sits.
+ *
+ * The old seat was WR.w*(0.12+hash*0.76): a uniform scatter across 76% of a world 3.2 viewports
+ * wide, while the opening camera sees ONE viewport at its centre. A given word therefore had
+ * about a one-in-six chance of falling in the opening view, so with a handful of kept words the
+ * sky reliably opened with none of them on glass and one only wandered in after a drag — exactly
+ * what D2 reported.
+ *
+ * Seats now grow outward from the camera's home on a golden-angle spiral: the nearest few are
+ * always inside the opening window, and the rest spread into the wider world as the shelf grows.
+ * Deterministic, so the same shelf seats the same way every time, and the collision pass still
+ * nudges any two that crowd. */
+const KEPT_ANGLE=Math.PI*(3-Math.sqrt(5));
+function keptSeat(index){
+  // the opening window, less the margin drawScaleStars already treats as off-glass
+  const halfW=Math.max(80,vw()/2-60),halfH=Math.max(80,(vh()-180)/2);
+  const unit=Math.min(halfW,halfH)/2;
+  const r=unit*Math.sqrt(index+0.6),a=index*KEPT_ANGLE;
+  return {x:clamp(WR.w/2+r*Math.cos(a),40,Math.max(40,WR.w-40)),
+          y:clamp(WR.h/2+r*Math.sin(a),40,Math.max(40,WR.h-40))};
+}
 function paintScaleStars(){
   if(!scaleBridge)return;
   const rows=recordReady?recordView?.keptWords||[]:[];
@@ -3686,17 +3712,25 @@ function paintScaleStars(){
         }
       }
       if(!attrs.articleId)caption.textContent=label;
-      star.setAttribute('aria-label',attrs.articleId?uiT('読み物の棚へ：','Article shelf: ')+label:uiT('残した言葉：','Kept word: ')+label);
+      // Hfix-2b · X-1 — the star says why it is there, in Today's sky's own words and from the
+      // same recorded sources. A word with no recorded reason says nothing: no line, nothing
+      // added to its name, no empty parenthesis. It never pretends to have a reason.
+      const why=typeof attrs.why==='string'?attrs.why.trim():'';
+      if(why){const line=document.createElement('span');line.className='scale-star-why';line.textContent=why;caption.append(line);}
+      const name=attrs.articleId?uiT('読み物の棚へ：','Article shelf: ')+label:uiT('残した言葉：','Kept word: ')+label;
+      star.setAttribute('aria-label',why?name+' · '+why:name);
+      if(why)star.dataset.why=why;else delete star.dataset.why;
+      star.title=why?label+' · '+why:label;
       if(attrs.articleId)star.dataset.articleId=attrs.articleId;else star.dataset.keptKey=attrs.keptKey;
       star.classList.toggle('scale-star-article',!!attrs.articleId);star.classList.toggle('scale-star-kept',!attrs.articleId);
       star.scaleActivate=action;star.scaleX=x;star.scaleY=y;
     };
     if(scaleArticle)mount('article:'+scaleArticle.articleId,scaleArticle.title,{articleId:scaleArticle.articleId,words:scaleArticle.words},scaleArticle.x,scaleArticle.y,()=>requestScaleStep('in',{articleId:scaleArticle.articleId}));
-    for(const row of rows){
-      const h=scaleHash(row.key),h2=scaleHash(row.key+'y');
-      const x=WR.w*(0.12+(h%100000)/100000*0.76),y=WR.h*(0.12+(h2%100000)/100000*0.76);
-      mount('kept:'+row.key,row.label,{keptKey:row.key},x,y,()=>requestScaleStep('word',{wordKey:row.key}));
-    }
+    rows.forEach((row,index)=>{
+      const seat=keptSeat(index);
+      mount('kept:'+row.key,row.label,{keptKey:row.key,why:row.why},seat.x,seat.y,
+        ()=>requestScaleStep('word',{wordKey:row.key}));
+    });
     for(const [key,star]of scaleStars)if(!next.has(key)){star.remove();scaleStars.delete(key);}
   }
   drawScaleStars();
