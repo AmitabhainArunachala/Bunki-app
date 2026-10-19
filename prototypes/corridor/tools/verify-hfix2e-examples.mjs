@@ -131,7 +131,8 @@ try {
     const block = page.locator('#sheet .example').first();
     if (await block.count()) await block.scrollIntoViewIfNeeded();
     await shot(page, 'KT6-A-examples');
-    assert(/あい/u.test(`${sheet.reading}${sheet.headword}`), `KT6-A: the page is あい (${JSON.stringify(sheet)})`);
+    assert.equal(sheet.node, 'word:あい', `KT6-A: the page is the word あい, not the kanji (${JSON.stringify(sheet)})`);
+    assert(/あい/u.test(`${sheet.reading}${sheet.headword}`), `KT6-A: the page reads あい (${JSON.stringify(sheet)})`);
     const love = examples.filter((text) => text.includes('愛'));
     assert.deepEqual(love, [], `KT6-A: no 愛 sentence is shown as 藍's example (${love.join(' | ')})`);
     const strangers = examples.filter((text) => !text.includes('藍') && !text.includes('あい'));
