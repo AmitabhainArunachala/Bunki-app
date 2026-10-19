@@ -179,8 +179,9 @@ async function guidedRows(engine, browserType) {
 }
 
 for (const [engine, browserType] of Object.entries(ENGINES)) {
-  console.log(`\n— ${engine} ${browserType.name() === 'webkit' ? webkit : chromium}.version?.() ?? ''`);
-  console.log(`— ${engine} · uptime: ${process.env.KAIRO_UPTIME || '(record beside)'}${CONTROL ? ` · CONTROL ${CONTROL}` : ''}`);
+  const probe = await browserType.launch();
+  console.log(`\n— ${engine} ${probe.version()}${CONTROL ? ` · CONTROL ${CONTROL}` : ''}`);
+  await probe.close();
   for (const word of WORDS) await wordRows(engine, browserType, word);
   await guidedRows(engine, browserType);
 }
