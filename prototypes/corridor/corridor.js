@@ -11667,6 +11667,22 @@ function layersMarkTop(left, width) {
  * no seat can hold whole gets the move that gives it the most room the glass allows (its word at the glass's edge). */
 /** Hfix-1A · whether a word moves with the reading's own scroller (the page when it is on one, else the document): no fixed
  * or sticky layer and no scroller of its own between them. */
+/** The app's own move of the reading (a stage seated whole beside its word, opened layers set whole on the glass) is not
+ * his input: the one scroll it makes is marked, so a writing it lands on goes on (writeWord's interrupt passes it). Any
+ * other scroll, his own, still ends the writing. */
+const APP_SCROLLS = new Map();
+function moveReading(scroller, by) {
+  if (scroller) scroller.scrollTop += by;
+  else window.scrollTo({ top: window.scrollY + by, behavior: 'instant' });
+  APP_SCROLLS.set(scroller || window, { top: scroller ? scroller.scrollTop : window.scrollY, until: performance.now() + 1000 });
+}
+function appMadeScroll(event) {
+  const target = event.target === document || event.target === document.documentElement ? window : event.target;
+  const made = APP_SCROLLS.get(target);
+  if (!made) return false;
+  APP_SCROLLS.delete(target);
+  return performance.now() <= made.until && Math.abs((target === window ? window.scrollY : target.scrollTop) - made.top) <= 1;
+}
 function readingCarries(anchor) {
   if (!anchor?.isConnected) return false;
   const scroller = anchor.closest('#sheet');
@@ -11828,9 +11844,7 @@ function placeFloating(card, r, anchor = null) {
     if (top == null && anchor && !sentence && !fontsLoading) {
       const move = readingMoveFor(anchor, r, m.height, ceiling, floor, { most: true });
       if (move) {
-        const scroller = anchor.closest('#sheet');
-        if (scroller) scroller.scrollTop += move;
-        else window.scrollTo({ top: window.scrollY + move, behavior: 'instant' });
+        moveReading(anchor.closest('#sheet'), move);
         r = anchorBox(anchor);
         roomAbove = r.top - 10 - ceiling;
         roomBelow = floor - (r.bottom + 10);
@@ -15299,7 +15313,7 @@ function layersOnGlass(block) {
   const floor = Math.min(innerHeight, edge('#primary-tabs', 'top') ?? innerHeight, edge('.listen-row', 'top') ?? innerHeight) - 8;
   const down = document.documentElement.scrollHeight - innerHeight - window.scrollY;
   const rise = Math.ceil(Math.min(box.bottom - floor, box.top - ceiling, down));
-  if (rise > 0) window.scrollTo({ top: window.scrollY + rise, behavior: 'instant' });
+  if (rise > 0) moveReading(null, rise);
 }
 function openReaderLayers(mark) {
   const paragraph = readerLayerParagraph();
@@ -36560,7 +36574,7 @@ function writeWord(word, { reading = null, after = null, elapsed = 0, onBegin = 
   if (reading) reading.dataset.inkHeld = '';
   const ink = { word, reading, strokes, per, total, anims: [], startedAt: null, ended: null, disposed: false };
   inkOwners.set(word, ink);
-  const interrupt = (event) => ink.end('input', event);
+  const interrupt = (event) => { if (event.type !== 'scroll' || !appMadeScroll(event)) ink.end('input', event); };
   // a tap or the start of a touch scroll (pointerdown), a key, or any scroll (a wheel, a trackpad, a scrollbar). Not a
   // wheel listener: one on the window makes WebKit rebuild its event regions as it is added and taken away (a 25–35 ms
   // frame at each end of the writing, measured), while a scroll listener costs nothing
