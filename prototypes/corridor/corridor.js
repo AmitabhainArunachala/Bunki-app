@@ -22549,6 +22549,15 @@ function kanjiDisplayRecord(id, reference = null) {
     st: canonical.st ?? entry.strokeCount,
   };
 }
+/** K01 · the one record a kanji's entry and its writing room both show: the learner's saved copy, else the whole
+ * reference record, else the wider SKIP index's KANJIDIC2 entry (胤); null only while none of them holds it. */
+function kanjiEntryRecord(id, reference = null) {
+  return retainedKanjiRecord(id) || kanjiDisplayRecord(id, reference) || D.kanji[id] || window.BunkiSkipUI?.getKanji(S.skipUi, id) || null;
+}
+/** The writing room's record: its entry's, with the reference entry that entry was opened from. */
+function strokeRoomRecord(id) {
+  return kanjiEntryRecord(id, S.stack.findLast((node) => node.t === 'kanji' && node.id === id)?.referenceEntry);
+}
 function renderReferenceMetadata(container, entry) {
   if (entry.type === 'word' && entry.variants?.length) {
     for (const variant of entry.variants) {
@@ -34674,7 +34683,7 @@ function renderKanjiNode(sheet, node) {
   const hero = el('div', 'hero');
   hero.append(el('div', 'hero-glyph', k.c));
   const meta = el('div', 'hero-meta');
-  const display = retained || kanjiDisplayRecord(node.id, node.referenceEntry) || k;
+  const display = kanjiEntryRecord(node.id, node.referenceEntry) || k;
   meta.append(el('div', 'hero-mean', display.m || tx('語義は未収録です。', 'Meaning not supplied.')));
   const chips = el('div', 'shelf-meta');
   if (Number.isInteger(k.st)) chips.append(catalogChip(`${k.st} 画`, `${k.st} strokes`, 'strokes', k.st, node.from));
@@ -35970,7 +35979,7 @@ function renderStrokePage(root) {
     stopInkRoom(); // the page is gone however it left — never orphan an engine
     return;
   }
-  const k = kanjiDisplayRecord(st.id, S.stack.findLast((node) => node.t === 'kanji' && node.id === st.id)?.referenceEntry);
+  const k = strokeRoomRecord(st.id);
   const paths = strokePathsFor(st.id);
   const reduced = strokeReduced();
 

@@ -4,6 +4,8 @@
  *                              音, 訓 against 訓), the lessons' selection first.
  *   K01-official               中 shows ジュウ — a reading only the official table gives — starred and named.
  *   K01-joyo-forms             剝 and 𠮟 (official forms kanji.json lacks) are found by reading and open whole.
+ *   K01-stroke-extended        胤 (the SKIP index's KANJIDIC2 record) shows the same readings in its writing room as
+ *                              on its entry: イン / たね, never — / —.
  *   K03-lookup                 食 by たべる, taberu, タベル, ﾀﾍﾞﾙ, ｔａｂｅｒｕ, たべr (an IME mid-word) and た;
  *                              生 by いきる, うまれる, なま; かいう never finds 介 (two readings are never joined).
  *   K04-kodansha               #8 is 胤 in both editions, 2013 #22 is 仔; 胤 opens with both numbers; a fixed
@@ -28,9 +30,9 @@
  *                              retake both stay reachable ("last time" shown); 鹿 (7級's tail) has a lesson;
  *                              nothing is enrolled.
  * Controls (`--control <name>`, in-memory page.route edits, no disk copies) must turn their rows red:
- *   recap-browse · refilter-kkld · drop-official-reading · forget-finder · failed-lesson-disappears.
+ *   recap-browse · refilter-kkld · drop-official-reading · stroke-own-record · forget-finder · failed-lesson-disappears.
  * Usage: KAIRO_SITE_DIR=<site> KAIRO_ARTIFACT_SHA256=<digest> KAIRO_EVIDENCE_DIR=<dir>
- *        [KAIRO_BROWSER=webkit|chromium|all] [--shots] [--control <name>] node verify-kanji-trust.mjs
+ *        [KAIRO_BROWSER=webkit|chromium|all] [--shots] [--control <name>] [--only <row,row>] node verify-kanji-trust.mjs
  */
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
@@ -80,6 +82,8 @@ const CONTROLS = {
       row[2] = row[2].filter((reading) => !['う.まれる', 'うま.れる', 'う.まれ', 'うまれ'].includes(reading));
       return JSON.stringify(doc);
     } },
+  'stroke-own-record': { rows: ['K01-stroke-extended'], file: 'corridor.js',
+    edit: (text) => replaceOnce(text, 'return kanjiEntryRecord(id, S.stack', 'return kanjiDisplayRecord(id, S.stack') },
   'forget-finder': { rows: ['K05-nested-return', 'K05-nested-search-page'], file: 'corridor.js',
     edit: (text) => replaceOnce(text, 'kdx: home.kdx || undefined, searchLens: home.searchLens,', '') },
   'failed-lesson-disappears': { rows: ['K08-lessons'], file: 'corridor.js',
@@ -91,6 +95,8 @@ function replaceOnce(text, from, to) {
 }
 const control = controlName ? CONTROLS[controlName] : null;
 assert(!controlName || control, `unknown control ${controlName}`);
+const onlyAt = process.argv.indexOf('--only');
+const only = onlyAt >= 0 ? process.argv[onlyAt + 1].split(',') : null;
 
 const host = await startStaticHost({ site, port: 0 });
 const results = [];
@@ -169,6 +175,16 @@ async function backToFinder(page) {
   if (await page.locator('#sheet').isVisible()) await closeSheet(page);
   return { query: await page.inputValue('#kdx-textfield'), shown: (await glyphsIn(page, '#kdx-results')).length, y: await page.evaluate(() => window.scrollY) };
 }
+/** The entry's writing room, its readings woken: each list as the room shows it, with any star kept. */
+async function strokeRoomReadings(page) {
+  await page.locator('#strokes-door').click();
+  await page.locator('#stroke-page').waitFor();
+  await page.locator('.stroke-chrome-trigger').first().click();
+  await settle(page, 500);
+  const values = await page.locator('#stroke-awake-field .stroke-reading-value').allTextContents();
+  const list = (text) => (text || '').split('・').map((s) => s.replace(/[（）]/g, '').trim()).filter((s) => s && s !== '—');
+  return { on: list(values[0]), kun: list(values[1]) };
+}
 const plain = (reading) => reading.replace(/[.\-*\s]/g, '');
 const kindOf = (reading) => (/[ァ-ヺ]/.test(reading) ? 'on' : 'kun');
 
@@ -214,6 +230,23 @@ const ROWS = {
     assert.deepEqual(officialMissing('剝', readings), [], `剝 lacks ${officialMissing('剝', readings)}`);
     await closeSheet(page);
     return `剝 by はがす, 𠮟 by しかる; 剝 opens: ${readings.on.join('・')} / ${readings.kun.join('・')}`;
+  },
+  async 'K01-stroke-extended'({ page }) {
+    // 胤 is in no lesson and KanjiVG has no strokes for it: its entry is the wider SKIP index's KANJIDIC2 record,
+    // reached here by its SKIP code in the search room (a door every build has)
+    await page.locator('#chrome-search').click();
+    await page.locator('#nav-search-input').fill('skip:1-1-8');
+    await page.locator('[data-skip-hit="胤"]').click();
+    await page.locator('#sheet .hero-glyph').waitFor();
+    await settle(page, 600);
+    const entry = await entryReadings(page);
+    const room = await strokeRoomReadings(page);
+    if (shots) await page.screenshot({ path: shotPath('yin-stroke') });
+    const shown = (readings) => `${readings.on.join('・') || '—'} / ${readings.kun.join('・') || '—'}`;
+    assert(entry.on.includes('イン') && entry.kun.includes('たね'), `胤's entry: ${shown(entry)}`);
+    assert.deepEqual({ on: room.on.map(plain), kun: room.kun.map(plain) }, { on: entry.on.map(plain), kun: entry.kun.map(plain) },
+      `胤: entry ${shown(entry)}, writing room ${shown(room)}`);
+    return `胤 by skip:1-1-8: entry ${shown(entry)} = writing room ${shown(room)}`;
   },
   async 'K03-lookup'({ page }) {
     await lens(page, 'by reading');
@@ -315,6 +348,7 @@ const ROWS = {
     await readingSearch(page, 'なま');
     const nested = (await glyphsIn(page, 'main')).length;
     const back = await backToFinder(page);
+    if (shots) await page.screenshot({ path: shotPath('nested-return') });
     assert(back.query === 'た' && back.shown === outer.shown.length && Math.abs(back.y - outer.y) <= 4,
       `back from なま (${nested} hits): query "${back.query}", ${back.shown} of ${outer.shown.length} shown, scroll ${outer.y}→${back.y}`);
     return `た: ${outer.shown.length} shown → ${outer.shown.at(-1)} → its search icon → なま (${nested}) → Back, close: "${back.query}", ${back.shown} shown, scroll ${outer.y}→${back.y}`;
@@ -566,7 +600,8 @@ async function entryRow({ page }, glyph) {
 let currentEngine = '';
 const shotPath = (name) => resolve(evidence, `after-${currentEngine}-${name}.png`);
 
-const order = control ? control.rows : Object.keys(ROWS);
+const order = control ? control.rows : only || Object.keys(ROWS);
+assert(order.every((row) => ROWS[row]), `unknown row in ${order.join(',')}`);
 let failures = 0;
 for (const engine of engines) {
   currentEngine = engine;
