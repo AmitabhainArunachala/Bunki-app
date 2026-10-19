@@ -19,6 +19,7 @@ import { contextBrowserVersion } from './browser-version-support.mjs';
 import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { selectBackupFile } from './record-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable, already built KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -402,7 +403,8 @@ async function exportUi(fixture, label) {
 async function importUi(fixture, file) {
   await tray(fixture);
   const timeOrigin = await fixture.page.evaluate(() => performance.timeOrigin), start = fixture.assetLoads.length;
-  await fixture.page.locator('#import-file').setInputFiles(file);
+  // Every restore asks first (Hfix-2a): answer exactly that confirmation; any other dialog fails.
+  await selectBackupFile(fixture.page, file);
   await fixture.page.waitForFunction(prior => performance.timeOrigin !== prior && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 });
   await ready(fixture.page); await attestRuntime(fixture, start, 'actual-ui-import-reload');
 }
@@ -477,11 +479,19 @@ define('ordinary-drafts-restart-export-restore-offline', async fixture => {
   assert(exported.backup.journal);
   await close(fixture); await launch(fixture);
   assert.deepEqual((await readAppRecordSnapshot(fixture.page)).record, exported.after.record, 'Export metadata and exact drafts survive full browser close');
-  await close(fixture); fixture.profile = 'profile-foreign'; await launch(fixture); await tray(fixture);
+  // A browser with its own learner refuses a different learner's backup. An empty browser would adopt it after a
+  // confirmation (Hfix-2a, the accepted product), so this profile first does real learner work: it chooses a sentence
+  // to practise from a reading, as the journey above did. The refusal comes before any restore confirmation.
+  await close(fixture); fixture.profile = 'profile-foreign'; await launch(fixture); await practiceFromSource(fixture); await tray(fixture);
   const foreignBefore = await readAppRecordSnapshot(fixture.page);
   assert.notEqual(foreignBefore.installation.binding.learnerId, recoveryBaseline.installation.binding.learnerId);
-  await fixture.page.locator('#import-file').setInputFiles(exported.file);
-  await fixture.page.waitForFunction(() => document.getElementById('record-portability-status')?.textContent.includes('belongs to a different learner'));
+  let foreignDialogs = 0; const foreignDialog = (dialog) => { foreignDialogs += 1; void dialog.dismiss().catch(() => {}); };
+  fixture.page.on('dialog', foreignDialog);
+  try {
+    await fixture.page.locator('#import-file').setInputFiles(exported.file);
+    await fixture.page.waitForFunction(() => document.getElementById('record-portability-status')?.textContent.includes('belongs to a different learner'));
+  } finally { fixture.page.off('dialog', foreignDialog); }
+  assert.equal(foreignDialogs, 0, 'A different learner\'s backup is refused before any restore confirmation');
   assert.deepEqual(await readAppRecordSnapshot(fixture.page), foreignBefore, 'Ownership refusal leaves every native row and authority field unchanged');
   await fixture.page.locator('#record-portability-status').scrollIntoViewIfNeeded(); await shot(fixture, 'foreign-learner-backup-refused');
   fixture.observations.push({ name: 'ordinary-foreign-learner-refusal', nativeRowsAndAuthorityUnchanged: true });
