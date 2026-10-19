@@ -1,3 +1,4 @@
+import { syntheticEvidence } from './test-evidence-fixture.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
@@ -75,6 +76,7 @@ function fixture(caller = callers.ci) {
     log: '/evidence/gate.log',
     startedAt: '2026-10-06T00:00:01Z',
     completedAt: '2026-10-06T00:00:05Z',
+    ...(status === 'passed' ? syntheticEvidence(name, identity.sha, artifact.artifactSha256) : {}),
   });
   const first = {
     schemaVersion: 1,
@@ -299,6 +301,9 @@ function siblingShards() {
   const gateB = (name, status) => ({
     ...clone(f.first.gates[0]),
     name,
+    ...(status === 'passed'
+      ? syntheticEvidence(name, f.first.identity.sha, f.artifact.artifactSha256)
+      : {}),
     status,
     exitCode: status === 'passed' ? 0 : 1,
   });
@@ -802,4 +807,16 @@ test('persisted scheduling keys must name a positive numeric run attempt', () =>
       () => pendingAttempts([], { [key]: entry }, 'p1', NOW),
       /Malformed scheduling key/,
     );
+});
+
+test('ledger observation cannot promote a passing retry without its per-gate evidence', () => {
+  const valid = fixture();
+  assert.equal(observePair(valid).length, 1);
+  for (const attempt of ['first', 'second']) {
+    const broken = fixture();
+    const gate = broken[attempt].gates.find((g) => g.status === 'passed');
+    assert(gate);
+    delete gate.evidenceReceipt;
+    assert.throws(() => observePair(broken), /Required per-gate evidence receipt missing/);
+  }
 });

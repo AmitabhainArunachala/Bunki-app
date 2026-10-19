@@ -12,6 +12,7 @@ import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
 import { DEVICE_TUTOR, setUpDeviceTutor } from './tutor-fixture-support.mjs';
@@ -102,7 +103,7 @@ for (const engine of engines) for (const width of sizes) {
       acceptDownloads: true, ignoreHTTPSErrors: true, ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
       recordVideo: { dir: videos, size: { width, height: width === 390 ? 844 : 1050 } },
     });
-    result.browserVersion = context.browser()?.version();
+    result.browserVersion = await contextBrowserVersion(context, { chromium, webkit }[engine]);
     await context.route('**/*', route => {
       const url = new URL(route.request().url()); if (url.origin === ORIGIN) return route.continue();
       result.externalRequests.push({ origin: url.origin, pathname: url.pathname }); return route.abort();

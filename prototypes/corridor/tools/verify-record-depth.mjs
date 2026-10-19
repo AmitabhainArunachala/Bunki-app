@@ -21,16 +21,25 @@
  * Claim boundary: headless engines on a Mac, not his phone; the record and archive are seeded straight into the
  * installation's own store (the state a year of use leaves), never through an app reducer. */
 import assert from 'node:assert/strict';
-import { randomUUID } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { spawn, execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { parseRecordArgs, recordCompletion, recordControlVerdict, RECORD_ROWS, RECORD_CONTROLS, deliveredAsBuilt, serveRecorded } from './vh-learning-contracts.mjs';
+import { createHash, randomUUID } from 'node:crypto';
+import { mkdirSync, readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { resolve } from 'node:path';
+import { resolve, join } from 'node:path';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot } from './record-test-support.mjs';
 import { serveMutation } from './reader-gloss-mutants.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 
+const selection = parseRecordArgs(process.argv.slice(2));
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+const nonce = process.env.RECORD_DEPTH_NONCE || null;
+const startedAt = new Date().toISOString();
+const verifierSha256 = createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex');
+const verifierGitSha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Pin an immutable built site and its digest');
 const site = resolveCorridorSite(), evidence = resolveCorridorEvidence();
 mkdirSync(evidence, { recursive: true });
@@ -48,11 +57,9 @@ const CONTROLS = {
   'tutor-spelling-key': { kills: ['T.archive'], edits: [{ file: 'corridor.js', key: 'ref',
     from: '  const ref = wordArchiveRef(node, rec);', to: '  const ref = `word:${node.id}`;' }] },
 };
-const controlAt = process.argv.indexOf('--control');
-const controlName = controlAt >= 0 ? process.argv[controlAt + 1] : null;
+const controlName = selection.control;
 const control = controlName ? CONTROLS[controlName] : null;
-assert(!controlName || control, `--control is one of ${Object.keys(CONTROLS).join(', ')}`);
-const only = process.argv.includes('--only') ? process.argv[process.argv.indexOf('--only') + 1].split(',') : null;
+const only = selection.only || (controlName ? [RECORD_CONTROLS[controlName].case] : null);
 const manifest = new Map(identity.files.map((file) => [file.path, file.sha256]));
 const delay = (ms) => new Promise((done) => setTimeout(done, ms));
 const DAY = 86400000;
@@ -62,13 +69,58 @@ const KAWAGUCHI = Object.freeze({ id: 'aozora:049966-1', search: 'チベット�
 const rows = [];
 const versions = {};
 const served = { served: [], setupError: null };
+const delivered = [];
 let engine = '';
 const check = (id, title, ok, observed = '') => {
   rows.push({ id: `${engine}/${id}`, title, ok: !!ok, observed });
   console.log(`${ok ? 'ok  ' : 'FAIL'} ${engine}/${id} ${title}${ok ? '' : ` — ${JSON.stringify(observed).slice(0, 700)}`}`);
   return !!ok;
 };
-const host = await startStaticHost({ site, port: 0 });
+let host = null;
+let terminalError = null;
+const reportBase = () => ({ schema: 'vh-record-depth/1', runId, nonce, startedAt, finishedAt: new Date().toISOString(),
+  site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierGitSha, verifierSha256,
+  engines, browsers: versions, selectors: selection, scope: only ? 'diagnostic' : 'full-engine', terminalError });
+
+// Parent proof uses fresh child directories/nonces. No child receipt from an earlier attempt can enter the verdict.
+if (selection.controls) {
+  const proof = { ...reportBase(), phase: 'controls-parent', rows: [], controls: [], fullAcceptance: false };
+  const child = async (args, phase, actualEngine) => {
+    const childNonce=randomUUID(), dir=mkdtempSync(join(evidence, `${actualEngine}-${phase}-`));
+    let log='';
+    const status=await new Promise(resolveStatus=>{
+      const proc=spawn(process.execPath, [fileURLToPath(import.meta.url), ...args], {env:{...process.env,KAIRO_BROWSER:actualEngine,KAIRO_EVIDENCE_DIR:dir,KAIRO_GATE_RUN_ID:runId,RECORD_DEPTH_NONCE:childNonce},stdio:['ignore','pipe','pipe'],detached:process.platform!=='win32'});
+      proc.stdout.on('data',bytes=>{log+=bytes; process.stdout.write(bytes);}); proc.stderr.on('data',bytes=>{log+=bytes; process.stderr.write(bytes);});
+      let timedOut=false; const timer=setTimeout(()=>{timedOut=true;try { if(process.platform==='win32') proc.kill('SIGKILL'); else process.kill(-proc.pid,'SIGKILL'); } catch {}},30*60*1000);
+      proc.on('error',error=>{clearTimeout(timer);resolveStatus({error:String(error),code:null});});
+      proc.on('close',(code,signal)=>{clearTimeout(timer);resolveStatus({code,signal,timedOut});});
+    });
+    writeFileSync(join(dir,'child.log'),log);
+    let receipt=null; try {receipt=JSON.parse(readFileSync(join(dir,'verify-record-depth.json'),'utf8'));} catch {}
+    const valid=receipt?.runId===runId && receipt?.nonce===childNonce && receipt?.artifactSha256===identity.artifactSha256 && receipt?.gitSha===identity.gitSha
+      && receipt?.verifierSha256===verifierSha256 && JSON.stringify(receipt?.engines)===JSON.stringify([actualEngine]) && !status.timedOut && !status.signal && !status.error;
+    return {dir,status,valid,receipt};
+  };
+  try {
+    for (const actualEngine of engines) {
+      const candidate=await child([], 'candidate', actualEngine);
+      proof.rows.push(...(candidate.receipt?.rows || []));
+      proof.browsers[actualEngine]=candidate.receipt?.browsers?.[actualEngine];
+      for (const [name,spec] of Object.entries(RECORD_CONTROLS)) {
+        const mutant=await child(['--control',name,'--only',spec.case],name,actualEngine);
+        const restore=await child(['--only',spec.case],`${name}-restore`,actualEngine);
+        const verdict=candidate.valid && mutant.valid && restore.valid && candidate.status.code===3 && mutant.status.code===1 && restore.status.code===3
+          ? recordControlVerdict({name,engine:actualEngine,candidate:candidate.receipt,mutant:mutant.receipt,restore:restore.receipt})
+          : {verdict:'incomplete',reason:'child identity, completion or process status invalid'};
+        proof.controls.push({name,engine:actualEngine,candidate,mutant,restore,...verdict});
+      }
+    }
+    Object.assign(proof,recordCompletion(proof.rows,engines));
+    proof.fullAcceptance=proof.diagnosticPass && proof.controls.length===engines.length*Object.keys(RECORD_CONTROLS).length && proof.controls.every(row=>row.verdict==='killed');
+  } catch(error) {proof.terminalError=String(error.stack || error);}
+  finally {proof.finishedAt=new Date().toISOString();writeFileSync(resolve(evidence,'verify-record-depth.json'),JSON.stringify(proof,null,2)+'\n');}
+  process.exit(proof.fullAcceptance ? 0 : 1);
+}
 
 /** measure-aged-record's moderate profile (150 taps, 60 reviews and 10 new cards a day), its row layouts unchanged. */
 function agedRoots(days) {
@@ -204,6 +256,7 @@ async function importRecord(page, path) {
 }
 
 try {
+  host = await startStaticHost({ site, port: 0 });
   for (engine of engines) {
     const browser = await ({ chromium, webkit })[engine].launch({ headless: true });
     versions[engine] = browser.version();
@@ -224,6 +277,7 @@ try {
           async (route) => { await gate; await route.continue().catch(() => {}); });
       }
       if (control) await serveMutation(context, { origin: host.origin, manifest, control: served, edits: control.edits });
+      else await serveRecorded(context, { origin: host.origin, files: ['corridor.js'], delivered });
       const page = await context.newPage(), errors = [];
       page.setDefaultTimeout(30000);
       page.on('pageerror', (error) => errors.push(error.message));
@@ -450,11 +504,17 @@ try {
     }, { held: true });
     await browser.close();
   }
+} catch (error) {
+  terminalError=String(error.stack || error);
 } finally {
-  await host.close();
+  await host?.close().catch(error=>{terminalError ||= String(error.stack || error);});
+  const completion=recordCompletion(rows,engines,only || Object.keys(RECORD_ROWS));
+  let deliveryError=null;
+  if (!control) try { deliveredAsBuilt({ files: ['corridor.js'], rows: delivered, manifest }); } catch (error) { deliveryError=error.message; }
+  const report={...reportBase(),phase:control ? 'mutant' : 'candidate',...completion,rows,
+    fullAcceptance:false, ...(control ? {control:{name:controlName,kills:control.kills,served:served.served,setupError:served.setupError}} : {delivered,deliveryError})};
+  report.diagnosticPass &&= !terminalError && !served.setupError && !deliveryError;
+  writeFileSync(resolve(evidence,'verify-record-depth.json'),JSON.stringify(report,null,2)+'\n');
+  console.log(`\n${rows.filter(row=>row.ok).length}/${rows.length} — evidence ${evidence}`);
+  process.exitCode=report.diagnosticPass ? 3 : 1;
 }
-writeFileSync(resolve(evidence, 'verify-record-depth.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256,
-  browsers: versions, ...(control ? { control: { name: controlName, kills: control.kills, served: served.served, setupError: served.setupError } } : {}), rows }, null, 1));
-const failed = rows.filter((row) => !row.ok);
-console.log(`\n${rows.length - failed.length}/${rows.length} — evidence ${evidence}`);
-process.exit(failed.length ? 1 : 0);

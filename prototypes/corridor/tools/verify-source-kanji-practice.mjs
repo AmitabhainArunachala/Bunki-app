@@ -14,6 +14,7 @@ import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
@@ -148,7 +149,7 @@ async function launch(fixture, { offline = false } = {}) {
     serviceWorkers: 'allow', acceptDownloads: true, ignoreHTTPSErrors: true,
     ...(fixture.engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
   });
-  activeContexts += 1; fixture.browserVersion = fixture.context.browser()?.version();
+  activeContexts += 1; fixture.browserVersion = await contextBrowserVersion(fixture.context, { chromium, webkit }[fixture.engine]);
   fixture.lifecycle.push({ action: 'launch', episode: fixture.episode, profile: fixture.profile, offline, at: new Date().toISOString() });
   // This existing-device practice journey excludes only the separately tested fresh-device demonstration.
   await fixture.context.addInitScript(() => { localStorage.setItem('kairo-word-ladder-demo-v1', '1'); });

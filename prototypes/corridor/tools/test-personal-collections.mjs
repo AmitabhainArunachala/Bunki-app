@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
-import {webcrypto} from 'node:crypto';
-import {relative,sep} from 'node:path';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {webcrypto,createHash,randomUUID} from 'node:crypto';
+import {relative,sep,resolve} from 'node:path';
+import {resolveCorridorEvidence} from '../../../scripts/resolve-corridor-site.mjs';
 import {fileURLToPath} from 'node:url';
 import vm from 'node:vm';
 import {CORRIDOR_REQUIRED_ROOTS,corridorAssetFiles} from '../../../scripts/corridor-assets.mjs';
@@ -11,9 +12,12 @@ import {validateCollection,validateEnrichment,parseImport,backup,digest,safeURL}
 import {mergeEnrichment} from '../decks/personal/enrichment.mjs';
 import {fixture,enrichmentFixture} from './personal-fixture.mjs';
 
+const checks=[], runId=process.env.KAIRO_GATE_RUN_ID||randomUUID();
+let receiptError=null;
+try {
 // the scheduler is built by srs-core.mjs from the app's one pin
 const pin = JSON.parse(readFileSync(new URL('../data/fsrs-pin.json', import.meta.url), 'utf8'));
-const data = await fixture(), engine = createEngine(data,api,pin), checks=[];
+const data = await fixture(), engine = createEngine(data,api,pin);
 const test = async (name,fn) => { await fn(); checks.push(name); };
 const now=Date.parse('2026-10-04T02:00:00.000Z');
 let counter=0; const id=()=>`test-${++counter}`, fresh=()=>engine.fresh('fixture-device');
@@ -131,4 +135,11 @@ await test('private route and all module dependencies are packaged and precached
     assert(precached.has(path),`${path} is precached by the service worker`);
   }
 });
-console.log(JSON.stringify({suite:'personal-collections',passed:checks.length,checks},null,2));
+} catch(error) { receiptError=String(error.stack||error); process.exitCode=1; } finally {
+ const paths=['../decks/personal/engine.mjs','../decks/personal/schema.mjs','../decks/personal/enrichment.mjs','../vendor/ts-fsrs.mjs','./personal-fixture.mjs','../sw.js','../../../scripts/corridor-assets.mjs'];
+ const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
+ const receipt={schemaVersion:2,runId,suite:'personal-collections',passed:checks.length,checks,error:receiptError,completed:!receiptError,
+  verifierSha256:sha(readFileSync(fileURLToPath(import.meta.url))),sources:paths.map(path=>({path,sha256:sha(readFileSync(new URL(path,import.meta.url)))}))};
+ writeFileSync(resolve(resolveCorridorEvidence(),'personal-collections.json'),JSON.stringify(receipt,null,2)+'\n');
+ console.log(JSON.stringify(receipt,null,2));
+}

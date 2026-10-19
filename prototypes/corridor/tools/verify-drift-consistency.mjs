@@ -27,7 +27,7 @@
  */
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, extname, join, resolve } from 'node:path';
 import process from 'node:process';
@@ -1403,6 +1403,8 @@ if (SOAK_MS > 0) {
   const chainVerified = CHAIN_HOPS >= 25 && chainCompleted >= 25 && chainStrata.size >= 2 && chainViolations === 0;
   const report = {
     schemaVersion: 2,
+    runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(),
+    runtime: { engine: 'chromium', version: browser?.version() || null },
     generated: 'drift-consistency sweep v2',
     startedAt,
     finishedAt: new Date().toISOString(),

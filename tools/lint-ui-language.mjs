@@ -11,9 +11,13 @@ import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from 'playwright-core';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../scripts/resolve-corridor-site.mjs';
+import { uiLanguageReportPath } from './ui-language-report.mjs';
 import { fixture, enrichmentFixture } from '../prototypes/corridor/tools/personal-fixture.mjs';
 import { entryCloseSelector } from '../prototypes/corridor/tools/sheet-navigation-support.mjs';
-import { DEVICE_TUTOR_STORE, setUpDeviceTutor } from '../prototypes/corridor/tools/tutor-fixture-support.mjs';
+import {
+  DEVICE_TUTOR_STORE,
+  setUpDeviceTutor,
+} from '../prototypes/corridor/tools/tutor-fixture-support.mjs';
 
 export const ROOMS = [
   'drift',
@@ -87,7 +91,8 @@ const ROOM_STAMPS = {
   settings: 'settings',
 };
 const site = resolveCorridorSite(),
-  out = path.join(resolveCorridorEvidence(), 'ui-language');
+  reportPath = uiLanguageReportPath(resolveCorridorEvidence()),
+  out = path.dirname(reportPath);
 const screenshots = process.argv.includes('--screenshots');
 const japaneseTour = process.argv.includes('--both-languages');
 const coreOnly = process.argv.includes('--core-only');
@@ -279,7 +284,8 @@ export async function inspectChrome(page) {
     // evidence · record · probe · draft · assisted · source inbox · test release · response record. (One backslash:
     // this regex lives in the page function, not in a template string — `\\b` matched a literal backslash and let
     // every English word through; the negative control caught it.)
-    const BANNED = /\b(unreviewed|corpus|evidence|records?|probes?|drafts?|assisted|source inbox|test release|response record)\b|未確認|探査|助けありと記録/iu;
+    const BANNED =
+      /\b(unreviewed|corpus|evidence|records?|probes?|drafts?|assisted|source inbox|test release|response record)\b|未確認|探査|助けありと記録/iu;
     const issues = [],
       inspected = [];
     const chromeText =
@@ -416,7 +422,7 @@ async function record(page, room, language) {
     ...result,
   });
   await writeFile(
-    path.join(out, 'report.json'),
+    reportPath,
     JSON.stringify(
       {
         artifact: site,
@@ -484,7 +490,10 @@ try {
     await record(page, 'guided-branch', language);
     await page.locator('.guided-room [data-action=close-branch]').click();
     // the one-hand pass: a word door opens the app's slip beside it (no word room); Escape puts it away
-    await page.locator('.gs-word').first().evaluate((n) => n.click());
+    await page
+      .locator('.gs-word')
+      .first()
+      .evaluate((n) => n.click());
     await page.locator('#mini[data-from="guided"]').waitFor();
     await record(page, 'guided-word', language);
     await page.locator('#mini').focus();
@@ -618,7 +627,7 @@ try {
   }
   const issues = results.flatMap((r) => r.issues.map((i) => ({ room: r.room, ...i })));
   await writeFile(
-    path.join(out, 'report.json'),
+    reportPath,
     JSON.stringify({ artifact: site, results, errors, issues }, null, 2) + '\n',
   );
   console.log(
@@ -640,7 +649,7 @@ try {
   assert.equal(
     issues.length,
     0,
-    `${issues.length} English chrome language leaks; see ${path.join(out, 'report.json')}`,
+    `${issues.length} English chrome language leaks; see ${reportPath}`,
   );
   assert.equal(
     results.filter((r) => r.error).length,

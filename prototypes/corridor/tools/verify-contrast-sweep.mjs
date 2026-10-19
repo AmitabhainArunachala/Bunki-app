@@ -32,35 +32,73 @@
  *   C7 source every gradient in every sheet the screens load (the lazy deck and guided sheets too) carries its comment —
  *             `bokashi: ichimonji|atenashi|urushi|emitted — surface — depth|light|brush|focus`, or `drawn:` for a hard-stop
  *             drawing — or is a mask (alpha only, no pigment); and no bokashi or drawing names a literal colour.
+ *   C8 chrome (Hfix-1A, F-1) the fixed chrome is opaque enough that text under it never shows through: with the reading
+ *             scrolled so text lies under the bars, each bar's pixels are the same with what scrolls under them (the
+ *             room's, the page's, a deck's content) hidden as with it shown. Judged wherever a bar paints (found over a
+ *             #ff00ff ground; a clear strip in a bar's box paints nothing and is no chrome). The controls standing on a bar
+ *             (a fixed or sticky element inside its box and on top there, as the deck's key on its foot band) are the bar's
+ *             own and stay in every shot.
+ *             The declared fade (INT-VH, the lead's ruling of 2026-10-19 on the deck's foot band): a bar at the foot may
+ *             declare a top-edge fade with its own `--fade-edge` (a length in px, at most 24 px, leaving the bar a body
+ *             below it), so a line scrolling under it recedes instead of being cut. C8 then judges only the pixels below
+ *             that declared strip, every one of them, and they must be fully opaque, the controls on the bar included:
+ *             the bar and what stands on it give the same pixels over two grounds (#ff00ff, #00ff00), and nothing under
+ *             them shows through. A declaration on a bar not at the foot, taller than 24 px, or not a px length is red.
+ *             And C1 reads each line where a reader reads it: inside the open reading area between the bars and clear of
+ *             their shade (a run's every line probed, not its first alone); a line outside it is read again with the
+ *             document or the page scrolled clear, the run keeping its worst pair (F-1's 9 reds were lines read under the
+ *             tab bar's edge and shade).
  * Negative controls (one-hand/M/neg): a literal #1f3a5f → transparent top bar → C3 red; the key-kanji sheet flat again
- * → C5 red; the bar's ink lowered onto its paper → C1 red; the word's page at 85 % of its page's luminance → C6 red. */
+ * → C5 red; the bar's ink lowered onto its paper → C1 red; the word's page at 85 % of its page's luminance → C6 red;
+ * SWEEP_NEGATIVE=translucent-bar (Hfix-1A) → C8 red. In every full run (INT-VH, the lead's ruling): on hokusai's deck front,
+ * each engine, the actual foot band's fade undeclared, declared at 30 px, and see-through below its declared strip → C8 red,
+ * each restored to the exact style and the exact candidate measurement (rows …/deck-front.C8-control.*). */
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
 import { inflateSync } from 'node:zlib';
+import { createHash, randomUUID } from 'node:crypto';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
+import { readAppRecord } from './record-test-support.mjs';
+import { contrastExpectedCases } from '../../../scripts/ci/vh-existing-report-contracts.mjs';
+import { judgeContrastArrival, judgeContrastArrivals } from './vh-contrast-arrival.mjs';
 
+const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['webkit', 'chromium'];
+assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
+const WORLDS = Object.freeze(['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'keyblock', 'hakuu', 'kaku']);
+const NIGHT = new Set(['rokusho', 'yoru', 'nami', 'hakuu', 'kaku']);
+// Hfix-1B's five rooms (the tutor's room, Guided and its field map, Speak and its key page) are settled states like the
+// rest: the independent admission roster (vh-existing-report-contracts CONTRAST_STATES) lists them in this order
+const SETTLED_STATES = Object.freeze(['shelf', 'reader', 'slip', 'page', 'page-examples', 'today', 'learn', 'words', 'me', 'settings', 'tutor', 'guided', 'guided-field', 'speak', 'speak-key', 'deck-front', 'deck-back']);
+const STATE_NAMES = Object.freeze([...SETTLED_STATES, 'fresh-demo']);
+assert(process.argv.slice(2).every((arg) => arg === '--demo-only') && process.argv.length <= 3, 'Unknown contrast-sweep argument');
+const demoOnly = process.argv.includes('--demo-only');
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+// a partial run (SWEEP_WORLDS / SWEEP_STATES) is for a builder's iteration only: it can never pass as an acceptance
+const onlyWorlds = Object.hasOwn(process.env, 'SWEEP_WORLDS') ? process.env.SWEEP_WORLDS.split(',') : null;
+const onlyStates = Object.hasOwn(process.env, 'SWEEP_STATES') ? process.env.SWEEP_STATES.split(',') : null;
+assert(!onlyWorlds || onlyWorlds.every((world) => WORLDS.includes(world)), 'Unknown/empty SWEEP_WORLDS selector');
+assert(!onlyStates || onlyStates.every((state) => STATE_NAMES.includes(state)), 'Unknown/empty SWEEP_STATES selector');
+assert(!onlyWorlds || new Set(onlyWorlds).size === onlyWorlds.length, 'Duplicate SWEEP_WORLDS selector');
+assert(!onlyStates || new Set(onlyStates).size === onlyStates.length, 'Duplicate SWEEP_STATES selector');
+// Hfix-1A · a negative control (SWEEP_NEGATIVE=translucent-bar): the tab bar painted see-through, so text under it shows
+// through; C8 must go red. INT-VH: a declared control is a selector like the others (VH-1): exact when set, and its run is
+// diagnostic, never an acceptance (partial, and named in the receipt's selectors)
+const SWEEP_NEGATIVE = Object.hasOwn(process.env, 'SWEEP_NEGATIVE') ? process.env.SWEEP_NEGATIVE : null;
+assert(SWEEP_NEGATIVE === null || SWEEP_NEGATIVE === 'translucent-bar', `unknown SWEEP_NEGATIVE ${SWEEP_NEGATIVE}`);
+const partial = demoOnly || !!(onlyWorlds || onlyStates) || SWEEP_NEGATIVE !== null;
+const worlds = WORLDS.filter((w) => !onlyWorlds || onlyWorlds.includes(w));
+const states = STATE_NAMES.filter((s) => (!demoOnly || s === 'fresh-demo') && (!onlyStates || onlyStates.includes(s)));
+assert(worlds.length && states.length, 'nothing to sweep');
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Pin an immutable built site and its digest');
 const site = resolveCorridorSite(), evidence = resolveCorridorEvidence();
 const identity = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), 'utf8'));
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
-const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['webkit', 'chromium'];
-assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
-const WORLDS = Object.freeze(['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'keyblock', 'hakuu', 'kaku']);
-const NIGHT = new Set(['rokusho', 'yoru', 'nami', 'hakuu', 'kaku']);
-const STATE_NAMES = Object.freeze(['shelf', 'reader', 'slip', 'page', 'page-examples', 'today', 'learn', 'words', 'me', 'settings', 'tutor', 'guided', 'guided-field', 'speak', 'speak-key', 'deck-front', 'deck-back']);
-// a partial run (SWEEP_WORLDS / SWEEP_STATES) is for a builder's iteration only: it can never pass as an acceptance
-const onlyWorlds = process.env.SWEEP_WORLDS ? process.env.SWEEP_WORLDS.split(',') : null;
-const onlyStates = process.env.SWEEP_STATES ? process.env.SWEEP_STATES.split(',') : null;
-const partial = !!(onlyWorlds || onlyStates);
-const worlds = WORLDS.filter((w) => !onlyWorlds || onlyWorlds.includes(w));
-const states = STATE_NAMES.filter((s) => !onlyStates || onlyStates.includes(s));
-assert(worlds.length && states.length, 'nothing to sweep');
 const delay = (ms) => new Promise((done) => setTimeout(done, ms));
 const STORY = Object.freeze({ id: 'kantei:jp-105-actions-202609-25startup', search: 'スタートアップ大賞' });
 const WORD = '総理';
@@ -376,6 +414,34 @@ const IN_PAGE = () => {
         });
       }
     }
+    // Hfix-1A (F-1, the lead's ruling) · the open reading area: the glass between the fixed or sticky bars at its top and
+    // its foot, and clear of their shade. A line of a run is read where a reader reads it, inside that area; a line under a
+    // bar or in its shade waits for a pass that scrolls it clear (deferred), never sampled against the bar's own paint. A
+    // bar's own words are read in it. The bars are tagged (data-sweep-bar) for C8.
+    const bars = [];
+    for (const el of document.querySelectorAll('body > *, #app > *, #sheet > *, .kp > *, .kp-study > *')) {
+      const s = getComputedStyle(el);
+      if (!['fixed', 'sticky'].includes(s.position) || s.visibility !== 'visible' || s.display === 'none') continue;
+      const r = el.getBoundingClientRect();
+      if (r.width < vw * 0.6 || r.height < 8 || r.height > vh * 0.3 || r.bottom <= 0 || r.top >= vh) continue;
+      // a bar meets the glass's edge (the bar and the thread under it at the top; the tab bar, a player, a grade bar at the
+      // foot): a fixed overlay standing mid-glass (the slip) is no bar
+      const top = r.top <= 52, foot = r.bottom >= vh - 2;
+      if (!top && !foot) continue;
+      // the shade a bar casts past its edge (its box-shadows: offset, blur and spread toward the open area)
+      let shade = 0;
+      for (const m of String(s.boxShadow || '').matchAll(/(-?[\d.]+)px\s+(-?[\d.]+)px\s+([\d.]+)px(?:\s+(-?[\d.]+)px)?/g)) {
+        if (/inset/.test(s.boxShadow)) continue;
+        const dy = Number(m[2]), blur = Number(m[3]), spread = Number(m[4] || 0);
+        shade = Math.max(shade, top ? dy + blur + spread : -dy + blur + spread);
+      }
+      el.dataset.sweepBar = top ? 'top' : 'foot';
+      bars.push({ el, sel: path(el), top, rect: { left: r.left, top: r.top, right: r.right, bottom: r.bottom }, shade: Math.max(0, shade) });
+    }
+    const openTop = Math.max(0, ...bars.filter((b) => b.top).map((b) => b.rect.bottom + b.shade));
+    const openBottom = Math.min(vh, ...bars.filter((b) => !b.top).map((b) => b.rect.top - b.shade));
+    const inBar = (el) => bars.some((b) => b.el.contains(el));
+    const scrollerOf = (el) => (el.closest('#sheet') ? 'sheet' : el.closest('#app, main, body') ? 'doc' : 'other');
     // text runs
     const texts = [];
     const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
@@ -413,15 +479,32 @@ const IN_PAGE = () => {
         if (s.filter && s.filter !== 'none' && !/^(drop-shadow\([^)]*\)\s*)+$/.test(s.filter)) filter = s.filter;
       }
       if (opacity < 0.02) continue;
-      // occluded: none of three probes along the first rect lands on the run's element or its family
-      const q = rects[0], ys = (q.top + q.bottom) / 2;
+      // each line on its own (F-1: only the first line was probed, so a run's later lines were read under the tab bar): a
+      // line is read where it stands in the open area and its own element is the topmost thing along it; a line outside
+      // the open area waits for a pass that scrolls it clear; a line covered inside it by something else is occluded
       const family = (hit) => !!hit && (hit === el || el.contains(hit) || hit.contains(el));
-      const hits = [q.left + 2, (q.left + q.right) / 2, q.right - 2].map((x) => document.elementFromPoint(x, ys));
-      if (!hits.some(family)) { texts.push({ occluded: true, text: content.slice(0, 30), sel: path(el) }); continue; }
+      const own = inBar(el), measured = [], deferred = [];
+      for (const q of rects) {
+        const ys = (q.top + q.bottom) / 2;
+        const open = own || (q.top >= openTop - 0.5 && q.bottom <= openBottom + 0.5);
+        if (!open) { deferred.push(q.top < openTop ? q.top - openTop - 12 : q.bottom - openBottom + 12); continue; }
+        const hits = [q.left + 2, (q.left + q.right) / 2, q.right - 2].map((x) => document.elementFromPoint(x, ys));
+        if (hits.some(family)) measured.push(q);
+      }
+      const key = `${path(el)}|${content.slice(0, 40)}`;
+      if (!measured.length) {
+        if (deferred.length) texts.push({ deferred: true, key, need: deferred, scroller: scrollerOf(el), text: content.slice(0, 30), sel: path(el) });
+        else texts.push({ occluded: true, text: content.slice(0, 30), sel: path(el) });
+        continue;
+      }
+      rects = measured;
       const svg = el instanceof SVGElement;
       const fill = svg ? cs.fill : (cs.webkitTextFillColor || cs.color);
       texts.push({
+        key, partial: deferred.length > 0, need: deferred, scroller: scrollerOf(el),
         text: content.slice(0, 40), sel: path(el), rects, colour: fill, colourProp: cs.color, opacity, blend, filter,
+        demo: !!el.closest('#mini[data-demo="true"]'),
+        demoBandLabel: !!el.closest('#mini[data-demo="true"] .mini-band-label'),
         clipText: /text/.test(cs.backgroundClip || '') || /text/.test(cs.webkitBackgroundClip || ''),
         stroke: parseFloat(cs.webkitTextStrokeWidth || '0') > 0, fontPx: parseFloat(cs.fontSize), weight: Number(cs.fontWeight) || 400,
         hidden: !!el.closest('[aria-hidden="true"]'),
@@ -446,7 +529,8 @@ const IN_PAGE = () => {
     }).filter(Boolean);
     probe.remove();
     return {
-      pigments, page, bodyBg, paints, texts, figures: figureRects, kanji,
+      pigments, page, bodyBg, paints, texts, figures: figureRects, kanji, open: { top: openTop, bottom: openBottom },
+      bars: bars.map((b) => ({ sel: b.sel, top: b.top, rect: b.rect, shade: b.shade })),
       meta: { theme: root.dataset.theme || 'hokusai', room: root.dataset.room || '', view: body.dataset.view || '', scrollY, sheetTop: document.getElementById('sheet')?.scrollTop ?? null },
     };
   };
@@ -646,7 +730,10 @@ function analyse(world, state, data, shot, bands) {
   // C1 text
   for (const t of data.texts) {
     if (t.occluded) { out.occluded++; continue; }
-    const record = { text: t.text, sel: t.sel, fontPx: t.fontPx, weight: t.weight, hidden: t.hidden };
+    // Hfix-1A (F-1): a run whose every line lies outside the open reading area waits for the pass that scrolls it clear
+    if (t.deferred) { out.deferred = (out.deferred || 0) + 1; continue; }
+    const record = { key: t.key, text: t.text, sel: t.sel, fontPx: t.fontPx, weight: t.weight, hidden: t.hidden,
+      opacity: t.opacity, demo: t.demo, demoBandLabel: t.demoBandLabel };
     const fg = parseColour(t.colour);
     const why = t.clipText ? 'clipped-to-text' : t.blend ? `blend ${t.blend}` : t.filter ? `filter ${t.filter}` : (!fg ? `paint ${t.colour}` : (fg.a === 0 && t.stroke ? 'stroke-only' : ''));
     if (why) { out.unresolved.push({ ...record, why }); continue; }
@@ -816,8 +903,368 @@ function sourceAudit() {
   return found;
 }
 
+/* First-use is a separate pristine device, never inferred from the settled-reader fixture.
+ * Lead ruling, 2026-10-19 VH-1: D2/C1 judges rest states, not mid-fade. The arrival must
+ * reach full opacity by its authored duration plus one independently calibrated frame. No opacity is
+ * forced, no animation is cancelled/paused, and the 4.5/3:1 C1 thresholds stay intact. */
+const DEMO_ARRIVAL = () => {
+  const seen = new WeakSet();
+  const installedDocument = document, installedWindow = window, documentId = crypto.randomUUID();
+  window.__contrastDocumentIdentity = { document: installedDocument, window: installedWindow, documentId };
+  window.__contrastDemoArrivals = [];
+  const observe = () => {
+    const mini = document.querySelector('#mini[data-demo="true"]');
+    if (!mini || seen.has(mini)) return;
+    seen.add(mini);
+    const style = getComputedStyle(mini);
+    const animations = mini.getAnimations();
+    const animation = animations.find((item) => item instanceof CSSAnimation && item.animationName === 'read-mini-rise');
+    const row = { mountSequence: window.__contrastDemoArrivals.length, name: animation?.animationName || style.animationName,
+      animationType: animation?.constructor.name || null,
+      actualAnimationNames: animations.map((item) => item.animationName || item.id || item.constructor.name),
+      sampled: false, terminal: null, connected: true, timeOrigin: performance.timeOrigin,
+      documentId, sameDocument: document === installedDocument && window === installedWindow &&
+        window.__contrastCalibrationDocument === document && window.__contrastCalibrationWindow === window,
+      frameCalibration: window.__contrastFrameCalibration || null, samples: [] };
+    window.__contrastDemoArrivals.push({ mini, row });
+    if (!animation) {
+      row.missingAnimation = true; row.sampled = true; row.terminal = 'missing-animation'; row.opacity = Number(style.opacity);
+      return;
+    }
+    const timing = animation.effect.getComputedTiming();
+    row.authoredDuration = Number(timing.duration);
+    row.authoredDelay = Number(timing.delay);
+    row.authoredEndDelay = Number(timing.endDelay);
+    row.authoredIterations = Number(timing.iterations);
+    row.authoredEnd = Number(timing.endTime);
+    const observedMount = performance.now();
+    const sample = (now) => {
+      if (!mini.isConnected) {
+        row.connected = false; row.superseded = true; row.sampled = true; row.terminal = 'detached';
+        row.supersededBeforeFinish = !(row.opacity === 1 && row.playState === 'finished');
+        row.detached = { rafTime: now, observedAt: performance.now(), playState: animation.playState, currentTime: animation.currentTime };
+        return;
+      }
+      row.startTime = animation.startTime;
+      row.currentTime = animation.currentTime;
+      row.playbackRate = animation.playbackRate;
+      row.opacity = Number(getComputedStyle(mini).opacity);
+      row.playState = animation.playState;
+      row.rafTime = now;
+      // Lead 0842: compare the observing frame and the animation start on their
+      // shared document timeline. Callback delivery is separate telemetry; a late
+      // FRAME still never buys itself a later origin or a larger allowance.
+      row.observedAt = performance.now();
+      row.callbackDeliveryMs = row.observedAt - row.rafTime;
+      row.elapsed = row.startTime === null ? null : row.rafTime - row.startTime;
+      row.samples.push({ rafTime: row.rafTime, observedAt: row.observedAt, elapsed: row.elapsed,
+        callbackDeliveryMs: row.callbackDeliveryMs, currentTime: row.currentTime, opacity: row.opacity, playState: row.playState });
+      const allowance = row.frameCalibration?.frameMs;
+      const finished = row.elapsed !== null && row.opacity === 1 && row.playState === 'finished';
+      const late = row.elapsed !== null && row.elapsed > row.authoredEnd + allowance;
+      if (finished || late || row.observedAt - observedMount >= 2000) {
+        row.sampled = true;
+        row.terminal = finished ? 'finished' : late ? 'deadline-exceeded' : 'observer-budget-exhausted';
+        return;
+      }
+      requestAnimationFrame(sample);
+    };
+    requestAnimationFrame(sample);
+  };
+  new MutationObserver(observe).observe(document, { childList: true, subtree: true });
+};
+const demoC1 = (result) => result.pairs.length > 0 && result.unresolved.length === 0 && result.pairs.every((pair) => pair.ok);
+async function measureDemo(page, world, phase) {
+  const data = await page.evaluate(([owned, inks]) => window.__sweep.collect(owned, [], inks), [OWNED, INKS]);
+  data.texts = data.texts.filter((text) => text.demo);
+  await page.evaluate(() => window.__sweep.hide(true));
+  let shot;
+  try {
+    await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+    shot = decodePng(await page.screenshot({ type: 'png' }));
+  } finally { await page.evaluate(() => window.__sweep.hide(false)); }
+  const result = analyse(world, `fresh-demo.${phase}`, data, shot, []);
+  result.engine = engine;
+  return result;
+}
+async function freshDemo(browser, world, report) {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: DPR,
+    serviceWorkers: 'block', reducedMotion: 'no-preference', colorScheme: 'light' });
+  const errors = [];
+  try {
+    await silenceBrowserAudio(context);
+    await context.addInitScript(IN_PAGE);
+    await context.addInitScript(DEMO_ARRIVAL);
+    await context.addInitScript((id) => localStorage.setItem('kairo-theme', id), world);
+    await context.route('**/*', (route) => new URL(route.request().url()).origin === origin ? route.continue() : route.abort());
+    const page = await context.newPage();
+    page.on('pageerror', (error) => errors.push(error.message));
+    page.setDefaultTimeout(20000);
+    await STEPS.shelf(page);
+    await page.evaluate(async () => {
+      const timestamps = [];
+      await new Promise((done) => {
+        const sample = (now) => { timestamps.push(now); if (timestamps.length === 13) done(); else requestAnimationFrame(sample); };
+        requestAnimationFrame(sample);
+      });
+      const sorted = timestamps.slice(1).map((stamp, index) => stamp - timestamps[index]).sort((a, b) => a - b);
+      window.__contrastFrameCalibration = { method: 'median-of-12-pre-arrival-raf-intervals',
+        timeOrigin: performance.timeOrigin, timestamps, frameMs: (sorted[5] + sorted[6]) / 2,
+        documentId: window.__contrastDocumentIdentity.documentId,
+        sameDocument: window.__contrastDocumentIdentity.document === document && window.__contrastDocumentIdentity.window === window };
+      window.__contrastCalibrationDocument = document;
+      window.__contrastCalibrationWindow = window;
+    });
+    await STEPS.reader(page);
+    await page.locator('#mini[data-demo="true"] .mini-word').waitFor();
+    await page.waitForFunction(() => {
+      const mini = document.querySelector('#mini[data-demo="true"]');
+      const observation = window.__contrastDemoArrivals.findLast((item) => item.mini === mini)?.row;
+      return observation?.sampled && mini.getAttribute('aria-busy') !== 'true' &&
+        Number(getComputedStyle(mini).opacity) === 1 && !mini.getAnimations().some((animation) => animation.playState === 'running' || animation.playState === 'pending');
+    });
+    await page.evaluate(async () => { await document.fonts.ready; });
+    const facts = await page.evaluate(() => ({
+      word: document.querySelector('#mini[data-demo="true"] .mini-word')?.textContent.trim(),
+      seen: localStorage.getItem('kairo-word-ladder-demo-v1'),
+      theme: document.documentElement.dataset.theme || 'hokusai',
+      motionPreference: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduce' : 'no-preference',
+      arrivals: window.__contrastDemoArrivals.map(({ mini, row }) => ({ ...row, connected: mini.isConnected,
+        current: mini.isConnected && mini.matches('#mini[data-demo="true"]') })),
+    }));
+    check(`${world}/fresh-demo.reach`, 'a pristine device opened the real first-use word demonstration', !!facts.word && facts.seen === '1', facts.word);
+    check(`${world}/fresh-demo.world`, 'the fresh demonstration wears its requested world', facts.theme === world, facts.theme);
+    const observedArrivals = facts.arrivals.map((row) => ({ ...row, motionPreference: facts.motionPreference }));
+    const arrivalVerdict = judgeContrastArrivals(observedArrivals);
+    const arrivals = observedArrivals.map((observed, index) => {
+      const judged = judgeContrastArrival(observed);
+      return { ...observed, completed: judged.passed, frameMs: judged.frameMs, deadlineMs: judged.deadlineMs, arrivalErrors: arrivalVerdict.mounts[index].errors };
+    });
+    check(`${world}/fresh-demo.arrival`, 'every displayed named read-mini-rise reaches full opacity by its own authored end plus an independently calibrated frame',
+      facts.motionPreference === 'no-preference' && arrivalVerdict.passed, arrivals);
+    const candidate = await measureDemo(page, world, 'settled');
+    report.results.push(candidate);
+    check(`${world}/fresh-demo.coverage`, 'the actual demo headword and Kanji label are included in the pixel contrast measurement',
+      candidate.pairs.some((pair) => pair.text === facts.word) && candidate.pairs.some((pair) => pair.demoBandLabel && pair.text === 'Kanji'),
+      candidate.pairs.map(({ text, sel, opacity }) => ({ text, sel, opacity })));
+    check(`${world}/fresh-demo.C1`, 'every settled first-use demo text run meets the unchanged C1 threshold', demoC1(candidate), candidate);
+    await page.screenshot({ path: join(evidence, 'shots', `${engine}-${world}-fresh-demo.jpg`), type: 'jpeg', quality: 88 });
+    if (world === 'hokusai') {
+      const recordBefore = await readAppRecord(page);
+      const label = page.locator('#mini[data-demo="true"] .mini-band-label').filter({ hasText: /^Kanji$/ }).first();
+      const oldStyle = await label.getAttribute('style');
+      let mutant;
+      try {
+        await label.evaluate((node) => { node.style.setProperty('color', 'rgb(120, 120, 120)', 'important');
+          node.style.setProperty('-webkit-text-fill-color', 'rgb(120, 120, 120)', 'important');
+          node.style.setProperty('background', 'rgb(120, 120, 120)', 'important'); });
+        mutant = await measureDemo(page, world, 'mutant');
+      } finally {
+        await label.evaluate((node, prior) => { if (prior === null) node.removeAttribute('style'); else node.setAttribute('style', prior); }, oldStyle);
+      }
+      const restored = await measureDemo(page, world, 'restored');
+      const recordAfter = await readAppRecord(page);
+      const sameRecord = JSON.stringify(recordBefore) === JSON.stringify(recordAfter);
+      const control = { engine, id: 'same-ink-background', candidate, mutant, restored, recordBefore, recordAfter,
+        styleBefore: oldStyle, styleAfter: await label.getAttribute('style') };
+      report.controls.push(control);
+      check(`${world}/fresh-demo.control-kill`, 'same ink and background on the actual Kanji label makes the same C1 predicate fail',
+        demoC1(candidate) && !demoC1(mutant) && mutant.pairs.some((pair) => pair.demoBandLabel && pair.text === 'Kanji' && !pair.ok), mutant);
+      check(`${world}/fresh-demo.control-restore`, 'restoring the exact style restores the settled C1 result',
+        demoC1(restored) && oldStyle === control.styleAfter && JSON.stringify(candidate.pairs) === JSON.stringify(restored.pairs), restored);
+      check(`${world}/fresh-demo.control-record`, 'the DOM contrast fault and restoration preserve the whole native record', sameRecord);
+    }
+  } catch (error) {
+    check(`${world}/fresh-demo.error`, 'first-use contrast walk completed', false, String(error.stack || error));
+  } finally {
+    check(`${world}/fresh-demo.page-errors`, 'first-use contrast has no page errors', errors.length === 0, errors);
+    await context.close();
+  }
+}
+
+/* ------------------------------------------------------------------ C8 chrome */
+// INT-VH, the lead's ruling (2026-10-19) on C8 and the deck's foot band: the fade stays (deliberate design, so a line
+// scrolling under the band recedes instead of being cut) and C8 is made precise rather than loosened. A bar at the foot may
+// declare a top-edge fade, with its own --fade-edge (a px length, at most FADE_EDGE_MAX, leaving the bar a body below it);
+// C8 then judges only the pixels below that declared strip, and every one of them must be fully opaque, the controls on
+// the bar included. A bar that declares nothing is judged as Hfix-1A wrote, wherever it paints.
+const FADE_EDGE_MAX = 24;
+const chromeClear = (chrome) => !chrome || (chrome.through.length === 0 && chrome.translucent.length === 0 && chrome.invalid.length === 0);
+async function measureChrome(page) {
+  const moved = await page.evaluate(() => {
+    const sheet = document.getElementById('sheet'), y0 = scrollY, s0 = sheet?.scrollTop ?? 0;
+    scrollBy({ top: 240, behavior: 'instant' });
+    if (sheet) sheet.scrollTop = s0 + 240;
+    return { doc: scrollY - y0, sheet: (sheet?.scrollTop ?? 0) - s0 };
+  });
+  try {
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    const whole = decodePng(await page.screenshot({ type: 'png' }));
+    // the bars, each with the fade it declares itself (a value its parent also computes is inherited, not declared), and
+    // the controls standing on them: a fixed or sticky element outside every bar, inside a bar's box and on top there (the
+    // element the glass hits at its centre), as the deck's key on its foot band. A control on a bar is the bar's own: it
+    // stays in every shot, and the bar is judged with it
+    const found = await page.evaluate(() => {
+      const fade = (el) => getComputedStyle(el).getPropertyValue('--fade-edge').trim();
+      const bars = [...document.querySelectorAll('[data-sweep-bar]')].map((b) => {
+        const r = b.getBoundingClientRect(), own = fade(b), inherited = b.parentElement ? fade(b.parentElement) : '';
+        return { sel: b.id ? `#${b.id}` : b.className.split(' ')[0], side: b.dataset.sweepBar, declared: own && own !== inherited ? own : null,
+          left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+      }).filter((r) => r.right - r.left > 0 && r.bottom - r.top > 0);
+      const parts = [];
+      for (const el of document.querySelectorAll('body *')) {
+        if (el.closest('[data-sweep-bar]')) continue;
+        const s = getComputedStyle(el);
+        if (!['fixed', 'sticky'].includes(s.position) || s.visibility !== 'visible' || s.display === 'none') continue;
+        const r = el.getBoundingClientRect();
+        if (r.width <= 0 || r.height <= 0) continue;
+        const bar = bars.find((b) => r.left >= b.left - 1 && r.right <= b.right + 1 && r.top >= b.top - 1 && r.bottom <= b.bottom + 1);
+        const hit = bar && document.elementFromPoint((r.left + r.right) / 2, (r.top + r.bottom) / 2);
+        if (!hit || !el.contains(hit)) continue;
+        el.dataset.sweepBarPart = bar.sel;
+        parts.push({ sel: el.id ? `#${el.id}` : String(el.className).split(' ')[0], bar: bar.sel });
+      }
+      return { bars, parts };
+    });
+    const keep = '[data-sweep-bar], [data-sweep-bar] *, [data-sweep-bar-part], [data-sweep-bar-part] *';
+    await page.evaluate((kept) => {
+      const style = document.createElement('style');
+      style.id = 'sweep-isolate';
+      // only what scrolls under the bars goes: the room's content, the page's, a deck's; overlays that stand on a bar
+      // (the report door, the 層 mark, the slip, the deck's key) stay in both shots. A bar standing inside that content (a
+      // deck's top and grade bars) is never hidden and is itself made visible, so its own parts keep the visibility the
+      // app gave them (a part the bar hides while scrolled stays hidden)
+      const under = ['#app > main', '#sheet > :not([data-sweep-bar])', '.kp-study > :not([data-sweep-bar])'];
+      const off = `:not(${kept})`;
+      style.textContent = `${under.map((q) => [`${q}${off}`, `${q} ${off}`, `${q}${off}::before`, `${q}${off}::after`, `${q} ${off}::before`, `${q} ${off}::after`].join(', ')).join(', ')} { visibility: hidden !important; transition: none !important; }
+        [data-sweep-bar], [data-sweep-bar-part] { visibility: visible !important; }`;
+      document.head.append(style);
+    }, keep);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    const alone = decodePng(await page.screenshot({ type: 'png' }));
+    // the bars alone over a loud ground (#ff00ff): where a bar's box shows that ground unchanged, the bar paints nothing (a
+    // clear strip its box holds above its body, as the deck's grade bar does): no chrome there to judge. A bar that paints,
+    // however faintly (a frosted bar of the page's own colour), is judged on all it paints. The same over a second ground
+    // (#00ff00): a pixel that differs between the two lets its ground through, so it is not fully opaque
+    const bareOn = async (ground) => {
+      await page.evaluate(([kept, g]) => {
+        document.getElementById('sweep-bare')?.remove();
+        const style = document.createElement('style');
+        style.id = 'sweep-bare';
+        const off = `:not(${kept})`;
+        style.textContent = `body *${off}, body *${off}::before, body *${off}::after, body::before, body::after { visibility: hidden !important; transition: none !important; }
+          [data-sweep-bar], [data-sweep-bar-part] { visibility: visible !important; } html { background: ${g} !important; } body { background: transparent !important; }`;
+        document.head.append(style);
+      }, [keep, ground]);
+      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+      return decodePng(await page.screenshot({ type: 'png' }));
+    };
+    const bare = await bareOn('#ff00ff'), green = await bareOn('#00ff00');
+    const chrome = { bars: found.bars.length, scrolled: moved, parts: found.parts, fades: [], invalid: [], through: [], translucent: [] };
+    for (const r of found.bars) {
+      let edge = null;
+      if (r.declared !== null) {
+        const px = /^\d+(?:\.\d+)?px$/.test(r.declared) ? Number.parseFloat(r.declared) : Number.NaN;
+        const why = r.side !== 'foot' ? 'a fade is declared only by a bar at the foot'
+          : !(px > 0) ? 'not a positive length in px'
+            : px > FADE_EDGE_MAX ? `taller than ${FADE_EDGE_MAX} px`
+              : px >= r.bottom - r.top ? 'leaves the bar no body below its strip' : '';
+        if (why) chrome.invalid.push({ bar: r.sel, side: r.side, declared: r.declared, why });
+        else { edge = px; chrome.fades.push({ bar: r.sel, side: r.side, edge }); }
+      }
+      const x0 = Math.max(0, Math.floor(r.left * DPR)), x1 = Math.min(whole.width, Math.ceil(r.right * DPR));
+      const y0 = Math.max(0, Math.floor(r.top * DPR)), y1 = Math.min(whole.height, Math.ceil(r.bottom * DPR));
+      // a declared bar: only the rows wholly below its strip, every pixel of them; any other bar: all it paints
+      const from = edge === null ? y0 : Math.max(y0, Math.ceil((r.top + edge) * DPR));
+      let worst = 0, count = 0, seen = 0, open = 0, openWorst = 0;
+      for (let y = from; y < y1; y += 1) for (let x = x0; x < x1; x += 1) {
+        const m = pixel(bare, x, y);
+        if (edge === null && m.r >= 250 && m.g <= 5 && m.b >= 250) continue;
+        if (edge !== null) {
+          const g = pixel(green, x, y), t = Math.max(Math.abs(m.r - g.r), Math.abs(m.g - g.g), Math.abs(m.b - g.b));
+          if (t > 0) { open += 1; if (t > openWorst) openWorst = t; }
+        }
+        seen += 1;
+        const a = pixel(whole, x, y), b = pixel(alone, x, y);
+        const d = Math.max(Math.abs(a.r - b.r), Math.abs(a.g - b.g), Math.abs(a.b - b.b));
+        if (d > worst) worst = d;
+        if (d > 8) count += 1;
+      }
+      if (worst > 8) chrome.through.push({ bar: r.sel, worst, pixels: count, ...(edge === null ? {} : { below: edge }) });
+      if (open) chrome.translucent.push({ bar: r.sel, below: edge, worst: openWorst, pixels: open, of: seen });
+    }
+    return chrome;
+  } finally {
+    await page.evaluate((m) => {
+      document.getElementById('sweep-isolate')?.remove();
+      document.getElementById('sweep-bare')?.remove();
+      for (const el of document.querySelectorAll('[data-sweep-bar-part]')) delete el.dataset.sweepBarPart;
+      scrollBy({ top: -m.doc, behavior: 'instant' });
+      const sheet = document.getElementById('sheet');
+      if (sheet) sheet.scrollTop -= m.sheet;
+    }, moved);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  }
+}
+// The declared fade's controls, in VH-1's form (the same-ink control's): each mutates the actual foot band of the actual
+// deck front (hokusai, every engine), measures C8 exactly as the scene was measured, and restores the exact style; the
+// receipt keeps the candidate (the scene's own C8 measurement), the mutant and the restored measurement, the style and the
+// native record. A bar with transparency and no declaration, a declared fade taller than 24 px, and transparency below the
+// declared strip must each turn C8 red.
+const FOOT_BAND = 'kp-foot-band';
+const C8_CONTROLS = Object.freeze([
+  { id: 'fade-undeclared', what: 'the same 18 px fade with no declaration',
+    css: '--fade-edge: initial; -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18px); mask-image: linear-gradient(to bottom, transparent, #000 18px);',
+    red: (m) => !m.fades.some((f) => f.bar === FOOT_BAND) && !m.invalid.some((f) => f.bar === FOOT_BAND) && m.through.some((t) => t.bar === FOOT_BAND && t.pixels > 0) },
+  { id: 'fade-overdeclared', what: 'a declared fade of 30 px, taller than 24 px', css: '--fade-edge: 30px;',
+    red: (m) => m.invalid.some((f) => f.bar === FOOT_BAND && f.declared === '30px' && f.why === `taller than ${FADE_EDGE_MAX} px`) },
+  { id: 'fade-translucent-below', what: 'the band see-through below its declared strip (its paint at 85 %)',
+    css: 'background: color-mix(in srgb, var(--kp-dock) 85%, transparent);',
+    red: (m) => m.fades.some((f) => f.bar === FOOT_BAND) && m.translucent.some((t) => t.bar === FOOT_BAND && t.pixels > 0) },
+]);
+async function chromeControls(page, world, state, candidate, report) {
+  const ids = [...C8_CONTROLS.map((control) => control.id), 'restore', 'record'];
+  try {
+    const band = page.locator(`.kp-study > .${FOOT_BAND}`).first();
+    const declares = chromeClear(candidate) && !!candidate?.fades.some((f) => f.bar === FOOT_BAND && f.side === 'foot' && f.edge > 0 && f.edge <= FADE_EDGE_MAX);
+    const recordBefore = await readAppRecord(page);
+    const runs = [];
+    for (const control of C8_CONTROLS) {
+      const styleBefore = await band.getAttribute('style');
+      let mutant;
+      try {
+        await band.evaluate((node, css) => node.setAttribute('style', css), control.css);
+        mutant = await measureChrome(page);
+      } finally {
+        await band.evaluate((node, prior) => { if (prior === null) node.removeAttribute('style'); else node.setAttribute('style', prior); }, styleBefore);
+      }
+      const restored = await measureChrome(page);
+      runs.push({ control, mutant, restored, styleBefore, styleAfter: await band.getAttribute('style') });
+    }
+    const recordAfter = await readAppRecord(page);
+    for (const { control, mutant, restored, styleBefore, styleAfter } of runs) {
+      report.controls.push({ engine, id: `c8-${control.id}`, scene: `${world}/${state}`, mutation: control.css, candidate, mutant, restored,
+        styleBefore, styleAfter, recordBefore, recordAfter });
+      check(`${world}/${state}.C8-control.${control.id}`, `C8 goes red on ${control.what}, where the actual band declaring its fade is green`,
+        declares && !chromeClear(mutant) && control.red(mutant), mutant);
+    }
+    check(`${world}/${state}.C8-control.restore`, 'restoring the exact style after each control restores the exact candidate C8 measurement',
+      runs.every((run) => run.styleAfter === run.styleBefore && JSON.stringify(run.restored) === JSON.stringify(candidate)), runs.map((run) => run.restored));
+    check(`${world}/${state}.C8-control.record`, 'the C8 faults and their restoration preserve the whole native record', JSON.stringify(recordBefore) === JSON.stringify(recordAfter));
+  } catch (error) {
+    for (const id of ids) if (!rows.some((row) => row.id === `${engine}/${world}/${state}.C8-control.${id}`))
+      check(`${world}/${state}.C8-control.${id}`, 'the C8 control completed', false, String(error.stack || error).slice(0, 600));
+  }
+}
+
 /* ------------------------------------------------------------------ run */
-const report = { identity: { gitSha: identity.gitSha, artifactSha256: identity.artifactSha256 }, partial, worlds, states, engines: {}, results: [], source: null };
+const report = { schemaVersion: 2, runId, artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty,
+  verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
+  arrivalPredicateSha256: createHash('sha256').update(readFileSync(new URL('./vh-contrast-arrival.mjs', import.meta.url))).digest('hex'),
+  identity: { gitSha: identity.gitSha, artifactSha256: identity.artifactSha256 }, partial, worlds, states, engines: {}, results: [], controls: [], source: null,
+  requestedScope: partial ? 'diagnostic' : 'full', selectors: { worlds: onlyWorlds, states: onlyStates, demoOnly, ...(SWEEP_NEGATIVE !== null ? { negative: SWEEP_NEGATIVE } : {}) },
+  freshDemoMotion: 'no-preference', settledMotion: 'reduce',
+  contrastTimingContract: 'Lead rulings 0806/0842, 2026-10-19 VH-1: D2/C1 at rest; actual named read-mini-rise finishes at full opacity by its authored end plus one independently pre-calibrated frame. Elapsed is observing RAF/document.timeline timestamp minus CSSAnimation.startTime; performance.now is callback-delivery telemetry only.' };
 mkdirSync(join(evidence, 'shots'), { recursive: true });
 try {
   const source = sourceAudit();
@@ -834,16 +1281,23 @@ try {
     const version = browser.version();
     report.engines[engine] = version;
     console.log(`engine ${engine} ${version}`);
+    try {
     for (const world of worlds) {
+      if (states.includes('fresh-demo')) await freshDemo(browser, world, report);
+      if (!states.some((state) => SETTLED_STATES.includes(state))) continue;
       const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: DPR, serviceWorkers: 'block', reducedMotion: 'reduce', colorScheme: 'light' });
       await silenceBrowserAudio(context);
       await context.addInitScript(IN_PAGE);
+      if (SWEEP_NEGATIVE === 'translucent-bar') await context.addInitScript(() => document.addEventListener('DOMContentLoaded', () => {
+        const style = document.createElement('style');
+        style.textContent = '#primary-tabs { background: color-mix(in srgb, var(--color-bar, #f5efe0) 55%, transparent) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }';
+        document.head.append(style);
+      }));
       await context.addInitScript((id) => {
         try {
           localStorage.setItem('kairo-theme', id);
           localStorage.setItem('bunki-cloze:prefs:v3:n1', JSON.stringify({ look: 'world', zoom: 'full', sittings: 3, ruleSeen: true }));
-          // G3's first-use demonstration of a word's stage is a fresh device's alone (its own verifier walks it): a settled
-          // reader is read without it, as every other G3-era walk reads it (at site-6 the reader was read mid-demonstration)
+          // This is the settled-device fixture. freshDemo independently measures the pristine-device demonstration.
           localStorage.setItem('kairo-word-ladder-demo-v1', '1');
         } catch { /* storage refused: the theme check below fails the walk */ }
       }, world);
@@ -854,7 +1308,7 @@ try {
       await canvas.evaluate(IN_PAGE);
       page.setDefaultTimeout(20000);
       page.on('pageerror', (error) => errors.push(error.message));
-      for (const state of STATE_NAMES) {
+      for (const state of SETTLED_STATES) {
         if (!states.includes(state) && !['shelf', 'reader', 'slip', 'page', 'today', 'me', 'deck-front'].includes(state)) continue;
         try {
           await STEPS[state](page);
@@ -900,12 +1354,63 @@ try {
         await canvas.evaluate(() => window.__sweep.replica(null));
         const result = analyse(world, state, data, shot, bands);
         result.engine = engine;
+        // Hfix-1A (F-1, the lead's ruling) · every run with a line outside the open area is read again scrolled clear of the
+        // bars: one pass that moves the document (or the page) down for the lines under the top bars, one that moves it up
+        // for the lines over the tab bar; each run keeps its worst pair from every pass. A run in a layer no scroll moves is
+        // under a bar C8 proves opaque, and is counted (barred), never read against the bar's paint
+        const waiting = data.texts.filter((t) => t.deferred || t.partial);
+        const reread = { passes: 0, read: 0, barred: [] };
+        const readKeys = new Set(result.pairs.map((p) => p.key));
+        for (const dir of [-1, 1]) {
+          const mine = waiting.filter((t) => ['doc', 'sheet'].includes(t.scroller) && t.need.some((n) => Math.sign(n) === dir));
+          if (!mine.length) continue;
+          const needs = mine.flatMap((t) => t.need.filter((n) => Math.sign(n) === dir));
+          const delta = dir < 0 ? Math.min(...needs) : Math.max(...needs);
+          const moved = await page.evaluate((d) => {
+            const sheet = document.getElementById('sheet'), y0 = scrollY, s0 = sheet?.scrollTop ?? 0;
+            scrollBy({ top: d, behavior: 'instant' });
+            if (sheet) sheet.scrollTop = s0 + d;
+            return { doc: scrollY - y0, sheet: (sheet?.scrollTop ?? 0) - s0 };
+          }, delta);
+          await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+          const again = await page.evaluate(([owned, inks]) => window.__sweep.collect(owned, [], inks), [OWNED, INKS]);
+          await page.evaluate(() => window.__sweep.hide(true));
+          await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+          const clear = decodePng(await page.screenshot({ type: 'png' }));
+          await page.evaluate(() => window.__sweep.hide(false));
+          await page.evaluate((m) => { scrollBy({ top: -m.doc, behavior: 'instant' }); const sheet = document.getElementById('sheet'); if (sheet) sheet.scrollTop -= m.sheet; }, moved);
+          const keys = new Set(mine.map((t) => t.key));
+          const pass = analyse(world, state, { ...again, texts: again.texts.filter((t) => keys.has(t.key)), figures: [], paints: [], kanji: [] }, clear, []);
+          reread.passes += 1;
+          for (const pair of pass.pairs) {
+            reread.read += 1;
+            readKeys.add(pair.key);
+            const had = result.pairs.find((p) => p.key === pair.key);
+            if (!had) result.pairs.push({ ...pair, pass: dir < 0 ? 'scrolled down' : 'scrolled up' });
+            else if (pair.ratio / pair.required < had.ratio / had.required) Object.assign(had, pair, { pass: dir < 0 ? 'scrolled down' : 'scrolled up' });
+          }
+          result.unresolved.push(...pass.unresolved);
+        }
+        reread.barred = waiting.filter((t) => !readKeys.has(t.key)).map((t) => `${t.text} ${t.sel}`.slice(0, 80));
+        result.reread = reread;
+        // C8 (F-1) · the fixed chrome is opaque enough that text under it never shows through: with the reading scrolled
+        // so text lies under the bars, each bar's pixels are the same with what scrolls under them hidden as with it shown
+        // (any channel within 8/255); a bar at the foot that declares a top-edge fade is judged below its strip, where it
+        // must be fully opaque (measureChrome)
+        // INT-VH: VH-1's form for a row a screen may not apply to (as C5): the row is always written, its applicability
+        // explicit, so the admission roster is exact. Where no fixed bar meets the glass there is no chrome to judge, as
+        // Hfix-1A's conditional row had nothing to say there; wherever a bar paints, the measurement and predicate are Hfix-1A's
+        const chrome = data.bars?.length ? await measureChrome(page) : null;
+        if (chrome) result.chrome = chrome;
+        check(`${world}/${state}.C8`, `${world}/${state}: the fixed chrome (${chrome?.bars ?? 0} bars${chrome?.fades.length ? `; ${chrome.fades.map((f) => `${f.bar} declares a ${f.edge} px fade`).join(', ')}` : ''}) is opaque: no text under it shows through (scrolled ${chrome ? chrome.scrolled.doc || chrome.scrolled.sheet : 0} px)`,
+          chromeClear(chrome), { applicability: chrome ? 'measured' : 'vacuous-no-fixed-chrome', ...(chrome || {}) });
+        if (world === 'hokusai' && state === 'deck-front') await chromeControls(page, world, state, chrome, report);
         report.results.push(result);
         const fails = result.pairs.filter((p) => !p.ok).sort((a, b) => a.ratio / a.required - b.ratio / b.required);
         const worstPair = result.pairs.slice().sort((a, b) => a.ratio / a.required - b.ratio / b.required)[0];
-        check(`${world}/${state}.C1`, `${world}/${state}: every visible text run reads (${result.pairs.length} runs; worst ${worstPair ? `${worstPair.ratio}:1 "${worstPair.text}"` : '—'})`,
+        check(`${world}/${state}.C1`, `${world}/${state}: every visible text run reads, each line in the open reading area (${result.pairs.length} runs, ${result.reread.read} read again scrolled clear of the bars; worst ${worstPair ? `${worstPair.ratio}:1 "${worstPair.text}"` : '—'})`,
           fails.length === 0 && result.unresolved.length === 0,
-          { fails: fails.slice(0, 12).map((p) => `${p.ratio}<${p.required} ${p.fg} on ${p.bg} "${p.text}" ${p.sel}`), unresolved: result.unresolved.slice(0, 8) });
+          { fails: fails.slice(0, 12).map((p) => `${p.ratio}<${p.required} ${p.fg} on ${p.bg} "${p.text}" ${p.sel}${p.pass ? ` (${p.pass})` : ''}`), unresolved: result.unresolved.slice(0, 8), barred: result.reread.barred.slice(0, 6) });
         if (result.figures.length) check(`${world}/${state}.C2`, `${world}/${state}: the overlay stands as a figure on its page (≥ 3:1 fill or lit edge on one whole side)`,
           result.figures.every((f) => f.ok), result.figures);
         check(`${world}/${state}.C3`, `${world}/${state}: every gradient and every owned surface roots in the world's ${result.pigmentCount} pigments`,
@@ -913,8 +1418,8 @@ try {
         const banded = result.banding.filter((b) => !b.ok);
         check(`${world}/${state}.C4`, `${world}/${state}: no banding, gentle slope — ≤ 1 visible tonal step per 24 px (${result.banding.length} gradation layers drawn)`,
           banded.length === 0, banded.slice(0, 8));
-        if (result.kanji.length) check(`${world}/${state}.C5`, `${world}/${state}: the key-kanji sheets wear their wash and the kanji reads ≥ 4.5:1 (${result.kanji.length})`,
-          result.kanji.every((k) => k.ok), result.kanji);
+        check(`${world}/${state}.C5`, `${world}/${state}: the key-kanji sheets wear their wash and the kanji reads ≥ 4.5:1 (${result.kanji.length})`,
+          result.kanji.every((k) => k.ok), { applicability: result.kanji.length ? 'measured' : 'vacuous-no-key-kanji-sheet', measured: result.kanji.length, sheets: result.kanji });
         if (!NIGHT.has(world)) check(`${world}/${state}.C6`, `${world}/${state}: no muddy surface (between ink and 92 % of the page)`, result.muddy.length === 0, result.muddy.slice(0, 10));
       }
       if (onlyStates?.includes('shelf') || !onlyStates) {
@@ -924,8 +1429,11 @@ try {
       check(`${world}.page-errors`, `${world}: no page errors`, errors.length === 0, errors.slice(0, 6));
       await context.close();
     }
-    await browser.close();
+    } finally { await browser.close(); }
   }
+} catch (error) {
+  report.error = String(error.stack || error);
+  check('fatal', 'contrast sweep completed', false, report.error);
 } finally {
   await host.close?.();
 }
@@ -940,10 +1448,16 @@ for (const eng of Object.keys(report.engines)) for (const world of worlds) {
 }
 report.table = table;
 report.rows = rows;
+report.expectedCases = contrastExpectedCases(engines.length === 2 ? 'all' : engines[0]);
+report.observedCases = rows.map((row) => row.id);
+report.selectedPassed = rows.length > 0 && rows.every((row) => row.ok) && !report.error;
+report.fullAcceptance = !partial && report.selectedPassed && report.expectedCases.length === rows.length &&
+  new Set(report.observedCases).size === rows.length && report.expectedCases.every((id) => report.observedCases.includes(id));
+writeFileSync(join(evidence, 'contrast-sweep.json'), JSON.stringify(report, null, 1));
 writeFileSync(join(evidence, `sweep-${engines.join('-')}.json`), JSON.stringify(report, null, 1));
 console.log('\nworst pair per world');
 for (const t of table) console.log(`  ${t.engine.padEnd(8)} ${t.world.padEnd(9)} runs ${String(t.runs).padStart(5)}  unresolved ${t.unresolved}  ${t.worst}`);
 const failed = rows.filter((r) => !r.ok);
 console.log(`\n${rows.length - failed.length}/${rows.length} rows green${partial ? ' — PARTIAL RUN (SWEEP_WORLDS/SWEEP_STATES): never an acceptance' : ''}`);
 console.log(`artifact ${identity.artifactSha256} @ ${identity.gitSha}`);
-process.exitCode = failed.length ? 1 : partial ? 3 : 0;
+process.exitCode = failed.length || (!partial && !report.fullAcceptance) ? 1 : partial ? 3 : 0;

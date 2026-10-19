@@ -21,6 +21,10 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[2]
+sys.path.insert(0, str(ROOT / "scripts" / "ci"))
+from vh_python_receipts import CheckReceipt  # noqa: E402
+REPORT = CheckReceipt("deck-gloss-ja", __file__, ROOT)
 sys.argv = sys.argv[:1]  # build.py reads its flags at import
 sys.path.insert(0, str(HERE))
 import build  # noqa: E402
@@ -29,6 +33,7 @@ FAILS: list[str] = []
 
 
 def check(name: str, ok: bool, detail: str = "") -> None:
+    REPORT.record(name, ok, detail)
     print(f"{'✓' if ok else '✗'} {name}{f' ({detail})' if detail and not ok else ''}")
     if not ok:
         FAILS.append(name)
@@ -100,6 +105,8 @@ check("the standalone page's gloss map carries the deck word's definition only",
 no_table = build.tokens_file(deck, {})
 check("with an empty table, defs is exactly the deck words' definitions", set(no_table["defs"]) == {"t-001"})
 
+if not REPORT.complete() and not FAILS:
+    FAILS.append("receipt: exact check roster incomplete")
 if FAILS:
     raise SystemExit(f"{len(FAILS)} check(s) failed")
 print("all gloss_ja checks pass")

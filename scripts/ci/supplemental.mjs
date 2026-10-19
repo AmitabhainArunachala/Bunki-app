@@ -1,6 +1,7 @@
 /** Unique assertions retained from the consolidated standalone workflows. */
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export function supplementalGates(out) {
@@ -20,6 +21,27 @@ export function supplementalGates(out) {
         'scripts/ci/battery.test.mjs',
         'scripts/ci/receipts.test.mjs',
         'scripts/ci/ledger.test.mjs',
+        'scripts/ci/verification-admission.test.mjs',
+        'scripts/ci/gate-evidence.test.mjs',
+        'scripts/ci/framework-receipt.test.mjs',
+        'scripts/ci/gate-roster-coverage.test.mjs',
+        'scripts/ci/vh-assessment-report-contracts.test.mjs',
+        'scripts/ci/vh-deck-report-contracts.test.mjs',
+        'scripts/ci/vh-existing-report-contracts.test.mjs',
+        'scripts/ci/vh-learning-report-contracts.test.mjs',
+        'scripts/ci/vh-media-report-contracts.test.mjs',
+        'scripts/ci/vh-misc-report-contracts.test.mjs',
+        'scripts/ci/vh-python-report-contracts.test.mjs',
+        'scripts/ci/vh-retained-report-contracts.test.mjs',
+        'scripts/ci/vh-visual-report-contracts.test.mjs',
+        'scripts/ci/vh-voice-report-contracts.test.mjs',
+        'prototypes/corridor/tools/test-vh-type-ruby-controls.mjs',
+        'prototypes/corridor/tools/vh-word-grammar-contracts.test.mjs',
+        'prototypes/corridor/tools/vh-learning-contracts.test.mjs',
+        'prototypes/corridor/tools/vh-learning-reader-receipt.test.mjs',
+        'prototypes/corridor/tools/vh-contrast-arrival.test.mjs',
+        'prototypes/corridor/tools/vh-visual-contracts.test.mjs',
+        'prototypes/corridor/tools/test-vh-voice-contracts.mjs',
         'scripts/release/release.test.mjs',
       ],
       requiredPath: 'scripts/ci/receipts.test.mjs',
@@ -36,7 +58,9 @@ export function supplementalGates(out) {
     },
     node('n2n1-decks-browser', 'prototypes/corridor/tools/verify-n2n1-decks.mjs'),
     node('places-layout', 'prototypes/corridor/tools/verify-places-layout.mjs'),
-    node('report-delivery', 'prototypes/corridor/tools/verify-report-delivery.mjs'),
+    node('report-delivery', 'prototypes/corridor/tools/verify-report-delivery.mjs', [], {
+      KAIRO_BROWSER: 'all',
+    }),
     {
       name: 'report-relay',
       command: process.execPath,
@@ -44,8 +68,10 @@ export function supplementalGates(out) {
       requiredPath: 'services/report-relay/test/worker.test.mjs',
     },
     node('redesign-language', 'tools/lint-ui-language.mjs', ['--screenshots', '--both-languages']),
-    node('redesign-foundation', 'tools/verify-redesign-foundation.mjs'),
-    node('redesign-docks', 'tools/verify-redesign-docks.mjs'),
+    node('redesign-foundation', 'tools/verify-redesign-foundation.mjs', [], {
+      KAIRO_BROWSER: 'all',
+    }),
+    node('redesign-docks', 'tools/verify-redesign-docks.mjs', [], { KAIRO_BROWSER: 'all' }),
     node(
       'personal-collections-contract',
       'prototypes/corridor/tools/test-personal-collections.mjs',
@@ -60,7 +86,10 @@ export function supplementalGates(out) {
       'personal-collections-browser',
       'prototypes/corridor/tools/verify-personal-collections.mjs',
       [],
-      { PERSONAL_QA_OUT: join(out, 'personal-collections-browser') },
+      {
+        PERSONAL_QA_OUT: join(out, 'personal-collections-browser'),
+        PERSONAL_BROWSERS: 'chromium,webkit',
+      },
     ),
     node('personal-host-chromium', 'prototypes/corridor/tools/verify-personal-host.mjs'),
     node('personal-host-webkit', 'prototypes/corridor/tools/verify-personal-host.mjs', [], {
@@ -79,36 +108,33 @@ export function supplementalGates(out) {
     ]),
   ].map((gate) => ({ ...gate, env: { KAIRO_EVIDENCE_DIR: join(out, gate.name), ...gate.env } }));
 }
+const DECK_PATHS = ['prototypes/corridor/decks', 'decks/kotoba-mine'];
 export function frozenDeck(root = process.cwd()) {
-  for (const args of [[], ['--profile', 'public']])
-    execFileSync('python3', ['decks/kotoba-mine/tools/build.py', '--frozen', ...args], {
-      cwd: root,
-      stdio: 'inherit',
-    });
-  execFileSync(
-    'git',
-    [
-      'diff',
-      '--stat',
-      '--exit-code',
-      '--',
-      'prototypes/corridor/decks',
-      'decks/kotoba-mine',
-      ':(exclude)*.apkg',
-    ],
-    { cwd: root, stdio: 'inherit' },
-  );
-  const untracked = execFileSync(
-    'git',
-    [
-      'ls-files',
-      '--others',
-      '--exclude-standard',
-      '--',
-      'prototypes/corridor/decks',
-      'decks/kotoba-mine',
-    ],
-    { cwd: root, encoding: 'utf8' },
-  ).trim();
-  assert.equal(untracked, '', 'Deck build wrote uncommitted outputs');
+  const generated = execFileSync('git', ['ls-files', '-z', '--', ...DECK_PATHS], {
+    cwd: root,
+    encoding: 'utf8',
+  })
+    .split('\0')
+    .filter((file) => file.endsWith('.apkg'))
+    .map((file) => [join(root, file), readFileSync(join(root, file))]);
+  try {
+    for (const args of [[], ['--profile', 'public']])
+      execFileSync('python3', ['decks/kotoba-mine/tools/build.py', '--frozen', ...args], {
+        cwd: root,
+        stdio: 'inherit',
+      });
+    execFileSync(
+      'git',
+      ['diff', '--stat', '--exit-code', '--', ...DECK_PATHS, ':(exclude)*.apkg'],
+      { cwd: root, stdio: 'inherit' },
+    );
+    const untracked = execFileSync(
+      'git',
+      ['ls-files', '--others', '--exclude-standard', '--', ...DECK_PATHS],
+      { cwd: root, encoding: 'utf8' },
+    ).trim();
+    assert.equal(untracked, '', 'Deck build wrote uncommitted outputs');
+  } finally {
+    for (const [file, bytes] of generated) writeFileSync(file, bytes);
+  }
 }

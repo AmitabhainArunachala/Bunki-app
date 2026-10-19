@@ -18,6 +18,10 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[2]
+sys.path.insert(0, str(ROOT / "scripts" / "ci"))
+from vh_python_receipts import CheckReceipt  # noqa: E402
+REPORT = CheckReceipt("deck-segment-overrides", __file__, ROOT)
 sys.path.insert(0, str(HERE))
 import build_corridor as bc  # noqa: E402
 import fugashi  # noqa: E402
@@ -27,6 +31,7 @@ FAILS: list[str] = []
 
 
 def ok(name: str, cond: bool, detail: str = "") -> None:
+    REPORT.record(name, cond, detail)
     print(f"{'  ok  ' if cond else ' FAIL '} {name}{'  — ' + detail if detail and not cond else ''}")
     if not cond:
         FAILS.append(name)
@@ -51,6 +56,8 @@ FIXED = [
     ("まどのそとを見た", ("まど", "窓"), [("ま", "ま"), ("どの", "どの")]),
     ("ぶちょうに話した", ("ぶちょう", "部長"), [("ぶちょう", "ふちょう")]),
     ("戻ってくるのは相変わらずなんで、最後は", ("な", "だ"), [("なん", "なん"), ("で", "で")]),
+    # R3-3 (Hfix-1A): after なけれ, ばか (idiot) + の is ば + かの (that)
+    ("さもなければかの国に入るに困難", ("かの", "かの"), [("ばか", "ばか"), ("の", "の")]),
 ]
 for text, want, mistake in FIXED:
     got = split(text)
@@ -70,7 +77,7 @@ copula = split("戻ってくるのは相変わらずなんで、最後は")
 ok("相変わらずなんで: な + ん + で, no 何 left", ("ん", "ん") in copula and not any(s == "なん" for s, _ in copula), json.dumps(copula, ensure_ascii=False))
 
 # 2. the guards
-for text in ["いまどの駅？", "なんでそう思うの", "暇なんで、行きます"]:
+for text in ["いまどの駅？", "なんでそう思うの", "暇なんで、行きます", "あいつはばかの一つ覚えだ"]:
     ok(f"{text}: UniDic's split is kept", split(text) == raw(text), json.dumps(split(text), ensure_ascii=False))
 
 # 3. a bad entry is refused
@@ -90,4 +97,5 @@ finally:
     bc.SEGMENT_OVERRIDES_PATH, bc._SEGMENT_OVERRIDES = real_path, real
 
 print(f"\n{'all checks green' if not FAILS else f'{len(FAILS)} failing'}")
-sys.exit(1 if FAILS else 0)
+receipt_ok = REPORT.complete()
+sys.exit(1 if FAILS or not receipt_ok else 0)

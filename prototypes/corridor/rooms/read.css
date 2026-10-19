@@ -730,6 +730,31 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
     0 -16px 48px -14px rgb(0 0 0 / 62%);
 }
 
+/* Hfix-1A (L-4) · a run of full-width Latin letters or digits in a word (Ｍｕｊｉｎ, ２０２６) takes the face's
+   proportional widths, never letter-spaced, and never breaks inside (corridor.js appendTextRuns) */
+.tok-word .fw-run { font-feature-settings: 'palt' 1; white-space: nowrap; }
+
+/* Hfix-1A · a stage cut short of its rows (no seat on the glass holds it whole) ends between two rows and says it scrolls:
+   its foot fades into the band the cut falls in (corridor.js markCardMore), the hold strip's own sign
+   (editorial.css .seal-strip[data-more]), and the fade leaves once the last row is in view */
+/* Hfix-1A · the room a meaning still to come keeps in the word band (reserveSenseRoom) is the word view's; the sentence view
+   sets its head otherwise, and keeps none */
+#mini.is-sentence .mini-head-text { min-height: 0 !important; }
+#mini[data-more='true']::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  flex: none;
+  display: block;
+  height: 32px;
+  margin-top: -32px;
+  /* bokashi: atenashi — the stage's foot — focus: the band's own ground rising over its last 32 px, where there is more
+     (32, not 22: C4's one step per 24 px; over 22 px hokusai's band rose 4.9 ΔE, two steps, in WebKit) */
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--mini-more-ground, var(--mini-paper)) 0%, transparent),
+    var(--mini-more-ground, var(--mini-paper)));
+  pointer-events: none;
+}
+
 /* 1. the word band */
 #mini .mini-head { display: grid; align-items: start; }
 #mini .mini-head-text { display: grid; gap: 2px; min-width: 0; }

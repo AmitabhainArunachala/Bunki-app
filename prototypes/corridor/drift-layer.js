@@ -3634,11 +3634,13 @@ function restorePlace(place){
 function focusArticle(article){
   if(article===null){scaleArticle=null;paintScaleStars();return true;}
   if(!article||typeof article.articleId!=='string'||!article.articleId||typeof article.title!=='string')return false;
+  // Hfix-1A · the title's words (the app's one word rule, jaWords), when they spell the title: its caption breaks only between them
+  const words=Array.isArray(article.words)&&article.words.every(w=>typeof w==='string')&&article.words.join('')===article.title?article.words.slice():null;
   if(scaleArticle?.articleId!==article.articleId||article.reveal===true){
     // The star is anchored in the retained camera's world, never in a donor word.
     const p=s2wl(vw()/2,vh()*0.34);
-    scaleArticle={articleId:article.articleId,title:article.title,x:p.x,y:p.y};
-  }else scaleArticle.title=article.title;
+    scaleArticle={articleId:article.articleId,title:article.title,words,x:p.x,y:p.y};
+  }else{scaleArticle.title=article.title;scaleArticle.words=words;}
   paintScaleStars();return true;
 }
 function checkedKeptWords(rows){
@@ -3673,7 +3675,11 @@ function paintScaleStars(){
       star.replaceChildren();
       const caption=document.createElement('span');caption.className='scale-star-caption';
       star.append(caption);star.title=label;star.scaleFullSize=null;scaleLayoutDirty=true;
-      if(attrs.articleId){
+      if(attrs.articleId&&attrs.words){
+        // Hfix-1A (round 1: 知床 broken across lines, H-nami-04, H-rokusho-11): a line ends only between two of its words
+        caption.classList.add('is-words');
+        attrs.words.forEach((word,i)=>{if(i)caption.append(document.createElement('wbr'));caption.append(document.createTextNode(word));});
+      }else if(attrs.articleId){
         for(const part of label.split(/([0-9０-９]+)/u)){
           if(/^[0-9０-９]+$/u.test(part)){const number=document.createElement('span');number.className='scale-star-number';number.textContent=part;caption.append(number);}
           else caption.append(document.createTextNode(part));
@@ -3685,7 +3691,7 @@ function paintScaleStars(){
       star.classList.toggle('scale-star-article',!!attrs.articleId);star.classList.toggle('scale-star-kept',!attrs.articleId);
       star.scaleActivate=action;star.scaleX=x;star.scaleY=y;
     };
-    if(scaleArticle)mount('article:'+scaleArticle.articleId,scaleArticle.title,{articleId:scaleArticle.articleId},scaleArticle.x,scaleArticle.y,()=>requestScaleStep('in',{articleId:scaleArticle.articleId}));
+    if(scaleArticle)mount('article:'+scaleArticle.articleId,scaleArticle.title,{articleId:scaleArticle.articleId,words:scaleArticle.words},scaleArticle.x,scaleArticle.y,()=>requestScaleStep('in',{articleId:scaleArticle.articleId}));
     for(const row of rows){
       const h=scaleHash(row.key),h2=scaleHash(row.key+'y');
       const x=WR.w*(0.12+(h%100000)/100000*0.76),y=WR.h*(0.12+(h2%100000)/100000*0.76);

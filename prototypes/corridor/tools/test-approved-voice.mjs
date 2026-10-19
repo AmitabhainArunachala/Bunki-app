@@ -67,7 +67,7 @@ function domFixture() {
     const classes = new Set(className.split(/\s+/).filter(Boolean)), attributes = new Map();
     let id = '', text = content;
     const node = {
-      tagName, className, children: [], dataset: {}, handlers: {}, isConnected: true,
+      tagName, className, children: [], dataset: {}, handlers: {}, isConnected: true, title: '',
       classList: { add: name => classes.add(name), remove: name => classes.delete(name), contains: name => classes.has(name) },
       style: { setProperty(name, value) { this[name] = value; } },
       get id() { return id; }, set id(value) { id = value; ids.set(value, node); },
@@ -87,7 +87,10 @@ function domFixture() {
     };
     return node;
   }
-  return { el, document: { getElementById: id => ids.get(id) || null } };
+  const listeners = new Map();
+  return { el, document: { getElementById: id => ids.get(id) || null, addEventListener(type, handler) {
+    if (!listeners.has(type)) listeners.set(type, []); listeners.get(type).push(handler);
+  }, dispatchEvent(event) { for (const handler of listeners.get(event.type) || []) handler(event); } } };
 }
 
 function mediaFixture() {
@@ -169,6 +172,7 @@ test('REAL · the shipped build is pending and silent, and no stale interim choi
   }
   const words = shipped('manifest.json');
   const approved = words?.v === 2 ? Object.keys(words.words || {}).length : 0;
+  const admitted = words?.v === 2 && words.lock?.model === LOCK.model && !!words.words && typeof words.words === 'object';
   // TRIPWIRE. The pending state is honest only while the locked voice has recorded nothing. The
   // day a clip lands this fails, and the positive case below must carry the proof instead.
   const onDisk = clipsOnDisk(`w/${MAIN}`);
@@ -187,9 +191,12 @@ test('REAL · the shipped build is pending and silent, and no stale interim choi
     assert.equal(f.deviceVoiceCalls.length, 0, 'never the device voice');
     assert.deepEqual(f.writes, [], 'nothing is written to storage');
     assert.equal(f.preferences.get('kairo-rec-voice-v1') ?? null, preference, 'the old value is left untouched');
-    assert.equal(button.dataset.voiceUnavailable, approved ? 'not-recorded' : 'no-recordings');
-    if (!approved) continue;
-    assert.match(note.textContent, language === 'ja' ? /収録音声/u : /No .* recording/u);
+    assert.equal(button.dataset.voiceUnavailable, admitted ? 'not-recorded' : 'no-recordings');
+    const expected = admitted
+      ? language === 'ja' ? `${LOCK.voices[MAIN]} の収録音声はありません（準備中）` : `No ${LOCK.voices[MAIN]} recording yet — on its way`
+      : language === 'ja' ? 'この版には収録音声がありません' : 'This build has no recorded voices';
+    assert.equal(note.textContent, expected, 'REAL unavailable copy is exact and visible');
+    assert.equal(button.title, expected, 'REAL unavailable title equals the visible reason');
   }
 });
 
@@ -378,6 +385,47 @@ test('CONTROL · a stored voice preference decides nothing at all', async () => 
  * Synthetic manifests, because a failure, a cancellation and a late completion cannot be staged
  * with real media. These never stand in for a real-manifest positive. */
 
+test('VH COPY-VOICE · unavailable copy and title follow manifest admission in both languages', async () => {
+  for (const language of ['en', 'ja']) for (const [kind, words, admitted] of [
+    ['null', null, false], ['legacy', { v: 1, words: {} }, false],
+    ['empty-v2', { v: 2, lock: lockBlock, words: {} }, true], ['missing-word-v2', approvedWords(), true],
+  ]) {
+    const f = await fixture({ words, language }), { button, note } = f.card();
+    f.context.speakCardReading('みしゅうろく', button, '未収録'); await settle();
+    const expected = admitted
+      ? language === 'ja' ? `${LOCK.voices[MAIN]} の収録音声はありません（準備中）` : `No ${LOCK.voices[MAIN]} recording yet — on its way`
+      : language === 'ja' ? 'この版には収録音声がありません' : 'This build has no recorded voices';
+    assert.equal(note.textContent, expected, `unavailable visible copy: ${kind}/${language}`);
+    assert.equal(button.title, expected, `unavailable title: ${kind}/${language}`);
+    assert.equal(button.dataset.voiceUnavailable, admitted ? 'not-recorded' : 'no-recordings');
+    assert.equal(f.created.length, 0); assert.equal(f.deviceVoiceCalls.length, 0);
+  }
+});
+
+test('VH COPY-VOICE · absent narration adds no dead excerpt Listen control', async () => {
+  for (const language of ['en', 'ja']) {
+    const f = await fixture({ narration: null, language });
+    const inserted = [], quote = f.el('blockquote', 'sentence-original', '最初の文。');
+    quote.dataset.sourceId = 'fixture'; quote.after = (node) => inserted.push(node);
+    const root = { querySelectorAll: (selector) => selector === 'blockquote.sentence-original' ? [quote] : [] };
+    f.context.enhanceJapaneseProse(root);
+    assert.equal(inserted.length, 0, 'pending quote must not create a Listen control');
+    assert.equal(f.created.length, 0); assert.equal(f.deviceVoiceCalls.length, 0);
+  }
+});
+
+test('VH COPY-VOICE · admitted narration exposes the locked excerpt label', async () => {
+  for (const language of ['en', 'ja']) {
+    const f = await fixture({ narration: approvedManifest(), language });
+    const inserted = [], quote = f.el('blockquote', 'sentence-original', '最初の文。');
+    quote.dataset.sourceId = 'fixture'; quote.after = (node) => inserted.push(node);
+    f.context.enhanceJapaneseProse({ querySelectorAll: (selector) => selector === 'blockquote.sentence-original' ? [quote] : [] });
+    assert.equal(inserted.length, 1);
+    assert.equal(inserted[0].textContent, language === 'ja' ? `${LOCK.voices[MAIN]}の声で聞く` : `Listen · ${LOCK.voices[MAIN]}`);
+    assert.equal(f.created.length, 0, 'enhancement itself never plays');
+  }
+});
+
 test('MECHANICS · only the exact approved identities are accepted; absent or offline stays silent', async () => {
   const f = await fixture({ narration: approvedManifest() });
   assert.equal(f.loadedNarration()?.v, 2);
@@ -483,13 +531,18 @@ test('MECHANICS · retrying an available clip clears the old error; a new failur
   f.context.speakCardReading('でんしゃ', button, '電車'); await settle();
   f.created[0].fail(); await settle();
   assert.equal(note.textContent, 'This recording could not play here');
+  assert.equal(button.title, 'This recording could not play here', 'first failure title is exact');
   f.context.speakCardReading('でんしゃ', button, '電車'); await settle();
   assert.equal(note.textContent, '', 'a currently playing retry must not retain the old failure');
+  assert.equal(button.title, '', 'retry title clears the old failure');
   f.created[1].end(); await settle();
   assert.equal(note.textContent, '');
+  assert.equal(button.title, '', 'successful completion has no error title');
   f.context.speakCardReading('でんしゃ', button, '電車'); await settle();
+  button.title = 'stale failure sentinel';
   f.created[2].fail(); await settle();
   assert.equal(note.textContent, 'This recording could not play here');
+  assert.equal(button.title, 'This recording could not play here', 'subsequent failure updates its title');
 });
 
 test('MECHANICS · leaving a card face retires its pending manifest request and active clip', async () => {

@@ -63,7 +63,8 @@
  * Negative controls (one-hand/G1/neg-control): the 91dvh cap back → P1 red; the scrim re-appended → P1 red; the word not
  * sent travelling (enterWord) → P2 red; the page fading in over the reader instead of arriving whole → P14 red. */
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import { foldGeometryEqual, foldShiftBites, grammarSelection, grammarAcceptance, sharedHoverDiverges } from './vh-word-grammar-contracts.mjs';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
@@ -100,9 +101,18 @@ const WORLDS = Object.freeze(['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokus
 const FRAME_WINDOW = 1400;
 
 const rows = [];
+const selection = grammarSelection(process.argv.slice(2));
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+const completedWalks = [], g6Completed = [];
+const g1Only = process.argv.includes('--g1-only');
+const vhInkOnly = process.argv.includes('--vh-ink-only');
+const vhOnly = vhInkOnly || process.argv.includes('--vh-contracts-only');
+let mediaPhase = 'candidate';
 let engine = '';
-const check = (id, title, ok, observed = '') => {
-  rows.push({ id: `${engine}/${id}`, title, ok: !!ok, observed });
+let rowProvenance = {phase:'control',walk:null};
+const check = (id, title, ok, observed = '', provenance = rowProvenance) => {
+  const actualProvenance = /^(?:G[1-5]\.negative\.|G6\.(?:touch|keyboard)\.negative\.)/u.test(id) ? {phase:'control',walk:null} : provenance;
+  rows.push({ id: `${engine}/${id}`, title, ok: !!ok, observed, ...actualProvenance });
   console.log(`${ok ? 'ok  ' : 'FAIL'} ${engine}/${id} ${title}${ok ? '' : ` — ${JSON.stringify(observed).slice(0, 500)}`}`);
   return !!ok;
 };
@@ -145,7 +155,7 @@ Object.assign(K, ${JSON.stringify(skyFixtureCaptions)});
 ${skyFixtureAnchor}` });
 // G5: --g5-only runs only the G5 walks (hold = seal, the strip, the tray flight, layers); --g5-controls adds its three
 // negative controls (a second hold un-keeps, the strip covers a button, a layer stays open after a tap elsewhere)
-const g5Controls = process.argv.includes('--g5-controls');
+const g5Controls = withControls || process.argv.includes('--g5-controls');
 const g5Only = process.argv.includes('--g5-only');
 assert(!(g5Only && (g2Only || g3Only || g4Only)), 'Choose one explicit narrow schedule');
 // G6: --g6-only runs the scale-travel suite alone; --g6-thread-current-only its twelve current-thread contexts;
@@ -495,7 +505,7 @@ const g2Card = (now, { stability, daysAgo, state = 2 }) => ({ due: new Date(now 
   scheduled_days: Math.round(stability * 0.6) + daysAgo, reps: 7, lapses: 0, learning_steps: 0, state });
 const g2Row = (t, key, g) => [t, key, g, 2, 3, 0.95, 40, 5, 42, 5, 30, t + 30 * G2_DAY];
 const G2_CONTROLS = {
-  'reading-check-dropped': { kills: ['G2.4'], edits: [{ file: 'corridor.js', key: 'reading', from: '  const reading = shown ? kanaReadingKey(shown) || null : null;\n  const make =',
+  'reading-check-dropped': { kills: ['G2.4', 'G2.4.rooms'], edits: [{ file: 'corridor.js', key: 'reading', from: '  const reading = shown ? kanaReadingKey(shown) || null : null;\n  const make =',
     to: '  const reading = null;\n  const make =' }] },
   'tap-schedules': { kills: ['G2.7'], edits: [{ file: 'corridor.js', key: 'schedules', from: '  const help = article ? readHelpPatch(latest, article, key, now) : null;',
     to: "  const help = article ? readHelpPatch(latest, article, key, now) : null;\n  if (plainRecord(latest.srs) && owns(latest.srs, srsKey('word', identity.id))) patch.srs = { ...latest.srs, [srsKey('word', identity.id)]: { ...latest.srs[srsKey('word', identity.id)], due: new Date(now).toISOString() } };" }] },
@@ -517,12 +527,13 @@ async function g2ShowParagraph(page) {
   });
   await delay(400);
 }
-async function g2Walks(walk, browser) {
+async function g2Walks(walk, browser, forcedControl = null) {
   const version = browser.version();
   console.log(`G2 ${engine} ${version}`);
   g2Versions[engine] = version;
   const controlAt = process.argv.indexOf('--g2-control');
-  const control = controlAt >= 0 ? G2_CONTROLS[process.argv[controlAt + 1]] : null;
+  const controlId = forcedControl || (controlAt >= 0 ? process.argv[controlAt + 1] : null);
+  const control = controlId ? G2_CONTROLS[controlId] : null;
   assert(controlAt < 0 || control, `--g2-control is one of ${Object.keys(G2_CONTROLS).join(', ')}`);
   const manifest = new Map(identity.files.map((file) => [file.path, file.sha256]));
   const served = { served: [], setupError: null };
@@ -565,7 +576,7 @@ async function g2Walks(walk, browser) {
   const record = (page) => readAppRecordSnapshot(page).then((snapshot) => snapshot.record);
   const scheduling = (value) => JSON.stringify(G2_SCHEDULING.map((key) => [key, value[key] ?? null]));
   /** The one paragraph, every state: the record a learner leaves after weeks of reading and review. */
-  const seedParagraph = async (page) => {
+  const seedParagraph = async (page, fixture) => {
     await openStory(page);
     const nodes = await page.evaluate((map) => Object.fromEntries(Object.entries(map).map(([name, at]) =>
       [name, { node: window.__KAIRO_DEPTH__.readerNode(at), key: window.__KAIRO_DEPTH__.key(window.__KAIRO_DEPTH__.readerNode(at) || {}),
@@ -573,7 +584,7 @@ async function g2Walks(walk, browser) {
     const today = await page.evaluate(() => window.__KAIRO_DEPTH__.day());
     const now = Date.now();
     const words = Object.fromEntries(Object.entries(nodes).map(([name, value]) => [name, value.node?.id]));
-    check('G2.F0.fixture', 'the paragraph names its words, each the quick dictionary\'s own record (so no index decides them)',
+    check(`G2.F0.${fixture}`, 'the paragraph names its words, each the quick dictionary\'s own record (so no index decides them)',
       words.unmet === '出席' && words.met === '官邸' && words.again === '大賞' && words.recalled === '表彰' && words.owned === '大臣' &&
       words.listed === '式' && words.notYet === '挨拶' && ['unmet', 'met', 'again', 'recalled', 'owned', 'listed', 'notYet'].every((name) => nodes[name].kind === 'core'), nodes);
     const seeded = await seed(page, (value) => {
@@ -603,7 +614,7 @@ async function g2Walks(walk, browser) {
   // G2.1 · G2.2 · G2.3 · G2.4 · G2.5 · G2.6 — one walk through the seeded paragraph and every room it reaches
   await walk('g2-depth', async (page) => {
     await prepare(page);
-    const { seeded, now } = await seedParagraph(page);
+    const { seeded, now } = await seedParagraph(page,'depth');
     const facts = {};
     for (const [name, at] of Object.entries(G2_PARA)) facts[name] = await tokenFacts(page, at);
     await g2ShowParagraph(page);
@@ -695,7 +706,7 @@ async function g2Walks(walk, browser) {
   // G2.4 · the capped homograph opened: its slip and its page
   await walk('g2-reading', async (page) => {
     await prepare(page);
-    await seedParagraph(page);
+    await seedParagraph(page,'reading');
     await g2Stage(page, token(page, G2_PARA.homograph));
     // the full dictionary names 年 read ねん (#2084840): the card is drawn again with it
     await page.waitForFunction(() => /ねん/u.test(document.querySelector('#mini .mini-reading')?.textContent || '') && !!document.querySelector('#mini button.mini-word'), null, { timeout: 10000 }).catch(() => {});
@@ -718,7 +729,7 @@ async function g2Walks(walk, browser) {
   // G2.7 · looking up never schedules
   await walk('g2-taps', async (page) => {
     await prepare(page);
-    await seedParagraph(page);
+    await seedParagraph(page,'taps');
     const before = await record(page);
     for (const at of [G2_PARA.met, G2_PARA.owned, G2_PARA.unmet]) {
       await g2Stage(page, token(page, at));
@@ -742,7 +753,8 @@ async function g2Walks(walk, browser) {
       scheduling(before) === scheduling(after) && moved.length === 0 && after.met?.entries?.[ownedKey]?.said?.value === 'not-yet' &&
       Object.keys(after.met.entries).length > Object.keys(before.met.entries).length, { moved, said: after.met?.entries?.[ownedKey]?.said });
   });
-  if (control) controlsRun.push({ engine, control: process.argv[controlAt + 1], served: served.served, setupError: served.setupError });
+  if (control) controlsRun.push({ engine, control: controlId, served: served.served, setupError: served.setupError });
+  return served;
 }
 
 
@@ -878,10 +890,21 @@ function g6ControlFor(page,from,to){
   const direction=G6_ORDER.indexOf(to)>G6_ORDER.indexOf(from)?'in':'out';
   return page.locator(`${G6_RAIL}[data-scale="${from}"] button[data-scale-${direction}]`);
 }
+// Hfix-1A (the lead's item 8; it pinned the word rail's "kanji ›" on every word page): a word's rail offers its way in only
+// back to the kanji entered from it in the visit, so the first word → kanji edge goes through the page's own kanji row (the
+// door a learner sees) and every later one through the rail (verify-hfix-1a 8.* holds the rule itself)
+async function g6Door(page,from,to){
+  if(from==='word'&&to==='kanji'){
+    const rail=page.locator(`${G6_RAIL}[data-scale="word"] button[data-scale-in]`);
+    if(await rail.count())return rail;
+    return page.locator(`#sheet .entry-row[data-kanjirow="${G6_ORIGIN.kanji}"]`);
+  }
+  return g6ControlFor(page,from,to);
+}
 async function g6Move(page,{from,to,modality,home,timing=false}){
   const before=await g6ScaleFacts(page);
   assert.equal(before.scale,from,`edge begins at actual ${from}`);
-  const control=g6ControlFor(page,from,to);
+  const control=await g6Door(page,from,to);
   if(modality==='keyboard')assert((await g6TabReach(page,control)).found,`real Tab order reaches ${from}→${to}`);
   let measurement=null;
   if(timing)measurement=await measure(page,()=>g6Activate(page,control,modality));
@@ -2348,7 +2371,7 @@ async function runG6Suite(browser){
       emit('schedule','exact declared assertion set completed without harness error',!result.error&&localRows.length===ids.length+1&&ids.every(id=>localRows.some(r=>r.id===id&&!r.observed?.unexecuted)),{expected:ids,actual:localRows.map(r=>r.id),error:result.error||null});
       result.endedAt=new Date().toISOString();
       if(control){control.error=result.error;control.pageErrors=pageErrors;control.consoleErrors=consoleErrors;}
-      if(publish)for(const row of localRows)check(`G6.${name}.${row.id}`,row.title,row.ok,row.observed);
+      if(publish)for(const row of localRows)check(`G6.${name}.${row.id}`,row.title,row.ok,row.observed,{phase:'candidate',walk:`G6.${name}`});
       const resultPath=resolve(evidence,`${engine}-G6-${name.replace(/[^a-z0-9.-]/giu,'_')}.json`);
       try{writeFileSync(resultPath,JSON.stringify({site,gitSha:identity.gitSha,artifactSha256:identity.artifactSha256,verifierSha256,browserVersion:browserVersions[engine],node:process.version,result},null,2));}
       finally{await context.close();}
@@ -2424,7 +2447,7 @@ async function runG6Suite(browser){
         await page.locator('#kp-start').tap();await page.locator('#kp-card .kp-sentence').waitFor();
         // Q · the front's passage is drawn again once its own tokens arrive (data-words="tokens"): the witness is fired at
         // the settled sentence, never at the one about to be replaced (site-6: six synthetic pointers on a detached <p>)
-        await page.waitForFunction(()=>document.querySelector('#kp-card .kp-sentence')?.dataset.words==='tokens',null,{timeout:10000}).catch(()=>{});
+        await page.waitForFunction(()=>document.querySelector('#kp-card .kp-sentence')?.dataset.words==='tokens',null,{timeout:10000});
         const front=await page.locator('#kp-card').evaluate(n=>({card:n.dataset.card,reveal:!!document.getElementById('kp-reveal'),doors:n.querySelectorAll('.kp-tok,[data-deck-word],rt').length}));
         assert(front.card&&front.reveal&&front.doors===0,'actual unanswered sealed-front fixture');
         let row=await g6TwoPointerPolicy(page,'#kp-card .kp-sentence');emit('front.policy','sealed deck text retains two-pointer default',row.ok,row.observed);
@@ -2468,8 +2491,12 @@ try {
     browserVersions[engine] = browser.version();
     console.log(`${engine} ${browserVersions[engine]}`);
     // G6's suite runs beside the walks, never under another slice's narrow schedule
-    if (!g2Only && !g3Only && !g4Only && !g5Only) await runG6Suite(browser);
+    if (!vhOnly && !g1Only && !g2Only && !g3Only && !g4Only && !g5Only) { await runG6Suite(browser); g6Completed.push(engine); }
+    const retainedWalks = new Map();
     const walk = async (name, body, { viewport = { width: 390, height: 844 }, mobile = true, control = null, init = null, demo = false, phase = 'candidate', reducedMotion = 'no-preference' } = {}) => {
+      if (vhInkOnly && name!=='G4-interrupt-save') return;
+      if (vhOnly && !['page','exposure','g2-depth','g2-reading','g2-taps','G4-interrupt-save','G5-room-hover','G5-layers'].includes(name)) return;
+      if (g1Only && /^(?:G[2-6]|g2)/u.test(name)) return;
       if (g2Only && !name.startsWith('g2')) return;
       if (g6Only && !name.startsWith('G6')) return;
       // --controls-only is a G3 schedule that also replays G4's three candidate schedules (G4-named)
@@ -2482,6 +2509,11 @@ try {
       if (sentencesOnly && name !== 'G3-front' && !name.startsWith('G3-sentence-')) return;
       if (kanaOnly && name !== 'G3-kana' && name !== 'G3-particle') return;
       if (skyReadingsOnly && name !== 'G3-sky-glyph' && name !== 'G3-particle') return;
+      const began = rows.length;
+      const completion = { engine, name, phase: control ? `mutant:${control.id}` : phase, complete: false };
+      completedWalks.push(completion);
+      mediaPhase = completion.phase.replaceAll(':','-');
+      if (!control && phase === 'candidate') retainedWalks.set(name, { body, options: { viewport, mobile, init, demo, reducedMotion }, start: began });
       const context = await browser.newContext({ viewport, isMobile: mobile, hasTouch: true, deviceScaleFactor: 2, serviceWorkers: 'block', reducedMotion });
       await context.addInitScript(GLYPHS);
       if (!demo) await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1'));
@@ -2496,7 +2528,9 @@ try {
       const page = await context.newPage(), errors = [];
       page.setDefaultTimeout(15000);
       page.on('pageerror', (error) => errors.push(error.message));
-      try { await body(page); }
+      const priorProvenance = rowProvenance;
+      rowProvenance = {phase:completion.phase,walk:name};
+      try { await body(page); completion.complete = true; }
       catch (error) {
         if (control) control.error = String(error.stack || error);
         check(`${name}.error`, `${name} ran to the end`, false, String(error.stack || error).slice(0, 700));
@@ -2512,7 +2546,10 @@ try {
         }
         if (control) control.pageErrors = errors;
         check(`${name}.page-errors`, `${name}: no page errors`, errors.length === 0, errors);
-        await context.close();
+        completion.complete &&= errors.length === 0;
+        completion.rowIds = rows.slice(began).map(row => row.id);
+        if (!control && phase === 'candidate') retainedWalks.get(name).rows = rows.slice(began);
+        try { await context.close(); } finally { rowProvenance = priorProvenance; }
       }
     };
 
@@ -2801,18 +2838,27 @@ try {
       await openStory(page, { story: { id: 'aozora:049966-1', search: '河口慧海' } });
       const meaning = page.locator('#reader .tok[data-index="540"]');
       const shina = page.locator('#reader .tok[data-index="547"]');
+      // Hfix-1A (one Save on screen; it pinned "the bar names the stage's word" while the stage stood): while a stage stands
+      // the bar's Save steps aside (hidden, its room kept, inert) and still names that word; folded, it returns naming it
+      const keep = () => page.evaluate(() => { const bar = document.getElementById('chrome-keep'); return bar && { name: bar.getAttribute('aria-label'), text: bar.textContent,
+        disabled: bar.disabled, held: bar.classList.contains('reader-capture-held'), rest: bar.hasAttribute('data-save-rest'),
+        aside: bar.hasAttribute('data-aside') && bar.inert && getComputedStyle(bar).visibility === 'hidden', shown: !bar.inert && getComputedStyle(bar).visibility === 'visible' }; });
       await stage(page, meaning);
-      const first = await page.locator('#chrome-keep').getAttribute('aria-label');
-      check('G3.save.fixture', 'the first stage and bar refer to 意味', (await slipFacts(page)).word === '意味' && /意味/u.test(first || ''), { first, stage: await slipFacts(page) });
+      const first = await keep();
+      check('G3.save.fixture', 'the first stage refers to 意味, and while it stands the bar\'s Save steps aside, naming 意味', (await slipFacts(page)).word === '意味' && first?.aside === true && /意味/u.test(first.name || ''), { first, stage: await slipFacts(page) });
       await leaveStage(page);
+      const folded = await keep();
+      check('G3.save.folded', 'folded, the bar\'s Save returns and names 意味', folded?.shown === true && !folded.aside && /意味/u.test(folded.name || ''), folded);
       await stage(page, shina);
       await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true');
-      const state = await page.evaluate(() => { const bar = document.getElementById('chrome-keep'), save = document.querySelector('#mini #mini-take'); return {
-        word: document.querySelector('#mini .mini-word')?.textContent.trim(), held: save?.disabled, bar: bar && { name: bar.getAttribute('aria-label'), text: bar.textContent, disabled: bar.disabled, held: bar.classList.contains('reader-capture-held'), rest: bar.hasAttribute('data-save-rest') },
-      }; });
-      check('G3.save.current', 'unconfirmed シナ holds Save and never leaves live 意味 in the top bar', state.word === 'シナ' && state.held === true && (!state.bar || state.bar.rest || (state.bar.held && /シナ/u.test(`${state.bar.name} ${state.bar.text}`))) && !/意味/u.test(`${state.bar?.name} ${state.bar?.text}`), state);
+      const state = await page.evaluate(() => { const save = document.querySelector('#mini #mini-take'); return { word: document.querySelector('#mini .mini-word')?.textContent.trim(), held: save?.disabled }; });
+      state.bar = await keep();
+      check('G3.save.current', 'unconfirmed シナ holds Save; the bar\'s Save stands aside and never leaves live 意味 in the top bar', state.word === 'シナ' && state.held === true && state.bar?.aside === true && (state.bar.rest || (state.bar.held && /シナ/u.test(`${state.bar.name} ${state.bar.text}`))) && !/意味/u.test(`${state.bar?.name} ${state.bar?.text}`), state);
+      await leaveStage(page);
+      state.folded = await keep();
+      check('G3.save.current-folded', 'folded, the bar\'s Save returns and never names live 意味: at rest, or holding シナ', state.folded?.shown === true && (state.folded.rest || (state.folded.held && /シナ/u.test(`${state.folded.name} ${state.folded.text}`))) && !/意味/u.test(`${state.folded.name} ${state.folded.text}`), state.folded);
       const beforeSave = await readAppRecord(page);
-      if (state.bar && !state.bar.disabled) await page.locator('#chrome-keep').click();
+      if (state.folded && !state.folded.disabled) await page.locator('#chrome-keep').click();
       await delay(500);
       const record = await readAppRecord(page);
       check('G3.save.no-phantom', 'changing stage never saves the previous word', JSON.stringify(record.taken) === JSON.stringify(beforeSave.taken) && !record.taken.some((item) => item.t === 'word' && item.id === '意味'), record.taken);
@@ -2830,11 +2876,17 @@ try {
       await particle.tap(); await delay(600);
       const part = await ladderFacts(page, particle);
       check('G3.kana.particle', 'a one-character particle is a word door and reaches a nonempty stage', part.stages === 1 && !!part.word && !part.page, part);
-      const particleSave = await page.evaluate(() => ({ miniSave: !!document.querySelector('#mini #mini-take'),
-        barRest: document.getElementById('chrome-keep')?.hasAttribute('data-save-rest'),
-        barKey: document.getElementById('chrome-keep')?.dataset.saveKey, barName: document.getElementById('chrome-keep')?.getAttribute('aria-label') }));
-      check('G3.kana.particle-save-rest', 'a particle stage with no Save leaves the bar at rest with no previous target',
-        !particleSave.miniSave && particleSave.barRest === true && particleSave.barKey === '', particleSave);
+      const barState = () => page.evaluate(() => { const bar = document.getElementById('chrome-keep'); return { miniSave: !!document.querySelector('#mini #mini-take'),
+        barRest: bar?.hasAttribute('data-save-rest'), barKey: bar?.dataset.saveKey, barName: bar?.getAttribute('aria-label'),
+        aside: !!bar && bar.hasAttribute('data-aside') && bar.inert && getComputedStyle(bar).visibility === 'hidden' }; });
+      const particleSave = await barState();
+      // Hfix-1A: while the particle's stage stands the bar's Save stands aside (one Save on screen), still at rest
+      check('G3.kana.particle-save-rest', 'a particle stage with no Save leaves the bar at rest with no previous target, standing aside while the stage stands',
+        !particleSave.miniSave && particleSave.barRest === true && particleSave.barKey === '' && particleSave.aside, particleSave);
+      await page.keyboard.press('Escape'); await delay(300);
+      const particleFolded = await barState();
+      check('G3.kana.particle-folded-rest', 'folded, the bar\'s Save returns at rest with no previous target',
+        particleFolded.barRest === true && particleFolded.barKey === '' && !particleFolded.aside, particleFolded);
       const beforeParticleSave = await readAppRecord(page);
       await page.locator('#chrome-keep').click(); await delay(400);
       const afterParticleSave = await readAppRecord(page);
@@ -3255,13 +3307,17 @@ try {
     const tapMidWriting = async (page, locator) => {
       await midWriting(page);
       const before = await inkFacts(page);
-      await locator.tap();
-      const after = await page.evaluate(() => {
-        const word = document.querySelector('#mini .mini-word');
-        const offsets = [...(word?.querySelectorAll('.ink-wet path') || [])].map((path) => parseFloat(getComputedStyle(path).strokeDashoffset));
-        return { ended: [...(window.__ink || [])].filter((row) => row.ended === 'input').length,
-          chars: word?.querySelectorAll('.ink-char').length ?? 0, drawn: offsets.every((value) => value <= 0.001) };
+      await page.evaluate(() => {
+        window.__vhHeldInk = null;
+        window.addEventListener('pointerdown', () => {
+          const word = document.querySelector('#mini .mini-word');
+          const offsets = [...(word?.querySelectorAll('.ink-wet path') || [])].map(path=>parseFloat(getComputedStyle(path).strokeDashoffset));
+          window.__vhHeldInk={ended:word?.dataset.inkEnded==='input'?1:0, chars:word?.querySelectorAll('.ink-char').length??0,
+            offsets, drawn:offsets.length>0 && offsets.every(value=>Number.isFinite(value)&&value<=0.001)};
+        }, {capture:true,once:true});
       });
+      await locator.tap();
+      const after = await page.evaluate(() => window.__vhHeldInk);
       return { before, after };
     };
     /* The interrupt schedule the negative control replays: a tap on Save during the writing finishes it at once and still
@@ -3493,7 +3549,15 @@ try {
       await page.evaluate(() => { window.__ink = []; });
       await stage(page, readerWord(page));
       await midWriting(page);
-      const gutter = await page.evaluate(() => { const r = document.getElementById('reader').getBoundingClientRect(); return { x: Math.max(2, r.left / 2), y: Math.min(innerHeight - 140, 760) }; });
+      // paper a finger lands on: no word within a fingertip of it, since Chromium adjusts a touch to a door near it (Hfix-1A:
+      // item 11's proportional digits reflowed the story, and its "た。" line came to sit at the old fixed point)
+      const gutter = await page.evaluate(() => {
+        const r = document.getElementById('reader').getBoundingClientRect(), x = Math.max(2, r.left / 2);
+        const near = (y) => [...document.querySelectorAll('#reader .tok, #reader button, #reader a, #reader [role="button"]')].some((n) => {
+          const b = n.getBoundingClientRect(); return b.width && b.left - x < 40 && b.top - 28 < y && b.bottom + 28 > y; });
+        for (let y = Math.min(innerHeight - 140, 760); y > 160; y -= 6) if (!near(y)) return { x, y };
+        return { x, y: Math.min(innerHeight - 140, 760) };
+      });
       const onPaper = await page.evaluate(({ x, y }) => { const hit = document.elementFromPoint(x, y); return !!hit && !hit.closest('#mini, .tok, button, a, [role="button"]'); }, gutter);
       await page.touchscreen.tap(gutter.x, gutter.y);
       await page.waitForFunction(() => !document.getElementById('mini'), null, { timeout: 3000 }).catch(() => {});
@@ -3755,7 +3819,7 @@ try {
       } else check('G4.frames.recorded', 'Chromium frames recorded beside WebKit (never averaged in)', samples.every((s) => s.writing?.frames > 20) && Number.isFinite(worstWriting), summary);
     });
 
-    if (withControls && !g6Only) {
+    if (withControls && !g1Only && !g2Only && !g5Only && !g6Only) {
       const specs = [
         { id: 'stalled-second', run: 'G3-stalled', probe: stalledProbe, kill: 'G3.control.stage',
           witness: (row) => row.observed.reading && row.observed.stages === 0 && !row.observed.page,
@@ -3794,7 +3858,7 @@ try {
           edits: [{ file: 'drift-layer.css', key: 'bare-glyph-full-width', from: '  width: fit-content;\n  margin-inline: auto;\n', to: '' }] },
       ];
       // --g4-only replays G4's three controls alone; G3's controls need G3's candidate schedules
-      for (const spec of g4Only ? [] : specs.filter((spec) => !skyOwnershipOnly || spec.run === 'G3-sky-ownership')) {
+      for (const spec of (g4Only || vhOnly) ? [] : specs.filter((spec) => !skyOwnershipOnly || spec.run === 'G3-sky-ownership')) {
         const control = { engine, id: spec.id, edits: spec.edits, served: [], pageErrors: [] };
         const begin = rows.length;
         await walk(spec.run, spec.probe, { control });
@@ -3825,6 +3889,14 @@ try {
        * product mutation (source bytes on disk are never edited); it is killed only when every named kill row fails for
        * its witnessed reason while every other row of the schedule still passes, and the unmodified restore passes. */
       const g4Specs = [
+        { id:'missing-final-stroke',run:'G4-interrupt-save',probe:interruptSaveProbe,kills:['G4.interrupt.save-at-once'],
+          witness:row=>row.observed.ended>=1 && row.observed.chars>0 && row.observed.offsets.some(v=>v>0.001) && row.observed.plain,
+          edits:[{file:'corridor.js',key:'last-stroke-not-finished',from:'      for (const animation of ink.anims) animation.finish();',
+            to:"      for (const animation of ink.anims) animation.finish();\n      word.querySelector('.ink-wet path:last-child')?.style.setProperty('stroke-dashoffset','1','important');"}]},
+        { id:'never-plain-after-input',run:'G4-interrupt-save',probe:interruptSaveProbe,kills:['G4.interrupt.save-at-once'],
+          witness:row=>row.observed.ended>=1 && row.observed.drawn && row.observed.plain===false,
+          edits:[{file:'corridor.js',key:'retain-finished-wrapper',from:'        setTimeout(ink.dispose, 0);',to:'        /* VH negative: finished ink never becomes plain. */'}]},
+
         { id: 'writing-blocks-tap', run: 'G4-interrupt-save', probe: interruptSaveProbe, kills: ['G4.interrupt.save-acts'],
           witness: (row) => row.observed.saved === false && !row.observed.taken.includes(`word:${WORD}`),
           edits: [{ file: 'corridor.js', key: 'ink-eats-its-tap', from: "  const interrupt = (event) => ink.end('input', event);",
@@ -3842,7 +3914,7 @@ try {
             to: "    strokeSpeedControl({ dataset: {} }), el('p', 'settings-layout-note', tx('書く速さは、書の間のスライダー一つで決まります。'," }] },
       ];
       // G4's controls replay G4's candidate schedules, which a G3 narrow schedule (other than --controls-only) does not run
-      for (const spec of g3Only && !controlsOnly ? [] : g4Specs) {
+      for (const spec of g3Only && !controlsOnly ? [] : g4Specs.filter(spec=>!vhOnly || spec.run==='G4-interrupt-save')) {
         const control = { engine, id: spec.id, edits: spec.edits, served: [], pageErrors: [] };
         const begin = rows.length;
         await g4Walk(spec.run, spec.probe, { control });
@@ -3859,7 +3931,7 @@ try {
           control.rows.every((row) => killIds.includes(row.id) || row.ok);
         control.verdict = !cleanCandidate || !complete ? 'incomplete' : killed ? 'killed' : targets.every((row) => row?.ok) ? 'survived' : 'contaminated';
         const restoreBegin = rows.length;
-        await g4Walk(spec.run, spec.probe);
+        await g4Walk(spec.run, spec.probe, { phase: `restore:${spec.id}` });
         control.restore = rows.splice(restoreBegin);
         const restored = JSON.stringify(control.restore.map((row) => row.id)) === JSON.stringify(expected) && control.restore.every((row) => row.ok);
         controls.push(control);
@@ -4131,6 +4203,28 @@ try {
         offered.lists.every((row) => row.pressed === 'false') && !!onList && after.lists.find((row) => row.name === '旅')?.pressed === 'true' && after.strip, { offered: offered.lists, after: after.lists });
       check('G5.list.labels', 'the strip with lists still speaks in plain full verbs', labelsClean(after), after.acts);
     });
+
+    await walk('G5-room-hover', async page=>{
+      await openStory(page); await readerWord(page).click(); await page.keyboard.press('Escape');
+      const keep=page.locator('#app > .chrome button.save-one.chrome-keep');
+      const back=page.locator('#app > .chrome [data-bar-back]');
+      await keep.waitFor();
+      const sample=async()=>{
+        await keep.hover(); await delay(250);
+        const held=await keep.evaluate(n=>({hover:n.matches(':hover'),background:getComputedStyle(n).backgroundColor,disabled:n.disabled}));
+        await back.hover(); await delay(250);
+        const peer=await back.evaluate(n=>({hover:n.matches(':hover'),background:getComputedStyle(n).backgroundColor,disabled:n.disabled}));
+        return {held,peer,equal:held.hover&&peer.hover&&!held.disabled&&!peer.disabled&&held.background===peer.background&&held.background!=='rgba(0, 0, 0, 0)'};
+      };
+      const baseline=await sample();check('G5.room.shared-hover','room Keep shares its room bar hover background',baseline.equal,baseline);
+      if(withControls){
+        const style=await keep.getAttribute('style');await keep.evaluate(n=>n.style.setProperty('background','rgb(255, 0, 255)','important'));
+        const mutant=await sample();await keep.evaluate((n,value)=>value===null?n.removeAttribute('style'):n.setAttribute('style',value),style);
+        const restore=await sample();const killed=baseline.equal&&!mutant.equal&&sharedHoverDiverges(mutant,baseline)&&restore.equal;
+        controls.push({engine,id:'G5.room-keep-hover',kind:'DOM style mutation',baseline,mutant,restore,verdict:killed?'killed':'incomplete'});
+        check('G5.negative.room-keep-hover','only room Keep diverges from shared hover; clean style restores equality',killed,{baseline,mutant,restore});
+      }
+    },{viewport:{width:1280,height:800},mobile:false});
 
     // a word held inside the word's page: the strip stands in the page (it scrolls with it), under its bar, over no button
     /** The word's page draws itself again when its dictionary row lands (reviveBuiltAhead → refreshWordSheet), later on a
@@ -4562,10 +4656,12 @@ try {
       // measured from the reader's own top, so a scroll is never mistaken for a line that moved
       const geometry = () => page.evaluate((paragraph) => {
         const origin = document.getElementById('reader').getBoundingClientRect().top;
-        return [...document.querySelectorAll(paragraph)].map((node) => {
+        return [...document.querySelectorAll(paragraph)].map((node, index) => {
           const r = node.getBoundingClientRect();
-          return [Math.round(r.top - origin), Math.round(r.height), [...node.querySelectorAll('.tok[data-index]')].slice(0, 12)
-            .map((tok) => { const b = tok.getBoundingClientRect(); return [Math.round(b.left), Math.round(b.top - origin)]; })];
+          return { id: `${index}:${node.querySelector('.tok[data-index]')?.dataset.index}`, top: r.top - origin, height: r.height,
+            tokens: [...node.querySelectorAll('.tok[data-index]')].slice(0, 12).map((tok) => {
+              const b = tok.getBoundingClientRect(); return { id: tok.dataset.index, left: b.left, top: b.top - origin };
+            }) };
         });
       }, paragraph);
       const plain = await geometry();
@@ -4608,9 +4704,25 @@ try {
       const bareAgain = await geometry();
       // F · the tap that folded the layers raised 大賞's reading (G3's first rung), a native rt: in WebKit its line may settle by
       // under a pixel, which F's own ruler calls no movement (a reading "moves no line", < 1 px). Every line and word is where
-      // it was within that, read whole-pixel
-      const within = (a, b) => (Array.isArray(a) ? Array.isArray(b) && a.length === b.length && a.every((x, i) => within(x, b[i])) : Math.abs(a - b) <= 1);
-      check('G5.layers.bare-again', 'folded, the reading is bare and every line where it was (within F\'s 1 px)', within(bareAgain, plain), { plain, bareAgain });
+      // it was: raw coordinates, strict < 1 px, never rounded before comparison.
+      check('G5.layers.bare-again', 'folded, the reading is bare and every raw coordinate moves strictly less than 1 px', foldGeometryEqual(bareAgain, plain), { plain, bareAgain });
+      if (g5Controls) {
+        for (const [id, amount] of [['fold-shift-one-pixel', 1], ['fold-shift-one-quarter-over', 1.25]]) {
+          const beforeScroll = await page.evaluate(() => [scrollX, scrollY]);
+          const direction = bareAgain[0].top >= plain[0].top ? 1 : -1;
+          const previous = await page.locator(paragraph).first().evaluate((node, dy) => {
+            const previous = node.style.transform; node.style.transform = `translateY(${dy}px) ${previous}`; return previous;
+          }, amount * direction);
+          const shifted = await geometry();
+          const afterScroll = await page.evaluate(() => [scrollX, scrollY]);
+          await page.locator(paragraph).first().evaluate((node, value) => { node.style.transform = value; }, previous);
+          const restoredGeometry = await geometry();
+          const killed = foldGeometryEqual(bareAgain, plain) && foldShiftBites({ plain, baseline: bareAgain, shifted, amount, direction });
+          const restored = foldGeometryEqual(restoredGeometry, plain) && JSON.stringify(beforeScroll) === JSON.stringify(afterScroll);
+          controls.push({ engine, id, kind: 'post-fold DOM geometry mutation', amount, direction, baseline: bareAgain, shifted, restore: restoredGeometry, beforeScroll, afterScroll, verdict: killed && restored ? 'killed' : 'incomplete' });
+          check(`G5.negative.${id}`, 'the real folded paragraph shifted by the declared amount fails raw geometry; restoring its style passes without page scroll', killed && restored, { amount, direction, beforeScroll, afterScroll, shifted, restoredGeometry });
+        }
+      }
       await page.keyboard.press('Escape'); await delay(200);
       await page.locator('#layers-mark').tap(); await delay(250);
       await page.keyboard.press('Escape'); await delay(250);
@@ -4674,7 +4786,7 @@ try {
       }
     });
 
-    if (g5Controls) {
+    if (g5Controls && !vhOnly && !g1Only && !g2Only && !g3Only && !g4Only && !g6Only) {
       const specs = [
         { id: 'second-hold-unkeeps', run: 'G5-second', probe: g5SecondProbe, kill: 'G5.second-hold',
           witness: (row) => row.observed.cards === 0,
@@ -4709,7 +4821,7 @@ try {
         const killed = cleanCandidate && complete && !!target && !target.ok && witnessed && control.rows.every((row) => row.id === target.id || row.ok);
         control.verdict = !cleanCandidate || !complete ? 'incomplete' : killed ? 'killed' : target?.ok ? 'survived' : 'contaminated';
         const restoreBegin = rows.length;
-        await walk(spec.run, spec.probe);
+        await walk(spec.run, spec.probe, { phase: `restore:${spec.id}` });
         control.restore = rows.splice(restoreBegin);
         const restored = JSON.stringify(control.restore.map((row) => row.id)) === JSON.stringify(expected) && control.restore.every((row) => row.ok);
         controls.push(control);
@@ -5044,7 +5156,7 @@ try {
       for (const world of ['sumi', 'yoru']) {
         await openStory(page, { world });
         const scale = await page.evaluate(() => devicePixelRatio);
-        const save = (buffer, way, t) => writeFileSync(resolve(evidence, `${engine}-P14-${world}-${way}-${String(t).padStart(3, '0')}ms.png`), buffer);
+        const save = (buffer, way, t) => writeFileSync(resolve(evidence, `${engine}-${mediaPhase}-P14-${world}-${way}-${String(t).padStart(3, '0')}ms.png`), buffer);
         // arriving: the reader and its card → the page
         await stage(page, readerWord(page));
         await page.locator('#mini .mini-word').waitFor();
@@ -5089,16 +5201,87 @@ try {
       }
     });
 
-    await g2Walks(walk, browser);
+    const g2Start = rows.length;
+    if (!g1Only) await g2Walks(walk, browser);
+    const g2Baseline = rows.slice(g2Start);
+    if (withControls && ((vhOnly && !vhInkOnly) || g2Only || selection.fullRequested) && !process.argv.includes('--g2-control')) {
+      for (const [id, spec] of Object.entries(G2_CONTROLS)) {
+        const begin = rows.length;
+        const served = await g2Walks((name, body, options = {}) => walk(name, body, { ...options, phase: `mutant:${id}` }), browser, id);
+        const mutant = rows.splice(begin);
+        const restoreBegin = rows.length;
+        await g2Walks((name, body, options = {}) => walk(name, body, { ...options, phase: `restore:${id}` }), browser);
+        const restore = rows.splice(restoreBegin);
+        const expected = g2Baseline.map(row => row.id), kills = spec.kills.map(key => `${engine}/${key}`);
+        const targets = kills.map(key => mutant.find(row => row.id === key));
+        const same = value => JSON.stringify(value.map(row => row.id)) === JSON.stringify(expected);
+        const witnessed = id === 'reading-check-dropped'
+          ? targets.every(row => row && !row.ok && (row.id.endsWith('.rooms')
+            ? row.observed?.slip?.kept || row.observed?.basis?.kept || !['met', null].includes(row.observed?.slip?.depth) || (row.observed?.slip?.reading==='ねん' && row.observed?.basis?.text.includes('this reading’s entry is not settled') && !row.observed?.basis?.text.includes('another reading'))
+            : [row.observed?.capped, row.observed?.homograph].some(fact => fact && (fact.kept || !['met', null].includes(fact.depth)))))
+          : targets.every(row => row && !row.ok && row.observed?.moved?.length > 0);
+        const clean = g2Baseline.length > 0 && g2Baseline.every(row => row.ok) && new Set(expected).size === expected.length;
+        const complete = same(mutant) && same(restore) && !served.setupError && spec.edits.every(edit =>
+          served.served.some(file => file.file === edit.file && file.applied.some(applied => applied.key === edit.key)));
+        const killed = clean && complete && witnessed && mutant.every(row => kills.includes(row.id) || row.ok);
+        const restored = same(restore) && restore.every(row => row.ok);
+        const control = { engine, id: `G2.${id}`, edits: spec.edits, ...served, baseline: g2Baseline, rows: mutant, restore,
+          verdict: !clean || !complete ? 'incomplete' : killed && restored ? 'killed' : 'contaminated' };
+        controls.push(control);
+        check(`G2.negative.${id}`, 'exact G2 candidate, witnessed product fault, clean restore', killed && restored, { clean, complete, witnessed, restored, targets });
+      }
+    }
+    if (withControls && ((vhOnly && !vhInkOnly) || g1Only || selection.fullRequested)) {
+      const specs = [
+        { id: 'page-capped', run: 'page', kills: ['P1.viewport', 'P1.cap'],
+          witness: row => row.observed?.maxHeight !== 'none' && row.observed?.maxHeight !== undefined,
+          edits: [{file:'editorial.css',key:'restore-91dvh-cap',from:'  max-width: none;\n  max-height: none;\n  margin: 0;',to:'  max-width: none;\n  max-height: 91dvh;\n  margin: 0;'}] },
+        { id: 'scrim-appended', run: 'page', kills: ['P1.scrim'], witness: row => row.observed > 0,
+          edits: [{file:'corridor.js',key:'append-scrim',from:'  const sheet = prebuilt || buildPage(node);',to:"  const sheet = prebuilt || buildPage(node);\n  const scrim = el('div', 'scrim'); scrim.style.pointerEvents = 'none'; root.append(scrim);"}] },
+        { id: 'word-not-travelling', run: 'page', kills: ['P2.cut'], witness: row => !row.observed?.flight && row.observed?.landed?.headword === '1',
+          edits: [{file:'corridor.js',key:'remove-word-travel',from:'  if (leaves) flyWord(leaves, heroOf(sheet));',to:'  /* VH-1 negative: the word never travels. */'}] },
+        { id: 'page-fades-over-reader', run: 'exposure', kills: ['P14.arrive-sumi', 'P14.arrive-yoru'],
+          witness: row => row.observed?.mask >= 2000 && Object.entries(row.observed.share || {}).some(([time, share]) => Number(time) >= 80 && share > P14_LIMIT),
+          edits: [{file:'corridor.js',key:'fade-page-over-reader',from:'  if (leaves) flyWord(leaves, heroOf(sheet));',to:"  if (leaves) { sheet.animate([{opacity: 0}, {opacity: 1}], {duration: 320, fill: 'none', id: 'vh-page-fade'}); flyWord(leaves, heroOf(sheet)); }"}] },
+      ];
+      for (const spec of specs) {
+        const schedule = retainedWalks.get(spec.run);
+        assert(schedule, `Missing G1 control candidate ${spec.run}`);
+        const baseline = schedule.rows;
+        const expected = baseline.map(row => row.id), kills = spec.kills.map(id => `${engine}/${id}`);
+        const control = { engine, id: `G1.${spec.id}`, edits: spec.edits, served: [], pageErrors: [], baseline };
+        const begin = rows.length;
+        await walk(spec.run, schedule.body, { ...schedule.options, control });
+        control.rows = rows.splice(begin);
+        const targets = kills.map(id => control.rows.find(row => row.id === id));
+        const same = result => JSON.stringify(result.map(row => row.id)) === JSON.stringify(expected);
+        const clean = baseline.length > 1 && baseline.every(row => row.ok) && new Set(expected).size === expected.length;
+        const complete = !control.error && !control.setupError && !control.pageErrors.length && same(control.rows) && spec.edits.every(edit =>
+          control.served.some(file => file.file === edit.file && file.applied.some(applied => applied.key === edit.key)));
+        const witnessed = targets.every(row => row && !row.ok && spec.witness(row));
+        const killed = clean && complete && witnessed && control.rows.every(row => kills.includes(row.id) || row.ok);
+        const restoreBegin = rows.length;
+        await walk(spec.run, schedule.body, { ...schedule.options, phase: `restore:${spec.id}` });
+        control.restore = rows.splice(restoreBegin);
+        const restored = same(control.restore) && control.restore.every(row => row.ok);
+        control.verdict = !clean || !complete ? 'incomplete' : killed && restored ? 'killed' : 'contaminated';
+        controls.push(control);
+        check(`G1.negative.${spec.id}`, 'G1 candidate passes, the exact fault has its named pixel/geometry witness, and clean restore passes', killed && restored,
+          { clean, complete, witnessed, restored, targets, error: control.error || control.setupError });
+      }
+    }
     await browser.close();
   }
+} catch(error) {
+  check('schedule.error','word-grammar schedule completes',false,String(error.stack||error));
 } finally {
   await host.close();
 }
 
 function innerHeightOf(facts) { return facts?.inner?.height || 844; }
 
-writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: g2Only ? 'G2 walks only' : g6ThreadCurrentOnly ? 'G6 current-thread visibility: six width/palette native contexts only' : g6FramesOnly ? 'G6 twelve directed edges and frames only; draft scope limits in g6-<engine>.json' : g6ControlsOnly ? 'G6 controls with positives and restores only' : g6Only ? 'G6 core schedule only; no G1/G2/G3/G4/G5 claim; draft scope limits in g6-<engine>.json' : g4Only ? `G4 only${withControls ? ' with its three negative controls' : ''}; G1, G2, G3 and G5 gates not run` : g5Only ? `G5 only${g5Controls ? ' with its negative controls' : ''}; G1, G2, G3 and G4 gates not run` : skyOwnershipOnly ? `G3 controlled sky glyph hit ownership${withControls ? ' and its negative controls' : ''}; named 嘩/眩/貰 use fixture-only corpus/captions, actual product mount/hit code; no natural-input, G1 or frame claim` : skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 and G4 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : `G1, G2, G3, G4, G5 and G6 core (G6 scope limits in per-engine receipt)${g5Controls ? ' with G5 negative controls' : ''}`, ...(Object.keys(g2Versions).length ? { browsers: g2Versions } : {}), ...(controlsRun.length ? { control: controlsRun } : {}), rows, frames, controls, fixtures }, null, 1));
+const admission = grammarAcceptance({ argv: process.argv.slice(2), engines, rows, walks: completedWalks, g6Completed, controls, runtimeFiles: identity.files });
+writeFileSync(resolve(evidence, 'verify-word-grammar.json'), JSON.stringify({ schemaVersion: 1, runId, engines, requestedScope: selection, walks: completedWalks, g6Completed, ...admission, site, gitSha: identity.gitSha, artifactSha256: identity.artifactSha256, verifierSha256, browserVersions, scope: vhOnly ? 'VH-1 repaired contracts only; diagnostic, no full acceptance' : g1Only ? 'G1 candidate and controls only; diagnostic' : g2Only ? 'G2 walks only' : g6ThreadCurrentOnly ? 'G6 current-thread visibility: six width/palette native contexts only' : g6FramesOnly ? 'G6 twelve directed edges and frames only; draft scope limits in g6-<engine>.json' : g6ControlsOnly ? 'G6 controls with positives and restores only' : g6Only ? 'G6 core schedule only; no G1/G2/G3/G4/G5 claim; draft scope limits in g6-<engine>.json' : g4Only ? `G4 only${withControls ? ' with its three negative controls' : ''}; G1, G2, G3 and G5 gates not run` : g5Only ? `G5 only${g5Controls ? ' with its negative controls' : ''}; G1, G2, G3 and G4 gates not run` : skyOwnershipOnly ? `G3 controlled sky glyph hit ownership${withControls ? ' and its negative controls' : ''}; named 嘩/眩/貰 use fixture-only corpus/captions, actual product mount/hit code; no natural-input, G1 or frame claim` : skyReadingsOnly ? 'G3 actual sky glyph and reader particle across all dials; canonical host getter; hosted sky particle rendering unproven because its legacy scene is unreachable; no G1 or frame gates' : controlsOnly ? 'G3 and G4 negative controls only; exact candidate schedules, mutants and restores; no G1 or frame gates' : roomsOnly ? 'G3 Words, sky words/glyphs, and reader particle; fixed activation counts; no G1 or frame gates' : sentencesOnly ? 'G3 sentence/example rendered ruby, all three dials, and sealed front; no G1 or frame gates' : kanaOnly ? 'G3 identical kana, particle bar Save, and meaningful particle dials; no G1 or frame gates' : g3Only ? 'G3 only; G1 gates not run' : `G1, G2, G3, G4, G5 and G6 core (G6 scope limits in per-engine receipt)${g5Controls ? ' with G5 negative controls' : ''}`, ...(Object.keys(g2Versions).length ? { browsers: g2Versions } : {}), ...(controlsRun.length ? { control: controlsRun } : {}), rows, frames, controls, fixtures }, null, 1));
 const failed = rows.filter((row) => !row.ok);
 console.log(`\n${rows.length - failed.length}/${rows.length} — evidence ${evidence}`);
-process.exit(failed.length ? 1 : 0);
+process.exit(failed.length || (selection.fullRequested && !admission.fullAcceptance) ? 1 : admission.fullAcceptance ? 0 : 3);

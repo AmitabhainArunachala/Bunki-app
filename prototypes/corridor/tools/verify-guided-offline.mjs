@@ -17,6 +17,7 @@
  * Usage: node verify-guided-offline.mjs
  */
 import { execFileSync, spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:https';
 import { dirname, extname, join, resolve, sep } from 'node:path';
@@ -194,6 +195,8 @@ async function main() {
       if (built.status !== 0) throw new Error(`build-standalone failed: ${(built.stderr || String(built.error)).slice(0, 300)}`);
     }
     report.standalone = file;
+    report.standaloneDeclared = process.env.GUIDED_STANDALONE || null;
+    report.standaloneSha256 = createHash('sha256').update(readFileSync(file)).digest('hex');
     const single = await browser.newContext({ viewport: { width: 390, height: 844 } });
     single.on('page', (page) => page.on('pageerror', (error) => pageErrors.push(error.message)));
     await single.setOffline(true);

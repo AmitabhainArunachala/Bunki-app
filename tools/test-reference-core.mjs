@@ -76,9 +76,11 @@ const require = createRequire(import.meta.url);
 const core = require(CORE_PATH);
 
 let testCount = 0;
+const completedTests = [];
 function test(name, fn) {
   fn();
   testCount++;
+  completedTests.push({ name, passed: true });
   console.log(`PASS ${name}`);
 }
 function deepFreeze(value) {
@@ -908,3 +910,24 @@ console.log(
   ),
 );
 console.log(`Coverage evidence: ${COVERAGE_PATH}`);
+
+if (EVIDENCE_OUT)
+  writeFileSync(
+    resolve(EVIDENCE_OUT, 'verification-report.json'),
+    JSON.stringify(
+      {
+        kind: 'bunki-reference-core',
+        runId: process.env.KAIRO_GATE_RUN_ID,
+        fullAcceptance: true,
+        checks: completedTests,
+        coverageParity: true,
+        relationshipParity: true,
+        completedAt: new Date().toISOString(),
+        verifierSha256: createHash('sha256')
+          .update(readFileSync(new globalThis.URL(import.meta.url)))
+          .digest('hex'),
+      },
+      null,
+      2,
+    ) + '\n',
+  );

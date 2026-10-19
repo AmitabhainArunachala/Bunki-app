@@ -1,0 +1,2245 @@
+{
+  "schemaVersion": 1,
+  "reviewedHead": "384d4a70e05a33019f1ad36789d13d22de04094a",
+  "note": "Independent candidate assertion identities, reconciled against historical complete schedules and current verifier source. Green/red observations do not change this roster. Engine-specific timing obligations are retained.",
+  "sources": [
+    {
+      "path": "G6/codex-build/site-17-wordgrammar/verify-word-grammar.json",
+      "sha256": "ac72a1568af6ccc790e94496464eb119e89f50bc55bf81cd5c95a69ee2a03f45"
+    },
+    {
+      "path": "G4/claude-build/wg-4-chromium/verify-word-grammar.json",
+      "sha256": "a64055413e249e4dff2a116498433b90f085017340cb0551f54ccb640a7c9bca"
+    },
+    {
+      "path": "G5/runs/c13g5-chromium-verify-word-grammar/verify-word-grammar.json",
+      "sha256": "035a0f3b1273e56fedac7919922c1e84939051cc8d51f31dddf554153a4dccca"
+    },
+    {
+      "path": "H/codex-H1/VH1/wg-vh-chromium/verify-word-grammar.json",
+      "sha256": "a3bd3ab0fcca0462a673bfffc129e05b0777cbf35c38afc11dac37f3256f4617"
+    },
+    {
+      "path": "G6/codex-build/final-handback-prep/final-e38-g6-only-controls/g6-chromium.json",
+      "sha256": "850951f002651148b42cb439fb6218f92423a546ca4219163130070f8172d824"
+    },
+    {
+      "path": "G4/claude-build/wg-4b-webkit/verify-word-grammar.json",
+      "sha256": "1de8224403cf76ac9194cf317607e9490af91f1f5b15cf7b7a219718efac9bb5"
+    },
+    {
+      "path": "G5/runs/c13g5-webkit-verify-word-grammar/verify-word-grammar.json",
+      "sha256": "1729b70b963fd643ddd2400826ffeaf0d84d4f610aaf4b48439d6eed3815cdb1"
+    },
+    {
+      "path": "H/codex-H1/VH1/wg-vh-webkit/verify-word-grammar.json",
+      "sha256": "bd75de885df05f0351276786ffd6727a023f746a7b894e6c7d401064a78cb351"
+    },
+    {
+      "path": "G6/codex-build/final-handback-prep/final-e38-g6-only-controls/g6-webkit.json",
+      "sha256": "d7ff4ea5fdb889d6a8878341ba7280be03a4a5ce3bbc30717f3a5a9a9172c91a"
+    }
+  ],
+  "engines": {
+    "chromium": {
+      "G3-stalled": [
+        "G3.control.reading",
+        "G3.control.stage",
+        "G3-stalled.page-errors"
+      ],
+      "G3-clear": [
+        "G3.clear.reading",
+        "G3.clear.bare",
+        "G3-clear.page-errors"
+      ],
+      "G3-front": [
+        "G3.front.fixture",
+        "G3.front.sealed",
+        "G3.front.press",
+        "G3-front.page-errors"
+      ],
+      "G3-sky-ownership": [
+        "G3.sky-ownership.corpus",
+        "G3.sky-ownership.fixture",
+        "G3.sky-ownership.centre",
+        "G3.sky-ownership.caption",
+        "G3.sky-ownership.setup",
+        "G3-sky-ownership.page-errors"
+      ],
+      "G3-ladder": [
+        "G3.on-touch.first",
+        "G3.on-touch.stage",
+        "G3.on-touch.page",
+        "G3.on-touch.return-stage",
+        "G3.on-touch.bare",
+        "G3.on-touch.frames",
+        "G3.off.first",
+        "G3.off.stage",
+        "G3.off.page",
+        "G3.off.return-stage",
+        "G3.off.bare",
+        "G3.off.frames",
+        "G3.always.first",
+        "G3.always.stage",
+        "G3.always.page",
+        "G3.always.return-stage",
+        "G3.always.bare",
+        "G3.always.frames",
+        "G3-ladder.page-errors"
+      ],
+      "G3-direct-and-anchor": [
+        "G3.anchor-third",
+        "G3.escape-stage",
+        "G3.direct-page",
+        "G3.direct-bare",
+        "G3.outside-reading",
+        "G3.native-pinch",
+        "G3-direct-and-anchor.page-errors"
+      ],
+      "G3-current-save": [
+        "G3.save.fixture",
+        "G3.save.folded",
+        "G3.save.current",
+        "G3.save.current-folded",
+        "G3.save.no-phantom",
+        "G3-current-save.page-errors"
+      ],
+      "G3-kana": [
+        "G3.kana.fixture",
+        "G3.kana.identical",
+        "G3.kana.particle",
+        "G3.kana.particle-save-rest",
+        "G3.kana.particle-folded-rest",
+        "G3.kana.particle-no-card",
+        "G3-kana.page-errors"
+      ],
+      "G3-sentence-example-off": [
+        "G3.sentence.example.off.bare",
+        "G3.sentence.example.off.first",
+        "G3.sentence.example.off.stage",
+        "G3.sentence.example.off.page",
+        "G3.sentence.example.off.return-stage",
+        "G3.sentence.example.off.clear",
+        "G3-sentence-example-off.page-errors"
+      ],
+      "G3-sentence-example-on-touch": [
+        "G3.sentence.example.on-touch.bare",
+        "G3.sentence.example.on-touch.first",
+        "G3.sentence.example.on-touch.stage",
+        "G3.sentence.example.on-touch.page",
+        "G3.sentence.example.on-touch.return-stage",
+        "G3.sentence.example.on-touch.clear",
+        "G3-sentence-example-on-touch.page-errors"
+      ],
+      "G3-sentence-example-always": [
+        "G3.sentence.example.always.bare",
+        "G3.sentence.example.always.first",
+        "G3.sentence.example.always.stage",
+        "G3.sentence.example.always.page",
+        "G3.sentence.example.always.return-stage",
+        "G3.sentence.example.always.clear",
+        "G3-sentence-example-always.page-errors"
+      ],
+      "G3-sentence-page-off": [
+        "G3.sentence.page.off.bare",
+        "G3.sentence.page.off.first",
+        "G3.sentence.page.off.stage",
+        "G3.sentence.page.off.page",
+        "G3.sentence.page.off.return-stage",
+        "G3.sentence.page.off.clear",
+        "G3-sentence-page-off.page-errors"
+      ],
+      "G3-sentence-page-on-touch": [
+        "G3.sentence.page.on-touch.bare",
+        "G3.sentence.page.on-touch.first",
+        "G3.sentence.page.on-touch.stage",
+        "G3.sentence.page.on-touch.page",
+        "G3.sentence.page.on-touch.return-stage",
+        "G3.sentence.page.on-touch.clear",
+        "G3-sentence-page-on-touch.page-errors"
+      ],
+      "G3-sentence-page-always": [
+        "G3.sentence.page.always.bare",
+        "G3.sentence.page.always.first",
+        "G3.sentence.page.always.stage",
+        "G3.sentence.page.always.page",
+        "G3.sentence.page.always.return-stage",
+        "G3.sentence.page.always.clear",
+        "G3-sentence-page-always.page-errors"
+      ],
+      "G3-words": [
+        "G3.words.centre-fixture",
+        "G3.words.centre-stage",
+        "G3.words.centre-page",
+        "G3.words.centre-return",
+        "G3.words.centre-bare",
+        "G3.words.peripheral.reading",
+        "G3.words.peripheral.stage",
+        "G3.words.peripheral.hold-same-stage",
+        "G3.words.peripheral.page",
+        "G3.words.peripheral.return",
+        "G3.words.peripheral.bare",
+        "G3.words.peripheral.recenter",
+        "G3-words.page-errors"
+      ],
+      "G3-words-family": [
+        "G3.words.unknown-part",
+        "G3.words.family.reading",
+        "G3.words.family.stage",
+        "G3.words.family.hold-same-stage",
+        "G3.words.family.page",
+        "G3.words.family.return",
+        "G3.words.family.bare",
+        "G3.words.family.recenter",
+        "G3-words-family.page-errors"
+      ],
+      "G3-sky": [
+        "G3.sky.on-touch.bare",
+        "G3.sky.on-touch.first",
+        "G3.sky.on-touch.stage",
+        "G3.sky.on-touch.page",
+        "G3.sky.on-touch.return-stage",
+        "G3.sky.on-touch.clear",
+        "G3.sky.on-touch.revisit-reading",
+        "G3.sky.on-touch.reading-close",
+        "G3.sky.off.bare",
+        "G3.sky.off.first",
+        "G3.sky.off.stage",
+        "G3.sky.off.page",
+        "G3.sky.off.return-stage",
+        "G3.sky.off.clear",
+        "G3.sky.always.bare",
+        "G3.sky.always.first",
+        "G3.sky.always.stage",
+        "G3.sky.always.page",
+        "G3.sky.always.return-stage",
+        "G3.sky.always.clear",
+        "G3-sky.page-errors"
+      ],
+      "G3-sky-glyph": [
+        "G3.sky-glyph.off.canonical",
+        "G3.sky-glyph.off.bare",
+        "G3.sky-glyph.off.hit-1",
+        "G3.sky-glyph.off.first",
+        "G3.sky-glyph.off.stage",
+        "G3.sky-glyph.off.hit-2",
+        "G3.sky-glyph.off.page",
+        "G3.sky-glyph.off.return",
+        "G3.sky-glyph.off.clear",
+        "G3.sky-glyph.on-touch.canonical",
+        "G3.sky-glyph.on-touch.bare",
+        "G3.sky-glyph.on-touch.hit-1",
+        "G3.sky-glyph.on-touch.first",
+        "G3.sky-glyph.on-touch.hit-2",
+        "G3.sky-glyph.on-touch.stage",
+        "G3.sky-glyph.on-touch.hit-3",
+        "G3.sky-glyph.on-touch.page",
+        "G3.sky-glyph.on-touch.return",
+        "G3.sky-glyph.on-touch.clear",
+        "G3.sky-glyph.always.canonical",
+        "G3.sky-glyph.always.bare",
+        "G3.sky-glyph.always.hit-1",
+        "G3.sky-glyph.always.first",
+        "G3.sky-glyph.always.stage",
+        "G3.sky-glyph.always.hit-2",
+        "G3.sky-glyph.always.page",
+        "G3.sky-glyph.always.return",
+        "G3.sky-glyph.always.clear",
+        "G3-sky-glyph.page-errors"
+      ],
+      "G3-particle": [
+        "G3.particle.off.bare",
+        "G3.particle.off.first",
+        "G3.particle.off.stage",
+        "G3.particle.off.clear",
+        "G3.particle.on-touch.bare",
+        "G3.particle.on-touch.first",
+        "G3.particle.on-touch.stage",
+        "G3.particle.on-touch.clear",
+        "G3.particle.always.bare",
+        "G3.particle.always.first",
+        "G3.particle.always.stage",
+        "G3.particle.always.clear",
+        "G3-particle.page-errors"
+      ],
+      "G3-demo": [
+        "G3.demo.once",
+        "G3.demo.no-work",
+        "G3.demo.no-replay",
+        "G3-demo.page-errors"
+      ],
+      "page": [
+        "P3.card",
+        "P1.viewport",
+        "P1.grip",
+        "P1.scrim",
+        "P1.cap",
+        "P1.paper",
+        "P1.bar",
+        "P2.cut",
+        "P2.same-word",
+        "P2.built-ahead",
+        "P9.kanji-top",
+        "P10.report",
+        "P12.own-first",
+        "P12.fold",
+        "P3.stage-return",
+        "P3.close",
+        "P3.again",
+        "page.page-errors"
+      ],
+      "depth": [
+        "P4.back.own-card",
+        "P4.back.back-uncovered",
+        "P4.back.depth2",
+        "P4.back.depth1",
+        "P4.back.parent-page",
+        "P4.back.parent-stage",
+        "P4.back.bare",
+        "P4.escape.own-card",
+        "P4.escape.back-uncovered",
+        "P4.escape.depth2",
+        "P5.escape.depth1",
+        "P5.escape.parent-page",
+        "P5.escape.parent-stage",
+        "P5.escape.bare",
+        "depth.page-errors"
+      ],
+      "stale": [
+        "P6.no-stale",
+        "P6.page-word",
+        "stale.page-errors"
+      ],
+      "frames": [
+        "P7.return-0",
+        "P7.return-1",
+        "P7.return-2",
+        "P7.frames-recorded",
+        "frames.page-errors"
+      ],
+      "worlds": [
+        "P8.hokusai",
+        "P8.sumi",
+        "P8.sumi-depths",
+        "P8.shu",
+        "P8.akafuji",
+        "P8.iwa",
+        "P8.rokusho",
+        "P8.yoru",
+        "P8.nami",
+        "P8.keyblock",
+        "P8.hakuu",
+        "P8.kaku",
+        "worlds.page-errors"
+      ],
+      "gloss": [
+        "P11.one-line",
+        "P11.entries-apart",
+        "gloss.page-errors"
+      ],
+      "desktop": [
+        "P13.desktop",
+        "desktop.page-errors"
+      ],
+      "text-200": [
+        "P15.double",
+        "P15.text-200",
+        "text-200.page-errors"
+      ],
+      "exposure": [
+        "P14.arrive-sumi",
+        "P14.stage-return-sumi",
+        "P14.back-sumi",
+        "P14.arrive-yoru",
+        "P14.stage-return-yoru",
+        "P14.back-yoru",
+        "exposure.page-errors"
+      ],
+      "G4-interrupt-save": [
+        "G4.interrupt.save-writing",
+        "G4.interrupt.save-at-once",
+        "G4.interrupt.save-acts",
+        "G4-interrupt-save.page-errors"
+      ],
+      "G4-ghost": [
+        "G4.ghost.first-frame",
+        "G4.ghost.first-pixels",
+        "G4-ghost.page-errors"
+      ],
+      "G4-one-speed": [
+        "G4.one-speed",
+        "G4-one-speed.page-errors"
+      ],
+      "G4-depth": [
+        "G4.depth.unmet.write",
+        "G4.depth.unmet.strokes",
+        "G4.depth.unmet.reading-flow",
+        "G4.depth.unmet.settled",
+        "G4.depth.met.write",
+        "G4.depth.met.strokes",
+        "G4.depth.met.reading-flow",
+        "G4.depth.met.settled",
+        "G4.depth.again.written",
+        "G4.depth.recalled.bare",
+        "G4.depth.recalled.on-request",
+        "G4.depth.owned.bare",
+        "G4.depth.owned.on-request",
+        "G4.depth.return",
+        "G4-depth.page-errors"
+      ],
+      "G4-tempo": [
+        "G4.tempo.slider",
+        "G4.tempo.planned",
+        "G4.tempo.measured",
+        "G4-tempo.page-errors"
+      ],
+      "G4-interrupt": [
+        "G4.interrupt.word",
+        "G4.interrupt.word-return",
+        "G4.interrupt.key",
+        "G4.interrupt.paper",
+        "G4.interrupt.touch-scroll",
+        "G4-interrupt.page-errors"
+      ],
+      "G4-interrupt-desktop": [
+        "G4.interrupt.wheel",
+        "G4.interrupt.mouse-word",
+        "G4.interrupt.mouse-save",
+        "G4-interrupt-desktop.page-errors"
+      ],
+      "G4-brush": [
+        "G4.brush.never",
+        "G4.brush.mark",
+        "G4.brush.always",
+        "G4.brush.hold",
+        "G4-brush.page-errors"
+      ],
+      "G4-demo": [
+        "G4.demo.no-ink",
+        "G4-demo.page-errors"
+      ],
+      "G4-reduced": [
+        "G4.reduced",
+        "G4-reduced.page-errors"
+      ],
+      "G4-room": [
+        "G4.ghost.leaves",
+        "G4.rail.classic",
+        "G4.rail.quiet",
+        "G4-room.page-errors"
+      ],
+      "G4-voice": [
+        "G4.voice.passive",
+        "G4.voice.asked",
+        "G4.voice.return-keeps",
+        "G4.voice.never-device",
+        "G4-voice.page-errors"
+      ],
+      "G4-frames": [
+        "G4.frames.recorded",
+        "G4-frames.page-errors"
+      ],
+      "G5-second": [
+        "G5.first-hold",
+        "G5.second-hold",
+        "G5-second.page-errors"
+      ],
+      "G5-place": [
+        "G5.strip.place",
+        "G5-place.page-errors"
+      ],
+      "G5-layer-fold": [
+        "G5.layers.mark-opens",
+        "G5.layers.fold-paper",
+        "G5-layer-fold.page-errors"
+      ],
+      "G5-seal": [
+        "G5.ring",
+        "G5.seal.kept",
+        "G5.seal.flight",
+        "G5.seal.strip",
+        "G5.labels",
+        "G5.remove",
+        "G5.seal.durable",
+        "G5-seal.page-errors"
+      ],
+      "G5-keys": [
+        "G5.right-click",
+        "G5.escape",
+        "G5.shift-f10",
+        "G5.full-entry",
+        "G5-keys.page-errors"
+      ],
+      "G5-lists": [
+        "G5.new-list",
+        "G5.list.one-tap",
+        "G5.list.labels",
+        "G5-lists.page-errors"
+      ],
+      "G5-page": [
+        "G5.page.kept",
+        "G5.page.strip",
+        "G5.page.escape",
+        "G5-page.page-errors"
+      ],
+      "G5-deck": [
+        "G5.deck.front-sealed",
+        "G5.deck.back-hold",
+        "G5.deck.back-strip",
+        "G5.deck.second-hold",
+        "G5.deck.escape",
+        "G5.deck.right-click",
+        "G5-deck.page-errors"
+      ],
+      "G5-bar-save-phone": [
+        "G5.bar-save.phone.save",
+        "G5.bar-save.phone.saved",
+        "G5-bar-save-phone.page-errors"
+      ],
+      "G5-bar-save-mac": [
+        "G5.bar-save.mac.save",
+        "G5.bar-save.mac.saved",
+        "G5-bar-save-mac.page-errors"
+      ],
+      "G5-reduced": [
+        "G5.reduced",
+        "G5-reduced.page-errors"
+      ],
+      "G5-glass-320x568": [
+        "G5.strip.fits.320x568.first",
+        "G5.glass.320x568.first",
+        "G5.strip.fits.320x568.foot",
+        "G5.glass.320x568.foot",
+        "G5.strip.fits.320x568.top",
+        "G5.glass.320x568.top",
+        "G5.bookmark.320x568",
+        "G5-glass-320x568.page-errors"
+      ],
+      "G5-glass-390x844": [
+        "G5.strip.fits.390x844.first",
+        "G5.glass.390x844.first",
+        "G5.strip.fits.390x844.foot",
+        "G5.glass.390x844.foot",
+        "G5.strip.fits.390x844.top",
+        "G5.glass.390x844.top",
+        "G5.bookmark.390x844",
+        "G5-glass-390x844.page-errors"
+      ],
+      "G5-glass-430x932": [
+        "G5.strip.fits.430x932.first",
+        "G5.glass.430x932.first",
+        "G5.strip.fits.430x932.foot",
+        "G5.glass.430x932.foot",
+        "G5.strip.fits.430x932.top",
+        "G5.glass.430x932.top",
+        "G5.bookmark.430x932",
+        "G5-glass-430x932.page-errors"
+      ],
+      "G5-remove-everywhere": [
+        "G5.remove.undo",
+        "G5.remove.everywhere",
+        "G5-remove-everywhere.page-errors"
+      ],
+      "G5-tray": [
+        "G5.bookmark.lands",
+        "G5.browse.no-review",
+        "G5-tray.page-errors"
+      ],
+      "G5-layers": [
+        "G5.layers.rest",
+        "G5.layers.only-mark",
+        "G5.layers.open",
+        "G5.layers.lines-hold",
+        "G5.layers.fold-word",
+        "G5.layers.bare-again",
+        "G5.layers.fold-keys",
+        "G5-layers.page-errors"
+      ],
+      "G5-frames": [
+        "G5-frames.page-errors"
+      ],
+      "g2-depth": [
+        "G2.F0.depth",
+        "G2.1",
+        "G2.2",
+        "G2.4",
+        "G2.5",
+        "G2.6",
+        "G2.3",
+        "G2.5.release",
+        "g2-depth.page-errors"
+      ],
+      "g2-reading": [
+        "G2.F0.reading",
+        "G2.4.rooms",
+        "g2-reading.page-errors"
+      ],
+      "g2-taps": [
+        "G2.F0.taps",
+        "G2.7",
+        "g2-taps.page-errors"
+      ],
+      "G5-room-hover": [
+        "G5.room.shared-hover",
+        "G5-room-hover.page-errors"
+      ],
+      "G6.current-thread.320.hokusai": [
+        "G6.current-thread.320.hokusai.current.context",
+        "G6.current-thread.320.hokusai.current.part-route",
+        "G6.current-thread.320.hokusai.current.part-contained",
+        "G6.current-thread.320.hokusai.current.part-scroll-only",
+        "G6.current-thread.320.hokusai.current.return-line",
+        "G6.current-thread.320.hokusai.current.sky-contained",
+        "G6.current-thread.320.hokusai.current.sky-return-line",
+        "G6.current-thread.320.hokusai.current.no-record-work",
+        "G6.current-thread.320.hokusai.errors",
+        "G6.current-thread.320.hokusai.schedule"
+      ],
+      "G6.current-thread.320.sumi": [
+        "G6.current-thread.320.sumi.current.context",
+        "G6.current-thread.320.sumi.current.part-route",
+        "G6.current-thread.320.sumi.current.part-contained",
+        "G6.current-thread.320.sumi.current.part-scroll-only",
+        "G6.current-thread.320.sumi.current.return-line",
+        "G6.current-thread.320.sumi.current.sky-contained",
+        "G6.current-thread.320.sumi.current.sky-return-line",
+        "G6.current-thread.320.sumi.current.no-record-work",
+        "G6.current-thread.320.sumi.errors",
+        "G6.current-thread.320.sumi.schedule"
+      ],
+      "G6.current-thread.390.hokusai": [
+        "G6.current-thread.390.hokusai.current.context",
+        "G6.current-thread.390.hokusai.current.part-route",
+        "G6.current-thread.390.hokusai.current.part-contained",
+        "G6.current-thread.390.hokusai.current.part-scroll-only",
+        "G6.current-thread.390.hokusai.current.return-line",
+        "G6.current-thread.390.hokusai.current.sky-contained",
+        "G6.current-thread.390.hokusai.current.sky-return-line",
+        "G6.current-thread.390.hokusai.current.no-record-work",
+        "G6.current-thread.390.hokusai.errors",
+        "G6.current-thread.390.hokusai.schedule"
+      ],
+      "G6.current-thread.390.sumi": [
+        "G6.current-thread.390.sumi.current.context",
+        "G6.current-thread.390.sumi.current.part-route",
+        "G6.current-thread.390.sumi.current.part-contained",
+        "G6.current-thread.390.sumi.current.part-scroll-only",
+        "G6.current-thread.390.sumi.current.return-line",
+        "G6.current-thread.390.sumi.current.sky-contained",
+        "G6.current-thread.390.sumi.current.sky-return-line",
+        "G6.current-thread.390.sumi.current.no-record-work",
+        "G6.current-thread.390.sumi.errors",
+        "G6.current-thread.390.sumi.schedule"
+      ],
+      "G6.current-thread.430.hokusai": [
+        "G6.current-thread.430.hokusai.current.context",
+        "G6.current-thread.430.hokusai.current.part-route",
+        "G6.current-thread.430.hokusai.current.part-contained",
+        "G6.current-thread.430.hokusai.current.part-scroll-only",
+        "G6.current-thread.430.hokusai.current.return-line",
+        "G6.current-thread.430.hokusai.current.sky-contained",
+        "G6.current-thread.430.hokusai.current.sky-return-line",
+        "G6.current-thread.430.hokusai.current.no-record-work",
+        "G6.current-thread.430.hokusai.errors",
+        "G6.current-thread.430.hokusai.schedule"
+      ],
+      "G6.current-thread.430.sumi": [
+        "G6.current-thread.430.sumi.current.context",
+        "G6.current-thread.430.sumi.current.part-route",
+        "G6.current-thread.430.sumi.current.part-contained",
+        "G6.current-thread.430.sumi.current.part-scroll-only",
+        "G6.current-thread.430.sumi.current.return-line",
+        "G6.current-thread.430.sumi.current.sky-contained",
+        "G6.current-thread.430.sumi.current.sky-return-line",
+        "G6.current-thread.430.sumi.current.no-record-work",
+        "G6.current-thread.430.sumi.errors",
+        "G6.current-thread.430.sumi.schedule"
+      ],
+      "G6.touch.edges": [
+        "G6.touch.edges.edge-1.article-sentence",
+        "G6.touch.edges.edge-1.article-sentence.frames",
+        "G6.touch.edges.edge-2.sentence-word",
+        "G6.touch.edges.edge-2.sentence-word.frames",
+        "G6.touch.edges.edge-3.word-kanji",
+        "G6.touch.edges.edge-3.word-kanji.frames",
+        "G6.touch.edges.edge-4.kanji-part",
+        "G6.touch.edges.edge-4.kanji-part.frames",
+        "G6.touch.edges.edge-5.part-kanji",
+        "G6.touch.edges.edge-5.part-kanji.frames",
+        "G6.touch.edges.edge-6.kanji-word",
+        "G6.touch.edges.edge-6.kanji-word.frames",
+        "G6.touch.edges.edge-7.word-sentence",
+        "G6.touch.edges.edge-7.word-sentence.frames",
+        "G6.touch.edges.edge-8.sentence-article",
+        "G6.touch.edges.edge-8.sentence-article.frames",
+        "G6.touch.edges.edge-8.sentence-article.line",
+        "G6.touch.edges.edge-9.article-shelf",
+        "G6.touch.edges.edge-9.article-shelf.frames",
+        "G6.touch.edges.edge-10.shelf-sky",
+        "G6.touch.edges.edge-10.shelf-sky.frames",
+        "G6.touch.edges.edge-11.sky-shelf",
+        "G6.touch.edges.edge-11.sky-shelf.frames",
+        "G6.touch.edges.edge-12.shelf-article",
+        "G6.touch.edges.edge-12.shelf-article.frames",
+        "G6.touch.edges.edge-12.shelf-article.line",
+        "G6.touch.edges.no-record-work",
+        "G6.touch.edges.errors",
+        "G6.touch.edges.schedule"
+      ],
+      "G6.touch.forty": [
+        "G6.touch.forty.edge-1.article-sentence",
+        "G6.touch.forty.edge-2.sentence-word",
+        "G6.touch.forty.edge-3.word-kanji",
+        "G6.touch.forty.edge-4.kanji-part",
+        "G6.touch.forty.edge-5.part-kanji",
+        "G6.touch.forty.edge-6.kanji-word",
+        "G6.touch.forty.edge-7.word-sentence",
+        "G6.touch.forty.edge-8.sentence-article",
+        "G6.touch.forty.edge-8.sentence-article.line",
+        "G6.touch.forty.edge-9.article-shelf",
+        "G6.touch.forty.edge-10.shelf-sky",
+        "G6.touch.forty.edge-11.sky-shelf",
+        "G6.touch.forty.edge-12.shelf-article",
+        "G6.touch.forty.edge-12.shelf-article.line",
+        "G6.touch.forty.edge-13.article-sentence",
+        "G6.touch.forty.edge-14.sentence-word",
+        "G6.touch.forty.edge-15.word-kanji",
+        "G6.touch.forty.edge-16.kanji-part",
+        "G6.touch.forty.edge-17.part-kanji",
+        "G6.touch.forty.edge-18.kanji-word",
+        "G6.touch.forty.edge-19.word-sentence",
+        "G6.touch.forty.edge-20.sentence-article",
+        "G6.touch.forty.edge-20.sentence-article.line",
+        "G6.touch.forty.edge-21.article-shelf",
+        "G6.touch.forty.edge-22.shelf-sky",
+        "G6.touch.forty.edge-23.sky-shelf",
+        "G6.touch.forty.edge-24.shelf-article",
+        "G6.touch.forty.edge-24.shelf-article.line",
+        "G6.touch.forty.edge-25.article-sentence",
+        "G6.touch.forty.edge-26.sentence-word",
+        "G6.touch.forty.edge-27.word-kanji",
+        "G6.touch.forty.edge-28.kanji-part",
+        "G6.touch.forty.edge-29.part-kanji",
+        "G6.touch.forty.edge-30.kanji-word",
+        "G6.touch.forty.edge-31.word-sentence",
+        "G6.touch.forty.edge-32.sentence-article",
+        "G6.touch.forty.edge-32.sentence-article.line",
+        "G6.touch.forty.edge-33.article-shelf",
+        "G6.touch.forty.edge-34.shelf-sky",
+        "G6.touch.forty.edge-35.sky-shelf",
+        "G6.touch.forty.edge-36.shelf-article",
+        "G6.touch.forty.edge-36.shelf-article.line",
+        "G6.touch.forty.edge-37.article-sentence",
+        "G6.touch.forty.edge-38.sentence-word",
+        "G6.touch.forty.edge-39.word-sentence",
+        "G6.touch.forty.edge-40.sentence-article",
+        "G6.touch.forty.edge-40.sentence-article.line",
+        "G6.touch.forty.no-record-work",
+        "G6.touch.forty.errors",
+        "G6.touch.forty.schedule"
+      ],
+      "G6.keyboard.edges": [
+        "G6.keyboard.edges.edge-1.article-sentence",
+        "G6.keyboard.edges.edge-1.article-sentence.frames",
+        "G6.keyboard.edges.edge-2.sentence-word",
+        "G6.keyboard.edges.edge-2.sentence-word.frames",
+        "G6.keyboard.edges.edge-3.word-kanji",
+        "G6.keyboard.edges.edge-3.word-kanji.frames",
+        "G6.keyboard.edges.edge-4.kanji-part",
+        "G6.keyboard.edges.edge-4.kanji-part.frames",
+        "G6.keyboard.edges.edge-5.part-kanji",
+        "G6.keyboard.edges.edge-5.part-kanji.frames",
+        "G6.keyboard.edges.edge-6.kanji-word",
+        "G6.keyboard.edges.edge-6.kanji-word.frames",
+        "G6.keyboard.edges.edge-7.word-sentence",
+        "G6.keyboard.edges.edge-7.word-sentence.frames",
+        "G6.keyboard.edges.edge-8.sentence-article",
+        "G6.keyboard.edges.edge-8.sentence-article.frames",
+        "G6.keyboard.edges.edge-8.sentence-article.line",
+        "G6.keyboard.edges.edge-9.article-shelf",
+        "G6.keyboard.edges.edge-9.article-shelf.frames",
+        "G6.keyboard.edges.edge-10.shelf-sky",
+        "G6.keyboard.edges.edge-10.shelf-sky.frames",
+        "G6.keyboard.edges.edge-11.sky-shelf",
+        "G6.keyboard.edges.edge-11.sky-shelf.frames",
+        "G6.keyboard.edges.edge-12.shelf-article",
+        "G6.keyboard.edges.edge-12.shelf-article.frames",
+        "G6.keyboard.edges.edge-12.shelf-article.line",
+        "G6.keyboard.edges.no-record-work",
+        "G6.keyboard.edges.errors",
+        "G6.keyboard.edges.schedule"
+      ],
+      "G6.keyboard.forty": [
+        "G6.keyboard.forty.edge-1.article-sentence",
+        "G6.keyboard.forty.edge-2.sentence-word",
+        "G6.keyboard.forty.edge-3.word-kanji",
+        "G6.keyboard.forty.edge-4.kanji-part",
+        "G6.keyboard.forty.edge-5.part-kanji",
+        "G6.keyboard.forty.edge-6.kanji-word",
+        "G6.keyboard.forty.edge-7.word-sentence",
+        "G6.keyboard.forty.edge-8.sentence-article",
+        "G6.keyboard.forty.edge-8.sentence-article.line",
+        "G6.keyboard.forty.edge-9.article-shelf",
+        "G6.keyboard.forty.edge-10.shelf-sky",
+        "G6.keyboard.forty.edge-11.sky-shelf",
+        "G6.keyboard.forty.edge-12.shelf-article",
+        "G6.keyboard.forty.edge-12.shelf-article.line",
+        "G6.keyboard.forty.edge-13.article-sentence",
+        "G6.keyboard.forty.edge-14.sentence-word",
+        "G6.keyboard.forty.edge-15.word-kanji",
+        "G6.keyboard.forty.edge-16.kanji-part",
+        "G6.keyboard.forty.edge-17.part-kanji",
+        "G6.keyboard.forty.edge-18.kanji-word",
+        "G6.keyboard.forty.edge-19.word-sentence",
+        "G6.keyboard.forty.edge-20.sentence-article",
+        "G6.keyboard.forty.edge-20.sentence-article.line",
+        "G6.keyboard.forty.edge-21.article-shelf",
+        "G6.keyboard.forty.edge-22.shelf-sky",
+        "G6.keyboard.forty.edge-23.sky-shelf",
+        "G6.keyboard.forty.edge-24.shelf-article",
+        "G6.keyboard.forty.edge-24.shelf-article.line",
+        "G6.keyboard.forty.edge-25.article-sentence",
+        "G6.keyboard.forty.edge-26.sentence-word",
+        "G6.keyboard.forty.edge-27.word-kanji",
+        "G6.keyboard.forty.edge-28.kanji-part",
+        "G6.keyboard.forty.edge-29.part-kanji",
+        "G6.keyboard.forty.edge-30.kanji-word",
+        "G6.keyboard.forty.edge-31.word-sentence",
+        "G6.keyboard.forty.edge-32.sentence-article",
+        "G6.keyboard.forty.edge-32.sentence-article.line",
+        "G6.keyboard.forty.edge-33.article-shelf",
+        "G6.keyboard.forty.edge-34.shelf-sky",
+        "G6.keyboard.forty.edge-35.sky-shelf",
+        "G6.keyboard.forty.edge-36.shelf-article",
+        "G6.keyboard.forty.edge-36.shelf-article.line",
+        "G6.keyboard.forty.edge-37.article-sentence",
+        "G6.keyboard.forty.edge-38.sentence-word",
+        "G6.keyboard.forty.edge-39.word-sentence",
+        "G6.keyboard.forty.edge-40.sentence-article",
+        "G6.keyboard.forty.edge-40.sentence-article.line",
+        "G6.keyboard.forty.no-record-work",
+        "G6.keyboard.forty.errors",
+        "G6.keyboard.forty.schedule"
+      ],
+      "G6.pending-word-menu": [
+        "G6.pending-word-menu.menu.pending-real-request",
+        "G6.pending-word-menu.menu.source-retained",
+        "G6.pending-word-menu.menu.no-late-menu",
+        "G6.pending-word-menu.menu.no-late-focus",
+        "G6.pending-word-menu.menu.source-unchanged",
+        "G6.pending-word-menu.menu.no-record-work",
+        "G6.pending-word-menu.errors",
+        "G6.pending-word-menu.schedule"
+      ],
+      "G6.pending-word-menu.escape": [
+        "G6.pending-word-menu.escape.menu.pending-held",
+        "G6.pending-word-menu.escape.menu.cancel-state",
+        "G6.pending-word-menu.escape.menu.no-late-menu",
+        "G6.pending-word-menu.escape.menu.no-late-focus",
+        "G6.pending-word-menu.escape.menu.source-unchanged",
+        "G6.pending-word-menu.escape.menu.no-record-work",
+        "G6.pending-word-menu.escape.errors",
+        "G6.pending-word-menu.escape.schedule"
+      ],
+      "G6.pending-word-menu.outside": [
+        "G6.pending-word-menu.outside.menu.pending-held",
+        "G6.pending-word-menu.outside.menu.cancel-state",
+        "G6.pending-word-menu.outside.menu.no-late-menu",
+        "G6.pending-word-menu.outside.menu.no-late-focus",
+        "G6.pending-word-menu.outside.menu.source-unchanged",
+        "G6.pending-word-menu.outside.menu.no-record-work",
+        "G6.pending-word-menu.outside.errors",
+        "G6.pending-word-menu.outside.schedule"
+      ],
+      "G6.pending-word-menu.room": [
+        "G6.pending-word-menu.room.menu.pending-held",
+        "G6.pending-word-menu.room.menu.cancel-state",
+        "G6.pending-word-menu.room.menu.no-late-menu",
+        "G6.pending-word-menu.room.menu.no-late-focus",
+        "G6.pending-word-menu.room.menu.source-unchanged",
+        "G6.pending-word-menu.room.menu.no-record-work",
+        "G6.pending-word-menu.room.errors",
+        "G6.pending-word-menu.room.schedule"
+      ],
+      "G6.pending-word-menu.overlap": [
+        "G6.pending-word-menu.overlap.menu.pending-held",
+        "G6.pending-word-menu.overlap.menu.newest-only",
+        "G6.pending-word-menu.overlap.menu.no-record-work",
+        "G6.pending-word-menu.overlap.errors",
+        "G6.pending-word-menu.overlap.schedule"
+      ],
+      "G6.archive.shelf": [
+        "G6.archive.shelf.archive.back",
+        "G6.archive.shelf.archive.reopen-line",
+        "G6.archive.shelf.archive.shelf-bead",
+        "G6.archive.shelf.archive.sky-inward",
+        "G6.archive.shelf.archive.sky-return-line",
+        "G6.archive.shelf.archive.back-to-shelf",
+        "G6.archive.shelf.archive.no-record-work",
+        "G6.archive.shelf.errors",
+        "G6.archive.shelf.schedule"
+      ],
+      "G6.touch.sourceless-particle": [
+        "G6.touch.sourceless-particle.particle.no-sentence-bead",
+        "G6.touch.sourceless-particle.particle.article-return",
+        "G6.touch.sourceless-particle.particle.no-record-work",
+        "G6.touch.sourceless-particle.errors",
+        "G6.touch.sourceless-particle.schedule"
+      ],
+      "G6.touch.read-on": [
+        "G6.touch.read-on.readon.read-farther",
+        "G6.touch.read-on.readon.exit-recaptured",
+        "G6.touch.read-on.readon.reopen-line",
+        "G6.touch.read-on.readon.no-record-work",
+        "G6.touch.read-on.errors",
+        "G6.touch.read-on.schedule"
+      ],
+      "G6.keyboard.sourceless-particle": [
+        "G6.keyboard.sourceless-particle.particle.no-sentence-bead",
+        "G6.keyboard.sourceless-particle.particle.article-return",
+        "G6.keyboard.sourceless-particle.particle.no-record-work",
+        "G6.keyboard.sourceless-particle.errors",
+        "G6.keyboard.sourceless-particle.schedule"
+      ],
+      "G6.keyboard.read-on": [
+        "G6.keyboard.read-on.readon.read-farther",
+        "G6.keyboard.read-on.readon.exit-recaptured",
+        "G6.keyboard.read-on.readon.reopen-line",
+        "G6.keyboard.read-on.readon.no-record-work",
+        "G6.keyboard.read-on.errors",
+        "G6.keyboard.read-on.schedule"
+      ],
+      "G6.touch.thread": [
+        "G6.touch.thread.bead.word",
+        "G6.touch.thread.bead.kanji",
+        "G6.touch.thread.bead.sentence",
+        "G6.touch.thread.bead.article",
+        "G6.touch.thread.bead.article.line",
+        "G6.touch.thread.bead.shelf",
+        "G6.touch.thread.bead.shelf.line",
+        "G6.touch.thread.no-record-work",
+        "G6.touch.thread.errors",
+        "G6.touch.thread.schedule"
+      ],
+      "G6.touch.recursion": [
+        "G6.touch.recursion.recursive.current-visible",
+        "G6.touch.recursion.recursive.order",
+        "G6.touch.recursion.recursive.ancestor",
+        "G6.touch.recursion.recursive.no-record-work",
+        "G6.touch.recursion.errors",
+        "G6.touch.recursion.schedule"
+      ],
+      "G6.touch.replacement-source": [
+        "G6.touch.replacement-source.source.replaced",
+        "G6.touch.replacement-source.errors",
+        "G6.touch.replacement-source.schedule"
+      ],
+      "G6.touch.abandoned-navigate": [
+        "G6.touch.abandoned-navigate.abandoned.navigate",
+        "G6.touch.abandoned-navigate.errors",
+        "G6.touch.abandoned-navigate.schedule"
+      ],
+      "G6.touch.abandoned-wheel": [
+        "G6.touch.abandoned-wheel.abandoned.wheel",
+        "G6.touch.abandoned-wheel.errors",
+        "G6.touch.abandoned-wheel.schedule"
+      ],
+      "G6.keyboard.thread": [
+        "G6.keyboard.thread.bead.word",
+        "G6.keyboard.thread.bead.kanji",
+        "G6.keyboard.thread.bead.sentence",
+        "G6.keyboard.thread.bead.article",
+        "G6.keyboard.thread.bead.article.line",
+        "G6.keyboard.thread.bead.shelf",
+        "G6.keyboard.thread.bead.shelf.line",
+        "G6.keyboard.thread.no-record-work",
+        "G6.keyboard.thread.errors",
+        "G6.keyboard.thread.schedule"
+      ],
+      "G6.keyboard.recursion": [
+        "G6.keyboard.recursion.recursive.current-visible",
+        "G6.keyboard.recursion.recursive.order",
+        "G6.keyboard.recursion.recursive.ancestor",
+        "G6.keyboard.recursion.recursive.no-record-work",
+        "G6.keyboard.recursion.errors",
+        "G6.keyboard.recursion.schedule"
+      ],
+      "G6.keyboard.replacement-source": [
+        "G6.keyboard.replacement-source.source.replaced",
+        "G6.keyboard.replacement-source.errors",
+        "G6.keyboard.replacement-source.schedule"
+      ],
+      "G6.keyboard.abandoned-navigate": [
+        "G6.keyboard.abandoned-navigate.abandoned.navigate",
+        "G6.keyboard.abandoned-navigate.errors",
+        "G6.keyboard.abandoned-navigate.schedule"
+      ],
+      "G6.keyboard.abandoned-wheel": [
+        "G6.keyboard.abandoned-wheel.abandoned.wheel",
+        "G6.keyboard.abandoned-wheel.errors",
+        "G6.keyboard.abandoned-wheel.schedule"
+      ],
+      "G6.sky.private-keyboard": [
+        "G6.sky.private-keyboard.private.entry",
+        "G6.sky.private-keyboard.private.root-focus",
+        "G6.sky.private-keyboard.private.next-enter",
+        "G6.sky.private-keyboard.private.source-camera",
+        "G6.sky.private-keyboard.private.no-record-work",
+        "G6.sky.private-keyboard.errors",
+        "G6.sky.private-keyboard.schedule"
+      ],
+      "G6.sky.handlers.spread": [
+        "G6.sky.handlers.spread.hand.one-edge",
+        "G6.sky.handlers.spread.hand.no-record-write",
+        "G6.sky.handlers.spread.errors",
+        "G6.sky.handlers.spread.schedule"
+      ],
+      "G6.sky.handlers.third": [
+        "G6.sky.handlers.third.hand.gate",
+        "G6.sky.handlers.third.hand.one-edge",
+        "G6.sky.handlers.third.hand.no-record-write",
+        "G6.sky.handlers.third.errors",
+        "G6.sky.handlers.third.schedule"
+      ],
+      "G6.sky.handlers.cancel": [
+        "G6.sky.handlers.cancel.hand.gate",
+        "G6.sky.handlers.cancel.hand.one-edge",
+        "G6.sky.handlers.cancel.hand.no-record-write",
+        "G6.sky.handlers.cancel.errors",
+        "G6.sky.handlers.cancel.schedule"
+      ],
+      "G6.sky.handlers.foreign": [
+        "G6.sky.handlers.foreign.hand.gate",
+        "G6.sky.handlers.foreign.hand.one-edge",
+        "G6.sky.handlers.foreign.hand.no-record-write",
+        "G6.sky.handlers.foreign.errors",
+        "G6.sky.handlers.foreign.schedule"
+      ],
+      "G6.sky.handlers.contract": [
+        "G6.sky.handlers.contract.hand.gate",
+        "G6.sky.handlers.contract.hand.one-edge",
+        "G6.sky.handlers.contract.hand.no-record-write",
+        "G6.sky.handlers.contract.errors",
+        "G6.sky.handlers.contract.schedule"
+      ],
+      "G6.sky.handlers.stage": [
+        "G6.sky.handlers.stage.stage.blocks-sky",
+        "G6.sky.handlers.stage.stage.no-record-write",
+        "G6.sky.handlers.stage.errors",
+        "G6.sky.handlers.stage.schedule"
+      ],
+      "G6.sky.native.spread": [
+        "G6.sky.native.spread.hand.one-edge",
+        "G6.sky.native.spread.hand.no-record-write",
+        "G6.sky.native.spread.errors",
+        "G6.sky.native.spread.schedule"
+      ],
+      "G6.sky.native.third": [
+        "G6.sky.native.third.hand.gate",
+        "G6.sky.native.third.hand.one-edge",
+        "G6.sky.native.third.hand.no-record-write",
+        "G6.sky.native.third.errors",
+        "G6.sky.native.third.schedule"
+      ],
+      "G6.sky.native.cancel": [
+        "G6.sky.native.cancel.hand.gate",
+        "G6.sky.native.cancel.hand.one-edge",
+        "G6.sky.native.cancel.hand.no-record-write",
+        "G6.sky.native.cancel.errors",
+        "G6.sky.native.cancel.schedule"
+      ],
+      "G6.sky.native.contract": [
+        "G6.sky.native.contract.hand.gate",
+        "G6.sky.native.contract.hand.one-edge",
+        "G6.sky.native.contract.hand.no-record-write",
+        "G6.sky.native.contract.errors",
+        "G6.sky.native.contract.schedule"
+      ],
+      "G6.sky.native.stage": [
+        "G6.sky.native.stage.stage.blocks-sky",
+        "G6.sky.native.stage.stage.no-record-write",
+        "G6.sky.native.stage.errors",
+        "G6.sky.native.stage.schedule"
+      ],
+      "G6.sky.pending-cue": [
+        "G6.sky.pending-cue.pending.block",
+        "G6.sky.pending-cue.pending.commit",
+        "G6.sky.pending-cue.pending.resume",
+        "G6.sky.pending-cue.errors",
+        "G6.sky.pending-cue.schedule"
+      ],
+      "G6.sky.pending-grade": [
+        "G6.sky.pending-grade.pending.block",
+        "G6.sky.pending-grade.pending.commit",
+        "G6.sky.pending-grade.pending.resume",
+        "G6.sky.pending-grade.errors",
+        "G6.sky.pending-grade.schedule"
+      ],
+      "G6.sky.handlers.lost-terminal": [
+        "G6.sky.handlers.lost-terminal.lost.untrusted-drained",
+        "G6.sky.handlers.lost-terminal.lost.no-record-write",
+        "G6.sky.handlers.lost-terminal.errors",
+        "G6.sky.handlers.lost-terminal.schedule"
+      ],
+      "G6.sky.handlers.interrupted-hold": [
+        "G6.sky.handlers.interrupted-hold.hold.blur",
+        "G6.sky.handlers.interrupted-hold.hold.hidden",
+        "G6.sky.handlers.interrupted-hold.hold.no-record-write",
+        "G6.sky.handlers.interrupted-hold.hold.premise",
+        "G6.sky.handlers.interrupted-hold.errors",
+        "G6.sky.handlers.interrupted-hold.schedule"
+      ],
+      "G6.sky.native.lost-terminal": [
+        "G6.sky.native.lost-terminal.lost.consumed",
+        "G6.sky.native.lost-terminal.lost.recovered",
+        "G6.sky.native.lost-terminal.lost.no-record-write",
+        "G6.sky.native.lost-terminal.errors",
+        "G6.sky.native.lost-terminal.schedule"
+      ],
+      "G6.sky.native.interrupted-hold": [
+        "G6.sky.native.interrupted-hold.hold.blur",
+        "G6.sky.native.interrupted-hold.hold.hidden",
+        "G6.sky.native.interrupted-hold.hold.no-record-write",
+        "G6.sky.native.interrupted-hold.hold.premise",
+        "G6.sky.native.interrupted-hold.errors",
+        "G6.sky.native.interrupted-hold.schedule"
+      ],
+      "G6.sky.star-rail.article": [
+        "G6.sky.star-rail.article.rail.admission",
+        "G6.sky.star-rail.article.rail.clear",
+        "G6.sky.star-rail.article.rail.resize-identity",
+        "G6.sky.star-rail.article.rail.destination",
+        "G6.sky.star-rail.article.rail.inverse",
+        "G6.sky.star-rail.article.rail.no-record-write",
+        "G6.sky.star-rail.article.errors",
+        "G6.sky.star-rail.article.schedule"
+      ],
+      "G6.sky.star-rail.kept": [
+        "G6.sky.star-rail.kept.rail.admission",
+        "G6.sky.star-rail.kept.rail.clear",
+        "G6.sky.star-rail.kept.rail.resize-identity",
+        "G6.sky.star-rail.kept.rail.destination",
+        "G6.sky.star-rail.kept.rail.inverse",
+        "G6.sky.star-rail.kept.rail.no-record-write",
+        "G6.sky.star-rail.kept.errors",
+        "G6.sky.star-rail.kept.schedule"
+      ],
+      "G6.source.received-occurrence": [
+        "G6.source.received-occurrence.ordinary-no-anchor989",
+        "G6.source.received-occurrence.explicit-source2351",
+        "G6.source.received-occurrence.new-source-outward-inward2351",
+        "G6.source.received-occurrence.learning-unchanged",
+        "G6.source.received-occurrence.errors",
+        "G6.source.received-occurrence.schedule"
+      ],
+      "G6.sky.kept-projection": [
+        "G6.sky.kept-projection.kept.identity",
+        "G6.sky.kept-projection.kept.native-door",
+        "G6.sky.kept-projection.kept.source-provenance",
+        "G6.sky.kept-projection.kept.no-record-write",
+        "G6.sky.kept-projection.kept.list-only",
+        "G6.sky.kept-projection.kept.removed",
+        "G6.sky.kept-projection.errors",
+        "G6.sky.kept-projection.schedule"
+      ],
+      "G6.text-policy": [
+        "G6.text-policy.reader.synthetic",
+        "G6.text-policy.sentence.synthetic",
+        "G6.text-policy.word.synthetic",
+        "G6.text-policy.stage.synthetic",
+        "G6.text-policy.errors",
+        "G6.text-policy.schedule"
+      ],
+      "G6.native-text-pinch": [
+        "G6.native-text-pinch.reader.native-chromium",
+        "G6.native-text-pinch.errors",
+        "G6.native-text-pinch.schedule"
+      ],
+      "G6.deck-text-policy": [
+        "G6.deck-text-policy.front.policy",
+        "G6.deck-text-policy.front.sealed",
+        "G6.deck-text-policy.back.policy",
+        "G6.deck-text-policy.errors",
+        "G6.deck-text-policy.schedule"
+      ]
+    },
+    "webkit": {
+      "G3-stalled": [
+        "G3.control.reading",
+        "G3.control.stage",
+        "G3-stalled.page-errors"
+      ],
+      "G3-clear": [
+        "G3.clear.reading",
+        "G3.clear.bare",
+        "G3-clear.page-errors"
+      ],
+      "G3-front": [
+        "G3.front.fixture",
+        "G3.front.sealed",
+        "G3.front.press",
+        "G3-front.page-errors"
+      ],
+      "G3-sky-ownership": [
+        "G3.sky-ownership.corpus",
+        "G3.sky-ownership.fixture",
+        "G3.sky-ownership.centre",
+        "G3.sky-ownership.caption",
+        "G3.sky-ownership.setup",
+        "G3-sky-ownership.page-errors"
+      ],
+      "G3-ladder": [
+        "G3.on-touch.first",
+        "G3.on-touch.stage",
+        "G3.on-touch.page",
+        "G3.on-touch.return-stage",
+        "G3.on-touch.bare",
+        "G3.on-touch.frames",
+        "G3.off.first",
+        "G3.off.stage",
+        "G3.off.page",
+        "G3.off.return-stage",
+        "G3.off.bare",
+        "G3.off.frames",
+        "G3.always.first",
+        "G3.always.stage",
+        "G3.always.page",
+        "G3.always.return-stage",
+        "G3.always.bare",
+        "G3.always.frames",
+        "G3-ladder.page-errors"
+      ],
+      "G3-direct-and-anchor": [
+        "G3.anchor-third",
+        "G3.escape-stage",
+        "G3.direct-page",
+        "G3.direct-bare",
+        "G3.outside-reading",
+        "G3.native-pinch",
+        "G3-direct-and-anchor.page-errors"
+      ],
+      "G3-current-save": [
+        "G3.save.fixture",
+        "G3.save.folded",
+        "G3.save.current",
+        "G3.save.current-folded",
+        "G3.save.no-phantom",
+        "G3-current-save.page-errors"
+      ],
+      "G3-kana": [
+        "G3.kana.fixture",
+        "G3.kana.identical",
+        "G3.kana.particle",
+        "G3.kana.particle-save-rest",
+        "G3.kana.particle-folded-rest",
+        "G3.kana.particle-no-card",
+        "G3-kana.page-errors"
+      ],
+      "G3-sentence-example-off": [
+        "G3.sentence.example.off.bare",
+        "G3.sentence.example.off.first",
+        "G3.sentence.example.off.stage",
+        "G3.sentence.example.off.page",
+        "G3.sentence.example.off.return-stage",
+        "G3.sentence.example.off.clear",
+        "G3-sentence-example-off.page-errors"
+      ],
+      "G3-sentence-example-on-touch": [
+        "G3.sentence.example.on-touch.bare",
+        "G3.sentence.example.on-touch.first",
+        "G3.sentence.example.on-touch.stage",
+        "G3.sentence.example.on-touch.page",
+        "G3.sentence.example.on-touch.return-stage",
+        "G3.sentence.example.on-touch.clear",
+        "G3-sentence-example-on-touch.page-errors"
+      ],
+      "G3-sentence-example-always": [
+        "G3.sentence.example.always.bare",
+        "G3.sentence.example.always.first",
+        "G3.sentence.example.always.stage",
+        "G3.sentence.example.always.page",
+        "G3.sentence.example.always.return-stage",
+        "G3.sentence.example.always.clear",
+        "G3-sentence-example-always.page-errors"
+      ],
+      "G3-sentence-page-off": [
+        "G3.sentence.page.off.bare",
+        "G3.sentence.page.off.first",
+        "G3.sentence.page.off.stage",
+        "G3.sentence.page.off.page",
+        "G3.sentence.page.off.return-stage",
+        "G3.sentence.page.off.clear",
+        "G3-sentence-page-off.page-errors"
+      ],
+      "G3-sentence-page-on-touch": [
+        "G3.sentence.page.on-touch.bare",
+        "G3.sentence.page.on-touch.first",
+        "G3.sentence.page.on-touch.stage",
+        "G3.sentence.page.on-touch.page",
+        "G3.sentence.page.on-touch.return-stage",
+        "G3.sentence.page.on-touch.clear",
+        "G3-sentence-page-on-touch.page-errors"
+      ],
+      "G3-sentence-page-always": [
+        "G3.sentence.page.always.bare",
+        "G3.sentence.page.always.first",
+        "G3.sentence.page.always.stage",
+        "G3.sentence.page.always.page",
+        "G3.sentence.page.always.return-stage",
+        "G3.sentence.page.always.clear",
+        "G3-sentence-page-always.page-errors"
+      ],
+      "G3-words": [
+        "G3.words.centre-fixture",
+        "G3.words.centre-stage",
+        "G3.words.centre-page",
+        "G3.words.centre-return",
+        "G3.words.centre-bare",
+        "G3.words.peripheral.reading",
+        "G3.words.peripheral.stage",
+        "G3.words.peripheral.hold-same-stage",
+        "G3.words.peripheral.page",
+        "G3.words.peripheral.return",
+        "G3.words.peripheral.bare",
+        "G3.words.peripheral.recenter",
+        "G3-words.page-errors"
+      ],
+      "G3-words-family": [
+        "G3.words.unknown-part",
+        "G3.words.family.reading",
+        "G3.words.family.stage",
+        "G3.words.family.hold-same-stage",
+        "G3.words.family.page",
+        "G3.words.family.return",
+        "G3.words.family.bare",
+        "G3.words.family.recenter",
+        "G3-words-family.page-errors"
+      ],
+      "G3-sky": [
+        "G3.sky.on-touch.bare",
+        "G3.sky.on-touch.first",
+        "G3.sky.on-touch.stage",
+        "G3.sky.on-touch.page",
+        "G3.sky.on-touch.return-stage",
+        "G3.sky.on-touch.clear",
+        "G3.sky.on-touch.revisit-reading",
+        "G3.sky.on-touch.reading-close",
+        "G3.sky.off.bare",
+        "G3.sky.off.first",
+        "G3.sky.off.stage",
+        "G3.sky.off.page",
+        "G3.sky.off.return-stage",
+        "G3.sky.off.clear",
+        "G3.sky.always.bare",
+        "G3.sky.always.first",
+        "G3.sky.always.stage",
+        "G3.sky.always.page",
+        "G3.sky.always.return-stage",
+        "G3.sky.always.clear",
+        "G3-sky.page-errors"
+      ],
+      "G3-sky-glyph": [
+        "G3.sky-glyph.off.canonical",
+        "G3.sky-glyph.off.bare",
+        "G3.sky-glyph.off.hit-1",
+        "G3.sky-glyph.off.first",
+        "G3.sky-glyph.off.stage",
+        "G3.sky-glyph.off.hit-2",
+        "G3.sky-glyph.off.page",
+        "G3.sky-glyph.off.return",
+        "G3.sky-glyph.off.clear",
+        "G3.sky-glyph.on-touch.canonical",
+        "G3.sky-glyph.on-touch.bare",
+        "G3.sky-glyph.on-touch.hit-1",
+        "G3.sky-glyph.on-touch.first",
+        "G3.sky-glyph.on-touch.hit-2",
+        "G3.sky-glyph.on-touch.stage",
+        "G3.sky-glyph.on-touch.hit-3",
+        "G3.sky-glyph.on-touch.page",
+        "G3.sky-glyph.on-touch.return",
+        "G3.sky-glyph.on-touch.clear",
+        "G3.sky-glyph.always.canonical",
+        "G3.sky-glyph.always.bare",
+        "G3.sky-glyph.always.hit-1",
+        "G3.sky-glyph.always.first",
+        "G3.sky-glyph.always.stage",
+        "G3.sky-glyph.always.hit-2",
+        "G3.sky-glyph.always.page",
+        "G3.sky-glyph.always.return",
+        "G3.sky-glyph.always.clear",
+        "G3-sky-glyph.page-errors"
+      ],
+      "G3-particle": [
+        "G3.particle.off.bare",
+        "G3.particle.off.first",
+        "G3.particle.off.stage",
+        "G3.particle.off.clear",
+        "G3.particle.on-touch.bare",
+        "G3.particle.on-touch.first",
+        "G3.particle.on-touch.stage",
+        "G3.particle.on-touch.clear",
+        "G3.particle.always.bare",
+        "G3.particle.always.first",
+        "G3.particle.always.stage",
+        "G3.particle.always.clear",
+        "G3-particle.page-errors"
+      ],
+      "G3-demo": [
+        "G3.demo.once",
+        "G3.demo.no-work",
+        "G3.demo.no-replay",
+        "G3-demo.page-errors"
+      ],
+      "page": [
+        "P3.card",
+        "P1.viewport",
+        "P1.grip",
+        "P1.scrim",
+        "P1.cap",
+        "P1.paper",
+        "P1.bar",
+        "P2.cut",
+        "P2.same-word",
+        "P2.built-ahead",
+        "P9.kanji-top",
+        "P10.report",
+        "P12.own-first",
+        "P12.fold",
+        "P3.stage-return",
+        "P3.close",
+        "P3.again",
+        "page.page-errors"
+      ],
+      "depth": [
+        "P4.back.own-card",
+        "P4.back.back-uncovered",
+        "P4.back.depth2",
+        "P4.back.depth1",
+        "P4.back.parent-page",
+        "P4.back.parent-stage",
+        "P4.back.bare",
+        "P4.escape.own-card",
+        "P4.escape.back-uncovered",
+        "P4.escape.depth2",
+        "P5.escape.depth1",
+        "P5.escape.parent-page",
+        "P5.escape.parent-stage",
+        "P5.escape.bare",
+        "depth.page-errors"
+      ],
+      "stale": [
+        "P6.no-stale",
+        "P6.page-word",
+        "stale.page-errors"
+      ],
+      "frames": [
+        "P7.return-0",
+        "P7.return-1",
+        "P7.return-2",
+        "P7.frames",
+        "frames.page-errors"
+      ],
+      "worlds": [
+        "P8.hokusai",
+        "P8.sumi",
+        "P8.sumi-depths",
+        "P8.shu",
+        "P8.akafuji",
+        "P8.iwa",
+        "P8.rokusho",
+        "P8.yoru",
+        "P8.nami",
+        "P8.keyblock",
+        "P8.hakuu",
+        "P8.kaku",
+        "worlds.page-errors"
+      ],
+      "gloss": [
+        "P11.one-line",
+        "P11.entries-apart",
+        "gloss.page-errors"
+      ],
+      "desktop": [
+        "P13.desktop",
+        "desktop.page-errors"
+      ],
+      "text-200": [
+        "P15.double",
+        "text-200.page-errors"
+      ],
+      "exposure": [
+        "P14.arrive-sumi",
+        "P14.stage-return-sumi",
+        "P14.back-sumi",
+        "P14.arrive-yoru",
+        "P14.stage-return-yoru",
+        "P14.back-yoru",
+        "exposure.page-errors"
+      ],
+      "G4-interrupt-save": [
+        "G4.interrupt.save-writing",
+        "G4.interrupt.save-at-once",
+        "G4.interrupt.save-acts",
+        "G4-interrupt-save.page-errors"
+      ],
+      "G4-ghost": [
+        "G4.ghost.first-frame",
+        "G4.ghost.first-pixels",
+        "G4-ghost.page-errors"
+      ],
+      "G4-one-speed": [
+        "G4.one-speed",
+        "G4-one-speed.page-errors"
+      ],
+      "G4-depth": [
+        "G4.depth.unmet.write",
+        "G4.depth.unmet.strokes",
+        "G4.depth.unmet.reading-flow",
+        "G4.depth.unmet.settled",
+        "G4.depth.met.write",
+        "G4.depth.met.strokes",
+        "G4.depth.met.reading-flow",
+        "G4.depth.met.settled",
+        "G4.depth.again.written",
+        "G4.depth.recalled.bare",
+        "G4.depth.recalled.on-request",
+        "G4.depth.owned.bare",
+        "G4.depth.owned.on-request",
+        "G4.depth.return",
+        "G4-depth.page-errors"
+      ],
+      "G4-tempo": [
+        "G4.tempo.slider",
+        "G4.tempo.planned",
+        "G4.tempo.measured",
+        "G4-tempo.page-errors"
+      ],
+      "G4-interrupt": [
+        "G4.interrupt.word",
+        "G4.interrupt.word-return",
+        "G4.interrupt.key",
+        "G4.interrupt.paper",
+        "G4-interrupt.page-errors"
+      ],
+      "G4-interrupt-desktop": [
+        "G4.interrupt.wheel",
+        "G4.interrupt.mouse-word",
+        "G4.interrupt.mouse-save",
+        "G4-interrupt-desktop.page-errors"
+      ],
+      "G4-brush": [
+        "G4.brush.never",
+        "G4.brush.mark",
+        "G4.brush.always",
+        "G4.brush.hold",
+        "G4-brush.page-errors"
+      ],
+      "G4-demo": [
+        "G4.demo.no-ink",
+        "G4-demo.page-errors"
+      ],
+      "G4-reduced": [
+        "G4.reduced",
+        "G4-reduced.page-errors"
+      ],
+      "G4-room": [
+        "G4.ghost.leaves",
+        "G4.rail.classic",
+        "G4.rail.quiet",
+        "G4-room.page-errors"
+      ],
+      "G4-voice": [
+        "G4.voice.passive",
+        "G4.voice.asked",
+        "G4.voice.return-keeps",
+        "G4.voice.never-device",
+        "G4-voice.page-errors"
+      ],
+      "G4-frames": [
+        "G4.frames.writing",
+        "G4.frames.interrupt",
+        "G4-frames.page-errors"
+      ],
+      "G5-second": [
+        "G5.first-hold",
+        "G5.second-hold",
+        "G5-second.page-errors"
+      ],
+      "G5-place": [
+        "G5.strip.place",
+        "G5-place.page-errors"
+      ],
+      "G5-layer-fold": [
+        "G5.layers.mark-opens",
+        "G5.layers.fold-paper",
+        "G5-layer-fold.page-errors"
+      ],
+      "G5-seal": [
+        "G5.ring",
+        "G5.seal.kept",
+        "G5.seal.flight",
+        "G5.seal.strip",
+        "G5.labels",
+        "G5.remove",
+        "G5.seal.durable",
+        "G5-seal.page-errors"
+      ],
+      "G5-keys": [
+        "G5.right-click",
+        "G5.escape",
+        "G5.shift-f10",
+        "G5.full-entry",
+        "G5-keys.page-errors"
+      ],
+      "G5-lists": [
+        "G5.new-list",
+        "G5.list.one-tap",
+        "G5.list.labels",
+        "G5-lists.page-errors"
+      ],
+      "G5-page": [
+        "G5.page.kept",
+        "G5.page.strip",
+        "G5.page.escape",
+        "G5-page.page-errors"
+      ],
+      "G5-deck": [
+        "G5.deck.front-sealed",
+        "G5.deck.back-hold",
+        "G5.deck.back-strip",
+        "G5.deck.second-hold",
+        "G5.deck.escape",
+        "G5.deck.right-click",
+        "G5-deck.page-errors"
+      ],
+      "G5-bar-save-phone": [
+        "G5.bar-save.phone.save",
+        "G5.bar-save.phone.saved",
+        "G5-bar-save-phone.page-errors"
+      ],
+      "G5-bar-save-mac": [
+        "G5.bar-save.mac.save",
+        "G5.bar-save.mac.saved",
+        "G5-bar-save-mac.page-errors"
+      ],
+      "G5-reduced": [
+        "G5.reduced",
+        "G5-reduced.page-errors"
+      ],
+      "G5-glass-320x568": [
+        "G5.strip.fits.320x568.first",
+        "G5.glass.320x568.first",
+        "G5.strip.fits.320x568.foot",
+        "G5.glass.320x568.foot",
+        "G5.strip.fits.320x568.top",
+        "G5.glass.320x568.top",
+        "G5.bookmark.320x568",
+        "G5-glass-320x568.page-errors"
+      ],
+      "G5-glass-390x844": [
+        "G5.strip.fits.390x844.first",
+        "G5.glass.390x844.first",
+        "G5.strip.fits.390x844.foot",
+        "G5.glass.390x844.foot",
+        "G5.strip.fits.390x844.top",
+        "G5.glass.390x844.top",
+        "G5.bookmark.390x844",
+        "G5-glass-390x844.page-errors"
+      ],
+      "G5-glass-430x932": [
+        "G5.strip.fits.430x932.first",
+        "G5.glass.430x932.first",
+        "G5.strip.fits.430x932.foot",
+        "G5.glass.430x932.foot",
+        "G5.strip.fits.430x932.top",
+        "G5.glass.430x932.top",
+        "G5.bookmark.430x932",
+        "G5-glass-430x932.page-errors"
+      ],
+      "G5-remove-everywhere": [
+        "G5.remove.undo",
+        "G5.remove.everywhere",
+        "G5-remove-everywhere.page-errors"
+      ],
+      "G5-tray": [
+        "G5.bookmark.lands",
+        "G5.browse.no-review",
+        "G5-tray.page-errors"
+      ],
+      "G5-layers": [
+        "G5.layers.rest",
+        "G5.layers.only-mark",
+        "G5.layers.open",
+        "G5.layers.lines-hold",
+        "G5.layers.fold-word",
+        "G5.layers.bare-again",
+        "G5.layers.fold-keys",
+        "G5-layers.page-errors"
+      ],
+      "G5-frames": [
+        "G5.frames.seal",
+        "G5.frames.landing",
+        "G5-frames.page-errors"
+      ],
+      "g2-depth": [
+        "G2.F0.depth",
+        "G2.1",
+        "G2.2",
+        "G2.4",
+        "G2.5",
+        "G2.6",
+        "G2.3",
+        "G2.5.release",
+        "g2-depth.page-errors"
+      ],
+      "g2-reading": [
+        "G2.F0.reading",
+        "G2.4.rooms",
+        "g2-reading.page-errors"
+      ],
+      "g2-taps": [
+        "G2.F0.taps",
+        "G2.7",
+        "g2-taps.page-errors"
+      ],
+      "G5-room-hover": [
+        "G5.room.shared-hover",
+        "G5-room-hover.page-errors"
+      ],
+      "G6.current-thread.320.hokusai": [
+        "G6.current-thread.320.hokusai.current.context",
+        "G6.current-thread.320.hokusai.current.part-route",
+        "G6.current-thread.320.hokusai.current.part-contained",
+        "G6.current-thread.320.hokusai.current.part-scroll-only",
+        "G6.current-thread.320.hokusai.current.return-line",
+        "G6.current-thread.320.hokusai.current.sky-contained",
+        "G6.current-thread.320.hokusai.current.sky-return-line",
+        "G6.current-thread.320.hokusai.current.no-record-work",
+        "G6.current-thread.320.hokusai.errors",
+        "G6.current-thread.320.hokusai.schedule"
+      ],
+      "G6.current-thread.320.sumi": [
+        "G6.current-thread.320.sumi.current.context",
+        "G6.current-thread.320.sumi.current.part-route",
+        "G6.current-thread.320.sumi.current.part-contained",
+        "G6.current-thread.320.sumi.current.part-scroll-only",
+        "G6.current-thread.320.sumi.current.return-line",
+        "G6.current-thread.320.sumi.current.sky-contained",
+        "G6.current-thread.320.sumi.current.sky-return-line",
+        "G6.current-thread.320.sumi.current.no-record-work",
+        "G6.current-thread.320.sumi.errors",
+        "G6.current-thread.320.sumi.schedule"
+      ],
+      "G6.current-thread.390.hokusai": [
+        "G6.current-thread.390.hokusai.current.context",
+        "G6.current-thread.390.hokusai.current.part-route",
+        "G6.current-thread.390.hokusai.current.part-contained",
+        "G6.current-thread.390.hokusai.current.part-scroll-only",
+        "G6.current-thread.390.hokusai.current.return-line",
+        "G6.current-thread.390.hokusai.current.sky-contained",
+        "G6.current-thread.390.hokusai.current.sky-return-line",
+        "G6.current-thread.390.hokusai.current.no-record-work",
+        "G6.current-thread.390.hokusai.errors",
+        "G6.current-thread.390.hokusai.schedule"
+      ],
+      "G6.current-thread.390.sumi": [
+        "G6.current-thread.390.sumi.current.context",
+        "G6.current-thread.390.sumi.current.part-route",
+        "G6.current-thread.390.sumi.current.part-contained",
+        "G6.current-thread.390.sumi.current.part-scroll-only",
+        "G6.current-thread.390.sumi.current.return-line",
+        "G6.current-thread.390.sumi.current.sky-contained",
+        "G6.current-thread.390.sumi.current.sky-return-line",
+        "G6.current-thread.390.sumi.current.no-record-work",
+        "G6.current-thread.390.sumi.errors",
+        "G6.current-thread.390.sumi.schedule"
+      ],
+      "G6.current-thread.430.hokusai": [
+        "G6.current-thread.430.hokusai.current.context",
+        "G6.current-thread.430.hokusai.current.part-route",
+        "G6.current-thread.430.hokusai.current.part-contained",
+        "G6.current-thread.430.hokusai.current.part-scroll-only",
+        "G6.current-thread.430.hokusai.current.return-line",
+        "G6.current-thread.430.hokusai.current.sky-contained",
+        "G6.current-thread.430.hokusai.current.sky-return-line",
+        "G6.current-thread.430.hokusai.current.no-record-work",
+        "G6.current-thread.430.hokusai.errors",
+        "G6.current-thread.430.hokusai.schedule"
+      ],
+      "G6.current-thread.430.sumi": [
+        "G6.current-thread.430.sumi.current.context",
+        "G6.current-thread.430.sumi.current.part-route",
+        "G6.current-thread.430.sumi.current.part-contained",
+        "G6.current-thread.430.sumi.current.part-scroll-only",
+        "G6.current-thread.430.sumi.current.return-line",
+        "G6.current-thread.430.sumi.current.sky-contained",
+        "G6.current-thread.430.sumi.current.sky-return-line",
+        "G6.current-thread.430.sumi.current.no-record-work",
+        "G6.current-thread.430.sumi.errors",
+        "G6.current-thread.430.sumi.schedule"
+      ],
+      "G6.touch.edges": [
+        "G6.touch.edges.edge-1.article-sentence",
+        "G6.touch.edges.edge-1.article-sentence.frames",
+        "G6.touch.edges.edge-2.sentence-word",
+        "G6.touch.edges.edge-2.sentence-word.frames",
+        "G6.touch.edges.edge-3.word-kanji",
+        "G6.touch.edges.edge-3.word-kanji.frames",
+        "G6.touch.edges.edge-4.kanji-part",
+        "G6.touch.edges.edge-4.kanji-part.frames",
+        "G6.touch.edges.edge-5.part-kanji",
+        "G6.touch.edges.edge-5.part-kanji.frames",
+        "G6.touch.edges.edge-6.kanji-word",
+        "G6.touch.edges.edge-6.kanji-word.frames",
+        "G6.touch.edges.edge-7.word-sentence",
+        "G6.touch.edges.edge-7.word-sentence.frames",
+        "G6.touch.edges.edge-8.sentence-article",
+        "G6.touch.edges.edge-8.sentence-article.frames",
+        "G6.touch.edges.edge-8.sentence-article.line",
+        "G6.touch.edges.edge-9.article-shelf",
+        "G6.touch.edges.edge-9.article-shelf.frames",
+        "G6.touch.edges.edge-10.shelf-sky",
+        "G6.touch.edges.edge-10.shelf-sky.frames",
+        "G6.touch.edges.edge-11.sky-shelf",
+        "G6.touch.edges.edge-11.sky-shelf.frames",
+        "G6.touch.edges.edge-12.shelf-article",
+        "G6.touch.edges.edge-12.shelf-article.frames",
+        "G6.touch.edges.edge-12.shelf-article.line",
+        "G6.touch.edges.no-record-work",
+        "G6.touch.edges.errors",
+        "G6.touch.edges.schedule"
+      ],
+      "G6.touch.forty": [
+        "G6.touch.forty.edge-1.article-sentence",
+        "G6.touch.forty.edge-2.sentence-word",
+        "G6.touch.forty.edge-3.word-kanji",
+        "G6.touch.forty.edge-4.kanji-part",
+        "G6.touch.forty.edge-5.part-kanji",
+        "G6.touch.forty.edge-6.kanji-word",
+        "G6.touch.forty.edge-7.word-sentence",
+        "G6.touch.forty.edge-8.sentence-article",
+        "G6.touch.forty.edge-8.sentence-article.line",
+        "G6.touch.forty.edge-9.article-shelf",
+        "G6.touch.forty.edge-10.shelf-sky",
+        "G6.touch.forty.edge-11.sky-shelf",
+        "G6.touch.forty.edge-12.shelf-article",
+        "G6.touch.forty.edge-12.shelf-article.line",
+        "G6.touch.forty.edge-13.article-sentence",
+        "G6.touch.forty.edge-14.sentence-word",
+        "G6.touch.forty.edge-15.word-kanji",
+        "G6.touch.forty.edge-16.kanji-part",
+        "G6.touch.forty.edge-17.part-kanji",
+        "G6.touch.forty.edge-18.kanji-word",
+        "G6.touch.forty.edge-19.word-sentence",
+        "G6.touch.forty.edge-20.sentence-article",
+        "G6.touch.forty.edge-20.sentence-article.line",
+        "G6.touch.forty.edge-21.article-shelf",
+        "G6.touch.forty.edge-22.shelf-sky",
+        "G6.touch.forty.edge-23.sky-shelf",
+        "G6.touch.forty.edge-24.shelf-article",
+        "G6.touch.forty.edge-24.shelf-article.line",
+        "G6.touch.forty.edge-25.article-sentence",
+        "G6.touch.forty.edge-26.sentence-word",
+        "G6.touch.forty.edge-27.word-kanji",
+        "G6.touch.forty.edge-28.kanji-part",
+        "G6.touch.forty.edge-29.part-kanji",
+        "G6.touch.forty.edge-30.kanji-word",
+        "G6.touch.forty.edge-31.word-sentence",
+        "G6.touch.forty.edge-32.sentence-article",
+        "G6.touch.forty.edge-32.sentence-article.line",
+        "G6.touch.forty.edge-33.article-shelf",
+        "G6.touch.forty.edge-34.shelf-sky",
+        "G6.touch.forty.edge-35.sky-shelf",
+        "G6.touch.forty.edge-36.shelf-article",
+        "G6.touch.forty.edge-36.shelf-article.line",
+        "G6.touch.forty.edge-37.article-sentence",
+        "G6.touch.forty.edge-38.sentence-word",
+        "G6.touch.forty.edge-39.word-sentence",
+        "G6.touch.forty.edge-40.sentence-article",
+        "G6.touch.forty.edge-40.sentence-article.line",
+        "G6.touch.forty.no-record-work",
+        "G6.touch.forty.errors",
+        "G6.touch.forty.schedule"
+      ],
+      "G6.keyboard.edges": [
+        "G6.keyboard.edges.edge-1.article-sentence",
+        "G6.keyboard.edges.edge-1.article-sentence.frames",
+        "G6.keyboard.edges.edge-2.sentence-word",
+        "G6.keyboard.edges.edge-2.sentence-word.frames",
+        "G6.keyboard.edges.edge-3.word-kanji",
+        "G6.keyboard.edges.edge-3.word-kanji.frames",
+        "G6.keyboard.edges.edge-4.kanji-part",
+        "G6.keyboard.edges.edge-4.kanji-part.frames",
+        "G6.keyboard.edges.edge-5.part-kanji",
+        "G6.keyboard.edges.edge-5.part-kanji.frames",
+        "G6.keyboard.edges.edge-6.kanji-word",
+        "G6.keyboard.edges.edge-6.kanji-word.frames",
+        "G6.keyboard.edges.edge-7.word-sentence",
+        "G6.keyboard.edges.edge-7.word-sentence.frames",
+        "G6.keyboard.edges.edge-8.sentence-article",
+        "G6.keyboard.edges.edge-8.sentence-article.frames",
+        "G6.keyboard.edges.edge-8.sentence-article.line",
+        "G6.keyboard.edges.edge-9.article-shelf",
+        "G6.keyboard.edges.edge-9.article-shelf.frames",
+        "G6.keyboard.edges.edge-10.shelf-sky",
+        "G6.keyboard.edges.edge-10.shelf-sky.frames",
+        "G6.keyboard.edges.edge-11.sky-shelf",
+        "G6.keyboard.edges.edge-11.sky-shelf.frames",
+        "G6.keyboard.edges.edge-12.shelf-article",
+        "G6.keyboard.edges.edge-12.shelf-article.frames",
+        "G6.keyboard.edges.edge-12.shelf-article.line",
+        "G6.keyboard.edges.no-record-work",
+        "G6.keyboard.edges.errors",
+        "G6.keyboard.edges.schedule"
+      ],
+      "G6.keyboard.forty": [
+        "G6.keyboard.forty.edge-1.article-sentence",
+        "G6.keyboard.forty.edge-2.sentence-word",
+        "G6.keyboard.forty.edge-3.word-kanji",
+        "G6.keyboard.forty.edge-4.kanji-part",
+        "G6.keyboard.forty.edge-5.part-kanji",
+        "G6.keyboard.forty.edge-6.kanji-word",
+        "G6.keyboard.forty.edge-7.word-sentence",
+        "G6.keyboard.forty.edge-8.sentence-article",
+        "G6.keyboard.forty.edge-8.sentence-article.line",
+        "G6.keyboard.forty.edge-9.article-shelf",
+        "G6.keyboard.forty.edge-10.shelf-sky",
+        "G6.keyboard.forty.edge-11.sky-shelf",
+        "G6.keyboard.forty.edge-12.shelf-article",
+        "G6.keyboard.forty.edge-12.shelf-article.line",
+        "G6.keyboard.forty.edge-13.article-sentence",
+        "G6.keyboard.forty.edge-14.sentence-word",
+        "G6.keyboard.forty.edge-15.word-kanji",
+        "G6.keyboard.forty.edge-16.kanji-part",
+        "G6.keyboard.forty.edge-17.part-kanji",
+        "G6.keyboard.forty.edge-18.kanji-word",
+        "G6.keyboard.forty.edge-19.word-sentence",
+        "G6.keyboard.forty.edge-20.sentence-article",
+        "G6.keyboard.forty.edge-20.sentence-article.line",
+        "G6.keyboard.forty.edge-21.article-shelf",
+        "G6.keyboard.forty.edge-22.shelf-sky",
+        "G6.keyboard.forty.edge-23.sky-shelf",
+        "G6.keyboard.forty.edge-24.shelf-article",
+        "G6.keyboard.forty.edge-24.shelf-article.line",
+        "G6.keyboard.forty.edge-25.article-sentence",
+        "G6.keyboard.forty.edge-26.sentence-word",
+        "G6.keyboard.forty.edge-27.word-kanji",
+        "G6.keyboard.forty.edge-28.kanji-part",
+        "G6.keyboard.forty.edge-29.part-kanji",
+        "G6.keyboard.forty.edge-30.kanji-word",
+        "G6.keyboard.forty.edge-31.word-sentence",
+        "G6.keyboard.forty.edge-32.sentence-article",
+        "G6.keyboard.forty.edge-32.sentence-article.line",
+        "G6.keyboard.forty.edge-33.article-shelf",
+        "G6.keyboard.forty.edge-34.shelf-sky",
+        "G6.keyboard.forty.edge-35.sky-shelf",
+        "G6.keyboard.forty.edge-36.shelf-article",
+        "G6.keyboard.forty.edge-36.shelf-article.line",
+        "G6.keyboard.forty.edge-37.article-sentence",
+        "G6.keyboard.forty.edge-38.sentence-word",
+        "G6.keyboard.forty.edge-39.word-sentence",
+        "G6.keyboard.forty.edge-40.sentence-article",
+        "G6.keyboard.forty.edge-40.sentence-article.line",
+        "G6.keyboard.forty.no-record-work",
+        "G6.keyboard.forty.errors",
+        "G6.keyboard.forty.schedule"
+      ],
+      "G6.pending-word-menu": [
+        "G6.pending-word-menu.menu.pending-real-request",
+        "G6.pending-word-menu.menu.source-retained",
+        "G6.pending-word-menu.menu.no-late-menu",
+        "G6.pending-word-menu.menu.no-late-focus",
+        "G6.pending-word-menu.menu.source-unchanged",
+        "G6.pending-word-menu.menu.no-record-work",
+        "G6.pending-word-menu.errors",
+        "G6.pending-word-menu.schedule"
+      ],
+      "G6.pending-word-menu.escape": [
+        "G6.pending-word-menu.escape.menu.pending-held",
+        "G6.pending-word-menu.escape.menu.cancel-state",
+        "G6.pending-word-menu.escape.menu.no-late-menu",
+        "G6.pending-word-menu.escape.menu.no-late-focus",
+        "G6.pending-word-menu.escape.menu.source-unchanged",
+        "G6.pending-word-menu.escape.menu.no-record-work",
+        "G6.pending-word-menu.escape.errors",
+        "G6.pending-word-menu.escape.schedule"
+      ],
+      "G6.pending-word-menu.outside": [
+        "G6.pending-word-menu.outside.menu.pending-held",
+        "G6.pending-word-menu.outside.menu.cancel-state",
+        "G6.pending-word-menu.outside.menu.no-late-menu",
+        "G6.pending-word-menu.outside.menu.no-late-focus",
+        "G6.pending-word-menu.outside.menu.source-unchanged",
+        "G6.pending-word-menu.outside.menu.no-record-work",
+        "G6.pending-word-menu.outside.errors",
+        "G6.pending-word-menu.outside.schedule"
+      ],
+      "G6.pending-word-menu.room": [
+        "G6.pending-word-menu.room.menu.pending-held",
+        "G6.pending-word-menu.room.menu.cancel-state",
+        "G6.pending-word-menu.room.menu.no-late-menu",
+        "G6.pending-word-menu.room.menu.no-late-focus",
+        "G6.pending-word-menu.room.menu.source-unchanged",
+        "G6.pending-word-menu.room.menu.no-record-work",
+        "G6.pending-word-menu.room.errors",
+        "G6.pending-word-menu.room.schedule"
+      ],
+      "G6.pending-word-menu.overlap": [
+        "G6.pending-word-menu.overlap.menu.pending-held",
+        "G6.pending-word-menu.overlap.menu.newest-only",
+        "G6.pending-word-menu.overlap.menu.no-record-work",
+        "G6.pending-word-menu.overlap.errors",
+        "G6.pending-word-menu.overlap.schedule"
+      ],
+      "G6.archive.shelf": [
+        "G6.archive.shelf.archive.back",
+        "G6.archive.shelf.archive.reopen-line",
+        "G6.archive.shelf.archive.shelf-bead",
+        "G6.archive.shelf.archive.sky-inward",
+        "G6.archive.shelf.archive.sky-return-line",
+        "G6.archive.shelf.archive.back-to-shelf",
+        "G6.archive.shelf.archive.no-record-work",
+        "G6.archive.shelf.errors",
+        "G6.archive.shelf.schedule"
+      ],
+      "G6.touch.sourceless-particle": [
+        "G6.touch.sourceless-particle.particle.no-sentence-bead",
+        "G6.touch.sourceless-particle.particle.article-return",
+        "G6.touch.sourceless-particle.particle.no-record-work",
+        "G6.touch.sourceless-particle.errors",
+        "G6.touch.sourceless-particle.schedule"
+      ],
+      "G6.touch.read-on": [
+        "G6.touch.read-on.readon.read-farther",
+        "G6.touch.read-on.readon.exit-recaptured",
+        "G6.touch.read-on.readon.reopen-line",
+        "G6.touch.read-on.readon.no-record-work",
+        "G6.touch.read-on.errors",
+        "G6.touch.read-on.schedule"
+      ],
+      "G6.keyboard.sourceless-particle": [
+        "G6.keyboard.sourceless-particle.particle.no-sentence-bead",
+        "G6.keyboard.sourceless-particle.particle.article-return",
+        "G6.keyboard.sourceless-particle.particle.no-record-work",
+        "G6.keyboard.sourceless-particle.errors",
+        "G6.keyboard.sourceless-particle.schedule"
+      ],
+      "G6.keyboard.read-on": [
+        "G6.keyboard.read-on.readon.read-farther",
+        "G6.keyboard.read-on.readon.exit-recaptured",
+        "G6.keyboard.read-on.readon.reopen-line",
+        "G6.keyboard.read-on.readon.no-record-work",
+        "G6.keyboard.read-on.errors",
+        "G6.keyboard.read-on.schedule"
+      ],
+      "G6.touch.thread": [
+        "G6.touch.thread.bead.word",
+        "G6.touch.thread.bead.kanji",
+        "G6.touch.thread.bead.sentence",
+        "G6.touch.thread.bead.article",
+        "G6.touch.thread.bead.article.line",
+        "G6.touch.thread.bead.shelf",
+        "G6.touch.thread.bead.shelf.line",
+        "G6.touch.thread.no-record-work",
+        "G6.touch.thread.errors",
+        "G6.touch.thread.schedule"
+      ],
+      "G6.touch.recursion": [
+        "G6.touch.recursion.recursive.current-visible",
+        "G6.touch.recursion.recursive.order",
+        "G6.touch.recursion.recursive.ancestor",
+        "G6.touch.recursion.recursive.no-record-work",
+        "G6.touch.recursion.errors",
+        "G6.touch.recursion.schedule"
+      ],
+      "G6.touch.replacement-source": [
+        "G6.touch.replacement-source.source.replaced",
+        "G6.touch.replacement-source.errors",
+        "G6.touch.replacement-source.schedule"
+      ],
+      "G6.touch.abandoned-navigate": [
+        "G6.touch.abandoned-navigate.abandoned.navigate",
+        "G6.touch.abandoned-navigate.errors",
+        "G6.touch.abandoned-navigate.schedule"
+      ],
+      "G6.touch.abandoned-key": [
+        "G6.touch.abandoned-key.abandoned.key",
+        "G6.touch.abandoned-key.errors",
+        "G6.touch.abandoned-key.schedule"
+      ],
+      "G6.keyboard.thread": [
+        "G6.keyboard.thread.bead.word",
+        "G6.keyboard.thread.bead.kanji",
+        "G6.keyboard.thread.bead.sentence",
+        "G6.keyboard.thread.bead.article",
+        "G6.keyboard.thread.bead.article.line",
+        "G6.keyboard.thread.bead.shelf",
+        "G6.keyboard.thread.bead.shelf.line",
+        "G6.keyboard.thread.no-record-work",
+        "G6.keyboard.thread.errors",
+        "G6.keyboard.thread.schedule"
+      ],
+      "G6.keyboard.recursion": [
+        "G6.keyboard.recursion.recursive.current-visible",
+        "G6.keyboard.recursion.recursive.order",
+        "G6.keyboard.recursion.recursive.ancestor",
+        "G6.keyboard.recursion.recursive.no-record-work",
+        "G6.keyboard.recursion.errors",
+        "G6.keyboard.recursion.schedule"
+      ],
+      "G6.keyboard.replacement-source": [
+        "G6.keyboard.replacement-source.source.replaced",
+        "G6.keyboard.replacement-source.errors",
+        "G6.keyboard.replacement-source.schedule"
+      ],
+      "G6.keyboard.abandoned-navigate": [
+        "G6.keyboard.abandoned-navigate.abandoned.navigate",
+        "G6.keyboard.abandoned-navigate.errors",
+        "G6.keyboard.abandoned-navigate.schedule"
+      ],
+      "G6.keyboard.abandoned-key": [
+        "G6.keyboard.abandoned-key.abandoned.key",
+        "G6.keyboard.abandoned-key.errors",
+        "G6.keyboard.abandoned-key.schedule"
+      ],
+      "G6.sky.private-keyboard": [
+        "G6.sky.private-keyboard.private.entry",
+        "G6.sky.private-keyboard.private.root-focus",
+        "G6.sky.private-keyboard.private.next-enter",
+        "G6.sky.private-keyboard.private.source-camera",
+        "G6.sky.private-keyboard.private.no-record-work",
+        "G6.sky.private-keyboard.errors",
+        "G6.sky.private-keyboard.schedule"
+      ],
+      "G6.sky.handlers.spread": [
+        "G6.sky.handlers.spread.hand.one-edge",
+        "G6.sky.handlers.spread.hand.no-record-write",
+        "G6.sky.handlers.spread.errors",
+        "G6.sky.handlers.spread.schedule"
+      ],
+      "G6.sky.handlers.third": [
+        "G6.sky.handlers.third.hand.gate",
+        "G6.sky.handlers.third.hand.one-edge",
+        "G6.sky.handlers.third.hand.no-record-write",
+        "G6.sky.handlers.third.errors",
+        "G6.sky.handlers.third.schedule"
+      ],
+      "G6.sky.handlers.cancel": [
+        "G6.sky.handlers.cancel.hand.gate",
+        "G6.sky.handlers.cancel.hand.one-edge",
+        "G6.sky.handlers.cancel.hand.no-record-write",
+        "G6.sky.handlers.cancel.errors",
+        "G6.sky.handlers.cancel.schedule"
+      ],
+      "G6.sky.handlers.foreign": [
+        "G6.sky.handlers.foreign.hand.gate",
+        "G6.sky.handlers.foreign.hand.one-edge",
+        "G6.sky.handlers.foreign.hand.no-record-write",
+        "G6.sky.handlers.foreign.errors",
+        "G6.sky.handlers.foreign.schedule"
+      ],
+      "G6.sky.handlers.contract": [
+        "G6.sky.handlers.contract.hand.gate",
+        "G6.sky.handlers.contract.hand.one-edge",
+        "G6.sky.handlers.contract.hand.no-record-write",
+        "G6.sky.handlers.contract.errors",
+        "G6.sky.handlers.contract.schedule"
+      ],
+      "G6.sky.handlers.stage": [
+        "G6.sky.handlers.stage.stage.blocks-sky",
+        "G6.sky.handlers.stage.stage.no-record-write",
+        "G6.sky.handlers.stage.errors",
+        "G6.sky.handlers.stage.schedule"
+      ],
+      "G6.sky.pending-cue": [
+        "G6.sky.pending-cue.pending.block",
+        "G6.sky.pending-cue.pending.commit",
+        "G6.sky.pending-cue.pending.resume",
+        "G6.sky.pending-cue.errors",
+        "G6.sky.pending-cue.schedule"
+      ],
+      "G6.sky.pending-grade": [
+        "G6.sky.pending-grade.pending.block",
+        "G6.sky.pending-grade.pending.commit",
+        "G6.sky.pending-grade.pending.resume",
+        "G6.sky.pending-grade.errors",
+        "G6.sky.pending-grade.schedule"
+      ],
+      "G6.sky.handlers.lost-terminal": [
+        "G6.sky.handlers.lost-terminal.lost.untrusted-drained",
+        "G6.sky.handlers.lost-terminal.lost.no-record-write",
+        "G6.sky.handlers.lost-terminal.errors",
+        "G6.sky.handlers.lost-terminal.schedule"
+      ],
+      "G6.sky.handlers.interrupted-hold": [
+        "G6.sky.handlers.interrupted-hold.hold.blur",
+        "G6.sky.handlers.interrupted-hold.hold.hidden",
+        "G6.sky.handlers.interrupted-hold.hold.no-record-write",
+        "G6.sky.handlers.interrupted-hold.hold.premise",
+        "G6.sky.handlers.interrupted-hold.errors",
+        "G6.sky.handlers.interrupted-hold.schedule"
+      ],
+      "G6.sky.star-rail.article": [
+        "G6.sky.star-rail.article.rail.admission",
+        "G6.sky.star-rail.article.rail.clear",
+        "G6.sky.star-rail.article.rail.resize-identity",
+        "G6.sky.star-rail.article.rail.destination",
+        "G6.sky.star-rail.article.rail.inverse",
+        "G6.sky.star-rail.article.rail.no-record-write",
+        "G6.sky.star-rail.article.errors",
+        "G6.sky.star-rail.article.schedule"
+      ],
+      "G6.sky.star-rail.kept": [
+        "G6.sky.star-rail.kept.rail.admission",
+        "G6.sky.star-rail.kept.rail.clear",
+        "G6.sky.star-rail.kept.rail.resize-identity",
+        "G6.sky.star-rail.kept.rail.destination",
+        "G6.sky.star-rail.kept.rail.inverse",
+        "G6.sky.star-rail.kept.rail.no-record-write",
+        "G6.sky.star-rail.kept.errors",
+        "G6.sky.star-rail.kept.schedule"
+      ],
+      "G6.source.received-occurrence": [
+        "G6.source.received-occurrence.ordinary-no-anchor989",
+        "G6.source.received-occurrence.explicit-source2351",
+        "G6.source.received-occurrence.new-source-outward-inward2351",
+        "G6.source.received-occurrence.learning-unchanged",
+        "G6.source.received-occurrence.errors",
+        "G6.source.received-occurrence.schedule"
+      ],
+      "G6.sky.kept-projection": [
+        "G6.sky.kept-projection.kept.identity",
+        "G6.sky.kept-projection.kept.native-door",
+        "G6.sky.kept-projection.kept.source-provenance",
+        "G6.sky.kept-projection.kept.no-record-write",
+        "G6.sky.kept-projection.kept.list-only",
+        "G6.sky.kept-projection.kept.removed",
+        "G6.sky.kept-projection.errors",
+        "G6.sky.kept-projection.schedule"
+      ],
+      "G6.text-policy": [
+        "G6.text-policy.reader.synthetic",
+        "G6.text-policy.sentence.synthetic",
+        "G6.text-policy.word.synthetic",
+        "G6.text-policy.stage.synthetic",
+        "G6.text-policy.errors",
+        "G6.text-policy.schedule"
+      ],
+      "G6.deck-text-policy": [
+        "G6.deck-text-policy.front.policy",
+        "G6.deck-text-policy.front.sealed",
+        "G6.deck-text-policy.back.policy",
+        "G6.deck-text-policy.errors",
+        "G6.deck-text-policy.schedule"
+      ]
+    }
+  },
+  "reconciliation": [
+    "INT-VH merge 2 (2026-10-19): Hfix-1A (item 4, one Save on screen) adds G3.save.folded and G3.save.current-folded to G3-current-save and G3.kana.particle-folded-rest to G3-kana in both engines; G3.save.fixture, G3.save.current and G3.kana.particle-save-rest keep their identities with Hfix-1A's titles and predicates.",
+    "G1/G3 check identity expressions unchanged since 66b95be7; preserved all three reading dials, six sentence cases, eleven worlds and engine-specific timing rows.",
+    "G4 identity expressions unchanged since 8282c0f6; Chromium-only native touch scroll and engine-specific frame rows retained.",
+    "G5 identity expressions unchanged since 2b59c8d7 except new room-hover candidate and its independently required control; added two room-hover candidate identities.",
+    "G2 F0 fixture split into depth/reading/taps in current source; all remaining G2 candidate identities from current VH receipts.",
+    "G6 runG6Suite schedule matches e38db78d; current differences are emitted phase/walk metadata and waiting for the actual settled deck front, neither changes assertion identities."
+  ]
+}
