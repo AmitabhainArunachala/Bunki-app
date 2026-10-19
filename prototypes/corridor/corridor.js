@@ -32695,14 +32695,13 @@ function exampleIdentity(id, node = null) {
     const written = Array.isArray(row?.[4]) ? row[4] : [];
     for (const form of written.length ? written : Array.isArray(row?.[5]) ? row[5] : []) forms.add(form);
   }
-  // KT-6 round 3 (recheck 0508, the lead's ruling): the word's own entry is the one entry that writes its key with the
-  // word's own reading and sense (exampleOwnRows; never a homograph: 首's こうべ entry is 頭's, 才's sense is not 歳's).
-  // Its spellings with the key's kanji are the word's own (another okurigana: 押さえる, 代わる, 或る); a spelling with other
-  // kanji only when that entry has one sense or JMdict restricts none of its senses to some of its spellings (依る, 拠る and
-  // 由る share every sense of 因る's entry; 張る keeps a sense of its own, so it never stands under 貼る). Never another
-  // entry's spelling.
+  // KT-6 (the lead's final ruling, 05:4x): the word's own entry is the one entry that writes its key with the word's own
+  // reading and sense (exampleOwnRows; never a homograph: 首's こうべ entry is 頭's, 才's sense is not 歳's). Of its
+  // spellings only those written with the key's own kanji are the word's (another okurigana: 押さえる, 代わる, 或る): a
+  // sentence written with other kanji does not hold this word's written form (依る is not 因る, 機械 is not 器械, 表す is
+  // not 現す), whatever entry the dictionary files it under. Never another entry's spelling.
   for (const row of exampleOwnRows(key)) {
-    for (const form of row[4]) if (!forms.has(form) && (exampleKanji(form) === exampleKanji(key) || exampleSensesShared(row))) forms.add(form);
+    for (const form of row[4]) if (!forms.has(form) && exampleKanji(form) === exampleKanji(key)) forms.add(form);
   }
   let readings = null;
   if (own === node && (node.seq || node.reading) && rows.length) {
@@ -32733,31 +32732,6 @@ function exampleOwnRows(key) {
   return dictionaryRowsForForm(key).filter((row) => Array.isArray(row?.[4]) && row[4].includes(key) &&
     (row[5] || []).some((kana) => kataToHira(kana) === reading && dictionaryReadingSupportsForm(row, kana, key)) &&
     (row[6] || []).some((gloss) => senses.has(exampleSenseKey(gloss))));
-}
-/** Whether every spelling of an entry carries every sense of it: one sense, or no sense JMdict restricts to some of its
- * spellings (the entry's detail, once its shard is here: ensureExampleIdentity). Unknown is no. */
-function exampleSensesShared(row) {
-  const senses = D.dictionaryDetails?.get(String(row?.[0]))?.[3] || null;
-  const count = senses ? senses.length : Array.isArray(row?.[12]) ? row[12].length : 0;
-  if (count === 1) return true;
-  if (!senses) return false;
-  return senses.every((sense) => !Array.isArray(sense?.[1]) || !sense[1].length || sense[1].includes('*'));
-}
-/** KT-6 · the detail the sense check reads for the word's own entry, fetched once and only when a bank sentence of the
- * word writes it with other kanji (因る's sentences write 依る, 拠る). True when it arrived, so the page draws its examples
- * again. */
-async function ensureExampleIdentity(id) {
-  if (!exampleKanji(id) || !D.dict?.[id]) return false;
-  await ensureDictionaryRowsForForm(id);
-  const own = exampleOwnRows(id).filter((row) => !exampleSensesShared(row) && !D.dictionaryDetails?.get(String(row[0])));
-  if (!own.length) return false;
-  const written = new Set((await ensureBankExamples(id)).flatMap((ex) => (ex.tokens || []).filter((token) => token.c).map((token) => token.b)));
-  const shards = [...new Set(own
-    .filter((row) => row[4].some((form) => exampleKanji(form) !== exampleKanji(id) && written.has(form)))
-    .map((row) => dictionaryShardId(row[0])))];
-  if (!shards.length) return false;
-  await Promise.all(shards.map(ensureDictionaryShard));
-  return true;
 }
 function exampleTokenIsWord(token, identity) {
   if (!token?.c) return false;
@@ -35190,12 +35164,6 @@ function renderWordNode(sheet, node) {
       if (!entries.length) return;
       refreshWordSheet(node);
     });
-  }
-  // KT-6 · the word's own entries and the details the identity's sense check reads, asked once; the examples are drawn
-  // again when they land
-  if (!personalHost && !node.exampleIdentityAsked && window.__CORRIDOR_STANDALONE__ !== true) {
-    node.exampleIdentityAsked = true;
-    ensureExampleIdentity(node.id).then((arrived) => { if (arrived) refreshWordSheet(node); }).catch(() => {});
   }
   const { first: leadExamples, more: moreExamples } = exampleOrder(node, findExamples(node.id, 6, node));
   if (leadExamples.length || moreExamples.length) {

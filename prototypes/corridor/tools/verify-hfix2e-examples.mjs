@@ -7,13 +7,15 @@
  *          Control: no token ever counts as the word.
  *   KT6-C  an inflected verb keeps its inflected examples (歩く: ≥ 4, one written 歩け/歩き/歩い). Green on base and
  *          branch (a guard). Control: as B.
- * KT-6 rounds 2 and 3 (critic 0426 and recheck 0508; the lead's rulings), against 1f790977 (round 1) and a760b2ad (round 2):
- *   KT6-D  MUST STAY IN: the words whose own entry writes their sentences another way show them again: 押える ← 押さえる (6),
- *          代る ← 代わる (6), 因る ← 依る/拠る (6: entry 1168660 shares every sense), 或 ← 或る. Red on 1f790977. Control: no
- *          own-entry spelling admitted.
- *   KT6-G  MUST STAY OUT: a homograph entry never lends its sentences: no example of 首 holds 頭 without 首, of 比 頃, of 画
- *          絵, of 為る 成る, of 才 歳, of 開く 空く; 問 (もん) shows no 問い sentence. Red on a760b2ad (round 2's every entry
- *          that writes the key). Control: the own entry is again every entry that writes the key.
+ * KT-6's final rule (the lead's ruling after round 3: the word's own entry by reading and sense, and of it only the
+ * spellings with the key's own kanji), against 1f790977 (round 1), a760b2ad (round 2) and 02c6f0f2 (round 3):
+ *   KT6-D  MUST STAY IN: an okurigana variant of the word's own entry is the word's written form: 押える ← 押さえる (6),
+ *          代る ← 代わる (6), 或 ← 或る (1). Red on 1f790977. Control: no own-entry spelling admitted.
+ *   KT6-G  MUST STAY OUT: no example of 首 holds 頭 without 首, of 比 頃, of 画 絵, of 為る 成る, of 才 歳, of 開く 空く,
+ *          of 器械 機械, of 現す 表; 問 (もん) shows no 問い sentence. Red on a760b2ad (homographs) and on 02c6f0f2 (other
+ *          kanji of the own entry). Control: the own entry is again every entry that writes the key.
+ *   KT6-H  因る shows no 依る/拠る/由る sentence (another kanji is not this word's written form). Red on a760b2ad and
+ *          02c6f0f2. Control: every spelling of the own entry admitted, whatever its kanji.
  *   KT6-E  張る never stands under 貼る (one entry, 1427900, but a sense of its own): every example 貼る's page shows
  *          holds 貼. A guard, green on 1f790977 too. Control: every same-entry spelling admitted whatever its senses.
  *   KT6-F  藍 still shows no example at all. A guard, green on 1f790977 too. Control: the bank read by the bare kana.
@@ -55,8 +57,9 @@ const CONTROL = {
   'KT6-D': ['  for (const row of exampleOwnRows(key)) {', '  for (const row of []) {'],
   // the own entry is again every entry that writes the key, whatever its reading and sense (round 2)
   'KT6-G': ["  return dictionaryRowsForForm(key).filter((row) => Array.isArray(row?.[4]) && row[4].includes(key) &&\n", "  return dictionaryRowsForForm(key).filter((row) => Array.isArray(row?.[4]) && row[4].includes(key) || false &&\n"],
-  // every same-entry spelling admitted whatever its senses: 張る would stand under 貼る
-  'KT6-E': ['function exampleSensesShared(row) {', 'function exampleSensesShared(row) {\n  return true;'],
+  // every spelling of the own entry admitted, whatever its kanji: 張る would stand under 貼る, 依る under 因る
+  'KT6-E': ['    for (const form of row[4]) if (!forms.has(form) && exampleKanji(form) === exampleKanji(key)) forms.add(form);', '    for (const form of row[4]) if (!forms.has(form)) forms.add(form);'],
+  'KT6-H': ['    for (const form of row[4]) if (!forms.has(form) && exampleKanji(form) === exampleKanji(key)) forms.add(form);', '    for (const form of row[4]) if (!forms.has(form)) forms.add(form);'],
   'KT6-F': ['const banked = bankExamplesFor(id, node);', 'const banked = D.exampleBank?.get(id) || [];'],
 };
 async function ready(page) {
@@ -209,7 +212,7 @@ try {
     return { examples, inflected };
   });
   await row('KT6-D', async ({ page }) => {
-    const words = [['押える', /押さえ/u, 6], ['代る', /代わ/u, 6], ['因る', /[依拠由]/u, 6], ['或', /或る/u, 1]];
+    const words = [['押える', /押さえ/u, 6], ['代る', /代わ/u, 6], ['或', /或る/u, 1]];
     const seen = {};
     for (const [word, own, least] of words) {
       await openWordPage(page, word);
@@ -224,7 +227,8 @@ try {
 
   await row('KT6-G', async ({ page }) => {
     // [word, the homograph entry's spelling that must not stand under it, the word's own kanji]
-    const pairs = [['首', '頭', '首'], ['比', '頃', '比'], ['画', '絵', '画'], ['為る', '成', '為'], ['才', '歳', '才'], ['開く', '空', '開'], ['問', '問い', null]];
+    const pairs = [['首', '頭', '首'], ['比', '頃', '比'], ['画', '絵', '画'], ['為る', '成', '為'], ['才', '歳', '才'], ['開く', '空', '開'],
+      ['器械', '機械', '器'], ['現す', '表', '現'], ['問', '問い', null]];
     const seen = {};
     for (const [word, stranger, own] of pairs) {
       await openWordPage(page, word);
@@ -236,6 +240,15 @@ try {
     const lending = Object.entries(seen).filter(([, row]) => row.lent.length);
     assert.deepEqual(lending.map(([word]) => word), [], `KT6-G: no homograph entry lends its sentences (${JSON.stringify(Object.fromEntries(lending))})`);
     return seen;
+  });
+
+  await row('KT6-H', async ({ page }) => {
+    await openWordPage(page, '因る');
+    const examples = await settledExamples(page);
+    await shot(page, 'KT6-H-examples');
+    const other = examples.filter((text) => /[依拠由]/u.test(text) && !text.includes('因'));
+    assert.deepEqual(other, [], `KT6-H: 因る shows no 依る/拠る/由る sentence (${other.join(' | ')})`);
+    return { examples };
   });
 
   await row('KT6-E', async ({ page }) => {
