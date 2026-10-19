@@ -263,6 +263,55 @@ function contrastFixture(engine) {
       (scene) => scene.world === 'hokusai' && scene.state === 'fresh-demo.settled',
     ),
   );
+  // INT-VH (2026-10-19), the lead's ruling on C8: hokusai's deck front carries the foot band declaring its fade, and the
+  // three in-run controls each turn C8 red for their own fault and restore the exact measurement
+  const chrome = {
+    bars: 2,
+    scrolled: { doc: 240, sheet: 0 },
+    parts: [{ sel: '#kp-reveal', bar: 'kp-foot-band' }],
+    fades: [{ bar: 'kp-foot-band', side: 'foot', edge: 18 }],
+    invalid: [],
+    through: [],
+    translucent: [],
+  };
+  report.results.find((scene) => scene.world === 'hokusai' && scene.state === 'deck-front').chrome =
+    structuredClone(chrome);
+  for (const [id, mutant] of [
+    [
+      'c8-fade-undeclared',
+      { ...chrome, fades: [], through: [{ bar: 'kp-foot-band', worst: 211, pixels: 640 }] },
+    ],
+    [
+      'c8-fade-overdeclared',
+      {
+        ...chrome,
+        fades: [],
+        invalid: [
+          { bar: 'kp-foot-band', side: 'foot', declared: '30px', why: 'taller than 24 px' },
+        ],
+      },
+    ],
+    [
+      'c8-fade-translucent-below',
+      {
+        ...chrome,
+        translucent: [{ bar: 'kp-foot-band', below: 18, worst: 38, pixels: 50000, of: 50000 }],
+      },
+    ],
+  ])
+    report.controls.push({
+      engine,
+      id,
+      scene: 'hokusai/deck-front',
+      mutation: 'fixture',
+      candidate: structuredClone(chrome),
+      mutant,
+      restored: structuredClone(chrome),
+      styleBefore: null,
+      styleAfter: null,
+      recordBefore: { unknownExtension: ['preserved'] },
+      recordAfter: { unknownExtension: ['preserved'] },
+    });
   return {
     report,
     context: { engine, runId: 'contrast-attempt', artifactSha256: A, verifierSha256: B },
@@ -274,8 +323,9 @@ for (const engine of ['chromium', 'webkit'])
     const { report, context } = contrastFixture(engine);
     const validate = (value) => validateExistingReport(gate, value, context);
     // INT-VH (2026-10-19): + Hfix-1B's five settled states × eleven worlds (world, C1, C3-C5; C6 by day): 857 → 1162;
-    // + Hfix-1A's C8 for each of the seventeen settled states × eleven worlds: 1162 → 1349
-    assert.equal(contrastExpectedCases(engine).length, 1349);
+    // + Hfix-1A's C8 for each of the seventeen settled states × eleven worlds: 1162 → 1349;
+    // + the declared fade's three controls, their restore and their record on hokusai's deck front: 1349 → 1354
+    assert.equal(contrastExpectedCases(engine).length, 1354);
     assert(validate(report).passed, validate(report).errors.join(';'));
     const mutations = [
       (r) => {
@@ -397,6 +447,87 @@ for (const engine of ['chromium', 'webkit'])
       },
       (r) => {
         r.controls[0].restored.pairs[0].ratio = 6;
+      },
+      // INT-VH (2026-10-19): the declared fade's controls and the consumer's own C8 judgement
+      (r) => {
+        r.controls.pop();
+      },
+      (r) => {
+        r.controls.find((control) => control.id === 'c8-fade-undeclared').engine = 'other';
+      },
+      (r) => {
+        r.controls.find((control) => control.id === 'c8-fade-undeclared').scene = 'sumi/deck-front';
+      },
+      (r) => {
+        const control = r.controls.find((entry) => entry.id === 'c8-fade-undeclared');
+        control.mutant = structuredClone(control.candidate);
+      },
+      (r) => {
+        r.controls.find((control) => control.id === 'c8-fade-undeclared').mutant.fades = [
+          { bar: 'kp-foot-band', side: 'foot', edge: 18 },
+        ];
+      },
+      (r) => {
+        r.controls.find(
+          (control) => control.id === 'c8-fade-overdeclared',
+        ).mutant.invalid[0].declared = '20px';
+      },
+      (r) => {
+        r.controls.find((control) => control.id === 'c8-fade-translucent-below').mutant.fades = [];
+      },
+      (r) => {
+        r.controls.find((control) => control.id === 'c8-fade-overdeclared').restored.fades = [];
+      },
+      (r) => {
+        r.controls.find((control) => control.id === 'c8-fade-translucent-below').styleAfter =
+          'opacity: 0.5';
+      },
+      (r) => {
+        r.controls.find(
+          (control) => control.id === 'c8-fade-undeclared',
+        ).recordAfter.unknownExtension = [];
+      },
+      (r) => {
+        r.controls.find((control) => control.id === 'c8-fade-undeclared').candidate.fades = [];
+      },
+      (r) => {
+        r.results.find(
+          (scene) => scene.world === 'hokusai' && scene.state === 'deck-front',
+        ).chrome.through = [{ bar: 'kp-foot-band', worst: 40, pixels: 12, below: 18 }];
+      },
+      (r) => {
+        const deck = r.results.find(
+          (scene) => scene.world === 'hokusai' && scene.state === 'deck-front',
+        );
+        for (const chrome of [
+          deck.chrome,
+          ...r.controls
+            .filter((control) => control.id.startsWith('c8-'))
+            .flatMap((control) => [control.candidate, control.restored]),
+        ])
+          chrome.fades[0].edge = 30;
+      },
+      (r) => {
+        r.results.find((scene) => scene.world === 'sumi' && scene.state === 'deck-front').chrome = {
+          bars: 2,
+          scrolled: { doc: 240, sheet: 0 },
+          parts: [],
+          fades: [{ bar: 'kp-foot-band', side: 'foot', edge: 18 }],
+          invalid: [],
+          through: [],
+          translucent: [{ bar: 'kp-foot-band', below: 18, worst: 3, pixels: 2, of: 50000 }],
+        };
+      },
+      (r) => {
+        r.results.find((scene) => scene.world === 'sumi' && scene.state === 'reader').chrome = {
+          bars: 3,
+          scrolled: { doc: 240, sheet: 0 },
+          parts: [],
+          fades: [{ bar: 'chrome', side: 'top', edge: 12 }],
+          invalid: [],
+          through: [],
+          translucent: [],
+        };
       },
     ];
     mutations.forEach((mutate, index) => {

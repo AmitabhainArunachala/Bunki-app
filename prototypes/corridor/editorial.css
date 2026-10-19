@@ -3421,14 +3421,18 @@ body:has(#app .kp-study > .kp-reveal) #app { padding-bottom: 0; }
    page), under Undo's own band and Reveal, over the passage. Its top 18 px is an alpha mask (no pigment), so a line
    scrolling under the band recedes into the stage instead of being cut; a tap on it turns the card as the stage does. It
    is drawn only while the front's key is there: a back revealed in place keeps the card's node, and with it this element,
-   which player.css then keeps undrawn (it would lie over the back's last row and take its taps) */
+   which player.css then keeps undrawn (it would lie over the back's last row and take its taps).
+   The band declares its fade (--fade-edge, the one length the mask is drawn from): the contrast sweep's C8 lets a bar at
+   the foot fade through a declared top strip of at most 24 px and judges every pixel below it, the keys standing on the
+   band included, fully opaque (INT-VH, the lead's ruling of 2026-10-19) */
 #app .kp .kp-study:has(> .kp-reveal) > .kp-foot-band {
   display: block; order: 3; flex: none; position: sticky; bottom: 0; z-index: 1;
   height: calc(82px + env(safe-area-inset-bottom, 0px));
   margin: -88px calc((100% - 100vw) / 2) calc(-10px - env(safe-area-inset-bottom, 0px));
   background: var(--kp-dock);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18px);
-  mask-image: linear-gradient(to bottom, transparent, #000 18px);
+  --fade-edge: 18px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 var(--fade-edge));
+  mask-image: linear-gradient(to bottom, transparent, #000 var(--fade-edge));
 }
 /* Undo on the next front stands on the key's row at the left, 10px off the foot (the safe area counted once), on its
    opaque full-width dock band, so no passage ink shows through it; the key paints over that band at the right */

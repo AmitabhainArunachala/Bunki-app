@@ -698,6 +698,53 @@ export const CONTRAST_STATES = Object.freeze([
   'deck-back',
 ]);
 const CONTRAST_NIGHT = new Set(['rokusho', 'yoru', 'nami', 'hakuu', 'kaku']);
+// INT-VH (2026-10-19), the lead's ruling on C8 and the deck's foot band: a bar at the foot may declare a top-edge fade of
+// at most 24 px, and C8 then judges every pixel below that strip fully opaque. Its three in-run controls (hokusai's deck
+// front, each engine: the fade undeclared, declared taller than 24 px, see-through below its strip), each restored, are
+// rostered here and re-judged from the receipt, independent of the producer's predicate.
+export const CONTRAST_C8_FADE_EDGE_MAX = 24;
+export const CONTRAST_C8_CONTROLS = Object.freeze([
+  'fade-undeclared',
+  'fade-overdeclared',
+  'fade-translucent-below',
+]);
+const CONTRAST_C8_CONTROL_ROWS = Object.freeze(
+  [...CONTRAST_C8_CONTROLS, 'restore', 'record'].map((id) => `C8-control.${id}`),
+);
+const CONTRAST_C8_BAND = 'kp-foot-band';
+const chromeShaped = (chrome) =>
+  !!chrome &&
+  ['fades', 'invalid', 'through', 'translucent'].every((key) => Array.isArray(chrome[key]));
+const declaredFade = (fade) =>
+  fade?.side === 'foot' &&
+  Number.isFinite(fade.edge) &&
+  fade.edge > 0 &&
+  fade.edge <= CONTRAST_C8_FADE_EDGE_MAX;
+const chromeClear = (chrome) =>
+  chromeShaped(chrome) &&
+  chrome.invalid.length === 0 &&
+  chrome.through.length === 0 &&
+  chrome.translucent.length === 0 &&
+  chrome.fades.every(declaredFade);
+const bandDeclares = (chrome) =>
+  chromeShaped(chrome) &&
+  chrome.fades.some((fade) => fade.bar === CONTRAST_C8_BAND && declaredFade(fade));
+const C8_KILLS = Object.freeze({
+  'c8-fade-undeclared': (mutant) =>
+    !mutant.fades.some((fade) => fade.bar === CONTRAST_C8_BAND) &&
+    !mutant.invalid.some((fade) => fade.bar === CONTRAST_C8_BAND) &&
+    mutant.through.some((row) => row.bar === CONTRAST_C8_BAND && row.pixels > 0),
+  'c8-fade-overdeclared': (mutant) =>
+    mutant.invalid.some(
+      (fade) =>
+        fade.bar === CONTRAST_C8_BAND &&
+        /^\d+(?:\.\d+)?px$/u.test(fade.declared) &&
+        Number.parseFloat(fade.declared) > CONTRAST_C8_FADE_EDGE_MAX,
+    ),
+  'c8-fade-translucent-below': (mutant) =>
+    bandDeclares(mutant) &&
+    mutant.translucent.some((row) => row.bar === CONTRAST_C8_BAND && row.pixels > 0),
+});
 export function contrastExpectedCases(engine = 'chromium') {
   return [
     'source/C7',
@@ -715,6 +762,7 @@ export function contrastExpectedCases(engine = 'chromium') {
             'C8',
             ...(['slip', 'deck-front', 'deck-back'].includes(state) ? ['C2'] : []),
             ...(!CONTRAST_NIGHT.has(world) ? ['C6'] : []),
+            ...(world === 'hokusai' && state === 'deck-front' ? CONTRAST_C8_CONTROL_ROWS : []),
           ].map((id) => `${browser}/${world}/${state}.${id}`),
         ),
         `${browser}/${world}/shelf.C5-present`,
@@ -924,10 +972,14 @@ for (const engine of ['chromium', 'webkit']) {
         require(arrivals.passed, `${world}: every displayed named arrival must meet its own calibrated deadline: ${arrivals.errors.join('; ')}`);
       }
       const controls = Array.isArray(report.controls) ? report.controls : [];
-      require(controls.length === 1 &&
-        controls[0]?.engine === engine &&
-        controls[0]?.id === 'same-ink-background', 'Contrast DOM control roster incomplete');
-      for (const control of controls) {
+      require(exact(
+        ['same-ink-background', ...Object.keys(C8_KILLS)],
+        controls.map((control) => control?.id),
+      ) &&
+        controls.every(
+          (control) => control?.engine === engine,
+        ), 'Contrast DOM control roster incomplete');
+      for (const control of controls.filter((entry) => entry?.id === 'same-ink-background')) {
         require(same(
           control.candidate,
           scenes.find(
@@ -957,6 +1009,41 @@ for (const engine of ['chromium', 'webkit']) {
             control.recordAfter,
           ), 'Contrast control changed native record');
       }
+      const deck = scenes.find(
+        (scene) =>
+          scene.engine === engine && scene.world === 'hokusai' && scene.state === 'deck-front',
+      );
+      for (const control of controls.filter((entry) => Object.hasOwn(C8_KILLS, entry?.id))) {
+        require(control.scene === 'hokusai/deck-front' &&
+          chromeShaped(deck?.chrome) &&
+          same(
+            control.candidate,
+            deck.chrome,
+          ), `${control.id}: C8 control is detached from the actual deck-front measurement`);
+        require(chromeClear(control.candidate) &&
+          bandDeclares(
+            control.candidate,
+          ), `${control.id}: C8 control candidate is not the green foot band declaring its fade`);
+        require(chromeShaped(control.mutant) &&
+          !chromeClear(control.mutant) &&
+          C8_KILLS[control.id](
+            control.mutant,
+          ), `${control.id}: C8 control failed to turn C8 red for its fault`);
+        require(same(control.candidate, control.restored) &&
+          control.styleBefore !== undefined &&
+          control.styleBefore ===
+            control.styleAfter, `${control.id}: C8 control did not restore exact style/measurement`);
+        require(control.recordBefore &&
+          same(
+            control.recordBefore,
+            control.recordAfter,
+          ), `${control.id}: C8 control changed native record`);
+      }
+      // C8 re-judged from the receipt: every measured chrome is clear, and every declared fade is a foot bar's, ≤ 24 px
+      for (const scene of scenes.filter((entry) => entry.chrome !== undefined))
+        require(chromeClear(
+          scene.chrome,
+        ), `${scene.engine}/${scene.world}/${scene.state}: C8 chrome shows through, is not opaque below a declared fade, or declares a fade out of bounds`);
       return {
         passed: errors.length === 0,
         errors,

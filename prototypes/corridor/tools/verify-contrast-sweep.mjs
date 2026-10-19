@@ -35,14 +35,24 @@
  *   C8 chrome (Hfix-1A, F-1) the fixed chrome is opaque enough that text under it never shows through: with the reading
  *             scrolled so text lies under the bars, each bar's pixels are the same with what scrolls under them (the
  *             room's, the page's, a deck's content) hidden as with it shown. Judged wherever a bar paints (found over a
- *             #ff00ff ground; a clear strip in a bar's box paints nothing and is no chrome).
+ *             #ff00ff ground; a clear strip in a bar's box paints nothing and is no chrome). The controls standing on a bar
+ *             (a fixed or sticky element inside its box and on top there, as the deck's key on its foot band) are the bar's
+ *             own and stay in every shot.
+ *             The declared fade (INT-VH, the lead's ruling of 2026-10-19 on the deck's foot band): a bar at the foot may
+ *             declare a top-edge fade with its own `--fade-edge` (a length in px, at most 24 px, leaving the bar a body
+ *             below it), so a line scrolling under it recedes instead of being cut. C8 then judges only the pixels below
+ *             that declared strip, every one of them, and they must be fully opaque, the controls on the bar included:
+ *             the bar and what stands on it give the same pixels over two grounds (#ff00ff, #00ff00), and nothing under
+ *             them shows through. A declaration on a bar not at the foot, taller than 24 px, or not a px length is red.
  *             And C1 reads each line where a reader reads it: inside the open reading area between the bars and clear of
  *             their shade (a run's every line probed, not its first alone); a line outside it is read again with the
  *             document or the page scrolled clear, the run keeping its worst pair (F-1's 9 reds were lines read under the
  *             tab bar's edge and shade).
  * Negative controls (one-hand/M/neg): a literal #1f3a5f → transparent top bar → C3 red; the key-kanji sheet flat again
  * → C5 red; the bar's ink lowered onto its paper → C1 red; the word's page at 85 % of its page's luminance → C6 red;
- * SWEEP_NEGATIVE=translucent-bar (Hfix-1A) → C8 red. */
+ * SWEEP_NEGATIVE=translucent-bar (Hfix-1A) → C8 red. In every full run (INT-VH, the lead's ruling): on hokusai's deck front,
+ * each engine, the actual foot band's fade undeclared, declared at 30 px, and see-through below its declared strip → C8 red,
+ * each restored to the exact style and the exact candidate measurement (rows …/deck-front.C8-control.*). */
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -1072,6 +1082,181 @@ async function freshDemo(browser, world, report) {
   }
 }
 
+/* ------------------------------------------------------------------ C8 chrome */
+// INT-VH, the lead's ruling (2026-10-19) on C8 and the deck's foot band: the fade stays (deliberate design, so a line
+// scrolling under the band recedes instead of being cut) and C8 is made precise rather than loosened. A bar at the foot may
+// declare a top-edge fade, with its own --fade-edge (a px length, at most FADE_EDGE_MAX, leaving the bar a body below it);
+// C8 then judges only the pixels below that declared strip, and every one of them must be fully opaque, the controls on
+// the bar included. A bar that declares nothing is judged as Hfix-1A wrote, wherever it paints.
+const FADE_EDGE_MAX = 24;
+const chromeClear = (chrome) => !chrome || (chrome.through.length === 0 && chrome.translucent.length === 0 && chrome.invalid.length === 0);
+async function measureChrome(page) {
+  const moved = await page.evaluate(() => {
+    const sheet = document.getElementById('sheet'), y0 = scrollY, s0 = sheet?.scrollTop ?? 0;
+    scrollBy({ top: 240, behavior: 'instant' });
+    if (sheet) sheet.scrollTop = s0 + 240;
+    return { doc: scrollY - y0, sheet: (sheet?.scrollTop ?? 0) - s0 };
+  });
+  try {
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    const whole = decodePng(await page.screenshot({ type: 'png' }));
+    // the bars, each with the fade it declares itself (a value its parent also computes is inherited, not declared), and
+    // the controls standing on them: a fixed or sticky element outside every bar, inside a bar's box and on top there (the
+    // element the glass hits at its centre), as the deck's key on its foot band. A control on a bar is the bar's own: it
+    // stays in every shot, and the bar is judged with it
+    const found = await page.evaluate(() => {
+      const fade = (el) => getComputedStyle(el).getPropertyValue('--fade-edge').trim();
+      const bars = [...document.querySelectorAll('[data-sweep-bar]')].map((b) => {
+        const r = b.getBoundingClientRect(), own = fade(b), inherited = b.parentElement ? fade(b.parentElement) : '';
+        return { sel: b.id ? `#${b.id}` : b.className.split(' ')[0], side: b.dataset.sweepBar, declared: own && own !== inherited ? own : null,
+          left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+      }).filter((r) => r.right - r.left > 0 && r.bottom - r.top > 0);
+      const parts = [];
+      for (const el of document.querySelectorAll('body *')) {
+        if (el.closest('[data-sweep-bar]')) continue;
+        const s = getComputedStyle(el);
+        if (!['fixed', 'sticky'].includes(s.position) || s.visibility !== 'visible' || s.display === 'none') continue;
+        const r = el.getBoundingClientRect();
+        if (r.width <= 0 || r.height <= 0) continue;
+        const bar = bars.find((b) => r.left >= b.left - 1 && r.right <= b.right + 1 && r.top >= b.top - 1 && r.bottom <= b.bottom + 1);
+        const hit = bar && document.elementFromPoint((r.left + r.right) / 2, (r.top + r.bottom) / 2);
+        if (!hit || !el.contains(hit)) continue;
+        el.dataset.sweepBarPart = bar.sel;
+        parts.push({ sel: el.id ? `#${el.id}` : String(el.className).split(' ')[0], bar: bar.sel });
+      }
+      return { bars, parts };
+    });
+    const keep = '[data-sweep-bar], [data-sweep-bar] *, [data-sweep-bar-part], [data-sweep-bar-part] *';
+    await page.evaluate((kept) => {
+      const style = document.createElement('style');
+      style.id = 'sweep-isolate';
+      // only what scrolls under the bars goes: the room's content, the page's, a deck's; overlays that stand on a bar
+      // (the report door, the 層 mark, the slip, the deck's key) stay in both shots. A bar standing inside that content (a
+      // deck's top and grade bars) is never hidden and is itself made visible, so its own parts keep the visibility the
+      // app gave them (a part the bar hides while scrolled stays hidden)
+      const under = ['#app > main', '#sheet > :not([data-sweep-bar])', '.kp-study > :not([data-sweep-bar])'];
+      const off = `:not(${kept})`;
+      style.textContent = `${under.map((q) => [`${q}${off}`, `${q} ${off}`, `${q}${off}::before`, `${q}${off}::after`, `${q} ${off}::before`, `${q} ${off}::after`].join(', ')).join(', ')} { visibility: hidden !important; transition: none !important; }
+        [data-sweep-bar], [data-sweep-bar-part] { visibility: visible !important; }`;
+      document.head.append(style);
+    }, keep);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    const alone = decodePng(await page.screenshot({ type: 'png' }));
+    // the bars alone over a loud ground (#ff00ff): where a bar's box shows that ground unchanged, the bar paints nothing (a
+    // clear strip its box holds above its body, as the deck's grade bar does): no chrome there to judge. A bar that paints,
+    // however faintly (a frosted bar of the page's own colour), is judged on all it paints. The same over a second ground
+    // (#00ff00): a pixel that differs between the two lets its ground through, so it is not fully opaque
+    const bareOn = async (ground) => {
+      await page.evaluate(([kept, g]) => {
+        document.getElementById('sweep-bare')?.remove();
+        const style = document.createElement('style');
+        style.id = 'sweep-bare';
+        const off = `:not(${kept})`;
+        style.textContent = `body *${off}, body *${off}::before, body *${off}::after, body::before, body::after { visibility: hidden !important; transition: none !important; }
+          [data-sweep-bar], [data-sweep-bar-part] { visibility: visible !important; } html { background: ${g} !important; } body { background: transparent !important; }`;
+        document.head.append(style);
+      }, [keep, ground]);
+      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+      return decodePng(await page.screenshot({ type: 'png' }));
+    };
+    const bare = await bareOn('#ff00ff'), green = await bareOn('#00ff00');
+    const chrome = { bars: found.bars.length, scrolled: moved, parts: found.parts, fades: [], invalid: [], through: [], translucent: [] };
+    for (const r of found.bars) {
+      let edge = null;
+      if (r.declared !== null) {
+        const px = /^\d+(?:\.\d+)?px$/.test(r.declared) ? Number.parseFloat(r.declared) : Number.NaN;
+        const why = r.side !== 'foot' ? 'a fade is declared only by a bar at the foot'
+          : !(px > 0) ? 'not a positive length in px'
+            : px > FADE_EDGE_MAX ? `taller than ${FADE_EDGE_MAX} px`
+              : px >= r.bottom - r.top ? 'leaves the bar no body below its strip' : '';
+        if (why) chrome.invalid.push({ bar: r.sel, side: r.side, declared: r.declared, why });
+        else { edge = px; chrome.fades.push({ bar: r.sel, side: r.side, edge }); }
+      }
+      const x0 = Math.max(0, Math.floor(r.left * DPR)), x1 = Math.min(whole.width, Math.ceil(r.right * DPR));
+      const y0 = Math.max(0, Math.floor(r.top * DPR)), y1 = Math.min(whole.height, Math.ceil(r.bottom * DPR));
+      // a declared bar: only the rows wholly below its strip, every pixel of them; any other bar: all it paints
+      const from = edge === null ? y0 : Math.max(y0, Math.ceil((r.top + edge) * DPR));
+      let worst = 0, count = 0, seen = 0, open = 0, openWorst = 0;
+      for (let y = from; y < y1; y += 1) for (let x = x0; x < x1; x += 1) {
+        const m = pixel(bare, x, y);
+        if (edge === null && m.r >= 250 && m.g <= 5 && m.b >= 250) continue;
+        if (edge !== null) {
+          const g = pixel(green, x, y), t = Math.max(Math.abs(m.r - g.r), Math.abs(m.g - g.g), Math.abs(m.b - g.b));
+          if (t > 0) { open += 1; if (t > openWorst) openWorst = t; }
+        }
+        seen += 1;
+        const a = pixel(whole, x, y), b = pixel(alone, x, y);
+        const d = Math.max(Math.abs(a.r - b.r), Math.abs(a.g - b.g), Math.abs(a.b - b.b));
+        if (d > worst) worst = d;
+        if (d > 8) count += 1;
+      }
+      if (worst > 8) chrome.through.push({ bar: r.sel, worst, pixels: count, ...(edge === null ? {} : { below: edge }) });
+      if (open) chrome.translucent.push({ bar: r.sel, below: edge, worst: openWorst, pixels: open, of: seen });
+    }
+    return chrome;
+  } finally {
+    await page.evaluate((m) => {
+      document.getElementById('sweep-isolate')?.remove();
+      document.getElementById('sweep-bare')?.remove();
+      for (const el of document.querySelectorAll('[data-sweep-bar-part]')) delete el.dataset.sweepBarPart;
+      scrollBy({ top: -m.doc, behavior: 'instant' });
+      const sheet = document.getElementById('sheet');
+      if (sheet) sheet.scrollTop -= m.sheet;
+    }, moved);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  }
+}
+// The declared fade's controls, in VH-1's form (the same-ink control's): each mutates the actual foot band of the actual
+// deck front (hokusai, every engine), measures C8 exactly as the scene was measured, and restores the exact style; the
+// receipt keeps the candidate (the scene's own C8 measurement), the mutant and the restored measurement, the style and the
+// native record. A bar with transparency and no declaration, a declared fade taller than 24 px, and transparency below the
+// declared strip must each turn C8 red.
+const FOOT_BAND = 'kp-foot-band';
+const C8_CONTROLS = Object.freeze([
+  { id: 'fade-undeclared', what: 'the same 18 px fade with no declaration',
+    css: '--fade-edge: initial; -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18px); mask-image: linear-gradient(to bottom, transparent, #000 18px);',
+    red: (m) => !m.fades.some((f) => f.bar === FOOT_BAND) && !m.invalid.some((f) => f.bar === FOOT_BAND) && m.through.some((t) => t.bar === FOOT_BAND && t.pixels > 0) },
+  { id: 'fade-overdeclared', what: 'a declared fade of 30 px, taller than 24 px', css: '--fade-edge: 30px;',
+    red: (m) => m.invalid.some((f) => f.bar === FOOT_BAND && f.declared === '30px' && f.why === `taller than ${FADE_EDGE_MAX} px`) },
+  { id: 'fade-translucent-below', what: 'the band see-through below its declared strip (its paint at 85 %)',
+    css: 'background: color-mix(in srgb, var(--kp-dock) 85%, transparent);',
+    red: (m) => m.fades.some((f) => f.bar === FOOT_BAND) && m.translucent.some((t) => t.bar === FOOT_BAND && t.pixels > 0) },
+]);
+async function chromeControls(page, world, state, candidate, report) {
+  const ids = [...C8_CONTROLS.map((control) => control.id), 'restore', 'record'];
+  try {
+    const band = page.locator(`.kp-study > .${FOOT_BAND}`).first();
+    const declares = chromeClear(candidate) && !!candidate?.fades.some((f) => f.bar === FOOT_BAND && f.side === 'foot' && f.edge > 0 && f.edge <= FADE_EDGE_MAX);
+    const recordBefore = await readAppRecord(page);
+    const runs = [];
+    for (const control of C8_CONTROLS) {
+      const styleBefore = await band.getAttribute('style');
+      let mutant;
+      try {
+        await band.evaluate((node, css) => node.setAttribute('style', css), control.css);
+        mutant = await measureChrome(page);
+      } finally {
+        await band.evaluate((node, prior) => { if (prior === null) node.removeAttribute('style'); else node.setAttribute('style', prior); }, styleBefore);
+      }
+      const restored = await measureChrome(page);
+      runs.push({ control, mutant, restored, styleBefore, styleAfter: await band.getAttribute('style') });
+    }
+    const recordAfter = await readAppRecord(page);
+    for (const { control, mutant, restored, styleBefore, styleAfter } of runs) {
+      report.controls.push({ engine, id: `c8-${control.id}`, scene: `${world}/${state}`, mutation: control.css, candidate, mutant, restored,
+        styleBefore, styleAfter, recordBefore, recordAfter });
+      check(`${world}/${state}.C8-control.${control.id}`, `C8 goes red on ${control.what}, where the actual band declaring its fade is green`,
+        declares && !chromeClear(mutant) && control.red(mutant), mutant);
+    }
+    check(`${world}/${state}.C8-control.restore`, 'restoring the exact style after each control restores the exact candidate C8 measurement',
+      runs.every((run) => run.styleAfter === run.styleBefore && JSON.stringify(run.restored) === JSON.stringify(candidate)), runs.map((run) => run.restored));
+    check(`${world}/${state}.C8-control.record`, 'the C8 faults and their restoration preserve the whole native record', JSON.stringify(recordBefore) === JSON.stringify(recordAfter));
+  } catch (error) {
+    for (const id of ids) if (!rows.some((row) => row.id === `${engine}/${world}/${state}.C8-control.${id}`))
+      check(`${world}/${state}.C8-control.${id}`, 'the C8 control completed', false, String(error.stack || error).slice(0, 600));
+  }
+}
+
 /* ------------------------------------------------------------------ run */
 const report = { schemaVersion: 2, runId, artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty,
   verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
@@ -1210,71 +1395,16 @@ try {
         result.reread = reread;
         // C8 (F-1) · the fixed chrome is opaque enough that text under it never shows through: with the reading scrolled
         // so text lies under the bars, each bar's pixels are the same with what scrolls under them hidden as with it shown
-        // (any channel within 8/255)
+        // (any channel within 8/255); a bar at the foot that declares a top-edge fade is judged below its strip, where it
+        // must be fully opaque (measureChrome)
         // INT-VH: VH-1's form for a row a screen may not apply to (as C5): the row is always written, its applicability
         // explicit, so the admission roster is exact. Where no fixed bar meets the glass there is no chrome to judge, as
         // Hfix-1A's conditional row had nothing to say there; wherever a bar paints, the measurement and predicate are Hfix-1A's
-        let chrome = null;
-        if (data.bars?.length) {
-          const moved = await page.evaluate(() => {
-            const sheet = document.getElementById('sheet'), y0 = scrollY, s0 = sheet?.scrollTop ?? 0;
-            scrollBy({ top: 240, behavior: 'instant' });
-            if (sheet) sheet.scrollTop = s0 + 240;
-            return { doc: scrollY - y0, sheet: (sheet?.scrollTop ?? 0) - s0 };
-          });
-          await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
-          const whole = decodePng(await page.screenshot({ type: 'png' }));
-          const barRects = await page.evaluate(() => [...document.querySelectorAll('[data-sweep-bar]')].map((b) => { const r = b.getBoundingClientRect();
-            return { sel: b.id ? `#${b.id}` : b.className.split(' ')[0], left: r.left, top: r.top, right: r.right, bottom: r.bottom }; }).filter((r) => r.right - r.left > 0 && r.bottom - r.top > 0));
-          await page.evaluate(() => {
-            const style = document.createElement('style');
-            style.id = 'sweep-isolate';
-            // only what scrolls under the bars goes: the room's content, the page's, a deck's; overlays that stand on a bar
-            // (the report door, the 層 mark, the slip) stay in both shots. A bar standing inside that content (a deck's top
-            // and grade bars) is never hidden and is itself made visible, so its own parts keep the visibility the app gave
-            // them (a part the bar hides while scrolled stays hidden)
-            const under = ['#app > main', '#sheet > :not([data-sweep-bar])', '.kp-study > :not([data-sweep-bar])'];
-            const off = ':not([data-sweep-bar], [data-sweep-bar] *)';
-            style.textContent = `${under.map((q) => [`${q}${off}`, `${q} ${off}`, `${q}${off}::before`, `${q}${off}::after`, `${q} ${off}::before`, `${q} ${off}::after`].join(', ')).join(', ')} { visibility: hidden !important; transition: none !important; }
-              [data-sweep-bar] { visibility: visible !important; }`;
-            document.head.append(style);
-          });
-          await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
-          const alone = decodePng(await page.screenshot({ type: 'png' }));
-          // the bars alone over a loud ground (#ff00ff): where a bar's box shows that ground unchanged, the bar paints
-          // nothing (a clear strip its box holds above its body, as the deck's grade bar does): no chrome there to judge.
-          // A bar that paints, however faintly (a frosted bar of the page's own colour), is judged on all it paints
-          await page.evaluate(() => {
-            const style = document.createElement('style');
-            style.id = 'sweep-bare';
-            const off = ':not([data-sweep-bar], [data-sweep-bar] *)';
-            style.textContent = `body *${off}, body *${off}::before, body *${off}::after, body::before, body::after { visibility: hidden !important; transition: none !important; }
-              [data-sweep-bar] { visibility: visible !important; } html { background: #ff00ff !important; } body { background: transparent !important; }`;
-            document.head.append(style);
-          });
-          await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
-          const bare = decodePng(await page.screenshot({ type: 'png' }));
-          await page.evaluate((m) => { document.getElementById('sweep-isolate')?.remove(); document.getElementById('sweep-bare')?.remove(); scrollBy({ top: -m.doc, behavior: 'instant' });
-            const sheet = document.getElementById('sheet'); if (sheet) sheet.scrollTop -= m.sheet; }, moved);
-          const through = [];
-          for (const r of barRects) {
-            let worst = 0, count = 0;
-            const x0 = Math.max(0, Math.floor(r.left * DPR)), x1 = Math.min(whole.width, Math.ceil(r.right * DPR));
-            const y0 = Math.max(0, Math.floor(r.top * DPR)), y1 = Math.min(whole.height, Math.ceil(r.bottom * DPR));
-            for (let y = y0; y < y1; y += 1) for (let x = x0; x < x1; x += 1) {
-              const m = pixel(bare, x, y);
-              if (m.r >= 250 && m.g <= 5 && m.b >= 250) continue;
-              const a = pixel(whole, x, y), b = pixel(alone, x, y);
-              const d = Math.max(Math.abs(a.r - b.r), Math.abs(a.g - b.g), Math.abs(a.b - b.b));
-              if (d > worst) worst = d;
-              if (d > 8) count += 1;
-            }
-            if (worst > 8) through.push({ bar: r.sel, worst, pixels: count });
-          }
-          result.chrome = chrome = { bars: barRects.length, scrolled: moved, through };
-        }
-        check(`${world}/${state}.C8`, `${world}/${state}: the fixed chrome (${chrome?.bars ?? 0} bars) is opaque: no text under it shows through (scrolled ${chrome ? chrome.scrolled.doc || chrome.scrolled.sheet : 0} px)`,
-          !chrome || chrome.through.length === 0, { applicability: chrome ? 'measured' : 'vacuous-no-fixed-chrome', ...(chrome || {}) });
+        const chrome = data.bars?.length ? await measureChrome(page) : null;
+        if (chrome) result.chrome = chrome;
+        check(`${world}/${state}.C8`, `${world}/${state}: the fixed chrome (${chrome?.bars ?? 0} bars${chrome?.fades.length ? `; ${chrome.fades.map((f) => `${f.bar} declares a ${f.edge} px fade`).join(', ')}` : ''}) is opaque: no text under it shows through (scrolled ${chrome ? chrome.scrolled.doc || chrome.scrolled.sheet : 0} px)`,
+          chromeClear(chrome), { applicability: chrome ? 'measured' : 'vacuous-no-fixed-chrome', ...(chrome || {}) });
+        if (world === 'hokusai' && state === 'deck-front') await chromeControls(page, world, state, chrome, report);
         report.results.push(result);
         const fails = result.pairs.filter((p) => !p.ok).sort((a, b) => a.ratio / a.required - b.ratio / b.required);
         const worstPair = result.pairs.slice().sort((a, b) => a.ratio / a.required - b.ratio / b.required)[0];
