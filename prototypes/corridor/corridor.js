@@ -22945,20 +22945,31 @@ function renderKdxRadical(main) {
 /* 頻度 — newspaper frequency rank (KANJIDIC2's 2,501 most used, carried by
  * the SKIP sidecar). Loaded once, on first use. */
 let kanjiFreqPromise = null;
+let kanjiFreqError = null;
 function ensureKanjiFrequency() {
   if (D.kanjiFreq) return Promise.resolve(D.kanjiFreq);
   if (!kanjiFreqPromise) {
-    kanjiFreqPromise = fetch('data/share_alike/skip.json')
-      .then((r) => (r.ok ? r.json() : null))
+    // K06 · a failed load is kept as an error, never as an empty table, and lets go of its promise so the
+    // learner's retry fetches again (it once cached {} for good and answered "no match" forever)
+    kanjiFreqError = null;
+    const bundled = window.__CORRIDOR_BUNDLE__?.['share_alike/skip'];
+    kanjiFreqPromise = (bundled ? Promise.resolve(bundled) : fetch('data/share_alike/skip.json').then((r) => {
+      if (!r.ok) throw new Error(`frequency table: ${r.status}`);
+      return r.json();
+    }))
       .then((data) => {
+        if (!Array.isArray(data?.entries)) throw new Error('frequency table unreadable');
         const map = {};
-        for (const e of (data && data.entries) || []) if (e.frequency != null) map[e.literal] = e.frequency;
+        for (const e of data.entries) if (e.frequency != null) map[e.literal] = e.frequency;
         D.kanjiFreq = map;
         return map;
       })
-      .catch(() => {
-        D.kanjiFreq = {};
-        return D.kanjiFreq;
+      .catch((error) => {
+        kanjiFreqError = error;
+        return null;
+      })
+      .finally(() => {
+        kanjiFreqPromise = null;
       });
   }
   return kanjiFreqPromise;
@@ -22995,8 +23006,13 @@ const FREQ_BANDS = [
 ];
 function renderKdxFrequency(main) {
   main.append(withEn(el('p', 'eyebrow', '頻度'), 'by how often it appears in newspapers — rank 1 is the commonest', 'en-inline'));
-  if (!D.kanjiFreq) {
-    main.append(el('p', 'sem-empty', tx('頻度表を読み込み中…', 'loading the frequency table…')));
+  // K06 · a table that could not load says so under the bands it would answer, with its retry; a band chosen
+  // meanwhile is the one the retry answers
+  const failed = !D.kanjiFreq && kanjiFreqError && !kanjiFreqPromise;
+  if (!D.kanjiFreq && !failed) {
+    const loading = el('p', 'sem-empty', tx('頻度表を読み込み中…', 'loading the frequency table…'));
+    loading.dataset.kdxLoad = 'pending';
+    main.append(loading);
     ensureKanjiFrequency().then(() => {
       if (S.view === 'search' || S.view === 'kanjidex') render();
     });
@@ -23018,6 +23034,10 @@ function renderKdxFrequency(main) {
     row.append(b);
   }
   main.append(row);
+  if (failed) {
+    kdxLoadFailed(main, 'kdx-freq-retry', '頻度表を読み込めなかった。', 'The frequency table could not be loaded.', ensureKanjiFrequency);
+    return;
+  }
   if (S.kdx.freqLo) {
     const chars = kdxFrequencyHits(S.kdx.freqLo, S.kdx.freqHi);
     renderKdxGrid(main, chars, 500, `freq:${S.kdx.freqLo}`, { mark: (b, c) => { b.dataset.freq = String(D.kanjiFreq[c]); } });
@@ -23069,23 +23089,40 @@ function renderKdxLevel(main) {
  * edition for 2,904 kanji, the 1999 first edition for 2,230. Every number
  * says its edition; the 2022 printing has no public mapping yet. */
 let kkldPromise = null;
+let kkldError = null;
 function ensureKkld() {
   if (D.kkld) return Promise.resolve(D.kkld);
   if (!kkldPromise) {
     // the standalone file carries the table; a served site fetches it, and
-    // the service worker keeps it for offline visits
+    // the service worker keeps it for offline visits. K06 · a failed load is an
+    // error with a retry, never an empty table answering "no kanji carries that
+    // number"; the promise lets go so the retry fetches again.
+    kkldError = null;
     const bundled = window.__CORRIDOR_BUNDLE__?.['share_alike/kkld'];
-    kkldPromise = (bundled ? Promise.resolve(bundled) : fetch('data/share_alike/kkld.json').then((r) => (r.ok ? r.json() : null)))
+    kkldPromise = (bundled ? Promise.resolve(bundled) : fetch('data/share_alike/kkld.json').then((r) => {
+      if (!r.ok) throw new Error(`Kodansha table: ${r.status}`);
+      return r.json();
+    }))
       .then((data) => {
-        D.kkld = data && data.entries ? data : { entries: {}, byNumber2013: {}, byNumber1999: {}, counts: {} };
+        if (!data?.entries || !data.byNumber2013 || !data.byNumber1999) throw new Error('Kodansha table unreadable');
+        D.kkld = data;
         return D.kkld;
       })
-      .catch(() => {
-        D.kkld = { entries: {}, byNumber2013: {}, byNumber1999: {}, counts: {} };
-        return D.kkld;
+      .catch((error) => {
+        kkldError = error;
+        return null;
+      })
+      .finally(() => {
+        kkldPromise = null;
       });
   }
   return kkldPromise;
+}
+/** The kanji one Kodansha number names in one edition: every glyph the table maps, none filtered by the core
+ * layer (K04 · #8 is 胤 in both editions; a glyph outside kanji.json opens its KANJIDIC2 entry). */
+function kkldNumberGlyphs(ed, number) {
+  const table = ed === 'ed1999' ? D.kkld?.byNumber1999 : D.kkld?.byNumber2013;
+  return [...(table?.[String(Number(number))] || [])];
 }
 function kkldOf(c) {
   return D.kkld?.entries?.[c] || null;
@@ -23100,13 +23137,6 @@ function kkldLine(c) {
 }
 function renderKdxKkld(main) {
   main.append(withEn(el('p', 'eyebrow', 'Kodansha 番号'), "Kodansha Kanji Learner's Dictionary entry number", 'en-inline'));
-  if (!D.kkld) {
-    main.append(el('p', 'sem-empty', tx('番号表を読み込み中…', 'loading the number table…')));
-    ensureKkld().then(() => {
-      if (S.view === 'search' || S.view === 'kanjidex') render();
-    });
-    return;
-  }
   const edRow = el('div', 'kdx-row');
   for (const [id, ja, en] of [
     ['ed2013', '2013年版（改訂増補）', '2013 Revised & Expanded'],
@@ -23136,6 +23166,21 @@ function renderKdxKkld(main) {
   const paintKkld = () => {
     out.textContent = '';
     const q = (S.kdx.kkldQ || '').trim();
+    // K06 · the number table still on its way, or failed: said in the results, the typed query kept, and the
+    // retry (or the arrival) answers that same query in place
+    if (!D.kkld) {
+      if (kkldError && !kkldPromise) {
+        kdxLoadFailed(out, 'kdx-kkld-retry', '番号表を読み込めなかった。', 'The Kodansha number table could not be loaded.', ensureKkld);
+        return;
+      }
+      const loading = el('p', 'sem-empty', tx('番号表を読み込み中…', 'loading the number table…'));
+      loading.dataset.kdxLoad = 'pending';
+      out.append(loading);
+      ensureKkld().then(() => {
+        if (out.isConnected) paintKkld();
+      });
+      return;
+    }
     if (!q) {
       out.append(el('p', 'fine', tx(
         `${(D.kkld.counts?.ed2013 || 0).toLocaleString()} 字に 2013年版の番号、${(D.kkld.counts?.ed1999 || 0).toLocaleString()} 字に 1999年版の番号。2022年版の番号は載せていない。`,
@@ -23144,16 +23189,15 @@ function renderKdxKkld(main) {
       return;
     }
     const ed = S.kdx.kkldEd || 'ed2013';
-    const table = ed === 'ed1999' ? D.kkld.byNumber1999 : D.kkld.byNumber2013;
     if (/^\d+$/.test(q)) {
-      const chars = (table[String(Number(q))] || []).filter((c) => D.kanji[c]);
-      renderKdxGrid(out, chars, 20);
-      for (const g of out.querySelectorAll('.kdx-glyph')) g.dataset.kkld = q;
+      const chars = kkldNumberGlyphs(ed, q);
+      renderKdxGrid(out, chars, 20, `kkld:${ed}:${q}`, { mark: (b) => { b.dataset.kkld = q; b.dataset.kkldEd = ed; } });
       if (!chars.length) out.append(el('p', 'fine', tx('この番号の字はこの版にない。', 'No kanji carries that number in this edition.')));
       return;
     }
-    const chars = [...q].filter((c) => D.kanji[c]);
-    renderKdxGrid(out, chars, 20);
+    // a typed kanji is looked up whether or not the core layer holds it (胤 has its numbers too)
+    const chars = [...new Set([...q])].filter((c) => kkldOf(c) || D.kanji[c] || kanjiReference(c));
+    renderKdxGrid(out, chars, 20, `kkld:${ed}:${q}`);
     for (const c of chars) {
       const line = kkldLine(c);
       out.append(el('p', 'fine', `${c} · ${line || tx('Kodansha 番号なし', 'no Kodansha number')}`));
