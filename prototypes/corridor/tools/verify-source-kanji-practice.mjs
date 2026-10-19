@@ -406,18 +406,25 @@ async function faceDown(fixture, entry) {
   if (entry.plan.kind === 'kanji-reading') {
     assert.equal(await fixture.page.locator('.sentence-recall .sentence-answer').textContent(), fixture.source.token.s);
     assert.equal(await fixture.page.locator('.sentence-recall .sentence-response-text').count(), 0, 'Supplied kana is hidden before checking or revealing');
-    assert.match(await fixture.page.locator('.sentence-recall').innerText(), /whole word[\s\S]*unreviewed/u);
+    // S (82361f78; John, 10-16: no provenance label in the learner's app): the face says how the reading is checked and
+    // never that the supplied reading is automatic or unreviewed
+    const recall = await fixture.page.locator('.sentence-recall').innerText();
+    assert.match(recall, /Read the whole word in this sentence\./u);
+    assert.doesNotMatch(recall, /automatic|unreviewed|not been reviewed/iu);
   }
   assert.equal(await fixture.page.locator('#sentence-recall-check').isDisabled(), true);
 }
-// Again turns the same card face-down at once (Anki's learn-ahead, 35f8b940): no countdown beat and
-// no いま見る. The graded card is reinserted as the session's very next item, answer box empty.
+// Again reinserts the graded card as the session's very next item. SRS (b00e5e93): a reinserted learning step waits for
+// its due, so with only that step left the sitting closes, says when it comes back and offers it now, early; there is no
+// countdown and no いま見る (35f8b940's face-down-at-once beat went with them). The card stays face-down until then.
 async function againReturns(fixture, entry, session) {
   const page = fixture.page;
-  await page.waitForFunction(() => !document.querySelector('.grade')
-    && document.getElementById('sentence-recall-answer')?.value === '');
+  await page.locator('#review-pause').waitFor();
+  assert.equal(await page.locator('.grade').count(), 0);
+  assert.equal(await page.locator('#sentence-recall-answer').count(), 0, 'The learning step waits for its due');
   assert.equal(await page.locator('[data-review-wait]').count(), 0, 'Again holds no countdown');
-  await faceDown(fixture, entry);
+  assert.match(await page.locator('#review-pause').innerText(), /^1 word is in a learning step \(the next is due in /u);
+  assert.equal(await page.locator('#review-ahead').count(), 1, 'The close offers the step now, early');
   assert.deepEqual(await page.evaluate(() => window.__KAIRO_SRS__.session()),
     { queue: session.queue + 1, ix: session.ix + 1, deferred: session.deferred }, 'Again reinserts the card as the next item');
 }
@@ -638,7 +645,11 @@ async function ordinary(fixture) {
   await page.locator('#source-kanji-practice').click(); await page.locator('#kanji-reading-confirm').waitFor();
   await focusedInViewport(page, 'kanji-reading-confirm');
   assert.equal(await page.locator('.sentence-original').textContent(), source.quote);
-  assert.match(await page.locator('main').innerText(), /automatically supplied reading has not been reviewed[\s\S]*whole word/u);
+  // S (82361f78; John, 10-16: no provenance label in the learner's app): the choice says how a response is compared and
+  // never that the supplied reading is automatic or unreviewed
+  const choice = await page.locator('main').innerText();
+  assert.match(choice, /Your response is compared with the reading of the whole word in this sentence\./u);
+  assert.doesNotMatch(choice, /automatic|unreviewed|not been reviewed/iu);
   retained(beforeKanji, await snapshot(fixture, 'reading-choice-neutral'));
   await shot(fixture, 'explicit-whole-token-reading-choice');
   await page.locator('#sentence-practice-back').click();
