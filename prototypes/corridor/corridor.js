@@ -2277,6 +2277,7 @@ async function openAppRecord() {
       if (supplied === undefined) throw new Error('invalid-native-provisioning');
       if (supplied !== null) initialScope = supplied;
     }
+    await bindingModule.recoverLocalRecordAdoption({ storage: localStorage, assertOwner, initialScope });
     let provisionedInstallation = null;
     if (initialScope !== undefined) {
       // Refuse malformed provisioning or an existing scope mismatch before
@@ -5162,6 +5163,7 @@ function keepScroll() {
   else if (S.view === 'publisher') S.publisherScroll = window.scrollY;
   else if (S.view === 'source-reader') S.sourceScroll = window.scrollY;
   else if (S.view === 'feed') S.feedScroll = window.scrollY;
+  else if (S.view === 'yoji') S.yojiScroll = window.scrollY;
   else if (S.view === 'levels' && !S.stack.length) referenceLibrary?.keepScroll();
 }
 
@@ -5173,6 +5175,7 @@ function returnScroll() {
   else if (S.view === 'publisher') window.scrollTo(0, S.publisherScroll);
   else if (S.view === 'source-reader') window.scrollTo(0, S.sourceScroll);
   else if (S.view === 'feed') window.scrollTo(0, S.feedScroll);
+  else if (S.view === 'yoji') window.scrollTo(0, S.yojiScroll || 0);
   else if (S.view === 'levels') referenceLibrary?.returnScroll();
 }
 
@@ -18683,6 +18686,77 @@ async function buildImportPlan(value, trustedPolicy) {
     ...(journal ? { journal } : {}) });
 }
 
+/** Read all existing personal-store rows without creating a database in a fresh browser.
+ * An aborted initial version transaction leaves no database behind, including on Cancel.
+ * Unknown stores and unreadable/blocked storage cannot establish an empty installation. */
+async function personalCollectionsEmptyForAdoption() {
+  const { DB_NAME } = await import('./decks/personal/store.mjs');
+  return new Promise((resolve, reject) => {
+    let absent = false, settled = false;
+    const finish = (empty, error) => { if (settled) return; settled = true; error ? reject(error) : resolve(empty); };
+    const request = indexedDB.open(DB_NAME);
+    request.onupgradeneeded = () => { absent = true; request.transaction.abort(); };
+    request.onerror = (event) => { event.preventDefault(); absent ? finish(true) : finish(false, request.error); };
+    request.onblocked = () => finish(false, new Error('personal-store-blocked'));
+    request.onsuccess = () => {
+      const db = request.result;
+      if (settled) { db.close(); return; }
+      db.onversionchange = () => db.close();
+      try {
+        const names = [...db.objectStoreNames];
+        if (db.version !== 1 || names.length !== 1 || names[0] !== 'collections') { db.close(); finish(false); return; }
+        const tx = db.transaction(names, 'readonly');
+        let count = 0;
+        for (const name of names) {
+          const query = tx.objectStore(name).count();
+          query.onsuccess = () => { count += query.result; };
+        }
+        tx.oncomplete = () => { db.close(); finish(count === 0); };
+        tx.onabort = tx.onerror = () => { db.close(); finish(false, tx.error || new Error('personal-store-unreadable')); };
+      } catch (error) { db.close(); finish(false, error); }
+    };
+  });
+}
+
+/** Adoption is allowed only while this installation has no learner work.
+ * Unknown roots, operation history (including tombstones), prior app commands
+ * and recovery drafts are deliberately not interpreted as empty. */
+async function emptyRecordForAdoption(snapshot) {
+  const same = (a, b) => canonicalRecordJson(a) === canonicalRecordJson(b);
+  const docs = snapshot.documents;
+  if (!Array.isArray(docs) || docs.length !== 2) return false;
+  const record = docs.find((row) => row.collection === 'learner-record' && row.id === 'current')?.value;
+  const archive = docs.find((row) => row.collection === 'learner-archive' && row.id === 'current')?.value;
+  const empty = { ...DEFAULT_LEARNER_RECORD, driftState: {
+    format: 'kairo-drift-state', version: 1, store: { known: {}, unknown: {}, lk: 0, lu: 0 },
+  } };
+  if (!validStoreEnvelope(record) || record.v !== 1 || !Array.isArray(record.taken) || !owns(record, 'driftState') ||
+    !Object.entries(record).every(([key, value]) => owns(empty, key) && same(value, empty[key])) ||
+    !same(archive, { version: 1, turns: [] })) return false;
+  if (!['operations', 'ready', 'pending', 'quarantined'].every((key) => Array.isArray(snapshot.replica?.[key]) && !snapshot.replica[key].length) ||
+    !['outbox', 'acknowledgedOutbox', 'inbox', 'checkpoints'].every((key) => Array.isArray(snapshot[key]) && !snapshot[key].length) ||
+    snapshot.actor?.sequence !== 0 || snapshot.actor.predecessor !== null) return false;
+  const localEmpty = () => {
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY);
+      if (raw !== null && !same(JSON.parse(raw), {})) return false;
+      // Device-local deck and guided-session stores are outside backups and must never be rebound.
+      // Recovery slots also hold learner input outside the portable record.
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const key = localStorage.key(i);
+        if (key.startsWith('bunki-cloze:') || key.startsWith('bunki-srs-deck:') || key.startsWith('kairo-guided-session-v1:') ||
+          ((key.includes('recovery') || key.includes('capture-draft') || key.includes('excerpt-draft') || key.includes('transcript-draft')) &&
+            key.includes(recordInstallation.databaseName))) return false;
+      }
+      if ([...document.querySelectorAll('#note-input, #chat-input, #personal-note-input, .record-note-edit-input, #sentence-production-text, #sentence-listening-text, #vocabulary-list-name, #source-capture-form input, #source-capture-form textarea')]
+        .some((input) => input.value)) return false;
+    } catch { return false; }
+    return true;
+  };
+  try { return localEmpty() && await personalCollectionsEmptyForAdoption() && localEmpty(); }
+  catch { return false; }
+}
+
 function renderPortRow(main) {
   const port = el('div', 'port-row');
   port.id = 'record-backup';
@@ -18761,6 +18835,7 @@ function renderPortRow(main) {
     const epoch = recordEpoch;
     imp.disabled = true;
     let sealed = false;
+    let closedForAdoption = false;
     try {
       if (f.size > IMPORT_MAX_BYTES) throw new Error('import-too-large');
       if (!(await flushRecordDrafts())) throw new Error('drafts-unsettled');
@@ -18778,7 +18853,25 @@ function renderPortRow(main) {
         if (await commitStorePatch((latest) => ({ srsPrefs: { ...latest.srsPrefs, fsrs: fitted } }))) location.reload();
         return;
       }
-      const plan = await buildImportPlan(s, recordInstallation.policy);
+      let plan; let adoption = false;
+      const bindingModule = await import('./record-binding.mjs');
+      try { plan = await buildImportPlan(s, recordInstallation.policy); }
+      catch (error) {
+        if (error.code !== 'ownership-mismatch') throw error;
+        const current = await recordController.snapshot();
+        if (current.status !== 'active' || current.snapshot.revision !== preview.snapshot.revision ||
+          !(await emptyRecordForAdoption(current.snapshot))) throw error;
+        let policy;
+        try { policy = bindingModule.localBackupAdoptionPolicy(recordInstallation.policy, s.journal.scope); }
+        catch { throw error; }
+        if (typeof window.kairoSync?.initialScope === 'function') {
+          const provisioned = await window.kairoSync.initialScope();
+          if (provisioned !== null && (provisioned?.accountId !== policy.binding.accountId ||
+            provisioned?.learnerId !== policy.binding.learnerId)) throw error;
+        }
+        plan = await buildImportPlan(s, policy);
+        adoption = true;
+      }
       const record = JSON.parse(plan.recordText);
       // Historical files did not include Drift. Preserve this installation's
       // accepted Drift state when restoring such a file; never invent history.
@@ -18816,9 +18909,35 @@ function renderPortRow(main) {
           ...(plan.journal ? { journal: await recordSha256(plan.journal) } : {}) } };
       if (!recordWritable(epoch)) throw new Error('record-unavailable');
       if (!recordDraftsSettled(preview.snapshot.record)) throw new Error('drafts-unsettled');
+      const confirmation = tx(
+        `バックアップから保存した語、リスト、ノート、学習記録と会話履歴 ${archive.turns.length} 件を復元します。${adoption ? 'この空のブラウザはバックアップの学習者を引き継ぎます。' : 'このブラウザの現在の記録を置き換えます。'} デッキ独自の進捗は含まれません。復元しますか？`,
+        `Restore saved words, lists, notes, learning records and ${archive.turns.length} conversation turns from this backup? ${adoption ? 'This empty browser will adopt the backup’s learner.' : 'This replaces the current record in this browser.'} Separate deck progress is not included.`);
+      if (!window.confirm(confirmation)) return;
+      if (!recordWritable(epoch) || !recordDraftsSettled(preview.snapshot.record)) throw new Error('drafts-unsettled');
       storeSealed = true; sealed = true;
       refreshTeacherDraftSurface(); refreshSentenceDraftSurfaces();
       revalidateTutorRequests();
+      if (adoption) {
+        closeRecordSync(); teacherDraftController?.close(); sentenceDraftController?.close();
+        closedForAdoption = true;
+        await recordApp.close();
+        let transitionEpoch = epoch;
+        await bindingModule.adoptLocalRecord({ storage: localStorage, crypto: globalThis.crypto,
+          assertOwner: () => recordOwner && !recordDeparted && !staleTab && recordEpoch === transitionEpoch,
+          installation: recordInstallation, oldController: recordController,
+          expectedRevision: preview.snapshot.revision, backup, isEmpty: emptyRecordForAdoption,
+          validateRecord: (value) => {
+            if (!validStoreEnvelope(value)) return false;
+            try { recordControllerModule.readDriftState(value); return true; } catch { return false; }
+          }, validateArchive: validArchiveRows,
+          appOptions: { assessmentSubjectResolver: resolveAssessmentSubject,
+            assessmentFormResolver: resolveReceivedAssessmentForm, assessmentPresentationResolver: resolveAssessmentPresentation },
+          retire: async () => {
+            await recordController.close(); recordEpoch += 1; transitionEpoch = recordEpoch; recordRecovered = false;
+          },
+        });
+        assessmentRoom?.dispose(); location.reload(); return;
+      }
       const outcome = await recordApp.restore(backup, { expectedRevision: preview.snapshot.revision });
       if (outcome.status !== 'active') {
         recordFailure(outcome.reason, true);
@@ -18830,6 +18949,7 @@ function renderPortRow(main) {
       assessmentRoom?.dispose();
       location.reload();
     } catch (error) {
+      if (closedForAdoption) recordFailure('adoption-reload-required', true);
       portNote.textContent = error.message === 'import-too-large'
         ? tx('このファイルは 32 MiB の上限を超える。記録は変えていない。', 'This file exceeds the 32 MiB import limit. Nothing was changed.')
         : error.message === 'drafts-unsettled'
@@ -18843,7 +18963,7 @@ function renderPortRow(main) {
           : tx('読み込みを完了できなかった。保存の警告を確認し、書き出したままの JSON を選ぶ。',
             'Import could not finish. Check the storage warning and select an unchanged exported JSON file.');
     } finally {
-      if (sealed && recordEpoch === epoch) {
+      if (sealed && !closedForAdoption && recordEpoch === epoch) {
         storeSealed = false;
         refreshTeacherDraftSurface(); refreshSentenceDraftSurfaces();
       }
@@ -23034,6 +23154,7 @@ function renderYoji(main) {
   let deb = null;
   filter.addEventListener('input', () => {
     S.yojiQ = filter.value;
+    S.yojiExpanded = false;
     clearTimeout(deb);
     deb = setTimeout(() => {
       document.getElementById('yoji-body')?.replaceWith(renderYojiBody(all));
@@ -23048,15 +23169,17 @@ function renderYojiBody(all) {
   const q = (S.yojiQ || '').trim();
   const hits = q ? all.filter((i) => i.w.includes(q) || i.r.includes(q)) : all;
   const CAP = 80;
+  const shown = S.yojiExpanded ? hits.length : Math.min(CAP, hits.length);
   if (q || hits.length !== all.length || hits.length > CAP) {
     body.append(
-      el('p', 'card-kind', hits.length > CAP ? tx(`${hits.length} 語 — 先頭 ${CAP} 語`, `${hits.length} idioms — first ${CAP} shown`) : tx(`${hits.length} 語`, `${hits.length} idioms`)),
+      el('p', 'card-kind', hits.length > shown ? tx(`${hits.length} 語 — 先頭 ${shown} 語`, `${hits.length} idioms — first ${shown} shown`) : tx(`${hits.length} 語`, `${hits.length} idioms`)),
     );
   }
-  for (const i of hits.slice(0, CAP)) {
+  const appendRow = (i) => {
     const row = el('button', 'entry-row compound');
     row.type = 'button';
     row.dataset.yoji = i.w;
+    row.id = `yoji-${i.w}`;
     const stack = el('span', 'row-stack');
     const top = el('span', 'row-word');
     top.append(document.createTextNode(i.w));
@@ -23064,8 +23187,21 @@ function renderYojiBody(all) {
     stack.append(top);
     if (i.g?.[0]) stack.append(el('span', 'row-gloss', i.g[0]));
     row.append(stack, el('span', 'row-go', '›'));
-    row.addEventListener('click', () => go({ t: 'idiom', id: i.w }));
+    row.addEventListener('click', () => go({ t: 'idiom', id: i.w }, { invoker: row }));
     body.append(row);
+  };
+  hits.slice(0, shown).forEach(appendRow);
+  if (shown < hits.length) {
+    const more = el('button', 'chip', tx(`全 ${hits.length} 語を表示`, `Show all ${hits.length} idioms`));
+    more.id = 'yoji-show-all'; more.type = 'button';
+    more.addEventListener('click', () => {
+      S.yojiExpanded = true;
+      more.remove();
+      hits.slice(shown).forEach(appendRow);
+      body.querySelector('.card-kind').textContent = tx(`${hits.length} 語`, `${hits.length} idioms`);
+      document.getElementById(`yoji-${hits[shown].w}`)?.focus({ preventScroll: true });
+    });
+    body.append(more);
   }
   if (!hits.length) body.append(el('div', 'sem-empty', tx('その形の語はない。', 'No idiom matches that.')));
   return body;
@@ -24543,7 +24679,8 @@ function wwPlate(model, section) {
   centre.tabIndex = -1;
   centre.style.setProperty('--x', String((WW_CX / WW_W) * 100));
   centre.style.setProperty('--y', String(WW_CY));
-  if (c.reading) centre.append(wwLearn('span', 'ww-c-r', c.reading));
+  if (c.reading) centre.append(c.type === 'word'
+    ? wwReadingDoor(c, section, 'ww-c-r') : wwLearn('span', 'ww-c-r', c.reading));
   // the plate's headword opens the app's one slip beside it (contract §1): word · reading · meaning · Save ▾,
   // and the slip's band is the door into the full entry. A part that is also a kanji opens as that kanji; a
   // radical that is not has no slip of its own and opens its entry directly.
@@ -24648,6 +24785,61 @@ function wwPlate(model, section) {
   return plate;
 }
 
+/** A reading printed for a Words entry belongs to that entry. Generic prose
+ * lookup deliberately cannot infer this ownership from kana alone. */
+function wwReadingDoor(c, section, className = '') {
+  const button = wwLearn('button', `ww-reading-door ${className}`, c.reading);
+  button.type = 'button';
+  button.setAttribute('aria-haspopup', 'dialog');
+  button.addEventListener('click', (event) => {
+    event.stopPropagation();
+    openSlip({ t: 'word', id: c.key, reading: c.reading }, {
+      anchor: button, from: 'lookup', focus: event.detail === 0, readingVisible: () => true,
+    });
+    section.querySelector('.ww-reading-choices')?.remove();
+    wordWeb.readingChoices = { key: c.key, reading: c.reading, rows: null };
+    section.append(wwReadingChoices(c));
+  });
+  return button;
+}
+
+/** These are session-only room choices. A normal room refresh after closing a
+ * slip must retain them; an answer for an older centre cannot replace them. */
+function wwReadingChoices(c) {
+  const choices = el('div', 'ww-reading-choices');
+  choices.dataset.japaneseLookup = 'off';
+  const state = wordWeb.readingChoices;
+  if (!state || c.type !== 'word' || state.key !== c.key || state.reading !== c.reading) return choices;
+  if (state.rows === null && !state.error) {
+    state.loading ||= ensureDictionaryRowsForForm(c.reading).then((rows) => {
+      state.rows = readerChoiceMatch({ b: c.reading, s: c.reading, r: c.reading }, rows).rows;
+    }).catch(() => { state.error = true; });
+    state.loading.then(() => {
+      if (choices.isConnected && wordWeb.readingChoices === state) choices.replaceWith(wwReadingChoices(c));
+    });
+    return choices;
+  }
+  if (state.error) {
+    choices.append(el('p', 'note', tx('同じ読みのほかの語を読み込めなかった。読みをもう一度押すと再試行する。',
+      'Other words with this reading could not load. Tap the reading again to retry.')));
+    return choices;
+  }
+  if (state.rows.length < 2) return choices;
+  choices.setAttribute('role', 'group');
+  choices.setAttribute('aria-label', tx(`「${c.reading}」と読む語`, `Words read ${c.reading}`));
+  choices.append(el('p', 'note', tx(`「${c.reading}」と読む語`, `Words read ${c.reading}`)));
+  for (const match of state.rows) {
+    const choice = wwLearn('button', 'chip ww-reading-choice', `${match.head} · ${match.reading}`);
+    choice.type = 'button'; choice.dataset.seq = match.seq;
+    choice.append(el('span', null, ` — ${match.gloss}`));
+    choice.addEventListener('click', (click) => openSlip({ t: 'word', id: match.head, seq: match.seq, reading: match.reading }, {
+      anchor: choice, from: 'lookup', focus: click.detail === 0, readingVisible: () => true,
+    }));
+    choices.append(choice);
+  }
+  return choices;
+}
+
 function wwDetail(model, section) {
   const c = model.centre;
   const box = el('div', 'ww-detail');
@@ -24668,6 +24860,7 @@ function wwDetail(model, section) {
       const cell = el('div', null);
       cell.append(el('dt', null, k));
       const dd = ja ? wwLearn('dd', null, v) : el('dd', null, v);
+      if (c.type === 'word' && ja && v === c.reading) dd.replaceChildren(wwReadingDoor(c, section));
       cell.append(dd);
       dl.append(cell);
     }
@@ -24884,6 +25077,7 @@ function renderWordWeb({ quiet = false } = {}) {
   });
   head.append(walk);
   section.append(head, wwPlate(model, section), wwDetail(model, section));
+  if (wordWeb.readingChoices?.key === model.centre.key) section.append(wwReadingChoices(model.centre));
   if (!model.nodes.some((n) => n.type === 'passage')) wwWatchPassages(section, 0);
   return section;
 }
@@ -39903,7 +40097,7 @@ let primaryDockObserver;
 /** Keep the report rail above live room controls, including wrapped labels. */
 function observePrimaryDocks() {
   if (primaryDockObserver) return;
-  const selector = '.kp-grades, .pc-controls, .cd-dock, .listen-row.play-bar, .pc-status:not(:empty):not(.pc-status-inline), .reader-toast';
+  const selector = '.kp-grades, .pc-controls, .cd-dock, .listen-row.play-bar, .pc-status:not(:empty):not(.pc-status-inline), .reader-toast, #primary-tabs, .primary-tab-label';
   let frame = 0;
   const watched = new Set();
   const schedule = () => {
@@ -39914,10 +40108,28 @@ function observePrimaryDocks() {
       for (const node of watched) if (!nodes.has(node)) { resize.unobserve(node); watched.delete(node); }
       for (const node of nodes) if (!watched.has(node)) { resize.observe(node); watched.add(node); }
       const nav = document.getElementById('primary-tabs');
+      if (nav?.getBoundingClientRect().width) {
+        const style = getComputedStyle(nav);
+        const available = nav.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+        const required = [...nav.querySelectorAll('.primary-tab')].reduce((sum, button) => {
+          const label = button.querySelector('.primary-tab-label');
+          const due = button.querySelector('.station-due');
+          return sum + Math.max(44, (label?.getBoundingClientRect().width || 0) +
+            (due ? due.getBoundingClientRect().width + 8 : 0) + 16);
+        }, 0);
+        const wrapped = String(required > available);
+        if (nav.dataset.wrapped !== wrapped) nav.dataset.wrapped = wrapped;
+        // A sheet temporarily hides the bar; keep its last measured clearance
+        // so opening the sheet does not move the room beneath it.
+        const height = `${Math.ceil(nav.getBoundingClientRect().height)}px`;
+        if (document.body.style.getPropertyValue('--primary-tabs-height') !== height)
+          document.body.style.setProperty('--primary-tabs-height', height);
+      }
       const navHeight = nav?.getBoundingClientRect().height || 0;
       let clearance = 0;
       if (document.body.classList.contains('has-primary-tabs')) {
         for (const node of nodes) {
+          if (node === nav || node.matches('.primary-tab-label')) continue;
           const style = getComputedStyle(node), rect = node.getBoundingClientRect();
           if (!rect.width || !rect.height || rect.bottom <= 0 || rect.top >= innerHeight || style.visibility === 'hidden') continue;
           if (style.position !== 'fixed' && !(style.position === 'sticky' && rect.bottom >= innerHeight - navHeight - 1)) continue;
@@ -39960,7 +40172,8 @@ function buildPrimaryTabs(root, { personal = false } = {}) {
   // the station that carries it: Today in the current layout, Review in the layout under test
   const dueTab = placesLayout() ? 'review' : 'today';
   for (const tab of tabs) {
-    const button = el('button', 'primary-tab', tx(tab.ja, tab.en));
+    const button = el('button', 'primary-tab');
+    button.append(el('span', 'primary-tab-label', tx(tab.ja, tab.en)));
     button.type = 'button';
     button.id = `tab-${tab.id}`;
     const node = el('i', 'station-node');

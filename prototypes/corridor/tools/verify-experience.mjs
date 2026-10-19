@@ -42,7 +42,7 @@ await silenceBrowserAudio(context);
 const page=await context.newPage();page.setDefaultTimeout(6500);
 page.on('pageerror',e=>errors.push({at:new Date().toISOString(),error:String(e)}));
 page.on('request',r=>{if(/anthropic|openai|generativelanguage/.test(r.url()))requests.push({url:r.url(),method:r.method()});});
-page.on('dialog',async d=>{observations.push({type:'native-dialog',message:d.message()});await d.dismiss();});
+page.on('dialog',async d=>{observations.push({type:'native-dialog',message:d.message()});if(!/^Restore saved words, lists, notes, learning records and /u.test(d.message())) await d.dismiss();});
 let serial=0;
 const sleep=ms=>page.waitForTimeout(ms);
 const visible=async s=>await page.locator(s).first().isVisible().catch(()=>false);

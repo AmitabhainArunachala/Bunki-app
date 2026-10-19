@@ -3201,7 +3201,7 @@ body[data-view='contextdeck'] .cd-level { display: inline-flex; margin: 0 0 12px
 
 /* BEGIN BUNKI NAVIGATION SHELL · additive foundation ======================== */
 body { --nav-clearance: 0px; }
-body.has-primary-tabs { --nav-clearance: calc(60px + env(safe-area-inset-bottom, 0px)); }
+body.has-primary-tabs { --nav-clearance: var(--primary-tabs-height, calc(60px + env(safe-area-inset-bottom, 0px))); }
 body.has-primary-tabs #app { padding-bottom: var(--nav-clearance); }
 .primary-tabs {
   /* the Line (concept D graft, skinned C+A): five stations on one hairline track */
@@ -3214,7 +3214,8 @@ body.has-primary-tabs #app { padding-bottom: var(--nav-clearance); }
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0;
   box-sizing: border-box;
-  height: var(--nav-clearance);
+  min-height: calc(60px + env(safe-area-inset-bottom, 0px));
+  height: auto;
   padding: 6px var(--tabs-pad) calc(6px + env(safe-area-inset-bottom, 0px));
   border-top: var(--stroke-hairline) solid var(--color-edge-strong);
   background: var(--color-glass);
@@ -5263,6 +5264,25 @@ body:not(.ui-bi) .primary-tabs .primary-tab[aria-current='page'] { font-weight: 
 .primary-tabs .station-node { background: var(--color-bar); }
 .primary-tabs .line-car::before { box-shadow: 0 0 0 3px var(--color-bar); }
 
+/* Hfix-2a: keep whole destination names at enlarged text sizes. The measured
+   labels decide when five stations need more than one row; no word is clipped. */
+.primary-tabs .primary-tab-label { white-space: nowrap; }
+.primary-tabs[data-wrapped='true'] { display: flex; flex-wrap: wrap; gap: 4px 0; }
+.primary-tabs[data-wrapped='true'] .primary-tab {
+  flex: 1 0 auto;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+.primary-tabs[data-wrapped='true'] .primary-tab::before { content: none; }
+.primary-tabs[data-wrapped='true'] :is(.station-node, .line-car) { display: none; }
+.primary-tabs[data-wrapped='true'] .station-due { position: static; margin-left: 8px; background: transparent; }
+.primary-tabs[data-wrapped='true'] .primary-tab[aria-current='page'] .primary-tab-label {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
 /* ---- raised paper: a defined edge plus contact and ambient shadow ---- */
 body.v-depth-layered:not([data-view='drift']) :is(.study-door, .foundation-door) {
   background: var(--color-surface);
@@ -6069,3 +6089,22 @@ body[data-furigana='0'] #drift-layer .word .yomi { opacity: 0; }
 body.ginga #app > .scale-thread { position: fixed; left: 0; top: calc(56px + env(safe-area-inset-top, 0px)); }
 /* The deck's one-finger vertical scroll must still allow the phone's text zoom. */
 #kp-card { touch-action: pan-y pinch-zoom; }
+
+/* Words readings are dictionary doors; retain the surrounding type and ink. */
+.ww-reading-door {
+  pointer-events: auto;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+.ww-reading-choices { margin-block: 1rem; }
+.ww-reading-choices .ww-reading-choice { display: block; max-width: 100%; margin-block: .5rem; white-space: normal; text-align: start; }
+/* The choices sit on the room's paper, without the generic note/chip tint. */
+body .ww .ww-reading-choices > :is(.note, .ww-reading-choice) { background: transparent; box-shadow: none; }
+body .ww .ww-reading-choices > .note { color: var(--color-ink); }
