@@ -4,8 +4,12 @@
  * The ladder contract is exercised as an attribute, not claimed as a ladder interaction.
  * Lead 1940's title rows use real first and second taps on fresh native profiles; they
  * measure the title's layout through the first state, not the Ladder's own behaviour.
- * Lead 2140 adds the same taps on 大賞 beside a saved 日本: that ring is held to every
- * visible card character's box, ruby included, and to the card's actual text ink.
+ * Lead 2140 adds the same taps on 大賞 beside a saved 日本; lead 2240 adds the natural wrapped
+ * title of wikinews:27998, tapping 大臣 on the line below a saved 巡る. Each ring is held to
+ * every OTHER visible card character's box, ruby included, and to all of the card's actual
+ * text ink, its own word's included. Its own word's font box is measured, not required clear.
+ * --title-rings runs only those ring cases: 2 engines x 11 worlds x phone (21px) and desktop
+ * (34px), 44 exact cases. It never sets fullAcceptance; only the exact roster sets its own field.
  */
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
@@ -26,8 +30,21 @@ const PARA = { unmet: 23, met: 14, again: 18, recalled: 20, owned: 13, listed: 2
 const DAY = 86400000;
 const STORY = 'kantei:jp-105-actions-202609-25startup';
 const CONTEXT_STORY = 'aozora:000772-1';
+// nextLineOn: the engine/size layouts where the natural title sets the tapped word's reading on the line below the ring.
 const LIVE = [{ name: 'live-daisho', id: STORY, query: 'スタートアップ大賞', word: '大賞' }, { name: 'live-watashi', id: CONTEXT_STORY, query: '私の個人主義', word: '私' },
-  { name: 'live-daisho-saved-nihon', id: STORY, query: 'スタートアップ大賞', word: '大賞', prior: '日本' }];
+  { name: 'live-daisho-saved-nihon', id: STORY, query: 'スタートアップ大賞', word: '大賞', prior: '日本', nextLineOn: ['webkit/phone'] },
+  { name: 'live-daijin-saved-meguru', id: 'wikinews:27998', archiveYear: '2015', query: '巡る', word: '大臣', prior: '巡る', nextLineOn: ['webkit/desktop', 'chromium/desktop'] }];
+const DEVICES = { phone: { viewport: { width: 390, height: 844 }, touch: true, titleFont: '21px' }, desktop: { viewport: { width: 1440, height: 900 }, touch: false, titleFont: '34px' } };
+const defaultSize = (engine) => (engine === 'webkit' ? 'phone' : 'desktop');
+const RING_LIVE = LIVE.filter((l) => l.prior);
+const RING_ENGINES = ['webkit', 'chromium'];
+const RING_SIZES = ['phone', 'desktop'];
+const ringRows = (spec) => [`world.${spec.name}`, `${spec.name}.device`, ...['fresh', 'reading-beside-ring', 'reading-without-encounter', 'prior-state-intact', 'stage-commits-met', 'first-tap-base-glyphs', 'second-tap-base-glyphs',
+  'fresh-to-state-base-glyphs', 'title-rhythm-through-inputs', 'source-visible-and-owned', 'scroll-unchanged', 'slip-seated'].map((id) => `${spec.name}.${id}`),
+  ...['before', 'reading', 'stage-open', 'stage-met'].flatMap((frame) => ['fragment-alignment', 'no-other-glyph-overlap', ...(frame === 'stage-open' ? [] : ['ring-clear-of-ink'])].map((id) => `${spec.name}-${frame}.${id}`))];
+const ringCaseId = (engine, world, size) => `${engine}/${world}/${size}`;
+const RING_REQUIRED = RING_ENGINES.flatMap((engine) => WORLDS.flatMap((world) => RING_SIZES.map((size) => ({ caseId: ringCaseId(engine, world, size), engine, world, size, titleFont: DEVICES[size].titleFont,
+  rows: RING_LIVE.flatMap(ringRows), nextLineWitnesses: RING_LIVE.filter((l) => l.nextLineOn.includes(`${engine}/${size}`)).map((l) => l.name) }))));
 // Lead 2010: these titles are already enhanced when their reader opens. Only
 // wikinews has a BODY sidecar request; jawiki has no deferred-title arm.
 const LATE = [
@@ -49,10 +66,12 @@ const savedWord = (id, now) => ({ t: 'word', id, label: id, ts: now - 40 * DAY, 
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const option = (name) => { const i = process.argv.indexOf(name); return i < 0 ? null : process.argv[i + 1]; };
 const allowedArgs = new Set(['--worlds', '--control-current-paint']);
-for (let i = 2; i < process.argv.length; i++) { if (['--diagnostic-inline-end', '--late-lookup'].includes(process.argv[i])) continue; assert(allowedArgs.has(process.argv[i]) && process.argv[i + 1], `Invalid option ${process.argv[i]}`); i++; }
+for (let i = 2; i < process.argv.length; i++) { if (['--diagnostic-inline-end', '--late-lookup', '--title-rings'].includes(process.argv[i])) continue; assert(allowedArgs.has(process.argv[i]) && process.argv[i + 1], `Invalid option ${process.argv[i]}`); i++; }
 const diagnosticInlineEnd = process.argv.includes('--diagnostic-inline-end');
 const lateLookup = process.argv.includes('--late-lookup');
+const titleRings = process.argv.includes('--title-rings');
 assert(!lateLookup || (!option('--worlds') && !diagnosticInlineEnd), 'The late-lookup roster names its own worlds and paint');
+assert(!titleRings || (!lateLookup && !diagnosticInlineEnd), 'The title-ring roster is its own mode');
 const worlds = lateLookup ? LATE_WORLDS : option('--worlds')?.split(',') || WORLDS;
 assert(worlds.length && new Set(worlds).size === worlds.length && worlds.every((w) => WORLDS.includes(w)), 'Named, unique public worlds required');
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['webkit', 'chromium'];
@@ -62,7 +81,10 @@ const controlFile = option('--control-current-paint');
 const controlBytes = controlFile ? readFileSync(resolve(controlFile)) : null;
 const report = { schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(), startedAt: new Date().toISOString(),
   verifierSha256: hash(readFileSync(fileURLToPath(import.meta.url))), command: [process.execPath, ...process.argv.slice(1)],
-  scope: { engines, worlds, full: !lateLookup && engines.length === 2 && worlds.length === 11, rooms: lateLookup ? [] : ['slip', 'basis', 'tray', 'today', 'mirror'],
+  scope: { engines, worlds, full: !lateLookup && !titleRings && engines.length === 2 && worlds.length === 11, rooms: lateLookup || titleRings ? [] : ['slip', 'basis', 'tray', 'today', 'mirror'],
+    ...(titleRings ? { titleRingRoster: { fixtures: RING_LIVE.map((l) => ({ name: l.name, story: l.id, saved: l.prior, tapped: l.word, nextLineOn: l.nextLineOn })), engines: RING_ENGINES, worlds: WORLDS, sizes: DEVICES, cases: RING_REQUIRED.length, required: RING_REQUIRED,
+      scheduled: RING_REQUIRED.filter((c) => engines.includes(c.engine) && worlds.includes(c.world)).map((c) => c.caseId), claim: 'lead2240: both saved-ring fixtures, real first and second input, at 21px phone and 34px desktop titles',
+      nextLineGap: 'chromium/phone: neither natural title sets a tapped reading on the line below a saved ring; its rows hold every other box and all ink, and no next-line clearance is claimed there' } } : {}),
     ...(lateLookup ? { lateRoster: { titles: [...new Set(LATE.map((l) => l.id))], engines: LATE_ENGINES, worlds: LATE_WORLDS, cases: LATE_REQUIRED.length, required: LATE_REQUIRED, scheduled: LATE_REQUIRED.filter((c) => engines.includes(c.engine)).map((c) => c.caseId), claim: 'lead2010: native cold titles plus actual wikinews BODY success/failure/retry; 12 real cases, not every world', jawikiSidecar: 'not exercised: no such request exists', deferredTitleWitness: 'not required by lead2010; neither native title is deferred' } } : {}),
     card: { title: STORY, context: `${CONTEXT_STORY} 講演 met+saved`, live: LIVE.map((l) => `${l.id} ${l.word}: fresh profile${l.prior ? ` with ${l.prior} met+saved` : ''}, real first and second input`) },
     fixture: 'G2 first paragraph; native installation record; exact dictionary identities', ladder: 'attribute contract only' },
@@ -70,8 +92,9 @@ const report = { schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || rando
     deltaEStatus: 'conservative engineering bound, not WCAG', measurement: 'actual device pixels: painted screenshot vs identical geometry with only dots hidden; paper is the hidden pixel' },
   diagnosticInlineEnd,
   control: { file: controlFile, sha256: controlBytes ? hash(controlBytes) : null, served: [], setupError: null }, contexts: [], errors: [], passed: false, fullAcceptance: false };
-const save = () => writeFileSync(resolve(evidence, lateLookup ? 'verify-depth-visibility-late.json' : 'verify-depth-visibility.json'), JSON.stringify(report, null, 2));
-const row = (out, id, passed, detail) => { out.rows.push({ id, passed: Boolean(passed), detail }); if (!passed) console.log(`FAIL ${out.engine}/${out.world} ${id}`); };
+const save = () => writeFileSync(resolve(evidence, lateLookup ? 'verify-depth-visibility-late.json' : titleRings ? 'verify-depth-visibility-title-rings.json' : 'verify-depth-visibility.json'), JSON.stringify(report, null, 2));
+const shotTag = (out) => (titleRings ? `${out.engine}-${out.world}-${out.size}` : `${out.engine}-${out.world}`);
+const row = (out, id, passed, detail) => { out.rows.push({ id, passed: Boolean(passed), detail }); if (!passed) console.log(`FAIL ${out.engine}/${out.world}${titleRings ? `/${out.size}` : ''} ${id}`); };
 let host;
 let base;
 function png(buffer) {
@@ -111,9 +134,9 @@ async function openPassage(page, { id, query, archiveYear }) {
   const direct = page.locator(`[data-passage="${id}"]:not([data-recommendation]) .shelf-open`).first();
   if (await direct.count()) await direct.click(); else { await openShelfTools(page); await page.locator('#shelf-reading-search').fill(query); await page.locator('#shelf-reading-search').press('Enter'); await page.locator(`#shelf-reading-results [data-passage="${id}"] .shelf-open`).first().click(); }
 }
-async function story(page, id = STORY, query = 'スタートアップ大賞') {
+async function story(page, id = STORY, query = 'スタートアップ大賞', archiveYear) {
   await boot(page);
-  await openPassage(page, { id, query });
+  await openPassage(page, { id, query, archiveYear });
   await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 30000 }); await delay(1000);
 }
 /** The title as laid out now, with the native depth of every card word read
@@ -459,8 +482,8 @@ async function settledRecord(page, { quietMs = 750, timeout = 8000 } = {}) {
   return { snapshot, settled: false, quietMs, waitedMs: Date.now() - started, reads };
 }
 /** Native met+saved history for one title word, committed before the live inputs begin. */
-async function seedPrior(page, { id, query, prior }) {
-  await story(page, id, query);
+async function seedPrior(page, { id, query, prior, archiveYear }) {
+  await story(page, id, query, archiveYear);
   const node = await page.evaluate((word) => { const node = { t: 'word', id: word }; return { key: window.__KAIRO_DEPTH__.key(node), kind: window.__KAIRO_DEPTH__.identity(node)?.kind ?? null }; }, prior);
   assert.equal(node.kind, 'core', `Native title ${prior} identity is core`);
   const today = await page.evaluate(() => window.__KAIRO_DEPTH__.day()), now = Date.now();
@@ -468,7 +491,7 @@ async function seedPrior(page, { id, query, prior }) {
   value.met = { version: 1, entries: { ...(value.met?.entries || {}), [node.key]: { first: today, last: today, days: 1 } } };
   value.taken = [...(value.taken || []), savedWord(prior, now)];
   await commitRecord(page, value, 'prior');
-  await story(page, id, query);
+  await story(page, id, query, archiveYear);
   await page.waitForFunction((word) => document.querySelector(`.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"][data-depth="met"][data-kept]`), prior);
   return node;
 }
@@ -486,7 +509,10 @@ async function titleRingFrame(page, out, name, label, raster) {
   lineGeometry(out, frame, dots);
   if (!raster) return dots;
   const view = await page.evaluate(() => ({ x: scrollX, y: scrollY, dpr: devicePixelRatio }));
-  const shot = async (suffix) => png(await page.screenshot({ path: resolve(evidence, `${out.engine}-${out.world}-${frame}${suffix}.png`), animations: 'allow' }));
+  const slip = await page.evaluate((centres) => { const m = document.getElementById('mini'), s = m && getComputedStyle(m), r = m?.getBoundingClientRect();
+    return m && s.display !== 'none' && s.visibility !== 'hidden' && r.width > 0 && r.height > 0 ? { left: r.left + scrollX, top: r.top + scrollY, right: r.right + scrollX, bottom: r.bottom + scrollY, onTop: centres.map(([x, y]) => Boolean(document.elementFromPoint(x - scrollX, y - scrollY)?.closest('#mini'))) } : null; },
+  dots.map((d) => [(d.left + d.right) / 2, (d.top + d.bottom) / 2]));
+  const shot = async (suffix) => png(await page.screenshot({ path: resolve(evidence, `${shotTag(out)}-${frame}${suffix}.png`), animations: 'allow' }));
   const shown = await shot('');
   const noDots = await page.addStyleTag({ content: hideCss }); const paper = await shot('-paper');
   const noText = await page.addStyleTag({ content: hideCardText }); const bare = await shot('-bare');
@@ -494,8 +520,9 @@ async function titleRingFrame(page, out, name, label, raster) {
   const again = await facts(page, TITLE_DOTS);
   const stable = JSON.stringify(again.map((d) => [d.probeId, d.host, d.left, d.top])) === JSON.stringify(dots.map((d) => [d.probeId, d.host, d.left, d.top])) && JSON.stringify(again.captureFrame.glyphs) === JSON.stringify(dots.captureFrame.glyphs);
   const differs = (a, b) => a.some((v, k) => Math.abs(v - b[k]) > 3);
-  const ink = dots.map((d) => {
+  const ink = dots.map((d, i) => {
     const box = { left: d.left - d.spread - 1, top: d.top - d.spread - 1, right: d.right + d.spread + 1, bottom: d.bottom + d.spread + 1 }, hits = { own: 0, other: 0, reading: 0, unattributed: 0 };
+    const underSlip = Boolean(slip && slip.onTop[i] && box.left >= slip.left && box.top >= slip.top && box.right <= slip.right && box.bottom <= slip.bottom);
     let painted = 0;
     for (let y = Math.max(0, Math.floor((box.top - view.y) * view.dpr)); y < Math.min(shown.height, Math.ceil((box.bottom - view.y) * view.dpr)); y++)
       for (let x = Math.max(0, Math.floor((box.left - view.x) * view.dpr)); x < Math.min(shown.width, Math.ceil((box.right - view.x) * view.dpr)); x++) {
@@ -507,18 +534,24 @@ async function titleRingFrame(page, out, name, label, raster) {
         const glyph = dots.captureFrame.glyphs.find((g) => cx >= g.left && cx <= g.right && cy >= g.top && cy <= g.bottom);
         hits[!glyph ? 'unattributed' : glyph.rt ? 'reading' : glyph.owner === d.probeId ? 'own' : 'other']++;
       }
-    return { probeId: d.probeId, text: d.text, depth: d.depth, kept: d.kept, box, painted, hits };
+    return { probeId: d.probeId, text: d.text, depth: d.depth, kept: d.kept, box, painted, underSlip, hits };
   });
-  row(out, `${frame}.ring-clear-of-ink`, stable && ink.length > 0 && ink.every((d) => d.painted >= 4 && Object.values(d.hits).every((n) => n === 0)), { stable, view, ink });
+  row(out, `${frame}.ring-clear-of-ink`, stable && ink.length > 0 && ink.every((d) => (d.painted >= 4 || d.underSlip) && Object.values(d.hits).every((n) => n === 0)), { stable, view, slip, ink });
   return dots;
 }
-async function liveFirstState(page, out, { name, id, query, word, prior }) {
-  const priorNode = prior ? await seedPrior(page, { id, query, prior }) : null;
-  if (!prior) await story(page, id, query);
+async function liveFirstState(page, out, { name, id, query, word, prior, archiveYear, nextLineOn = [] }) {
+  const priorNode = prior ? await seedPrior(page, { id, query, prior, archiveYear }) : null;
+  if (!prior) await story(page, id, query, archiveYear);
+  const nextLineRequired = nextLineOn.includes(`${out.engine}/${out.size}`);
   await page.locator('.reader-card').evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' })); await delay(250);
   const selector = `.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"]`, target = page.locator(selector).first();
   const native = await page.evaluate((word) => { const node = { t: 'word', id: word }; return { key: window.__KAIRO_DEPTH__.key(node), kind: window.__KAIRO_DEPTH__.identity(node)?.kind ?? null }; }, word);
-  const lines = await page.evaluate(() => [...document.querySelectorAll('.reader-card > h1.view-title .japanese-lookup-word')].map((w) => { const r = w.getClientRects()[0]; return { text: w.dataset.lookupText, top: r?.top ?? null, bottom: r?.bottom ?? null }; }));
+  const lines = await page.evaluate(() => [...document.querySelectorAll('.reader-card > h1.view-title .japanese-lookup-word')].map((w) => { const rects = [...w.getClientRects()], r = rects[0]; return { text: w.dataset.lookupText, top: r?.top ?? null, bottom: r?.bottom ?? null, fragments: rects.map((f) => ({ top: f.top, bottom: f.bottom })) }; }));
+  const lineTops = [];
+  for (const f of lines.flatMap((l) => l.fragments).sort((a, b) => a.top - b.top)) if (!lineTops.length || f.top - lineTops.at(-1) > (f.bottom - f.top) / 2) lineTops.push(f.top);
+  const lineOf = (f) => (f ? lineTops.findIndex((top) => Math.abs(f.top - top) <= (f.bottom - f.top) / 2) : -1);
+  const priorLine = prior ? lineOf(lines.find((l) => l.text === prior)?.fragments.at(-1)) : -1, targetLine = lineOf(lines.find((l) => l.text === word)?.fragments[0]);
+  const adjacent = priorLine >= 0 && targetLine === priorLine + 1, layout = { size: out.size, lineTops, priorLine, targetLine, adjacent, nextLineRequired };
   const sample = (label) => page.evaluate(async ({ selector, label }) => {
     await document.fonts.ready;
     const el = document.querySelector(selector);
@@ -542,7 +575,7 @@ async function liveFirstState(page, out, { name, id, query, word, prior }) {
       visible: r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight, hitOwned: Boolean(hit && (hit === el || el.contains(hit))),
       mini: m && m.width > 0 && m.height > 0 && ms.display !== 'none' && ms.visibility !== 'hidden' ? plain(m) : null };
   }, { selector, label });
-  const input = () => (out.engine === 'webkit' ? target.tap() : target.click());
+  const input = () => (out.touch ? target.tap() : target.click());
   const shift = (a, b) => (a && b ? Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y)) : Infinity);
   const baseShift = (a, b) => (a.base.length && a.base.length === b.base.length && a.base.every((g, i) => g.char === b.base[i].char)
     ? Math.max(...a.base.flatMap((g, i) => ['left', 'top', 'right', 'bottom'].map((k) => Math.abs(g[k] - b.base[i][k])))) : Infinity);
@@ -561,7 +594,7 @@ async function liveFirstState(page, out, { name, id, query, word, prior }) {
   const first = lines.find((l) => l.text === '日本'), daisho = lines.find((l) => l.text === '大賞');
   const twoLine = Boolean(first && daisho && first.top != null && daisho.top != null && daisho.top - first.top > (first.bottom - first.top) / 2);
   const priorPainted = !prior || Boolean(fresh?.words.some((w) => w.title && w.text === prior && w.painted && w.nativeActive));
-  row(out, `${name}.fresh`, native.kind === 'core' && fresh?.titleWords > 0 && stateless(fresh, (w) => w.text !== prior) && priorPainted && !before.rung && !before.mini && !pre.record.met?.entries?.[native.key] && (out.engine !== 'webkit' || id !== STORY || twoLine), { native, prior: prior ? { word: prior, node: priorNode, painted: priorPainted } : null, lines, twoLine, fresh, before, revision: pre.revision });
+  row(out, `${name}.fresh`, native.kind === 'core' && fresh?.titleWords > 0 && stateless(fresh, (w) => w.text !== prior) && priorPainted && !before.rung && !before.mini && !pre.record.met?.entries?.[native.key] && (out.engine !== 'webkit' || out.size !== 'phone' || id !== STORY || twoLine) && (!nextLineRequired || adjacent), { native, prior: prior ? { word: prior, node: priorNode, painted: priorPainted } : null, lines, twoLine, layout, fresh, before, revision: pre.revision });
   if (prior) await titleRingFrame(page, out, name, 'before', true);
   await input();
   const input1 = await sample('input-1');
@@ -572,8 +605,8 @@ async function liveFirstState(page, out, { name, id, query, word, prior }) {
     const targetNode = await target.evaluate((el) => el.dataset.dotsNode);
     const readingGlyphs = out.captureFrames[`${name}-reading`].glyphs.filter((g) => g.rt && g.owner === targetNode);
     const underRing = ring ? readingGlyphs.filter((g) => g.top > ring.fragments.at(-1).bottom && g.left < ring.right + ring.spread && g.right > ring.left - ring.spread) : [];
-    row(out, `${name}.reading-beside-ring`, ring?.depth === 'met' && ring.kept && readingGlyphs.length > 0 && readingGlyphs.map((g) => g.text).join('') === reading.reading.replace(/\s/gu, '') && (out.engine !== 'webkit' || underRing.length > 0),
-      { ring: ring && { text: ring.text, depth: ring.depth, kept: ring.kept, box: [ring.left - ring.spread, ring.top - ring.spread, ring.right + ring.spread, ring.bottom + ring.spread], fragments: ring.fragments }, reading: reading.reading, readingGlyphs, underRing });
+    row(out, `${name}.reading-beside-ring`, ring?.depth === 'met' && ring.kept && readingGlyphs.length > 0 && readingGlyphs.map((g) => g.text).join('') === reading.reading.replace(/\s/gu, '') && (!nextLineRequired || underRing.length > 0),
+      { layout, ring: ring && { text: ring.text, depth: ring.depth, kept: ring.kept, box: [ring.left - ring.spread, ring.top - ring.spread, ring.right + ring.spread, ring.bottom + ring.spread], fragments: ring.fragments }, reading: reading.reading, readingGlyphs, underRing });
   }
   const settle = await settledRecord(page);
   const beforeInput2 = await readAppRecordSnapshot(page);
@@ -711,14 +744,15 @@ async function rooms(page, out) {
 }
 
 /** A fresh native profile for this engine and world, served the same CSS as every other page of the run. */
-async function openContext(browser, engine, world) {
-  const context = await browser.newContext({ viewport: engine === 'webkit' ? { width: 390, height: 844 } : { width: 1440, height: 900 }, deviceScaleFactor: 2, isMobile: engine === 'webkit', hasTouch: engine === 'webkit', reducedMotion: 'reduce', colorScheme: 'light', serviceWorkers: 'block' });
+async function openContext(browser, engine, world, size = defaultSize(engine)) {
+  const device = DEVICES[size];
+  const context = await browser.newContext({ viewport: device.viewport, deviceScaleFactor: 2, isMobile: device.touch, hasTouch: device.touch, reducedMotion: 'reduce', colorScheme: 'light', serviceWorkers: 'block' });
   await context.addInitScript((world) => { localStorage.setItem('kairo-theme', world); localStorage.setItem('kairo-word-ladder-demo-v1', '1'); }, world);
   if (controlBytes || diagnosticInlineEnd || process.env.DOTS_BASE_URL) await context.route(new URL('editorial.css', base).href + '*', async (route) => { try { const response = await route.fetch(); const original = await response.body(); const expected = report.identity.files?.find((f) => f.path === 'editorial.css')?.sha256; assert(expected && hash(original) === expected, 'Control fetched CSS does not match artifact'); const servedBytes = controlBytes || (process.env.DOTS_BASE_URL ? original : Buffer.concat([original, Buffer.from('\n.japanese-lookup-word:is([data-depth],[data-kept])::after { left:auto; right:auto; transform:translateX(calc(-0.5em - var(--depth-size)/2)); }\n')])); if (!process.env.DOTS_BASE_URL) assert(hash(original) !== hash(servedBytes), 'Control must change CSS'); (process.env.DOTS_BASE_URL ? (report.remoteCssServed ||= []) : report.control.served).push({ url: route.request().url(), candidateSha256: hash(original), servedSha256: hash(servedBytes) }); await route.fulfill({ response, body: servedBytes, headers: { ...response.headers(), 'content-length': String(servedBytes.length), 'content-type': 'text/css' } }); } catch (e) { report.control.setupError = String(e.stack); await route.abort(); } });
   return context;
 }
 async function freshWalk(browser, out, walk) {
-  const context = await openContext(browser, out.engine, out.world);
+  const context = await openContext(browser, out.engine, out.world, out.size);
   try { const page = await context.newPage(); page.setDefaultTimeout(15000); page.on('pageerror', (e) => out.errors.push(String(e))); await walk(page); }
   finally { await context.close(); }
 }
@@ -843,11 +877,40 @@ async function lateWalk(browser, out) {
   out.passed = out.lateAdmission.accepted;
   save();
 }
-async function one(browser, engine, world) {
-  const out = { engine, version: browser.version(), world, viewport: engine === 'webkit' ? { width: 390, height: 844 } : { width: 1440, height: 900 }, deviceScaleFactor: 2, touch: engine === 'webkit', startedAt: new Date().toISOString(), rows: [], measurements: {}, errors: [] };
+/** Lead 2240: each saved-ring fixture on a fresh native profile at this size, with the device and font it actually rendered. */
+async function ringDevice(page, out, spec) {
+  const device = DEVICES[out.size];
+  const actual = await page.evaluate(() => ({ width: innerWidth, height: innerHeight, touchEvents: 'ontouchstart' in window, touchPoints: navigator.maxTouchPoints, fontSize: getComputedStyle(document.querySelector('.reader-card > h1.view-title')).fontSize }));
+  row(out, `${spec.name}.device`, actual.width === device.viewport.width && actual.height === device.viewport.height && actual.touchEvents === device.touch && actual.fontSize === device.titleFont,
+    { size: out.size, input: out.touch ? 'tap' : 'click', expected: device, actual });
+}
+function ringContextAdmission(out) {
+  const requiredRows = RING_LIVE.flatMap(ringRows), executedRows = out.rows.map((r) => r.id);
+  return { caseId: ringCaseId(out.engine, out.world, out.size), requiredRows, executedRows, missingRows: requiredRows.filter((id) => !executedRows.includes(id)), unexpectedRows: executedRows.filter((id) => !requiredRows.includes(id)),
+    accepted: !out.errors.length && exactRoster(executedRows, requiredRows) && out.rows.every((r) => r.passed === true) && exactRoster(out.ringCases.map((c) => c.name), RING_LIVE.map((l) => l.name)) &&
+      out.ringCases.every((c) => c.completed && !c.error && exactRoster(c.rowIds, ringRows(RING_LIVE.find((l) => l.name === c.name)))) };
+}
+async function ringWalk(browser, out) {
+  out.ringCases = [];
+  for (const spec of RING_LIVE) {
+    const result = { name: spec.name, story: spec.id, saved: spec.prior, tapped: spec.word, startedAt: new Date().toISOString(), rowIds: [], completed: false };
+    out.ringCases.push(result); const start = out.rows.length;
+    try { await freshWalk(browser, out, async (page) => { await liveFirstState(page, out, spec); await ringDevice(page, out, spec); await worldBinding(page, out, spec.name); }); result.completed = true; }
+    catch (error) { result.error = String(error.stack || error); out.errors.push(`${spec.name}: ${result.error}`); console.error(`${ringCaseId(out.engine, out.world, out.size)} ${spec.name}: ${error.message}`); }
+    finally { result.rowIds = out.rows.slice(start).map((r) => r.id); result.completedAt = new Date().toISOString(); save(); }
+  }
+  out.completedWalk = true;
+  out.completedAt = new Date().toISOString();
+  out.ringAdmission = ringContextAdmission(out);
+  out.passed = out.ringAdmission.accepted;
+  save();
+}
+async function one(browser, engine, world, size = defaultSize(engine)) {
+  const out = { engine, version: browser.version(), world, size, viewport: DEVICES[size].viewport, deviceScaleFactor: 2, touch: DEVICES[size].touch, startedAt: new Date().toISOString(), rows: [], measurements: {}, errors: [] };
   report.contexts.push(out); save();
   if (lateLookup) return lateWalk(browser, out);
-  const context = await openContext(browser, engine, world);
+  if (titleRings) return ringWalk(browser, out);
+  const context = await openContext(browser, engine, world, size);
   try {
     const page = await context.newPage(); page.setDefaultTimeout(15000); page.on('pageerror', (e) => out.errors.push(String(e)));
     await seed(page, out);
@@ -902,7 +965,7 @@ try {
     assert.equal(report.remoteCssBytesSha256, report.identity.files?.find((f) => f.path === 'editorial.css')?.sha256, 'Remote CSS bytes must match build identity');
   } else { const site = resolveCorridorSite(); report.site = site; report.identity = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), 'utf8')); host = await startStaticHost({ site, port: 0 }); base = new URL(`${host.origin}/`); report.mode = 'local artifact'; }
   report.baseUrl = base.href; save();
-  const runEngine = async (engine) => { const browser = await ({ webkit, chromium }[engine]).launch({ headless: true }); try { for (const world of worlds) await one(browser, engine, world); } finally { await browser.close(); } };
+  const runEngine = async (engine) => { const browser = await ({ webkit, chromium }[engine]).launch({ headless: true }); try { for (const world of worlds) for (const size of titleRings ? RING_SIZES : [defaultSize(engine)]) await one(browser, engine, world, size); } finally { await browser.close(); } };
   report.parallelEngines = process.env.DOTS_PARALLEL_ENGINES === '1';
   if (report.parallelEngines) await Promise.all(engines.map(runEngine)); else for (const engine of engines) await runEngine(engine);
 } catch (error) { report.errors.push(String(error.stack || error)); console.error(error.message); }
@@ -912,7 +975,7 @@ finally {
   }
   if (host) await host.close();
   report.completedAt = new Date().toISOString();
-  report.passed = !report.errors.length && !report.control.setupError && report.contexts.length === engines.length * worlds.length && report.contexts.every((c) => c.passed) && (!controlBytes || report.control.served.length > 0);
+  report.passed = !report.errors.length && !report.control.setupError && report.contexts.length === engines.length * worlds.length * (titleRings ? RING_SIZES.length : 1) && report.contexts.every((c) => c.passed) && (!controlBytes || report.control.served.length > 0);
   report.fullAcceptance = report.passed && report.scope.full && report.mode === 'local artifact' && !controlBytes && !diagnosticInlineEnd;
   if (lateLookup) {
     const requiredContexts = LATE_ENGINES.flatMap((engine) => LATE_WORLDS.map((world) => `${engine}/${world}`));
@@ -926,6 +989,16 @@ finally {
         exactRoster(report.contexts.map((c) => `${c.engine}/${c.world}`), requiredContexts) && exactRoster(executedCases, requiredCases) && exactRoster(executedRows, requiredRows) &&
         report.contexts.every((c) => c.completedWalk && lateContextAdmission(c).accepted) };
     report.lateRosterAccepted = report.lateAdmission.accepted;
+  }
+  if (titleRings) {
+    const requiredCases = RING_REQUIRED.map((c) => c.caseId), executedCases = report.contexts.map((c) => ringCaseId(c.engine, c.world, c.size));
+    const requiredRows = RING_REQUIRED.flatMap((c) => c.rows.map((id) => `${c.caseId}/${id}`)), executedRows = report.contexts.flatMap((c) => c.rows.map((r) => `${ringCaseId(c.engine, c.world, c.size)}/${r.id}`));
+    report.titleRingAdmission = { requiredCases, executedCases, missingCases: requiredCases.filter((id) => !executedCases.includes(id)), unexpectedCases: executedCases.filter((id) => !requiredCases.includes(id)),
+      failedRows: report.contexts.flatMap((c) => c.rows.filter((r) => !r.passed).map((r) => `${ringCaseId(c.engine, c.world, c.size)}/${r.id}`)), requiredRowCount: requiredRows.length, executedRowCount: executedRows.length,
+      accepted: report.passed && report.mode === 'local artifact' && !controlBytes && !diagnosticInlineEnd && exactRoster(engines, RING_ENGINES) && exactRoster(worlds, WORLDS) &&
+        exactRoster(executedCases, requiredCases) && exactRoster(executedRows, requiredRows) && report.contexts.every((c) => c.completedWalk && ringContextAdmission(c).accepted) };
+    report.titleRingRosterAccepted = report.titleRingAdmission.accepted;
+    report.fullAcceptance = false;
   }
   report.control.killed = Boolean(controlBytes && !report.control.setupError && !report.errors.length && report.contexts.every((c) => !c.errors.length) && report.control.served.length && report.contexts.some((c) => c.rows.some((r) => /^(reader|title|context|slip|basis|prose|tray|today|mirror)(?:-[a-z]+)*\.(size|contrast|nonempty|semantic-separation)$/.test(r.id) && !r.passed)));
   save(); console.log(`DOTS ${report.passed ? 'PASS' : 'FAIL'}: ${evidence}`); if (!report.passed) process.exitCode = 1;
