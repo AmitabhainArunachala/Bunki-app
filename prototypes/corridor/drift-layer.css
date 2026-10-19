@@ -309,4 +309,9 @@ body[data-furigana='2'] #drift-layer .drift-reading rt { opacity: 1; }
   line-height: 1.35; color: var(--faint); }
 #drift-layer .scale-star.is-compact .scale-star-why { margin-top: 4px; }
 #drift-layer .scale-star:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; border-radius: 4px; }
+/* Hfix-2b r2 · H2-1 — a revealed gloss is part of the word, so the glass-edge fade counts it. On one
+   nowrap line a whole gloss (KH1-3 restored them) ran to ~700px, wider than a phone's glass, so a
+   glossed word could never stand wholly inside it. The gloss now wraps, no wider than the old
+   32-character line was, and keeps every word of its text. */
+#drift-layer .word .gloss { white-space: normal; width: max-content; max-width: 16em; }
 /* The scale thread shares the world's bar ink and keeps every ancestor in reach. */

@@ -20,6 +20,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildVocabulary, CLIP_CAP, looksClipped } from './gloss-text.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR = resolve(HERE, '..');
@@ -729,6 +730,46 @@ patch('    if(n.kind==="word"&&(n.mode==="free"||n.mode==="glide")&&n!==focusN&&
 patch('        const ef=dE<=-34?0:(dE+34)/68;',
   '        const ef=dE<=0?0:dE/34;',
   'Hfix-2b H2-1 the edge dissolve ends at the rim: a box that touches it draws at opacity 0');
+// Hfix-2b r2 · H2-1 under a held drag (Grok's critique of 927996ae). Two holes in the box the fade
+// judged, both measured on a tapped word dragged to the rim:
+//   · WHERE — the fade read n.x/n.y, but the paint translates n.x+dragX, n.y+dragY. With the finger
+//     down the word and its reading kept ~0.97 ink 12-33 px past the rim. The fade now reads the
+//     painted centre, the same two sums the transform below uses.
+//   · WHAT — a revealed reading sits above the word's own box and a revealed gloss below it, both
+//     centred on it. They are the word the learner sees, so they are now part of its box: above
+//     (eUp) and below (eDn) are kept apart because the two lines are not symmetric. A line counts
+//     when its class shows it (unfolded/glossed, or furigana always-on), or when it is drawn at all.
+//     The cache key adds the furigana setting, since that alone can show a reading.
+patch('      if(n.boxKey!==n.el.className&&n.el.isConnected&&Math.min(n.x,vw()-n.x,n.y,vh()-n.y)<220){\n'
+  + '        const bw=n.el.offsetWidth, bh=n.el.offsetHeight;\n'
+  + '        if(bw>0&&bh>0){n.boxW=bw;n.boxH=bh;n.boxKey=n.el.className;}\n'
+  + '      }\n'
+  + '      if(n.boxW>0){ehw=Math.max(ehw,n.boxW*n.s*zs2/2); ehh=Math.max(ehh,n.boxH*n.s*zs2/2);}\n'
+  + '      let dE=Math.min(n.x-ehw,vw()-n.x-ehw,n.y-ehh,vh()-n.y-ehh);',
+  '      const pcx=n.x+n.dragX, pcy=n.y+n.dragY;\n'
+  + '      const furi=document.body.dataset.furigana||"", boxKey=n.el.className+"|"+furi;\n'
+  + '      if(n.boxKey!==boxKey&&n.el.isConnected&&Math.min(pcx,vw()-pcx,pcy,vh()-pcy)<220){\n'
+  + '        const bw=n.el.offsetWidth, bh=n.el.offsetHeight;\n'
+  + '        if(bw>0&&bh>0){\n'
+  + '          const cl=n.el.classList, lod=cl.contains("lod");\n'
+  + '          const yo=n.el.querySelector(":scope > .yomi"), gl=n.el.querySelector(":scope > .gloss");\n'
+  + '          const shown=(el,byClass)=>!!el&&!lod&&(byClass||Number(getComputedStyle(el).opacity)>0);\n'
+  + '          const ys=shown(yo,furi!=="0"&&(cl.contains("unfolded")||cl.contains("glossed")||furi==="2"));\n'
+  + '          const gs=shown(gl,cl.contains("glossed"));\n'
+  + '          n.boxW=Math.max(bw,ys?yo.offsetWidth:0,gs?gl.offsetWidth:0);\n'
+  + '          n.boxUp=bh/2+(ys?yo.offsetHeight:0); n.boxDn=bh/2+(gs?gl.offsetHeight:0);\n'
+  + '          n.boxKey=boxKey;\n'
+  + '        }\n'
+  + '      }\n'
+  + '      let eUp=ehh, eDn=ehh;\n'
+  + '      if(n.boxW>0){const k=n.s*zs2; ehw=Math.max(ehw,n.boxW*k/2); eUp=Math.max(ehh,n.boxUp*k); eDn=Math.max(ehh,n.boxDn*k);}\n'
+  + '      let dE=Math.min(pcx-ehw,vw()-pcx-ehw,pcy-eUp,vh()-pcy-eDn);',
+  'Hfix-2b r2 H2-1 the fade judges the painted box: the drag, and a revealed reading and gloss');
+patch('        const dx=Math.max(c.x-(n.x+ehw),(n.x-ehw)-(c.x+c.w));\n'
+  + '        const dy=Math.max(c.y-(n.y+ehh),(n.y-ehh)-(c.y+c.h));',
+  '        const dx=Math.max(c.x-(pcx+ehw),(pcx-ehw)-(c.x+c.w));\n'
+  + '        const dy=Math.max(c.y-(pcy+eDn),(pcy-eUp)-(c.y+c.h));',
+  'Hfix-2b r2 H2-1 host chrome is judged against the same painted box');
 patch('vg.addColorStop(1,th.dark?"rgba(0,0,0,.5)":rgba(th.ink,.14));', 'vg.addColorStop(1,th.dark?"rgba(0,0,0,.36)":rgba(th.ink,.07));', 'r4 lighter vignette');
 patch('ictx.globalAlpha=Math.min(.3,th.blobA*b.a);', 'ictx.globalAlpha=th.dark?Math.min(.09,th.blobA*b.a*.4):Math.min(.2,th.blobA*b.a*.8);', 'r4 pools a whisper by night, a cool mist by day');
 patch('pool:["#1E50A2","#1E50A2","#165E83","#165E83","#EB6101"]', 'pool:["#1E50A2","#1E50A2","#165E83","#165E83","#6E87A6"]', 'r4 the day mist stays cool (北斎)');
@@ -1722,6 +1763,11 @@ const cssOut = (css + `
   line-height: 1.35; color: var(--faint); }
 #drift-layer .scale-star.is-compact .scale-star-why { margin-top: 4px; }
 #drift-layer .scale-star:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; border-radius: 4px; }
+/* Hfix-2b r2 · H2-1 — a revealed gloss is part of the word, so the glass-edge fade counts it. On one
+   nowrap line a whole gloss (KH1-3 restored them) ran to ~700px, wider than a phone's glass, so a
+   glossed word could never stand wholly inside it. The gloss now wraps, no wider than the old
+   32-character line was, and keeps every word of its text. */
+#drift-layer .word .gloss { white-space: normal; width: max-content; max-width: 16em; }
 /* The scale thread shares the world's bar ink and keeps every ancestor in reach. */
 `).replace(/#tray\b/g, '#drift-tray');
 
@@ -1753,6 +1799,66 @@ if (js.includes('</script')) {
   throw new Error('emitted js contains "</script" — standalone embedding would truncate');
 }
 
+/* --------------------------------------------------------------- glosses
+ * Hfix-2b r2 · KH1-3. The legacy extractor cut every WBIG gloss at exactly 32 characters. fugu's
+ * repair (tools/repair-drift-glosses.mjs) restored 466 of them, but it only touched a row its
+ * detector called clipped, and that detector defaults to WHOLE when it has no evidence: a tail
+ * like "pleasantl" or "conscio" is a prefix of no word the corpus spells out, and a tail of "a"
+ * or "i" ("look a", "rich i") is accepted as a word. Sixteen cut glosses were served (Grok, 0610).
+ * At the cap the cut could have landed anywhere, so a 32-character row is taken as cut unless it
+ * proves otherwise, and the 466's own rule settles it:
+ *   1. the dictionary's gloss (data/share_alike/words.json) when that is whole — not itself at
+ *      the cap and not structurally cut. Complete beats long.
+ *   2. else the row stands only if it ends on a known whole word of three letters or more;
+ *   3. else it is cut honestly at a sense boundary ("; ", then ", "), else at a word boundary,
+ *      and says so with "…".
+ * It runs on the emitted literal, so the served file cannot carry a cap-cut gloss whatever the
+ * donor holds. */
+const WBIG_AT = [...js.matchAll(/const WBIG=(\[.*\]);/g)];
+if (WBIG_AT.length !== 1) throw new Error(`expected exactly one WBIG literal, found ${WBIG_AT.length}`);
+const glossPass = { atCap: 0, dictionary: 0, kept: 0, cut: 0 };
+{
+  const rows = JSON.parse(WBIG_AT[0][1]);
+  const doc = JSON.parse(readFileSync(resolve(CORRIDOR, 'data/share_alike/words.json'), 'utf8'));
+  const dict = doc.words || doc;
+  const vocabulary = buildVocabulary(rows.map((row) => (Array.isArray(row) ? row[2] : '')),
+    Object.values(dict).map((rec) => rec?.g || ''));
+  const norm = (s) => String(s ?? '').trim().replace(/\s+/gu, ' ');
+  const structural = (s) => /[\s([,;]$/u.test(s)
+    || (s.match(/\(/gu) || []).length > (s.match(/\)/gu) || []).length;
+  const endsOnWord = (s) => {
+    const m = /([A-Za-z][A-Za-z'-]*)[)"'’.!?]*$/u.exec(s);
+    return !!m && m[1].length >= 3 && vocabulary.words.has(m[1].toLowerCase());
+  };
+  const honestCut = (s) => {
+    const trim = (v) => v.replace(/[\s,;([-]+$/u, '');
+    for (const sep of ['; ', ', ', ' ']) {
+      for (let i = s.lastIndexOf(sep); i > 0; i = s.lastIndexOf(sep, i - 1)) {
+        const head = trim(s.slice(0, i));
+        if (head && !structural(head)) return `${head}…`;
+      }
+    }
+    throw new Error(`no honest cut for the gloss "${s}"`);
+  };
+  const out = rows.map((row) => {
+    if (!Array.isArray(row) || typeof row[2] !== 'string' || row[2].length !== CLIP_CAP) return row;
+    glossPass.atCap += 1;
+    const whole = norm(dict[row[0]]?.g);
+    let next;
+    if (whole && whole.length !== CLIP_CAP && !structural(whole) && !looksClipped(whole)) {
+      next = whole; glossPass.dictionary += 1;
+    } else if (!structural(row[2]) && endsOnWord(row[2])) {
+      next = row[2]; glossPass.kept += 1;
+    } else {
+      next = honestCut(row[2]); glossPass.cut += 1;
+    }
+    if (next === row[2]) return row;
+    const copy = row.slice(); copy[2] = next; return copy;
+  });
+  js = js.slice(0, WBIG_AT[0].index) + `const WBIG=${JSON.stringify(out)};`
+    + js.slice(WBIG_AT[0].index + WBIG_AT[0][0].length);
+}
+
 const header = `/* GENERATED by tools/build-drift-layer.mjs from prototypes/drift/drift-artifact.html
  * (${patchCount} exact-string gate patches applied — see the extractor for the list).
  * Do not edit by hand; edit the drift source or the extractor. */
@@ -1769,8 +1875,10 @@ if (process.argv.includes('--check')) {
     process.exit(1);
   }
   console.log(`drift-layer: committed output matches the extractor (${patchCount} patches)`);
+  console.log(`drift-layer: WBIG glosses at the ${CLIP_CAP}-character cap ${glossPass.atCap}: dictionary ${glossPass.dictionary}, kept ${glossPass.kept}, cut honestly ${glossPass.cut}`);
   process.exit(0);
 }
+console.log(`drift-layer: WBIG glosses at the ${CLIP_CAP}-character cap ${glossPass.atCap}: dictionary ${glossPass.dictionary}, kept ${glossPass.kept}, cut honestly ${glossPass.cut}`);
 for (const [name, text] of outputs) writeFileSync(resolve(CORRIDOR, name), text);
 console.log(
   `drift-layer: css ${(css.length / 1024).toFixed(0)} KB · markup ${(markup.length / 1024).toFixed(1)} KB · js ${(js.length / 1024).toFixed(0)} KB · ${patchCount} patches, all asserted unique`,

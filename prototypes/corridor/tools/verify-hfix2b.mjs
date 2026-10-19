@@ -14,6 +14,10 @@
  *   H2-1  nothing legible in the sky is cut by the glass edge, at 390×844, 1024×768 and
  *         1440×900, at rest and while dragging; and, by the lead's ruling (MISSION/inbox/0238),
  *         no sky word draws above opacity 0 while its box crosses the rim — not even a sliver
+ *   r2    (Grok's critique of 927996ae, MISSION/inbox/0610) every gloss the sky is served ends on
+ *         a whole word, the sixteen it found cut included; and a tapped word HELD by the finger
+ *         and dragged to the rim, with its reading shown, draws nothing above 0 across the rim,
+ *         finger down and after release
  *
  * HOW BASE IS MEASURED. `KAIRO_HFIX2B_BASE=1` routes the four runtime files this slice changed
  * to their bytes at the base commit, so the base and the branch are judged by the SAME rows on
@@ -26,6 +30,10 @@
  *   cover    slide the rail so the shelf bead hides under 宙   → X-14 must go red
  *   edge     restore the old guard's three exclusions          → H2-1 must go red
  *   curve    restore the donor's dissolve, (dE+34)/68 squared   → H2-1's no-sliver row must go red
+ *   gloss    serve 遊ぶ's 32-character cut again               → both r2 gloss rows must go red
+ *   held     the fade reads n.x/n.y again, not the painted spot → the held-drag row must go red
+ *   reveal   the fade's box leaves out the reading and gloss    → reported; red where a reading
+ *            is wider than its word
  * A control that leaves its row green is itself a failure, and is reported as one.
  *
  * This writes nothing to the learner's record beyond the fixture it imports and the one "Not yet"
@@ -44,7 +52,7 @@ import { startCorridorDev } from '../../../scripts/serve-corridor-dev.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { restoreAppFixture } from './record-fixture-support.mjs';
 import { installOracle } from './repair-drift-glosses.mjs';
-import { looksClipped } from './gloss-text.mjs';
+import { CLIP_CAP, looksClipped } from './gloss-text.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../../..');
@@ -92,6 +100,21 @@ const NEW_EDGE_GUARD = '    {\n      const zf=(n.fpx||14)*n.s*cam.z;';
 // The dissolve's band, as the lead ruled it: it ends AT the rim. The donor's ran 34px past it.
 const NEW_CURVE = '        const ef=dE<=0?0:dE/34;';
 const OLD_CURVE = '        const ef=dE<=-34?0:(dE+34)/68;';
+// r2: the fade reads the PAINTED centre (the drag included) and counts a revealed reading/gloss
+const NEW_HELD = '      const pcx=n.x+n.dragX, pcy=n.y+n.dragY;';
+const OLD_HELD = '      const pcx=n.x, pcy=n.y;';
+const REVEAL_LINES = [
+  ['          const ys=shown(yo,', '          const ys=false&&shown(yo,'],
+  ['          const gs=shown(gl,', '          const gs=false&&shown(gl,'],
+];
+/** The sixteen glosses Grok found served cut (0610), each with the fragment it ended on. */
+const GROK_CUT = {
+  遊ぶ: 'to spend time pleasantl', お礼: 'thankin', 忘れ物: 'something forgotte', お洒落: 'fashion-conscio',
+  仮名遣い: 'syllabary spel', 清濁: 'purity and impuri', 終始: 'consisten', 治る: 'to recover from i',
+  召し上がる: '(たべる) a', 拝見: 'seeing, look a', 捲る: 'pages of a', 睨む: 'to keep a',
+  恵まれる: 'to be rich i', 打ち込む: 'to shoot i', 踏まえる: 'to have origin i', 保温: 'keeping heat i',
+};
+const CUT_YASOBU = '["遊ぶ","あそぶ","to play; to spend time pleasantl",5]';
 
 /** corridor.js keeps its functions in its own top-level scope, not on `window`, so a test cannot
  * reach the writer the word page calls. This rides INSIDE corridor.js — base bytes included, so
@@ -220,6 +243,99 @@ async function sweepSkyEdges(page, host, label, drag) {
   worst.sort((a, b) => b.op - a.op);
   return { total, samples, cut: worst };
 }
+
+/** r2 · H2-1 under a HELD drag (Grok, 0610). Every node, and every reading or gloss line a word
+ * shows, judged by its EFFECTIVE opacity (the product up the ancestor chain): above 0 and more
+ * than half a pixel past the rim is a cut. The held word is also reported on its own, opacity
+ * aside, so the row can prove the drag really carried it to the rim. */
+const readHeld = (page) => page.evaluate(() => {
+  const eff = (el) => {
+    let o = 1;
+    for (let n = el; n && n !== document.documentElement; n = n.parentElement) {
+      const s = getComputedStyle(n);
+      if (s.display === 'none' || s.visibility === 'hidden') return 0;
+      o *= Number(s.opacity);
+    }
+    return o;
+  };
+  const over = (r) => Math.max(-r.left, r.right - innerWidth, -r.top, r.bottom - innerHeight);
+  const onGlass = (r) => r.width > 0 && r.height > 0
+    && Math.min(r.right, innerWidth) - Math.max(r.left, 0) > 0 && Math.min(r.bottom, innerHeight) - Math.max(r.top, 0) > 0;
+  const cut = [];
+  let held = null;
+  for (const n of document.querySelectorAll('#drift-layer :is(.word, .glyph, .part)')) {
+    const parts = [['box', n], ...[...n.querySelectorAll(':scope > .yomi, :scope > .gloss')].map((c) => [c.className, c])];
+    const text = (n.querySelector('.base, .g') || n).textContent.trim().slice(0, 8);
+    for (const [part, el] of parts) {
+      const r = el.getBoundingClientRect();
+      const o = eff(el);
+      if (n.dataset.h2held === '1') {
+        held ??= { word: text, cls: n.className, parts: {} };
+        held.parts[part] = { eff: +o.toFixed(3), over: +over(r).toFixed(1) };
+      }
+      if (o > 0 && onGlass(r) && over(r) > 0.5) cut.push({ text, part, eff: +o.toFixed(3), over: +over(r).toFixed(1) });
+    }
+  }
+  return { cut, held };
+});
+async function heldDrag(page, host, width, height) {
+  await page.goto(`${host.origin}/index.html?entry=drift&ui=bi`);
+  await page.waitForFunction(() => document.body.dataset.ready === '1');
+  await page.waitForTimeout(1500);
+  // the word Grok carried, 取り上げる, when the sky shows it; else the widest word with a reading
+  const pick = await page.evaluate(() => {
+    const inside = (r) => r.width > 0 && r.left >= 8 && r.right <= innerWidth - 8 && r.top >= 60 && r.bottom <= innerHeight - 100;
+    const words = [...document.querySelectorAll('#drift-layer .word')].filter((n) => Number(getComputedStyle(n).opacity) > 0.2
+      && inside(n.getBoundingClientRect()) && (n.querySelector(':scope > .yomi')?.textContent || '').trim());
+    const n = words.find((w) => w.querySelector('.base')?.textContent === '取り上げる')
+      || words.sort((a, b) => b.getBoundingClientRect().width - a.getBoundingClientRect().width)[0];
+    if (!n) return null;
+    n.dataset.h2held = '1';
+    const r = n.getBoundingClientRect();
+    return { word: n.querySelector('.base')?.textContent || '', x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  });
+  const result = { pick, samples: 0, cut: [], reached: 0, readingShown: false, heldCls: '' };
+  if (!pick) return result;
+  // the tap: the word comes forward and its reading shows; the camera brings it to the centre
+  await page.mouse.click(pick.x, pick.y);
+  await page.waitForTimeout(1400);
+  const at = await page.evaluate(() => {
+    const n = document.querySelector('[data-h2held="1"]');
+    const r = n.getBoundingClientRect();
+    let o = 1;
+    const yomi = n.querySelector(':scope > .yomi');
+    for (let e = yomi; e && e !== document.documentElement; e = e.parentElement) o *= Number(getComputedStyle(e).opacity);
+    return { left: r.left, right: r.right, y: r.top + r.height / 2, cls: n.className, reading: o };
+  });
+  result.heldCls = at.cls;
+  // the state Grok measured: the tapped word at rest, its reading drawn
+  result.readingShown = at.reading > 0.5;
+  const take = async (phase) => {
+    const seen = await readHeld(page);
+    result.samples += 1;
+    result.cut.push(...seen.cut.map((c) => ({ ...c, phase })));
+    if (seen.held && phase === 'held') {
+      result.reached = Math.max(result.reached, seen.held.parts.box?.over ?? 0, seen.held.parts.yomi?.over ?? 0);
+    }
+  };
+  // hold it near its left edge and carry it to the right rim: the word moves 0.9 of the finger,
+  // so it ends well past the rim while the finger stays on the glass
+  const from = { x: at.left + 6, y: at.y };
+  const to = width - 4;
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  for (let s = 1; s <= 10; s += 1) {
+    await page.mouse.move(from.x + ((to - from.x) * s) / 10, from.y);
+    if (s >= 3) await take('held');
+  }
+  for (let i = 0; i < 3; i += 1) { await page.waitForTimeout(150); await take('held'); }
+  await page.mouse.up();
+  // after release: through the glide, and past the bloom's 10 s clear that Grok's drop reached
+  for (let i = 0; i < 10; i += 1) { await page.waitForTimeout(150); await take('released'); }
+  for (let i = 0; i < 10; i += 1) { await page.waitForTimeout(1000); await take('released'); }
+  result.cut.sort((a, b) => b.eff - a.eff);
+  return result;
+}
 const readKeptStars = (page) => page.evaluate(() => [...document.querySelectorAll('.scale-star-kept')]
   .filter((n) => !n.hidden)
   .map((n) => {
@@ -267,6 +383,12 @@ try {
         if (!AS_BASE && CONTROL === 'why' && hit === '/drift-layer.js') {
           text = swap(text, "why:typeof row.why==='string'?row.why:''", "why:''", 'why');
         }
+        // the r2 gloss control: 遊ぶ's row served with its old 32-character cut
+        if (!AS_BASE && CONTROL === 'gloss' && hit === '/drift-layer.js') {
+          const row = text.match(/\["遊ぶ","あそぶ","[^"]*",5\]/gu) || [];
+          if (row.length !== 1) throw new Error(`control "gloss" did not apply: ${row.length} rows for 遊ぶ`);
+          text = swap(text, row[0], CUT_YASOBU, 'gloss');
+        }
         // the H2-1 control: put the three exclusions back, so only free-drifting words that
         // are neither focused nor in a constellation can dissolve — the base's own guard
         if (!AS_BASE && CONTROL === 'edge' && hit === '/drift-layer.js') {
@@ -281,7 +403,7 @@ try {
       /* ---------------------------------------------------------------- KH1-3, on the served bytes */
       await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi`);
       await page.waitForFunction(() => document.body.dataset.ready === '1');
-      installOracle();
+      const oracle = installOracle();
       const layer = await page.evaluate(async () => (await fetch('/drift-layer.js')).text());
       const literal = /const WBIG=(\[.*\]);/.exec(layer);
       const rows = literal ? JSON.parse(literal[1]) : [];
@@ -291,6 +413,31 @@ try {
       const headline = rows.find((row) => row[0] === '取り上げる')?.[2] || '';
       check(`${tag} · KH1-3 取り上げる carries its whole gloss, not "…to confi"`,
         !!headline && !looksClipped(headline) && !headline.endsWith('to confi'), JSON.stringify(headline));
+      // r2 · without the benefit of the doubt. The detector above calls a 32-character tail whole
+      // unless the corpus spells out a longer word beginning with it, and it takes "a" and "i" as
+      // words, so "pleasantl" and "rich i" passed it. At the old cap a gloss must PROVE it ends on
+      // a word: a known whole word of three letters or more. At any length it must not end on a
+      // separator, a space or an open parenthesis.
+      const endsOnWord = (s) => {
+        const m = /([A-Za-z][A-Za-z'-]*)[)"'’.!?]*$/u.exec(s);
+        return !!m && m[1].length >= 3 && oracle.words.has(m[1].toLowerCase());
+      };
+      const structural = (s) => /[\s([,;]$/u.test(s)
+        || (s.match(/\(/gu) || []).length > (s.match(/\)/gu) || []).length;
+      const glossRows = rows.filter((row) => Array.isArray(row) && typeof row[2] === 'string');
+      const atCap = glossRows.filter((row) => row[2].length === CLIP_CAP);
+      const unproven = glossRows.filter((row) => structural(row[2]) || (row[2].length === CLIP_CAP && !endsOnWord(row[2])));
+      check(`${tag} · KH1-3 r2 every gloss the sky is served ends on a whole word, none left at the 32-character cut`,
+        glossRows.length > 0 && unproven.length === 0,
+        `${glossRows.length} glosses, ${atCap.length} at the cap, ${unproven.length} unproven`
+        + `${unproven.length ? `: ${JSON.stringify(unproven.slice(0, 6).map((row) => [row[0], row[2]]))}` : ''}`);
+      const servedGloss = Object.fromEntries(glossRows.map((row) => [row[0], row[2]]));
+      const stillCut = Object.entries(GROK_CUT)
+        .filter(([word, tail]) => typeof servedGloss[word] !== 'string' || servedGloss[word].endsWith(tail));
+      check(`${tag} · KH1-3 r2 the sixteen glosses Grok found cut are whole or honestly cut`,
+        stillCut.length === 0,
+        `${Object.keys(GROK_CUT).length - stillCut.length} of ${Object.keys(GROK_CUT).length} repaired`
+        + `${stillCut.length ? `: ${JSON.stringify(stillCut.slice(0, 4).map(([word]) => [word, servedGloss[word] ?? null]))}` : ''}`);
 
       /* ---------------------------------------------------------------- seed his shelf */
       const now = await page.evaluate(() => Date.now());
@@ -448,6 +595,13 @@ try {
           if (!AS_BASE && CONTROL === 'curve' && hit === '/drift-layer.js') {
             text = swap(text, NEW_CURVE, OLD_CURVE, 'curve');
           }
+          // r2 controls: the fade back on the unpainted centre, or blind to the revealed lines
+          if (!AS_BASE && CONTROL === 'held' && hit === '/drift-layer.js') {
+            text = swap(text, NEW_HELD, OLD_HELD, 'held');
+          }
+          if (!AS_BASE && CONTROL === 'reveal' && hit === '/drift-layer.js') {
+            for (const [from, to] of REVEAL_LINES) text = swap(text, from, to, 'reveal');
+          }
           return route.fulfill({ status: 200, contentType: TYPE[hit.slice(hit.lastIndexOf('.'))], body: text });
         });
         const swept = await sweepSkyEdges(edgePage, host, sizeName, { x: width / 2, y: height / 2 });
@@ -463,6 +617,15 @@ try {
           `${swept.total} nodes drawn, ${swept.samples} samples, ${swept.cut.length} crossings drawn above 0 (${faintKinds})`
           + `${swept.cut.length ? `, brightest ${swept.cut[0].op}: ${JSON.stringify(swept.cut.slice(0, 4))}` : ''}`);
         await edgePage.screenshot({ path: join(out, `edges-${sizeName}-${AS_BASE ? 'base' : 'branch'}${CONTROL ? `-${CONTROL}` : ''}.png`) });
+        // r2 · the held drag, on a fresh sky
+        const held = await heldDrag(edgePage, host, width, height);
+        const heldWhere = [...new Set(held.cut.map((c) => `${c.phase}:${c.part}`))].join('+') || 'none';
+        check(`${tag} · H2-1 r2 ${sizeName} ${width}×${height}: a tapped word held and dragged past the rim draws nothing above 0 across it, finger down or after release`,
+          !!held.pick && held.readingShown && held.reached > 5 && held.samples > 0 && held.cut.length === 0,
+          `${held.pick ? held.pick.word : 'no word with a reading on the glass'} (${held.heldCls}), reading shown ${held.readingShown}, `
+          + `carried ${held.reached}px past the rim, ${held.samples} samples, ${held.cut.length} crossings above 0 (${heldWhere})`
+          + `${held.cut.length ? `, brightest ${held.cut[0].eff}: ${JSON.stringify(held.cut.slice(0, 4))}` : ''}`);
+        await edgePage.screenshot({ path: join(out, `held-${sizeName}-${AS_BASE ? 'base' : 'branch'}${CONTROL ? `-${CONTROL}` : ''}.png`) });
         check(`${tag} · H2-1 ${sizeName} no page errors`, edgeErrors.length === 0, edgeErrors.slice(0, 2).join(' | '));
         await edgeContext.close();
       }
