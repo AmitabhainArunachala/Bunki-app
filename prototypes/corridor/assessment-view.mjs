@@ -581,8 +581,10 @@ export function createAssessmentView(host) {
     group.append(node('p', 'exam-status', imported.length
       ? tx('日本語能力試験の公式問題集から、この端末に読み込んだ問題です。個人学習用で、バックアップ・同期・外部のAIには送りません。',
         'Questions from the official JLPT workbooks, imported on this device for personal study. They never go into backups, sync or an outside AI.')
-      : tx(`${level}の本物の試験は、まだありません。公式問題集から Mac で作ったファイル（.kairo-private-pack）を読み込むと、この端末だけで使えます。`,
-        `No real ${level} paper added yet. Add one from the file you make on your Mac from an official workbook (.kairo-private-pack); it stays on this device.`)));
+      // H2-fix (H2-6, Grok's H2 walk): the same three facts in a learner's words: his own workbook, made into a private file
+      // for himself, brought in here (the file picker below still takes the .kairo-private-pack file)
+      : tx(`${level}の本物の試験は、まだありません。自分の公式問題集から、自分だけが使うファイルを Mac で作り、ここで読み込みます。この端末から出ません。`,
+        `No real ${level} test here yet. If you own an official JLPT workbook, you can turn it into a private file for yourself on your Mac and bring it in here. It stays on this device.`)));
     for (const entry of imported) renderOfficialCard(group, entry);
     const label = node('label', 'chip exam-official-import');
     label.append(node('span', '', importing ? tx('確認して保存しています…', 'Checking and saving…') : tx('本物の試験を読み込む', 'Import a real test')));
