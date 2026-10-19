@@ -5504,6 +5504,20 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture.is-kanji {
   --color-muted: color-mix(in srgb, var(--color-ink) 84%, var(--color-paper));
   --color-label-2: color-mix(in srgb, var(--color-ink) 86%, var(--color-paper));
 }
+/* X-19 (Hfix-2e) · the thesaurus's quiet labels (a headword's English, "to walk"; a row's relation, "opposites") stand on
+   the reference grid's ruled lines as well as on its paper, and must read at 4.5:1 on the line. Their ink is the world's
+   own ink taken a step deeper toward it, only where the quiet ramp falls under the line (赤富士 3.9:1, 柿渋 4.3:1, 木版 4.5:1);
+   every other world keeps its quiet ink, and the shared ramp (--color-quiet, --faint) is unchanged. */
+:where(:root[data-theme='akafuji'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+  --color-thes-label: color-mix(in srgb, var(--color-ink) 84%, var(--color-paper));
+}
+:where(:root[data-theme='iwa'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+  --color-thes-label: color-mix(in srgb, var(--color-ink) 88%, var(--color-paper));
+}
+:where(:root[data-theme='keyblock'] :is(body:not([data-view='drift']), body[data-view='drift'] #sheet)) {
+  --color-thes-label: color-mix(in srgb, var(--color-ink) 80%, var(--color-paper));
+}
+:is(.thes-gloss, .thes-rel) { color: var(--color-thes-label, var(--faint)); }
 /* the picture slot's backing (seen only while a picture loads) is the world's sunk paper, not a topic's ink */
 .story-picture { background-color: var(--tone-sunk); }
 /* the shelf's Tools door: a 藍 wash dimmed up into the raised paper (it sat 13 % under the page: muddy) */
