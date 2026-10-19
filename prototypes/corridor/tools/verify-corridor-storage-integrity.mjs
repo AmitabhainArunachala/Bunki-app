@@ -651,29 +651,47 @@ const articleBlock = between(
   'const bundledArticle = (p) =>',
   '/* --------------------------------------------------- 新聞アーカイブ',
 );
+// N2 and R3 (2026-10-18): an arriving article's tokens are marked for the te-form's auxiliaries and for their place in
+// the text, and the shelf's sense sidecar is asked for once (through fetchData); the arrival runs those actual functions
+const articleArrival = definitions('pageLoads', 'DATA_RETRY_MS', 'fetchData', 'TE_FORM_AUXILIARY', 'markTeFormAuxiliaries',
+  'TOKEN_CONTEXT', 'markSenseContext', 'senseSidecarPromise', 'ensureSenseSidecar', 'READER_KANA');
 await verifiedAsync('article-rejection-http-failure-and-retry', async () => {
-  let fetches = 0;
+  let fetches = 0, sidecarFetches = 0;
   const articleContext = vm.createContext({
     window: {},
-    fetch: async () => {
+    D: {},
+    AbortController,
+    fetch: async (url) => {
+      if (url === 'data/articles/senses.json') {
+        sidecarFetches += 1;
+        return { ok: false, status: 404 };
+      }
+      assert.equal(url, 'data/articles/retry.json', 'the article is the only other request');
       fetches += 1;
       if (fetches === 1) throw new Error('network failed');
       if (fetches === 2) return { ok: false, status: 503 };
       return { ok: true, json: async () => ({ text: '本文', tokens: [{ s: '本文' }] }) };
     },
   });
-  vm.runInContext(`${articleBlock}\n;globalThis.__articleApi = { ensureArticle };`, articleContext, {
+  vm.runInContext(`${articleArrival}\n${articleBlock}\n;globalThis.__articleApi = { ensureArticle, TOKEN_CONTEXT };`, articleContext, {
     filename: 'corridor-article-block.js',
   });
-  const passage = { file: 'retry.json' };
+  const passage = { id: 'retry', file: 'retry.json' };
   await assert.rejects(articleContext.__articleApi.ensureArticle(passage), /network failed/);
   assert.equal(Object.hasOwn(passage, '_loading'), false);
   await assert.rejects(articleContext.__articleApi.ensureArticle(passage), /503/);
   assert.equal(Object.hasOwn(passage, '_loading'), false);
+  assert.equal(sidecarFetches, 0, 'a load that failed marks nothing and asks for no sidecar');
   await articleContext.__articleApi.ensureArticle(passage);
   assert.equal(fetches, 3);
   assert.equal(passage.text, '本文');
   assert.equal(Object.hasOwn(passage, '_loading'), false);
+  // the arrival's marks, made by the actual functions: the token knows its place in its article, and the sidecar is
+  // asked for once
+  const place = articleContext.__articleApi.TOKEN_CONTEXT.get(passage.tokens[0]);
+  assert.equal(place?.passage, 'retry');
+  assert.equal(place.index, 0);
+  assert.equal(sidecarFetches, 1);
 });
 
 
