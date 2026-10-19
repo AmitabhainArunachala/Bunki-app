@@ -25,6 +25,8 @@
  *       W-1: a dictionary shard that fails once is asked again, and the stage still lands on its sense;
  *   15  R3-3: さもなければかの is ば + かの (that), never ばか (idiot);
  *   16  H0-1: Today's note field shows its whole hint at 390 and 320, in English and 日本語;
+ *   19  on a fresh device the first-use word demo's slip mounts once: its read-mini-rise runs once to its end at full
+ *       opacity, and its answer comes in place (as shipped, and with the arrival stretched so the answer lands mid-rise);
  * HFIX1A_ONLY=1.ink,3. runs only the items with those row prefixes (a partial run, never an acceptance: exit 3 when green).
  * Negative controls: HFIX1A_NEGATIVE=<id> runs one item with its defect put back (the base's own lines served in place of
  * the fix, or CSS over the page) and that item's rows must go red; --controls runs every control after the plain run and
@@ -96,6 +98,8 @@ const CONTROL = {
   'seg-baka': { item: '15.', source: [['data/articles/aozora-049966-2.json',
     '{"s":"ば","b":"ば","p":"助詞","r":"ば","f":[{"t":"ば"}],"c":false,"rs":"segment"},{"s":"かの","b":"かの","p":"連体詞","r":"かの","f":[{"t":"かの"}],"c":true,"rs":"segment"}',
     '{"s":"ばか","b":"ばか","p":"名詞","r":"ばか","f":[{"t":"ばか"}],"c":true},{"s":"の","b":"の","p":"助詞","r":"の","f":[{"t":"の"}],"c":false}']] },
+  // 19 · a slip drawn again on its own word is a new element again (the base's remount)
+  remount: { item: '19.', source: [['corridor.js', '  const standing = arriving ? null : standingSlip();', '  const standing = null;']] },
   'note-hint': { item: '16.', css: '.chat-row:has(> #note-input) { flex-wrap: nowrap !important; } .chat-row > #note-input { flex: 1 !important; padding-inline: 20px !important; } .chat-row > #note-input::placeholder { font-size: var(--type-chrome) !important; }' },
   thread: { item: '3.', css: '.scale-thread { scroll-snap-type: none !important; }',
     source: [['corridor.js', '    if (delta) thread.scrollLeft = threadRest(thread, thread.scrollLeft + delta);', '    if (delta) thread.scrollLeft += delta;']] },
@@ -109,11 +113,15 @@ const check = (id, pass, detail = '') => {
   console.log(`${pass ? '  ok  ' : ' FAIL '} ${name}${detail ? `  — ${(typeof detail === 'string' ? detail : JSON.stringify(detail)).slice(0, 320)}` : ''}`);
 };
 
-async function session(browser, { width = 390, height = 844, world = 'hokusai', ui = 'bi', query = 'entry=shelf', reduced = false } = {}) {
+async function session(browser, { width = 390, height = 844, world = 'hokusai', ui = 'bi', query = 'entry=shelf', reduced = false,
+  fresh = false, css = null, init = null } = {}) {
   const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1, isMobile: true, hasTouch: true,
     reducedMotion: reduced ? 'reduce' : 'no-preference', serviceWorkers: 'block', timezoneId: 'Asia/Tokyo', colorScheme: 'light' });
   await silenceBrowserAudio(context);
-  await context.addInitScript((w) => { try { localStorage.setItem('kairo-theme', w); localStorage.setItem('kairo-word-ladder-demo-v1', '1'); } catch { /* private */ } }, world);
+  // a fresh device (item 19) has never seen the first-use word demo; every other walk has
+  await context.addInitScript(([w, seen]) => { try { localStorage.setItem('kairo-theme', w); if (seen) localStorage.setItem('kairo-word-ladder-demo-v1', '1'); } catch { /* private */ } }, [world, !fresh]);
+  if (init) await context.addInitScript(init);
+  if (css) await context.addInitScript((text) => { document.addEventListener('DOMContentLoaded', () => { const s = document.createElement('style'); s.textContent = text; document.head.append(s); }); }, css);
   const spec = control ? CONTROL[control] : null;
   const files = [...new Set((spec?.source || []).map(([f]) => f))];
   for (const file of files) await context.route(new RegExp(`/${file.replace(/[.*+?^${}()|[\]\\/]/gu, '\\$&')}(\\?.*)?$`), async (route) => {
@@ -790,6 +798,74 @@ async function itemStageInk(browser, engine) {
     b.ceremony === 'write' && b.log.includes('ink:writing') && b.log.includes('ended:input') && !b.log.includes('ended:written') && !b.errors.length, b);
 }
 
+// 19 · every #mini[data-demo] the document shows, each with its arrival sampled at every frame (as sol's VH-1 sweep observes
+// it: a MutationObserver over the document, the named CSSAnimation read-mini-rise). A copy set and removed inside one task
+// (placeFloating's inert measuring copy) is never at a frame, so never a displayed mount
+const DEMO_OBSERVER = () => {
+  const seen = new WeakSet();
+  window.__demoMounts = [];
+  const observe = () => {
+    const mini = document.querySelector('#mini[data-demo="true"]');
+    if (!mini || seen.has(mini)) return;
+    seen.add(mini);
+    const row = { at: performance.now(), frames: 0, samples: [], finished: false, superseded: false };
+    window.__demoMounts.push({ mini, row });
+    const sample = () => {
+      if (!mini.isConnected) { row.superseded = !row.finished; return; }
+      row.frames += 1;
+      const rise = mini.getAnimations().find((a) => a.animationName === 'read-mini-rise');
+      const s = { t: Math.round(performance.now() - row.at), state: rise ? rise.playState : 'none', current: rise ? Math.round(rise.currentTime ?? -1) : null,
+        opacity: Number(getComputedStyle(mini).opacity), gloss: (mini.querySelector('.mini-gloss')?.textContent || '').trim().slice(0, 24), busy: mini.getAttribute('aria-busy') };
+      if (rise) { row.named = true; row.duration = Number(rise.effect.getComputedTiming().duration); }
+      row.samples.push(s);
+      if (!rise && row.named && s.opacity === 1) { row.finished = true; row.endedAt = s.t; }
+      if (rise?.playState === 'finished' && s.opacity === 1) { row.finished = true; row.endedAt = s.t; }
+      if (row.samples.length < 400) requestAnimationFrame(sample);
+    };
+    requestAnimationFrame(sample);
+  };
+  new MutationObserver(observe).observe(document, { childList: true, subtree: true });
+};
+const ALL_WORLDS = ['sumi', 'shu', 'iwa', 'hokusai', 'akafuji', 'keyblock', 'rokusho', 'yoru', 'kaku', 'nami', 'hakuu'];
+async function itemDemoArrival(browser, engine) {
+  // 19 · on a fresh device the first-use word demo's slip is mounted once: its arrival (read-mini-rise) runs once to its end
+  // at full opacity, and what it says is brought up to its answer in place. In all eleven worlds as shipped (sol's VH-1
+  // re-judgement: at base every world, both engines, mounted it twice, the first still rising), and in two with the
+  // arrival stretched to 1.6 s so its answer lands while it rises (the change mid-arrival is required there). Reached as
+  // he reaches it: the shelf's own door to the story
+  for (const [world, stretched] of [...ALL_WORLDS.map((w) => [w, false]), ['hokusai', true], ['yoru', true]]) {
+    const { context, page, errors } = await session(browser, { world, fresh: true, init: DEMO_OBSERVER,
+      css: stretched ? '#mini { animation-duration: 1600ms !important; }' : null });
+    try {
+      const door = page.locator(`[data-passage="${STORY}"]:not([data-recommendation]) .shelf-open`).first();
+      if (await door.count()) { await door.scrollIntoViewIfNeeded(); await door.click(); }
+      else await page.evaluate((id) => window.__H1A__.open(id), STORY);
+      await page.locator('#mini[data-demo="true"] .mini-word').waitFor({ timeout: 15_000 });
+      await page.waitForFunction(() => { const m = document.querySelector('#mini[data-demo="true"]');
+        return !!m && m.getAttribute('aria-busy') !== 'true' && !m.querySelector('[data-sense-wait], .mini-wait') && window.__demoMounts.every(({ row }) => row.finished || row.superseded); },
+      null, { timeout: 15_000 }).catch(() => {});
+      await delay(400);
+      const f = await page.evaluate(() => {
+        const current = document.querySelector('#mini[data-demo="true"]');
+        const mounts = window.__demoMounts.map(({ mini, row }) => ({ current: mini === current, frames: row.frames, named: !!row.named, duration: row.duration,
+          finished: row.finished, superseded: row.superseded, endedAt: row.endedAt ?? null,
+          first: row.samples[0] || null, last: row.samples[row.samples.length - 1] || null,
+          // what it said while it rose, and once risen
+          rising: [...new Set(row.samples.filter((s) => s.state === 'running').map((s) => s.gloss))], settled: (current?.querySelector('.mini-gloss')?.textContent || '').trim() }));
+        return { mounts, seen: localStorage.getItem('kairo-word-ladder-demo-v1'), word: current?.querySelector('.mini-word')?.textContent.trim() || null,
+          theme: document.documentElement.dataset.theme || 'hokusai' };
+      });
+      const shown = f.mounts.filter((m) => m.frames > 0);
+      const one = shown.length === 1 && shown[0].current;
+      const arrival = one && shown[0].named && shown[0].finished && !shown[0].superseded && shown[0].last?.opacity === 1;
+      const answered = one && !!shown[0].settled && shown[0].settled !== '…';
+      const midway = !stretched || (one && shown[0].rising.length > 1);
+      check(`19.demo-arrival · ${engine} ${world}${stretched ? ' (arrival stretched to 1.6 s)' : ''} · the first-use demo's slip mounts once, its read-mini-rise runs once to its end at full opacity, its answer comes in place${stretched ? ' while it rises' : ''}`,
+        f.seen === '1' && f.theme === world && one && arrival && answered && midway && !errors.length, { ...f, shown: shown.length, errors });
+    } finally { await context.close(); }
+  }
+}
+
 const ITEMS = [
   { id: 'stage', prefix: '1.', run: itemStage },
   { id: 'stage-ink', prefix: '1.ink', run: itemStageInk },
@@ -807,6 +883,7 @@ const ITEMS = [
   { id: 'fetches', prefix: '14.', run: itemFetches },
   { id: 'segment', prefix: '15.', run: itemSegment },
   { id: 'note-hint', prefix: '16.', run: itemNoteHint },
+  { id: 'demo-arrival', prefix: '19.', run: itemDemoArrival },
 ];
 
 const log = { engines: {} };

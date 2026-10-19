@@ -9656,7 +9656,7 @@ function activateWordLadder(anchor, options) {
   anchor.dataset.ladderRung = 'stage';
   return visit.openStage({ restore: !!options.restore, demo: !!options.demo });
 }
-function removeMini() {
+function removeMini({ keep = null } = {}) {
   // the card's own menu goes with the card; a bar's drawer belongs to its bar, and the render that follows decides it
   // (adoptSaveMenuOwner): arriving data that redraws the page keeps it open, a page or room that goes takes it along
   if (!document.getElementById('vocabulary-list-popover')?.classList.contains('is-drawer')) closeVocabularyListPopover();
@@ -9664,7 +9664,8 @@ function removeMini() {
   // G4 · its writing ends where it stands (a stage drawn again resumes it), and its voice stops unless only redrawn
   if (slip) retireStage({ refreshing: ladderRefreshing });
   if (slip && !miniDiving && !ladderRefreshing) finishPageTransition();
-  slip?.remove();
+  // Hfix-1A (19) · a slip about to be drawn again in place (showMini's `keep`) stays where it stands
+  if (slip !== keep) slip?.remove();
   miniAnchor = null;
   miniEntry = null;
   const closing = miniOnClose;
@@ -9677,6 +9678,16 @@ function removeMini() {
 /** The slip that stands for a word now. */
 function standingSlip() {
   return document.getElementById('mini');
+}
+/** Hfix-1A (19) · a standing slip made ready to be drawn again in place: what it says goes (its content, its attributes but
+ * its id, what the slip maps hold for it), and it is drawn from nothing as a new slip is; its element, its arrival still
+ * running, its listeners and observers stay. */
+function blankSlip(card) {
+  card.replaceChildren();
+  for (const { name } of [...card.attributes]) if (name !== 'id') card.removeAttribute(name);
+  SLIP_NODE.delete(card);
+  SLIP_OWN_MEANING.delete(card);
+  return card;
 }
 /** The standing slip's headword: where the word leaves from when the slip is the door into the page. */
 function slipHeadword() {
@@ -11212,8 +11223,13 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   }
   // a fresh arrival is a move the frame sampler names; a slip drawn again on the same word (its entry arrived) is not
   const arriving = !(standingSlip() && miniAnchor === span);
+  // Hfix-1A (the lead's item 19: the first-use demo's slip began its arrival, then began it again, as its answer came) ·
+  // a slip drawn again on its own word is the same slip: one mount per arrival. What it says changes in place (its answer,
+  // its sense, a refresh); its element, its arrival (read-mini-rise) and its wiring stay, and it is seated again from what
+  // it now says
+  const standing = arriving ? null : standingSlip();
   ladderRefreshing = ladderVisit?.anchor === span;
-  try { removeMini(); } finally { ladderRefreshing = false; }
+  try { removeMini({ keep: standing }); } finally { ladderRefreshing = false; }
   const other = nodeFor || { t: kind, id: token.b };
   const { g, held, node: captureNode, state: miniState, identityHeld, heldReason = null } = kind === 'word'
     ? wordSaveFacts(token, { reader, from, record })
@@ -11223,7 +11239,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
     ladderVisit.saveFacts = save === 'none' ? () => null
       : () => ({ label, g, held, heldReason, node: captureNode, state: wordCaptureState(captureNode), identityHeld });
   }
-  const mini = el('div', null);
+  const mini = standing ? blankSlip(standing) : el('div', null);
   mini.id = 'mini';
   if (ladderVisit?.demo) mini.dataset.demo = 'true';
   mini.tabIndex = -1;
@@ -11415,7 +11431,8 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // the word's kanji, their parts and its web follow the actions, so Save is always the first thing in reach
   if (kanji) { const web = miniKanjiWeb(token.b, span); if (web) mini.append(web); }
   if (sentence) mini.append(sentence);
-  mini.addEventListener('keydown', (event) => {
+  // (a slip drawn again in place has its Escape already: the same word's)
+  if (!standing) mini.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
     event.preventDefault();
     event.stopPropagation();
@@ -11430,7 +11447,7 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   // and 音 marks in its row
   const ceremony = ladderVisit?.anchor === span
     ? ladderVisit.ceremony?.(mini, { word, label, token, kind, nodeFor, reading, actions, arriving }) : null;
-  document.body.append(mini);
+  if (!standing) document.body.append(mini);
   if (senseWaiting) { SLIP_OWN_MEANING.set(mini, String(g.m[0])); reserveSenseRoom(said, g); }
   miniAnchor = span;
   miniEntry = entryAvailable ? onEntry : null;
@@ -11589,6 +11606,15 @@ function frameFoot(onPage, fixedEdge) {
 }
 /** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
 function keepFloatingBeside(card, anchor, { follow = false } = {}) {
+  // Hfix-1A (19) · a slip drawn again in place keeps its wiring (below): it is only seated again from what it now says
+  if (card._kept?.anchor === anchor) { card._kept.again(); return; }
+  let watch = null, watched = [], last = 0, lastContent = 0;
+  card._kept = { anchor, again: () => {
+    placeFloating(card, anchorBox(anchor));
+    if (watch) { for (const band of watched) watch.unobserve(band); watched = [...card.children]; for (const band of watched) watch.observe(band); }
+    last = card.getBoundingClientRect().height;
+    lastContent = card.scrollHeight;
+  } };
   placeFloating(card, anchorBox(anchor));
   card.addEventListener('scroll', () => markCardMore(card), { passive: true });
   card.addEventListener('focusin', () => {
@@ -11608,10 +11634,11 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
   if (typeof ResizeObserver !== 'function') return;
   // Hfix-1A · a card cut to its room keeps its box when what is inside it grows (the sense arriving after "…"), so its
   // content's own height is watched too: the cut is chosen again on the rows as they now stand
-  let last = card.getBoundingClientRect().height, lastContent = card.scrollHeight;
+  last = card.getBoundingClientRect().height;
+  lastContent = card.scrollHeight;
   let grow = null, frame = 0;
   const seat = () => {
-    if (!card.isConnected || !anchor.isConnected) { watch.disconnect(); grow?.disconnect(); return; }
+    if (!card.isConnected || !anchor.isConnected) { watch?.disconnect(); grow?.disconnect(); return; }
     if (Math.abs(card.getBoundingClientRect().height - last) < 1 && Math.abs(card.scrollHeight - lastContent) < 1) return;
     placeFloating(card, anchorBox(anchor));
     last = card.getBoundingClientRect().height;
@@ -11626,12 +11653,13 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
     grow = new MutationObserver(seat);
     grow.observe(card, { childList: true, subtree: true, characterData: true });
   }
-  const watch = new ResizeObserver(() => {
+  watch = new ResizeObserver(() => {
     if (frame) return;
     frame = requestAnimationFrame(() => { frame = 0; seat(); });
   });
   watch.observe(card);
-  for (const band of card.children) watch.observe(band);
+  watched = [...card.children];
+  for (const band of watched) watch.observe(band);
 }
 
 /** A card beside its word: short cards fit above or below the fixed chrome; a tall sentence on a
