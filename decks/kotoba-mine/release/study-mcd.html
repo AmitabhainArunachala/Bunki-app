@@ -7768,7 +7768,7 @@ function onStorage(e) {
   ctx.ledgerText = e.newValue;
   // a close that is waiting on cards in a learning step counts them again; the card on screen is checked when answered
   if (ui.screen === 'home' || (ui.screen === 'study' && !ui.queue[ui.pos])) {
-    if (ui.screen === 'study') settle();
+    if (ui.screen === 'study') refreshPause();
     paint();
   }
 }
@@ -8547,6 +8547,19 @@ function settle() {
     const words = new Set(learning.map((l) => ctx.index.cards.get(l.id)?.word.id));
     ui.pause = { count: step.count, words: words.size, at: step.at, canEarly: step.canEarly };
   }
+}
+/** the close's pause, read again when a step falls due or comes within the learn-ahead limit, or another window wrote:
+ * the close stays until the learner chooses ("they will wait for you"); a step that is due now reads "due now" */
+function refreshPause() {
+  const now = new Date();
+  const learning = learningCards(now);
+  if (!learning.length) {
+    ui.pause = null;
+    return;
+  }
+  const next = Math.min(...learning.map((l) => l.due));
+  const words = new Set(learning.map((l) => ctx.index.cards.get(l.id)?.word.id));
+  ui.pause = { count: learning.length, words: words.size, at: Math.max(next, now.getTime()), canEarly: next - now.getTime() <= LEARN_AHEAD_MS };
 }
 /** the close's choice: review the cards in a learning step now (early, when they are not due yet) */
 function reviewAhead() {
@@ -10504,7 +10517,7 @@ function doneScreen() {
     if (turn > now.getTime()) {
       pauseTimer = setTimeout(() => {
         if (ui.screen === 'study' && !ui.queue[ui.pos] && ctx?.root?.isConnected) {
-          settle();
+          refreshPause();
           paint();
         }
       }, Math.min(2 ** 31 - 1, turn - now.getTime() + 50));
