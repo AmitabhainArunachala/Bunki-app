@@ -24902,7 +24902,10 @@ function wwDetail(model, section) {
       b.dataset.uiContentValue = k;
       b.append(wwLearn('span', null, k));
       b.setAttribute('aria-label', tx(`漢字「${k}」をひらく`, `Open the kanji ${k}`));
-      b.addEventListener('click', event => openWordWebLadder({ type: 'kanji', key: k }, section, b, event.detail === 0));
+      b.addEventListener('click', (event) => {
+        if (event.detail !== 0 && Date.now() < swallowClickUntil) return; // the hold's own release (Hfix-2e: a mouse's too)
+        openWordWebLadder({ type: 'kanji', key: k }, section, b, event.detail === 0);
+      });
       wireWordWebHold(b, () => ({ t: 'kanji', id: k }),
         () => openWordWebLadder({ type: 'kanji', key: k }, section, b, true, true));
       grid.append(b);
@@ -24977,32 +24980,121 @@ function openWordWebLadder(item, section, anchor, keyboard = false, redo = false
     },
   });
 }
-/** Press-and-hold (touch and pen) or right-click on a web node opens its slip in place; a hold that moves is
- * a scroll, and the hold's release never counts as the walking tap (swallowClickUntil, as the reader's menu). */
+/** Hfix-2e · the Words room's hold is the reader's hold (John, 10-19 17:19, on the Mac: "HOLDING A WORD does nothing at
+ * all"; checklist S1): a finger, a pen, or a mouse or trackpad press held still on a web node's word or kanji fills the
+ * ring from RING_MS and seals it at MENU_MS (sealWord: the 印 presses on, the word is kept, the strip opens; a second hold
+ * opens the same strip and keeps nothing twice). A mouse holds with its primary button only, never with Control (the
+ * Mac's secondary click); it has no implicit capture, so its move, release and cancel are heard on the window, and past
+ * MOVE_PX it is a drag, never a seal. A finger that moves is a scroll. The hold's release never counts as the walking tap
+ * (swallowClickUntil). A radical that is not a kanji has nothing to keep: its hold opens it in place, as before.
+ * Right-click and Shift+F10 open the node's slip, as before (comb-0's G7 reads a cut caption whole there). */
 function wireWordWebHold(button, nodeOf, activate = null) {
+  warmSealStripFaces();
   let hold = null;
-  const clear = () => { if (hold) clearTimeout(hold.timer); hold = null; };
   const open = () => {
     if (activate) { activate(); return; }
     const node = nodeOf();
     if (!node) return;
     openSlip(node, { anchor: button, from: 'lookup', redo: true });
   };
-  button.addEventListener('contextmenu', (event) => { event.preventDefault(); clear(); open(); });
+  // the identity a hold keeps is the one the node's slip saves (openSlip: the quick dictionary's record, else the kept
+  // card's own)
+  let record = null;
+  const door = {
+    get target() { const node = nodeOf(); return node ? { kind: node.t, id: node.id } : null; },
+    get label() { return nodeOf()?.id || ''; },
+    get copyText() { return nodeOf()?.id || ''; },
+    get entryAvailable() { const node = nodeOf(); return !!node && (node.t === 'word' ? !!record : !!D.kanji?.[node.id]); },
+    prepare: async () => {
+      const node = nodeOf();
+      if (!node) return false;
+      record = node.t === 'word' ? lookup(node.id) || savedNodeRecord(node) || null : null;
+    },
+    save: () => {
+      const node = nodeOf();
+      if (!node) return null;
+      if (node.t !== 'word') return { g: null, held: false, node, state: wordCaptureState(node), identityHeld: false };
+      return wordSaveFacts({ s: node.id, b: node.id, r: record?.r || '', c: !!record }, { record });
+    },
+    quickLook: () => open(),
+    openEntry: (modality) => { const node = nodeOf(); if (node) go(node, { invoker: button, instant: modality === 'keyboard' }); },
+    reopen: () => open(),
+  };
+  // a committed mouse hold keeps no text selected: the press was a hold, not the start of a drag
+  const unselect = () => {
+    const selection = typeof getSelection === 'function' ? getSelection() : null;
+    if (selection && !selection.isCollapsed && selection.containsNode?.(button, true)) selection.removeAllRanges();
+  };
+  const clear = () => {
+    const h = hold;
+    if (!h) return;
+    hold = null;
+    clearTimeout(h.timer);
+    clearTimeout(h.ringTimer);
+    window.removeEventListener('pointerdown', h.other, true);
+    h.unwatch?.();
+    if (!h.committed) h.ring?.cancel();
+  };
+  const commit = (h) => {
+    if (hold !== h || h.committed) return;
+    h.committed = Date.now();
+    clearTimeout(h.timer);
+    clearTimeout(h.ringTimer);
+    // the release may synthesise a click: it belongs to the hold, never to the walk
+    swallowClickUntil = Date.now() + 700;
+    if (h.mouse) unselect();
+    if (!nodeOf()) { open(); return; }
+    void sealWord(button, door, { ring: h.ring });
+  };
+  const moved = (event) => {
+    if (!hold || event.pointerId !== hold.start.id) return;
+    if (hold.committed) { if (hold.mouse) unselect(); return; }
+    if (Math.hypot(event.clientX - hold.start.x, event.clientY - hold.start.y) > GESTURE.MOVE_PX) clear();
+  };
+  const released = (event) => {
+    if (!hold || event.pointerId !== hold.start.id) return;
+    if (hold.committed) swallowClickUntil = Date.now() + 700;
+    clear();
+  };
+  button.addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+    // a touch hold some engines also report as a contextmenu is the same hold: one seal, never two
+    if (hold && !hold.committed && event.pointerType !== 'mouse') { commit(hold); return; }
+    if (hold?.committed && Date.now() - hold.committed < 1200) return;
+    clear();
+    open();
+  });
   button.addEventListener('pointerdown', (event) => {
     clear();
-    if (event.pointerType === 'mouse' || event.isPrimary === false) return;
-    hold = { start: { x: event.clientX, y: event.clientY }, timer: setTimeout(() => {
-      hold = null;
-      swallowClickUntil = Date.now() + 700;
-      open();
-    }, GESTURE.MENU_MS) };
+    if (event.isPrimary === false) return;
+    const mouse = event.pointerType === 'mouse';
+    if (mouse && (event.button !== 0 || event.ctrlKey)) return;
+    const start = { x: event.clientX, y: event.clientY, id: event.pointerId };
+    const h = { start, ring: null, committed: 0, mouse };
+    h.other = (other) => { if (other.pointerId !== start.id && hold === h && !h.committed) clear(); };
+    window.addEventListener('pointerdown', h.other, true);
+    if (mouse) {
+      const lost = () => clear();
+      window.addEventListener('pointermove', moved, true);
+      window.addEventListener('pointerup', released, true);
+      window.addEventListener('pointercancel', lost, true);
+      window.addEventListener('blur', lost);
+      h.unwatch = () => {
+        window.removeEventListener('pointermove', moved, true);
+        window.removeEventListener('pointerup', released, true);
+        window.removeEventListener('pointercancel', lost, true);
+        window.removeEventListener('blur', lost);
+      };
+    }
+    if (nodeOf()) h.ringTimer = setTimeout(() => { if (hold === h && !h.committed) h.ring = holdRing(start.x, start.y); }, GESTURE.RING_MS);
+    h.timer = setTimeout(() => commit(h), GESTURE.MENU_MS);
+    hold = h;
   });
-  button.addEventListener('pointermove', (event) => {
-    if (hold && Math.hypot(event.clientX - hold.start.x, event.clientY - hold.start.y) > GESTURE.MOVE_PX) clear();
+  button.addEventListener('pointermove', moved);
+  button.addEventListener('pointerup', released);
+  button.addEventListener('pointercancel', (event) => {
+    if (hold && event.pointerId === hold.start.id) clear();
   });
-  button.addEventListener('pointerup', clear);
-  button.addEventListener('pointercancel', clear);
   button.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && document.getElementById('mini')) { event.preventDefault(); event.stopPropagation(); removeMini(); return; }
     if (event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey)) { event.preventDefault(); open(); }
