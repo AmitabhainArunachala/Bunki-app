@@ -279,8 +279,23 @@ async function exportUi(fixture, label) {
 async function importUi(fixture, file) {
   if (!await fixture.page.locator('#import-file').count()) { await shelf(fixture); await fixture.page.locator('#tray').click(); }
   const timeOrigin = await fixture.page.evaluate(() => performance.timeOrigin);
-  await fixture.page.locator('#import-file').setInputFiles(file);
-  await fixture.page.waitForFunction((prior) => performance.timeOrigin !== prior && document.body.dataset.ready === '1', timeOrigin, { timeout: 20000 });
+  // Every restore now asks the learner to confirm first (Hfix-2a, 71907eb2). Accept exactly that confirmation, as
+  // record-fixture-support's selectBackupFile does; any other dialog fails the row. The one 20 s wait is unchanged.
+  let problem;
+  const confirm = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  fixture.page.on('dialog', confirm);
+  try {
+    await fixture.page.locator('#import-file').setInputFiles(file);
+    await fixture.page.waitForFunction((prior) => performance.timeOrigin !== prior && document.body.dataset.ready === '1', timeOrigin, { timeout: 20000 });
+    if (problem) throw problem;
+  } finally { fixture.page.off('dialog', confirm); }
   await tutor(fixture);
 }
 async function pendingQuestion(fixture, contextRef, question, reply, fail = false) {
