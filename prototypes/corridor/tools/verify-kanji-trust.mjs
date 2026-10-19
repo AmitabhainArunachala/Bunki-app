@@ -11,6 +11,10 @@
  *   K05-frequency              1001–2501 counts 1,150, all 1,150 reachable; Back from the last lands on the
  *                              same band, still open, at the same place.
  *   K05-reading-all            た: every counted hit reachable.
+ *   K05-nested-return          た, all shown → the last hit → its search icon → なま → Back, close: the finder is
+ *                              た again, every hit shown, at the same place.
+ *   K05-nested-search-page     the same in the search room: reading た → the last hit → its search icon → meaning
+ *                              "water" → Back, close: the reading lens, た, every hit shown, at the same place.
  *   K05-idioms                 一: as many idioms reachable as the heading counts (135).
  *   K05-parts                  父 found by 父 and by ちち though it is used in fewer than 8 kanji.
  *   K06-load                   a failed first load of the frequency table, the Kodansha table and the complete
@@ -24,7 +28,7 @@
  *                              retake both stay reachable ("last time" shown); 鹿 (7級's tail) has a lesson;
  *                              nothing is enrolled.
  * Controls (`--control <name>`, in-memory page.route edits, no disk copies) must turn their rows red:
- *   recap-browse · refilter-kkld · drop-official-reading · failed-lesson-disappears.
+ *   recap-browse · refilter-kkld · drop-official-reading · forget-finder · failed-lesson-disappears.
  * Usage: KAIRO_SITE_DIR=<site> KAIRO_ARTIFACT_SHA256=<digest> KAIRO_EVIDENCE_DIR=<dir>
  *        [KAIRO_BROWSER=webkit|chromium|all] [--shots] [--control <name>] node verify-kanji-trust.mjs
  */
@@ -76,6 +80,8 @@ const CONTROLS = {
       row[2] = row[2].filter((reading) => !['う.まれる', 'うま.れる', 'う.まれ', 'うまれ'].includes(reading));
       return JSON.stringify(doc);
     } },
+  'forget-finder': { rows: ['K05-nested-return', 'K05-nested-search-page'], file: 'corridor.js',
+    edit: (text) => replaceOnce(text, 'kdx: home.kdx || undefined, searchLens: home.searchLens,', '') },
   'failed-lesson-disappears': { rows: ['K08-lessons'], file: 'corridor.js',
     edit: (text) => replaceOnce(text, 'const shown = all ? plan : plan.filter((l) => again.has(l) || next.includes(l));', 'const shown = all ? plan.filter((l) => !S.lessonsDone[l.id]) : plan.filter((l) => next.includes(l));') },
 };
@@ -139,6 +145,29 @@ async function closeSheet(page) {
   const selector = (await page.locator('#sheet-close').isVisible()) ? '#sheet-close' : '#sheet-back';
   await page.locator(selector).click();
   await settle(page, 600);
+}
+/** A reading search with every hit shown, then its last hit opened from where it lies on the page. */
+async function expandedReadingResults(page, query) {
+  await readingSearch(page, query);
+  const more = page.locator('#kdx-results [data-kdx-more]');
+  if (await more.count()) await more.click();
+  await settle(page, 400);
+  const shown = await glyphsIn(page, '#kdx-results');
+  const last = page.locator(`#kdx-results .kdx-glyph[data-kdx-hit="${shown.at(-1)}"]`);
+  await last.scrollIntoViewIfNeeded();
+  await settle(page, 300);
+  const y = await page.evaluate(() => window.scrollY);
+  await last.click();
+  await page.locator('#sheet .hero-glyph').waitFor();
+  await settle(page, 500);
+  return { shown, y };
+}
+/** Back from a search opened on an entry, then the entry closed: the finder as it now stands. */
+async function backToFinder(page) {
+  await page.locator('#back').click();
+  await settle(page, 900);
+  if (await page.locator('#sheet').isVisible()) await closeSheet(page);
+  return { query: await page.inputValue('#kdx-textfield'), shown: (await glyphsIn(page, '#kdx-results')).length, y: await page.evaluate(() => window.scrollY) };
 }
 const plain = (reading) => reading.replace(/[.\-*\s]/g, '');
 const kindOf = (reading) => (/[ァ-ヺ]/.test(reading) ? 'on' : 'kun');
@@ -275,6 +304,37 @@ const ROWS = {
     const all = (await glyphsIn(page, '#kdx-results')).length;
     assert(count > 200 && all === count, `た: counted ${count}, first ${first}, reachable ${all}`);
     return `た: ${count} counted, first page ${first}, all ${all} reachable`;
+  },
+  async 'K05-nested-return'({ page }) {
+    await lens(page, 'by reading');
+    await readingsArrived(page);
+    const outer = await expandedReadingResults(page, 'た');
+    await page.locator('#sheet-search').click();
+    await page.locator('[data-search-lens="reading"]').click();
+    await settle(page, 300);
+    await readingSearch(page, 'なま');
+    const nested = (await glyphsIn(page, 'main')).length;
+    const back = await backToFinder(page);
+    assert(back.query === 'た' && back.shown === outer.shown.length && Math.abs(back.y - outer.y) <= 4,
+      `back from なま (${nested} hits): query "${back.query}", ${back.shown} of ${outer.shown.length} shown, scroll ${outer.y}→${back.y}`);
+    return `た: ${outer.shown.length} shown → ${outer.shown.at(-1)} → its search icon → なま (${nested}) → Back, close: "${back.query}", ${back.shown} shown, scroll ${outer.y}→${back.y}`;
+  },
+  async 'K05-nested-search-page'({ page }) {
+    await page.locator('#chrome-search').click();
+    await page.locator('[data-search-lens="reading"]').click();
+    await readingsArrived(page);
+    const outer = await expandedReadingResults(page, 'た');
+    await page.locator('#sheet-search').click();
+    await page.locator('[data-search-lens="meaning"]').click();
+    await settle(page, 300);
+    await page.locator('#kdx-textfield').fill('water');
+    await settle(page, 500);
+    const nested = (await glyphsIn(page, 'main')).length;
+    const back = await backToFinder(page);
+    const lensOn = await page.locator('[data-search-lens="reading"][aria-pressed="true"]').count();
+    assert(lensOn && back.query === 'た' && back.shown === outer.shown.length && Math.abs(back.y - outer.y) <= 4,
+      `back from meaning "water" (${nested} hits): reading lens ${lensOn}, query "${back.query}", ${back.shown} of ${outer.shown.length} shown, scroll ${outer.y}→${back.y}`);
+    return `search room, reading た: ${outer.shown.length} shown → ${outer.shown.at(-1)} → its search icon → meaning "water" (${nested}) → Back, close: reading lens, "${back.query}", ${back.shown} shown, scroll ${outer.y}→${back.y}`;
   },
   async 'K05-idioms'({ page }) {
     await openEntry(page, '一');

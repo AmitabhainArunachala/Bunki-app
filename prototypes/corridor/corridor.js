@@ -5876,6 +5876,9 @@ function keepNavigationReturn(destination, invoker = document.activeElement) {
     searchFrom: S.searchFrom, navQ: S.navQ, navSourceContext: S.navSourceContext,
     referenceState: referenceLibrary ? { ...referenceLibrary.state } : null,
     pendingReferenceCollection: S.view === 'levels' ? pendingReferenceCollection : null,
+    // K05 · the 字引 finder and the search room's lenses share one query (S.kdx): a search opened from an entry
+    // changes it, so the frame keeps the finder as it was (query, lens, show-all) for the return to put back
+    kdx: S.kdx ? JSON.parse(JSON.stringify(S.kdx)) : null, searchLens: S.searchLens,
   });
   S.stack = [];
   S.dialogInvoker = null;
@@ -5905,6 +5908,7 @@ function returnFromNavigation() {
     scaleVisit: home.scaleVisit && home.scaleVisit.recordEpoch === recordEpoch ? home.scaleVisit : null,
     passageId: home.passageId, readerScroll: home.readerScroll, readerTake: home.readerTake,
     searchFrom: home.searchFrom, navQ: home.navQ, navSourceContext: home.navSourceContext,
+    kdx: home.kdx || undefined, searchLens: home.searchLens,
     sheetReturnFocus: home.stack.at(-1)?.returnFocus || null,
   });
   render();
