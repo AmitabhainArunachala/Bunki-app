@@ -140,8 +140,8 @@ async function fields() {
     await boot(s.page, '?room=me&ui=bi');
     await s.page.locator('[data-horizon="field-india"]').waitFor({ timeout: 20_000 });
     const en = await notes();
-    await s.page.locator('[data-horizon="field-india"]').scrollIntoViewIfNeeded();
-    await sleep(300);
+    await s.page.evaluate(() => document.querySelector('[data-horizon="field-india"]').scrollIntoView({ block: 'center' }));
+    await sleep(400);
     await shot(s.page, `${MAIN.name}-H2-4-fields-en`);
     await boot(s.page, '?room=me&ui=ja');
     await s.page.locator('[data-horizon="field-india"]').waitFor({ timeout: 20_000 });
@@ -182,6 +182,10 @@ async function report(size) {
     await sleep(500);
     const withDetails = await actions();
     await shot(page, `${size.name}-H2-5-report-details`);
+    // the plain words themselves, in view above the foot
+    await page.evaluate(() => (document.querySelector('#br-form .br-sent') || document.querySelector('#br-form .br-details pre'))?.scrollIntoView({ block: 'center' }));
+    await sleep(300);
+    await shot(page, `${size.name}-H2-5-report-details-words`);
     row('H2-5', `${size.name} · Send and Return to lesson stand whole on the glass, at open and with Details open`,
       whole(atOpen) && whole(withDetails), { atOpen, withDetails });
     const details = await page.evaluate(() => {
@@ -237,7 +241,7 @@ async function report(size) {
     await sleep(400);
     const unstuck = await actions();
     row('H2-5', `${size.name} · negative control · with the foot unstuck and Details open, the actions leave the glass`,
-      hasFoot ? !whole(unstuck) : 'n/a (no foot on this build)', { hasFoot, unstuck });
+      hasFoot ? !whole(unstuck) : 'n/a', { hasFoot, unstuck, ...(hasFoot ? {} : { why: 'no foot on this build' }) });
     row('H2-5', `${size.name} · control · no page error, nothing left the site`, !s.seen.pageErrors.length && !s.seen.external.length, s.seen);
   } finally { await s.close(); }
 }
