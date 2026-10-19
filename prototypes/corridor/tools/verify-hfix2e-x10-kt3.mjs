@@ -131,15 +131,19 @@ async function openStory(page) {
   await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 20_000 });
   await settle(page, 700);
 }
-// the ladder to the card: the reading first where the dial raises it, then the card
+// the ladder to the card, one rung a press: the reading where the dial raises it and, once Ladder is woven, the English
+// under the word; a word at its stage rung has its card on the way (a further press would dive into its page)
 async function openCard(page) {
   const tok = page.locator(WORD_SEL).first();
   await tok.scrollIntoViewIfNeeded();
   await delay(200);
-  await press(tok);
-  const rung = await page.waitForFunction((el) => (document.getElementById('mini') ? 'stage' : el.dataset.ladderRung === 'reading' ? 'reading' : null),
-    await tok.elementHandle(), { timeout: 8000 }).then((h) => h.jsonValue()).catch(() => null);
-  if (rung === 'reading') await press(tok);
+  for (let presses = 0; presses < 4; presses++) {
+    const was = await tok.getAttribute('data-ladder-rung');
+    if (was === 'stage' || await page.locator('#mini').count()) break;
+    await press(tok);
+    await page.waitForFunction(([el, before]) => !!document.getElementById('mini') || (el.dataset.ladderRung || null) !== before,
+      [await tok.elementHandle(), was], { timeout: 8000 }).catch(() => {});
+  }
   await page.locator('#mini .mini-word').waitFor({ timeout: 10_000 });
   await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 12_000 }).catch(() => {});
   await settle(page, 500);
