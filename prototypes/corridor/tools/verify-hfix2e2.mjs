@@ -54,6 +54,9 @@ assert(['base', 'branch', 'control'].includes(mode), `unknown HFIX2E2_MODE ${mod
 const CONTROL = process.env.HFIX2E2_CONTROL || '';
 assert(mode === 'control' ? ['x13', 'fade', 'seat', 'nami'].includes(CONTROL) : !CONTROL, 'HFIX2E2_CONTROL names one control, and only in control mode');
 const BASE_SHA = process.env.HFIX2E2_BASE_SHA || '1f790977';
+// HFIX2E2_SERVE_DIR: serve this build's two files from a directory instead of the site's own (a check of this lane's change
+// on another lane's build before the two are merged, e.g. Ladder's site with this lane's hunks applied to its two files)
+const SERVE_DIR = process.env.HFIX2E2_SERVE_DIR || '';
 const ONLY = (process.env.HFIX2E2_CASE || '').split(',').map((s) => s.trim()).filter(Boolean);
 assert(ONLY.every((c) => ['X13', 'G61', 'NAMI'].includes(c)), `unknown HFIX2E2_CASE ${ONLY}`);
 const runs = (item) => !ONLY.length || ONLY.includes(item);
@@ -87,12 +90,13 @@ const mutated = [];
  * A control that does not apply exactly once is an error, never a silent green. */
 function served(file, text, bytes) {
   if (bytes === 'base') return atBase(file);
-  let body = text;
+  const own = SERVE_DIR ? readFileSync(join(SERVE_DIR, file), 'utf8') : text;
+  let body = own;
   if (bytes === 'control') for (const [f, from, to] of MUTATIONS[CONTROL]) {
     if (f !== file) continue;
     assert.equal(body.split(from).length, 2, `control ${CONTROL}: "${from.slice(0, 60)}" must be in ${file} exactly once`);
     body = body.replace(from, to);
-    mutated.push({ control: CONTROL, file, original: sha(text), served: sha(body) });
+    mutated.push({ control: CONTROL, file, original: sha(own), served: sha(body) });
   }
   return body;
 }
@@ -109,7 +113,7 @@ const host = await startCorridorDev(0);
 const browser = await ({ webkit, chromium }[engine]).launch();
 const version = browser.version();
 const results = [];
-console.log(`engine ${engine} ${version} · mode ${mode}${CONTROL ? ` (${CONTROL})` : ''} · build ${identity.gitSha} · artifact ${identity.artifactSha256}`);
+console.log(`engine ${engine} ${version} · mode ${mode}${CONTROL ? ` (${CONTROL})` : ''} · build ${identity.gitSha} · artifact ${identity.artifactSha256}${SERVE_DIR ? ` · its two files served from ${SERVE_DIR}` : ''} · base ${BASE_SHA}`);
 console.log(`load at start: ${load()}`);
 
 const PHONE = { isMobile: true, hasTouch: true, deviceScaleFactor: 2 };
@@ -558,7 +562,7 @@ function nami() {
     "viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false, deviceScaleFactor: DPR, serviceWorkers: 'block', reducedMotion: 'reduce', colorScheme: 'light' }");
   // the two files this lane changed, served at the base (base mode) or with the control's defect (control mode)
   const originRoute = "await context.route('**/*', (route) => (new URL(route.request().url()).origin === origin ? route.continue() : route.abort()));";
-  if (BYTES !== 'branch') {
+  if (BYTES !== 'branch' || SERVE_DIR) {
     const swapped = served('editorial.css', readFileSync(join(process.env.KAIRO_SITE_DIR, 'editorial.css'), 'utf8'), BYTES);
     const file = join(out, `editorial-${BYTES}.css`);
     writeFileSync(file, swapped);
@@ -572,7 +576,7 @@ function nami() {
   // the four slots, each in nami: the shelf tools at rest and under a pointer on the idioms door; the sentence's page at
   // its examples, at rest and under a pointer on "Practice it"
   once('/* ------------------------------------------------------------------ run */', `
-const ORIGINAL = { reader: STEPS.reader, slip: STEPS.slip, page: STEPS.page, examples: STEPS['page-examples'] };
+const ORIGINAL = { reader: STEPS.reader, examples: STEPS['page-examples'] };
 const nowhere = async (page) => { await page.mouse.move(1, Math.round((await page.evaluate(() => innerHeight)) / 2)); };
 const tools = async (page, hover) => {
   await page.goto(origin + '/index.html?entry=shelf&ui=bi'); await ready(page);
@@ -584,14 +588,18 @@ const tools = async (page, hover) => {
 const practice = async (page, hover) => {
   await page.goto(origin + '/index.html?entry=shelf&ui=bi'); await ready(page);
   await ORIGINAL.reader(page);
-  if (${NAMI_VIEWPORT === 'desktop'}) {
-    // the Mac: the same walk with a mouse (the sweep's own slip step taps)
-    const word = page.locator('#reader .tok[data-prose-label="' + WORD + '"]').first();
-    for (let i = 0; i < 3 && !(await page.locator('#mini').count()); i += 1) { await word.click(); await page.waitForTimeout(500); }
-    await page.locator('#mini .mini-word').waitFor({ timeout: 15000 }); await settle(page, 1300);
-    await page.locator('#mini .mini-word').click();
-    await page.locator('#sheet').waitFor({ timeout: 15000 }); await settle(page, 600);
-  } else { await ORIGINAL.slip(page); await ORIGINAL.page(page); }
+  // the word climbs its ladder one press a rung until its box stands (the reading, then, once Ladder's English rung is
+  // woven, the English under it), then its headword opens the page: a finger on the phone, a mouse on the Mac
+  const desktop = ${NAMI_VIEWPORT === 'desktop'};
+  const press = (locator) => (desktop ? locator.click() : locator.tap());
+  const word = page.locator('#reader .tok[data-prose-label="' + WORD + '"]').first();
+  for (let i = 0; i < 4 && !(await page.locator('#mini').count()); i += 1) { await press(word); await page.waitForTimeout(600); }
+  await page.locator('#mini .mini-word').waitFor({ timeout: 15000 }); await settle(page, 1300);
+  // the sweep's own page step, with the device's own press
+  await press(page.locator('#mini .mini-word'));
+  await page.locator('#sheet').waitFor({ timeout: 15000 });
+  await page.waitForFunction(() => !document.querySelector('.cut-word') && !document.getAnimations().some((a) => a.id === 'kairo-cut' || String(a.effect?.pseudoElement || '').startsWith('::view-transition')), null, { timeout: 5000 }).catch(() => {});
+  await settle(page, 600);
   await ORIGINAL.examples(page);
   await page.locator('#entry-sentence-practice').scrollIntoViewIfNeeded();
   if (hover) await page.locator('#entry-sentence-practice').hover(); else await nowhere(page);
@@ -602,7 +610,7 @@ STEPS.words = (page) => tools(page, true);
 STEPS.speak = (page) => practice(page, false);
 STEPS['speak-key'] = (page) => practice(page, true);
 /* ------------------------------------------------------------------ run */`);
-  if (BYTES !== 'branch') once("writeFileSync(join(evidence, 'contrast-sweep.json'), JSON.stringify(report, null, 1));",
+  if (BYTES !== 'branch' || SERVE_DIR) once("writeFileSync(join(evidence, 'contrast-sweep.json'), JSON.stringify(report, null, 1));",
     "report.hfix2e2Swaps = globalThis.__hfix2e2Swaps || 0; writeFileSync(join(evidence, 'contrast-sweep.json'), JSON.stringify(report, null, 1));");
   const runner = join(out, 'hfix2e2-nami-runner.mjs');
   writeFileSync(runner, adapted);
@@ -610,7 +618,7 @@ STEPS['speak-key'] = (page) => practice(page, true);
   const child = spawnSync(process.execPath, [runner], { stdio: 'inherit', env: { ...process.env, SWEEP_WORLDS: 'nami', SWEEP_STATES: 'learn,words,speak,speak-key' } });
   if (child.error) throw child.error;
   const report = JSON.parse(readFileSync(join(out, `sweep-${engine}.json`), 'utf8'));
-  const swaps = BYTES === 'branch' ? null : JSON.parse(readFileSync(join(out, 'contrast-sweep.json'), 'utf8')).hfix2e2Swaps;
+  const swaps = BYTES === 'branch' && !SERVE_DIR ? null : JSON.parse(readFileSync(join(out, 'contrast-sweep.json'), 'utf8')).hfix2e2Swaps;
   const slots = { learn: ['tools', 'rest', 'button#yoji-link > span.l-ja'], words: ['tools', 'pointer', 'button#yoji-link > span.l-ja'],
     speak: ['practice', 'rest', 'button#entry-sentence-practice > span.l-ja'], 'speak-key': ['practice', 'pointer', 'button#entry-sentence-practice > span.l-ja'] };
   const found = {};
@@ -628,7 +636,7 @@ STEPS['speak-key'] = (page) => practice(page, true);
   for (const [key, label] of [['tools', 'the idioms label on the shelf tools\' door'], ['practice', '"Practice it"']]) {
     for (const how of ['rest', 'pointer']) {
       const f = found[`${key}.${how}`];
-      const ok = !!f && f.ratio >= 4.6 && (BYTES === 'branch' || swaps > 0);
+      const ok = !!f && f.ratio >= 4.6 && ((BYTES === 'branch' && !SERVE_DIR) || swaps > 0);
       results.push({ name: `NAMI.${key}.${how} · ${engine} ${NAMI_VIEWPORT === 'desktop' ? '1440×900' : '390×844'} · in nami ${label} reads 4.6:1 or more ${how === 'rest' ? 'at rest' : 'under a pointer'}`, item: 'NAMI', pass: ok,
         detail: { ...f, siblings: found[`${key}.${how}.siblings`] }, error: ok ? null : `measured ${JSON.stringify(f)}`, before, after: load() });
       console.log(`${ok ? '  ok  ' : ' FAIL '} NAMI.${key}.${how} · ${engine} · ${f ? `${f.ratio} (${f.fg} on ${f.bg})` : 'not measured'}`);
@@ -651,6 +659,7 @@ if (runs('NAMI')) nami();
 const counted = results.filter((r) => !/^(G61\.trace|NAMI\.sweep) /u.test(r.name));
 const green = counted.filter((r) => r.pass).length;
 const report = { engine, version, mode, control: CONTROL || null, base: BASE_SHA, only: ONLY, build: identity.gitSha, artifact: identity.artifactSha256,
+  serveDir: SERVE_DIR || null, served: SERVE_DIR ? Object.fromEntries(Object.keys(FILES).map((f) => [f, sha(readFileSync(join(SERVE_DIR, f), 'utf8'))])) : null,
   mutations: mutated.filter((m, i, all) => all.findIndex((n) => n.file === m.file && n.served === m.served) === i), rows: results, green, total: counted.length,
   loadAtEnd: load() };
 writeFileSync(join(out, `hfix2e2-${engine}-${mode}${CONTROL ? `-${CONTROL}` : ''}.json`), `${JSON.stringify(report, null, 2)}\n`);
