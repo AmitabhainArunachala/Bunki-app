@@ -6063,3 +6063,4 @@ body.ginga #app > .scale-thread { position: fixed; left: 0; top: calc(56px + env
 .ww-reading-choices .ww-reading-choice { display: block; max-width: 100%; margin-block: .5rem; white-space: normal; text-align: start; }
 /* The choices sit on the room's paper, without the generic note/chip tint. */
 body .ww .ww-reading-choices > :is(.note, .ww-reading-choice) { background: transparent; box-shadow: none; }
+body .ww .ww-reading-choices > .note { color: var(--color-ink); }
