@@ -23318,11 +23318,19 @@ function renderSkipLookup(host, options = {}) {
 function kdxGridShown(chars, cap, open) {
   return open ? chars : chars.slice(0, cap);
 }
+/** Hfix-2e (KT-3) · a grid glyph's name says the kanji itself, then its meaning (「稿 — draft」), with the reading its
+ * grid found it by where it has one (「食 たべる — eat」): the gloss alone hid the glyph from VoiceOver. A kanji the
+ * lessons lack keeps its reference meaning. */
+function kdxGlyphName(c, reading = '') {
+  const gloss = String((D.kanji[c] || kanjiReference(c))?.m || '').toLowerCase();
+  const head = reading ? `${c} ${reading}` : c;
+  return gloss ? `${head} — ${gloss}` : head;
+}
 /** The shared results grid — every hit opens the same kanji entry. The count is the true one, and a grid longer
  * than its first page carries one "show all" door (K05). `key` names the query: an opened grid stays open for that
  * query in this session (S.kdx, never the record), so Back from an entry lands on the same place. `empty: false`
  * leaves out the no-match line when the lookup itself is not complete (a failure is not a no-match, K06). */
-function renderKdxGrid(host, chars, CAP = 200, key = '', { empty = true, mark = null } = {}) {
+function renderKdxGrid(host, chars, CAP = 200, key = '', { empty = true, mark = null, readingOf = null } = {}) {
   const open = !!key && S.kdx?.open === key;
   const heading = (shown) => tx(`見つかった字 — ${chars.length}`, shown < chars.length
     ? `${chars.length.toLocaleString('en')} found — first ${shown} shown` : `${chars.length.toLocaleString('en')} found`);
@@ -23339,7 +23347,7 @@ function renderKdxGrid(host, chars, CAP = 200, key = '', { empty = true, mark = 
       const b = el('button', 'kdx-glyph', c);
       b.type = 'button';
       b.dataset.kdxHit = c;
-      if (D.kanji[c]) b.setAttribute('aria-label', D.kanji[c].m);
+      b.setAttribute('aria-label', kdxGlyphName(c, readingOf?.(c) || ''));
       mark?.(b, c);
       b.addEventListener('click', () => go({ t: 'kanji', id: c }));
       grid.append(b);
@@ -23869,7 +23877,13 @@ function kdxTextResults(kind) {
         wrap.append(retry);
       }
     }
-    renderKdxGrid(wrap, chars, 200, `reading:${qh}`, { empty: state === 'complete' });
+    // Hfix-2e (KT-3) · each glyph's name carries the reading it was found by (た.べる is said たべる)
+    const readingOf = (c) => {
+      const k = kanjiReference(c) || D.kanji[c];
+      const hit = [...(k?.on || []), ...(k?.kun || [])].find((r) => helpers.readingMatch([r], qh) === rank.get(c));
+      return hit ? String(hit).replace(/[.\-]/gu, '') : '';
+    };
+    renderKdxGrid(wrap, chars, 200, `reading:${qh}`, { empty: state === 'complete', readingOf });
     return wrap;
   }
   const ql = q.toLowerCase();
@@ -23973,7 +23987,7 @@ function kdxDrawResults(chars) {
   for (const c of chars) {
     const b = el('button', 'kdx-glyph', c);
     b.type = 'button';
-    if (D.kanji[c]) b.setAttribute('aria-label', D.kanji[c].m);
+    b.setAttribute('aria-label', kdxGlyphName(c));
     b.addEventListener('click', () => go({ t: 'kanji', id: c }));
     grid.append(b);
   }
