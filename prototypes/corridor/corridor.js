@@ -40084,16 +40084,13 @@ const ME_DECKS = [
  * is labelled expected until jlpt.jp announces it. Each field counts only what he holds by recall
  * from the fields deck's own group for it (deck.json words[].group). */
 const ME_N1_SITTING = { year: 2027, month: 6 };
-/* H2-fix (H2-4, Grok's H2 walk): each note is the rest of his own sentence for that field, said so it is true under its
- * heading. His india words, "Yoga and Buddhism and Jain and Hindu history rooted in Japanese history and tied in to modern
- * neuroscience", lost their subject when split, and the note read as if the field were Japanese history. */
 const ME_FIELDS = [
   { id: 'mind', ja: '学習心理学', en: 'Learning psychology',
     noteJa: '神経可塑性・学ぶことを学ぶ・人間の可能性', noteEn: 'Neuroplasticity, learning about learning, human potential' },
   { id: 'india', ja: 'ヨーガ・仏教・ジャイナ教・ヒンドゥー教の歴史', en: 'Yoga, Buddhism, Jain and Hindu history',
-    noteJa: '日本にどう根づいたか、現代の脳科学とどうつながるか', noteEn: 'How they took root in Japan, and their ties to modern neuroscience' },
+    noteJa: '日本の歴史に根ざし、現代の脳科学につながる', noteEn: 'Rooted in Japanese history, tied to modern neuroscience' },
   { id: 'ai', ja: '半導体・AI・投資', en: 'Semiconductors, AI and investing',
-    noteJa: 'そして、ホフスタッター・再帰・計算機科学・テクノロジー', noteEn: 'Also Hofstadter, recursion, computer science and tech' },
+    noteJa: 'ホフスタッター・再帰・計算機科学・テクノロジー', noteEn: 'Hofstadter, recursion, computer science and tech' },
 ];
 /** The July sitting: the first Sunday of July in the goal year, local midnight. */
 function meN1Sitting() {

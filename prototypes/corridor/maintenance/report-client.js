@@ -613,8 +613,8 @@
       diagnostics = diagnostics && typeof diagnostics === 'object' ? diagnostics : {};
       const version = clip(diagnostics.app_version || options.appVersion || options.github?.version || '', 40);
       const build = validBuild(ctx.build) ? ctx.build.git_sha.slice(0, 12) : '';
-      const app = build ? L(`版 ${version || '—'}、ビルド ${build}`, `version ${version || '—'}, build ${build}`)
-        : L(`版 ${version || '—'}（この写しにはビルド番号がない）`, `version ${version || '—'} (this copy carries no build number)`);
+      const app = build ? L(`バージョン ${version || '—'}、ビルド ${build}`, `version ${version || '—'}, build ${build}`)
+        : L(`バージョン ${version || '—'}（この写しにはビルド番号がない）`, `version ${version || '—'} (this copy carries no build number)`);
       const size = diagnostics.viewport?.width && diagnostics.viewport?.height ? `${Math.round(diagnostics.viewport.width)} × ${Math.round(diagnostics.viewport.height)}${L('、', ', ')}` : '';
       const items = [
         L('あなたの言葉と、選んだ種類', 'Your words, and the kind of problem you chose'),

@@ -2,13 +2,14 @@
 /** H2-fix · the rows of Grok's H2 phone walk (DEFECTS.md items 3–8), walked in real browsers against a built site. One engine
  * per run: WebKit at 390×844 with touch (and 1024×768 for the report sheet), Chromium at 1440×900 (and 1024×768).
  *
- *   H2-3  the startup-awards article (kantei:…-25startup) opens on no warehouse picture; its shelf card shows its key
- *         kanji. Control: the other startup-awards article (MEXT, about a warehouse-robot maker) keeps its own picture.
- *   H2-4  Me's India field says its own subtitle (EN and 日本語), and the AI field's reads as the rest of his sentence.
- *         Control: the learning-psychology field's subtitle is unchanged.
+ *   H2-3  (round 2, the lead's ruling: reverted) the startup-awards article keeps its own picture: the Prime Minister's
+ *         speech is about the top prize, Mujin's warehouse robots. Controls only: that picture, and the MEXT article's.
+ *   H2-4  (round 2, the lead's ruling: reverted) his own D5 words stay word for word in Me (EN and 日本語), as
+ *         verify-comb-0 G14 pins them. A control only.
  *   H2-5  Report a problem: Send and Return to lesson stand whole on the glass at open and with Details open; Details says
  *         in plain words what gets sent and where, with no JSON on show; the report and the GitHub issue it opens carry the
- *         served build's git and artifact digests (read from the site's build-identity.json). Controls: the where-sentence
+ *         served build's git and artifact digests (read from the site's build-identity.json); in 日本語 the app line reads
+ *         バージョン. Controls: the where-sentence
  *         is unchanged and Return to lesson closes the sheet; a negative control unsticks the foot and must turn red.
  *   H2-6  JLPT practice's import line in plain words. Control: the import button and its .kairo-private-pack picker stay.
  *   H2-8  the reader byline's kanji grade in plain words (EN and 日本語). Control: a grade-5 story still says "Kanji grade 5".
@@ -105,18 +106,18 @@ async function picture() {
     const card = s.page.locator(`#shelf-reading-results [data-passage="${STARTUP.id}"]`).first();
     await card.waitFor({ timeout: 20_000 });
     await sleep(600);
-    const onCard = await card.evaluate((node) => ({ imgs: [...node.querySelectorAll('img')].map((img) => img.getAttribute('src')),
-      kanji: node.querySelector('.story-picture.is-kanji .story-hero-kanji')?.textContent || null }));
+    const onCard = await card.evaluate((node) => ({ imgs: [...node.querySelectorAll('img')].map((img) => img.getAttribute('src')) }));
     await card.locator('.shelf-open').first().click();
     await s.page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 30_000 });
     await sleep(900);
-    const inReader = await s.page.evaluate(() => ({ figures: document.querySelectorAll('figure.reader-picture').length,
-      warehouse: [...document.querySelectorAll('#app img')].map((img) => img.getAttribute('src') || '').filter((src) => src.includes('25startup')),
-      headline: document.querySelector('h1.view-title, .reader-head h1, #app h1')?.textContent?.trim().slice(0, 40) || '' }));
+    const inReader = await s.page.evaluate(() => {
+      const img = document.querySelector('figure.reader-picture img');
+      return img ? { src: img.currentSrc || img.src, alt: img.alt, loaded: img.complete && img.naturalWidth > 0 } : null;
+    });
     await shot(s.page, `${MAIN.name}-H2-3-startup-reader`);
-    row('H2-3', 'the startup-awards article opens on no warehouse picture (reader and shelf card)',
-      inReader.figures === 0 && inReader.warehouse.length === 0 && onCard.imgs.every((src) => !src?.includes('25startup')), { inReader, onCard });
-    row('H2-3', 'its shelf card shows its key kanji 賞, as every picture-less story does', onCard.kanji === '賞' && onCard.imgs.length === 0, onCard);
+    row('H2-3', 'control · the startup-awards article keeps its own picture, the top prize\'s warehouse robots (reader and shelf card)',
+      !!inReader?.loaded && inReader.src.includes('kantei-jp-105-actions-202609-25startup') && /robot arm/u.test(inReader.alt) &&
+        onCard.imgs.some((src) => src?.includes('kantei-jp-105-actions-202609-25startup')), { inReader, onCard });
     // control: the MEXT startup-awards article is about a warehouse-robot maker; its own picture stays
     await boot(s.page);
     await openArticle(s.page, MEXT);
@@ -146,13 +147,11 @@ async function fields() {
     await boot(s.page, '?room=me&ui=ja');
     await s.page.locator('[data-horizon="field-india"]').waitFor({ timeout: 20_000 });
     const ja = await notes();
-    row('H2-4', 'the India field says its own subtitle (EN)', en.india.name === 'Yoga, Buddhism, Jain and Hindu history' &&
-      en.india.note === 'How they took root in Japan, and their ties to modern neuroscience' && !/Rooted in Japanese history/u.test(en.india.note), en.india);
-    row('H2-4', 'the India field says its own subtitle (日本語)', ja.india.note === '日本にどう根づいたか、現代の脳科学とどうつながるか', ja.india);
-    row('H2-4', 'the AI field\'s subtitle reads as the rest of his sentence (EN and 日本語)',
-      en.ai.note === 'Also Hofstadter, recursion, computer science and tech' && ja.ai.note === 'そして、ホフスタッター・再帰・計算機科学・テクノロジー', { en: en.ai, ja: ja.ai });
-    row('H2-4', 'control · the learning-psychology field\'s subtitle is unchanged',
-      en.mind.note === 'Neuroplasticity, learning about learning, human potential' && ja.mind.note === '神経可塑性・学ぶことを学ぶ・人間の可能性', { en: en.mind, ja: ja.mind });
+    // round 2: his own D5 words, word for word (JOHN_TOUR_FEEDBACK_2026-10-08 D5; verify-comb-0 G14)
+    row('H2-4', 'control · his own D5 words stay word for word in all three fields (EN and 日本語)',
+      en.india.note === 'Rooted in Japanese history, tied to modern neuroscience' && ja.india.note === '日本の歴史に根ざし、現代の脳科学につながる' &&
+        en.ai.note === 'Hofstadter, recursion, computer science and tech' && ja.ai.note === 'ホフスタッター・再帰・計算機科学・テクノロジー' &&
+        en.mind.note === 'Neuroplasticity, learning about learning, human potential' && ja.mind.note === '神経可塑性・学ぶことを学ぶ・人間の可能性', { en, ja });
   } finally { await s.close(); }
 }
 
@@ -243,6 +242,26 @@ async function report(size) {
     row('H2-5', `${size.name} · negative control · with the foot unstuck and Details open, the actions leave the glass`,
       hasFoot ? !whole(unstuck) : 'n/a', { hasFoot, unstuck, ...(hasFoot ? {} : { why: 'no foot on this build' }) });
     row('H2-5', `${size.name} · control · no page error, nothing left the site`, !s.seen.pageErrors.length && !s.seen.external.length, s.seen);
+  } finally { await s.close(); }
+}
+
+/** H2-5 in 日本語 (round 2): Details' app line reads バージョン, never 版 */
+async function reportJa() {
+  const s = await session();
+  try {
+    await boot(s.page, '?entry=shelf&ui=ja');
+    await s.page.locator('#bunki-report-bug').click();
+    await s.page.locator('#br-actual').waitFor({ timeout: 15_000 });
+    await sleep(900);
+    await s.page.locator('.br-details > summary').first().click();
+    await sleep(400);
+    const served = await s.page.evaluate(async () => { const id = await (await fetch('build-identity.json', { cache: 'no-store' })).json(); return { sha: id.gitSha, version: id.release?.version }; });
+    const text = await s.page.evaluate(() => document.querySelector('#br-form .br-details')?.innerText || '');
+    await s.page.evaluate(() => document.querySelector('#br-form .br-sent')?.scrollIntoView({ block: 'center' }));
+    await sleep(300);
+    await shot(s.page, `${MAIN.name}-H2-5-report-details-ja`);
+    row('H2-5', '日本語 · Details\' app line reads バージョン and the version, with the served build',
+      !!served.version && text.includes(`このアプリ：バージョン ${served.version}、ビルド ${String(served.sha).slice(0, 12)}`) && !/版 /u.test(text), text.slice(0, 300));
   } finally { await s.close(); }
 }
 
@@ -337,6 +356,7 @@ await guarded('H2-3', 'picture', picture);
 await guarded('H2-4', 'fields', fields);
 await guarded('H2-5', `report ${MAIN.name}`, () => report(MAIN));
 await guarded('H2-5', `report ${TABLET.name}`, () => report(TABLET));
+await guarded('H2-5', 'report 日本語', reportJa);
 await guarded('H2-6', 'import line', importLine);
 await guarded('H2-8', 'byline', byline);
 await guarded('H2-7', 'key lines', keyLines);
