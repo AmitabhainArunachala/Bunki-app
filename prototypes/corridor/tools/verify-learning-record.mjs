@@ -532,7 +532,7 @@ async function propertyChecks() {
   };
   const scenarioNames = ['grade', 'reject-retry', 'undo-reject-retry', 'undo-conflict', 'replace-before-stage',
     'replace-after-stage', 'epoch-loss', 'stale-enrollment', 'disclosure-guard', 'concurrent-merge',
-    'dojo-existing', 'kanji-unavailable', 'committed-lost-ack', 'ownership-after-publication', 'two-grade-two-undo'];
+    'dojo-existing', 'kanji-unavailable', 'committed-lost-ack', 'ownership-after-publication', 'two-grade-two-undo', 'backward-step'];
   const commandsFor = (historyIndex, historySeed) => {
     const random = rngFor(historySeed);
     const commands = [];
@@ -540,8 +540,11 @@ async function propertyChecks() {
     for (let episode = 0; episode < episodes; episode += 1) {
       const kind = episode === 0 ? historyIndex % scenarioNames.length : episode === 1 ? 0 : random(scenarioNames.length);
       const rating = 1 + random(4);
+      // srs-core refuses a grade before its due: the episode every history grades in (the second) and the cases that need
+      // their first grade saved walk the clock on, forward only, to their card's due
+      const toDue = episode === 1 || ['ownership-after-publication', 'backward-step'].includes(scenarioNames[kind]);
       const start = { op: 'start', type: kind === 11 ? 1 : random(2), dojo: kind === 10,
-        declared: random(4) === 0 ? 0 : 1, shift: [-172800000, 0, 60000, 86400000][random(4)] };
+        declared: random(4) === 0 ? 0 : 1, shift: [-172800000, 0, 60000, 86400000][random(4)], toDue };
       const gradeCommand = { op: 'grade', rating };
       const ok = { op: 'ack', save: true };
       const stage = { op: 'stage' };
@@ -565,11 +568,13 @@ async function propertyChecks() {
         case 'kanji-unavailable': part = [start, { op: 'dictionary', available: false }, gradeCommand, stage, ok,
           { op: 'dictionary', available: true }, gradeCommand, stage, ok]; break;
         case 'committed-lost-ack': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, lostAck: true }]; break;
-        // its grade must save before ownership moves: a card earlier backward moves left before its due is reached first
-        case 'ownership-after-publication': part = [{ ...start, toDue: true }, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, loseOwnershipAfterPublish: true }]; break;
+        case 'ownership-after-publication': part = [start, gradeCommand, { op: 'duplicate' }, stage, { op: 'ack', save: true, loseOwnershipAfterPublish: true }]; break;
         case 'two-grade-two-undo': part = [start, { op: 'grade', rating: 1 }, stage, ok,
           { op: 'clock', shift: 86400000 }, { op: 'disclosure', revealed: true, declared: 1 }, gradeCommand, stage, ok,
           { op: 'undo' }, stage, ok, { op: 'undo' }, stage, ok]; break;
+        // the device clock set back a few minutes: Again puts the card in a short step, which the due gate serves within the
+        // 20-minute learn-ahead limit, and the grade is anchored at the last review (the clamp), never before it
+        case 'backward-step': part = [start, { op: 'grade', rating: 1 }, stage, ok, { ...start, shift: -300000, toDue: false }, gradeCommand, stage, ok]; break;
         default: part = [start, gradeCommand, { op: 'duplicate' }, stage, ok];
       }
       part.push({ op: 'resume' });
