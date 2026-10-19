@@ -184,7 +184,10 @@ async function shelf(fixture) {
     if (view === 'drift') {
       await page.locator('#ginga-symbol').focus(); await page.keyboard.press('Enter'); await page.locator('.bubble-shelf').click();
     } else await page.locator('#back').click();
-    await page.waitForFunction(previous => document.body.dataset.view !== previous, view);
+    // Ladder (the lead's W2 ruling, 10-19, a spec change): with a word's reading, English or box up, the bar's Back folds the
+    // word bare and stays; the next Back leaves. Each Back is observed: the room changes, or the word stands bare
+    await page.waitForFunction(previous => document.body.dataset.view !== previous ||
+      (previous === 'reader' && !document.getElementById('mini') && !document.querySelector('#reader [data-ladder-rung]')), view);
   }
   assert.fail('Ordinary Back controls did not reach the bookshelf');
 }

@@ -470,6 +470,14 @@ async function main() {
     await page.keyboard.press('Shift+Enter');
     const alternativeReading = await word.evaluate(node => ({ rung: node.dataset.ladderRung, visible: node.querySelectorAll('rt:not(.hidden-rt)').length, stage: !!document.getElementById('mini') }));
     check('Shift+Enter first exposes only the reading', alternativeReading.rung === 'reading' && alternativeReading.visible > 0 && !alternativeReading.stage, JSON.stringify(alternativeReading));
+    // Ladder (John, 10-19, a spec change): the second Shift+Enter sets the word's English under it, the reading kept and no
+    // stage; only once that rung is seen does the third open the stage
+    await page.keyboard.press('Shift+Enter');
+    await page.waitForFunction(node => node.dataset.ladderRung !== 'reading' || !!document.getElementById('mini'), await word.elementHandle());
+    const englishAlternative = await word.evaluate(node => ({ rung: node.dataset.ladderRung, english: !!node.querySelector(':scope > .tok-en .tok-en-text'),
+      visible: node.querySelectorAll('rt:not(.hidden-rt)').length, stage: !!document.getElementById('mini') }));
+    check('Shift+Enter next sets the English under the word, its reading kept, no stage yet',
+      englishAlternative.rung === 'gloss' && englishAlternative.english && englishAlternative.visible > 0 && !englishAlternative.stage, JSON.stringify(englishAlternative));
     await page.keyboard.press('Shift+Enter');
     await page.locator('#mini').waitFor();
     const firstAlternative = await page.evaluate('document.querySelector("#mini") ? "quickLook.open" : null');
