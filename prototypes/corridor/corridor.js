@@ -4824,6 +4824,8 @@ async function boot() {
     }
   }
   D.wordCap = manifest.caps.kanjiWordCap;
+  // K07 · words whose written alternative holds a kanji (しいたけ／椎茸): one rule with the generator's
+  D.kanjiAltWords = window.BunkiReferenceCore?.kanjiAltWords?.(D.dict) || new Map();
 
   try {
     fsrsApi = window.__TSFSRS__ || (await import('./vendor/ts-fsrs.mjs'));
@@ -34529,6 +34531,15 @@ function confusablesFor(c) {
   return [...(CONFUSABLE_MAP[c] || [])];
 }
 
+/** K07 · a JMdict spelling tag said plainly beside a word's gloss (rK, iK, oK, ateji); '' for the rest. */
+function writtenFormNote(tags = []) {
+  if (tags.includes('rK')) return tx('まれな表記', 'rare spelling');
+  if (tags.includes('iK')) return tx('変則的な表記', 'irregular spelling');
+  if (tags.includes('oK')) return tx('古い表記', 'old spelling');
+  if (tags.includes('ateji')) return tx('当て字', 'ateji spelling');
+  return '';
+}
+
 function renderKanjiNode(sheet, node) {
   const retained = retainedKanjiRecord(node.id);
   const k = retained || D.kanji[node.id] || window.BunkiSkipUI?.getKanji(S.skipUi, node.id);
@@ -34714,45 +34725,67 @@ function renderKanjiNode(sheet, node) {
   // No silent cap: an initial page, then "show all" reveals the whole list
   // (Renzo shows "6 of 96" the same way). The count in the heading is the true
   // total, so the depth of the dictionary is visible at a glance.
+  // K07 · then the words reached through a written alternative (しいたけ／椎茸, あい／藍), shown by the spelling
+  // that holds this kanji and opening that very entry; a Jōyō kanji no shipped word list names carries up to ten
+  // JMdict words chosen at build time (the reference sidecar), each opening its own entry by sequence and reading.
   const words = D.kanjiWords[k.c] || [];
-  if (words.length) {
-    sheet.append(withEn(el('p', 'eyebrow', `よく使う語 — ${words.length} 語`), 'common compounds', 'en-inline'));
+  const listed = new Set(words);
+  const alternates = (D.kanjiAltWords?.get(k.c) || []).filter(([id]) => !listed.has(id));
+  const filled = !words.length && !alternates.length ? kanjiReferenceRows()?.words.get(k.c) || [] : [];
+  const items = [
+    ...words.map((id) => ({ id })),
+    ...alternates.map(([id, form]) => ({ id, form })),
+    ...filled.map(([seq, form, reading, gloss, tags]) => ({ id: form, form, seq: String(seq), reading, gloss, tags })),
+  ];
+  if (items.length) {
+    sheet.append(filled.length
+      ? withEn(el('p', 'eyebrow', `この字を含む語 — ${items.length} 語`), 'words that contain it', 'en-inline')
+      : withEn(el('p', 'eyebrow', `よく使う語 — ${items.length} 語`), 'common compounds', 'en-inline'));
     const rows = el('div', 'entry-rows');
-    const makeRow = (w) => {
-      const g = lookup(w);
+    const makeRow = (item) => {
+      const g = item.seq ? { r: item.reading, m: [item.gloss] } : lookup(item.id);
       const row = el('button', 'entry-row compound');
       row.type = 'button';
+      if (item.form) row.dataset.wordSpelling = item.form;
+      if (item.seq) row.dataset.jmdictSeq = item.seq;
       const main = el('span', 'row-stack');
       const top = el('span', 'row-word');
-      top.append(document.createTextNode(w));
+      top.append(document.createTextNode(item.form || item.id));
       if (g?.r) top.append(el('span', 'row-reading', g.r));
       main.append(top);
-      if (g?.m?.[0]) main.append(el('span', 'row-gloss', g.m[0]));
+      const gloss = [g?.m?.[0], writtenFormNote(item.tags)].filter(Boolean).join(' — ');
+      if (gloss) main.append(el('span', 'row-gloss', gloss));
       row.append(main);
       row.append(el('span', 'row-go', '›'));
-      row.addEventListener('click', () => go({ t: 'word', id: w, from: node.from }));
+      row.addEventListener('click', () => go(item.seq
+        ? { t: 'word', id: item.form, seq: item.seq, reading: item.reading, from: node.from }
+        : { t: 'word', id: item.id, from: node.from }));
       return row;
     };
     const FIRST = 24;
-    for (const w of (node.compoundsExpanded ? words : words.slice(0, FIRST))) rows.append(makeRow(w));
+    for (const item of (node.compoundsExpanded ? items : items.slice(0, FIRST))) rows.append(makeRow(item));
     sheet.append(rows);
-    if (words.length > FIRST && !node.compoundsExpanded) {
+    if (items.length > FIRST && !node.compoundsExpanded) {
       const more = el('button', 'more-row');
       more.type = 'button';
-      const remain = words.length - FIRST;
-      more.textContent = tx(`のこり ${remain} 語をすべて見る`, `show all ${words.length} — ${remain} more`);
+      const remain = items.length - FIRST;
+      more.textContent = tx(`のこり ${remain} 語をすべて見る`, `show all ${items.length} — ${remain} more`);
       more.addEventListener('click', () => {
         node.compoundsExpanded = true;
-        for (const w of words.slice(FIRST)) rows.append(makeRow(w));
+        for (const item of items.slice(FIRST)) rows.append(makeRow(item));
         more.remove();
       });
       sheet.append(more);
     }
   } else {
     sheet.append(withEn(el('p', 'eyebrow', 'この字を含む語'), 'words that contain it', 'en-inline'));
-    sheet.append(
-      el('div', 'sem-empty', tx('この字を含む語は辞書側にまだない。部品からは続けられる。', 'No listed word contains this kanji yet — the walk continues through its parts.')),
-    );
+    // K07 · a Jōyō kanji the build found in no shipped dictionary says so plainly
+    const none = kanjiReferenceRows()?.wordless.has(k.c);
+    const empty = el('div', 'sem-empty', none
+      ? tx('この字を含む語は、このアプリの辞書にはない。', 'No word in this app’s dictionaries contains this kanji.')
+      : tx('この字を含む語は辞書側にまだない。部品からは続けられる。', 'No listed word contains this kanji yet — the walk continues through its parts.'));
+    if (none) empty.dataset.wordless = 'checked';
+    sheet.append(empty);
   }
 
   // K05 · as many idioms as the heading counts are one tap away
