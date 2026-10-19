@@ -2958,8 +2958,14 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .layers-mark:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 @media (max-width: 520px) {
   body[data-view='reader'] .layers-mark { right: calc(var(--s2) + 44px + 8px); bottom: calc(8px + env(safe-area-inset-bottom)); }
-  body.has-primary-tabs[data-view='reader'] .layers-mark { bottom: calc(var(--nav-clearance) + 8px); }
+  body.has-primary-tabs[data-view='reader'] .layers-mark { bottom: calc(var(--nav-clearance) + 4px); }
   body[data-view='reader']:has(.listen-row.play-bar[data-open='true']) .layers-mark { display: none; }
+  /* Hfix-2e2 · X-13 · on a phone the column runs the glass's whole width, so a mark resting at the foot stood over the
+     reading mid-article. While 層 rests there it stands on the reader's dock (the slim paper strip the player lives on,
+     #app::after): the lines pass under the dock as they pass under the tab bar, and never under the mark. Its box stays
+     where the cards and strips already take it as their floor; docked in its open block, the strip goes with it. */
+  body[data-view='reader']:not(.zen):has(#layers-mark:not([data-docked])):not(:has(.listen-row.play-bar[data-open='true'])) #app::after { display: block; }
+  body.has-primary-tabs[data-view='reader']:not(.zen):has(#layers-mark:not([data-docked])):not(:has(.listen-row.play-bar[data-open='true'])) #app::after { height: 52px; }
 }
 /* Hfix-1A · open, the mark stands in its block's own corner (corridor.js dockLayersMark): the block's lines flow round it,
    so it is never over a glyph or a gloss; the block holds it (flow-root) however short it is */
