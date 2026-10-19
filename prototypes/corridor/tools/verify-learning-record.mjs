@@ -495,6 +495,18 @@ async function propertyChecks() {
   };
   const pendingCount = (f) => assert.equal(f.queue.length, 1, 'One pending intention must queue exactly one save');
   const advancedOnce = (rv, previousIx) => assert.equal(rv.ix, previousIx + 1, 'One acknowledged grade advances the cursor exactly once');
+  // An actual handler settles at once when it refuses and on its acknowledgment when it saves. One still open after that
+  // is a contract failure, named with its command (the history's trace), never a run left waiting on it: before this
+  // bound, a save the model wrongly refused was awaited unacknowledged and node exited on the unsettled await (13)
+  // without a receipt.
+  const HANDLER_SETTLE_MS = 10000;
+  const settled = async (promise, label) => {
+    let timer;
+    const bound = new Promise((_, fail) => {
+      timer = setTimeout(() => fail(new assert.AssertionError({ message: label + ': the actual handler did not settle within ' + HANDLER_SETTLE_MS + ' ms' })), HANDLER_SETTLE_MS);
+    });
+    try { return await Promise.race([promise, bound]); } finally { clearTimeout(timer); }
+  };
   const revokeTarget = (row, key, index) => same(row.slice(1), [key, 0, index], 'Undo targets its original grade row');
   // Deliberately corrupt only oracle inputs, never authored code or live data.
   // Each control must fail at the same assertion used by generated histories.
@@ -553,8 +565,10 @@ async function propertyChecks() {
           const enrollment = random(2) ? 'suspend' : 'remove';
           part = [start, gradeCommand, { op: 'external', kind: enrollment }, stage, ok, { op: 'external', kind: 'enroll' }]; break;
         }
+        // the answer's face is the guard (35f8b940, 2026-09-28: Show answer replaced the 思い出した/まだ declaration): a
+        // face-down card refuses a grade whether a declaration stands or not, and a shown card is graded with none
         case 'disclosure-guard': part = [start, { op: 'disclosure', revealed: false, declared: 1 }, gradeCommand,
-          { op: 'disclosure', revealed: true, declared: null }, gradeCommand, { op: 'disclosure', revealed: true, declared: 1 }, gradeCommand, stage, ok]; break;
+          { op: 'disclosure', revealed: false, declared: null }, gradeCommand, { op: 'disclosure', revealed: true, declared: null }, gradeCommand, stage, ok]; break;
         case 'concurrent-merge': part = [start, gradeCommand, { op: 'external', kind: 'unrelated' }, { op: 'external', kind: 'target' }, stage, ok]; break;
         case 'dojo-existing': part = [start, { op: 'external', kind: 'mature' }, gradeCommand, { op: 'duplicate' }, stage, ok, { op: 'undo' }, stage, ok]; break;
         case 'kanji-unavailable': part = [start, { op: 'dictionary', available: false }, gradeCommand, stage, ok,
@@ -689,10 +703,15 @@ async function propertyChecks() {
           case 'dictionary': if (command.available) f.c.D.kanji.学 = { m: 'synthetic learning' }; else delete f.c.D.kanji.学; break;
           case 'grade': {
             assert.equal(pending, null); const rv = f.S.review, before = f.durable(), session = sessionValue(rv);
-            const allowed = !!f.S.focus || (rv.revealed && rv.declared !== null);
+            // a drill grades as it is asked; a review card once its answer is shown (35f8b940: no declaration is needed;
+            // a declared まだ, declared 0, still makes the grade Again)
+            const allowed = !!f.S.focus || rv.revealed;
             const promise = attemptGrade(command.rating);
             unchanged(f, before, rv, session, 'grade activation before acknowledgment');
-            if (!allowed) { assert.equal(await promise, false); assert.equal(f.queue.length, 0); count('disclosureRejections'); break; }
+            if (!allowed) {
+              assert.equal(f.queue.length, 0, 'A refused grade queues no save');
+              assert.equal(await settled(promise, 'refused grade'), false); count('disclosureRejections'); break;
+            }
             pendingCount(f);
             const current = rv.queue[rv.ix], dojo = !!f.S.focus;
             const effectiveRating = !dojo && rv.declared === 0 ? 1 : command.rating;
@@ -711,7 +730,8 @@ async function propertyChecks() {
           }
           case 'duplicate': {
             assert(pending); const before = f.durable(), session = sessionValue(pending.rv);
-            const value = pending.kind === 'grade' ? await attemptGrade(pending.rating) : await byClass(f.render('renderReviewUndo', pending.rv), 'review-undo').fire();
+            const value = await settled(pending.kind === 'grade' ? attemptGrade(pending.rating) : byClass(f.render('renderReviewUndo', pending.rv), 'review-undo').fire(),
+              'duplicate ' + pending.kind);
             assert.equal(value, false); pendingCount(f); unchanged(f, before, pending.rv, session, 'duplicate pending activation'); count('pendingDuplicates'); break;
           }
           case 'stage': stagePending(); break;
@@ -749,7 +769,7 @@ async function propertyChecks() {
               f.c.recordEpoch += 1;
               trace.at(-1).publicationBoundary = { savedBeforeOwnershipLoss: true, oldEpoch: p.epoch, newEpoch: f.c.recordEpoch };
             } : undefined });
-            const returned = await p.promise;
+            const returned = await settled(p.promise, 'acknowledged ' + p.kind);
             if (command.loseOwnershipAfterPublish) {
               assert(publishedBeforeOwnershipLoss, 'Ownership-loss callback ran only after saved publication');
               same(f.durable(), publishedBeforeOwnershipLoss, 'Ownership loss retains the complete published roots');
