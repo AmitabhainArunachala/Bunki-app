@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath, URL } from 'node:url';
 import { join } from 'node:path';
-import { batteryGates } from '../verify-release-gates.mjs';
+import { batteryGates, validateKanjiTrustReport } from '../verify-release-gates.mjs';
 import { supplementalGates } from './supplemental.mjs';
 import { gateEvidenceDeclaration } from './gate-evidence.mjs';
 import { acceptanceEnvironment } from './verification-admission.mjs';
@@ -23,9 +23,9 @@ for (const file of readdirSync(join(root, 'scripts/ci')).filter((f) =>
       for (const key of value) known.add(key);
     }
 }
-test('all 189 canonical and supplemental gates have unique names and mandatory declarations', () => {
-  assert.equal(gates.length, 189);
-  assert.equal(new Set(gates.map((g) => g.name)).size, 189);
+test('all 191 canonical and supplemental gates have unique names and mandatory declarations', () => {
+  assert.equal(gates.length, 191);
+  assert.equal(new Set(gates.map((g) => g.name)).size, 191);
   const expected = JSON.parse(
     readFileSync(new URL('./vh-required-gate-roster.json', import.meta.url), 'utf8'),
   );
@@ -47,6 +47,50 @@ test('all 189 canonical and supplemental gates have unique names and mandatory d
     /No required evidence contract/u,
   );
 });
+test('Kanji-trust admission accepts complete pinned receipts and rejects incomplete or foreign evidence', () => {
+  const names = [
+    'K01-sei', 'K01-kai', 'K01-o', 'K01-official', 'K01-joyo-forms',
+    'K01-stroke-extended', 'K01-stroke-official', 'K01-stroke-failed',
+    'K03-lookup', 'K04-kodansha', 'K05-frequency', 'K05-reading-all',
+    'K05-nested-return', 'K05-nested-search-page', 'K05-idioms', 'K05-parts',
+    'K07-words', 'K06-load', 'K08-lessons',
+  ];
+  for (const engine of ['chromium', 'webkit']) {
+    const pin = { engine, artifactSha256: 'a'.repeat(64), siteDir: '/pinned/site' };
+    const good = {
+      schemaVersion: 1, control: null, failures: 0,
+      artifactSha256: pin.artifactSha256, site: pin.siteDir,
+      results: [{ engine, rows: names.map((row) => ({ row, pass: true })) }],
+    };
+    assert.equal(validateKanjiTrustReport(good, pin), true);
+    for (const mutate of [
+      (v) => { v.schemaVersion = 2; },
+      (v) => { v.control = 'notes-below'; },
+      (v) => { v.failures = 1; },
+      (v) => { v.results = []; },
+      (v) => { v.results.push(structuredClone(v.results[0])); },
+      (v) => { v.results[0].engine = engine === 'chromium' ? 'webkit' : 'chromium'; },
+      (v) => { delete v.results[0].rows; },
+      (v) => { v.results[0].rows = []; },
+      (v) => { v.results[0].rows.pop(); },
+      (v) => { v.results[0].rows[1] = structuredClone(v.results[0].rows[0]); },
+      (v) => { v.results[0].rows.reverse(); },
+      (v) => { v.results[0].rows[0].pass = false; },
+      (v) => { v.artifactSha256 = 'b'.repeat(64); },
+      (v) => { delete v.artifactSha256; },
+      (v) => { v.site = '/foreign/site'; },
+      (v) => { delete v.site; },
+    ]) {
+      const bad = structuredClone(good);
+      mutate(bad);
+      assert.throws(() => validateKanjiTrustReport(bad, pin));
+    }
+    for (const missing of ['engine', 'artifactSha256', 'siteDir']) {
+      assert.throws(() => validateKanjiTrustReport(good, { ...pin, [missing]: undefined }));
+    }
+  }
+});
+
 test('every exported selector is removed from ambient input, including empty values', () => {
   for (const value of ['diagnostic-mutant', '']) {
     const ambient = {

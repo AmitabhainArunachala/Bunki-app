@@ -260,6 +260,16 @@ export function batteryGates(out, env = process.env) {
     node('skip-core', tool('test-skip-core')),
     node('skip-ui-contracts', tool('test-skip-ui')),
     node('kanji-capture', tool('test-kanji-capture')),
+    ...['chromium', 'webkit'].map((engine) => {
+      const name = engine === 'chromium' ? 'kanji-trust' : 'kanji-trust-webkit';
+      return {
+        ...node(name, tool('verify-kanji-trust'), [], {
+          ...report(name, 'kanji-trust', 'verify-kanji-trust.json'),
+          engine,
+        }),
+        env: { KAIRO_BROWSER: engine },
+      };
+    }),
     node(
       'word-saved-answer',
       tool('test-word-saved-answer'),
@@ -844,11 +854,15 @@ export function batteryGates(out, env = process.env) {
       'search-fallback-core',
       'search-fallback-ui',
       'standalone-journey',
+      'kanji-trust',
     ].includes(gate.report?.type)
       ? {
           report: {
             ...gate.report,
             artifactSha256: env.KAIRO_VERIFIED_ARTIFACT_SHA256,
+            ...(gate.report.type === 'kanji-trust'
+              ? { siteDir: env.KAIRO_SITE_DIR ? resolve(env.KAIRO_SITE_DIR) : null }
+              : {}),
             ...(gate.report.type === 'standalone-journey'
               ? {
                   siteDir: env.KAIRO_SITE_DIR ? resolve(env.KAIRO_SITE_DIR) : null,
@@ -1724,6 +1738,32 @@ function requireNamedCases(rows, names, field = 'pass', accepted = true) {
   );
 }
 
+export function validateKanjiTrustReport(value, { engine, artifactSha256, siteDir }) {
+  const expectedRows = [
+    'K01-sei', 'K01-kai', 'K01-o', 'K01-official', 'K01-joyo-forms',
+    'K01-stroke-extended', 'K01-stroke-official', 'K01-stroke-failed',
+    'K03-lookup', 'K04-kodansha', 'K05-frequency', 'K05-reading-all',
+    'K05-nested-return', 'K05-nested-search-page', 'K05-idioms', 'K05-parts',
+    'K07-words', 'K06-load', 'K08-lessons',
+  ];
+  assert.equal(value.schemaVersion, 1, 'Unknown Kanji-trust receipt version');
+  assert.equal(value.control, null, 'A mutant Kanji-trust run is not an acceptance');
+  assert.equal(value.failures, 0, 'Kanji-trust reports failures');
+  assert(['chromium', 'webkit'].includes(engine), 'Kanji-trust engine must be pinned');
+  assert(Array.isArray(value.results), 'Kanji-trust has no engine results');
+  assert.deepEqual(value.results.map((result) => result.engine), [engine], 'Foreign or extra engine');
+  const rows = value.results[0].rows;
+  assert(Array.isArray(rows), 'Kanji-trust has no completed rows');
+  assert.deepEqual(rows.map((row) => row.row), expectedRows, 'Incomplete or reordered Kanji-trust run');
+  assert(rows.every((row) => row.pass === true), 'Kanji-trust contains a failed row');
+  assert.match(artifactSha256 || '', /^[a-f0-9]{64}$/u, 'Kanji-trust artifact must be pinned');
+  assert.equal(value.artifactSha256, artifactSha256, 'Foreign Kanji-trust artifact');
+  assert.equal(typeof siteDir, 'string', 'Kanji-trust site must be pinned');
+  assert(isAbsolute(siteDir), 'Kanji-trust site must be absolute');
+  assert.equal(value.site, siteDir, 'Foreign Kanji-trust site');
+  return true;
+}
+
 function requireCompleteReport({
   path,
   type,
@@ -1769,6 +1809,8 @@ function requireCompleteReport({
       'Check count disagrees with the receipt',
     );
     assert.equal(value.summary?.failed, 0, 'Receipt reports failures');
+  } else if (type === 'kanji-trust') {
+    validateKanjiTrustReport(value, { engine, artifactSha256, siteDir });
   } else if (type === 'teaching-context' || type === 'ai-adaptation') {
     assert.equal(
       value.suite,
@@ -2725,6 +2767,8 @@ async function verifyRunner(out) {
     'skip-core',
     'skip-ui-contracts',
     'kanji-capture',
+    'kanji-trust',
+    'kanji-trust-webkit',
     'word-saved-answer',
     'word-saved-answer-controls',
     'word-saved-answer-mutation-controls',

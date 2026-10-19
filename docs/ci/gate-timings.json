@@ -2296,6 +2296,74 @@
       ]
     },
     {
+      "name": "kanji-trust",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "cc6109314d090dad2fa1679b377c127f0592545e",
+        "producerBytesBasis": "Kanji-trust merged onto the Ink integration; producer bytes pinned by SHA-256.",
+        "producer": "prototypes/corridor/tools/verify-kanji-trust.mjs",
+        "producerSha256": "765b72e36bdd404a912953b83a7fa978b8bbe91be22b2aad950f268ba6080587",
+        "command": [
+          "node",
+          "prototypes/corridor/tools/verify-kanji-trust.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/kanji-trust"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-kanji-trust.mjs",
+            "sha256": "765b72e36bdd404a912953b83a7fa978b8bbe91be22b2aad950f268ba6080587"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures this canonical gate on the pinned combined artifact.",
+      "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
+      "limitations": [
+        "No numeric timing is claimed for this unmeasured contract."
+      ]
+    },
+    {
+      "name": "kanji-trust-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "cc6109314d090dad2fa1679b377c127f0592545e",
+        "producerBytesBasis": "Kanji-trust merged onto the Ink integration; producer bytes pinned by SHA-256.",
+        "producer": "prototypes/corridor/tools/verify-kanji-trust.mjs",
+        "producerSha256": "765b72e36bdd404a912953b83a7fa978b8bbe91be22b2aad950f268ba6080587",
+        "command": [
+          "node",
+          "prototypes/corridor/tools/verify-kanji-trust.mjs"
+        ],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/kanji-trust-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-kanji-trust.mjs",
+            "sha256": "765b72e36bdd404a912953b83a7fa978b8bbe91be22b2aad950f268ba6080587"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures this canonical gate on the pinned combined artifact.",
+      "unmeasuredReason": "No completed canonical wrapper measurement is yet retained. Direct local verifier runs are not wrapper measurements.",
+      "limitations": [
+        "No numeric timing is claimed for this unmeasured contract."
+      ]
+    },
+    {
       "name": "later-encounters-contracts",
       "sampleCount": 5,
       "medianSeconds": 0.863,
