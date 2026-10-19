@@ -104,6 +104,9 @@ const EDITS = Object.freeze({
   stalled: { file: 'corridor.js', from: '      return ladderVisit.openStage({ restore: false, demo: false, meaningShown });', to: "      return 'gloss';" },
   keepReading: { file: 'corridor.js', from: '  visit.clearReveal?.();', to: '  // control: leave the summoned reading painted' },
   // Ladder: with ふりがな なし a tap shows the touched word's reading; the control puts back the old dial gate, so off shows none
+  // Ladder R4: a reader word's English rung settles with no English (its gloss missing)
+  englishEmpty: { file: 'corridor.js', from: 'const readerTokenLead = (token) => readerDoorLead(readingToken(token));',
+    to: "const readerTokenLead = (token) => ''; // control: the English rung settles with no English" },
   offHidden: { file: 'corridor.js', from: '  if (S.dials.furigana === 2) return;\n  const before = S.revealed ? [...S.revealed] : [];',
     to: '  if (S.dials.furigana !== 1) return; // control: off never shows the touched word\'s reading\n  const before = S.revealed ? [...S.revealed] : [];' },
 });
@@ -117,6 +120,10 @@ const CONTROLS = Object.freeze([
   { name:'g3-stalled', title:'third activation stalls at the English before the stage', edits:['stalled'], run:'d4',
     requires:['D4.A-prior-state','D4.B-door','D4.tap-shows','D4.second-tap-english'], kills:['D4.third-tap-stage'], allowed:[],
     witness:rows => rows.get('D4.third-tap-stage')?.observed?.popup === null ? '' : 'the stage still opened' },
+  // Ladder R4: D4.A-english reads これ's English once its line has settled; a missing gloss still turns it red
+  { name:'english-settles-empty', title:"a reader word's English rung settles with no English", edits:['englishEmpty'], run:'d4',
+    requires:['D4.A-prior-state','D4.B-door','D4.second-tap-english'], kills:['D4.A-english'], allowed:['D4.own-english'],
+    witness:rows => rows.get('D4.A-english')?.observed?.glosses?.[0] === '' ? '' : 'これ still showed English' },
   { name:'g3-kept-reading', title:'fold leaves summoned ruby behind', edits:['keepReading'], run:'d2',
     requires:['D2.f1.door','D2.f1.popup-reading','D2.f0.door','D2.f0.popup-reading'], kills:['D2.f1.bare-after-fold','D2.f0.bare-after-fold'], allowed:[],
     witness:rows => [1,0].every(f => rows.get(`D2.f${f}.bare-after-fold`)?.observed?.every(row => row.visibleRuby === READING)) ? '' : 'the folded word did not retain its exact reading' },
@@ -250,6 +257,13 @@ async function focusToken(page, index) {
 }
 const classes = (state) => String(state?.cls || '').split(/\s+/);
 // a real click at the token's centre; `own` records whether that point is the token itself (the click is made either way)
+/** Ladder R4 (the lead's F1 ruling, 10-20): a reader word's English rung keeps its line empty until its gloss is settled
+ * (the box's lead gloss, once its reading's rows and its sense are in), then says it once. The row's real end state is that
+ * line out of its wait (.tok-en-wait gone), read then, never at a fixed moment after the tap. */
+const settledEnglish = (page, index) => page.waitForFunction((i) => {
+  const node = document.querySelector(`#reader .tok[data-index="${i}"]`);
+  return !!node && !node.querySelector(':scope > .tok-en.tok-en-wait');
+}, index, { timeout: 3_000 }).catch(() => {});
 async function tapCentre(page, index) {
   const node = page.locator(`#reader .tok[data-index="${index}"]`);
   const count = await node.count();
@@ -422,6 +436,7 @@ async function d4Walk(page, rec) {
   const aTap = await tapCentre(page, A_TOKEN.index);
   // Ladder (John, 10-19): これ is its own kana, so its first tap is its English under it (no reading rung, no stage yet)
   await page.waitForFunction((i) => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung === 'gloss', A_TOKEN.index, { timeout: 3_000 }).catch(() => {});
+  await settledEnglish(page, A_TOKEN.index);
   const aAfter = await tokenState(page, A_TOKEN.index), aPopup = await popupState(page), aMarks = await readerMarks(page);
   rec('D4.A-prior-state', `D4 ${PASSAGE_A} token ${A_TOKEN.index} ${A_TOKEN.token.s} starts plain, and one tap leaves it the touched word, its English under it`,
     aBefore?.tag === 'span' && classes(aBefore).includes('content') && aBefore.surface === A_TOKEN.token.s && !aBefore.lit && aBefore.gloss === null
@@ -546,6 +561,7 @@ async function d5Detour(page, rec) {
   const awayTaps = [await tapCentre(page, A_TOKEN.index)];
   // Ladder (John, 10-19): これ is its own kana: its one tap sets its English under it (no stage yet)
   await page.waitForFunction((i) => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung === 'gloss', A_TOKEN.index, { timeout: 3_000 }).catch(() => {});
+  await settledEnglish(page, A_TOKEN.index);
   const awayMarked = await readerMarks(page), awayWord = await tokenState(page, A_TOKEN.index);
   rec('D5.away-marks', `D5 ${D5.away} opens unmarked, and one tap leaves its token ${A_TOKEN.index} ${A_TOKEN.token.s} (an index ${D5.home} has not touched) the touched word, its English under it its only mark`,
     awayClean.passage === D5.away && canonical(markSets(awayClean)) === canonical({ lit: [], glossed: [] }) && awayTaps.every((tap) => tap.done)
@@ -661,6 +677,7 @@ async function d6Visit(page, rec) {
   const awayTaps = [await tapCentre(page, A_TOKEN.index)];
   // Ladder (John, 10-19): これ is its own kana: its one tap sets its English under it (no stage yet)
   await page.waitForFunction((i) => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung === 'gloss', A_TOKEN.index, { timeout: 3_000 }).catch(() => {});
+  await settledEnglish(page, A_TOKEN.index);
   const awayMarked = await readerMarks(page), awayWord = await tokenState(page, A_TOKEN.index);
   rec('D6.away-marks', `D6 ${D6.away} opens unmarked, and one tap leaves its token ${A_TOKEN.index} ${A_TOKEN.token.s} (an index ${D6.home} has not touched) the touched word, its English under it its only mark`,
     awayClean.passage === D6.away && canonical(markSets(awayClean)) === canonical({ lit: [], glossed: [] }) && awayTaps.every((tap) => tap.done)
