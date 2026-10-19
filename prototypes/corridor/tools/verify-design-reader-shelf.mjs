@@ -417,6 +417,19 @@ async function tapToken(page, index, { scroll = true } = {}) {
   }
 }
 
+/** Ladder · a tap where the control stands on the glass, once it holds still (two frames alike): a finger's tap, which never
+ * scrolls the page to its target first. */
+async function tapWhereItStands(page, selector) {
+  await page.locator(selector).waitFor();
+  const at = await page.locator(selector).evaluate((node) => new Promise((done) => {
+    let last = null;
+    const tick = () => { const r = node.getBoundingClientRect(), now = `${r.x}|${r.y}|${r.width}|${r.height}`;
+      if (now === last) done({ x: r.x + r.width / 2, y: r.y + r.height / 2 }); else { last = now; requestAnimationFrame(tick); } };
+    requestAnimationFrame(tick);
+  }));
+  await page.mouse.click(at.x, at.y);
+}
+
 /** The popup's painted box and which of its views is open. */
 const popupSeat = (page) => page.locator('#mini').evaluate((node) => {
   const r = node.getBoundingClientRect();
@@ -1479,8 +1492,11 @@ try {
           await page.waitForTimeout(400); // the card has finished rising
           const left = await popupSeat(page);
           assert.equal(left.word, text, `token ${index} of the fixture article`);
-          await page.locator('#mini #mini-sentence-open').click();
-          await page.locator('#mini #reader-sentence-practice').click();
+          // Ladder (the lead's ruling (c), 10-19: the box rides in the text's layer): the doors are tapped where they stand,
+          // as a finger does. Playwright's click first scrolls its target into view; with the box in the text layer that
+          // scroll moves the article (to 413 px here, then the practice view starts at 0), which no finger's tap does
+          await tapWhereItStands(page, '#mini #mini-sentence-open');
+          await tapWhereItStands(page, '#mini #reader-sentence-practice');
           await page.waitForFunction(() => document.body.dataset.view === 'sentence-practice');
           await page.locator('#sentence-practice-back').click();
           await page.waitForFunction(() => document.body.dataset.view === 'reader');
