@@ -662,25 +662,52 @@ html[data-register='attempt'] :is(.exam-question-map summary, .exam-leave-contro
 .exam-length-time { font-size: var(--type-label); letter-spacing: 0; }
 .exam-levels .chip { border-radius: var(--radius-seal); box-shadow: none; }
 
-/* The writing surface retains its living brush. The one speed control has
- * enough room to show all three positions without a second hidden control. */
+/* One native three-position range, dressed as three small ink marks. Its
+ * transparent hit area stays 84 × 44; labels remain available to VoiceOver. */
 .stroke-speed-wrap, .stroke-speed-wrap.stroke-corner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 4px 12px;
-  width: 224px;
-  padding: 13px 16px;
-  border: 1px solid var(--ed-rule);
-  border-radius: var(--radius-card);
-  background: var(--ed-paper);
+  display: block;
+  width: 84px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   box-shadow: none;
-  color: var(--ed-ink);
+  color: var(--ink);
 }
-.stroke-speed-label { font: var(--type-chrome)/1.5 var(--sans); }
-.stroke-speed-wrap .stroke-speed-range { grid-column: 1 / -1; width: 100%; height: 44px; margin: 0; accent-color: var(--ai); }
-.stroke-speed-labels { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 12px; font: var(--type-caption)/1.5 var(--sans); color: var(--ed-muted); }
-.stroke-speed-readout { font: var(--type-label)/1.5 var(--sans); color: var(--ed-ink); font-variant-numeric: tabular-nums; }
-.stroke-page .stroke-speed-wrap.stroke-corner { opacity: 1; }
+.stroke-speed-wrap:not(.stroke-corner) { position: relative; }
+.stroke-speed-label, .stroke-speed-readout {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.stroke-speed-wrap .stroke-speed-range {
+  position: absolute;
+  inset: 0;
+  width: 84px;
+  height: 44px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.stroke-speed-labels {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 44px;
+  pointer-events: none;
+  font: 15px/1 var(--serif);
+  color: inherit;
+}
+.stroke-speed-glyph { padding-block: 4px; border-bottom: 1px solid transparent; }
+.stroke-speed-wrap[data-speed='0'] .stroke-speed-glyph:nth-child(1),
+.stroke-speed-wrap[data-speed='1'] .stroke-speed-glyph:nth-child(2),
+.stroke-speed-wrap[data-speed='2'] .stroke-speed-glyph:nth-child(3) { border-bottom-color: currentColor; }
+.stroke-speed-wrap:has(:focus-visible) { outline: 2px solid currentColor; outline-offset: -2px; }
 
 /* The tutor's existing lacquer surface owns local pigments, so the page
  * frame must inherit those instead of placing pale text on a paper ground. */
@@ -746,8 +773,6 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
   html[data-register='attempt'] .exam-paper .exam-passage { padding: 18px 14px; font-size: var(--type-reading); }
   .exam-option-row { gap: 12px; }
   .exam-option-text { font-size: var(--type-reading); }
-  .stroke-speed-wrap.stroke-corner { width: min(196px, calc((100vw - 88px) / 2)); padding: 10px 8px; gap: 4px 8px; }
-  .stroke-speed-wrap.stroke-corner .stroke-speed-labels { gap: 0; }
 }
 @media (max-width: 360px) {
   .reference-other-rooms { width: 100%; justify-content: space-between; }
@@ -2186,7 +2211,7 @@ body .sheet .stroke-door {
   box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 16%, transparent), 0 24px 60px -28px color-mix(in srgb, var(--ink) 60%, transparent),
     0 0 0 1px color-mix(in srgb, var(--ink) 10%, transparent);
 }
-#stroke-page[data-minimal='on'] .stroke-back, #stroke-page[data-minimal='on'] #strokes-back, #stroke-page .stroke-btn.stroke-corner, #stroke-page .stroke-chrome-trigger {
+#stroke-page[data-minimal='on'] .stroke-back, #stroke-page[data-minimal='on'] #strokes-back, #stroke-page .stroke-chrome-trigger {
   opacity: 0.92;
   border: 1px solid var(--raised-edge-strong);
   border-radius: var(--radius-control);
@@ -2196,23 +2221,27 @@ body .sheet .stroke-door {
 }
 #stroke-page[data-minimal='on'] .stroke-back, #stroke-page[data-minimal='on'] #strokes-back { flex-direction: row; gap: 6px; padding: 0 16px; font: 600 var(--type-control)/1 var(--sans); }
 #stroke-page .stroke-back .en-sub { display: inline; font-size: var(--type-caption); letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
-#stroke-page .stroke-btn.stroke-corner { padding: 6px 16px; }
+/* The two learning controls belong to the sheet, without raised surfaces.
+ * Full pigment (rather than low opacity) keeps the tiny marks legible in every world. */
+#stroke-page .stroke-btn.stroke-corner,
+#stroke-page .stroke-speed-wrap,
+#stroke-page .stroke-speed-wrap.stroke-corner {
+  opacity: 1;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+}
 #stroke-page #stroke-numbers {
-  max-width: min(196px, calc((100vw - 88px) / 2));
-  white-space: normal;
-  overflow-wrap: anywhere;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  padding: 0;
+  font: 18px/1 var(--serif);
 }
-#stroke-page .stroke-btn.stroke-corner .l-ja { font: 600 var(--type-chrome)/1.3 var(--sans); color: var(--text); }
-#stroke-page .stroke-btn.stroke-corner .en-sub { font-size: var(--type-caption); letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
-#stroke-page :is(.stroke-back, .stroke-btn, .stroke-chrome-trigger):hover { opacity: 1; border-color: var(--ai); }
-#stroke-page .stroke-speed-wrap, #stroke-page .stroke-speed-wrap.stroke-corner {
-  border: 1px solid var(--raised-edge);
-  border-radius: var(--radius-control);
-  background: var(--raised);
-  box-shadow: var(--raised-shadow);
-}
-#stroke-page .stroke-speed-label { font: 600 var(--type-chrome)/1.5 var(--sans); color: var(--text); }
-#stroke-page .stroke-speed-labels { font: var(--type-caption)/1.5 var(--sans); color: var(--text-2); }
+#stroke-page #stroke-numbers[aria-pressed='true'] .stroke-corner-glyph { border-bottom: 1px solid currentColor; }
+#stroke-page :is(.stroke-back, .stroke-chrome-trigger):hover { opacity: 1; border-color: var(--ai); }
 /* G4 · the stroke page never shows an empty board (Grok's G-9: 海 stood as a blank board for about 13 s while the living
    ink woke). The whole character rests as a faint お手本 from the first frame — in the stage while the renderer is still
    being chosen and under the classic hand, and in the body-level layer that rides the living ink once it writes (a

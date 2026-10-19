@@ -34576,9 +34576,11 @@ const strokeReduced = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 let strokeFrame = null;
+let strokeRetiming = null;
 function cancelStrokeAnimation() {
   if (strokeFrame != null) cancelAnimationFrame(strokeFrame);
   strokeFrame = null;
+  strokeRetiming = null;
 }
 
 /** KanjiVG stores each stroke's start as its path's first moveto. */
@@ -34736,13 +34738,10 @@ function startStrokeAnimation(page) {
     return;
   }
 
-  // ゆっくり governs this hand too: it is the only writing a device without WebGL/WebGPU ever
-  // sees, and the corner stood there pressed while it ran at one speed (PR #77 007479d0). The
-  // default speed keeps the classic timing exactly.
-  const pace = STROKE_SPEED_DEFAULT / strokeSpeed();
-  const GAP = 90 * pace;
+  // Canonical durations stay fixed; the virtual clock changes rate in place.
+  const GAP = 90;
   const durations = paths.map((path) =>
-    Math.min(1000, Math.max(260, (Number(path.dataset.len) || 0) * 9)) * pace,
+    Math.min(1000, Math.max(260, (Number(path.dataset.len) || 0) * 9)),
   );
   const starts = [];
   let acc = 0;
@@ -34755,15 +34754,25 @@ function startStrokeAnimation(page) {
   page.dataset.state = 'drawing';
   paintStrokes(page, 1, 0);
 
-  let t0 = null;
+  let wallAnchor = performance.now(), virtualAnchor = 0;
+  let rate = strokeSpeed() / STROKE_SPEED_DEFAULT;
+  strokeRetiming = {
+    page,
+    setSpeed(speed) {
+      const now = performance.now();
+      virtualAnchor += (now - wallAnchor) * rate;
+      wallAnchor = now;
+      rate = speed / STROKE_SPEED_DEFAULT;
+    },
+  };
   const frame = (ts) => {
-    if (t0 == null) t0 = ts;
-    const t = ts - t0;
+    const t = virtualAnchor + (ts - wallAnchor) * rate;
     if (t >= span) {
       paintStrokes(page, total, 1);
       page.dataset.state = 'done';
       S.strokes.step = total;
       strokeFrame = null;
+      strokeRetiming = null;
       return;
     }
     let index = 0;
@@ -34817,6 +34826,10 @@ function strokeReadingRow(ja, en, values, kind = 'on') {
  * an already-finished character. */
 function strokeNumbersControl(page, reduced) {
   const numbers = strokeControl('stroke-numbers', '筆順の番号', 'stroke order numbers');
+  numbers.setAttribute('aria-label', tx('筆順の番号', 'Stroke order numbers'));
+  numbers.title = tx('筆順の番号', 'Stroke order numbers');
+  numbers.replaceChildren(el('span', 'stroke-corner-glyph', '順'));
+  numbers.firstChild.setAttribute('aria-hidden', 'true');
   numbers.setAttribute('aria-pressed', String(S.strokeNumbers));
   numbers.addEventListener('click', () => {
     S.strokeNumbers = !S.strokeNumbers;
@@ -34880,21 +34893,22 @@ function strokeSpeedControl(page) {
   readout.id = 'stroke-speed-readout';
   readout.setAttribute('for', range.id);
   const marks = el('div', 'stroke-speed-labels');
+  const glyphs = ['緩', '中', '速'];
   marks.setAttribute('aria-hidden', 'true');
-  names.forEach((name) => marks.append(el('span', null, name)));
+  glyphs.forEach((glyph) => marks.append(el('span', 'stroke-speed-glyph', glyph)));
   const paint = () => {
     const index = STROKE_SPEED_STEPS.indexOf(strokeSpeed());
     range.value = String(index);
     range.setAttribute('aria-valuetext', names[index]);
     readout.textContent = names[index];
+    wrap.dataset.speed = String(index);
+    range.title = `${tx('書く速さ', 'Writing speed')}: ${names[index]}`;
   };
   range.addEventListener('input', () => {
     setStrokeSpeed(STROKE_SPEED_STEPS[Number(range.value)]);
     paint();
-  });
-  range.addEventListener('change', () => {
-    if (page.dataset.living === 'on' && inkRoom?.handle) inkRoom.handle.rewrite(strokeRewriteOptions());
-    else startStrokeAnimation(page);
+    if (page.dataset.living === 'on' && inkRoom?.page === page) inkRoom.handle?.setSpeed(strokeSpeed());
+    else if (strokeRetiming?.page === page) strokeRetiming.setSpeed(strokeSpeed());
   });
   paint();
   wrap.append(label, readout, range, marks);
@@ -35103,12 +35117,19 @@ let inkRoom = null; // { handle, canvas, page, stage, lift, syncLift, unsync } �
  * mark; a new device starts at Normal, the middle of the slider. */
 const STROKE_SPEED_KEY = 'kairo-stroke-speed-v1';
 const STROKE_SPEED_DEFAULT = 1.1;
-const STROKE_SPEED_SLOW = 0.7;
-const STROKE_SPEED_STEPS = Object.freeze([STROKE_SPEED_SLOW, STROKE_SPEED_DEFAULT, 1.6]);
+const STROKE_SPEED_SLOW = 0.55;
+const STROKE_SPEED_STEPS = Object.freeze([STROKE_SPEED_SLOW, STROKE_SPEED_DEFAULT, 2.2]);
 function strokeSpeed() {
   if (typeof S.strokeSpeed !== 'number') {
     let value = NaN;
     try { value = parseFloat(localStorage.getItem(STROKE_SPEED_KEY)); } catch { /* no device preference */ }
+    // Preserve the chosen position of the old continuous/three-step preference.
+    // New values are unambiguous, so this migration is idempotent on every boot.
+    if (Number.isFinite(value) && !STROKE_SPEED_STEPS.includes(value)) {
+      const legacy = [0.7, 1.1, 1.6];
+      const nearest = legacy.reduce((a, b) => Math.abs(b - value) < Math.abs(a - value) ? b : a, 1.1);
+      value = STROKE_SPEED_STEPS[legacy.indexOf(nearest)];
+    }
     S.strokeSpeed = Number.isFinite(value) ? value : STROKE_SPEED_DEFAULT;
   }
   S.strokeSpeed = STROKE_SPEED_STEPS.reduce((nearest, value) =>
@@ -35470,6 +35491,8 @@ async function mountInkRoom(room2, ch, paths, reduced) {
       return;
     }
     room.handle = handle;
+    // The learner can move the control while the renderer is still waking.
+    handle.setSpeed(strokeSpeed());
     handle.ondead = () => {
       // Device loss returns the numbered SVG to the stage before classic
       // drawing resumes. The page therefore never loses its honest fallback.

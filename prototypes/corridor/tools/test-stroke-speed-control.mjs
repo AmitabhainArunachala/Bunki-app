@@ -7,14 +7,15 @@ const source = readFileSync(new URL('../corridor.js', import.meta.url), 'utf8');
 const control = source.slice(source.indexOf('function strokeSpeedControl('), source.indexOf('/** The honest room:', source.indexOf('function strokeSpeedControl(')));
 const speed = source.slice(source.indexOf("const STROKE_SPEED_KEY ="), source.indexOf('function stopInkRoom(', source.indexOf("const STROKE_SPEED_KEY =")));
 function fixture(stored) {
-  const memory = new Map(stored == null ? [] : [['kairo-stroke-speed-v1', stored]]), rewrites = [], fallback = [];
+  const memory = new Map(stored == null ? [] : [['kairo-stroke-speed-v1', stored]]), retimes = [], fallback = [];
   const context = {
     S: {}, tx: (_ja, en) => en,
     localStorage: { getItem: key => memory.get(key), setItem: (key, value) => memory.set(key, value) },
-    inkRoom: { handle: { rewrite: options => rewrites.push(options) } },
+    inkRoom: { handle: { setSpeed: value => retimes.push(value), rewrite: () => assert.fail('A rate change must not restart the character') } },
+    strokeRetiming: { setSpeed: value => fallback.push(value) },
     startStrokeAnimation: page => fallback.push(page),
     el(tagName, className, textContent = '') {
-      return { tagName, className, textContent, children: [], attributes: {}, handlers: {},
+      return { tagName, className, textContent, dataset: {}, children: [], attributes: {}, handlers: {},
         append(...children) { this.children.push(...children); },
         setAttribute(key, value) { this.attributes[key] = value; },
         addEventListener(type, handler) { this.handlers[type] = handler; } };
@@ -22,27 +23,28 @@ function fixture(stored) {
   };
   vm.createContext(context);
   vm.runInContext(`${speed}\n${control}\nthis.control = strokeSpeedControl; this.speed = strokeSpeed;`, context);
-  return { context, memory, rewrites, fallback };
+  return { context, memory, retimes, fallback };
 }
 
 test('A fresh writing room has one three-position slider at Normal; both renderers obey changed speed', () => {
   const f = fixture();
   const page = { dataset: { living: 'on' } };
+  f.context.inkRoom.page = page; f.context.strokeRetiming.page = page;
   const control = f.context.control(page), range = control.children.find(child => child.tagName === 'input');
   assert.equal(control.children.filter(child => child.tagName === 'input').length, 1);
   assert.equal(control.children.filter(child => child.tagName === 'button').length, 0);
   assert.equal(range.min, '0'); assert.equal(range.max, '2'); assert.equal(range.step, '1');
   assert.equal(range.value, '1'); assert.equal(range.attributes['aria-valuetext'], 'Normal');
-  range.value = '0'; range.handlers.input(); range.handlers.change();
-  assert.equal(f.memory.get('kairo-stroke-speed-v1'), '0.7'); assert.equal(f.rewrites[0].speed, 0.7);
+  range.value = '0'; range.handlers.input();
+  assert.equal(f.memory.get('kairo-stroke-speed-v1'), '0.55'); assert.equal(f.retimes[0], 0.55);
   page.dataset.living = 'fallback';
-  range.value = '2'; range.handlers.input(); range.handlers.change();
-  assert.equal(f.memory.get('kairo-stroke-speed-v1'), '1.6'); assert.equal(range.attributes['aria-valuetext'], 'Fast');
-  assert.equal(f.fallback.length, 1); assert.equal(f.fallback[0], page);
+  range.value = '2'; range.handlers.input();
+  assert.equal(f.memory.get('kairo-stroke-speed-v1'), '2.2'); assert.equal(range.attributes['aria-valuetext'], 'Fast');
+  assert.equal(f.fallback.length, 1); assert.equal(f.fallback[0], 2.2);
 });
 
 test('Existing continuous preferences recover to the nearest speed; invalid storage recovers to Normal', () => {
-  for (const [stored, expected, position] of [['0.4', 0.7, '0'], ['1.0', 1.1, '1'], ['1.5', 1.6, '2'], ['invalid', 1.1, '1']]) {
+  for (const [stored, expected, position] of [['0.4', 0.55, '0'], ['0.7', 0.55, '0'], ['1.0', 1.1, '1'], ['1.5', 2.2, '2'], ['1.6', 2.2, '2'], ['0.55', 0.55, '0'], ['2.2', 2.2, '2'], ['invalid', 1.1, '1']]) {
     const f = fixture(stored), control = f.context.control({ dataset: {} });
     assert.equal(f.context.speed(), expected);
     assert.equal(control.children.find(child => child.tagName === 'input').value, position);
@@ -89,8 +91,8 @@ test('G4 tempo: min(110, 1400 ÷ strokes) a stroke, never under 45 ms, at the mi
   const slow = await inkContext({ stored: '0.7' }), fast = await inkContext({ stored: '1.6' });
   for (const n of [1, 7, 25, 31, 32, 40]) {
     assert(slow.inkStrokeMs(n) > at(n) && at(n) > fast.inkStrokeMs(n), `${n} strokes: slow > middle > fast`);
-    assert.equal(slow.inkStrokeMs(n), at(n) * (1.1 / 0.7));
-    assert.equal(fast.inkStrokeMs(n), at(n) * (1.1 / 1.6));
+    assert.equal(slow.inkStrokeMs(n), at(n) * 2);
+    assert.equal(fast.inkStrokeMs(n), at(n) / 2);
   }
 });
 
@@ -139,4 +141,32 @@ test('G4 card depth: no card unmet, kept met, never reviewed met, learning again
   assert.equal(of('年', { reading: 'ねん' }), 'met', 'a reading unlike the one he keeps is at most met — help, never owned');
   assert.equal(context.cardDepth({ t: 'kanji', id: '海' }, T), 'owned', 'a kanji reads its own card');
   assert.equal(context.cardDepth({ t: 'particle', id: 'wa' }, T), 'unmet');
+});
+
+// Execute the actual SVG fallback with a controlled display clock. Retiming
+// preserves the current stroke; replay is a separate operation.
+test('SVG fallback retimes the current stroke without clearing it or moving backwards', () => {
+  const run = source.slice(source.indexOf('function startStrokeAnimation('), source.indexOf('function strokeControl('));
+  let now = 0, pending, latest;
+  const path = () => ({ dataset: {}, style: {}, getTotalLength: () => 100 });
+  const paths = [path(), path()], bleeds = [path(), path()];
+  const page = { dataset: {}, querySelectorAll: selector => selector === '.stroke-ink path' ? paths : bleeds };
+  const context = { S: { strokes: {} }, strokeFrame: null, strokeRetiming: null,
+    performance: { now: () => now }, strokeReduced: () => false,
+    strokeSpeed: () => 1.1, STROKE_SPEED_DEFAULT: 1.1,
+    cancelStrokeAnimation: () => { pending = null; },
+    requestAnimationFrame: fn => { pending = fn; return 1; },
+    paintStrokes: (_page, stroke, fraction) => { latest = { stroke, fraction }; },
+  };
+  vm.createContext(context); vm.runInContext(run + '\nthis.start = startStrokeAnimation;', context);
+  context.start(page);
+  const tick = time => { now = time; const frame = pending; pending = null; frame(time); };
+  tick(225); assert.equal(latest.fraction, 0.25);
+  context.strokeRetiming.setSpeed(2.2);
+  tick(450); assert.equal(latest.fraction, 0.75, 'double rate advances half a stroke in the next225ms');
+  context.strokeRetiming.setSpeed(0.55);
+  tick(630); assert.equal(latest.fraction, 0.85, 'slow change keeps progress and advances at half rate');
+  assert.equal(latest.stroke, 1);
+  tick(3100); assert.equal(latest.stroke, 2); assert.equal(latest.fraction, 1);
+  assert.equal(page.dataset.state, 'done'); assert.equal(context.strokeRetiming, null);
 });
