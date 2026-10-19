@@ -118,14 +118,28 @@ async function touchAt(page, selector, index, holdMs, scroll = true) {
   // mid-scroll; a centred target is always clear of both chrome bands.)
   // A caller that has just centred the target and measures it on screen passes scroll = false (openWordStage
   // already hands its flag on).
-  if (scroll) await target.evaluate((n) => n.scrollIntoView({ block: 'center' }));
-  await page.waitForTimeout(60);
-  // aim at the element's first line fragment, the way a finger aims at the
-  // glyphs — a union box can drift into the line gap once a gloss hangs below
-  const box = await target.evaluate((node) => {
-    const r = node.getClientRects()[0] ?? node.getBoundingClientRect();
-    return { x: r.x, y: r.y, width: r.width, height: r.height };
-  });
+  // A locator finds its element in one round trip and evaluates on it in the next. A surface drawn again in place
+  // between the two (the word's stage, redrawn as its meaning arrives) hands the evaluation a node it has already
+  // detached: its box is zero though its successor stands where it stood (INTFIX-C, the rehearsal's "touch: no box for
+  // #mini button.mini-word", 2026-10-20). Each step says whether it met a live node; on a detached one the selector
+  // is found again and the step done again, as Playwright's own actions retry a detached element, so the finger aims
+  // at the element the selector names now. No wait is added or widened, and a live node without a box still fails.
+  let box = null;
+  for (let attempt = 0; attempt < 3 && !box; attempt += 1) {
+    if (scroll && !await target.evaluate((n) => {
+      if (!n.isConnected) return false;
+      n.scrollIntoView({ block: 'center' });
+      return true;
+    })) continue;
+    await page.waitForTimeout(60);
+    // aim at the element's first line fragment, the way a finger aims at the
+    // glyphs — a union box can drift into the line gap once a gloss hangs below
+    box = await target.evaluate((node) => {
+      if (!node.isConnected) return null;
+      const r = node.getClientRects()[0] ?? node.getBoundingClientRect();
+      return { x: r.x, y: r.y, width: r.width, height: r.height };
+    });
+  }
   if (!box || !box.width) throw new Error(`touch: no box for ${selector}`);
   const x = box.x + box.width / 2;
   const y = box.y + box.height / 2;
@@ -4676,44 +4690,46 @@ async function main() {
   // ------------- C1's own finding: the sentence page walks on to its article
   // (rubric §9.5 — a review answer returns to the source sentence AND its
   // article). The demonstration found the sentence half present, this half
-  // missing. A bank example must still show no door: honest absence.
+  // missing. (A bank example's sentence page draws no such door: honest absence, product-side.)
+  // INTFIX-C (2026-10-20): the walk looked for the sentence door (▷) on the word's STAGE, which draws none: the product
+  // draws ▷ on the example lines of a word page (and on glossary refs). So it never reached a sentence page, and wrote
+  // an "honest absence" row that passed on nothing, in every run since at least 2026-10-04: the row VH-1's retained
+  // contract rightly refuses. The walk now takes the product's own path: the first text's word page, the ▷ of the
+  // word's own sentence (the example line drawn from the article the word was tapped in), that sentence's page, and
+  // its door home. The door must be there, and must land in the same article.
   console.log('\n— C1 finding · the sentence page reaches its article');
   await open('?entry=shelf');
   await page.waitForSelector('.shelf-item:not([data-recommendation])');
   await tap(page, FIRST_TEXT);
-  await page.waitForSelector('#reader .tok.content');
-  const sentHome = await page.evaluate(`(() => {
-    const tok = document.querySelector('#reader .tok.content');
-    return tok ? tok.textContent.trim() : '';
-  })()`);
-  await openWordStage(page, '#reader .tok.content');
-  const sentDoorSeen = await page.evaluate(`(() => {
-    const d = document.querySelector('.sent-door');
-    if (d) { d.click(); return true; }
-    return false;
-  })()`);
-  if (sentDoorSeen) {
-    await page.waitForSelector('#sheet');
-    await page.waitForTimeout(300);
-  }
+  await settleReader(page);
+  const sentFrom = await page.evaluate(`(() => ({
+    word: document.querySelector('#reader .tok.content')?.textContent.trim() || '',
+    title: document.querySelector('#reader h1.view-title, h1.view-title')?.textContent.trim() || '',
+  }))()`);
+  await holdWord(page, '#reader .tok.content');
+  const ownDoor = '#sheet .example[data-own] .sent-door';
+  await page.waitForSelector(ownDoor);
+  const ownSentence = await page.evaluate(`document.querySelector('#sheet .example[data-own] .example-ja')?.textContent || ''`);
+  await page.evaluate(`document.querySelector(${JSON.stringify(ownDoor)}).click()`);
+  await page.waitForSelector('#sheet .sent-reader');
   const homeDoor = await page.evaluate(`(() => {
     const b = document.querySelector('#sent-home');
     return { present: !!b, label: b ? b.textContent : '' };
   })()`);
+  let landed = { view: '', reader: false, sheet: true, title: '' };
   if (homeDoor.present) {
     await page.evaluate(`document.querySelector('#sent-home')?.click()`);
     await page.waitForTimeout(600);
-    const landed = await page.evaluate(`(() => ({
+    landed = await page.evaluate(`(() => ({
       view: document.body.dataset.view || '',
       reader: !!document.querySelector('#reader'),
       sheet: !!document.querySelector('#sheet'),
+      title: document.querySelector('#reader h1.view-title, h1.view-title')?.textContent.trim() || '',
     }))()`);
-    check('C1 · the sentence page walks on to the whole article it came from',
-      landed.reader && !landed.sheet, JSON.stringify({ ...homeDoor, ...landed, from: sentHome }));
-  } else {
-    check('C1 · a sentence with no shelf article shows no door onto nothing',
-      true, 'no article-backed sentence page reached in this walk — honest absence path');
   }
+  check('C1 · the sentence page walks on to the whole article it came from',
+    homeDoor.present && landed.reader && !landed.sheet && !!sentFrom.title && landed.title === sentFrom.title,
+    JSON.stringify({ ...homeDoor, ...landed, from: sentFrom.word, article: sentFrom.title, sentence: ownSentence }));
   // ------------- E3 round-A findings (the closing double-dry earned these)
   // (1) a captured-but-never-STARTED row drilled in the 漢字だけ block must
   // stay practice: the no-debt law says only 始める enrols, and srsDueItems
