@@ -3707,7 +3707,7 @@ try {
             from: "    if (top == null && !sentence && anchor?.matches?.('#reader .tok, .japanese-lookup-word, .sentence-tok') &&\n        card.querySelector(':scope > .mini-web') && !card.classList.contains('is-compact')) {",
             to: '    if (false) { // Ladder negative: no compact card' },
           { file: 'corridor.js', key: 'no-glide',
-            from: '    if (top == null && !sentence && scroller && Math.max(roomAbove - shift, roomBelow + shift) < mustShowHeight(card)) {',
+            from: '    if (top == null && !sentence && scroller && card._mayGlide && Math.max(roomAbove - shift, roomBelow + shift) < mustShowHeight(card)) {',
             to: '    if (false) { // Ladder negative: no room made; the card is cut where it stands' }] },
         { id: 'no-aside-mark', run: 'L-climb', body: ladderClimb, options: ladderView, kills: ['L.dots'], witness: (row) => row.observed.aside === null,
           edits: [{ file: 'corridor.js', key: 'english-without-aside', from: "  if (hasEn) span.dataset.depthAside = 'meaning';",

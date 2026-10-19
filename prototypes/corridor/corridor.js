@@ -11930,7 +11930,14 @@ function placeFloating(card, r) {
     // Only where no seat beside its word holds even that of the compact card (a short glass: 320×568) does the text it rides
     // with glide, the least that lets a seat hold the whole card, else that much of it; the card says so (data-glide)
     let glided = 0;
-    if (top == null && !sentence && scroller && Math.max(roomAbove - shift, roomBelow + shift) < mustShowHeight(card)) {
+    // the text glides for a box his tap opened, never for one the app puts back (a page or Practice returning to its stage:
+    // the article stands where he left it; a hold's refresh) nor for the first-use demonstration: decided at the box's
+    // arrival, while its visit still says how it came, and kept while it stands
+    if (card._mayGlide === undefined) {
+      const visit = ladderVisit?.anchor === anchor ? ladderVisit : null;
+      card._mayGlide = !(visit && (visit.restore || visit.restoreNext || visit.redo || visit.demo));
+    }
+    if (top == null && !sentence && scroller && card._mayGlide && Math.max(roomAbove - shift, roomBelow + shift) < mustShowHeight(card)) {
       const word = { top: r.top - shift, bottom: r.bottom - shift };
       glided = roomForCard(word, ceiling, floor, scroller, [m.height, Math.min(m.height, mustShowHeight(card))],
         (scroller === 'window' ? startScroll : scroller.scrollTop) + shift);
@@ -11954,14 +11961,15 @@ function placeFloating(card, r) {
     // the glide stays on the card for as long as it stands (a later re-seat does not hide that the print moved)
     if (glided) card.dataset.glide = String((Number(card.dataset.glide) || 0) + glided);
     if (top == null) {
-      // Ladder · a cut card takes the room it has and no more (a 96 px floor past a smaller room stood it on its word), and
-      // ends 10 px from its word on the side it stands
+      // Ladder · a cut card takes the room it has and no more (a 96 px floor past a smaller room stood it on its word). Above
+      // its word it still meets the chrome's edge (Hfix-1A: no strip of cut title glyphs over it; a sentence opened from it
+      // keeps that top edge), its foot, shortened to a row, ending further from the word; below it, 10 px under the word
       const above = roomAbove - shift, below = roomBelow + shift;
       const fit = rowCut(card, Math.max(above, below, 1));
       card.style.maxHeight = `${fit}px`;
       card.style.overflowY = 'auto';
       if (scrolled) card.scrollTop = scrolled;
-      top = above >= below ? r.top - shift - 10 - fit : r.bottom - shift + 10;
+      top = above >= below ? ceiling : r.bottom - shift + 10;
     }
   }
   // a card nearly as wide as the screen is centred, its two gutters equal (review round 2 #13);
