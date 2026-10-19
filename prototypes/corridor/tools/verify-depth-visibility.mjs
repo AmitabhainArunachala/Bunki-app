@@ -78,8 +78,19 @@ async function story(page) {
   if (await direct.count()) await direct.click(); else { await openShelfTools(page); await page.locator('#shelf-reading-search').fill('スタートアップ大賞'); await page.locator('#shelf-reading-search').press('Enter'); await page.locator(`#shelf-reading-results [data-passage="${STORY}"] .shelf-open`).first().click(); }
   await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 30000 }); await delay(1000);
 }
-async function seed(page) {
+/** The title as laid out now, with the native depth of every card word read
+ * through the app's own resolver, independent of painted attributes. */
+const titleLayout = (page) => page.evaluate(() => {
+  const h1 = document.querySelector('.reader-card > h1.view-title');
+  if (!h1) return null;
+  const style = getComputedStyle(h1), words = [...document.querySelectorAll('.reader-card .japanese-lookup-word[data-lookup-text]')];
+  return { fontSize: style.fontSize, lineHeight: style.lineHeight, paddingBottom: style.paddingBottom, height: h1.getBoundingClientRect().height,
+    painted: words.filter((w) => w.dataset.depth != null || w.dataset.kept != null).map((w) => w.dataset.lookupText),
+    nativeActive: words.filter((w) => { const d = window.__KAIRO_DEPTH__.depth({ t: 'word', id: w.dataset.lookupText }); return d && (d.depth !== 'unmet' || d.kept); }).map((w) => w.dataset.lookupText) };
+});
+async function seed(page, out) {
   await story(page);
+  out.freshTitle = await titleLayout(page);
   const nodes = await page.evaluate((map) => Object.fromEntries(Object.entries(map).map(([name, at]) => { const node = window.__KAIRO_DEPTH__.readerNode(at); return [name, { node, key: window.__KAIRO_DEPTH__.key(node || {}), kind: window.__KAIRO_DEPTH__.identity(node || {})?.kind }]; })), PARA);
   const wanted = { unmet: '出席', met: '官邸', again: '大賞', recalled: '表彰', owned: '大臣', listed: '式', notYet: '挨拶' };
   assert(Object.entries(wanted).every(([k, v]) => nodes[k]?.node?.id === v && nodes[k].kind === 'core'), `Fixture identity mismatch: ${JSON.stringify(nodes)}`);
@@ -97,6 +108,12 @@ async function seed(page) {
   value.obslog = [...(value.obslog || []), ...['官邸', '大賞', '表彰'].flatMap((word) => [[now - 30 * 60000, 'tap', `word:${word}`, 2, STORY], [now - 15 * 60000, 'tap', `word:${word}`, 2, STORY], [now - 6 * DAY, 'dojo', `word:${word}`, 1], [now - 5 * DAY, 'dojo', `word:${word}`, 3]])];
   value.srs['word:挨拶'].due = new Date(now - 60000).toISOString();
   value.met = { version: 1, entries: Object.fromEntries([['met', 0, 0, 1], ['again', 9, 1, 3], ['recalled', 30, 4, 6], ['owned', 60, 2, 11], ['notYet', 20, 1, 4]].map(([k, first, last, days]) => [nodes[k].key, { first: today - first, last: today - last, days, ...(k === 'notYet' ? { said: { value: 'not-yet', at: now - DAY, cursor: value.revlog.length } } : {}) }])) };
+  // The title's first word, met today and saved: on the phone its ring sits on
+  // the first title line, over the second line's glyphs.
+  const nativeTitle = await page.evaluate(() => { const node = { t: 'word', id: '日本' }; return { node, key: window.__KAIRO_DEPTH__.key(node), kind: window.__KAIRO_DEPTH__.identity(node)?.kind }; });
+  assert.equal(nativeTitle.kind, 'core', 'Native title 日本 identity is core');
+  value.met.entries[nativeTitle.key] = { first: today, last: today, days: 1 };
+  value.taken.push(item('日本'));
   const blank = new URL('__dots-blank', base).href;
   await page.route(blank, (route) => route.fulfill({ contentType: 'text/html', body: '<!doctype html><title>Native fixture</title>' }));
   await page.goto(blank);
@@ -336,6 +353,18 @@ async function titleCard(page, out) {
     glyphCensus: census.reduce((lanes, g) => ({ ...lanes, [g.block]: (lanes[g.block] || 0) + 1 }), {}), captionCharacters, captionGlyphs };
   row(out, 'title.card-glyph-census', census.length > 0 && captionGlyphs === captionCharacters, out.titleCoverage);
   row(out, 'title.fixture-states', title.some((d) => ['met', 'again', 'recalled', 'owned'].includes(d.depth)) && title.some((d) => d.kept), out.titleCoverage);
+  const nihon = (out.nativeCensus?.title || []).find((r) => r.text === '日本');
+  const nihonKind = await page.evaluate(() => window.__KAIRO_DEPTH__.identity({ t: 'word', id: '日本' })?.kind ?? null);
+  row(out, 'title.native-nihon', nihonKind === 'core' && nihon?.active === true && nihon.expectedDepth === 'met' && nihon.expectedKept && nihon.actualDepth === 'met' && nihon.actualKept, { kind: nihonKind, census: nihon || null });
+  if (out.engine === 'webkit') {
+    const first = title.find((d) => d.text === '日本'), second = title.find((d) => d.text === '大賞');
+    const a = first?.fragments.at(-1), b = second?.fragments[0];
+    const distinct = Boolean(a && b) && b.top - a.top > (a.bottom - a.top) / 2 && a.top <= Math.min(...title.flatMap((d) => d.fragments.map((f) => f.top))) + 0.5;
+    const underRing = distinct ? out.captureFrames[first.captureFrame].glyphs.filter((g) => g.owner !== first.probeId && Math.abs(g.top - b.top) <= 1 && g.left < first.right + first.spread && g.right > first.left - first.spread) : [];
+    row(out, 'title.first-line-ring', distinct && first.kept && underRing.length > 0, { first: first && { fragments: first.fragments, dot: [first.left, first.top, first.right, first.bottom], spread: first.spread, kept: first.kept }, second: second && { fragments: second.fragments }, underRing });
+  }
+  const fresh = out.freshTitle, stateful = await titleLayout(page);
+  row(out, 'title.no-state-unreserved', Boolean(fresh && stateful) && !fresh.painted.length && !fresh.nativeActive.length && stateful.painted.length > 0 && fresh.fontSize === stateful.fontSize && fresh.lineHeight !== stateful.lineHeight && fresh.paddingBottom !== stateful.paddingBottom, { fresh, stateful });
 }
 async function rooms(page, out) {
   out.roomStateCoverage = {};
@@ -403,7 +432,7 @@ async function one(browser, engine, world) {
     await context.addInitScript((world) => { localStorage.setItem('kairo-theme', world); localStorage.setItem('kairo-word-ladder-demo-v1', '1'); }, world);
     if (controlBytes || diagnosticInlineEnd || process.env.DOTS_BASE_URL) await context.route(new URL('editorial.css', base).href + '*', async (route) => { try { const response = await route.fetch(); const original = await response.body(); const expected = report.identity.files?.find((f) => f.path === 'editorial.css')?.sha256; assert(expected && hash(original) === expected, 'Control fetched CSS does not match artifact'); const servedBytes = controlBytes || (process.env.DOTS_BASE_URL ? original : Buffer.concat([original, Buffer.from('\n.japanese-lookup-word:is([data-depth],[data-kept])::after { left:auto; right:auto; transform:translateX(calc(-0.5em - var(--depth-size)/2)); }\n')])); if (!process.env.DOTS_BASE_URL) assert(hash(original) !== hash(servedBytes), 'Control must change CSS'); (process.env.DOTS_BASE_URL ? (report.remoteCssServed ||= []) : report.control.served).push({ url: route.request().url(), candidateSha256: hash(original), servedSha256: hash(servedBytes) }); await route.fulfill({ response, body: servedBytes, headers: { ...response.headers(), 'content-length': String(servedBytes.length), 'content-type': 'text/css' } }); } catch (e) { report.control.setupError = String(e.stack); await route.abort(); } });
     const page = await context.newPage(); page.setDefaultTimeout(15000); page.on('pageerror', (e) => out.errors.push(String(e)));
-    await seed(page);
+    await seed(page, out);
     await worldBinding(page, out, 'reader');
     await page.evaluate(() => { const el = document.querySelector('#reader .tok[data-index]'); window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + scrollY - 160)); });
     await delay(400);
