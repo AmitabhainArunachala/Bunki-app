@@ -4030,6 +4030,8 @@ try {
             to: 'const readerTokenLead = (token) => readerDoorLead(readingTokenEntry(token)); // Ladder negative: the English never takes the sense' }] },
       ];
       for (const spec of ladderSpecs) {
+        // a narrowed run (KAIRO_LADDER_WALKS) runs only the controls of the walks it ran
+        if (ladderWalks.length && !ladderWalks.some((prefix) => spec.run.startsWith(prefix))) continue;
         const baseline = ladderSchedules[spec.run] || [];
         const expected = baseline.map((row) => row.id);
         const control = { engine, id: `ladder:${spec.id}`, edits: spec.edits, served: [], pageErrors: [] };
