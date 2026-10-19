@@ -4591,7 +4591,7 @@ function kanjiReadingsInWord(chars, reading, word = '') {
           // compound cuts it; the rest of the suffix is the stem's own grammar, not something this word writes
           if (!(cand.suffix === cand.w || cand.suffix.startsWith(cand.w))) continue;
           if (!space.startsWith(cand.w, cand.base.length)) continue;
-          fits.push({ display: `${cand.base}（${cand.w}）`, consume: cand.base.length + cand.w.length, rank: 0 });
+          fits.push({ display: `${cand.base}（${cand.w}）`, consume: cand.base.length + cand.w.length, rank: 0, consumedW: true });
         } else {
           // nothing written after the kanji (a compound's inside, or 々): the kun may name the whole
           // span this kanji reads here, without claiming okurigana (試合 あい, never あ（い）)
@@ -4606,8 +4606,8 @@ function kanjiReadingsInWord(chars, reading, word = '') {
     const seen = new Set();
     return fits.filter((fit) => !seen.has(fit.display) && (seen.add(fit.display), true));
   };
-  // a dotted kun's bare stem (死人 し・にん, 古巣 ふる・す, 一月 ひと・つき): never a greedy choice — it stands
-  // only when every later kanji still matches (r4: a span may not eat the next kanji's kana)
+  // a dotted kun's bare stem (死人 シ・ニン, 古巣 ふる・す, 一月 ひと・つき, 見本 み・ホン): never a greedy
+  // choice — it stands only when every later kanji still matches (r4: a span may not eat the next kanji's kana)
   const stemsFor = (i, pos) => {
     const stems = [];
     for (const cand of candLists[i]) {
@@ -4616,10 +4616,26 @@ function kanjiReadingsInWord(chars, reading, word = '') {
     }
     return stems.sort((a, b) => b.consume - a.consume);
   };
+  // the move after a fit: the reading position plus, when the fit didn't itself spend it, the kana the word
+  // writes between this kanji and the next (男の人: おとこ steps の before ひと). No kana, no step.
+  const advance = (i, pos, f) => {
+    let mid = pos + f.consume;
+    const w = candLists[i][0]?.w || '';
+    if (!f.consumedW && w) {
+      if (!hira.startsWith(w, mid)) return -1;
+      mid += w.length;
+    }
+    return mid;
+  };
+  // a path is complete only at the end of the reading, and no kanji may match after a blank one
+  // (r4 review: 男の人 is not お・と, 一生 is not い, 脱出 is not だ)
   const fullFrom = (i, pos, memo) => {
-    if (i >= chars.length) return true;
+    if (i >= chars.length) return pos === hira.length;
     const key = `${i}:${pos}`;
-    if (!memo.has(key)) memo.set(key, [...fitsFor(i, pos), ...stemsFor(i, pos)].some((f) => fullFrom(i + 1, pos + f.consume, memo)));
+    if (!memo.has(key)) memo.set(key, [...fitsFor(i, pos), ...stemsFor(i, pos)].some((f) => {
+      const mid = advance(i, pos, f);
+      return mid >= 0 && fullFrom(i + 1, mid, memo);
+    }));
     return memo.get(key);
   };
   const out = [];
@@ -4627,11 +4643,11 @@ function kanjiReadingsInWord(chars, reading, word = '') {
   for (let i = 0; i < chars.length; i++) {
     const memo = new Map();
     const fits = hira ? fitsFor(i, pos) : [];
-    const chosen = fits.find((f) => fullFrom(i + 1, pos + f.consume, memo))
-      || stemsFor(i, pos).find((f) => fullFrom(i + 1, pos + f.consume, memo))
-      || fits[0];
-    if (chosen) pos += chosen.consume;
-    out.push(chosen ? chosen.display : '');
+    let chosen = fits.find((f) => { const mid = advance(i, pos, f); return mid >= 0 && fullFrom(i + 1, mid, memo); });
+    if (!chosen) chosen = stemsFor(i, pos).find((f) => { const mid = advance(i, pos, f); return mid >= 0 && fullFrom(i + 1, mid, memo); });
+    if (chosen) pos = advance(i, pos, chosen);
+    else if (fits[0]) pos += fits[0].consume; // no full path: the r3 greedy seat, unchanged
+    out.push((chosen || fits[0]) ? (chosen || fits[0]).display : '');
   }
   return out;
 }

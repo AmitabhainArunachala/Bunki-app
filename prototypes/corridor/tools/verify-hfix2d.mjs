@@ -89,6 +89,10 @@ const WORDS = [
   { q: '一月', row: { ja: ['ひと', 'つき'], en: ['One', 'Month'] } },
   { q: '口調', row: { ja: ['ク', 'チョウ'], en: ['Mouth', 'Tune'] } },
   { q: '黒色', row: { ja: ['くろ', 'いろ'], en: ['Black', 'Color'] } },
+  // r4 fix · a path completes only at the end of the reading, stepping the word's own kana, and no kanji
+  // matches after a blank: 男の人 splits おとこ・ひと (the の is stepped), 一生 stays an honest blank
+  { q: '男の人', row: { ja: ['おとこ', 'ひと'], en: ['Male', 'Person'] } },
+  { q: '一生', row: { ja: ['', ''], en: ['One', 'Life'] } },
 ];
 const JA_PLAIN = /^[ぁ-ゖァ-ヶー一-鿯々〇〻（）・·０-９ ]+$/u; // no Latin on a JA label: kana, kanji, parens, ・/·, spaces, full-width digits
 const EN_PLAIN = /^[a-z][a-z ·,'-]*$/u; // one plain English line, no parentheses, no romaji tags
