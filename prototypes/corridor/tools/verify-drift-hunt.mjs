@@ -718,33 +718,33 @@ for (let attempt = 1; attempt <= 3; attempt++) {
     // delivery is still proved against the exact node by hit.sameNode below. If no candidate
     // owns any of its own points the staging still fails, so a product regression that makes
     // orbiters untouchable stays red.
-    const ownedPoint = (el, r) => {
+    const owns = (el, x, y) => x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight &&
+      el.contains(document.elementFromPoint(x, y));
+    // Points inside the word's own glyph, used only as a fallback. A single owned sliver is not
+    // enough: the field drifts between this snapshot and the native touch, so a word whose
+    // centre belongs to a neighbour is a word the finger will miss. A fallback candidate must
+    // own its glyph centre AND both flanks before it is trusted.
+    const glyphHold = (el) => {
       const glyph = el.querySelector('.base');
       const g = glyph ? glyph.getBoundingClientRect() : null;
-      const points = [];
-      if (g && g.width && g.height) points.push([g.left + g.width / 2, g.top + g.height / 2]);
-      points.push([r.left + r.width / 2, r.top + r.height / 2]);
-      if (g && g.width && g.height) {
-        points.push([g.left + g.width * 0.3, g.top + g.height / 2], [g.left + g.width * 0.7, g.top + g.height / 2]);
-      }
-      for (const [x, y] of points) {
-        if (!(x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight)) continue;
-        if (el.contains(document.elementFromPoint(x, y))) return { x, y };
-      }
-      return null;
+      if (!g || !g.width || !g.height) return null;
+      const y = g.top + g.height / 2;
+      const mid = g.left + g.width / 2;
+      if (!owns(el, mid, y) || !owns(el, g.left + g.width * 0.3, y) || !owns(el, g.left + g.width * 0.7, y)) return null;
+      return { x: mid, y };
     };
-    const orb = words.map((el) => {
+    const candidates = words.map((el) => {
       const r = el.getBoundingClientRect();
       return { el, r, x: r.left + r.width / 2, y: r.top + r.height / 2 };
     }).filter((o) => o.r.width && !o.el.classList.contains('center') &&
       parseFloat(o.el.style.opacity || '1') > 0.4 && o.r.top > 110 && o.r.bottom < 560 &&
       (!cr || o.r.bottom < cr.top - 20 || o.r.top > cr.bottom + 20 || o.r.right < cr.left - 20 || o.r.left > cr.right + 20))
-      .sort((a, b) => (a.y + a.x) - (b.y + b.x))
-      .reduce((found, o) => {
-        if (found) return found;
-        const point = ownedPoint(o.el, o.r);
-        return point ? { ...o, x: point.x, y: point.y } : null;
-      }, null);
+      .sort((a, b) => (a.y + a.x) - (b.y + b.x));
+    // Unchanged first choice: the highest/leftmost orbiter that owns its own centre. Only when
+    // no orbiter owns its centre — the state that broke this staging — does the glyph fallback
+    // run, so a run that used to stage still stages exactly the same word.
+    const orb = candidates.find((o) => owns(o.el, o.x, o.y))
+      || candidates.reduce((found, o) => found || (() => { const h = glyphHold(o.el); return h ? { ...o, x: h.x, y: h.y } : null; })(), null);
     const corner = cr ? { x: cr.right - 26, y: cr.top + 20 } : null;
     const stage = {
       card: corner ? { ...corner, hit: card.contains(document.elementFromPoint(corner.x, corner.y)) } : null,
