@@ -2746,6 +2746,19 @@ body.v-depth-layered .inline-link {
   text-transform: lowercase;
 }
 
+.senses .sense-usage {
+  font-family: var(--sans);
+  font-size: var(--type-caption);
+  letter-spacing: 0.06em;
+  color: var(--faint);
+  opacity: 0.75;
+  margin: 0 0 3px;
+}
+
+.senses .dictionary-usage {
+  margin-top: 2px;
+}
+
 .sense-list {
   margin: 0 0 12px;
   padding-left: 22px;
