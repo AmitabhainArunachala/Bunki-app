@@ -44,7 +44,7 @@
     let dbPromise = database();
     dbPromise.catch(() => {});
     let config = null, configPromise = null, configError = '', serviceUnavailable = false, draft = null, draftDirty = false, active = 'new', selectedId = null;
-    let draftCanAdoptBuild = false;
+    let draftCanAdoptBuild = false, exactOpen = false;
     let syncing = false, disposed = false, closing = false, unmountPromise = null, initialized = false, engaged = false, saveTimer, retryTimer, pollTimer;
     let saveQueue = Promise.resolve(), message = '', returnState = null, rows = [], previewUrls = [];
     let busy = false, attachmentBusy = false, recovering = false, followups = {}, sessionPromise = null;
@@ -177,6 +177,8 @@
         '### What I expected', '', clip(report.expected, compact ? 200 : 600), '',
         '### Where', '',
         `- App: KAIRO ${target?.version || '(version unknown)'}`,
+        // H2-fix (H2-5): the served build the report came from, when this copy knows it
+        ...(validBuild(ctx.build) ? [`- Build: ${code(compact ? ctx.build.git_sha.slice(0, 12) : ctx.build.git_sha)}, artifact ${code(compact ? ctx.build.artifact_sha256.slice(0, 12) : ctx.build.artifact_sha256)}`] : []),
         `- Screen: ${code(ctx.surface)}`,
         `- Path: ${code(compact ? clip(ctx.route, 120) : ctx.route)}`,
         ...(ctx.content_ids.length ? [`- Content: ${(compact ? ctx.content_ids.slice(0, 4).map(value => clip(value, 60)) : ctx.content_ids).map(code).join(', ')}`] : []),
@@ -224,6 +226,15 @@
       return { git_sha: build.git_sha, artifact_sha256: build.artifact_sha256 };
     }
 
+    // H2-fix (H2-5): a context captured in this document, still without a build, takes the served build's identity once the
+    // host has read it (options.hostBuild). A recovered draft keeps its unknown identity, as with the service's build.
+    const validBuild = build => !!build && /^[a-f0-9]{40}$/.test(build.git_sha || '') && /^[a-f0-9]{64}$/.test(build.artifact_sha256 || '');
+    function adoptHostBuild(build) {
+      const held = draft?.context?.context?.build;
+      if (!draftCanAdoptBuild || !held || held.git_sha || held.artifact_sha256 || !validBuild(build)) return false;
+      draft.context.context.build = { git_sha: build.git_sha, artifact_sha256: build.artifact_sha256 };
+      return true;
+    }
     function capture() {
       let source = {};
       try { source = typeof options.getContext === 'function' ? options.getContext() || {} : {}; } catch { /* Safe minimal context remains usable. */ }
@@ -564,6 +575,9 @@
       (mode === 'new' ? body.querySelector('#br-actual') : body.querySelector('button'))?.focus({ preventScroll: true });
       if (mode === 'list') run(updateReports);
       else run(() => loadConfig().then(() => { if (dialog.open && active === 'new' && !busy) render(); }));
+      if (mode === 'new' && typeof options.hostBuild === 'function') {
+        run(() => Promise.resolve(options.hostBuild()).then(build => { if (adoptHostBuild(build) && dialog.open && active === 'new' && !busy) render(); }, () => {}));
+      }
     }
     function restoreReturn() {
       clearTimeout(pollTimer);
@@ -590,16 +604,41 @@
     // sent him to GitHub): the screen by its name, the next step plainly, and everything technical — the screen's id,
     // where a report is filed, the exact context sent — under one quiet Details. Nothing a report needs is removed.
     const L = (ja, en) => (root.dataset.locale === 'ja' ? ja : en);
-    function exactContext(context, extra = '') { return `<details class="br-details"><summary>${L('詳しく', 'Details')}</summary>${extra}<pre>${esc(JSON.stringify(context, null, 2))}</pre><p class="br-note">${L('送られるのは、この欄とあなたの言葉、選んだ画像だけ。', 'Only these fields, your words, and the screenshots you choose are included.')}</p></details>`; }
+    // H2-fix (H2-5, Grok's H2 walk: Details printed a JSON block): Details says in plain words what a report carries and where
+    // it goes. The exact data stays one more tap away, for the app's makers; nothing a report sends is hidden or removed.
+    function plainSent(data, screen) {
+      const ctx = data?.context || {};
+      let diagnostics = data?.diagnostics;
+      if (!diagnostics) { try { diagnostics = JSON.parse((data?.evidence || []).find(item => item.kind === 'action_trace')?.summary || 'null'); } catch { diagnostics = null; } }
+      diagnostics = diagnostics && typeof diagnostics === 'object' ? diagnostics : {};
+      const version = clip(diagnostics.app_version || options.appVersion || options.github?.version || '', 40);
+      const build = validBuild(ctx.build) ? ctx.build.git_sha.slice(0, 12) : '';
+      const app = build ? L(`版 ${version || '—'}、ビルド ${build}`, `version ${version || '—'}, build ${build}`)
+        : L(`版 ${version || '—'}（この写しにはビルド番号がない）`, `version ${version || '—'} (this copy carries no build number)`);
+      const size = diagnostics.viewport?.width && diagnostics.viewport?.height ? `${Math.round(diagnostics.viewport.width)} × ${Math.round(diagnostics.viewport.height)}${L('、', ', ')}` : '';
+      const items = [
+        L('あなたの言葉と、選んだ種類', 'Your words, and the kind of problem you chose'),
+        `${L('どの画面か：', 'Which screen: ')}${esc(screen || ctx.surface?.replace(/^corridor\//, '') || '—')}`,
+        `${L('このアプリ：', 'This app: ')}${esc(app)}`,
+        `${L('画面の大きさと表示の言語：', 'Your screen’s size and the app’s language: ')}${esc(size)}${ctx.locale === 'ja' ? L('日本語', 'Japanese') : L('英語', 'English')}`,
+        ...(Array.isArray(diagnostics.action_trace) && diagnostics.action_trace.length ? [L('その前に開いた画面の名前', 'The names of the screens you opened before it')] : []),
+        ...(Array.isArray(diagnostics.frames) && diagnostics.frames.length ? [L('この端末で今週いちばん重かった動き（名前と時間だけ）', 'This week’s slowest moments on this device (names and times only)')] : []),
+      ];
+      return `<p class="br-note br-sent-head">${L('送るもの', 'What gets sent')}</p><ul class="br-sent">${items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+    }
+    function exactContext(context, extra = '', screen = '') { return `<details class="br-details"><summary>${L('詳しく', 'Details')}</summary>${plainSent(context, screen)}${extra}<p class="br-note">${L('送られるのは、この欄とあなたの言葉、選んだ画像だけ。', 'Only these fields, your words, and the screenshots you choose are included.')}</p><button type="button" class="br-exact-toggle" data-br="exact" aria-expanded="${exactOpen}" aria-controls="br-exact">${exactOpen ? L('送るデータそのものを閉じる', 'Hide the exact data') : L('送るデータそのものを見る（直す人向け）', 'Show the exact data sent (for the app’s makers)')}</button><pre id="br-exact" ${exactOpen ? '' : 'hidden'}>${esc(JSON.stringify(context, null, 2))}</pre></details>`; }
     function render() {
       const focus = document.activeElement, focusId = body.contains(focus) ? focus.id : '', start = focus?.selectionStart, end = focus?.selectionEnd, scroll = body.scrollTop;
       const focusAction = body.contains(focus) ? focus.dataset.br : null, focusRecord = focus?.dataset.id;
+      const detailsOpen = !!body.querySelector('.br-details')?.open, view = active;
       clearPreviews();
       const jaTitles = root.dataset.locale === 'ja';
       root.querySelector('#br-title').textContent = active === 'new' ? (jaTitles ? '不具合を知らせる' : 'Report a problem') : active === 'detail' ? (jaTitles ? 'あなたの報告' : 'Your report') : (jaTitles ? '送った報告' : 'My reports');
       root.querySelector('[data-br="new"]').setAttribute('aria-current', active === 'new' ? 'page' : 'false');
       root.querySelector('[data-br="list"]').setAttribute('aria-current', active !== 'new' ? 'page' : 'false');
+      if (active === 'new') adoptHostBuild(capture().context.build);
       body.innerHTML = active === 'new' ? newMarkup() : active === 'detail' ? detailMarkup() : listMarkup();
+      if (detailsOpen && view === active) { const details = body.querySelector('.br-details'); if (details) details.open = true; }
       protectClosingDialog();
       if (focusId || focusAction) {
         const replacement = focusId ? body.querySelector(`#${focusId}`) : [...body.querySelectorAll('[data-br]')].find(item => item.dataset.br === focusAction && item.dataset.id === focusRecord);
@@ -617,13 +656,13 @@
       const delivery = canQueueReview() ? 'lavish' : githubMode() ? 'github' : service && !serviceUnavailable ? 'service' : 'device';
       const where = delivery === 'github' ? L('報告は、アプリを直す人が読む GitHub の公開ページに、あなたの言葉とこの画面の欄を入れて開く。そこで「Submit new issue」を押すと送られる。公開されるので、個人的なことは書かない。写しはこの端末に残る。', 'This opens GitHub with your words and this screen filled in. Tap “Submit new issue” there to send it. Issues in this repository are public, so leave out anything private. A copy stays on this device.')
         : delivery === 'service' && config?.public_reports === true ? L('送った報告は、画像と一緒に GitHub の公開ページに載る。個人的なことは書かない。写しはこの端末に残る。', 'Send report files it as a public GitHub issue, with its screenshots, so leave out anything private. A copy stays on this device.') : '';
-      const details = `<p class="br-note">${L('この画面', 'This screen')}: ${esc(scope)}</p>${where ? `<p class="br-note">${where}</p>` : ''}`;
+      const details = where ? `<p class="br-note">${where}</p>` : '';
       return `${notice()}<p>${L('何が起きたか教えてください。レッスンの場所はそのまま残る。', 'Tell us what happened. Your place in the lesson stays here.')}</p><p class="br-context-summary"><strong>${L('この画面について', 'Reporting this screen')}</strong><br>${esc(named || scope)}${scopeChanged ? `<br><button type="button" data-br="context">${L('いまの画面に切り替える', 'Use the current screen for this draft')}</button>` : ''}</p>${options.clockNotice ? `<p class="br-note">${esc(typeof options.clockNotice === 'function' ? options.clockNotice() : options.clockNotice)}</p>` : ''}
         ${configError && !githubMode() ? `<p class="br-note">${esc(configError)}</p>` : ''}${recoveryMarkup(savedDrafts, 'recover-draft', 'reports')}<form id="br-form"><label class="br-field"><span>${L('何が起きた？', 'What happened?')}</span><textarea id="br-actual" name="actual" ${busy ? 'readonly' : ''} required maxlength="12000" rows="4" placeholder="${L('どの文、どのボタンで？', 'Which sentence or control was involved?')}">${esc(draft?.actual)}</textarea></label>
         <label class="br-field"><span>${L('どうなるはずだった？', 'What did you expect?')} <small>${L('なくてもよい', 'Optional')}</small></span><textarea id="br-expected" name="expected" ${busy ? 'readonly' : ''} maxlength="4000" rows="2">${esc(draft?.expected)}</textarea></label>
         <label class="br-field"><span>${L('種類', 'Category')}</span><select id="br-category" name="category" ${busy ? 'disabled' : ''}>${[['bug', '動かない', 'Something isn’t working'], ['content', '言葉・内容', 'Language or content'], ['experience', '学びかた', 'Learning experience'], ['idea', '思いつき', 'An idea']].map(([value, ja, en]) => `<option value="${value}" ${draft?.category === value ? 'selected' : ''}>${L(ja, en)}</option>`).join('')}</select></label>
-        ${exactContext(draft?.context, details)}${githubMode() && !draft?.attachments?.length ? `<p class="br-note">${L('画面の写真は、送るときに開くページで足せる。', 'You can add a picture of the screen on the page that opens when you send.')}</p>` : `<label class="br-field"><span>Add a screenshot <small>Optional</small></span><input id="br-files" type="file" accept="image/png,image/jpeg,image/webp" multiple ${attachmentBusy || busy ? 'disabled' : ''} aria-describedby="br-file-note"></label><p id="br-file-note" class="br-note">Choose an image yourself. Preview it below and remove anything private. PNG, JPEG or WebP; up to ${limits.attachment_count} images, ${Math.floor(limits.attachment_bytes / 1048576)} MB each.</p><div class="br-attachments">${(draft?.attachments || []).map(preview).join('')}</div>`}
-        <div class="br-actions"><button type="submit" class="br-primary" data-delivery="${delivery}" ${busy || attachmentBusy ? 'disabled' : ''}>${busy ? L('保存している…', 'Saving…') : delivery === 'lavish' ? 'Save & queue in Lavish' : delivery === 'github' ? L('送る', 'Send') : delivery === 'service' ? 'Send report' : 'Save on this device'}</button><button type="button" data-br="close">${L('レッスンに戻る', 'Return to lesson')}</button></div><p class="br-note">${delivery === 'lavish' ? 'Your words and screen context will join the Lavish feedback queue. Press Send to Agent in Lavish when ready. Screenshots remain saved here; use Lavish annotations to share images.' : delivery === 'github' ? L('送ると、仕上げのページが開く。そこで送信して届く。写しはこの端末に残る。', 'Send opens a page to finish sending your report there. A copy stays on this device.') : delivery === 'service' ? L('写しはこの端末に残る。', 'A copy stays on this device.') : 'Saving keeps the report in this browser. “Received” appears only when a connected service confirms delivery.'}</p></form>`;
+        ${exactContext(draft?.context, details, named || scope)}${githubMode() && !draft?.attachments?.length ? `<p class="br-note">${L('画面の写真は、送るときに開くページで足せる。', 'You can add a picture of the screen on the page that opens when you send.')}</p>` : `<label class="br-field"><span>Add a screenshot <small>Optional</small></span><input id="br-files" type="file" accept="image/png,image/jpeg,image/webp" multiple ${attachmentBusy || busy ? 'disabled' : ''} aria-describedby="br-file-note"></label><p id="br-file-note" class="br-note">Choose an image yourself. Preview it below and remove anything private. PNG, JPEG or WebP; up to ${limits.attachment_count} images, ${Math.floor(limits.attachment_bytes / 1048576)} MB each.</p><div class="br-attachments">${(draft?.attachments || []).map(preview).join('')}</div>`}
+        <p class="br-note">${delivery === 'lavish' ? 'Your words and screen context will join the Lavish feedback queue. Press Send to Agent in Lavish when ready. Screenshots remain saved here; use Lavish annotations to share images.' : delivery === 'github' ? L('送ると、仕上げのページが開く。そこで送信して届く。写しはこの端末に残る。', 'Send opens a page to finish sending your report there. A copy stays on this device.') : delivery === 'service' ? L('写しはこの端末に残る。', 'A copy stays on this device.') : 'Saving keeps the report in this browser. “Received” appears only when a connected service confirms delivery.'}</p><div class="br-actions br-foot"><button type="submit" class="br-primary" data-delivery="${delivery}" ${busy || attachmentBusy ? 'disabled' : ''}>${busy ? L('保存している…', 'Saving…') : delivery === 'lavish' ? 'Save & queue in Lavish' : delivery === 'github' ? L('送る', 'Send') : delivery === 'service' ? 'Send report' : 'Save on this device'}</button><button type="button" data-br="close">${L('レッスンに戻る', 'Return to lesson')}</button></div></form>`;
     }
     function listMarkup() {
       return `${notice()}<p class="br-note">${githubMode() ? L('報告はこの端末に残る。開くと送れる。', 'Your reports stay on this device. Open one to send it.') : 'Reports and guest access are saved in this browser. Clearing browser data removes that access.'}</p><div class="br-actions"><button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button><button type="button" data-br="new">New report</button></div>${configError ? `<p class="br-note">${esc(configError)}</p>` : ''}${rows.length ? `<ul class="br-report-list">${rows.map(row => `<li><button type="button" data-br="detail" data-id="${esc(row.id)}"><span class="br-report-title">${esc(clip(row.report.user_words, 140))}${Array.from(row.report.user_words).length > 140 ? '…' : ''}</span><span class="br-status">${esc(statusLabel(row))}</span><time class="br-date" datetime="${esc(row.created_at)}">${esc(new Date(row.created_at).toLocaleDateString())}</time></button></li>`).join('')}</ul>` : '<h3>No reports yet</h3><p>A report can describe something broken, a language issue, or an idea for KAIRO.</p>'}`;
@@ -639,7 +678,7 @@
       const githubSend = !isReceived && githubMode();
       const issue = isReceived && /^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+$/.test(view.issue?.url || '') ? view.issue : null;
       const withoutAi = config?.ai?.status === 'none';
-      return `${notice()}<button type="button" data-br="list">Back to my reports</button><h3>${esc(statusLabel(row))}</h3><p class="br-note">${issue ? `Filed as issue #${esc(issue.number)}. <a href="${esc(issue.url)}" target="_blank" rel="noopener">Open it on GitHub</a>` : isReceived ? `Receipt ${esc(view.receipt.receipt_id)}` : row.review_queued_at ? 'Your words and screen context are queued in Lavish. Use Send to Agent there when you are ready. A copy remains saved in this browser.' : githubSend ? (row.github_opened_at ? 'GitHub was opened with this report. If you did not tap “Submit new issue” there, send it again.' : 'Not sent yet. Send it to GitHub to file it for fixing.') : 'Saved locally. You can leave this sheet; the report stays in this browser until it can be sent.'}</p>${githubSend ? `<div class="br-actions"><a class="br-primary br-link" href="${esc(issueUrl(report))}" target="_blank" rel="noopener" data-br="github" data-id="${esc(row.id)}">${row.github_opened_at ? 'Send to GitHub again' : 'Send to GitHub'}</a><button type="button" data-br="copy" data-id="${esc(row.id)}">Copy report text</button></div>` : ''}${row.delivery_error && !serviceUnavailable && !canQueueReview() ? `<p class="br-note">${esc(row.delivery_error)}</p>` : ''}<h4>Your original words</h4><p class="br-verbatim">${esc(report.user_words)}</p><h4>What you expected</h4><p class="br-verbatim">${esc(report.expected)}</p>${exactContext({ context: report.context, evidence: report.evidence.filter(item => item.kind === 'action_trace'), attachment_ids: report.attachment_ids })}<div class="br-actions">${githubSend ? '' : `<button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button>`}${!isReceived && canQueueReview() ? `<button type="button" data-br="queue-review" ${busy ? 'disabled' : ''}>${row.review_queued_at ? 'Queue in Lavish again' : 'Queue in Lavish'}</button>` : ''}${isReceived && !withoutAi ? `<button type="button" data-br="propose" ${busy || ['running', 'pending'].includes(view.triage?.state) && view.triage?.state !== 'pending' ? 'disabled' : ''}>Ask Sensei for a proposal</button>` : ''}</div>
+      return `${notice()}<button type="button" data-br="list">Back to my reports</button><h3>${esc(statusLabel(row))}</h3><p class="br-note">${issue ? `Filed as issue #${esc(issue.number)}. <a href="${esc(issue.url)}" target="_blank" rel="noopener">Open it on GitHub</a>` : isReceived ? `Receipt ${esc(view.receipt.receipt_id)}` : row.review_queued_at ? 'Your words and screen context are queued in Lavish. Use Send to Agent there when you are ready. A copy remains saved in this browser.' : githubSend ? (row.github_opened_at ? 'GitHub was opened with this report. If you did not tap “Submit new issue” there, send it again.' : 'Not sent yet. Send it to GitHub to file it for fixing.') : 'Saved locally. You can leave this sheet; the report stays in this browser until it can be sent.'}</p>${githubSend ? `<div class="br-actions"><a class="br-primary br-link" href="${esc(issueUrl(report))}" target="_blank" rel="noopener" data-br="github" data-id="${esc(row.id)}">${row.github_opened_at ? 'Send to GitHub again' : 'Send to GitHub'}</a><button type="button" data-br="copy" data-id="${esc(row.id)}">Copy report text</button></div>` : ''}${row.delivery_error && !serviceUnavailable && !canQueueReview() ? `<p class="br-note">${esc(row.delivery_error)}</p>` : ''}<h4>Your original words</h4><p class="br-verbatim">${esc(report.user_words)}</p><h4>What you expected</h4><p class="br-verbatim">${esc(report.expected)}</p>${exactContext({ context: report.context, evidence: report.evidence.filter(item => item.kind === 'action_trace'), attachment_ids: report.attachment_ids }, '', report.context?.surface?.replace(/^corridor\//, '').replaceAll('/', ' › ') || '')}<div class="br-actions">${githubSend ? '' : `<button type="button" data-br="refresh" ${busy ? 'disabled' : ''}>${busy ? 'Checking…' : 'Refresh & retry'}</button>`}${!isReceived && canQueueReview() ? `<button type="button" data-br="queue-review" ${busy ? 'disabled' : ''}>${row.review_queued_at ? 'Queue in Lavish again' : 'Queue in Lavish'}</button>` : ''}${isReceived && !withoutAi ? `<button type="button" data-br="propose" ${busy || ['running', 'pending'].includes(view.triage?.state) && view.triage?.state !== 'pending' ? 'disabled' : ''}>Ask Sensei for a proposal</button>` : ''}</div>
         ${isReceived ? `<h3>${withoutAi ? 'Progress' : 'Sensei analysis'}</h3>${protectedAnswer ? '<p class="br-note">Your report is available. AI analysis and proposals can be read after the protected sitting ends, to keep answer support unchanged.</p>' : `<p class="br-note">${esc(triageText(view))}</p>${view.conversation?.length ? `<ol class="br-thread">${view.conversation.map(item => `<li><strong>${esc(item.actor === 'sensei' ? 'Sensei · AI interpretation' : item.actor === 'user' ? 'You' : withoutAi ? 'On GitHub' : 'Service update')}</strong><p class="br-verbatim">${esc(item.text)}</p></li>`).join('')}</ol>` : ''}${(view.proposals || []).map(proposalMarkup).join('')}`}${recoveryMarkup(savedFollowups, 'recover-followup', 'follow-ups')}${pending ? `<section class="br-pending"><h4>Awaiting confirmation</h4><p class="br-verbatim">${esc(pending.data.text)}</p><button type="button" data-br="retry-followup" ${busy ? 'disabled' : ''}>Retry pending follow-up</button><p class="br-note">This retries the same message and request ID. The text below is kept separately.</p></section>` : ''}<form id="br-follow-form"><label class="br-field"><span>Add a detail or reply</span><textarea id="br-follow" ${recovering || !followupSlots[row.id] ? 'readonly' : ''} maxlength="4000" rows="3">${esc(follow)}</textarea></label><div class="br-actions"><button type="submit" ${busy || pending || !followupSlots[row.id] ? 'disabled' : ''}>Send follow-up</button><button type="button" data-br="reopen" ${busy || pending || !followupSlots[row.id] ? 'disabled' : ''}>Still happening</button></div><p class="br-note">“Still happening” keeps this thread and adds the current screen context.</p></form>` : ''}`;
     }
     function triageText(view) {
@@ -844,6 +883,12 @@
         const action = button.dataset.br;
         if (action === 'open' || action === 'new') { button.focus({ preventScroll: true }); return open('new'); }
         else if (action === 'context') { draft.context = capture(); scheduleDraft(); render(); }
+        else if (action === 'exact') {
+          exactOpen = !exactOpen;
+          button.setAttribute('aria-expanded', String(exactOpen));
+          button.textContent = exactOpen ? L('送るデータそのものを閉じる', 'Hide the exact data') : L('送るデータそのものを見る（直す人向け）', 'Show the exact data sent (for the app’s makers)');
+          button.parentElement.querySelector('#br-exact')?.toggleAttribute('hidden', !exactOpen);
+        }
         else if (action === 'queue-review') return queueReview();
         else if (action === 'reports' || action === 'list') return open('list');
         else if (action === 'close') close();
@@ -895,6 +940,7 @@
       if (closing || disposed) return;
       if (event.target.id === 'br-form') {
         let preset = null;
+        adoptHostBuild(capture().context.build);
         if (githubMode() && !busy && !attachmentBusy && draft?.actual.trim()) {
           // Open GitHub inside the tap: a browser blocks a window opened after the
           // save's await. If it is blocked anyway, the saved report keeps a link.

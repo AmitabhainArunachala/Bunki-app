@@ -1629,8 +1629,10 @@ export const SENSE_CASE_IDS = Object.freeze([
   'chromium/c.page-errors',
 ]);
 // INT-VH (merge 2): recomputed after the reviewed aozora-049966-2 change below (Hfix-1A R3-3); every other entry unchanged
+// H2-fix (H2-3): recomputed after data/articles/index.json's one row change below (the startup-awards article's warehouse
+// picture withdrawn, its key kanji 賞 added); no token, sense or dictionary file changed, every other entry unchanged
 export const SENSE_DATA_INVENTORY_SHA256 =
-  '5477af625758b6e84d76e14b39e7d9fd92ae3cdc8043a9f4fd9bb315ef05eff1';
+  '06483189cf6348684c7d0b2da7b2f894f255a2e62c285d76773c002be7fb7064';
 export const SPEAK_CHECK_NAMES = Object.freeze({
   S1: [
     'the Learn room has one Speak door, a study-door row',
@@ -5255,7 +5257,7 @@ export const SENSE_DATA_INVENTORY = Object.freeze([
     'data/articles/govonline-article-202609-tv-6628.json',
     'c77a856a6ecca272724d452ef32c1e9469342e6952f4072db7565ce2af3e8eef',
   ],
-  ['data/articles/index.json', '9c29aab55cf7538dc3b3f3cbdbd07d5d4045f574ce67b89303373949ddbeba42'],
+  ['data/articles/index.json', 'da31d6b2534b998b7d286332060a87570b2af4273cc200d9e36a4abc419c9d8f'],
   [
     'data/articles/jawiki-3492442.json',
     '76a52a9b2fae5108f0897a0a714e26f39ea9982c958706758b715d3a961d2145',

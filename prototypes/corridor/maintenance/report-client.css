@@ -41,7 +41,7 @@
 #bunki-reports-root .br-nav { display: flex; gap: 20px; border-bottom: 1px solid var(--br-line); padding: 0 28px; }
 #bunki-reports-root .br-nav button { border: 0; border-radius: 0; padding: 10px 0; font-size: var(--type-label); color: var(--br-muted); }
 #bunki-reports-root .br-nav button[aria-current="page"] { color: var(--br-ink); box-shadow: inset 0 -2px var(--br-ink); }
-#bunki-reports-root .br-body { padding: 22px 28px 32px; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: var(--br-muted) var(--br-paper); scrollbar-width: thin; min-height: 0; }
+#bunki-reports-root .br-body { --br-pad-x: 28px; padding: 22px var(--br-pad-x) 32px; overflow-y: auto; overscroll-behavior: contain; scrollbar-color: var(--br-muted) var(--br-paper); scrollbar-width: thin; min-height: 0; }
 #bunki-reports-root .br-note { color: var(--br-muted); font-size: var(--type-label); line-height: 1.6; }
 #bunki-reports-root .br-notice { padding: 12px 0; border-bottom: 1px solid var(--br-line); margin-bottom: 18px; white-space: pre-wrap; }
 #bunki-reports-root .br-error { color: var(--br-ink); font-weight: 600; }
@@ -55,6 +55,15 @@
 #bunki-reports-root input[type="file"] { display: block; max-width: 100%; font-size: var(--type-label); margin: 10px 0; }
 #bunki-reports-root input[type="file"]::file-selector-button { min-height: 44px; border: 1px solid var(--br-line); padding: 8px 12px; margin-right: 10px; background: transparent; color: var(--br-ink); border-radius: var(--radius-seal); }
 #bunki-reports-root .br-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 20px 0 8px; }
+/* H2-fix (H2-5, Grok's H2 walk: at 390×844 Send and Return to lesson were cut by the glass's foot, and the iPad's sat below
+   it): the new report's two actions stand at the sheet's foot on every size, whole on the glass and clear of a phone's home
+   bar; the form scrolls under them. The body gives up its bottom padding so the foot meets the sheet's edge. */
+#bunki-reports-root .br-body:has(> #br-form) { padding-bottom: 0; }
+#bunki-reports-root #br-form > .br-foot { position: sticky; bottom: 0; z-index: 1; margin: 16px calc(-1 * var(--br-pad-x)) 0; padding: 12px var(--br-pad-x) calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--br-line); background: var(--br-paper); }
+#bunki-reports-root .br-sent-head { margin: 0 0 4px; color: var(--br-ink); font-weight: 600; }
+#bunki-reports-root .br-sent { margin: 0 0 12px; padding-left: 20px; color: var(--br-muted); font-size: var(--type-label); line-height: 1.6; }
+#bunki-reports-root .br-sent li { margin-bottom: 4px; overflow-wrap: anywhere; }
+#bunki-reports-root .br-exact-toggle { min-height: 44px; margin: 0 0 12px; padding: 8px 0; border: 0; background: none; font-size: var(--type-label); color: var(--br-muted); text-decoration: underline; text-underline-offset: 3px; text-align: left; }
 #bunki-reports-root a.br-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border: 1px solid var(--br-ink); border-radius: var(--radius-card); padding: 8px 12px; text-decoration: none; font: inherit; }
 #bunki-reports-root details { margin: 18px 0; border-block: 1px solid var(--br-line); }
 #bunki-reports-root summary { cursor: pointer; min-height: 44px; padding: 10px 0; font-size: var(--type-label); }
@@ -80,7 +89,7 @@
 #bunki-reports-root .br-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 @media (max-width: 480px) {
   #bunki-reports-root .br-heading { padding: 18px 18px 10px; }
-  #bunki-reports-root .br-body { padding: 18px 18px 28px; }
+  #bunki-reports-root .br-body { --br-pad-x: 18px; padding: 18px var(--br-pad-x) 28px; }
   #bunki-reports-root .br-nav { padding-inline: 18px; gap: 18px; }
   #bunki-reports-root h2 { font-size: var(--type-section); }
   #bunki-reports-root .br-sheet { height: 100dvh; }

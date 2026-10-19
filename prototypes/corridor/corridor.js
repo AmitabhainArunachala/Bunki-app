@@ -6997,7 +6997,7 @@ function renderShelfBody(search = null) {
   select('sort', tx('並び順', 'Sort'), [['today', '今日の棚', 'For today'], ['latest', '最新', 'Latest'], ['new', '新着', 'Newly added'], ['title', '見出し順', 'Title'], ['short', '短い順', 'Shortest']]);
   select('topic', tx('分野', 'Topic'), [['', '分野', 'Topic'], ...topics]);
   select('jlpt', tx('レベル（JLPT の目安）', 'Level (JLPT, as a guide)'), [['', 'レベル', 'Level'], ...['N5','N4','N3','N2','N1'].map(v => [v, v, ''])]);
-  select('grade', tx('漢字の学年', 'Kanji grade'), [['', '学年', 'Grade'], ...[1,2,3,4,5,6].map(v => [String(v), `小${v}`, `Grade ${v}`]), ['secondary', '中学以上', 'Secondary+']]);
+  select('grade', tx('漢字の学年', 'Kanji grade'), [['', '学年', 'Grade'], ...[1,2,3,4,5,6].map(v => [String(v), `小${v}`, `Grade ${v}`]), ['secondary', '中学以上', 'Beyond elementary school']]);
   const searchLabel = el('label', 'shelf-reading-search filter-search');
   searchLabel.append(uiIcon('search'));
   const find = el('input'); find.type='search'; find.value=filters.text; find.placeholder=tx('探す','Search'); find.id='shelf-reading-search';
@@ -9180,12 +9180,14 @@ function demonstrateWordLadder(reader) {
 function gradeTag(p) {
   const grade = p.readingFacets?.schoolGrade;
   if (!grade) return document.createTextNode('');
-  const ja = grade === 'secondary' ? '中学以上' : `小${grade}`;
-  const en = grade === 'secondary' ? 'secondary+' : `grade ${grade}`;
-  const tag = el('span', 'grade-tag', tx(`漢字 ${ja}`, `Kanji ${en}`));
+  // H2-fix (H2-8): plain words, not "Kanji secondary+". The measure: the school year by which nine in ten of the
+  // story's kanji are taught (reading_facets.py), so "secondary" means more than one in ten come after elementary school
+  const secondary = grade === 'secondary';
+  const tag = el('span', 'grade-tag', secondary ? tx('中学以上の漢字', 'Kanji beyond elementary school') : tx(`漢字 小${grade}`, `Kanji grade ${grade}`));
   // a label, like the level beside it: not prose to look up
   tag.dataset.japaneseLookup = 'off';
-  tag.title = tx(`使われている漢字の学年: ${ja}`, `kanji up to school ${en}`);
+  tag.title = secondary ? tx('小学校のあとで習う漢字が、1割より多く使われている', 'More than one in ten of its kanji are taught after elementary school')
+    : tx(`漢字の9割は小学${grade}年までに習うもの`, `Nine in ten of its kanji are taught by school grade ${grade}`);
   return tag;
 }
 /** The article's picture under its headline, when one has been drawn (FEEL pass 2026-10-02): the
@@ -22549,9 +22551,10 @@ function renderAiSetup(main) {
     el(
       'p',
       'gloss',
+      // H2-fix (H2-7): first what the tutor does, then what it needs; the app brings no keys of its own
       tx(
-        '先生に質問するには、使っている AI サービス（Anthropic など）の鍵をここに入れる。鍵はこの端末にだけ残り、学習記録には入らない。送るのは、そのサービスだけ。',
-        'To ask the tutor, add the key from your AI service (Anthropic, or one like it). The key stays on this device, outside your learning record, and goes only to that service.',
+        '先生は、あなたの AI サービス（Anthropic など）を通して質問に答える。始めるには、そのサービスの鍵をここに入れる。鍵はこの端末にだけ残り、学習記録には入らない。送るのは、そのサービスだけ。',
+        'The tutor answers your questions through an AI service of your own (Anthropic, or one like it). To start, add that service’s key here. The key stays on this device, outside your learning record, and goes only to that service.',
       ),
     ),
   );
@@ -40081,13 +40084,16 @@ const ME_DECKS = [
  * is labelled expected until jlpt.jp announces it. Each field counts only what he holds by recall
  * from the fields deck's own group for it (deck.json words[].group). */
 const ME_N1_SITTING = { year: 2027, month: 6 };
+/* H2-fix (H2-4, Grok's H2 walk): each note is the rest of his own sentence for that field, said so it is true under its
+ * heading. His india words, "Yoga and Buddhism and Jain and Hindu history rooted in Japanese history and tied in to modern
+ * neuroscience", lost their subject when split, and the note read as if the field were Japanese history. */
 const ME_FIELDS = [
   { id: 'mind', ja: '学習心理学', en: 'Learning psychology',
     noteJa: '神経可塑性・学ぶことを学ぶ・人間の可能性', noteEn: 'Neuroplasticity, learning about learning, human potential' },
   { id: 'india', ja: 'ヨーガ・仏教・ジャイナ教・ヒンドゥー教の歴史', en: 'Yoga, Buddhism, Jain and Hindu history',
-    noteJa: '日本の歴史に根ざし、現代の脳科学につながる', noteEn: 'Rooted in Japanese history, tied to modern neuroscience' },
+    noteJa: '日本にどう根づいたか、現代の脳科学とどうつながるか', noteEn: 'How they took root in Japan, and their ties to modern neuroscience' },
   { id: 'ai', ja: '半導体・AI・投資', en: 'Semiconductors, AI and investing',
-    noteJa: 'ホフスタッター・再帰・計算機科学・テクノロジー', noteEn: 'Hofstadter, recursion, computer science and tech' },
+    noteJa: 'そして、ホフスタッター・再帰・計算機科学・テクノロジー', noteEn: 'Also Hofstadter, recursion, computer science and tech' },
 ];
 /** The July sitting: the first Sunday of July in the goal year, local midnight. */
 function meN1Sitting() {
@@ -41432,6 +41438,35 @@ function render() {
 // Operational reports have their own outbox and recipient. Never export the
 // learner record, provider settings, chat, answers or source text implicitly.
 const maintenanceNavigation = [];
+/* H2-fix (H2-5, Grok's H2 walk: a report's git_sha and artifact_sha256 were null): a report names the build it came from.
+ * The site build writes build-identity.json beside index.html, and the worker serves the installed release's own copy. Its
+ * two digests open the file, so only its head is read, once, when a report sheet first opens: the file list after them
+ * (megabytes) is never read whole, and a lesson that never opens a report never asks for it. A copy with no identity file
+ * (the development server) reports its build as unknown. */
+let servedBuild = null;
+let servedBuildRead = null;
+function maintenanceServedBuild() {
+  servedBuildRead ||= (async () => {
+    try {
+      const response = await fetch(new URL('build-identity.json', document.baseURI), { cache: 'no-cache' });
+      const reader = response.ok ? response.body?.getReader() : null;
+      if (!reader) return null;
+      const decoder = new TextDecoder();
+      let head = '';
+      try {
+        while (head.length < 65536) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          head += decoder.decode(value, { stream: true });
+          const sha = /"gitSha":\s*"([a-f0-9]{40})"/u.exec(head), artifact = /"artifactSha256":\s*"([a-f0-9]{64})"/u.exec(head);
+          if (sha && artifact) return (servedBuild = { git_sha: sha[1], artifact_sha256: artifact[1] });
+        }
+      } finally { reader.cancel().catch(() => {}); }
+    } catch { /* no identity to read: the report says so */ }
+    return null;
+  })();
+  return servedBuildRead;
+}
 function maintenanceContext() {
   let selected = null;
   try { selected = S.view === 'mock' ? currentAssessmentV2() : null; } catch { /* Boot may be incomplete. */ }
@@ -41449,6 +41484,7 @@ function maintenanceContext() {
   return {
     surface: `corridor/${surface}${S.strokes ? '/strokes' : detail ? `/detail/${detail.t}` : ''}`,
     route: location.pathname,
+    build: servedBuild,
     content_ids: contentIds,
     content_revision: selected?.form?.revisionId || null,
     viewport: { width: innerWidth, height: innerHeight },
@@ -41617,6 +41653,7 @@ function mountMaintenanceReports() {
     // picks up that label either way.
     github: { newIssueUrl: 'https://github.com/AmitabhainArunachala/Bunki-app/issues/new', label: 'kairo-report', version: APP_RELEASE.version },
     getContext: maintenanceContext,
+    hostBuild: maintenanceServedBuild,
     // Q · the sheet names the screen in his words (the room, the story, the word open), its ids under Details
     describeScreen: maintenanceScreenName,
     clockNotice: () => {

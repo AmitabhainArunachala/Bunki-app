@@ -1173,7 +1173,8 @@ export function createSpeakRoom(host) {
   }
   const STATUS = {
     offline: ['つながっていません。これまでの会話と保存した影は開けます。', 'Not connected. Past conversations and saved lines still open.'],
-    'no-key': ['Kore と話すには、Google の鍵がこの端末に必要です。', 'To talk with Kore, this device needs a Google key.'],
+    // H2-fix (H2-7): first what Speak is, then what it needs; the app brings no keys of its own
+    'no-key': ['Kore と声で、日本語の会話ができます。それには Google の鍵が要りますが、この端末にはまだありません。', 'Speak is a spoken conversation in Japanese with Kore. It runs on a Google key, and this device has none yet.'],
     'no-cap': ['話す前に、月の上限を決めてください。', 'Set a monthly limit before you talk.'],
     cap: ['今月の上限に達しました。次の会話は上限を変えると始められます。', 'This month’s limit is reached. Raise it to talk again.'],
     record: ['記録の準備ができていません。少し待ってから、もう一度。', 'Your record is not ready yet. Try again in a moment.'],
