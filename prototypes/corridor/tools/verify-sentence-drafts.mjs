@@ -19,7 +19,24 @@ import { contextBrowserVersion } from './browser-version-support.mjs';
 import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
-import { selectBackupFile } from './record-fixture-support.mjs';
+
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable, already built KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -403,9 +420,8 @@ async function exportUi(fixture, label) {
 async function importUi(fixture, file) {
   await tray(fixture);
   const timeOrigin = await fixture.page.evaluate(() => performance.timeOrigin), start = fixture.assetLoads.length;
-  // Every restore asks first (Hfix-2a): answer exactly that confirmation; any other dialog fails.
-  await selectBackupFile(fixture.page, file);
-  await fixture.page.waitForFunction(prior => performance.timeOrigin !== prior && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 });
+  await answeringRestore(fixture.page, async () => { await fixture.page.locator('#import-file').setInputFiles(file);
+    await fixture.page.waitForFunction(prior => performance.timeOrigin !== prior && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 }); });
   await ready(fixture.page); await attestRuntime(fixture, start, 'actual-ui-import-reload');
 }
 

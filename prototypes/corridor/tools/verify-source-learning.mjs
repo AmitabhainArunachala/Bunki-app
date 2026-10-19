@@ -14,7 +14,24 @@ import { chromium, webkit } from 'playwright-core';
 import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
-import { selectBackupFile } from './record-fixture-support.mjs';
+
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
 import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
@@ -290,9 +307,8 @@ for (const engine of engines) for (const width of sizes) {
       for (const key of ['taken', 'srs', 'revlog', 'sourceInbox', 'teacherContexts', 'lists'])
         assert.deepEqual(backup.record[key], reviewed.record[key]);
       const timeOrigin = await page.evaluate(() => performance.timeOrigin);
-      // Every restore asks first (Hfix-2a): answer exactly that confirmation; any other dialog fails.
-      await selectBackupFile(page, backupFile);
-      await page.waitForFunction((old) => performance.timeOrigin !== old && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 });
+      await answeringRestore(page, async () => { await page.locator('#import-file').setInputFiles(backupFile);
+        await page.waitForFunction((old) => performance.timeOrigin !== old && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 }); });
       await close(); await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
       await page.waitForFunction(() => !!navigator.serviceWorker.controller, null, { timeout: 30000 });
       if (engine === 'webkit') disconnected = true; else await context.setOffline(true);

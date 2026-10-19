@@ -14,7 +14,24 @@ import { chromium, webkit } from 'playwright-core';
 import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
-import { selectBackupFile } from './record-fixture-support.mjs';
+
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged site');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
 assert(!existsSync(join(OUT, 'receipt.json')), 'Use a fresh evidence directory');
@@ -381,9 +398,9 @@ for (const engine of engines) for (const width of sizes) {
     await close(); profile = 'profile-recovery-point'; await open(); await shelf(page); await suggestion('revisit').waitFor();
     assert.deepEqual((await readAppRecordSnapshot(page)).record, recoveryBaseline.record);
     await page.locator('#tray').click();
-    // Every restore asks first (Hfix-2a): answer exactly that confirmation; any other dialog fails.
-    const originTime = await page.evaluate(() => performance.timeOrigin); await selectBackupFile(page, backup);
-    await page.waitForFunction(prior => performance.timeOrigin !== prior && document.body.dataset.ready === '1', originTime, { timeout: 30000 });
+    const originTime = await page.evaluate(() => performance.timeOrigin);
+    await answeringRestore(page, async () => { await page.locator('#import-file').setInputFiles(backup);
+      await page.waitForFunction(prior => performance.timeOrigin !== prior && document.body.dataset.ready === '1', originTime, { timeout: 30000 }); });
     const restored = await readAppRecordSnapshot(page);
     // Import preserves null/omitted draft roots when neither side has drafts.
     // Every learner root remains part of the exact whole-record comparison.
