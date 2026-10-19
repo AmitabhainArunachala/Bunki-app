@@ -10,7 +10,9 @@
  * text ink, its own word's included. Its own word's font box is measured, not required clear.
  * The saved occurrence itself is bound in every raster frame, its ring pixels included. Where the
  * open slip covers it, that frame is geometry only; the native Escape then uncovers the same ring,
- * and the word's native first input shows its reading again beside it. A raster batch is taken only
+ * and the word's native first input shows its reading again beside it; a real pointer hover on the saved word, with that
+ * reading still open, then puts its own hairline mark under the ring. That mark is a box shadow, not a glyph: the bare frame removes it with the
+ * text, so a dot painted on it counts as ink. A raster batch is taken only
  * on the settled reader (no room transition); its shots may differ only within dots, or it is retaken.
  * Identity is read from what the app opened and showed, not from the selectors the verifier chose.
  * --title-rings runs only those ring cases: 2 engines x 11 worlds x phone (21px) and desktop
@@ -40,16 +42,18 @@ const CONTEXT_STORY = 'aozora:000772-1';
 const LIVE = [{ name: 'live-daisho', id: STORY, query: 'スタートアップ大賞', word: '大賞' }, { name: 'live-watashi', id: CONTEXT_STORY, query: '私の個人主義', word: '私' },
   { name: 'live-daisho-saved-nihon', id: STORY, query: 'スタートアップ大賞', word: '大賞', reading: 'たいしょう', prior: '日本', nextLineOn: ['webkit/phone'] },
   { name: 'live-daijin-saved-meguru', id: 'wikinews:27998', archiveYear: '2015', query: '巡る', word: '大臣', reading: 'だいじん', prior: '巡る', nextLineOn: ['webkit/desktop', 'chromium/desktop'], uncover: true }];
-const titleLeading = (fontPx, viewportWidth) => fontPx * 1.45 + (viewportWidth >= 521 ? 31 : 20);
+// Phone or desktop leading follows the page's own (max-width: 520px) match, never a rounded innerWidth.
+const titleLeading = (fontPx, phone) => fontPx * 1.45 + (phone ? 20 : 31);
 const DEVICES = { phone: { viewport: { width: 390, height: 844 }, touch: true, titleFont: '21px' }, desktop: { viewport: { width: 1440, height: 900 }, touch: false, titleFont: '34px' } };
 const defaultSize = (engine) => (engine === 'webkit' ? 'phone' : 'desktop');
 const RING_LIVE = LIVE.filter((l) => l.prior);
 const RING_ENGINES = ['webkit', 'chromium'];
 const RING_SIZES = ['phone', 'desktop'];
-const ringFrames = (spec) => [['before', true], ['reading', true], ['stage-open', false], ['stage-met', !spec.uncover], ...(spec.uncover ? [['stage-met-uncovered', true], ['stage-met-restored', true]] : [])];
+const ringFrames = (spec) => [['before', true], ['reading', true], ['stage-open', false], ['stage-met', !spec.uncover], ...(spec.uncover ? [['stage-met-uncovered', true], ['stage-met-restored', true], ['active-saved', true]] : [])];
 const ringRows = (spec) => [`world.${spec.name}`, `${spec.name}.device`, ...['fresh', 'reading-beside-ring', 'reading-without-encounter', 'prior-state-intact', 'stage-commits-met', 'first-tap-base-glyphs', 'second-tap-base-glyphs',
-  'fresh-to-state-base-glyphs', 'title-rhythm-through-inputs', 'source-visible-and-owned', 'scroll-unchanged', 'slip-seated', ...(spec.uncover ? ['uncovered-record-identical', 'uncovered-title-stable', 'restored-reading', 'restored-record-identical'] : [])].map((id) => `${spec.name}.${id}`),
-  ...ringFrames(spec).flatMap(([frame, raster]) => ['fragment-alignment', 'no-other-glyph-overlap', ...(raster ? ['scene-settled', 'ring-clear-of-ink', 'saved-occurrence'] : [])].map((id) => `${spec.name}-${frame}.${id}`))];
+  'fresh-to-state-base-glyphs', 'title-rhythm-through-inputs', 'source-visible-and-owned', 'scroll-unchanged', 'slip-seated', 'title-leading-breakpoint',
+  ...(spec.uncover ? ['uncovered-record-identical', 'uncovered-title-stable', 'restored-reading', 'restored-record-identical', 'active-saved-input'] : [])].map((id) => `${spec.name}.${id}`),
+  ...ringFrames(spec).flatMap(([frame, raster]) => ['fragment-alignment', 'no-other-glyph-overlap', ...(raster ? ['scene-settled', 'ring-clear-of-ink', 'saved-occurrence', 'active-mark'] : [])].map((id) => `${spec.name}-${frame}.${id}`))];
 const ringCaseId = (engine, world, size) => `${engine}/${world}/${size}`;
 const RING_REQUIRED = RING_ENGINES.flatMap((engine) => WORLDS.flatMap((world) => RING_SIZES.map((size) => ({ caseId: ringCaseId(engine, world, size), engine, world, size, titleFont: DEVICES[size].titleFont,
   rows: RING_LIVE.flatMap(ringRows), nextLineWitnesses: RING_LIVE.filter((l) => l.nextLineOn.includes(`${engine}/${size}`)).map((l) => l.name) }))));
@@ -73,7 +77,7 @@ const exactRoster = (observed, expected) => observed.length === expected.length 
 const savedWord = (id, now) => ({ t: 'word', id, label: id, ts: now - 40 * DAY, started: now - 40 * DAY });
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const option = (name) => { const i = process.argv.indexOf(name); return i < 0 ? null : process.argv[i + 1]; };
-const allowedArgs = new Set(['--worlds', '--control-current-paint', '--scene-fixture']);
+const allowedArgs = new Set(['--worlds', '--control-current-paint', '--scene-fixture', '--mark-fixture']);
 for (let i = 2; i < process.argv.length; i++) { if (['--diagnostic-inline-end', '--late-lookup', '--title-rings', '--self-test-admission'].includes(process.argv[i])) continue; assert(allowedArgs.has(process.argv[i]) && process.argv[i + 1], `Invalid option ${process.argv[i]}`); i++; }
 const diagnosticInlineEnd = process.argv.includes('--diagnostic-inline-end');
 const lateLookup = process.argv.includes('--late-lookup');
@@ -81,8 +85,8 @@ const titleRings = process.argv.includes('--title-rings');
 const selfTestAdmission = process.argv.includes('--self-test-admission');
 assert(!lateLookup || (!option('--worlds') && !diagnosticInlineEnd), 'The late-lookup roster names its own worlds and paint');
 assert(!titleRings || (!lateLookup && !diagnosticInlineEnd), 'The title-ring roster is its own mode');
-assert(!selfTestAdmission || process.argv.length === 3 || (process.argv.length === 5 && option('--scene-fixture')), 'The admission self-test takes only --scene-fixture');
-assert(!option('--scene-fixture') || selfTestAdmission, '--scene-fixture belongs to the admission self-test');
+assert(!selfTestAdmission || process.argv.length - 3 === 2 * ['--scene-fixture', '--mark-fixture'].filter((o) => option(o)).length, 'The admission self-test takes only --scene-fixture and --mark-fixture');
+assert((!option('--scene-fixture') && !option('--mark-fixture')) || selfTestAdmission, 'Fixtures belong to the admission self-test');
 const worlds = lateLookup ? LATE_WORLDS : option('--worlds')?.split(',') || WORLDS;
 assert(worlds.length && new Set(worlds).size === worlds.length && worlds.every((w) => WORLDS.includes(w)), 'Named, unique public worlds required');
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['webkit', 'chromium'];
@@ -132,6 +136,8 @@ const delta = (a, b) => Math.hypot(...lab(a).map((v, i) => v - lab(b)[i]));
 const median = (colors) => colors.length ? [0, 1, 2].map((i) => colors.map((x) => x[i]).sort((a, b) => a - b)[Math.floor(colors.length / 2)]) : null;
 const hideCss = '#reader .tok > .tok-word::after,.japanese-lookup-word::after,#mini .mini-word::after,.today-star::after{visibility:hidden!important}.depth-dot{visibility:hidden!important}';
 const hideCardText = '.reader-card,.reader-card *{color:transparent!important;-webkit-text-fill-color:transparent!important;text-decoration-color:transparent!important;text-shadow:none!important}';
+// Bare frame only: the touched title word's native hairline mark (editorial.css "H · Word", an inset box shadow) is ink too.
+const hideTitleMark = '.reader-card > h1.view-title .japanese-lookup-word:is(:hover,:focus-visible){box-shadow:none!important}';
 async function boot(page) {
   await page.goto(new URL('index.html?entry=shelf&ui=bi', base).href);
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 45000 });
@@ -568,8 +574,28 @@ function sceneStability({ shown, paper, restored }, circles, view) {
   return { stable: outsideChanged === 0 && restoredChanged === 0 && Boolean(restored), outsideChanged, restoredChanged, restoredCompared: Boolean(restored), firstOutside };
 }
 const ALL_DOTS = '#reader .tok:is([data-depth],[data-kept]) > .tok-word, .japanese-lookup-word:is([data-depth],[data-kept]), #mini:is([data-depth],[data-kept]) .mini-word';
+/** Each touched (hovered or focused) title word's native mark: its computed inset shadow's thickness at the foot of every
+ * fragment. Geometry only; whether it is painted is read from the paper and bare pixels. */
+const titleMarks = (page) => page.evaluate(() => [...document.querySelectorAll('.reader-card > h1.view-title .japanese-lookup-word')].flatMap((el) => {
+  const shadow = getComputedStyle(el).boxShadow, hover = el.matches(':hover'), focusVisible = el.matches(':focus-visible');
+  if (!(hover || focusVisible) || !/inset/.test(shadow)) return [];
+  const [, offsetY = 0] = [...shadow.replace(/[a-z-]+\([^)]*\)/gi, '').matchAll(/(-?[\d.]+)px/g)].map((m) => Number(m[1]));
+  const thickness = Math.abs(offsetY);
+  return thickness > 0 ? [{ probeId: el.dataset.dotsNode || null, text: el.dataset.lookupText, hover, focusVisible, shadow, thickness,
+    bands: [...el.getClientRects()].map((r) => ({ left: r.left + scrollX, right: r.right + scrollX, top: r.bottom + scrollY - thickness, bottom: r.bottom + scrollY })) }] : [];
+}));
+/** Every touched word's mark must be painted (ink in paper, gone in bare) and no dot may paint on any mark. A frame that names
+ * its touched word needs exactly that word's mark and its own unoccluded dot: a saved word's ring painted, a met word's fill. */
+const activeMarkVerdict = (marks, ink, expected = null) => {
+  const named = expected ? marks.filter((m) => m.text === expected.text) : [];
+  const dot = named.length === 1 ? ink.find((d) => d.probeId === named[0].probeId) || null : null;
+  const own = !expected || Boolean(dot && named[0].markInk > 0 && dot.painted >= 4 && !dot.coveredBySlip && (dot.hits.mark ?? 0) === 0 &&
+    (expected.kept ? dot.kept && dot.depth === 'met' && dot.ringPainted >= 4 : !dot.kept && dot.depth === 'met'));
+  return { expected, marks: marks.map(({ bands: _, ...m }) => m), dot: dot && { probeId: dot.probeId, text: dot.text, depth: dot.depth, kept: dot.kept, painted: dot.painted, ringPainted: dot.ringPainted, coveredBySlip: dot.coveredBySlip, hits: dot.hits },
+    passed: marks.every((m) => m.markInk > 0) && ink.every((d) => typeof d.hits.mark === 'number' && d.hits.mark === 0) && own };
+};
 const dotCircles = (dots) => dots.map((d) => ({ x: (d.left + d.right) / 2, y: (d.top + d.bottom) / 2, r: Math.min(d.width, d.height) / 2 + d.spread + 1, text: d.text }));
-async function titleRingFrame(page, out, name, label, raster, prior) {
+async function titleRingFrame(page, out, name, label, raster, prior, expectedActive = null) {
   const frame = `${name}-${label}`;
   await page.locator('.reader-card .japanese-lookup-word').evaluateAll((els, name) => els.forEach((el, i) => { el.dataset.dotsNode ||= `${name}-${i}`; }), name);
   const dots = await facts(page, TITLE_DOTS);
@@ -584,6 +610,7 @@ async function titleRingFrame(page, out, name, label, raster, prior) {
   out.ringOcclusion ||= {}; out.ringOcclusion[frame] = { slip, raster, covered: dots.map((d, i) => ({ text: d.text, probeId: d.probeId, coveredBySlip: covered(d, i) })) };
   if (!raster) return dots;
   const circles = dotCircles([...await facts(page, ALL_DOTS), ...await facts(page, '.depth-dot:is([data-depth],[data-kept])', false)]);
+  const marks = await titleMarks(page);
   const attempts = []; out.sceneAttempts ||= {}; out.sceneAttempts[frame] = attempts;
   let view, shown, paper, bare, again;
   for (let attempt = 1; ; attempt++) {
@@ -592,7 +619,7 @@ async function titleRingFrame(page, out, name, label, raster, prior) {
     const shot = async (suffix) => { const image = png(await page.screenshot({ path: resolve(evidence, `${shotTag(out)}-${frame}${suffix}${attempt > 1 ? `-attempt${attempt}` : ''}.png`), animations: 'allow' })); states.push(await sceneState(page)); return image; };
     shown = await shot('');
     const noDots = await page.addStyleTag({ content: hideCss }); paper = await shot('-paper');
-    const noText = await page.addStyleTag({ content: hideCardText }); bare = await shot('-bare');
+    const noText = await page.addStyleTag({ content: hideCardText + hideTitleMark }); bare = await shot('-bare');
     await noText.evaluate((s) => s.remove()); await noDots.evaluate((s) => s.remove());
     await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
     const restored = await shot('-restored');
@@ -606,8 +633,16 @@ async function titleRingFrame(page, out, name, label, raster, prior) {
   row(out, `${frame}.scene-settled`, true, { attempts, circles: circles.length });
   const stable = JSON.stringify(again.map((d) => [d.probeId, d.host, d.left, d.top])) === JSON.stringify(dots.map((d) => [d.probeId, d.host, d.left, d.top])) && JSON.stringify(again.captureFrame.glyphs) === JSON.stringify(dots.captureFrame.glyphs);
   const differs = (a, b) => a.some((v, k) => Math.abs(v - b[k]) > 3);
+  const onMark = (x, y) => { const l = x / view.dpr + view.x, t = y / view.dpr + view.y, r = l + 1 / view.dpr, b = t + 1 / view.dpr;
+    return marks.some((m) => m.bands.some((band) => r > band.left && l < band.right && b > band.top && t < band.bottom)); };
+  for (const m of marks) {
+    m.markInk = 0;
+    for (const band of m.bands)
+      for (let y = Math.max(0, Math.floor((band.top - view.y) * view.dpr)); y < Math.min(shown.height, Math.ceil((band.bottom - view.y) * view.dpr)); y++)
+        for (let x = Math.max(0, Math.floor((band.left - view.x) * view.dpr)); x < Math.min(shown.width, Math.ceil((band.right - view.x) * view.dpr)); x++) if (differs(pix(paper, x, y), pix(bare, x, y))) m.markInk++;
+  }
   const ink = dots.map((d, i) => {
-    const box = { left: d.left - d.spread - 1, top: d.top - d.spread - 1, right: d.right + d.spread + 1, bottom: d.bottom + d.spread + 1 }, hits = { own: 0, other: 0, reading: 0, unattributed: 0 };
+    const box = { left: d.left - d.spread - 1, top: d.top - d.spread - 1, right: d.right + d.spread + 1, bottom: d.bottom + d.spread + 1 }, hits = { own: 0, other: 0, reading: 0, mark: 0, unattributed: 0 };
     const centre = [(d.left + d.right) / 2, (d.top + d.bottom) / 2];
     let painted = 0, ringPainted = 0;
     for (let y = Math.max(0, Math.floor((box.top - view.y) * view.dpr)); y < Math.min(shown.height, Math.ceil((box.bottom - view.y) * view.dpr)); y++)
@@ -618,6 +653,7 @@ async function titleRingFrame(page, out, name, label, raster, prior) {
         const cx = (x + 0.5) / view.dpr + view.x, cy = (y + 0.5) / view.dpr + view.y;
         if (Math.hypot(cx - centre[0], cy - centre[1]) > d.width / 2 + 0.5) ringPainted++;
         if (!differs(behind, pix(bare, x, y))) continue;
+        if (onMark(x, y)) { hits.mark++; continue; }
         const glyph = dots.captureFrame.glyphs.find((g) => cx >= g.left && cx <= g.right && cy >= g.top && cy <= g.bottom);
         hits[!glyph ? 'unattributed' : glyph.rt ? 'reading' : glyph.owner === d.probeId ? 'own' : 'other']++;
       }
@@ -628,7 +664,9 @@ async function titleRingFrame(page, out, name, label, raster, prior) {
     const occurrences = await page.locator(`.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${prior}"]`).evaluateAll((els) => els.map((el) => el.dataset.dotsNode));
     row(out, `${frame}.saved-occurrence`, savedOccurrenceVerdict(occurrences, ink).passed, { saved: prior, ...savedOccurrenceVerdict(occurrences, ink) });
   }
-  dots.ink = ink;
+  const markVerdict = activeMarkVerdict(marks, ink, expectedActive);
+  row(out, `${frame}.active-mark`, stable && markVerdict.passed, { stable, category: 'native box-shadow mark, not a font glyph', ...markVerdict });
+  dots.ink = ink; dots.marks = marks;
   return dots;
 }
 async function liveFirstState(page, out, { name, id, query, word, prior, archiveYear, nextLineOn = [], uncover = false }) {
@@ -761,7 +799,7 @@ async function liveFirstState(page, out, { name, id, query, word, prior, archive
     await input();
     await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.ladderRung === 'reading', selector); await delay(350);
     const restored = await sample('stage-met-restored');
-    const restoredDots = await titleRingFrame(page, out, name, 'stage-met-restored', true, prior);
+    const restoredDots = await titleRingFrame(page, out, name, 'stage-met-restored', true, prior, { text: word, kept: false });
     const restoredRecord = await settledRecord(page);
     const savedPaint = (frameDots) => { const e = frameDots.ink?.find((d) => d.text === prior); return e ? { painted: e.painted, ringPainted: e.ringPainted, depth: e.depth, kept: e.kept } : null; };
     const ring = restoredDots.find((d) => d.text === prior), targetNode = await target.evaluate((el) => el.dataset.dotsNode);
@@ -774,6 +812,19 @@ async function liveFirstState(page, out, { name, id, query, word, prior, archive
         scroll: [restored.scrollX, restored.scrollY], savedPaint: { uncovered: savedPaint(uncoveredDots), restored: savedPaint(restoredDots) }, underRing, nextLineRequired });
     row(out, `${name}.restored-record-identical`, held.settled && restoredRecord.settled && restoredRecord.snapshot.revision === held.snapshot.revision && JSON.stringify(restoredRecord.snapshot.record) === JSON.stringify(held.snapshot.record),
       { control: 'native first input after Escape', held: { revision: held.snapshot.revision }, restored: { revision: restoredRecord.snapshot.revision, settled: restoredRecord.settled, reads: restoredRecord.reads } });
+    // The saved word itself under a real pointer while the lower word's reading stays open: its ring beside its own mark. At
+    // the phone's size this is a narrow window's pointer; a touch instead moves the reading to the touched word.
+    const priorSelector = `.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${prior}"]`, priorTarget = page.locator(priorSelector).first();
+    await priorTarget.hover(); await delay(350);
+    const touched = await sample('active-saved');
+    const priorState = await page.evaluate((sel) => { const el = document.querySelector(sel); return { hover: el.matches(':hover'), focusVisible: el.matches(':focus-visible'), rung: el.dataset.ladderRung || null, depth: el.dataset.depth || null, kept: el.dataset.kept != null }; }, priorSelector);
+    await titleRingFrame(page, out, name, 'active-saved', true, prior, { text: prior, kept: true });
+    const touchedRecord = await settledRecord(page);
+    row(out, `${name}.active-saved-input`, priorState.hover && priorState.depth === 'met' && priorState.kept && touched.rung === 'reading' && touched.reading === reading.reading &&
+      JSON.stringify(touched.title) === JSON.stringify(before.title) && baseShift(before, touched) <= 1 && touched.scrollX === before.scrollX && touched.scrollY === before.scrollY &&
+      held.settled && touchedRecord.settled && touchedRecord.snapshot.revision === held.snapshot.revision && JSON.stringify(touchedRecord.snapshot.record) === JSON.stringify(held.snapshot.record),
+      { input: 'pointer hover', prior: priorState, target: { rung: touched.rung, reading: touched.reading }, title: touched.title, before: before.title, baseShift: baseShift(before, touched), scroll: [touched.scrollX, touched.scrollY],
+        record: { held: held.snapshot.revision, touched: touchedRecord.snapshot.revision, settled: touchedRecord.settled } });
   }
   const saved = prior ? await page.evaluate((word) => [...document.querySelectorAll(`.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"][data-kept]`)].map((el) => el.dataset.lookupText), prior) : [];
   return { story: openedStory, saved, readingOwners, slipAnchor, selectedInput: { door, word: await target.evaluate((el) => el.dataset.lookupText) } };
@@ -901,7 +952,7 @@ const titleGeometry = (page, label) => page.evaluate(async (label) => {
     for (let i = 0; i < text.length; i++) { if (!text.textContent[i].trim()) continue; const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1); const b = range.getBoundingClientRect(); if (b.width && b.height) glyphs.push({ char: text.textContent[i], left: b.left, top: b.top, right: b.right, bottom: b.bottom }); }
   }
   const wrapper = h.querySelector('[data-lookup-readings-pending]'), reader = document.querySelector('#reader');
-  return { label, scrollX, scrollY, viewportWidth: innerWidth, title: box(h.getBoundingClientRect()), card: box(card.getBoundingClientRect()), lineHeight: style.lineHeight, paddingBottom: style.paddingBottom, fontSize: style.fontSize,
+  return { label, scrollX, scrollY, viewportWidth: innerWidth, phone: matchMedia('(max-width: 520px)').matches, title: box(h.getBoundingClientRect()), card: box(card.getBoundingClientRect()), lineHeight: style.lineHeight, paddingBottom: style.paddingBottom, fontSize: style.fontSize,
     titleText: h.textContent, titleHTML: h.innerHTML, lookupGroups: [...h.querySelectorAll('.japanese-lookup-text')].map((g) => g.textContent),
     pending: Boolean(wrapper), busy: wrapper?.getAttribute('aria-busy') ?? null, words: h.querySelectorAll('.japanese-lookup-word').length, buttons: [...h.querySelectorAll('button')].map((b) => b.textContent), glyphs,
     body: { busy: reader?.getAttribute('aria-busy'), tokens: reader?.querySelectorAll('.tok[data-index]').length ?? 0, notes: [...document.querySelectorAll('main .note')].map((n) => n.textContent), retry: [...document.querySelectorAll('main .note button')].map((b) => b.textContent) } };
@@ -974,7 +1025,7 @@ async function lateTitle(page, out, spec, result) {
     }
     const frames = result.frames, deltas = frames.map((f) => ({ label: f.label, delta: titleDelta(cold, f) }));
     add('native-title-not-deferred', frames.every((f) => !f.missing && f.titleText === cold.titleText && f.words === spec.words && !f.pending && !f.buttons.length), frames.map((f) => ({ label: f.label, words: f.words, pending: f.pending, buttons: f.buttons })));
-    add('unconditional-title-rhythm', frames.every((f) => Number.parseFloat(f.paddingBottom) === 8 && Math.abs(Number.parseFloat(f.lineHeight) - titleLeading(Number.parseFloat(f.fontSize), f.viewportWidth)) < 0.01), frames.map((f) => ({ label: f.label, viewportWidth: f.viewportWidth, fontSize: f.fontSize, lineHeight: f.lineHeight, paddingBottom: f.paddingBottom })));
+    add('unconditional-title-rhythm', frames.every((f) => Number.parseFloat(f.paddingBottom) === 8 && Math.abs(Number.parseFloat(f.lineHeight) - titleLeading(Number.parseFloat(f.fontSize), f.phone)) < 0.01), frames.map((f) => ({ label: f.label, viewportWidth: f.viewportWidth, phone: f.phone, fontSize: f.fontSize, lineHeight: f.lineHeight, paddingBottom: f.paddingBottom })));
     add('title-identical', deltas.every(({ delta: d }) => d && d.rhythm && Object.values(d.title).every((v) => v === 0)), deltas);
     add('card-identical', deltas.every(({ delta: d }) => d && Object.values(d.card).every((v) => v === 0)), deltas);
     add('glyphs-identical', deltas.every(({ delta: d }) => d && d.glyphShift === 0), deltas);
@@ -1019,6 +1070,29 @@ async function ringDevice(page, out, spec) {
   const inputProof = device.touch ? touches >= 2 && mice === 0 : mice >= 2 && touches === 0;
   row(out, `${spec.name}.device`, actual.width === device.viewport.width && actual.height === device.viewport.height && actual.fontSize === device.titleFont && inputProof,
     { size: out.size, input: out.touch ? 'tap' : 'click', expected: device, actual, trustedOnWord: { touches, mice } });
+  // The page's own stylesheets, title classes and root attributes in frames 520, 520.5 and 521 CSS px wide: each frame's
+  // leading follows its own (max-width: 520px) match. Both engines lay a 520.5 px frame out at a whole 521 px viewport, so the
+  // fractional frame is recorded as observed; the complement query leaves no width with neither leading.
+  const breakpoint = await page.evaluate(async (widths) => {
+    const attrs = (el) => [...el.attributes].map((a) => `${a.name}="${a.value.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`).join(' ');
+    const h = document.querySelector('.reader-card > h1.view-title'), card = h.closest('.reader-card'), sheets = [...document.querySelectorAll('link[rel="stylesheet"]')].map((l) => l.href);
+    const live = { phone: matchMedia('(max-width: 520px)').matches, fontSize: getComputedStyle(h).fontSize, lineHeight: getComputedStyle(h).lineHeight, paddingBottom: getComputedStyle(h).paddingBottom }, frames = [];
+    for (const width of widths) {
+      const frame = document.createElement('iframe');
+      frame.style.cssText = `position:fixed;left:-20000px;top:0;width:${width}px;height:300px;border:0;visibility:hidden`;
+      frame.srcdoc = `<!doctype html><html ${attrs(document.documentElement)}><head>${sheets.map((href) => `<link rel="stylesheet" href="${href}">`).join('')}</head><body ${attrs(document.body)}><div id="app"><main><div class="${card.className}"><h1 class="${h.className}">日本</h1></div></main></div></body></html>`;
+      const loaded = new Promise((done) => frame.addEventListener('load', done, { once: true }));
+      document.documentElement.append(frame); await loaded;
+      const w = frame.contentWindow, t = w.document.querySelector('h1'), st = w.getComputedStyle(t);
+      frames.push({ width, viewportWidth: w.document.documentElement.getBoundingClientRect().width, innerWidth: w.innerWidth, phone: w.matchMedia('(max-width: 520px)').matches, sheets: w.document.styleSheets.length, fontSize: st.fontSize, lineHeight: st.lineHeight, paddingBottom: st.paddingBottom });
+      frame.remove();
+    }
+    return { live, frames, sheets: sheets.length };
+  }, [520, 520.5, 521]);
+  const leads = (f) => Number.parseFloat(f.paddingBottom) === 8 && Math.abs(Number.parseFloat(f.lineHeight) - titleLeading(Number.parseFloat(f.fontSize), f.phone)) < 0.01;
+  const [at520, fractional, at521] = breakpoint.frames;
+  row(out, `${spec.name}.title-leading-breakpoint`, leads(breakpoint.live) && breakpoint.live.phone === device.touch && breakpoint.frames.every((f) => leads(f) && f.sheets === breakpoint.sheets) && breakpoint.sheets > 0 &&
+    at520.phone && !at521.phone && fractional.phone === (fractional.innerWidth <= 520), breakpoint);
 }
 function ringContextAdmission(out) {
   const requiredRows = RING_LIVE.flatMap(ringRows), executedRows = out.rows.map((r) => r.id);
@@ -1079,6 +1153,9 @@ function runAdmissionSelfTest() {
     'duplicate row': (o) => { o.rows.push({ ...o.rows[0] }); },
     'failed row': (o) => { o.rows[3].passed = false; },
     'missing restored reading': (o) => { const id = 'live-daijin-saved-meguru.restored-reading'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[1].rowIds = o.ringCases[1].rowIds.filter((r) => r !== id); },
+    'missing active saved-ring proof': (o) => { const id = 'live-daijin-saved-meguru-active-saved.active-mark'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[1].rowIds = o.ringCases[1].rowIds.filter((r) => r !== id); },
+    'missing active saved-ring input': (o) => { const id = 'live-daijin-saved-meguru.active-saved-input'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[1].rowIds = o.ringCases[1].rowIds.filter((r) => r !== id); },
+    'missing leading breakpoint proof': (o) => { const id = 'live-daisho-saved-nihon.title-leading-breakpoint'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[0].rowIds = o.ringCases[0].rowIds.filter((r) => r !== id); },
     'missing scene proof': (o) => { const id = 'live-daisho-saved-nihon-before.scene-settled'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[0].rowIds = o.ringCases[0].rowIds.filter((r) => r !== id); },
     'missing uncovered continuation': (o) => { const id = 'live-daijin-saved-meguru-stage-met-uncovered.ring-clear-of-ink'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[1].rowIds = o.ringCases[1].rowIds.filter((r) => r !== id); },
     'occluded stage-met raster substituted': (o) => { const from = 'live-daijin-saved-meguru-stage-met-uncovered.ring-clear-of-ink', to = 'live-daijin-saved-meguru-stage-met.ring-clear-of-ink'; o.rows.find((r) => r.id === from).id = to; o.ringCases[1].rowIds = o.ringCases[1].rowIds.map((r) => (r === from ? to : r)); },
@@ -1096,6 +1173,20 @@ function runAdmissionSelfTest() {
     'saved occurrence missing from paint': [['n-1'], [{ ...ringInk, probeId: 'n-2' }]],
     'two saved occurrences': [['n-1', 'n-3'], [ringInk]],
   };
+  const markedRing = { ...ringInk, coveredBySlip: false, hits: { own: 0, other: 0, reading: 0, mark: 0, unattributed: 0 } }, mark = { probeId: 'n-1', text: '巡る', markInk: 40, bands: [] };
+  const metFill = { ...markedRing, probeId: 'n-2', text: '大臣', kept: false, ringPainted: 0 }, metMark = { ...mark, probeId: 'n-2', text: '大臣' };
+  const touched = {
+    'touched mark absent': [[], [markedRing], { text: '巡る', kept: true }],
+    'touched mark unpainted (still in the bare frame)': [[{ ...mark, markInk: 0 }], [markedRing], { text: '巡る', kept: true }],
+    'ring painted on the mark': [[mark], [{ ...markedRing, hits: { ...markedRing.hits, mark: 3 } }], { text: '巡る', kept: true }],
+    'mark census not taken': [[mark], [{ ...markedRing, hits: { own: 0, other: 0, reading: 0, unattributed: 0 } }], { text: '巡る', kept: true }],
+    'touched ring under the slip': [[mark], [{ ...markedRing, coveredBySlip: true }], { text: '巡る', kept: true }],
+    'touched ring band unpainted': [[mark], [{ ...markedRing, ringPainted: 0 }], { text: '巡る', kept: true }],
+    'another word touched': [[metMark], [markedRing, metFill], { text: '巡る', kept: true }],
+    'met fill on its own mark': [[metMark], [{ ...metFill, hits: { ...metFill.hits, mark: 12 } }], { text: '大臣', kept: false }],
+    'met fill expected, saved ring found': [[mark], [markedRing], { text: '巡る', kept: false }],
+    'untouched dot on another mark': [[metMark], [metFill, { ...markedRing, hits: { ...markedRing.hits, mark: 1 } }], null],
+  };
   const settled = { observer: true, generation: 1, viewTransitions: 1, activeViewTransitions: 0, transition: false, hero: false, arrival: false, mainOpacity: '1', room: [], view: 'reader', mainBound: true };
   const bound = { generation: 1, viewTransitions: 1 };
   const scenes = {
@@ -1106,10 +1197,31 @@ function runAdmissionSelfTest() {
     'another transition began during the batch': { ...settled, generation: 2 }, 'another view transition began': { ...settled, viewTransitions: 2 },
     'main element replaced': { ...settled, mainBound: false }, 'not the reader': { ...settled, view: 'shelf' }, 'observer absent': { ...settled, observer: false },
   };
-  const results = { positive: { admission: ringContextAdmission(good()).accepted, savedOccurrence: savedOccurrenceVerdict(['n-1'], [ringInk]).passed, settledScene: settledScene(settled, bound) },
+  const results = { positive: { admission: ringContextAdmission(good()).accepted, savedOccurrence: savedOccurrenceVerdict(['n-1'], [ringInk]).passed, settledScene: settledScene(settled, bound),
+    touchedSavedRing: activeMarkVerdict([mark], [markedRing], { text: '巡る', kept: true }).passed, touchedMetFill: activeMarkVerdict([metMark], [markedRing, metFill], { text: '大臣', kept: false }).passed, untouchedFrame: activeMarkVerdict([], [markedRing], null).passed },
     refused: Object.fromEntries([...Object.entries(altered).map(([k, f]) => { const o = good(); f(o); return [k, !ringContextAdmission(o).accepted]; }),
       ...Object.entries(saved).map(([k, [occ, ink]]) => [k, !savedOccurrenceVerdict(occ, ink).passed]),
-      ...Object.entries(scenes).map(([k, state]) => [`scene: ${k}`, !settledScene(state, bound)])]) };
+      ...Object.entries(scenes).map(([k, state]) => [`scene: ${k}`, !settledScene(state, bound)]),
+      ...Object.entries(touched).map(([k, [marks, ink, expected]]) => [`mark: ${k}`, !activeMarkVerdict(marks, ink, expected).passed])]) };
+  const markFixture = option('--mark-fixture');
+  if (markFixture) {
+    // c15c5bfd's retained Chromium 1440 藍 frame (DOTS-SHOT-1): 大臣's met fill over its own 0.5px mark, which the old bare frame kept.
+    const receipt = JSON.parse(readFileSync(resolve(markFixture, 'verify-depth-visibility-title-rings.json'), 'utf8'));
+    const context = receipt.contexts.find((c) => c.engine === 'chromium' && c.world === 'hokusai' && c.size === 'desktop'), frame = 'live-daijin-saved-meguru-stage-met-restored';
+    const read = (suffix) => png(readFileSync(resolve(markFixture, `chromium-hokusai-desktop-${frame}${suffix}.png`)));
+    const [shown, paper, bare] = ['', '-paper', '-bare'].map(read), view = context.rows.find((r) => r.id === `${frame}.ring-clear-of-ink`).detail.view;
+    const dot = context.measurements[frame].find((d) => d.depth === 'met' && !d.kept), foot = dot.fragments.at(-1), band = { left: foot.left, right: foot.right, top: foot.bottom - 0.5, bottom: foot.bottom };
+    const ink = context.rows.find((r) => r.id === `${frame}.ring-clear-of-ink`).detail.ink.find((d) => d.probeId === dot.probeId);
+    const differs = (a, b) => a.some((v, k) => Math.abs(v - b[k]) > 3), rows = (b) => [Math.floor((b.top - view.y) * view.dpr), Math.ceil((b.bottom - view.y) * view.dpr)], cols = (b) => [Math.floor((b.left - view.x) * view.dpr), Math.ceil((b.right - view.x) * view.dpr)];
+    let markInk = 0, paintedOnMark = 0;
+    for (let y = rows(band)[0]; y < rows(band)[1]; y++) for (let x = cols(band)[0]; x < cols(band)[1]; x++) {
+      if (differs(pix(paper, x, y), pix(bare, x, y))) markInk++;
+      const cx = (x + 0.5) / view.dpr + view.x; if (cx >= dot.left - 1 && cx <= dot.right + 1 && differs(pix(shown, x, y), pix(paper, x, y))) paintedOnMark++;
+    }
+    const verdict = activeMarkVerdict([{ probeId: dot.probeId, text: '大臣', markInk, bands: [band] }], [ink], { text: '大臣', kept: false });
+    results.markFixture = { dir: markFixture, receiptSha256: hash(readFileSync(resolve(markFixture, 'verify-depth-visibility-title-rings.json'))), producer: receipt.verifierSha256, dot: dot.probeId, band, markInk, paintedOnMark, oldHits: ink.hits };
+    results.refused['retained c15 frame: met fill on a mark the old bare frame kept'] = !verdict.passed && markInk === 0 && paintedOnMark > 0;
+  }
   const fixture = option('--scene-fixture');
   if (fixture) {
     // Native fix3's retained WebKit desktop batch: BEFORE's shown shot still holds the outgoing shelf; READING is settled.

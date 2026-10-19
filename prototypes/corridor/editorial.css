@@ -5475,13 +5475,19 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
 }
 /* every reader title, unconditionally: each title line holds its own font cell plus room for a reading above and a ring below
    (a room the desktop title widens for its larger reading), laid out once for whatever arrives later (its words, a state, a
-   reading, late name readings); a stateful word's dot sits in that room, its offset scaled with the title's size, off the ink
-   of its own word, of the next title line and of a reading shown there, and clear of the English caption. Repeating the same
-   class preserves the matched titles and outranks the later rooms/read.css font shorthand and phone leading without an
-   important declaration. */
+   reading, late name readings); a stateful word's dot sits in that room, below its word's box and so below the hairline mark
+   the word shows while touched, off the next title line, a reading shown there and the English caption. The phone's room is
+   too short for a saved ring to clear both that mark and the next line's reading, so the ring drops only while its own word
+   is touched; a touch moves the reading to that word, so the two never meet. The desktop query is the exact complement of the
+   phone title font's. Repeating the same class preserves the matched titles and outranks the later rooms/read.css font
+   shorthand and phone leading without an important declaration. */
 html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 20px); padding-bottom: 8px; }
-@media (min-width: 521px) { html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 31px); } }
-html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom:calc(0.2em - 9.88px); }
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom: -6.75px; }
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word[data-kept]:is(:hover,:focus-visible)::after { bottom: -9.25px; }
+@media not (max-width: 520px) {
+  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 31px); }
+  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom: -9.25px; }
+}
 /* Ladder contract: only this occurrence steps aside while its inline English is open. Removing the attribute
    restores the same fill and ring; the painter and learner record are untouched, and no line box moves. */
 #reader .tok[data-depth-aside='meaning'] > .tok-word::after,
