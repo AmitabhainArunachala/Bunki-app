@@ -14,6 +14,14 @@
   },
   "entries": [
     {
+      "word": "一晩中",
+      "reading": "ひとばんじゅう",
+      "surfaces": ["一晩", "中"],
+      "readings": [null, "じゅう"],
+      "kind": "term",
+      "note": "Throughout the night: 中 reads じゅう (Hfix-2c; both Words you looked up decks)."
+    },
+    {
       "word": "天之御中主神",
       "reading": "あめのみなかぬしのかみ",
       "surfaces": ["天之御中主", "神"],

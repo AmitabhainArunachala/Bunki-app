@@ -9,13 +9,15 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
 mkdirSync(OUT, { recursive: true });
 const require = createRequire(ROOT + '/package.json');
-const { chromium } = require('playwright');
+const { chromium, webkit } = require('playwright');
+const engine = process.env.KAIRO_BROWSER || 'chromium';
+assert(['chromium', 'webkit'].includes(engine));
 const { startStaticHost } = require(ROOT + '/prototypes/bunki-desktop/lib/static-host.cjs');
 const identity = JSON.parse(readFileSync(SITE + '/build-identity.json'));
 const card = JSON.parse(readFileSync(SITE + '/decks/n1/deck.json')).words[0].cards[0];
 assert.equal(card.id, 'nn-67f6fe4a2f-ca1c2c4f');
-const host = await startStaticHost({ site: SITE, port: 0 }), browser = await chromium.launch();
-const proof = { identity, scope: 'Native public controls on unchanged N1 first card, disposable learner records. Display-only negative fixtures call the public sentenceNodes renderer on deeply frozen clones; they do not alter production data.', cases: [], failures: [] };
+const host = await startStaticHost({ site: SITE, port: 0 }), browser = await ({ chromium, webkit })[engine].launch();
+const proof = { identity, engine, browserVersion: browser.version(), scope: 'Native public controls on unchanged N1 first card, disposable learner records. Display-only negative fixtures call the public sentenceNodes renderer on deeply frozen clones; they do not alter production data.', cases: [], failures: [] };
 const check = (name, passed, observations) => { proof.cases.push({ name, passed, observations }); if (!passed) proof.failures.push(name); };
 async function resting(page) {
   await page.evaluate(async () => {
@@ -33,6 +35,14 @@ const census = () => {
 const seated = (s, context) => s.windowed === true && s.inner > 0 && (!context || s.context.some(([, open]) => open === '1'));
 const fits = s => s.toggle.top >= s.header.bottom && s.target.top >= Math.max(s.header.bottom, s.windowed ? s.anchor.top : s.header.bottom) && s.target.bottom <= Math.min(s.bar.top, s.windowed ? s.anchor.bottom : s.bar.top) && s.def.bottom <= s.bar.top && s.toggle.bottom <= s.bar.top && s.overflow === 0;
 async function labels(page, cdp, lang) {
+  const expected = lang === 'ja' ? ['この画面の不具合を知らせる', '不具合を知らせる'] : ['Report a problem on this screen', 'Report a problem'];
+  if (!cdp) {
+    const button = page.getByRole('button', { name: expected[0], exact: true });
+    const container = page.locator('.br-rail');
+    const observations = { button: await button.ariaSnapshot(), container: await container.ariaSnapshot(), title: await button.getAttribute('title') };
+    check('WebKit accessible report entry ' + lang, await button.count() === 1 && observations.container.includes(expected[1]) && observations.title === expected[0], observations);
+    return;
+  }
   const { root } = await cdp.send('DOM.getDocument', { depth: 0 });
   const get = async selector => {
     const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector });
@@ -41,16 +51,15 @@ async function labels(page, cdp, lang) {
   };
   const actual = { button: await get('#bunki-report-bug'), container: await get('.br-rail'), title: await page.locator('#bunki-report-bug').getAttribute('title') };
   // the house voice (one hand, slice E): 不具合を知らせる · Report a problem
-  const expected = lang === 'ja' ? ['この画面の不具合を知らせる', '不具合を知らせる'] : ['Report a problem on this screen', 'Report a problem'];
   check('actual accessibility tree report entry ' + lang, actual.button.some(n => n.role === 'button' && n.name === expected[0]) && actual.container.some(n => n.name === expected[1]) && actual.title === expected[0], actual);
 }
 try {
   for (const width of [320, 390]) for (const zoom of ['full', 'focus']) {
     const context = await browser.newContext({ viewport: { width, height: 844 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
     try {
-      await context.addInitScript(zoom => localStorage.setItem('bunki-cloze:prefs:v3:n1', JSON.stringify({ look: 'world', zoom, sittings: 3, ruleSeen: true })), zoom);
-      const page = await context.newPage(), cdp = await context.newCDPSession(page);
-      await cdp.send('DOM.enable'); await cdp.send('Accessibility.enable');
+      await context.addInitScript(zoom => localStorage.setItem('bunki-cloze:prefs:v3:n1', JSON.stringify({ look: 'world', zoom, sittings: 3, ruleSeen: true, againCoachSeen: true })), zoom);
+      const page = await context.newPage(), cdp = engine === 'chromium' ? await context.newCDPSession(page) : null;
+      if (cdp) { await cdp.send('DOM.enable'); await cdp.send('Accessibility.enable'); }
       await page.goto(host.origin + '/index.html?deck=n1&ui=bi');
       // the report entry's accessible names, in both languages, on the deck home (the card screen has none)
       for (const lang of ['ja', 'bi']) { await page.locator(`#lang [data-lang=${lang}]`).click(); await labels(page, cdp, lang); }

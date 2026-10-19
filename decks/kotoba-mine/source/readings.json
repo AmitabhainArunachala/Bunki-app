@@ -594,42 +594,8 @@
       "cards": ["km-011-m07", "km-284-m08"],
       "note": "full run passages (2, source/mcd/v2-2026-10-05-b*.json): 1人, 2人: ひとり, ふたり (り on 人), not にん"
     },
-    {
-      "surface": "月",
-      "reading": "がつ",
-      "after": "[0-9]",
-      "before": "",
-      "cards": [
-        "km-011-m07",
-        "km-015-m08",
-        "km-061-m07",
-        "km-099-m08",
-        "km-102-m07",
-        "km-147-m07",
-        "km-164-m07",
-        "km-215-m06",
-        "km-216-m07",
-        "km-228-m06",
-        "km-248-m06",
-        "km-248-m07",
-        "km-249-m07",
-        "km-251-m06",
-        "km-269-m07",
-        "km-300-m07",
-        "km-304-m08",
-        "km-308-m06",
-        "km-310-m07"
-      ],
-      "note": "full run passages (19, source/mcd/v2-2026-10-05-b*.json): a date (1962年10月、): がつ; UniDic reads 月 before a comma as つき"
-    },
-    {
-      "surface": "日",
-      "reading": "にち",
-      "after": "(?:^|[^0-9])1[57]",
-      "before": "",
-      "cards": ["km-059-m07", "km-267-m06"],
-      "note": "full run passages (2, source/mcd/v2-2026-10-05-b*.json): 3月15日, 11月17日: にち, not か"
-    },
+
+
     {
       "surface": "年",
       "reading": "ねん",

@@ -842,7 +842,7 @@ function verifyBackParity() {
     releaseParity.push({ page, css: html.includes(playerCss), mount: html.includes(mount), roomMotion: html.includes(roomMotion), fonts: (html.match(/@font-face\s*\{/gu) || []).length });
     if (!['function leechLadder', 'function deleteCard', 'function suspendedField', 'function kanjiFamily', 'function seeAlsoLine', 'function swapCard', 'restoreSuspended', 'LEECH_LAPSES = 5', 'kp-kfam', 'kp-rhint'].every((k) => html.includes(k))) bad.push(`${page}: no delete, ladder or kanji family`);
     // Hfix-1B: the rule and the eyebrow say it unmistakably (Kimi KH1-1, KH1-2); the old wording is gone
-    if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'ruleSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT, UI_RULE_TEXT, '印のついた語を思い出す', 'function revealInPlace', 'kp-kindchip', 'kp-levelchip', 'prefers-reduced-motion'].every((k) => html.includes(k)) || /kp-tapword|is-four|VISUAL_TIPS|topicColour|kp-lvchip|答えを見て理解が深まった|improved your understanding|'印の語を思い出す'/.test(html)) bad.push(`${page}: not the current player`);
+    if (!['function sentenceEnds', 'kp-folds', 'kp-zoom', 'againCoachSeen', 'savePrefQuiet', 'kp-en-none', RULE_TEXT, UI_RULE_TEXT, '印のついた語を思い出す', 'function revealInPlace', 'kp-kindchip', 'kp-levelchip', 'prefers-reduced-motion'].every((k) => html.includes(k)) || /kp-tapword|is-four|VISUAL_TIPS|topicColour|kp-lvchip|答えを見て理解が深まった|improved your understanding|'印の語を思い出す'/.test(html)) bad.push(`${page}: not the current player`);
     if (!['function settleBack', 'function clampContext', 'function fitClamps', 'function sourceFold', 'kp-f-src', 'HINT_SITTINGS = 3', 'function skipFor', 'この語の他の文'].every((k) => html.includes(k)) || /記録を消す|kp-danger|'kp-hint'/.test(html)) bad.push(`${page}: not the Phase 1 follow-ups player`);
   }
   check('parity: both separately served Kotoba release HTML outputs embed the exact built-site player CSS and mount code, room motion, and all 451 bundled faces',
@@ -1080,7 +1080,7 @@ async function verifyPilot(browser, base, cardId = PILOT_CARD, label = 'pilot') 
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await context.addInitScript(SEEDED);
   await context.addInitScript(`try { if (!sessionStorage.getItem('__pilot_seeded')) { sessionStorage.setItem('__pilot_seeded', '1');
-    localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mcd', ${JSON.stringify(JSON.stringify({ ruleSeen: true, newPerDay: 0 }))});
+    localStorage.setItem('bunki-cloze:prefs:v3:kotoba-mcd', ${JSON.stringify(JSON.stringify({ againCoachSeen: true, newPerDay: 0 }))});
     localStorage.setItem('bunki-cloze:kotoba-mcd', ${JSON.stringify(state)}); } } catch {}`);
   const page = await context.newPage();
   const errors = [];
@@ -1211,7 +1211,7 @@ async function verifyTap(browser, base) {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(SEEDED);
     await context.addInitScript(`try { if (!sessionStorage.getItem('__tap_seeded')) { sessionStorage.setItem('__tap_seeded', '1');
-      localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify({ ruleSeen: true, ...(prefs || {}) }))});
+      localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify({ againCoachSeen: true, ...(prefs || {}) }))});
       ${state ? `localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)});` : ''} } } catch {}`);
     const page = await context.newPage();
     const errors = [];
@@ -1463,7 +1463,7 @@ async function verifyTap(browser, base) {
     for (const [file, deckId, cardId] of [['study-mcd.html', 'kotoba-mcd', 'km-109-m01'], ['study.html', 'kotoba-mine', 'km-114-1']]) {
       const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
       await context.addInitScript(`try { if (!sessionStorage.getItem('__tap_seeded')) { sessionStorage.setItem('__tap_seeded', '1');
-        localStorage.setItem('bunki-cloze:prefs:v3:${deckId}', ${JSON.stringify(JSON.stringify({ newPerDay: 0, ruleSeen: true }))});
+        localStorage.setItem('bunki-cloze:prefs:v3:${deckId}', ${JSON.stringify(JSON.stringify({ newPerDay: 0, againCoachSeen: true }))});
         localStorage.setItem('bunki-cloze:${deckId}', ${JSON.stringify(due(deckId, cardId))}); } } catch {}`);
       const page = await context.newPage();
       const errors = [];
@@ -1683,7 +1683,7 @@ async function verifyBack(browser, base) {
       const hit = document.elementFromPoint(g.left + g.width / 2, g.top + g.height / 2); const t = document.getElementById('primary-tabs')?.getBoundingClientRect(); const tabs = t?.height > 0 ? t : null; return { position: getComputedStyle(document.querySelector('.kp-grades')).position, bottom: Math.round(b.bottom), top: Math.round(b.top), expectedBottom: Math.round(tabs?.top ?? innerHeight), tabsBottom: tabs ? Math.round(tabs.bottom) : null, viewport: innerHeight, noOverlap: b.bottom <= (tabs?.top ?? innerHeight), hit: !!hit?.closest('#kp-grade-good'), rule: document.getElementById('kp-rule')?.textContent ?? null }; })()`);
     await o.page.click('#kp-rule-dismiss');
     await o.page.waitForSelector('#kp-grade-good');
-    const dismissed = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').ruleSeen, zoom: document.getElementById('kp-card').dataset.zoom, enOpen: document.querySelector('#kp-card .kp-f-en').open })`);
+    const dismissed = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mcd') || '{}').againCoachSeen, zoom: document.getElementById('kp-card').dataset.zoom, enOpen: document.querySelector('#kp-card .kp-f-en').open })`);
     check(
       'e) the grade bar is pinned to the bottom of the phone screen and shows its rule (Hfix-1B: "If the answer was new to you, choose Again" · 「答えを見て初めて分かったなら「もう一度」」) until dismissed; dismissing is remembered in prefs and keeps an open fold open',
       bar.position === 'fixed' && bar.bottom === bar.expectedBottom && bar.viewport === 844 && (bar.tabsBottom === null || bar.tabsBottom === 844) && bar.noOverlap && bar.hit && bar.rule?.includes(UI_RULE_TEXT) && !dismissed.rule && dismissed.seen === true && dismissed.zoom === 'focus' && dismissed.enOpen === true,
@@ -1711,8 +1711,8 @@ async function verifyBack(browser, base) {
     await o.page.click('#kp-grade-good');
     await o.page.click('#kp-reveal');
     await o.page.waitForSelector('.kp-grade');
-    const next = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mine') || '{}').ruleSeen })`);
-    check('e) the rule is shown once: after the card it sat under is answered, the next back has none (prefs ruleSeen)', !next.rule && next.seen === true, JSON.stringify(next));
+    const next = await o.page.evaluate(`({ rule: !!document.getElementById('kp-rule'), seen: JSON.parse(localStorage.getItem('bunki-cloze:prefs:v3:kotoba-mine') || '{}').againCoachSeen })`);
+    check('e) the rule is shown once: after the card it sat under is answered, the next back has none (prefs againCoachSeen)', !next.rule && next.seen === true, JSON.stringify(next));
     await close(o);
   }
 
@@ -2126,7 +2126,7 @@ async function verifyReview(browser, base) {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(SEEDED);
     await context.addInitScript(`try { if (!sessionStorage.getItem('__review_seeded')) { sessionStorage.setItem('__review_seeded', '1');
-      localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify({ newPerDay: 0, ruleSeen: true, ...prefs }))});
+      localStorage.setItem('bunki-cloze:prefs:v3:${deck}', ${JSON.stringify(JSON.stringify({ newPerDay: 0, againCoachSeen: true, ...prefs }))});
       localStorage.setItem('bunki-cloze:${deck}', ${JSON.stringify(state)}); } } catch {}`);
     if (inject) {
       await context.route(`**/decks/${deck}/deck.json`, async (route) => {

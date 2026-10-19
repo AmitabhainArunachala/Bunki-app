@@ -635,35 +635,35 @@
     },
     {
       "card": "km-011-m07",
-      "after": "72年2",
-      "surface": "月",
+      "after": "72年",
+      "surface": "2月",
       "before": "、長",
-      "right": "がつ",
-      "wrong": "つき"
+      "right": "にがつ",
+      "wrong": "につき"
     },
     {
       "card": "km-015-m08",
-      "after": "3年11",
-      "surface": "月",
+      "after": "3年",
+      "surface": "11月",
       "before": "、対",
-      "right": "がつ",
-      "wrong": "つき"
+      "right": "じゅういちがつ",
+      "wrong": "じゅういちつき"
     },
     {
       "card": "km-061-m07",
-      "after": "2年10",
-      "surface": "月",
+      "after": "2年",
+      "surface": "10月",
       "before": "、ソ",
-      "right": "がつ",
-      "wrong": "つき"
+      "right": "じゅうがつ",
+      "wrong": "じゅうつき"
     },
     {
       "card": "km-059-m07",
-      "after": "3月15",
-      "surface": "日",
+      "after": "3月",
+      "surface": "15日",
       "before": "、ロ",
-      "right": "にち",
-      "wrong": "か"
+      "right": "じゅうごにち",
+      "wrong": "じゅうごか"
     },
     {
       "card": "km-262-m08",

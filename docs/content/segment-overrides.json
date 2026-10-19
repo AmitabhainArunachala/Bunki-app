@@ -432,7 +432,7 @@
     {
       "word": "ラピダス",
       "match": [{ "s": "ラピダス" }],
-      "tokens": [{ "s": "ラピダス", "b": "ラピダス", "p": "名詞", "r": "らぴだす", "c": false }],
+      "tokens": [{ "s": "ラピダス", "b": "ラピダス", "p": "名詞", "r": "らぴだす", "c": true }],
       "note": "katakana company name (Rapidus) given its reading; UniDic keeps it whole but leaves it without one (Bunki batch-4r, bunki-read-n2-japan-us-chip-fab)"
     },
     {

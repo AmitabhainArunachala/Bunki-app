@@ -29098,7 +29098,37 @@ function renderReview(main) {
     // recording is explained on activation; it never borrows an interim voice.
     const spoken = backc.reading || (item.t === 'kanji' ? '' : item.label);
     const row = el('div', 'review-reading-row reveal r-1');
-    if (backc.reading) row.append(el('div', 'review-reading', backc.reading));
+    if (item.t === 'kanji') {
+      // Kanji-trust owns the complete display record; lessons keep their own short selection.
+      const display = kanjiDisplayRecord(item.id) || retainedKanjiRecord(item.id);
+      const lesson = D.kanji[item.id] || {};
+      const readings = el('div', 'review-reading');
+      readings.dataset.kanjiReadings = display?.readingsState || 'listed';
+      for (const [kind, label] of [['on', tx('音読み', 'On readings')], ['kun', tx('訓読み', 'Kun readings')]]) {
+        const selected = display?.[kind === 'on' ? 'lessonOn' : 'lessonKun'] || lesson[kind] || [];
+        const line = el('p', 'review-kanji-readings');
+        line.append(el('span', 'sense-pos', label + ' · '));
+        for (const [i, reading] of (display?.[kind] || []).entries()) {
+          if (i) line.append(document.createTextNode(' · '));
+          const value = el('span', 'review-kanji-reading', reading);
+          value.dataset.reading = reading;
+          value.lang = 'ja';
+          if (selected.includes(reading)) {
+            value.dataset.lessonSelection = 'true';
+            value.append(el('small', 'sense-pos', tx('（レッスン）', ' (lesson)')));
+          }
+          if (display?.officialReadings?.includes(reading)) value.append(document.createTextNode('*'));
+          line.append(value);
+        }
+        readings.append(line);
+      }
+      if (readings.querySelector('[data-lesson-selection]')) readings.append(el('p', 'sense-pos', tx('「レッスン」は、このレッスンで扱う読みです。', '“Lesson” marks the readings selected for this lesson.')));
+      if (display?.officialReadings?.length) readings.append(el('p', 'sense-pos', tx('＊ 常用漢字表にある読み。', '* Reading supplied by the Jōyō Kanji Table.')));
+      if (display?.readingsState !== 'complete') readings.append(el('p', 'sense-pos', display?.readingsState === 'pending'
+        ? tx('全ての読みを読み込み中…', 'Loading the complete reading set…')
+        : tx('全ての読みは現在表示できません。確認できる読みを表示しています。', 'The complete reading set is unavailable. Showing the available readings.')));
+      row.append(readings);
+    } else if (backc.reading) row.append(el('div', 'review-reading', backc.reading));
     if (spoken && recManifest !== null) {
       const say = el('button', 'say');
       say.type = 'button';
