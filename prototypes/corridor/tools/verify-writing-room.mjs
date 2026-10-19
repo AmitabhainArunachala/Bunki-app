@@ -512,9 +512,10 @@ async function main() {
         readings.every((row) => row.lang === 'ja'),
       JSON.stringify(readings),
     );
+    // Kanji-trust K01: the room shows every KANJIDIC2 reading, the lessons' バツ・ハツ・カ first, then ボチ
     check(
       'all on and kun readings render without two-item truncation',
-      readings[0]?.value === 'バツ・ハツ・カ' &&
+      readings[0]?.value === 'バツ・ハツ・カ・ボチ' &&
         readings[1]?.value === 'き（る）・そむ（く）・う（つ）',
       JSON.stringify(readings),
     );
