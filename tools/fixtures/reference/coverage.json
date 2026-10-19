@@ -141,7 +141,7 @@
         },
         "joyo": {
           "path": "tools/fixtures/reference/joyo-2010.json",
-          "sha256": "67831f9bb9a0ca8c7a9061674fb5a37e515c4a0bee5fc8719eaad30a9cbb85db"
+          "sha256": "6d89e9a6c14366a6970fcb765066d4457ea24d9da8205bc1224041a994c95f8f"
         }
       },
       "kanjidicArchive": {

@@ -96,7 +96,8 @@ export function dictionaryCandidates(entries) {
 }
 
 const byCodePoint = (a, b) => a.codePointAt(0) - b.codePointAt(0);
-const appliesTo = (list, value) => Array.isArray(list) && (list.includes('*') || list.includes(value));
+const appliesTo = (list, value) =>
+  Array.isArray(list) && (list.includes('*') || list.includes(value));
 export const WORDS_PER_EMPTY_KANJI = 10;
 
 /**
@@ -110,11 +111,24 @@ export const WORDS_PER_EMPTY_KANJI = 10;
  *   that spelling and the gloss the first of the first sense allowed for both; common spellings first.
  * - kanjiWithoutWords: the Jōyō kanji no shipped dictionary writes any word with.
  */
-export function kanjiTrustProjection({ kanji, kmeta, dict, words, skip, joyo, index, detail, archiveCharacters }) {
+export function kanjiTrustProjection({
+  kanji,
+  kmeta,
+  dict,
+  words,
+  skip,
+  joyo,
+  index,
+  detail,
+  archiveCharacters,
+}) {
   const skipBy = new Map(skip.entries.map((entry) => [entry.literal, entry]));
   const joyoGlyphs = joyo.rows.map((row) => row[0]);
-  assert.deepEqual([...joyoGlyphs].sort(byCodePoint), Object.keys(kmeta).sort(byCodePoint),
-    'The official table and the shipped stroke data name the same 2,136 characters');
+  assert.deepEqual(
+    [...joyoGlyphs].sort(byCodePoint),
+    Object.keys(kmeta).sort(byCodePoint),
+    'The official table and the shipped stroke data name the same 2,136 characters',
+  );
   const glyphs = [...new Set([...Object.keys(kanji), ...joyoGlyphs])].sort(byCodePoint);
   const kanjiReadings = [];
   for (const glyph of glyphs) {
@@ -125,32 +139,49 @@ export function kanjiTrustProjection({ kanji, kmeta, dict, words, skip, joyo, in
     }
     kanjiReadings.push([glyph, [...entry.readings.on], [...entry.readings.kun]]);
   }
-  const kanjiRecords = joyoGlyphs.filter((glyph) => !kanji[glyph]).sort(byCodePoint).map((glyph) => {
-    const entry = skipBy.get(glyph);
-    return [glyph, [...entry.meanings], entry.strokeCounts?.[0] ?? null, entry.radical ?? null];
-  });
+  const kanjiRecords = joyoGlyphs
+    .filter((glyph) => !kanji[glyph])
+    .sort(byCodePoint)
+    .map((glyph) => {
+      const entry = skipBy.get(glyph);
+      return [glyph, [...entry.meanings], entry.strokeCounts?.[0] ?? null, entry.radical ?? null];
+    });
   if (archiveCharacters) {
     const unique = (values) => [...new Set(values)];
     for (const [glyph, on, kun] of kanjiReadings) {
       const groups = archiveCharacters.get(glyph)?.readingMeaning?.groups || [];
       const raw = groups.flatMap((group) => group.readings || []);
-      assert.deepEqual([on, kun], [
-        unique(raw.filter((reading) => reading.type === 'ja_on').map((reading) => reading.value)),
-        unique(raw.filter((reading) => reading.type === 'ja_kun').map((reading) => reading.value)),
-      ], `KANJIDIC2 reading parity: ${glyph}`);
+      assert.deepEqual(
+        [on, kun],
+        [
+          unique(raw.filter((reading) => reading.type === 'ja_on').map((reading) => reading.value)),
+          unique(
+            raw.filter((reading) => reading.type === 'ja_kun').map((reading) => reading.value),
+          ),
+        ],
+        `KANJIDIC2 reading parity: ${glyph}`,
+      );
     }
   }
   const projected = new Map(kanjiReadings.map(([glyph, on, kun]) => [glyph, [...on, ...kun]]));
   const officialReadings = [];
   for (const [glyph, readings] of joyo.rows) {
-    const present = new Set([...(kanji[glyph]?.on || []), ...(kanji[glyph]?.kun || []), ...(projected.get(glyph) || [])]
-      .map(core.readingKey));
-    for (const reading of readings) if (!present.has(core.readingKey(reading))) officialReadings.push([glyph, reading]);
+    const present = new Set(
+      [
+        ...(kanji[glyph]?.on || []),
+        ...(kanji[glyph]?.kun || []),
+        ...(projected.get(glyph) || []),
+      ].map(core.readingKey),
+    );
+    for (const reading of readings)
+      if (!present.has(core.readingKey(reading))) officialReadings.push([glyph, reading]);
   }
   // The app's own word lists: headwords and `k` lists (D.kanjiWords), then alternate spellings.
   const buckets = core.kanjiWordBuckets(dict, words);
   const alternates = core.kanjiAltWords(dict);
-  const empty = new Set(joyoGlyphs.filter((glyph) => !buckets.get(glyph)?.size && !alternates.get(glyph)?.length));
+  const empty = new Set(
+    joyoGlyphs.filter((glyph) => !buckets.get(glyph)?.size && !alternates.get(glyph)?.length),
+  );
   const candidates = new Map([...empty].map((glyph) => [glyph, []]));
   for (const row of index.entries) {
     const forms = new Set(row[4].flatMap((form) => [...form]));
@@ -166,24 +197,48 @@ export function kanjiTrustProjection({ kanji, kmeta, dict, words, skip, joyo, in
       const found = detail(seq);
       shardsUsed.add(found.shard);
       const [, kanjiForms, kanaForms, senses] = found.entry;
-      const form = kanjiForms.find(([text, , tags]) => text.includes(glyph) && !tags.includes('sK'));
+      const form = kanjiForms.find(
+        ([text, , tags]) => text.includes(glyph) && !tags.includes('sK'),
+      );
       if (!form) continue;
-      const kana = kanaForms.find(([text, , tags, applies]) => !tags.includes('sk') && appliesTo(applies, form[0]));
+      const kana = kanaForms.find(
+        ([, , tags, applies]) => !tags.includes('sk') && appliesTo(applies, form[0]),
+      );
       if (!kana) continue;
-      const sense = senses.find((item) => appliesTo(item[1], form[0]) && appliesTo(item[2], kana[0]) && item[10]?.length);
+      const sense = senses.find(
+        (item) => appliesTo(item[1], form[0]) && appliesTo(item[2], kana[0]) && item[10]?.length,
+      );
       if (!sense) continue;
-      picked.push({ row: [seq, form[0], kana[0], sense[10][0][0], [...form[2]]], formCommon: form[1], entryCommon, rare: form[2].includes('rK') });
+      picked.push({
+        row: [seq, form[0], kana[0], sense[10][0][0], [...form[2]]],
+        formCommon: form[1],
+        entryCommon,
+        rare: form[2].includes('rK'),
+      });
     }
-    picked.sort((a, b) => b.formCommon - a.formCommon || b.entryCommon - a.entryCommon || Number(a.rare) - Number(b.rare)
-      || [...a.row[1]].length - [...b.row[1]].length || Number(a.row[0]) - Number(b.row[0]));
-    if (picked.length) jmdictWords.push([glyph, picked.slice(0, WORDS_PER_EMPTY_KANJI).map((item) => item.row)]);
+    picked.sort(
+      (a, b) =>
+        b.formCommon - a.formCommon ||
+        b.entryCommon - a.entryCommon ||
+        Number(a.rare) - Number(b.rare) ||
+        [...a.row[1]].length - [...b.row[1]].length ||
+        Number(a.row[0]) - Number(b.row[0]),
+    );
+    if (picked.length)
+      jmdictWords.push([glyph, picked.slice(0, WORDS_PER_EMPTY_KANJI).map((item) => item.row)]);
     else if (candidates.get(glyph).length) searchOnly.push(glyph);
   }
   const filled = new Set(jmdictWords.map(([glyph]) => glyph));
   const kanjiWithoutWords = [...empty].filter((glyph) => !filled.has(glyph)).sort(byCodePoint);
   return {
-    kanjiReadings, kanjiRecords, officialReadings, jmdictWords, kanjiWithoutWords,
-    emptyBeforeJmdict: [...empty].sort(byCodePoint), searchOnly, shardsUsed: [...shardsUsed].sort(),
+    kanjiReadings,
+    kanjiRecords,
+    officialReadings,
+    jmdictWords,
+    kanjiWithoutWords,
+    emptyBeforeJmdict: [...empty].sort(byCodePoint),
+    searchOnly,
+    shardsUsed: [...shardsUsed].sort(),
   };
 }
 
@@ -384,9 +439,21 @@ export function buildReferenceData({ archive, prior } = {}) {
   };
   const skip = json(sourcePaths.skip);
   const joyo = json(sourcePaths.joyo);
-  assert.equal(skip.sources.find((source) => source.release)?.sha256, ARCHIVE_SHA, 'skip.json carries the pinned KANJIDIC2');
+  assert.equal(
+    skip.sources.find((source) => source.release)?.sha256,
+    ARCHIVE_SHA,
+    'skip.json carries the pinned KANJIDIC2',
+  );
   const trust = kanjiTrustProjection({
-    kanji, kmeta, dict, words, skip, joyo, index: dictionaryIndex, detail, archiveCharacters,
+    kanji,
+    kmeta,
+    dict,
+    words,
+    skip,
+    joyo,
+    index: dictionaryIndex,
+    detail,
+    archiveCharacters,
   });
   return {
     schemaVersion: 3,
@@ -536,7 +603,8 @@ export function buildReferenceData({ archive, prior } = {}) {
           dictionaryDate: skip.provenance.dictionaryDate,
           databaseVersion: skip.provenance.databaseVersion,
         },
-        readingScope: 'Every kanji.json glyph and the 2,136 characters of the 2010 常用漢字表 (= strokes.json meta).',
+        readingScope:
+          'Every kanji.json glyph and the 2,136 characters of the 2010 常用漢字表 (= strokes.json meta).',
         readingRule:
           'Exact KANJIDIC2 on/kun strings in source order. The app lists kanji.json readings first, then each further KANJIDIC2 reading, then officialReadings; nothing is dropped or merged.',
         kanjiReadingRows: trust.kanjiReadings.length,
@@ -549,17 +617,20 @@ export function buildReferenceData({ archive, prior } = {}) {
           characters: joyo.counts.characters,
           readings: joyo.counts.readings,
         },
-        officialReadingsAdded: trust.officialReadings.map(([glyph, reading]) => `${glyph}:${reading}`),
+        officialReadingsAdded: trust.officialReadings.map(
+          ([glyph, reading]) => `${glyph}:${reading}`,
+        ),
         wordFill: {
           source: `prototypes/corridor/data/share_alike/dict-v2 (JMdict ${dictionaryIndex.source.pin})`,
           perKanji: WORDS_PER_EMPTY_KANJI,
-          rule:
-            'Only for a Jōyō kanji no shipped word list names (headwords, k lists, alternate spellings). JMdict entries written with it, never a search-only spelling (sK); reading allowed for that spelling; first gloss of the first sense allowed for both; common spellings first, rare (rK) last, then shorter, then sequence.',
+          rule: 'Only for a Jōyō kanji no shipped word list names (headwords, k lists, alternate spellings). JMdict entries written with it, never a search-only spelling (sK); reading allowed for that spelling; first gloss of the first sense allowed for both; common spellings first, rare (rK) last, then shorter, then sequence.',
           emptyBefore: trust.emptyBeforeJmdict.join(''),
           filled: trust.jmdictWords.map(([glyph]) => glyph).join(''),
           searchOnlySpellingsOnly: trust.searchOnly.join(''),
           withoutWords: trust.kanjiWithoutWords.join(''),
-          shardSha256: Object.fromEntries(trust.shardsUsed.map((shard) => [shardPath(shard), hash(read(shardPath(shard)))])),
+          shardSha256: Object.fromEntries(
+            trust.shardsUsed.map((shard) => [shardPath(shard), hash(read(shardPath(shard)))]),
+          ),
         },
       },
       rebuild:

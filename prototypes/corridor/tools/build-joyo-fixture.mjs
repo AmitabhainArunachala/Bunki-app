@@ -90,11 +90,11 @@ export function validate(fixture) {
   return fixture;
 }
 
-/** Readable and diffable: the header pretty-printed, one row per line. */
-const serialize = (fixture) => {
-  const { rows, ...head } = fixture;
-  const top = JSON.stringify(head, null, 2).replace(/\n\}$/u, '');
-  return `${top},\n  "rows": [\n${rows.map((row) => `    ${JSON.stringify(row)}`).join(',\n')}\n  ]\n}\n`;
+/** The repository's own JSON style (prettier, as `npm run format:check` reads it): one row per line. */
+const serialize = async (fixture) => {
+  const prettier = await import('prettier');
+  const options = (await prettier.resolveConfig(FIXTURE)) || {};
+  return prettier.format(JSON.stringify(fixture), { ...options, parser: 'json', filepath: FIXTURE });
 };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
@@ -109,13 +109,13 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     if (html) {
       const bytes = readFileSync(html);
       assert.equal(createHash('sha256').update(bytes).digest('hex'), fixture.sha256, 'the page differs from the one the fixture records');
-      assert.equal(serialize(fixtureFrom(bytes, fixture)), committed, 'fixture is stale against its page');
+      assert.equal(await serialize(fixtureFrom(bytes, fixture)), committed, 'fixture is stale against its page');
     }
     console.log(`Jōyō fixture verified: ${fixture.counts.characters} characters, ${fixture.counts.readings} readings${html ? ', byte parity with the recorded page' : ''}.`);
   } else {
     assert(html && arg('--fetched') && arg('--last-modified'), 'Build needs --html, --fetched and --last-modified');
     const fixture = fixtureFrom(readFileSync(html), { fetchedAt: arg('--fetched'), lastModified: arg('--last-modified') });
-    writeFileSync(FIXTURE, serialize(fixture));
+    writeFileSync(FIXTURE, await serialize(fixture));
     console.log(`Wrote ${FIXTURE}: ${fixture.counts.characters} characters, ${fixture.counts.readings} readings (${fixture.counts.indentedReadings} indented).`);
   }
 }
