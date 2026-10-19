@@ -3669,7 +3669,11 @@ try {
       const text = (y) => { const e = document.elementFromPoint(x, y); return !!e?.closest('#reader, main') && !e.closest('[data-bar], .chrome, #tabs, nav, header, #mini'); };
       let top = 0; while (top < innerHeight && !text(top)) top += 1;
       let bottom = innerHeight - 1; while (bottom > top && !text(bottom)) bottom -= 1;
-      return { top, bottom: bottom + 1 };
+      // a dock at the foot (the reader's #app::after strip, Hfix-2e part 2's X-13) takes no pointer: read its own box
+      const dock = getComputedStyle(document.getElementById('app'), '::after');
+      const dockTop = dock.display !== 'none' && dock.position === 'fixed' && dock.content !== 'none' && parseFloat(dock.height) > 0
+        ? innerHeight - (parseFloat(dock.bottom) || 0) - parseFloat(dock.height) : Infinity;
+      return { top, bottom: Math.min(bottom + 1, dockTop), dockTop: Number.isFinite(dockTop) ? Math.round(dockTop) : null };
     });
     const d7InkFacts = (page) => page.evaluate(() => {
       const mini = document.getElementById('mini');
