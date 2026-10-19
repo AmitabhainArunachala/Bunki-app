@@ -73,11 +73,17 @@ async function reviewRun() {
       const r = el.getBoundingClientRect();
       const xs = [r.left + 1, (r.left + r.right) / 2, r.right - 1];
       const ys = [r.top + 1, (r.top + r.bottom) / 2, r.bottom - 1];
-      const hits = xs.flatMap(x => ys.map(y => {
+      // Rounded button corners belong to the surrounding ground, not the
+      // painted hit target. Probe their centre and four edge midpoints; retain
+      // all nine centre/edge/corner probes for the rectangular fallback line.
+      const points = el.matches('#zen-exit, #zen-more')
+        ? [[xs[1], ys[1]], [xs[0], ys[1]], [xs[2], ys[1]], [xs[1], ys[0]], [xs[1], ys[2]]]
+        : xs.flatMap(x => ys.map(y => [x, y]));
+      const hits = points.map(([x, y]) => {
         const hit = document.elementFromPoint(x, y);
         return { x, y, hit: hit ? hit.tagName + (hit.id ? '#' + hit.id : '') + (hit.className ? '.' + String(hit.className).replace(/\s+/g, '.') : '') : null,
           own: !!hit && (hit === el || el.contains(hit)) };
-      }));
+      });
       const textBoxes = []; const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
       for (let n = walker.nextNode(); n; n = walker.nextNode()) {
         if (!n.textContent.trim()) continue;
@@ -100,14 +106,26 @@ async function reviewRun() {
   async function measure(page, world, state) {
     const data = await page.evaluate(([owned, inks]) => window.__sweep.collect(owned, [], inks), [OWNED, INKS]);
     await page.evaluate(() => window.__sweep.hide(true));
-    let shot;
+    let shot, hiddenPaint;
     try {
+      // Negative controls must never outrank the shared glyph-hiding stylesheet.
+      // A coloured glyph in this shot would be mistaken for its own background,
+      // producing a bogus 1:1 red. Check both paint properties before sampling.
+      hiddenPaint = await page.locator('.review-kanji-status, #zen-exit, #zen-more').evaluateAll(nodes =>
+        nodes.flatMap(el => [el, ...el.querySelectorAll('*')]).map(el => {
+          const cs = getComputedStyle(el);
+          return { selector: el.id ? '#' + el.id : el.className, colour: cs.color, textFill: cs.webkitTextFillColor };
+        }));
+      assert(hiddenPaint.length >= 2, 'Both zen targets reached before background sampling');
+      assert(hiddenPaint.every(paint => parseColour(paint.colour)?.a === 0 &&
+        (!paint.textFill || parseColour(paint.textFill)?.a === 0)),
+        'Background sample still paints target glyphs: ' + JSON.stringify(hiddenPaint));
       await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
       shot = decodePng(await page.screenshot({ type: 'png' }));
     } finally { await page.evaluate(() => window.__sweep.hide(false)); }
     const result = analyse(world, state, data, shot, []);
     const target = p => /review-kanji-status|#zen-(exit|more)/.test(p.sel);
-    return { pairs: result.pairs.filter(target), unresolved: result.unresolved.filter(target),
+    return { hiddenPaint, pairs: result.pairs.filter(target), unresolved: result.unresolved.filter(target),
       roots: result.roots.filter(p => p.sel?.includes('review-face')) };
   }
   async function runCase(world, state, widths, historical = false) {
@@ -147,7 +165,7 @@ async function reviewRun() {
       assert(before.taken.some(t => t.id === '生' && t.t === 'kanji'), 'Fixture was actually imported');
       await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#reveal').click();
       await page.locator('[data-kanji-readings]').waitFor(); await settle(page, 400);
-      if (historical) await page.addStyleTag({ content: 'body.zen .review-kanji-status { color: #a02a1e !important; -webkit-text-fill-color: #a02a1e !important; }' });
+      if (historical) await page.addStyleTag({ content: 'body.zen .review-face [data-kanji-readings] > p.review-kanji-status { color: #a02a1e; }' });
       for (const width of widths) {
         await page.setViewportSize({ width, height: width === 320 ? 568 : width === 390 ? 844 : 900 });
         await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
@@ -186,7 +204,7 @@ async function reviewRun() {
           initialGeometry, scrolledToStatus, geometry: g, ...measured, beforeSha256: sha(JSON.stringify(before)), afterSha256: sha(JSON.stringify(after)), ...stamp() });
         if (state === 'listed' && width === 390 && ['sumi','hokusai'].includes(world)) {
           const kind = world === 'sumi' ? 'fallback-old-ink' : 'zen-old-ink';
-          const css = kind === 'fallback-old-ink' ? 'body.zen .review-kanji-status { color: #a02a1e !important; -webkit-text-fill-color: #a02a1e !important; }' : 'body.zen #zen-exit, body.zen #zen-more { color: var(--zen-text) !important; -webkit-text-fill-color: var(--zen-text) !important; opacity: 1 !important; }';
+          const css = kind === 'fallback-old-ink' ? 'body.zen .review-face [data-kanji-readings] > p.review-kanji-status { color: #a02a1e; }' : 'body.zen #zen-exit, body.zen #zen-more { color: var(--zen-text); }';
           const style = await page.addStyleTag({ content: css });
           const control = await measure(page, world, state);
           const relevant = control.pairs.filter(p => kind === 'fallback-old-ink' ? p.sel.includes('review-kanji-status') : /#zen-(exit|more)/.test(p.sel));
