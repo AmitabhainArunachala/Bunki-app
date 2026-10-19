@@ -4,6 +4,8 @@
  * The ladder contract is exercised as an attribute, not claimed as a ladder interaction.
  * Lead 1940's title rows use real first and second taps on fresh native profiles; they
  * measure the title's layout through the first state, not the Ladder's own behaviour.
+ * Lead 2140 adds the same taps on 大賞 beside a saved 日本: that ring is held to every
+ * visible card character's box, ruby included, and to the card's actual text ink.
  */
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
@@ -24,7 +26,8 @@ const PARA = { unmet: 23, met: 14, again: 18, recalled: 20, owned: 13, listed: 2
 const DAY = 86400000;
 const STORY = 'kantei:jp-105-actions-202609-25startup';
 const CONTEXT_STORY = 'aozora:000772-1';
-const LIVE = [{ name: 'live-daisho', id: STORY, query: 'スタートアップ大賞', word: '大賞' }, { name: 'live-watashi', id: CONTEXT_STORY, query: '私の個人主義', word: '私' }];
+const LIVE = [{ name: 'live-daisho', id: STORY, query: 'スタートアップ大賞', word: '大賞' }, { name: 'live-watashi', id: CONTEXT_STORY, query: '私の個人主義', word: '私' },
+  { name: 'live-daisho-saved-nihon', id: STORY, query: 'スタートアップ大賞', word: '大賞', prior: '日本' }];
 // Lead 2010: these titles are already enhanced when their reader opens. Only
 // wikinews has a BODY sidecar request; jawiki has no deferred-title arm.
 const LATE = [
@@ -61,7 +64,7 @@ const report = { schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || rando
   verifierSha256: hash(readFileSync(fileURLToPath(import.meta.url))), command: [process.execPath, ...process.argv.slice(1)],
   scope: { engines, worlds, full: !lateLookup && engines.length === 2 && worlds.length === 11, rooms: lateLookup ? [] : ['slip', 'basis', 'tray', 'today', 'mirror'],
     ...(lateLookup ? { lateRoster: { titles: [...new Set(LATE.map((l) => l.id))], engines: LATE_ENGINES, worlds: LATE_WORLDS, cases: LATE_REQUIRED.length, required: LATE_REQUIRED, scheduled: LATE_REQUIRED.filter((c) => engines.includes(c.engine)).map((c) => c.caseId), claim: 'lead2010: native cold titles plus actual wikinews BODY success/failure/retry; 12 real cases, not every world', jawikiSidecar: 'not exercised: no such request exists', deferredTitleWitness: 'not required by lead2010; neither native title is deferred' } } : {}),
-    card: { title: STORY, context: `${CONTEXT_STORY} 講演 met+saved`, live: LIVE.map((l) => `${l.id} ${l.word}: fresh profile, real first and second input`) },
+    card: { title: STORY, context: `${CONTEXT_STORY} 講演 met+saved`, live: LIVE.map((l) => `${l.id} ${l.word}: fresh profile${l.prior ? ` with ${l.prior} met+saved` : ''}, real first and second input`) },
     fixture: 'G2 first paragraph; native installation record; exact dictionary identities', ladder: 'attribute contract only' },
   thresholds: { fillCssPx: 6, actualFillExtentCssPx: 5, actualFillAreaCssPx2: 18, actualFillNote: 'Interior mask excludes 0.25px radius edge; extent allows circle antialiasing, area rejects clipped stripes', keptOuterCssPx: 10, knownContrast: 3, savedContrast: 3, metContrast: 1.5, semanticDeltaE76: 10,
     deltaEStatus: 'conservative engineering bound, not WCAG', measurement: 'actual device pixels: painted screenshot vs identical geometry with only dots hidden; paper is the hidden pixel' },
@@ -94,6 +97,7 @@ const lab = (rgb) => { const [r, g, b] = rgb.map(linear); const f = (t) => t > 2
 const delta = (a, b) => Math.hypot(...lab(a).map((v, i) => v - lab(b)[i]));
 const median = (colors) => colors.length ? [0, 1, 2].map((i) => colors.map((x) => x[i]).sort((a, b) => a - b)[Math.floor(colors.length / 2)]) : null;
 const hideCss = '#reader .tok > .tok-word::after,.japanese-lookup-word::after,#mini .mini-word::after,.today-star::after{visibility:hidden!important}.depth-dot{visibility:hidden!important}';
+const hideCardText = '.reader-card,.reader-card *{color:transparent!important;-webkit-text-fill-color:transparent!important;text-decoration-color:transparent!important;text-shadow:none!important}';
 async function boot(page) {
   await page.goto(new URL('index.html?entry=shelf&ui=bi', base).href);
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 45000 });
@@ -454,8 +458,63 @@ async function settledRecord(page, { quietMs = 750, timeout = 8000 } = {}) {
   }
   return { snapshot, settled: false, quietMs, waitedMs: Date.now() - started, reads };
 }
-async function liveFirstState(page, out, { name, id, query, word }) {
+/** Native met+saved history for one title word, committed before the live inputs begin. */
+async function seedPrior(page, { id, query, prior }) {
   await story(page, id, query);
+  const node = await page.evaluate((word) => { const node = { t: 'word', id: word }; return { key: window.__KAIRO_DEPTH__.key(node), kind: window.__KAIRO_DEPTH__.identity(node)?.kind ?? null }; }, prior);
+  assert.equal(node.kind, 'core', `Native title ${prior} identity is core`);
+  const today = await page.evaluate(() => window.__KAIRO_DEPTH__.day()), now = Date.now();
+  const value = (await readAppRecordSnapshot(page)).record;
+  value.met = { version: 1, entries: { ...(value.met?.entries || {}), [node.key]: { first: today, last: today, days: 1 } } };
+  value.taken = [...(value.taken || []), savedWord(prior, now)];
+  await commitRecord(page, value, 'prior');
+  await story(page, id, query);
+  await page.waitForFunction((word) => document.querySelector(`.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"][data-depth="met"][data-kept]`), prior);
+  return node;
+}
+const TITLE_DOTS = '.reader-card > h1.view-title .japanese-lookup-word:is([data-depth],[data-kept])';
+/** One live frame of the title's stateful dots against the whole card: every visible character box (title, its shown
+ * readings, caption, context and instrument lines) by the common title law, and, when asked, the actual raster: ring
+ * pixels (shown vs dots hidden) never on text ink (dots hidden vs card text transparent), its own word's glyphs included. */
+async function titleRingFrame(page, out, name, label, raster) {
+  const frame = `${name}-${label}`;
+  await page.locator('.reader-card .japanese-lookup-word').evaluateAll((els, name) => els.forEach((el, i) => { el.dataset.dotsNode ||= `${name}-${i}`; }), name);
+  const dots = await facts(page, TITLE_DOTS);
+  out.captureFrames ||= {}; out.captureFrames[frame] = dots.captureFrame;
+  for (const d of dots) d.captureFrame = frame;
+  out.measurements[frame] = dots;
+  lineGeometry(out, frame, dots);
+  if (!raster) return dots;
+  const view = await page.evaluate(() => ({ x: scrollX, y: scrollY, dpr: devicePixelRatio }));
+  const shot = async (suffix) => png(await page.screenshot({ path: resolve(evidence, `${out.engine}-${out.world}-${frame}${suffix}.png`), animations: 'allow' }));
+  const shown = await shot('');
+  const noDots = await page.addStyleTag({ content: hideCss }); const paper = await shot('-paper');
+  const noText = await page.addStyleTag({ content: hideCardText }); const bare = await shot('-bare');
+  await noText.evaluate((s) => s.remove()); await noDots.evaluate((s) => s.remove());
+  const again = await facts(page, TITLE_DOTS);
+  const stable = JSON.stringify(again.map((d) => [d.probeId, d.host, d.left, d.top])) === JSON.stringify(dots.map((d) => [d.probeId, d.host, d.left, d.top])) && JSON.stringify(again.captureFrame.glyphs) === JSON.stringify(dots.captureFrame.glyphs);
+  const differs = (a, b) => a.some((v, k) => Math.abs(v - b[k]) > 3);
+  const ink = dots.map((d) => {
+    const box = { left: d.left - d.spread - 1, top: d.top - d.spread - 1, right: d.right + d.spread + 1, bottom: d.bottom + d.spread + 1 }, hits = { own: 0, other: 0, reading: 0, unattributed: 0 };
+    let painted = 0;
+    for (let y = Math.max(0, Math.floor((box.top - view.y) * view.dpr)); y < Math.min(shown.height, Math.ceil((box.bottom - view.y) * view.dpr)); y++)
+      for (let x = Math.max(0, Math.floor((box.left - view.x) * view.dpr)); x < Math.min(shown.width, Math.ceil((box.right - view.x) * view.dpr)); x++) {
+        const behind = pix(paper, x, y);
+        if (!differs(pix(shown, x, y), behind)) continue;
+        painted++;
+        if (!differs(behind, pix(bare, x, y))) continue;
+        const cx = (x + 0.5) / view.dpr + view.x, cy = (y + 0.5) / view.dpr + view.y;
+        const glyph = dots.captureFrame.glyphs.find((g) => cx >= g.left && cx <= g.right && cy >= g.top && cy <= g.bottom);
+        hits[!glyph ? 'unattributed' : glyph.rt ? 'reading' : glyph.owner === d.probeId ? 'own' : 'other']++;
+      }
+    return { probeId: d.probeId, text: d.text, depth: d.depth, kept: d.kept, box, painted, hits };
+  });
+  row(out, `${frame}.ring-clear-of-ink`, stable && ink.length > 0 && ink.every((d) => d.painted >= 4 && Object.values(d.hits).every((n) => n === 0)), { stable, view, ink });
+  return dots;
+}
+async function liveFirstState(page, out, { name, id, query, word, prior }) {
+  const priorNode = prior ? await seedPrior(page, { id, query, prior }) : null;
+  if (!prior) await story(page, id, query);
   await page.locator('.reader-card').evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' })); await delay(250);
   const selector = `.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"]`, target = page.locator(selector).first();
   const native = await page.evaluate((word) => { const node = { t: 'word', id: word }; return { key: window.__KAIRO_DEPTH__.key(node), kind: window.__KAIRO_DEPTH__.identity(node)?.kind ?? null }; }, word);
@@ -501,11 +560,21 @@ async function liveFirstState(page, out, { name, id, query, word }) {
   const before = await sample('before');
   const first = lines.find((l) => l.text === '日本'), daisho = lines.find((l) => l.text === '大賞');
   const twoLine = Boolean(first && daisho && first.top != null && daisho.top != null && daisho.top - first.top > (first.bottom - first.top) / 2);
-  row(out, `${name}.fresh`, native.kind === 'core' && fresh?.titleWords > 0 && stateless(fresh) && !before.rung && !before.mini && !pre.record.met?.entries?.[native.key] && (out.engine !== 'webkit' || id !== STORY || twoLine), { native, lines, twoLine, fresh, before, revision: pre.revision });
+  const priorPainted = !prior || Boolean(fresh?.words.some((w) => w.title && w.text === prior && w.painted && w.nativeActive));
+  row(out, `${name}.fresh`, native.kind === 'core' && fresh?.titleWords > 0 && stateless(fresh, (w) => w.text !== prior) && priorPainted && !before.rung && !before.mini && !pre.record.met?.entries?.[native.key] && (out.engine !== 'webkit' || id !== STORY || twoLine), { native, prior: prior ? { word: prior, node: priorNode, painted: priorPainted } : null, lines, twoLine, fresh, before, revision: pre.revision });
+  if (prior) await titleRingFrame(page, out, name, 'before', true);
   await input();
   const input1 = await sample('input-1');
   await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.ladderRung != null, selector); await delay(350);
   const reading = await sample('reading');
+  if (prior) {
+    const ringDots = await titleRingFrame(page, out, name, 'reading', true), ring = ringDots.find((d) => d.text === prior);
+    const targetNode = await target.evaluate((el) => el.dataset.dotsNode);
+    const readingGlyphs = out.captureFrames[`${name}-reading`].glyphs.filter((g) => g.rt && g.owner === targetNode);
+    const underRing = ring ? readingGlyphs.filter((g) => g.top > ring.fragments.at(-1).bottom && g.left < ring.right + ring.spread && g.right > ring.left - ring.spread) : [];
+    row(out, `${name}.reading-beside-ring`, ring?.depth === 'met' && ring.kept && readingGlyphs.length > 0 && readingGlyphs.map((g) => g.text).join('') === reading.reading.replace(/\s/gu, '') && (out.engine !== 'webkit' || underRing.length > 0),
+      { ring: ring && { text: ring.text, depth: ring.depth, kept: ring.kept, box: [ring.left - ring.spread, ring.top - ring.spread, ring.right + ring.spread, ring.bottom + ring.spread], fragments: ring.fragments }, reading: reading.reading, readingGlyphs, underRing });
+  }
   const settle = await settledRecord(page);
   const beforeInput2 = await readAppRecordSnapshot(page);
   const encounterAt = (snapshot) => snapshot.record.met?.entries?.[native.key] ?? null;
@@ -514,11 +583,20 @@ async function liveFirstState(page, out, { name, id, query, word }) {
   await input();
   await page.locator('#mini').waitFor({ state: 'visible' });
   const opened = await sample('stage-open');
+  if (prior) await titleRingFrame(page, out, name, 'stage-open', false);
   const miniHandle = await page.$('#mini');
   const committed = await waitForAppRecord(page, (value) => Boolean(value.met?.entries?.[native.key]), { description: `native first encounter for ${word}` });
   await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.depth === 'met', selector); await delay(350);
   const met = await sample('stage-met');
+  if (prior) await titleRingFrame(page, out, name, 'stage-met', true);
   const after = await readAppRecordSnapshot(page);
+  if (prior) {
+    const priorDepth = await page.evaluate((word) => window.__KAIRO_DEPTH__.depth({ t: 'word', id: word }), prior);
+    const saved = (record) => JSON.stringify((record.taken || []).filter((t) => t.id === prior));
+    row(out, `${name}.prior-state-intact`, JSON.stringify(pre.record.met?.entries?.[priorNode.key]) === JSON.stringify(after.record.met?.entries?.[priorNode.key]) && Boolean(pre.record.met?.entries?.[priorNode.key]) &&
+      saved(pre.record) !== '[]' && saved(pre.record) === saved(after.record) && Object.keys(pre.record).every((key) => key in after.record) && priorDepth?.depth === 'met' && priorDepth.kept,
+      { before: { met: pre.record.met?.entries?.[priorNode.key], taken: JSON.parse(saved(pre.record)) }, after: { met: after.record.met?.entries?.[priorNode.key], taken: JSON.parse(saved(after.record)) }, priorDepth, missingKeys: Object.keys(pre.record).filter((key) => !(key in after.record)) });
+  }
   const sameMini = Boolean(miniHandle) && await miniHandle.evaluate((el) => el.isConnected && el === document.getElementById('mini'));
   const expected = await page.evaluate((word) => window.__KAIRO_DEPTH__.depth({ t: 'word', id: word }), word);
   const frames = [before, input1, reading, opened, met];
