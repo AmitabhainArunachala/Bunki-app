@@ -3436,13 +3436,18 @@ function keptWordProjection(record) {
   };
   for (const row of record.taken || []) remember(row);
   for (const list of Object.values(record.lists || {})) for (const row of list || []) remember(row);
+  // Hfix-2b · X-1 — the not-yet marks are gathered once for the whole shelf, not once per word
+  const notYet = new Set(notYetMarks(record).map((mark) => mark.id));
+  const now = Date.now();
   return [...words.values()].map(row => {
     const identity = wordCardIdentity(record, row.id);
     const answer = savedAnswerFor({ t: 'word', id: row.id }, record);
     const key = JSON.stringify([row.id, identity.kind, identity.seq || null,
       identity.reading ?? null, identity.gloss ?? null]);
     return { key, id: row.id, label: row.label || row.id, identity,
-      reading: identity.reading || answer?.reading || '', status: answer?.status || 'unavailable', answer };
+      reading: identity.reading || answer?.reading || '', status: answer?.status || 'unavailable', answer,
+      // why this word's star stands in the 宙 sky; '' when the record holds no reason
+      why: keptStarWhy(record, row.id, now, notYet) };
   }).sort((a, b) => a.key < b.key ? -1 : a.key > b.key ? 1 : 0);
 }
 
@@ -3484,7 +3489,9 @@ async function installDriftRecord() {
     if (!isCurrent(scopeId) || current.status !== 'active') return { status: 'recovery-required' };
     return { status: 'active', scopeId, revision: current.snapshot.revision,
       driftState: recordControllerModule.readDriftState(current.snapshot.record),
-      keptWords: keptWordProjection(current.snapshot.record).map(({ key, id, label, reading, status }) => ({ key, id, label, reading, status })) };
+      // Hfix-2b · X-1 — `why` rides with each kept word so its star can say why it is there
+      keptWords: keptWordProjection(current.snapshot.record)
+        .map(({ key, id, label, reading, status, why }) => ({ key, id, label, reading, status, why })) };
   };
   const commands = new Map();
   await window.__DRIFT__.setRecordBridge({ version: 1, isCurrent,
@@ -17354,6 +17361,81 @@ function todaySkyWhy(kind, detail = {}) {
   if (kind === 'kin') return tx(`今日のことばと「${detail.kanji}」が同じ`, `shares ${detail.kanji} with today's word`);
   return '';
 }
+
+/** Hfix-2b · X-9 — every word standing under his own "Not yet", read where the WORD PAGE writes
+ * it: `met.entries[<encounterKey>].said = { value:'not-yet', at, cursor }`.
+ *
+ * Today's sky used to read one mark only — the review room's obslog 'reveal' row — and nothing
+ * writes that row any more, so a word he marked on its own page never reached the sky. Both marks
+ * are read now; this is the newer of the two, and the one he actually presses.
+ *
+ * A mark stands unless a later recall released it, which is the exact rule `wordDepth` applies at
+ * the word's own ring (match === 'same' && notYetReleased). The sky and the ring therefore cannot
+ * disagree. The identity comes from the key itself rather than being re-derived, so a word whose
+ * dictionary entry has since moved is still counted as the word he marked.
+ *
+ * Pure: reads the record, writes nothing, adds no field, and touches no SRS ledger or schedule. */
+function notYetMarks(record = S) {
+  const root = record?.met;
+  if (!metReadable(root)) return [];
+  const marks = [];
+  for (const [key, entry] of Object.entries(root.entries || {})) {
+    const said = plainRecord(entry) && plainRecord(entry.said) ? entry.said : null;
+    if (said?.value !== 'not-yet') continue;
+    let parsed = null;
+    try { parsed = JSON.parse(key); } catch { parsed = null; }
+    // [1, 'word', id, kind, seq, reading] — what he met, never the spelling alone
+    if (!Array.isArray(parsed) || parsed[0] !== 1 || parsed[1] !== 'word' || !nonEmptyString(parsed[2])) continue;
+    const identity = { t: 'word', id: parsed[2], kind: parsed[3], seq: parsed[4] ?? null, reading: parsed[5] ?? null };
+    const skey = srsKey('word', identity.id);
+    const match = depthIdentityMatch(identity, wordCardIdentity(record, identity.id));
+    if (match === 'same' && notYetReleased(record, skey, said.cursor)) continue;
+    marks.push({ id: identity.id, key: skey, at: finiteNumber(said.at) ? said.at : 0 });
+  }
+  return marks.sort((a, b) => b.at - a.at);
+}
+
+/** Hfix-2b · X-1 — why one 宙 star is there, in the same words and from the same recorded sources
+ * as Today's sky (MASTER_SPEC §7 line 39: "each star says why it is there").
+ *
+ * Asked in Today's own order: a miss, then his own "Not yet", then repeated look-ups, then a
+ * review due today. Only what the record actually holds — a word with nothing recorded against it
+ * returns '', and its star then says nothing rather than inventing a reason to exist.
+ *
+ * `notYet` is the set from notYetMarks, passed in so a shelf of kept words costs one pass, not one
+ * pass per word. Pure: reads the record only. */
+function keptStarWhy(record, id, now = Date.now(), notYet = null) {
+  if (!nonEmptyString(id)) return '';
+  const skey = srsKey('word', id);
+  const since = now - TODAY_SKY_MISS_DAYS * 86400000;
+  // 1 · missed lately: the review log's Again, and a practice or test answer wrong
+  let miss = null;
+  const later = (row, test) => { if (!miss || row[0] > miss.at) miss = { at: row[0], test }; };
+  for (const row of record.revlog || []) {
+    if (Array.isArray(row) && row[1] === skey && row[2] === 1 && row[0] >= since) later(row, false);
+  }
+  for (const row of record.obslog || []) {
+    if (!Array.isArray(row) || row[0] < since || !['probe', 'dojo', 'lesson', 'mock'].includes(row[1])) continue;
+    if (row[3] === 1 && row[2] === skey) later(row, row[1] === 'mock');
+  }
+  if (miss) return todaySkyWhy('missed', miss);
+  // 2 · his own "Not yet", the same read X-9 gives Today's sky
+  const marked = notYet || new Set(notYetMarks(record).map((mark) => mark.id));
+  if (marked.has(id)) return todaySkyWhy('unknown');
+  // 3 · looked up on two or more occasions, ten minutes apart
+  const times = [];
+  for (const row of record.obslog || []) {
+    if (!Array.isArray(row) || row[1] !== 'tap' || row[3] < 2 || row[2] !== skey) continue;
+    if (!times.length || row[0] - times[times.length - 1] >= 10 * 60000) times.push(row[0]);
+  }
+  if (times.length >= 2) return todaySkyWhy('looked', { times: times.length });
+  // 4 · due today, by the card's own instant
+  const card = plainRecord(record.srs) && owns(record.srs, skey) && plainRecord(record.srs[skey]) ? record.srs[skey] : null;
+  const end = new Date(now);
+  end.setHours(23, 59, 59, 999);
+  if (card && validInstant(card.due) && Date.parse(card.due) <= end.getTime()) return todaySkyWhy('due');
+  return '';
+}
 /* The deck ledgers' misses (localStorage, the deck's own schedule), read once a day through the deck's own read-only
  * export; the sky draws without them and is drawn again in place when they arrive. */
 let todayDeckMisses = null;
@@ -17427,9 +17509,16 @@ function todaySkyPicks(dayWord, today, readPick) {
   for (const miss of todaySkyDeckMisses()) misses.push({ key: `word:${miss.term}`, at: miss.at });
   misses.sort((x, y) => y.at - x.at);
   for (const miss of misses) add(label(miss.key), 'missed', todaySkyWhy('missed', miss), itemOf(miss.key));
-  // 2 · marked not yet (the review room's まだ)
-  const unknown = (S.obslog || []).filter((row) => Array.isArray(row) && row[1] === 'reveal' && row[3] === 0).sort((x, y) => y[0] - x[0]);
-  for (const row of unknown) add(label(row[2]), 'unknown', todaySkyWhy('unknown'), itemOf(row[2]));
+  // 2 · marked not yet — BOTH marks (X-9). The review room's old まだ (an obslog 'reveal' row,
+  // which nothing writes any more) and, since Hfix-2b, the mark the word page itself writes and
+  // he actually presses. Reading only the first meant a word marked on its page never reached
+  // this sky at all. `add` keeps the first of a word, so the newer moment wins its place.
+  const unknown = (S.obslog || [])
+    .filter((row) => Array.isArray(row) && row[1] === 'reveal' && row[3] === 0)
+    .map((row) => ({ key: row[2], at: row[0] }))
+    .concat(notYetMarks(S).map((mark) => ({ key: mark.key, at: mark.at })))
+    .sort((x, y) => y.at - x.at);
+  for (const row of unknown) add(label(row.key), 'unknown', todaySkyWhy('unknown'), itemOf(row.key));
   // 3 · looked up on two or more occasions (ten minutes apart), and not kept
   const looks = new Map();
   for (const row of S.obslog || []) {
