@@ -175,16 +175,6 @@
     "result": "observed",
     "startedAt": "2026-10-12T06:09:39Z"
   },
-  "37176715636/1": {
-    "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-10-04T04:20:18Z",
-    "reason": "Unexpected producer event"
-  },
-  "37176715639/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T04:20:18Z"
-  },
   "37177224718/1": {
     "result": "observed",
     "startedAt": "2026-10-04T04:30:55Z"
@@ -1550,5 +1540,9 @@
   "37925123360/17": {
     "result": "observed",
     "startedAt": "2026-10-19T01:23:08Z"
+  },
+  "37714882624/20": {
+    "result": "observed",
+    "startedAt": "2026-10-19T01:23:01Z"
   }
 }
