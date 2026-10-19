@@ -18343,10 +18343,42 @@ async function buildImportPlan(value, trustedPolicy) {
     ...(journal ? { journal } : {}) });
 }
 
+/** Read all existing personal-store rows without creating a database in a fresh browser.
+ * An aborted initial version transaction leaves no database behind, including on Cancel.
+ * Unknown stores and unreadable/blocked storage cannot establish an empty installation. */
+async function personalCollectionsEmptyForAdoption() {
+  const { DB_NAME } = await import('./decks/personal/store.mjs');
+  return new Promise((resolve, reject) => {
+    let absent = false, settled = false;
+    const finish = (empty, error) => { if (settled) return; settled = true; error ? reject(error) : resolve(empty); };
+    const request = indexedDB.open(DB_NAME);
+    request.onupgradeneeded = () => { absent = true; request.transaction.abort(); };
+    request.onerror = (event) => { event.preventDefault(); absent ? finish(true) : finish(false, request.error); };
+    request.onblocked = () => finish(false, new Error('personal-store-blocked'));
+    request.onsuccess = () => {
+      const db = request.result;
+      if (settled) { db.close(); return; }
+      db.onversionchange = () => db.close();
+      try {
+        const names = [...db.objectStoreNames];
+        if (db.version !== 1 || names.length !== 1 || names[0] !== 'collections') { db.close(); finish(false); return; }
+        const tx = db.transaction(names, 'readonly');
+        let count = 0;
+        for (const name of names) {
+          const query = tx.objectStore(name).count();
+          query.onsuccess = () => { count += query.result; };
+        }
+        tx.oncomplete = () => { db.close(); finish(count === 0); };
+        tx.onabort = tx.onerror = () => { db.close(); finish(false, tx.error || new Error('personal-store-unreadable')); };
+      } catch (error) { db.close(); finish(false, error); }
+    };
+  });
+}
+
 /** Adoption is allowed only while this installation has no learner work.
  * Unknown roots, operation history (including tombstones), prior app commands
  * and recovery drafts are deliberately not interpreted as empty. */
-function emptyRecordForAdoption(snapshot) {
+async function emptyRecordForAdoption(snapshot) {
   const same = (a, b) => canonicalRecordJson(a) === canonicalRecordJson(b);
   const docs = snapshot.documents;
   if (!Array.isArray(docs) || docs.length !== 2) return false;
@@ -18361,21 +18393,25 @@ function emptyRecordForAdoption(snapshot) {
   if (!['operations', 'ready', 'pending', 'quarantined'].every((key) => Array.isArray(snapshot.replica?.[key]) && !snapshot.replica[key].length) ||
     !['outbox', 'acknowledgedOutbox', 'inbox', 'checkpoints'].every((key) => Array.isArray(snapshot[key]) && !snapshot[key].length) ||
     snapshot.actor?.sequence !== 0 || snapshot.actor.predecessor !== null) return false;
-  try {
-    const raw = sessionStorage.getItem(DRAFT_KEY);
-    if (raw !== null && !same(JSON.parse(raw), {})) return false;
-    // Separate deck ledgers are outside backups and must never be rebound.
-    // Recovery slots also hold learner input outside the portable record.
-    for (let i = 0; i < localStorage.length; i += 1) {
-      const key = localStorage.key(i);
-      if (key.startsWith('bunki-cloze:') ||
-        ((key.includes('recovery') || key.includes('capture-draft') || key.includes('excerpt-draft') || key.includes('transcript-draft')) &&
-          key.includes(recordInstallation.databaseName))) return false;
-    }
-    if ([...document.querySelectorAll('#note-input, #chat-input, #personal-note-input, .record-note-edit-input, #sentence-production-text, #sentence-listening-text, #vocabulary-list-name, #source-capture-form input, #source-capture-form textarea')]
-      .some((input) => input.value)) return false;
-  } catch { return false; }
-  return true;
+  const localEmpty = () => {
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY);
+      if (raw !== null && !same(JSON.parse(raw), {})) return false;
+      // Device-local deck and guided-session stores are outside backups and must never be rebound.
+      // Recovery slots also hold learner input outside the portable record.
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const key = localStorage.key(i);
+        if (key.startsWith('bunki-cloze:') || key.startsWith('bunki-srs-deck:') || key.startsWith('kairo-guided-session-v1:') ||
+          ((key.includes('recovery') || key.includes('capture-draft') || key.includes('excerpt-draft') || key.includes('transcript-draft')) &&
+            key.includes(recordInstallation.databaseName))) return false;
+      }
+      if ([...document.querySelectorAll('#note-input, #chat-input, #personal-note-input, .record-note-edit-input, #sentence-production-text, #sentence-listening-text, #vocabulary-list-name, #source-capture-form input, #source-capture-form textarea')]
+        .some((input) => input.value)) return false;
+    } catch { return false; }
+    return true;
+  };
+  try { return localEmpty() && await personalCollectionsEmptyForAdoption() && localEmpty(); }
+  catch { return false; }
 }
 
 function renderPortRow(main) {
@@ -18481,7 +18517,7 @@ function renderPortRow(main) {
         if (error.code !== 'ownership-mismatch') throw error;
         const current = await recordController.snapshot();
         if (current.status !== 'active' || current.snapshot.revision !== preview.snapshot.revision ||
-          !emptyRecordForAdoption(current.snapshot)) throw error;
+          !(await emptyRecordForAdoption(current.snapshot))) throw error;
         let policy;
         try { policy = bindingModule.localBackupAdoptionPolicy(recordInstallation.policy, s.journal.scope); }
         catch { throw error; }

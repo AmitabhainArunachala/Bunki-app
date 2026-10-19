@@ -330,7 +330,7 @@ export async function adoptLocalRecord({ storage, crypto: random, assertOwner, i
   ]);
   const before = ADOPTION_KEYS.map((key) => storage.getItem(key));
   const oldSnapshot = activeSnapshot(await oldController.snapshot());
-  insist(oldSnapshot.revision === expectedRevision && isEmpty(oldSnapshot), 'ownership-mismatch');
+  insist(oldSnapshot.revision === expectedRevision && (await isEmpty(oldSnapshot)) === true, 'ownership-mismatch');
   const oldSha256 = encodeLocalJson(oldSnapshot).sha256;
   const staged = memoryStorage([['kairo-corridor-v1', JSON.stringify({ v: 1, taken: [] })]]);
   const guard = () => assertOwner() === true;
@@ -360,7 +360,7 @@ export async function adoptLocalRecord({ storage, crypto: random, assertOwner, i
       document('kairo:record-host-commands', restored.receipt.changeId), 'adoption-restore-diverged');
     await controller.close(); controller = null;
     const latest = activeSnapshot(await oldController.snapshot());
-    insist(encodeLocalJson(latest).sha256 === oldSha256 && isEmpty(latest), 'ownership-mismatch');
+    insist(encodeLocalJson(latest).sha256 === oldSha256 && (await isEmpty(latest)) === true, 'ownership-mismatch');
     insist(guard() && ADOPTION_KEYS.every((key, i) => storage.getItem(key) === before[i]), 'adoption-storage-diverged');
     const intent = { format: 'kairo-local-record-adoption', version: 1, before,
       after: ADOPTION_KEYS.map((key) => staged.getItem(key)), oldSha256,
@@ -374,7 +374,8 @@ export async function adoptLocalRecord({ storage, crypto: random, assertOwner, i
     const retiredController = await createRecordController({ ...retired, writer: adoptionWriter(retired, guard),
       requireDrift: true, legacyStorage: retiredStorage });
     try {
-      insist(encodeLocalJson(activeSnapshot(await retiredController.snapshot())).sha256 === oldSha256, 'adoption-record-diverged');
+      const retiredSnapshot = activeSnapshot(await retiredController.snapshot());
+      insist(encodeLocalJson(retiredSnapshot).sha256 === oldSha256 && (await isEmpty(retiredSnapshot)) === true, 'adoption-record-diverged');
     } finally { await retiredController.close(); }
     insist(guard() && storage.getItem(ADOPTION_KEY) === null &&
       ADOPTION_KEYS.every((key, i) => storage.getItem(key) === before[i]), 'adoption-storage-diverged');
