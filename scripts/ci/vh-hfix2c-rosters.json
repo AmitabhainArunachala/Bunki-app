@@ -149,14 +149,7 @@
     "X21": 1
   },
   "transition": "生/390/pending-to-complete: real reference bytes repaint the same review without writes",
-  "protectedRoots": [
-    "srs",
-    "taken",
-    "revlog",
-    "obslog",
-    "stats",
-    "suspended"
-  ],
+  "protectedRoots": ["srs", "taken", "revlog", "obslog", "stats", "suspended"],
   "worlds": [
     "hokusai",
     "sumi",
@@ -170,11 +163,7 @@
     "hakuu",
     "kaku"
   ],
-  "states": [
-    "page",
-    "deck-front",
-    "deck-back"
-  ],
+  "states": ["page", "deck-front", "deck-back"],
   "contrast": {
     "chromium": [
       "source/C7",

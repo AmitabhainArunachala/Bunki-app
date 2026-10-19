@@ -37,9 +37,18 @@ import {
   RELEASE_GROUPS,
 } from './ci/gate-evidence.mjs';
 import { commandCheckEvidence } from './ci/command-check-contracts.mjs';
-import { loadHfix2cPins, validateHfix2cFocused, validateHfix2cLaneAdmission } from './ci/vh-hfix2c-report-contracts.mjs';
+import {
+  loadHfix2cPins,
+  validateHfix2cFocused,
+  validateHfix2cLaneAdmission,
+} from './ci/vh-hfix2c-report-contracts.mjs';
 import { loadHfix2dPins, validateHfix2dReport } from './ci/vh-hfix2d-report-contracts.mjs';
-import { BATCH3_SUITES, BATCH3_REPORT_TYPES, loadBatch3Pins, validateBatch3Admission } from './ci/vh-batch3-report-contracts.mjs';
+import {
+  BATCH3_SUITES,
+  BATCH3_REPORT_TYPES,
+  loadBatch3Pins,
+  validateBatch3Admission,
+} from './ci/vh-batch3-report-contracts.mjs';
 
 const SELF = fileURLToPath(import.meta.url);
 const ROOT = resolve(dirname(SELF), '..');
@@ -292,11 +301,23 @@ export function batteryGates(out, env = process.env) {
         const name = engine === 'chromium' ? suite : `${suite}-webkit`;
         const focused = suite === 'hfix2c';
         return {
-          ...node(name, focused ? tool('verify-hfix2c') : 'scripts/ci/run-hfix2c-contrast-gate.mjs', [], {
-            ...report(name, focused ? 'hfix2c' : 'hfix2c-three-state-contrast', focused ? 'result.json' : 'lane-admission.json'),
-            engine,
-          }),
-          env: { KAIRO_BROWSER: engine, ...(focused ? { HFIX2C_MODE: 'branch', HFIX2C_CASE: '', HFIX2C_BASE: '' } : {}) },
+          ...node(
+            name,
+            focused ? tool('verify-hfix2c') : 'scripts/ci/run-hfix2c-contrast-gate.mjs',
+            [],
+            {
+              ...report(
+                name,
+                focused ? 'hfix2c' : 'hfix2c-three-state-contrast',
+                focused ? 'result.json' : 'lane-admission.json',
+              ),
+              engine,
+            },
+          ),
+          env: {
+            KAIRO_BROWSER: engine,
+            ...(focused ? { HFIX2C_MODE: 'branch', HFIX2C_CASE: '', HFIX2C_BASE: '' } : {}),
+          },
         };
       }),
     ),
@@ -304,19 +325,26 @@ export function batteryGates(out, env = process.env) {
       const name = engine === 'chromium' ? 'hfix2d' : 'hfix2d-webkit';
       return {
         ...node(name, tool('verify-hfix2d'), [], { ...report(name, 'hfix2d'), engine }),
-        env: { KAIRO_BROWSER: engine,
-          KAIRO_EXPECT_GITSHA: env.KAIRO_SITE_DIR ? json(join(env.KAIRO_SITE_DIR, 'build-identity.json')).gitSha : '' },
+        env: {
+          KAIRO_BROWSER: engine,
+          KAIRO_EXPECT_GITSHA: env.KAIRO_SITE_DIR
+            ? json(join(env.KAIRO_SITE_DIR, 'build-identity.json')).gitSha
+            : '',
+        },
       };
     }),
-    ...BATCH3_SUITES.flatMap((suite) => ['chromium', 'webkit'].map((engine) => {
-      const name = engine === 'chromium' ? suite : `${suite}-webkit`;
-      return {
-        ...node(name, `scripts/ci/run-${suite}-gate.mjs`, [], {
-          ...report(name, `batch3-${suite}`, 'lane-admission.json'), engine,
-        }),
-        env: { KAIRO_BROWSER: engine },
-      };
-    })),
+    ...BATCH3_SUITES.flatMap((suite) =>
+      ['chromium', 'webkit'].map((engine) => {
+        const name = engine === 'chromium' ? suite : `${suite}-webkit`;
+        return {
+          ...node(name, `scripts/ci/run-${suite}-gate.mjs`, [], {
+            ...report(name, `batch3-${suite}`, 'lane-admission.json'),
+            engine,
+          }),
+          env: { KAIRO_BROWSER: engine },
+        };
+      }),
+    ),
     node(
       'word-saved-answer',
       tool('test-word-saved-answer'),
@@ -933,14 +961,26 @@ export function batteryGates(out, env = process.env) {
           report: {
             ...gate.report,
             artifactSha256: env.KAIRO_VERIFIED_ARTIFACT_SHA256,
-            ...(['hfix2a', 'hfix2a-item-a', 'hfix2c', 'hfix2c-three-state-contrast', 'hfix2d', ...BATCH3_REPORT_TYPES].includes(gate.report.type)
+            ...([
+              'hfix2a',
+              'hfix2a-item-a',
+              'hfix2c',
+              'hfix2c-three-state-contrast',
+              'hfix2d',
+              ...BATCH3_REPORT_TYPES,
+            ].includes(gate.report.type)
               ? {
                   siteIdentity: env.KAIRO_SITE_DIR
                     ? json(join(env.KAIRO_SITE_DIR, 'build-identity.json'))
                     : null,
                 }
               : {}),
-            ...(['hfix2c', 'hfix2c-three-state-contrast', 'hfix2d', ...BATCH3_REPORT_TYPES].includes(gate.report.type)
+            ...([
+              'hfix2c',
+              'hfix2c-three-state-contrast',
+              'hfix2d',
+              ...BATCH3_REPORT_TYPES,
+            ].includes(gate.report.type)
               ? { siteDir: env.KAIRO_SITE_DIR ? resolve(env.KAIRO_SITE_DIR) : null }
               : {}),
             ...(gate.report.type === 'kanji-trust'
@@ -1831,22 +1871,47 @@ function requireNamedCases(rows, names, field = 'pass', accepted = true) {
 
 export function validateKanjiTrustReport(value, { engine, artifactSha256, siteDir }) {
   const expectedRows = [
-    'K01-sei', 'K01-kai', 'K01-o', 'K01-official', 'K01-joyo-forms',
-    'K01-stroke-extended', 'K01-stroke-official', 'K01-stroke-failed',
-    'K03-lookup', 'K04-kodansha', 'K05-frequency', 'K05-reading-all',
-    'K05-nested-return', 'K05-nested-search-page', 'K05-idioms', 'K05-parts',
-    'K07-words', 'K06-load', 'K08-lessons',
+    'K01-sei',
+    'K01-kai',
+    'K01-o',
+    'K01-official',
+    'K01-joyo-forms',
+    'K01-stroke-extended',
+    'K01-stroke-official',
+    'K01-stroke-failed',
+    'K03-lookup',
+    'K04-kodansha',
+    'K05-frequency',
+    'K05-reading-all',
+    'K05-nested-return',
+    'K05-nested-search-page',
+    'K05-idioms',
+    'K05-parts',
+    'K07-words',
+    'K06-load',
+    'K08-lessons',
   ];
   assert.equal(value.schemaVersion, 1, 'Unknown Kanji-trust receipt version');
   assert.equal(value.control, null, 'A mutant Kanji-trust run is not an acceptance');
   assert.equal(value.failures, 0, 'Kanji-trust reports failures');
   assert(['chromium', 'webkit'].includes(engine), 'Kanji-trust engine must be pinned');
   assert(Array.isArray(value.results), 'Kanji-trust has no engine results');
-  assert.deepEqual(value.results.map((result) => result.engine), [engine], 'Foreign or extra engine');
+  assert.deepEqual(
+    value.results.map((result) => result.engine),
+    [engine],
+    'Foreign or extra engine',
+  );
   const rows = value.results[0].rows;
   assert(Array.isArray(rows), 'Kanji-trust has no completed rows');
-  assert.deepEqual(rows.map((row) => row.row), expectedRows, 'Incomplete or reordered Kanji-trust run');
-  assert(rows.every((row) => row.pass === true), 'Kanji-trust contains a failed row');
+  assert.deepEqual(
+    rows.map((row) => row.row),
+    expectedRows,
+    'Incomplete or reordered Kanji-trust run',
+  );
+  assert(
+    rows.every((row) => row.pass === true),
+    'Kanji-trust contains a failed row',
+  );
   assert.match(artifactSha256 || '', /^[a-f0-9]{64}$/u, 'Kanji-trust artifact must be pinned');
   assert.equal(value.artifactSha256, artifactSha256, 'Foreign Kanji-trust artifact');
   assert.equal(typeof siteDir, 'string', 'Kanji-trust site must be pinned');
@@ -1998,32 +2063,70 @@ function requireCompleteReport({
     assert.equal(value.version, 1, 'Unknown SRS conformance receipt version');
     assert.equal(value.only, null, 'A targeted SRS run is never an acceptance');
     assert.deepEqual(value.engines, [engine], 'The SRS receipt is for another engine');
-    assert(Array.isArray(value.results) && value.results.length >= 30, 'The SRS receipt has too few checks');
-    assert.equal(new Set(value.results.map((row) => row.name)).size, value.results.length, 'Duplicate SRS checks');
-    assert(value.results.every((row) => row.pass === true), 'The SRS receipt contains a failed check');
-    assert(Array.isArray(value.controls) && value.controls.length >= 10, 'The SRS receipt has too few controls');
-    assert(value.controls.every((control) => control.caught === true), 'An SRS negative control was not caught');
+    assert(
+      Array.isArray(value.results) && value.results.length >= 30,
+      'The SRS receipt has too few checks',
+    );
+    assert.equal(
+      new Set(value.results.map((row) => row.name)).size,
+      value.results.length,
+      'Duplicate SRS checks',
+    );
+    assert(
+      value.results.every((row) => row.pass === true),
+      'The SRS receipt contains a failed check',
+    );
+    assert(
+      Array.isArray(value.controls) && value.controls.length >= 10,
+      'The SRS receipt has too few controls',
+    );
+    assert(
+      value.controls.every((control) => control.caught === true),
+      'An SRS negative control was not caught',
+    );
     assert.equal(value.pass, true, 'The SRS receipt does not pass');
-    assert(artifactSha256 && value.artifactSha256 === artifactSha256, 'The SRS receipt is for another artifact');
-    assert(sourceSha256 && value.verifierSha256 === sourceSha256, 'The SRS receipt is from another verifier');
+    assert(
+      artifactSha256 && value.artifactSha256 === artifactSha256,
+      'The SRS receipt is for another artifact',
+    );
+    assert(
+      sourceSha256 && value.verifierSha256 === sourceSha256,
+      'The SRS receipt is from another verifier',
+    );
   } else if (type === 'hfix2c' || type === 'hfix2c-three-state-contrast') {
     const pins = loadHfix2cPins({ root: ROOT, siteDir, engine, runId });
     assert.equal(pins.artifactSha256, artifactSha256, 'Hfix-2c descriptor artifact differs');
     assert.deepEqual(pins.identity, siteIdentity, 'Hfix-2c descriptor identity differs');
-    assert.equal(sourceSha256, type === 'hfix2c' ? pins.sources.focused : pins.sources.wrapper, 'Hfix-2c descriptor source differs');
+    assert.equal(
+      sourceSha256,
+      type === 'hfix2c' ? pins.sources.focused : pins.sources.wrapper,
+      'Hfix-2c descriptor source differs',
+    );
     if (type === 'hfix2c') validateHfix2cFocused(value, pins);
     else validateHfix2cLaneAdmission(value, dirname(path), pins);
   } else if (BATCH3_REPORT_TYPES.includes(type)) {
     const suite = type.slice('batch3-'.length);
     const pins = loadBatch3Pins({ root: ROOT, siteDir, suite, engine, runId });
-    assert.equal(pins.identity.artifactSha256, artifactSha256, 'Batch 3 descriptor artifact differs');
+    assert.equal(
+      pins.identity.artifactSha256,
+      artifactSha256,
+      'Batch 3 descriptor artifact differs',
+    );
     assert.deepEqual(pins.identity, siteIdentity, 'Batch 3 descriptor identity differs');
-    assert.equal(sourceSha256, pins.sources[`scripts/ci/run-${suite}-gate.mjs`], 'Batch 3 descriptor source differs');
+    assert.equal(
+      sourceSha256,
+      pins.sources[`scripts/ci/run-${suite}-gate.mjs`],
+      'Batch 3 descriptor source differs',
+    );
     validateBatch3Admission(value, dirname(path), pins);
   } else if (type === 'hfix2d') {
     const pins = loadHfix2dPins({ root: ROOT, siteDir, engine, runId });
     assert.equal(pins.artifactSha256, artifactSha256, 'Hfix-2d descriptor artifact differs');
-    assert.equal(digest(JSON.stringify(pins.identity)), digest(JSON.stringify(siteIdentity)), 'Hfix-2d descriptor identity differs');
+    assert.equal(
+      digest(JSON.stringify(pins.identity)),
+      digest(JSON.stringify(siteIdentity)),
+      'Hfix-2d descriptor identity differs',
+    );
     assert.equal(sourceSha256, pins.verifierSha256, 'Hfix-2d descriptor source differs');
     validateHfix2dReport(value, pins);
   } else if (type === 'teaching-context' || type === 'ai-adaptation') {

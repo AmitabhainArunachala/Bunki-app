@@ -189,7 +189,9 @@ try {
         }));
         check(
           `${label} · a sky word opens its slip first, on that word, its band the door; no entry yet`,
-          slip.word === star.text && /^(全項目を開く|Open the full entry)$/u.test(slip.door) && slip.sheet === 0,
+          slip.word === star.text &&
+            /^(全項目を開く|Open the full entry)$/u.test(slip.door) &&
+            slip.sheet === 0,
           JSON.stringify(slip),
         );
         await page.locator('#mini button.mini-word').tap();

@@ -200,10 +200,18 @@ export const READER_CONTROLS = Object.freeze({
     kills: [1, 0].map((f) => `D2.f${f}.popup-absent`),
   },
   'inline-english-content': { run: 'd4', key: 'contentEnglish', kills: ['D4.A-english'] },
-  'inline-english-named-d4': { run: 'd4', key: 'namedEnglish', kills: ['D4.tap-shows', 'D4.own-english'] },
+  'inline-english-named-d4': {
+    run: 'd4',
+    key: 'namedEnglish',
+    kills: ['D4.tap-shows', 'D4.own-english'],
+  },
   'inline-english-named-d5': { run: 'd5', key: 'namedEnglish', kills: ['D5.named-no-english'] },
   'g3-stalled': { run: 'd4', key: 'stalled', kills: ['D4.third-tap-stage'] },
-  'g3-kept-reading': { run: 'd2', key: 'keepReading', kills: ['D2.f1.bare-after-fold', 'D2.f0.bare-after-fold'] },
+  'g3-kept-reading': {
+    run: 'd2',
+    key: 'keepReading',
+    kills: ['D2.f1.bare-after-fold', 'D2.f0.bare-after-fold'],
+  },
   'g3-off-hidden': {
     run: 'd2',
     key: 'offHidden',
@@ -294,26 +302,46 @@ function readerWitness(name, control) {
       );
     });
   if (name === 'inline-english-content')
-    return seen('D4.A-english')?.glosses?.length === 1 && seen('D4.A-english').glosses[0] === 'VH_INLINE_ENGLISH';
+    return (
+      seen('D4.A-english')?.glosses?.length === 1 &&
+      seen('D4.A-english').glosses[0] === 'VH_INLINE_ENGLISH'
+    );
   if (name === 'inline-english-named-d4')
-    return seen('D4.tap-shows')?.view?.gloss === 'VH_INLINE_ENGLISH' && seen('D4.own-english')?.glosses?.[0] === 'VH_INLINE_ENGLISH';
+    return (
+      seen('D4.tap-shows')?.view?.gloss === 'VH_INLINE_ENGLISH' &&
+      seen('D4.own-english')?.glosses?.[0] === 'VH_INLINE_ENGLISH'
+    );
   if (name === 'inline-english-named-d5')
     return seen('D5.named-no-english')?.glosses?.includes('VH_INLINE_ENGLISH');
   if (name === 'g3-stalled') return seen('D4.third-tap-stage')?.popup === null;
   if (name === 'g3-kept-reading')
-    return [1, 0].every(f => seen(`D2.f${f}.bare-after-fold`)?.length === 3 &&
-      seen(`D2.f${f}.bare-after-fold`).every(row => row.visibleRuby === 'たにがわ'));
+    return [1, 0].every(
+      (f) =>
+        seen(`D2.f${f}.bare-after-fold`)?.length === 3 &&
+        seen(`D2.f${f}.bare-after-fold`).every((row) => row.visibleRuby === 'たにがわ'),
+    );
   if (name === 'g3-off-hidden')
-    return seen('D2.f0.visible-reading')?.length === 3 && seen('D2.f0.visible-reading').every(value => value === '') &&
-      seen('D2.f0.english-rung')?.englishes?.length === 3 && seen('D2.f0.english-rung').englishes.every(row => row.visibleRuby === '');
+    return (
+      seen('D2.f0.visible-reading')?.length === 3 &&
+      seen('D2.f0.visible-reading').every((value) => value === '') &&
+      seen('D2.f0.english-rung')?.englishes?.length === 3 &&
+      seen('D2.f0.english-rung').englishes.every((row) => row.visibleRuby === '')
+    );
   if (name === 'm8')
     return ['k0f2', 'k2f1'].every((key) => seen(`D3.${key}.opens-lookup`)?.mini === null);
   if (name === 'r1')
-    return [1, 0].every(f => seen(`D2.f${f}.visible-reading`)?.length === 3 &&
-      seen(`D2.f${f}.visible-reading`).every(value => value === 'たにかわ') &&
-      seen(`D2.f${f}.popup-reading`)?.length === 3 && seen(`D2.f${f}.popup-reading`).every(row => row?.reading === 'たにかわ') &&
-      seen(`D2.f${f}.accessible-reading`)?.length === 3 && seen(`D2.f${f}.accessible-reading`).every(row =>
-        row.description === 'たにかわ · Enter: next word layer · Shift+F10: save and more'));
+    return [1, 0].every(
+      (f) =>
+        seen(`D2.f${f}.visible-reading`)?.length === 3 &&
+        seen(`D2.f${f}.visible-reading`).every((value) => value === 'たにかわ') &&
+        seen(`D2.f${f}.popup-reading`)?.length === 3 &&
+        seen(`D2.f${f}.popup-reading`).every((row) => row?.reading === 'たにかわ') &&
+        seen(`D2.f${f}.accessible-reading`)?.length === 3 &&
+        seen(`D2.f${f}.accessible-reading`).every(
+          (row) =>
+            row.description === 'たにかわ · Enter: next word layer · Shift+F10: save and more',
+        ),
+    );
   return false;
 }
 function validateReader(report, context, require, engines) {
@@ -356,8 +384,12 @@ function validateReader(report, context, require, engines) {
         (control.rows || []).map((row) => row.id),
       ), `${control.name}: incomplete mutant schedule`);
     require((control.rows || []).every((row) => executed(row) && typeof row.pass === 'boolean') &&
-      spec.kills.every(id => control.rows.find(row => row.id === id)?.pass === false) &&
-      control.rows.filter(row => row.pass === false).every(row => [...spec.kills, ...(spec.allowed || [])].includes(row.id)), `${control.name}: wrong named red set`);
+      spec.kills.every((id) => control.rows.find((row) => row.id === id)?.pass === false) &&
+      control.rows
+        .filter((row) => row.pass === false)
+        .every((row) =>
+          [...spec.kills, ...(spec.allowed || [])].includes(row.id),
+        ), `${control.name}: wrong named red set`);
     require(readerWitness(control.name, control), `${control.name}: intended fault not witnessed`);
     const file = control.name === 'r1' ? 'data/articles/aozora-046605.json' : 'corridor.js',
       digest = runtime(context, file);

@@ -716,7 +716,9 @@ test('Kotoba requires the early-choice K163 and the exact againCoachSeen K092 na
   for (const mutate of [
     (r) => r.results.splice(early, 1),
     (r) => r.results.push(structuredClone(r.results[early])),
-    (r) => { r.results[coach].name = r.results[coach].name.replace('againCoachSeen', 'ruleSeen'); },
+    (r) => {
+      r.results[coach].name = r.results[coach].name.replace('againCoachSeen', 'ruleSeen');
+    },
   ]) {
     const bad = structuredClone(good);
     mutate(bad);

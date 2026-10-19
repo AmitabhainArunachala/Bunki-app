@@ -5,7 +5,12 @@ import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
 import { fileURLToPath, URL } from 'node:url';
 import { dirname, join } from 'node:path';
-import { batteryGates, runGates, validateKanjiTrustReport, validateHfix2aReport } from '../verify-release-gates.mjs';
+import {
+  batteryGates,
+  runGates,
+  validateKanjiTrustReport,
+  validateHfix2aReport,
+} from '../verify-release-gates.mjs';
 import { BATCH3_SUITES, batch3NarrowingEnvironment } from './vh-batch3-report-contracts.mjs';
 import { supplementalGates } from './supplemental.mjs';
 import { gateEvidenceDeclaration } from './gate-evidence.mjs';
@@ -52,37 +57,86 @@ test('all 215 canonical and supplemental gates have unique names and mandatory d
 });
 test('Kanji-trust admission accepts complete pinned receipts and rejects incomplete or foreign evidence', () => {
   const names = [
-    'K01-sei', 'K01-kai', 'K01-o', 'K01-official', 'K01-joyo-forms',
-    'K01-stroke-extended', 'K01-stroke-official', 'K01-stroke-failed',
-    'K03-lookup', 'K04-kodansha', 'K05-frequency', 'K05-reading-all',
-    'K05-nested-return', 'K05-nested-search-page', 'K05-idioms', 'K05-parts',
-    'K07-words', 'K06-load', 'K08-lessons',
+    'K01-sei',
+    'K01-kai',
+    'K01-o',
+    'K01-official',
+    'K01-joyo-forms',
+    'K01-stroke-extended',
+    'K01-stroke-official',
+    'K01-stroke-failed',
+    'K03-lookup',
+    'K04-kodansha',
+    'K05-frequency',
+    'K05-reading-all',
+    'K05-nested-return',
+    'K05-nested-search-page',
+    'K05-idioms',
+    'K05-parts',
+    'K07-words',
+    'K06-load',
+    'K08-lessons',
   ];
   for (const engine of ['chromium', 'webkit']) {
     const pin = { engine, artifactSha256: 'a'.repeat(64), siteDir: '/pinned/site' };
     const good = {
-      schemaVersion: 1, control: null, failures: 0,
-      artifactSha256: pin.artifactSha256, site: pin.siteDir,
+      schemaVersion: 1,
+      control: null,
+      failures: 0,
+      artifactSha256: pin.artifactSha256,
+      site: pin.siteDir,
       results: [{ engine, rows: names.map((row) => ({ row, pass: true })) }],
     };
     assert.equal(validateKanjiTrustReport(good, pin), true);
     for (const mutate of [
-      (v) => { v.schemaVersion = 2; },
-      (v) => { v.control = 'notes-below'; },
-      (v) => { v.failures = 1; },
-      (v) => { v.results = []; },
-      (v) => { v.results.push(structuredClone(v.results[0])); },
-      (v) => { v.results[0].engine = engine === 'chromium' ? 'webkit' : 'chromium'; },
-      (v) => { delete v.results[0].rows; },
-      (v) => { v.results[0].rows = []; },
-      (v) => { v.results[0].rows.pop(); },
-      (v) => { v.results[0].rows[1] = structuredClone(v.results[0].rows[0]); },
-      (v) => { v.results[0].rows.reverse(); },
-      (v) => { v.results[0].rows[0].pass = false; },
-      (v) => { v.artifactSha256 = 'b'.repeat(64); },
-      (v) => { delete v.artifactSha256; },
-      (v) => { v.site = '/foreign/site'; },
-      (v) => { delete v.site; },
+      (v) => {
+        v.schemaVersion = 2;
+      },
+      (v) => {
+        v.control = 'notes-below';
+      },
+      (v) => {
+        v.failures = 1;
+      },
+      (v) => {
+        v.results = [];
+      },
+      (v) => {
+        v.results.push(structuredClone(v.results[0]));
+      },
+      (v) => {
+        v.results[0].engine = engine === 'chromium' ? 'webkit' : 'chromium';
+      },
+      (v) => {
+        delete v.results[0].rows;
+      },
+      (v) => {
+        v.results[0].rows = [];
+      },
+      (v) => {
+        v.results[0].rows.pop();
+      },
+      (v) => {
+        v.results[0].rows[1] = structuredClone(v.results[0].rows[0]);
+      },
+      (v) => {
+        v.results[0].rows.reverse();
+      },
+      (v) => {
+        v.results[0].rows[0].pass = false;
+      },
+      (v) => {
+        v.artifactSha256 = 'b'.repeat(64);
+      },
+      (v) => {
+        delete v.artifactSha256;
+      },
+      (v) => {
+        v.site = '/foreign/site';
+      },
+      (v) => {
+        delete v.site;
+      },
     ]) {
       const bad = structuredClone(good);
       mutate(bad);
@@ -406,122 +460,225 @@ test('every exported adapter fails closed for absent and malformed producer rece
 });
 
 test('four Hfix-2c descriptors pin their order, engines, receipts and full focused invocation', () => {
-  const rows = gates.filter(gate => gate.name.startsWith('hfix2c'));
-  assert.deepEqual(rows.map(gate => gate.name), ['hfix2c', 'hfix2c-webkit', 'hfix2c-contrast', 'hfix2c-contrast-webkit']);
+  const rows = gates.filter((gate) => gate.name.startsWith('hfix2c'));
+  assert.deepEqual(
+    rows.map((gate) => gate.name),
+    ['hfix2c', 'hfix2c-webkit', 'hfix2c-contrast', 'hfix2c-contrast-webkit'],
+  );
   for (const gate of rows) {
     const engine = gate.name.endsWith('-webkit') ? 'webkit' : 'chromium';
     const focused = !gate.name.includes('contrast');
     assert.equal(gate.env.KAIRO_BROWSER, engine);
     assert.equal(gate.report.engine, engine);
     assert.equal(gate.report.type, focused ? 'hfix2c' : 'hfix2c-three-state-contrast');
-    assert.equal(gate.report.path, join(out, gate.name, focused ? 'result.json' : 'lane-admission.json'));
-    assert.deepEqual(gate.args, [focused ? 'prototypes/corridor/tools/verify-hfix2c.mjs' : 'scripts/ci/run-hfix2c-contrast-gate.mjs']);
-    const env = acceptanceEnvironment({ KAIRO_BROWSER: 'all', HFIX2C_MODE: 'control', HFIX2C_CASE: 'KT1', HFIX2C_BASE: '/foreign', SWEEP_STATES: 'page', SWEEP_WORLDS: '', SWEEP_NEGATIVE: '', SWEEP_DEBUG: '1' }, gate.env);
+    assert.equal(
+      gate.report.path,
+      join(out, gate.name, focused ? 'result.json' : 'lane-admission.json'),
+    );
+    assert.deepEqual(gate.args, [
+      focused
+        ? 'prototypes/corridor/tools/verify-hfix2c.mjs'
+        : 'scripts/ci/run-hfix2c-contrast-gate.mjs',
+    ]);
+    const env = acceptanceEnvironment(
+      {
+        KAIRO_BROWSER: 'all',
+        HFIX2C_MODE: 'control',
+        HFIX2C_CASE: 'KT1',
+        HFIX2C_BASE: '/foreign',
+        SWEEP_STATES: 'page',
+        SWEEP_WORLDS: '',
+        SWEEP_NEGATIVE: '',
+        SWEEP_DEBUG: '1',
+      },
+      gate.env,
+    );
     assert.equal(env.KAIRO_BROWSER, engine);
-    for (const key of ['SWEEP_STATES', 'SWEEP_WORLDS', 'SWEEP_NEGATIVE', 'SWEEP_DEBUG']) assert(!Object.hasOwn(env, key));
-    if (focused) { assert.equal(env.HFIX2C_MODE, 'branch'); assert.equal(env.HFIX2C_CASE, ''); assert.equal(env.HFIX2C_BASE, ''); }
-    else for (const key of ['HFIX2C_MODE', 'HFIX2C_CASE', 'HFIX2C_BASE']) assert(!Object.hasOwn(env, key));
+    for (const key of ['SWEEP_STATES', 'SWEEP_WORLDS', 'SWEEP_NEGATIVE', 'SWEEP_DEBUG'])
+      assert(!Object.hasOwn(env, key));
+    if (focused) {
+      assert.equal(env.HFIX2C_MODE, 'branch');
+      assert.equal(env.HFIX2C_CASE, '');
+      assert.equal(env.HFIX2C_BASE, '');
+    } else
+      for (const key of ['HFIX2C_MODE', 'HFIX2C_CASE', 'HFIX2C_BASE'])
+        assert(!Object.hasOwn(env, key));
   }
 });
 
 test('two Hfix-2d descriptors bind one engine, no controls and the candidate commit', () => {
-  const rows = gates.filter(gate => gate.name.startsWith('hfix2d'));
-  assert.deepEqual(rows.map(gate => gate.name), ['hfix2d', 'hfix2d-webkit']);
+  const rows = gates.filter((gate) => gate.name.startsWith('hfix2d'));
+  assert.deepEqual(
+    rows.map((gate) => gate.name),
+    ['hfix2d', 'hfix2d-webkit'],
+  );
   for (const gate of rows) {
     const engine = gate.name.endsWith('-webkit') ? 'webkit' : 'chromium';
-    assert.equal(gate.env.KAIRO_BROWSER, engine); assert.equal(gate.report.engine, engine);
+    assert.equal(gate.env.KAIRO_BROWSER, engine);
+    assert.equal(gate.report.engine, engine);
     assert.equal(gate.report.type, 'hfix2d');
     assert.equal(gate.report.path, join(out, gate.name, 'verification-report.json'));
     assert.deepEqual(gate.args, ['prototypes/corridor/tools/verify-hfix2d.mjs']);
-    const env = acceptanceEnvironment({ KAIRO_BROWSER: 'all', KAIRO_EXPECT_GITSHA: 'stale', HFIX2C_MODE: 'control', SWEEP_STATES: 'page' }, gate.env);
-    assert.equal(env.KAIRO_BROWSER, engine); assert.equal(env.KAIRO_EXPECT_GITSHA, '');
-    assert(!Object.hasOwn(env, 'HFIX2C_MODE')); assert(!Object.hasOwn(env, 'SWEEP_STATES'));
+    const env = acceptanceEnvironment(
+      {
+        KAIRO_BROWSER: 'all',
+        KAIRO_EXPECT_GITSHA: 'stale',
+        HFIX2C_MODE: 'control',
+        SWEEP_STATES: 'page',
+      },
+      gate.env,
+    );
+    assert.equal(env.KAIRO_BROWSER, engine);
+    assert.equal(env.KAIRO_EXPECT_GITSHA, '');
+    assert(!Object.hasOwn(env, 'HFIX2C_MODE'));
+    assert(!Object.hasOwn(env, 'SWEEP_STATES'));
   }
-  const parent = join(homedir(), '.dharma/bunki/hfix2d-descriptor-tests'); mkdirSync(parent, { recursive: true });
-  const site = mkdtempSync(join(parent, 'site-')), gitSha = 'c'.repeat(40);
+  const parent = join(homedir(), '.dharma/bunki/hfix2d-descriptor-tests');
+  mkdirSync(parent, { recursive: true });
+  const site = mkdtempSync(join(parent, 'site-')),
+    gitSha = 'c'.repeat(40);
   // batteryGates hydrates every site-bound descriptor before this test selects
   // Hfix-2d; mirror the release runner's synthetic practice-source fixture.
-  const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+  const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
   const files = [
-    'corridor.js', 'record-host.mjs', 'record-app.mjs', 'assessment-controller.mjs',
-    'record-controller.mjs', 'modules/record-core.mjs', 'modules/assessment-core.mjs',
+    'corridor.js',
+    'record-host.mjs',
+    'record-app.mjs',
+    'assessment-controller.mjs',
+    'record-controller.mjs',
+    'modules/record-core.mjs',
+    'modules/assessment-core.mjs',
     'data/mock/sets/n5-01.json',
-  ].map(path => {
-    const bytes = path === 'record-host.mjs' || path === 'data/mock/sets/n5-01.json'
-      ? readFileSync(join(root, 'prototypes/corridor', path))
-      : Buffer.from(`// Synthetic source identity fixture: ${path}\n`);
+  ].map((path) => {
+    const bytes =
+      path === 'record-host.mjs' || path === 'data/mock/sets/n5-01.json'
+        ? readFileSync(join(root, 'prototypes/corridor', path))
+        : Buffer.from(`// Synthetic source identity fixture: ${path}\n`);
     const file = join(site, path);
     mkdirSync(dirname(file), { recursive: true });
     writeFileSync(file, bytes);
     return { path, bytes: bytes.length, sha256: hash(bytes) };
   });
   const artifactSha256 = hash(JSON.stringify(files));
-  writeFileSync(join(site, 'build-identity.json'), JSON.stringify({ gitSha, artifactSha256, files }));
-  const bound = batteryGates(out, { KAIRO_SITE_DIR: site,
-    KAIRO_VERIFIED_ARTIFACT_SHA256: artifactSha256, KAIRO_EXPECT_GITSHA: 'stale' }).filter(gate => gate.name.startsWith('hfix2d'));
-  assert(bound.every(gate => gate.env.KAIRO_EXPECT_GITSHA === gitSha));
+  writeFileSync(
+    join(site, 'build-identity.json'),
+    JSON.stringify({ gitSha, artifactSha256, files }),
+  );
+  const bound = batteryGates(out, {
+    KAIRO_SITE_DIR: site,
+    KAIRO_VERIFIED_ARTIFACT_SHA256: artifactSha256,
+    KAIRO_EXPECT_GITSHA: 'stale',
+  }).filter((gate) => gate.name.startsWith('hfix2d'));
+  assert(bound.every((gate) => gate.env.KAIRO_EXPECT_GITSHA === gitSha));
 });
 
 function batch3DescriptorSite(parent) {
   const site = mkdtempSync(join(parent, 'site-'));
-  const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+  const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
   const sourceAssetSha256 = 'a'.repeat(64);
   const files = [
-    'index.html', 'sw.js', 'manifest.webmanifest', 'corridor.js', 'record-host.mjs',
-    'record-app.mjs', 'assessment-controller.mjs', 'record-controller.mjs',
-    'modules/record-core.mjs', 'modules/assessment-core.mjs', 'data/mock/sets/n5-01.json',
-  ].map(path => {
-    const bytes = path === 'record-host.mjs' || path === 'data/mock/sets/n5-01.json'
-      ? readFileSync(join(root, 'prototypes/corridor', path))
-      : Buffer.from(path === 'sw.js'
-        ? `self.KAIRO_ASSET_VERSION = ${JSON.stringify(sourceAssetSha256)};\n`
-        : `// Explicit nonexecuted synthetic artifact: ${path}\n`);
+    'index.html',
+    'sw.js',
+    'manifest.webmanifest',
+    'corridor.js',
+    'record-host.mjs',
+    'record-app.mjs',
+    'assessment-controller.mjs',
+    'record-controller.mjs',
+    'modules/record-core.mjs',
+    'modules/assessment-core.mjs',
+    'data/mock/sets/n5-01.json',
+  ].map((path) => {
+    const bytes =
+      path === 'record-host.mjs' || path === 'data/mock/sets/n5-01.json'
+        ? readFileSync(join(root, 'prototypes/corridor', path))
+        : Buffer.from(
+            path === 'sw.js'
+              ? `self.KAIRO_ASSET_VERSION = ${JSON.stringify(sourceAssetSha256)};\n`
+              : `// Explicit nonexecuted synthetic artifact: ${path}\n`,
+          );
     mkdirSync(dirname(join(site, path)), { recursive: true });
     writeFileSync(join(site, path), bytes);
     return { path, bytes: bytes.length, sha256: hash(bytes) };
   });
-  const identity = { schemaVersion: 1, product: 'KAIRO', sourceDirty: false,
-    gitSha: 'c'.repeat(40), sourceAssetSha256, artifactSha256: hash(JSON.stringify(files)), files };
+  const identity = {
+    schemaVersion: 1,
+    product: 'KAIRO',
+    sourceDirty: false,
+    gitSha: 'c'.repeat(40),
+    sourceAssetSha256,
+    artifactSha256: hash(JSON.stringify(files)),
+    files,
+  };
   writeFileSync(join(site, 'build-identity.json'), JSON.stringify(identity));
   return { site, identity };
 }
 
 test('twelve Batch 3 descriptors preserve exact order, one engine, wrapper and mandatory pins', () => {
   const expected = [
-    'hfix2e-contrast', 'hfix2e-contrast-webkit',
-    'hfix2e-examples', 'hfix2e-examples-webkit',
-    'hfix2e-hold', 'hfix2e-hold-webkit',
-    'hfix2e-x10-kt3', 'hfix2e-x10-kt3-webkit',
-    'hfix2b', 'hfix2b-webkit', 'hfix2e2', 'hfix2e2-webkit',
+    'hfix2e-contrast',
+    'hfix2e-contrast-webkit',
+    'hfix2e-examples',
+    'hfix2e-examples-webkit',
+    'hfix2e-hold',
+    'hfix2e-hold-webkit',
+    'hfix2e-x10-kt3',
+    'hfix2e-x10-kt3-webkit',
+    'hfix2b',
+    'hfix2b-webkit',
+    'hfix2e2',
+    'hfix2e2-webkit',
   ];
   const parent = join(homedir(), '.dharma/bunki/batch3-descriptor-tests');
   mkdirSync(parent, { recursive: true });
   const { site, identity } = batch3DescriptorSite(parent);
-  const all = batteryGates(out, { KAIRO_SITE_DIR: site,
-    KAIRO_VERIFIED_ARTIFACT_SHA256: identity.artifactSha256 });
-  const start = all.findIndex(gate => gate.name === 'hfix2d-webkit') + 1;
+  const all = batteryGates(out, {
+    KAIRO_SITE_DIR: site,
+    KAIRO_VERIFIED_ARTIFACT_SHA256: identity.artifactSha256,
+  });
+  const start = all.findIndex((gate) => gate.name === 'hfix2d-webkit') + 1;
   const rows = all.slice(start, start + 12);
-  assert.deepEqual(rows.map(gate => gate.name), expected);
-  assert.deepEqual(BATCH3_SUITES.flatMap(suite => [suite, `${suite}-webkit`]), expected);
+  assert.deepEqual(
+    rows.map((gate) => gate.name),
+    expected,
+  );
+  assert.deepEqual(
+    BATCH3_SUITES.flatMap((suite) => [suite, `${suite}-webkit`]),
+    expected,
+  );
   for (const key of batch3NarrowingEnvironment) assert(NARROWING_ENV.includes(key), key);
   for (const gate of rows) {
     const engine = gate.name.endsWith('-webkit') ? 'webkit' : 'chromium';
     const suite = gate.name.replace(/-webkit$/u, '');
     const wrapper = `scripts/ci/run-${suite}-gate.mjs`;
-    assert.deepEqual(gate.args, [wrapper]); assert.equal(gate.requiredPath, wrapper);
-    assert.equal(gate.env.KAIRO_BROWSER, engine); assert.equal(gate.report.engine, engine);
+    assert.deepEqual(gate.args, [wrapper]);
+    assert.equal(gate.requiredPath, wrapper);
+    assert.equal(gate.env.KAIRO_BROWSER, engine);
+    assert.equal(gate.report.engine, engine);
     assert.equal(gate.report.type, `batch3-${suite}`);
     assert.equal(gate.report.path, join(out, gate.name, 'lane-admission.json'));
     assert.equal(gate.report.artifactSha256, identity.artifactSha256);
-    assert.deepEqual(gate.report.siteIdentity, identity); assert.equal(gate.report.siteDir, site);
-    assert.equal(gate.report.sourceSha256, createHash('sha256').update(readFileSync(join(root, wrapper))).digest('hex'));
+    assert.deepEqual(gate.report.siteIdentity, identity);
+    assert.equal(gate.report.siteDir, site);
+    assert.equal(
+      gate.report.sourceSha256,
+      createHash('sha256')
+        .update(readFileSync(join(root, wrapper)))
+        .digest('hex'),
+    );
     assert.equal(gateEvidenceDeclaration(gate, root, out).kind, 'retained-report');
-    const ambient = Object.fromEntries(batch3NarrowingEnvironment.map(key => [key, 'foreign-selector']));
+    const ambient = Object.fromEntries(
+      batch3NarrowingEnvironment.map((key) => [key, 'foreign-selector']),
+    );
     const env = acceptanceEnvironment({ ...ambient, KAIRO_BROWSER: 'all' }, gate.env);
     assert.equal(env.KAIRO_BROWSER, engine);
     for (const key of batch3NarrowingEnvironment) assert(!Object.hasOwn(env, key), key);
   }
-  assert(supplementalGates(out).find(gate => gate.name === 'ci-contracts').args.includes('scripts/ci/vh-batch3-report-contracts.test.mjs'));
+  assert(
+    supplementalGates(out)
+      .find((gate) => gate.name === 'ci-contracts')
+      .args.includes('scripts/ci/vh-batch3-report-contracts.test.mjs'),
+  );
 });
 
 test('Batch 3 runGates dispatch requires fresh native evidence after a zero-exit synthetic process', async () => {
@@ -532,7 +689,9 @@ test('Batch 3 runGates dispatch requires fresh native evidence after a zero-exit
   const producer = join(fixture, 'explicit-synthetic-producer.mjs');
   // This process writes only synthetic unit data. It imports consumers and fixtures,
   // never the native browser producer, and exercises the real runGates dispatch.
-  writeFileSync(producer, `
+  writeFileSync(
+    producer,
+    `
 import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -564,22 +723,52 @@ if(mode==='narrowed'||mode==='engine') {
  put('result.json',value);admission.files['result.json']=batch3Digest(JSON.stringify(value));
 }
 put('lane-admission.json',admission);
-`);
+`,
+  );
   for (const engine of ['chromium', 'webkit']) {
-    for (const mutation of ['good', 'missing', 'empty', 'suite', 'artifact', 'stale', 'wrapper', 'narrowed', 'engine']) {
+    for (const mutation of [
+      'good',
+      'missing',
+      'empty',
+      'suite',
+      'artifact',
+      'stale',
+      'wrapper',
+      'narrowed',
+      'engine',
+    ]) {
       const runOut = join(fixture, `${engine}-${mutation}`);
       const name = engine === 'chromium' ? 'hfix2e-examples' : 'hfix2e-examples-webkit';
-      const gate = batteryGates(runOut, { KAIRO_SITE_DIR: site,
-        KAIRO_VERIFIED_ARTIFACT_SHA256: identity.artifactSha256 }).find(gate => gate.name === name);
+      const gate = batteryGates(runOut, {
+        KAIRO_SITE_DIR: site,
+        KAIRO_VERIFIED_ARTIFACT_SHA256: identity.artifactSha256,
+      }).find((gate) => gate.name === name);
       const report = { ...gate.report };
       if (mutation === 'artifact') report.artifactSha256 = 'f'.repeat(64);
       if (mutation === 'wrapper') report.sourceSha256 = 'f'.repeat(64);
-      const result = await runGates({ root: fixture, out: runOut, gates: [{ ...gate,
-        args: [producer], requiredPath: producer, report,
-        env: { ...gate.env, BATCH3_UNIT_MUTATION: mutation },
-      }] });
-      assert.equal(result.gates[0].processExitCode, 0, `${engine}/${mutation}: synthetic child must exit zero`);
-      assert.equal(result.gates[0].status, mutation === 'good' ? 'passed' : 'incomplete', `${engine}/${mutation}: ${result.gates[0].detail}`);
+      const result = await runGates({
+        root: fixture,
+        out: runOut,
+        gates: [
+          {
+            ...gate,
+            args: [producer],
+            requiredPath: producer,
+            report,
+            env: { ...gate.env, BATCH3_UNIT_MUTATION: mutation },
+          },
+        ],
+      });
+      assert.equal(
+        result.gates[0].processExitCode,
+        0,
+        `${engine}/${mutation}: synthetic child must exit zero`,
+      );
+      assert.equal(
+        result.gates[0].status,
+        mutation === 'good' ? 'passed' : 'incomplete',
+        `${engine}/${mutation}: ${result.gates[0].detail}`,
+      );
       assert.equal(result.exitCode, mutation === 'good' ? 0 : 1, `${engine}/${mutation}`);
     }
   }

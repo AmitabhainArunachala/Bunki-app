@@ -143,41 +143,12 @@
       ]
     },
     "hfix2e-hold": {
-      "chromium": [
-        "W7-hold",
-        "W7-centre",
-        "W7-drag",
-        "W7-right",
-        "W7-key",
-        "W7-tap"
-      ],
-      "webkit": [
-        "W7-hold",
-        "W7-centre",
-        "W7-tap"
-      ]
+      "chromium": ["W7-hold", "W7-centre", "W7-drag", "W7-right", "W7-key", "W7-tap"],
+      "webkit": ["W7-hold", "W7-centre", "W7-tap"]
     },
     "hfix2e-examples": {
-      "chromium": [
-        "KT6-A",
-        "KT6-B",
-        "KT6-C",
-        "KT6-D",
-        "KT6-G",
-        "KT6-H",
-        "KT6-E",
-        "KT6-F"
-      ],
-      "webkit": [
-        "KT6-A",
-        "KT6-B",
-        "KT6-C",
-        "KT6-D",
-        "KT6-G",
-        "KT6-H",
-        "KT6-E",
-        "KT6-F"
-      ]
+      "chromium": ["KT6-A", "KT6-B", "KT6-C", "KT6-D", "KT6-G", "KT6-H", "KT6-E", "KT6-F"],
+      "webkit": ["KT6-A", "KT6-B", "KT6-C", "KT6-D", "KT6-G", "KT6-H", "KT6-E", "KT6-F"]
     },
     "hfix2e-x10-kt3": {
       "chromium": [
