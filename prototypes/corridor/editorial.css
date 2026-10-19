@@ -3404,8 +3404,10 @@ body:has(#app .kp-study > .kp-reveal) #app { padding-bottom: 0; }
 /* the foot's band: one strip of the stage under the foot's words, edge to edge and down to the glass, so no passage ink
    shows around them; a real element (mount.js footBand: what it covers is covered, for a tap and for a reader of the
    page), under Undo's own band and Reveal, over the passage. Its top 18 px is an alpha mask (no pigment), so a line
-   scrolling under the band recedes into the stage instead of being cut; a tap on it turns the card as the stage does */
-#app .kp .kp-study > .kp-foot-band {
+   scrolling under the band recedes into the stage instead of being cut; a tap on it turns the card as the stage does. It
+   is drawn only while the front's key is there: a back revealed in place keeps the card's node, and with it this element,
+   which player.css then keeps undrawn (it would lie over the back's last row and take its taps) */
+#app .kp .kp-study:has(> .kp-reveal) > .kp-foot-band {
   display: block; order: 3; flex: none; position: sticky; bottom: 0; z-index: 1;
   height: calc(82px + env(safe-area-inset-bottom, 0px));
   margin: -88px calc((100% - 100vw) / 2) calc(-10px - env(safe-area-inset-bottom, 0px));
