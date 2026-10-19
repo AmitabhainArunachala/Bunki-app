@@ -2,6 +2,13 @@
   "about": "Readings the tokeniser gets wrong in these two decks (review finding F17). build.py applies them after tokenising and before ruby is built; they do not touch the app-wide lexicon in docs/content/reading-overrides.json. A rule sets `reading` (hiragana) on `surface` where the text right before it ends with a match of `after` and the text right after it starts with a match of `before` (both regexes, empty = anything). With `cards`, it applies only to the passages those card ids (from ids.json) are built from. A rule that matches nothing fails the build. tools/kotoba-deck-ruby.fixtures.json lists the readings the shipped decks must and must not show.",
   "rules": [
     {
+      "surface": "一",
+      "reading": "いっ",
+      "after": "",
+      "before": "[かヵ]月",
+      "note": "一か月・一ヵ月 are いっかげつ. Covers both spellings without changing dates such as 一月 (Hfix-2c R2, Kimi readings review)."
+    },
+    {
       "surface": "人",
       "reading": "じん",
       "after": "(日本|外国|中国|宇宙|エジプト|文化|著名|星|オランダ|スウェーデン)",

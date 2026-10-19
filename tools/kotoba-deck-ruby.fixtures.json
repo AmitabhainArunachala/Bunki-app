@@ -2,6 +2,102 @@
   "about": "Readings the shipped 言葉の鉱脈 decks must show (review finding F17). For each entry, every ruby segment of `card` that spells `surface`, follows text ending in `after` and precedes text starting with `before`, reads `right`; at least one such segment exists; none reads `wrong`. Checked by tools/kotoba-deck-ruby.test.mjs and prototypes/corridor/tools/verify-kotoba-mine.mjs. The fixes come from decks/kotoba-mine/source/readings.json.",
   "pairs": [
     {
+      "card": "km-218-m01",
+      "after": "手術から",
+      "surface": "一",
+      "before": "か月",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-218-m02",
+      "after": "手術から",
+      "surface": "一",
+      "before": "か月",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-218-m03",
+      "after": "手術から",
+      "surface": "一",
+      "before": "か月",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-310-m01",
+      "after": "が、全面復旧には",
+      "surface": "一",
+      "before": "か月",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-310-m02",
+      "after": "が、全面復旧には",
+      "surface": "一",
+      "before": "か月",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-044-m01",
+      "after": "格闘家は、試合の",
+      "surface": "一",
+      "before": "か月",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-044-m04",
+      "after": "格闘家は、試合の",
+      "surface": "一",
+      "before": "か月",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-282-m02",
+      "after": "務所を出てわずか",
+      "surface": "一",
+      "before": "か月",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-100-m04",
+      "after": "と、小さな穴なら",
+      "surface": "一",
+      "before": "か月",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-162-m04",
+      "after": "22日に開業から",
+      "surface": "一",
+      "before": "ヵ月",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-116-m06",
+      "after": "復習した人とで、",
+      "surface": "一",
+      "before": "か月",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
+      "card": "km-288-m10",
+      "after": "は怖いんで、まず",
+      "surface": "一",
+      "before": "か月",
+      "right": "いっ",
+      "wrong": "いち"
+    },
+    {
       "card": "km-175-m01",
       "after": "日本",
       "surface": "人",

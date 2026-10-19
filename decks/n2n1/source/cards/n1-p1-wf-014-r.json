@@ -23,15 +23,16 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
+   "cardId": "nn-347d8ac336-eeb3974e",
    "term": "仕掛け",
    "reading": "しかけ",
    "pos": "noun",
    "meaning": "mechanism; device; setup",
    "defJa": "あらかじめ用意した工夫やからくり",
    "passage": {
-    "ja": "歴史を語る名手は、聞き手の関心を引く仕掛けを、話の最初に置く。たとえば「本能寺の変の前夜、中国へ向かうはずだった軍勢が、なぜか京へ進路を変えた」と切り出せば、聞き手は、なぜ、と先を知りたくなる。答えをすぐに渡さず、疑問を持ち越させることが、その技の核心だ。そそっかしい聞き手でさえ、続きを待たずにはいられない。話の構成は、情報の順序を設計する仕事にほかならない。",
+    "ja": "歴史を語る名手は、聞き手の関心を引く仕掛けを、話の最初に意図的に置く。たとえば「本能寺の変の前夜、中国へ向かうはずだった軍勢が、なぜか京へ進路を変えた」と切り出せば、聞き手は、なぜ、と先を知りたくなる。答えをすぐに渡さず、疑問を持ち越させることが、その技の核心だ。そそっかしい聞き手でさえ、続きを待たずにはいられない。話の構成とは、情報の順序を設計する仕事だ。",
     "form": "仕掛け",
-    "en": "A master at telling history places a device that draws the listener's interest at the very beginning of the story. If he opens with, for example, 'On the eve of the Honnoji Incident, an army that was supposed to head for the western provinces changed course, for some reason, toward Kyoto', the listener wants to know what comes next, and why. Not handing over the answer at once, but making the question carry over, is the core of the technique. Even a careless listener cannot help waiting for the continuation. Structuring a story is nothing other than the work of designing the order of information.",
+    "en": "A master at telling history deliberately places a device that draws the listener's interest at the very beginning of the story. If he opens with, for example, 'On the eve of the Honnoji Incident, an army that was supposed to head for the western provinces changed course, for some reason, toward Kyoto', the listener wants to know what comes next, and why. Not handing over the answer at once, but making the question carry over, is the core of the technique. Even a careless listener cannot help waiting for the continuation. Structuring a story is the work of designing the order of information.",
     "register": "語",
     "topic": "history",
     "tipJa": "「仕掛けを施す・置く」。聞き手の関心を引くために前もって用意した工夫。",
