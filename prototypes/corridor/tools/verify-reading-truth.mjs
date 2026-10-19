@@ -75,7 +75,8 @@
  * Negative control: the same run against a build with R's reading edits reverted fails A1 on 年 (とし). N2: with the te-form
  * rule reverted (no token marked) N2.te, R2.stem and AUX fail; with the kana いる rule reverted N2.alone fails. */
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import { selection, scopeResult, READING_CASES, classEvidence, specialEvidence, loadSpecialProofs, exactRoster } from './vh-visual-contracts.mjs';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
@@ -87,6 +88,7 @@ import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 
+assert(process.argv.length === 2, 'Unknown reading-truth argument');
 assert(process.env.KAIRO_SITE_DIR && process.env.KAIRO_ARTIFACT_SHA256, 'Pin an immutable built site and its digest');
 const site = resolveCorridorSite(), evidence = resolveCorridorEvidence();
 const identity = JSON.parse(readFileSync(resolve(site, 'build-identity.json'), 'utf8'));
@@ -95,7 +97,12 @@ const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['chromium', 'webkit'];
 assert(engines.every((engine) => ['chromium', 'webkit'].includes(engine)));
 // a negative control's scope (READING_TRUTH_ONLY=r2,sweep,…): a partial run, never an acceptance result
-const ONLY = (process.env.READING_TRUTH_ONLY || '').split(',').filter(Boolean);
+const selectedReading = selection(process.env.READING_TRUTH_ONLY, READING_CASES, 'READING_TRUTH_ONLY');
+const ONLY = selectedReading || [];
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+const completedCases = [];
+const controls = [];
+assert(process.env.READING_TRUTH_PAST_F0 === undefined || ['0', '1'].includes(process.env.READING_TRUTH_PAST_F0), 'Invalid READING_TRUTH_PAST_F0');
 const PAST_F0 = process.env.READING_TRUTH_PAST_F0 === '1';
 const run = (name) => !ONLY.length || ONLY.includes(name);
 const versions = {};
@@ -419,6 +426,9 @@ const guided = await loadGuidedSet((await loadGuidedIndex(guidedJson))[0], guide
 check('F0.guided', 'every guided word reads as the quick dictionary reads it (so its card can only agree)',
   Object.values(guided.words).every((word) => !core[word.surface] || k2h(core[word.surface].r) === k2h(word.reading)),
   Object.values(guided.words).filter((word) => core[word.surface] && k2h(core[word.surface].r) !== k2h(word.reading)).map((w) => w.surface));
+const specialFixture = JSON.parse(readFileSync(new URL('./vh-reading-special-fixtures.json', import.meta.url), 'utf8'));
+const specialProofs = loadSpecialProofs(site, specialFixture);
+check('F0.special-proofs', '56 reviewed name/reading classifications bind exact article bytes, token context and sidecar rows', specialProofs.size === 56);
 const F0_OK = rows.every((row) => row.recorded || row.ok);
 
 /* ------------------------------------------------------------------ the browser */
@@ -501,7 +511,8 @@ const miniState = (page) => page.evaluate(() => {
   const take = mini.querySelector('#mini-take');
   return { kind: mini.dataset.kind ?? null, word: mini.querySelector('.mini-word')?.childNodes[0]?.textContent ?? null, reading: mini.querySelector('.mini-reading')?.textContent ?? '',
     gloss: mini.querySelector('.mini-gloss')?.textContent ?? '', take: take ? { disabled: take.disabled, text: take.textContent.trim() } : null,
-    reason: mini.querySelector('#mini-take-reason')?.textContent ?? null };
+    reason: mini.querySelector('#mini-take-reason')?.textContent ?? null,
+    reasonVisible: (() => { const reason = mini.querySelector('#mini-take-reason'); if (!reason) return false; const box = reason.getBoundingClientRect(), style = getComputedStyle(reason); return box.width > 0 && box.height > 0 && style.visibility !== 'hidden' && style.display !== 'none' && Number(style.opacity) > 0; })() };
 });
 /** Reach the stage without waiting for dictionary settlement (cold-index gates hold that promise). */
 async function activateStage(page, locator, activate = () => tapAt(page, locator)) {
@@ -1053,6 +1064,101 @@ async function r2Cases(page) {
   await closeMini(page);
 }
 
+/* VH-1 V-06/V-07: explicit positives (not dependent on inflected sweep inclusion)
+ * and controls against actual mounted cards. DOM overlays are restored before a
+ * new natural activation; no shipped source or dictionary is modified. */
+async function specialCases(page) {
+  const fixtures = [
+    { at: GONGITSUNE, index: 76 },
+    { at: art('bunki-graded-n3-hashira-counter', 'bunki-graded-n3-hashira-counter.json', '柱'), index: 242 },
+  ];
+  const observe = async fixture => {
+    await openArticle(page, fixture.at);
+    await tok(page, fixture.index).scrollIntoViewIfNeeded();
+    const before = await readAppRecord(page);
+    const card = (await slip(page, tok(page, fixture.index))).settled;
+    const after = await readAppRecord(page);
+    const token = tokenAt(fixture);
+    return { card, token, before, after, judged: specialEvidence({ article: fixture.at.id, index: fixture.index, token, card,
+      proof: specialProofs.get(`${fixture.at.id}#${fixture.index}`) }) };
+  };
+  for (const fixture of fixtures) {
+    const seen = await observe(fixture), key = `${fixture.at.id}#${fixture.index}`;
+    check(`SPECIAL.${key}.classification`, 'the special label has independently reviewed source evidence and is read as written', seen.judged.classification && seen.judged.asWritten, seen);
+    check(`SPECIAL.${key}.held`, 'the genuine name/reading holds Save with a visible reason', seen.judged.held, seen.card);
+    check(`SPECIAL.${key}.record`, 'natural lookup preserves every save/grade root; legitimate encounter observations are retained',
+      ['taken','srs','revlog','stats','lists'].every(field => JSON.stringify(seen.before[field]) === JSON.stringify(seen.after[field])), { before: seen.before, after: seen.after });
+    for (const mutation of ['special-label-save-enabled', 'special-label-save-reason-empty']) {
+      if (!seen.judged.classification || !seen.judged.asWritten || !seen.judged.held) {
+        controls.push({ id: mutation, engine, fixture: key, candidate: seen.card, passed: false, status: 'inconclusive', reason: 'Clean candidate prerequisite failed; no mutation kill claimed' });
+        check(`SPECIAL.control.${key}.${mutation}`, 'held-Save control requires a clean candidate before its intended red can count', false, seen.card);
+        continue;
+      }
+      await delay(250);
+      const recordBefore = await readAppRecord(page);
+      const original = await page.locator('#mini').innerHTML();
+      await page.evaluate(mutation => {
+        const take = document.querySelector('#mini-take'), reason = document.querySelector('#mini-take-reason');
+        if (!take || !reason) throw new Error('special control missing Save/reason prerequisite');
+        if (mutation === 'special-label-save-enabled') take.disabled = false;
+        else reason.textContent = '';
+      }, mutation);
+      const card = await miniState(page);
+      const judged = specialEvidence({ article: fixture.at.id, index: fixture.index, token: seen.token, card,
+        proof: specialProofs.get(key) });
+      await page.locator('#mini').evaluate((mini, html) => { mini.innerHTML = html; }, original);
+      const restored = await miniState(page), restoredHTML = await page.locator('#mini').innerHTML(), recordAfter = await readAppRecord(page);
+      const caught = seen.judged.classification && seen.judged.asWritten && seen.judged.held && judged.classification && judged.asWritten && !judged.held
+        && original === restoredHTML && JSON.stringify(restored) === JSON.stringify(seen.card) && JSON.stringify(recordBefore) === JSON.stringify(recordAfter);
+      controls.push({ id: mutation, engine, fixture: key, candidate: seen.card, mutant: card, judged, restored, recordBefore, recordAfter, passed: caught });
+      check(`SPECIAL.control.${key}.${mutation}`, 'only the held-Save obligation rejects the mutation, byte-restored card passes', caught, { judged, restored });
+    }
+    await closeMini(page);
+  }
+  const fixture = UNFIT[0];
+  await openArticle(page, fixture.at);
+  const candidate = (await slip(page, tok(page, fixture.index))).settled;
+  const token = tokenAt(fixture), entry = meaningEntry(candidate.word, k2h(candidate.reading || candidate.word), candidate.gloss);
+  const positive = classEvidence(token.p, entry);
+  check('SPECIAL.class-proof.fixture', 'actual かえり card means to return with entry 1221270 v5r/vi proof',
+    candidate.word === 'かえる' && candidate.gloss === 'to return' && positive.proved && positive.proofs.some(proof => proof.seq === '1221270'), { candidate, positive });
+  for (const mutation of ['class-proof-missing', 'class-proof-noun-substitution']) {
+    const mutant = { ...entry, p: '', pos: mutation === 'class-proof-missing' ? [] : ['n'],
+      proofs: entry?.proofs?.map(proof => ({ ...proof, pos: mutation === 'class-proof-missing' ? [] : ['n'] })) || [] };
+    const judged = classEvidence(token.p, mutant), restored = classEvidence(token.p, entry);
+    const caught = positive.proved && !judged.proved && restored.proved;
+    controls.push({ id: mutation, engine, candidate: positive, mutant: judged, restored, passed: caught });
+    check(`SPECIAL.control.${mutation}`, 'the actual class adjudicator rejects absent/wrong POS and accepts restored exact evidence', caught, judged);
+  }
+  for (const kind of ['name', 'reading']) {
+    await delay(250);
+    const recordBefore = await readAppRecord(page);
+    const original = await page.locator('#mini').innerHTML();
+    await page.evaluate(({ surface, kind }) => {
+      const mini = document.getElementById('mini'), word = mini.querySelector('.mini-word');
+      if (!word?.firstChild || !mini.querySelector('#mini-take')) throw new Error('ordinary verb mutation missing card prerequisites');
+      let reading = mini.querySelector('.mini-reading');
+      if (!reading) { reading = document.createElement('span'); reading.className = 'mini-reading'; word.after(reading); }
+      word.firstChild.textContent = surface; reading.textContent = surface;
+      mini.querySelector('.mini-gloss').textContent = `a ${kind} in this text`;
+      mini.querySelector('#mini-take').disabled = true;
+      let reason = mini.querySelector('#mini-take-reason');
+      if (!reason) { reason = document.createElement('p'); reason.id = 'mini-take-reason'; mini.append(reason); }
+      reason.hidden = false; reason.style.cssText = 'display:block;visibility:visible;opacity:1'; reason.textContent = 'So it can’t be saved here.';
+    }, { surface: token.s, kind });
+    const card = await miniState(page);
+    const judged = specialEvidence({ article: fixture.at.id, index: fixture.index, token, card, proof: specialProofs.get(`${fixture.at.id}#${fixture.index}`) });
+    await page.locator('#mini').evaluate((mini, html) => { mini.innerHTML = html; }, original);
+    const restored = await miniState(page), recordAfter = await readAppRecord(page);
+    const caught = positive.proved && judged.asWritten && judged.held && !judged.classification
+      && original === await page.locator('#mini').innerHTML() && JSON.stringify(restored) === JSON.stringify(candidate)
+      && JSON.stringify(recordBefore) === JSON.stringify(recordAfter);
+    controls.push({ id: `ordinary-verb-labeled-${kind}`, engine, candidate, mutant: card, judged, restored, recordBefore, recordAfter, passed: caught });
+    check(`SPECIAL.control.ordinary-verb-labeled-${kind}`, 'the ordinary verb can be as-written and held yet must fail independent classification', caught, { card, judged });
+  }
+  await closeMini(page);
+}
+
 /* ------------------------------------------------------------------ SWEEP · every inflected token */
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const reviewQueue = JSON.parse(readFileSync(resolve(REPO, 'docs/content/feed-review-queue.json'), 'utf8'));
@@ -1065,7 +1171,9 @@ const inheritedRows = shelfRows.filter((row) => !TWENTY.includes(row.id)).sort((
 // a fixed sample of 20 inherited articles the shelf shows: picks at an even step through the id order; a pick the shelf
 // does not show (a row held back from the shelf, 検収前) gives way to the next row in id order
 const SAMPLE_PICKS = Array.from({ length: 20 }, (_, i) => Math.floor((i * inheritedRows.length) / 20));
-const SWEEP_ONLY = (process.env.READING_TRUTH_SWEEP_IDS || '').split(',').filter(Boolean);
+const selectedSweep = selection(process.env.READING_TRUTH_SWEEP_IDS, shelfRows.map(row => row.id), 'READING_TRUTH_SWEEP_IDS');
+const SWEEP_ONLY = selectedSweep || [];
+assert(!SWEEP_ONLY.length || run('sweep'), 'READING_TRUTH_SWEEP_IDS requires the sweep case');
 const KANA_ONLY = /^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u;
 // a card still saying "…" has not answered: it is never counted as saying none (Codex's f2e3015e review)
 const SAYS_NONE = (line) => [NO_ENTRY, NO_READING].includes(line) || /^Several entries: /u.test(line);
@@ -1103,26 +1211,34 @@ function derivedHow(token, label, stated) {
  * entry, or a row of the original word layer (words.json) — it writes `label` and reads it `stated` (or a sound change of
  * it, for a word read as written), and the meaning is one of its own. */
 function meaningEntry(label, stated, gloss, readings = [stated]) {
+  // Bind POS to this exact form, reading and shown sense; a homograph or another
+  // sense's POS cannot lend proof. The quick dictionary's prose POS is not authority.
+  const proofs = readings.flatMap(reading => readAs(label, reading).flatMap(row => {
+    const seq = String(row[0]);
+    return (detailOf(seq)?.[3] || []).flatMap((sense, senseIndex) => {
+      const written = sense[1] || ['*'], kana = sense[2] || ['*'];
+      if (!written.includes('*') && !written.includes(label)) return [];
+      if (!kana.includes('*') && !kana.some(value => k2h(value) === k2h(reading))) return [];
+      if (!(sense[10] || []).some(value => value[0] === gloss)) return [];
+      return [{ seq, form: label, reading, senseIndex, gloss, pos: sense[0] || [] }];
+    });
+  }));
   if (core[label] && readings.includes(k2h(core[label].r)) && (core[label].m || []).includes(gloss)) {
-    const seqs = readings.flatMap((reading) => readAs(label, reading)).map((row) => String(row[0]));
-    return { from: 'quick', p: core[label].p, pos: [...new Set(seqs.flatMap(posOf))] };
+    return { from: 'quick', p: core[label].p, pos: proofs.flatMap(proof => proof.pos), proofs };
   }
   for (const reading of readings) {
-    const row = readAs(label, reading).find((candidate) => [candidate[3], ...candidate[6]].includes(gloss));
-    if (row) return { from: 'index', seq: String(row[0]), pos: posOf(String(row[0])) };
+    const row = readAs(label, reading).find(candidate => [candidate[3], ...candidate[6]].includes(gloss));
+    if (row) {
+      const matching = proofs.filter(proof => proof.seq === String(row[0]));
+      return { from: 'index', seq: String(row[0]), pos: matching.flatMap(proof => proof.pos), proofs: matching };
+    }
   }
   const layer = legacyWords[label];
-  if (layer && String(layer.r || '').split(/;\s*/u).map(k2h).some((reading) => readings.includes(reading)) && layer.g === gloss) {
-    return { from: 'words', pos: [] };
+  if (layer && String(layer.r || '').split(/;\s*/u).map(k2h).some(reading => readings.includes(reading)) && layer.g === gloss) {
+    return { from: 'words', pos: proofs.flatMap(proof => proof.pos), proofs };
   }
   return null;
 }
-// the token's class against the entry's: a verb by "verb" or a JMdict v… code; an adjective by its i-, ix-, ku- or shiku-
-// class. An entry no served data gives a part of speech for is of unknown class: recorded, never counted as a fit
-const verbal = (part) => /verb/u.test(part) || /^v[0-9a-z]/u.test(part);
-const adjectival = (part) => /i-adjective|^adj-(i|ix|ku|shiku)$|aux-adj/u.test(part);
-const classOf = (entry) => [...String(entry.p || '').split(' · ').filter(Boolean), ...entry.pos];
-const classFits = (p, entry) => (p === '動詞' ? classOf(entry).some(verbal) : p === '形容詞' ? classOf(entry).some(adjectival) : true);
 // N2 · the one card of another class a verb may show: right after the te-form, JMdict's own expression for that use,
 // written as the text writes it (〜てください: 下さい, an expression whose sense follows the te-form)
 const teExpressionFits = (tokens, index, label, stated) => afterTeForm(tokens, index)
@@ -1241,7 +1357,8 @@ async function sweepCase(browser, contextOptions) {
     await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 20000 });
     return true;
   };
-  const queue = [...TWENTY.map((id) => ({ id, group: 'twenty' })), ...SAMPLE_PICKS.map((at) => ({ at, group: 'inherited' }))];
+  const queue = SWEEP_ONLY.length ? SWEEP_ONLY.map(id => ({ id, group: TWENTY.includes(id) ? 'twenty' : 'selected' }))
+    : [...TWENTY.map((id) => ({ id, group: 'twenty' })), ...SAMPLE_PICKS.map((at) => ({ at, group: 'inherited' }))];
   const swept = new Set();
   try {
     for (const item of queue) {
@@ -1316,9 +1433,11 @@ async function sweepCase(browser, contextOptions) {
             out.answer = 'unanswered';
             out.issues.push('the card still says "…": it never answered');
           } else if (NOT_A_WORD.includes(gloss)) {
-            // R3 · a name or a reading: the card is the word as written, and lends no entry's meaning
             out.answer = 'notAWord';
-            if (label !== token.s) out.issues.push(`the card says "${gloss}" yet is not a card of ${token.s} as written`);
+            out.specialEvidence = specialEvidence({ article: id, index, token, card, proof: specialProofs.get(`${id}#${index}`) });
+            if (!out.specialEvidence.asWritten) out.issues.push(`the card says "${gloss}" yet is not a card of ${token.s} as written`);
+            if (!out.specialEvidence.classification) out.issues.push('special label has no independently reviewed classification');
+            if (!out.specialEvidence.held) out.issues.push('special label Save is not held with a visible reason');
           } else if (SAYS_NONE(gloss) || gloss === QUICK_MISS) {
             out.answer = /^Several entries: /u.test(gloss) ? 'several' : asWritten ? 'asWritten' : 'noEntry';
             // a card naming no entry holds its Save and says why (D23's honest line)
@@ -1328,8 +1447,11 @@ async function sweepCase(browser, contextOptions) {
             out.answer = entry?.from === 'quick' ? 'quick' : entry?.from === 'words' ? 'wordLayer' : 'entry';
             out.entry = entry;
             if (!entry) out.issues.push(`"${gloss}" belongs to no entry that writes ${label} and reads it ${stated}`);
-            else if (['動詞', '形容詞'].includes(token.p) && !classOf(entry).length) out.classUnknown = true;
-            else if (!classFits(token.p, entry) && !teExpressionFits(tokens, index, label, stated) && !expressionFits(tokens, index, label, stated)) out.issues.push(`${entry.seq || `the ${entry.from === 'words' ? 'word layer' : 'quick dictionary'}'s word`} is not a ${token.p} (${classOf(entry).join(' ')})`);
+            else {
+              out.classEvidence = classEvidence(token.p, entry, teExpressionFits(tokens, index, label, stated) || expressionFits(tokens, index, label, stated));
+              out.classUnknown = out.classEvidence.unknown;
+              if (!out.classEvidence.proved) out.issues.push(out.classUnknown ? 'class evidence is unproved for this exact entry/form/reading/sense' : `${entry.seq || entry.from} is not a ${token.p} (${out.classEvidence.pos.join(' ')})`);
+            }
           }
           report.totals[out.answer] = (report.totals[out.answer] || 0) + 1;
           if (out.classUnknown) report.totals.classUnknown += 1;
@@ -1352,12 +1474,18 @@ async function sweepCase(browser, contextOptions) {
   const twentySwept = report.articles.filter((article) => article.group === 'twenty').length;
   const inheritedSwept = report.articles.filter((article) => article.group === 'inherited').length;
   check('SWEEP.articles', `the sweep walked the forty reviewed articles and 20 inherited articles the shelf shows (${twentySwept} + ${inheritedSwept}; not on the shelf: ${report.notOnShelf.join(', ') || 'none'})`,
-    SWEEP_ONLY.length ? report.articles.length > 0 : twentySwept === TWENTY.length && TWENTY.length === 40 && inheritedSwept === 20 && !report.notOnShelf.some((id) => TWENTY.includes(id)),
+    SWEEP_ONLY.length ? exactRoster(SWEEP_ONLY, report.articles.map(article => article.id)) : twentySwept === TWENTY.length && TWENTY.length === 40 && inheritedSwept === 20 && !report.notOnShelf.some((id) => TWENTY.includes(id)),
     { twentySwept, inheritedSwept, notOnShelf: report.notOnShelf });
   check('SWEEP.taps', `every inflected token opened its card (${report.totals.tapped} of ${report.totals.tokens} distinct, ${report.totals.occurrences} occurrences, ${report.articles.length} articles)`,
     report.totals.tokens > 0 && report.totals.tapFailures === 0, list((x) => x.card === null));
   check('SWEEP.readings', 'every card states a reading that comes from its token\'s own, or is the word as the text writes and reads it',
     !all.some((x) => x.card && !x.how), list((x) => x.card && !x.how));
+  check('SWEEP.class-evidence', 'every verb/adjective meaning has positive exact entry/form/reading/sense POS evidence; unknown is unproved',
+    report.totals.classUnknown === 0 && report.articles.every(article => article.rows.every(row => !row.classEvidence || row.classEvidence.proved)),
+    report.articles.flatMap(article => article.rows.filter(row => row.classEvidence && !row.classEvidence.proved).map(row => ({ article: article.id, index: row.index, evidence: row.classEvidence }))));
+  check('SWEEP.special-classification', 'name and reading labels have independently reviewed source classification and are read as written',
+    report.articles.every(article => article.rows.every(row => !row.specialEvidence || (row.specialEvidence.classification && row.specialEvidence.asWritten))),
+    list(row => row.specialEvidence && (!row.specialEvidence.classification || !row.specialEvidence.asWritten)));
   check('SWEEP.meanings', 'every meaning a card shows belongs to an entry that writes its word, reads it so, and is of the token\'s class',
     !all.some((x) => x.issues.some((issue) => /belongs to no entry|is not a |kanji data/u.test(issue))), list((x) => x.issues.some((issue) => /belongs to no entry|is not a |kanji data/u.test(issue))));
   check('SWEEP.no-quick-miss', 'no settled card says "Not in the quick dictionary"', !all.some((x) => x.issues.some((issue) => /quick dictionary/u.test(issue))),
@@ -1368,7 +1496,7 @@ async function sweepCase(browser, contextOptions) {
     !all.some((x) => x.issues.some((issue) => /Save is not held/u.test(issue))), list((x) => x.issues.some((issue) => /Save is not held/u.test(issue))));
   check('SWEEP.page-errors', 'the sweep: no page errors', errors.length === 0, errors.slice(0, 5));
   record('SWEEP.counts', 'the sweep\'s counts (distinct tokens per article; answers)', report.totals);
-  record('SWEEP.class-unknown', 'meanings whose entry no served data gives a part of speech for (not judged)', report.articles
+  record('SWEEP.class-unknown', 'meanings whose exact entry/sense has no independent POS proof (unproved, failing acceptance)', report.articles
     .flatMap((article) => article.rows.filter((row) => row.classUnknown).map((row) => `${article.id} #${row.index} ${row.s}/${row.b}: ${row.card?.word} ${row.card?.gloss} (${row.entry?.from})`)));
 }
 
@@ -1534,7 +1662,7 @@ try {
       // L · every page error counts: the ResizeObserver loop error this line used to drop (R) was the slip's own
       // observer resizing the card inside its callback, fixed at its source (keepFloatingBeside)
       page.on('pageerror', (error) => errors.push(error.message));
-      try { await body(page); }
+      try { await body(page); completedCases.push(`${engine}/${name}`); }
       catch (error) {
         check(`${name}.error`, `${name} ran to the end`, false, String(error.stack || error).slice(0, 600));
         await page.screenshot({ path: resolve(evidence, `${engine}-${name}.png`), fullPage: false }).catch(() => {});
@@ -1543,6 +1671,7 @@ try {
         await context.close();
       }
     };
+    if (run('special')) await each('special', specialCases);
     if (run('reader')) await each('reader', readerCases);
     if (run('stable')) await each('stable', stableCases);
     if (run('sentence')) await each('sentence', sentenceCase);
@@ -1551,23 +1680,25 @@ try {
     if (run('r2')) await each('r2', r2Cases);
     if (run('aux')) await each('aux', auxCases);
     if (run('auxsweep')) {
-      try { await auxSweepCase(browser, contextOptions); }
+      try { await auxSweepCase(browser, contextOptions); completedCases.push(`${engine}/auxsweep`); }
       catch (error) { check('AUX.error', 'the auxiliary sweep ran to the end', false, String(error.stack || error).slice(0, 600)); }
     }
     if (run('capture')) {
-      try { await captureCase(browser, contextOptions); }
+      try { await captureCase(browser, contextOptions); completedCases.push(`${engine}/capture`); }
       catch (error) { check('capture.error', 'capture ran to the end', false, String(error.stack || error).slice(0, 600)); }
     }
+    let coldCompleted = 0;
     for (const answer of run('cold') ? ['held', 'fail'] : []) {
-      try { await coldCase(browser, contextOptions, answer); }
+      try { await coldCase(browser, contextOptions, answer); coldCompleted++; }
       catch (error) { check(`A9.${answer}.error`, `A9 (${answer}) ran to the end`, false, String(error.stack || error).slice(0, 600)); }
     }
+    if (coldCompleted === 2) completedCases.push(`${engine}/cold`);
     if (run('unread')) {
-      try { await unreadCase(browser, contextOptions); }
+      try { await unreadCase(browser, contextOptions); completedCases.push(`${engine}/unread`); }
       catch (error) { check('A10.error', 'A10 ran to the end', false, String(error.stack || error).slice(0, 600)); }
     }
     if (run('sweep')) {
-      try { await sweepCase(browser, contextOptions); }
+      try { await sweepCase(browser, contextOptions); completedCases.push(`${engine}/sweep`); }
       catch (error) { check('SWEEP.error', 'the sweep ran to the end', false, String(error.stack || error).slice(0, 600)); }
     }
     await browser.close();
@@ -1575,9 +1706,18 @@ try {
 } finally {
   await host.close();
   const failed = rows.filter((row) => !row.recorded && !row.ok);
-  writeFileSync(resolve(evidence, 'verify-reading-truth.json'), `${JSON.stringify({ site, served: identity.gitSha, artifactSha256: identity.artifactSha256,
+  const rowContract = JSON.parse(readFileSync(new URL('./vh-reading-row-roster.json', import.meta.url), 'utf8'));
+  const selectedCases = selectedReading || READING_CASES;
+  const requiredRows = selectedCases.flatMap(name => rowContract.cases[name]);
+  if (selectedCases.includes('capture') && selectedCases.includes('r2')) requiredRows.push(...rowContract.captureWithR2);
+  const rowRoster = scopeResult({ expected: engines.flatMap(engine => requiredRows.map(id => `${engine}/${id}`)),
+    observed: rows.filter(row => row.engine !== 'data' && !row.recorded).map(row => `${row.engine}/${row.id}`), passed: !failed.length });
+  const acceptance = scopeResult({ expected: engines.flatMap(engine => (selectedReading || READING_CASES).map(name => `${engine}/${name}`)),
+    observed: completedCases, passed: !failed.length && rowRoster.fullAcceptance, diagnostic: selectedReading !== null || selectedSweep !== null || PAST_F0 });
+  writeFileSync(resolve(evidence, 'verify-reading-truth.json'), `${JSON.stringify({ schemaVersion: 2, runId, requestedScope: selectedReading || 'full', ...acceptance,
+    verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'), rowRoster, controls, site, served: identity.gitSha, artifactSha256: identity.artifactSha256,
     engines, versions, partial: ONLY.length ? ONLY : false, sweepIds: SWEEP_ONLY.length ? SWEEP_ONLY : false, pastF0: PAST_F0, failed: failed.length, rows }, null, 2)}\n`);
   if (ONLY.length || SWEEP_ONLY.length || PAST_F0) console.log(`PARTIAL RUN (${[...ONLY, ...SWEEP_ONLY, ...(PAST_F0 ? ['past F0'] : [])].join(', ')}): a control's scope, not an acceptance result`);
   console.log(`\n${rows.filter((row) => !row.recorded).length - failed.length} passed, ${failed.length} failed, ${rows.filter((row) => row.recorded).length} recorded · engines ${JSON.stringify(versions)} · evidence ${evidence}`);
-  process.exitCode = failed.length ? 1 : 0;
+  process.exitCode = acceptance.exitCode;
 }

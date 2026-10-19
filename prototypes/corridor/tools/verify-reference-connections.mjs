@@ -337,7 +337,7 @@ try {
 } finally {
   await browser.close(); await new Promise((done) => server.close(done));
   if (shots) writeFileSync(resolve(shots, 'connections-results.json'), `${JSON.stringify(results, null, 2)}\n`);
-  if (shots) writeFileSync(resolve(shots, 'execution.json'), `${JSON.stringify({ selectedCase, excludedChecks, externalRequests,
+  if (shots) writeFileSync(resolve(shots, 'execution.json'), `${JSON.stringify({ selectedCase, excludedChecks, externalRequests, site: root, runId: process.env.KAIRO_GATE_RUN_ID ?? null,
     browser: { engine: 'Chromium', version: browser.version(), headless: true, maximumContexts: 1 } }, null, 2)}\n`);
 }
 const failures = results.filter((r) => !r.pass);

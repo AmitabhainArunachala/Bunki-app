@@ -31,6 +31,9 @@
  */
 /* global document, window, indexedDB, navigator, location, fetch, IDBObjectStore, Blob, DOMException */
 import assert from 'node:assert/strict';
+import { createHash, randomUUID } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { reportCopyObservation, reportDeliveryAcceptance } from './vh-learning-contracts.mjs';
 import { Buffer } from 'node:buffer';
 import console from 'node:console';
 import process from 'node:process';
@@ -46,6 +49,11 @@ const ISSUE = 'https://github.com/AmitabhainArunachala/Bunki-app/issues/new';
 const out = resolveCorridorEvidence();
 mkdirSync(out, { recursive: true });
 const host = await startCorridorDev(0);
+const identity = JSON.parse(readFileSync(join(host.site, 'build-identity.json'), 'utf8'));
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+const startedAt = new Date().toISOString();
+const verifierGitSha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+const verifierSha256 = createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex');
 const version = JSON.parse(readFileSync(new URL('../../../release.json', import.meta.url))).version;
 const RELAY_KEY = 'relay-test-key-0123456789';
 const setupLink = () => `${host.origin}/index.html?report-relay=${relay.origin}&report-key=${RELAY_KEY}`;
@@ -59,7 +67,10 @@ const waitFor = async (predicate, timeout = 20_000) => {
   }
   return true;
 };
-const engines = process.env.KAIRO_BROWSER === 'chromium' ? { chromium } : { chromium, webkit };
+assert(!process.env.KAIRO_BROWSER || ['chromium','webkit','all'].includes(process.env.KAIRO_BROWSER), 'unknown browser');
+assert(process.argv.length === 2, 'report-delivery takes no narrowing arguments');
+const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? { [process.env.KAIRO_BROWSER]: ({chromium,webkit})[process.env.KAIRO_BROWSER] } : { chromium, webkit };
+const versions = {}, controls = [], scenarios = [];
 const checks = [];
 // In GitHub Actions a failed check is also an annotation, so the failure is
 // readable from the check run without downloading the job log.
@@ -77,7 +88,9 @@ const check = (name, pass, detail = '') => {
 const scenario = async (name, body) => {
   try {
     await body();
+    scenarios.push({name, completed: true});
   } catch (error) {
+    scenarios.push({name, completed: false});
     check(`${name} ran to completion`, false, String(error?.message || error).split('\n').slice(0, 3).join(' '));
   }
 };
@@ -91,8 +104,8 @@ async function acceptSetupLink(page) {
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
 }
 
-async function openSheet(page, beforeProbe) {
-  await page.goto(`${host.origin}/index.html?entry=shelf`, { waitUntil: 'load' });
+async function openSheet(page, beforeProbe, locale = 'en') {
+  await page.goto(`${host.origin}/index.html?entry=shelf&ui=${locale === 'ja' ? 'ja' : 'bi'}`, { waitUntil: 'load' });
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
   await page.locator('#bunki-report-bug').click();
   await page.locator('#br-actual').waitFor();
@@ -120,19 +133,71 @@ const issueOf = (address) => {
   return { base: `${url.origin}${url.pathname}`, title: url.searchParams.get('title') || '', body: url.searchParams.get('body') || '', labels: url.searchParams.get('labels'), length: address.length };
 };
 
+
+async function observeCopy(page, options = {}) {
+  const button = page.locator('#br-form .br-primary');
+  const label = options.pending || options.relay ? 'Send report' : options.locale === 'ja' ? '送る' : 'Send';
+  const state = await button.evaluate(node => ({visible:node.innerText.trim(),delivery:node.dataset.delivery,disabled:node.disabled}));
+  state.visibleShown = await button.isVisible();
+  state.accessible = await page.getByRole('button',{name:label,exact:true}).evaluateAll((nodes,node)=>nodes.includes(node),await button.elementHandle()) ? label : '[accessible name mismatch]';
+  return { observed:state, assertions:reportCopyObservation(state,options) };
+}
+async function disclosure(page, locale = 'en', relayMode = false) {
+  const details=page.locator('#br-form .br-details');
+  if (await details.getAttribute('open') === null) await details.locator('summary').click();
+  const expected=locale==='ja' ? (relayMode ? '送った報告は、画像と一緒に GitHub の公開ページに載る。個人的なことは書かない。写しはこの端末に残る。' : '報告は、アプリを直す人が読む GitHub の公開ページに、あなたの言葉とこの画面の欄を入れて開く。そこで「Submit new issue」を押すと送られる。公開されるので、個人的なことは書かない。写しはこの端末に残る。')
+    : relayMode ? 'Send report files it as a public GitHub issue, with its screenshots, so leave out anything private. A copy stays on this device.' : 'This opens GitHub with your words and this screen filled in. Tap “Submit new issue” there to send it. Issues in this repository are public, so leave out anything private. A copy stays on this device.';
+  const node=details.getByText(expected,{exact:true});
+  return {expected, pass:await node.count()===1 && await node.isVisible(), text:await details.innerText()};
+}
+async function copyControl(page, {name,engine,locale,options={},mutate,observe=()=>observeCopy(page,options),kills}) {
+  const before=await observe();
+  const button=page.locator('#br-form .br-primary'), details=page.locator('#br-form .br-details');
+  const snapshot=await page.evaluate(()=>({button:document.querySelector('#br-form .br-primary').outerHTML,details:document.querySelector('#br-form .br-details').outerHTML}));
+  let mutant,restored,error=null;
+  try {await mutate(button,details); mutant=await observe();}
+  catch(e) {error=String(e.stack || e);}
+  finally {
+    await page.evaluate(saved=>{document.querySelector('#br-form .br-primary').outerHTML=saved.button;document.querySelector('#br-form .br-details').outerHTML=saved.details;},snapshot);
+    restored=await observe();
+  }
+  const clean=row=>row && Object.values(row.assertions).every(value=>value===true);
+  const reds=mutant ? Object.keys(mutant.assertions).filter(key=>!mutant.assertions[key]) : [];
+  const killed=!error && clean(before) && clean(restored) && reds.length===kills.length && kills.every(key=>reds.includes(key));
+  const proof={name,engine,locale,kind:'isolated DOM observation control',before,mutant,restored,error,kills,verdict:killed?'killed':'incomplete'};
+  controls.push(proof); check(`${engine}/${locale}/C.${name}`,killed,JSON.stringify(proof));
+}
+
 try {
   for (const [engine, browserType] of Object.entries(engines)) {
     console.log(`\n— ${engine}`);
     const browser = await browserType.launch({ ...(engine === 'chromium' && process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}) });
+    versions[engine] = browser.version();
     try {
-      const fresh = async ({ blockWindows = false, relayDelayMs = 0 } = {}) => {
+      // INT-VH (2026-10-19). Since Hfix-1B (H0-4) a page asks a report service only when it has one: the service the page
+      // declares (window.__BUNKI_MAINTENANCE_URL__) or a relay set up on the device; a device set up for neither asks none.
+      // · holdProbe (VH-1): the page declares this host as its service, as a deployment that runs one does, and the host's
+      //   /api/config is held until released, then answers 404 (none here). Only there is that 404 the declared service's own
+      //   answer rather than a fault, so only there is it excused in the console.
+      // · holdRelay (Hfix-1B's "relay answering late", in VH-1's held form): a relay set up on this device whose config is held
+      //   until released, then passed through to the relay.
+      // · asked (Hfix-1B): every request to this host's /api/.
+      const fresh = async ({ blockWindows = false, holdProbe = false, holdRelay = false } = {}) => {
+        let releaseProbe = () => {}, releaseRelay = () => {};
+        const probe = new Promise(done => { releaseProbe = done; });
+        const relayAnswer = new Promise(done => { releaseRelay = done; });
         const context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
         // every request to this host's /api/ (Hfix-1B, H0-4: a device not set up asks no service there)
         const asked = [];
         context.on('request', (request) => { const url = new URL(request.url()); if (url.origin === host.origin && url.pathname.startsWith('/api/')) asked.push(`${request.method()} ${url.pathname}`); });
+        if (holdProbe) await context.addInitScript(() => { window.__BUNKI_MAINTENANCE_URL__ = location.origin; });
+        if (holdProbe) await context.route(`${host.origin}/api/config`, async (route) => {
+          await probe;
+          await route.fulfill({ status: 404, contentType: 'application/json', body: '{}' });
+        });
         // a relay set up on this device whose config answers late
-        if (relayDelayMs) await context.route(`${relay.origin}/k/${RELAY_KEY}/api/config`, async (route) => {
-          await new Promise((resolve) => setTimeout(resolve, relayDelayMs));
+        if (holdRelay) await context.route(`${relay.origin}/k/${RELAY_KEY}/api/config`, async (route) => {
+          await relayAnswer;
           await route.continue();
         });
         await context.route('https://github.com/**', (route) => route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>stub</title><p>GitHub stub</p>' }));
@@ -141,19 +206,45 @@ try {
         const page = await context.newPage();
         const errors = [];
         page.on('pageerror', (error) => errors.push(error.message));
-        // Hfix-1B (H0-4): no exception for the host's /api/config any more; the sheet no longer asks it
+        // Hfix-1B (H0-4): no exception for the host's /api/config on a page that declares no service (the sheet no longer asks
+        // it); where the page declares this host as its service (holdProbe), that probe's 404 is the service's answer (VH-1)
         page.on('console', (message) => {
-          if (message.type() === 'error' && !/favicon\.ico$/.test(message.location()?.url || '')) errors.push(message.text());
+          const url = message.location()?.url || '';
+          if (message.type() === 'error' && !/favicon\.ico$/.test(url) && !(holdProbe && /\/api\/config$/.test(url))) errors.push(message.text());
         });
-        return { context, page, errors, asked };
+        return { context, page, errors, asked, releaseProbe, releaseRelay };
       };
+
+      // Q's approved Send/送る copy, real held probe, and public disclosure under Details.
+      for (const locale of ['en','ja']) await scenario(`${engine} · copy ${locale}`,async()=>{
+        const {context,page,errors,releaseProbe}=await fresh({holdProbe:true});
+        try {
+          await openSheet(page,async()=>{
+            const state=await observeCopy(page,{locale,pending:true});
+            check(`${engine}/${locale}/pending-copy`,Object.values(state.assertions).every(Boolean),JSON.stringify(state));
+            await copyControl(page,{name:'fallback-advertised-before-probe',engine,locale,options:{locale,pending:true},kills:['delivery'],mutate:button=>button.evaluate(node=>{node.dataset.delivery='github';})});
+            releaseProbe();
+          },locale);
+          const state=await observeCopy(page,{locale});
+          check(`${engine}/${locale}/fallback-copy`,Object.values(state.assertions).every(Boolean),JSON.stringify(state));
+          for(const [name,value] of [['fallback-copy-empty',''],['fallback-copy-wrong','Wrong send label']])
+            await copyControl(page,{name,engine,locale,options:{locale},kills:['label'],mutate:button=>button.evaluate((node,text)=>{node.textContent=text;},value)});
+          await copyControl(page,{name:'fallback-accessible-name-wrong',engine,locale,options:{locale},kills:['label'],mutate:button=>button.evaluate(node=>node.setAttribute('aria-label','Wrong accessible label'))});
+          const note=await disclosure(page,locale);
+          check(`${engine}/${locale}/public-disclosure`,note.pass,note.text);
+          await copyControl(page,{name:'public-disclosure-removed',engine,locale,kills:['disclosure'],
+            observe:async()=>{const note=await disclosure(page,locale);return {observed:note,assertions:{disclosure:note.pass}};},
+            mutate:async(_button,details)=>{await details.getByText(note.expected,{exact:true}).evaluate(node=>node.remove());}});
+          check(`${engine}/${locale}/copy-page-errors`,errors.length===0,errors.join(' | '));
+        } finally {releaseProbe();await context.close();}
+      });
 
       // 1–2 · one tap opens the prefilled issue and saves the same report
       await scenario(`${engine} · prefilled issue`, async () => {
         const { context, page, errors } = await fresh();
         await openSheet(page);
-        const note = await page.locator('#br-form > .br-note').last().textContent();
-        check(`${engine} · the sheet says GitHub issues are public before anything is sent`, /public/.test(note), note);
+        const note = await disclosure(page);
+        check(`${engine} · the sheet says GitHub issues are public before anything is sent`, note.pass, note.text);
         const words = 'The reader popup covers the word 天気 after I tap it.\nSecond line with detail.';
         await page.locator('#br-actual').fill(words);
         await page.locator('#br-expected').fill('The popup should sit below the word.');
@@ -212,10 +303,27 @@ try {
 
       // 4 · a blocked window still saves, and the link sends it (also covers older saved reports)
       await scenario(`${engine} · blocked window`, async () => {
+        // INT-VH (2026-10-19): both rows kept. VH-1's: where a service may still answer, the sheet must not offer GitHub until
+        // the probe confirms there is none. Since Hfix-1B (H0-4) only a page that declares a service probes one, so the row
+        // runs on such a page with its probe held (the copy scenario's held probe), and its 404 then brings GitHub.
+        const declaredErrors = [];
+        {
+          const declared = await fresh({ blockWindows: true, holdProbe: true });
+          try {
+            let pendingLabel = '';
+            await openSheet(declared.page, async () => { pendingLabel = await declared.page.locator('#br-form .br-primary').getAttribute('data-delivery'); declared.releaseProbe(); });
+            check(`${engine} · GitHub is offered only after the probe confirms there is no service`,
+              !!pendingLabel && pendingLabel !== 'github', `while pending: ${pendingLabel}`);
+          } finally {
+            declared.releaseProbe();
+            declaredErrors.push(...declared.errors);
+            await declared.context.close();
+          }
+        }
         // Hfix-1B (H0-4), rewritten on purpose: this row pinned the old probe (the host's /api/config, answered late, with
         // GitHub held back until its 404). A device not set up now asks no service: its first frame offers the prefilled
         // page, and the host's /api/ is never asked. The hold for a service that may still answer is kept where a service
-        // can exist, a relay set up on this device (the "relay answering late" scenario below).
+        // can exist: a page that declares one (above) and a relay set up on this device (the "relay answering late" scenario).
         const { context, page, errors, asked } = await fresh({ blockWindows: true });
         let firstLabel = '';
         await openSheet(page, async () => { firstLabel = await page.locator('#br-form .br-primary').getAttribute('data-delivery'); });
@@ -242,7 +350,7 @@ try {
         check(`${engine} · My reports lists it as opened on GitHub`, listed === 'Opened on GitHub', listed);
         check(`${engine} · with no service set up, the sheet asked this host's /api/ nothing (open, save, send, list)`,
           asked.length === 0, asked.join(' | '));
-        check(`${engine} · no console errors (blocked window)`, errors.length === 0, errors.join(' | '));
+        check(`${engine} · no console errors (blocked window)`, errors.length === 0 && declaredErrors.length === 0, [...declaredErrors, ...errors].join(' | '));
         await context.close();
       });
       // 5 · the relay: one setup link, then reports go straight to GitHub
@@ -273,7 +381,7 @@ try {
         await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
         const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('kairo-report-relay-v1') || 'null')?.url);
         check(`${engine} · pasting the setup link in Settings sets up this device`,
-          /Not set up/.test(before) && stored === `${relay.origin}/k/${RELAY_KEY}`, `${before} → ${stored}`);
+          before === 'On this device, sending a report opens a page where you finish sending it.' && stored === `${relay.origin}/k/${RELAY_KEY}`, `${before} → ${stored}`);
         let failed = null;
         for (const deadline = Date.now() + 20_000; !failed && Date.now() < deadline; await page.waitForTimeout(250))
           failed = (await savedRows(page)).find((row) => row.delivery_error) || null;
@@ -297,9 +405,11 @@ try {
         await page.locator('#br-actual').waitFor();
         const ready = await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.textContent === 'Send report', null, { timeout: 15_000 }).then(() => true, () => false);
         check(`${engine} · with the relay set up, the sheet sends reports itself`, ready, await page.locator('#br-form .br-primary').textContent());
-        const sendNote = await page.locator('#br-form > p.br-note').last().textContent();
+        const sendNote = await disclosure(page, 'en', true);
+        const relayCopy = await observeCopy(page, {relay:true});
+        check(`${engine}/relay-copy`, Object.values(relayCopy.assertions).every(Boolean), JSON.stringify(relayCopy));
         check(`${engine} · before sending, the sheet says the report and its screenshots become a public GitHub issue`,
-          /public GitHub issue, with its screenshots/.test(sendNote), sendNote);
+          sendNote.pass, sendNote.text);
         await page.locator('#br-actual').fill('The tutor reply is cut off.');
         await page.locator('#br-files').setInputFiles({ name: 'screen.png', mimeType: 'image/png', buffer: PIXEL_PNG });
         await page.locator('.br-attachments figure').waitFor();
@@ -375,18 +485,25 @@ try {
 
       // 4b · Hfix-1B (H0-4): a relay set up on this device whose config answers late. Until it answers, the sheet must not
       //      offer GitHub (the service may still answer), and once it does, the sheet sends reports itself
+      //      INT-VH: the relay's config is held until the pending sheet is read (VH-1's held form of a late answer, as its own
+      //      held probe replaced a 2.5 s delay), then released; the rows and their predicates are Hfix-1B's
       await scenario(`${engine} · relay answering late`, async () => {
-        const { context, page, errors, asked } = await fresh({ relayDelayMs: 2500 });
-        await acceptSetupLink(page);
-        await page.locator('#bunki-report-bug').click();
-        await page.locator('#br-actual').waitFor();
-        const pending = await page.locator('#br-form .br-primary').getAttribute('data-delivery');
-        check(`${engine} · while a set-up relay has not answered, the sheet does not offer GitHub`, !!pending && pending !== 'github', `while pending: ${pending}`);
-        const ready = await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.textContent === 'Send report', null, { timeout: 15_000 }).then(() => true, () => false);
-        check(`${engine} · once the relay answers, the sheet sends reports itself`, ready, await sheetState(page));
-        check(`${engine} · the relay is asked; this host's /api/ is not`, asked.length === 0, asked.join(' | '));
-        check(`${engine} · no console errors (relay answering late)`, errors.length === 0, errors.join(' | '));
-        await context.close();
+        const { context, page, errors, asked, releaseRelay } = await fresh({ holdRelay: true });
+        try {
+          await acceptSetupLink(page);
+          await page.locator('#bunki-report-bug').click();
+          await page.locator('#br-actual').waitFor();
+          const pending = await page.locator('#br-form .br-primary').getAttribute('data-delivery');
+          check(`${engine} · while a set-up relay has not answered, the sheet does not offer GitHub`, !!pending && pending !== 'github', `while pending: ${pending}`);
+          releaseRelay();
+          const ready = await page.waitForFunction(() => document.querySelector('#br-form .br-primary')?.textContent === 'Send report', null, { timeout: 15_000 }).then(() => true, () => false);
+          check(`${engine} · once the relay answers, the sheet sends reports itself`, ready, await sheetState(page));
+          check(`${engine} · the relay is asked; this host's /api/ is not`, asked.length === 0, asked.join(' | '));
+          check(`${engine} · no console errors (relay answering late)`, errors.length === 0, errors.join(' | '));
+        } finally {
+          releaseRelay();
+          await context.close();
+        }
       });
 
       // 7 · the setup link opened in the browser leaves the address and waits in
@@ -428,13 +545,14 @@ try {
       await browser.close();
     }
   }
+} catch (error) {
+  check('terminal error', false, String(error.stack || error));
 } finally {
-  await host.close?.();
-  await relay.close();
-  await github.close();
+  for (const resource of [host,relay,github]) await resource.close?.().catch(error=>check('cleanup error',false,String(error)));
+  const { scope, expectedChecks, expectedScenarios, expectedControls, observedControls, diagnosticPass, fullAcceptance } =
+    reportDeliveryAcceptance({ engines: Object.keys(engines), checks, scenarios, controls });
+  writeFileSync(join(out, 'verification-report.json'), `${JSON.stringify({schema:'vh-report-delivery/1',suite:'report-delivery',version,runId,startedAt,finishedAt:new Date().toISOString(),
+    gitSha:identity.gitSha,artifactSha256:identity.artifactSha256,verifierGitSha,verifierSha256,engines:Object.keys(engines),browsers:versions,scope,checks,expectedChecks,scenarios,expectedScenarios,controls,expectedControls,observedControls,diagnosticPass,fullAcceptance},null,2)}\n`);
+  console.log(`\n${checks.filter(row=>row.pass).length}/${checks.length} checks passed`);
+  if (!fullAcceptance) process.exitCode=1;
 }
-
-const failed = checks.filter((item) => !item.pass);
-writeFileSync(join(out, 'verification-report.json'), `${JSON.stringify({ suite: 'report-delivery', version, checks }, null, 2)}\n`);
-console.log(`\n${checks.length - failed.length}/${checks.length} checks passed`);
-if (failed.length) process.exitCode = 1;

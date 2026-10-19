@@ -17,7 +17,7 @@
  *   KAIRO_EVIDENCE_DIR=~/.dharma/… KAIRO_SITE_DIR=<built site> KAIRO_BROWSER=all|webkit|chromium \
  *     node prototypes/corridor/tools/verify-speak.mjs
  *   SPEAK_CASES=S4,S9 runs only those cases. SPEAK_FAULT=<name> serves one one-line mutant (below).
- *   --negatives runs every mutant (WebKit, its named cases) in a child and reports whether each was caught: caught means
+ *   --negatives runs every applicable mutant (22 WebKit, 21 Chromium; blob-kept is WebKit-only) in a child: caught means
  *   the named case ran to its end with no page error and its own witness check went red; a setup failure is "not run".
  *   SPEAK_NEGATIVES=a,b picks mutants; SPEAK_NEGATIVES_PARALLEL=n runs n at once; SPEAK_NEGATIVES_BREAK_SETUP=1 is the
  *   runner's own control (every child's setup fails, so every row must read "not run").
@@ -54,7 +54,8 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import { selection, SPEAK_CASE_IDS, SPEAK_CONTROL_IDS, SPEAK_CONTROL_IDS_BY_ENGINE, speakControlPlan, exactRoster, speakCompletion, adjudicateSpeakPhase } from './vh-voice-contracts.mjs';
 import { createRequire } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -125,61 +126,123 @@ const FAULTS = {
     from: '    if (st.turnBusy) return false;\n    const token = ++st.turnToken;', to: '    const token = ++st.turnToken;' },
 };
 
+// Only these exact additional rows are necessary consequences of the named fault. The primary witness remains
+// required. Every other red is inconclusive; there is no "any failure in S9/S23" allowance.
+const DOWNSTREAM = {
+  'no-gate': { S4: ['a planted word said unaided is prod-gap 3', "the room's gate and the sensei mine's gate agree on one fixture"] },
+  'settings-claim': { S19: ['and when the device takes them, Saved — the key and the limit are both held'] },
+  'device-voice': { S9: ['a failed voice leaves the line visibly silent ("声を出せませんでした"), never Charon, never the device'] },
+  'charon-main': { S9: ["with V's lock in the app, the room voices in the lock's model, not its own pin",
+    'a two-person scene uses Charon only for the second character', 'a failed voice leaves the line visibly silent ("声を出せませんでした"), never Charon, never the device'] },
+  'auto-save': { S8: ['FSRS untouched: no review row, no card state', 'one tap on Save makes the card'] },
+  'mic-on-entry': { S3: ['the ring opens to listen on its own after her line, and only then asks for the microphone',
+    'every take ends with all tracks stopped', 'leaving the room stops every track'] },
+  'tracks-kept': { S3: ['leaving the room stops every track'] },
+  'late-opening-voice': { S17: ['a new scene while the old opening waits: the old line is never voiced, the new one is'] },
+  'spend-unchecked': { S19: ['written at last, the owed cost counts: past the cap the next turn is refused'] },
+  'notes-claim': { S20: ['trying again keeps them, once each'] },
+  'no-his-pitch': { S23: ['a corrected line, shadowed from the look back after End: the same three things, against its whole reading',
+    'a saved line, shadowed from the saved list: the same three things, her line from the kept audio'] },
+  'residue-target': { S23: ['a saved line, shadowed from the saved list: the same three things, her line from the kept audio'] },
+  'ended-no-shadow': { S23: ['a saved line, shadowed from the saved list: the same three things, her line from the kept audio'] },
+  'blob-kept': { S12: ['and after the reload it plays on'] },
+  overlap: { S22: ['the kept line goes once the answer is in, after it, never beside it'] },
+};
+
 /* ---------------------------------------------------------------- the negative-control runner
  * A mutant counts as caught only when its child ran every named case to its end with no page error, and the intended
  * witness check went red. A setup failure, a timeout, a page error or a red elsewhere is "not run", never a kill. */
+assert(exactRoster(SPEAK_CONTROL_IDS, Object.keys(FAULTS)), 'Speak fault registry moved; review independent controls roster');
+const requestedEngines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['webkit', 'chromium'];
+assert(requestedEngines.every((name) => ['webkit', 'chromium'].includes(name)), 'unknown KAIRO_BROWSER');
+assert(process.argv.slice(2).every((arg) => arg === '--negatives'), 'unknown Speak verifier argument');
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
 if (process.argv.includes('--negatives')) {
-  const only = process.env.SPEAK_NEGATIVES ? new Set(process.env.SPEAK_NEGATIVES.split(',')) : null;
-  const jobs = Object.entries(FAULTS).filter(([name]) => !only || only.has(name));
+  assert(process.env.SPEAK_CASES === undefined && !process.env.SPEAK_FAULT && !process.env.SPEAK_OVERLAY_SOURCE,
+    'negative parent cannot inherit a narrowed case, fault or source overlay');
+  const selected = selection(process.env.SPEAK_NEGATIVES, SPEAK_CONTROL_IDS, 'SPEAK_NEGATIVES');
+  const { jobs: plannedJobs, requestedScope, applicability } = speakControlPlan(requestedEngines, selected);
+  const jobs = plannedJobs.map(job => ({ ...job, fault: FAULTS[job.name] }));
   const parallel = Math.max(1, Math.min(4, Number(process.env.SPEAK_NEGATIVES_PARALLEL) || 1));
-  /** One mutant in its own child: its named cases only, its own evidence folder. */
-  const runOne = ([name, fault]) => new Promise((done) => {
+  const parentDir = resolveCorridorEvidence();
+  const invocation = randomUUID();
+  const digest = (body) => createHash('sha256').update(body).digest('hex');
+  const site = resolveCorridorSite();
+  const identity = JSON.parse(readFileSync(join(site, 'build-identity.json'), 'utf8'));
+  const phases = async ({ engine, name, fault }) => {
     const cases = Object.keys(fault.witness);
-    const evidence = join(resolveCorridorEvidence(), `negative-${name}`);
-    mkdirSync(evidence, { recursive: true });
-    const child = spawn(process.execPath, [fileURLToPath(import.meta.url)], {
-      env: { ...process.env, SPEAK_FAULT: name, SPEAK_CASES: cases.join(','), KAIRO_BROWSER: process.env.KAIRO_BROWSER || 'webkit',
-        KAIRO_EVIDENCE_DIR: evidence, SPEAK_SHOTS_DIR: '', SPEAK_BREAK_SETUP: process.env.SPEAK_NEGATIVES_BREAK_SETUP === '1' ? '1' : '' },
-      stdio: 'ignore',
-    });
-    const timer = setTimeout(() => child.kill('SIGKILL'), 900_000);
-    child.on('close', (code) => {
-      clearTimeout(timer);
-      let receipt = null;
-      try { receipt = JSON.parse(readFileSync(join(evidence, 'verify-speak.json'), 'utf8')); } catch { /* no receipt */ }
-      const reds = (receipt?.checks || []).filter((c) => !c.pass);
-      const perCase = cases.map((id) => {
-        const ran = (receipt?.cases || []).some((c) => c.case === id && c.checks > 0) && !reds.some((c) => c.case === id && c.name === 'the case ran to its end');
-        const witness = reds.find((c) => c.case === id && fault.witness[id].test(c.name));
-        return { case: id, ran, witness: witness ? witness.name : null };
+    const source = readFileSync(join(site, fault.file), 'utf8');
+    const matches = source.split(fault.from).length - 1;
+    const anchor = { matches, before: digest(source), after: digest(source.replace(fault.from, fault.to)), file: fault.file };
+    if (matches !== 1 || anchor.before === anchor.after) return { engine, fault: name, status: 'not-run', anchor, error: 'mutation anchor must occur exactly once and change bytes' };
+    const runPhase = (phase) => new Promise((done) => {
+      const nonce = randomUUID(), evidence = join(parentDir, invocation, engine, name, `${phase}-${nonce}`);
+      mkdirSync(evidence, { recursive: true });
+      const env = { ...process.env, SPEAK_CASES: cases.join(','), KAIRO_BROWSER: engine, KAIRO_EVIDENCE_DIR: evidence,
+        KAIRO_GATE_RUN_ID: runId, SPEAK_RUN_NONCE: nonce, SPEAK_RUN_PHASE: phase, SPEAK_SHOTS_DIR: '' };
+      for (const key of ['SPEAK_FAULT', 'SPEAK_NEGATIVES', 'SPEAK_OVERLAY_SOURCE', 'SPEAK_BREAK_SETUP']) delete env[key];
+      if (phase === 'mutant') env.SPEAK_FAULT = name;
+      if (process.env.SPEAK_NEGATIVES_BREAK_SETUP === '1') env.SPEAK_BREAK_SETUP = '1';
+      let timedOut = false, spawnError = null;
+      const child = spawn(process.execPath, [fileURLToPath(import.meta.url)], { env, stdio: ['ignore', 'pipe', 'pipe'] });
+      let output = ''; child.stdout.on('data', (data) => { output += data; }); child.stderr.on('data', (data) => { output += data; });
+      const timer = setTimeout(() => { timedOut = true; child.kill('SIGKILL'); }, 900_000);
+      child.on('error', (error) => { spawnError = String(error); });
+      child.on('close', (code, signal) => {
+        clearTimeout(timer); writeFileSync(join(evidence, 'child.log'), output);
+        let receipt = null;
+        try { receipt = JSON.parse(readFileSync(join(evidence, 'verify-speak.json'), 'utf8')); } catch { /* missing is incomplete */ }
+        const verdict = adjudicateSpeakPhase({ receipt, exit: code, signal, timedOut, nonce, engine, cases,
+          fault: phase === 'mutant' ? name : '', witness: fault.witness, downstream: DOWNSTREAM[name] || {} });
+        const identityOkay = receipt?.runId === runId && receipt?.phase === phase && receipt?.artifactSha256 === identity.artifactSha256
+          && receipt?.verifierSha256 === digest(readFileSync(fileURLToPath(import.meta.url)));
+        const mutation = receipt?.mutations?.[name];
+        const served = phase !== 'mutant' || (mutation?.matches === 1 && mutation.before === anchor.before && mutation.after === anchor.after && mutation.served > 0);
+        done({ phase, nonce, evidence, exit: code, signal, timedOut, spawnError, ...verdict, ok: verdict.ok && identityOkay && served && !spawnError,
+          identityOkay, mutation: mutation || null, served: receipt?.served || null });
       });
-      const clean = !!receipt && !receipt.error && (receipt.pageErrors || []).length === 0;
-      const status = !clean || perCase.some((c) => !c.ran) ? 'not-run' : code !== 0 && perCase.every((c) => c.witness) ? 'caught' : 'missed';
-      const row = { fault: name, file: fault.file, status, exit: code, cases: perCase,
-        otherReds: reds.filter((c) => !perCase.some((p) => p.witness === c.name)).map((c) => `${c.case}: ${c.name}`) };
-      console.log(`  ${status.padEnd(7)} ${name} (${fault.file}) → ${perCase.map((c) => `${c.case} ${c.witness ? `red at "${c.witness}"` : c.ran ? 'witness green' : 'did not run'}`).join('; ')}; exit ${code}`);
-      done(row);
     });
-  });
-  const rows = [];
-  const queue = [...jobs];
-  await Promise.all(Array.from({ length: parallel }, async () => { while (queue.length) rows.push(await runOne(queue.shift())); }));
-  rows.sort((a, b) => jobs.findIndex(([n]) => n === a.fault) - jobs.findIndex(([n]) => n === b.fault));
-  const out = join(resolveCorridorEvidence(), 'verify-speak-negatives.json');
-  writeFileSync(out, `${JSON.stringify({ at: new Date().toISOString(), parallel, rows }, null, 2)}\n`);
-  const caught = rows.filter((r) => r.status === 'caught').length;
-  console.log(`negatives: ${caught}/${rows.length} caught · ${rows.filter((r) => r.status === 'not-run').length} not run · ${out}`);
-  process.exit(caught === rows.length ? 0 : 1);
+    const baseline = await runPhase('baseline');
+    if (!baseline.ok) return { engine, fault: name, status: 'not-run', anchor, baseline };
+    const mutant = await runPhase('mutant');
+    // A restore is still required after an inconclusive mutant; the served base was never edited.
+    const restore = await runPhase('restore');
+    const restored = digest(readFileSync(join(site, fault.file))) === anchor.before
+      && JSON.stringify(baseline.served) === JSON.stringify(restore.served);
+    const status = baseline.ok && mutant.ok && restore.ok && restored ? 'caught' : 'not-run';
+    console.log(`${engine} ${name}: ${status} (baseline=${baseline.ok}, mutant=${mutant.ok}, restore=${restore.ok}, bytes=${restored})`);
+    return { engine, fault: name, status, anchor, baseline, mutant, restore, restored };
+  };
+  const rows = [], queue = [...jobs];
+  await Promise.all(Array.from({ length: parallel }, async () => {
+    while (queue.length) { const job = queue.shift(); try { rows.push(await phases(job)); } catch (error) { rows.push({ engine: job.engine, fault: job.name, status: 'not-run', error: String(error.stack || error) }); } }
+  }));
+  const expectedCases = jobs.map(({ engine, name }) => `${engine}/${name}`);
+  const observedCases = rows.map(({ engine, fault }) => `${engine}/${fault}`);
+  const selectedPassed = exactRoster(expectedCases, observedCases) && rows.every((row) => row.status === 'caught');
+  const fullAcceptance = selectedPassed && selected === null && process.env.SPEAK_NEGATIVES_BREAK_SETUP === undefined;
+  const out = join(parentDir, 'verify-speak-negatives.json');
+  writeFileSync(out, `${JSON.stringify({ schemaVersion: 1, runId, invocation, at: new Date().toISOString(), artifactSha256: identity.artifactSha256,
+    sourceSha: identity.gitSha, verifierSha256: digest(readFileSync(fileURLToPath(import.meta.url))), engines: requestedEngines,
+    selected, requestedScope, applicability, expectedCases, observedCases, selectedPassed, fullAcceptance, parallel, rows }, null, 2)}\n`);
+  process.exit(!selectedPassed ? 1 : fullAcceptance ? 0 : 3);
 }
 
 /* ---------------------------------------------------------------- the run */
-const SITE = resolveCorridorSite();
-const EVIDENCE = resolveCorridorEvidence();
-const WHICH = process.env.KAIRO_BROWSER || 'all';
-const ONLY = process.env.SPEAK_CASES ? new Set(process.env.SPEAK_CASES.split(',').map((x) => x.trim()).filter(Boolean)) : null;
+const selectedCases = selection(process.env.SPEAK_CASES, SPEAK_CASE_IDS, 'SPEAK_CASES');
+const ONLY = selectedCases === null ? null : new Set(selectedCases);
+assert(process.env.SPEAK_NEGATIVES === undefined, 'SPEAK_NEGATIVES requires --negatives');
 const FAULT_NAME = process.env.SPEAK_FAULT || '';
 const FAULT = FAULT_NAME ? FAULTS[FAULT_NAME] : null;
 assert(!FAULT_NAME || FAULT, `unknown SPEAK_FAULT ${FAULT_NAME}`);
+assert(!FAULT_NAME || requestedEngines.every(engine => SPEAK_CONTROL_IDS_BY_ENGINE[engine].includes(FAULT_NAME)),
+  `SPEAK_FAULT ${FAULT_NAME}: inapplicable to requested engine`);
+const phase = process.env.SPEAK_RUN_PHASE || 'candidate';
+assert(['candidate', 'baseline', 'mutant', 'restore'].includes(phase), 'unknown SPEAK_RUN_PHASE');
+assert(phase === 'candidate' || (ONLY && process.env.SPEAK_RUN_NONCE), 'child phase needs explicit diagnostic scope and fresh nonce');
+assert(phase !== 'mutant' || FAULT_NAME, 'mutant phase needs its named fault');
+const SITE = resolveCorridorSite();
+const EVIDENCE = resolveCorridorEvidence();
 const SHOTS = process.env.SPEAK_SHOTS_DIR || '';
 const OVERLAY = process.env.SPEAK_OVERLAY_SOURCE === '1';
 const KEY = 'speak-test-dummy-key-7f3a';
@@ -195,6 +258,7 @@ const SILENT_WAV = `data:audio/wav;base64,${core.bytesToBase64(core.wavFromInt16
 const results = [];
 const engines = { offOrigin: [], served: {} };
 const pageErrors = [];
+const mutations = {};
 let current = '';
 function check(name, pass, detail = '') {
   results.push({ engine: current.split(' ')[0], case: current.split(' ')[1], name, pass: !!pass, detail: String(detail).slice(0, 600) });
@@ -290,7 +354,12 @@ async function newRoom(browser, { key = true, cap = 10, usd = 0, reducedMotion =
     let body = OVERLAY ? readFileSync(join(SOURCE, path), 'utf8') : await (await route.fetch()).text();
     if (FAULT && FAULT.file === name) {
       assert.equal(body.split(FAULT.from).length, 2, `fault anchor must occur once in ${name}`);
+      const before = createHash('sha256').update(body).digest('hex');
       body = body.replace(FAULT.from, FAULT.to);
+      const after = createHash('sha256').update(body).digest('hex');
+      const prior = mutations[FAULT_NAME];
+      assert(!prior || (prior.before === before && prior.after === after), 'mutation source changed during run');
+      mutations[FAULT_NAME] = { matches: 1, before, after, served: (prior?.served || 0) + 1 };
     }
     // V's lock as the app carries it: its generated mirror in corridor.js (replaced where the merge brought it, else added)
     if (name === 'corridor.js' && mirror) {
@@ -1741,7 +1810,9 @@ async function shots(browser) {
 }
 
 /* ---------------------------------------------------------------- main */
-const receipt = { at: new Date().toISOString(), site: SITE, overlay: OVERLAY, fault: FAULT_NAME || null, only: ONLY ? [...ONLY] : null, engines: {}, cases: [], checks: results, pageErrors };
+assert(exactRoster(SPEAK_CASE_IDS, Object.keys(CASES)), 'Speak implementation case registry moved; review the independent required roster');
+const receipt = { schemaVersion: 1, runId, nonce: process.env.SPEAK_RUN_NONCE || randomUUID(), phase,
+  verifierSha256: createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex'), at: new Date().toISOString(), site: SITE, overlay: OVERLAY, fault: FAULT_NAME || null, only: ONLY ? [...ONLY] : null, engines: {}, cases: [], checks: results, pageErrors };
 let host = null;
 try {
   const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
@@ -1752,8 +1823,9 @@ try {
   receipt.mock = engines.mock.endpoint;
   // the instruments themselves, by digest, so a receipt names the verifier and the mock that judged it
   receipt.instruments = Object.fromEntries(['verify-speak.mjs', 'speak-mock-partner.mjs'].map((f) => [f, createHash('sha256').update(readFileSync(join(HERE, f))).digest('hex')]));
-  try { receipt.artifact = JSON.parse(readFileSync(join(SITE, 'build-identity.json'), 'utf8')).artifactSha256 || null; } catch { receipt.artifact = null; }
-  const names = WHICH === 'all' ? ['webkit', 'chromium'] : [WHICH];
+  const identity = JSON.parse(readFileSync(join(SITE, 'build-identity.json'), 'utf8'));
+  receipt.artifact = receipt.artifactSha256 = identity.artifactSha256; receipt.sourceSha = identity.gitSha;
+  const names = requestedEngines;
   for (const name of names) {
     const browser = await ({ chromium, webkit })[name].launch();
     receipt.engines[name] = browser.version();
@@ -1765,8 +1837,10 @@ try {
         const started = Date.now();
         const before = results.length;
         engines.mock.reset();
+        let completed = false, caseTimer;
         try {
-          await Promise.race([run(browser, name), new Promise((_, reject) => setTimeout(() => reject(new Error('case timed out (240 s)')), 240_000))]);
+          await Promise.race([run(browser, name), new Promise((_, reject) => { caseTimer = setTimeout(() => reject(new Error('case timed out (240 s)')), 240_000); })]);
+          completed = true;
         } catch (error) {
           let snap = null;
           try { snap = await engines.last?.page?.evaluate(() => window.__SPEAK_TEST__?.snap()); } catch { /* the page is gone */ }
@@ -1774,8 +1848,9 @@ try {
           const mock = engines.mock.requests.slice(-6).map((r) => `${r.kind}:${r.mode || r.voiceName || ''}`);
           check('the case ran to its end', false, `${String(error?.message || error).split('\n')[0]} · snap ${JSON.stringify(snap)?.slice(0, 400)} · mock ${mock.join(' ')} · console ${tail.join(' | ').slice(0, 400)}`);
         }
+        clearTimeout(caseTimer);
         const rows = results.slice(before);
-        receipt.cases.push({ engine: name, case: id, pass: rows.length > 0 && rows.every((r) => r.pass), checks: rows.length, ms: Date.now() - started });
+        receipt.cases.push({ engine: name, case: id, completed, pass: rows.length > 0 && rows.every((r) => r.pass), checks: rows.length, ms: Date.now() - started });
       }
       if (!ONLY) {
         // across every case: nothing left for any origin but the site and his configured provider (the harness blocks such a
@@ -1784,7 +1859,7 @@ try {
         const tried = engines.offOrigin.filter((x) => x.case.startsWith(`${name} `));
         check('across every case, the app tried no request to any origin but the site and his configured provider', tried.length === 0,
           `${tried.length} tried${tried.length ? `: ${tried.slice(0, 4).map((x) => `${x.case} ${x.method} ${x.url}${x.body ? ` (${x.body.length} bytes)` : ''}`).join(' | ')}` : ''}`);
-        receipt.cases.push({ engine: name, case: 'egress', pass: tried.length === 0, checks: 1, ms: 0 });
+        receipt.cases.push({ engine: name, case: 'egress', completed: true, pass: tried.length === 0, checks: 1, ms: 0 });
       }
       if (SHOTS && name === 'webkit' && !FAULT) { current = `${name} shots`; await shots(browser); }
     } finally { await browser.close(); }
@@ -1795,12 +1870,16 @@ try {
 } finally {
   if (pageErrors.length) receipt.cases.push({ engine: 'all', case: 'late page errors', pass: false, checks: pageErrors.length });
   receipt.served = Object.fromEntries(Object.entries(engines.served).map(([name, digests]) => [name, [...digests]]));
-  receipt.pass = !receipt.error && receipt.cases.length > 0 && receipt.cases.every((c) => c.pass);
+  receipt.mutations = mutations;
+  Object.assign(receipt, speakCompletion({ engines: requestedEngines, selected: selectedCases, cases: receipt.cases, checks: results,
+    error: receipt.error, pageErrors, fault: FAULT_NAME, overlay: OVERLAY || phase !== 'candidate' || process.env.SPEAK_BREAK_SETUP === '1' }));
+  receipt.requestedScope = selectedCases || SPEAK_CASE_IDS;
+  receipt.pass = receipt.selectedPassed;
   writeFileSync(join(EVIDENCE, 'verify-speak.json'), `${JSON.stringify(receipt, null, 2)}\n`);
   await engines.mock?.close().catch(() => {});
   await host?.close().catch(() => {});
   const failed = receipt.cases.filter((c) => !c.pass);
   console.log(`\nverify-speak: ${receipt.cases.length - failed.length}/${receipt.cases.length} cases green${failed.length ? ` · red: ${failed.map((c) => `${c.engine} ${c.case}`).join(', ')}` : ''}`);
   console.log(`receipt: ${join(EVIDENCE, 'verify-speak.json')}`);
-  process.exitCode = receipt.pass ? 0 : 1;
+  process.exitCode = !receipt.selectedPassed ? 1 : receipt.fullAcceptance ? 0 : 3;
 }

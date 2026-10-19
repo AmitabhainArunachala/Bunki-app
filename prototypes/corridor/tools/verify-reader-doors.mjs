@@ -18,7 +18,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
@@ -26,6 +26,7 @@ import { pathToFileURL } from 'node:url';
 
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { escapeObligations, READER_D1_DAY, READER_D1_PICKS, readerDoorsReceipt, deliveredAsBuilt, serveRecorded } from './vh-learning-contracts.mjs';
 import { restoreAppFixture } from './record-fixture-support.mjs';
 
 const require = createRequire(import.meta.url);
@@ -35,6 +36,11 @@ const SITE = resolveCorridorSite();
 const EVIDENCE = resolveCorridorEvidence();
 const engine = process.env.KAIRO_BROWSER || 'chromium';
 if (!['chromium', 'webkit'].includes(engine)) throw new Error('KAIRO_BROWSER must be chromium or webkit; run each engine separately');
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+const verifierSha256 = shaAtStart();
+const verifierGitSha = execFileSync('git', ['rev-parse', 'HEAD'], {encoding:'utf8'}).trim();
+function shaAtStart() { return createHash('sha256').update(require('node:fs').readFileSync(new URL(import.meta.url))).digest('hex'); }
+let servedIdentity = null;
 let browserVersion = null;
 const results = [];
 const pageErrors = [];
@@ -100,16 +106,40 @@ const EDITS = Object.freeze({
     to: JSON.stringify({ ...DOOR.token, r: WRONG_READING, f: [{ t: SURFACE, r: WRONG_READING }] }) },
   stalled: { file: 'corridor.js', from: "      return ladderVisit.openStage({ restore: false, demo: false });", to: "      return 'reading';" },
   keepReading: { file: 'corridor.js', from: '  visit.clearReveal?.();', to: '  // control: leave the summoned reading painted' },
+  lostFocus: { file: 'corridor.js', from: '  if (anchor.isConnected) focusProseWord(anchor, { preventScroll: true });\n}, true);',
+    to: '  // VH control: popup closes without restoring focus\n}, true);' },
+  wrongFocus: { file: 'corridor.js', from: '  if (anchor.isConnected) focusProseWord(anchor, { preventScroll: true });\n}, true);',
+    to: '  document.querySelector("[data-vh-duplicate]")?.focus({ preventScroll: true });\n}, true);' },
+  keepPopup: { file: 'corridor.js', from: '  slip?.remove();\n  miniAnchor = null;', to: '  // VH control: leave the mounted popup\n  miniAnchor = null;' },
+  contentEnglish: { file: 'corridor.js', from: `    // R · the slip stands for the entry the token's own reading names (readingToken). A word the core lacks whose`,
+    to: `    if (index === 1 && token.s === "これ") { span.querySelector(".tok-en")?.remove(); span.append(el("span", "tok-en", "VH_INLINE_ENGLISH")); span.classList.add("has-en"); }\n    // R · the slip stands for the entry the token's own reading names (readingToken). A word the core lacks whose` },
+  namedEnglish: { file: 'corridor.js', from: "  span.querySelector('.tok-en')?.remove();\n  span.classList.remove('has-en');\n  span.classList.toggle('lit', shown);",
+    to: "  span.querySelector('.tok-en')?.remove();\n  if (shown && index === 1) { span.append(el('span', 'tok-en', 'VH_INLINE_ENGLISH')); span.classList.add('has-en'); } else span.classList.remove('has-en');\n  span.classList.toggle('lit', shown);" },
   offRuby: { file: 'corridor.js', from: "  anchor.dataset.ladderRung = 'stage';\n  return visit.openStage({ restore: !!options.restore, demo: !!options.demo });",
     to: "  anchor.dataset.ladderRung = 'stage';\n  if (S.dials.furigana === 0) { inlineWordReading(anchor, reading); anchor.querySelectorAll('ruby').forEach(ruby => ruby.dataset.r = reading); }\n  return visit.openStage({ restore: !!options.restore, demo: !!options.demo });" },
 });
 const RUN_ROWS = Object.freeze({
-  d2: [1, 0].flatMap(f => ['door','first-rung','popup-reading','visible-reading','accessible-reading','no-english','focus-returns','neighbour-unchanged','no-navigation','bare-after-fold'].map(row => `D2.f${f}.${row}`)),
+  d2: [1, 0].flatMap(f => ['door','first-rung','popup-reading','visible-reading','accessible-reading','no-english','popup-focus-premise','focus-returns','popup-absent','neighbour-unchanged','no-navigation','bare-after-fold'].map(row => `D2.f${f}.${row}`)),
   d3: ['k0f2','k2f1'].flatMap(key => ['names','pointer','opens-lookup'].map(row => `D3.${key}.${row}`)),
+  d5: ['home-marks','detour','away-marks','returned','home-bare-return','away-index-not-lit','named-tap','named-no-english'].map(id => `D5.${id}`),
   d4: ['D4.A-prior-state','D4.A-no-english','D4.same-document','D4.same-dials','D4.B-door','D4.no-inherited-state','D4.tap-shows','D4.second-tap-stage','D4.fold-bare','D4.never-english'],
 });
-const RUN_FIXTURE = Object.freeze({ d2: 'D2.fixture', d3: 'D3.fixture', d4: 'D4.fixture' });
+const RUN_FIXTURE = Object.freeze({ d2: 'D2.fixture', d3: 'D3.fixture', d4: 'D4.fixture', d5: 'D5.fixture' });
 const CONTROLS = Object.freeze([
+  ...['lostFocus', 'wrongFocus', 'keepPopup'].map((edit, index) => ({
+    name: ['escape-loses-source-focus', 'escape-focuses-other-occurrence', 'escape-leaves-popup-open'][index],
+    title: 'Escape starts inside the real popup and returns to the exact source occurrence', edits: [edit], run: 'd2',
+    requires: [1, 0].flatMap(f => [`D2.f${f}.popup-reading`, `D2.f${f}.popup-focus-premise`, ...(edit === 'keepPopup' ? [`D2.f${f}.focus-returns`] : [`D2.f${f}.popup-absent`])]),
+    kills: [1, 0].map(f => `D2.f${f}.${edit === 'keepPopup' ? 'popup-absent' : 'focus-returns'}`), allowed: [],
+    witness: rows => [1, 0].every(f => rows.get(`D2.f${f}.${edit === 'keepPopup' ? 'popup-absent' : 'focus-returns'}`)?.observed?.every(row =>
+      edit === 'keepPopup' ? row.popupPresent && row.back : !row.back && row.popupGone && (edit !== 'wrongFocus' || row.onDuplicate))) ? '' : 'the exact Escape fault was not observed',
+  })),
+  { name: 'inline-english-content', title: 'content stage paints forbidden inline English', edits: ['contentEnglish'], run: 'd4',
+    requires: ['D4.A-prior-state'], kills: ['D4.A-no-english'], allowed: [],
+    witness: rows => rows.get('D4.A-no-english')?.observed?.glosses?.every(value => value === 'VH_INLINE_ENGLISH') ? '' : 'the exact content sentinel was not observed' },
+  ...['d4', 'd5'].map(run => ({ name: `inline-english-named-${run}`, title: 'named reading paints forbidden inline English', edits: ['namedEnglish'], run,
+    requires: [run === 'd4' ? 'D4.tap-shows' : 'D5.named-tap'], kills: [run === 'd4' ? 'D4.never-english' : 'D5.named-no-english'], allowed: [],
+    witness: rows => rows.get(run === 'd4' ? 'D4.never-english' : 'D5.named-no-english')?.observed?.glosses?.includes('VH_INLINE_ENGLISH') ? '' : 'the exact named sentinel was not observed' })),
   { name:'g3-stalled', title:'second activation stalls before stage', edits:['stalled'], run:'d4',
     requires:['D4.A-prior-state','D4.B-door','D4.tap-shows'], kills:['D4.second-tap-stage'], allowed:[],
     witness:rows => rows.get('D4.second-tap-stage')?.observed?.popup === null ? '' : 'the stage still opened' },
@@ -131,19 +161,22 @@ const CONTROLS = Object.freeze([
       ? '' : 'the exact wrong reading was not shown and spoken' },
 ]);
 
-async function openPage(viewport, query, mutation = null) {
+async function openPage(viewport, query, mutation = null, { shelfDay = null, restore = null } = {}) {
   const context = await browser.newContext({ viewport, reducedMotion: 'reduce', deviceScaleFactor: viewport.width > 1000 ? 2 : 3,
-    ...(mutation ? { serviceWorkers: 'block' } : {}) });
+    ...(mutation || restore ? { serviceWorkers: 'block' } : {}) });
   const sink = mutation ? mutation.control.pageErrors : pageErrors;
   context.on('page', (page) => page.on('pageerror', (error) => {
     if (sink.length < 20) sink.push({ case: currentCase, message: error.message });
   }));
   try {
     // This suite models an already-seen demo on this device; the fresh-device demo has its own G3 verifier.
-    await context.addInitScript(ownOrigin => {
-      if (location.origin === ownOrigin) localStorage.setItem('kairo-word-ladder-demo-v1', '1');
-    }, origin);
+    await context.addInitScript(({ ownOrigin, day }) => {
+      if (location.origin !== ownOrigin) return;
+      localStorage.setItem('kairo-word-ladder-demo-v1', '1');
+      if (day) localStorage.setItem('kairo-shelf-day', day);
+    }, { ownOrigin: origin, day: shelfDay });
     if (mutation) await serveMutation(context, mutation);
+    if (restore) await serveRecorded(context, { origin, files: restore.files, delivered: restore.delivered });
     const page = await context.newPage();
     await page.goto(`${origin}/index.html${query}`);
     if (mutation?.control.setupError) throw new Error(`mutation setup: ${mutation.control.setupError}`);
@@ -342,11 +375,12 @@ const popupState = (page) => page.evaluate(() => {
 /** D2 at one furigana setting: the fixture door, tap/Enter/Space, against the literal reading. */
 async function d2Door(page, rec, furigana) {
   const key = `D2.f${furigana}`, label = `D2 f=${furigana}`;
-  const views = [], firsts = [], popups = [], folds = [], focus = [], neighbours = [], navigation = [], acts = [];
+  const views = [], accessibleViews = [], firsts = [], popups = [], folds = [], focus = [], neighbours = [], navigation = [], acts = [];
   let before = null;
   for (const how of ['tap','Enter','Space']) {
     await openArticle(page, `dials=0,${furigana},0&ui=bi`, PASSAGE_B);
     const node = page.locator(`#reader .tok[data-index="${DOOR.index}"]`);
+    const source = await node.elementHandle(); // exact connected occurrence, captured before opening its popup
     before ||= await tokenState(page, DOOR.index);
     const neighbour = await tokenState(page, DOOR.neighbour.index);
     const activate = async () => how === 'tap' ? tapCentre(page, DOOR.index)
@@ -358,15 +392,28 @@ async function d2Door(page, rec, furigana) {
     if (furigana===1) await activate();
     await page.waitForFunction(() => !!document.getElementById('mini'), null, {timeout:5000}).catch(()=>{});
     popups.push(await popupState(page));
-    const inPopup = await page.evaluate(() => !!document.activeElement?.closest('#mini'));
-    await focusToken(page, DOOR.index);
-    views.push(await tokenState(page,DOOR.index));
+    // A distinct, connected same-spelling occurrence makes a spelling-only return insufficient.
+    await node.evaluate(n => { const twin = n.cloneNode(true); twin.dataset.vhDuplicate = 'true'; twin.dataset.index = 'vh-duplicate'; twin.tabIndex = -1; n.after(twin); });
+    views.push(await tokenState(page, DOOR.index));
+    if (how === 'tap') await page.locator('#mini').focus();
+    const premise = await source.evaluate(n => ({ inside: !!document.activeElement?.closest('#mini'), source: document.activeElement === n, connected: n.isConnected }));
     await page.keyboard.press('Escape');
-    await page.waitForFunction(() => !document.getElementById('mini'), null, {timeout:3000}).catch(()=>{});
+    const popupGone = await page.waitForFunction(() => !document.getElementById('mini'), null, {timeout:3000}).then(() => true, () => false);
     folds.push(await tokenState(page,DOOR.index));
-    focus.push({how,inPopup,back:await node.evaluate(n=>document.activeElement===n)});
+    focus.push({how, premise, popupGone, popupPresent: !popupGone,
+      back: await source.evaluate(n => n.isConnected && document.activeElement === n),
+      onDuplicate: await page.evaluate(() => document.activeElement?.dataset.vhDuplicate === 'true')});
+    await page.locator('[data-vh-duplicate]').evaluateAll(nodes => nodes.forEach(n => n.remove()));
     neighbours.push(canonical(await tokenState(page,DOOR.neighbour.index))===canonical(neighbour));
     navigation.push(await page.evaluate(pid=>document.body.dataset.view==='reader'&&document.querySelector('.listen-row')?.dataset.passage===pid,PASSAGE_B));
+    // Separate fresh selection walk: never move focus to the source before the Escape being tested.
+    await openArticle(page, `dials=0,${furigana},0&ui=bi`, PASSAGE_B);
+    await activate();
+    await page.waitForFunction(({i,f}) => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung === (f === 1 ? 'reading' : 'stage'), {i:DOOR.index,f:furigana}, {timeout:5000});
+    if (furigana === 1) await activate();
+    await page.waitForFunction(() => !!document.getElementById('mini'), null, {timeout:5000});
+    await focusToken(page, DOOR.index);
+    accessibleViews.push(await tokenState(page, DOOR.index));
   }
   const done=acts.every(row=>row.done&&row.own);
   rec(`${key}.door`,`${label}: literal name is an inline span door, initially bare`, before?.tag==='span'&&classes(before).includes('named')&&before.surface===SURFACE&&before.visibleRuby==='',JSON.stringify(before));
@@ -375,11 +422,14 @@ async function d2Door(page, rec, furigana) {
   rec(`${key}.popup-reading`,`${label}: each modality reaches the exact word and reading at stage`,done&&popups.every(row=>row?.word===SURFACE&&row.reading===READING),JSON.stringify(popups),popups);
   const visible=views.map(row=>row?.visibleRuby??null);
   rec(`${key}.visible-reading`,`${label}: inline ruby obeys the dial exactly`,done&&visible.every(value=>value===(furigana===1?READING:'')),JSON.stringify(visible),visible);
-  const labels=views.map(row=>({name:row?.name,description:row?.description,role:row?.role}));
+  const labels=accessibleViews.map(row=>({name:row?.name,description:row?.description,role:row?.role}));
   rec(`${key}.accessible-reading`,`${label}: selected prose word names only itself and describes only the permitted reading`,
-    done&&views.every(row=>row?.name===SURFACE&&row.role==='group'&&spoken(row,furigana===1?READING:null)),JSON.stringify(labels),labels);
+    done&&accessibleViews.every(row=>row?.name===SURFACE&&row.role==='group'&&spoken(row,furigana===1?READING:null)),JSON.stringify(labels),labels);
   rec(`${key}.no-english`,`${label}: no inline English appears`,done&&views.every(row=>row&&row.gloss===null&&!row.hasEn),JSON.stringify(views.map(row=>row?.gloss)));
-  rec(`${key}.focus-returns`,`${label}: keyboard stage takes focus; Escape returns to the same occurrence`,focus.every(row=>row.back&&(row.how==='tap'||row.inPopup)),JSON.stringify(focus));
+  const escape = escapeObligations(focus);
+  rec(`${key}.popup-focus-premise`, `${label}: every Escape starts inside the popup, outside the exact source`, escape.premise, JSON.stringify(focus), focus);
+  rec(`${key}.focus-returns`,`${label}: Escape returns from the popup to the exact connected occurrence`,escape.exactSource,JSON.stringify(focus),focus);
+  rec(`${key}.popup-absent`, `${label}: Escape removes the actual popup`, escape.popupAbsent, JSON.stringify(focus), focus);
   rec(`${key}.neighbour-unchanged`,`${label}: neighbouring particle is unchanged`,neighbours.every(Boolean),JSON.stringify(neighbours));
   rec(`${key}.no-navigation`,`${label}: every activation stays in the literal article`,navigation.every(Boolean),JSON.stringify(navigation));
   rec(`${key}.bare-after-fold`,`${label}: Escape removes stage, rung and summoned reading`,folds.every(row=>row?.rung===null&&row.visibleRuby===''&&!row.lit),JSON.stringify(folds),folds);
@@ -747,6 +797,26 @@ async function runControl(spec) {
     await context?.close().catch(() => {});
   }
   [control.verdict, control.reason] = adjudicate(spec, control);
+  control.restore = { rows: [], delivered: [], error: null, pageErrors: [] };
+  let restored = null;
+  const errorsBefore = pageErrors.length;
+  const files = edits.map((edit) => edit.file);
+  try {
+    restored = await openPage(DESK, ['d2', 'd3'].includes(spec.run) ? '?entry=shelf' : D4_QUERY, null,
+      { restore: { files, delivered: control.restore.delivered } });
+    const rec = (id, name, pass, detail, observed) => control.restore.rows.push({id, name, pass: !!pass, detail, observed});
+    if (spec.run === 'd3') await d3Names(restored.page, rec);
+    else if (spec.run === 'd4') await d4Walk(restored.page, rec);
+    else if (spec.run === 'd5') await d5Detour(restored.page, rec);
+    else for (const f of [1, 0]) await d2Door(restored.page, rec, f);
+    deliveredAsBuilt({ files, rows: control.restore.delivered, manifest });
+  } catch (error) { control.restore.error = String(error.stack || error); }
+  finally { await restored?.context.close(); }
+  control.restore.pageErrors = pageErrors.slice(errorsBefore);
+  const restoredIds = control.restore.rows.map(row => row.id);
+  control.restore.passed = !control.restore.error && !control.restore.pageErrors.length && restoredIds.length === RUN_ROWS[spec.run].length
+    && new Set(restoredIds).size === restoredIds.length && RUN_ROWS[spec.run].every(id => control.restore.rows.some(row => row.id === id && row.pass));
+  if (!control.restore.passed) { control.verdict = 'incomplete'; control.reason += '; restored candidate did not pass the exact schedule'; }
   check(`C ${spec.name} (${spec.title}) is killed by ${spec.kills.join(' + ')}`, control.verdict === 'killed',
     `${control.verdict}: ${control.reason}`, { id: `C.${spec.name}` });
   return control;
@@ -763,6 +833,7 @@ try {
   {
     const { context, page } = await openPage({ width: 1024, height: 800 }, '?entry=shelf');
     const identity = await (await page.request.get(`${origin}/build-identity.json`)).json();
+    servedIdentity = identity;
     manifest = new Map(identity.files.map((row) => [row.path, row.sha256]));
     let head = null; try { head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(); } catch { /* outside a checkout */ }
     const expected = process.env.KAIRO_EXPECT_GITSHA || head;
@@ -776,9 +847,11 @@ try {
   currentCase = 'D1';
   for (const viewport of [{ width: 1728, height: 996 }, { width: 390, height: 844 }]) {
     const label = `${viewport.width}`;
-    const { context, page } = await openPage(viewport, '?entry=shelf');
+    const { context, page } = await openPage(viewport, '?entry=shelf', null, { shelfDay: READER_D1_DAY });
     const count = await page.locator('#shelf-today .shelf-open').count();
-    check(`D1 ${label}: today's picks are on the shelf`, count > 0, `${count} doors`);
+    const day = await page.locator('#shelf-today').getAttribute('data-day').catch(() => null);
+    check(`D1 ${label}: today's picks are on the shelf`, count === READER_D1_PICKS && day === READER_D1_DAY, `${count} doors on ${day}`,
+      { observed: { day, count } });
     for (let i = 0; i < count; i++) {
       await page.goto(`${origin}/index.html?entry=shelf`); await ready(page);
       const door = page.locator('#shelf-today .shelf-open').nth(i);
@@ -876,7 +949,8 @@ try {
   await browser?.close().catch((error) => results.push({ name: 'browser · cleanup', pass: false, detail: error.message }));
   await host?.close().catch((error) => results.push({ name: 'host · cleanup', pass: false, detail: error.message }));
   if (pageErrors.length) results.push({ name: 'no uncaught page errors', pass: false, detail: JSON.stringify(pageErrors) });
-  writeFileSync(resolve(EVIDENCE, 'reader-doors.json'), JSON.stringify({ engine, browserVersion, origin, results, controls, pageErrors, lastCase: currentCase }, null, 2) + '\n');
+  writeFileSync(resolve(EVIDENCE, 'reader-doors.json'), JSON.stringify(readerDoorsReceipt({ runId, servedIdentity, verifierGitSha, verifierSha256, engine, browserVersion, origin,
+    d1Day: READER_D1_DAY, results, controls, pageErrors, expectedControls: CONTROLS.length, lastCase: currentCase }), null, 2) + '\n');
 }
 const failed = results.filter((r) => !r.pass);
 console.log(`\n${results.length - failed.length}/${results.length} passed · evidence ${EVIDENCE}`);

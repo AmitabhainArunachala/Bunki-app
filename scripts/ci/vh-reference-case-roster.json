@@ -1,0 +1,22 @@
+[
+  "Frozen inputs remain byte-identical; generated core is pure",
+  "Every dictionary and graded-word row reaches a labelled or unknown collection",
+  "Every wbig/drift word and kotobako vocabulary classification is represented",
+  "Every boot kanji, grade fact and JLPT metadata row is accounted for",
+  "Every full Kentei source row survives, including duplicates and glyphless records",
+  "Exact membership sets match the independently calculated all-source union",
+  "Kentei source species relationships are exact, bidirectional and never inherited grades",
+  "Dictionary links retain all exact candidates and enforce written-form reading scopes",
+  "Partial kanji fields fill only from the same literal and retain field provenance",
+  "Offline checks reject accidental pinned metadata corruption rather than blessing it",
+  "Every dictionary candidate has an actual correctly routed canonical detail target",
+  "Reference-to-runtime and source word-to-kanji edges have no dangling canonical targets",
+  "Known source gaps remain honest; no synthetic N3 kanji or inferred levels",
+  "All collection pages concatenate to every entry with no cap or duplicate",
+  "Each collection is deterministically reading-sorted; no sort mutates its input",
+  "Source disagreements, unknown/special levels and metadata gaps in independent fixtures",
+  "Query normalization, kana variants, token AND, whitespace, English and literal symbols",
+  "Pagination handles empty results, late pages, fractional and invalid options without caps",
+  "Output edits cannot mutate runtime sources or the licensed source sidecar",
+  "Browser global and CommonJS exports have the same contract"
+]

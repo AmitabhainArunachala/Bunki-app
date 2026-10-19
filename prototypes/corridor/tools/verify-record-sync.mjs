@@ -4,6 +4,7 @@
 // bindings, which are declared in the generated document rather than Node.
 /* global recordEpoch: writable, recordSyncSlot, closeRecordSync */
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { dirname, resolve } from 'node:path';
@@ -12,7 +13,8 @@ import { build } from 'esbuild';
 import { chromium } from 'playwright-core';
 
 const repository = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
-const source = readFileSync(resolve(repository, 'prototypes/corridor/corridor.js'), 'utf8');
+const sourceBytes = readFileSync(resolve(repository, 'prototypes/corridor/corridor.js'));
+const source = sourceBytes.toString('utf8');
 const bundled = await build({ absWorkingDir: repository,
   stdin: { contents: "export * from './prototypes/corridor/record-sync.mjs'; export { createSyncOperation, operationReference, encodeLocalJson } from './scripts/corridor-record-entry.ts';", resolveDir: repository }, bundle: true, write: false,
   platform: 'browser', format: 'esm', target: 'es2022', logLevel: 'silent',
@@ -234,9 +236,10 @@ const server = createServer((req, res) => {
   res.end(req.url === '/record-sync.mjs' ? moduleBytes : html);
 });
 await new Promise((done) => server.listen(0, '127.0.0.1', done));
-let browser;
+let browser, browserVersion = null;
 try {
   browser = await chromium.launch({ headless: true });
+  browserVersion = browser.version();
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   const errors = []; page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(`http://127.0.0.1:${server.address().port}/`);
@@ -317,4 +320,5 @@ try {
   await browser?.close();
   await new Promise((done) => server.close(done));
 }
-console.log(JSON.stringify({ pass: true, count: checks.length, checks, scope: 'Synthetic adapter and Chromium DOM behavior; no authenticated native transport exercised.' }, null, 2));
+console.log(JSON.stringify({ pass: true, count: checks.length, checks, runId: process.env.KAIRO_GATE_RUN_ID ?? null,
+  sourceSha256: createHash('sha256').update(sourceBytes).digest('hex'), browser: { engine: 'chromium', version: browserVersion }, scope: 'Synthetic adapter and Chromium DOM behavior; no authenticated native transport exercised.' }, null, 2));

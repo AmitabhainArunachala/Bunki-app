@@ -11,6 +11,7 @@ import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged site');
@@ -125,6 +126,7 @@ for (const engine of engines) for (const width of sizes) {
       acceptDownloads: true, ignoreHTTPSErrors: true, ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
       recordVideo: { dir: videoDir, size: { width, height: width === 390 ? 844 : 1050 } },
     });
+    result.browserVersion = await contextBrowserVersion(context, { chromium, webkit }[engine]);
     await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device fixture.
     await context.route('**/*', route => {
       const url = new URL(route.request().url()); if (url.origin === ORIGIN) return route.continue();

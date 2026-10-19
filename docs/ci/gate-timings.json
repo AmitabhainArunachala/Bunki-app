@@ -1,12 +1,16 @@
 {
   "schemaVersion": 1,
   "repository": "AmitabhainArunachala/Bunki-app",
-  "measurement": "Each gate's completedAt minus startedAt from uploaded battery.json; seconds, wall clock.",
+  "measurement": "Legacy rows retain real historical CI wall-clock observations at their listed source SHAs. They are not current-producer measurements. Entries with currentContract explicitly state current measurementStatus; all unknown current values remain unmeasured. Scheduling policy limits are separate from measurements.",
   "limitations": [
     "Five completed batteries, including failed batteries whose later gates still ran; failed gates can finish early.",
     "Historical SHAs differ; maxSeconds is a conservative observed scheduling weight, not a future upper bound.",
     "Runner setup, artifact build/download/upload and queue time are excluded from per-gate durations.",
-    "Local f938 log duplicates run 37407758020 attempt 2 and is not a sixth independent sample."
+    "Local f938 log duplicates run 37407758020 attempt 2 and is not a sixth independent sample.",
+    "VH-1 additions use only retained measured evidence. Missing current-contract timings remain explicitly unmeasured and require FULL measurement; no default or estimate is labeled measured.",
+    "Type-ruby retains one 594-second, 26-row, both-engine historical command only under historicalSamples. The newer current contract is unmeasured. Separate-engine timings are never summed into a combined command.",
+    "The two record-depth producer intervals now live under historicalMeasurements because current producer bytes and receipt obligations changed.",
+    "Legacy rows without currentContract remain historical CI scheduling observations, not certification that current bytes were measured."
   ],
   "sources": [
     {
@@ -890,114 +894,6 @@
           "status": "passed",
           "startedAt": "2026-10-06T11:11:53.348Z",
           "completedAt": "2026-10-06T11:11:53.394Z"
-        }
-      ]
-    },
-    {
-      "name": "continuity",
-      "sampleCount": 2,
-      "medianSeconds": 88.0,
-      "meanSeconds": 88.0,
-      "maxSeconds": 88,
-      "minSeconds": 88,
-      "successfulMedianSeconds": 88,
-      "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Both engines in one gate (KAIRO_BROWSER=all): site-5 41+47 s (Chromium H1b red once, green on rerun), site-6 40+48 s.",
-      "samples": [
-        {
-          "runId": null,
-          "seconds": 88,
-          "status": "failed",
-          "source": "local"
-        },
-        {
-          "runId": null,
-          "seconds": 88,
-          "status": "passed",
-          "source": "local"
-        }
-      ]
-    },
-    {
-      "name": "sense-truth",
-      "sampleCount": 3,
-      "medianSeconds": 956,
-      "meanSeconds": 1042.0,
-      "maxSeconds": 1279,
-      "minSeconds": 891,
-      "successfulMedianSeconds": 923.5,
-      "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Chromium: site-5 1279 s (three rows timed out under load, before G3's ladder port), then 956 s, site-6 891 s.",
-      "samples": [
-        {
-          "runId": null,
-          "seconds": 1279,
-          "status": "failed",
-          "source": "local"
-        },
-        {
-          "runId": null,
-          "seconds": 956,
-          "status": "passed",
-          "source": "local"
-        },
-        {
-          "runId": null,
-          "seconds": 891,
-          "status": "passed",
-          "source": "local"
-        }
-      ]
-    },
-    {
-      "name": "sense-truth-webkit",
-      "sampleCount": 2,
-      "medianSeconds": 1372.0,
-      "meanSeconds": 1372.0,
-      "maxSeconds": 1427,
-      "minSeconds": 1317,
-      "successfulMedianSeconds": 1372.0,
-      "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. WebKit: site-5 1427 s, site-6 1317 s.",
-      "samples": [
-        {
-          "runId": null,
-          "seconds": 1427,
-          "status": "passed",
-          "source": "local"
-        },
-        {
-          "runId": null,
-          "seconds": 1317,
-          "status": "passed",
-          "source": "local"
-        }
-      ]
-    },
-    {
-      "name": "type-ruby",
-      "sampleCount": 3,
-      "medianSeconds": 96,
-      "meanSeconds": 100.333,
-      "maxSeconds": 115,
-      "minSeconds": 90,
-      "successfulMedianSeconds": 115,
-      "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Both engines in one gate (KAIRO_BROWSER=all): site-5 39+57 s and site-6 36+54 s (R1-on-touch-320 red, since fixed), site-9 46+69 s (19/19 each).",
-      "samples": [
-        {
-          "runId": null,
-          "seconds": 96,
-          "status": "failed",
-          "source": "local"
-        },
-        {
-          "runId": null,
-          "seconds": 90,
-          "status": "failed",
-          "source": "local"
-        },
-        {
-          "runId": null,
-          "seconds": 115,
-          "status": "passed",
-          "source": "local"
         }
       ]
     },
@@ -6081,48 +5977,82 @@
     },
     {
       "name": "teacher-drafts-integration",
-      "sampleCount": 5,
-      "medianSeconds": 173.743,
-      "meanSeconds": 162.887,
-      "maxSeconds": 177.425,
-      "minSeconds": 124.435,
-      "successfulMedianSeconds": 173.743,
-      "samples": [
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [
         {
-          "runId": 37326384597,
-          "seconds": 176.256,
-          "status": "passed",
-          "startedAt": "2026-10-05T18:40:24.160Z",
-          "completedAt": "2026-10-05T18:43:20.416Z"
-        },
-        {
-          "runId": 37327953066,
-          "seconds": 173.743,
-          "status": "passed",
-          "startedAt": "2026-10-05T15:06:17.616Z",
-          "completedAt": "2026-10-05T15:09:11.359Z"
-        },
-        {
-          "runId": 37400558515,
-          "seconds": 124.435,
-          "status": "passed",
-          "startedAt": "2026-10-06T01:55:19.671Z",
-          "completedAt": "2026-10-06T01:57:24.106Z"
-        },
-        {
-          "runId": 37407758020,
-          "seconds": 177.425,
-          "status": "passed",
-          "startedAt": "2026-10-06T07:31:40.322Z",
-          "completedAt": "2026-10-06T07:34:37.747Z"
-        },
-        {
-          "runId": 37452295779,
-          "seconds": 162.575,
-          "status": "passed",
-          "startedAt": "2026-10-06T11:03:22.859Z",
-          "completedAt": "2026-10-06T11:06:05.434Z"
+          "sampleCount": 5,
+          "medianSeconds": 173.743,
+          "meanSeconds": 162.887,
+          "maxSeconds": 177.425,
+          "minSeconds": 124.435,
+          "successfulMedianSeconds": 173.743,
+          "samples": [
+            {
+              "runId": 37326384597,
+              "seconds": 176.256,
+              "status": "passed",
+              "startedAt": "2026-10-05T18:40:24.160Z",
+              "completedAt": "2026-10-05T18:43:20.416Z"
+            },
+            {
+              "runId": 37327953066,
+              "seconds": 173.743,
+              "status": "passed",
+              "startedAt": "2026-10-05T15:06:17.616Z",
+              "completedAt": "2026-10-05T15:09:11.359Z"
+            },
+            {
+              "runId": 37400558515,
+              "seconds": 124.435,
+              "status": "passed",
+              "startedAt": "2026-10-06T01:55:19.671Z",
+              "completedAt": "2026-10-06T01:57:24.106Z"
+            },
+            {
+              "runId": 37407758020,
+              "seconds": 177.425,
+              "status": "passed",
+              "startedAt": "2026-10-06T07:31:40.322Z",
+              "completedAt": "2026-10-06T07:34:37.747Z"
+            },
+            {
+              "runId": 37452295779,
+              "seconds": 162.575,
+              "status": "passed",
+              "startedAt": "2026-10-06T11:03:22.859Z",
+              "completedAt": "2026-10-06T11:06:05.434Z"
+            }
+          ],
+          "currentContractMeasured": false,
+          "historicalReason": "Retained real observations predate the current producer and admission contract; never a current-command timing."
         }
+      ],
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-teacher-drafts.mjs",
+        "producerSha256": "425200dba444995d1c78426920792816a854ea40c350670c9ad893aa8607cba6",
+        "command": ["node", "prototypes/corridor/tools/verify-teacher-drafts.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/teacher-drafts-integration"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-teacher-drafts.mjs",
+            "sha256": "425200dba444995d1c78426920792816a854ea40c350670c9ad893aa8607cba6"
+          }
+        ]
+      },
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
       ]
     },
     {
@@ -6448,66 +6378,6 @@
       ]
     },
     {
-      "name": "word-grammar",
-      "sampleCount": 3,
-      "medianSeconds": 1277,
-      "meanSeconds": 1282.0,
-      "maxSeconds": 1309,
-      "minSeconds": 1260,
-      "successfulMedianSeconds": null,
-      "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Chromium, run with --controls --g5-controls (the gate runs --controls): site-5 1309 s and 1277 s, site-6 1260 s; each red on one row since fixed, none a timeout.",
-      "samples": [
-        {
-          "runId": null,
-          "seconds": 1309,
-          "status": "failed",
-          "source": "local"
-        },
-        {
-          "runId": null,
-          "seconds": 1277,
-          "status": "failed",
-          "source": "local"
-        },
-        {
-          "runId": null,
-          "seconds": 1260,
-          "status": "failed",
-          "source": "local"
-        }
-      ]
-    },
-    {
-      "name": "word-grammar-webkit",
-      "sampleCount": 3,
-      "medianSeconds": 1521,
-      "meanSeconds": 1518.0,
-      "maxSeconds": 1530,
-      "minSeconds": 1503,
-      "successfulMedianSeconds": null,
-      "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. WebKit, run with --controls --g5-controls (the gate runs --controls): site-5 1521 s and 1530 s, site-6 1503 s; red on the headless frame-timing proxies under load (FULL's quiet run judges those), none a timeout. No local run passed, so successfulMedianSeconds is null.",
-      "samples": [
-        {
-          "runId": null,
-          "seconds": 1521,
-          "status": "failed",
-          "source": "local"
-        },
-        {
-          "runId": null,
-          "seconds": 1530,
-          "status": "failed",
-          "source": "local"
-        },
-        {
-          "runId": null,
-          "seconds": 1503,
-          "status": "failed",
-          "source": "local"
-        }
-      ]
-    },
-    {
       "name": "word-saved-answer",
       "sampleCount": 5,
       "medianSeconds": 14.377,
@@ -6644,6 +6514,2101 @@
           "completedAt": "2026-10-06T11:40:13.814Z"
         }
       ]
+    },
+    {
+      "name": "record-depth",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-record-depth.mjs",
+        "producerSha256": "cc9fb9bad6e3c13d2a178bf7adce03cb80cea3dd06aa93ac62aad69795cc99b4",
+        "command": ["node", "prototypes/corridor/tools/verify-record-depth.mjs", "--controls"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/record-depth"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-record-depth.mjs",
+            "sha256": "cc9fb9bad6e3c13d2a178bf7adce03cb80cea3dd06aa93ac62aad69795cc99b4"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ],
+      "historicalMeasurements": [
+        {
+          "measurementStatus": "measured-producer-interval",
+          "currentContract": {
+            "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+            "producer": "prototypes/corridor/tools/verify-record-depth.mjs",
+            "producerSha256": "4029a13ac2b9742fcd917d3a26e19640975bc9c393679352b1625787364b5b6f",
+            "command": ["node", "prototypes/corridor/tools/verify-record-depth.mjs", "--controls"],
+            "environment": {
+              "KAIRO_BROWSER": "chromium"
+            }
+          },
+          "sampleCount": 1,
+          "samples": [
+            {
+              "runId": "f7b35507-95ff-4eea-8d2e-0f51c643b9a1",
+              "seconds": 76.977,
+              "status": "passed",
+              "startedAt": "2026-10-18T21:54:10.779Z",
+              "completedAt": "2026-10-18T21:55:27.756Z",
+              "measurementBoundary": "producer startedAt to finishedAt, full controls-parent; excludes process startup/imports before startedAt",
+              "engine": "chromium",
+              "scope": {
+                "scope": "full-engine",
+                "selectors": {
+                  "only": null,
+                  "control": null,
+                  "controls": true
+                },
+                "phase": "controls-parent"
+              },
+              "assertionCount": 17,
+              "fullAcceptance": true,
+              "processExitCode": null,
+              "command": [
+                "node",
+                "prototypes/corridor/tools/verify-record-depth.mjs",
+                "--controls"
+              ],
+              "commandProvenance": "producer selectors controls=true, only=null, control=null and phase=controls-parent; exact shell argv not retained",
+              "sourceSha": "384d4a70e05a33019f1ad36789d13d22de04094a",
+              "artifactSha256": "339f7b39d99f72dbc079359780b6e516efb7cbf3aaef15dee528b0184748a29d",
+              "producerSha256": "4029a13ac2b9742fcd917d3a26e19640975bc9c393679352b1625787364b5b6f",
+              "receipt": {
+                "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/H/codex-H1/VH1/learning/record-chromium-1/verify-record-depth.json",
+                "sha256": "fd62a846e59abe3513148c893af1db30eeda5f0d2237425512dad64c3ced3d5a"
+              }
+            }
+          ],
+          "wrapperWallTimeMeasured": false,
+          "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+          "measurementBoundary": "producer-declared startedAt to finishedAt; full controls-parent interval, not external process-launch instrumentation",
+          "medianSeconds": 76.977,
+          "meanSeconds": 76.977,
+          "maxSeconds": 76.977,
+          "minSeconds": 76.977,
+          "successfulMedianSeconds": 76.977,
+          "limitations": [
+            "Duration excludes any import/startup before producer startedAt and is not a quiet product-frame verdict.",
+            "App artifact remains 384d4a70; no future merged-artifact acceptance is inferred."
+          ],
+          "currentContractMeasured": false,
+          "historicalReason": "Retained real observations predate the current producer and admission contract; never a current-command timing."
+        }
+      ],
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only."
+    },
+    {
+      "name": "speak",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-speak.mjs",
+        "producerSha256": "fdb0c6273c6562a36604f5c16d60890704c18073f774846eec45c7f67c483bfc",
+        "command": ["node", "prototypes/corridor/tools/verify-speak.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/speak"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-speak.mjs",
+            "sha256": "fdb0c6273c6562a36604f5c16d60890704c18073f774846eec45c7f67c483bfc"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "speak-negatives",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-speak.mjs",
+        "producerSha256": "fdb0c6273c6562a36604f5c16d60890704c18073f774846eec45c7f67c483bfc",
+        "command": ["node", "prototypes/corridor/tools/verify-speak.mjs", "--negatives"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/speak-negatives"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-speak.mjs",
+            "sha256": "fdb0c6273c6562a36604f5c16d60890704c18073f774846eec45c7f67c483bfc"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "vh-sense-controls",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-vh-sense-controls.mjs",
+        "producerSha256": "46531e69bf78ddb5557eabeeb3a42f36ee62b6747c1037eed17d28fd9b7cdf70",
+        "command": ["node", "prototypes/corridor/tools/verify-vh-sense-controls.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/vh-sense-controls"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-vh-sense-controls.mjs",
+            "sha256": "46531e69bf78ddb5557eabeeb3a42f36ee62b6747c1037eed17d28fd9b7cdf70"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "reader-doors",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-reader-doors.mjs",
+        "producerSha256": "ecc9623b42270b0ce02411495503e94c2cedf8ed5e8a94b93a3d5149db999c5a",
+        "command": ["node", "prototypes/corridor/tools/verify-reader-doors.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/reader-doors"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-reader-doors.mjs",
+            "sha256": "ecc9623b42270b0ce02411495503e94c2cedf8ed5e8a94b93a3d5149db999c5a"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "reading-truth",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-reading-truth.mjs",
+        "producerSha256": "450b2f053679bc338b238b2e5a0579d7fc8debe3a60feffc169ed5cb7b51b384",
+        "command": ["node", "prototypes/corridor/tools/verify-reading-truth.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/reading-truth"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-reading-truth.mjs",
+            "sha256": "450b2f053679bc338b238b2e5a0579d7fc8debe3a60feffc169ed5cb7b51b384"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "comb-0",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-comb-0.mjs",
+        "producerSha256": "7a41f868b552c5c88673eed8b8a364b608b4ca16034c70e86265b935092b1dd7",
+        "command": ["node", "prototypes/corridor/tools/verify-comb-0.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/comb-0"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-comb-0.mjs",
+            "sha256": "7a41f868b552c5c88673eed8b8a364b608b4ca16034c70e86265b935092b1dd7"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "sweep",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-sweep.mjs",
+        "producerSha256": "425274d1c80e2bd5dabdd7f815e225e277cb114fe0c6c8ca1dfcac3757f24414",
+        "command": ["node", "prototypes/corridor/tools/verify-sweep.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/sweep"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-sweep.mjs",
+            "sha256": "425274d1c80e2bd5dabdd7f815e225e277cb114fe0c6c8ca1dfcac3757f24414"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "contrast-sweep",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-contrast-sweep.mjs",
+        "producerSha256": "348b87a21aa67f83444d870edf3166efe7fec53bdbd8743d2ea419780f1b06b5",
+        "command": ["node", "prototypes/corridor/tools/verify-contrast-sweep.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/contrast-sweep"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-contrast-sweep.mjs",
+            "sha256": "348b87a21aa67f83444d870edf3166efe7fec53bdbd8743d2ea419780f1b06b5"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "design-reader-shelf",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-design-reader-shelf.mjs",
+        "producerSha256": "153d0196617dc5fa4b81cd7c524962eee8283ca6b5fc524ca5ee42b1cd72701d",
+        "command": ["node", "prototypes/corridor/tools/verify-design-reader-shelf.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/design-reader-shelf"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-design-reader-shelf.mjs",
+            "sha256": "153d0196617dc5fa4b81cd7c524962eee8283ca6b5fc524ca5ee42b1cd72701d"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "record-depth-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-record-depth.mjs",
+        "producerSha256": "cc9fb9bad6e3c13d2a178bf7adce03cb80cea3dd06aa93ac62aad69795cc99b4",
+        "command": ["node", "prototypes/corridor/tools/verify-record-depth.mjs", "--controls"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/record-depth-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-record-depth.mjs",
+            "sha256": "cc9fb9bad6e3c13d2a178bf7adce03cb80cea3dd06aa93ac62aad69795cc99b4"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ],
+      "historicalMeasurements": [
+        {
+          "measurementStatus": "measured-producer-interval",
+          "currentContract": {
+            "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+            "producer": "prototypes/corridor/tools/verify-record-depth.mjs",
+            "producerSha256": "4029a13ac2b9742fcd917d3a26e19640975bc9c393679352b1625787364b5b6f",
+            "command": ["node", "prototypes/corridor/tools/verify-record-depth.mjs", "--controls"],
+            "environment": {
+              "KAIRO_BROWSER": "webkit"
+            }
+          },
+          "sampleCount": 1,
+          "samples": [
+            {
+              "runId": "e14d6a3e-b5fa-4ab9-8d49-62297ce153ec",
+              "seconds": 93.575,
+              "status": "passed",
+              "startedAt": "2026-10-18T21:56:02.121Z",
+              "completedAt": "2026-10-18T21:57:35.696Z",
+              "measurementBoundary": "producer startedAt to finishedAt, full controls-parent; excludes process startup/imports before startedAt",
+              "engine": "webkit",
+              "scope": {
+                "scope": "full-engine",
+                "selectors": {
+                  "only": null,
+                  "control": null,
+                  "controls": true
+                },
+                "phase": "controls-parent"
+              },
+              "assertionCount": 17,
+              "fullAcceptance": true,
+              "processExitCode": null,
+              "command": [
+                "node",
+                "prototypes/corridor/tools/verify-record-depth.mjs",
+                "--controls"
+              ],
+              "commandProvenance": "producer selectors controls=true, only=null, control=null and phase=controls-parent; exact shell argv not retained",
+              "sourceSha": "384d4a70e05a33019f1ad36789d13d22de04094a",
+              "artifactSha256": "339f7b39d99f72dbc079359780b6e516efb7cbf3aaef15dee528b0184748a29d",
+              "producerSha256": "4029a13ac2b9742fcd917d3a26e19640975bc9c393679352b1625787364b5b6f",
+              "receipt": {
+                "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/H/codex-H1/VH1/learning/record-webkit-1/verify-record-depth.json",
+                "sha256": "06a43ecd484663a29be09b012c006798962642a477067ae7844a384d32fb3d91"
+              }
+            }
+          ],
+          "wrapperWallTimeMeasured": false,
+          "measurementObligation": "FULL measures the current canonical command and engine scope, including wrapper startup and shutdown, on the pinned combined artifact.",
+          "measurementBoundary": "producer-declared startedAt to finishedAt; full controls-parent interval, not external process-launch instrumentation",
+          "medianSeconds": 93.575,
+          "meanSeconds": 93.575,
+          "maxSeconds": 93.575,
+          "minSeconds": 93.575,
+          "successfulMedianSeconds": 93.575,
+          "limitations": [
+            "Duration excludes any import/startup before producer startedAt and is not a quiet product-frame verdict.",
+            "App artifact remains 384d4a70; no future merged-artifact acceptance is inferred."
+          ],
+          "currentContractMeasured": false,
+          "historicalReason": "Retained real observations predate the current producer and admission contract; never a current-command timing."
+        }
+      ],
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only."
+    },
+    {
+      "name": "speak-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-speak.mjs",
+        "producerSha256": "fdb0c6273c6562a36604f5c16d60890704c18073f774846eec45c7f67c483bfc",
+        "command": ["node", "prototypes/corridor/tools/verify-speak.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/speak-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-speak.mjs",
+            "sha256": "fdb0c6273c6562a36604f5c16d60890704c18073f774846eec45c7f67c483bfc"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "speak-negatives-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-speak.mjs",
+        "producerSha256": "fdb0c6273c6562a36604f5c16d60890704c18073f774846eec45c7f67c483bfc",
+        "command": ["node", "prototypes/corridor/tools/verify-speak.mjs", "--negatives"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/speak-negatives-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-speak.mjs",
+            "sha256": "fdb0c6273c6562a36604f5c16d60890704c18073f774846eec45c7f67c483bfc"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "vh-sense-controls-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-vh-sense-controls.mjs",
+        "producerSha256": "46531e69bf78ddb5557eabeeb3a42f36ee62b6747c1037eed17d28fd9b7cdf70",
+        "command": ["node", "prototypes/corridor/tools/verify-vh-sense-controls.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/vh-sense-controls-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-vh-sense-controls.mjs",
+            "sha256": "46531e69bf78ddb5557eabeeb3a42f36ee62b6747c1037eed17d28fd9b7cdf70"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "reader-doors-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-reader-doors.mjs",
+        "producerSha256": "ecc9623b42270b0ce02411495503e94c2cedf8ed5e8a94b93a3d5149db999c5a",
+        "command": ["node", "prototypes/corridor/tools/verify-reader-doors.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/reader-doors-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-reader-doors.mjs",
+            "sha256": "ecc9623b42270b0ce02411495503e94c2cedf8ed5e8a94b93a3d5149db999c5a"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "reading-truth-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-reading-truth.mjs",
+        "producerSha256": "450b2f053679bc338b238b2e5a0579d7fc8debe3a60feffc169ed5cb7b51b384",
+        "command": ["node", "prototypes/corridor/tools/verify-reading-truth.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/reading-truth-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-reading-truth.mjs",
+            "sha256": "450b2f053679bc338b238b2e5a0579d7fc8debe3a60feffc169ed5cb7b51b384"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "comb-0-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-comb-0.mjs",
+        "producerSha256": "7a41f868b552c5c88673eed8b8a364b608b4ca16034c70e86265b935092b1dd7",
+        "command": ["node", "prototypes/corridor/tools/verify-comb-0.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/comb-0-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-comb-0.mjs",
+            "sha256": "7a41f868b552c5c88673eed8b8a364b608b4ca16034c70e86265b935092b1dd7"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "sweep-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-sweep.mjs",
+        "producerSha256": "425274d1c80e2bd5dabdd7f815e225e277cb114fe0c6c8ca1dfcac3757f24414",
+        "command": ["node", "prototypes/corridor/tools/verify-sweep.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/sweep-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-sweep.mjs",
+            "sha256": "425274d1c80e2bd5dabdd7f815e225e277cb114fe0c6c8ca1dfcac3757f24414"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "contrast-sweep-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-contrast-sweep.mjs",
+        "producerSha256": "348b87a21aa67f83444d870edf3166efe7fec53bdbd8743d2ea419780f1b06b5",
+        "command": ["node", "prototypes/corridor/tools/verify-contrast-sweep.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/contrast-sweep-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-contrast-sweep.mjs",
+            "sha256": "348b87a21aa67f83444d870edf3166efe7fec53bdbd8743d2ea419780f1b06b5"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "design-reader-shelf-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-design-reader-shelf.mjs",
+        "producerSha256": "153d0196617dc5fa4b81cd7c524962eee8283ca6b5fc524ca5ee42b1cd72701d",
+        "command": ["node", "prototypes/corridor/tools/verify-design-reader-shelf.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/design-reader-shelf-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-design-reader-shelf.mjs",
+            "sha256": "153d0196617dc5fa4b81cd7c524962eee8283ca6b5fc524ca5ee42b1cd72701d"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "vh-voice-controls",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-vh-voice-controls.mjs",
+        "producerSha256": "13b2123bfac7d301fbc131a10707c5e4558bb0019e4d59baec0709a8e7ee7303",
+        "command": ["node", "prototypes/corridor/tools/verify-vh-voice-controls.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/vh-voice-controls"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-vh-voice-controls.mjs",
+            "sha256": "13b2123bfac7d301fbc131a10707c5e4558bb0019e4d59baec0709a8e7ee7303"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "type-ruby",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-type-ruby.mjs",
+        "producerSha256": "d829279e24f3e7da7c49c875b0591ec6fa852e940524cef9a12c51cd2e46f8bc",
+        "command": ["node", "prototypes/corridor/tools/verify-type-ruby.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "all",
+          "KAIRO_EVIDENCE_DIR": "/unused/type-ruby"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-type-ruby.mjs",
+            "sha256": "d829279e24f3e7da7c49c875b0591ec6fa852e940524cef9a12c51cd2e46f8bc"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [
+        {
+          "sampleCount": 3,
+          "medianSeconds": 96,
+          "meanSeconds": 100.333,
+          "maxSeconds": 115,
+          "minSeconds": 90,
+          "successfulMedianSeconds": 115,
+          "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Both engines in one gate (KAIRO_BROWSER=all): site-5 39+57 s and site-6 36+54 s (R1-on-touch-320 red, since fixed), site-9 46+69 s (19/19 each).",
+          "samples": [
+            {
+              "runId": null,
+              "seconds": 96,
+              "status": "failed",
+              "source": "local"
+            },
+            {
+              "runId": null,
+              "seconds": 90,
+              "status": "failed",
+              "source": "local"
+            },
+            {
+              "runId": null,
+              "seconds": 115,
+              "status": "passed",
+              "source": "local"
+            }
+          ],
+          "currentContractMeasured": false,
+          "historicalReason": "INT-VH merge (2026-10-19): local measurements from the INTG3 merge lane (e47b5f2e, the lead's ruling, on 09c9239d) of this gate's producer before VH-1's current contract; kept exactly as observed, never a current-command timing. Both sides added this gate; the merge keeps one entry per gate."
+        }
+      ],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ],
+      "historicalSamples": [
+        {
+          "seconds": 594,
+          "status": "passed",
+          "measurementStatus": "historical-both-engine-command",
+          "currentContractMeasured": false,
+          "assertionCount": 26,
+          "scope": {
+            "scope": "F type and ruby: one ladder (sheets and rendered), one ruby rule, readings at half their word and 10 px or more on touch and always at 320/390/430/1368, never touching, never crossing a line, never meeting a glyph, over their word, moving no line; the deck back the same; glosses 13 px or more; the reader at 200 % text"
+          },
+          "engines": ["chromium", "webkit"],
+          "command": ["node", "prototypes/corridor/tools/verify-type-ruby.mjs"],
+          "environment": {
+            "KAIRO_BROWSER": "all"
+          },
+          "sourceSha": "252fab6a426dfe6d19dbf0c1521e7e289b848dbd",
+          "artifactSha256": "d20473ea79b832539647ab033750e6856ba2d2630a05a5cf48d21e3343b0edb7",
+          "producerSha256": "60ce428aa492fbeb32216738b876a27475693e70213907027bc9a5d0f996c07c",
+          "startedAt": null,
+          "completedAt": null,
+          "startedClockLocal": "13:25:54",
+          "completedClockLocal": "13:35:48",
+          "timingResolutionSeconds": 1,
+          "measurementBoundary": "retained shell date +%s delta for one both-engine command",
+          "processExitCode": 0,
+          "fullAcceptance": null,
+          "receipt": {
+            "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/F/final9/type-ruby-both/type-ruby.json",
+            "sha256": "ef240e4a4d27fb8f28439c7db95bb20e0e6e8450b0516ec7b42fba9998209f94"
+          },
+          "timingEvidence": {
+            "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/F/final9/batch.log",
+            "sha256": "178423247d7223381f6d9f7a7ba374d8080c00ae4014ed98db87e048b3408e89"
+          },
+          "timingLine": "type-ruby-both exit 0 (594s)",
+          "timingLineNumber": 4,
+          "clockProvenance": {
+            "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/F/final9.log",
+            "sha256": "ae2af1af37f99fb498452d077cfae277f16892960499fb10ba2c2ae7d97d18e6"
+          },
+          "commandHarness": {
+            "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/F/tools/run-targeted.sh",
+            "sha256": "7485a22d9a15e1857f53fc69086fe5ca75a26b0d0f556a75e68ed86d674b5891"
+          },
+          "callerScript": {
+            "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/F/tools/final9.sh",
+            "sha256": "b29b25e3e5f9e54c8bae5179e4f64db32fc7b70678e3ef3fdbb44c0d2bbdcc06"
+          },
+          "limitations": [
+            "Historical 26-row contract differs from cad5a167 current 17 assertions per engine plus shared checks; no final contract acceptance inferred.",
+            "Clock-only timestamps have no retained date; no filesystem dates are promoted to run start/end."
+          ]
+        }
+      ]
+    },
+    {
+      "name": "word-saved-answer-mutation-controls",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/test-word-saved-answer.mjs",
+        "producerSha256": "a74a301f9557ab2586ad052e390e429d5f7b6a72d073b7ac1043672762032768",
+        "command": ["node", "prototypes/corridor/tools/test-word-saved-answer.mjs", "--controls"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/word-saved-answer-mutation-controls"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/test-word-saved-answer.mjs",
+            "sha256": "a74a301f9557ab2586ad052e390e429d5f7b6a72d073b7ac1043672762032768"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "continuity",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-continuity.mjs",
+        "producerSha256": "69f587fb9edf3af6c8b44f9d7a9cde914217c375871b03aa01df7c8abcceb3f4",
+        "command": ["node", "prototypes/corridor/tools/verify-continuity.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "all",
+          "KAIRO_EVIDENCE_DIR": "/unused/continuity"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-continuity.mjs",
+            "sha256": "69f587fb9edf3af6c8b44f9d7a9cde914217c375871b03aa01df7c8abcceb3f4"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [
+        {
+          "sampleCount": 2,
+          "medianSeconds": 88.0,
+          "meanSeconds": 88.0,
+          "maxSeconds": 88,
+          "minSeconds": 88,
+          "successfulMedianSeconds": 88,
+          "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Both engines in one gate (KAIRO_BROWSER=all): site-5 41+47 s (Chromium H1b red once, green on rerun), site-6 40+48 s.",
+          "samples": [
+            {
+              "runId": null,
+              "seconds": 88,
+              "status": "failed",
+              "source": "local"
+            },
+            {
+              "runId": null,
+              "seconds": 88,
+              "status": "passed",
+              "source": "local"
+            }
+          ],
+          "currentContractMeasured": false,
+          "historicalReason": "INT-VH merge (2026-10-19): local measurements from the INTG3 merge lane (e47b5f2e, the lead's ruling, on 09c9239d) of this gate's producer before VH-1's current contract; kept exactly as observed, never a current-command timing. Both sides added this gate; the merge keeps one entry per gate."
+        }
+      ],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "sense-truth",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-sense-truth.mjs",
+        "producerSha256": "71e37adfc68e23fd2c799e8baf62614de2be2e072d9f5886fae52fd98199b0cd",
+        "command": ["node", "prototypes/corridor/tools/verify-sense-truth.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/sense-truth"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-sense-truth.mjs",
+            "sha256": "71e37adfc68e23fd2c799e8baf62614de2be2e072d9f5886fae52fd98199b0cd"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [
+        {
+          "sampleCount": 3,
+          "medianSeconds": 956,
+          "meanSeconds": 1042.0,
+          "maxSeconds": 1279,
+          "minSeconds": 891,
+          "successfulMedianSeconds": 923.5,
+          "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Chromium: site-5 1279 s (three rows timed out under load, before G3's ladder port), then 956 s, site-6 891 s.",
+          "samples": [
+            {
+              "runId": null,
+              "seconds": 1279,
+              "status": "failed",
+              "source": "local"
+            },
+            {
+              "runId": null,
+              "seconds": 956,
+              "status": "passed",
+              "source": "local"
+            },
+            {
+              "runId": null,
+              "seconds": 891,
+              "status": "passed",
+              "source": "local"
+            }
+          ],
+          "currentContractMeasured": false,
+          "historicalReason": "INT-VH merge (2026-10-19): local measurements from the INTG3 merge lane (e47b5f2e, the lead's ruling, on 09c9239d) of this gate's producer before VH-1's current contract; kept exactly as observed, never a current-command timing. Both sides added this gate; the merge keeps one entry per gate."
+        }
+      ],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "sense-truth-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-sense-truth.mjs",
+        "producerSha256": "71e37adfc68e23fd2c799e8baf62614de2be2e072d9f5886fae52fd98199b0cd",
+        "command": ["node", "prototypes/corridor/tools/verify-sense-truth.mjs"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/sense-truth-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-sense-truth.mjs",
+            "sha256": "71e37adfc68e23fd2c799e8baf62614de2be2e072d9f5886fae52fd98199b0cd"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [
+        {
+          "sampleCount": 2,
+          "medianSeconds": 1372.0,
+          "meanSeconds": 1372.0,
+          "maxSeconds": 1427,
+          "minSeconds": 1317,
+          "successfulMedianSeconds": 1372.0,
+          "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. WebKit: site-5 1427 s, site-6 1317 s.",
+          "samples": [
+            {
+              "runId": null,
+              "seconds": 1427,
+              "status": "passed",
+              "source": "local"
+            },
+            {
+              "runId": null,
+              "seconds": 1317,
+              "status": "passed",
+              "source": "local"
+            }
+          ],
+          "currentContractMeasured": false,
+          "historicalReason": "INT-VH merge (2026-10-19): local measurements from the INTG3 merge lane (e47b5f2e, the lead's ruling, on 09c9239d) of this gate's producer before VH-1's current contract; kept exactly as observed, never a current-command timing. Both sides added this gate; the merge keeps one entry per gate."
+        }
+      ],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "word-grammar",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-word-grammar.mjs",
+        "producerSha256": "4dda5d29919c9e01375a0c2396e9b946621fab0895fbf083458f63525e449748",
+        "command": ["node", "prototypes/corridor/tools/verify-word-grammar.mjs", "--controls"],
+        "environment": {
+          "KAIRO_BROWSER": "chromium",
+          "KAIRO_EVIDENCE_DIR": "/unused/word-grammar"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-word-grammar.mjs",
+            "sha256": "4dda5d29919c9e01375a0c2396e9b946621fab0895fbf083458f63525e449748"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [
+        {
+          "sampleCount": 3,
+          "medianSeconds": 1277,
+          "meanSeconds": 1282.0,
+          "maxSeconds": 1309,
+          "minSeconds": 1260,
+          "successfulMedianSeconds": null,
+          "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. Chromium, run with --controls --g5-controls (the gate runs --controls): site-5 1309 s and 1277 s, site-6 1260 s; each red on one row since fixed, none a timeout.",
+          "samples": [
+            {
+              "runId": null,
+              "seconds": 1309,
+              "status": "failed",
+              "source": "local"
+            },
+            {
+              "runId": null,
+              "seconds": 1277,
+              "status": "failed",
+              "source": "local"
+            },
+            {
+              "runId": null,
+              "seconds": 1260,
+              "status": "failed",
+              "source": "local"
+            }
+          ],
+          "currentContractMeasured": false,
+          "historicalReason": "INT-VH merge (2026-10-19): local measurements from the INTG3 merge lane (e47b5f2e, the lead's ruling, on 09c9239d) of this gate's producer before VH-1's current contract; kept exactly as observed, never a current-command timing. Both sides added this gate; the merge keeps one entry per gate."
+        }
+      ],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "word-grammar-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-word-grammar.mjs",
+        "producerSha256": "4dda5d29919c9e01375a0c2396e9b946621fab0895fbf083458f63525e449748",
+        "command": ["node", "prototypes/corridor/tools/verify-word-grammar.mjs", "--controls"],
+        "environment": {
+          "KAIRO_BROWSER": "webkit",
+          "KAIRO_EVIDENCE_DIR": "/unused/word-grammar-webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-word-grammar.mjs",
+            "sha256": "4dda5d29919c9e01375a0c2396e9b946621fab0895fbf083458f63525e449748"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "historicalMeasurements": [
+        {
+          "sampleCount": 3,
+          "medianSeconds": 1521,
+          "meanSeconds": 1518.0,
+          "maxSeconds": 1530,
+          "minSeconds": 1503,
+          "successfulMedianSeconds": null,
+          "provenance": "LOCAL measurement, INTG3 merge lane, 2026-10-18/19, Apple silicon M5, node v22.23.3, under fleet load 7-15. No CI run has executed this gate in this form yet, so these are not GitHub receipts and must be replaced by the first battery's own numbers. WebKit, run with --controls --g5-controls (the gate runs --controls): site-5 1521 s and 1530 s, site-6 1503 s; red on the headless frame-timing proxies under load (FULL's quiet run judges those), none a timeout. No local run passed, so successfulMedianSeconds is null.",
+          "samples": [
+            {
+              "runId": null,
+              "seconds": 1521,
+              "status": "failed",
+              "source": "local"
+            },
+            {
+              "runId": null,
+              "seconds": 1530,
+              "status": "failed",
+              "source": "local"
+            },
+            {
+              "runId": null,
+              "seconds": 1503,
+              "status": "failed",
+              "source": "local"
+            }
+          ],
+          "currentContractMeasured": false,
+          "historicalReason": "INT-VH merge (2026-10-19): local measurements from the INTG3 merge lane (e47b5f2e, the lead's ruling, on 09c9239d) of this gate's producer before VH-1's current contract; kept exactly as observed, never a current-command timing. Both sides added this gate; the merge keeps one entry per gate."
+        }
+      ],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "ci-contracts",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "scripts/ci/battery.test.mjs",
+        "producerSha256": "128c2bcc0edd58dcaaaec934d337798d034742a0afa68df3dfc7c6735d19d21b",
+        "command": [
+          "node",
+          "--test",
+          "scripts/ci/battery.test.mjs",
+          "scripts/ci/receipts.test.mjs",
+          "scripts/ci/ledger.test.mjs",
+          "scripts/ci/verification-admission.test.mjs",
+          "scripts/ci/gate-evidence.test.mjs",
+          "scripts/ci/framework-receipt.test.mjs",
+          "scripts/ci/gate-roster-coverage.test.mjs",
+          "scripts/ci/vh-assessment-report-contracts.test.mjs",
+          "scripts/ci/vh-deck-report-contracts.test.mjs",
+          "scripts/ci/vh-existing-report-contracts.test.mjs",
+          "scripts/ci/vh-learning-report-contracts.test.mjs",
+          "scripts/ci/vh-media-report-contracts.test.mjs",
+          "scripts/ci/vh-misc-report-contracts.test.mjs",
+          "scripts/ci/vh-python-report-contracts.test.mjs",
+          "scripts/ci/vh-retained-report-contracts.test.mjs",
+          "scripts/ci/vh-visual-report-contracts.test.mjs",
+          "scripts/ci/vh-voice-report-contracts.test.mjs",
+          "prototypes/corridor/tools/test-vh-type-ruby-controls.mjs",
+          "prototypes/corridor/tools/vh-word-grammar-contracts.test.mjs",
+          "prototypes/corridor/tools/vh-learning-contracts.test.mjs",
+          "prototypes/corridor/tools/vh-learning-reader-receipt.test.mjs",
+          "prototypes/corridor/tools/vh-contrast-arrival.test.mjs",
+          "prototypes/corridor/tools/vh-visual-contracts.test.mjs",
+          "prototypes/corridor/tools/test-vh-voice-contracts.mjs",
+          "scripts/release/release.test.mjs"
+        ],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/ci-contracts"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "scripts/ci/battery.test.mjs",
+            "sha256": "128c2bcc0edd58dcaaaec934d337798d034742a0afa68df3dfc7c6735d19d21b"
+          },
+          {
+            "path": "scripts/ci/receipts.test.mjs",
+            "sha256": "e1fb6348a8c1b9c73fae56e7b89dd52e8d9339830845fb776ec2e749acdd4cdf"
+          },
+          {
+            "path": "scripts/ci/ledger.test.mjs",
+            "sha256": "59a242ae3900022c4317e9ceccdbe1e574037cc73bf8bd8a2ce546fbabc9282d"
+          },
+          {
+            "path": "scripts/ci/verification-admission.test.mjs",
+            "sha256": "80142de2792df9c09328f4d73ec9198e6a8d4714bdd25a12b7eed2c4819f984c"
+          },
+          {
+            "path": "scripts/ci/gate-evidence.test.mjs",
+            "sha256": "51355eda67a4ccfa628324f1eb94315b861c4d58993f367e52ad6cc40243e978"
+          },
+          {
+            "path": "scripts/ci/framework-receipt.test.mjs",
+            "sha256": "585de76cb7ac743134ce9baa6163f24f137c3e8e544e44b11e0f94cb38d4a19d"
+          },
+          {
+            "path": "scripts/ci/gate-roster-coverage.test.mjs",
+            "sha256": "fefc37cfb612e73940fdd7a314da274a81b7040cdca548feb7a8bf103b4ecf0a"
+          },
+          {
+            "path": "scripts/ci/vh-assessment-report-contracts.test.mjs",
+            "sha256": "b7d09c8dbfb40d1e788b8735c20b77e1cbf5cb6b2642d204afc563f2072656b1"
+          },
+          {
+            "path": "scripts/ci/vh-deck-report-contracts.test.mjs",
+            "sha256": "8977cfdd3015718116dff05a8dd4466ef37f947dcb66736cefca1cf0bc67a371"
+          },
+          {
+            "path": "scripts/ci/vh-existing-report-contracts.test.mjs",
+            "sha256": "08baa5c5c62b4a3c97699a7c42a90ce21de544b59dde89babe1cb22f9f851d01"
+          },
+          {
+            "path": "scripts/ci/vh-learning-report-contracts.test.mjs",
+            "sha256": "4209db0ff7d4637ab94d28625b3cb77a7ab0575dcc703d6b33befe2dc32e3257"
+          },
+          {
+            "path": "scripts/ci/vh-media-report-contracts.test.mjs",
+            "sha256": "cf643662cc84d5a6238ff44c858880ca648b3dc1e3f187d56d1773f577e2701e"
+          },
+          {
+            "path": "scripts/ci/vh-misc-report-contracts.test.mjs",
+            "sha256": "170b92ac2c318016d3aea68f27a0ab4a9f0e66e19d0e2f9c4c3d480f572b1785"
+          },
+          {
+            "path": "scripts/ci/vh-python-report-contracts.test.mjs",
+            "sha256": "2e02992e6526a926b13a55e086d8a28067805d751dd1dc0706663976345c49fc"
+          },
+          {
+            "path": "scripts/ci/vh-retained-report-contracts.test.mjs",
+            "sha256": "03c9f818ec4b07cfbd215992b7950aa946b8dc341edcbf736e1bd1e0b782ab04"
+          },
+          {
+            "path": "scripts/ci/vh-visual-report-contracts.test.mjs",
+            "sha256": "751b6e54b8e83b76a1b9d25b613684f682e08fdc09694609ad7ea1f372b49748"
+          },
+          {
+            "path": "scripts/ci/vh-voice-report-contracts.test.mjs",
+            "sha256": "83c673b95869185f72882aa54f33d7be726333dffa3473543aab60d21dac1e58"
+          },
+          {
+            "path": "prototypes/corridor/tools/test-vh-type-ruby-controls.mjs",
+            "sha256": "28eee8b8fcd80979b1ddbae52e97f87b8660d5663e20d97872b0c00c29c06f39"
+          },
+          {
+            "path": "prototypes/corridor/tools/vh-word-grammar-contracts.test.mjs",
+            "sha256": "d4d3e3c213f80fe3e686045d82a4d3248d27bd3d67da98ee5dab584518cece44"
+          },
+          {
+            "path": "prototypes/corridor/tools/vh-learning-contracts.test.mjs",
+            "sha256": "371d301d21e0155262eb0ffb4da7fab9a091fc761a08175d61083f97a4f9cc8b"
+          },
+          {
+            "path": "prototypes/corridor/tools/vh-learning-reader-receipt.test.mjs",
+            "sha256": "8bd2ffd44c2a601dd21f2b497aab01e25131a254fb453840f2f003e1bb873f15"
+          },
+          {
+            "path": "prototypes/corridor/tools/vh-contrast-arrival.test.mjs",
+            "sha256": "1fb2ee5c8f724faca0397274dcce48668ef8502ce8e47eba84fd1cbf84d7c40d"
+          },
+          {
+            "path": "prototypes/corridor/tools/vh-visual-contracts.test.mjs",
+            "sha256": "42411ca09c5783bcf0d725d0f6721ed1ec10a5c05e005040945773c415cf8350"
+          },
+          {
+            "path": "prototypes/corridor/tools/test-vh-voice-contracts.mjs",
+            "sha256": "f0d3b681a925aec6a80b533f5faa60ce858844d1aeebfbb042c1b95d2e5577f8"
+          },
+          {
+            "path": "scripts/release/release.test.mjs",
+            "sha256": "472e281f11dd4a273f59b1fa8dc69d9d29fc6b42d1535615ebf7376adaf7407e"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "deck-frozen-build",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "scripts/ci/deck-frozen.mjs",
+        "producerSha256": "dbd9b1b6144369f08ae0525641533569cec6baf4a05e4e54dcf374d1f22acee6",
+        "command": ["node", "scripts/ci/deck-frozen.mjs"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/deck-frozen-build"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "scripts/ci/deck-frozen.mjs",
+            "sha256": "dbd9b1b6144369f08ae0525641533569cec6baf4a05e4e54dcf374d1f22acee6"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "deck-gloss-ja",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "scripts/ci/python-deck.mjs",
+        "producerSha256": "2f2e1b9b288bf66bbde0bd4f1281699875170d86addc27d6810deefff81e521a",
+        "command": ["node", "scripts/ci/python-deck.mjs", "test_gloss_ja.py"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/deck-gloss-ja"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "scripts/ci/python-deck.mjs",
+            "sha256": "2f2e1b9b288bf66bbde0bd4f1281699875170d86addc27d6810deefff81e521a"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "deck-export-mcd",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "scripts/ci/python-deck.mjs",
+        "producerSha256": "2f2e1b9b288bf66bbde0bd4f1281699875170d86addc27d6810deefff81e521a",
+        "command": ["node", "scripts/ci/python-deck.mjs", "test_export_mcd.py"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/deck-export-mcd"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "scripts/ci/python-deck.mjs",
+            "sha256": "2f2e1b9b288bf66bbde0bd4f1281699875170d86addc27d6810deefff81e521a"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "deck-player-browser",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-kotoba-mine.mjs",
+        "producerSha256": "13b5b3b7dec0e967326f3226d5ee39100fc8bce240c762d251a782d3f1b17edb",
+        "command": ["node", "prototypes/corridor/tools/verify-kotoba-mine.mjs"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/deck-player-browser"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-kotoba-mine.mjs",
+            "sha256": "13b5b3b7dec0e967326f3226d5ee39100fc8bce240c762d251a782d3f1b17edb"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "deck-segment-overrides",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/test_segment_overrides.py",
+        "producerSha256": "87200e9811ee378a3dd3b866fb25f01c445bf0d9f464c320e8bc461c7e0f2322",
+        "command": ["python3", "prototypes/corridor/tools/test_segment_overrides.py"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/deck-segment-overrides"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/test_segment_overrides.py",
+            "sha256": "87200e9811ee378a3dd3b866fb25f01c445bf0d9f464c320e8bc461c7e0f2322"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "n2n1-decks-browser",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-n2n1-decks.mjs",
+        "producerSha256": "792433334601df6c284db3c65ca83ee549fdf70854bfc2c59302f785ca7baf8c",
+        "command": ["node", "prototypes/corridor/tools/verify-n2n1-decks.mjs"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/n2n1-decks-browser"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-n2n1-decks.mjs",
+            "sha256": "792433334601df6c284db3c65ca83ee549fdf70854bfc2c59302f785ca7baf8c"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "places-layout",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-places-layout.mjs",
+        "producerSha256": "fa76845aa0e74506e2837845327859b1fb9e292115c5dfa0e71075c1f87fa7ba",
+        "command": ["node", "prototypes/corridor/tools/verify-places-layout.mjs"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/places-layout"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-places-layout.mjs",
+            "sha256": "fa76845aa0e74506e2837845327859b1fb9e292115c5dfa0e71075c1f87fa7ba"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "report-delivery",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-report-delivery.mjs",
+        "producerSha256": "c812846ceb214792b18d0be79a0661c76c48570423bd9b044430d8f3dbd5643c",
+        "command": ["node", "prototypes/corridor/tools/verify-report-delivery.mjs"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/report-delivery",
+          "KAIRO_BROWSER": "all"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-report-delivery.mjs",
+            "sha256": "c812846ceb214792b18d0be79a0661c76c48570423bd9b044430d8f3dbd5643c"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "report-relay",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "services/report-relay/test/worker.test.mjs",
+        "producerSha256": "758104ec20a05afcf8fc9aaca65d7f97397c48e5cd3907ddde76196b00d59ae8",
+        "command": ["node", "--test", "services/report-relay/test/worker.test.mjs"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/report-relay"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "services/report-relay/test/worker.test.mjs",
+            "sha256": "758104ec20a05afcf8fc9aaca65d7f97397c48e5cd3907ddde76196b00d59ae8"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "redesign-language",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "tools/lint-ui-language.mjs",
+        "producerSha256": "78820dd43ce16ee9cc40cb1f22747a6001b80ede473f09962180e038dabc9c93",
+        "command": ["node", "tools/lint-ui-language.mjs", "--screenshots", "--both-languages"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/redesign-language"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "tools/lint-ui-language.mjs",
+            "sha256": "78820dd43ce16ee9cc40cb1f22747a6001b80ede473f09962180e038dabc9c93"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "redesign-foundation",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "tools/verify-redesign-foundation.mjs",
+        "producerSha256": "c6de4e775ed92380b79c835c4104b40dc94627b1b8e3ae084b0aba678c42ba04",
+        "command": ["node", "tools/verify-redesign-foundation.mjs"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/redesign-foundation",
+          "KAIRO_BROWSER": "all"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "tools/verify-redesign-foundation.mjs",
+            "sha256": "c6de4e775ed92380b79c835c4104b40dc94627b1b8e3ae084b0aba678c42ba04"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "redesign-docks",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "tools/verify-redesign-docks.mjs",
+        "producerSha256": "dc2e1ee837d4316697f2128c322733317b73c206d8f6bfa4a0ebd6c7be9e72a8",
+        "command": ["node", "tools/verify-redesign-docks.mjs"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/redesign-docks",
+          "KAIRO_BROWSER": "all"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "tools/verify-redesign-docks.mjs",
+            "sha256": "dc2e1ee837d4316697f2128c322733317b73c206d8f6bfa4a0ebd6c7be9e72a8"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "personal-collections-contract",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/test-personal-collections.mjs",
+        "producerSha256": "aaeac8a50f45af4c6033b4d616c71bbc73d35c5a40e19d87a514ce65b236a2d1",
+        "command": ["node", "prototypes/corridor/tools/test-personal-collections.mjs"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/personal-collections-contract"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/test-personal-collections.mjs",
+            "sha256": "aaeac8a50f45af4c6033b4d616c71bbc73d35c5a40e19d87a514ce65b236a2d1"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "personal-host-bridge",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/decks/personal/tests/host-bridge.test.mjs",
+        "producerSha256": "c0d376a7cf80c498585b6a5b53e85b8953bed1185dee783159aa42ecaa0f30de",
+        "command": [
+          "node",
+          "--test",
+          "prototypes/corridor/decks/personal/tests/host-bridge.test.mjs"
+        ],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/personal-host-bridge"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/decks/personal/tests/host-bridge.test.mjs",
+            "sha256": "c0d376a7cf80c498585b6a5b53e85b8953bed1185dee783159aa42ecaa0f30de"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "personal-collections-browser",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-personal-collections.mjs",
+        "producerSha256": "ec386c9646c2d126c95f0abe163c56cb505bd3e0d0c1c9d9b0b5ea116386126f",
+        "command": ["node", "prototypes/corridor/tools/verify-personal-collections.mjs"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/personal-collections-browser",
+          "PERSONAL_QA_OUT": "/unused/personal-collections-browser",
+          "PERSONAL_BROWSERS": "chromium,webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-personal-collections.mjs",
+            "sha256": "ec386c9646c2d126c95f0abe163c56cb505bd3e0d0c1c9d9b0b5ea116386126f"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "personal-host-chromium",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-personal-host.mjs",
+        "producerSha256": "23d92fdce1a0bff59cee552f8f3b3a1099655dcc05635e1d14a7997d9f4b269d",
+        "command": ["node", "prototypes/corridor/tools/verify-personal-host.mjs"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/personal-host-chromium"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-personal-host.mjs",
+            "sha256": "23d92fdce1a0bff59cee552f8f3b3a1099655dcc05635e1d14a7997d9f4b269d"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "personal-host-webkit",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-personal-host.mjs",
+        "producerSha256": "23d92fdce1a0bff59cee552f8f3b3a1099655dcc05635e1d14a7997d9f4b269d",
+        "command": ["node", "prototypes/corridor/tools/verify-personal-host.mjs"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/personal-host-webkit",
+          "PERSONAL_HOST_BROWSER": "webkit"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-personal-host.mjs",
+            "sha256": "23d92fdce1a0bff59cee552f8f3b3a1099655dcc05635e1d14a7997d9f4b269d"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "experience-require-skip",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/verify-experience.mjs",
+        "producerSha256": "f873b1bf816878e36f98dfd4d04e26985d3ca34acbe3e9e211af148d4f8b2625",
+        "command": ["node", "prototypes/corridor/tools/verify-experience.mjs", "--require-skip"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/experience-require-skip"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/verify-experience.mjs",
+            "sha256": "f873b1bf816878e36f98dfd4d04e26985d3ca34acbe3e9e211af148d4f8b2625"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "legacy-drift-storage",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/drift/tools/verify-storage-integrity.mjs",
+        "producerSha256": "9d26b33981a38044271ec2500210139145b6c10d1154be13ba0c8b90588e4c18",
+        "command": [
+          "node",
+          "prototypes/drift/tools/verify-storage-integrity.mjs",
+          "--out",
+          "/unused/legacy-drift-storage/report.json"
+        ],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/legacy-drift-storage"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/drift/tools/verify-storage-integrity.mjs",
+            "sha256": "9d26b33981a38044271ec2500210139145b6c10d1154be13ba0c8b90588e4c18"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "runtime-syntax",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "scripts/ci/runtime-syntax.mjs",
+        "producerSha256": "f319257f124477cf594dc44bdc73fdff8bf9197c10a4f33dbc79c7c8ef5870bb",
+        "command": ["node", "scripts/ci/runtime-syntax.mjs"],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/runtime-syntax"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "scripts/ci/runtime-syntax.mjs",
+            "sha256": "f319257f124477cf594dc44bdc73fdff8bf9197c10a4f33dbc79c7c8ef5870bb"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
+    },
+    {
+      "name": "standalone-build",
+      "measurementStatus": "unmeasured",
+      "currentContract": {
+        "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+        "producerBytesBasis": "Final VH-1 working tree on the parent; producer bytes pinned by SHA-256, not falsely attributed to the parent commit.",
+        "producer": "prototypes/corridor/tools/build-standalone.mjs",
+        "producerSha256": "947e3e180056a31a48822aaf57cf637caf03cda73ed4f1e364086940519937e1",
+        "command": [
+          "node",
+          "prototypes/corridor/tools/build-standalone.mjs",
+          "/unused/bunki-standalone.html"
+        ],
+        "environment": {
+          "KAIRO_EVIDENCE_DIR": "/unused/standalone-build"
+        },
+        "pathPlaceholder": "/unused is the evidence-root placeholder used to enumerate the canonical schedule.",
+        "declaredFileInputs": [
+          {
+            "path": "prototypes/corridor/tools/build-standalone.mjs",
+            "sha256": "947e3e180056a31a48822aaf57cf637caf03cda73ed4f1e364086940519937e1"
+          }
+        ]
+      },
+      "sampleCount": 0,
+      "samples": [],
+      "wrapperWallTimeMeasured": false,
+      "measurementObligation": "FULL measures the current canonical command, engine and complete controls on the pinned combined artifact.",
+      "unmeasuredReason": "No retained real completed measurement binds this current complete command and producer/admission contract. Earlier observations, where available, are historical only.",
+      "limitations": [
+        "No numeric sample or summary statistic is supplied for this current unmeasured contract.",
+        "Historical samples and registry source receipts remain intact; no summed engines, estimated or failed-run value is promoted."
+      ]
     }
-  ]
+  ],
+  "vh1EvidenceCatalog": {
+    "path": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/H/codex-H1/VH1/TIMING-EVIDENCE-CATALOG.json",
+    "sha256": "855dbef053bbb4608a6d24a9146307363be11a794b26d324427d26fa0dc41be5",
+    "registrySha": "cad5a167964d611d70fe6c1ccf9d0e270f40c5cb",
+    "newGateCount": 21,
+    "additionalExistingGate": "type-ruby",
+    "measuredProducerIntervalCount": 2,
+    "unmeasuredCurrentContractCount": 20,
+    "rejectedProposal": "INTG3/gate-timings.PROPOSAL.json sums separate engine runs and includes failed components; those values are not adopted.",
+    "catalogScope": "Historical catalog at cad5a167; original counts describe that catalog only. currentRefresh describes the current registry.",
+    "currentRefresh": {
+      "producerBytesParent": "5f6c2055c200513257dce95a45c91a289ce961eb",
+      "scheduleSha256": "400bf0dc655fbcc836671fee134f764de7c964d669a7f448be8f7f663486f84a",
+      "requiredGateCount": 189,
+      "newMissingEntries": [
+        "word-saved-answer-mutation-controls",
+        "continuity",
+        "sense-truth",
+        "sense-truth-webkit",
+        "word-grammar",
+        "word-grammar-webkit",
+        "ci-contracts",
+        "deck-frozen-build",
+        "deck-gloss-ja",
+        "deck-export-mcd",
+        "deck-player-browser",
+        "deck-segment-overrides",
+        "n2n1-decks-browser",
+        "places-layout",
+        "report-delivery",
+        "report-relay",
+        "redesign-language",
+        "redesign-foundation",
+        "redesign-docks",
+        "personal-collections-contract",
+        "personal-host-bridge",
+        "personal-collections-browser",
+        "personal-host-chromium",
+        "personal-host-webkit",
+        "experience-require-skip",
+        "legacy-drift-storage",
+        "runtime-syntax",
+        "standalone-build"
+      ],
+      "demotedPriorMeasurements": [
+        "teacher-drafts-integration",
+        "record-depth",
+        "record-depth-webkit"
+      ],
+      "currentUnmeasuredCount": 51,
+      "unchangedLegacyObjects": 138,
+      "newMeasuredValues": 0
+    }
+  }
 }

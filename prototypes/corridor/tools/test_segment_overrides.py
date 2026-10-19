@@ -18,6 +18,10 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[2]
+sys.path.insert(0, str(ROOT / "scripts" / "ci"))
+from vh_python_receipts import CheckReceipt  # noqa: E402
+REPORT = CheckReceipt("deck-segment-overrides", __file__, ROOT)
 sys.path.insert(0, str(HERE))
 import build_corridor as bc  # noqa: E402
 import fugashi  # noqa: E402
@@ -27,6 +31,7 @@ FAILS: list[str] = []
 
 
 def ok(name: str, cond: bool, detail: str = "") -> None:
+    REPORT.record(name, cond, detail)
     print(f"{'  ok  ' if cond else ' FAIL '} {name}{'  — ' + detail if detail and not cond else ''}")
     if not cond:
         FAILS.append(name)
@@ -90,4 +95,5 @@ finally:
     bc.SEGMENT_OVERRIDES_PATH, bc._SEGMENT_OVERRIDES = real_path, real
 
 print(f"\n{'all checks green' if not FAILS else f'{len(FAILS)} failing'}")
-sys.exit(1 if FAILS else 0)
+receipt_ok = REPORT.complete()
+sys.exit(1 if FAILS or not receipt_ok else 0)

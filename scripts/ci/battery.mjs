@@ -15,8 +15,19 @@ import {
 import { homedir } from 'node:os';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { batteryGates, runGates, verifyArtifact } from '../verify-release-gates.mjs';
+import { batteryGates, gateTimeoutMs, runGates, verifyArtifact } from '../verify-release-gates.mjs';
 import { supplementalGates } from './supplemental.mjs';
+import { requireGateAttemptEvidence } from './verification-admission.mjs';
+import { plannedProofContract } from './gate-evidence.mjs';
+import { parse as parseYaml } from 'yaml';
+import {
+  budgetFits,
+  scheduledBudget,
+  requireScheduledBudget,
+  shardMatrix,
+  validateWorkflowSchedule,
+} from './scheduling-budgets.mjs';
+export { shardMatrix, validateWorkflowSchedule } from './scheduling-budgets.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const NOW = () => new Date().toISOString();
@@ -153,12 +164,25 @@ export function createPlan({
   };
   const all = [...gates, ...supplemental];
   const shards = [];
+  const budgetsFor = (items, id = 'balanced-pending') => {
+    const shard = { id, gates: items.map((g) => g.name) };
+    return items.map((g) => ({
+      name: g.name,
+      timeoutMs: gateTimeoutMs(gateForShard(g, shard, {}).timeoutMs),
+    }));
+  };
+  const fits = (items) => budgetFits(budgetsFor(items));
   const add = (id, kind, items) =>
     shards.push({
       id,
       kind,
       gates: items.map((g) => g.name),
       predictedSeconds: items.reduce((sum, g) => sum + weight(g.name), 0),
+      predictionKind: 'scheduling-estimate-not-validation',
+      estimatedWeightNames: items
+        .filter((g) => !Number.isFinite(weights.get(g.name)) || weights.get(g.name) <= 0)
+        .map((g) => g.name),
+      budget: scheduledBudget(budgetsFor(items, id)),
       browsers:
         kind === 'fast' && !items.some((g) => g.name === 'vitest')
           ? []
@@ -168,9 +192,13 @@ export function createPlan({
               ? ['webkit']
               : ['chromium', 'webkit'],
       e2e: items.some((g) => g.name === 'e2e'),
-      corpus: items.some((g) => ['corpus-pytest', 'reading-facets'].includes(g.name)),
+      corpus: items.some((g) =>
+        ['corpus-pytest', 'reading-facets', 'ci-contracts'].includes(g.name),
+      ),
       python: items.some(
-        (g) => DECKS.has(g.name) || ['corpus-pytest', 'reading-facets', 'vitest'].includes(g.name),
+        (g) =>
+          DECKS.has(g.name) ||
+          ['corpus-pytest', 'reading-facets', 'vitest', 'ci-contracts'].includes(g.name),
       ),
     });
   const fast = all.filter((g) => FAST.has(g.name) && !DECKS.has(g.name));
@@ -181,8 +209,14 @@ export function createPlan({
   for (const g of fast.sort(
     (a, b) => weight(b.name) - weight(a.name) || a.name.localeCompare(b.name),
   )) {
-    let i = loads.indexOf(Math.min(...loads));
-    if (loads[i] + weight(g.name) > 240) {
+    assert(fits([g]), `Gate ${g.name} cannot fit the hosted execution limit`);
+    const eligible = bins
+      .map((bin, i) => i)
+      .filter(
+        (i) => fits([...bins[i], g]) && (!bins[i].length || loads[i] + weight(g.name) <= 240),
+      );
+    let i = eligible.sort((a, b) => loads[a] - loads[b] || a - b)[0];
+    if (i === undefined) {
       i = bins.length;
       bins.push([]);
       loads.push(0);
@@ -219,7 +253,17 @@ export function createPlan({
         b.reduce((s, g) => s + weight(g.name), 0) - a.reduce((s, g) => s + weight(g.name), 0) ||
         a[0].name.localeCompare(b[0].name),
     )) {
-      const i = seconds.indexOf(Math.min(...seconds));
+      assert(
+        fits(unit),
+        `Gate group ${unit.map((g) => g.name).join(',')} cannot fit the hosted execution limit`,
+      );
+      const eligible = balanced.map((bin, i) => i).filter((i) => fits([...balanced[i], ...unit]));
+      let i = eligible.sort((a, b) => seconds[a] - seconds[b] || a - b)[0];
+      if (i === undefined) {
+        i = balanced.length;
+        balanced.push([]);
+        seconds.push(0);
+      }
       balanced[i].push(...unit);
       seconds[i] += unit.reduce((s, g) => s + weight(g.name), 0);
     }
@@ -241,6 +285,7 @@ export function createPlan({
   validatePlan(plan, {
     canonical: gates.map((g) => g.name),
     supplemental: supplemental.map((g) => g.name),
+    descriptors: all,
   });
   return plan;
 }
@@ -249,6 +294,7 @@ export function validatePlan(
   {
     canonical = batteryGates('/unused', {}).map((g) => g.name),
     supplemental = supplementalGates('/unused').map((g) => g.name),
+    descriptors = [...batteryGates('/unused', {}), ...supplementalGates('/unused')],
   } = {},
 ) {
   assert.equal(plan.schemaVersion, 1);
@@ -276,6 +322,14 @@ export function validatePlan(
     assert(/^[a-z][a-z0-9-]*$/.test(s.id));
     assert(s.gates.length > 0);
     assert(['fast', 'battery'].includes(s.kind));
+    requireScheduledBudget(
+      s,
+      s.gates.map((name) => {
+        const gate = descriptors.find((g) => g.name === name);
+        assert(gate, `Unknown gate budget: ${name}`);
+        return { name, timeoutMs: gateTimeoutMs(gateForShard(gate, s, {}).timeoutMs) };
+      }),
+    );
   }
   for (const shard of plan.shards) {
     assert.equal(
@@ -295,10 +349,15 @@ export function validatePlan(
         [name],
         'Dedicated history shard changed',
       );
+    const balanced = plan.shards.filter((s) => s.id.startsWith('balanced-'));
+    assert(balanced.length >= 10, 'Balanced lanes omitted');
     exact(
-      plan.shards.filter((s) => s.id.startsWith('balanced-')).map((s) => s.id),
-      Array.from({ length: 10 }, (_, i) => `balanced-${String(i + 1).padStart(2, '0')}`),
-      'Balanced shard count changed',
+      balanced.map((s) => s.id),
+      Array.from(
+        { length: balanced.length },
+        (_, i) => `balanced-${String(i + 1).padStart(2, '0')}`,
+      ),
+      'Balanced shard sequence changed',
     );
     const e2e = plan.shards.find((s) => s.gates.includes('e2e'));
     assert(
@@ -306,6 +365,11 @@ export function validatePlan(
       'E2E requires its colocated earlier build',
     );
   }
+  equal(
+    plan.shards.find((s) => s.id === 'fast-decks')?.gates,
+    [...DECKS],
+    'Frozen deck order changed',
+  );
   exact(
     plan.requiredJobs,
     plan.scope === 'full' ? ['build', 'native'] : ['build'],
@@ -499,6 +563,10 @@ export async function executeShard({
       assert(gate, 'Unknown gate');
       return gateForShard(gate, shard, artifactEnv);
     });
+    requireScheduledBudget(
+      retryShard || shard,
+      selected.map((g) => ({ name: g.name, timeoutMs: gateTimeoutMs(g.timeoutMs) })),
+    );
     // Each verifier owns its evidence directory. Several require it to be absent
     // at entry to prevent stale evidence from being admitted as a fresh run.
     const battery = await runGates({
@@ -579,6 +647,22 @@ export async function executeShard({
     throw error;
   }
 }
+let plannedDescriptors;
+const plannedContracts = new Map();
+export function requirePlannedGateProof(name, proof) {
+  if (!plannedContracts.has(name)) {
+    plannedDescriptors ??= new Map(
+      [...batteryGates('/planned-proof', {}), ...supplementalGates('/planned-proof')].map((g) => [
+        g.name,
+        g,
+      ]),
+    );
+    const gate = plannedDescriptors.get(name);
+    assert(gate, `Unplanned gate cannot carry admitted proof: ${name}`);
+    plannedContracts.set(name, plannedProofContract(gate, ROOT));
+  }
+  return plannedContracts.get(name).require(proof);
+}
 const terminal = new Set(['passed', 'failed', 'missing', 'timed-out', 'incomplete']);
 export function admitReceipt(plan, receipt, shard, attempt, artifact, expected = shard.gates) {
   assert.equal(receipt.schemaVersion, 1);
@@ -609,6 +693,13 @@ export function admitReceipt(plan, receipt, shard, attempt, artifact, expected =
     assert.equal(gate.status === 'passed', gate.exitCode === 0);
     assert(gate.completedAt && Date.parse(gate.completedAt) >= Date.parse(gate.startedAt));
     assert(gate.log, 'Gate log missing');
+    if (gate.status === 'passed') {
+      requireGateAttemptEvidence(gate, {
+        gitSha: plan.identity.sha,
+        artifactSha256: artifact.artifactSha256,
+      });
+      requirePlannedGateProof(gate.name, gate.evidenceReceipt.proof);
+    }
   }
   assert.equal(
     receipt.status === 'passed',
@@ -638,9 +729,21 @@ export function createRetryPlan(plan, receipts, artifact, jobs, phase = 'all') {
     assert(row, 'Missing first-attempt shard');
     admitReceipt(plan, row, shard, 1, artifact);
     if (jobs) requireJob(jobs, `battery / ${shard.id}`, plan.identity, row);
-    const failed = row.gates.filter((g) => g.status !== 'passed').map((g) => g.name);
+    const failed = shard.gates.filter(
+      (name) => row.gates.find((g) => g.name === name).status !== 'passed',
+    );
     if (failed.length) {
-      const retryShard = { ...shard, gates: failed };
+      const retryShard = {
+        ...shard,
+        gates: failed,
+        budget: scheduledBudget(
+          failed.map((name) => shard.budget.gateTimeouts.find((g) => g.name === name)),
+        ),
+      };
+      // Prediction weights belong to the original scheduling run; retry admission uses only failed gate ceilings.
+      delete retryShard.predictedSeconds;
+      delete retryShard.estimatedWeightNames;
+      delete retryShard.predictionKind;
       if (failed.includes('e2e') && !failed.includes('e2e-build')) {
         assert.match(
           row.dependencies?.e2eBuild?.sha256 || '',
@@ -666,6 +769,7 @@ export function createRetryPlan(plan, receipts, artifact, jobs, phase = 'all') {
   return retry;
 }
 export function validateRetryPlan(plan, retry) {
+  validatePlan(plan);
   assert.equal(retry.schemaVersion, 1);
   assert.equal(retry.kind, 'bunki-ci-retry-plan');
   const selected = phaseShards(plan, retry.phase);
@@ -688,6 +792,15 @@ export function validateRetryPlan(plan, retry) {
     assert(s.gates.length > 0);
     unique(s.gates);
     assert(s.gates.every((g) => original.gates.includes(g)));
+    equal(
+      s.gates,
+      original.gates.filter((g) => s.gates.includes(g)),
+      'Retry gate dependency order changed',
+    );
+    requireScheduledBudget(
+      s,
+      s.gates.map((name) => original.budget.gateTimeouts.find((g) => g.name === name)),
+    );
   }
   return retry;
 }
@@ -984,26 +1097,17 @@ export async function main(args = process.argv.slice(2)) {
     const scope = o.paths ? classifyPaths(read(o.paths)) : o.scope || 'full';
     const plan = createPlan({ scope });
     write(o.out, plan);
-    const matrix = {
-      include: phaseShards(plan, 'battery').map((s) => ({
-        shard: s.id,
-        kind: s.kind,
-        python: s.python,
-        corpus: s.corpus,
-        e2e: s.e2e,
-        browsers: s.browsers.join(' '),
-      })),
-    };
-    const fastMatrix = {
-      include: phaseShards(plan, 'fast').map((s) => ({
-        shard: s.id,
-        kind: s.kind,
-        python: s.python,
-        corpus: s.corpus,
-        e2e: s.e2e,
-        browsers: s.browsers.join(' '),
-      })),
-    };
+    const matrix = shardMatrix(phaseShards(plan, 'battery'));
+    const fastMatrix = shardMatrix(phaseShards(plan, 'fast'));
+    validateWorkflowSchedule(
+      parseYaml(readFileSync(join(ROOT, '.github/workflows/ci.yml'), 'utf8')),
+      {
+        fast: phaseShards(plan, 'fast'),
+        battery: phaseShards(plan, 'battery'),
+        'fast-retry': phaseShards(plan, 'fast'),
+        retry: phaseShards(plan, 'battery'),
+      },
+    );
     const hasBattery = phaseShards(plan, 'battery').length > 0;
     console.log(
       JSON.stringify({ scope, planDigest: plan.planDigest, matrix, fastMatrix, hasBattery }),
@@ -1047,16 +1151,18 @@ export async function main(args = process.argv.slice(2)) {
       phase,
     );
     write(o.out, retry);
-    const matrix = {
-      include: retry.shards.map((s) => ({
-        shard: s.id,
-        kind: s.kind,
-        python: s.python,
-        corpus: s.corpus,
-        e2e: s.e2e,
-        browsers: s.browsers.join(' '),
-      })),
-    };
+    const matrix = shardMatrix(retry.shards);
+    validateWorkflowSchedule(
+      parseYaml(readFileSync(join(ROOT, '.github/workflows/ci.yml'), 'utf8')),
+      {
+        ...(phase === 'all' || phase === 'fast'
+          ? { 'fast-retry': retry.shards.filter((s) => s.kind === 'fast') }
+          : {}),
+        ...(phase === 'all' || phase === 'battery'
+          ? { retry: retry.shards.filter((s) => s.kind === 'battery') }
+          : {}),
+      },
+    );
     console.log(JSON.stringify(matrix));
     if (process.env.GITHUB_OUTPUT)
       appendFileSync(

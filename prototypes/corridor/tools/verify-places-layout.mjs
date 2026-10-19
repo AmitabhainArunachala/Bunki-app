@@ -34,6 +34,7 @@ import { startCorridorDev } from '../../../scripts/serve-corridor-dev.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { restoreAppFixture } from './record-fixture-support.mjs';
+import { rubyHideMovesNothing, rubyTurnKeepsPassage } from './vh-visual-contracts.mjs';
 
 const out = resolveCorridorEvidence();
 const host = await startCorridorDev(0);
@@ -401,12 +402,11 @@ try {
     const back = await lines(), backTops = await tops();
     const pitches = backTops.slice(1).map((t, i) => t - backTops[i]);
     const backText = await text();
-    check('focus · the turn keeps the passage whole, its lines at one pitch', backText.length > 0 && backText === frontText &&
-      pitches.length > 2 && Math.max(...pitches) - Math.min(...pitches) <= 1, JSON.stringify({ pitches, same: backText === frontText, front: front.slice(0, 2), back: back.slice(0, 2) }));
+    check('focus · the turn keeps the passage whole, its lines at one pitch', rubyTurnKeepsPassage({ frontText, backText, pitches }), JSON.stringify({ pitches, same: backText === frontText, front: front.slice(0, 2), back: back.slice(0, 2) }));
     await page.locator('#kp-readings').click();
     await page.waitForTimeout(500);
     check('focus · the Readings switch returns the clean text', (await readings()) <= 2, `${await readings()} shown`);
-    check('focus · turning readings off moves no line', JSON.stringify(await lines()) === JSON.stringify(back) && JSON.stringify(await tops()) === JSON.stringify(backTops), JSON.stringify({ back: back.slice(0, 2), off: (await lines()).slice(0, 2) }));
+    check('focus · turning readings off moves no line', rubyHideMovesNothing({ back, backTops, lines: await lines(), tops: await tops() }), JSON.stringify({ back: back.slice(0, 2), off: (await lines()).slice(0, 2) }));
     // the same pads in a night world (夜)
     await page.evaluate(() => localStorage.setItem('kairo-theme', 'yoru'));
     await page.goto(`${host.origin}/index.html?entry=shelf&ui=bi`);

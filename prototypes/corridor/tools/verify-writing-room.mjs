@@ -11,14 +11,15 @@
  */
 
 import { createServer } from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
+import { createHash, randomUUID } from 'node:crypto';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
 import process from 'node:process';
 
 import { chromium } from 'playwright-core';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import { restoreAppFixture } from './record-fixture-support.mjs';
-import { resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 
 const CORRIDOR_DIR = resolveCorridorSite();
 const PHONE = { width: 390, height: 844 };
@@ -274,6 +275,8 @@ async function main() {
   const { server, base, misses } = await startServer();
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
   const noise = [];
+  const startedAt = new Date().toISOString(), identity = JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'build-identity.json'), 'utf8'));
+  let completed = false, failure = null;
 
   try {
     const context = await browser.newContext({
@@ -960,9 +963,20 @@ async function main() {
       noise.length === 0,
       noise.join(' | '),
     );
+    completed = true;
+  } catch (error) {
+    failure = String(error.stack || error);
+    throw error;
   } finally {
     await browser.close();
     server.close();
+    writeFileSync(resolve(resolveCorridorEvidence(), 'writing-room.json'), JSON.stringify({
+      schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(), startedAt, finishedAt: new Date().toISOString(),
+      site: CORRIDOR_DIR, artifactSha256: identity.artifactSha256,
+      verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
+      engine: 'chromium', browserVersion: browser.version(), completed, failure, results, failures,
+      errors: noise, missingAssets: misses, fullAcceptance: completed && !failure && failures === 0,
+    }, null, 2) + '\n');
   }
 
   console.log(`\n${results.length - failures}/${results.length} checks passed`);

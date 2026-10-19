@@ -32,22 +32,33 @@
  */
 /* global window, document, getComputedStyle, innerWidth, innerHeight, Node, NodeFilter, indexedDB */
 import assert from 'node:assert/strict';
+import { combExpectedIds } from '../../../scripts/ci/vh-visual-report-contracts.mjs';
+import { createHash, randomUUID } from 'node:crypto';
+import { exactRoster, loadMixedLexemes, plainBadBreak, mixedScriptMutationControl } from './vh-visual-contracts.mjs';
 import console from 'node:console';
 import process from 'node:process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { chromium, webkit } from 'playwright-core';
 import { startCorridorDev } from '../../../scripts/serve-corridor-dev.mjs';
-import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 
+assert(process.env.COMB_NEGATIVE === undefined || process.env.COMB_NEGATIVE.trim().length > 0, 'Explicit empty COMB_NEGATIVE is invalid');
+assert(process.argv.length === 2, 'Unknown comb argument');
 const NEGATIVE = process.env.COMB_NEGATIVE || '';
+assert(!NEGATIVE || ['breaks','save','gradebar','safe','sky','web','labels','plain','card','parts','hook','details','me','count','focus','offline','guided'].includes(NEGATIVE), 'Unknown COMB_NEGATIVE');
+assert(process.env.KAIRO_BROWSER === undefined || ['chromium','webkit','all'].includes(process.env.KAIRO_BROWSER), 'Unknown or empty browser scope');
+const runId = process.env.KAIRO_GATE_RUN_ID || randomUUID();
+const identity = JSON.parse(readFileSync(join(resolveCorridorSite(), 'build-identity.json'), 'utf8'));
+const lexicalEvidence = loadMixedLexemes(resolveCorridorSite());
+const controls = [];
 const out = resolveCorridorEvidence();
 mkdirSync(out, { recursive: true });
 const host = await startCorridorDev(0);
 const checks = [];
-const check = (name, pass, detail = '') => {
-  checks.push({ name, pass: !!pass, detail: String(detail).slice(0, 1500) });
+const check = (name, pass, detail = '', id) => {
+  checks.push({ id, name, pass: !!pass, detail: String(detail).slice(0, 1500) });
   console.log(`${pass ? '  ok  ' : ' FAIL '} ${name}${detail ? `  — ${String(detail).slice(0, 300)}` : ''}`);
 };
 const engines = process.env.KAIRO_BROWSER === 'chromium' ? { chromium }
@@ -115,36 +126,7 @@ const INSTRUMENTS = `window.__I__ = (() => {
 
 // the plain oracle for a break before text[i] in untokenised Japanese (the app's own word rule is not consulted)
 const KATA = /[ァ-ヺー]/u;
-const KANJI = /[一-鿿々]/u;
-const HIRA = /[ぁ-ゖ]/u;
-const DIGIT = /[0-9０-９]/u;
-const CLOSE = /[、。，．！？」』）〉》〕］｝ー〜…‥ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ]/u;
-const OPEN = /[「『（〈《〔［｛]/u;
-// what a number counts (年, 月, 回, 人 …): a number and its counter are one word; any other kanji word after a number
-// (1.2.1｜通常版) is a word of its own
-const COUNTER = /[年月日時分秒回号人本件個円歳条位度階巻章話部点名社台枚冊匹頭羽杯軒週代種目期次世紀万億兆割倍％%]/u;
-// a word's kana ending, as the plain oracle can know it without a dictionary: the okurigana of a one-kanji stem (並｜ぶ,
-// 始｜まる, 思｜う) or a one-kana particle on a kanji or katakana word (熟語｜の, 決心｜の): a kana word of its own after
-// a longer word (先生｜ことば, 通常版｜この) is not an ending
-const PARTICLE = /[はがをにでとのもへや]/u;
-function kanaEnding(text, i) {
-  const stem = /[\p{Script=Han}々]+$/u.exec(text.slice(0, i))?.[0] || '';
-  const kana = /^\p{Script=Hiragana}+/u.exec(text.slice(i))?.[0] || '';
-  if ([...stem].length === 1 && !/\p{Script=Han}/u.test(text[i - 2] || '')) return true;
-  return PARTICLE.test(kana[0] || '') && kana.length === 1;
-}
-function badBreak(text, i) {
-  const a = text[i - 1], b = text[i];
-  if (!a || !b || /\s/u.test(a) || /\s/u.test(b)) return '';
-  if (DIGIT.test(a) && DIGIT.test(b)) return 'inside a number';
-  if (a === '第' && DIGIT.test(b)) return 'between 第 and its number';
-  if (DIGIT.test(a) && COUNTER.test(b)) return 'between a number and its counter';
-  if (KATA.test(a) && KATA.test(b)) return 'inside a katakana word';
-  if (HIRA.test(b) && (KANJI.test(a) || KATA.test(a)) && kanaEnding(text, i)) return 'before a word\'s kana ending';
-  if (CLOSE.test(b)) return 'before a closing mark';
-  if (OPEN.test(a)) return 'after an opening mark';
-  return '';
-}
+const badBreak = (text, i) => plainBadBreak(text, i, lexicalEvidence);
 // a break inside a katakana run is the emergency only when the run alone is wider than the block's line
 function katakanaRunWidth(lines, i) {
   let s = i, e = i;
@@ -257,7 +239,7 @@ try {
           const warm = await open();
           check(`G8 · ${tag} · Guided opens warm in under 1 s, and cold under 1 s or with its progress line`,
             warm.ready !== null && warm.ready < 1000 && cold.ready !== null && (cold.ready < 1000 || (cold.line !== null && cold.line < 300)),
-            `cold ${Math.round(cold.ready ?? -1)} ms (line ${cold.line === null ? 'none' : `${Math.round(cold.line)} ms`}) · warm ${Math.round(warm.ready ?? -1)} ms`);
+            `cold ${Math.round(cold.ready ?? -1)} ms (line ${cold.line === null ? 'none' : `${Math.round(cold.line)} ms`}) · warm ${Math.round(warm.ready ?? -1)} ms`, `C01/${tag}`);
           await context.close();
         }
 
@@ -295,7 +277,7 @@ try {
             const named = !word || (bar.word === word && bar.label.includes(word));
             const shownAt390 = !(word === '総理' && width === 390) || bar.wordShown;
             check(`G12 · ${tag} · the bar's Save fits whole, ${state}`, bar.overflow <= 1 && bar.wide <= 1 && bar.outside === 0 && bar.cut <= 0.5 && bar.lines === 1 && named && shownAt390,
-              `"${bar.text}" (${bar.label}) · cut ${bar.cut.toFixed(1)} · lines ${bar.lines} · bar overflow ${bar.overflow} · page ${bar.wide} px past the glass · doors outside ${bar.outside}${word ? ` · word ${word} shown ${bar.wordShown}` : ''}`);
+              `"${bar.text}" (${bar.label}) · cut ${bar.cut.toFixed(1)} · lines ${bar.lines} · bar overflow ${bar.overflow} · page ${bar.wide} px past the glass · doors outside ${bar.outside}${word ? ` · word ${word} shown ${bar.wordShown}` : ''}`, `C02/${tag}/${state}`);
           }
           await context.close();
         }
@@ -303,13 +285,17 @@ try {
         // G2/G3 · Japanese breaks only between words
         if (want('breaks')) {
           const { context, page } = await session(browser, width, lang);
+          const lexicalControl = await mixedScriptMutationControl(page, { engine, lang, width }, lexicalEvidence);
+          controls.push(lexicalControl);
+          check(`G2.VH1 · ${tag} · mixed-script-verb-split has a completed intended red and byte-restored green`, lexicalControl.passed,
+            JSON.stringify({ premise: lexicalControl.premise, clean: lexicalControl.clean, wrong: lexicalControl.wrong, restored: lexicalControl.back }), `C03/${tag}`);
           await page.evaluate(() => window.__COMB__.visit('shelf'));
           await settle(page, 900);
           const shelf = await page.evaluate(() => [...document.querySelectorAll('#app main :is(.shelf-title, .story-lede)')].filter((n) => window.__I__.shown(n)).map((n) => { const l = window.__I__.lines(n, null); return { text: l.text, glyphs: l.glyphs.map((g) => ({ ch: g.ch, left: g.left, right: g.right })), breaks: l.breaks.map((b) => b.i), width: n.getBoundingClientRect().width }; }));
           const bad = judge(shelf);
           const named = ['新田', '藤井', '第78回', 'ノーベル', '挑んだ', '２０２６', '正倉院'].flatMap((w) => shelf.filter((b) => b.text.includes(w)).flatMap((b) => { const at = b.text.indexOf(w); return b.breaks.filter((i) => i > at && i < at + w.length).map(() => w); }));
           check(`G2 · ${tag} · the shelf's ${shelf.length} titles and ledes break only between words`, shelf.length > 20 && !bad.length && !named.length,
-            `${bad.length} in-word breaks${bad.length ? `: ${bad.slice(0, 6).join(' · ')}` : ''}${named.length ? ` · split: ${named.join(', ')}` : ''}`);
+            `${bad.length} in-word breaks${bad.length ? `: ${bad.slice(0, 6).join(' · ')}` : ''}${named.length ? ` · split: ${named.join(', ')}` : ''}`, `C04/${tag}`);
           // a reader: no token split; a number stays with its counter; the title card and the foot by the plain oracle
           for (const id of [STARTUP, 'bunki-read-n1-neocognitron']) {
             await page.evaluate((x) => window.__COMB__.open(x), id);
@@ -325,7 +311,7 @@ try {
               .map(([b, i, why]) => `${b.text.slice(Math.max(0, i - 5), i)}｜${b.text.slice(i, i + 5)} (${why})`);
             check(`G3 · ${tag} · ${id}: no token split, a number keeps its counter, the title and foot break between words`,
               reader.inToken === 0 && !numbers.length && !otherBad.length && reader.blocks.every((b) => b.inUnit === 0),
-              `${reader.breaks.length} body breaks · in a token ${reader.inToken} · number splits ${numbers.map((i) => `${reader.text.slice(i - 4, i)}｜${reader.text.slice(i, i + 3)}`).join(' ')} · title/foot ${otherBad.slice(0, 4).join(' · ')}`);
+              `${reader.breaks.length} body breaks · in a token ${reader.inToken} · number splits ${numbers.map((i) => `${reader.text.slice(i - 4, i)}｜${reader.text.slice(i, i + 3)}`).join(' ')} · title/foot ${otherBad.slice(0, 4).join(' · ')}`, `C05/${tag}/${id}`);
           }
           await context.close();
           // a deck: the front (sealed: no doors) and the back keep every word whole
@@ -343,7 +329,7 @@ try {
           const fill = back.chars * back.font / back.width; // the lines the back's characters need at the least
           check(`G2 · ${tag} · the deck's front has no doors and keeps its words whole; so does its back; both wrap inside the phone`,
             front.doors === 0 && front.words > 10 && front.inWord === 0 && back.inWord === 0 && back.words > 10 && front.wide <= 1 && back.wide <= 1 && back.lines >= Math.floor(fill * 0.7),
-            `front: ${front.doors} doors, ${front.words} words, ${front.inWord} of ${front.breaks} breaks inside one, ${front.wide} px past the glass · back: ${back.words} words, ${back.inWord} of ${back.breaks} inside one, ${back.lines} lines for ${back.chars} characters, ${back.wide} px past the glass`);
+            `front: ${front.doors} doors, ${front.words} words, ${front.inWord} of ${front.breaks} breaks inside one, ${front.wide} px past the glass · back: ${back.words} words, ${back.inWord} of ${back.breaks} inside one, ${back.lines} lines for ${back.chars} characters, ${back.wide} px past the glass`, `C06/${tag}`);
           await deck.context.close();
           // every room the app sets its own text in: its Japanese breaks only between words
           const rooms = await session(browser, width, lang);
@@ -369,7 +355,7 @@ try {
           }
           const roomBad = judge(census);
           check(`G2 · ${tag} · the Japanese of ${ROOMS_JA.length} rooms (${census.length} blocks) breaks only between words`, census.length > 50 && !roomBad.length,
-            `${roomBad.length} in-word breaks${roomBad.length ? `: ${roomBad.slice(0, 6).join(' · ')}` : ''}`);
+            `${roomBad.length} in-word breaks${roomBad.length ? `: ${roomBad.slice(0, 6).join(' · ')}` : ''}`, `C07/${tag}`);
           await rooms.context.close();
         }
 
@@ -412,7 +398,7 @@ try {
             });
             check(`G10 · ${tag} · ${id}: the answer stands above its grade bar, no fold row cut, nothing under it at the end`,
               rest.saidBottom <= rest.dockTop && rest.dockTop <= 844 && rest.cut === 0 && end === 0 && rest.wide <= 1,
-              `answer says to ${rest.saidBottom}, bar at ${rest.dockTop} · rows cut ${rest.cut} · at the end ${end} under · ${rest.wide} px past the glass`);
+              `answer says to ${rest.saidBottom}, bar at ${rest.dockTop} · rows cut ${rest.cut} · at the end ${end} under · ${rest.wide} px past the glass`, `C08/${tag}/${id}`);
             await context.close();
           }
         }
@@ -438,7 +424,7 @@ try {
             for (const t of found.atEnd) under.push(`${room} end: ${t}`);
             if (found.wide > 1) under.push(`${room} is ${found.wide} px wider than the phone`);
           }
-          check(`G11 · ${tag} · ${rooms.length} rooms clear their bars at the top and the end, and fit the phone's width`, !under.length, under.slice(0, 6).join(' · '));
+          check(`G11 · ${tag} · ${rooms.length} rooms clear their bars at the top and the end, and fit the phone's width`, !under.length, under.slice(0, 6).join(' · '), `C09/${tag}`);
           await context.close();
           if (engine === 'chromium') {
             const sheet = await session(browser, width, lang);
@@ -449,7 +435,7 @@ try {
             await settle(sheet.page, 600);
             const head = await sheet.page.evaluate(() => Math.min(...['#br-title', '.br-close'].map((s) => document.querySelector(s)?.getBoundingClientRect().top ?? 0)));
             const end = await sheet.page.evaluate(async () => { const b = document.querySelector('dialog.br-sheet .br-body'); b.scrollTop = b.scrollHeight; await new Promise((r) => setTimeout(r, 120)); const leaves = window.__I__.leaves(document.querySelector('dialog.br-sheet')); return Math.max(...leaves.flatMap((el) => window.__I__.rects(el)).map((r) => r.bottom)); });
-            check(`G11 · ${tag} · the report sheet clears the status bar (59 px) and the home indicator (34 px)`, head >= 59 && end <= 844 - 34, `title at ${Math.round(head)} · last line ends ${Math.round(end)}`);
+            check(`G11 · ${tag} · the report sheet clears the status bar (59 px) and the home indicator (34 px)`, head >= 59 && end <= 844 - 34, `title at ${Math.round(head)} · last line ends ${Math.round(end)}`, `C10/${tag}`);
             await sheet.context.close();
             const deck = await session(browser, width, lang, { query: 'deck=n2' });
             const dcdp = await deck.context.newCDPSession(deck.page);
@@ -459,7 +445,7 @@ try {
             await deck.page.locator('.kp-grades').waitFor();
             await settle(deck.page, 900);
             const dock = await deck.page.evaluate(() => { const d = document.querySelector('.kp-grades').getBoundingClientRect(); const below = window.__I__.leaves().filter((el) => !document.querySelector('.kp-grades').contains(el)).flatMap((el) => window.__I__.rects(el)).filter((r) => r.top >= d.bottom - 0.5 && r.top < innerHeight - 0.5).length; return { bottom: d.bottom, below }; });
-            check(`G11 · ${tag} · the focus room's grade bar stands on the foot, no line of the page showing below it`, dock.bottom >= 844 - 0.5 && dock.below === 0, `bar bottom ${dock.bottom.toFixed(1)} · text below it ${dock.below}`);
+            check(`G11 · ${tag} · the focus room's grade bar stands on the foot, no line of the page showing below it`, dock.bottom >= 844 - 0.5 && dock.below === 0, `bar bottom ${dock.bottom.toFixed(1)} · text below it ${dock.below}`, `C11/${tag}`);
             await deck.context.close();
           } else if (lang === 'bi' && width === 390) console.log(`  ..   G11 · ${engine}: the phone's insets cannot be set in WebKit; the inset checks run in Chromium`);
         }
@@ -490,7 +476,7 @@ try {
             await page.waitForTimeout(600);
           }
           const bands = await page.evaluate(() => document.querySelectorAll('.sky-edge[data-drift-chrome]').length);
-          check(`G6 · ${tag} · the sky cuts no word at the glass (6 samples while it drifts)`, cut.size === 0, `${cut.size} cut: ${[...cut.keys()].slice(0, 6).join(' ')} · edge bands ${bands}`);
+          check(`G6 · ${tag} · the sky cuts no word at the glass (6 samples while it drifts)`, cut.size === 0, `${cut.size} cut: ${[...cut.keys()].slice(0, 6).join(' ')} · edge bands ${bands}`, `C12/${tag}`);
           await context.close();
         }
 
@@ -555,7 +541,7 @@ try {
           // in English at 320 the base pushed captions past the plate; the fixed set must still hold such captions
           const pressed = !(lang === 'bi' && width === 320) || stress > 0;
           check(`G7 · ${tag} · the word web fits: lenses whole, legend clear of the nodes, labels inside the plate and plainly named (the day's web and ${G7_FIXED.length} fixed)`,
-            !faults.length && pressed, `${stress} captions under edge pressure · ${reached} cut short, read whole in their slips${pressed ? '' : ' · the fixed set holds no caption under edge pressure'}${faults.length ? ` · ${faults.slice(0, 6).join(' · ')}` : ''}`);
+            !faults.length && pressed, `${stress} captions under edge pressure · ${reached} cut short, read whole in their slips${pressed ? '' : ' · the fixed set holds no caption under edge pressure'}${faults.length ? ` · ${faults.slice(0, 6).join(' · ')}` : ''}`, `C13/${tag}`);
           await context.close();
         }
 
@@ -591,7 +577,7 @@ try {
                 return { i, word: t.textContent.trim().slice(0, 8), gap: above ? top - m.bottom : m.top - w.bottom };
               }, index));
             }
-            check(`G4 · ${tag} · a word's card stands 8 px clear of the word and its reading`, gaps.every((g) => g.gap >= 8 - 0.5), gaps.map((g) => `${g.word} ${g.gap.toFixed(1)}`).join(' · '));
+            check(`G4 · ${tag} · a word's card stands 8 px clear of the word and its reading`, gaps.every((g) => g.gap >= 8 - 0.5), gaps.map((g) => `${g.word} ${g.gap.toFixed(1)}`).join(' · '), `C14/${tag}`);
           }
           if (want('parts')) {
             const parts = await run(page, `(() => {
@@ -616,7 +602,7 @@ try {
             const row = await page.evaluate(() => [...document.querySelectorAll('#mini .mini-kanji-row[data-kanji="総"] .mini-kanji-part')].map((n) => n.textContent).join('+'));
             check(`G4 · ${tag} · each kanji's parts shown once, at their own level, named plainly (総 = 糸 + 忩 on the card)`,
               !parts.bad.length && !parts.noisy.length && parts.so === '糸+忩' && row === '糸+忩',
-              `${parts.bad.length} faults${parts.bad.length ? `: ${parts.bad.slice(0, 4).join(' · ')}` : ''} · noisy names ${parts.noisy.slice(0, 3).join(', ')} · 総 = ${parts.so} · card ${row}`);
+              `${parts.bad.length} faults${parts.bad.length ? `: ${parts.bad.slice(0, 4).join(' · ')}` : ''} · noisy names ${parts.noisy.slice(0, 3).join(', ')} · 総 = ${parts.so} · card ${row}`, `C15/${tag}`);
           }
           await context.close();
         }
@@ -635,7 +621,7 @@ try {
             return { pool: pool.length, untrue, shown, part, shownTrue };
           })()`);
           check(`G5 · ${tag} · every hook Today can show names a part that is each kanji's radical (today: ${hook.shown} ${hook.part})`,
-            hook.pool > 20 && !hook.untrue.length && hook.shownTrue, `${hook.pool} words · ${hook.untrue.length} untrue: ${hook.untrue.slice(0, 5).join(' · ')}`);
+            hook.pool > 20 && !hook.untrue.length && hook.shownTrue, `${hook.pool} words · ${hook.untrue.length} untrue: ${hook.untrue.slice(0, 5).join(' · ')}`, `C16/${tag}`);
           await context.close();
         }
 
@@ -667,7 +653,7 @@ try {
           const settings = await page.evaluate(() => document.getElementById('settings-reports-status')?.textContent || '');
           const leak = [['report sheet', sheet?.text], ['tutor', tutor?.text], ['Settings', settings]].filter(([, t]) => DEV.test(t || '')).map(([w, t]) => `${w}: ${(t.match(DEV) || [''])[0]}`);
           check(`G13 · ${tag} · the report sheet, the tutor and Settings speak learner words; ids, GitHub, addresses and models sit under one closed Details`,
-            !leak.length && sheet?.details === 1 && sheet.closed && id && tutor?.closed && fields.inFold && fields.key, `${leak.join(' · ') || 'no developer words shown'} · sheet Details ${sheet?.details}, closed ${sheet?.closed}, holds the id ${id} · tutor fold ${fields.inFold}, key shown ${fields.key}`);
+            !leak.length && sheet?.details === 1 && sheet.closed && id && tutor?.closed && fields.inFold && fields.key, `${leak.join(' · ') || 'no developer words shown'} · sheet Details ${sheet?.details}, closed ${sheet?.closed}, holds the id ${id} · tutor fold ${fields.inFold}, key shown ${fields.key}`, `C17/${tag}`);
           await context.close();
         }
 
@@ -683,7 +669,7 @@ try {
             : ['日本の歴史に根ざし、現代の脳科学につながる'];
           check(`G14 · ${tag} · Me's lines for goals not begun are plain sentences, never capitals; his own D5 words stay`,
             me.length >= 3 && me.every((m) => m.upper === 'none' && sentence(m.text) && m.shown.trim() === m.text) && his.every((h) => d5.includes(h)),
-            me.map((m) => `${m.shown.trim()} [${m.upper}]`).join(' · '));
+            me.map((m) => `${m.shown.trim()} [${m.upper}]`).join(' · '), `C18/${tag}`);
           await context.close();
         }
 
@@ -696,7 +682,7 @@ try {
           log[`count-${engine}-${lang}`] = count.tally;
           const other = log[`count-${engine}-${lang === 'bi' ? 'ja' : 'bi'}`];
           check(`G1 · ${tag} · the shelf's count is the stories on it (and the same in both languages)`, Number(count.tally) === count.stories && count.shelf === count.stories && (!other || other === count.tally),
-            `tally ${count.tally} · stories on the shelf ${count.shelf} · shelfStories ${count.stories}${other ? ` · the other language ${other}` : ''}`);
+            `tally ${count.tally} · stories on the shelf ${count.shelf} · shelfStories ${count.stories}${other ? ` · the other language ${other}` : ''}`, `C19/${tag}`);
           await context.close();
         }
 
@@ -712,7 +698,7 @@ try {
           await page.locator('#vocabulary-list-popover input[data-list="Q list"]:checked').waitFor();
           await page.waitForTimeout(600);
           const focused = await page.evaluate(() => document.activeElement?.matches?.('#vocabulary-list-popover input[data-list="Q list"]') || false);
-          check(`13a · ${tag} · ticking a list in the Save menu keeps the keyboard on that box`, focused, String(await page.evaluate(() => document.activeElement?.outerHTML?.slice(0, 120))));
+          check(`13a · ${tag} · ticking a list in the Save menu keeps the keyboard on that box`, focused, String(await page.evaluate(() => document.activeElement?.outerHTML?.slice(0, 120))), `C20/${tag}`);
           await context.close();
         }
 
@@ -738,7 +724,7 @@ try {
           });
           check(`13b · ${tag} · a report with a screenshot saves with the device offline, the screenshot as its bytes`,
             saved.rows === 1 && saved.files.length === 1 && saved.files[0] > 0 && saved.blobs === 0,
-            `${saved.rows} saved · screenshots ${JSON.stringify(saved.files)} (blobs ${saved.blobs}) · ${saved.notice.slice(0, 160)}`);
+            `${saved.rows} saved · screenshots ${JSON.stringify(saved.files)} (blobs ${saved.blobs}) · ${saved.notice.slice(0, 160)}`, `C21/${tag}`);
           await context.setOffline(false);
           await context.close();
         }
@@ -751,6 +737,13 @@ try {
   console.log(failed.length ? `COMB-0 FAIL — ${failed.length} of ${checks.length}` : `COMB-0 PASS — ${checks.length} checks`);
   if (failed.length || !checks.length) process.exitCode = 1;
 } finally {
-  writeFileSync(join(out, `comb-0${NEGATIVE ? `-negative-${NEGATIVE}` : ''}.json`), `${JSON.stringify({ engines: log.engines, negative: NEGATIVE || null, checks }, null, 2)}\n`);
+  const expectedCases = combExpectedIds(Object.keys(engines).length === 2 ? 'all' : Object.keys(engines)[0]);
+  const observedCases = checks.map(row => row.id);
+  const complete = exactRoster(expectedCases, observedCases);
+  if (!NEGATIVE && !complete) process.exitCode = 1;
+  writeFileSync(join(out, `comb-0${NEGATIVE ? `-negative-${NEGATIVE}` : ''}.json`), `${JSON.stringify({ schemaVersion: 2, runId, expectedCases, observedCases, complete, artifactSha256: identity.artifactSha256, gitSha: identity.gitSha, sourceDirty: identity.sourceDirty, verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
+    requestedScope: NEGATIVE || 'full', selectedPassed: checks.length > 0 && checks.every(row => row.pass),
+    fullAcceptance: !NEGATIVE && complete && checks.length > 0 && checks.every(row => row.pass), engines: log.engines, negative: NEGATIVE || null, checks, controls }, null, 2)}\n`);
   await host.close();
+  if (!process.exitCode && NEGATIVE) process.exitCode = 3;
 }

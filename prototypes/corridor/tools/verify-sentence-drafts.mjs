@@ -15,6 +15,7 @@ import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
@@ -94,7 +95,7 @@ async function launch(fixture, { offline = false, protectedState = false } = {})
     ...(fixture.engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
   });
   await fixture.context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device fixture.
-  fixture.browserVersion = fixture.context.browser()?.version();
+  fixture.browserVersion = await contextBrowserVersion(fixture.context, { chromium, webkit }[fixture.engine]);
   await silenceBrowserAudio(fixture.context);
   await fixture.context.tracing.start({ screenshots: true, snapshots: true, sources: true });
   fixture.traceActive = true;

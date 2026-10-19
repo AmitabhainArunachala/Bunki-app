@@ -1,0 +1,369 @@
+{
+  "deck-gloss-ja": {
+    "producer": "decks/kotoba-mine/tools/test_gloss_ja.py",
+    "inputs": [
+      "decks/kotoba-mine/source/**/*.json",
+      "decks/kotoba-mine/tools/build.py",
+      "decks/kotoba-mine/tools/export_mcd.py"
+    ],
+    "checks": [
+      {
+        "id": "deck-gloss-ja/01",
+        "name": "gloss_ja.json is prettier-formatted JSON (2-space indent, trailing newline)",
+        "callsites": ["decks/kotoba-mine/tools/test_gloss_ja.py:49"]
+      },
+      {
+        "id": "deck-gloss-ja/02",
+        "name": "the table holds over a thousand senses",
+        "callsites": ["decks/kotoba-mine/tools/test_gloss_ja.py:51"]
+      },
+      {
+        "id": "deck-gloss-ja/03",
+        "name": "every sense is at most 40 characters",
+        "callsites": ["decks/kotoba-mine/tools/test_gloss_ja.py:53"]
+      },
+      {
+        "id": "deck-gloss-ja/04",
+        "name": "no key is a deck word",
+        "callsites": ["decks/kotoba-mine/tools/test_gloss_ja.py:56"]
+      },
+      {
+        "id": "deck-gloss-ja/05",
+        "name": "the most frequent passage lemmas have a sense",
+        "callsites": ["decks/kotoba-mine/tools/test_gloss_ja.py:60"]
+      },
+      {
+        "id": "deck-gloss-ja/06",
+        "name": "gloss_ja() refuses a sense over 40 characters",
+        "callsites": [
+          "decks/kotoba-mine/tools/test_gloss_ja.py:70",
+          "decks/kotoba-mine/tools/test_gloss_ja.py:72"
+        ]
+      },
+      {
+        "id": "deck-gloss-ja/07",
+        "name": "gloss_ja() refuses a two-line sense",
+        "callsites": [
+          "decks/kotoba-mine/tools/test_gloss_ja.py:70",
+          "decks/kotoba-mine/tools/test_gloss_ja.py:72"
+        ]
+      },
+      {
+        "id": "deck-gloss-ja/08",
+        "name": "gloss_ja() refuses an empty sense",
+        "callsites": [
+          "decks/kotoba-mine/tools/test_gloss_ja.py:70",
+          "decks/kotoba-mine/tools/test_gloss_ja.py:72"
+        ]
+      },
+      {
+        "id": "deck-gloss-ja/09",
+        "name": "gloss_ja() refuses a sense with no Japanese",
+        "callsites": [
+          "decks/kotoba-mine/tools/test_gloss_ja.py:70",
+          "decks/kotoba-mine/tools/test_gloss_ja.py:72"
+        ]
+      },
+      {
+        "id": "deck-gloss-ja/10",
+        "name": "gloss_ja() refuses a list, not an object",
+        "callsites": [
+          "decks/kotoba-mine/tools/test_gloss_ja.py:70",
+          "decks/kotoba-mine/tools/test_gloss_ja.py:72"
+        ]
+      },
+      {
+        "id": "deck-gloss-ja/11",
+        "name": "the deck word's defs entry is its defJa tokens, as before",
+        "callsites": ["decks/kotoba-mine/tools/test_gloss_ja.py:86"]
+      },
+      {
+        "id": "deck-gloss-ja/12",
+        "name": "lemmas the passage uses get the table's sense, keyed by lemma",
+        "callsites": ["decks/kotoba-mine/tools/test_gloss_ja.py:88"]
+      },
+      {
+        "id": "deck-gloss-ja/13",
+        "name": "a lemma only the word's definition uses gets the table's sense too",
+        "callsites": ["decks/kotoba-mine/tools/test_gloss_ja.py:90"]
+      },
+      {
+        "id": "deck-gloss-ja/14",
+        "name": "a lemma nobody uses ships no sense",
+        "callsites": ["decks/kotoba-mine/tools/test_gloss_ja.py:92"]
+      },
+      {
+        "id": "deck-gloss-ja/15",
+        "name": "a lemma the table lacks ships no sense (today's behaviour)",
+        "callsites": ["decks/kotoba-mine/tools/test_gloss_ja.py:93"]
+      },
+      {
+        "id": "deck-gloss-ja/16",
+        "name": "defs holds the word id and the used lemmas only",
+        "callsites": ["decks/kotoba-mine/tools/test_gloss_ja.py:95"]
+      },
+      {
+        "id": "deck-gloss-ja/17",
+        "name": "a table key that is a deck word fails the build",
+        "callsites": [
+          "decks/kotoba-mine/tools/test_gloss_ja.py:99",
+          "decks/kotoba-mine/tools/test_gloss_ja.py:101"
+        ]
+      },
+      {
+        "id": "deck-gloss-ja/18",
+        "name": "the standalone page's gloss map carries the deck word's definition only",
+        "callsites": ["decks/kotoba-mine/tools/test_gloss_ja.py:103"]
+      },
+      {
+        "id": "deck-gloss-ja/19",
+        "name": "with an empty table, defs is exactly the deck words' definitions",
+        "callsites": ["decks/kotoba-mine/tools/test_gloss_ja.py:106"]
+      }
+    ]
+  },
+  "deck-export-mcd": {
+    "producer": "decks/kotoba-mine/tools/test_export_mcd.py",
+    "inputs": [
+      "decks/kotoba-mine/source/**/*.json",
+      "decks/kotoba-mine/tools/build.py",
+      "decks/kotoba-mine/tools/export_mcd.py"
+    ],
+    "checks": [
+      {
+        "id": "deck-export-mcd/01",
+        "name": "a v1 written passage (2 sentences, 30-odd characters, no register) is accepted",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:70"]
+      },
+      {
+        "id": "deck-export-mcd/02",
+        "name": "a v1 record gets no optional fields",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:71"]
+      },
+      {
+        "id": "deck-export-mcd/03",
+        "name": "a written passage over 300 characters is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:73"]
+      },
+      {
+        "id": "deck-export-mcd/04",
+        "name": "a written passage of 6 sentences is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:75"]
+      },
+      {
+        "id": "deck-export-mcd/05",
+        "name": "a contract-v2 passage of 4 sentences, 180–300 characters, target once, matching English is accepted",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:79"]
+      },
+      {
+        "id": "deck-export-mcd/06",
+        "name": "a contract-v2 passage of 3 sentences is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:82"]
+      },
+      {
+        "id": "deck-export-mcd/07",
+        "name": "a contract-v2 passage with the target twice is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:84"]
+      },
+      {
+        "id": "deck-export-mcd/08",
+        "name": "a contract-v2 passage whose English has a different sentence count is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:86"]
+      },
+      {
+        "id": "deck-export-mcd/09",
+        "name": "a contract-v2 passage of 6 sentences is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:88"]
+      },
+      {
+        "id": "deck-export-mcd/10",
+        "name": "register, topic, tipJa and grammar are carried; an empty sense is dropped",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:92"]
+      },
+      {
+        "id": "deck-export-mcd/11",
+        "name": "an unknown register is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:94"]
+      },
+      {
+        "id": "deck-export-mcd/12",
+        "name": "an unknown topic is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:95"]
+      },
+      {
+        "id": "deck-export-mcd/13",
+        "name": "a tipJa with Latin letters is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:96"]
+      },
+      {
+        "id": "deck-export-mcd/14",
+        "name": "a two-line tipJa is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:97"]
+      },
+      {
+        "id": "deck-export-mcd/15",
+        "name": "a grammar id not in grammar-v11.json is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:98"]
+      },
+      {
+        "id": "deck-export-mcd/16",
+        "name": "a Japanese sense of at most 40 characters is carried",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:99"]
+      },
+      {
+        "id": "deck-export-mcd/17",
+        "name": "an English sense is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:101"]
+      },
+      {
+        "id": "deck-export-mcd/18",
+        "name": "a sense over 40 characters is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:102"]
+      },
+      {
+        "id": "deck-export-mcd/19",
+        "name": "undated files come first in name order, then dated batches by date",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:106"]
+      },
+      {
+        "id": "deck-export-mcd/20",
+        "name": "v2_first puts a word's contract-v2 passages first, each group in the order read",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:109"]
+      },
+      {
+        "id": "deck-export-mcd/21",
+        "name": "build.passage_fields carries register, topic, tipJa, sense and labelled grammar",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:115"]
+      },
+      {
+        "id": "deck-export-mcd/22",
+        "name": "build.passage_fields gives an old passage nothing",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:118"]
+      },
+      {
+        "id": "deck-export-mcd/23",
+        "name": "build.passage_fields fails on an unknown grammar id",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:119"]
+      },
+      {
+        "id": "deck-export-mcd/24",
+        "name": "the v2 batches (32 files, 954 passages, 323 words) pass every rule; the pilot is 54 passages for 20 words",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:136"]
+      },
+      {
+        "id": "deck-export-mcd/25",
+        "name": "in mcd.json every word (323) starts with its v2 passages, in batch order, then its earlier ones (none of which has a register)",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:140"]
+      },
+      {
+        "id": "deck-export-mcd/26",
+        "name": "other_terms finds 性能 by surface, 競っ by its dictionary form 競う and 生得的 across tokens",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:146"]
+      },
+      {
+        "id": "deck-export-mcd/27",
+        "name": "other_terms does not read 導体 (a deck word) inside 半導体",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:148"]
+      },
+      {
+        "id": "deck-export-mcd/28",
+        "name": "other_terms skips the target itself",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:149"]
+      },
+      {
+        "id": "deck-export-mcd/29",
+        "name": "a contract-v2 passage that uses another deck word is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:151"]
+      },
+      {
+        "id": "deck-export-mcd/30",
+        "name": "the same passage with allow and an allowReason is accepted",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:153"]
+      },
+      {
+        "id": "deck-export-mcd/31",
+        "name": "allow without an allowReason is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:155"]
+      },
+      {
+        "id": "deck-export-mcd/32",
+        "name": "an allow the passage does not use is refused",
+        "callsites": ["decks/kotoba-mine/tools/test_export_mcd.py:156"]
+      }
+    ]
+  },
+  "deck-segment-overrides": {
+    "producer": "prototypes/corridor/tools/test_segment_overrides.py",
+    "inputs": [
+      "docs/content/segment-overrides.json",
+      "prototypes/corridor/tools/build_corridor.py"
+    ],
+    "checks": [
+      {
+        "id": "deck-segment-overrides/01",
+        "name": "えきのこうばんで聞いた: こうばん opens 交番, the text is unchanged",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:64"]
+      },
+      {
+        "id": "deck-segment-overrides/02",
+        "name": "まどのそとを見た: まど opens 窓, the text is unchanged",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:64"]
+      },
+      {
+        "id": "deck-segment-overrides/03",
+        "name": "ぶちょうに話した: ぶちょう opens 部長, the text is unchanged",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:64"]
+      },
+      {
+        "id": "deck-segment-overrides/04",
+        "name": "戻ってくるのは相変わらずなんで、最後は: な opens だ, the text is unchanged",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:64"]
+      },
+      {
+        "id": "deck-segment-overrides/05",
+        "name": "えきのこうばんで聞いた: without the lexicon UniDic still splits it [('こう', 'こう'), ('ばん', 'ばん')]",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:69"]
+      },
+      {
+        "id": "deck-segment-overrides/06",
+        "name": "まどのそとを見た: without the lexicon UniDic still splits it [('ま', 'ま'), ('どの', 'どの')]",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:69"]
+      },
+      {
+        "id": "deck-segment-overrides/07",
+        "name": "ぶちょうに話した: without the lexicon UniDic still splits it [('ぶちょう', 'ふちょう')]",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:69"]
+      },
+      {
+        "id": "deck-segment-overrides/08",
+        "name": "戻ってくるのは相変わらずなんで、最後は: without the lexicon UniDic still splits it [('なん', 'なん'), ('で', 'で')]",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:69"]
+      },
+      {
+        "id": "deck-segment-overrides/09",
+        "name": "相変わらずなんで: な + ん + で, no 何 left",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:75"]
+      },
+      {
+        "id": "deck-segment-overrides/10",
+        "name": "いまどの駅？: UniDic's split is kept",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:79"]
+      },
+      {
+        "id": "deck-segment-overrides/11",
+        "name": "なんでそう思うの: UniDic's split is kept",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:79"]
+      },
+      {
+        "id": "deck-segment-overrides/12",
+        "name": "暇なんで、行きます: UniDic's split is kept",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:79"]
+      },
+      {
+        "id": "deck-segment-overrides/13",
+        "name": "an entry whose tokens do not spell its match is refused",
+        "callsites": ["prototypes/corridor/tools/test_segment_overrides.py:92"]
+      }
+    ]
+  }
+}

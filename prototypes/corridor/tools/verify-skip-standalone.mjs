@@ -24,6 +24,7 @@ const page = await context.newPage();
 page.setDefaultTimeout(15000);
 const errors = [];
 const requests = [];
+const checks = [];
 page.on('pageerror', e => errors.push(e.message));
 const documentPath = fragment ? resolve(temporary, 'fragment-host.html') : bundle;
 if (fragment) writeFileSync(documentPath, `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>${readFileSync(bundle, 'utf8')}</body></html>`);
@@ -61,18 +62,22 @@ try {
         padding: style.padding, minWidth: style.minWidth, minHeight: style.minHeight } };
   });
   assert(shelfLook.art > 0 && shelfLook.artSource === 'blob:', `The shelf art must be embedded: ${JSON.stringify(shelfLook)}`);
+  checks.push('embedded-shelf-art');
   assert.equal(shelfLook.grid, 'grid', 'The editorial shelf layout must be inlined');
+  checks.push('inlined-editorial-shelf-layout');
   // A native button can compute declared display:inline to inline-block. Both
   // stay in the prose line; zero padding/border/background is the contract.
   assert(['inline', 'inline-block'].includes(shelfLook.word?.display), 'Lookup words stay in the prose line');
   assert.deepEqual({ ...shelfLook.word, display: undefined },
     { display: undefined, border: 'none', background: 'rgba(0, 0, 0, 0)', padding: '0px', minWidth: '0px', minHeight: '0px' },
     'Lookup words must read as prose, not default buttons');
+  checks.push('lookup-words-read-as-prose');
   // Japanese shelf prose still exercises the lookup styling contract. The
   // English chrome no longer supplies incidental Japanese lookup words.
   await page.locator('#lang [data-lang="bi"]').click();
   assert.equal(await page.locator('#lang [data-lang="bi"]').getAttribute('aria-pressed'), 'true',
     'The remaining standalone journey uses English chrome');
+  checks.push('english-chrome');
   // the study tools sit behind the shelf's one 学習ツール button (glance pass 2026-10-01): the door
   // is closed away until that button opens the panel, and then it is visible and reachable
   assert(!(await kanjidex.isVisible()), 'The dictionary door waits behind the 学習ツール button');
@@ -80,6 +85,7 @@ try {
   assert(await kanjidex.isVisible(), 'The dictionary door is visible once the 学習ツール panel is open');
   assert.equal(await kanjidex.and(page.getByRole('button',{name:/^kanji by shape$/u})).count(),1,
     'Dictionary tool includes its label in the accessible name');
+  checks.push('dictionary-door-behind-study-tools');
   await kanjidex.click();
   await page.locator('.kdx-lens').filter({hasText:'by its shape'}).click();
   await page.locator('.skip-hit').first().waitFor();
@@ -87,21 +93,27 @@ try {
   assert.equal(await page.locator('.skip-wheel-column:not(.skip-wheel-filter)').count(),3);
   assert.equal(await page.locator('.skip-wheel-filter[data-role="filter"]').count(),1);
   assert.equal(await page.locator('.skip-wheel-parts[data-role="left-parts"]').count(),1);
+  checks.push('skip-grid-wheels-and-filters');
   assert.equal(requests.filter(u=>u.includes('skip')).length,0);
   assert.equal(requests.filter(u=>/editorial\.css|design\//u.test(u)).length,0,JSON.stringify(requests));
+  checks.push('no-skip-or-editorial-requests');
   await page.click('#back');
   await openShelfTools(page);
   await page.locator('#decks-link').click();
   await page.locator('.dojo-deck[data-deck="context"]').waitFor();
   assert.equal(await page.locator('.dojo-deck[data-deck="personal"]').count(),0,'The handoff offers no personal-collections deck');
+  checks.push('no-personal-deck-row');
   await page.goto(personalURL.href,{waitUntil:'domcontentloaded'});
   await page.locator('#shelf-reading-results .shelf-item').first().waitFor();
   assert.notEqual(await page.evaluate(() => document.body.dataset.view),'personaldeck','The personal route falls back to the shelf');
   assert.equal(await page.locator('.pc').count(),0);
+  checks.push('personal-route-falls-back-to-shelf');
   assert.equal(requests.filter(u=>u.includes('decks/personal')).length,0,JSON.stringify(requests));
+  checks.push('no-personal-requests');
   assert.equal(errors.length,0,JSON.stringify(errors));
+  checks.push('no-page-errors');
   await page.screenshot({path:resolve(temporary,'skip-standalone.png')});
-  writeFileSync(resolve(temporary,'result.json'),JSON.stringify({pass:true,mode:fragment?'fragment':'document',artifactSha256:identity.artifactSha256,browser:browser.version(),requests,errors,shelfLook,scope:'Silent Chromium standalone lookup mechanics and embedded editorial layer; no physical-device or full learner journey acceptance'},null,2)+'\n');
+  writeFileSync(resolve(temporary,'result.json'),JSON.stringify({pass:true,mode:fragment?'fragment':'document',runId:process.env.KAIRO_GATE_RUN_ID??null,site,artifactSha256:identity.artifactSha256,browser:browser.version(),checks,requests,errors,shelfLook,scope:'Silent Chromium standalone lookup mechanics and embedded editorial layer; no physical-device or full learner journey acceptance'},null,2)+'\n');
   console.log('PASS standalone: real SKIP grid, three code wheels and two independent filters with all subresource network blocked.');
   console.log('PASS no runtime exceptions or external SKIP data requests.');
   console.log(`PASS embedded editorial layer and shelf art: ${JSON.stringify(shelfLook)}`);
