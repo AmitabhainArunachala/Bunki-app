@@ -3519,7 +3519,15 @@ try {
       await page.evaluate(() => { window.__ink = []; });
       await stage(page, readerWord(page));
       await midWriting(page);
-      const gutter = await page.evaluate(() => { const r = document.getElementById('reader').getBoundingClientRect(); return { x: Math.max(2, r.left / 2), y: Math.min(innerHeight - 140, 760) }; });
+      // paper a finger lands on: no word within a fingertip of it, since Chromium adjusts a touch to a door near it (Hfix-1A:
+      // item 11's proportional digits reflowed the story, and its "た。" line came to sit at the old fixed point)
+      const gutter = await page.evaluate(() => {
+        const r = document.getElementById('reader').getBoundingClientRect(), x = Math.max(2, r.left / 2);
+        const near = (y) => [...document.querySelectorAll('#reader .tok, #reader button, #reader a, #reader [role="button"]')].some((n) => {
+          const b = n.getBoundingClientRect(); return b.width && b.left - x < 40 && b.top - 28 < y && b.bottom + 28 > y; });
+        for (let y = Math.min(innerHeight - 140, 760); y > 160; y -= 6) if (!near(y)) return { x, y };
+        return { x, y: Math.min(innerHeight - 140, 760) };
+      });
       const onPaper = await page.evaluate(({ x, y }) => { const hit = document.elementFromPoint(x, y); return !!hit && !hit.closest('#mini, .tok, button, a, [role="button"]'); }, gutter);
       await page.touchscreen.tap(gutter.x, gutter.y);
       await page.waitForFunction(() => !document.getElementById('mini'), null, { timeout: 3000 }).catch(() => {});
