@@ -88,6 +88,7 @@ function reader() {
       set('D4.own-english', { glosses: ['VH_INLINE_ENGLISH', 'valley', 'valley'] });
     }
     if (name === 'g3-stalled') set(spec.kills[0], { popup: null });
+    if (name === 'english-settles-empty') set('D4.A-english', { glosses: [''] });
     if (name === 'g3-kept-reading')
       for (const kill of spec.kills)
         set(
@@ -1028,8 +1029,8 @@ test('record served base and candidate/restore page loads are bound to the teste
 });
 
 test('Ladder reader schedule retains all three rungs, off reading and independent VH Escape rows', () => {
-  assert.equal(READER_CASES.length, 102);
-  assert.equal(Object.keys(READER_CONTROLS).length, 11);
+  assert.equal(READER_CASES.length, 103);
+  assert.equal(Object.keys(READER_CONTROLS).length, 12);
   assert.equal(READER_RUN_ROWS.d2.length, 26);
   assert.equal(READER_RUN_ROWS.d4.length, 11);
   for (const f of [1, 0])
@@ -1105,5 +1106,80 @@ test('Ladder controls reject vacuous/wrong witnesses, missing off kills, or unre
     const valid = reader();
     for (const id of optional) row(valid, 'r1', id).pass = false;
     assert.deepEqual(adapter.validate(valid, context).errors, []);
+  }
+});
+
+test('settled English control preserves every woven control and requires its exact empty-gloss fault', () => {
+  const names = [
+    'escape-loses-source-focus',
+    'escape-focuses-other-occurrence',
+    'escape-leaves-popup-open',
+    'inline-english-content',
+    'inline-english-named-d4',
+    'inline-english-named-d5',
+    'g3-stalled',
+    'english-settles-empty',
+    'g3-kept-reading',
+    'g3-off-hidden',
+    'm8',
+    'r1',
+  ];
+  assert.deepEqual(Object.keys(READER_CONTROLS), names);
+  assert.equal(READER_CASES.length, 103);
+  assert.equal(READER_CASES.filter((id) => !id.startsWith('C.')).length, 91);
+  const get = (report) =>
+    report.controls.find((control) => control.name === 'english-settles-empty');
+  const main = (control) => control.rows.find((row) => row.id === 'D4.A-english');
+  for (const engine of ['chromium', 'webkit']) {
+    const adapter =
+      learningReportContracts[engine === 'webkit' ? 'reader-doors-webkit' : 'reader-doors'];
+    const fresh = () => ({ ...reader(), engine });
+    const judge = (report) => adapter.validate(report, { ...context, engine });
+    for (const optionalPass of [true, false]) {
+      const good = fresh();
+      get(good).rows.find((row) => row.id === 'D4.own-english').pass = optionalPass;
+      assert.equal(judge(good).passed, true, `${engine}: exactly named optional collateral red`);
+    }
+    for (const mutate of [
+      (control) => {
+        main(control).observed = {};
+      },
+      (control) => {
+        main(control).observed.glosses = [];
+      },
+      (control) => {
+        main(control).observed.glosses = ['this'];
+      },
+      (control) => {
+        main(control).observed.glosses = ['', 'extra'];
+      },
+      (control) => {
+        main(control).pass = true;
+      },
+      (control) => {
+        control.rows.find((row) => row.id === 'D4.B-door').pass = false;
+      },
+      (control) => {
+        control.served[0].applied[0].key = 'contentEnglish';
+      },
+      (control) => {
+        control.restore.rows.find((row) => row.id === 'D4.A-english').pass = false;
+      },
+      (control) => {
+        control.restore.delivered[0].sha256 = FOREIGN;
+      },
+    ]) {
+      const bad = fresh();
+      mutate(get(bad));
+      assert.equal(judge(bad).passed, false, engine);
+    }
+    const missing = fresh();
+    missing.controls = missing.controls.filter(
+      (control) => control.name !== 'english-settles-empty',
+    );
+    assert.equal(judge(missing).passed, false);
+    const omitted = fresh();
+    omitted.results = omitted.results.filter((row) => row.id !== 'C.english-settles-empty');
+    assert.equal(judge(omitted).passed, false);
   }
 });

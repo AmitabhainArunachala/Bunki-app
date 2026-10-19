@@ -207,6 +207,12 @@ export const READER_CONTROLS = Object.freeze({
   },
   'inline-english-named-d5': { run: 'd5', key: 'namedEnglish', kills: ['D5.named-no-english'] },
   'g3-stalled': { run: 'd4', key: 'stalled', kills: ['D4.third-tap-stage'] },
+  'english-settles-empty': {
+    run: 'd4',
+    key: 'englishEmpty',
+    kills: ['D4.A-english'],
+    allowed: ['D4.own-english'],
+  },
   'g3-kept-reading': {
     run: 'd2',
     key: 'keepReading',
@@ -314,6 +320,8 @@ function readerWitness(name, control) {
   if (name === 'inline-english-named-d5')
     return seen('D5.named-no-english')?.glosses?.includes('VH_INLINE_ENGLISH');
   if (name === 'g3-stalled') return seen('D4.third-tap-stage')?.popup === null;
+  if (name === 'english-settles-empty')
+    return seen('D4.A-english')?.glosses?.length === 1 && seen('D4.A-english').glosses[0] === '';
   if (name === 'g3-kept-reading')
     return [1, 0].every(
       (f) =>
