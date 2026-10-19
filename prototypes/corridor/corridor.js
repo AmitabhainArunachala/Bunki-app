@@ -29122,9 +29122,9 @@ function renderReview(main) {
         }
         readings.append(line);
       }
-      if (readings.querySelector('[data-lesson-selection]')) readings.append(el('p', 'sense-pos', tx('「レッスン」は、このレッスンで扱う読みです。', '“Lesson” marks the readings selected for this lesson.')));
-      if (display?.officialReadings?.length) readings.append(el('p', 'sense-pos', tx('＊ 常用漢字表にある読み。', '* Reading supplied by the Jōyō Kanji Table.')));
-      if (display?.readingsState !== 'complete') readings.append(el('p', 'sense-pos', display?.readingsState === 'pending'
+      if (readings.querySelector('[data-lesson-selection]')) readings.append(el('p', 'sense-pos review-kanji-note', tx('「レッスン」は、このレッスンで扱う読みです。', '“Lesson” marks the readings selected for this lesson.')));
+      if (display?.officialReadings?.length) readings.append(el('p', 'sense-pos review-kanji-note', tx('＊ 常用漢字表にある読み。', '* Reading supplied by the Jōyō Kanji Table.')));
+      if (display?.readingsState !== 'complete') readings.append(el('p', 'sense-pos review-kanji-status', display?.readingsState === 'pending'
         ? tx('全ての読みを読み込み中…', 'Loading the complete reading set…')
         : tx('全ての読みは現在表示できません。確認できる読みを表示しています。', 'The complete reading set is unavailable. Showing the available readings.')));
       row.append(readings);

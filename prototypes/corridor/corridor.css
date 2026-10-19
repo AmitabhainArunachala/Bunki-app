@@ -6434,10 +6434,10 @@ body.zen .review-face {
   background-color: var(--card-ground-0, var(--card-ground));
   /* kōzo fibers (anisotropic turbulence) + su-no-me laid lines — the paper
    * is real; texture alpha ≤6% so the ink never loses contrast */
-  /* drawn: su-no-me, the washi's laid lines — hairlines of the card's ink at a breath, hard-edged */
+  /* drawn: su-no-me, the washi's laid lines in the active world's dark pigment */
   background-image:
-    repeating-linear-gradient(180deg, color-mix(in srgb, var(--card-ink) 2.2%, transparent) 0 1px, transparent 1px 6px),
-    repeating-linear-gradient(90deg, color-mix(in srgb, var(--card-ink) 1.2%, transparent) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(180deg, color-mix(in srgb, var(--color-zen-ground-deep) 2.2%, transparent) 0 1px, transparent 1px 6px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--color-zen-ground-deep) 1.2%, transparent) 0 1px, transparent 1px 34px),
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='0.04 0.008' numOctaves='4' seed='7' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0.45 0 0 0 0 0.38 0 0 0 0 0.25 0 0 0 0.06 0'/></filter><rect width='400' height='400' filter='url(%23w)'/></svg>");
   /* lacquerware radii stay small; the rim is maki-e gold, one hair wide */
   border: 0;
@@ -6506,6 +6506,24 @@ body.zen .review-reading {
   color: var(--card-red);
   letter-spacing: 0.05em; /* the brush hand carries its own rhythm */
   text-shadow: 0 0 0.5px currentColor;
+}
+/* A full kanji reading set can exceed a short screen. Keep its paper in normal
+ * document flow instead of letting the answer spill into the sticky grade row. */
+body.zen .review-face:has([data-kanji-readings]) {
+  flex-shrink: 0;
+}
+body.zen [data-kanji-readings] .review-kanji-readings {
+  margin: 8px 0;
+}
+/* Reading labels and provenance are interface copy, not brush-sized readings. */
+body.zen [data-kanji-readings] .sense-pos {
+  font: 400 var(--type-chrome)/1.5 var(--font-ui);
+  letter-spacing: normal;
+  text-shadow: none;
+  color: var(--color-zen-ground-deep);
+}
+body.zen [data-kanji-readings] > .sense-pos {
+  margin: 8px 0 0;
 }
 /* 音 — the fifth seal: the card's voice door */
 .say {
@@ -6655,11 +6673,13 @@ body.zen .declare-row .declare-notyet {
   border: 1px solid color-mix(in srgb, var(--zen-text) 32%, transparent);
 }
 
-/* the room's small lights — small, not faint: they are the only way out of the room and its
- * menu, and at 0.55 they fell under 4.5:1 in the 岩 world (PR #77 f7cd297c) */
+/* These fixed controls can pass over the answer's paper when it scrolls. Their
+ * own world surface keeps the ink legible regardless of what is underneath. */
 body.zen .zen-exit,
 body.zen .zen-more {
-  color: var(--zen-text);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border-radius: var(--radius-control);
   opacity: 1;
 }
 body.zen .zen-progress i {
