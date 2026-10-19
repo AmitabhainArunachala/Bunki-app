@@ -9519,8 +9519,32 @@ function unpinTouchRows(rt) {
     if (n.hasAttribute('data-touch-pin')) { n.style.removeProperty('width'); n.removeAttribute('data-touch-pin'); }
   }
 }
+/** Hfix-2e2 · G6-1 · a touch reading folded away fades before its box goes (editorial.css: the lead's 2158 delayed
+ * collapse). While it fades it keeps its seat, its overhang and its pinned rows: unseated at once, a reading wider than its
+ * word would widen the word for the fade and move the line twice. It is unseated once it has gone (its fade ended or was cut
+ * short), and at once where no fade runs (reduced motion, or a reading no longer on the page). */
+const TOUCH_READING_FADES = new WeakSet();
+function touchReadingFading(rt) {
+  if (!rt.isConnected || !rt.classList.contains('hidden-rt') || getComputedStyle(rt).display === 'none') return false;
+  if (!TOUCH_READING_FADES.has(rt)) {
+    TOUCH_READING_FADES.add(rt);
+    let late = 0;
+    const gone = () => {
+      rt.removeEventListener('transitionend', gone);
+      rt.removeEventListener('transitioncancel', gone);
+      clearTimeout(late);
+      TOUCH_READING_FADES.delete(rt);
+      requestAnimationFrame(() => seatTouchReading(rt));
+    };
+    rt.addEventListener('transitionend', gone);
+    rt.addEventListener('transitioncancel', gone);
+    late = setTimeout(gone, 1000);
+  }
+  return true;
+}
 function seatTouchReading(rt) {
   if (!rt?.style) return;
+  if (touchReadingFading(rt)) return;
   rt.style.removeProperty('margin-inline');
   if (rt.isConnected) unpinTouchRows(rt);
   if (!touchReading(rt)) return;
