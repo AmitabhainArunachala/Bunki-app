@@ -698,6 +698,7 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
   animation: read-mini-rise var(--motion-room) var(--ease-enter) backwards;
 }
 @keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, var(--mini-rise, 10px), 0); } }
+#mini[data-side='above'] { --mini-rise: -10px; }
 /* Ladder · a word set in the page's own text carries its card: the card stands in the text's scroll layer (placeFloating:
    data-flow="text", its top in the document), travels with the word and goes under the bars and the tabs as the text does */
 #mini[data-flow='text'] {

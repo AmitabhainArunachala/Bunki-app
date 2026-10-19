@@ -11908,14 +11908,13 @@ function placeFloating(card, r) {
   else delete card.dataset.seatScroll;
   card.style.left = `${left + ox}px`;
   card.style.top = `${top + oy}px`;
-  card.style.removeProperty('clip-path');
+  card.style.clipPath = '';
   // CSS rounds fractional positions; retain the exact calculated seat for the sentence pin.
   if (Number.isFinite(top)) card.dataset.floatingTop = String(top);
   else delete card.dataset.floatingTop;
   // which side of its word the card stands on: its shade falls away from the word, never across it, and above its word it
-  // arrives from above, so its rise never brushes the reading
+  // arrives from above (rooms/read.css --mini-rise), so its rise never brushes the reading
   card.dataset.side = top < r.top ? 'above' : 'below';
-  card.style.setProperty('--mini-rise', card.dataset.side === 'above' ? '-10px' : '10px');
   card._seat = scroller && scroller !== 'window' && anchor ? { scroller, top, left, anchor: anchor.getBoundingClientRect(),
     frame: { top: ceiling, bottom: Math.min(floor + 8, scroller.getBoundingClientRect().bottom) } } : null;
   markCardMore(card);
@@ -11945,8 +11944,7 @@ function travelSlip(card) {
   card.dataset.floatingTop = String(top);
   const box = card.getBoundingClientRect();
   const cutTop = Math.max(0, seat.frame.top - box.top), cutBottom = Math.max(0, box.bottom - seat.frame.bottom);
-  if (cutTop || cutBottom) card.style.clipPath = `inset(${cutTop}px 0 ${cutBottom}px 0)`;
-  else card.style.removeProperty('clip-path');
+  card.style.clipPath = cutTop || cutBottom ? `inset(${cutTop}px 0 ${cutBottom}px 0)` : '';
 }
 // a scroll inside a page (any scroller but the window, whose cards ride in its own layer) carries its word's card along
 if (typeof document !== 'undefined') document.addEventListener('scroll', (event) => {
