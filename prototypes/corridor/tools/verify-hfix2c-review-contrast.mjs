@@ -164,15 +164,20 @@ async function reviewRun() {
       const before = snapshot(await reviewRecord(page));
       assert(before.taken.some(t => t.id === '生' && t.t === 'kanji'), 'Fixture was actually imported');
       await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#reveal').click();
-      await page.locator('[data-kanji-readings]').waitFor(); await settle(page, 400);
+      await page.locator('[data-kanji-readings]').waitFor(); await settle(page, historical ? 700 : 400);
       if (historical) await page.addStyleTag({ content: 'body.zen .review-face [data-kanji-readings] > p.review-kanji-status { color: #a02a1e; }' });
       for (const width of widths) {
-        await page.setViewportSize({ width, height: width === 320 ? 568 : width === 390 ? 844 : 900 });
-        await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-        await settle(page, 200);
+        // Historical control reproduces the original three-state adapter's
+        // as-arrived 390x844 review back. Resizing or scrolling would rescue its
+        // old clipped/overlaid status line and change the defect being measured.
+        if (!historical) {
+          await page.setViewportSize({ width, height: width === 320 ? 568 : width === 390 ? 844 : 900 });
+          await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+          await settle(page, 200);
+        }
         const initialGeometry = await page.evaluate(geometry);
         let scrolledToStatus = false;
-        if (state !== 'complete' && !initialGeometry.fallback.missing &&
+        if (!historical && state !== 'complete' && !initialGeometry.fallback.missing &&
             (!initialGeometry.fallback.fullyVisible || !initialGeometry.fallback.unobscured)) {
           if (!fixture && !historical && ['sumi','hokusai'].includes(world) && [390,1440].includes(width))
             await page.screenshot({ path: join(evidence, 'shots', `${engine}-${world}-${state}-${width}-initial.png`) });
@@ -194,7 +199,7 @@ async function reviewRun() {
           const red = fallbackPairs.length > 0 && fallbackPairs.some(p => !p.ok);
           const requiredRed = engine === 'chromium';
           report.controls.push({ kind: 'historical-fallback-presentation', world, width, pairs: fallbackPairs, red, requiredRed,
-            pass: statusCorrect && unchanged && fallbackPairs.length > 0 && (!requiredRed || red), geometry: g,
+            pass: statusCorrect && unchanged && fallbackPairs.length > 0 && (!requiredRed || red), initialGeometry, scrolledToStatus, geometry: g,
             expectation: requiredRed ? 'Exact pre-R2 ground/seat plus old fallback ink must reproduce the actual Chromium red' : 'Historical WebKit fallback was green; preserve its actual ratio without inventing a defect' });
           await page.screenshot({ path: join(evidence, 'shots', name + '.png') }); persist(); continue;
         }
