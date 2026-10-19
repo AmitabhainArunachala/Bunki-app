@@ -9483,8 +9483,8 @@ function deckIds() {
  * (storage full) only means the row is missing: the tap still opens. */
 function logTap(card, where, frame, depth) {
   const cardId = card?.id || ui.queue[ui.pos] || '';
-  const next = logLookup(ctx.state, { cardId, where, surface: frame.surface, key: frame.key, depth }, new Date());
-  if (save(next)) ctx.state = next;
+  // a lookup is written like a grade: on the ledger as it is stored now, never a stale copy over another window's grades
+  writeLedger((fresh) => logLookup(fresh, { cardId, where, surface: frame.surface, key: frame.key, depth }, new Date()));
 }
 
 /** the word whose meaning is open shows its reading; closing the meaning returns the clean text */
