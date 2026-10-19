@@ -3897,10 +3897,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   white-space: nowrap;
 }
 
-.stroke-reading-field--long {
-  grid-template-columns: minmax(0, 1fr);
-}
-
 .stroke-reading-note {
   grid-column: 1 / -1;
   margin: 0;

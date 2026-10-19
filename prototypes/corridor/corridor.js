@@ -35228,9 +35228,6 @@ function strokeAwakeField(page, k) {
     strokeReadingRow('音読み', 'on', k?.on, 'on', k?.officialReadings),
     strokeReadingRow('訓読み', 'kun', k?.kun, 'kun', k?.officialReadings),
   );
-  // a long complete list (生 has eighteen kun; 54 kanji have more than six of a kind) reads across the whole width
-  // rather than down a half-width column; every other kanji keeps the two boxes side by side
-  if ((k?.on?.length || 0) > 6 || (k?.kun?.length || 0) > 6) readings.classList.add('stroke-reading-field--long');
   if (k?.officialReadings?.length) {
     readings.append(el('p', 'stroke-reading-note', tx('* 常用漢字表（2010年）にある読み', '* a reading from the official Jōyō kanji table (2010)')));
   }
