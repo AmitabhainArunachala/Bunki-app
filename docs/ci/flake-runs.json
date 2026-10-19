@@ -163,40 +163,6 @@
     "result": "observed",
     "startedAt": "2026-10-12T06:09:39Z"
   },
-  "37200242361/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T11:53:24Z"
-  },
-  "37200516229/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T11:58:29Z"
-  },
-  "37200848240/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T12:04:13Z"
-  },
-  "37201081984/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T12:08:24Z"
-  },
-  "37201269477/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T12:11:45Z"
-  },
-  "37201349759/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T12:13:11Z"
-  },
-  "37201855087/1": {
-    "result": "rejected",
-    "policy": "9835b8e2c755d1df8326937d2a35799822f2ffe3c54507fb849ce109f55a45a4",
-    "startedAt": "2026-10-04T12:22:05Z",
-    "reason": "Unexpected producer event"
-  },
-  "37201855140/1": {
-    "result": "observed",
-    "startedAt": "2026-10-04T12:22:05Z"
-  },
   "37321519626/1": {
     "result": "observed",
     "startedAt": "2026-10-05T14:02:35Z"
@@ -1498,5 +1464,9 @@
   "37714882624/21": {
     "result": "observed",
     "startedAt": "2026-10-19T09:26:13Z"
+  },
+  "37925123360/18": {
+    "result": "observed",
+    "startedAt": "2026-10-19T09:26:21Z"
   }
 }
