@@ -1031,8 +1031,10 @@ try {
       const englishShown = await page.waitForFunction((i) => document.querySelector(`#reader .tok[data-index="${i}"]`)?.dataset.ladderRung === 'gloss',
         IU.index, { timeout: 10_000 }).then(() => true, () => false);
       const english = await tokenState(page, IU);
-      check(`G2 ${lang}: one tap sets いう's English under it: the word kept, its row under it, no popup yet`,
-        englishShown && english?.surface === IU.token.s && english.rung === 'gloss' && english.lines === 1 && english.hasEn && !!english.lineText
+      // Ladder R2 (the lead's spec change, 10-20: "it never shows —; with no gloss at all, show nothing under the word and keep
+      // the rung"): いう has no English of its own (several entries read いう), so its rung's row says nothing, never the dash
+      check(`G2 ${lang}: one tap sets いう's English rung: the word kept, its row under it saying nothing (no English of its own) and never "—", no popup yet`,
+        englishShown && english?.surface === IU.token.s && english.rung === 'gloss' && english.lines === 1 && english.hasEn && english.lineText === ''
           && await page.locator('#mini').count() === 0, JSON.stringify(english), { id: `G2.${lang}.english` });
       await tap(page, IU);
       // R2 · the popup settles once the full dictionary has answered: before, the quick dictionary's miss; after, the entries

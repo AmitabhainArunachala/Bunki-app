@@ -387,6 +387,18 @@ const GLYPHS = () => {
   };
 };
 const glyphsOf = (page, selector) => page.evaluate((s) => window.__glyphs(document.querySelector(s)), selector);
+/* Ladder R2 · every text an English row under a text word says, in order, by the word's index (window.__en): recorded in the
+ * mutation's own microtask, so a text that stood for a frame is never missed — read by the walks, never written back. */
+const EN_TRACE = () => {
+  window.__en = {};
+  const note = () => {
+    for (const ink of document.querySelectorAll('.tok[data-index] > .tok-en > .tok-en-text')) {
+      const list = (window.__en[ink.closest('.tok[data-index]').dataset.index] ||= []);
+      if (list.at(-1) !== ink.textContent) list.push(ink.textContent);
+    }
+  };
+  new MutationObserver(note).observe(document, { subtree: true, childList: true, characterData: true });
+};
 /* G4 · every change of a stage headword's ink (data-ink: arriving · writing · settling; data-ink-ended: written · input ·
  * replaced), with the document clock and what the word held then — read by the walks, never written back. */
 const INK_TRACE = () => {
@@ -3626,6 +3638,123 @@ try {
           place.rows[0].text === '総' && place.rows[1].text === '理' && place.rows.every((row) => row.whole) && place.clear &&
           (place.still || place.glideJustified)), places);
     };
+    // Ladder R2 · D7 on short glasses (the critic's FAIL, 10-20, WebKit touch: 総理 at 30, 45 and 60 % of the clear glass at
+    // 390×520 and 390×560, and the second 総理 mid-glass at 320×568, its box cut with its fade lying on a kanji row; DESIGN:
+    // "the fade never lies on a row"). Wherever the word stands, its box (opened by observed rungs) is compact; where it is
+    // cut, its fade lies on no row of it and the cut falls across none; it stands on neither the word, its reading nor its
+    // English. The rows are every line the box has: its bands, their own lines, Save's menu items
+    const d7FadeFacts = (page) => page.evaluate(() => {
+      const mini = document.getElementById('mini');
+      if (!mini) return { mini: false };
+      const box = mini.getBoundingClientRect(), border = parseFloat(getComputedStyle(mini).borderTopWidth) || 0;
+      const seen = { top: box.top + border, bottom: box.top + border + mini.clientHeight };
+      const after = getComputedStyle(mini, '::after'), more = mini.dataset.more === 'true';
+      const fade = more && after.content !== 'none' && after.content !== 'normal' ? parseFloat(after.height) : 0;
+      const fadeTop = seen.bottom - fade;
+      const rows = [...mini.querySelectorAll('.mini-head, .mini-word-note, .mini-actions, .mini-take-reason, .mini-band-head, .mini-kanji-row, ' +
+        '.mini-sentence-open, #vocabulary-list-popover > *, .vocabulary-list-more > *')].filter((n) => n.getClientRects().length).map((n) => {
+        const r = n.getBoundingClientRect();
+        return { row: n.className.split(' ')[0] + (n.matches('.mini-kanji-row') ? `:${n.textContent.trim().slice(0, 1)}` : ''),
+          top: Math.round(r.top * 10) / 10, bottom: Math.round(r.bottom * 10) / 10 };
+      });
+      return { mini: true, compact: mini.classList.contains('is-compact'), cut: mini.scrollHeight > mini.clientHeight + 1, more, fade,
+        scrollTop: mini.scrollTop, glide: mini.dataset.glide ?? null, side: mini.dataset.side ?? null,
+        seen: { top: Math.round(seen.top), bottom: Math.round(seen.bottom) },
+        underFade: fade ? rows.filter((r) => r.bottom > fadeTop + 0.5 && r.top < seen.bottom - 0.5)
+          .map((r) => `${r.row} ${r.top}–${r.bottom} (fade ${Math.round(fadeTop)}–${Math.round(seen.bottom)})`) : [],
+        across: rows.filter((r) => r.top < seen.bottom - 0.5 && r.bottom > seen.bottom + 0.5).map((r) => r.row),
+        kanji: rows.filter((r) => r.row.startsWith('mini-kanji-row') && r.top >= seen.top - 0.5 && r.bottom <= fadeTop + 0.5).map((r) => r.row.slice(-1)) };
+    });
+    const ladderD7Short = (viewport) => async (page) => {
+      await openStory(page);
+      const places = [];
+      // the first 総理 at 30, 45 and 60 % of the clear glass; the second (the critic's 320×568 case) mid-glass
+      for (const [nth, spot] of [[0, 0.3], [0, 0.45], [0, 0.6], [1, 0.45]]) {
+        const word = page.locator(`#reader .tok[data-prose-label="${WORD}"]`).nth(nth);
+        for (let k = 0; k < 2; k++) {
+          await word.evaluate((node, spot) => {
+            const edge = (sel, side, fallback) => { const n = document.querySelector(sel); if (!n) return fallback; const style = getComputedStyle(n);
+              if (!['fixed', 'sticky'].includes(style.position) || style.display === 'none') return fallback; const b = n.getBoundingClientRect(); return b.height ? b[side] : fallback; };
+            const ceiling = Math.max(edge('#app > .chrome', 'bottom', 0), edge('#app > .scale-thread', 'bottom', 0));
+            const floor = Math.min(edge('#primary-tabs', 'top', innerHeight), edge('.listen-row', 'top', innerHeight), innerHeight);
+            scrollBy(0, window.__glyphs(node).top - (ceiling + (floor - ceiling) * spot));
+          }, spot);
+          await delay(300);
+        }
+        const index = Number(await word.getAttribute('data-index'));
+        const placed = await word.evaluate((node) => Math.round(window.__glyphs(node).top));
+        const rungs = [];
+        for (let step = 0; step < 3 && !(await page.locator('#mini').count()); step++) {
+          await pressSettled(page, word, 500);
+          rungs.push(await page.locator('#mini').count() ? 'stage' : await word.getAttribute('data-ladder-rung'));
+        }
+        // the glide, the sense and a late font have seated it
+        await delay(1500);
+        const seen = await d7FadeFacts(page), clear = await boxClear(page, word);
+        places.push({ index, spot, placed, rungs, ...seen, clear: clear.clear, overReading: clear.overReading, overWord: clear.overWord, overEnglish: clear.overEnglish });
+        if (spot === 0.45) await page.screenshot({ path: resolve(evidence, `${engine}-L-d7-fade-${viewport.width}x${viewport.height}-${nth ? 'second' : 'first'}.png`) });
+        await page.keyboard.press('Escape'); await delay(400);
+        if (await page.locator('#mini').count()) { await page.keyboard.press('Escape'); await delay(400); }
+      }
+      check(`L.d7.fade.${viewport.width}x${viewport.height}`, `${viewport.width}×${viewport.height}: 総理 at 30, 45 and 60 % of the clear glass and the second 総理 mid-glass: its box, opened by observed rungs, is compact; where it is cut its fade lies on no row of it and the cut falls across none; it stands on neither the word, its reading nor its English`,
+        places.length === 4 && places.every((place) => place.mini && place.compact && place.rungs.at(-1) === 'stage' && place.clear &&
+          (!place.cut || (place.more && place.fade >= 16 && place.underFade.length === 0 && place.across.length === 0))), places);
+    };
+    // Ladder R2 · the English rung's words (the critic's round-1 FAIL, 10-20: tap 2 repeated the quick dictionary's first
+    // gloss, and 9 of the story's 102 content words showed "—"). On a cold dictionary (its index answering 1.8 s late), every
+    // text an English row says is recorded as it changes (EN_TRACE). A word whose sense the article's sense data names (the
+    // sidecar: 先 in 出荷先 is "destination", ため in 広げていくために "sake") never says another meaning, not even first; a word
+    // whose box has a meaning says it under the word (スタートアップ: "startup"), a word whose box has none says nothing,
+    // and no row ever says "—"
+    const GLOSS_SENSE = [{ index: 155, s: '先', english: 'destination', never: 'point' }, { index: 256, s: 'ため', english: 'sake', never: 'good' }];
+    const GLOSS_PLAIN = [{ index: 17, s: 'スタートアップ', english: 'startup' }, { index: 90, s: 'Ｍｕｊｉｎ' }, { index: 123, s: 'ＡＩ' }, { index: 128, s: '実装' },
+      { index: 212, s: 'ござい' }, { index: 217, s: '各賞' }];
+    const ladderGloss = async (page) => {
+      await page.route('**/data/share_alike/dict-v2/index.json', async (route) => { await delay(1800); await route.continue().catch(() => {}); });
+      await openStory(page);
+      const words = [];
+      for (const fixture of [...GLOSS_SENSE, ...GLOSS_PLAIN]) {
+        const word = page.locator(`#reader .tok[data-index="${fixture.index}"]`);
+        await word.evaluate((node) => node.scrollIntoView({ block: 'center' }));
+        await delay(250);
+        const label = await word.getAttribute('data-prose-label');
+        for (let step = 0; step < 2 && (await word.getAttribute('data-ladder-rung')) !== 'gloss' && !(await page.locator('#mini').count()); step++) {
+          await pressSettled(page, word, 300);
+        }
+        const rung = await word.getAttribute('data-ladder-rung');
+        // its answer: the row stops waiting once its reading's rows and its sense are in (the first word waits for the index)
+        await page.waitForFunction((node) => !node.querySelector(':scope > .tok-en.tok-en-wait'), await word.elementHandle(), { timeout: 15000 }).catch(() => {});
+        await delay(words.length ? 1200 : 2600);
+        const row = await word.evaluate((node) => {
+          const line = node.querySelector(':scope > .tok-en'), ink = line?.querySelector('.tok-en-text');
+          return { english: ink ? ink.textContent : null, drawn: !!line && getComputedStyle(line).display !== 'none' && line.getClientRects().length > 0 && !!ink?.textContent.trim() };
+        });
+        // the box: what its meaning line says once it has settled (not busy, its sense not pending)
+        await pressSettled(page, word, 300);
+        await page.waitForFunction(() => { const m = document.getElementById('mini'); return !!m && !m.getAttribute('aria-busy') && m.dataset.sense !== 'pending'; }, null, { timeout: 15000 }).catch(() => {});
+        await delay(300);
+        const box = await page.evaluate(() => { const gloss = document.querySelector('#mini .mini-gloss');
+          return { box: !!document.getElementById('mini'), gloss: gloss?.textContent.trim() ?? null, miss: !!gloss?.matches('.mini-miss, .mini-wait') }; });
+        words.push({ ...fixture, label, rung, ...row, ...box, seen: await page.evaluate((i) => window.__en?.[i] || [], fixture.index) });
+        await page.keyboard.press('Escape'); await delay(350);
+        if (await page.locator('#mini').count()) { await page.keyboard.press('Escape'); await delay(350); }
+      }
+      const all = await page.evaluate(() => window.__en || {});
+      const dashes = Object.entries(all).flatMap(([index, texts]) => texts.filter((text) => /^\s*[—–-]\s*$/u.test(text)).map((text) => `#${index} ${text}`));
+      const plain = words.filter((w) => !w.never);
+      check('L.gloss.never-dash', 'no English row under a word ever says "—" (the story\'s dash words on a cold dictionary): a word whose box has a meaning says it under the word (スタートアップ "startup"), a word whose box has none says nothing, its rung standing',
+        plain.length === GLOSS_PLAIN.length && dashes.length === 0 && plain.every((w) => {
+          const want = GLOSS_PLAIN.find((f) => f.index === w.index);
+          return w.rung === 'gloss' && w.box && (w.gloss && !w.miss ? w.drawn && !!w.english?.trim() : !w.drawn && !w.english?.trim()) &&
+            (!want.english || w.english === want.english);
+        }), { dashes, words: plain });
+      const sensed = words.filter((w) => w.never);
+      // another meaning: any text but the sense's own (a dash is no meaning; L.gloss.never-dash judges it)
+      for (const w of sensed) w.wrong = w.seen.filter((text) => text.trim() && !/^[—–-]$/u.test(text.trim()) && text.trim() !== GLOSS_SENSE.find((f) => f.index === w.index).english);
+      check('L.gloss.sense', 'a word whose sense the article\'s sense data names (先 in 出荷先, ため) says that sense\'s gloss under it, on a cold dictionary, and never another meaning first',
+        sensed.length === GLOSS_SENSE.length && sensed.every((w) => w.rung === 'gloss' && w.drawn && w.english === GLOSS_SENSE.find((f) => f.index === w.index).english && !w.wrong.length),
+        { words: sensed.map(({ index, s, label, rung, english, drawn, gloss, seen, wrong }) => ({ index, s, label, rung, english, drawn, box: gloss, seen, wrong })) });
+    };
     const ladderRun = async (name, body, options = {}) => {
       const begin = rows.length;
       await walk(name, body, options);
@@ -3682,6 +3811,12 @@ try {
     // the D7 control runs where John reads: the Mac in Chromium, the 390×844 phone in WebKit
     const d7Control = desk ? d7Views[0] : d7Views[1];
     for (const viewport of d7Views) await ladderRun(`L-d7-${viewport.width}`, ladderD7(viewport), { viewport, mobile: !desk });
+    // Ladder R2 · D7's fade on the short glasses, where the critic found it on a row: the phone (the Mac's glass is never this
+    // short); the English rung's words in both engines
+    const d7ShortViews = desk ? [] : [{ width: 390, height: 520 }, { width: 390, height: 560 }, { width: 320, height: 568 }];
+    for (const viewport of d7ShortViews) await ladderRun(`L-d7s-${viewport.width}x${viewport.height}`, ladderD7Short(viewport), { viewport, mobile: true });
+    const glossView = { ...ladderView, init: EN_TRACE };
+    await ladderRun('L-gloss', ladderGloss, glossView);
     if (withControls && ladderOn) {
       // the Ladder's own named controls: each served in memory (page.route), never edited on disk; killed only when its named
       // rows fail for the witnessed reason while every other row of its schedule passes, and the unmodified restore passes
@@ -3712,6 +3847,29 @@ try {
         { id: 'no-aside-mark', run: 'L-climb', body: ladderClimb, options: ladderView, kills: ['L.dots'], witness: (row) => row.observed.aside === null,
           edits: [{ file: 'corridor.js', key: 'english-without-aside', from: "  if (hasEn) span.dataset.depthAside = 'meaning';",
             to: "  if (false) span.dataset.depthAside = 'meaning'; // Ladder negative: the English row leaves the dot in place" }] },
+        // Ladder R2 · the cut takes no account of its fade (Hfix-1A's rowCut alone): at 390×560 the fade lies on 理's row
+        ...(desk ? [] : [{ id: 'fade-on-a-row', run: 'L-d7s-390x560', body: ladderD7Short({ width: 390, height: 560 }),
+          options: { viewport: { width: 390, height: 560 }, mobile: true }, kills: ['L.d7.fade.390x560'],
+          witness: (row) => row.observed.some((place) => place.underFade?.length > 0),
+          edits: [{ file: 'corridor.js', key: 'cut-without-its-fade',
+            from: "      const fit = (card.classList.contains('is-compact') ? fadeCut(card, room) : null) ?? rowCut(card, room);",
+            to: '      const fit = rowCut(card, room); // Ladder negative: the cut leaves its fade no room' }] }]),
+        // Ladder R2 · a word with no English says the dash again
+        { id: 'dash-for-none', run: 'L-gloss', body: ladderGloss, options: glossView, kills: ['L.gloss.never-dash'],
+          witness: (row) => row.observed.dashes?.length > 0,
+          edits: [{ file: 'corridor.js', key: 'english-dash', from: "  line.firstElementChild.textContent = text || '';",
+            to: "  line.firstElementChild.textContent = text || '—'; // Ladder negative: the dash" },
+          { file: 'corridor.js', key: 'english-dash-drawn', from: "  line.classList.toggle('tok-en-miss', !text && !waiting);",
+            to: "  line.classList.toggle('tok-en-miss', false); // Ladder negative: the dash is drawn" }] },
+        // Ladder R2 · the English rung takes the word's own first gloss, never the sense its sentence uses
+        { id: 'english-ignores-sense', run: 'L-gloss', body: ladderGloss, options: glossView, kills: ['L.gloss.sense'],
+          witness: (row) => row.observed.words?.some((w) => w.wrong?.length > 0),
+          edits: [{ file: 'corridor.js', key: 'english-never-waits', from: '  const named = sensing && !!sidecarSense(senseNeighbours(token))?.seq;',
+            to: '  const named = false; // Ladder negative: the English never waits for its sense' },
+          { file: 'corridor.js', key: 'english-without-sense', from: "  const line = inlineGlossLine(named ? '' : readerTokenGloss(token), !!reading || sensing);",
+            to: "  const line = inlineGlossLine(named ? '' : readerDoorGloss(readingTokenEntry(token)), !!reading || sensing); // Ladder negative" },
+          { file: 'corridor.js', key: 'english-follows-no-sense', from: '    const was = line.firstElementChild.textContent, found = readerTokenGloss(token);',
+            to: '    const was = line.firstElementChild.textContent, found = readerDoorGloss(readingTokenEntry(token)); // Ladder negative' }] },
       ];
       for (const spec of ladderSpecs) {
         const baseline = ladderSchedules[spec.run] || [];
