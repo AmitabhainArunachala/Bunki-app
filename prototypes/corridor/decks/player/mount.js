@@ -2676,6 +2676,9 @@ function settleBack() {
   const answer = face?.querySelector('.kp-answer');
   const def = answer?.querySelector(':scope > .kp-def');
   if (!def || ui.screen !== 'study') return;
+  const folds = face.querySelector('.kp-folds');
+  // Recalculate the extra seating gap after a viewport, font or fold change.
+  folds?.style.removeProperty('margin-top');
   const bar = ctx.root.querySelector('.kp-grades');
   const barTop = bar ? Math.min(innerHeight, bar.getBoundingClientRect().top) : innerHeight;
   const bottomLimit = barTop - SETTLE_GAP;
@@ -2761,12 +2764,27 @@ function settleBack() {
     // A whole line plus a whole fold can move past an edge; bound the search by the
     // available reading area, and choose the least page movement that clears both.
     const reach = Math.ceil(bottomLimit - topLimit);
-    for (let k = 0; k <= reach; k++) {
-      const d = [whole(dy + k), whole(dy - k)].find(fitsEdges);
-      if (d === undefined) continue;
-      dy = d;
-      break;
+    const findSeat = () => {
+      for (let k = 0; k <= reach; k++) {
+        const d = [whole(dy + k), whole(dy - k)].find(fitsEdges);
+        if (d !== undefined) return d;
+      }
+    };
+    let seat = findSeat();
+    if (seat === undefined && folds && rows.length) {
+      // If every normal-gap seat would cut ink or a fold, make room below the
+      // answer for one whole line plus the dock's clear band. Short cards whose
+      // folds already fit keep their normal spacing (including unmatched MCD).
+      const line = Math.max(1, ...ink.map(([a, b]) => b - a));
+      const extra = Math.ceil(Math.max(0, dockTop - (rows[0][0] - dy)) + line + 1);
+      folds.style.marginTop = `${(parseFloat(getComputedStyle(folds).marginTop) || 0) + extra}px`;
+      rows.splice(0, rows.length, ...[...face.querySelectorAll(FOLD_ROWS)].map(node => {
+        const r = node.getBoundingClientRect(); return [r.top - lift, r.bottom - lift];
+      }));
+      room.down = document.documentElement.scrollHeight - innerHeight - window.scrollY;
+      seat = findSeat();
     }
+    if (seat !== undefined) dy = seat;
   }
   if (dy) window.scrollTo({ top: window.scrollY + dy, behavior: 'instant' });
   if (windowed) seatUnderHeader(windowed, marked);
