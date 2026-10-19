@@ -56,7 +56,8 @@ test('standalone and fragment embed reference, SKIP and loadable durable record 
     assert.equal(typeof modules.binding.openLocalRecordBinding, 'function');
     assert.equal(typeof modules.core.IndexedDbReplicationStore, 'function');
     assert.equal(typeof modules.sync.createRecordSyncAdapter, 'function');
-    for (const path of ['./record-controller.mjs', './record-binding.mjs', './record-app.mjs', './record-sync.mjs', './modules/record-core.mjs', './corridor-ink.js']) {
+    assert.equal(typeof modules.personalStore?.openStore, 'function', 'Standalone runtime lacks the personal store the adoption check opens');
+    for (const path of ['./record-controller.mjs', './record-binding.mjs', './record-app.mjs', './record-sync.mjs', './modules/record-core.mjs', './decks/personal/store.mjs', './corridor-ink.js']) {
       for (const quote of ["'", '"']) {
         assert(!html.includes(`import(${quote}${path}${quote})`), `Standalone still requires missing sibling ${path}`);
       }

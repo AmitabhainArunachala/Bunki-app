@@ -66,9 +66,14 @@ const assessmentImports = new Map([
   ['./assessment-delivery.mjs', 'assessmentDelivery'],
   ['./assessment-received.mjs', 'assessmentReceived'],
 ]);
+// Device-local stores outside the portable record. Backup adoption refuses while one holds learner activity, so the
+// single file carries the store its check opens (the collections stay hidden in the standalone; the check does not).
+const deviceStoreImports = new Map([
+  ['./decks/personal/store.mjs', 'personalStore'],
+]);
 const recordRuntimeBuild = buildSync({
   absWorkingDir: CORRIDOR,
-  stdin: { contents: [...recordImports, ...assessmentImports, ...controllerImports.values()].map(([specifier, name]) =>
+  stdin: { contents: [...recordImports, ...assessmentImports, ...deviceStoreImports, ...controllerImports.values()].map(([specifier, name]) =>
     `export * as ${name} from ${JSON.stringify(specifier)};`).join('\n'),
   resolveDir: CORRIDOR, sourcefile: 'standalone-record-entry.mjs', loader: 'js' },
   outfile: 'standalone-record-runtime.mjs', bundle: true, format: 'esm',
@@ -140,7 +145,7 @@ function moduleUrlExpression(dataUrl) {
 }
 let appScript = read('corridor.js');
 assert(appScript.includes('window.__KAIRO_SHELF_ART_URL__'), 'Standalone shelf art requires the application asset URL hook');
-for (const [specifier, name] of [...recordImports, ...assessmentImports]) {
+for (const [specifier, name] of [...recordImports, ...assessmentImports, ...deviceStoreImports]) {
   const original = `import('${specifier}')`;
   assert.equal(appScript.split(original).length - 1, 1, `Standalone runtime import changed: ${specifier}`);
   appScript = appScript.replace(original, `import(window.__KAIRO_RECORD_RUNTIME_URL__).then(module => module.${name})`);
@@ -439,7 +444,7 @@ writeFileSync(out + '.build.json', JSON.stringify({ status: 'passed', site: CORR
   output: out, standaloneSha256: digest(readFileSync(out)),
   inlinedControllerModules: [...controllerImports.values()].map(([specifier]) => specifier),
   recordRuntimeSha256: digest(recordRuntimeBytes), inlinedRecordModules: [...recordImports.keys()],
-  inlinedAssessmentModules: [...assessmentImports.keys()],
+  inlinedAssessmentModules: [...assessmentImports.keys()], inlinedDeviceStoreModules: [...deviceStoreImports.keys()],
   assessmentAssets: [...assessmentAssets].map(([path, { bytes, sha256 }]) => ({ path, bytes, sha256 })),
   recordModuleTransport: 'blob', inlinedModuleTransport: 'blob', driftSharesRecordRuntime: true,
   inkModuleSha256: digest(inkBytes), builderSha256: digest(readFileSync(fileURLToPath(import.meta.url))),
