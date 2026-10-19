@@ -24690,16 +24690,22 @@ function wwPlate(model, section) {
   glyph.dataset.len = String(Math.min([...c.glyph].length, 4));
   glyph.title = tx('語釈を開く', 'Open the quick look');
   glyph.setAttribute('aria-haspopup', 'dialog');
+  const openCentre = (keyboard = false) => {
+    if (!centreNode) { go({ t: 'radical', id: c.key }, { invoker: glyph }); return; }
+    openSlip(centreNode, { anchor: glyph, from: 'lookup', focus: keyboard, readingVisible: () => !!c.reading });
+  };
   glyph.addEventListener('click', (event) => {
     event.stopPropagation();
-    if (!centreNode) { go({ t: 'radical', id: c.key }, { invoker: glyph }); return; }
-    openSlip(centreNode, { anchor: glyph, from: 'lookup', focus: event.detail === 0, readingVisible: () => !!c.reading });
+    if (event.detail !== 0 && Date.now() < swallowClickUntil) return; // the hold's own release
+    openCentre(event.detail === 0);
   });
   glyph.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !document.getElementById('mini')) return;
     event.preventDefault(); event.stopPropagation();
     removeMini();
   });
+  // Hfix-2e · the headword holds like every word in the web (S1): the ring, the 印, the strip
+  wireWordWebHold(glyph, () => centreNode, () => openCentre(true));
   centre.append(glyph);
   if (c.gloss) centre.append(el('span', 'ww-c-m', c.gloss));
   inner.append(centre);

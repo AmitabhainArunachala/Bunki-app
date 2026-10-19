@@ -5,6 +5,7 @@
  *   W7-hold   a hold on a word in the Words room's word web: the ring fills (read 300 ms in), the 印 presses on, the
  *             strip opens, the kept count rises by one, and the walk does not climb; a second hold opens the same strip
  *             and keeps nothing twice. Red on the base (the mouse is ignored; a finger opens the slip), green on the branch.
+ *   W7-centre the same hold on the web's headword (its big glyph), which had no hold at all: red on the base.
  *   W7-drag   guard: a mouse that moves past 9 px before the seal is a drag, never a seal (Chromium).
  *   W7-right  guard: right-click still opens the node's slip, never the strip (comb-0's G7 reads cut captions there).
  *   W7-tap    guard: a quick press still walks the node's ladder, never seals.
@@ -53,7 +54,7 @@ async function context(name) {
   await ctx.route('**/*', (route) => new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort());
   const page = await ctx.newPage(); page.setDefaultTimeout(15000);
   const errors = []; page.on('pageerror', (error) => errors.push(String(error)));
-  if (mode === 'control' && name === 'W7-hold') await page.route('**/corridor.js', async (route) => {
+  if (mode === 'control' && (name === 'W7-hold' || name === 'W7-centre')) await page.route('**/corridor.js', async (route) => {
     const response = await route.fetch(); const original = await response.text();
     const [from, to] = MUTANTS[phone ? 'finger' : 'mouse'];
     assert.equal(original.split(from).length, 2, `control ${name}: its mutation names one place`);
@@ -102,7 +103,7 @@ const watch = (page) => page.evaluate(() => {
   }).observe(document.body, { childList: true, subtree: true });
 });
 const facts = (page, key) => page.evaluate((key) => {
-  const node = document.querySelector(`.ww-plate .ww-node[data-ww-key="${CSS.escape(key)}"]`);
+  const node = key === '#centre' ? document.querySelector('.ww-plate .ww-c-glyph') : document.querySelector(`.ww-plate .ww-node[data-ww-key="${CSS.escape(key)}"]`);
   const strip = document.getElementById('seal-strip');
   return {
     count: Number(document.getElementById('tray')?.dataset.count ?? NaN),
@@ -153,8 +154,7 @@ async function row(name, body) {
 }
 const fail = (message, detail) => Object.assign(new Error(message), { detail });
 
-await row('W7-hold', async ({ page }) => {
-  const { node, type, key } = await pickNode(page);
+async function sealRow(page, { node, type, key }) {
   const c0 = (await facts(page, key)).count;
   const first = await holdOn(page, node, key);
   const detail = { held: { type, key }, by: phone ? 'finger' : 'mouse', c0, first };
@@ -178,6 +178,12 @@ await row('W7-hold', async ({ page }) => {
   if (second.after.count !== c0 + 1) throw fail(`the second hold changed the count to ${second.after.count}`, detail);
   if (second.after.mini || second.after.rung) throw fail('the second release climbed the walk', detail);
   return detail;
+}
+await row('W7-hold', async ({ page }) => sealRow(page, await pickNode(page)));
+await row('W7-centre', async ({ page }) => {
+  const node = page.locator('.ww-plate .ww-c-glyph');
+  await node.scrollIntoViewIfNeeded();
+  return sealRow(page, { node, type: 'centre', key: '#centre' });
 });
 if (!phone) await row('W7-drag', async ({ page }) => {
   const { node, key } = await pickNode(page);
