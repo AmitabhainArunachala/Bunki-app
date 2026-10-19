@@ -88,6 +88,12 @@ const checks = {
       const record = merged(data, glyph);
       for (const reading of [...row.on, ...row.kun]) if (![...record.on, ...record.kun].includes(reading)) failures.push(`${glyph}: dropped ${reading}`);
     }
+    // complete, not only faithful: every kanji.json or Jōyō glyph KANJIDIC2 gives readings has its row
+    const projected = new Set(data.extra.kanjiReadings.map(([glyph]) => glyph));
+    for (const glyph of new Set([...Object.keys(data.kanji), ...official.rows.map(([g]) => g)])) {
+      const source = skipBy.get(glyph);
+      if ((source?.readings.on.length || source?.readings.kun.length) && !projected.has(glyph)) failures.push(`${glyph}: no projected row`);
+    }
     return failures;
   },
   'K01 each official-only reading is one the table lists and neither kanji.json nor KANJIDIC2 has'(data) {
@@ -98,6 +104,14 @@ const checks = {
       const row = data.extra.kanjiReadings.find((item) => item[0] === glyph);
       const have = [...(data.kanji[glyph]?.on || []), ...(data.kanji[glyph]?.kun || []), ...(row?.[1] || []), ...(row?.[2] || [])];
       if (have.some((value) => core.readingKey(value) === core.readingKey(reading))) failures.push(`${glyph}:${reading} was already present`);
+    }
+    // and complete: every official reading neither kanji.json nor KANJIDIC2 has is named here
+    const named = new Set(data.extra.officialReadings.map(([glyph, reading]) => `${glyph}:${reading}`));
+    const skipBy = new Map(data.skip.entries.map((entry) => [entry.literal, entry]));
+    for (const [glyph, readings] of official.rows) {
+      const source = skipBy.get(glyph);
+      const have = new Set([...(data.kanji[glyph]?.on || []), ...(data.kanji[glyph]?.kun || []), ...(source?.readings.on || []), ...(source?.readings.kun || [])].map(core.readingKey));
+      for (const reading of readings) if (!have.has(core.readingKey(reading)) && !named.has(`${glyph}:${reading}`)) failures.push(`${glyph}:${reading} unnamed`);
     }
     return failures;
   },
@@ -212,6 +226,20 @@ const checks = {
         if (!entry[2].some(([text, , , kanji]) => text === reading && applies(kanji, form))) failures.push(`${glyph} ${form}: ${reading} not allowed`);
         if (!entry[3].some((sense) => applies(sense[1], form) && applies(sense[2], reading) && sense[10].some(([text]) => text === gloss))) failures.push(`${glyph} ${form}: gloss "${gloss}" not of an allowed sense`);
       }
+    }
+    // complete: every Jōyō kanji no shipped word list names and JMdict writes with a displayable spelling has words
+    const buckets = core.kanjiWordBuckets(data.dict, data.words);
+    const alternates = core.kanjiAltWords(data.dict);
+    const filled = new Set(data.extra.jmdictWords.map(([glyph]) => glyph));
+    const written = new Map();
+    for (const row of data.index.entries) for (const form of row[4]) for (const glyph of new Set([...form])) {
+      if (!written.has(glyph)) written.set(glyph, []);
+      written.get(glyph).push([row[0], form]);
+    }
+    for (const [glyph] of official.rows) {
+      if (buckets.get(glyph)?.size || alternates.get(glyph)?.length || filled.has(glyph)) continue;
+      const shown = (written.get(glyph) || []).find(([seq, form]) => !detail(seq)[1].find(([text]) => text === form)?.[2].includes('sK'));
+      if (shown) failures.push(`${glyph}: JMdict writes ${shown[1]} (${shown[0]}) but the page has no words`);
     }
     for (const glyph of data.extra.kanjiWithoutWords) {
       for (const row of data.index.entries) {
