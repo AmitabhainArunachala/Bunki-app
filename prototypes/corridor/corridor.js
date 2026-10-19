@@ -9838,8 +9838,11 @@ document.addEventListener(
     // Back owns its own one-level fold on click; do not consume a second
     // level by dismissing the stage at pointerdown first. Ladder (the lead's sweep, 10-19): the top bar's ‹ Back (#back) is
     // one of them — with a reading, an English or a box up it folds the word bare (back → foldWordLadder), and only the next
-    // Back leaves the article; cleared here at its press, the word was already bare and the first Back left for the shelf
-    if (ladderVisit && target.closest?.('#sheet-back, #chrome-back, #back, [data-bar-back], [data-action="navigation.back"]')) return;
+    // Back leaves the article; cleared here at its press, the word was already bare and the first Back left for the shelf.
+    // The first-use demonstration's box is the app's own, not a word he climbed: Back clears it at its press and leaves, as
+    // before (folded first, Back stayed in the article and continuity's H2 waited for a room change that never came)
+    if (ladderVisit && (target.closest?.('#sheet-back, #chrome-back, [data-action="navigation.back"]') ||
+        (!ladderVisit.demo && target.closest?.('#back, [data-bar-back]')))) return;
     // an outside press returns the word bare from its reading or its English (Ladder: as now, in one step)
     if (!mini && (ladderVisit?.rung === 'reading' || ladderVisit?.rung === 'gloss') && !ladderVisit.anchor.contains(target) &&
         !target.closest?.('#seal-strip, #vocabulary-list-popover')) clearWordLadder();
@@ -14742,14 +14745,23 @@ function wireTokenGestures(span, token, index, p) {
     go(readerEntryNode(token, index, p), { invoker: span, from: (fromSlip && slipHeadword()) || span, instant: modality === 'keyboard' });
   };
   const sentence = () => readerTakeNode({ id: token.b, index, p: p.id });
+  // Ladder · Hfix-1A's item 18 on the ladder: the sense the box will show is asked for at the word's first rung (its
+  // reading, or its English where the reading is up), the way the box asks for it once it stands (its reading answered,
+  // then ensureSense). The box comes two taps on and finds it at hand. It had been asked for only after the box stood
+  // with its "…": the dictionary's shard went out about 160 ms after the box on a quiet machine, later under load, so a
+  // Save aimed during that "…" raced a request not yet made (the pending-save rows: asked 0)
+  const senseAhead = () => {
+    if (SENSE_GAVE_UP.has(token)) return;
+    Promise.resolve(readyTokenReading(token)).then(() => ensureSense(token, readingTokenEntry(token))).catch(() => {});
+  };
   const quickLook = (modality = 'pointer', { restore = false, demo = false } = {}) => activateWordLadder(span, {
     surface: displayPairs(token).map(pair => pair.t).join(''), reading: token.r, modality, restore, demo,
-    reveal: () => { setReaderTake(token.b, index, p.id); markReaderReading(index); },
+    reveal: () => { setReaderTake(token.b, index, p.id); markReaderReading(index); senseAhead(); },
     clearReveal: () => clearReaderReadings(),
     readingVisible: () => S.dials.furigana === 2 || !!S.revealed?.has(index),
     onReveal: () => obsLog('tap', obsKey, 1, p.id),
     // Ladder · the English under the word (the shared per-index state, so a repaint or a redraw keeps it)
-    gloss: () => { setReaderTake(token.b, index, p.id); return glossReaderToken(index); },
+    gloss: () => { setReaderTake(token.b, index, p.id); senseAhead(); return glossReaderToken(index); },
     // the meaning is shown: the observation log's depth 2, once a visit, at the first rung that shows it
     onGloss: () => obsLog('tap', obsKey, 2, p.id),
     openStage: ({ restore, demo, meaningShown }) => {
