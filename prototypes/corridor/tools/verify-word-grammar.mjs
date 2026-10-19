@@ -3705,15 +3705,22 @@ try {
     // text an English row says is recorded as it changes (EN_TRACE). A word whose sense the article's sense data names (the
     // sidecar: 先 in 出荷先 is "destination", ため in 広げていくために "sake") never says another meaning, not even first; a word
     // whose box has a meaning says it under the word (スタートアップ: "startup"), a word whose box has none says nothing,
-    // and no row ever says "—"
-    const GLOSS_SENSE = [{ index: 155, s: '先', english: 'destination', never: 'point' }, { index: 256, s: 'ため', english: 'sake', never: 'good' }];
+    // and no row ever says "—". Ladder R3 (the lead's ruling, 10-20, on Kimi's check 0458): Kimi's worst five, from the
+    // reviewed rows the sense data now has for both test articles — 式 in 表彰式 "ceremony", フード in フードテック "food",
+    // ロール in ロールモデル "role", 誠 in 誠に "indeed", 対応 in 災害対応 "response" (the second article) — and ため led by
+    // "purpose"
+    const GLOSS_A2 = Object.freeze({ id: 'kantei:jp-105-actions-202609-15hyousyou', search: '防災功労者' });
+    const GLOSS_SENSE = [{ index: 155, s: '先', english: 'destination', never: 'point' }, { index: 256, s: 'ため', english: 'purpose', never: 'good' },
+      { index: 21, s: '式', english: 'ceremony', never: 'way' }, { index: 318, s: 'フード', english: 'food', never: 'hood' },
+      { index: 191, s: 'ロール', english: 'role', never: 'roll' }, { index: 207, s: '誠', english: 'indeed', never: 'truth' },
+      { story: GLOSS_A2, index: 244, s: '対応', english: 'response', never: 'correspondence' }];
+    const glossWant = (w) => GLOSS_SENSE.find((f) => f.index === w.index && (f.story?.id || STORY.id) === w.at);
     const GLOSS_PLAIN = [{ index: 17, s: 'スタートアップ', english: 'startup' }, { index: 90, s: 'Ｍｕｊｉｎ' }, { index: 123, s: 'ＡＩ' }, { index: 128, s: '実装' },
       { index: 212, s: 'ござい' }, { index: 217, s: '各賞' }];
     const ladderGloss = async (page) => {
       await page.route('**/data/share_alike/dict-v2/index.json', async (route) => { await delay(1800); await route.continue().catch(() => {}); });
-      await openStory(page);
-      const words = [];
-      for (const fixture of [...GLOSS_SENSE, ...GLOSS_PLAIN]) {
+      const words = [], traced = [];
+      const walkWords = async (fixtures) => { for (const fixture of fixtures) {
         const word = page.locator(`#reader .tok[data-index="${fixture.index}"]`);
         await word.evaluate((node) => node.scrollIntoView({ block: 'center' }));
         await delay(250);
@@ -3735,12 +3742,18 @@ try {
         await delay(300);
         const box = await page.evaluate(() => { const gloss = document.querySelector('#mini .mini-gloss');
           return { box: !!document.getElementById('mini'), gloss: gloss?.textContent.trim() ?? null, miss: !!gloss?.matches('.mini-miss, .mini-wait') }; });
-        words.push({ ...fixture, label, rung, ...row, ...box, seen: await page.evaluate((i) => window.__en?.[i] || [], fixture.index) });
+        words.push({ ...fixture, at: fixture.story?.id || STORY.id, label, rung, ...row, ...box, seen: await page.evaluate((i) => window.__en?.[i] || [], fixture.index) });
         await page.keyboard.press('Escape'); await delay(350);
         if (await page.locator('#mini').count()) { await page.keyboard.press('Escape'); await delay(350); }
-      }
-      const all = await page.evaluate(() => window.__en || {});
-      const dashes = Object.entries(all).flatMap(([index, texts]) => texts.filter((text) => /^\s*[—–-]\s*$/u.test(text)).map((text) => `#${index} ${text}`));
+      } };
+      // the story, then the second test article (its own page: a cold dictionary again)
+      await openStory(page);
+      await walkWords([...GLOSS_SENSE.filter((f) => !f.story), ...GLOSS_PLAIN]);
+      traced.push(await page.evaluate(() => window.__en || {}));
+      await openStory(page, { story: GLOSS_A2 });
+      await walkWords(GLOSS_SENSE.filter((f) => f.story));
+      traced.push(await page.evaluate(() => window.__en || {}));
+      const dashes = traced.flatMap((all) => Object.entries(all).flatMap(([index, texts]) => texts.filter((text) => /^\s*[—–-]\s*$/u.test(text)).map((text) => `#${index} ${text}`)));
       const plain = words.filter((w) => !w.never);
       check('L.gloss.never-dash', 'no English row under a word ever says "—" (the story\'s dash words on a cold dictionary): a word whose box has a meaning says it under the word (スタートアップ "startup"), a word whose box has none says nothing, its rung standing',
         plain.length === GLOSS_PLAIN.length && dashes.length === 0 && plain.every((w) => {
@@ -3750,10 +3763,10 @@ try {
         }), { dashes, words: plain });
       const sensed = words.filter((w) => w.never);
       // another meaning: any text but the sense's own (a dash is no meaning; L.gloss.never-dash judges it)
-      for (const w of sensed) w.wrong = w.seen.filter((text) => text.trim() && !/^[—–-]$/u.test(text.trim()) && text.trim() !== GLOSS_SENSE.find((f) => f.index === w.index).english);
-      check('L.gloss.sense', 'a word whose sense the article\'s sense data names (先 in 出荷先, ため) says that sense\'s gloss under it, on a cold dictionary, and never another meaning first',
-        sensed.length === GLOSS_SENSE.length && sensed.every((w) => w.rung === 'gloss' && w.drawn && w.english === GLOSS_SENSE.find((f) => f.index === w.index).english && !w.wrong.length),
-        { words: sensed.map(({ index, s, label, rung, english, drawn, gloss, seen, wrong }) => ({ index, s, label, rung, english, drawn, box: gloss, seen, wrong })) });
+      for (const w of sensed) w.wrong = w.seen.filter((text) => text.trim() && !/^[—–-]$/u.test(text.trim()) && text.trim() !== glossWant(w)?.english);
+      check('L.gloss.sense', 'a word whose sense the article\'s sense data names says that sense\'s gloss under it, on a cold dictionary, and never another meaning first: 先 in 出荷先 "destination", ため "purpose"; Kimi\'s worst five 式 "ceremony", フード "food", ロール "role", 誠 "indeed", 対応 "response"',
+        sensed.length === GLOSS_SENSE.length && sensed.every((w) => !!glossWant(w) && w.rung === 'gloss' && w.drawn && w.english === glossWant(w).english && !w.wrong.length),
+        { words: sensed.map(({ at, index, s, label, rung, english, drawn, gloss, seen, wrong }) => ({ at, index, s, label, rung, english, drawn, box: gloss, seen, wrong })) });
     };
     const ladderRun = async (name, body, options = {}) => {
       const begin = rows.length;
