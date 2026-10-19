@@ -4507,13 +4507,15 @@ function posLine(tags) {
     : null;
   const zuruText = zuru
     ? S.lang === 'ja'
-      ? transitivity.length ? `動詞（ザ変・${jaTrans}）` : 'ザ変動詞'
+      // Hfix-2d r3 · school grammar files 信ずる・感ずる under サ変; the label names the ずる form inside the
+      // one pair of parens (no nesting, no wave dash: the JA label set is kana, kanji, parens, ・)
+      ? transitivity.length ? `動詞（サ変・ずる・${jaTrans}）` : '動詞（サ変・ずる）'
       : `zuru verb${transitivity.length ? `, ${enTrans}` : ''}`
     : null;
   // 〜ていく・〜てみる: an aux-v with a class is the subsidiary verb, in that class, not a 助動詞
   const auxClass = auxVerb && (verbClass || suru || kuru || zuru)
     ? S.lang === 'ja'
-      ? `補助動詞（${verbClass ? JA_CLASS[verbClass] : suru ? 'サ変' : kuru ? 'カ変' : 'ザ変'}）`
+      ? `補助動詞（${verbClass ? JA_CLASS[verbClass] : suru ? 'サ変' : kuru ? 'カ変' : 'サ変・ずる'}）`
       : `${verbClass ? EN_CLASS[verbClass] : suru ? 'suru' : kuru ? 'kuru' : 'zuru'} subsidiary verb`
     : null;
   const pieces = [];
@@ -4532,8 +4534,9 @@ function posLine(tags) {
       continue;
     }
     if (code === 'aux-v') {
-      // alone (or beside だ・です) it stays 助動詞; with a class it is the auxClass composite above
-      if (!auxClass) pieces.push(dictionaryTag(code));
+      // alone it stays 助動詞; with a class it is the auxClass composite above; beside the copula the
+      // copula's own line already says it (です・だ read 助動詞（断定） once, Hfix-2d r3)
+      if (!auxClass && !codes.includes('cop')) pieces.push(dictionaryTag(code));
       continue;
     }
     if (code === 'adv' && codes.includes('adv-to')) continue; // one family once: 副詞（と） / to-adverb covers it
@@ -4541,42 +4544,65 @@ function posLine(tags) {
   }
   return [...new Set(pieces)].join(' · ');
 }
-/* Hfix-2d r2 · the reading each of a word's kanji uses in that word, one left-to-right pass over the word's
- * own reading. An on reading must match in katakana (勉強 → ベン・キョウ), a kun reading in hiragana, with its
- * okurigana when the word writes it (書く → か（く）, 静か → しず（か）). A kanji nothing matches shows ''
- * (今日, 大人: their words are jukujikun, no single reading to stand in the slot). Only data the app ships:
- * the word's reading and each kanji's own on/kun lists. */
-function kanjiReadingsInWord(chars, reading) {
+/* Hfix-2d r3 · the reading each of a word's kanji uses in that word, one left-to-right pass over the word's
+ * own reading. An on reading must match in katakana (勉強 → ベン・キョウ), a kun reading in hiragana. Okurigana
+ * comes only from the kana the word itself writes right after the kanji (書く → か（く）, 三つ → みっ（つ）,
+ * 暖かい → あたた（かい）) — never from the reading's tail (羽 shows はね, not は（ね）; 時々 shows とき, the
+ * 々 stops the kana run). A dotted kun whose okurigana the word doesn't write is rejected unless the word
+ * writes its first part (食べ物's 食 takes た（べ） from た.べる); inside a compound a kun may name its whole
+ * unwritten span without parens (組合 → くみ・あい, never あ（い）). The longest match wins. A kanji nothing
+ * matches shows '' (今日, 大人: their words are jukujikun, no single reading to stand in the slot). Only data
+ * the app ships: the written word, the word's reading and each kanji's own on/kun lists. */
+function kanjiReadingsInWord(chars, reading, word = '') {
   const hira = String(reading || '').replace(/[\u30a1-\u30f6]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60));
   const kata = String(reading || '').replace(/[\u3041-\u3096]/gu, (ch) => String.fromCharCode(ch.charCodeAt(0) + 0x60));
   const out = [];
   let pos = 0;
+  let wordPos = 0;
   for (const c of chars) {
     let found = '';
     const k = D.kanji[c];
     if (k && hira) {
+      // the kana the written word itself puts right after this kanji — the only source of a parenthesised
+      // okurigana (hiragana only; 々, another kanji, katakana or the word's end stop the run)
+      const at = word ? word.indexOf(c, wordPos) : -1;
+      const w = at < 0 ? '' : /^[ぁ-ゖ]+/u.exec(word.slice(at + 1))?.[0] || '';
+      if (at >= 0) wordPos = at + 1;
       const candidates = [];
       for (const on of k.on || []) candidates.push({ on: true, base: on, suffix: '' });
       for (const kun of k.kun || []) {
         const dot = kun.indexOf('.');
         candidates.push({ on: false, base: dot < 0 ? kun : kun.slice(0, dot), suffix: dot < 0 ? '' : kun.slice(dot + 1) });
       }
+      const fits = [];
       for (const cand of candidates) {
         const space = (cand.on ? kata : hira).slice(pos);
         if (!cand.base || !space.startsWith(cand.base)) continue;
         if (cand.suffix) {
-          // a dotted kun asks the word to write its okurigana (た.べる only inside たべる)
-          if (!space.startsWith(cand.suffix, cand.base.length)) continue;
-          found = `${cand.base}（${cand.suffix}）`;
-          pos += cand.base.length + cand.suffix.length;
-        } else {
-          found = cand.base;
-          pos += cand.base.length;
-          if (!cand.on && c === chars[chars.length - 1]) {
-            const tail = /^[ぁ-ゖ]+/u.exec(hira.slice(pos))?.[0] || '';
-            if (tail) found = `${cand.base}（${tail}）`;
+          if (w) {
+            // a dotted kun asks the word to write its okurigana — exactly it (書く か（く）, 三つ みっ（つ）) or
+            // its written first part when a compound cuts it (食べ物 た（べ） from た.べる); the rest of the
+            // suffix is the stem's own grammar, not something this word writes
+            if (!(cand.suffix === w || cand.suffix.startsWith(w))) continue;
+            if (!space.startsWith(w, cand.base.length)) continue;
+            fits.push({ display: `${cand.base}（${w}）`, consume: cand.base.length + w.length, rank: 0 });
+          } else {
+            // nothing written after the kanji (a compound's inside, or 々): the kun may name the whole
+            // span this kanji reads here, without claiming okurigana (試合 あい, never あ（い）)
+            if (!space.startsWith(cand.suffix, cand.base.length)) continue;
+            fits.push({ display: cand.base + cand.suffix, consume: cand.base.length + cand.suffix.length, rank: 2 });
           }
+        } else {
+          fits.push({ display: cand.base, consume: cand.base.length, rank: 1 });
         }
+      }
+      fits.sort((a, b) => b.consume - a.consume || a.rank - b.rank);
+      const seen = new Set();
+      for (const fit of fits) {
+        if (seen.has(fit.display)) continue;
+        seen.add(fit.display);
+        found = fit.display;
+        pos += fit.consume;
         break;
       }
     }
@@ -34461,11 +34487,11 @@ function renderWordNode(sheet, node) {
   if (rowChars.length) {
     sheet.append(withEn(el('p', 'eyebrow', 'この語の漢字'), 'kanji in this word', 'en-inline'));
     const rows = el('div', 'entry-rows');
-    // Hfix-2d r2 · in 日本語 a row names the kanji by the reading it has IN THIS WORD (on in katakana, kun in
+    // Hfix-2d r3 · in 日本語 a row names the kanji by the reading it has IN THIS WORD (on in katakana, kun in
     // hiragana), matched left to right over the word's own reading — never an English keyword, never a reading
     // the word doesn't use (本 ホン on the ほん page, 気 キ on 天気, 番 バン on 一番); empty when none matches
     const wordReading = String(rec?.r || node.reading || '').trim();
-    const inWord = S.lang === 'ja' ? kanjiReadingsInWord(rowChars, wordReading) : null;
+    const inWord = S.lang === 'ja' ? kanjiReadingsInWord(rowChars, wordReading, label) : null;
     for (const [charIndex, c] of rowChars.entries()) {
       const row = el('button', 'entry-row');
       row.type = 'button';

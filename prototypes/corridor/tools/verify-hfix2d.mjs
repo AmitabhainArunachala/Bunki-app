@@ -1,20 +1,29 @@
 #!/usr/bin/env node
 /** Hfix-2d · the word page's parts of speech and kanji keywords in 日本語 and plain English, plus Guided's
  * start box (X-17, X-18, X-3b). Real WebKit 390×844 touch + Chromium 1440×900, browser.version() logged.
+ * Round 3 (the r2 critic's two must-fix items): the usage tags' ink keeps C1 contrast in every world, and
+ * a kanji row's okurigana comes only from the kana the word itself writes.
  *
- *   P   the seven packet words in both modes: each .sense-pos line is the plain form for the sense's own
+ *   P   the packet words in both modes: each .sense-pos line is the plain form for the sense's own
  *       tags — JA: the school terms (名詞, 動詞（五段・他動詞）, 動詞（一段・他動詞）, する動詞（他動詞）,
  *       い形容詞, な形容詞, 副詞); EN: one plain line, no parentheses, no romaji ("godan verb, transitive").
+ *       です・だ read 助動詞（断定） once (r3); ずる verbs read 動詞（サ変・ずる・他動詞） (r3).
  *   K   the word page's kanji rows: in 日本語 a keyword that exists only in English is replaced by the
- *       kanji's own reading (or left out); in EN the keyword stays. Label surfaces (.sense-pos, the rows'
+ *       kanji's own reading (or left out); in EN the keyword stays. Okurigana only from the written word
+ *       (r3): 時々 とき (the 々 stops it), 三つ みっ（つ）, 四つ よっ（つ）, 羽 はね, 形 かたち,
+ *       試合・場合 あい, plus 暖かい あたた（かい） (the longest kun), 食べ物 た（べ） (the written part),
+ *       組合 くみ (no okurigana claimed inside a compound). Label surfaces (.sense-pos, the rows'
  *       .row-main, .eyebrow) carry no Latin in 日本語 mode beyond the licence identifiers.
+ *   C   the quiet usage tags keep C1: .sense-usage reads ≥ 4.5:1 against its sheet in all 11 worlds (r3;
+ *       r2's opacity 0.75 read 3.2–4.4 in 8 of them).
  *   G   Guided's start box stays seated: the begin control is inside the first viewport at 390; the field
  *       preview fills the box (no tall empty stretch); on the Mac the arrival keeps the phone's measure.
  *
  * Usage: KAIRO_SITE_DIR=<built site> KAIRO_ARTIFACT_SHA256=<sha> KAIRO_EXPECT_GITSHA=<sha> \
  *          KAIRO_BROWSER=all|webkit|chromium node prototypes/corridor/tools/verify-hfix2d.mjs
  * Controls (page.route, no disk copies): --control pos-revert (base's tag join → P red), --control
- * keyword-revert (English keyword in 日本語 → K red), --control preview-removed (G red).
+ * keyword-revert (English keyword in 日本語 → K red), --control preview-removed (G red), --control
+ * baseline-label (G centring red), --control usage-dim (the r2 opacity back → C red).
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -25,7 +34,7 @@ import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 
 const CONTROL = process.argv.includes('--control') ? process.argv[process.argv.indexOf('--control') + 1] : null;
-const CONTROLS = new Set(['pos-revert', 'keyword-revert', 'preview-removed', 'baseline-label']);
+const CONTROLS = new Set(['pos-revert', 'keyword-revert', 'preview-removed', 'baseline-label', 'usage-dim']);
 if (CONTROL && !CONTROLS.has(CONTROL)) throw new Error(`unknown control ${CONTROL}`);
 const ENGINES = process.env.KAIRO_BROWSER === 'webkit' ? { webkit } : process.env.KAIRO_BROWSER === 'chromium' ? { chromium } : { webkit, chromium };
 const out = resolveCorridorEvidence();
@@ -57,16 +66,34 @@ const WORDS = [
   { q: '見る', ja: ['動詞（一段・他動詞）', '補助動詞（一段）'], en: ['ichidan verb, transitive', 'ichidan subsidiary verb'], row: { ja: ['み（る）'], en: ['See'] } },
   { q: 'ゆっくり', ja: ['副詞', '副詞（と） · する動詞', '副詞 · する動詞'], en: ['adverb', 'to-adverb · suru verb', 'adverb · suru verb'],
     usage: { ja: ['〔擬音語・擬態語〕'], en: ['onomatopoeic or mimetic word'] }, row: { ja: [], en: [] } },
+  // r3 · the copula reads 助動詞（断定） once (r2 printed 助動詞 twice), and a ずる verb names サ変
+  { q: 'です', ja: ['助動詞（断定）'], en: ['copula'], row: { ja: [], en: [] } },
+  { q: '信ずる', ja: ['動詞（サ変・ずる・他動詞）'], en: ['zuru verb, transitive'], row: { ja: ['シン'], en: ['Faith'] } },
+  // r3 · okurigana only from the kana the word itself writes: the 々 stops it (時々), the written kana
+  // decides the parens (三つ, 四つ), none is invented from the reading (羽, 形, 試合, 場合)
+  { q: '時々', row: { ja: ['とき'], en: ['Time'] } },
+  { q: '三つ', row: { ja: ['みっ（つ）'], en: ['Three'] } },
+  { q: '四つ', row: { ja: ['よっ（つ）'], en: ['Four'] } },
+  { q: '羽', row: { ja: ['はね'], en: ['Feathers'] } },
+  { q: '形', row: { ja: ['かたち'], en: ['Shape'] } },
+  { q: '試合', row: { ja: ['シ', 'あい'], en: ['Test', 'Fit'] } },
+  { q: '場合', row: { ja: ['ば', 'あい'], en: ['Location', 'Fit'] } },
+  // r3, my three: the longest kun wins (暖かい), a compound keeps the written part (食べ物), and inside a
+  // compound no okurigana is claimed (組合)
+  { q: '暖かい', row: { ja: ['あたた（かい）'], en: ['Warmth'] } },
+  { q: '食べ物', row: { ja: ['た（べ）', 'もの'], en: ['Eat', 'Thing'] } },
+  { q: '組合', row: { ja: ['くみ', 'あい'], en: ['Association', 'Fit'] } },
 ];
 const JA_PLAIN = /^[ぁ-ゖァ-ヶー一-鿯々〇〻（）・·０-９ ]+$/u; // no Latin on a JA label: kana, kanji, parens, ・/·, spaces, full-width digits
 const EN_PLAIN = /^[a-z][a-z ·,'-]*$/u; // one plain English line, no parentheses, no romaji tags
 const ROMAJI = /futsuumeishi|keiyoushi|tokubetsu|jisho|verb \(/iu; // the defect signatures: full entity names, a parenthesised verb class
 
-async function session(browserType, { width, height, ui }) {
+async function session(browserType, { width, height, ui, theme }) {
   const browser = await browserType.launch();
   const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 2, isMobile: width < 500, hasTouch: width < 500,
     serviceWorkers: 'block', reducedMotion: 'no-preference', locale: 'ja-JP' });
   await silenceBrowserAudio(context);
+  if (theme) await context.addInitScript((t) => { try { localStorage.setItem('kairo-theme', t); } catch {} }, theme);
   await context.route('**/*', (route) => (new URL(route.request().url()).origin === ORIGIN ? route.continue() : route.abort()));
   if (CONTROL === 'pos-revert') {
     await context.route('**/corridor.js', async (route) => {
@@ -92,6 +119,13 @@ async function session(browserType, { width, height, ui }) {
         ? '\n.gs-arrival > :not(.gs-intro) { display: none !important; }'
         : '\n.gs-button { align-items: baseline !important; }';
       return route.fulfill({ body: `${text}${extra}`, contentType: 'text/css' });
+    });
+  }
+  if (CONTROL === 'usage-dim') {
+    // the r2 defect back: the quiet tags at 0.75 read 3.2–4.4:1 in 8 of the 11 worlds
+    await context.route('**/corridor.css', async (route) => {
+      const text = await (await route.fetch()).text();
+      return route.fulfill({ body: `${text}\n.senses .sense-usage { opacity: 0.75 !important; }`, contentType: 'text/css' });
     });
   }
   const page = await context.newPage();
@@ -166,6 +200,42 @@ async function wordRows(engine, browserType, word) {
   }
 }
 
+// r3 · C1 for the quiet usage tags: .sense-usage composited (its colour × every ancestor's opacity) over the
+// nearest opaque background must read ≥ 4.5:1 in every world. Colours go through a 1×1 canvas so any CSS
+// colour function resolves to rgba.
+const WORLDS = [['hokusai', '藍'], ['sumi', '墨'], ['shu', '朱'], ['akafuji', '赤'], ['iwa', '柿'], ['nami', '浪'],
+  ['keyblock', '板'], ['hakuu', '雷'], ['rokusho', '漆'], ['yoru', '金'], ['kaku', '殻']];
+async function contrastRows(engine, browserType) {
+  for (const [world, seal] of WORLDS) {
+    const s = await session(browserType, { width: 390, height: 844, ui: 'ja', theme: world });
+    try {
+      await wordFacts(s.page, '本', 'ja');
+      const m = await s.page.evaluate(() => {
+        const cv = document.createElement('canvas'); cv.width = 1; cv.height = 1;
+        const g = cv.getContext('2d', { willReadFrequently: true });
+        const rgba = (css) => { g.clearRect(0, 0, 1, 1); g.fillStyle = '#000'; g.fillStyle = css; g.fillRect(0, 0, 1, 1); const d = g.getImageData(0, 0, 1, 1).data; return { r: d[0], g: d[1], b: d[2], a: d[3] / 255 }; };
+        const lin = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+        const lum = (c) => 0.2126 * lin(c.r) + 0.7152 * lin(c.g) + 0.0722 * lin(c.b);
+        const over = (fg, bg) => ({ r: fg.r * fg.a + bg.r * (1 - fg.a), g: fg.g * fg.a + bg.g * (1 - fg.a), b: fg.b * fg.a + bg.b * (1 - fg.a), a: 1 });
+        const el = [...document.querySelectorAll('#sheet .sense-usage')].find((n) => n.offsetParent);
+        if (!el) return { missing: true };
+        let opacity = 1;
+        for (let n = el; n; n = n.parentElement) opacity *= Number(getComputedStyle(n).opacity);
+        const fg = rgba(getComputedStyle(el).color);
+        const layers = [];
+        for (let n = el; n; n = n.parentElement) { const c = rgba(getComputedStyle(n).backgroundColor); if (c.a > 0) { layers.push(c); if (c.a >= 0.999) break; } }
+        let bg = { r: 255, g: 255, b: 255, a: 1 };
+        for (const c of layers.reverse()) bg = over(c, bg);
+        const ink = over({ ...fg, a: fg.a * opacity }, bg);
+        const [x, y] = [lum(ink), lum(bg)].sort((p, q) => q - p);
+        return { ratio: +((x + 0.05) / (y + 0.05)).toFixed(2), opacity: +opacity.toFixed(3), text: el.textContent.trim().slice(0, 12) };
+      });
+      check(`C · ${engine} · ${seal} · the quiet usage tag keeps C1 (≥ 4.5:1)`, !m.missing && m.ratio >= 4.5, m);
+    } catch (error) { check(`C · ${engine} · ${seal} · the contrast walk ran`, false, String(error?.message || error).split('\n')[0]); }
+    await s.close();
+  }
+}
+
 async function guidedRows(engine, browserType) {
   for (const [width, height] of [[390, 844], [1440, 900]]) {
     const s = await session(browserType, { width, height, ui: 'ja' });
@@ -215,6 +285,7 @@ for (const [engine, browserType] of Object.entries(ENGINES)) {
   console.log(`\n— ${engine} ${probe.version()}${CONTROL ? ` · CONTROL ${CONTROL}` : ''}`);
   await probe.close();
   for (const word of WORDS) await wordRows(engine, browserType, word);
+  await contrastRows(engine, browserType);
   await guidedRows(engine, browserType);
 }
 

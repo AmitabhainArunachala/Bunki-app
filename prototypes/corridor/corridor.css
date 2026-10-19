@@ -2751,7 +2751,6 @@ body.v-depth-layered .inline-link {
   font-size: var(--type-caption);
   letter-spacing: 0.06em;
   color: var(--faint);
-  opacity: 0.75;
   margin: 0 0 3px;
 }
 
