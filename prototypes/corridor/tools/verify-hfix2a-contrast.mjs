@@ -26,16 +26,16 @@ replaceOnce('createRequire(import.meta.url)', `createRequire(${JSON.stringify(so
 replaceOnce('for (const state of STATE_NAMES)', 'for (const state of states)');
 replaceOnce('/* ------------------------------------------------------------------ run */', `
 STEPS.shelf = async (page) => {
-  await page.goto(`${origin}/index.html?entry=shelf&ui=bi`); await ready(page);
+  await page.goto(origin + '/index.html?entry=shelf&ui=bi'); await ready(page);
   await page.evaluate(() => {
     for (const button of document.querySelectorAll('.primary-tab'))
-      button.style.fontSize = `${parseFloat(getComputedStyle(button).fontSize) * 2}px`;
+      button.style.fontSize = (parseFloat(getComputedStyle(button).fontSize) * 2) + 'px';
   });
   await page.waitForFunction(() => document.querySelector('#primary-tabs')?.dataset.wrapped === 'true');
   await eagerImages(page); await settle(page, 700);
 };
 STEPS.words = async (page) => {
-  await page.goto(`${origin}/index.html?entry=shelf&ui=bi`); await ready(page);
+  await page.goto(origin + '/index.html?entry=shelf&ui=bi'); await ready(page);
   await page.evaluate(() => window.openWordWeb('橋', { type: 'word' })); await ready(page);
   await page.locator('.ww-c-r').click(); await page.locator('#mini').waitFor();
   await page.keyboard.press('Escape'); await page.locator('#mini').waitFor({ state: 'detached' });
