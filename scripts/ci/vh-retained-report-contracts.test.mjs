@@ -399,6 +399,7 @@ const learningInventory = [
   'g2-the-roots-validate-strictly-and-keep-later-versions',
   'g2-help-per-1000-characters-counts-first-readings-once',
   'g2-a-kept-word-answers-cold-from-its-own-card',
+  'hfix1b-me-reads-one-count-so-unaided-never-exceeds-read',
 ];
 const tapOutput = (marker, rows) => {
   const ids = Object.keys(rows),
