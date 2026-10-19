@@ -5519,24 +5519,46 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
    BEGIN BUNKI G2 · 深さ — the quiet dot (slice G2, 17 October 2026)
    John (10-15): "I do like the color dot idea… in the most subtle way possible… layers of depth dictated by a subtle
    color schema and delicately placed in every session it would help deepen retention". One dot under a word, in its
-   world's key pigment (contract §6b: the block its sky is printed from) laid into its paper like the printer's 濃淡: a
-   word met once is a breath of the pigment, seen again a half tone, recalled most of it, familiar the pigment itself.
+   world's text ink laid into its paper like the printer's 濃淡: a word met once is a lighter ink, seen again a half tone,
+   recalled most of it, familiar the ink itself. Six CSS pixels give the fill 44% more area than the former five;
+   the kept ring spans eleven (ten on the slip). The visibility verifier measures the actual paper, including inherited opacity.
    The dot sits where a 圏点 sits, under the word, out of the line box (absolute: no line, ruby or gloss moves), and never
-   takes a tap (pointer-events: none). The ring around it is the world's seal red, and it means one thing everywhere: kept.
-   In 朱・胡粉 the key IS the seal's vermilion, so there the dot is the print's other block, its soot ink, and the red is
-   left to the ring. Every value below is a world token or a mix of two (D3); corridor.js wordDepth decides the state.
+   takes a tap (pointer-events: none). Body text and the title card's context line never change their line height for a
+   dot. The reader's title is the one exception (lead rulings 1940, 1950, 2000): every reader title always reserves line
+   space, whatever its words or their state, so its rings clear the next title line and the English caption and nothing
+   arriving mid-reading (a state, a reading, late name readings) ever reflows the title.
+   The ring around a dot is the world's seal red, and it means one thing everywhere: kept.
+   Red is left to the ring in every world. Every value below is a world token or a mix of two (D3);
+   corridor.js wordDepth decides the state; stronger paint never invents an encounter or changes the record.
    ========================================================================== */
-:where(body, #sheet, #mini) {
-  --depth-pigment: var(--tone-key, var(--world-accent));
-  --depth-ground: var(--tone-ground, var(--world-ground));
-  --depth-met: color-mix(in srgb, var(--depth-pigment) 30%, var(--depth-ground));
-  --depth-again: color-mix(in srgb, var(--depth-pigment) 55%, var(--depth-ground));
-  --depth-recalled: color-mix(in srgb, var(--depth-pigment) 78%, var(--depth-ground));
+/* the met dot's share of its world's ink, per world: the least that keeps a met dot at 3:1 or more against its paper on every
+   surface it sits on, and about 3.5:1 in running text, measured in both engines (lead ruling 2026-10-20, John's S5). It stays
+   lighter than seen-again (65%) and far from known. Only the colour changes: no size, place or ring. hokusai has no theme name. */
+:root { --depth-met-share: 55%; }
+:root[data-theme='sumi'] { --depth-met-share: 57%; }
+:root[data-theme='shu'] { --depth-met-share: 60%; }
+:root[data-theme='akafuji'] { --depth-met-share: 60%; }
+:root[data-theme='iwa'] { --depth-met-share: 60%; }
+:root[data-theme='rokusho'] { --depth-met-share: 48%; }
+:root[data-theme='yoru'] { --depth-met-share: 51%; }
+:root[data-theme='nami'] { --depth-met-share: 58%; }
+:root[data-theme='keyblock'] { --depth-met-share: 59%; }
+:root[data-theme='hakuu'] { --depth-met-share: 53%; }
+:root[data-theme='kaku'] { --depth-met-share: 48%; }
+:where(body, #sheet, #mini, .reader-card) {
+  --depth-pigment: var(--color-ink, var(--world-ink));
+  --depth-ground: var(--reader-paper, var(--tone-ground, var(--world-ground)));
+  --depth-met: color-mix(in srgb, var(--depth-pigment) var(--depth-met-share, 48%), var(--depth-ground));
+  --depth-again: color-mix(in srgb, var(--depth-pigment) 65%, var(--depth-ground));
+  --depth-recalled: color-mix(in srgb, var(--depth-pigment) 82%, var(--depth-ground));
   --depth-owned: var(--depth-pigment);
   --depth-ring: var(--color-seal, var(--world-signal));
-  --depth-size: 5px;
+  --depth-size: 6px;
 }
-:where(:root[data-theme='shu']) :where(body, #sheet, #mini) { --depth-pigment: var(--world-ink); }
+/* A word page can cover the reader, and the title card is raised in front of its paper: each has its own ground,
+   not the paper inherited behind it. */
+:where(#sheet, #mini) { --depth-ground: var(--tone-ground, var(--world-ground)); }
+:where(.reader-card) { --depth-ground: var(--reader-card, var(--tone-ground, var(--world-ground))); }
 /* the state's fill: one rule per state, read by every dot below (zero-specificity list, so a surface of its own — the slip's
    band — can set its own steps) */
 :where(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-depth='met'] { --depth-fill: var(--depth-met); }
@@ -5545,7 +5567,7 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
 :where(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-depth='owned'] { --depth-fill: var(--depth-owned); }
 /* kept: a hairline of the page between the dot and its seal-red ring (a kept word not yet met is the ring alone) */
 :where(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-kept] {
-  --depth-edge: 0 0 0 1px var(--depth-ground), 0 0 0 2px var(--depth-ring);
+  --depth-edge: 0 0 0 1px var(--depth-ground), 0 0 0 2.5px var(--depth-ring);
 }
 
 /* in running text (the reader, a page's prose): under the word's own row, centred, out of the line box */
@@ -5565,6 +5587,37 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
   box-shadow: var(--depth-edge, none);
   pointer-events: none;
 }
+/* A prose word can wrap between glyphs; its positioned inline box can then have zero width. With both horizontal
+   insets auto, the dot starts at the text's own inline end, then moves under the final glyph. No line breaks change.
+   A pixel of lift keeps the saved ring clear of the next line's glyph box. Reader tokens stay centred. */
+.japanese-lookup-word:is([data-depth], [data-kept])::after {
+  left: auto;
+  right: auto;
+  bottom: calc(-0.3em + 1px);
+  transform: translateX(calc(-0.5em - var(--depth-size) / 2));
+}
+/* every reader title, unconditionally: each title line holds its own font cell plus room for a reading above and a ring below
+   (a room the desktop title widens for its larger reading), laid out once for whatever arrives later (its words, a state, a
+   reading, late name readings); a stateful word's dot sits in that room, below its word's box and so below the hairline mark
+   the word shows while touched, off the next title line, a reading shown there and the English caption. On the phone a saved
+   ring drops below that mark only while its own word is touched (a pointer, keyboard focus), and the phone's room is measured
+   to keep even that ring clear of a reading the next line shows (22px: WebKit's 大賞 reading under a hovered 日本 needed 1.85px
+   more than 20px). The desktop query is the exact complement of the phone title font's. Repeating the same class preserves the
+   matched titles and outranks the later rooms/read.css font shorthand and phone leading without an important declaration. */
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 22px); padding-bottom: 8px; }
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom: -6.75px; }
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word[data-kept]:is(:hover,:focus-visible)::after { bottom: -9.25px; }
+/* a keyboard-focused title word keeps the focus token's decoration in one piece (a title word never wraps, so nothing looks
+   different); with the token's clone WebKit re-broke the title's pretty-wrapped lines at the next rendering, moving 大賞 191px */
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:focus-visible { -webkit-box-decoration-break: slice; box-decoration-break: slice; }
+@media not (max-width: 520px) {
+  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 31px); }
+  html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom: -9.25px; }
+}
+/* Ladder contract: only this occurrence steps aside while its inline English is open. Removing the attribute
+   restores the same fill and ring; the painter and learner record are untouched, and no line box moves. */
+#reader .tok[data-depth-aside='meaning'] > .tok-word::after,
+.japanese-lookup-word[data-depth-aside='meaning']::after { opacity: 0; }
 /* a dot of its own (the page's headword, a list row, a mirror row, the basis line): inline, after the word */
 .depth-dot {
   display: none;
@@ -5583,11 +5636,11 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
 /* the slip: its band is the world's ink, so the dot is the band's own word ink (the paper showing through, 白抜き) at the
    same steps, and the ring is the band's warm note (the reading's red lit by paper, 5:1 on the ink) */
 #mini { --depth-band-ink: var(--mini-head-ink, var(--world-paper)); }
-#mini[data-depth='met'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 34%, transparent); }
-#mini[data-depth='again'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 56%, transparent); }
-#mini[data-depth='recalled'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 78%, transparent); }
+#mini[data-depth='met'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 48%, transparent); }
+#mini[data-depth='again'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 65%, transparent); }
+#mini[data-depth='recalled'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 82%, transparent); }
 #mini[data-depth='owned'] { --depth-fill: var(--depth-band-ink); }
-#mini[data-kept] { --depth-edge: 0 0 0 1.5px var(--mini-reading, var(--depth-ring)); }
+#mini[data-kept] { --depth-edge: 0 0 0 2px var(--mini-reading, var(--depth-ring)); }
 /* beside the word, at its middle, like a seal set by a name: under it the dot would sit in the reading's line. The dot is the
    word's last flex item, its margins netting no width, pushed to the box's end and centred on it: 9 px past the word's box,
    at its middle, where a box positioned on the word drew it. The word itself is never positioned: its ::before is the reach
@@ -5605,6 +5658,11 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
   pointer-events: none;
 }
 /* a star in Today's sky: the dot under the word as in the text */
+html[data-room='tray'] .today-star {
+  /* The star's authored breath reaches 66% opacity. Lower only its seal into the world's ink so the
+     composited ring still clears 3:1 at that trough; the star's text and motion keep their own opacity. */
+  --depth-ring: color-mix(in srgb, var(--color-seal, var(--world-signal)) 75%, var(--depth-pigment));
+}
 html[data-room='tray'] .today-star:is([data-depth], [data-kept])::after {
   content: '';
   position: absolute;
