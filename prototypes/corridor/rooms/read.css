@@ -691,10 +691,19 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture { background-colo
     0 14px 40px -12px rgb(20 24 34 / 32%);
   color: var(--color-ink);
   cursor: auto;
-  /* the card rises and settles: translate and opacity only (placeFloating measures it as it opens) */
+  /* Ladder · a scroll inside the card never scrolls the text beneath it */
+  overscroll-behavior: contain;
+  /* the card rises and settles: translate and opacity only (placeFloating measures it as it opens). Ladder · above its word
+     it settles downward from above (--mini-rise), so its rise never brushes the word's reading */
   animation: read-mini-rise var(--motion-room) var(--ease-enter) backwards;
 }
-@keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, 10px, 0); } }
+@keyframes read-mini-rise { from { opacity: 0.01; transform: translate3d(0, var(--mini-rise, 10px), 0); } }
+/* Ladder · a word set in the page's own text carries its card: the card stands in the text's scroll layer (placeFloating:
+   data-flow="text", its top in the document), travels with the word and goes under the bars and the tabs as the text does */
+#mini[data-flow='text'] {
+  position: absolute;
+  z-index: 18;
+}
 :root:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #mini {
   /* night: the band is the world's lacquer — its depth (ground 48% + black) under the word, its sheen (ground 72% +
      black) at the foot where it meets the raised lacquer paper; the word is the world's shell-white or sutra-cream
