@@ -15,7 +15,7 @@
  * text, so a dot painted on it counts as ink. On the 日本 title, after its own walk, the story opened again through its
  * native door and 大賞's native first input show 大賞's reading on the phone's next line; a real pointer hover, then the
  * title's own roving Home key, make the saved 日本 active without activating it: its lowered ring must clear that reading
- * too, and the reading, record, title and scroll stay as they were.
+ * too, and the reading, record, title and scroll stay as they were; keyboard focus moves no title glyph.
  * A raster batch is taken only
  * on the settled reader (no room transition); its shots may differ only within dots, or it is retaken.
  * Identity is read from what the app opened and showed, not from the selectors the verifier chose.
@@ -57,7 +57,7 @@ const ringFrames = (spec) => [['before', true], ['reading', true], ['stage-open'
   ...(spec.uncover ? [['stage-met-uncovered', true], ['stage-met-restored', true], ['active-saved', true]] : []), ...(spec.besideReading ? [['active-hover', true], ['active-key', true]] : [])];
 const ringRows = (spec) => [`world.${spec.name}`, `${spec.name}.device`, ...['fresh', 'reading-beside-ring', 'reading-without-encounter', 'prior-state-intact', 'stage-commits-met', 'first-tap-base-glyphs', 'second-tap-base-glyphs',
   'fresh-to-state-base-glyphs', 'title-rhythm-through-inputs', 'source-visible-and-owned', 'scroll-unchanged', 'slip-seated', 'title-leading-breakpoint',
-  ...(spec.besideReading ? ['active-hover-input', 'active-key-input'] : []),
+  ...(spec.besideReading ? ['active-hover-input', 'active-key-input', 'active-key-title-still'] : []),
   ...(spec.uncover ? ['uncovered-record-identical', 'uncovered-title-stable', 'restored-reading', 'restored-record-identical', 'active-saved-input'] : [])].map((id) => `${spec.name}.${id}`),
   ...ringFrames(spec).flatMap(([frame, raster]) => ['fragment-alignment', 'no-other-glyph-overlap', ...(raster ? ['scene-settled', 'ring-clear-of-ink', 'saved-occurrence', 'active-mark'] : [])].map((id) => `${spec.name}-${frame}.${id}`))];
 const ringCaseId = (engine, world, size) => `${engine}/${world}/${size}`;
@@ -1139,8 +1139,8 @@ async function besideReadingWalk(page, out, { name, id, query, word, reading, pr
       target: { hover: t.matches(':hover'), focused: a === t }, active: a ? { tag: a.tagName, lookup: a.dataset?.lookupText ?? null, inTitleRoving: Boolean(block && (a === block || block.contains(a))) } : null };
   }, { priorSelector, selector });
   const same = (a, b) => a.settled && b.settled && a.snapshot.revision === b.snapshot.revision && JSON.stringify(a.snapshot.record) === JSON.stringify(b.snapshot.record);
-  // WebKit lays a keyboard-focused title word out anew only at its next rendering (the focus token's box-decoration-break), so
-  // each state is rendered once, unrecorded, before anything is measured: a frame never straddles two layouts.
+  // Each state is rendered once, unrecorded, before anything is measured, so a layout that changes only at rendering is the one
+  // measured (WebKit re-broke the title there when the focus token cloned its decoration) and no frame straddles two layouts.
   const rendered = async () => { await page.screenshot({ animations: 'allow' }); await delay(100); };
   await rendered();
   const before = await sample('beside-before'), beforeGeometry = await titleGeometry(page, 'beside-before'), pre = await settledRecord(page);
@@ -1163,6 +1163,9 @@ async function besideReadingWalk(page, out, { name, id, query, word, reading, pr
     const underRing = ring ? readingGlyphs.filter((g) => g.top > ring.fragments.at(-1).bottom && g.left < ring.right + ring.spread && g.right > ring.left - ring.spread) : [];
     const record = await settledRecord(page);
     const activated = label === 'active-hover' ? state.prior.hover && !state.prior.focusVisible : state.prior.focused && state.prior.focusVisible && !state.prior.hover && !park.under?.lookup && Boolean(start?.active?.inTitleRoving);
+    // Keyboard focus arriving in the title moves no title glyph: 大賞's own base glyphs and every title character stay within 1px.
+    if (label === 'active-key') row(out, `${name}.active-key-title-still`, activated && JSON.stringify(touched.title) === JSON.stringify(before.title) && baseShift(before, touched) <= 1 && glyphShift(beforeGeometry.glyphs, geometry.glyphs) <= 1,
+      { input: how, word: { text: word, shift: baseShift(before, touched), before: before.base, after: touched.base }, titleGlyphShift: glyphShift(beforeGeometry.glyphs, geometry.glyphs), title: touched.title, before: before.title });
     row(out, `${name}.${label}-input`, activated && state.prior.depth === 'met' && state.prior.kept && touched.rung === 'reading' && touched.reading === reading && !touched.mini &&
       JSON.stringify(touched.title) === JSON.stringify(before.title) && baseShift(before, touched) <= 1 && glyphShift(beforeGeometry.glyphs, geometry.glyphs) <= 1 &&
       touched.scrollX === before.scrollX && touched.scrollY === before.scrollY && (!nextLineRequired || underRing.length > 0) && same(held, record),
@@ -1236,6 +1239,7 @@ function runAdmissionSelfTest() {
     'missing leading breakpoint proof': (o) => { const id = 'live-daisho-saved-nihon.title-leading-breakpoint'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[0].rowIds = o.ringCases[0].rowIds.filter((r) => r !== id); },
     'missing narrow hover beside the reading': (o) => { const id = 'live-daisho-saved-nihon-active-hover.no-other-glyph-overlap'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[0].rowIds = o.ringCases[0].rowIds.filter((r) => r !== id); },
     'missing narrow keyboard input beside the reading': (o) => { const id = 'live-daisho-saved-nihon.active-key-input'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[0].rowIds = o.ringCases[0].rowIds.filter((r) => r !== id); },
+    'missing keyboard title-still proof': (o) => { const id = 'live-daisho-saved-nihon.active-key-title-still'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[0].rowIds = o.ringCases[0].rowIds.filter((r) => r !== id); },
     'missing scene proof': (o) => { const id = 'live-daisho-saved-nihon-before.scene-settled'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[0].rowIds = o.ringCases[0].rowIds.filter((r) => r !== id); },
     'missing uncovered continuation': (o) => { const id = 'live-daijin-saved-meguru-stage-met-uncovered.ring-clear-of-ink'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[1].rowIds = o.ringCases[1].rowIds.filter((r) => r !== id); },
     'occluded stage-met raster substituted': (o) => { const from = 'live-daijin-saved-meguru-stage-met-uncovered.ring-clear-of-ink', to = 'live-daijin-saved-meguru-stage-met.ring-clear-of-ink'; o.rows.find((r) => r.id === from).id = to; o.ringCases[1].rowIds = o.ringCases[1].rowIds.map((r) => (r === from ? to : r)); },

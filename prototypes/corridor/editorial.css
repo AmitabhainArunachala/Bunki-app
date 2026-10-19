@@ -5484,6 +5484,9 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
 html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 22px); padding-bottom: 8px; }
 html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom: -6.75px; }
 html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word[data-kept]:is(:hover,:focus-visible)::after { bottom: -9.25px; }
+/* a keyboard-focused title word keeps the focus token's decoration in one piece (a title word never wraps, so nothing looks
+   different); with the token's clone WebKit re-broke the title's pretty-wrapped lines at the next rendering, moving 大賞 191px */
+html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:focus-visible { -webkit-box-decoration-break: slice; box-decoration-break: slice; }
 @media not (max-width: 520px) {
   html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title { line-height: calc(1.45em + 31px); }
   html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > h1.view-title.view-title .japanese-lookup-word:is([data-depth],[data-kept])::after { bottom: -9.25px; }
