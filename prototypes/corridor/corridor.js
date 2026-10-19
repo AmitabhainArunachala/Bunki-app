@@ -8603,6 +8603,7 @@ function renderSourceReading(main) {
   if (context?.sourceId === saved.id && context.sourceDigest === article.body.contentSha256 &&
       article.body.text.slice(context.start, context.end) === context.quote) {
     const mark = el('mark', 'publisher-context-return', context.quote); mark.id = 'source-context-return'; mark.tabIndex = -1;
+    focusReturnMarkOnce(mark);
     body.replaceChildren(article.body.text.slice(0, context.start), mark, article.body.text.slice(context.end));
     requestAnimationFrame(() => { if (mark.isConnected) { mark.scrollIntoView({ block: 'center' }); mark.focus({ preventScroll: true }); } });
   }
@@ -8827,7 +8828,7 @@ function renderPublisherReading(main) {
   if (returning?.sourceId === saved.receiptSha256 && returning.sourceKind === 'publisher-reading' &&
       article.body.text.slice(returning.start, returning.end) === returning.quote) {
     const mark = el('mark', 'publisher-context-return', returning.quote);
-    mark.id = 'publisher-context-return'; mark.tabIndex = -1;
+    mark.id = 'publisher-context-return'; mark.tabIndex = -1; focusReturnMarkOnce(mark);
     body.replaceChildren(article.body.text.slice(0, returning.start), mark, article.body.text.slice(returning.end));
     requestAnimationFrame(() => {
       if (!mark.isConnected) return;
@@ -13571,6 +13572,16 @@ function markSenseContext(tokens, passage = null) {
   tokens.forEach((token, index) => {
     if (token && typeof token === 'object' && (passage || !TOKEN_CONTEXT.has(token))) TOKEN_CONTEXT.set(token, { tokens, index, passage });
   });
+}
+
+/** A return mark is focused once on return, so the exact saved span is announced. It must never take a press: with
+ * tabindex a mouse or finger press on the highlight focused the mark instead of starting a text selection, so a drag
+ * that began on the saved words selected nothing. The tabindex goes at the mark's first blur, or at the first press on
+ * it, before the press's default action; the highlight looks the same. */
+function focusReturnMarkOnce(mark) {
+  const release = () => mark.removeAttribute('tabindex');
+  mark.addEventListener('blur', release, { once: true });
+  mark.addEventListener('pointerdown', release, { once: true, capture: true });
 }
 
 /** The shelf's sense sidecar (data/articles/senses.json, R3 part 2), asked for once. The single file carries it with
