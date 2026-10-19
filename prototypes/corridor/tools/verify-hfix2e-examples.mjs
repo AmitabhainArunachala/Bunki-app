@@ -7,10 +7,13 @@
  *          Control: no token ever counts as the word.
  *   KT6-C  an inflected verb keeps its inflected examples (歩く: ≥ 4, one written 歩け/歩き/歩い). Green on base and
  *          branch (a guard). Control: as B.
- * KT-6 round 2 (critic 0426 on 1f790977; the lead's ruling), each against 1f790977 as its base:
- *   KT6-D  the seven words a variant okurigana or a same-entry spelling writes show their own sentences again (押える
- *          ← 押さえる, 代る ← 代わる, 問 ← 問い, 願 ← 願い, 勢 ← 勢い, 或 ← 或る, 因る ← 依る/拠る/由る: entry 1168660 shares
- *          every sense). Red on 1f790977 (0 or 1 left). Control: no own-entry spelling admitted.
+ * KT-6 rounds 2 and 3 (critic 0426 and recheck 0508; the lead's rulings), against 1f790977 (round 1) and a760b2ad (round 2):
+ *   KT6-D  MUST STAY IN: the words whose own entry writes their sentences another way show them again: 押える ← 押さえる (6),
+ *          代る ← 代わる (6), 因る ← 依る/拠る (6: entry 1168660 shares every sense), 或 ← 或る. Red on 1f790977. Control: no
+ *          own-entry spelling admitted.
+ *   KT6-G  MUST STAY OUT: a homograph entry never lends its sentences: no example of 首 holds 頭 without 首, of 比 頃, of 画
+ *          絵, of 為る 成る, of 才 歳, of 開く 空く; 問 (もん) shows no 問い sentence. Red on a760b2ad (round 2's every entry
+ *          that writes the key). Control: the own entry is again every entry that writes the key.
  *   KT6-E  張る never stands under 貼る (one entry, 1427900, but a sense of its own): every example 貼る's page shows
  *          holds 貼. A guard, green on 1f790977 too. Control: every same-entry spelling admitted whatever its senses.
  *   KT6-F  藍 still shows no example at all. A guard, green on 1f790977 too. Control: the bank read by the bare kana.
@@ -50,6 +53,8 @@ const CONTROL = {
   'KT6-C': ['function exampleTokenIsWord(token, identity) {', 'function exampleTokenIsWord(token, identity) {\n  return false;'],
   // no spelling of the word's own entries is admitted, as on 1f790977
   'KT6-D': ['  for (const row of exampleOwnRows(key)) {', '  for (const row of []) {'],
+  // the own entry is again every entry that writes the key, whatever its reading and sense (round 2)
+  'KT6-G': ["  return dictionaryRowsForForm(key).filter((row) => Array.isArray(row?.[4]) && row[4].includes(key) &&\n", "  return dictionaryRowsForForm(key).filter((row) => Array.isArray(row?.[4]) && row[4].includes(key) || false &&\n"],
   // every same-entry spelling admitted whatever its senses: 張る would stand under 貼る
   'KT6-E': ['function exampleSensesShared(row) {', 'function exampleSensesShared(row) {\n  return true;'],
   'KT6-F': ['const banked = bankExamplesFor(id, node);', 'const banked = D.exampleBank?.get(id) || [];'],
@@ -204,16 +209,32 @@ try {
     return { examples, inflected };
   });
   await row('KT6-D', async ({ page }) => {
-    const words = [['押える', /押さえ/u], ['代る', /代わ/u], ['問', /問い/u], ['願', /願い/u], ['勢', /勢い/u], ['或', /或る/u], ['因る', /[依拠由]/u]];
+    const words = [['押える', /押さえ/u, 6], ['代る', /代わ/u, 6], ['因る', /[依拠由]/u, 6], ['或', /或る/u, 1]];
     const seen = {};
-    for (const [word, own] of words) {
+    for (const [word, own, least] of words) {
       await openWordPage(page, word);
       const examples = await settledExamples(page);
-      seen[word] = { count: examples.length, own: examples.filter((text) => own.test(text)).length, first: examples[0] || null };
+      seen[word] = { count: examples.length, least, own: examples.filter((text) => own.test(text)).length, first: examples[0] || null };
     }
     await shot(page, 'KT6-D-last');
-    const short = Object.entries(seen).filter(([, row]) => !row.count || !row.own);
+    const short = Object.entries(seen).filter(([, row]) => row.count < row.least || !row.own);
     assert.deepEqual(short.map(([word]) => word), [], `KT6-D: each word shows its own sentences again (${JSON.stringify(seen)})`);
+    return seen;
+  });
+
+  await row('KT6-G', async ({ page }) => {
+    // [word, the homograph entry's spelling that must not stand under it, the word's own kanji]
+    const pairs = [['首', '頭', '首'], ['比', '頃', '比'], ['画', '絵', '画'], ['為る', '成', '為'], ['才', '歳', '才'], ['開く', '空', '開'], ['問', '問い', null]];
+    const seen = {};
+    for (const [word, stranger, own] of pairs) {
+      await openWordPage(page, word);
+      const examples = await settledExamples(page);
+      const lent = examples.filter((text) => text.includes(stranger) && (!own || !text.includes(own)));
+      seen[word] = { count: examples.length, lent };
+    }
+    await shot(page, 'KT6-G-last');
+    const lending = Object.entries(seen).filter(([, row]) => row.lent.length);
+    assert.deepEqual(lending.map(([word]) => word), [], `KT6-G: no homograph entry lends its sentences (${JSON.stringify(Object.fromEntries(lending))})`);
     return seen;
   });
 

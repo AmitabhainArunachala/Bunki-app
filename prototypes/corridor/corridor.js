@@ -32695,11 +32695,12 @@ function exampleIdentity(id, node = null) {
     const written = Array.isArray(row?.[4]) ? row[4] : [];
     for (const form of written.length ? written : Array.isArray(row?.[5]) ? row[5] : []) forms.add(form);
   }
-  // KT-6 round 2 (critic 0426, the lead's ruling): the word's own entries are every entry that writes its key (押える is a
-  // spelling of 押さえる's entry, 問 of 問い's). Their spellings with the key's kanji (another okurigana: 押さえる, 代わる,
-  // 問い, 願い, 勢い, 或る) are the word's own; a spelling with other kanji only when the entry has one sense or JMdict
-  // restricts none of its senses to some of its spellings (依る, 拠る and 由る share every sense of 因る's entry; 張る keeps
-  // a sense of its own, so it never stands under 貼る). Never another entry's spelling.
+  // KT-6 round 3 (recheck 0508, the lead's ruling): the word's own entry is the one entry that writes its key with the
+  // word's own reading and sense (exampleOwnRows; never a homograph: 首's こうべ entry is 頭's, 才's sense is not 歳's).
+  // Its spellings with the key's kanji are the word's own (another okurigana: 押さえる, 代わる, 或る); a spelling with other
+  // kanji only when that entry has one sense or JMdict restricts none of its senses to some of its spellings (依る, 拠る and
+  // 由る share every sense of 因る's entry; 張る keeps a sense of its own, so it never stands under 貼る). Never another
+  // entry's spelling.
   for (const row of exampleOwnRows(key)) {
     for (const form of row[4]) if (!forms.has(form) && (exampleKanji(form) === exampleKanji(key) || exampleSensesShared(row))) forms.add(form);
   }
@@ -32716,10 +32717,22 @@ function exampleIdentity(id, node = null) {
 function exampleKanji(form) {
   return (String(form || '').match(/\p{Script=Han}/gu) || []).join('');
 }
-/** The entries at hand that write `key` as one of their spellings (a kanji key only: a kana key names no entry by itself). */
+/** A gloss as the sense test compares it: the dictionary's own normalisation, its ellipses and spacing set aside ("a certain
+ * ..." and "a certain..." are one sense). */
+function exampleSenseKey(gloss) {
+  return normalizeGloss(String(gloss || '')).replace(/[.…]+/gu, ' ').replace(/\s+/gu, ' ').trim();
+}
+/** The word's own entry: of the entries at hand that write `key`, the one read the core word's way (that reading allowed
+ * for this spelling) and holding one of its senses. A kanji key with a core word only: a kana key, or a word with no core
+ * reading and sense, names no entry by itself. */
 function exampleOwnRows(key) {
-  if (!key || !D.dictionaryIndex || !exampleKanji(key)) return [];
-  return dictionaryRowsForForm(key).filter((row) => Array.isArray(row?.[4]) && row[4].includes(key));
+  const core = D.dict?.[key];
+  if (!key || !core?.r || !D.dictionaryIndex || !exampleKanji(key)) return [];
+  const reading = kataToHira(core.r);
+  const senses = new Set((core.m || []).flatMap((gloss) => String(gloss).split(/;\s*/u)).map(exampleSenseKey).filter(Boolean));
+  return dictionaryRowsForForm(key).filter((row) => Array.isArray(row?.[4]) && row[4].includes(key) &&
+    (row[5] || []).some((kana) => kataToHira(kana) === reading && dictionaryReadingSupportsForm(row, kana, key)) &&
+    (row[6] || []).some((gloss) => senses.has(exampleSenseKey(gloss))));
 }
 /** Whether every spelling of an entry carries every sense of it: one sense, or no sense JMdict restricts to some of its
  * spellings (the entry's detail, once its shard is here: ensureExampleIdentity). Unknown is no. */
@@ -32730,13 +32743,17 @@ function exampleSensesShared(row) {
   if (!senses) return false;
   return senses.every((sense) => !Array.isArray(sense?.[1]) || !sense[1].length || sense[1].includes('*'));
 }
-/** KT-6 · the details the sense check reads for a word's own entries written with other kanji, fetched once. True when
- * something arrived, so the page draws its examples again. */
+/** KT-6 · the detail the sense check reads for the word's own entry, fetched once and only when a bank sentence of the
+ * word writes it with other kanji (因る's sentences write 依る, 拠る). True when it arrived, so the page draws its examples
+ * again. */
 async function ensureExampleIdentity(id) {
-  if (!exampleKanji(id)) return false;
+  if (!exampleKanji(id) || !D.dict?.[id]) return false;
   await ensureDictionaryRowsForForm(id);
-  const shards = [...new Set(exampleOwnRows(id)
-    .filter((row) => row[4].some((form) => exampleKanji(form) !== exampleKanji(id)) && !D.dictionaryDetails?.get(String(row[0])))
+  const own = exampleOwnRows(id).filter((row) => !exampleSensesShared(row) && !D.dictionaryDetails?.get(String(row[0])));
+  if (!own.length) return false;
+  const written = new Set((await ensureBankExamples(id)).flatMap((ex) => (ex.tokens || []).filter((token) => token.c).map((token) => token.b)));
+  const shards = [...new Set(own
+    .filter((row) => row[4].some((form) => exampleKanji(form) !== exampleKanji(id) && written.has(form)))
     .map((row) => dictionaryShardId(row[0])))];
   if (!shards.length) return false;
   await Promise.all(shards.map(ensureDictionaryShard));

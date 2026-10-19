@@ -27,7 +27,7 @@ function constant(name) {
 }
 // KT-6 round 2's helpers (the word's own entries and their sense check) are read when the served build has them, so the
 // same census runs on the build before them and the counts compare
-const optional = ['exampleKanji', 'exampleOwnRows', 'exampleSensesShared'].filter((name) => new RegExp(`\\nfunction ${name}\\(`).test(source));
+const optional = ['exampleKanji', 'exampleSenseKey', 'exampleOwnRows', 'exampleSensesShared'].filter((name) => new RegExp(`\\nfunction ${name}\\(`).test(source));
 const names = ['kataToHira', 'normalizeGloss', 'dictionaryReadingSummaries', 'dictionaryReadingSupportsForm', 'dictionaryCoreMatch',
   'dictionaryRowBySeq', 'dictionaryRowsForForm', 'dictionaryRowsFor', 'dictionaryDetailRowsFor', ...optional, 'exampleIdentity',
   'exampleTokenIsWord', 'exampleHoldsWord', 'inflateExampleToken'];
@@ -103,7 +103,8 @@ const spotRows = spots.map(([key, why]) => {
 });
 
 const report = { site, artifact: JSON.parse(readFileSync(join(site, 'build-identity.json'), 'utf8')).artifactSha256,
-  rule: optional.length ? 'a bank sentence is a word\'s example only when a content token\'s dictionary form is one of the word\'s own written forms: key, core alt, the shown entry\'s spellings (kana forms only for an entry with no kanji), and the spellings of every entry that writes the key: with the key\'s kanji, or with other kanji when the entry has one sense or restricts none of its senses to some spellings'
+  rule: optional.includes('exampleSenseKey') ? 'a bank sentence is a word\'s example only when a content token\'s dictionary form is one of the word\'s own written forms: key, core alt, the shown entry\'s spellings (kana forms only for an entry with no kanji), and the spellings of the word\'s own entry (the entry writing the key with the core word\'s reading and one of its senses): with the key\'s kanji, or with other kanji when that entry has one sense or restricts none of its senses to some spellings'
+    : optional.length ? 'a bank sentence is a word\'s example only when a content token\'s dictionary form is one of the word\'s own written forms: key, core alt, the shown entry\'s spellings (kana forms only for an entry with no kanji), and the spellings of every entry that writes the key: with the key\'s kanji, or with other kanji when the entry has one sense or restricts none of its senses to some spellings'
     : 'a bank sentence is a word\'s example only when a content token\'s dictionary form is one of the word\'s own written forms (key, core alt, its own entry\'s spellings; kana forms only for an entry with no kanji)',
   helpers: optional,
   all: tally, core, firstExampleChanged: firstChanged, spots: spotRows, changed };
