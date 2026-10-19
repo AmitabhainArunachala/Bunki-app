@@ -5410,24 +5410,26 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
    BEGIN BUNKI G2 · 深さ — the quiet dot (slice G2, 17 October 2026)
    John (10-15): "I do like the color dot idea… in the most subtle way possible… layers of depth dictated by a subtle
    color schema and delicately placed in every session it would help deepen retention". One dot under a word, in its
-   world's key pigment (contract §6b: the block its sky is printed from) laid into its paper like the printer's 濃淡: a
-   word met once is a breath of the pigment, seen again a half tone, recalled most of it, familiar the pigment itself.
+   world's text ink laid into its paper like the printer's 濃淡: a word met once is a lighter ink, seen again a half tone,
+   recalled most of it, familiar the ink itself. Six CSS pixels give the fill 44% more area than the former five;
+   the kept ring spans ten. The visibility verifier measures the actual paper, including inherited opacity.
    The dot sits where a 圏点 sits, under the word, out of the line box (absolute: no line, ruby or gloss moves), and never
    takes a tap (pointer-events: none). The ring around it is the world's seal red, and it means one thing everywhere: kept.
-   In 朱・胡粉 the key IS the seal's vermilion, so there the dot is the print's other block, its soot ink, and the red is
-   left to the ring. Every value below is a world token or a mix of two (D3); corridor.js wordDepth decides the state.
+   Red is left to the ring in every world. Every value below is a world token or a mix of two (D3);
+   corridor.js wordDepth decides the state; stronger paint never invents an encounter or changes the record.
    ========================================================================== */
 :where(body, #sheet, #mini) {
-  --depth-pigment: var(--tone-key, var(--world-accent));
-  --depth-ground: var(--tone-ground, var(--world-ground));
-  --depth-met: color-mix(in srgb, var(--depth-pigment) 30%, var(--depth-ground));
-  --depth-again: color-mix(in srgb, var(--depth-pigment) 55%, var(--depth-ground));
-  --depth-recalled: color-mix(in srgb, var(--depth-pigment) 78%, var(--depth-ground));
+  --depth-pigment: var(--color-ink, var(--world-ink));
+  --depth-ground: var(--reader-paper, var(--tone-ground, var(--world-ground)));
+  --depth-met: color-mix(in srgb, var(--depth-pigment) 48%, var(--depth-ground));
+  --depth-again: color-mix(in srgb, var(--depth-pigment) 65%, var(--depth-ground));
+  --depth-recalled: color-mix(in srgb, var(--depth-pigment) 82%, var(--depth-ground));
   --depth-owned: var(--depth-pigment);
   --depth-ring: var(--color-seal, var(--world-signal));
-  --depth-size: 5px;
+  --depth-size: 6px;
 }
-:where(:root[data-theme='shu']) :where(body, #sheet, #mini) { --depth-pigment: var(--world-ink); }
+/* A word page can cover the reader: it has its own ground, not the paper inherited behind it. */
+:where(#sheet, #mini) { --depth-ground: var(--tone-ground, var(--world-ground)); }
 /* the state's fill: one rule per state, read by every dot below (zero-specificity list, so a surface of its own — the slip's
    band — can set its own steps) */
 :where(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-depth='met'] { --depth-fill: var(--depth-met); }
@@ -5456,6 +5458,10 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
   box-shadow: var(--depth-edge, none);
   pointer-events: none;
 }
+/* Ladder contract: only this occurrence steps aside while its inline English is open. Removing the attribute
+   restores the same fill and ring; the painter and learner record are untouched, and no line box moves. */
+#reader .tok[data-depth-aside='meaning'] > .tok-word::after,
+.japanese-lookup-word[data-depth-aside='meaning']::after { opacity: 0; }
 /* a dot of its own (the page's headword, a list row, a mirror row, the basis line): inline, after the word */
 .depth-dot {
   display: none;
@@ -5474,11 +5480,11 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
 /* the slip: its band is the world's ink, so the dot is the band's own word ink (the paper showing through, 白抜き) at the
    same steps, and the ring is the band's warm note (the reading's red lit by paper, 5:1 on the ink) */
 #mini { --depth-band-ink: var(--mini-head-ink, var(--world-paper)); }
-#mini[data-depth='met'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 34%, transparent); }
-#mini[data-depth='again'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 56%, transparent); }
-#mini[data-depth='recalled'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 78%, transparent); }
+#mini[data-depth='met'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 48%, transparent); }
+#mini[data-depth='again'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 65%, transparent); }
+#mini[data-depth='recalled'] { --depth-fill: color-mix(in srgb, var(--depth-band-ink) 82%, transparent); }
 #mini[data-depth='owned'] { --depth-fill: var(--depth-band-ink); }
-#mini[data-kept] { --depth-edge: 0 0 0 1.5px var(--mini-reading, var(--depth-ring)); }
+#mini[data-kept] { --depth-edge: 0 0 0 2px var(--mini-reading, var(--depth-ring)); }
 /* beside the word, at its middle, like a seal set by a name: under it the dot would sit in the reading's line. The dot is the
    word's last flex item, its margins netting no width, pushed to the box's end and centred on it: 9 px past the word's box,
    at its middle, where a box positioned on the word drew it. The word itself is never positioned: its ::before is the reach
