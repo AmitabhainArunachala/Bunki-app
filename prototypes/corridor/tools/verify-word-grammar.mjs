@@ -616,10 +616,10 @@ async function g2Walks(walk, browser) {
     const page0 = await page.evaluate(() => getComputedStyle(document.querySelector('#reader')).backgroundColor);
     const steps = fills.map((fill) => contrast(fill, page0));
     check('G2.1', 'the paragraph: 出席 bare · 官邸 met · 大賞 again · 表彰 recalled · 大臣 owned, four fills each deeper against the page, '
-      + 'each fill at least 6 px, met at least 1.5:1 and known at least 3:1 on the reader paper, '
+      + 'each fill at least 6 px, met at least 3:1 and known at least 3:1 on the reader paper, '
       + 'each dot out of the line (absolute, untouchable) and every row its natural height',
     states && new Set(fills).size === 4 && steps.every((ratio, i) => i === 0 || ratio > steps[i - 1]) &&
-      steps[0] >= 1.5 && steps[2] >= 3 && steps[3] >= 3 &&
+      steps[0] >= 3 && steps[2] >= 3 && steps[3] >= 3 &&
       ['met', 'again', 'recalled', 'owned'].every((name) => Math.min(facts[name].dot.width, facts[name].dot.height) >= 6) &&
       ['met', 'again', 'recalled', 'owned'].every((name) => facts[name].dot.position === 'absolute' && facts[name].dot.events === 'none') &&
       ['met', 'again', 'recalled', 'owned'].every((name) => Math.abs(facts[name].rowHeight - facts.unmet.rowHeight) <= 0.5), { facts, fills, steps });

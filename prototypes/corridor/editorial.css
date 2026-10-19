@@ -5422,10 +5422,24 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
    Red is left to the ring in every world. Every value below is a world token or a mix of two (D3);
    corridor.js wordDepth decides the state; stronger paint never invents an encounter or changes the record.
    ========================================================================== */
+/* the met dot's share of its world's ink, per world: the least that keeps a met dot at 3:1 or more against its paper on every
+   surface it sits on, and about 3.5:1 in running text, measured in both engines (lead ruling 2026-10-20, John's S5). It stays
+   lighter than seen-again (65%) and far from known. Only the colour changes: no size, place or ring. hokusai has no theme name. */
+:root { --depth-met-share: 55%; }
+:root[data-theme='sumi'] { --depth-met-share: 57%; }
+:root[data-theme='shu'] { --depth-met-share: 60%; }
+:root[data-theme='akafuji'] { --depth-met-share: 60%; }
+:root[data-theme='iwa'] { --depth-met-share: 60%; }
+:root[data-theme='rokusho'] { --depth-met-share: 48%; }
+:root[data-theme='yoru'] { --depth-met-share: 51%; }
+:root[data-theme='nami'] { --depth-met-share: 58%; }
+:root[data-theme='keyblock'] { --depth-met-share: 59%; }
+:root[data-theme='hakuu'] { --depth-met-share: 53%; }
+:root[data-theme='kaku'] { --depth-met-share: 48%; }
 :where(body, #sheet, #mini, .reader-card) {
   --depth-pigment: var(--color-ink, var(--world-ink));
   --depth-ground: var(--reader-paper, var(--tone-ground, var(--world-ground)));
-  --depth-met: color-mix(in srgb, var(--depth-pigment) 48%, var(--depth-ground));
+  --depth-met: color-mix(in srgb, var(--depth-pigment) var(--depth-met-share, 48%), var(--depth-ground));
   --depth-again: color-mix(in srgb, var(--depth-pigment) 65%, var(--depth-ground));
   --depth-recalled: color-mix(in srgb, var(--depth-pigment) 82%, var(--depth-ground));
   --depth-owned: var(--depth-pigment);

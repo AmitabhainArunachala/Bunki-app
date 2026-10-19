@@ -109,7 +109,7 @@ const report = { schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || rando
     ...(lateLookup ? { lateRoster: { titles: [...new Set(LATE.map((l) => l.id))], engines: LATE_ENGINES, worlds: LATE_WORLDS, cases: LATE_REQUIRED.length, required: LATE_REQUIRED, scheduled: LATE_REQUIRED.filter((c) => engines.includes(c.engine)).map((c) => c.caseId), claim: 'lead2010: native cold titles plus actual wikinews BODY success/failure/retry; 12 real cases, not every world', jawikiSidecar: 'not exercised: no such request exists', deferredTitleWitness: 'not required by lead2010; neither native title is deferred' } } : {}),
     card: { title: STORY, context: `${CONTEXT_STORY} 講演 met+saved`, live: LIVE.map((l) => `${l.id} ${l.word}: fresh profile${l.prior ? ` with ${l.prior} met+saved` : ''}, real first and second input`) },
     fixture: 'G2 first paragraph; native installation record; exact dictionary identities', ladder: 'attribute contract only' },
-  thresholds: { fillCssPx: 6, actualFillExtentCssPx: 5, actualFillAreaCssPx2: 18, actualFillNote: 'Interior mask excludes 0.25px radius edge; extent allows circle antialiasing, area rejects clipped stripes', keptOuterCssPx: 10, knownContrast: 3, savedContrast: 3, metContrast: 1.5, semanticDeltaE76: 10,
+  thresholds: { fillCssPx: 6, actualFillExtentCssPx: 5, actualFillAreaCssPx2: 18, actualFillNote: 'Interior mask excludes 0.25px radius edge; extent allows circle antialiasing, area rejects clipped stripes', keptOuterCssPx: 10, knownContrast: 3, savedContrast: 3, metContrast: 3, metBreathTroughContrast: 1.5, semanticDeltaE76: 10,
     deltaEStatus: 'conservative engineering bound, not WCAG', measurement: 'actual device pixels: painted screenshot vs identical geometry with only dots hidden; paper is the hidden pixel' },
   diagnosticInlineEnd,
   control: { file: controlFile, sha256: controlBytes ? hash(controlBytes) : null, served: [], setupError: null }, contexts: [], errors: [], passed: false, fullAcceptance: false };
@@ -342,7 +342,10 @@ function checkPaint(out, name, dots) {
   const active = dots.filter((d) => d.depth || d.kept);
   row(out, `${name}.nonempty`, active.length > 0 && active.every((d) => d.raster.changedPixels >= 4 && d.display !== 'none' && d.visibility !== 'hidden'), active.map((d) => ({ index: d.index, depth: d.depth, changed: d.raster.changedPixels })));
   row(out, `${name}.size`, active.every((d) => (d.depth === 'unmet' || !d.depth || (Math.min(d.width, d.height) >= 6 && d.raster.fillPaintedWidth >= 5 && d.raster.fillPaintedHeight >= 5 && d.raster.fillPaintedAreaCssPx2 >= 18)) && (!d.kept || (d.outer >= 10 && Math.min(d.raster.paintedWidth, d.raster.paintedHeight) >= 9))), active.map((d) => ({ index: d.index, width: d.width, outer: d.outer, raster: [d.raster.paintedWidth, d.raster.paintedHeight] })));
-  row(out, `${name}.contrast`, active.every((d) => (!['owned', 'recalled'].includes(d.depth) || d.raster.fillContrast >= 3) && (!['met', 'again'].includes(d.depth) || d.raster.fillContrast >= 1.5) && (!d.kept || d.raster.ringContrast >= 3)), active.map((d) => ({ index: d.index, depth: d.depth, fill: d.raster.fillContrast, ring: d.raster.ringContrast })));
+  // A met dot reads at 3:1 on its paper wherever it rests (lead 2026-10-20, John's S5); Today's star at its authored breath
+  // trough keeps the earlier 1.5:1 floor for met and again, and seen-again keeps 1.5:1 elsewhere (it is darker than met).
+  const metFloor = name === 'today-minimum-breath' ? 1.5 : 3;
+  row(out, `${name}.contrast`, active.every((d) => (!['owned', 'recalled'].includes(d.depth) || d.raster.fillContrast >= 3) && (d.depth !== 'met' || d.raster.fillContrast >= metFloor) && (d.depth !== 'again' || d.raster.fillContrast >= 1.5) && (!d.kept || d.raster.ringContrast >= 3)), active.map((d) => ({ index: d.index, depth: d.depth, fill: d.raster.fillContrast, ring: d.raster.ringContrast, metFloor })));
 }
 /** Enumerate the native surface before looking at painter output. A deleted
  * data-depth/data-kept attribute cannot delete its obligation from this census. */
@@ -1368,6 +1371,13 @@ async function one(browser, engine, world, size = defaultSize(engine)) {
     await worldBinding(page, out, 'after-rooms');
     await freshWalk(browser, out, (fresh) => contextCard(fresh, out));
     for (const live of LIVE) await freshWalk(browser, out, (fresh) => liveFirstState(fresh, out, live));
+    // Every met dot this context painted, on every surface but Today's breath trough: at least 3:1 on its paper, and lighter than
+    // each known (recalled, owned) dot on the same surface.
+    const surfaces = Object.entries(out.measurements).filter(([name]) => !name.startsWith('today-minimum-breath')).map(([name, dots]) => ({ name,
+      met: dots.filter((d) => d.depth === 'met' && d.raster?.fill).map((d) => d.raster.fillContrast), known: dots.filter((d) => ['owned', 'recalled'].includes(d.depth) && d.raster?.fill).map((d) => d.raster.fillContrast) }));
+    const metAll = surfaces.flatMap((s) => s.met);
+    row(out, 'met.visible-and-lighter', metAll.length > 0 && metAll.every((c) => c >= 3) && surfaces.every((s) => !s.known.length || s.met.every((m) => s.known.every((k) => m < k))),
+      { floor: 3, minimum: metAll.length ? Math.min(...metAll) : null, perSurface: surfaces.filter((s) => s.met.length).map((s) => ({ surface: s.name, metMin: Math.min(...s.met), metMax: Math.max(...s.met), knownMin: s.known.length ? Math.min(...s.known) : null })) });
     out.completedWalk = true;
   } catch (error) { out.errors.push(String(error.stack || error)); console.error(`${engine}/${world}: ${error.message}`); }
   finally { await context.close(); out.completedAt = new Date().toISOString(); out.passed = !out.errors.length && out.completedWalk && out.rows.length >= 24 && out.rows.every((r) => r.passed); save(); }
