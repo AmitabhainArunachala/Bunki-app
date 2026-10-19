@@ -50,7 +50,9 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   // ladderGlossRung, inlineWordGloss, inlineGlossLine), and its card rides with it where its text scrolls (slipScroller)
   'inlineWordReading', 'ladderGlossRung', 'inlineWordGloss', 'inlineGlossLine', 'inlineGloss', 'slipScroller',
   // Ladder R2 (2026-10-20): the English row is seated and set by one hand each (seatGlossRow, setGlossLine)
-  'seatGlossRow', 'setGlossLine'];
+  'seatGlossRow', 'setGlossLine',
+  // Ladder R4 (2026-10-20): a lookup word's English is the gloss its box leads with (boxLeadGloss)
+  'boxLeadGloss'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
