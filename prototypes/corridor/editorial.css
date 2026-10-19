@@ -2968,11 +2968,44 @@ body .token-actions button:hover { background: var(--ai-wash); }
   body.has-primary-tabs[data-view='reader'] .layers-mark { bottom: calc(var(--nav-clearance) + 4px); }
   body[data-view='reader']:has(.listen-row.play-bar[data-open='true']) .layers-mark { display: none; }
   /* Hfix-2e2 · X-13 · on a phone the column runs the glass's whole width, so a mark resting at the foot stood over the
-     reading mid-article. While 層 rests there it stands on the reader's dock (the slim paper strip the player lives on,
-     #app::after): the lines pass under the dock as they pass under the tab bar, and never under the mark. Its box stays
-     where the cards and strips already take it as their floor; docked in its open block, the strip goes with it. */
-  body[data-view='reader']:not(.zen):has(#layers-mark:not([data-docked])):not(:has(.listen-row.play-bar[data-open='true'])) #app::after { display: block; }
-  body.has-primary-tabs[data-view='reader']:not(.zen):has(#layers-mark:not([data-docked])):not(:has(.listen-row.play-bar[data-open='true'])) #app::after { height: 52px; }
+     reading mid-article. While 層 rests there it stands on the reader's dock (#app::after): the lines pass under the dock
+     as they pass under the tab bar, and never under the mark. Its box stays where the cards and strips already take it as
+     their floor. Docked in its open block, the dock fades away in the chrome's beat, and comes back as 層 comes home. */
+  body[data-view='reader']:not(.zen):has(#layers-mark):not(:has(.listen-row.play-bar[data-open='true'])) #app::after {
+    display: block;
+    transition: opacity var(--motion-room) var(--ease-standard);
+  }
+  body[data-view='reader']:not(.zen):has(#layers-mark[data-docked]):not(:has(.listen-row.play-bar[data-open='true'])):not(:has(.reader-actions:not([hidden]))) #app::after { opacity: 0; }
+  /* round 2 (the critic's shape 1): the dock is the Line's own surface, so the foot reads as one deeper bar in every world —
+     the bar's colour, the Line's band laid once across both (one image the height of the two, the dock showing its top and
+     the tab bar its foot), the Line's hairline and shade moved up to the dock's top edge, none between them. 層 stands at
+     the bar's right end over the report glyph, a quiet ring in the bar's own ink. */
+  body.has-primary-tabs[data-view='reader']:not(.zen):has(#layers-mark):not(:has(.listen-row.play-bar[data-open='true'])) #app::after {
+    height: 52px;
+    border-top: 0;
+    background-color: var(--color-bar);
+    background-image: var(--tone-line-paint);
+    background-size: 100% calc(100% + var(--nav-clearance));
+    background-position: top;
+    background-repeat: no-repeat;
+    box-shadow: inset 0 var(--stroke-hairline) 0 var(--color-bar-line), 0 -0.5px 0 color-mix(in srgb, var(--color-ink) 4%, transparent);
+  }
+  body.has-primary-tabs[data-view='reader']:not(.zen):has(#layers-mark):not(:has(.listen-row.play-bar[data-open='true'])) #primary-tabs {
+    background-origin: border-box;
+    transition: border-top-color var(--motion-room) var(--ease-standard), box-shadow var(--motion-room) var(--ease-standard);
+  }
+  body.has-primary-tabs[data-view='reader']:not(.zen):has(#layers-mark:not([data-docked])):not(:has(.listen-row.play-bar[data-open='true'])) #primary-tabs {
+    border-top-color: transparent;
+    box-shadow: none;
+    background-size: 100% calc(52px + 100%);
+    background-position: bottom;
+  }
+  body.has-primary-tabs[data-view='reader'] .layers-mark:not([data-docked]) {
+    right: calc(4px + env(safe-area-inset-right, 0px));
+    background: var(--color-bar);
+    color: var(--color-bar-quiet);
+    box-shadow: inset 0 0 0 1px var(--color-bar-quiet);
+  }
 }
 /* Hfix-1A · open, the mark stands in its block's own corner (corridor.js dockLayersMark): the block's lines flow round it,
    so it is never over a glyph or a gloss; the block holds it (flow-root) however short it is */

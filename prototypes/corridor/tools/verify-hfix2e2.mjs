@@ -8,7 +8,12 @@
  *         press region, inside the open glass (between the frame at the top and whatever stands at the foot: the tab bar,
  *         the reader's dock) meets 層's box, and a press at any visible token's centre near 層 lands on the token, not on
  *         層. 層 stays reachable: shown, 44×44, the top thing at its own centre, and one press opens the layers and one folds
- *         them home. On the Mac (1440×900) the mark, its box and its styles are exactly the base's.
+ *         them home. On the Mac (1440×900) the mark, its box and its styles are exactly the base's. Round 2 (the critic's
+ *         shape 1): in hokusai, yoru and sumi at 390×844 and 320×568 the dock is the tab bar's own surface (the same
+ *         colour and paint, the pixels either side of the seam the same, no hairline or shade between them), 層 is 44×44
+ *         at the bar's right end inside the dock, and its disc reads at 3:1 or more against the bar's pixels around it;
+ *         the dock fades away as the layers open and back as they fold (two frames or more between, one way, by 450 ms),
+ *         and under reduced motion it goes and comes at once.
  *   G61   a reading folded away on touch fades: the frames after the fold (Escape) show it fading (opacity strictly between
  *         0.05 and 0.95 on ≥ 3 frames, never rising, its box gone by 400 ms); the line never moves while it fades (every
  *         other word of its paragraph within 0.5 px, its overhang kept) and comes back to the fresh layout; the reveal
@@ -25,6 +30,8 @@
  * at the base commit, so base and branch are judged by the same rows on the same server, as verify-hfix2b does) · control
  * (HFIX2E2_CONTROL names one defect put back by a route-mutated file; its rows must go red):
  *   x13   the reader's dock is not drawn while 層 rests at the foot           → X13.cover must go red
+ *   look  round 1's dock: a raised strip of its own, the Line's hairline between, the disc ringless → X13.look must go red
+ *   snap  the dock appears and goes in one frame                                → X13.fade must go red
  *   fade  the folded reading's transition is dropped (the base's instant conceal) → G61.fade must go red
  *   seat  the fold unseats its reading at once, while it still fades            → G61.still must go red
  *   nami  nami's label ink is not declared (the accent, #8fb3d1, again)         → NAMI must go red
@@ -38,6 +45,7 @@ import { createHash } from 'node:crypto';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
+import { inflateSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
 import { startCorridorDev } from '../../../scripts/serve-corridor-dev.mjs';
@@ -52,7 +60,7 @@ assert(['webkit', 'chromium'].includes(engine), 'Choose exactly one engine (KAIR
 const mode = process.env.HFIX2E2_MODE || 'branch';
 assert(['base', 'branch', 'control'].includes(mode), `unknown HFIX2E2_MODE ${mode}`);
 const CONTROL = process.env.HFIX2E2_CONTROL || '';
-assert(mode === 'control' ? ['x13', 'fade', 'seat', 'nami'].includes(CONTROL) : !CONTROL, 'HFIX2E2_CONTROL names one control, and only in control mode');
+assert(mode === 'control' ? ['x13', 'look', 'snap', 'fade', 'seat', 'nami'].includes(CONTROL) : !CONTROL, 'HFIX2E2_CONTROL names one control, and only in control mode');
 const BASE_SHA = process.env.HFIX2E2_BASE_SHA || '1f790977';
 // HFIX2E2_SERVE_DIR: serve this build's two files from a directory instead of the site's own (a check of this lane's change
 // on another lane's build before the two are merged, e.g. Ladder's site with this lane's hunks applied to its two files)
@@ -78,9 +86,15 @@ const atBase = (file) => {
   if (!baseText.has(file)) baseText.set(file, execFileSync('git', ['show', `${BASE_SHA}:${FILES[file]}`], { cwd: REPO, maxBuffer: 1 << 29 }).toString('utf8'));
   return baseText.get(file);
 };
-const DOCK = "body[data-view='reader']:not(.zen):has(#layers-mark:not([data-docked])):not(:has(.listen-row.play-bar[data-open='true'])) #app::after { display: block; }";
+const DOCK = "body[data-view='reader']:not(.zen):has(#layers-mark):not(:has(.listen-row.play-bar[data-open='true'])) #app::after {\n    display: block;\n";
 const MUTATIONS = {
-  x13: [['editorial.css', DOCK, DOCK.replace('{ display: block; }', '{ display: none; }')]],
+  x13: [['editorial.css', DOCK, DOCK.replace('display: block;', 'display: none;')]],
+  // round 2's look put back to round 1's: the dock a raised strip of its own, the Line's hairline between them, the disc ringless
+  look: [['editorial.css', '    background-color: var(--color-bar);\n    background-image: var(--tone-line-paint);\n', '    background-color: var(--raised);\n    background-image: none;\n'],
+    ['editorial.css', '    border-top-color: transparent;\n    box-shadow: none;\n', ''],
+    ['editorial.css', '    box-shadow: inset 0 0 0 1px var(--color-bar-quiet);\n', '    box-shadow: none;\n']],
+  // the dock appears and goes in one frame
+  snap: [['editorial.css', DOCK + '    transition: opacity var(--motion-room) var(--ease-standard);\n', DOCK]],
   fade: [['editorial.css', '  transition: opacity var(--motion-fast) var(--ease-exit), display var(--motion-fast) allow-discrete;\n', '']],
   seat: [['corridor.js', '  if (touchReadingFading(rt)) return;\n', '']],
   nami: [['editorial.css', '{ --color-accent-label: #a8c4db; }', '{ }']],
@@ -180,7 +194,7 @@ const coverAt = (page) => page.evaluate(() => {
   };
   // the reader's dock (#app::after): where it is drawn it is the foot of the open glass
   const app = document.getElementById('app'), dockStyle = app && getComputedStyle(app, '::after');
-  const dock = dockStyle && dockStyle.display !== 'none' && dockStyle.position === 'fixed' && dockStyle.content !== 'none'
+  const dock = dockStyle && dockStyle.display !== 'none' && dockStyle.position === 'fixed' && dockStyle.content !== 'none' && Number(dockStyle.opacity) >= 0.99
     ? { top: innerHeight - parseFloat(dockStyle.bottom) - parseFloat(dockStyle.height), bottom: innerHeight - parseFloat(dockStyle.bottom),
       background: dockStyle.backgroundColor } : null;
   const top = Math.max(0, fixedEdge('#app > .chrome', 'bottom') ?? 0, fixedEdge('#app > .scale-thread', 'bottom') ?? 0);
@@ -306,6 +320,169 @@ async function x13Mac() {
     assert.deepEqual(build.words, base.words, 'the reading around it');
     assert.deepEqual([...base.errors, ...build.errors], [], 'no page error');
     return { base: { box: base.box, style: base.style, dock: base.dock }, build: { box: build.box, style: build.style, dock: build.dock }, words: build.words.length };
+  });
+}
+
+/* ---------------------------------------------------------------- X13 round 2: how the dock looks, and how it comes and goes */
+/** A screenshot's pixels (8-bit RGB or RGBA, not interlaced: what Playwright writes). */
+function decodePng(buffer) {
+  let at = 8, width = 0, height = 0, type = 0;
+  const idat = [];
+  while (at < buffer.length) {
+    const length = buffer.readUInt32BE(at), kind = buffer.toString('ascii', at + 4, at + 8), data = buffer.subarray(at + 8, at + 8 + length);
+    if (kind === 'IHDR') {
+      width = data.readUInt32BE(0); height = data.readUInt32BE(4); type = data[9];
+      assert(data[8] === 8 && data[12] === 0, 'PNG: 8-bit, not interlaced');
+    } else if (kind === 'IDAT') idat.push(data);
+    else if (kind === 'IEND') break;
+    at += 12 + length;
+  }
+  const channels = type === 6 ? 4 : type === 2 ? 3 : 0;
+  assert(channels, `PNG colour type ${type}`);
+  const raw = inflateSync(Buffer.concat(idat)), stride = width * channels, rgb = Buffer.alloc(width * height * 3);
+  let previous = Buffer.alloc(stride);
+  for (let y = 0; y < height; y += 1) {
+    const filter = raw[y * (stride + 1)], line = Buffer.from(raw.subarray(y * (stride + 1) + 1, (y + 1) * (stride + 1)));
+    for (let x = 0; x < stride; x += 1) {
+      const a = x >= channels ? line[x - channels] : 0, b = previous[x], c = x >= channels ? previous[x - channels] : 0;
+      let value = line[x];
+      if (filter === 1) value += a;
+      else if (filter === 2) value += b;
+      else if (filter === 3) value += (a + b) >> 1;
+      else if (filter === 4) { const pa = Math.abs(b - c), pb = Math.abs(a - c), pc = Math.abs(a + b - 2 * c); value += pa <= pb && pa <= pc ? a : pb <= pc ? b : c; }
+      line[x] = value & 255;
+    }
+    for (let x = 0; x < width; x += 1) for (let k = 0; k < 3; k += 1) rgb[(y * width + x) * 3 + k] = line[x * channels + k];
+    previous = line;
+  }
+  return { width, height, at: (x, y) => { const i = (Math.min(height - 1, Math.max(0, Math.round(y))) * width + Math.min(width - 1, Math.max(0, Math.round(x)))) * 3; return [rgb[i], rgb[i + 1], rgb[i + 2]]; } };
+}
+/** A computed colour, rgb()/rgba() or color(srgb …), as [r, g, b, alpha] on 0–255. */
+function parseColor(text) {
+  let m = /rgba?\(\s*([\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)/u.exec(String(text));
+  if (m) return [Number(m[1]), Number(m[2]), Number(m[3]), m[4] == null ? 1 : Number(m[4])];
+  m = /color\(srgb\s+([\d.e-]+)\s+([\d.e-]+)\s+([\d.e-]+)(?:\s*\/\s*([\d.]+))?\s*\)/u.exec(String(text));
+  if (m) return [Number(m[1]) * 255, Number(m[2]) * 255, Number(m[3]) * 255, m[4] == null ? 1 : Number(m[4])];
+  return null;
+}
+const luminance = ([r, g, b]) => { const f = (v) => { const c = v / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+const contrastOf = (a, b) => { const [hi, lo] = [luminance(a), luminance(b)].sort((p, q) => q - p); return (hi + 0.05) / (lo + 0.05); };
+const channelGap = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])));
+const median = (list) => { const sorted = [...list].sort((p, q) => p - q); return sorted[Math.floor(sorted.length / 2)]; };
+
+async function x13Look(world, width, height) {
+  await row(`X13.look · ${engine} ${world} ${width}×${height} · the dock is the tab bar's own surface, one bar with no line between them; 層 at its right end, its disc at 3:1 or more against it`, 'X13', async () => {
+    const { context, page, errors } = await session({ width, height, device: PHONE, world });
+    try {
+      await openStory(page);
+      await page.evaluate(() => window.scrollTo(0, Math.round((document.documentElement.scrollHeight - innerHeight) / 2)));
+      await frames(page, 2); await delay(450);
+      const f = await page.evaluate(() => {
+        const tabs = document.getElementById('primary-tabs'), ts = getComputedStyle(tabs), tr = tabs.getBoundingClientRect();
+        const a = getComputedStyle(document.getElementById('app'), '::after');
+        const m = document.getElementById('layers-mark'), ms = getComputedStyle(m), mr = m.getBoundingClientRect();
+        const bug = document.querySelector('#bunki-reports-root .br-rail')?.getBoundingClientRect();
+        return { dpr: window.devicePixelRatio, vw: innerWidth, theme: document.documentElement.dataset.theme || 'hokusai',
+          tabs: { top: tr.top, bg: ts.backgroundColor, image: ts.backgroundImage, border: ts.borderTopColor, shadow: ts.boxShadow },
+          dock: { display: a.display, opacity: Number(a.opacity), bg: a.backgroundColor, image: a.backgroundImage,
+            top: innerHeight - parseFloat(a.bottom) - parseFloat(a.height), bottom: innerHeight - parseFloat(a.bottom) },
+          mark: { box: [mr.left, mr.top, mr.right, mr.bottom], fill: ms.backgroundColor, ring: ms.boxShadow, ink: ms.color },
+          bug: bug ? [bug.left, bug.top, bug.right, bug.bottom] : null };
+      });
+      const png = decodePng(await page.screenshot({ type: 'png' }));
+      await shot(page, `X13-look-${world}-${width}x${height}`);
+      const dpr = f.dpr, seam = f.tabs.top;
+      const drawn = f.dock.display !== 'none' && f.dock.opacity >= 0.99 && Math.abs(f.dock.bottom - seam) <= 1;
+      // one surface: the same colour and the same paint, and the pixels either side of the seam the same
+      const xs = [];
+      for (let x = 6; x < Math.min(f.bug?.[0] ?? f.vw, f.mark.box[0]) - 8; x += 3) xs.push(x);
+      const across = xs.map((x) => channelGap(png.at(x * dpr, (seam - 3) * dpr), png.at(x * dpr, (seam + 3) * dpr)));
+      const evenAcross = across.filter((g) => g <= 3).length / Math.max(1, across.length);
+      // no line between them: each device row across the seam reads as the rows either side of it
+      const rowColour = (y) => [0, 1, 2].map((k) => median(xs.map((x) => png.at(x * dpr, y)[k])));
+      const outside = [rowColour((seam - 6) * dpr), rowColour((seam + 6) * dpr)];
+      const lines = [];
+      for (let y = Math.round((seam - 2) * dpr); y <= Math.round((seam + 2) * dpr); y += 1) {
+        const c = rowColour(y), gap = Math.min(channelGap(c, outside[0]), channelGap(c, outside[1]));
+        if (gap > 3) lines.push({ y: +(y / dpr).toFixed(1), colour: c, gap });
+      }
+      // 層's disc against the bar: its ring (or, with none, its fill) against the bar's pixels just outside it
+      const boundary = parseColor(/(?:rgba?|color)\([^)]*\)/u.exec(f.mark.ring)?.[0]) ?? parseColor(f.mark.fill);
+      const cx = (f.mark.box[0] + f.mark.box[2]) / 2, cy = (f.mark.box[1] + f.mark.box[3]) / 2;
+      const around = [];
+      for (let deg = 0; deg < 360; deg += 20) {
+        const x = cx + 26 * Math.cos((deg * Math.PI) / 180), y = cy + 26 * Math.sin((deg * Math.PI) / 180);
+        if (y > f.dock.top + 1.5 && y < f.dock.bottom - 1.5 && x > 1 && x < f.vw - 1) around.push(png.at(x * dpr, y * dpr));
+      }
+      const discContrast = boundary && around.length ? Math.min(...around.map((c) => contrastOf(boundary.slice(0, 3), c))) : 0;
+      const seated = f.mark.box[2] - f.mark.box[0] === 44 && f.mark.box[3] - f.mark.box[1] === 44 && f.vw - f.mark.box[2] <= 8
+        && f.mark.box[1] >= f.dock.top - 0.5 && f.mark.box[3] <= f.dock.bottom + 0.5;
+      const borderGone = (parseColor(f.tabs.border)?.[3] ?? 1) === 0 && f.tabs.shadow === 'none';
+      const detail = { world: f.theme, drawn, dock: { ...f.dock, image: f.dock.image.slice(0, 90) }, tabs: { ...f.tabs, image: f.tabs.image.slice(0, 90) },
+        sameColour: f.dock.bg === f.tabs.bg, samePaint: f.dock.image === f.tabs.image, evenAcross: +evenAcross.toFixed(3), worstAcross: Math.max(0, ...across),
+        lines, outside, borderGone, ring: f.mark.ring, boundary: boundary?.map((v) => Math.round(v)), discContrast: +discContrast.toFixed(2), samples: around.length,
+        mark: f.mark.box, seated, errors };
+      const fail = (message) => { const problem = new Error(message); problem.detail = detail; throw problem; };
+      if (f.theme !== world) fail(`the world is ${world}: ${f.theme}`);
+      if (!drawn) fail(`the dock stands on the tab bar: ${JSON.stringify(detail.dock)}`);
+      if (!detail.sameColour || !detail.samePaint) fail(`the dock wears the tab bar's colour and paint: ${JSON.stringify({ dock: detail.dock, tabs: detail.tabs })}`);
+      if (evenAcross < 0.9) fail(`the pixels either side of the seam are the same (${Math.round(evenAcross * 100)} % of ${across.length} columns within 3/255)`);
+      if (lines.length || !borderGone) fail(`no hairline or shade between the dock and the tab bar: ${JSON.stringify({ lines, borderGone })}`);
+      if (!(discContrast >= 3)) fail(`層's disc reads at 3:1 or more against the bar: ${detail.discContrast}`);
+      if (!seated) fail(`層 is 44×44 at the bar's right end, inside the dock: ${JSON.stringify({ mark: f.mark.box, dock: [f.dock.top, f.dock.bottom], vw: f.vw })}`);
+      if (errors.length) fail(`page errors: ${errors.join(' | ')}`);
+      return detail;
+    } finally { await context.close(); }
+  });
+}
+
+async function x13Fade(reduced) {
+  await row(`X13.fade · ${engine} 390×844${reduced ? ' (reduced motion)' : ''} · ${reduced ? 'the dock goes and comes back at once' : 'the dock fades away as the layers open and back as they fold, in the chrome\'s beat'}`, 'X13', async () => {
+    const { context, page, errors } = await session({ width: 390, height: 844, device: PHONE, reduced });
+    try {
+      await openStory(page);
+      await page.evaluate(() => window.scrollTo(0, Math.round((document.documentElement.scrollHeight - innerHeight) / 2)));
+      await frames(page, 2); await delay(450);
+      const watch = (ms) => page.evaluate((ms) => {
+        const app = document.getElementById('app'), mark = document.getElementById('layers-mark');
+        const rec = { start: performance.now(), change: null, frames: [] };
+        new MutationObserver(() => { if (rec.change == null) rec.change = performance.now(); }).observe(mark, { attributes: true, attributeFilter: ['data-docked'] });
+        window.__h2e2dock = rec;
+        const tick = () => { rec.frames.push([performance.now(), Number(getComputedStyle(app, '::after').opacity), getComputedStyle(app, '::after').display]); if (performance.now() - rec.start < ms) requestAnimationFrame(tick); };
+        requestAnimationFrame(tick);
+      }, ms);
+      const read = () => page.evaluate(() => { const r = window.__h2e2dock, at = r.change;
+        return { change: at == null ? null : Math.round(at - r.start), frames: r.frames.map(([t, o, d]) => [Math.round(t - (at ?? r.start)), +o.toFixed(3), d]) }; });
+      await watch(800); await delay(60);
+      await page.locator('#layers-mark').tap();
+      await delay(850);
+      const open = await read();
+      await watch(800); await delay(60);
+      await page.locator('#layers-mark').tap();
+      await delay(850);
+      const fold = await read();
+      const judge = (rec, from, to) => {
+        const before = rec.frames.filter(([t]) => t < 0).at(-1), after = rec.frames.filter(([t]) => t >= 0);
+        const shownBefore = !!before && before[2] !== 'none' && Math.abs(before[1] - from) < 0.01;
+        const between = after.filter(([, o, d]) => d !== 'none' && o > 0.05 && o < 0.95);
+        const turned = after.filter(([, o], k) => k && (to > from ? o < after[k - 1][1] - 0.001 : o > after[k - 1][1] + 0.001));
+        const done = after.find(([, o]) => Math.abs(o - to) < 0.01);
+        return { change: rec.change, shownBefore, first: after[0] ?? null, between: between.length, turned: turned.length, doneAt: done?.[0] ?? null,
+          frames: after.slice(0, 16) };
+      };
+      const opened = judge(open, 1, 0), folded = judge(fold, 0, 1);
+      const detail = { opened, folded, errors };
+      const fail = (message) => { const problem = new Error(message); problem.detail = detail; throw problem; };
+      for (const [name, j, to] of [['as the layers open', opened, 0], ['as they fold', folded, 1]]) {
+        if (j.change == null) fail(`${name}: 層 never moved`);
+        if (!j.shownBefore) fail(`${name}: the dock stood as it should before the change: ${JSON.stringify(j)}`);
+        if (reduced) {
+          if (!j.first || Math.abs(j.first[1] - to) >= 0.01) fail(`${name}: at once under reduced motion: ${JSON.stringify(j)}`);
+        } else if (j.between < 2 || j.turned || j.doneAt == null || j.doneAt > 450) fail(`${name}: a fade of two frames or more, one way, done by 450 ms: ${JSON.stringify(j)}`);
+      }
+      if (errors.length) fail(`page errors: ${errors.join(' | ')}`);
+      return detail;
+    } finally { await context.close(); }
   });
 }
 
@@ -653,6 +830,9 @@ STEPS['speak-key'] = (page) => practice(page, true);
 try {
   if (runs('X13')) {
     for (const [w, h] of [[390, 844], [320, 568]]) await x13Walk(w, h);
+    for (const world of ['hokusai', 'yoru', 'sumi']) for (const [w, h] of [[390, 844], [320, 568]]) await x13Look(world, w, h);
+    await x13Fade(false);
+    await x13Fade(true);
     if (engine === 'chromium') await x13Mac();
   }
   if (runs('G61')) await g61();
