@@ -9,7 +9,10 @@
  * every OTHER visible card character's box, ruby included, and to all of the card's actual
  * text ink, its own word's included. Its own word's font box is measured, not required clear.
  * The saved occurrence itself is bound in every raster frame, its ring pixels included. Where the
- * open slip covers it, that frame is geometry only; the native Escape then uncovers the same ring.
+ * open slip covers it, that frame is geometry only; the native Escape then uncovers the same ring,
+ * and the word's native first input shows its reading again beside it. A raster batch is taken only
+ * on the settled reader (no room transition); its shots may differ only within dots, or it is retaken.
+ * Identity is read from what the app opened and showed, not from the selectors the verifier chose.
  * --title-rings runs only those ring cases: 2 engines x 11 worlds x phone (21px) and desktop
  * (34px), 44 exact cases. It never sets fullAcceptance; only the exact roster sets its own field.
  * --self-test-admission runs the roster and saved-ring verdicts against altered receipts, no browser.
@@ -35,18 +38,18 @@ const STORY = 'kantei:jp-105-actions-202609-25startup';
 const CONTEXT_STORY = 'aozora:000772-1';
 // nextLineOn: the engine/size layouts where the natural title sets the tapped word's reading on the line below the ring.
 const LIVE = [{ name: 'live-daisho', id: STORY, query: 'スタートアップ大賞', word: '大賞' }, { name: 'live-watashi', id: CONTEXT_STORY, query: '私の個人主義', word: '私' },
-  { name: 'live-daisho-saved-nihon', id: STORY, query: 'スタートアップ大賞', word: '大賞', prior: '日本', nextLineOn: ['webkit/phone'] },
-  { name: 'live-daijin-saved-meguru', id: 'wikinews:27998', archiveYear: '2015', query: '巡る', word: '大臣', prior: '巡る', nextLineOn: ['webkit/desktop', 'chromium/desktop'], uncover: true }];
-const titleLeading = (fontPx) => fontPx * 1.45 + Math.max(20, fontPx * 0.94);
+  { name: 'live-daisho-saved-nihon', id: STORY, query: 'スタートアップ大賞', word: '大賞', reading: 'たいしょう', prior: '日本', nextLineOn: ['webkit/phone'] },
+  { name: 'live-daijin-saved-meguru', id: 'wikinews:27998', archiveYear: '2015', query: '巡る', word: '大臣', reading: 'だいじん', prior: '巡る', nextLineOn: ['webkit/desktop', 'chromium/desktop'], uncover: true }];
+const titleLeading = (fontPx, viewportWidth) => fontPx * 1.45 + (viewportWidth >= 521 ? 31 : 20);
 const DEVICES = { phone: { viewport: { width: 390, height: 844 }, touch: true, titleFont: '21px' }, desktop: { viewport: { width: 1440, height: 900 }, touch: false, titleFont: '34px' } };
 const defaultSize = (engine) => (engine === 'webkit' ? 'phone' : 'desktop');
 const RING_LIVE = LIVE.filter((l) => l.prior);
 const RING_ENGINES = ['webkit', 'chromium'];
 const RING_SIZES = ['phone', 'desktop'];
-const ringFrames = (spec) => [['before', true], ['reading', true], ['stage-open', false], ['stage-met', !spec.uncover], ...(spec.uncover ? [['stage-met-uncovered', true]] : [])];
+const ringFrames = (spec) => [['before', true], ['reading', true], ['stage-open', false], ['stage-met', !spec.uncover], ...(spec.uncover ? [['stage-met-uncovered', true], ['stage-met-restored', true]] : [])];
 const ringRows = (spec) => [`world.${spec.name}`, `${spec.name}.device`, ...['fresh', 'reading-beside-ring', 'reading-without-encounter', 'prior-state-intact', 'stage-commits-met', 'first-tap-base-glyphs', 'second-tap-base-glyphs',
-  'fresh-to-state-base-glyphs', 'title-rhythm-through-inputs', 'source-visible-and-owned', 'scroll-unchanged', 'slip-seated', ...(spec.uncover ? ['uncovered-record-identical', 'uncovered-title-stable'] : [])].map((id) => `${spec.name}.${id}`),
-  ...ringFrames(spec).flatMap(([frame, raster]) => ['fragment-alignment', 'no-other-glyph-overlap', ...(raster ? ['ring-clear-of-ink', 'saved-occurrence'] : [])].map((id) => `${spec.name}-${frame}.${id}`))];
+  'fresh-to-state-base-glyphs', 'title-rhythm-through-inputs', 'source-visible-and-owned', 'scroll-unchanged', 'slip-seated', ...(spec.uncover ? ['uncovered-record-identical', 'uncovered-title-stable', 'restored-reading', 'restored-record-identical'] : [])].map((id) => `${spec.name}.${id}`),
+  ...ringFrames(spec).flatMap(([frame, raster]) => ['fragment-alignment', 'no-other-glyph-overlap', ...(raster ? ['scene-settled', 'ring-clear-of-ink', 'saved-occurrence'] : [])].map((id) => `${spec.name}-${frame}.${id}`))];
 const ringCaseId = (engine, world, size) => `${engine}/${world}/${size}`;
 const RING_REQUIRED = RING_ENGINES.flatMap((engine) => WORLDS.flatMap((world) => RING_SIZES.map((size) => ({ caseId: ringCaseId(engine, world, size), engine, world, size, titleFont: DEVICES[size].titleFont,
   rows: RING_LIVE.flatMap(ringRows), nextLineWitnesses: RING_LIVE.filter((l) => l.nextLineOn.includes(`${engine}/${size}`)).map((l) => l.name) }))));
@@ -70,7 +73,7 @@ const exactRoster = (observed, expected) => observed.length === expected.length 
 const savedWord = (id, now) => ({ t: 'word', id, label: id, ts: now - 40 * DAY, started: now - 40 * DAY });
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const option = (name) => { const i = process.argv.indexOf(name); return i < 0 ? null : process.argv[i + 1]; };
-const allowedArgs = new Set(['--worlds', '--control-current-paint']);
+const allowedArgs = new Set(['--worlds', '--control-current-paint', '--scene-fixture']);
 for (let i = 2; i < process.argv.length; i++) { if (['--diagnostic-inline-end', '--late-lookup', '--title-rings', '--self-test-admission'].includes(process.argv[i])) continue; assert(allowedArgs.has(process.argv[i]) && process.argv[i + 1], `Invalid option ${process.argv[i]}`); i++; }
 const diagnosticInlineEnd = process.argv.includes('--diagnostic-inline-end');
 const lateLookup = process.argv.includes('--late-lookup');
@@ -78,7 +81,8 @@ const titleRings = process.argv.includes('--title-rings');
 const selfTestAdmission = process.argv.includes('--self-test-admission');
 assert(!lateLookup || (!option('--worlds') && !diagnosticInlineEnd), 'The late-lookup roster names its own worlds and paint');
 assert(!titleRings || (!lateLookup && !diagnosticInlineEnd), 'The title-ring roster is its own mode');
-assert(!selfTestAdmission || process.argv.length === 3, 'The admission self-test takes no other option');
+assert(!selfTestAdmission || process.argv.length === 3 || (process.argv.length === 5 && option('--scene-fixture')), 'The admission self-test takes only --scene-fixture');
+assert(!option('--scene-fixture') || selfTestAdmission, '--scene-fixture belongs to the admission self-test');
 const worlds = lateLookup ? LATE_WORLDS : option('--worlds')?.split(',') || WORLDS;
 assert(worlds.length && new Set(worlds).size === worlds.length && worlds.every((w) => WORLDS.includes(w)), 'Named, unique public worlds required');
 const engines = process.env.KAIRO_BROWSER && process.env.KAIRO_BROWSER !== 'all' ? [process.env.KAIRO_BROWSER] : ['webkit', 'chromium'];
@@ -516,6 +520,55 @@ const savedOccurrenceVerdict = (occurrences, ink) => {
   const entry = occurrences.length === 1 ? ink.find((d) => d.probeId === occurrences[0]) : null;
   return { occurrences, entry: entry || null, passed: Boolean(entry && entry.depth === 'met' && entry.kept && entry.painted >= 4 && entry.ringPainted >= 4) };
 };
+/** Verifier-only witness of the app's room transitions (corridor.js enterRoomTransition / startViewTransition): each new
+ * html[data-room-transition] and each native view transition is counted; the app's behaviour and timing are untouched. */
+function sceneObserver() {
+  const scene = window.__dotsScene = { generation: 0, viewTransitions: 0, activeViewTransitions: 0 };
+  const watch = () => new MutationObserver((records) => { for (const r of records) if (r.attributeName === 'data-room-transition' && r.oldValue === null && document.documentElement.hasAttribute('data-room-transition')) scene.generation++; })
+    .observe(document.documentElement, { attributes: true, attributeOldValue: true, attributeFilter: ['data-room-transition'] });
+  if (document.documentElement) watch(); else document.addEventListener('readystatechange', watch, { once: true });
+  const start = Document.prototype.startViewTransition;
+  if (start) Document.prototype.startViewTransition = function (...args) { const t = start.apply(this, args); scene.viewTransitions++; scene.activeViewTransitions++; const done = () => { scene.activeViewTransitions--; }; t.finished.then(done, done); return t; };
+}
+const sceneState = (page) => page.evaluate(() => {
+  const html = document.documentElement, main = document.querySelector('#app > main'), s = window.__dotsScene || null;
+  const room = document.getAnimations().filter((a) => String(a.animationName || '').startsWith('kairo-room') || String(a.effect?.pseudoElement || '').startsWith('::view-transition'))
+    .filter((a) => a.pending || a.playState !== 'finished').map((a) => ({ name: a.animationName || null, pseudo: a.effect?.pseudoElement || null, state: a.playState, pending: a.pending }));
+  return { observer: Boolean(s), generation: s?.generation ?? null, viewTransitions: s?.viewTransitions ?? null, activeViewTransitions: s?.activeViewTransitions ?? null,
+    transition: html.hasAttribute('data-room-transition'), hero: html.hasAttribute('data-room-hero'), arrival: Boolean(main?.hasAttribute('data-room-arrival')),
+    mainOpacity: main ? getComputedStyle(main).opacity : null, room, view: document.body.dataset.view || null, mainBound: Boolean(main && window.__dotsSceneMain === main) };
+});
+/** A capture may begin only on the settled reader: no room transition, hero or arrival marker, the main room opaque, no
+ * room or view-transition animation pending or unfinished; once bound, the same main element and transition counts. */
+const settledScene = (state, bound = null) => Boolean(state?.observer && !state.transition && !state.hero && !state.arrival && state.mainOpacity === '1' && state.activeViewTransitions === 0 &&
+  Array.isArray(state.room) && state.room.length === 0 && state.view === 'reader' && (!bound || (state.mainBound && state.generation === bound.generation && state.viewTransitions === bound.viewTransitions)));
+async function bindScene(page, { timeout = 15000 } = {}) {
+  const started = Date.now(); let state = await sceneState(page);
+  while (!settledScene(state) && Date.now() - started < timeout) { await delay(50); state = await sceneState(page); }
+  if (!settledScene(state)) throw new Error(`Reader scene never settled: ${JSON.stringify(state)}`);
+  await page.evaluate(() => { window.__dotsSceneMain = document.querySelector('#app > main'); return new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))); });
+  state = await sceneState(page);
+  if (!settledScene(state) || !state.mainBound) throw new Error(`Reader scene changed while binding: ${JSON.stringify(state)}`);
+  return state;
+}
+/** Decoded-pixel scene invariant for one differential batch: the painted and dots-hidden shots differ only within some
+ * eligible dot's outer ring (+1 CSS px), and the restored shot, same styles as the first, equals it everywhere. */
+function sceneStability({ shown, paper, restored }, circles, view) {
+  const same = [paper, restored].filter(Boolean).every((im) => im.width === shown.width && im.height === shown.height);
+  if (!same) return { stable: false, reason: 'screenshot size changed', outsideChanged: null, restoredChanged: null };
+  const differs = (a, b, i) => Math.abs(a[i] - b[i]) > 3 || Math.abs(a[i + 1] - b[i + 1]) > 3 || Math.abs(a[i + 2] - b[i + 2]) > 3;
+  let outsideChanged = 0, restoredChanged = 0, firstOutside = null;
+  for (let y = 0; y < shown.height; y++) for (let x = 0; x < shown.width; x++) {
+    const i = (y * shown.width + x) * 3;
+    if (restored && differs(shown.pixels, restored.pixels, i)) restoredChanged++;
+    if (!differs(shown.pixels, paper.pixels, i)) continue;
+    const cx = (x + 0.5) / view.dpr + view.x, cy = (y + 0.5) / view.dpr + view.y;
+    if (!circles.some((c) => Math.hypot(cx - c.x, cy - c.y) <= c.r)) { outsideChanged++; firstOutside ||= [cx, cy]; }
+  }
+  return { stable: outsideChanged === 0 && restoredChanged === 0 && Boolean(restored), outsideChanged, restoredChanged, restoredCompared: Boolean(restored), firstOutside };
+}
+const ALL_DOTS = '#reader .tok:is([data-depth],[data-kept]) > .tok-word, .japanese-lookup-word:is([data-depth],[data-kept]), #mini:is([data-depth],[data-kept]) .mini-word';
+const dotCircles = (dots) => dots.map((d) => ({ x: (d.left + d.right) / 2, y: (d.top + d.bottom) / 2, r: Math.min(d.width, d.height) / 2 + d.spread + 1, text: d.text }));
 async function titleRingFrame(page, out, name, label, raster, prior) {
   const frame = `${name}-${label}`;
   await page.locator('.reader-card .japanese-lookup-word').evaluateAll((els, name) => els.forEach((el, i) => { el.dataset.dotsNode ||= `${name}-${i}`; }), name);
@@ -530,13 +583,27 @@ async function titleRingFrame(page, out, name, label, raster, prior) {
   const covered = (d, i) => Boolean(slip && slip.onTop[i] && d.left - d.spread >= slip.left && d.top - d.spread >= slip.top && d.right + d.spread <= slip.right && d.bottom + d.spread <= slip.bottom);
   out.ringOcclusion ||= {}; out.ringOcclusion[frame] = { slip, raster, covered: dots.map((d, i) => ({ text: d.text, probeId: d.probeId, coveredBySlip: covered(d, i) })) };
   if (!raster) return dots;
-  const view = await page.evaluate(() => ({ x: scrollX, y: scrollY, dpr: devicePixelRatio }));
-  const shot = async (suffix) => png(await page.screenshot({ path: resolve(evidence, `${shotTag(out)}-${frame}${suffix}.png`), animations: 'allow' }));
-  const shown = await shot('');
-  const noDots = await page.addStyleTag({ content: hideCss }); const paper = await shot('-paper');
-  const noText = await page.addStyleTag({ content: hideCardText }); const bare = await shot('-bare');
-  await noText.evaluate((s) => s.remove()); await noDots.evaluate((s) => s.remove());
-  const again = await facts(page, TITLE_DOTS);
+  const circles = dotCircles([...await facts(page, ALL_DOTS), ...await facts(page, '.depth-dot:is([data-depth],[data-kept])', false)]);
+  const attempts = []; out.sceneAttempts ||= {}; out.sceneAttempts[frame] = attempts;
+  let view, shown, paper, bare, again;
+  for (let attempt = 1; ; attempt++) {
+    const bound = await bindScene(page), states = [];
+    view = await page.evaluate(() => ({ x: scrollX, y: scrollY, dpr: devicePixelRatio }));
+    const shot = async (suffix) => { const image = png(await page.screenshot({ path: resolve(evidence, `${shotTag(out)}-${frame}${suffix}${attempt > 1 ? `-attempt${attempt}` : ''}.png`), animations: 'allow' })); states.push(await sceneState(page)); return image; };
+    shown = await shot('');
+    const noDots = await page.addStyleTag({ content: hideCss }); paper = await shot('-paper');
+    const noText = await page.addStyleTag({ content: hideCardText }); bare = await shot('-bare');
+    await noText.evaluate((s) => s.remove()); await noDots.evaluate((s) => s.remove());
+    await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+    const restored = await shot('-restored');
+    again = await facts(page, TITLE_DOTS);
+    const scene = sceneStability({ shown, paper, restored }, circles, view), settled = states.every((state) => settledScene(state, bound));
+    attempts.push({ attempt, bound: { generation: bound.generation, viewTransitions: bound.viewTransitions }, settled, ...(settled ? {} : { states }), ...scene });
+    if (settled && scene.stable) break;
+    save();
+    if (attempt >= 3) throw new Error(`${frame}: no settled, stable raster scene in 3 attempts: ${JSON.stringify(attempts.map(({ states: _, ...a }) => a))}`);
+  }
+  row(out, `${frame}.scene-settled`, true, { attempts, circles: circles.length });
   const stable = JSON.stringify(again.map((d) => [d.probeId, d.host, d.left, d.top])) === JSON.stringify(dots.map((d) => [d.probeId, d.host, d.left, d.top])) && JSON.stringify(again.captureFrame.glyphs) === JSON.stringify(dots.captureFrame.glyphs);
   const differs = (a, b) => a.some((v, k) => Math.abs(v - b[k]) > 3);
   const ink = dots.map((d, i) => {
@@ -561,6 +628,7 @@ async function titleRingFrame(page, out, name, label, raster, prior) {
     const occurrences = await page.locator(`.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${prior}"]`).evaluateAll((els) => els.map((el) => el.dataset.dotsNode));
     row(out, `${frame}.saved-occurrence`, savedOccurrenceVerdict(occurrences, ink).passed, { saved: prior, ...savedOccurrenceVerdict(occurrences, ink) });
   }
+  dots.ink = ink;
   return dots;
 }
 async function liveFirstState(page, out, { name, id, query, word, prior, archiveYear, nextLineOn = [], uncover = false }) {
@@ -570,6 +638,7 @@ async function liveFirstState(page, out, { name, id, query, word, prior, archive
   await page.locator('.reader-card').evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' })); await delay(250);
   const selector = `.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"]`, target = page.locator(selector).first();
   const native = await page.evaluate((word) => { const node = { t: 'word', id: word }; return { key: window.__KAIRO_DEPTH__.key(node), kind: window.__KAIRO_DEPTH__.identity(node)?.kind ?? null }; }, word);
+  const openedStory = await page.evaluate(() => ({ listen: [...document.querySelectorAll('#app > main .listen-row[data-passage]')].map((el) => el.dataset.passage), places: [...document.querySelectorAll('#record-reading-places[data-source-id]')].map((el) => el.dataset.sourceId) }));
   const lines = await page.evaluate(() => [...document.querySelectorAll('.reader-card > h1.view-title .japanese-lookup-word')].map((w) => { const rects = [...w.getClientRects()], r = rects[0]; return { text: w.dataset.lookupText, top: r?.top ?? null, bottom: r?.bottom ?? null, fragments: rects.map((f) => ({ top: f.top, bottom: f.bottom })) }; }));
   const lineTops = [];
   for (const f of lines.flatMap((l) => l.fragments).sort((a, b) => a.top - b.top)) if (!lineTops.length || f.top - lineTops.at(-1) > (f.bottom - f.top) / 2) lineTops.push(f.top);
@@ -625,6 +694,9 @@ async function liveFirstState(page, out, { name, id, query, word, prior, archive
   const input1 = await sample('input-1');
   await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.ladderRung != null, selector); await delay(350);
   const reading = await sample('reading');
+  const readingOwners = await page.evaluate(() => { const baseText = (el) => { const copy = el.cloneNode(true); copy.querySelectorAll('rt, rp').forEach((r) => r.remove()); return copy.textContent.replace(/\s/gu, ''); };
+    return [...document.querySelectorAll('.reader-card > h1.view-title [data-ladder-rung]')].map((el) => ({ rung: el.dataset.ladderRung, lookup: el.dataset.lookupText ?? null, base: baseText(el),
+      reading: [...el.querySelectorAll('rt')].filter((rt) => { const st = getComputedStyle(rt); return !rt.classList.contains('hidden-rt') && st.display !== 'none' && st.visibility !== 'hidden' && st.opacity !== '0'; }).map((rt) => rt.textContent).join('') })); });
   if (prior) {
     const ringDots = await titleRingFrame(page, out, name, 'reading', true, prior), ring = ringDots.find((d) => d.text === prior);
     const targetNode = await target.evaluate((el) => el.dataset.dotsNode);
@@ -641,6 +713,8 @@ async function liveFirstState(page, out, { name, id, query, word, prior, archive
   await input();
   await page.locator('#mini').waitFor({ state: 'visible' });
   const opened = await sample('stage-open');
+  const slipAnchor = await page.evaluate(() => { const baseText = (el) => { const copy = el.cloneNode(true); copy.querySelectorAll('rt, rp').forEach((r) => r.remove()); return copy.textContent.replace(/\s/gu, ''); }; const mini = document.getElementById('mini'), anchor = mini?._kept?.anchor || null;
+    return { present: Boolean(mini), connected: Boolean(anchor?.isConnected), inTitle: Boolean(anchor && document.querySelector('.reader-card > h1.view-title')?.contains(anchor)), lookup: anchor?.dataset?.lookupText ?? null, base: anchor ? baseText(anchor) : null, miniKind: mini?.dataset.kind ?? null, miniKey: mini?.dataset.key ?? null }; });
   if (prior) await titleRingFrame(page, out, name, 'stage-open', false, prior);
   const miniHandle = await page.$('#mini');
   const committed = await waitForAppRecord(page, (value) => Boolean(value.met?.entries?.[native.key]), { description: `native first encounter for ${word}` });
@@ -677,14 +751,32 @@ async function liveFirstState(page, out, { name, id, query, word, prior, archive
     await page.keyboard.press('Escape');
     await page.locator('#mini').waitFor({ state: 'detached' }); await delay(350);
     const uncovered = await sample('stage-met-uncovered');
-    await titleRingFrame(page, out, name, 'stage-met-uncovered', true, prior);
+    const uncoveredDots = await titleRingFrame(page, out, name, 'stage-met-uncovered', true, prior);
     const released = await settledRecord(page);
     row(out, `${name}.uncovered-record-identical`, held.settled && released.settled && released.snapshot.revision === held.snapshot.revision && JSON.stringify(released.snapshot.record) === JSON.stringify(held.snapshot.record),
       { control: 'Escape', held: { revision: held.snapshot.revision, settled: held.settled }, released: { revision: released.snapshot.revision, settled: released.settled, reads: released.reads } });
     row(out, `${name}.uncovered-title-stable`, !uncovered.mini && uncovered.visible && uncovered.hitOwned && JSON.stringify(uncovered.title) === JSON.stringify(before.title) && baseShift(before, uncovered) <= 1 && uncovered.scrollX === before.scrollX && uncovered.scrollY === before.scrollY && uncovered.depth === 'met',
       { title: uncovered.title, before: before.title, baseShift: baseShift(before, uncovered), scroll: [uncovered.scrollX, uncovered.scrollY], mini: uncovered.mini, depth: uncovered.depth, reading: uncovered.reading });
+    // The fold also folds the lower word's reading; its native first input shows the same reading again beside the same ring.
+    await input();
+    await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.ladderRung === 'reading', selector); await delay(350);
+    const restored = await sample('stage-met-restored');
+    const restoredDots = await titleRingFrame(page, out, name, 'stage-met-restored', true, prior);
+    const restoredRecord = await settledRecord(page);
+    const savedPaint = (frameDots) => { const e = frameDots.ink?.find((d) => d.text === prior); return e ? { painted: e.painted, ringPainted: e.ringPainted, depth: e.depth, kept: e.kept } : null; };
+    const ring = restoredDots.find((d) => d.text === prior), targetNode = await target.evaluate((el) => el.dataset.dotsNode);
+    const restoredGlyphs = out.captureFrames[`${name}-stage-met-restored`].glyphs.filter((g) => g.rt && g.owner === targetNode);
+    const underRing = ring ? restoredGlyphs.filter((g) => g.top > ring.fragments.at(-1).bottom && g.left < ring.right + ring.spread && g.right > ring.left - ring.spread) : [];
+    row(out, `${name}.restored-reading`, restored.rung === 'reading' && restored.reading.length > 0 && restored.reading === reading.reading && restored.depth === 'met' && !restored.mini && restored.visible && restored.hitOwned &&
+      JSON.stringify(restored.title) === JSON.stringify(before.title) && baseShift(before, restored) <= 1 && restored.scrollX === before.scrollX && restored.scrollY === before.scrollY &&
+      Boolean(savedPaint(uncoveredDots)) && JSON.stringify(savedPaint(restoredDots)) === JSON.stringify(savedPaint(uncoveredDots)) && (!nextLineRequired || underRing.length > 0),
+      { input: out.touch ? 'tap' : 'click', rung: restored.rung, reading: restored.reading, original: reading.reading, depth: restored.depth, mini: restored.mini, title: restored.title, before: before.title, baseShift: baseShift(before, restored),
+        scroll: [restored.scrollX, restored.scrollY], savedPaint: { uncovered: savedPaint(uncoveredDots), restored: savedPaint(restoredDots) }, underRing, nextLineRequired });
+    row(out, `${name}.restored-record-identical`, held.settled && restoredRecord.settled && restoredRecord.snapshot.revision === held.snapshot.revision && JSON.stringify(restoredRecord.snapshot.record) === JSON.stringify(held.snapshot.record),
+      { control: 'native first input after Escape', held: { revision: held.snapshot.revision }, restored: { revision: restoredRecord.snapshot.revision, settled: restoredRecord.settled, reads: restoredRecord.reads } });
   }
-  return { door, saved: prior ? await page.evaluate((word) => [...document.querySelectorAll(`.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"][data-kept]`)].map((el) => el.dataset.lookupText), prior) : [], tapped: await target.evaluate((el) => el.dataset.lookupText) };
+  const saved = prior ? await page.evaluate((word) => [...document.querySelectorAll(`.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"][data-kept]`)].map((el) => el.dataset.lookupText), prior) : [];
+  return { story: openedStory, saved, readingOwners, slipAnchor, selectedInput: { door, word: await target.evaluate((el) => el.dataset.lookupText) } };
 }
 async function rooms(page, out) {
   out.roomStateCoverage = {};
@@ -787,6 +879,7 @@ async function openContext(browser, engine, world, size = defaultSize(engine)) {
   const device = DEVICES[size];
   const context = await browser.newContext({ viewport: device.viewport, deviceScaleFactor: 2, isMobile: device.touch, hasTouch: device.touch, reducedMotion: 'reduce', colorScheme: 'light', serviceWorkers: 'block' });
   await context.addInitScript((world) => { localStorage.setItem('kairo-theme', world); localStorage.setItem('kairo-word-ladder-demo-v1', '1'); }, world);
+  await context.addInitScript(sceneObserver);
   if (controlBytes || diagnosticInlineEnd || process.env.DOTS_BASE_URL) await context.route(new URL('editorial.css', base).href + '*', async (route) => { try { const response = await route.fetch(); const original = await response.body(); const expected = report.identity.files?.find((f) => f.path === 'editorial.css')?.sha256; assert(expected && hash(original) === expected, 'Control fetched CSS does not match artifact'); const servedBytes = controlBytes || (process.env.DOTS_BASE_URL ? original : Buffer.concat([original, Buffer.from('\n.japanese-lookup-word:is([data-depth],[data-kept])::after { left:auto; right:auto; transform:translateX(calc(-0.5em - var(--depth-size)/2)); }\n')])); if (!process.env.DOTS_BASE_URL) assert(hash(original) !== hash(servedBytes), 'Control must change CSS'); (process.env.DOTS_BASE_URL ? (report.remoteCssServed ||= []) : report.control.served).push({ url: route.request().url(), candidateSha256: hash(original), servedSha256: hash(servedBytes) }); await route.fulfill({ response, body: servedBytes, headers: { ...response.headers(), 'content-length': String(servedBytes.length), 'content-type': 'text/css' } }); } catch (e) { report.control.setupError = String(e.stack); await route.abort(); } });
   return context;
 }
@@ -808,7 +901,7 @@ const titleGeometry = (page, label) => page.evaluate(async (label) => {
     for (let i = 0; i < text.length; i++) { if (!text.textContent[i].trim()) continue; const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1); const b = range.getBoundingClientRect(); if (b.width && b.height) glyphs.push({ char: text.textContent[i], left: b.left, top: b.top, right: b.right, bottom: b.bottom }); }
   }
   const wrapper = h.querySelector('[data-lookup-readings-pending]'), reader = document.querySelector('#reader');
-  return { label, scrollX, scrollY, title: box(h.getBoundingClientRect()), card: box(card.getBoundingClientRect()), lineHeight: style.lineHeight, paddingBottom: style.paddingBottom, fontSize: style.fontSize,
+  return { label, scrollX, scrollY, viewportWidth: innerWidth, title: box(h.getBoundingClientRect()), card: box(card.getBoundingClientRect()), lineHeight: style.lineHeight, paddingBottom: style.paddingBottom, fontSize: style.fontSize,
     titleText: h.textContent, titleHTML: h.innerHTML, lookupGroups: [...h.querySelectorAll('.japanese-lookup-text')].map((g) => g.textContent),
     pending: Boolean(wrapper), busy: wrapper?.getAttribute('aria-busy') ?? null, words: h.querySelectorAll('.japanese-lookup-word').length, buttons: [...h.querySelectorAll('button')].map((b) => b.textContent), glyphs,
     body: { busy: reader?.getAttribute('aria-busy'), tokens: reader?.querySelectorAll('.tok[data-index]').length ?? 0, notes: [...document.querySelectorAll('main .note')].map((n) => n.textContent), retry: [...document.querySelectorAll('main .note button')].map((b) => b.textContent) } };
@@ -881,7 +974,7 @@ async function lateTitle(page, out, spec, result) {
     }
     const frames = result.frames, deltas = frames.map((f) => ({ label: f.label, delta: titleDelta(cold, f) }));
     add('native-title-not-deferred', frames.every((f) => !f.missing && f.titleText === cold.titleText && f.words === spec.words && !f.pending && !f.buttons.length), frames.map((f) => ({ label: f.label, words: f.words, pending: f.pending, buttons: f.buttons })));
-    add('unconditional-title-rhythm', frames.every((f) => Number.parseFloat(f.paddingBottom) === 8 && Math.abs(Number.parseFloat(f.lineHeight) - titleLeading(Number.parseFloat(f.fontSize))) < 0.01), frames.map((f) => ({ label: f.label, fontSize: f.fontSize, lineHeight: f.lineHeight, paddingBottom: f.paddingBottom })));
+    add('unconditional-title-rhythm', frames.every((f) => Number.parseFloat(f.paddingBottom) === 8 && Math.abs(Number.parseFloat(f.lineHeight) - titleLeading(Number.parseFloat(f.fontSize), f.viewportWidth)) < 0.01), frames.map((f) => ({ label: f.label, viewportWidth: f.viewportWidth, fontSize: f.fontSize, lineHeight: f.lineHeight, paddingBottom: f.paddingBottom })));
     add('title-identical', deltas.every(({ delta: d }) => d && d.rhythm && Object.values(d.title).every((v) => v === 0)), deltas);
     add('card-identical', deltas.every(({ delta: d }) => d && Object.values(d.card).every((v) => v === 0)), deltas);
     add('glyphs-identical', deltas.every(({ delta: d }) => d && d.glyphShift === 0), deltas);
@@ -931,7 +1024,11 @@ function ringContextAdmission(out) {
   const requiredRows = RING_LIVE.flatMap(ringRows), executedRows = out.rows.map((r) => r.id);
   const known = RING_REQUIRED.some((c) => c.caseId === ringCaseId(out.engine, out.world, out.size));
   const identity = (c) => { const spec = RING_LIVE.find((l) => l.name === c.name);
-    return Boolean(spec) && c.story === spec.id && c.saved === spec.prior && c.tapped === spec.word && c.observed?.door === spec.id && JSON.stringify(c.observed?.saved) === JSON.stringify([spec.prior]) && c.observed?.tapped === spec.word; };
+    const o = c.observed, owner = o?.readingOwners?.length === 1 ? o.readingOwners[0] : null, slip = o?.slipAnchor;
+    return Boolean(spec) && c.story === spec.id && c.saved === spec.prior && c.tapped === spec.word &&
+      JSON.stringify(o?.story?.listen) === JSON.stringify([spec.id]) && JSON.stringify(o?.story?.places) === JSON.stringify([`bundled-reading:${spec.id}`]) && JSON.stringify(o?.saved) === JSON.stringify([spec.prior]) &&
+      Boolean(owner) && owner.rung === 'reading' && owner.lookup === spec.word && owner.base === spec.word && owner.reading === spec.reading &&
+      Boolean(slip?.present && slip.connected && slip.inTitle) && slip.lookup === spec.word && slip.base === spec.word; };
   return { caseId: ringCaseId(out.engine, out.world, out.size), requiredRows, executedRows, missingRows: requiredRows.filter((id) => !executedRows.includes(id)), unexpectedRows: executedRows.filter((id) => !requiredRows.includes(id)),
     identities: (out.ringCases || []).map((c) => ({ name: c.name, story: c.story, saved: c.saved, tapped: c.tapped, observed: c.observed ?? null, bound: identity(c) })),
     accepted: known && !out.errors.length && exactRoster(executedRows, requiredRows) && out.rows.every((r) => r.passed === true) && exactRoster((out.ringCases || []).map((c) => c.name), RING_LIVE.map((l) => l.name)) &&
@@ -958,19 +1055,31 @@ function runAdmissionSelfTest() {
   const good = () => {
     const out = { engine: 'webkit', world: 'hokusai', size: 'desktop', errors: [], rows: [], ringCases: [] };
     for (const spec of RING_LIVE) { const ids = ringRows(spec); out.rows.push(...ids.map((id) => ({ id, passed: true })));
-      out.ringCases.push({ name: spec.name, story: spec.id, saved: spec.prior, tapped: spec.word, observed: { door: spec.id, saved: [spec.prior], tapped: spec.word }, completed: true, rowIds: ids }); }
+      out.ringCases.push({ name: spec.name, story: spec.id, saved: spec.prior, tapped: spec.word, completed: true, rowIds: ids,
+        observed: { story: { listen: [spec.id], places: [`bundled-reading:${spec.id}`] }, saved: [spec.prior], readingOwners: [{ rung: 'reading', lookup: spec.word, base: spec.word, reading: spec.reading }],
+          slipAnchor: { present: true, connected: true, inTitle: true, lookup: spec.word, base: spec.word }, selectedInput: { door: spec.id, word: spec.word } } }); }
     return out;
   };
   const altered = {
     'wrong story': (o) => { o.ringCases[1].story = 'jawiki:5238864-s63'; },
     'wrong saved word': (o) => { o.ringCases[0].saved = '大賞'; },
     'wrong tapped word': (o) => { o.ringCases[1].tapped = '巡る'; },
-    'opened door is another story': (o) => { o.ringCases[0].observed.door = 'wikinews:27998'; },
+    'reader opened another story': (o) => { o.ringCases[0].observed.story.listen = ['wikinews:27998']; },
+    'bookmarks name another story': (o) => { o.ringCases[1].observed.story.places = ['bundled-reading:jawiki:5238864-s63']; },
+    'intended door chosen, another story opened': (o) => { o.ringCases[1].observed.story.listen = [STORY]; },
+    'reader story missing': (o) => { o.ringCases[0].observed.story.listen = []; },
+    'another word shows its reading': (o) => { o.ringCases[0].observed.readingOwners[0].lookup = '日本'; },
+    'two words show readings': (o) => { o.ringCases[1].observed.readingOwners.push({ ...o.ringCases[1].observed.readingOwners[0] }); },
+    'wrong reading shown': (o) => { o.ringCases[1].observed.readingOwners[0].reading = 'たいしょう'; },
+    'slip opened for another word': (o) => { o.ringCases[1].observed.slipAnchor.lookup = '巡る'; o.ringCases[1].observed.slipAnchor.base = '巡る'; },
+    'slip anchored outside the title': (o) => { o.ringCases[0].observed.slipAnchor.inTitle = false; },
     'saved ring absent on the page': (o) => { o.ringCases[1].observed.saved = []; },
     'saved ring duplicated': (o) => { o.ringCases[0].observed.saved = ['日本', '日本']; },
     'missing row': (o) => { o.rows.pop(); },
     'duplicate row': (o) => { o.rows.push({ ...o.rows[0] }); },
     'failed row': (o) => { o.rows[3].passed = false; },
+    'missing restored reading': (o) => { const id = 'live-daijin-saved-meguru.restored-reading'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[1].rowIds = o.ringCases[1].rowIds.filter((r) => r !== id); },
+    'missing scene proof': (o) => { const id = 'live-daisho-saved-nihon-before.scene-settled'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[0].rowIds = o.ringCases[0].rowIds.filter((r) => r !== id); },
     'missing uncovered continuation': (o) => { const id = 'live-daijin-saved-meguru-stage-met-uncovered.ring-clear-of-ink'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[1].rowIds = o.ringCases[1].rowIds.filter((r) => r !== id); },
     'occluded stage-met raster substituted': (o) => { const from = 'live-daijin-saved-meguru-stage-met-uncovered.ring-clear-of-ink', to = 'live-daijin-saved-meguru-stage-met.ring-clear-of-ink'; o.rows.find((r) => r.id === from).id = to; o.ringCases[1].rowIds = o.ringCases[1].rowIds.map((r) => (r === from ? to : r)); },
     'page error': (o) => { o.errors.push('pageerror'); },
@@ -987,10 +1096,34 @@ function runAdmissionSelfTest() {
     'saved occurrence missing from paint': [['n-1'], [{ ...ringInk, probeId: 'n-2' }]],
     'two saved occurrences': [['n-1', 'n-3'], [ringInk]],
   };
-  const results = { positive: { admission: ringContextAdmission(good()).accepted, savedOccurrence: savedOccurrenceVerdict(['n-1'], [ringInk]).passed },
+  const settled = { observer: true, generation: 1, viewTransitions: 1, activeViewTransitions: 0, transition: false, hero: false, arrival: false, mainOpacity: '1', room: [], view: 'reader', mainBound: true };
+  const bound = { generation: 1, viewTransitions: 1 };
+  const scenes = {
+    'room transition marker present': { ...settled, transition: true }, 'room hero marker present': { ...settled, hero: true }, 'main still arriving': { ...settled, arrival: true },
+    'main not yet opaque': { ...settled, mainOpacity: '0.98' }, 'view transition unfinished': { ...settled, activeViewTransitions: 1 },
+    'outgoing room snapshot still animating': { ...settled, room: [{ name: 'kairo-room-leave', pseudo: '::view-transition-old(kairo-room)', state: 'running', pending: false }] },
+    'arrival animation pending': { ...settled, room: [{ name: 'kairo-room-arrive', pseudo: null, state: 'running', pending: true }] },
+    'another transition began during the batch': { ...settled, generation: 2 }, 'another view transition began': { ...settled, viewTransitions: 2 },
+    'main element replaced': { ...settled, mainBound: false }, 'not the reader': { ...settled, view: 'shelf' }, 'observer absent': { ...settled, observer: false },
+  };
+  const results = { positive: { admission: ringContextAdmission(good()).accepted, savedOccurrence: savedOccurrenceVerdict(['n-1'], [ringInk]).passed, settledScene: settledScene(settled, bound) },
     refused: Object.fromEntries([...Object.entries(altered).map(([k, f]) => { const o = good(); f(o); return [k, !ringContextAdmission(o).accepted]; }),
-      ...Object.entries(saved).map(([k, [occ, ink]]) => [k, !savedOccurrenceVerdict(occ, ink).passed])]) };
-  const passed = results.positive.admission && results.positive.savedOccurrence && Object.values(results.refused).every(Boolean);
+      ...Object.entries(saved).map(([k, [occ, ink]]) => [k, !savedOccurrenceVerdict(occ, ink).passed]),
+      ...Object.entries(scenes).map(([k, state]) => [`scene: ${k}`, !settledScene(state, bound)])]) };
+  const fixture = option('--scene-fixture');
+  if (fixture) {
+    // Native fix3's retained WebKit desktop batch: BEFORE's shown shot still holds the outgoing shelf; READING is settled.
+    const receipt = JSON.parse(readFileSync(resolve(fixture, 'verify-depth-visibility-title-rings.json'), 'utf8'));
+    const context = receipt.contexts.find((c) => c.engine === 'webkit' && c.world === 'hokusai' && c.size === 'desktop');
+    const batch = (frame) => { const name = `webkit-hokusai-desktop-live-daisho-saved-nihon-${frame}`, read = (suffix) => png(readFileSync(resolve(fixture, `${name}${suffix}.png`)));
+      const circles = dotCircles(context.measurements[`live-daisho-saved-nihon-${frame}`]), view = context.rows.find((r) => r.id === `live-daisho-saved-nihon-${frame}.ring-clear-of-ink`).detail.view;
+      return sceneStability({ shown: read(''), paper: read('-paper'), restored: read('') }, circles, view); };
+    const before = batch('before'), reading = batch('reading');
+    results.fixture = { dir: fixture, receiptSha256: hash(readFileSync(resolve(fixture, 'verify-depth-visibility-title-rings.json'))), before, reading };
+    results.positive.settledRetainedReading = reading.outsideChanged === 0;
+    results.refused['retained fix3 BEFORE batch with the outgoing shelf'] = !before.stable && before.outsideChanged > 0;
+  }
+  const passed = Object.values(results.positive).every(Boolean) && Object.values(results.refused).every(Boolean);
   console.log(JSON.stringify({ selfTestAdmission: passed, ...results }, null, 1));
   return passed;
 }
