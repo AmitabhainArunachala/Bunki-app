@@ -5418,7 +5418,7 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
    Red is left to the ring in every world. Every value below is a world token or a mix of two (D3);
    corridor.js wordDepth decides the state; stronger paint never invents an encounter or changes the record.
    ========================================================================== */
-:where(body, #sheet, #mini) {
+:where(body, #sheet, #mini, .reader-card) {
   --depth-pigment: var(--color-ink, var(--world-ink));
   --depth-ground: var(--reader-paper, var(--tone-ground, var(--world-ground)));
   --depth-met: color-mix(in srgb, var(--depth-pigment) 48%, var(--depth-ground));
@@ -5428,8 +5428,10 @@ body .search-page .nav-search-input { background: var(--tone-sunk); }
   --depth-ring: var(--color-seal, var(--world-signal));
   --depth-size: 6px;
 }
-/* A word page can cover the reader: it has its own ground, not the paper inherited behind it. */
+/* A word page can cover the reader, and the title card is raised in front of its paper: each has its own ground,
+   not the paper inherited behind it. */
 :where(#sheet, #mini) { --depth-ground: var(--tone-ground, var(--world-ground)); }
+:where(.reader-card) { --depth-ground: var(--reader-card, var(--tone-ground, var(--world-ground))); }
 /* the state's fill: one rule per state, read by every dot below (zero-specificity list, so a surface of its own — the slip's
    band — can set its own steps) */
 :where(#reader .tok, .japanese-lookup-word, .depth-dot, #mini, .today-star)[data-depth='met'] { --depth-fill: var(--depth-met); }

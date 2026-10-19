@@ -138,14 +138,15 @@ async function facts(page, selector, pseudo = true) {
       host: { x: r.x + scrollX, y: r.y + scrollY, width: r.width, height: r.height }, readerPaper: getComputedStyle(document.querySelector('#reader') || document.body).getPropertyValue('--reader-paper') };
   });
     const glyphs = [];
-    if (elements.some((el) => el.matches('.japanese-lookup-word') && el.closest('#sheet'))) {
+    const roots = [...new Set(elements.map((el) => el.matches('.japanese-lookup-word') && el.closest('#sheet, .reader-card')).filter(Boolean))];
+    if (roots.length) {
       // Each containing prose block includes ordinary Japanese, English,
       // punctuation and ruby. Lookup spans are owners, never the glyph census.
-      const blocks = new Set([...document.querySelectorAll('#sheet .japanese-lookup-word')].map((el) => {
+      const blocks = new Set(roots.flatMap((root) => [...root.querySelectorAll('.japanese-lookup-word')].map((el) => {
         let block = el.parentElement;
-        while (block && block.id !== 'sheet' && getComputedStyle(block).display === 'inline') block = block.parentElement;
+        while (block && block !== root && getComputedStyle(block).display === 'inline') block = block.parentElement;
         return block;
-      }).filter(Boolean));
+      })).filter(Boolean));
       const seen = new Set();
       for (const block of blocks) {
         const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT); let text;
@@ -312,6 +313,22 @@ async function ladderContract(page, out) {
   row(out, 'ladder.target-only', at >= 0 && !isHidden(before[at]) && isHidden(during[at]) && !isHidden(after[at]) && during.every((d, i) => i === at || JSON.stringify(d) === JSON.stringify(before[i])), { before: before[at], during: during[at], after: after[at] });
   row(out, 'ladder.no-geometry-or-record-change', beforeRecord === afterRecord && JSON.stringify(before.map((d) => d.host)) === JSON.stringify(during.map((d) => d.host)) && JSON.stringify(before) === JSON.stringify(after), { recordBefore: hash(beforeRecord), recordAfter: hash(afterRecord), changedKeys: [...new Set([...Object.keys(JSON.parse(beforeRecord)), ...Object.keys(JSON.parse(afterRecord))])].filter((key) => JSON.stringify(JSON.parse(beforeRecord)[key]) !== JSON.stringify(JSON.parse(afterRecord)[key])).map((key) => ({ key, before: JSON.parse(beforeRecord)[key], after: JSON.parse(afterRecord)[key] })) });
 }
+function lineGeometry(out, name, dots) {
+  row(out, `${name}.fragment-alignment`, dots.every((d) => d.fragments.some((f) => (d.left + d.right) / 2 >= f.left - 0.5 && (d.left + d.right) / 2 <= f.right + 0.5 && (d.top + d.bottom) / 2 >= f.bottom - 2 && (d.top + d.bottom) / 2 <= f.bottom + 12)), dots.map((d) => ({ text: d.text, dot: [d.left, d.top, d.right, d.bottom], fragments: d.fragments, cssGeometry: d.cssGeometry })));
+  const clashes = dots.flatMap((d) => out.captureFrames[d.captureFrame].glyphs.filter((g) => g.owner !== d.probeId && d.left - d.spread < g.right && d.right + d.spread > g.left && d.top - d.spread < g.bottom && d.bottom + d.spread > g.top).map((g) => ({ captureFrame: d.captureFrame, dot: d.text, dotBox: [d.left - d.spread, d.top - d.spread, d.right + d.spread, d.bottom + d.spread], host: d.host, fragments: d.fragments, cssGeometry: d.cssGeometry, glyph: g })));
+  row(out, `${name}.no-other-glyph-overlap`, clashes.length === 0, clashes);
+}
+/** The reader's title words sit on the raised title card, not the reader's
+ * paper. The native fixture's saved and reviewed words hold state there too. */
+async function titleCard(page, out) {
+  const heading = page.locator('.reader-card h1.view-title');
+  if (await heading.count()) { await heading.first().evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' })); await delay(250); }
+  const title = await surfaceCapture(page, out, 'title', '.reader-card .japanese-lookup-word[data-lookup-text]');
+  checkPaint(out, 'title', title);
+  lineGeometry(out, 'title', title);
+  out.titleCoverage = title.map((d) => ({ text: d.text, depth: d.depth, kept: d.kept, fragments: d.fragments.length, wrapped: d.fragments.length > 1 }));
+  row(out, 'title.fixture-states', title.some((d) => ['met', 'again', 'recalled', 'owned'].includes(d.depth)) && title.some((d) => d.kept), out.titleCoverage);
+}
 async function rooms(page, out) {
   out.roomStateCoverage = {};
   const familySamples = { slip: [], basis: [], prose: [] };
@@ -334,9 +351,7 @@ async function rooms(page, out) {
     if (await page.locator(proseSelector).count()) {
       const prose = await surfaceCapture(page, out, `prose-${name}`, proseSelector);
       checkPaint(out, `prose-${name}`, prose); familySamples.prose.push(...prose);
-      row(out, `prose-${name}.fragment-alignment`, prose.every((d) => d.fragments.some((f) => (d.left + d.right) / 2 >= f.left - 0.5 && (d.left + d.right) / 2 <= f.right + 0.5 && (d.top + d.bottom) / 2 >= f.bottom - 2 && (d.top + d.bottom) / 2 <= f.bottom + 12)), prose.map((d) => ({ text: d.text, dot: [d.left, d.top, d.right, d.bottom], fragments: d.fragments, cssGeometry: d.cssGeometry })));
-      const clashes = prose.flatMap((d) => out.captureFrames[d.captureFrame].glyphs.filter((g) => g.owner !== d.probeId && d.left - d.spread < g.right && d.right + d.spread > g.left && d.top - d.spread < g.bottom && d.bottom + d.spread > g.top).map((g) => ({ captureFrame: d.captureFrame, dot: d.text, dotBox: [d.left - d.spread, d.top - d.spread, d.right + d.spread, d.bottom + d.spread], host: d.host, fragments: d.fragments, cssGeometry: d.cssGeometry, glyph: g })));
-      row(out, `prose-${name}.no-other-glyph-overlap`, clashes.length === 0, clashes);
+      lineGeometry(out, `prose-${name}`, prose);
       out.proseCoverage = [...(out.proseCoverage || []), ...prose.map((d) => ({ text: d.text, depth: d.depth, kept: d.kept }))];
     }
     await page.locator('#sheet-back').click(); await page.waitForFunction(() => !document.getElementById('sheet')); await delay(250);
@@ -411,6 +426,7 @@ async function one(browser, engine, world) {
     }, dots);
     row(out, 'reader.no-next-line-overlap', collisions.length === 0, collisions);
     await ladderContract(page, out);
+    await titleCard(page, out);
     console.log(JSON.stringify({ engine, world, metrics: { met: met?.raster, owned: owned?.raster, recalled: recalled?.raster }, states })); save();
     await rooms(page, out);
     await worldBinding(page, out, 'after-rooms');
@@ -441,6 +457,6 @@ finally {
   report.completedAt = new Date().toISOString();
   report.passed = !report.errors.length && !report.control.setupError && report.contexts.length === engines.length * worlds.length && report.contexts.every((c) => c.passed) && (!controlBytes || report.control.served.length > 0);
   report.fullAcceptance = report.passed && report.scope.full && report.mode === 'local artifact' && !controlBytes && !diagnosticInlineEnd;
-  report.control.killed = Boolean(controlBytes && !report.control.setupError && !report.errors.length && report.contexts.every((c) => !c.errors.length) && report.control.served.length && report.contexts.some((c) => c.rows.some((r) => /^(reader|slip|basis|prose|tray|today|mirror)(?:-[a-z]+)?\.(size|contrast|nonempty|semantic-separation)$/.test(r.id) && !r.passed)));
+  report.control.killed = Boolean(controlBytes && !report.control.setupError && !report.errors.length && report.contexts.every((c) => !c.errors.length) && report.control.served.length && report.contexts.some((c) => c.rows.some((r) => /^(reader|title|slip|basis|prose|tray|today|mirror)(?:-[a-z]+)*\.(size|contrast|nonempty|semantic-separation)$/.test(r.id) && !r.passed)));
   save(); console.log(`DOTS ${report.passed ? 'PASS' : 'FAIL'}: ${evidence}`); if (!report.passed) process.exitCode = 1;
 }
