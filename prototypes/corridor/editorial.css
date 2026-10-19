@@ -6103,12 +6103,19 @@ body.ginga #app > .scale-thread { position: fixed; left: 0; top: calc(56px + env
   text-decoration: underline;
   text-underline-offset: .2em;
 }
-/* Keep the printed reading fixed while giving it its own invisible press region.
-   The centre's headword starts immediately below, so that region grows upward. */
+/* Give the reading its own press region. Its one-pixel rise clears the headword's
+   text overhang without moving the headword or the surrounding diagram. */
 .ww-reading-door::before {
   content: '';
   position: absolute;
   pointer-events: auto;
+}
+.ww-reading-door.ww-c-r { transform: translateY(-1px); }
+/* A single-kanji word has a kanji node immediately above it. Put only its reading
+   beside the centre, with a two-pixel gap beyond both controls' minimum reach. */
+.ww-centre:has(> .ww-c-glyph[data-len='1']) > .ww-reading-door.ww-c-r {
+  right: calc(50% + 2px);
+  transform: translate(min(-50%, -22px), -1px);
 }
 .ww-reading-door.ww-c-r::before {
   left: 50%;
@@ -6124,7 +6131,7 @@ body.ginga #app > .scale-thread { position: fixed; left: 0; top: calc(56px + env
 .ww-marks > div > dd > .ww-reading-door::before {
   left: 8px;
   right: 8px;
-  bottom: 0;
+  bottom: 2px;
   height: 44px;
 }
 .ww-reading-choices { margin-block: 1rem; }
