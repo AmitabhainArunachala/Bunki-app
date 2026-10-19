@@ -57,6 +57,8 @@ const BASE_SHA = process.env.HFIX2E2_BASE_SHA || '1f790977';
 const ONLY = (process.env.HFIX2E2_CASE || '').split(',').map((s) => s.trim()).filter(Boolean);
 assert(ONLY.every((c) => ['X13', 'G61', 'NAMI'].includes(c)), `unknown HFIX2E2_CASE ${ONLY}`);
 const runs = (item) => !ONLY.length || ONLY.includes(item);
+const NAMI_VIEWPORT = process.env.HFIX2E2_NAMI_VIEWPORT || 'phone';
+assert(['phone', 'desktop'].includes(NAMI_VIEWPORT) && !(NAMI_VIEWPORT === 'desktop' && engine === 'webkit'), `bad HFIX2E2_NAMI_VIEWPORT ${NAMI_VIEWPORT}`);
 const out = resolveCorridorEvidence();
 mkdirSync(out, { recursive: true });
 const identity = JSON.parse(readFileSync(join(process.env.KAIRO_SITE_DIR, 'build-identity.json'), 'utf8'));
@@ -275,12 +277,12 @@ async function x13Walk(width, height) {
 async function x13Mac() {
   await row(`X13.mac · ${engine} 1440×900 · on the Mac 層, its box and its styles, and the reading around it, are exactly the base's`, 'X13', async () => {
     const facts = {};
-    for (const bytes of ['base', BYTES]) {
+    for (const [side, bytes] of [['base', 'base'], ['build', BYTES]]) {
       const { context, page, errors } = await session({ width: 1440, height: 900, device: MAC, bytes });
       try {
         await openStory(page);
         await page.evaluate(() => window.scrollTo(0, 1200)); await frames(page, 2); await delay(200);
-        facts[bytes === 'base' ? 'base' : 'build'] = { errors, ...await page.evaluate(() => {
+        facts[side] = { errors, ...await page.evaluate(() => {
           const mark = document.getElementById('layers-mark'), r = mark.getBoundingClientRect(), s = getComputedStyle(mark);
           const dock = getComputedStyle(document.getElementById('app'), '::after');
           return { box: [r.left, r.top, r.width, r.height], style: [s.position, s.right, s.bottom, s.zIndex, s.display, s.backgroundColor, s.color, s.borderRadius].join(' | '),
@@ -501,13 +503,13 @@ async function g61() {
   // G6's 599 press regions of 知床 at 320: this build's are the base's, fresh, and again after a reading is raised and folded
   await row(`G61.press · ${engine} 320×568 · the 599 press regions of 知床 are the base's, and the same again after a fold`, 'G61', async () => {
     const regions = {};
-    for (const bytes of ['base', BYTES]) {
+    for (const [side, bytes] of [['base', 'base'], ['build', BYTES]]) {
       const { context, page, errors } = await session({ width: 320, height: 568, device: phone ? PHONE : MAC, bytes });
       try {
         await openStory(page);
         const fresh = await pressRegions(page);
         let folded = null;
-        if (bytes !== 'base') {
+        if (side === 'build') {
           const index = await chooseOverhang(page);
           const y = await page.evaluate(() => window.scrollY);
           await frames(page, 2); await delay(200);
@@ -519,7 +521,7 @@ async function g61() {
           await frames(page, 2);
           folded = await pressRegions(page);
         }
-        regions[bytes === 'base' ? 'base' : 'build'] = { fresh, folded, errors };
+        regions[side] = { fresh, folded, errors };
       } finally { await context.close(); }
     }
     const { base, build } = regions;
@@ -551,6 +553,9 @@ function nami() {
   // each slot navigates on its own: no prerequisite walk
   once("if (!states.includes(state) && !['shelf', 'reader', 'slip', 'page', 'today', 'me', 'deck-front'].includes(state)) continue;",
     'if (!states.includes(state)) continue;');
+  // the sweep's own 390×844 touch phone, or (HFIX2E2_NAMI_VIEWPORT=desktop, Chromium) the Mac's 1440×900 with a mouse
+  if (NAMI_VIEWPORT === 'desktop') once("viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: DPR, serviceWorkers: 'block', reducedMotion: 'reduce', colorScheme: 'light' }",
+    "viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false, deviceScaleFactor: DPR, serviceWorkers: 'block', reducedMotion: 'reduce', colorScheme: 'light' }");
   // the two files this lane changed, served at the base (base mode) or with the control's defect (control mode)
   const originRoute = "await context.route('**/*', (route) => (new URL(route.request().url()).origin === origin ? route.continue() : route.abort()));";
   if (BYTES !== 'branch') {
@@ -578,7 +583,16 @@ const tools = async (page, hover) => {
 };
 const practice = async (page, hover) => {
   await page.goto(origin + '/index.html?entry=shelf&ui=bi'); await ready(page);
-  await ORIGINAL.reader(page); await ORIGINAL.slip(page); await ORIGINAL.page(page); await ORIGINAL.examples(page);
+  await ORIGINAL.reader(page);
+  if (${NAMI_VIEWPORT === 'desktop'}) {
+    // the Mac: the same walk with a mouse (the sweep's own slip step taps)
+    const word = page.locator('#reader .tok[data-prose-label="' + WORD + '"]').first();
+    for (let i = 0; i < 3 && !(await page.locator('#mini').count()); i += 1) { await word.click(); await page.waitForTimeout(500); }
+    await page.locator('#mini .mini-word').waitFor({ timeout: 15000 }); await settle(page, 1300);
+    await page.locator('#mini .mini-word').click();
+    await page.locator('#sheet').waitFor({ timeout: 15000 }); await settle(page, 600);
+  } else { await ORIGINAL.slip(page); await ORIGINAL.page(page); }
+  await ORIGINAL.examples(page);
   await page.locator('#entry-sentence-practice').scrollIntoViewIfNeeded();
   if (hover) await page.locator('#entry-sentence-practice').hover(); else await nowhere(page);
   await settle(page, 600);
@@ -609,13 +623,13 @@ STEPS['speak-key'] = (page) => practice(page, true);
     found[`${where}.${how}.siblings`] = (result?.pairs || []).filter((p) => p.sel !== sel && /grammar-link > span\.l-ja|teacher-door .*btn-tertiary|#entry-sentence-ask|teacher-actions > button\.chip/u.test(p.sel || ''))
       .map((p) => [p.sel, p.ratio, p.fg, p.bg]).slice(0, 12);
   }
-  results.push({ name: `NAMI.sweep · ${engine}`, item: 'NAMI', pass: child.status !== null, detail: { exit: child.status, swaps, browser: report.engines?.[engine], loadBefore: before, loadAfter: load() },
+  results.push({ name: `NAMI.sweep · ${engine}`, item: 'NAMI', pass: child.status !== null, detail: { exit: child.status, swaps, viewport: NAMI_VIEWPORT, browser: report.engines?.[engine], loadBefore: before, loadAfter: load() },
     error: null, before, after: load() });
   for (const [key, label] of [['tools', 'the idioms label on the shelf tools\' door'], ['practice', '"Practice it"']]) {
     for (const how of ['rest', 'pointer']) {
       const f = found[`${key}.${how}`];
       const ok = !!f && f.ratio >= 4.6 && (BYTES === 'branch' || swaps > 0);
-      results.push({ name: `NAMI.${key}.${how} · ${engine} 390×844 · in nami ${label} reads 4.6:1 or more ${how === 'rest' ? 'at rest' : 'under a pointer'}`, item: 'NAMI', pass: ok,
+      results.push({ name: `NAMI.${key}.${how} · ${engine} ${NAMI_VIEWPORT === 'desktop' ? '1440×900' : '390×844'} · in nami ${label} reads 4.6:1 or more ${how === 'rest' ? 'at rest' : 'under a pointer'}`, item: 'NAMI', pass: ok,
         detail: { ...f, siblings: found[`${key}.${how}.siblings`] }, error: ok ? null : `measured ${JSON.stringify(f)}`, before, after: load() });
       console.log(`${ok ? '  ok  ' : ' FAIL '} NAMI.${key}.${how} · ${engine} · ${f ? `${f.ratio} (${f.fg} on ${f.bg})` : 'not measured'}`);
     }
