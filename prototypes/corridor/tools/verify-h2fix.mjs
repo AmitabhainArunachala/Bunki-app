@@ -271,10 +271,11 @@ async function importLine() {
   try {
     await boot(s.page);
     await openShelfDoor(s.page, '#mock-link');
-    const status = s.page.locator('.exam-official .exam-status').first();
-    await status.waitFor({ timeout: 20_000 });
-    await status.scrollIntoViewIfNeeded();
-    await sleep(500);
+    // the room may draw itself again as its catalogue arrives: wait, settle, then always read the current node
+    await s.page.locator('.exam-official .exam-status').first().waitFor({ timeout: 20_000 });
+    await sleep(1200);
+    await s.page.evaluate(() => document.querySelector('.exam-official .exam-status')?.scrollIntoView({ block: 'center' }));
+    await sleep(400);
     const got = await s.page.evaluate(() => {
       const input = document.querySelector('#exam-official-file');
       const label = document.querySelector('.exam-official-import');
