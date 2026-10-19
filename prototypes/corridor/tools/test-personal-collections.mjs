@@ -11,7 +11,9 @@ import {validateCollection,validateEnrichment,parseImport,backup,digest,safeURL}
 import {mergeEnrichment} from '../decks/personal/enrichment.mjs';
 import {fixture,enrichmentFixture} from './personal-fixture.mjs';
 
-const data = await fixture(), engine = createEngine(data,api), checks=[];
+// the scheduler is built by srs-core.mjs from the app's one pin
+const pin = JSON.parse(readFileSync(new URL('../data/fsrs-pin.json', import.meta.url), 'utf8'));
+const data = await fixture(), engine = createEngine(data,api,pin), checks=[];
 const test = async (name,fn) => { await fn(); checks.push(name); };
 const now=Date.parse('2026-10-04T02:00:00.000Z');
 let counter=0; const id=()=>`test-${++counter}`, fresh=()=>engine.fresh('fixture-device');
@@ -27,7 +29,7 @@ await test('answer enrichment binds to original text without changing assessment
   const enriched={...data,enrichment};await validateCollection(enriched);
   assert.equal(enriched.contentDigest,data.contentDigest);
   assert.equal(JSON.stringify(data),original);
-  assert.deepEqual(createEngine(enriched,api).cards.map(c=>c.id),engine.cards.map(c=>c.id));
+  assert.deepEqual(createEngine(enriched,api,pin).cards.map(c=>c.id),engine.cards.map(c=>c.id));
   const restored=await parseImport(backup({collection:data,progress:one,enrichment}));
   assert.deepEqual(restored.progress.events,one.events);assert.deepEqual(restored.enrichment,enrichment);
   assert.deepEqual((await parseImport(enrichment)).enrichment,enrichment);
