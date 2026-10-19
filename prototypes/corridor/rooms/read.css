@@ -1412,6 +1412,10 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
    every target keeps its 44 px. */
 #mini .mini-kanji-readings { display: none; }
 #mini.is-compact .mini-head { padding: 6px 8px 7px 16px; }
+#mini.is-compact .mini-head {
+  /* bokashi: ichimonji — the compact card's head band — brush: the same stroke on a shorter band, its lift starting higher so it is drawn over as many px as the full band's (contrast-sweep C4: ≤ 1 visible tonal step per 24 px; from 56 % of a 79 px band it was 2) */
+  background-image: linear-gradient(180deg, var(--mini-head) 0 25%, var(--mini-head-2) 100%);
+}
 #mini.is-compact .mini-head-text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
 /* the room a meaning still to come keeps (reserveSenseRoom) is measured in the full card's lines: the compact card keeps none,
    as the sentence view keeps none; a meaning that lands later seats the card again */
