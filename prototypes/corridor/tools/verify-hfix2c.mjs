@@ -21,7 +21,7 @@ const BASE = process.env.HFIX2C_BASE || '/Users/dhyana/.dharma/bunki_review/2026
 const engine = process.env.KAIRO_BROWSER || 'webkit', mode = process.env.HFIX2C_MODE || 'branch';
 assert(['webkit', 'chromium'].includes(engine)); assert(['base', 'branch', 'control'].includes(mode));
 const only = process.env.HFIX2C_CASE;
-assert(!only || ['X20','X8','X4','readings','KT1','X21'].includes(only), 'Known selected case');
+assert(!only || ['X20','X8','X4','X4-return','readings','KT1','X21'].includes(only), 'Known selected case');
 const hash = s => createHash('sha256').update(s).digest('hex');
 const uptime = () => execFileSync('uptime', { encoding: 'utf8' }).trim();
 const read = (file, base = SITE) => readFileSync(join(base, file), 'utf8');
@@ -46,6 +46,7 @@ async function newPage(group, width = 390, height = 844) {
   page.on('pageerror', e => receipt.errors.push({ group, message: String(e) }));
   if (mode === 'control') {
     if (group === 'X20') await routeFile(page, 'editorial.css', s => s + '\n#app .kp .kp-study > #kp-undo { pointer-events: none !important; }\n', 'Undo label loses its own pointer target');
+    if (group === 'X4-return') await routeFile(page, 'decks/player/mount.js', s => replaceOne(s, "foldSeatGap: face.querySelector('.kp-folds')?.style.marginTop || '',", "foldSeatGap: '',"), 'lose transient fold spacing on remount');
     if (group === 'X8') await routeFile(page, 'decks/player/mount.js', s => replaceOne(s, 'if (!ctx.prefs.againCoachSeen)', 'if (!ctx.prefs.ruleSeen)'), 'old coach flag');
     if (group === 'X4') await routeFile(page, 'decks/player/mount.js', s => replaceOne(replaceOne(replaceOne(s, 'if (!fitsEdges(dy)) {', 'if (false) {'), 'rBottom - d <= bottomLimit + 0.5 || rTop - d >= dockTop - 0.5', '!(rTop - d < barTop - 0.5 && rBottom - d > barTop + 0.5)'), 'return row.bottom - lift <= bottom + 0.5 || row.top - lift >= dockTop - 0.5;', 'return !(row.top - lift < barTop - 0.5 && row.bottom - lift > barTop + 0.5);'), 'restore old edge conditions; scheduling and coach untouched');
     if (group === 'readings') for (const d of ['kotoba-mine', 'kotoba-mcd']) for (const f of ['deck.json', 'tokens.json']) await routeFile(page, `decks/${d}/${f}`, s => {
@@ -157,6 +158,34 @@ async function layoutRows() {
       check('X4', `${width}x${height} ${fresh ? 'fresh' : 'returning'}: whole header line and clear grade band`, g.cut.length === 0 && g.foldBad.length === 0 && g.answer[0].top >= g.header.bottom + 12 - 1 && g.answer.at(-1).bottom <= g.bar.top - 12 + 1 && (!g.targetCanFit || (g.target.top >= Math.max(g.header.bottom + 12, g.view.top) - 1 && g.target.bottom <= Math.min(g.bar.top - 12, g.view.bottom) + 1 && (!g.toggle || g.toggle.top >= g.header.bottom + 12 - 1))) && g.overflow === 0, g);
     } finally { await context.close(); }
   }
+}
+/** The public player remount contract also serves non-corridor hosts. In a deliberately
+ * off-window pose it must restore the extra fold spacing without a fresh fit. */
+async function remountRow() {
+  const {context,page} = await newPage('X4-return',320,568);
+  try {
+    await deckStart(page,'n2',{sittings:0,ruleSeen:false,againCoachSeen:false});
+    await page.locator('#kp-reveal').click(); await resting(page);
+    const observed = await page.evaluate(async () => {
+      const player = await import('./decks/player/mount.js');
+      const old = document.querySelector('.kp'), main = old.parentElement;
+      // A learner may scroll their target out of view; returning must preserve that choice.
+      window.scrollBy({top:24,behavior:'instant'});
+      const saved = player.capturePresentation(), host = player.hostAdapter();
+      const gap = old.querySelector('.kp-folds').style.marginTop;
+      const ledger = localStorage.getItem('bunki-cloze:n2');
+      old.remove();
+      await player.render(main,{deckId:'n2',storage:localStorage,host,english:true,focusRoom:true,presentation:saved});
+      const after = player.capturePresentation();
+      return {gap,restoredGap:document.querySelector('.kp-folds').style.marginTop,saved,after,
+        rebuilt:!old.isConnected,ledgerUnchanged:ledger===localStorage.getItem('bunki-cloze:n2')};
+    });
+    check('X4-return','320x568 public remount preserves an off-window fold gap',
+      parseFloat(observed.gap)>12 && observed.saved.fitted===false && observed.rebuilt &&
+      observed.restoredGap===observed.gap && observed.after.card===observed.saved.card &&
+      observed.after.inner===observed.saved.inner && Math.abs(observed.after.anchor-observed.saved.anchor)<1 && observed.ledgerUnchanged,observed);
+    await page.screenshot({path:join(OUT,'shots','remounted-short-card.png')});
+  } finally {await context.close();}
 }
 const DAYS = 'ついたち ふつか みっか よっか いつか むいか なのか ようか ここのか とおか じゅういちにち じゅうににち じゅうさんにち じゅうよっか じゅうごにち じゅうろくにち じゅうしちにち じゅうはちにち じゅうくにち はつか にじゅういちにち にじゅうににち にじゅうさんにち にじゅうよっか にじゅうごにち にじゅうろくにち にじゅうしちにち にじゅうはちにち にじゅうくにち さんじゅうにち さんじゅういちにち'.split(' ');
 const MONTHS = 'いちがつ にがつ さんがつ しがつ ごがつ ろくがつ しちがつ はちがつ くがつ じゅうがつ じゅういちがつ じゅうにがつ'.split(' ');
@@ -270,14 +299,14 @@ async function diversityRows() {
   } finally { await context.close(); }
 }
 try {
-  for (const [key, fn] of [['X20', undoRows], ['X8', coachRows], ['X4', layoutRows], ['readings', readingRows], ['KT1', kanjiRows], ['X21', diversityRows]]) {
+  for (const [key, fn] of [['X20', undoRows], ['X8', coachRows], ['X4', layoutRows], ['X4-return', remountRow], ['readings', readingRows], ['KT1', kanjiRows], ['X21', diversityRows]]) {
     if (only && only !== key) continue;
     try { await fn(); } catch (error) { receipt.errors.push({ group: key, error: error.stack }); console.error(error); }
   }
 } finally { await browser.close(); await host.close(); }
 const groups = [...new Set(receipt.rows.map(r => r.group))];
 receipt.groups = Object.fromEntries(groups.map(g => [g, { rows: receipt.rows.filter(r => r.group === g).length, red: receipt.rows.filter(r => r.group === g && !r.pass).length }]));
-const expectedCounts = {X20:4,'X20-key':4,X8:10,X4:4,KT1:6,X21:1,inventory:1};
+const expectedCounts = {X20:4,'X20-key':4,X8:10,X4:4,'X4-return':1,KT1:6,X21:1,inventory:1};
 const selectedGroups = only ? (only === 'X20' ? ['X20','X20-key'] : only === 'readings' ? ['readings','inventory'] : [only]) : Object.keys(expectedCounts).concat('readings');
 function expectedBase(row) {
   if (['inventory','X20-key','X21'].includes(row.group)) return true;

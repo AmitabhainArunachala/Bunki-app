@@ -7548,6 +7548,7 @@ function capturePresentation({ includeInert = false } = {}) {
     folds: [...face.querySelectorAll('.kp-fold')].map(n => ({ key: [...n.classList].find(c => c.startsWith('kp-f-')), open: n.open })),
     context: [...passage.querySelectorAll('.kp-ctx')].map(n => ({ side: n.dataset.side, open: n.dataset.open || '' })),
     windowed: passage.classList.contains('kp-window'), height: passage.style.getPropertyValue('--kp-window-h'),
+    foldSeatGap: face.querySelector('.kp-folds')?.style.marginTop || '',
     inner: passage.scrollTop, anchor: passage.getBoundingClientRect().top, page: window.scrollY,
     fitted: backFits(),
   };
@@ -7564,6 +7565,10 @@ function restorePresentation(saved, { seat = true } = {}) {
   const face = ctx.root.querySelector('#kp-card');
   const passage = face?.querySelector('.kp-sentence');
   if (!passage) return;
+  // This spacing belongs to the current reading pose, including a deliberately
+  // scrolled pose that must not be automatically fitted again on return.
+  const folds = face.querySelector('.kp-folds');
+  if (folds) folds.style.marginTop = saved.foldSeatGap || '';
   for (const fold of saved.folds) {
     const node = fold.key && face.querySelector(`.${fold.key}`);
     if (node) node.open = fold.open;
@@ -10174,7 +10179,7 @@ function settleBack() {
       }
     };
     let seat = findSeat();
-    if (seat === undefined && folds && rows.length) {
+    if (seat === undefined && folds && rows.length && bottom - word <= bottomLimit - topLimit + 1) {
       // If every normal-gap seat would cut ink or a fold, make room below the
       // answer for one whole line plus the dock's clear band. Short cards whose
       // folds already fit keep their normal spacing (including unmatched MCD).
@@ -10186,6 +10191,7 @@ function settleBack() {
       }));
       room.down = document.documentElement.scrollHeight - innerHeight - window.scrollY;
       seat = findSeat();
+      if (seat === undefined) folds.style.removeProperty('margin-top');
     }
     if (seat !== undefined) dy = seat;
   }
