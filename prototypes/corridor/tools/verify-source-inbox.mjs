@@ -14,6 +14,24 @@ import { chromium, webkit } from 'playwright-core';
 import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
 import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
@@ -96,6 +114,8 @@ async function frontDoor(page) {
   await inbox(page);
   await page.locator('#source-capture-text').waitFor();
 }
+// A click or tap on a reader word walks the tap ladder and opens the word (the accepted product); a desktop learner
+// selects text with a mouse drag (lead's ruling 10-20). Press just before 町, drag across it, release just after it.
 async function selectWord(page) {
   const body = page.locator('#source-reader-body'); await page.evaluate(() => document.fonts.ready); await body.scrollIntoViewIfNeeded();
   const point = await body.evaluate((node) => {
@@ -104,14 +124,16 @@ async function selectWord(page) {
     while ((text = walker.nextNode())) {
       if (position < offset + text.length) {
         const range = document.createRange(); range.setStart(text, position - offset); range.setEnd(text, position - offset + 1);
-        const rect = range.getBoundingClientRect(), box = node.getBoundingClientRect();
-        return { x: rect.x - box.x + rect.width / 4, y: rect.y - box.y + rect.height / 2, start: position };
+        let rect = range.getBoundingClientRect();
+        if (rect.top < 0 || rect.bottom > innerHeight) { text.parentElement.scrollIntoView({ block: 'center' }); rect = range.getBoundingClientRect(); }
+        return { left: rect.left, right: rect.right, width: rect.width, y: rect.top + rect.height / 2, start: position };
       }
       offset += text.length;
     }
     throw new Error('Word not present');
   });
-  await body.dblclick({ position: { x: point.x, y: point.y } });
+  await page.mouse.move(point.left - point.width / 4, point.y); await page.mouse.down();
+  await page.mouse.move(point.right + point.width / 4, point.y, { steps: 8 }); await page.mouse.up();
   await page.waitForFunction(() => window.getSelection()?.toString() === '町');
   await page.waitForFunction(() => document.querySelector('#source-context-save')?.disabled === false);
   return point.start;
@@ -236,8 +258,8 @@ for (const engine of engines) for (const width of sizes) {
     result.observations.push({ source, topic, backupFile, backupSha256: hash(readFileSync(backupFile)), captureCreatesReviews: false });
     // Restore the unchanged app-generated backup using the normal import control.
     const timeOrigin = await page.evaluate(() => performance.timeOrigin);
-    await page.locator('#import-file').setInputFiles(backupFile);
-    await page.waitForFunction((old) => performance.timeOrigin !== old && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 });
+    await answeringRestore(page, async () => { await page.locator('#import-file').setInputFiles(backupFile);
+      await page.waitForFunction((old) => performance.timeOrigin !== old && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 }); });
     await frontDoor(page);
     const restored = await readAppRecordSnapshot(page); assert.deepEqual(restored.record.sourceInbox, saved.record.sourceInbox);
     await page.locator(`[data-source-capture="${source.id}"]`).click(); await page.locator('#source-reader-body').waitFor();

@@ -64,7 +64,7 @@ export const REFERENCE_DATA_PINS = Object.freeze({
   'data/share_alike/strokes.json':
     '435c37c0063fba4180d3cb444ef54cfa2430e71a650a4032cc481ada29627f2b',
   'data/share_alike/reference-extra.json':
-    '580de91dcfef2cf50bb2734e64c9dd63b6da676d1e47fccc0d910eb345d8bb42',
+    '8a5c953e3936c8ec8b337f41f2cc27fb61469b7fa87ea95405d54641532b991b',
 });
 export const SKIP_BROWSER_NAMES = Object.freeze([
   'dictionary tool includes its label in the accessible name',

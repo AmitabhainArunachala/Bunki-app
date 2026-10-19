@@ -2110,6 +2110,8 @@ let recordApp = null;
 let recordController = null;
 let recordInstallation = null;
 let recordControllerModule = null;
+// Loaded once at boot and reused by backup adoption: the standalone build rewrites each record module's single import.
+let recordBindingModule = null;
 let recordSyncSlot = null;
 
 function closeRecordSync() {
@@ -2265,6 +2267,7 @@ async function openAppRecord() {
       import('./record-controller.mjs'), import('./record-binding.mjs'), import('./record-app.mjs'),
     ]);
     recordControllerModule = controllerModule;
+    recordBindingModule = bindingModule;
     const assertOwner = () => recordOwner && !recordDeparted && !staleTab && epoch === recordEpoch;
     if (!assertOwner()) throw new Error('record-owner-changed');
     let initialScope;
@@ -8600,6 +8603,7 @@ function renderSourceReading(main) {
   if (context?.sourceId === saved.id && context.sourceDigest === article.body.contentSha256 &&
       article.body.text.slice(context.start, context.end) === context.quote) {
     const mark = el('mark', 'publisher-context-return', context.quote); mark.id = 'source-context-return'; mark.tabIndex = -1;
+    focusReturnMarkOnce(mark);
     body.replaceChildren(article.body.text.slice(0, context.start), mark, article.body.text.slice(context.end));
     requestAnimationFrame(() => { if (mark.isConnected) { mark.scrollIntoView({ block: 'center' }); mark.focus({ preventScroll: true }); } });
   }
@@ -8824,7 +8828,7 @@ function renderPublisherReading(main) {
   if (returning?.sourceId === saved.receiptSha256 && returning.sourceKind === 'publisher-reading' &&
       article.body.text.slice(returning.start, returning.end) === returning.quote) {
     const mark = el('mark', 'publisher-context-return', returning.quote);
-    mark.id = 'publisher-context-return'; mark.tabIndex = -1;
+    mark.id = 'publisher-context-return'; mark.tabIndex = -1; focusReturnMarkOnce(mark);
     body.replaceChildren(article.body.text.slice(0, returning.start), mark, article.body.text.slice(returning.end));
     requestAnimationFrame(() => {
       if (!mark.isConnected) return;
@@ -13570,12 +13574,24 @@ function markSenseContext(tokens, passage = null) {
   });
 }
 
-/** The shelf's sense sidecar (data/articles/senses.json, R3 part 2), asked for once. */
+/** A return mark is focused once on return, so the exact saved span is announced. It must never take a press: with
+ * tabindex a mouse or finger press on the highlight focused the mark instead of starting a text selection, so a drag
+ * that began on the saved words selected nothing. The tabindex goes at the mark's first blur, or at the first press on
+ * it, before the press's default action; the highlight looks the same. */
+function focusReturnMarkOnce(mark) {
+  const release = () => mark.removeAttribute('tabindex');
+  mark.addEventListener('blur', release, { once: true });
+  mark.addEventListener('pointerdown', release, { once: true, capture: true });
+}
+
+/** The shelf's sense sidecar (data/articles/senses.json, R3 part 2), asked for once. The single file carries it with
+ * the articles (articles/senses), as it carries their bodies; it has no sibling file to fetch. */
 let senseSidecarPromise = null;
 function ensureSenseSidecar() {
   if (D.senseSidecar || senseSidecarPromise) return senseSidecarPromise || Promise.resolve(D.senseSidecar);
-  senseSidecarPromise = fetchData('data/articles/senses.json')
-    .then((res) => (res.ok ? res.json() : null))
+  const bundled = window.__CORRIDOR_BUNDLE__?.['articles/senses'];
+  senseSidecarPromise = (bundled ? Promise.resolve(bundled)
+    : fetchData('data/articles/senses.json').then((res) => (res.ok ? res.json() : null)))
     .then((data) => { D.senseSidecar = data?.schemaVersion === 1 && data.articles ? data.articles : {}; return D.senseSidecar; },
       () => { D.senseSidecar = {}; return D.senseSidecar; });
   return senseSidecarPromise;
@@ -19058,7 +19074,7 @@ function renderPortRow(main) {
         return;
       }
       let plan; let adoption = false;
-      const bindingModule = await import('./record-binding.mjs');
+      const bindingModule = recordBindingModule;
       try { plan = await buildImportPlan(s, recordInstallation.policy); }
       catch (error) {
         if (error.code !== 'ownership-mismatch') throw error;

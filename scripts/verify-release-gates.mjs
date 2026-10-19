@@ -1789,6 +1789,7 @@ const STANDALONE_RECORD_MODULES = [
   './record-app.mjs',
   './record-sync.mjs',
   './modules/record-core.mjs',
+  './srs-core.mjs',
 ];
 const PRACTICE_HISTORY_CASES = [
   'two-completed-attempts-and-failed-save-actions',
