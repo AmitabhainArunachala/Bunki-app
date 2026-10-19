@@ -11589,23 +11589,8 @@ function frameFoot(onPage, fixedEdge) {
 }
 /** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
 function keepFloatingBeside(card, anchor, { follow = false } = {}) {
-  placeFloating(card, anchorBox(anchor), anchor);
+  placeFloating(card, anchorBox(anchor));
   card.addEventListener('scroll', () => markCardMore(card), { passive: true });
-  // Hfix-1A · a card beside a word the reading carries moves with it when the reading scrolls (it stood fixed, and a word
-  // scrolled while its stage stood slid under it: reader-gloss's tap on that word met the stage's band): the same seat,
-  // translated by the scroll since it was taken (placeFloating records it), never seated again mid-scroll
-  if (!follow && readingCarries(anchor)) {
-    const scroller = anchor.closest?.('#sheet') || null;
-    // carried with the reading, it passes under the room's bars as its word does (never over the bar)
-    if (!scroller) card.dataset.carried = '';
-    const offset = () => (scroller ? scroller.scrollTop : window.scrollY);
-    const carry = () => {
-      if (!card.isConnected || !anchor.isConnected) { (scroller || window).removeEventListener('scroll', carry); return; }
-      if (card.dataset.flow === 'document' || !Number.isFinite(card._seatOffset) || !card.dataset.floatingTop) return;
-      card.style.top = `${Number(card.dataset.floatingTop) - (offset() - card._seatOffset)}px`;
-    };
-    (scroller || window).addEventListener('scroll', carry, { passive: true });
-  }
   card.addEventListener('focusin', () => {
     requestAnimationFrame(() => { if (card.isConnected) revealFloatingFocus(card); });
   });
@@ -11617,7 +11602,7 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
       const now = anchor.getBoundingClientRect();
       if (Math.abs(now.left - was.left) < 1 && Math.abs(now.top - was.top) < 1) return;
       was = now;
-      placeFloating(card, anchorBox(anchor), anchor);
+      placeFloating(card, anchorBox(anchor));
     }, 120);
   }
   if (typeof ResizeObserver !== 'function') return;
@@ -11628,7 +11613,7 @@ function keepFloatingBeside(card, anchor, { follow = false } = {}) {
   const seat = () => {
     if (!card.isConnected || !anchor.isConnected) { watch.disconnect(); grow?.disconnect(); return; }
     if (Math.abs(card.getBoundingClientRect().height - last) < 1 && Math.abs(card.scrollHeight - lastContent) < 1) return;
-    placeFloating(card, anchorBox(anchor), anchor);
+    placeFloating(card, anchorBox(anchor));
     last = card.getBoundingClientRect().height;
     lastContent = card.scrollHeight;
   };
@@ -11660,57 +11645,6 @@ function layersMarkTop(left, width) {
   if (!box?.height || box.right <= left || box.left >= left + width) return null;
   return box.top;
 }
-/** Hfix-1A · how far the reading moves so a card taller than the room on either side of its word stands whole beside it:
- * the hold strip's own rule (placeSealStrip), the least move, never so far that the word leaves the glass. The scroller is
- * the page when the word is on one, else the document; a word in a layer that does not scroll with the reading (the sky,
- * a deck, a list of its own) never moves. Returns the move in px (positive: the reading rises), or 0. With `most`, a card
- * no seat can hold whole gets the move that gives it the most room the glass allows (its word at the glass's edge). */
-/** Hfix-1A · whether a word moves with the reading's own scroller (the page when it is on one, else the document): no fixed
- * or sticky layer and no scroller of its own between them. */
-/** The app's own move of the reading (a stage seated whole beside its word, opened layers set whole on the glass) is not
- * his input: the one scroll it makes is marked, so a writing it lands on goes on (writeWord's interrupt passes it). Any
- * other scroll, his own, still ends the writing. */
-const APP_SCROLLS = new Map();
-function moveReading(scroller, by) {
-  if (scroller) scroller.scrollTop += by;
-  else window.scrollTo({ top: window.scrollY + by, behavior: 'instant' });
-  APP_SCROLLS.set(scroller || window, { top: scroller ? scroller.scrollTop : window.scrollY, until: performance.now() + 1000 });
-}
-function appMadeScroll(event) {
-  const target = event.target === document || event.target === document.documentElement ? window : event.target;
-  const made = APP_SCROLLS.get(target);
-  if (!made) return false;
-  APP_SCROLLS.delete(target);
-  return performance.now() <= made.until && Math.abs((target === window ? window.scrollY : target.scrollTop) - made.top) <= 1;
-}
-function readingCarries(anchor) {
-  if (!anchor?.isConnected) return false;
-  const scroller = anchor.closest('#sheet');
-  for (let node = anchor.parentElement; node && node !== (scroller || document.body); node = node.parentElement) {
-    const style = getComputedStyle(node);
-    if (style.position === 'fixed' || style.position === 'sticky') return false;
-    if (/(auto|scroll)/u.test(style.overflowY) && node.scrollHeight > node.clientHeight + 1) return false;
-  }
-  return true;
-}
-function readingMoveFor(anchor, r, tall, ceiling, floor, { most = false } = {}) {
-  if (!readingCarries(anchor)) return 0;
-  const scroller = anchor.closest('#sheet');
-  const room = scroller
-    ? { up: scroller.scrollTop, down: scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop }
-    : { up: window.scrollY, down: document.documentElement.scrollHeight - window.innerHeight - window.scrollY };
-  const moves = [];
-  const rise = Math.ceil(r.bottom + 10 + tall - floor);
-  if (rise > 0 && rise <= room.down && r.top - rise >= ceiling) moves.push(rise);
-  const fall = Math.ceil(ceiling - (r.top - 10 - tall));
-  if (fall > 0 && fall <= room.up && r.bottom + fall <= floor) moves.push(-fall);
-  if (moves.length || !most) return moves.sort((a, b) => Math.abs(a) - Math.abs(b))[0] || 0;
-  const now = Math.max(r.top - 10 - ceiling, floor - (r.bottom + 10));
-  const up = Math.max(0, Math.min(Math.floor(r.top - ceiling), room.down));
-  const down = Math.max(0, Math.min(Math.floor(floor - r.bottom), room.up));
-  const best = [[up, floor - (r.bottom - up + 10)], [-down, r.top + down - 10 - ceiling]].sort((a, b) => b[1] - a[1])[0];
-  return best[1] >= now + 24 ? best[0] : 0;
-}
 /** Hfix-1A · a card shortened to its room ends between two of its rows, never across one (H1: 理's row sliced through
  * its glyph): the deepest row foot inside the room, else the room. */
 function rowCut(card, room) {
@@ -11735,7 +11669,7 @@ function markCardMore(card) {
   if (ground && ground !== 'transparent' && !/[,/]\s*0\)$/u.test(ground)) card.style.setProperty('--mini-more-ground', ground);
   else card.style.removeProperty('--mini-more-ground');
 }
-function placeFloating(card, r, anchor = null) {
+function placeFloating(card, r) {
   const wasDocument = card.dataset.flow === 'document';
   if (wasDocument && !card.classList.contains('is-sentence')) {
     const before = window.scrollY;
@@ -11766,7 +11700,7 @@ function placeFloating(card, r, anchor = null) {
     : Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2));
   const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
     fixedEdge('.kp-grades', 'top') ?? height, layersMarkTop(cardLeft, m.width) ?? height) - 8;
-  let roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
+  const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
   const sentence = card.classList.contains('is-sentence');
   let seatHeight = m.height;
   // Reserve the real sentence view's space before the word popup appears. The inert
@@ -11819,8 +11753,9 @@ function placeFloating(card, r, anchor = null) {
     }
   }
   else {
-    // Hfix-1A · the word card stands whole beside its word first (the sentence's reserve only chooses between the seats
-    // that hold it whole); then the reading moves the least that seats it whole; only then is it cut, between two rows
+    // Hfix-1A · the word card stands whole beside its word where it can (the sentence's reserve only chooses between the
+    // seats that hold it whole); else it is cut, between two rows. The print never moves for it (G3: the second activation
+    // exposes the stage without moving the print)
     const seatWhole = () => {
       if (seatHeight <= roomAbove) return r.top - 10 - seatHeight;
       if (seatHeight <= roomBelow) return r.bottom + 10;
@@ -11832,25 +11767,6 @@ function placeFloating(card, r, anchor = null) {
       return null;
     };
     top = seatWhole();
-    // the reading moves once, by the card's real size: while a face the card uses still loads (the first stage of a page
-    // asks for its kanji parts' glyphs), it measures in fallback metrics (463 px for 420 in Chromium), so it is seated for
-    // now and again once the faces are in
-    const fontsLoading = document.fonts?.status === 'loading';
-    if (top == null && anchor && !sentence && fontsLoading) {
-      document.fonts.ready.then(() => {
-        if (card.isConnected && anchor.isConnected && standingSlip() === card && card.dataset.flow !== 'document') placeFloating(card, anchorBox(anchor), anchor);
-      });
-    }
-    if (top == null && anchor && !sentence && !fontsLoading) {
-      const move = readingMoveFor(anchor, r, m.height, ceiling, floor, { most: true });
-      if (move) {
-        moveReading(anchor.closest('#sheet'), move);
-        r = anchorBox(anchor);
-        roomAbove = r.top - 10 - ceiling;
-        roomBelow = floor - (r.bottom + 10);
-        top = seatWhole();
-      }
-    }
     if (top == null) {
       const fit = rowCut(card, Math.max(roomAbove, roomBelow, 96));
       card.style.maxHeight = `${fit}px`;
@@ -11869,9 +11785,6 @@ function placeFloating(card, r, anchor = null) {
   // CSS rounds fractional positions; retain the exact calculated seat for the sentence pin.
   if (Number.isFinite(top)) card.dataset.floatingTop = String(top);
   else delete card.dataset.floatingTop;
-  // the reading's offset this seat was taken at (keepFloatingBeside carries the card with its word from here)
-  const seatScroller = (anchor || miniAnchor)?.closest?.('#sheet') || null;
-  card._seatOffset = seatScroller ? seatScroller.scrollTop : window.scrollY;
   // which side of its word the card stands on: its shade falls away from the word, never across it
   card.dataset.side = top < r.top ? 'above' : 'below';
   markCardMore(card);
@@ -15313,7 +15226,7 @@ function layersOnGlass(block) {
   const floor = Math.min(innerHeight, edge('#primary-tabs', 'top') ?? innerHeight, edge('.listen-row', 'top') ?? innerHeight) - 8;
   const down = document.documentElement.scrollHeight - innerHeight - window.scrollY;
   const rise = Math.ceil(Math.min(box.bottom - floor, box.top - ceiling, down));
-  if (rise > 0) moveReading(null, rise);
+  if (rise > 0) window.scrollTo({ top: window.scrollY + rise, behavior: 'instant' });
 }
 function openReaderLayers(mark) {
   const paragraph = readerLayerParagraph();
@@ -36574,7 +36487,7 @@ function writeWord(word, { reading = null, after = null, elapsed = 0, onBegin = 
   if (reading) reading.dataset.inkHeld = '';
   const ink = { word, reading, strokes, per, total, anims: [], startedAt: null, ended: null, disposed: false };
   inkOwners.set(word, ink);
-  const interrupt = (event) => { if (event.type !== 'scroll' || !appMadeScroll(event)) ink.end('input', event); };
+  const interrupt = (event) => ink.end('input', event);
   // a tap or the start of a touch scroll (pointerdown), a key, or any scroll (a wheel, a trackpad, a scrollbar). Not a
   // wheel listener: one on the window makes WebKit rebuild its event regions as it is added and taken away (a 25–35 ms
   // frame at each end of the writing, measured), while a scroll listener costs nothing

@@ -2,10 +2,9 @@
  * Hfix-1A · the reader and word surfaces after review round 1 (one-hand/HFIX1/BRIEF-A.md: the lead's confirmed list from
  * the round-1 shots, the Gemini critic's findings and FINDINGS.md). One named row per item, on the staged artifact, in the
  * engine KAIRO_BROWSER names (webkit or chromium; both when unset), at 390×844 unless the row names another size:
- *   1   the stage stands whole beside its word (the reading moves the least that seats it, the word kept on the glass); a
- *       stage no seat can hold ends between two rows, says so with a fade at its foot, and scrolls by touch and keyboard;
- *       the reading's move is the app's own, not his input: the word still writes itself to the end (1.ink), while a
- *       scroll the app did not make ends the writing;
+ *   1   the stage stands whole beside its word where a seat holds it; else it ends between two rows, says so with a fade at
+ *       its foot, and scrolls by touch and keyboard;
+ *       the print never moves for it (G3), and its seat never ends the word's writing (1.ink), while his own scroll does;
  *   2   the open layers lie under no part of the 層 mark (it stands in their corner), whole on the glass; it folds them and
  *       goes home;
  *   3   at part depth the thread rests with no bead half under the sticky 宙, the current bead whole, also after a finger
@@ -74,7 +73,8 @@ const CONTROL = {
     ['corridor.js', 'const fit = rowCut(card, Math.max(roomAbove, roomBelow, 96));', 'const fit = Math.max(roomAbove, roomBelow, 96);'],
   ] },
   'stage-fade': { item: '1.', css: "#mini[data-more='true']::after { content: none !important; }" },
-  'ink-move': { item: '1.ink', source: [['corridor.js', 'function appMadeScroll(event) {', 'function appMadeScroll(event) { return false;']] },
+  // a seat that scrolls the reading (the defect the round-1 capture found: every writing ended before its first stroke)
+  'ink-seat': { item: '1.ink', source: [['corridor.js', '  card.style.top = `${top}px`;\n', "  card.style.top = `${top}px`;\n  if (card.id === 'mini' && !card.dataset.inkSeat) { card.dataset.inkSeat = '1'; window.scrollBy({ top: 40, behavior: 'instant' }); }\n"]] },
   layers: { item: '2.', source: [['corridor.js', 'dockLayersMark(mark, block, null, () => layersOnGlass(block));', 'void layersOnGlass;']] },
   'one-save': { item: '4.', source: [['corridor.js', 'function paintKeepAside(button) {', 'function paintKeepAside(button) { return;']] },
   'speak-bar': { item: '5.', source: [['corridor.js', "  if (S.view === 'reader' && passage()) chrome.append(chromeKeep());",
@@ -189,23 +189,27 @@ const stageFacts = (page) => page.evaluate((sel) => {
 const sliced = (f) => f.rows.filter((r) => r.top < f.seen.bottom - 0.5 && r.bottom > f.seen.bottom + 0.5);
 
 async function itemStage(browser, engine) {
-  // 1 · the stage stands whole, in three worlds: no row past its box, the word on the glass and clear of the card
+  // 1 · in three worlds at 390×844 the stage shows all its rows, or ends between two rows and says it scrolls (a fade at
+  // its foot); never a row sliced mid-glyph. The word stays on the glass, clear of the card, and the print never moves
+  // for it (G3: the second activation exposes the stage without moving the print)
   for (const world of WORLDS) {
     const { context, page, errors } = await session(browser, { world });
     try {
       await openStory(page);
-      const before = await page.evaluate(() => window.scrollY);
+      await page.locator(WORD_SEL).first().scrollIntoViewIfNeeded();
+      await delay(200);
+      const before = await page.evaluate((sel) => ({ y: window.scrollY, word: document.querySelector(sel).getBoundingClientRect().top }), WORD_SEL);
       await stage(page);
       const f = await stageFacts(page);
       const whole = f.scrollHeight <= f.clientHeight + 1 && f.rows.every((r) => r.top >= f.seen.top - 0.5 && r.bottom <= f.seen.bottom + 0.5);
+      const cutClean = f.scrollHeight > f.clientHeight + 1 && !sliced(f).length && f.more === 'true' && !!f.fade;
       const clear = f.word.top >= f.ceiling - 0.5 && f.word.bottom <= f.floor + 0.5 && (f.bottom <= f.word.top - 8 || f.top >= f.word.bottom + 8);
       const framed = f.top >= f.ceiling - 0.5 && f.bottom <= f.floor + 0.5;
-      // the least move: a moved stage's far edge meets its frame (8 px over the tab bar or the 層 mark it spans, or the
-      // frame's foot), or the reading never moved
-      const moved = Math.round(f.scrollY - before);
-      const least = moved === 0 || (moved > 0 ? f.cardFloor - f.bottom >= 6.5 && f.cardFloor - f.bottom <= 10 : f.top - f.ceiling >= -0.5 && f.top - f.ceiling <= 2);
-      check(`1.stage-whole · ${engine} ${world} 390×844`, whole && clear && framed && least && !errors.length,
-        { whole, clear, framed, least, moved, top: Math.round(f.top), bottom: Math.round(f.bottom), scrollHeight: f.scrollHeight, clientHeight: f.clientHeight,
+      const still = Math.abs(f.scrollY - before.y) < 1 && Math.abs(f.word.top - before.word) < 2;
+      check(`1.stage-whole · ${engine} ${world} 390×844 · every row shown, or a clean cut that says it scrolls; the word clear and the print still`,
+        (whole || cutClean) && clear && framed && still && !errors.length,
+        { whole, cutClean, clear, framed, still, moved: Math.round(f.scrollY - before.y), sliced: sliced(f).map((r) => r.row), more: f.more,
+          top: Math.round(f.top), bottom: Math.round(f.bottom), scrollHeight: f.scrollHeight, clientHeight: f.clientHeight,
           word: [Math.round(f.word.top), Math.round(f.word.bottom)], ceiling: f.ceiling, floor: f.floor, errors });
     } finally { await context.close(); }
   }
@@ -748,9 +752,9 @@ async function itemNoteHint(browser, engine) {
 }
 
 async function itemStageInk(browser, engine) {
-  // 1 · its writing: a stage seated whole moves the reading itself (1.stage-whole's least move), and that move is not
-  // his input, so the word still writes itself (筆 at a first meeting) to the end; a scroll the app did not make itself
-  // still ends the writing at once (found by the round-1 capture's screen 06: the move ended every writing)
+  // 1 · its writing: seating the stage (and seating it again as its content settles) never scrolls the reading, so the
+  // word still writes itself (筆 at a first meeting) to the end; a scroll by his hand ends the writing at once (found by the
+  // round-1 capture's screen 06: a seat that moved the reading ended every writing before its first stroke)
   const walk = async (scrollMidway) => {
     const { context, page, errors } = await session(browser, { world: 'hokusai' });
     try {
@@ -779,10 +783,10 @@ async function itemStageInk(browser, engine) {
     } finally { await context.close(); }
   };
   const a = await walk(false);
-  check(`1.ink-moved · ${engine} · the stage moved the reading itself (${a.moved} px) and its word still wrote itself to the end`,
-    a.ceremony === 'write' && a.moved !== 0 && a.log.includes('ink:writing') && a.log.includes('ended:written') && !a.log.includes('ended:input') && !a.errors.length, a);
+  check(`1.ink-seat · ${engine} · the stage seated beside its word (the print still: ${a.moved} px), its word writes itself to the end`,
+    a.ceremony === 'write' && a.moved === 0 && a.log.includes('ink:writing') && a.log.includes('ended:written') && !a.log.includes('ended:input') && !a.errors.length, a);
   const b = await walk(true);
-  check(`1.ink-hand · ${engine} · a scroll the app did not make itself ends the writing at once`,
+  check(`1.ink-hand · ${engine} · a scroll by his hand ends the writing at once`,
     b.ceremony === 'write' && b.log.includes('ink:writing') && b.log.includes('ended:input') && !b.log.includes('ended:written') && !b.errors.length, b);
 }
 
