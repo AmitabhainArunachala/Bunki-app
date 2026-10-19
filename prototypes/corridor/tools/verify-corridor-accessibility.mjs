@@ -556,12 +556,25 @@ async function main() {
     check('pointer action one exposes only the reading', readingOnly.rung === 'reading' && readingOnly.visible > 0 && !readingOnly.stage && !readingOnly.page && !readingOnly.under, JSON.stringify(readingOnly));
     check('the reading reveal keeps its glyph anchor still', Math.abs(await glyphBottom(page, tokenIndex) - anchorBefore) < 2);
     await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
+    // Ladder (John, 10-19, a spec change): pointer action two sets the word's English under it, its reading kept and no stage;
+    // only once that rung is seen does action three open the stage
+    await page.waitForFunction((i) => { const n = document.querySelectorAll('#reader .tok.content')[i];
+      return n?.dataset.ladderRung !== 'reading' || !!document.getElementById('mini'); }, tokenIndex);
+    const englishOnly = await page.locator('#reader .tok.content').nth(tokenIndex).evaluate(node => ({ rung: node.dataset.ladderRung,
+      english: !!node.querySelector(':scope > .tok-en .tok-en-text'), visible: node.querySelectorAll('rt:not(.hidden-rt)').length,
+      stage: !!document.getElementById('mini'), page: !!document.getElementById('sheet'), under: document.querySelectorAll('#reader .tok-en').length }));
+    check('pointer action two sets the English under the word, its reading kept, no stage yet',
+      englishOnly.rung === 'gloss' && englishOnly.english && englishOnly.visible > 0 && !englishOnly.stage && !englishOnly.page && englishOnly.under === 1,
+      JSON.stringify(englishOnly));
+    await touchAt(page, '#reader .tok.content', tokenIndex, 0, false);
     await page.locator('#mini').waitFor();
     const firstPopup = await popupProbe();
     const firstReach = await tapGeometry(page, '#reader .tok.content', tokenIndex);
     check(
-      'pointer action two opens the stage with the reading and meaning, and writes nothing under the word',
-      firstPopup.open && firstPopup.reading && firstPopup.gloss && firstPopup.save === 'Save' && firstPopup.under === 0 && firstPopup.inside,
+      // Ladder (John, 10-19, a spec change): the stage is action three, and "nothing under the word" becomes "only the word's
+      // own English, which action two set" (one row in the whole text)
+      'pointer action three opens the stage with the reading and meaning, and writes nothing under the word but its own English',
+      firstPopup.open && firstPopup.reading && firstPopup.gloss && firstPopup.save === 'Save' && firstPopup.under === 1 && firstPopup.inside,
       JSON.stringify({ firstPopup, taps: tapAttempts.slice(-2) }),
     );
     // the word stays where it is on the screen. (A phone's sticky header grows by the chrome's 覚える door when a
@@ -579,10 +592,11 @@ async function main() {
       popup: Boolean(document.querySelector('#mini')), sheet: Boolean(document.querySelector('#sheet')),
       current: node.classList.contains('tok-current'), gloss: Boolean(node.querySelector('.tok-en')),
     }));
-    // The third action opens the page; Back restores the stage.
+    // The fourth action (Ladder: it was the third) opens the page; Back restores the stage. The word's own English stays held
+    // under it while its page stands (the visit keeps it for the way back to its stage)
     check(
-      'a third action on the same word opens its full entry — the popup gone, no English under the word, the word still the chosen one',
-      secondState.sheet && !secondState.popup && !secondState.gloss && secondState.current,
+      'a fourth action on the same word opens its full entry — the popup gone, the word\'s own English held under it, the word still the chosen one',
+      secondState.sheet && !secondState.popup && secondState.gloss && secondState.current,
       JSON.stringify(secondState),
     );
     await page.locator(await entryCloseSelector(page)).click();
@@ -649,6 +663,14 @@ async function main() {
       await page.keyboard.press('Enter');
       const reading = await keyboardWord.evaluate(node => ({ rung: node.dataset.ladderRung, visible: node.querySelectorAll('rt:not(.hidden-rt)').length, stage: !!document.getElementById('mini'), focused: document.activeElement === node }));
       check('keyboard Enter first reveals reading and keeps the selected occurrence', reading.rung === 'reading' && reading.visible > 0 && !reading.stage && reading.focused, JSON.stringify(reading));
+      // Ladder (John, 10-19, a spec change): the second Enter sets the English under the word, the keyboard staying on it; the
+      // third, taken only once that rung is seen, opens the stage
+      await page.keyboard.press('Enter');
+      await keyboardWord.evaluate((node) => new Promise((done) => { const t0 = performance.now(); const tick = () => (node.dataset.ladderRung !== 'reading' || document.getElementById('mini') || performance.now() - t0 > 5000 ? done() : requestAnimationFrame(tick)); tick(); }));
+      const englishKey = await keyboardWord.evaluate(node => ({ rung: node.dataset.ladderRung, english: !!node.querySelector(':scope > .tok-en .tok-en-text'),
+        stage: !!document.getElementById('mini'), focused: document.activeElement === node }));
+      check('keyboard Enter next sets the English under the word and keeps the selected occurrence',
+        englishKey.rung === 'gloss' && englishKey.english && !englishKey.stage && englishKey.focused, JSON.stringify(englishKey));
       await page.keyboard.press('Enter');
       await page.waitForSelector('#mini');
       // R3 · the stage is read once answered (aria-busy cleared, up to 5 s), as popupProbe reads the pointer's (M-3)
@@ -676,15 +698,26 @@ async function main() {
     await openReader(page, base);
     const particle = page.locator('#reader .tok.particle').first();
     await touchAt(page, '#reader .tok.particle');
-    // R4 (09b5e2a7): a particle uses the same quick-lookup door as every word — a tap opens its
-    // role and 助詞へ; it never opens the sheet and never lights a reading
+    // R4 (09b5e2a7): a particle uses the same quick-lookup door as every word; it never opens the sheet and never lights a
+    // reading. Ladder (John, 10-19, a spec change): like every kana word, its first tap sets its English (its role) under
+    // it, and the next, taken only once that rung is seen, opens its quick look (its role and 助詞へ)
+    await particle.evaluate((node) => new Promise((done) => { const t0 = performance.now(); const tick = () => (node.dataset.ladderRung || document.getElementById('mini') || performance.now() - t0 > 5000 ? done() : requestAnimationFrame(tick)); tick(); }));
+    const particleEnglish = await particle.evaluate((node) => ({ rung: node.dataset.ladderRung ?? null, english: !!node.querySelector(':scope > .tok-en .tok-en-text'),
+      stage: !!document.getElementById('mini'), sheet: !!document.getElementById('sheet'), reveal: node.classList.contains('lit') }));
+    check('particle pointer tap first sets its role in English under it, never the sheet, a reveal or a stage',
+      particleEnglish.rung === 'gloss' && particleEnglish.english && !particleEnglish.stage && !particleEnglish.sheet && !particleEnglish.reveal,
+      JSON.stringify(particleEnglish));
+    if (particleEnglish.rung === 'gloss') {
+      await touchAt(page, '#reader .tok.particle');
+      await page.locator('#mini').waitFor({ timeout: 5000 }).catch(() => {});
+    }
     const particleTap = {
       sheet: await page.locator('#sheet').count(),
       reveal: await particle.evaluate((node) => node.classList.contains('lit')),
       quickLook: await page.locator('#mini [data-action="entry.open"][data-target-kind="particle"]').count(),
     };
     check(
-      'particle pointer tap opens its quick look, never the sheet or a reveal',
+      'particle pointer tap (its second, Ladder) opens its quick look, never the sheet or a reveal',
       particleTap.sheet === 0 && !particleTap.reveal && particleTap.quickLook === 1,
       JSON.stringify(particleTap),
     );
