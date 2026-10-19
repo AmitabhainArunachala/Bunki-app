@@ -4829,7 +4829,7 @@ async function boot() {
 
   try {
     fsrsApi = window.__TSFSRS__ || (await import('./vendor/ts-fsrs.mjs'));
-    srsCore = await import('./srs-core.mjs');
+    srsCore = window.__SRS_CORE__ || (await import('./srs-core.mjs'));
     buildSrsScheduler(pin, true);
   } catch (err) {
     console.warn('FSRS unavailable', err);
@@ -28303,9 +28303,22 @@ function isLeech(item) {
   const rec = S.srs[key];
   return !!rec && (rec.lapses || 0) >= LEECH_LAPSES && !S.suspended[key];
 }
+/** Burying across surfaces (lead's ruling 10-19, srs-core): a saved word: card whose word (lemma and reading) was
+ * answered in a deck or the context deck today rests until tomorrow; kanji:, sentence and question cards are other
+ * skills and never rest, and a card in its learning steps keeps them. answered: srsCore.answeredToday(...). */
+function srsWordRests(item, answered) {
+  if (item.t !== 'word' || !srsCore) return false;
+  return srsCore.buriedHere(answered, item.id, D.dict?.[item.id]?.r ?? null, 'corridor');
+}
+/** after a real grade of a saved word (never practice): the word was answered here today */
+function srsNoteAnswered(item, now) {
+  if (item.t !== 'word' || !srsCore) return false;
+  return srsCore.noteAnswered(globalThis.localStorage, srsCore.wordIdentity(item.id, D.dict?.[item.id]?.r), 'corridor', now);
+}
 function srsDueItems(now = new Date()) {
   const reviews = [];
   const fresh = [];
+  const answered = srsCore ? srsCore.answeredToday(globalThis.localStorage, now) : {};
   // one row per card: a duplicated type:id row (an old import) is one card with one schedule, asked once
   const keys = new Set();
   for (const item of S.taken) {
@@ -28313,6 +28326,7 @@ function srsDueItems(now = new Date()) {
     if (S.suspended[key] || keys.has(key)) continue;
     keys.add(key);
     const rec = S.srs[key];
+    if ((!rec || rec.state === 2) && srsWordRests(item, answered)) continue;
     if (!rec) {
       // no-debt migration (PR70-P1-1): a cardless row joins the queue only
       // when the learner explicitly started it. Legacy and imported rows
@@ -28371,11 +28385,17 @@ function todayQueue(now = new Date(), scope = null) {
   const ahead = [];
   const nowMs = now.getTime();
   const keys = new Set();
+  const answered = srsCore ? srsCore.answeredToday(globalThis.localStorage, now) : {};
+  let buried = 0;
   for (const item of S.taken) {
     const key = srsKey(item.t, item.id);
     if (S.suspended[key] || (inScope && !inScope.has(key)) || keys.has(key)) continue;
     keys.add(key);
     const rec = S.srs[key];
+    if ((!rec || rec.state === 2) && (!rec ? finiteNumber(item.started) : Date.parse(rec.due) <= nowMs) && srsWordRests(item, answered)) {
+      buried += 1;
+      continue;
+    }
     if (!rec) {
       if (finiteNumber(item.started)) fresh.push(item);
       continue;
@@ -28417,7 +28437,7 @@ function todayQueue(now = new Date(), scope = null) {
     learn.push(...ahead);
     order.push(...ahead);
   }
-  return { learn, review, new: fresher, order, held, reviewRoom };
+  return { learn, review, new: fresher, order, held, reviewRoom, buried };
 }
 /** Midnight at the start of a date, in the learner's own calendar. */
 function startOfDay(d) {
@@ -28762,6 +28782,9 @@ function renderReview(main) {
       const turn = paused.canEarly ? paused.at : paused.at - srsCore.LEARN_AHEAD_MS;
       if (turn > Date.now()) reviewPauseTimer = setTimeout(() => { if (S.review === rv && S.view === 'review') render(); }, Math.min(2 ** 31 - 1, turn - Date.now() + 50));
     }
+    // saved words answered in a deck today rest until tomorrow (burying across surfaces), said quietly
+    const buried = S.focus || rv.scope === undefined ? 0 : todayQueue(new Date(), rv.scope).buried;
+    if (buried) main.append(el('p', 'srs-forecast review-buried', srsCore.buriedWords(buried, bi() ? 'en' : 'ja')));
     // the close's tally (concept C): kept, again and the sitting's time, each named in the
     // learner's language, never a bare 再/良 seal (EN purity). A zero-grade close has no cells.
     const sum = el('dl', 'review-summary');
@@ -29291,7 +29314,7 @@ function renderReview(main) {
           });
         return;
       }
-      await commitStandardGrade({
+      const graded = await commitStandardGrade({
           rv,
           item,
           key: effKey,
@@ -29300,6 +29323,8 @@ function renderReview(main) {
           now: pressedNow,
           day,
         });
+      // a saved word answered here today: its cards in the decks rest until tomorrow (burying across surfaces)
+      if (graded) srsNoteAnswered(item, pressedNow);
     });
     row.append(b);
   }

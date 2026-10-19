@@ -17,6 +17,8 @@
 import {
   RATINGS,
   buildQueue,
+  buriedToday,
+  buriedWords,
   cardTokens,
   changeOf,
   closeLines,
@@ -32,6 +34,7 @@ import {
   logLookup,
   nextStep,
   normalizeState,
+  noteAnsweredWord,
   pauseWords,
   preview,
   repairCard,
@@ -124,7 +127,7 @@ const HINT_SITTINGS = 3;
 // the sitting (srs-core's rule): ahead — the learner chose to review learning steps early; early — the card on screen
 // came by that choice; pause — nothing else is left but cards in a learning step ({ count, words, at, canEarly });
 // shown — the card's stored record when it was put on screen (a grade refuses if another window changed it since)
-const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, log: [], started: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null, ahead: false, early: false, pause: null, shown: 'null' };
+const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, log: [], started: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null, ahead: false, early: false, pause: null, shown: 'null', buried: 0 };
 let ctx = null; // { root, deck, deckKey, index, storage, onLeave, openEntry, host, tokenFile, gloss, state, ledgerText, scheduler, prefs, notice }
 let mountRequest = 0;
 let pendingStart = null;
@@ -947,7 +950,7 @@ function titleParts(deck) {
 function homeScreen() {
   const { deck, state, prefs } = ctx;
   const now = new Date();
-  const q = buildQueue(deck, state, now, prefs.newPerDay, { skip: skipFor(prefs.mode) });
+  const q = buildQueue(deck, state, now, prefs.newPerDay, { skip: skipFor(prefs.mode), buried: buriedToday(ctx.storage, deck.id, now) });
   const statuses = deck.words.map((w) => wordStatus(w, state));
   const known = statuses.filter((s) => s.key === 'known').length;
   const hard = statuses.filter((s) => s.key === 'hard').length;
@@ -985,6 +988,8 @@ function homeScreen() {
   const start = btn('kp-start', label, () => startSession(), { id: 'kp-start' });
   start.disabled = !total && !stepping.length;
   box.append(start);
+  // cards whose word was answered on another surface today rest until tomorrow (burying across decks), said quietly
+  if (q.buried) box.append(el('p', 'kp-sub kp-buried', buriedWords(q.buried, ctx.english === false ? 'ja' : 'en')));
 
   const foot = el('div', 'kp-foot');
   foot.append(btn('kp-link', t("語の一覧"), () => go('list'), { id: 'kp-to-list' }), btn('kp-link', t("設定"), () => go('settings'), { id: 'kp-to-settings' }));
@@ -1071,7 +1076,7 @@ function frameFront() {
 }
 
 function startSession() {
-  const q = buildQueue(ctx.deck, ctx.state, new Date(), ctx.prefs.newPerDay, { skip: skipFor(ctx.prefs.mode) });
+  const q = buildQueue(ctx.deck, ctx.state, new Date(), ctx.prefs.newPerDay, { skip: skipFor(ctx.prefs.mode), buried: buriedToday(ctx.storage, ctx.deck.id, new Date()) });
   // one more sitting of this deck: the tap and swipe hints count these (HINT_SITTINGS). Not stored
   // (storage full) only means they show a little longer.
   const prefs = { ...ctx.prefs, sittings: (Number(ctx.prefs.sittings) || 0) + 1 };
@@ -1086,6 +1091,7 @@ function startSession() {
   ui.undo = null;
   ui.rail = 0;
   ui.ahead = false;
+  ui.buried = q.buried;
   settle();
   resetCard();
   wantTokens();
@@ -1113,10 +1119,17 @@ function learningCards(now) {
 function settle() {
   const now = new Date();
   const waiting = [];
+  // a word answered on another surface since the sitting began rests too (its 字 cards and learning steps stay)
+  const rests = buriedToday(ctx.storage, ctx.deck.id, now);
   for (const id of ui.queue.slice(ui.pos)) {
     if (waiting.includes(id) || isSuspended(ctx.state, id) || !ctx.index.cards.has(id)) continue;
     const s = ctx.state.cards[id];
     if (!servable(s, now) || (s && s.state !== 2 && s.state !== 0)) continue;
+    const { card, word } = ctx.index.cards.get(id);
+    if (card.type !== 'kanji' && rests(word)) {
+      ui.buried++;
+      continue;
+    }
     waiting.push(id);
   }
   const queued = new Set(waiting);
@@ -2841,6 +2854,9 @@ function commit(rating, { stay = false } = {}) {
     return;
   }
   askToKeepStorage();
+  // the word was answered here today: its cards on the other surfaces rest until tomorrow
+  const indexed = ctx.index.cards.get(id);
+  noteAnsweredWord(ctx.storage, ctx.deck.id, indexed?.word, indexed?.card, now);
   if (cardMode() !== 'choice') retireRule();
   ui.toast = '';
   ui.undo = { change: changeOf(r.before, r.state), sitting };
@@ -3096,6 +3112,7 @@ function doneScreen() {
     const soon = learningSoon(ctx.deck, ctx.state, now, DAY, { skip: skipFor(ctx.prefs.mode) })[0];
     box.append(el('p', 'kp-sub', soon ? t(`次の復習は ${fmtWait(Math.max(0, soon.t - Date.now()))}後。`, `Next review in ${fmtWait(Math.max(0, soon.t - Date.now()))}.`) : t("今日の分は終わり。また明日。")));
   }
+  if (ui.buried) box.append(el('p', 'kp-sub kp-buried', buriedWords(ui.buried, lang)));
   // one door forward: the host's reading for today, the words just met waiting in it
   const door = ctx.focusRoom ? safely(() => ctx.next?.() || null, null) : null;
   if (door) {
@@ -3456,6 +3473,6 @@ export async function summary(deckId, storage = window.localStorage) {
   const { deck } = await loadDeck(deckId);
   const { state } = loadState(storage, deck);
   const prefs = prefsFor(storage, deck);
-  const q = buildQueue(deck, state, new Date(), prefs.newPerDay, { skip: skipFor(prefs.mode) });
+  const q = buildQueue(deck, state, new Date(), prefs.newPerDay, { skip: skipFor(prefs.mode), buried: buriedToday(storage, deck.id, new Date()) });
   return { due: q.due.length, fresh: q.fresh.length, total: q.queue.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
 }

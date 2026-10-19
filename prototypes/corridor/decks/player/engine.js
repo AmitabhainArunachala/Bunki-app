@@ -32,6 +32,19 @@ export const sittingTally = srsCore.sittingTally;
 export const closeLines = srsCore.closeLines;
 export const pauseWords = srsCore.pauseWords;
 export const LEARN_AHEAD_MS = srsCore.LEARN_AHEAD_MS;
+export const buriedWords = srsCore.buriedWords;
+/** this deck's burying across surfaces for today: (word) => true when the word (lemma and reading) was answered on
+ * another surface today; the 字 cards are never buried (buildQueue) */
+export function buriedToday(storage, deckId, now) {
+  const answered = srsCore.answeredToday(storage, now);
+  const where = `deck:${deckId}`;
+  return (word) => srsCore.buriedHere(answered, word.term, word.reading, where);
+}
+/** after a real answer of a word card (never a 字 card): the word was answered in this deck today */
+export function noteAnsweredWord(storage, deckId, word, card, now) {
+  if (card?.type === 'kanji' || !word) return false;
+  return srsCore.noteAnswered(storage, srsCore.wordIdentity(word.term, word.reading), `deck:${deckId}`, now);
+}
 
 export function dayKey(date) {
   const y = date.getFullYear();
@@ -407,10 +420,12 @@ export function introducedToday(state, now, deck) {
  * sibling waits for tomorrow), then new sentences up to the daily cap, at
  * most one per word per day. Suspended cards are never in it; a passage the
  * repair ladder swapped in is due from the moment of the swap; a card the
- * answer mode skips (skip: skipFor(mode)) is neither due nor new. Opening a
- * queue writes nothing.
+ * answer mode skips (skip: skipFor(mode)) is neither due nor new. A word answered on another surface
+ * today (buried(word), srs-core's burying across surfaces) waits until tomorrow: its due review and
+ * new cards are left out and counted (buried); its 字 cards are another skill and stay, and a card in
+ * its own learning steps keeps them. Opening a queue writes nothing.
  */
-export function buildQueue(deck, state, now, newPerDay, { skip = null } = {}) {
+export function buildQueue(deck, state, now, newPerDay, { skip = null, buried = null } = {}) {
   const off = new Set(state.groupsOff);
   const due = [];
   const fresh = [];
@@ -418,8 +433,12 @@ export function buildQueue(deck, state, now, newPerDay, { skip = null } = {}) {
   const swapped = swapDue(state);
   const endOfDay = new Date(now);
   endOfDay.setHours(23, 59, 59, 999);
+  const resting = new Set();
+  let buriedCount = 0;
   for (const word of deck.words) {
     if (off.has(word.group)) continue;
+    const rests = !!buried?.(word);
+    if (rests) resting.add(word.id);
     for (const card of word.cards) {
       if (isSuspended(state, card.id) || skip?.(card)) continue;
       const stored = state.cards[card.id];
@@ -430,7 +449,12 @@ export function buildQueue(deck, state, now, newPerDay, { skip = null } = {}) {
       if (stored.introducedAt && dayKey(new Date(stored.introducedAt)) === dayKey(now)) busyWords.add(word.id);
       const learning = stored.state !== REVIEW;
       const dueAt = new Date(stored.due).getTime();
-      if (dueAt <= (learning ? now.getTime() : endOfDay.getTime())) due.push({ card, word, dueAt });
+      if (dueAt > (learning ? now.getTime() : endOfDay.getTime())) continue;
+      if (rests && !learning && card.type !== 'kanji') {
+        buriedCount++;
+        continue;
+      }
+      due.push({ card, word, dueAt });
     }
   }
   due.sort((a, b) => a.dueAt - b.dueAt);
@@ -446,12 +470,16 @@ export function buildQueue(deck, state, now, newPerDay, { skip = null } = {}) {
     if (!room) break;
     if (off.has(word.group) || seen.has(word.id) || busyWords.has(word.id)) continue;
     const card = nextNewCard(word, state, deck.unlockDays, skip);
+    if (card && resting.has(word.id) && card.type !== 'kanji') {
+      buriedCount++;
+      continue;
+    }
     if (card) {
       fresh.push(card.id);
       room--;
     }
   }
-  return { due: dueOut, fresh, queue: [...dueOut, ...fresh] };
+  return { due: dueOut, fresh, queue: [...dueOut, ...fresh], buried: buriedCount };
 }
 
 /** learning steps due inside the sitting (minutes away), soonest first; skip as in buildQueue */

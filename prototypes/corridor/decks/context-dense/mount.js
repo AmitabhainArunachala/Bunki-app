@@ -7,7 +7,7 @@
  * The page follows the backs of Core / Yomitan cards (the whole reading in
  * furigana), an MCD front (one gap in the sentence), and the corridor seals.
  */
-import { basicTsv, closeLines, counts, createScheduler, emptyState, grade, LEARN_AHEAD_MS, nextStep, normalizeState, paragraphOf, pauseWords, preview, servable, sittingTally, studyQueue, validateDeck, waitWords, RATINGS, codePoints } from './engine.js';
+import { basicTsv, buriedToday, buriedWords, closeLines, counts, createScheduler, emptyState, grade, LEARN_AHEAD_MS, nextStep, normalizeState, noteAnsweredCard, paragraphOf, pauseWords, preview, servable, sittingTally, studyQueue, validateDeck, waitWords, RATINGS, codePoints } from './engine.js';
 
 const deck = await fetch(new URL('./deck.json', import.meta.url)).then((response) => {
   if (!response.ok) throw new Error('context deck could not be read');
@@ -56,6 +56,8 @@ const ui = {
   early: false,
   pause: null,
   shown: 'null',
+  buried: 0,
+  storage: null,
 };
 let pauseTimer = null;
 let paintedTurn = null;
@@ -89,8 +91,14 @@ const isStep = (stored) => !!stored && (stored.state === 1 || stored.state === 3
  */
 function settle(state, now = new Date()) {
   const waiting = [];
+  // a word answered on another surface today rests until tomorrow (a card in its learning steps keeps them)
+  const rests = ui.storage ? buriedToday(ui.storage, now) : () => false;
   for (const card of ui.queue.slice(ui.index)) {
     if (waiting.includes(card) || isStep(state.cards[card.id]) || !servable(state.cards[card.id], now)) continue;
+    if (rests(card)) {
+      ui.buried += 1;
+      continue;
+    }
     waiting.push(card);
   }
   const queued = new Set(waiting.map((card) => card.id));
@@ -289,6 +297,8 @@ function commit(host, opts, state, rating) {
     return;
   }
   ui.log.push({ word: card.id, before: stored?.state ?? null, rating, early: ui.early });
+  // the word was answered here today: its cards on the other surfaces rest until tomorrow
+  noteAnsweredCard(opts.storage, card, now);
   ui.index += 1;
   settle(next, now);
   paint(host, opts, next);
@@ -389,6 +399,8 @@ function paintHome(room, opts, state, look) {
     ui.log = [];
     ui.started = Date.now();
     ui.ahead = false;
+    ui.buried = 0;
+    ui.storage = opts.storage;
     settle(fresh);
     paint(opts.host, opts, fresh);
   });
@@ -500,6 +512,7 @@ function paintDone(room, opts) {
   const lang = english ? 'en' : 'ja';
   // what the sitting did, every number counted from its own answers (srs-core closeLines)
   if (ui.log.length) for (const line of closeLines(sittingTally(ui.log, { startedAt: ui.started || null, now }), lang)) room.append(h('p', 'cd-lead cd-said', line));
+  if (ui.buried) room.append(h('p', 'cd-lead cd-buried', buriedWords(ui.buried, lang)));
   const actions = h('div', 'cd-actions');
   if (ui.pause) {
     // cards still in a learning step: they come back when due; the learner may review them now, early, within the limit

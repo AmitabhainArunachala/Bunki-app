@@ -10,7 +10,9 @@
  *      LEARN_AHEAD_MS early, or let them wait (nextStep); and the gate that refuses to grade a card
  *      that is not due now (servable);
  *   4. the close: what a sitting did, counted from its own answers (sittingTally, closeLines,
- *      pauseWords).
+ *      pauseWords);
+ *   5. burying across surfaces: once a word is answered on one surface today, its cards on the
+ *      others wait until tomorrow (answeredToday, buriedHere, noteAnswered).
  *
  * Each surface keeps its own ledger (no learner record moves); every one of them asks this module.
  */
@@ -218,4 +220,65 @@ export function pauseWords(pause, lang = 'en', now = new Date()) {
     line: canEarly ? `${head}: review ${count === 1 ? 'it' : 'them'} now${due ? '' : ', early'}, or ${count === 1 ? 'it' : 'they'} will wait for you.` : `${head}; ${count === 1 ? 'it' : 'they'} will wait for you.`,
     now: canEarly ? (due ? 'Review now' : 'Review now, early') : null,
   };
+}
+
+/* ---------------------------------------------------------------- burying across surfaces
+ * Lead's ruling 10-19: once a word (its lemma and reading) is answered on any surface today (the
+ * learner's local day), its cards on the OTHER surfaces — the other decks, the context deck, the
+ * saved word: card — wait until tomorrow. A kanji card (a 字 card, a kanji: card) is another skill:
+ * it neither buries nor is buried. A card already in its own learning steps keeps its steps. No
+ * schedule is merged and no record moves: the day's answered words are one small key every surface
+ * reads, and writes after a real answer (practice never writes it). */
+export const ANSWERED_KEY = 'bunki-srs:answered-today';
+
+const toHiragana = (text) => String(text || '').replace(/[\u30a1-\u30f6]/gu, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+/** a word's identity on every surface: its lemma and its reading in hiragana ('検証|けんしょう') */
+export function wordIdentity(term, reading) {
+  return `${term}|${toHiragana(reading || term)}`;
+}
+
+/** the learner's day, local midnight to midnight */
+export function dayOf(now) {
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
+/** today's answered words, { [identity]: [where, ...] } (empty on a new day, or without storage) */
+export function answeredToday(storage, now) {
+  try {
+    const raw = JSON.parse(storage?.getItem(ANSWERED_KEY) || 'null');
+    if (raw && raw.day === dayOf(now) && raw.words && typeof raw.words === 'object' && !Array.isArray(raw.words)) return raw.words;
+  } catch {
+    /* unreadable: nothing is buried */
+  }
+  return {};
+}
+
+/** is this word buried here today: answered on a surface other than `where`? A side that does not
+ * know the reading (reading null) matches the lemma's every reading. */
+export function buriedHere(answered, term, reading, where) {
+  const others = (list) => Array.isArray(list) && list.some((w) => w !== where);
+  if (reading != null && reading !== '') return others(answered[wordIdentity(term, reading)]);
+  return Object.entries(answered).some(([id, list]) => id.startsWith(`${term}|`) && others(list));
+}
+
+/** after a real answer: this word was answered here today. False when storage refuses (nothing else changes). */
+export function noteAnswered(storage, identity, where, now) {
+  if (!storage) return false;
+  try {
+    const words = { ...answeredToday(storage, now) };
+    const list = Array.isArray(words[identity]) ? words[identity] : [];
+    if (list.includes(where)) return true;
+    words[identity] = [...list, where];
+    storage.setItem(ANSWERED_KEY, JSON.stringify({ day: dayOf(now), words }));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** the close's quiet line for cards that waited because their word was answered elsewhere today */
+export function buriedWords(count, lang = 'en') {
+  if (!count) return '';
+  if (lang === 'ja') return `今日ほかで答えた語の札 ${count} 枚は、明日まで待ちます。`;
+  return `${count === 1 ? '1 card for a word you already answered today waits' : `${count} cards for words you already answered today wait`} until tomorrow.`;
 }

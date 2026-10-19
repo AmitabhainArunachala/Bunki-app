@@ -297,7 +297,16 @@ export function createScheduler(fsrsApi, pin, learner = null) {
   return srsCore.createScheduler(fsrsApi, pin, learner);
 }
 /** the sitting rule, the due gate and the close, from the same owner */
-export const { nextStep, servable, sittingTally, closeLines, pauseWords, waitWords, LEARN_AHEAD_MS } = srsCore;
+export const { nextStep, servable, sittingTally, closeLines, pauseWords, waitWords, LEARN_AHEAD_MS, buriedWords } = srsCore;
+/** burying across surfaces for today: (card) => true when its word (target and reading) was answered elsewhere today */
+export function buriedToday(storage, now) {
+  const answered = srsCore.answeredToday(storage, now);
+  return (card) => srsCore.buriedHere(answered, card.target, card.reading, 'context');
+}
+/** after a real answer: the word was answered in the context deck today */
+export function noteAnsweredCard(storage, card, now) {
+  return srsCore.noteAnswered(storage, srsCore.wordIdentity(card.target, card.reading), 'context', now);
+}
 
 function reviveCard(stored, TypeConvert) {
   return TypeConvert.card({

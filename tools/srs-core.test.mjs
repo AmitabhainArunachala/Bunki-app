@@ -124,3 +124,36 @@ describe('the close counts the sitting', () => {
     expect(core.pauseWords({ count: 1, at: at(25 * MIN).getTime(), canEarly: false }, 'en', T).now).toBe(null);
   });
 });
+
+describe('burying across surfaces (lead\'s ruling 10-19)', () => {
+  const memory = () => {
+    const map = new Map();
+    return { getItem: (k) => map.get(k) ?? null, setItem: (k, v) => map.set(k, v) };
+  };
+  it('a word answered on one surface rests on the others today, never on its own, and not tomorrow', () => {
+    const storage = memory();
+    core.noteAnswered(storage, core.wordIdentity('検証', 'ケンショウ'), 'deck:senmon', T);
+    const today = core.answeredToday(storage, T);
+    expect(core.buriedHere(today, '検証', 'けんしょう', 'deck:kotoba-mine')).toBe(true);
+    expect(core.buriedHere(today, '検証', 'けんしょう', 'deck:senmon')).toBe(false);
+    expect(core.buriedHere(today, '検証', 'けんせい', 'corridor')).toBe(false);
+    expect(core.buriedHere(today, '検証', null, 'corridor')).toBe(true);
+    expect(core.buriedHere(core.answeredToday(storage, at(DAYS(1))), '検証', 'けんしょう', 'context')).toBe(false);
+    expect(core.buriedWords(3)).toBe('3 cards for words you already answered today wait until tomorrow.');
+    expect(core.noteAnswered(null, 'x|x', 'context', T)).toBe(false);
+  });
+  it('the deck queue leaves a buried word\'s review and new cards out, keeps its 字 card and its learning steps', async () => {
+    const player = await import('../prototypes/corridor/decks/player/engine.js');
+    const deck = { id: 'd', groups: [{ id: 'g' }], words: [
+      { id: 'w1', group: 'g', term: '検証', reading: 'けんしょう', cards: [{ id: 'w1-1', lv: 1 }, { id: 'w1-k', lv: 1, type: 'kanji' }] },
+      { id: 'w2', group: 'g', term: '実装', reading: 'じっそう', cards: [{ id: 'w2-1', lv: 1 }] },
+      { id: 'w3', group: 'g', term: '量産', reading: 'りょうさん', cards: [{ id: 'w3-1', lv: 1 }] },
+    ] };
+    const rec = (state, dueMs) => ({ due: new Date(T.getTime() + dueMs).toISOString(), state, stability: 5, difficulty: 5, reps: 2, lapses: 0, introducedAt: at(-DAYS(9)).toISOString() });
+    const state = { ...player.emptyState('d'), cards: { 'w1-1': rec(2, -MIN), 'w1-k': rec(2, -2 * MIN), 'w2-1': rec(1, -MIN) } };
+    // all three words were answered elsewhere today
+    const q = player.buildQueue(deck, state, T, 5, { buried: () => true });
+    expect(q.queue).toEqual(['w1-k', 'w2-1']);
+    expect(q.buried).toBe(2);
+  });
+});

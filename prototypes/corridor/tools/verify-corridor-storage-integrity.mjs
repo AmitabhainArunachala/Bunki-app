@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import ts from 'typescript';
 import * as fsrs from '../vendor/ts-fsrs.mjs';
+import * as srsCore from '../srs-core.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 
 const corridorPath = fileURLToPath(new URL('../corridor.js', import.meta.url));
@@ -1219,7 +1220,7 @@ await verifiedAsync('actual-scheduler-initialization-preserves-pin-and-gates-per
   for (const fitted of [undefined, tuned, { w: PIN.w.slice(0, 20) }]) {
     const notes = [];
     const context = vm.createContext({ fsrsApi: null, scheduler: null, srsParams: null, srsCustom: null,
-      window: { __TSFSRS__: fsrs }, pin: clone(PIN), S: { srsPrefs: fitted === undefined ? {} : { fsrs: clone(fitted) } },
+      window: { __TSFSRS__: fsrs, __SRS_CORE__: srsCore }, pin: clone(PIN), S: { srsPrefs: fitted === undefined ? {} : { fsrs: clone(fitted) } },
       srsParamsProblem: storeApi.srsParamsProblem, noteIgnoredSrsParams: (reason) => notes.push(reason),
       D: { pin: clone(PIN) },
     });
