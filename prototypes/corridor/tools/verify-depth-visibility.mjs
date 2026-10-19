@@ -12,7 +12,11 @@
  * open slip covers it, that frame is geometry only; the native Escape then uncovers the same ring,
  * and the word's native first input shows its reading again beside it; a real pointer hover on the saved word, with that
  * reading still open, then puts its own hairline mark under the ring. That mark is a box shadow, not a glyph: the bare frame removes it with the
- * text, so a dot painted on it counts as ink. A raster batch is taken only
+ * text, so a dot painted on it counts as ink. On the 日本 title, after its own walk, the story opened again through its
+ * native door and 大賞's native first input show 大賞's reading on the phone's next line; a real pointer hover, then the
+ * title's own roving Home key, make the saved 日本 active without activating it: its lowered ring must clear that reading
+ * too, and the reading, record, title and scroll stay as they were.
+ * A raster batch is taken only
  * on the settled reader (no room transition); its shots may differ only within dots, or it is retaken.
  * Identity is read from what the app opened and showed, not from the selectors the verifier chose.
  * --title-rings runs only those ring cases: 2 engines x 11 worlds x phone (21px) and desktop
@@ -40,7 +44,7 @@ const STORY = 'kantei:jp-105-actions-202609-25startup';
 const CONTEXT_STORY = 'aozora:000772-1';
 // nextLineOn: the engine/size layouts where the natural title sets the tapped word's reading on the line below the ring.
 const LIVE = [{ name: 'live-daisho', id: STORY, query: 'スタートアップ大賞', word: '大賞' }, { name: 'live-watashi', id: CONTEXT_STORY, query: '私の個人主義', word: '私' },
-  { name: 'live-daisho-saved-nihon', id: STORY, query: 'スタートアップ大賞', word: '大賞', reading: 'たいしょう', prior: '日本', nextLineOn: ['webkit/phone'] },
+  { name: 'live-daisho-saved-nihon', id: STORY, query: 'スタートアップ大賞', word: '大賞', reading: 'たいしょう', prior: '日本', nextLineOn: ['webkit/phone'], besideReading: true },
   { name: 'live-daijin-saved-meguru', id: 'wikinews:27998', archiveYear: '2015', query: '巡る', word: '大臣', reading: 'だいじん', prior: '巡る', nextLineOn: ['webkit/desktop', 'chromium/desktop'], uncover: true }];
 // Phone or desktop leading follows the page's own (max-width: 520px) match, never a rounded innerWidth.
 const titleLeading = (fontPx, phone) => fontPx * 1.45 + (phone ? 20 : 31);
@@ -49,9 +53,11 @@ const defaultSize = (engine) => (engine === 'webkit' ? 'phone' : 'desktop');
 const RING_LIVE = LIVE.filter((l) => l.prior);
 const RING_ENGINES = ['webkit', 'chromium'];
 const RING_SIZES = ['phone', 'desktop'];
-const ringFrames = (spec) => [['before', true], ['reading', true], ['stage-open', false], ['stage-met', !spec.uncover], ...(spec.uncover ? [['stage-met-uncovered', true], ['stage-met-restored', true], ['active-saved', true]] : [])];
+const ringFrames = (spec) => [['before', true], ['reading', true], ['stage-open', false], ['stage-met', !spec.uncover],
+  ...(spec.uncover ? [['stage-met-uncovered', true], ['stage-met-restored', true], ['active-saved', true]] : []), ...(spec.besideReading ? [['active-hover', true], ['active-key', true]] : [])];
 const ringRows = (spec) => [`world.${spec.name}`, `${spec.name}.device`, ...['fresh', 'reading-beside-ring', 'reading-without-encounter', 'prior-state-intact', 'stage-commits-met', 'first-tap-base-glyphs', 'second-tap-base-glyphs',
   'fresh-to-state-base-glyphs', 'title-rhythm-through-inputs', 'source-visible-and-owned', 'scroll-unchanged', 'slip-seated', 'title-leading-breakpoint',
+  ...(spec.besideReading ? ['active-hover-input', 'active-key-input'] : []),
   ...(spec.uncover ? ['uncovered-record-identical', 'uncovered-title-stable', 'restored-reading', 'restored-record-identical', 'active-saved-input'] : [])].map((id) => `${spec.name}.${id}`),
   ...ringFrames(spec).flatMap(([frame, raster]) => ['fragment-alignment', 'no-other-glyph-overlap', ...(raster ? ['scene-settled', 'ring-clear-of-ink', 'saved-occurrence', 'active-mark'] : [])].map((id) => `${spec.name}-${frame}.${id}`))];
 const ringCaseId = (engine, world, size) => `${engine}/${world}/${size}`;
@@ -1070,29 +1076,101 @@ async function ringDevice(page, out, spec) {
   const inputProof = device.touch ? touches >= 2 && mice === 0 : mice >= 2 && touches === 0;
   row(out, `${spec.name}.device`, actual.width === device.viewport.width && actual.height === device.viewport.height && actual.fontSize === device.titleFont && inputProof,
     { size: out.size, input: out.touch ? 'tap' : 'click', expected: device, actual, trustedOnWord: { touches, mice } });
-  // The page's own stylesheets, title classes and root attributes in frames 520, 520.5 and 521 CSS px wide: each frame's
-  // leading follows its own (max-width: 520px) match. Both engines lay a 520.5 px frame out at a whole 521 px viewport, so the
-  // fractional frame is recorded as observed; the complement query leaves no width with neither leading.
-  const breakpoint = await page.evaluate(async (widths) => {
+  // The page's own stylesheets, title classes and root attributes in frames 520, 520.5 and 521 CSS px wide and a 520.5 px frame
+  // zoomed 2x: each frame's leading follows its own (max-width: 520px) match. Plain frames snap to whole pixels in both engines.
+  // Chromium carries the zoom into the frame and lays it out 520.5 px wide, where neither (max-width: 520px) nor the retired
+  // (min-width: 521px) holds: there the title must take the complement's desktop leading, so that query cannot come back unseen.
+  // WebKit keeps the zoomed frame's own width whole; its observation is recorded, not claimed.
+  const breakpoint = await page.evaluate(async (specs) => {
     const attrs = (el) => [...el.attributes].map((a) => `${a.name}="${a.value.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`).join(' ');
     const h = document.querySelector('.reader-card > h1.view-title'), card = h.closest('.reader-card'), sheets = [...document.querySelectorAll('link[rel="stylesheet"]')].map((l) => l.href);
     const live = { phone: matchMedia('(max-width: 520px)').matches, fontSize: getComputedStyle(h).fontSize, lineHeight: getComputedStyle(h).lineHeight, paddingBottom: getComputedStyle(h).paddingBottom }, frames = [];
-    for (const width of widths) {
+    for (const { width, zoom = 1 } of specs) {
       const frame = document.createElement('iframe');
-      frame.style.cssText = `position:fixed;left:-20000px;top:0;width:${width}px;height:300px;border:0;visibility:hidden`;
+      frame.style.cssText = `position:fixed;left:-20000px;top:0;width:${width}px;height:300px;border:0;visibility:hidden${zoom === 1 ? '' : `;zoom:${zoom}`}`;
       frame.srcdoc = `<!doctype html><html ${attrs(document.documentElement)}><head>${sheets.map((href) => `<link rel="stylesheet" href="${href}">`).join('')}</head><body ${attrs(document.body)}><div id="app"><main><div class="${card.className}"><h1 class="${h.className}">日本</h1></div></main></div></body></html>`;
       const loaded = new Promise((done) => frame.addEventListener('load', done, { once: true }));
       document.documentElement.append(frame); await loaded;
-      const w = frame.contentWindow, t = w.document.querySelector('h1'), st = w.getComputedStyle(t);
-      frames.push({ width, viewportWidth: w.document.documentElement.getBoundingClientRect().width, innerWidth: w.innerWidth, phone: w.matchMedia('(max-width: 520px)').matches, sheets: w.document.styleSheets.length, fontSize: st.fontSize, lineHeight: st.lineHeight, paddingBottom: st.paddingBottom });
+      const w = frame.contentWindow, t = w.document.querySelector('h1'), st = w.getComputedStyle(t), mm = (q) => w.matchMedia(q).matches;
+      frames.push({ width, zoom, viewportWidth: w.document.documentElement.getBoundingClientRect().width, innerWidth: w.innerWidth, phone: mm('(max-width: 520px)'), retiredDesktop: mm('(min-width: 521px)'),
+        sheets: w.document.styleSheets.length, fontSize: st.fontSize, lineHeight: st.lineHeight, paddingBottom: st.paddingBottom });
       frame.remove();
     }
     return { live, frames, sheets: sheets.length };
-  }, [520, 520.5, 521]);
+  }, [{ width: 520 }, { width: 520.5 }, { width: 521 }, { width: 520.5, zoom: 2 }]);
   const leads = (f) => Number.parseFloat(f.paddingBottom) === 8 && Math.abs(Number.parseFloat(f.lineHeight) - titleLeading(Number.parseFloat(f.fontSize), f.phone)) < 0.01;
-  const [at520, fractional, at521] = breakpoint.frames;
+  const [at520, fractional, at521, zoomed] = breakpoint.frames;
+  breakpoint.fractionalWitness = { engine: out.engine, gap: !zoomed.phone && !zoomed.retiredDesktop, viewportWidth: zoomed.viewportWidth, fractional: !Number.isInteger(zoomed.viewportWidth),
+    required: out.engine === 'chromium', note: out.engine === 'chromium' ? 'Chromium lays the zoomed frame out at a fractional width' : 'WebKit keeps the zoomed frame whole; recorded as observed' };
   row(out, `${spec.name}.title-leading-breakpoint`, leads(breakpoint.live) && breakpoint.live.phone === device.touch && breakpoint.frames.every((f) => leads(f) && f.sheets === breakpoint.sheets) && breakpoint.sheets > 0 &&
-    at520.phone && !at521.phone && fractional.phone === (fractional.innerWidth <= 520), breakpoint);
+    at520.phone && !at521.phone && fractional.phone === (fractional.innerWidth <= 520) && (out.engine !== 'chromium' || (breakpoint.fractionalWitness.gap && breakpoint.fractionalWitness.fractional)), breakpoint);
+}
+/** After the fixture's own walk the same learner opens the story again through its native door, and the lower word's native
+ * first input shows its reading (on the phone, on the line below the saved ring). A real pointer hover (a narrow window's mouse),
+ * then, with the pointer parked on the card's corner, the title's own roving Home key (focus-visible, no activation) each make the
+ * saved word active: neither folds or moves that reading or writes the record, and its ring, lowered below its own mark, must still
+ * clear the reading's boxes and ink and every other card box. A touch on the saved word is not this case: it moves the reading. */
+async function besideReadingWalk(page, out, { name, id, query, word, reading, prior, archiveYear, nextLineOn = [] }) {
+  await story(page, id, query, archiveYear);
+  await page.waitForFunction((word) => document.querySelector(`.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"][data-depth="met"][data-kept]`), prior);
+  await page.locator('.reader-card').evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' })); await delay(250);
+  const nextLineRequired = nextLineOn.includes(`${out.engine}/${out.size}`);
+  const selector = `.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${word}"]`, target = page.locator(selector).first();
+  const priorSelector = `.reader-card > h1.view-title .japanese-lookup-word[data-lookup-text="${prior}"]`, priorTarget = page.locator(priorSelector).first();
+  const sample = (label) => page.evaluate(({ selector, label }) => {
+    const el = document.querySelector(selector), h1 = el.closest('h1.view-title'), heading = getComputedStyle(h1), base = [];
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let text;
+    while ((text = walker.nextNode())) {
+      if (text.parentElement.closest('rt, rp')) continue;
+      for (let i = 0; i < text.length; i++) { if (!text.textContent[i].trim()) continue; const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1);
+        for (const b of range.getClientRects()) if (b.width && b.height) base.push({ char: text.textContent[i], left: b.left, top: b.top, right: b.right, bottom: b.bottom }); }
+    }
+    const mini = document.getElementById('mini'), m = mini?.getBoundingClientRect(), ms = mini && getComputedStyle(mini);
+    return { label, scrollX, scrollY, base, rung: el.dataset.ladderRung || null, depth: el.dataset.depth || null,
+      reading: [...el.querySelectorAll('rt')].filter((rt) => { const s = getComputedStyle(rt); return !rt.classList.contains('hidden-rt') && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0'; }).map((rt) => rt.textContent).join(''),
+      title: { height: h1.getBoundingClientRect().height, lineHeight: heading.lineHeight, paddingBottom: heading.paddingBottom, fontSize: heading.fontSize },
+      mini: m && m.width > 0 && m.height > 0 && ms.display !== 'none' && ms.visibility !== 'hidden' ? { x: m.x, y: m.y, width: m.width, height: m.height } : null };
+  }, { selector, label });
+  const baseShift = (a, b) => (a.base.length && a.base.length === b.base.length && a.base.every((g, i) => g.char === b.base[i].char)
+    ? Math.max(...a.base.flatMap((g, i) => ['left', 'top', 'right', 'bottom'].map((k) => Math.abs(g[k] - b.base[i][k])))) : Infinity);
+  const activeState = () => page.evaluate(({ priorSelector, selector }) => {
+    const p = document.querySelector(priorSelector), t = document.querySelector(selector), a = document.activeElement, block = p.closest('[data-prose-roving]');
+    return { prior: { hover: p.matches(':hover'), focusVisible: p.matches(':focus-visible'), focused: a === p, depth: p.dataset.depth || null, kept: p.dataset.kept != null },
+      target: { hover: t.matches(':hover'), focused: a === t }, active: a ? { tag: a.tagName, lookup: a.dataset?.lookupText ?? null, inTitleRoving: Boolean(block && (a === block || block.contains(a))) } : null };
+  }, { priorSelector, selector });
+  const same = (a, b) => a.settled && b.settled && a.snapshot.revision === b.snapshot.revision && JSON.stringify(a.snapshot.record) === JSON.stringify(b.snapshot.record);
+  // WebKit lays a keyboard-focused title word out anew only at its next rendering (the focus token's box-decoration-break), so
+  // each state is rendered once, unrecorded, before anything is measured: a frame never straddles two layouts.
+  const rendered = async () => { await page.screenshot({ animations: 'allow' }); await delay(100); };
+  await rendered();
+  const before = await sample('beside-before'), beforeGeometry = await titleGeometry(page, 'beside-before'), pre = await settledRecord(page);
+  await (out.touch ? target.tap() : target.click());
+  await page.waitForFunction((selector) => document.querySelector(selector)?.dataset.ladderRung === 'reading', selector); await delay(350); await rendered();
+  const held = await settledRecord(page), afterInput1 = await activeState();
+  for (const [label, how] of [['active-hover', 'pointer hover'], ['active-key', 'keyboard Home']]) {
+    let start = null, park = null;
+    if (label === 'active-hover') await priorTarget.hover();
+    else {
+      park = await page.locator('.reader-card').evaluate((el) => { const r = el.getBoundingClientRect(), x = r.left + 2, y = r.top + 2, under = document.elementFromPoint(x, y);
+        return { x, y, under: under ? { tag: under.tagName, className: String(under.className), lookup: Boolean(under.closest('.japanese-lookup-word')) } : null }; });
+      await page.mouse.move(park.x, park.y); await delay(150); start = await activeState(); await page.keyboard.press('Home');
+    }
+    await delay(350); await rendered();
+    const touched = await sample(label), state = await activeState(), geometry = await titleGeometry(page, label);
+    const frameDots = await titleRingFrame(page, out, name, label, true, prior, { text: prior, kept: true });
+    const ring = frameDots.find((d) => d.text === prior), targetNode = await target.evaluate((el) => el.dataset.dotsNode);
+    const readingGlyphs = out.captureFrames[`${name}-${label}`].glyphs.filter((g) => g.rt && g.owner === targetNode);
+    const underRing = ring ? readingGlyphs.filter((g) => g.top > ring.fragments.at(-1).bottom && g.left < ring.right + ring.spread && g.right > ring.left - ring.spread) : [];
+    const record = await settledRecord(page);
+    const activated = label === 'active-hover' ? state.prior.hover && !state.prior.focusVisible : state.prior.focused && state.prior.focusVisible && !state.prior.hover && !park.under?.lookup && Boolean(start?.active?.inTitleRoving);
+    row(out, `${name}.${label}-input`, activated && state.prior.depth === 'met' && state.prior.kept && touched.rung === 'reading' && touched.reading === reading && !touched.mini &&
+      JSON.stringify(touched.title) === JSON.stringify(before.title) && baseShift(before, touched) <= 1 && glyphShift(beforeGeometry.glyphs, geometry.glyphs) <= 1 &&
+      touched.scrollX === before.scrollX && touched.scrollY === before.scrollY && (!nextLineRequired || underRing.length > 0) && same(held, record),
+      { input: how, opened: 'the story again through its native door, then the word\'s native first input', afterInput1, park, start, state, target: { rung: touched.rung, reading: touched.reading, depth: touched.depth, mini: touched.mini },
+        title: touched.title, before: before.title, baseShift: baseShift(before, touched), titleGlyphShift: glyphShift(beforeGeometry.glyphs, geometry.glyphs), scroll: [touched.scrollX, touched.scrollY], nextLineRequired, underRing,
+        ring: ring && { box: [ring.left - ring.spread, ring.top - ring.spread, ring.right + ring.spread, ring.bottom + ring.spread], cssBottom: ring.cssGeometry.bottom },
+        record: { beforeInput1: pre.snapshot.revision, held: held.snapshot.revision, after: record.snapshot.revision, input1Wrote: !same(pre, held), settled: [pre.settled, held.settled, record.settled] } });
+  }
 }
 function ringContextAdmission(out) {
   const requiredRows = RING_LIVE.flatMap(ringRows), executedRows = out.rows.map((r) => r.id);
@@ -1113,7 +1191,7 @@ async function ringWalk(browser, out) {
   for (const spec of RING_LIVE) {
     const result = { name: spec.name, story: spec.id, saved: spec.prior, tapped: spec.word, startedAt: new Date().toISOString(), rowIds: [], completed: false };
     out.ringCases.push(result); const start = out.rows.length;
-    try { await freshWalk(browser, out, async (page) => { result.observed = await liveFirstState(page, out, spec); await ringDevice(page, out, spec); await worldBinding(page, out, spec.name); }); result.completed = true; }
+    try { await freshWalk(browser, out, async (page) => { result.observed = await liveFirstState(page, out, spec); await ringDevice(page, out, spec); await worldBinding(page, out, spec.name); if (spec.besideReading) await besideReadingWalk(page, out, spec); }); result.completed = true; }
     catch (error) { result.error = String(error.stack || error); out.errors.push(`${spec.name}: ${result.error}`); console.error(`${ringCaseId(out.engine, out.world, out.size)} ${spec.name}: ${error.message}`); }
     finally { result.rowIds = out.rows.slice(start).map((r) => r.id); result.completedAt = new Date().toISOString(); save(); }
   }
@@ -1156,6 +1234,8 @@ function runAdmissionSelfTest() {
     'missing active saved-ring proof': (o) => { const id = 'live-daijin-saved-meguru-active-saved.active-mark'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[1].rowIds = o.ringCases[1].rowIds.filter((r) => r !== id); },
     'missing active saved-ring input': (o) => { const id = 'live-daijin-saved-meguru.active-saved-input'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[1].rowIds = o.ringCases[1].rowIds.filter((r) => r !== id); },
     'missing leading breakpoint proof': (o) => { const id = 'live-daisho-saved-nihon.title-leading-breakpoint'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[0].rowIds = o.ringCases[0].rowIds.filter((r) => r !== id); },
+    'missing narrow hover beside the reading': (o) => { const id = 'live-daisho-saved-nihon-active-hover.no-other-glyph-overlap'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[0].rowIds = o.ringCases[0].rowIds.filter((r) => r !== id); },
+    'missing narrow keyboard input beside the reading': (o) => { const id = 'live-daisho-saved-nihon.active-key-input'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[0].rowIds = o.ringCases[0].rowIds.filter((r) => r !== id); },
     'missing scene proof': (o) => { const id = 'live-daisho-saved-nihon-before.scene-settled'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[0].rowIds = o.ringCases[0].rowIds.filter((r) => r !== id); },
     'missing uncovered continuation': (o) => { const id = 'live-daijin-saved-meguru-stage-met-uncovered.ring-clear-of-ink'; o.rows = o.rows.filter((r) => r.id !== id); o.ringCases[1].rowIds = o.ringCases[1].rowIds.filter((r) => r !== id); },
     'occluded stage-met raster substituted': (o) => { const from = 'live-daijin-saved-meguru-stage-met-uncovered.ring-clear-of-ink', to = 'live-daijin-saved-meguru-stage-met.ring-clear-of-ink'; o.rows.find((r) => r.id === from).id = to; o.ringCases[1].rowIds = o.ringCases[1].rowIds.map((r) => (r === from ? to : r)); },
