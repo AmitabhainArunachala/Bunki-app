@@ -549,12 +549,22 @@ test('contrast CLI rejects unknown, empty and duplicate narrowing before artifac
     [[], { SWEEP_STATES: '' }, 'Unknown/empty SWEEP_STATES'],
     [[], { SWEEP_STATES: 'invented' }, 'Unknown/empty SWEEP_STATES'],
     [[], { SWEEP_STATES: 'reader,reader' }, 'Duplicate SWEEP_STATES'],
+    // VC-1: the C1 controls are declared controls like translucent-bar: exact known ids, no repeat, on their own scene
+    [[], { SWEEP_NEGATIVE: '' }, 'unknown SWEEP_NEGATIVE'],
+    [[], { SWEEP_NEGATIVE: 'c1-imagined' }, 'unknown SWEEP_NEGATIVE'],
+    [[], { SWEEP_NEGATIVE: 'c1-timeout,c1-timeout' }, 'unknown SWEEP_NEGATIVE'],
+    [
+      [],
+      { SWEEP_NEGATIVE: 'c1-gold-edge', SWEEP_STATES: 'reader' },
+      'Each C1 control runs on its own scene',
+    ],
   ]) {
     const env = { ...process.env, KAIRO_BROWSER: 'chromium' };
     delete env.KAIRO_SITE_DIR;
     delete env.KAIRO_ARTIFACT_SHA256;
     delete env.SWEEP_WORLDS;
     delete env.SWEEP_STATES;
+    delete env.SWEEP_NEGATIVE;
     const result = spawnSync(process.execPath, [file, ...args], {
       env: { ...env, ...selectors },
       encoding: 'utf8',
