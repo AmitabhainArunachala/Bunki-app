@@ -13,6 +13,7 @@ import { chromium, webkit } from 'playwright-core';
 import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { selectBackupFile } from './record-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -255,7 +256,8 @@ for (const engine of engines) for (const width of sizes) {
     const backup = JSON.parse(readFileSync(backupPath)); assert.deepEqual(backup.record.sentencePractice, restarted.sentencePractice);
     await close(); profile = 'profile-restored'; await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
     await shelf(page); await lists(page);
-    const timeOrigin = await page.evaluate(() => performance.timeOrigin); await page.locator('#import-file').setInputFiles(backupPath);
+    // Every restore asks first (Hfix-2a): answer exactly that confirmation; any other dialog fails.
+    const timeOrigin = await page.evaluate(() => performance.timeOrigin); await selectBackupFile(page, backupPath);
     await page.waitForFunction(old => performance.timeOrigin !== old && document.body?.dataset.ready === '1', timeOrigin, { timeout: 30000 });
     await close(); await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
     await page.waitForFunction(() => !!navigator.serviceWorker.controller, null, { timeout: 30000 });

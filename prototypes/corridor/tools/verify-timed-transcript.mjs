@@ -14,6 +14,7 @@ import { chromium, webkit } from 'playwright-core';
 import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { selectBackupFile } from './record-fixture-support.mjs';
 import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
@@ -273,7 +274,8 @@ for (const engine of engines) for (const width of sizes) {
     await (await backupWork).saveAs(backupFile); assert.deepEqual(JSON.parse(readFileSync(backupFile)).record.sourceInbox, withSecond.record.sourceInbox);
     await close(); profile = 'restored-profile'; await open(); await frontDoor(page); await lists(page);
     const imported = page.waitForEvent('framenavigated', { predicate: frame => frame === page.mainFrame(), timeout: 30000 });
-    await page.locator('#import-file').setInputFiles(backupFile); await imported; await ready(page); await inbox(page);
+    // Every restore asks first (Hfix-2a): answer exactly that confirmation; any other dialog fails.
+    await selectBackupFile(page, backupFile); await imported; await ready(page); await inbox(page);
     const restored = await readAppRecordSnapshot(page); assert.deepEqual(restored.record.sourceInbox, withSecond.record.sourceInbox); assert.equal(restored.record.taken[0].sourceContextRef, topic.id);
     await openSource(page, parent); await page.waitForFunction(() => !!navigator.serviceWorker.controller);
     if (engine === 'webkit') disconnected = true; else await context.setOffline(true);
