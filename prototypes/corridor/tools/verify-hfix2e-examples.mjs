@@ -52,6 +52,9 @@ async function context(row) {
   await ctx.route('**/*', (route) => new URL(route.request().url()).origin === host.origin ? route.continue() : route.abort());
   const page = await ctx.newPage(); page.setDefaultTimeout(15000);
   const errors = []; page.on('pageerror', (error) => errors.push(String(error)));
+  // the bank's fetches, heard from outside the page (the page's own resource timing buffer fills long before them)
+  const finished = []; page.on('requestfinished', (request) => finished.push(request.url()));
+  page.finishedUrls = finished;
   if (mode === 'control') await page.route('**/corridor.js', async (route) => {
     const response = await route.fetch(); const original = await response.text();
     const [from, to] = CONTROL[row];
@@ -83,10 +86,10 @@ async function row(name, body) {
 async function settled(page, shards) {
   await page.waitForFunction(() => !document.querySelector('#sheet .dictionary-opening') &&
     !/Opening complete senses|詳しい意味を開いています/u.test(document.querySelector('#sheet')?.textContent || ''), null, { timeout: 20000 });
-  await page.waitForFunction((names) => {
-    const got = performance.getEntriesByType('resource').map((entry) => entry.name);
-    return names.every((name) => got.some((url) => url.includes(`/examples/${name}`)));
-  }, shards, { timeout: 20000 });
+  const fetched = () => shards.every((name) => page.finishedUrls.some((url) => url.includes(`/examples/${name}`)));
+  for (const until = Date.now() + 20000; !fetched(); await page.waitForTimeout(100)) {
+    assert(Date.now() < until, `the bank never answered (${shards.join(', ')}; heard ${page.finishedUrls.filter((url) => url.includes('/examples/')).join(', ') || 'none'})`);
+  }
   await page.waitForTimeout(900);
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 }
