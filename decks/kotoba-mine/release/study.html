@@ -7530,7 +7530,7 @@ const HINT_SITTINGS = 3;
 // the sitting (srs-core's rule): ahead — the learner chose to review learning steps early; early — the card on screen
 // came by that choice; pause — nothing else is left but cards in a learning step ({ count, words, at, canEarly });
 // shown — the card's stored record when it was put on screen (a grade refuses if another window changed it since)
-const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, log: [], started: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null, ahead: false, early: false, pause: null, shown: 'null', buried: 0 };
+const ui = { screen: 'home', queue: [], pos: 0, revealed: false, seen: false, picked: null, undo: null, done: 0, right: 0, log: [], started: 0, q: '', open: null, from: null, toast: '', rail: 0, sheet: null, pop: null, ahead: false, passFrom: 0, early: false, pause: null, shown: 'null', buried: 0 };
 let ctx = null; // { root, deck, deckKey, index, storage, onLeave, openEntry, host, tokenFile, gloss, state, ledgerText, scheduler, prefs, notice }
 let mountRequest = 0;
 let pendingStart = null;
@@ -8495,6 +8495,7 @@ function startSession() {
   ui.undo = null;
   ui.rail = 0;
   ui.ahead = false;
+  ui.passFrom = 0;
   ui.buried = q.buried;
   settle();
   resetCard();
@@ -8567,6 +8568,7 @@ function refreshPause() {
 /** the close's choice: review the cards in a learning step now (early, when they are not due yet) */
 function reviewAhead() {
   ui.ahead = true;
+  ui.passFrom = ui.pos;
   settle();
   resetCard();
   paintResponse({ resetScroll: true, front: true });
@@ -8605,7 +8607,9 @@ function studyScreen() {
   if (!id) return doneScreen();
   const { card, word } = ctx.index.cards.get(id);
   const mode = cardMode();
-  const total = ui.queue.length;
+  // the early pass chosen at the close counts its own cards: those answered in it, this one, and the steps still to come
+  const from = ui.ahead ? ui.passFrom : 0;
+  const total = ui.ahead ? ui.pos - from + new Set([id, ...learningCards(new Date()).map((l) => l.id), ...ui.queue.slice(ui.pos + 1)]).size : ui.queue.length;
   const top = el('header', 'kp-top kp-top-study');
   // the house's one top bar (one hand): this is its instance while a card is up — 44, one back glyph (drawn by the
   // frame), its own middle (the rail and the count)
@@ -8617,9 +8621,9 @@ function studyScreen() {
   const prog = el('div', 'kp-progress');
   // a short sitting draws one segment per card (the rail itself still ticks by transform)
   if (total > 1 && total <= 30) prog.style.setProperty('--kp-n', String(total));
-  prog.append(rail(ui.pos / total));
+  prog.append(rail((ui.pos - from) / total));
   // 削除 is not here (Hfix-1B, the lead's round-1 ruling): a card is taken out on its back, never from a front
-  top.append(prog, el('span', 'kp-count', `${ui.pos + 1}/${total}`));
+  top.append(prog, el('span', 'kp-count', `${ui.pos - from + 1}/${total}`));
   box.append(top);
 
   const stored = ctx.state.cards[id];
@@ -8642,9 +8646,9 @@ function studyScreen() {
     word.level ? levelChip(word.level) : null,
     // where the card is in its schedule: never seen, still in a learning step, or a review
     // (the focus room draws only the step one: kp-st-step)
-    el('span', `kp-chip ${!stored ? 'kp-st-new' : stored.state === 1 || stored.state === 3 ? 'kp-st-learn kp-st-step' : 'kp-st-learn'}`, !stored ? t("初めて") : stored.state === 1 || stored.state === 3 ? t('学習中', 'Learning') : t("復習")),
-    // shown before its step is due, by the learner's choice at the close: it says so, and why
-    ui.early ? el('span', 'kp-chip kp-st-early kp-st-step', t('少し早め · ほかに札がないため', 'Early · nothing else left')) : null,
+    // shown before its step is due, by the learner's choice at the close, it says so and why, in the words every
+    // surface uses (context cards, saved words, your own texts)
+    el('span', `kp-chip ${!stored ? 'kp-st-new' : stored.state === 1 || stored.state === 3 ? `kp-st-learn kp-st-step${ui.early ? ' kp-st-early' : ''}` : 'kp-st-learn'}`, !stored ? t("初めて") : stored.state === 1 || stored.state === 3 ? (ui.early ? t('学習中 · 少し早め（ほかに札がないため）', 'Learning · a few minutes early (nothing else left)') : t('学習中', 'Learning')) : t("復習")),
   );
   // the card's one instruction, as its eyebrow (chrome: it names the task, never the answer)
   chips.prepend(cardEyebrow(card, mode));
@@ -9678,7 +9682,7 @@ function leechLadder(card, word) {
 
 /** this sitting's place, for one undo step */
 function sittingNow() {
-  return { queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log], ahead: ui.ahead, early: ui.early, shown: ui.shown };
+  return { queue: [...ui.queue], pos: ui.pos, done: ui.done, right: ui.right, log: [...ui.log], ahead: ui.ahead, passFrom: ui.passFrom, early: ui.early, shown: ui.shown };
 }
 /** adopt a ledger change made on the card on screen (change: fresh ledger → changed ledger, via writeLedger): stored
  * first, then one undo step that takes back only what it touched */
@@ -10421,6 +10425,7 @@ function undo() {
   ui.right = sitting.right;
   ui.log = sitting.log || [];
   ui.ahead = sitting.ahead;
+  ui.passFrom = sitting.passFrom ?? 0;
   ui.early = sitting.early;
   ui.pause = null;
   ui.shown = JSON.stringify(ctx.state.cards[ui.queue[ui.pos]] ?? null);
