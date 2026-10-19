@@ -379,13 +379,23 @@ async function tapToken(page, index, { scroll = true } = {}) {
   const activated = await tok.elementHandle();
   try {
     await page.waitForFunction((node) => node?.isConnected &&
-      (node.dataset.ladderRung === 'reading' ||
+      (node.dataset.ladderRung === 'reading' || node.dataset.ladderRung === 'gloss' ||
         (node.dataset.ladderRung === 'stage' && !!document.querySelector('#mini'))), activated, { timeout: 5000 });
   } finally { await activated?.dispose(); }
   if (!await page.locator('#mini').count()) {
-    const revealed = await tok.evaluate((node) => node.dataset.ladderRung === 'reading');
-    assert(revealed, `token ${index}: first activation produced neither the reading rung nor a stage`);
-    await tok.click();
+    const revealed = await tok.evaluate((node) => node.dataset.ladderRung === 'reading' || node.dataset.ladderRung === 'gloss');
+    assert(revealed, `token ${index}: first activation produced neither the reading rung, the English rung nor a stage`);
+    // Ladder (John, 10-19): after the reading comes the English under the word, then the stage — each click only once the
+    // rung before it is seen, never a blind retry
+    if (await tok.evaluate((node) => node.dataset.ladderRung === 'reading')) {
+      await tok.click();
+      await page.waitForFunction((node) => node?.isConnected && (node.dataset.ladderRung === 'gloss' || !!document.querySelector('#mini')),
+        await tok.elementHandle(), { timeout: 5000 });
+    }
+    if (!await page.locator('#mini').count()) {
+      assert(await tok.evaluate((node) => node.dataset.ladderRung === 'gloss'), `token ${index}: the English rung did not follow the reading`);
+      await tok.click();
+    }
     await page.waitForSelector('#mini');
     await page.waitForTimeout(250);
   }
@@ -1098,6 +1108,10 @@ try {
       await page.keyboard.press('Enter');
       const reveal = await word.evaluate((node) => node.dataset.ladderRung === 'reading');
       assert(reveal && await page.locator('#mini').count() === 0, 'first Enter did not stop at the reading rung');
+      // Ladder (John, 10-19): the second Enter sets the English under the word; the third opens the popup
+      await page.keyboard.press('Enter');
+      const english = await word.evaluate((node) => node.dataset.ladderRung === 'gloss' && !!node.querySelector(':scope > .tok-en'));
+      assert(english && await page.locator('#mini').count() === 0, 'second Enter did not stop at the English rung');
       await page.keyboard.press('Enter');
       await page.waitForSelector('#mini');
       const popup = await page.evaluate(() => document.activeElement?.id);

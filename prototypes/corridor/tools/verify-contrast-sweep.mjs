@@ -576,11 +576,18 @@ const STEPS = {
   async slip(page) {
     // G3 · the word is found by its prose label (a word in a roving paragraph carries no aria-label until the keyboard
     // selects it), and climbs its ladder: its reading in place, then the slip
+    // Ladder (John, 10-19): its reading, then its English under it, then the slip — each tap only once the rung before it
+    // is seen, each rung past the last
     const word = page.locator(`#reader .tok[data-prose-label="${WORD}"]`).first();
-    await word.tap();
-    const rung = await page.waitForFunction((el) => (document.getElementById('mini') ? 'stage' : el.dataset.ladderRung === 'reading' ? 'reading' : null),
-      await word.elementHandle(), { timeout: 8000 }).then((h) => h.jsonValue()).catch(() => null);
-    if (rung === 'reading') await word.tap();
+    const node = await word.elementHandle();
+    let rung = null;
+    for (let step = 0; step < 3 && rung !== 'stage'; step++) {
+      if (step && !['reading', 'gloss'].includes(rung)) break;
+      await word.tap();
+      rung = await page.waitForFunction(({ el, last }) => (document.getElementById('mini') ? 'stage'
+        : ['reading', 'gloss'].includes(el.dataset.ladderRung) && el.dataset.ladderRung !== last ? el.dataset.ladderRung : null),
+        { el: node, last: rung }, { timeout: 8000 }).then((h) => h.jsonValue()).catch(() => null);
+    }
     await page.locator('#mini .mini-word').waitFor({ timeout: 15000 });
     await settle(page, 1300);
   },

@@ -44,7 +44,11 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   // Hfix-1A (2026-10-19): a cut slip ends between two rows and fades at its foot (rowCut, markCardMore); a meaning still to
   // come keeps its room and lands in place (reserveSenseRoom, SLIP_OWN_MEANING); a slip drawn again on its word is the
   // same element, cleared (blankSlip)
-  'rowCut', 'markCardMore', 'reserveSenseRoom', 'SLIP_OWN_MEANING', 'blankSlip'];
+  'rowCut', 'markCardMore', 'reserveSenseRoom', 'SLIP_OWN_MEANING', 'blankSlip',
+  // Ladder (2026-10-19, John: "one tap should just be the furigana, two taps should be the furigana plus the english word
+  // underneath, three taps should reveal the box"): a word set in text climbs reading → English → stage (inlineWordReading,
+  // ladderGlossRung, inlineWordGloss, inlineGlossLine), and its card rides with it where its text scrolls (slipScroller)
+  'inlineWordReading', 'ladderGlossRung', 'inlineWordGloss', 'inlineGlossLine', 'inlineGloss', 'slipScroller'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
@@ -72,6 +76,8 @@ class Element {
   }
   get textContent() { return this.ownText + this.children.map(child => child.textContent).join(''); }
   get lastChild() { return this.children[this.children.length - 1] ?? null; }
+  // the reading rung wraps a word's own nodes (inlineWordReading): here a word's nodes are its children
+  get childNodes() { return this.children; }
   set textContent(text) { this.ownText = text; this.children = []; }
   append(...nodes) { for (const node of nodes) { this.children.push(node); node.parentElement = this; } }
   setAttribute(name, value) { this.attributes[name] = String(value); }
@@ -121,6 +127,7 @@ function app({ withIndex = true, withKanji = false } = {}) {
   const D = { dict, words, kanji: withKanji ? copy(kanjiTable) : {}, dictionaryIndex: withIndex ? index : null,
     dictionaryByForm: new Map(), dictionaryCompleteForms: new Set(), dictionaryBySeq: new Map() };
   const document = { body, querySelectorAll: selector => body.querySelectorAll(selector),
+    createRange: () => ({ selectNodeContents() {}, getClientRects: () => [] }),
     getElementById: id => body.querySelector(`#${id}`),
     createTextNode: text, createDocumentFragment: () => new Element('#fragment'), createElement: tag => new Element(tag),
     createTreeWalker(parent) {
@@ -129,10 +136,14 @@ function app({ withIndex = true, withKanji = false } = {}) {
       visit(parent); let at = -1;
       return { nextNode() { return ++at < nodes.length; }, get currentNode() { return nodes[at]; } };
     } };
-  // G3 · the reading dial shows readings, so a tap goes straight to the word's stage (activateWordLadder skips the reading
-  // rung when readings are off or always shown); verify-word-grammar pins every rung in both engines
+  // G3 · the reading dial shows readings. Ladder · a word set in text still climbs its rungs where they have something to
+  // show: a reading not yet up, then its English, then the stage (open() below climbs only rungs it has seen);
+  // verify-word-grammar pins every rung in both engines
   const context = vm.createContext({ D, S: { view: 'shelf', taken: [], deepWords: {}, dials: { kanji: 0, furigana: 2 } },
     document, NodeFilter: { SHOW_TEXT: 4 }, Intl, window: { innerWidth: 400 }, queueMicrotask,
+    // Ladder · a word's reading rung puts a ruby in its anchor, which the card's seat reads (anchorBox): the browser's
+    // computed style and text boxes, stubbed at their boundary (no pseudo-element label, no text box: one ruby line)
+    getComputedStyle: () => ({ content: 'none', display: 'inline', visibility: 'visible', opacity: '1', fontSize: '16px' }),
     // G3's ladder touches device Back's sentinel, the top bar's keep and the room's re-render, and wires the word menu's
     // gestures: those are the browser's and other rooms' (their own verifiers), stubbed at their boundary here
     // G4 · the stage's ink ceremony (dressStage: depth, the writing, 読 · 意) is the browser's; verify-word-grammar's G4
@@ -156,13 +167,44 @@ function app({ withIndex = true, withKanji = false } = {}) {
     openVocabularyListPopover: (node, label, invoker, options) => menus.push({ node: copy(node), label, invoker: invoker?.id, menu: !!options?.menu }),
     excerptListenLabel: () => { throw new Error('This lookup suite must not enter audio controls'); } });
   vm.runInContext(program, context);
-  const open = async (surface, details = {}) => {
+  // Ladder · the stage is the word's last rung before its page: each activation climbs one rung, and the next is taken only
+  // from a rung the anchor shows (reading, then English), never blindly; `rungs` records the climb
+  const climb = async (surface, details = {}) => {
     const anchor = new Element('button', '', surface); body.append(anchor);
-    await context.openJapaneseLookup(anchor, surface, details);
-    return body.querySelector('#mini');
+    const rungs = [await context.openJapaneseLookup(anchor, surface, details)];
+    const shown = [{ rung: anchor.dataset.ladderRung, english: find(anchor, 'tok-en')?.textContent ?? null }];
+    for (let step = 0; step < 2 && ['reading', 'gloss'].includes(anchor.dataset.ladderRung) && !body.querySelector('#mini'); step++) {
+      rungs.push(await context.openJapaneseLookup(anchor, surface, details));
+      shown.push({ rung: anchor.dataset.ladderRung, english: find(anchor, 'tok-en')?.textContent ?? null });
+    }
+    return { mini: body.querySelector('#mini'), rungs, shown, anchor };
   };
-  return { context, body, document, opened, chosen, menus, open };
+  const open = async (surface, details = {}) => (await climb(surface, details)).mini;
+  return { context, body, document, opened, chosen, menus, open, climb };
 }
+
+test('Ladder: a lookup word climbs its reading, then its English under it, then its stage; a kana word starts at its English', async () => {
+  const f = app();
+  // 上手 read うわて: the reading is not up, so it comes first; then the English of the sense its text names; then the stage
+  const kanji = await f.climb('上手', { reading: 'うわて', pos: '名詞' });
+  assert.deepEqual(kanji.shown.map((row) => row.rung), ['reading', 'gloss', 'stage']);
+  assert.equal(kanji.shown[0].english, null, 'the reading rung shows no English');
+  const english = kanji.shown[1].english;
+  assert.ok(english && english !== '—', `the English rung shows the word's English (${english})`);
+  assert.equal(kanji.shown[2].english, english, 'the stage keeps the English under the word');
+  assert.equal(kanji.anchor.dataset.depthAside, 'meaning', 'the occurrence steps its depth dot aside while its English shows');
+  assert.equal(find(kanji.mini, 'mini-word').textContent, '上手');
+  // しま is written as it is read: no reading rung, its English first
+  const kana = await f.climb('しま');
+  assert.deepEqual(kana.shown.map((row) => row.rung), ['gloss', 'stage']);
+  assert.equal(kana.shown[0].english, 'will do');
+  assert.equal(find(kana.mini, 'mini-gloss').textContent, 'will do');
+  // the fold, as now: the word returns bare in one step, its English and its aside mark gone
+  f.context.clearWordLadder();
+  assert.equal(find(kana.anchor, 'tok-en'), null);
+  assert.equal(kana.anchor.dataset.depthAside, undefined);
+  assert.equal(kana.anchor.classList.contains('has-en'), false);
+});
 
 test('Auxiliary ます never borrows 升; its unresolved full-entry door cannot reopen that entry', async () => {
   const f = app();

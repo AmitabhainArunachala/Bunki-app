@@ -203,12 +203,18 @@ const BRIDGE = `window.__F__ = {
   visit: (v) => { removeMini(); S.stack = []; S.strokes = null; S.view = v; render(); window.scrollTo(0, 0); },
 };`;
 /** G3 · a word in the reader is found by its prose name (an idle word carries no aria-label: its paragraph is the one
- * Tab stop), and a tap climbs its ladder: on touch the first raises its reading in place, the next draws its card. */
+ * Tab stop), and a tap climbs its ladder. Ladder (John, 10-19): the first raises its reading in place, the next sets its
+ * English under it, the next draws its card — each click only once the rung before it is seen, never a blind extra. */
 const readerTok = (page, label) => page.locator(`#reader .tok[data-prose-label="${label}"]`).first();
 async function climbToCard(page, tok) {
-  await tok.click();
-  await page.waitForFunction((node) => !!document.getElementById('mini') || node.dataset.ladderRung === 'reading', await tok.elementHandle(), { timeout: 10000 });
-  if (!(await page.locator('#mini').count())) await tok.click();
+  const node = await tok.elementHandle();
+  let last = null;
+  for (let step = 0; step < 3 && !(await page.locator('#mini').count()); step++) {
+    await tok.click();
+    last = await page.waitForFunction(({ node, last }) => document.getElementById('mini') ? 'stage'
+      : ['reading', 'gloss'].includes(node.dataset.ladderRung) && node.dataset.ladderRung !== last ? node.dataset.ladderRung : null,
+      { node, last }, { timeout: 10000 }).then((handle) => handle.jsonValue());
+  }
   await page.locator('#mini').waitFor();
 }
 /** the deck's back with its readings on, as a learner reaches it: the deck, Begin, 答えを見る, 読み on */
