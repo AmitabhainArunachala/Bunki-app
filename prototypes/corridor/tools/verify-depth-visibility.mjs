@@ -25,11 +25,23 @@ const DAY = 86400000;
 const STORY = 'kantei:jp-105-actions-202609-25startup';
 const CONTEXT_STORY = 'aozora:000772-1';
 const LIVE = [{ name: 'live-daisho', id: STORY, query: 'スタートアップ大賞', word: '大賞' }, { name: 'live-watashi', id: CONTEXT_STORY, query: '私の個人主義', word: '私' }];
-// Lead 2000's bounded late-lookup roster: two shipped titles whose words wait on the
-// name-readings sidecar, success and failure-then-retry, both engines, 藍 and 墨.
-const LATE = [{ name: 'late-typhoon', id: 'jawiki:5238864-s63', query: '台風' }, { name: 'late-nohe', id: 'wikinews:27998', archiveYear: '2015' }];
-const LATE_MODES = ['success', 'fail-retry'];
+// Lead 2010: these titles are already enhanced when their reader opens. Only
+// wikinews has a BODY sidecar request; jawiki has no deferred-title arm.
+const LATE = [
+  { name: 'jawiki-cold', id: 'jawiki:5238864-s63', query: '台風', mode: 'cold', words: 6, phases: ['cold', 'settled-cold'] },
+  { name: 'wikinews-body-success', id: 'wikinews:27998', archiveYear: '2015', mode: 'success', words: 26, phases: ['cold', 'body-loaded'] },
+  { name: 'wikinews-body-fail-retry', id: 'wikinews:27998', archiveYear: '2015', mode: 'fail-retry', words: 26, phases: ['cold', 'body-failed', 'body-retry-pending', 'body-loaded'] },
+];
+const LATE_ENGINES = ['webkit', 'chromium'];
 const LATE_WORLDS = ['hokusai', 'sumi'];
+const lateRows = (spec) => [`world.${spec.name}`, ...[
+  'cold-open', 'native-title-not-deferred', 'unconditional-title-rhythm', 'title-identical', 'card-identical', 'glyphs-identical', 'scroll-identical', 'phase-roster', 'request-sequence',
+  ...(spec.mode === 'cold' ? ['cold-loaded'] : ['body-pending', 'body-loaded']),
+  ...(spec.mode === 'fail-retry' ? ['body-failed', 'native-retry'] : []),
+].map((id) => `${spec.name}.${id}`)];
+const lateCaseId = (engine, world, spec) => `${engine}/${world}/${spec.name}`;
+const LATE_REQUIRED = LATE_ENGINES.flatMap((engine) => LATE_WORLDS.flatMap((world) => LATE.map((spec) => ({ caseId: lateCaseId(engine, world, spec), engine, world, name: spec.name, story: spec.id, mode: spec.mode, phases: spec.phases, rows: lateRows(spec) }))));
+const exactRoster = (observed, expected) => observed.length === expected.length && new Set(observed).size === observed.length && observed.every((id) => expected.includes(id));
 const savedWord = (id, now) => ({ t: 'word', id, label: id, ts: now - 40 * DAY, started: now - 40 * DAY });
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const option = (name) => { const i = process.argv.indexOf(name); return i < 0 ? null : process.argv[i + 1]; };
@@ -48,7 +60,7 @@ const controlBytes = controlFile ? readFileSync(resolve(controlFile)) : null;
 const report = { schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(), startedAt: new Date().toISOString(),
   verifierSha256: hash(readFileSync(fileURLToPath(import.meta.url))), command: [process.execPath, ...process.argv.slice(1)],
   scope: { engines, worlds, full: !lateLookup && engines.length === 2 && worlds.length === 11, rooms: lateLookup ? [] : ['slip', 'basis', 'tray', 'today', 'mirror'],
-    ...(lateLookup ? { lateRoster: { titles: LATE.map((l) => l.id), modes: LATE_MODES, engines: ['webkit', 'chromium'], worlds: LATE_WORLDS, cases: LATE.length * LATE_MODES.length * 2 * LATE_WORLDS.length, claim: 'bounded named roster for late name-reading titles; not every world' } } : {}),
+    ...(lateLookup ? { lateRoster: { titles: [...new Set(LATE.map((l) => l.id))], engines: LATE_ENGINES, worlds: LATE_WORLDS, cases: LATE_REQUIRED.length, required: LATE_REQUIRED, scheduled: LATE_REQUIRED.filter((c) => engines.includes(c.engine)).map((c) => c.caseId), claim: 'lead2010: native cold titles plus actual wikinews BODY success/failure/retry; 12 real cases, not every world', jawikiSidecar: 'not exercised: no such request exists', deferredTitleWitness: 'not required by lead2010; neither native title is deferred' } } : {}),
     card: { title: STORY, context: `${CONTEXT_STORY} 講演 met+saved`, live: LIVE.map((l) => `${l.id} ${l.word}: fresh profile, real first and second input`) },
     fixture: 'G2 first paragraph; native installation record; exact dictionary identities', ladder: 'attribute contract only' },
   thresholds: { fillCssPx: 6, actualFillExtentCssPx: 5, actualFillAreaCssPx2: 18, actualFillNote: 'Interior mask excludes 0.25px radius edge; extent allows circle antialiasing, area rejects clipped stripes', keptOuterCssPx: 10, knownContrast: 3, savedContrast: 3, metContrast: 1.5, semanticDeltaE76: 10,
@@ -562,19 +574,57 @@ async function rooms(page, out) {
   const today = await surfaceCapture(page, out, 'today', '.today-star:not([hidden])');
   checkPaint(out, 'today', today); semanticFamily(out, 'today', today);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
+  // Reconstructed after the native gate timeout from its retained partial
+  // 95ddf5cf receipt: float at authored rest, independently breath at its trough.
+  // This does not claim full opacity inside the deliberately fading moving edge.
   out.todayAnimation = await page.evaluate(() => {
     const found = [];
     for (const animation of document.getAnimations()) {
       const timing = animation.effect.getTiming(); animation.pause();
+      if (animation.animationName === 'today-float') animation.currentTime = 0;
       if (animation.animationName === 'today-breath') {
         animation.currentTime = Number(timing.delay || 0) + Number(timing.duration);
-        found.push({ name: animation.animationName, currentTime: animation.currentTime, timing, frames: animation.effect.getKeyframes() });
+        const target = animation.effect.target;
+        found.push({ name: animation.animationName, text: target?.textContent, node: target?.dataset.depthNode, currentTime: animation.currentTime, playState: animation.playState,
+          timing, frames: animation.effect.getKeyframes(), opacity: Number(getComputedStyle(target).opacity) });
       }
     }
     return found;
   });
-  row(out, 'today.native-breath-reached', out.todayAnimation.length > 0, out.todayAnimation);
-  checkPaint(out, 'today-minimum-breath', await surfaceCapture(page, out, 'today-minimum-breath', '.today-star.due:not([hidden])'));
+  row(out, 'today.native-breath-reached', out.todayAnimation.length > 0 && out.todayAnimation.every((a) => {
+    const endpoint = a.frames.find((f) => f.computedOffset === 1);
+    return a.playState === 'paused' && a.currentTime === Number(a.timing.delay || 0) + Number(a.timing.duration) && Number(endpoint?.opacity) === 0.66 && Math.abs(a.opacity - 0.66) < 0.000001;
+  }), out.todayAnimation);
+  const trough = await surfaceCapture(page, out, 'today-minimum-breath', '.today-star.due:not([hidden])');
+  const dueFacts = await facts(page, '.today-star.due:not([hidden])');
+  out.todayFloatRest = await page.locator('.today-star.due:not([hidden])').evaluateAll((stars, { dots, measured }) => stars.map((star) => {
+    const d = dots.find((dot) => dot.probeId === star.dataset.dotsNode), raster = measured.find((dot) => dot.probeId === star.dataset.dotsNode);
+    const style = getComputedStyle(star), lane = star.closest('.today-sky-lane'), laneStyle = lane && getComputedStyle(lane), box = lane?.getBoundingClientRect();
+    const mask = laneStyle?.maskImage && laneStyle.maskImage !== 'none' ? laneStyle.maskImage : laneStyle?.webkitMaskImage || 'none';
+    const fade = mask === 'none' ? 0 : Number(/rgb\(0, 0, 0\) ([\d.]+)px/.exec(mask)?.[1]);
+    const opaque = box ? { left: box.left + scrollX + fade, right: box.right + scrollX - fade } : null;
+    const ring = d ? { left: d.left - d.spread, right: d.right + d.spread, top: d.top - d.spread, bottom: d.bottom + d.spread } : null;
+    const clearance = ring && opaque ? { left: ring.left - opaque.left, right: opaque.right - ring.right } : null;
+    const animation = star.getAnimations().find((a) => a.animationName === 'today-float');
+    const matrix = new DOMMatrix(style.transform === 'none' ? undefined : style.transform);
+    const vars = Object.fromEntries(['--from', '--to', '--lag', '--ring'].map((key) => [key, style.getPropertyValue(key).trim()]));
+    const timeline = animation?.effect.getTiming();
+    const authoredX = timeline ? parseFloat(vars['--from']) + (parseFloat(vars['--to']) - parseFloat(vars['--from'])) * ((-Number(timeline.delay) / Number(timeline.duration)) % 1) : null;
+    return { probeId: star.dataset.dotsNode, text: star.textContent, node: star.dataset.depthNode, measured: Boolean(raster), lane: lane?.dataset.lane,
+      claim: 'breath-trough paint with float at authored rest', animations: star.getAnimations().map((a) => ({ name: a.animationName, currentTime: a.currentTime, playState: a.playState, timing: a.effect.getTiming(), frames: a.effect.getKeyframes() })),
+      currentTime: animation?.currentTime ?? null, playState: animation?.playState ?? null, transform: style.transform, opacity: Number(style.opacity), vars, authoredX,
+      // Native WebKit serializes rest as +0.000012px. This precision bound is
+      // only for transform arithmetic; all ring/mask boundaries stay >= 0.
+      atRest: !animation || (Math.abs(authoredX) < 0.001 && Math.abs(matrix.m41 - authoredX) < 0.001 && matrix.m42 === 0 && matrix.m11 === 1 && matrix.m22 === 1),
+      mask, fade, laneBox: box ? { left: box.left + scrollX, right: box.right + scrollX, top: box.top + scrollY, bottom: box.bottom + scrollY } : null,
+      host: d?.host, ring, opaque, clearance,
+      sameCapturedRing: Boolean(d && raster) && ['left', 'right', 'top', 'bottom', 'spread'].every((key) => d[key] === raster[key]),
+      viewport: Boolean(ring && raster) && ring.left - raster.raster.offset.x >= 0 && ring.right - raster.raster.offset.x <= innerWidth && ring.top - raster.raster.offset.y >= 0 && ring.bottom - raster.raster.offset.y <= innerHeight };
+  }), { dots: dueFacts, measured: trough });
+  row(out, 'today-minimum-breath.float-at-rest', trough.length > 0 && exactRoster(out.todayFloatRest.filter((d) => d.measured).map((d) => d.probeId), trough.map((d) => d.probeId)) && out.todayFloatRest.filter((d) => d.measured).every((d) =>
+    d.sameCapturedRing && d.atRest && d.viewport && Number.isFinite(d.fade) && d.clearance?.left >= 0 && d.clearance?.right >= 0 &&
+    (d.currentTime === null || (d.currentTime === 0 && d.playState === 'paused')) && d.animations.every((a) => a.playState === 'paused' && (a.name !== 'today-breath' || (a.currentTime === Number(a.timing.delay || 0) + Number(a.timing.duration) && Math.abs(d.opacity - 0.66) < 0.000001)))), out.todayFloatRest);
+  checkPaint(out, 'today-minimum-breath', trough);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.locator('#tab-me, #tab-progress').first().click(); await page.locator('#me-progress').waitFor(); await page.locator('#me-progress').click();
   await page.waitForFunction(() => document.body.dataset.view === 'kagami'); await delay(300);
@@ -606,70 +656,113 @@ const titleGeometry = (page, label) => page.evaluate(async (label) => {
     if (text.parentElement.closest('button, rt, rp')) continue;
     for (let i = 0; i < text.length; i++) { if (!text.textContent[i].trim()) continue; const range = document.createRange(); range.setStart(text, i); range.setEnd(text, i + 1); const b = range.getBoundingClientRect(); if (b.width && b.height) glyphs.push({ char: text.textContent[i], left: b.left, top: b.top, right: b.right, bottom: b.bottom }); }
   }
-  const wrapper = h.querySelector('[data-lookup-readings-pending]');
+  const wrapper = h.querySelector('[data-lookup-readings-pending]'), reader = document.querySelector('#reader');
   return { label, scrollX, scrollY, title: box(h.getBoundingClientRect()), card: box(card.getBoundingClientRect()), lineHeight: style.lineHeight, paddingBottom: style.paddingBottom, fontSize: style.fontSize,
-    pending: Boolean(wrapper), busy: wrapper?.getAttribute('aria-busy') ?? null, words: h.querySelectorAll('.japanese-lookup-word').length, buttons: [...h.querySelectorAll('button')].map((b) => b.textContent), glyphs };
+    titleText: h.textContent, titleHTML: h.innerHTML, lookupGroups: [...h.querySelectorAll('.japanese-lookup-text')].map((g) => g.textContent),
+    pending: Boolean(wrapper), busy: wrapper?.getAttribute('aria-busy') ?? null, words: h.querySelectorAll('.japanese-lookup-word').length, buttons: [...h.querySelectorAll('button')].map((b) => b.textContent), glyphs,
+    body: { busy: reader?.getAttribute('aria-busy'), tokens: reader?.querySelectorAll('.tok[data-index]').length ?? 0, notes: [...document.querySelectorAll('main .note')].map((n) => n.textContent), retry: [...document.querySelectorAll('main .note button')].map((b) => b.textContent) } };
 }, label);
 const glyphShift = (a, b) => (a.length && a.length === b.length && a.every((g, i) => g.char === b[i].char) ? Math.max(...a.flatMap((g, i) => ['left', 'top', 'right', 'bottom'].map((k) => Math.abs(g[k] - b[i][k])))) : Infinity);
-const titleDelta = (a, b) => (a.missing || b.missing ? null : { height: b.title.height - a.title.height, width: b.title.width - a.title.width, top: b.title.top - a.title.top, left: b.title.left - a.title.left,
-  cardHeight: b.card.height - a.card.height, cardTop: b.card.top - a.card.top, scrollY: b.scrollY - a.scrollY, rhythm: [a.lineHeight, a.paddingBottom, a.fontSize].join() === [b.lineHeight, b.paddingBottom, b.fontSize].join(), glyphShift: glyphShift(a.glyphs, b.glyphs) });
-const sameTitle = (d) => Boolean(d) && d.height === 0 && d.width === 0 && Math.abs(d.top) <= 1 && Math.abs(d.left) <= 1 && d.cardHeight === 0 && Math.abs(d.cardTop) <= 1 && d.scrollY === 0 && d.rhythm && d.glyphShift <= 1;
-const frameSummary = ({ glyphs, ...frame }) => ({ ...frame, glyphCount: glyphs?.length ?? 0 });
-/** Lead 2000: a title whose words wait on the name-readings sidecar renders
- * once. The real sidecar request is held; it is released whole (success) or
- * failed, then retried through the title's own Reload readings button. */
-async function lateTitle(page, out, spec, mode) {
-  const label = `${spec.name}-${mode}`, requests = [], held = [];
+const titleDelta = (a, b) => (a.missing || b.missing ? null : { title: Object.fromEntries(['left', 'top', 'width', 'height'].map((k) => [k, b.title[k] - a.title[k]])),
+  card: Object.fromEntries(['left', 'top', 'width', 'height'].map((k) => [k, b.card[k] - a.card[k]])), scrollX: b.scrollX - a.scrollX, scrollY: b.scrollY - a.scrollY,
+  rhythm: [a.lineHeight, a.paddingBottom, a.fontSize].join() === [b.lineHeight, b.paddingBottom, b.fontSize].join(), glyphShift: glyphShift(a.glyphs, b.glyphs) });
+/** Lead 2010's native observation: no deferred TITLE in either story. Hold the
+ * actual wikinews BODY request; retry only its native .note/Try again door. */
+async function lateTitle(page, out, spec, result) {
+  const requests = result.requests, held = [];
   await page.route('**/data/share_alike/skip.json', async (route) => {
-    const request = { url: route.request().url(), status: null }; requests.push(request);
-    request.status = await new Promise((release) => held.push(release));
-    if (request.status === 200) await route.fulfill({ response: await route.fetch() });
-    else await route.fulfill({ status: request.status, contentType: 'text/plain', body: 'Deliberate name-readings failure' });
+    const request = { url: route.request().url(), requestedAt: new Date().toISOString(), status: null, fulfilled: false }; requests.push(request);
+    try {
+      request.status = spec.mode === 'cold' ? 200 : await new Promise((release) => held.push(release));
+      request.releasedAt = new Date().toISOString();
+      if (request.status === 200) {
+        const response = await route.fetch(); assert(response.ok(), 'Actual sidecar response must succeed'); const bytes = await response.body();
+        request.bodySha256 = hash(bytes); request.bytes = bytes.length;
+        const expected = report.identity.files?.find((f) => f.path === 'data/share_alike/skip.json')?.sha256;
+        assert(expected && request.bodySha256 === expected, 'Sidecar bytes must match the pinned artifact');
+        await route.fulfill({ response, body: bytes });
+      } else await route.fulfill({ status: request.status, contentType: 'text/plain', body: 'Deliberate native BODY name-readings failure' });
+      request.fulfilled = true;
+    } catch (error) { request.error = String(error.stack || error); out.errors.push(request.error); await route.abort().catch(() => {}); }
   });
   const heldCount = async (count) => { const deadline = Date.now() + 15000; while (held.length < count && Date.now() < deadline) await delay(25); return held.length === count; };
-  const press = (locator) => (out.engine === 'webkit' ? locator.tap() : locator.click());
-  const pending = '.reader-card > h1.view-title [data-lookup-readings-pending]';
+  const add = (suffix, passed, detail) => row(out, `${spec.name}.${suffix}`, passed, detail);
+  const sample = async (label) => {
+    const frame = await titleGeometry(page, label); result.frames.push(frame);
+    const name = `${out.engine}-${out.world}-${spec.name}-${label}.png`;
+    const bytes = await page.screenshot({ path: resolve(evidence, name), fullPage: false, animations: 'allow' });
+    result.screenshots.push({ label, path: name, sha256: hash(bytes) }); save(); return frame;
+  };
   try {
-    await boot(page);
-    await openPassage(page, spec);
-    await page.locator(pending).first().waitFor({ timeout: 30000 });
-    await page.locator('.reader-card').evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' })); await delay(250);
-    const firstHeld = await heldCount(1);
-    const cold = await titleGeometry(page, 'cold-pending');
-    row(out, `${label}.cold-pending`, firstHeld && requests.length === 1 && cold.pending && cold.words === 0 && !cold.buttons.length, { requests: requests.length, cold: frameSummary(cold) });
-    held.shift()?.(mode === 'success' ? 200 : 503);
-    const frames = [cold];
-    if (mode === 'fail-retry') {
-      const retry = page.locator(`${pending} > button`).first();
-      await retry.waitFor({ timeout: 15000 });
-      const failed = await titleGeometry(page, 'failed'); frames.push(failed);
-      await press(retry);
-      const secondHeld = await heldCount(1);
-      const retrying = await titleGeometry(page, 'retry-pending'); frames.push(retrying);
-      row(out, `${label}.native-retry`, failed.buttons.length === 1 && secondHeld && requests.length === 2 && retrying.pending && retrying.busy === 'true' && !retrying.buttons.length, { failedButtons: failed.buttons, requests: requests.map((r) => r.status), retrying: frameSummary(retrying) });
-      held.shift()?.(200);
+    await boot(page); await openPassage(page, spec);
+    await page.locator('.reader-card > h1.view-title').waitFor({ timeout: 30000 });
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('.reader-card').evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' })); await delay(250);
+    await worldBinding(page, out, spec.name);
+    if (spec.mode !== 'cold') assert(await heldCount(1), 'Exactly one real BODY request must be held');
+    const cold = await sample('cold');
+    add('cold-open', !cold.missing && cold.glyphs.length > 0 && cold.words === spec.words && !cold.pending && !cold.buttons.length, { story: spec.id, words: cold.words, pending: cold.pending, requestCount: requests.length, trigger: spec.mode === 'cold' ? 'none observed' : 'BODY', titleText: cold.titleText });
+    if (spec.mode === 'cold') {
+      await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 30000 }); await delay(350);
+      const settled = await sample('settled-cold');
+      result.sidecar = 'not exercised: no such request exists';
+      add('cold-loaded', cold.body.tokens > 0 && settled.body.tokens > 0 && settled.body.busy !== 'true' && requests.length === 0, { cold: cold.body, settled: settled.body, sidecar: result.sidecar });
+    } else {
+      add('body-pending', cold.body.busy === 'true' && cold.body.tokens === 0 && requests.length === 1 && held.length === 1 && requests[0].status === null, { body: cold.body, requests: requests.length });
+      held.shift()(spec.mode === 'fail-retry' ? 503 : 200);
+      if (spec.mode === 'fail-retry') {
+        const retry = page.locator('main .note').getByRole('button', { name: 'Try again', exact: true });
+        await retry.waitFor({ timeout: 15000 });
+        const failed = await sample('body-failed');
+        add('body-failed', failed.body.busy === 'false' && failed.body.tokens === 0 && failed.body.retry.length === 1 && failed.body.retry[0] === 'Try again' && requests.length === 1 && requests[0].status === 503 && requests[0].fulfilled, { body: failed.body, request: requests[0] });
+        result.retryInput = { method: out.engine === 'webkit' ? 'tap' : 'click', selector: 'main .note', accessibleName: 'Try again', at: new Date().toISOString() };
+        if (out.engine === 'webkit') await retry.tap(); else await retry.click();
+        await page.waitForFunction(() => document.querySelector('#reader')?.getAttribute('aria-busy') === 'true');
+        const retryHeld = await heldCount(1);
+        const retrying = await sample('body-retry-pending');
+        add('native-retry', retryHeld && requests.length === 2 && requests[1].status === null && retrying.body.busy === 'true' && retrying.body.tokens === 0 && !retrying.body.retry.length, { body: retrying.body, requests: requests.map((r) => r.status), input: result.retryInput });
+        assert(held.length === 1, 'Exactly one retry request must be held'); held.shift()(200);
+      }
+      await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 30000 }); await delay(350);
+      const loaded = await sample('body-loaded');
+      add('body-loaded', loaded.body.tokens === 532 && loaded.body.busy !== 'true' && !loaded.body.retry.length && requests.at(-1)?.status === 200 && requests.at(-1)?.fulfilled, { body: loaded.body, expectedNativeTokens: 532 });
+      result.sidecar = 'actual BODY-triggered request exercised; title was already enhanced';
     }
-    await page.waitForFunction(() => { const h = document.querySelector('.reader-card > h1.view-title'); return Boolean(h) && h.querySelectorAll('.japanese-lookup-word').length > 0 && !h.querySelector('[data-lookup-readings-pending]'); }, null, { timeout: 30000 });
-    if (mode === 'success') await page.locator('#reader .tok[data-index]').first().waitFor({ timeout: 30000 });
-    await delay(350);
-    const loaded = await titleGeometry(page, 'loaded'); frames.push(loaded);
-    const delta = titleDelta(cold, loaded);
-    row(out, `${label}.loaded-words`, loaded.words > 0 && !loaded.pending && !loaded.buttons.length && requests.at(-1)?.status === 200, { words: loaded.words, statuses: requests.map((r) => r.status) });
-    row(out, `${label}.title-identical`, sameTitle(delta), { delta, cold: frameSummary(cold), loaded: frameSummary(loaded) });
-    if (mode === 'fail-retry') row(out, `${label}.through-failure-identical`, frames.every((f) => sameTitle(titleDelta(cold, f))), frames.map((f) => ({ label: f.label, delta: titleDelta(cold, f), buttons: f.buttons })));
-    await page.screenshot({ path: resolve(evidence, `${out.engine}-${out.world}-${label}-loaded.png`), fullPage: false });
-    out.lateCases.push({ label, completed: true, statuses: requests.map((r) => r.status), frames: frames.map(frameSummary) });
-  } finally { while (held.length) held.shift()(503); }
+    const frames = result.frames, deltas = frames.map((f) => ({ label: f.label, delta: titleDelta(cold, f) }));
+    add('native-title-not-deferred', frames.every((f) => !f.missing && f.titleText === cold.titleText && f.words === spec.words && !f.pending && !f.buttons.length), frames.map((f) => ({ label: f.label, words: f.words, pending: f.pending, buttons: f.buttons })));
+    add('unconditional-title-rhythm', frames.every((f) => Number.parseFloat(f.paddingBottom) === 8 && Math.abs(Number.parseFloat(f.lineHeight) - (Number.parseFloat(f.fontSize) * 1.45 + 20)) < 0.01), frames.map((f) => ({ label: f.label, fontSize: f.fontSize, lineHeight: f.lineHeight, paddingBottom: f.paddingBottom })));
+    add('title-identical', deltas.every(({ delta: d }) => d && d.rhythm && Object.values(d.title).every((v) => v === 0)), deltas);
+    add('card-identical', deltas.every(({ delta: d }) => d && Object.values(d.card).every((v) => v === 0)), deltas);
+    add('glyphs-identical', deltas.every(({ delta: d }) => d && d.glyphShift === 0), deltas);
+    add('scroll-identical', deltas.every(({ delta: d }) => d && d.scrollX === 0 && d.scrollY === 0), deltas);
+    add('phase-roster', frames.map((f) => f.label).join('|') === spec.phases.join('|'), { required: spec.phases, executed: frames.map((f) => f.label) });
+    const expectedStatuses = spec.mode === 'cold' ? [] : spec.mode === 'success' ? [200] : [503, 200];
+    add('request-sequence', requests.length === expectedStatuses.length && requests.every((r, i) => r.status === expectedStatuses[i] && r.fulfilled && !r.error && (r.status !== 200 || Boolean(r.bodySha256))), { expected: expectedStatuses, requests, sidecar: result.sidecar });
+    result.completed = true;
+  } finally { while (held.length) { result.cleanupReleased = true; held.shift()(503); } }
+}
+function lateContextAdmission(out) {
+  const expectedCases = LATE.map((spec) => lateCaseId(out.engine, out.world, spec));
+  const expectedRows = LATE.flatMap(lateRows);
+  return { requiredCases: expectedCases, executedCases: out.lateCases.map((c) => c.caseId), requiredRows: expectedRows, executedRows: out.rows.map((r) => r.id),
+    accepted: !out.errors.length && exactRoster(out.lateCases.map((c) => c.caseId), expectedCases) && exactRoster(out.rows.map((r) => r.id), expectedRows) && out.rows.every((r) => r.passed === true) && LATE.every((spec) => {
+      const c = out.lateCases.find((entry) => entry.caseId === lateCaseId(out.engine, out.world, spec));
+      return c?.completed === true && !c.cleanupReleased && !c.error && c.story === spec.id && c.mode === spec.mode && exactRoster(c.rowIds, lateRows(spec)) && c.frames.map((f) => f.label).join('|') === spec.phases.join('|');
+    }) };
 }
 async function lateWalk(browser, out) {
   out.lateCases = [];
-  for (const spec of LATE) for (const mode of LATE_MODES) {
-    try { await freshWalk(browser, out, (page) => lateTitle(page, out, spec, mode)); }
-    catch (error) { out.errors.push(`${spec.name}-${mode}: ${String(error.stack || error)}`); console.error(`${out.engine}/${out.world} ${spec.name}-${mode}: ${error.message}`); }
+  for (const spec of LATE) {
+    const result = { caseId: lateCaseId(out.engine, out.world, spec), name: spec.name, story: spec.id, mode: spec.mode, startedAt: new Date().toISOString(), frames: [], requests: [], screenshots: [], rowIds: [], completed: false };
+    out.lateCases.push(result); const start = out.rows.length;
+    try { await freshWalk(browser, out, (page) => lateTitle(page, out, spec, result)); }
+    catch (error) { result.error = String(error.stack || error); out.errors.push(`${spec.name}: ${result.error}`); console.error(`${out.engine}/${out.world} ${spec.name}: ${error.message}`); }
+    finally { result.rowIds = out.rows.slice(start).map((r) => r.id); result.completedAt = new Date().toISOString(); save(); }
   }
   out.completedWalk = true;
   out.completedAt = new Date().toISOString();
-  out.passed = !out.errors.length && out.lateCases.length === LATE.length * LATE_MODES.length && out.lateCases.every((c) => c.completed) && out.rows.length > 0 && out.rows.every((r) => r.passed);
+  out.lateAdmission = lateContextAdmission(out);
+  out.passed = out.lateAdmission.accepted;
   save();
 }
 async function one(browser, engine, world) {
@@ -743,7 +836,19 @@ finally {
   report.completedAt = new Date().toISOString();
   report.passed = !report.errors.length && !report.control.setupError && report.contexts.length === engines.length * worlds.length && report.contexts.every((c) => c.passed) && (!controlBytes || report.control.served.length > 0);
   report.fullAcceptance = report.passed && report.scope.full && report.mode === 'local artifact' && !controlBytes && !diagnosticInlineEnd;
-  if (lateLookup) report.lateRosterAccepted = report.passed && engines.length === 2 && report.mode === 'local artifact' && !controlBytes;
+  if (lateLookup) {
+    const requiredContexts = LATE_ENGINES.flatMap((engine) => LATE_WORLDS.map((world) => `${engine}/${world}`));
+    const requiredCases = LATE_REQUIRED.map((c) => c.caseId);
+    const executedCases = report.contexts.flatMap((c) => (c.lateCases || []).map((entry) => entry.caseId));
+    const requiredRows = LATE_REQUIRED.flatMap((c) => c.rows.map((id) => `${c.engine}/${c.world}/${id}`));
+    const executedRows = report.contexts.flatMap((c) => c.rows.map((r) => `${c.engine}/${c.world}/${r.id}`));
+    report.lateAdmission = { requiredContexts, executedContexts: report.contexts.map((c) => `${c.engine}/${c.world}`), requiredCases, executedCases, requiredRows, executedRows,
+      missingCases: requiredCases.filter((id) => !executedCases.includes(id)), unexpectedCases: executedCases.filter((id) => !requiredCases.includes(id)),
+      accepted: report.passed && report.mode === 'local artifact' && !controlBytes && !diagnosticInlineEnd && exactRoster(engines, LATE_ENGINES) && exactRoster(worlds, LATE_WORLDS) &&
+        exactRoster(report.contexts.map((c) => `${c.engine}/${c.world}`), requiredContexts) && exactRoster(executedCases, requiredCases) && exactRoster(executedRows, requiredRows) &&
+        report.contexts.every((c) => c.completedWalk && lateContextAdmission(c).accepted) };
+    report.lateRosterAccepted = report.lateAdmission.accepted;
+  }
   report.control.killed = Boolean(controlBytes && !report.control.setupError && !report.errors.length && report.contexts.every((c) => !c.errors.length) && report.control.served.length && report.contexts.some((c) => c.rows.some((r) => /^(reader|title|context|slip|basis|prose|tray|today|mirror)(?:-[a-z]+)*\.(size|contrast|nonempty|semantic-separation)$/.test(r.id) && !r.passed)));
   save(); console.log(`DOTS ${report.passed ? 'PASS' : 'FAIL'}: ${evidence}`); if (!report.passed) process.exitCode = 1;
 }
