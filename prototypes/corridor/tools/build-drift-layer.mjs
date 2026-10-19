@@ -720,6 +720,15 @@ patch('    if(n.kind==="word"&&(n.mode==="free"||n.mode==="glide")&&n!==focusN&&
   + '      }\n'
   + '      if(n.boxW>0){ehw=Math.max(ehw,n.boxW*n.s*zs2/2); ehh=Math.max(ehh,n.boxH*n.s*zs2/2);}',
   'Hfix-2b H2-1 every rendered node dissolves at the glass edge, not only free words');
+// Hfix-2b · H2-1, the lead's ruling (MISSION/inbox/0238): a faint sliver at the rim is still a
+// cut-off look, so no word may show PARTLY at the glass edge. The donor's dissolve ran across the
+// rim — ef=(dE+34)/68, squared — so a box that just met the rim still drew at 25% and one half
+// over it at ~6%. One constant moves: the band's outer end, from 34px past the rim to the rim
+// itself. A node keeps full ink until its box is 34px from the rim, eases out over those 34px
+// (still squared), and is at opacity 0 the moment its box touches the rim.
+patch('        const ef=dE<=-34?0:(dE+34)/68;',
+  '        const ef=dE<=0?0:dE/34;',
+  'Hfix-2b H2-1 the edge dissolve ends at the rim: a box that touches it draws at opacity 0');
 patch('vg.addColorStop(1,th.dark?"rgba(0,0,0,.5)":rgba(th.ink,.14));', 'vg.addColorStop(1,th.dark?"rgba(0,0,0,.36)":rgba(th.ink,.07));', 'r4 lighter vignette');
 patch('ictx.globalAlpha=Math.min(.3,th.blobA*b.a);', 'ictx.globalAlpha=th.dark?Math.min(.09,th.blobA*b.a*.4):Math.min(.2,th.blobA*b.a*.8);', 'r4 pools a whisper by night, a cool mist by day');
 patch('pool:["#1E50A2","#1E50A2","#165E83","#165E83","#EB6101"]', 'pool:["#1E50A2","#1E50A2","#165E83","#165E83","#6E87A6"]', 'r4 the day mist stays cool (北斎)');

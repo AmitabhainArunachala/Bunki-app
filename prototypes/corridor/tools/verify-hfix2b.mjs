@@ -12,7 +12,8 @@
  *   X-9   a word marked "Not yet" through the app's own writer reaches Today's sky, with its
  *         reason
  *   H2-1  nothing legible in the sky is cut by the glass edge, at 390×844, 1024×768 and
- *         1440×900, at rest and while dragging
+ *         1440×900, at rest and while dragging; and, by the lead's ruling (MISSION/inbox/0238),
+ *         no sky word draws above opacity 0 while its box crosses the rim — not even a sliver
  *
  * HOW BASE IS MEASURED. `KAIRO_HFIX2B_BASE=1` routes the four runtime files this slice changed
  * to their bytes at the base commit, so the base and the branch are judged by the SAME rows on
@@ -24,6 +25,7 @@
  *   why      strip `why` from the kept projection              → X-1 must go red
  *   cover    slide the rail so the shelf bead hides under 宙   → X-14 must go red
  *   edge     restore the old guard's three exclusions          → H2-1 must go red
+ *   curve    restore the donor's dissolve, (dE+34)/68 squared   → H2-1's no-sliver row must go red
  * A control that leaves its row green is itself a failure, and is reported as one.
  *
  * This writes nothing to the learner's record beyond the fixture it imports and the one "Not yet"
@@ -87,6 +89,9 @@ function swap(text, from, to, label) {
 const OLD_EDGE_GUARD = '    if(n.kind==="word"&&(n.mode==="free"||n.mode==="glide")&&n!==focusN&&!n.hlDom){\n'
   + '      const zf=(n.fpx||14)*n.s*cam.z;';
 const NEW_EDGE_GUARD = '    {\n      const zf=(n.fpx||14)*n.s*cam.z;';
+// The dissolve's band, as the lead ruled it: it ends AT the rim. The donor's ran 34px past it.
+const NEW_CURVE = '        const ef=dE<=0?0:dE/34;';
+const OLD_CURVE = '        const ef=dE<=-34?0:(dE+34)/68;';
 
 /** corridor.js keeps its functions in its own top-level scope, not on `window`, so a test cannot
  * reach the writer the word page calls. This rides INSIDE corridor.js — base bytes included, so
@@ -130,14 +135,17 @@ const WHY = { test: 'missed in a test', yesterday: 'missed yesterday', unknown: 
 
 /** Every kept star the sky is actually showing, with how it is painted. */
 
-/** H2-1 — anything LEGIBLE in the sky that crosses the glass edge.
+/** H2-1 — anything in the sky that crosses the glass edge. Two rows read the same sweep.
  *
- * The sky's law is a dissolve, not a hard stop: a node fades out over its last ~34px, so while
- * it is crossing it is both faintly visible and partly outside. That is the design. The floor
- * below separates that intended whisper from a cut a reader can actually read — at the moment a
- * node's box touches the edge the fade has already taken it to a quarter of its opacity, and a
- * node meaningfully over the edge is below a sixteenth. Anything at or above the floor must lie
- * wholly inside. Measured on the rendered box, so a glyph's hero type counts at its real size. */
+ * The first is the legibility guard: nothing at or above LEGIBLE opacity may cross. On its own
+ * it let the donor's dissolve through, which ran ACROSS the rim — a box that just touched the
+ * edge still drew at a quarter of its opacity, one half over it at about a sixteenth.
+ *
+ * The second is the lead's ruling on that whisper (MISSION/inbox/0238): a faint sliver at the
+ * rim is still a cut-off look. A node is either wholly inside, or it has faded to opacity 0
+ * before its box meets the rim — so that row has no floor at all. "Crosses" means more than
+ * half a CSS pixel of the rendered box lies beyond the rim, which absorbs sub-pixel rounding and
+ * nothing else. Measured on the rendered box, so a glyph's hero type counts at its real size. */
 const LEGIBLE = 0.08;
 const readCutNodes = (page, floor) => page.evaluate((limit) => {
   const layer = document.getElementById('drift-layer');
@@ -149,7 +157,8 @@ const readCutNodes = (page, floor) => page.evaluate((limit) => {
   const cut = [];
   for (const n of nodes) {
     const op = Number(getComputedStyle(n).opacity);
-    if (!(op >= limit)) continue;
+    // a node at opacity 0 draws nothing, whatever its box does
+    if (!(op > 0) || !(op >= limit)) continue;
     const r = n.getBoundingClientRect();
     if (!r.width || !r.height) continue;
     // A CUT is a node the glass slices: part of it on screen, part of it beyond. A node that
@@ -163,7 +172,8 @@ const readCutNodes = (page, floor) => page.evaluate((limit) => {
       cut.push({ text: (n.textContent || '').trim().slice(0, 10),
         kind: n.classList.contains('scale-star') ? 'scale-star'
           : n.classList.contains('word') ? 'word' : n.classList.contains('glyph') ? 'glyph' : 'part',
-        sat: n.classList.contains('bsat'), op: +op.toFixed(3), over: Math.round(over),
+        sat: n.classList.contains('bsat'), op: +op.toFixed(3), over: +over.toFixed(1),
+        rot: (/rotate\(([-\d.]+)deg\)/u.exec(n.style.transform || '') || [])[1] || '0',
         rect: [Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)] });
     }
   }
@@ -179,10 +189,14 @@ async function sweepSkyEdges(page, host, label, drag) {
   await page.waitForTimeout(1500);
   const worst = [];
   let total = 0;
-  const sample = async () => {
-    const seen = await readCutNodes(page, LEGIBLE);
+  let samples = 0;
+  // every crossing drawn above 0 is kept, with the moment it was seen; the legibility row
+  // filters this same list by its floor, so both rows judge one sweep
+  const sample = async (phase = 'rest') => {
+    const seen = await readCutNodes(page, 0);
     total = Math.max(total, seen.total);
-    worst.push(...seen.cut);
+    samples += 1;
+    worst.push(...seen.cut.map((c) => ({ ...c, phase })));
   };
   for (let i = 0; i < 4; i += 1) { await page.waitForTimeout(700); await sample(); }
   // raise a constellation: its satellites sit at 0.95 and orbit, which is where the walk's
@@ -192,19 +206,19 @@ async function sweepSkyEdges(page, host, label, drag) {
     const box = await word.boundingBox().catch(() => null);
     if (box) { await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2); await page.waitForTimeout(1200); }
   }
-  for (let i = 0; i < 4; i += 1) { await page.waitForTimeout(700); await sample(); }
+  for (let i = 0; i < 4; i += 1) { await page.waitForTimeout(700); await sample('bloom'); }
   // and while the field is carried: a node crossing the rim must fade, not slide out whole
   for (const [dx, dy] of [[-150, -90], [150, 90], [-90, 150]]) {
     await page.mouse.move(drag.x, drag.y);
     await page.mouse.down();
     for (let s = 1; s <= 5; s += 1) await page.mouse.move(drag.x + (dx * s) / 5, drag.y + (dy * s) / 5);
-    await sample();
+    await sample('drag');
     await page.mouse.up();
     await page.waitForTimeout(500);
-    await sample();
+    await sample('after-drag');
   }
   worst.sort((a, b) => b.op - a.op);
-  return { total, cut: worst };
+  return { total, samples, cut: worst };
 }
 const readKeptStars = (page) => page.evaluate(() => [...document.querySelectorAll('.scale-star-kept')]
   .filter((n) => !n.hidden)
@@ -430,14 +444,24 @@ try {
           if (!AS_BASE && CONTROL === 'edge' && hit === '/drift-layer.js') {
             text = swap(text, NEW_EDGE_GUARD, OLD_EDGE_GUARD, 'edge');
           }
+          // the no-sliver control: the donor's band back, running 34px past the rim
+          if (!AS_BASE && CONTROL === 'curve' && hit === '/drift-layer.js') {
+            text = swap(text, NEW_CURVE, OLD_CURVE, 'curve');
+          }
           return route.fulfill({ status: 200, contentType: TYPE[hit.slice(hit.lastIndexOf('.'))], body: text });
         });
         const swept = await sweepSkyEdges(edgePage, host, sizeName, { x: width / 2, y: height / 2 });
-        const kinds = [...new Set(swept.cut.map((c) => c.kind))].join('+') || 'none';
+        const legible = swept.cut.filter((c) => c.op >= LEGIBLE);
+        const kinds = [...new Set(legible.map((c) => c.kind))].join('+') || 'none';
         check(`${tag} · H2-1 ${sizeName} ${width}×${height}: nothing legible is cut by the glass edge`,
-          swept.total > 0 && swept.cut.length === 0,
-          `${swept.total} nodes drawn, ${swept.cut.length} cut at ≥${LEGIBLE} opacity (${kinds})`
-          + `${swept.cut.length ? `: ${JSON.stringify(swept.cut.slice(0, 4))}` : ''}`);
+          swept.total > 0 && legible.length === 0,
+          `${swept.total} nodes drawn, ${legible.length} cut at ≥${LEGIBLE} opacity (${kinds})`
+          + `${legible.length ? `: ${JSON.stringify(legible.slice(0, 4))}` : ''}`);
+        const faintKinds = [...new Set(swept.cut.map((c) => c.kind))].join('+') || 'none';
+        check(`${tag} · H2-1 ${sizeName} ${width}×${height}: no sky word draws above opacity 0 while its box crosses the rim`,
+          swept.total > 0 && swept.samples > 0 && swept.cut.length === 0,
+          `${swept.total} nodes drawn, ${swept.samples} samples, ${swept.cut.length} crossings drawn above 0 (${faintKinds})`
+          + `${swept.cut.length ? `, brightest ${swept.cut[0].op}: ${JSON.stringify(swept.cut.slice(0, 4))}` : ''}`);
         await edgePage.screenshot({ path: join(out, `edges-${sizeName}-${AS_BASE ? 'base' : 'branch'}${CONTROL ? `-${CONTROL}` : ''}.png`) });
         check(`${tag} · H2-1 ${sizeName} no page errors`, edgeErrors.length === 0, edgeErrors.slice(0, 2).join(' | '));
         await edgeContext.close();
