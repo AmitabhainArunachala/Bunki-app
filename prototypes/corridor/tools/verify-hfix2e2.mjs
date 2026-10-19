@@ -157,6 +157,7 @@ async function row(name, item, body) {
     pass = true;
   } catch (problem) {
     error = String(problem.stack || problem).split('\n').slice(0, 4).join(' | ');
+    detail = problem.detail ?? null;
   }
   results.push({ name, item, pass, detail, error, before, after: load() });
   console.log(`${pass ? '  ok  ' : ' FAIL '} ${name}${error ? `  — ${error.slice(0, 600)}` : ''}`);
@@ -245,10 +246,14 @@ async function x13Walk(width, height) {
         firstCovered: covered.slice(0, 3).map((s) => ({ y: s.y, mark: s.mark, glass: s.glass, over: s.over.slice(0, 4), press: s.press.slice(0, 4), hits: s.hits.slice(0, 4) })),
         sample: stops[Math.floor(stops.length / 2)] && { ...stops[Math.floor(stops.length / 2)], over: undefined, press: undefined, hits: undefined },
         tokensSeen: stops.reduce((n, s) => n + s.tokens, 0), errors };
-      assert(stops.length >= 8 && max > height * 3, `the walk covers a long article: ${JSON.stringify(detail)}`);
-      assert.equal(unreachable.length, 0, `層 is shown, 44×44 and the top thing at its own centre at every stop: ${JSON.stringify(unreachable.slice(0, 2))}`);
-      assert.equal(covered.length, 0, `層 never stands over a reading token, its press region or a press at its centre: ${JSON.stringify(detail.firstCovered)}`);
-      assert.deepEqual(errors, [], 'no page error');
+      const words = new Set(covered.flatMap((s) => [...s.over, ...s.press, ...s.hits].map((o) => o.text)));
+      Object.assign(detail, { wordsUnder: words.size, stopsWithBox: covered.filter((s) => s.over.length).length,
+        stopsWithReach: covered.filter((s) => s.press.length).length, stopsWithPress: covered.filter((s) => s.hits.length).length });
+      const fail = (message) => { const problem = new Error(message); problem.detail = detail; throw problem; };
+      if (!(stops.length >= 8 && max > height * 3)) fail(`the walk covers a long article: ${JSON.stringify(detail)}`);
+      if (unreachable.length) fail(`層 is shown, 44×44 and the top thing at its own centre at every stop: ${JSON.stringify(unreachable.slice(0, 2))}`);
+      if (covered.length) fail(`層 stands over the reading at ${covered.length} of ${stops.length} stops (${words.size} words): ${JSON.stringify(detail.firstCovered)}`);
+      if (errors.length) fail(`page errors: ${errors.join(' | ')}`);
       return detail;
     } finally { await context.close(); }
   });
